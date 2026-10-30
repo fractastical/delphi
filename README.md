@@ -2,7 +2,22 @@
 
 This project was created for **Science Claw Hack @ MIT**.
 
-It builds on the Project Delphi ontology and uses [nanopublications](https://nanopub.net/) (nanopubs) as the format for publishing and querying small, citable, machine-readable scientific claims.
+## Goal
+
+Our goal is to find the **fundamental theorems of biology**: the general laws that hold across organisms, scales, and systems, stated precisely enough to test.
+
+To get there, we:
+
+- extract candidate laws from the literature as claims, each traced back to its source papers and datasets;
+- formalize them where possible, for example as Lean 4 theorems using the ontology's formal-verification terms;
+- test them against real empirical data, and record the evidence and our assessments of it;
+- publish each step as a nanopublication, so every candidate law, test, and assessment can be cited, queried, and challenged.
+
+A machine-checked proof shows that a theorem follows from its stated assumptions. It does not show that living systems satisfy those assumptions, which is a question for evidence and experiment.
+
+## Approach
+
+This project builds on the Project Delphi ontology and uses [nanopublications](https://nanopub.net/) (nanopubs) as the format for publishing and querying small, citable, machine-readable scientific claims.
 
 ## Best practices
 
