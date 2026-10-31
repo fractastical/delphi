@@ -88,6 +88,7 @@ with sync_playwright() as p:
     assert "posterior (under" not in nt and "decision:" not in nt and pg.locator("#beliefout table").count() == 0, nt[:300]
     pg.goto(base + "/index.html#/work?tab=resources"); pg.wait_for_selector("h2:has-text('Live system report')", timeout=20000)
     rt = pg.locator("#sysraw").inner_text().lower(); print("SYSTEM:", rt[:160].replace("\n", " "))
+    assert "running release (measured)" in rt and "tasks, specs and goal as the running checkout reports them" in rt, rt[:400]
     assert "store" in rt and "actual cost: unknown" in rt and "not attributable to any job, team or service" in rt and "claim" in rt, rt[:500]
     pg.goto(base + "/index.html#/work"); expect(pg.locator("#depsha")).not_to_have_text("asking the runtime…", timeout=20000)
     print("DEPLOYED:", pg.locator("#depsha").inner_text()[:120]); assert "measured" in pg.locator("#depsha").inner_text() or "not reported" in pg.locator("#depsha").inner_text()
