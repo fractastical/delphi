@@ -1,0 +1,67 @@
+@prefix this: <https://w3id.org/np/RAwxJeO-upXOe_AeL_dlGAKkJxWXvNt1-fkkbS7u5NKwY>.
+@prefix sub: <https://w3id.org/np/RAwxJeO-upXOe_AeL_dlGAKkJxWXvNt1-fkkbS7u5NKwY/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0> a <http://www.w3.org/2004/02/skos/core#Concept>, <https://w3id.org/delphi/ontology/Concept>;
+    dc:description "Scores how far a claim can be resolved, that is confirmed or refuted, by analysing scientific datasets that are publicly available today, without collecting new data. It scores testability with existing data, not whether the claim is true. Each dimension is a graded judgement in [0,1] (delphi:hasScore), never a probability. The overall score is the weighted mean of the five dimensions, computed by the pipeline from the assessor's dimension scores. Version 0.2.0 has the same dimensions, anchors and weights as 0.1.0 with author-neutral wording, so it applies to claims from any source work. Verdicts: resolvable-now = existing open data and standard methods could confirm or refute the claim as stated; partially-resolvable = existing data can test part of the claim, a restricted scope of it, or a proxy for it; needs-new-data = testable in principle, but the necessary data do not exist yet; not-empirically-resolvable = the claim is definitional, conceptual, or has no measurable consequence that distinguishes it from rivals.";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Resolvability of a claim with currently available datasets, v0.2.0";
+    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://github.com/fractastical/delphisci/blob/90eb9de2a1dac758f5a0d9f03de43cac7c8b6dd7/thompson-growth-form/assessment/rubric.json>;
+    <http://www.w3.org/2004/02/skos/core#narrower> <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-analysis-feasibility>, <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-data-adequacy>, <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-data-existence>, <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-discriminating-power>, <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-operationalizability>.
+<https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-analysis-feasibility> a <http://www.w3.org/2004/02/skos/core#Concept>, <https://w3id.org/delphi/ontology/Concept>;
+    dc:description "Weight 0.15. Could a small team with standard methods run the analysis on the existing data within weeks? Anchors: 0.0 = would require years of compilation or methods that do not exist; 0.5 = months of data harmonization or specialist methods; 1.0 = standard analysis, days to weeks.";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Analysis feasibility (dataset-resolvability 0.2.0)";
+    <http://www.w3.org/2004/02/skos/core#broader> <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0>.
+<https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-data-adequacy> a <http://www.w3.org/2004/02/skos/core#Concept>, <https://w3id.org/delphi/ontology/Concept>;
+    dc:description "Weight 0.2. Do those datasets have the coverage, sample size, taxonomic, spatial and temporal scope and resolution that the claim's scope requires? Anchors: 0.0 = available data cover a negligible or badly biased fraction of the claim's scope; 0.5 = adequate for a subset (some taxa, regions or periods) only; 1.0 = coverage and resolution match the claim's full stated scope.";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Data adequacy (dataset-resolvability 0.2.0)";
+    <http://www.w3.org/2004/02/skos/core#broader> <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0>.
+<https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-data-existence> a <http://www.w3.org/2004/02/skos/core#Concept>, <https://w3id.org/delphi/ontology/Concept>;
+    dc:description "Weight 0.25. Do specific, publicly accessible datasets exist today that contain the variables needed? Anchors: 0.0 = no dataset known to contain the variables; 0.5 = data exist but are scattered across papers, supplements or restricted repositories and would have to be compiled; 1.0 = one or more named, openly downloadable datasets contain the variables directly.";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Data existence (dataset-resolvability 0.2.0)";
+    <http://www.w3.org/2004/02/skos/core#broader> <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0>.
+<https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-discriminating-power> a <http://www.w3.org/2004/02/skos/core#Concept>, <https://w3id.org/delphi/ontology/Concept>;
+    dc:description "Weight 0.2. Would the analysis discriminate the claim from its plausible rivals, rather than being uninformative, confounded, or circular (for example testing descent with a tree built by assuming it)? Anchors: 0.0 = every plausible outcome is compatible with both the claim and its rivals, or the test is circular; 0.5 = informative but with serious confounds or known biases (e.g. preservation or sampling bias); 1.0 = a clean test whose outcome would clearly favour the claim or its rival.";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Discriminating power (dataset-resolvability 0.2.0)";
+    <http://www.w3.org/2004/02/skos/core#broader> <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0>.
+<https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-operationalizability> a <http://www.w3.org/2004/02/skos/core#Concept>, <https://w3id.org/delphi/ontology/Concept>;
+    dc:description "Weight 0.2. Can the claim be turned into measurable variables and an explicit decision criterion (what result would confirm it, what would refute it) without losing what the author meant? Anchors: 0.0 = no measurable content: definitional, metaphysical or purely rhetorical; 0.5 = measurable only after substantial interpretation, or several competing operationalizations; 1.0 = maps directly onto standard measured variables with an obvious confirming and refuting result.";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Operationalizability (dataset-resolvability 0.2.0)";
+    <http://www.w3.org/2004/02/skos/core#broader> <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0>
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://orcid.org/0009-0007-4948-9192>, <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-builder>;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/90eb9de2a1dac758f5a0d9f03de43cac7c8b6dd7/thompson-growth-form/assessment/rubric.json>.
+<https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-builder> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci On Growth and Form pipeline builder";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Rubric: Resolvability of a claim with currently available datasets, v0.2.0";
+    dc:created "2026-10-31T03:37:40.168Z"^^xsd:dateTime;
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Concept>;
+    npx:introduces <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917>.
+<https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> <http://www.w3.org/2000/01/rdf-schema#label> "thompson-growth-form-1917".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "H7+WC2mAWO8r9gz6q88RugdTjR++j1B8g7esWnCfA2BSINFspWynnRHL5KaYftGMjpdsVIn7+A6zYEu1lIf5bwEpHTJ+Cp02J6AesNt4MssXx4Ny5zZsDI0APzIdF7fXWGndIH4lDOHlTnoWpHXQx1sjM3eq5EHYH/XuDuqBUcSWpfScQ3qwk1/lSLIw9VYeX6gU8HGwwDMOvhcOb7RvyNd9Es+9E2R+MoLyrT1ORF3c7vt5uAKtU/HNBVx1pIr9A0f2QME6cZNDw3FOP++HXeCzlIWHyA5/VjGzDy8GhJtnE+DHZu2jdAhjzgHI+xL+klIi4VisGkUVnaXbTDYBvw=="
+}
