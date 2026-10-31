@@ -79,8 +79,11 @@ def pbdb_taxon(name):
     if not recs:
         return None
     r = recs[0]
+    def val(k):
+        v = r.get(k)
+        return None if (v is None or str(v).startswith("NO_")) else v
     out = {"taxon_no": int(r["oid"].split(":")[1]), "name": r["nam"], "rank": r.get("rnk"), "n_occurrences": r.get("noc"),
-           "is_extant": r.get("ext"), "phylum": r.get("phl"), "class": r.get("cll"), "order": r.get("odl"), "family": r.get("fml")}
+           "is_extant": r.get("ext"), "phylum": val("phl"), "class": val("cll"), "order": val("odl"), "family": val("fml")}
     if r.get("acc") and r["acc"] != r["oid"]:
         out["accepted_taxon_no"] = int(r["acc"].split(":")[1])
         out["accepted_name"] = r.get("acn")
@@ -124,7 +127,8 @@ def main():
         names = [t["query"]] + ([accepted] if accepted != t["query"] else []) + t.get("wd_names", [])
         qid, _ = wikidata_qid(names)
         taxid = ncbi_taxid(t["query"]) or (ncbi_taxid(accepted) if accepted != t["query"] else None)
-        pb = pbdb_taxon(t["query"]) if t.get("extinct") else None
+        # PBDB for extinct taxa, and for extant higher taxa the GBIF backbone lacks (their fossil record is still a dataset)
+        pb = pbdb_taxon(t["query"]) if (t.get("extinct") or not usage.get("key")) else None
         wo = worms_aphia(t["query"]) if t.get("marine") else None
 
         lineage = {k: usage.get(k) for k in ("phylum", "class", "order", "family")}
