@@ -1,0 +1,28 @@
+{
+  "claim_id": "wolfram2002-ch03-10",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch03-10",
+  "project": "wolfram-nks",
+  "status": "preregistered",
+  "hypothesis": "Every parallel substitution system in which each element is replaced according to its own colour alone (a context-free morphism iterated from a single element) produces a nested pattern: operationally, the sequence it generates has sub-exponential subword complexity (at most quadratic, as Pansiot's theorem gives for pure morphic words), never the near-maximal complexity of a random or 'complex' sequence; whereas substitution systems whose replacement depends on a neighbouring element can produce sequences of near-maximal subword complexity.",
+  "pass_criterion": "Pre-registered: enumerate exhaustively (a) all 225 neighbour-independent systems with 2 colours and replacement strings of length 0..3, and (b) all 2197 systems with 3 colours and replacement strings of length 0..2; start each from each single colour and iterate until the string has at least 2^15 symbols (or the string dies out, stays bounded for 60 steps, or exceeds 10^6 symbols). For every run that reaches 2^15 symbols ('growing'), compute the subword complexity p(n) (number of distinct length-n factors) of the first min(len, 2^17) symbols for n = 1..20. The claim passes if every growing neighbour-independent run has p(20) <= 10^4 and p(20)/p(10) <= 8 (a quadratic law gives 4, an exponential law about 2^10), and if the Thue-Morse system {0 -> 01, 1 -> 10} reproduces OEIS A010060 and the Fibonacci system {0 -> 01, 1 -> 0} reproduces OEIS A003849 term for term over the available b-file terms. Discriminating power: the neighbour-dependent control family (2 colours, replacement of each element determined by the pair (element, right neighbour), replacement strings of length 1 or 2, 1296 systems, right-most element paired with colour 0) must contain at least one system whose growing run has p(20) > 2 x 10^4 and p(20)/p(10) > 8; otherwise the test cannot separate the two families and the verdict is at most 'inconclusive'.",
+  "fail_criterion": "Pre-registered: 'refutes' if any growing neighbour-independent run has p(20) > 10^4 or p(20)/p(10) > 8, or if the Thue-Morse or Fibonacci outputs disagree with the OEIS b-files; 'inconclusive' if the control family contains no system exceeding the thresholds (the complexity measure would then be too weak to distinguish nested from more complicated behaviour).",
+  "planned_datasets": [
+    "neighbour-independent-substitution-systems",
+    "neighbour-dependent-control-systems",
+    "oeis-a010060-bfile",
+    "oeis-a003849-bfile"
+  ],
+  "interpretation": "Wolfram's 'nested pattern' is given a formal operational content as low (sub-exponential, at most polynomial) subword complexity, which is the standard combinatorial signature of self-similar/morphic sequences: the Thue-Morse, Fibonacci and Cantor examples he gives all have p(n) = O(n). Rules whose replacement for some colour is the empty string, or that keep every string bounded, are included in the enumeration but can only give finite or eventually periodic output, which is trivially nested; the complexity test is applied to growing runs only. The claim's second half ('more complicated behaviour requires neighbour dependence') is tested only in the direction that neighbour-dependent systems can exceed the complexity bound, as a check of discriminating power; the universal statement itself is tested by exhaustive enumeration of two finite families.",
+  "datasets": [],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-wolfram-nks-0123",
+    "date": "2026-10-31"
+  }
+}
