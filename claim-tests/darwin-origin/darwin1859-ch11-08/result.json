@@ -1,0 +1,29 @@
+{
+  "claim_id": "darwin1859-ch11-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch11-08",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "If now-separate continents and the existing oceanic islands were not continuously or almost continuously joined by land during the period of existing species, then even at the lowest Quaternary sea level (about -130 m) the sea floor between them should remain submerged: oceanic islands should not connect to any continent, and the Atlantic, Indian and Southern Ocean gaps between continents should not close.",
+  "pass_criterion": "Pre-registered. Using the NOAA ETOPO 2022 global relief model exported from the NCEI image service onto a 0.1-degree grid, cells with elevation >= -130 m are treated as potentially emergent and labelled into connected components (with longitude wrap). The 45 pre-registered oceanic islands in derived/sites.csv are checked for membership of a continental component (continent seeds in the same file). Five continental gaps are tested for connection at -130 m: (T1) Eurasia-North America via the Atlantic, with the Bering region (lat > 55 N, lon 160 E to 160 W) masked as deep; (T2) Africa/Eurasia-South America; (T3) Australia/New Guinea-Asia; (T4) Antarctica-South America; (T5) Antarctica-Australia. The claim is SUPPORTED if none of T1-T5 is connected at -130 m and at least 90% of the oceanic islands are unconnected. A set of 20 continental (shelf or fragment) islands is run as a positive control and is not part of the verdict.",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if two or more of T1-T5 are connected at -130 m, or if 25% or more of the oceanic islands connect to a continent at -130 m. Other outcomes are 'mixed'. The Bering connection between Eurasia and North America is reported separately with its sill depth (the shallowest threshold at which the two connect) because Darwin's wording concerns continents that are 'now quite separate' and he explicitly accepted a near-continuous circumpolar land connection during the glacial period (Chapter XI); it does not enter the verdict.",
+  "planned_datasets": ["noaa-etopo-2022-ncei-imageserver"],
+  "interpretation": "'The recent period' / 'period of existing species' is read as the Quaternary, for which the maximum glacio-eustatic sea-level fall (about 120-130 m below present) is the most generous possible allowance for land exposure; a gap that remains submerged at -130 m cannot have been bridged by land at any time in that period without vertical crustal movement, which Darwin's opponents (Forbes) invoked and Darwin doubted. 'Oceanic islands' are the volcanic and coral islands listed in derived/sites.csv (one representative point each). 'Continuously or almost continuously united' is approximated by connectivity at the extreme lowstand; connections that exist only near -130 m were at most intermittent, which already satisfies Darwin's denial, so the test is conservative with respect to the claim. The 0.1-degree grid (about 11 km) cannot resolve straits narrower than a cell; bilinear resampling smooths sills, which is noted as a limitation.",
+  "datasets": [
+    {
+      "id": "noaa-etopo-2022-ncei-imageserver",
+      "name": "NOAA NCEI ETOPO 2022 Global Relief Model, served via the DEM_mosaics/DEM_all ArcGIS ImageServer (exportImage)",
+      "landing_url": "https://www.ncei.noaa.gov/products/etopo-global-relief-model",
+      "doi": "10.25921/fd45-gt74",
+      "version": "ETOPO 2022 (as served 2026)",
+      "license": "public domain (US Government work)",
+      "files": [],
+      "role": "global elevation/bathymetry on a 0.1-degree grid"
+    }
+  ],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-b201", "date": "2026-10-31" }
+}
