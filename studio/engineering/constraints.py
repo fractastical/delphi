@@ -607,6 +607,16 @@ def q_speed_max(v) -> Constraint:
 
 # ---- solver -> Lean certificate (one pattern) ------------------------------------------------------------------
 
+_LEAN_IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_']*$")
+_LEAN_RESERVED = frozenset({
+    "theorem", "lemma", "def", "example", "instance", "structure", "inductive", "class", "namespace", "section",
+    "end", "open", "import", "variable", "universe", "axiom", "abbrev", "macro", "syntax", "elab", "by", "fun",
+    "let", "have", "show", "from", "at", "in", "match", "with", "if", "then", "else", "do", "sorry", "set_option",
+    "attribute", "local", "private", "protected", "noncomputable", "partial", "unsafe", "opaque", "where",
+    "deriving", "mutual", "extends", "calc", "True", "False", "Type", "Prop", "Sort",
+})
+
+
 def _terms_eq(a, b) -> bool:
     """Structural equality of two term tuples, order-insensitive, dimensions included."""
     def norm(ts):
@@ -632,12 +642,19 @@ def lean_conflict_certificate(model: Model, result: "SolveResult | Mapping", que
       * the result is only required to claim `unsat` with exactly this core, as a sanity gate -- the
         emitted theorem's truth does not depend on it.
     Emitting this text is not running Lean."""
+    if not _LEAN_IDENT.match(name) or name in _LEAN_RESERVED:
+        raise ValueError(f"unsafe Lean identifier {name!r}: need [A-Za-z_][A-Za-z0-9_']* and not a Lean keyword")
+    query = list(query)  # materialise ONCE: a generator would otherwise be consumed by the first use
+    try:
+        model.validate(query)  # units, duplicates, reserved names, positivity, no-op terms
+    except (ValueError, KeyError):
+        return None
     r = result if isinstance(result, Mapping) else result.to_json()
     if r.get("status") != "unsat" or set(r.get("conflict") or []) != {"q_wl_min", "q_speed_max", "level_lift_proxy"}:
         return None
-    by = {c.name: c for c in list(model.constraints) + list(query)}
-    if len(by) != len(model.constraints) + len(list(query)) or any(n not in by for n in
-                                                                  ("q_wl_min", "q_speed_max", "level_lift_proxy")):
+    by = {c.name: c for c in list(model.constraints) + query}
+    if len(by) != len(model.constraints) + len(query) or any(n not in by for n in
+                                                            ("q_wl_min", "q_speed_max", "level_lift_proxy")):
         return None
     lift, wl, sp = by["level_lift_proxy"], by["q_wl_min"], by["q_speed_max"]
     d_wl, d_v = dim(kg=1, m=-1, s=-2), dim(m=1, s=-1)
