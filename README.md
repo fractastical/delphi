@@ -22,6 +22,34 @@ To get there, we:
 
 A machine-checked proof shows that a theorem follows from its stated assumptions. It does not show that living systems satisfy those assumptions, which is a question for evidence and experiment. Likewise, each organism's simulation is checked against that organism's own data, not data borrowed from another species.
 
+## Progress at a glance
+
+Illustrated summaries of what has been done so far, regenerated as the project moves. All counts come from the repo itself (git history, `delphi_overview`, `organisms/merged/`, `cell-geometry/results/`).
+
+### Everything so far
+
+Claims, assessments, nanopub files, organisms, claim tests, registries and commits per hour, from the first commit through the overnight run.
+
+![Snapshot of everything so far](assets/repo-snapshot.png)
+
+### Commit history, animated
+
+One frame per commit of the opening evening (18:40 to midnight, Oct 30, 2026): claims extracted, assessments, nanopub files, and the repo layout filling in.
+
+![Animated commit history](assets/repo-history.gif)
+
+### Organisms overnight
+
+The parallel cloud-agent run that vendored organism reference data for every chapter of Darwin and Thompson: 782 taxa, 3,340 mentions, 1,372 dataset records, merged in [`organisms/`](organisms/README.md).
+
+![Organisms overnight run](assets/organisms-overnight.gif)
+
+### Nebius
+
+Cellpose-SAM on the Nebius Scientific AI Platform segmented micrographs from seven species to test three of Thompson's cell-packing claims; see [`cell-geometry/`](cell-geometry/README.md).
+
+![What we did with Nebius](assets/nebius-snapshot.png)
+
 ## Approach
 
 This project builds on the Project Delphi ontology and uses [nanopublications](https://nanopub.net/) (nanopubs) as the format for publishing and querying small, citable, machine-readable scientific claims.
