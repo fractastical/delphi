@@ -61,23 +61,31 @@
 
   /* Home: sourced anatomy beside the actual 3D candidate. Statuses are the fish3d candidate's own; nothing is called validated. */
   const STATUS_WORDS = { derived: "derived from a sourced fit", functional: "set from a sourced relation or the design target", figure_read: "read from a published figure", aesthetic: "aesthetic choice", assumed: "assumed", numerical: "numerical setting", design_assumption: "design assumption", "assumed transfer": "assumed transfer" };
+  /* Candidate-dependent statement about what the selected 3D model is. Status words are the candidate's own; nothing is called validated. */
+  function groundNote(c, H) {
+    const sc = c.status_counts || {}; const parts = Object.entries(sc).map(([k, n]) => n + " " + (STATUS_WORDS[k] || k)).join(", ");
+    if (!c.knobs) return html`<b>Not biorealistic and not validated.</b> This baseline is an engineered candidate sized from published measurements. Its flat fin plates (${H.candidate.fin_thickness.value} mm), lattice scales and decorative eyes are assumptions. ${H.candidate.label}`;
+    const rays = c.rays ? Object.entries(c.rays).map(([k, n]) => k + " " + n).join(", ") : "";
+    return html`<b>Ray-supported fins and a scale map, not a validated fish.</b> Selected candidate ${c.label}: fins are modelled as individual rays with a membrane between them${rays ? " (" + rays + " rays)" : ""}; ray counts, attachments, outline and scales are sourced where the viewer's table says so and assumed otherwise. Recorded parameter statuses: ${parts || "not recorded"}. Eyes and gill covers are simplified, pigment is an appearance choice, and no biological or aerodynamic validation is claimed. The data panel and region cards below describe the N1 baseline reference.`;
+  }
+
   function groundingSection(snap) {
     const H = snap.home_biology;
     if (!H) return html`<section class="panel"><h2>Start from real fish anatomy.</h2><p class="empty">No fish3d candidate or fish-control data is present in this snapshot.</p></section>`;
     const f = H.fitted[0]; const c = H.candidate; const sh = Object.entries(H.fish1990.pectoral_share_pct_mean_se).sort((x, y) => x[1][0] - y[1][0]); const lo = sh[0], hi = sh[sh.length - 1]; const cm = (snap.coupling_manifest || {}).counts; const SOFT = new Set(["aesthetic", "assumed", "numerical", "assumed transfer", "design_assumption"]);
     return html`<section class="panel grounding" aria-labelledby="gr-h"><h2 id="gr-h">Start from real fish anatomy.</h2>
-      <p class="note warn small"><b>Not biorealistic and not validated.</b> This is an engineered candidate sized from published measurements. Its flat fin plates (${c.fin_thickness.value} mm), lattice scales and decorative eyes are assumptions, marked below. ${c.label}</p>
+      <p class="note warn small" id="grnote"></p>
       ${snap.fish3d_viewer ? html`<div class="fishchoose"><label for="fishcand"><b>Candidate</b></label> <select id="fishcand">${snap.fish3d_viewer.candidates.map((c, i) => html`<option value="${c.id}" ${i === (snap.fish3d_viewer.candidates.length > 1 ? 1 : 0) ? raw("selected") : ""}>${c.label}</option>`)}</select> <span class="small faint" id="fishknobs"></span></div>
         <h3 class="sr">Interactive 3D candidate</h3>
         <div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint" id="fishnote">The 3D model is a candidate mesh. Colours and pigment bands are appearance choices, each marked sourced or assumed in the viewer. Not an organism and not an aerodynamic result. The schematic drawing and printable models are below.</p>` : ""}
       <div class="groundgrid"><div><div id="fishmini" class="fishmini"></div></div>
-        <div><h3>What the body and fins are sized from</h3>
+        <div><h3>What the body and fins are sized from <span class="faint small">(N1 baseline reference)</span></h3>
           <p>Candidate N1: standard length ${c.standard_length_mm.toFixed(1)} mm, wing span ${c.wing_span_mm.toFixed(1)} mm, wing area ${Math.round(c.wing_area_mm2)} mm², mass ${c.mass_kg} kg.</p>
           <ul>
             <li><b>Measured here:</b> pectoral fin length against standard length in ${f.n} preserved ${f.group} specimens (${f.species.join(", ")}; ${f.material}) follows length ∝ SL<sup>${f.b.toFixed(3)}</sup>, 95% bootstrap interval ${f.b_ci95[0].toFixed(3)} to ${f.b_ci95[1].toFixed(3)}, R² ${f.r2.toFixed(3)}. Species and sizes are pooled. Source: Daane et al. 2021, Data S1A, fit made in this repository.</li>
             <li><b>Published, raw data unavailable:</b> Fish 1990 reports the pectoral fins as ${lo[0]} (${lo[1][0]} ± ${lo[1][1]}%) to ${hi[0]} (${hi[1][0]} ± ${hi[1][1]}%) of wing area by genus, and ${H.fish1990.hypocaudal_share_pct_mean_se[0]}% ± ${H.fish1990.hypocaudal_share_pct_mean_se[1]} of caudal area in the lower lobe (pooled). ${H.fish1990.raw_data}.</li></ul>
           <p class="small"><b>Evidence kinds, kept apart:</b> ${Object.entries(H.evidence_counts).map(([k, n]) => html`${U.pill(n + " " + k.replace(/_/g, " "), "grp")} `)} ${H.no_cross_source_conversion} These are different kinds of record, not ${Object.values(H.evidence_counts).reduce((a, b) => a + b, 0)} empirically learned laws. ${H.knobs_status}.</p>
-          <h3>Region by region: where each parameter comes from</h3>
+          <h3>Region by region: where each parameter comes from <span class="faint small">(the N1 baseline reference, not the candidate selected above)</span></h3>
           <div class="regiongrid">${H.regions.map((r) => { const soft = Object.entries(r.params).filter(([, v]) => SOFT.has(v)).map(([k, v]) => k.replace(/_/g, " ") + " (" + (STATUS_WORDS[v] || v) + ")"); const hard = Object.entries(r.params).filter(([, v]) => !SOFT.has(v)); return html`<article class="region"><h4>${r.id}</h4>
             <p class="small">${hard.length} parameter${hard.length === 1 ? "" : "s"} sourced, derived or read from a figure: ${[...new Set(hard.map(([, v]) => STATUS_WORDS[v] || v))].join("; ") || "none"}.</p>
             ${soft.length ? html`<p class="small assumed"><b>Assumed or chosen:</b> ${soft.join("; ")}.</p>` : ""}${r.notes.length ? html`<p class="small faint">${r.notes[0]}</p>` : ""}</article>`; })}</div>
@@ -115,12 +123,13 @@
           const host = root.querySelector("#fish-viewer"), sel = root.querySelector("#fishcand"); let viewer = null, gen = 0;
           const mount = async () => {
             const my = ++gen; const c = snap.fish3d_viewer.candidates.find((x) => x.id === sel.value);
+            root.querySelector("#grnote").innerHTML = groundNote(c, snap.home_biology).toString();
             root.querySelector("#fishknobs").textContent = c.knobs ? Object.entries(c.knobs).map(([k, v]) => k.replace(/_/g, " ") + " " + v).join(" · ") : "baseline: flat fin plates, assumed thickness";
-            try { const m = await import("./model-viewer.js"); if (my !== gen) return; if (viewer && viewer.dispose) viewer.dispose(); host.textContent = ""; host.className = "fishviewer";
-              viewer = m.mountFishViewer(host, { base: c.base, layout: "hero", ...(c.variants.length ? { variants: c.variants } : {}) }); }
+            try { const m = await import("./model-viewer.js"); if (my !== gen) return; if (viewer && viewer.destroy) viewer.destroy(); host.textContent = ""; host.className = "fishviewer";
+              viewer = m.mountFishViewer(host, { base: c.base, layout: "hero", ...(c.variants.length ? { variants: c.variants } : {}) }); DF.fishViewer = viewer; }
             catch (e) { host.textContent = "The 3D viewer could not load (" + e.message + "). The turntable and drawing remain below."; }
           };
-          sel.addEventListener("change", mount); DF.onLeave(() => { gen++; if (viewer && viewer.dispose) viewer.dispose(); }); mount();
+          sel.addEventListener("change", mount); DF.onLeave(() => { gen++; if (viewer && viewer.destroy) viewer.destroy(); viewer = null; DF.fishViewer = null; }); mount();
         }
         DF.bindForm(root, "goal", (v) => DF.href("/studio", { goal: v.goal }));
         try { const L = await DF.liveQuestionCount(); if (L) root.querySelector("#homeq").parentElement.innerHTML = `<b>${L.n}</b> questions in the live node <span class="faint small">(${esc(L.source)})</span>`; } catch (e) { /* the snapshot figure stays */ }

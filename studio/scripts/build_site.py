@@ -12,6 +12,7 @@ those is derivable from a file here.
 from __future__ import annotations
 
 import argparse
+import collections
 import datetime
 import json
 import re
@@ -408,7 +409,7 @@ def fish3d_files(ins: Inputs, out: dict) -> dict | None:
     for v in comps.values():
         if v.get("stl"):
             put(cid, v["stl"], v.get("stl_sha256"))
-    candidates = [{"id": cid, "label": "N1 baseline (flat fin plates)", "base": f"artifacts/fish3d/{cid}/", "variants": [], "knobs": None, "candidate_sha256": json.loads(ins.read(f"{d}/candidate.json")).get("candidate_sha256")}]
+    candidates = [{"id": cid, "label": "N1 baseline (flat fin plates)", "base": f"artifacts/fish3d/{cid}/", "variants": [], "knobs": None, "status_counts": dict(collections.Counter(p["status"] for c in comps.values() for p in c.get("params", {}).values() if isinstance(p, dict) and "status" in p)), "rays": None, "candidate_sha256": json.loads(ins.read(f"{d}/candidate.json")).get("candidate_sha256")}]
     ix = "artifacts/fish3d/v3-index.json"
     if (ROOT / ix).exists():
         V = json.loads(ins.read(ix))
@@ -423,7 +424,9 @@ def fish3d_files(ins: Inputs, out: dict) -> dict | None:
                     put(vid, c["stl"], c.get("stl_sha256"))
             if ok:
                 candidates.append({"id": vid, "label": vid.replace("fish3d-", ""), "base": f"artifacts/fish3d/{vid}/", "knobs": meta["knobs"], "candidate_sha256": meta["candidate_sha256"],
-                                   "variants": [{"id": "adult-fao", "glb": "fish-adult-fao.glb", "appearance": "appearance-adult-fao.json", "poster": "preview-adult-fao.png"}]})
+                                   "variants": [{"id": "adult-fao", "glb": "fish-adult-fao.glb", "appearance": "appearance-adult-fao.json", "poster": "preview-adult-fao.png", "video": None}],
+                                   "status_counts": dict(collections.Counter(p["status"] for c in vc.values() for p in c.get("params", {}).values() if isinstance(p, dict) and "status" in p)),
+                                   "rays": {k: f["n_rays"] for k, f in json.loads(ins.read(f"{vd}/rays.json"))["fins"].items()} if (ROOT / vd / "rays.json").exists() else None})
         shared = V.get("shared")
     else:
         shared = None

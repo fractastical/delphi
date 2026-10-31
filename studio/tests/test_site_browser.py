@@ -865,8 +865,11 @@ def test_home_leads_with_sourced_anatomy_assumptions_and_the_actual_candidate(br
     pg.goto(base + "#/home")
     pg.wait_for_selector(".grounding .region")
     t = pg.locator(".grounding").text_content()
-    assert "Start from real fish anatomy." in t and "Not biorealistic and not validated" in t
-    assert "flat fin plates" in t and "lattice scales" in t and "decorative eyes" in t
+    assert "Start from real fish anatomy." in t and "not a validated fish" in t and "no biological or aerodynamic validation is claimed" in t
+    pg.select_option("#fishcand", "fish3d-N1-cypselurus-baseline")
+    pg.wait_for_function("document.querySelector('#grnote').textContent.includes('flat fin plates')")
+    t = pg.locator(".grounding").text_content()
+    assert "Not biorealistic and not validated" in t and "lattice scales" in t and "decorative eyes" in t
     assert "length ∝ SL" in t and "R² 0.98" in t and "raw data unavailable" in t.lower() or "UNAVAILABLE" in t
     assert "not 51 empirically learned laws" in t
     assert pg.locator(".grounding .region").count() == 9 and pg.locator(".grounding .region .assumed").count() >= 5
@@ -1149,3 +1152,28 @@ def test_frontier_board_graph_labels_stay_inside_the_drawing_and_do_not_overlap(
         pg.goto(base + "#/frontier"); pg.wait_for_selector("#wbgraph svg")
         g = _graph_issues(pg, "#wbgraph")
         assert g.get("outside") == [] and g.get("overlaps") == [], (w, g)
+
+
+def test_home_viewer_is_destroyed_on_candidate_change_and_on_leaving_and_the_note_follows_the_candidate(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/home")
+    pg.wait_for_selector("#fish-viewer.mv")
+    pg.wait_for_function("window.DF && DF.fishViewer && typeof DF.fishViewer.destroy === 'function'")
+    pg.evaluate("() => { window.__destroyed = 0; const v = DF.fishViewer; const d = v.destroy.bind(v); v.destroy = () => { window.__destroyed++; d(); }; }")
+    note = pg.locator("#grnote").text_content()
+    assert "Ray-supported fins" in note and "not a validated fish" in note and "flat fin plates" not in note and "N1 baseline reference" in note
+    assert "N1 baseline reference" in pg.locator(".grounding h3").first.text_content() or "N1 baseline reference" in pg.locator(".grounding").text_content()
+    pg.select_option("#fishcand", "fish3d-N1-cypselurus-baseline")
+    pg.wait_for_function("document.querySelector('#grnote').textContent.includes('flat fin plates')")
+    assert pg.evaluate("window.__destroyed") == 1, "changing candidate must destroy the previous viewer"
+    pg.wait_for_function("DF.fishViewer && typeof DF.fishViewer.destroy === 'function'")
+    pg.evaluate("() => { window.__destroyed = 0; const v = DF.fishViewer; const d = v.destroy.bind(v); v.destroy = () => { window.__destroyed++; d(); }; }")
+    pg.evaluate("location.hash = '#/knowledge'"); pg.wait_for_selector("#cbrowse")
+    assert pg.evaluate("window.__destroyed") == 1 and pg.evaluate("DF.fishViewer") is None, "leaving Home must destroy the viewer"
+    assert pg.locator("canvas.mv-canvas, #fish-viewer canvas").count() == 0
+
+
+def test_v3_candidates_declare_no_video_so_the_fallback_cannot_offer_a_missing_turntable(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    for c in snap["fish3d_viewer"]["candidates"][1:]:
+        assert c["variants"] and all("video" in v and v["video"] is None for v in c["variants"]), c["id"]
