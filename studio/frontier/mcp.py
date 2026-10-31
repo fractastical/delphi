@@ -21,6 +21,8 @@ from mcp.types import ToolAnnotations
 from pydantic import Field, ValidationError
 
 from .models import KINDS, MAX_BUNDLE_RECORDS, MAX_RECORD_BYTES, PAYLOADS, POLICY, SCHEMA, Ref
+from .search import SEARCH_KIND, SearchIndex
+from .artifacts import ArtifactIndex
 from .store import FrontierError, Store
 
 MANIFEST_VERSION = "frontier-mcp-capabilities-0.1"
@@ -89,9 +91,14 @@ def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = Non
         tools.append({"name": fn.__name__, "kind": kind, "requires_role": requires, "summary": (fn.__doc__ or "").strip().split("\n")[0]})
         server.tool(annotations=annotations)(_guard(fn))
 
-    def frontier_search(query: str = "", kind: str | None = None, status: str | None = None, limit: int = 20, after: str = "") -> dict:
-        """Read public current versions using literal text and structured filters, maximum 50."""
-        return store.search(query=query, kind=kind, status=status, limit=limit, after=after)
+    index = SearchIndex(store)
+
+    def frontier_search(query: str = "", kind: str | None = None, status: str | list[str] | None = None, limit: int = 20, after: str = "",
+                        kinds: list[str] | None = None, source: str | None = None, scope: str | None = None, context: str | None = None,
+                        include_history: bool = False, cursor: str = "") -> dict:
+        """Search public records: GIN full-text plus literal text, exact version/id/source pins, kind/status/source/scope/context filters, bounded pages (max 50). Lexical only, no embeddings; relevance is not truth."""
+        return index.query(query=query, kind=kind, kinds=kinds, status=status, source=source, scope=scope, context=context,
+                           include_history=include_history, limit=limit, cursor=cursor, after=after)
 
     def frontier_get(target: Ref) -> dict:
         """Retrieve one exact public version and its separate node-local review status."""
@@ -105,7 +112,12 @@ def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = Non
         """Read an append-only public event page; consumers deduplicate event versions."""
         return store.events(after=after, limit=limit)
 
-    for f in (frontier_search, frontier_get, frontier_neighborhood, frontier_events):
+    def frontier_artifacts(query: str = "", role: str | None = None, evidence_kind: str | None = None,
+                           limit: int = 20, cursor: str = "") -> dict:
+        """Find public artifact declarations with evidence, action, context and review links. Does not fetch or verify bytes."""
+        return ArtifactIndex(store).search(query, role=role, evidence_kind=evidence_kind, limit=limit, cursor=cursor)
+
+    for f in (frontier_search, frontier_get, frontier_neighborhood, frontier_events, frontier_artifacts):
         register(f, READ, "read", None)
 
     def manifest() -> dict:
@@ -114,7 +126,9 @@ def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = Non
                 "credentials": "Process environment only (FRONTIER_DSN; FRONTIER_TOKEN with --allow-write). Never accepted as a tool argument, never returned.",
                 "tools": tools, "not_available": NOT_AVAILABLE, "record_kinds": list(KINDS),
                 "schema_resources": "frontier://schema/{kind} returns that kind's payload JSON schema",
+                "payload_extensions": ["Claim.origin", "Problem.approach/scales/context_tags", "Action.inputs", "Evidence.relation/produced_by/artifacts"],
                 "limits": {"max_record_bytes": MAX_RECORD_BYTES, "max_bundle_records": MAX_BUNDLE_RECORDS, "search_page_max": 50, "lease_seconds": [1, 600]},
+                "search": {"engine": SEARCH_KIND, "filters": ["kind|kinds", "status", "source (URI prefix)", "scope", "context", "include_history"], "exact_pins": ["version", "record id", "source URI"], "pagination": "opaque next_cursor, pass back as cursor (or legacy after)"},
                 "transition_states_via_mcp": ["ready (coordinator only)", "running", "submitted", "blocked", "cancelled", "failed"],
                 "lease_id_note": "A lease_id is a bearer capability for that lease: keep it inside the leasing agent's session. It is not logged by this server.",
                 "write_semantics": "Writes return the store's response verbatim: records start 'proposed'; MCP cannot make anything 'accepted'."}

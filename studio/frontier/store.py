@@ -138,6 +138,16 @@ class Store:
             raise Forbidden("Required role missing")
         return p
 
+    def principal(self, token: str) -> dict:
+        """Who a credential belongs to, WITHOUT the credential. Read-only; raises Unauthorized for a missing or unknown token.
+
+        Public replacement for callers that reached into `_auth` (the MCP server's startup check and manifest, the admin tool).
+        Changes no other store behaviour."""
+        with self.connection() as c:
+            p = self._auth(c, token)
+        return {"actor": p["actor"], "operator": p["operator"], "roles": list(p["roles"]), "namespaces": list(p["namespaces"]),
+                "daily_write_limit": p["daily_write_limit"]}
+
     def _read_principal(self, c, token):
         return self._auth(c, token) if token else None
 
@@ -160,6 +170,9 @@ class Store:
     def _validate_refs(self, c, record, principal, current=True):
         for relation, target in references(record):
             referenced = self._raw(c, target, principal, current=current)
+            if record["kind"] == "Evidence" and relation == "produced_by":
+                if referenced["payload"]["target"] != record["payload"]["target"]:
+                    raise Conflict("Producing action and evidence must pin the same target")
             # An action needs acceptance criteria, falsifiers, a next action and a stop bound.
             # A `recorded` problem has none of them, so there is nothing to execute or to stop.
             if record["kind"] == "Action" and relation == "targets" and referenced["kind"] == "Problem":

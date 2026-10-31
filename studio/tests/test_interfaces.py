@@ -56,7 +56,7 @@ def test_http_real_authenticated_proposal_and_shared_read(store):
 
 
 ROOT = Path(__file__).resolve().parents[1]
-READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_capabilities"}
+READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_capabilities", "frontier_artifacts"}
 WRITE_TOOLS = {"frontier_propose", "frontier_lease", "frontier_transition"}
 SECRET_NAMES = {"token", "dsn", "password", "credential", "authorization", "secret", "api_key", "apikey"}
 
@@ -100,6 +100,8 @@ def test_official_mcp_stdio_reads_same_persisted_record(store):
             value = val(await session.call_tool("frontier_get", {"target": ref(record)}))
             assert value["record"] == record
             assert (await session.call_tool("frontier_search", {"limit": 51})).isError
+            assert (await session.call_tool("frontier_artifacts", {"limit": 51})).isError
+            assert val(await session.call_tool("frontier_artifacts", {}))["items"] == []
             caps = val(await session.call_tool("frontier_capabilities", {}))
             assert caps["mode"] == "read_only" and caps["principal"] is None and caps["namespace"] == store.namespace
             assert {t["name"] for t in caps["tools"]} == READ_TOOLS and "review" in " ".join(caps["not_available"])

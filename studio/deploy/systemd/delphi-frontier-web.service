@@ -1,0 +1,27 @@
+# Delphi Frontier website/API adapter: loopback 127.0.0.1:8971, nginx (frontier.morphoswarm.ai) in front. USER unit.
+# NOT INSTALLED by the branch that added it; install steps are in docs/runtime.md.
+# Access token: the studio service's existing EnvironmentFile (MORPHOSWARM_STUDIO_TOKEN) and/or a dedicated FRONTIER_ACCESS_TOKEN in
+# web.env (FRONTIER_ACCESS_TOKEN wins). No value is in this repository and this unit never prints one. NOTE: studio.env holds the studio's
+# other settings too; the adapter reads only the two names above, but if you want a smaller blast radius create web.env and drop the studio line.
+[Unit]
+Description=Delphi Frontier website/API (loopback 8971)
+After=delphi-frontier-postgres.service
+Requires=delphi-frontier-postgres.service
+
+[Service]
+Type=simple
+WorkingDirectory=/data/services/delphi-frontier/app
+Environment="FRONTIER_DSN=host=/data/services/delphi-frontier/run port=5471 dbname=frontier user=frontier_app"
+Environment=OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+EnvironmentFile=-%h/.config/morphoswarm/studio.env
+EnvironmentFile=-%h/.config/delphi-frontier/web.env
+ExecStart=/home/ubuntu/miniconda3/bin/python -m frontier.web --namespace delphi-frontier --schema public --port 8971 --site /data/services/delphi-frontier/app/site
+Restart=always
+RestartSec=3
+MemoryMax=1G
+MemorySwapMax=0
+TasksMax=64
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=default.target
