@@ -1127,3 +1127,21 @@ def test_malformed_entity_route_makes_no_request_and_navigation_moves_focus_to_m
     assert not [u for u in seen if "Bogus" in u]
     pg.evaluate("location.hash = '#/knowledge'"); pg.wait_for_selector("#cbrowse")
     assert pg.evaluate("document.activeElement && document.activeElement.id") == "main"
+
+
+def _graph_issues(pg, selector):
+    return pg.evaluate("""(sel) => { const svg = document.querySelector(sel + ' svg'); if (!svg) return {missing: true};
+      const box = svg.getBoundingClientRect(); const labels = [...svg.querySelectorAll('.g-label, .g-sub, .col-title, text')].map(t => ({r: t.getBoundingClientRect(), s: t.textContent.trim()})).filter(x => x.s && x.r.width > 0);
+      const out = labels.filter(x => x.r.left < box.left - 1 || x.r.right > box.right + 1).map(x => x.s.slice(0, 30));
+      const hosts = svg.closest('.graphhost'); const hostBox = hosts ? hosts.getBoundingClientRect() : box;
+      const overlaps = []; const lab = [...svg.querySelectorAll('.g-label')].map(t => ({r: t.getBoundingClientRect(), s: t.textContent.trim()}));
+      for (let i = 0; i < lab.length; i++) for (let j = i + 1; j < lab.length; j++) { const a = lab[i].r, b = lab[j].r; const ox = Math.min(a.right, b.right) - Math.max(a.left, b.left), oy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top); if (ox > 2 && oy > 2) overlaps.push([lab[i].s.slice(0, 20), lab[j].s.slice(0, 20)]); }
+      return {outside: out, overlaps: overlaps.slice(0, 5), n: labels.length}; }""", selector)
+
+
+def test_frontier_board_graph_labels_stay_inside_the_drawing_and_do_not_overlap(browser, base):
+    for w, h in ((1280, 900), (400, 800)):
+        pg = page(browser, w, h)
+        pg.goto(base + "#/frontier"); pg.wait_for_selector("#wbgraph svg")
+        g = _graph_issues(pg, "#wbgraph")
+        assert g.get("outside") == [] and g.get("overlaps") == [], (w, g)
