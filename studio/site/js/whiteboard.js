@@ -223,7 +223,7 @@
 
 `,
       async after(root) {
-        DF.mountFishMini(root.querySelector("#fishmini"));
+        DF.mountFishMini(root.querySelector("#fishmini"), snap);
         DF.renderLiveQuestions(root.querySelector("#livepanel"), snap, route);
         const cls = { goal: "goal", con: "con" };
         DF.graph.draw(root.querySelector("#wbgraph"), {

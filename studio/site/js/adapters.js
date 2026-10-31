@@ -45,11 +45,11 @@
   }
 
   /* Catalog: GET /api/catalog?query&kind&status&limit<=50&after -> {records, next_cursor, namespace, mode}. */
-  async function catalog({ query = "", kind = "", status = "", limit = 20, after = "" } = {}) {
+  async function catalog({ query = "", kind = "", status = "", limit = 20, after = "", signal = null } = {}) {
     limit = Math.max(1, Math.min(50, limit | 0 || 20));
     if (isLive()) {
       const q = new URLSearchParams(); if (query) q.set("query", query); if (kind) q.set("kind", kind); if (status) q.set("status", status); q.set("limit", String(limit)); if (after) q.set("after", after);
-      const r = await getJSON("api/catalog?" + q.toString());
+      const r = await getJSON("api/catalog?" + q.toString(), 3000, signal);
       return { records: (r.results || []).map(norm), next_cursor: r.next_cursor || null, namespace: r.namespace || null, mode: r.mode || "live", search_mode: r.search_mode || null, source: "runtime" };
     }
     const needle = query.trim().toLowerCase();

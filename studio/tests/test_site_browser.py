@@ -699,3 +699,50 @@ def test_frontier_shows_the_3d_fish_above_the_open_questions(browser, base):
     fish_y = pg.locator("#fishmini").bounding_box()["y"]
     board_y = pg.locator("#wb-h").bounding_box()["y"]
     assert fish_y < board_y, (fish_y, board_y)
+
+
+def test_knowledge_infinite_scroll_appends_one_page_at_a_time_with_retry_and_end(browser, base):
+    import json as _j
+    from urllib.parse import urlparse, parse_qs
+    calls = []
+
+    def rec(i):
+        return {"record": {"namespace": "n", "kind": "Claim", "id": f"c{i:03d}", "version": "a" * 64, "payload": {"title": f"Claim {i}", "statement": f"S{i}"}}, "local_status": "proposed", "is_head": True}
+
+    def catalog(route):
+        q = parse_qs(urlparse(route.request.url).query); after = q.get("after", [""])[0]; calls.append(after)
+        if after == "c049" and calls.count("c049") == 1:
+            return route.fulfill(status=503, json={"error": "x", "message": "temporarily down"})
+        start = int(after[1:]) + 1 if after else 0
+        end = min(start + 50, 120)
+        route.fulfill(json={"mode": "live", "namespace": "n", "results": [rec(i) for i in range(start, end)], "next_cursor": None if end >= 120 else f"c{end - 1:03d}"})
+
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", catalog)
+    pg.goto(base + "#/knowledge")
+    pg.wait_for_selector("#cblist .claimcard")
+    pg.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+    pg.wait_for_selector("#cbmore [role=alert]")           # scrolling (or the sentinel) asked for page 2 and the node refused
+    assert pg.locator("#cblist .claimcard").count() == 50 and "Page 1" not in pg.locator("#main").inner_text()
+    pg.click("#cbmore [data-more]")                       # retry
+    pg.wait_for_function("document.querySelectorAll('#cblist .claimcard').length === 100")
+    pg.evaluate("window.scrollTo(0, document.body.scrollHeight)")   # scrolling alone loads the last page
+    pg.wait_for_function("document.querySelectorAll('#cblist .claimcard').length === 120")
+    assert "End of the list" in pg.locator("#cbmore").inner_text()
+    assert len(pg.locator("#cblist .claimcard").evaluate_all("els => [...new Set(els.map(e => e.textContent))]")) == 120
+
+
+def test_home_and_frontier_offer_all_six_printable_models_with_stl_download(browser, base):
+    names = ["A-precursor-short-fin", "B-two-wing-glider", "C-four-wing-glider", "N1-cypselurus-baseline", "N2-area-x1.3", "N3-area-x1.3-ar-x1.2"]
+    for route in ("#/home", "#/frontier"):
+        pg = page(browser)
+        pg.goto(base + route)
+        pg.wait_for_selector(".printmodels select")
+        assert pg.locator(".printmodels option").all_inner_texts() == names
+        pg.select_option(".printmodels select", "N2-area-x1.3")
+        dl = pg.locator(".printmodels a[download]")
+        assert dl.get_attribute("href").endswith("artifacts/print/stl/N2-area-x1.3.stl") and dl.get_attribute("download") == "N2-area-x1.3.stl"
+        info = pg.locator(".printmodels p").inner_text()
+        assert " mm" in info and "does not change" in info

@@ -38,12 +38,25 @@
     return { redraw };
   };
 
-  DF.mountFishMini = function (host) {
+  DF.mountFishMini = function (host, snap) {
     host.innerHTML = '<div class="mini-canvas"></div>';
     DF.mountFishCanvas(host.querySelector(".mini-canvas"), { getCand: () => DF.cand });
     const cap = document.createElement("p"); cap.className = "caption";
-    cap.innerHTML = `Candidate: <b>${esc(DF.candLabel || "custom")}</b>. Dimensions are arithmetic or illustration, not a measured fish. <a href="${DF.href("/engineering")}">Change it in Engineering</a>.`;
+    cap.innerHTML = `Drawing: candidate <b>${esc(DF.candLabel || "custom")}</b>, a schematic from the Engineering parameters, not one of the printable STL models below. Dimensions are arithmetic or illustration, not a measured fish. <a href="${DF.href("/engineering")}">Change it in Engineering</a>.`;
     host.appendChild(cap);
+    const forms = ((snap && snap.print_forms && snap.print_forms.forms) || []).filter((f) => f.files && f.files.stl);
+    if (!forms.length) return;
+    const id = "pm" + Math.random().toString(36).slice(2, 7);
+    const box = document.createElement("div"); box.className = "printmodels";
+    box.innerHTML = html`<label for="${id}"><b>Printable models</b> (STL, millimetres)</label> <select id="${id}">${forms.map((f) => html`<option value="${f.id}">${f.id}</option>`)}</select> <a class="btn small" id="${id}-dl" download>Download STL</a>
+      <p class="small faint" id="${id}-info" aria-live="polite"></p>`.toString();
+    host.appendChild(box);
+    const selEl = box.querySelector("select"), dl = box.querySelector("a"), info = box.querySelector("p");
+    const show = () => {
+      const f = forms.find((x) => x.id === selEl.value); dl.href = f.files.stl.href; dl.setAttribute("download", f.id + ".stl"); dl.setAttribute("aria-label", "Download " + f.id + ".stl");
+      info.textContent = `${f.title}. Bounding box ${(f.bounds_mm || []).map((v) => v.toFixed(1)).join(" × ")} mm at print size. Illustrative print form, not a validated design; the drawing above does not change with this choice.`;
+    };
+    selEl.addEventListener("change", show); show();
   };
 
   /* STL (binary or ASCII) -> triangles in metres in the viewer's frame (x length, y up = STL z, z right = STL y). */
