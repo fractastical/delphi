@@ -1,12 +1,52 @@
 {
  "schema": "frontier-site-snapshot-0.1",
- "label": "snapshot of inputs 62f52d337a08",
- "input_fingerprint": "62f52d337a08f05778495b32ef4b122765a41d7d65e82ad5bb7fe6b5cb10e9c2",
+ "label": "snapshot of inputs 611f3bd35dee",
+ "input_fingerprint": "611f3bd35dee84913dc48c6e81a0688e1e75369119534af812e2ca8063b09076",
  "inputs": [
   {
    "path": "GOAL.md",
    "sha256": "9b74f9dd41603df14c4c6467beed907eb55a9d9b58be2ef173dc04a3749753c4",
    "bytes": 6906
+  },
+  {
+   "path": "artifacts/bioelectric/bioelectric.mp4",
+   "sha256": "25647a2a6b87a23a695bcb130c47073acce5928f1ebffc9bc17466b3074fb594",
+   "bytes": 157609
+  },
+  {
+   "path": "artifacts/bioelectric/controls_baseline.json",
+   "sha256": "c12e6404ad3da96a5b2aadc849f5ff569ba6065dccc29ff1c4d3d6102a3c0d09",
+   "bytes": 2021
+  },
+  {
+   "path": "artifacts/bioelectric/manifest.json",
+   "sha256": "e6436fa5a4f30f2638068c7314b9f20e4800536ccb087e2d858bc5ee2f3a0be3",
+   "bytes": 9171
+  },
+  {
+   "path": "artifacts/bioelectric/poster.png",
+   "sha256": "a21730262a7fdf928b111ec7083de99e3d8f53f86265fab1d88cece9b331cb83",
+   "bytes": 123076
+  },
+  {
+   "path": "artifacts/bioelectric/render_receipt.json",
+   "sha256": "e6801066b8048df05e3c86f7f066d51971b74c5820b181c41f56ccdc1e2611a7",
+   "bytes": 1972
+  },
+  {
+   "path": "artifacts/mechanobio/mechanobio.mp4",
+   "sha256": "993fca9057746fae6f9bd56518619a45f5582397f82c6c3abfb3cdc7d5a1602e",
+   "bytes": 264242
+  },
+  {
+   "path": "artifacts/mechanobio/poster.png",
+   "sha256": "967255cda3309b2e67f93d3aaaf3dc0908185be331734c6bea5492f95b3c9b2f",
+   "bytes": 162992
+  },
+  {
+   "path": "artifacts/mechanobio/render-manifest.json",
+   "sha256": "5fcbcbf424b12e98dd9f3e4941157265d6f8ee69159f1c102a968af3d6d83ebb",
+   "bytes": 2287
   },
   {
    "path": "artifacts/print/design/A-precursor-short-fin.json",
@@ -3926,6 +3966,109 @@
    ],
    "couplings": [],
    "manifest": "engineering/fin_mechanics/artifacts/manifest.json",
+   "native": true
+  },
+  {
+   "id": "bioelectric-cells",
+   "title": "Bioelectric cell-voltage model: baseline, sodium-reduced and disconnected gap junctions",
+   "scales": [
+    "cellular"
+   ],
+   "evidence_kind": "SimulationResult",
+   "model": {
+    "name": "frontier.bioelectric.bundle/1",
+    "context": "Saved states of an electrophysiology model rendered as frames. convergence checked for default HH scenario and smooth passive cable; not the entire atlas"
+   },
+   "time": {
+    "units": "model time in milliseconds; 30.0 ms horizon shown over 7.5 s of video",
+    "note": "none; selected actual saved state frames"
+   },
+   "video": {
+    "file": "bioelectric.mp4",
+    "sha256": "25647a2a6b87a23a695bcb130c47073acce5928f1ebffc9bc17466b3074fb594",
+    "note": "180 frames at 24 fps"
+   },
+   "video_state": "present_verified",
+   "video_href": "artifacts/simulations/bioelectric-cells/bioelectric.mp4",
+   "poster_href": "artifacts/simulations/bioelectric-cells/poster.png",
+   "numerical_checks": [
+    {
+     "name": "sealed equal area gap charge balance",
+     "result": "passed",
+     "tolerance": 1e-12
+    },
+    {
+     "name": "frozen gate capacitive relaxation closed form",
+     "result": "passed",
+     "tolerance": 1e-07
+    },
+    {
+     "name": "voltage clamp gate closed form",
+     "result": "passed",
+     "tolerance": 1e-09
+    },
+    {
+     "name": "sealed passive cable grid convergence",
+     "result": "passed",
+     "tolerance": null
+    },
+    {
+     "name": "HH time step convergence",
+     "result": "passed",
+     "tolerance": null
+    },
+    {
+     "name": "mutation control",
+     "result": "recorded in mutation_receipt.json"
+    }
+   ],
+   "parameter_unknowns": [
+    "Bounds: sodium_scale, potassium_scale, gap_mS_cm2, stimulus_uA_cm2, temperature_c, duration_ms, dt_ms"
+   ],
+   "open_questions": [
+    "Biological validation: not attempted; source parameters, no raw-data reproduction or fin transfer"
+   ],
+   "couplings": [],
+   "manifest": "artifacts/bioelectric/manifest.json",
+   "native": true
+  },
+  {
+   "id": "mechanobio-clutch",
+   "title": "Adhesion clutch mechanics (render of a simulation)",
+   "scales": [
+    "cellular"
+   ],
+   "evidence_kind": "render_of_simulation",
+   "model": {
+    "name": "frontier.mechanobio.render-manifest/1",
+    "context": "Frames chosen from a saved molecular-clutch trajectory and its response sweep; not a cell and not a fin."
+   },
+   "time": {
+    "units": "model time in seconds (see the trajectory file)",
+    "note": "180 frames at 15 fps, frame indices hashed (e0f5b8273e5f…)"
+   },
+   "video": {
+    "file": "mechanobio.mp4",
+    "sha256": "993fca9057746fae6f9bd56518619a45f5582397f82c6c3abfb3cdc7d5a1602e",
+    "note": "264242 bytes"
+   },
+   "video_state": "present_verified",
+   "video_href": "artifacts/simulations/mechanobio-clutch/mechanobio.mp4",
+   "poster_href": "artifacts/simulations/mechanobio-clutch/poster.png",
+   "numerical_checks": [
+    {
+     "name": "controls",
+     "result": "recorded in controls.json and protocol.json"
+    }
+   ],
+   "parameter_unknowns": [
+    "Environment and parameter provenance are in environment.json and protocol.json; transfer to a fin is not attempted."
+   ],
+   "open_questions": [
+    "What measured traction or substrate stiffness would calibrate this against a real tissue?"
+   ],
+   "couplings": [],
+   "manifest": "artifacts/mechanobio/render-manifest.json",
    "native": true
   },
   {

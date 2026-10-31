@@ -646,3 +646,23 @@ def test_assurance_map_renders_vectors_regions_matrix_and_never_a_percentage(bro
     pg.click(".mcell[data-from=m2][data-to=m3]")
     assert "unknown" in pg.locator("#asmcell").inner_text()
     assert "expected information gain" in txt.lower() and "not computed" in txt.lower()
+
+
+def test_connect_tab_states_what_is_and_is_not_verified(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=connect")
+    pg.wait_for_selector("#cn-h")
+    txt = pg.locator("#main").inner_text().lower()
+    assert "not verified" in txt and "frontier_artifacts" in txt and "never put a credential" in txt
+    assert pg.input_value("#sharelink").startswith("http")
+
+
+def test_gallery_has_every_verified_video_with_a_player(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    ids = [m["id"] for m in snap["simulation_manifests"] if m.get("video_state") == "present_verified"]
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector(".simcard")
+    assert pg.locator("video").count() == len(ids) and len(ids) >= 4
+    for i in ids:
+        assert pg.locator(f"#sim-{i} video").count() == 1, i

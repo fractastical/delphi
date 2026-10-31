@@ -313,6 +313,32 @@ def native_video_cards(ins: Inputs, out: dict) -> list[dict]:
             "numerical_checks": [{"name": "frames flagged invalid by the beam checker", "result": f"{v['n_frames_invalid']} of {v['n_frames']}"}, {"name": "reproducible quantity", "result": "frames_data_sha256 " + v["frames_data_sha256"][:16] + "…"}],
             "parameter_unknowns": ["Material and geometry come from the request file, not from a measured fin."], "open_questions": ["Which loads on a real fin ray would the load bridge need from the glide model, and with what uncertainty?"],
             "couplings": [], "manifest": f"{d}/manifest.json", "native": True})
+    d = "artifacts/bioelectric"; mf = ROOT / d / "manifest.json"
+    if mf.exists():
+        m = json.loads(ins.read(f"{d}/manifest.json")); fl = m.get("files", {}); rr = json.loads(ins.read(f"{d}/render_receipt.json")) if (ROOT / d / "render_receipt.json").exists() else {}
+        vsha = (fl.get("bioelectric.mp4") or {}).get("sha256"); psha = (fl.get("poster.png") or {}).get("sha256")
+        st, href = _vid(ins, out, "bioelectric-cells", d, "bioelectric.mp4", vsha) if vsha else ("none", None)
+        _, ph = _vid(ins, out, "bioelectric-cells", d, "poster.png", psha) if psha else (None, None)
+        ctrl = json.loads(ins.read(f"{d}/controls_baseline.json")) if (ROOT / d / "controls_baseline.json").exists() else {}
+        cards.append({"id": "bioelectric-cells", "title": "Bioelectric cell-voltage model: baseline, sodium-reduced and disconnected gap junctions", "scales": ["cellular"], "evidence_kind": m.get("evidence_kind", "SimulationResult"),
+            "model": {"name": m.get("schema"), "context": "Saved states of an electrophysiology model rendered as frames. " + str(m.get("numerical_scope", ""))},
+            "time": {"units": f"model time in milliseconds; {rr.get('model_horizon_ms')} ms horizon shown over {rr.get('wall_playback_seconds')} s of video", "note": str(rr.get("temporal_interpolation", ""))},
+            "video": {"file": "bioelectric.mp4", "sha256": vsha, "note": f"{rr.get('n_frames')} frames at {rr.get('fps')} fps"}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": c.get("name", "control").replace("_", " "), "result": "passed" if c.get("passed") else "FAILED", "tolerance": c.get("tolerance") or c.get("tolerance_mV")} for c in (ctrl.get("checks") or [])][:6] + [{"name": "mutation control", "result": "recorded in mutation_receipt.json"}],
+            "parameter_unknowns": ["Bounds: " + ", ".join(m.get("bounds", {}) if isinstance(m.get("bounds"), dict) else m.get("bounds", []))], "open_questions": ["Biological validation: " + str(m.get("biological_validation", "not stated"))],
+            "couplings": [], "manifest": f"{d}/manifest.json", "native": True})
+    d = "artifacts/mechanobio"; mf = ROOT / d / "render-manifest.json"
+    if mf.exists():
+        m = json.loads(ins.read(f"{d}/render-manifest.json")); by = {a["title"]: a for a in m.get("artifacts", [])}
+        v = by.get("mechanobio.mp4"); po = by.get("poster.png")
+        st, href = _vid(ins, out, "mechanobio-clutch", d, "mechanobio.mp4", v["sha256"]) if v else ("none", None)
+        _, ph = _vid(ins, out, "mechanobio-clutch", d, "poster.png", po["sha256"]) if po else (None, None)
+        cards.append({"id": "mechanobio-clutch", "title": "Adhesion clutch mechanics (render of a simulation)", "scales": ["cellular"], "evidence_kind": m.get("evidence_kind", "render_of_simulation"),
+            "model": {"name": m.get("schema"), "context": "Frames chosen from a saved molecular-clutch trajectory and its response sweep; not a cell and not a fin."},
+            "time": {"units": "model time in seconds (see the trajectory file)", "note": f"{m.get('frames')} frames at {m.get('fps')} fps, frame indices hashed ({str(m.get('frame_indices_sha256'))[:12]}…)"},
+            "video": {"file": "mechanobio.mp4", "sha256": v["sha256"] if v else None, "note": f"{v['byte_size']} bytes" if v else ""}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": "controls", "result": "recorded in controls.json and protocol.json"}], "parameter_unknowns": ["Environment and parameter provenance are in environment.json and protocol.json; transfer to a fin is not attempted."],
+            "open_questions": ["What measured traction or substrate stiffness would calibrate this against a real tissue?"], "couplings": [], "manifest": f"{d}/render-manifest.json", "native": True})
     d = "engineering/simulation/video"
     for mname, vid, title, scale in (("manifest.json", "glide-fixed-launch", "Glide trajectories at a fixed launch (point mass)", "organism"), ("manifest_rd.json", "rd-fields", "Reaction-diffusion field time series", "tissue")):
         if not (ROOT / d / mname).exists():

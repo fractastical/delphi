@@ -2,7 +2,7 @@
  * author_report (what documents and people say) and measured (what a receipt in the tree records). */
 (function () {
   const DF = window.DF; const { html, raw, esc } = DF; const U = DF.ui;
-  const TABS = [["overview", "Overview"], ["specs", "Specs and goals"], ["work", "Work and bottlenecks"], ["resources", "Resources"], ["receipts", "Receipts"], ["runtime", "Runtime and tools"]];
+  const TABS = [["overview", "Overview"], ["specs", "Specs and goals"], ["work", "Work and bottlenecks"], ["resources", "Resources"], ["receipts", "Receipts"], ["runtime", "Runtime and tools"], ["connect", "Connect and share"]];
   const AUTHOR = html`<span class="pill lvl-a" title="Written by the authors of the work">author report</span>`;
   const MEAS = html`<span class="pill lvl-m" title="A receipt in the tree records this">measured</span>`;
   const BLOCK = /blocked|failed|authentication|repair|requested|pending|recovery|not yet|unknown/i;
@@ -11,7 +11,7 @@
     const tab = route.params.tab || "overview"; const S = snap.system; const live = DF.api.isLive();
     const nav = html`<nav class="subnav" aria-label="System sections">${TABS.map(([k, t]) => html`<a href="${DF.href("/work", { tab: k })}" aria-current="${tab === k ? "page" : "false"}">${t}</a>`)}</nav>`;
     const head = html`<section class="pagehead"><h1>System</h1><p class="lede">What is being built, by whom, against which spec, and what has actually been measured. Two levels stay apart: ${AUTHOR} (documents and status text) and ${MEAS} (a run with a receipt). Nothing here is live activity, and no step is claimed to have built itself.</p>${nav}</section>`;
-    const body = { overview, specs, work, resources, receipts, runtime }[tab] || overview;
+    const body = { overview, specs, work, resources, receipts, runtime, connect }[tab] || overview;
     const out = body(snap, S, live, route);
     return { html: html`${head}${out.html}`, after: out.after };
   };
@@ -122,15 +122,46 @@
       ${S.measured.length ? "" : U.empty("No receipt is present in this tree.")}<p class="small faint">Not here because no receipt exists in this tree: mesh or geometry validation, controlled reuse measurements, executed claim reuse, GPU runs.</p></section>` };
   }
 
+  /* /api/counts as received: scalars with their units, nested groups collapsed, and every note or basis string kept right next to the numbers it qualifies. */
+  const NOTEKEYS = new Set(["note", "basis", "meaning", "scope", "label"]);
+  function tree(o, depth = 0) {
+    if (o === null || o === undefined) return html`<span class="faint">none</span>`;
+    if (typeof o !== "object") return html`${String(o)}`;
+    if (Array.isArray(o)) return o.length > 8 ? html`${o.length} items` : html`${o.map((x) => (typeof x === "object" ? JSON.stringify(x) : String(x))).join(", ")}`;
+    const ent = Object.entries(o); const notes = ent.filter(([k, v]) => NOTEKEYS.has(k) && typeof v === "string"); const rest = ent.filter(([k, v]) => !(NOTEKEYS.has(k) && typeof v === "string"));
+    const simple = rest.every(([, v]) => v === null || typeof v !== "object");
+    return html`${notes.map(([k, v]) => html`<p class="small faint"><b>${k}.</b> ${v}</p>`)}${simple ? html`<dl class="kv">${rest.map(([k, v]) => html`<div><dt>${k.replace(/_/g, " ")}</dt><dd>${String(v)}</dd></div>`)}</dl>` : html`<ul class="ctree">${rest.map(([k, v]) => (v && typeof v === "object" && depth >= 1 ? html`<li><details><summary>${k.replace(/_/g, " ")}</summary>${tree(v, depth + 1)}</details></li>` : html`<li><b>${k.replace(/_/g, " ")}</b>: ${tree(v, depth + 1)}</li>`))}</ul>`}`;
+  }
+  function countsView(R) {
+    const keys = Object.keys(R).filter((k) => !["cache_seconds", "schema", "generated_at"].includes(k));
+    return html`<p class="note small">Counts of records and declarations, not independent observations. A number comes with the note the node attaches to it (for example, zero byte-checked is the absence of any check, not a finding). Cached ${R.cache_seconds || "?"} s.</p>${keys.map((k) => html`<details ${["claims", "artifacts"].includes(k) ? raw("open") : ""}><summary><b>${k.replace(/_/g, " ")}</b></summary>${tree(R[k], 0)}</details>`)}`;
+  }
+
+  /* Connect and share: what a person or agent can actually use, with what is and is not verified. Nothing is claimed beyond the repository's own documents. */
+  function connect(snap, S, live) {
+    const origin = location.origin;
+    const apis = [["GET /api/health", "service status"], ["GET /api/catalog, /api/record, /api/events", "records, with exact pins"], ["GET /api/discovery?q=", "search (the response says which engine ran)"], ["GET /api/graph", "neighbourhood of one exact record"], ["GET /api/artifacts, /api/media?sha256=", "declared artifacts; node-verified local copies"], ["GET /api/attention, /api/system, /api/counts", "open work, system report, corpus counts"], ["POST /api/engineering/solve, /api/beliefs/solve, /api/simulations/run", "bounded calculations; they store nothing"]];
+    return { html: html`<section class="panel" aria-labelledby="cn-h"><h2 id="cn-h">Connect an agent (MCP)</h2>
+      <p class="note small"><b>What is verified.</b> The server code, its read-only default and its write gate are in the repository and its tests. A remote endpoint is configured on this node's address <code>${origin}/mcp</code>; a connection from a specific product client is <b>not verified</b> by this page. Treat the address as the place to try, and report what a client actually does.</p>
+      <ul><li><b>Reading</b> public records, artifacts and schemas needs no credential on a public-read node.</li><li><b>Writing</b> (propose, lease, change state) needs the calling operator's own bearer credential; it is checked per request and an invalid one is refused, never treated as anonymous. Proposals stay <i>proposed</i> until an independent operator reviews them.</li><li>Never put a credential in a prompt, a URL or a shared link.</li></ul>
+      <p class="small">Tools declared in <code>docs/mcp.md</code>: ${snap.capabilities.map((t) => html`<code>${t.name}</code> (${t.mode}) `)}. ${U.src("doc:mcp", "Read the MCP document")}</p></section>
+      <section class="panel"><h2>Use the node directly (HTTP, read-only unless noted)</h2><div class="tablewrap"><table><thead><tr><th>Endpoint</th><th>What it gives</th></tr></thead><tbody>${apis.map(([e, w]) => html`<tr><td><code>${e}</code></td><td>${w}</td></tr>`)}</tbody></table></div><p class="small faint">Calculation endpoints need a session token from <code>GET /api/session</code> and send it as <code>X-CSRF-Token</code>.</p></section>
+      <section class="panel"><h2>Share this view</h2><p class="small">The address bar carries the exact view, record pin or filter. Links to records include their version, so a shared link names the same record version for everyone.</p><p><input id="sharelink" type="text" readonly value="${location.href}" size="60" aria-label="Link to this view"> <button class="btn small" type="button" id="copylink">Copy link</button> <span id="copied" class="small" role="status"></span></p></section>`,
+      after(root) { const inp = root.querySelector("#sharelink"); root.querySelector("#copylink").addEventListener("click", async () => { inp.select(); try { await navigator.clipboard.writeText(inp.value); root.querySelector("#copied").textContent = "Copied."; } catch (e) { root.querySelector("#copied").textContent = "Select the text and copy it; this browser blocked clipboard access."; } }); } };
+  }
+
   function runtime(snap, S, live) {
     return { html: html`<section class="panel"><h2>Runtime</h2><p>${U.pill(live ? "live runtime" : "snapshot only", live ? "ok" : "warn")} ${DF.api.state.reason}.</p>
         ${live ? html`<p>Namespace: <code>${DF.api.state.health.namespace || "not reported"}</code>.</p>` : html`<p class="note small">No runtime is connected, so there are no agents, leases, resources or contributions to show. Nothing below is simulated.</p>`}</section>
       <section class="panel"><h2>Events</h2><div id="events" role="status">Loading…</div></section>
+      ${live ? html`<section class="panel" aria-labelledby="cnt-h"><h2 id="cnt-h">Corpus counts (from the node)</h2><div id="corpuscounts" role="status">Loading…</div></section>` : ""}
       ${live ? html`<section class="panel"><h2>What the live store holds</h2><p class="note small">Counts of records by kind, read by paging the catalog (50 per page). These are records, not independent observations: imported claims repeat what their sources assert.</p><button class="btn small" type="button" id="countrecs">Count records by kind</button><div id="counts" role="status"></div></section>` : ""}
       <section class="panel"><h2>Declared capabilities (MCP tools)</h2><p class="note small">Parsed from the Tools row of <code>docs/mcp.md</code>. A declared tool is not demonstrated competence; no success receipts are attached.</p>
         <div class="tablewrap"><table><thead><tr><th>Tool</th><th>Mode</th></tr></thead><tbody>${snap.capabilities.map((t) => html`<tr><td><code>${t.name}</code></td><td>${t.mode}</td></tr>`)}</tbody></table></div>
         <p class="small">Writes need <code>--allow-write</code> and an operator credential kept outside prompts; contributions stay proposed. ${U.src("doc:mcp", "Read the MCP document")}</p></section>`,
       async after(root) {
+        const cc = root.querySelector("#corpuscounts");
+        if (cc) DF.api.counts().then((r) => { cc.removeAttribute("role"); cc.innerHTML = (r.unavailable ? `<p class="empty">The counts endpoint did not answer (${esc(r.reason)}). Nothing is shown in its place; the button below pages the catalog instead.</p>` : countsView(r.report)).toString(); });
         const cb = root.querySelector("#countrecs");
         if (cb) cb.addEventListener("click", async () => {
           const out = root.querySelector("#counts"); cb.disabled = true; const rows = []; let capped = false;

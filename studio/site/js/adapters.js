@@ -90,6 +90,12 @@
     try { return await getJSON("api/media?sha256=" + sha, 6000); } catch (e) { if (/HTTP 404/.test(e.message)) state.mediaAbsent = true; return null; }
   }
 
+  /* GET /api/counts: cached corpus counts with their own notes and bases. Returned as received; rendering keeps every note next to its number. */
+  async function counts() {
+    if (!isLive()) return { unavailable: true, reason: "no live runtime" };
+    try { return { report: await getJSON("api/counts", 8000) }; } catch (e) { return { unavailable: true, reason: e.message }; }
+  }
+
   async function events() {
     if (isLive()) { const r = await getJSON("api/events?limit=50"); return { events: (r.events || []).map((e) => ({ sequence: e.sequence, kind: (e.envelope || {}).kind, id: (e.envelope || {}).id, version: (e.envelope || {}).version, issuer: (e.envelope || {}).issuer, created_at: (e.envelope || {}).created_at })), next_cursor: r.next_cursor || null, source: "runtime" }; }
     return { events: [], source: "snapshot", note: "A snapshot has no event stream." };
@@ -180,5 +186,5 @@
     } catch (e) { if (e.name === "AbortError") throw e; if (/HTTP 404/.test(e.message)) { state.graphAbsent = true; return null; } throw e; }
   }
 
-  DF.api = { state, isLive, load, discovery, graph, catalog, record, artifacts, media, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
+  DF.api = { state, isLive, load, discovery, graph, catalog, record, artifacts, media, counts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
 })();
