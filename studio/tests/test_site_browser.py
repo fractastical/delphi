@@ -437,17 +437,15 @@ def test_claim_browser_filters_cards_and_drills_down(browser, base):
     pg.wait_for_selector(".entmain h2:has-text('Statement')", timeout=15000)
 
 
-def test_graph_view_exists_is_keyboard_operable_and_says_how_it_was_built(browser, base):
+def test_graph_without_a_runtime_does_not_invent_a_neighbourhood(browser, base):
     pg = page(browser)
     pg.goto(base + "#/entity/Claim/turing-ddi")
     pg.wait_for_selector(".entside a:has-text('neighbourhood graph')")
     pg.click(".entside a:has-text('neighbourhood graph')")
-    pg.wait_for_selector("#gv svg .g-node", timeout=15000)
-    assert "Derived in this browser" in pg.locator("#gwrap").inner_text()
-    assert "Zoom in" in pg.locator(".gtools").inner_text()
-    pg.locator("#gv .g-node").first.focus()
-    pg.keyboard.press("Enter")
-    assert "Open the page" in pg.locator("#gdetail").inner_text()
+    pg.wait_for_selector("#gwrap .empty", timeout=15000)
+    txt = pg.locator("#gwrap").inner_text()
+    assert "not available on this node" in txt and "does not guess" in txt
+    assert pg.locator("#gv").count() == 0, "no drawing without the graph service"
     pg.goto(base + "#/graph/Claim/no-such")
     pg.wait_for_selector("text=could not be built", timeout=15000)
 
@@ -522,3 +520,129 @@ def test_project_draft_drives_coverage_and_annotation_drafts_export_in_the_contr
     doc = json.loads(Path(dl.value.path()).read_text())
     assert doc["payload"]["kind"] == "proposed_edit" and doc["payload"]["anchor"]["frame"] == "ui_anchor" and doc["payload"]["anchor"]["record"] is None
     assert "not submitted" in doc["note"].lower()
+
+
+SNAP_REF = lambda: next(c for c in json.loads((ROOT / "site/data/catalog.json").read_text())["records"] if c["ref"]["kind"] == "Claim")["ref"]
+
+
+def test_entity_pin_is_exact_and_never_replaced_by_a_head(browser, base):
+    ref = SNAP_REF()
+    pg = page(browser)
+    pg.goto(base + f"#/entity/Claim/{ref['id']}?v={ref['version']}&ns={ref['namespace']}")
+    pg.wait_for_selector(".entmain", timeout=15000)
+    assert "exact pin from the link" in pg.locator("#entity").inner_text()
+    pg.goto(base + f"#/entity/Claim/{ref['id']}?v={'0' * 64}&ns={ref['namespace']}")
+    pg.wait_for_selector("h1:has-text('Not found')", timeout=15000)
+    assert "not replaced by another version" in pg.locator("#entity").inner_text()
+    pg.goto(base + f"#/entity/Claim/{ref['id']}")
+    pg.wait_for_selector(".entmain", timeout=15000)
+    assert "resolved to the current head" in pg.locator("#entity").inner_text()
+
+
+def test_runtime_graph_renders_object_scope_succinctly_and_with_exact_pins(browser, base):
+    """Renderer test with a canned runtime (the static server has no /api): live health and session, an exact record, and the market graph shape."""
+    ref = SNAP_REF(); other = {"namespace": "node-a", "kind": "Evidence", "id": "ev-1", "version": "b" * 64}
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "snapshot", "results": [], "next_cursor": None}))
+    pg.route("**/api/record*", lambda r: r.fulfill(json={"mode": "live", "record": {"namespace": ref["namespace"], "kind": "Claim", "id": ref["id"], "version": ref["version"], "payload": {"title": "T", "statement": "S"}}, "local_status": "proposed", "is_head": True, "action": None}))
+    pg.route("**/api/graph*", lambda r: r.fulfill(json={"schema": "frontier-graph-0.1", "truncated": False, "counts": {"nodes": 2, "edges": 1},
+        "scope": {"visibility": "public", "edge_origin": {"typed": 1, "derived": 0}, "incoming_edges": ["a"]},
+        "nodes": [{"id": "c", "type": "Claim", "kind": "Claim", "ref": ref, "title": "Centre", "local_status": "proposed", "is_head": True, "distance": 0}, {"id": "e", "type": "Evidence", "kind": "Evidence", "ref": other, "title": "Neighbour", "local_status": "imported_unreviewed", "is_head": True, "distance": 1}],
+        "edges": [{"id": "x", "from": "e", "to": "c", "kind": "targets", "label": "targets"}]}))
+    pg.goto(base + f"#/graph/Claim/{ref['id']}?v={ref['version']}&ns={ref['namespace']}")
+    pg.wait_for_selector("#gv svg .g-node", timeout=15000)
+    txt = pg.locator("#gwrap").inner_text()
+    assert "[object Object]" not in txt and "visibility: public" in txt
+    hrefs = pg.locator("#gdetail a, #gwrap table a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert any(("v=" + "b" * 64) in h and "ns=node-a" in h for h in hrefs), hrefs
+
+
+def _mock_live(pg, run_handler):
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "results": [], "next_cursor": None}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.route("**/api/simulations/run", run_handler)
+
+
+def test_simulation_preview_widget_follows_the_contract_and_never_clamps(browser, base):
+    """Renderer and request-shape test against a canned node: exact envelope, range refusal, completed plot, unknown without frames, safe error text."""
+    seen = []
+    def handler(route):
+        body = json.loads(route.request.post_data); seen.append(body)
+        if body["model"] == "bioelectric" and body["parameters"].get("sodium_scale") == 0.35:
+            route.fulfill(json={"schema": "frontier.simulation.preview/1", "status": "completed", "model": "bioelectric", "evidence_kind": "SimulationResult", "persisted": False, "calibrated": False,
+                "request_sha256": "a" * 64, "effective_request_sha256": "b" * 64, "code_sha256": "c" * 64, "computed_at": "2026-10-31T21:00:00Z", "scope": "Preview only.", "preview_limits": {"duration_ms": [10, 30]},
+                "result": {"time_ms": [0, 1, 2, 3], "voltage_mV": [[-70, -70], [-60, -65], [-40, -50], [-30, -45]]}})
+        elif body["model"] == "mechanobio":
+            route.fulfill(status=429, json={"error": "solver_busy", "message": "Two previews are running."})
+        else:
+            route.fulfill(json={"schema": "frontier.simulation.preview/1", "status": "unknown", "reason": "compute_budget_exhausted", "model": "bioelectric", "persisted": False, "calibrated": False})
+    pg = page(browser)
+    _mock_live(pg, handler)
+    pg.goto(base + "#/studio/flying-fish?scale=cellular")
+    pg.wait_for_selector("#simwidget form", timeout=15000)
+    pg.fill("#sw-duration_ms", "99")
+    pg.click("#simwidget button[type=submit]")
+    assert "not clamped" in pg.locator("#sw-err").inner_text() and not seen, "an out-of-range value must be refused before any request"
+    pg.fill("#sw-duration_ms", "30")
+    pg.click("#simwidget button[type=submit]")
+    pg.wait_for_selector("#sw-out .rescard svg.chart", timeout=15000)
+    out = pg.locator("#sw-out").inner_text().lower()
+    assert "persisted: false" in out and "calibrated: false" in out and "not calibrated" in out and "completed" in out
+    assert set(seen[0]) == {"model", "parameters"} and seen[0]["model"] == "bioelectric" and seen[0]["parameters"]["duration_ms"] == 30
+    pg.fill("#sw-sodium_scale", "0.5")
+    pg.click("#simwidget button[type=submit]")
+    pg.wait_for_selector("#sw-out .rescard .vlabel:has-text('unknown')", timeout=15000)
+    assert "compute budget exhausted" in pg.locator("#sw-out").inner_text().lower() and pg.locator("#sw-out svg.chart").count() == 0
+    pg.select_option("#sw-model", "mechanobio")
+    pg.click("#simwidget button[type=submit]")
+    pg.wait_for_selector("#sw-out .adapter-out.unavailable", timeout=15000)
+    assert "busy" in pg.locator("#sw-out").inner_text().lower() and "429" in pg.locator("#sw-out").inner_text()
+    assert seen[-1] == {"model": "mechanobio", "parameters": {"parameters": {"viscosity_pN_s_nm": 1.0}, "duration_s": 5, "dt_s": 0.01, "frame_count": 101}}
+
+
+def test_simulation_widget_is_disabled_and_honest_without_a_node(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=cellular")
+    pg.wait_for_selector("#simwidget form", timeout=15000)
+    assert pg.locator("#simwidget button[type=submit]").is_disabled()
+    assert "Needs a live node" in pg.locator("#simwidget").inner_text()
+
+
+_ASSURANCE_FIXTURE = """() => {
+  const ev = [{path: 'artifacts/x.json', sha256: 'a'.repeat(64), selector: '$.rows[0]'}];
+  const vec = (e, n, x) => ({empirical_validation: {status: e, summary: 'no calibration data', scope: 'none', evidence: []}, numerical_fidelity: {status: n, summary: 'FEM matches closed form', scope: 'scoped controls only', evidence: ev}, cross_scale_transfer: {status: x, summary: 'bridge unsupported', scope: 'cell to organ', evidence: ev}});
+  return {schema: 'frontier.design-assurance/1', project_id: 'flying-fish', status: 'unsupported_essential_bridges', biological_success_probability: null, probability_calibrated: false, file_sha256: 'f'.repeat(64),
+    dimensions: ['formal_properties', 'numerical_fidelity', 'empirical_validation', 'parameter_coverage', 'cross_scale_transfer', 'ensemble_robustness'],
+    nodes: [{id: 'region:body', kind: 'region', label: 'Body', region_ids: ['body'], model_ids: ['m1'], vector: vec('unknown', 'scoped_pass', 'unsupported_bridge')},
+            {id: 'region:pectoral-left', kind: 'region', label: 'Pectoral, left', region_ids: ['pectoral-left'], model_ids: ['m2'], vector: vec('unknown', 'failed', 'unknown')},
+            {id: 'scale:organ', kind: 'scale', label: 'organ', studio_anchor: 'flying-fish:organ', vector: vec('unknown', 'scoped_pass', 'unknown')}],
+    transfer_matrix: {axes: ['m1', 'm2', 'm3'], entries: [{from: 'm1', to: 'm2', status: 'scenario', unit_check: 'dimensions match', assumptions: ['A1'], missing_calibrations: ['cell to organ'], evidence: ev, quantitative_error: null}]},
+    dependence_graph: {aggregation: 'no product or sum of confidence'}, project: {unsupported_essential_bridges: ['molecular to fin geometry'], counterexamples: [], next_actions: [{text: 'Find a calibration dataset', blocked_by: ['F002']}], expected_information_gain: null},
+    notices: ['regions are UI anchors'], evidence_index: [{path: 'artifacts/x.json', sha256: 'a'.repeat(64), byte_size: 10}]}; }"""
+
+
+def test_assurance_map_renders_vectors_regions_matrix_and_never_a_percentage(browser, base):
+    """Renderer test on a fixture built from the contract fields (the real map is not in this tree)."""
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#assurance")
+    assert "No design-assurance map is present" in pg.locator("#assurance").inner_text()
+    pg.evaluate("(src) => { const A = (new Function('return ' + src))()(); const host = document.getElementById('assurance'); host.innerHTML = DF.assurancePanel(A).toString(); DF.assuranceWire(host, A, null); }", _ASSURANCE_FIXTURE)
+    txt = pg.locator("#assurance").inner_text()
+    assert "not computed" in txt and "calibrated: false" in txt and "%" not in txt
+    assert pg.is_checked("input[value=empirical_validation]")
+    assert pg.locator("#assurance .part.t-unk").count() >= 1, "empirical validation defaults to unknown (neutral)"
+    pg.check("input[value=numerical_fidelity]")
+    assert pg.locator("#assurance .part[data-region=pectoral-left].t-bad").count() == 1 and pg.locator("#assurance .part[data-region=body].t-good, #assurance .part[data-region=body].t-mid").count() == 1
+    pg.click("#assurance .part[data-region=body]")
+    d = pg.locator("#asdetail").inner_text()
+    assert "scoped controls only" in d and "a" * 12 in d and "$.rows[0]" in d
+    pg.click(".mcell[data-from=m1][data-to=m2]")
+    assert "Quantitative error: not measured" in pg.locator("#asmcell").inner_text() and "Missing calibrations" in pg.locator("#asmcell").inner_text()
+    pg.click(".mcell[data-from=m2][data-to=m3]")
+    assert "unknown" in pg.locator("#asmcell").inner_text()
+    assert "expected information gain" in txt.lower() and "not computed" in txt.lower()
