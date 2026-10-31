@@ -96,7 +96,7 @@ verification asymmetry.
 
 | Claim | Level | Receipt | Status |
 |---|---|---|---|
-| Public MCP live, **19 tools** (manifest: 15 `read`, 3 `write`), protocol 2025-06-18, server `Delphi Frontier MCP` 1.27.0 | M | `tools_list.json`, HTTP 200 at 2026-10-31T22:08:18Z | **Earned** |
+| Public MCP live, **19 tools** (manifest: 16 `read`, 3 `write`) (manifest: 15 `read`, 3 `write`), protocol 2025-06-18, server `Delphi Frontier MCP` 1.27.0 | M | `tools_list.json`, HTTP 200 at 2026-10-31T22:08:18Z | **Earned** |
 | **Anonymous reads work**: `frontier_search` returns records with no credential | M | `read_search_anonymous.json` | **Earned** |
 | **Anonymous calculations work**: `frontier_simulate` returns an HH trajectory in 1.10 s, `calibrated: false`, six model-file sha256s, request sha256, full environment | M | `calc_simulate_anonymous.json`, `computed_at` 2026-10-31T22:10:02Z | **Earned** |
 | **Writes are refused**: well-formed `frontier_propose` with no credential → `unauthorized: Authenticated operator token required` | M | `control_write_anonymous_refused.json` | **Earned — this is the must-fail control** |
@@ -143,6 +143,17 @@ Full document with read-levels: `docs/research/generative-roadmap.md`. Page copy
 | Generate → filter → exact-solver gate | — | **Published across several domains, 2025-26.** Read-level: search-summary, no full texts read |
 | H1: a withdrawn claim identifies its own derived synthetic data | — | **Hypothesis.** One web search found no prior art; that is a lead, **not** a demonstration of absence |
 | H2: the exact solver carries its own scope conditions | — | **Hypothesis**, motivated by our own windowed-error measurement |
+
+**Wording corrections required by root review, 2026-10-31:**
+- The zebrafish medium is an **ASSUMED nutrient medium**, never "a real medium". The glucose cap
+  of 10 and every other uptake bound are **uncalibrated assumptions**.
+- The BETSE run is a **generic patch**, not the same organism. Fin applicability is an explicit
+  unknown.
+- Say **"we have not established a sourced flying-fish EI profile"**, never "nobody has measured
+  EI" — we have not searched well enough to claim an absence.
+- The **923-cell figure is an arithmetic extrapolation**, not a demonstrated hardware limit.
+  Measured limits are h = 7.2 mm at L 32 and 0.9 mm at L 256 against a 0.5 mm plate. We have not
+  run it and have not established that one H100 cannot.
 
 **Forbidden:** "first diffusion model for synthetic biology", and any IP claim. The method class is
 published; what we propose is the evidence loop around it.
