@@ -189,7 +189,7 @@ tested anything, so a non-raising N1 or N2 fails the pilot and stops the run.
 
 ## 11. Amendments after independent critique
 
-An independent critique of §1–§11 was obtained from Gemini (`gemini-3.1-pro-preview`,
+An independent critique of the protocol as it then stood (§1–§11 before this section was inserted; now §1–§10 and §12) was obtained from Gemini (`gemini-3.1-pro-preview`,
 and an earlier accidental call to an image model — see the audit receipts). Its output
 is model opinion and every point below was checked here before being acted on.
 

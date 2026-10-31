@@ -26,7 +26,7 @@ LIGHT = {"surface": "#2a78d6", "function": "#eb6834", "bg": "#fcfcfb",
 DARK = {"surface": "#3987e5", "function": "#d95926", "bg": "#1a1a19",
         "ink": "#f0efec", "ink2": "#c3c2b7", "grid": "#343431"}
 
-W, H = 940, 648
+W, H = 940, 716
 PANEL_W, PANEL_H = 370, 290
 PAD_L, PAD_T, GAP = 68, 118, 56
 # Roughly how many characters of 11.5px system-ui fit across the plotting width.
@@ -167,13 +167,17 @@ def main() -> int:
         f"[{cb['delta_ci_low']:+.3f}, {cb['delta_ci_high']:+.3f}] clustered by position; "
         f"paired permutation p = {esm['paired_permutation_delta']['p_two_sided']:.3g}"
         + (f"; Williams p = {w['p_two_sided']:.3g}" if w.get("applicable") else ""),
-        f"H1 (better agreement with surface expression): {verdict.upper()}. "
-        f"Assay-to-assay ρ = {w.get('rho_between_assays', float('nan')):+.3f} — function is measured "
-        f"downstream of surface expression, so these are not independent readouts.",
+        f"H1 (better agreement with surface expression): {verdict.upper()} — the interval spans zero, "
+        f"which is not support. This subset resolves |Δρ| of about {1.96 * d['bootstrap_sd']:.2f}; the "
+        f"external reference implies about 0.03, so the design is underpowered for the question by "
+        f"roughly fivefold.",
+        f"Assay-to-assay ρ = {w.get('rho_between_assays', float('nan')):+.3f}: the model tracks each assay "
+        f"about as closely as the two assays track each other. Function is measured downstream of surface "
+        f"expression, so they are not independent readouts — though this ρ is lower than that alone implies.",
     ]
     y = strip_y + 44
     for i, line in enumerate(caption):
-        cls = "caption-strong" if i == 2 else "caption"
+        cls = "caption-strong" if i >= 2 else "caption"
         for part in _wrap(line):
             body.append(f'<text x="{PAD_L}" y="{y}" class="{cls}">{_esc(part)}</text>')
             y += 17
