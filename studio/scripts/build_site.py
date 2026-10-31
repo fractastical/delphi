@@ -304,6 +304,28 @@ def native_video_cards(ins: Inputs, out: dict) -> list[dict]:
     return cards
 
 
+COUPLING = "engineering/COUPLING_MANIFEST.json"
+
+
+def coupling_manifest(ins: Inputs, files: dict, docs: list) -> dict | None:
+    """The guilds coupling manifest: typed interface verdicts between models. A verdict is about interfaces, not biology."""
+    if not (ROOT / COUPLING).exists():
+        return None
+    m = json.loads(ins.read(COUPLING))
+    if (ROOT / "docs/model-coupling.md").exists():
+        t = ins.text("docs/model-coupling.md"); files["docs/model-coupling.md"] = t.encode()
+        docs.append({"id": "model-coupling", "title": next((l[2:].strip() for l in t.splitlines() if l.startswith("# ")), "model-coupling"), "status_line": None, "path": "docs/model-coupling.md", "sha256": ins.seen["docs/model-coupling.md"]["sha256"], "href": "data/docs/model-coupling.md"})
+    rows = []
+    for c in m["couplings"]:
+        cp, v = c["coupling"], c["verdict"]
+        rows.append({"id": cp["id"], "from": cp["from"], "to": cp["to"], "mapping_kind": cp.get("mapping_kind"), "time_relation": cp.get("time_relation"), "uncertainty_kind": cp.get("uncertainty_kind"), "note": cp.get("note"),
+                     "status": v["status"], "label": v["label"], "reasons": v.get("reasons", []), "checks": v.get("checks", {}), "missing_calibrations": v.get("missing_calibrations", []), "assumption_ids": v.get("assumption_ids", [])})
+    return {"schema": m["schema"], "manifest_sha256": m.get("manifest_sha256"), "file_sha256": ins.seen[COUPLING]["sha256"], "scope": m["scope"], "counts": m["counts"], "must_display": m["must_display"], "must_not_say": m["must_not_say"],
+            "assumptions": m["assumptions"], "calibrations_registered": m["calibrations_registered"], "timescale_separation": m.get("timescale_separation"), "couplings": rows,
+            "models": [{"id": x["model_id"], "name": x["name"], "status": x.get("status"), "engine": x.get("engine"), "scope": x.get("scope"), "not_established": x.get("not_established", []), "ports": len(x.get("ports", []))} for x in m["models"]],
+            "proposals": [{"id": x["id"], "title": x["title"], "status": x["status"], "coupling": x.get("source_coupling"), "success": x.get("success"), "falsifier": x.get("falsifier"), "not_a_claim": x.get("not_a_claim")} for x in m.get("problem_proposals", [])]}
+
+
 def checklist(text: str) -> list[dict]:
     return [{"done": m.group(1) == "x", "text": m.group(2).strip()} for m in re.finditer(r"^- \[([ x])\] (.+)$", text, re.M)]
 
@@ -382,6 +404,7 @@ def build() -> dict[str, bytes]:
     if simulation is not None:
         simulation["controlled"] = controlled
     manifests = manifests + native_video_cards(ins, extra)
+    couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
@@ -402,6 +425,7 @@ def build() -> dict[str, bytes]:
         "attestation_check": attestation,
         "simulation_manifests": manifests,
         "system": system,
+        "coupling_manifest": couplings_m,
         "belief_example": belief_ex,
         "print_forms": prints,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),

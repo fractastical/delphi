@@ -278,3 +278,18 @@ def test_frontier_labels_snapshot_versus_live_views(browser, base):
     pg.wait_for_selector("#livepanel h2")
     assert "snapshot" in pg.locator("#livepanel").inner_text().lower()
     assert "curated mission projection from the snapshot" in pg.locator("section.board").inner_text().lower()
+
+
+def test_coupling_manifest_verdicts_are_shown_with_their_scope(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector("#cp-h, h2:has-text('Couplings between the models')")
+    txt = pg.locator("#main").inner_text().lower()
+    M = snap.get("coupling_manifest")
+    if not M:
+        assert "no coupling manifest is present" in txt
+        return
+    assert "registered calibrations: none" in txt and "not biology" in txt
+    assert pg.locator("section[aria-labelledby=cp-h] tbody tr").count() >= len(M["couplings"])
+    assert str(M["counts"]["refused"]) + " refused" in txt
