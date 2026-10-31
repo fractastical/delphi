@@ -769,7 +769,7 @@ def occurrence_rationale(rec, checks, flags, s) -> str:
     parts.append("Recorded checksums reproduce exactly." if cm else ("Recorded checksums no longer reproduce, as expected for a live count body; integrity is scored on the count." if cm is False else "No checksum could be compared."))
     if flags:
         parts.append("Flags: " + "; ".join(flags[:4]) + ("." if len(flags) <= 4 else f" (+{len(flags) - 4} more)."))
-    parts.append(f"Source authority, independence and authenticity inherit from the gbif-occurrence-api source score"
+    parts.append("Source authority, independence and authenticity inherit from the gbif-occurrence-api source score"
                  + ("." if s["authenticity"] == SOURCE_SCORES["gbif-occurrence-api"]["authenticity"] and s["source-authority"] == SOURCE_SCORES["gbif-occurrence-api"]["source-authority"] else ", lowered because the record itself shows a problem."))
     return " ".join(parts)
 
