@@ -7,6 +7,13 @@ It reads exported records and events, writes nothing to the store, adds no recor
 `does_not_imply`). Truth is the Assessment column and is never read by a ranking; probability appears only (a) as a declared prior inside EVPI, labelled
 as a belief about a *decision* state, and (b) in forecasts of *process events*. They are never blended into one score.
 
+## Changes after review (2026-10-31)
+* **Keys keep the namespace.** Rows, rankings, facets, dependents and actions are identified by `namespace/kind/id` (`row["key"]`), never by bare id; a bare id collides across nodes. Dependencies, claim ids, annotations, interests and assessments are matched on namespace, kind, id and (where pinned) exact version. Collision tests use two nodes with the same ids.
+* **`truth` is gone.** The column is `assessment`: each assertion carries issuer, source, record namespace and whether it was imported from another node; `local_acceptance` is this node's own state for the exact target version and exists only when local states are supplied. Nothing here is called truth.
+* **Store adapter** (`attention/pg.py`): read-only PostgreSQL reader (server-side `default_transaction_read_only=on`, five tables, no credential-bearing table, private records excluded). Digest failures (corruption) and schema skew (a store newer than this checkout) are reported separately; unknown vocabulary values are carried verbatim with `recognized: false`.
+* **Snapshot** (`attention/snapshot.py`, `python -m attention snapshot --dsn ... --namespace ... [--demo] --out ...`): actual attention snapshot with `missing_priorities` per Problem and an explicit `unplaced` reason in each ranking; source-field links (`attention/links.py`); authored demo annotations are separate (`attention/demo.py`, never in the actual snapshot).
+* **Learning interfaces and research queue:** `attention/LEARNING-INTERFACES.md` (protocol sketch only; no implementation, no RL claim).
+
 ## Interface
 
 ```

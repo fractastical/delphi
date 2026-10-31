@@ -51,8 +51,17 @@ def action_ledger(records: list[dict], events: list[dict], now: str, annotations
         ann = annotations.get(tp["version"])
         if ann and ann.get("next_action"):
             est = ann["next_action"]["resource_estimate"]
+        times = [aware_time(h["witnessed_at"]) for h in history]
+        counts = {t: sum(1 for h in history if h["event_type"] == t) for t in ("action_leased", "action_expired", "action_failed", "action_blocked", "action_cancelled", "action_disputed")}
+        outcome = {  # DATA ONLY: what happened, as the store witnessed it. No weight, no decay, no score is computed here.
+            "final_state": state, "terminal": state in ("accepted", "disputed", "failed", "cancelled"), "path": [h["event_type"] for h in history],
+            "n_leases": counts["action_leased"], "n_expired": counts["action_expired"], "n_failed": counts["action_failed"], "n_blocked": counts["action_blocked"],
+            "n_cancelled": counts["action_cancelled"], "n_disputed": counts["action_disputed"],
+            "first_witnessed_at": history[0]["witnessed_at"] if history else None, "last_witnessed_at": history[-1]["witnessed_at"] if history else None,
+            "elapsed_seconds_first_to_last_event": (max(times) - min(times)).total_seconds() if times else None,
+            "resources_consumed": "not recorded by the store"}
         rows.append({
-            "action": {k: a[k] for k in ("namespace", "kind", "id", "version")}, "target": tp, "title": a["payload"]["title"],
+            "outcome": outcome, "key": f"{a['namespace']}/Action/{a['id']}", "action": {k: a[k] for k in ("namespace", "kind", "id", "version")}, "target": tp, "title": a["payload"]["title"],
             "state": state, "lease": lease, "lease_live_at_now": live, "reviewer_operators": reviewer_ops,
             "cost_stop_bounds_text": a["payload"]["cost_stop_bounds"], "inputs": a["payload"].get("inputs"), "estimate": est,
             "consumed": "not recorded by the store (it meters nothing)", "events": history, "flags": flags,

@@ -1,4 +1,4 @@
-"""python -m attention {view|rank|ledger|score-events|evaluate|trace-gate}  (read-only; writes only with --out)"""
+"""python -m attention {view|snapshot|score-events|evaluate|trace-gate}  (read-only; writes only with --out)"""
 from __future__ import annotations
 
 import argparse
@@ -25,12 +25,20 @@ def main(argv=None) -> int:
     v = sub.add_parser("view"); v.add_argument("--records", required=True); v.add_argument("--events"); v.add_argument("--annotations", nargs="*", default=[]); v.add_argument("--now"); v.add_argument("--out")
     s = sub.add_parser("score-events"); [s.add_argument(f"--{a}", required=True) for a in ("specs", "forecasts", "resolutions", "now")]
     e = sub.add_parser("evaluate"); e.add_argument("--rows", required=True); e.add_argument("--frozen", required=True); e.add_argument("--arms", required=True)
+    n = sub.add_parser("snapshot"); n.add_argument("--dsn", required=True); n.add_argument("--namespace", required=True); n.add_argument("--schema")
+    n.add_argument("--annotations", nargs="*", default=[]); n.add_argument("--demo", action="store_true"); n.add_argument("--now"); n.add_argument("--out", required=True)
     g = sub.add_parser("trace-gate"); g.add_argument("--commons-runs", required=True); g.add_argument("--out")
     a = ap.parse_args(argv)
     if a.cmd == "view":
         now = a.now or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         out = view.build_view(_records(a.records), _load(a.events) if a.events else [], [_load(p) for p in a.annotations], now)
         out["rankings"] = rank.all_baselines(out["rows"])
+    elif a.cmd == "snapshot":
+        from . import demo, pg, snapshot
+        read = pg.read_store(a.dsn, a.namespace, schema=a.schema)
+        now = a.now or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        anns = [_load(p) for p in a.annotations] + (demo.demo_annotations(read["records"]) if a.demo else [])
+        out = snapshot.build_snapshot(read, anns, now, "with_demo_annotations" if a.demo else "actual")
     elif a.cmd == "score-events":
         out = forecast.score_events(_load(a.specs), _load(a.forecasts), _load(a.resolutions), a.now)
     elif a.cmd == "evaluate":

@@ -75,6 +75,14 @@ def world():
     return {"pa": pa, "pb": pb, "pc": pc, "pd": pd, "act": act, "events": evs, "records": [pa, pb, pc, pd, act]}
 
 
+def K(*names, kind="Problem", ns=NS):
+    return [f"{ns}/{kind}/{n}" for n in names]
+
+
+def short(tiers):
+    return [[k.rsplit("/", 1)[-1] for k in t["ids"]] for t in tiers]
+
+
 def V(w, annotations=(), extra=()):
     return view.build_view(w["records"] + list(extra), w["events"], list(annotations), NOW)
 
@@ -86,7 +94,7 @@ def row(v, id):
 def test_view_without_annotations_reports_unknown_not_a_guess(world):
     v = V(world)
     r = row(v, "PB")
-    assert r["store"]["completeness"] == {"vocabulary": "frontier-store", "field": "completeness", "value": "recorded"}
+    assert r["store"]["completeness"] == {"vocabulary": "frontier-store", "field": "completeness", "value": "recorded", "recognized": True}
     assert r["store"]["downstream_uses_untyped"] == ["prose use"] and r["typed_unlocks"] == [] and r["typed_next_action"] is None
     assert r["utility"]["status"] == "unknown" and r["annotation"]["status"] == "none"
     assert r["register_labels"]["importance"]["vocabulary"] == "morphoswarm-register"
@@ -128,12 +136,12 @@ def test_a_tampered_annotation_is_rejected_and_reported_not_applied(world):
 def test_baseline_rankings_and_how_much_each_actually_orders(world):
     v = V(world, [annot(world["pa"])])
     R = rank.all_baselines(v["rows"])
-    ids = lambda name: [t["ids"] for t in R[name]["tiers"]]
+    ids = lambda name: short(R[name]["tiers"])
     assert ids("id_order") == [["PA"], ["PB"], ["PC"], ["PD"]] and R["id_order"]["pairs_ordered_fraction"] == 1.0
     assert ids("actionable_first") == [["PA"], ["PB", "PC", "PD"]]
     assert R["actionable_first"]["pairs_ordered_fraction"] == pytest.approx(3 / 6)           # PA vs 3 others ordered; 3 pairs inside the recorded tier tied
     # labels: PB (3,3) dominates PD (2,2) dominates PC (1,1) -> three layers ; PA has no labels -> unplaced
-    assert ids("register_label_layers") == [["PB"], ["PD"], ["PC"]] and R["register_label_layers"]["unplaced"][0][0] == "PA"
+    assert ids("register_label_layers") == [["PB"], ["PD"], ["PC"]] and R["register_label_layers"]["unplaced"][0][0] == K("PA")[0]
     assert R["register_label_layers"]["pairs_ordered_fraction"] == pytest.approx(3 / 6)      # 3 placed items, all 3 pairs ordered, of 6 pairs overall
     assert ids("typed_unlock_groups") == [["PA"]] and len(R["typed_unlock_groups"]["unplaced"]) == 3     # PA: groups {g1,g2} = 2 ; others have no applied annotation
     assert ids("declared_evpi") == [["PA"]] and R["declared_evpi"]["tiers"][0]["rank"] == 1
@@ -143,21 +151,21 @@ def test_baseline_rankings_and_how_much_each_actually_orders(world):
 def test_register_layers_leave_equal_labels_tied(world):
     w = dict(world); w["records"] = world["records"] + [problem("PE", labels=("foundational", "near-term"))]
     R = rank.register_label_layers(V(w)["rows"])
-    assert R["tiers"][0]["ids"] == ["PB", "PE"]                                              # equal labels share a tier; no tie-break by id meaning
+    assert short(R["tiers"])[0] == ["PB", "PE"]                                              # equal labels share a tier; no tie-break by id meaning
 
 
-def test_truth_and_priority_are_independent(world):
+def test_assessment_assertions_and_priority_are_independent(world):
     base = V(world, [annot(world["pa"])])
     r0 = rank.all_baselines(base["rows"])
     with_truth = V(world, [annot(world["pa"])], extra=[assessment(world["pc"], "accepted"), assessment(world["pa"], "rejected")])
     r1 = rank.all_baselines(with_truth["rows"])
     assert r0 == r1                                                                          # accepting or rejecting claims moves no ranking
-    assert row(with_truth, "PC")["truth"]["assessment_decision"]["value"] == "accepted" and row(base, "PC")["truth"]["assessment_decision"] is None
-    # and an annotation cannot change a truth column
-    assert row(base, "PA")["truth"] == row(V(world), "PA")["truth"]
+    assert row(with_truth, "PC")["assessment"]["latest_assertion"]["decision"]["value"] == "accepted" and row(base, "PC")["assessment"]["latest_assertion"] is None
+    # and an annotation cannot change an assessment column
+    assert row(base, "PA")["assessment"] == row(V(world), "PA")["assessment"]
     # an assessment on an older version is counted, not applied
     older = assessment(problem("PB", labels=("specialist", "long-term")), "accepted")
-    assert row(V(world, extra=[older]), "PB")["truth"]["assessment_decision"] is None
+    assert row(V(world, extra=[older]), "PB")["assessment"]["latest_assertion"] is None and row(V(world, extra=[older]), "PB")["assessment"]["assessments_on_older_versions"] == 1
 
 
 def test_interest_counts_issuers_on_the_current_version_only(world):
@@ -208,16 +216,16 @@ def test_proposed_connection_edges_do_not_count_toward_unlock_groups(world):
     pa_doc = annot(world["pa"], unlocks=base["unlocks"] + [extra])          # PA: groups g1, g2 counted + g3 proposed only
     pb_doc = annot(world["pb"])                                             # PB: groups g1, g2
     R = rank.typed_unlock_groups(V(world, [pa_doc, pb_doc])["rows"])
-    assert [t["ids"] for t in R["tiers"]] == [["PA", "PB"]]                  # equal at 2 groups each; counting the analogy would split them
+    assert short(R["tiers"]) == [["PA", "PB"]]                  # equal at 2 groups each; counting the analogy would split them
 
 
 def test_derived_dependents_invert_the_stores_typed_dependencies(world):
     pe = problem("PE", dependencies=[ref(world["pa"])])
     pf = problem("PF", dependencies=[ref(world["pa"]), ref(world["pb"])])
     v = V(world, extra=[pe, pf])
-    assert row(v, "PA")["dependents"] == ["PE", "PF"] and row(v, "PB")["dependents"] == ["PF"] and row(v, "PC")["dependents"] == []
+    assert row(v, "PA")["dependents"] == K("PE", "PF") and row(v, "PB")["dependents"] == K("PF") and row(v, "PC")["dependents"] == []
     R = rank.derived_dependents(v["rows"])
-    assert [t["ids"] for t in R["tiers"]] == [["PA"], ["PB"], ["PC", "PD", "PE", "PF"]]
+    assert short(R["tiers"]) == [["PA"], ["PB"], ["PC", "PD", "PE", "PF"]]
     stale = problem("PE", dependencies=[ref(problem("PA", actionable=True, title="older"))])
     assert row(V(world, extra=[stale]), "PA")["dependents_pinned_to_older_version"] == 1
 
@@ -268,11 +276,11 @@ def test_view_exposes_why_each_question_unlocks_a_requirement_or_challenges_a_th
     effects = [w["effect"] for w in r["why_priority"] if w["field"] == "annotation.unlocks.relation"]
     assert any("minimum feature spacing" in e and "[counts toward declared value]" in e for e in effects)
     assert any("prediction that spacing scales" in e and "not part of any value" in e for e in effects)
-    assert v["whiteboard_facets"] == {"design_requirement": [], "theory_challenge": [], "both": ["PA"], "neither_stated": ["PB", "PC", "PD"]}
+    assert v["whiteboard_facets"] == {"design_requirement": [], "theory_challenge": [], "both": K("PA"), "neither_stated": K("PB", "PC", "PD")}
     assert "annotator-declared belief about the state of a DECISION" in r["utility"]["prior_meaning"]
 
 
-def test_challenging_a_theory_does_not_move_its_truth_and_its_truth_does_not_move_the_ranking(world):
+def test_challenging_a_theory_assesses_nothing_and_assessing_it_moves_no_ranking(world):
     theory = rec("Claim", "theory-t", {"title": "t", "statement": "s", "context": "c", "assumptions": ["a"], "limitations": ["l"], "source": SRC})
     global THEORY
     saved, THEORY = THEORY, ref(theory)
@@ -283,7 +291,7 @@ def test_challenging_a_theory_does_not_move_its_truth_and_its_truth_does_not_mov
                                                "independence_rationale": "fixture", "limitations": ["fixture"]}, issuer="bob")
         v1 = V(world, [doc], extra=[theory, asm])
         assert rank.all_baselines(v1["rows"]) == r0                              # rejecting the theory changes no priority
-        assert row(v1, "PA")["truth"]["assessment_decision"] is None             # and the challenge edge does not assess anything
+        assert row(v1, "PA")["assessment"]["latest_assertion"] is None           # and the challenge edge does not assess anything
     finally:
         THEORY = saved
 
@@ -308,3 +316,109 @@ def test_cli_view_reads_a_bundle_file_and_prints_rows_rankings_and_the_disclaime
     out = json.loads((tmp_path / "out.json").read_text())
     assert out["n_problems"] == 4 and set(out["rankings"]) >= {"id_order", "derived_dependents", "declared_evpi"} and "viable or true" in out["does_not_imply"]
     assert "does_not_imply" in capsys.readouterr().out
+
+
+# ------------------------------------------------------------------ action outcomes as data (the foundation for any later learning protocol)
+def test_ledger_outcome_is_plain_data_from_witnessed_events(world):
+    o = V(world)["action_ledger"][0]["outcome"]
+    # events: ready 17:10, leased 17:20, running 17:25 -> first-to-last 15 min
+    assert o["final_state"] == "running" and o["terminal"] is False and o["n_leases"] == 1 and o["n_expired"] == 0
+    assert o["path"] == ["action_ready", "action_leased", "action_running"] and o["elapsed_seconds_first_to_last_event"] == 900.0
+    assert o["resources_consumed"].startswith("not recorded")
+    assert not any(k in o for k in ("score", "weight", "decay", "reward", "pheromone"))               # no learning quantity is computed here
+    act = world["act"]
+    evs = world["events"] + [event("action_expired", act, at="2026-10-31T17:50:00+00:00"), event("action_leased", act, at="2026-10-31T17:55:00+00:00", details={"lease_until": "2026-10-31T19:30:00+00:00"}),
+                             event("action_failed", act, at="2026-10-31T18:05:00+00:00")]
+    o2 = action_ledger(world["records"], evs, NOW)[0]["outcome"]
+    assert (o2["n_leases"], o2["n_expired"], o2["n_failed"], o2["terminal"], o2["final_state"]) == (2, 1, 1, True, "failed")
+
+
+# ------------------------------------------------------------------ BLOCKING REVIEW FINDING: same id on different nodes must not collapse
+def rec_ns(ns, kind, id, payload, created=T, issuer="alice", status=None):
+    d = Draft(namespace=ns, kind=kind, id=id, issuer=issuer, source_uri=f"urn:{ns}", payload=payload)
+    return make_record(d, created_at=created)
+
+
+def problem_ns(ns, id, **kw):
+    p = {"title": f"{ns} {id}", "known_state": "k", "question": f"question {ns}/{id}", "problem_kind": "sourced_field_open_problem", "novelty_status": "unchecked",
+         "data_access": "none", "completeness": "recorded", "required_capabilities": [], "downstream_uses": [], "source": SRC}
+    p.update(kw)
+    return rec_ns(ns, "Problem", id, p)
+
+
+def two_nodes():
+    a1 = problem_ns("node-a", "P1", original={"register_record": {"importance": {"value": "foundational"}, "tractability": {"value": "near-term"}}})
+    b1 = problem_ns("node-b", "P1", original={"register_record": {"importance": {"value": "specialist"}, "tractability": {"value": "long-term"}}})
+    b2 = problem_ns("node-b", "P2", dependencies=[ref(b1)])
+    return a1, b1, b2
+
+
+def test_same_id_on_two_nodes_stays_two_rows_with_full_keys():
+    a1, b1, b2 = two_nodes()
+    v = view.build_view([a1, b1, b2], [], [], NOW)
+    keys = [r["key"] for r in v["rows"]]
+    assert keys == ["node-a/Problem/P1", "node-b/Problem/P1", "node-b/Problem/P2"] and v["n_problems"] == 3
+    R = rank.all_baselines(v["rows"])
+    assert [t["ids"] for t in R["id_order"]["tiers"]] == [[k] for k in keys] and R["id_order"]["n_placed"] == 3
+    # each node's labels stay on its own row; the register layers separate them
+    assert [t["ids"] for t in R["register_label_layers"]["tiers"]] == [["node-a/Problem/P1"], ["node-b/Problem/P1"]]
+    assert all(r["key"].count("/") == 2 for r in v["rows"])
+
+
+def test_dependencies_match_namespace_and_exact_version():
+    a1, b1, b2 = two_nodes()
+    v = view.build_view([a1, b1, b2], [], [], NOW)
+    by = {r["key"]: r for r in v["rows"]}
+    assert by["node-b/Problem/P1"]["dependents"] == ["node-b/Problem/P2"] and by["node-a/Problem/P1"]["dependents"] == []
+    R = rank.derived_dependents(v["rows"])
+    assert [t["ids"] for t in R["tiers"]] == [["node-b/Problem/P1"], ["node-a/Problem/P1", "node-b/Problem/P2"]]
+    # a dependency pinned to an OLD node-b/P1 version is counted against node-b/P1 only, and flagged
+    old_b1 = problem_ns("node-b", "P1", title="older")
+    b3 = problem_ns("node-b", "P3", dependencies=[ref(old_b1)])
+    v2 = view.build_view([a1, b1, b2, b3], [], [], NOW)
+    by2 = {r["key"]: r for r in v2["rows"]}
+    assert by2["node-b/Problem/P1"]["dependents_pinned_to_older_version"] == 1 and by2["node-a/Problem/P1"]["dependents_pinned_to_older_version"] == 0
+
+
+def test_annotations_signals_assessments_and_actions_do_not_cross_nodes():
+    a1, b1, b2 = two_nodes()
+    doc = A.make_annotation({"target": ref(a1), "annotator_operator": "op", "created_at": T, "limitations": ["x"],
+                             "decisions": {"D": {"utility_status": "unknown", "description": "d"}},
+                             "unlocks": [{"kind": "proposed_connection", "decision_id": "D", "independent_group": "g", "provenance": "p"}]})
+    interest = rec_ns("node-b", "Interest", "i1", {"target": ref(b1), "signal": "following", "explanation": "e"}, issuer="u1")
+    from frontier.models import DIMENSIONS
+    dims = {d: {"status": "passed", "reviewer": "bob", "rationale": "fixture", "evidence_links": []} for d in DIMENSIONS}
+    asm = rec_ns("node-a", "Assessment", "asm1", {"target": ref(a1), "decision": "accepted", "dimensions": dims, "independence_rationale": "i", "limitations": ["l"]}, issuer="bob")
+    act = rec_ns("node-b", "Action", "act1", {"target": ref(b1), "title": "t", "acceptance_criteria": ["x"], "required_capabilities": [], "cost_stop_bounds": "b",
+                                              "cache_key": {"target": b1["version"], "input": "i", "code": "c", "model": "m", "environment": "e", "parameters": "p", "scope": "s", "acceptance_policy": POLICY}})
+    v = view.build_view([a1, b1, b2, interest, asm, act], [], [doc], NOW)
+    by = {r["key"]: r for r in v["rows"]}
+    assert by["node-a/Problem/P1"]["annotation"]["status"] == "applied" and by["node-b/Problem/P1"]["annotation"]["status"] == "none"
+    assert by["node-b/Problem/P1"]["interest_issuers"] == {"following": ["u1"]} and by["node-a/Problem/P1"]["interest_issuers"] == {}
+    assert by["node-a/Problem/P1"]["interests_on_older_versions"] == 0          # not even counted as an old-version interest of a different node's record
+    assert by["node-a/Problem/P1"]["assessment"]["latest_assertion"]["decision"]["value"] == "accepted" and by["node-b/Problem/P1"]["assessment"]["latest_assertion"] is None
+    assert by["node-b/Problem/P1"]["assessment"]["assessments_on_older_versions"] == 0
+    assert [x["key"] for x in by["node-b/Problem/P1"]["actions"]] == ["node-b/Action/act1"] and by["node-a/Problem/P1"]["actions"] == []
+
+
+# ------------------------------------------------------------------ assessments from imports are assertions, not local acceptance
+def test_imported_assessment_is_labelled_an_assertion_and_not_local_acceptance(world):
+    pc = world["pc"]
+    asm = assessment(pc, "accepted")
+    # no local states supplied -> nothing about local acceptance is claimed
+    b = view.assessment_block([asm], ref(pc), None)
+    assert b["local_acceptance"] == {"provided": False, "target_local_status": None, "is_local_review_outcome": False, "note": "local states not supplied to this view"}
+    a = b["latest_assertion"]
+    assert a["issuer"] == "bob" and a["source_uri"] == "urn:test" and a["decision"]["value"] == "accepted" and a["record_local_status"] is None
+    # the Assessment record itself was imported from another node: still an assertion, and the target is imported_unreviewed locally
+    states = {asm["version"]: "imported_unreviewed", pc["version"]: "imported_unreviewed"}
+    b = view.assessment_block([asm], ref(pc), states)
+    assert b["latest_assertion"]["imported_from_another_node"] is True and b["local_acceptance"]["is_local_review_outcome"] is False
+    # only this node's own accepted/disputed/rejected state of the exact target version is a local review outcome
+    states2 = {asm["version"]: "proposed", pc["version"]: "accepted"}
+    b2 = view.assessment_block([asm], ref(pc), states2)
+    assert b2["local_acceptance"]["is_local_review_outcome"] is True and b2["latest_assertion"]["imported_from_another_node"] is False
+    # an Assessment record in a different namespace than its target is flagged as imported even without states
+    foreign = rec_ns("node-z", "Assessment", "asm-f", {**asm["payload"]}, issuer="zed")
+    assert view.assessment_block([foreign], ref(pc), None)["latest_assertion"]["imported_from_another_node"] is True
+    assert '"truth"' not in __import__("json").dumps(view.build_view(world["records"] + [asm], world["events"], [], NOW, local_status=states2), default=str)

@@ -24,6 +24,8 @@ STORE = {
     "verification_status": _lit(M.ResourceOffer, "verification_status"),
     "assessment_decision": _lit(M.Assessment, "decision"),
     "event_type": tuple(get_args(M.EventType)),
+    # node-local review state; the store keeps it as a SQL CHECK in schema.sql, not a pydantic Literal. A test compares this to schema.sql.
+    "local_status": ("proposed", "imported_unreviewed", "accepted", "disputed", "rejected"),
 }
 REGISTER = {"importance": ("foundational", "significant", "specialist"), "tractability": ("near-term", "medium-term", "long-term")}
 # DECLARED direction, a policy assumption of this layer, not a register fact: higher number = ranks earlier.
@@ -57,6 +59,15 @@ def tag(vocabulary: str, field: str, value: str) -> dict:
     if value not in allowed:
         raise VocabularyError(f"{value!r} is not a {vocabulary}.{field} value; allowed {allowed}")
     return {"vocabulary": vocabulary, "field": field, "value": value}
+
+
+def tag_lenient(vocabulary: str, field: str, value) -> dict:
+    """Like tag, but a value this checkout does not know is CARRIED VERBATIM and marked `recognized: False` instead of raising. A running store
+    may be newer than the models this layer was written against; its words are kept, never mapped to the nearest known word."""
+    allowed = VOCABULARIES.get(vocabulary, {}).get(field)
+    if allowed is None:
+        raise VocabularyError(f"unknown vocabulary/field {vocabulary}.{field}")
+    return {"vocabulary": vocabulary, "field": field, "value": value, "recognized": value in allowed}
 
 
 def translate(src: dict, dst_vocabulary: str, dst_field: str) -> dict:

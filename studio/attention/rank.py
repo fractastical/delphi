@@ -24,7 +24,7 @@ def _result(name, basis, tiers, unplaced, n, note):
 
 
 def _id(row):
-    return row["ref"]["id"]
+    return row["key"]           # namespace/kind/id: ids alone collide across nodes
 
 
 def id_order(rows):
