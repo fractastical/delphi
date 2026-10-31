@@ -176,6 +176,11 @@ KNOB_STATUS = {
 }
 
 
+BUILD_FILES = ["engineering/fishv3/build.py", "engineering/fishv3/fins.py", "engineering/fishv3/appearance.py",
+               "engineering/fish3d/build.py", "engineering/geometry/forms.py", "engineering/geometry/mesh.py",
+               "engineering/geometry/sources.py", "artifacts/print/sources/daane2021-S1A-summary.json"]
+
+
 def code_hash() -> str:
     h = hashlib.sha256()
     for f in sorted(Path(__file__).parent.glob("*.py")):
@@ -491,7 +496,13 @@ def panels_json(fans: dict, nc: int) -> dict:
                 quads.append([A3[j].round(7).tolist(), A3[j + 1].round(7).tolist(),
                               B3[j + 1].round(7).tolist(), B3[j].round(7).tolist()])
         outline = FN.to_fish(fan.outline(), *frame, warp=warp) * mir / 1000
-        out[cid] = {"outline_m": outline.round(7).tolist(), "quads_m": quads,
+
+        def line(P, frame=frame, warp=warp, mir=mir):
+            return (FN.to_fish(P, *frame, warp=warp) * mir / 1000).round(7).tolist()
+        edges = {"root_m": line(R), "tip_m": line(T),
+                 "leading_edge_m": line(np.linspace(R[0], T[0], 8)),
+                 "trailing_edge_m": line(np.linspace(R[-1], T[-1], 8))}
+        out[cid] = {"outline_m": outline.round(7).tolist(), "quads_m": quads, **edges,
                     "fin_plane": {"origin_m": (frame[0] * mir / 1000).tolist(), "e_u": (frame[1] * mir).tolist(),
                                   "e_w": (frame[2] * mir).tolist()},
                     "area_flat_m2": fan.area_mm2() / 1e6,
@@ -555,6 +566,19 @@ def build_one(variant: str, out_root: Path, render: bool) -> dict:
     (out / "components").mkdir(parents=True, exist_ok=True)
     (out / "candidate.json").write_bytes(cb)
     comps, rep, fans, srec, body = build_components(cand)
+    an = cand["anatomy"]
+    mem, (r0, _r1) = v(an["membrane_thickness_mm"]), v(an["ray_radius_mm"])
+    for cid in COMPONENTS:
+        if cid in FINS:
+            rep[cid]["thickness_mm"] = A({"membrane": mem, "ray_max": 2 * r0 * (v(an["caudal_lower_ray_radius_scale"])
+                                                                               if cid == "caudal" else 1.0)},
+                                         "assumed", "membrane slab plus tapered rays; a thin part (shell) for flow")
+        elif cid.startswith("operculum"):
+            rep[cid]["thickness_mm"] = an["operculum_thickness_mm"]
+        elif cid == "scales":
+            rep[cid]["thickness_mm"] = an["scale_thickness_mm"]
+        else:
+            rep[cid]["thickness_mm"] = A(None, "derived", "closed volume part")
     checks, files = {}, {}
     scene = trimesh.Scene()
     arrays = {}
@@ -568,7 +592,8 @@ def build_one(variant: str, out_root: Path, render: bool) -> dict:
             p.write_bytes(tm.export(file_type="stl")); files[f"components/{cid}.stl"] = B1.sha(p.read_bytes())
         scene.add_geometry(trimesh.Trimesh((V / 1000.0) @ B1.GLTF_FROM_FISH.T, T, process=False), node_name=cid,
                            geom_name=cid)
-    glb = scene.export(file_type="glb"); (out / "fish.glb").write_bytes(glb); files["fish.glb"] = B1.sha(glb)
+    glb = AP.patch_glb(scene.export(file_type="glb"), csha, with_materials=False)
+    (out / "fish.glb").write_bytes(glb); files["fish.glb"] = B1.sha(glb)
     nc = v(cand["numerical"]["panel_chordwise"])
     docs = {
         "components.json": {"schema": "frontier.fish3d.components/2", "candidate_sha256": csha,
@@ -578,7 +603,11 @@ def build_one(variant: str, out_root: Path, render: bool) -> dict:
                                                  "stl": None if cid == "scales" else f"components/{cid}.stl",
                                                  "stl_sha256": files.get(f"components/{cid}.stl")}
                                            for cid in COMPONENTS},
-                            "overlap_note": "fin roots are inset into the body; union before volume or flow use"},
+                            "overlap_note": "fin roots are inset into the body; union before volume or flow use",
+                            "deployment": {kk: vv for kk, vv in cand["knobs"].items()},
+                            "build": {"command": "python -m engineering.fishv3.build --only <variant> --no-render",
+                                      "files": BUILD_FILES, "pins": {"numpy": "2.4.4", "manifold3d": "3.5.4",
+                                                                     "trimesh": "5.2.0"}}},
         "rays.json": {"schema": "frontier.fish3d.rays/1", "candidate_sha256": csha, "units": "m",
                       "use": "fin-ray loads (e.g. engineering.fin_mechanics): length_m and tributary_width_m per ray",
                       "fins": rays_json(fans)},
@@ -605,7 +634,8 @@ def build_one(variant: str, out_root: Path, render: bool) -> dict:
                 V, T = arrays[cid]
                 sc.add_geometry(trimesh.Trimesh((V / 1000.0) @ B1.GLTF_FROM_FISH.T, T, vertex_colors=cols[cid],
                                                 process=False), node_name=cid, geom_name=cid)
-            g = sc.export(file_type="glb"); (out / f"fish-{opt}.glb").write_bytes(g)
+            g = AP.patch_glb(sc.export(file_type="glb"), csha, with_materials=True)
+            (out / f"fish-{opt}.glb").write_bytes(g)
             files[f"fish-{opt}.glb"] = B1.sha(g)
             rec["glb"], rec["glb_sha256"] = f"fish-{opt}.glb", files[f"fish-{opt}.glb"]
         rec["geometry_glb_sha256"] = files["fish.glb"]

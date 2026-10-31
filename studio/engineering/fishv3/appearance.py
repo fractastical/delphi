@@ -102,3 +102,48 @@ def record(option: str, csha: str) -> dict:
                                                      "fin_dark": FIN_DARK.tolist(), "fin_pale": FIN_PALE.tolist(),
                                                      "grey": GREY.tolist(), "clear": CLEAR.tolist()},
             "label": "Appearance only. Not a validated pigment-pattern map; geometry is identical across options."}
+
+
+# glTF materials for the coloured GLBs: vertex colours (COLOR_0) multiply a white base colour, so the viewer
+# shows the appearance layer instead of falling back to flat colours.  Values are design choices; the anal fin's
+# transparency follows FAO ("anal fin transparent"), the pelvic's is assumed.
+MATERIALS = {
+    "skin": {"pbrMetallicRoughness": {"baseColorFactor": [1, 1, 1, 1], "metallicFactor": 0.35, "roughnessFactor": 0.35}},
+    "eye": {"pbrMetallicRoughness": {"baseColorFactor": [1, 1, 1, 1], "metallicFactor": 0.0, "roughnessFactor": 0.05}},
+    "fin": {"pbrMetallicRoughness": {"baseColorFactor": [1, 1, 1, 1], "metallicFactor": 0.0, "roughnessFactor": 0.5},
+            "doubleSided": True},
+    "fin_clear": {"pbrMetallicRoughness": {"baseColorFactor": [1, 1, 1, 0.45], "metallicFactor": 0.0,
+                                           "roughnessFactor": 0.4}, "alphaMode": "BLEND", "doubleSided": True},
+}
+
+
+def material_of(cid: str) -> str:
+    if cid in ("anal", "pelvic_L", "pelvic_R"):
+        return "fin_clear"
+    if cid.startswith(("pectoral", "dorsal", "caudal")):
+        return "fin"
+    return "eye" if cid.startswith("eye") else "skin"
+
+
+def patch_glb(glb: bytes, csha: str, with_materials: bool) -> bytes:
+    """Add node extras (component id, candidate sha256) and, for coloured GLBs, materials.  Geometry buffers are
+    left byte for byte as written."""
+    import json
+    import struct
+    n = struct.unpack("<I", glb[12:16])[0]
+    j = json.loads(glb[20:20 + n])
+    rest = glb[20 + n:]
+    names = list(MATERIALS)
+    if with_materials:
+        j["materials"] = [dict(MATERIALS[k], name=k) for k in names]
+    for node in j["nodes"]:
+        cid = node.get("name")
+        node["extras"] = {"component_id": cid, "candidate_sha256": csha,
+                          "provenance": f"components.json#/components/{cid}"}
+        if with_materials and "mesh" in node:
+            for prim in j["meshes"][node["mesh"]]["primitives"]:
+                prim["material"] = names.index(material_of(cid))
+    js = json.dumps(j, separators=(",", ":"), sort_keys=True).encode()
+    js += b" " * (-len(js) % 4)
+    body = struct.pack("<I", len(js)) + b"JSON" + js + rest
+    return glb[:8] + struct.pack("<I", 12 + len(body)) + body
