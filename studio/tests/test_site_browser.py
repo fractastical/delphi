@@ -198,7 +198,7 @@ def test_simulation_gallery_never_invents_a_video(browser, base):
     pg.goto(base + "#/simulations")
     pg.wait_for_selector(".simcard, .empty")
     snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
-    verified = [m for m in snap["simulation_manifests"] if m.get("video_state") == "present_verified"]
+    verified = [m for m in snap["simulation_manifests"] if m.get("video_state") in ("present_verified", "present_unpinned")]
     assert pg.locator("video").count() == len(verified), "a player may appear only for a verified video file"
     html = pg.evaluate("""() => DF.views.simulations(Object.assign({}, DF.api.state.snapshot, {simulation: null, simulation_manifests: [
       {id: 'ok', title: 'ok', scales: ['cellular'], video_state: 'present_verified', video_href: 'artifacts/simulations/ok/v.mp4', manifest: 'm'},
@@ -267,7 +267,7 @@ def test_print_forms_and_videos_match_their_declared_bytes(browser, base):
         assert pg.locator(".meshhost .viewbar button").count() == 4
     pg.goto(base + "#/simulations")
     pg.wait_for_selector(".simcard, .empty")
-    vids = [m for m in snap["simulation_manifests"] if m.get("video_state") == "present_verified"]
+    vids = [m for m in snap["simulation_manifests"] if m.get("video_state") in ("present_verified", "present_unpinned")]
     assert pg.locator("video").count() == len(vids)
     for m in vids:
         assert (ROOT / "site" / m["video_href"]).is_file()
@@ -558,6 +558,8 @@ def test_runtime_graph_renders_object_scope_succinctly_and_with_exact_pins(brows
     assert "[object Object]" not in txt and "visibility: public" in txt
     hrefs = pg.locator("#gdetail a, #gwrap table a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
     assert any(("v=" + "b" * 64) in h and "ns=node-a" in h for h in hrefs), hrefs
+    fills = pg.evaluate("[...document.querySelectorAll('.gsvg .g-node .g-label')].map(e => getComputedStyle(e).fill)")
+    assert fills and all(f != "rgb(255, 255, 255)" for f in fills), fills        # labels sit on the cream canvas: never white
 
 
 def _mock_live(pg, run_handler):
@@ -660,7 +662,7 @@ def test_connect_tab_states_what_is_and_is_not_verified(browser, base):
 
 def test_gallery_has_every_verified_video_with_a_player(browser, base):
     snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
-    ids = [m["id"] for m in snap["simulation_manifests"] if m.get("video_state") == "present_verified"]
+    ids = [m["id"] for m in snap["simulation_manifests"] if m.get("video_state") in ("present_verified", "present_unpinned")]
     pg = page(browser)
     pg.goto(base + "#/simulations")
     pg.wait_for_selector(".simcard")
@@ -856,3 +858,323 @@ def test_design_review_never_attaches_an_unrelated_fish_project(browser, base):
     pg.wait_for_selector("#drlive")
     pg.wait_for_function("document.querySelector('#drlive').textContent.includes('project-flying-fish-mission')")
     assert "no Project record" in pg.locator("#drlive").text_content() and not seen
+
+
+def test_home_leads_with_sourced_anatomy_assumptions_and_the_actual_candidate(browser, base):
+    pg = page(browser, 1700, 900)
+    pg.goto(base + "#/home")
+    pg.wait_for_selector(".grounding .region")
+    t = pg.locator(".grounding").text_content()
+    assert "Start from real fish anatomy." in t and "not a validated fish" in t and "no biological or aerodynamic validation is claimed" in t
+    pg.select_option("#fishcand", "fish3d-N1-cypselurus-baseline")
+    pg.wait_for_function("document.querySelector('#grnote').textContent.includes('flat fin plates')")
+    t = pg.locator(".grounding").text_content()
+    assert "Not biorealistic and not validated" in t and "lattice scales" in t and "decorative eyes" in t
+    assert "length ∝ SL" in t and "R² 0.98" in t and "raw data unavailable" in t.lower() or "UNAVAILABLE" in t
+    assert "not 51 empirically learned laws" in t
+    assert pg.locator(".grounding .region").count() == 9 and pg.locator(".grounding .region .assumed").count() >= 5
+    assert pg.locator(".grounding .printmodels select").count() == 1 and pg.locator(".grounding .turntable video").count() == 1
+    y_ground = pg.locator(".grounding").bounding_box()["y"]; y_paths = pg.locator(".paths").bounding_box()["y"]
+    assert y_ground < y_paths
+    # wide desktop uses the room; paragraphs stay readable; no horizontal overflow
+    assert pg.locator("main").bounding_box()["width"] > 1400
+    assert pg.evaluate("document.querySelector('.lede').getBoundingClientRect().width") <= 900
+    assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+    assert pg.locator("svg.mark").count() == 1
+
+
+def test_system_built_tab_links_evidence_keeps_failures_and_labels_the_repo_public(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=built")
+    pg.wait_for_selector("#bt-h")
+    t = pg.locator("#main").text_content()
+    assert "public source" in t and "github.com/kganjam/delphi-frontier" in t
+    assert "private until" not in t
+    assert "ResourceExhausted" in t and "UREQ_TOS_NOT_ACCEPTED" in t and "INCONCLUSIVE" in t and "POSITIVE" in t
+    assert "actual spend" in t.lower() or "Unknown" in t
+    assert pg.locator("tbody tr").count() >= 13
+    assert pg.locator(".tablewrap td:has-text('preregistered')").count() == 0   # date-only verdicts are not placed on the dated timeline
+    assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+
+
+def test_home_mounts_the_actual_glb_viewer_with_a_working_fallback(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/home")
+    pg.wait_for_selector("#fish-viewer.mv")
+    ids = pg.locator("#fishcand option").evaluate_all("els => els.map(e => e.value)")
+    assert ids[0] == "fish3d-N1-cypselurus-baseline" and ids[1:] == ["fish3d-v3a-fan", "fish3d-v3b-glide-pose", "fish3d-v3c-daane-length"]
+    assert pg.input_value("#fishcand") == "fish3d-v3a-fan"
+    assert "pectoral camber" in pg.locator("#fishknobs").text_content()
+    pg.locator("#fish-viewer").scroll_into_view_if_needed()
+    pg.wait_for_function("document.querySelector('#fish-viewer').textContent.length > 40", timeout=20000)
+    pg.select_option("#fishcand", "fish3d-N1-cypselurus-baseline")
+    pg.wait_for_function("document.querySelector('#fishknobs').textContent.includes('flat fin plates')")
+    assert pg.errors == []
+    for rel in ("fish3d-N1-cypselurus-baseline/fish.glb", "fish3d-v3a-fan/fish-adult-fao.glb", "fish3d-v3b-glide-pose/appearance-adult-fao.json", "fish3d-v3c-daane-length/components.json"):
+        r = pg.request.get(base + "artifacts/fish3d/" + rel)
+        assert r.status == 200, rel
+    assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+
+
+def test_betse_morpheus_openfold_and_md_cards_keep_their_limits(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    for cid in ("betse-tissue", "morpheus-multicell", "molecular-md"):
+        pg.wait_for_selector(f"#sim-{cid} video")
+    pg.wait_for_selector("#sim-openfold2-kcnj13")
+    assert "not a fish fin" in pg.locator("#sim-betse-tissue").text_content() and "No sha256 is declared" in pg.locator("#sim-betse-tissue").text_content()
+    assert "not calibrated" in pg.locator("#sim-morpheus-multicell").text_content().lower() and "600 s cap" in pg.locator("#sim-morpheus-multicell").text_content()
+    md = pg.locator("#sim-molecular-md").text_content()
+    assert "not achieved" in md and "not computed (null)" in md and "300 K is the target, not the observation" in md
+    of = pg.locator("#sim-openfold2-kcnj13").text_content()
+    assert "No video file" in of and "not a calibrated probability" in of.replace("calibrated probability of", "calibrated probability") or "calibrated probability" in of
+    assert "PREDICTED" in of
+
+
+def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/home")
+    pg.wait_for_selector(".aboutmenu summary")
+    pg.focus(".aboutmenu summary"); pg.keyboard.press("Enter")
+    hrefs = pg.locator(".aboutmenu details[open] a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative"]
+    assert pg.locator("nav[aria-label=Views] > ul > li > a:has-text('Generative')").count() == 0   # not a top-level item
+    assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/home"); pg2.wait_for_selector(".aboutmenu summary")
+    assert not pg2.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+
+
+def test_system_built_tab_reports_counters_only_with_unknowns_and_no_scorecard(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=built")
+    pg.wait_for_selector("#bt-h")
+    t = pg.locator("#main").text_content()
+    for q in ("Agents", "Model calls and tokens", "GPU jobs (own H100)", "GPU container work seconds", "CPU jobs (own)", "GPU utilisation", "Cost"):
+        assert q in t, q
+    assert "CPU seconds are not recorded: unknown" in t and "Total distinct agents and currently active agents: unknown" in t
+    assert "1037.4 s" in t and "GPU kernel seconds and billed GPU seconds: unknown" in t and "not a count of agents" in t and "Provider COMPLETED means the container ended" in t and "Reuse by anyone outside this team is not recorded" in t
+    assert "%" not in pg.locator(".tablewrap").first.text_content()
+    assert "scorecard" not in t.lower() and "rubric" not in t.lower()
+
+
+def test_cuda_md_card_and_warmstart_bytes_are_exact(browser, base):
+    import hashlib
+    b = (ROOT / "site/artifacts/molecular/warmstart-v3.tar.xz").read_bytes()
+    assert len(b) == 1809144 and hashlib.sha256(b).hexdigest() == "4154fcdc3784fa1bfe6c667cdc20fabc346e8c482d9010ad5646a10eea78c3bf"
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector("#sim-molecular-md-cuda video")
+    t = pg.locator("#sim-molecular-md-cuda").text_content()
+    assert "three 100 ps" in t and "Equilibrated ensemble: not established" in t and "not computed (null)" in t and "not a confidence interval" in t
+    assert "0.2 ps CPU setup run" in pg.locator("#sim-molecular-md").text_content()
+
+
+def _overflow(pg):
+    return pg.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
+
+
+def test_frontier_question_table_keeps_bounded_columns_and_short_rows(browser, base):
+    pg = page(browser, 1280, 900)
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector(".qtable tbody tr")
+    m = pg.evaluate("""() => { const t = document.querySelector('.qtable'); const wrap = t.closest('.tablewrap'); const a = t.querySelector('tbody td:first-child');
+      return {table: t.getBoundingClientRect().width, wrap: wrap.getBoundingClientRect().width, id: a.getBoundingClientRect().width,
+              rows: [...t.querySelectorAll('tbody tr')].map(r => r.getBoundingClientRect().height)}; }""")
+    assert m["table"] <= m["wrap"] + 1, m
+    assert m["id"] <= 180, m
+    assert max(m["rows"]) <= 190, m
+
+
+def test_phone_pages_do_not_widen_and_the_nav_wraps_into_view(browser, base):
+    pg = page(browser, 400, 800)
+    for route in ("#/knowledge", "#/frontier", "#/work?tab=runtime", "#/work?tab=built", "#/studio/flying-fish", "#/simulations"):
+        pg.goto(base + route)
+        pg.wait_for_timeout(1200)
+        assert _overflow(pg) <= 0, (route, _overflow(pg))
+    pg.goto(base + "#/home"); pg.wait_for_selector(".aboutmenu summary")
+    edges = pg.evaluate("[...document.querySelectorAll('nav[aria-label=Views] > ul > li')].map(li => { const r = li.getBoundingClientRect(); return [li.textContent.trim().slice(0, 10), Math.round(r.left), Math.round(r.right)]; })")
+    assert all(l >= 0 and r <= 400 for _, l, r in edges), edges
+    assert [e[0] for e in edges][-2:] == ["System", "About"] or any(e[0].startswith("System") for e in edges), edges
+
+
+def test_large_json_trees_are_collapsed_by_default(browser, base):
+    pg = page(browser)
+    for route in ("#/work?tab=runtime", "#/work?tab=resources", "#/work?tab=built"):
+        pg.goto(base + route); pg.wait_for_timeout(1200)
+        big = pg.evaluate("""() => [...document.querySelectorAll('pre, .tree')].filter(e => e.textContent.length > 2000 && !e.closest('details') ).length""")
+        assert big == 0, (route, big)
+
+
+def test_live_question_table_with_long_ids_and_text_stays_inside_its_panel(browser, base):
+    def rec(i):
+        long_id = f"problem-{i:03d}-" + "x" * 56
+        return {"record": {"namespace": "n", "kind": "Problem", "id": long_id, "version": "a" * 64, "payload": {
+            "question": "Does a very long and detailed open question about cross scale calibration keep its row readable? " * 3,
+            "known_state": "A long statement of what is known. " * 12, "next_action_text": "A bounded next action. " * 6, "problem_kind": "design", "completeness": "actionable",
+            "approach": "top_down", "scales": ["organ", "organism"], "context_tags": ["tag-" + "y" * 30], "dependencies": []}}, "local_status": "proposed", "is_head": True}
+    for w, h in ((1280, 900), (400, 800)):
+        pg = page(browser, w, h)
+        pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+        pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+        pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+        pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": [rec(i) for i in range(30)]}))
+        pg.goto(base + "#/frontier")
+        pg.wait_for_selector(".livepanel table tbody tr")
+        m = pg.evaluate("""() => { const t = document.querySelector('.livepanel table'); const wrap = t.closest('.tablewrap'); const a = t.querySelector('tbody td:first-child');
+          return {table: t.getBoundingClientRect().width, wrap: wrap.getBoundingClientRect().width, id: a.getBoundingClientRect().width,
+                  rows: [...t.querySelectorAll('tbody tr')].map(r => r.getBoundingClientRect().height), page: document.documentElement.scrollWidth - document.documentElement.clientWidth}; }""")
+        assert m["page"] <= 0, (w, m)
+        assert m["id"] <= (230 if w > 500 else 170), (w, m)
+        assert max(m["rows"]) <= 200, (w, m)
+
+
+def test_phone_knowledge_filters_with_long_facet_values_do_not_widen_the_page(browser, base):
+    def rec(i):
+        return {"record": {"namespace": "n", "kind": "Claim", "id": f"c{i:03d}", "version": "a" * 64, "payload": {"title": f"Claim {i}", "statement": "S" * 200, "prior_review": {"delphi_original": {"delphi_graph": {"thinker": "A thinker with an extremely long name " * 3, "work": "A work title that is also far too long for one line " * 3, "year": 1990 + i % 30}}}}}, "local_status": "proposed", "is_head": True}
+    pg = page(browser, 400, 800)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": [rec(i) for i in range(12)]}))
+    pg.goto(base + "#/knowledge")
+    pg.wait_for_selector("#cblist .claimcard")
+    assert _overflow(pg) <= 0, _overflow(pg)
+
+
+def test_attention_json_is_collapsed_and_filled_only_when_opened(browser, base):
+    big = {"schema": "frontier.attention/1", "generated_at": "t", "namespace": "n", "view": {"rows": [{"ref": {"id": f"p{i}"}, "store": {"question": "q" * 400}} for i in range(120)]}}
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": []}))
+    pg.route("**/api/attention", lambda r: r.fulfill(json={"report": big}))
+    pg.goto(base + "#/work?tab=work")
+    pg.wait_for_selector("details.rawjson")
+    assert pg.evaluate("document.querySelector('details.rawjson pre').textContent.length") == 0
+    assert pg.evaluate("document.querySelector('details.rawjson').open") is False
+    pg.click("details.rawjson summary")
+    pg.wait_for_function("document.querySelector('details.rawjson pre').textContent.length > 10000")
+
+
+def test_simulation_preview_never_prints_an_object_for_structured_errors_or_digest_maps(browser, base):
+    def handler(route):
+        body = json.loads(route.request.post_data)
+        if body["model"] == "mechanobio":
+            route.fulfill(status=400, json={"error": {"code": "parameter_out_of_range", "message": {"field": "dt_s", "limit": 0.1}}})
+        else:
+            route.fulfill(json={"schema": "frontier.simulation.preview/1", "status": "completed", "model": "bioelectric", "evidence_kind": "SimulationResult", "persisted": False, "calibrated": False,
+                "request_sha256": "a" * 64, "effective_request_sha256": "b" * 64, "code_sha256": {"model.py": "c" * 64, "run.py": "d" * 64}, "computed_at": "2026-10-31T21:00:00Z", "scope": "Preview only.",
+                "result": {"time_ms": [0, 1, 2], "voltage_mV": [[-70, -70], [-60, -65], [-40, -50]]}})
+    pg = page(browser)
+    _mock_live(pg, handler)
+    pg.goto(base + "#/studio/flying-fish?scale=cellular")
+    pg.wait_for_selector("#simwidget form", timeout=15000)
+    pg.fill("#sw-duration_ms", "30")
+    pg.click("#simwidget button[type=submit]")
+    pg.wait_for_selector("#sw-out .rescard svg.chart", timeout=15000)
+    t = pg.locator("#sw-out").text_content()
+    assert "[object Object]" not in t and "model.py" in t and "run.py" in t
+    pg.select_option("#sw-model", "mechanobio")
+    pg.click("#simwidget button[type=submit]")
+    pg.wait_for_selector("#sw-out .adapter-out.unavailable", timeout=15000)
+    t = pg.locator("#sw-out").text_content()
+    assert "[object Object]" not in t and "parameter_out_of_range" in t and "HTTP 400" in t
+
+
+def test_live_questions_unknown_id_empty_filter_and_assessment_are_readable(browser, base):
+    def rec(i):
+        return {"record": {"namespace": "n", "kind": "Problem", "id": f"q{i}", "version": "a" * 64, "payload": {"question": f"Question {i}?", "known_state": "Known.", "next_action_text": "Do.", "problem_kind": "design", "completeness": "actionable", "approach": "top_down", "scales": ["organ"], "context_tags": [], "dependencies": []}}, "local_status": "proposed", "is_head": True}
+    att = {"report": {"schema": "frontier.attention/1", "generated_at": "t", "namespace": "n", "view": {"rows": [{"ref": {"namespace": "n", "kind": "Problem", "id": "q1", "version": "a" * 64}, "store": {"question": "Question 1?", "known_state": "Known.", "next_action_text": "Do.", "problem_kind": "design", "completeness": "actionable", "approach": "top_down", "scales": ["organ"], "context_tags": [], "dependencies": []},
+        "assessment": {"truth": {"label": "unknown", "evidence": ["e1", "e2"]}, "reviewer": None}, "actions": [], "interest_issuers": {}, "why_priority": [], "register_labels": []}]}}}
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/attention", lambda r: r.fulfill(json=att["report"]))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": [rec(1)]}))
+    pg.goto(base + "#/frontier?live=q1")
+    pg.wait_for_selector("#lqdetail h3, #lqdetail h4")
+    t = pg.locator("#lqdetail").text_content()
+    assert "[object Object]" not in t and "{" not in t and "label: unknown" in t and "e1; e2" in t
+    pg.goto(base + "#/frontier?live=does-not-exist")
+    pg.wait_for_selector("#lqdetail .detail-empty")
+    t = pg.locator("#lqdetail").text_content()
+    assert "No such question" in t and "does-not-exist" in t and "Question 1" not in t
+    pg.goto(base + "#/frontier?lq=zzzz-nothing")
+    pg.wait_for_selector(".livepanel .count")
+    assert "No live question matches these filters" in pg.locator(".livepanel").text_content()
+
+
+def test_ranked_results_say_when_nothing_contains_the_query_and_print_no_raw_index_json(browser, base):
+    items = [{"type": "record", "ref": {"namespace": "n", "kind": "Claim", "id": "c1", "version": "a" * 64}, "title": "Fin allometry", "snippet": "Pectoral length scales with body length.", "kind": "Claim", "local_status": "proposed", "score": 0.62, "score_kind": "cosine", "why_matched": ["embedding"]}]
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": []}))
+    pg.route("**/api/discovery*", lambda r: r.fulfill(json={"items": items, "mode": "hybrid", "index": {"name": "frontier-index", "model": "gemini-embedding-001", "documents": 2444, "nested": {"a": 1}}}))
+    pg.goto(base + "#/search?q=qzxvbnm&tab=catalog")
+    pg.wait_for_selector("#dr-h")
+    pg.wait_for_function("document.querySelector('#main').textContent.includes('Fin allometry')")
+    t = pg.locator("#main").text_content()
+    assert "No result contains your words" in t and "{" not in pg.locator("#dr-h").locator("xpath=..").text_content()
+    assert "documents 2444" in t
+    pg.goto(base + "#/search?q=fin&tab=catalog")
+    pg.wait_for_function("document.querySelector('#main').textContent.includes('Fin allometry')")
+    assert "No result contains your words" not in pg.locator("#main").text_content()
+
+
+def test_malformed_entity_route_makes_no_request_and_navigation_moves_focus_to_main(browser, base):
+    seen = []
+    pg = page(browser)
+    pg.on("request", lambda r: seen.append(r.url) if "/api/" in r.url else None)
+    pg.goto(base + "#/frontier"); pg.wait_for_selector(".board")
+    pg.evaluate("location.hash = '#/entity/Bogus/x'")
+    pg.wait_for_selector("h1:has-text('Not found')")
+    t = pg.locator("#main").text_content()
+    assert "not a record kind this site knows" in t and "HTTP 400" not in t
+    assert not [u for u in seen if "Bogus" in u]
+    pg.evaluate("location.hash = '#/knowledge'"); pg.wait_for_selector("#cbrowse")
+    assert pg.evaluate("document.activeElement && document.activeElement.id") == "main"
+
+
+def _graph_issues(pg, selector):
+    return pg.evaluate("""(sel) => { const svg = document.querySelector(sel + ' svg'); if (!svg) return {missing: true};
+      const box = svg.getBoundingClientRect(); const labels = [...svg.querySelectorAll('.g-label, .g-sub, .col-title, text')].map(t => ({r: t.getBoundingClientRect(), s: t.textContent.trim()})).filter(x => x.s && x.r.width > 0);
+      const out = labels.filter(x => x.r.left < box.left - 1 || x.r.right > box.right + 1).map(x => x.s.slice(0, 30));
+      const hosts = svg.closest('.graphhost'); const hostBox = hosts ? hosts.getBoundingClientRect() : box;
+      const overlaps = []; const lab = [...svg.querySelectorAll('.g-label')].map(t => ({r: t.getBoundingClientRect(), s: t.textContent.trim()}));
+      for (let i = 0; i < lab.length; i++) for (let j = i + 1; j < lab.length; j++) { const a = lab[i].r, b = lab[j].r; const ox = Math.min(a.right, b.right) - Math.max(a.left, b.left), oy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top); if (ox > 2 && oy > 2) overlaps.push([lab[i].s.slice(0, 20), lab[j].s.slice(0, 20)]); }
+      return {outside: out, overlaps: overlaps.slice(0, 5), n: labels.length}; }""", selector)
+
+
+def test_frontier_board_graph_labels_stay_inside_the_drawing_and_do_not_overlap(browser, base):
+    for w, h in ((1280, 900), (400, 800)):
+        pg = page(browser, w, h)
+        pg.goto(base + "#/frontier"); pg.wait_for_selector("#wbgraph svg")
+        g = _graph_issues(pg, "#wbgraph")
+        assert g.get("outside") == [] and g.get("overlaps") == [], (w, g)
+
+
+def test_home_viewer_is_destroyed_on_candidate_change_and_on_leaving_and_the_note_follows_the_candidate(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/home")
+    pg.wait_for_selector("#fish-viewer.mv")
+    pg.wait_for_function("window.DF && DF.fishViewer && typeof DF.fishViewer.destroy === 'function'")
+    pg.evaluate("() => { window.__destroyed = 0; const v = DF.fishViewer; const d = v.destroy.bind(v); v.destroy = () => { window.__destroyed++; d(); }; }")
+    note = pg.locator("#grnote").text_content()
+    assert "Ray-supported fins" in note and "not a validated fish" in note and "flat fin plates" not in note and "N1 baseline reference" in note
+    assert "N1 baseline reference" in pg.locator(".grounding h3").first.text_content() or "N1 baseline reference" in pg.locator(".grounding").text_content()
+    pg.select_option("#fishcand", "fish3d-N1-cypselurus-baseline")
+    pg.wait_for_function("document.querySelector('#grnote').textContent.includes('flat fin plates')")
+    assert pg.evaluate("window.__destroyed") == 1, "changing candidate must destroy the previous viewer"
+    pg.wait_for_function("DF.fishViewer && typeof DF.fishViewer.destroy === 'function'")
+    pg.evaluate("() => { window.__destroyed = 0; const v = DF.fishViewer; const d = v.destroy.bind(v); v.destroy = () => { window.__destroyed++; d(); }; }")
+    pg.evaluate("location.hash = '#/knowledge'"); pg.wait_for_selector("#cbrowse")
+    assert pg.evaluate("window.__destroyed") == 1 and pg.evaluate("DF.fishViewer") is None, "leaving Home must destroy the viewer"
+    assert pg.locator("canvas.mv-canvas, #fish-viewer canvas").count() == 0
+
+
+def test_v3_candidates_declare_no_video_so_the_fallback_cannot_offer_a_missing_turntable(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    for c in snap["fish3d_viewer"]["candidates"][1:]:
+        assert c["variants"] and all("video" in v and v["video"] is None for v in c["variants"]), c["id"]

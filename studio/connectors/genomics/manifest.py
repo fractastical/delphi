@@ -16,7 +16,7 @@ OUT = ROOT / "data" / "genomics"
 
 ROLES = {"index.json": ("index", "multi", "all"), "genes.csv": ("table", "Danio rerio", "source_assessment"), "sources.json": ("sources", "multi", "source_assessment"),
          "records/records.json": ("records", "multi", "all"), "assembly_check.json": ("check", "Danio rerio", "source_assessment"), "id_crosscheck.json": ("check", "Danio rerio", "source_assessment"), "lat4a_resolution_v2.json": ("check", "Danio rerio", "source_assessment"), "daane2021_pins.json": ("check", "multi", "all"), "daane2021_chain.json": ("check", "multi", "all"),
-         "daane2021_source.json": ("sources", "multi", "source_assessment"), "daane2021_records.json": ("records", "multi", "all"), "lat4a_resolution.json": ("check", "Danio rerio", "source_assessment"),
+         "daane2021_source.json": ("sources", "multi", "source_assessment"), "daane2021_records.json": ("records", "multi", "all"), "lat4a_resolution.json": ("check", "Danio rerio", "source_assessment"), "lat4a_resolution_v3.json": ("check", "Danio rerio", "source_assessment"), "daane2021_supplement_sheets.json": ("check", "multi", "source_assessment"), "daane2021_supplement_records.json": ("records", "multi", "all"),
          "flyingfish_genome_facts.json": ("table", "Hirundichthys speculiger", "sequence_annotation"), "daniocell_correlations.csv": ("table", "Danio rerio", "expression_correlation"),
          "daniocell_tissue_group_thumbnails.csv": ("table", "Danio rerio", "expression_correlation"), "zfin_expression_selected.csv": ("table", "Danio rerio", "expression_correlation"),
          "zfin_phenotype_selected.csv": ("table", "Danio rerio", "genotype_phenotype"), "receipts.json": ("receipts", "multi", "all"), "flyingfish_receipts.json": ("receipts", "Hirundichthys speculiger", "sequence_annotation"),
@@ -28,10 +28,10 @@ DISPLAY_RULES = {
     "cross_species_statements": "proposed_transfer only: render as a hypothesis, never as evidence, never beside a species-specific result without the label",
     "missing_values": "show as missing (blank or 'not recorded'), never as zero; absence of a curated annotation is 'not curated', not 'not expressed'",
     "unresolved_identifiers": ["lat4a"],
-    "unresolved_rule": "lat4a has no accession in the paper: show 'inferred: slc43a2a (probable, not confirmed)' and never present slc43a2a as the paper's stated identifier; link to lat4a_resolution_v2.json",
+    "unresolved_rule": "the paper prints no zebrafish accession for lat4a: show 'inferred: slc43a2a (supported by the supplement's naming and an Ensembl ortholog; not an author-stated zebrafish accession)' and never present slc43a2a as the paper's stated identifier; link to lat4a_resolution_v3.json",
     "show_per_plot": ["title", "limits caption inside the figure", "input hashes from plots/plot_manifest.json"],
     "must_not_say": ["causal or interaction evidence was gathered here", "Daniocell correlation means regulation", "best-hit SwissProt similarity is orthology", "any flying-fish structure is annotated beyond the mirrorwing assembly",
-                     "NCBI Gene coordinates are GRCz11", "the paper's lat4a is confirmed to be slc43a2a (it is inferred; slc43a2b is disfavoured, not excluded)", "the zebrafish lat4a x kcnh2a phenocopy shows flight, or that flying fishes use these genes (the genomic data are correlational)", "genomes available is a proven mutation map"],
+                     "NCBI Gene coordinates are GRCz11", "the paper's lat4a is confirmed to be slc43a2a by the authors or by a residue check (it is supported by the supplement's medaka naming and Ensembl orthology; the authors print no zebrafish accession)", "the zebrafish lat4a x kcnh2a phenocopy shows flight, or that flying fishes use these genes (the genomic data are correlational)", "genomes available is a proven mutation map"],
     "licence_rule": "a source with license null has no stated licence in the bytes read; link to it, do not host its content; CC BY items (mirrorwing paper, figshare 14600634) are redistributable with attribution",
 }
 
@@ -58,11 +58,12 @@ def main() -> int:
     idx = json.loads((OUT / "index.json").read_text())
     recs = json.loads((OUT / "records" / "records.json").read_text())["records"]
     drecs = json.loads((OUT / "daane2021_records.json").read_text())["records"]
-    man = {"manifest_schema": "genomics-manifest-0.2 (connector-local)", "supersedes": "genomics-manifest-0.1: additive (Daane 2021 layer, an `inferred` field, reworded lat4a display rule and must_not_say)", "retrieved": idx["retrieved"], "namespace": "node-a (corpus remaps)", "status": "proposed; nothing submitted, reviewed or accepted",
-           "counts": {"genes": len(idx["genes"]), "records": {k: sum(1 for r in recs if r["kind"] == k) for k in ("Claim", "Evidence", "Problem")}, "records_daane2021": {k: sum(1 for r in drecs if r["kind"] == k) for k in ("Claim", "Evidence", "Problem")}, "sources": len(json.loads((OUT / "sources.json").read_text())["cards"]),
+    srecs = json.loads((OUT / "daane2021_supplement_records.json").read_text())["records"]
+    man = {"manifest_schema": "genomics-manifest-0.3 (connector-local)", "supersedes": "genomics-manifest-0.2: additive (supplement Data S1 read for lat4a, 5 new records, corrected sheet descriptions); the lat4a display rule and `inferred` wording change from 'probable, not confirmed' to 'supported' and say what is still not established. 0.2 and every earlier file stay as the record of the earlier state.", "retrieved": idx["retrieved"], "namespace": "node-a (corpus remaps)", "status": "proposed; nothing submitted, reviewed or accepted",
+           "counts": {"genes": len(idx["genes"]), "records": {k: sum(1 for r in recs if r["kind"] == k) for k in ("Claim", "Evidence", "Problem")}, "records_daane2021": {k: sum(1 for r in drecs if r["kind"] == k) for k in ("Claim", "Evidence", "Problem")}, "records_supplement": {k: sum(1 for r in srecs if r["kind"] == k) for k in ("Claim", "Evidence", "Problem")}, "sources": len(json.loads((OUT / "sources.json").read_text())["cards"]),
                       "files": len(files), "plots": sum(1 for f in files if f["role"] == "plot")},
-           "unresolved": ["lat4a accession: the paper prints none (see lat4a_resolution_v2.json)"], "inferred": ["lat4a = slc43a2a (ZDB-GENE-040426-964), probable, not confirmed; see lat4a_resolution_v2.json"],
-           "not_fetched": ["Zebrahub gene-level data", "DANIO-CODE regulatory tracks", "Daniocell 2023 full text (not open access)", "Daane 2021 supplement: Tables S1-S3, Data S1A-S1N, Figures S1-S4 (the 19-page PDF was read in full; Data S1A is being extracted by dx-submit)", "any causal_intervention data", "flyingfish assembly sequence (311 MB)"],
+           "unresolved": ["lat4a zebrafish accession: neither the paper text nor Data S1 prints one (they use medaka Ensembl ids); the residue check is still inconclusive for slc43a2a (see lat4a_resolution_v3.json)"], "inferred": ["lat4a = slc43a2a (ZDB-GENE-040426-964, ENSDARG00000036848), SUPPORTED by the supplement's naming (Data S1G/H/J) and an Ensembl one-to-one ortholog; not an author-stated zebrafish accession; see lat4a_resolution_v3.json"],
+           "not_fetched": ["Zebrahub gene-level data", "DANIO-CODE regulatory tracks", "Daniocell 2023 full text (not open access)", "Daane 2021 supplement: Tables S1-S3 and Figures S1-S4 (Data S1 rows naming lat4a, lat4b and slc43a2b in sheets G, H, I, J were read here; the rest of Data S1 was not; Data S1A is in the fish-controls branch)", "any causal_intervention data", "flyingfish assembly sequence (311 MB)"],
            "display_rules": DISPLAY_RULES, "files": files}
     (OUT / "manifest.json").write_text(json.dumps(man, indent=1, sort_keys=True))
     schema = {
@@ -70,10 +71,10 @@ def main() -> int:
         "type": "object", "additionalProperties": False, "required": ["manifest_schema", "retrieved", "namespace", "status", "counts", "unresolved", "inferred", "not_fetched", "display_rules", "files"],
         "$defs": {"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}},
         "properties": {
-            "manifest_schema": {"const": "genomics-manifest-0.2 (connector-local)"}, "retrieved": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"}, "namespace": {"type": "string"}, "status": {"type": "string", "pattern": "^proposed"},
+            "manifest_schema": {"const": "genomics-manifest-0.3 (connector-local)"}, "retrieved": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"}, "namespace": {"type": "string"}, "status": {"type": "string", "pattern": "^proposed"},
             "counts": {"type": "object", "required": ["genes", "records", "sources", "files", "plots"], "properties": {"genes": {"type": "integer", "minimum": 1}, "records": {"type": "object", "required": ["Claim", "Evidence", "Problem"]},
                                                                                                                "sources": {"type": "integer"}, "files": {"type": "integer"}, "plots": {"type": "integer", "minimum": 1}}},
-            "unresolved": {"type": "array", "items": {"type": "string"}, "contains": {"pattern": "^lat4a"}}, "inferred": {"type": "array", "items": {"type": "string"}, "minItems": 1, "contains": {"pattern": "probable, not confirmed"}}, "supersedes": {"type": "string"}, "not_fetched": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+            "unresolved": {"type": "array", "items": {"type": "string"}, "contains": {"pattern": "^lat4a"}}, "inferred": {"type": "array", "items": {"type": "string"}, "minItems": 1, "contains": {"pattern": "SUPPORTED.*not an author-stated"}}, "supersedes": {"type": "string"}, "not_fetched": {"type": "array", "items": {"type": "string"}, "minItems": 1},
             "display_rules": {"type": "object", "required": ["show_species_on_every_row", "show_evidence_class_label_on_every_row", "cross_species_statements", "missing_values", "unresolved_identifiers", "must_not_say", "licence_rule"],
                               "properties": {"show_species_on_every_row": {"const": True}, "show_evidence_class_label_on_every_row": {"const": True}, "unresolved_identifiers": {"type": "array", "contains": {"const": "lat4a"}},
                                              "must_not_say": {"type": "array", "minItems": 5}}},

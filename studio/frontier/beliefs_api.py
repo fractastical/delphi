@@ -14,15 +14,15 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from threading import BoundedSemaphore
 
 from .beliefs import BeliefError, canonical, digest, solve
+from .worker_limits import Slots
 
 ROOT = Path(__file__).resolve().parents[1]
 API_SCHEMA = "frontier.beliefs.api/1"
 MAX_REQUEST_BYTES = 32 * 1024
 TIMEOUT_S = 8
-SLOTS = BoundedSemaphore(2)
+SLOTS = Slots(2)                 # also draws on the process-wide worker budget in worker_limits
 SCENARIO_KEYS = {"schema", "label", "variables", "priors", "factors", "decision", "collapse"}
 WORKER_ARGV = [sys.executable, "-m", "frontier.beliefs_api", "--worker"]
 ASSUMED_SCOPE = ("Consequences of the declared assumptions in the submitted scenario only (priors, factors, "
@@ -114,6 +114,8 @@ def solve_scenario(data) -> dict:
 if __name__ == "__main__":
     if sys.argv[1:] != ["--worker"]:
         raise SystemExit("Use the bounded adapter, or --worker with a finite JSON scenario on stdin")
+    from .worker_limits import cap_worker
+    cap_worker()
     try:
         raw = sys.stdin.buffer.read(MAX_REQUEST_BYTES + 1)
         if len(raw) > MAX_REQUEST_BYTES:

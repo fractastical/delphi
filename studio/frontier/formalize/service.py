@@ -13,17 +13,17 @@ import os
 import signal
 import subprocess
 import sys
-import threading
 import time
 from pathlib import Path
 
 from . import dims as D
 from . import leangen, refusals
 from .grammar import (LIMITS, SCHEMA_ERROR, SCHEMA_RESPONSE, GrammarError, canonical, is_literal, parse_literal,
-                      sha256_obj, term_to_text, validate_request)
-from .solve import Model, check, holds
+                      sha256_obj, validate_request)
+from .solve import Model, check
+from ..worker_limits import Slots
 
-SLOTS = threading.BoundedSemaphore(2)
+SLOTS = Slots(2)                 # also draws on the process-wide worker budget in worker_limits
 REPO_ROOT = Path(__file__).resolve().parents[2]
 WORKER_ARGV = [sys.executable, "-s", "-m", "frontier.formalize.worker"]  # tests may point this at a labelled stub
 ASSUMED_SCOPE = ("Only the constraints exactly as written, under the declared symbols, units and domains. Not a claim that the "
@@ -108,7 +108,9 @@ def controls(req: dict, ctx: dict, base_checks: dict, dim_rep: list) -> list:
     """Named controls.  Each has a pre-declared `expected`; `observed` is measured; they never change the verdict."""
     out = []
     cons = ctx["constraints"]
-    sdim = {n: D.parse_unit(s["unit"]) for n, s in ctx["symbols"].items()}
+    # Validate every declared unit, including symbols unused by a proposal.
+    for symbol in ctx["symbols"].values():
+        D.parse_unit(symbol["unit"])
 
     def dim_ok(c2ctx) -> bool:
         sd = {n: D.parse_unit(s["unit"]) for n, s in c2ctx["symbols"].items()}

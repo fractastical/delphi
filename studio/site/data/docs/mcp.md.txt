@@ -25,8 +25,13 @@ including an actual simulation, constraint solve, formalization, belief calculat
 exact Project lookup and hash-checked print asset lookup. The receipt is
 `deploy/receipts/mcp-expanded-check.json`. These calculations wrote no scientific
 records. Discovery used its explicit lexical fallback in that check.
-The source branch additionally provides `frontier_design_context`; check the
-live capability manifest for its deployment status.
+The October 31 About release also deployed `frontier_design_context`, bringing
+the live total to 19 tools (16 read/calculation tools and three credentialed
+contribution tools). At 3:45pm PDT, the official SDK client completed 35 checks,
+including exact-version design context and bounded calculations; no scientific
+records were written. The receipt is
+[`about-mcp-live-check.json`](../deploy/receipts/about-mcp-live-check.json).
+Check the live capability manifest for the currently deployed tool set.
 Start with `frontier_capabilities`, then use exact refs from `frontier_search`,
 `frontier_discover` or `frontier_graph` with `frontier_get`.
 
@@ -127,9 +132,9 @@ action submitted through this MCP server and that a different operator can accep
 
 ## Expanded read and calculation tools
 
-The source branch registers these 16 read-only tools in both stdio and remote
-modes. Check `frontier_capabilities` on the actual server before relying on a
-tool, because deployment may lag this branch.
+The server registers these 16 read-only tools in both stdio and remote modes.
+Check `frontier_capabilities` on the actual server before relying on a tool,
+because subsequent deployment changes may differ from this dated record.
 
 | Tool | What it returns | Important scope |
 |---|---|---|

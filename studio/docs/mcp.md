@@ -25,8 +25,13 @@ including an actual simulation, constraint solve, formalization, belief calculat
 exact Project lookup and hash-checked print asset lookup. The receipt is
 `deploy/receipts/mcp-expanded-check.json`. These calculations wrote no scientific
 records. Discovery used its explicit lexical fallback in that check.
-The source branch additionally provides `frontier_design_context`; check the
-live capability manifest for its deployment status.
+The October 31 About release also deployed `frontier_design_context`, bringing
+the live total to 19 tools (16 read/calculation tools and three credentialed
+contribution tools). At 3:45pm PDT, the official SDK client completed 35 checks,
+including exact-version design context and bounded calculations; no scientific
+records were written. The receipt is
+[`about-mcp-live-check.json`](../deploy/receipts/about-mcp-live-check.json).
+Check the live capability manifest for the currently deployed tool set.
 Start with `frontier_capabilities`, then use exact refs from `frontier_search`,
 `frontier_discover` or `frontier_graph` with `frontier_get`.
 
@@ -127,9 +132,9 @@ action submitted through this MCP server and that a different operator can accep
 
 ## Expanded read and calculation tools
 
-The source branch registers these 16 read-only tools in both stdio and remote
-modes. Check `frontier_capabilities` on the actual server before relying on a
-tool, because deployment may lag this branch.
+The server registers these 16 read-only tools in both stdio and remote modes.
+Check `frontier_capabilities` on the actual server before relying on a tool,
+because subsequent deployment changes may differ from this dated record.
 
 | Tool | What it returns | Important scope |
 |---|---|---|
@@ -144,7 +149,7 @@ tool, because deployment may lag this branch.
 | `frontier_catalogue` | Counts and coverage report from the existing catalogue adapter | Describes the bounded public catalogue, not all records that may exist elsewhere. |
 | `frontier_project_inspect` | One exact Project envelope and its pinned members | Project pins remain exact; membership does not establish applicability or acceptance. |
 | `frontier_design_context` | Exact Project/member annotations and paginated challenge/reply threads | Every annotation carries its exact anchor and thread pin; authored challenges and replies do not vote, validate, or resolve a design. |
-| `frontier_artifact_inspect` | Exact-hash matching Evidence declarations and guarded local-media matches | Local bytes are checked under the release's public `site/artifacts` tree. Remote URIs are never fetched; no content preview is returned. Declaration alone is not byte verification. |
+| `frontier_artifact_inspect` | Exact-hash matching Evidence declarations, guarded local-media matches and optional text | `include_text=true` reads published UTF-8 JSON, plain text or CSV only, after rechecking the complete file digest. Maximum file size is 1,000,000 bytes; `max_chars` defaults to 8,000 and is bounded to 1–16,000. Truncation and unavailable/unsupported content are explicit. Remote URIs are never fetched. Declaration alone is not byte verification. |
 | `frontier_simulate` | One allowlisted bioelectric or mechanobiology preview | Fixed bounded local adapter; ephemeral `SimulationResult`, never accepted Evidence. No arbitrary code, cloud job or external inference. |
 | `frontier_engineer` | Existing finite aircraft-constraint calculation | Ephemeral exact-constraint result. The optional Z3 solver must be installed; otherwise the adapter returns a bounded `solver_unavailable` error. No biological validation is implied. |
 | `frontier_formalize` | Existing finite expression/formalization proposal | Ephemeral proposal; not a persisted or accepted formal Evidence record. |

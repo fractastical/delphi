@@ -63,7 +63,9 @@
 
   /* Exact-pin resolution. With a version in the link the Ref is built from namespace/kind/id/version and read directly: a pin is never substituted by a head.
    * Without a version the current head is resolved explicitly and said to be; if several namespaces hold the id, the caller must show a choice. */
+  const KNOWN_KINDS = ["Claim", "Problem", "Evidence", "Assessment", "Action", "Actor", "ResourceOffer", "Interest", "Event", "Project", "Annotation"];
   DF.resolveRecord = async function (kind, id, { ns = "", v = "" } = {}) {
+    if (!KNOWN_KINDS.includes(kind)) return { error: `“${kind}” is not a record kind this site knows (${KNOWN_KINDS.join(", ")}); no request was made` };
     if (v) {
       if (!ns) { const c = (await DF.api.catalog({ query: id, kind, limit: 50 })).records.filter((x) => x.ref.id === id && x.ref.version === v); if (c.length !== 1) return { error: c.length ? `the version pin matches records in more than one namespace; add the namespace to the link` : `no ${kind} “${id}” with that exact version is visible`, candidates: c.map((x) => x.ref) }; ns = c[0].ref.namespace; }
       const ref = { namespace: ns, kind, id, version: v };

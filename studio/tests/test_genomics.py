@@ -77,7 +77,9 @@ def test_manifest_obeys_its_schema_and_the_schema_rejects_violations():
     assert not list(v.iter_errors(man))
 
     def broken(edit):
-        m = json.loads(json.dumps(man)); edit(m); return list(v.iter_errors(m))
+        m = json.loads(json.dumps(man))
+        edit(m)
+        return list(v.iter_errors(m))
     assert broken(lambda m: m["files"][0].update(sha256="xyz"))
     assert broken(lambda m: m["unresolved"].clear())
     assert broken(lambda m: m["display_rules"].update(show_species_on_every_row=False))
@@ -385,11 +387,93 @@ def test_record_contexts_quote_the_pinned_sentences_exactly():
         assert qs[qid]["quote"] == text and str(qs[qid]["pdf_page"]) == page, qid
 
 
-def test_manifest_v02_marks_lat4a_inferred_not_resolved_and_pins_the_new_files():
+def test_manifest_v03_marks_lat4a_supported_not_author_stated_and_pins_the_new_files():
     m = J("manifest.json")
-    assert m["manifest_schema"].startswith("genomics-manifest-0.2") and m["inferred"] and "probable, not confirmed" in m["inferred"][0]
-    assert m["unresolved"][0].startswith("lat4a accession") and m["counts"]["records_daane2021"] == {"Claim": 7, "Evidence": 6, "Problem": 3}
+    assert m["manifest_schema"].startswith("genomics-manifest-0.3") and m["inferred"] and "SUPPORTED" in m["inferred"][0] and "not an author-stated zebrafish accession" in m["inferred"][0]
+    assert m["unresolved"][0].startswith("lat4a zebrafish accession") and m["counts"]["records_daane2021"] == {"Claim": 7, "Evidence": 6, "Problem": 3}
+    assert m["counts"]["records_supplement"] == {"Claim": 2, "Evidence": 2, "Problem": 1}
     paths = {f["path"] for f in m["files"]}
-    assert {"data/genomics/daane2021_pins.json", "data/genomics/daane2021_chain.json", "data/genomics/lat4a_resolution_v2.json", "data/genomics/daane2021_records.json", "data/genomics/artifacts/ncbi_NP_956545.1_slc43a2a.faa"} <= paths
-    assert "inferred: slc43a2a (probable, not confirmed)" in m["display_rules"]["unresolved_rule"]
-    assert any("confirmed to be slc43a2a" in x for x in m["display_rules"]["must_not_say"]) and any("proven mutation map" in x for x in m["display_rules"]["must_not_say"])
+    assert {"data/genomics/daane2021_pins.json", "data/genomics/daane2021_chain.json", "data/genomics/lat4a_resolution_v2.json", "data/genomics/lat4a_resolution_v3.json", "data/genomics/daane2021_records.json",
+            "data/genomics/daane2021_supplement_records.json", "data/genomics/daane2021_supplement_sheets.json", "data/genomics/artifacts/ncbi_NP_956545.1_slc43a2a.faa",
+            "data/genomics/artifacts/ensembl_homology_ENSORLG00000009715.json", "data/genomics/artifacts/ensembl_homology_ENSORLG00000005019.json"} <= paths
+    assert "not an author-stated" in m["display_rules"]["unresolved_rule"] and "lat4a_resolution_v3.json" in m["display_rules"]["unresolved_rule"]
+    assert any("by the authors or by a residue check" in x for x in m["display_rules"]["must_not_say"]) and any("proven mutation map" in x for x in m["display_rules"]["must_not_say"])
+
+
+def test_a_manifest_that_overclaims_lat4a_is_rejected_by_the_schema():
+    jsonschema = pytest.importorskip("jsonschema")
+    v = jsonschema.Draft202012Validator(J("manifest.schema.json"))
+    m = J("manifest.json")
+    assert not list(v.iter_errors(m))
+    m["inferred"] = ["lat4a = slc43a2a, confirmed by the authors"]
+    assert list(v.iter_errors(m)), "the old 'probable' wording and an overclaim must both fail the 0.3 contract"
+
+
+def test_lat4a_supplement_rows_chain_and_control():
+    r, sh = J("lat4a_resolution_v3.json"), J("daane2021_supplement_sheets.json")
+    A, B = "ENSORLG00000009715", "ENSORLG00000005019"
+    cells = {s: [x["cells"] for x in v["rows"]] for s, v in sh["lat4a_rows"].items()}
+    assert [A, "lat4a", "F326L"] == next(c for c in cells["G - conv. aa subst."] if A in c)[:3]
+    assert next(c for c in cells["H - fin and limb genes"] if A in c)[:2] == [A, "lat4a"] and next(c for c in cells["H - fin and limb genes"] if B in c)[:2] == [B, "lat4b"]
+    assert next(c for c in cells["J - Exocoeidae phylop"] if A in c) == [A, "slc43a2a", "acc", 0.00837]
+    assert next(c for c in cells["I - Glider RER genes"] if B in c)[1] == "slc43a2b"
+    assert sh["workbook"]["sha256"] == "1ac98650f493036218837d235ed4451ff096d926fa50b797dcea4fc7fca52279" and sh["workbook"]["stored_in_repo"] is False
+    assert not [q for q in D.rglob("*.xlsx")], "the workbook is not stored"
+    assert r["status"].startswith("SUPPORTED") and "not author" not in r["status"] and "state no ZFIN accession" in r["status"]
+    z = {x["symbol"]: x for x in csv.DictReader(open(D / "genes.csv"))}
+    def hom(f):
+        return [h["id"] for h in json.loads((D / "artifacts" / f).read_text())["data"][0]["homologies"] if h["type"] == "ortholog_one2one"]
+    assert hom(f"ensembl_homology_{A}.json") == [z["slc43a2a"]["ensembl_gene"]] == ["ENSDARG00000036848"]
+    assert hom(f"ensembl_homology_{B}.json") == [z["slc43a2b"]["ensembl_gene"]] and r["negative_control"]["distinct_from_lat4a"] is True
+    assert z["slc43a2a"]["zfin_gff_chr"] == "15" and z["slc43a2b"]["zfin_gff_chr"] == "10"
+    import hashlib
+    for st in r["chain"]:
+        if "sha256" in st:
+            assert hashlib.sha256((D / "artifacts" / st["artifact"]).read_bytes()).hexdigest() == st["sha256"]
+    assert len(r["still_not_established"]) == 4 and any("inconclusive" in x for x in r["still_not_established"])
+
+
+def test_the_chain_check_fails_if_the_ortholog_or_the_label_is_changed(tmp_path):
+    """negative controls: the comparison used above must flag a swapped ortholog and a swapped sheet label."""
+    z = {x["symbol"]: x for x in csv.DictReader(open(D / "genes.csv"))}
+    hom = json.loads((D / "artifacts" / "ensembl_homology_ENSORLG00000009715.json").read_text())
+    def ids(h):
+        return [x["id"] for x in h["data"][0]["homologies"]]
+    assert ids(hom) == [z["slc43a2a"]["ensembl_gene"]]
+    hom["data"][0]["homologies"][0]["id"] = z["slc43a2b"]["ensembl_gene"]
+    assert ids(hom) != [z["slc43a2a"]["ensembl_gene"]], "a swapped ortholog is detected"
+    sh = J("daane2021_supplement_sheets.json")["lat4a_rows"]["J - Exocoeidae phylop"]["rows"]
+    assert [x for x in sh if "ENSORLG00000009715" in x["cells"]][0]["cells"][1] == "slc43a2a" != "slc43a2b"
+
+
+def test_the_earlier_lat4a_records_are_unchanged_and_the_new_ones_supersede_status_only():
+    old = {r["id"]: r for r in J("daane2021_records.json")["records"]}
+    new = J("daane2021_supplement_records.json")
+    ids = {r["id"] for r in new["records"]}
+    assert {"gx-lat4a-is-probably-slc43a2a", "gx-problem-lat4a-accession"} <= set(old) and not ({"gx-lat4a-is-probably-slc43a2a", "gx-problem-lat4a-accession"} & ids)
+    # Versions copied from the committed file at 1dc2aaa, deliberately independent of the data: an edit to a superseded record must fail here (they are append-only).
+    assert old["gx-lat4a-is-probably-slc43a2a"]["version"] == "218c2a7e5f10bf647bde0410c158ef5f3effe4e021e96b3a3e2b29fc776c6c1e"
+    assert old["gx-problem-lat4a-accession"]["version"] == "cd52c6d53994908fa1afc7187a0b3e5496c86890ce34c26f2dd059cd554993f9"
+    assert old["gx-lat4a-is-probably-slc43a2a"]["payload"]["title"].startswith("Inference (probable, not confirmed): the paper's lat4a is zebrafish slc43a2")
+    models_ = pytest.importorskip("frontier.models")
+    for rid in ("gx-lat4a-is-probably-slc43a2a", "gx-problem-lat4a-accession"):     # the stored version must still be the digest of the stored content
+        r = old[rid]
+        assert models_.make_record(models_.Draft.model_validate({k: r[k] for k in ("namespace", "kind", "id", "issuer", "source_uri", "visibility", "predecessor", "payload")}), created_at=r["created_at"])["version"] == r["version"], rid
+    assert len(old) == 16 and len(new["records"]) == 5 and ids == {"gx-daane-datas1-names-lat4a-as-slc43a2a", "gx-lat4a-is-slc43a2a-supported", "gx-problem-lat4a-residues", "gx-ev-datas1-lat4a-rows", "gx-ev-ensembl-ortholog"}
+    assert "append_only_note" in new and "kept" in new["append_only_note"] or "keep their versions" in new["append_only_note"]
+    claim = next(r for r in new["records"] if r["id"] == "gx-lat4a-is-slc43a2a-supported")["payload"]
+    assert "not author-stated" in claim["title"] and any("authors print no zebrafish accession" in x for x in claim["limitations"]) and any("inconclusive" in x for x in claim["limitations"])
+    by = {}
+    for r in new["records"]:
+        by[r["id"]] = r
+    for r in new["records"]:
+        if r["kind"] == "Evidence":
+            assert r["payload"]["target"]["version"] == by[r["payload"]["target"]["id"]]["version"], "evidence pins its exact target version"
+
+
+def test_corrected_sheet_descriptions_replace_the_guesses_without_editing_the_pins():
+    sh = J("daane2021_supplement_sheets.json")["sheets"]
+    assert "copy number" in sh["E - CNV"] and "contig" not in sh["E - CNV"] and "heterozygous" in sh["D - heterozygosity"] and "phyloP" in sh["J - Exocoeidae phylop"] and "noncoding" in sh["K - accel CNEs Exocoet."] and "contig" not in sh["E - CNV"]
+    assert len(sh) == 14
+    old = J("daane2021_pins.json")["supplement"]["items"]["Data S1C-S1N"]
+    assert "contigs (E)" in old["what"], "the pins file is left unchanged as the record of the earlier guess"

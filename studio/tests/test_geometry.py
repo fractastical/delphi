@@ -24,12 +24,16 @@ from engineering.geometry import validate as VAL  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "artifacts" / "print"
-MANIFEST = json.loads((OUT / "manifest.json").read_text())
+DIRS = {"v1": OUT, "v2": REPO / "artifacts" / "print-v2"}  # one edition per directory (build.py --edition)
+MANIFESTS = {ed: json.loads((d / "manifest.json").read_text()) for ed, d in DIRS.items()}
+MANIFEST = MANIFESTS["v1"]
 FORM_IDS = [f.id for f in F.FORMS]
+CASES = [(ed, f.id) for ed, forms in F.EDITIONS.items() for f in forms]
+EDITION_OF = {fid: ed for ed, fid in CASES}
 
 
 def design(form_id: str) -> dict:
-    return json.loads((OUT / "design" / f"{form_id}.json").read_text())
+    return json.loads((DIRS[EDITION_OF[form_id]] / "design" / f"{form_id}.json").read_text())
 
 
 def cube(offset=(0.0, 0.0, 0.0)):
@@ -119,18 +123,18 @@ def test_stl_roundtrip_and_weld():
 
 # ---- the committed artifacts ----
 
-@pytest.mark.parametrize("form_id", FORM_IDS)
-def test_committed_stls_pass_the_validator(form_id):
+@pytest.mark.parametrize("edition,form_id", CASES)
+def test_committed_stls_pass_the_validator(edition, form_id):
     for name in (f"{form_id}.stl", f"{form_id}-stand.stl"):
-        data = (OUT / "stl" / name).read_bytes()
-        assert hashlib.sha256(data).hexdigest() == MANIFEST["files"][f"stl/{name}"]
+        data = (DIRS[edition] / "stl" / name).read_bytes()
+        assert hashlib.sha256(data).hexdigest() == MANIFESTS[edition]["files"][f"stl/{name}"]
         r = VAL.check(*VAL.read_stl(data), box_mm=B.BOX_MM, thickness=False)
         assert r["ok"], (name, r)
         assert r["face_connected_components"] == 1 and r["degenerate_triangles"] == 0
 
 
-@pytest.mark.parametrize("form_id", FORM_IDS)
-def test_design_records_its_checks(form_id):
+@pytest.mark.parametrize("edition,form_id", CASES)
+def test_design_records_its_checks(edition, form_id):
     d = design(form_id)
     v = d["validation"]
     assert v["ok"] and d["stand"]["validation"]["ok"] and d["stl_roundtrip"]["ok"]
@@ -147,8 +151,8 @@ def test_design_records_its_checks(form_id):
     assert "Not an ancestor" in d["label"] and "viable" in d["engineering_status"]["may_not_say"]
 
 
-@pytest.mark.parametrize("form_id", FORM_IDS)
-def test_prop_rebuilds_from_its_design_json(form_id):
+@pytest.mark.parametrize("edition,form_id", CASES)
+def test_prop_rebuilds_from_its_design_json(edition, form_id):
     """The design JSON is the whole input: rebuilding from it gives the committed mesh, byte for byte."""
     d = design(form_id)
     solid, _ = F.build_prop(F.FORMS_BY_ID[form_id], d["biological_design_SI"], d["prop_mm"]["display_scale"])
@@ -158,7 +162,7 @@ def test_prop_rebuilds_from_its_design_json(form_id):
 
 def test_every_parameter_is_kind_labelled():
     kinds = {"functional", "figure_read", "design_assumption", "aesthetic", "derived", "print"}
-    for form_id in FORM_IDS:
+    for _, form_id in CASES:
         d = design(form_id)
         for group in ("biological_design_SI", "aesthetic_and_shape_parameters", "print_parameters"):
             for name, p in d[group].items():
@@ -166,12 +170,12 @@ def test_every_parameter_is_kind_labelled():
 
 
 def test_biology_scale_and_resin_stay_separate():
-    for form_id in FORM_IDS:
+    for ed, form_id in CASES:
         d = design(form_id)
         mm = d["prop_mm"]
-        mass = {"morphology-v1": 0.1, "nca-comparison-v1": 0.05}[d["set"]["id"]]
+        mass = {"morphology": 0.1, "nca-comparison": 0.05}[d["set"]["id"].rsplit("-", 1)[0]]
         assert d["biological_design_SI"]["mass_kg"]["value"] == pytest.approx(mass)
-        assert mm["display_scale"] == MANIFEST["sets"][d["set"]["id"]]["display_scale"]
+        assert mm["display_scale"] == MANIFESTS[ed]["sets"][d["set"]["id"]]["display_scale"]
         assert "slicer" in mm["resin"]
         built = mm["built"]
         assert built["pectoral_prop_area_exaggeration"] == pytest.approx(1.0, abs=0.02)
@@ -179,19 +183,22 @@ def test_biology_scale_and_resin_stay_separate():
 
 # ---- solver links ----
 
-def test_solver_statuses_and_candidates():
-    status = {k: v["solver"] for k, v in MANIFEST["forms"].items()}
-    assert status == {"A-precursor-short-fin": "unsat", "B-two-wing-glider": "feasible",
-                      "C-four-wing-glider": "feasible", "N1-cypselurus-baseline": "feasible",
-                      "N2-area-x1.3": "feasible", "N3-area-x1.3-ar-x1.2": "feasible"}
-    for form_id in FORM_IDS:
+@pytest.mark.parametrize("edition", sorted(DIRS))
+def test_solver_statuses_and_candidates(edition):
+    status = {k: v["solver"] for k, v in MANIFESTS[edition]["forms"].items()}
+    sfx = "" if edition == "v1" else f"-{edition}"
+    assert status == {f"A-precursor-short-fin{sfx}": "unsat", f"B-two-wing-glider{sfx}": "feasible",
+                      f"C-four-wing-glider{sfx}": "feasible", f"N1-cypselurus-baseline{sfx}": "feasible",
+                      f"N2-area-x1.3{sfx}": "feasible", f"N3-area-x1.3-ar-x1.2{sfx}": "feasible"}
+    out = DIRS[edition]
+    for form_id, st in status.items():
         d = design(form_id)
         cand = d["glide_candidate"]
-        assert (cand is not None) == (status[form_id] == "feasible")
+        assert (cand is not None) == (st == "feasible")
         if cand:
-            c = json.loads((OUT / cand["path"]).read_text())
+            c = json.loads((out / cand["path"]).read_text())
             assert c["schema"] == SB.CANDIDATE_SCHEMA
-            assert hashlib.sha256((OUT / cand["path"]).read_bytes()).hexdigest() == cand["sha256"]
+            assert hashlib.sha256((out / cand["path"]).read_bytes()).hexdigest() == cand["sha256"]
             w = c["solver_result"]["witness"]
             assert d["biological_design_SI"]["wing_area_m2"]["solver_exact"] == w["S"]
         assert d["engineering_status"]["glide"]["status"] in ("not_run", "not_applicable", "attached")
@@ -210,14 +217,16 @@ def _have_solver_commit() -> bool:
 def test_solver_rerun_matches_recorded_result():
     pytest.importorskip("z3")
     mod, prov = SB.load_solver(REPO)
-    assert prov["blob_sha256"] == MANIFEST["run"]["solver"]["blob_sha256"]
-    for form_id in FORM_IDS:
-        rec = json.loads((OUT / "solver" / f"{form_id}.solver.json").read_text())
+    for ed, form_id in CASES:
+        assert prov["blob_sha256"] == MANIFESTS[ed]["run"]["solver"]["blob_sha256"]
+        rec = json.loads((DIRS[ed] / "solver" / f"{form_id}.solver.json").read_text())
         q = rec["query"]
         from fractions import Fraction
         run = SB.solve_point(mod, Fraction(q["m"]), Fraction(q["S"]), Fraction(q["b"]), B.LAUNCH_SPEED)
         assert run["default"]["status"] == rec["default"]["status"]
-        assert run["default"]["conflict"] == rec["default"]["conflict"]
+        # an unsat core is a set; z3 lists it in an order that depends on what this process solved before (measured:
+        # A-v2 re-solved after the six v1 queries lists the same three constraints rotated), so compare as sets
+        assert sorted(run["default"]["conflict"] or []) == sorted(rec["default"]["conflict"] or [])
 
 
 # ---- sources and the species graph ----
@@ -252,32 +261,36 @@ def test_graph_keeps_conjecture_apart():
 
 def test_artifacts_were_built_by_this_code():
     """A geometry edit without a rebuild leaves artifacts describing other code; rebuild with build.py."""
-    assert MANIFEST["run"]["code_sha256"] == B.code_hash()
+    for m in MANIFESTS.values():
+        assert m["run"]["code_sha256"] == B.code_hash()
 
 
 # ---- sets, the NCA comparison set and the site's download manifest ----
 
-def test_every_set_meets_the_length_aim_at_one_scale():
-    for sid, s in MANIFEST["sets"].items():
+@pytest.mark.parametrize("edition", sorted(DIRS))
+def test_every_set_meets_the_length_aim_at_one_scale(edition):
+    m = MANIFESTS[edition]
+    for sid, s in m["sets"].items():
         assert s["length_aim"]["met"], (sid, s["length_aim"])
-        assert {MANIFEST["forms"][f]["display_scale"] for f in s["forms"]} == {s["display_scale"]}
+        assert {m["forms"][f]["display_scale"] for f in s["forms"]} == {s["display_scale"]}
 
 
-def test_comparison_set_is_ncas_geometry():
+@pytest.mark.parametrize("sfx", ["", "-v2"])
+def test_comparison_set_is_ncas_geometry(sfx):
     """N1-N3 are dx-nca's three geometries (Fish Cypselurus fit at 0.05 kg, S x fS, whole-wing AR x fAR), and the
     quoted simulation rows come from NCA's committed CSV with the recorded sha256."""
     from engineering.geometry import sources as src
     expect = {"N1-cypselurus-baseline": (0.005699, 0.2117), "N2-area-x1.3": (0.007409, 0.2414),
               "N3-area-x1.3-ar-x1.2": (0.007409, 0.2644)}  # nca-to-print.md table, written out independently
     for form_id, (S, b) in expect.items():
-        d = design(form_id)
+        d = design(form_id + sfx)
         bio = d["biological_design_SI"]
         assert bio["wing_area_m2"]["value"] == pytest.approx(S, abs=5e-7)
         assert bio["wing_span_m"]["value"] == pytest.approx(b, abs=5e-5)
         sim = d["simulation_comparison"]
         assert sim["geometry_matches"] and sim["sha256"] == src.NCA_CONTROLLED["comparison_csv_sha256"]
         assert sim["evidence_kind"] == "simulated" and len(sim["rows"]) == 6
-    sink = [float(design(f)["simulation_comparison"]["rows"][0]["sink_eq_ms"]) for f in expect]
+    sink = [float(design(f + sfx)["simulation_comparison"]["rows"][0]["sink_eq_ms"]) for f in expect]
     assert sink[0] > sink[1] > sink[2]  # NCA's one robust effect, as recorded, not re-derived here
 
 
@@ -296,16 +309,66 @@ def test_morphology_set_files_are_preserved():
         assert (REPO / path).read_bytes() == old, path
 
 
-def test_download_manifest_matches_the_files():
-    dl = json.loads((OUT / "downloads.json").read_text())
+@pytest.mark.parametrize("edition", sorted(DIRS))
+def test_download_manifest_matches_the_files(edition):
+    out = DIRS[edition]
+    dl = json.loads((out / "downloads.json").read_text())
+    assert dl["base"] == f"{out.relative_to(REPO).as_posix()}/"
     assert dl["printer_resin"]["printer"] == "unknown" and any("Printer and resin are unknown" in x
                                                               for x in dl["limitations"])
-    assert [f["id"] for f in dl["forms"]] == FORM_IDS
+    assert [f["id"] for f in dl["forms"]] == [f.id for f in F.EDITIONS[edition]]
     for f in dl["forms"]:
         assert {e["kind"] for e in f["files"]} >= {"stl_prop", "stl_stand", "glb_prop"}
         for e in f["files"]:
-            data = (OUT / e["path"]).read_bytes()
+            data = (out / e["path"]).read_bytes()
             assert len(data) == e["bytes"] and hashlib.sha256(data).hexdigest() == e["sha256"]
         for c in (f["prop_checks"], f["stand_checks"]):
             assert c["ok"] and c["closed_two_manifold"] and c["consistently_oriented"] and c["min_wall_ok"]
             assert c["face_connected_components"] == 1 and c["self_intersection"] == "not checked"
+
+
+# ---- the v2 edition: corrected body profile, new ids, v1 untouched ----
+
+PUBLISHED_V1 = "518671a"  # work/print-forms with the six v1 turntables, as the site took them
+
+
+def test_v1_binaries_unchanged_since_publication():
+    """v2 is additive: every v1 mesh, stand, GLB, solver run, candidate, image and video keeps its published bytes.
+    Only JSON/HTML records that carry the build code hash may change."""
+    try:
+        listed = subprocess.run(["git", "-C", str(REPO), "ls-tree", "-r", "--name-only", PUBLISHED_V1, "--",
+                                 "artifacts/print"], check=True, capture_output=True, text=True).stdout.split()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        pytest.skip(f"commit {PUBLISHED_V1} is not in this clone")
+    binaries = [p for p in listed if p.endswith((".stl", ".glb", ".png", ".mp4", ".gif"))
+                or "/solver/" in p or "/glide/" in p]
+    assert len(binaries) == 12 + 6 + 13 + 6 * 3 + 6 + 5, len(binaries)  # stl, glb, img, media, solver, glide
+    for path in binaries:
+        old = subprocess.run(["git", "-C", str(REPO), "show", f"{PUBLISHED_V1}:{path}"], check=True,
+                             capture_output=True).stdout
+        assert (REPO / path).read_bytes() == old, path
+
+
+def test_v2_is_v1_with_the_pointwise_profile_only():
+    """Same specs except id, set, labels and body_profile; the recorded body width at each fin root is the
+    pointwise profile for v2 and the frozen v1 function for v1; and every v2 prop mesh differs from its v1 form."""
+    from dataclasses import asdict
+
+    from engineering.geometry import mesh as M
+    m2 = MANIFESTS["v2"]
+    for v1, v2 in zip(F.EDITIONS["v1"], F.EDITIONS["v2"]):
+        a, b = asdict(v1), asdict(v2)
+        changed = {k for k in a if a[k] != b[k]}
+        assert changed <= {"id", "set_id", "short", "title", "status_note", "body_profile", "fin_shape_from"}
+        assert (v1.body_profile, v2.body_profile) == ("v1", "pointwise") and v2.id == v1.id + "-v2"
+        assert m2["edition"]["supersedes"][v2.id] == v1.id
+        for spec, fn in ((v1, M.body_profile_v1), (v2, M.body_profile)):
+            bio = design(spec.id)["biological_design_SI"]
+            W = bio["body_half_width_max_m"]["value"]
+            ped = spec.params["peduncle_fraction"]["value"]
+            got = bio["fin_layout_bio"]["value"]["body_width_at_fins_m"]
+            for fin, x in bio["fin_x_over_sl"]["value"].items():
+                assert got[fin] == pytest.approx(2 * W * float(fn(np.array([x]), ped)[0]), rel=1e-12), (spec.id, fin)
+        assert design(v2.id)["validation"]["mesh_sha256"] != design(v1.id)["validation"]["mesh_sha256"]
+    for sid, s in m2["sets"].items():
+        assert s["supersedes"] == sid.replace("-v2", "-v1")

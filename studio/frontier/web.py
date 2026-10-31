@@ -52,10 +52,10 @@ MIME = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", 
 # Extra types, served ONLY from <site>/artifacts/ (the guarded artifact subtree), never from the rest of the site.
 ARTIFACT_MIME = {".stl": "model/stl", ".obj": "model/obj", ".glb": "model/gltf-binary", ".csv": "text/csv; charset=utf-8",
                  ".lean": "text/plain; charset=utf-8", ".trig": "application/trig",
-                 ".mp4": "video/mp4", ".webm": "video/webm"}
+                 ".mp4": "video/mp4", ".webm": "video/webm", ".xz": "application/x-xz"}
 STREAMED = {".mp4", ".webm"}                                                  # served by seek+chunk with Range support, never read whole into memory
 MAX_VIDEO_BYTES = 64_000_000
-ARTIFACT_DOWNLOAD = {".stl", ".obj", ".glb"}                                   # binary models download; text types render as text
+ARTIFACT_DOWNLOAD = {".stl", ".obj", ".glb", ".xz"}                           # binary models/archives download; text types render as text
 SENSITIVE_NAME = re.compile(r"(secret|token|credential|password|passwd|private|apikey|api_key|\.pem|\.key|\.env|id_rsa)", re.I)
 MAX_STATIC_BYTES = 8_000_000
 MAX_ARTIFACT_BYTES = 16_000_000
@@ -77,6 +77,8 @@ class WebConfig:
     cookie_secure: bool = True
     session_ttl: int = 8 * 3600
     max_sessions: int = 500
+    anon_sessions_per_window: int = 60                           # anonymous sessions one client may mint per window; the store is capped, so a flood would evict everyone else's
+    anon_session_window: int = 600
     public_site: bool = False                                    # True: static shell is open, data stays gated
     public_read: bool = False                                    # public records + shell; anonymous CSRF sessions for bounded calculations
     search_mode: str = "store_lexical"                           # honest label of what /api/catalog actually runs
@@ -349,11 +351,12 @@ def mime_for(root: Path, target: Path) -> str | None:
 def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Callable[[], int]):
     sessions = Sessions(cfg.session_ttl, cfg.max_sessions)
     limiter = FailureLimiter(cfg.login_failures, cfg.login_window)
+    anon_minted = FailureLimiter(cfg.anon_sessions_per_window, cfg.anon_session_window)      # counts mints, not failures: same sliding-window bookkeeping
     cookie_name = ("__Host-" if cfg.cookie_secure else "") + "frontier_session"
     attention = AttentionSource(store, cfg)
     discovery_search = cfg.discovery_search or Discovery(store, GeminiEmbedder(timeout=8)).search
     discovery_slots = BoundedSemaphore(4)
-    media = LocalMedia(cfg.site_dir) if cfg.site_dir else None
+    media = LocalMedia(cfg.site_dir, scan_ttl=10) if cfg.site_dir else None
     counts_lock, counts_cache = Lock(), {}
     system = SystemStatus(store, **({"root": cfg.system_root} if cfg.system_root else {}), ttl=cfg.system_ttl, runner=cfg.system_runner)
 
@@ -537,6 +540,11 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
             sid, sess = self.session()
             if m == "GET":
                 if cfg.public_read:
+                    if not sess:
+                        key = self.client_key()
+                        if anon_minted.blocked(key):
+                            raise Throttled("Too many sessions requested; wait and retry")
+                        anon_minted.fail(key)
                     csrf, extra = (sess["csrf"], []) if sess else self.new_session_headers()
                     return self.json(200, {"authenticated": False, "public_access": True, "csrf": csrf}, extra)
                 if not sess:

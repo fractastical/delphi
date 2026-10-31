@@ -20,15 +20,16 @@ import platform
 import signal
 import subprocess
 import sys
-from threading import BoundedSemaphore
 import time
+
+from .worker_limits import Slots
 
 ROOT = Path(__file__).resolve().parents[1]
 API_SCHEMA = "frontier.simulation.preview/1"
 MAX_REQUEST_BYTES = 8192
 MAX_RESPONSE_BYTES = 4 * 1024 * 1024
 TIMEOUT_S = 8
-SLOTS = BoundedSemaphore(2)
+SLOTS = Slots(2)                 # also draws on the process-wide worker budget in worker_limits
 WORKER_ARGV = [sys.executable, "-m", "frontier.simulation_api", "--worker"]
 MODEL_FIELDS = {
     "bioelectric": {"schema", "sodium_scale", "potassium_scale", "gap_mS_cm2", "stimulus_uA_cm2", "temperature_c", "duration_ms", "dt_ms"},
@@ -244,13 +245,8 @@ def run_preview(data):
 def _worker():
     # Service cgroup bounds the whole tree; these additional per-child limits
     # bound memory/CPU even when this adapter is called outside that service.
-    import resource
-    for key, cap in [(resource.RLIMIT_AS, 2 * 1024**3), (resource.RLIMIT_CPU, 8)]:
-        soft, hard = resource.getrlimit(key)
-        value = min(cap, hard) if hard != resource.RLIM_INFINITY else cap
-        if soft != resource.RLIM_INFINITY:
-            value = min(value, soft)
-        resource.setrlimit(key, (value, value))
+    from .worker_limits import cap_worker
+    cap_worker()
     raw = sys.stdin.buffer.read(MAX_REQUEST_BYTES + 1)
     if len(raw) > MAX_REQUEST_BYTES:
         raise _Invalid("Request too large")

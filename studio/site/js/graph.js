@@ -51,7 +51,8 @@
       g.appendChild(node("rect", { x: p.x, y: p.y, width: nodeW, height: nodeH, rx: 9, class: "g-box" }));
       const lines = wrap(n.label, 26);
       lines.forEach((l, i) => g.appendChild(node("text", { x: p.x + 10, y: p.y + 18 + i * 14, class: "g-label" }, l)));
-      if (n.sub && lines.length < 3) g.appendChild(node("text", { x: p.x + 10, y: p.y + 18 + lines.length * 14, class: "g-sub" }, n.sub));
+      if (n.sub && lines.length < 3) { const maxc = Math.max(8, Math.floor((nodeW - 20) / 6)); const sub = n.sub.length > maxc ? n.sub.slice(0, maxc - 1) + "…" : n.sub;   // a long sub-label is cut to the box, the full text stays in the aria-label
+        g.appendChild(node("text", { x: p.x + 10, y: p.y + 18 + lines.length * 14, class: "g-sub" }, sub)); }
       activate(g, () => spec.onSelect("node", n.id));
       ng.appendChild(g);
     });

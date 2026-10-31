@@ -27,7 +27,7 @@ def register_surfaces(server, store: Store, register, *, read_annotations, publi
     embedder = GeminiEmbedder()
     discovery = Discovery(store, embedder)
     artifacts = ArtifactIndex(store)
-    media = LocalMedia(Path(__file__).resolve().parents[1] / "site")
+    media = LocalMedia(Path(__file__).resolve().parents[1] / "site", scan_ttl=10)
 
     def frontier_discover(query: Annotated[str, Field(min_length=1, max_length=200)],
                           kind: str | None = None,
@@ -68,8 +68,10 @@ def register_surfaces(server, store: Store, register, *, read_annotations, publi
         return project_design_context(store, target.model_dump(), limit=limit, cursor=cursor)
 
     def frontier_artifact_inspect(sha256: Annotated[str, Field(pattern=r"^[0-9a-fA-F]{64}$")],
-                                  limit: Annotated[int, Field(ge=1, le=20)] = 10) -> dict:
-        """Inspect matching Evidence declarations and check for matching bytes in this release's guarded public artifacts tree."""
+                                  limit: Annotated[int, Field(ge=1, le=20)] = 10,
+                                  include_text: bool = False,
+                                  max_chars: Annotated[int, Field(ge=1, le=16_000)] = 8000) -> dict:
+        """Inspect exact-hash declarations and published bytes; optionally read a bounded UTF-8 JSON/text/CSV excerpt after verifying its complete file hash."""
         digest = sha256.lower()
         declarations = artifacts.search(query=digest, limit=limit)["items"]
         declarations = [row for row in declarations if row["artifact"]["sha256"].lower() == digest]
@@ -77,8 +79,9 @@ def register_surfaces(server, store: Store, register, *, read_annotations, publi
         for match in local["matches"]:
             match["public_url"] = f"https://{public_host}{match['href']}" if public_host else None
         return {"schema": "frontier.artifact.inspect/1", "sha256": digest, "declarations": declarations,
-                "local_published_bytes": local, "preview": None,
-                "scope": "Declarations are not byte verification. Local bytes are hash-checked by LocalMedia within the public artifacts subtree; remote URIs are never fetched. No text preview is available."}
+                "local_published_bytes": local,
+                "preview": media.text_preview(digest, max_chars=max_chars) if include_text else None,
+                "scope": "Declarations are not byte verification. Local bytes are hash-checked within the public artifacts subtree; remote URIs are never fetched. Optional text excerpts require a matching complete-file hash and retain explicit size and truncation limits."}
 
     def frontier_simulate(model: Literal["bioelectric", "mechanobio"],
                           parameters: Annotated[dict, Field(description="Finite parameters for the selected allowlisted simulation model; no code or command fields.")]) -> dict:

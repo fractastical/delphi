@@ -32,6 +32,65 @@ def test_actual_bytes_deduplicated_and_href_percent_encoded(tmp_path):
     assert "unchanged" in result["scope"] and result["index"]["complete"] is True
 
 
+def test_text_preview_verifies_full_bytes_and_truncates_by_character(tmp_path):
+    contents = '{"label":"fin αβγ", "units":"Pa"}'.encode()
+    put(tmp_path, "artifacts/a space.json", contents)
+    digest = sha256(contents).hexdigest()
+    result = media.LocalMedia(tmp_path).text_preview(digest, max_chars=15)
+    assert result["status"] == "available" and result["full_file_hash_verified"] is True
+    assert result["text"] == contents.decode()[:15] and result["truncated"] is True
+    assert result["byte_size"] == len(contents) and result["characters_returned"] == 15
+    assert result["href"] == "/artifacts/a%20space.json" and str(tmp_path) not in str(result)
+    complete = media.LocalMedia(tmp_path).text_preview(digest)
+    assert complete["text"] == contents.decode() and complete["truncated"] is False
+
+
+@pytest.mark.parametrize("value", [0, -1, 16001, True, 1.5, "100"])
+def test_text_preview_rejects_invalid_limit_before_scan(tmp_path, monkeypatch, value):
+    projection = media.LocalMedia(tmp_path)
+    monkeypatch.setattr(projection, "_scan", lambda: pytest.fail("invalid limit scanned files"))
+    with pytest.raises(FrontierError):
+        projection.text_preview("a" * 64, max_chars=value)
+
+
+@pytest.mark.parametrize("name,contents,status", [
+    ("frame.png", b"image", "unsupported_type"),
+    ("invalid.json", b"\xff", "unsupported_encoding"),
+    ("binary.txt", b"zero\x00byte", "unsupported_encoding"),
+    ("private/result.json", b"private content", "unavailable"),
+])
+def test_text_preview_never_returns_binary_or_private_content(tmp_path, name, contents, status):
+    put(tmp_path, "artifacts/" + name, contents)
+    result = media.LocalMedia(tmp_path).text_preview(sha256(contents).hexdigest())
+    assert result["status"] == status and result["text"] is None
+
+
+def test_text_preview_size_limit_and_cached_replacement_fail_closed(tmp_path, monkeypatch):
+    path = put(tmp_path, "artifacts/trace.json", b"12345")
+    digest = sha256(path.read_bytes()).hexdigest()
+    projection = media.LocalMedia(tmp_path, scan_ttl=60)
+    assert projection.lookup(digest)["matches"]
+    monkeypatch.setattr(media, "MAX_TEXT_BYTES", 4)
+    assert projection.text_preview(digest)["status"] == "too_large"
+    monkeypatch.setattr(media, "MAX_TEXT_BYTES", 100)
+    path.write_bytes(b"54321")
+    result = projection.text_preview(digest)
+    assert result["status"] == "changed" and result["text"] is None
+
+
+def test_text_preview_cached_path_cannot_be_replaced_by_symlink(tmp_path):
+    site = tmp_path / "site"
+    path = put(site, "artifacts/trace.json", b"published")
+    outside = put(tmp_path, "outside.json", b"not published")
+    projection = media.LocalMedia(site, scan_ttl=60)
+    digest = sha256(b"published").hexdigest()
+    assert projection.lookup(digest)["matches"]
+    path.unlink()
+    path.symlink_to(outside)
+    result = projection.text_preview(digest)
+    assert result["text"] is None and "not published" not in str(result)
+
+
 def test_real_changes_removal_and_same_mtime_drop_old_digest(tmp_path):
     target = put(tmp_path, "artifacts/frame.png", b"old")
     projection = media.LocalMedia(tmp_path)
@@ -189,3 +248,21 @@ def test_release_symlink_is_pinned_to_one_resolved_root(tmp_path):
     assert projection.lookup(sha256(b"one").hexdigest())["matches"]
     assert not projection.lookup(sha256(b"two").hexdigest())["matches"]
     assert media.LocalMedia(current).lookup(sha256(b"two").hexdigest())["matches"]
+
+
+def test_scan_ttl_bounds_rescans_from_anonymous_lookups(tmp_path):
+    """The public adapter sets scan_ttl so repeated /api/media requests share one walk of the artifact tree."""
+    put(tmp_path, "artifacts/a.png", b"first")
+    projection = media.LocalMedia(tmp_path, scan_ttl=3600)
+    scans = []
+    real = projection._scan
+    projection._scan = lambda: (scans.append(1), real())[1]
+    for _ in range(25):
+        projection.lookup("0" * 64)
+    assert len(scans) == 1                      # control below: ttl 0 (the default) still rescans every call
+    fresh = media.LocalMedia(tmp_path)
+    fresh_scans, real = [], fresh._scan
+    fresh._scan = lambda: (fresh_scans.append(1), real())[1]
+    for _ in range(3):
+        fresh.lookup("0" * 64)
+    assert len(fresh_scans) == 3
