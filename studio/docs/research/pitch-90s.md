@@ -53,9 +53,12 @@ claims and evidence foundation. **Flying Fish is the featured project**, not the
 |---|---|---|
 | live store | `frontier.morphoswarm.ai`, API `mode: live` | **verified**, HTTP 200 |
 | 912 claims / 261 problems | `POST /v1/read/search`, paginated | **verified with receipt**; re-run |
-| regional assurance + interface uncertainty | — | **BEING BUILT by native workers. Not verified by me. Do not show a map that does not exist.** |
+| regional assurance + interface uncertainty | assurance suite | **26 tests passed, integrated** — reported by native workers, **not re-run by me** |
+| MCP, public | 12 official-SDK checks | **live and public** — reported, not re-run by me |
+| Studio, public | interactive Hodgkin–Huxley + mechanobio | **live and public** — reported, not viewed by me |
 | three candidates | `A-precursor-short-fin`, `B-two-wing-glider`, `C-four-wing-glider` design + glide JSON | **present on the release** |
-| robustness ensemble | native workers, against root **SPEC-008** | **SPEC-008 does not yet exist on any delphi-frontier branch** (checked all remotes). Morphoswarm's SPEC-008 is the Postgres schema and is unrelated |
+| fin robustness ensemble | baseline **20/64**, shorter **33/64**, stiffer **34/64** | **a ranking under ASSUMED joint draws and load cases.** Biological success, mass and area costs are **unknown**. See the rule below |
+| root SPEC-008 | — | **not on any delphi-frontier branch** when I checked all remotes. Morphoswarm's SPEC-008 is the Postgres schema, unrelated |
 | constraints | `exocoetid_check.py`, 8 constraints, each carrying its derivation population | **verified**: 71 tests, exit 0, re-run from the durable copy |
 | gap → Problem | `CANNOT-EVALUATE` already returned per constraint | **verified**; the wiring to pinned Problems is the new work |
 | simulations | 8 `.mp4` incl. `glide_fixed_launch`, `rd_fields`, `fin_mechanics` | **present**; I have not viewed them |
@@ -85,3 +88,45 @@ truth that a novel organism design does not have. So ours is **an assurance map 
 constraints and their evidence**, not a calibrated predictor — and no number from it is
 comparable to a pLDDT value. Stating that difference out loud is stronger than hoping nobody asks,
 and it is the same discipline that made the borrowing worth doing.
+
+## The ensemble result, stated so it cannot be overread
+
+**20/64 baseline, 33/64 shorter, 34/64 stiffer.** Two things must travel with those numbers or
+they mislead:
+
+1. **The draws and load cases are assumed, not measured.** This ranks three candidates under a
+   stated model. It is not a probability that any of them works.
+2. **The costs are unknown.** Biological success, mass and area are not in this score. "Stiffer
+   survives more load cases" is not "stiffer is better" — a stiffer fin may be heavier, costlier
+   to grow, or developmentally unreachable, and none of that is measured here.
+
+So the honest sentence is: *under our assumed joint draws and load cases, shorter and stiffer
+variants survive roughly a third of cases against the baseline's fifth, and we do not know what
+they cost.* **That gap is itself a pinned Problem** — which is the thesis working, not a caveat
+bolted on.
+
+## The Erk model: a retained partial reproduction
+
+A scale-Erk model **reproduces five source bands** and **misses the rise and the
+synchrony-growth-impairment**. It is **retained**, not discarded, and shown as a partial
+reproduction with the misses named.
+
+This is the assurance map in miniature: the model is strong in one region and absent in another,
+and saying which is the product. A single "the model reproduces the paper" claim would be false;
+a single "the model fails" claim would throw away five reproduced bands. **Neither is a number
+for the whole model, and there isn't one.**
+
+## Positioning against prior art — integration, not a unique graph
+
+**What we claim: the workflow integration.** Goal → sourced constraints → models and simulations
+→ artifacts → regional assurance with interface uncertainty → pinned Problems and Actions →
+evidence reusable by the next project, end to end on one platform.
+
+**What we do NOT claim: a unique graph, typed objects, artifact lineage, independent review, or
+dead-ends-as-artifacts.** ScienceClaw and Infinite implement those and publish them. ASK models
+versioned epistemic state. Those are cited, not competed with. The category-theoretic work from
+the same group is substantially more formal than ours on model coupling.
+
+**The feature-level difference remains narrow and is the one to say:** the decision rule is
+attached to the question before the result exists, and a low-assurance region becomes a pinned
+Problem automatically. We are claiming a **loop that closes**, not a novel data structure.
