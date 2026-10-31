@@ -1,0 +1,89 @@
+{
+  "claim_id": "thompson1917-ch11-15",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch11-15",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "If shells as different as Cerithium (pointed turbinate), Solarium (obtuse turbinate / trochiform), Natica (globose) and Planorbis (discoid) differ little in spiral angle alpha and mainly in the apical semi-angle theta, then across public specimens of these four body forms the between-form spread of alpha (computed from the whorl-breadth ratio R and theta with Thompson's own relation R = exp(2 pi sin(theta) cot(alpha))) must be small, of the order of a few degrees, while the between-form spread of theta spans most of its possible range.",
+  "pass_criterion": "Pre-registered. For every specimen with >= 3 digitised successive half-whorl apertures (Collins et al. 2021 helicospiral gastropods) estimate per revolution the linear whorl-breadth ratio R (square root of the aperture-area ratio per 360 degrees, from a log-linear fit of area on angle) and the apical semi-angle theta = atan(d(r_outer)/d(y)) from the outward and axial displacement of the whorl per revolution (theta = 90 degrees for planispiral shells). For the discoid form, which that dataset lacks, use adult whorls of the planispiral ammonoid conchs of Korn & Walton 2018 (R = dm at whorl n+1 / dm at whorl n over the last full whorl, theta = 90 degrees). Compute alpha = arccot(ln R / (2 pi sin theta)) in degrees. Assign specimens to Thompson's four forms by family: pointed turbinate = Turritellidae (Maoricolpus; Thompson lists Turritella with Cerithium), obtuse turbinate / trochiform = Trochoidea (Zethalia, Cookia; Thompson's Solarium / Trochus group), globose = Tonnoidea (Tonna, Semicassis; Thompson's Natica / Dolium group), discoid = planispiral ammonoids. The claim is supported if the range of the four form-mean alphas is <= 10 degrees while the range of form-mean thetas is >= 45 degrees, i.e. alpha range < one quarter of theta range.",
+  "fail_criterion": "Pre-registered. The claim is refuted if the range of form-mean alphas is >= 20 degrees, or if it is not smaller than the range of form-mean thetas (the forms differ as much or more in spiral angle as in apical angle). Results between these thresholds are 'mixed'. If any of the four forms has fewer than 2 usable specimens the test is inconclusive (underpowered).",
+  "planned_datasets": [
+    "dryad-p5hqbzknw-collins-2021-helicospiral-gastropods",
+    "dryad-c17p8-korn-walton-2018-ammonoid-ontogenetic-conch-parameters"
+  ],
+  "interpretation": "Thompson's four genera are not present in any public measurement set found (Dryad, Zenodo, figshare searched), so the test follows the body forms he names rather than the genera: his table groups shells as 'pointed turbinates' (Turritella, Cerithium, theta 7-15 degrees), 'obtuse turbinates' (Solarium 50-55, Trochus 35 degrees), globose forms (Natica, Dolium, Conus, theta ~70 degrees) and 'discoids' (Planorbis, Nautilus, Ammonites, theta 90 degrees). alpha is derived exactly as Thompson derived it, from the ratio of breadths of consecutive whorls and the apical semi-angle via R = e^(2 pi sin theta cot alpha). The 2D-photograph semilandmark data of Collins et al. (apertures digitised every 180 degrees along the coiling axis) give aperture area and centroid position per half whorl; the ammonoid cross-section data give diameters per half whorl. Note that because biological R lies between ~1.1 and ~10, alpha in degrees is mathematically confined to roughly 70-89 degrees whatever theta is, so a small alpha range is partly a property of the degree scale Thompson used; the coefficient of variation of cot(alpha) (the radial-to-tangential growth ratio itself) is reported alongside as a scale-free supplement. The Korn & Walton ammonoid table was already downloaded and inspected for claim test thompson1917-ch11-05 before this pre-registration; the Collins et al. zip has not been downloaded, only its file listing, metadata/specimen tables (taxon, locality, imaging method) and processing code were read.",
+  "datasets": [
+    {
+      "id": "dryad-p5hqbzknw-collins-2021-helicospiral-gastropods",
+      "name": "Data associated with: Going round the twist - An empirical analysis of shell coiling in helicospiral gastropods (Collins, Klapaukh, Crampton, Gazley, Schipper, Maksimenko, Hines 2021, Paleobiology)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw",
+      "doi": "10.5061/dryad.p5hqbzknw",
+      "version": "3 (published 2021-01-13)",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "download_url": "https://datadryad.org/downloads/file_stream/547236",
+          "retrieved_at": "2026-10-31T04:44:44Z",
+          "byte_size": 521094347,
+          "sha256": "edab9e356820a43984bcf8130359ec29f7e6c00ca3995292fcd922ba2cb3a2a9"
+        }
+      ],
+      "role": "Collins_et_al_data.zip: sectioned_shells.tps (184 specimens, 29 species; two coiling-axis landmarks and 4-18 aperture outlines of 50 semilandmarks each, 180 degrees apart, with image scale in mm/px) plus the 198 source photographs (not used)"
+    },
+    {
+      "id": "dryad-c17p8-korn-walton-2018-ammonoid-ontogenetic-conch-parameters",
+      "name": "Data from: Iterative ontogenetic development of ammonoid conch shapes from the Devonian through to the Jurassic (Walton & Korn 2018, Palaeontology)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.c17p8",
+      "doi": "10.5061/dryad.c17p8",
+      "version": "1 (published 2018-05-16)",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "download_url": "https://datadryad.org/downloads/file_stream/34579",
+          "retrieved_at": "2026-10-31T04:25:34Z",
+          "byte_size": 215182,
+          "sha256": "fbe2012f1d420ef7b292141ae0ed0ea8d046c4c15303663565dc72e0727ebe40"
+        }
+      ],
+      "role": "'dm' sheet: conch diameter at every half whorl for 179 planispiral ammonoid species; the last full whorl gives R for the discoid form"
+    }
+  ],
+  "method": "The tps file was parsed; for each specimen the aperture polygons were converted to mm with the recorded scale, their areas (shoelace), centroid positions along the coiling axis (y) and outermost distances from the axis (r_outer) computed, and angle assigned as 180 degrees per successive aperture. R = exp(pi * slope of ln(area) on angle), theta = atan(|d r_outer / d angle| / |d y / d angle|) from linear fits, alpha = arccot(ln R / (2 pi sin theta)). For the 179 ammonoid species R = dm(last whorl) / dm(one whorl earlier), theta = 90 degrees. Specimens were grouped into Thompson's four forms (Turritellidae n=35, Trochoidea n=2, Tonnoidea n=2, planispiral ammonoids n=179); form means of alpha and theta and their ranges were compared with the pre-registered thresholds. The CV of cot(alpha) across form means was computed as the scale-free supplement.",
+  "measured": {
+    "value": 8.35,
+    "unit": "range (degrees) of form-mean spiral angle alpha across the four body forms; range of form-mean apical semi-angle theta = 81.5 degrees",
+    "n": 218,
+    "uncertainty": "within-form SD of alpha 0.8-1.7 degrees; trochiform and globose forms have only 2 specimens each",
+    "extra": {
+      "form_means": {
+        "pointed turbinate (Turritellidae)": {"n": 35, "R": 1.241, "theta_deg": 8.5, "alpha_deg": 76.9, "alpha_sd": 0.81},
+        "obtuse turbinate / trochiform (Trochoidea)": {"n": 2, "R": 1.84, "theta_deg": 38.9, "alpha_deg": 81.0, "alpha_sd": 1.73},
+        "globose (Tonnoidea)": {"n": 2, "R": 2.132, "theta_deg": 32.7, "alpha_deg": 77.6, "alpha_sd": 0.97},
+        "discoid (planispiral ammonoids)": {"n": 179, "R": 1.695, "theta_deg": 90.0, "alpha_deg": 85.3, "alpha_sd": 0.99}
+      },
+      "alpha_range_deg": 8.35,
+      "theta_range_deg": 81.53,
+      "alpha_range_over_theta_range": 0.102,
+      "cv_cot_alpha_across_forms": 0.395,
+      "cv_theta_across_forms": 0.806,
+      "all_26_gastropod_species_alpha_range_deg": [70.8, 87.3],
+      "all_26_gastropod_species_theta_range_deg": [8.5, 49.4],
+      "decision": {
+        "pass_alpha_range_le_10_and_theta_range_ge_45": true,
+        "fail_alpha_range_ge_20": false,
+        "fail_alpha_range_not_smaller_than_theta_range": false,
+        "underpowered": false
+      }
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.6,
+  "caveats": [
+    "The named genera (Cerithium, Solarium, Natica, Planorbis) were replaced by public specimens of the same body forms (Turritellidae, Trochoidea, Tonnoidea, planispiral ammonoids), following Thompson's own grouping of shells by form in the same table; this is a reinterpretation of the genus-level statement.",
+    "Two of the four forms (trochiform, globose) rest on two specimens each, the pre-registered minimum; the pointed-turbinate and discoid forms are well sampled (35 and 179).",
+    "The apical semi-angle measured here for the globose shells (28-37 degrees) is the cone of the digitised spire whorls, not the envelope of the whole shell including the body whorl as in Thompson's table (Natica ~70 degrees); the theta range would be larger, not smaller, with his convention, so the conclusion is unaffected.",
+    "Spiral angle expressed in degrees is compressed towards 90 degrees for all biologically realistic whorl-expansion ratios, which is part of why alpha varies little; on the scale-free measure cot(alpha), the radial-to-tangential growth ratio, the forms still differ about half as much (CV 0.40) as they do in theta (CV 0.81), so the direction of Thompson's claim holds either way, but the 'very little indeed' is partly an artefact of his angle scale.",
+    "Measured alphas (76.9-85.3 degrees) are a few degrees lower than Thompson's tabulated values (82-85) for the same forms, because R here comes from aperture-area growth per revolution over the spire rather than from whorl breadths at the body whorl.",
+    "Dryad downloads are served behind a proof-of-work interstitial (Anubis); analysis.py completes it automatically and must download the 521 MB archive (only the 1.5 MB .tps inside is read)."
+  ],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/thompson-claim-tests-cf12", "date": "2026-10-31" }
+}

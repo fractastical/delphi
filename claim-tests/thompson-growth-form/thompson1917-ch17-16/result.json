@@ -1,0 +1,95 @@
+{
+  "claim_id": "thompson1917-ch17-16",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch17-16",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "If the differences between the human skull and the chimpanzee (and baboon) skull form one continuous deformation whose grid areas 'increase in a gradual and approximately logarithmic order' from above downwards and from behind forwards, then the local area scale factor of the human-to-ape transformation of the lateral (sagittal) skull profile must be a smooth monotone function of antero-inferior position, with its logarithm roughly linear in that position, rather than a patchwork of region-specific changes.",
+  "pass_criterion": "Pre-registered. Primary plan (landmark coordinates available for Homo sapiens and Pan troglodytes): generalised Procrustes superimposition of all specimens; species mean configurations; projection of the means onto the midsagittal plane (midline landmarks as they are, bilateral landmarks averaged across sides) giving a lateral profile with x = antero-posterior and y = supero-inferior axes defined by the Frankfurt-like orientation of the human mean; fit a 2-D thin-plate spline mapping the human mean to the chimpanzee mean and evaluate its Jacobian determinant J (local area ratio chimpanzee/human) at every landmark of the human mean. Define the down-forward coordinate u = (x_forward + y_downward)/sqrt(2) of each landmark. The claim is supported if (a) Spearman rho(u, log J) >= 0.6 with positive sign, (b) the sign of the correlation of log J with x_forward alone and with y_downward alone is positive in both, and (c) an ordinary linear regression of log J on u explains >= 50% of the variance in log J (the 'logarithmic order' of areas, i.e. geometric progression of area ratio with grid position). Secondary plan (only inter-landmark distances available): log of the ratio of chimpanzee to human mean distance, each distance first divided by the geometric mean of all distances in its specimen; assign each distance by the anatomical names of its endpoints to one of three ordered regions (1 neurocranium/vault/occiput, 2 orbit/upper face/nasal, 3 maxilla/palate/mandible/alveolar); supported if Spearman rho(region rank, log ratio) >= 0.6 and region medians increase monotonically 1 < 2 < 3. If the data also contain Gorilla, the same statistics are reported for Gorilla as a replication but do not enter the verdict. Because baboon (Papio) data could not be located, confidence attached to any verdict is capped at 0.6.",
+  "fail_criterion": "Pre-registered. Refuted if Spearman rho(u, log J) < 0.3 (primary plan) or rho(region rank, log ratio) < 0.3 (secondary plan), or if the correlation of log J with x_forward and with y_downward have opposite signs (expansion forwards but contraction downwards or vice versa), or if the regression of log J on u explains < 25% of the variance while log J differs between anatomical regions in a non-monotone way (patchwork rather than gradient). Results between the pass and fail thresholds are 'mixed'. If the deposited file contains neither coordinates nor named inter-landmark distances per specimen (e.g. only summary statistics), the verdict is inconclusive with reason data-unavailable.",
+  "planned_datasets": [
+    "zenodo-4976293-schroeder-voncramontaubadel-2017-hominoid-crania"
+  ],
+  "interpretation": "Thompson's grids compare lateral profile drawings of one human, one chimpanzee and one baboon skull. His claim has two parts: (1) the human-to-ape change is a single smooth deformation, not independent changes of jaws, braincase and face; (2) within that deformation the local area ratio increases 'in a gradual and approximately logarithmic order' downwards and forwards, i.e. the logarithm of the area ratio grows roughly linearly with position along the down-forward direction. Both are operationalized on species mean landmark configurations via a thin-plate spline (the modern formalisation of Thompson's coordinate transformation): smoothness and single-gradient structure are measured by how much of the variation in log local area ratio is explained by a linear gradient in down-forward position, and the 'logarithmic order' by the sign and strength of that gradient. Searches of Dryad, Zenodo and figshare on 2026-10-31 found no public per-specimen landmark set containing Papio together with Homo and Pan; MorphoSource and Phenome10K scans require a login and would also require digitising landmarks, which is beyond this test. The Zenodo deposit of Schroeder & von Cramon-Taubadel (2017, Evolution) covers 15 extant hominoid taxa including Homo and Pan; its exact contents (coordinates vs distances, per specimen vs summary) were not inspected before this pre-registration, which is why primary and secondary plans are both stated.",
+  "datasets": [
+    {
+      "id": "zenodo-4976293-schroeder-voncramontaubadel-2017-hominoid-crania",
+      "name": "Data from: The evolution of hominoid cranial diversity: a quantitative genetic approach (Schroeder & von Cramon-Taubadel 2017, Evolution)",
+      "landing_url": "https://zenodo.org/records/4976293",
+      "doi": "10.5061/dryad.3cf54",
+      "version": "Zenodo record 4976293 (Dryad mirror)",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "download_url": "https://zenodo.org/api/records/4976293/files/Schroeder,%20von%20Cramon-Taubadel_Evolution2017.xlsx/content",
+          "retrieved_at": "2026-10-31T04:55:30Z",
+          "byte_size": 182135,
+          "sha256": "ca809bdfb64f1f92eb6d8dc077d806824a898c45aab7a903429b7a952c7f7ca2"
+        }
+      ],
+      "role": "39 natural-log inter-landmark cranial distances for 547 adult hominoid crania: Homo sapiens n=50, Pan troglodytes n=96 (three subspecies), Pan paniscus n=40, Gorilla n=110, Pongo n=66, Hylobatidae n=184"
+    }
+  ],
+  "method": "The deposit holds per-specimen inter-landmark distances, not coordinates, so the pre-registered secondary plan was run. Each specimen's 39 log distances were centred on their mean (log geometric-mean size correction); species means were taken; the log ratio Pan troglodytes / Homo was formed for each distance. Each of the 21 landmarks was assigned to an ordered region of the human skull from its anatomical name (1 neurocranium/vault/cranial base: BR LD AS OPI BA JP APET EAM SP TS KR; 2 orbit/upper face/nasal/zygomatic arch: NA FM ZS ZYGO NSL; 3 maxilla/palate/alveolar: IS PM PNS MT ZI), and each distance scored by the mean of its endpoint ranks. Spearman rho between score and log ratio, medians by region and a bootstrap over specimens (2000 resamples) were computed; Gorilla and Pan paniscus were run as replications that do not enter the verdict.",
+  "measured": {
+    "value": 0.6962,
+    "unit": "Spearman rho (region score vs size-corrected log distance ratio Pan troglodytes/Homo)",
+    "n": 39,
+    "uncertainty": "bootstrap 95% CI over specimens 0.664-0.732; p = 8.6e-7",
+    "extra": {
+      "median_logratio_same_region_distances_Pan": {
+        "neurocranium/base": -0.1835,
+        "orbit/upper face": 0.0271,
+        "maxilla/palate": 0.18
+      },
+      "medians_monotone_over_all_five_score_levels_Pan": true,
+      "ols_slope_logratio_per_region_step_Pan": 0.2194,
+      "ols_r2_Pan": 0.4825,
+      "rho_same_region_distances_only_Pan": 0.6898,
+      "Gorilla_replication": {
+        "rho": 0.7196,
+        "ci": [
+          0.6952,
+          0.7533
+        ],
+        "slope_per_step": 0.2806,
+        "r2": 0.5077,
+        "medians": {
+          "neurocranium/base": -0.2754,
+          "orbit/upper face": 0.0801,
+          "maxilla/palate": 0.3087
+        }
+      },
+      "Pan_paniscus_replication": {
+        "rho": 0.6512,
+        "ci": [
+          0.6248,
+          0.6693
+        ],
+        "slope_per_step": 0.1728,
+        "r2": 0.4171
+      },
+      "n_specimens": {
+        "Homo": 50,
+        "Pan_troglodytes": 96,
+        "Gorilla": 110,
+        "Pan_paniscus": 40
+      }
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.5,
+  "caveats": [
+    "Secondary (weaker) plan: the deposit gives inter-landmark distances, not landmark coordinates, so no thin-plate-spline area ratios could be computed; distance ratios are linear rather than areal scale factors and position is an ordinal three-level region score assigned by the analyst from landmark names, not a measured coordinate.",
+    "No baboon (Papio) data were available; Thompson's statement that the baboon shows 'the same order' of deformation with greater intensity is untested. Gorilla, which Thompson also mentions, shows the same gradient with a steeper slope (0.28 vs 0.22 log units per region step), consistent with his 'increased intensity' remark.",
+    "The relation is monotone and roughly linear in log ratio across region ranks (R^2 0.48 for Pan, 0.51 for Gorilla), which is what 'approximately logarithmic order' predicts, but with only three ordinal positions a linear trend cannot be distinguished from other monotone shapes.",
+    "Within the neurocranium, cranial-base distances (APET-BA, KR-SP, BA-EAM) have positive log ratios while vault distances (BR-LD, LD-AS, OPI-LD) are strongly negative, in line with Thompson's claim that the gradient runs downwards as well as forwards; this was not a pre-registered test.",
+    "Species means of adult crania of mixed sex were compared; the dataset's log distances are size-corrected by geometric mean, so the test concerns shape, whereas Thompson's figures also carried a size difference.",
+    "Spearman p-values treat the 39 distances as independent, which they are not (shared endpoints); the bootstrap CI over specimens does not address this dependence either."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/thompson-claim-tests-cf12",
+    "date": "2026-10-31"
+  }
+}
