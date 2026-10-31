@@ -29,7 +29,7 @@ def dct2_matrix(N, dtype=np.float64):
     return C.astype(dtype)
 
 
-def simulate(cells, dt=0.02, grid_factor=1, device="cuda", deadline=None, log=print, check_every=200):
+def simulate(cells, dt=0.02, grid_factor=1, device="cuda", deadline=None, log=print, check_every=200, perturb=0.0, frame_ids=(), nframes=0):
     """cells: list of derived cell dicts (one model). Returns list of per-cell result dicts (same order).
     grid_factor=2 doubles the number of cells per side (spatial-refinement arm). dt may be halved by the caller."""
     model = cells[0]["model"]
@@ -51,6 +51,10 @@ def simulate(cells, dt=0.02, grid_factor=1, device="cuda", deadline=None, log=pr
         pu, pv = S.ic_modal(c["seed"], c["K"], c["L"], N, c["eps"] * abs(ust), c["eps"] * abs(vst))
         X0[i, :N, 0] = ust + pu
         X0[i, :N, 1] = vst + pv
+    if perturb:      # stability control: relative multiplicative noise on the initial state, fixed per cell id, applied identically to u and v entries
+        for i, c in enumerate(cells):
+            rg = np.random.default_rng(10 ** 6 + int(c["id"]))
+            X0[i, :Ns[i], :] *= 1.0 + perturb * rg.standard_normal((Ns[i], 2))
     Dv = np.array([float(F(c["Dv"])) for c in cells])
     mh = np.stack([np.exp(-1.0 * q * dt / 2), np.exp(-Dv[:, None] * q * dt / 2)], axis=-1)       # (B,Nmax,2); padded q=0 -> 1 but C is 0 there
     mask = np.zeros((B, Nmax))
@@ -81,7 +85,12 @@ def simulate(cells, dt=0.02, grid_factor=1, device="cuda", deadline=None, log=pr
     n_i = [int(round(c["T"] / dt)) for c in cells]
     chk_i = [int(round(0.9 * n)) for n in n_i]
     nmax = max(n_i)
-    ev = set(chk_i) | set(n_i) | set(range(1, nmax + 1, check_every))
+    frame_steps = {}
+    for i, c in enumerate(cells):
+        if c["id"] in set(frame_ids) and nframes:
+            frame_steps[i] = sorted({int(round(n_i[i] * k / (nframes - 1))) for k in range(nframes)} - {0})
+    frames = {i: [] for i in frame_steps}
+    ev = set(chk_i) | set(n_i) | set(range(1, nmax + 1, check_every)) | {st for v in frame_steps.values() for st in v}
     ev_steps = sorted(s for s in ev if s <= nmax)
     snap, final, finalv = {}, {}, {}
     diverged = [False] * B
@@ -111,6 +120,9 @@ def simulate(cells, dt=0.02, grid_factor=1, device="cuda", deadline=None, log=pr
                 for i in range(B):
                     series[i].append(sd[i])
             Sn = Sx.cpu().numpy()
+            for i, sts in frame_steps.items():
+                if s in sts:
+                    frames[i].append((s * dt, Sn[i, :Ns[i], 0].astype(np.float32)))
             for i in range(B):
                 if chk_i[i] == s:
                     snap[i] = Sn[i, :Ns[i], 0].copy()
@@ -134,6 +146,9 @@ def simulate(cells, dt=0.02, grid_factor=1, device="cuda", deadline=None, log=pr
             r["u_final"] = final[i]
             r["v_final"] = finalv[i]
             r["u_snap"] = snap[i]
+        if i in frames and frames[i]:
+            r["frame_t"] = np.array([t for t, _ in frames[i]])
+            r["frames_u"] = np.stack([f for _, f in frames[i]])
         r["std_series"] = series[i]
         r["ust"] = steady[i][0]
         out.append(r)

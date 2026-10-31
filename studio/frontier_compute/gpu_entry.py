@@ -30,16 +30,20 @@ for arm in arms:
         meta["arms"][arm] = {"status": "not_run_out_of_budget"}
         print("arm", arm, "NOT RUN (budget)", flush=True)
         continue
-    dt, gf = {"base": (0.02, 1), "dt2": (0.01, 1), "grid2": (0.02, 2)}[arm]
+    dt, gf, pert = {"base": (0.02, 1, 0.0), "dt2": (0.01, 1, 0.0), "grid2": (0.02, 2, 0.0), "perturb": (0.02, 1, 1e-10)}[arm]
+    fids = [int(x) for x in sys.argv[sys.argv.index("--frames") + 1].split(",")] if "--frames" in sys.argv and arm == "base" else []
+    nfr = int(sys.argv[sys.argv.index("--nframes") + 1]) if "--nframes" in sys.argv else 0
     for model in sorted({c["model"] for c in cells}):
         sub = [c for c in cells if c["model"] == model]
-        res, m = G.simulate(sub, dt=dt, grid_factor=gf, device=dev, deadline=t_start + budget, log=lambda s: print(s, flush=True))
+        res, m = G.simulate(sub, dt=dt, grid_factor=gf, device=dev, deadline=t_start + budget, log=lambda s: print(s, flush=True), perturb=pert, frame_ids=fids, nframes=nfr)
         meta["arms"].setdefault(arm, {})[model] = {k: v for k, v in m.items() if k != "series_t"}
         meta["arms"][arm].setdefault("series_t", {})[model] = m["series_t"]
         for r in res:
-            for k in ("u_final", "v_final", "u_snap"):
+            for k in ("u_final", "v_final", "u_snap", "frame_t", "frames_u"):
                 if k in r:
-                    fields[f"{r['id']}_{arm}_{k}"] = r.pop(k)
+                    v = r.pop(k)
+                    if arm == "base":          # fields kept for the base arm only (size); other arms keep metrics
+                        fields[f"{r['id']}_{arm}_{k}"] = v
             r["arm"] = arm
             rows.append(r)
         print("arm", arm, model, "B", m["B"], "steps", m["steps"], "wall_s", round(m["wall_s"], 1), "timed_out", m["timed_out"], flush=True)
