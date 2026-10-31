@@ -1,8 +1,7 @@
 """Auditable D2Q9 BGK lattice-Boltzmann solver with Guo forcing, mid-way bounce-back on a solid mask, momentum-exchange force and open boundaries.
 torch float64; runs on CPU or CUDA unchanged. Lattice units (dx = dt = 1, c_s^2 = 1/3, nu = (tau - 1/2)/3, p = rho/3). Evidence kind: simulated."""
-from __future__ import annotations
 
-import math
+from __future__ import annotations
 
 import torch
 
@@ -22,7 +21,11 @@ class LBM:
         self.cx = torch.tensor(CX, **d)[:, None, None]
         self.cy = torch.tensor(CY, **d)[:, None, None]
         self.w = torch.tensor(W, **d)[:, None, None]
-        self.solid = torch.zeros(nx, ny, dtype=torch.bool, device=self.dev) if solid is None else solid.to(self.dev)
+        self.solid = (
+            torch.zeros(nx, ny, dtype=torch.bool, device=self.dev)
+            if solid is None
+            else solid.to(self.dev)
+        )
         self.fluid = ~self.solid
         self.force = force
         self.f = None
@@ -33,7 +36,10 @@ class LBM:
         for i in range(9):
             sh = (CX[i], CY[i])
             self.bb.append(torch.roll(self.solid, shifts=sh, dims=(0, 1)) & self.fluid)
-            self.out.append(torch.roll(self.solid, shifts=(-CX[i], -CY[i]), dims=(0, 1)) & self.fluid)
+            self.out.append(
+                torch.roll(self.solid, shifts=(-CX[i], -CY[i]), dims=(0, 1))
+                & self.fluid
+            )
 
     def feq(self, rho, ux, uy):
         cu = self.cx * ux + self.cy * uy
@@ -63,7 +69,10 @@ class LBM:
         if self.force != (0.0, 0.0):
             Fx, Fy = self.force
             cu = self.cx * ux + self.cy * uy
-            post = post + (1 - 0.5 * om) * self.w * (3 * ((self.cx - ux) * Fx + (self.cy - uy) * Fy) + 9 * cu * (self.cx * Fx + self.cy * Fy))
+            post = post + (1 - 0.5 * om) * self.w * (
+                3 * ((self.cx - ux) * Fx + (self.cy - uy) * Fy)
+                + 9 * cu * (self.cx * Fx + self.cy * Fy)
+            )
         new = torch.empty_like(post)
         for i in range(9):
             new[i] = torch.roll(post[i], shifts=(CX[i], CY[i]), dims=(0, 1))
@@ -79,14 +88,20 @@ class LBM:
                 fy = fy + 2 * CY[i] * s
         if self.open is not None:
             U, rho0 = self.open
-            eq = self.feq(torch.tensor(rho0, dtype=torch.float64, device=self.dev), torch.tensor(U, dtype=torch.float64, device=self.dev), torch.tensor(0.0, dtype=torch.float64, device=self.dev))
+            eq = self.feq(
+                torch.tensor(rho0, dtype=torch.float64, device=self.dev),
+                torch.tensor(U, dtype=torch.float64, device=self.dev),
+                torch.tensor(0.0, dtype=torch.float64, device=self.dev),
+            )
             eq = eq.reshape(9, 1, 1)
             new[:, 0, :] = eq[:, 0, :].expand(9, self.ny)
             new[:, :, 0] = eq[:, :, 0].expand(9, self.nx)
             new[:, :, -1] = eq[:, :, 0].expand(9, self.nx)
             new[:, -1, :] = new[:, -2, :]
         if self.solid.any():
-            new = torch.where(self.solid[None], self.w.expand(9, self.nx, self.ny), new)     # solid nodes held at rest equilibrium (rho = 1)
+            new = torch.where(
+                self.solid[None], self.w.expand(9, self.nx, self.ny), new
+            )  # solid nodes held at rest equilibrium (rho = 1)
         self.f = new
         return (fx, fy) if want_force else None
 
