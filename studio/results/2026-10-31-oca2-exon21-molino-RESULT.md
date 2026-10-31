@@ -408,3 +408,117 @@ finding.
 
 What this does **not** establish is in section 9: n = 1 per population, no causal
 claim, no test of the Pachón exon-24 claim, and no statement about wild populations.
+
+---
+
+## 12. Appendix A — the N-gap check, specific to exon 21
+
+*(Added after the result, at the team lead's request. It can only weaken the
+finding, never strengthen it: a run of Ns over the exon-21 position would make the
+absence an assembly gap rather than a deletion, and would move the verdict to
+inconclusive. It did not.)*
+
+An assembly gap is the one alternative explanation the preregistered criterion
+cannot distinguish by itself, so the N-detector needs its own positive control —
+otherwise "0 Ns" and "my N-counter is broken" read identically.
+
+**Positive control: do these assemblies contain detectable N-runs at all?**
+
+| assembly | chr5 length | total N | N-runs | longest run |
+|---|---|---|---|---|
+| surface CM041913.1 | 58,297,222 | **0** | 0 | 0 |
+| **Molino CM041831.1** | 59,920,421 | **2,000** | **4** | 500 bp |
+| Tinaja CM041856.1 | 59,648,305 | 500 | 1 | 500 bp |
+
+The control passes **on the assembly that matters**. Molino is where the absence is
+claimed, and Molino chromosome 5 does contain N-gaps, four of them, which the same
+counter finds. So a zero from this counter on Molino is a measurement, not a
+silence.
+
+Note the asymmetry honestly: **surface chr5 contains no N at all**, so on surface
+the N-detector has no positive control. That does not matter here, because surface
+is where exon 21 is *present* at 82/82; an assembly gap is not a competing
+explanation for finding something.
+
+**The measurement.**
+
+| region | length | N |
+|---|---|---|
+| surface, exon 21 itself, 18,464,523-18,464,627 | 105 bp | **0** |
+| surface, the deletion window 18,464,458-18,469,069 | 4,612 bp | **0** |
+| surface, exon 21 +/- 5 kb | 10,105 bp | **0** |
+| **Molino, the whole exon-20-to-22 interval 19,325,244-19,336,816** | **11,573 bp** | **0** |
+| Tinaja, exon 21 +/- 5 kb | 10,082 bp | **0** |
+
+**Where Molino's four N-runs actually are**, since "0 in the window" is only
+meaningful with their positions:
+
+| N-run on Molino chr5 | length | distance to the oca2 locus |
+|---|---|---|
+| 7,065,125 - 7,065,624 | 500 bp | 12,259,620 bp |
+| 18,330,723 - 18,331,222 | 500 bp | **994,022 bp** (nearest) |
+| 36,064,757 - 36,065,256 | 500 bp | 16,727,941 bp |
+| 47,595,632 - 47,596,131 | 500 bp | 28,258,816 bp |
+
+The nearest gap in the Molino assembly is **994 kb** from the locus. The contracted
+interval is contiguous sequence. **The absence of exon 21 is not an assembly gap.**
+
+## 13. Appendix B — exact reproduction
+
+Accessions and the byte lengths they returned, so a mismatch is visible rather than
+assumed:
+
+| file | accession | bp | bytes |
+|---|---|---|---|
+| `chr5_surface.fa` | CM041913.1 (= NC_064412.1) | 58,297,222 | 59,268,951 |
+| `chr5_molino.fa` | CM041831.1 | 59,920,421 | 60,919,223 |
+| `chr5_tinaja.fa` | CM041856.1 | 59,648,305 | 60,642,572 |
+| `molino_wg.zip` | GCA_023375845.1 | 1,361,196,561 (108 records) | 402,778,100 |
+| `oca2_surface_locus.gb` | NC_064412.1:18,405,444-18,589,784 | 184,341 | 283,632 |
+
+```sh
+# 1. the three chromosomes (EBI ENA; a bogus accession returns HTTP 404, so this
+#    endpoint can come back empty)
+for p in CM041913.1:surface CM041831.1:molino CM041856.1:tinaja; do
+  systemd-run --user --scope -p TasksMax=64 -p MemoryMax=4G -p MemorySwapMax=0 \
+    -p RuntimeMaxSec=900 \
+    curl -sS --max-time 880 -o "chr5_${p##*:}.fa" \
+      "https://www.ebi.ac.uk/ena/browser/api/fasta/${p%%:*}"
+done
+
+# 2. the annotated surface oca2 locus, padded 20 kb each side
+curl -sS "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore\
+&id=NC_064412.1&seq_start=18405444&seq_stop=18589784&rettype=gbwithparts&retmode=text" \
+  -o oca2_surface_locus.gb
+
+# 3. exons in TRANSCRIPT order (the gene is on the minus strand, so exon 1 is the
+#    HIGHEST coordinate and the join() interval list must be reversed), plus the
+#    shuffled must-fail decoys
+python3 -I parse_exons.py            # -> exons.json ; 24 exons, mRNA 2,671 bp
+
+# 4. the measurement
+python3 -I scan.py surface molino tinaja     # -> scan_results.json
+python3 -I breakpoint.py                     # offset profile / deletion window
+python3 -I numbering_check.py                # Ma et al. 2015 oligos vs my exon 21
+python3 -I ngap.py                           # Appendix A
+
+# 5. genome-wide. NOTE: `grep -o` here is ugrep 7.8.4 and reports only
+#    NON-OVERLAPPING matches, so a k-mer COUNT from it is wrong. Use presence/
+#    absence per label, which it answers correctly.
+curl -sS -L -o molino_wg.zip "https://api.ncbi.nlm.nih.gov/datasets/v2alpha/genome/\
+accession/GCA_023375845.1/download?include_annotation_type=GENOME_FASTA"
+python3 -I wg2_prep.py <the .fna> flat.txt pats.txt    # 4 MB chunks, 23 bp overlap
+for L in exon21_TEST exon20_POSCTRL exon22_POSCTRL DECOY21_MUSTFAIL; do
+  grep -c -F -f "pats_$L.txt" flat.txt; echo "rc=$?"
+done
+# expected: exon21_TEST 0 (rc 1), exon20 1 (rc 0), exon22 1 (rc 0), DECOY 0 (rc 1)
+```
+
+Scripts are in
+`/tmp/claude-1000/-home-ubuntu-git-morphoswarm/9fd16842-507d-49d0-a92a-82363be6489e/scratchpad/cavefish/`
+(`parse_exons.py`, `scan.py`, `breakpoint.py`, `numbering_check.py`, `wg2_prep.py`,
+`ngap.py`). They are session-scratch and will not survive; the commands above
+reconstruct them from the accessions, which are the durable part.
+
+Every job ran under
+`systemd-run --user --scope -p TasksMax=64 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=900`.
