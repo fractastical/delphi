@@ -270,3 +270,67 @@ def test_malformed_scenarios_raise(mutate):
     mutate(sc)
     with pytest.raises(B.BeliefError):
         B.solve(sc)
+
+
+# ---- consumer contract (review findings 1-3) -----------------------------------------------------
+
+def test_rationals_are_exact_strings_and_float_is_the_wrong_parser():
+    # Deliberately NON-INTEGRAL fixture: EV(advance) = "17/5", forecast "3/5", threshold "5/14".
+    r = B.solve(B.EXAMPLE_SCENARIO)
+    ev = r["decision"]["actions"]["advance"]["expected_value"]
+    assert ev == "17/5" and F(ev) == F(17, 5)
+    with pytest.raises(ValueError):
+        float(ev)                                   # fail-loud on a fraction ...
+    assert float(r["decision"]["actions"]["hold"]["expected_value"]) == 0.0   # ... silent on "0"
+    assert F(r["decision"]["preferred_changes_when"]["breakeven"][0]["p_threshold"]) == F(5, 14)
+    assert F(r["variables"]["H"]["posterior"]["yes"]) + F(r["variables"]["H"]["posterior"]["no"]) == 1
+
+
+def test_ok_response_may_contain_a_bare_status_only_action():
+    sc = scenario([var("A"), var("B")], [prior("A"), prior("B")],
+                  [fac("psi", ["A", "B"], [["t", "t", "1"], ["t", "f", "0"], ["f", "t", "0"], ["f", "f", "1"]]),
+                   fac("nob", ["B"], [["t", "0"], ["f", "1"]])])
+    sc["decision"]["actions"] = {"go": {"assumes": {"B": "t"}}, "stop": {}}
+    r = B.solve(sc)
+    acts = r["decision"]["actions"]
+    assert r["status"] == "ok"
+    assert acts["go"] == {"status": "impossible-under-its-assumptions"}
+    assert "expected_value" not in acts["go"] and "forecast" not in acts["go"]
+    assert F(acts["stop"]["expected_value"]) == 0 and "forecast" in acts["stop"]
+
+
+def _refusal_scenarios():
+    big = scenario([var("A")], [prior("A")], [fac("e", ["A"], [["t", "1"], ["f", "1"]])])
+    big["variables"][0]["states"] = [f"s{i}" for i in range(B.MAX_STATES + 1)]
+    chain = scenario([var("A"), var("B")], [prior("A"), prior("B")],
+                     [fac("psi", ["A", "B"], [["t", "t", "1"], ["t", "f", "2"], ["f", "t", "3"], ["f", "f", "4"]])])
+    return {
+        "ok": (B.EXAMPLE_SCENARIO, B.Caps()),
+        "refused-cap-exceeded": (big, B.Caps()),
+        "refused-duplicate-evidence": (dup_scenario(), B.Caps()),
+        "unresolved-no-prior": (scenario([var("A")], [], []), B.Caps()),
+        "unsupported-cyclic-beyond-exact-cap": (triangle(), B.Caps(max_elim_cells=4)),
+        "unsupported-beyond-exact-cap": (chain, B.Caps(max_elim_cells=2)),     # acyclic, still capped
+        "contradiction": (scenario([var("A")], [prior("A")], [fac("no_t", ["A"], [["t", "0"], ["f", "1"]]),
+                                                               fac("no_f", ["A"], [["t", "1"], ["f", "0"]])]),
+                          B.Caps()),
+    }
+
+
+def test_every_status_in_the_vocabulary_has_a_fixture():
+    assert set(_refusal_scenarios()) == set(B.STATUSES)
+
+
+@pytest.mark.parametrize("status", B.STATUSES)
+def test_only_ok_carries_decision_variables_structure_and_calibration_survives_everywhere(status):
+    sc, caps = _refusal_scenarios()[status]
+    r = B.solve(sc, caps)
+    assert r["status"] == status
+    keys = {"decision", "variables", "structure"}
+    if status == "ok":
+        assert keys <= set(r)
+    else:
+        assert not keys & set(r), "a non-ok response must not look renderable"
+        assert r["reasons"]
+    assert r["metadata"]["calibration"].startswith("UNKNOWN") and "not a truth score" in r["metadata"]["interpretation"]
+    assert r["input_hash"] and r["output_hash"]

@@ -44,6 +44,8 @@ MAX_ELIM_CELLS = 50_000     # largest intermediate table variable elimination ma
 MAX_ACTIONS = 8
 PRIOR_METHODS = ("declared", "uniform-ignorance", "reference-class")
 _ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.:-]{0,79}$")
+STATUSES = ("ok", "refused-cap-exceeded", "refused-duplicate-evidence", "unresolved-no-prior",
+            "unsupported-cyclic-beyond-exact-cap", "unsupported-beyond-exact-cap", "contradiction")
 CALIBRATION = ("UNKNOWN: no calibration of these numbers against outcomes has been done. They are "
                "consequences of the declared assumptions, not measured accuracy.")
 INTERPRETATION = ("A decision-conditioned forecast under declared assumptions. It is not a truth "
@@ -413,6 +415,10 @@ def solve(scenario: dict, caps: Caps = Caps()) -> dict:
 
     def finish(status: str, *reasons: str) -> dict:
         res["status"], res["reasons"] = status, list(reasons)
+        if status != "ok":      # consumer contract: a non-ok result never carries decision/variables/structure
+            if "structure" in res:
+                res["diagnostics"] = {"structure_at_failure": res.pop("structure")}
+            assert status in STATUSES and not {"decision", "variables", "structure"} & set(res)
         res["output_hash"] = digest({k: v for k, v in res.items() if k != "output_hash"})
         return res
 

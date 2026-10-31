@@ -124,3 +124,42 @@ committed; any edit changes it.
 
 Exact but small; potentials, not a probabilistic program. No continuous variables. Calibration unknown.
 Not wired into the store or MCP surface; callers pass a scenario dict.
+
+## Consumer contract (from the independent review of 2b2ad18; binding for web and UI code)
+
+1. **Rationals are exact `"p/q"` strings; parse them exactly.** `float("17/5")` throws, `float("0")`
+   silently succeeds, so a consumer tested only on integral values ships and then breaks. Use
+   Python `fractions.Fraction(s)` (`Fraction("17/5") == Fraction(17, 5)`) or, in JS, split on `/`
+   and use `BigInt` (`const [n, d = "1"] = s.split("/"); BigInt(n)`, `BigInt(d)`), converting to a
+   display decimal only at the last step. **Web consumers must parse "p/q" strings exactly.** The
+   bundled example is deliberately non-integral (`"3/5"`, `"17/5"`, `"5/14"`); a consumer test that
+   uses it fails on day one if it parses with `float`/`Number`. The site is asked to integrate this.
+2. **`status == "ok"` does not mean every action is renderable.** An action whose own `assumes`
+   contradict the evidence is the bare object `{"status": "impossible-under-its-assumptions"}` with no
+   `expected_value` and no `forecast`, inside an otherwise `ok` response. Check each action's keys.
+3. **The only guard is `status === "ok"`.** The vocabulary has no safe prefix (`contradiction`,
+   `unresolved-no-prior` and `unsupported-*` do not start with `refused`). Vocabulary:
+   `beliefs.STATUSES` = ok, refused-cap-exceeded, refused-duplicate-evidence, unresolved-no-prior,
+   unsupported-cyclic-beyond-exact-cap, unsupported-beyond-exact-cap, contradiction. Every non-ok
+   result omits `decision`, `variables` and `structure` (diagnostics, if any, move to `diagnostics`);
+   a parametrised test pins this for every status, and fails if a status is added without a fixture.
+   `metadata.calibration` (UNKNOWN), `input_hash`, `output_hash` and `reasons` are on every status.
+
+## Web adapter: `frontier/beliefs_api.py`
+
+`solve_scenario(dict)` and `parse_body(bytes)` for a website. Request: finite JSON, at most 32 KB
+(`request_too_large`, 413), top-level keys only those of the scenario schema (no code, equations,
+commands; nested validation is `frontier.beliefs`', and `do` is refused). The solve runs in a fresh
+child of the same interpreter (`sys.executable -m frontier.beliefs_api --worker`), request on stdin,
+canonical JSON on stdout, environment limited to PATH, OMP_NUM_THREADS=1, OPENBLAS_NUM_THREADS=1,
+MKL_NUM_THREADS=1, PYTHONDONTWRITEBYTECODE=1, timeout 8 s, at most 2 concurrent slots (a third gets
+`FrontierError` code `solver_busy`, HTTP 429). A timeout returns `{"status": "unknown", ...}` with no
+result, never a posterior. A worker failure is the fixed `solver_unavailable` (503), no trace or
+request echoed. A rejected scenario is `invalid_request` (400) with the validator's message (at most
+300 characters, authored by `frontier.beliefs`, describing the caller's own input).
+Every response, error bodies included (`error_body(exc)`), carries `calibrated: false` and
+`assumed_scope`, the declared-assumption scope text. Success shape:
+`{schema, status, calibrated, assumed_scope, result}` with `result` as above (the status is mirrored,
+so the guard in item 3 applies to both). Not wired into `frontier/web.py`; that belongs to the web
+owner. Limits: wall-clock timeout only (the memory and process bounds are the service unit's); the
+timeout is the stdlib `subprocess` kill of the direct child, which spawns nothing.
