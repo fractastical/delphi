@@ -67,6 +67,7 @@
     const f = H.fitted[0]; const c = H.candidate; const sh = Object.entries(H.fish1990.pectoral_share_pct_mean_se).sort((x, y) => x[1][0] - y[1][0]); const lo = sh[0], hi = sh[sh.length - 1]; const cm = (snap.coupling_manifest || {}).counts; const SOFT = new Set(["aesthetic", "assumed", "numerical", "assumed transfer", "design_assumption"]);
     return html`<section class="panel grounding" aria-labelledby="gr-h"><h2 id="gr-h">Start from real fish anatomy.</h2>
       <p class="note warn small"><b>Not biorealistic and not validated.</b> This is an engineered candidate sized from published measurements. Its flat fin plates (${c.fin_thickness.value} mm), lattice scales and decorative eyes are assumptions, marked below. ${c.label}</p>
+      ${snap.fish3d_viewer ? html`<div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint">The 3D model is the candidate mesh (fish.glb, sha256 ${snap.fish3d_viewer.glb_sha256.slice(0, 12)}…). Colours are appearance only. The schematic drawing and printable models are below.</p>` : ""}
       <div class="groundgrid"><div><div id="fishmini" class="fishmini"></div></div>
         <div><h3>What the body and fins are sized from</h3>
           <p>Candidate N1: standard length ${c.standard_length_mm.toFixed(1)} mm, wing span ${c.wing_span_mm.toFixed(1)} mm, wing area ${Math.round(c.wing_area_mm2)} mm², mass ${c.mass_kg} kg.</p>
@@ -90,6 +91,7 @@
       html: html`<section class="hero compact"><div><p class="eyebrow">MorphoSwarm Frontier</p><h1>Design together.<br>Know what's open.</h1></div>
         <div class="herotext"><p class="lede">Two ways in, one body of evidence. <b>Studio</b> is where a design goal is worked across scales, with the models, media and gaps in one place. <b>Frontier</b> is the shared list of open questions and who is working on them. Both read the same claims and evidence, kept in the Delphi foundation: what we know, what's next, who's working on it.</p></div></section>
       ${groundingSection(snap)}
+      <p class="small aboutlink"><a href="${DF.href("/about")}">About this project</a> · <a href="${DF.href("/generative")}">Generative biology: from mechanistic simulation to equation-conditioned models</a></p>
       <section class="panel goalpanel">${goalForm("")}</section>
 
       <section class="paths" aria-label="Two entry paths">
@@ -107,6 +109,7 @@
         <p class="small faint">Projects other than Flying fish are added as Project records; none is invented here.</p></section>`,
       async after(root) {
         DF.mountFishMini(root.querySelector("#fishmini"), snap);
+        if (snap.fish3d_viewer && root.querySelector("#fish-viewer")) import("./model-viewer.js").then((m) => { const v = m.mountFishViewer(root.querySelector("#fish-viewer"), { base: snap.fish3d_viewer.base, layout: "hero" }); DF.onLeave(() => v.dispose && v.dispose()); }).catch((e) => { root.querySelector("#fish-viewer").textContent = "The 3D viewer could not load (" + e.message + "). The turntable and drawing remain below."; });
         DF.bindForm(root, "goal", (v) => DF.href("/studio", { goal: v.goal }));
         try { const L = await DF.liveQuestionCount(); if (L) root.querySelector("#homeq").parentElement.innerHTML = `<b>${L.n}</b> questions in the live node <span class="faint small">(${esc(L.source)})</span>`; } catch (e) { /* the snapshot figure stays */ }
       },

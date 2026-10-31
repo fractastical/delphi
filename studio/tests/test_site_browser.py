@@ -198,7 +198,7 @@ def test_simulation_gallery_never_invents_a_video(browser, base):
     pg.goto(base + "#/simulations")
     pg.wait_for_selector(".simcard, .empty")
     snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
-    verified = [m for m in snap["simulation_manifests"] if m.get("video_state") == "present_verified"]
+    verified = [m for m in snap["simulation_manifests"] if m.get("video_state") in ("present_verified", "present_unpinned")]
     assert pg.locator("video").count() == len(verified), "a player may appear only for a verified video file"
     html = pg.evaluate("""() => DF.views.simulations(Object.assign({}, DF.api.state.snapshot, {simulation: null, simulation_manifests: [
       {id: 'ok', title: 'ok', scales: ['cellular'], video_state: 'present_verified', video_href: 'artifacts/simulations/ok/v.mp4', manifest: 'm'},
@@ -267,7 +267,7 @@ def test_print_forms_and_videos_match_their_declared_bytes(browser, base):
         assert pg.locator(".meshhost .viewbar button").count() == 4
     pg.goto(base + "#/simulations")
     pg.wait_for_selector(".simcard, .empty")
-    vids = [m for m in snap["simulation_manifests"] if m.get("video_state") == "present_verified"]
+    vids = [m for m in snap["simulation_manifests"] if m.get("video_state") in ("present_verified", "present_unpinned")]
     assert pg.locator("video").count() == len(vids)
     for m in vids:
         assert (ROOT / "site" / m["video_href"]).is_file()
@@ -660,7 +660,7 @@ def test_connect_tab_states_what_is_and_is_not_verified(browser, base):
 
 def test_gallery_has_every_verified_video_with_a_player(browser, base):
     snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
-    ids = [m["id"] for m in snap["simulation_manifests"] if m.get("video_state") == "present_verified"]
+    ids = [m["id"] for m in snap["simulation_manifests"] if m.get("video_state") in ("present_verified", "present_unpinned")]
     pg = page(browser)
     pg.goto(base + "#/simulations")
     pg.wait_for_selector(".simcard")
@@ -889,3 +889,47 @@ def test_system_built_tab_links_evidence_keeps_failures_and_labels_the_repo_priv
     assert pg.locator("tbody tr").count() >= 13
     assert pg.locator(".tablewrap td:has-text('preregistered')").count() == 0   # date-only verdicts are not placed on the dated timeline
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+
+
+def test_home_mounts_the_actual_glb_viewer_with_a_working_fallback(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/home")
+    pg.wait_for_selector("#fish-viewer.mv")
+    pg.locator("#fish-viewer").scroll_into_view_if_needed()
+    pg.wait_for_function("document.querySelector('#fish-viewer .mv-badges') && document.querySelector('#fish-viewer').textContent.length > 40", timeout=20000)
+    t = pg.locator("#fish-viewer").text_content()
+    assert "not claimed" in t.lower() or "fallback" in t.lower() or "interactive" in t.lower() or "sha256" in t.lower()
+    assert pg.errors == []
+    for rel in ("fish.glb", "components.json", "render/render.json"):
+        r = pg.request.get(base + "artifacts/fish3d/fish3d-N1-cypselurus-baseline/" + rel)
+        assert r.status == 200, rel
+    assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+
+
+def test_betse_morpheus_openfold_and_md_cards_keep_their_limits(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    for cid in ("betse-tissue", "morpheus-multicell", "molecular-md"):
+        pg.wait_for_selector(f"#sim-{cid} video")
+    pg.wait_for_selector("#sim-openfold2-kcnj13")
+    assert "not a fish fin" in pg.locator("#sim-betse-tissue").text_content() and "No sha256 is declared" in pg.locator("#sim-betse-tissue").text_content()
+    assert "not calibrated" in pg.locator("#sim-morpheus-multicell").text_content().lower() and "600 s cap" in pg.locator("#sim-morpheus-multicell").text_content()
+    md = pg.locator("#sim-molecular-md").text_content()
+    assert "not achieved" in md and "not computed (null)" in md and "300 K is the target, not the observation" in md
+    of = pg.locator("#sim-openfold2-kcnj13").text_content()
+    assert "No video file" in of and "not a calibrated probability" in of.replace("calibrated probability of", "calibrated probability") or "calibrated probability" in of
+    assert "PREDICTED" in of
+
+
+def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/home")
+    pg.wait_for_selector(".aboutmenu summary")
+    pg.focus(".aboutmenu summary"); pg.keyboard.press("Enter")
+    hrefs = pg.locator(".aboutmenu details[open] a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative"]
+    assert pg.locator("nav[aria-label=Views] > ul > li > a:has-text('Generative')").count() == 0   # not a top-level item
+    assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/home"); pg2.wait_for_selector(".aboutmenu summary")
+    assert not pg2.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")

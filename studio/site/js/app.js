@@ -19,6 +19,7 @@
     e.preventDefault(); const v = {}; new FormData(form).forEach((val, k) => { if (String(val).trim()) v[k] = String(val).trim(); }); DF.go(build(v));
   }));
 
+  const ABOUT = [["/about", "Overview"], ["/about/team", "Team"], ["/about/docs", "Documentation"], ["/about/inspirations", "Motivation & inspirations"], ["/generative", "Generative biology"]];
   const NAV = [["studio", "Studio"], ["frontier", "Frontier"], ["knowledge", "Knowledge"], ["evidence", "Evidence"], ["work", "System"]];
   const STUDIO_GROUP = new Set(["studio", "engineering", "simulations", "belief"]);       // reached from a project; they highlight Studio
   const inNav = (k, view) => view === k || (k === "studio" && STUDIO_GROUP.has(view)) || (k === "knowledge" && view === "entity") || (k === "work" && view === "system");
@@ -27,7 +28,8 @@
   function header(route) {
     const s = DF.api.state; const live = s.mode === "live";
     return html`<div class="bar"><a class="brand" href="${DF.href("/home")}"><svg class="mark" viewBox="0 0 44 28" width="44" height="28" aria-hidden="true" focusable="false"><defs><linearGradient id="mk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c8f24a"/><stop offset="1" stop-color="#2bb3a3"/></linearGradient></defs><path d="M3 15c5-8 14-9 21-5 4 2 6 4 8 5-2 1-4 3-8 5-7 4-16 3-21-5z" fill="url(#mk)"/><path d="M32 15l8-7v14z" fill="url(#mk)" opacity=".85"/><circle cx="9" cy="13.5" r="1.4" fill="#0e2433"/><path d="M14 8c3-4 6-6 12-7M17 7c4-1 8 0 12 3M12 20c2 3 5 5 10 6" fill="none" stroke="#c8f24a" stroke-width="1.3" stroke-linecap="round"/><g fill="#c8f24a"><circle cx="26" cy="1.2" r="1.5"/><circle cx="29.5" cy="10" r="1.5"/><circle cx="22" cy="26" r="1.5"/></g></svg>MorphoSwarm <b>Frontier</b><span class="brandsub">claims and evidence: Delphi</span></a>
-      <nav aria-label="Views"><ul>${NAV.map(([k, t]) => html`<li><a href="${DF.href("/" + k)}" aria-current="${inNav(k, route.view) ? "page" : "false"}">${t}</a></li>`)}</ul></nav>
+      <nav aria-label="Views"><ul>${NAV.map(([k, t]) => html`<li><a href="${DF.href("/" + k)}" aria-current="${inNav(k, route.view) ? "page" : "false"}">${t}</a></li>`)}
+        <li class="aboutmenu"><details><summary class="${route.view === "about" || route.view === "generative" ? "on" : ""}">About</summary><ul aria-label="About">${ABOUT.map(([h, t]) => html`<li><a href="${DF.href(h)}">${t}</a></li>`)}</ul></details></li></ul></nav>
       <form class="gsearch" role="search" id="gs"><label class="sr" for="gq">Search the catalog</label><input id="gq" type="search" placeholder="Search records" value="${route.view === "search" ? route.params.q || "" : ""}"><button class="btn small" type="submit">Search</button></form>
       <span class="mode ${live ? "live" : "snap"}" title="${esc(s.reason)}">${live ? "Live runtime" : "Snapshot"}</span></div>
       ${live && !s.publicAccess && s.authenticated === false ? html`<div class="banner" role="status"><b>Runtime reachable, not signed in.</b> Records need a session: <a href="/login">sign in</a>. Until then the catalog, artifacts and solver are unavailable, and the page shows the snapshot.</div>` : ""}
@@ -45,7 +47,7 @@
     const fn = DF.views[route.view];
     const y = lastView === route.view ? window.scrollY : 0;
     document.title = (route.view[0].toUpperCase() + route.view.slice(1)) + " · MorphoSwarm Frontier";
-    if (!fn) { main.innerHTML = html`<section class="pagehead"><h1>Not found</h1><p class="lede">There is no view called “${route.view}”. Choose one from the navigation above.</p></section>`.toString(); }
+    if (!fn) { main.innerHTML = html`<section class="pagehead"><h1>Not found</h1><p class="lede">${route.view === "about" || route.view === "generative" ? "This page is delivered by a module that is not part of this build yet." : "There is no view called “" + route.view + "”."} Choose one from the navigation above.</p></section>`.toString(); }
     else {
       try {
         const out = fn(snap, route); main.innerHTML = out.html.toString(); DF.renderMath(main);

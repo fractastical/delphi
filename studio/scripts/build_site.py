@@ -282,7 +282,7 @@ def controlled_results(ins: Inputs, out: dict) -> dict | None:
                          "verified": (w.get("independent_verify_certificate") or {}).get("ok"), "not_established": (w.get("receipt") or {}).get("not_established")} if w else None), "files": files}
 
 
-def _vid(ins, out, vid, src_dir, fname, declared, bytes_declared=None):
+def _vid(ins, out, vid, src_dir, fname, declared, bytes_declared=None, allow_unpinned=False):
     """Copy a declared video/poster into the site and compare its bytes with the declared sha256."""
     f = ROOT / src_dir / fname
     if not f.is_file():
@@ -291,7 +291,7 @@ def _vid(ins, out, vid, src_dir, fname, declared, bytes_declared=None):
     if declared and declared != h:
         return "digest_mismatch", None
     out[f"{SIM_OUT}/{vid}/{fname}"] = b
-    return "present_verified", f"artifacts/simulations/{vid}/{fname}"
+    return ("present_verified" if declared or not allow_unpinned else "present_unpinned"), f"artifacts/simulations/{vid}/{fname}"
 
 
 def build_timeline(ins: Inputs) -> dict | None:
@@ -358,6 +358,24 @@ def home_biology(ins: Inputs) -> dict | None:
         "manifest": f"{fc}/manifest.json"}
 
 
+def fish3d_files(ins: Inputs, out: dict) -> dict | None:
+    """Copy the actual fish3d GLB, component provenance, render files and component STLs for the viewer, each only if its bytes equal the declared sha256."""
+    cid = "fish3d-N1-cypselurus-baseline"; d = f"artifacts/fish3d/{cid}"
+    if not (ROOT / d / "render/render.json").exists():
+        return None
+    r = json.loads(ins.read(f"{d}/render/render.json")); comps = json.loads(ins.read(f"{d}/components.json"))["components"]; state = {"copied": [], "refused": []}
+    def put(rel, declared=None):
+        b = ins.read(f"{d}/{rel}") if (ROOT / d / rel).exists() else None
+        if b is None or (declared and digest_bytes(b) != declared):
+            state["refused"].append(rel); return
+        out[f"@artifacts/fish3d/{cid}/{rel}"] = b; state["copied"].append(rel)
+    put("fish.glb", r["glb_sha256"]); put("components.json"); put("render/render.json"); put("render/poster.png", r["poster_sha256"]); put("render/turntable.mp4", r["video"]["sha256"])
+    for n, v in comps.items():
+        if v.get("stl"):
+            put(v["stl"], v.get("stl_sha256"))
+    return {"base": f"artifacts/fish3d/{cid}/", "glb_sha256": r["glb_sha256"], **state}
+
+
 def lifecycle_block(ins: Inputs) -> dict | None:
     """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
     d = "data/fish-lifecycle"
@@ -396,6 +414,57 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "sources": [{"label": "Solver, protocol and controls", "locator": f"{d}/protocol sha256 {sm['protocol_sha256'][:12]}…, analytic-controls.json (Poiseuille, Taylor-Green)"}, {"label": "Geometry", "locator": f"{rm['mesh']['path']} sha256 {rm['mesh']['sha256'][:12]}…"}],
             "limitations": [rm["mesh"]["geometry_warning"], sm["scope"], "biological_success_probability: null (not computed)."],
             "couplings": [], "manifest": f"{d}/render-manifest.json", "native": True})
+    d = "artifacts/bioelectric-tissue"
+    if (ROOT / d / "summary.json").exists():
+        sm = json.loads(ins.read(f"{d}/summary.json")); ef = sm["effects"]; ku, gb, kg = ef["k_up"], ef["gj_block"], ef.get("k_up_gj_block", {})
+        st, href = _vid(ins, out, "betse-tissue", d, "bioelectric_tissue.mp4", None, allow_unpinned=True); _, ph = _vid(ins, out, "betse-tissue", d, "poster.png", None, allow_unpinned=True)
+        cards.append({"id": "betse-tissue", "title": "BETSE bioelectric tissue patch: potassium permeability and gap-junction block", "scales": ["tissue", "cellular"], "evidence_kind": "SimulationResult (" + sm["label"] + ")",
+            "model": {"name": sm["betse"] + ", official seed/init/sim", "context": f"{sm['n_cells']} cells, {sm['n_membranes']} membranes on a hexagonal patch; electrodiffusion with gap junctions and an electrogenic pump; {sm['samples']} samples over {sm['time_s'][1]:.1f} s; intervention window {sm['intervention_window_s'][0]} to {sm['intervention_window_s'][1]} s on {ku['n_targeted_cells']} targeted cells. The potassium change is a generic membrane-permeability scale, not a named channel."},
+            "time": {"units": "seconds of model time", "note": "Five scenarios from one seeded world: baseline, K+ permeability up, gap junctions blocked, both, baseline at half time step."},
+            "video": {"file": "bioelectric_tissue.mp4", "sha256": None, "note": "No digest is declared for this movie in the worker's summary; the build copied the file but could not check it against a declaration."}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": k.replace("_", " "), "result": "passed" if v.get("ok") else "FAILED"} for k, v in sm["checks"].items()]
+                + [{"name": "K+ up: peak change in targeted cells", "result": f"{ku['targeted_peak_dVm_mV']:.2f} mV; {ku['other_peak_dVm_mV']:.2f} mV in the {ku['n_other_cells']} untargeted cells (spread through gap junctions)"}, {"name": "gap junctions blocked alone", "result": f"{gb['targeted_peak_dVm_mV']:.3f} mV targeted, {gb['other_peak_dVm_mV']:.3f} mV untargeted"}]
+                + ([{"name": "K+ up with junctions blocked", "result": f"{kg['targeted_peak_dVm_mV']:.2f} mV targeted; {kg['other_peak_dVm_mV']:.2f} mV untargeted"}] if kg else []),
+            "parameter_unknowns": ["Not calibrated to any fish cell, fin or channel (Kir2.1 is not modelled).", "Concentrations and permeabilities are BETSE defaults and the worker's scale factors."],
+            "open_questions": ["Which measured cell-type voltage and permeability data would calibrate this patch?", "How would tissue voltage map to a fin growth law? No such bridge exists."],
+            "limitations": ["Simulated numerical output, not observed, not calibrated, not a fish fin.", "Single-reader work: not independently reviewed."], "couplings": [], "manifest": f"{d}/summary.json", "native": True})
+    d = "artifacts/multicell"
+    if (ROOT / d / "summary.json").exists():
+        sm = json.loads(ins.read(f"{d}/summary.json")); arms = sm["arms"]; shas = {l.split()[1].split("/")[-1]: l.split()[0] for l in ins.text(f"{d}/mp4.sha256").splitlines() if l.strip()}
+        st, href = _vid(ins, out, "morpheus-multicell", d, "baseline.mp4", shas.get("baseline.mp4"))
+        cards.append({"id": "morpheus-multicell", "title": "Morpheus multicellular growth: cell cycle, division, cytokine feedback (baseline arm)", "scales": ["tissue", "cellular"], "evidence_kind": "SimulationResult (generic example model)",
+            "model": {"name": "Morpheus v2.3.9 official multiscale example (cell-cycle ODE, cellular Potts division, cytokine PDE, feedback)", "context": f"Three arms ran headless and each hit the 600 s cap at model time {sm['common_horizon_t']} of a 2.0 horizon. Generic and not calibrated; not fish growth."},
+            "time": {"units": "model time units (example model)", "note": "All arms are compared at the common horizon; none reached the planned end."},
+            "video": {"file": "baseline.mp4", "sha256": shas.get("baseline.mp4"), "note": "22 frames"}, "video_state": st, "video_href": href, "poster_href": None,
+            "numerical_checks": [{"name": f"arm {a}", "result": f"{v['cells_at_common_horizon']} cells at t={v['reached_t']}; divisions at {v['division_event_times_to_horizon']}; max cdk1 {v['max_cdk1']:.3f}"} for a, v in arms.items()],
+            "parameter_unknowns": ["Not calibrated to any organism.", "Run stopped at the 600 s cap; independent seeds, refinement and the full horizon were not run."],
+            "open_questions": ["Does the feedback-off arm keep fewer cells at the full horizon? Only the early window was observed."],
+            "limitations": ["Generic example, not fish growth.", "Seed repeat is one repeat, not an uncertainty estimate.", "Two further arm movies (feedback-off, seed repeat) exist in artifacts/multicell and are not shown here."], "couplings": [], "manifest": f"{d}/summary.json", "native": True})
+    d = "artifacts/molecular"
+    if (ROOT / d / "cpu-render/render.json").exists():
+        rr = json.loads(ins.read(f"{d}/cpu-render/render.json")); an = json.loads(ins.read(f"{d}/analysis.json")); o = rr["outputs"]
+        st, href = _vid(ins, out, "molecular-md", f"{d}/cpu-render", "trajectory.mp4", o["trajectory.mp4"]); _, ph = _vid(ins, out, "molecular-md", f"{d}/cpu-render", "poster.png", o["poster.png"])
+        lo, hi = an["kinetic_temperature_observed_range_K"]
+        cards.append({"id": "molecular-md", "title": "Collagen-mimetic trimer: classical molecular dynamics (OpenMM, CPU), rendered from saved states", "scales": ["molecular"], "evidence_kind": rr["kind"] + "; " + an["kind"],
+            "model": {"name": "OpenMM 8.4 classical atomistic MD of a synthetic collagen-mimetic (Pro-Pro-Gly) trimer", "context": f"{an['frames']} saved states, {an['production_ps']} ps production after {an['preliminary_thermalization_ps']} ps preliminary thermalization, seed {an['seed']}. Rigid alignment for display only; no deformation invented."},
+            "time": {"units": "picoseconds of simulated time", "note": f"{rr['frames']} frames at {rr['display_fps']} fps; trajectory duration is not a relaxation time."},
+            "video": {"file": "trajectory.mp4", "sha256": o["trajectory.mp4"], "note": ""}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": "kinetic temperature", "result": f"observed {lo:.0f} to {hi:.0f} K; 300 K is the target, not the observation"}, {"name": "kinetic equilibration", "result": an["kinetic_equilibration"]}, {"name": "conformational equilibration", "result": an["conformational_equilibration"]}, {"name": "CA RMSD from production start", "result": f"{an['final_CA_RMSD_from_production_start_nm']:.3f} nm"}],
+            "parameter_unknowns": ["Empirical accuracy: " + str(an["empirical_accuracy"]) + ".", "Material stiffness: not computed (null).", "No conversion from chain length to fin stiffness is made; the cross-scale gate refuses it."],
+            "open_questions": ["Does a longer, equilibrated run change any observable? A GPU run is pending and is not claimed here."],
+            "limitations": ["Not equilibrated: a deliberately short CPU setup run.", "Biological success probability: null (not computed).", "Synthetic collagen-mimetic peptide, not a fish protein."], "couplings": [], "manifest": f"{d}/cpu-render/render.json", "native": True})
+    d = "artifacts/bio-services/kcnj13_openfold2"
+    if (ROOT / d / "metrics.json").exists():
+        mt = json.loads(ins.read(f"{d}/metrics.json")); op = json.loads(ins.read(f"{d}/operation_receipt.json")); pl = mt["provider_metrics"]; cc = mt["coordinate_check"]
+        cards.append({"id": "openfold2-kcnj13", "title": "Predicted structure of zebrafish Kcnj13 (OpenFold2): a computed model, not an observation", "scales": ["molecular"], "evidence_kind": mt["epistemic_status"],
+            "model": {"name": f"OpenFold2 via {mt['provider']}, parameter set {mt['model_parameter_set']}, monomer, unrelaxed", "context": f"{mt['input_length_aa']} residues (NCBI BAF03613.1, matched to UniProt Q0KIZ7). Operation {mt['operation_id']} finished {op['completed_utc']} with status {op['final_status']}."},
+            "time": {"units": "none: a single static prediction", "note": f"Reported inference time {pl['reported_inference_seconds']:.1f} s; hardware allocation was not returned."},
+            "video": {"file": None, "sha256": None, "note": ""}, "video_state": "none", "poster_href": None,
+            "numerical_checks": [{"name": "returned sequence matches the input", "result": "yes" if cc["sequence_exact_match"] else "NO"}, {"name": "C-alpha residues parsed", "result": str(cc["ca_residue_count"])},
+                {"name": "pLDDT", "result": f"mean {pl['plddt']['mean']:.1f}; {pl['plddt']['fraction_at_least_70'] * 100:.0f}% of residues at or above 70; {pl['plddt']['fraction_below_50'] * 100:.0f}% below 50"}, {"name": "predicted aligned error", "result": f"mean {pl['predicted_aligned_error']['mean_A']:.1f} Å, max {pl['predicted_aligned_error']['max_A']:.1f} Å"}, {"name": "pTM", "result": f"{pl['ptm_score']:.2f}"}],
+            "parameter_unknowns": ["Confidence and PAE are model-internal metrics, not a calibrated probability that the structure is correct."],
+            "open_questions": ["Does a tetrameric, membrane-embedded model with a real MSA change the confidence? None was run."],
+            "limitations": mt["limits"], "couplings": [], "manifest": f"{d}/metrics.json", "native": True})
     d = "artifacts/fish3d/fish3d-N1-cypselurus-baseline/render"
     if (ROOT / d / "render.json").exists():
         r = json.loads(ins.read(f"{d}/render.json")); v = r["video"]
@@ -721,6 +790,7 @@ def build() -> dict[str, bytes]:
     lifecycle = lifecycle_block(ins)
     home_biology_block = home_biology(ins)
     timeline = build_timeline(ins)
+    fish3d_viewer = fish3d_files(ins, extra)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -751,6 +821,7 @@ def build() -> dict[str, bytes]:
         "lifecycle": lifecycle,
         "home_biology": home_biology_block,
         "timeline": timeline,
+        "fish3d_viewer": fish3d_viewer,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
@@ -763,7 +834,7 @@ def build() -> dict[str, bytes]:
 
 
 def write(out: dict[str, bytes]) -> None:
-    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results"):
+    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results", SITE / "artifacts" / "fish3d"):
         if d.exists():
             shutil.rmtree(d)
     for name, b in out.items():
@@ -776,7 +847,7 @@ def check(out: dict[str, bytes]) -> list[str]:
     at = lambda n: SITE / n[1:] if n.startswith("@") else DATA / n
     stale = [n for n, b in out.items() if not at(n).exists() or at(n).read_bytes() != b]
     extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
-    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
+    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results", "fish3d") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
     return stale + [f"unexpected {e}" for e in extra if e not in out] + [f"unexpected {e}" for e in pr if e not in out]
 
 
