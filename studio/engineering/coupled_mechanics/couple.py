@@ -92,7 +92,8 @@ def run(record: dict, target_json: dict) -> dict:
         "evidence_kind": p["evidence_kind"], "scope": p["scope"], "dimensionality": p["dimensionality"],
         "coupling": "one-way static: the flow field is not updated by the deflection",
         "member_id": target["id"], "frame_id": target["frame_id"], "L_m": str(L),
-        "tributary_width_m": str(p["width_m"]),
+        "tributary_width_m": (str(p["width_m"]) if p["width_m"] is not None   # /1: one width per member
+                              else [str(w) for w in p["widths_m"]]),          # /2: one per station
         "stations": {"s_m": [str(x) for x in s], "jump_Pa": [str(x) for x in p["jump_Pa"]],
                      "q_N_per_m": [str(x) for x in q]},
         "unit_derivation": "q [N/m] = (p_neg - p_pos) [Pa] * tributary width [m]; F [N] = int q ds; "

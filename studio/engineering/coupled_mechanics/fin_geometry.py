@@ -25,6 +25,8 @@ from pathlib import Path
 
 import numpy as np
 
+from .contract import canonical_sha
+
 ROOT = Path(__file__).resolve().parents[2]
 V3A = ROOT / "artifacts" / "fish3d" / "fish3d-v3a-fan"
 FIN = "pectoral_L"
@@ -44,10 +46,6 @@ class GeometryError(RuntimeError):
 
 def sha256_file(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
-
-
-def canonical_sha(obj) -> str:
-    return hashlib.sha256(json.dumps(obj, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
 def load(base: Path = V3A) -> dict:
@@ -141,9 +139,26 @@ def section(g: dict, s_over_L: float) -> dict:
     if not ahead:
         raise GeometryError(f"ray 1 does not cross section s/L={s_over_L}")
     w1 = min(ahead)
+    strip = (w1 - w0) / 2.0 + (w0 - w_le)
     return {"s_over_L": s_over_L, "u_m": u, "w_ray0_m": w0, "w_le_m": w_le, "w_aft_m": w_aft,
             "chord_m": c, "ray0_offset_from_le_m": w0 - w_le, "w_ray1_m": w1,
-            "tributary_local_m": (w1 - w0) / 2.0, "xi_strip": ((w1 - w0) / 2.0 + (w0 - w_le)) / c}
+            "tributary_local_m": (w1 - w0) / 2.0, "xi_strip": strip / c,
+            "strip_chordwise_m": strip, "width_per_ds_m": strip * float(np.cos(r0["sweep_rad"]))}
+
+
+def tributary_v2(g: dict, stations: list[tuple[str, float]]) -> dict:
+    """member-pressure/2 tributary block: ray 0's local width at each station, from the pinned geometry.
+
+    `stations` is [(s_m exact string, s/L)]. The width is dA/ds of ray 0's tributary strip: the strip
+    is bounded by chordwise lines (u = const), so over ds along the swept ray it covers du = cos(lambda) ds
+    of span and dA = (chordwise strip width) cos(lambda) ds. The strip runs from the leading edge (ray 0)
+    back to the midpoint between ray 0 and ray 1, as in `section`."""
+    widths = [{"s_m": s_m, "width_m": repr(section(g, f)["width_per_ds_m"])} for s_m, f in stations]
+    return {"status": "from_geometry", "unit": "m",
+            "source": ("ray 0 local strip width per station: (leading edge -> midpoint to ray 1, along the "
+                       "chord) * cos(sweep), from panels.json outline_m and rays.json polylines_m"),
+            "geometry_sha256": canonical_sha(g["sha256"]), "geometry_files_sha256": g["sha256"],
+            "widths": widths, "widths_sha256": canonical_sha(widths)}
 
 
 def member_json(g: dict) -> dict:

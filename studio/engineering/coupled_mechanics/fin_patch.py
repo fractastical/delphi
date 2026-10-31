@@ -25,7 +25,7 @@ import numpy as np
 
 from engineering.fin_mechanics.load_bridge import Refusal
 
-from . import SCHEMA_PRESSURE, SCHEMA_TARGET
+from . import SCHEMA_PRESSURE_V2, SCHEMA_TARGET
 from . import fin_geometry as fg
 from . import thin_airfoil as ta
 from .contract import MIN_CELLS_ACROSS_MEMBER, parse_member, parse_pressure
@@ -63,7 +63,11 @@ def transfer_load(record: dict, target_json: dict) -> dict:
 
 
 def fan_width_gap(ref: dict, transferred: dict) -> dict:
-    """Contract load (strip-mean jump x one declared width) against the strip's own load."""
+    """A transferred load against the strip's own load q_true(s), both integrated at the same stations.
+
+    For a v1 (one-width) record this is the G1 discrepancy: the retained v1 artifacts record F +15.5%
+    and root moment -8.6%. For a v2 record the station widths reproduce q_true, so both ratios are 1
+    to float rounding; what /2 still carries is the linear-between-stations error (`station_convergence`)."""
     s = [Fraction(x) for x in transferred["s_m"]]
     q_true = [Fraction(repr(st["q_true_N_per_m"])) for st in ref["stations"]]
     true = resultants(s, q_true)
@@ -72,10 +76,29 @@ def fan_width_gap(ref: dict, transferred: dict) -> dict:
             "F_contract_over_strip": transferred["F_N"] / Ft,
             "M_contract_over_strip": transferred["M_root_Nm"] / Mt,
             "local_width_chordwise_m": [st["tributary_local_m"] for st in ref["stations"]],
+            "width_per_ds_m": [st["width_per_ds_m"] for st in ref["stations"]],
             "declared_width_m": ref["tributary_width_declared_m"],
-            "meaning": ("the contract carries one tributary width per member; on a fan the local width "
-                        "grows from root to tip, so the contract load moves force toward the root. "
-                        "Reported, not corrected: the contract is unchanged")}
+            "meaning": ("one width per member (v1) moves a fan's load toward the root, because the local "
+                        "width grows from root to tip; per-station widths (v2) remove that error")}
+
+
+def station_convergence(g: dict, ns=(5, 9, 17, 33, 65)) -> dict:
+    """The /2 transfer of the analytic strip at n equally spaced stations, against the densest n.
+
+    q is linear between stations in the contract; q_true(s) is not, so F and M converge as the
+    stations are refined. Reported so a five-station load is quoted with its own error."""
+    tgt = member_target(g)
+    rows = []
+    for n in ns:
+        ref = ta.reference(g, s_over_L=tuple(i / (n - 1) for i in range(n)))
+        tr = transfer_load(ta.record(ref, g), tgt)
+        rows.append({"n_stations": n, "F_N": tr["F_N"], "M_root_Nm": tr["M_root_Nm"]})
+    Fd, Md = rows[-1]["F_N"], rows[-1]["M_root_Nm"]
+    for r in rows:
+        r["F_rel_to_densest"] = r["F_N"] / Fd - 1
+        r["M_rel_to_densest"] = r["M_root_Nm"] / Md - 1
+    return {"rows": rows, "densest": ns[-1],
+            "note": "relative to the densest station set, not to a closed form (q_true has none here)"}
 
 
 def protocol(g: dict | None = None) -> dict:
@@ -98,6 +121,7 @@ def protocol(g: dict | None = None) -> dict:
             "station_s_over_L": st["s_over_L"], "chord_m": c, "ray0_at_leading_edge": True,
             "tributary_strip_xi": [0.0, st["xi_strip"]],
             "Re_c_at_declared_U": flow["U_m_s"]["value"] * c / nu_air["value"],
+            "ray0_width_per_ds_m": st["width_per_ds_m"],
             "cells_along_chord_at_h": cells_chord, "cells_2d_at_h": n_cells,
             "analytic_reference_strip_mean_jump_Pa": st["dp_strip_mean_Pa"]})
     m = fg.member_json(g)
@@ -142,8 +166,9 @@ def protocol(g: dict | None = None) -> dict:
             "case_json_required": ["schema", "station_s_over_L", "member_sha256", "frame_sha256", "candidate_sha256",
                                    "h_m", "thickness_m", "medium", "rho_kg_m3", "U_m_s", "alpha_deg", "Re_c",
                                    "p_ref", "time_window_s", "gates", "solver", "surface_sha256"],
-            "transfer": "engineering.coupled_mechanics.fin_patch.record_from_sections -> member-pressure/1 "
-                        "(dimensionality 2d-extrusion), contract unchanged",
+            "transfer": "engineering.coupled_mechanics.fin_patch.record_from_sections -> member-pressure/2 "
+                        "(dimensionality 2d-extrusion): each section's strip-mean jump times ray 0's own "
+                        "local width at that station (fin_geometry.tributary_v2), never a fan-mean width",
         },
         "sections": sections,
         "cost_estimate_note": "cells only; run time must be measured on a small case by the solver owner",
@@ -180,7 +205,7 @@ def _section(case: dict, surface: np.ndarray, proto: dict) -> dict:
 
 
 def record_from_sections(cases: list[dict], surfaces: list[np.ndarray], proto: dict, g: dict | None = None) -> dict:
-    """Resolved sections -> frontier.coupled.member-pressure/1, dimensionality 2d-extrusion."""
+    """Resolved sections -> frontier.coupled.member-pressure/2, dimensionality 2d-extrusion."""
     g = g or fg.load()
     ref = ta.reference(g)
     L = ref["L_exact"]
@@ -188,7 +213,8 @@ def record_from_sections(cases: list[dict], surfaces: list[np.ndarray], proto: d
     order = sorted(range(len(cases)), key=lambda i: cases[i]["station_s_over_L"])
     t0 = max(float(s["time_window_s"][0]) for s in secs)
     t1 = min(float(s["time_window_s"][1]) for s in secs)
-    rec = {"schema": SCHEMA_PRESSURE,
+    s_m = [str(Fraction(cases[i]["station_s_over_L"]).limit_denominator(1000) * L) for i in order]
+    rec = {"schema": SCHEMA_PRESSURE_V2,
            "source": {"producer": "resolved fin-patch sections (strip theory over ray 0)", "evidence_kind": "simulated",
                       "receipt_sha256": fg.canonical_sha([s["case_sha256"] for s in secs]),
                       "fields_sha256": fg.canonical_sha([s["surface_sha256"] for s in secs]),
@@ -201,10 +227,8 @@ def record_from_sections(cases: list[dict], surfaces: list[np.ndarray], proto: d
                       "tip_m": proto["member"]["tip_m"], "normal": ["0", "0", "1"]},
            "pressure": {"unit": "Pa", "kind": "dimensional",
                         "reference": "strip-mean (Cp_minus - Cp_plus) * 0.5 rho U^2 over ray 0's tributary"},
-           "stations": [{"s_m": str(Fraction(cases[i]["station_s_over_L"]).limit_denominator(1000) * L),
-                         "p_pos_Pa": "0", "p_neg_Pa": repr(secs[i]["jump_Pa"])} for i in order],
-           "tributary": {"width_m": repr(ref["tributary_width_declared_m"]), "status": "from_geometry",
-                         "source": "rays.json ray 0 tributary_width_m (a fan mean)"},
+           "stations": [{"s_m": s, "p_pos_Pa": "0", "p_neg_Pa": repr(secs[i]["jump_Pa"])} for s, i in zip(s_m, order)],
+           "tributary": fg.tributary_v2(g, [(s, cases[i]["station_s_over_L"]) for s, i in zip(s_m, order)]),
            "time": {"kind": "time_mean", "window_s": [repr(t0), repr(t1)]},
            "resolution": {"cells_across_member_thickness": min(s["cells_across"] for s in secs),
                           "cells_along_member": len(secs)}}

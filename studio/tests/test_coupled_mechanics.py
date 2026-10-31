@@ -8,8 +8,8 @@ from fractions import Fraction
 
 import pytest
 
-from engineering.coupled_mechanics import cases, couple, traction
-from engineering.coupled_mechanics.contract import parse_pressure, parse_target
+from engineering.coupled_mechanics import SCHEMA_PRESSURE_V2, cases, couple, traction
+from engineering.coupled_mechanics.contract import canonical_sha, parse_pressure, parse_target
 from engineering.fin_mechanics import beam
 from engineering.fin_mechanics.load_bridge import Refusal
 
@@ -196,6 +196,105 @@ def test_parse_pressure_converts_Pa_times_m_to_N_per_m():
 def test_beam_module_is_the_existing_one():
     # The coupling must reuse fin_mechanics' FEM, not a second solver.
     assert couple.beam is beam
+
+
+# ------------------------------------------------------------------ member-pressure/2: per-station widths
+# Closed forms below are written out by hand for q(s) = jump(s) * w(s) with w linear in s:
+#   w(s) = w0 + (w1 - w0) u,  u = s/L
+#   uniform jump p:      F = p L (w0 + w1)/2,             M = p L^2 (w0/6 + w1/3)
+#   tip-heavy 2 p u:     F = 2 p L (w0/2 + (w1 - w0)/3),  M = 2 p L^2 (w0/3 + (w1 - w0)/4)
+# The tip-heavy q is quadratic, so the contract's linear-between-stations F has the trapezoid error
+# L h^2 q''/12 exactly, with q'' = 4 p (w1 - w0)/L^2.
+def _bridge_pwL():
+    b = cases.illustration_bridge()
+    return Fraction(b["exact"]["p_Pa"]), Fraction(b["exact"]["w_t_m"]), Fraction(b["exact"]["L_ray_m"])
+
+
+def v2(rec, width_of_u, s_labels=None):
+    """A /1 analytic record rewritten as /2 with w(u) at each station (test helper, not a producer)."""
+    rec = copy.deepcopy(rec)
+    L = Fraction(rec["member"]["tip_m"][0])
+    s = [st["s_m"] for st in rec["stations"]]
+    widths = [{"s_m": lab, "width_m": str(width_of_u(Fraction(x) / L))} for x, lab in zip(s, s_labels or s)]
+    rec["schema"] = SCHEMA_PRESSURE_V2
+    rec["tributary"] = {"status": "declared", "unit": "m", "source": "test: linear width",
+                        "geometry_sha256": "a" * 64, "widths": widths, "widths_sha256": canonical_sha(widths)}
+    return rec
+
+
+def _linear_width():
+    _, w, _ = _bridge_pwL()
+    w0, w1 = w / 2, 3 * w / 2
+    return w0, w1, (lambda u: w0 + (w1 - w0) * u)
+
+
+def test_v2_variable_width_matches_closed_form_force_and_moment():
+    p, _, L = _bridge_pwL()
+    w0, w1, wf = _linear_width()
+    r = couple.run(v2(cases.analytic_record("uniform", n_stations=4), wf), cases.target())
+    assert Fraction(r["resultants_exact"]["F_N"]) == p * L * (w0 + w1) / 2
+    assert Fraction(r["resultants_exact"]["M_root_Nm"]) == p * L * L * (w0 / 6 + w1 / 3)
+    assert r["tributary_width_m"] == [str(wf(Fraction(i, 3))) for i in range(4)]
+
+
+@pytest.mark.parametrize("n", [5, 9, 17])
+def test_v2_curved_load_error_is_the_trapezoid_term_exactly(n):
+    p, _, L = _bridge_pwL()
+    w0, w1, wf = _linear_width()
+    r = couple.run(v2(cases.analytic_record("tip_heavy", n_stations=n), wf), cases.target())
+    F_closed = 2 * p * L * (w0 / 2 + (w1 - w0) / 3)
+    h = L / (n - 1)
+    assert Fraction(r["resultants_exact"]["F_N"]) - F_closed == L * h * h * (4 * p * (w1 - w0) / (L * L)) / 12
+    M_closed = 2 * p * L * L * (w0 / 3 + (w1 - w0) / 4)
+    assert abs(Fraction(r["resultants_exact"]["M_root_Nm"]) / M_closed - 1) < Fraction(1, (n - 1) ** 2)
+
+
+def test_v2_constant_width_reduces_to_v1_exactly():
+    _, w, _ = _bridge_pwL()
+    for profile in ("uniform", "root_heavy", "tip_heavy"):
+        a = couple.run(cases.analytic_record(profile), cases.target())
+        b = couple.run(v2(cases.analytic_record(profile), lambda u: w), cases.target())
+        assert a["stations"] == b["stations"] and a["resultants_exact"] == b["resultants_exact"]
+        assert a["deflection"]["EI_lo"]["tip_m"] == b["deflection"]["EI_lo"]["tip_m"]
+        assert a["tributary_width_m"] == str(w) and b["tributary_width_m"] == [str(w)] * 9
+
+
+def test_v2_mutated_width_pairing_is_caught():
+    p, _, L = _bridge_pwL()
+    w0, w1, wf = _linear_width()
+    base = cases.analytic_record("uniform", n_stations=4)
+    # values reversed against their stations, labels kept: the contract cannot know, the closed form does
+    rev = v2(base, lambda u: wf(1 - u))
+    r = couple.run(rev, cases.target())
+    assert Fraction(r["resultants_exact"]["M_root_Nm"]) != p * L * L * (w0 / 6 + w1 / 3)
+    # labels that travel with the reversed values no longer align with the stations: refused
+    s = [st["s_m"] for st in base["stations"]]
+    refused("TRIBUTARY_ALIGNMENT", v2(base, wf, s_labels=s[::-1]))
+    short = v2(base, wf)
+    short["tributary"]["widths"] = short["tributary"]["widths"][:-1]
+    short["tributary"]["widths_sha256"] = canonical_sha(short["tributary"]["widths"])
+    refused("TRIBUTARY_ALIGNMENT", short)
+
+
+@pytest.mark.parametrize("edit,code", [
+    (lambda t: t["widths"][1].update(width_m="0"), "NON_POSITIVE"),
+    (lambda t: t["widths"][2].update(width_m="-1/1000"), "NON_POSITIVE"),
+    (lambda t: t["widths"][0].update(width_m=0.001), "FLOAT_INPUT"),
+    (lambda t: t.update(unit="mm"), "WRONG_LENGTH_UNIT"),
+    (lambda t: t.update(geometry_sha256=None), "BAD_HASH"),
+    (lambda t: t.update(width_m="1/1000"), "TRIBUTARY_WIDTH"),
+])
+def test_v2_widths_must_be_positive_exact_metres_with_provenance(edit, code):
+    rec = v2(cases.analytic_record("uniform", n_stations=4), _linear_width()[2])
+    edit(rec["tributary"])
+    rec["tributary"]["widths_sha256"] = canonical_sha(rec["tributary"]["widths"])
+    refused(code, rec)
+
+
+def test_v2_widths_hash_is_checked():
+    rec = v2(cases.analytic_record("uniform", n_stations=4), _linear_width()[2])
+    rec["tributary"]["widths"][1]["width_m"] = "1/100"  # edited after hashing
+    refused("BAD_HASH", rec)
 
 
 # ------------------------------------------------------------------ the actual 2D flow receipt

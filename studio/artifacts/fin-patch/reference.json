@@ -9,21 +9,95 @@
  "evidence_kind": "analytic",
  "gaps": [
   {
-   "F_contract_N": 0.0033376196812200964,
-   "F_contract_over_strip": 1.1553834833813563,
-   "F_strip_N": 0.002888754884613883,
-   "M_contract_over_strip": 0.9138518669275828,
-   "declared_width_m": 0.0012546649064203782,
+   "detail": "v1 (one fan-mean width) put F at 1.155x and the root moment at 0.914x the strip's own load; v2 carries ray 0's local width at each station, so both ratios are 1 at the stations, and what remains is the linear-between-stations error in v2_station_convergence",
    "id": "G1-fan-width",
    "kind": "dimensional",
-   "local_width_chordwise_m": [
-    0.0002695000000000024,
-    0.0007412597357181693,
-    0.0012129889754163205,
-    0.0016028994649795927,
-    0.0019560055556047985
-   ],
-   "meaning": "the contract carries one tributary width per member; on a fan the local width grows from root to tip, so the contract load moves force toward the root. Reported, not corrected: the contract is unchanged"
+   "status": "CLOSED by member-pressure/2 (root decision)",
+   "v1_constant_width_superseded": {
+    "F_contract_N": 0.0033376196812200964,
+    "F_contract_over_strip": 1.1553834833813563,
+    "F_strip_N": 0.002888754884613883,
+    "M_contract_over_strip": 0.9138518669275828,
+    "declared_width_m": 0.0012546649064203782,
+    "local_width_chordwise_m": [
+     0.0002695000000000024,
+     0.0007412597357181693,
+     0.0012129889754163205,
+     0.0016028994649795927,
+     0.0019560055556047985
+    ],
+    "meaning": "one width per member (v1) moves a fan's load toward the root, because the local width grows from root to tip; per-station widths (v2) remove that error",
+    "width_per_ds_m": [
+     0.000266877241419125,
+     0.0007340458383804577,
+     0.0012011842361072899,
+     0.0015873001390944016,
+     0.0019369698214481905
+    ]
+   },
+   "v2_per_station_width": {
+    "F_contract_N": 0.0028887548846138825,
+    "F_contract_over_strip": 0.9999999999999999,
+    "F_strip_N": 0.002888754884613883,
+    "M_contract_over_strip": 1.0,
+    "declared_width_m": 0.0012546649064203782,
+    "local_width_chordwise_m": [
+     0.0002695000000000024,
+     0.0007412597357181693,
+     0.0012129889754163205,
+     0.0016028994649795927,
+     0.0019560055556047985
+    ],
+    "meaning": "one width per member (v1) moves a fan's load toward the root, because the local width grows from root to tip; per-station widths (v2) remove that error",
+    "width_per_ds_m": [
+     0.000266877241419125,
+     0.0007340458383804577,
+     0.0012011842361072899,
+     0.0015873001390944016,
+     0.0019369698214481905
+    ]
+   },
+   "v2_station_convergence": {
+    "densest": 65,
+    "note": "relative to the densest station set, not to a closed form (q_true has none here)",
+    "rows": [
+     {
+      "F_N": 0.0028887548846138825,
+      "F_rel_to_densest": -0.016513522933608193,
+      "M_rel_to_densest": -0.01592014813854392,
+      "M_root_Nm": 0.0001344341079342806,
+      "n_stations": 5
+     },
+     {
+      "F_N": 0.0029250752178678306,
+      "F_rel_to_densest": -0.004148141298752961,
+      "M_rel_to_densest": -0.0037281666127205737,
+      "M_root_Nm": 0.00013609964163794803,
+      "n_stations": 9
+     },
+     {
+      "F_N": 0.002933753494408946,
+      "F_rel_to_densest": -0.0011935923794630376,
+      "M_rel_to_densest": -0.0010360541400015189,
+      "M_root_Nm": 0.00013646740827603552,
+      "n_stations": 17
+     },
+     {
+      "F_N": 0.0029370426423187797,
+      "F_rel_to_densest": -7.379072802415898e-05,
+      "M_rel_to_densest": -0.00013726743625097626,
+      "M_root_Nm": 0.00013659019057720077,
+      "n_stations": 33
+     },
+     {
+      "F_N": 0.002937259384827182,
+      "F_rel_to_densest": 0.0,
+      "M_rel_to_densest": 0.0,
+      "M_root_Nm": 0.0001366089425365117,
+      "n_stations": 65
+     }
+    ]
+   }
   },
   {
    "detail": "patch sections are 2D strips; finite span enters only via alpha_eff (elliptic lifting line, assumed; AR 3.67); 2D bracket is 1.54x larger",
@@ -94,7 +168,7 @@
    "cells_across_member_thickness": null,
    "cells_along_member": null
   },
-  "schema": "frontier.coupled.member-pressure/1",
+  "schema": "frontier.coupled.member-pressure/2",
   "source": {
    "candidate_sha256": "e8c2b666874a0658bf5be95a6603b68463e68dd67ac2c0a0be8728abb7e5763e",
    "evidence_kind": "analytic",
@@ -110,7 +184,7 @@
    "member_sha256": "baea87d8005083ab03d6c1ad686d79c19475add01fda9c64d3759362062f8c73",
    "pressure_sha256": "93183808c692e5c70443736dc4205b775459abc7085380723893cde53cd2af9e",
    "producer": "analytic: thin-airfoil strip on the v3a pectoral_L leading-edge ray",
-   "receipt_sha256": "17a24d5509d16c8ddf82efd951a138cd6d43d1b3930f4fdd9b99aa43b9f43755",
+   "receipt_sha256": "a5403b1cfe6ceafb0d299bc02a25b2c52e7e23a60942074db04c3f73783a6487",
    "units": "Pa jump, m frame; q_dyn = 0.5 rho U^2 from declared rho, U"
   },
   "stations": [
@@ -145,9 +219,39 @@
    "window_s": null
   },
   "tributary": {
-   "source": "rays.json ray 0 tributary_width_m (sha256 e644ff48d23e3ab6); a mean over a fan whose local width varies",
+   "geometry_files_sha256": {
+    "components.json": "5ec2c13d65de88d875c1f8c5bc8f5bd202cf058efed900ebf9ffcf02a09574b7",
+    "components/pectoral_L.stl": "220d22253ce104aea9b9be7b23892941e328e7317a19486162f36a2214c309c5",
+    "panels.json": "1f64a9759de289118e22e6a9edc5d76c63e6daef5c4a5b84e294e80021a1d33d",
+    "rays.json": "e644ff48d23e3ab6d616b1bdcbbaea532ed16b36f28970dda5eb75dfa8cb26e8"
+   },
+   "geometry_sha256": "6ac62c0861adc5a182f1e0d12f0eb0c7eb527e556731911078f649647fd4f704",
+   "source": "ray 0 local strip width per station: (leading edge -> midpoint to ray 1, along the chord) * cos(sweep), from panels.json outline_m and rays.json polylines_m",
    "status": "from_geometry",
-   "width_m": "0.0012546649064203782"
+   "unit": "m",
+   "widths": [
+    {
+     "s_m": "0",
+     "width_m": "0.000266877241419125"
+    },
+    {
+     "s_m": "498672778072869/25000000000000000",
+     "width_m": "0.0007340458383804577"
+    },
+    {
+     "s_m": "498672778072869/12500000000000000",
+     "width_m": "0.0012011842361072899"
+    },
+    {
+     "s_m": "1496018334218607/25000000000000000",
+     "width_m": "0.0015873001390944016"
+    },
+    {
+     "s_m": "498672778072869/6250000000000000",
+     "width_m": "0.0019369698214481905"
+    }
+   ],
+   "widths_sha256": "7dd27884780b94f6258be5d22e9a76c859f8a2db0129539bf4c1a543a4c59bb9"
   }
  },
  "reference": {
@@ -186,6 +290,7 @@
     "q_true_N_per_m": 0.009713169654579426,
     "ray0_offset_from_le_m": 0.0,
     "s_over_L": 0.0,
+    "strip_chordwise_m": 0.0002695000000000024,
     "strip_fraction_of_section_lift": 0.23917336223966568,
     "tributary_local_m": 0.0002695000000000024,
     "u_m": -1.7328102668923806e-08,
@@ -193,6 +298,7 @@
     "w_le_m": -5.218147754171287e-09,
     "w_ray0_m": -5.218147754171287e-09,
     "w_ray1_m": 0.0005389947818522506,
+    "width_per_ds_m": 0.000266877241419125,
     "xi_strip": 0.035712392664052024
    },
    {
@@ -202,6 +308,7 @@
     "q_true_N_per_m": 0.029189998899439726,
     "ray0_offset_from_le_m": 1.734723475976807e-18,
     "s_over_L": 0.25,
+    "strip_chordwise_m": 0.000741259735718171,
     "strip_fraction_of_section_lift": 0.21932850937660026,
     "tributary_local_m": 0.0007412597357181693,
     "u_m": 0.019752765852120893,
@@ -209,6 +316,7 @@
     "w_le_m": 0.002776069781852247,
     "w_ray0_m": 0.0027760697818522487,
     "w_ray1_m": 0.004258589253288587,
+    "width_per_ds_m": 0.0007340458383804577,
     "xi_strip": 0.029973659059335234
    },
    {
@@ -218,6 +326,7 @@
     "q_true_N_per_m": 0.04076156606115335,
     "ray0_offset_from_le_m": -3.469446951953614e-18,
     "s_over_L": 0.5,
+    "strip_chordwise_m": 0.001212988975416317,
     "strip_fraction_of_section_lift": 0.25605929800800353,
     "tributary_local_m": 0.0012129889754163205,
     "u_m": 0.039505549032344454,
@@ -225,6 +334,7 @@
     "w_le_m": 0.005552144781852248,
     "w_ray0_m": 0.005552144781852245,
     "w_ray1_m": 0.007978122732684886,
+    "width_per_ds_m": 0.0012011842361072899,
     "xi_strip": 0.04100670624343085
    },
    {
@@ -234,6 +344,7 @@
     "q_true_N_per_m": 0.04676012368976587,
     "ray0_offset_from_le_m": 0.0,
     "s_over_L": 0.75,
+    "strip_chordwise_m": 0.0016028994649795927,
     "strip_fraction_of_section_lift": 0.29364065028962016,
     "tributary_local_m": 0.0016028994649795927,
     "u_m": 0.05925833221256801,
@@ -241,6 +352,7 @@
     "w_le_m": 0.008328219781852247,
     "w_ray0_m": 0.008328219781852247,
     "w_ray1_m": 0.011534018711811433,
+    "width_per_ds_m": 0.0015873001390944016,
     "xi_strip": 0.05416954079540896
    },
    {
@@ -250,6 +362,7 @@
     "q_true_N_per_m": 0.04650778612596032,
     "ray0_offset_from_le_m": 1.734723475976807e-18,
     "s_over_L": 1.0,
+    "strip_chordwise_m": 0.0019560055556048003,
     "strip_fraction_of_section_lift": 0.3569840142044421,
     "tributary_local_m": 0.0019560055556047985,
     "u_m": 0.07901111539279156,
@@ -257,6 +370,7 @@
     "w_le_m": 0.011104294781852249,
     "w_ray0_m": 0.01110429478185225,
     "w_ray1_m": 0.015016305893061847,
+    "width_per_ds_m": 0.0019369698214481905,
     "xi_strip": 0.08079817107330031
    }
   ],
@@ -264,20 +378,139 @@
   "tributary_width_declared_m": 0.0012546649064203782
  },
  "schema": "frontier.coupled.fin-patch-reference/1",
+ "superseded_v1": {
+  "record": {
+   "dimensionality": "analytic",
+   "frame": {
+    "id": "fish3d-v3a/pectoral_L/ray0-local@72f9f5c8f253e502",
+    "length_unit": "m"
+   },
+   "member": {
+    "id": "fish3d-v3a/pectoral_L/ray0",
+    "normal": [
+     "0",
+     "0",
+     "1"
+    ],
+    "root_m": [
+     "0",
+     "0",
+     "0"
+    ],
+    "tip_m": [
+     "498672778072869/6250000000000000",
+     "0",
+     "0"
+    ]
+   },
+   "pressure": {
+    "kind": "dimensional",
+    "reference": "jump p_ventral - p_dorsal, thin-airfoil strip mean over ray 0's local tributary strip; inviscid, attached, flat plate",
+    "unit": "Pa"
+   },
+   "resolution": {
+    "cells_across_member_thickness": null,
+    "cells_along_member": null
+   },
+   "schema": "frontier.coupled.member-pressure/1",
+   "source": {
+    "candidate_sha256": "e8c2b666874a0658bf5be95a6603b68463e68dd67ac2c0a0be8728abb7e5763e",
+    "evidence_kind": "analytic",
+    "fields_sha256": null,
+    "frame_sha256": "72f9f5c8f253e5029209894e6e46ce38de442dfdc0e3ea482f9f0ff7580ee71e",
+    "geometry_files_sha256": {
+     "components.json": "5ec2c13d65de88d875c1f8c5bc8f5bd202cf058efed900ebf9ffcf02a09574b7",
+     "components/pectoral_L.stl": "220d22253ce104aea9b9be7b23892941e328e7317a19486162f36a2214c309c5",
+     "panels.json": "1f64a9759de289118e22e6a9edc5d76c63e6daef5c4a5b84e294e80021a1d33d",
+     "rays.json": "e644ff48d23e3ab6d616b1bdcbbaea532ed16b36f28970dda5eb75dfa8cb26e8"
+    },
+    "geometry_sha256": null,
+    "member_sha256": "baea87d8005083ab03d6c1ad686d79c19475add01fda9c64d3759362062f8c73",
+    "pressure_sha256": "93183808c692e5c70443736dc4205b775459abc7085380723893cde53cd2af9e",
+    "producer": "analytic: thin-airfoil strip on the v3a pectoral_L leading-edge ray",
+    "receipt_sha256": "e02bf158dbd5550617217d181ca312189042d9d2e93c42b410051cb44efb4f5e",
+    "units": "Pa jump, m frame; q_dyn = 0.5 rho U^2 from declared rho, U"
+   },
+   "stations": [
+    {
+     "p_neg_Pa": "36.395646188972336",
+     "p_pos_Pa": "0",
+     "s_m": "0"
+    },
+    {
+     "p_neg_Pa": "39.765907485889834",
+     "p_pos_Pa": "0",
+     "s_m": "498672778072869/25000000000000000"
+    },
+    {
+     "p_neg_Pa": "33.934483017568105",
+     "p_pos_Pa": "0",
+     "s_m": "498672778072869/12500000000000000"
+    },
+    {
+     "p_neg_Pa": "29.458904801988997",
+     "p_pos_Pa": "0",
+     "s_m": "1496018334218607/25000000000000000"
+    },
+    {
+     "p_neg_Pa": "24.010588916242593",
+     "p_pos_Pa": "0",
+     "s_m": "498672778072869/6250000000000000"
+    }
+   ],
+   "superseded": "constant-width fan loading; current method is member-pressure/2 (per-station widths)",
+   "time": {
+    "kind": "static",
+    "window_s": null
+   },
+   "tributary": {
+    "source": "rays.json ray 0 tributary_width_m (sha256 e644ff48d23e3ab6); a mean over a fan whose local width varies",
+    "status": "from_geometry",
+    "width_m": "0.0012546649064203782"
+   }
+  },
+  "retained_artifacts": "artifacts/fin-patch/v1-constant-width/",
+  "transfer": {
+   "F_N": 0.0033376196812200964,
+   "F_exact": "834404920305024143732562347746218627207341050479/250000000000000000000000000000000000000000000000000",
+   "M_root_Nm": 0.0001228528605144865,
+   "M_root_exact": "767830378215540560581030724342464357517244580832595175235948373/6250000000000000000000000000000000000000000000000000000000000000000",
+   "deflection": "NOT COMPUTED: EI of the v3a ray is unknown (preserved, not filled)",
+   "dimensionality": "analytic",
+   "evidence_kind": "analytic",
+   "q_N_per_m": [
+    0.04566434001979617,
+    0.049892888594505386,
+    0.042576404959661,
+    0.036961054036634355,
+    0.030125243295695683
+   ],
+   "s_m": [
+    "0",
+    "498672778072869/25000000000000000",
+    "498672778072869/12500000000000000",
+    "1496018334218607/25000000000000000",
+    "498672778072869/6250000000000000"
+   ],
+   "scope": "analytic pressure: adapter check only, no flow model",
+   "stress": "NOT COMPUTED: ray cross-section (c, I) is unknown (preserved, not filled)"
+  },
+  "why": "constant-width fan loading is knowingly wrong; kept only to reproduce G1"
+ },
  "transfer": {
-  "F_N": 0.0033376196812200964,
-  "F_exact": "834404920305024143732562347746218627207341050479/250000000000000000000000000000000000000000000000000",
-  "M_root_Nm": 0.0001228528605144865,
-  "M_root_exact": "767830378215540560581030724342464357517244580832595175235948373/6250000000000000000000000000000000000000000000000000000000000000000",
+  "F_N": 0.0028887548846138825,
+  "F_exact": "288875488461388260701769668118972208001601142971/100000000000000000000000000000000000000000000000000",
+  "M_root_Nm": 0.0001344341079342806,
+  "M_root_exact": "1680426349178507452808012470895520106272249921584044407873826113/12500000000000000000000000000000000000000000000000000000000000000000",
   "deflection": "NOT COMPUTED: EI of the v3a ray is unknown (preserved, not filled)",
   "dimensionality": "analytic",
   "evidence_kind": "analytic",
   "q_N_per_m": [
-   0.04566434001979617,
-   0.049892888594505386,
-   0.042576404959661,
-   0.036961054036634355,
-   0.030125243295695683
+   0.009713169654579426,
+   0.029189998899439722,
+   0.040761566061153345,
+   0.04676012368976587,
+   0.046507786125960314
   ],
   "s_m": [
    "0",

@@ -1,4 +1,4 @@
-"""v3a leading-edge ray: geometry pins, thin-airfoil reference, unchanged-contract transfer, patch emitter.
+"""v3a leading-edge ray: geometry pins, thin-airfoil reference, member-pressure/2 transfer, patch emitter.
 
 The section fixtures below are SYNTHETIC test data built from the analytic thin-airfoil jump: they
 exercise the emitter's arithmetic and refusals and are never written as results.
@@ -73,8 +73,9 @@ def test_reference_scales_as_U2_and_alpha_eff(g):
     assert ratio == pytest.approx(1 / (1 + 2 / base["aspect"]["AR"]), rel=1e-12)
 
 
-def test_analytic_record_meets_the_unchanged_contract(g):
+def test_analytic_record_meets_the_contract(g):
     rec = ta.record(ta.reference(g), g)
+    assert rec["schema"] == "frontier.coupled.member-pressure/2"
     tgt = fpch.member_target(g)
     tr = fpch.transfer_load(rec, tgt)
     assert tr["scope"].startswith("analytic") and tr["F_N"] > 0
@@ -90,13 +91,45 @@ def test_analytic_record_meets_the_unchanged_contract(g):
         fpch.transfer_load(bad, tgt)
 
 
-def test_fan_width_gap_is_reported_not_hidden(g):
+def test_v2_widths_are_ray0s_own_strip_from_the_pinned_geometry(g):
     ref = ta.reference(g)
-    tr = fpch.transfer_load(ta.record(ref, g), fpch.member_target(g))
-    gap = fpch.fan_width_gap(ref, tr)
-    w = gap["local_width_chordwise_m"]
-    assert w[0] < gap["declared_width_m"] < w[-1]
-    assert gap["F_contract_over_strip"] != pytest.approx(1.0, abs=0.01)
+    rec = ta.record(ref, g)
+    t = rec["tributary"]
+    assert t["geometry_sha256"] == fg.canonical_sha(fg.PINS) and t["unit"] == "m"
+    assert [w["s_m"] for w in t["widths"]] == [st["s_m"] for st in rec["stations"]]
+    lam = fg.ray0(g)["sweep_rad"]
+    w = [float(x["width_m"]) for x in t["widths"]]
+    for wi, st in zip(w, ref["stations"]):
+        # dA/ds of the strip = (chordwise strip width) cos(sweep), recomputed here from the section cut
+        assert wi == pytest.approx((st["tributary_local_m"] + st["ray0_offset_from_le_m"]) * math.cos(lam), rel=1e-12)
+    assert all(b > a > 0 for a, b in zip(w, w[1:]))  # a fan: the strip widens root -> tip
+
+
+def test_v1_constant_width_discrepancy_is_reproduced_and_v2_removes_it(g):
+    import json
+    ref = ta.reference(g)
+    tgt = fpch.member_target(g)
+    retained = json.loads((fg.ROOT / "artifacts/fin-patch/v1-constant-width/reference.json").read_text())
+    tr1 = fpch.transfer_load(ta.record(ref, g, version=1), tgt)
+    gap1 = fpch.fan_width_gap(ref, tr1)
+    # the retained f8ebc13 numbers, recomputed from code: F +15.5 %, root moment -8.6 %
+    assert tr1["F_exact"] == retained["transfer"]["F_exact"]
+    assert tr1["M_root_exact"] == retained["transfer"]["M_root_exact"]
+    assert gap1["F_contract_over_strip"] == pytest.approx(retained["gaps"][0]["F_contract_over_strip"], rel=1e-12)
+    assert gap1["M_contract_over_strip"] == pytest.approx(retained["gaps"][0]["M_contract_over_strip"], rel=1e-12)
+    assert round(gap1["F_contract_over_strip"] - 1, 3) == 0.155 and round(1 - gap1["M_contract_over_strip"], 3) == 0.086
+    w = gap1["local_width_chordwise_m"]
+    assert w[0] < gap1["declared_width_m"] < w[-1]
+    gap2 = fpch.fan_width_gap(ref, fpch.transfer_load(ta.record(ref, g), tgt))
+    assert gap2["F_contract_over_strip"] == pytest.approx(1, abs=1e-12)
+    assert gap2["M_contract_over_strip"] == pytest.approx(1, abs=1e-12)
+
+
+def test_v2_station_error_is_measured_and_shrinks(g):
+    rows = fpch.station_convergence(g)["rows"]
+    errs = [abs(r["F_rel_to_densest"]) for r in rows[:-1]]
+    assert all(b < a for a, b in zip(errs, errs[1:]))
+    assert errs[0] < 0.02  # the five-station load quoted in reference.json is within 2 % of 65 stations
 
 
 def test_protocol_resolution_and_hashes(g):
@@ -104,7 +137,13 @@ def test_protocol_resolution_and_hashes(g):
     t = g["component"]["params"]["thickness_mm"]["value"]["membrane"] / 1000
     assert t / p["grid"]["h_m"] >= 2 and t / p["grid"]["h_fine_m"] >= 3 - 1e-9
     assert p["inputs"]["candidate_sha256"] == fg.CANDIDATE and p["member"]["member_sha256"]
-    assert p["gates"]["grid_pair_rel_diff_max"] == 0.10
+    # gates are frozen: the move to member-pressure/2 changes no threshold
+    assert p["gates"] == {"resolution_cells_across_membrane_min": 2, "grid_pair_rel_diff_max": 0.10,
+                          "stationarity_rel_change_last_two_windows_max": 0.05,
+                          "zero_alpha_control_jump_over_alpha_case_max": 0.02,
+                          "sign": "strip-mean jump p_ventral - p_dorsal > 0 for alpha > 0"}
+    assert "member-pressure/2" in p["output_contract"]["transfer"]
+    assert all(s["ray0_width_per_ds_m"] > 0 for s in p["sections"])
     q = dict(p)
     sha = q.pop("protocol_sha256")
     assert fg.canonical_sha(q) == sha
@@ -139,6 +178,8 @@ def test_emitter_round_trips_the_analytic_strip_and_passes_the_contract(g):
     proto = fpch.protocol(g)
     cases, surfs = synthetic(g, proto, h_m=5e-5, thickness_m=1e-4)
     rec = fpch.record_from_sections(cases, surfs, proto, g)
+    assert rec["schema"] == "frontier.coupled.member-pressure/2"
+    assert rec["tributary"] == ta.record(ta.reference(g), g)["tributary"]  # same widths, same provenance
     assert rec["resolution"]["cells_across_member_thickness"] == 2
     tr = fpch.transfer_load(rec, fpch.member_target(g))
     assert tr["scope"].startswith("2d-extrusion section scenario")
@@ -193,3 +234,10 @@ def test_committed_fin_patch_artifacts_are_current(g):
             assert hashlib.sha256((fg.ROOT / name).read_bytes()).hexdigest() == pin, name
     proto = json.loads((art / "protocol.json").read_text())
     assert proto == json.loads(json.dumps(fpch.protocol(g), default=str))
+    # the superseded v1 artifacts are retained byte for byte, pinned by their own manifest and by ours
+    v1 = art / manifest["retained_v1"]["dir"]
+    v1_manifest = json.loads((v1 / "manifest.json").read_text())
+    for name, pin in v1_manifest["outputs"].items():
+        assert hashlib.sha256((v1 / name).read_bytes()).hexdigest() == pin["sha256"], name
+    for name, sha in manifest["retained_v1"]["sha256"].items():
+        assert hashlib.sha256((v1 / name).read_bytes()).hexdigest() == sha, name

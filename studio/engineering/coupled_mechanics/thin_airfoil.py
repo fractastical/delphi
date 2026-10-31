@@ -22,7 +22,7 @@ from fractions import Fraction
 
 import numpy as np
 
-from . import SCHEMA_PRESSURE
+from . import SCHEMA_PRESSURE, SCHEMA_PRESSURE_V2
 from . import fin_geometry as fg
 
 
@@ -70,7 +70,7 @@ def reference(g: dict | None = None, flow: dict | None = None, s_over_L=S_OVER_L
         sec = fg.section(g, f)
         Gs = G(sec["xi_strip"])
         strip_per_span = q_dyn * sec["chord_m"] * 4 * a_eff * Gs        # N per m of span u
-        w_c = sec["tributary_local_m"] + sec["ray0_offset_from_le_m"]   # LE to strip boundary, chordwise
+        w_c = sec["strip_chordwise_m"]                                  # LE to strip boundary, chordwise
         rows.append({**sec, "G": Gs, "strip_fraction_of_section_lift": Gs / (math.pi / 2),
                      "q_true_N_per_m": strip_per_span * math.cos(lam),
                      "dp_strip_mean_Pa": strip_per_span / w_c})
@@ -79,19 +79,30 @@ def reference(g: dict | None = None, flow: dict | None = None, s_over_L=S_OVER_L
             "L_exact": r0["L_exact"], "tributary_width_declared_m": r0["tributary_width_m"]}
 
 
-def record(ref: dict, g: dict | None = None) -> dict:
-    """The analytic reference as a frontier.coupled.member-pressure/1 record (contract unchanged).
+def record(ref: dict, g: dict | None = None, version: int = 2) -> dict:
+    """The analytic reference as a member-pressure record.
 
-    Each station's jump is the strip-mean dCp*q_dyn over ray 0's local tributary strip; the record's
-    width is rays.json tributary_width_m (from_geometry, a mean). The contract carries one width per
-    member, so q = jump * declared width differs from q_true where the fan's local width differs;
-    `fan_width_gap` in run.py reports that difference instead of hiding it."""
+    Each station's jump is the strip-mean dCp*q_dyn over ray 0's local tributary strip.
+    version 2 (current): each station carries its own width, the strip's dA/ds from the pinned
+      geometry (fin_geometry.tributary_v2), so q = jump * width reproduces q_true at every station.
+    version 1 (SUPERSEDED, kept to reproduce the retained v1 artifacts): one width per member,
+      rays.json tributary_width_m (a fan mean). On a fan that is knowingly wrong: it moves force
+      toward the root (F +15.5%, root moment -8.6% against the strip; fin_patch.fan_width_gap)."""
     g = g or fg.load()
     m = fg.member_json(g)
     L = ref["L_exact"]
-    stations = [{"s_m": str(Fraction(st["s_over_L"]).limit_denominator(1000) * L),
-                 "p_pos_Pa": "0", "p_neg_Pa": repr(float(st["dp_strip_mean_Pa"]))} for st in ref["stations"]]
-    rec = {"schema": SCHEMA_PRESSURE,
+    s_m = [str(Fraction(st["s_over_L"]).limit_denominator(1000) * L) for st in ref["stations"]]
+    stations = [{"s_m": s, "p_pos_Pa": "0", "p_neg_Pa": repr(float(st["dp_strip_mean_Pa"]))}
+                for s, st in zip(s_m, ref["stations"])]
+    if version == 2:
+        trib = fg.tributary_v2(g, [(s, st["s_over_L"]) for s, st in zip(s_m, ref["stations"])])
+    elif version == 1:
+        trib = {"width_m": repr(ref["tributary_width_declared_m"]), "status": "from_geometry",
+                "source": f"rays.json ray 0 tributary_width_m (sha256 {g['sha256']['rays.json'][:16]}); "
+                          "a mean over a fan whose local width varies"}
+    else:
+        raise ValueError(f"version {version}")
+    rec = {"schema": SCHEMA_PRESSURE_V2 if version == 2 else SCHEMA_PRESSURE,
            "source": {"producer": "analytic: thin-airfoil strip on the v3a pectoral_L leading-edge ray",
                       "evidence_kind": "analytic", "receipt_sha256": None, "fields_sha256": None,
                       "geometry_sha256": None, "candidate_sha256": m["candidate_sha256"],
@@ -105,11 +116,11 @@ def record(ref: dict, g: dict | None = None) -> dict:
                         "reference": "jump p_ventral - p_dorsal, thin-airfoil strip mean over ray 0's local "
                                      "tributary strip; inviscid, attached, flat plate"},
            "stations": stations,
-           "tributary": {"width_m": repr(ref["tributary_width_declared_m"]), "status": "from_geometry",
-                         "source": f"rays.json ray 0 tributary_width_m (sha256 {g['sha256']['rays.json'][:16]}); "
-                                   "a mean over a fan whose local width varies"},
+           "tributary": trib,
            "time": {"kind": "static", "window_s": None},
            "resolution": {"cells_across_member_thickness": None, "cells_along_member": None}}
+    if version == 1:
+        rec["superseded"] = "constant-width fan loading; current method is member-pressure/2 (per-station widths)"
     rec["source"]["pressure_sha256"] = fg.canonical_sha(rec["stations"])
     rec["source"]["receipt_sha256"] = fg.canonical_sha({k: v for k, v in rec.items() if k != "source"})
     return rec
