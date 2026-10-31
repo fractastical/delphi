@@ -161,6 +161,10 @@ def main() -> int:
     gdir = WORK / "geometry"
     if rc == 0:
         built = next(gout.iterdir())
+        (OUT / "geometry").mkdir(parents=True, exist_ok=True)
+        for f in ("candidate.json", "components.json", "build.json"):   # always returned, pass or fail
+            if (built / f).exists():
+                shutil.copy(built / f, OUT / "geometry" / f)
         gdir.mkdir(exist_ok=True)
         shutil.copy(built / "components.json", gdir / "components.json")
         for k in pins:
