@@ -59,6 +59,30 @@
       <p class="small faint">Manifest ${L.manifest} · ${U.src("doc:fish-lifecycle", "Read the life-cycle document")}</p></section>`;
   }
 
+  /* Home: sourced anatomy beside the actual 3D candidate. Statuses are the fish3d candidate's own; nothing is called validated. */
+  const STATUS_WORDS = { derived: "derived from a sourced fit", functional: "set from a sourced relation or the design target", figure_read: "read from a published figure", aesthetic: "aesthetic choice", assumed: "assumed", numerical: "numerical setting", design_assumption: "design assumption", "assumed transfer": "assumed transfer" };
+  function groundingSection(snap) {
+    const H = snap.home_biology;
+    if (!H) return html`<section class="panel"><h2>Start from real fish anatomy.</h2><p class="empty">No fish3d candidate or fish-control data is present in this snapshot.</p></section>`;
+    const f = H.fitted[0]; const c = H.candidate; const sh = Object.entries(H.fish1990.pectoral_share_pct_mean_se).sort((x, y) => x[1][0] - y[1][0]); const lo = sh[0], hi = sh[sh.length - 1]; const cm = (snap.coupling_manifest || {}).counts; const SOFT = new Set(["aesthetic", "assumed", "numerical", "assumed transfer", "design_assumption"]);
+    return html`<section class="panel grounding" aria-labelledby="gr-h"><h2 id="gr-h">Start from real fish anatomy.</h2>
+      <p class="note warn small"><b>Not biorealistic and not validated.</b> This is an engineered candidate sized from published measurements. Its flat fin plates (${c.fin_thickness.value} mm), lattice scales and decorative eyes are assumptions, marked below. ${c.label}</p>
+      ${snap.fish3d_viewer ? html`<div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint">The 3D model is the candidate mesh (fish.glb, sha256 ${snap.fish3d_viewer.glb_sha256.slice(0, 12)}…). Colours are appearance only. The schematic drawing and printable models are below.</p>` : ""}
+      <div class="groundgrid"><div><div id="fishmini" class="fishmini"></div></div>
+        <div><h3>What the body and fins are sized from</h3>
+          <p>Candidate N1: standard length ${c.standard_length_mm.toFixed(1)} mm, wing span ${c.wing_span_mm.toFixed(1)} mm, wing area ${Math.round(c.wing_area_mm2)} mm², mass ${c.mass_kg} kg.</p>
+          <ul>
+            <li><b>Measured here:</b> pectoral fin length against standard length in ${f.n} preserved ${f.group} specimens (${f.species.join(", ")}; ${f.material}) follows length ∝ SL<sup>${f.b.toFixed(3)}</sup>, 95% bootstrap interval ${f.b_ci95[0].toFixed(3)} to ${f.b_ci95[1].toFixed(3)}, R² ${f.r2.toFixed(3)}. Species and sizes are pooled. Source: Daane et al. 2021, Data S1A, fit made in this repository.</li>
+            <li><b>Published, raw data unavailable:</b> Fish 1990 reports the pectoral fins as ${lo[0]} (${lo[1][0]} ± ${lo[1][1]}%) to ${hi[0]} (${hi[1][0]} ± ${hi[1][1]}%) of wing area by genus, and ${H.fish1990.hypocaudal_share_pct_mean_se[0]}% ± ${H.fish1990.hypocaudal_share_pct_mean_se[1]} of caudal area in the lower lobe (pooled). ${H.fish1990.raw_data}.</li></ul>
+          <p class="small"><b>Evidence kinds, kept apart:</b> ${Object.entries(H.evidence_counts).map(([k, n]) => html`${U.pill(n + " " + k.replace(/_/g, " "), "grp")} `)} ${H.no_cross_source_conversion} These are different kinds of record, not ${Object.values(H.evidence_counts).reduce((a, b) => a + b, 0)} empirically learned laws. ${H.knobs_status}.</p>
+          <h3>Region by region: where each parameter comes from</h3>
+          <div class="regiongrid">${H.regions.map((r) => { const soft = Object.entries(r.params).filter(([, v]) => SOFT.has(v)).map(([k, v]) => k.replace(/_/g, " ") + " (" + (STATUS_WORDS[v] || v) + ")"); const hard = Object.entries(r.params).filter(([, v]) => !SOFT.has(v)); return html`<article class="region"><h4>${r.id}</h4>
+            <p class="small">${hard.length} parameter${hard.length === 1 ? "" : "s"} sourced, derived or read from a figure: ${[...new Set(hard.map(([, v]) => STATUS_WORDS[v] || v))].join("; ") || "none"}.</p>
+            ${soft.length ? html`<p class="small assumed"><b>Assumed or chosen:</b> ${soft.join("; ")}.</p>` : ""}${r.notes.length ? html`<p class="small faint">${r.notes[0]}</p>` : ""}</article>`; })}</div>
+          <p class="small">Parameter status words are the candidate's own (<code>components.json</code>); unknown biology is not filled in. <a href="${DF.href("/studio/flying-fish", { scale: "organ" })}">Modelled mechanics at the organ scale</a> · <a href="${DF.href("/simulations")}">All simulations</a>${cm ? html` · unsupported bridges: ${cm.refused} refused and ${cm.scenario} scenario-level of ${cm.refused + cm.scenario + cm.composable} couplings` : ""} · <a href="${DF.href("/evidence")}">Evidence status</a></p>
+          <details><summary><b>${H.sources.length} sources</b> <span class="faint small">licences and read levels as recorded</span></summary><ul class="small">${H.sources.map((x) => html`<li>${x.citation}<br><span class="faint">Read: ${x.read_level}. Licence: ${x.licence}</span></li>`)}</ul><p class="small faint">Raw source files are not redistributed by this site. Manifest ${H.manifest}.</p></details></div></div></section>`;
+  }
+
   /* ---------------------------------------------------------------- home */
   DF.views.home = function (snap) {
     const p = fish(snap); const forms = snap.print_forms ? snap.print_forms.forms : []; const vids = (snap.simulation_manifests || []).filter((m) => m.video_state === "present_verified" && m.poster_href);
@@ -66,8 +90,10 @@
     return {
       html: html`<section class="hero compact"><div><p class="eyebrow">MorphoSwarm Frontier</p><h1>Design together.<br>Know what's open.</h1></div>
         <div class="herotext"><p class="lede">Two ways in, one body of evidence. <b>Studio</b> is where a design goal is worked across scales, with the models, media and gaps in one place. <b>Frontier</b> is the shared list of open questions and who is working on them. Both read the same claims and evidence, kept in the Delphi foundation: what we know, what's next, who's working on it.</p></div></section>
+      ${groundingSection(snap)}
+      <p class="small aboutlink"><a href="${DF.href("/about")}">About this project</a> · <a href="${DF.href("/generative")}">Generative biology: from mechanistic simulation to equation-conditioned models</a></p>
       <section class="panel goalpanel">${goalForm("")}</section>
-      <section class="panel missionview" aria-labelledby="hfish"><h2 id="hfish">The current design</h2><div class="mv-fish"><div id="fishmini" class="fishmini"></div></div></section>
+
       <section class="paths" aria-label="Two entry paths">
         <article class="path studio"><p class="eyebrow">Studio · projects</p><h2>Work a design across scales</h2>
           <p>A project names a goal, breaks it into subsystems by scale, and shows for each the model that exists, its parameters and unknowns, equations, claims, media and open questions. Gaps stay visible.</p>
@@ -83,6 +109,7 @@
         <p class="small faint">Projects other than Flying fish are added as Project records; none is invented here.</p></section>`,
       async after(root) {
         DF.mountFishMini(root.querySelector("#fishmini"), snap);
+        if (snap.fish3d_viewer && root.querySelector("#fish-viewer")) import("./model-viewer.js").then((m) => { const v = m.mountFishViewer(root.querySelector("#fish-viewer"), { base: snap.fish3d_viewer.base, layout: "hero" }); DF.onLeave(() => v.dispose && v.dispose()); }).catch((e) => { root.querySelector("#fish-viewer").textContent = "The 3D viewer could not load (" + e.message + "). The turntable and drawing remain below."; });
         DF.bindForm(root, "goal", (v) => DF.href("/studio", { goal: v.goal }));
         try { const L = await DF.liveQuestionCount(); if (L) root.querySelector("#homeq").parentElement.innerHTML = `<b>${L.n}</b> questions in the live node <span class="faint small">(${esc(L.source)})</span>`; } catch (e) { /* the snapshot figure stays */ }
       },

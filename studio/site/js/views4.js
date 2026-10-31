@@ -2,7 +2,7 @@
  * author_report (what documents and people say) and measured (what a receipt in the tree records). */
 (function () {
   const DF = window.DF; const { html, raw, esc } = DF; const U = DF.ui;
-  const TABS = [["overview", "Overview"], ["specs", "Specs and goals"], ["work", "Work and bottlenecks"], ["resources", "Resources"], ["receipts", "Receipts"], ["runtime", "Runtime and tools"], ["connect", "Connect and share"]];
+  const TABS = [["overview", "Overview"], ["built", "How it was built"], ["specs", "Specs and goals"], ["work", "Work and bottlenecks"], ["resources", "Resources"], ["receipts", "Receipts"], ["runtime", "Runtime and tools"], ["connect", "Connect and share"]];
   const AUTHOR = html`<span class="pill lvl-a" title="Written by the authors of the work">author report</span>`;
   const MEAS = html`<span class="pill lvl-m" title="A receipt in the tree records this">measured</span>`;
   const BLOCK = /blocked|failed|authentication|repair|requested|pending|recovery|not yet|unknown/i;
@@ -11,10 +11,38 @@
     const tab = route.params.tab || "overview"; const S = snap.system; const live = DF.api.isLive();
     const nav = html`<nav class="subnav" aria-label="System sections">${TABS.map(([k, t]) => html`<a href="${DF.href("/work", { tab: k })}" aria-current="${tab === k ? "page" : "false"}">${t}</a>`)}</nav>`;
     const head = html`<section class="pagehead"><h1>System</h1><p class="lede">What is being built, by whom, against which spec, and what has actually been measured. Two levels stay apart: ${AUTHOR} (documents and status text) and ${MEAS} (a run with a receipt). Nothing here is live activity, and no step is claimed to have built itself.</p>${nav}</section>`;
-    const body = { overview, specs, work, resources, receipts, runtime, connect }[tab] || overview;
+    const body = { overview, built, specs, work, resources, receipts, runtime, connect }[tab] || overview;
     const out = body(snap, S, live, route);
     return { html: html`${head}${out.html}`, after: out.after };
   };
+
+  /* How it was built: dated receipts, usage windows, provider outcomes and preregistered verdicts, each with its file and sha256. Spend and total usage stay unknown. */
+  function built(snap) {
+    const T = snap.timeline;
+    if (!T) return { html: html`<section class="panel"><h2>How it was built</h2><p class="empty">No resource inventory or receipts are present in this snapshot.</p></section>` };
+    const tone = (ok) => (ok === true ? U.pill("passed", "ok") : ok === false ? U.pill("failed", "no") : U.pill("recorded", "st-unk"));
+    const ev = (r) => html`<code class="small">${r.path}</code> ${r.sha256 ? U.sha(r.sha256) : html`<span class="faint small">no digest recorded</span>`}`;
+    const N = T.nebius; const kinds = [...new Set(T.rows.map((r) => r.kind))];
+    return { html: html`<section class="panel" aria-labelledby="bt-h"><h2 id="bt-h">How it was built ${AUTHOR}</h2>
+      <p class="note small"><b>Source repository:</b> <a href="https://github.com/kganjam/delphi-frontier" rel="noopener">github.com/kganjam/delphi-frontier</a> ${U.pill("private until the operator confirms it is public", "warn")}. Do not assume you can open it.</p>
+      <p class="small">Every row is a file in the tree with its sha256. Times are UTC as recorded; Seattle local time is UTC−7 (PDT) on 2026-10-31. A row shows what that file records, not that the work was correct, independent or complete. Inventory observed ${T.observed_at.seattle}.</p>
+      <h3>Recorded counters (event window from ${T.event_window_start_utc.slice(0, 10)})</h3>
+      <div class="tablewrap"><table><caption class="sr">Counters recorded in receipts; unknown where no counter exists</caption><thead><tr><th scope="col">Quantity</th><th scope="col">Recorded</th><th scope="col">Status</th><th scope="col">Limit and source</th></tr></thead><tbody>${T.counters.map((c) => html`<tr><th scope="row">${c.quantity}</th><td>${c.value}</td><td>${U.pill(c.status, c.status === "actual" ? "ok" : c.status === "unknown" ? "no" : "warn")}</td><td class="small">${c.note}<br><code>${c.source}</code></td></tr>`)}</tbody></table></div>
+      <p class="small">Counts cover use recorded inside the event window only. Earlier work is not narrated here; where a result rests on published sources or earlier data, its card cites them with their hashes and licences.</p>
+      <h3>Reuse</h3>
+      <p class="small">What others can take and check: the claims and evidence through the <a href="${DF.href("/work", { tab: "connect" })}">public read interface and MCP tools</a>, every simulation with its manifest and limits on the <a href="${DF.href("/simulations")}">simulations page</a>, printable models and the 3D mesh on <a href="${DF.href("/home")}">Home</a>, and exact record pins on each entity page. Reuse by anyone outside this team is not recorded.</p>
+      <h3>Providers and jobs</h3>
+      <ul class="small"><li><b>Nebius (GPU jobs):</b> ${N.own_job_count} jobs by this project: ${Object.entries(N.job_states).filter(([, n]) => n).map(([k, n]) => n + " " + k.toLowerCase().replace(/_/g, " ")).join(", ")} (observed ${N.observed_at_utc}). Allocation is requested capacity, not utilisation.</li>
+        <li><b>Google Generative Language:</b> ${T.rows.filter((r) => r.kind === "model usage").map((r) => r.title + ": " + r.outcome.split(";")[0]).join("; ")}.</li>
+        <li><b>Live checks of the public node:</b> ${T.rows.filter((r) => r.kind === "live check").length} recorded, ${T.rows.filter((r) => r.kind === "live check" && r.ok).length} with every check passed.</li></ul>
+      <p class="note warn small"><b>Unknown:</b> ${T.unknown.join(" ")}</p>
+      <h3>Dated record (${T.rows.length} rows; ${kinds.join(", ")})</h3>
+      <div class="tablewrap"><table><caption class="sr">Dated build and run records</caption><thead><tr><th scope="col">Time (UTC)</th><th scope="col">Kind</th><th scope="col">What</th><th scope="col">Outcome</th><th scope="col">Evidence</th></tr></thead><tbody>${T.rows.map((r) => html`<tr><td class="small">${r.time.replace("T", " ").replace(/\.\d+Z?$/, "").replace("+00:00", "")}</td><td>${U.pill(r.kind, "grp")}</td><td>${r.title}</td><td class="small">${tone(r.ok)} ${r.outcome}${r.scope ? html`<br><span class="faint">${r.scope}</span>` : ""}</td><td>${ev(r)}</td></tr>`)}</tbody></table></div>
+      <h3>Results, stops and failures, with what checked them</h3>
+      <ul>${T.undated.map((r) => html`<li>${tone(r.ok)} <b>${r.title}</b>${r.date ? " (" + r.date + ", date only)" : ""}: ${r.outcome}<br>${ev(r)}</li>`)}</ul>
+      <h3>Limits of this record</h3><ul class="small">${T.limitations.map((x) => html`<li>${x}</li>`)}</ul>
+      <p class="small faint">Inventory ${T.inventory} ${U.sha(T.inventory_sha256)}. Agent activity beyond these files is not reconstructed here.</p></section>` };
+  }
 
   function overview(snap, S, live) {
     const open = S.goal_checklist.filter((g) => !g.done).length;
