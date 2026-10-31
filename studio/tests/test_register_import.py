@@ -125,3 +125,44 @@ def test_whole_register_imports_and_none_of_it_is_actionable(store, tmp_path):
     saved = store.submit(TOKENS["alice"], "register-0", first)["record"]
     with pytest.raises(Conflict, match="recorded, not actionable"):
         store.submit(TOKENS["alice"], "act-register-0", action(store, ref(saved)))
+
+
+def _claim_with_source(store, id, **source_changes):
+    from conftest import claim
+    draft = claim(store, id)
+    draft["payload"]["source"] = {**draft["payload"]["source"], **source_changes}
+    return draft
+
+
+def test_export_refuses_held_content_under_an_unstated_licence(store):
+    """A commons built on export/import must not launder redistribution rights.
+
+    An independent review of the Paperclip Evidence API found zero occurrences of licence,
+    copyright, terms-of-use or redistribution in its entire OpenAPI, while its `include_context`
+    option returns article passages. An adapter written against it would set
+    `content_available=true` with `license=None` and ship passages of unknown licence onward
+    inside a bundle that advertises integrity.
+    """
+    from frontier.models import ref
+    from frontier.store import Forbidden
+
+    offending = _claim_with_source(store, "unlicensed", content_available=True, license=None)
+    saved = store.submit(TOKENS["alice"], "unlicensed", offending)["record"]
+    with pytest.raises(Forbidden, match="unstated licence"):
+        store.export_bundle([ref(saved)])
+
+    # Control 1: the SAME record exports once a licence is stated, so the refusal is caused by
+    # the missing licence and not by the record or by export being broken.
+    licensed = _claim_with_source(store, "licensed", content_available=True, license="CC-BY-4.0")
+    ok = store.submit(TOKENS["alice"], "licensed", licensed)["record"]
+    assert store.export_bundle([ref(ok)])["records"]
+
+    # Control 2: a reference whose bytes we do NOT claim to hold exports with no licence at all.
+    # Sharing the digest of something you may not redistribute is exactly what is allowed.
+    reference = _claim_with_source(store, "reference-only", content_available=False, license=None)
+    pointer = store.submit(TOKENS["alice"], "reference-only", reference)["record"]
+    assert store.export_bundle([ref(pointer)])["records"]
+
+    # And the refusal names the offender, so a caller can fix it rather than guess.
+    with pytest.raises(Forbidden, match=r"Claim/unlicensed"):
+        store.export_bundle([ref(ok), ref(saved)])

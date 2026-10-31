@@ -43,6 +43,31 @@ class Missing(FrontierError):
     http_status = 404
 
 
+def _unlicensed_available_content(records):
+    """Record ids asserting held content bytes with no stated licence.
+
+    A commons whose whole point is export and import must not be the thing that launders
+    redistribution rights. An independent review of the Paperclip Evidence API measured zero
+    occurrences of licence, copyright, terms-of-use or redistribution across its entire OpenAPI,
+    while its `include_context` option returns article passages and would set
+    `content_available=true` -- so an adapter written without this check would export passages of
+    unknown licence inside a bundle that claims integrity.
+
+    A digest is integrity, not permission. Exporting the digest of content you may not
+    redistribute is fine; asserting you HOLD that content and shipping it onward is not. So the
+    refusal is narrow by design: it fires only on `content_available=true` together with an
+    absent licence, and never on a reference whose bytes we do not claim to have.
+    """
+    offenders = []
+    for record in records:
+        for key, value in (record.get("payload") or {}).items():
+            if key != "source" or not isinstance(value, dict):
+                continue
+            if value.get("content_available") and not value.get("license"):
+                offenders.append(f'{record["kind"]}/{record["id"]}')
+    return offenders
+
+
 class Store:
     def __init__(self, dsn: str, namespace: str, schema: str = "public"):
         if not re.fullmatch(r"[a-z][a-z0-9_]{0,62}", schema):
@@ -361,6 +386,12 @@ class Store:
                         versions.append(assessment["version"])
             if len(records) > MAX_BUNDLE_RECORDS:
                 raise FrontierError("Selected records plus dimensional reviews exceed 100-record bundle limit")
+            unlicensed = _unlicensed_available_content(records)
+            if unlicensed:
+                raise Forbidden(
+                    "Refusing to export content asserted available under an unstated licence: "
+                    + ", ".join(unlicensed[:5])
+                    + ". Set Source.license, or set content_available=false and share the digest only.")
             body = {"schema_version": "frontier-bundle-0.1", "exporting_node": self.namespace,
                     "records": records, "review_claims": claims, "policy_version": POLICY,
                     "trust": "Digest proves integrity only; reviews require receiving-node policy."}
