@@ -69,6 +69,10 @@ def records_from_file(path) -> list[dict]:
     from frontier.models import Record
     with open(path) as fh:
         data = json.load(fh)
+    if isinstance(data, dict) and isinstance(data.get("records"), list):      # e.g. a connector mapping file {"records": [...], ...}
+        data = data["records"]
+    if not isinstance(data, list):
+        raise ImportRefused(f"{path}: expected a JSON list of Records or an object with a 'records' list")
     return [Record.model_validate(r).model_dump() for r in data]
 
 
@@ -321,3 +325,57 @@ def main(argv=None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+# ---------------------------------------------------------------- receipt and site ids (pure functions over stored artifacts)
+def make_receipt(*, plans: dict, import_receipts: list, verifies: dict, counts_before: dict, counts_before_note: str, code: dict,
+                 principal: dict, store: dict, excluded: dict, cross_namespace: dict, notes: list) -> dict:
+    """The final machine-readable receipt. Built only from artifacts of the run; contains no credential."""
+    entries = [e for r in import_receipts for e in r]
+    inserted = sum(e.get("inserted", 0) for e in entries)
+    last = list(verifies.values())[-1]["counts_now"] if verifies else None
+    rep = {
+        "schema": "frontier-live-import-receipt-0.1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "status": "imported_unreviewed. No record was accepted, reviewed or independently verified by this import. "
+                  "single-reader, not Codex-reviewed.",
+        "code": code, "principal": principal, "store": store,
+        "plans": {k: {"plan_sha256": v["plan_sha256"], "bundles": [{"bundle_sha256": b["bundle_sha256"], "idempotency_key": b["idempotency_key"],
+                                                                      "records": b["records"]} for b in v["bundles"]],
+                      "total_records": v["total_records"], "by_namespace_kind": v["by_namespace_kind"]} for k, v in plans.items()},
+        "import_responses": [{k: e.get(k) for k in ("bundle_sha256", "idempotency_key", "records", "inserted", "forks", "at", "error")} for e in entries],
+        "inserted_total": inserted,
+        "forks_recorded": sum(len(e.get("forks") or []) for e in entries),
+        "verification": {k: {"verified_ok": v["verified_ok"], "problems": v["problems"], "status_counts": v["status_counts"], "verified_at": v.get("verified_at")}
+                         for k, v in verifies.items()},
+        "counts_before": counts_before, "counts_before_note": counts_before_note, "counts_after": last,
+        "excluded": excluded, "same_id_in_other_namespaces": cross_namespace,
+        "action_semantics": "Imported Action records remain in state 'proposed'. An import does not show any action executed locally; "
+                            "the executed-run claim rests on the Evidence's run receipt, hashed artifacts and link checks, not on this import.",
+        "issuer_note": "Import does not authenticate the issuer named in a record ('importer'); issuer_authenticated is false for every imported record.",
+        "notes": notes,
+    }
+    rep["receipt_sha256"] = sha_obj({k: v for k, v in rep.items() if k != "receipt_sha256"})
+    return rep
+
+
+def site_ids(records: list[dict], chain: dict) -> dict:
+    """Exact ids and edges for the site to render the claim -> action -> evidence -> artifact chain."""
+    by_v = {r["version"]: r for r in records}
+    rows = []
+    for e in (r for r in records if r["kind"] == "Evidence"):
+        t, pb = e["payload"]["target"], e["payload"]["produced_by"]
+        claim, act = by_v[t["version"]], by_v[pb["version"]]
+        rows.append({
+            "claim": ref_of(claim), "delphi_claim_iri": claim["source_uri"], "delphi_nanopub": claim["payload"]["source_record_version"],
+            "action": ref_of(act), "action_inputs": act["payload"]["inputs"], "evidence": ref_of(e),
+            "relation": e["payload"]["relation"], "evidence_kind": e["payload"]["evidence_kind"],
+            "artifacts": [{"role": a["role"], "sha256": a["sha256"], "byte_size": a["byte_size"], "uri": a["uri"], "availability": a["availability"],
+                           "title": a["title"]} for a in e["payload"]["artifacts"]],
+            "link_checks": [{"name": c["name"], "passed": c["passed"]} for c in e["payload"]["provenance"]["link_checks"]],
+            "run_id": e["payload"]["provenance"]["run_id"], "backend": "local (not hosted compute, no GPU)",
+        })
+    return {"schema": "frontier-site-chain-ids-0.1", "namespace": records[0]["namespace"], "status": "imported_unreviewed; Actions 'proposed'",
+            "chains": rows, "reuse_counts": chain.get("reuse_counts"),
+            "not_yet_hosted": "artifact manifest (no served URL); artifacts are urn:sha256 pointers, availability 'referenced', no licence stated",
+            "cross_namespace_note": "The same Delphi claim ids also exist as local proposals in namespace delphi-frontier; Evidence here pins the node-a versions."}

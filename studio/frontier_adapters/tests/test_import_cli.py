@@ -47,6 +47,52 @@ def token_file(tmp, tok=TOKEN, mode=0o600):
 
 
 class BuildOffline(unittest.TestCase):
+    def test_a_connector_mapping_wrapper_with_a_records_list_is_accepted_and_junk_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            recs = ic.records_from_file(CHAIN)
+            wrapped = os.path.join(tmp, "w.json")
+            with open(wrapped, "w") as fh:
+                json.dump({"records": recs, "status": "proposed"}, fh)
+            self.assertEqual([r["version"] for r in ic.records_from_file(wrapped)], [r["version"] for r in recs])
+            bad = os.path.join(tmp, "bad.json")
+            with open(bad, "w") as fh:
+                json.dump({"nope": 1}, fh)
+            with self.assertRaises(ic.ImportRefused):
+                ic.records_from_file(bad)
+
+    def test_site_ids_join_claim_action_evidence_by_exact_version_and_carry_no_path(self):
+        from frontier_adapters.artifacts import find_abs_paths
+        recs = ic.records_from_file(CHAIN)
+        with open(os.path.join(EX, "nca_chain", "chain.json")) as fh:
+            chain = json.load(fh)
+        ids = ic.site_ids(recs, chain)
+        self.assertEqual(len(ids["chains"]), 2)
+        by_v = {r["version"]: r for r in recs}
+        for c in ids["chains"]:
+            self.assertEqual(by_v[c["claim"]["version"]]["id"], c["claim"]["id"])
+            self.assertEqual(c["action_inputs"][0]["version"], c["claim"]["version"])
+            self.assertEqual(len(c["artifacts"]), 9); self.assertTrue(all(x["passed"] for x in c["link_checks"]))
+        self.assertEqual(find_abs_paths(ids), [])
+        self.assertIn("imported_unreviewed", ids["status"])
+
+    def test_receipt_is_hashed_credential_free_and_states_that_import_is_not_execution(self):
+        recs = ic.records_from_file(CHAIN)
+        b = ic.make_bundles(recs, "node-a")
+        with tempfile.TemporaryDirectory() as tmp:
+            plan = ic.write_plan(b, tmp, source={})
+        ver = {"claims": {"verified_ok": 6, "problems": [], "status_counts": {"imported_unreviewed": 6}, "counts_now": {"heads": {}, "forks": 0}}}
+        rep = ic.make_receipt(plans={"chain": plan}, import_receipts=[[{"bundle_sha256": b[0]["bundle_sha256"], "idempotency_key": ic.key_for(b[0]), "records": 6,
+                                                                         "inserted": 6, "forks": []}]],
+                              verifies=ver, counts_before={}, counts_before_note="n/a", code={}, principal={}, store={}, excluded={}, cross_namespace={}, notes=[])
+        self.assertEqual(rep["inserted_total"], 6); self.assertEqual(rep["forks_recorded"], 0)
+        self.assertIn("does not show any action executed locally", rep["action_semantics"])
+        self.assertEqual(len(rep["receipt_sha256"]), 64)
+        again = ic.make_receipt(plans={"chain": plan}, import_receipts=[[{"bundle_sha256": b[0]["bundle_sha256"], "idempotency_key": ic.key_for(b[0]), "records": 6,
+                                                                           "inserted": 6, "forks": []}]],
+                                verifies=ver, counts_before={}, counts_before_note="n/a", code={}, principal={}, store={}, excluded={}, cross_namespace={}, notes=[])
+        self.assertNotEqual(rep["generated_at"], None); rep2 = {k: v for k, v in again.items() if k not in ("generated_at", "receipt_sha256")}
+        self.assertEqual({k: v for k, v in rep.items() if k not in ("generated_at", "receipt_sha256")}, rep2)
+
     def test_build_is_deterministic_and_bounded_and_excludes_requested_ids(self):
         with tempfile.TemporaryDirectory() as tmp:
             dr = draft_files(tmp)
