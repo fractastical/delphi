@@ -169,6 +169,11 @@ It also refuses if any ray's length changes under the alterations. The rays, out
 all come from the candidate. Flow, the fin-ray adapter and the viewer keep reading the 1:1 candidate files; a prop
 is never a flow input.
 
+**Known issue in v3b, which the prop reproduces.** v3b's camber knob raises the fins' distal margin, by up to
+4.8 mm on the pectoral (`panels.json`); the leading and trailing rays stay in the fin plane. So outboard streamwise
+sections are nose-down (cfd3d fitted 3.55°), not airfoil-cambered. The camber shape is assumed. A chordwise-camber
+variant would need a new candidate id and has not been built.
+
 **Display scale 0.55** (1 mm of fish = 0.55 mm of prop; SL 159 → 87.5 mm). It is one scale for both props, so the
 largest v3 extent (199 mm, v3a span) becomes 109 mm and fits the provisional 120 mm box.
 
