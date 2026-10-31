@@ -8,8 +8,14 @@ the most interesting number we produced.
 *novelty* — our own candidate headlines. It is not a claim that nothing we did produced a result.
 On 2026-10-31 a preregistered test closed POSITIVE
 ([`results/2026-10-31-oca2-exon21-molino-RESULT.md`](../results/2026-10-31-oca2-exon21-molino-RESULT.md)):
-oca2 exon 21 is absent from all 1,361,196,561 bp of the Molino cavefish assembly, reproducing
-Warren et al. 2021 against a different fish and a different data type.
+oca2 exon 21 is absent from the 1,361,196,561 bp (72,000 of them N) Molino cavefish assembly,
+reproducing, on one laboratory fish's haploid assembly, the exon-21 absence Warren et al. 2021 reported
+from the short reads of wild-caught fish.
+
+*Limits that travel with it:* n = 1 per population and haploid/unphased (no zygosity call); nothing causal
+tested; Pachón not run; Protas et al. 2006 read as abstract only (it names neither population nor exon);
+the laboratory line of the sequenced fish is unknown; any reading that the deletion "tracks albinism" is
+post-hoc and withdrawn (RESULT section 14.4).
 
 **That is a successful independent reproduction, which is a different category from a novel
 claim, and the distinction is the whole point of this file.** We reproduced someone else's

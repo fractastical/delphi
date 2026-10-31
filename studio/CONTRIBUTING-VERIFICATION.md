@@ -91,8 +91,10 @@ knowledge. What had actually been retrieved was a BioSample `ecotype` field read
 unsourced for the whole run and would have upgraded a technical reproduction into a biological
 specificity result on the strength of recall.
 
-Challenged, it was sourced properly (Jeffery 2020, PMC7353729, full text) **and** the competing
-explanation was ruled out from our own data, and the result is stronger for it. The fix was not
+Challenged, it was sourced properly (Jeffery 2020, PMC7353729, full text) **and** one competing
+explanation (another oca2 lesion in the Tinaja fish) was checked in our own three single-fish assemblies,
+which does not rule it out at population level; the specificity reading was then withdrawn on independent
+review (RESULT section 14.4). The fix was not
 to delete the claim but to **mark the provenance failure in its own subsection** and ship the
 observation at the confidence the evidence supports — post-hoc, n=1 per population, phenotypes
 from a review about populations rather than from the individuals sequenced.
