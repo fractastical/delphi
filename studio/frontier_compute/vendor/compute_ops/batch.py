@@ -18,7 +18,7 @@ All cloud calls go through `Cloud`, so tests use a fake. No credential value is 
 """
 from __future__ import annotations
 
-import argparse, base64, datetime as dt, gzip, hashlib, io, json, os, re, shlex, subprocess, sys, tarfile, time
+import argparse, base64, binascii, datetime as dt, gzip, hashlib, io, json, os, re, shlex, subprocess, sys, tarfile, time
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -159,7 +159,7 @@ class Cloud:
         """All log lines in [since, until]; halves the window while a query hits the 1000-line API cap."""
         def q(a, b):
             rc, so, se = _run([NEB, "--profile", PROFILE, "ai", "job", "logs", job_id, "--since", a.isoformat(),
-                               "--until", b.isoformat(), "--tail", "1000"], 300)
+                               "--until", b.isoformat(), "--tail", "1000", "--timestamps"], 300)
             if rc and "in the future" not in se:
                 raise RuntimeError(f"logs rc={rc}: {se.strip()[:200]}")
             return [] if rc else so.splitlines()
@@ -170,48 +170,61 @@ class Cloud:
         return lines
 
 
+def _checked_chunks(chunks, metadata):
+    """Preserve genuine repeated data; remove overlapping log rows only if needed.
+
+    Provider timestamps make a repeated query row distinguishable from repeated
+    payload emitted at different times. Legacy untimestamped logs try the exact
+    stream first. Every candidate must match both the job-side length and SHA.
+    """
+    for candidate in (chunks, list(dict.fromkeys(chunks))):
+        try:
+            blob = base64.b64decode("".join(payload for _, payload in candidate), validate=True)
+        except (ValueError, binascii.Error):
+            continue
+        if len(blob) == metadata["bytes"] and hashlib.sha256(blob).hexdigest() == metadata["sha256"]:
+            return blob
+    raise ValueError("result digest mismatch (log lines lost or duplicated)")
+
+
 def extract_result(lines: list[str]):
     """-> (meta, tar_bytes|None). Verifies sha256 against the job-side digest; raises on mismatch."""
-    meta, b64, seen_end, seen, started = None, [], False, set(), False
+    meta, b64, seen_end, started = None, [], False, False
     for ln in lines:
         i = ln.find("COPS_RESULT_BEGIN ")
         if i >= 0:
-            meta = json.loads(ln[i + 18:]); b64 = []; seen = set(); started = True; seen_end = False; continue
+            meta = json.loads(ln[i + 18:]); b64 = []; started = True; seen_end = False; continue
         if started and "COPS_RESULT_END" in ln:
             seen_end = True; break
         j = ln.find("COPS_B64 ")
-        if started and j >= 0 and ln not in seen:        # windowed fetches can duplicate edge lines
-            seen.add(ln); b64.append(ln[j + 9:].strip())
+        if started and j >= 0:
+            b64.append((ln, ln[j + 9:].strip()))
     if meta is None or not seen_end:
         return meta, None
     if meta["truncated"]:
         return meta, None
-    blob = base64.b64decode("".join(b64))
-    if hashlib.sha256(blob).hexdigest() != meta["sha256"] or len(blob) != meta["bytes"]:
-        raise ValueError("result digest mismatch (log lines lost or duplicated)")
+    blob = _checked_chunks(b64, meta)
     return meta, blob
 
 
 def extract_parts(lines: list[str]):
     """Warm-worker parts: -> list of (meta, blob|None) for every COMPLETE part (BEGIN ... END) in log order; verifies sha256 per part; a part whose meta says truncated has blob None.
     Tolerates a log cut in the middle of a later part (that part is ignored: it is incomplete)."""
-    parts, cur, b64, seen = [], None, [], set()
+    parts, cur, b64 = [], None, []
     for ln in lines:
         i = ln.find("COPS_PART_BEGIN ")
         if i >= 0:
-            cur = json.loads(ln[i + 16:]); b64 = []; seen = set(); continue
+            cur = json.loads(ln[i + 16:]); b64 = []; continue
         if cur is not None and "COPS_PART_END" in ln:
             if cur.get("truncated"):
                 parts.append((cur, None))
             else:
-                blob = base64.b64decode("".join(b64))
-                if hashlib.sha256(blob).hexdigest() != cur["sha256"] or len(blob) != cur["bytes"]:
-                    raise ValueError(f"part {cur.get('id')} digest mismatch (log lines lost or duplicated)")
+                blob = _checked_chunks(b64, cur)
                 parts.append((cur, blob))
             cur = None; continue
         j = ln.find("COPS_B64 ")
-        if cur is not None and j >= 0 and ln not in seen:
-            seen.add(ln); b64.append(ln[j + 9:].strip())
+        if cur is not None and j >= 0:
+            b64.append((ln, ln[j + 9:].strip()))
     return parts
 
 
