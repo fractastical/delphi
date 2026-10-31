@@ -61,6 +61,16 @@
     return tris;
   };
 
+  /* Real geometry and videos first, as links into the sections that hold them. Nothing appears unless a file is present. */
+  function mediaStrip(snap) {
+    const imgs = (snap.print_forms ? snap.print_forms.forms : []).filter((f) => f.files.image).map((f) => ({ src: f.files.image.href, cap: f.title, to: DF.href("/engineering") + "#", kind: "mesh" }));
+    const vids = (snap.simulation_manifests || []).filter((m) => m.video_state === "present_verified" && m.poster_href).map((m) => ({ src: m.poster_href, cap: m.title, to: DF.href("/simulations"), kind: "video" }));
+    const items = [...imgs, ...vids]; if (!items.length) return "";
+    return html`<section class="panel mediastrip" aria-labelledby="ms-h"><h2 id="ms-h">Geometry and simulations, as recorded</h2>
+      <div class="mgrid">${items.map((i) => html`<a class="mitem" href="${i.kind === "video" ? i.to : "#/engineering?scroll=pf-h"}" ${i.kind === "mesh" ? raw('data-scroll-to="pf-h"') : ""}><img src="${i.src}" alt="${i.cap}" loading="lazy"><span>${i.kind === "video" ? "▶ " : ""}${i.cap}</span></a>`)}</div>
+      <p class="small faint">Files from earlier runs, each with its hash in the sections below and in <a href="${DF.href("/simulations")}">Simulations</a>. Illustrations and simulated output, not observations.</p></section>`;
+  }
+
   function printForms(snap) {
     const P = snap.print_forms;
     if (!P) return html`<p class="empty">No printable-form study is present in this tree (looked for <code>artifacts/print/manifest.json</code>). No mesh exists to show or download; nothing is drawn in its place.</p>`;
@@ -122,6 +132,7 @@
       html: html`<section class="pagehead"><h1>Engineering</h1>
         <p class="lede">From a requirement to a constrained design: requirements and constraints, candidate checks, and what simulation would be needed. Mission: <b>engineer toward a flying fish</b>.</p></section>
 
+        ${mediaStrip(snap)}
         <nav class="flow" aria-label="Engineering flow"><ol>${[["wb-g", "1 Goal"], ["rq-h", "2 Constraints"], ["ws-h", "3 Candidate"], ["rq-h", "4 Results"], ["oq-h", "5 Open questions"]].map(([id, t]) => html`<li><button type="button" class="btn small ghost" data-scroll="${id}">${t}</button></li>`)}</ol></nav>
         <section class="panel" id="wb-g" aria-labelledby="wb-gh"><h2 id="wb-gh">Goal</h2><p>${m.whiteboard.goal.text}</p><p class="small"><a href="${DF.href("/frontier/G1")}">See it on the whiteboard</a></p></section>
         <section class="panel" aria-labelledby="sc-h"><h2 id="sc-h">Scales</h2>
@@ -144,8 +155,10 @@
             <form id="candform" class="ws-form" aria-label="Candidate design inputs" novalidate>
               <div class="presets" role="group" aria-label="Load a labelled example">${m.presets.map((p) => html`<button class="btn small ghost" type="button" data-preset="${p.id}" title="${p.note}">${p.name}</button>`)}</div>
               <p id="presetnote" class="small faint" role="status"></p>
-              <fieldset><legend>Dimensions</legend>${FIELD_DEFS.map((f) => num(...f))}</fieldset>
-              <fieldset><legend>Design premises</legend>${TRI.map(([n, l]) => tri(n, l))}${shareDef}</fieldset>
+              <fieldset><legend>Core dimensions</legend>${FIELD_DEFS.slice(0, 4).map((f) => num(...f))}</fieldset>
+              <details class="adv"><summary><b>Advanced scientific settings</b> <span class="faint small">fin length, launch speed, air density, lift coefficient, solver requirements, premises and opt-in assumptions</span></summary>
+                <fieldset><legend>More dimensions and solver inputs</legend>${FIELD_DEFS.slice(4).map((f) => num(...f))}</fieldset>
+                <fieldset><legend>Design premises and assumptions</legend>${TRI.map(([n, l]) => tri(n, l))}${shareDef}</fieldset></details>
               <div class="row-actions"><button class="btn ghost small" type="button" id="resetc">Clear all (unknown)</button><button class="btn small" type="button" id="dlc">Download candidate JSON</button></div>
               <p class="small faint">The download is a local file on your machine. Nothing is submitted anywhere.</p>
             </form>
@@ -289,18 +302,33 @@
       try { const r = await DF.api[b.dataset.adapter](DF.cand); out.className = "adapter-out"; out.innerHTML = solveResult(r); }
       catch (e) { out.className = "adapter-out unavailable"; out.textContent = e.name === "Unavailable" ? `Not connected: ${e.adapter}. ${e.detail}` : "Request failed: " + e.message; }
     }));
+    root.querySelectorAll("[data-scroll-to]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); const t = root.querySelector("#" + a.dataset.scrollTo); if (t) t.scrollIntoView({ block: "start" }); }));
     root.querySelectorAll("[data-scroll]").forEach((b) => b.addEventListener("click", () => { const t = root.querySelector("#" + b.dataset.scroll); if (t) { t.scrollIntoView({ block: "start" }); t.setAttribute("tabindex", "-1"); t.focus({ preventScroll: true }); } }));
     update(false);
   }
 
   function solveResult(r) {
+    const full = solveFull(r); const res = r.result || {}; const man = r.ui_manifest || r.manifest || null; const wit = res.witness && typeof res.witness === "object" ? res.witness : null;
+    const st = (man && man.badge) || res.status || "no status returned"; const cb = r.checked_by && typeof r.checked_by === "object" ? r.checked_by : null;
+    const tone = res.status === "feasible" ? "warn" : res.status === "unsat" ? "no" : "st-unk";
+    const line = res.status === "feasible" ? "An exact point satisfies every declared constraint in the encoded model." : res.status === "unsat" ? "The declared constraints conflict; the conflict is named below." : res.reason || "The solver did not decide.";
+    return html`<div class="rescard"><div class="resrow"><span class="vlabel">${st}</span> ${U.pill("simulated, encoded model only", "ev")} ${cb ? U.pill("independent check: " + (cb.independent_witness ? (cb.independent_witness.ok === true ? "passed" : "not passed") : "n/a"), cb.independent_witness && cb.independent_witness.ok === true ? "ok" : "st-unk") : ""} ${U.pill("Lean: not run online", "st-unk")}</div>
+      <p>${line}</p>
+      ${wit ? html`<p class="small witline"><b>Witness</b> ${Object.entries(wit).map(([k, x]) => html`<span class="wv">${k} = ${DF.exact(x)}</span>`)}</p>` : ""}
+      ${Array.isArray(res.missing_parameters) && res.missing_parameters.length ? html`<p class="small"><b>Unset, so not evaluated:</b> ${res.missing_parameters.join(", ")}</p>` : ""}
+      ${res.conflict ? html`<p class="small"><b>Conflict</b> <code>${[].concat(res.conflict).map((x) => (typeof x === "string" ? x : JSON.stringify(x))).join(", ")}</code></p>` : ""}
+      ${Array.isArray(res.extrapolates_envelope) && res.extrapolates_envelope.length ? html`<p class="note warn small"><b>Extrapolates a source envelope:</b> ${res.extrapolates_envelope.join(", ")}</p>` : ""}
+      <details><summary class="small">Full solver response: scope, provenance, parameters, exactly what was submitted</summary>${full}</details></div>`.toString();
+  }
+
+  function solveFull(r) {
     const res = r.result || {}; const man = r.ui_manifest || r.manifest || null; const fu = Array.isArray(r.followup_questions) ? r.followup_questions : [];
     const cb = r.checked_by && typeof r.checked_by === "object" ? r.checked_by : null; const prov = res.provenance && typeof res.provenance === "object" ? res.provenance : null;
     const list = (a) => (a && a.length ? html`<ul>${a.map((x) => html`<li>${typeof x === "string" ? x : JSON.stringify(x)}</li>`)}</ul>` : "");
     const wit = res.witness && typeof res.witness === "object" ? res.witness : null; const conf = res.conflict;
     const kv = (o) => html`<dl class="kv">${Object.entries(o).map(([k, v]) => html`<div><dt>${k}</dt><dd>${typeof v === "object" && v !== null ? JSON.stringify(v) : DF.exact(v)}</dd></div>`)}</dl>`;
     const params = r.parameters && typeof r.parameters === "object" ? r.parameters : {};
-    return html`<div class="verdictbox"><div class="vlabel">${(man && man.badge) || res.status || "no status returned"}</div>
+    return html`<div class="fullresp">
       ${man && man.headline ? html`<p><b>${man.headline}</b></p>` : ""}${res.reason ? html`<p>${res.reason}</p>` : ""}
       <p class="small">${r.schema || ""} · evidence kind <b>${r.evidence_kind || "not reported"}</b> · computed ${r.computed_at || "not reported"} · request sha256 <code>${r.request_sha256 || "not reported"}</code></p>
       ${r.scope || res.scope ? html`<p class="note small"><b>Scope.</b> ${r.scope || res.scope}</p>` : ""}
@@ -317,7 +345,7 @@
       ${man && man.lean ? html`<p class="small">Lean covers: ${JSON.stringify(man.lean.covers || "")}. Does not cover: ${JSON.stringify(man.lean.does_not_cover || "")}.</p>` : ""}
       ${r._submitted ? html`<h4>Exactly what was submitted</h4><p class="small faint">Decimal strings rounded to 12 places; the area is derived as span² / aspect ratio in this browser. A null is an unknown, never a default.</p><pre class="json">${JSON.stringify(r._submitted, null, 1)}</pre>` : ""}
       <h4>Parameters (caller-supplied, with their basis)</h4><div class="tablewrap"><table><thead><tr><th>Name</th><th>Value</th><th>Unit</th><th>Basis</th></tr></thead><tbody>${Object.entries(params).map(([k, p]) => html`<tr><td>${k}</td><td>${p && typeof p === "object" ? (p.value === null ? "unknown" : p.value) : String(p)}</td><td>${p && p.unit || ""}</td><td>${p && p.basis || ""}</td></tr>`)}</tbody></table></div>
-      ${fu.length ? html`<h4>Follow-up questions (${r.questions_persisted === false ? "not stored; shown for this result only" : "as returned"})</h4><ul>${fu.map((q) => html`<li>${typeof q === "string" ? q : html`${U.pill(q.approach || "question", "ap-" + (q.approach || "unknown"))} ${q.question} <span class="faint small">${(q.scales || []).join(", ")}</span>`}</li>`)}</ul>` : ""}</div>`.toString();
+      ${fu.length ? html`<h4>Follow-up questions (${r.questions_persisted === false ? "not stored; shown for this result only" : "as returned"})</h4><ul>${fu.map((q) => html`<li>${typeof q === "string" ? q : html`${U.pill(q.approach || "question", "ap-" + (q.approach || "unknown"))} ${q.question} <span class="faint small">${(q.scales || []).join(", ")}</span>`}</li>`)}</ul>` : ""}</div>`;
   }
 
   /* ---------------- EVIDENCE ---------------- */

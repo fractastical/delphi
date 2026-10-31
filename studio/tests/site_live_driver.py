@@ -39,6 +39,7 @@ with sync_playwright() as p:
     pg.goto(base + "/index.html#/evidence"); expect(pg.locator("#artifacts")).not_to_have_text("Loading…", timeout=15000)
     print("artifacts rows:", pg.locator("#artifacts tbody tr").count())
     pg.goto(base + "/index.html#/engineering"); pg.wait_for_selector("#candform")
+    pg.locator("details.adv summary").click()                          # advanced settings are collapsed by default
     pg.get_by_role("button", name="Cypselurus-type, 0.1 kg").click()   # span/area are float arithmetic: must still be sent as exact decimals
 
     def solve(label, **fields):
@@ -46,10 +47,10 @@ with sync_playwright() as p:
             pg.fill("#f-" + k, str(fields.get(k, "")))
         pg.get_by_role("button", name="Request a solver run").click()
         out = pg.locator("[data-out=solve]")
-        expect(out.locator(".verdictbox, .unavailable")).to_be_visible(timeout=60000)
+        expect(out.locator(".rescard, .unavailable")).to_be_visible(timeout=60000)
         assert out.locator(".unavailable").count() == 0 and "Request failed" not in out.inner_text(), out.inner_text()[:300]
         status = out.locator(".vlabel").inner_text().strip().lower()
-        txt = out.inner_text()
+        txt = out.text_content()
         print(label, "->", status, "|", txt[:160].replace("\n", " "))
         assert "frontier.engineering.solve/1" in txt
         return status, txt
@@ -57,14 +58,14 @@ with sync_playwright() as p:
     st, txt = solve("FEASIBLE", rho="1.225", cl_max="1", mass_min="0.05")
     assert st == "feasible", st
     low = txt.lower()
-    assert "witness" in low and "independent witness check: passed" in low and "not run online" in low, txt[:800]
-    pg.screenshot(path=f"{out}/live-solver.png", full_page=True)
+    assert "witness" in low and "independent check: passed" in low and "not run online" in low, txt[:800]
+    pg.screenshot(path=f"{out}/live-solver.png", full_page=True); pg.set_viewport_size({"width": 400, "height": 860}); pg.screenshot(path=f"{out}/live-solver-mobile.png", full_page=True); pg.set_viewport_size({"width": 1280, "height": 900})
     st, txt = solve("UNSAT", rho="1.225", cl_max="1", mass_min="0.2")
     assert st == "unsat" and "conflict" in txt.lower(), st
     st, txt = solve("UNKNOWN-RHO-CL")      # blank rho / CL must stay unknown, never defaulted
     assert st in ("unknown", "not decided") or "unset" in txt.lower(), (st, txt[:300])
     rows = pg.locator("[data-out=solve] tr", has_text="rho")
-    assert "unknown" in rows.first.inner_text().lower(), rows.first.inner_text()
+    assert "unknown" in rows.first.text_content().lower(), rows.first.text_content()
     # belief solver: the bundled example (exact rationals), then an impossible action, then a non-ok status
     import json
     pg.goto(base + "/index.html#/belief"); pg.wait_for_selector("#scen")
