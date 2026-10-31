@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claim Graph — delphisci</title>
+<meta name="description" content="Every claim extracted in delphisci as an interactive graph, grouped by thinker or date, coloured by proof status, with links to the live nanopubs.">
+<link rel="icon" href="data:image/svg+xml,/*__SEAL_URI__*/">
+<style>
+:root{--bg:#0e1830;--navy:#14213d;--panel:#16243f;--panel2:#1b2b4d;--gold:#e5c07b;--gold2:#f2dba6;--line:rgba(229,192,123,.26);--goldfaint:rgba(229,192,123,.14);
+ --ink:#efe6cf;--mut:#a7b0c2;--serif:Georgia,'Times New Roman',serif;--sans:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:var(--sans);color:var(--ink);background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+a{color:var(--gold2)}a:hover{color:#fff}
+button,select,input{font:inherit;font-size:13px;color:var(--ink)}
+button{padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;cursor:pointer}
+button:hover{border-color:var(--gold);color:var(--gold2)}button.on{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:700}
+select,input{padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--panel)}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--navy)}
+header svg{width:38px;height:38px;flex:none}
+.title{font-family:var(--serif);color:var(--gold);font-size:19px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin:0}
+.counts{color:var(--mut);font-size:12.5px}
+.ctl{display:flex;align-items:center;gap:6px}.ctl>span{font-size:12px;color:var(--mut)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px}.seg button{border:none;padding:5px 12px}
+#search{width:220px}
+.spacer{flex:1}
+.legend{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:7px 16px;font-size:12px;color:var(--mut);border-bottom:1px solid var(--line);background:var(--panel)}
+.legend b{color:var(--ink);font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:2px 8px;border-radius:999px;border:1px solid transparent;user-select:none}
+.chip:hover{border-color:var(--line)}.chip.off{opacity:.35;text-decoration:line-through}
+.dot{width:11px;height:11px;border-radius:50%;display:inline-block}
+.grad{display:inline-block;width:120px;height:9px;border-radius:5px;vertical-align:middle}
+#stage{position:relative;flex:1;min-height:0}
+#g{width:100%;height:100%;display:block;cursor:grab;touch-action:none;background-image:radial-gradient(rgba(229,192,123,.08) 1px,transparent 1.2px);background-size:24px 24px}
+#g.drag{cursor:grabbing}
+.edge{fill:none}.sedge{stroke:rgba(229,192,123,.28);fill:none}
+.claim{cursor:pointer}.claim circle{stroke:#0e1830;stroke-width:1}
+.claim.draft circle{stroke:var(--ink);stroke-dasharray:2 1.5;stroke-width:.9}
+.claim.sel circle{stroke:#fff;stroke-width:2.5}
+.claim:hover circle{stroke:#fff;stroke-width:2}
+.dim{opacity:.1}
+.clabel{fill:var(--ink);font-size:8.5px;pointer-events:none;display:none}
+.elabel{fill:var(--gold2);font-size:6px;pointer-events:none;display:none;font-variant-numeric:tabular-nums}
+.z1 .clabel{display:block}.z2 .elabel{display:block}
+.anim .clabel,.anim .elabel{display:none}
+.hub{cursor:pointer}.hub circle{fill:var(--navy);stroke:var(--gold)}.hub:hover circle{fill:#22355d}
+.hubtext{fill:var(--gold2);font-family:var(--serif);text-anchor:middle;pointer-events:none}
+.gtitle{fill:var(--gold);font-family:var(--serif);font-weight:700;text-anchor:middle;letter-spacing:2px}
+.gsub{fill:var(--mut);text-anchor:middle}
+#tip{position:absolute;pointer-events:none;background:rgba(20,33,61,.97);border:1px solid var(--gold);border-radius:8px;padding:7px 10px;font-size:12.5px;max-width:340px;display:none;z-index:5}
+#tip .m{color:var(--mut);font-size:11.5px;margin-top:3px}
+.zoom{position:absolute;left:14px;bottom:14px;display:flex;gap:4px;background:rgba(20,33,61,.92);border:1px solid var(--line);border-radius:999px;padding:4px}
+.zoom button{border:none;font-weight:700;padding:4px 11px}
+.hint{position:absolute;left:14px;bottom:56px;font-size:11.5px;color:var(--mut);background:rgba(14,24,48,.7);padding:3px 8px;border-radius:6px}
+#panel{position:absolute;top:0;right:0;bottom:0;width:460px;max-width:100%;background:var(--navy);border-left:1.5px solid var(--gold);overflow-y:auto;padding:18px 20px 30px;transform:translateX(105%);transition:transform .22s ease;z-index:6;box-shadow:-12px 0 30px rgba(0,0,0,.4)}
+#panel.open{transform:none}
+#panel h2{font-family:var(--serif);color:var(--gold);font-size:19px;line-height:1.3;margin:10px 0 6px}
+#panel h3{font-family:var(--serif);color:var(--gold);font-size:11.5px;letter-spacing:2px;text-transform:uppercase;margin:18px 0 6px}
+#panel p{font-size:13.5px;line-height:1.55;margin:6px 0}
+#panel .meta{color:var(--mut);font-size:12.5px}
+#panel .x{position:sticky;top:0;float:right;border:none;font-size:20px;padding:0 6px;background:var(--navy)}
+blockquote{margin:8px 0;padding:6px 12px;border-left:2px solid var(--gold);color:var(--gold2);font-family:var(--serif);font-style:italic;font-size:13.5px;background:rgba(229,192,123,.05)}
+code{font-size:12px;color:var(--gold2);background:rgba(229,192,123,.08);padding:1px 4px;border-radius:3px;word-break:break-word}
+.badge{display:inline-block;color:var(--navy);font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;margin-right:4px}
+.badge.ghost{background:transparent;color:var(--ink);border:1px dashed var(--mut)}
+.np{display:block;margin:12px 0;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);font-size:13px;text-decoration:none}
+a.np{border-color:var(--gold)}a.np:hover{background:#22355d}
+.np b{color:var(--gold2)}
+.num{display:flex;align-items:center;gap:8px;font-size:13px;margin:4px 0}
+.num .bar{flex:none;width:120px;height:7px;background:#2a3a5e;border-radius:4px;overflow:hidden}.num .bar i{display:block;height:7px;background:var(--gold)}
+.num .lab{width:170px;color:var(--mut)}
+.as{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:8px 0;background:var(--panel)}
+.as p{font-size:12.5px!important}
+.list button{display:flex;gap:8px;align-items:center;width:100%;text-align:left;border-radius:8px;margin:3px 0;padding:7px 10px;background:var(--panel)}
+.list .v{margin-left:auto;color:var(--gold2);font-variant-numeric:tabular-nums;font-size:12px}
+@media(max-width:760px){#search{width:140px}.legend{gap:8px}#panel{width:100%}}
+</style></head><body>
+<header>
+  <!--__SEAL__-->
+  <div><h1 class="title">Claim Graph</h1><div class="counts" id="counts"></div></div>
+  <div class="spacer"></div>
+  <div class="ctl"><span>Group by</span><div class="seg"><button id="m-thinker" class="on" onclick="setMode('thinker')">Thinker</button><button id="m-date" onclick="setMode('date')">Date</button></div></div>
+  <div class="ctl"><span>Edge number</span><select id="edgesel" onchange="setEdge(this.value)">
+    <option value="resolvability">Resolvability score</option>
+    <option value="confidence">Assessor confidence</option>
+    <option value="none">None</option></select></div>
+  <input id="search" type="search" placeholder="Search claims…" aria-label="Search claims">
+</header>
+<div class="legend" id="legend"></div>
+<div id="stage">
+  <svg id="g" aria-label="Claim graph"><g id="vp"><g id="lEdges"></g><g id="lHubs"></g><g id="lClaims"></g></g></svg>
+  <div id="tip"></div>
+  <div class="hint">Scroll to zoom · drag to pan · click a claim or a hub</div>
+  <div class="zoom"><button onclick="zoomBy(0.75)" title="Zoom out">−</button><button onclick="fit()" title="Fit everything">Fit</button><button onclick="zoomBy(1.33)" title="Zoom in">+</button></div>
+  <aside id="panel"></aside>
+</div>
+<script>
+const DATA = /*__DATA__*/null;
+const CLAIMS = DATA.claims, byId = Object.fromEntries(CLAIMS.map(c => [c.id, c]));
+const $ = id => document.getElementById(id);
+const NS = 'http://www.w3.org/2000/svg';
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+/* ---------- proof status on a red-to-green scale ---------- */
+const STATUS = {
+  refuted:  { v: 0,    label: 'Refuted as stated' },
+  untested: { v: 0.45, label: 'Not yet proven or tested' },
+  partial:  { v: 0.75, label: 'Partly proved' },
+  proved:   { v: 1,    label: 'Proved (within its model)' },
+};
+const STOPS = [[0,[224,87,79]],[0.45,[229,184,75]],[1,[79,192,127]]];
+const ramp = v => { let i = 0; while (i < STOPS.length - 2 && v > STOPS[i+1][0]) i++;
+  const [a, ca] = STOPS[i], [b, cb] = STOPS[i+1], t = Math.max(0, Math.min(1, (v - a) / (b - a)));
+  return `rgb(${ca.map((x, k) => Math.round(x + (cb[k] - x) * t)).join(',')})`; };
+const scol = s => ramp(STATUS[s].v);
+const EDGE = {
+  resolvability: { label: 'Resolvability score', note: 'how testable the claim is with today\'s open data (0–1, mean of the blind assessors). A graded score, not a probability that the claim is true.' },
+  confidence:    { label: 'Assessor confidence', note: 'each assessor\'s stated confidence (0–1) that its own resolvability verdict is right, averaged. Not a probability that the claim is true.' },
+  none:          { label: 'None', note: '' },
+};
+
+const S = { mode: 'thinker', edge: 'resolvability', q: '', off: new Set(), sel: null, k: 1, tx: 0, ty: 0, L: null };
+
+/* ---------- header and legend ---------- */
+const thinkers = [...new Set(CLAIMS.map(c => c.thinker))];
+const live = CLAIMS.filter(c => c.registry === 'production').length;
+$('counts').textContent = `${CLAIMS.length} claims · ${thinkers.length} thinkers · ${live} live nanopubs · built ${DATA.built}`;
+function legend() {
+  const n = s => CLAIMS.filter(c => c.status === s).length;
+  $('legend').innerHTML = `<span><b>Node colour</b> = proof status</span>` +
+    Object.entries(STATUS).map(([s, d]) => `<span class="chip ${S.off.has(s)?'off':''}" onclick="toggleStatus('${s}')" title="Click to hide or show"><i class="dot" style="background:${scol(s)}"></i>${d.label} (${n(s)})</span>`).join('') +
+    `<span><i class="dot" style="border:1.5px dashed var(--ink)"></i> dashed = draft, not published</span>` +
+    (S.edge !== 'none' ? `<span title="${esc(EDGE[S.edge].note)}"><b>Edge</b> = ${EDGE[S.edge].label.toLowerCase()} (thicker = higher, dashed = not assessed yet) <u style="cursor:help">what is this?</u></span>` : '');
+}
+function toggleStatus(s) { S.off.has(s) ? S.off.delete(s) : S.off.add(s); legend(); applyFilter(); }
+
+/* ---------- layout: groups (thinker or year) → sections → claims, as radial clusters ---------- */
+const short = t => /Maynard Smith$/.test(t) ? 'Maynard Smith' : t.split(' ').slice(-1)[0];
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+function computeLayout(mode) {
+  const gkey = c => mode === 'thinker' ? c.thinker : `${Math.floor(c.year / 10) * 10}s`;
+  const groups = new Map();
+  for (const c of CLAIMS) {
+    const k = gkey(c);
+    if (!groups.has(k)) groups.set(k, { key: k, claims: [], year: c.year, years: new Set(), thinkers: new Set() });
+    const g = groups.get(k); g.claims.push(c); g.year = Math.min(g.year, c.year); g.years.add(c.year); g.thinkers.add(c.thinker);
+  }
+  const list = [...groups.values()].sort((a, b) => a.year - b.year || a.key.localeCompare(b.key));
+  const hubs = [], edges = [], pos = {};
+  // Radial cluster per group, positioned at its local origin; packed into rows afterwards.
+  for (const g of list) {
+    const subs = new Map();
+    g.claims.sort((a, b) => a.year - b.year);
+    for (const c of g.claims) {
+      const sk = mode === 'date' && (g.thinkers.size > 1 || g.years.size > 1) ? `${c.year} ${short(c.thinker)}: ${c.section.replace(/ \(\d{4}\)$/, '')}` : c.section;
+      if (!subs.has(sk)) subs.set(sk, []); subs.get(sk).push(c);
+    }
+    const sl = [...subs.entries()];
+    const n = g.claims.length, slots = n + (sl.length > 1 ? sl.length : 0);
+    const r2 = Math.max(n < 4 ? 110 : 160, slots * 15 / (2 * Math.PI));
+    g.r2 = r2; g.R = r2 + 200; g.local = [];
+    g.hub = { id: `g:${g.key}`, x: 0, y: 0, r: Math.min(46, 18 + Math.sqrt(n) * 2), group: g, kind: 'group', label: g.key };
+    let slot = 0;
+    for (const [sk, cs] of sl) {
+      let parent = g.hub;
+      if (sl.length > 1) {
+        const mid = -Math.PI / 2 + 2 * Math.PI * (slot + (cs.length - 1) / 2) / slots;
+        const r1 = Math.max(55, r2 * 0.5);
+        parent = { id: `s:${g.key}:${sk}`, x: r1 * Math.cos(mid), y: r1 * Math.sin(mid), r: 7 + Math.sqrt(cs.length), group: g, kind: 'section', label: sk, claims: cs, angle: mid };
+        g.local.push(parent);
+        edges.push({ from: g.hub, to: parent, structural: true });
+      }
+      for (const c of cs) {
+        const a = -Math.PI / 2 + 2 * Math.PI * slot / slots + (n === 1 ? 0 : 0);
+        pos[c.id] = { lx: r2 * Math.cos(a), ly: r2 * Math.sin(a), a, g };
+        edges.push({ from: parent, to: c });
+        slot++;
+      }
+      if (sl.length > 1) slot++;
+    }
+  }
+  // Pack clusters into rows, in chronological order.
+  const totalArea = list.reduce((s, g) => s + (2 * g.R) ** 2, 0);
+  const maxW = Math.max(2 * Math.max(...list.map(g => g.R)) + 400, Math.sqrt(totalArea) * 1.5);
+  let x = 0, y = 0, rowH = 0, row = [];
+  const flush = () => { for (const g of row) g.cy = y + rowH / 2 + 90; y += rowH + 160; x = 0; rowH = 0; row = []; };
+  for (const g of list) {
+    if (x > 0 && x + 2 * g.R > maxW) flush();
+    g.cx = x + g.R; x += 2 * g.R + 60; rowH = Math.max(rowH, 2 * g.R); row.push(g);
+  }
+  flush();
+  for (const g of list) {
+    g.hub.x += g.cx; g.hub.y += g.cy; hubs.push(g.hub);
+    for (const s of g.local) { s.x += g.cx; s.y += g.cy; hubs.push(s); }
+  }
+  for (const id in pos) { const p = pos[id]; p.x = p.lx + p.g.cx; p.y = p.ly + p.g.cy; }
+  return { list, hubs, edges, pos };
+}
+
+/* ---------- rendering ---------- */
+const svg = $('g'), vp = $('vp'), lE = $('lEdges'), lH = $('lHubs'), lC = $('lClaims');
+const nodeEls = {};
+const truncate = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
+for (const c of CLAIMS) {
+  const g = el('g', { class: `claim${c.draft ? ' draft' : ''}` }, lC);
+  el('circle', { r: 5, fill: scol(c.status) }, g);
+  const t = el('text', { class: 'clabel', dy: '0.32em' }, g); t.textContent = truncate(c.label, 46);
+  g.addEventListener('click', e => { e.stopPropagation(); openClaim(c.id); });
+  g.addEventListener('mouseenter', e => tip(e, c)); g.addEventListener('mousemove', moveTip); g.addEventListener('mouseleave', hideTip);
+  nodeEls[c.id] = { g, t };
+}
+const edgeVal = c => S.edge === 'none' ? null : c[S.edge];
+const fmt = v => v == null ? '–' : v.toFixed(2);
+
+function drawStatic(L) {
+  lE.innerHTML = ''; lH.innerHTML = '';
+  L.edgeEls = L.edges.map(e => {
+    if (e.structural) return { e, line: el('line', { class: 'sedge', 'stroke-width': 1.2 }, lE) };
+    const line = el('line', { class: 'edge' }, lE);
+    const lab = el('text', { class: 'elabel', 'text-anchor': 'middle', dy: '-0.35em' }, lE);
+    return { e, line, lab };
+  });
+  styleEdges(L);
+  for (const g of L.list) {
+    const isT = S.mode === 'thinker';
+    const prod = g.claims.filter(c => c.registry === 'production').length;
+    const ty = g.cy - g.R - 60, b1 = Math.max(30, g.R / 14), b2 = Math.max(15, g.R / 36);
+    const t1 = el('text', { class: 'gtitle', x: g.cx, y: ty, 'font-size': b1, 'data-base': b1 }, lH);
+    t1.textContent = g.key;
+    const t2 = el('text', { class: 'gsub', x: g.cx, y: ty + b2 * 1.5, 'font-size': b2, 'data-base': b2, 'data-y0': ty }, lH);
+    const who = [...g.thinkers].map(short).join(', '), yrs = [...g.years].sort();
+    t2.textContent = `${isT ? (yrs.length > 1 ? `${yrs[0]}–${yrs.at(-1)}` : yrs[0]) : who} · ${plural(g.claims.length, 'claim')} · ${prod} live`;
+  }
+  for (const h of L.hubs) {
+    const g = el('g', { class: 'hub', transform: `translate(${h.x},${h.y})` }, lH);
+    el('circle', { r: h.r, 'stroke-width': h.kind === 'group' ? 2.5 : 1.4 }, g);
+    if (h.kind === 'group') {
+      const t = el('text', { class: 'hubtext', dy: '0.35em', 'font-size': Math.min(16, h.r * 0.55) }, g); t.textContent = h.group.claims.length;
+    } else if (h.claims.length >= 3) {
+      // Section label sits just outside the section hub, pointing away from the group centre.
+      const out = 1, a = h.angle, flip = Math.cos(a) < 0;
+      const t = el('text', { class: 'hubtext', 'font-size': 11, 'text-anchor': flip ? 'end' : 'start', dy: '0.35em',
+        transform: `rotate(${a * 180 / Math.PI + (flip ? 180 : 0)}) translate(${(flip ? -1 : 1) * (h.r + 6) * out},0)` }, g);
+      t.textContent = truncate(h.label, 34);
+    }
+    g.addEventListener('click', e => { e.stopPropagation(); openHub(h); });
+    g.addEventListener('mouseenter', e => tipHub(e, h)); g.addEventListener('mousemove', moveTip); g.addEventListener('mouseleave', hideTip);
+  }
+}
+function styleEdges(L) {
+  for (const x of L.edgeEls) {
+    if (x.e.structural) continue;
+    const v = edgeVal(x.e.to);
+    if (v == null) x.line.setAttribute('style', 'stroke:rgba(167,176,194,.35);stroke-width:.6;stroke-dasharray:3 3');
+    else x.line.setAttribute('style', `stroke:rgba(229,192,123,${(0.2 + 0.65 * v).toFixed(2)});stroke-width:${(0.4 + 2.6 * v).toFixed(2)}`);
+    x.lab.textContent = v == null ? '' : fmt(v);
+  }
+}
+function place(L, P, t = 1, from = null) {
+  // P: claim positions; from: previous positions to tween from.
+  const cur = {};
+  for (const c of CLAIMS) {
+    const p = P[c.id], f = from?.[c.id] ?? p;
+    const x = f.x + (p.x - f.x) * t, y = f.y + (p.y - f.y) * t;
+    cur[c.id] = { x, y };
+    const { g, t: lab } = nodeEls[c.id];
+    g.setAttribute('transform', `translate(${x},${y})`);
+    if (t === 1) {
+      const deg = p.a * 180 / Math.PI, flip = Math.cos(p.a) < 0;
+      lab.setAttribute('transform', `rotate(${deg + (flip ? 180 : 0)})`);
+      lab.setAttribute('x', flip ? -9 : 9); lab.setAttribute('text-anchor', flip ? 'end' : 'start');
+    }
+  }
+  for (const x of L.edgeEls) {
+    const a = x.e.from, b = x.e.structural ? x.e.to : cur[x.e.to.id];
+    x.line.setAttribute('x1', a.x); x.line.setAttribute('y1', a.y); x.line.setAttribute('x2', b.x); x.line.setAttribute('y2', b.y);
+    if (x.lab && t === 1) {
+      const mx = a.x + (b.x - a.x) * 0.8, my = a.y + (b.y - a.y) * 0.8;
+      let deg = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI; if (deg > 90 || deg < -90) deg += 180;
+      x.lab.setAttribute('transform', `translate(${mx},${my}) rotate(${deg})`);
+    }
+  }
+}
+function setMode(mode, animate = true) {
+  const prev = S.L;
+  S.mode = mode; $('m-thinker').classList.toggle('on', mode === 'thinker'); $('m-date').classList.toggle('on', mode === 'date');
+  const L = computeLayout(mode); S.L = L;
+  drawStatic(L);
+  if (!prev || !animate) { place(L, L.pos); applyFilter(); fit(false); return; }
+  const from = {}; for (const id in prev.pos) from[id] = prev.pos[id];
+  svg.classList.add('anim');
+  const t0 = performance.now(), D = 650;
+  const step = now => {
+    const u = Math.min(1, (now - t0) / D), e = u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2;
+    place(L, L.pos, e, from);
+    if (u < 1) requestAnimationFrame(step); else { svg.classList.remove('anim'); applyFilter(); fit(); }
+  };
+  requestAnimationFrame(step);
+}
+function setEdge(v) { S.edge = v; styleEdges(S.L); legend(); if (S.sel) openClaim(S.sel, false); }
+
+/* ---------- search and status filter ---------- */
+const matches = c => !S.off.has(c.status) && (!S.q || `${c.label} ${c.text} ${c.thinker} ${c.work} ${c.section} ${c.year}`.toLowerCase().includes(S.q));
+function applyFilter() {
+  const on = new Set(CLAIMS.filter(matches).map(c => c.id));
+  for (const c of CLAIMS) nodeEls[c.id].g.classList.toggle('dim', !on.has(c.id));
+  for (const x of S.L.edgeEls) if (!x.e.structural) { x.line.classList.toggle('dim', !on.has(x.e.to.id)); x.lab.classList.toggle('dim', !on.has(x.e.to.id)); }
+  return on;
+}
+$('search').addEventListener('input', e => { S.q = e.target.value.trim().toLowerCase(); applyFilter(); });
+$('search').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const hit = CLAIMS.find(matches); if (hit) { openClaim(hit.id); focusOn([S.L.pos[hit.id]], 2.2); }
+});
+
+/* ---------- pan and zoom ---------- */
+const MINK = 0.04, MAXK = 8;
+function apply() {
+  vp.setAttribute('transform', `translate(${S.tx},${S.ty}) scale(${S.k})`);
+  svg.classList.toggle('z1', S.k >= 0.8); svg.classList.toggle('z2', S.k >= 1.5);
+  // Group titles keep a readable on-screen size when zoomed out.
+  for (const t of lH.querySelectorAll('.gtitle,.gsub')) {
+    const base = +t.dataset.base, px = t.classList.contains('gtitle') ? 17 : 11.5;
+    t.setAttribute('font-size', Math.max(base, px / S.k));
+    if (t.classList.contains('gsub')) t.setAttribute('y', +t.dataset.y0 + Math.max(base, px / S.k) * 1.5);
+  }
+}
+function animateTo(k, tx, ty, ms = 450) {
+  const a = { k: S.k, tx: S.tx, ty: S.ty }, t0 = performance.now();
+  const step = now => { const u = Math.min(1, (now - t0) / ms), e = 1 - (1 - u) ** 3;
+    S.k = a.k + (k - a.k) * e; S.tx = a.tx + (tx - a.tx) * e; S.ty = a.ty + (ty - a.ty) * e; apply(); if (u < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function bbox(points, pad) {
+  const xs = points.map(p => p.x), ys = points.map(p => p.y);
+  return [Math.min(...xs) - pad, Math.min(...ys) - pad, Math.max(...xs) + pad, Math.max(...ys) + pad];
+}
+function focusBox([x0, y0, x1, y1], maxK = MAXK, animate = true) {
+  const W = svg.clientWidth - ($('panel').classList.contains('open') ? $('panel').offsetWidth : 0), H = svg.clientHeight;
+  const k = Math.max(MINK, Math.min(maxK, W / (x1 - x0), H / (y1 - y0)));
+  const tx = W / 2 - k * (x0 + x1) / 2, ty = H / 2 - k * (y0 + y1) / 2;
+  animate ? animateTo(k, tx, ty) : (S.k = k, S.tx = tx, S.ty = ty, apply());
+}
+function fit(animate = true) {
+  const pts = S.L.list.flatMap(g => [{ x: g.cx - g.R, y: g.cy - g.R - 170 }, { x: g.cx + g.R, y: g.cy + g.R }]);
+  focusBox(bbox(pts, 20), MAXK, animate);
+}
+function focusOn(points, k) {
+  const W = svg.clientWidth - ($('panel').classList.contains('open') ? $('panel').offsetWidth : 0), H = svg.clientHeight;
+  const [x0, y0, x1, y1] = bbox(points, 0), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  animateTo(k, W / 2 - k * cx, H / 2 - k * cy);
+}
+function zoomBy(f, cx = svg.clientWidth / 2, cy = svg.clientHeight / 2) {
+  const k = Math.max(MINK, Math.min(MAXK, S.k * f));
+  S.tx = cx - (cx - S.tx) * (k / S.k); S.ty = cy - (cy - S.ty) * (k / S.k); S.k = k; apply();
+}
+svg.addEventListener('wheel', e => { e.preventDefault(); const r = svg.getBoundingClientRect(); zoomBy(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)), e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+let drag = null;
+svg.addEventListener('pointerdown', e => { if (e.button !== 0) return; drag = { x: e.clientX, y: e.clientY, tx: S.tx, ty: S.ty, moved: false }; });
+window.addEventListener('pointermove', e => {
+  if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (!drag.moved && Math.hypot(dx, dy) < 4) return;
+  drag.moved = true; svg.classList.add('drag'); S.tx = drag.tx + dx; S.ty = drag.ty + dy; apply();
+});
+let dragged = false;
+window.addEventListener('pointerup', e => {
+  dragged = !!drag?.moved;
+  if (drag && !drag.moved && e.target === svg) closePanel();
+  drag = null; svg.classList.remove('drag');
+});
+svg.addEventListener('click', e => { if (dragged) { e.stopPropagation(); dragged = false; } }, true);
+window.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); if (e.target.tagName === 'INPUT') return; if (e.key === 'f') fit(); if (e.key === '+' || e.key === '=') zoomBy(1.33); if (e.key === '-') zoomBy(0.75); });
+window.addEventListener('resize', () => fit(false));
+
+/* ---------- tooltip ---------- */
+const tipEl = $('tip');
+function tip(e, c) {
+  const v = edgeVal(c);
+  tipEl.innerHTML = `<b>${esc(c.label)}</b><div class="m">${esc(c.thinker)} · ${c.year} · ${esc(STATUS[c.status].label)}${v != null ? ` · ${EDGE[S.edge].label.toLowerCase()} ${fmt(v)}` : ''}</div>`;
+  tipEl.style.display = 'block'; moveTip(e);
+}
+function tipHub(e, h) {
+  const cs = h.kind === 'group' ? h.group.claims : h.claims;
+  tipEl.innerHTML = `<b>${esc(h.kind === 'group' ? h.group.key : h.label)}</b><div class="m">${cs.length} claims · click to zoom in and list them</div>`;
+  tipEl.style.display = 'block'; moveTip(e);
+}
+function moveTip(e) { const r = $('stage').getBoundingClientRect(); tipEl.style.left = Math.min(e.clientX - r.left + 14, r.width - 350) + 'px'; tipEl.style.top = (e.clientY - r.top + 14) + 'px'; }
+function hideTip() { tipEl.style.display = 'none'; }
+
+/* ---------- inspector panel ---------- */
+const panel = $('panel');
+const badge = (t, c) => `<span class="badge" style="background:${c}">${esc(t)}</span>`;
+const num = (lab, v) => v == null ? '' : `<div class="num"><span class="lab">${lab}</span><span class="bar"><i style="width:${Math.round(v * 100)}%"></i></span><b>${fmt(v)}</b></div>`;
+function npBlock(c) {
+  if (c.registry === 'production') return `<a class="np" href="${esc(c.uri)}" target="_blank" rel="noopener"><b>Open the live nanopub ↗</b><br><span class="meta">${esc(c.uri)}</span></a>`;
+  if (c.registry === 'test') return `<a class="np" href="${esc(c.uri)}" target="_blank" rel="noopener"><b>Test-registry nanopub ↗</b> (not yet in production)<br><span class="meta">${esc(c.uri)}</span></a>`;
+  return `<div class="np"><b>Not published yet.</b> ${c.draft ? 'This is a draft extraction: its quote has not been verified against the source text, so it has no nanopub yet.' : 'No nanopub has been built for this claim.'}</div>`;
+}
+function openClaim(id, move = true) {
+  const c = byId[id]; if (!c) return;
+  if (S.sel) nodeEls[S.sel].g.classList.remove('sel');
+  S.sel = id; nodeEls[id].g.classList.add('sel');
+  const a = c.assess || [];
+  panel.innerHTML = `<button class="x" onclick="closePanel()" aria-label="Close">×</button>
+    ${badge(STATUS[c.status].label, scol(c.status))}${c.draft ? '<span class="badge ghost">draft</span>' : ''}
+    <h2>${esc(c.label)}</h2>
+    <div class="meta">${esc(c.thinker)} · <i>${esc(c.work)}</i> (${c.year})${c.section && !c.section.startsWith(c.work) ? ` · ${esc(c.section)}` : ''}${c.locator ? ` · ${esc(c.locator)}` : ''}</div>
+    ${npBlock(c)}
+    <p>${esc(c.text)}</p>
+    ${c.quote ? `<blockquote>“${esc(c.quote)}”</blockquote>` : ''}
+    ${c.notation ? `<h3>Notation</h3><p><code>${esc(c.notation)}</code></p>` : ''}
+    ${c.statusNote ? `<h3>Proof status</h3><p>${esc(c.statusNote)}</p>` : ''}
+    ${c.test ? `<h3>Proposed test</h3><p>${esc(c.test)}</p>` : ''}
+    ${c.doi ? `<p class="meta">Source: <a href="https://doi.org/${esc(c.doi)}" target="_blank" rel="noopener">doi:${esc(c.doi)}</a></p>` : ''}
+    ${a.length ? `<h3>Edge numbers (${a.length} blind assessors)</h3>${num('Resolvability score', c.resolvability)}${num('Assessor confidence', c.confidence)}
+      <p class="meta">Resolvability is how testable the claim is with today's open data; confidence is how sure each assessor is of its own verdict. Neither is a probability that the claim is true.</p>
+      ${a.map(x => `<div class="as"><b>${esc(x.who)}</b> · ${esc(x.verdict)}<br>${num('Resolvability', x.overall)}${num('Confidence', x.confidence)}
+        ${x.operationalization ? `<p>${esc(x.operationalization)}</p>` : ''}
+        ${x.datasets.length ? `<p class="meta">Datasets: ${x.datasets.map(d => `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>`).join(' · ')}</p>` : ''}</div>`).join('')}`
+      : `<h3>Edge numbers</h3><p class="meta">Not assessed yet, so this claim's edge is dashed and has no number.</p>`}
+    ${c.scope ? `<h3>Scope</h3><p>${esc(c.scope)}</p>` : ''}
+    <p class="meta" style="margin-top:16px">Claim id <code>${esc(c.id)}</code></p>`;
+  panel.classList.add('open'); panel.scrollTop = 0;
+  if (move) { const p = S.L.pos[id]; if (S.k < 1.6) focusOn([p], 2.2); else focusOn([p], S.k); }
+}
+function openHub(h) {
+  const cs = (h.kind === 'group' ? h.group.claims : h.claims).slice();
+  const title = h.kind === 'group' ? h.group.key : h.label;
+  const by = s => cs.filter(c => c.status === s).length;
+  panel.innerHTML = `<button class="x" onclick="closePanel()" aria-label="Close">×</button>
+    <h2>${esc(title)}</h2>
+    <div class="meta">${cs.length} claims · ${cs.filter(c => c.registry === 'production').length} live nanopubs · ${Object.keys(STATUS).filter(by).map(s => `${by(s)} ${STATUS[s].label.toLowerCase()}`).join(' · ')}</div>
+    <div class="list" style="margin-top:12px">${cs.map(c => `<button onclick="openClaim('${esc(c.id)}')"><i class="dot" style="background:${scol(c.status)};flex:none"></i>${esc(c.label)}<span class="v">${fmt(edgeVal(c))}</span></button>`).join('')}</div>`;
+  panel.classList.add('open'); panel.scrollTop = 0;
+  const pts = cs.map(c => S.L.pos[c.id]).concat([h]);
+  requestAnimationFrame(() => focusBox(bbox(pts, 230), 2.5));
+}
+function closePanel() { panel.classList.remove('open'); if (S.sel) nodeEls[S.sel].g.classList.remove('sel'); S.sel = null; }
+
+legend();
+setMode('thinker', false);
+</script>
+</body></html>
