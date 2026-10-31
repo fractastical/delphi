@@ -4,10 +4,11 @@
 Terms: int = variable index, tuple (l, r) = l o r.  Operator tables for k elements are all k^(k^2)
 arrays T[x, y]; Wolfram's rule number has digit f(x, y) at position k*x + y (least significant = f(0,0)).
 
-Run: python3 analysis.py [--k4]   (writes derived/axioms.csv and derived/supplementary.json, prints measured block;
+Run: python3 analysis.py [--k4]   (writes derived/axioms.csv.gz and derived/supplementary.json, prints measured block;
      about 2 minutes; --k4 adds the capped 4-element search S2, about 25 minutes)
 """
 import csv
+import gzip
 import itertools
 import json
 import os
@@ -261,7 +262,7 @@ def main():
     print(f"k=2,3 model enumeration done ({time.time()-t0:.0f}s)", file=sys.stderr)
 
     os.makedirs(os.path.join(HERE, "derived"), exist_ok=True)
-    with open(os.path.join(HERE, "derived", "axioms.csv"), "w", newline="") as f:
+    with gzip.open(os.path.join(HERE, "derived", "axioms.csv.gz"), "wt", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         w.writeheader()
         w.writerows(rows)
@@ -338,7 +339,7 @@ def main():
                   "excluding_degenerate": {"n": N - k4_none, "many_forms_fraction": round((many + k4_many) / max(1, N - k4_none), 4),
                                            "single_form_fraction": round(k4_single / max(1, N - k4_none), 4)}}
     print(f"S2 done ({time.time()-t0:.0f}s): {supp['S2']}", file=sys.stderr)
-    with open(os.path.join(HERE, "derived", "axioms.csv"), "w", newline="") as f:
+    with gzip.open(os.path.join(HERE, "derived", "axioms.csv.gz"), "wt", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         w.writeheader()
         w.writerows(rows)
