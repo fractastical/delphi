@@ -24,10 +24,16 @@ preserved and no new sequence-generation request is being routed elsewhere.
   Four tests check repeated payloads, query overlaps and corruption.
 - [x] Dispatch one molecular retry after a specific derivative-oracle diagnosis
   on the recovered state. Physical parameters and original tolerances remain.
-- [ ] Collect the molecular retry's controls, actual CUDA parity and trajectories.
-- [ ] Admit a useful remote 4-vCPU owner packet when ready. No nonduplicate
-  Morpheus/WaterLily packet has arrived; quota reads expose no numeric headroom.
-- [ ] Integrate GPUops' frozen cylinder interpretation and corrected field videos.
+- [x] Collect the molecular retry: three actual 100 ps CUDA trajectories,
+  303 finite saved states, all 20 output hashes checked and all numerical controls
+  passed. Equilibration, experimental accuracy and tissue-to-fin transfer remain unknown.
+- [x] Admit the useful remote 4-vCPU Morpheus packet at 15:17:17 PDT. Three
+  one-thread arms continue the original full horizon; earlier local partials remain.
+- [x] Integrate GPUops' frozen cylinder interpretation and corrected field videos.
+  Cylinder numeric gates passed; the literature bands remain source-unverified.
+- [ ] Collect the Morpheus full-horizon or explicitly partial result.
+- [ ] Dispatch the forthcoming controlled 3D WaterLily packet after its packaging,
+  runtime and status contracts are frozen. The failed physical reference stays visible.
 
 The angle batch requires a passing parity check in the same allocation. Its
 subsequent workloads reject a missing or failed gate. The original 3 MB return

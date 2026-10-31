@@ -2,8 +2,8 @@
   "$schema": "resource-inventory.schema.json",
   "schema_version": "frontier.resource-inventory/1",
   "observed_at": {
-    "utc": "2026-10-31T22:14:30.647028Z",
-    "seattle": "2026-10-31 15:14:30 PDT (UTC-07:00)"
+    "utc": "2026-10-31T22:20:19.964367Z",
+    "seattle": "2026-10-31 15:20:19 PDT (UTC-07:00)"
   },
   "scope": {
     "project": "delphi-frontier",
@@ -19,36 +19,35 @@
   "compute": {
     "nebius": {
       "project_id": "project-e00p797qpr0049snsqvf0k",
-      "observed_at_utc": "2026-10-31T22:14:30.647028Z",
-      "own_job_count": 28,
+      "observed_at_utc": "2026-10-31T22:20:19.964367Z",
+      "own_job_count": 29,
       "job_states": {
         "RUNNING": 1,
+        "COMPLETED": 22,
         "FAILED": 3,
-        "COMPLETED": 21,
         "CANCELLED": 3
       },
       "active_allocations": {
         "instances": 1,
         "running_instances": 1,
         "pulling_instances": 0,
-        "gpus": 1,
-        "vcpus": 16,
-        "memory_gb": 200,
+        "gpus": 0,
+        "vcpus": 4,
+        "memory_gb": 16,
         "jobs_with_unknown_capacity": 0,
         "interpretation": "Requested capacity of nonterminal jobs, including startup. RUNNING is not measured GPU utilization. Kernel utilization is unknown until sampled telemetry is collected."
       },
       "active_jobs": [
         {
-          "id": "aijob-e00h8rra7x8ams6jyn",
-          "name": "delphi-evolve-ops-infra15-collagen-md-reference-oracle-a1",
-          "created_at": "2026-10-31T22:10:55.702648Z",
+          "id": "aijob-e00bqeswtkd7dexff4",
+          "name": "delphi-evolve-ops-infra16-morpheus-full-horizon-a1",
+          "created_at": "2026-10-31T22:17:10.724256Z",
           "state": "RUNNING",
-          "platform": "gpu-h100-sxm",
-          "preset": "1gpu-16vcpu-200gb",
+          "platform": "cpu-d3",
+          "preset": "4vcpu-16gb",
           "requested_capacity": {
-            "gpu": 1,
-            "vcpu": 16,
-            "gb": 200
+            "vcpu": 4,
+            "gb": 16
           }
         }
       ],
@@ -64,15 +63,14 @@
         "price": "unavailable"
       },
       "live_state_request_window_utc": [
-        "2026-10-31T22:14:29.142929+00:00",
-        "2026-10-31T22:14:30.647028+00:00"
+        "2026-10-31T22:20:17.642048+00:00",
+        "2026-10-31T22:20:19.964367+00:00"
       ],
       "scope": "Own job names beginning delphi-evolve-ops- or bioservices-; other-team state counts only",
       "shared_state_counts": {
-        "RUNNING": 2,
-        "IMAGE_PULLING": 4,
+        "RUNNING": 6,
+        "COMPLETED": 50,
         "FAILED": 13,
-        "COMPLETED": 49,
         "CANCELLED": 5
       },
       "current_gpu_utilization_pct": null,
@@ -81,6 +79,24 @@
         "quota_read": "QuotaAllowance status NOT_USED exposes neither numerical limit nor aggregate usage; it cannot establish capacity.",
         "shared_jobs_and_endpoints": "Fresh read saw six active H100 allocations and no active CPU serverless allocation; other services may consume the quota.",
         "admission": "No new CPU job created; waiting for useful nonduplicate Morpheus/WaterLily packet before a bounded 4-vCPU attempt."
+      },
+      "cpu_worker_admission": {
+        "observed_at_utc": "2026-10-31T22:17:17Z",
+        "job_id": "aijob-e00bqeswtkd7dexff4",
+        "preset": "4vcpu-16gb",
+        "kind": "cpu",
+        "provider_admission": "created",
+        "packet_sha256": "994eb8314f1d912e7dc16a9a9ca0e9d5591f86cf805bfa16e6e2070f2c34f4f7",
+        "full_horizon": 2.0,
+        "arm_timeout_s": 3000,
+        "arms": 3,
+        "threads_per_arm": 1,
+        "image": "docker.io/library/python@sha256:623674a14ef93d052bb9b0de4dbf5f28eb578a35263838941cc8aa43213c1487",
+        "packed_preflight": "passed packet SHA, inner SHA256SUMS and shell syntax; no local scientific rerun",
+        "runtime_verification": "pending; exact public binary hash required; any nonzero arm exit or short horizon recorded as partial",
+        "output_cap_bytes": 12000000,
+        "prior_local_partial": "artifacts/multicell/summary.json",
+        "provider_spend": null
       }
     },
     "google_compute": {
@@ -244,6 +260,23 @@
       "gpu_samples_ge90pct": 140,
       "gpu_memory_used_mib_max": 921.0,
       "power_w_mean": 297.85292592592594,
+      "interpretation": "Historical sampled allocation window, including setup and artifact emission; not current utilization or a project-wide average."
+    },
+    {
+      "task_label": "infra-collagen-md-v2",
+      "source": "results/infra/md-v2/results/infra15-collagen-md-reference-oracle/out/telemetry_device.csv",
+      "sha256": "67c85dbb4362713d7ea83242e0067ce44b2f2bbe6e270b6c9032f248aa8f8c61",
+      "window_utc": [
+        "2026-10-31T22:13:23.701000Z",
+        "2026-10-31T22:15:29.733000Z"
+      ],
+      "samples": 127,
+      "sample_period_ms": 1000,
+      "gpu_utilization_pct_mean": 37.40944881889764,
+      "gpu_utilization_pct_max": 95.0,
+      "gpu_samples_ge90pct": 48,
+      "gpu_memory_used_mib_max": 1075.0,
+      "power_w_mean": 124.28244094488188,
       "interpretation": "Historical sampled allocation window, including setup and artifact emission; not current utilization or a project-wide average."
     }
   ],
