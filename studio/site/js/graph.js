@@ -16,7 +16,7 @@
   /* spec: {columns:[{title}], nodes:[{id,label,col,row,cls,sub}], edges:[{id,from,to,kind,label}], selected:{type,id}, onSelect(type,id), legend:[{cls,text}], ariaLabel} */
   function draw(host, spec) {
     host.innerHTML = "";
-    const colW = 210, nodeW = 176, nodeH = 52, gapY = 22, padX = 18, padTop = 34;
+    const colW = 262, nodeW = 176, nodeH = 52, gapY = 22, padX = 18, padTop = 34;
     const rows = Math.max(1, ...spec.nodes.map((n) => n.row + 1));
     const W = padX * 2 + colW * spec.columns.length - (colW - nodeW);
     const H = padTop + rows * (nodeH + gapY);
@@ -24,7 +24,7 @@
     svg.style.minWidth = Math.min(W, 800) + "px";
     spec.columns.forEach((c, i) => svg.appendChild(node("text", { x: padX + i * colW, y: 16, class: "g-col" }, c.title)));
     const pos = {}; spec.nodes.forEach((n) => { pos[n.id] = { x: padX + n.col * colW, y: padTop + n.row * (nodeH + gapY) }; });
-    const eg = node("g"); const ng = node("g");
+    const eg = node("g"); const ng = node("g"); const placed = [];
     const sel = spec.selected || {};
     const defs = node("defs"); defs.innerHTML = '<marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="g-arrow"/></marker>';
     svg.appendChild(defs); svg.appendChild(eg); svg.appendChild(ng);
@@ -39,9 +39,15 @@
       const g = node("g", { class: "g-edge " + (e.kind || "") + (sel.type === "edge" && sel.id === e.id ? " sel" : ""), tabindex: 0, role: "button", "aria-label": `Edge ${e.kind || ""}: ${e.label || e.id}. Select for detail.` });
       g.appendChild(node("path", { d, class: "g-line", "marker-end": "url(#arr)" }));
       g.appendChild(node("path", { d, class: "g-hit" }));
-      const kind = e.kind || "";
-      g.appendChild(node("rect", { x: mx - 4 - kind.length * 3.1, y: my - 15, width: 8 + kind.length * 6.2, height: 14, rx: 7, class: "g-elabel-bg" }));
-      g.appendChild(node("text", { x: mx, y: my - 4, class: "g-elabel", "text-anchor": "middle" }, kind));
+      const kind = e.kind || ""; const lw = 8 + kind.length * 6.2;
+      // Place the label on the first spot along the edge that touches no node box and no earlier label; if none is free it is hidden until the edge is hovered, focused or selected (its kind stays in the aria-label and the list below).
+      const bez = (t) => { if (sameCol) return [x1 + (x2 - x1) * t, y1 + (y2 - y1) * t]; const u = 1 - t; return [u * u * u * x1 + 3 * u * u * t * mx + 3 * u * t * t * mx + t * t * t * x2, u * u * u * y1 + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t * t * t * y2]; };
+      const hit = (r) => placed.some((q) => r.x < q.x + q.w && r.x + r.w > q.x && r.y < q.y + q.h && r.y + r.h > q.y) || Object.values(pos).some((q) => r.x < q.x + nodeW && r.x + r.w > q.x && r.y < q.y + nodeH && r.y + r.h > q.y);
+      let spot = null; for (const t of [0.5, 0.42, 0.58, 0.34, 0.66, 0.26, 0.74, 0.18, 0.82]) { const [px, py] = bez(t); const r = { x: px - lw / 2, y: py - 7, w: lw, h: 14 }; if (!hit(r)) { spot = r; break; } }
+      const lx = spot ? spot.x + lw / 2 : mx, ly = spot ? spot.y + 11 : my - 4; if (spot) placed.push(spot);
+      const hid = spot ? "" : " g-hid";
+      g.appendChild(node("rect", { x: lx - lw / 2, y: ly - 11, width: lw, height: 14, rx: 7, class: "g-elabel-bg" + hid }));
+      g.appendChild(node("text", { x: lx, y: ly, class: "g-elabel" + hid, "text-anchor": "middle" }, kind));
       activate(g, () => spec.onSelect("edge", e.id));
       eg.appendChild(g);
     });
