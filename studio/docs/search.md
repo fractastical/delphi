@@ -108,14 +108,29 @@ A record asserting held content with no licence never yields a snippet (the same
 * A version-hash query also returns the `Event` records that cite that version, at lower rank.
 * Review status is node-local. Nothing here federates across nodes.
 
-## Wiring (for the integrator; not done here)
+## Wiring (done)
 
-`/v1/read/search` and the `frontier_search` MCP tool still call `Store.search`. To switch, call
-`SearchIndex(store).search(...)` with the same `token`, and call `SearchIndex(store).initialize()` where the store is initialised.
+* **HTTP**: `Application.dispatch("/v1/read/search", ...)` now calls `SearchIndex.query`. Authentication stays in the `Authorization` header
+  (a `token` in the body is still rejected before dispatch). Unknown body fields are rejected with 400.
+* **MCP**: `frontier_search` calls the same `SearchIndex.query` (anonymous, public records only, as before); `frontier_capabilities` gains a
+  `search` block. Tool annotations stay read-only.
+* **Backward compatible request fields**: `query`, `kind` (one kind), `status`, `limit`, `after` keep working. `""` for `kind`/`status` still
+  means no filter. New optional fields: `kinds` (list), `source`, `scope`, `context`, `include_history`, `cursor`. `kind` with `kinds`, or
+  `cursor` with `after`, is refused. `next_cursor` can be passed back as `cursor` or as the legacy `after`. A bare 64-hex version in
+  `after` is honoured only for an empty query (still version order, so the old listing is unchanged); with a query it is refused, because
+  results are then ordered by relevance.
+* **Response differences from the old `Store.search`** (everything else is kept): `why_matched` is a list of strings, not one string;
+  `search_kind` states the new engine; each result adds `is_head`, `score`, `source`, `curation`, `disputes`, `evidence_references`,
+  `reference_truncation`, `references_complete`, `snippet`; `next_cursor` is opaque rather than a bare version.
+* **Indexes**: `python -m frontier.search --namespace NS [--schema S]` (with `FRONTIER_DSN`) creates them, idempotently, after
+  `python -m frontier init`. Search works without them, only slower. `search_schema.sql` must be added to package data
+  (`frontier = ["schema.sql", "search_schema.sql"]`); that edit to `pyproject.toml` was left to the integrator. `store.py`, `models.py`
+  and `__main__.py` are untouched; `Store.search` is left in place and unchanged.
 
 ## Tests
 
 `systemd-run --user --scope -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=600 bash scripts/test_postgres.sh tests/test_search.py`
-Covered: access isolation (anonymous, namespace-less principal, owner; private evidence and exact-version pins), kind/context/equation
+Wiring tests (`tests/test_search_wiring.py`): legacy and new request fields over `Application`, real loopback HTTP and the official MCP stdio client, `after`/`cursor` aliases, private-record isolation, validation errors, the index CLI.
+Covered in `tests/test_search.py`: access isolation (anonymous, namespace-less principal, owner; private evidence and exact-version pins), kind/context/equation
 retrieval, exact identifiers and version pins, ranking order, stable pagination across inserts, opposing and disputed references
 (including the forged-Assessment case), bounded reference lists, curation labels, indexes-only, read-only behaviour, and parameter bounds.

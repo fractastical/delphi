@@ -8,17 +8,19 @@ from urllib.parse import urlsplit
 from pydantic import ValidationError
 
 from .models import MAX_BUNDLE_BYTES, canonical
+from .search import SearchIndex
 from .store import FrontierError, Store
 
 
 class Application:
     def __init__(self, store: Store):
         self.store = store
+        self.search = SearchIndex(store)  # reads only; the indexes are created by `python -m frontier.search`, search works without them
 
     def dispatch(self, path, data, token=None, key=None):
         if not isinstance(data, dict):
             raise FrontierError("JSON object required")
-        read = {"/v1/read/get": self.store.get, "/v1/read/search": self.store.search,
+        read = {"/v1/read/get": self.store.get, "/v1/read/search": self.search.query,
                 "/v1/read/neighborhood": self.store.neighborhood, "/v1/read/events": self.store.events,
                 "/v1/read/export": self.store.export_bundle}
         write = {"/v1/proposals": self.store.submit, "/v1/reviews": self.store.review,
