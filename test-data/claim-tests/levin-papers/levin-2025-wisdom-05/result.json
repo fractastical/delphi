@@ -1,0 +1,25 @@
+{
+  "claim_id": "levin-2025-wisdom-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2025-wisdom-05",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "hypothesis": "In the public RNA-seq of planarians whose heads regenerated adapted to barium chloride (GEO GSE98084), only a handful of genes are differentially expressed between barium-adapted heads and control heads, i.e. a small fraction of the expressed transcriptome.",
+  "pass_criterion": "Pre-registered: with the deposited per-sample expression values, comparing barium-adapted head samples with untreated control head samples (Welch t-test on log2(CPM+1) per gene, genes with mean CPM >= 1 in either group, Benjamini-Hochberg FDR), the number of genes with FDR < 0.05 and |log2 fold change| >= 1 is <= 20, and is <= 0.2% of the tested genes.",
+  "fail_criterion": "Pre-registered: >= 100 genes meet FDR < 0.05 and |log2 fold change| >= 1 in that comparison. Counts of 21-99 are pre-registered as 'mixed'. If either group has fewer than two replicate samples, or no per-sample quantification can be obtained or computed from the deposit, the verdict is 'inconclusive' (underpowered or data-unavailable).",
+  "planned_datasets": [
+    "GEO GSE98084 (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98084): sample table and supplementary processed files"
+  ],
+  "interpretation": "Only the transcriptomic clause is tested: 'just a handful of genes up- and down-regulated' is mapped to the count of genes passing FDR < 0.05 and a two-fold change between barium-adapted and control heads, with 'handful' fixed in advance at <= 20 (the threshold proposed in the dataset-resolvability assessment). Head degeneration, complete adaptation and the claim that cells solved an unselected problem are not variables in the expression data and are not tested. The same finding is stated in levin-2023-agential-15 (Darwin's agential materials, 2023); this single test covers both claim ids and is filed under levin-2025-wisdom-05. If the deposit has additional groups (e.g. acute barium exposure before adaptation), their comparison with controls is reported as context only and does not enter the verdict. A t-test on few replicates has limited power, so the number of genes with |log2FC| >= 1 at nominal p < 0.01 is also reported as a sensitivity measure, not part of the verdict.",
+  "test_contract": {
+    "expected_observation": "At most 20 genes (and at most 0.2% of tested genes) pass FDR < 0.05 and |log2FC| >= 1 between barium-adapted and control planarian heads.",
+    "disconfirming_observation": "100 or more genes pass that threshold, i.e. a broad transcriptional programme rather than a handful of genes.",
+    "admissible_datasets": "Public RNA-seq of planarian heads regenerated under barium chloride with untreated controls, at least two replicates per group, with per-sample counts or normalized expression in the deposit or recomputable from it. The deposit of the original study (Emmons-Bell et al., the claim's ref [66]) is the only known such dataset; it is not independent of the claim's source lab, but the reanalysis is independent of the authors' pipeline.",
+    "inference_method": "Per-gene Welch t-test on log2(CPM+1) (or log2(normalized value+1) if only normalized values are deposited), Benjamini-Hochberg FDR across genes expressed at mean >= 1 in either group; count genes with FDR < 0.05 and |log2FC| >= 1; <= 20 supports, >= 100 refutes, otherwise mixed."
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
