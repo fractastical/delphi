@@ -472,11 +472,29 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "open_questions": ["Does the feedback-off arm keep fewer cells at the full horizon? Only the early window was observed."],
             "limitations": ["Generic example, not fish growth.", "Seed repeat is one repeat, not an uncertainty estimate.", "Two further arm movies (feedback-off, seed repeat) exist in artifacts/multicell and are not shown here."], "couplings": [], "manifest": f"{d}/summary.json", "native": True})
     d = "artifacts/molecular"
+    if (ROOT / d / "cuda-render/render.json").exists() and (ROOT / d / "cuda-analysis/ensemble.json").exists():
+        rr = json.loads(ins.read(f"{d}/cuda-render/render.json")); en = json.loads(ins.read(f"{d}/cuda-analysis/ensemble.json")); o = rr["outputs"]; runs = en["runs"]; ds = en["descriptive_endpoint_CA_RMSD_nm"]
+        st, href = _vid(ins, out, "molecular-md-cuda", f"{d}/cuda-render", "trajectory.mp4", o["trajectory.mp4"]); _, ph = _vid(ins, out, "molecular-md-cuda", f"{d}/cuda-render", "poster.png", o["poster.png"])
+        cards.append({"id": "molecular-md-cuda", "title": "Collagen-mimetic trimer: three 100 ps molecular dynamics runs on an H100 (OpenMM, CUDA)", "scales": ["molecular"], "evidence_kind": rr["kind"] + "; computed ensemble of declared seeds",
+            "model": {"name": "OpenMM classical atomistic MD, CUDA backend, ff14SB with TIP3P water", "context": f"{len(runs)} runs (seeds {', '.join(str(r['seed']) for r in runs)}), each {runs[0]['production_ps']:.0f} ps production after {runs[0]['preliminary_thermalization_ps']:.0f} ps thermalization, {runs[0]['frames']} saved states per run. The movie shows seed {rr['seed']}. One structure, one solvent system, one force field and one assumed 300 K condition are shared by all runs."},
+            "time": {"units": "picoseconds of simulated time", "note": f"{rr['frames']} frames at {rr['display_fps']} fps; rigid alignment for display only. Duration is not a relaxation time."},
+            "video": {"file": "trajectory.mp4", "sha256": o["trajectory.mp4"], "note": ""}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": f"seed {r['seed']}", "result": f"CA RMSD from production start {r['final_CA_RMSD_from_production_start_nm']:.3f} nm; kinetic temperature {r['kinetic_temperature_range_K'][0]:.0f} to {r['kinetic_temperature_range_K'][1]:.0f} K; last 20% mean {r['last_20_percent_sampled_temperature_mean_K']:.1f} ± {r['last_20_percent_sampled_temperature_SD_K']:.1f} K"} for r in runs]
+                + [{"name": "endpoint CA RMSD across seeds", "result": f"mean {ds['mean']:.3f} nm, sample SD {ds['sample_SD']:.3f} nm, range {ds['minimum']:.3f} to {ds['maximum']:.3f} nm (n = {ds['n_runs']})"}],
+            "parameter_unknowns": ["Empirical accuracy: " + str(en["empirical_accuracy"]) + ".", "Equilibrated ensemble: " + str(en["equilibrated_ensemble"]) + ".", "Tissue material modulus: not computed (null)."],
+            "open_questions": ["Do longer runs from different starting structures change any observable? Warm-start parents for a next job are recorded in warmstart-v3.json."],
+            "limitations": [en["scope"], "Biological success probability: null (not computed).", "Synthetic collagen-mimetic peptide, not a fish protein.", "The earlier 0.2 ps CPU setup run is a separate card and is not part of this ensemble."], "couplings": [], "manifest": f"{d}/cuda-render/render.json", "native": True})
+    ws = f"{d}/warmstart-v3.tar.xz"
+    if (ROOT / ws).exists() and (ROOT / d / "warmstart-v3.json").exists():
+        wm = json.loads(ins.read(f"{d}/warmstart-v3.json")); b = ins.read(ws)
+        if digest_bytes(b) == wm["sha256"] and len(b) == wm["bytes"]:
+            out["@artifacts/molecular/warmstart-v3.tar.xz"] = b
+    d = "artifacts/molecular"
     if (ROOT / d / "cpu-render/render.json").exists():
         rr = json.loads(ins.read(f"{d}/cpu-render/render.json")); an = json.loads(ins.read(f"{d}/analysis.json")); o = rr["outputs"]
         st, href = _vid(ins, out, "molecular-md", f"{d}/cpu-render", "trajectory.mp4", o["trajectory.mp4"]); _, ph = _vid(ins, out, "molecular-md", f"{d}/cpu-render", "poster.png", o["poster.png"])
         lo, hi = an["kinetic_temperature_observed_range_K"]
-        cards.append({"id": "molecular-md", "title": "Collagen-mimetic trimer: classical molecular dynamics (OpenMM, CPU), rendered from saved states", "scales": ["molecular"], "evidence_kind": rr["kind"] + "; " + an["kind"],
+        cards.append({"id": "molecular-md", "title": "Collagen-mimetic trimer: 0.2 ps CPU setup run (OpenMM), the earlier short run", "scales": ["molecular"], "evidence_kind": rr["kind"] + "; " + an["kind"],
             "model": {"name": "OpenMM 8.4 classical atomistic MD of a synthetic collagen-mimetic (Pro-Pro-Gly) trimer", "context": f"{an['frames']} saved states, {an['production_ps']} ps production after {an['preliminary_thermalization_ps']} ps preliminary thermalization, seed {an['seed']}. Rigid alignment for display only; no deformation invented."},
             "time": {"units": "picoseconds of simulated time", "note": f"{rr['frames']} frames at {rr['display_fps']} fps; trajectory duration is not a relaxation time."},
             "video": {"file": "trajectory.mp4", "sha256": o["trajectory.mp4"], "note": ""}, "video_state": st, "video_href": href, "poster_href": ph,
@@ -865,7 +883,7 @@ def build() -> dict[str, bytes]:
 
 
 def write(out: dict[str, bytes]) -> None:
-    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results", SITE / "artifacts" / "fish3d"):
+    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results", SITE / "artifacts" / "fish3d", SITE / "artifacts" / "molecular"):
         if d.exists():
             shutil.rmtree(d)
     for name, b in out.items():
@@ -878,7 +896,7 @@ def check(out: dict[str, bytes]) -> list[str]:
     at = lambda n: SITE / n[1:] if n.startswith("@") else DATA / n
     stale = [n for n, b in out.items() if not at(n).exists() or at(n).read_bytes() != b]
     extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
-    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results", "fish3d") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
+    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results", "fish3d", "molecular") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
     return stale + [f"unexpected {e}" for e in extra if e not in out] + [f"unexpected {e}" for e in pr if e not in out]
 
 

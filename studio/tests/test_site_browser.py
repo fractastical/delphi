@@ -940,9 +940,21 @@ def test_system_built_tab_reports_counters_only_with_unknowns_and_no_scorecard(b
     pg.goto(base + "#/work?tab=built")
     pg.wait_for_selector("#bt-h")
     t = pg.locator("#main").text_content()
-    for q in ("Agents", "Model calls and tokens", "GPU jobs", "GPU seconds", "CPU jobs and usage", "Cost"):
+    for q in ("Agents", "Model calls and tokens", "GPU jobs (own H100)", "GPU container work seconds", "CPU jobs (own)", "GPU utilisation", "Cost"):
         assert q in t, q
-    assert "No CPU counter is recorded" in t and "Total GPU seconds across all jobs: unknown" in t and "Total distinct agents: unknown" in t
+    assert "CPU seconds are not recorded: unknown" in t and "Total distinct agents and currently active agents: unknown" in t
     assert "1037.4 s" in t and "GPU kernel seconds and billed GPU seconds: unknown" in t and "not a count of agents" in t and "Provider COMPLETED means the container ended" in t and "Reuse by anyone outside this team is not recorded" in t
     assert "%" not in pg.locator(".tablewrap").first.text_content()
     assert "scorecard" not in t.lower() and "rubric" not in t.lower()
+
+
+def test_cuda_md_card_and_warmstart_bytes_are_exact(browser, base):
+    import hashlib
+    b = (ROOT / "site/artifacts/molecular/warmstart-v3.tar.xz").read_bytes()
+    assert len(b) == 1809144 and hashlib.sha256(b).hexdigest() == "4154fcdc3784fa1bfe6c667cdc20fabc346e8c482d9010ad5646a10eea78c3bf"
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector("#sim-molecular-md-cuda video")
+    t = pg.locator("#sim-molecular-md-cuda").text_content()
+    assert "three 100 ps" in t and "Equilibrated ensemble: not established" in t and "not computed (null)" in t and "not a confidence interval" in t
+    assert "0.2 ps CPU setup run" in pg.locator("#sim-molecular-md").text_content()
