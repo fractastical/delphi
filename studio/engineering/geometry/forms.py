@@ -210,10 +210,10 @@ def biological_point(spec: FormSpec) -> dict:
     return out
 
 
-def body_scale(sl: float, mass: float, rho: float, a: dict) -> tuple[float, float]:
+def body_scale(sl: float, mass: float, rho: float, a: dict, profile=M.body_profile_v1) -> tuple[float, float]:
     """Max half-width W (m) such that the loft's volume equals mass / density.  Returns (W, volume)."""
     s = np.linspace(0, 1, 4001)
-    f = M.body_profile(s, _v(a["peduncle_fraction"]))
+    f = profile(s, _v(a["peduncle_fraction"]))
     I = float(np.trapezoid(f * f, s))
     k = _v(a["body_height_over_width"]) * (1 + _v(a["ventral_flattening"]))
     V = mass / rho
@@ -226,7 +226,7 @@ def _chord_integral(base_frac: float, s_max: float) -> float:
     return float(np.trapezoid(M.fin_chord(x, base_frac, s_max), x))
 
 
-def fin_layout(spec: FormSpec, bio: dict, shape_ref: dict | None = None) -> dict:
+def fin_layout(spec: FormSpec, bio: dict, shape_ref: dict | None = None, profile=M.body_profile_v1) -> dict:
     """Fin lengths, areas, chords and body rectangles in SI, before print-only opening/thickening.
     Fish 1990 wing area = 2 pectoral + 2 pelvic + the body rectangle at each fin base (base chord x body width)."""
     a = spec.params
@@ -234,7 +234,7 @@ def fin_layout(spec: FormSpec, bio: dict, shape_ref: dict | None = None) -> dict
     W = _v(bio["body_half_width_max_m"])
     ped = _v(a["peduncle_fraction"])
     xf = _v(bio["fin_x_over_sl"])
-    width = {k: 2 * W * float(M.body_profile(np.array([xf[k]]), ped)[0]) for k in ("pectoral", "pelvic")}
+    width = {k: 2 * W * float(profile(np.array([xf[k]]), ped)[0]) for k in ("pectoral", "pelvic")}
     Ip = _chord_integral(_v(a["pectoral_base_fraction"]), _v(a["pectoral_s_max"]))
     Iv = _chord_integral(_v(a["pelvic_base_fraction"]), _v(a["pelvic_s_max"]))
     L_v = _v(bio["pelvic_length_over_sl"]) * sl
@@ -269,14 +269,15 @@ def fin_layout(spec: FormSpec, bio: dict, shape_ref: dict | None = None) -> dict
             "pectoral_length_over_sl": L_p / sl, "pelvic_length_over_sl": L_v / sl}
 
 
-def complete_point(spec: FormSpec, bio: dict, shape_ref: dict | None = None) -> dict:
-    """Body size from volume = mass / density, then the fin layout; fin_ratio forms get S, b, share from it."""
+def complete_point(spec: FormSpec, bio: dict, shape_ref: dict | None = None, profile=M.body_profile_v1) -> dict:
+    """Body size from volume = mass / density, then the fin layout; fin_ratio forms get S, b, share from it.
+    `profile` defaults to the frozen v1 function so the published print sets rebuild unchanged (see mesh.py)."""
     a = spec.params
     sl = _v(bio["standard_length_m"])
-    W, V = body_scale(sl, spec.mass_kg, _v(bio["body_density_kg_m3"]), a)
+    W, V = body_scale(sl, spec.mass_kg, _v(bio["body_density_kg_m3"]), a, profile)
     bio["body_half_width_max_m"] = P(W, "derived", "from body volume = mass / density and the aesthetic profile")
     bio["body_volume_m3"] = P(V, "derived", "mass / body density")
-    lay = fin_layout(spec, bio, shape_ref)
+    lay = fin_layout(spec, bio, shape_ref, profile)
     if spec.fins_from == "fin_ratio":
         note = (f"derived: Daane S1A fin lengths x Form {spec.fin_shape_from} fin shape (area / length^2), "
                 "plus body rectangles (Fish 1990 definition)")
@@ -383,7 +384,7 @@ def build_prop(spec: FormSpec, bio: dict, scale: float, res: M.Resolution = M.Re
     to_bio_area = 1 / (k * k)
 
     def prof(s):
-        return M.body_profile(np.asarray(s, dtype=float), ped)
+        return M.body_profile_v1(np.asarray(s, dtype=float), ped)  # frozen for the published print sets
 
     # --- body: cosine-clustered stations, half-sizes clamped to the print minimum near the snout
     s = 0.5 * (1 - np.cos(np.linspace(0, np.pi, res.stations)))
@@ -505,5 +506,5 @@ def body_section_mm(spec: FormSpec, bio: dict, scale: float):
     hw, flat, ped = _v(a["body_height_over_width"]), _v(a["ventral_flattening"]), _v(a["peduncle_fraction"])
 
     def f(x):
-        return float(M.body_profile(np.array([min(max(x / sl, 0), 1)]), ped)[0])
+        return float(M.body_profile_v1(np.array([min(max(x / sl, 0), 1)]), ped)[0])
     return (lambda x: W * f(x)), (lambda x: -W * hw * flat * f(x))
