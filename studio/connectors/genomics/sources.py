@@ -14,7 +14,7 @@ from typing import Callable, Iterator
 ALLOWED_HOSTS = frozenset({
     "zfin.org", "daniocell.nichd.nih.gov", "eutils.ncbi.nlm.nih.gov", "api.genome.ucsc.edu", "www.ebi.ac.uk", "rest.uniprot.org",
     "rest.ensembl.org", "www.ncbi.nlm.nih.gov", "zebrahub.sf.czbiohub.org", "danio-code.zfin.org",
-    "api.figshare.com", "ndownloader.figshare.com", "figshare.com",
+    "api.figshare.com", "ndownloader.figshare.com", "figshare.com", "public.czbiohub.org",
 })
 USER_AGENT = "delphi-frontier-genomics/0.1 (read-only bounded connector)"
 MAX_BYTES = 200_000_000          # the task's ceiling for any single download
