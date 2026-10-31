@@ -2,7 +2,7 @@
   "claim_id": "darwin1859-ch11-13",
   "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch11-13",
   "project": "darwin-origin",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If Darwin is right that the temperature of the whole world was simultaneously cooler during the Glacial period, then within one and the same dated interval of the last glaciation (the Last Glacial Maximum chronozone, 19-23 ka) surface temperature should have been below modern values everywhere: in both hemispheres, at all latitudes, and in every ocean basin, not only in the northern regions where glacial geology was first described.",
   "pass_criterion": "In the MARGO gridded compilation of LGM (19-23 ka) sea-surface temperature anomalies (modern minus LGM, annual mean, 5x5 degree cells), (i) >= 90 % of cells with data show cooling (anomaly > 0), (ii) in every 30-degree latitude band of each hemisphere with >= 5 cells, and in each of the Atlantic, Indian and Pacific basins, >= 80 % of cells show cooling and the area-weighted mean anomaly is > 0 with a one-sample t-test p < 0.01, and (iii) the area-weighted global mean anomaly is >= 1 degree C.",
   "fail_criterion": "Refutes if any hemisphere, or any 30-degree band of a hemisphere with >= 5 cells, or any basin, has a majority of cells warmer than modern, or if the global fraction of cooling cells is < 60 %. Any other outcome is mixed.",
@@ -10,12 +10,592 @@
     "margo-2009-lgm-sst-anomaly-grid"
   ],
   "interpretation": "Darwin's 'Glacial period' is read as the last glaciation and 'this period' as its culmination; the MARGO project's LGM chronozone (19-23 ka, defined on independent radiocarbon and stratigraphic age models) is the standard operationalisation of a single simultaneous interval, so testing whether cooling is found in every region within that window tests simultaneity directly. 'Temperature of the whole world' is tested with sea-surface temperature because the ocean compilation is global, gridded and has quantified errors; land temperatures are not tested here. Darwin's own hedge ('or at least along broad longitudinal belts') is covered by the per-band and per-basin criteria. A cell counts as 'cooler' if the central anomaly estimate is positive; a sensitivity count using only cells whose anomaly exceeds its total error is reported but is not part of the rule.",
-  "datasets": [],
-  "method": "",
-  "measured": {},
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "datasets": [
+    {
+      "id": "margo-2009-lgm-sst-anomaly-grid",
+      "name": "MARGO Project Members (2009) Constraints on the magnitude and patterns of ocean cooling at the Last Glacial Maximum, Nature Geoscience 2:127-132; supplementary Table S9 (MARGO_all_LGM_SST, 5x5 degree grid), archived at PANGAEA",
+      "landing_url": "https://doi.pangaea.de/10.1594/PANGAEA.733406",
+      "doi": "10.1594/PANGAEA.733406",
+      "version": "supplementary information zip dated 2010-02-05 / 2010-03-18",
+      "license": "CC BY 3.0",
+      "files": [
+        {
+          "download_url": "https://store.pangaea.de/Publications/Waelbroeck_et_al_2009/NGS-2008-09-00905_supplementary_information.zip",
+          "retrieved_at": "2026-10-31T05:01:55Z",
+          "byte_size": 4065648,
+          "sha256": "8861b8adc97088dfcea92a7281e77f572f3227364040f05f5254bc575031ff55"
+        }
+      ],
+      "role": "modern (WOA98) and LGM (19-23 ka) annual SST per 5x5 degree cell with total error, number of records and proxies"
+    }
+  ],
+  "method": "analysis.py downloads the MARGO supplementary zip, parses Table S9 (307 ocean grid cells with LGM reconstructions), computes cooling = modern WOA98 SST minus LGM SST per cell (the table's own 'anomaly' column is LGM minus modern despite the caption, so the two temperature columns are used directly), and evaluates the fraction of cooler cells, the cosine-latitude weighted mean cooling and a one-sided t-test globally, per hemisphere, per 30-degree latitude band and per ocean basin (basins assigned from longitude). The verdict follows the pre-registered thresholds.",
+  "measured": {
+    "value": 0.8436,
+    "unit": "fraction of 5x5 degree ocean grid cells with LGM (19-23 ka) annual SST below modern",
+    "n": 307,
+    "uncertainty": "area-weighted mean cooling 2.063 C; 0.433 of cells cooler by more than the stated total error",
+    "extra": {
+      "global": {
+        "n_cells": 307,
+        "fraction_cooler": 0.8436,
+        "fraction_cooler_beyond_error": 0.4332,
+        "area_weighted_mean_cooling_C": 2.063,
+        "median_cooling_C": 1.71,
+        "t_p_one_sided": 1.8716876406185094e-39
+      },
+      "by_hemisphere": {
+        "N": {
+          "n_cells": 179,
+          "fraction_cooler": 0.8212,
+          "fraction_cooler_beyond_error": 0.4302,
+          "area_weighted_mean_cooling_C": 2.275,
+          "median_cooling_C": 1.7,
+          "t_p_one_sided": 7.739448288468804e-21
+        },
+        "S": {
+          "n_cells": 128,
+          "fraction_cooler": 0.875,
+          "fraction_cooler_beyond_error": 0.4375,
+          "area_weighted_mean_cooling_C": 1.81,
+          "median_cooling_C": 1.72,
+          "t_p_one_sided": 2.4926042443105438e-24
+        }
+      },
+      "by_latitude_band": {
+        "N0-30": {
+          "n_cells": 84,
+          "fraction_cooler": 0.9167,
+          "fraction_cooler_beyond_error": 0.3214,
+          "area_weighted_mean_cooling_C": 1.655,
+          "median_cooling_C": 1.575,
+          "t_p_one_sided": 1.6280926480582507e-18
+        },
+        "N30-60": {
+          "n_cells": 63,
+          "fraction_cooler": 0.8571,
+          "fraction_cooler_beyond_error": 0.6349,
+          "area_weighted_mean_cooling_C": 3.624,
+          "median_cooling_C": 3.8,
+          "t_p_one_sided": 1.9698754329959065e-12
+        },
+        "N60-90": {
+          "n_cells": 32,
+          "fraction_cooler": 0.5,
+          "fraction_cooler_beyond_error": 0.3125,
+          "area_weighted_mean_cooling_C": 1.225,
+          "median_cooling_C": 0.23,
+          "t_p_one_sided": 0.09861292529748958
+        },
+        "S0-30": {
+          "n_cells": 82,
+          "fraction_cooler": 0.8293,
+          "fraction_cooler_beyond_error": 0.2805,
+          "area_weighted_mean_cooling_C": 1.425,
+          "median_cooling_C": 1.23,
+          "t_p_one_sided": 1.3437079877920558e-13
+        },
+        "S30-60": {
+          "n_cells": 46,
+          "fraction_cooler": 0.9565,
+          "fraction_cooler_beyond_error": 0.7174,
+          "area_weighted_mean_cooling_C": 2.66,
+          "median_cooling_C": 2.65,
+          "t_p_one_sided": 5.895134941592706e-14
+        }
+      },
+      "by_basin": {
+        "Atlantic": {
+          "n_cells": 127,
+          "fraction_cooler": 0.7953,
+          "fraction_cooler_beyond_error": 0.5197,
+          "area_weighted_mean_cooling_C": 2.775,
+          "median_cooling_C": 1.99,
+          "t_p_one_sided": 3.5634198540508164e-17
+        },
+        "Indian": {
+          "n_cells": 92,
+          "fraction_cooler": 0.9565,
+          "fraction_cooler_beyond_error": 0.3804,
+          "area_weighted_mean_cooling_C": 1.625,
+          "median_cooling_C": 1.62,
+          "t_p_one_sided": 1.8604598356435716e-23
+        },
+        "Pacific": {
+          "n_cells": 87,
+          "fraction_cooler": 0.7931,
+          "fraction_cooler_beyond_error": 0.3563,
+          "area_weighted_mean_cooling_C": 1.694,
+          "median_cooling_C": 1.49,
+          "t_p_one_sided": 1.1649723599266166e-10
+        },
+        "Southern Ocean": {
+          "n_cells": 1,
+          "fraction_cooler": 1.0,
+          "fraction_cooler_beyond_error": 1.0,
+          "area_weighted_mean_cooling_C": 3.26,
+          "median_cooling_C": 3.26,
+          "t_p_one_sided": null
+        }
+      },
+      "subsets_failing_pass_thresholds": [
+        "band N60-90",
+        "basin Atlantic",
+        "basin Pacific"
+      ],
+      "subsets_with_majority_warming": [],
+      "n_cells_warmer_than_modern": 48,
+      "n_cells_warmer_than_modern_beyond_total_error": 5,
+      "n_cells_single_record": 142,
+      "fraction_cooler_cells_with_2plus_records": 0.8848,
+      "n_cells_with_2plus_records": 165,
+      "cells_warmer_than_modern": [
+        {
+          "lon180": -17.5,
+          "lat": 67.5,
+          "cooling": -6.32,
+          "toterr_ann": 1.39,
+          "n_records": 2.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": 2.5,
+          "lat": 72.5,
+          "cooling": -4.78,
+          "toterr_ann": 2.4,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": 152.5,
+          "lat": 47.5,
+          "cooling": -4.69,
+          "toterr_ann": 1.5,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": 137.5,
+          "lat": 37.5,
+          "cooling": -3.65,
+          "toterr_ann": 2.45,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": 162.5,
+          "lat": 37.5,
+          "cooling": -3.48,
+          "toterr_ann": 3.67,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": -37.5,
+          "lat": 52.5,
+          "cooling": -2.52,
+          "toterr_ann": 1.64,
+          "n_records": 3.0,
+          "n_proxies": 2.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -47.5,
+          "lat": 57.5,
+          "cooling": -2.42,
+          "toterr_ann": 3.99,
+          "n_records": 5.0,
+          "n_proxies": 3.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -12.5,
+          "lat": 72.5,
+          "cooling": -2.25,
+          "toterr_ann": 4.3,
+          "n_records": 4.0,
+          "n_proxies": 2.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -7.5,
+          "lat": 82.5,
+          "cooling": -1.8,
+          "toterr_ann": 2.03,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": 32.5,
+          "lat": 82.5,
+          "cooling": -1.56,
+          "toterr_ann": 2.03,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": -172.5,
+          "lat": 17.5,
+          "cooling": -1.44,
+          "toterr_ann": 3.67,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": 12.5,
+          "lat": 82.5,
+          "cooling": -1.31,
+          "toterr_ann": 2.29,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": 127.5,
+          "lat": 27.5,
+          "cooling": -1.27,
+          "toterr_ann": 1.58,
+          "n_records": 2.0,
+          "n_proxies": 1.0,
+          "basin": "Indian"
+        },
+        {
+          "lon180": -32.5,
+          "lat": 52.5,
+          "cooling": -1.25,
+          "toterr_ann": 2.75,
+          "n_records": 2.0,
+          "n_proxies": 2.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": 42.5,
+          "lat": 82.5,
+          "cooling": -1.15,
+          "toterr_ann": 2.03,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": -7.5,
+          "lat": 67.5,
+          "cooling": -1.09,
+          "toterr_ann": 7.57,
+          "n_records": 2.0,
+          "n_proxies": 2.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -37.5,
+          "lat": 62.5,
+          "cooling": -1.06,
+          "toterr_ann": 2.4,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -37.5,
+          "lat": 57.5,
+          "cooling": -1.04,
+          "toterr_ann": 3.94,
+          "n_records": 4.0,
+          "n_proxies": 3.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -2.5,
+          "lat": 77.5,
+          "cooling": -1.03,
+          "toterr_ann": 1.62,
+          "n_records": 2.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -102.5,
+          "lat": -27.5,
+          "cooling": -1.01,
+          "toterr_ann": 4.12,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": 17.5,
+          "lat": 82.5,
+          "cooling": -0.96,
+          "toterr_ann": 1.73,
+          "n_records": 2.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -17.5,
+          "lat": -17.5,
+          "cooling": -0.92,
+          "toterr_ann": 1.62,
+          "n_records": 2.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": 12.5,
+          "lat": -32.5,
+          "cooling": -0.92,
+          "toterr_ann": 1.54,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -112.5,
+          "lat": -17.5,
+          "cooling": -0.9,
+          "toterr_ann": 2.91,
+          "n_records": 2.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": -7.5,
+          "lat": 72.5,
+          "cooling": -0.86,
+          "toterr_ann": 2.29,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": 112.5,
+          "lat": -27.5,
+          "cooling": -0.8,
+          "toterr_ann": 2.58,
+          "n_records": 3.0,
+          "n_proxies": 2.0,
+          "basin": "Indian"
+        },
+        {
+          "lon180": -17.5,
+          "lat": -22.5,
+          "cooling": -0.74,
+          "toterr_ann": 2.56,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -132.5,
+          "lat": 2.5,
+          "cooling": -0.72,
+          "toterr_ann": 3.21,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": 132.5,
+          "lat": 37.5,
+          "cooling": -0.64,
+          "toterr_ann": 3.0,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": 2.5,
+          "lat": 82.5,
+          "cooling": -0.64,
+          "toterr_ann": 2.29,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -12.5,
+          "lat": -17.5,
+          "cooling": -0.63,
+          "toterr_ann": 1.51,
+          "n_records": 2.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -122.5,
+          "lat": -17.5,
+          "cooling": -0.61,
+          "toterr_ann": 1.9,
+          "n_records": 3.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": 87.5,
+          "lat": -27.5,
+          "cooling": -0.45,
+          "toterr_ann": 1.7,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Indian"
+        },
+        {
+          "lon180": 157.5,
+          "lat": -12.5,
+          "cooling": -0.4,
+          "toterr_ann": 1.7,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": 7.5,
+          "lat": 77.5,
+          "cooling": -0.38,
+          "toterr_ann": 4.84,
+          "n_records": 2.0,
+          "n_proxies": 2.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -107.5,
+          "lat": -7.5,
+          "cooling": -0.37,
+          "toterr_ann": 3.21,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": 72.5,
+          "lat": -27.5,
+          "cooling": -0.29,
+          "toterr_ann": 1.93,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Indian"
+        },
+        {
+          "lon180": -172.5,
+          "lat": 2.5,
+          "cooling": -0.27,
+          "toterr_ann": 2.86,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": -117.5,
+          "lat": 2.5,
+          "cooling": -0.27,
+          "toterr_ann": 3.21,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": -27.5,
+          "lat": -32.5,
+          "cooling": -0.25,
+          "toterr_ann": 1.46,
+          "n_records": 2.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -137.5,
+          "lat": -12.5,
+          "cooling": -0.25,
+          "toterr_ann": 3.21,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": -12.5,
+          "lat": -22.5,
+          "cooling": -0.24,
+          "toterr_ann": 1.48,
+          "n_records": 3.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": 152.5,
+          "lat": -17.5,
+          "cooling": -0.14,
+          "toterr_ann": 1.7,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": -177.5,
+          "lat": 2.5,
+          "cooling": -0.1,
+          "toterr_ann": 3.44,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Pacific"
+        },
+        {
+          "lon180": -17.5,
+          "lat": 72.5,
+          "cooling": -0.1,
+          "toterr_ann": 1.42,
+          "n_records": 3.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -7.5,
+          "lat": 32.5,
+          "cooling": -0.09,
+          "toterr_ann": 1.59,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -62.5,
+          "lat": 72.5,
+          "cooling": -0.03,
+          "toterr_ann": 1.96,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        },
+        {
+          "lon180": -42.5,
+          "lat": 17.5,
+          "cooling": -0.02,
+          "toterr_ann": 2.56,
+          "n_records": 1.0,
+          "n_proxies": 1.0,
+          "basin": "Atlantic"
+        }
+      ],
+      "fraction_cooler_sensitivity_beyond_error": 0.4332,
+      "verdict_by_rule": "mixed"
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.75,
+  "caveats": [
+    "Within the single LGM chronozone 84.4 % of 307 ocean cells were cooler than today (area-weighted mean cooling 2.06 C, p = 2e-39), both hemispheres (82 % and 88 %), every latitude band and every basin cooled on average with p < 1e-9, except the 60-90 N band (50 % of cells, p = 0.10). No subset shows majority warming, so the refutation condition is far from met; the 'supports' thresholds (>= 90 % globally, >= 80 % in every subset) are missed by the global figure, the Atlantic (79.5 %), the Pacific (79.3 %) and the Nordic Seas. Darwin's hedged version ('along broad longitudinal belts from pole to pole') is clearly supported; the literal 'whole world' is supported as a mean statement but not cell by cell.",
+    "Of the 48 cells warmer than modern, only 5 are warmer by more than MARGO's stated total error, and 142 of 307 cells rest on a single record; among cells with >= 2 records 88.5 % are cooler. The warm cells cluster in the Nordic Seas and the north-west Pacific, where foraminiferal transfer functions are known to give ambiguous LGM estimates (sea-ice and seasonality effects), i.e. where the proxy is least reliable rather than where the climate was demonstrably warmer.",
+    "Only sea-surface temperature is tested; terrestrial pollen- and glacier-based LGM reconstructions show cooling on all continents but were not used here because no comparable gridded text-format compilation with quantified errors was located.",
+    "Simultaneity is inherited from the MARGO chronozone (19-23 ka, independently dated at each site); the test shows that the same dated interval was cold almost everywhere, which is what Darwin asserted, but it does not test the longer onset/termination phasing between hemispheres.",
+    "The first run used the table's anomaly column with the sign read from the captions, which inverted every result; the sign was verified against the raw temperature columns and the script now derives cooling from those columns. The pre-registered criterion was not changed."
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "claude-fable-5.1",
