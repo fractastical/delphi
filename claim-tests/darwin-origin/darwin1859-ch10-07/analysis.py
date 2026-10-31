@@ -213,7 +213,7 @@ def analyse_group(group, stages):
         "n_multicontinent_genera_tertiary": int(len(stag_t)),
         "staggered_fraction_tertiary": frac_t,
         "n_multicontinent_genera_kpg_control": int(len(stag_k)),
-        "staggered_fraction_kpg_control": frac_k,
+        "staggered_fraction_kpg_control": None if np.isnan(frac_k) else frac_k,
         # an empty control set leaves the control comparison undefined; the > 0.5 condition still applies
         "clauseB_pass": bool(frac_t > 0.5 and (np.isnan(frac_k) or frac_t > frac_k)),
         "clauseB_control_defined": bool(len(stag_k) > 0),
