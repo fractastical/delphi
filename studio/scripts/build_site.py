@@ -133,8 +133,10 @@ def recorded_results(ins: Inputs, files: dict) -> tuple[dict | None, dict | None
         for name in SIM_FILES:
             if (ROOT / SIM_DIR / name).exists():
                 b = ins.read(f"{SIM_DIR}/{name}")
-                files[f"results/{name}"] = b
-                listing.append({"name": name, "path": f"{SIM_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": f"data/results/{name}"})
+                csv = name.endswith(".csv")                      # the runtime serves .csv only under site/artifacts/
+                out_files_key = f"@artifacts/results/{name}" if csv else f"results/{name}"
+                files[out_files_key] = b
+                listing.append({"name": name, "path": f"{SIM_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": (f"artifacts/results/{name}" if csv else f"data/results/{name}")})
         load = lambda n: json.loads((ROOT / SIM_DIR / n).read_text()) if (ROOT / SIM_DIR / n).exists() else None
         summ, ctrl, find = load("summary.json"), load("controls.json"), load("model_structure_findings.json")
         sim = {"summary": {k: v for k, v in summ.items() if k != "pareto_designs_selected_dimensions"}, "pareto_selected": summ.get("pareto_designs_selected_dimensions", []),
@@ -153,9 +155,9 @@ def attestation_check(ins: Inputs, files: dict, docs: list) -> dict | None:
         return None
     mech, rev = json.loads(ins.read(ATT)), json.loads(ins.read(ATT_REVIEW))
     text = ins.text(ATT_README)
-    files["docs/" + Path(ATT_README).name] = text.encode()
+    files["docs/" + Path(ATT_README).name + ".txt"] = text.encode()
     docs.append({"id": Path(ATT_README).stem, "title": next(l[2:].strip() for l in text.splitlines() if l.startswith("# ")), "status_line": None, "path": ATT_README,
-                 "sha256": ins.seen[ATT_README]["sha256"], "href": "data/docs/" + Path(ATT_README).name})
+                 "sha256": ins.seen[ATT_README]["sha256"], "href": "data/docs/" + Path(ATT_README).name + ".txt"})
     by = {r["slug"] + str(r["index"]): r for r in mech["results"]}
     items = []
     for it in rev["items"]:
@@ -239,8 +241,8 @@ def controlled_results(ins: Inputs, out: dict) -> dict | None:
     files = []
     for name in ("summary.json", "comparison.csv", "witness_check.json"):
         if (ROOT / CTRL_DIR / name).exists():
-            b = ins.read(f"{CTRL_DIR}/{name}"); out[f"docs/controlled_{name}"] = b
-            files.append({"name": name, "path": f"{CTRL_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": f"data/docs/controlled_{name}"})
+            b = ins.read(f"{CTRL_DIR}/{name}"); csv = name.endswith(".csv"); out[f"@artifacts/results/controlled_{name}" if csv else f"docs/controlled_{name}"] = b
+            files.append({"name": name, "path": f"{CTRL_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": (f"artifacts/results/controlled_{name}" if csv else f"data/docs/controlled_{name}")})
     return {"model_version": s.get("model_version"), "evidence_kind": s.get("evidence_kind"), "protocol": s.get("protocol"), "n_rows": s.get("n_rows"), "n_unconverged": s.get("n_unconverged"),
             "baselines": s.get("baselines", []), "baselines_excluded": s.get("baselines_excluded_wl_outside_genus_range", []),
             "n_baseline_infeasible_scenarios": len(s.get("baseline_infeasible_scenarios", [])), "n_designs": len(designs),
@@ -313,8 +315,8 @@ def coupling_manifest(ins: Inputs, files: dict, docs: list) -> dict | None:
         return None
     m = json.loads(ins.read(COUPLING))
     if (ROOT / "docs/model-coupling.md").exists():
-        t = ins.text("docs/model-coupling.md"); files["docs/model-coupling.md"] = t.encode()
-        docs.append({"id": "model-coupling", "title": next((l[2:].strip() for l in t.splitlines() if l.startswith("# ")), "model-coupling"), "status_line": None, "path": "docs/model-coupling.md", "sha256": ins.seen["docs/model-coupling.md"]["sha256"], "href": "data/docs/model-coupling.md"})
+        t = ins.text("docs/model-coupling.md"); files["docs/model-coupling.md.txt"] = t.encode()
+        docs.append({"id": "model-coupling", "title": next((l[2:].strip() for l in t.splitlines() if l.startswith("# ")), "model-coupling"), "status_line": None, "path": "docs/model-coupling.md", "sha256": ins.seen["docs/model-coupling.md"]["sha256"], "href": "data/docs/model-coupling.md.txt"})
     rows = []
     for c in m["couplings"]:
         cp, v = c["coupling"], c["verdict"]
@@ -336,9 +338,9 @@ def system_block(ins: Inputs, files: dict, docs: list, board: list, lean, sim, a
     specs = []
     for p in sorted((ROOT / "specs").glob("*.md")):
         rel = p.relative_to(ROOT).as_posix(); text = ins.text(rel); name = p.name
-        if f"docs/{name}" not in files:
-            files[f"docs/{name}"] = text.encode()
-            docs.append({"id": p.stem, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}"})
+        if f"docs/{name}.txt" not in files:
+            files[f"docs/{name}.txt"] = text.encode()
+            docs.append({"id": p.stem, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}.txt"})
         did = next((d["id"] for d in docs if d["path"] == rel), p.stem)
         specs.append({"id": did, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "path": rel, "sha256": ins.seen[rel]["sha256"]})
     measured = []
@@ -385,14 +387,14 @@ def build() -> dict[str, bytes]:
         text = ins.text(rel)
         meta = doc_meta(rel, text)
         meta["sha256"] = ins.seen[rel]["sha256"]
-        meta["href"] = f"data/docs/{p.name}"
+        meta["href"] = f"data/docs/{p.name}.txt"
         docs.append(meta)
-        files[f"docs/{p.name}"] = text.encode()
+        files[f"docs/{p.name}.txt"] = text.encode()
     for rel, ident, title in (("specs/SPEC-005-agentic-engineering-demo.md", "SPEC-005", "SPEC-005 Agentic engineering on a shared biological frontier"),
                               ("docs/mcp.md", "mcp", "Frontier MCP server")):
         name = Path(rel).name
-        docs.append({"id": ident, "title": title, "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}"})
-        files[f"docs/{name}"] = ins.read(rel)
+        docs.append({"id": ident, "title": title, "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}.txt"})
+        files[f"docs/{name}.txt"] = ins.read(rel)
 
     # The label is a digest of the input hashes, not a git revision: a commit or merge cannot make --check stale.
     lean_receipt, simulation = recorded_results(ins, files)
@@ -440,7 +442,7 @@ def build() -> dict[str, bytes]:
 
 
 def write(out: dict[str, bytes]) -> None:
-    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print"):
+    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results"):
         if d.exists():
             shutil.rmtree(d)
     for name, b in out.items():
@@ -453,7 +455,7 @@ def check(out: dict[str, bytes]) -> list[str]:
     at = lambda n: SITE / n[1:] if n.startswith("@") else DATA / n
     stale = [n for n, b in out.items() if not at(n).exists() or at(n).read_bytes() != b]
     extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
-    pr = [("@artifacts/print/" + p.relative_to(SITE / "artifacts/print").as_posix()) for p in (SITE / "artifacts/print").rglob("*") if p.is_file()] if (SITE / "artifacts/print").exists() else []
+    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
     return stale + [f"unexpected {e}" for e in extra if e not in out] + [f"unexpected {e}" for e in pr if e not in out]
 
 

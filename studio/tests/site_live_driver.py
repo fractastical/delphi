@@ -43,7 +43,7 @@ with sync_playwright() as p:
     total = int(pg.locator("#counts tr", has_text="Total").inner_text().split()[-1]); print("LIVE COUNT total records:", total); assert total >= 28
     assert "not independent observations" in pg.locator("#counts").inner_text()
     assert "No agents, leases or contributions are displayed" not in ev and "KIND" in ev.upper() and pg.locator("#events tbody tr").count() > 0, "seeded events were not rendered"
-    pg.goto(base + "/index.html#/evidence"); expect(pg.locator("#artifacts")).not_to_have_text("Loading…", timeout=15000)
+    pg.goto(base + "/index.html#/evidence?tab=artifacts"); expect(pg.locator("#artifacts")).not_to_have_text("Loading…", timeout=15000)
     print("artifacts rows:", pg.locator("#artifacts tbody tr").count())
     pg.goto(base + "/index.html#/engineering"); pg.wait_for_selector("#candform")
     pg.locator("details.adv summary").click()                          # advanced settings are collapsed by default
@@ -139,6 +139,15 @@ with sync_playwright() as p:
     kc = pg.locator("#cbrowse .count").inner_text(); print("CLAIM BROWSER:", kc); assert "read from the live node" in kc and int(kc.split(" ")[0]) >= 21
     pg.goto(base + "/index.html#/graph/Problem/F001"); pg.wait_for_selector("#gv .g-node", timeout=20000)
     gt = pg.locator("#gwrap").inner_text(); print("GRAPH:", gt[:120].replace("\n", " ")); assert pg.locator("#gv .g-node").count() >= 2, "F001 depends on F004: two nodes expected"
+    import hashlib as _h
+    snap2 = json.loads(open(__file__.replace("tests/site_live_driver.py", "site/data/snapshot.json")).read()); bad = []
+    for dd in snap2["documents"]:
+        r = pg.context.request.get(base + "/" + dd["href"])
+        if r.status != 200 or _h.sha256(r.body()).hexdigest() != dd["sha256"]: bad.append((dd["href"], r.status))
+    for f in (snap2.get("simulation") or {}).get("files", []):
+        r = pg.context.request.get(base + "/" + f["href"])
+        if r.status != 200 or _h.sha256(r.body()).hexdigest() != f["sha256"]: bad.append((f["href"], r.status))
+    print("DOCS/DOWNLOADS served with declared bytes:", len(snap2["documents"]) + len((snap2.get("simulation") or {}).get("files", [])) - len(bad), "bad:", bad); assert not bad, bad
     att = pg.context.request.get(base + "/api/attention"); print("ATTENTION", att.status, att.text()[:160].replace("\n", " ")); assert att.status in (200, 503)
     assert not errs, errs
     print("ALL LIVE CHECKS PASSED"); b.close()

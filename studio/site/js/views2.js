@@ -352,6 +352,7 @@
   /* ---------------- EVIDENCE ---------------- */
   const readClass = (rl) => (/^full-text/.test(rl) ? "full-text" : /^abstract/.test(rl) ? "abstract" : /parsed/.test(rl) ? "parsed data" : "summary / listing / unread");
   DF.views.evidence = function (snap, route) {
+    if (route.params.tab === "artifacts") return artifactsTab(snap, route);
     const m = snap.mission; const f = { rl: route.params.rl || "" };
     const srcs = m.sources.filter((s) => !f.rl || readClass(s.read_level) === f.rl);
     const classes = [...new Set(m.sources.map((s) => readClass(s.read_level)))];
@@ -361,7 +362,7 @@
       ...m.data_inventory.filter((d) => /not found/.test(d.state)).map((d) => ({ t: d.what, w: d.detail, id: null })),
     ];
     return {
-      html: html`<section class="pagehead"><h1>Evidence</h1><p class="lede">Sources with the grade at which each was actually read, disagreements kept visible, and replayable results, including the one that stopped. Open any source to see what the page rests on.</p></section>
+      html: html`<section class="pagehead"><h1>Evidence</h1><p class="lede">Sources with the grade at which each was actually read, disagreements kept visible, and replayable results, including the one that stopped. Open any source to see what the page rests on.</p><nav class="flow" aria-label="Evidence sections"><ol>${[["ev-s", "Sources"], ["ev-d", "Disagreement"], ["ev-r", "Replayable results"], ["ev-att", "Curation example"], ["ev-a", "Artifacts"], ["ev-n", "Not obtained"]].map(([id, t]) => html`<li><button type="button" class="btn small ghost" data-scroll="${id}">${t}</button></li>`)}</ol></nav></section>
 
       <section class="panel" aria-labelledby="ev-s"><h2 id="ev-s">Sources</h2>
         <form class="filters" data-form="evidence" aria-label="Filter sources"><label>Read level <select name="rl"><option value="">all</option>${classes.map((c) => html`<option ${c === f.rl ? raw("selected") : ""}>${c}</option>`)}</select></label><button class="btn" type="submit">Apply</button>${f.rl ? html`<a class="btn ghost" href="${DF.href("/evidence")}">Clear</a>` : ""}</form>
@@ -379,11 +380,8 @@
 
       ${attestationSection(snap)}
 
-      <section class="panel" aria-labelledby="ev-a"><h2 id="ev-a">Artifacts index</h2>
-        <p class="note small">Data, proofs, simulations, geometry, code and documents, each with its exact source, the context it was made in, the check it passed or failed, any dispute, and the next action. A digest in a record is a declaration, not a byte verification.</p>
-        <p class="small" id="artsummary" role="status"></p>
-        <form class="filters" data-form="evidence" aria-label="Filter artifacts"><label>Type <select name="at"><option value="">all</option>${["data", "proof", "simulation", "geometry", "protocol", "code", "document"].map((t) => html`<option ${t === (route.params.at || "") ? raw("selected") : ""}>${t}</option>`)}</select></label><input type="hidden" name="rl" value="${f.rl}"><button class="btn" type="submit">Apply</button></form>
-        <div id="artifacts" role="status">Loading…</div></section>
+      <section class="panel" aria-labelledby="ev-a"><h2 id="ev-a">Artifacts</h2><p class="small" id="artsummary" role="status">Counting…</p>
+        <p><a class="btn" href="${DF.href("/evidence", { tab: "artifacts" })}">Open the artifacts index</a></p></section>
 
       <section class="panel" aria-labelledby="ev-n"><h2 id="ev-n">What could not be obtained</h2>
         <p class="note small">Unread sources and unfound data are first-class: they bound what any constraint here can claim.</p>
@@ -391,17 +389,43 @@
         <h3>Data inventory (exocoetid)</h3><div class="tablewrap"><table><thead><tr><th>Dataset</th><th>State</th><th>Detail</th></tr></thead><tbody>${m.data_inventory.map((d) => html`<tr><td>${d.what}</td><td>${U.pill(d.state, /not found/.test(d.state) ? "no" : "ok")}</td><td>${d.detail}</td></tr>`)}</tbody></table></div>
         <p class="small faint">${dataStates(m.data_inventory)}</p></section>`,
       async after(root) {
-        DF.bindForm(root, "evidence", (v) => DF.href("/evidence", v));
-        const host = root.querySelector("#artifacts"); const want = route.params.at || "";
-        const rows = DF.artifactIndex(snap);
-        try { const r = await DF.api.artifacts({ limit: 50 }); rows.push(...DF.liveArtifacts(r.items)); } catch (e) { rows.push({ title: "Runtime artifacts could not be read", type: "document", source: e.message, context: "", check: "", dispute: "", next: "", error: true }); }
-        const byType = rows.reduce((o, r) => ((o[r.type] = (o[r.type] || 0) + 1), o), {}); const dl = rows.filter((r) => r.download).length;
-        root.querySelector("#artsummary").textContent = `${rows.length} artifacts indexed: ${Object.entries(byType).map(([t, n]) => `${n} ${t}`).join(", ")}. ${dl} offer a file that is present and hash-checked in this build; the rest are declared pointers. The ${(snap.print_forms ? snap.print_forms.forms.length : 0)} print forms, ${(snap.simulation_manifests || []).filter((m) => m.video_state === "present_verified").length} verified videos and ${snap.simulation ? snap.simulation.files.length : 0} simulation result files are listed under Studio, Engineering and Simulations with their own checks.`;
-        const shown = rows.filter((r) => !want || r.type === want);
-        host.innerHTML = shown.length ? html`<div class="tablewrap"><table class="arttable"><thead><tr><th>Artifact</th><th>Type</th><th>Exact source</th><th>Context</th><th>Check</th><th>Dispute</th><th>Next action</th></tr></thead><tbody>${shown.map((r) => html`<tr><td>${r.doc ? U.src("doc:" + r.doc, r.title) : r.title}</td><td>${U.pill(r.type, "ev")}</td><td>${r.url ? U.ext(r.url, r.source) : r.source}</td><td>${clipCell(r.context)}</td><td>${clipCell(r.check)}</td><td>${clipCell(r.dispute || "")}</td><td>${clipCell(r.next)}${r.download ? html` <a class="btn small ghost" href="${r.download}" target="_blank" rel="noopener noreferrer" download>Download file</a>` : r.doc ? "" : html` <span class="faint small">no downloadable file is declared</span>`}</td></tr>`)}</tbody></table></div>`.toString() : `<p class="empty">No ${esc(want || "")} artifact is indexed. Nothing is shown in its place.</p>`;
+        DF.bindForm(root, "evidence", (x) => DF.href("/evidence", x));
+        root.querySelectorAll("[data-scroll]").forEach((b) => b.addEventListener("click", () => { const t = root.querySelector("#" + b.dataset.scroll); if (t) { t.scrollIntoView({ block: "start" }); t.setAttribute("tabindex", "-1"); t.focus({ preventScroll: true }); } }));
+        const rows = await artifactRows(snap);
+        root.querySelector("#artsummary").textContent = artSummary(snap, rows);
       },
     };
   };
+
+  async function artifactRows(snap) {
+    const rows = DF.artifactIndex(snap);
+    try { const r = await DF.api.artifacts({ limit: 50 }); rows.push(...DF.liveArtifacts(r.items)); } catch (e) { rows.push({ title: "Runtime artifacts could not be read", type: "document", source: e.message, context: "", check: "", dispute: "", next: "", error: true }); }
+    return rows;
+  }
+  function artSummary(snap, rows) {
+    const byType = rows.reduce((o, r) => ((o[r.type] = (o[r.type] || 0) + 1), o), {}); const dl = rows.filter((r) => r.download).length;
+    return `${rows.length} artifacts indexed: ${Object.entries(byType).map(([t, n]) => `${n} ${t}`).join(", ")}. ${dl} offer a file that is present and hash-checked in this build; the rest are declared pointers. The ${(snap.print_forms ? snap.print_forms.forms.length : 0)} print forms, ${(snap.simulation_manifests || []).filter((m) => m.video_state === "present_verified").length} verified videos and ${snap.simulation ? snap.simulation.files.length : 0} simulation result files are shown under Studio, Engineering and Simulations with their own checks.`;
+  }
+
+  /* One line per artifact; the declared context, check, dispute and next action sit in a details element; the shared caveat is stated once. */
+  function artifactsTab(snap, route) {
+    const want = route.params.at || ""; const per = 20; const pg = Math.max(0, +route.params.p || 0);
+    return {
+      html: html`<section class="pagehead"><p class="eyebrow"><a href="${DF.href("/evidence")}">Evidence</a> / artifacts</p><h1>Artifacts index</h1><p class="lede">Data, proofs, simulations, geometry, code and documents. A digest in a record is a declaration, not a byte verification; a file is offered only when it is present here and matches its hash.</p></section>
+        <section class="panel"><p class="small" id="artsummary" role="status">Loading…</p>
+        <form class="filters" data-form="artf" aria-label="Filter artifacts"><label>Type <select name="at"><option value="">all</option>${["data", "proof", "simulation", "geometry", "protocol", "code", "document"].map((t) => html`<option ${t === want ? raw("selected") : ""}>${t}</option>`)}</select></label><button class="btn" type="submit">Apply</button></form>
+        <div id="artifacts" role="status">Loading…</div></section>`,
+      async after(root) {
+        DF.bindForm(root, "artf", (x) => DF.href("/evidence", { tab: "artifacts", ...x }));
+        const rows = await artifactRows(snap); root.querySelector("#artsummary").textContent = artSummary(snap, rows);
+        const shown = rows.filter((r) => !want || r.type === want); const page = shown.slice(pg * per, pg * per + per); const host = root.querySelector("#artifacts"); host.removeAttribute("role");
+        const lnk = (p) => DF.href("/evidence", { tab: "artifacts", at: want, p });
+        host.innerHTML = shown.length ? html`<div class="tablewrap"><table class="arttable"><thead><tr><th>Artifact</th><th>Type</th><th>Source</th><th>Details</th></tr></thead><tbody>${page.map((r) => html`<tr><td>${r.doc ? U.src("doc:" + r.doc, r.title) : r.title}</td><td>${U.pill(r.type, "ev")}</td><td class="small">${r.url ? U.ext(r.url, String(r.source).slice(0, 60)) : String(r.source).slice(0, 90)}${r.download ? html` <a class="btn small ghost" href="${r.download}" target="_blank" rel="noopener noreferrer" download>Download file</a>` : ""}</td>
+            <td><details><summary class="small">context, check, dispute, next action</summary><p class="small"><b>Context.</b> ${r.context}</p><p class="small"><b>Check.</b> ${r.check}</p>${r.dispute ? html`<p class="small"><b>Dispute.</b> ${r.dispute}</p>` : ""}<p class="small"><b>Next.</b> ${r.next}</p></details></td></tr>`)}</tbody></table></div>
+          <p class="pager">${pg > 0 ? html`<a class="btn small ghost" href="${lnk(pg - 1)}">Previous</a>` : ""} <span class="small">Page ${pg + 1} of ${Math.max(1, Math.ceil(shown.length / per))} (${shown.length} artifacts)</span> ${(pg + 1) * per < shown.length ? html`<a class="btn small" href="${lnk(pg + 1)}">Next</a>` : ""}</p>`.toString() : `<p class="empty">No ${esc(want || "")} artifact is indexed. Nothing is shown in its place.</p>`;
+      },
+    };
+  }
   /* Long declared text stays available but does not take over the page: first 220 characters, the rest in a details element. */
   function clipCell(text, n = 220) {
     const t = String(text ?? ""); if (t.length <= n) return t;

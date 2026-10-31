@@ -450,3 +450,39 @@ def test_graph_view_exists_is_keyboard_operable_and_says_how_it_was_built(browse
     assert "Open the page" in pg.locator("#gdetail").inner_text()
     pg.goto(base + "#/graph/Claim/no-such")
     pg.wait_for_selector("text=could not be built", timeout=15000)
+
+
+def test_snapshot_document_and_download_links_use_types_the_runtime_serves(browser, base):
+    """Regression for the live 404s: the runtime serves .md and .csv only in narrow places, so documents ship as .txt and CSVs live under artifacts/."""
+    import os
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    hrefs = [d["href"] for d in snap["documents"]]
+    sim = snap.get("simulation") or {}
+    hrefs += [f["href"] for f in sim.get("files", [])] + [f["href"] for f in (sim.get("controlled") or {}).get("files", [])]
+    for h in hrefs:
+        assert (ROOT / "site" / h).is_file(), h
+        ext = os.path.splitext(h)[1]
+        assert ext != ".md", h
+        assert ext != ".csv" or h.startswith("artifacts/"), h
+    pg = page(browser)
+    pg.goto(base + "#/evidence?src=doc:2026-10-31-oca2-exon21-molino-RESULT")
+    pg.wait_for_selector("#drawer:not([hidden]) .md", timeout=15000)
+
+
+def test_live_style_question_table_row_click_and_id_not_wrapped(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector("#livepanel h2")
+    # snapshot mode shows no live table; the curated table keeps ids on one line and rows are links
+    h = pg.evaluate("() => { const a = document.querySelector('.qtable td:first-child a'); return a ? a.getBoundingClientRect().height : 0; }")
+    assert 0 < h < 30, h
+
+
+def test_evidence_overview_is_short_and_artifacts_have_their_own_paged_tab(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/evidence")
+    pg.wait_for_selector("#ev-a")
+    assert pg.evaluate("document.documentElement.scrollHeight") < 8000
+    pg.click("a:has-text('Open the artifacts index')")
+    pg.wait_for_selector("#artifacts table", timeout=15000)
+    assert pg.locator("#artifacts tbody tr").count() <= 20

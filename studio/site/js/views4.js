@@ -19,7 +19,7 @@
   function overview(snap, S, live) {
     const open = S.goal_checklist.filter((g) => !g.done).length;
     return { html: html`<section class="panel"><h2>Where this stands</h2>
-      <dl class="kv"><div><dt>Snapshot</dt><dd>${snap.label}</dd></div><div><dt>Runtime</dt><dd>${live ? "live, signed in" : DF.api.state.mode === "live" ? "reachable, not signed in" : "none (snapshot only)"}</dd></div>
+      <dl class="kv"><div><dt>Snapshot</dt><dd>${snap.label}</dd></div><div><dt>Runtime</dt><dd>${DF.api.state.authenticated ? "live, signed in" : DF.api.state.mode === "live" && DF.api.state.publicAccess ? "live, public read-only (not signed in)" : DF.api.state.mode === "live" ? "reachable, not signed in" : "none (snapshot only)"}</dd></div>
         <div><dt>Deployed commit</dt><dd id="depsha">${live ? "asking the runtime…" : "not reported: a snapshot cannot know it"}</dd></div></dl>
       <p class="note small">The deployed commit is shown only if the runtime's own system report states it. This page never infers it from the snapshot.</p></section>
       <section class="panel"><h2>Goal checklist ${AUTHOR}</h2><p class="small faint">From <code>GOAL.md</code>. A ticked box is the authors' report; ${open} of ${S.goal_checklist.length} are unticked. What a receipt backs is under <a href="${DF.href("/work", { tab: "receipts" })}">Receipts</a>.</p>

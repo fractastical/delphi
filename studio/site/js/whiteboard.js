@@ -78,7 +78,7 @@
     if (e) return html`<article class="detail"><p class="eyebrow">Edge · ${e.kind}</p><h3>${e.label}</h3><p class="note small">${{ requires: "The goal is only satisfied if this constraint holds.", "grounded in": "A threshold taken from a source, at that source's read level.", "limited by": "The constraint cannot be strengthened or trusted further until the question is settled.", about: "The question concerns this source or claim.", blocks: "A dependency between questions." }[e.kind]}</p></article>`;
     const q = mdl.qs.find((x) => x.id === sel);
     if (q) return questionDetail(q, snap, mdl);
-    return html`<p class="empty">Nothing in this snapshot has the id “${sel}”. Clear the selection to return to the board.</p>`;
+    return html`<p class="empty">The curated board has no entry with the id “${sel}”. If it is a question in the live node it is in the Questions panel above. Clear the selection to return to the board.</p>`;
   }
 
   function questionDetail(q, snap, mdl) {
@@ -133,15 +133,16 @@
     if (!(DF.api.isLive())) { host.innerHTML = html`<section class="panel"><h2>Questions ${U.pill("snapshot", "warn")}</h2><p class="small">Only the curated snapshot projection below is available: ${DF.api.state.mode === "live" ? "the runtime is reachable but this session is not signed in." : "no runtime answered."} The live store's questions appear here when the runtime is reachable and you are signed in.</p></section>`.toString(); return; }
     host.innerHTML = '<section class="panel"><h2>Questions</h2><p role="status">Loading the live questions…</p></section>';
     let L; try { L = await liveRows(); } catch (e) { host.innerHTML = html`<section class="panel"><h2>Questions</h2><p class="empty">The live questions could not be read: ${e.message}. Nothing is shown in their place.</p></section>`.toString(); return; }
-    const f = { lq: route.params.lq || "", lk: route.params.lk || "", lc: route.params.lc || "", la: route.params.la || "", lw: route.params.lw || "", n: Math.max(40, +route.params.n || 40) };
-    const sel = route.params.live || null; const rows = L.rows;
+    const f = { lq: route.params.lq || "", lk: route.params.lk || "", lc: route.params.lc || "", la: route.params.la || "", lw: route.params.lw || "", ls: route.params.ls || "", n: Math.max(40, +route.params.n || 40) };
+    const rows = L.rows; const sel = route.params.live || (route.parts[1] && L.rows.some((r) => r.id === route.parts[1]) ? route.parts[1] : null);
     const owner = (r) => (r.actions ? [...new Set(r.actions.filter((x) => x.lease_live_at_now && x.lease_operator).map((x) => x.lease_operator))] : null);
     const match = (r) => (!f.lk || r.kind === f.lk) && (!f.lc || r.completeness === f.lc) && (!f.la || (r.approach || "none") === f.la) && (!f.lw || (f.lw === "leased" ? (owner(r) || []).length : f.lw === "actions" ? (r.actions || []).length : true)) && (!f.lq || JSON.stringify([r.id, r.question, r.known, r.tags, r.title]).toLowerCase().includes(f.lq.toLowerCase()));
-    const list = rows.filter(match); const shown = list.slice(0, f.n);
+    const info = (r) => (r.completeness === "actionable" ? 4 : 0) + ((r.actions || []).length ? 2 : 0) + (r.approach ? 1 : 0);
+    const list = rows.filter(match).sort(f.ls === "id" ? (a, b) => String(a.id).localeCompare(String(b.id)) : (a, b) => info(b) - info(a) || String(a.id).localeCompare(String(b.id))); const shown = list.slice(0, f.n);
     const uniq = (k) => [...new Set(rows.map((r) => r[k] || (k === "approach" ? "none" : "")).filter(Boolean))].sort();
     const hrefF = (extra) => DF.href("/frontier", { ...route.params, ...extra });
-    const cur = rows.find((r) => r.id === sel);
-    const row = (r) => { const o = owner(r); return html`<tr class="${r.id === sel ? "on" : ""}"><td><a href="${hrefF({ live: r.id })}" aria-current="${r.id === sel ? "true" : "false"}"><b>${r.id}</b></a></td><td>${r.title || ""}${r.title ? html`<br>` : ""}<span class="small">${String(r.question || "").slice(0, 160)}${String(r.question || "").length > 160 ? "…" : ""}</span></td><td>${U.pill(String(r.completeness || "not stated"), r.completeness === "actionable" ? "ok" : "st-unk")}</td><td>${r.approach ? U.pill(r.approach, "ap-" + r.approach) : html`<span class="faint small">not stated</span>`}</td><td>${o === null ? html`<span class="faint small">needs attention layer</span>` : o.length ? o.join(", ") : html`<span class="faint small">none recorded</span>`}</td><td>${r.actions === null ? "" : (r.actions || []).length}</td></tr>`; };
+    const cur = rows.find((r) => r.id === sel) || shown[0]; const effSel = cur ? cur.id : null;
+    const row = (r) => { const o = owner(r); return html`<tr class="${r.id === effSel ? "on" : ""}" data-href="${hrefF({ live: r.id })}"><td><a href="${hrefF({ live: r.id })}" aria-current="${r.id === effSel ? "true" : "false"}"><b>${r.id}</b></a></td><td><a class="qlink" href="${hrefF({ live: r.id })}">${r.title || ""}${r.title ? html`<br>` : ""}<span class="small">${String(r.question || "").slice(0, 160)}${String(r.question || "").length > 160 ? "…" : ""}</span></a></td><td>${U.pill(String(r.completeness || "not stated"), r.completeness === "actionable" ? "ok" : "st-unk")}</td><td>${r.approach ? U.pill(r.approach, "ap-" + r.approach) : html`<span class="faint small">not stated</span>`}</td><td>${o === null ? html`<span class="faint small">needs attention layer</span>` : o.length ? o.join(", ") : html`<span class="faint small">none recorded</span>`}</td><td>${r.actions === null ? "" : (r.actions || []).length}</td></tr>`; };
     const det = cur ? liveDetail(cur) : html`<div class="detail-empty"><h3>Select a question</h3><p>Pick a row to see what the store declares about it: state, who holds a live lease, actions, dependents, and why it is ranked where it is.</p></div>`;
     host.innerHTML = html`<section class="panel livepanel" aria-labelledby="lq-h"><h2 id="lq-h">Questions ${U.pill("live", "ok")} <span class="faint small">${rows.length} in the node${L.source === "attention" ? ", via the attention layer" : ", via the catalog (attention layer unavailable, so no owners or actions)"}</span></h2>
       <p class="small faint">Read just now from the runtime${L.generated_at ? " (" + L.generated_at + ")" : ""}. This is the store's own list, separate from the curated mission projection below. A count of records is not a measure of progress, and priority is not truth.</p>
@@ -150,11 +151,13 @@
         <label>Completeness <select name="lc"><option value="">all</option>${uniq("completeness").map((k) => html`<option ${k === f.lc ? raw("selected") : ""}>${k}</option>`)}</select></label>
         <label>Approach <select name="la"><option value="">all</option>${uniq("approach").map((k) => html`<option ${k === f.la ? raw("selected") : ""}>${k}</option>`)}</select></label>
         ${L.source === "attention" ? html`<label>Work <select name="lw"><option value="">any</option><option value="leased" ${f.lw === "leased" ? raw("selected") : ""}>live lease held</option><option value="actions" ${f.lw === "actions" ? raw("selected") : ""}>has an action</option></select></label>` : ""}
-        <input type="hidden" name="live" value="${sel || ""}"><button class="btn" type="submit">Apply</button>${f.lq || f.lk || f.lc || f.la || f.lw ? html`<a class="btn ghost" href="${DF.href("/frontier", sel ? { live: sel } : {})}">Clear</a>` : ""}</form>
+        <label>Sort <select name="ls"><option value="">most informative first</option><option value="id" ${f.ls === "id" ? raw("selected") : ""}>id</option></select></label><input type="hidden" name="live" value="${sel || ""}"><button class="btn" type="submit">Apply</button>${f.lq || f.lk || f.lc || f.la || f.lw ? html`<a class="btn ghost" href="${DF.href("/frontier", sel ? { live: sel } : {})}">Clear</a>` : ""}</form>
+      <p class="small">${(() => { const rec = rows.filter((r) => r.completeness !== "actionable").length; return `${rec} of ${rows.length} are recorded only: the store keeps a question as recorded until it has acceptance criteria, falsifiers, a next action and stop bounds, and refuses an action against it until then. Approach, scales and tags are shown only when the record states them.`; })()}</p>
       <p class="count" role="status">${list.length} of ${rows.length} shown (${shown.length} on screen)</p>
       <div class="split graphsplit"><div class="tablewrap"><table class="qtable"><thead><tr><th>Id</th><th>Question</th><th>Completeness</th><th>Approach</th><th>Live lease holder</th><th>Actions</th></tr></thead><tbody>${shown.map(row)}</tbody></table>
         ${list.length > shown.length ? html`<p><a class="btn small" href="${hrefF({ n: f.n + 60 })}">Show 60 more</a></p>` : ""}</div><div class="detail-col" id="lqdetail" tabindex="-1">${det}</div></div></section>`.toString();
     DF.bindForm(host, "frontier", (vals) => DF.href("/frontier", vals)); DF.renderMath(host);
+    host.querySelectorAll("tr[data-href]").forEach((tr) => tr.addEventListener("click", (e) => { if (e.target.closest("a")) return; DF.go(tr.dataset.href); }));
   };
 
   function liveDetail(r) {
