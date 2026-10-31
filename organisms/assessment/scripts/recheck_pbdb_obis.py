@@ -98,6 +98,23 @@ PHYLUM_ALIASES = {
     "ectoprocta": {"bryozoa"},
 }
 
+# Class names that differ only by classification scheme between GBIF/Wikidata and PBDB/WoRMS.
+CLASS_ALIASES = {
+    "actinopterygii": {"osteichthyes", "actinopteri", "teleostei"},
+    "actinopteri": {"osteichthyes", "actinopterygii", "teleostei"},
+    "teleostei": {"osteichthyes", "actinopterygii", "actinopteri"},
+    "osteichthyes": {"actinopterygii", "actinopteri", "sarcopterygii", "teleostei"},
+    "sarcopterygii": {"osteichthyes"},
+    "elasmobranchii": {"chondrichthyes"},
+    "chondrichthyes": {"elasmobranchii"},
+    "reptilia": {"sauropsida"},
+    "sauropsida": {"reptilia"},
+    "aves": {"reptilia", "sauropsida"},
+    "anthozoa": {"octocorallia", "hexacorallia"},
+    "octocorallia": {"anthozoa"},
+    "hexacorallia": {"anthozoa"},
+}
+
 PBDB_SHOW_CLASS = "class,size"
 
 
@@ -464,10 +481,53 @@ def phyla_equal(a: str | None, b: str | None) -> bool | None:
     return b in PHYLUM_ALIASES.get(a, set()) or a in PHYLUM_ALIASES.get(b, set())
 
 
+def classes_equal(a: str | None, b: str | None) -> bool | None:
+    if not a or not b:
+        return None
+    a, b = a.lower(), b.lower()
+    if a == b:
+        return True
+    return b in CLASS_ALIASES.get(a, set()) or a in CLASS_ALIASES.get(b, set())
+
+
 HIGH_RANKS = {"kingdom", "subkingdom", "infrakingdom", "superphylum", "phylum", "subphylum", "infraphylum", "unranked", "clade", "informal group", "grade (paraphyletic)", "grade (obsolete)", "superclass"}
 
 
-def compare_taxon(expected: dict | None, observed: dict | None) -> dict:
+def clean_rank_value(v: str | None) -> str | None:
+    """PBDB uses NO_PHYLUM_SPECIFIED etc. for unplaced taxa; treat those as unknown."""
+    if not v or str(v).upper().startswith("NO_"):
+        return None
+    return v
+
+
+def lineage_agreement(expected: dict, observed: dict) -> int:
+    """Number of lineage levels (phylum, class, order) on which the two agree; -1 on conflict."""
+    lineage = expected.get("lineage") or {}
+    obs_name = (observed.get("name") or "").lower()
+    score = 0
+    for level in ("phylum", "class", "order"):
+        e = lineage.get(level)
+        o = clean_rank_value(observed.get(level))
+        if not e or not o:
+            continue
+        if e.lower() == obs_name:
+            # the taxon is itself the expected phylum/class/order
+            score += 1
+            continue
+        if level == "phylum":
+            same = phyla_equal(e, o)
+        elif level == "class":
+            same = classes_equal(e, o)
+        else:
+            same = e.lower() == o.lower()
+        if same:
+            score += 1
+        else:
+            return -1
+    return score
+
+
+def compare_taxon(expected: dict | None, observed: dict | None, homonyms: list[dict] | None = None) -> dict:
     """Compare the record's taxon with what the database returned for the query."""
     out = {"name_match": None, "lineage_match": None, "note": None}
     if not expected or not observed:
@@ -479,8 +539,26 @@ def compare_taxon(expected: dict | None, observed: dict | None) -> dict:
     exp_class = lineage.get("class")
     obs_names = {(observed.get("name") or "").lower(), (observed.get("accepted_name") or "").lower()} - {""}
     out["name_match"] = exp_name in obs_names if exp_name else None
-    obs_phylum = observed.get("phylum")
-    obs_class = observed.get("class")
+    obs_phylum = clean_rank_value(observed.get("phylum"))
+    obs_class = clean_rank_value(observed.get("class"))
+    if homonyms and len(homonyms) > 1:
+        # The database picked one of several taxa with this name; check it is the one
+        # whose lineage (phylum/class/order) fits the record's taxon best.
+        scored = [(lineage_agreement(expected, h), h) for h in homonyms]
+        best_score = max(s for s, _ in scored)
+        chosen = next((s for s, h in scored if h.get("oid") == observed.get("oid")), None)
+        if chosen is not None and chosen < 0 and best_score >= 1:
+            best = next(h for s, h in scored if s == best_score)
+            out["lineage_match"] = False
+            out["note"] = (
+                f"'{observed.get('name')}' is a homonym; the query resolved to {observed.get('oid')} "
+                f"(phylum {obs_phylum}, class {obs_class}, order {clean_rank_value(observed.get('order'))}) but "
+                f"{best.get('oid')} (phylum {clean_rank_value(best.get('phylum'))}, class {clean_rank_value(best.get('class'))}, "
+                f"order {clean_rank_value(best.get('order'))}) fits the record's taxon {expected.get('accepted_name')} "
+                f"(order {lineage.get('order')})"
+            )
+            out["wrong_homonym"] = {"resolved": observed.get("oid"), "better": best.get("oid"), "better_noc": best.get("noc")}
+            return out
     if exp_name and (observed.get("name") or "").lower() == exp_name and (exp_rank in HIGH_RANKS or exp_phylum is None or exp_phylum.lower() == exp_name):
         out["lineage_match"] = True
     elif exp_phylum and obs_phylum:
@@ -490,7 +568,7 @@ def compare_taxon(expected: dict | None, observed: dict | None) -> dict:
     elif exp_phylum and (observed.get("name") or "").lower() == exp_phylum.lower():
         out["lineage_match"] = True
     elif exp_class and obs_class:
-        out["lineage_match"] = exp_class.lower() == obs_class.lower()
+        out["lineage_match"] = classes_equal(exp_class, obs_class)
     if out["lineage_match"] is False:
         out["note"] = (
             f"record taxon {expected.get('accepted_name')} (phylum {exp_phylum}, class {exp_class}) vs database taxon "
@@ -572,32 +650,40 @@ def match_counts(record: dict, dists: list[dict], lookups: dict[int, dict]) -> l
             "match_method": None,
             "kind": ctype,
         }
+        # Aggregates over a merged record are restricted to the slice the count came from.
+        scope = dists
+        scope_note = ""
+        if c.get("slice") and any(d.get("slice") for d in dists):
+            scoped = [d for d in dists if d.get("slice") == c["slice"]]
+            if scoped:
+                scope = scoped
+                scope_note = f" (restricted to the {len(scoped)} distributions of slice {c['slice']})"
         if ctype == "agg-count":
             desc = (c.get("description") or "").lower()
             if "extinct" in desc:
-                vals = [d["observed"].get("n_extinct") for d in dists if d["info"]["kind"] in ("pbdb-taxa-list", "pbdb-taxa-single")]
+                vals = [d["observed"].get("n_extinct") for d in scope if d["info"]["kind"] in ("pbdb-taxa-list", "pbdb-taxa-single")]
                 entry["observed"] = sum(v for v in vals if v is not None) if vals else None
-                entry["match_method"] = "number of returned taxa with ext=0"
+                entry["match_method"] = "number of returned taxa with ext=0" + scope_note
             elif "at least one" in desc or "with an occurrence" in desc or "with fossil occurrences" in desc:
-                entry["observed"] = sum(1 for d in dists if (d["observed"].get("count") or 0) > 0)
-                entry["match_method"] = "number of distributions whose observed count > 0"
+                entry["observed"] = sum(1 for d in scope if (d["observed"].get("count") or 0) > 0)
+                entry["match_method"] = "number of distributions whose observed count > 0" + scope_note
             elif "taxon record" in desc or "returned" in desc or "resolved" in desc or "taxon_no" in desc:
-                if any(d["info"]["kind"] == "pbdb-taxa-list" for d in dists):
-                    entry["observed"] = sum(d["observed"].get("n_records") or 0 for d in dists if d["info"]["kind"] == "pbdb-taxa-list")
-                    entry["match_method"] = "number of taxon records returned by taxa/list"
+                if any(d["info"]["kind"] == "pbdb-taxa-list" for d in scope):
+                    entry["observed"] = sum(d["observed"].get("n_records") or 0 for d in scope if d["info"]["kind"] == "pbdb-taxa-list")
+                    entry["match_method"] = "number of taxon records returned by taxa/list" + scope_note
                 else:
-                    entry["observed"] = sum(1 for d in dists if d["observed"].get("ok"))
-                    entry["match_method"] = "number of distributions that resolved to a record"
+                    entry["observed"] = sum(1 for d in scope if d["observed"].get("ok"))
+                    entry["match_method"] = "number of distributions that resolved to a record" + scope_note
             else:
-                entry["observed"] = sum(1 for d in dists if d["observed"].get("count") is not None)
-                entry["match_method"] = "number of distributions with an observed count"
+                entry["observed"] = sum(1 for d in scope if d["observed"].get("count") is not None)
+                entry["match_method"] = "number of distributions with an observed count" + scope_note
         elif ctype == "agg-sum":
             desc = (c.get("description") or "")
             use_noc = "noc" in desc.lower()
             kinds = {"pbdb-taxa-single", "pbdb-taxa-list"} if use_noc else {"pbdb-occs-list", "obis-occurrence", "obis-statistics"}
-            pool = [d for d in dists if d["info"]["kind"] in kinds]
+            pool = [d for d in scope if d["info"]["kind"] in kinds]
             if not pool:
-                pool = dists
+                pool = scope
             m = re.search(r"per taxon:\s*(.*)$", desc, flags=re.I)
             if m:
                 names = {re.sub(r"[^a-z0-9]+", "-", x.split("=")[0].strip().lower()).strip("-") for x in m.group(1).split(",") if "=" in x}
@@ -638,6 +724,12 @@ def match_counts(record: dict, dists: list[dict], lookups: dict[int, dict]) -> l
             if not cands and (single_taxon or len(dists) == 1):
                 cands = list(dists)
                 method = "single-taxon record"
+            if not cands and ctype in ("noc", "siz", "exs"):
+                # Taxon-record quantities with no name in the description: the record has a
+                # single taxon record (or taxon lookups) to compare with, so use them all and
+                # let the closest value win.
+                cands = list(dists)
+                method = "no name in description; all distributions considered"
             if len(cands) > 1 and c.get("slice"):
                 same = [d for d in cands if d.get("slice") == c["slice"]]
                 if same:
@@ -887,7 +979,7 @@ def assess_record(record: dict, taxa: dict, sources: dict, client: Client, resol
                 }
         if observed_taxon and observed_taxon.get("name"):
             info["resolved_name"] = observed_taxon["name"]
-        cmp = compare_taxon(exp, observed_taxon)
+        cmp = compare_taxon(exp, observed_taxon, (lk or {}).get("homonyms"))
         multi_id = info["kind"] == "pbdb-taxa-list" and len(info.get("ids") or []) > 1
         tc = {
             "distribution": info["url"],
@@ -919,6 +1011,8 @@ def assess_record(record: dict, taxa: dict, sources: dict, client: Client, resol
             tc["obis_name_lookup"] = lk["name_lookup"]
         if cmp["note"]:
             tc["note"] = cmp["note"]
+        if cmp.get("wrong_homonym"):
+            tc["wrong_homonym"] = cmp["wrong_homonym"]
         if exp and info.get("name") and (exp.get("accepted_name") or "").lower() != info["name"].lower():
             tc["query_differs_from_taxon"] = True
             if record_taxon_lookup is not None:
@@ -983,6 +1077,11 @@ def assess_record(record: dict, taxa: dict, sources: dict, client: Client, resol
             size_consistent = all(x <= 12 for x in diffs)
 
     lineage_mismatch = [t for t in taxon_checks if t["lineage_match"] is False]
+    # Severity: the queried name resolves to an organism with a different name (the record's
+    # taxon is simply not what was counted) is worse than a same-name homonym picked by the
+    # database; and one bad name among many distributions is less damaging than the only one.
+    mismatch_other_name = [t for t in lineage_mismatch if t.get("name_match") is False]
+    mismatch_minor = bool(lineage_mismatch) and len(lineage_mismatch) <= max(1, 0.1 * n_dist) and n_dist >= 10
     not_found = [t for t in taxon_checks if t["found"] is False]
     name_warn = [t for t in taxon_checks if t.get("warnings")]
     invalid = [t for t in taxon_checks if t.get("taxonomic_difference") and any(k in t["taxonomic_difference"] for k in ("nomen", "invalid", "misspelling"))]
@@ -1053,7 +1152,12 @@ def assess_record(record: dict, taxa: dict, sources: dict, client: Client, resol
         completeness -= 0.1
         notes.append("some distributions have no sha256/byte_size")
     if lineage_mismatch:
-        completeness = min(completeness, 0.3)
+        if mismatch_minor:
+            completeness = min(completeness, 0.6)
+        elif mismatch_other_name:
+            completeness = min(completeness, 0.3)
+        else:
+            completeness = min(completeness, 0.35)
     if query_differs:
         label = (record.get("label") or "").lower()
         mentioned = all(name_in_text(t["queried"], label) for t in query_differs if t.get("queried"))
@@ -1076,7 +1180,7 @@ def assess_record(record: dict, taxa: dict, sources: dict, client: Client, resol
     if bad_dois:
         authenticity = min(authenticity, 0.5)
     if lineage_mismatch:
-        authenticity = min(authenticity, 0.5)
+        authenticity = min(authenticity, 0.5 if (mismatch_other_name and not mismatch_minor) else 0.7)
     if ident["status"] == 404 or (ident["resolves"] is False and ident["status"] not in (403, None)):
         authenticity = min(authenticity, 0.0)
     if material and len(material) == len(comparable) and comparable:
@@ -1106,10 +1210,23 @@ def assess_record(record: dict, taxa: dict, sources: dict, client: Client, resol
     for b in bad_dois:
         obstacles.append(f"{b['field']} {b['value']} {b['problem']}.")
     for t in lineage_mismatch:
-        obstacles.append(f"Homonym/mismatch: '{t['queried']}' resolves in {db_label} to {t['resolved_name']} ({t['resolved_id']}, phylum {t['resolved_phylum']}), not to the record's taxon {t['expected_taxon']}.")
+        if t.get("wrong_homonym"):
+            obstacles.append(f"Wrong homonym: {t['note']}; the recorded count is therefore for a different organism.")
+        else:
+            obstacles.append(f"Homonym/mismatch: '{t['queried']}' resolves in {db_label} to {t['resolved_name']} ({t['resolved_id']}, phylum {t['resolved_phylum']}), not to the record's taxon {t['expected_taxon']} ({t['note']}).")
     for t in homonymous:
         if t not in lineage_mismatch:
-            obstacles.append(f"'{t['queried']}' is a homonym in PBDB ({t['n_homonyms_in_pbdb']} taxa share the name); the query resolved to {t['resolved_id']} (phylum {t['resolved_phylum']}), consistent with the record's taxon.")
+            msg = f"'{t['queried']}' is a homonym in PBDB ({t['n_homonyms_in_pbdb']} taxa share the name); the query resolved to {t['resolved_id']} (phylum {t['resolved_phylum']}), consistent with the record's taxon."
+            # A base_name occurrence query matching several taxa counts all of them.
+            d = next((x for x in dists if x["info"]["url"] == t["distribution"]), None)
+            if d and d["info"]["kind"] == "pbdb-occs-list" and d["observed"].get("count") is not None:
+                nocs = [h.get("noc") for h in t.get("homonyms") or []]
+                if all(isinstance(n, int) for n in nocs) and len(nocs) > 1 and d["observed"]["count"] == sum(nocs):
+                    msg += f" The base_name count ({d['observed']['count']}) equals the sum of the homonyms' occurrence counts ({' + '.join(str(n) for n in nocs)}), i.e. it includes every taxon with this name."
+            obstacles.append(msg)
+    for t in lineage_mismatch:
+        if t.get("name_match") is True and not t.get("wrong_homonym"):
+            obstacles.append(f"The record's taxon key {t.get('expected_key')} is a different organism with the same name as the {db_label} taxon actually counted; the dataset describes the {db_label} taxon, so the taxon link (not the count) needs repair.")
     for t in invalid + synonyms:
         obstacles.append(f"'{t['queried']}' is '{t['taxonomic_difference']}' {t.get('accepted_name') or ''} in PBDB; base_name counts are those of the accepted taxon.".replace("  ", " "))
     for t in taxon_checks:
@@ -1142,7 +1259,7 @@ def assess_record(record: dict, taxa: dict, sources: dict, client: Client, resol
     )
     if taxon_checks:
         resolved = [t for t in taxon_checks if t["found"]]
-        consistent = [t for t in resolved if t["lineage_match"] is True or t["name_match"] is True]
+        consistent = [t for t in resolved if t["lineage_match"] is True or (t["name_match"] is True and t["lineage_match"] is None)]
         s = f"{len(resolved)} of {len(taxon_checks)} queried name(s)/id(s) resolve in {db_label}"
         if consistent:
             s += f", {len(consistent)} verifiably to the record's taxon (name or phylum/class agree)"
