@@ -8,7 +8,7 @@
   const BLOCK = /blocked|failed|authentication|repair|requested|pending|recovery|not yet|unknown/i;
 
   DF.views.work = DF.views.system = function (snap, route) {
-    const tab = route.params.tab || "overview"; const S = snap.system; const live = DF.api.state.mode === "live" && DF.api.state.authenticated;
+    const tab = route.params.tab || "overview"; const S = snap.system; const live = DF.api.isLive();
     const nav = html`<nav class="subnav" aria-label="System sections">${TABS.map(([k, t]) => html`<a href="${DF.href("/work", { tab: k })}" aria-current="${tab === k ? "page" : "false"}">${t}</a>`)}</nav>`;
     const head = html`<section class="pagehead"><h1>System</h1><p class="lede">What is being built, by whom, against which spec, and what has actually been measured. Two levels stay apart: ${AUTHOR} (documents and status text) and ${MEAS} (a run with a receipt). Nothing here is live activity, and no step is claimed to have built itself.</p>${nav}</section>`;
     const body = { overview, specs, work, resources, receipts, runtime }[tab] || overview;
@@ -43,7 +43,7 @@
       <div class="tablewrap"><table><thead><tr><th>Priority</th><th>Deliverable</th><th>Owner</th><th>Status text</th><th></th></tr></thead><tbody>${rows.map((r) => html`<tr><td>${r.priority}</td><td>${r.deliverable}</td><td>${r.owner}</td><td>${r.status_text}</td><td>${BLOCK.test(r.status_text) ? U.pill("possible bottleneck", "warn") : ""}</td></tr>`)}</tbody></table></div>
       <p class="small faint">Branch names, commit hashes and release path are not in this file, so none is shown. They appear here once the runtime's system report supplies them.</p></section><div id="attn"></div>`,
       async after(root) {
-        if (!(DF.api.state.mode === "live" && DF.api.state.authenticated)) return;
+        if (!(DF.api.isLive())) return;
         const r = await DF.api.attention();
         root.querySelector("#attn").innerHTML = (r.unavailable ? html`<section class="panel"><h2>Attention view</h2><p class="empty">Not available (${r.reason}). Nothing is shown in its place.</p></section>`
           : html`<section class="panel"><h2>Attention view, as received</h2><p class="note small">Built by the attention layer from public stored records and events. Its fields are shown unprocessed: priority here is not truth, and this page has not checked it.</p><pre class="json">${JSON.stringify(r.report, null, 2)}</pre></section>`).toString();

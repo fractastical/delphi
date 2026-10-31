@@ -28,7 +28,7 @@ class Web:
     def __init__(self, store, site, **cfg):
         self.store = store
         cfg.setdefault("cookie_secure", False)
-        self.cfg = WebConfig.with_tokens(GATE, site_dir=site, **cfg)
+        self.cfg = WebConfig.with_tokens(*(() if cfg.get("public_read") else (GATE,)), site_dir=site, **cfg)
         self.server = make_web_server(store, self.cfg)
         self.port = self.server.server_port
         self.thread = Thread(target=self.server.serve_forever, daemon=True)
@@ -121,6 +121,48 @@ def test_public_site_option_opens_only_the_static_shell(store, site):
     try:
         assert w.req("GET", "/", cookie=False)[0] == 200
         assert w.req("GET", "/api/catalog", cookie=False)[0] == 401
+    finally:
+        w.close()
+
+
+def test_public_read_without_gate_opens_public_records_but_never_writes_or_private_data(store, site):
+    from urllib.parse import urlencode
+    public = store.submit(TOKENS["alice"], "public-read", claim(store))["record"]
+    private = store.submit(TOKENS["alice"], "private-read", claim(store, id="private", visibility="private"))["record"]
+    w = Web(store, site, public_read=True)
+    try:
+        assert not w.cfg.gate_tokens
+        for path in ("/", "/app.css", "/api/catalog", "/api/artifacts", "/api/events"):
+            assert w.req("GET", path, cookie=False)[0] == 200
+        assert w.req("GET", "/login")[1]["location"] == "/"
+        assert w.json("POST", "/v1/read/get", {"target": ref(public)}, cookie=False)[0] == 200
+        assert w.req("GET", "/api/record?" + urlencode(ref(private)), cookie=False)[0] == 404
+        assert b'"private"' not in w.req("GET", "/api/catalog", cookie=False)[2]
+        for path in ("/v1/proposals", "/v1/reviews", "/v1/import", "/v1/actions/lease", "/v1/actions/transition"):
+            assert w.json("POST", path, {}, cookie=False)[0] == 401
+        assert w.req("GET", "/.env", cookie=False)[0] == 404
+    finally:
+        w.close()
+
+
+def test_public_calculation_gets_anonymous_csrf_session_without_operator_permission(store, site):
+    from frontier.web import Route
+    path = "/api/engineering/solve"
+    w = Web(store, site, public_read=True, routes={"POST " + path: Route(lambda req: (200, {"result": req["body"]["x"] + 1}))})
+    try:
+        origin = {"Origin": f"http://127.0.0.1:{w.port}"}
+        assert w.json("POST", path, {"x": 2}, origin)[0] == 401
+        status, session, headers = w.json("GET", "/api/session")
+        assert status == 200 and session["public_access"] is True and session["authenticated"] is False
+        w.cookie = headers["set-cookie"].split(";")[0]
+        assert "HttpOnly" in headers["set-cookie"] and "SameSite=Strict" in headers["set-cookie"]
+        assert w.json("GET", "/api/session")[1]["csrf"] == session["csrf"]
+        assert w.json("POST", path, {"x": 2}, origin)[0] == 403
+        headers = {**origin, "X-CSRF-Token": session["csrf"]}
+        assert w.json("POST", path, {"x": 2}, headers)[:2] == (200, {"result": 3})
+        assert w.json("POST", path, {"x": 2}, {**headers, "Origin": "https://evil.example"})[0] == 403
+        assert w.json("POST", "/v1/proposals", {"draft": claim(store)}, headers)[0] == 401
+        assert w.json("POST", "/v1/proposals", {"draft": claim(store)}, {**headers, "Authorization": "Bearer " + TOKENS["alice"], "Idempotency-Key": "public-bearer"})[0] == 200
     finally:
         w.close()
 

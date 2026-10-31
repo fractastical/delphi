@@ -502,7 +502,7 @@
         <form class="filters" role="search" data-form="catalog" aria-label="Search the catalog"><input type="hidden" name="tab" value="catalog">
           <label>Query <input type="search" name="q" value="${f.q}" placeholder="words in a record"></label>
           <label>Kind <select name="kind"><option value="">all</option>${kinds.map((k) => html`<option ${k === f.kind ? raw("selected") : ""}>${k}</option>`)}</select></label>
-          <label>Local status <select name="status"><option value="">any</option>${(DF.api.state.mode === "live" && DF.api.state.authenticated ? ["proposed", "imported_unreviewed", "accepted", "disputed", "rejected"] : ["snapshot_unreviewed"]).map((s) => html`<option value="${s}" ${s === f.status ? raw("selected") : ""}>${s.replace(/_/g, " ")}</option>`)}</select></label>
+          <label>Local status <select name="status"><option value="">any</option>${(DF.api.isLive() ? ["proposed", "imported_unreviewed", "accepted", "disputed", "rejected"] : ["snapshot_unreviewed"]).map((s) => html`<option value="${s}" ${s === f.status ? raw("selected") : ""}>${s.replace(/_/g, " ")}</option>`)}</select></label>
           <button class="btn" type="submit">Search</button>${f.q || f.kind || f.status ? html`<a class="btn ghost" href="${DF.href(base, { tab: "catalog" })}">Clear</a>` : ""}</form>
         <p class="count" id="ccount" role="status">Loading…</p><ul class="catalog" id="clist"></ul><div id="cmore"></div></section>`,
       async after(root) {

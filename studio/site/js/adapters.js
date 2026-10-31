@@ -7,7 +7,7 @@
   }
   const state = { mode: "snapshot", health: null, reason: "not probed", snapshot: null, catalog: null };
 
-  const isLive = () => state.mode === "live" && state.authenticated === true;
+  const isLive = () => state.mode === "live" && (state.publicAccess === true || state.authenticated === true);
 
   async function getJSON(url, ms = 3000) {
     const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
@@ -29,7 +29,7 @@
       const h = await getJSON("api/health", 2500);
       if (h && (h.status === "ok" || h.ok === true || h.status === "live")) {
         state.mode = "live"; state.health = h; state.reason = "runtime answered /api/health";
-        try { const s = await getJSON("api/session", 3000); state.authenticated = !!s.authenticated; } catch (e) { state.authenticated = false; }
+        try { const s = await getJSON("api/session", 3000); state.authenticated = !!s.authenticated; state.publicAccess = s.public_access === true; } catch (e) { state.authenticated = false; state.publicAccess = false; }
       }
       else { state.reason = "/api/health answered but did not report ok"; }
     } catch (e) { state.reason = "runtime unavailable (" + (e.name === "AbortError" ? "timeout" : e.message) + ")"; }
@@ -131,5 +131,5 @@
   const simulate = pending("simulation");
   const propose = pending("proposal submission");
 
-  DF.api = { state, load, catalog, record, artifacts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
+  DF.api = { state, isLive, load, catalog, record, artifacts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
 })();

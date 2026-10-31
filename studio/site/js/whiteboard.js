@@ -130,7 +130,7 @@
   }
 
   DF.renderLiveQuestions = async function (host, snap, route) {
-    if (!(DF.api.state.mode === "live" && DF.api.state.authenticated)) { host.innerHTML = html`<section class="panel"><h2>Questions ${U.pill("snapshot", "warn")}</h2><p class="small">Only the curated snapshot projection below is available: ${DF.api.state.mode === "live" ? "the runtime is reachable but this session is not signed in." : "no runtime answered."} The live store's questions appear here when the runtime is reachable and you are signed in.</p></section>`.toString(); return; }
+    if (!(DF.api.isLive())) { host.innerHTML = html`<section class="panel"><h2>Questions ${U.pill("snapshot", "warn")}</h2><p class="small">Only the curated snapshot projection below is available: ${DF.api.state.mode === "live" ? "the runtime is reachable but this session is not signed in." : "no runtime answered."} The live store's questions appear here when the runtime is reachable and you are signed in.</p></section>`.toString(); return; }
     host.innerHTML = '<section class="panel"><h2>Questions</h2><p role="status">Loading the live questions…</p></section>';
     let L; try { L = await liveRows(); } catch (e) { host.innerHTML = html`<section class="panel"><h2>Questions</h2><p class="empty">The live questions could not be read: ${e.message}. Nothing is shown in their place.</p></section>`.toString(); return; }
     const f = { lq: route.params.lq || "", lk: route.params.lk || "", lc: route.params.lc || "", la: route.params.la || "", lw: route.params.lw || "", n: Math.max(40, +route.params.n || 40) };
