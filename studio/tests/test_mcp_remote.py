@@ -22,7 +22,7 @@ INIT = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolV
 RHEA = "test-only-reviewer-only-token-0000000"
 READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_artifacts", "frontier_capabilities",
               "frontier_discover", "frontier_graph", "frontier_catalogue", "frontier_project_inspect", "frontier_artifact_inspect",
-              "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief"}
+              "frontier_design_context", "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief"}
 
 
 def free_port():

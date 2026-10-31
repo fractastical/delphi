@@ -29,7 +29,7 @@ from .search import SEARCH_KIND, SearchIndex
 from .artifacts import ArtifactIndex
 from .store import FrontierError, Store, Unauthorized
 
-MANIFEST_VERSION = "frontier-mcp-capabilities-0.2"
+MANIFEST_VERSION = "frontier-mcp-capabilities-0.3"
 READ = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False)
 # Append-only store: nothing is destroyed; a retry with the same idempotency key and request returns the stored response.
 WRITE = ToolAnnotations(readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False)
