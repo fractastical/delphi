@@ -166,3 +166,55 @@ def test_export_refuses_held_content_under_an_unstated_licence(store):
     # And the refusal names the offender, so a caller can fix it rather than guess.
     with pytest.raises(Forbidden, match=r"Claim/unlicensed"):
         store.export_bundle([ref(ok), ref(saved)])
+
+
+PROPOSALS = Path("/data/artifacts/delphi-evolve-rethink/messages/sourced-problems-proposal.json")
+
+
+@pytest.mark.skipif(not PROPOSALS.exists(), reason="sourced proposals not present on this host")
+def test_sourced_problems_are_actionable_and_close_the_loop(store, tmp_path):
+    """Curation discipline is the difference, and it is measurable.
+
+    The curated register gives 250 problems, 0 actionable, 40.8% carrying any source. Problems
+    sourced to a retrieved identifier with a locator and a substring-checked quote give 15 of 17
+    actionable and 100% with a resolvable URI. Same schema, same importer contract, opposite
+    result -- so `0 of 250` is a statement about how the register was built, not about the bar.
+    """
+    from frontier.models import ref
+
+    out = tmp_path / "sourced.jsonl"
+    done = subprocess.run([sys.executable, str(REPO / "scripts" / "import_sourced_problems.py"),
+                           str(PROPOSALS), "--out", str(out)], capture_output=True, text=True, timeout=300)
+    assert done.returncode == 0, done.stderr
+    report = json.loads(done.stdout)
+    assert report["rejected"] == 0
+    assert report["actionable"] >= 1
+    assert report["with_resolvable_source_uri"] == report["importable"]
+    # Nothing claims to hold bytes, so none of these can trip the export licence gate.
+    drafts = [json.loads(line) for line in out.read_text().splitlines()]
+    for d in drafts:
+        assert d["payload"]["source"]["content_available"] is False
+
+    actionable = next(d for d in drafts if d["payload"]["completeness"] == "actionable")
+    saved = store.submit(TOKENS["alice"], "sourced-actionable", actionable | {"issuer": "alice"})["record"]
+
+    # THE LOOP: a sourced problem that states what would settle it can carry an Action, be made
+    # ready, and be leased by a worker. This is what `recorded` problems cannot do.
+    act = store.submit(TOKENS["alice"], "act-sourced", action(store, ref(saved)))["record"]
+    store.transition(TOKENS["alice"], "ready-sourced", ref(act), "ready")
+    lease = store.lease(TOKENS["carol"], "lease-sourced", ref(act))
+    assert lease["state"] == "leased" and lease["lease_id"]
+
+    # And it exports, because it carries a resolvable source and claims no content bytes.
+    bundle = store.export_bundle([ref(saved)])
+    assert bundle["records"] and bundle["bundle_sha256"]
+
+    # Control: the recorded ones still cannot be acted on, so the gate did not simply go away.
+    rec = [d for d in drafts if d["payload"]["completeness"] == "recorded"]
+    if rec:
+        r = store.submit(TOKENS["alice"], "sourced-recorded", rec[0] | {"issuer": "alice"})["record"]
+        # A distinct record id: conftest.action() always uses "action", and this test already
+        # submitted one, so reusing it fails on a stale predecessor and would mask the real gate.
+        blocked = action(store, ref(r)) | {"id": "action-against-recorded"}
+        with pytest.raises(Conflict, match="recorded, not actionable"):
+            store.submit(TOKENS["alice"], "act-sourced-recorded", blocked)
