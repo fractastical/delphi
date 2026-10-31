@@ -1,0 +1,39 @@
+{
+  "claim_id": "darwin1859-ch09-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch09-14",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "If oceans have occupied their present areas and continents theirs since the earliest Silurian, then at every time from ~440 Ma to the present the geographic locations now occupied by land were occupied by continental land, and the locations now occupied by ocean were ocean.",
+  "pass_criterion": "Pre-registered. Using the GPlates Web Service with the Merdith et al. (2021) plate model, the model's coastline polygons are reconstructed to 440, 400, 350, 300, 250, 200, 150, 100 and 50 Ma. On a 2x2 degree global grid (area-weighted by cos latitude), classify each present-day grid cell as land or ocean from the time-0 coastlines. L_all = area fraction of present land cells that fall inside reconstructed coastline polygons at every one of the nine times; O_all = area fraction of present ocean cells that fall outside them at every time. The claim is SUPPORTED if L_all >= 0.75 and O_all >= 0.75.",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if L_all < 0.50 or O_all < 0.50. Intermediate outcomes are 'mixed'. For comparison the per-time fractions (L_t, O_t) and the expected overlap for randomly placed continents (equal to the present land fraction) are reported. The PALEOMAP model is run as a robustness check and is not part of the verdict.",
+  "planned_datasets": ["gplates-web-service-merdith2021", "gplates-web-service-paleomap"],
+  "interpretation": "Darwin's 'where our oceans now extend, oceans have extended' and 'where continents now exist, large tracts of land have existed ... since the earliest silurian period' is read as spatial persistence of land and ocean in a fixed geographic (Earth) frame, which is how he and his contemporaries understood it (he explicitly allows 'great oscillations of level' but not lateral movement). Plate reconstructions place continental crust in a palaeomagnetic / mantle reference frame; the coastline polygons of the plate model are used as the outline of continental land at each time. Modern reinterpretation: the claim is tested against reconstructed continental positions, which did not exist as a concept in 1859; palaeolongitude in the Palaeozoic is uncertain, which could shift overlap either way.",
+  "datasets": [
+    {
+      "id": "gplates-web-service-merdith2021",
+      "name": "GPlates Web Service, reconstruct/coastlines with model MERDITH2021 (Merdith et al. 2021, Earth-Science Reviews 214:103477)",
+      "landing_url": "https://gws.gplates.org/",
+      "doi": "10.1016/j.earscirev.2020.103477",
+      "version": "MERDITH2021 as served by gws.gplates.org",
+      "license": "CC BY 4.0 (EarthByte plate models)",
+      "files": [],
+      "role": "reconstructed coastline polygons at nine times and at present"
+    },
+    {
+      "id": "gplates-web-service-paleomap",
+      "name": "GPlates Web Service, reconstruct/coastlines with model PALEOMAP (Scotese PALEOMAP PaleoAtlas)",
+      "landing_url": "https://gws.gplates.org/",
+      "doi": null,
+      "version": "PALEOMAP as served by gws.gplates.org",
+      "license": "CC BY 4.0",
+      "files": [],
+      "role": "robustness check with an independent plate model"
+    }
+  ],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-b201", "date": "2026-10-31" }
+}
