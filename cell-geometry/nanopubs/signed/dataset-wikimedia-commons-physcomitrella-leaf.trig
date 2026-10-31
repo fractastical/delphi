@@ -1,0 +1,82 @@
+@prefix this: <https://w3id.org/np/RAQTWTMxgNObWJbDiWgJ2_k98B0yy0BFPMxzmnLqUui58>.
+@prefix sub: <https://w3id.org/np/RAQTWTMxgNObWJbDiWgJ2_k98B0yy0BFPMxzmnLqUui58/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+sub:count0 a <https://schema.org/PropertyValue>;
+    <https://schema.org/description> "image files in this dataset";
+    <https://schema.org/propertyID> "n_images";
+    <https://schema.org/value> 1.
+sub:count1 a <https://schema.org/PropertyValue>;
+    <https://schema.org/description> "width in pixels of the downloaded file";
+    <https://schema.org/propertyID> "width_px";
+    <https://schema.org/value> 1920;
+    <https://schema.org/unitText> "px".
+sub:count2 a <https://schema.org/PropertyValue>;
+    <https://schema.org/description> "height in pixels of the downloaded file";
+    <https://schema.org/propertyID> "height_px";
+    <https://schema.org/value> 1277;
+    <https://schema.org/unitText> "px".
+sub:file a <http://www.w3.org/ns/dcat#Distribution>;
+    <http://spdx.org/rdf/terms#checksum> sub:fileChecksum;
+    <http://www.w3.org/ns/dcat#byteSize> 511651;
+    <http://www.w3.org/ns/dcat#downloadURL> <https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Physcomitrella_patens_%28a%2C_144649-481016%29_6961.JPG/1920px-Physcomitrella_patens_%28a%2C_144649-481016%29_6961.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail>;
+    <http://www.w3.org/ns/dcat#mediaType> <https://www.iana.org/assignments/media-types/image/jpeg>.
+sub:fileChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "c37789a261f2cd756d805bd9f1b69b18895c55556511d27f8832c1d753eaf5cd".
+<https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf> a <http://www.w3.org/ns/dcat#Dataset>;
+    dc:bibliographicCitation "HermannSchachner (Wikimedia Commons user). Physcomitrella patens (a, 144649-481016) 6961.JPG. Wikimedia Commons, CC0. https://commons.wikimedia.org/wiki/File:Physcomitrella_patens_(a,_144649-481016)_6961.JPG";
+    dc:creator "HermannSchachner (Wikimedia Commons user)";
+    dc:description "Physcomitrella patens";
+    dc:identifier "File:Physcomitrella patens (a, 144649-481016) 6961.JPG";
+    dc:license <http://creativecommons.org/publicdomain/zero/1.0/deed.en/>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Wikimedia Commons image: Physcomitrella patens (a, 144649-481016) 6961.JPG (Physcomitrium patens, moss leaflet cells)";
+    <http://www.w3.org/ns/dcat#distribution> sub:file;
+    <http://www.w3.org/ns/dcat#landingPage> <https://commons.wikimedia.org/wiki/File:Physcomitrella_patens_(a,_144649-481016)_6961.JPG>;
+    <http://www.w3.org/ns/dcat#version> "Commons rendition retrieved 2026-10-31T03:43:31Z";
+    <https://schema.org/about> "Physcomitrium patens (Plantae), moss leaflet cells";
+    <https://schema.org/additionalProperty> sub:count0, sub:count1, sub:count2;
+    <https://schema.org/measurementTechnique> "light microscopy of a moss leaflet"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry>;
+    prov:wasDerivedFrom <https://commons.wikimedia.org/wiki/File:Physcomitrella_patens_(a,_144649-481016)_6961.JPG>;
+    prov:wasGeneratedBy sub:retrieval.
+<https://w3id.org/delphi/resource/agent/delphisci-cell-geometry> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci cell-geometry claim tester";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:retrieval a prov:Activity;
+    prov:endedAtTime "2026-10-31T03:43:31Z"^^xsd:dateTime;
+    prov:qualifiedAssociation sub:retrievalPlan;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+sub:retrievalPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e66117b39b3f6cc9aadb3aac747d33176d47dd0d/cell-geometry/fetch_inputs.py>
+}
+sub:pubinfo {
+this: dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Dataset: Wikimedia Commons image Physcomitrella patens (a, 144649-481016) 6961.JPG";
+    dc:created "2026-10-31T14:38:29.901Z"^^xsd:dateTime;
+    npx:hasNanopubType <http://www.w3.org/ns/dcat#Dataset>;
+    npx:introduces <https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917>.
+<https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> <http://www.w3.org/2000/01/rdf-schema#label> "thompson-growth-form-1917".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "ATayMWwyfwu7tDrzb+/u+9WSwqAsHWjDH4rQqvjGzTYuQZamdpT+1Jt/8kEurQI7xd11nKw2i7ESpj7VFccXrU8L/EduTZf2hA51Ueoih3eAE3+Ls9BII08/EIwTjRVgjL3IAgy9LnEOhsQhK0YC2tcRKo7rsTbCdPE73YHZqHGxObt9VZ0eo4fkJavc/WWsx+o+3nn49KCjH0kUucDzUO/D0nXFPA03qrrCVK/nAjUaNwpT5ZGzwskcQDolsiwi+aMNMzh6tdL73yyPwCWf5bMLRqUCkAgWgIEFzMOOThvOtRqRKh5VRYqSirTCMHB+/ZOuXqqY30sI6HNCJ2rvdw=="
+}

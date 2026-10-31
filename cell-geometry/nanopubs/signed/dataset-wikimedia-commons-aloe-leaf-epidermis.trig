@@ -1,0 +1,82 @@
+@prefix this: <https://w3id.org/np/RAwGUM1VZveS7coNGE7nGUzMpaCt8s5vFgIrTIgCoIcYY>.
+@prefix sub: <https://w3id.org/np/RAwGUM1VZveS7coNGE7nGUzMpaCt8s5vFgIrTIgCoIcYY/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+sub:count0 a <https://schema.org/PropertyValue>;
+    <https://schema.org/description> "image files in this dataset";
+    <https://schema.org/propertyID> "n_images";
+    <https://schema.org/value> 1.
+sub:count1 a <https://schema.org/PropertyValue>;
+    <https://schema.org/description> "width in pixels of the downloaded file";
+    <https://schema.org/propertyID> "width_px";
+    <https://schema.org/value> 1920;
+    <https://schema.org/unitText> "px".
+sub:count2 a <https://schema.org/PropertyValue>;
+    <https://schema.org/description> "height in pixels of the downloaded file";
+    <https://schema.org/propertyID> "height_px";
+    <https://schema.org/value> 1440;
+    <https://schema.org/unitText> "px".
+sub:file a <http://www.w3.org/ns/dcat#Distribution>;
+    <http://spdx.org/rdf/terms#checksum> sub:fileChecksum;
+    <http://www.w3.org/ns/dcat#byteSize> 421093;
+    <http://www.w3.org/ns/dcat#downloadURL> <https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/Aloe_vera_Cells%2C_150X.jpg/1920px-Aloe_vera_Cells%2C_150X.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail>;
+    <http://www.w3.org/ns/dcat#mediaType> <https://www.iana.org/assignments/media-types/image/jpeg>.
+sub:fileChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "431fcd7480aa2c80e5014e2705fd8036ef24a4b0ff9d8decb39e9b0e432789ba".
+<https://w3id.org/delphi/resource/dataset/wikimedia-commons-aloe-leaf-epidermis> a <http://www.w3.org/ns/dcat#Dataset>;
+    dc:bibliographicCitation "ConformationXII (Wikimedia Commons user). Aloe vera Cells, 150X.jpg. Wikimedia Commons, CC BY-SA 4.0. https://commons.wikimedia.org/wiki/File:Aloe_vera_Cells,_150X.jpg";
+    dc:creator "ConformationXII (Wikimedia Commons user)";
+    dc:description "The image is a photomicrograph (PMG) of the lower epidermis of Aloe vera, viewed under brightfield illumination at 150X magnification. In an attempt to find alternative stains which are less toxic than conventional ones, Lamy fountain pen ink was used. Nuclei are stained blue, and the guard cells of a stomata are clearly visible (dark green/brown). The image was taken using an Olympus OIC student ";
+    dc:identifier "File:Aloe vera Cells, 150X.jpg";
+    dc:license <https://creativecommons.org/licenses/by-sa/4.0/>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Wikimedia Commons image: Aloe vera Cells, 150X.jpg (Aloe vera, lower leaf epidermis)";
+    <http://www.w3.org/ns/dcat#distribution> sub:file;
+    <http://www.w3.org/ns/dcat#landingPage> <https://commons.wikimedia.org/wiki/File:Aloe_vera_Cells,_150X.jpg>;
+    <http://www.w3.org/ns/dcat#version> "Commons rendition retrieved 2026-10-31T03:43:33Z";
+    <https://schema.org/about> "Aloe vera (Plantae), lower leaf epidermis";
+    <https://schema.org/additionalProperty> sub:count0, sub:count1, sub:count2;
+    <https://schema.org/measurementTechnique> "brightfield light microscopy of the lower leaf epidermis, 150x, fountain-pen-ink stain"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry>;
+    prov:wasDerivedFrom <https://commons.wikimedia.org/wiki/File:Aloe_vera_Cells,_150X.jpg>;
+    prov:wasGeneratedBy sub:retrieval.
+<https://w3id.org/delphi/resource/agent/delphisci-cell-geometry> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci cell-geometry claim tester";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:retrieval a prov:Activity;
+    prov:endedAtTime "2026-10-31T03:43:33Z"^^xsd:dateTime;
+    prov:qualifiedAssociation sub:retrievalPlan;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+sub:retrievalPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e66117b39b3f6cc9aadb3aac747d33176d47dd0d/cell-geometry/fetch_inputs.py>
+}
+sub:pubinfo {
+this: dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Dataset: Wikimedia Commons image Aloe vera Cells, 150X.jpg";
+    dc:created "2026-10-31T14:38:29.901Z"^^xsd:dateTime;
+    npx:hasNanopubType <http://www.w3.org/ns/dcat#Dataset>;
+    npx:introduces <https://w3id.org/delphi/resource/dataset/wikimedia-commons-aloe-leaf-epidermis>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917>.
+<https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> <http://www.w3.org/2000/01/rdf-schema#label> "thompson-growth-form-1917".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "s0gGRdNKoXscyc778CGL7MfTBJGepNT9m5lbJupSiv/WsBFUJTKd2NNAQM/2gJZuv65DHkte3sNUHtLvV8rwOINIyzIvKhAbbMjEGd1/if1ZuHHCM8Ayh2KC0MbalTT5T2H8USHuh5bVQxhzZQEmEjb2LDeEw6psI4vZYqULLJrsjhX863AodMqvoEpX+XHPJREpu6bdDc1FgCsFSilonOz78Di8rsesxwqpnA64ZdJ2550ffwZT5yry7nok4MhlVwT/jrA53RZAA/i25+2qqAlcbg5K+/WKtVyWfFf5k/tygJRl8dcLcmbpo6w8mDHLsSVD70ZNgHNMDBJXKnho2g=="
+}

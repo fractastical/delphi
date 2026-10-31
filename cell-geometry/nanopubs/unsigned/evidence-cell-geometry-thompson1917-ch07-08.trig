@@ -1,0 +1,242 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch07-08> delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/cell-geometry-thompson1917-ch07-08> .
+  <https://w3id.org/delphi/resource/evidence/cell-geometry-thompson1917-ch07-08> a delphi:EvidenceItem ;
+    rdfs:label "Exploratory cell-geometry test of thompson1917-ch07-08 on 5 images: supports" ;
+    dct:description "Exploratory test of thompson1917-ch07-08: If hexagons are regular only where cells are equal in size, tissues with more uniform cell areas have a larger fraction of six-sided cells, and within a tissue cells in more size-heterogeneous neighbourhoods depart more from six sides.\n\nResult: -0.9 (Spearman rho, tissue area CV vs fraction of six-sided interior cells; n = 5; p = 0.0374).\n\nCriterion: Exploratory, not pre-registered: the images were segmented and inspected before the pass criterion was written. Treat the verdict as hypothesis-generating; a pre-registered replication on new images is needed before it counts as a test. Supports if Spearman rho between tissue area CV and fraction of six-sided interior cells is <= -0.7 across usable tissues; mixed if between -0.7 and 0; refutes if >= 0.\n\nInterpretation: Tests the size-uniformity part only; 'forces uniform' is not measured. This is a second, multi-tissue attempt; the pre-registered within-RPE test of the same claim is claim-tests/thompson-growth-form/thompson1917-ch07-08/result.json." ;
+    schema:value "-0.9"^^xsd:double ;
+    schema:unitText "Spearman rho, tissue area CV vs fraction of six-sided interior cells" ;
+    delphi:pValue "0.0374"^^xsd:double ;
+    delphi:statisticalTest "Spearman rank correlation across 5 tissues, two-sided" ;
+    rdfs:comment "Exploratory, not pre-registered: the images were segmented and inspected before the pass criterion was written. Treat the verdict as hypothesis-generating; a pre-registered replication on new images is needed before it counts as a test.\nOnly 5 tissues; the across-tissue correlation rests on five points.\nThe random-Voronoi control shows the same within-image relation, so the result is a property of space-filling partitions in general and says nothing about forces." ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e66117b39b3f6cc9aadb3aac747d33176d47dd0d/claim-tests/thompson-growth-form/thompson1917-ch07-08/cellpose-multi-tissue/result.json> ;
+    prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-human-corneal-endothelium> ;
+    prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-drosophila-compound-eye> ;
+    prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf> ;
+    prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-festuca-leaf-epidermis> ;
+    prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-aloe-leaf-epidermis> ;
+    schema:additionalProperty sub:value0 ;
+    schema:additionalProperty sub:value1 ;
+    schema:additionalProperty sub:value2 ;
+    schema:additionalProperty sub:value3 ;
+    schema:additionalProperty sub:value4 ;
+    schema:additionalProperty sub:value5 ;
+    schema:additionalProperty sub:value6 ;
+    schema:additionalProperty sub:value7 ;
+    schema:additionalProperty sub:value8 ;
+    schema:additionalProperty sub:value9 ;
+    schema:additionalProperty sub:value10 ;
+    schema:additionalProperty sub:value11 ;
+    schema:additionalProperty sub:value12 ;
+    schema:additionalProperty sub:value13 ;
+    schema:additionalProperty sub:value14 ;
+    schema:additionalProperty sub:value15 ;
+    schema:additionalProperty sub:value16 ;
+    schema:additionalProperty sub:value17 ;
+    schema:additionalProperty sub:value18 ;
+    schema:additionalProperty sub:value19 ;
+    schema:additionalProperty sub:value20 ;
+    schema:additionalProperty sub:value21 .
+  sub:value0 a schema:PropertyValue ;
+    schema:propertyID "verdict" ;
+    schema:value "supports" ;
+    schema:description "verdict under the criterion stated in the description, exploratory (not pre-registered); tester's confidence 0.5" .
+  sub:value1 a schema:PropertyValue ;
+    schema:propertyID "n_images" ;
+    schema:value "5"^^xsd:integer ;
+    schema:description "tissue images analysed, one per tissue" .
+  sub:value2 a schema:PropertyValue ;
+    schema:propertyID "n_species" ;
+    schema:value "5"^^xsd:integer ;
+    schema:description "species the analysed tissues come from" .
+  sub:value3 a schema:PropertyValue ;
+    schema:propertyID "n_cells_segmented" ;
+    schema:value "874"^^xsd:integer ;
+    schema:description "cells segmented by Cellpose across the analysed images" .
+  sub:value4 a schema:PropertyValue ;
+    schema:propertyID "area_cv" ;
+    schema:value "0.299"^^xsd:double ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-human-corneal-endothelium> ;
+    schema:description "coefficient of variation of interior cell areas, Homo sapiens corneal endothelium (alizarin red, in situ)" .
+  sub:value5 a schema:PropertyValue ;
+    schema:propertyID "frac_hexagons" ;
+    schema:value "0.667"^^xsd:double ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-human-corneal-endothelium> ;
+    schema:description "fraction of interior cells with exactly six neighbours, Homo sapiens corneal endothelium (alizarin red, in situ)" .
+  sub:value6 a schema:PropertyValue ;
+    schema:propertyID "n_interior_cells" ;
+    schema:value "93"^^xsd:integer ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-human-corneal-endothelium> ;
+    schema:description "cells fully surrounded by other segmented cells, Homo sapiens corneal endothelium (alizarin red, in situ)" .
+  sub:value7 a schema:PropertyValue ;
+    schema:propertyID "area_cv" ;
+    schema:value "0.09"^^xsd:double ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-drosophila-compound-eye> ;
+    schema:description "coefficient of variation of interior cell areas, Drosophila melanogaster compound eye ommatidia (SEM)" .
+  sub:value8 a schema:PropertyValue ;
+    schema:propertyID "frac_hexagons" ;
+    schema:value "0.993"^^xsd:double ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-drosophila-compound-eye> ;
+    schema:description "fraction of interior cells with exactly six neighbours, Drosophila melanogaster compound eye ommatidia (SEM)" .
+  sub:value9 a schema:PropertyValue ;
+    schema:propertyID "n_interior_cells" ;
+    schema:value "152"^^xsd:integer ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-drosophila-compound-eye> ;
+    schema:description "cells fully surrounded by other segmented cells, Drosophila melanogaster compound eye ommatidia (SEM)" .
+  sub:value10 a schema:PropertyValue ;
+    schema:propertyID "area_cv" ;
+    schema:value "0.404"^^xsd:double ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf> ;
+    schema:description "coefficient of variation of interior cell areas, Physcomitrium patens moss leaflet cells" .
+  sub:value11 a schema:PropertyValue ;
+    schema:propertyID "frac_hexagons" ;
+    schema:value "0.389"^^xsd:double ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf> ;
+    schema:description "fraction of interior cells with exactly six neighbours, Physcomitrium patens moss leaflet cells" .
+  sub:value12 a schema:PropertyValue ;
+    schema:propertyID "n_interior_cells" ;
+    schema:value "36"^^xsd:integer ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf> ;
+    schema:description "cells fully surrounded by other segmented cells, Physcomitrium patens moss leaflet cells" .
+  sub:value13 a schema:PropertyValue ;
+    schema:propertyID "area_cv" ;
+    schema:value "0.52"^^xsd:double ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-festuca-leaf-epidermis> ;
+    schema:description "coefficient of variation of interior cell areas, Festuca arundinacea grass leaf epidermis (SEM)" .
+  sub:value14 a schema:PropertyValue ;
+    schema:propertyID "frac_hexagons" ;
+    schema:value "0.241"^^xsd:double ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-festuca-leaf-epidermis> ;
+    schema:description "fraction of interior cells with exactly six neighbours, Festuca arundinacea grass leaf epidermis (SEM)" .
+  sub:value15 a schema:PropertyValue ;
+    schema:propertyID "n_interior_cells" ;
+    schema:value "58"^^xsd:integer ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-festuca-leaf-epidermis> ;
+    schema:description "cells fully surrounded by other segmented cells, Festuca arundinacea grass leaf epidermis (SEM)" .
+  sub:value16 a schema:PropertyValue ;
+    schema:propertyID "area_cv" ;
+    schema:value "0.235"^^xsd:double ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-aloe-leaf-epidermis> ;
+    schema:description "coefficient of variation of interior cell areas, Aloe vera lower leaf epidermis" .
+  sub:value17 a schema:PropertyValue ;
+    schema:propertyID "frac_hexagons" ;
+    schema:value "0.507"^^xsd:double ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-aloe-leaf-epidermis> ;
+    schema:description "fraction of interior cells with exactly six neighbours, Aloe vera lower leaf epidermis" .
+  sub:value18 a schema:PropertyValue ;
+    schema:propertyID "n_interior_cells" ;
+    schema:value "75"^^xsd:integer ;
+    schema:about <https://w3id.org/delphi/resource/dataset/wikimedia-commons-aloe-leaf-epidermis> ;
+    schema:description "cells fully surrounded by other segmented cells, Aloe vera lower leaf epidermis" .
+  sub:value19 a schema:PropertyValue ;
+    schema:propertyID "area_cv_random_voronoi_control" ;
+    schema:value "0.616"^^xsd:double ;
+    schema:description "coefficient of variation of interior cell areas, synthetic random Voronoi tiling of 509 cells (calibration control)" .
+  sub:value20 a schema:PropertyValue ;
+    schema:propertyID "frac_hexagons_random_voronoi_control" ;
+    schema:value "0.269"^^xsd:double ;
+    schema:description "fraction of interior cells with exactly six neighbours, synthetic random Voronoi tiling of 509 cells (calibration control)" .
+  sub:value21 a schema:PropertyValue ;
+    schema:propertyID "n_interior_cells_random_voronoi_control" ;
+    schema:value "435"^^xsd:integer ;
+    schema:description "cells fully surrounded by other segmented cells, synthetic random Voronoi tiling of 509 cells (calibration control)" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry> ;
+    prov:wasGeneratedBy sub:analysis .
+  sub:analysis a prov:Activity ;
+    rdfs:label "Junction-angle and neighbour-number measurement on Cellpose masks" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry> ;
+    prov:qualifiedAssociation sub:analysisPlan ;
+    prov:wasInformedBy sub:segmentation0 ;
+    prov:wasInformedBy sub:segmentation1 ;
+    prov:wasInformedBy sub:segmentation2 ;
+    prov:wasInformedBy sub:segmentation3 ;
+    prov:wasInformedBy sub:segmentation4 .
+  sub:analysisPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e66117b39b3f6cc9aadb3aac747d33176d47dd0d/cell-geometry/analyze.py> .
+  sub:segmentation0 a prov:Activity ;
+    rdfs:label "Cellpose segmentation of human-corneal-endothelium, Nebius operation op-88c64c6c1ed019df" ;
+    dct:identifier "op-88c64c6c1ed019df" ;
+    prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-human-corneal-endothelium> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose> ;
+    prov:startedAtTime "2026-10-31T03:59:04Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-10-31T03:59:08Z"^^xsd:dateTime ;
+    schema:description "input PNG sha256 b6bb942891669fb05d3e2cfda5c10ab272dbb86fce529b408ce49b66685d61b8 (crop null of the downloaded file); mask sha256 78ddf749045db35d474dfeab0be5ed7b63b6bd5470c0bca017158c07313023ee; 139 objects; diameter hint auto" .
+  sub:segmentation1 a prov:Activity ;
+    rdfs:label "Cellpose segmentation of drosophila-compound-eye, Nebius operation op-66616d87d6bbc038" ;
+    dct:identifier "op-66616d87d6bbc038" ;
+    prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-drosophila-compound-eye> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose> ;
+    prov:startedAtTime "2026-10-31T04:10:32Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-10-31T04:10:36Z"^^xsd:dateTime ;
+    schema:description "input PNG sha256 b5756a70bf88cab98b908833acd0de916d63876786cda6f219fb96b20d51f0a1 (crop [0,0,1600,1075] of the downloaded file); mask sha256 0fc006b9b838773b4000eeb07972cfc7a3f287350faaa59e9cd4388361c1751c; 223 objects; diameter hint auto" .
+  sub:segmentation2 a prov:Activity ;
+    rdfs:label "Cellpose segmentation of physcomitrella-leaf, Nebius operation op-5914678cabfd153b" ;
+    dct:identifier "op-5914678cabfd153b" ;
+    prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose> ;
+    prov:startedAtTime "2026-10-31T04:17:15Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-10-31T04:17:18Z"^^xsd:dateTime ;
+    schema:description "input PNG sha256 c3160be9b42cbb98a0986d25fa7d517a45e760a8e8e8b3fe2017c405ca58db16 (crop null of the downloaded file); mask sha256 2e95512401367e17c53fabb020929b553c87bafc722a37edcfffb696cfb2c71d; 135 objects; diameter hint 80" .
+  sub:segmentation3 a prov:Activity ;
+    rdfs:label "Cellpose segmentation of festuca-leaf-epidermis, Nebius operation op-42fd591f68652535" ;
+    dct:identifier "op-42fd591f68652535" ;
+    prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-festuca-leaf-epidermis> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose> ;
+    prov:startedAtTime "2026-10-31T04:12:31Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-10-31T04:12:37Z"^^xsd:dateTime ;
+    schema:description "input PNG sha256 40860be8e6c07d35e9d968d7e21bc1a673f4f2627b3de0ef1b8f0df2aa77255b (crop null of the downloaded file); mask sha256 6628bfc067fcdc66a620b29dc5a5288340602040012f4b734f71b3dd3db43f73; 260 objects; diameter hint auto" .
+  sub:segmentation4 a prov:Activity ;
+    rdfs:label "Cellpose segmentation of aloe-leaf-epidermis, Nebius operation op-ab000188a0746cc5" ;
+    dct:identifier "op-ab000188a0746cc5" ;
+    prov:used <https://w3id.org/delphi/resource/dataset/wikimedia-commons-aloe-leaf-epidermis> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose> ;
+    prov:startedAtTime "2026-10-31T04:18:09Z"^^xsd:dateTime ;
+    prov:endedAtTime "2026-10-31T04:18:15Z"^^xsd:dateTime ;
+    schema:description "input PNG sha256 5fb2fefbc9f911f1c335edc8fa45629ca3f41f62d23701188c1cd06371ab30b5 (crop null of the downloaded file); mask sha256 8d7eacb6fda670ae9ea9eb205718ed7448356b6388ab2826878dc783743d30af; 117 objects; diameter hint 130" .
+  <https://w3id.org/delphi/resource/agent/nebius-scientific-ai-cellpose> a prov:SoftwareAgent ;
+    rdfs:label "Cellpose CPSAM v2 on the Nebius Scientific AI Platform (segment_cells_native)" ;
+    schema:softwareVersion "cellpose 4.2.1, model mouseland/cellpose-sam/cpsam_v2 sha256 0f1cc3f7ecdd8a037a57c6c48d9d8921391be4cbce3fa9f13c3e3a2e1253c667" ;
+    prov:actedOnBehalfOf <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry> ;
+    prov:qualifiedAssociation sub:segmentPlan .
+  sub:segmentPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e66117b39b3f6cc9aadb3aac747d33176d47dd0d/cell-geometry/segment.py> .
+  <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry> a prov:SoftwareAgent ;
+    rdfs:label "delphisci cell-geometry claim tester" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T14:38:29.901Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Evidence item: exploratory cell-geometry test of Thompson 1917 claim thompson1917-ch07-08" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:EvidenceItem ;
+    npx:introduces <https://w3id.org/delphi/resource/evidence/cell-geometry-thompson1917-ch07-08> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+  <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> rdfs:label "thompson-growth-form-1917" .
+}

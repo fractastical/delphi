@@ -1,0 +1,88 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf> a dcat:Dataset ;
+    rdfs:label "Wikimedia Commons image: Physcomitrella patens (a, 144649-481016) 6961.JPG (Physcomitrium patens, moss leaflet cells)" ;
+    dct:identifier "File:Physcomitrella patens (a, 144649-481016) 6961.JPG" ;
+    dct:bibliographicCitation "HermannSchachner (Wikimedia Commons user). Physcomitrella patens (a, 144649-481016) 6961.JPG. Wikimedia Commons, CC0. https://commons.wikimedia.org/wiki/File:Physcomitrella_patens_(a,_144649-481016)_6961.JPG" ;
+    dct:description "Physcomitrella patens" ;
+    dct:creator "HermannSchachner (Wikimedia Commons user)" ;
+    dct:license <http://creativecommons.org/publicdomain/zero/1.0/deed.en/> ;
+    dcat:landingPage <https://commons.wikimedia.org/wiki/File:Physcomitrella_patens_(a,_144649-481016)_6961.JPG> ;
+    dcat:version "Commons rendition retrieved 2026-10-31T03:43:31Z" ;
+    schema:measurementTechnique "light microscopy of a moss leaflet" ;
+    schema:about "Physcomitrium patens (Plantae), moss leaflet cells" ;
+    dcat:distribution sub:file ;
+    schema:additionalProperty sub:count0 ;
+    schema:additionalProperty sub:count1 ;
+    schema:additionalProperty sub:count2 .
+  sub:file a dcat:Distribution ;
+    dcat:downloadURL <https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Physcomitrella_patens_%28a%2C_144649-481016%29_6961.JPG/1920px-Physcomitrella_patens_%28a%2C_144649-481016%29_6961.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail> ;
+    dcat:byteSize "511651"^^xsd:integer ;
+    dcat:mediaType <https://www.iana.org/assignments/media-types/image/jpeg> ;
+    spdx:checksum sub:fileChecksum .
+  sub:fileChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "c37789a261f2cd756d805bd9f1b69b18895c55556511d27f8832c1d753eaf5cd" .
+  sub:count0 a schema:PropertyValue ;
+    schema:propertyID "n_images" ;
+    schema:value "1"^^xsd:integer ;
+    schema:description "image files in this dataset" .
+  sub:count1 a schema:PropertyValue ;
+    schema:propertyID "width_px" ;
+    schema:value "1920"^^xsd:integer ;
+    schema:unitText "px" ;
+    schema:description "width in pixels of the downloaded file" .
+  sub:count2 a schema:PropertyValue ;
+    schema:propertyID "height_px" ;
+    schema:value "1277"^^xsd:integer ;
+    schema:unitText "px" ;
+    schema:description "height in pixels of the downloaded file" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry> ;
+    prov:wasDerivedFrom <https://commons.wikimedia.org/wiki/File:Physcomitrella_patens_(a,_144649-481016)_6961.JPG> ;
+    prov:wasGeneratedBy sub:retrieval .
+  sub:retrieval a prov:Activity ;
+    prov:endedAtTime "2026-10-31T03:43:31Z"^^xsd:dateTime ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry> ;
+    prov:qualifiedAssociation sub:retrievalPlan .
+  sub:retrievalPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e66117b39b3f6cc9aadb3aac747d33176d47dd0d/cell-geometry/fetch_inputs.py> .
+  <https://w3id.org/delphi/resource/agent/delphisci-cell-geometry> a prov:SoftwareAgent ;
+    rdfs:label "delphisci cell-geometry claim tester" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T14:38:29.901Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Dataset: Wikimedia Commons image Physcomitrella patens (a, 144649-481016) 6961.JPG" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType dcat:Dataset ;
+    npx:introduces <https://w3id.org/delphi/resource/dataset/wikimedia-commons-physcomitrella-leaf> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+  <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> rdfs:label "thompson-growth-form-1917" .
+}
