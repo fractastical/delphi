@@ -169,6 +169,14 @@ def explain_match(envelope: dict, query: str, raw_query: str, exact_version: str
     return reasons, fields, snippet
 
 
+def _params_id(q, raw, kinds_t, status_t, source, scope, context, include_history) -> str:
+    return sha256(canonical({"q": q, "raw": raw, "k": kinds_t, "s": status_t, "src": (source or "").lower(), "sc": scope,
+                             "c": (context or "").lower(), "h": include_history}).encode()).hexdigest()[:8]
+
+
+REQUEST_FIELDS = ("query", "kind", "kinds", "status", "source", "scope", "context", "include_history", "limit", "cursor", "after")
+
+
 class SearchIndex:
     """``SearchIndex(store).search(...)``: lexical and exact discovery with the Store's own authorisation and visibility."""
 
@@ -205,8 +213,7 @@ class SearchIndex:
         raw = query.strip()
         q = raw.lower()
         exact_version = q if _HEX64.fullmatch(q) else None
-        params_id = sha256(canonical({"q": q, "raw": raw, "k": kinds_t, "s": status_t, "src": (source or "").lower(), "sc": scope,
-                                      "c": (context or "").lower(), "h": include_history}).encode()).hexdigest()[:8]
+        params_id = _params_id(q, raw, kinds_t, status_t, source, scope, context, include_history)
         if m and m["pid"] != params_id:
             raise FrontierError("Cursor belongs to a different query or filter set")
         with self.store.connection() as c:
@@ -294,6 +301,36 @@ class SearchIndex:
                     "search_kind": SEARCH_KIND, "ordering": "score descending, then version ascending (stable keyset cursor)",
                     "limit": limit, "heads_only": not include_history}
 
+    def query(self, query: str = "", kind: str | None = None, kinds: str | Sequence[str] | None = None,
+              status: str | Sequence[str] | None = None, source: str | None = None, scope: str | None = None,
+              context: str | None = None, include_history: bool = False, limit: int = 20, cursor: str = "", after: str = "",
+              token: str | None = None) -> dict:
+        """Transport entry point for HTTP and MCP: the legacy Store.search request fields (``query``, ``kind``, ``status``, ``limit``,
+        ``after``) keep working, and the new fields are optional. Unknown fields are rejected by the signature (HTTP 400 / MCP error).
+
+        * ``kind`` (one kind) is the legacy spelling of ``kinds``; giving both is refused.
+        * ``after`` is the legacy spelling of ``cursor``: the ``next_cursor`` of the previous page is accepted under either name. A bare
+          64-hex version in ``after`` is the old "versions greater than" listing and is honoured only when ``query`` is empty, where the
+          order is still by version ascending; with a query the order is by relevance, so pass the returned ``next_cursor`` instead.
+        """
+        kind, status = kind or None, status or None  # the legacy request treated "" as "no filter"
+        if kind is not None and kinds is not None:
+            raise FrontierError("Give either kind or kinds, not both")
+        if cursor and after:
+            raise FrontierError("Give either cursor or after, not both")
+        for name, value in (("cursor", cursor), ("after", after)):
+            if not isinstance(value, str):
+                raise FrontierError(f"{name} must be a string")
+        if after and _HEX64.fullmatch(after):
+            if query.strip():
+                raise FrontierError("A bare version in 'after' only works for an empty query; pass the next_cursor from the previous page")
+            kinds_t = _as_tuple(kind if kind is not None else kinds, KINDS, "kind")
+            status_t = _as_tuple(status, STATUSES, "review status")
+            cursor = f"0.{after}.{_params_id('', '', kinds_t, status_t, source, scope, context, include_history)}"
+            after = ""
+        return self.search(query, kinds=kind if kind is not None else kinds, status=status, source=source, scope=scope, context=context,
+                           include_history=include_history, limit=limit, cursor=cursor or after, token=token)
+
     def _related(self, c, principal, versions: list[str]) -> dict:
         """Explicit relations only: recorded disputing/rejecting reviews, the evidence those reviews cite, diverging imported
         versions, and Evidence records that target a result. Nothing is inferred from text or from the absence of a dispute.
@@ -376,3 +413,19 @@ class SearchIndex:
                  "source_fidelity": source_fidelity(source_view(e["envelope"]["payload"])),
                  "note": "targets this version; whether it supports or opposes is not inferred"})
         return out
+
+
+def _main() -> None:
+    """``FRONTIER_DSN=... python -m frontier.search --namespace NS [--schema S]``: create the search indexes (operator-only, idempotent)."""
+    import argparse
+    import os
+    ap = argparse.ArgumentParser(description="Create the Frontier search indexes (after `python -m frontier init`).")
+    ap.add_argument("--namespace", required=True)
+    ap.add_argument("--schema", default="public")
+    a = ap.parse_args()
+    SearchIndex(Store(os.environ["FRONTIER_DSN"], a.namespace, a.schema)).initialize()
+    print("search indexes ready")
+
+
+if __name__ == "__main__":
+    _main()
