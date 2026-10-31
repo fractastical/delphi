@@ -1,0 +1,105 @@
+@prefix this: <https://w3id.org/np/RAi2l85pQhUXQShYNailPR-cqHdWDcoaH45ZdPpptoh60>.
+@prefix sub: <https://w3id.org/np/RAi2l85pQhUXQShYNailPR-cqHdWDcoaH45ZdPpptoh60/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci dataset-resolvability assessor (Grok 4.7)";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/grok-4.7-high-fast>.
+<https://w3id.org/delphi/resource/model/grok-4.7-high-fast> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Grok 4.7";
+    dc:identifier "grok-4.7-high-fast".
+<https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Grok 4.7 on wolfram2002-ch10-13: resolvable-now, resolvability 0.81";
+    dc:description "The model classes and the data source are fully specified, and both fitting and resampling are standard. Agreement on the fitted statistics together with a loss of detailed structure is a direct confirming pattern; reproduction of those details is a direct refutation. The check is a computation on generated data, not a new experiment.";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0>;
+    dc:type "resolution-route/computation";
+    <http://www.w3.org/2000/01/rdf-schema#comment> "Proposed test with existing data: Fit block-frequency, Markov, and probabilistic cellular-automaton models to data from deterministic cellular automata, matching the statistics used in the fit, then compare typical model samples with the original on features not in the fit. Samples that match the fitted statistics but are more random and miss the detailed features confirm the claim; samples that reproduce those features refute it.";
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0";
+    <https://w3id.org/delphi/ontology/evidenceAgainst> "'More random' needs a pre-registered feature score beyond the fitted statistics.", "A probabilistic model with enough hidden state can be made to copy the data, so the model class has to stay the ones named.";
+    <https://w3id.org/delphi/ontology/hasConfidence> "0.77"^^xsd:double;
+    <https://w3id.org/delphi/ontology/hasEvidence> <https://w3id.org/delphi/resource/evidence/wolfram2002-ch10-13--grok--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch10-13--grok--dataset-2>;
+    <https://w3id.org/delphi/ontology/hasScore> "0.806"^^xsd:double;
+    <https://w3id.org/delphi/ontology/hasVerdict> "resolvable-now".
+<https://w3id.org/delphi/resource/evidence/wolfram2002-ch10-13--grok--dataset-1> a <https://w3id.org/delphi/ontology/EvidenceItem>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Candidate dataset: Golly";
+    dc:description "open generator of deterministic cellular-automaton data to which probabilistic models can be fitted";
+    prov:wasDerivedFrom <https://golly.sourceforge.net/>.
+<https://w3id.org/delphi/resource/evidence/wolfram2002-ch10-13--grok--dataset-2> a <https://w3id.org/delphi/ontology/EvidenceItem>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Candidate dataset: SageMath";
+    dc:description "open fitting of Markov and block-frequency models and comparison of typical samples";
+    prov:wasDerivedFrom <https://www.sagemath.org/>.
+<https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok--analysis-feasibility> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Analysis feasibility of wolfram2002-ch10-13 by Grok 4.7: 0.82";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-analysis-feasibility>;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0/analysis-feasibility";
+    <https://w3id.org/delphi/ontology/hasScore> "0.82"^^xsd:double;
+    dc:isPartOf <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok>.
+<https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok--data-adequacy> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Data adequacy of wolfram2002-ch10-13 by Grok 4.7: 0.72";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-data-adequacy>;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0/data-adequacy";
+    <https://w3id.org/delphi/ontology/hasScore> "0.72"^^xsd:double;
+    dc:isPartOf <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok>.
+<https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok--data-existence> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Data existence of wolfram2002-ch10-13 by Grok 4.7: 0.86";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-data-existence>;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0/data-existence";
+    <https://w3id.org/delphi/ontology/hasScore> "0.86"^^xsd:double;
+    dc:isPartOf <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok>.
+<https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok--discriminating-power> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Discriminating power of wolfram2002-ch10-13 by Grok 4.7: 0.76";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-discriminating-power>;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0/discriminating-power";
+    <https://w3id.org/delphi/ontology/hasScore> "0.76"^^xsd:double;
+    dc:isPartOf <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok>.
+<https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok--operationalizability> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Operationalizability of wolfram2002-ch10-13 by Grok 4.7: 0.86";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-operationalizability>;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0/operationalizability";
+    <https://w3id.org/delphi/ontology/hasScore> "0.86"^^xsd:double;
+    dc:isPartOf <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok>.
+<https://w3id.org/delphi/resource/claim/wolfram2002-ch10-13> <https://w3id.org/delphi/ontology/hasAssessment> <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok>, <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok--analysis-feasibility>, <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok--data-adequacy>, <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok--data-existence>, <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok--discriminating-power>, <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok--operationalizability>
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    prov:wasDerivedFrom <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0>, <https://github.com/fractastical/delphisci/blob/b767f83a40b537c1334379c102d09b7a899bda3c/wolfram-nks/assessment/raw/grok/batch-5.json>;
+    prov:wasGeneratedBy sub:assessment.
+sub:assessment a prov:Activity;
+    prov:qualifiedAssociation sub:assessmentPlan;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>.
+sub:assessmentPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/b767f83a40b537c1334379c102d09b7a899bda3c/wolfram-nks/assessment/INSTRUCTIONS.md>
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Grok 4.7 on wolfram2002-ch10-13: resolvable-now, resolvability 0.81";
+    dc:created "2026-10-31T04:06:01.363Z"^^xsd:dateTime;
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch10-13--grok>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/wolfram-nks-2002>.
+<https://w3id.org/delphi/resource/domain/wolfram-nks-2002> <http://www.w3.org/2000/01/rdf-schema#label> "wolfram-nks-2002".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "YpqfqoXuN0BxhJhyAtfOLqjn1zk/On1n3KSImmtqXib1YLjKgp6UTQUDd+NzFDY3Ag/gX5k/4HJXRDoVjrL0HlRlNpYfFEjdBp1Aing5DHdmfLju8EndfMMy29rM9bE6cdfiepfAR2EgbnwTltaBoMkOXMBlbR8f4Kzbk9ifesAjisc1qg+1wkgWS7ku+8neFYxtt8+vUhUCI3LU3pBeXbL0h1l69az2AFHZGTO8ynUoyG2jb9uIznGvZWtU055bCPSJtTABKy4OMV+8uAlfR82tvaxGq8JQt6UglCL2MQOD6A0KLjz3PxLJNyQhL197+s7gQzJQDsoGa5hAW0xRog=="
+}
