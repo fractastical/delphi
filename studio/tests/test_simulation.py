@@ -124,3 +124,20 @@ def test_controlled_stall_constraint_marks_heavy_baseline_infeasible_at_12ms():
     from engineering.simulation import controlled as CT
     b = CT.baseline("Cypselurus", 0.4)
     assert CT.metrics(b, 12.0, CT.POLARS["P1_nominal"])[1] > 12.0               # level stall speed exceeds the release speed
+
+
+def test_video_artifacts_manifest_consistent():
+    import hashlib, json, pathlib
+    d = pathlib.Path(__file__).resolve().parent.parent / "engineering" / "simulation" / "video"
+    for man, vid in (("manifest.json", "glide_fixed_launch.mp4"), ("manifest_rd.json", "rd_fields.mp4")):
+        m = json.loads((d / man).read_text())
+        f = d / vid
+        assert hashlib.sha256(f.read_bytes()).hexdigest() == m["video_sha256"]
+        assert 10 <= m["duration_video_s"] <= 20 and f.stat().st_size < 8_000_000 and m["ffmpeg_exit"] == 0 and m["evidence_kind"] == "simulated"
+        assert "glide" in json.dumps(m["time_units"]) or "tau" in json.dumps(m["time_units"])
+
+
+def test_rd_rerun_reproduces_frozen_rows():
+    import json, pathlib
+    r = json.loads((pathlib.Path(__file__).resolve().parent.parent / "engineering" / "simulation" / "rd" / "receipt.json").read_text())
+    assert all(c["reproduces_frozen_row"] and c["relative_amp_difference"] < 1e-9 for c in r["cells"])
