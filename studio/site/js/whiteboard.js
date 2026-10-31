@@ -91,7 +91,7 @@
       <p>${U.pill(q.state.replace(/_/g, " "), q.state === "open" ? "open" : "done")} ${U.pill(wb.approaches[a.approach][0], "ap-" + a.approach)} ${q.origin === "curated" ? U.pill("curated", "cur") : U.pill("generated", "gen")}</p>
       <p class="small faint">Approach is ${a.fromRecord ? "stated by the record" : "assigned by this site's authors (the record carries no approach field)"}.</p>
       ${q.state === "resolved_in_review" ? html`<p class="note small">“Resolved in review” is an upstream project label, not acceptance by this site.</p>` : ""}
-      <dl class="kv wide"><div><dt>Owner</dt><dd>${a.owner || "no owner recorded"}</dd></div><div><dt>Scales</dt><dd>${a.scales.length ? a.scales.map((s) => html`<a class="pill" href="${DF.href("/engineering", { scale: s })}">${(snap.mission.scales.find((x) => x.key === s) || { label: s }).label}</a> `) : "none stated"}</dd></div>
+      <dl class="kv wide"><div><dt>Owner</dt><dd>${a.owner || "no owner recorded"}</dd></div><div><dt>Scales</dt><dd>${a.scales.length ? a.scales.map((s) => html`<a class="pill" href="${DF.href("/studio/flying-fish", { scale: s })}" title="Open this subsystem in the Flying fish studio">${(snap.mission.scales.find((x) => x.key === s) || { label: s }).label}</a> `) : "none stated"}</dd></div>
       <div><dt>Context tags</dt><dd>${a.tags.length ? a.tags.join(", ") : "none"}</dd></div>
       <div><dt>Blocked by</dt><dd>${a.blockedBy.length ? a.blockedBy.map((d) => html`<a href="${DF.href("/frontier/" + d)}">${d}</a> `) : "nothing recorded"}</dd></div>
       <div><dt>Limits constraints</dt><dd>${a.limits.length ? a.limits.map((c) => html`<a href="${DF.href("/frontier/" + c)}">${c}</a> `) : "none"}</dd></div></dl>
@@ -189,7 +189,7 @@
 
     return {
       html: html`
-      <section class="hero compact"><div><p class="eyebrow">Delphi Frontier</p><h1>What we know.<br>What's next.<br>Who's working on it.</h1></div>
+      <section class="hero compact"><div><p class="eyebrow">MorphoSwarm Frontier · open work</p><h1>What we know.<br>What's next.<br>Who's working on it.</h1></div>
         <div class="herotext"><p class="lede">An open-questions whiteboard where a design goal and the literature meet. <b>Top-down</b>: goal, then constraints, then what is unresolved. <b>Bottom-up</b>: theory and evidence fitted to known biology, then challenged and reconciled. The questions column is where they have to agree.</p>
           <p class="mission"><b>Mission</b> Engineer toward a flying fish.</p></div></section>
 

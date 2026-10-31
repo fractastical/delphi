@@ -373,6 +373,7 @@ def build() -> dict[str, bytes]:
     seeds = ins.json("seeds/frontier-data.json")
     problems = ins.json("seeds/frontier-problems.json")
     mission = ins.json("site/content/mission.json")
+    projects = ins.json("site/content/projects.json")
     board = parse_board(ins.text("tasks/BUILD.md"))
     spec_text = ins.text("specs/SPEC-005-agentic-engineering-demo.md")
     mcp_text = ins.text("docs/mcp.md")
@@ -417,6 +418,7 @@ def build() -> dict[str, bytes]:
         "bridges": seeds["bridges"],
         "problems": problems["problems"],
         "mission": mission,
+        "projects": projects,
         "documents": docs,
         "capabilities": tools,
         "board": board,

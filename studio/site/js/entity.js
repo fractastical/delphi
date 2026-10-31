@@ -17,7 +17,7 @@
   }
   function artifacts(arts) {
     if (!Array.isArray(arts) || !arts.length) return html`<p class="faint small">No artifact is declared.</p>`;
-    return html`<div class="artgrid">${arts.map((a) => html`<article class="artcard"><h4>${a.title}</h4>${mediaOf(a)}
+    return html`<div class="artgrid">${arts.map((a) => html`<article class="artcard"><h3>${a.title}</h3>${mediaOf(a)}
       <p class="small">${U.pill(a.role, "ev")} ${U.pill(a.media_type, "grp")} ${U.pill(a.availability, a.availability === "downloadable" ? "ok" : "st-unk")}</p>
       <p class="small">${/^https:/.test(a.uri || "") ? U.ext(a.uri, a.uri) : html`<code>${a.uri}</code>`}<br>sha256 ${U.sha(a.sha256)} · ${a.byte_size} bytes${a.license ? " · licence " + a.license : ""}</p>
       <p class="small faint">The digest is declared; the bytes have not been verified by this page.</p></article>`)}</div>`;
@@ -32,17 +32,17 @@
 
   function body(rec, snap, related) {
     const p = rec.payload || {}; const k = rec.ref.kind; const eq = equationFor(rec, snap);
-    const eqBlock = eq ? html`<h3>Equation</h3>${DF.mixedSpan(eq)}<p class="small faint">Rendered with KaTeX. An expression it cannot render is shown as its TeX source, marked unsupported.</p>` : "";
-    if (k === "Claim") return html`<h3>Statement</h3>${para(p.statement)}${eqBlock}<h3>Context</h3>${para(p.context)}<h3>Assumptions</h3>${list(p.assumptions)}<h3>Limitations</h3>${list(p.limitations)}<h3>Source</h3>${src(p.source)}
-      ${p.prior_review && Object.keys(p.prior_review).length ? html`<h3>Upstream review (an assertion, not local acceptance)</h3><dl class="kv wide">${Object.entries(p.prior_review).filter(([, v]) => typeof v === "string").map(([a, v]) => html`<div><dt>${a.replace(/_/g, " ")}</dt><dd>${v}</dd></div>`)}</dl>` : ""}`;
-    if (k === "Evidence") return html`<h3>What was done</h3>${para(p.method)}<h3>Result context</h3>${para(p.context)}
-      <p>${U.pill("evidence kind: " + p.evidence_kind, "ev")} ${p.relation ? U.pill("relation to target: " + p.relation, "grp") : ""}</p><h3>Uncertainty</h3>${para(p.uncertainty)}<h3>Limitations</h3>${list(p.limitations)}<h3>Assumptions</h3>${list(p.assumptions)}
-      <h3>Artifacts</h3>${artifacts(p.artifacts)}<h3>Source</h3>${src(p.source)}${p.source_dependence ? html`<details><summary class="small">Source dependence</summary><pre class="json">${JSON.stringify(p.source_dependence, null, 1)}</pre></details>` : ""}
+    const eqBlock = eq ? html`<h2 class="eh">Equation</h2>${DF.mixedSpan(eq)}<p class="small faint">Rendered with KaTeX. An expression it cannot render is shown as its TeX source, marked unsupported.</p>` : "";
+    if (k === "Claim") return html`<h2 class="eh">Statement</h2>${para(p.statement)}${eqBlock}<h2 class="eh">Context</h2>${para(p.context)}<h2 class="eh">Assumptions</h2>${list(p.assumptions)}<h2 class="eh">Limitations</h2>${list(p.limitations)}<h2 class="eh">Source</h2>${src(p.source)}
+      ${p.prior_review && Object.keys(p.prior_review).length ? html`<h2 class="eh">Upstream review (an assertion, not local acceptance)</h2><dl class="kv wide">${Object.entries(p.prior_review).filter(([, v]) => typeof v === "string").map(([a, v]) => html`<div><dt>${a.replace(/_/g, " ")}</dt><dd>${v}</dd></div>`)}</dl>` : ""}`;
+    if (k === "Evidence") return html`<h2 class="eh">What was done</h2>${para(p.method)}<h2 class="eh">Result context</h2>${para(p.context)}
+      <p>${U.pill("evidence kind: " + p.evidence_kind, "ev")} ${p.relation ? U.pill("relation to target: " + p.relation, "grp") : ""}</p><h2 class="eh">Uncertainty</h2>${para(p.uncertainty)}<h2 class="eh">Limitations</h2>${list(p.limitations)}<h2 class="eh">Assumptions</h2>${list(p.assumptions)}
+      <h2 class="eh">Artifacts</h2>${artifacts(p.artifacts)}<h2 class="eh">Source</h2>${src(p.source)}${p.source_dependence ? html`<details><summary class="small">Source dependence</summary><pre class="json">${JSON.stringify(p.source_dependence, null, 1)}</pre></details>` : ""}
       ${p.provenance ? html`<details><summary class="small">Provenance</summary><pre class="json">${JSON.stringify(p.provenance, null, 1)}</pre></details>` : ""}`;
-    if (k === "Problem") return html`<h3>The question</h3>${para(p.question)}<h3>What is known</h3>${para(p.known_state)}${eqBlock}<p>${U.pill("completeness: " + (p.completeness || "not stated"), p.completeness === "actionable" ? "ok" : "st-unk")} ${p.problem_kind ? U.pill(p.problem_kind, "grp") : ""}</p>
-      ${p.next_action ? html`<h3>Next action</h3>${para(p.next_action)}` : ""}${(p.acceptance_criteria || []).length ? html`<h3>What would settle it</h3>${list(p.acceptance_criteria)}` : ""}${(p.falsifiers || []).length ? html`<h3>Falsifiers</h3>${list(p.falsifiers)}` : ""}
-      <h3>Capabilities needed</h3>${list(p.required_capabilities)}<h3>Data access</h3>${para(p.data_access)}<h3>Novelty status</h3>${para(p.novelty_status)}<h3>Source</h3>${src(p.source)}`;
-    if (k === "Action") return html`<h3>What would be done</h3>${para(p.title)}<h3>Acceptance criteria</h3>${list(p.acceptance_criteria)}<h3>Cost and stop bounds</h3>${para(p.cost_stop_bounds)}<h3>Capabilities needed</h3>${list(p.required_capabilities)}
+    if (k === "Problem") return html`<h2 class="eh">The question</h2>${para(p.question)}<h2 class="eh">What is known</h2>${para(p.known_state)}${eqBlock}<p>${U.pill("completeness: " + (p.completeness || "not stated"), p.completeness === "actionable" ? "ok" : "st-unk")} ${p.problem_kind ? U.pill(p.problem_kind, "grp") : ""}</p>
+      ${p.next_action ? html`<h2 class="eh">Next action</h2>${para(p.next_action)}` : ""}${(p.acceptance_criteria || []).length ? html`<h2 class="eh">What would settle it</h2>${list(p.acceptance_criteria)}` : ""}${(p.falsifiers || []).length ? html`<h2 class="eh">Falsifiers</h2>${list(p.falsifiers)}` : ""}
+      <h2 class="eh">Capabilities needed</h2>${list(p.required_capabilities)}<h2 class="eh">Data access</h2>${para(p.data_access)}<h2 class="eh">Novelty status</h2>${para(p.novelty_status)}<h2 class="eh">Source</h2>${src(p.source)}`;
+    if (k === "Action") return html`<h2 class="eh">What would be done</h2>${para(p.title)}<h2 class="eh">Acceptance criteria</h2>${list(p.acceptance_criteria)}<h2 class="eh">Cost and stop bounds</h2>${para(p.cost_stop_bounds)}<h2 class="eh">Capabilities needed</h2>${list(p.required_capabilities)}
       ${p.target ? html`<p><b>Target:</b> ${refLink(p.target)}</p>` : ""}${(p.inputs || []).length ? html`<p><b>Inputs:</b> ${p.inputs.map((r) => html`${refLink(r)} `)}</p>` : ""}`;
     const scal = Object.entries(p).filter(([, v]) => typeof v === "string" || typeof v === "number" || typeof v === "boolean");
     return html`<dl class="kv wide">${scal.map(([a, v]) => html`<div><dt>${a.replace(/_/g, " ")}</dt><dd>${String(v)}</dd></div>`)}</dl>`;
@@ -73,14 +73,14 @@
           <p>${U.pill(r.kind, "k-" + r.kind)} ${U.pill("local status: " + String(rec.local_status || "not reported").replace(/_/g, " "), "st-unk")} ${rec.is_head === false ? U.pill("not the current version", "warn") : ""}</p>
           <p class="small faint"><code>${r.namespace}/${r.kind}/${r.id}</code> · version ${U.sha(r.version)} · ${rec.issuer ? "issuer " + rec.issuer + " · " : ""}Imported or upstream labels are assertions made elsewhere; a local status is this node's review state only.</p>
           <div class="entlayout"><div class="entmain">${body(rec, snap, rel)}</div>
-          <aside class="entside" aria-label="Related"><h3>Related</h3>${rel.length ? html`<ul>${rel.map(([a, x]) => html`<li>${a}: ${refLink(x)}</li>`)}</ul>` : html`<p class="faint small">No typed reference in this record.</p>`}<div id="relmore"></div>
+          <aside class="entside" aria-label="Related"><h2 class="eh">Related</h2>${rel.length ? html`<ul>${rel.map(([a, x]) => html`<li>${a}: ${refLink(x)}</li>`)}</ul>` : html`<p class="faint small">No typed reference in this record.</p>`}<div id="relmore"></div>
             <p class="small"><a class="btn small" href="${DF.href("/graph/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace })}">Open the neighbourhood graph</a></p></aside></div>
           <details class="advraw"><summary><b>Advanced: raw record envelope</b></summary><pre class="json">${JSON.stringify(rec.raw || rec, null, 2)}</pre></details>`.toString();
         DF.renderMath(host);
         // Evidence that points at this record (a lexical lookup of records that mention its id, filtered to a real typed target reference).
         try {
           const more = (await DF.api.catalog({ query: r.id, limit: 50 })).records.filter((x) => x.ref.id !== r.id && x.payload && x.payload.target && x.payload.target.id === r.id);
-          if (more.length) host.querySelector("#relmore").innerHTML = html`<h4>Records that target this one</h4><ul>${more.map((x) => html`<li>${U.pill(x.ref.kind, "k-" + x.ref.kind)} ${refLink(x.ref, x.title)}${x.payload.relation ? html` <span class="faint small">(${x.payload.relation})</span>` : ""}</li>`)}</ul>`.toString();
+          if (more.length) host.querySelector("#relmore").innerHTML = html`<h3>Records that target this one</h3><ul>${more.map((x) => html`<li>${U.pill(x.ref.kind, "k-" + x.ref.kind)} ${refLink(x.ref, x.title)}${x.payload.relation ? html` <span class="faint small">(${x.payload.relation})</span>` : ""}</li>`)}</ul>`.toString();
         } catch (e) { /* the page stands without it */ }
       },
     };

@@ -380,7 +380,8 @@
       ${attestationSection(snap)}
 
       <section class="panel" aria-labelledby="ev-a"><h2 id="ev-a">Artifacts index</h2>
-        <p class="note small">Data, proofs, simulations, geometry, code and documents, each with its exact source, the context it was made in, the check it passed or failed, any dispute, and the next action. A digest in a record is a declaration, not a byte verification. <b>No simulation or geometry artifact is indexed in this snapshot.</b></p>
+        <p class="note small">Data, proofs, simulations, geometry, code and documents, each with its exact source, the context it was made in, the check it passed or failed, any dispute, and the next action. A digest in a record is a declaration, not a byte verification.</p>
+        <p class="small" id="artsummary" role="status"></p>
         <form class="filters" data-form="evidence" aria-label="Filter artifacts"><label>Type <select name="at"><option value="">all</option>${["data", "proof", "simulation", "geometry", "protocol", "code", "document"].map((t) => html`<option ${t === (route.params.at || "") ? raw("selected") : ""}>${t}</option>`)}</select></label><input type="hidden" name="rl" value="${f.rl}"><button class="btn" type="submit">Apply</button></form>
         <div id="artifacts" role="status">Loading…</div></section>
 
@@ -388,12 +389,14 @@
         <p class="note small">Unread sources and unfound data are first-class: they bound what any constraint here can claim.</p>
         <ul class="neg">${neg.map((n) => html`<li><b>${n.t}</b> ${n.w} ${n.id ? U.src(n.id, "Open") : ""}</li>`)}</ul>
         <h3>Data inventory (exocoetid)</h3><div class="tablewrap"><table><thead><tr><th>Dataset</th><th>State</th><th>Detail</th></tr></thead><tbody>${m.data_inventory.map((d) => html`<tr><td>${d.what}</td><td>${U.pill(d.state, /not found/.test(d.state) ? "no" : "ok")}</td><td>${d.detail}</td></tr>`)}</tbody></table></div>
-        <p class="small faint">States separate discovered, retrieved, replayed and validated. Here, nothing has been replayed or validated.</p></section>`,
+        <p class="small faint">${dataStates(m.data_inventory)}</p></section>`,
       async after(root) {
         DF.bindForm(root, "evidence", (v) => DF.href("/evidence", v));
         const host = root.querySelector("#artifacts"); const want = route.params.at || "";
         const rows = DF.artifactIndex(snap);
         try { const r = await DF.api.artifacts({ limit: 50 }); rows.push(...DF.liveArtifacts(r.items)); } catch (e) { rows.push({ title: "Runtime artifacts could not be read", type: "document", source: e.message, context: "", check: "", dispute: "", next: "", error: true }); }
+        const byType = rows.reduce((o, r) => ((o[r.type] = (o[r.type] || 0) + 1), o), {}); const dl = rows.filter((r) => r.download).length;
+        root.querySelector("#artsummary").textContent = `${rows.length} artifacts indexed: ${Object.entries(byType).map(([t, n]) => `${n} ${t}`).join(", ")}. ${dl} offer a file that is present and hash-checked in this build; the rest are declared pointers. The ${(snap.print_forms ? snap.print_forms.forms.length : 0)} print forms, ${(snap.simulation_manifests || []).filter((m) => m.video_state === "present_verified").length} verified videos and ${snap.simulation ? snap.simulation.files.length : 0} simulation result files are listed under Studio, Engineering and Simulations with their own checks.`;
         const shown = rows.filter((r) => !want || r.type === want);
         host.innerHTML = shown.length ? html`<div class="tablewrap"><table class="arttable"><thead><tr><th>Artifact</th><th>Type</th><th>Exact source</th><th>Context</th><th>Check</th><th>Dispute</th><th>Next action</th></tr></thead><tbody>${shown.map((r) => html`<tr><td>${r.doc ? U.src("doc:" + r.doc, r.title) : r.title}</td><td>${U.pill(r.type, "ev")}</td><td>${r.url ? U.ext(r.url, r.source) : r.source}</td><td>${clipCell(r.context)}</td><td>${clipCell(r.check)}</td><td>${clipCell(r.dispute || "")}</td><td>${clipCell(r.next)}${r.download ? html` <a class="btn small ghost" href="${r.download}" target="_blank" rel="noopener noreferrer" download>Download file</a>` : r.doc ? "" : html` <span class="faint small">no downloadable file is declared</span>`}</td></tr>`)}</tbody></table></div>`.toString() : `<p class="empty">No ${esc(want || "")} artifact is indexed. Nothing is shown in its place.</p>`;
       },
@@ -416,6 +419,11 @@
   DF.liveArtifacts = (items) => items.map((it) => { const a = it.artifact || {}; return { title: a.title || "(untitled)", type: ROLE_TYPE[a.role] || "document", source: `${a.uri} · sha256 ${String(a.sha256).slice(0, 12)}… · ${a.byte_size} bytes · ${a.availability}${it.is_head === false ? " · superseded version" : ""}`, url: /^https:/.test(a.uri || "") ? a.uri : null,
     context: (it.context || "") + (it.relation ? ` (relation: ${it.relation}; target ${it.target ? it.target.kind + " " + it.target.id : "?"}${it.produced_by ? "; produced by " + it.produced_by.id : ""})` : ""), check: `${it.evidence_kind || "evidence"}; local status ${String(it.local_status || "not reported").replace(/_/g, " ")}; digest declared, bytes ${it.artifact_bytes_verified ? "verified" : "not verified"}`,
     dispute: it.relation === "refutes" ? "This evidence refutes its target." : "", download: a.availability === "downloadable" && /^https:/.test(a.uri || "") ? a.uri : null, next: (it.limitations || []).join("; ") }; });
+
+  function dataStates(inv) {
+    const n = inv.length; const nf = inv.filter((d) => /not found/.test(d.state)).length; const rt = inv.filter((d) => /retrieved/.test(d.state)).length;
+    return `Of the ${n} exocoetid datasets listed here, ${rt} were retrieved (as counts or metadata only) and ${nf} could not be found. None of these has been replayed against a model or validated; replays elsewhere in this site (BioModels, fin mechanics, glide, reaction-diffusion) are of other inputs.`;
+  }
 
   function attestationSection(snap) {
     const A = snap.attestation_check; if (!A) return "";

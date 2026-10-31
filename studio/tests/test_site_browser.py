@@ -140,7 +140,7 @@ def test_engineering_checks_never_fake_a_pass(browser, base):
 
 def test_mobile_has_no_horizontal_page_overflow(browser, base):
     pg = page(browser, 400, 860)
-    for route in ["frontier", "knowledge?tab=graph", "engineering", "simulations", "evidence", "work", "work?tab=receipts", "belief"]:
+    for route in ["home", "studio/flying-fish", "studio/flying-fish?scale=organ", "entity/Claim/turing-ddi", "frontier", "knowledge?tab=graph", "engineering", "simulations", "evidence", "work", "work?tab=receipts", "belief"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_timeout(1200)
         assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth"), route
@@ -307,7 +307,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -370,3 +370,38 @@ def test_search_autocomplete_is_typed_keyboard_operable_and_honest(browser, base
     assert "No match" in pg.locator("#ac-list .ace").inner_text()
     pg.press("#gq", "Escape")
     assert pg.locator("#ac-list").is_hidden()
+
+
+def test_two_entry_paths_studio_and_frontier_are_clear_and_cross_linked(browser, base):
+    pg = page(browser)
+    pg.goto(base)
+    pg.wait_for_selector(".paths .path.studio")
+    assert pg.locator(".brand").inner_text().lower().startswith("morphoswarm")
+    nav = pg.locator("header nav a").all_inner_texts()
+    assert nav[:2] == ["Studio", "Frontier"], nav
+    assert pg.locator(".path.studio a:has-text('Open the Flying fish studio')").count() == 1
+    assert pg.locator(".path.frontier a:has-text('Open the Frontier')").count() == 1
+    pg.locator(".path.studio a:has-text('Open the Flying fish studio')").click()
+    pg.wait_for_selector(".studiogrid")
+    assert "/studio/flying-fish" in pg.url
+    assert pg.locator("header nav a[aria-current=page]").inner_text() == "Studio"
+
+
+def test_studio_subsystems_show_models_gaps_questions_and_local_only_drafts(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=cellular")
+    pg.wait_for_selector(".studiogrid")
+    txt = pg.locator(".studiomain").inner_text().lower()
+    assert "collier 1996" in txt or "delta-notch" in txt
+    assert pg.locator(".studiomain video").count() >= 0
+    pg.get_by_role("link", name="Molecular", exact=False).first.click()
+    pg.wait_for_selector("text=No model is attached at this scale")
+    assert "daane" in pg.locator(".studiomain").inner_text().lower()
+    pg.fill("#annbody", "Check the Daane transfer claim")
+    pg.click("#annsave")
+    assert "local draft, not submitted" in pg.locator("#annlist").inner_text()
+    assert "nothing is submitted" in pg.locator("#ann-h ~ .note").inner_text().lower()
+    pg.locator("#annlist [data-del]").first.click()
+    assert "No drafts" in pg.locator("#annlist").inner_text()
+    pg.goto(base + "#/studio/not-a-project")
+    pg.wait_for_selector("h1:has-text('No such project')")
