@@ -197,7 +197,9 @@ def test_simulation_gallery_never_invents_a_video(browser, base):
     pg = page(browser)
     pg.goto(base + "#/simulations")
     pg.wait_for_selector(".simcard, .empty")
-    assert pg.locator("video").count() == 0, "no video file exists in the snapshot, so no player may appear"
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    verified = [m for m in snap["simulation_manifests"] if m.get("video_state") == "present_verified"]
+    assert pg.locator("video").count() == len(verified), "a player may appear only for a verified video file"
     html = pg.evaluate("""() => DF.views.simulations(Object.assign({}, DF.api.state.snapshot, {simulation: null, simulation_manifests: [
       {id: 'ok', title: 'ok', scales: ['cellular'], video_state: 'present_verified', video_href: 'artifacts/simulations/ok/v.mp4', manifest: 'm'},
       {id: 'miss', title: 'miss', scales: ['cellular'], video_state: 'declared_but_missing', manifest: 'm'},
@@ -241,3 +243,30 @@ def test_system_view_keeps_author_report_and_measured_apart(browser, base):
     assert "Solver and Lean boundary" in pg.locator("#drawer").inner_text()
     pg.go_back()
     pg.wait_for_selector("#drawer", state="hidden")
+
+
+def test_print_forms_and_videos_match_their_declared_bytes(browser, base):
+    """Whatever artifacts the tree provides: every offered file exists and equals its declared sha256; absence is stated."""
+    import hashlib
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    pg = page(browser)
+    pg.goto(base + "#/engineering")
+    pg.wait_for_selector("#pf-h")
+    pf = snap.get("print_forms")
+    if not pf:
+        assert "no printable-form study is present" in pg.locator("section[aria-labelledby=pf-h]").inner_text().lower()
+    else:
+        for f in pf["forms"]:
+            for key in ("stl", "stand_stl", "image", "image_on_stand"):
+                ent = f["files"].get(key)
+                if ent:
+                    assert hashlib.sha256((ROOT / "site" / ent["href"]).read_bytes()).hexdigest() == ent["sha256"] == ent["declared_sha256"], (f["id"], key)
+        pg.locator("[data-loadmesh]").first.click()
+        pg.wait_for_selector(".meshhost canvas")
+        assert pg.locator(".meshhost .viewbar button").count() == 4
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector(".simcard, .empty")
+    vids = [m for m in snap["simulation_manifests"] if m.get("video_state") == "present_verified"]
+    assert pg.locator("video").count() == len(vids)
+    for m in vids:
+        assert (ROOT / "site" / m["video_href"]).is_file()

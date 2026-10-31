@@ -26,7 +26,8 @@
         <div class="tablewrap"><table><thead><tr><th>Author's box</th><th>Item</th></tr></thead><tbody>${S.goal_checklist.map((g) => html`<tr><td>${g.done ? U.pill("ticked", "ok") : U.pill("open", "open")}</td><td>${g.text}</td></tr>`)}</tbody></table></div></section>
       <section class="panel"><h2>The two levels</h2><div class="two"><article><h3>${AUTHOR}</h3><p>${S.levels.author_report}</p></article><article><h3>${MEAS}</h3><p>${S.levels.measured}</p></article></div></section>`,
       async after(root) { if (!live) return; const r = await DF.api.system(); const el = root.querySelector("#depsha"); const rep = r.report || {}; const k = ["deployed_sha", "git_sha", "commit", "sha", "release"].find((x) => typeof rep[x] === "string");
-        el.textContent = k ? `${rep[k]} (reported by the runtime as “${k}”)` : r.unavailable ? `not reported (system report unavailable: ${r.reason})` : "not reported in the system report"; } };
+        const sha = rep.release && rep.release.checkout_sha; const bi = rep.build && rep.build.release_sha;
+        el.textContent = sha ? `${sha} (measured: git rev-parse HEAD of the deployed checkout)${bi ? `; build-info reports ${bi}, matches: ${rep.build.matches_checkout}` : ""}` : k ? `${rep[k]} (reported by the runtime as “${k}”)` : r.unavailable ? `not reported (system report unavailable: ${r.reason})` : "not reported in the system report"; } };
   }
 
   function specs(snap, S) {
@@ -54,12 +55,37 @@
       <tr><td>CPU jobs, utilisation</td><td>none in this tree</td><td>${U.pill("unknown", "st-unk")}</td></tr><tr><td>GPU jobs, utilisation</td><td>none in this tree</td><td>${U.pill("unknown", "st-unk")}</td></tr>
       <tr><td>Provider-billed cost</td><td>none; the board says it is not yet known</td><td>${U.pill("unknown", "st-unk")}</td></tr><tr><td>Resource bounds used for runs</td><td>stated in <code>tasks/BUILD.md</code> (author report)</td><td>${AUTHOR}</td></tr></tbody></table></div>
       <ul>${S.unknown.map((u) => html`<li>${u}</li>`)}</ul><p class="small faint">An estimate is not an actual. Figures appear here only when the runtime reports them.</p></section><div id="sysraw"></div>`,
-      async after(root) { if (!live) return; const r = await DF.api.system(); root.querySelector("#sysraw").innerHTML = rawBlock(r).toString(); } };
+      async after(root) { if (!live) return; const r = await DF.api.system(); root.querySelector("#sysraw").innerHTML = liveSystem(r).toString(); } };
   }
 
-  function rawBlock(r) {
-    return r.unavailable ? html`<section class="panel"><h2>Live system report</h2><p class="empty">Not available (${r.reason}). Nothing is shown in its place.</p></section>`
-      : html`<section class="panel"><h2>Live system report, as received</h2><p class="note small">The report's fields are not yet specified, so it is shown unprocessed rather than interpreted. Nothing here has been checked by this page.</p><pre class="json">${JSON.stringify(r.report, null, 2)}</pre></section>`;
+  const MODE = (m) => (m === "measured" ? MEAS : m === "worker_report" ? AUTHOR : U.pill(String(m || "unlabelled"), "st-unk"));
+  const bytes = (n) => (n === null || n === undefined ? "unknown" : n >= 1e9 ? (n / 1e9).toFixed(2) + " GB" : n >= 1e6 ? (n / 1e6).toFixed(1) + " MB" : Math.round(n / 1e3) + " kB");
+  const sect = (s) => (s && s.status === "unavailable" ? html`<p class="empty">This section was unavailable on the runtime (${s.section}). Nothing is shown in its place.</p>` : null);
+
+  /* Rendered from the documented frontier.system/1 shape (frontier/system_status.py). Every section carries its own mode label. */
+  function liveSystem(r) {
+    if (r.unavailable) return html`<section class="panel"><h2>Live system report</h2><p class="empty">Not available (${r.reason}). Nothing is shown in its place.</p></section>`;
+    const R = r.report; if (!R || R.schema !== "frontier.system/1") return html`<section class="panel"><h2>Live system report</h2><p class="note warn small">The runtime answered with an unrecognised schema (${String(R && R.schema)}), so it is shown unprocessed.</p><pre class="json">${JSON.stringify(R, null, 2)}</pre></section>`;
+    const st = R.store || {}, pr = R.process || {}, ho = R.host || {}, sv = R.services || {}, rl = R.release || {}, rs = R.resources || {};
+    return html`<section class="panel"><h2>Live system report ${MEAS}</h2><p class="small faint">Generated ${R.generated_at}${R.cache ? `, ${R.cache.cached ? "cached " + R.cache.age_seconds + " s" : "fresh"} (reused up to ${R.cache.ttl_seconds} s)` : ""}. ${R.legend ? R.legend.measured : ""}</p>
+      <h3>Store ${MODE(st.mode)}</h3>${sect(st) || html`<p class="small">${st.note}</p><div class="tablewrap"><table><thead><tr><th>Kind</th><th>Local status</th><th>Versions</th><th>Current heads</th></tr></thead><tbody>${(st.records_by_kind_and_local_status || []).map((x) => html`<tr><td>${x.kind}</td><td>${String(x.local_status).replace(/_/g, " ")}</td><td>${x.versions}</td><td>${x.heads}</td></tr>`)}</tbody></table></div>
+        <p class="small">Events by type: ${(st.events_by_type || []).map((e) => `${e.event_type} ${e.count}`).join(", ") || "none"}. Database ${bytes(st.database && st.database.size_bytes)}, up ${st.database ? Math.round(st.database.uptime_seconds / 60) + " min" : "unknown"}, PostgreSQL ${st.database && st.database.server_version}. These are record counts, not independent observations.</p>`}
+      <h3>Services ${MODE(sv.mode)}</h3><div class="tablewrap"><table><thead><tr><th>Unit</th><th>State</th><th>Restarts</th><th>Memory</th><th>Tasks</th><th>Active since</th></tr></thead><tbody>${(sv.units || []).map((u) => html`<tr><td><code>${u.unit}</code></td><td>${u.state === "measured" ? `${u.active_state}/${u.sub_state}` : "unavailable"}</td><td>${u.restarts ?? "unknown"}</td><td>${bytes(u.memory_current_bytes)}</td><td>${u.tasks_current ?? "unknown"}</td><td>${u.active_since || ""}</td></tr>`)}</tbody></table></div>
+      <h3>This web process ${MODE(pr.mode)}</h3>${sect(pr) || html`<p class="small">${pr.scope}: up ${Math.round(pr.uptime_seconds)} s, ${bytes(pr.resident_memory_kb * 1000)} resident, ${pr.threads} threads, CPU ${pr.cpu_seconds && pr.cpu_seconds.user} s user / ${pr.cpu_seconds && pr.cpu_seconds.system} s system.</p>`}
+      <h3>Host ${MODE(ho.mode)}</h3>${sect(ho) || html`<p class="note warn small"><b>${ho.scope}</b></p><p class="small">${ho.cpu_count} CPUs; load ${ho.load_average ? `${ho.load_average["1m"]} / ${ho.load_average["5m"]} / ${ho.load_average["15m"]}` : "unknown"}; memory available ${bytes(ho.memory_kb && ho.memory_kb.MemAvailable * 1000)} of ${bytes(ho.memory_kb && ho.memory_kb.MemTotal * 1000)}${ho.cpu_pressure_some ? `; CPU pressure (some) avg10 ${ho.cpu_pressure_some.avg10}` : ""}.</p>`}
+      <h3>Release ${MODE(rl.mode)}</h3><p>Checkout commit: <code>${rl.checkout_sha || "not available"}</code>${rl.note ? html` <span class="faint small">${rl.note}</span>` : ""}</p>${buildBlock(R.build)}
+      <h3>Provider job receipts ${MODE(rs.mode)}</h3>${resBlock(rs)}</section>`;
+  }
+  function buildBlock(b) {
+    if (!b || b.status === "unavailable") return "";
+    if (b.status !== "reported") return html`<p class="small">Build info: <b>${b.status}</b>. ${b.reason || ""} ${b.note || ""}</p>`;
+    return html`<p class="small">${AUTHOR} Build info reports release <code>${b.release_sha}</code>, built ${b.built_at}. Matches the measured checkout: <b>${b.matches_checkout === null ? "not determinable" : String(b.matches_checkout)}</b>. File sha256 ${U.sha(b.sha256)}.</p>
+      ${(b.checks || []).length ? html`<div class="tablewrap"><table><thead><tr><th>Check (as reported)</th><th>Result</th><th>Command</th></tr></thead><tbody>${b.checks.map((c) => html`<tr><td>${c.name}</td><td>${c.result || (c.passed !== undefined ? `${c.passed} of ${c.total} passed` : c.exit !== undefined ? `exit ${c.exit}` : "")}</td><td><code>${c.command || ""}</code></td></tr>`)}</tbody></table></div><p class="small faint">These checks are the releaser's report; the page has not re-run them.</p>` : ""}`;
+  }
+  function resBlock(rs) {
+    return html`<p><b>Actual cost:</b> ${rs.actual_cost ? rs.actual_cost.status : "unknown"}. ${rs.actual_cost ? rs.actual_cost.reason : ""}</p><p><b>Utilisation:</b> ${rs.utilization ? rs.utilization.status.replace(/_/g, " ") : "unknown"}. ${rs.utilization ? rs.utilization.reason : ""}</p>
+      ${(rs.receipt_files || []).length ? html`<div class="tablewrap"><table><thead><tr><th>Receipt</th><th>Status</th><th>Pinned sha256</th></tr></thead><tbody>${rs.receipt_files.map((f) => html`<tr><td>${f.id}<br><span class="small faint">${f.description || ""}</span></td><td>${f.status}</td><td>${U.sha(f.pinned_sha256)}</td></tr>`)}</tbody></table></div>` : html`<p class="empty">No pinned receipt file.</p>`}
+      ${(rs.jobs || []).length ? html`<div class="tablewrap"><table><thead><tr><th>Job</th><th>State</th><th>Self-reported wall (s)</th><th>Timed out</th><th>First / last event</th></tr></thead><tbody>${rs.jobs.map((j) => html`<tr><td>${j.job_name || j.job_id || ""}<br><span class="small faint">${j.item || ""}</span></td><td>${j.job_state || j.controller_status || ""}</td><td>${j.inner_wall_s ?? "unknown"}</td><td>${String(j.timed_out)}</td><td class="small">${j.first_event_at || ""}<br>${j.last_event_at || ""}</td></tr>`)}</tbody></table></div><p class="small faint">${rs.jobs_reported} jobs; ${rs.sum_note || ""}</p>` : ""}`;
   }
 
   function receipts(snap, S) {

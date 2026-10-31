@@ -12,7 +12,7 @@
   };
 
   /* A canvas with view buttons, drag/touch/keyboard rotation. Returns {redraw}. */
-  DF.mountFishCanvas = function (host, { readonly = false, getCand }) {
+  DF.mountFishCanvas = function (host, { readonly = false, getCand, getGeo, label }) {
     host.innerHTML = "";
     const cam = { yaw: F.VIEWS["3/4"][0], pitch: F.VIEWS["3/4"][1] };
     const wrap = document.createElement("div"); wrap.className = "fishwrap";
@@ -21,11 +21,11 @@
     const bar = document.createElement("div"); bar.className = "viewbar"; bar.setAttribute("role", "group"); bar.setAttribute("aria-label", "Camera view");
     Object.keys(F.VIEWS).forEach((k) => { const b = document.createElement("button"); b.type = "button"; b.className = "btn small"; b.textContent = k === "3/4" ? "3/4 view" : k[0].toUpperCase() + k.slice(1); b.addEventListener("click", () => { [cam.yaw, cam.pitch] = F.VIEWS[k]; redraw(); }); bar.appendChild(b); });
     wrap.appendChild(canvas); host.appendChild(wrap); host.appendChild(bar);
-    const hint = document.createElement("p"); hint.className = "small faint"; hint.textContent = "Drag to rotate, or focus the drawing and use the arrow keys. Stylised body proportions are fixed; only the entered dimensions and fin share change the shape. A design visualisation, not an observed fish and not CFD."; host.appendChild(hint);
+    const hint = document.createElement("p"); hint.className = "small faint"; hint.textContent = getGeo ? "Drag to rotate, or focus the drawing and use the arrow keys. Drawn from the triangles of the STL file; scale bar in metres at display scale." : "Drag to rotate, or focus the drawing and use the arrow keys. Stylised body proportions are fixed; only the entered dimensions and fin share change the shape. A design visualisation, not an observed fish and not CFD."; host.appendChild(hint);
     function redraw() {
-      const c = getCand(); const geo = F.geometry(c);
-      const d = F.derive(c);
-      canvas.setAttribute("aria-label", geo.missing ? "Design drawing: dimensions missing" : `Parametric design drawing: standard length ${fmt(c.standard_length_m, 3)} m, span ${fmt(c.span_m, 3)} m, wing area ${fmt(d.area, 3)} square metres. Visualisation only.`);
+      const c = getCand ? getCand() : null; const geo = getGeo ? getGeo() : F.geometry(c);
+      const d = c ? F.derive(c) : null;
+      canvas.setAttribute("aria-label", label || (geo.missing ? "Design drawing: dimensions missing" : `Parametric design drawing: standard length ${fmt(c.standard_length_m, 3)} m, span ${fmt(c.span_m, 3)} m, wing area ${fmt(d.area, 3)} square metres. Visualisation only.`));
       F.paint(canvas, geo, cam);
     }
     let drag = null;
@@ -45,6 +45,41 @@
     cap.innerHTML = `Candidate: <b>${esc(DF.candLabel || "custom")}</b>. Dimensions are arithmetic or illustration, not a measured fish. <a href="${DF.href("/engineering")}">Change it in Engineering</a>.`;
     host.appendChild(cap);
   };
+
+  /* STL (binary or ASCII) -> triangles in metres in the viewer's frame (x length, y up = STL z, z right = STL y). */
+  DF.parseSTL = function (buf) {
+    const dv = new DataView(buf); const tris = []; const P = (x, y, z) => [x / 1000, z / 1000, y / 1000];
+    const n = dv.byteLength >= 84 ? dv.getUint32(80, true) : 0;
+    if (dv.byteLength === 84 + n * 50 && n > 0) {
+      for (let i = 0; i < n; i++) { const o = 84 + i * 50 + 12; const p = []; for (let k = 0; k < 3; k++) p.push(P(dv.getFloat32(o + k * 12, true), dv.getFloat32(o + k * 12 + 4, true), dv.getFloat32(o + k * 12 + 8, true))); tris.push({ p, kind: "body" }); }
+      return tris;
+    }
+    const txt = new TextDecoder().decode(buf); const re = /vertex\s+(\S+)\s+(\S+)\s+(\S+)/g; let m; const vs = [];
+    while ((m = re.exec(txt))) vs.push(P(+m[1], +m[2], +m[3]));
+    if (!vs.length || vs.length % 3) throw new Error("not a readable STL (neither binary nor ASCII with whole triangles)");
+    for (let i = 0; i < vs.length; i += 3) tris.push({ p: [vs[i], vs[i + 1], vs[i + 2]], kind: "body" });
+    return tris;
+  };
+
+  function printForms(snap) {
+    const P = snap.print_forms;
+    if (!P) return html`<p class="empty">No printable-form study is present in this tree (looked for <code>artifacts/print/manifest.json</code>). No mesh exists to show or download; nothing is drawn in its place.</p>`;
+    const chk = (b) => (b === true ? U.pill("yes", "ok") : b === false ? U.pill("no", "no") : U.pill("not reported", "st-unk"));
+    return html`<p class="note warn"><b>${P.label}</b></p>
+      <p class="small faint">${P.display_scale_note}. Display scale ${P.display_scale}. Built with solver ${String(P.run.solver_commit || "").slice(0, 9)} (${P.run.solver_branch}); libraries ${Object.entries(P.run.libraries || {}).map(([k, v]) => k + " " + v).join(", ")}. The 3D shapes below are files from that run, not this page's parametric drawing.</p>
+      <div class="cards">${P.forms.map((f) => html`<article class="card pform"><h3>${f.title}</h3><p class="small">${f.role}</p>
+        ${f.files.image_on_stand ? html`<img src="${f.files.image_on_stand.href}" alt="Rendered image of ${f.title} on its stand, from the study" loading="lazy">` : ""}
+        <p>${U.pill("solver: " + f.solver, f.solver === "feasible" ? "warn" : "no")} ${U.pill("glide: " + String(f.glide).replace(/_/g, " "), "st-unk")} ${U.pill("Lean: not run", "st-unk")}</p>
+        <p class="small">${f.meaning}${(f.solver_conflict || []).length ? html` Conflict: <code>${f.solver_conflict.join(", ")}</code>.` : ""}</p>
+        <p class="small">${f.status_note}</p>
+        <dl class="kv"><div><dt>Bounds (mm)</dt><dd>${(f.bounds_mm || []).map((x) => fmt(x, 4)).join(" × ")}</dd></div><div><dt>Volume (mm³)</dt><dd>${fmt(f.volume_mm3, 5)}</dd></div>
+          <div><dt>Closed 2-manifold</dt><dd>${chk(f.validation.closed_two_manifold)}</dd></div><div><dt>Consistently oriented</dt><dd>${chk(f.validation.consistently_oriented)}</dd></div><div><dt>Converged (coarse/default/fine)</dt><dd>${chk(f.converged)}</dd></div><div><dt>STL round trip</dt><dd>${chk(f.roundtrip.ok)} ${f.roundtrip.triangles || ""} triangles</dd></div></dl>
+        <p class="small"><b>Not to be said of this form:</b> ${(f.may_not_say || []).join("; ")}.</p>
+        <details><summary class="small">Not checked (${(f.not_checked || []).length})</summary>${(f.not_checked || []).length ? html`<ul>${f.not_checked.map((x) => html`<li>${x}</li>`)}</ul>` : ""}</details>
+        <div class="meshhost" data-mesh="${f.files.stl ? f.files.stl.href : ""}" data-label="${f.title}"><button class="btn small" type="button" data-loadmesh>Inspect the mesh here</button></div>
+        <p class="small">${f.files.stl ? html`<a class="btn small ghost" href="${f.files.stl.href}" download>Download STL</a> ${U.sha(f.files.stl.sha256)} · ${f.files.stl.bytes} bytes` : html`<span class="faint">no STL in the tree</span>`} ${f.files.stand_stl ? html` · <a href="${f.files.stand_stl.href}" download>stand STL</a>` : ""}</p>
+        <p class="faint small">Mesh checks are closure and orientation on this file; printability, slicing, supports and a physical print are not tested.</p></article>`)}</div>`;
+  }
 
   /* ---------------- ENGINEERING ---------------- */
   const STATUS = { pass: ["pass", "ok", "within the check"], fail: ["fail", "no", "outside the check"], unknown: ["cannot evaluate", "unk", "input missing"], disputed: ["disputed", "warn", "sources disagree"] };
@@ -132,6 +167,8 @@
           <p class="note small">For each constraint, the unresolved questions that stop it from being strengthened or trusted further. They update with the candidate's results; each opens on the whiteboard.</p>
           <div id="oqlist"></div></section>
 
+        <section class="panel" aria-labelledby="pf-h"><h2 id="pf-h">Printable form studies</h2>${printForms(snap)}</section>
+
         <section class="panel" aria-labelledby="rr-h"><h2 id="rr-h">Recorded results: Lean receipt and simulation</h2>${recordedResults(snap)}</section>
 
         <section class="panel" aria-labelledby="sv-h"><h2 id="sv-h">Solver candidates and simulation</h2>
@@ -163,12 +200,21 @@
         <div class="tablewrap"><table><thead><tr><th>Numerical control</th><th>Error or drift</th><th>Tolerance</th></tr></thead><tbody>${ctl}</tbody></table></div>
         <p class="small">All controls pass: <b>${String(c.all_pass)}</b>.</p>
         ${f.interpretation ? html`<p class="note warn small"><b>The authors' own caveat.</b> ${f.interpretation}</p>` : ""}</article>`;
+    const C = S.controlled;
+    const ctrl = C ? html`<article class="card"><h3>Corrected common-launch comparison ${U.pill("preferred over the Pareto set", "ok")} ${U.pill("simulated", "ev")}</h3>
+        <p class="small">${C.n_rows} rows (${C.n_unconverged} unconverged), model ${C.model_version}, protocol <code>${C.protocol}</code>. Designs are compared with a genus baseline under the same launch speeds and drag scenarios, not by their own best case.</p>
+        <ul><li>Designs compared: <b>${C.n_designs}</b>. Robust wins over the baseline across scenarios: <b>${C.n_robust_win}</b>. Designs whose comparison flips between scenarios: <b>${C.n_flips}</b>.</li>
+        <li>Baseline infeasible in ${C.n_baseline_infeasible_scenarios} genus/mass/launch/drag scenarios (shown as such, not dropped).</li>
+        <li>${(C.baselines_excluded || []).length} baseline masses were excluded because their wing loading falls outside the genus's measured range.</li></ul>
+        <div class="tablewrap"><table><thead><tr><th>Baseline genus</th><th>m (kg)</th><th>S (m²)</th><th>AR</th><th>WL (N/m²)</th><th>vs Table II fit</th></tr></thead><tbody>${(C.baselines || []).map((b) => html`<tr><td><i>${b.genus}</i></td><td>${fx(b.m, 3)}</td><td>${fx(b.S, 3)}</td><td>${fx(b.AR, 3)}</td><td>${fx(b.WL, 4)}</td><td>${fx(100 * b.WL_cross_check_rel_diff, 2)}% apart</td></tr>`)}</tbody></table></div>
+        ${C.witness ? html`<h4>Solver witness check</h4><p class="small">Status <b>${C.witness.solver_status}</b>; independent verification <b>${String(C.witness.verified)}</b>. Query: <code>${C.witness.query}</code>. Witness: ${Object.entries(C.witness.witness || {}).map(([k, x]) => html`${k} = ${DF.exact(x)}; `)} wing loading ${fx(C.witness.wing_loading, 4)} N/m². A point in the encoded model, not a design.</p>${(C.witness.not_established || []).length ? html`<p class="small"><b>Not established:</b> ${C.witness.not_established.join("; ")}.</p>` : ""}` : ""}
+        <p class="small">${C.files.map((f) => html`<a href="${f.href}">${f.name}</a> (${f.bytes} bytes, ${U.sha(f.sha256)}) `)}</p></article>` : "";
     const fig = (S.files || []).find((x) => x.name === "figure.png");
     const par = S.pareto_selected || [];
-    return html`<div class="cards">${lean}${sim}</div>
+    return html`<div class="cards">${lean}${ctrl}${sim}</div>
       ${fig ? html`<figure class="simfig"><img src="${fig.href}" alt="Recorded simulation figure from the glide sweep" loading="lazy"><figcaption class="small faint">Figure as recorded (<code>${fig.path}</code>, sha256 ${U.sha(fig.sha256)}). Simulated point-mass glides, not a fish and not CFD.</figcaption></figure>` : ""}
-      ${par.length ? html`<details class="pareto"><summary><b>${par.length} selected Pareto designs (simulated)</b>: open the table</summary><p class="small faint">Objectives: ${(m.pareto_objectives || []).join("; ")}. Range quantiles come from the Monte Carlo over the priors above. Use one as the candidate to compare it against the constraint flags; the standard length stays unknown.</p>
-        <div class="tablewrap"><table><thead><tr><th>m (kg)</th><th>S (m²)</th><th>b (m)</th><th>AR</th><th>WL (N/m²)</th><th>range q10 / q50 / q90 (m)</th><th>sink (m/s)</th><th>L/D</th><th></th></tr></thead><tbody>${par.map((d, i) => html`<tr><td>${fx(d.m, 3)}</td><td>${fx(d.S, 3)}</td><td>${fx(d.b, 3)}</td><td>${fx(d.AR, 3)}</td><td>${fx(d.WL, 3)}</td><td>${fx(d.range_q10, 3)} / ${fx(d.range_q50, 3)} / ${fx(d.range_q90, 3)}</td><td>${fx(d.sink_eq_ms, 3)}</td><td>${fx(d.LoD_eq, 3)}</td><td><button class="btn small ghost" type="button" data-pareto="${i}">Use as candidate</button></td></tr>`)}</tbody></table></div></details>` : ""}
+      ${par.length ? html`<details class="pareto"><summary><b>${par.length} selected Pareto designs from the first sweep: exploratory, uncalibrated</b>. Open the table</summary><p class="note warn small"><b>Not a recommendation.</b> In this model mass cancels at a fixed wing loading and aspect ratio, and the release-speed convention drives range, so this Pareto set mostly reflects those conventions and favours small mass trivially. Read the corrected common-launch comparison${C ? " above" : " when it is available"} instead. Objectives: ${(m.pareto_objectives || []).join("; ")}.</p>
+        <div class="tablewrap"><table><thead><tr><th>m (kg)</th><th>S (m²)</th><th>b (m)</th><th>AR</th><th>WL (N/m²)</th><th>range q10 / q50 / q90 (m)</th><th>sink (m/s)</th><th>L/D</th><th></th></tr></thead><tbody>${par.map((d, i) => html`<tr><td>${fx(d.m, 3)}</td><td>${fx(d.S, 3)}</td><td>${fx(d.b, 3)}</td><td>${fx(d.AR, 3)}</td><td>${fx(d.WL, 3)}</td><td>${fx(d.range_q10, 3)} / ${fx(d.range_q50, 3)} / ${fx(d.range_q90, 3)}</td><td>${fx(d.sink_eq_ms, 3)}</td><td>${fx(d.LoD_eq, 3)}</td><td><button class="btn small ghost" type="button" data-pareto="${i}">Load (exploratory)</button></td></tr>`)}</tbody></table></div></details>` : ""}
       <p class="small">Files: ${(S.files || []).map((x) => html`<a href="${x.href}">${x.name}</a> (${x.bytes} bytes, ${U.sha(x.sha256)}) `)}</p>
       <p class="small faint">There is no mesh or print-geometry artifact in this tree; the drawing above is a parametric visualisation, not a validated model.</p>`;
   }
@@ -220,9 +266,17 @@
     root.querySelectorAll("[data-pareto]").forEach((b) => b.addEventListener("click", () => {
       const d = snap.simulation.pareto_selected[+b.dataset.pareto]; const c = F.blank();
       c.mass_kg = +d.m.toPrecision(6); c.span_m = +d.b.toPrecision(6); c.aspect_ratio = +d.AR.toPrecision(6);
-      DF.cand = c; DF.candLabel = `Pareto design ${+b.dataset.pareto + 1} (simulated, glide-pointmass)`; writeForm(form, c);
-      root.querySelector("#presetnote").textContent = DF.candLabel + ": mass, span and aspect ratio from a simulated sweep. Standard length is unknown."; update(false);
+      DF.cand = c; DF.candLabel = `Exploratory Pareto row ${+b.dataset.pareto + 1} (uncalibrated; not a recommendation)`; writeForm(form, c);
+      root.querySelector("#presetnote").textContent = DF.candLabel + ": mass, span and aspect ratio from an exploratory sweep whose mass dependence is a model artefact. Standard length is unknown."; update(false);
       form.scrollIntoView({ block: "start" });
+    }));
+    root.querySelectorAll("[data-loadmesh]").forEach((b) => b.addEventListener("click", async () => {
+      const host = b.closest(".meshhost"); const href = host.dataset.mesh; if (!href) return; b.disabled = true; b.textContent = "Loading…";
+      try {
+        const r = await fetch(href); if (!r.ok) throw new Error("HTTP " + r.status);
+        const tris = DF.parseSTL(await r.arrayBuffer()); host.innerHTML = "";
+        DF.mountFishCanvas(host, { getGeo: () => ({ tris }), label: `Mesh of ${host.dataset.label}: ${tris.length} triangles, from the STL file. Drag or use arrow keys to rotate.` });
+      } catch (e) { host.innerHTML = `<p class="empty">Could not load the mesh: ${esc(e.message)}. Nothing is drawn in its place.</p>`; }
     }));
     root.querySelector("#resetc").addEventListener("click", () => { DF.cand = F.blank(); DF.candLabel = "nothing declared"; writeForm(form, DF.cand); root.querySelector("#presetnote").textContent = "Cleared. Every check is now unknown."; update(false); });
     root.querySelector("#dlc").addEventListener("click", () => {
