@@ -1367,3 +1367,16 @@ def test_morpheus_full_horizon_chart_is_labelled_a_chart_not_a_spatial_movie(bro
     pg.goto(base + "#/simulations"); pg.wait_for_selector("#sim-morpheus-full-horizon-chart video")
     t = pg.locator("#sim-morpheus-full-horizon-chart").text_content()
     assert "not a spatial tissue movie" in t and "draws no cell shapes or fields" in t and "No sha256 is declared" in t and "256 cells" in t and "128 cells" in t
+
+
+def test_recovery_inputs_are_published_exactly_and_the_failed_run_is_not_called_complete(browser, base):
+    import hashlib
+    b = (ROOT / "site/artifacts/rd-diffusion/primary-runtime-inputs.tar.xz").read_bytes()
+    assert len(b) == 5007988 and hashlib.sha256(b).hexdigest() == "4c43b04106469764c1d24450a29c1e200914e3b7952c417bb62508fd52862a5d"
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=built"); pg.wait_for_selector("#bt-h")
+    t = pg.locator("#main").text_content()
+    assert "primary run: failed" in t and "no evaluation and no generated examples exist" in t and "training and evaluation are not complete" in t
+    href = pg.locator("a[download][href$='primary-runtime-inputs.tar.xz']").get_attribute("href")
+    assert href == "artifacts/rd-diffusion/primary-runtime-inputs.tar.xz"
+    assert pg.request.get(base + href).status == 200

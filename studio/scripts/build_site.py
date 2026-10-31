@@ -498,6 +498,19 @@ def print_v3_block(ins: Inputs, out: dict) -> dict | None:
     return {"forms": forms, "limitations": D["limitations"], "printer_resin": D["printer_resin"], "refused": refused}
 
 
+def recovery_inputs(ins: Inputs, out: dict) -> dict | None:
+    """The fixed public copy of the failed primary DDPM run's checkpoint inputs: published only if the archive's size and sha256 equal the sidecar's, never described as an evaluation."""
+    d = "artifacts/rd-diffusion"; sc = f"{d}/primary-runtime-inputs.json"; ar = f"{d}/primary-runtime-inputs.tar.xz"
+    if not ((ROOT / sc).exists() and (ROOT / ar).exists()):
+        return None
+    m = json.loads(ins.read(sc)); b = ins.read(ar)
+    ok = len(b) == m["bytes"] and digest_bytes(b) == m["archive_sha256"]
+    if ok:
+        out["@artifacts/rd-diffusion/primary-runtime-inputs.tar.xz"] = b; out["@artifacts/rd-diffusion/primary-runtime-inputs.json"] = ins.read(sc)
+    return {"published": ok, "href": "artifacts/rd-diffusion/primary-runtime-inputs.tar.xz" if ok else None, "bytes": m["bytes"], "sha256": m["archive_sha256"], "status": m["status"], "training_steps": m["training_steps"], "checkpoint_sha256": m["checkpoint_sha256"],
+            "primary_full_run_status": m["primary_full_run_status"], "original_primary_job_id": m["original_primary_job_id"], "next_admission": m["next_admission"], "members": m["files"], "sidecar": sc}
+
+
 def lifecycle_block(ins: Inputs) -> dict | None:
     """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
     d = "data/fish-lifecycle"
@@ -996,6 +1009,7 @@ def build() -> dict[str, bytes]:
     fish3d_viewer = fish3d_files(ins, extra)
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
+    recovery_in = recovery_inputs(ins, extra)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -1029,6 +1043,7 @@ def build() -> dict[str, bytes]:
         "fish3d_viewer": fish3d_viewer,
         "formalize": formalize_ex,
         "print_v3": print_v3,
+        "recovery_inputs": recovery_in,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
@@ -1041,7 +1056,7 @@ def build() -> dict[str, bytes]:
 
 
 def write(out: dict[str, bytes]) -> None:
-    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results", SITE / "artifacts" / "fish3d", SITE / "artifacts" / "molecular", SITE / "artifacts" / "print-v3"):
+    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results", SITE / "artifacts" / "fish3d", SITE / "artifacts" / "molecular", SITE / "artifacts" / "print-v3", SITE / "artifacts" / "rd-diffusion"):
         if d.exists():
             shutil.rmtree(d)
     for name, b in out.items():
@@ -1054,7 +1069,7 @@ def check(out: dict[str, bytes]) -> list[str]:
     at = lambda n: SITE / n[1:] if n.startswith("@") else DATA / n
     stale = [n for n, b in out.items() if not at(n).exists() or at(n).read_bytes() != b]
     extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
-    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results", "fish3d", "molecular", "print-v3") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
+    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results", "fish3d", "molecular", "print-v3", "rd-diffusion") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
     return stale + [f"unexpected {e}" for e in extra if e not in out] + [f"unexpected {e}" for e in pr if e not in out]
 
 
