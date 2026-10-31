@@ -120,3 +120,56 @@ def test_avx512_repair_is_geometry_only_and_evidenced():
     assert (ev / "candidate.default.json").read_bytes() != pin            # default AVX-512 dispatch does not
     d = json.loads((ev / "diff-pin-vs-cloud-default.json").read_text())
     assert d["n_differences"] == 3 and d["max_ulps"] <= 2 and not d["non_numeric"]
+
+
+VLM = ART / "vlm"
+V3 = ("fish3d-v3a-fan", "fish3d-v3b-glide-pose", "fish3d-v3c-daane-length")
+
+
+def test_vlm_controls_pass_and_the_mutant_fails():
+    r = json.loads((VLM / "controls.json").read_text())
+    g = json.loads((ROOT / "engineering/cfd3d/gates_vlm.json").read_text())["controls"]
+    assert set(g) <= set(r) and r["all_pass"] is True
+    assert r["V5_mutant_collocation_quarter_chord"]["rel_err"] > g["V1_elliptic_AR6"]["pass"]["rel_err_max"]
+
+
+def test_vlm_seg_vel_matches_an_infinite_line_vortex():
+    v = _load("vlm")
+    import numpy as np
+    P = np.array([[0.0, 0.0, 1.0]])
+    u = v.seg_vel(P, np.array([[-1e6, 0.0, 0.0]]), np.array([[1e6, 0.0, 0.0]]))[0, 0]
+    assert u == pytest.approx([0.0, -1 / (2 * 3.141592653589793), 0.0], abs=1e-9)     # Gamma/(2 pi r), right-hand
+
+
+@pytest.mark.parametrize("v", V3)
+def test_vlm_fish_record_carries_its_candidate_and_conserves_force(v):
+    import numpy as np
+    r = json.loads((VLM / v / "vlm.json").read_text())
+    assert len(r["candidate_sha256"]) == 64 and r["source"].endswith(v)
+    assert all(m["modelled_as"].startswith("zero-thickness") for m in r["membrane"].values())
+    assert set(r["dynamic_pressure_Pa"]) == {"air_20C", "water_20C"}
+    for c in r["cases"].values():
+        assert c["side_force_over_lift"] < 1e-9
+        for f in c["fins"].values():
+            assert f["transfer_vector_residual_over_gross"] < 1e-12
+            assert len(f["quad_dCp"]) == len(f["quad_area_m2"]) == len(f["quad_upper_normal"])
+            assert np.isfinite(f["quad_dCp"]).all()
+
+
+GPU = ART / "gpu-v1"
+
+
+def test_gpu_bundle_matches_its_receipt_and_keeps_the_failed_gate():
+    r = json.loads((GPU / "receipt.json").read_text())
+    for row in r["files"]:
+        assert sha(GPU / row["path"]) == row["sha256"]
+    st = json.loads((GPU / "status.json").read_text())
+    assert st["reference_gate"]["C1_sphere_Re100"] == "FAIL" and "FAILED" in st["science"]
+    assert r["candidate_sha256"] == json.loads((ART / "geometry/components.json").read_text())["candidate_sha256"]
+    d = json.loads((GPU / "gpu_diag.json").read_text())
+    assert abs(d["sphere_D32"]["Cd_mean"]) < 0.95            # still below the frozen band at D 32
+
+
+def test_gpu_grid_pairs_never_make_a_force_claim():
+    s = json.loads((ART / "summary-gpu-v1.json").read_text())
+    assert len(s["grid_pairs"]) == 2 and all(p["physical_force_claim"] is False for p in s["grid_pairs"])
