@@ -78,6 +78,24 @@ def records_from_file(path) -> list[dict]:
 
 
 # ---------------------------------------------------------------- bundles
+def load_frozen_bundle(path) -> dict:
+    """A bundle someone else exported, imported exactly as written. Refuses a changed hash, an unknown shape, a record whose digest fails,
+    duplicate versions, or two versions of one head in the same bundle."""
+    from frontier.models import MAX_BUNDLE_BYTES, MAX_BUNDLE_RECORDS, Record, canonical, digest
+    with open(path) as fh:
+        b = json.load(fh)
+    if not isinstance(b, dict) or set(b) != {"schema_version", "exporting_node", "records", "review_claims", "policy_version", "trust", "bundle_sha256"}:
+        raise ImportRefused(f"{os.path.basename(path)}: not a frontier-bundle-0.1 object")
+    if b["schema_version"] != "frontier-bundle-0.1" or digest({k: v for k, v in b.items() if k != "bundle_sha256"}) != b["bundle_sha256"]:
+        raise ImportRefused(f"{os.path.basename(path)}: bundle_sha256 does not match its content")
+    if not 1 <= len(b["records"]) <= MAX_BUNDLE_RECORDS or len(canonical(b).encode()) > MAX_BUNDLE_BYTES:
+        raise ImportRefused(f"{os.path.basename(path)}: record count or size outside the bundle limits")
+    for r in b["records"]:
+        Record.model_validate(r)                                            # recomputes the record digest
+    check_unique(b["records"])
+    return b
+
+
 def order(records: list[dict]) -> list[dict]:
     return sorted(records, key=lambda r: (KIND_ORDER.get(r["kind"], 9), r["namespace"], r["id"]))
 
@@ -481,6 +499,7 @@ def main(argv=None) -> int:
     ap.add_argument("command", choices=["build", "preflight", "import", "verify", "submit-local"])
     ap.add_argument("--records", action="append", default=[], help="JSON file of full Records (kept exact)")
     ap.add_argument("--drafts", action="append", default=[], help="JSONL of Draft dicts (created_at pinned to each draft's retrieval time)")
+    ap.add_argument("--frozen-bundle", action="append", default=[], help="build: an already-exported frontier-bundle-0.1 file, kept byte-for-byte (its bundle_sha256 and record order are preserved)")
     ap.add_argument("--exclude-id", action="append", default=[], help="draft ids to leave out (e.g. ones already represented by --records)")
     ap.add_argument("--exporting-node", default="node-a")
     ap.add_argument("--max-records", type=int, default=100)
@@ -496,6 +515,14 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     if a.command == "submit-local":
         return submit_local(a)
+    if a.command == "build" and a.frozen_bundle:
+        if a.records or a.drafts:
+            raise ImportRefused("--frozen-bundle cannot be mixed with --records/--drafts")
+        bundles = [load_frozen_bundle(f) for f in a.frozen_bundle]
+        plan = write_plan(bundles, a.out, source={"frozen_bundle_files": [os.path.basename(x) for x in a.frozen_bundle], "frozen": True})
+        print(json.dumps({"bundles": len(bundles), "records": plan["total_records"], "by_namespace_kind": plan["by_namespace_kind"], "plan_sha256": plan["plan_sha256"],
+                          "bundle_sha256": [b["bundle_sha256"] for b in bundles]}, indent=1))
+        return 0
     if a.command == "build":
         recs = []
         for r in a.records: recs += records_from_file(r)
