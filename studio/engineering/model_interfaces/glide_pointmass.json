@@ -5,16 +5,17 @@
  "not_established": [
   "biological feasibility",
   "fin-tissue coupling",
-  "calibrated lift/drag for any fish"
+  "calibrated lift/drag for any fish (Park & Choi 2010 unread)"
  ],
  "ports": [
   {
    "bounds": {
     "hi": "53/100",
     "lo": "3/1000",
-    "source": "sweep range in nca-to-codex03.md",
-    "status": "assumed"
+    "source": "Fish 1990 p.393 specimen range",
+    "status": "measured"
    },
+   "caveat": "",
    "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
    "dim": {
     "kg": 1,
@@ -25,8 +26,8 @@
    "kind": "dimensional",
    "name": "m",
    "provenance": {
-    "read_level": "none",
-    "source": "candidate from the constraint solver",
+    "read_level": "file",
+    "source": "candidate from the constraint solver (schema.parse_candidate)",
     "status": "assumed"
    },
    "quantity": "body mass",
@@ -36,6 +37,7 @@
   },
   {
    "bounds": null,
+   "caveat": "",
    "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
    "dim": {
     "kg": 0,
@@ -46,7 +48,7 @@
    "kind": "dimensional",
    "name": "S",
    "provenance": {
-    "read_level": "none",
+    "read_level": "file",
     "source": "candidate",
     "status": "assumed"
    },
@@ -57,6 +59,7 @@
   },
   {
    "bounds": null,
+   "caveat": "",
    "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
    "dim": {
     "kg": 0,
@@ -67,7 +70,7 @@
    "kind": "dimensional",
    "name": "b",
    "provenance": {
-    "read_level": "none",
+    "read_level": "file",
     "source": "candidate",
     "status": "assumed"
    },
@@ -78,6 +81,7 @@
   },
   {
    "bounds": null,
+   "caveat": "",
    "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
    "dim": {
     "kg": 0,
@@ -88,8 +92,8 @@
    "kind": "dimensional",
    "name": "release_speed",
    "provenance": {
-    "read_level": "none",
-    "source": "glide default is 1.5 x stall speed; witness V only if the caller opts in",
+    "read_level": "file",
+    "source": "evaluate.py: default 1.5 x stall speed; the witness V is used only when release_speed_from_witness is set",
     "status": "assumed"
    },
    "quantity": "release speed",
@@ -99,6 +103,51 @@
   },
   {
    "bounds": null,
+   "caveat": "",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 1,
+    "m": -3,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "rho",
+   "provenance": {
+    "read_level": "file",
+    "source": "flight_assumptions.rho: design assumption, schema bound (0, 2)",
+    "status": "assumed"
+   },
+   "quantity": "air density",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "kg/m^3"
+  },
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 0,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensionless",
+   "name": "CL_max",
+   "provenance": {
+    "read_level": "file",
+    "source": "flight_assumptions.CL_max: design assumption, schema bound (0, 3)",
+    "status": "assumed"
+   },
+   "quantity": "maximum usable lift coefficient",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "1"
+  },
+  {
+   "bounds": null,
+   "caveat": "",
    "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
    "dim": {
     "kg": 0,
@@ -109,8 +158,8 @@
    "kind": "dimensional",
    "name": "glide_range",
    "provenance": {
-    "read_level": "none",
-    "source": "simulated, CD0/e/CL_max are declared priors",
+    "read_level": "file",
+    "source": "simulated; CD0/e/CL_max are declared priors, not measurements",
     "status": "simulated"
    },
    "quantity": "horizontal glide range",
@@ -120,6 +169,7 @@
   },
   {
    "bounds": null,
+   "caveat": "",
    "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
    "dim": {
     "kg": 0,
@@ -142,18 +192,24 @@
  ],
  "reference": {
   "branch": "work/nca-glide",
-  "commit": "4dee158",
-  "path": "engineering/simulation/{schema,glide,evaluate}.py",
-  "read_by": "dx-guilds, from the owner's hand-off note; code not re-read",
-  "repo": "kganjam/delphi-frontier"
+  "commit": "87e72f9",
+  "files": {
+   "engineering/simulation/evaluate.py": "0a793951b8812a9093a637c61d79f3f4fea5e93f07a92825e46601c8e84357fc",
+   "engineering/simulation/glide.py": "1f6a04baaf5a7cda589f80907ba00ac93f5b20fd458211a2340f3ec44de79fa7",
+   "engineering/simulation/schema.py": "94b4f003be514ac5055ed184b0e2695a68bf0de8689e387238e9583c8e62b944"
+  },
+  "path": "engineering/simulation/evaluate.py, engineering/simulation/glide.py, engineering/simulation/schema.py",
+  "read_by": "dx-guilds, read from the source at this commit",
+  "repo": "kganjam/delphi-frontier",
+  "source_sha256": "00aa99ad590bf67113e7d9dc76b184f55f4a10df3a62abc1fed4af2e46c853fd"
  },
  "run": {
   "deterministic": true,
-  "entrypoint": "engineering.simulation.evaluate",
+  "entrypoint": "engineering.simulation.evaluate.evaluate",
   "schema": "frontier.glide.candidate/1"
  },
  "schema": "frontier.model.interface/1",
- "scope": "point-mass flight with declared drag/lift priors (CL_max 0.8-1.6, CD0 0.03-0.12, e 0.6-0.95: priors, not measurements)",
+ "scope": "point-mass flight with declared drag/lift priors (priors, not measurements); controlled-launch comparison exists",
  "status": "implemented",
  "timescale": {
   "kind": "unknown",

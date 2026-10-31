@@ -15,13 +15,27 @@ model, and makes no claim of biological feasibility.
   The uniform-load formula was not in the portion read; it is verified in the tests by independent numerical
   integration of M(x)/EI (`scipy.integrate.quad`), and the point-load one likewise.
 - Fish-fin source: Alben, Madden & Lauder (2007), *The mechanics of active fin-shape control in ray-finned
-  fishes*, J R Soc Interface 4(13):243-256, doi:10.1098/rsif.2006.0181 (PMC2359861). **Full-text PMC page
-  was fetched through a summarising tool, not read as the raw PDF**; sections 3.4, 5.2, 5.3 were queried.
-  Relayed facts used only as context: bluegill sunfish rays, three-point bending, `B = EI ~ 1e-6 to 1e-5 J m`
-  (= N m^2); clamping both hemitrichs vs one changes cantilever stiffness ~12x; the paper's model is a
-  *bilaminar* elastica with intraray shear (not a single beam) and gives no closed-form tip-deflection
-  formula. Re-check these numbers against the PDF before any publication use. They are **not** used to
-  calibrate or validate anything here; the bluegill band is drawn in gray on the plots as context only.
+  fishes*, J R Soc Interface 4(13):243-256, doi:10.1098/rsif.2006.0181 (PMC2359861). **Full text read** as the
+  publisher HTML hosted on PMC, downloaded with curl (`curl -sSL https://pmc.ncbi.nlm.nih.gov/articles/PMC2359861/`,
+  exit 0, HTTP 200, 213,488 bytes, sha256 `3ee6a0ea...b7854`) and text-extracted with `python -I` (70,538
+  characters). The PDF could not be obtained (PMC served a proof-of-work page; royalsocietypublishing.org and
+  Europe PMC returned 403; not bypassed), so the HTML has no page numbers and citations are by section/figure.
+  An earlier version of this package relied on a summarising fetch tool; the numbers below were then re-checked
+  against the primary text and **confirmed**:
+  - Section 3.4 "Physical scalings" (after eq. 3.19): "using three-point bending tests ... the 'composite'
+    Young's modulus ... E ~ 1e8-1e9 N m^-2, with the average area moment of inertia I ~ 1e-6 cm^4. Hence, the
+    measured B = EI ~ 1e-6-1e-5 J m." J m = N m^2, and 1e-6 cm^4 = 1e-14 m^4, so E*I = 1e-6 to 1e-5 N m^2
+    (consistent). This is the gray band. Species bluegill sunfish (*Lepomis macrochirus*); 24 rays from six fish
+    (maximum ray length 40.3 +/- 0.8 mm), tested in water within 48 h; the scaling estimate uses L = 4 cm for a
+    typical ray. It is an **order-of-magnitude product of a composite E and an average I** (area moments from
+    one fin's microCT scan, Section 2); it is not a per-ray or per-position measurement and is not in any table
+    or figure. The paper's own scaling argument (eq. 3.19) gave B ~ 1e-6 J m, lower than measured.
+  - Section 5.2 and Figure 7 caption: base-clamped ray, vertical point force at about two-thirds of the way along
+    the ray; slope 1.98 N m^-1 with both hemitrich bases clamped, "about 12 times the value when one hemitrich is
+    free". That is a stiffness (N/m) at a point load, not an EI.
+  - The paper's model is a *bilaminar* elastica with intraray shear (Section 3), not a single beam, and it gives
+    no closed-form tip-deflection formula. The band is **not** used to calibrate or validate anything here and
+    is drawn in gray hatching as context only.
 - Other fin-ray papers (Lauder lab, Fernandez-Gutierrez et al.) appeared in search results and were NOT read.
 
 ## Inputs: `frontier.finmech.request/1`
@@ -61,7 +75,7 @@ order 2.00 (expected 2), reference by independent quadrature.
 ## Measurement question that would resolve the unknown EI
 What is the effective flexural rigidity EI(x) of an excised ray of the target fin, under the clamping
 condition matching its in-fin boundary condition, and is it above or below `EI_crit`? Apparatus: clamp the ray
-base (state whether both hemitrichs; Alben et al. report ~12x difference), load the tip with a calibrated
+base (state whether both hemitrichs; Alben et al. Fig. 7 report ~12x stiffness difference, point force at 2/3 of the ray), load the tip with a calibrated
 micro-force transducer (<= 1 microN) or calibrated cantilever probe, track tip displacement optically
 (<= 1 micrometre), keep hydrated, work at tip/L < 0.1, repeat with the clamp moved along the ray, and cross-check
 with micro-CT second moment of area. `EI = P L^3 / (3 delta)` from the linear slope. Decision: `EI >= EI_crit`
