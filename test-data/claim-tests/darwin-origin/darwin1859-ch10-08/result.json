@@ -1,0 +1,36 @@
+{
+  "claim_id": "darwin1859-ch10-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch10-08",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "Extinct animal families in the fossil record are bottom-heavy: their genus diversity peaks early in their history and tapers over a longer decline, so the centre of gravity of the diversity trajectory lies in the first half of the family's duration.",
+  "pass_criterion": "Pre-registered: from the Paleobiology Database taxa API, all accepted animal (Metazoa) genera with first and last appearance ages and family assignment. A family is extinct if none of its genera is flagged extant and every genus has lastapp_min_ma > 0. Each genus ranges from firstapp_max_ma to lastapp_min_ma; the family's range is the union. Diversity D(t) = number of genera ranging through t on a 0.1 Myr grid. Centre of gravity CG = sum(D(t) * tau(t)) / sum(D(t)), tau = (family origin - t) / (family origin - family end), so CG < 0.5 means diversity is concentrated early and decline is slower than rise. Families qualify with >= 5 genera and duration >= 10 Myr. SUPPORTS if the median CG < 0.5, the one-sided Wilcoxon signed-rank test of CG - 0.5 < 0 has p < 0.01, and at least 55% of families have CG < 0.5.",
+  "fail_criterion": "Pre-registered: REFUTES if the median CG >= 0.5. Any other outcome is MIXED. Fewer than 100 qualifying families: inconclusive (underpowered); PBDB API unreachable: inconclusive (data-unavailable). Descriptive secondary statistics: median CG and share below 0.5 for families ending at the five big mass extinctions (end-Ordovician 443.8, Late Devonian 372.2, end-Permian 251.9, end-Triassic 201.4, end-Cretaceous 66.0 Ma, within 2 Myr) versus all others, and for Paleozoic-, Mesozoic- and Cenozoic-originating families.",
+  "planned_datasets": [
+    "pbdb-taxa-api"
+  ],
+  "interpretation": "Darwin's 'complete extinction of the species of a group is generally a slower process than their production' is read through clade shape (Gould et al. 1977): if production is fast and extermination slow, the diversity trajectory rises steeply and tapers, giving a centre of gravity in the first half of the clade's duration. Groups are extinct animal families as classified in PBDB (Darwin's 'groups' of genera and families); diversity is counted in genera, because Darwin's species are rarely resolved in the fossil record. Range-through ranges from database first and last appearances are used without sampling correction; the Signor-Lipps effect pulls last appearances earlier and can shorten or lengthen the tail, so the test measures the record as compiled.",
+  "test_contract": {
+    "expected_observation": "Most extinct families have a diversity centre of gravity below 0.5 of their duration (early peak, longer decline).",
+    "disconfirming_observation": "Extinct families are symmetric or top-heavy (median centre of gravity at or above 0.5).",
+    "admissible_datasets": "A community fossil occurrence database giving first and last appearance ages for genera with family classification, compiled independently of Darwin; open access; at least 100 extinct families with five or more genera.",
+    "inference_method": "Range-through genus diversity per family on a 0.1 Myr grid; centre of gravity relative to family duration; one-sided Wilcoxon signed-rank test against 0.5 with p < 0.01, median < 0.5 and share below 0.5 >= 55% for support; median >= 0.5 refutes."
+  },
+  "preregistration": {
+    "api_url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Metazoa&rank=genus&taxon_status=accepted&show=app,class",
+    "min_genera": 5,
+    "min_duration_myr": 10,
+    "grid_myr": 0.1,
+    "min_families": 100,
+    "alpha": 0.01,
+    "share_threshold": 0.55,
+    "mass_extinctions_ma": [443.8, 372.2, 251.9, 201.4, 66.0],
+    "mass_extinction_window_myr": 2
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
