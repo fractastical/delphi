@@ -1,0 +1,891 @@
+{
+  "claim_id": "darwin1859-ch12-11",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-11",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "Across continental and near-continental islands, the fraction of an island's terrestrial mammal species that also occur on the neighbouring mainland decreases with the maximum depth of the sea channel separating them, and this relationship holds after controlling for the width of the channel; islands whose channel is shallower than the Pleistocene low stand (about 120 m) share more species than islands whose channel is deeper.",
+  "pass_criterion": "Pre-registered: for each of 28 fixed islands, (i) the terrestrial mammal species set (GBIF Mammalia occurrences with >= 3 records inside the island box, minus bats, cetaceans, sirenians, pinnipeds and 12 domestic or commensal genera), (ii) the same for a fixed neighbouring-mainland box, (iii) channel depth = greatest water depth (GEBCO 2020 via the OpenTopoData API, 100 points) along a fixed straight transect between the nearest island and mainland shores, and (iv) channel width = transect length. f = |island ∩ mainland| / |island|. SUPPORTS if all of: Spearman rho(f, log depth) < 0 with one-sided p < 0.05; partial Spearman of f on log depth controlling log width < 0 with one-sided p < 0.05; mean f of islands with depth <= 120 m exceeds mean f of islands with depth > 120 m.",
+  "fail_criterion": "Pre-registered: REFUTES if Spearman rho(f, log depth) >= 0 or if mean f of shallow (<= 120 m) islands is <= mean f of deep (> 120 m) islands. Any other outcome is MIXED. Islands with fewer than 5 qualifying species are dropped; with fewer than 12 islands remaining the result is inconclusive (underpowered). If the bathymetry API is unreachable the result is inconclusive (data-unavailable).",
+  "planned_datasets": [
+    "gbif-occurrence-search-api",
+    "gebco-2020-via-opentopodata"
+  ],
+  "interpretation": "'Terrestrial mammals' excludes bats (Darwin treats them separately), marine mammals and species carried by humans (domestic stock, commensal rodents, Homo); other introductions remain in GBIF and bias against the claim by making deep-water islands look similar to the mainland. 'Depth of sea' is the present maximum depth along a straight line between the nearest shores; Darwin's reasoning is about former land connections, so the 120 m Pleistocene low-stand depth is the pre-registered dividing line, and present depth is an imperfect stand-in for past connection (caveat). 'Same or allied species' is measured at the species level only (shared species fraction); genus-level affinity is recorded as a secondary descriptive measure. For Wallacean islands (Sulawesi, Lombok) the Sunda-shelf islands Borneo and Bali serve as the 'mainland', and for Hokkaido and Ireland the larger neighbouring islands (Honshu, Great Britain) do, as Darwin himself discusses Britain and its islands; this is noted.",
+  "datasets": [
+    {
+      "id": "gbif-occurrence-search-api",
+      "name": "GBIF occurrence search API (facet counts of speciesKey/genusKey for Mammalia and excluded groups within island and mainland boxes; GBIF Backbone Taxonomy for keys)",
+      "landing_url": "https://www.gbif.org/developer/occurrence",
+      "doi": null,
+      "version": "live API, retrieved 2026-10-31T04:51:11Z to 2026-10-31T05:05:24Z",
+      "license": "varies by publisher (CC0 / CC BY / CC BY-NC); API output is aggregated counts",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Chiroptera&rank=ORDER&kingdom=Animalia&strict=true",
+          "retrieved_at": "2026-10-31T04:51:11Z",
+          "byte_size": 287,
+          "sha256": "06bccfc9b300b9b335a65d1432bc64090022358d48f9fb550ad84216d3adad60"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/match?name=Cetacea&rank=ORDER&kingdom=Animalia&strict=true",
+          "retrieved_at": "2026-10-31T04:51:12Z",
+          "byte_size": 278,
+          "sha256": "59bfb2ebe469377c87c3c28efaa36144a376b7afed21790ac12949bf1f29ddfc"
+        }
+      ],
+      "files_note": "First two of 1083 GBIF requests shown; all requests with URL, retrieval time, byte size and SHA-256 are in derived/fetch_log.csv.gz.",
+      "role": "terrestrial mammal species and genus lists (>= 3 records) for 28 islands and their neighbouring mainland boxes"
+    },
+    {
+      "id": "gebco-2020-via-opentopodata",
+      "name": "GEBCO 2020 global bathymetry grid, sampled through the OpenTopoData public API (dataset gebco2020)",
+      "landing_url": "https://www.opentopodata.org/datasets/gebco2020/",
+      "doi": "10.5285/a29c5465-b138-234d-e053-6c86abc040b9",
+      "version": "GEBCO_2020 (15 arc-second grid)",
+      "license": "GEBCO grid: public domain / free use with attribution; OpenTopoData API: free public service",
+      "files": [
+        {
+          "download_url": "https://api.opentopodata.org/v1/gebco2020?locations=51.13000%2C1.33000%7C51.12818%2C1.33525%7C51.12636%2C1.34051%7C51.12455%2C1.34576%7C51.12273%2C1.35101%7C51.12091%2C1.35626%7C51.11909%2C1.36152%7C51.11727%2C1.36677%7C51.11545%2C1.37202%7C51.11364%2C1.37727%7C51.11182%2C1.38253%7C51.11000%2C1.38778%7C51.10818%2C1.39303%7C51.10636%2C1.39828%7C51.10455%2C1.40354%7C51.10273%2C1.40879%7C51.10091%2C1.41404%7C51.09909%2C1.41929%7C51.09727%2C1.42455%7C51.09545%2C1.42980%7C51.09364%2C1.43505%7C51.09182%2C1.44030%7C51.09000%2C1.44556%7C51.08818%2C1.45081%7C51.08636%2C1.45606%7C51.08455%2C1.46131%7C51.08273%2C1.46657%7C51.08091%2C1.47182%7C51.07909%2C1.47707%7C51.07727%2C1.48232%7C51.07545%2C1.48758%7C51.07364%2C1.49283%7C51.07182%2C1.49808%7C51.07000%2C1.50333%7C51.06818%2C1.50859%7C51.06636%2C1.51384%7C51.06455%2C1.51909%7C51.06273%2C1.52434%7C51.06091%2C1.52960%7C51.05909%2C1.53485%7C51.05727%2C1.54010%7C51.05545%2C1.54535%7C51.05364%2C1.55061%7C51.05182%2C1.55586%7C51.05000%2C1.56111%7C51.04818%2C1.56636%7C51.04636%2C1.57162%7C51.04455%2C1.57687%7C51.04273%2C1.58212%7C51.04091%2C1.58737%7C51.03909%2C1.59263%7C51.03727%2C1.59788%7C51.03545%2C1.60313%7C51.03364%2C1.60838%7C51.03182%2C1.61364%7C51.03000%2C1.61889%7C51.02818%2C1.62414%7C51.02636%2C1.62939%7C51.02455%2C1.63465%7C51.02273%2C1.63990%7C51.02091%2C1.64515%7C51.01909%2C1.65040%7C51.01727%2C1.65566%7C51.01545%2C1.66091%7C51.01364%2C1.66616%7C51.01182%2C1.67141%7C51.01000%2C1.67667%7C51.00818%2C1.68192%7C51.00636%2C1.68717%7C51.00455%2C1.69242%7C51.00273%2C1.69768%7C51.00091%2C1.70293%7C50.99909%2C1.70818%7C50.99727%2C1.71343%7C50.99545%2C1.71869%7C50.99364%2C1.72394%7C50.99182%2C1.72919%7C50.99000%2C1.73444%7C50.98818%2C1.73970%7C50.98636%2C1.74495%7C50.98455%2C1.75020%7C50.98273%2C1.75545%7C50.98091%2C1.76071%7C50.97909%2C1.76596%7C50.97727%2C1.77121%7C50.97545%2C1.77646%7C50.97364%2C1.78172%7C50.97182%2C1.78697%7C50.97000%2C1.79222%7C50.96818%2C1.79747%7C50.96636%2C1.80273%7C50.96455%2C1.80798%7C50.96273%2C1.81323%7C50.96091%2C1.81848%7C50.95909%2C1.82374%7C50.95727%2C1.82899%7C50.95545%2C1.83424%7C50.95364%2C1.83949%7C50.95182%2C1.84475%7C50.95000%2C1.85000",
+          "retrieved_at": "2026-10-31T04:51:51Z",
+          "byte_size": 14472,
+          "sha256": "1d6eb152d65773419c73b8684f7fcfafd5b03f31293fbfc0771f37f6df4fbf63"
+        },
+        {
+          "download_url": "https://api.opentopodata.org/v1/gebco2020?locations=54.85000%2C-5.80000%7C54.84990%2C-5.79313%7C54.84980%2C-5.78626%7C54.84970%2C-5.77939%7C54.84960%2C-5.77253%7C54.84949%2C-5.76566%7C54.84939%2C-5.75879%7C54.84929%2C-5.75192%7C54.84919%2C-5.74505%7C54.84909%2C-5.73818%7C54.84899%2C-5.73131%7C54.84889%2C-5.72444%7C54.84879%2C-5.71758%7C54.84869%2C-5.71071%7C54.84859%2C-5.70384%7C54.84848%2C-5.69697%7C54.84838%2C-5.69010%7C54.84828%2C-5.68323%7C54.84818%2C-5.67636%7C54.84808%2C-5.66949%7C54.84798%2C-5.66263%7C54.84788%2C-5.65576%7C54.84778%2C-5.64889%7C54.84768%2C-5.64202%7C54.84758%2C-5.63515%7C54.84747%2C-5.62828%7C54.84737%2C-5.62141%7C54.84727%2C-5.61455%7C54.84717%2C-5.60768%7C54.84707%2C-5.60081%7C54.84697%2C-5.59394%7C54.84687%2C-5.58707%7C54.84677%2C-5.58020%7C54.84667%2C-5.57333%7C54.84657%2C-5.56646%7C54.84646%2C-5.55960%7C54.84636%2C-5.55273%7C54.84626%2C-5.54586%7C54.84616%2C-5.53899%7C54.84606%2C-5.53212%7C54.84596%2C-5.52525%7C54.84586%2C-5.51838%7C54.84576%2C-5.51152%7C54.84566%2C-5.50465%7C54.84556%2C-5.49778%7C54.84545%2C-5.49091%7C54.84535%2C-5.48404%7C54.84525%2C-5.47717%7C54.84515%2C-5.47030%7C54.84505%2C-5.46343%7C54.84495%2C-5.45657%7C54.84485%2C-5.44970%7C54.84475%2C-5.44283%7C54.84465%2C-5.43596%7C54.84455%2C-5.42909%7C54.84444%2C-5.42222%7C54.84434%2C-5.41535%7C54.84424%2C-5.40848%7C54.84414%2C-5.40162%7C54.84404%2C-5.39475%7C54.84394%2C-5.38788%7C54.84384%2C-5.38101%7C54.84374%2C-5.37414%7C54.84364%2C-5.36727%7C54.84354%2C-5.36040%7C54.84343%2C-5.35354%7C54.84333%2C-5.34667%7C54.84323%2C-5.33980%7C54.84313%2C-5.33293%7C54.84303%2C-5.32606%7C54.84293%2C-5.31919%7C54.84283%2C-5.31232%7C54.84273%2C-5.30545%7C54.84263%2C-5.29859%7C54.84253%2C-5.29172%7C54.84242%2C-5.28485%7C54.84232%2C-5.27798%7C54.84222%2C-5.27111%7C54.84212%2C-5.26424%7C54.84202%2C-5.25737%7C54.84192%2C-5.25051%7C54.84182%2C-5.24364%7C54.84172%2C-5.23677%7C54.84162%2C-5.22990%7C54.84152%2C-5.22303%7C54.84141%2C-5.21616%7C54.84131%2C-5.20929%7C54.84121%2C-5.20242%7C54.84111%2C-5.19556%7C54.84101%2C-5.18869%7C54.84091%2C-5.18182%7C54.84081%2C-5.17495%7C54.84071%2C-5.16808%7C54.84061%2C-5.16121%7C54.84051%2C-5.15434%7C54.84040%2C-5.14747%7C54.84030%2C-5.14061%7C54.84020%2C-5.13374%7C54.84010%2C-5.12687%7C54.84000%2C-5.12000",
+          "retrieved_at": "2026-10-31T04:52:17Z",
+          "byte_size": 14655,
+          "sha256": "bd196052d764e39b443b74bfc95895b2881c26095db1aa03d08b7fd3160237f0"
+        }
+      ],
+      "files_note": "First two of 28 transect requests shown (100 points each); all are in derived/fetch_log.csv.gz.",
+      "role": "maximum water depth along the straight transect between island and mainland shores"
+    }
+  ],
+  "method": "For each of 28 islands the GBIF occurrence API returned speciesKey and genusKey facet counts for Mammalia in the island box and in the mainland box, and the same for Chiroptera, Cetacea, Sirenia, Phocidae, Otariidae, Odobenidae and 12 domestic or commensal genera, which were subtracted; species with >= 3 records formed the sets. f = fraction of island species also present in the mainland set. Channel depth = greatest depth among 100 GEBCO 2020 points along the pre-registered straight transect (OpenTopoData API); width = transect length. Three islands with < 5 qualifying species (Pemba, Lombok, Cyprus) were dropped (n = 25). Spearman's rho between f and log depth, the partial Spearman correlation controlling log width, and the shallow (<= 120 m) vs deep (> 120 m) means were compared with the pre-registered thresholds.",
+  "measured": {
+    "value": -0.2258,
+    "unit": "Spearman rho between log channel depth and the fraction of island terrestrial mammal species shared with the neighbouring mainland",
+    "n": 25,
+    "uncertainty": "one-sided p=0.139; partial rho controlling log channel width=-0.116, one-sided p=0.295",
+    "extra": {
+      "spearman_p_one_sided": 0.13888223882429712,
+      "partial_rho_given_log_width": -0.11591597514946844,
+      "partial_p_one_sided": 0.29481272657266033,
+      "mean_f_shallow_le_120m": 0.5858430669720607,
+      "n_shallow": 14,
+      "mean_f_deep_gt_120m": 0.49560593018675336,
+      "n_deep": 11,
+      "mannwhitney_p_shallow_greater": 0.28266867020319136,
+      "spearman_rho_width_vs_f": -0.2742835211345429,
+      "spearman_rho_depth_vs_f_genus_level": -0.09849943014601273,
+      "islands_dropped": [
+        "pemba",
+        "lombok",
+        "cyprus"
+      ],
+      "exclusion_keys": {
+        "Chiroptera": 734,
+        "Cetacea": 733,
+        "Sirenia": 802,
+        "Phocidae": 5310,
+        "Otariidae": 5309,
+        "Odobenidae": 9680,
+        "Homo": 2436435,
+        "Rattus": 2439223,
+        "Mus": 9800657,
+        "Canis": 5219142,
+        "Felis": 2435022,
+        "Bos": 2441017,
+        "Ovis": 9531221,
+        "Capra": 2441047,
+        "Sus": 2441213,
+        "Equus": 8652950,
+        "Oryctolagus": 2436939,
+        "Bubalus": 8166441
+      }
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.6,
+  "caveats": [
+    "The direction is as Darwin stated (rho = -0.23; shallow islands share 59% of species with the mainland, deep islands 50%; the three deepest continental fragments, Cuba, Sulawesi and Madagascar, share 9%, 5% and 1%), but neither the correlation nor the shallow-deep difference reaches the pre-registered significance levels, so the verdict is MIXED.",
+    "The deep-water islands with high sharing are the Mediterranean islands (Corsica-Sardinia 0.72, Crete 0.73, Balearics 0.81, Sicily 0.39) plus Ireland (0.94) and Vancouver Island (0.86). The Mediterranean islands' present mammal faunas consist overwhelmingly of species introduced by humans since the Neolithic after their endemic faunas went extinct, and Ireland's fauna includes many Holocene introductions; GBIF has no reliable native-status flag, so these introductions could not be removed and they work directly against the claim. Vancouver Island was glaciated and its present channel depth overstates its Pleistocene isolation.",
+    "Several shallow-channel islands show low sharing for reasons unrelated to depth: New Guinea (0.20) and Sulawesi-adjacent Borneo (0.52) have large endemic radiations and small mainland reference boxes; Taiwan (0.36), Hainan (0.33) and Bioko (0.39) carry many island forms raised to species rank in recent taxonomy, which lowers species-level sharing while genus-level sharing stays higher (Hokkaido 0.47 vs 0.90 at genus level).",
+    "Channel depth is the maximum depth along one straight line between two pre-registered points, not the true sill depth; several transects cross land (e.g. 70 of 100 points for Sakhalin, 59 for Trinidad), and present depth is only a proxy for Pleistocene connection, which is what Darwin's argument actually concerns.",
+    "For Sulawesi and Lombok the Sunda-shelf islands Borneo and Bali stand in for the mainland, and for Hokkaido and Ireland the larger neighbouring islands do.",
+    "Bounding boxes of very different size and sampling intensity were used for islands and mainland regions; a mainland box that is too small or too thinly recorded lowers f regardless of depth.",
+    "GBIF is a live resource; re-running reproduces the method but counts drift as records are added."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-bdd1",
+    "date": "2026-10-31"
+  },
+  "preregistration": {
+    "mammalia_key": 359,
+    "excluded_higher_taxa": [
+      "Chiroptera",
+      "Cetacea",
+      "Sirenia",
+      "Phocidae",
+      "Otariidae",
+      "Odobenidae"
+    ],
+    "excluded_genera": [
+      "Homo",
+      "Rattus",
+      "Mus",
+      "Canis",
+      "Felis",
+      "Bos",
+      "Ovis",
+      "Capra",
+      "Sus",
+      "Equus",
+      "Oryctolagus",
+      "Bubalus"
+    ],
+    "min_records_per_species": 3,
+    "min_species_per_island": 5,
+    "min_islands": 12,
+    "low_stand_depth_m": 120,
+    "bathymetry_api": "https://api.opentopodata.org/v1/gebco2020",
+    "transect_points": 100,
+    "basis_of_record_excluded": [
+      "FOSSIL_SPECIMEN",
+      "LIVING_SPECIMEN"
+    ],
+    "year_range": "1900,2026",
+    "islands": [
+      {
+        "id": "great-britain",
+        "island": [
+          -5.4,
+          49.9,
+          1.8,
+          58.7
+        ],
+        "mainland": [
+          -1.5,
+          48.5,
+          4.5,
+          51.3
+        ],
+        "transect": [
+          [
+            51.13,
+            1.33
+          ],
+          [
+            50.95,
+            1.85
+          ]
+        ],
+        "mainland_note": "northern France / Belgium"
+      },
+      {
+        "id": "ireland",
+        "island": [
+          -10.7,
+          51.3,
+          -5.9,
+          55.5
+        ],
+        "mainland": [
+          -5.4,
+          49.9,
+          1.8,
+          58.7
+        ],
+        "transect": [
+          [
+            54.85,
+            -5.8
+          ],
+          [
+            54.84,
+            -5.12
+          ]
+        ],
+        "mainland_note": "Great Britain"
+      },
+      {
+        "id": "sri-lanka",
+        "island": [
+          79.5,
+          5.8,
+          82,
+          10
+        ],
+        "mainland": [
+          76.5,
+          8,
+          80.5,
+          13
+        ],
+        "transect": [
+          [
+            9.1,
+            79.7
+          ],
+          [
+            9.17,
+            79.45
+          ]
+        ],
+        "mainland_note": "southern India"
+      },
+      {
+        "id": "tasmania",
+        "island": [
+          144.5,
+          -43.8,
+          148.5,
+          -40.5
+        ],
+        "mainland": [
+          143,
+          -39.2,
+          148.5,
+          -36
+        ],
+        "transect": [
+          [
+            -40.75,
+            147.9
+          ],
+          [
+            -39.13,
+            146.4
+          ]
+        ],
+        "mainland_note": "Victoria"
+      },
+      {
+        "id": "new-guinea",
+        "island": [
+          131,
+          -10.5,
+          151,
+          -1
+        ],
+        "mainland": [
+          141,
+          -17,
+          146,
+          -10.5
+        ],
+        "transect": [
+          [
+            -9.1,
+            142.5
+          ],
+          [
+            -10.7,
+            142.5
+          ]
+        ],
+        "mainland_note": "Cape York"
+      },
+      {
+        "id": "sumatra",
+        "island": [
+          95,
+          -6,
+          106.2,
+          6
+        ],
+        "mainland": [
+          99.5,
+          1.2,
+          104.5,
+          6.7
+        ],
+        "transect": [
+          [
+            1.9,
+            101.4
+          ],
+          [
+            2.4,
+            101.8
+          ]
+        ],
+        "mainland_note": "Peninsular Malaysia"
+      },
+      {
+        "id": "borneo",
+        "island": [
+          108.8,
+          -4.2,
+          119.3,
+          7.4
+        ],
+        "mainland": [
+          99.5,
+          1.2,
+          104.5,
+          6.7
+        ],
+        "transect": [
+          [
+            1.6,
+            110.3
+          ],
+          [
+            2.4,
+            103.9
+          ]
+        ],
+        "mainland_note": "Peninsular Malaysia across the Sunda shelf"
+      },
+      {
+        "id": "hainan",
+        "island": [
+          108.5,
+          18.1,
+          111.1,
+          20.2
+        ],
+        "mainland": [
+          107,
+          20.3,
+          112,
+          23.5
+        ],
+        "transect": [
+          [
+            20.15,
+            110.3
+          ],
+          [
+            20.4,
+            110.2
+          ]
+        ],
+        "mainland_note": "Guangdong / Guangxi"
+      },
+      {
+        "id": "taiwan",
+        "island": [
+          120,
+          21.8,
+          122.1,
+          25.4
+        ],
+        "mainland": [
+          117,
+          23.5,
+          120,
+          27
+        ],
+        "transect": [
+          [
+            24.5,
+            120.8
+          ],
+          [
+            24.7,
+            118.9
+          ]
+        ],
+        "mainland_note": "Fujian"
+      },
+      {
+        "id": "sakhalin",
+        "island": [
+          141.5,
+          45.8,
+          144.9,
+          54.5
+        ],
+        "mainland": [
+          135,
+          46,
+          141.4,
+          54
+        ],
+        "transect": [
+          [
+            52.0,
+            141.9
+          ],
+          [
+            52.2,
+            141.3
+          ]
+        ],
+        "mainland_note": "Khabarovsk coast"
+      },
+      {
+        "id": "hokkaido",
+        "island": [
+          139.3,
+          41.3,
+          146,
+          45.6
+        ],
+        "mainland": [
+          138,
+          36,
+          142,
+          41.3
+        ],
+        "transect": [
+          [
+            41.4,
+            140.2
+          ],
+          [
+            41.26,
+            140.35
+          ]
+        ],
+        "mainland_note": "Honshu (Blakiston's line)"
+      },
+      {
+        "id": "japan-main",
+        "island": [
+          129.5,
+          31,
+          142,
+          41.3
+        ],
+        "mainland": [
+          126,
+          34.3,
+          129.6,
+          38
+        ],
+        "transect": [
+          [
+            33.5,
+            129.9
+          ],
+          [
+            35.1,
+            129.0
+          ]
+        ],
+        "mainland_note": "southern Korea"
+      },
+      {
+        "id": "newfoundland",
+        "island": [
+          -59.5,
+          46.6,
+          -52.6,
+          51.7
+        ],
+        "mainland": [
+          -66,
+          49,
+          -55.5,
+          53
+        ],
+        "transect": [
+          [
+            51.6,
+            -55.7
+          ],
+          [
+            51.5,
+            -56.7
+          ]
+        ],
+        "mainland_note": "Labrador / Quebec North Shore"
+      },
+      {
+        "id": "vancouver-island",
+        "island": [
+          -128.5,
+          48.3,
+          -123.3,
+          50.9
+        ],
+        "mainland": [
+          -123.3,
+          49.0,
+          -121,
+          51.2
+        ],
+        "transect": [
+          [
+            48.65,
+            -123.3
+          ],
+          [
+            49.0,
+            -123.1
+          ]
+        ],
+        "mainland_note": "British Columbia Lower Mainland"
+      },
+      {
+        "id": "trinidad",
+        "island": [
+          -62,
+          10,
+          -60.8,
+          11
+        ],
+        "mainland": [
+          -64,
+          8.5,
+          -62.1,
+          10.5
+        ],
+        "transect": [
+          [
+            10.08,
+            -61.9
+          ],
+          [
+            9.9,
+            -62.2
+          ]
+        ],
+        "mainland_note": "north-eastern Venezuela"
+      },
+      {
+        "id": "sicily",
+        "island": [
+          12.3,
+          36.6,
+          15.7,
+          38.3
+        ],
+        "mainland": [
+          15.7,
+          37.9,
+          17.2,
+          40
+        ],
+        "transect": [
+          [
+            38.19,
+            15.56
+          ],
+          [
+            38.22,
+            15.64
+          ]
+        ],
+        "mainland_note": "Calabria"
+      },
+      {
+        "id": "zanzibar",
+        "island": [
+          39.15,
+          -6.5,
+          39.65,
+          -5.7
+        ],
+        "mainland": [
+          38.3,
+          -7,
+          39.1,
+          -5.5
+        ],
+        "transect": [
+          [
+            -6.1,
+            39.2
+          ],
+          [
+            -6.3,
+            38.85
+          ]
+        ],
+        "mainland_note": "Tanzania coast"
+      },
+      {
+        "id": "pemba",
+        "island": [
+          39.6,
+          -5.5,
+          39.9,
+          -4.8
+        ],
+        "mainland": [
+          38.5,
+          -5.6,
+          39.3,
+          -4.5
+        ],
+        "transect": [
+          [
+            -5.2,
+            39.65
+          ],
+          [
+            -5.1,
+            39.1
+          ]
+        ],
+        "mainland_note": "Tanga coast"
+      },
+      {
+        "id": "bioko",
+        "island": [
+          8.4,
+          3.2,
+          9.0,
+          3.8
+        ],
+        "mainland": [
+          9.0,
+          3.2,
+          10.5,
+          4.5
+        ],
+        "transect": [
+          [
+            3.75,
+            8.8
+          ],
+          [
+            4.0,
+            9.2
+          ]
+        ],
+        "mainland_note": "Cameroon"
+      },
+      {
+        "id": "kangaroo-island",
+        "island": [
+          136.5,
+          -36.1,
+          138.15,
+          -35.5
+        ],
+        "mainland": [
+          138.15,
+          -36,
+          139,
+          -34.8
+        ],
+        "transect": [
+          [
+            -35.8,
+            138.12
+          ],
+          [
+            -35.6,
+            138.1
+          ]
+        ],
+        "mainland_note": "Fleurieu Peninsula"
+      },
+      {
+        "id": "madagascar",
+        "island": [
+          43.2,
+          -25.7,
+          50.5,
+          -11.9
+        ],
+        "mainland": [
+          34.5,
+          -21,
+          40.8,
+          -10.5
+        ],
+        "transect": [
+          [
+            -16.2,
+            44.4
+          ],
+          [
+            -16.2,
+            39.9
+          ]
+        ],
+        "mainland_note": "Mozambique"
+      },
+      {
+        "id": "sulawesi",
+        "island": [
+          118.7,
+          -6,
+          125.3,
+          1.9
+        ],
+        "mainland": [
+          108.8,
+          -4.2,
+          119.3,
+          7.4
+        ],
+        "transect": [
+          [
+            -1.0,
+            119.3
+          ],
+          [
+            -0.5,
+            117.6
+          ]
+        ],
+        "mainland_note": "Borneo (Sunda shelf) across the Makassar Strait"
+      },
+      {
+        "id": "lombok",
+        "island": [
+          115.8,
+          -9,
+          116.8,
+          -8.1
+        ],
+        "mainland": [
+          114.4,
+          -8.9,
+          115.8,
+          -8
+        ],
+        "transect": [
+          [
+            -8.5,
+            115.85
+          ],
+          [
+            -8.4,
+            115.7
+          ]
+        ],
+        "mainland_note": "Bali (Sunda shelf) across the Lombok Strait"
+      },
+      {
+        "id": "cuba",
+        "island": [
+          -85,
+          19.8,
+          -74,
+          23.3
+        ],
+        "mainland": [
+          -90.5,
+          17.5,
+          -86.5,
+          21.7
+        ],
+        "transect": [
+          [
+            21.87,
+            -84.95
+          ],
+          [
+            21.6,
+            -87.1
+          ]
+        ],
+        "mainland_note": "Yucatán"
+      },
+      {
+        "id": "corsica-sardinia",
+        "island": [
+          8.1,
+          38.8,
+          9.9,
+          43.1
+        ],
+        "mainland": [
+          10,
+          41,
+          12.5,
+          44
+        ],
+        "transect": [
+          [
+            42.7,
+            9.5
+          ],
+          [
+            42.9,
+            10.5
+          ]
+        ],
+        "mainland_note": "Tuscany / Lazio"
+      },
+      {
+        "id": "crete",
+        "island": [
+          23.4,
+          34.8,
+          26.4,
+          35.7
+        ],
+        "mainland": [
+          21.5,
+          36.3,
+          24.2,
+          38.3
+        ],
+        "transect": [
+          [
+            35.5,
+            23.6
+          ],
+          [
+            36.4,
+            23.2
+          ]
+        ],
+        "mainland_note": "Peloponnese / Attica"
+      },
+      {
+        "id": "cyprus",
+        "island": [
+          32.2,
+          34.5,
+          34.7,
+          35.8
+        ],
+        "mainland": [
+          32,
+          36,
+          36.5,
+          37.5
+        ],
+        "transect": [
+          [
+            35.4,
+            33.0
+          ],
+          [
+            36.0,
+            32.8
+          ]
+        ],
+        "mainland_note": "southern Turkey"
+      },
+      {
+        "id": "balearics",
+        "island": [
+          1.1,
+          38.6,
+          4.4,
+          40.2
+        ],
+        "mainland": [
+          -1.5,
+          38,
+          1.0,
+          42.5
+        ],
+        "transect": [
+          [
+            39.6,
+            2.4
+          ],
+          [
+            39.5,
+            0.0
+          ]
+        ],
+        "mainland_note": "Valencia / inland Catalonia"
+      }
+    ]
+  }
+}
