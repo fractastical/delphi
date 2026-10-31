@@ -143,7 +143,7 @@ def build_view(records: list[dict], events: list[dict], annotations: list[dict],
         ds = dependents.get((row["ref"]["namespace"], row["ref"]["id"]), [])
         row["dependents"] = sorted({d["dependent"] for d in ds})
         row["dependents_pinned_to_older_version"] = sum(1 for d in ds if d["pinned_version"] != row["ref"]["version"])
-    ledger = action_ledger(records, events, now, {v: a for v, a in applied_by_version.items()})
+    ledger = action_ledger(records, events, now, {v: a for v, a in applied_by_version.items()}, local_status)
     by_problem = defaultdict(list)
     for L in ledger:
         by_problem[(L["target"]["namespace"], L["target"]["id"])].append(L)

@@ -18,6 +18,12 @@ from psycopg.rows import dict_row
 from frontier.models import Record, canonical, digest
 
 
+# Stated in every read's meta so a reader can see exactly what was left out. Kept outside read_store so a test can assert that function's SQL never names these tables.
+OTHER_EXCLUSIONS = ["private records (unless include_private)",
+                    "tables principals, idempotency, write_receipts, reviews, forks, imported_review_claims, action_state are never read",
+                    "record bodies are never rewritten; beyond the five tables only aggregate counts (census) are read"]
+
+
 class ReadOnlyError(RuntimeError):
     pass
 
@@ -52,16 +58,34 @@ def _describe(dsn: str) -> dict:
     return {k: kv[k] for k in ("host", "port", "dbname") if k in kv}
 
 
-def read_store(dsn: str, namespace: str, *, schema: str | None = None, include_private: bool = False) -> dict:
-    """Return {records, events, local_status, typed_edges, heads, meta}. Reads only; see module docstring."""
+def census(dsn: str, schema: str | None = None) -> dict:
+    """Aggregate counts for the WHOLE database, all namespaces, no record bodies: what exists, so a scoped read can say what it left out."""
     with connect_readonly(dsn, schema) as c:
-        recs = c.execute("SELECT version, envelope FROM record_versions WHERE namespace=%s", (namespace,)).fetchall()
-        heads = c.execute("SELECT kind, record_id, version FROM heads WHERE namespace=%s", (namespace,)).fetchall()
-        states = c.execute("SELECT s.version, s.status FROM local_states s JOIN record_versions v ON v.version=s.version WHERE v.namespace=%s", (namespace,)).fetchall()
-        edges = c.execute("""SELECT e.source_version, e.relation, e.target_namespace, e.target_kind, e.target_id, e.target_version
-                             FROM typed_edges e JOIN record_versions v ON v.version=e.source_version WHERE v.namespace=%s""", (namespace,)).fetchall()
-        evs = c.execute("""SELECT e.sequence, v.envelope FROM events e JOIN record_versions v ON v.version=e.event_version
-                           WHERE v.namespace=%s ORDER BY e.sequence""", (namespace,)).fetchall()
+        recs = c.execute("SELECT namespace, kind, envelope->>'visibility' AS visibility, count(*) AS n FROM record_versions GROUP BY 1,2,3 ORDER BY 1,2,3").fetchall()
+        states = c.execute("SELECT status, count(*) AS n FROM local_states GROUP BY 1 ORDER BY 1").fetchall()
+        events = c.execute("""SELECT v.namespace AS event_namespace, e.event_type, t.namespace AS target_namespace, t.kind AS target_kind, count(*) AS n
+                              FROM events e JOIN record_versions v ON v.version=e.event_version JOIN record_versions t ON t.version=e.target_version
+                              GROUP BY 1,2,3,4 ORDER BY 1,2,3,4""").fetchall()
+    return {"record_versions": recs, "total_record_versions": sum(r["n"] for r in recs), "local_status": states,
+            "events_by_namespace_and_target": events, "total_events": sum(e["n"] for e in events),
+            "namespaces": sorted({r["namespace"] for r in recs})}
+
+
+def read_store(dsn: str, namespace: str | list[str] | None = None, *, schema: str | None = None, include_private: bool = False) -> dict:
+    """Return {records, events, local_status, typed_edges, heads, meta}. Reads only; see module docstring.
+    `namespace`: one namespace, a list, or None for ALL namespaces. The scope actually used, and what it excluded, is recorded in meta."""
+    listed = None if namespace is None else ([namespace] if isinstance(namespace, str) else list(namespace))
+    where_ns = "TRUE" if listed is None else "v.namespace = ANY(%s)"
+    args = () if listed is None else (listed,)
+    with connect_readonly(dsn, schema) as c:
+        recs = c.execute(f"SELECT version, envelope FROM record_versions v WHERE {where_ns}", args).fetchall()
+        heads = c.execute(f"SELECT kind, record_id, version, namespace FROM heads v WHERE {where_ns}", args).fetchall()
+        states = c.execute(f"SELECT s.version, s.status FROM local_states s JOIN record_versions v ON v.version=s.version WHERE {where_ns}", args).fetchall()
+        edges = c.execute(f"""SELECT e.source_version, e.relation, e.target_namespace, e.target_kind, e.target_id, e.target_version
+                             FROM typed_edges e JOIN record_versions v ON v.version=e.source_version WHERE {where_ns}""", args).fetchall()
+        evs = c.execute(f"""SELECT e.sequence, v.envelope FROM events e JOIN record_versions v ON v.version=e.event_version
+                           WHERE {where_ns} ORDER BY e.sequence""", args).fetchall()
+        whole = c.execute("SELECT namespace, kind, count(*) AS n FROM record_versions GROUP BY 1,2 ORDER BY 1,2").fetchall()
         read_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     records, excluded_private, integrity, skew = [], 0, [], []
     for r in recs:
@@ -78,14 +102,19 @@ def read_store(dsn: str, namespace: str, *, schema: str | None = None, include_p
     visible = {r["version"] for r in records}
     events = [{"sequence": e["sequence"], "envelope": e["envelope"]} for e in evs if e["envelope"]["version"] in visible]
     status = {s["version"]: s["status"] for s in states if s["version"] in visible}
-    head_versions = {(h["kind"], h["record_id"]): h["version"] for h in heads if h["version"] in visible}
+    head_versions = {(h["namespace"], h["kind"], h["record_id"]): h["version"] for h in heads if h["version"] in visible}
     records.sort(key=lambda r: (r["kind"], r["id"], r["created_at"], r["version"]))
     content = {"records": [r["version"] for r in records], "events": [(e["sequence"], e["envelope"]["version"]) for e in events]}
     return {
         "records": records, "events": events, "local_status": status,
         "typed_edges": [e for e in edges if e["source_version"] in visible],
-        "heads": {f"{k}/{i}": v for (k, i), v in sorted(head_versions.items())},
-        "meta": {"source": {**_describe(dsn), "namespace": namespace, "schema": schema or "public"}, "read_at_utc": read_at, "read_only": True,
+        "heads": {f"{n}/{k}/{i}": v for (n, k, i), v in sorted(head_versions.items())},
+        "meta": {"source": {**_describe(dsn), "schema": schema or "public"},
+                 "scope": {"mode": "all_namespaces" if listed is None else "listed_namespaces", "namespaces_requested": listed,
+                           "namespaces_read": sorted({r["namespace"] for r in records}),
+                           "excluded_by_scope": [{"namespace": w["namespace"], "kind": w["kind"], "record_versions": w["n"]} for w in whole
+                                                 if listed is not None and w["namespace"] not in listed],
+                           "other_exclusions": OTHER_EXCLUSIONS}, "read_at_utc": read_at, "read_only": True,
                  "tables_read": ["record_versions", "heads", "local_states", "typed_edges", "events"],
                  "records": len(records), "events": len(events), "excluded_private": excluded_private, "integrity_failures": integrity,
                  "schema_skew": {"count": len(skew), "examples": skew[:3], "by_kind": dict(Counter(x["kind"] for x in skew)),

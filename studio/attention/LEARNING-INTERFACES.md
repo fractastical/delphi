@@ -26,9 +26,13 @@ mechanism or claim is viable or true; every output keeps `does_not_imply`.
   first/last witnessed time, elapsed seconds. **Plain data; no weight, score or decay is computed.**
 * Not recorded by the store today, and needed before anything is learnable: why a path failed (a `reason`), resources actually consumed (SPEC-003: the store meters
   nothing), result quality, and the exact inputs consumed (root is adding `Action.inputs`; `Evidence.produced_by` would link results to the action that made them).
-* Volume today: the live store holds 0 Actions and 0 action events, so **no action outcome exists to learn from.** The only real failed-path-then-repair data I know of is
-  the Lean-commons attempts in delphi-evolve (`ebe0242`, `artifacts/commons/runs/*/attempts.jsonl`: per target up to 3 attempts with compiler feedback). It is
-  model-specific, not Frontier traffic, and I have not analysed it for this purpose.
+* Volume today (live database, read 2026-10-31 ~19:20Z, public records; see `results/scoped_metrics_2ecdbe3.json`): **2 real Action versions exist, and no Action has any lifecycle event.**
+  Namespace `delphi-frontier` (1440 record versions: 21 Claim, 257 Problem, 1162 Event) holds 0 Actions and 0 action events. Namespace `node-a` (884 imported record versions: 880 Claim, 2 Action,
+  2 Evidence) holds the 2 Actions, imported from an OpenResearch local run, each with `inputs`, a full eight-part cache key and a stated cost note, and local state `imported_unreviewed`. The
+  import events (884 `record_imported`) belong to `delphi-frontier` but target `node-a` records. So real action versions and real path keys exist for testing the *definition* of a path (R5),
+  but **no outcome exists to learn from**, and a replay on these cannot support any allocation claim.
+* The only real failed-path-then-repair data I know of is the Lean-commons attempts in delphi-evolve (`ebe0242`, `artifacts/commons/runs/*/attempts.jsonl`: per target up to 3 attempts with compiler
+  feedback). It is model-specific, not Frontier traffic, and I have not analysed it for this purpose.
 
 ## 3. Interfaces (proposed; none is built unless stated)
 
@@ -56,11 +60,11 @@ scope change (invalidate by version, not only by time).
 
 | # | question | data needed | minimal bounded step | stop rule / what would count | blocked by |
 |---|---|---|---|---|---|
-| R1 | Do action outcomes carry any signal about later outcomes of related paths? | >= 30 Actions with terminal outcomes across >= 6 Problems | descriptive tables of `outcome` by Problem and capability; no model | stop at tables; a "signal" needs a preregistered comparison with a base-rate predictor | **no Actions exist** |
+| R1 | Do action outcomes carry any signal about later outcomes of related paths? | >= 30 Actions with terminal outcomes across >= 6 Problems | descriptive tables of `outcome` by Problem and capability; no model | stop at tables; a "signal" needs a preregistered comparison with a base-rate predictor | **2 Action versions exist (imported), 0 outcomes** |
 | R2 | What half-life, if any, fits? | inter-event durations over many paths | a fixed grid of half-lives, sensitivity only | do not choose from sparse data; declare and report the whole grid | R1 |
 | R3 | Does suppressing identical-key retries cut duplicate effort without hiding fixable failures? | traces with repeated identical-key attempts and a later success or a changed key | replay on real traces, never simulation | only a preregistered replay can support a claim; otherwise a null is reported | traces with retries |
 | R4 | Does a mandatory exploration share prevent lock-in? | a policy run on real allocation traces | compare two shares at a matched budget via `evaluate` | needs `trace_gate` to pass; today it is blocked (see `results/trace_gate_commons_ebe0242.json`) | allocation traces |
-| R5 | Can path keys be made stable enough that "the same path" is well defined? | cache keys of real Actions | audit of key-dimension change frequency | report how often a retried path changes a dimension | Actions |
+| R5 | Can path keys be made stable enough that "the same path" is well defined? | cache keys of real Actions (2 exist, imported, from one run; their `environment` is recorded as NOT RECORDED) | audit of which key dimensions are actually pinned | report how often a dimension is unrecorded or changes on retry | more Actions |
 | R6 | Operator-distinct counting vs account counting | an identity layer | none today | out of scope until an identity model exists; no federation or identity claim | identity |
 | R7 | Are forecasts of action outcomes calibrated? | specs and resolutions written before forecasts | `forecast.score_events` on real specs | `calibrated_claim_allowed` stays false until a preregistered, adequately large set resolves | specs, resolutions |
 
