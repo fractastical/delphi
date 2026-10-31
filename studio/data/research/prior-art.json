@@ -139,7 +139,43 @@
      "title": "Cross-domain benchmarks reveal when coordinated AI agents improve scientific inference",
      "read_level": "read",
      "AUTHOR_NAME_TRAP": "The arXiv API metadata literally returns 'Fiona Y. Wong'; the paper's own PDF title block says WANG. Metadata typo. She is first author on the categorical framework, on ScienceClaw AND on the MRS perspective - getting her name wrong is the cheapest bad error available to us. claude-15 committed 'Wong' at c09522e from the agent's first report; corrected here.",
-     "VERDICT": "IT IS a cross-domain benchmark with frozen panels, explicit baselines, ablations and null controls. CONSEQUENCE: '2603.14312 has no ablation' stays TRUE of that paper, but 'that measurement is missing from their work' is FALSE AND MUST NOT BE SAID. Our MorphoBench absent-ablation gap claim is dead in its broad form."
+     "VERDICT": "IT IS a cross-domain benchmark with frozen panels, explicit baselines, ablations and null controls. CONSEQUENCE: '2603.14312 has no ablation' stays TRUE of that paper, but 'that measurement is missing from their work' is FALSE AND MUST NOT BE SAID. Our MorphoBench absent-ablation gap claim is dead in its broad form.",
+     "measures_coordinated_vs_single_agent": true,
+     "comparator_is_matched_on_inputs": "'A single-agent summary baseline may access the same extracted channel flags or summary features, but it does not preserve channel-specific artifact exchange, provenance, or reuse as part of the inference process.'",
+     "rig": "19 comparator/ablation arms, 11 controls, 28 metrics; leave-one-pair-out AUROC, matched-pair accuracy, median lead time, permutation p, retrieval@3",
+     "results": [
+      {
+       "task": "Climate-Vector",
+       "n": "12+12",
+       "coordinated": "AUROC 0.944",
+       "vs_single_agent": "+0.208",
+       "verdict": "WINS"
+      },
+      {
+       "task": "Cosmic Filter",
+       "n": "12+12",
+       "coordinated": "0.955",
+       "vs_single_agent": "0.951",
+       "verdict": "TIE"
+      },
+      {
+       "task": "Computational Kuhn",
+       "n": "16+16",
+       "coordinated": "0.9688",
+       "vs_single_agent": "citation channel alone 0.969",
+       "verdict": "NO GAIN"
+      },
+      {
+       "task": "Sound of Molecules",
+       "n": "16x6",
+       "coordinated": "retrieval@3 0.2708",
+       "vs_single_agent": "loses to best chemistry baseline",
+       "verdict": "REPRESENTATIONAL ONLY"
+      }
+     ],
+     "their_own_discussion": "'Multi-agent decomposition does not automatically outperform a strong single-agent combined baseline ... These results argue against treating agent count or decomposition as intrinsically valuable.'",
+     "THE_HEADLINE": "Coordination WINS in 1 of 4, TIES in 1, is MATCHED in 1, and is NON-PREDICTIVE in 1. They built the benchmark, ran it on ScienceClaw x Infinite, and published a MOSTLY NEGATIVE result about their own thesis.",
+     "their_stated_scope": "Curated retrospective panels of 24-32; calibration error 0.6243 on one task; the authors' own words: 'supports retrospective discrimination, not prospective forecasting'. RECORDED AS FACT. The reviewer explicitly declined to offer this as a gap, and that was the right call."
     }
    ],
    "collisions_we_must_not_claim": [
@@ -168,7 +204,8 @@
     "evidence": "zero .lean/.v/.agda/.thy/.smt2 files, with controls of 569 + 14 + 39 .py files proving the search ran",
     "their_certificates_are": "type/arity/parent/hash obligations, two of them weak: the hash obligation passes VACUOUSLY on an empty content_hash (`not artifact.content_hash or ...`), and `invariants_ok = bool(payload.get('invariants'))` checks PRESENCE, not truth",
     "how_it_must_be_stated": "'no .lean/.v/.agda/.thy/.smt2 in these three repositories at these SHAs' - NOT 'they do not do verification'",
-    "UNRESOLVED": "which SHA the code claims were read at. Asked. Until answered these findings may describe a superseded snapshot, and scienceclaw moved two commits on 2026-10-30."
+    "UNRESOLVED": "which SHA the code claims were read at. Asked. Until answered these findings may describe a superseded snapshot, and scienceclaw moved two commits on 2026-10-30.",
+    "scope_error_found_and_closed_by_the_reviewer": "Part I censused the BRANCH tree for proof-assistant files, not main. Now checked on main @ 894598cd3a: 2,177 blobs, ZERO .lean/.v/.thy/.agda/.smt2/.mlw, with controls 544 .py / 999 .md / 91 .json. The zero holds on BOTH trees. BreakingTheWorld 9a3da118b1 (14 .py) and CategoryTheoryDesign fa8100bad1 (39 .py) are pinned too."
    },
    "implemented_vs_claimed_verdict": "Neither direction of the test fires. The code matches the structure, but the categorical layer is a POST-HOC AUDIT over hand-authored schemas (build_schema_iter0..3; 'colimit' appears 0 times in the 851-line Kan file), not a runtime constraint. The authors say so themselves: 'weaker than a software-enforced schema category, and should not be overclaimed'; 'not yet a certified functor in software.'",
    "dimension_coverage": {
@@ -182,14 +219,21 @@
    "code_currency_resolved": {
     "answer_to_which_SHA": "The categorical code was inspected at scienceclaw branch categoryscienceclaw-mechanics @ 38b2f681e8, WHICH IS STILL THE TIP. BreakingTheWorld @ 9a3da118b1 and CategoryTheoryDesign @ fa8100bad1. infinite main unchanged at 699b90a422.",
     "the_main_branch_move": "2 commits, 9 files, both 2026-10-30: LLM-client / JWT / dry-run bug fixes plus 4 new test files. NOTHING under artifacts/, the pressure formula, the mutator, the needs layer or the type vocabulary. So every code claim survives, now stated as a diff rather than assumed.",
-    "one_inherited_criticism_went_stale": "'only one test file exercises project-specific core behaviour' was true until yesterday; 503 lines of project-specific tests landed on 2026-10-30 and have NOT been read."
+    "one_inherited_criticism_went_stale": "'only one test file exercises project-specific core behaviour' was true until yesterday; 503 lines of project-specific tests landed on 2026-10-30 and have NOT been read.",
+    "sha_question_answered": "BETTER THAN A RE-CHECK. The two certificate findings were never read from the 2026-10-17 clone; they came from a pinned raw URL at scienceclaw@38b2f681e8, re-fetched today with sha256 b55c858c3d14e059d03ecf717690c62007b239979c788d294776e3860c1f6796 and lines 110/123/141/146 unchanged. Re-checking against main is IMPOSSIBLE: categoryscienceclaw/ DOES NOT EXIST on main (contents API 'Not Found' at 894598cd3a, EXISTS with 20 entries at 38b2f681e8 as the control; main's recursive tree has 0 paths beginning categoryscienceclaw). The branch is DIVERGED, not stale: ahead 4 / behind 5, merge-base f4a628669d 2026-05-21, tip 38b2f681e8 2026-07-30. There is no newer version of that code to have read. That branch is also the URL arXiv:2606.01444 itself cites."
    },
    "the_one_defensible_differentiator": {
     "sentence": "They have the objects; we add the decision rule to the object, before the result exists.",
     "why_it_holds": "Their gates are real but live in code and in the ACCEPTED artifact's payload - the HEA gate_rule is recorded INSIDE the winning model, so the criterion is written AFTER the verdict, by the winner. Ours is committed to git before the result exists, with the timestamp as the evidence.",
     "what_is_NOT_defensible": "The broader claim that typed research objects or independent review are ours.",
     "near_miss_to_know": "ScienceClaw's mutation_policy LOOKS like a learned policy - versioned, lineage-chained, drift-plotted. It is not. The update only ever lowers the threshold, bumps stagnation on a 15% coin flip, and reads no outcome. A congestion throttle with a version number."
-   }
+   },
+   "RUBRIC_CONSEQUENCE": {
+    "which_criterion": "Collective Capability, 25% of the score",
+    "the_problem": "The rubric asks for a multi-agent versus single-agent comparison, and the judges have run exactly that comparison and published a CONDITIONAL, mostly negative answer. A confident collective-capability claim from us is refuted by the judges' own data before we speak.",
+    "the_honest_move": "Present the CONDITION, not the capability. Cite 2605.22300, state that coordination won 1 of 4 on their own benchmark, and say what condition we think separates the win from the three non-wins. Engaging with their negative result is the strongest available signal that we read their work."
+   },
+   "required_edit_elsewhere": "morphoswarm docs/prior-art/scienceclaw-infinite.md section 4 item 6 says 'MorphoBench (SPEC-006) supplies the missing measurement rig'. The first half ('2603.14312 reports qualitative outcomes only') STAYS TRUE. The second half is a claim about a gap they closed in May and must be removed or rewritten. That is another repo's file; claude-15 did not edit it."
   }
  ]
 }
