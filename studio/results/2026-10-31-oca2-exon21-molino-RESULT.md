@@ -522,3 +522,103 @@ reconstruct them from the accessions, which are the durable part.
 
 Every job ran under
 `systemd-run --user --scope -p TasksMax=64 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=900`.
+
+---
+
+## 14. Appendix C — the Tinaja arm: provenance of "not albino", and the one non-unity cave number
+
+*(Added after the result, at the team lead's request, who flagged that this is the
+claim that would most improve the finding and therefore the one to distrust most.
+He was right to ask: at preregistration time it was recall.)*
+
+### 14.1 Provenance, stated plainly
+
+When I wrote "Tinaja is a cave population that is **not** albino" into the
+preregistration, that was **background knowledge, not retrieved**. What I had
+actually retrieved at that moment was BioSample SAMN26927012's `/ecotype="Tinaja
+cave"`, which establishes *cave* and says nothing about pigment. The claim was
+unsourced for the whole run.
+
+**It has a retrieved source now.** Jeffery WR, "*Astyanax* surface and cave fish
+morphs", *EvoDevo* 2020, PMID 32676179, PMC7353729, open access CC BY.
+**Read-level: full-text.** Verbatim:
+
+> "The loss of melanin pigmentation is caused by differentiation of fewer
+> melanophores, reduced melanin synthesis, which leads to brown coloration in some
+> cavefish populations (e.g., Tinaja), and the complete loss of melanin, which
+> results in albinism in other cavefish populations (e.g., Pachón and Molino)"
+
+That sentence contrasts the two cases explicitly and puts Tinaja on the brown,
+non-albino side and Molino on the albino side. Two further qualifications, because
+they bound what it supports: it is a **review**, and it attributes that sentence to
+its own reference [23], which I did **not** open — so this is a review's
+characterisation, read at full text, not the primary measurement. And it describes
+the populations, not the two specific laboratory individuals these assemblies were
+built from.
+
+### 14.2 Does Tinaja carry a *different* oca2 lesion? My data answers this directly
+
+This was the lead's decisive objection: if Tinaja has some other oca2 lesion, then
+82/82 at exon 21 is unremarkable and the specificity framing collapses. I had
+reported only exons 19-23. The full table:
+
+| exon | surface | Molino | Tinaja |   | exon | surface | Molino | Tinaja |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 1.000 | 1.000 | 1.000 | | 13 | 1.000 | 1.000 | 1.000 |
+| 2 | 1.000 | 0.991 | 1.000 | | 14 | 1.000 | 0.793 | 1.000 |
+| 3 | 1.000 | 1.000 | 0.959 | | 15 | 1.000 | 1.000 | 1.000 |
+| 4 | 1.000 | 1.000 | 1.000 | | 16 | 1.000 | 1.000 | 1.000 |
+| 5 | 1.000 | 1.000 | 1.000 | | 17 | 1.000 | 1.000 | 1.000 |
+| 6 | 1.000 | 1.000 | 1.000 | | 18 | 1.000 | 1.000 | 1.000 |
+| 7 | 1.000 | 0.822 | 0.726 | | 19 | 1.000 | 1.000 | 1.000 |
+| 8 | 1.000 | 1.000 | 1.000 | | 20 | 1.000 | 1.000 | 1.000 |
+| 9 | 1.000 | 1.000 | 1.000 | | **21** | **1.000** | **0.000** | **1.000** |
+| 10 | 1.000 | 1.000 | 1.000 | | 22 | 1.000 | 1.000 | 0.662 |
+| 11 | 1.000 | 0.814 | 0.814 | | 23 | 1.000 | 1.000 | 1.000 |
+| 12 | 1.000 | 1.000 | 1.000 | | 24 | *1.075* | *1.068* | *0.913* |
+
+**No oca2 exon is absent in Tinaja. All 24 are present.** Exon 21 in Molino is the
+only zero in the entire table, and the next lowest value anywhere is 0.662.
+(Exon 24's values above 1 are the metric defect of section 9; no conclusion is drawn
+from that row.)
+
+### 14.3 The 0.662, which I had not explained
+
+Tinaja exon 22 reads 47 of 71. By direct alignment of the Tinaja genomic sequence
+against the surface exon, that interval contains **exactly one mismatch**: surface
+`G` to Tinaja `A`, at position 49 of the 94 bp exon.
+
+A single interior substitution destroys every 24-mer window spanning it, which is 24
+of them. Predicted survivors: **47 of 71**. Observed: **47 of 71**. The arithmetic
+reproduces the number exactly.
+
+The same check on the other non-unity value I could test, Molino exon 7 at 0.822:
+one mismatch, surface `T` to Molino `C` at position 124 of 158; predicted 111 of
+135; observed 111 of 135.
+
+So the reduced values are **point substitutions, not lesions**, and the metric is
+behaving exactly as a k-mer metric must under single-base divergence. This is also
+the answer to the lead's third point: the metric defect inflates and cannot produce
+a zero, and 0.662 is neither — it is simply one SNP.
+
+**What I did not determine:** whether that G-to-A substitution changes the OCA2
+protein. I did not translate it and I make no claim about it. For what it is worth
+from the literature rather than from my data, Ma et al. 2015 (PMC4361574,
+**full-text**) state: "Two cavefish populations contain coding deletions in oca2
+when compared to the surface population. Exon 21 is deleted in Molino fish, and a
+portion of exon 24 is deleted in Pachón cavefish" — naming two, not three.
+
+### 14.4 What the Tinaja arm now supports, and what it does not
+
+**Supports:** within these three assemblies, the oca2 exon-21 deletion is present in
+the albino cave population and absent from the brown cave population and from
+surface. It therefore tracks albinism rather than cave-dwelling. That is a stronger
+statement than the preregistered one.
+
+**Does not support:** anything with n > 1 per population. Three fish. The
+pigmentation phenotypes come from a review describing populations, not from these
+individuals, which were not phenotyped by me and whose BioSamples record ecotype
+but not pigment. And the Tinaja exon-22 SNP is uncharacterised. **This is a
+suggestive specificity observation, not a tested hypothesis** — it was not
+preregistered, and it must not be reported with the same confidence as the exon-21
+result, which was.
