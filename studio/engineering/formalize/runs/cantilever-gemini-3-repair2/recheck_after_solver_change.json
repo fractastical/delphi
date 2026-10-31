@@ -1,0 +1,130 @@
+{
+ "note": "The proposal and the model output are UNCHANGED. Round 2 recorded status 'unknown' (propose_response.json, kept as recorded). Two changes then followed to the CHECKER, not the proposal: (1) the witness search resolved the eliminated variables in listed order, so an equality that depended on another equality's variable always failed (a bug, fixed to dependency order); (2) the candidate grid gained fine points near the low end of a domain. The SAME request was re-checked. Every witness is re-evaluated exactly, in fractions.Fraction, by code independent of the search.",
+ "original_status": "unknown",
+ "recheck": {
+  "assumed_scope": "Only the constraints exactly as written, under the declared symbols, units and domains. Not a claim that the constraints encode the source text, not a claim about biological function, and nothing outside the declared symbols and domains.",
+  "calibrated": false,
+  "checks": [
+   {
+    "candidates_tried": 97,
+    "constraint": "ALL",
+    "independent_check": "ok",
+    "method": "exact-rational (candidate search + linear solve)",
+    "result": "sat",
+    "witness": {
+     "B": "1/1000000",
+     "E": "100000000",
+     "I": "1/100000000000000",
+     "L": "1/1000",
+     "P": "100",
+     "w_C": "1/30"
+    }
+   }
+  ],
+  "controls_summary": {
+   "as_expected": 6,
+   "n": 6
+  },
+  "dimension_report": [
+   {
+    "constraint": "C1",
+    "dims": "kg m^4 s^-2",
+    "ok": true
+   },
+   {
+    "constraint": "C2",
+    "dims": "kg m^3 s^-2",
+    "ok": true
+   }
+  ],
+  "evidence_kind": "formal",
+  "lean": "not_run",
+  "lean_statement": {
+   "meaning": "unit-rescaling invariance of each constraint as written; compile separately (engineering/formalize/lean_run.py)",
+   "sha256": "67d64061ad31be5f9b6dcf4e30399348d14f3a93899747c20703e96d0094a742",
+   "status": "generated_not_compiled",
+   "text": "import Mathlib.Tactic\n\n/-- Generated from constraint C1 (op `==`). Rescaling base units multiplies both sides by the same factor\n    ((s_kg ^ 1 * s_m ^ 4) * (s_s ^ 2)\u207b\u00b9); so the constraint is invariant. ALL rational values and all nonzero scales. -/\ntheorem unit_rescaling_invariance_C1 (s_kg s_m s_s : \u211a) (h_kg : s_kg \u2260 0) (h_m : s_m \u2260 0) (h_s : s_s \u2260 0)\n    (v_E v_I v_L v_P v_w_C : \u211a) :\n    (((3 : \u211a) * (v_E * ((s_kg ^ 1) * (s_m ^ 1 * s_s ^ 2)\u207b\u00b9)) * (v_I * ((s_m ^ 4))) * (v_w_C * ((s_m ^ 1)))) = ((v_P * ((s_kg ^ 1 * s_m ^ 1) * (s_s ^ 2)\u207b\u00b9)) * ((v_L * ((s_m ^ 1))) ^ 3))) \u2194 (((3 : \u211a) * v_E * v_I * v_w_C) = (v_P * (v_L ^ 3))) := by\n  have hL : ((3 : \u211a) * (v_E * ((s_kg ^ 1) * (s_m ^ 1 * s_s ^ 2)\u207b\u00b9)) * (v_I * ((s_m ^ 4))) * (v_w_C * ((s_m ^ 1)))) = ((s_kg ^ 1 * s_m ^ 4) * (s_s ^ 2)\u207b\u00b9) * ((3 : \u211a) * v_E * v_I * v_w_C) := by\n    field_simp <;> ring\n  have hR : ((v_P * ((s_kg ^ 1 * s_m ^ 1) * (s_s ^ 2)\u207b\u00b9)) * ((v_L * ((s_m ^ 1))) ^ 3)) = ((s_kg ^ 1 * s_m ^ 4) * (s_s ^ 2)\u207b\u00b9) * (v_P * (v_L ^ 3)) := by\n    field_simp <;> ring\n  have hF : ((s_kg ^ 1 * s_m ^ 4) * (s_s ^ 2)\u207b\u00b9) \u2260 0 := by positivity\n  rw [hL, hR]\n  exact mul_right_inj' hF\n\n\n/-- Generated from constraint C2 (op `==`). Rescaling base units multiplies both sides by the same factor\n    ((s_kg ^ 1 * s_m ^ 3) * (s_s ^ 2)\u207b\u00b9); so the constraint is invariant. ALL rational values and all nonzero scales. -/\ntheorem unit_rescaling_invariance_C2 (s_kg s_m s_s : \u211a) (h_kg : s_kg \u2260 0) (h_m : s_m \u2260 0) (h_s : s_s \u2260 0)\n    (v_B v_E v_I : \u211a) :\n    ((v_B * ((s_kg ^ 1 * s_m ^ 3) * (s_s ^ 2)\u207b\u00b9)) = ((v_E * ((s_kg ^ 1) * (s_m ^ 1 * s_s ^ 2)\u207b\u00b9)) * (v_I * ((s_m ^ 4))))) \u2194 (v_B = (v_E * v_I)) := by\n  have hL : (v_B * ((s_kg ^ 1 * s_m ^ 3) * (s_s ^ 2)\u207b\u00b9)) = ((s_kg ^ 1 * s_m ^ 3) * (s_s ^ 2)\u207b\u00b9) * v_B := by\n    field_simp <;> ring\n  have hR : ((v_E * ((s_kg ^ 1) * (s_m ^ 1 * s_s ^ 2)\u207b\u00b9)) * (v_I * ((s_m ^ 4)))) = ((s_kg ^ 1 * s_m ^ 3) * (s_s ^ 2)\u207b\u00b9) * (v_E * v_I) := by\n    field_simp <;> ring\n  have hF : ((s_kg ^ 1 * s_m ^ 3) * (s_s ^ 2)\u207b\u00b9) \u2260 0 := by positivity\n  rw [hL, hR]\n  exact mul_right_inj' hF\n\n",
+   "theorems": [
+    "unit_rescaling_invariance_C1",
+    "unit_rescaling_invariance_C2"
+   ]
+  },
+  "limits": {
+   "max_bytes": 16384,
+   "max_nodes": 64,
+   "timeout_s": 8
+  },
+  "negative_controls": [
+   {
+    "expected": "rejected",
+    "kind": "dimension",
+    "name": "exponent_mutant:C1.rhs:L^3->4",
+    "note": "a dimensionless base symbol would not be detected by units",
+    "observed": "rejected"
+   },
+   {
+    "expected": "rejected",
+    "kind": "dimension",
+    "name": "wrong_unit:E",
+    "observed": "rejected"
+   },
+   {
+    "expected": "rejected",
+    "kind": "dimension",
+    "name": "wrong_unit:I",
+    "observed": "rejected"
+   },
+   {
+    "expected": "rejected",
+    "kind": "dimension",
+    "name": "wrong_unit:L",
+    "observed": "rejected"
+   },
+   {
+    "expected": "accepted",
+    "kind": "positive",
+    "name": "witness_independent_recheck",
+    "observed": "accepted"
+   },
+   {
+    "expected": "rejected",
+    "kind": "witness",
+    "name": "perturbed_witness_rejected",
+    "note": "one symbol of the witness increased by 1 unit of its own declared unit",
+    "observed": "rejected"
+   }
+  ],
+  "next_questions": [
+   "The passage provides a range for B (10^-6 to 10^-5 J m) and E (10^8 to 10^9 N m^-2) but a single value for I (10^-6 cm^4). The product of the lower bounds of E and I (10^8 * 10^-14 = 10^-6) matches the lower bound of B, but the upper bound of B (10^-5) is not reached unless I or E varies further.",
+   "symbol w_C has status 'unknown': its value/range is not given by the source",
+   "Does each symbol's unit and domain match the source's definition? (this tool cannot check translation fidelity)",
+   "Is the witness (if any) inside the empirically relevant range, or only inside the declared box?"
+  ],
+  "not_established": [
+   "translation fidelity to the source",
+   "biological function",
+   "anything outside the declared symbols/domains"
+  ],
+  "proposal_sha256": "bef257851d89407dfa51e4c96bc0b2eb2197cd89301852168ea71aaa2ba63922",
+  "refusals": [],
+  "request_sha256": "1968ed318207d0fa5550e37edcc9cc876975bb974ce325f396636d782740f39a",
+  "schema": "frontier.formalize.response/1",
+  "source_mapping_declared": [
+   "C1",
+   "C2"
+  ],
+  "status": "checked",
+  "unresolved_translation": [
+   {
+    "id": "U1",
+    "question": "The passage provides a range for B (10^-6 to 10^-5 J m) and E (10^8 to 10^9 N m^-2) but a single value for I (10^-6 cm^4). The product of the lower bounds of E and I (10^8 * 10^-14 = 10^-6) matches the lower bound of B, but the upper bound of B (10^-5) is not reached unless I or E varies further."
+   },
+   {
+    "id": "UNKNOWN_w_C",
+    "question": "symbol w_C has status 'unknown': its value/range is not given by the source"
+   }
+  ],
+  "worker_wall_s": 0.06
+ },
+ "request_sha256_unchanged": true
+}

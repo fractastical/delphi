@@ -101,6 +101,7 @@ class WebConfig:
         self.routes.setdefault("POST /api/engineering/solve", Route(engineering_handler, max_body=1024, max_concurrent=8))
         self.routes.setdefault("POST /api/beliefs/solve", Route(beliefs_handler, max_body=32768, max_concurrent=8))
         self.routes.setdefault("POST /api/simulations/run", Route(simulation_handler, max_body=8192, max_concurrent=2))
+        self.routes.setdefault("POST /api/formalize/propose", Route(formalize_handler, max_body=16384, max_concurrent=2))
         for key in self.routes:
             method, _, path = key.partition(" ")
             if method not in ("GET", "POST") or not re.fullmatch(r"/api/[a-z0-9][a-z0-9/_-]{0,80}", path) or path in RESERVED_API:
@@ -139,6 +140,13 @@ def simulation_handler(req):
     """Trusted CPU previews with fixed models, isolated workers and no persistence."""
     from .simulation_api import run_preview
     return 200, run_preview(req["body"])
+
+
+def formalize_handler(req):
+    """Check declarative constraints; no persistence, model call or Lean execution."""
+    from .formalize import http_status, propose
+    result = propose(req["body"])
+    return http_status(result), result
 
 
 def beliefs_handler(req):
