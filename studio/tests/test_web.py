@@ -106,6 +106,33 @@ def test_health_is_public_and_carries_no_detail(web):
     assert web.req("POST", "/api/health", cookie=False)[0] == 405
 
 
+def test_public_design_context_and_credentialed_challenge_preserve_exact_pins(store, site):
+    from urllib.parse import urlencode
+    from test_design_review import challenge, project
+    member_record = store.submit(TOKENS["alice"], "web-design-member", claim(store))["record"]
+    project_record = store.submit(TOKENS["alice"], "web-design-project", project(store, ref(member_record)))["record"]
+    target = ref(project_record)
+    w = Web(store, site, public_read=True)
+    try:
+        path = "/api/design/context?" + urlencode(target)
+        status, body, _ = w.json("GET", path)
+        assert status == 200 and body["project"]["record"]["version"] == target["version"]
+        assert body["annotations"] == [] and body["pagination"]["next_cursor"] is None
+        assert w.json("GET", path + "&limit=51")[0] == 400
+        assert w.json("GET", path + "&cursor=invalid")[0] == 400
+        draft = challenge(store, target)
+        assert w.json("POST", "/v1/design/reviews", {"draft": draft})[0] == 401
+        headers = {"Authorization": "Bearer " + TOKENS["alice"], "Idempotency-Key": "web-design-challenge"}
+        status, result, _ = w.json("POST", "/v1/design/reviews", {"draft": draft}, headers=headers)
+        assert status == 200 and result["local_status"] == "proposed"
+        status, body, _ = w.json("GET", path + "&limit=1")
+        assert status == 200 and len(body["annotations"]) == 1
+        assert body["annotations"][0]["record"]["payload"]["anchor"]["record"] == target
+        assert body["project"]["local_review"]["status"] == "proposed"
+    finally:
+        w.close()
+
+
 def test_everything_else_is_gated_and_html_navigation_goes_to_login(web):
     for path in ("/api/catalog", "/api/record", "/api/events", "/api/session"):
         assert web.req("GET", path, cookie=False)[0] == 401
