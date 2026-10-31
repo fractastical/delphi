@@ -31,8 +31,23 @@ def _manifold_from(verts: np.ndarray, tris: np.ndarray) -> mf.Manifold:
     return m
 
 
+_S_MAX = 0.5 / 1.4  # argmax of sqrt(s) (1 - s)^0.9
+_G_MAX = math.sqrt(_S_MAX) * (1 - _S_MAX) ** 0.9
+
+
 def body_profile(s: np.ndarray, peduncle: float) -> np.ndarray:
-    """Normalised fusiform half-size along the body, 0 at the snout, `peduncle` at the caudal base."""
+    """Normalised fusiform half-size along the body, 0 at the snout, `peduncle` at the caudal base.  Pointwise:
+    the value at s does not depend on which other points are evaluated with it."""
+    g = np.sqrt(np.clip(s, 0, 1)) * (1 - np.clip(s, 0, 1)) ** 0.9 / _G_MAX
+    return (1 - peduncle) * g + peduncle * np.clip(s, 0, 1) ** 2
+
+
+def body_profile_v1(s: np.ndarray, peduncle: float) -> np.ndarray:
+    """FROZEN DEFECT, kept only so the published print sets (morphology-v1, nca-comparison-v1) rebuild byte for
+    byte.  It normalises by the maximum of its INPUT, so a single-point call returns ~(1 - peduncle) + peduncle s^2
+    (near full width) wherever it is evaluated: +3% at the pectoral root (s 0.27), +11% at the pelvic root (s 0.55),
+    up to +98% near the tail.  Arrays that span the body's maximum (the loft stations) are nearly unaffected.
+    New geometry must use body_profile."""
     g = np.sqrt(np.clip(s, 0, 1)) * (1 - np.clip(s, 0, 1)) ** 0.9
     g = g / g.max()
     return (1 - peduncle) * g + peduncle * np.clip(s, 0, 1) ** 2

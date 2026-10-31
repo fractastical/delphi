@@ -747,3 +747,112 @@ def test_home_and_frontier_offer_all_six_printable_models_with_stl_download(brow
         assert dl.get_attribute("href").endswith("artifacts/print/stl/N2-area-x1.3.stl") and dl.get_attribute("download") == "N2-area-x1.3.stl"
         info = pg.locator(".printmodels p").inner_text()
         assert " mm" in info and "does not change" in info
+
+
+def test_windtunnel_behavior_and_scale_growth_cards_keep_partial_assumed_and_missed(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    for cid in ("windtunnel-2d", "behavior-cpg", "scale-erk-wave"):
+        pg.wait_for_selector(f"#sim-{cid} video")
+    wt = pg.locator("#sim-windtunnel-2d").text_content()
+    assert "FAIL" in wt and "PARTIAL" in wt and "not validated flight" in wt and "not computed (null)" in wt
+    er = pg.locator("#sim-scale-erk-wave").text_content()
+    assert "ASSUMED" in er and "LINEAR" in er and "MISS" in er and "rise 10 90 h" in er and "synchronous" in er.lower()
+    pg.locator("#sim-scale-erk-wave details.simdet:has-text('Equations')").evaluate("d => d.open = true")
+    pg.wait_for_selector("#sim-scale-erk-wave .eq-math .katex")
+    assert pg.locator("#sim-scale-erk-wave .katex-error").count() == 0
+    assert "no biological or fluid-force success is tested" in pg.locator("#sim-behavior-cpg").text_content()
+    pg.goto(base + "#/studio/flying-fish?scale=neural")
+    pg.wait_for_function("document.querySelector('#main').textContent.includes('Rhythm-generator')")
+    assert pg.locator(".artcard video").count() >= 1
+
+
+def test_design_review_prompts_and_local_challenge_draft_in_the_contract_shape(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#designreview")
+    t = pg.locator("#designreview").text_content()
+    assert "not a vote" in t.lower() and "source-only prompt" in t and "No node is connected" in t and "never holds a credential" in t
+    assert pg.locator("#designreview .drprompts .drcard").count() == 4
+    pg.click("[data-seed=release-convention]")
+    assert pg.input_value("#drform select[name=dimension]") == "aerodynamics"
+    pg.fill("#drform textarea[name=scope]", "Organism-scale glide model only.")
+    pg.fill("#drform textarea[name=alternative]", "A sourced fixed release.")
+    pg.fill("#drform input[name=member_index]", "3")
+    pg.click("#drform button[type=submit]")
+    d = pg.evaluate("() => JSON.parse(localStorage.getItem('frontier-design-review-draft:flying-fish'))")
+    pl = d[0]["payload"]
+    assert pl["kind"] == "challenge" and pl["design_review"]["dimension"] == "aerodynamics" and pl["design_review"]["member_index"] == 3 and pl["design_review"]["evidence_refs"] == []
+    assert pl["anchor"]["record"]["kind"] == "Project" and pl["anchor"]["record"]["version"].startswith("UNPINNED")
+    assert "not submitted" in pg.locator("#drdrafts").text_content()
+    pg.fill("#drform textarea[name=evidence_refs]", "not-a-pin")
+    pg.fill("#drform textarea[name=body]", "x"); pg.fill("#drform textarea[name=scope]", "s"); pg.fill("#drform textarea[name=alternative]", "a"); pg.fill("#drform textarea[name=falsifiable_next_test]", "t")
+    pg.click("#drform button[type=submit]")
+    assert "Not an exact pin" in pg.locator("#drerr").inner_text()
+
+
+def test_design_review_shows_live_challenges_with_replies_and_no_resolution(browser, base):
+    v = "b" * 64
+    proj = {"namespace": "n", "kind": "Project", "id": "project-flying-fish-mission", "version": v}
+    ch = {"namespace": "n", "kind": "Annotation", "id": "ann-1", "version": "c" * 64}
+
+    def ann(ref, payload, mi=None):
+        return {"ref": ref, "record": {"payload": payload}, "local_status": "proposed", "anchor_ref": proj, "member_index": mi, "thread_root_ref": ref}
+    ctx = {"schema": "frontier.project.design-context/1", "project": {}, "members": [], "withheld_unlicensed": 2,
+           "annotations": [ann(ch, {"kind": "challenge", "body": "Stiffness measured in one regime is assumed in another.", "anchor": {"record": proj}, "design_review": {"dimension": "biology", "evidence_basis": "assumption", "scope": "Member 3 glide model.", "alternative": "Depends on strain rate.", "falsifiable_next_test": "Static vs cyclic loads.", "evidence_refs": []}}, 3),
+                           ann({"namespace": "n", "kind": "Annotation", "id": "ann-2", "version": "d" * 64}, {"kind": "comment", "body": "Agreed, which fin?", "anchor": {"record": proj}, "reply_to": {"version": ch["version"], "id": ch["id"], "kind": ch["kind"], "namespace": ch["namespace"]}})],   # property order differs from the root ref
+           "pagination": {"limit": 50, "returned": 2, "next_cursor": None, "truncated": False}, "interpretation": "Annotations are authored challenges or replies, not votes."}
+    seen = []
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    other = {"record": {"namespace": "n", "kind": "Project", "id": "other-fish-project", "version": "e" * 64, "payload": {"title": "Flying fish (a different project)"}}, "local_status": "proposed", "is_head": True}
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": [other, {"record": {**proj, "payload": {"title": "Mission"}}, "local_status": "proposed", "is_head": True}]}))
+    pg.route("**/api/design/context*", lambda r: (seen.append(r.request.url), r.fulfill(json=ctx))[1])
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#drlive .drcard")
+    t = pg.locator("#drlive").inner_text()
+    assert "1 challenge" in t and "none resolved" in t and "open: no resolution state exists" in t.lower() and "1 reply" in t and "2 withheld" in t
+    assert "Stiffness measured" in t and "Falsifiable next test" in t and "member 3" in t.lower()
+    assert seen and f"version={v}" in seen[0] and "kind=Project" in seen[0]
+    assert "id=project-flying-fish-mission" in seen[0] and "other-fish-project" not in seen[0]
+    assert "1 reply" in t, "a reply whose reply_to lists its properties in another order still attaches to its challenge"
+
+
+def test_lifecycle_panel_shows_unknowns_and_the_borrowed_parameter_label(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=developmental")
+    pg.wait_for_selector(".lifecycle table")
+    t = pg.locator(".lifecycle").text_content()
+    assert "not a flying fish" in t and "Not claimed: a living whole-fish bioprint is feasible" in t
+    assert pg.locator(".lifecycle .tablewrap").first.locator("tbody tr").count() == 10 and pg.locator(".lifecycle td .pill.no, .lifecycle td .no").count() >= 1
+    assert "borrowed parameters, not a feasibility statement" in t and "SIZING AID UNDER BORROWED PARAMETERS" in t
+    href = pg.locator(".lifecycle a:has-text('life-cycle document')").get_attribute("href")
+    assert href
+
+
+def test_home_shows_the_fish3d_turntable_with_its_limits_and_download(browser, base):
+    for route in ("#/home", "#/frontier"):
+        pg = page(browser)
+        pg.goto(base + route)
+        pg.wait_for_selector(".turntable video")
+        t = pg.locator(".turntable").text_content()
+        assert "not an organism" in t and "not an aerodynamic result" in t
+        assert pg.locator(".turntable a[download]").get_attribute("href").endswith("turntable.mp4")
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector("#sim-fish3d-render video")
+    assert "Not claimed: aerodynamic performance or validity" in pg.locator("#sim-fish3d-render").text_content()
+
+
+def test_design_review_never_attaches_an_unrelated_fish_project(browser, base):
+    seen = []
+    other = {"record": {"namespace": "n", "kind": "Project", "id": "some-other-fish", "version": "e" * 64, "payload": {"title": "Flying fish"}}, "local_status": "proposed", "is_head": True}
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": [other]}))
+    pg.route("**/api/design/context*", lambda r: (seen.append(r.request.url), r.fulfill(json={}))[1])
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#drlive")
+    pg.wait_for_function("document.querySelector('#drlive').textContent.includes('project-flying-fish-mission')")
+    assert "no Project record" in pg.locator("#drlive").text_content() and not seen

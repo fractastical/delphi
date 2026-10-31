@@ -42,6 +42,10 @@
       <h4>Parameter unknowns</h4>${list(c.parameter_unknowns, "None stated, which is not the same as none.")}
       <h4>Open questions</h4>${list(c.open_questions, "None stated.")}
       <h4>Coupling between scales</h4><div class="chainwrap">${DF.raw(chain(snap, c))}</div><p class="small faint">Filled circle: a scale this artifact runs at. Dashed link: unknown bridge (no executable coupling recorded).</p></details>
+      ${(c.limitations || []).length ? html`<div class="note small warn"><b>Limitations.</b><ul>${c.limitations.map((x) => html`<li>${x}</li>`)}</ul></div>` : ""}
+      ${(c.equations || []).length ? html`<details class="simdet"><summary><b>Equations and sources</b> <span class="faint small">${c.equations.length} equation${c.equations.length === 1 ? "" : "s"} · ${(c.sources || []).length} source${(c.sources || []).length === 1 ? "" : "s"}</span></summary>
+        ${c.equations.map((q) => html`<div class="eqcard"><h4>${q.label}</h4><div class="eq-math">${DF.texSpan(q.tex, true)}</div><p class="small faint">${q.source}</p></div>`)}
+        <h4>Sources</h4><ul class="small">${(c.sources || []).map((x) => html`<li>${x.label}<br><span class="faint">${x.locator}</span></li>`)}</ul></details>` : ""}
       ${c.files && c.files.length ? html`<p class="small">Files: ${c.files.map((f) => html`<a href="${f.href}">${f.name}</a> (${f.bytes} bytes, ${U.sha(f.sha256)}) `)}</p>` : ""}
       <p class="small faint">${c.manifest ? "Manifest: " + c.manifest : ""}</p>`}</article>`;
   }
