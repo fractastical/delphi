@@ -1,0 +1,121 @@
+{
+  "claim_id": "darwin1859-ch05-06",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch05-06",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "In a phylogeny containing obligate cave (troglobitic/stygobitic) animals and surface animals from North America and Europe, each cave lineage is nested among, or sister to, taxa of its own continent; American and European cave taxa do not form clades with each other to the exclusion of surface taxa.",
+  "pass_criterion": "Pre-registered. Using the Open Tree of Life synthetic tree induced on the taxa listed in derived/taxa.csv (continent assignment verified with GBIF occurrences), for every cave taxon compute the node-count distance to the nearest same-continent taxon (cave or surface, d_same) and to the nearest other-continent cave taxon (d_othercave). The claim is SUPPORTED if (i) d_same <= d_othercave for at least 70% of cave taxa, and (ii) the induced tree contains no clade that includes at least one North American and at least one European cave taxon while containing no surface taxon ('exclusive transcontinental cave clade').",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if fewer than 50% of cave taxa satisfy d_same <= d_othercave, or if two or more independent exclusive transcontinental cave clades occur (in different taxonomic groups). Results between the two thresholds, or a single such clade, are recorded as 'mixed'. If fewer than 10 cave taxa (across at least 3 groups) can be placed in the tree, the verdict is inconclusive/underpowered.",
+  "planned_datasets": [
+    "open-tree-of-life-synth-v15",
+    "gbif-occurrence-api"
+  ],
+  "interpretation": "Darwin's 'cave-animals of America' and 'of Europe' are read as obligate subterranean species of North America and Europe; 'affinities to the other inhabitants of that continent' is read as phylogenetic relationship (sister-group or nesting) to surface lineages of the same continent, versus the alternative he rejects, that the two continents' cave faunas are specially allied to each other. Taxa were chosen before any tree was inspected and are listed in derived/taxa.csv; groups are Amphibia (Urodela), Amphipoda, Isopoda, Coleoptera (Trechini and Leiodidae) and Orthoptera (Rhaphidophoridae), the groups in which both continents have well-known troglobites. Continent assignment of each species is verified post hoc against GBIF: a species is kept only if at least 90% of its GBIF occurrences on the two continents fall on the pre-registered continent; names that the Open Tree TNRS cannot match are dropped. Phylogenetic 'affinity' is measured by node counts on the synthetic tree because it has no branch lengths; polytomies produce ties, which count in favour of whichever criterion they satisfy (a tie between a same-continent and an other-continent cave neighbour satisfies d_same <= d_othercave).",
+  "datasets": [
+    {
+      "id": "open-tree-of-life-synth-v15",
+      "name": "Open Tree of Life synthetic tree (current version via API v3)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "doi": null,
+      "version": "opentree16.1",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "download_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+          "retrieved_at": "2026-10-31T04:28:43Z",
+          "byte_size": 611,
+          "sha256": "aa8103ee4fe56d946d224583eeccbcc1294fdb6bafbfb2f6ba2c44897c5b317c",
+          "note": "synthetic tree version"
+        },
+        {
+          "download_url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+          "retrieved_at": "2026-10-31T04:28:43Z",
+          "byte_size": 73114,
+          "sha256": "c467178741c7503f0e6a3258d86ab413e0ae4877db354ce29aea544d279196f1",
+          "note": "TNRS name matching"
+        },
+        {
+          "download_url": "https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree",
+          "retrieved_at": "2026-10-31T04:29:59Z",
+          "byte_size": 10555,
+          "sha256": "f98b7a617ce645fe0afe8bc24f6278516a4f7a70ae3b04594dfd0e32dab7154b",
+          "note": "induced synthetic subtree"
+        }
+      ],
+      "role": "phylogenetic placement of cave and surface taxa (induced subtree, TNRS matching)"
+    },
+    {
+      "id": "gbif-occurrence-api",
+      "name": "GBIF occurrence search API (continent facet)",
+      "landing_url": "https://www.gbif.org/occurrence/search",
+      "doi": null,
+      "version": null,
+      "license": "varies by dataset (CC0 / CC BY / CC BY-NC); counts only used here",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/species/match and https://api.gbif.org/v1/occurrence/search?limit=0&taxonKey=<k>&continent=<c> (per-call list in derived/files.json)",
+          "retrieved_at": "2026-10-31T04:28:43Z",
+          "byte_size": 50492,
+          "sha256": "d52b6600e5cef86aff400612f7b8c1043d6995d459800c0442720d8dfcacda66",
+          "note": "243 API responses; sha256 here is the SHA-256 of the concatenated per-response SHA-256 hex digests"
+        }
+      ],
+      "role": "verification of the continent of each sampled species"
+    }
+  ],
+  "method": "81 pre-registered species (40 obligate cave, 41 surface; 5 groups) were matched to Open Tree taxonomy with the TNRS (1 unmatched: Neaphaenops tellkampfi), and their continent was checked against GBIF occurrence counts in North America vs Europe (1 dropped: Crangonyx pseudogracilis, now mostly recorded in Europe where it is introduced). The induced subtree of synthetic tree opentree16.1 was requested for the remaining 79 taxa. For each of the 38 cave taxa the node-count distance to the nearest same-continent taxon and to the nearest other-continent cave taxon was computed, and all clades were scanned for ones containing cave taxa of both continents but no surface taxon.",
+  "measured": {
+    "value": 0.9474,
+    "unit": "fraction of cave taxa with nearest same-continent taxon at least as close as nearest other-continent cave taxon",
+    "n": 38,
+    "uncertainty": "95% Wilson CI [0.827, 0.985]",
+    "extra": {
+      "synth_id": "opentree16.1",
+      "taxa_preregistered": 81,
+      "taxa_unmatched_by_tnrs": [
+        "Neaphaenops tellkampfi"
+      ],
+      "taxa_failed_continent_check": [
+        "Crangonyx pseudogracilis"
+      ],
+      "taxa_absent_from_synth_tree": [],
+      "broken_taxa_reported_by_api": [],
+      "tips_in_induced_tree": 79,
+      "cave_taxa_evaluated": 38,
+      "cave_taxa_satisfying": 36,
+      "cave_taxa_by_continent": {
+        "NA": 19,
+        "EU": 19
+      },
+      "fraction_by_continent": {
+        "NA": 0.9473684210526315,
+        "EU": 0.9473684210526315
+      },
+      "groups_placed": [
+        "Amphibia",
+        "Amphipoda",
+        "Coleoptera",
+        "Isopoda",
+        "Orthoptera"
+      ],
+      "exclusive_transcontinental_cave_clades": [],
+      "groups_with_exclusive_transcontinental_cave_clades": [],
+      "rule_based_verdict": "supports"
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.8,
+  "caveats": [
+    "The synthetic tree has no branch lengths and several groups are poorly resolved (Asellidae genera, Niphargus/Crangonyctidae, Cholevinae), so node-count distances are coarse; both failing cases (Monolistra caeca, Ptomaphagus hirtus) arise where the induced tree places same-continent relatives in a deeper or unresolved position, and Ptomaphagus hirtus sits in a Staphylinoidea polytomy with the European Leptodirini.",
+    "The surface comparators are a pre-registered selection, not an exhaustive sample of each continent's fauna; adding taxa could only shorten d_same, so the design is lenient toward the claim in that respect, but the second criterion (no exclusive transcontinental cave clade) does not depend on how many surface taxa were sampled within the included families.",
+    "Proteus anguinus (Europe) is sister to Necturus (North America, surface) in the tree: a transatlantic family-level link that is not a cave-to-cave link; d_same for Proteus is the distance to European Salamandridae.",
+    "No European obligate cave fishes were available, so Amblyopsidae were not included; the cross-continent comparison therefore covers salamanders, amphipods, isopods, beetles and cave crickets only.",
+    "Open Tree synthesis is itself built from published phylogenies plus taxonomy, so this is a test against the current synthesis of the literature rather than a de novo molecular analysis."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-b201",
+    "date": "2026-10-31"
+  }
+}
