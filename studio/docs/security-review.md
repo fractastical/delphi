@@ -81,6 +81,24 @@ The tree's 20 are: 15 class A, 3 oneAPI UUID lines, 1 class C, and 1 line in thi
 
 Not covered: nested archives deeper than three levels, content encoded deeper than three levels, files above gitleaks' size limits, and any ref created after 15:38 PDT. The first-run limits in section 5 still apply. This is the receipt for the commit and time above; a later tip needs a new scan.
 
+## 7a. Final delta rescan before the visibility change (15:53-15:55 PDT, 22:53-22:55 UTC)
+
+Same gitleaks 8.30.1 binary and flags as section 7 (no config, redacted, archive and decode depth 3, capped scope). The scanned refs were frozen first, so every count below comes from one rev-list.
+
+| Item | Value |
+|---|---|
+| Frozen refs | 71 `refs/remotes/origin/*` entries (hashes in `scanref-manifest.txt`, receipt directory `/data/artifacts/delphi-evolve-rethink/security/final2-20261031/`), copied to local `refs/freeze/*` before scanning |
+| Commits | **581** reachable = **135** merges + **446** non-merge (135 + 446 = 581, one `git rev-list --glob='refs/freeze/*'` set). Root branch ancestry: 478. The earlier "548 = 127 + 422" was off by one because it was two separate counts taken at different moments; it is superseded by this set. |
+| Root tree | `origin/codex/frontier-demo-20261031` at `17edd4480f46`, 1,872 files |
+| Incoming | `origin/work/fish3d-v3` at `8dc5cc47c9e3`, not merged into the root branch at the time of the scan (`merge-base --is-ancestor` said no); its commits are inside the 581 history set |
+| Merged tree | `git merge-tree --write-tree 17edd4480f46 8dc5cc47c9e3` was conflict-free (tree `3387e8f6cac0`), archived and scanned, 2,034 files. This is a simulated merge, not root's actual merge commit; scan the real one if its tree differs |
+| Findings | history **23**, root tree **19**, merged tree **19** (root and merged have the same rule, file and line set). All `Secret` fields `REDACTED`, all `Match` fields contain `REDACTED`. |
+| Delta vs section 7 | History: the 23 fingerprints are identical to the previous run's 23, so the 33 commits added since section 7's set (581 against 548, including `work/fish3d-v3`) added no hit; the receipt file is byte-identical to the earlier one (same prefix). Tree: 19, the previous 20 minus the quotation in this document removed in `aee47f5` |
+| Classification of the 19 tree hits | 15 sampling keys (class A) + 3 `oneAPI` package UUID lines (class B, in `env/Manifest.toml` and twice in `env_gpu/Manifest.toml`) + 1 test marker (class C). The 23 history hits are these plus 3 expired Figshare URLs (class D, history only) plus the earlier quotation (history only). Nothing new. |
+| Receipts | sha256 prefixes: `history.redacted.json` `fcc98d7251854102`, `tree-root.redacted.json` `f9bdb3a5855c4142`, `tree-merged.redacted.json` `9b7f16701770fd63`, `scanref-manifest.txt` `0163330a2dec150d`. These files are local and are not in git |
+
+Not covered, beyond section 5: the actual merge commit if it differs from the simulated tree, refs pushed after 15:53 PDT, and nested archives or encodings deeper than three levels. Root's own check for those is the last step before the flip.
+
 ## 8. Before any visibility change
 
 Root's final rescan of the latest refs, and the nested-archive scan result, are required. This document changes no repository visibility.
