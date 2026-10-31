@@ -59,7 +59,10 @@ preserved and no new sequence-generation request is being routed elsewhere.
   not equilibrium or a tissue modulus.
 - [x] Collect MD extensions:33filehashes,303finite savedstates, original
   controls passed; frozen window-drift resultsFALSE,FALSE,TRUE retained.
-- [ ] Collect repaired CFD and RD audit/precision-run outputs; preserve failures.
+- [x] Collect repaired CFD: four 3D cases, twelve pressure arrays and two actual-field movies; the frozen physical sphere reference still FAILS.
+- [x] Collect all five training-only RD audit configurations and 960 paired rows. The independent full derived-metric reproduction FAILED; all 66 discrepancies concern nearly uniform-field spectral-power ratios. Original values remain.
+- [x] Unify the primary diffusion collection/publication audit before outputs arrive; 23 focused tests pass, including nonfinite rejection.
+- [ ] Recover the running primary diffusion weights and held-out outputs, then admit only the separately preregistered secondary evaluation packet if its gates pass.
 
 The angle batch requires a passing parity check in the same allocation. Its
 subsequent workloads reject a missing or failed gate. The original 3 MB return
@@ -67,7 +70,7 @@ cap discarded a 6.78 MB field archive; that failure remains recorded. The new
 12 MB cap was selected before the recovery run. Returned hashes and actual
 field trajectories are required before videos or downstream evidence are added.
 
-These simulations are declared models. The current fish flow is a two-dimensional,
+These simulations are declared models. The earlier fish flow was a two-dimensional,
 low-Reynolds sagittal projection of a print mesh. It cannot establish the effect
 of changing wing span, real flight performance or biological viability. The
 projection limitation was checked on all three meshes at three resolutions.
@@ -90,3 +93,19 @@ retains no credentials, job environments or other teams' identifiers. The batch
 controller enforces one GPU per job, the existing team ceiling, bounded runtime
 and yielding to foreign queued demand. Only its own recorded job IDs may be
 cancelled. It runs inside capped systemd units on this host.
+
+
+The next 24-hour plan is the `preparation` array in
+[`results/infra/queue.json`](../results/infra/queue.json), with owners, prepared
+source/protocol commits, time estimates, admission requirements and stop gates.
+The running diffusion job comes first. Its separate exact-W1/full-ensemble
+evaluation awaits a valid returned checkpoint and a frozen packet. The local
+resolved-fin CFD protocol awaits its CPU controls and measured runtime; no extra
+GPU is reserved for an unprepared packet. Pressure-to-mechanics work reuses the
+returned 3D arrays with Reynolds-consistent units and explicit unresolved
+physical-reference/fin-resolution limits. No further molecular job is requested.
+
+At the 2026-10-31 16:26:01 PDT accounting refresh, current Frontier jobs and exact-record
+historical team jobs remain separate. The shared project's unmatched jobs are
+**unattributed**, not asserted to be other teams. None of the broader historical
+attribution grants cancellation permission.
