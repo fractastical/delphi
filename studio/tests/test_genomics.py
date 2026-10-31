@@ -283,3 +283,113 @@ def test_zfin_ensembl_ids_agree_across_two_zfin_files_and_the_check_says_it_is_n
         assert rows[sym]["ensembl_gene"] == v["ensembl_1_to_1"] and v["ensembl_1_to_1"] in v["ensembl_in_zfin_gff_alias"], sym
     # negative control: a wrong id must not count as agreeing
     assert "ENSDARG00000000000" not in c["genes"]["kcnh2a"]["ensembl_in_zfin_gff_alias"]
+
+
+# ---- Daane 2021 layer (the paper was read in full; its PDF is not stored) -----------------------
+
+
+def test_daane_pins_are_verified_quotes_with_pdf_pages_and_the_pdf_is_not_in_the_repo():
+    p = J("daane2021_pins.json")
+    assert len(p["quotes"]) >= 30
+    for q in p["quotes"].values():
+        assert q["verified_verbatim"] is True and len(q["quote"].split()) <= 25
+        assert q["pdf_page"] is None or 1 <= q["pdf_page"] <= 19
+    assert {k: v["pdf_page"] for k, v in p["figures"].items()} == {"Figure 1": 3, "Figure 2": 5, "Figure 3": 6, "Figure 4": 7}
+    assert p["pdf"]["stored_in_repo"] is False and re.fullmatch(r"[0-9a-f]{64}", p["pdf"]["sha256"]) and p["pdf"]["pages"] == 19
+    assert not [x for x in ROOT.rglob("*.pdf") if "node_modules" not in x.parts and ".git" not in x.parts]
+    assert "THE PIN" in p["figures"]["Figure 4"]["what"] and "fig4_title" in p["figures"]["Figure 4"]["quotes"]
+
+
+def test_supplement_is_located_but_not_claimed_as_read():
+    s = J("daane2021_pins.json")["supplement"]
+    assert s["in_the_19_page_pdf"] is False and s["retrieved"] is False and "doi.org/10.1016/j.cub.2021.08.054" in s["where"]
+    assert {"Table S1", "Table S2", "Table S3", "Data S1A", "Data S1B", "Data S1C-S1N"} <= set(s["items"])
+    assert all("description_basis" in v for v in s["items"].values()), "each description says how it was derived"
+    assert "dx-submit" in s["items"]["Data S1A"]["status"]
+    acc = J("daane2021_pins.json")["accessions"]
+    assert {"PRJNA743939", "10.5281/zenodo.5082978", "ERX1428166"} <= set(acc)
+
+
+def test_chain_quotes_exist_and_the_chain_states_its_limits():
+    d = J("daane2021_chain.json")
+    qs = J("daane2021_pins.json")["quotes"]
+    ch, cp = d["chain"], d["perturbations"]
+    def ids(node):
+        if isinstance(node, dict):
+            for k, v in node.items():
+                if k in ("quotes", "mechanism_quotes") and isinstance(v, list):
+                    yield from v
+                elif k.endswith("_quote") and isinstance(v, str):
+                    yield v
+                else:
+                    yield from ids(v)
+        elif isinstance(node, list):
+            for v in node:
+                yield from ids(v)
+    used = set(ids(d))
+    assert used and used <= set(qs), used - set(qs)
+    assert [s["step"] for s in ch["chain"]] == [1, 2, 3] and "NOT a validated mechanism" in ch["status"] and "NOT a prescription" in ch["status"]
+    text = json.dumps(ch["context"])
+    assert "flight" in text and "genomes_available_is_not_a_mutation_map" in ch["context"]
+    assert "not shown to be REQUIRED" in json.dumps(ch["chain"][1]) and "gain-of-function" in json.dumps(ch["chain"][1]).lower() or "gain of function" in json.dumps(ch["chain"][1]).lower()
+    assert "INFERRED" in json.dumps(ch["chain"][0])
+    assert "NOT" in cp["status"] or "Not" in cp["status"]
+    for c in cp["candidate_perturbations"]:
+        assert "unknown" in c and c["why"] and c["quotes"], c["id"]
+    assert any(c["id"] == "cp2" and "not tested" in c["status"] for c in cp["candidate_perturbations"])
+    assert "not_a_prescription" in cp and any("disagree" in json.dumps(a) for a in cp["zebrafish_alleles_in_the_paper"])
+
+
+def test_lat4a_resolution_is_probable_not_confirmed_and_keeps_the_conflicting_evidence():
+    r = J("lat4a_resolution_v2.json")
+    assert r["status"].startswith("PROBABLE slc43a2a") and "NOT confirmed" in r["status"] and r["evidence_against_or_unresolved"]
+    g = {x["symbol"]: x for x in csv.DictReader(open(D / "genes.csv"))}
+    assert g["slc43a2a"]["zfin_gff_chr"] == "15" and g["slc43a2b"]["zfin_gff_chr"] == "10"
+    ra = r["residue_check"]
+    assert ra["slc43a2a"]["length"] == 153 and ra["slc43a2a"]["aa200"] is None and ra["slc43a2a"]["verdict"].startswith("INCONCLUSIVE")
+    assert (ra["slc43a2b"]["aa200"], ra["slc43a2b"]["aa326"]) == ("M", "D")
+    seqb = "".join((D / "artifacts" / "ncbi_NP_001008585.1_slc43a2b.faa").read_text().splitlines()[1:])
+    assert (seqb[199], seqb[325], len(seqb)) == ("M", "D", 592), "the recorded residues are what the stored protein says"
+    assert "supersedes" in r and "unchanged" in r["supersedes"]
+
+
+def test_daane_records_validate_pin_exact_versions_and_leave_the_first_24_unchanged():
+    from frontier import models, store
+    recs = J("daane2021_records.json")["records"]
+    assert len(recs) == 16
+    by = {r["id"]: r for r in recs}
+    for r in recs:
+        models.Record.model_validate(r)
+        if r["kind"] == "Evidence":
+            t = r["payload"]["target"]
+            assert by[t["id"]]["version"] == t["version"] and r["payload"]["evidence_kind"] != "observed" and r["payload"]["limitations"]
+        if r["kind"] == "Claim":
+            assert "[species:" in json.dumps(r["payload"]) and "evidence_class:" in json.dumps(r["payload"])
+    assert not store._unlicensed_available_content(recs)
+    assert all(r["payload"]["completeness"] == "recorded" for r in recs if r["kind"] == "Problem")
+    old = J("records/records.json")["records"]
+    assert len(old) == 24 and next(r for r in old if r["id"] == "gx-problem-lat4a-identity")["payload"]["original"]["status"] == "unresolved"
+    assert not (set(by) & {r["id"] for r in old}), "no id is reused: records are append-only"
+    assert by["gx-lat4a-is-probably-slc43a2a"]["payload"]["origin"] == "derived" and "Inference (probable, not confirmed)" in by["gx-lat4a-is-probably-slc43a2a"]["payload"]["title"]
+
+
+def test_record_contexts_quote_the_pinned_sentences_exactly():
+    qs = J("daane2021_pins.json")["quotes"]
+    recs = J("daane2021_records.json")["records"]
+    cites = []
+    for r in recs:
+        for m in re.finditer(r'\[([a-z0-9_]+)\] p\.(\d+|None): "([^"]+)"', json.dumps(r["payload"], ensure_ascii=False).replace('\\"', '"')):
+            cites.append(m.groups())
+    assert len(cites) >= 15
+    for qid, page, text in cites:
+        assert qs[qid]["quote"] == text and str(qs[qid]["pdf_page"]) == page, qid
+
+
+def test_manifest_v02_marks_lat4a_inferred_not_resolved_and_pins_the_new_files():
+    m = J("manifest.json")
+    assert m["manifest_schema"].startswith("genomics-manifest-0.2") and m["inferred"] and "probable, not confirmed" in m["inferred"][0]
+    assert m["unresolved"][0].startswith("lat4a accession") and m["counts"]["records_daane2021"] == {"Claim": 7, "Evidence": 6, "Problem": 3}
+    paths = {f["path"] for f in m["files"]}
+    assert {"data/genomics/daane2021_pins.json", "data/genomics/daane2021_chain.json", "data/genomics/lat4a_resolution_v2.json", "data/genomics/daane2021_records.json", "data/genomics/artifacts/ncbi_NP_956545.1_slc43a2a.faa"} <= paths
+    assert "inferred: slc43a2a (probable, not confirmed)" in m["display_rules"]["unresolved_rule"]
+    assert any("confirmed to be slc43a2a" in x for x in m["display_rules"]["must_not_say"]) and any("proven mutation map" in x for x in m["display_rules"]["must_not_say"])
