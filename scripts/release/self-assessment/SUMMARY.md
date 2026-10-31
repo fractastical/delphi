@@ -14,6 +14,17 @@ Rubric `scienceclaw-rubric/0.1.0` ([rubric.json](rubric.json), weights from [sci
 
 Assessor confidence in own scoring: Gemini 4 Argon 0.9, GPT-5.6 Sol 0.93, Grok 4.7 0.74.
 
+## Nanopubs
+
+| Nanopub | Test registry | Production |
+|---|---|---|
+| `scienceclaw-rubric-0.1.0` | [RA3-M6Px9j…](https://w3id.org/np/RA3-M6Px9j5hXl3rCuaKD1HT9HBrvpz9-PFVZP4TGBKGw) | not promoted |
+| `delphisci-db966bc4--gemini` | [RAw3mZDVeu…](https://w3id.org/np/RAw3mZDVeui1UMHiD61i3M1srnFEI6nfZr83E9SjeuMNQ) | not promoted |
+| `delphisci-db966bc4--gpt` | [RAH0kHd0vV…](https://w3id.org/np/RAH0kHd0vVCOOK_T5p0KXoD_JSkZuZs8o_8gFUxNwFJQU) | not promoted |
+| `delphisci-db966bc4--grok` | [RAYleIpUNb…](https://w3id.org/np/RAYleIpUNbvSeTMajvmXue4pCai1o7td9DBXSYrruBACI) | not promoted |
+
+Published by `build/publish.mjs`; full record in [nanopubs/manifest.jsonl](nanopubs/manifest.jsonl).
+
 ## Did anyone find a multi-agent vs single-agent comparison?
 
 - **Gemini 4 Argon**: no (repo/plugins/fittest/README.md). No multi-agent vs. single-agent or decentralized vs. centralized task execution comparison exists in the pack (confirmed by issue #61; issue #41 mentions a 'four-arm agent comparison harness' on 20 claims, but no files or results from it exist in captured/tree.txt). The closest measurement is in repo/plugins/fittest/README.md (and issue #57), which evaluates leave-one-out disagreement routing across two assessors (GPT-5.6 Sol and Grok 4.7) on 99 decisive data tests: trusting all mean scores yields 0.83 accuracy (17 silent failures), whereas escalating high-disagreement/low-confidence claims yields 0.935 accuracy on the 77 trusted claims and catches 12 of 17 errors.
