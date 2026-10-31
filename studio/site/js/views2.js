@@ -203,19 +203,30 @@
   }
 
   function solveResult(r) {
-    const res = r.result || {}; const man = r.ui_manifest || r.manifest || null; const fu = r.followup_questions || [];
+    const res = r.result || {}; const man = r.ui_manifest || r.manifest || null; const fu = Array.isArray(r.followup_questions) ? r.followup_questions : [];
+    const cb = r.checked_by && typeof r.checked_by === "object" ? r.checked_by : null; const prov = res.provenance && typeof res.provenance === "object" ? res.provenance : null;
     const list = (a) => (a && a.length ? html`<ul>${a.map((x) => html`<li>${typeof x === "string" ? x : JSON.stringify(x)}</li>`)}</ul>` : "");
-    const rows = man && Array.isArray(man.rows) ? man.rows : [];
+    const wit = res.witness && typeof res.witness === "object" ? res.witness : null; const conf = res.conflict;
+    const kv = (o) => html`<dl class="kv">${Object.entries(o).map(([k, v]) => html`<div><dt>${k}</dt><dd>${typeof v === "object" && v !== null ? JSON.stringify(v) : DF.exact(v)}</dd></div>`)}</dl>`;
+    const params = r.parameters && typeof r.parameters === "object" ? r.parameters : {};
     return html`<div class="verdictbox"><div class="vlabel">${(man && man.badge) || res.status || "no status returned"}</div>
-      ${man && man.headline ? html`<p><b>${man.headline}</b></p>` : ""}
-      <p class="small">${r.schema || ""} · checked by ${r.checked_by || "not reported"} · computed ${r.computed_at || "not reported"} · request sha256 <code>${r.request_sha256 || "not reported"}</code></p>
+      ${man && man.headline ? html`<p><b>${man.headline}</b></p>` : ""}${res.reason ? html`<p>${res.reason}</p>` : ""}
+      <p class="small">${r.schema || ""} · evidence kind <b>${r.evidence_kind || "not reported"}</b> · computed ${r.computed_at || "not reported"} · request sha256 <code>${r.request_sha256 || "not reported"}</code></p>
+      ${r.scope || res.scope ? html`<p class="note small"><b>Scope.</b> ${r.scope || res.scope}</p>` : ""}
       ${man && man.must_display && man.must_display.length ? html`<h4>The solver requires this to be shown</h4>${list(man.must_display)}` : ""}
       ${man && man.must_not_say && man.must_not_say.length ? html`<h4>Must not be said</h4>${list(man.must_not_say)}` : ""}
-      ${res.conflict ? html`<h4>Conflict</h4><pre class="json">${JSON.stringify(res.conflict, null, 1)}</pre>` : ""}${res.witness ? html`<h4>Witness (a candidate in the encoded model only, not a validated design)</h4><pre class="json">${JSON.stringify(man && man.witness ? man.witness : res.witness, null, 1)}</pre>` : ""}
-      ${rows.length ? html`<h4>Constraints considered</h4><div class="tablewrap"><table><thead><tr><th>Constraint</th><th>Kind</th><th>In force</th><th>In conflict</th><th>Source</th><th>Correspondence / assumption</th></tr></thead><tbody>${rows.map((x) => html`<tr><td>${x.name || x.id || ""}</td><td>${x.kind}</td><td>${String(x.in_force)}</td><td>${String(x.in_conflict)}</td><td>${x.source || ""}</td><td>${x.correspondence || ""}${x.opt_in_assumption ? " (opt-in assumption)" : ""}${x.parameters_missing && x.parameters_missing.length ? " Missing: " + x.parameters_missing.join(", ") : ""}</td></tr>`)}</tbody></table></div>` : ""}
-      ${man && man.verification ? html`<h4>Independent verification</h4><pre class="json">${JSON.stringify(man.verification, null, 1)}</pre>` : ""}
-      ${man && man.lean ? html`<h4>Lean</h4><p class="small">Run by this solver: <b>${String(man.lean.run_by_this_solver)}</b>. No online Lean status is produced; any Lean receipt is separate and offline.</p>${man.lean.covers ? html`<p class="small"><b>Covers:</b> ${JSON.stringify(man.lean.covers)}</p>` : ""}${man.lean.does_not_cover ? html`<p class="small"><b>Does not cover:</b> ${JSON.stringify(man.lean.does_not_cover)}</p>` : ""}` : ""}
-      <h4>Parameters used</h4><pre class="json">${JSON.stringify(r.parameters || {}, null, 1)}</pre>${fu.length ? html`<h4>Follow-up questions</h4>${list(fu)}` : ""}</div>`.toString();
+      ${wit ? html`<h4>Witness: an exact point in the encoded model, not a validated design</h4>${kv(wit)}` : ""}
+      ${res.partial_witness && typeof res.partial_witness === "object" ? html`<h4>Partial point (NOT a design)</h4>${kv(res.partial_witness)}` : ""}
+      ${Array.isArray(res.missing_parameters) && res.missing_parameters.length ? html`<p><b>Unset parameters, so some constraints were not evaluated:</b> ${res.missing_parameters.join(", ")}</p>` : ""}
+      ${conf ? html`<h4>Conflict</h4><pre class="json">${JSON.stringify(conf, null, 1)}</pre>` : ""}
+      ${Array.isArray(res.extrapolates_envelope) && res.extrapolates_envelope.length ? html`<p class="note warn small"><b>Extrapolates a source envelope:</b> ${res.extrapolates_envelope.join(", ")}</p>` : ""}
+      ${prov ? html`<h4>Constraints used and where they come from</h4><div class="tablewrap"><table><thead><tr><th>Constraint</th><th>Kind</th><th>Source</th><th>Correspondence</th></tr></thead><tbody>${Object.entries(prov).map(([k, x]) => html`<tr><td><code>${k}</code></td><td>${x.kind}</td><td>${x.source}</td><td>${x.correspondence || ""}</td></tr>`)}</tbody></table></div>` : ""}
+      ${man && Array.isArray(man.rows) ? html`<h4>Constraint rows</h4><div class="tablewrap"><table><thead><tr><th>Constraint</th><th>Kind</th><th>In force</th><th>In conflict</th><th>Source</th><th>Correspondence</th></tr></thead><tbody>${man.rows.map((x) => html`<tr><td>${x.name || x.id || ""}</td><td>${x.kind}</td><td>${String(x.in_force)}</td><td>${String(x.in_conflict)}</td><td>${x.source || ""}</td><td>${x.correspondence || ""}${x.opt_in_assumption ? " (opt-in assumption)" : ""}${x.parameters_missing && x.parameters_missing.length ? " Missing: " + x.parameters_missing.join(", ") : ""}</td></tr>`)}</tbody></table></div>` : ""}
+      <h4>Checks</h4>${cb ? html`<ul><li>Solver: ${res.solver ? JSON.stringify(res.solver) : cb.solver ? JSON.stringify(cb.solver) : "not reported"}</li><li>Independent witness check: ${cb.independent_witness ? html`<b>${cb.independent_witness.ok === true ? "passed" : "not passed"}</b> ${cb.independent_witness.problems && cb.independent_witness.problems.length ? JSON.stringify(cb.independent_witness.problems) : ""}` : "not applicable (no witness)"}</li><li>Lean: <b>${cb.lean === "not_run" ? "not run online" : String(cb.lean)}</b>. Any Lean receipt is offline and separate.</li></ul>` : html`<p>${typeof r.checked_by === "string" ? r.checked_by : "not reported"}</p>`}
+      ${man && man.lean ? html`<p class="small">Lean covers: ${JSON.stringify(man.lean.covers || "")}. Does not cover: ${JSON.stringify(man.lean.does_not_cover || "")}.</p>` : ""}
+      ${r._submitted ? html`<h4>Exactly what was submitted</h4><p class="small faint">Decimal strings rounded to 12 places; the area is derived as span² / aspect ratio in this browser. A null is an unknown, never a default.</p><pre class="json">${JSON.stringify(r._submitted, null, 1)}</pre>` : ""}
+      <h4>Parameters (caller-supplied, with their basis)</h4><div class="tablewrap"><table><thead><tr><th>Name</th><th>Value</th><th>Unit</th><th>Basis</th></tr></thead><tbody>${Object.entries(params).map(([k, p]) => html`<tr><td>${k}</td><td>${p && typeof p === "object" ? (p.value === null ? "unknown" : p.value) : String(p)}</td><td>${p && p.unit || ""}</td><td>${p && p.basis || ""}</td></tr>`)}</tbody></table></div>
+      ${fu.length ? html`<h4>Follow-up questions (${r.questions_persisted === false ? "not stored; shown for this result only" : "as returned"})</h4><ul>${fu.map((q) => html`<li>${typeof q === "string" ? q : html`${U.pill(q.approach || "question", "ap-" + (q.approach || "unknown"))} ${q.question} <span class="faint small">${(q.scales || []).join(", ")}</span>`}</li>`)}</ul>` : ""}</div>`.toString();
   }
 
   /* ---------------- EVIDENCE ---------------- */
@@ -262,7 +273,7 @@
         const rows = DF.artifactIndex(snap);
         try { const r = await DF.api.artifacts({ limit: 50 }); rows.push(...DF.liveArtifacts(r.items)); } catch (e) { rows.push({ title: "Runtime artifacts could not be read", type: "document", source: e.message, context: "", check: "", dispute: "", next: "", error: true }); }
         const shown = rows.filter((r) => !want || r.type === want);
-        host.innerHTML = shown.length ? html`<div class="tablewrap"><table class="arttable"><thead><tr><th>Artifact</th><th>Type</th><th>Exact source</th><th>Context</th><th>Check</th><th>Dispute</th><th>Next action</th></tr></thead><tbody>${shown.map((r) => html`<tr><td>${r.doc ? U.src("doc:" + r.doc, r.title) : r.title}</td><td>${U.pill(r.type, "ev")}</td><td>${r.url ? U.ext(r.url, r.source) : r.source}</td><td>${r.context}</td><td>${r.check}</td><td>${r.dispute || ""}</td><td>${r.next}</td></tr>`)}</tbody></table></div>`.toString() : `<p class="empty">No ${esc(want || "")} artifact is indexed. Nothing is shown in its place.</p>`;
+        host.innerHTML = shown.length ? html`<div class="tablewrap"><table class="arttable"><thead><tr><th>Artifact</th><th>Type</th><th>Exact source</th><th>Context</th><th>Check</th><th>Dispute</th><th>Next action</th></tr></thead><tbody>${shown.map((r) => html`<tr><td>${r.doc ? U.src("doc:" + r.doc, r.title) : r.title}</td><td>${U.pill(r.type, "ev")}</td><td>${r.url ? U.ext(r.url, r.source) : r.source}</td><td>${r.context}</td><td>${r.check}</td><td>${r.dispute || ""}</td><td>${r.next}${r.download ? html` <a class="btn small ghost" href="${r.download}" target="_blank" rel="noopener noreferrer" download>Download file</a>` : r.doc ? "" : html` <span class="faint small">no downloadable file is declared</span>`}</td></tr>`)}</tbody></table></div>`.toString() : `<p class="empty">No ${esc(want || "")} artifact is indexed. Nothing is shown in its place.</p>`;
       },
     };
   };
@@ -274,7 +285,7 @@
   };
   DF.liveArtifacts = (items) => items.map((it) => { const a = it.artifact || {}; return { title: a.title || "(untitled)", type: ROLE_TYPE[a.role] || "document", source: `${a.uri} · sha256 ${String(a.sha256).slice(0, 12)}… · ${a.byte_size} bytes · ${a.availability}${it.is_head === false ? " · superseded version" : ""}`, url: /^https:/.test(a.uri || "") ? a.uri : null,
     context: (it.context || "") + (it.relation ? ` (relation: ${it.relation}; target ${it.target ? it.target.kind + " " + it.target.id : "?"}${it.produced_by ? "; produced by " + it.produced_by.id : ""})` : ""), check: `${it.evidence_kind || "evidence"}; local status ${String(it.local_status || "not reported").replace(/_/g, " ")}; digest declared, bytes ${it.artifact_bytes_verified ? "verified" : "not verified"}`,
-    dispute: it.relation === "refutes" ? "This evidence refutes its target." : "", next: (it.limitations || []).join("; ") }; });
+    dispute: it.relation === "refutes" ? "This evidence refutes its target." : "", download: a.availability === "downloadable" && /^https:/.test(a.uri || "") ? a.uri : null, next: (it.limitations || []).join("; ") }; });
 
   /* ---------------- WORK ---------------- */
   DF.views.work = function (snap) {

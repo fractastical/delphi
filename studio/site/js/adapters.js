@@ -81,16 +81,25 @@
    * rho and cl_max are null (unknown) unless the user typed them; the assumption flags default to false. */
   async function solve(c) {
     if (!isLive()) throw new Unavailable("constraint solver", "No runtime is connected, so no solver ran and no result is shown.");
-    const dec = (x) => (x === null || x === undefined || !isFinite(x) ? null : String(x));
+    const MAX = { rho: 10, cl_max: 3, mass: 50, area: 10, span: 10, speed: 100, mass_min: 50, wing_loading_min: 1000, speed_max: 100 };
+    const dec = (x, key) => {
+      if (x === null || x === undefined || !isFinite(x)) return null;
+      const s = Number(x).toFixed(12).replace(/0+$/, "").replace(/\.$/, "");
+      if (!/^(?:0|[1-9][0-9]{0,5})(?:\.[0-9]{1,12})?$/.test(s) || !(Number(s) > 0) || Number(s) > MAX[key]) throw new Error(`${key} = ${x} cannot be sent: the solver takes a positive decimal no greater than ${MAX[key]} with at most 12 decimals`);
+      return s;
+    };
     const area = c.span_m && c.aspect_ratio ? (c.span_m * c.span_m) / c.aspect_ratio : null;
-    const body = { rho: dec(c.rho), cl_max: dec(c.cl_max), mass: dec(c.mass_kg), area: dec(area), span: dec(c.span_m), speed: dec(c.launch_speed),
-      mass_min: dec(c.mass_min), wing_loading_min: dec(c.wing_loading_min), speed_max: dec(c.speed_max), relax_envelopes: false, assume_pectoral_ar_applies_to_wing: c.assume_pect_ar_wing === true, assume_taxi_speed_applies_to_flight: c.assume_taxi_flight === true };
-    Object.keys(body).forEach((k) => { if (body[k] === null && !["rho", "cl_max"].includes(k)) delete body[k]; });
+    const body = { rho: dec(c.rho, "rho"), cl_max: dec(c.cl_max, "cl_max"), mass: dec(c.mass_kg, "mass"), area: dec(area, "area"), span: dec(c.span_m, "span"), speed: dec(c.launch_speed, "speed"),
+      mass_min: dec(c.mass_min, "mass_min"), wing_loading_min: dec(c.wing_loading_min, "wing_loading_min"), speed_max: dec(c.speed_max, "speed_max"), relax_envelopes: false,
+      assume_pectoral_ar_applies_to_wing: c.assume_pect_ar_wing === true, assume_taxi_speed_applies_to_flight: c.assume_taxi_flight === true };
     const sess = await getJSON("api/session", 5000); const csrf = sess.csrf || sess.csrf_token || sess.token;
     if (!csrf) throw new Error("the session did not provide a CSRF token");
     const r = await fetch("api/engineering/solve", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json", "X-CSRF-Token": csrf }, body: JSON.stringify(body), cache: "no-store" });
-    if (!r.ok) throw new Error("solver answered HTTP " + r.status);
-    return r.json();
+    if (!r.ok) {
+      let e = null; try { e = await r.json(); } catch (x) { /* not JSON */ }
+      throw new Error(`the solver refused the request (HTTP ${r.status}${e && e.error ? ", " + e.error : ""})${e && e.message ? ": " + e.message : ""}. Submitted: ${JSON.stringify(body)}`);
+    }
+    const out = await r.json(); out._submitted = body; return out;
   }
   const belief = pending("belief / forecast");
   const simulate = pending("simulation");

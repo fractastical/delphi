@@ -23,15 +23,31 @@ with sync_playwright() as p:
     pg.goto(base + "/index.html#/evidence"); expect(pg.locator("#artifacts")).not_to_have_text("Loading…", timeout=15000)
     print("artifacts rows:", pg.locator("#artifacts tbody tr").count())
     pg.goto(base + "/index.html#/engineering"); pg.wait_for_selector("#candform")
-    pg.fill("#f-rho", "1.225"); pg.fill("#f-cl_max", "1"); pg.fill("#f-mass_min", "0.2"); pg.fill("#f-wing_loading_min", "100"); pg.fill("#f-speed_max", "20")
-    pg.get_by_role("button", name="Request a solver run").click()
-    pg.wait_for_selector("[data-out=solve] .verdictbox", timeout=60000)
-    txt = pg.locator("[data-out=solve]").inner_text(); print("SOLVER:", txt[:400].replace("\n", " | "))
-    assert "frontier.engineering.solve/1" in txt
+    pg.get_by_role("button", name="Cypselurus-type, 0.1 kg").click()   # span/area are float arithmetic: must still be sent as exact decimals
+
+    def solve(label, **fields):
+        for k in ("rho", "cl_max", "mass_min", "wing_loading_min", "speed_max"):
+            pg.fill("#f-" + k, str(fields.get(k, "")))
+        pg.get_by_role("button", name="Request a solver run").click()
+        out = pg.locator("[data-out=solve]")
+        expect(out.locator(".verdictbox, .unavailable")).to_be_visible(timeout=60000)
+        assert out.locator(".unavailable").count() == 0 and "Request failed" not in out.inner_text(), out.inner_text()[:300]
+        status = out.locator(".vlabel").inner_text().strip().lower()
+        txt = out.inner_text()
+        print(label, "->", status, "|", txt[:160].replace("\n", " "))
+        assert "frontier.engineering.solve/1" in txt
+        return status, txt
+
+    st, txt = solve("FEASIBLE", rho="1.225", cl_max="1", mass_min="0.05")
+    assert st == "feasible", st
+    low = txt.lower()
+    assert "witness" in low and "independent witness check: passed" in low and "not run online" in low, txt[:800]
     pg.screenshot(path=f"{out}/live-solver.png", full_page=True)
-    # unknowns stay unknown: blank rho/CL must not be defaulted
-    pg.fill("#f-rho", ""); pg.fill("#f-cl_max", "")
-    pg.get_by_role("button", name="Request a solver run").click(); pg.wait_for_timeout(3000)
-    print("UNKNOWN-RHO:", pg.locator("[data-out=solve]").inner_text()[:300].replace("\n", " | "))
+    st, txt = solve("UNSAT", rho="1.225", cl_max="1", mass_min="0.2")
+    assert st == "unsat" and "conflict" in txt.lower(), st
+    st, txt = solve("UNKNOWN-RHO-CL")      # blank rho / CL must stay unknown, never defaulted
+    assert st in ("unknown", "not decided") or "unset" in txt.lower(), (st, txt[:300])
+    rows = pg.locator("[data-out=solve] tr", has_text="rho")
+    assert "unknown" in rows.first.inner_text().lower(), rows.first.inner_text()
     assert not errs, errs
     print("ALL LIVE CHECKS PASSED"); b.close()

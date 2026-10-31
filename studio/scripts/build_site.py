@@ -15,7 +15,6 @@ import argparse
 import json
 import re
 import shutil
-import subprocess
 import sys
 from hashlib import sha256
 from pathlib import Path
@@ -25,7 +24,6 @@ SITE = ROOT / "site"
 DATA = SITE / "data"
 SCHEMA = "frontier-site-snapshot-0.1"
 NAMESPACE = "snapshot"
-INPUT_DIRS = ("seeds", "results", "specs", "tasks", "docs", "site/content")
 
 CAPABILITY_TOOLS = {
     "frontier_search": "read", "frontier_get": "read", "frontier_neighborhood": "read",
@@ -41,14 +39,6 @@ def digest_bytes(b: bytes) -> str:
 
 def canonical(v) -> str:
     return json.dumps(v, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-
-
-def git(*args) -> str | None:
-    try:
-        r = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=20)
-    except (OSError, subprocess.SubprocessError):
-        return None
-    return r.stdout.strip() if r.returncode == 0 and r.stdout.strip() else None
 
 
 class Inputs:
@@ -142,13 +132,12 @@ def build() -> dict[str, bytes]:
         docs.append({"id": ident, "title": title, "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}"})
         files[f"docs/{name}"] = ins.read(rel)
 
-    # Last commit touching an input: stable across unrelated commits, so --check is meaningful.
-    commit = git("log", "-1", "--format=%H", "--", *INPUT_DIRS)
+    # The label is a digest of the input hashes, not a git revision: a commit or merge cannot make --check stale.
+    fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
-        "label": f"snapshot of inputs at {commit[:12]}" if commit else "snapshot (git revision unavailable)",
-        "git_commit": commit,
-        "git_commit_time": git("log", "-1", "--format=%cI", "--", *INPUT_DIRS),
+        "label": f"snapshot of inputs {fingerprint[:12]}",
+        "input_fingerprint": fingerprint,
         "inputs": sorted(ins.seen.values(), key=lambda i: i["path"]),
         "scope": {"claims": seeds["scope"], "problems": problems["scope"], "ranking": problems["ranking"], "seed_source_revision": seeds["source_revision"]},
         "claims": seeds["nodes"],
