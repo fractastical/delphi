@@ -26,6 +26,9 @@ for what is actually published. Details, ranking semantics and known gaps:
 - `darwin-origin/`: 247 claims from *On the Origin of Species*, with dataset-resolvability assessments.
 - `math-bio-theorems/`: key theorem claims of mathematical-biology thinkers, with LaTeX math.
 - `thompson-growth-form/`, `wolfram-nks/`: in progress.
+- `organisms/`: every animal taxon Darwin and Thompson mention (782 taxa, 3,340 located mentions),
+  resolved to GBIF/NCBI/Wikidata/WoRMS/PBDB, with 1,372 provenanced dataset records (occurrence
+  counts, genomes, trait databases). Merged view in `organisms/merged/`; see `organisms/README.md`.
 - `agent/`: Discord agent. `docs/`: claim graph site. `chats/`: transcripts of past agent sessions.
 
 Publishing signs with the operator's ORCID key and cannot be undone; ask before publishing to production.
