@@ -1,6 +1,6 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 02:59PM PDT.
+Coordinator: codex-03. Updated October 31, 2026, 03:32PM PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-008 define acceptance. This board supersedes the earlier 1:48pm snapshot.
 Every status distinguishes implementation, integration, publication and biological validation.
@@ -31,6 +31,24 @@ Every status distinguishes implementation, integration, publication and biologic
 | P1 | Prior-art differentiation and pitch | claude-15 | Revision assigned around organism design exposing knowledge gaps, regional assurance and reusable evidence |
 | P1 | Print props and manufacturing | claude-05 | Six meshes and geometry checks; turntables ready; physical printing, printer/resin selection and living bioprinting unverified |
 | P2 | Apex redirect and old Studio preservation | codex-03 | Only after new-site acceptance; studio.morphoswarm.ai retained; apex unchanged |
+
+## Current integration checkpoint — October 31, 3:32PM PDT
+
+This section supersedes the earlier resource snapshots below; their timestamps remain as history.
+
+- [x] About overview, people/agents, docs and inspirations, plus Generative Biology research thesis implemented. Primary prior art includes physics-informed diffusion, GenCFD and biological cellular-Potts diffusion surrogates; novelty is an integration hypothesis. Root browser checks exercised five routes at desktop/mobile, all six equation controls, document drawer and About menu; screenshots inspected. Publication pending the shared release.
+- [x] Actual mesh viewer, wider Home, sourced anatomy framing and System build/usage narrative integrated. Independent critique still requires final checks for Frontier table width, phone Knowledge filter width, navigation and raw JSON presentation.
+- [x] H100 OpenMM run recovered: three 100 ps trajectories, 101 saved frames each; CPU/CUDA numerical checks and output hashes recorded. Actual-state render and descriptive ensemble integrated. No equilibration, biological accuracy or fin modulus claimed.
+- [x] BETSE generic tissue run, Morpheus partial local run, Kcnj13 hosted OpenFold prediction and associated media integrated. New Morpheus CPU full-horizon run is recovered by infrastructure; scientific analysis/curation still pending.
+- [x] Controlled 3D WaterLily GPU job admitted at 3:27:22pm PDT, one H100. Provider read at 3:27:58pm showed PROVISIONING. Frozen numerical checks precede candidate cases; no completed GPU/physical validation claimed yet.
+- [ ] User-requested actual conditional diffusion pilot: dx-market-r1 owns frozen RD solver data, parameter/seed holdouts, small DDPM training, baseline evaluation and claim/equation provenance. Infrastructure owns one-H100 dispatch; packet preparation underway. No trained result yet.
+- [ ] Anatomy/appearance improvement: claude05 owns additive v3 fish with biological fin outlines, rays/membranes, scales and explicitly assumed pigmentation; claude10/site own interactive presentation. Same geometry must be reused for physical comparisons.
+- [ ] Publish warmstart-v3.tar.xz (exact SHA in molecular manifest), then infrastructure can dispatch the frozen MD continuation after higher-priority RD/3D packets.
+- [ ] Controlled collective-capability pilot: resource_scaling preregisters three matched-budget evidence-synthesis arms using primary public papers, 27 bounded model calls. No collective improvement or scaling law established yet.
+- [ ] Public repository: source/history and current tree scans completed and classified, public-web hardening integrated. Final updated scan, regression checks, main-branch landing and visibility change remain. Current repository still private. No active account credential identified by the scoped scans; expired public Figshare download URLs were removed from current receipts.
+- [ ] Final release: regenerate snapshot, test combined exact commit, deploy web + design-context MCP, verify public reads/authenticated writes and media. Current live release remains c804b317b2afe3e6d180141de134e03606c2e910.
+
+System reporting must use dated actual hackathon receipts: available shared capacity is not our utilization; completed jobs are not current GPU occupancy; missing total tokens/spend stay unknown. Public pages should make meaningful results and limitations easy to inspect without self-awarded judging scores or earlier in-house-project marketing history.
 
 ## Deadline release queue
 
