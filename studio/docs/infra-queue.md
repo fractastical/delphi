@@ -39,8 +39,11 @@ preserved and no new sequence-generation request is being routed elsewhere.
   all twelve STL hashes matched, but candidate JSON differed. No CFD ran.
 - [ ] Diagnose that exact metadata difference before any CFD retry. The failed
   physical sphere reference remains visible independently of the packaging issue.
-- [ ] Dispatch the newly requested conditional RD diffusion training pilot when
-  its preregistered dataset, split, controls and compact packet are ready.
+- [x] Dispatch the conditional RD diffusion training pilot at 15:36:40 PDT.
+  The frozen CUDA control must pass before training and held-out evaluation.
+- [ ] Recover the trained checkpoint, hold-out results and baseline/null comparisons.
+- [x] Queue a CPU-only diagnostic for the 3D candidate hash mismatch; preserve
+  the exact GPU failure and all three full candidate JSON variants.
 - [ ] Extend the three short MD states only after the exact warm-start archive
   is public and hash-checked. The frozen question measures remaining structural
   drift; it does not assert equilibrium or a tissue modulus.
