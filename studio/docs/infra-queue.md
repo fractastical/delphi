@@ -37,8 +37,11 @@ preserved and no new sequence-generation request is being routed elsewhere.
 - [x] Dispatch the controlled 3D WaterLily packet after its packaging, runtime
   and status contracts were frozen. It stopped at the candidate metadata hash:
   all twelve STL hashes matched, but candidate JSON differed. No CFD ran.
-- [ ] Diagnose that exact metadata difference before any CFD retry. The failed
-  physical sphere reference remains visible independently of the packaging issue.
+- [x] Diagnose the exact metadata difference on remote CPU: NumPy AVX-512
+  dispatch changes three float64 widths by one or two ULPs. Disabling that
+  dispatch reproduces the original hash. No geometry gate is relaxed.
+- [ ] Admit one repaired CFD packet once its geometry-only setting is frozen.
+  The failed physical sphere reference remains visible independently.
 - [x] Dispatch the conditional RD diffusion training pilot at 15:36:40 PDT.
   The frozen CUDA control must pass before training and held-out evaluation.
 - [ ] Recover the trained checkpoint, hold-out results and baseline/null comparisons.
