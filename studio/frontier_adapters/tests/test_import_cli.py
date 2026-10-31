@@ -442,6 +442,21 @@ class SubmitLocal(unittest.TestCase):
         with open(rp) as fh:
             self.assertFalse(json.load(fh)["independent_reviewer"])
 
+    def test_input_may_be_a_pretty_printed_object_with_a_long_meta_block_before_drafts(self):
+        path = self.drafts()
+        with open(path) as fh:
+            items = [json.loads(l) for l in fh]
+        obj = os.path.join(self.tmp.name, "obj.json")
+        with open(obj, "w") as fh:
+            json.dump({"schema": "x", "meta": {"note": "n" * 2000}, "drafts": items}, fh, indent=2)       # `drafts` far beyond the first 400 characters
+        rc, out, _ = self.run_cli(obj)
+        self.assertEqual((rc, out["mode"], out["planned"]["create"]), (0, "dry_run", 2))
+        junk = os.path.join(self.tmp.name, "junk.json")
+        with open(junk, "w") as fh:
+            json.dump({"drafts": [{"nope": 1}]}, fh)
+        rc, out, _ = self.run_cli(junk)
+        self.assertEqual(rc, 3)                                                          # refused, not read as empty
+
     def test_rerun_is_unchanged_and_makes_no_new_version(self):
         p = self.drafts()
         self.run_cli(p, "--execute")

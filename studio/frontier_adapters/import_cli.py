@@ -400,7 +400,18 @@ def load_local_drafts(path: str, namespace: str, actor: str, submission: dict, *
     raw = Path(path).read_bytes()
     file_sha = sha256(raw).hexdigest()
     text = raw.decode()
-    items = json.loads(text)["drafts"] if text.lstrip().startswith("{") and '"drafts"' in text[:400] else [json.loads(l) for l in text.splitlines() if l.strip()]
+    try:                                                   # a whole-file JSON value first: an object with `drafts` (any position), or a list
+        whole = json.loads(text)
+    except ValueError:
+        whole = None
+    if isinstance(whole, dict) and isinstance(whole.get("drafts"), list):
+        items = whole["drafts"]
+    elif isinstance(whole, list):
+        items = whole
+    else:                                                  # otherwise JSON Lines
+        items = [json.loads(l) for l in text.splitlines() if l.strip()]
+    if not items or not all(isinstance(x, dict) and {"kind", "id", "payload"} <= set(x) for x in items):
+        raise mod.Stop("input is not a list of Draft objects (expected JSONL, a JSON list, or an object with a `drafts` list)")
     out, seen, report = [], set(), {"content_available_ids": [], "origins": {}, "reissued_from": {}}
     for n, d0 in enumerate(items, 1):
         d = copy.deepcopy(d0)
