@@ -743,6 +743,81 @@ LATER["md"] = md_chain
 ALL_CHAINS = {**CHAINS, **LATER}
 
 
+def md_continuation_chain(repo: str, commit: str, *, namespace="node-a", issuer="importer", created_at=None) -> AssetChain:
+    """Three conditional 900 ps continuations (global 100 -> 1000 ps) of the three CUDA parents: ONE system, three branches, not six independent samples.
+
+    Kept apart: the provider run, the predeclared window diagnostic (False, False, True), and the render of one branch (context only).
+    """
+    created_at = created_at or em._commit_utc(repo, commit)
+    c = AssetChain(repo, commit, namespace, issuer, created_at, "md_continuation")
+    v3, an_dir, rd = f"{MD}/cuda-v3", f"{MD}/continuation-analysis", f"{MD}/continuation-render"
+    pr = c.jblob(f"{v3}/production/receipt.json")
+    jr = c.jblob(f"{v3}/job-receipt.json")
+    rv = c.jblob(f"{v3}/return-verification.json")
+    proto = c.jblob(f"{MD}/continuation-protocol.json")
+    an = c.jblob(f"{an_dir}/summary.json")
+    anp = c.jblob(f"{an_dir}/provenance.json")
+    rn = c.jblob(f"{rd}/render.json")
+    runs = pr["runs"]
+    c.check("runs", sorted(r["seed"] for r in runs) == [11731, 11732, 11733] and all(r["backend"] == "CUDA" and r["production_ps"] == 900.0 for r in runs), f"runs {[(r['seed'], r['backend'], r['production_ps']) for r in runs]}")
+    c.check("not_independent", an["n_parent_branches"] == 3 and an["n_new_independent_biological_samples"] == 0 and "not6independent" in pr["scope"].replace(" ", ""), f"scope {pr['scope']!r}")
+    flags = [b["predeclared_diagnostic"]["small_window_drift"] for b in sorted(an["branches"], key=lambda b: b["parent_seed"])]
+    c.check("drift_flags", flags == [False, False, True] and an["small_window_drift_diagnostic_count"] == 1, f"flags {flags}")
+    c.check("analysis.receipts", an["extension_receipt_sha256"] == hashlib.sha256(c.blob(f"{v3}/production/receipt.json")).hexdigest() and an["protocol_sha256"] == pr["protocol_sha256"], "analysis names this production receipt and protocol")
+    c.check("render.receipt", rn["simulation_receipt_sha256"] == hashlib.sha256(c.blob(f"{v3}/production/receipt.json")).hexdigest() and rn["seed"] == 11731, "render names this production receipt (seed 11731 only)")
+    prod = {n: c.same_hash(f"prod.{n}", f"{v3}/production/{n}", h) for n, h in pr["files"].items()}
+    present = {n: c.same_hash(f"job.{n}", f"{v3}/{n}", h) for n, h in jr["files"].items() if _has(c, f"{v3}/{n}")}
+    not_here = sorted(n for n in jr["files"] if n not in present)
+    c.same_hash("analysis.summary", f"{an_dir}/summary.json", anp["outputs"]["summary.json"])
+    c.same_hash("analysis.png", f"{an_dir}/conditional-branches.png", anp["outputs"]["conditional-branches.png"])
+    rn_out = {n: c.same_hash(f"render.{n}", f"{rd}/{n}", h) for n, h in rn["outputs"].items()}
+    ids = (jr["source_job_id"], rv["source_job_id"])
+    lim = [em.IMPORT_NOTE, "Classical atomistic MD of a collagen-mimetic peptide; empirical accuracy UNKNOWN; cross-scale transfer UNKNOWN. " + NOT_CALIBRATED,
+           "Three conditional continuations of three parents under one Hamiltonian: NOT six independent samples, and no equilibrium, folding-stability, material-modulus or biological-success probability follows.",
+           "Each branch restarts from exact recorded positions and velocities with a new thermostat seed; the State XML does not preserve integrator RNG state, so this is not a bitwise replay of the parent's stochastic stream."]
+    asm = [f"OpenMM {pr['openmm_version']}; continuation protocol sha256 {pr['protocol_sha256'][:16]}...; warm start sha256 {pr['warmstart_sha256'][:16]}...; no reset velocities, no minimisation, no extra thermalisation."]
+    br = "; ".join(f"parent {b['parent_seed']} -> {b['new_thermostat_seed']}: final RMSD from the parent production start {b['final_original_reference_CA_RMSD_nm']:.3f} nm" for b in sorted(an["branches"], key=lambda b: b["parent_seed"]))
+    cl_r = _claim(c, "run-mdc-claim-three-branches-1000ps", "Collagen-mimetic MD: three conditional continuations reached 1000 ps from the three CUDA parents",
+                  f"Starting from the exact saved final states of the three 100 ps parents (seeds 1731-1733), three H100 CUDA continuations (new thermostat seeds 11731-11733) each ran {runs[0]['production_ps']:g} further ps, to a global production time of 1000 ps. {br}.",
+                  "Three branches of one system, conditional on their parents. " + pr["scope"], asm, lim, f"{v3}/production/receipt.json", c.blob(f"{v3}/production/receipt.json"), "Production receipt: three CUDA continuations.")
+    a1 = _action(c, SRC, "run-mdc-action-cuda-v3", cl_r, f"Provider-executed job (CUDA; {jr['GPU'].split(',')[0]}); the producer reports {rv['all_returned_job_file_hashes_independently_checked']} returned file hashes independently checked. The two receipts name different job ids ({ids[0]} in job-receipt.json, which the production receipt calls the PARENT job; {ids[1]} in return-verification.json); both are retained as found and not reconciled here",
+                 [ACCEPT_REPLAY, ACCEPT_REVIEW], ["OpenMM 8.4 with CUDA on an H100"], dict(input=f"warm start sha256 {pr['warmstart_sha256']}; parent final states sha256 " + ", ".join(b["state_sha256"][:12] for b in proto["branches"]),
+                 code=f"git:{em.REPO_LABEL}@{commit}; run code sha256 {pr['code_sha256'][:16]}", model="OpenMM 8.4 classical MD, CUDA mixed precision (no language model)", environment=f"python {pr['python'].split('(')[0].strip()}; numpy {pr['numpy_version']}; GPU {jr['GPU']}",
+                 parameters=f"{proto['additional_production_steps']} steps at {proto['timestep_ps']} ps; {proto['temperature_K']} K; friction {proto['friction_per_ps']}/ps; new thermostat seeds 11731-11733", scope="three conditional continuations"), [])
+    ev_r = _evidence(c, SRC, "run-mdc-evidence-cuda-v3", cl_r, kind="simulated", relation="unspecified", produced_by=a1, source=em._source(c, f"{v3}/production/receipt.json", c.blob(f"{v3}/production/receipt.json"), "Production receipt."),
+                     method=f"Three CUDA continuations; every file hash in the production receipt was recomputed ({len(prod)} files) and so was every job-receipt hash whose file is in the checkout ({len(present)})" + (f"; {len(not_here)} job-receipt files are not in the checkout and are stated, not checked." if not_here else "."),
+                     context="Applicability: this prepared system. " + em.IMPORT_NOTE, assumptions=asm, provenance=_prov(c, runs=[{k: r[k] for k in ("seed", "parent_seed", "wall_seconds", "final_CA_RMSD_nm")} for r in runs], job_ids_as_found=list(ids), files_recomputed=len(prod) + len(present), files_stated_not_checked=not_here),
+                     limitations=lim, uncertainty="Three branches of one parent set; no convergence or block-averaging claim.",
+                     artifacts=[c.artifact("output", f"{v3}/production/{n}", prod[n], n) for n in sorted(prod) if n.startswith(("trajectory-", "metrics-"))] + [c.artifact("log", f"{v3}/production/receipt.json", c.blob(f"{v3}/production/receipt.json"), "production receipt"),
+                        c.artifact("log", f"{v3}/job-receipt.json", c.blob(f"{v3}/job-receipt.json"), "job receipt"), c.artifact("log", f"{v3}/return-verification.json", c.blob(f"{v3}/return-verification.json"), "return verification"),
+                        c.artifact("protocol", f"{MD}/continuation-protocol.json", c.blob(f"{MD}/continuation-protocol.json"), "continuation protocol")])
+    dg = [b["predeclared_diagnostic"] for b in sorted(an["branches"], key=lambda b: b["parent_seed"])]
+    cl_d = _claim(c, "run-mdc-claim-window-diagnostic-false-false-true", "Collagen-mimetic MD: the predeclared small-window drift diagnostic read False, False, True across the three branches",
+                  "Comparing the 600-800 ps and 800-1000 ps windows, the producer's predeclared small_window_drift flag is " + ", ".join(f"{b['parent_seed']}: {d['small_window_drift']} (RMSD window-mean change {d['RMSD_window_mean_change_nm']:.4f} nm, C-alpha Rg change {d['CA_Rg_window_mean_change_nm']:.4f} nm)" for b, d in zip(sorted(an["branches"], key=lambda b: b["parent_seed"]), dg))
+                  + f"; {an['small_window_drift_diagnostic_count']} of {an['diagnostic_denominator']} true. Two of three are false, and they are retained.",
+                  "A descriptive finite-window diagnostic. " + an["scope"], asm, lim + ["The flag is not a stability probability; even true does not establish equilibrium."], f"{an_dir}/summary.json", c.blob(f"{an_dir}/summary.json"), "Analysis summary.")
+    a2 = _action(c, SRC, "run-mdc-action-window-analysis", cl_d, "Imported record of a producer-reported analysis (not re-run by Frontier); the analysis names the production receipt and protocol it read and both hashes were matched here",
+                 [ACCEPT_REPLAY, ACCEPT_REVIEW], ["python3 with numpy"], dict(input=f"production receipt sha256 {an['extension_receipt_sha256']}; parent receipt sha256 {an['parent_receipt_sha256']}", code=f"git:{em.REPO_LABEL}@{commit}; analysis code sha256 {an['analysis_code_sha256'][:16]}",
+                 model="none: descriptive analysis", environment="NOT RECORDED in the files read", parameters="windows 600-800 and 800-1000 ps, predeclared", scope="finite-window diagnostic"), [ev_r])
+    _evidence(c, SRC, "run-mdc-evidence-window-analysis", cl_d, kind="simulated", relation="unspecified", produced_by=a2, source=em._source(c, f"{an_dir}/summary.json", c.blob(f"{an_dir}/summary.json"), "Analysis summary."),
+              method="Predeclared two-window comparison per branch; output hashes were recomputed.", context="Applicability: these three branches. " + em.IMPORT_NOTE, assumptions=asm,
+              provenance=_prov(c, flags=flags, n_parent_branches=an["n_parent_branches"], n_new_independent_biological_samples=an["n_new_independent_biological_samples"], biological_success_probability=an["biological_success_probability"]),
+              limitations=lim, uncertainty="Windows of 22-23 samples each; no uncertainty model.", artifacts=[c.artifact("output", f"{an_dir}/summary.json", c.blob(f"{an_dir}/summary.json"), "analysis summary"), c.artifact("output", f"{an_dir}/conditional-branches.png", c.blob(f"{an_dir}/conditional-branches.png"), "branch figure")])
+    ra = _action(c, SRC, "run-mdc-action-render", cl_r, "Imported record of a producer-reported render (not re-run by Frontier): video and poster of ONE branch (seed 11731) from its saved states, rigidly aligned, no deformation invented",
+                 ["Re-rendering reproduces the frames; mp4 bytes can differ across ffmpeg builds.", "Pictures are views of computed states, not evidence."], ["python3 with matplotlib; ffmpeg"],
+                 dict(input=f"continuation evidence version {ev_r['version']}; trajectory sha256 {rn['trajectory_sha256'][:16]}", code=f"git:{em.REPO_LABEL}@{commit}; render code sha256 {rn['render_code_sha256'][:16]}", model="none: rendering", environment="NOT RECORDED",
+                 parameters=f"{rn['frames']} frames at {rn['display_fps']} fps; global time {rn['global_production_time_ps'][0]:g}-{rn['global_production_time_ps'][1]:g} ps", scope="visualisation of one branch"), [ev_r])
+    _evidence(c, SRC, "run-mdc-evidence-render", cl_r, kind="simulated", relation="context_only", produced_by=ra, source=em._source(c, f"{rd}/render.json", c.blob(f"{rd}/render.json"), "Render receipt."),
+              method="Producer renders the saved seed-11731 trajectory; output hashes were recomputed.", context=RENDER_NOTE + " " + em.IMPORT_NOTE, assumptions=asm, provenance=_prov(c, seed=rn["seed"], frames=rn["frames"], outputs_recomputed=sorted(rn_out)),
+              limitations=[em.IMPORT_NOTE, RENDER_NOTE, NOT_CALIBRATED, "One of three branches is shown."], artifacts=[c.artifact("output", f"{rd}/{n}", rn_out[n], d) for n, d in (("trajectory.mp4", "video of branch 11731"), ("poster.png", "poster"))]
+              + [c.artifact("log", f"{rd}/render.json", c.blob(f"{rd}/render.json"), "render receipt")])
+    return c
+
+
+LATER["md_continuation"] = md_continuation_chain
+ALL_CHAINS = {**CHAINS, **LATER}
+
+
 # ---------------------------------------------------------------------------------------------------------------------------- bundles
 # Root is making the repository public after a credential/history audit: no curated output may carry a presigned URL or a secret-looking field.
 SECRETISH = re.compile(r"X-Amz|Signature=|Expires=|presign|[?&]token=|access[_-]?key|secret|passw(?:or)?d|api[_-]?key|bearer|authorization|AKIA[0-9A-Z]{8}|sk-[A-Za-z0-9]{16}|BEGIN [A-Z ]*PRIVATE|\.credentials|https?://[^\"\s]*\?", re.I)
