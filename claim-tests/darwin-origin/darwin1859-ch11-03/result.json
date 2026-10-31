@@ -1,0 +1,985 @@
+{
+  "claim_id": "darwin1859-ch11-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch11-03",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "Within one continent, the genus-level composition of the fauna/flora of two strongly contrasting habitats (hot desert vs. humid tropical forest) is more similar than the composition of the same habitat type on two different continents; i.e. geographic region, not habitat, is the primary predictor of taxonomic affinity.",
+  "pass_criterion": "Pre-registered: for each of five taxonomic groups (Mammalia, Aves, Squamata, Amphibia, Magnoliopsida), compute the Sørensen similarity of genus sets (2|A∩B|/(|A|+|B|), GBIF occurrence-derived genus lists, genera with >= 5 records per region) for (i) the 5 within-continent / different-habitat region pairs and (ii) the 20 between-continent / same-habitat region pairs. The claim is SUPPORTED if the mean of (i) exceeds the mean of (ii) in at least 4 of the 5 groups AND a one-sided Mann-Whitney U test pooling all groups' pairs (i) vs (ii) gives p < 0.01.",
+  "fail_criterion": "Pre-registered: REFUTED if the mean of (i) exceeds the mean of (ii) in 2 or fewer of the 5 groups, or if the pooled one-sided Mann-Whitney test in the opposite direction ((ii) > (i)) gives p < 0.05. Any other outcome is MIXED. If fewer than 4 groups have >= 20 genera in every region, the result is inconclusive (underpowered).",
+  "planned_datasets": [
+    "gbif-occurrence-search-api"
+  ],
+  "interpretation": "Darwin's 'productions of the same continent' are taken as the native genera recorded in GBIF within fixed bounding boxes on five continents (South America, Africa, Australia, North America incl. Central America, mainland Asia). 'Different stations' is operationalized as two habitat types with the strongest possible contrast on each continent: a hot desert/semi-desert box and a humid tropical forest box. 'Affinity' is operationalized as sharing genera (and, secondarily, families), which is the pre-phylogenetic measure of relatedness Darwin himself used. The 'same sea' half of the claim is not tested here. Regions are fixed before any data are downloaded; genera of domestic and commensal species that humans have spread worldwide (Homo, Rattus, Mus, Canis, Felis, Bos, Ovis, Capra, Sus, Equus, Columba) are excluded, as are fossil and living (zoo/garden) specimen records, because the claim concerns natural distribution.",
+  "datasets": [
+    {
+      "id": "gbif-occurrence-search-api",
+      "name": "GBIF occurrence search API (facet counts of genusKey/familyKey within bounding boxes; GBIF Backbone Taxonomy for keys)",
+      "landing_url": "https://www.gbif.org/developer/occurrence",
+      "doi": null,
+      "version": "live API, retrieved 2026-10-31",
+      "license": "varies by publisher (GBIF data CC0 / CC BY / CC BY-NC); API output aggregated counts",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Homo&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:30Z",
+          "byte_size": 1159,
+          "sha256": "df72a948055ebccbb9f7ecae16a0d8650d6e339b4d3535ea91c5994ddb05e278"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Rattus&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:31Z",
+          "byte_size": 2683,
+          "sha256": "eed5b86df582c604090a3d5b0c5ecab67d64cd21c8a079eb32a7aa62155a84a3"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Mus&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:32Z",
+          "byte_size": 2035,
+          "sha256": "4c6b7b987f7622db8a10673185ed3b05a7d10cb3838e4c166a73d5384e122805"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Canis&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:32Z",
+          "byte_size": 2026,
+          "sha256": "6ed6e7c079fe649f820ae8258eb85a5d4240e61c70ccff1e61b4192792ba0dcd"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Felis&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:33Z",
+          "byte_size": 1158,
+          "sha256": "079ea2272ab01063ae41c49a6aabd44d061f16fb0ee8aa3b6dadd6e91997b188"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Bos&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:34Z",
+          "byte_size": 1153,
+          "sha256": "746db06441e646d49db9cea6df38253a96e0c84a7b6ed724fc36d0213a1c36f2"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Ovis&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:34Z",
+          "byte_size": 1159,
+          "sha256": "e843f79b191ed55ffa0201cf928040a54d7425b378f24c8c73d5fb1d26d0edcb"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Capra&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:35Z",
+          "byte_size": 1161,
+          "sha256": "d87f9986bc11ff1a51cf6c54dca92d0c16b9981a9c231d7a638ad40145b3acac"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Sus&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:36Z",
+          "byte_size": 1153,
+          "sha256": "b07d658ae6105cf0058e9c0e9b71be21d3b4d7d49ade36863e00178fe427f25a"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Equus&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:36Z",
+          "byte_size": 1164,
+          "sha256": "474d79f9a2295398050c7105645d8c752134c368178b32bf90593360f455bb33"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species?name=Columba&rank=GENUS&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&limit=50",
+          "retrieved_at": "2026-10-31T04:27:37Z",
+          "byte_size": 3605,
+          "sha256": "3ca62cd97d0678ba9e60525ca363bd502e8a1140ef4d4fb7e4d875a3ac2ddde7"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/359",
+          "retrieved_at": "2026-10-31T04:27:38Z",
+          "byte_size": 690,
+          "sha256": "8cd94b5a5677cc9b69647923f1cf0745459028dc516430ed5ff70313b28b3445"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/212",
+          "retrieved_at": "2026-10-31T04:27:38Z",
+          "byte_size": 676,
+          "sha256": "37f3fc4e31470be121cf339f695870f356927831f6064a2d0b9e4461e3d73c8d"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/11592253",
+          "retrieved_at": "2026-10-31T04:27:39Z",
+          "byte_size": 714,
+          "sha256": "2f2239e91b247aea9f5e533be5be1e22e4e091d24587ff6559741d62bc6422fe"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/131",
+          "retrieved_at": "2026-10-31T04:27:39Z",
+          "byte_size": 693,
+          "sha256": "70b7b954eff5b07c6bc9cec83601d26b74f3595fd45f4bbc3d523e53c27bc73f"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/220",
+          "retrieved_at": "2026-10-31T04:27:40Z",
+          "byte_size": 723,
+          "sha256": "b5722e74527d502af2353b9d7dfe40f8c512a0afcf96ab020342842693668a0e"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28-70+-35%2C-64+-35%2C-64+-27%2C-70+-27%2C-70+-35%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:41Z",
+          "byte_size": 3119,
+          "sha256": "a2a6a613da446498ec9582d0ec30f5279d06f09c90ed49190b5c2d49619916ea"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28-70+-35%2C-64+-35%2C-64+-27%2C-70+-27%2C-70+-35%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:41Z",
+          "byte_size": 924,
+          "sha256": "3b8a15acfabbb92ac5d0e1d3004adfeea6279e0b447bbbfde6bd6cecf79a44a1"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28-70+-8%2C-60+-8%2C-60+0%2C-70+0%2C-70+-8%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:42Z",
+          "byte_size": 4735,
+          "sha256": "8904861d18b98c46cccd07905287913ec997cff5d45746596addf0a6e1b4532c"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28-70+-8%2C-60+-8%2C-60+0%2C-70+0%2C-70+-8%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:42Z",
+          "byte_size": 1230,
+          "sha256": "8e82dab5d3960a5924ad2f432edb1b06ae54c1e940191fd143219a8450d8a629"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%2815+-28%2C22+-28%2C22+-20%2C15+-20%2C15+-28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:43Z",
+          "byte_size": 4091,
+          "sha256": "97cf2015fad467d39bb57ca0a23a9f3f21e4e5551d035880338d7c071255a25c"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%2815+-28%2C22+-28%2C22+-20%2C15+-20%2C15+-28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:44Z",
+          "byte_size": 1449,
+          "sha256": "39b22a417886bfbe2caf7e3feb22c3e19dc5f9a08cf3d3fdacca0ce37cfb922f"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%2815+-5%2C25+-5%2C25+3%2C15+3%2C15+-5%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:44Z",
+          "byte_size": 4220,
+          "sha256": "5825a4bc9daa46c392dba721ee09bcfb64079f9806a98c683f50f2312a175ed2"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%2815+-5%2C25+-5%2C25+3%2C15+3%2C15+-5%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:45Z",
+          "byte_size": 1267,
+          "sha256": "4e5e6dd0c29db466d875222151e6f7e798871f23abc4d03d29e5c59ea1d490e5"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28128+-30%2C138+-30%2C138+-22%2C128+-22%2C128+-30%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:45Z",
+          "byte_size": 2374,
+          "sha256": "5c528a67d75b5155b298ce1e2e4a84b5c25e9b0822aa296f06e8a43a73741a1a"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28128+-30%2C138+-30%2C138+-22%2C128+-22%2C128+-30%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:46Z",
+          "byte_size": 1063,
+          "sha256": "ef7e1290c83d90aee811fbde9e41d44235f549f10a95a43b0f897b8270cc6ba4"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28143+-20%2C147+-20%2C147+-14%2C143+-14%2C143+-20%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:47Z",
+          "byte_size": 3462,
+          "sha256": "b808dd3091b1018f6a744a356226402be9c4c66f443af93cc723355e3eb8db74"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28143+-20%2C147+-20%2C147+-14%2C143+-14%2C143+-20%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:47Z",
+          "byte_size": 1240,
+          "sha256": "953e1e33097d693f79902bf35e8ea2710f38fe6f42e5deed0965f27a875c716e"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28-115+28%2C-105+28%2C-105+34%2C-115+34%2C-115+28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:48Z",
+          "byte_size": 5587,
+          "sha256": "e22aaa9a02fb378d3c6e81dafc4917d5c7292b6cc806f5a78945c4c82d0109f1"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28-115+28%2C-105+28%2C-105+34%2C-115+34%2C-115+28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:48Z",
+          "byte_size": 1798,
+          "sha256": "72352bc152aed8a9655a618826a4bcab79f8b531c0ebbf8e9c89f65ee7c4ec51"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28-92+14%2C-84+14%2C-84+20%2C-92+20%2C-92+14%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:49Z",
+          "byte_size": 5259,
+          "sha256": "83b5361ed958ea03553de41d6173b8acc2b669e687bcaf987b502ca202a83c77"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28-92+14%2C-84+14%2C-84+20%2C-92+20%2C-92+14%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:50Z",
+          "byte_size": 1446,
+          "sha256": "6eee586ea09f17eef49c65e234509493da1f089357a8e5b825c8a35039a0896f"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%2869+24%2C75+24%2C75+30%2C69+30%2C69+24%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:50Z",
+          "byte_size": 1712,
+          "sha256": "b6ea1a24d73b0b86dca15cd58cd23d8e7b1a3331081ce9fb257f0122f102c0ac"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%2869+24%2C75+24%2C75+30%2C69+30%2C69+24%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:51Z",
+          "byte_size": 873,
+          "sha256": "46b496382408cd24e62f71e918554aa42ba5901c40d479444616c9b5cca14fff"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28100+2%2C104+2%2C104+8%2C100+8%2C100+2%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:51Z",
+          "byte_size": 3999,
+          "sha256": "be8b377940ec5f97521d2d00349b77fe5c7e04459d0bfaec6f422bdf52248e9d"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=359&geometry=POLYGON%28%28100+2%2C104+2%2C104+8%2C100+8%2C100+2%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:52Z",
+          "byte_size": 1204,
+          "sha256": "aa7a00dca8fa3cbc7a7013759d170e3a5c9b3ec0b76eb6175c00c8972c438f87"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28-70+-35%2C-64+-35%2C-64+-27%2C-70+-27%2C-70+-35%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:53Z",
+          "byte_size": 12105,
+          "sha256": "901aae257baa3785a896edf24510a38234fa2e5c10ff3f5076a4f1ec7845f96c"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28-70+-35%2C-64+-35%2C-64+-27%2C-70+-27%2C-70+-35%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:53Z",
+          "byte_size": 2148,
+          "sha256": "dd4f7f4204afbbcfb03979c2368334609f946c357e54da413f80f76fcaaa15fe"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28-70+-8%2C-60+-8%2C-60+0%2C-70+0%2C-70+-8%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:54Z",
+          "byte_size": 15520,
+          "sha256": "762573cff2575b7b350b0fb3f312df17e6f69315b0a6e6896bebabc00ee7a6c5"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28-70+-8%2C-60+-8%2C-60+0%2C-70+0%2C-70+-8%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:55Z",
+          "byte_size": 2300,
+          "sha256": "e11090fb0e469fd61107d61444511fb5bd6ead12c74fa87f4427d8326a841aba"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%2815+-28%2C22+-28%2C22+-20%2C15+-20%2C15+-28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:55Z",
+          "byte_size": 10012,
+          "sha256": "711ba1113125f03d949574b921b7ca4d4f92d2e7430675ebbecae1b5ac8a49dc"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%2815+-28%2C22+-28%2C22+-20%2C15+-20%2C15+-28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:56Z",
+          "byte_size": 2932,
+          "sha256": "796133ebb92589726835714573ad5a0e15a320b70daba445b288f4e5337c628e"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%2815+-5%2C25+-5%2C25+3%2C15+3%2C15+-5%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:56Z",
+          "byte_size": 10617,
+          "sha256": "1659600822572801fbe982967035931c2643a84d563b0374dae097c8295fb043"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%2815+-5%2C25+-5%2C25+3%2C15+3%2C15+-5%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:57Z",
+          "byte_size": 2705,
+          "sha256": "7abe58d56c0cf4d5a30f1eebe2c447b43852f29e59ee13fb9823cf845f40cfb9"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28128+-30%2C138+-30%2C138+-22%2C128+-22%2C128+-30%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:58Z",
+          "byte_size": 8517,
+          "sha256": "2a59e76be6126ed1774fea5bdf5a6c2d2b4f9fd93dba2d8dab4e652f9ca49b56"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28128+-30%2C138+-30%2C138+-22%2C128+-22%2C128+-30%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:58Z",
+          "byte_size": 2709,
+          "sha256": "4415215cf70de04c98305f79afd75a2915003057749b3fcd415f113f66aa0d86"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28143+-20%2C147+-20%2C147+-14%2C143+-14%2C143+-20%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:59Z",
+          "byte_size": 10499,
+          "sha256": "b4d4978258583ff1fa05c5c227c870196de2555ff02d83989b5294b2b9459f8f"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28143+-20%2C147+-20%2C147+-14%2C143+-14%2C143+-20%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:27:59Z",
+          "byte_size": 3011,
+          "sha256": "73fa13f5ed9f4ecf1af5e20b707a6e63a51c965addc5344affb5fc833741ab28"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28-115+28%2C-105+28%2C-105+34%2C-115+34%2C-115+28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:00Z",
+          "byte_size": 13133,
+          "sha256": "40e9c1650d1d43f6f5879e9378abdbd817052efce5394a3583c44fe3e5b583ca"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28-115+28%2C-105+28%2C-105+34%2C-115+34%2C-115+28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:01Z",
+          "byte_size": 3043,
+          "sha256": "3d8334726b6e4337658484f9164f8942526fc4ac87ccbc68d9ba747e3a0d95ff"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28-92+14%2C-84+14%2C-84+20%2C-92+20%2C-92+14%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:01Z",
+          "byte_size": 16161,
+          "sha256": "01ac21038d1889d60e88fc71261534ef65c794b119aaf2886e2fc82a8b187695"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28-92+14%2C-84+14%2C-84+20%2C-92+20%2C-92+14%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:02Z",
+          "byte_size": 2750,
+          "sha256": "9b6f2f5337acc5c3d185f325062dd18833ec9b0a33518a9a0b2726b1f3bb07e8"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%2869+24%2C75+24%2C75+30%2C69+30%2C69+24%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:02Z",
+          "byte_size": 8594,
+          "sha256": "84f883bddc8a337376717d987584c46d0c53083f2df1de150f6917ae98214c1f"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%2869+24%2C75+24%2C75+30%2C69+30%2C69+24%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:03Z",
+          "byte_size": 2674,
+          "sha256": "29514b6c6969a5fdb71667bf31f7b357d607e2fb7841caa4004be7df0f7837de"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28100+2%2C104+2%2C104+8%2C100+8%2C100+2%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:04Z",
+          "byte_size": 12147,
+          "sha256": "f96046c585b004b5952444a8f7ad0be4f0dd3b465ac2c97182415d2ab349daeb"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=212&geometry=POLYGON%28%28100+2%2C104+2%2C104+8%2C100+8%2C100+2%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:04Z",
+          "byte_size": 3027,
+          "sha256": "c5f16c341760ff0ef5019aaa10ecdd403427a6c1d15c176fd17c40e931941ad4"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28-70+-35%2C-64+-35%2C-64+-27%2C-70+-27%2C-70+-35%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:05Z",
+          "byte_size": 1524,
+          "sha256": "023c6409f60acafb5abfbe8844d27f7df0f806e23d335866d06576ed7699f317"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28-70+-35%2C-64+-35%2C-64+-27%2C-70+-27%2C-70+-35%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:05Z",
+          "byte_size": 596,
+          "sha256": "4a7fd3da8fd3e8aa619f39033feee482232302efa125844d217d90a4b1df2867"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28-70+-8%2C-60+-8%2C-60+0%2C-70+0%2C-70+-8%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:06Z",
+          "byte_size": 3459,
+          "sha256": "d147a1e4f62e1c1d6b5b4936aa85fa287d73033902be3c749d579c01e8b53417"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28-70+-8%2C-60+-8%2C-60+0%2C-70+0%2C-70+-8%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:07Z",
+          "byte_size": 798,
+          "sha256": "4daed112c16c420b681d9bc57605a00bdbf35da7d0e58cea0117c892e77849d6"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%2815+-28%2C22+-28%2C22+-20%2C15+-20%2C15+-28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:07Z",
+          "byte_size": 2340,
+          "sha256": "74412d188b37a7808e0ea9de08bcbcd8097c5d903b37d0b381b747997050aa80"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%2815+-28%2C22+-28%2C22+-20%2C15+-20%2C15+-28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:08Z",
+          "byte_size": 690,
+          "sha256": "19769a96cd8a415d4dfe54bd84bfd448a007d8a560da86cd065dbbe7dcf597e5"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%2815+-5%2C25+-5%2C25+3%2C15+3%2C15+-5%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:08Z",
+          "byte_size": 2178,
+          "sha256": "e6328c4b0e090f04f36277993eb2bd2103125927b4b3b0ea7e91ed43c60aa3da"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%2815+-5%2C25+-5%2C25+3%2C15+3%2C15+-5%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:09Z",
+          "byte_size": 650,
+          "sha256": "6f21624127fda57eb4d5a9e6f4291f924b4dc0633e48ceb45b07cd07c324f456"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28128+-30%2C138+-30%2C138+-22%2C128+-22%2C128+-30%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:10Z",
+          "byte_size": 2787,
+          "sha256": "ea3a49748c091c7b013dfa7d975fd551016db91a3a545a1e9ebd205a5447ba3f"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28128+-30%2C138+-30%2C138+-22%2C128+-22%2C128+-30%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:10Z",
+          "byte_size": 467,
+          "sha256": "19f7cd225203703feb7d495e663e9539271c13c902211b8b321a6a6c73cd00b6"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28143+-20%2C147+-20%2C147+-14%2C143+-14%2C143+-20%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:11Z",
+          "byte_size": 3202,
+          "sha256": "2cee0f49e4307cdc34154e37b7645947e329d18f8b4d70cefb0f56e65176a81f"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28143+-20%2C147+-20%2C147+-14%2C143+-14%2C143+-20%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:11Z",
+          "byte_size": 554,
+          "sha256": "23370f44212a519523c365a7fc75d32eb4b6c078f24a050e228be5a849fbf231"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28-115+28%2C-105+28%2C-105+34%2C-115+34%2C-115+28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:12Z",
+          "byte_size": 2899,
+          "sha256": "e96a0941064978b26efa59086260dc08a008938337e54e1d80b80b7255c577ed"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28-115+28%2C-105+28%2C-105+34%2C-115+34%2C-115+28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:13Z",
+          "byte_size": 782,
+          "sha256": "54fc7a6912fc7f79563b023c719cb2f3100b1d3cdcac310b2ecf0907d3baf155"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28-92+14%2C-84+14%2C-84+20%2C-92+20%2C-92+14%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:13Z",
+          "byte_size": 3938,
+          "sha256": "bce4429719e8836dc7522fba105d4f91fd99c80d9c8ffdc3b759e4fdae5694ef"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28-92+14%2C-84+14%2C-84+20%2C-92+20%2C-92+14%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:14Z",
+          "byte_size": 840,
+          "sha256": "0995cd0dd3d997c4e3912bf4ce2ed84bba3e0a0bf1970e07846cb1151f72881c"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%2869+24%2C75+24%2C75+30%2C69+30%2C69+24%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:14Z",
+          "byte_size": 1588,
+          "sha256": "5056a638b9e2e42adbedafbd2af5646c73659f007b14e0bfc4541a5de8d044df"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%2869+24%2C75+24%2C75+30%2C69+30%2C69+24%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:15Z",
+          "byte_size": 503,
+          "sha256": "41223f5c469c3a320deb0cd8ee040e14496844d9ebd8e5fe4ddcb37399f0712e"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28100+2%2C104+2%2C104+8%2C100+8%2C100+2%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:16Z",
+          "byte_size": 2917,
+          "sha256": "94d172f86f1dfd20d20258001a37341985b4cced7f38a1da59969a76881fab54"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=11592253&geometry=POLYGON%28%28100+2%2C104+2%2C104+8%2C100+8%2C100+2%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:16Z",
+          "byte_size": 742,
+          "sha256": "ca21dd67ae148334a09dae0d3ab3160caddb38bde7f0c90557a75aaa2b3ffe93"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28-70+-35%2C-64+-35%2C-64+-27%2C-70+-27%2C-70+-35%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:17Z",
+          "byte_size": 744,
+          "sha256": "7d398c8215daa87861e98cb0131e3a50daa0405e1c510bcb750c4b2bec99f782"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28-70+-35%2C-64+-35%2C-64+-27%2C-70+-27%2C-70+-35%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:17Z",
+          "byte_size": 452,
+          "sha256": "afde3dc769f64cda4d8d19166b7e7a6dcda2f3d8b9f7452f82d562a4e2b4d0b0"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28-70+-8%2C-60+-8%2C-60+0%2C-70+0%2C-70+-8%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:18Z",
+          "byte_size": 2305,
+          "sha256": "ab3312d62120ddd3a82eb57e88508012a28e4c4ab80934c79717b544d93d8037"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28-70+-8%2C-60+-8%2C-60+0%2C-70+0%2C-70+-8%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:19Z",
+          "byte_size": 726,
+          "sha256": "353a91b55513babd29b8dc510a4d8f23051dc69c2f95ed6efd9dc3ee48965fa4"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%2815+-28%2C22+-28%2C22+-20%2C15+-20%2C15+-28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:19Z",
+          "byte_size": 594,
+          "sha256": "31944763ff9aadbc24493be9cd22ab3dc2f81fbbfad8f241f0af30e45f88344c"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%2815+-28%2C22+-28%2C22+-20%2C15+-20%2C15+-28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:20Z",
+          "byte_size": 359,
+          "sha256": "f21fd484744ac875cf7dd236cba94d935b370a56d4cc48a9582ae370c94cd600"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%2815+-5%2C25+-5%2C25+3%2C15+3%2C15+-5%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:20Z",
+          "byte_size": 957,
+          "sha256": "84419b9127eb2c47ccb53c442c9adf080f4cce7e6f773547fbd2d5691c9e2c3b"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%2815+-5%2C25+-5%2C25+3%2C15+3%2C15+-5%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:21Z",
+          "byte_size": 478,
+          "sha256": "9ea6340ac18e2c5b37de91b790c27ed1f2dcb2c24854ff405b5fc18dc0925d49"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28128+-30%2C138+-30%2C138+-22%2C128+-22%2C128+-30%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:22Z",
+          "byte_size": 569,
+          "sha256": "40f905228d9d8656f84f80a8ad04c7a6342b2d5e57036358a0c8c7809518ae86"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28128+-30%2C138+-30%2C138+-22%2C128+-22%2C128+-30%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:22Z",
+          "byte_size": 281,
+          "sha256": "57ee5f1f4f10be2b43010cdfec5fa1f2e9ab0dc4c23a89cf6dff32fb2e757b5a"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28143+-20%2C147+-20%2C147+-14%2C143+-14%2C143+-20%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:23Z",
+          "byte_size": 679,
+          "sha256": "5be477a6d551663f4f537595cee5a3bc92ef774d31abfde0097924c929a9e725"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28143+-20%2C147+-20%2C147+-14%2C143+-14%2C143+-20%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:23Z",
+          "byte_size": 319,
+          "sha256": "5ba198d865702a017bb36f8505c283fa7a98e56e99ca6a89140a874eb2c79a61"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28-115+28%2C-105+28%2C-105+34%2C-115+34%2C-115+28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:24Z",
+          "byte_size": 913,
+          "sha256": "b74c582c74cd4643305f7eee68e90097d11c1781a4662317643967f7e6c05254"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28-115+28%2C-105+28%2C-105+34%2C-115+34%2C-115+28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:25Z",
+          "byte_size": 510,
+          "sha256": "c1c8ea3e2240069fb679f959784ebf5f310361b6003a3e4db11897ef4328a445"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28-92+14%2C-84+14%2C-84+20%2C-92+20%2C-92+14%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:25Z",
+          "byte_size": 1860,
+          "sha256": "babe2b85b87ea3ae7326200ece0b779ccc68ce99f0b23f3443e4e38f7376c6ec"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28-92+14%2C-84+14%2C-84+20%2C-92+20%2C-92+14%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:26Z",
+          "byte_size": 549,
+          "sha256": "004891e484e3fe057614196a90b8acc93f57840720974fa62be6bebc17d585e0"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%2869+24%2C75+24%2C75+30%2C69+30%2C69+24%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:26Z",
+          "byte_size": 376,
+          "sha256": "686aac7482ff656e9db3e3b8447a2fc4f8fb93f65f253ce00cf5d00fe46e61cf"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%2869+24%2C75+24%2C75+30%2C69+30%2C69+24%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:27Z",
+          "byte_size": 245,
+          "sha256": "b0a04f778571645578e2183a90cb9575b0080db32bf574197b0c88345bd282ed"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28100+2%2C104+2%2C104+8%2C100+8%2C100+2%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:28Z",
+          "byte_size": 1646,
+          "sha256": "1c0e0317b8d1672f71a663c596637b531a63c93e2ac1d1452149c5b0a60d8ce8"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=131&geometry=POLYGON%28%28100+2%2C104+2%2C104+8%2C100+8%2C100+2%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:28Z",
+          "byte_size": 393,
+          "sha256": "e455b5decde464e28f46a79f1c3150a674f3ac040758d2f14ef51827cc202a63"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28-70+-35%2C-64+-35%2C-64+-27%2C-70+-27%2C-70+-35%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:29Z",
+          "byte_size": 33460,
+          "sha256": "90b274f31c2550d44a44665efb1d9c98101671a892a08fadc95d4b2df4349555"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28-70+-35%2C-64+-35%2C-64+-27%2C-70+-27%2C-70+-35%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:30Z",
+          "byte_size": 4447,
+          "sha256": "69d04563aac669d2771ad09f24b456bd9fc2f975bbb3f11b8bbbe25a41b04448"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28-70+-8%2C-60+-8%2C-60+0%2C-70+0%2C-70+-8%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:30Z",
+          "byte_size": 40138,
+          "sha256": "c00170d402dc7adeeed5efb79f98c38a3279ed336dded592fef78f062fbfbeaf"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28-70+-8%2C-60+-8%2C-60+0%2C-70+0%2C-70+-8%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:31Z",
+          "byte_size": 5104,
+          "sha256": "5f0355326b9fdf0173faf1af0d39153cf565e7816cdf0f844b51c5663c439c0c"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%2815+-28%2C22+-28%2C22+-20%2C15+-20%2C15+-28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:32Z",
+          "byte_size": 22101,
+          "sha256": "3c6772454cf799c633e4582ab3f92c59ea65ee966dbf080d4c359cc49508ee48"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%2815+-28%2C22+-28%2C22+-20%2C15+-20%2C15+-28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:32Z",
+          "byte_size": 3618,
+          "sha256": "5e9dba7c4f1ed5804254c0925ec97cf108b658781be089523baf87c95d2a32da"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%2815+-5%2C25+-5%2C25+3%2C15+3%2C15+-5%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:33Z",
+          "byte_size": 37972,
+          "sha256": "ca7d7481b42f8fb964bb97db112b525dff952f64b4f721f075cd712ea7908f8b"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%2815+-5%2C25+-5%2C25+3%2C15+3%2C15+-5%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:33Z",
+          "byte_size": 4760,
+          "sha256": "b645d989e554da9fcbf76f2d65a933dbbb7da17bcd7f1f7a79a6d91dfc4968b7"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28128+-30%2C138+-30%2C138+-22%2C128+-22%2C128+-30%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:34Z",
+          "byte_size": 20729,
+          "sha256": "1904c6cc896d17b638f53062d761255e909f80540ffa9cd031fa82f71a4cc53c"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28128+-30%2C138+-30%2C138+-22%2C128+-22%2C128+-30%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:35Z",
+          "byte_size": 3492,
+          "sha256": "ae3437c6db5bb5eca43bbbbc8c5c1635a1493a4763b623127d0f917cc46e8120"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28143+-20%2C147+-20%2C147+-14%2C143+-14%2C143+-20%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:36Z",
+          "byte_size": 45408,
+          "sha256": "8efb01ccf11ab49dd3bd9d20bcd1852599f1d462a37ddec952befc5bbd9f1d54"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28143+-20%2C147+-20%2C147+-14%2C143+-14%2C143+-20%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:36Z",
+          "byte_size": 5750,
+          "sha256": "b5c1d2a005c25dd1959d79dc0b52b242fdd2260b65032a2617cc1729e18c8469"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28-115+28%2C-105+28%2C-105+34%2C-115+34%2C-115+28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:37Z",
+          "byte_size": 50372,
+          "sha256": "40cb59d82575fc4726d72a1232170e0719f0045f62532eb6c41be483c979d11f"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28-115+28%2C-105+28%2C-105+34%2C-115+34%2C-115+28%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:38Z",
+          "byte_size": 5000,
+          "sha256": "69e432801352838c9f92940445aceda4ddf6ca2001becf13bc5747f0e5baee38"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28-92+14%2C-84+14%2C-84+20%2C-92+20%2C-92+14%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:38Z",
+          "byte_size": 60109,
+          "sha256": "3c53e22d6fb0fde0e9fe134182b1a8f3c38dfcf551f203126afb47b88713c899"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28-92+14%2C-84+14%2C-84+20%2C-92+20%2C-92+14%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:39Z",
+          "byte_size": 6674,
+          "sha256": "da9ce74e2d9a3e9297bbac412d90955392e4d8bcf50f96a3b40f697654866ae0"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%2869+24%2C75+24%2C75+30%2C69+30%2C69+24%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:40Z",
+          "byte_size": 16483,
+          "sha256": "a92759cc649978949d400a2fae590dc7e7a1ce9cda25bcd8953a335e8f176cdf"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%2869+24%2C75+24%2C75+30%2C69+30%2C69+24%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:40Z",
+          "byte_size": 3333,
+          "sha256": "0965ea3a64c98e21eae1cc8a1e5c3ec3a4338f634c99d9c31edc710bb1accb77"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28100+2%2C104+2%2C104+8%2C100+8%2C100+2%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:41Z",
+          "byte_size": 42629,
+          "sha256": "f7d5abc5a772544a91eb239bdf3b462d7b11ef925643c9e13587b2c22d886df0"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=220&geometry=POLYGON%28%28100+2%2C104+2%2C104+8%2C100+8%2C100+2%29%29&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=familyKey&facetLimit=50000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:28:42Z",
+          "byte_size": 5908,
+          "sha256": "c85bab5f1b50d4ed3c743b67db9f0c5d9c4a87688fa36f92283dd1dd475c018a"
+        }
+      ],
+      "role": "genus and family presence lists (>= 5 records) for 10 regions x 5 taxonomic groups; genus-key lookups for the excluded commensal genera"
+    }
+  ],
+  "method": "For each of 5 groups (Mammalia, Aves, Squamata, Amphibia, Magnoliopsida) and 10 pre-registered regions (a hot-desert and a humid-forest box on each of 5 continents) the GBIF occurrence API was queried for facet counts of genusKey and familyKey (hasCoordinate, no geospatial issue, PRESENT, 1900-2026, fossil and living specimens excluded). Genera with >= 5 records formed the regional genus set; 11 domestic/commensal genera were removed. Sørensen similarity was computed for all 45 region pairs per group and pairs were classed as within-continent/different-habitat (5 per group), between-continent/same-habitat (20) or between-continent/different-habitat (20). Means were compared per group and a pooled one-sided Mann-Whitney U test (within-continent/different-habitat > between-continent/same-habitat) was run on the 25 vs 100 genus-level pair similarities.",
+  "measured": {
+    "value": 4,
+    "unit": "groups (of 5) where within-continent/different-habitat mean genus Sørensen > between-continent/same-habitat mean",
+    "n": 225,
+    "uncertainty": "pooled one-sided Mann-Whitney (within > between-same-habitat), genus level: U=2086, p=1.22e-07",
+    "extra": {
+      "pooled_mean_sorensen_genus": {
+        "within-continent/different-habitat": 0.3853657141086866,
+        "between-continent/same-habitat": 0.1575813010464145,
+        "between-continent/different-habitat": 0.11869452331388222
+      },
+      "pooled_mean_sorensen_family": {
+        "within-continent/different-habitat": 0.7102182895799578,
+        "between-continent/same-habitat": 0.4848975635684794
+      },
+      "mannwhitney_p_within_greater_genus": 1.220398161619688e-07,
+      "mannwhitney_p_within_less_genus": 0.9999998819234305,
+      "mannwhitney_p_within_greater_family": 2.917676362357981e-07,
+      "n_pairs_within": 25,
+      "n_pairs_between_same_habitat": 100,
+      "per_group": {
+        "Mammalia": {
+          "mean_sorensen_genus": {
+            "within-continent/different-habitat": 0.3145440510377016,
+            "between-continent/same-habitat": 0.08622171817102822,
+            "between-continent/different-habitat": 0.05442220747186464
+          },
+          "mean_sorensen_family": {
+            "within-continent/different-habitat": 0.6451250312578145,
+            "between-continent/same-habitat": 0.39994705622434584,
+            "between-continent/different-habitat": 0.3571636150187481
+          },
+          "min_genera_in_a_region": 28
+        },
+        "Aves": {
+          "mean_sorensen_genus": {
+            "within-continent/different-habitat": 0.5965834137160181,
+            "between-continent/same-habitat": 0.2844835321738711,
+            "between-continent/different-habitat": 0.2545794112795977
+          },
+          "mean_sorensen_family": {
+            "within-continent/different-habitat": 0.8395365966336215,
+            "between-continent/same-habitat": 0.5607686111599987,
+            "between-continent/different-habitat": 0.5502036753979649
+          },
+          "min_genera_in_a_region": 208
+        },
+        "Squamata": {
+          "mean_sorensen_genus": {
+            "within-continent/different-habitat": 0.37016635991550817,
+            "between-continent/same-habitat": 0.05466906736278633,
+            "between-continent/different-habitat": 0.04328220226654045
+          },
+          "mean_sorensen_family": {
+            "within-continent/different-habitat": 0.7735968588909764,
+            "between-continent/same-habitat": 0.4453279528089401,
+            "between-continent/different-habitat": 0.4444028869347205
+          },
+          "min_genera_in_a_region": 34
+        },
+        "Amphibia": {
+          "mean_sorensen_genus": {
+            "within-continent/different-habitat": 0.3506848147709788,
+            "between-continent/same-habitat": 0.055625306012481626,
+            "between-continent/different-habitat": 0.04577044662062847
+          },
+          "mean_sorensen_family": {
+            "within-continent/different-habitat": 0.6682579642579644,
+            "between-continent/same-habitat": 0.2994764033509154,
+            "between-continent/different-habitat": 0.2990479195332728
+          },
+          "min_genera_in_a_region": 4
+        },
+        "Magnoliopsida": {
+          "mean_sorensen_genus": {
+            "within-continent/different-habitat": 0.29484993110322655,
+            "between-continent/same-habitat": 0.3069068815119051,
+            "between-continent/different-habitat": 0.19541834893077975
+          },
+          "mean_sorensen_family": {
+            "within-continent/different-habitat": 0.6245749968594126,
+            "between-continent/same-habitat": 0.7189677942981972,
+            "between-continent/different-habitat": 0.5938200265706078
+          },
+          "min_genera_in_a_region": 315
+        }
+      },
+      "underpowered_groups": [
+        "Amphibia"
+      ],
+      "excluded_genus_keys": {
+        "Homo": 2436435,
+        "Rattus": 2439223,
+        "Mus": 9800657,
+        "Canis": 5219142,
+        "Felis": 2435022,
+        "Bos": 2441017,
+        "Ovis": 9531221,
+        "Capra": 2441047,
+        "Sus": 2441213,
+        "Equus": 8652950,
+        "Columba": 2495404
+      }
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.85,
+  "caveats": [
+    "Magnoliopsida is the one group where the same habitat on another continent is as similar (0.307) as a different habitat on the same continent (0.295); introduced weeds and genuinely cosmopolitan plant genera both contribute, and GBIF cannot flag introductions reliably.",
+    "Amphibia is underpowered (as few as 4 genera in the Thar desert box) but the criterion was still met in 4 groups with >= 20 genera everywhere (Mammalia, Aves, Squamata, Magnoliopsida); Amphibia is reported but did not decide the verdict.",
+    "Genus sharing is a pre-phylogenetic proxy for 'affinity'; no phylogenetic beta-diversity was computed.",
+    "Introduced and vagrant species other than the 11 excluded commensal genera remain in the lists; they bias toward between-continent similarity, i.e. against the claim.",
+    "Bounding boxes approximate habitats; each box contains some other habitat. Sampling intensity differs by orders of magnitude between boxes (e.g. Asian desert mammals 2.5k records vs North American desert 237k), which depresses similarity for poorly sampled regions regardless of category.",
+    "The 'same sea' half of the claim was not tested.",
+    "GBIF is a live resource; re-running reproduces the method but counts drift as records are added. Response checksums at retrieval time are in derived/fetch_log.json."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-bdd1",
+    "date": "2026-10-31"
+  },
+  "preregistration": {
+    "regions": {
+      "south-america-desert": {
+        "continent": "South America",
+        "habitat": "desert",
+        "description": "Argentine Monte desert / dry Chaco",
+        "bbox": [
+          -70,
+          -35,
+          -64,
+          -27
+        ]
+      },
+      "south-america-forest": {
+        "continent": "South America",
+        "habitat": "forest",
+        "description": "western Amazon basin",
+        "bbox": [
+          -70,
+          -8,
+          -60,
+          0
+        ]
+      },
+      "africa-desert": {
+        "continent": "Africa",
+        "habitat": "desert",
+        "description": "Namib / Kalahari",
+        "bbox": [
+          15,
+          -28,
+          22,
+          -20
+        ]
+      },
+      "africa-forest": {
+        "continent": "Africa",
+        "habitat": "forest",
+        "description": "Congo basin",
+        "bbox": [
+          15,
+          -5,
+          25,
+          3
+        ]
+      },
+      "australia-desert": {
+        "continent": "Australia",
+        "habitat": "desert",
+        "description": "central Australian deserts",
+        "bbox": [
+          128,
+          -30,
+          138,
+          -22
+        ]
+      },
+      "australia-forest": {
+        "continent": "Australia",
+        "habitat": "forest",
+        "description": "Queensland Wet Tropics and adjacent coast",
+        "bbox": [
+          143,
+          -20,
+          147,
+          -14
+        ]
+      },
+      "north-america-desert": {
+        "continent": "North America",
+        "habitat": "desert",
+        "description": "Sonoran / Chihuahuan deserts",
+        "bbox": [
+          -115,
+          28,
+          -105,
+          34
+        ]
+      },
+      "north-america-forest": {
+        "continent": "North America",
+        "habitat": "forest",
+        "description": "southern Mexico / Central American humid forest",
+        "bbox": [
+          -92,
+          14,
+          -84,
+          20
+        ]
+      },
+      "asia-desert": {
+        "continent": "Asia",
+        "habitat": "desert",
+        "description": "Thar desert and adjacent arid Rajasthan / Sindh",
+        "bbox": [
+          69,
+          24,
+          75,
+          30
+        ]
+      },
+      "asia-forest": {
+        "continent": "Asia",
+        "habitat": "forest",
+        "description": "Peninsular Malaysia / southern Thailand rainforest (mainland)",
+        "bbox": [
+          100,
+          2,
+          104,
+          8
+        ]
+      }
+    },
+    "groups": {
+      "Mammalia": 359,
+      "Aves": 212,
+      "Squamata": 11592253,
+      "Amphibia": 131,
+      "Magnoliopsida": 220
+    },
+    "min_records_per_genus": 5,
+    "excluded_genera": [
+      "Homo",
+      "Rattus",
+      "Mus",
+      "Canis",
+      "Felis",
+      "Bos",
+      "Ovis",
+      "Capra",
+      "Sus",
+      "Equus",
+      "Columba"
+    ],
+    "basis_of_record_excluded": [
+      "FOSSIL_SPECIMEN",
+      "LIVING_SPECIMEN"
+    ],
+    "year_range": "1900-2026"
+  }
+}

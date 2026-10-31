@@ -1,0 +1,70 @@
+{
+  "id": "dataset-reliability",
+  "version": "0.1.0",
+  "label": "Reliability of a vendored dataset record, v0.1.0",
+  "description": "Scores how far a dataset record under organisms/ is an authentic, complete, independently produced record of what it describes, following the dataset convention of the Project Delphi ontology (ONTOLOGY.md, 'Dataset convention'). The hypothesis assessed is 'dataset X is an authentic, complete record of what it describes'. Each dimension is a graded judgement in [0,1] (delphi:hasScore), never a probability. Fitness of a dataset for a particular claim is NOT scored here; it belongs to the claim's assessment. The assessor must not be the agent that vendored the record.",
+  "dimensions": [
+    {
+      "id": "source-authority",
+      "label": "Source authority",
+      "weight": 0.2,
+      "question": "Is the source peer-reviewed or a curated, governed repository with a data paper, versioning and a stable identifier, or an unreviewed upload?",
+      "anchors": {
+        "0.0": "anonymous or unreviewed upload, no versioning, no data paper, no governance",
+        "0.5": "institutional or community database without a data paper or without versioning; or a data paper but no persistent identifier",
+        "1.0": "peer-reviewed data paper or a governed international infrastructure (e.g. GBIF, NCBI, WoRMS, PBDB) with a DOI or stable identifier, documented curation and versioning"
+      }
+    },
+    {
+      "id": "integrity",
+      "label": "Integrity",
+      "weight": 0.25,
+      "question": "Does the identifier still resolve, and does every distribution's recorded checksum or recorded count match what the repository serves now? For live API counts, is the re-queried value within the tolerance stated below?",
+      "anchors": {
+        "0.0": "identifier does not resolve, or a checksum or count was recorded that cannot be reproduced and disagrees materially",
+        "0.5": "identifier resolves but a checksum could not be re-verified (download blocked, archive assembled on demand), or a live count drifted beyond tolerance for an explainable reason (new records indexed)",
+        "1.0": "identifier resolves and every checksum matches exactly, or every live count re-queried matches within tolerance (relative difference <= 0.5% or absolute <= 5)"
+      }
+    },
+    {
+      "id": "completeness",
+      "label": "Completeness",
+      "weight": 0.2,
+      "question": "Does the record describe what it claims to describe: are the counts, version, license, creators, citation and distributions present and consistent with what the source publishes (e.g. row counts vs. the data paper, taxon list vs. rows actually matched)?",
+      "anchors": {
+        "0.0": "counts or key metadata missing or contradicted by the source",
+        "0.5": "metadata present but partly unstated (license null, version implied by date only) or counts not cross-checkable",
+        "1.0": "all convention fields present, counts match the source's own statement of its size, taxa listed are actually present in the data"
+      }
+    },
+    {
+      "id": "independence",
+      "label": "Independence",
+      "weight": 0.15,
+      "question": "Is the data independent of this project's own outputs and of the claims it will be used to test (not model output, not derived from the claim text, not a re-aggregation of another record in this repository)?",
+      "anchors": {
+        "0.0": "derived from this project's models, claims or other vendored records",
+        "0.5": "aggregated from third-party sources whose independence from each other is unclear (e.g. compilation databases that ingest one another)",
+        "1.0": "primary measurements or curated primary records produced with no relation to this project"
+      }
+    },
+    {
+      "id": "authenticity",
+      "label": "Authenticity",
+      "weight": 0.2,
+      "question": "Is it real measured or observed data rather than synthetic, template or placeholder content, and is the record free of signs of fabrication (invented DOIs, non-existent accessions, round numbers without provenance)?",
+      "anchors": {
+        "0.0": "synthetic, template or placeholder content, or a DOI/accession/URL that does not exist",
+        "0.5": "real source but some record fields look templated or could not be traced to the source (e.g. citation text not found at the DOI)",
+        "1.0": "every identifier, DOI, accession and count traces to the real source; data are measured or observed records"
+      }
+    }
+  ],
+  "verdicts": [
+    {"id": "reliable", "rule": "overall >= 0.8 and integrity >= 0.7 and authenticity >= 0.8"},
+    {"id": "usable-with-caveats", "rule": "overall >= 0.55 and authenticity >= 0.5, not reliable"},
+    {"id": "needs-repair", "rule": "integrity < 0.5 or completeness < 0.4, but authenticity >= 0.5"},
+    {"id": "reject", "rule": "authenticity < 0.5 or identifier does not exist"}
+  ],
+  "overall": "weighted mean of the five dimension scores"
+}

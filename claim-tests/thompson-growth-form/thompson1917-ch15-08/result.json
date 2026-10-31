@@ -1,0 +1,57 @@
+{
+  "claim_id": "thompson1917-ch15-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch15-08",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "If lateral-spined (S. mansoni) and terminal-spined (S. haematobium) eggs are mechanical variants produced by one species, then worms assigned to S. mansoni and to S. haematobium belong to one interbreeding lineage: their mitochondrial cox1 sequences should be no more divergent from each other than sequences within either nominal species, and should not form two reciprocally separated clusters.",
+  "pass_criterion": "Pre-registered (claim supported). Using GenBank cox1 sequences (up to 40 per nominal species, chosen by a fixed random seed from all records >= 400 bp, hybrids excluded by title), pairwise uncorrected p-distances computed on pairwise alignments over >= 300 overlapping sites: the mean S. mansoni vs S. haematobium distance is <= 0.03, or the distributions overlap (minimum between-group distance smaller than the maximum within-group distance of either species, i.e. no barcode gap).",
+  "fail_criterion": "Pre-registered (claim refuted). The minimum S. mansoni vs S. haematobium distance exceeds the maximum within-species distance of both S. mansoni and S. haematobium (complete barcode gap), the mean between-group distance is >= 0.10, and that mean is at least as large as the mean distance between each of two universally recognised distinct species pairs measured the same way (S. haematobium vs S. bovis; S. mansoni vs S. rodhaini). Any other combination is 'mixed'. If fewer than 10 usable sequences per focal species can be retrieved the verdict is 'inconclusive' (data-unavailable).",
+  "planned_datasets": ["ncbi-genbank-schistosoma-cox1"],
+  "interpretation": "Thompson's compound claim has two parts: (i) a mechanism (the lateral spine is moulded in a funnel-shaped part of the uterus), and (ii) the taxonomic conclusion he draws from it, that the two egg forms 'do not shew the existence of a separate species, S. mansoni'. Part (i) is anatomical and is not operationalizable with public data; part (ii) is tested here by genetic species delimitation, which did not exist in 1917 (modern reinterpretation: 'separate species' is read as a separately evolving, reproductively isolated lineage, detectable as a deep, reciprocally separated mitochondrial divergence comparable to that between other accepted Schistosoma species). GenBank species labels for sequenced adult worms rest on life-cycle, host and multilocus data, not only on egg-spine position, which limits the circularity noted by the assessors.",
+  "datasets": [
+    {
+      "id": "ncbi-genbank-schistosoma-cox1",
+      "name": "NCBI GenBank nucleotide records: Schistosoma cox1 (cytochrome c oxidase subunit I) sequences, 400-2000 bp, sampled 2026-10-31",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/nuccore/",
+      "doi": null,
+      "version": "GenBank as of 2026-10-31; esearch counts: S. mansoni 408, S. haematobium 384, S. bovis 336, S. rodhaini 10, S. japonicum 34, S. curassoni 88, S. guineensis 5, S. intercalatum 4, S. mattheei 6",
+      "license": "NCBI data are public domain (no restrictions on reuse)",
+      "files": [
+        {
+          "name": "derived/schistosoma_cox1.fasta (145 records; accessions listed in derived/accessions.csv)",
+          "download_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&rettype=fasta&retmode=text&id=<accessions from derived/accessions.csv>; selection by esearch term \"<species>\"[Organism] AND (cox1[Gene] OR COI[Gene] OR COX1[Gene] OR \"cytochrome c oxidase subunit I\"[Title] OR \"cytochrome oxidase subunit 1\"[Title] OR \"cytochrome c oxidase subunit 1\"[Title]) AND 400:2000[SLEN] NOT hybrid[Title] NOT cDNA[Title] NOT mRNA[Title] NOT EST[Keyword] NOT genome[Title], subsampled with random.Random(20261031)",
+          "retrieved_at": "2026-10-31T05:01:47Z",
+          "byte_size": 128348,
+          "sha256": "1677f5246fd78f7fab86720802acac068e0aa6843aba958232dd21a005644c09",
+          "role": "cox1 sequences of 40 S. mansoni, 40 S. haematobium, 20 S. bovis, 10 S. rodhaini, 10 S. japonicum, 10 S. curassoni, 5 S. guineensis, 4 S. intercalatum, 6 S. mattheei"
+        }
+      ],
+      "role": "mitochondrial divergence within and between nominal Schistosoma species"
+    }
+  ],
+  "method": "fetch.py queries NCBI E-utilities for cox1 records of each nominal species, subsamples them with a fixed seed, and writes the FASTA (committed, 128 KB) and an accession list. analysis.py aligns every pair of sequences locally (Biopython PairwiseAligner, both orientations), computes the uncorrected p-distance over aligned A/C/G/T columns (pairs with < 300 such columns discarded; 9354 of 10440 pairs retained), and summarises distances within S. mansoni, within S. haematobium, between them, and between recognised species pairs (S. haematobium vs S. bovis, S. mansoni vs S. rodhaini, and others) for calibration.",
+  "measured": {
+    "value": 0.1676,
+    "unit": "mean uncorrected cox1 p-distance, S. mansoni vs S. haematobium",
+    "n": 1481,
+    "uncertainty": "range 0.1475-0.2054 over 1481 sequence pairs (40 x 40 sequences)",
+    "extra": {
+      "within_mansoni": {"n_pairs": 767, "mean": 0.0222, "max": 0.0712},
+      "within_haematobium": {"n_pairs": 780, "mean": 0.0067, "max": 0.0638},
+      "barcode_gap": true,
+      "min_between_over_max_within": 0.1475,
+      "recognised_species_pairs_mean": {"haematobium_vs_bovis": 0.1039, "mansoni_vs_rodhaini": 0.1173, "haematobium_vs_curassoni": 0.1042, "haematobium_vs_guineensis": 0.1043, "haematobium_vs_intercalatum": 0.1084, "mansoni_vs_japonicum": 0.2001},
+      "within_other_species_mean": {"bovis": 0.0076, "rodhaini": 0.0036, "curassoni": 0.009}
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.97,
+  "caveats": [
+    "Only the taxonomic conclusion of the claim is tested. Whether the lateral spine is moulded in a funnel-shaped part of the ootype/uterus (the mechanism Thompson takes from Looss) is not addressed by sequence data; but since the two egg types belong to lineages about 17% divergent in cox1, more than the divergence between other accepted Schistosoma species, the egg forms cannot be variants of one species whatever their mechanical origin.",
+    "Mitochondrial distance is one line of evidence; the same conclusion is standard from nuclear genomes, chromosome structure, intermediate-host specificity (Biomphalaria vs Bulinus) and the absence of fertile S. mansoni x S. haematobium hybrids. Those were not re-analysed here.",
+    "GenBank species labels are taken at face value. A few unusually divergent 'within-species' pairs (max 7.1% within S. mansoni, 6.4% within S. haematobium, one S. japonicum sequence 25% from the rest) probably reflect mislabelled or atypical records; they make the within-species range wider, i.e. work against the verdict, which is nonetheless reached with a wide margin.",
+    "The sequenced cox1 regions vary between studies; distances were computed only on overlapping aligned columns (>= 300), and 10% of pairs with no sufficient overlap were dropped.",
+    "The test is a modern reinterpretation: Thompson (following Looss) argued from egg morphology and uterine anatomy; genetic species concepts post-date him."
+  ],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5-1-thinking-high", "run": "cursor/thompson-claim-tests-6e84", "date": "2026-10-31" }
+}

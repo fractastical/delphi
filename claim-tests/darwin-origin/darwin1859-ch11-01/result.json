@@ -1,0 +1,153 @@
+{
+  "claim_id": "darwin1859-ch11-01",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch11-01",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "Across regions of the world, the taxonomic similarity of their biotas is explained by which land mass they belong to (shared history and barriers) rather than by the similarity of their climates; in particular, climatically matched regions on different continents (e.g. the Mediterranean-climate belts of Australia, South Africa and Chile) share fewer taxa than climatically different regions on the same continent.",
+  "pass_criterion": "Pre-registered. For the 23 regions in derived/regions.csv (5x5 degree boxes, pre-assigned to a continent and to one of six climate classes), genus lists of mammals, birds and vascular plants are taken from GBIF occurrences (genera with >= 3 georeferenced records in the box), and climate from the NASA POWER climatology (annual mean 2 m temperature, annual precipitation, seasonal temperature range at five points per box). For each taxon group, pairwise Jaccard dissimilarity between regions is regressed on standardised climate distance and a same-continent indicator (permutation test over region labels, 2000 permutations). The claim is SUPPORTED if, in at least 2 of the 3 taxon groups, (a) the same-continent effect is significant (p < 0.05) and its partial R-squared exceeds that of climate distance, and (b) the mean Jaccard similarity of climate-matched pairs on different continents is lower than the mean similarity of climate-mismatched pairs on the same continent.",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if, in at least 2 of the 3 taxon groups, climate distance has the larger partial R-squared and the same-continent effect is not significant, or climate-matched cross-continental pairs are more similar than climate-mismatched same-continent pairs. Other outcomes are 'mixed'. If GBIF returns fewer than 20 genera for a region/group, that region is dropped for that group; if fewer than 15 regions remain for a group, the group is not evaluated.",
+  "planned_datasets": [
+    "gbif-occurrence-api",
+    "nasa-power-climatology"
+  ],
+  "interpretation": "Darwin's 'inhabitants of various regions' are read as the genus-level composition of three well-recorded groups (Mammalia, Aves, Tracheophyta); 'climatal and other physical conditions' as the NASA POWER temperature and precipitation climatology; 'similarity' as Jaccard similarity of genus lists. His 'accounted for' is read comparatively: climate distance should explain less of the variation in biotic similarity than does being on the same land mass, and his own example (Australia, South Africa, western South America at 25-35 degrees S) is tested directly as the climate-matched cross-continental pairs. The absolute wording ('neither ... nor ... can be accounted for') is not testable as stated because climate obviously limits distributions within a continent; the comparative reading is the one tested. Regions and climate classes were fixed before any data were retrieved. GBIF records include introduced species, which inflate cross-continental similarity and therefore work against the claim.",
+  "datasets": [
+    {
+      "id": "gbif-occurrence-api",
+      "name": "GBIF occurrence search API (genus facets within bounding boxes)",
+      "landing_url": "https://www.gbif.org/occurrence/search",
+      "doi": null,
+      "version": null,
+      "license": "varies by dataset (CC0 / CC BY / CC BY-NC); aggregate counts only",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?... (one call per region/group; full list with per-call SHA-256 in derived/files.json)",
+          "retrieved_at": "2026-10-31T04:36:07Z",
+          "byte_size": 1456878,
+          "sha256": "e6f0c7cf9813bd30da63586c080fe606f83eeaa1fbed018b5592b23f292ab8c7",
+          "note": "69 API responses; sha256 is the SHA-256 of the concatenated per-response SHA-256 hex digests"
+        }
+      ],
+      "role": "genus lists of mammals, birds and vascular plants per region"
+    },
+    {
+      "id": "nasa-power-climatology",
+      "name": "NASA POWER climatology API (temporal/climatology/point)",
+      "landing_url": "https://power.larc.nasa.gov/",
+      "doi": null,
+      "version": null,
+      "license": "public domain (NASA)",
+      "files": [
+        {
+          "download_url": "https://power.larc.nasa.gov/api/temporal/climatology/point?... (one call per region/group; full list with per-call SHA-256 in derived/files.json)",
+          "retrieved_at": "2026-10-31T04:35:28Z",
+          "byte_size": 120063,
+          "sha256": "18a1f490a5e95eecfce74a592281932a743dfa018ba869d57b587cb1808c3a28",
+          "note": "115 API responses; sha256 is the SHA-256 of the concatenated per-response SHA-256 hex digests"
+        }
+      ],
+      "role": "temperature and precipitation climatology per region"
+    }
+  ],
+  "method": "Genus lists for Mammalia, Aves and Tracheophyta were obtained for the 23 pre-registered 5x5 degree regions from GBIF genus facets (genera with >= 3 georeferenced, non-flagged, present records); climate was summarised from NASA POWER climatology at five points per box (annual mean T2M, annual precipitation, seasonal temperature range), standardised (log precipitation) and converted to Euclidean climate distance. Pairwise Jaccard dissimilarity (253 pairs) was regressed on climate distance and a same-continent indicator with a Mantel-type permutation test (2000 permutations of region labels), and partial R-squared values compared; separately, the mean similarity of climate-matched cross-continental pairs was compared with climate-mismatched same-continent pairs. Central Arabia was dropped for mammals (17 genera < 20).",
+  "measured": {
+    "value": 2,
+    "unit": "taxon groups (of 3) in which same-continent membership outweighs climate distance and climate-matched cross-continental pairs are less similar than climate-mismatched same-continent pairs",
+    "n": 253,
+    "uncertainty": "permutation p-values per group in extra",
+    "extra": {
+      "groups": {
+        "Mammalia": {
+          "evaluated": true,
+          "regions": 22,
+          "regions_dropped": [
+            "ASI_ARABIA"
+          ],
+          "median_genera_per_region": 103.5,
+          "beta_climate": 0.02404,
+          "beta_same_continent": -0.21683,
+          "r2_full": 0.6149,
+          "partial_r2_climate": 0.04929,
+          "partial_r2_same_continent": 0.53121,
+          "p_climate": 0.0045,
+          "p_same_continent": 0.0005,
+          "mean_similarity_climate_matched_cross_continent": 0.09609,
+          "n_pairs_climate_matched_cross_continent": 33,
+          "mean_similarity_climate_mismatched_same_continent": 0.30242,
+          "n_pairs_climate_mismatched_same_continent": 32,
+          "mannwhitney_p_matched_cross_less_than_mismatched_same": 0.0,
+          "darwin_triad_mean_similarity_AUS_SW_AFR_CAPE_SAM_CHILE": 0.1589,
+          "condition_a_continent_dominates": true,
+          "condition_b_matched_cross_lt_mismatched_same": true,
+          "passes_both": true,
+          "fails": false
+        },
+        "Aves": {
+          "evaluated": true,
+          "regions": 23,
+          "regions_dropped": [],
+          "median_genera_per_region": 268.0,
+          "beta_climate": 0.02545,
+          "beta_same_continent": -0.35298,
+          "r2_full": 0.63043,
+          "partial_r2_climate": 0.03023,
+          "partial_r2_same_continent": 0.57215,
+          "p_climate": 0.04048,
+          "p_same_continent": 0.0005,
+          "mean_similarity_climate_matched_cross_continent": 0.21836,
+          "n_pairs_climate_matched_cross_continent": 36,
+          "mean_similarity_climate_mismatched_same_continent": 0.56727,
+          "n_pairs_climate_mismatched_same_continent": 34,
+          "mannwhitney_p_matched_cross_less_than_mismatched_same": 0.0,
+          "darwin_triad_mean_similarity_AUS_SW_AFR_CAPE_SAM_CHILE": 0.23508,
+          "condition_a_continent_dominates": true,
+          "condition_b_matched_cross_lt_mismatched_same": true,
+          "passes_both": true,
+          "fails": false
+        },
+        "Tracheophyta": {
+          "evaluated": true,
+          "regions": 23,
+          "regions_dropped": [],
+          "median_genera_per_region": 1377.0,
+          "beta_climate": 0.05719,
+          "beta_same_continent": -0.08755,
+          "r2_full": 0.48292,
+          "partial_r2_climate": 0.36437,
+          "partial_r2_same_continent": 0.08401,
+          "p_climate": 0.0005,
+          "p_same_continent": 0.0005,
+          "mean_similarity_climate_matched_cross_continent": 0.23273,
+          "n_pairs_climate_matched_cross_continent": 36,
+          "mean_similarity_climate_mismatched_same_continent": 0.26743,
+          "n_pairs_climate_mismatched_same_continent": 34,
+          "mannwhitney_p_matched_cross_less_than_mismatched_same": 0.11195,
+          "darwin_triad_mean_similarity_AUS_SW_AFR_CAPE_SAM_CHILE": 0.25416,
+          "condition_a_continent_dominates": false,
+          "condition_b_matched_cross_lt_mismatched_same": true,
+          "passes_both": false,
+          "fails": false
+        }
+      },
+      "n_regions": 23,
+      "n_permutations": 2000,
+      "seed": 20261031,
+      "rule_based_verdict": "supports"
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.75,
+  "caveats": [
+    "For vascular plants the result is reversed: climate distance explains more of the genus-level dissimilarity (partial R2 0.36) than continent (0.08), although the same-continent effect is still significant and climate-matched cross-continental pairs are still (non-significantly) less similar than mismatched same-continent pairs. Genus-level plant composition is strongly shared across continents (cosmopolitan and Holarctic genera, plus introduced species in GBIF), so the claim holds for mammals and birds but not, at genus rank, for plants.",
+    "GBIF occurrences include introduced and vagrant taxa and uneven sampling; the >= 3 record filter removes only the rarest. Introduced species inflate cross-continental similarity and bias the test against the claim.",
+    "Climate is summarised by three variables from a 0.5 degree reanalysis-based climatology at five points per box; finer climatic structure (soils, topography) is not represented. The 'same continent' indicator also absorbs geographic distance, which Darwin treated as part of the same explanation (barriers and history).",
+    "Darwin's own triad (SW Australia, Western Cape, central Chile) shares a mean of 16% of mammal genera and 24% of bird genera, versus 30% and 57% for climatically different regions on the same continent.",
+    "The absolute wording of the claim is not tested; the comparative reading (continent outweighs climate) is."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-b201",
+    "date": "2026-10-31"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "claim_id": "darwin1859-ch13-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch13-08",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "If distinct lineages adapted to similar conditions converge in external form, then among bird species from different orders, pairs sharing an ecological niche should be closer in external morphology than pairs with different niches; external morphology should predict ecological niche better than it predicts order (deep ancestry), yet within an order it should still predict family membership well above chance.",
+  "pass_criterion": "Using AVONET (Tobias et al. 2022) species-level external measurements (beak length culmen, beak length nares, beak width, beak depth, tarsus length, wing length, Kipp's distance, secondary1, hand-wing index, tail length, body mass; log-transformed and z-scored) and AVONET ecological categories (trophic niche, primary lifestyle, habitat), three clauses are tested. (a) Convergence: among all between-order species pairs, the mean standardized Euclidean morphological distance of pairs with identical niche (same trophic niche AND same primary lifestyle) is at least 10% smaller than that of pairs with different trophic niche AND different primary lifestyle, with a permutation p < 0.01 (niche labels shuffled among species, 200 permutations). (b) Concealment between groups: leave-one-out k-nearest-neighbour (k = 5) prediction from morphology yields a Cohen's kappa for ecological niche (trophic niche x primary lifestyle combination) that is higher than the kappa for taxonomic order. (c) Affinity within groups: among orders with >= 3 families and >= 30 species, leave-one-out k-NN prediction of family from morphology (congeners excluded from the neighbour pool) gives kappa > 0.3 in a majority of such orders. Verdict 'supports' if all three clauses pass; 'mixed' if one or two pass; 'refutes' if none passes.",
+  "fail_criterion": "Clause (a) fails if same-niche between-order pairs are not at least 10% closer in morphology than different-niche pairs, or the permutation p >= 0.01. Clause (b) fails if morphology predicts order with kappa >= that for niche. Clause (c) fails if kappa for family within order is <= 0.3 in half or more of the eligible orders. No clause passing refutes the claim; (a) failing alone already refutes the central convergence statement and is reported as 'mixed' only if (b) or (c) pass.",
+  "planned_datasets": [
+    "avonet-tobias2022-figshare"
+  ],
+  "interpretation": "Darwin's 'very distinct lines of descent' is read as different bird orders; 'similar conditions' as the same AVONET trophic niche and primary lifestyle; 'close external resemblance' as proximity in the space of AVONET external measurements (bill, wing, tail, tarsus, mass), which are exactly the adaptive external characters Darwin had in mind. 'Almost worthless for classification between groups' is read comparatively: external form carries more information about ecology than about ordinal membership. 'Can indicate true affinity within a group' is read as external form still predicting family within an order. Only birds are tested (the claim is stated for animals generally); taxonomy (BirdLife/AVONET orders and families) is used as the measure of relatedness, which is a modern phylogenetically informed classification but not a dated tree.",
+  "datasets": [
+    {
+      "id": "avonet-tobias2022-figshare",
+      "name": "AVONET: morphological, ecological and geographical data for all birds (ELEData.zip, file TraitData/AVONET1_BirdLife.csv)",
+      "landing_url": "https://figshare.com/articles/dataset/AVONET_morphological_ecological_and_geographical_data_for_all_birds_Tobias_et_al_2021_Ecology_Letters_/16586228",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "version": "figshare v7; paper doi:10.1111/ele.13898",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://ndownloader.figshare.com/files/38429873",
+          "retrieved_at": "2026-10-31T04:33:00Z",
+          "byte_size": 17758930,
+          "sha256": "e7e76dbe5c389753ff73a70d8a09b5fa01a15e75f359b34b01e2602b85e88f32"
+        }
+      ],
+      "role": "external morphological measurements, trophic niche, primary lifestyle, BirdLife order and family for all bird species"
+    }
+  ],
+  "method": "AVONET1 (BirdLife taxonomy) species with complete values for 11 external measurements were log-transformed and z-scored (n = 10999). (a) For every between-order species pair the Euclidean distance was computed; the mean distance for pairs with identical trophic niche and primary lifestyle was compared with pairs differing in both, and the ratio was tested against 200 permutations of niche labels across species. (b) Leave-one-out 5-nearest-neighbour prediction from morphology was scored with Cohen's kappa for niche (trophic niche x lifestyle) and for order. (c) Within each order with >= 3 families and >= 30 species, family was predicted by LOO 5-NN with congeners excluded from the neighbour pool, and kappa recorded.",
+  "measured": {
+    "value": 0.7337421790640335,
+    "unit": "ratio of mean morphological distance, same-niche / different-niche between-order species pairs",
+    "n": 10999,
+    "uncertainty": "permutation p = 0.0050 (200 permutations); permutation ratios ranged 0.979-1.019",
+    "extra": {
+      "clause_a": {
+        "mean_dist_same_niche": 3.90972543018393,
+        "mean_dist_diff_niche": 5.328473054624177,
+        "n_pairs_same_niche": 3620370,
+        "n_pairs_diff_niche": 21170269,
+        "ratio": 0.7337421790640335,
+        "perm_p": 0.004975124378109453,
+        "pass": true
+      },
+      "clause_b": {
+        "kappa_niche": 0.6273356536895107,
+        "kappa_order": 0.937292571628471,
+        "accuracy_niche": 0.6885171379216293,
+        "accuracy_order": 0.9610873715792345,
+        "n_niche_classes": 35,
+        "n_orders": 36,
+        "pass": false
+      },
+      "clause_c": {
+        "n_eligible_orders": 15,
+        "n_orders_kappa_gt_0.3": 12,
+        "median_kappa_family": 0.5092518101367662,
+        "pass": true
+      }
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.75,
+  "caveats": [
+    "Birds only; Darwin's claim covers animals generally and plants by extension.",
+    "AVONET measurements are linear external dimensions and mass; 'close external resemblance' in Darwin's sense also covers colour, texture and overall habitus, which are not measured.",
+    "Ecological niche categories are coarse (10 trophic niches x 5 lifestyles) and were partly assigned with knowledge of morphology, which could inflate morphology-niche association.",
+    "Orders are used as 'very distinct lines of descent'; divergence times between orders vary widely and no dated tree was used.",
+    "k-NN kappa for order and for niche are not on identical footing (different class counts and class imbalance); kappa corrects for chance agreement but not fully for class structure.",
+    "Some AVONET trait values are inferred from congeners (Inference column); these were retained and slightly inflate within-genus similarity, which clause (c) mitigates by excluding congeners from the neighbour pool."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-0e75",
+    "date": "2026-10-31"
+  }
+}

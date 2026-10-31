@@ -1,0 +1,121 @@
+{
+  "claim_id": "darwin1859-ch07-04",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch07-04",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "If Darwin is right that the migratory instinct varies within species in extent and may be lost, then partial migration (some individuals or populations of a species migrate while others of the same species stay resident) is a common condition among birds rather than a rare anomaly, and species classified as partial migrants show measurably more winter presence inside their breeding latitudes than obligate migrants do.",
+  "pass_criterion": "Primary (AVONET, Tobias et al. 2022, BirdLife taxonomy sheet): P = share of bird species with a coded Migration score that are coded 2 (partially migratory) among all species, and Q = share coded 2 among non-sedentary species (score 2 or 3). Secondary (GBIF occurrence counts, Northern Hemisphere, years 2000 onward, non-fossil non-captive records, 5-degree latitude bands 0-80 N): for 12 pre-registered species, W = fraction of December-February records that fall in the latitude bands holding the central 80 % of June-July records (winter residency index). Partial-migrant set: Erithacus rubecula, Turdus merula, Sylvia atricapilla, Fringilla coelebs, Sturnus vulgaris, Turdus migratorius. Obligate-migrant set: Hirundo rustica, Apus apus, Phylloscopus trochilus, Setophaga striata, Tyrannus tyrannus, Cuculus canorus. Supports if P >= 0.20 and W is higher in the partial-migrant set than in the obligate set by a one-sided Mann-Whitney test at p < 0.05 with median W of the partial set >= 0.25.",
+  "fail_criterion": "Refutes if P < 0.05 (within-species variation in migratory extent is a rare anomaly) or if the obligate set has median W >= the partial set (the trait classification does not correspond to any measurable difference in winter residency). Otherwise mixed. The nest-construction clause is not tested (no public, geographically coded nest-architecture dataset at the within-species level was identified) and is recorded as untested in caveats.",
+  "planned_datasets": [
+    "avonet-supplementary-dataset-1",
+    "gbif-occurrence-api-birds"
+  ],
+  "interpretation": "Darwin's examples of instinct variation are migration (extent, direction, total loss) and nest form; this test addresses the migration example only. 'Varies within species in a state of nature' is operationalised as partial migration: a species whose populations or individuals differ in whether or how far they migrate. AVONET's Migration score (1 sedentary, 2 partially migratory, 3 migratory) is an expert synthesis from handbooks; it is used for the global prevalence P. The GBIF index W checks that this classification corresponds to an observable pattern: a species whose individuals all migrate should have few winter records at breeding latitudes, whereas a partial migrant retains many. Recent records (2000 onward) are used because eBird dominates GBIF bird data and gives dense year-round coverage; the Northern Hemisphere restriction avoids mixing austral seasons. Latitude bands are global in longitude, so for species occurring on more than one continent (Sturnus vulgaris, introduced in North America) the index pools populations. Thresholds: 20 % of all bird species being partial migrants is taken as 'common'; 5 % as 'rare'. Direction of migration and the evolutionary loss of migration are not measured separately, since occurrence data cannot attribute a wintering bird to its breeding population.",
+  "datasets": [
+    {
+      "id": "avonet-supplementary-dataset-1",
+      "name": "AVONET: morphological, ecological and geographical data for all birds (Tobias et al. 2022), Supplementary dataset 1, sheet AVONET1_BirdLife, column Migration",
+      "landing_url": "https://figshare.com/articles/dataset/AVONET_morphological_ecological_and_geographical_data_for_all_birds_Tobias_et_al_2021_Ecology_Letters_/16586228",
+      "doi": "10.1111/ele.13898",
+      "version": "Figshare file 34480856",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://ndownloader.figshare.com/files/34480856",
+          "retrieved_at": "2026-10-31T05:27:08Z",
+          "byte_size": 21524673,
+          "sha256": "eb645e83dddb40f1654a3e8d721998dbca76eff540231b7b809267c1e96f8d3e"
+        }
+      ],
+      "role": "Migration score (1 sedentary, 2 partially migratory, 3 migratory) for 10,986 species in the BirdLife taxonomy"
+    },
+    {
+      "id": "gbif-occurrence-api-birds",
+      "name": "GBIF occurrence search API: record counts per 5-degree latitude band (0-80 N), years 2000-2030, months 6-7 and 12-2, non-fossil non-captive georeferenced records, for 12 species",
+      "landing_url": "https://www.gbif.org/occurrence/search",
+      "doi": null,
+      "version": "live API snapshot, retrieved 2026-10-31",
+      "license": "per-dataset CC0 / CC BY / CC BY-NC (GBIF aggregate terms)",
+      "files": [],
+      "role": "winter residency index W per species; all 576 band-count calls and 12 name-match calls with checksums are listed in derived/requests.csv, band counts in derived/gbif_latitude_bands.csv"
+    }
+  ],
+  "method": "analysis.py downloads the AVONET xlsx, reads the Migration column of the AVONET1_BirdLife sheet and computes P (share coded 2 among all scored species) and Q (share coded 2 among species coded 2 or 3), plus a per-order table (derived/avonet_migration_by_order.csv). For each of the 12 pre-registered species it resolves the GBIF taxon key and counts records in sixteen 5-degree latitude bands from 0 to 80 N for June-July and for December plus January-February (GBIF month ranges cannot wrap the year, so winter is two calls). The summer core is the set of bands overlapping the 10th-90th percentile of summer records; W is the share of winter records in those bands. Partial and obligate sets are compared with a one-sided Mann-Whitney U test. The verdict follows the pre-registered thresholds (P 0.20 / 0.05; W medians; p < 0.05).",
+  "measured": {
+    "value": 0.1089,
+    "unit": "share of bird species coded as partially migratory (AVONET Migration = 2) among all species with a migration score",
+    "n": 10986,
+    "uncertainty": "AVONET expert coding; GBIF winter residency index from 5-degree band counts (eBird-dominated, effort-biased)",
+    "extra": {
+      "avonet_sheet": "AVONET1_BirdLife",
+      "n_sedentary": 8804,
+      "n_partial": 1196,
+      "n_migratory": 986,
+      "share_partial_among_nonsedentary_Q": 0.5481,
+      "share_nonsedentary": 0.1986,
+      "avonet_migration_code_of_test_species": {
+        "Erithacus rubecula": 3,
+        "Turdus merula": 1,
+        "Sylvia atricapilla": 3,
+        "Fringilla coelebs": 2,
+        "Sturnus vulgaris": 2,
+        "Turdus migratorius": 3,
+        "Hirundo rustica": 3,
+        "Apus apus": 3,
+        "Phylloscopus trochilus": 3,
+        "Setophaga striata": 3,
+        "Tyrannus tyrannus": 3,
+        "Cuculus canorus": 3
+      },
+      "winter_residency_index_W": {
+        "Erithacus rubecula": 0.9148,
+        "Turdus merula": 0.8829,
+        "Sylvia atricapilla": 0.5376,
+        "Fringilla coelebs": 0.9298,
+        "Sturnus vulgaris": 0.8293,
+        "Turdus migratorius": 0.7945,
+        "Hirundo rustica": 0.2189,
+        "Apus apus": 0.3808,
+        "Phylloscopus trochilus": 0.3928,
+        "Setophaga striata": 0.036,
+        "Tyrannus tyrannus": 0.0187,
+        "Cuculus canorus": 0.715
+      },
+      "summer_minus_winter_mean_latitude_deg": {
+        "Erithacus rubecula": 2.93,
+        "Turdus merula": 0.09,
+        "Sylvia atricapilla": 8.74,
+        "Fringilla coelebs": 4.13,
+        "Sturnus vulgaris": 2.12,
+        "Turdus migratorius": 3.73,
+        "Hirundo rustica": 23.03,
+        "Apus apus": 15.78,
+        "Phylloscopus trochilus": 29.47,
+        "Setophaga striata": 42.29,
+        "Tyrannus tyrannus": 33.48,
+        "Cuculus canorus": 9.29
+      },
+      "median_W_partial_set": 0.8561,
+      "median_W_obligate_set": 0.2998,
+      "mann_whitney_U": 35.0,
+      "mann_whitney_p_one_sided": 0.0021645021645021645,
+      "verdict_by_rule": "mixed"
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.7,
+  "caveats": [
+    "P = 1196 / 10986 = 10.9 % of all bird species are coded as partial migrants, below the pre-registered 20 % 'common' threshold but far above the 5 % 'rare' threshold, so the primary criterion lands in the mixed zone. The threshold was set against all birds, most of which (80 %) are sedentary tropical species for which the migratory instinct does not arise; among the 2,182 species that migrate at all, 54.8 % (Q) are partial migrants, i.e. within-species variation in migratory extent is the majority condition among migrants. Had the pre-registration used Q the verdict would have been supports; it is reported as mixed because the rule is fixed in advance.",
+    "The secondary GBIF test passes clearly: median winter residency index W = 0.8561 for the six species pre-registered as partial migrants versus 0.2998 for the six obligate long-distance migrants (one-sided Mann-Whitney p = 0.0022). Winter records per summer record in the breeding core are 0.37-2.5 for the partial set versus 0.0007-0.11 for the obligate set, so the pattern Darwin described (some individuals of a species stay where others leave) is directly visible in occurrence data.",
+    "AVONET's codes for the six species I pre-registered as partial migrants are 3, 1, 3, 2, 2, 3 (Erithacus rubecula, Turdus merula and Sylvia atricapilla are coded fully migratory, Turdus merula sedentary), illustrating that a single species-level code compresses continuous within-species variation and will be assigned by predominant behaviour; this makes P a conservative estimate of how many species show some within-species variation in migration.",
+    "W for obligate migrants is inflated by a small number of winter records that are probably misidentifications, stragglers or data errors (e.g. Cuculus canorus W = 0.72 from 4,863 winter records against 579,201 summer records, a 0.8 % ratio); W is a ratio among winter records only and does not weight by how few they are. The winter/summer ratio reported above corrects for this.",
+    "The 'direction' and 'total loss' components of Darwin's migration example are not measured separately: occurrence counts cannot assign a wintering bird to its breeding population, and AVONET has no population-level codes. The nest-construction clause is untested; no public, within-species, geographically coded nest-architecture dataset was identified (NestWatch and BTO Nest Record Scheme data require application).",
+    "eBird dominates GBIF bird records, so counts reflect observer effort as much as bird abundance; the latitude-band design pools longitudes and continents (relevant for Sturnus vulgaris, native in Eurasia and introduced in North America, both populations partially migratory)."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-6221",
+    "date": "2026-10-31"
+  }
+}

@@ -13,8 +13,11 @@ Don't grep TriG files or hand-write SPARQL first. Use the `delphisci` MCP server
 2. `delphi_search_claims` (`mathOnly: true` for formal statements) or `delphi_get_claim`.
 3. `delphi_rank_claims` with an assessment type, e.g. `dataset-resolvability/0.1.0`.
 4. `delphi_graph` for thinker/year/status views and model truth scores (from `docs/claims.json`).
+5. `delphi_organisms` / `delphi_get_organism` for the animal taxa, their vendored datasets and the
+   per-taxon dataset-coverage ranking (genome, bioelectric, traits, fossils, …).
 
-Without MCP, the same queries are available as `node mcp/cli.mjs <overview|search|claim|rank|graph|sparql>`.
+Without MCP, the same queries are available as
+`node mcp/cli.mjs <overview|search|claim|rank|graph|organisms|organism|sparql>`.
 Outside the repo, `npx -y github:fractastical/delphi` runs the same server.
 
 Default `source` is `local` (repo files, including unpublished drafts). Pass `source: "network"`
@@ -26,6 +29,9 @@ for what is actually published. Details, ranking semantics and known gaps:
 - `darwin-origin/`: 247 claims from *On the Origin of Species*, with dataset-resolvability assessments.
 - `math-bio-theorems/`: key theorem claims of mathematical-biology thinkers, with LaTeX math.
 - `thompson-growth-form/`, `wolfram-nks/`: in progress.
+- `organisms/`: every animal taxon Darwin and Thompson mention (782 taxa, 3,340 located mentions),
+  resolved to GBIF/NCBI/Wikidata/WoRMS/PBDB, with 1,372 provenanced dataset records (occurrence
+  counts, genomes, trait databases). Merged view in `organisms/merged/`; see `organisms/README.md`.
 - `agent/`: Discord agent. `docs/`: claim graph site. `chats/`: transcripts of past agent sessions.
 
 Publishing signs with the operator's ORCID key and cannot be undone; ask before publishing to production.

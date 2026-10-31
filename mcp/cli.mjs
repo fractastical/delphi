@@ -8,9 +8,14 @@
 //   node mcp/cli.mjs graph --thinker turing --sort disagreement
 //   node mcp/cli.mjs graph --group-by thinker
 //   node mcp/cli.mjs sparql 'SELECT ...'
+//   node mcp/cli.mjs organisms --overview
+//   node mcp/cli.mjs organisms --has-axis genome --missing-axis traits --rank species
+//   node mcp/cli.mjs organisms --group-by class
+//   node mcp/cli.mjs organism columba-livia
 
 import { browseClaims } from "./graph.mjs";
 import { getClaim, overview, rankClaims, searchClaims, sparql } from "./lib.mjs";
+import { browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const opts = {};
@@ -31,6 +36,12 @@ const commands = {
   rank: () => rankClaims({ type: positional[0], ...opts }),
   graph: () => browseClaims({ text: positional[0], ...opts }),
   sparql: () => sparql(positional[0] ?? opts.query, opts.source),
+  organisms: () => opts.overview ? organismsOverview() : browseOrganisms({
+    text: positional[0], ...opts,
+    hasAxis: opts.hasAxis ? String(opts.hasAxis).split(",") : [],
+    missingAxis: opts.missingAxis ? String(opts.missingAxis).split(",") : [],
+  }),
+  organism: () => getOrganism({ id: positional[0] ?? opts.id, includeMentions: opts.includeMentions !== false }),
 };
 
 if (!commands[cmd]) {

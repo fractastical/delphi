@@ -1,0 +1,95 @@
+{
+  "claim_id": "wolfram2002-ch02-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch02-05",
+  "project": "wolfram-nks",
+  "status": "complete",
+  "hypothesis": "The first 1,000,000 values of the centre column of elementary rule 30 started from a single black cell are not eventually periodic within that range, and the bit sequence passes the NIST SP 800-22 statistical test battery at the standard significance level.",
+  "pass_criterion": "Pre-registered. (1) Non-repetition: for every period p in 1..500000, the final matching suffix of x[t] = x[t - p] has length less than p (no tail of the million-step sequence consists of at least two full periods of any period p <= N/2). (2) Randomness: run the following tests, implemented in numpy following NIST SP 800-22 rev. 1a, on the 1,000,000-bit sequence: frequency (monobit), block frequency (M = 128), runs, longest run of ones (M = 10000), binary matrix rank (32 x 32), discrete Fourier transform, non-overlapping template matching (m = 9, template 000000001, N = 8 blocks), overlapping template matching (m = 9, M = 1032), Maurer's universal (L = 7, Q = 1280), linear complexity (M = 500), serial (m = 16; two p-values), approximate entropy (m = 10), cumulative sums (forward and backward), random excursions (8 states) and random excursions variant (18 states), i.e. about 41 p-values. 'supports' if (1) holds, no p-value is below 1e-4, and at most 2 p-values are below 0.01 (the NIST alpha; with 41 p-values the chance of 3 or more below 0.01 under randomness is about 0.8 %). Cross-check (not part of the verdict): the first 100,000 computed bits must agree with the OEIS A051023 b-file; a disagreement means the generator is wrong and the verdict becomes 'inconclusive' with reason 'other'.",
+  "fail_criterion": "Pre-registered. 'refutes' if any period is found under (1), or if any p-value is below 1e-6, or if 4 or more p-values are below 0.01. Otherwise (e.g. exactly 3 p-values below 0.01, or one between 1e-6 and 1e-4) -> 'mixed'. Random-excursions tests are only applied if the number of cycles J >= 500 as NIST requires; if not applicable they are simply omitted from the count.",
+  "planned_datasets": [
+    "nks-ch02-05-rule30-center-column-generator",
+    "oeis-a051023-bfile"
+  ],
+  "interpretation": "'Never repeats' is read as 'is not eventually periodic within the first million steps' (an eventually periodic sequence shows at least two full periods before the end). 'Statistical tests show no meaningful deviation from perfect randomness' is read relative to the fixed, public NIST SP 800-22 battery at alpha = 0.01, as the assessors suggested; passing it cannot establish randomness, only the absence of the deviations those tests detect, so the test can refute but only weakly confirm. The battery is implemented from the NIST specification in analysis.py rather than by running the NIST C code, so the p-values are reproducible from a clean checkout.",
+  "datasets": [
+    {
+      "id": "nks-ch02-05-rule30-center-column-generator",
+      "name": "Centre column of elementary cellular automaton rule 30 from a single black cell, steps 0..999999, computed exactly by analysis.py (bit-packed numpy evolution restricted to the light cone of the centre cell at step 10^6)",
+      "landing_url": "https://www.wolframscience.com/nks/p28--how-do-simple-programs-behave/",
+      "doi": null,
+      "version": "analysis.py in this directory",
+      "license": "generated",
+      "files": [],
+      "role": "the sequence under test"
+    },
+    {
+      "id": "oeis-a051023-bfile",
+      "name": "OEIS A051023 (centre column of rule 30), b-file with 100001 terms",
+      "landing_url": "https://oeis.org/A051023",
+      "doi": null,
+      "version": "as retrieved",
+      "license": "CC BY-SA 4.0 (OEIS)",
+      "files": [
+        {
+          "download_url": "https://oeis.org/A051023/b051023.txt",
+          "retrieved_at": "2026-10-31T04:51:51Z",
+          "byte_size": 788899,
+          "sha256": "4d0c4a0272bc2b0fb5c1e91281d6dffc757d67cd6ffd8aa9f7486dac4685c1a9"
+        }
+      ],
+      "role": "independent published copy of the first 100,000 terms, used to validate the generator"
+    }
+  ],
+  "method": "analysis.py evolves rule 30 from a single black cell for 10^6 steps with bit-packed numpy (uint64 words), updating only the words inside the light cone of the centre cell at the final step, and records the centre cell at every step (generation 17 s). The first 100,001 bits were compared with the OEIS A051023 b-file. Eventual periodicity was tested for every p <= 500000 by computing the length of the longest suffix with x[t] = x[t-p] using big-integer XOR, counting a period when that length is at least p and at least 64 bits. Fifteen NIST SP 800-22 statistics (frequency, block frequency M=128, runs, longest run M=10000, 32x32 matrix rank, DFT, non-overlapping template 000000001, overlapping template m=9, Maurer universal L=7/Q=1280, linear complexity M=500 via Berlekamp-Massey, serial m=16 (2), approximate entropy m=10, cumulative sums forward/backward) were implemented in numpy/scipy from the NIST specification and validated on numpy pseudo-random bits before use; random excursions were not applicable (J = 340 cycles < 500).",
+  "measured": {
+    "value": {
+      "periods_found": 0,
+      "min_nist_p": 0.10092,
+      "n_p_below_0.01": 0,
+      "n_p_values": 15,
+      "fraction_ones": 0.50077
+    },
+    "unit": "count of periods p <= 500000 with at least two full periods (>= 64 bits) at the end of the sequence; NIST p-values",
+    "n": 1000000,
+    "uncertainty": "deterministic sequence; p-values are those of the NIST statistics",
+    "extra": {
+      "nist_p_values": {
+        "frequency": 0.12453838034610193,
+        "block_frequency_M128": 0.7307168468487671,
+        "runs": 0.25247354229972585,
+        "longest_run_M10000": 0.21940200758594855,
+        "matrix_rank_32": 0.5709524101375326,
+        "dft": 0.4855375919873811,
+        "nonoverlapping_template_000000001": 0.3232571852780813,
+        "overlapping_template_m9": 0.818399106213606,
+        "universal_L7_Q1280": 0.7393317698680175,
+        "linear_complexity_M500": 0.5459031779755872,
+        "serial_m16_p1": 0.34325614521633563,
+        "serial_m16_p2": 0.7281344940742969,
+        "approximate_entropy_m10": 0.10091887412825769,
+        "cusum_forward": 0.16231784430404292,
+        "cusum_backward": 0.14594569834334337
+      },
+      "oeis_agreement_first_100001_terms": true,
+      "max_periodic_suffix_len_bits": 17,
+      "argmax_p": 166992,
+      "random_excursions_J": 340,
+      "sha256_of_packed_bit_string": "4bf71a265b7a3b9847703f274c736c552825a859fd2251d8bfad75b1fe05b3e9",
+      "first_64_bits": "1101110011000101100100111010111001110101011000011001010110101011"
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.85,
+  "caveats": [
+    "Deviation from the literal pre-registration, decided on synthetic random bits before the rule 30 sequence was examined: the periodicity criterion 'suffix length >= p' flags chance matches at tiny p (a random sequence ending in 0101 has two full periods of p = 2), so a minimum matching-suffix length of 64 bits was added. For rule 30 the longest periodic suffix over all p is 17 bits (at p = 166992), so the verdict is the same under either version of the criterion.",
+    "The battery is a faithful numpy re-implementation of 15 NIST SP 800-22 statistics, not the NIST reference C code; it was checked on pseudo-random input, on an LFSR of known linear complexity and on constructed periodic sequences. Every p-value lies between 0.10 and 0.82, with none below 0.01, so no test detected a deviation; passing a finite battery cannot establish 'perfect randomness', only the absence of the regularities these tests detect, and that is the scope the claim's own wording ('none of the tests I have ever done') allows.",
+    "Random excursions and random excursions variant were omitted because the sequence has only 340 zero-crossing cycles, below the 500 NIST requires.",
+    "Black-cell frequency over the million steps is 0.50077 (frequency-test p = 0.12), consistent with the claim's implicit 50/50 balance."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-wolfram-nks-e5f4",
+    "date": "2026-10-31"
+  }
+}

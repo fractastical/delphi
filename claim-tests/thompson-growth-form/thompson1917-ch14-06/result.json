@@ -1,0 +1,78 @@
+{
+  "claim_id": "thompson1917-ch14-06",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch14-06",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "Within one species, heads (or cones) carrying a given parastichy pair are split about equally between the two chiralities: the larger parastichy family runs clockwise in roughly half of specimens and anticlockwise in the other half, as in Thompson's 224 right-handed versus 243 left-handed among 467 five-eight spruce cones.",
+  "pass_criterion": "Pre-registered. In the Turing's Sunflowers data (Helianthus annuus), restrict to heads with both a clockwise and an anticlockwise parastichy count that together form an adjacent pair of one Fibonacci-type sequence (Fibonacci, Lucas, double Fibonacci or F4, as defined by Swinton et al. 2016). Define a head as right-handed when its larger family is clockwise. Pooled over all such heads, the proportion p of right-handed heads must satisfy |p - 0.5| <= 0.10 and a two-sided exact binomial test against 0.5 must give P >= 0.05. In addition, in each pair class with n >= 20 heads, |p - 0.5| <= 0.15 or the binomial P >= 0.05. Primary counts are the photoreviewed counts (author's annotation file); the submitter counts are a secondary replication.",
+  "fail_criterion": "Pre-registered. Pooled |p - 0.5| > 0.10 with two-sided exact binomial P < 0.01 (a substantial and significant excess of one chirality), or the same pattern in the two most frequent pair classes. Any other outcome is 'mixed' (e.g. a small but significant bias with |p - 0.5| <= 0.10) or 'inconclusive' (fewer than 100 usable heads: underpowered).",
+  "planned_datasets": ["turings-sunflowers-dryad-f9k77"],
+  "interpretation": "Thompson's 'direction' of the five-series (right- versus left-handed spiral) is mapped to the chirality of the larger parastichy family of a Fibonacci-type pair, scored as clockwise or anticlockwise in a fixed viewing convention (the seed face of the head as photographed). Thompson's own counts are of Norway spruce cones; no public per-cone table of those counts exists, so the test is a replication in another phyllotactic system (sunflower capitula), which the claim explicitly extends to ('phyllotactic systems generally'). Thompson's own 224:243 split is reported alongside for comparison but is not used as data.",
+  "datasets": [
+    {
+      "id": "turings-sunflowers-dryad-f9k77",
+      "name": "Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Turing's Sunflowers)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "doi": "10.5061/dryad.f9k77",
+      "version": "1 (published 2016-04-19)",
+      "license": "CC0 1.0",
+      "paper_doi": "10.1098/rsos.160091",
+      "files": [
+        {
+          "name": "JS annotations for MSF007_Countdata.xlsx",
+          "download_url": "https://datadryad.org/downloads/file_stream/4662",
+          "retrieved_at": "2026-10-31T04:26:00Z",
+          "byte_size": 53848,
+          "sha256": "1ae05773075326e64bd110bdd5dd90a6d78986d2fdff67936532ac51167b883d",
+          "role": "photoreviewed parastichy counts JS.P1/JS.P2 with handedness H1/H2 (cw/ccw) for 738 submissions"
+        },
+        {
+          "name": "MSF007_SunflowerData_20151020_anonymised.xlsx",
+          "download_url": "https://datadryad.org/downloads/file_stream/4663",
+          "retrieved_at": "2026-10-31T04:26:00Z",
+          "byte_size": 108344,
+          "sha256": "b3df75b467d92c08eb58a5a78576aa2ee5937153de7640b3ef8df14bd143f408",
+          "role": "submitter-reported clockwise (Spiral.Count.A) and anticlockwise (Spiral.Count.B) counts, species, cultivar"
+        },
+        {
+          "name": "MOSIpaperPE.Rnw",
+          "download_url": "https://datadryad.org/downloads/file_stream/4664",
+          "retrieved_at": "2026-10-31T04:26:00Z",
+          "byte_size": 98016,
+          "sha256": "f0fe52a415366cdd568c260739eaca90e867d3db687878bd800ce731799ab8d4",
+          "role": "authors' analysis source, used only to confirm column semantics (Spiral.Count.A = clockwise, Spiral.Count.B = anticlockwise; d0/d1/d2/u ambiguity codes)"
+        }
+      ],
+      "role": "chirality of the larger parastichy family in Helianthus annuus heads"
+    }
+  ],
+  "method": "fetch.py downloads the two spreadsheets (Dryad serves them behind a browser proof-of-work challenge; the files were obtained with headless Chrome, checksummed, and a 49 KB derived table committed under derived/). analysis.py parses the photoreviewed counts (best estimate before any parenthesised range), keeps heads whose two counts are adjacent members of the Fibonacci, Lucas, double-Fibonacci or F4 sequence, and scores a head right-handed if the larger family is clockwise. The proportion right-handed is tested against 0.5 with a two-sided exact binomial test, pooled and within each pair class; the submitter counts are analysed the same way as a replication.",
+  "measured": {
+    "value": 0.5257,
+    "unit": "proportion of heads whose larger parastichy family runs clockwise (photoreviewed counts)",
+    "n": 272,
+    "uncertainty": "exact 95% CI 0.465-0.586; two-sided binomial P = 0.43",
+    "extra": {
+      "right_handed": 143,
+      "left_handed": 129,
+      "by_pair_photoreviewed": {
+        "34/55": {"n": 125, "p_right": 0.544, "P": 0.371},
+        "55/89": {"n": 82, "p_right": 0.4268, "P": 0.224},
+        "21/34": {"n": 29, "p_right": 0.6897, "P": 0.0614}
+      },
+      "secondary_submitter_counts": {"n": 360, "right_handed": 185, "left_handed": 175, "p_right": 0.5139, "P": 0.635, "ci95": [0.4609, 0.5666],
+        "34/55": {"n": 170, "p_right": 0.5}, "55/89": {"n": 120, "p_right": 0.5167}},
+      "thompson_1917_spruce_5_8_for_comparison": {"right": 224, "left": 243, "p_right": 0.4797, "P": 0.405}
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.85,
+  "caveats": [
+    "The test is on sunflower capitula, not on the Norway spruce cones Thompson cites; his spruce tally is not available as a per-cone dataset and was not re-analysed.",
+    "The sample is a citizen-science collection of mostly one cultivated species grown in many gardens; counts are subjective, but handedness (which family is larger and which way it runs) is robust to small count errors.",
+    "Heads whose two counts did not form an adjacent Fibonacci-type pair (about 40% of photoreviewed heads with two counts) were excluded by the pre-registered rule; chirality in disordered heads is not tested.",
+    "The 21/34 class (n = 29) leans right-handed (20:9, P = 0.06); it passes the pre-registered class rule only through its P value, and the two large classes lean in opposite directions, consistent with chance.",
+    "The pass criterion tolerates a true bias of up to 10 percentage points; the 95% CI (0.465-0.586) excludes biases larger than about 9 points in either direction."
+  ],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5-1-thinking-high", "run": "cursor/thompson-claim-tests-6e84", "date": "2026-10-31" }
+}

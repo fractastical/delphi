@@ -1,0 +1,104 @@
+{
+  "claim_id": "darwin1859-ch10-16",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch10-16",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "The taxonomic similarity of marine fossil faunas from two geological stages decreases with the time separating them, consecutive stages being far more similar than widely separated ones, and the fauna of each stage is intermediate between the faunas of the stages before and after it.",
+  "pass_criterion": "Pre-registered. Using Paleobiology Database marine Metazoa genus lists per international stage (ICS 2020 scale as served by PBDB; stages shorter than 1 Myr excluded; stages with fewer than 200 genera excluded), compute Jaccard similarity between all stage pairs. The claim is SUPPORTED if (i) the Spearman correlation between pairwise Jaccard similarity and the separation of stage midpoints (Myr) is <= -0.5 with Mantel permutation p < 0.001, (ii) the mean Jaccard similarity of consecutive stage pairs is at least 2 times the mean similarity of pairs separated by 5 or more intervening stages, and (iii) for at least 80% of stages i with both neighbours, J(i-1, i+1) <= min(J(i-1, i), J(i, i+1)) (intermediacy).",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if the Spearman correlation is > -0.2, or the consecutive/remote similarity ratio is < 1.2, or intermediacy holds for fewer than 50% of stages. Other outcomes are 'mixed'.",
+  "planned_datasets": [
+    "pbdb-occs-taxa-by-stage"
+  ],
+  "interpretation": "Darwin's 'formations' are read as international chronostratigraphic stages (the finest global units with ages), 'fossils ... closely related' as sharing of genera (the finest rank that is comparable across regions in PBDB), and 'remote' as separation by five or more stages. 'Intermediate' is read as: two stages bracketing a third never share more genera with each other than either shares with the middle stage. Only marine environments are used because marine faunas have the most continuous record. Modern reinterpretation: PBDB stage assignments of collections rest partly on biostratigraphy, which could inflate within-stage faunal homogeneity; the pass criterion therefore requires a large, graded effect over multi-stage separations, not merely a within-stage one.",
+  "datasets": [
+    {
+      "id": "pbdb-occs-taxa-by-stage",
+      "name": "Paleobiology Database, data service 1.2: occs/taxa (genus lists of marine Metazoa per stage) and intervals/list (stage ages)",
+      "landing_url": "https://paleobiodb.org/",
+      "doi": null,
+      "version": "PBDB live data service, retrieved 2026-10-31",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://paleobiodb.org/data1.2/intervals/list.json?scale=1",
+          "retrieved_at": "2026-10-31T04:38:59Z",
+          "byte_size": 23821,
+          "sha256": "046cbb80a6ad01e558198d1e11f27946cb83ee1797425edd12e8ea885b7dbb01",
+          "note": "ICS stage ages"
+        },
+        {
+          "download_url": "https://paleobiodb.org/data1.2/occs/taxa.json?base_name=Metazoa&interval=<stage>&rank=genus&envtype=marine&timerule=major&limit=all (one call per stage; per-call SHA-256 in derived/files.json)",
+          "retrieved_at": "2026-10-31T04:38:59Z",
+          "byte_size": 11535267,
+          "sha256": "d793bfa52522ea88da90ebb9783a44834a3b94958d48256f8f9480a0ed2e5e06",
+          "note": "97 API responses; sha256 is the SHA-256 of the concatenated per-response SHA-256 hex digests"
+        }
+      ],
+      "role": "genus occurrence lists per stage and stage boundary ages"
+    }
+  ],
+  "method": "The 101 ICS stages of PBDB time scale 1 were retrieved; the 6 stages shorter than 1 Myr (Holocene and Pleistocene) were excluded and the Fortunian (139 genera) fell below the 200-genus floor, leaving 94 stages. For each stage the list of marine Metazoa genera with at least one occurrence (occs/taxa, envtype=marine, timerule=major) was downloaded (38,533 distinct genera; median 1,070 per stage). Jaccard similarity was computed for all 4,371 stage pairs and correlated (Spearman) with midpoint age separation, with significance from 2000 permutations of stage labels; mean similarity of consecutive pairs was compared with pairs separated by five or more stages; and for each interior stage the bracketing stages' similarity was compared with their similarity to the middle stage.",
+  "measured": {
+    "value": -0.8697,
+    "unit": "Spearman rho between pairwise Jaccard genus similarity of stages and their midpoint age separation (Myr)",
+    "n": 4371,
+    "uncertainty": "Mantel permutation p = 0.0005 (2000 permutations)",
+    "extra": {
+      "stages_used": 94,
+      "stages_excluded_short": 6,
+      "stages_excluded_few_genera": [
+        "Fortunian"
+      ],
+      "total_distinct_genera": 38533,
+      "median_genera_per_stage": 1069.5,
+      "mean_jaccard_consecutive": 0.29433,
+      "mean_jaccard_remote_gap_ge_5": 0.02344,
+      "consecutive_over_remote_ratio": 12.559,
+      "fraction_stages_intermediate": 0.8696,
+      "n_stages_tested_for_intermediacy": 92,
+      "mean_jaccard_by_number_of_intervening_stages_plus_one": {
+        "1": 0.29433,
+        "2": 0.21552,
+        "3": 0.16987,
+        "4": 0.14226,
+        "5": 0.12298,
+        "6": 0.10727,
+        "7": 0.09471,
+        "8": 0.08284,
+        "9": 0.0733,
+        "10": 0.0644,
+        "11": 0.05718,
+        "12": 0.05156,
+        "13": 0.0458,
+        "14": 0.04001,
+        "15": 0.03605,
+        "16": 0.032,
+        "17": 0.0297,
+        "18": 0.02663,
+        "19": 0.02437,
+        "20": 0.0221
+      },
+      "conditions": {
+        "decay_rho_le_-0.5_p_lt_0.001": true,
+        "consecutive_ge_2x_remote": true,
+        "intermediacy_ge_0.8": true
+      },
+      "rule_based_verdict": "supports"
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.9,
+  "caveats": [
+    "PBDB collections are assigned to stages partly by biostratigraphy, so some of the within-stage homogeneity is built into the data; the graded decay over 2-20 stages (0.29, 0.22, 0.17, ... 0.02) is not explicable by that alone, and the ratio at exactly five stages' separation (0.29 / 0.12) still exceeds the pre-registered factor of 2.",
+    "The 'remote' mean (gap >= 5 stages, 0.023) is dominated by very distant pairs; the profile by separation is given in measured.extra so the reader can choose a different threshold.",
+    "Genus sharing is a proxy for Darwin's 'closely related'; shared genera undercount relatedness between remote stages that share families but no genera, so the measured decay is steeper than a phylogenetic distance would be.",
+    "Intermediacy failed for 12 of 92 stages, mostly short or poorly sampled stages where sampling noise makes the two neighbours marginally more similar to each other than to the middle stage.",
+    "Stage durations vary (1-20 Myr) and sampling intensity varies strongly between stages; neither was corrected for, consistent with Darwin's claim being about raw faunal lists."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-b201",
+    "date": "2026-10-31"
+  }
+}

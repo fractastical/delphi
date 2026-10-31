@@ -166,7 +166,15 @@ git fetch origin 'refs/heads/cursor/*:refs/remotes/origin/cursor/*'
 for b in $(git branch -r | grep -E 'origin/cursor/.*organisms'); do git merge --no-edit "$b"; done
 node organisms/validate.mjs
 node organisms/merge.mjs        # -> organisms/merged/{taxa,datasets,mentions}.json, SUMMARY.md
+node organisms/coverage.mjs     # -> organisms/merged/coverage.json, COVERAGE.md
 ```
+
+`coverage.mjs` ranks every taxon by how many data axes our records cover (genome sequencing
+graded by assembly level, bioelectric/electrophysiology, DNA barcodes, trait tables, 3D
+morphology, phylogeny, occurrences, fossils, conservation status, taxonomic resolution). Axes
+with no records yet (bioelectric, barcodes) are kept so the gap is visible per organism;
+`COVERAGE.md` lists the taxa with known electrophysiology sources as leads for that pass.
+Dataset records may set `"category": "<axis id>"` to override the id/keyword classification.
 
 `merge.mjs` unifies taxa across slices and projects by GBIF key (else Wikidata QID, else NCBI
 taxid), unions names, mentions and datasets, merges shared-database records by id, and lists

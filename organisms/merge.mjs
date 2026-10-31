@@ -83,7 +83,7 @@ for (const { project, slice, dir } of slices()) {
     }
     for (const [k, v] of Object.entries(ids)) {
       if (v === null || v === undefined || v === "") continue;
-      if (m.identifiers[k] !== undefined && m.identifiers[k] !== v)
+      if (m.identifiers[k] !== undefined && String(m.identifiers[k]) !== String(v))
         conflicts.push(`${key}: identifiers.${k} ${m.identifiers[k]} vs ${v} (${project}/${slice}/${t.slug})`);
       else m.identifiers[k] = v;
     }
@@ -115,7 +115,7 @@ for (const { project, slice, dir } of slices()) {
         if (!same) {
           const clash = (m.counts ?? []).find((x) => x.property_id === c.property_id && x.value !== c.value && !x.slice);
           // Counts scoped to the slice's own taxa (n_rows_for_taxa, n_taxa_covered) differ by design.
-          if (clash && /^n_/.test(c.property_id) && !/for_taxa|covered|listed/.test(c.property_id))
+          if (clash && /^n_/.test(c.property_id) && !/for_taxa|covered|listed|matched|resolved/.test(c.property_id))
             conflicts.push(`dataset ${d.id}: ${c.property_id} ${clash.value} vs ${c.value} in ${project}/${slice} (check the queried key)`);
           (m.counts ??= []).push({ ...c, slice: `${project}/${slice}` });
         }
@@ -145,7 +145,15 @@ writeFileSync(join(OUT, "mentions.json"), JSON.stringify(mentions, null, 2) + "\
 const byAuthority = (k) => taxaOut.filter((t) => t.identifiers[k] !== undefined).length;
 const byClass = {};
 for (const t of taxaOut) byClass[t.lineage.class ?? t.lineage.phylum ?? "unknown"] = (byClass[t.lineage.class ?? t.lineage.phylum ?? "unknown"] ?? 0) + 1;
-const source = (d) => (d.id.startsWith("gbif-") ? "GBIF occurrences" : d.id.startsWith("ncbi-genome") ? "NCBI genome assembly" : d.id.startsWith("pbdb") ? "Paleobiology Database" : d.label ?? d.id);
+const source = (d) => {
+  if (/^gbif-occ/.test(d.id)) return "GBIF occurrence counts";
+  if (/^gbif-backbone/.test(d.id)) return "GBIF Backbone Taxonomy";
+  if (/^ncbi-genome/.test(d.id)) return "NCBI genome assemblies";
+  if (/^ncbi-tax/.test(d.id)) return "NCBI Taxonomy";
+  if (/^pbdb-occ/.test(d.id)) return "Paleobiology Database occurrence counts";
+  if (/^obis-occ/.test(d.id)) return "OBIS occurrence counts";
+  return (d.label ?? d.id).split(/[:(,]| - | v\d| \d{4}/)[0].trim();
+};
 const bySource = {};
 for (const d of datasetsOut) bySource[source(d)] = (bySource[source(d)] ?? 0) + 1;
 const noDataset = taxaOut.filter((t) => t.datasets.length === 0);
