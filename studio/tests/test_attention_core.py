@@ -14,7 +14,7 @@ U = {"reuse": {"H": 10, "notH": -20}, "skip": {"H": 0, "notH": 0}}
 
 # ------------------------------------------------------------------ vocabularies
 def test_store_vocabulary_is_read_from_the_store_models():
-    assert vocab.STORE["problem_kind"] == ("project_gap", "computational_open_question", "sourced_field_open_problem", "resolved_scope_correction")
+    assert vocab.STORE["problem_kind"] == ("project_gap", "computational_open_question", "sourced_field_open_problem", "resolved_scope_correction", "curated_question")
     assert vocab.STORE["completeness"] == ("recorded", "actionable")
     assert vocab.STORE["signal"] == ("following", "can_contribute", "resource_offer", "blocked_by_this")
     assert vocab.STORE["verification_status"] == ("unverified", "declared", "checked")

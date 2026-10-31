@@ -244,16 +244,16 @@ def test_envelope_check_separates_corruption_from_schema_skew():
     assert pg.check_envelope(good) == ("ok", "")
     tampered = {**good, "payload": {**good["payload"], "title": "changed"}}                            # version no longer matches the bytes
     assert pg.check_envelope(tampered)[0] == "digest"
-    newer = skewed(good, problem_kind="curated_question")                                               # valid digest, unknown word
+    newer = skewed(good, problem_kind="future_problem_kind")                                           # valid digest, unknown word
     verdict, detail = pg.check_envelope(newer)
     assert verdict == "schema" and "problem_kind" in detail
 
 
 def test_unknown_store_vocabulary_is_carried_verbatim_not_mapped_or_fatal():
-    newer = skewed(problem("PA"), problem_kind="curated_question")
+    newer = skewed(problem("PA"), problem_kind="future_problem_kind")
     s = snapshot.build_snapshot(fake_read(newer), [], NOW)
     kind = s["problems"][0]["store"]["problem_kind"]
-    assert kind == {"vocabulary": "frontier-store", "field": "problem_kind", "value": "curated_question", "recognized": False}
+    assert kind == {"vocabulary": "frontier-store", "field": "problem_kind", "value": "future_problem_kind", "recognized": False}
     known = snapshot.build_snapshot(fake_read(problem("PB")), [], NOW)["problems"][0]["store"]["problem_kind"]
     assert known["recognized"] is True and known["value"] == "sourced_field_open_problem"
     assert vocab.tag_lenient("frontier-store", "local_status", "archived")["recognized"] is False
