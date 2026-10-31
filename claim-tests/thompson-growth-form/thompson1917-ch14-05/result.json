@@ -2,17 +2,71 @@
   "claim_id": "thompson1917-ch14-05",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch14-05",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Within one species of sunflower, larger capitula carry higher parastichy pairs: head diameter increases in order across the successive Fibonacci pairs (e.g. 21/34 < 34/55 < 55/89 < 89/144), so parastichy numbers rise with the size of the whole structure.",
   "pass_criterion": "Pre-registered. In the Turing's Sunflowers data (Helianthus annuus), restrict to heads with a recorded head (seedhead) diameter and with both parastichy counts forming an adjacent pair of a Fibonacci-type sequence (Fibonacci, Lucas, double Fibonacci or F4, as defined by Swinton et al. 2016). The Spearman rank correlation between head diameter and the larger parastichy number must be positive with rho >= 0.30 and P < 0.01, and the median head diameter must increase monotonically across successive pair classes of the main Fibonacci sequence that each have n >= 10 heads.",
   "fail_criterion": "Pre-registered. rho <= 0.10, or P >= 0.05, or an inversion of median diameter between adjacent main-sequence pair classes each with n >= 10 (larger pair at smaller heads). 0.10 < rho < 0.30 with P < 0.05 and no inversion is 'mixed'. If the data file carries no head-size measurement, the verdict is 'inconclusive' with reason 'data-unavailable'; if fewer than 50 heads have both diameter and a resolved pair, 'inconclusive' with reason 'underpowered'.",
   "planned_datasets": ["turings-sunflowers-dryad-f9k77"],
   "interpretation": "Thompson's 'size of the entire structure' is mapped to the diameter of the sunflower seedhead as reported by the grower; 'the arrangement' is mapped to the adjacent Fibonacci-type parastichy pair, ordered by its larger member. Primary counts are the photoreviewed counts where available, otherwise the submitter's counts. The claim's extension to other composites is not tested here; only the sunflower disc, which is Thompson's named example, is.",
-  "datasets": [],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "datasets": [
+    {
+      "id": "turings-sunflowers-dryad-f9k77",
+      "name": "Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Turing's Sunflowers)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.f9k77",
+      "doi": "10.5061/dryad.f9k77",
+      "version": "1 (published 2016-04-19)",
+      "license": "CC0 1.0",
+      "paper_doi": "10.1098/rsos.160091",
+      "files": [
+        {
+          "name": "JS annotations for MSF007_Countdata.xlsx",
+          "download_url": "https://datadryad.org/downloads/file_stream/4662",
+          "retrieved_at": "2026-10-31T04:26:00Z",
+          "byte_size": 53848,
+          "sha256": "1ae05773075326e64bd110bdd5dd90a6d78986d2fdff67936532ac51167b883d",
+          "role": "photoreviewed parastichy counts JS.P1/JS.P2 for 738 submissions"
+        },
+        {
+          "name": "MSF007_SunflowerData_20151020_anonymised.xlsx",
+          "download_url": "https://datadryad.org/downloads/file_stream/4663",
+          "retrieved_at": "2026-10-31T04:26:00Z",
+          "byte_size": 108344,
+          "sha256": "b3df75b467d92c08eb58a5a78576aa2ee5937153de7640b3ef8df14bd143f408",
+          "role": "grower-reported Head.diameter (cm) and submitter counts Spiral.Count.A (clockwise) / Spiral.Count.B (anticlockwise)"
+        },
+        {
+          "name": "MOSIpaperPE.Rnw",
+          "download_url": "https://datadryad.org/downloads/file_stream/4664",
+          "retrieved_at": "2026-10-31T04:26:00Z",
+          "byte_size": 98016,
+          "sha256": "f0fe52a415366cdd568c260739eaca90e867d3db687878bd800ce731799ab8d4",
+          "role": "authors' analysis source, used only to confirm column semantics"
+        }
+      ],
+      "role": "head diameter and parastichy pair for Helianthus annuus heads"
+    }
+  ],
+  "method": "fetch.py obtains the two spreadsheets (Dryad serves downloads behind a browser proof-of-work challenge; files were fetched with headless Chrome, checksummed, and a 49 KB derived table committed under derived/). analysis.py keeps heads with a reported head diameter and an adjacent Fibonacci-type pair (photoreviewed counts first, submitter counts otherwise), computes the Spearman correlation between diameter and the larger parastichy number, and compares median diameters across the main-sequence pair classes 21/34, 34/55, 55/89 and 89/144 (Kruskal-Wallis as a supplementary test).",
+  "measured": {
+    "value": 0.6744,
+    "unit": "Spearman rho, head diameter (cm) vs larger parastichy number",
+    "n": 401,
+    "uncertainty": "P = 1.6e-54; photoreviewed-only subset n = 257, rho = 0.700",
+    "extra": {
+      "median_diameter_cm_by_fibonacci_pair": {"21/34": {"n": 35, "median": 7.0}, "34/55": {"n": 171, "median": 9.5}, "55/89": {"n": 140, "median": 14.0}, "89/144": {"n": 11, "median": 24.0}},
+      "median_monotone_increasing": true,
+      "kruskal_wallis": {"H": 162.77, "p": 4.63e-35},
+      "n_photoreviewed": 257,
+      "n_submitter_only": 144
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.9,
+  "caveats": [
+    "Head diameter was measured and reported by the growers themselves (citizen science), with unknown precision and probably mixed conventions (disc versus whole head); such noise biases the correlation towards zero, not away from it.",
+    "The sample is cultivated Helianthus annuus of many cultivars; the claim's remark about other composites is not tested.",
+    "Thompson lists 34/55, 55/89 and 89/144 as occurring in one species; here the 89/144 class has only 11 heads, though their median diameter (24 cm) is well above the 55/89 class (14 cm).",
+    "Size and developmental stage are confounded in a cross-sectional sample; the claim is about size, and that is what was measured."
+  ],
   "agent": { "kind": "cloud-agent", "model": "claude-fable-5-1-thinking-high", "run": "cursor/thompson-claim-tests-6e84", "date": "2026-10-31" }
 }
