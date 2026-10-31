@@ -14,6 +14,7 @@ from typing import Callable, Iterator
 ALLOWED_HOSTS = frozenset({
     "zfin.org", "daniocell.nichd.nih.gov", "eutils.ncbi.nlm.nih.gov", "api.genome.ucsc.edu", "www.ebi.ac.uk", "rest.uniprot.org",
     "rest.ensembl.org", "www.ncbi.nlm.nih.gov", "zebrahub.sf.czbiohub.org", "danio-code.zfin.org",
+    "api.figshare.com", "ndownloader.figshare.com", "figshare.com",
 })
 USER_AGENT = "delphi-frontier-genomics/0.1 (read-only bounded connector)"
 MAX_BYTES = 200_000_000          # the task's ceiling for any single download
@@ -37,16 +38,20 @@ class Receipt:
     etag: str | None
     bytes: int
     sha256: str
+    md5: str | None = None
     truncated: bool = False
 
     def to_dict(self) -> dict:
         return asdict(self)
 
 
-def _check(url: str) -> None:
+def _check(url: str, via: str | None = None) -> None:
     p = urllib.parse.urlsplit(url)
+    # figshare's downloader answers 302 to a short-lived signed S3 URL; allow exactly that hop and nothing else on S3
+    if via == "ndownloader.figshare.com" and p.hostname == "s3-eu-west-1.amazonaws.com" and p.path.startswith("/pfigshare-u-files/") and p.scheme == "https":
+        return
     if p.scheme != "https" or p.hostname not in ALLOWED_HOSTS:
-        raise FetchRefused(f"refusing URL outside the allow-list: {url}")
+        raise FetchRefused(f"refusing URL outside the allow-list: {url.split('?')[0]}")
 
 
 def _open(url: str, cap: int):
@@ -59,7 +64,7 @@ def _open(url: str, cap: int):
 
     class Redirects(urllib.request.HTTPRedirectHandler):
         def redirect_request(self, req, fp, code, msg, headers, newurl):
-            _check(newurl)
+            _check(newurl, urllib.parse.urlsplit(req.full_url).hostname)
             return super().redirect_request(req, fp, code, msg, headers, newurl)
 
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
@@ -74,9 +79,9 @@ def _open(url: str, cap: int):
     return resp
 
 
-def _receipt(url: str, resp, h, n: int, truncated: bool = False) -> Receipt:
+def _receipt(url: str, resp, h, n: int, md5=None, truncated: bool = False) -> Receipt:
     return Receipt(url, resp.geturl(), datetime.now(timezone.utc).isoformat(timespec="seconds"), resp.status, resp.headers.get("Content-Type"),
-                   resp.headers.get("Last-Modified"), resp.headers.get("ETag"), n, h.hexdigest(), truncated)
+                   resp.headers.get("Last-Modified"), resp.headers.get("ETag"), n, h.hexdigest(), md5.hexdigest() if md5 else None, truncated)
 
 
 def fetch(url: str, cap: int = 20_000_000) -> tuple[bytes, Receipt]:
@@ -85,8 +90,8 @@ def fetch(url: str, cap: int = 20_000_000) -> tuple[bytes, Receipt]:
     resp.close()
     if len(body) > cap:
         raise FetchRefused(f"{url}: body exceeds the cap {cap}")
-    h = hashlib.sha256(body)
-    return body, _receipt(url, resp, h, len(body))
+    h, m = hashlib.sha256(body), hashlib.md5(body)
+    return body, _receipt(url, resp, h, len(body), m)
 
 
 def stream_lines(url: str, keep: Callable[[str], bool], cap: int = MAX_BYTES) -> tuple[list[str], list[str], Receipt]:
@@ -95,13 +100,14 @@ def stream_lines(url: str, keep: Callable[[str], bool], cap: int = MAX_BYTES) ->
     The receipt's sha256 and byte count describe the WHOLE source stream, so the kept subset can be tied to it.
     """
     resp = _open(url, cap)
-    h, n, kept, comments = hashlib.sha256(), 0, [], []
+    h, m, n, kept, comments = hashlib.sha256(), hashlib.md5(), 0, [], []
     for raw in resp:
         n += len(raw)
         if n > cap:
             resp.close()
             raise FetchRefused(f"{url}: stream exceeds the cap {cap}")
         h.update(raw)
+        m.update(raw)
         line = raw.decode("utf-8", errors="replace").rstrip("\n")
         if line.startswith("#"):
             if len(comments) < 60:
@@ -109,4 +115,4 @@ def stream_lines(url: str, keep: Callable[[str], bool], cap: int = MAX_BYTES) ->
         elif keep(line):
             kept.append(line)
     resp.close()
-    return kept, comments, _receipt(url, resp, h, n)
+    return kept, comments, _receipt(url, resp, h, n, m)
