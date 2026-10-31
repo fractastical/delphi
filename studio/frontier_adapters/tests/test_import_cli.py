@@ -495,3 +495,38 @@ class SubmitLocal(unittest.TestCase):
                           "--token-file", token_file(self.tmp.name), "--expect-actor", "someone-else", "--expect-operator", "local-fleet", "--execute"])
         self.assertEqual(rc, 3); self.assertEqual(ic.counts(self.store)["versions"], 0)
 
+
+
+class FrozenBundle(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup)
+        claim = _rec("Claim", "c1", _claim_payload()); t = ic.ref_of(claim)
+        self.recs = [_rec("Action", "a1", _action_payload(t, [t])), claim]                       # deliberately NOT in builder order
+        from frontier.models import POLICY, digest
+        body = {"schema_version": "frontier-bundle-0.1", "exporting_node": "node-a", "records": self.recs, "review_claims": [], "policy_version": POLICY, "trust": ic.TRUST}
+        self.bundle = {**body, "bundle_sha256": digest(body)}
+
+    def write(self, b, name="b.json"):
+        p = os.path.join(self.tmp.name, name)
+        with open(p, "w") as fh: json.dump(b, fh)
+        return p
+
+    def test_frozen_bundle_keeps_its_hash_and_order_and_the_builder_would_not(self):
+        p = self.write(self.bundle)
+        out = os.path.join(self.tmp.name, "plan")
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(ic.main(["build", "--frozen-bundle", p, "--out", out]), 0)
+        plan, bundles = ic.load_bundles(os.path.join(out, "plan.json"))
+        self.assertEqual(bundles[0]["bundle_sha256"], self.bundle["bundle_sha256"])
+        self.assertEqual([r["id"] for r in bundles[0]["records"]], ["a1", "c1"])
+        rebuilt = ic.make_bundles(self.recs, "node-a")
+        self.assertNotEqual(rebuilt[0]["bundle_sha256"], self.bundle["bundle_sha256"])          # control: the sorting builder changes the hash
+
+    def test_tampered_hash_record_or_shape_is_refused(self):
+        bad = copy.deepcopy(self.bundle); bad["records"][1]["payload"]["title"] = "changed"
+        with self.assertRaises(ic.ImportRefused): ic.load_frozen_bundle(self.write(bad))        # content no longer matches bundle_sha256
+        bad = copy.deepcopy(self.bundle); bad["bundle_sha256"] = "0" * 64
+        with self.assertRaises(ic.ImportRefused): ic.load_frozen_bundle(self.write(bad, "c.json"))
+        bad = copy.deepcopy(self.bundle); bad["extra"] = 1
+        with self.assertRaises(ic.ImportRefused): ic.load_frozen_bundle(self.write(bad, "d.json"))
+        self.assertEqual(ic.load_frozen_bundle(self.write(self.bundle, "e.json"))["bundle_sha256"], self.bundle["bundle_sha256"])   # positive control
