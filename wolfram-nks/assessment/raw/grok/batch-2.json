@@ -1,0 +1,1036 @@
+[
+  {
+    "claim_id": "wolfram2002-ch03-16",
+    "scores": {
+      "operationalizability": 0.65,
+      "data-existence": 0.8,
+      "data-adequacy": 0.6,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.75
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.72,
+    "operationalization": "Enumerate millions of short programs in one or two low-level languages, run each for a fixed number of steps, and apply compression and statistical randomness tests to the output. Finding a few outputs that pass those tests confirms the existential part; finding none in a large bounded search would challenge 'typically.'",
+    "candidate_datasets": [
+      {"name": "GCC", "url": "https://gcc.gnu.org/", "role": "compile and run enumerated short C programs whose outputs are then tested"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "generate short programs and apply randomness and compression tests to their traces"},
+      {"name": "NIST Computer Security Resource Center", "url": "https://csrc.nist.gov/", "role": "public statistical test suite for deciding whether a bit string looks random"}
+    ],
+    "obstacles": [
+      "What counts as a short program depends on the language's syntax, so the same behavior can look rare or common under a different encoding.",
+      "Statistical tests can fail to detect hidden regularity, and they do not prove that an output is random."
+    ],
+    "rationale": "The search Wolfram describes is a finite enumeration that public compilers can repeat, and a handful of complex-looking outputs would support the claim as an existence result. 'Complex and seemingly random' and 'typically' across practical languages still need a chosen battery of tests and a chosen notion of program length, so the replication tests a proxy for the full wording. A small team can run that proxy in weeks, but the result would not cleanly cover every low-level language."
+  },
+  {
+    "claim_id": "wolfram2002-ch03-17",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.85,
+      "data-adequacy": 0.75,
+      "discriminating-power": 0.7,
+      "analysis-feasibility": 0.85
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.76,
+    "operationalization": "Enumerate small combinator-style rules of the form e[x_][y_] to an expression in x and y, iterate them from a fixed seed, and record whether expression size stabilizes, becomes periodic or nested, or keeps growing while passing randomness tests. A single non-stabilizing, statistically irregular example confirms the claim; every small rule stabilizing or becoming nested would refute it inside that rule bound.",
+    "candidate_datasets": [
+      {"name": "Wolfram Engine", "url": "https://www.wolfram.com/engine/", "role": "run the symbolic replacement rules in the form Wolfram states and record expression size"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "enumerate small rewrite rules and test growth and statistical irregularity of the expression sizes"}
+    ],
+    "obstacles": [
+      "Visual or statistical irregularity does not prove that a particular rule never eventually stabilizes.",
+      "The frequency word 'often' depends on how the space of expressions is enumerated."
+    ],
+    "rationale": "The claim is an existence claim about a fully specified class of rewrite systems, and both the rules in the book and a wider sample of short rules can be rerun exactly. Non-stabilizing growth together with a failed periodicity check is a direct confirming outcome, and universal stabilization in the searched class would refute it. The only soft spot is how strongly a finite sample supports 'often,' which is not required to settle the stated 'can.'"
+  },
+  {
+    "claim_id": "wolfram2002-ch03-18",
+    "scores": {
+      "operationalizability": 0.45,
+      "data-existence": 0.7,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.45,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.7,
+    "operationalization": "Across several standard classes (cellular automata, Turing machines, substitution systems, register machines), classify small rules into repetitive, nested, and irregular, and compare the fraction that are irregular. Complexity appearing in every class supports universality; a natural class whose entire small-rule space stays simple would count against independence from system details.",
+    "candidate_datasets": [
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "enumerate and evolve cellular automaton rules whose behavior is being compared across system types"},
+      {"name": "Busy Beaver Challenge", "url": "https://bbchallenge.org/", "role": "public census and simulators for small Turing machines, as one system class in the comparison"},
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "published sequences generated by simple rules, as an independent check on complexity outside cellular automata"}
+    ],
+    "obstacles": [
+      "There is no agreed enumeration of 'all kinds of simple programs,' so a survey of standard classes is only a sample.",
+      "Behavior classes are partly a matter of classification thresholds, which can make different systems look more alike than they are."
+    ],
+    "rationale": "Public simulators already cover the main discrete classes Wolfram uses, and repeating his removals of rigid grids and parallel update is a finite computation. The claim's scope is universality and independence from details of particular systems, which no finite catalog can exhaust. A survey can support or strain the claim for the classes studied in the chapter, which is a real but partial test."
+  },
+  {
+    "claim_id": "wolfram2002-ch03-19",
+    "scores": {
+      "operationalizability": 0.55,
+      "data-existence": 0.75,
+      "data-adequacy": 0.6,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.7
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.68,
+    "operationalization": "Order rules in each studied class by description length and record the shortest rule whose evolution is neither periodic nor nested under a fixed classifier. A first complex rule at very small size in every class supports an extremely low threshold; complexity appearing only at large description length in some class would refute that class.",
+    "candidate_datasets": [
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "exhaustive evolution of small cellular automaton rule spaces ordered by rule complexity"},
+      {"name": "Busy Beaver Challenge", "url": "https://bbchallenge.org/", "role": "census of small Turing machines, to locate the smallest machines with non-simple behavior"}
+    ],
+    "obstacles": [
+      "'Extremely low' and 'complex' depend on the complexity measure and the behavior classifier.",
+      "Some rule spaces are small enough to exhaust, but others can only be sampled."
+    ],
+    "rationale": "For the concrete classes in the chapter, the smallest rule that leaves repetition and nesting is a computable statistic, and several of those spaces are fully enumerable with public software. The claim that the threshold is extremely low in every kind of system still needs a shared scale of rule complexity, and different scales move the threshold. Existing enumerations can test the chapter's classes under an explicit scale, not the unqualified general principle."
+  },
+  {
+    "claim_id": "wolfram2002-ch03-20",
+    "scores": {
+      "operationalizability": 0.5,
+      "data-existence": 0.7,
+      "data-adequacy": 0.45,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.6
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.65,
+    "operationalization": "Classify long evolutions of many simple programs into repetition, nesting, apparent randomness, and localized structures, and measure how often a behavior falls outside those four. Dominance of the four classes supports the claim; a large share of a well-defined class falling into a fifth stable type would challenge dominance.",
+    "candidate_datasets": [
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "generate large samples of cellular automaton evolutions to classify into the four behavior types"},
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "published simple sequences whose regular, nested, or irregular character can be compared with the four themes"}
+    ],
+    "obstacles": [
+      "The four themes are broad enough that many rival taxonomies can be fitted to the same pictures.",
+      "The extension from simple programs to a vast range of systems is not covered by program enumeration alone."
+    ],
+    "rationale": "Samples of cellular automata, Turing machines, and related systems can be labeled with Wolfram's four themes using public simulators, and that labeling is informative for those classes. 'Dominant,' 'almost independent of the details,' and the extension to a vast range of systems are loose enough that many outcomes remain compatible with the claim. The test therefore reaches the simple-program core and not the full stated scope."
+  },
+  {
+    "claim_id": "wolfram2002-ch03-21",
+    "scores": {
+      "operationalizability": 0.25,
+      "data-existence": 0.3,
+      "data-adequacy": 0.2,
+      "discriminating-power": 0.15,
+      "analysis-feasibility": 0.25
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.62,
+    "operationalization": "No specific natural system, observable, or decision threshold is fixed by the claim. A comparison of one phenomenon with a simple program would neither confirm that overall behavior can be stated without internal details nor refute it, because 'important features' and 'usually' can be reassigned after the fact.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "The claim names no natural system and no observable that would count as an important feature.",
+      "A failed simple-program model can be set aside as not the relevant feature, and a successful one does not show that the internals were unnecessary."
+    ],
+    "rationale": "The sentence is a methodological consequence Wolfram draws from universality: one might describe a natural system without knowing its parts. Nothing in the wording picks a system, a measurement, or a result that would favor this over the rival view that the important features are system-specific. Public data about particular natural systems therefore do not contain the variables the claim would need, because those variables were never specified."
+  },
+  {
+    "claim_id": "wolfram2002-ch03-22",
+    "scores": {
+      "operationalizability": 0.3,
+      "data-existence": 0.2,
+      "data-adequacy": 0.15,
+      "discriminating-power": 0.2,
+      "analysis-feasibility": 0.25
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.78,
+    "operationalization": "The claim is about a method's ability to find phenomena that were not anticipated and to do so with mathematical precision. Whether a given discovery was 'genuinely unexpected' is a judgment about prior beliefs, not a variable in a dataset, so no confirming or refuting result is fixed.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "Any historical discovery can be redescribed as having been anticipated or as having been missed by the traditional method.",
+      "Precision of a computer experiment is a property of its specification, not an empirical outcome that distinguishes the methodology from rivals."
+    ],
+    "rationale": "Wolfram is recommending a method and describing its advantage: experiments on fully specified programs can reveal behavior one did not set out to construct. That is a conceptual claim about inquiry. Historical episodes in the book illustrate it, but they do not supply a measurement that would confirm or refute the general advantage over constructing examples of predefined behavior."
+  },
+  {
+    "claim_id": "wolfram2002-ch03-23",
+    "scores": {
+      "operationalizability": 0.2,
+      "data-existence": 0.15,
+      "data-adequacy": 0.1,
+      "discriminating-power": 0.15,
+      "analysis-feasibility": 0.2
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.82,
+    "operationalization": "The claim is advice about experimental design: start with the simplest system, because extra complication is usually unnecessary. 'Too simple,' 'the most common mistake,' and 'interesting behavior' are not tied to a measured error rate or a decision criterion.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "'The most common mistake' is an author's judgment about practice, not a count defined over a specified population of experiments.",
+      "A complicated system that reveals something a simple one misses can be classified as a case where the simple system was not yet understood."
+    ],
+    "rationale": "This is a methodological maxim drawn from Wolfram's experience, together with the assertion that simple systems already suffice for complex behavior. The second idea is tested by other claims in the batch; this claim itself gives no population of experiments, no coding of 'mistake,' and no result that would show the maxim is wrong. It is not a statement that existing data can settle."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-01",
+    "scores": {
+      "operationalizability": 0.35,
+      "data-existence": 0.3,
+      "data-adequacy": 0.25,
+      "discriminating-power": 0.2,
+      "analysis-feasibility": 0.35
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.7,
+    "operationalization": "The claim ties 'complete analysis by traditional mathematics' to 'fairly simple behavior' and explains textbook examples by that selection. Systems that traditional methods can solve are simple in the sense of those methods, so the outcome does not separate a factual regularity from the definition of analyzability.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "The claim is close to a selection effect: textbooks keep systems that traditional analysis can finish, and those systems are then called simple.",
+      "There is no independent catalog of 'all number-based systems traditional mathematics can analyze completely' whose behavior could come out complex."
+    ],
+    "rationale": "Wolfram's point is that when calculus and similar methods finish the job, the behavior they find is simple, and that textbooks are chosen for that amenability. That connection is built into what those methods can express. A survey of solved textbook systems would reproduce the selection rather than test a further empirical claim about number-based systems."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-02",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.9,
+      "data-adequacy": 0.85,
+      "discriminating-power": 0.65,
+      "analysis-feasibility": 0.95
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.8,
+    "operationalization": "Compute long orbits of simple arithmetic iterations, including successive powers of 3 in base 2, and test the digit arrays and size series for periodicity, nesting, and statistical irregularity. A long irregular orbit confirms that simple number systems can be complex; every simple arithmetic system in a declared class collapsing to a short closed form would refute it.",
+    "candidate_datasets": [
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "published values of powers and related integer sequences to compare with direct iteration"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "arbitrary-precision iteration of simple arithmetic maps and statistical tests on the resulting digits"}
+    ],
+    "obstacles": [
+      "A finite irregular prefix can still have a regularity that appears only at larger scales.",
+      "'Highly complex' has to be read as failing standard periodicity and compression tests rather than as a proved absence of a formula."
+    ],
+    "rationale": "The claim is existential and the examples are elementary iterations. Public arbitrary-precision arithmetic recomputes them far past the pictures in the book, and a detected closed form or eventual period would refute a specific example while a persistent irregular pattern confirms the 'can.' That is enough to settle the claim as stated, with the usual limit that statistical tests do not prove infinite randomness."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-03",
+    "scores": {
+      "operationalizability": 0.72,
+      "data-existence": 0.95,
+      "data-adequacy": 0.8,
+      "discriminating-power": 0.6,
+      "analysis-feasibility": 0.9
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.78,
+    "operationalization": "Compute a very long prefix of the base-2 digits of successive powers of 3, remove the small-scale triangular structure, and run equidistribution, autocorrelation, and compression tests. A stable large-scale regularity refutes 'random for all practical purposes'; its absence on prefixes far beyond practical use confirms the claim as stated.",
+    "candidate_datasets": [
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "published powers of 3 and related digit sequences for an independent check of the iteration"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "compute long binary expansions of 3^n and apply statistical tests"}
+    ],
+    "obstacles": [
+      "Tests on a finite prefix cannot prove that the infinite digit array is normal or pattern-free.",
+      "The acknowledged small-scale structure has to be excluded by a declared filter, or it will be counted as a regularity."
+    ],
+    "rationale": "The object is a single explicit sequence, and 'for all practical purposes' matches a large finite computation rather than an unproved normality theorem. Arbitrary-precision powers of 3 are immediate to generate, and either a clear large-scale pattern or its continued absence decides the practical claim. The open number-theoretic question of normality is a stronger statement than the one Wolfram makes."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-04",
+    "scores": {
+      "operationalizability": 0.75,
+      "data-existence": 0.9,
+      "data-adequacy": 0.75,
+      "discriminating-power": 0.6,
+      "analysis-feasibility": 0.85
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.74,
+    "operationalization": "Compute the fractional parts of (3/2)^n to high precision for a large range of n and test them for equidistribution, autocorrelation, and lattice structure. Visible large-scale order would refute apparent randomness; agreement with randomness diagnostics on a long prefix would confirm the practical claim.",
+    "candidate_datasets": [
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "published integer sequences related to floor((3/2)^n) and the fractional parts"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "high-precision computation of fractional parts of (3/2)^n and statistical tests"}
+    ],
+    "obstacles": [
+      "Equidistribution of {(3/2)^n} is a stronger open statement than the practical appearance claim.",
+      "High powers need carefully controlled precision, and rounding error can imitate or hide structure."
+    ],
+    "rationale": "Fractional parts of successive powers of 3/2 are a concrete, base-independent sequence and can be computed for millions of terms with public arbitrary-precision arithmetic. The claim is about apparent complexity and randomness, which standard tests on those terms can support or, if a pattern appears, refute. A proof of equidistribution is not required for the practical reading Wolfram gives."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-05",
+    "scores": {
+      "operationalizability": 0.8,
+      "data-existence": 0.9,
+      "data-adequacy": 0.7,
+      "discriminating-power": 0.65,
+      "analysis-feasibility": 0.85
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.76,
+    "operationalization": "Iterate n to 5n/2 when n is even and (n+1)/2 when n is odd, starting at 6, and test the logarithmic sizes for a cycle and for autocorrelation. A detected cycle or a simple closed form refutes complex non-repetitive sizes; a very long aperiodic fluctuating orbit confirms the claim for this rule.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "arbitrary-precision iteration of the piecewise map and cycle and randomness tests on log-size"},
+      {"name": "Wolfram Engine", "url": "https://www.wolfram.com/engine/", "role": "recompute the orbit Wolfram plots and compare sizes after millions of steps"}
+    ],
+    "obstacles": [
+      "Absence of a cycle in a finite orbit does not prove the orbit never eventually repeats.",
+      "Slow growth of the integers makes very long orbits costly, though still routine for millions of steps."
+    ],
+    "rationale": "The rule and the starting value are explicit, and the quantity plotted is the size of an integer, so the observation is not an artifact of a digit base. Recomputing a long orbit and testing it for repetition is a standard calculation that would confirm the reported complexity or find a cycle that refutes it. The infinite-time reading is stronger than the claim, which is that such rules can produce this behavior."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-06",
+    "scores": {
+      "operationalizability": 0.45,
+      "data-existence": 0.75,
+      "data-adequacy": 0.5,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.65
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.7,
+    "operationalization": "Classify ensembles of simple arithmetic iterations and of local cellular automata with the same behavior taxonomy, and compare the frequencies of repetition, nesting, irregularity, and localized structures. A large, robust difference in those frequencies would challenge 'very similar'; agreement would support it for the sampled families.",
+    "candidate_datasets": [
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "sample of local cellular automaton behaviors to compare with arithmetic iterations"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "simulate non-local arithmetic maps and score them with the same behavior classifier"}
+    ],
+    "obstacles": [
+      "'Very similar' and 'do not crucially affect' have no sharp distance between behavior classes.",
+      "Carries are non-local, so a similarity of pictures can coexist with different mechanisms, and both readings fit the same outputs."
+    ],
+    "rationale": "Both sides of the comparison are simulable, and one can score arithmetic orbits and cellular automata with one classifier. The claim that the kinds of behavior are very similar, and that rule details therefore do not matter, is a qualitative summary of those pictures rather than a criterion with an obvious refutation. A matched sample is informative and still confounded by how the classes are drawn."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-07",
+    "scores": {
+      "operationalizability": 0.75,
+      "data-existence": 0.85,
+      "data-adequacy": 0.65,
+      "discriminating-power": 0.6,
+      "analysis-feasibility": 0.75
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.72,
+    "operationalization": "Iterate base-2 reverse-and-add from 512 for a very large number of steps, detect persistent localized blocks by spatial correlation, and test the digit field for an eventual global period. Onset of simple repetition would refute the claim; persistence of localized structures without a short period supports it on that horizon.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "arbitrary-precision base-2 reverse-and-add from 512 and tests for periodicity and localized blocks"},
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "published reverse-and-add and palindrome-related sequences for comparison with the iteration"}
+    ],
+    "obstacles": [
+      "A trajectory that is not periodic in any feasible prefix can still become periodic later, so 'never' is not finitely settled.",
+      "Localized structures can be defined in more than one way, and some definitions will count transient clumps."
+    ],
+    "rationale": "The process and the seed 512 are fixed, and Wolfram already displays the millionth step, which is reproducible with ordinary big-integer code. That decides whether localized structures and the absence of short repetition survive much longer inspection. It does not decide the universal claim that the pattern never becomes simply repetitive, so the existing computation resolves a long but finite part of the statement."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-08",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.9,
+      "data-adequacy": 0.75,
+      "discriminating-power": 0.6,
+      "analysis-feasibility": 0.9
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.78,
+    "operationalization": "Evaluate nested recurrences that use only addition and subtraction, such as rules depending on f[n - f[n-1]], and test the fluctuations of f[n] for nesting versus statistical irregularity. An irregular fluctuation series confirms that such rules can be complex; every well-defined rule in the class reducing to a regular nested or periodic fluctuation would refute the 'can.'",
+    "candidate_datasets": [
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "published Hofstadter and meta-Fibonacci sequences generated by nested addition-subtraction recurrences"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "compute long prefixes of the recurrences and test fluctuations for regularity"}
+    ],
+    "obstacles": [
+      "Some of these recurrences are known to be nested and are related to binary digits, so the randomness claim has to be restricted to the irregular cases.",
+      "Statistical irregularity of fluctuations does not identify the mechanism that produces them."
+    ],
+    "rationale": "The sequences are integer recurrences with published terms and trivial recomputation, and Wolfram's own examples already separate nested cases from irregular ones. Showing that at least some addition-subtraction recurrences of this kind have fluctuations that fail periodicity and nesting tests settles the existence claim. Calling those fluctuations random 'in many respects' is a weaker, test-dependent gloss on that same computation."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-09",
+    "scores": {
+      "operationalizability": 0.5,
+      "data-existence": 0.95,
+      "data-adequacy": 0.85,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.9
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.72,
+    "operationalization": "Compare prime gaps, residue counts, and related prime statistics with the Cramér random model and with the prime number theorem on primes tabulated far beyond the pictures in the book. Systematic agreement on a predeclared list of statistics would support randomness in those respects; the test does not pin down 'many respects.'",
+    "candidate_datasets": [
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "the sequence of primes and prime-gap sequences for statistical comparison"},
+      {"name": "The Prime Pages", "url": "https://t5k.org/", "role": "public prime tables and prime-gap data extending far past any visual inspection"}
+    ],
+    "obstacles": [
+      "'In many respects' remains true if some statistics look random and others, such as the prime number theorem or Chebyshev biases, do not.",
+      "The sieve that generates the primes builds in modular structure, so a test can rediscover that structure or average it away depending on the statistic."
+    ],
+    "rationale": "Primes are tabulated to limits that make sampling error irrelevant for any practical appearance claim, and the comparison with a random model is standard. The wording still cannot be cleanly refuted: known regularities and known random-like features both sit comfortably inside 'in many respects remarkably random.' The data are more than adequate, and the decision criterion is not."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-10",
+    "scores": {
+      "operationalizability": 0.4,
+      "data-existence": 0.85,
+      "data-adequacy": 0.6,
+      "discriminating-power": 0.35,
+      "analysis-feasibility": 0.7
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.62,
+    "operationalization": "For primes, divisor sums, sums of squares, and Goldbach-type counts, measure residual complexity after subtracting the regularities number theory has proved. Persistent irregular residuals are compatible with complexity coming from the generating rule; a full short description of each sequence would challenge that reading.",
+    "candidate_datasets": [
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "divisor sums, sums of squares, prime-related sequences, and their known formulas"},
+      {"name": "LMFDB", "url": "https://www.lmfdb.org/", "role": "compiled number-theoretic data and proven regularities against which residual complexity can be judged"}
+    ],
+    "obstacles": [
+      "Showing that a sequence looks complex does not show that the complexity is a fundamental consequence of the rule rather than of a specific analytic mechanism.",
+      "Several of the sequences are tied to open problems, so 'despite centuries of work' is not itself a complexity measure."
+    ],
+    "rationale": "The sequences named in the section are public and their proved regularities are catalogued, so the descriptive claim that considerable complexity remains is checkable. The further claim that this complexity arises as a fundamental consequence of the generating rules, in the same sense as in other simple programs, is an interpretation of that remainder. The same tables are compatible with ordinary number-theoretic explanations, so the causal wording is only partly tested."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-11",
+    "scores": {
+      "operationalizability": 0.8,
+      "data-existence": 0.95,
+      "data-adequacy": 0.85,
+      "discriminating-power": 0.65,
+      "analysis-feasibility": 0.85
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.82,
+    "operationalization": "Apply a fixed suite of normality and randomness tests to public prefixes of the digits of pi in several bases. A significant regular pattern on those prefixes would refute the practical claim; continued absence of such a pattern on prefixes far larger than those Wolfram cites would confirm it.",
+    "candidate_datasets": [
+      {"name": "Numberworld", "url": "https://www.numberworld.org/", "role": "public record of computed digits of pi against which regularity searches are run"},
+      {"name": "Google Pi Delivery", "url": "https://pi.delivery/", "role": "downloadable digits of pi for statistical tests in base 10 and base 16"},
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "the digit sequence of pi for a small independent check of the expansion"}
+    ],
+    "obstacles": [
+      "Passing statistical tests on a finite prefix does not prove that pi is normal.",
+      "A regularity with an extremely long period can be missed by any fixed test suite."
+    ],
+    "rationale": "Wolfram's claim is explicitly about computed digits and practical randomness, and public archives now hold many orders of magnitude more digits than the two hundred billion he cites. Running standard tests on those digits, or inspecting the published tests, can confirm the practical claim or refute it by exhibiting a regularity. Normality of pi remains unproved, and that is a stronger statement than the one being scored."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-12",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.8,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.6,
+      "analysis-feasibility": 0.75
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.73,
+    "operationalization": "For a large set of non-square integers, compute long digit prefixes of the square root in several bases and run randomness tests. One systematic digit pattern would refute the universal claim; clean results on the sample support it only inside that sample and those lengths.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "high-precision square roots of many non-squares and statistical tests on their digits"},
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "published digit sequences of square roots such as sqrt(2) for an external check"}
+    ],
+    "obstacles": [
+      "The claim quantifies over every non-square and every digit position, which no finite sample covers.",
+      "Normality of specific square roots is open, so tests speak only to appearance."
+    ],
+    "rationale": "Any particular square root is computable to enormous precision, and a single patterned expansion would refute the claim that every non-square has random-looking digits. A large sample can be checked in weeks and would resolve the claim on that sample. It would not reach every non-square integer or the infinite tail of each expansion, so the universal statement stays partly open."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-13",
+    "scores": {
+      "operationalizability": 0.65,
+      "data-existence": 0.8,
+      "data-adequacy": 0.6,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.8
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.72,
+    "operationalization": "Compute long digit prefixes of cube roots, fourth roots, logarithms, and exponentials of small integers and score them with the same randomness tests used for square roots. A recurring pattern in a declared 'simple' family would challenge 'almost all'; uniform irregularity would support the claim inside that family.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "high-precision roots, logarithms, and exponentials of small integers and digit tests"},
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "published digits of constants such as cube roots and logarithms"}
+    ],
+    "obstacles": [
+      "'Almost all' and 'simple numbers' need an explicit finite range before a failure rate means anything.",
+      "Special cases with known structure, such as logarithms of powers of the base, have to be excluded or they trivially fail randomness."
+    ],
+    "rationale": "The constants Wolfram lists are all computable to high precision with standard libraries, so the appearance claim is testable on a wide explicit range. 'Almost all' is a quantitative hedge that a sample can estimate only after the range is chosen, and a few structured exceptions are easy to produce by choice of base. The computation therefore settles a specified sample, which is part of the claim."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-14",
+    "scores": {
+      "operationalizability": 0.95,
+      "data-existence": 0.85,
+      "data-adequacy": 0.95,
+      "discriminating-power": 0.95,
+      "analysis-feasibility": 0.9
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.95,
+    "operationalization": "A real number has an eventually periodic digit expansion in an integer base if and only if it is rational, and for p/q the repeating block has length at most q-1 because the division remainder is an integer in 1, ..., q-1. A non-rational with an eventually periodic expansion, or a rational p/q whose minimal period exceeds q-1, would refute the claim; the standard remainder argument rules both out.",
+    "candidate_datasets": [
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "periods of decimal expansions of unit fractions, as a finite check of the bound of at most q-1"}
+    ],
+    "obstacles": [
+      "Terminating expansions are eventually periodic with repeating 0, and the statement has to be read that way or terminating rationals look like counterexamples."
+    ],
+    "rationale": "Both directions are elementary and published: long division has finitely many remainders, so every rational eventually repeats with period at most q-1, and an eventually periodic expansion is a finite geometric series, hence rational. The argument covers every integer base and every real, which is the claim's scope. Checking published periods of 1/q is only a sanity check on top of the proof."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-15",
+    "scores": {
+      "operationalizability": 0.8,
+      "data-existence": 0.75,
+      "data-adequacy": 0.8,
+      "discriminating-power": 0.85,
+      "analysis-feasibility": 0.65
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.66,
+    "operationalization": "Identify nested digit sequences from substitution systems with automatic or morphic sequences, and use the theorem that irrational automatic numbers are transcendental. An algebraic integer root whose digits are generated by such a substitution would refute the claim; the transcendence theorem confirms it for that class.",
+    "candidate_datasets": [
+      {"name": "Annals of Mathematics", "url": "https://annals.math.princeton.edu/", "role": "published proof that irrational automatic numbers are transcendental, hence not roots"},
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "classic nested digit sequences, such as the Thue-Morse sequence, to fix the class the theorem covers"}
+    ],
+    "obstacles": [
+      "Wolfram's 'nested' has to be mapped onto automatic or morphic sequences, and non-constant-length substitutions are the less immediate case.",
+      "The theorem is specialist reading rather than a few days of routine checking."
+    ],
+    "rationale": "Roots of integers are algebraic, and a published theorem says an irrational number with an automatic base-b expansion is transcendental, so it is not such a root. Constant-length substitution systems, which are the nested digit sequences Wolfram constructs, produce automatic sequences, so the mapping is the standard one. The remaining care is whether every pattern he would call nested falls under that theorem; that is a scope check inside the proof, not a missing dataset."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-16",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.85,
+      "data-adequacy": 0.7,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.8
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.74,
+    "operationalization": "Use Lagrange's theorem for the periodic continued fractions of quadratic irrationals, and the known regular expansion of e, as the proved half. For pi and for higher roots, test long computed continued-fraction terms for periodicity and for statistical irregularity; a simple pattern would refute 'essentially random,' while non-periodicity alone does not establish randomness.",
+    "candidate_datasets": [
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "published continued-fraction terms for pi, e, and roots"},
+      {"name": "Numberworld", "url": "https://www.numberworld.org/", "role": "high-precision constants from which long continued fractions can be derived"}
+    ],
+    "obstacles": [
+      "Non-periodic is weaker than random: a structured but unbounded sequence of partial quotients would satisfy the theorem and fail 'essentially random.'",
+      "It is still open whether the continued fraction of pi is unbounded, so computation only probes a prefix."
+    ],
+    "rationale": "The contrast Wolfram draws for square roots and for e is settled by classical theorems, and those theorems also prove that cube roots of non-cubes are not eventually periodic. The further statement that the terms for pi and higher roots seem essentially random is an appearance claim about computed prefixes, which public expansions can test and not prove. The bundle is therefore only partly resolved."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-17",
+    "scores": {
+      "operationalizability": 0.4,
+      "data-existence": 0.7,
+      "data-adequacy": 0.45,
+      "discriminating-power": 0.35,
+      "analysis-feasibility": 0.6
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.6,
+    "operationalization": "Fix a small list of representations with comparable evaluation cost, such as integer-base digits and continued fractions, and test whether numbers defined by simple operations look simple in every representation or irregular in some. Irregularity in every representation on the list supports intrinsic complexity for those representations; a representation that simplifies all of them challenges the claim inside the list.",
+    "candidate_datasets": [
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "digit and continued-fraction expansions of constants generated by simple operations"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "compute several representations of the same constants and compare their regularity"}
+    ],
+    "obstacles": [
+      "A representation can be designed to make any particular number look simple, and 'comparable effort' is hard to enforce across all representations.",
+      "'Often' and 'intrinsic' have no single decision threshold."
+    ],
+    "rationale": "Digits and continued fractions already show that the same constant can look simple in one representation and irregular in another, and both representations are computable or proved. The claim is about any representation in which recovering the value costs about the same for all numbers, which is a much larger class than the ones that have been checked. A short list of standard representations is a real partial test and leaves the universal wording open."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-18",
+    "scores": {
+      "operationalizability": 0.85,
+      "data-existence": 0.8,
+      "data-adequacy": 0.75,
+      "discriminating-power": 0.8,
+      "analysis-feasibility": 0.75
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "mixed",
+    "confidence": 0.7,
+    "operationalization": "For a range of alpha, compute the sign changes of sin(x) + sin(alpha x) and compare them with the generalized substitution system driven by the continued-fraction terms of (alpha-1)/(alpha+1). Systematic mismatch refutes the identity; agreement on long prefixes, together with the Sturmian coding of two-frequency crossings, confirms it. Quadratic irrationals should additionally yield nested patterns.",
+    "candidate_datasets": [
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "continued-fraction terms and Sturmian or mechanical words used as the predicted crossing patterns"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "high-precision axis crossings of sums of two sinusoids for comparison with the substitution system"}
+    ],
+    "obstacles": [
+      "Crossings that fall extremely close to zero need validated numerics so that a rounding error is not counted as a mismatch.",
+      "The exact prefactor (alpha-1)/(alpha+1) might differ from the classical slope coding by a transformation that has to be checked rather than assumed."
+    ],
+    "rationale": "Both sides of the claimed correspondence are explicit: a trigonometric zero set and a substitution rule read off a continued fraction. Long numerical comparisons are routine, and the underlying combinatorics is the standard theory of mechanical words for two irrational frequencies. A mismatch of the stated formula would refute this wording even if a nearby formula were true, so the test discriminates the claim as written."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-19",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.85,
+      "data-adequacy": 0.95,
+      "discriminating-power": 0.85,
+      "analysis-feasibility": 0.95
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.9,
+    "operationalization": "Prove that the doubling map modulo 1 shifts the base-2 expansion one place to the left. The orbit of a dyadic rational such as 1/2 is then eventually zero, and the orbit looks random only when the seed's digits already do. An orbit of a simple seed that is random in the leading bits would refute the identity.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "check the digit-shift identity on simple and on irregular seeds"},
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "binary expansions used as seeds whose shift under doubling can be compared termwise"}
+    ],
+    "obstacles": [
+      "The phrase 'no randomness of its own' is philosophical if randomness is not located in the digit sequence, but that is the location the claim uses."
+    ],
+    "rationale": "The shift map is the left shift on binary digits, which is a short exact identity rather than an empirical tendency. It covers every seed in the unit interval, so scope and discriminating power match the claim: simple seeds stay simple, and irregular output is copied from irregular seeds. Numerical checks illustrate the identity; the proof settles it."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-20",
+    "scores": {
+      "operationalizability": 0.75,
+      "data-existence": 0.9,
+      "data-adequacy": 0.85,
+      "discriminating-power": 0.65,
+      "analysis-feasibility": 0.9
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.78,
+    "operationalization": "Iterate the fractional part of 3x/2, and the other simple maps Wolfram contrasts with the shift, starting from 1/2, and test digits and sizes for periodicity and statistical irregularity. Eventual periodicity or a short formula refutes intrinsic randomness from that seed; a long irregular orbit from a simple seed confirms it.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "exact rational or high-precision iteration of the maps from the seed 1/2"},
+      {"name": "OEIS", "url": "https://oeis.org/", "role": "sequences generated by iterating fractional parts of linear maps, for comparison"}
+    ],
+    "obstacles": [
+      "Statistical irregularity of a finite orbit does not prove that the map is a randomness source in a stronger algorithmic sense.",
+      "These orbits are related to the base-2 digits of powers of 3, so a hidden structure there would also be a structure here."
+    ],
+    "rationale": "The maps and the simple seed are fully specified, and the contrast with the shift map is that the same seed produces irregular output. That orbit is an exact computation, reproducible at lengths far beyond the figures. A detected period would refute the example, and a persistent irregular orbit confirms the existence claim Wolfram states."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-21",
+    "scores": {
+      "operationalizability": 0.45,
+      "data-existence": 0.6,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.35,
+      "analysis-feasibility": 0.6
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.66,
+    "operationalization": "For the shift map, use the digit-shift identity: sensitive dependence only reveals later digits of the seed. For maps that also look random from simple seeds, separate amplified seed differences from irregularity already present at the simple seed. The general claim is confirmed only if that separation can be made; it is refuted if some system produces irregular output from a simple seed with no sensitive dependence, or if sensitive dependence is shown to add new irregularity beyond the seed.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "compare orbits of nearby seeds for the shift map and for the intrinsically irregular maps"}
+    ],
+    "obstacles": [
+      "Whether sensitive dependence 'produces' randomness depends on whether one describes the state by its size or by its digits.",
+      "The general principle covers all chaotic systems, while the clean argument is specific to digit shifts."
+    ],
+    "rationale": "On the shift map the claim is the digit identity already settled by proof: sensitive dependence displays digits that were in the seed. Extending the same moral to every chaotic system, including ones Wolfram thinks generate randomness intrinsically, requires a decomposition of randomness that the simulations do not force. Rivals who treat sensitive dependence as the source of randomness read the same orbits differently, so only the shift-map case is a clean test."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-22",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.85,
+      "data-adequacy": 0.7,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.8
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.74,
+    "operationalization": "Simulate one-dimensional continuous cellular automata, including fractional part of 3/2 times the neighborhood average and addition of a constant modulo 1, in exact rational or high-precision arithmetic. Persistent aperiodicity and particle-like localized structures support the claim; collapse to periodic or spatially uniform evolution under exact arithmetic would refute the examples.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "exact or high-precision simulation of continuous-valued cellular automata and tests for localized structures"},
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "discrete cellular automata used as the comparison class for 'the same kind of complexity'"}
+    ],
+    "obstacles": [
+      "Floating-point artifacts can create or destroy fine structure, so the run has to be checked in exact or validated arithmetic.",
+      "'The same kind of complexity' is a qualitative comparison and can be satisfied by loose resemblance."
+    ],
+    "rationale": "These systems are discrete in space and time with a continuous cell value, and the stated update rules are exact maps that public arithmetic can iterate at large size. Reproducing aperiodic evolution and localized structures would confirm the examples; a drift to a simple attractor would refute them. Matching the open-ended phrase 'the same kind of complexity' as ordinary cellular automata is a further, less sharp comparison."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-23",
+    "scores": {
+      "operationalizability": 0.25,
+      "data-existence": 0.4,
+      "data-adequacy": 0.25,
+      "discriminating-power": 0.15,
+      "analysis-feasibility": 0.25
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.74,
+    "operationalization": "The claim says nature does not fundamentally follow partial differential equations such as Maxwell's, Einstein's, and Schrödinger's. Agreement of those equations with experiment is compatible both with their being fundamental and with their being approximations, and the claim states no discrepancy that would decide.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "Any finite-precision success of a continuum equation is compatible with a discrete substrate below the tested scale.",
+      "'Fundamentally' is not tied to a scale, an observable, or a rival equation with a different prediction."
+    ],
+    "rationale": "High-precision tests of the classical field equations exist and support those equations as working models. The claim is the further negative statement that nature does not fundamentally follow them. No outcome of those tests distinguishes a fundamental continuum law from an arbitrarily accurate approximation, because the claim names no observable consequence that the two readings do not share."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-24",
+    "scores": {
+      "operationalizability": 0.15,
+      "data-existence": 0.2,
+      "data-adequacy": 0.1,
+      "discriminating-power": 0.1,
+      "analysis-feasibility": 0.15
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.88,
+    "operationalization": "The claim is a counterfactual: had computers arrived earlier in the history of mathematics, scientific models would probably not be dominated by partial differential equations. Historical sources can document why those equations were used; they cannot instantiate the other timeline.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "A counterfactual history has no observable that would confirm or refute it.",
+      "'In many respects a historical accident' can be retained or withdrawn without a change in any dataset."
+    ],
+    "rationale": "Wolfram offers a suspicion about why partial differential equations came to dominate, based on their solvability before computers. That is a counterfactual historical judgment. Archives of mathematics can support a narrative about actual motives; they do not contain the world in which computers arrived earlier, so the claim has no confirming or refuting observation."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-25",
+    "scores": {
+      "operationalizability": 0.65,
+      "data-existence": 0.65,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.45,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.68,
+    "operationalization": "Re-solve the specific simple partial differential equations Wolfram exhibits, under at least two independent discretizations with a convergence check, and test whether the complex patterns and discrete-looking patches survive. Scheme-independent complexity confirms the claim; patterns that disappear under refinement would refute those examples.",
+    "candidate_datasets": [
+      {"name": "FEniCS", "url": "https://fenicsproject.org/", "role": "independent finite-element solutions of the partial differential equations under refinement"},
+      {"name": "SciPy", "url": "https://scipy.org/", "role": "standard numerical PDE solvers used as a second discretization"}
+    ],
+    "obstacles": [
+      "The book itself notes that some details of these solutions are sensitive to the numerical scheme.",
+      "There is no canonical sample of 'simple' partial differential equations, so existence is easier to support than to refute."
+    ],
+    "rationale": "The claim is an existence claim about continuous equations, and public solvers can recompute candidate equations at varying resolution. Scheme-independent complex patterns would confirm it, while patterns that are discretization artifacts would refute the published examples. Because the book already flags scheme sensitivity, a single gallery of pictures is not an adequate dataset, and a careful convergence study is more than a routine week's work."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-26",
+    "scores": {
+      "operationalizability": 0.4,
+      "data-existence": 0.55,
+      "data-adequacy": 0.35,
+      "discriminating-power": 0.3,
+      "analysis-feasibility": 0.4
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.62,
+    "operationalization": "Compare the fraction of complex outcomes in a fully enumerated discrete family with the fraction in an explicitly sampled continuous family, such as continuous cellular automata with a random constant. A much smaller continuous fraction, stable under several samplings, would challenge 'not fundamentally rarer'; similar fractions would support it for those families.",
+    "candidate_datasets": [
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "enumerated discrete cellular automata giving a baseline rate of complex behavior"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "sample continuous cellular automata and score them with the same complexity classifier"}
+    ],
+    "obstacles": [
+      "There is no natural uniform measure on partial differential equations or on continuous rules, and Wolfram notes that sampling them is ill-posed.",
+      "Approximation artifacts, which the claim itself emphasizes, bias any continuous sample toward both false complexity and missed complexity."
+    ],
+    "rationale": "A paired comparison of discrete cellular automata with continuous cellular automata is computable and speaks to one reading of 'not rarer.' The claim is about continuous systems in general and uses 'probably' and 'fundamentally,' which no sampling measure can nail down. Different ways of drawing formulas produce different rates, so the existing computations test a proxy."
+  },
+  {
+    "claim_id": "wolfram2002-ch04-27",
+    "scores": {
+      "operationalizability": 0.5,
+      "data-existence": 0.6,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.45,
+      "analysis-feasibility": 0.45
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.64,
+    "operationalization": "List the phenomena already recorded for discrete simple programs, such as repetition, nesting, apparent randomness, and localized structures, and search simple continuous cellular automata, maps, and partial differential equations for each one. A continuous example supports that item; a proved obstruction for one item would refute 'essentially all,' while a failed search would not.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "search continuous cellular automata and iterated maps for each discrete phenomenon"},
+      {"name": "FEniCS", "url": "https://fenicsproject.org/", "role": "numerical search among simple partial differential equations for the same phenomena"}
+    ],
+    "obstacles": [
+      "Failure to find a continuous example does not refute an existence claim, so the universal statement is hard to falsify.",
+      "Numerical artifacts can imitate localized structures and nesting in continuum simulations."
+    ],
+    "rationale": "Some of the discrete phenomena, including irregular evolution and localized structures, already have continuous examples that can be resimulated. 'Essentially all' of the phenomena from the preceding chapters is an open-ended list, and absence of an example is weak evidence against a suspicion that an example exists. The claim is therefore testable piece by piece and not as a finished universal statement."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-01",
+    "scores": {
+      "operationalizability": 0.55,
+      "data-existence": 0.75,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.5,
+      "analysis-feasibility": 0.6
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.7,
+    "operationalization": "For matched families of cellular automata, Turing machines, and substitution systems in one, two, and three dimensions, estimate the fraction of small rules with irregular behavior. A sharp drop or jump in that fraction with dimension would challenge 'does not fundamentally change'; stable fractions would support it inside those families.",
+    "candidate_datasets": [
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "simulate one- and two-dimensional cellular automata for a matched complexity census"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "sample three-dimensional rules and small higher-dimensional Turing machines with the same classifier"}
+    ],
+    "obstacles": [
+      "Three-dimensional and large-neighborhood rule spaces can only be sampled, and the sample can miss rare complex rules.",
+      "'Fundamentally' and 'not much effect' move with the classifier and with how rules are paired across dimensions."
+    ],
+    "rationale": "One-dimensional elementary cellular automata are fully enumerable, and two-dimensional totalistic rules are searchable with public software, so a dimension comparison is a real computation. Three-dimensional samples and the words 'does not fundamentally change' keep the result from covering the whole claim. The test can detect a gross dimension effect and cannot certify that no such effect exists outside the sampled families."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-02",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.85,
+      "data-adequacy": 0.7,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.8
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.74,
+    "operationalization": "Evolve two-dimensional totalistic cellular automata from a single seed, extract the central one-dimensional slice, and score that slice with a classifier trained on ordinary one-dimensional cellular automata. Systematic mismatch of behavior types would challenge 'strikingly similar'; agreement on a large rule sample would support it.",
+    "candidate_datasets": [
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "evolve two-dimensional cellular automata and export one-dimensional slices"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "classify slices against one-dimensional cellular automaton behavior types"}
+    ],
+    "obstacles": [
+      "Similarity of pictures can be strong while a quantitative classifier still disagrees, or the reverse.",
+      "The slice through the middle is one observable; other slices can look less like one-dimensional cellular automata."
+    ],
+    "rationale": "The objects compared are explicit evolutions, and both the two-dimensional rules and the one-dimensional comparison class are standard to simulate. A predeclared similarity measure on a large totalistic sample would confirm or strain the visual claim. Without a sharp cutoff for 'very similar,' the exercise remains a partial, informative test rather than a yes-or-no resolution."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-03",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.9,
+      "data-adequacy": 0.9,
+      "discriminating-power": 0.85,
+      "analysis-feasibility": 0.9
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.88,
+    "operationalization": "Run the stated eight-neighbor rule (black only with exactly three black neighbors, with the published survival and death cases) from a short row of black cells, and measure circularity and the quadrupolar Fourier component of the boundary against a circle of radius about 0.37t. Circularity staying near 1 at large t confirms the approximation; a persistent square or diamond anisotropy would refute it.",
+    "candidate_datasets": [
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "exact evolution of the two-dimensional rule whose outline is compared with a circle"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "compute circularity and radial error of the grown pattern as functions of time"}
+    ],
+    "obstacles": [
+      "On a square lattice a perfect circle is impossible, so 'closely approximate' needs a numeric tolerance such as circularity or radial error.",
+      "Very large t is cheap but not infinite; a late drift away from circularity would still count against the claim."
+    ],
+    "rationale": "The rule, the initial row, and the claimed circular outline are concrete, and the evolution is an exact finite cellular automaton. Public simulators can run it for far more than the 400 steps in the figure and report a circularity statistic with an obvious confirming or refuting range. Grid anisotropy is precisely what the measurement is designed to detect, so the test discriminates the claim from a merely blob-like growth."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-04",
+    "scores": {
+      "operationalizability": 0.8,
+      "data-existence": 0.9,
+      "data-adequacy": 0.8,
+      "discriminating-power": 0.7,
+      "analysis-feasibility": 0.85
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.78,
+    "operationalization": "Evolve the rule 'turn black if exactly three of eight neighbors are black, otherwise stay the same' from a row of eleven black cells, and track the outline's Fourier spectrum and diameter over many thousands of steps. Continued change of the outline without collapse to a fixed shape confirms complexity of the overall form; stabilization to a simple growing shape would refute it.",
+    "candidate_datasets": [
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "exact long evolution of the eight-neighbor growth rule from a finite seed"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "measure whether the outer shape keeps changing or settles into a simple form"}
+    ],
+    "obstacles": [
+      "A shape that keeps changing for thousands of steps can still settle later, so the run bounds the claim rather than proving it for all time.",
+      "Interior complexity can be mistaken for complexity of the outline unless the outline is measured separately."
+    ],
+    "rationale": "The rule and the seed are fixed, and the claim is that this simple growth rule produces overall shapes that keep changing, not only complicated interiors. That is a finite, exact simulation with a shape statistic that either keeps evolving or locks onto a simple form. A long confirming run settles the existence claim as stated; only a stronger 'forever' reading would remain open."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-05",
+    "scores": {
+      "operationalizability": 0.55,
+      "data-existence": 0.7,
+      "data-adequacy": 0.5,
+      "discriminating-power": 0.45,
+      "analysis-feasibility": 0.6
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.68,
+    "operationalization": "Simulate a sample of three-dimensional cellular automata with 6-neighbor and 26-neighbor rules and classify them against the one- and two-dimensional behavior types. A behavior that cannot be placed in those types would challenge 'the same basic kinds'; a sample that stays within them supports the claim for that sample.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "simulate small three-dimensional cellular automata and classify their growth"},
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "one- and two-dimensional reference behaviors for the comparison"}
+    ],
+    "obstacles": [
+      "Three-dimensional rule space is too large to exhaust, and printed or rendered samples emphasize symmetric cases.",
+      "'The same basic kinds' can absorb new phenomena by calling them minor, which weakens refutation."
+    ],
+    "rationale": "Small three-dimensional rules are straightforward to simulate, and the examples in the book can be recomputed and labeled with the same taxonomy used in lower dimensions. That tests the claim on a sample. It does not cover three-dimensional rules in general, and the phrase 'basic kinds' is elastic enough that a novel phenomenon can be filed as a detail rather than a counterexample."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-06",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.75,
+      "data-adequacy": 0.65,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.6
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.7,
+    "operationalization": "Sample millions of two-dimensional Turing machines with two, three, and four head states and two colors, and classify each run as repetitive, nested, or complex. A complex fraction near a few per million at four states, and none at two or three states in a large sample, would support the claim; a complex fraction of many percent would refute 'rare.'",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "sample two-dimensional Turing machines and automatically classify their space-time patterns"},
+      {"name": "Busy Beaver Challenge", "url": "https://bbchallenge.org/", "role": "methods and censuses for small Turing machines, as a check on how rare non-simple behavior is in a related family"}
+    ],
+    "obstacles": [
+      "Long-period nested motion is easily misclassified as complex, which moves the estimated rate by more than 'a few per million.'",
+      "The four-state, two-color, four-direction rule space is far too large to exhaust, so the rate is a sample estimate."
+    ],
+    "rationale": "The numerical claim, a few complex rules per million at four states and only simple behavior at two or three, is a sampling statement that a small team can replicate. Two-state machines are small enough for a near-census; four-state machines are not, and the result hinges on an automatic behavior classifier. That replication can confirm the order of magnitude or refute it, with a serious classification confound, so it resolves the claim only in part."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-07",
+    "scores": {
+      "operationalizability": 0.85,
+      "data-existence": 0.7,
+      "data-adequacy": 0.9,
+      "discriminating-power": 0.8,
+      "analysis-feasibility": 0.85
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.82,
+    "operationalization": "A neighbor-independent replacement rule sends each element to a fixed finite configuration of smaller elements, so the pattern at step n is a union of scaled copies of the pattern at step n-1. That is nested structure. A deterministic neighbor-independent geometric rule whose construction is not self-similar would refute the claim.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "iterate geometric replacement rules, including overlapping ones, and check self-similarity of the construction"}
+    ],
+    "obstacles": [
+      "Heavy overlaps can make the drawn picture look solid rather than nested even though the construction is still hierarchical.",
+      "Random or neighbor-dependent replacements are outside the claim and are not counterexamples."
+    ],
+    "rationale": "The claim is that independent replacement forces a nested pattern, and that follows from the definition of an iterated function system: each stage is an assembly of copies of the previous stage. The argument covers grids and free geometric rules, including the overlapping cases Wolfram mentions. Examples can be drawn to illustrate it; the proof is what settles the universal wording."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-08",
+    "scores": {
+      "operationalizability": 0.55,
+      "data-existence": 0.7,
+      "data-adequacy": 0.6,
+      "discriminating-power": 0.5,
+      "analysis-feasibility": 0.75
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.68,
+    "operationalization": "Simulate two-dimensional substitution rules in which the replacement depends on neighboring cells, and test whether the result is a purely nested self-similar pattern. A persistent non-nested pattern confirms the computational half; the historical claim that traditional fractal geometry excludes interactions is a separate judgment about the literature.",
+    "candidate_datasets": [
+      {"name": "Python", "url": "https://www.python.org/", "role": "evolve neighbor-dependent two-dimensional substitution systems and test for pure nesting"},
+      {"name": "Golly", "url": "https://golly.sourceforge.net/", "role": "related grid rules with neighbor interaction, as additional examples of non-nested growth"}
+    ],
+    "obstacles": [
+      "What 'traditional fractal geometry' considers is a historical classification and can be disputed by pointing at exceptions in the literature.",
+      "A neighbor-dependent rule can still be nested, so one nested example does not refute 'readily yields' non-nested patterns."
+    ],
+    "rationale": "The computational half is direct: neighbor-dependent grid substitutions can be run, and non-nested outputs confirm that allowing interactions produces patterns outside pure nesting. The claim that traditional fractal geometry misses complexity because it excludes interactions is a characterization of a field, and a simulation does not decide how that field is defined. Existing computation therefore settles the constructive half only."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-09",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.75,
+      "data-adequacy": 0.85,
+      "discriminating-power": 0.9,
+      "analysis-feasibility": 0.85
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.85,
+    "operationalization": "Exhibit directed graphs in which every node has out-degree two and the connection pattern is that of a line, a square grid, a cubic lattice, a regular tree, or a nested hierarchy, and give the inductive step that raises the dimension by one. A dimension for which no such out-degree-two encoding exists would refute the claim.",
+    "candidate_datasets": [
+      {"name": "NetworkX", "url": "https://networkx.org/", "role": "build the proposed out-degree-two graphs and check degree, dimension, and reachability"}
+    ],
+    "obstacles": [
+      "Whether a finite graph 'forms' an infinite array or tree is a claim about a repeating connection rule, and the check has to be on that rule rather than on a drawing.",
+      "Different layouts of the same graph look different, so the test has to use the connection pattern, not the picture."
+    ],
+    "rationale": "Wolfram gives explicit out-degree-two wirings for one, two, and three dimensions and says the same scheme extends. That extension is a short constructive argument: encode an n-dimensional lattice by a fixed local rewiring of identical nodes. Software can verify the small cases, and the inductive construction covers every finite dimension, which is the scope of the claim."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-10",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.75,
+      "data-adequacy": 0.6,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.5
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.66,
+    "operationalization": "Enumerate network rewiring rules that branch on whether the two outgoing edges meet, and then rules that branch on the number of distinct nodes within distance two, and record the node-count series. Universal eventual repetition in the first family, and an irregular fraction on the order of 1 in 10,000 in the second, would support the claim; a much higher irregular fraction, or a short period in the alleged random examples, would refute it.",
+    "candidate_datasets": [
+      {"name": "NetworkX", "url": "https://networkx.org/", "role": "apply local rewiring and node-insertion rules and record the number of nodes"},
+      {"name": "Python", "url": "https://www.python.org/", "role": "sample the distance-two rule space and test node-count series for periodicity"}
+    ],
+    "obstacles": [
+      "The rate 'about one in 10,000' depends on the encoding and the measure used to draw random rules.",
+      "A node count can look random for a long time and then fall into a long cycle, and growing networks make those runs expensive."
+    ],
+    "rationale": "The two rule families are described precisely enough to resample, and public graph libraries can apply the rewrites. A sample large enough to estimate a one-in-ten-thousand rate, with long enough evolutions to trust the irregular cases, is a specialist project of weeks to months rather than a routine analysis. The qualitative contrast, repetitive at distance one and sometimes irregular at distance two, is the part that existing computation can actually pin down."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-11",
+    "scores": {
+      "operationalizability": 0.2,
+      "data-existence": 0.3,
+      "data-adequacy": 0.15,
+      "discriminating-power": 0.1,
+      "analysis-feasibility": 0.2
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.8,
+    "operationalization": "The claim suspects that some network systems will turn out to be closely related to the structure of space and spacetime. No network rule, no derived continuum limit, and no observation that would fail if the suspicion were wrong are identified.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "'Closely related' can be satisfied by any discrete model that recovers ordinary geometry at large scales, or withdrawn if that model fails, without touching the suspicion.",
+      "Tests of Lorentz invariance or of general relativity constrain specific discrete-spacetime proposals, not an unspecified future network system."
+    ],
+    "rationale": "This is an explicit suspicion about a future identification between some network system and spacetime, with no accompanying prediction. Precision data on gravity and particle physics can confirm or refute particular models that make particular predictions. They do not contain a variable corresponding to 'some of these systems will in the end turn out to be closely related,' so the claim as stated has no discriminating test."
+  }
+]

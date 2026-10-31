@@ -1,0 +1,1323 @@
+[
+  {
+    "claim_id": "wolfram2002-ch05-12",
+    "scores": {
+      "operationalizability": 0.62,
+      "data-existence": 0.7,
+      "data-adequacy": 0.45,
+      "discriminating-power": 0.58,
+      "analysis-feasibility": 0.48
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.7,
+    "operationalization": "Enumerate a declared family of short string-rewriting rules, plot the number of distinct strings against step, and classify each run as bounded, slowly growing, or exponential. A large intermediate class would challenge the claim; a strong two-way split would support it inside that family.",
+    "candidate_datasets": [
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "published multiway evolutions and rule specifications for the simple systems in this section"
+      },
+      {
+        "name": "SageMath",
+        "url": "https://www.sagemath.org/",
+        "role": "public computer-algebra system for enumerating short rewriting rules and counting distinct strings"
+      }
+    ],
+    "obstacles": [
+      "Fast growth exhausts memory, so the systems that are easiest to classify are the slow ones.",
+      "The fraction called rare moves when the distribution over rule size and alphabet changes.",
+      "A short run can make polynomial growth look exponential."
+    ],
+    "rationale": "State counts are a direct observable, and small rules can be simulated with public software, so a finite census is a real test. The claim quantifies over multiway systems in general, while only very small rules stay computable, and the fast-growing majority is exactly what the state explosion hides. Ensemble choice and the cutoff for slow growth keep a sample from settling the full quantifiers."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-13",
+    "scores": {
+      "operationalizability": 0.58,
+      "data-existence": 0.68,
+      "data-adequacy": 0.5,
+      "discriminating-power": 0.52,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.68,
+    "operationalization": "For each slowly growing rule, track the sequence of string counts and test whether it becomes periodic, including the stated period-1071 example. A cycle supports the example; a diverse sample that stays aperiodic past many times its apparent transient would challenge the word typically.",
+    "candidate_datasets": [
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "rule and initial condition for the published multiway run whose count differences repeat every 1071 steps"
+      },
+      {
+        "name": "SageMath",
+        "url": "https://www.sagemath.org/",
+        "role": "rewrite-system enumeration and cycle detection on state-count sequences"
+      }
+    ],
+    "obstacles": [
+      "Eventually is not a finite test: a cycle can sit beyond any chosen cutoff.",
+      "Periods of hundreds or thousands of steps are missed by short runs.",
+      "Apparent randomness has to be translated into a chosen statistical test."
+    ],
+    "rationale": "The period-1071 example is a concrete simulation with the rule given in the text, and repetition of a count sequence is a sharp detection problem. Typically and in the end still refer to an open collection of slowly growing systems, and failure to find a cycle does not refute an unbounded wait. A sample can confirm the published example and estimate a rate; it cannot close the general statement."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-14",
+    "scores": {
+      "operationalizability": 0.22,
+      "data-existence": 0.2,
+      "data-adequacy": 0.15,
+      "discriminating-power": 0.15,
+      "analysis-feasibility": 0.3
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.78,
+    "operationalization": "The successor network is the directed graph of the rewriting relation itself, so drawing it reproduces the definition rather than testing a separate prediction. Complicated has no stated numeric cutoff that would confirm or refute the sentence.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "Deterministic successors make the time-network true by the setup of the system.",
+      "Quite complicated names no graph invariant and no decision threshold."
+    ],
+    "rationale": "Wolfram presents the network as a consequence of the rule that each string has fixed successors, so the representation holds by construction for every multiway system. The remaining predicate, that the pattern is often quite complicated, does not specify an invariant or a rival it would exclude. Building example graphs is easy and does not decide the sentence."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-15",
+    "scores": {
+      "operationalizability": 0.95,
+      "data-existence": 0.88,
+      "data-adequacy": 0.95,
+      "discriminating-power": 0.95,
+      "analysis-feasibility": 0.9
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.86,
+    "operationalization": "Form the de Bruijn graph whose edges are locally allowed colorings. A cycle is a purely repetitive solution; a satisfiable one-dimensional constraint whose graph had no cycle would refute the claim, and the standard cycle argument says that case does not occur.",
+    "candidate_datasets": [
+      {
+        "name": "SageMath",
+        "url": "https://www.sagemath.org/",
+        "role": "build the finite de Bruijn graph of a concrete one-dimensional constraint and search it for a cycle"
+      }
+    ],
+    "obstacles": [
+      "Local means a finite window, which is the reading the surrounding text supports.",
+      "The result is existence of one repetitive solution, not uniqueness."
+    ],
+    "rationale": "The statement is the standard fact that a nonempty one-dimensional subshift of finite type contains a periodic point, proved by finding a cycle in a finite de Bruijn graph. That argument covers every finite local constraint in one dimension, and a small team can check it in days. A concrete constraint can also be audited in SageMath by building the same graph."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-16",
+    "scores": {
+      "operationalizability": 0.92,
+      "data-existence": 0.72,
+      "data-adequacy": 0.58,
+      "discriminating-power": 0.84,
+      "analysis-feasibility": 0.38
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.64,
+    "operationalization": "Encode each subset of the 32 five-cell templates as a constraint, test it against the published list of 171 repetitive patterns, and run a backtracking search where none of those patterns fit. Agreement with 766,979,044 unsatisfiable cases and no satisfiable case outside the 171 patterns would confirm the census; one extra pattern or a shifted count would refute it.",
+    "candidate_datasets": [
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "the published catalogue of 171 repetitive patterns and the numbering of five-cell template constraints"
+      }
+    ],
+    "obstacles": [
+      "There are 2^32 constraints, and some unsatisfiability witnesses are large finite regions.",
+      "The 171 patterns let many constraints be checked quickly, but the exact global count needs the full search.",
+      "A bug in the numbering or symmetry reduction would move the integer without changing the mathematics."
+    ],
+    "rationale": "The claim is a finite, fully specified census, so in principle a recomputation decides it, and the 171 patterns are printed and can be checked against individual constraints now. Reproducing the exact unsatisfiable count is a specialist enumeration far past a few weeks, because some constraints only fail on large regions. Existing public material therefore tests pieces of the census rather than the integer as stated."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-17",
+    "scores": {
+      "operationalizability": 0.28,
+      "data-existence": 0.2,
+      "data-adequacy": 0.15,
+      "discriminating-power": 0.2,
+      "analysis-feasibility": 0.25
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.66,
+    "operationalization": "A constraint system is defined by allowed local templates rather than by an update rule, so the absence of a built-in evolution step restates that definition. Enormous effort has no cutoff that would separate this contrast from ordinary search.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "The sentence contrasts a constraint with an explicit update rule, which is how the two setups are defined.",
+      "Enormous computational effort names no complexity bound and no class of instances."
+    ],
+    "rationale": "The text says there is no direct procedure because the system is given by constraints, which is the definition of that setup rather than a further fact. Nearby theorems about tiling being undecidable are stronger than anything this paragraph states, and the same section says that with tricks the examples at hand are feasible. No measurement distinguishes the sentence from the definition it restates."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-18",
+    "scores": {
+      "operationalizability": 0.78,
+      "data-existence": 0.7,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.72,
+      "analysis-feasibility": 0.42
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.6,
+    "operationalization": "Reconstruct the book's numbering, force constraint 18762389 from its required template, and test whether the resulting coloring is the published base-2 nested pattern and whether any earlier constraint already has no repetitive solution. An earlier aperiodic example, or a second infinite coloring, would refute the corresponding clause.",
+    "candidate_datasets": [
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "templates, numbering, and the published nested coloring for constraint 18762389"
+      },
+      {
+        "name": "SageMath",
+        "url": "https://www.sagemath.org/",
+        "role": "exact arithmetic and search over small template sets while checking periodic candidates"
+      }
+    ],
+    "obstacles": [
+      "Uniqueness on the infinite grid needs a forcing argument, not only a finite picture.",
+      "Showing this constraint is first requires the same standard on more than 18 million predecessors.",
+      "The numbering scheme has to be reconstructed before the index can be audited."
+    ],
+    "rationale": "Constraint 18762389 is explicitly described, and its nested coloring can be checked against the twelve templates in weeks. The claim also says it is the first such constraint after more than 18 million trials and that the coloring is the only one, which is a large search plus an infinite-grid uniqueness argument. Public material settles the single picture much more readily than the priority and uniqueness clauses."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-19",
+    "scores": {
+      "operationalizability": 0.48,
+      "data-existence": 0.55,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.42,
+      "analysis-feasibility": 0.4
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.66,
+    "operationalization": "Draw a large explicit sample of required-template constraints, search each for a satisfying coloring, and classify that coloring as repetitive, nested, or neither by a stated substitution or automata test. One coloring that fails both repetitive and nested tests would refute the sample claim; a clean sample only supports it.",
+    "candidate_datasets": [
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "the template scheme and the nested example used as the complexity ceiling in this census"
+      }
+    ],
+    "obstacles": [
+      "The millions actually tested are not archived as a list.",
+      "Nested versus more complicated is a judgment unless a formal class such as automatic sequences is fixed in advance.",
+      "A negative search leaves the other constraints in the 137 billion untouched."
+    ],
+    "rationale": "The sentence is carefully limited to millions tested, so it is a sample claim rather than a universal theorem, but that sample is not deposited as data. A new sample of millions is a proxy, and millions remain a thin slice of 137,438,953,472 constraints. Finding a clearly non-nested coloring would refute the intended content; failing to find one would not close it."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-20",
+    "scores": {
+      "operationalizability": 0.78,
+      "data-existence": 0.88,
+      "data-adequacy": 0.82,
+      "discriminating-power": 0.8,
+      "analysis-feasibility": 0.72
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "mixed",
+    "confidence": 0.64,
+    "operationalization": "Transcribe the 56 allowed 3 by 3 templates, check that the rule 30 spacetime diagram uses only those templates, and prove that each new row is forced. A second infinite coloring, or a row that rule 30 produces and the templates forbid, would refute the construction.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "generate the rule 30 spacetime diagram used as the forced pattern"
+      },
+      {
+        "name": "OEIS A051023",
+        "url": "https://oeis.org/A051023",
+        "role": "published center column of rule 30 from a single black cell, as a check on the simulated diagram"
+      },
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "the figure that specifies the 56 allowed 3 by 3 templates"
+      }
+    ],
+    "obstacles": [
+      "The templates have to be read from the figure.",
+      "Uniqueness on the infinite grid follows only if the local forcing argument is complete.",
+      "Largely random is only as sharp as a chosen statistical battery on the rule 30 row."
+    ],
+    "rationale": "The scope is one finite template set, and rule 30 is a standard public automaton, so the correspondence can be audited by a small team. Uniqueness is a proof from local forcing rather than a picture, which is why the route is mixed, and transcribing the figure is the slow step. The soft phrase largely random is carried by the already specified rule 30 pattern rather than by a separate experiment."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-21",
+    "scores": {
+      "operationalizability": 0.45,
+      "data-existence": 0.68,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.5,
+      "analysis-feasibility": 0.48
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.67,
+    "operationalization": "Fix finite ensembles of small constraints and of small cellular-automaton rules, score each output as repetitive, nested, or complex by pre-registered tests, and compare the two rates. A constraint rate of complex outcomes comparable to the rule rate would challenge the contrast inside those ensembles.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "enumerate and evolve the simple cellular-automaton rules used as the comparison class"
+      },
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "the constraint families whose simple cases are claimed to produce mostly simple patterns"
+      }
+    ],
+    "obstacles": [
+      "Almost all, simple, and fairly simple each depend on the ensemble and the complexity score.",
+      "Constraint spaces and rule spaces are different sets, so raw rates are not automatically comparable.",
+      "The text already allows rare complex constraints, so only the rate is at issue."
+    ],
+    "rationale": "Both sides of the comparison can be sampled: small template constraints by search, and elementary rules by direct evolution. The sentence is a rate claim about almost all simple constraints, and any finite sample leaves the tail, the complexity cutoff, and the matching of the two ensembles open. It can support or challenge a stated proxy, not the unrestricted quantifier."
+  },
+  {
+    "claim_id": "wolfram2002-ch05-22",
+    "scores": {
+      "operationalizability": 0.15,
+      "data-existence": 0.15,
+      "data-adequacy": 0.1,
+      "discriminating-power": 0.1,
+      "analysis-feasibility": 0.2
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.88,
+    "operationalization": "The sentence names a historical cause of a disciplinary failure. No variable in the scientific record is the counterfactual complexity research that would have occurred under a different choice of equations.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "The sentence is a causal claim about the history of method.",
+      "The same publication record fits many other accounts of when complexity became a topic."
+    ],
+    "rationale": "Whether equations-as-constraints delayed the recognition of complexity is a counterfactual about the history of science. Publication archives record what was studied; they do not record which alternative methods would have found the phenomenon. No outcome distinguishes this reason from other accounts of the same history."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-01",
+    "scores": {
+      "operationalizability": 0.72,
+      "data-existence": 0.92,
+      "data-adequacy": 0.78,
+      "discriminating-power": 0.72,
+      "analysis-feasibility": 0.9
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.78,
+    "operationalization": "Evolve standard elementary rules from random initial rows and compare block entropy, density, and domain structure with the initial row. Collapse to a uniform or periodic state, or stable domains, confirms organization for those rules; output that stays statistically indistinguishable from the input would refute it for them.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "evolve elementary and other simple cellular automata from random initial conditions"
+      },
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "the specific rules, including rules 254, 232, and 110, used as the chapter's examples"
+      }
+    ],
+    "obstacles": [
+      "Not at all random still depends on which statistics are applied.",
+      "Many has no numeric threshold, though the claim is witnessed by a handful of rules."
+    ],
+    "rationale": "Many is an existential quantifier over simple programs, and the elementary rules named in the chapter are fully specified and trivial to run. Uniform, periodic, and localized outcomes are standard measurements that separate organized evolution from a field that stays as random as its input. A small team can finish that check in days."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-02",
+    "scores": {
+      "operationalizability": 0.55,
+      "data-existence": 0.9,
+      "data-adequacy": 0.5,
+      "discriminating-power": 0.5,
+      "analysis-feasibility": 0.78
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.7,
+    "operationalization": "Evolve every elementary rule, and a declared sample of larger rules, from random initial conditions, and assign each run by pre-registered measurements of activity, damage spread, and localized structures. A large residue that fits none of the four bins, or a stable three-bin or five-bin partition with higher agreement, would challenge the four-class claim inside that sample.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "exhaustive evolution of the 256 elementary rules and samples of larger rules"
+      },
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "the rule sequences and the borderline examples the book already separates from the four classes"
+      }
+    ],
+    "obstacles": [
+      "The book itself exhibits rules that sit on class boundaries.",
+      "All kinds supplies no measure over dimension, radius, and number of states.",
+      "Visual assignment is only partly reproduced by formal proxies."
+    ],
+    "rationale": "The 256 elementary rules are a complete public family and can be classified in days, so the four-way picture is testable on the space the chapter mostly shows. Almost always and all kinds extend past that space, and the text already records borderline rules that one definition places in one class and another definition places elsewhere. A sample can measure agreement; it cannot make the four bins unique or universal."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-03",
+    "scores": {
+      "operationalizability": 0.48,
+      "data-existence": 0.88,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.45,
+      "analysis-feasibility": 0.82
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.58,
+    "operationalization": "For rule 110 and other rules already tagged class 4 by an independent activity criterion, catalogue persistent finite objects and measure collision transients. Simple periodic objects whose collisions have long, input-sensitive transients support the description for those rules.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "simulate rule 110 and other class 4 rules and record glider collisions"
+      },
+      {
+        "name": "Catagolue",
+        "url": "https://catagolue.hatsya.com/",
+        "role": "public census of localized objects in Life and related two-dimensional rules"
+      }
+    ],
+    "obstacles": [
+      "Localized interacting structures are the visual mark already used to name class 4.",
+      "Fairly simple and very complicated are not numeric.",
+      "Object censuses cover famous rules and miss an open-ended class."
+    ],
+    "rationale": "Named exemplars such as rule 110 have public simulators and, for Life, a public object census, so the phenomenology of simple objects with long collisions can be checked directly. The class label in the sentence is itself assigned by that phenomenology, which limits how far the check can discriminate a rival description. The result is a solid audit of exemplars and a weak test of the class as a class."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-04",
+    "scores": {
+      "operationalizability": 0.58,
+      "data-existence": 0.85,
+      "data-adequacy": 0.5,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.7
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.66,
+    "operationalization": "Assign classes from one declared criterion, then predict held-out measurements such as damage-spread rate, cycle growth with ring size, and language size. High mutual information supports the correlation; a property that stays unpredictable after the class is known challenges it.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "compute activity, damage spread, and cycle lengths for elementary and sampled rules"
+      }
+    ],
+    "obstacles": [
+      "A property used to assign the class cannot be counted as an independent prediction.",
+      "Most detailed properties is an open list.",
+      "Borderline rules, which the text displays, weaken a strict correlation."
+    ],
+    "rationale": "Standard cellular-automaton statistics are cheap to compute for elementary rules, and association with a pre-registered class label is an ordinary analysis. The sentence says most properties and often enough, and it is easy to build a circular test that reuses the visual features as both label and outcome. A held-out statistic can support the correlation on a finite family only."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-05",
+    "scores": {
+      "operationalizability": 0.52,
+      "data-existence": 0.8,
+      "data-adequacy": 0.5,
+      "discriminating-power": 0.52,
+      "analysis-feasibility": 0.62
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.63,
+    "operationalization": "Prove the syntactic restrictions that the text says yield only class 1 or 2, and separately train simple predictors from the rule table to the class on a held-out finite family. A predictor that is short and accurate on most of that family would challenge the no-easy-way clause; the syntactic proofs stand or fall on their own.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "label finite rule families by observed class for a prediction baseline"
+      },
+      {
+        "name": "SageMath",
+        "url": "https://www.sagemath.org/",
+        "role": "check algebraic restrictions that force class 1 or class 2 behavior"
+      }
+    ],
+    "obstacles": [
+      "Failure of several predictors does not prove that no easy predictor exists.",
+      "Undecidability applies to infinite families, not to one fixed finite rule table.",
+      "Easy way is a family of formalizations, not a single test."
+    ],
+    "rationale": "The positive half, that some syntactic families never leave class 1 or 2, is a finite proof of the sort the text sketches and can be checked. The negative half, that most rules have no easy class readout, is an absence claim: public rule tables let one try predictors, and a strong predictor would hurt it, but unsuccessful trials leave it open. The two halves therefore resolve to different degrees."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-06",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.88,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.62,
+      "analysis-feasibility": 0.75
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.7,
+    "operationalization": "Define activity as the fraction of cells that change per step, assign classes by localized structures rather than by activity, and test whether class 4 sits between class 2 and class 3 along stated one-parameter rule sequences. A class 4 stretch whose activity matches class 3, or a sequence whose class 4 rules sit outside the class 2 to class 3 boundary, would challenge the claim in that family.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "measure activity along totalistic and elementary rule sequences"
+      },
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "the four-color totalistic sequence in which class 4 is said to sit between class 2 and class 3"
+      }
+    ],
+    "obstacles": [
+      "The ordering is informative only when class labels are not themselves activity thresholds.",
+      "Commonly depends on how rule sequences are parametrized.",
+      "A single class 4 run wavers, so the comparison needs a time average."
+    ],
+    "rationale": "Activity is a direct time series, and the book's one-parameter sequences are fully specified, so the intermediate-activity pattern can be measured in days on those sequences. Commonly over sequences of rules, discrete and continuous, is wider than any one family, and class labels remain partly visual. The ordering is a real test on the published sequences and a sample beyond them."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-07",
+    "scores": {
+      "operationalizability": 0.6,
+      "data-existence": 0.82,
+      "data-adequacy": 0.58,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.8
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.68,
+    "operationalization": "Scan the averaging-plus-fractional-part family as the additive constant runs from 0 to 1, and tag each value by activity and by whether discrete localized structures appear. Four regimes in the same order as discrete classes, with localized structures at the transitions, would support the claim for this family.",
+    "candidate_datasets": [
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "the exact continuous update, including the fractional-part averaging rule and the 1.13 neighbor weight"
+      }
+    ],
+    "obstacles": [
+      "Gray-level pictures still need a mapping onto the four discrete classes.",
+      "The evidence is one parametrized family, while continuous cellular automata are a wider class.",
+      "Localized structures can depend on how the gray levels are displayed."
+    ],
+    "rationale": "The continuous family is an explicit formula, so a parameter scan is ordinary numerical work and can be finished quickly. Calling the output essentially the same four classes adds an interpretation step that discrete rules do not need, and localized structures have to be separated from display choices. The scan tests this family well and the broader wording only through that proxy."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-08",
+    "scores": {
+      "operationalizability": 0.64,
+      "data-existence": 0.9,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.62,
+      "analysis-feasibility": 0.8
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.72,
+    "operationalization": "Evolve the small two-dimensional totalistic rules and the Game of Life from random and near-blank seeds, then classify one-dimensional slices by the same activity and damage criteria used in one dimension. Failure of those slices to use all four types, or failure of Life to sustain localized objects on a white background, would challenge the corresponding clause.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "evolve two-dimensional totalistic rules and the Game of Life, including spacetime slices"
+      },
+      {
+        "name": "Catagolue",
+        "url": "https://catagolue.hatsya.com/",
+        "role": "census of Life objects that persist and move on an empty background"
+      }
+    ],
+    "obstacles": [
+      "A one-dimensional slice can display a class the full two-dimensional field does not.",
+      "Small totalistic codes do not exhaust two-dimensional rules.",
+      "Life is much better archived than the general two-dimensional claim."
+    ],
+    "rationale": "The 5-neighbor totalistic rules that preserve a white background are a small finite list, and Life is simulated and censused in public software, so the slice comparison and the white-background clause are practical. The sentence says two-dimensional cellular automata in general show the same four classes, which that list does not cover. Slices are a useful proxy and also a possible confound."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-09",
+    "scores": {
+      "operationalizability": 0.8,
+      "data-existence": 0.9,
+      "data-adequacy": 0.58,
+      "discriminating-power": 0.72,
+      "analysis-feasibility": 0.85
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.74,
+    "operationalization": "Flip one initial cell, plot the Hamming difference against time, and classify the difference as dying, bounded, linearly spreading, or sporadic. A systematic mismatch between that class and an independently assigned behavioral class would challenge the correspondence on the family tested.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "difference patterns for elementary rules and for rule 110 after a one-cell flip"
+      }
+    ],
+    "obstacles": [
+      "Always is exhaustive for elementary rules and only sampled for larger rules.",
+      "Sporadic versus uniform spread needs a declared front-speed test.",
+      "Damage response is sometimes used as the definition of the class it is supposed to track."
+    ],
+    "rationale": "A one-cell perturbation has a standard difference pattern, and for all 256 elementary rules the four response types can be measured in days. The sentence says changes always die out in class 1, always stay local in class 2, and so on, for cellular automata of each class, which is wider than the elementary family. The test is clean on that family and partial as a universal claim."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-10",
+    "scores": {
+      "operationalizability": 0.28,
+      "data-existence": 0.3,
+      "data-adequacy": 0.2,
+      "discriminating-power": 0.22,
+      "analysis-feasibility": 0.25
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.64,
+    "operationalization": "The sentence says important features of natural systems can be read off a correspondence with cellular-automaton information flow. It names neither the systems, the features, nor the measurement that would confirm or refute the correspondence.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "Most important features and the class correspondence are not fixed observables.",
+      "Other classifications fit the same natural phenomena.",
+      "A program that looks similar is not a test of a natural system."
+    ],
+    "rationale": "The sentence is a general claim about natural systems and does not specify which systems or which measurements carry the class correspondence. Observational archives contain many series that could be narrated in those terms, and also in rival terms, without a deciding contrast. As stated, the sentence has no discriminating consequence."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-11",
+    "scores": {
+      "operationalizability": 0.68,
+      "data-existence": 0.85,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.58,
+      "analysis-feasibility": 0.72
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.69,
+    "operationalization": "Measure the spatial range of a one-cell perturbation and the eventual temporal period on class 2 candidates. Given a finite range of a few cells, the pigeonhole bound predicts a short period; a class 2 rule with long-range damage or a nonrepeating evolution would challenge the account.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "measure damage range and repetition period for elementary class 2 rules"
+      }
+    ],
+    "obstacles": [
+      "Localization, short periods, and the class 2 label are easy to make circular.",
+      "Typically a few cells needs a survey beyond the usual examples.",
+      "The period bound is a theorem only after the finite-range premise is established."
+    ],
+    "rationale": "Once a region is shown to be dynamically finite, eventual repetition is the pigeonhole principle and is settled by proof. Whether rules called class 2 actually break into independent patches a few cells wide is a simulation survey, complete for elementary rules and open beyond them. The causal story is therefore only as strong as the non-circular localization measurement."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-12",
+    "scores": {
+      "operationalizability": 1.0,
+      "data-existence": 0.92,
+      "data-adequacy": 1.0,
+      "discriminating-power": 0.98,
+      "analysis-feasibility": 0.98
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.95,
+    "operationalization": "A deterministic system with N states follows a path in a finite set, so some state repeats by step N and the path cycles with period at most N. A deterministic finite counterexample would refute it; the counting argument leaves no such system.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "The bound applies to the eventual period, after a transient of length at most N.",
+      "Definite rules means the next state is a function of the current state alone."
+    ],
+    "rationale": "The claim is the pigeonhole principle on a finite deterministic state set: after at most N steps a state recurs, and the period is then at most N. The argument matches the full stated scope and can be checked in an afternoon. No external dataset enters, because the state set is the entire input to the proof."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-13",
+    "scores": {
+      "operationalizability": 0.78,
+      "data-existence": 0.82,
+      "data-adequacy": 0.52,
+      "discriminating-power": 0.74,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.7,
+    "operationalization": "On a ring of size n, start each elementary rule from a single black cell, detect the cycle, and compare its length with 2^n. Rule 45 staying nearer that ceiling than every other elementary rule, with class 3 periods rising much faster than class 2 periods, would support the claim over the computed range.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "cycle detection for elementary rules on cyclic lattices"
+      },
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "the published period-versus-size curves, including the rule 45 value at n = 29"
+      }
+    ],
+    "obstacles": [
+      "Cycles near 2^n at n around 30 cost on the order of a billion steps per orbit.",
+      "Always, for every n, is not settled by any finite table.",
+      "The curves use one black cell, a special orbit rather than the longest cycle in the state space."
+    ],
+    "rationale": "Period versus ring size is an exact computation, and the single-black-cell protocol is the one in the figure captions, so moderate n for all 256 elementary rules is a fair small-team project. The distinctive clause is that only rule 45 stays close to 2^n for every n, and a table up to n near 30 cannot close every n. The class 3 growth contrast is visible in the same tables as a restricted-scope result."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-14",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.92,
+      "data-adequacy": 0.84,
+      "discriminating-power": 0.68,
+      "analysis-feasibility": 0.9
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.76,
+    "operationalization": "Generate rule 30 and rule 22 from simple seeds, including one black cell, and apply a standard randomness battery to interior columns and rows. Passage together with no obvious nested or periodic closed form supports the existential claim; a short regular description of those sequences would refute it.",
+    "candidate_datasets": [
+      {
+        "name": "OEIS A051023",
+        "url": "https://oeis.org/A051023",
+        "role": "published middle column of rule 30 from a single black cell"
+      },
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "generate rule 30 and rule 22 spacetime from simple seeds"
+      },
+      {
+        "name": "TestU01",
+        "url": "https://simul.iro.umontreal.ca/testu01/tu01.html",
+        "role": "standard statistical battery for the generated columns"
+      }
+    ],
+    "obstacles": [
+      "A statistical battery can miss a hidden regularity.",
+      "Random here means random under practical tests, which is the standard the book itself uses."
+    ],
+    "rationale": "The claim is existential and names rule 30 and rule 22, both of which are trivial to run from simple seeds, with the rule 30 center column already deposited in the OEIS. Standard batteries can confirm the practical randomness the text asserts, or expose a regularity that would undermine the example. They do not prove the absence of every possible pattern, which is why discriminating power is below the operational clarity of the simulation."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-15",
+    "scores": {
+      "operationalizability": 0.92,
+      "data-existence": 0.9,
+      "data-adequacy": 0.92,
+      "discriminating-power": 0.9,
+      "analysis-feasibility": 0.92
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.88,
+    "operationalization": "Check that rule 90 is linear over GF(2), hence every spacetime diagram is the XOR of single-cell diagrams, and compare a low-density random seed under rule 90 and rule 22. Persistent density modulation in rule 90 and its disappearance in rule 22 confirm the contrast; a nonlinear identity, or a low-density effect that dies in rule 90, would refute the corresponding clause.",
+    "candidate_datasets": [
+      {
+        "name": "SageMath",
+        "url": "https://www.sagemath.org/",
+        "role": "verify linearity of rule 90 over GF(2) and the superposition identity"
+      },
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "compare low-density evolution under rule 90 and rule 22"
+      }
+    ],
+    "obstacles": [
+      "The density picture is a finite run; the persistence claim itself follows from linearity.",
+      "Cannot generate randomness intrinsically is settled by the superposition theorem, not by a statistical test."
+    ],
+    "rationale": "Rule 90 is left XOR right, so additivity and superposition of the single-cell nested pattern are a short algebraic proof covering every initial condition. The low-density contrast with rule 22 is the same fact read off a simulation and can be reproduced in minutes. The scope is these two rules, which the proof and the runs cover."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-16",
+    "scores": {
+      "operationalizability": 0.55,
+      "data-existence": 0.72,
+      "data-adequacy": 0.42,
+      "discriminating-power": 0.48,
+      "analysis-feasibility": 0.68
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.66,
+    "operationalization": "Compare block statistics of rule 22 and rule 30 across widely different seeds, looking for stable densities and entropies despite sensitive details. Matching large-scale statistics support the automaton half; the natural-systems half needs a named phenomenon and a perturbation test that existing automaton runs do not provide.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "large-scale statistics of rule 22 and rule 30 across initial conditions"
+      },
+      {
+        "name": "OEIS A051023",
+        "url": "https://oeis.org/A051023",
+        "role": "a fixed rule 30 column used as a baseline random sequence"
+      }
+    ],
+    "obstacles": [
+      "Which large-scale properties must match is not fixed.",
+      "The natural-systems clause names no phenomenon and no dataset.",
+      "Stable averages are also produced by noisy systems that do not generate randomness intrinsically."
+    ],
+    "rationale": "Stability of coarse statistics for rule 22 and rule 30 is a straightforward simulation and can be confirmed or challenged on those rules. The sentence then says this kind of stability underlies the apparent stability of many natural systems, which requires observations the automaton survey does not contain. The computational half is in reach; the explanatory half is not resolved by it."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-17",
+    "scores": {
+      "operationalizability": 0.98,
+      "data-existence": 0.9,
+      "data-adequacy": 0.98,
+      "discriminating-power": 0.95,
+      "analysis-feasibility": 0.95
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.92,
+    "operationalization": "A spatially periodic seed of period n makes every length-n block identical, so one block evolves as a 2^n-state deterministic system and the temporal period is at most 2^n. A cellular automaton and a repeated block whose evolution never cycled within that bound would refute the claim.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "spot-check that repeated blocks cycle within 2^n steps for concrete rules"
+      }
+    ],
+    "obstacles": [
+      "The bound is an upper limit, not the period that a given block actually attains.",
+      "The factor 2^n is for two colors; the same argument with k colors gives k^n."
+    ],
+    "rationale": "The argument in the text is a complete proof: spatial period n plus a deterministic local rule reduces each block to a finite ring of 2^n states, which must cycle. It applies to every cellular automaton, which is the stated scope, and the counting step is immediate. Concrete rules can be spot-checked in Golly, but the general claim does not depend on those runs."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-18",
+    "scores": {
+      "operationalizability": 0.76,
+      "data-existence": 0.88,
+      "data-adequacy": 0.6,
+      "discriminating-power": 0.8,
+      "analysis-feasibility": 0.84
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.75,
+    "operationalization": "Verify that every pair of aligned two-cell blocks under rule 126 updates, on alternate steps, exactly as rule 90 updates single cells, and search a declared family for further block emulations. A mismatch refutes the named example; the frequency claim depends on how often such encodings appear in the search.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "compare rule 126 on paired blocks with rule 90 on the corresponding cells"
+      },
+      {
+        "name": "SageMath",
+        "url": "https://www.sagemath.org/",
+        "role": "exhaustive check of the finitely many block neighborhoods in the emulation"
+      }
+    ],
+    "obstacles": [
+      "Quite common needs a declared search over rules and block encodings.",
+      "The rule 126 example is a finite check and does not establish the frequency.",
+      "Behave exactly like must be a commuting diagram, not a visual resemblance."
+    ],
+    "rationale": "The rule 126 emulation of rule 90 on blocks of paired cells is a finite case check and is decisive for that example. Quite common, and the further remark that class 3 rules can thereby act like class 2 rules, requires a survey whose hit rate depends on the encoding search. The example is resolvable now; the frequency claim is a sample."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-19",
+    "scores": {
+      "operationalizability": 0.82,
+      "data-existence": 0.85,
+      "data-adequacy": 0.88,
+      "discriminating-power": 0.82,
+      "analysis-feasibility": 0.78
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.73,
+    "operationalization": "Assume a blocking under which blocks obey the same rule as cells, and require the spacetime diagram to equal its own rescaling. The configurations invariant under that rescaling are the uniform and the nested ones; a self-emulating rule with a spacetime diagram outside those two forms would refute the dichotomy.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "exhibit the rule 90 blocking used as the model of exact self-emulation"
+      },
+      {
+        "name": "SageMath",
+        "url": "https://www.sagemath.org/",
+        "role": "check the block-update identities that the self-emulation proof assumes"
+      }
+    ],
+    "obstacles": [
+      "Nested has to mean invariance under the same blocking the rule emulates.",
+      "The dichotomy covers exact self-emulation, not a merely similar picture."
+    ],
+    "rationale": "Exact self-emulation means the spacetime diagram is unchanged by a fixed rescaling, and the configurations with that invariance are the uniform and the hierarchically nested ones. That is a short structural proof once the blocking is formalized, and rule 90 supplies a fully checkable instance. The argument covers the conditional scope the sentence actually states."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-20",
+    "scores": {
+      "operationalizability": 0.88,
+      "data-existence": 0.9,
+      "data-adequacy": 0.85,
+      "discriminating-power": 0.86,
+      "analysis-feasibility": 0.86
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.8,
+    "operationalization": "Test all 256 elementary rules for linearity over GF(2), reduce the linear ones by color swap and reflection, and check the claimed block emulations for rules 90, 150, and 184. An extra linear equivalence class, or a failed emulation identity, would refute the corresponding clause.",
+    "candidate_datasets": [
+      {
+        "name": "SageMath",
+        "url": "https://www.sagemath.org/",
+        "role": "enumerate elementary rules and test additivity and block-emulation identities"
+      },
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "visual and statistical check of nested evolution for rules 90, 150, and 184"
+      }
+    ],
+    "obstacles": [
+      "Fundamentally different means up to the usual color and reflection symmetries.",
+      "Rare, outside the elementary linear list, is a sample remark attached to a sharp classification."
+    ],
+    "rationale": "Additivity implies a binomial self-similarity identity, which is a proof that every additive rule emulates itself and produces nested patterns. Among the 256 elementary rules the linear ones can be listed exhaustively, and the claim that rules 90 and 150 are the only distinct cases is a finite check under stated symmetries. Rule 184's three-cell emulation is another finite identity. The word rare is the only soft residue."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-21",
+    "scores": {
+      "operationalizability": 0.74,
+      "data-existence": 0.8,
+      "data-adequacy": 0.5,
+      "discriminating-power": 0.68,
+      "analysis-feasibility": 0.5
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.67,
+    "operationalization": "Build the regular language of length-unrestricted configurations after t steps and count states in its minimal automaton. Growth near t^2 for class 1 and 2 rules, and at least exponential growth for non-surjective class 3 and 4 rules, would support the split over the times that can be built.",
+    "candidate_datasets": [
+      {
+        "name": "SageMath",
+        "url": "https://www.sagemath.org/",
+        "role": "subset construction and minimization of the regular languages of one-dimensional configurations"
+      },
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "identify surjective elementary rules and generate the short forbidden blocks that seed the languages"
+      }
+    ],
+    "obstacles": [
+      "The subset construction becomes infeasible in the exponential regime the claim describes.",
+      "Surjective rules started from all sequences are real exceptions and must be separated.",
+      "Polynomial versus exponential is ambiguous at the small times one can finish."
+    ],
+    "rationale": "The network in the text is the automaton for the regular language of admissible configurations, which is computable for elementary rules at small t, and the surjective exceptions are a known finite list. Exponential growth is self-limiting: the interesting class 3 and 4 networks are exactly those a small team cannot expand far. Early-time counts test the split on elementary rules and leave most class 3 and 4 rules, and large t, open."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-22",
+    "scores": {
+      "operationalizability": 0.5,
+      "data-existence": 0.85,
+      "data-adequacy": 0.48,
+      "discriminating-power": 0.42,
+      "analysis-feasibility": 0.62
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.6,
+    "operationalization": "For a rule labeled class 4 by its interacting objects, search finite seeds for a spatially localized periodic, possibly moving, object. Finding one supports the claim for that rule; a proof that every finite object dies would refute it for that rule.",
+    "candidate_datasets": [
+      {
+        "name": "Catagolue",
+        "url": "https://catagolue.hatsya.com/",
+        "role": "public census of persistent localized objects in Life-like rules"
+      },
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "search rule 110 and other class 4 rules for oscillators and spaceships"
+      }
+    ],
+    "obstacles": [
+      "Persistent localized structures are close to the visual definition of class 4.",
+      "A finite search can miss a very large immortal object and cannot prove that none exists.",
+      "Any class 4 system is not a closed list."
+    ],
+    "rationale": "For Life and rule 110, persistent objects are already catalogued and can be rechecked, so the existential half holds for the standard exemplars. The sentence says any class 4 system must have such an object, and systems are placed in that class largely because persistent interacting objects are visible. A search confirms exemplars; it does not separate the sentence from the definition of the class."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-23",
+    "scores": {
+      "operationalizability": 0.4,
+      "data-existence": 0.72,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.48
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.62,
+    "operationalization": "In each class 4 rule with a known stationary object above a declared size, search larger seeds for a spaceship. A moving object supports the implication for that rule; a completeness proof that only stationary objects exist would refute it.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "search for moving localized structures in rule 110 and other class 4 rules"
+      },
+      {
+        "name": "Catagolue",
+        "url": "https://catagolue.hatsya.com/",
+        "role": "censuses that separate still lifes, oscillators, and spaceships in Life-like rules"
+      }
+    ],
+    "obstacles": [
+      "Sufficiently complicated can be raised after a stationary-only example.",
+      "Eventually sets no search bound, so a negative census is inconclusive.",
+      "The supporting evidence is experience with many rules, not a defined sample."
+    ],
+    "rationale": "Spaceship searches are standard and, for Life and rule 110, already public, so particular rules can be shown to have moving objects. The sentence is an implication with an adjustable antecedent, sufficiently complicated, and an unbounded search, eventually. A finite census can add examples; it cannot close the implication or refute it by failing to find a spaceship."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-24",
+    "scores": {
+      "operationalizability": 0.46,
+      "data-existence": 0.82,
+      "data-adequacy": 0.45,
+      "discriminating-power": 0.48,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.6,
+    "operationalization": "Re-run the published seeds for unbounded growth in rule 110 and in the code 1329 rule, and prove growth from a repeating production cycle where one exists. A seed whose pattern provably grows supports that example; all sorts of other systems has no fixed target list.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "simulate the published rule 110 and code 1329 seeds that appear to grow without bound"
+      },
+      {
+        "name": "Catagolue",
+        "url": "https://catagolue.hatsya.com/",
+        "role": "known growing patterns and constructors in Life-like class 4 rules"
+      }
+    ],
+    "obstacles": [
+      "All sorts of other systems is not a fixed list of target behaviors.",
+      "A long growing run is not yet a proof of unbounded growth.",
+      "The general class 4 claim is much wider than rule 110 and code 1329."
+    ],
+    "rationale": "Specific growing seeds are described well enough to resimulate, and a repeating production cycle can turn some of them into proofs of unbounded growth. The sentence says class 4 automata can mimic all sorts of other systems, which those seeds illustrate and do not exhaust. Existing simulators resolve the examples and leave the general feature as a sample."
+  },
+  {
+    "claim_id": "wolfram2002-ch06-25",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.92,
+      "data-adequacy": 0.78,
+      "discriminating-power": 0.72,
+      "analysis-feasibility": 0.88
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "computation",
+    "confidence": 0.74,
+    "operationalization": "Resimulate the published rule 110 collisions, including the collision whose outcome is unresolved for thousands of steps, and record transient length and the number of outgoing objects. Long input-sensitive cascades support the claim; uniformly short, simple scattering would refute it for this rule.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "exact resimulation of rule 110 persistent structures and their collisions"
+      },
+      {
+        "name": "A New Kind of Science online",
+        "url": "https://www.wolframscience.com/nks/",
+        "role": "the structure catalogue and the collision geometries, including the multi-thousand-step interaction"
+      }
+    ],
+    "obstacles": [
+      "Immense is pinned here to the book's own transients of thousands of steps.",
+      "A finite collision catalogue does not describe every interaction.",
+      "Complexity of an outcome still depends on which description length is used."
+    ],
+    "rationale": "The empirical content is the collision phenomenology of rule 110, and both the structures and a collision that takes more than 4000 steps are specified well enough to rerun in Golly. A small team can measure transient lengths and outgoing objects in days. That decides the rule 110 claim; the phrase class 4 systems like rule 110 is carried by this exemplar rather than by a survey."
+  },
+  {
+    "claim_id": "wolfram2002-ch07-01",
+    "scores": {
+      "operationalizability": 0.42,
+      "data-existence": 0.55,
+      "data-adequacy": 0.32,
+      "discriminating-power": 0.32,
+      "analysis-feasibility": 0.4
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.55,
+    "operationalization": "Test recurrence of the same behavioral classes across declared families of simple programs. The nature half would require a pre-registered list of features on which a molecular system and a cellular-automaton model must agree, which the sentence does not provide.",
+    "candidate_datasets": [
+      {
+        "name": "Golly",
+        "url": "https://golly.sourceforge.io/",
+        "role": "compare behavioral classes across one-dimensional, totalistic, and two-dimensional rules"
+      }
+    ],
+    "obstacles": [
+      "The same universal features has no fixed list of measurements.",
+      "Visual resemblance between a program and a natural system does not identify a shared mechanism.",
+      "No public dataset aligns molecular systems with these behavioral classes."
+    ],
+    "rationale": "The program-to-program half can be sampled by comparing classes across rule families, which is ordinary simulation and supports only a proxy for universality. The crucial clause extends the same features to real molecules, and the sentence never says which features or which systems would decide it. Matching pictures do not discriminate a shared mechanism from coincidence, so the nature half stays unresolved."
+  },
+  {
+    "claim_id": "wolfram2002-ch07-02",
+    "scores": {
+      "operationalizability": 0.32,
+      "data-existence": 0.3,
+      "data-adequacy": 0.25,
+      "discriminating-power": 0.2,
+      "analysis-feasibility": 0.35
+    },
+    "verdict": "not-empirically-resolvable",
+    "resolution_route": "none",
+    "confidence": 0.72,
+    "operationalization": "Sort systems by whether randomness is inserted at every step, only in the initial condition, or not at all. Every system falls in one of those three bins by construction, so the partition does not state an additional outcome that could fail.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "The three mechanisms partition systems by where randomness is inserted.",
+      "No observation distinguishes this partition from itself restated in other words."
+    ],
+    "rationale": "External noise, transcribed initial conditions, and no random input are a logical trichotomy about where randomness enters a model. Any system can be placed in one bin once that modeling choice is made, so the census cannot come out against the sentence. The pictures illustrate the bins; they do not test whether the bins are exhaustive."
+  },
+  {
+    "claim_id": "wolfram2002-ch07-03",
+    "scores": {
+      "operationalizability": 0.55,
+      "data-existence": 0.3,
+      "data-adequacy": 0.2,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.25
+    },
+    "verdict": "needs-new-data",
+    "resolution_route": "empirical-data",
+    "confidence": 0.7,
+    "operationalization": "For each phenomenon in a declared catalogue of natural randomness, use repeatability under controlled perturbations to assign intrinsic generation, environmental input, or initial-condition transcription, then compute the fraction assigned to intrinsic generation. A small fraction would refute a large fraction, if not essentially all.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "Mechanism labels require repeated, perturbation-controlled runs that were usually not archived.",
+      "The scope is a large fraction of randomness in the natural world, far beyond any existing catalogue.",
+      "Most observational records remain compatible with environmental or initial-condition accounts."
+    ],
+    "rationale": "The later repeatability criterion makes the mechanism assignment measurable in principle, so the sentence is not empty. Public archives do not contain that assignment for any representative catalogue of natural randomness, and the text itself treats the attribution as a belief to be illustrated later. Settling a large fraction, let alone essentially all, requires data that have not been collected for this purpose."
+  },
+  {
+    "claim_id": "wolfram2002-ch07-04",
+    "scores": {
+      "operationalizability": 0.74,
+      "data-existence": 0.52,
+      "data-adequacy": 0.42,
+      "discriminating-power": 0.58,
+      "analysis-feasibility": 0.5
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "empirical-data",
+    "confidence": 0.63,
+    "operationalization": "Run a standard randomness battery on bitstreams from noise-amplifying hardware, and where the device physics is documented, test dead time and environmental correlation as causes. Systematic battery failures support deviations; a large public set of historically relevant devices that pass would challenge consistently.",
+    "candidate_datasets": [
+      {
+        "name": "NIST Computer Security Resource Center",
+        "url": "https://csrc.nist.gov/",
+        "role": "public statistical tests and evaluation material for physical random-bit generators"
+      },
+      {
+        "name": "TestU01",
+        "url": "https://simul.iro.umontreal.ca/testu01/tu01.html",
+        "role": "battery applied to whatever raw noise-generator streams are actually released"
+      }
+    ],
+    "obstacles": [
+      "A failed battery shows a deviation; a passed battery does not prove perfect randomness.",
+      "Open streams cover modern semiconductor devices far better than spark gaps and vacuum tubes.",
+      "Dead time and environmental correlation are confounded in most published bitstreams."
+    ],
+    "rationale": "Deviation from perfect randomness is operational in the NIST and TestU01 batteries, and published evaluations of noise-based generators are real but scattered. Those evaluations over-represent modern diodes relative to the spark gaps and vacuum tubes named in the text, and they rarely separate relaxation from environmental correlation. The sample can test a proxy for consistently; it does not cover the historical class."
+  },
+  {
+    "claim_id": "wolfram2002-ch07-05",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.62,
+      "data-adequacy": 0.5,
+      "discriminating-power": 0.62,
+      "analysis-feasibility": 0.68
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.66,
+    "operationalization": "Count e-foldings between a stated macroscopic tolerance and an atomic or thermal scale, using a doubling per collision or per kneading step. A result of order ten collisions for a laboratory-scale pegboard would support that clause; a separation of hundreds of collisions would challenge it.",
+    "candidate_datasets": [
+      {
+        "name": "CODATA fundamental physical constants",
+        "url": "https://physics.nist.gov/cuu/Constants/",
+        "role": "atomic sizes and thermal scales used to count amplification steps down to uncontrollable lengths"
+      }
+    ],
+    "obstacles": [
+      "Around ten depends on the size of the apparatus and the initial uncertainty.",
+      "A real pegboard also has fabrication error, not only atomic uncertainty.",
+      "Kneading and mirror arrangements are idealized, so only the scale-separation arithmetic is directly calculable."
+    ],
+    "rationale": "The quantitative core is an amplification count from public atomic and thermal scales, and a doubling map reaches atomic lengths in a few tens of steps, which a small team can recompute. Raw trajectories of the pegboard, kneading, and mirror devices are not a public dataset, so the laboratory half is a scaling argument rather than a reanalysis of runs. Around ten and typically remain order-of-magnitude statements tied to apparatus size."
+  },
+  {
+    "claim_id": "wolfram2002-ch07-06",
+    "scores": {
+      "operationalizability": 0.74,
+      "data-existence": 0.86,
+      "data-adequacy": 0.58,
+      "discriminating-power": 0.6,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.64,
+    "operationalization": "Integrate the planetary equations from public ephemerides with a tiny change in initial conditions and measure divergence over a few million years. Exponential separation supports sensitive dependence on that timescale; bounded separation would challenge it. The clause about present-day features needs a named feature the divergence is supposed to explain.",
+    "candidate_datasets": [
+      {
+        "name": "NASA JPL Solar System Dynamics",
+        "url": "https://ssd.jpl.nasa.gov/",
+        "role": "planetary initial conditions and dynamical models for long-term integrations"
+      },
+      {
+        "name": "JPL planetary ephemerides",
+        "url": "https://ssd.jpl.nasa.gov/planets/eph_export.html",
+        "role": "downloadable development ephemerides used as the present-day state of the solar system"
+      }
+    ],
+    "obstacles": [
+      "Significant randomness has no numeric divergence threshold.",
+      "May explain some present-day features names no feature.",
+      "Million-year integrations mix sensitive dependence with truncation and model error."
+    ],
+    "rationale": "Public JPL ephemerides and standard n-body integrations are enough to test whether nearby solar-system trajectories diverge over a few million years, which is the dynamical core of the sentence. That computation is specialist work, and published integrations already exist to audit. The hedge that this may explain some present-day features names nothing that a divergence plot could confirm or refute."
+  },
+  {
+    "claim_id": "wolfram2002-ch07-07",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.88,
+      "data-adequacy": 0.82,
+      "discriminating-power": 0.9,
+      "analysis-feasibility": 0.88
+    },
+    "verdict": "resolvable-now",
+    "resolution_route": "proof",
+    "confidence": 0.84,
+    "operationalization": "Apply the spectral test to a maximal-period linear congruential generator: successive outputs lie on a lattice, visible as stripes in two- or three-dimensional plots. A maximal-period generator whose tuples were equidistributed in those dimensions would refute the regularity claim; the lattice theorem says none is.",
+    "candidate_datasets": [
+      {
+        "name": "TestU01",
+        "url": "https://simul.iro.umontreal.ca/testu01/tu01.html",
+        "role": "spectral and statistical tests of linear congruential generators, including known bad multipliers"
+      },
+      {
+        "name": "NIST Computer Security Resource Center",
+        "url": "https://csrc.nist.gov/",
+        "role": "public randomness tests applied to the same generator output"
+      }
+    ],
+    "obstacles": [
+      "Lattice structure is one specific deviation, not every possible defect.",
+      "Perfect randomness is read here as equidistribution of low-dimensional tuples, matching the stripe pictures."
+    ],
+    "rationale": "Full-period linear congruential sequences lie on lattices, which is a published theorem and is exactly the stripe failure drawn in the text. The generators are defined by their multipliers, so both the proof and a direct spectral test cover the class rather than one accidental example. A small team can reproduce the pictures and the test in days."
+  },
+  {
+    "claim_id": "wolfram2002-ch07-08",
+    "scores": {
+      "operationalizability": 0.4,
+      "data-existence": 0.65,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.35,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "computation",
+    "confidence": 0.54,
+    "operationalization": "Take generator families with published closed-form analyses and test their outputs for proved regularities such as lattices or linear structure. A fully analyzed family that also passed every declared randomness test would challenge the tendency inside that collection.",
+    "candidate_datasets": [
+      {
+        "name": "TestU01",
+        "url": "https://simul.iro.umontreal.ca/testu01/tu01.html",
+        "role": "compare analyzable generators such as linear congruential and linear-feedback families with less analyzable rules"
+      }
+    ],
+    "obstacles": [
+      "Detecting a deviation is itself a piece of analysis, so the sentence is close to a tautology.",
+      "Tends to states no rate.",
+      "A system can be analyzed in one respect and still pass a fixed test battery."
+    ],
+    "rationale": "Linear congruential generators and linear-feedback registers are public, analyzed, and known to carry detectable regularities, so the intended examples can be checked. The sentence says that the possibility of detailed analysis tends to imply a deviation from perfect randomness, and finding such a deviation is largely what detailed analysis means. The example families are testable; the general tendency is not a separate empirical claim."
+  },
+  {
+    "claim_id": "wolfram2002-ch07-09",
+    "scores": {
+      "operationalizability": 0.48,
+      "data-existence": 0.45,
+      "data-adequacy": 0.32,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.4
+    },
+    "verdict": "partially-resolvable",
+    "resolution_route": "mixed",
+    "confidence": 0.55,
+    "operationalization": "For systems that emit a declared large entropy in a declared short time, assign the source as intrinsic, environmental, or initial-condition, using device documentation and repeatability. A substantial class of fast emitters documented as amplified external noise would challenge overwhelmingly likely.",
+    "candidate_datasets": [
+      {
+        "name": "NIST Computer Security Resource Center",
+        "url": "https://csrc.nist.gov/",
+        "role": "public characterizations of fast hardware random-bit generators and their noise sources"
+      }
+    ],
+    "obstacles": [
+      "Large amount and short time have no numerical thresholds in the text.",
+      "Avalanche and quantum amplifiers produce randomness quickly from an external microscopic source.",
+      "Mechanism labels for natural systems are not deposited as a dataset."
+    ],
+    "rationale": "Engineered fast random-bit generators are the one place where rate and source are both documented well enough for a partial test, and some of those sources are amplified external or quantum noise. That comparison can challenge a universal reading of overwhelmingly likely without settling natural systems. The thresholds that define a large amount in a short time are not in the sentence, and natural cases lack the required paired observations."
+  },
+  {
+    "claim_id": "wolfram2002-ch07-10",
+    "scores": {
+      "operationalizability": 0.72,
+      "data-existence": 0.32,
+      "data-adequacy": 0.22,
+      "discriminating-power": 0.62,
+      "analysis-feasibility": 0.28
+    },
+    "verdict": "needs-new-data",
+    "resolution_route": "empirical-data",
+    "confidence": 0.72,
+    "operationalization": "Repeat a controlled experiment below a measured perturbation threshold and test whether the detailed random-looking series agrees across runs. Stable details support intrinsic generation; run-to-run disagreement at the same detail level supports an environmental or initial-condition source.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "Raw repeats of random-looking experiments are rarely deposited.",
+      "Coarse agreement can be mistaken for detail-level repeatability.",
+      "Perturbation size is seldom measured in the same run as the pattern."
+    ],
+    "rationale": "Repeatability of details across runs is a sharp contrast among the three mechanisms, and the continuous-automaton perturbation pictures show what the threshold test would look like. The text says there is very little good information on natural experiments of this kind, and no public dataset now supplies matched raw repeats with measured perturbations. The criterion is ready; the observations it needs are not."
+  }
+]
