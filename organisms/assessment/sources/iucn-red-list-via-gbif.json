@@ -1,0 +1,36 @@
+{
+  "source_id": "iucn-red-list-via-gbif",
+  "label": "IUCN Red List of Threatened Species as a GBIF checklist dataset (19491596-35ae-4a91-9a98-85cf505f1bd3), served per species by the GBIF Species API endpoint species/{key}/iucnRedListCategory",
+  "scope_note": "Scored only as the GBIF-served mirror used by the single record iucn-red-list-via-gbif-2026-10-31 in the GBIF batch. The IUCN Red List proper (iucnredlist.org, its API and assessment methodology) belongs to whichever assessor owns the IUCN source; if a dedicated `iucn-red-list` source file exists, that one should take precedence for authority and governance of the underlying assessments.",
+  "homepage": "https://www.iucnredlist.org/",
+  "doi": "10.15468/0qnb58",
+  "data_paper_or_docs": [
+    "https://api.gbif.org/v1/dataset/19491596-35ae-4a91-9a98-85cf505f1bd3",
+    "https://techdocs.gbif.org/en/openapi/v1/species",
+    "https://techdocs.gbif.org/en/data-processing/taxonomy-interpretation"
+  ],
+  "doi_verification": {
+    "method": "https://doi.org/api/handles/10.15468/0qnb58",
+    "result": "responseCode 1; URL value https://www.gbif.org/dataset/19491596-35ae-4a91-9a98-85cf505f1bd3 (checked 2026-10-31)."
+  },
+  "not_verified_from_this_host": {
+    "note": "www.iucnredlist.org and api.iucnredlist.org answer HTTP 403 to this host's non-browser client, as does www.gbif.org; IUCN's own terms-of-use page could therefore not be read and the licence statement below comes from the GBIF registry record only.",
+    "urls": [
+      "https://www.iucnredlist.org/",
+      "https://www.gbif.org/dataset/19491596-35ae-4a91-9a98-85cf505f1bd3"
+    ]
+  },
+  "governance": "Published to GBIF by IUCN (registry organisation d44af9a3-e779-40c0-a186-79e7717c6d2b) as a checklist with a Darwin Core Archive endpoint (hosted-datasets.gbif.org/datasets/iucn/iucn-latest.zip). Registry metadata on 2026-10-31: title 'The IUCN Red List of Threatened Species', licence http://creativecommons.org/licenses/by/4.0/legalcode, pubDate 2026-07-28, citation provided by source: 'IUCN (2026). The IUCN Red List of Threatened Species. Version 2026-1.' The per-species endpoint returns the category, code, iucnTaxonID and the backbone usage it was matched to, so the GBIF-side matching (backbone key to IUCN taxon) is an additional processing step between the assessment and the vendored value.",
+  "versioning": "Versioned by IUCN release (2026-1 in the registry record at check time); the GBIF index re-ingests the checklist when IUCN republishes it, so the category served for a key can change between IUCN versions without any change in the request URL. The record under assessment states 'GBIF index 2026-10-31' as its version, which is the retrieval date rather than the IUCN version.",
+  "scores": {
+    "source-authority": 0.9,
+    "independence": 0.95,
+    "authenticity": 1.0
+  },
+  "known_issues": [
+    "The record's licence field says the GBIF checklist is CC BY-NC 4.0; the registry record on 2026-10-31 reports CC BY 4.0 for the current (2026-07-28) publication. Either the licence changed with the 2026-1 release or the vendor copied an older statement; it should be rechecked against the registry when the record is published.",
+    "The category is attached to a GBIF backbone usage by name matching; where the backbone and IUCN taxon concepts differ (split or lumped species) the served category may belong to a different concept than the backbone key implies. The response carries `usageKey` and `iucnTaxonID`, which should be compared with the record.",
+    "The value vendored (ordinal position in NE,DD,LC,NT,VU,EN,CR,EW,EX) is the project's own encoding, not an IUCN field; the IUCN code string in the description is the source value."
+  ],
+  "rationale": "Source authority 0.9: the IUCN Red List is a governed, versioned, globally recognised assessment programme and its GBIF checklist carries a verified DOI and an explicit licence, but the vendored value passes through GBIF's name matching and the record's version is a retrieval date rather than the IUCN release, which costs some of the 1.0 anchor. Independence 0.95: expert assessments produced entirely outside this project; the small deduction reflects that IUCN assessments themselves draw on the occurrence and literature record that other datasets in this repository also derive from. Authenticity 1.0: each category traces to a real IUCN taxon id returned live by the API."
+}

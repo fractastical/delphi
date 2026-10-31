@@ -1,0 +1,44 @@
+{
+  "source_id": "gbif-backbone-taxonomy",
+  "label": "GBIF Backbone Taxonomy (checklist dataset d7dddbf4-2cf0-4f39-9b2a-bb099caae36c), as served by the GBIF Species API (species/match, species/{key})",
+  "homepage": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+  "doi": "10.15468/39omei",
+  "data_paper_or_docs": [
+    "https://api.gbif.org/v1/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+    "https://techdocs.gbif.org/en/openapi/v1/species",
+    "https://techdocs.gbif.org/en/data-processing/taxonomy-interpretation",
+    "https://hosted-datasets.gbif.org/datasets/backbone/",
+    "https://hosted-datasets.gbif.org/datasets/backbone/README.html",
+    "https://hosted-datasets.gbif.org/datasets/backbone/current/config.yaml",
+    "https://data-blog.gbif.org/post/gbif-backbone-taxonomy/",
+    "https://github.com/gbif/checklistbank"
+  ],
+  "governance_docs": [
+    "https://docs.gbif.org/effective-nodes-guidance/1.0/en/"
+  ],
+  "doi_verification": {
+    "method": "https://doi.org/api/handles/10.15468/39omei",
+    "result": "responseCode 1; URL value https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c (checked 2026-10-31). The landing page itself returns HTTP 403 to non-browser clients, so the registry API record was used as the verified metadata source."
+  },
+  "not_verified_from_this_host": {
+    "note": "www.gbif.org (dataset landing page, terms, licence pages) answers HTTP 403 to automated clients; those pages are not cited as verified.",
+    "urls": [
+      "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+    ]
+  },
+  "governance": "Published by the GBIF Secretariat (registry organisation fbca90e3-8aed-48b1-84e3-369afbd000ce) under CC BY 4.0 (registry field `license` = http://creativecommons.org/licenses/by/4.0/legalcode). The backbone is a single synthetic management classification assembled by an automated, configured build (config.yaml published with each release) that starts from the Catalogue of Life and merges names from 105 further sources (WoRMS, PBDB, IRMNG, ITIS, ZooBank, Fauna Europaea, iBOL BINs, UNITE SHs, ...), each name carrying `datasetID` of its primary source. There is no peer-reviewed data paper; the authoritative description is the registry metadata and the Secretariat's technical documentation and data blog.",
+  "versioning": "Released versions are archived with dates since 2009 at hosted-datasets.gbif.org/datasets/backbone/ (2009-09-01 ... 2022-11-23, 2023-08-28; `current/` = 2023-08-28). Registry metadata: created 2011-03-02, pubDate 2023-08-28, modified 2023-11-17. GBIF's techdocs state that the backbone build process has been discontinued in favour of the Catalogue of Life eXtended Release (COL XR, checklistKey 7ddf754f-d193-4cc9-b351-99906754a03b); the backbone will no longer be updated but all backbone identifiers are preserved and remain the default taxonomy of the API. A usage key (`usageKey`/`taxonKey`, integer) is therefore a stable identifier; `species/match` results are deterministic for a fixed backbone release but depend on the hint parameters (kingdom, rank, family) supplied.",
+  "scores": {
+    "source-authority": 0.95,
+    "independence": 0.8,
+    "authenticity": 1.0
+  },
+  "known_issues": [
+    "Several higher taxa familiar from Darwin and Thompson have no accepted backbone usage at the expected rank (Reptilia, Crustacea, Vertebrata, Pisces, Ungulata, Pachydermata, Papilionoidea). Verified 2026-10-31: `species/match?name=Reptilia&kingdom=Animalia` returns Chordata (usageKey 44, matchType HIGHERRANK, also with strict=true) and lists key 358 'Reptilia' as a PROPARTE_SYNONYM class with numDescendants 0; the reptile orders are instead ranked as classes directly under Chordata (Squamata 11592253 CLASS, Testudines 11418114 CLASS). Vendors who did not reject HIGHERRANK fallbacks or synonym usages recorded the wrong key, and a count under such an orphaned key is meaningless.",
+    "Homonyms across kingdoms (e.g. Anura, Anguilla, Fundulus, Homarus, Pieris, Castor) require kingdom/rank hints; a match without hints can return a plant or fungus usage of the same name.",
+    "The backbone is frozen at the 2023-08-28 release; names described or re-circumscribed since then are only in COL XR. Rank assignments for some groups differ from current usage (verified 2026-10-31: Marsupialia 9712517 is ranked FAMILY with 15 descendants, so a count under it does not cover the marsupial orders; Cetacea 733 is an ORDER under Mammalia although slices disagree on its rank).",
+    "Match responses include `confidence` and `matchType` fields and the full higher classification, so the JSON body is stable for a fixed release but can change byte-for-byte if the API's serialisation or the underlying release changes; checksum drift on a `species/match` body is therefore possible without any taxonomic change.",
+    "The registry record exposes no `version` string; version has to be expressed as the release date."
+  ],
+  "rationale": "Source authority 0.95: a DOI-bearing (10.15468/39omei, verified through the handle API), CC BY 4.0 checklist dataset of a governed international infrastructure, with dated archived releases since 2009, a published build configuration and stable integer identifiers that GBIF commits to preserving; the small deduction is for the absence of a peer-reviewed data paper and the fact that the build is now discontinued, so the classification will drift from current taxonomy. Independence 0.8: the backbone is explicitly a compilation of 105 other checklists (Catalogue of Life first, then WoRMS, PBDB, ITIS, IRMNG and others, several of which also ingest one another), which is the rubric's 0.5 situation for mutual independence of sources, but it is wholly unrelated to this project and its claims and each name records its primary source dataset, so it is scored well above that anchor. Authenticity 1.0: every usage key, name and classification traces to a real checklist record retrievable from the API and the archived releases; nothing is synthetic in the sense of the rubric (the word 'synthetic' in GBIF's description means 'assembled', not fabricated)."
+}
