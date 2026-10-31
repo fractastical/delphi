@@ -305,9 +305,12 @@ def build_timeline(ins: Inputs) -> dict | None:
     uf = "results/resources/hackathon-usage.json"; U = json.loads(ins.read(uf)) if (ROOT / uf).exists() else None
     R = json.loads(ins.read(ri)); rows = []; sha = lambda path: ins.seen[path]["sha256"] if path in ins.seen else None
     add = lambda t, kind, title, outcome, path, ok=None, scope="", digest=None: rows.append({"time": t, "kind": kind, "title": title, "outcome": outcome, "ok": ok, "path": path, "sha256": digest or sha(path), "scope": scope})
+    dated_only = []
     for f in sorted((ROOT / "deploy/receipts").glob("*.json")):
         path = f"deploy/receipts/{f.name}"; d = json.loads(ins.read(path)); ch = d.get("checks", [])
         npass = sum(1 for c in ch if c.get("passed")); target = d.get("base") or d.get("endpoint") or "public node"
+        if "checked_at" not in d:                         # a receipt with no time of day is listed apart, never given a made-up time
+            dated_only.append({"title": f.stem.replace("-", " ") + (" (release " + str(d["sha"])[:12] + ")" if d.get("sha") else ""), "outcome": "; ".join(f"{c.get('name', 'check')}: {c.get('result') or ('passed' if c.get('passed') is True else 'not passed')} (exit {c.get('exit', 'not recorded')})" for c in ch) or "no checks listed", "ok": all(c.get("exit", 1) == 0 for c in ch) if ch else None, "path": path, "sha256": sha(path), "date": "no time recorded"}); continue
         add(d["checked_at"], "live check", f.stem.replace("-", " ") + " (" + target + ")", f"{npass} of {len(ch)} checks passed", path, npass == len(ch), d.get("scope", ""))
     for k, u in (U or R)["model_usage"].items():
         if isinstance(u, dict) and u.get("window_utc"):
@@ -316,7 +319,6 @@ def build_timeline(ins: Inputs) -> dict | None:
     for t in (U or R)["historical_gpu_telemetry"]:
         mem = f"; memory max {t['gpu_memory_used_mib_max']} of {t['gpu_memory_total_mib']} MiB" if t.get("gpu_memory_used_mib_max") is not None and t.get("gpu_memory_total_mib") else ""
         add(t["window_utc"][0], "GPU telemetry", t["task_label"], f"{t['samples']} samples at {t.get('sample_period_ms', 1000)} ms; GPU utilisation mean {t['gpu_utilization_pct_mean']}%, max {t['gpu_utilization_pct_max']}%" + (f", {t['samples_ge_90']} samples at or above 90%" if t.get("samples_ge_90") is not None else "") + mem, t["source"], None, "A sampled historical window, not current utilisation.", t.get("sha256"))
-    dated_only = []
     for f in sorted((ROOT / "results").glob("20*.md")):
         path = f"results/{f.name}"; t = ins.text(path); date = f.name[:10]
         head = next((l for l in t.splitlines() if l.startswith("**")), ""); title = next((l[2:].strip() for l in t.splitlines() if l.startswith("# ")), f.name)
