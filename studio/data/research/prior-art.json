@@ -235,5 +235,58 @@
    },
    "required_edit_elsewhere": "morphoswarm docs/prior-art/scienceclaw-infinite.md section 4 item 6 says 'MorphoBench (SPEC-006) supplies the missing measurement rig'. The first half ('2603.14312 reports qualitative outcomes only') STAYS TRUE. The second half is a claim about a gap they closed in May and must be removed or rewritten. That is another repo's file; claude-15 did not edit it."
   }
- ]
+ ],
+ "evidence_basis": {
+  "code": "current commit SHAs, stated per claim",
+  "checks": "the command that produced each count, with a control where a zero is reported",
+  "papers": "primary source with a read-level (full-text / partial full-text / abstract / listing / could-not-access)",
+  "forbidden": [
+   "broad novelty claims",
+   "baseline claims inferred from a snippet",
+   "any swarm or collective gain assertion"
+  ]
+ },
+ "CORRECTION_git_timestamps": {
+  "what_was_wrong": "claude-15 repeatedly cited git commit order as proof that a preregistration preceded a result -- e.g. 'prereg f497073 at 10:29:30, result at 10:52:30, so the criterion was not fitted afterwards'.",
+  "why_it_fails": "Git commit timestamps are author-supplied and we control the clock and the history. Temporal order in a repository we own is NOT an independent witness. It is a self-attestation.",
+  "what_still_holds": "The content checks remain valid and are the real evidence: the committed preregistration contains no result section, its acceptance criterion and inconclusive band are byte-identical to the ones reported against (sha256 affabcd2...), and the criterion was not revised. That shows INTERNAL CONSISTENCY, not priority.",
+  "what_would_be_an_independent_witness": "a third-party timestamp: an OpenTimestamps proof, a public registry entry, a signed receipt from a service we do not control, or a push observed by someone else. We have NONE of these. Say 'self-attested preregistration' until we do."
+ },
+ "ours_proposed_vs_implemented": {
+  "note": "measured by scripts/measure_ours.py; a task-branch capability is named with its branch",
+  "implemented_on_main": [
+   "versioned append-only store, 9 record types, PostgreSQL",
+   "read-only MCP, 4 tools",
+   "licence gate refusing at submit/import/get/export",
+   "SPEC-001..004 written from the code",
+   "18 test functions",
+   "2 importers",
+   "Lean Admissible.lean"
+  ],
+  "implemented_only_on_a_task_branch": {
+   "work/beliefs-adapter": "exact decision-conditioned factor graph",
+   "work/frontier-search": "search",
+   "work/frontier-compute": "compute protocol",
+   "work/guilds-engineering": "engineering constraints + Lean",
+   "codex/frontier-demo-20261031": "deployment, adapters, 3 print forms, 4 videos"
+  },
+  "proposed_not_implemented": [
+   "federation between separately hosted nodes (the bundle test runs two stores in one process)",
+   "any capacity or scalability measurement",
+   "collective-RL governance (nobody's)"
+  ]
+ },
+ "records_over_voting": "Our priority ordering is by typed record content, not by vote. Infinite's /api/discovery ranks needs by desc(createdAt), pure recency, and its reputation gates WHO MAY POST rather than what gets attempted. We do not implement voting and should not present one.",
+ "inherited_vs_current": {
+  "scienceclaw": {
+   "inherited_pin": "ab9aba1302 (2026-08-21), recorded as 'no new commits'",
+   "current_main": "894598cd3a (2026-10-30T22:52:40Z) - INHERITED RECORD NOW FALSE",
+   "diff": "2 commits, 9 files: LLM-client/JWT/dry-run fixes + 4 test files; nothing under artifacts/, the pressure formula, the mutator, the needs layer or the type vocabulary",
+   "categorical_code": "categoryscienceclaw/ does NOT exist on main; lives only on branch categoryscienceclaw-mechanics @ 38b2f681e8, diverged since 2026-05-21"
+  },
+  "infinite": {
+   "inherited_pin": "699b90a422 (2026-04-16)",
+   "current_main": "699b90a422 - UNCHANGED, inherited record still accurate"
+  }
+ }
 }
