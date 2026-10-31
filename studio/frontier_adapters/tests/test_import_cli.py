@@ -301,3 +301,182 @@ class ImportScratchStore(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def _rec(kind, id, payload, *, namespace="node-a", predecessor=None, created="2026-10-31T00:00:00+00:00"):
+    from frontier.models import Draft, make_record
+    return make_record(Draft.model_validate({"namespace": namespace, "kind": kind, "id": id, "issuer": "tester", "source_uri": "urn:t", "visibility": "public",
+                                             "predecessor": predecessor, "payload": payload}), created_at=created)
+
+
+def _claim_payload(title="c"):
+    return {"title": title, "statement": "s", "context": "c", "assumptions": [], "limitations": [],
+            "source": {"uri": None, "locator": None, "source_version": None, "content_sha256": None, "content_available": False, "access": "x", "license": None}}
+
+
+def _evidence_payload(target, produced_by=None, artifacts=()):
+    p = {"target": target, "evidence_kind": "simulated", "source": _claim_payload()["source"],
+         "created_time": {"value": "2026-10-31T00:00:00+00:00", "basis": "declared"}, "retrieved_time": {"value": "2026-10-31T00:00:00+00:00", "basis": "declared"},
+         "method": "m", "context": "c", "assumptions": [], "provenance": {}, "source_dependence": {}, "uncertainty": "u", "limitations": ["l"], "relation": "context_only"}
+    if produced_by:
+        p["produced_by"] = produced_by
+    if artifacts:
+        p["artifacts"] = list(artifacts)
+    return p
+
+
+def _action_payload(target, inputs=()):
+    return {"target": target, "title": "a", "acceptance_criteria": ["c"], "required_capabilities": [], "cost_stop_bounds": "b", "inputs": list(inputs),
+            "cache_key": {"target": target["version"], "input": "i", "code": "c", "model": "m", "environment": "e", "parameters": "p", "scope": "s",
+                          "acceptance_policy": models.POLICY}}
+
+
+class GraphGates(unittest.TestCase):
+    def good_set(self):
+        claim = _rec("Claim", "c1", _claim_payload())
+        t = ic.ref_of(claim)
+        action = _rec("Action", "a1", _action_payload(t, [t]))
+        out = {"title": "video", "uri": "urn:sha256:" + "a" * 64, "sha256": "a" * 64, "byte_size": 10, "media_type": "video/mp4", "role": "output",
+               "availability": "referenced", "license": None}
+        ev = _rec("Evidence", "e1", _evidence_payload(t, ic.ref_of(action), [out]))
+        return claim, action, ev
+
+    def test_a_consistent_chain_passes_and_lineage_is_tabulated(self):
+        g = ic.graph_gates(list(self.good_set()))
+        self.assertTrue(g["ok"]); self.assertEqual(g["refused"], [])
+        self.assertEqual(g["lineage"][0]["artifact_roles"], ["output"]); self.assertEqual(g["lineage"][0]["action_inputs"], ["c1"])
+
+    def test_dangling_target_producer_and_input_are_refused(self):
+        claim, action, ev = self.good_set()
+        self.assertFalse(ic.graph_gates([action, ev])["ok"])                    # claim missing: Action target/input and Evidence target dangle
+        self.assertFalse(ic.graph_gates([claim, ev])["ok"])                     # Action missing: produced_by dangles
+        self.assertTrue(ic.graph_gates([claim, action, ev])["ok"])              # positive control
+
+    def test_producer_and_evidence_must_pin_the_same_target(self):
+        claim, action, ev = self.good_set()
+        other = _rec("Claim", "c2", _claim_payload("other"))
+        bad = _rec("Evidence", "e2", _evidence_payload(ic.ref_of(other), ic.ref_of(action)))
+        g = ic.graph_gates([claim, other, action, bad])
+        self.assertFalse(g["ok"]); self.assertIn("same target", g["refused"][0]["why"])
+
+    def test_an_imported_assessment_may_not_claim_a_decision(self):
+        claim = _rec("Claim", "c1", _claim_payload())
+        t = ic.ref_of(claim)
+        dims = {d: {"status": "unreviewed", "reviewer": "r", "rationale": "x", "evidence_links": []} for d in models.DIMENSIONS}
+        base = {"target": t, "decision": "unreviewed", "dimensions": dims, "independence_rationale": "i", "limitations": ["l"]}
+        self.assertTrue(ic.graph_gates([claim, _rec("Assessment", "ok", base)])["ok"])
+        accepted = dict(base, decision="accepted")
+        self.assertFalse(ic.graph_gates([claim, _rec("Assessment", "acc", accepted)])["ok"])        # MUST-FAIL: imports cannot manufacture review
+        passed = copy.deepcopy(base); passed["dimensions"]["source_fidelity"]["status"] = "passed"
+        self.assertFalse(ic.graph_gates([claim, _rec("Assessment", "pas", passed)])["ok"])
+
+    def test_dangling_predecessor_is_refused_unless_deliberately_allowed_and_then_warned(self):
+        c1 = _rec("Claim", "c1", _claim_payload("v1"))
+        v2 = _rec("Claim", "c1", _claim_payload("v2"), predecessor=c1["version"], created="2026-11-01T00:00:00+00:00")
+        g = ic.graph_gates([v2])
+        self.assertFalse(g["ok"]); self.assertIn("dangling", g["refused"][0]["why"])
+        g2 = ic.graph_gates([v2], allow_dangling_predecessor=("c1",))
+        self.assertTrue(g2["ok"]); self.assertTrue(any("dangling predecessor allowed" in w["why"] for w in g2["warnings"]))
+        self.assertTrue(ic.graph_gates([c1, v2]) is not None)
+
+    def test_shared_producing_action_and_missing_output_artifact_are_flagged(self):
+        claim, action, ev = self.good_set()
+        ev2 = _rec("Evidence", "e2", _evidence_payload(ic.ref_of(claim), ic.ref_of(action)))          # no artifacts at all
+        g = ic.graph_gates([claim, action, ev, ev2])
+        why = " | ".join(w["why"] for w in g["warnings"])
+        self.assertIn("share one producing Action", why); self.assertIn("no typed artifact with role 'output'", why)
+
+
+@unittest.skipUnless(DSN, "FRONTIER_TEST_DSN not set: scratch-PostgreSQL submit-local tests NOT run (use scripts/test_postgres.sh)")
+class SubmitLocal(unittest.TestCase):
+    def setUp(self):
+        from frontier.store import Store
+        self.store = Store(DSN, "delphi-frontier", "test_" + uuid4().hex)
+        self.store.initialize()
+        self.store.provision(TOKEN, "corpus-importer", "local-fleet", ["contributor", "coordinator"], ["delphi-frontier"], 1000)
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+
+    def drafts(self, **mods):
+        claim = {"namespace": "frontier-fable", "kind": "Claim", "id": "claim:x-1", "issuer": "fable-lead", "source_uri": "https://example.org/src",
+                 "visibility": "public", "predecessor": None, "payload": dict(_claim_payload("from a foreign namespace"), origin="source_statement")}
+        problem = {"namespace": "frontier-fable", "kind": "Problem", "id": "problem:x-1", "issuer": "fable-lead", "source_uri": "https://example.org/src",
+                   "visibility": "public", "predecessor": None,
+                   "payload": {"title": "p", "known_state": "k", "question": "q", "problem_kind": "project_gap", "novelty_status": "n", "data_access": "d",
+                               "completeness": "recorded", "required_capabilities": [], "downstream_uses": [], "source": _claim_payload()["source"]}}
+        items = [claim, problem]
+        for fn in mods.values():
+            fn(items)
+        p = os.path.join(self.tmp.name, "d.jsonl")
+        with open(p, "w") as fh:
+            for d in items:
+                fh.write(json.dumps(d) + "\n")
+        return p
+
+    def run_cli(self, path, *extra):
+        out = os.path.join(self.tmp.name, "r.json")
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = ic.main(["submit-local", "--input", path, "--dsn", DSN, "--namespace", "delphi-frontier", "--schema", self.store.schema,
+                          "--token-file", token_file(self.tmp.name), "--expect-actor", "corpus-importer", "--expect-operator", "local-fleet",
+                          "--receipt-out", out, *extra])
+        self.assertNotIn(TOKEN, buf.getvalue())
+        return rc, json.loads(buf.getvalue().strip().splitlines()[-1]), out
+
+    def test_dry_run_default_writes_nothing_then_execute_reissues_with_provenance_in_the_right_field(self):
+        p = self.drafts()
+        before = ic.counts(self.store)
+        rc, out, _ = self.run_cli(p)
+        self.assertEqual((rc, out["mode"], out["written"]), (0, "dry_run", 0)); self.assertEqual(ic.counts(self.store), before)
+        rc, out, rp = self.run_cli(p, "--execute")
+        self.assertEqual((rc, out["written"]), (0, 2)); self.assertEqual(out["read_back"]["not_head_or_not_proposed"], [])
+        with self.store.connection() as c:
+            rows = {r["kind"]: r["envelope"] for r in c.execute("SELECT kind,envelope FROM record_versions WHERE kind IN ('Claim','Problem')").fetchall()}
+        for kind, env in rows.items():
+            self.assertEqual((env["namespace"], env["issuer"]), ("delphi-frontier", "corpus-importer"))
+        sub_claim = rows["Claim"]["payload"]["prior_review"]["submission"]; sub_prob = rows["Problem"]["payload"]["original"]["submission"]
+        for sub in (sub_claim, sub_prob):
+            self.assertEqual((sub["original_namespace"], sub["original_issuer"]), ("frontier-fable", "fable-lead"))
+            self.assertIn("not a review", sub["label"]); self.assertEqual(len(sub["draft_content_sha256"]), 64)
+        self.assertEqual(rows["Claim"]["payload"]["origin"], "source_statement")             # their content untouched
+        with open(rp) as fh:
+            self.assertFalse(json.load(fh)["independent_reviewer"])
+
+    def test_rerun_is_unchanged_and_makes_no_new_version(self):
+        p = self.drafts()
+        self.run_cli(p, "--execute")
+        n = ic.counts(self.store)["versions"]
+        rc, out, _ = self.run_cli(p, "--execute")
+        self.assertEqual((rc, out["planned"]["unchanged"], out["written"]), (0, 2, 0)); self.assertEqual(ic.counts(self.store)["versions"], n)
+
+    def test_content_available_stops_unless_allowed_by_id(self):
+        def avail(items):
+            items[0]["payload"]["source"].update(content_available=True, license="CC0-1.0")
+        p = self.drafts(a=avail)
+        rc, out, _ = self.run_cli(p, "--execute")
+        self.assertEqual(rc, 3); self.assertIn("AVAILABLE", out["stopped"]); self.assertEqual(ic.counts(self.store)["versions"], 0)
+        rc, out, _ = self.run_cli(p, "--execute", "--allow-content-available", "claim:x-1")
+        self.assertEqual((rc, out["written"]), (0, 2))
+
+    def test_a_foreign_pin_an_assessment_and_a_path_each_stop_everything_before_any_write(self):
+        def pin(items):
+            items[0]["payload"]["dependencies"] = [{"namespace": "frontier-fable", "kind": "Claim", "id": "z", "version": "a" * 64}]
+        def assess(items):
+            items.append({"namespace": "frontier-fable", "kind": "Assessment", "id": "rev", "issuer": "fable-lead", "source_uri": "urn:x", "visibility": "public",
+                          "predecessor": None, "payload": {}})
+        def path(items):
+            items[0]["payload"]["context"] = "see /home/ubuntu/secret"
+        for name, fn, needle in (("foreign pin", pin, "pins"), ("assessment", assess, "reviews cannot"), ("path", path, "absolute local path")):
+            with self.subTest(name):
+                if name == "foreign pin":                       # Claim has no `dependencies`; put the ref in a field that exists
+                    fn = lambda items: items[1]["payload"].__setitem__("dependencies", [{"namespace": "frontier-fable", "kind": "Claim", "id": "z", "version": "a" * 64}])
+                rc, out, _ = self.run_cli(self.drafts(m=fn), "--execute")
+                self.assertEqual(rc, 3, out); self.assertIn(needle, out["stopped"]); self.assertEqual(ic.counts(self.store)["versions"], 0)
+
+    def test_the_wrong_credential_holder_is_refused(self):
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rc = ic.main(["submit-local", "--input", self.drafts(), "--dsn", DSN, "--namespace", "delphi-frontier", "--schema", self.store.schema,
+                          "--token-file", token_file(self.tmp.name), "--expect-actor", "someone-else", "--expect-operator", "local-fleet", "--execute"])
+        self.assertEqual(rc, 3); self.assertEqual(ic.counts(self.store)["versions"], 0)
+

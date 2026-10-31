@@ -4,6 +4,7 @@
   python -m frontier_adapters.import_cli preflight --plan DIR/plan.json --dsn ... --namespace NS --token-file F
   python -m frontier_adapters.import_cli import    --plan DIR/plan.json --dsn ... --namespace NS --token-file F --receipt R.jsonl [--execute]
   python -m frontier_adapters.import_cli verify    --plan DIR/plan.json --dsn ... --namespace NS --receipt-out R.json
+  python -m frontier_adapters.import_cli submit-local --input DRAFTS --dsn ... --namespace NS --token-file F --expect-actor A --expect-operator O --receipt-out R.json [--execute]
 
 Properties (each has a test against a scratch PostgreSQL):
   * No network, no model call. Inputs are frozen files; outputs are bundles of <=100 records built exactly as
@@ -191,7 +192,87 @@ def counts(store) -> dict:
     return {"heads": heads, "versions": versions, "status": status, "forks": forks, "events": events, "write_receipts_24h": wr}
 
 
-def preflight(store, token, bundles) -> dict:
+
+# ---------------------------------------------------------------- graph gates (import_bundle validates NO references; these do)
+def _present(c, r) -> bool:
+    return bool(c.execute("SELECT 1 FROM record_versions WHERE namespace=%s AND kind=%s AND record_id=%s AND version=%s",
+                          (r["namespace"], r["kind"], r["id"], r["version"])).fetchone())
+
+
+def graph_gates(records: list[dict], store=None, *, allow_dangling_predecessor=()) -> dict:
+    """Closure and lineage checks over a set of records about to be imported.
+
+    `Store.import_bundle` checks digests but no references, so an inconsistent graph would be stored as written. These checks
+    refuse that (refused), flag what needs a human (warnings) and tabulate typed lineage per Evidence (lineage). A reference is
+    satisfied by the set itself or, with a store, by the exact version already in the store.
+    Nothing here reviews anything: an imported Assessment that claims a decision is REFUSED, because an import must not
+    manufacture independent review.
+    """
+    by_v = {r["version"]: r for r in records}
+    refused, warnings, lineage = [], [], []
+    c_ctx = store.connection() if store is not None else None
+    c = c_ctx.__enter__() if c_ctx else None
+    try:
+        def exists(ref):
+            r = by_v.get(ref["version"])
+            if r is not None and (r["namespace"], r["kind"], r["id"]) == (ref["namespace"], ref["kind"], ref["id"]):
+                return r
+            if c is not None and _present(c, ref):
+                row = c.execute("SELECT envelope FROM record_versions WHERE version=%s", (ref["version"],)).fetchone()
+                return row["envelope"]
+            return None
+
+        for r in records:
+            tag = f"{r['namespace']}/{r['kind']}/{r['id']}"
+            p = r["payload"]
+            if r["kind"] == "Assessment" and (p.get("decision") != "unreviewed" or any(d.get("status") in ("passed", "failed") for d in p.get("dimensions", {}).values())):
+                refused.append({"record": tag, "why": "an imported Assessment claims a decision or a dimension result; imports must not manufacture review"})
+            if r["predecessor"] and exists({"namespace": r["namespace"], "kind": r["kind"], "id": r["id"], "version": r["predecessor"]}) is None \
+                    and r["id"] not in allow_dangling_predecessor:
+                refused.append({"record": tag, "why": "predecessor version is in neither the set nor the store (dangling); allow it explicitly with --allow-dangling-predecessor ID",
+                                "predecessor": r["predecessor"]})
+            elif r["predecessor"] and r["id"] in allow_dangling_predecessor and exists({"namespace": r["namespace"], "kind": r["kind"], "id": r["id"], "version": r["predecessor"]}) is None:
+                warnings.append({"record": tag, "why": "dangling predecessor allowed explicitly; the earlier version is not in the store", "predecessor": r["predecessor"]})
+            if r["kind"] == "Evidence":
+                tgt = exists(p["target"])
+                if tgt is None:
+                    refused.append({"record": tag, "why": "Evidence target is in neither the set nor the store", "target": p["target"]["id"]})
+                act = None
+                if p.get("produced_by"):
+                    act = exists(p["produced_by"])
+                    if act is None:
+                        refused.append({"record": tag, "why": "produced_by Action is in neither the set nor the store", "action": p["produced_by"]["id"]})
+                    elif act["payload"].get("target") != p["target"]:
+                        refused.append({"record": tag, "why": "produced_by Action and Evidence do not pin the same target (the store enforces this on submit)"})
+                    if not any(a["role"] == "output" for a in p.get("artifacts", [])):
+                        warnings.append({"record": tag, "why": "Evidence has produced_by but no typed artifact with role 'output'"})
+                if p["evidence_kind"] == "observed":
+                    warnings.append({"record": tag, "why": "evidence_kind 'observed': a human must confirm something was actually observed"})
+                lineage.append({"evidence": tag, "kind": p["evidence_kind"], "relation": p.get("relation", "unspecified"),
+                                "target": f"{p['target']['namespace']}/{p['target']['kind']}/{p['target']['id']}",
+                                "produced_by": None if not p.get("produced_by") else p["produced_by"]["id"],
+                                "action_inputs": [i["id"] for i in (act or {}).get("payload", {}).get("inputs", [])],
+                                "artifact_roles": sorted({a["role"] for a in p.get("artifacts", [])}), "artifacts": len(p.get("artifacts", []))})
+            if r["kind"] == "Action":
+                if exists(p["target"]) is None:
+                    refused.append({"record": tag, "why": "Action target is in neither the set nor the store"})
+                for i in p.get("inputs", []):
+                    if exists(i) is None:
+                        refused.append({"record": tag, "why": "Action input is in neither the set nor the store", "input": i["id"]})
+    finally:
+        if c_ctx:
+            c_ctx.__exit__(None, None, None)
+    per_action = {}
+    for l in lineage:
+        if l["produced_by"]:
+            per_action.setdefault(l["produced_by"], []).append(l["evidence"])
+    shared = {a: e for a, e in per_action.items() if len(e) > 1}
+    if shared:
+        warnings.append({"why": "several Evidence records share one producing Action: one execution, not several", "actions": shared})
+    return {"refused": refused, "warnings": warnings, "lineage": lineage, "ok": not refused}
+
+
+def preflight(store, token, bundles, *, allow_dangling_predecessor=()) -> dict:
     p = store.principal(token)
     recs = [r for b in bundles for r in b["records"]]
     existing_versions, would_fork, new = [], [], 0
@@ -210,8 +291,9 @@ def preflight(store, token, bundles) -> dict:
             for row in c.execute("SELECT namespace FROM heads WHERE kind=%s AND record_id=%s AND namespace<>%s", (r["kind"], r["id"], r["namespace"])).fetchall():
                 other_ns.setdefault(f"{r['kind']}/{r['id']}", set()).add(row["namespace"])
     quota_left = p["daily_write_limit"] - counts(store)["write_receipts_24h"]
-    return {"principal": {k: p[k] for k in ("actor", "operator", "roles", "namespaces", "daily_write_limit")},
-            "can_import": "coordinator" in p["roles"] and store.namespace in p["namespaces"],
+    gates = graph_gates(recs, store, allow_dangling_predecessor=tuple(allow_dangling_predecessor))
+    return {"gates": gates, "principal": {k: p[k] for k in ("actor", "operator", "roles", "namespaces", "daily_write_limit")},
+            "can_import": "coordinator" in p["roles"] and store.namespace in p["namespaces"] and gates["ok"],
             "records": len(recs), "new_heads": new, "already_present_versions": len(existing_versions),
             "would_fork": would_fork, "same_id_in_other_namespaces": {k: sorted(v) for k, v in sorted(other_ns.items())},
             "writes_needed": len(bundles), "quota_left": quota_left, "counts_before": counts(store)}
@@ -271,10 +353,121 @@ def verify(store, bundles, *, expect_status="imported_unreviewed", token=None) -
     return {"verified_ok": ok, "problems": bad, "status_counts": statuses, "counts_now": counts(store)}
 
 
+
+# ---------------------------------------------------------------- local proposals (re-issue into the store's namespace as the caller)
+import functools
+
+
+@functools.lru_cache(maxsize=1)
+def _root_submit():
+    """Root's `scripts/submit_drafts.py`, loaded by RELATIVE path so its planning, quota, head/predecessor and read-back logic is reused unchanged.
+    Cached: every call would otherwise create a new `Stop` class and `except mod.Stop` would stop matching."""
+    import importlib.util
+    from pathlib import Path
+    path = Path(__file__).resolve().parents[1] / "scripts" / "submit_drafts.py"
+    spec = importlib.util.spec_from_file_location("frontier_root_submit_drafts", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _refs_in(o, found=None):
+    found = [] if found is None else found
+    if isinstance(o, dict):
+        if {"namespace", "kind", "id", "version"} <= set(o):
+            found.append(o)
+        for v in o.values():
+            _refs_in(v, found)
+    elif isinstance(o, list):
+        for v in o:
+            _refs_in(v, found)
+    return found
+
+
+def load_local_drafts(path: str, namespace: str, actor: str, submission: dict, *, allow_content_available=()) -> tuple[list[dict], str, dict]:
+    """Draft dicts (JSONL, or a JSON object with a `drafts` list) -> local PROPOSALS under `namespace`, issued by `actor`.
+
+    This is the intentional exception to 'never rewrite a namespace': the records are NEW local proposals, not imports. What is
+    rewritten (namespace, issuer, predecessor) is recorded, with the original draft's content digest, in the payload field the kind has:
+    `original.submission` where the kind has `original` (Problem), else `prior_review.submission` (Claim). Both are provenance, not review.
+    """
+    import copy
+    from hashlib import sha256
+    from pathlib import Path
+    from frontier.models import Draft, digest
+    from .artifacts import find_abs_paths
+    mod = _root_submit()
+    raw = Path(path).read_bytes()
+    file_sha = sha256(raw).hexdigest()
+    text = raw.decode()
+    items = json.loads(text)["drafts"] if text.lstrip().startswith("{") and '"drafts"' in text[:400] else [json.loads(l) for l in text.splitlines() if l.strip()]
+    out, seen, report = [], set(), {"content_available_ids": [], "origins": {}, "reissued_from": {}}
+    for n, d0 in enumerate(items, 1):
+        d = copy.deepcopy(d0)
+        tag = f"{d.get('kind')}/{d.get('id')}"
+        if d["kind"] == "Assessment":
+            raise mod.Stop(f"{tag}: reviews cannot be submitted through this tool; an Assessment needs an independent reviewer principal")
+        if (d["kind"], d["id"]) in seen:
+            raise mod.Stop(f"item {n}: duplicate {tag} in the input")
+        seen.add((d["kind"], d["id"]))
+        foreign = [r for r in _refs_in(d["payload"]) if r["namespace"] != namespace]
+        if foreign:
+            raise mod.Stop(f"{tag}: payload pins {len(foreign)} record(s) outside {namespace!r}; re-issuing would break those pins, so remap them deliberately first")
+        if find_abs_paths(d["payload"]):
+            raise mod.Stop(f"{tag}: payload contains an absolute local path")
+        src = d["payload"].get("source") or {}
+        if src.get("content_available"):
+            report["content_available_ids"].append(d["id"])
+            if d["id"] not in allow_content_available:
+                raise mod.Stop(f"{tag}: marks source content as AVAILABLE (licence {src.get('license')!r}); allow it explicitly with --allow-content-available {d['id']}")
+        report["origins"][d["payload"].get("origin", "unset")] = report["origins"].get(d["payload"].get("origin", "unset"), 0) + 1
+        prov = {"label": "provenance of this LOCAL PROPOSAL; not a review and not an acceptance", "tool": "frontier_adapters.import_cli submit-local",
+                "original_namespace": d0["namespace"], "original_issuer": d0["issuer"], "input_file_sha256": file_sha,
+                "draft_content_sha256": digest(mod.content_of(d0)), **submission}
+        report["reissued_from"][d["id"]] = [d0["namespace"], d0["issuer"]]
+        d["namespace"], d["issuer"], d["predecessor"] = namespace, actor, None
+        payload = json.loads(json.dumps(d["payload"]))
+        from frontier.models import PAYLOADS
+        fields = PAYLOADS[d["kind"]].model_fields
+        if "original" in fields:
+            payload.setdefault("original", {})["submission"] = prov
+        elif "prior_review" in fields:
+            payload.setdefault("prior_review", {})["submission"] = prov
+        else:
+            raise mod.Stop(f"{tag}: kind {d['kind']} has no field that can carry submission provenance")
+        d["payload"] = payload
+        Draft.model_validate(d)
+        out.append(d)
+    return out, file_sha, report
+
+
+def submit_local(args) -> int:
+    mod = _root_submit()
+    try:
+        token = read_token(args.token_file)
+        store = _store(args.dsn, args.namespace, args.schema)
+        who = store.principal(token)
+        submission = {"submitted_by_actor": who["actor"], "submitted_by_operator": who["operator"], "role": "proposer; not an independent reviewer"}
+        drafts, file_sha, rep = load_local_drafts(args.input, args.namespace, who["actor"], submission, allow_content_available=set(args.allow_content_available))
+        receipt = mod.run(store, token, drafts, args.expect_actor, args.expect_operator, args.execute, args.receipt_out, file_sha,
+                          {"tool": "frontier_adapters.import_cli submit-local", "gates": rep})
+    except mod.Stop as e:
+        print(json.dumps({"ok": False, "stopped": str(e), "written": 0 if not args.execute else "see receipt if any"}))
+        return 3
+    except Exception as e:                                                  # never a traceback: it could carry a connection string
+        code = getattr(e, "code", type(e).__name__)
+        print(json.dumps({"ok": False, "error": code, "message": str(e)[:200] if code != "ValidationError" else "draft failed validation"}))
+        return 2
+    print(json.dumps({"mode": receipt["mode"], "planned": receipt["planned"], "quota_left_before": receipt["quota_left_before"],
+                      "written": sum(1 for r in receipt["records"] if r["action"] in ("create", "revise")) if args.execute else 0,
+                      "read_back": receipt.get("read_back"), "stopped": receipt.get("stopped"), "content_available_ids": rep["content_available_ids"]}))
+    return 0 if not receipt.get("stopped") and not (receipt.get("read_back") or {}).get("not_head_or_not_proposed") else 2
+
+
 # ---------------------------------------------------------------- CLI
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Bounded deterministic import of frozen records into a Frontier store (credentials never printed)")
-    ap.add_argument("command", choices=["build", "preflight", "import", "verify"])
+    ap.add_argument("command", choices=["build", "preflight", "import", "verify", "submit-local"])
     ap.add_argument("--records", action="append", default=[], help="JSON file of full Records (kept exact)")
     ap.add_argument("--drafts", action="append", default=[], help="JSONL of Draft dicts (created_at pinned to each draft's retrieval time)")
     ap.add_argument("--exclude-id", action="append", default=[], help="draft ids to leave out (e.g. ones already represented by --records)")
@@ -284,8 +477,14 @@ def main(argv=None) -> int:
     ap.add_argument("--dsn"); ap.add_argument("--namespace"); ap.add_argument("--schema", default="public"); ap.add_argument("--token-file")
     ap.add_argument("--receipt"); ap.add_argument("--receipt-out")
     ap.add_argument("--only-bundles", type=int, default=None, help="import only the first N bundles")
-    ap.add_argument("--execute", action="store_true", help="actually write; without it `import` is a dry run")
+    ap.add_argument("--allow-dangling-predecessor", action="append", default=[], help="record id whose predecessor is deliberately not in the store")
+    ap.add_argument("--execute", action="store_true", help="actually write; without it `import` and `submit-local` are dry runs")
+    ap.add_argument("--input", help="submit-local: JSONL of Drafts, or a JSON object with a `drafts` list")
+    ap.add_argument("--expect-actor"); ap.add_argument("--expect-operator")
+    ap.add_argument("--allow-content-available", action="append", default=[], help="submit-local: draft id whose source content_available=true is accepted")
     a = ap.parse_args(argv)
+    if a.command == "submit-local":
+        return submit_local(a)
     if a.command == "build":
         recs = []
         for r in a.records: recs += records_from_file(r)
@@ -310,10 +509,12 @@ def main(argv=None) -> int:
         return 0 if not rep["problems"] else 1
     token = read_token(a.token_file)
     if a.command == "preflight":
-        rep = preflight(store, token, bundles)
+        rep = preflight(store, token, bundles, allow_dangling_predecessor=a.allow_dangling_predecessor)
         print(json.dumps(rep, indent=1, sort_keys=True, default=str))
         return 0 if rep["can_import"] and not rep["would_fork"] else 1
-    pre = preflight(store, token, bundles)
+    pre = preflight(store, token, bundles, allow_dangling_predecessor=a.allow_dangling_predecessor)
+    if pre["gates"]["refused"]:
+        raise ImportRefused(f"graph gates refused {len(pre['gates']['refused'])} problem(s): {[g['why'][:70] for g in pre['gates']['refused'][:3]]}")
     if pre["would_fork"]:
         raise ImportRefused(f"{len(pre['would_fork'])} record(s) would fork an existing head; resolve deliberately first")
     if not pre["can_import"] or pre["quota_left"] < len(bundles):
