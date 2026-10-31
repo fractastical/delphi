@@ -2,39 +2,445 @@
   "claim_id": "darwin1859-ch11-14",
   "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch11-14",
   "project": "darwin-origin",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "The vascular-plant floras of high tropical mountains share a few identical species and many more genera with the temperate lowland floras of both hemispheres, and they share more genera with those temperate floras than the tropical lowlands at the foot of the same mountains do; the temperate lowland floras of the two hemispheres are likewise related at the genus level beyond what tropical lowlands share with them.",
   "pass_criterion": "Pre-registered. Regions: 4 tropical high-mountain regions M (GBIF records with elevation >= 3500 m in the N Andes and Trans-Mexican volcanic belt, >= 3000 m in the East African mountains and New Guinea highlands), their 4 tropical-lowland controls C (same bounding box, elevation <= 800 m), 3 northern (N) and 3 southern (S) temperate lowland regions L (elevation <= 600 m). Species/genus present if >= 3 records. For a pair (X, L): f_sp = |species(X) ∩ species(L)| / |species(X)|, f_gen = |genera(X) ∩ genera(L)| / |genera(X)|. SUPPORTS requires all of: (A) in >= 20 of the 24 (M, L) pairs, 0 < f_sp < 0.5 f_gen (identical species exist but are the minority of allied relationships); (B) in >= 20 of 24 (M, L) pairs f_gen(M, L) > f_gen(C_M, L) (one-sided binomial sign test vs 0.5, p < 0.01); (C) in >= 7 of the 9 (N, S) pairs f_gen(N, S) exceeds the mean over k of f_gen(C_k, S).",
   "fail_criterion": "Pre-registered: REFUTES if (B) holds in <= 12 of 24 pairs or (C) holds in <= 4 of 9 pairs. Any other combination is MIXED. If any mountain region yields fewer than 50 species, that region is dropped; with fewer than 3 mountain regions remaining the result is inconclusive (underpowered).",
-  "planned_datasets": ["gbif-occurrence-search-api"],
+  "planned_datasets": [
+    "gbif-occurrence-search-api"
+  ],
   "interpretation": "'Plants' = Tracheophyta (GBIF phylum key 7707728). 'Lofty mountains' including tropical ones = GBIF records above 3500 m (3000 m for Africa and New Guinea, whose summits are lower and more sparsely recorded) inside fixed tropical bounding boxes. 'Temperate lowlands of the northern and southern hemispheres' = fixed lowland boxes at 41-55 N and 34-55 S. 'Identically the same' = same GBIF backbone species; 'specifically distinct though related' = different species in the same genus (Darwin's own unit of alliance). Because 'remarkable' relatedness needs a reference, the tropical lowlands at the foot of each mountain range are the pre-registered control: Darwin's glacial-dispersal explanation implies the alpine flora, not the surrounding tropical lowland flora, is the one allied to temperate floras. Introduced species cannot be excluded from GBIF occurrence data; this inflates species identity (A) and is listed as a caveat.",
-  "datasets": [],
-  "method": "",
-  "measured": {},
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-bdd1", "date": "2026-10-31" },
+  "datasets": [
+    {
+      "id": "gbif-occurrence-search-api",
+      "name": "GBIF occurrence search API (facet counts of speciesKey/genusKey for Tracheophyta within bounding boxes and elevation bands; GBIF Backbone Taxonomy for keys)",
+      "landing_url": "https://www.gbif.org/developer/occurrence",
+      "doi": null,
+      "version": "live API, retrieved 2026-10-31",
+      "license": "varies by publisher (CC0 / CC BY / CC BY-NC); API output is aggregated counts",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-79+-5%2C-72+-5%2C-72+7%2C-79+7%2C-79+-5%29%29&elevation=3500%2C9000&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:24Z",
+          "byte_size": 97714,
+          "sha256": "86d7011cef517d1a72dbfdaf1c7afa78befa1f6c87ad40a36fa7abb5c6711421"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-79+-5%2C-72+-5%2C-72+7%2C-79+7%2C-79+-5%29%29&elevation=3500%2C9000&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:25Z",
+          "byte_size": 27016,
+          "sha256": "c24ef2fe52c7fbc2b46b815eb5cfa4ff300ad75cb9c754a7f3f69a1cfab74d01"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-79+-5%2C-72+-5%2C-72+7%2C-79+7%2C-79+-5%29%29&elevation=0%2C800&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:26Z",
+          "byte_size": 518218,
+          "sha256": "ed52ceb3aa399d16ddefd7a545d2ab900bfa42dd79f3d688f7745ac3ed2aabd0"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-79+-5%2C-72+-5%2C-72+7%2C-79+7%2C-79+-5%29%29&elevation=0%2C800&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:27Z",
+          "byte_size": 81373,
+          "sha256": "6f248331a4f769616b256d8a36119732cb2c3c30e612b7e72df270deee23e91d"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-100+18.5%2C-97+18.5%2C-97+20%2C-100+20%2C-100+18.5%29%29&elevation=3500%2C9000&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:28Z",
+          "byte_size": 33432,
+          "sha256": "c38915711f510cc25adb97ae9ccbf8e6b244a218c1d8982f3af0155ae03f8a63"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-100+18.5%2C-97+18.5%2C-97+20%2C-100+20%2C-100+18.5%29%29&elevation=3500%2C9000&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:29Z",
+          "byte_size": 14254,
+          "sha256": "74bbd99a1807f076dab6cbffa0b998419cc01fd9a59884a1e0da97c1ca2d7175"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-100+18.5%2C-97+18.5%2C-97+20%2C-100+20%2C-100+18.5%29%29&elevation=0%2C800&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:30Z",
+          "byte_size": 42135,
+          "sha256": "f360b23e221e75650b579dc6985db513f4bbfbecd600742cf571a91de58caf5a"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-100+18.5%2C-97+18.5%2C-97+20%2C-100+20%2C-100+18.5%29%29&elevation=0%2C800&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:31Z",
+          "byte_size": 23844,
+          "sha256": "9559f29d984a9ea751770a7d773e59132b2c9f2235a9295661d557c1f64bddf5"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%2829+-4%2C38+-4%2C38+4%2C29+4%2C29+-4%29%29&elevation=3000%2C9000&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:31Z",
+          "byte_size": 24290,
+          "sha256": "11b08b955d038324fcfa92efd08de373fe300b8cdb6fe59c381e21f274a2fa92"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%2829+-4%2C38+-4%2C38+4%2C29+4%2C29+-4%29%29&elevation=3000%2C9000&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:32Z",
+          "byte_size": 12171,
+          "sha256": "e4ef7b409649ce33ac37f7b6af0aefd0bafec723437ec1cfb13e9e4567512b6a"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%2829+-4%2C38+-4%2C38+4%2C29+4%2C29+-4%29%29&elevation=0%2C800&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:33Z",
+          "byte_size": 43603,
+          "sha256": "688b788782cb5d84a12f45327a9a92530df3564eb189112952414e401ed3f1a2"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%2829+-4%2C38+-4%2C38+4%2C29+4%2C29+-4%29%29&elevation=0%2C800&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:34Z",
+          "byte_size": 21243,
+          "sha256": "7055b821dcba0cf9b376e70ed2ad5535707a81251c6e2557fe94cabd86474163"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28137+-7%2C148+-7%2C148+-3%2C137+-3%2C137+-7%29%29&elevation=3000%2C9000&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:35Z",
+          "byte_size": 34884,
+          "sha256": "5643ef8ce7a5ad52d9ce8e3bef1d1939d4713ebb17af3fced58cdb9a8ec4c8b1"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28137+-7%2C148+-7%2C148+-3%2C137+-3%2C137+-7%29%29&elevation=3000%2C9000&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:36Z",
+          "byte_size": 13950,
+          "sha256": "086da01c9480f749a7de9241e406a6eedbd5e66b08b62b737c9833455e764996"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28137+-7%2C148+-7%2C148+-3%2C137+-3%2C137+-7%29%29&elevation=0%2C800&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:37Z",
+          "byte_size": 117688,
+          "sha256": "c8a91a3216497c757ea2e4af2054033e46f335f8d1db29e2ae89db5c220c370f"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28137+-7%2C148+-7%2C148+-3%2C137+-3%2C137+-7%29%29&elevation=0%2C800&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:38Z",
+          "byte_size": 43889,
+          "sha256": "6cbbb955cbfd3d814c206456acff5b02a3deffbce430c64b362d7ed805e9dd73"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%286+51%2C20+51%2C20+54.5%2C6+54.5%2C6+51%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:39Z",
+          "byte_size": 88427,
+          "sha256": "d1d72ed513349a830d956dbd68fef4834406ff21f2912c70179547e519fd8fcb"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%286+51%2C20+51%2C20+54.5%2C6+54.5%2C6+51%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:40Z",
+          "byte_size": 27728,
+          "sha256": "c47dbe056ae453092ebb9ab95265c334564ad3a9431b3666166490603a76a954"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-85+41%2C-70+41%2C-70+46%2C-85+46%2C-85+41%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:41Z",
+          "byte_size": 100763,
+          "sha256": "a41e33feb6a4b753aeff11b43b71507aebbe09070ae77d491d7d97102818a6b2"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-85+41%2C-70+41%2C-70+46%2C-85+46%2C-85+41%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:42Z",
+          "byte_size": 31120,
+          "sha256": "08c365d43500f379d7c0d20ecb21f4e6f83e302461639577d5b20906305af32a"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28125+35%2C142+35%2C142+45%2C125+45%2C125+35%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:43Z",
+          "byte_size": 133791,
+          "sha256": "0ade14b067f9eb8c753fd77bed48706999367e77bb98e32a20c129a0f42b879f"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28125+35%2C142+35%2C142+45%2C125+45%2C125+35%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:44Z",
+          "byte_size": 38826,
+          "sha256": "a57fb3aa9c888e8d0234b6ea389441ca851656b8d160880b0324c5c08006cbc5"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-75+-55%2C-63+-55%2C-63+-38%2C-75+-38%2C-75+-55%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:45Z",
+          "byte_size": 44775,
+          "sha256": "c911b2436abcf92d2e4196c50825e8fa358e90d97e9d94621e0d34bc36a25e31"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28-75+-55%2C-63+-55%2C-63+-38%2C-75+-38%2C-75+-55%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:46Z",
+          "byte_size": 20186,
+          "sha256": "0e5244a8c9be6d8c900989dc9552f509a4646458776e85402fca9019e53b0f00"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28166+-47%2C179+-47%2C179+-34%2C166+-34%2C166+-47%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:48Z",
+          "byte_size": 129702,
+          "sha256": "ada2c198bf196a0504609cc63ac3e624bfb8340f390ac7078027d52a6faef830"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28166+-47%2C179+-47%2C179+-34%2C166+-34%2C166+-47%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:49Z",
+          "byte_size": 41360,
+          "sha256": "86af790067ec71b916d336baf8e52756ea3f6595a9bbbf2184803dcd7c4a9a17"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28140+-44%2C149+-44%2C149+-37%2C140+-37%2C140+-44%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=speciesKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:50Z",
+          "byte_size": 126378,
+          "sha256": "b723b2af016b37502e54a66e6fe8694ccdf787a4f420c281b84bf4a12819ea4b"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=7707728&geometry=POLYGON%28%28140+-44%2C149+-44%2C149+-37%2C140+-37%2C140+-44%29%29&elevation=0%2C600&hasCoordinate=true&hasGeospatialIssue=false&occurrenceStatus=PRESENT&year=1900%2C2026&facet=genusKey&facetLimit=100000&limit=0&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:32:51Z",
+          "byte_size": 36595,
+          "sha256": "388b0a7538c0ce3441dacefeb98dedebc426599360884dc3e6470b7e030e9e45"
+        }
+      ],
+      "role": "species and genus presence lists (>= 3 records) for 4 tropical mountain regions, their 4 lowland controls and 6 temperate lowland regions"
+    }
+  ],
+  "method": "For 14 pre-registered regions the GBIF occurrence API was queried for Tracheophyta facet counts of speciesKey and genusKey restricted to the region's bounding box and elevation band (coordinates present, no geospatial issue, PRESENT, 1900-2026, fossil/living specimens excluded); taxa with >= 3 records formed each region's species and genus set. For every (tropical mountain M, temperate lowland L) pair the fraction of M's species also in L (f_sp) and of M's genera also in L (f_gen) was computed, and f_gen was compared with the same quantity for the tropical lowland control C at the foot of the same mountains. For the 9 (north, south) temperate pairs f_gen was compared with the mean f_gen from the four tropical lowland controls to the same southern region. Criteria (A), (B), (C) were counted and (B) tested with a one-sided binomial sign test.",
+  "measured": {
+    "value": 24,
+    "unit": "of 24 (tropical mountain, temperate lowland) pairs in which the mountain flora shares a larger fraction of its genera with the temperate flora than the adjacent tropical lowland flora does",
+    "n": 24,
+    "uncertainty": "one-sided binomial sign test vs 0.5: p=5.96e-08",
+    "extra": {
+      "A_pairs_identical_species_present_but_minority": 24,
+      "B_pairs_mountain_more_allied_than_tropical_lowland": 24,
+      "C_north_south_pairs_more_allied_than_tropical_lowland": 9,
+      "n_north_south_pairs": 9,
+      "median_f_sp_mountain_temperate": 0.041039626348948914,
+      "median_f_gen_mountain_temperate": 0.43939802336028755,
+      "median_f_gen_control_temperate": 0.1505384799936022,
+      "median_f_sp_north_south": 0.1364562118126273,
+      "median_f_gen_north_south": 0.39976553341148885,
+      "median_f_gen_tropical_lowland_south": 0.169554236308385,
+      "per_mountain_mean_f_gen": {
+        "M-andes": 0.34537815126050414,
+        "M-mexico": 0.519496855345912,
+        "M-eastafrica": 0.4714285714285715,
+        "M-newguinea": 0.379074658254469
+      },
+      "per_mountain_mean_f_gen_control": {
+        "M-andes": 0.09542157751586582,
+        "M-mexico": 0.22173913043478263,
+        "M-eastafrica": 0.2220496894409938,
+        "M-newguinea": 0.12446351931330472
+      },
+      "mountains_used": [
+        "M-andes",
+        "M-mexico",
+        "M-eastafrica",
+        "M-newguinea"
+      ],
+      "mountains_dropped_lt_50_species": [],
+      "binomial_p_B": 5.960464477539063e-08
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.8,
+  "caveats": [
+    "Introduced species inflate species identity: e.g. 28% of the Central European lowland species set is also recorded in lowland New Zealand, mostly European weeds and crops. Criterion (A) (identical species exist but are a minority) is therefore satisfied partly for the wrong reason; the genus-level criteria (B) and (C) are less affected because the comparison is against tropical lowland controls that also receive introductions.",
+    "f_gen normalises by the source region's genus count, so the very genus-rich Andean lowland control (2206 genera) is penalised relative to the Andean alpine set (595); the Mexican and East African controls, which are similar in size to their mountain sets, show the same ordering, so the result does not depend on this.",
+    "Elevation comes from the GBIF 'elevation' field, which is missing on many records; regional sets are therefore samples of the flora, not checklists, and are unevenly sampled (e.g. 12.8k records in lowland Patagonia vs 1.0M in lowland New Zealand).",
+    "Genus sharing is a pre-phylogenetic proxy for 'related in a most remarkable manner'; no phylogenetic distances were computed.",
+    "Only four tropical mountain systems and six temperate lowland regions were sampled; temperate mountains ('the more lofty mountains' generally) were not tested separately.",
+    "GBIF is a live resource; re-running reproduces the method but counts drift as records are added. Response checksums at retrieval time are in derived/fetch_log.json."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-bdd1",
+    "date": "2026-10-31"
+  },
   "preregistration": {
     "taxon_key": 7707728,
     "min_records": 3,
-    "basis_of_record_excluded": ["FOSSIL_SPECIMEN", "LIVING_SPECIMEN"],
+    "basis_of_record_excluded": [
+      "FOSSIL_SPECIMEN",
+      "LIVING_SPECIMEN"
+    ],
     "year_range": "1900,2026",
     "regions": {
-      "M-andes": { "type": "tropical-mountain", "bbox": [-79, -5, -72, 7], "elevation": [3500, 9000], "control": "C-andes" },
-      "C-andes": { "type": "tropical-lowland-control", "bbox": [-79, -5, -72, 7], "elevation": [0, 800] },
-      "M-mexico": { "type": "tropical-mountain", "bbox": [-100, 18.5, -97, 20], "elevation": [3500, 9000], "control": "C-mexico" },
-      "C-mexico": { "type": "tropical-lowland-control", "bbox": [-100, 18.5, -97, 20], "elevation": [0, 800] },
-      "M-eastafrica": { "type": "tropical-mountain", "bbox": [29, -4, 38, 4], "elevation": [3000, 9000], "control": "C-eastafrica" },
-      "C-eastafrica": { "type": "tropical-lowland-control", "bbox": [29, -4, 38, 4], "elevation": [0, 800] },
-      "M-newguinea": { "type": "tropical-mountain", "bbox": [137, -7, 148, -3], "elevation": [3000, 9000], "control": "C-newguinea" },
-      "C-newguinea": { "type": "tropical-lowland-control", "bbox": [137, -7, 148, -3], "elevation": [0, 800] },
-      "N-europe": { "type": "north-temperate-lowland", "bbox": [6, 51, 20, 54.5], "elevation": [0, 600] },
-      "N-neamerica": { "type": "north-temperate-lowland", "bbox": [-85, 41, -70, 46], "elevation": [0, 600] },
-      "N-neasia": { "type": "north-temperate-lowland", "bbox": [125, 35, 142, 45], "elevation": [0, 600] },
-      "S-patagonia": { "type": "south-temperate-lowland", "bbox": [-75, -55, -63, -38], "elevation": [0, 600] },
-      "S-newzealand": { "type": "south-temperate-lowland", "bbox": [166, -47, 179, -34], "elevation": [0, 600] },
-      "S-seaustralia": { "type": "south-temperate-lowland", "bbox": [140, -44, 149, -37], "elevation": [0, 600] }
+      "M-andes": {
+        "type": "tropical-mountain",
+        "bbox": [
+          -79,
+          -5,
+          -72,
+          7
+        ],
+        "elevation": [
+          3500,
+          9000
+        ],
+        "control": "C-andes"
+      },
+      "C-andes": {
+        "type": "tropical-lowland-control",
+        "bbox": [
+          -79,
+          -5,
+          -72,
+          7
+        ],
+        "elevation": [
+          0,
+          800
+        ]
+      },
+      "M-mexico": {
+        "type": "tropical-mountain",
+        "bbox": [
+          -100,
+          18.5,
+          -97,
+          20
+        ],
+        "elevation": [
+          3500,
+          9000
+        ],
+        "control": "C-mexico"
+      },
+      "C-mexico": {
+        "type": "tropical-lowland-control",
+        "bbox": [
+          -100,
+          18.5,
+          -97,
+          20
+        ],
+        "elevation": [
+          0,
+          800
+        ]
+      },
+      "M-eastafrica": {
+        "type": "tropical-mountain",
+        "bbox": [
+          29,
+          -4,
+          38,
+          4
+        ],
+        "elevation": [
+          3000,
+          9000
+        ],
+        "control": "C-eastafrica"
+      },
+      "C-eastafrica": {
+        "type": "tropical-lowland-control",
+        "bbox": [
+          29,
+          -4,
+          38,
+          4
+        ],
+        "elevation": [
+          0,
+          800
+        ]
+      },
+      "M-newguinea": {
+        "type": "tropical-mountain",
+        "bbox": [
+          137,
+          -7,
+          148,
+          -3
+        ],
+        "elevation": [
+          3000,
+          9000
+        ],
+        "control": "C-newguinea"
+      },
+      "C-newguinea": {
+        "type": "tropical-lowland-control",
+        "bbox": [
+          137,
+          -7,
+          148,
+          -3
+        ],
+        "elevation": [
+          0,
+          800
+        ]
+      },
+      "N-europe": {
+        "type": "north-temperate-lowland",
+        "bbox": [
+          6,
+          51,
+          20,
+          54.5
+        ],
+        "elevation": [
+          0,
+          600
+        ]
+      },
+      "N-neamerica": {
+        "type": "north-temperate-lowland",
+        "bbox": [
+          -85,
+          41,
+          -70,
+          46
+        ],
+        "elevation": [
+          0,
+          600
+        ]
+      },
+      "N-neasia": {
+        "type": "north-temperate-lowland",
+        "bbox": [
+          125,
+          35,
+          142,
+          45
+        ],
+        "elevation": [
+          0,
+          600
+        ]
+      },
+      "S-patagonia": {
+        "type": "south-temperate-lowland",
+        "bbox": [
+          -75,
+          -55,
+          -63,
+          -38
+        ],
+        "elevation": [
+          0,
+          600
+        ]
+      },
+      "S-newzealand": {
+        "type": "south-temperate-lowland",
+        "bbox": [
+          166,
+          -47,
+          179,
+          -34
+        ],
+        "elevation": [
+          0,
+          600
+        ]
+      },
+      "S-seaustralia": {
+        "type": "south-temperate-lowland",
+        "bbox": [
+          140,
+          -44,
+          149,
+          -37
+        ],
+        "elevation": [
+          0,
+          600
+        ]
+      }
     }
   }
 }
