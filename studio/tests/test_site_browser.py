@@ -1366,7 +1366,8 @@ def test_morpheus_full_horizon_chart_is_labelled_a_chart_not_a_spatial_movie(bro
     pg = page(browser)
     pg.goto(base + "#/simulations"); pg.wait_for_selector("#sim-morpheus-full-horizon-chart video")
     t = pg.locator("#sim-morpheus-full-horizon-chart").text_content()
-    assert "not a spatial tissue movie" in t and "draws no cell shapes or fields" in t and "No sha256 is declared" in t and "256 cells" in t and "128 cells" in t
+    assert "not a spatial tissue movie" in t and "draws no cell shapes or fields" in t and "Verified against its declared sha256" in t and "256 cells" in t and "128 cells" in t
+    assert pg.locator("#sim-morpheus-full-horizon-chart video").get_attribute("poster").endswith("full_horizon_chart_poster.png")
 
 
 def test_recovery_inputs_are_published_exactly_and_the_failed_run_is_not_called_complete(browser, base):
