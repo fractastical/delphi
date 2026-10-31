@@ -332,6 +332,19 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "sources": [{"label": "Solver, protocol and controls", "locator": f"{d}/protocol sha256 {sm['protocol_sha256'][:12]}…, analytic-controls.json (Poiseuille, Taylor-Green)"}, {"label": "Geometry", "locator": f"{rm['mesh']['path']} sha256 {rm['mesh']['sha256'][:12]}…"}],
             "limitations": [rm["mesh"]["geometry_warning"], sm["scope"], "biological_success_probability: null (not computed)."],
             "couplings": [], "manifest": f"{d}/render-manifest.json", "native": True})
+    d = "artifacts/fish3d/fish3d-N1-cypselurus-baseline/render"
+    if (ROOT / d / "render.json").exists():
+        r = json.loads(ins.read(f"{d}/render.json")); v = r["video"]
+        st, href = _vid(ins, out, "fish3d-render", d, "turntable.mp4", v["sha256"]); _, ph = _vid(ins, out, "fish3d-render", d, "poster.png", r["poster_sha256"])
+        cards.append({"id": "fish3d-render", "title": "Candidate N1 as a 3D model: path-traced turntable", "scales": ["organism"], "evidence_kind": r["evidence_kind"],
+            "model": {"name": r["schema"], "context": " ".join(r["caption"])},
+            "time": {"units": "none: a camera orbit around a static model", "note": f"{v['n_frames']} frames at {v['fps']} fps, looping; {v['width']}x{v['height']}"},
+            "video": {"file": "turntable.mp4", "sha256": v["sha256"], "note": f"{v['bytes']} bytes"}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": k.replace("_", " "), "result": "passed" if val else "FAILED"} for k, val in r["checks"].items()],
+            "parameter_unknowns": ["Fin thickness, eyes and gill covers are assumed.", "Scales are an assumed lattice (50 along the body), not a grown or measured pattern."],
+            "open_questions": ["What measured fin camber, ray structure and thickness would replace the assumed ones?"],
+            "limitations": ["Not claimed: " + x for x in r["not_claimed"]] + [f"The mesh itself (fish.glb, sha256 {r['glb_sha256'][:12]}…) is in artifacts/fish3d and is not served by this site."],
+            "couplings": [], "manifest": f"{d}/render.json", "native": True})
     d = "artifacts/behavior"
     if (ROOT / d / "manifest.json").exists() and (ROOT / d / "controls.json").exists():
         m = json.loads(ins.read(f"{d}/manifest.json")); ct = json.loads(ins.read(f"{d}/controls.json")); fl = m["files"]

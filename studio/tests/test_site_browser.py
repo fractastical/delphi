@@ -826,3 +826,16 @@ def test_lifecycle_panel_shows_unknowns_and_the_borrowed_parameter_label(browser
     assert "borrowed parameters, not a feasibility statement" in t and "SIZING AID UNDER BORROWED PARAMETERS" in t
     href = pg.locator(".lifecycle a:has-text('life-cycle document')").get_attribute("href")
     assert href
+
+
+def test_home_shows_the_fish3d_turntable_with_its_limits_and_download(browser, base):
+    for route in ("#/home", "#/frontier"):
+        pg = page(browser)
+        pg.goto(base + route)
+        pg.wait_for_selector(".turntable video")
+        t = pg.locator(".turntable").text_content()
+        assert "not an organism" in t and "not an aerodynamic result" in t
+        assert pg.locator(".turntable a[download]").get_attribute("href").endswith("turntable.mp4")
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector("#sim-fish3d-render video")
+    assert "Not claimed: aerodynamic performance or validity" in pg.locator("#sim-fish3d-render").text_content()
