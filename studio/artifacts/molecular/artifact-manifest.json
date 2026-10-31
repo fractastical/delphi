@@ -1,6 +1,6 @@
 {
   "schema": "frontier.molecular.artifact-manifest/1",
-  "source_commit_at_capture": "d7e31c5ae4074c7e64e802d0c628b1b344ed188c",
+  "source_commit_at_capture": "962b0889ce55cc978fed4366d0bf17376908535d",
   "kind": "Computed molecular simulation plus separate actual-state render and source-only roadmap",
   "source_inputs": [
     "artifacts/molecular/inputs/1k6f-assembly1.pdb"
@@ -11,24 +11,31 @@
     "artifacts/molecular/prepared/system.xml"
   ],
   "simulation_receipts": [
-    "artifacts/molecular/cpu-trajectory-final/receipt.json",
     "artifacts/molecular/cpu-controls/provenance.json",
+    "artifacts/molecular/cpu-trajectory-final/receipt.json",
+    "artifacts/molecular/cuda-v2/cpu-cuda-parity.json",
+    "artifacts/molecular/cuda-v2/job-receipt.json",
+    "artifacts/molecular/cuda-v2/production/receipt.json",
     "artifacts/molecular/gpu-attempt-1/receipt.json",
     "artifacts/molecular/gpu-attempt-1/repaired-controls/controls.json"
   ],
   "render_receipts": [
-    "artifacts/molecular/cpu-render/render.json"
+    "artifacts/molecular/cpu-render/render.json",
+    "artifacts/molecular/cuda-analysis/analysis-provenance.json",
+    "artifacts/molecular/cuda-render/render.json"
   ],
   "environment": [
-    "engineering/molecular/requirements.txt",
+    "artifacts/molecular/cuda-v2/environment.txt",
+    "artifacts/molecular/prepared/producer-provenance.json",
     "engineering/molecular/requirements-cuda.txt",
-    "artifacts/molecular/prepared/producer-provenance.json"
+    "engineering/molecular/requirements.txt"
   ],
   "cloud_state": {
     "first_job": "aijob-e00a3q798jsc6fdbas",
-    "first_status": "failed_CPU_derivative_gate_before_production",
-    "retry": "Infra reports same-job CPU controls passed; CUDA production receipt not yet returned",
-    "retry_job": "aijob-e00h8rra7x8ams6jyn"
+    "first_status": "failed_CPU_derivative_gate_before_production_preserved",
+    "retry_job": "aijob-e00h8rra7x8ams6jyn",
+    "retry_status": "completed_actual_CUDA3x100ps;20returnedfilehashes independentlyverified",
+    "extension_status": "frozen900psconditionalbranchpacket_ready_pending_publicinput_gate_and_infra_priority"
   },
   "empirical_validation": "unknown",
   "biological_success_probability": null,
@@ -37,6 +44,21 @@
       "path": "artifacts/molecular/analysis.json",
       "sha256": "179bc71195246e0754efdb29ec6c4ae80b3aa41e8b1b9eebe28a7f6172f5b164",
       "bytes": 926
+    },
+    {
+      "path": "artifacts/molecular/continuation-local-controls/CPU-check-only.json",
+      "sha256": "542af2e7673dfe87cc9f1e82e98f1f314cd1cafc6c4559b5f295f0e114a1f40a",
+      "bytes": 318
+    },
+    {
+      "path": "artifacts/molecular/continuation-local-controls/controls-1731.json",
+      "sha256": "e7689c61acf39180b2587a5fb8766ca47c2f446b4fb6085d6f1d2221fa13b60d",
+      "bytes": 4475
+    },
+    {
+      "path": "artifacts/molecular/continuation-protocol.json",
+      "sha256": "ee196ee1bf539c9a12e90d5ac7c081ccd351b806187ec0d4d60adfc55442d433",
+      "bytes": 3563
     },
     {
       "path": "artifacts/molecular/cpu-analysis/analysis-provenance.json",
@@ -120,13 +142,148 @@
     },
     {
       "path": "artifacts/molecular/cross-scale-gate.json",
-      "sha256": "41601c855cd07b862ba0d21b3fc0f5e1ca885f2517259ba9d75d30de4d1d90df",
-      "bytes": 46401
+      "sha256": "400fe47def92dc41bb40cbf891c29acb5de7b76d923b900496e3020500c4e966",
+      "bytes": 46743
+    },
+    {
+      "path": "artifacts/molecular/cuda-analysis/analysis-provenance.json",
+      "sha256": "123a5fa16a3ae895eed652bda30aca8a9426cc4d1c1da49a6b339955aa0411fa",
+      "bytes": 392
+    },
+    {
+      "path": "artifacts/molecular/cuda-analysis/ensemble.json",
+      "sha256": "a87297f8ecbb5fbfebbafc82ee0ab679912f5274c2ddf9edf128b72b8ae31e08",
+      "bytes": 3375
+    },
+    {
+      "path": "artifacts/molecular/cuda-analysis/ensemble.png",
+      "sha256": "f2e0e502d4d3bab93c9762aeebba861da9ddd20208120bad562009dbaafda4ce",
+      "bytes": 335899
+    },
+    {
+      "path": "artifacts/molecular/cuda-render/poster.png",
+      "sha256": "8884fe1cd94218238a5c28e1167faceb686b91680b825401ad421ec9c51dc2cd",
+      "bytes": 219438
+    },
+    {
+      "path": "artifacts/molecular/cuda-render/producer-render.py",
+      "sha256": "e8c89c6fa0496ba596961b498437ad1f1974ba4260bd26adc9c0d5d161b9815e",
+      "bytes": 8178
+    },
+    {
+      "path": "artifacts/molecular/cuda-render/render.json",
+      "sha256": "0e9430a0dc3a670530d3d1e2fc3c1ab3636fdfc579b4c559102d1cb03cf0e842",
+      "bytes": 1292
+    },
+    {
+      "path": "artifacts/molecular/cuda-render/trajectory.mp4",
+      "sha256": "f03ea1a2915d26e2904edef7d2fe72a3ac5ba894c1b04042372efc7718a7dd3d",
+      "bytes": 652288
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/cpu-controls/controls.json",
+      "sha256": "1408f8cdca33823c661beef2bad4357046334dad22c3ffbbb729912f3023d69a",
+      "bytes": 1319
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/cpu-cuda-parity.json",
+      "sha256": "61d2907d1177f5bf379eb6864e1455f5a797ca027abea59fd8bacdd7c921e98d",
+      "bytes": 445
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/environment.txt",
+      "sha256": "4c4492dcc4a229cf1076837ae5c6f27846c059e1955e569a5b2bcc27042db2a0",
+      "bytes": 255
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/job-receipt.json",
+      "sha256": "a3ec452805299a83b1545629a12bde0d4fbd7e4bad0b2aa19902499ddd9d0f93",
+      "bytes": 2335
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/prepared/atoms.json",
+      "sha256": "9de0fdae8f0326f34d0e9dfe08cea91c68c29c5e5c804c51c2775bfdddc7b682",
+      "bytes": 132603
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/prepared/preparation.json",
+      "sha256": "511edda46c0b4831acd557c6755e50423323e8e81ec7d7c4255b52ebe3a66506",
+      "bytes": 1352
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/prepared/prepared.pdb",
+      "sha256": "3e6845b675dc072a9f7418efaf8f7dcb5318e91d79da2262778da10726d136b3",
+      "bytes": 850029
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/prepared-inputs.tar.gz",
+      "sha256": "e04baa840bcf5afc074b0527a84954f4cb85a031e5f79102649a04b751cf23f6",
+      "bytes": 463770
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/production/final-state-1731.xml",
+      "sha256": "d7207d31693291efa96a77c716abfa36c702a26e48b53482ec19acc0eb8bc2e2",
+      "bytes": 1729474
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/production/final-state-1732.xml",
+      "sha256": "b1c46e525ebfdbc85ae948888870c3232875c4f88eaf6840afa905749dd9119b",
+      "bytes": 1729344
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/production/final-state-1733.xml",
+      "sha256": "bf5b2082f54793f89ff0a6468e2857303bec192c43e2bd47247ff9765c9c0273",
+      "bytes": 1729195
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/production/metrics-1731.json",
+      "sha256": "9ab1a3e7dd9c6b1feb316d626bb4f544f29ada2f6e12034b9a9747114518664a",
+      "bytes": 32924
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/production/metrics-1732.json",
+      "sha256": "fe0c2b68eb90540834d96c51d0d3d30b5376501eacb8a0b0963dac5bb24cbbe4",
+      "bytes": 32909
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/production/metrics-1733.json",
+      "sha256": "f7e9015483613112cc9c525515c12906969d3af84f9d4eaaa55dda70a764044e",
+      "bytes": 32941
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/production/receipt.json",
+      "sha256": "3665cd12f3fa2c3654d838ffa07645a94dd3d0a2a1138d558c22eb0451695bcb",
+      "bytes": 3605
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/production/trajectory-1731.npz",
+      "sha256": "e0fe577e9816653c4d5ff83e200e658bed76a671e288697a50efabc9a62e720a",
+      "bytes": 580203
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/production/trajectory-1732.npz",
+      "sha256": "c289eda8e0e4f51ff28adde6ba3ab091d28466d0cd73fa5ae3c72dd65fbae65c",
+      "bytes": 580073
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/production/trajectory-1733.npz",
+      "sha256": "a20f7f4e6afe4c88ef737b1012189a16460f54e5b1f439f50c74e7978366e314",
+      "bytes": 580206
+    },
+    {
+      "path": "artifacts/molecular/cuda-v2/return-provenance.json",
+      "sha256": "633a1670bc19aad5855848894046a6497be83f0b56ecc0b4a936d7cc0aa83b0d",
+      "bytes": 739
     },
     {
       "path": "artifacts/molecular/derivative-diagnosis-local.json",
       "sha256": "903109deccc89b60cd142327221842245c9b0c9bd3367e920ed218c0bf55e9f1",
       "bytes": 3357
+    },
+    {
+      "path": "artifacts/molecular/design-assurance.json",
+      "sha256": "257129b199c1a09f7cd5e9003baf10701ea4816566b9381640414fa038331366",
+      "bytes": 3229
     },
     {
       "path": "artifacts/molecular/gpu-attempt-1/controls.json",
@@ -175,13 +332,13 @@
     },
     {
       "path": "artifacts/molecular/model-index.json",
-      "sha256": "491addf5bc7c273433772273190710d2421ef553dc98b905186ffdd31dd9d3e9",
-      "bytes": 19481
+      "sha256": "82f2638251db687cbe90d518030dccec2701b06fd4f3be7164406db7d1f9211f",
+      "bytes": 19678
     },
     {
       "path": "artifacts/molecular/model-interface.json",
-      "sha256": "aa14fe7b186185b6b8af2c34905756961cf7930926a9e7cd424853cf395ede49",
-      "bytes": 3153
+      "sha256": "f04acfb4bba7e9811acff2a86f2332d16991733043223dc9b823ae422fabff55",
+      "bytes": 3399
     },
     {
       "path": "artifacts/molecular/packet-preflight.json",
@@ -194,6 +351,11 @@
       "bytes": 238
     },
     {
+      "path": "artifacts/molecular/packet-v3-preflight.json",
+      "sha256": "070a6b42e5ef2a923542aaf647c1ac7eb5f08bc43ab832658776e625b67d6ed9",
+      "bytes": 356
+    },
+    {
       "path": "artifacts/molecular/portable-md-v2.json",
       "sha256": "e71e2cf098f958e9a664e8cde2841a9384821b0395f1171db105f0a5cdfc722e",
       "bytes": 2023
@@ -202,6 +364,16 @@
       "path": "artifacts/molecular/portable-md-v2.tar.xz",
       "sha256": "f3473963a3b28d2133fb3a6aa3c8e4a68591f057b5ed84f5efc103a6e60cde45",
       "bytes": 28840
+    },
+    {
+      "path": "artifacts/molecular/portable-md-v3.json",
+      "sha256": "3ea129e182885972e732fc6901dd32578b8a40ea2604f750f16993ec985c00be",
+      "bytes": 1683
+    },
+    {
+      "path": "artifacts/molecular/portable-md-v3.tar.xz",
+      "sha256": "266f322d5f0538223f74c33da1df3c728657accb95854149733f41f5d8439c62",
+      "bytes": 10824
     },
     {
       "path": "artifacts/molecular/portable-md.json",
@@ -259,9 +431,19 @@
       "bytes": 3934
     },
     {
+      "path": "artifacts/molecular/warmstart-v3.json",
+      "sha256": "5ca2d6cb8e6ea98a4bd42c780265525b744fbc95a8e8764ec1e8e258ae030596",
+      "bytes": 1899
+    },
+    {
+      "path": "artifacts/molecular/warmstart-v3.tar.xz",
+      "sha256": "4154fcdc3784fa1bfe6c667cdc20fabc346e8c482d9010ad5646a10eea78c3bf",
+      "bytes": 1809144
+    },
+    {
       "path": "docs/simulation-roadmap.md",
-      "sha256": "7134992b470c362f6bac4c7b5c51ac5419ddf0728cd1d3a6721e814785183f42",
-      "bytes": 17433
+      "sha256": "17b1fec787aa993d58bced8a1348c4856b5d0187f3549495386fa2ec48fe0247",
+      "bytes": 19491
     },
     {
       "path": "engineering/molecular/__init__.py",
@@ -274,19 +456,24 @@
       "bytes": 6155
     },
     {
+      "path": "engineering/molecular/continuation.py",
+      "sha256": "78ba3ec932239493edbe2608b5d8bef5819fa19c026c1d0024eb01aec1af592f",
+      "bytes": 17869
+    },
+    {
       "path": "engineering/molecular/diagnose.py",
       "sha256": "19f13a0f3c4b7f3332a4f47bee45a7e3a00bf1a91125a4a05d1d2140fcf5f2f7",
       "bytes": 4154
     },
     {
       "path": "engineering/molecular/entry.py",
-      "sha256": "37cbf4c5499854be8725b67f35a7f85689ec6549f5ed4afe7f94249afb5b1ac4",
-      "bytes": 2345
+      "sha256": "14acc8144c50a515a6ef6fa67a301d039147d817afb97c7092d4f20d5eeeec25",
+      "bytes": 2577
     },
     {
       "path": "engineering/molecular/interface.py",
-      "sha256": "72d0040b170853fe56145c7bc73fe4b66956b588b60a775dc4541041cb98c54b",
-      "bytes": 3801
+      "sha256": "ff389e1550360975facef9bc203f7dfd43882e12dbb2356bbff6395e3c6c1244",
+      "bytes": 4037
     },
     {
       "path": "engineering/molecular/remote.py",
@@ -315,8 +502,9 @@
     },
     {
       "path": "tests/test_molecular.py",
-      "sha256": "562f1d9fa2328a39974dbb5da58f89a2fe85d0de0d71e1eab766ff6f6614d09d",
-      "bytes": 8310
+      "sha256": "d18f428c42ba52ca037679eb916934080e2e12b72b85b86656a425825f6ab5b5",
+      "bytes": 12571
     }
-  ]
+  ],
+  "scope": "File hashes are authoritative; all listed source/data files were committed at capture. Manifest excludes its own output hash."
 }
