@@ -1,0 +1,455 @@
+{
+  "schema": "frontier.simulation.model-index/1",
+  "checkpoint_date": "2026-10-31",
+  "scope": "Prioritized primary-source model inventory. Owner-dispatched and source-only entries are not completed simulations. No biological success probability is computed.",
+  "runtime_basis": "Planning estimates/caps except explicitly recorded CPU molecular run. GPU runtime is unknown until returned receipts.",
+  "models": [
+    {
+      "id": "collagen_mimetic_md",
+      "scale": [
+        "molecular",
+        "macromolecular"
+      ],
+      "engine": "OpenMM 8.4.0",
+      "status": "CPU_executed_GPU_submitted_by_infra",
+      "owner": "mechanobio_sim + infra_director",
+      "organism_link": "Synthetic collagen-mimetic motif; collagen scaffolds are relevant to zebrafish fins, native fish sequence not modeled",
+      "source": "https://www.rcsb.org/structure/1K6F",
+      "source_locator": "Assembly1; Berisio2002 crystal structure",
+      "inputs": "Exact public PDB SHA, ff14SB/TIP3P,87 modeled residues,10491 atoms,300K/0.1M scenario",
+      "coupling_ports": [
+        "atom_positions_nm",
+        "CA_RMSD_nm",
+        "chain_terminal_distance_nm"
+      ],
+      "missing_transfer": "No fibril assembly, crosslinks, tissue constitutive law, Young modulus or fin EI",
+      "compute": "CPU control done; required CUDA1H100,3x100ps protocol",
+      "setup_cost": "done",
+      "next_job": "Frozen packet submitted; inspect same-system CPU/CUDA parity then actual trajectories",
+      "artifacts": {
+        "protocol": "artifacts/molecular/protocol.json",
+        "controls": "artifacts/molecular/cpu-controls/controls.json",
+        "trajectory": "artifacts/molecular/cpu-trajectory-final/trajectory-1731.npz",
+        "receipt": "artifacts/molecular/cpu-trajectory-final/receipt.json",
+        "video": "artifacts/molecular/cpu-render/trajectory.mp4",
+        "poster": "artifacts/molecular/cpu-render/poster.png",
+        "render_receipt": "artifacts/molecular/cpu-render/render.json",
+        "interface": "artifacts/molecular/model-interface.json",
+        "cross_scale_gate": "artifacts/molecular/cross-scale-gate.json"
+      },
+      "empirical_accuracy": "unknown",
+      "biological_success_probability": null
+    },
+    {
+      "id": "morpheus_cell_cycle_feedback",
+      "scale": [
+        "subcellular",
+        "cellular",
+        "tissue"
+      ],
+      "engine": "Morpheus",
+      "status": "owner_dispatched_not_verified_here",
+      "owner": "claude06",
+      "organism_link": "Published educational multiscale motif, not fish calibration",
+      "source": "https://morpheus.gitlab.io/courses/multiscale-models/example/",
+      "source_locator": "Steps1–3:ODE→CPM→PDE→ODE",
+      "inputs": "Source XML, cell-cycle ODE,CPM geometry,cytokine diffusion",
+      "coupling_ports": [
+        "CDK1",
+        "APC",
+        "cell_division",
+        "cytokine_field"
+      ],
+      "missing_transfer": "Cell-specific model units and parameters do not define fish tissue",
+      "compute": "CPU2threads/600s first slice",
+      "setup_cost": "moderate",
+      "next_job": "Paired intact versus disabled cytokine→cell-cycle feedback; retain same seeds"
+    },
+    {
+      "id": "betse_tissue_ions",
+      "scale": [
+        "cellular",
+        "tissue"
+      ],
+      "engine": "BETSE",
+      "status": "owner_dispatched_not_verified_here",
+      "owner": "dx-market-r1",
+      "organism_link": "Bioelectric tissue mechanism; fish channel densities and geometry unknown",
+      "source": "https://github.com/betsee/betse",
+      "source_locator": "README Science:ions,channels,pumps,extracellular space",
+      "inputs": "Tissue geometry,ion concentrations,pumps,membrane channels,gap junctions",
+      "coupling_ports": [
+        "membrane_voltage_V",
+        "ion_concentration_mol_m3",
+        "junction_current_A"
+      ],
+      "missing_transfer": "Channel abundance,permeability,tissue geometry and phenotype mapping",
+      "compute": "CPU2threads/600s first slice",
+      "setup_cost": "moderate",
+      "next_job": "Local perturbation with gap junction open/blocked control and charge-balance checks"
+    },
+    {
+      "id": "zebrafish_gem",
+      "scale": [
+        "molecular",
+        "cellular",
+        "organism"
+      ],
+      "engine": "SBML constraint-based FBA",
+      "status": "owner_dispatched_not_verified_here",
+      "owner": "claude11",
+      "organism_link": "Actual generic Danio rerio metabolic reconstruction; not tissue-specific",
+      "source": "https://github.com/SysBioChalmers/Zebrafish-GEM",
+      "source_locator": "README/model/Zebrafish-GEM.xml; Wang2021",
+      "inputs": "Pinned SBML,exchange bounds,declared objective",
+      "coupling_ports": [
+        "oxygen_flux_mmol_gDW_h",
+        "ATP_flux_mmol_gDW_h",
+        "biomass_flux_per_h"
+      ],
+      "missing_transfer": "Flux is not concentration or whole-fish growth; no fin-specific medium/tissue fit",
+      "compute": "CPU LP2threads/600s",
+      "setup_cost": "low to moderate",
+      "next_job": "Oxygen-limited ATP versus biomass objectives; residual/bound checks and alternative optima"
+    },
+    {
+      "id": "waterlily_fish_3d",
+      "scale": [
+        "organ",
+        "organism"
+      ],
+      "engine": "WaterLily.jl + mesh body",
+      "status": "owner_dispatched_not_verified_here",
+      "owner": "claude04",
+      "organism_link": "Actual fish-derived candidate STL, not measured native fish",
+      "source": "https://github.com/WaterLily-jl/WaterLily.jl",
+      "source_locator": "Method/capabilities and2025paper doi10.1016/j.cpc.2025.109748",
+      "inputs": "Mesh SHA,fluid viscosity,speed,boundaries,grid",
+      "coupling_ports": [
+        "pressure_Pa",
+        "surface_traction_N",
+        "velocity_m_s",
+        "body_motion_m"
+      ],
+      "missing_transfer": "3D resolution/Re domain,fin material law,and fluid-structure feedback",
+      "compute": "CPU controls then1GPU",
+      "setup_cost": "moderate",
+      "next_job": "No-body/analytic/force-sign/grid/time controls before candidate mesh; pressure integration→beam"
+    },
+    {
+      "id": "fin_beam_glide",
+      "scale": [
+        "organ",
+        "organism"
+      ],
+      "engine": "Existing Hermite FEM + point-mass glide",
+      "status": "existing_artifacts_inspected_not_rerun",
+      "owner": "existing engineering owners",
+      "organism_link": "Fin-ray surrogate and flying-fish geometric envelopes; EI/load assumptions",
+      "source": "engineering/model_interfaces/finbeam_euler_bernoulli.json",
+      "source_locator": "Existing interface and assurance experiment artifacts",
+      "inputs": "Ray length,EI envelope,line load and glide parameters",
+      "coupling_ports": [
+        "line_load_N_m",
+        "tip_deflection_m",
+        "glide_range_m"
+      ],
+      "missing_transfer": "No calibrated native fish stiffness or3D aerodynamic coefficients",
+      "compute": "CPU",
+      "setup_cost": "ready reuse",
+      "next_job": "Actual pressure-field→conservative distributed-load bridge with multiple EI candidates"
+    },
+    {
+      "id": "motor_clutch_sls",
+      "scale": [
+        "molecular",
+        "cellular",
+        "tissue"
+      ],
+      "engine": "Existing stochastic motor-clutch/SLS implementation",
+      "status": "existing_artifacts_inspected_not_rerun",
+      "owner": "mechanobio_sim",
+      "organism_link": "Cell–ECM feedback motif; not fish calibrated",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5866566/",
+      "source_locator": "Gong2018 Model Description Eqs1–6",
+      "inputs": "Clutch/motor kinetics,substrate stiffness and relaxation;source versus assumed parameters retained",
+      "coupling_ports": [
+        "traction_pN",
+        "substrate_displacement_nm",
+        "actin_speed_nm_s"
+      ],
+      "missing_transfer": "Cell area/adhesion composition/fish context and tissue constitutive fit",
+      "compute": "CPU;existing600-run sweep",
+      "setup_cost": "ready reuse",
+      "next_job": "Use recorded traction statistics as a mechanism-level comparison; do not infer stiffness from MD length"
+    },
+    {
+      "id": "erk_scale_waves",
+      "scale": [
+        "subcellular",
+        "tissue",
+        "developmental"
+      ],
+      "engine": "Existing finite-difference RD model",
+      "status": "existing_owner_work_reported_not_replayed_here",
+      "owner": "fish-scale-growth owner",
+      "organism_link": "Zebrafish scale regeneration source; transfer to fins unknown",
+      "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8516634/",
+      "source_locator": "Numerical solutions,governing equations,Table1",
+      "inputs": "Erk/activator/inhibitor parameters,source region and µm/h grid",
+      "coupling_ports": [
+        "active_Erk_fraction",
+        "wave_speed_um_h",
+        "wave_period_h"
+      ],
+      "missing_transfer": "Morphogen identity,total Erk concentration and tissue-growth calibration",
+      "compute": "CPU/GPU PDE",
+      "setup_cost": "reuse existing owner implementation",
+      "next_job": "Inspect source/output pins before held-out wave-speed comparison; avoid generic RD duplication"
+    },
+    {
+      "id": "mapk_enzymatic_cascade",
+      "scale": [
+        "molecular",
+        "subcellular"
+      ],
+      "engine": "BioModels SBML + installed libRoadRunner/CVODE or COPASI",
+      "status": "source_only_input_retrieval_blocked403",
+      "owner": "unassigned next stage",
+      "organism_link": "Huang/Ferrell1996 Xenopus biochemical cascade,not fish rates",
+      "source": "https://www.ebi.ac.uk/biomodels/courses/20130627/Huang1996.pdf",
+      "source_locator": "Reaction scheme and enzyme cascade; BioModels BIOMD0000000009 candidate",
+      "inputs": "Exact SBML/version and enzyme/substrate totals required before run",
+      "coupling_ports": [
+        "ppMAPK_uM",
+        "kinase_total_uM",
+        "phosphatase_total_uM"
+      ],
+      "missing_transfer": "Native zebrafish kinetic rates and mapping to scale-wave effective parameters",
+      "compute": "CPU60s after input gate",
+      "setup_cost": "low once source retrieved; no new engine needed",
+      "next_job": "Phosphatase perturbation,kinase-zero negative control,mass conservation and tolerance pair"
+    },
+    {
+      "id": "physiome_hh",
+      "scale": [
+        "cellular",
+        "neural"
+      ],
+      "engine": "CellML HH / existing HH implementation",
+      "status": "existing_artifacts_inspected_not_rerun",
+      "owner": "bioelectric owner",
+      "organism_link": "Squid giant axon source,not native fish neural circuit",
+      "source": "https://models.physiomeproject.org/workspace/hodgkin_huxley_1952",
+      "source_locator": "Published workspace and CellML model",
+      "inputs": "Ion conductances,stimulus and source kinetic gates",
+      "coupling_ports": [
+        "voltage_V",
+        "spike_time_s"
+      ],
+      "missing_transfer": "Neural circuit and muscle activation calibration",
+      "compute": "CPU;existing49-case study",
+      "setup_cost": "ready reuse",
+      "next_job": "Prefer new source-grounded tissue/actuator port test to inflating generic HH sweep"
+    },
+    {
+      "id": "behavior_cpg",
+      "scale": [
+        "neural",
+        "organ",
+        "organism"
+      ],
+      "engine": "Existing reduced phase oscillator + servo",
+      "status": "existing_artifacts_inspected_not_rerun",
+      "owner": "behavior owner",
+      "organism_link": "Salamander/robot equations with separate zebrafish context,not neurons",
+      "source": "engineering/behavior/sources.json",
+      "source_locator": "Source DOI10.1126/science.1138353; separate zebrafish DOI10.7554/eLife.67453",
+      "inputs": "Frequency,phase lag,amplitude,servo bounds",
+      "coupling_ports": [
+        "phase_rad",
+        "frequency_Hz",
+        "joint_angle_rad",
+        "actuator_torque_Nm"
+      ],
+      "missing_transfer": "Neural-to-muscle mapping and moving-boundary CFD",
+      "compute": "CPU",
+      "setup_cost": "ready reuse",
+      "next_job": "Actuation-port replay only after fluid moving-boundary controls; no calibrated swimming efficacy"
+    },
+    {
+      "id": "danio_kcnj13_structure",
+      "scale": [
+        "molecular",
+        "macromolecular"
+      ],
+      "engine": "Native managed OpenFold2",
+      "status": "owner_dispatched_not_verified_here",
+      "owner": "resource_scaling",
+      "organism_link": "Unmodified canonical Danio Kcnj13 sequence sourced by service owner",
+      "source": "https://www.ncbi.nlm.nih.gov/gene/555691",
+      "source_locator": "Exact accession/sequence pin required from service owner",
+      "inputs": "Unmodified canonical sequence and managed tool schema",
+      "coupling_ports": [
+        "monomer_coordinates",
+        "model_confidence"
+      ],
+      "missing_transfer": "No MSA,membrane,tetramer,PIP2/ion environment or conductance from confidence",
+      "compute": "Managed inference",
+      "setup_cost": "owner tool/schema probe",
+      "next_job": "One actual model call with complete input/model/output receipts; no BioNeMo brand claim"
+    },
+    {
+      "id": "compucell3d",
+      "scale": [
+        "subcellular",
+        "cellular",
+        "tissue"
+      ],
+      "engine": "CompuCell3D",
+      "status": "source_only_fallback",
+      "owner": "unassigned",
+      "organism_link": "Generic CPM/SBML/PDE engine; selected biological model needed",
+      "source": "https://compucell3d.org/",
+      "source_locator": "About and official manuals",
+      "inputs": "CC3DML/Python model and kinetics",
+      "coupling_ports": [
+        "cell_shape",
+        "cell_state",
+        "diffusive_field"
+      ],
+      "missing_transfer": "Cell-type rates and CPM physical calibration",
+      "compute": "CPU;engine-specific GPU PDE optional",
+      "setup_cost": "moderate;avoid duplicate Morpheus install",
+      "next_job": "Fallback only if active Morpheus setup blocks"
+    },
+    {
+      "id": "physicell",
+      "scale": [
+        "cellular",
+        "tissue"
+      ],
+      "engine": "PhysiCell",
+      "status": "source_only_fallback",
+      "owner": "unassigned",
+      "organism_link": "Off-lattice multicellular engine,not fish model",
+      "source": "https://physicell.org/",
+      "source_locator": "Project goals,microenvironment-driven behavior",
+      "inputs": "Cell rules,substrate transport and initial geometry",
+      "coupling_ports": [
+        "cell_positions",
+        "cell_volumes",
+        "substrate_concentrations"
+      ],
+      "missing_transfer": "Fish cell behaviors and substrate/growth calibration",
+      "compute": "CPU2threads first",
+      "setup_cost": "moderate;avoid duplicate initial tissue slice",
+      "next_job": "Use only when off-lattice3D mechanics justifies replacing CPM abstraction"
+    },
+    {
+      "id": "febio_growth_mixture",
+      "scale": [
+        "tissue",
+        "organ"
+      ],
+      "engine": "FEBio multiphasic/reaction/large-deformation FEM",
+      "status": "source_only_next_stage",
+      "owner": "unassigned",
+      "organism_link": "Biomechanics engine,not parameterized fish tissue",
+      "source": "https://febiosoftware.github.io/febio-docs/features/modules/module_multiphasic/",
+      "source_locator": "Theory mixture/reaction modules; proposed2025growth paper not fully retrieved",
+      "inputs": "Mesh,constitutive law,solute/reaction kinetics,BCs",
+      "coupling_ports": [
+        "concentration_mol_m3",
+        "stress_Pa",
+        "strain",
+        "growth_tensor"
+      ],
+      "missing_transfer": "Measured native tissue kinetics,permeability,elasticity and growth law",
+      "compute": "CPU first",
+      "setup_cost": "high",
+      "next_job": "Analytic homogeneous-swelling/reaction test before cell→growth scenario"
+    },
+    {
+      "id": "fenics_pde",
+      "scale": [
+        "tissue",
+        "organ"
+      ],
+      "engine": "FEniCS FEM",
+      "status": "source_only_fallback",
+      "owner": "unassigned",
+      "organism_link": "PDE engine; biology comes from selected equations/data",
+      "source": "https://fenicsproject.org/",
+      "source_locator": "Platform overview/docs",
+      "inputs": "Weak form,mesh,BCs and parameters",
+      "coupling_ports": [
+        "specified_PDE_fields",
+        "traction",
+        "displacement"
+      ],
+      "missing_transfer": "Every biological constitutive and kinetic parameter",
+      "compute": "CPU",
+      "setup_cost": "moderate to high",
+      "next_job": "Use for a specific validated weak form; do not duplicate existing beam FEM"
+    },
+    {
+      "id": "ika_flow_swimming",
+      "scale": [
+        "organism"
+      ],
+      "engine": "OpenFOAM IKA-FLOW",
+      "status": "source_only_fallback",
+      "owner": "unassigned",
+      "organism_link": "Published underwater fish body-undulation cases,not aerial flight",
+      "source": "https://journal.openfoam.com/index.php/ofj/article/view/89",
+      "source_locator": "Coe/Gutschmidt2023 paper+casefiles",
+      "inputs": "Source cases,undulation law,mesh,fluid/turbulence settings",
+      "coupling_ports": [
+        "body_deformation",
+        "pressure",
+        "drag_lift"
+      ],
+      "missing_transfer": "Case geometry/control to actual fin design and flight",
+      "compute": "CPU CFD",
+      "setup_cost": "high",
+      "next_job": "Fallback to failed WaterLily setup,not duplicate simultaneous install"
+    },
+    {
+      "id": "eco_evolution_slim",
+      "scale": [
+        "ecological",
+        "evolutionary"
+      ],
+      "engine": "SLiM",
+      "status": "source_only_blocked_biological_inputs",
+      "owner": "unassigned",
+      "organism_link": "Population genetics engine;no fish phenotype-to-fitness law",
+      "source": "https://messerlab.org/slim/",
+      "source_locator": "Official model framework/manual",
+      "inputs": "Demography,mutation,recombination,measured selection/fitness model",
+      "coupling_ports": [
+        "allele_frequencies",
+        "lineages",
+        "population_sizes"
+      ],
+      "missing_transfer": "Genotype→geometry→realized fitness and ecological context",
+      "compute": "CPU",
+      "setup_cost": "low engine cost,high science cost",
+      "next_job": "Neutral analytic control only after meaningful demography inputs; no inferred evolutionary reachability"
+    }
+  ],
+  "shared_uncertainty": [
+    "Molecular seeds share one starting structure,forcefield and water model",
+    "A fitted or source-reproducing model is not validated fish biology",
+    "Independent code paths sharing source parameters are not independent empirical evidence",
+    "No model confidence field can be substituted for conductance,kcat,Young modulus or organism success"
+  ],
+  "access_findings": [
+    "Shenoy web open failed; directHTTP and publicJina succeeded",
+    "BioModels0000000009 direct403 and publicJina403;SBML not retrieved",
+    "Actinotrichia PMC challenged;publicJina full text retrieved",
+    "FEBio2025growth PDF directweb timeout;not read fully"
+  ],
+  "dispatch_rule": "Only frozen ready packets with passing numerical gates may be dispatched by infra owner; source-only rows are not jobs. No arbitrary workload expansion."
+}

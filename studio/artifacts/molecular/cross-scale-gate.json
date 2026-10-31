@@ -1,0 +1,1167 @@
+{
+  "schema": "frontier.coupling.manifest/1",
+  "scope": "A coupling verdict is about typed interfaces, not biology. 'composable' means the declared mapping is dimensionally and scope-consistent; it does not mean the models describe the same organism. 'scenario' results are assumption-level. No Lean theorem here proves biological correspondence.",
+  "timescale_separation": "10",
+  "counts": {
+    "composable": 0,
+    "scenario": 0,
+    "refused": 1
+  },
+  "models": [
+    {
+      "schema": "frontier.model.interface/1",
+      "model_id": "collagen_mimetic_md",
+      "name": "Collagen-mimetic atomistic MD (computed)",
+      "engine": "OpenMM8.4 CPU",
+      "status": "implemented",
+      "reference": {
+        "repo": "kganjam/delphi-frontier",
+        "branch": "work/multiscale-md",
+        "commit": "5a4b6fa",
+        "path": "artifacts/molecular/protocol.json,artifacts/molecular/cpu-trajectory-final/producer-run.py",
+        "files": {
+          "artifacts/molecular/protocol.json": "e888b7ef0d50407cc91f48f18e62f90e06a7f7dc3855d8c351b06f1a16e8828b",
+          "artifacts/molecular/cpu-trajectory-final/producer-run.py": "b7feb160ed410abf0b181ee677730f46bf5d1257e88e3c9b0ae4bd2c51d025d3"
+        },
+        "source_sha256": "5efd2d38607201d0262e6b1cdabd302685b1564c7b7bcaad26ad1fbe408b4fc7"
+      },
+      "ports": [
+        {
+          "name": "terminal_CA_distance",
+          "direction": "out",
+          "quantity": "molecular chain terminal separation",
+          "kind": "dimensional",
+          "unit": "nm",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": 0
+          },
+          "scale": "molecular",
+          "regime": "300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim",
+          "context": "Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only",
+          "provenance": {
+            "source": "Actual saved OpenMM CPU trajectory metrics and exact source snapshot",
+            "status": "simulated",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": "Three actual chain lengths, not a contour length or material modulus"
+        },
+        {
+          "name": "CA_RMSD",
+          "direction": "out",
+          "quantity": "C-alpha least-squares RMSD from production start",
+          "kind": "dimensional",
+          "unit": "nm",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": 0
+          },
+          "scale": "molecular",
+          "regime": "300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim",
+          "context": "Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only",
+          "provenance": {
+            "source": "Actual saved OpenMM CPU trajectory metrics and exact source snapshot",
+            "status": "simulated",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": "Rigid aligned; not an experimental accuracy measure"
+        }
+      ],
+      "timescale": {
+        "kind": "unknown",
+        "seconds": null,
+        "source": "0.2ps trajectory duration is not a physical relaxation-time estimate"
+      },
+      "run": {
+        "receipt": "artifacts/molecular/cpu-trajectory-final/receipt.json",
+        "protocol": "artifacts/molecular/protocol.json",
+        "controls": "artifacts/molecular/cpu-controls/controls.json",
+        "measured_biological_data": null
+      },
+      "scope": "Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only",
+      "not_established": [
+        "native fish collagen sequence",
+        "equilibrated conformational ensemble",
+        "force-field empirical accuracy",
+        "molecular stiffness",
+        "fibril assembly/crosslinking",
+        "tissue Young modulus",
+        "fin bending stiffness",
+        "fish function"
+      ]
+    },
+    {
+      "schema": "frontier.model.interface/1",
+      "model_id": "collier1996_two_cell",
+      "name": "Collier 1996 two-cell Delta-Notch lateral inhibition (BIOMD0000001047)",
+      "engine": "libroadrunner 2.10.0 (CVODE)",
+      "status": "implemented_replayed",
+      "reference": {
+        "repo": "kganjam/delphi-frontier",
+        "branch": "work/biomodels",
+        "commit": "abf1838",
+        "path": "connectors/biomodels/client.py, connectors/biomodels/receipts/BIOMD0000001047/receipt.json, connectors/biomodels/replay.py, connectors/biomodels/sbml.py",
+        "files": {
+          "connectors/biomodels/replay.py": "c9c017e6fd76aedcce2822de39c77a22349bea560dabc8ca432954f9d1938a8f",
+          "connectors/biomodels/sbml.py": "eda0dcf677cd6d7786e84c0180bec075bc6dbefaa04e7cdcaa0d48c2604d40a8",
+          "connectors/biomodels/client.py": "36e7bbcc93fb7102458fa43ecab9aa07bf775787577ef9f820ffb64b0691eea6",
+          "connectors/biomodels/receipts/BIOMD0000001047/receipt.json": "731a85a6fe893bd10f86196b5fd7101a64810d0d68ae03ebfa4eee3d2e04bc6e"
+        },
+        "source_sha256": "a229adc20ac75c1ee5760736726101f68ab569e052a37a71fff6f10eec955232",
+        "read_by": "dx-guilds, read from the source at this commit",
+        "sbml_sha256": "da21ab52edba14b61e41ee87df7a8bb2f367a1206e6e822602f1e75271fae8e2",
+        "note": "the SBML bytes are not committed; the receipt pins this digest"
+      },
+      "ports": [
+        {
+          "name": "parameters_a_b_h_k",
+          "direction": "in",
+          "quantity": "feedback parameters",
+          "kind": "model_units",
+          "unit": "model units",
+          "dim": null,
+          "scale": "cell",
+          "regime": "two coupled cells; non-dimensional as stored; no time scale",
+          "context": "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)",
+          "provenance": {
+            "source": "values stored in the SBML (a 0.01, b 100, h 2, k 2, mu 1, rho 1); paper not read",
+            "status": "unknown",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "delta_asymmetry",
+          "direction": "out",
+          "quantity": "Delta level difference between the two cells",
+          "kind": "model_units",
+          "unit": "model units",
+          "dim": null,
+          "scale": "cell",
+          "regime": "two coupled cells; non-dimensional as stored; no time scale",
+          "context": "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)",
+          "provenance": {
+            "source": "simulated (replay._asym over delta1, delta2); horizon 0-60 chosen by the connector",
+            "status": "simulated",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        }
+      ],
+      "timescale": {
+        "kind": "unknown",
+        "seconds": null,
+        "source": "the file declares none; horizon 0-60 is the connector's"
+      },
+      "run": {
+        "entrypoint": "connectors.biomodels.replay.replay_collier1996",
+        "deterministic": true
+      },
+      "scope": "a published model replayed as written; the replay checks the engine, not the file's fidelity to the paper",
+      "not_established": [
+        "any flying-fish or fin role for Notch/Delta",
+        "SI units",
+        "parameter provenance"
+      ]
+    },
+    {
+      "schema": "frontier.model.interface/1",
+      "model_id": "fin_load_bridge",
+      "name": "Load bridge: declared flight load -> line load on one fin ray (exact rational)",
+      "engine": "python Fraction",
+      "status": "implemented",
+      "reference": {
+        "repo": "kganjam/delphi-frontier",
+        "branch": "work/fin-mechanics",
+        "commit": "72df07c",
+        "path": "engineering/fin_mechanics/load_bridge.py",
+        "files": {
+          "engineering/fin_mechanics/load_bridge.py": "743d85121d2804fbed690a310d31f7ac7eec7fab9c8b06e776eee30fb4a97a11"
+        },
+        "source_sha256": "9d1a720671b4ed9e0d8bbc6d71a8d61b0781bb6ddc2234d2bf16d2ba5af9f2d6",
+        "read_by": "dx-guilds, read from the source at this commit"
+      },
+      "ports": [
+        {
+          "name": "b",
+          "direction": "in",
+          "quantity": "wing span",
+          "kind": "dimensional",
+          "unit": "m",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "candidate witness.b (load_bridge.bridge)",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "V",
+          "direction": "in",
+          "quantity": "speed at the level-flight proxy",
+          "kind": "dimensional",
+          "unit": "m/s",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": -1
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "candidate witness.V used as the flight speed",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": "speed from the level-flight proxy (L = W); not a measured or glide-derived flight speed"
+        },
+        {
+          "name": "rho",
+          "direction": "in",
+          "quantity": "air density",
+          "kind": "dimensional",
+          "unit": "kg/m^3",
+          "dim": {
+            "kg": 1,
+            "m": -3,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "flight_assumptions.rho: design assumption",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "CL",
+          "direction": "in",
+          "quantity": "lift coefficient",
+          "kind": "dimensionless",
+          "unit": "1",
+          "dim": {
+            "kg": 0,
+            "m": 0,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "CL_max or fin.CL override: design assumption",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": {
+            "lo": null,
+            "hi": "3",
+            "source": "load_bridge refuses CL outside (0, 3]",
+            "status": "assumed"
+          },
+          "caveat": ""
+        },
+        {
+          "name": "ray_length_fraction",
+          "direction": "in",
+          "quantity": "ray length / semispan",
+          "kind": "dimensionless",
+          "unit": "1",
+          "dim": {
+            "kg": 0,
+            "m": 0,
+            "s": 0
+          },
+          "scale": "organ",
+          "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "fin.ray_length_fraction_of_semispan: DECLARED",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": {
+            "lo": null,
+            "hi": "1",
+            "source": "load_bridge refuses a fraction > 1",
+            "status": "assumed"
+          },
+          "caveat": ""
+        },
+        {
+          "name": "tributary_width",
+          "direction": "in",
+          "quantity": "tributary width per ray",
+          "kind": "dimensional",
+          "unit": "m",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": 0
+          },
+          "scale": "organ",
+          "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "fin.tributary_width_m or b/n_rays: DECLARED",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "p_lift_proxy",
+          "direction": "out",
+          "quantity": "mean lift-pressure proxy",
+          "kind": "dimensional",
+          "unit": "Pa",
+          "dim": {
+            "kg": 1,
+            "m": -1,
+            "s": -2
+          },
+          "scale": "organ",
+          "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "0.5*rho*V^2*CL: a proxy, not a measured fin pressure",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": "derived from a mean lift-pressure PROXY (0.5*rho*V^2*CL) and a declared width; not a measured ray load"
+        },
+        {
+          "name": "q_line",
+          "direction": "out",
+          "quantity": "line load on one fin ray",
+          "kind": "dimensional",
+          "unit": "N/m",
+          "dim": {
+            "kg": 1,
+            "m": 0,
+            "s": -2
+          },
+          "scale": "organ",
+          "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "p_lift_proxy * tributary_width (declared width)",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": "derived from a mean lift-pressure PROXY (0.5*rho*V^2*CL) and a declared width; not a measured ray load"
+        },
+        {
+          "name": "L_ray",
+          "direction": "out",
+          "quantity": "fin ray length",
+          "kind": "dimensional",
+          "unit": "m",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": 0
+          },
+          "scale": "organ",
+          "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "ray_length_fraction * b / 2 (declared fraction)",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": "a DECLARED fraction/length, not a measurement"
+        }
+      ],
+      "timescale": {
+        "kind": "static",
+        "seconds": null,
+        "source": "algebra: no time dependence"
+      },
+      "run": {
+        "entrypoint": "engineering.fin_mechanics.load_bridge.bridge",
+        "deterministic": true,
+        "schema": "frontier.finmech.request/1"
+      },
+      "scope": "exact derivation of a line load from DECLARED rho, V, CL, ray fraction and tributary width",
+      "not_established": [
+        "a measured fin pressure",
+        "fluid-structure interaction",
+        "that the tributary width or ray length is real",
+        "that p*S balances weight (reported, not enforced)"
+      ]
+    },
+    {
+      "schema": "frontier.model.interface/1",
+      "model_id": "finbeam_euler_bernoulli",
+      "name": "Elastic fin-ray surrogate: clamped-free Euler-Bernoulli cantilever (SIMULATED)",
+      "engine": "numpy + scipy.sparse Hermite-cubic FEM",
+      "status": "implemented",
+      "reference": {
+        "repo": "kganjam/delphi-frontier",
+        "branch": "work/fin-mechanics",
+        "commit": "72df07c",
+        "path": "engineering/fin_mechanics/beam.py, engineering/fin_mechanics/sweep.py",
+        "files": {
+          "engineering/fin_mechanics/beam.py": "4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d",
+          "engineering/fin_mechanics/sweep.py": "17e2e1835d9f67c47b68e8285ae118b1b585c4d2b9a955bd13c598fbc498fa6e"
+        },
+        "source_sha256": "3bb3283e86cd73d0853716cb9bd9b3d70d6a45d0561362bf2273f21211301670",
+        "read_by": "dx-guilds, read from the source at this commit"
+      },
+      "ports": [
+        {
+          "name": "q_line",
+          "direction": "in",
+          "quantity": "line load on one fin ray",
+          "kind": "dimensional",
+          "unit": "N/m",
+          "dim": {
+            "kg": 1,
+            "m": 0,
+            "s": -2
+          },
+          "scale": "organ",
+          "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "uniform line load from the load bridge (or the same force at the tip)",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": "derived from a mean lift-pressure PROXY (0.5*rho*V^2*CL) and a declared width; not a measured ray load"
+        },
+        {
+          "name": "L_ray",
+          "direction": "in",
+          "quantity": "fin ray length",
+          "kind": "dimensional",
+          "unit": "m",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": 0
+          },
+          "scale": "organ",
+          "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "from the load bridge",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": "a DECLARED fraction/length, not a measurement"
+        },
+        {
+          "name": "flexural_rigidity",
+          "direction": "in",
+          "quantity": "fin ray flexural rigidity EI",
+          "kind": "dimensional",
+          "unit": "N m^2",
+          "dim": {
+            "kg": 1,
+            "m": 3,
+            "s": -2
+          },
+          "scale": "organ",
+          "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "elastic.EI_status = ASSUMED_RANGE_NOT_MEASURED; bluegill 1e-6..1e-5 J m (Alben et al. 2007) is context only, read through a summarising tool",
+            "status": "assumed",
+            "read_level": "none"
+          },
+          "bounds": {
+            "lo": "1/1000000",
+            "hi": "1",
+            "source": "example_request.json assumed sweep range",
+            "status": "assumed"
+          },
+          "caveat": "ASSUMED stiffness range; no calibrated fin stiffness exists"
+        },
+        {
+          "name": "tip_deflection",
+          "direction": "out",
+          "quantity": "tip deflection under load",
+          "kind": "dimensional",
+          "unit": "m",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": 0
+          },
+          "scale": "organ",
+          "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "simulated",
+            "status": "simulated",
+            "read_level": "none"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "critical_stiffness",
+          "direction": "out",
+          "quantity": "EI below which the declared load breaks the small-deformation limits",
+          "kind": "dimensional",
+          "unit": "N m^2",
+          "dim": {
+            "kg": 1,
+            "m": 3,
+            "s": -2
+          },
+          "scale": "organ",
+          "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "simulated",
+            "status": "simulated",
+            "read_level": "none"
+          },
+          "bounds": null,
+          "caveat": ""
+        }
+      ],
+      "timescale": {
+        "kind": "static",
+        "seconds": null,
+        "source": "static problem: no time step"
+      },
+      "run": {
+        "entrypoint": "engineering.fin_mechanics.sweep",
+        "deterministic": true,
+        "schema": "frontier.finmech.request/1"
+      },
+      "scope": "linear static beam with an ASSUMED stiffness range; no shear, no bilaminar structure, load uncoupled to deformation",
+      "not_established": [
+        "a calibrated fin stiffness",
+        "that any real ray lies in the assumed EI range",
+        "fluid-structure interaction",
+        "biological feasibility"
+      ]
+    },
+    {
+      "schema": "frontier.model.interface/1",
+      "model_id": "flying_fish_constraints",
+      "name": "Exact-rational constraint solver (mass, wing area, span, speed)",
+      "engine": "z3 5.3.3.0",
+      "status": "implemented",
+      "reference": {
+        "repo": "kganjam/delphi-frontier",
+        "branch": "work/guilds-engineering",
+        "commit": "948c2e1",
+        "path": "engineering/constraints.py",
+        "files": {
+          "engineering/constraints.py": "de0acf47ffc7ffbebe5a44d775e007e87b7f4a996256b6c94fc0e188a0fcead1"
+        },
+        "source_sha256": "7e004cb6a07c00f2d4eb20a1e83c12820d34653b73e1d9a0c4a6deaedef73fc5",
+        "read_by": "dx-guilds (author)"
+      },
+      "ports": [
+        {
+          "name": "m",
+          "direction": "out",
+          "quantity": "body mass",
+          "kind": "dimensional",
+          "unit": "kg",
+          "dim": {
+            "kg": 1,
+            "m": 0,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "solver witness; envelope Fish 1990 p.393",
+            "status": "assumed",
+            "read_level": "full-text"
+          },
+          "bounds": {
+            "lo": "3/1000",
+            "hi": "53/100",
+            "source": "Fish 1990 p.393 specimen range",
+            "status": "measured"
+          },
+          "caveat": ""
+        },
+        {
+          "name": "S",
+          "direction": "out",
+          "quantity": "wing area",
+          "kind": "dimensional",
+          "unit": "m^2",
+          "dim": {
+            "kg": 0,
+            "m": 2,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "solver witness",
+            "status": "assumed",
+            "read_level": "none"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "b",
+          "direction": "out",
+          "quantity": "wing span",
+          "kind": "dimensional",
+          "unit": "m",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "solver witness",
+            "status": "assumed",
+            "read_level": "none"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "V",
+          "direction": "out",
+          "quantity": "speed at the level-flight proxy",
+          "kind": "dimensional",
+          "unit": "m/s",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": -1
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "solver witness; level-flight proxy L=W",
+            "status": "assumed",
+            "read_level": "none"
+          },
+          "bounds": null,
+          "caveat": "speed from the level-flight proxy (L = W); not a measured or glide-derived flight speed"
+        }
+      ],
+      "timescale": {
+        "kind": "static",
+        "seconds": null,
+        "source": "a design point: the solver has no dynamics"
+      },
+      "run": {
+        "entrypoint": "engineering.constraints.solve",
+        "deterministic": true
+      },
+      "scope": "exact-rational feasibility of declared constraints; a level-flight proxy, not a glide analysis",
+      "not_established": [
+        "organism feasibility",
+        "glide performance",
+        "that any witness is a viable fish"
+      ]
+    },
+    {
+      "schema": "frontier.model.interface/1",
+      "model_id": "glide_pointmass",
+      "name": "Point-mass glide simulation (RK4)",
+      "engine": "numpy RK4",
+      "status": "implemented",
+      "reference": {
+        "repo": "kganjam/delphi-frontier",
+        "branch": "work/nca-glide",
+        "commit": "87e72f9",
+        "path": "engineering/simulation/evaluate.py, engineering/simulation/glide.py, engineering/simulation/schema.py",
+        "files": {
+          "engineering/simulation/schema.py": "94b4f003be514ac5055ed184b0e2695a68bf0de8689e387238e9583c8e62b944",
+          "engineering/simulation/glide.py": "1f6a04baaf5a7cda589f80907ba00ac93f5b20fd458211a2340f3ec44de79fa7",
+          "engineering/simulation/evaluate.py": "0a793951b8812a9093a637c61d79f3f4fea5e93f07a92825e46601c8e84357fc"
+        },
+        "source_sha256": "00aa99ad590bf67113e7d9dc76b184f55f4a10df3a62abc1fed4af2e46c853fd",
+        "read_by": "dx-guilds, read from the source at this commit"
+      },
+      "ports": [
+        {
+          "name": "m",
+          "direction": "in",
+          "quantity": "body mass",
+          "kind": "dimensional",
+          "unit": "kg",
+          "dim": {
+            "kg": 1,
+            "m": 0,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "candidate from the constraint solver (schema.parse_candidate)",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": {
+            "lo": "3/1000",
+            "hi": "53/100",
+            "source": "Fish 1990 p.393 specimen range",
+            "status": "measured"
+          },
+          "caveat": ""
+        },
+        {
+          "name": "S",
+          "direction": "in",
+          "quantity": "wing area",
+          "kind": "dimensional",
+          "unit": "m^2",
+          "dim": {
+            "kg": 0,
+            "m": 2,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "candidate",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "b",
+          "direction": "in",
+          "quantity": "wing span",
+          "kind": "dimensional",
+          "unit": "m",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "candidate",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "release_speed",
+          "direction": "in",
+          "quantity": "release speed",
+          "kind": "dimensional",
+          "unit": "m/s",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": -1
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "evaluate.py: default 1.5 x stall speed; the witness V is used only when release_speed_from_witness is set",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "rho",
+          "direction": "in",
+          "quantity": "air density",
+          "kind": "dimensional",
+          "unit": "kg/m^3",
+          "dim": {
+            "kg": 1,
+            "m": -3,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "flight_assumptions.rho: design assumption, schema bound (0, 2)",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "CL_max",
+          "direction": "in",
+          "quantity": "maximum usable lift coefficient",
+          "kind": "dimensionless",
+          "unit": "1",
+          "dim": {
+            "kg": 0,
+            "m": 0,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "flight_assumptions.CL_max: design assumption, schema bound (0, 3)",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "glide_range",
+          "direction": "out",
+          "quantity": "horizontal glide range",
+          "kind": "dimensional",
+          "unit": "m",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": 0
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "simulated; CD0/e/CL_max are declared priors, not measurements",
+            "status": "simulated",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "sink_rate",
+          "direction": "out",
+          "quantity": "equilibrium sink rate",
+          "kind": "dimensional",
+          "unit": "m/s",
+          "dim": {
+            "kg": 0,
+            "m": 1,
+            "s": -1
+          },
+          "scale": "organism",
+          "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+          "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+          "provenance": {
+            "source": "simulated",
+            "status": "simulated",
+            "read_level": "none"
+          },
+          "bounds": null,
+          "caveat": ""
+        }
+      ],
+      "timescale": {
+        "kind": "unknown",
+        "seconds": null,
+        "source": "glide duration is an output; no characteristic time is declared"
+      },
+      "run": {
+        "entrypoint": "engineering.simulation.evaluate.evaluate",
+        "deterministic": true,
+        "schema": "frontier.glide.candidate/1"
+      },
+      "scope": "point-mass flight with declared drag/lift priors (priors, not measurements); controlled-launch comparison exists",
+      "not_established": [
+        "biological feasibility",
+        "fin-tissue coupling",
+        "calibrated lift/drag for any fish (Park & Choi 2010 unread)"
+      ]
+    },
+    {
+      "schema": "frontier.model.interface/1",
+      "model_id": "rdfield_nonlinear_sweep",
+      "name": "Reaction-diffusion field (Schnakenberg, Brusselator): saved-state rerun",
+      "engine": "numpy Strang splitting + DCT-II diffusion + RK4",
+      "status": "implemented",
+      "reference": {
+        "repo": "kganjam/delphi-frontier",
+        "branch": "work/nca-glide",
+        "commit": "87e72f9",
+        "path": "engineering/simulation/rd/cells.json, engineering/simulation/rd/receipt.json, engineering/simulation/rd_frames.py",
+        "files": {
+          "engineering/simulation/rd_frames.py": "ee4ed03de805265bfbd1f7673a10b8b2d6eff2a71e0609d86a3e036796a85d12",
+          "engineering/simulation/rd/receipt.json": "a3af348c151336721c4f844028b0f7f585e02c34684bc8cdcc085bd0dc4048dc",
+          "engineering/simulation/rd/cells.json": "f74184cb56ba36e4face9978c96c2c00ae728a471183294c3f9d866eb066d6b6"
+        },
+        "source_sha256": "4e73b58ad3abcf9f1c2f52ed3369b6e70954f1c2989e3a64d42ea5eb092e8809",
+        "read_by": "dx-guilds, read from the source at this commit",
+        "upstream_repo": "kganjam/delphi-evolve",
+        "upstream_branch": "work/rethink-nca",
+        "upstream_prereg_commit": "cb27cf24521b7eb77f784bc266d2f3f584f049ff",
+        "upstream_results_commit": "1067cdb",
+        "upstream_rows_sha256": "a32c2bf7dd3c10162317974ae6a0ecbefa06c1c180a6886dea1bcb8ea4d4c882",
+        "note": "rd_frames.py is pinned-source reuse of solver A; rd/receipt.json compares two reruns with frozen rows"
+      },
+      "ports": [
+        {
+          "name": "L_over_lambda_c",
+          "direction": "in",
+          "quantity": "domain length / critical wavelength",
+          "kind": "dimensionless",
+          "unit": "1",
+          "dim": {
+            "kg": 0,
+            "m": 0,
+            "s": 0
+          },
+          "scale": "tissue",
+          "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+          "context": "abstract kinetics; no organism",
+          "provenance": {
+            "source": "sweep design",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "kinetic_parameters",
+          "direction": "in",
+          "quantity": "kinetic parameters",
+          "kind": "model_units",
+          "unit": "model units",
+          "dim": null,
+          "scale": "tissue",
+          "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+          "context": "abstract kinetics; no organism",
+          "provenance": {
+            "source": "published ranges or a stated prior",
+            "status": "assumed",
+            "read_level": "file"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "dominant_mode",
+          "direction": "out",
+          "quantity": "dominant mode number",
+          "kind": "dimensionless",
+          "unit": "1",
+          "dim": {
+            "kg": 0,
+            "m": 0,
+            "s": 0
+          },
+          "scale": "tissue",
+          "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+          "context": "abstract kinetics; no organism",
+          "provenance": {
+            "source": "simulated",
+            "status": "simulated",
+            "read_level": "none"
+          },
+          "bounds": null,
+          "caveat": ""
+        },
+        {
+          "name": "pattern_flag",
+          "direction": "out",
+          "quantity": "pattern / no pattern / not settled",
+          "kind": "dimensionless",
+          "unit": "1",
+          "dim": {
+            "kg": 0,
+            "m": 0,
+            "s": 0
+          },
+          "scale": "tissue",
+          "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+          "context": "abstract kinetics; no organism",
+          "provenance": {
+            "source": "simulated",
+            "status": "simulated",
+            "read_level": "none"
+          },
+          "bounds": null,
+          "caveat": ""
+        }
+      ],
+      "timescale": {
+        "kind": "unknown",
+        "seconds": null,
+        "source": "tau = gamma*t is dimensionless model time, unrelated to glide seconds"
+      },
+      "run": {
+        "entrypoint": "engineering.simulation.rd_frames",
+        "deterministic": true
+      },
+      "scope": "numerical rerun of two frozen sweep cells with every saved state kept; textbook kinetics only",
+      "not_established": [
+        "any fin or fish tissue",
+        "SI length or time scales",
+        "that a real tissue obeys these kinetics"
+      ]
+    }
+  ],
+  "calibrations_registered": [],
+  "assumptions": [
+    {
+      "id": "A1",
+      "text": "glide release speed equals the constraint solver's witness V (the glide model's own default is 1.5 x stall speed)",
+      "level": "assumption",
+      "owner": "dx-guilds"
+    },
+    {
+      "id": "A2",
+      "text": "Notch/Delta lateral-inhibition spacing from a two-cell non-dimensional model sets fin-ray stiffness scale (NO source supports this)",
+      "level": "assumption",
+      "owner": "dx-guilds"
+    },
+    {
+      "id": "A3",
+      "text": "the mean lift-pressure proxy p = 0.5*rho*V^2*CL, built from declared rho, V and CL, is the pressure carried by one fin ray (it is not a measured fin pressure; V is the solver's level-flight-proxy speed)",
+      "level": "assumption",
+      "owner": "dx-guilds"
+    },
+    {
+      "id": "A4",
+      "text": "ray length fraction and tributary width are declared values, not measurements (fin_mechanics example: 1/5 of the semispan, 1/100 m)",
+      "level": "assumption",
+      "owner": "dx-guilds"
+    },
+    {
+      "id": "A5",
+      "text": "the flexural-rigidity range is ASSUMED, not measured or calibrated: no calibrated fin stiffness exists in this repository",
+      "level": "assumption",
+      "owner": "dx-guilds"
+    }
+  ],
+  "couplings": [
+    {
+      "coupling": {
+        "id": "molecular_length_to_fin_EI",
+        "from": "collagen_mimetic_md.terminal_CA_distance",
+        "to": "finbeam_euler_bernoulli.flexural_rigidity",
+        "mapping_kind": "none",
+        "factor": null,
+        "calibration_id": null,
+        "assumption_ids": [],
+        "time_relation": "unknown",
+        "uncertainty_kind": "unknown",
+        "note": "Missing molecular-to-fibril-to-tissue constitutive law, morphology, volume fraction and crosslink calibration. A short molecular length trajectory cannot set fin EI."
+      },
+      "verdict": {
+        "coupling_id": "molecular_length_to_fin_EI",
+        "status": "refused",
+        "label": "refused: missing or inconsistent bridge; nothing was composed",
+        "reasons": [
+          "no mapping declared: the bridge is missing and is not invented here",
+          "scope mismatch without a calibration that bridges it: scale molecular -> organ; context 'Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime '300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim' -> 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure'"
+        ],
+        "checks": {
+          "endpoints": "pass",
+          "mapping": "fail",
+          "dimension": "n/a (no valid mapping)",
+          "scope": "fail: scale molecular -> organ; context 'Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime '300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim' -> 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure'",
+          "bounds": "unknown (bounds open or undeclared)",
+          "time": "unknown",
+          "caveats": "noted: collagen_mimetic_md.terminal_CA_distance: Three actual chain lengths, not a contour length or material modulus | finbeam_euler_bernoulli.flexural_rigidity: ASSUMED stiffness range; no calibrated fin stiffness exists",
+          "uncertainty": "unknown",
+          "assumptions": "none"
+        },
+        "missing_calibrations": [
+          "collagen_mimetic_md.terminal_CA_distance -> finbeam_euler_bernoulli.flexural_rigidity: calibration bridging scale molecular -> organ; context 'Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime '300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim' -> 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure'"
+        ],
+        "assumption_ids": []
+      }
+    }
+  ],
+  "problem_proposals": [
+    {
+      "schema": "frontier.problem.proposal/1",
+      "id": "problem-calibration-molecular_length_to_fin_EI",
+      "kind": "missing_calibration",
+      "status": "proposed",
+      "not_a_claim": true,
+      "source_coupling": "molecular_length_to_fin_EI",
+      "coupling_status": "refused",
+      "title": "Calibrate molecular chain terminal separation (collagen_mimetic_md.terminal_CA_distance) -> fin ray flexural rigidity EI (finbeam_euler_bernoulli.flexural_rigidity)",
+      "missing": [
+        "collagen_mimetic_md.terminal_CA_distance -> finbeam_euler_bernoulli.flexural_rigidity: calibration bridging scale molecular -> organ; context 'Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime '300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim' -> 'static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure'"
+      ],
+      "success": "A calibration record with a measured or fitted mapping, a data file with a recorded sha256, a declared domain, an uncertainty bound and the scale/context it bridges, read at full-text or data level, that passes validate_coupling as 'calibrated' (structure) AND whose held-out points fall inside the stated bound. The held-out fraction and the bound are frozen BEFORE the fit.",
+      "falsifier": "Held-out measurements outside the frozen bound, a calibration domain that does not contain the source model's declared parameter range, or no dataset pairing both quantities in the target context after the bounded search. Any of these closes the Problem as 'no calibration available', which keeps the coupling refused.",
+      "action_bounds": {
+        "allowed_actions": [
+          "bounded literature/data search by named repository (no whole-filesystem search)",
+          "read the primary paper or dataset and record the read level",
+          "CPU-only exact or numerical fit under systemd caps (MemoryMax=4G, <=2 threads)"
+        ],
+        "max_cpu_hours": "2 (declared cap, not an estimate)",
+        "gpu": false,
+        "paid_calls": false,
+        "stop_rule": "stop and report on the first of: no dataset found, domain mismatch, cap reached",
+        "forbidden": [
+          "paid model calls",
+          "GPU submission",
+          "contacting other teams",
+          "publishing a nanopub",
+          "presenting a result as an observation"
+        ]
+      },
+      "prerequisites": []
+    }
+  ],
+  "must_display": [
+    "A coupling verdict is about typed interfaces, not biology. 'composable' means the declared mapping is dimensionally and scope-consistent; it does not mean the models describe the same organism. 'scenario' results are assumption-level. No Lean theorem here proves biological correspondence.",
+    "Scenario results carry the label 'assumption-level'.",
+    "Registered calibrations: NONE"
+  ],
+  "must_not_say": [
+    "the models are coupled",
+    "validated multiscale model",
+    "the fin pattern is explained",
+    "Lean proves the biological correspondence"
+  ],
+  "manifest_sha256": "9117e50f4372d275794d2c809e1c5003d93f60b90135cec1ec03068f2ec3530b"
+}
