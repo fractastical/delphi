@@ -15,7 +15,8 @@ WorkingDirectory=/data/services/delphi-frontier/app
 Environment="FRONTIER_DSN=host=/data/services/delphi-frontier/run port=5471 dbname=frontier user=frontier_app"
 Environment=OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 Environment=FRONTIER_PUBLIC_READ=1
-EnvironmentFile=-%h/.config/morphoswarm/studio.env
+# studio.env is NOT loaded in public-read mode: that mode reads no access token, and the file carries the studio's other settings, which a public
+# process has no use for. Re-add it only to roll back to the gated release (then restore the access token the adapter reads).
 EnvironmentFile=-%h/.config/delphi-frontier/web.env
 ExecStart=/data/services/delphi-frontier/venv/bin/python -m frontier.web --namespace delphi-frontier --schema public --port 8971 --site /data/services/delphi-frontier/app/site
 Restart=always

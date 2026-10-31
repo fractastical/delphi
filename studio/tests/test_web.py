@@ -1192,3 +1192,25 @@ def test_video_types_are_served_only_from_guarded_artifacts_with_range_support(a
     with big.open("wb") as f:
         f.truncate(web.MAX_VIDEO_BYTES + 1)                                      # sparse file; refused by size, never read
     assert web.resolve_static(site, "/artifacts/big.mp4") is None
+
+
+def test_anonymous_session_minting_is_limited_per_client_and_a_cookie_holder_is_not_counted(store, site):
+    """The session table is capped and evicts the oldest, so unlimited anonymous minting would sign everyone else out of the calculators."""
+    w = Web(store, site, public_read=True, anon_sessions_per_window=3)
+    try:
+        assert [w.req("GET", "/api/session", cookie=False)[0] for _ in range(3)] == [200, 200, 200]
+        status, headers, _ = w.req("GET", "/api/session", cookie=False)
+        assert status == 429 and "retry-after" in headers
+        assert w.req("GET", "/api/health", cookie=False)[0] == 200            # the limit is on minting, not on the site
+    finally:
+        w.close()
+    w = Web(store, site, public_read=True, anon_sessions_per_window=3)
+    try:
+        assert w.req("GET", "/api/session", cookie=False)[0] == 200
+        w.cookie = None
+        s, body, h = w.json("GET", "/api/session", cookie=False)
+        w.cookie = h["set-cookie"].split(";")[0]
+        for _ in range(6):                                                     # an existing session is reused, never re-minted
+            assert w.req("GET", "/api/session")[0] == 200
+    finally:
+        w.close()

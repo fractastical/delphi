@@ -122,6 +122,8 @@ def solve_design(data):
 if __name__ == "__main__":
     if sys.argv[1:] != ["--worker"]:
         raise SystemExit("Use the bounded website adapter, or --worker with a finite JSON request on stdin")
+    from .worker_limits import cap_worker
+    cap_worker()
     try:
         raw = sys.stdin.buffer.read(1025)
         if len(raw) > 1024:
