@@ -3,14 +3,33 @@
 Official `mcp` SDK 1.27.0, stdio and stateless Streamable HTTP transports. Remote
 support salvages the collab worker's unfinished implementation, with additional
 request-budget, actual-body-byte and authentication-context checks. The earlier
-stdio smoke transcript below remains attributed to its original worker. Product
-client configuration and a deployed remote connection require separate receipts.
+stdio smoke transcript below remains attributed to its original worker.
 
 ## Remote endpoint
 
-The prepared user service binds `127.0.0.1:8972`; an exact nginx `/mcp` location
-proxies HTTPS requests. Deployment files are in `deploy/mcp/`. They are prepared
-configuration; this branch does not install them, reload nginx or start services.
+**Public endpoint: `https://frontier.morphoswarm.ai/mcp`.** Select Streamable HTTP
+in an MCP client. Public reads require no login or token. Writing requires an
+individual contributor credential. The website is https://frontier.morphoswarm.ai.
+
+The user service binds `127.0.0.1:8972`; an exact nginx `/mcp` location proxies
+HTTPS requests. Deployment files are in `deploy/mcp/`. The service and proxy
+were installed on October 31, 2026. The official SDK completed initialization,
+tool discovery, a real fish search and Project schema retrieval through public
+HTTPS; anonymous writes and an invalid supplied token were rejected. The twelve
+checks are recorded in `deploy/receipts/mcp-public-check.json`. No scientific
+record was written. A plain browser GET receives405: use an MCP client.
+
+The remote endpoint exposes six read tools and three credentialed contribution
+tools. Start with `frontier_capabilities`, then `frontier_search` and
+`frontier_get`. `frontier_artifacts` finds linked evidence assets. Search is
+currently lexical through MCP; the website also has a separate vector index.
+
+Repeat the deployed connectivity check with:
+
+```bash
+systemd-run --user --scope -p TasksMax=128 -p MemoryMax=1G -p MemorySwapMax=0 \
+  -p RuntimeMaxSec=180 python deploy/verify_mcp.py --receipt /tmp/frontier-mcp-check.json
+```
 
 ```bash
 python -m frontier mcp --namespace NODE --schema public --transport http \
