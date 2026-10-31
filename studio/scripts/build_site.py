@@ -200,6 +200,26 @@ PRINT_DIR = "artifacts/print"
 PRINT_OUT = "@artifacts/print"          # site-relative output root (the runtime serves .stl only under site/artifacts/)
 
 
+def print_media(ins: Inputs, out: dict, fid: str) -> dict | None:
+    """Turntable render of a form (optional): files are offered only when their bytes equal the render manifest's declared hashes."""
+    rj = ROOT / PRINT_DIR / "media" / fid / "render.json"
+    if not rj.exists():
+        return None
+    r = json.loads(ins.read(f"{PRINT_DIR}/media/{fid}/render.json")); res = {"evidence_kind": r.get("evidence_kind"), "caveats": r.get("caveats"), "checks": r.get("checks"), "render_sha256": ins.seen[f"{PRINT_DIR}/media/{fid}/render.json"]["sha256"], "video_href": None, "gif_href": None, "poster_href": None, "state": {}}
+    for key, fname, declared in (("video", r["video"]["file"], r["video"].get("sha256")), ("gif", (r.get("gif") or {}).get("file"), (r.get("gif") or {}).get("sha256")), ("poster", r.get("poster"), r.get("poster_sha256"))):
+        if not fname:
+            res["state"][key] = "not declared"; continue
+        f = ROOT / PRINT_DIR / "media" / fid / fname
+        if not f.is_file():
+            res["state"][key] = "declared_but_missing"; continue
+        b = ins.read(f"{PRINT_DIR}/media/{fid}/{fname}")
+        if declared and digest_bytes(b) != declared:
+            res["state"][key] = "digest_mismatch"; continue
+        out[f"{PRINT_OUT}/media/{fid}/{fname}"] = b; res[key + "_href"] = f"artifacts/print/media/{fid}/{fname}"; res["state"][key] = "present_verified"
+    res["video"] = {k: r["video"].get(k) for k in ("duration_s", "fps", "n_frames", "loop", "width", "height")}
+    return res
+
+
 def print_forms(ins: Inputs, out: dict) -> dict | None:
     """Printable form studies, when present: the manifest's own words and receipts, plus the real STL and image files."""
     mf = ROOT / PRINT_DIR / "manifest.json"
@@ -223,8 +243,11 @@ def print_forms(ins: Inputs, out: dict) -> dict | None:
             if (ROOT / PRINT_DIR / rel).exists():
                 entry["files"][key] = copy(rel)
         entry["files"]["design"] = {"sha256": entry["design_sha256"]}
+        entry["display_scale"] = f.get("display_scale"); entry["set"] = f.get("set"); entry["simulation_comparison"] = f.get("simulation_comparison")
+        entry["media"] = print_media(ins, out, fid)
         forms.append(entry)
-    return {"label": man.get("label"), "display_scale": man.get("display_scale"), "display_scale_note": man.get("display_scale_note"), "run": {k: man["run"].get(k) for k in ("box_mm", "launch_speed_query_m_s", "libraries")} | {"solver_commit": (man["run"].get("solver") or {}).get("commit"), "solver_branch": (man["run"].get("solver") or {}).get("branch")}, "forms": forms}
+    sets = {k: {"display_scale": v.get("display_scale"), "forms": v.get("forms", [])} for k, v in (man.get("sets") or {}).items()}
+    return {"label": man.get("label"), "sets": sets, "display_scale_note": man.get("display_scale_note"), "printer_resin": man.get("printer_resin"), "run": {k: man["run"].get(k) for k in ("box_mm", "launch_speed_query_m_s", "libraries")} | {"solver_commit": (man["run"].get("solver") or {}).get("commit"), "solver_branch": (man["run"].get("solver") or {}).get("branch")}, "forms": forms}
 
 
 SIM_OUT = "@artifacts/simulations"
@@ -277,7 +300,7 @@ def native_video_cards(ins: Inputs, out: dict) -> list[dict]:
             "video": {"file": v["file"], "sha256": v.get("sha256"), "note": f"{v['width']}x{v['height']}, {v['duration_s']} s, {v['codec']}"}, "video_state": st, "video_href": href, "poster_href": ph,
             "numerical_checks": [{"name": "replay inputs", "result": f"three scenario CSVs hashed ({len(m['inputs']['csv'])}); model and replay-code hashes recorded"}],
             "parameter_unknowns": ["Model time and concentrations are non-dimensional; no physical units."], "open_questions": ["It does not show: " + "; ".join(m["claims"]["does_not_show"]) + "."],
-            "couplings": [], "manifest": f"{d}/delta_notch_replay_manifest.json", "native": True})
+            "caption": m["claims"]["captions"]["header"] + " | " + m["claims"]["captions"]["footer"], "couplings": [], "manifest": f"{d}/delta_notch_replay_manifest.json", "native": True})
     d = "engineering/fin_mechanics/artifacts"; mf = ROOT / d / "manifest.json"
     if mf.exists():
         m = json.loads(ins.read(f"{d}/manifest.json")); o = m["outputs"]; v = m["video"]

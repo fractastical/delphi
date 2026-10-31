@@ -48,7 +48,7 @@
     if (k === "Claim") return html`<h2 class="eh">Statement</h2>${para(p.statement)}${eqBlock}<h2 class="eh">Context</h2>${para(p.context)}<h2 class="eh">Assumptions</h2>${list(p.assumptions)}<h2 class="eh">Limitations</h2>${list(p.limitations)}<h2 class="eh">Source</h2>${src(p.source)}
       ${delphiBlock(p)}
       ${p.prior_review && Object.keys(p.prior_review).length ? html`<h2 class="eh">Upstream review (an assertion, not local acceptance)</h2><dl class="kv wide">${Object.entries(p.prior_review).filter(([, v]) => typeof v === "string").map(([a, v]) => html`<div><dt>${a.replace(/_/g, " ")}</dt><dd>${v}</dd></div>`)}</dl>` : ""}`;
-    if (k === "Evidence") return html`<h2 class="eh">What was done</h2>${para(p.method)}<h2 class="eh">Result context</h2>${para(p.context)}
+    if (k === "Evidence") return html`${p.produced_by ? html`<p class="note small"><b>Produced by an Action.</b> ${refLink(p.produced_by, "Open the action")}. A proposed or imported Action record does not by itself show that anything ran locally; what supports a run is the receipt, the hashed artifacts and the link checks in this record's provenance. The relation “${p.relation || "unspecified"}” was declared by whoever submitted this record; it is not a review.</p>` : ""}<h2 class="eh">What was done</h2>${para(p.method)}<h2 class="eh">Result context</h2>${para(p.context)}
       <p>${U.pill("evidence kind: " + p.evidence_kind, "ev")} ${p.relation ? U.pill("relation to target: " + p.relation, "grp") : ""}</p><h2 class="eh">Uncertainty</h2>${para(p.uncertainty)}<h2 class="eh">Limitations</h2>${list(p.limitations)}<h2 class="eh">Assumptions</h2>${list(p.assumptions)}
       <h2 class="eh">Artifacts</h2>${artifacts(p.artifacts)}<h2 class="eh">Source</h2>${src(p.source)}${p.source_dependence ? html`<details><summary class="small">Source dependence</summary><pre class="json">${JSON.stringify(p.source_dependence, null, 1)}</pre></details>` : ""}
       ${p.provenance ? html`<details><summary class="small">Provenance</summary><pre class="json">${JSON.stringify(p.provenance, null, 1)}</pre></details>` : ""}`;
@@ -90,6 +90,11 @@
             <p class="small"><a class="btn small" href="${DF.href("/graph/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace })}">Open the neighbourhood graph</a></p></aside></div>
           <details class="advraw"><summary><b>Advanced: raw record envelope</b></summary><pre class="json">${JSON.stringify(rec.raw || rec, null, 2)}</pre></details>`.toString();
         DF.renderMath(host);
+        // The same id in another namespace is a different record: say so instead of merging or hiding it.
+        try {
+          const twins = (await DF.api.catalog({ query: r.id, kind: r.kind, limit: 50 })).records.filter((x) => x.ref.id === r.id && (x.ref.namespace !== r.namespace || x.ref.version !== r.version));
+          if (twins.length) host.querySelector("#relmore").insertAdjacentHTML("beforebegin", html`<p class="note small"><b>Other records share this id.</b> ${twins.map((x) => html`<a href="${DF.href("/entity/" + x.ref.kind + "/" + x.ref.id, { v: x.ref.version, ns: x.ref.namespace })}">${x.ref.namespace} (${String(x.ref.version).slice(0, 8)}…)</a> `)}They are separate records in separate namespaces or versions; this page does not merge or alias them.</p>`.toString());
+        } catch (e) { /* the page stands without it */ }
         // Evidence that points at this record (a lexical lookup of records that mention its id, filtered to a real typed target reference).
         try {
           const more = (await DF.api.catalog({ query: r.id, limit: 50 })).records.filter((x) => x.ref.id !== r.id && x.payload && x.payload.target && x.payload.target.id === r.id);
