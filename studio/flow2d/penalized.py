@@ -32,8 +32,15 @@ class NS2DPen(NS2D):
         raise NotImplementedError
 
 
-def disk_mask(N, cx, cy, radius, smooth=1.5, dtype=torch.float64):
-    """smooth indicator of a disk: tanh transition of width smooth*dx (periodic distance)."""
+def _ramp(sdist, w):
+    """compact-support smooth indicator: 1 for sdist <= -w/2, 0 for sdist >= +w/2, cubic smoothstep between (sdist = signed distance, negative inside the body).
+    Compact support matters: a tanh tail leaves chi/eta >> 1 well inside the nominal fluid region when eta is small, which shifts the effective wall inward."""
+    t = torch.clamp(0.5 - sdist / w, 0.0, 1.0)
+    return t * t * (3 - 2 * t)
+
+
+def disk_mask(N, cx, cy, radius, smooth=2.0, dtype=torch.float64):
+    """indicator of a disk, transition width smooth*dx, compact support (periodic distance)."""
     x = torch.arange(N, dtype=dtype) * (2 * math.pi / N)
     dx = 2 * math.pi / N
     X, Y = torch.meshgrid(x, x, indexing="ij")
@@ -41,12 +48,12 @@ def disk_mask(N, cx, cy, radius, smooth=1.5, dtype=torch.float64):
         r = (a - c + math.pi) % (2 * math.pi) - math.pi
         return r
     r = torch.sqrt(d(X, cx) ** 2 + d(Y, cy) ** 2)
-    return 0.5 * (1 - torch.tanh((r - radius) / (smooth * dx)))
+    return _ramp(r - radius, smooth * dx)
 
 
-def channel_mask(N, h, dtype=torch.float64, smooth=1.0):
-    """walls for |y - pi| > h (fluid slab of half-width h centred at y = pi)."""
+def channel_mask(N, h, dtype=torch.float64, smooth=2.0):
+    """walls for |y - pi| > h (fluid slab of half-width h centred at y = pi), compact-support transition of width smooth*dx."""
     y = torch.arange(N, dtype=dtype) * (2 * math.pi / N)
     dx = 2 * math.pi / N
-    s = 0.5 * (1 + torch.tanh((torch.abs(y - math.pi) - h) / (smooth * dx)))
+    s = _ramp(h - torch.abs(y - math.pi), smooth * dx)
     return s[None, :].expand(N, N).contiguous()
