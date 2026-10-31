@@ -15,15 +15,19 @@ import functools
 import json
 from typing import Annotated, Literal
 
+import anyio
+from mcp.server.auth.middleware.auth_context import get_access_token
+from mcp.server.auth.settings import AuthSettings
 from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp.exceptions import ToolError
+from mcp.server.transport_security import TransportSecuritySettings
 from mcp.types import ToolAnnotations
 from pydantic import Field, ValidationError
 
 from .models import KINDS, MAX_BUNDLE_RECORDS, MAX_RECORD_BYTES, PAYLOADS, POLICY, SCHEMA, Ref
 from .search import SEARCH_KIND, SearchIndex
 from .artifacts import ArtifactIndex
-from .store import FrontierError, Store
+from .store import FrontierError, Store, Unauthorized
 
 MANIFEST_VERSION = "frontier-mcp-capabilities-0.1"
 READ = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False)
@@ -64,32 +68,74 @@ def _guard(fn):
     return run
 
 
+def _guard_async(fn):
+    """Remote mode: run the (blocking, psycopg) tool body in a worker thread so one slow call never stalls other clients' requests. anyio copies the current
+    context into the thread, which is what carries the caller's auth context to `caller()`."""
+    @functools.wraps(fn)
+    async def run(*a, **k):
+        try:
+            return await anyio.to_thread.run_sync(functools.partial(fn, *a, **k))
+        except ToolError:
+            raise
+        except Exception as e:      # noqa: BLE001 - everything is mapped to a sanitised typed error
+            raise _sanitised(e) from None
+    return run
+
+
 def resolve_principal(store: Store, token: str) -> dict:
-    """The configured credential's identity, WITHOUT the credential. Uses the store's own authentication (read-only)."""
-    with store.connection() as c:
-        p = store._auth(c, token)       # noqa: SLF001 - reuse, not reimplement; a public Store.principal() would remove this coupling
-    return {"actor": p["actor"], "operator": p["operator"], "roles": list(p["roles"]), "namespaces": list(p["namespaces"]),
-            "daily_write_limit": p["daily_write_limit"]}
+    """The credential's identity, WITHOUT the credential (the store's own public, read-only `principal`)."""
+    return store.principal(token)
 
 
-def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = None) -> FastMCP:
+def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = None, remote: bool = False, public_host: str | None = None, port: int = 8972,
+             public_read: bool = False) -> FastMCP:
+    """stdio (default): one process credential in `token` (write mode only). remote=True: Streamable HTTP, stateless; there is NO process credential, every request
+    is authenticated with its own `Authorization: Bearer` operator credential and acts as that principal. Writes are an explicit server opt-in (`allow_write`) in both."""
     principal = None
-    if allow_write:
+    if public_read and not remote:
+        raise ValueError("public_read is a remote-transport option")
+    if remote and token:
+        raise ValueError("remote mode never takes a process credential; every request carries its own bearer")
+    if allow_write and not remote:
         if not token:
             raise ValueError("write mode needs the process credential")
         principal = resolve_principal(store, token)             # fails closed on an unknown token (store.Unauthorized)
         if "contributor" not in principal["roles"] or store.namespace not in principal["namespaces"]:
             raise ValueError("the configured principal cannot write this namespace as a contributor; refusing to enable write tools")
-    server = FastMCP("Delphi Frontier MCP", log_level="ERROR", instructions=(
-        "Bounded access to a Delphi Frontier node. Call frontier_capabilities first: it states the mode, the configured principal (never the credential), "
+    remote_kwargs = {}
+    if remote:
+        hosts = ["127.0.0.1:*", "localhost:*"] + ([public_host] if public_host else [])
+        origins = ["http://127.0.0.1:*", "http://localhost:*"] + ([f"https://{public_host}"] if public_host else [])
+        from .mcp_remote import StoreTokenVerifier
+        remote_kwargs = dict(host="127.0.0.1", port=port, stateless_http=True, json_response=True,
+                             transport_security=TransportSecuritySettings(enable_dns_rebinding_protection=True, allowed_hosts=hosts, allowed_origins=origins),
+                             )
+        if not public_read:
+            # Static bearer credentials, not OAuth: no protected-resource metadata is advertised (resource_server_url=None), so clients are not sent to an
+            # authorization server that does not exist. issuer_url is required by the SDK's settings model and is otherwise unused here.
+            remote_kwargs.update(auth=AuthSettings(issuer_url=f"https://{public_host or 'localhost'}/", resource_server_url=None, required_scopes=None),
+                                 token_verifier=StoreTokenVerifier(store))
+        # public_read: the route is not behind the SDK's RequireAuthMiddleware; frontier.mcp_remote.Guard authenticates with the SDK's own backend instead
+    acts_as = "the principal whose bearer credential accompanies each request" if remote else "the configured principal"
+    server = FastMCP("Delphi Frontier MCP", log_level="ERROR", **remote_kwargs, instructions=(
+        "Bounded access to a Delphi Frontier node. Call frontier_capabilities first: it states the mode, the calling principal (never the credential), "
         "the exact tools and what is deliberately not available. Exact versions, source assertions and node-local review status stay separate. "
-        + ("WRITE MODE: frontier_propose, frontier_lease and frontier_transition act as the configured principal; there is no review/accept tool and "
-           "acceptance needs an independent operator elsewhere." if allow_write else "READ-ONLY: no write tools are registered.")))
+        + (f"WRITE MODE: frontier_propose, frontier_lease and frontier_transition act as {acts_as}; the store's role checks decide what that principal may do; "
+           "there is no review/accept tool and acceptance needs an independent operator elsewhere." if allow_write else "READ-ONLY: no write tools are registered.")))
+
+    def caller() -> str:
+        """The credential to hand to the store: the request's own bearer (remote) or the process credential (stdio)."""
+        if remote:
+            at = get_access_token()
+            if at is None:
+                raise Unauthorized("Authenticated operator token required")
+            return at.token
+        return token
     tools: list[dict] = []
 
     def register(fn, annotations, kind, requires):
         tools.append({"name": fn.__name__, "kind": kind, "requires_role": requires, "summary": (fn.__doc__ or "").strip().split("\n")[0]})
-        server.tool(annotations=annotations)(_guard(fn))
+        server.tool(annotations=annotations)((_guard_async if remote else _guard)(fn))
 
     index = SearchIndex(store)
 
@@ -121,12 +167,25 @@ def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = Non
         register(f, READ, "read", None)
 
     def manifest() -> dict:
+        who = principal
+        if remote:
+            try:
+                who = store.principal(get_access_token().token) if get_access_token() else None
+            except Unauthorized:
+                who = None
         return {"manifest_version": MANIFEST_VERSION, "server": "Delphi Frontier MCP", "record_schema": SCHEMA, "review_policy": POLICY,
-                "namespace": store.namespace, "mode": "write_enabled" if allow_write else "read_only", "principal": principal,
-                "credentials": "Process environment only (FRONTIER_DSN; FRONTIER_TOKEN with --allow-write). Never accepted as a tool argument, never returned.",
+                "namespace": store.namespace, "mode": "write_enabled" if allow_write else "read_only", "principal": who,
+                "transport": "streamable-http (stateless, JSON responses); one POST per request at the exact path /mcp" if remote else "stdio",
+                "anonymous_reads": bool(public_read),
+                "credentials": (("Public reads need no credential. " if public_read else "") +
+                                "Per request: `Authorization: Bearer <your operator credential>` header ONLY. Never a query string, tool argument or resource; never returned. "
+                                "Each request is authenticated and acts as its own principal; the server holds no shared token. A credential that fails verification is refused, never "
+                                "treated as anonymous." + (" Every write tool needs a valid bearer." if public_read and allow_write else "") if remote else
+                                "Process environment only (FRONTIER_DSN; FRONTIER_TOKEN with --allow-write). Never accepted as a tool argument, never returned."),
                 "tools": tools, "not_available": NOT_AVAILABLE, "record_kinds": list(KINDS),
                 "schema_resources": "frontier://schema/{kind} returns that kind's payload JSON schema",
-                "payload_extensions": ["Claim.origin", "Problem.approach/scales/context_tags", "Action.inputs", "Evidence.relation/produced_by/artifacts"],
+                "payload_extensions": ["Claim.origin", "Problem.approach/scales/context_tags", "Action.inputs", "Action.proposal", "Action.proposal.plan_steps",
+                                       "Evidence.relation/produced_by/artifacts"],
                 "limits": {"max_record_bytes": MAX_RECORD_BYTES, "max_bundle_records": MAX_BUNDLE_RECORDS, "search_page_max": 50, "lease_seconds": [1, 600]},
                 "search": {"engine": SEARCH_KIND, "filters": ["kind|kinds", "status", "source (URI prefix)", "scope", "context", "include_history"], "exact_pins": ["version", "record id", "source URI"], "pagination": "opaque next_cursor, pass back as cursor (or legacy after)"},
                 "transition_states_via_mcp": ["ready (coordinator only)", "running", "submitted", "blocked", "cancelled", "failed"],
@@ -145,17 +204,17 @@ def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = Non
                 "(exact current head version or null), payload. Payload shapes: resource frontier://schema/{kind}."))],
                              idempotency_key: IdempotencyKey) -> dict:
             """Propose a record version as the configured principal. The result is 'proposed', never accepted; Events are emitted by the store only."""
-            return store.submit(token, idempotency_key, draft)
+            return store.submit(caller(), idempotency_key, draft)
 
         def frontier_lease(target: Ref, seconds: Annotated[int, Field(ge=1, le=600)], idempotency_key: IdempotencyKey) -> dict:
             """Atomically lease one 'ready' (or expired) Action version for 1..600 seconds. Returns lease_id for later transitions."""
-            return store.lease(token, idempotency_key, target.model_dump(), seconds)
+            return store.lease(caller(), idempotency_key, target.model_dump(), seconds)
 
         def frontier_transition(target: Ref, state: TransitionState, idempotency_key: IdempotencyKey,
                                 lease_id: Annotated[str | None, Field(description=(
                                     "Required for running/submitted/blocked/failed/cancelled by the lease holder; omit for coordinator 'ready'."))] = None) -> dict:
             """Move an Action through the execution lifecycle (ready, running, submitted, blocked, cancelled, failed). Acceptance is not reachable here."""
-            return store.transition(token, idempotency_key, target.model_dump(), state, lease_id)
+            return store.transition(caller(), idempotency_key, target.model_dump(), state, lease_id)
 
         register(frontier_propose, WRITE, "write", "contributor")
         register(frontier_lease, WRITE, "write", "contributor")

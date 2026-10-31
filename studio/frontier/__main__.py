@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import sys
+from typing import NoReturn
 
 from .store import FrontierError, Store
 
@@ -79,6 +80,12 @@ def main():
     p.add_argument("--allow-write", action="store_true",
                    help="mcp / mcp-smoke: register the proposal, lease and transition tools, acting as the principal in FRONTIER_TOKEN. Default: read-only.")
     p.add_argument("--timeout", type=int, default=30, help="mcp-smoke: seconds before giving up")
+    p.add_argument("--transport", choices=["stdio", "http"], default="stdio",
+                   help="mcp: stdio (default, unchanged) or http = remote Streamable HTTP on loopback; every request then carries its own bearer, no process credential is read")
+    p.add_argument("--mcp-port", type=int, default=8972, help="mcp --transport http: loopback port (nginx proxies the exact path /mcp here)")
+    p.add_argument("--public-read", action="store_true",
+                   help="mcp --transport http: allow anonymous READ tools and resources (public data only); write tools still need the caller's own valid bearer. Default: a bearer on every request.")
+    p.add_argument("--public-host", default="frontier.morphoswarm.ai", help="mcp --transport http: the Host value nginx forwards (DNS-rebinding allow-list)")
     args = p.parse_args()
     # Credentials stay in the environment/process, never in CLI arguments or logs.
     store = Store(os.environ["FRONTIER_DSN"], args.namespace, args.schema)
@@ -87,6 +94,9 @@ def main():
     elif args.command == "serve":
         from .http import make_server
         make_server(store, args.port).serve_forever()
+    elif args.command == "mcp" and args.transport == "http":
+        from .mcp_remote import serve
+        serve(store, port=args.mcp_port, public_host=args.public_host, allow_write=args.allow_write, public_read=args.public_read)       # FRONTIER_TOKEN is deliberately never read here
     elif args.command == "mcp":
         _mcp_server(store, args.allow_write).run(transport="stdio")
     elif args.command == "mcp-smoke":
