@@ -1,0 +1,101 @@
+{
+  "schema": "frontier.capability-agency.preregistration/1",
+  "status": "FROZEN_BEFORE_MODEL_CALLS",
+  "registered_utc": "2026-10-31T22:39:47Z",
+  "experiment_id": "capability-agency-pilot-20261031-v1",
+  "scope": "A small exploratory comparison of evidence synthesis and action selection across one serial analyst, three isolated specialists, and the same three specialists exchanging pinned notes.",
+  "claim_limit": "This pilot cannot establish a scaling law or general agent superiority. Task A's source states the core facts; the pilot measures evidence synthesis and verification, not discovery. All actor roles are fresh stateless calls to the same pinned model; role prompts do not establish cognitive independence or distinct-worker effects.",
+  "public_input_packet": "results/capability-agency/public_input_packet.json",
+  "runner": "results/capability-agency/run_pilot.py",
+  "deterministic_scorer": "results/capability-agency/score_pilot.py",
+  "prompt_specification": "results/capability-agency/prompt_template.md",
+  "privacy": {
+    "model_inputs": "The public input packet only. It contains open-access paper facts and deterministic arithmetic/unit outputs.",
+    "excluded": ["private repository code", "private prompts", "credentials", "unpublished model outputs", "user or agent private context"],
+    "provider_data_class": "public"
+  },
+  "model_selection": {
+    "model": "google/gemini-3.8-flash",
+    "provider_route": "OpenRouter chat completions; exact model ID pinned",
+    "catalog_observed_utc": "2026-10-31T22:39:47Z",
+    "live_catalog_context_tokens": 1048576,
+    "live_catalog_prompt_usd_per_million": 0.75,
+    "live_catalog_completion_usd_per_million": 3.75,
+    "lowest_flex_route_prompt_usd_per_million": 0.375,
+    "lowest_flex_route_completion_usd_per_million": 1.875,
+    "catalog_source": "https://openrouter.ai/api/v1/models/google/gemini-3.8-flash/endpoints",
+    "selection_reason": "The live OpenRouter endpoint catalog shows a 1M-token context. Its lowest-price Flex route is $0.375/M input and $1.875/M output, while the standard route shown is $0.75/M and $3.75/M. The Orchestra model registry scores the corresponding Gemini Flash model 8/10 analysis and reasoning. It clears the evidence-synthesis task floor without using Anthropic. The spend ceiling uses the higher standard rates to cover routing fallback. This is metered OpenRouter usage, not an NIM call or prepaid Google API usage.",
+    "maximum_cost_usd": 0.25,
+    "cost_basis": "Conservative ceiling: 27 calls x a 9,600-token input upper bound and 400 output tokens, at the higher observed standard rates ($0.75/M and $3.75/M), is approximately $0.235. The rendered prompt is capped at 9,000 UTF-8 bytes; adding the fixed system message and chat overhead remains within the 9,600-token bound under byte-fallback tokenization. Actual per-call provider usage will be retained."
+  },
+  "conditions": {
+    "single_serial_analyst": {
+      "calls_per_replicate": 3,
+      "actor_identity": "same stateless analyst role across three sequential calls",
+      "communication": "The analyst may see its own prior pinned JSON response in calls 2 and 3."
+    },
+    "isolated_specialists": {
+      "calls_per_replicate": 3,
+      "roles": ["equation-and-numerical analysis", "source-and-measurement provenance", "mechanical coupling and next action"],
+      "actor_identity": "three fresh stateless role prompts to the same pinned model; no persistent session or distinct-model claim",
+      "communication": "Each specialist receives the full public input packet and the same tools, but no other specialist's response."
+    },
+    "collaborating_specialists": {
+      "calls_per_replicate": 3,
+      "roles": ["equation-and-numerical analysis", "source-and-measurement provenance", "mechanical coupling and next action"],
+      "actor_identity": "three fresh stateless role prompts to the same pinned model; no persistent session or distinct-model claim",
+      "communication": "Specialist 2 receives specialist 1's SHA-pinned JSON; specialist 3 receives the exact SHA-pinned JSON from specialists 1 and 2. The actor chooses the next action in each response. This sequential exchange is the communication treatment."
+    }
+  },
+  "matched_budget_and_access": {
+    "repeats_per_condition": 3,
+    "tasks_per_response": 2,
+    "model_calls_per_condition": 9,
+    "total_model_calls": 27,
+    "model_and_parameters": {"model": "google/gemini-3.8-flash", "temperature": 0, "max_tokens_per_call": 400, "seed_per_repeat": [41031, 41032, 41033]},
+    "per_call_input_ceiling_tokens": 9600,
+    "per_call_output_ceiling_tokens": 400,
+    "same_inputs_and_tools": "Every actor receives the identical full public packet and identical calculator/unit-algebra results. No source information is withheld from any condition. Peer/self artifacts are the only information difference in the communication treatment; their tokens count toward the same input ceiling. The runner rejects any rendered user prompt above 9,000 UTF-8 bytes before sending; this plus the fixed system message and bounded chat overhead is below the conservative 9,600-token request ceiling. Actual provider input tokens are recorded; any reported usage above 9,600 is a protocol deviation.",
+    "tooling": "Two precomputed, deterministic tools in the packet: calculator-v1 and unit-algebra-v1. No web or other model calls are allowed during the pilot.",
+    "execution": "Serial calls; no retries, repair calls, or extra adjudication calls. A failed or malformed response consumes its scheduled slot and scores zero. The runner checks its worst-case priced token ceiling before each call and stops if the $0.25 total ceiling would be exceeded."
+  },
+  "aggregation": {
+    "same_rule_for_all_conditions": true,
+    "numeric_fields": "median of valid replies; missing if no valid reply",
+    "boolean_and_categorical_fields": "strict majority; ties or fewer than two valid replies yield null",
+    "primary_comparison": "mean deterministic rubric score of the field-wise aggregate per replicate, then mean across three replicates",
+    "secondary": ["mean per-reply deterministic score", "turn 1-to-3 correction trajectory", "number of prior response hashes actually passed to later calls", "actual input/output tokens and provider-reported cost"],
+    "language_model_judging": false
+  },
+  "scoring": {
+    "maximum_per_task": 8,
+    "maximum_per_response": 16,
+    "task_a_checks": [
+      "published_fit_form exactly linear",
+      "exponential_log_form_directly_measured false",
+      "linear_factor_24h within 0.001 of 1.144",
+      "exponential_factor_24h within 0.001 of 1.154964",
+      "relative_difference_percent within 0.1 of 0.9588",
+      "uncertainty_bands_overlap true",
+      "synchrony_effect exactly impairs_growth",
+      "decision_code exactly keep_exponential_form_as_assumption_and_test_sensitivity"
+    ],
+    "task_b_checks": [
+      "pressure_width_product_unit exactly N/m",
+      "dimensions_are_compatible true",
+      "source_measured_bending_stiffness true",
+      "pressure_to_ray_load_calibration_in_source false",
+      "measured_EI_min_N_m2 within 1e-10 of 1.5e-9",
+      "measured_EI_max_N_m2 within 1e-10 of 4e-9",
+      "measurement_method exactly mechanical_force_deflection",
+      "decision_code exactly retain_as_assumption_until_hydrodynamic_load_is_measured_or_validated"
+    ],
+    "scoring_method": "Deterministic parser and exact-value/tolerance checks only. No text grading, model judge, or self-reported confidence."
+  },
+  "call_order_by_repeat": {
+    "repeat_1": ["single_serial_analyst", "isolated_specialists", "collaborating_specialists"],
+    "repeat_2": ["isolated_specialists", "collaborating_specialists", "single_serial_analyst"],
+    "repeat_3": ["collaborating_specialists", "single_serial_analyst", "isolated_specialists"]
+  },
+  "outcome_reporting": ["report every scheduled response, including errors and malformed JSON", "report actual provider usage; distinguish account-wide deltas from per-request usage", "preserve null results and ties", "do not claim statistical significance from three repeats", "do not infer biological discovery or general scaling from this pilot"]
+}
