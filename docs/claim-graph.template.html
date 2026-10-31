@@ -66,7 +66,7 @@ code{font-size:12px;color:var(--gold2);background:rgba(229,192,123,.08);padding:
  <span class="sep"></span>
  <span class="lab">Show only</span>
  <label class="thr" title="Minimum truth probability (P)"><span class="pill pP">P ≥</span><input id="minP" type="range" min="0" max="1" step="0.05" value="0"><b id="minPv">any</b></label>
- <label class="thr" title="Minimum testability score (T). Only Darwin's claims have T scores so far."><span class="pill pT">T ≥</span><input id="minT" type="range" min="0" max="1" step="0.05" value="0"><b id="minTv">any</b></label>
+ <label class="thr" id="minTlab" title="Minimum testability score (T)"><span class="pill pT">T ≥</span><input id="minT" type="range" min="0" max="1" step="0.05" value="0"><b id="minTv">any</b></label>
  <button id="clearthr" onclick="setThresholds(0, 0)" style="display:none">Clear</button>
  <span class="small mut" id="shown"></span>
 </div>
@@ -278,6 +278,9 @@ $('search').addEventListener('input', e => {
 });
 $('search').addEventListener('keydown', e => { if (e.key === 'Enter') { const c = CLAIMS.find(c => passes(c) && matches(c)); if (c) selectClaim(c.id); } });
 
+const T_ONLY = (() => { const all = new Set(CLAIMS.map(c => c.thinker)), has = [...new Set(CLAIMS.filter(c => c.resolvability != null).map(c => c.thinker))];
+  return has.length && has.length < all.size ? `${has.map(short).join(' and ')}'s claims` : ''; })();
+$('minTlab').title += T_ONLY ? `. Only ${T_ONLY} have T scores so far.` : '';
 function setThresholds(p, t) {
   S.minP = +p; S.minT = +t; $('minP').value = S.minP; $('minT').value = S.minT;
   $('minPv').textContent = S.minP ? S.minP.toFixed(2) : 'any'; $('minTv').textContent = S.minT ? S.minT.toFixed(2) : 'any';
@@ -285,7 +288,7 @@ function setThresholds(p, t) {
   TREE = buildTree(S.mode);
   if (S.sel && !findNode(S.sel)) { S.sel = null; $('drawer').style.display = 'none'; }
   const n = TREE.claims.length;
-  $('shown').textContent = filtering() ? `${n} of ${CLAIMS.length} claims shown${S.minT ? ' · only Darwin has T scores so far' : ''}` : '';
+  $('shown').textContent = filtering() ? `${n} of ${CLAIMS.length} claims shown${S.minT && T_ONLY ? ` · only ${T_ONLY} have T scores so far` : ''}` : '';
   const q = new URLSearchParams(location.search); S.minP ? q.set('p', S.minP) : q.delete('p'); S.minT ? q.set('t', S.minT) : q.delete('t');
   history.replaceState(null, '', `${location.pathname}${q.size ? `?${q}` : ''}${location.hash}`);
   draw();
