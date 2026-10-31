@@ -63,11 +63,11 @@ machine-readable `../../data/research/flying-fish-source-cards.json`.
 | Scale (SPEC-026 #) | What is actionable now | Connector / source | Kind | Coupling downward |
 |---|---|---|---|---|
 | **Ecological / evolution (11/evo)** | Flyingfishes nested within halfbeaks; 38 exocoetid tips on a time-calibrated tree; convergent Triassic four-winger | Fish Tree of Life `.tre` (parsed, 11,638 tips); Lovejoy 2004 (`abstract`); Xu 2013 (`listing`) | **[EXEC]** C6a places a design on the tree; ancestor **reconstructed** as a surface beloniform, elongated lower jaw — a hypothesis, **not** demonstrated reachability | organism←evo: ancestor **reconstructed, not proven reachable** |
-| **Whole-organism (8)** | Wing loading 11.7–208.9 N/m²; AR 3.0–16.9; launch 10→16–20 m/s; family stops at 50 cm | Fish 1990 (`full-text`); Park & Choi 2010 (`full-text, via fetch`); Davenport 1992/2003; FishBase (scraped, 69/116) | **[EXEC]** C1,C2,C5,C6b · **[CLAIM]** predator-escape pressure, 167 yr old, **never quantified** (do not threshold) | organ←organism: pectoral = 76–92% of wing area (**measured**) |
-| **Organ (6)** — the fin/wing | Pectoral fin ≤78–79% SL; CG-vs-CoP stability; hypocaudal lobe 63.1% launch motor; pelvic fins >20% lift | Davenport 1992 (`abstract`); Fish 1990 (`full-text`); Park & Choi 2010 | **[EXEC]** C3 · **[CLAIM]/witness** C4 (qualitative; **no measured CG offset**; living witness *Oxyporhamphus*) | tissue←organ: **[GAP/bridge]** no measured map from fin-ray geometry+material to organ-scale AR under growth |
+| **Whole-organism (8)** | Wing loading 11.7–208.9 N/m²; AR 3.0–16.9; launch 10→16–20 m/s; family stops at 50 cm | Fish 1990 (`full-text`); Park & Choi 2010 (`abstract/relayed`); Davenport 1992/2003; FishBase (scraped, 69/116) | **[EXEC]** C1,C2,C5,C6b · **[CLAIM]** predator-escape pressure, 167 yr old, **never quantified** (do not threshold) | organ←organism: pectoral = 76–92% of wing area (**measured**) |
+| **Organ (6)** — the fin/wing | Pectoral fin ≤78–79% SL; CG-vs-CoP stability; hypocaudal lobe 63.1% launch motor; pelvic fins >20% lift | Davenport 1992 (`abstract`); Fish 1990 (`full-text`); Park & Choi 2010 | **[EXEC]** C3 · **[CLAIM]/witness** C4 (qualitative; **no numeric CG retrieved in the sources read**; witness *Oxyporhamphus*; stability is **configuration-dependent** and trades against lift — Saro-Cortes 2022 robotic, Park & Choi 2010 physical — so C4's static CG-sign is narrower than it reads, yet the *Oxyporhamphus* refutation survives: CG-aft is a body-plan fact) | tissue←organ: **[GAP/bridge]** no measured map from fin-ray geometry+material to organ-scale AR under growth |
 | **Tissue (5)** — lepidotrichia, cartilage, white muscle | *Model class + bioelectric mechanism (zebrafish), not exocoetid* | Jaw-joint deposit Zenodo 7586155 (`LoadScaling.lean`, workbook to 2e-16); bioelectric-fin refs | **[CLAIM]** model class transfers; **[GAP/bridge]** exocoetid parameters do not (§4a) | cell←tissue: open even in the model organism |
 | **Cellular (4)** — fin-bud cells: Vmem + mechanics | *Model-organism candidate:* Vmem/K⁺ (`kcnh2a`,`kcnk5b`) + calcineurin sets zebrafish fin size; nothing exocoetid-specific | Daane 2018 (PMC6039437), Stewart 2021, Jiang 2024 (`full-text`); jaw-joint per-cell tables (zebrafish, ~0.5 MB) | **[CLAIM]** in zebrafish · **[GAP/bridge]** for exocoetid | molecule←cell: `kcnh2a` links the two **in zebrafish**; unbuilt for exocoetid |
-| **Molecular (1)** — genes shaping paired-fin proportion | Genome-wide signatures across **35 beloniform species**; `lat4a`×`kcnh2a` **phenocopy flying-fish fin proportion in zebrafish**; 48/17,937 genes convergent rate-shift; >300,000 loci | **Daane 2021** (PMC9172250, `full-text via r.jina.ai` + Europe PMC `abstract`); NCBI `GCA_018398805.1` (scaffold) | **[CLAIM]** candidate for fin **size/proportion**; **no flight demonstrated by the genetics**; flying-fish side is phylogenomic **association**, functional test is **in zebrafish** | — |
+| **Molecular (1)** — genes shaping paired-fin proportion | Genome-wide signatures across **35 beloniform species**; `lat4a`×`kcnh2a` **phenocopy flying-fish fin proportion in zebrafish**; 48/17,937 genes convergent rate-shift; >300,000 loci | **Daane 2021** (`full-text`, NOAA repository PDF, 47 pp + Europe PMC `abstract`); NCBI `GCA_018398805.1` (scaffold) | **[CLAIM]** candidate for fin **size/proportion**; **no flight demonstrated by the genetics**; flying-fish side is phylogenomic **association**, functional test is **in zebrafish** | — |
 
 **Reading for spec005:** the executable constraints live at the top three rows and are arithmetic.
 Below the organ, the molecule scale carries a **sourced candidate** (Daane 2021) that spec005 should
@@ -162,8 +162,9 @@ a pass/fail gate. **Lean also bites on model-class lemmas** — the jaw-joint `L
 proves each growth law is positively homogeneous of degree one, so uniform load scaling cannot
 separate two laws tuned on a linear feature: a real theorem, true for all loads.
 
-**Where Lean is decoration:** C4 (no measured CG offset exists — keep qualitative, witness
-*Oxyporhamphus*); any constraint whose inputs are unsourced (max body mass as a physical limit, the
+**Where Lean is decoration:** C4 (no numeric CG was retrieved in the sources read, and Saro-Cortes 2022 +
+Park & Choi 2010 show longitudinal stability is configuration-dependent and trades against lift — so C4
+is qualitative-with-witness, narrower than a static CG-sign; the *Oxyporhamphus* refutation still holds); any constraint whose inputs are unsourced (max body mass as a physical limit, the
 400 m glide, quantified predator-escape pressure). **Lean over an empirical assumption surfaces the
 assumption; it does not make it true.** That is its correct, modest role.
 
@@ -192,7 +193,7 @@ openings ≠ launch+glide). The **model class and method** transfer; the **param
 cross-scale `[GAP]`. **No BioModels entry couples to any flying-fish scale.**
 
 ### 4b. The molecule→form candidate (Daane 2021) — what it shows and what it does NOT
-Cited source claim (`full-text via r.jina.ai`, Europe PMC `abstract`; non-OA, license none — quote
+Cited source claim (`full-text`, NOAA repository PDF 47 pp, + Europe PMC `abstract`; non-OA — short quote
 briefly, attribute): phylogenomics across **35 species** of flying fishes and relatives found coding
 + regulatory signatures for **convergently increased paired fin size**; intersecting with zebrafish
 fin-size mutants identified **`lat4a`** (L-type amino-acid transporter) and **`kcnh2a`** (K⁺ channel);

@@ -30,9 +30,28 @@ All measured ranges are **provenance-scoped envelopes, not feasibility laws.**
   an identity — the denominators differ. These are envelopes of a sample, not limits.
 
 ### A2. Park & Choi (2010) — Aerodynamic characteristics in gliding flight
-- *J. Exp. Biol.* 213:3269–3279. `full-text, via fetch tool`. Pectoral-fin AR **9.0–10.7** (same
-  quantity as A1's pectoral range, corroborating it); pelvic fins >20% lift; ground-effect drag 14%
-  water / 9% solid. Numeric L/D only in figures (`could-not-access`).
+- *J. Exp. Biol.* 213:3269–3279. **`abstract/relayed`** (provenance corrected). Measurements on
+  **physical MODELS** of *Cypselurus hiraii* (not live fish), three configurations: pelvic fins raise
+  lift and L/D via a jet-like flow between pectoral and pelvic fins; with both fins spread longitudinal
+  static stability is **enhanced**; L/D max near 0° AoA while lift peaks 30–35° (where fish leave the
+  water); glide polar ~ hawk/petrel/wood duck; induced drag from wing-tip vortices dominant; ground
+  effect reduces drag. Pectoral-fin AR **9.0–10.7** (same quantity as A1's pectoral range).
+- **Provenance (corrected, HOST claude-15):** a 403 is a fact about the client, not the document; "no
+  OA copy indexed by OpenAlex/Europe PMC" is **not** evidence none exists (no author-page/IR search
+  done). **No coefficients extracted; no calibrated-fish claim.** **Qualifies C4** (stability enhanced
+  only with both fins deployed).
+
+### A5. Saro-Cortes et al. (2022) — Robotic flying-fish model
+- *Integr. Comp. Biol.* 62(5):1202, `https://academic.oup.com/icb/article/62/5/1202/6623665`.
+  **`full-text via fetch tool`** (article URL reachable; pdf/advance paths 403 — path, not paywall).
+- **Supports (cited source claim):** a **robotic** model organism (physical, Re=30,000, 9 m/s), not a
+  live fish. Efficiency max with pelvic fin **behind** pectoral and at positive pitch; "never stable
+  for θ > 0°"; stability only at posterior pelvic positions (H4/H5) and **negative** pitch; explicit
+  **"trade-off between stability and lift generation"**; optimal config depends on locomotion stage.
+  C_L(H5) ≈ 0.4 (0.33–0.52); no L/D values.
+- **Qualifies C4:** longitudinal stability is **configuration-dependent** (pelvic position, pitch,
+  deployment) and trades against lift — narrower than a static CG-sign. **The *Oxyporhamphus*
+  refutation survives** (CG-aft is a body-plan fact, not a deployment state). Robotic, not a fish.
 
 ### A3. Davenport (1992) — Wing-loading, stability, morphometrics
 - *J. Mar. Biol. Assoc. UK* 72:25–39. `abstract, via fetch tool`. **Reports** (abstract-grade): a
@@ -64,8 +83,8 @@ All measured ranges are **provenance-scoped envelopes, not feasibility laws.**
 
 ### C1. Daane et al. (2021) — Modulation of bioelectric cues in the evolution of flying fishes
 - *Curr. Biol.* 31(24):5052–5061, DOI 10.1016/j.cub.2021.08.054, **PMC9172250**.
-  `full-text via r.jina.ai` (127 KB) + `abstract` (Europe PMC core). Non-OA; Europe PMC license
-  "None".
+  **`full-text`** — NOAA repository PDF (47 pp, `repository.library.noaa.gov/view/noaa/62581/noaa_62581_DS1.pdf`,
+  pdftotext) + `abstract` (Europe PMC core). Non-OA (publisher); the NOAA copy is the readable full text.
 - **Supports (cited source claim):** phylogenomics across **35 species**; >300,000 loci; 48/17,937
   genes with convergent evolutionary-rate shifts; **`lat4a`** (L-type amino-acid transporter) ×
   **`kcnh2a`** (K⁺ channel) interaction **phenocopies flying-fish fin proportion in zebrafish**;
@@ -74,8 +93,11 @@ All measured ranges are **provenance-scoped envelopes, not feasibility laws.**
 - **Hard limits of the claim:** this is fin **PROPORTION/size**, **NOT flight** — no flight is
   demonstrated by the genetics. The functional test is in **zebrafish**; the flying-fish side is
   **association**. Applying the phenocopy to a halfbeak/exocoetid is an **UNESTABLISHED
-  cross-organism transfer**. Exact Fig 4 ratio numbers **not extracted** — `daanelab.org` DNS-
-  unresolvable here, PMC/Europe PMC XML blocked for non-OA (access failure, open problem FF-Q07).
+  cross-organism transfer**. Fig 4 legend + double-mutant result now read verbatim (NOAA full text): the double mutant
+  `lat4a nr21/+;kcnh2a lof/+` shows wild-type medial fins with overgrown paired fins, "remarkably
+  similar to that of flying fishes." The "flying halfbeaks" *Euleptorhamphus* and *Oxyporhamphus* show
+  **intermediate** pectoral allometry. **Exact Fig 4 B/C plotted ratios remain in the figure panels /
+  Data S1A**, not in the body text (reduced blocker, open problem FF-Q07).
 
 ### C2. Bioelectric fin-size mechanism (model-organism basis)
 - Daane et al. 2018 (PMC6039437, `full-text`, CC BY): bioelectric/calcineurin sets zebrafish fin
@@ -155,3 +177,10 @@ locus" — **false**, Daane 2021 (C1); (2) cavefish as a "closed molecule→orga
 **independent rerun of a sequence-level fact** (C3); (3) "no public deposit" as universal absence —
 replaced by the **bounded, dated** search (§F); (4) "AR 3.0–16.9" as whole-wing — it is **individual
 pectoral-fin AR** (A1). Envelopes are not feasibility laws; organism-context transfers are labelled.
+
+**Round 2 (2026-10-31, HOST claude-15 sources):** (5) Daane 2021 upgraded to **full-text** via the
+NOAA repository PDF (C1); (6) added **Saro-Cortes 2022** robotic model (A5) and corrected **Park &
+Choi 2010** provenance (A2) — a 403 is about the client, not the document; (7) **C4 qualified**:
+longitudinal stability is configuration-dependent and trades against lift, narrower than a static
+CG-sign — the *Oxyporhamphus* refutation still holds. No coefficients extracted; no calibrated-fish
+claim. The CG wording is bounded ("no numeric CG retrieved in the sources read").
