@@ -1,0 +1,50 @@
+{
+  "claim_id": "darwin1859-ch12-12",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-12",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "For endemic vascular plants of oceanic islands, the nearest relatives outside the island group on an independent synthetic phylogeny are, in a large majority of cases, native to the nearest continent or to the island group's own neighbouring islands.",
+  "pass_criterion": "Pre-registered: endemics of island group A = WCVP accepted non-hybrid species whose non-doubtful native records (introduced = 0) all lie in A. For each genus containing such an endemic, all WCVP accepted species are matched exactly to Open Tree (TNRS, context 'Land plants') and the induced subtree of the synthetic tree is fetched. For a focal endemic, the outside relatives O are the non-A tips of the smallest clade containing the focal tip and >= 1 non-A tip. The focal endemic is 'near-related' if more than half of O have a native record in A's pre-registered near source S_A (the TDWG level-1 continent nearest to A, plus A's own TDWG level-2 region, i.e. other near islands). s_A = fraction near-related. Island groups with < 10 focal endemics are dropped. SUPPORTS ('almost universal rule') if pooled s >= 0.75 AND s_A >= 0.6 in at least 75% of remaining island groups.",
+  "fail_criterion": "Pre-registered: REFUTES if pooled s < 0.5 or if s_A < 0.5 in a majority of remaining island groups. Any other outcome is MIXED. Fewer than 5 island groups remaining: inconclusive (underpowered). WCVP or Open Tree unreachable: inconclusive (data-unavailable). As a descriptive control, the fraction of all non-A congeners native to S_A is reported for each island group.",
+  "planned_datasets": [
+    "wcvp-kew-checklist",
+    "opentree-synthetic-tree-api"
+  ],
+  "interpretation": "'Related to those of the nearest continent, or of other near islands' is read as: the closest non-island relatives (sister clade on the genus tree) are native to the nearest continent, with near islands meaning the TDWG level-2 region the island group belongs to. Nearest continents (TDWG level 1) are fixed in advance by great-circle proximity: Galápagos 8 (Southern America), Juan Fernández 8, Cape Verde 2 (Africa), Canaries 2, Madeira 2, Azores 1 (Europe), Hawaii 7 (Northern America), Bermuda 7, Mascarenes (MAU+REU+ROD) 2, Seychelles 2, Tristan da Cunha 2, Fiji 5 (Australasia). Darwin's own contrast with climatically similar distant regions (assessors' suggestion) is not modelled; the test asks only whether the nearest continent dominates. Plants only; genus-level trees, so endemics of island-endemic genera are not scored.",
+  "test_contract": {
+    "expected_observation": "In a large majority of island endemics, the nearest relatives outside the island group are native to the nearest continent or the island group's own region.",
+    "disconfirming_observation": "Nearest outside relatives of island endemics are mostly native to more distant regions.",
+    "admissible_datasets": "An expert checklist coding native ranges on a fixed regional scheme and a phylogeny estimated independently of Darwin's argument; open access; island groups with at least 10 scorable endemics.",
+    "inference_method": "Per endemic, majority rule on native regions of the outside relatives in the smallest clade on the Open Tree genus subtree; share near-related per island group compared with fixed thresholds (pooled >= 0.75 and >= 0.6 in 75% of groups for support; pooled < 0.5 or majority of groups < 0.5 for refutation)."
+  },
+  "preregistration": {
+    "wcvp_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+    "opentree_tnrs": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+    "opentree_induced_subtree": "https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree",
+    "tnrs_context": "Land plants",
+    "island_groups": {
+      "GAL": {"l3": ["GAL"], "near_l1": [8]},
+      "JNF": {"l3": ["JNF"], "near_l1": [8]},
+      "CVI": {"l3": ["CVI"], "near_l1": [2]},
+      "CNY": {"l3": ["CNY"], "near_l1": [2]},
+      "MDR": {"l3": ["MDR"], "near_l1": [2]},
+      "AZO": {"l3": ["AZO"], "near_l1": [1]},
+      "HAW": {"l3": ["HAW"], "near_l1": [7]},
+      "BER": {"l3": ["BER"], "near_l1": [7]},
+      "MASCARENES": {"l3": ["MAU", "REU", "ROD"], "near_l1": [2]},
+      "SEY": {"l3": ["SEY"], "near_l1": [2]},
+      "TDC": {"l3": ["TDC"], "near_l1": [2]},
+      "FIJ": {"l3": ["FIJ"], "near_l1": [5]}
+    },
+    "near_also_own_l2": true,
+    "max_genus_species": 3000,
+    "min_focal_per_group": 10,
+    "min_groups": 5
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
