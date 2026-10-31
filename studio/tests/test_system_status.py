@@ -322,42 +322,109 @@ def test_manifest_cli_has_only_worker_reports_and_measures_nothing(checkout):
     assert m["build"]["matches_checkout"] is None
 
 
-# ------------------------------------------------------------------ release identity from an archive (no .git), namespace scope, author-report label
-def make_release_layout(tmp_path, sha, marker_sha=None):
+# ------------------------------------------------------------------ release identity from an archive (no .git): a directory name is a CLAIM
+def make_release_layout(tmp_path, sha, marker_sha=None, tree_claim="auto"):
     rel = tmp_path / "svc" / "releases" / sha
-    rel.mkdir(parents=True)
+    (rel / "frontier").mkdir(parents=True)
+    (rel / "frontier" / "web.py").write_text("print('x')\n")
+    (rel / "run.sh").write_text("#!/bin/sh\n")
+    (rel / "run.sh").chmod(0o755)
     (rel / ".release-complete").write_text(json.dumps({"sha": marker_sha or sha}))
-    (rel / "build-info.json").write_text(json.dumps({"release_sha": sha, "built_at": "2026-10-31T19:00:00Z", "tree_sha": "c" * 40, "archive_sha256": "d" * 64,
-                                                    "checks_all_passed": True, "checks_receipt_sha256": "e" * 64, "checks": [{"name": "s", "command": "c", "exit": 0, "at": "t"}]}))
+    tree = ss.tree_hash(rel)[0] if tree_claim == "auto" else tree_claim
+    info = {"release_sha": sha, "built_at": "2026-10-31T19:00:00Z", "archive_sha256": "d" * 64, "checks_all_passed": True, "checks_receipt_sha256": "e" * 64,
+            "checks": [{"name": "s", "command": "c", "exit": 0, "at": "t"}]}
+    if tree:
+        info["tree_sha"] = tree
+    (rel / "build-info.json").write_text(json.dumps(info))
     app = tmp_path / "svc" / "app"
     app.symlink_to(rel)
     return app, rel
 
 
-def test_release_sha_comes_from_the_release_directory_when_there_is_no_git(store, tmp_path):
+def test_without_git_the_directory_name_is_only_a_claim_and_its_contents_are_checked_against_build_info(store, tmp_path):
     sha = "12" * 20
     app, rel = make_release_layout(tmp_path, sha)
-    snap = ss.SystemStatus(store, app, runner=Recorder(sha="not-a-sha")).snapshot()          # git cannot answer; the running directory can
+    snap = ss.SystemStatus(store, app, runner=Recorder(sha="not-a-sha")).snapshot()                  # git cannot answer
     r = snap["release"]
-    assert r["mode"] == "measured" and r["checkout_sha"] is None and r["dir_sha"] == sha and r["sha"] == sha and r["sha_source"] == "release directory name"
-    assert r["dir_name_matches_release_marker"] is True and snap["deployed_sha"] == sha
+    assert r["mode"] == "measured" and r["sha"] is None and r["checkout_sha"] is None and r["sha_source"] is None and "not measured" in r["note"]
+    assert snap["deployed_sha"] is None                                                               # never promoted from a directory name
+    assert snap["claimed_sha"] == sha
+    c = r["directory_claim"]
+    assert c["label"].startswith("claim:") and "not proof" in c["label"] and c["sha"] == sha and c["marker_matches_name"] is True
+    k = c["contents"]
+    assert k["checked"] is True and k["matches_recorded_tree"] is True and k["tree_sha_computed"] == k["tree_sha_recorded_in_build_info"] and k["files_hashed"] == 2
+    assert k["ignored_not_hashed"] == ["build-info.json", ".release-complete"] or set(k["ignored_not_hashed"]) == {"build-info.json", ".release-complete"}
+    assert "release tool's claim" in k["meaning"] and "verify --repo" in k["meaning"]
     b = snap["build"]
-    assert b["mode"] == "worker_report" and b["label"].startswith("author report") and b["release_sha"] == sha and b["matches_checkout"] is True and b["compared_with"] == "release directory name"
-    assert b["tree_sha"] == "c" * 40 and b["archive_sha256"] == "d" * 64 and b["checks_all_passed"] is True and b["checks_receipt_sha256"] == "e" * 64
+    assert b["mode"] == "worker_report" and b["label"].startswith("author report") and b["release_sha"] == sha
+    assert b["matches_checkout"] is None and b["compared_with"] is None and b["matches_directory_claim"] is True        # nothing was measured through git
+    assert b["tree_sha"] == "c" * 40 or len(b["tree_sha"]) == 40
 
 
-def test_git_is_preferred_when_available_and_a_wrong_marker_or_name_is_flagged(store, tmp_path):
+def test_changed_files_are_flagged_against_the_recorded_tree_and_the_check_is_cached(store, tmp_path):
+    sha = "34" * 20
+    app, rel = make_release_layout(tmp_path, sha)
+    s = ss.SystemStatus(store, app, runner=Recorder(sha="x"), ttl=0)
+    assert s.snapshot()["release"]["directory_claim"]["contents"]["matches_recorded_tree"] is True
+    (rel / "frontier" / "web.py").write_text("print('tampered')\n")
+    assert s.snapshot()["release"]["directory_claim"]["contents"]["matches_recorded_tree"] is True      # cached for 600 s: documented, not a live watch
+    fresh = ss.SystemStatus(store, app, runner=Recorder(sha="x"), ttl=0)
+    c = fresh.snapshot()["release"]["directory_claim"]["contents"]
+    assert c["matches_recorded_tree"] is False and c["tree_sha_computed"] != c["tree_sha_recorded_in_build_info"]
+    app2, _ = make_release_layout(tmp_path / "b", "56" * 20, tree_claim=None)                          # hand-built: build-info records no tree
+    c2 = ss.release_identity(app2, None)["directory_claim"]["contents"]
+    assert c2["checked"] is True and c2["matches_recorded_tree"] is None and c2["tree_sha_recorded_in_build_info"] is None
+
+
+def test_git_is_the_only_measured_release_sha_and_a_wrong_marker_is_flagged(store, tmp_path):
     sha = "12" * 20
     app, rel = make_release_layout(tmp_path, sha)
     snap = ss.SystemStatus(store, app, runner=Recorder(sha="9a" * 20)).snapshot()
-    assert snap["release"]["sha"] == "9a" * 20 and snap["release"]["sha_source"] == "git" and snap["release"]["dir_sha"] == sha and snap["build"]["matches_checkout"] is False
-    other = tmp_path / "second"
-    app2, _ = make_release_layout(other, sha, marker_sha="ff" * 20)
-    assert ss.release_identity(app2, None)["dir_name_matches_release_marker"] is False
+    assert snap["release"]["sha"] == "9a" * 20 and snap["release"]["sha_source"] == "git" and snap["deployed_sha"] == "9a" * 20 and snap["claimed_sha"] == sha
+    assert snap["build"]["matches_checkout"] is False and snap["build"]["compared_with"] == "git" and snap["build"]["matches_directory_claim"] is True
+    app2, _ = make_release_layout(tmp_path / "second", sha, marker_sha="ff" * 20)
+    assert ss.release_identity(app2, None)["directory_claim"]["marker_matches_name"] is False
     plain = tmp_path / "plain"
     plain.mkdir()
     r = ss.release_identity(plain, None)
-    assert r["sha"] is None and r["dir_sha"] is None and r["note"] and ss.release_identity(tmp_path / "notreleases" / ("ab" * 20), None)["dir_sha"] is None
+    assert r["sha"] is None and r["directory_claim"] is None and r["note"]
+    assert ss.release_identity(tmp_path / "notreleases" / ("ab" * 20), None)["directory_claim"] is None       # the parent must be called releases
+
+
+def test_the_tree_hash_equals_gits_and_the_release_tools_and_ignores_only_what_it_reports(tmp_path):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("rel_tool", ROOT / "deploy" / "release.py")
+    tool = importlib.util.module_from_spec(spec)
+    sys.modules["rel_tool"] = tool
+    spec.loader.exec_module(tool)
+    repo = tmp_path / "r"
+    (repo / "a" / "b").mkdir(parents=True)
+    (repo / "a" / "b" / "caf\u00e9.txt").write_text("unicode name\n")
+    (repo / "a" / "x.sh").write_text("#!/bin/sh\n")
+    (repo / "a" / "x.sh").chmod(0o755)
+    (repo / "top.txt").write_text("t\n")
+    (repo / "link").symlink_to("top.txt")
+    env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t", "PATH": os.environ["PATH"], "HOME": "/nonexistent"}
+    g = lambda *a: subprocess.run(["git", "-C", str(repo), *a], capture_output=True, text=True, check=True, env=env).stdout.strip()
+    g("init", "-q")
+    g("add", "-A")
+    g("commit", "-q", "-m", "m")
+    want = g("rev-parse", "HEAD^{tree}")
+    work = tmp_path / "w"
+    subprocess.run(f"git -C {repo} archive HEAD | tar -x -C {work}", shell=True, check=False, env=env) if work.mkdir() is None else None
+    got, ignored, files = ss.tree_hash(work)
+    assert got == want and files == 3 and ignored == [] and tool.git_tree_sha(work) == want
+    (work / "build-info.json").write_text("{}")
+    (work / "a" / "__pycache__").mkdir()
+    (work / "a" / "__pycache__" / "x.pyc").write_bytes(b"\0")
+    (work / "empty").mkdir()
+    got2, ignored2, _ = ss.tree_hash(work)
+    assert got2 == want and ignored2 == ["a/__pycache__/", "build-info.json"]                       # extras are ignored but never silently
+    (work / "top.txt").write_text("changed\n")
+    assert ss.tree_hash(work)[0] != want
+    with pytest.raises(ss._OverBudget):
+        ss.tree_hash(work, max_files=1)
+    assert ss.release_identity.__doc__ and "CLAIM" in ss.release_identity.__doc__
 
 
 def test_the_build_report_is_labelled_as_an_author_report_in_every_state(checkout):

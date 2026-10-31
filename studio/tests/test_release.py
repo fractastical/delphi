@@ -407,38 +407,128 @@ def test_the_module_is_standard_library_only():
     assert mods <= set(sys.stdlib_module_names), mods - set(sys.stdlib_module_names)
 
 
-def test_adopt_makes_a_hand_built_release_rollback_able_without_touching_its_content(rel, tmp_path, repo):
-    r, ops, out = rel
-    sha = "ab" * 20
+def handbuild(r, repo, sha, with_pycache=True):
+    """A release directory built outside release.py: git archive extracted by hand, plus a hand-written build-info.json (and runtime bytecode)."""
     d = r.releases / sha
     d.mkdir(parents=True)
-    (d / "flag.txt").write_text("ok")
+    subprocess.run(f"git -C {repo} archive {sha} | tar -x -C {d}", shell=True, check=True, env=GIT_ENV)
     (d / "build-info.json").write_text(json.dumps({"release_sha": sha, "built_at": "2026-10-31T19:24:06+00:00"}))
-    (r.root / "app").symlink_to(d)                                                           # as root created it: an absolute symlink to a hand-built release
-    assert not r.is_prepared(sha) and r.status()["app"] == sha and r.status()["releases"][0]["complete"] is False
-    before = {p.name: p.read_bytes() for p in d.iterdir()}
-    assert r.adopt(sha)["result"] == "plan_only" and not (d / ".release-complete").exists()
-    assert r.adopt(sha, apply=True)["result"] == "adopted" and r.is_prepared(sha)
-    assert {k: v for k, v in {p.name: p.read_bytes() for p in d.iterdir()}.items() if k != ".release-complete"} == before
-    marker = json.loads((d / ".release-complete").read_text())
-    assert marker["adopted"] is True and marker["sha"] == sha and "not archived or sealed" in marker["note"]
-    assert r.adopt(sha, apply=True)["result"] == "already_complete"
-    # the next release can now be deployed from it and rolled back to it
-    nxt = prepared(rel, tmp_path, repo, "ok")
+    if with_pycache:
+        (d / "frontier" / "__pycache__").mkdir()
+        (d / "frontier" / "__pycache__" / "web.cpython-313.pyc").write_bytes(b"\0\1")
+    return d
+
+
+def test_git_tree_sha_equals_gits_for_modes_symlinks_and_unicode(tmp_path, repo):
+    (repo / "bin").mkdir()
+    (repo / "bin" / "run.sh").write_text("#!/bin/sh\n")
+    (repo / "bin" / "run.sh").chmod(0o755)
+    (repo / "caf\u00e9.txt").write_text("x\n")
+    (repo / "ln").symlink_to("flag.txt")
+    sha = commit(repo)
+    work = tmp_path / "w"
+    work.mkdir()
+    subprocess.run(f"git -C {repo} archive {sha} | tar -x -C {work}", shell=True, check=True, env=GIT_ENV)
+    assert R.git_tree_sha(work) == git(repo, "rev-parse", sha + "^{tree}")
+    (work / "flag.txt").write_text("other")
+    assert R.git_tree_sha(work) != git(repo, "rev-parse", sha + "^{tree}")
+
+
+def test_verify_shows_whether_a_directory_holds_exactly_the_committed_files(rel, tmp_path, repo):
+    r, ops, out = rel
+    sha = prepared(rel, tmp_path, repo, "ok", {"keep.txt": "k"})
+    v = r.verify(sha, str(repo))
+    assert v["matches_git"] is True and v["matches_claimed_tree"] is True and v["dir_tree_sha"] == v["git_tree_sha"] == git(repo, "rev-parse", sha + "^{tree}")
+    assert set(v["ignored_not_hashed"]) == {"build-info.json", ".release-complete"}
+    assert r.verify(sha)["matches_git"] is None and "not equality with the git commit" in r.verify(sha)["note"]       # without --repo it says what it did NOT check
+    d = r.releases / sha
+    d.chmod(0o755), (d / "keep.txt").chmod(0o644)
+    (d / "keep.txt").write_text("tampered")
+    v2 = r.verify(sha, str(repo))
+    assert v2["matches_git"] is False and v2["matches_claimed_tree"] is False and v2["differences"] == ["differs: keep.txt"]
+
+
+def test_adopt_requires_the_files_to_be_byte_identical_to_the_commit(rel, tmp_path, repo):
+    r, ops, out = rel
+    sha = commit(repo, "ok", {"keep.txt": "k"})
+    d = handbuild(r, repo, sha)                                                              # identical except build-info.json and __pycache__: the allowed extras
+    (r.root / "app").symlink_to(d)
+    assert not r.is_prepared(sha) and r.status()["releases"][0]["complete"] is False
+    with pytest.raises(R.Refused, match="needs --repo"):
+        r.adopt(sha, apply=True)                                                               # a 40-hex name is never accepted on its own
+    before = {p.relative_to(d).as_posix(): p.read_bytes() for p in d.rglob("*") if p.is_file()}
+    assert r.adopt(sha, repo=str(repo))["result"] == "plan_only" and not (d / ".release-complete").exists()
+    assert r.adopt(sha, apply=True, repo=str(repo))["result"] == "adopted" and r.is_prepared(sha)
+    after = {p.relative_to(d).as_posix(): p.read_bytes() for p in d.rglob("*") if p.is_file() and p.name != ".release-complete"}
+    assert after == before
+    m = json.loads((d / ".release-complete").read_text())
+    assert m["adopted"] is True and m["verified_against_git"] is True and m["tree_sha"] == git(repo, "rev-parse", sha + "^{tree}") and "frontier/__pycache__/" in m["ignored_not_hashed"]
+    assert r.adopt(sha, apply=True, repo=str(repo))["result"] == "already_complete"
+    nxt = prepared(rel, tmp_path, repo, "ok", {"nxt.txt": "n"})
     assert r.deploy(nxt, apply=True)["result"] == "ok" and os.readlink(r.previous) == str(d)
     assert r.rollback(apply=True)["result"] == "ok" and os.readlink(r.app) == str(d)
 
 
-def test_adopt_refuses_when_it_cannot_be_sure(rel):
+@pytest.mark.parametrize("damage,expect", [("modify", "differs: keep.txt"), ("extra", "extra: surprise.py"), ("missing", "missing: keep.txt"), ("mode", "differs: run.sh")])
+def test_adopt_refuses_a_directory_that_is_not_the_commit_and_says_what_differs(rel, tmp_path, repo, damage, expect):
     r, *_ = rel
-    sha = "cd" * 20
+    sha = commit(repo, "ok", {"keep.txt": "k", "run.sh": "#!/bin/sh\n"})
+    d = handbuild(r, repo, sha)
+    if damage == "modify":
+        (d / "keep.txt").write_text("edited after the build")
+    elif damage == "extra":
+        (d / "surprise.py").write_text("print(1)")
+    elif damage == "missing":
+        (d / "keep.txt").unlink()
+    else:
+        (d / "run.sh").chmod(0o755)                                                          # executable bit flips the git mode; the bytes alone would not show it
+    with pytest.raises(R.Refused, match="not byte-identical") as e:
+        r.adopt(sha, apply=True, repo=str(repo))
+    if damage != "mode":
+        assert expect in str(e.value)
+    assert not (d / ".release-complete").exists()
+
+
+def test_adopt_refuses_when_it_cannot_be_sure(rel, repo):
+    r, *_ = rel
+    sha = commit(repo)
     with pytest.raises(R.Refused, match="does not exist"):
-        r.adopt(sha, apply=True)
+        r.adopt(sha, apply=True, repo=str(repo))
     d = r.releases / sha
     d.mkdir(parents=True)
     with pytest.raises(R.Refused, match="missing or unreadable"):
-        r.adopt(sha, apply=True)
+        r.adopt(sha, apply=True, repo=str(repo))
     (d / "build-info.json").write_text(json.dumps({"release_sha": "ee" * 20}))
     with pytest.raises(R.Refused, match="does not name this SHA"):
-        r.adopt(sha, apply=True)
+        r.adopt(sha, apply=True, repo=str(repo))
     assert not (d / ".release-complete").exists()
+
+
+def test_prepare_refuses_an_archive_whose_files_do_not_hash_to_the_commits_tree(rel, tmp_path, repo):
+    import io
+    import tarfile
+    r, ops, out = rel
+    sha = commit(repo, "ok", {"keep.txt": "k"})
+
+    class Tampered(FakeOps):
+        def archive(self, repo_path, s):
+            real = subprocess.run(["git", "-C", repo_path, "archive", "--format=tar", s], capture_output=True, check=True, env=GIT_ENV).stdout
+            buf = io.BytesIO()
+            with tarfile.open(fileobj=io.BytesIO(real)) as src, tarfile.open(fileobj=buf, mode="w") as dst:
+                for m in src:
+                    f = src.extractfile(m) if m.isfile() else None
+                    if m.name == "keep.txt":
+                        data = b"tampered in transit"
+                        m.size = len(data)
+                        f = io.BytesIO(data)
+                    dst.addfile(m, f)
+            buf.seek(0)
+
+            class P:
+                def wait(self):
+                    return 0
+            return P(), buf
+    r2 = R.Release(r.root, ops=Tampered(r.root), out=out.append)
+    with pytest.raises(R.Refused, match="do not hash to the commit's git tree"):
+        r2.prepare(str(repo), sha, receipt(tmp_path, sha))
+    assert not (r.releases / sha).exists() and not list(r.releases.glob(".partial-*"))

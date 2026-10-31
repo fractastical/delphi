@@ -114,7 +114,8 @@ python3 $R prepare --repo /path/to/checkout --sha <40-hex> --checks receipt.json
 python3 $R deploy   --sha <40-hex>                                      # plan only
 python3 $R deploy   --sha <40-hex> --apply [--health-timeout 30]        # swap, restart, health, automatic fall-back
 python3 $R rollback [--to <sha>] --apply                                # previous release (or a named prepared one), same safeguards
-python3 $R adopt    --sha <sha> [--apply]                               # one-time: let a hand-built release (e.g. the first live one) be rolled back TO
+python3 $R verify   --sha <sha> --repo /path/to/checkout                # read-only: recompute the git tree hash of releases/<sha>; equal to git's? (ignores and REPORTS build-info.json, .release-complete, __pycache__)
+python3 $R adopt    --sha <sha> --repo /path/to/checkout [--apply]      # one-time: let a hand-built release be rolled back TO, ONLY if byte-identical to the commit; --repo is required
 python3 $R deploy   --sha <sha> --apply --nginx-install                 # ONLY with this flag does it touch nginx (sudo, fixed steps, reverted if `nginx -t` fails)
 ```
 
@@ -135,3 +136,8 @@ python3 $R deploy   --sha <sha> --apply --nginx-install                 # ONLY w
 with `release.dir_name_matches_release_marker` checking that name against `.release-complete`; `deployed_sha` repeats it as a top-level string. `build.*` is the author report (label shown) and
 `build.matches_checkout` compares it with that measured SHA (`build.compared_with` says which). `store.counts_scope` states that counts cover every public namespace in the database, with `versions_by_namespace`;
 `store.namespace` is only this node's own.
+
+**Byte-level integrity (what a directory name is and is not).** A `releases/<40-hex>` directory name is a claim. `prepare` recomputes the git tree hash of what it extracted and refuses unless it equals `git rev-parse <sha>^{tree}`;
+`verify` does the same for any release and reports exactly what it ignored; `adopt` accepts a hand-built directory only if it is byte-identical to the commit (mode bits included) apart from `build-info.json` and `__pycache__`, and says which
+paths differ otherwise. On the live node, `verify --sha 9e6045ed... --repo <checkout>` (read-only, run 2026-10-31) found the directory identical to the commit: tree `876c2a4f...`, ignoring `build-info.json` and `frontier/__pycache__/`. `/api/system` reports the directory name only as
+`release.directory_claim` (never as `deployed_sha`, which is `git rev-parse HEAD` or null) and shows whether the files still hash to the tree recorded in `build-info.json` (cached 600 s; it is a tamper-evidence check, not a live watch).

@@ -125,24 +125,100 @@ def _proc(path: str, limit=65536) -> str | None:
         return None
 
 
-def release_identity(root: Path, git_sha: str | None) -> dict:
-    """Which release is running. `git rev-parse HEAD` only works in a git checkout; a `git archive` release has no .git, so the release SHA is also read from the
-    directory the code runs from (releases/<40-hex>, set by deploy/release.py through the `app` symlink). That name is checked against the release marker that
-    deploy/release.py writes, but it is still only a name: nothing here re-hashes the files."""
+import stat as _stat
+
+
+class _OverBudget(Exception):
+    pass
+
+
+def tree_hash(d: Path, ignore_top=frozenset({"build-info.json", ".release-complete"}), ignore_dirs=frozenset({"__pycache__"}), max_files=20000, max_bytes=300_000_000,
+              seconds=3.0) -> tuple[str | None, list, int]:
+    """Git tree object id of the files under `d`, computed from the bytes on disk with git's rules (same algorithm as deploy/release.py `git_tree_sha`; a test keeps the two
+    equal). Returns (tree_sha, ignored_names, files_hashed). Bounded; raises _OverBudget."""
+    deadline, state, ignored = time.monotonic() + seconds, {"files": 0, "bytes": 0}, []
+
+    def rec(p: Path, rel: str):
+        ents = []
+        for c in sorted(os.scandir(p), key=lambda e: e.name):
+            r, st = f"{rel}{c.name}", c.stat(follow_symlinks=False)
+            if (not rel and c.name in ignore_top) or (_stat.S_ISDIR(st.st_mode) and c.name in ignore_dirs):
+                ignored.append(r + ("/" if _stat.S_ISDIR(st.st_mode) else ""))
+                continue
+            if _stat.S_ISLNK(st.st_mode):
+                body = os.readlink(c.path).encode()
+                mode, h = b"120000", hashlib.sha1(b"blob %d\0" % len(body) + body).digest()
+            elif _stat.S_ISDIR(st.st_mode):
+                h = rec(Path(c.path), r + "/")
+                if h is None:
+                    continue
+                mode = b"40000"
+            elif _stat.S_ISREG(st.st_mode):
+                state["files"] += 1
+                state["bytes"] += st.st_size
+                if state["files"] > max_files or state["bytes"] > max_bytes or time.monotonic() > deadline:
+                    raise _OverBudget
+                hh = hashlib.sha1(b"blob %d\0" % st.st_size)
+                with Path(c.path).open("rb") as f:
+                    for chunk in iter(lambda: f.read(1 << 20), b""):
+                        hh.update(chunk)
+                mode, h = (b"100755" if st.st_mode & 0o111 else b"100644"), hh.digest()
+            else:
+                raise _OverBudget
+            name = c.name.encode()
+            ents.append((name + (b"/" if mode == b"40000" else b""), mode, name, h))
+        if not ents:
+            return None
+        body = b"".join(m + b" " + n + b"\0" + h for _, m, n, h in sorted(ents))
+        return hashlib.sha1(b"tree %d\0" % len(body) + body).digest()
+    out = rec(Path(d), "")
+    return (out.hex() if out else None), sorted(set(ignored)), state["files"]
+
+
+DIRECTORY_CLAIM_LABEL = ("claim: the name of the releases/<sha> directory the code runs from. A directory name is not proof that its files equal that git commit; "
+                         "`contents` checks the files against the tree hash that the release tool recorded in build-info.json, and only `release.py verify --repo` compares with git itself.")
+
+
+def release_identity(root: Path, git_sha: str | None, tree_cache: dict | None = None) -> dict:
+    """`sha` is MEASURED only through git (`git rev-parse HEAD` in a git checkout). A `git archive` release has no .git, so there the running directory's name is reported
+    separately as a CLAIM (`directory_claim`), never promoted to `sha`/`deployed_sha`."""
     real = Path(root).resolve()
     dir_sha = real.name if SHA40.fullmatch(real.name) and real.parent.name == "releases" else None
-    marker = None
+    claim = None
     if dir_sha:
+        marker = None
         try:
             mf = real / ".release-complete"                                   # a dotfile on purpose: written by deploy/release.py, outside read_small's allow-list
             marker = json.loads(mf.read_bytes()[:4096]).get("sha") == dir_sha if mf.is_file() and mf.stat().st_size <= 4096 else None
         except (OSError, ValueError, AttributeError):
             marker = None
-    sha = git_sha or dir_sha
-    return {"mode": "measured", "sha": sha, "sha_source": "git" if git_sha else ("release directory name" if dir_sha else None),
-            "checkout_sha": git_sha, "dir_sha": dir_sha, "dir_name_matches_release_marker": marker,
-            "source": "git rev-parse HEAD (fixed command) when the deployed tree is a git checkout; otherwise the name of the releases/<sha> directory the code runs from",
-            "note": None if sha else "not a git checkout and not a releases/<sha> directory, or the git command exceeded its budget"}
+        claimed_tree = None
+        try:
+            raw, _ = read_small(real, "build-info.json")
+            t = json.loads(raw).get("tree_sha") if raw else None
+            claimed_tree = t if isinstance(t, str) and SHA40.fullmatch(t) else None
+        except (ValueError, AttributeError):
+            pass
+        cache = tree_cache if tree_cache is not None else {}
+        hit = cache.get(str(real))
+        if hit and time.monotonic() - hit[0] < 600:
+            contents = {**hit[1], "cached_age_seconds": round(time.monotonic() - hit[0], 1)}
+        else:
+            t0 = time.monotonic()
+            try:
+                tree, ignored, files = tree_hash(real)
+                contents = {"checked": True, "tree_sha_computed": tree, "tree_sha_recorded_in_build_info": claimed_tree, "files_hashed": files, "ignored_not_hashed": ignored,
+                            "matches_recorded_tree": (tree == claimed_tree) if claimed_tree else None, "seconds": round(time.monotonic() - t0, 2),
+                            "meaning": "Whether the files on disk are unchanged since the release tool recorded their git tree hash. That the recorded hash belongs to the named commit is the "
+                                       "release tool's claim; `release.py verify --repo <git repo>` checks it against git."}
+            except (_OverBudget, OSError):
+                contents = {"checked": False, "reason": "tree hash exceeded its size/time budget or could not be read"}
+            cache[str(real)] = (time.monotonic(), contents)
+            contents = {**contents, "cached_age_seconds": 0.0}
+        claim = {"label": DIRECTORY_CLAIM_LABEL, "sha": dir_sha, "marker_matches_name": marker, "contents": contents}
+    return {"mode": "measured", "sha": git_sha, "sha_source": "git" if git_sha else None, "checkout_sha": git_sha, "directory_claim": claim,
+            "source": "git rev-parse HEAD (fixed command), measured only when the deployed tree is a git checkout",
+            "note": None if git_sha else "not measured: the deployed tree is not a git checkout (a git archive release has no .git) or the command exceeded its budget; see directory_claim"}
 
 
 def host_measurements() -> dict:
@@ -248,7 +324,7 @@ def goal_report(root: Path) -> dict:
 AUTHOR_LABEL = "author report: written when the release was cut (by deploy/release.py or by hand). Not verified here."
 
 
-def build_report(root: Path, release_sha: str | None, compared_with: str | None = None) -> dict:
+def build_report(root: Path, release_sha: str | None, compared_with: str | None = None, claimed_dir_sha: str | None = None) -> dict:
     """`build-info.json` at the checkout root is written by whoever cuts a release; this endpoint only validates its shape."""
     raw, why = read_small(root, "build-info.json")
     if raw is None:
@@ -273,7 +349,9 @@ def build_report(root: Path, release_sha: str | None, compared_with: str | None 
     return {"mode": "worker_report", "label": AUTHOR_LABEL, "source": "build-info.json", "sha256": sha256(raw), "status": "reported", "release_sha": d["release_sha"],
             "built_at": _clip(d.get("built_at"), 40), "checks": checks, **extra,
             "matches_checkout": None if release_sha is None else release_sha == d["release_sha"], "compared_with": compared_with if release_sha else None,
-            "matches_note": "Compared with the release SHA this service measured for itself (git HEAD, else the releases/<sha> directory name). Null means it could not be measured."}
+            "matches_directory_claim": None if claimed_dir_sha is None else claimed_dir_sha == d["release_sha"],
+            "matches_note": "`matches_checkout` compares with the SHA this service measured through git; null means no git checkout, so nothing was measured. "
+                            "`matches_directory_claim` compares with the releases/<sha> directory NAME, which is only a claim."}
 
 
 RECEIPT_FIELDS = ("job_id", "job_name", "job_state", "run_tag", "item", "controller_status", "inner_rc", "inner_wall_s", "timed_out",
@@ -341,7 +419,7 @@ def curated_manifest(root: Path = ROOT) -> dict:
 class SystemStatus:
     def __init__(self, store, root: Path = ROOT, ttl: int = TTL_S, runner=None):
         self.store, self.root, self.ttl, self.runner = store, Path(root), ttl, runner
-        self.lock, self.cached = Lock(), None
+        self.lock, self.cached, self.tree_cache = Lock(), None, {}
 
     def _section(self, name, fn):
         try:
@@ -363,8 +441,8 @@ class SystemStatus:
                    "process": self._section("process", process_measurements),
                    "host": self._section("host", host_measurements),
                    "services": {"mode": "measured", "source": "systemctl --user show (fixed command, our two units only)", "units": units},
-                   "release": self._section("release", lambda: release_identity(self.root, sha)),
-                   "deployed_sha": None,
+                   "release": self._section("release", lambda: release_identity(self.root, sha, self.tree_cache)),
+                   "deployed_sha": None, "claimed_sha": None,
                    "build": None,
                    "board": self._section("board", lambda: board_report(self.root)),
                    "specs": self._section("specs", lambda: specs_report(self.root)),
@@ -372,8 +450,11 @@ class SystemStatus:
                    "resources": self._section("resources", lambda: receipts_report(self.root)),
                    "limits": {"read_only": True, "fixed_command_budget_seconds": BUDGET_S, "launches_jobs": False,
                               "not_exposed": ["environment", "tokens", "credential paths", "host name or user names", "other processes' command lines", "other teams' jobs"]}}
-            out["deployed_sha"] = out["release"].get("sha") if isinstance(out["release"], dict) else None
-            out["build"] = self._section("build", lambda: build_report(self.root, out["deployed_sha"], out["release"].get("sha_source") if isinstance(out["release"], dict) else None))
+            rel = out["release"] if isinstance(out["release"], dict) else {}
+            out["deployed_sha"] = rel.get("sha")                                     # MEASURED via git only
+            dc = rel.get("directory_claim") or {}
+            out["claimed_sha"] = dc.get("sha")                                        # the directory name: a claim, labelled in release.directory_claim
+            out["build"] = self._section("build", lambda: build_report(self.root, out["deployed_sha"], "git" if out["deployed_sha"] else None, dc.get("sha")))
             self.cached = (t, out)
             return {**out, "cache": {"ttl_seconds": self.ttl, "cached": False, "age_seconds": 0.0}}
 
