@@ -1,0 +1,113 @@
+{
+  "solver_result": {
+    "status": "unsat",
+    "witness": null,
+    "conflict": [
+      "lift_stall",
+      "q_wl_min",
+      "q_speed_max"
+    ],
+    "core_minimal": true,
+    "missing_parameters": [],
+    "partial_witness": null,
+    "reason": "unsat on a subset of the declared constraints; z3 verdict re-checked by z3 only, no independent proof object",
+    "scope": "within the declared constraints only; not organism feasibility; a source envelope is not a universal feasibility region",
+    "extrapolates_envelope": [],
+    "used_constraints": [
+      "mass_lo",
+      "mass_hi",
+      "wl_lo",
+      "wl_hi",
+      "ar_lo",
+      "ar_hi",
+      "speed_lo",
+      "speed_hi",
+      "lift_stall",
+      "q_wl_min",
+      "q_speed_max"
+    ],
+    "provenance": {
+      "lift_stall": {
+        "kind": "physical_law",
+        "source": "level flight: lift 0.5 rho V^2 S CL >= weight m g (CL = maximum usable lift coefficient)",
+        "correspondence": "",
+        "parameters": {
+          "CL": {
+            "value": "1",
+            "kind": "design_assumption",
+            "source": "caller-set (maximum) lift coefficient; NOT supplied by any source in this repo"
+          },
+          "g": {
+            "value": "196133/20000",
+            "kind": "physical_law",
+            "source": "standard acceleration of gravity, defined value 9.80665 m/s^2 (CGPM 1901)"
+          },
+          "rho": {
+            "value": "49/40",
+            "kind": "design_assumption",
+            "source": "caller-set air density; NOT supplied by any source in this repo"
+          }
+        }
+      },
+      "q_wl_min": {
+        "kind": "user_query",
+        "source": "caller query",
+        "correspondence": "",
+        "parameters": {
+          "g": {
+            "value": "196133/20000",
+            "kind": "physical_law",
+            "source": "standard acceleration of gravity, defined value 9.80665 m/s^2 (CGPM 1901)"
+          }
+        }
+      },
+      "q_speed_max": {
+        "kind": "user_query",
+        "source": "caller query",
+        "correspondence": "",
+        "parameters": {}
+      }
+    },
+    "checks": {},
+    "solver": "z3-nlsat-tracked v1",
+    "z3_version": "5.3.3",
+    "lean": "not_run"
+  },
+  "lean_certificate_text": "theorem conflict_instance {m g S V : ℝ} (hS : 0 < S) (hV0 : 0 ≤ V)\n    (hwl : ((150 : ℝ) / 1) ≤ FlyingFish.wingLoading m g S) (hV : V ≤ ((10 : ℝ) / 1))\n    (hlift : 2 * m * g ≤ V ^ 2 * ((49 : ℝ) / 40) * S * ((1 : ℝ) / 1)) : False :=\n  FlyingFish.conflict_of_certificate hS hV0 (by norm_num) (by norm_num) hwl hV hlift (by norm_num)\n",
+  "lean_checks": {
+    "lean": "ran",
+    "lean_version": "Lean (version 4.35.0, x86_64-unknown-linux-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)",
+    "project": "/data/artifacts/mathlib-probe",
+    "theory_sha256": "566f43c30f2e2b35a9a24d96edfe2f83569d152e3e0b3dd8e17e76e1320dbc52",
+    "positive": {
+      "exit": 0,
+      "seconds": 9.7,
+      "n_axiom_prints": 7,
+      "axioms_used": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "only_standard_axioms": true,
+      "non_axiom_output": []
+    },
+    "negative": {
+      "exit": 1,
+      "seconds": 7.8,
+      "each_block_rejected": {
+        "wl_k2": true,
+        "mass_exponent": true,
+        "stall_k2": true,
+        "corrupted_certificate": true
+      },
+      "first_error_message": {
+        "wl_k2": "unsolved goals",
+        "mass_exponent": "unsolved goals",
+        "stall_k2": "unsolved goals",
+        "corrupted_certificate": "unsolved goals"
+      },
+      "errors_outside_blocks": []
+    },
+    "all_ok": true
+  }
+}
