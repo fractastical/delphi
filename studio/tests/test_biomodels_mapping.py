@@ -10,6 +10,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from connectors.biomodels import frontier_mapping as fm  # noqa: E402
+from connectors.biomodels import mapping_v2 as mv2  # noqa: E402
 
 ABS = re.compile(r"(?<![A-Za-z0-9_.])/(?:home|tmp|data|Users|var|opt|root|mnt|srv)/")
 
@@ -82,12 +83,12 @@ def test_negative_control_an_observed_record_would_be_caught(doc):
 
 @pytest.fixture(scope="module")
 def full():
-    return fm.build()
+    return mv2.build()
 
 
 def test_committed_mapping_is_not_stale(full):
     committed = json.loads((Path(fm.PACKAGE) / "mapping" / f"{fm.ACCESSION}.mapping.json").read_text())
-    assert committed == json.loads(json.dumps(full)), "rebuild with: python -m connectors.biomodels.frontier_mapping"
+    assert committed == json.loads(json.dumps(full)), "rebuild with: python -m connectors.biomodels.mapping_v2"
 
 
 def test_simulated_evidence_pins_the_model_claim_and_is_never_observed(full):
@@ -124,7 +125,7 @@ def test_artifacts_are_typed_digest_only_and_the_sbml_is_not_redistributed(full)
     assert len(sbml_in) == 1 and sbml_in[0]["sha256"] == fm.MODEL_SHA256 and sbml_in[0]["uri"] == "https://www.biomodels.org/BIOMD0000001047"
     manifest = json.loads((Path(fm.PACKAGE) / "orx" / "artifact-manifest.json").read_text())
     assert manifest["bytes_included"] is False and manifest["hosting"]["hosted"] is False
-    assert {a["sha256"] for a in arts} == {a["sha256"] for a in manifest["artifacts"]}
+    assert {a["sha256"] for a in manifest["artifacts"]} <= {a["sha256"] for a in arts}, "v2 keeps every artifact of the orx manifest"
     stray = [p for p in Path(fm.PACKAGE).rglob("*") if p.is_file() and p.suffix not in (".py", ".pyc") and "__pycache__" not in p.parts and b"<sbml" in p.read_bytes()[:20000]]
     assert not stray, f"raw SBML must not be committed: {stray}"
 
@@ -133,3 +134,44 @@ def test_negative_control_stray_sbml_would_be_detected(tmp_path):
     f = tmp_path / "x.xml"
     f.write_bytes(b'<?xml version="1.0"?><sbml level="2"/>')
     assert b"<sbml" in f.read_bytes()[:20000]
+
+
+def preserved(v1, v2):
+    """v2 keeps every v1 artifact and every replay hash, and changes nothing else about the Evidence."""
+    keep = {(a["sha256"], a["role"]) for a in v1["payload"]["artifacts"]} <= {(a["sha256"], a["role"]) for a in v2["payload"]["artifacts"]}
+    same = all(v1["payload"][k] == v2["payload"][k] for k in ("target", "evidence_kind", "relation", "produced_by", "source", "method", "context", "assumptions", "uncertainty"))
+    return keep and same and v2["predecessor"] == v1["version"] and (v1["namespace"], v1["kind"], v1["id"]) == (v2["namespace"], v2["kind"], v2["id"])
+
+
+def test_evidence_v2_chains_to_v1_and_preserves_the_replay_hashes(full):
+    v1, v2 = full["superseded_versions"][0], by_id(full)["orx-run-simulated-evidence"]
+    assert preserved(v1, v2) and v1["version"] != v2["version"]
+    chain = full["chains"][0]
+    assert chain["versions"] == [v1["version"], v2["version"]] and chain["head"] == v2["version"]
+    receipt = json.loads((Path(fm.PACKAGE) / "receipts" / fm.ACCESSION / "receipt.json").read_text())
+    kept = v2["payload"]["provenance"]["replay_hashes_preserved"]
+    assert kept["model_sha256"] == fm.MODEL_SHA256 == receipt["model"]["sha256"] and kept["replay_code_sha256"] == receipt["run"]["code_sha256"]
+    assert kept["csv"] == {k: v for k, v in receipt["output_sha256"].items() if k.endswith(".csv")}
+    assert [r["id"] for r in full["records"]].count("orx-run-simulated-evidence") == 1, "only the head is in records"
+
+
+def test_v2_links_video_poster_manifest_and_render_code_as_typed_artifacts(full):
+    v2 = by_id(full)["orx-run-simulated-evidence"]["payload"]
+    video = json.loads((Path(fm.PACKAGE) / "video" / "delta_notch_replay_manifest.json").read_text())
+    by_sha = {(a["sha256"], a["role"]): a for a in v2["artifacts"]}
+    assert (video["video"]["sha256"], "output") in by_sha and by_sha[(video["video"]["sha256"], "output")]["media_type"] == "video/mp4"
+    assert (video["poster"]["sha256"], "output") in by_sha
+    render_sha = mv2.hashlib.sha256((Path(fm.PACKAGE) / "render.py").read_bytes()).hexdigest()
+    man_sha = mv2.hashlib.sha256((Path(fm.PACKAGE) / "video" / "delta_notch_replay_manifest.json").read_bytes()).hexdigest()
+    assert (render_sha, "code") in by_sha and (man_sha, "log") in by_sha
+    assert any("not produced by the replay Action" in s for s in v2["limitations"])
+    assert all(a["availability"] == "referenced" and a["license"] is None for a in v2["artifacts"])
+
+
+def test_negative_control_a_successor_that_drops_an_artifact_is_not_preserved(full):
+    v1, v2 = full["superseded_versions"][0], by_id(full)["orx-run-simulated-evidence"]
+    bad = json.loads(json.dumps(v2))
+    bad["payload"]["artifacts"] = bad["payload"]["artifacts"][1:]
+    assert not preserved(v1, bad)
+    bad2 = json.loads(json.dumps(v2)); bad2["predecessor"] = "0" * 64
+    assert not preserved(v1, bad2)
