@@ -44,6 +44,25 @@ def _compile(src: str, label: str, timeout: int = 600) -> dict:
         return {"exit": p.returncode, "out": p.stdout + p.stderr, "seconds": round(time.time() - t, 1)}
 
 
+def provenance(extra_sources: dict[str, str]) -> dict:
+    """Hashes of every input to the Lean run, plus toolchain and Mathlib revision, so a receipt can be
+    matched to exactly what was compiled."""
+    here = {n: _sha(HERE / n) for n in ("GeometricSimilarity.lean", "MutantRefutations.lean",
+                                        "NegativeControls.lean", "lean_checks.py")}
+    here["../constraints.py"] = _sha(HERE.parent / "constraints.py")
+    prov = {"files": here,
+            "assembled_sources_sha256": {k: hashlib.sha256(v.encode()).hexdigest() for k, v in extra_sources.items()}}
+    try:
+        prov["lean_toolchain_file"] = (PROJECT / "lean-toolchain").read_text().strip()
+        man = json.loads((PROJECT / "lake-manifest.json").read_text())
+        prov["mathlib_rev"] = next(p["rev"] for p in man["packages"] if p["name"] == "mathlib")
+        prov["lake_manifest_sha256"] = _sha(PROJECT / "lake-manifest.json")
+        prov["lakefile_sha256"] = _sha(PROJECT / "lakefile.toml")
+    except (OSError, StopIteration, KeyError, ValueError) as e:
+        prov["toolchain_error"] = str(e)
+    return prov
+
+
 def corrupted_certificate(good: str) -> str:
     """Corrupt the solver-emitted certificate: raise vmax so the Lean side condition is false."""
     bad = good.replace("(10 : ℝ)", "(20 : ℝ)").replace("conflict_instance", "neg_corrupted")
@@ -59,6 +78,9 @@ def run(certificate_lean: str) -> dict:
         "\n#print axioms conflict_instance\n"
     neg_tpl = (HERE / "NegativeControls.lean").read_text()
     neg = theory + neg_tpl.replace("@@CORRUPTED_CERTIFICATE@@", corrupted_certificate(certificate_lean))
+    bad_cert = corrupted_certificate(certificate_lean)
+    prov = provenance({"positive": pos, "negative": neg, "certificate_text": certificate_lean,
+                       "corrupted_certificate_text": bad_cert})
     rp, rn = _compile(pos, "positive"), _compile(neg, "negative")
     # which labelled blocks contain an error
     lines = (theory + neg_tpl.replace("@@CORRUPTED_CERTIFICATE@@", corrupted_certificate(certificate_lean))).splitlines()
@@ -86,6 +108,7 @@ def run(certificate_lean: str) -> dict:
         "lean": "ran",
         "lean_version": subprocess.run(["lean", "--version"], capture_output=True, text=True).stdout.strip(),
         "project": str(PROJECT),
+        "provenance": prov,
         "theory_sha256": _sha(HERE / "GeometricSimilarity.lean"),
         "positive": {"exit": rp["exit"], "seconds": rp["seconds"], "n_axiom_prints": len(axioms),
                      "axioms_used": sorted(used), "only_standard_axioms": used <= STANDARD_AXIOMS and bool(used),

@@ -22,7 +22,7 @@ namespace FlyingFish
 /-- Wing loading `m g / S`  [N/m^2]. -/
 noncomputable def wingLoading (m g S : ℝ) : ℝ := m * g / S
 
-/-- Level-flight (stall) speed at lift coefficient `C`: `sqrt (2 m g / (rho S C))` [m/s]. -/
+/-- Level-flight proxy speed at lift coefficient `C` (L = W; a glide needs only W cos gamma): `sqrt (2 m g / (rho S C))` [m/s]. -/
 noncomputable def stallSpeed (m g rho S C : ℝ) : ℝ := Real.sqrt (2 * m * g / (rho * S * C))
 
 /-- Wing loading scales as `k`. -/
