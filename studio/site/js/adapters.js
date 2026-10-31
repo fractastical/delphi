@@ -84,6 +84,12 @@
     try { return { report: await getJSON("api/system") }; } catch (e) { return { unavailable: true, reason: e.message }; }
   }
 
+  /* GET /api/media?sha256= -> {matches[{href,sha256,byte_size,media_type,bytes_verified}], scope, index}. Local availability only; the Evidence's own declaration is never changed. null when not served. */
+  async function media(sha) {
+    if (!isLive() || state.mediaAbsent === true || !/^[0-9a-f]{64}$/.test(String(sha))) return null;
+    try { return await getJSON("api/media?sha256=" + sha, 6000); } catch (e) { if (/HTTP 404/.test(e.message)) state.mediaAbsent = true; return null; }
+  }
+
   async function events() {
     if (isLive()) { const r = await getJSON("api/events?limit=50"); return { events: (r.events || []).map((e) => ({ sequence: e.sequence, kind: (e.envelope || {}).kind, id: (e.envelope || {}).id, version: (e.envelope || {}).version, issuer: (e.envelope || {}).issuer, created_at: (e.envelope || {}).created_at })), next_cursor: r.next_cursor || null, source: "runtime" }; }
     return { events: [], source: "snapshot", note: "A snapshot has no event stream." };
@@ -129,7 +135,16 @@
     if (!isLive()) return { unavailable: true, reason: "no live runtime" };
     try { return { report: await getJSON("api/attention", 8000) }; } catch (e) { return { unavailable: true, reason: e.message }; }
   }
-  const simulate = pending("simulation");
+  /* POST /api/simulations/run {model, parameters} -> frontier.simulation.preview/1 (completed | unknown with reason). 400 invalid, 429 busy, 503 unavailable carry fixed safe messages. */
+  async function simulate(body) {
+    if (!isLive()) throw new Unavailable("simulation", "No runtime is connected, so nothing ran and no result is shown.");
+    if (JSON.stringify(body).length > 8192) throw new Error("the request is larger than the 8192-byte limit");
+    const sess = await getJSON("api/session", 5000); if (!sess.csrf) throw new Error("the session did not provide a CSRF token");
+    const r = await fetch("api/simulations/run", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json", "X-CSRF-Token": sess.csrf }, body: JSON.stringify(body), cache: "no-store" });
+    let j = null; try { j = await r.json(); } catch (e) { /* not JSON */ }
+    if (!r.ok) throw new Error(`${{ 400: "The request was refused as invalid", 404: "This node does not serve simulation previews", 429: "The preview slots are busy; try again shortly", 503: "The simulation runtime is unavailable on this node" }[r.status] || "The request failed"} (HTTP ${r.status}${j && j.error ? ", " + j.error : ""})${j && j.message ? ": " + j.message : ""}.`);
+    return j;
+  }
   const propose = pending("proposal submission");
 
   /* GET /api/discovery?q&kind&limit&mode=hybrid -> {items[{type,ref,artifact_sha256?,title,snippet,kind,local_status,score,score_kind,why_matched}], mode, index metadata, unavailable_reason?}.
@@ -165,5 +180,5 @@
     } catch (e) { if (e.name === "AbortError") throw e; if (/HTTP 404/.test(e.message)) { state.graphAbsent = true; return null; } throw e; }
   }
 
-  DF.api = { state, isLive, load, discovery, graph, catalog, record, artifacts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
+  DF.api = { state, isLive, load, discovery, graph, catalog, record, artifacts, media, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
 })();

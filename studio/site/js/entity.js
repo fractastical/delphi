@@ -61,6 +61,22 @@
     return html`<dl class="kv wide">${scal.map(([a, v]) => html`<div><dt>${a.replace(/_/g, " ")}</dt><dd>${String(v)}</dd></div>`)}</dl>`;
   }
 
+  /* Exact-pin resolution. With a version in the link the Ref is built from namespace/kind/id/version and read directly: a pin is never substituted by a head.
+   * Without a version the current head is resolved explicitly and said to be; if several namespaces hold the id, the caller must show a choice. */
+  DF.resolveRecord = async function (kind, id, { ns = "", v = "" } = {}) {
+    if (v) {
+      if (!ns) { const c = (await DF.api.catalog({ query: id, kind, limit: 50 })).records.filter((x) => x.ref.id === id && x.ref.version === v); if (c.length !== 1) return { error: c.length ? `the version pin matches records in more than one namespace; add the namespace to the link` : `no ${kind} “${id}” with that exact version is visible`, candidates: c.map((x) => x.ref) }; ns = c[0].ref.namespace; }
+      const ref = { namespace: ns, kind, id, version: v };
+      try { return { ref, rec: await DF.api.record(ref), pinned: true }; } catch (e) { return { error: `the pinned version ${String(v).slice(0, 12)}… of ${kind} ${id} (${ns}) is not available${DF.api.isLive() ? " on this node" : " in the snapshot"}; it is not replaced by another version (${e.message})` }; }
+    }
+    const cands = (await DF.api.catalog({ query: id, kind, limit: 50 })).records.filter((x) => x.ref.id === id && (!ns || x.ref.namespace === ns));
+    if (!cands.length) return { error: `no ${kind} with the id “${id}”${ns ? " in namespace " + ns : ""} is visible${DF.api.isLive() ? " on this node" : " in the snapshot"}` };
+    const heads = cands.filter((x) => x.is_head !== false);
+    if ((heads.length || cands.length) > 1 && new Set((heads.length ? heads : cands).map((x) => x.ref.namespace + "/" + x.ref.version)).size > 1) return { ambiguous: (heads.length ? heads : cands).map((x) => x.ref) };
+    const hit = heads[0] || cands[0];
+    return { ref: hit.ref, rec: await DF.api.record(hit.ref), pinned: false, resolvedHead: true };
+  };
+
   DF.views.entity = function (snap, route) {
     const kind = route.parts[1] || "", id = route.parts.slice(2).join("/");
     return {
@@ -68,15 +84,11 @@
       async after(root) {
         const host = root.querySelector("#entity"); const v = route.params.v || "";
         let rec = null;
-        try {
-          let ref = (DF.recRefs && DF.recRefs[`rec:${kind}:${id}`]) || null;
-          if (!ref || (v && ref.version !== v)) {
-            const cands = (await DF.api.catalog({ query: id, kind, limit: 50 })).records.filter((x) => x.ref && x.ref.id === id);
-            const hit = (v ? cands.find((x) => x.ref.version === v) : null) || cands[0]; ref = hit ? hit.ref : null;
-          }
-          if (!ref) throw new Error(`no ${kind} with the id “${id}” is visible${DF.api.isLive() ? " on this node" : " in the snapshot"}`);
-          rec = await DF.api.record(ref);
-        } catch (e) { host.innerHTML = html`<h1>Not found</h1><p class="lede">${e.message}.</p><p><a href="${DF.href("/search", { tab: "catalog" })}">Search the catalog</a></p>`.toString(); return; }
+        let R;
+        try { R = await DF.resolveRecord(kind, id, { ns: route.params.ns || "", v }); } catch (e) { R = { error: e.message }; }
+        if (R.ambiguous) { host.className = ""; host.removeAttribute("role"); host.innerHTML = html`<h1>${kind} ${id}: more than one record</h1><p class="lede">Several namespaces or versions hold this id and none is pinned in the link. Choose one; nothing is picked for you.</p><ul>${R.ambiguous.map((r) => html`<li><a href="${DF.href("/entity/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace })}">${r.namespace} · version ${String(r.version).slice(0, 12)}…</a></li>`)}</ul>`.toString(); return; }
+        if (R.error) { host.innerHTML = html`<h1>Not found</h1><p class="lede">${R.error}.</p><p><a href="${DF.href("/search", { tab: "catalog" })}">Search the catalog</a></p>`.toString(); return; }
+        rec = R.rec; if (!rec.ref) rec.ref = R.ref;
         const p = rec.payload || {}; const r = rec.ref;
         const rel = [];
         if (p.target) rel.push(["Targets", p.target]); if (p.produced_by) rel.push(["Produced by", p.produced_by]);
@@ -84,12 +96,17 @@
         host.className = ""; host.removeAttribute("role");
         host.innerHTML = html`<h1>${rec.title || r.id}</h1>
           <p>${U.pill(r.kind, "k-" + r.kind)} ${U.pill("local status: " + String(rec.local_status || "not reported").replace(/_/g, " "), "st-unk")} ${rec.is_head === false ? U.pill("not the current version", "warn") : ""}</p>
-          <p class="small faint"><code>${r.namespace}/${r.kind}/${r.id}</code> · version ${U.sha(r.version)} · ${rec.issuer ? "issuer " + rec.issuer + " · " : ""}Imported or upstream labels are assertions made elsewhere; a local status is this node's review state only.</p>
+          <p class="small faint"><code>${r.namespace}/${r.kind}/${r.id}</code> · version ${U.sha(r.version)} · ${R.pinned ? "exact pin from the link" : "resolved to the current head of this id (the link carries no version)"} · ${rec.issuer ? "issuer " + rec.issuer + " · " : ""}Imported or upstream labels are assertions made elsewhere; a local status is this node's review state only.</p>
           <div class="entlayout"><div class="entmain">${body(rec, snap, rel)}</div>
           <aside class="entside" aria-label="Related"><h2 class="eh">Related</h2>${rel.length ? html`<ul>${rel.map(([a, x]) => html`<li>${a}: ${refLink(x)}</li>`)}</ul>` : html`<p class="faint small">No typed reference in this record.</p>`}<div id="relmore"></div>
             <p class="small"><a class="btn small" href="${DF.href("/graph/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace })}">Open the neighbourhood graph</a></p></aside></div>
           <details class="advraw"><summary><b>Advanced: raw record envelope</b></summary><pre class="json">${JSON.stringify(rec.raw || rec, null, 2)}</pre></details>`.toString();
         DF.renderMath(host);
+        host.querySelectorAll(".artcard[data-sha]").forEach(async (card) => {          // local availability projection; the declaration above is untouched
+          const m = await DF.api.media(card.dataset.sha); const hit = m && (m.matches || []).find((x) => x.bytes_verified === true); if (!hit) return;
+          const el = /^image\//.test(hit.media_type) ? `<img class="embed" src="${esc(hit.href)}" alt="Verified local copy" loading="lazy">` : /^video\//.test(hit.media_type) ? `<video class="embed" controls playsinline preload="metadata" src="${esc(hit.href)}"></video>` : `<a href="${esc(hit.href)}">Open the local copy</a>`;
+          card.querySelector(".localmedia").innerHTML = `${el}<p class="small"><span class="pill ok">local copy, bytes verified by the node</span> ${esc(hit.media_type)}, ${hit.byte_size} bytes. The declared availability and URI above are unchanged.</p>`;
+        });
         // The same id in another namespace is a different record: say so instead of merging or hiding it.
         try {
           const twins = (await DF.api.catalog({ query: r.id, kind: r.kind, limit: 50 })).records.filter((x) => x.ref.id === r.id && (x.ref.namespace !== r.namespace || x.ref.version !== r.version));

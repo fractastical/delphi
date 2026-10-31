@@ -5,18 +5,6 @@
   const NS = "http://www.w3.org/2000/svg"; const svgEl = (n, a = {}, t) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); if (t !== undefined) e.textContent = t; return e; };
   const EDGE_LEGEND = { targets: "targets (evidence or action points at it)", produced_by: "produced by (artifact-producing action)", uses: "uses (action input)", depends_on: "depends on (question dependency)", related: "related (reported by the runtime)" };
 
-  async function derive(ref, rec) {
-    const nodes = new Map(); const edges = []; const key = (r) => `${r.namespace}/${r.kind}/${r.id}`;
-    const add = (r, title) => { const k = key(r); if (!nodes.has(k)) nodes.set(k, { id: k, type: r.kind, kind: r.kind, ref: r, title: title || r.id }); return k; };
-    const me = add(ref, rec.title); const p = rec.payload || {};
-    const out = (r, kind, label) => { if (r && r.kind && r.id) { const t = add({ namespace: r.namespace || ref.namespace, kind: r.kind, id: r.id, version: r.version }); edges.push({ id: `${me}>${t}:${kind}`, from: me, to: t, kind, label }); } };
-    out(p.target, "targets", "this record targets it"); out(p.produced_by, "produced_by", "produced by this action"); (p.inputs || []).forEach((x) => out(x, "uses", "uses this input")); (p.dependencies || []).forEach((x) => out(x, "depends_on", "depends on this question"));
-    let more = [];
-    try { more = (await DF.api.catalog({ query: ref.id, limit: 50 })).records.filter((x) => x.ref.id !== ref.id && x.payload && [x.payload.target, x.payload.produced_by, ...(x.payload.inputs || []), ...(x.payload.dependencies || [])].some((r) => r && r.id === ref.id)); } catch (e) { /* the graph stands without incoming edges */ }
-    more.forEach((x) => { const o = add(x.ref, x.title); const pl = x.payload; const kind = pl.target && pl.target.id === ref.id ? "targets" : pl.produced_by && pl.produced_by.id === ref.id ? "produced_by" : (pl.inputs || []).some((r) => r.id === ref.id) ? "uses" : "depends_on"; edges.push({ id: `${o}>${me}:${kind}`, from: o, to: me, kind, label: `${x.ref.kind} ${x.ref.id} points here` }); });
-    return { nodes: [...nodes.values()], edges, truncated: false, scope: "derived in this browser from typed references in the record and in records found by a text lookup of its id; not exhaustive", counts: { nodes: nodes.size, edges: edges.length }, source: "client" };
-  }
-
   DF.views.graph = function (snap, route) {
     const kind = route.parts[1] || "", id = route.parts.slice(2).join("/");
     return {
@@ -24,16 +12,26 @@
       async after(root) {
         const host = root.querySelector("#gwrap");
         try {
-          const cands = (await DF.api.catalog({ query: id, kind, limit: 50 })).records.filter((x) => x.ref.id === id); const v = route.params.v;
-          const hit = (v ? cands.find((x) => x.ref.version === v) : null) || cands[0]; if (!hit) throw new Error(`no ${kind} “${id}” is visible`);
-          const rec = await DF.api.record(hit.ref); const ref = hit.ref;
-          let G = null; try { G = await DF.api.graph(ref, { depth: 1, limit: 120 }); } catch (e) { G = null; }
-          if (G && Array.isArray(G.nodes)) G.source = "runtime"; else G = await derive(ref, rec);
-          draw(host, snap, ref, G);
+          const R = await DF.resolveRecord(kind, id, { ns: route.params.ns || "", v: route.params.v || "" });
+          if (R.ambiguous) { host.removeAttribute("role"); host.innerHTML = html`<p class="lede">More than one namespace or version holds this id and none is pinned. Choose one; nothing is picked for you.</p><ul>${R.ambiguous.map((r) => html`<li><a href="${DF.href("/graph/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace })}">${r.namespace} · version ${String(r.version).slice(0, 12)}…</a></li>`)}</ul>`.toString(); return; }
+          if (R.error) throw new Error(R.error);
+          const ref = R.ref; const rec = R.rec; let G = null;
+          try { G = await DF.api.graph(ref, { depth: 1, limit: 120 }); } catch (e) { host.removeAttribute("role"); host.innerHTML = html`<p class="empty">The graph service answered with an error (${e.message}). Nothing is drawn in its place.</p>${declared(ref, rec)}`.toString(); return; }
+          if (!G || !Array.isArray(G.nodes)) { host.removeAttribute("role"); host.innerHTML = html`<p class="empty">The graph service is not available on this node, so the neighbourhood cannot be drawn. This page does not guess one. What the exact record version declares itself is listed below.</p>${declared(ref, rec)}`.toString(); return; }
+          G.source = "runtime"; draw(host, snap, ref, G);
         } catch (e) { host.removeAttribute("role"); host.innerHTML = html`<p class="empty">The graph could not be built: ${e.message}. Nothing is drawn in its place.</p>`.toString(); }
       },
     };
   };
+
+  /* Outgoing typed references declared in this exact record version. Not the neighbourhood: incoming links need the graph service. */
+  function declared(ref, rec) {
+    const p = rec.payload || {}; const rows = []; const add = (kind, r) => { if (r && r.kind && r.id) rows.push([kind, r]); };
+    add("targets", p.target); add("produced by", p.produced_by); (p.inputs || []).forEach((x) => add("uses", x)); (p.dependencies || []).forEach((x) => add("depends on", x));
+    return html`<h2 class="eh">References declared in this exact version (outgoing only)</h2>${rows.length ? html`<ul>${rows.map(([k, r]) => html`<li>${k}: <a href="${DF.href("/entity/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace })}">${r.kind} ${r.id}</a> <span class="faint small">${r.namespace}, version ${String(r.version).slice(0, 12)}…</span></li>`)}</ul>` : html`<p class="faint">This version declares no typed reference.</p>`}`;
+  }
+
+  const scopeText = (s) => (typeof s === "string" ? s : s && typeof s === "object" ? Object.entries(s).map(([k, v]) => `${k.replace(/_/g, " ")}: ${Array.isArray(v) ? v.length + " listed" : v && typeof v === "object" ? Object.entries(v).map(([a, b]) => `${a} ${typeof b === "object" ? "…" : b}`).join(", ") : String(v)}`).join("; ") : "");
 
   function draw(host, snap, ref, G) {
     host.removeAttribute("role");
@@ -41,7 +39,7 @@
     const R = Math.max(150, 40 + others.length * 14); const W = 2 * R + 340, H = 2 * R + 140; const cx = W / 2, cy = H / 2; const pos = new Map([[centre.id, [cx, cy]]]);
     others.forEach((n, i) => { const a = (2 * Math.PI * i) / Math.max(1, others.length) - Math.PI / 2; pos.set(n.id, [cx + R * Math.cos(a), cy + R * Math.sin(a)]); });
     const kinds = [...new Set(G.edges.map((e) => e.kind))]; const hue = (k) => ["#0e7c86", "#a6c936", "#d97b29", "#7a5ea8", "#c0392b", "#3a7bd5"][kinds.indexOf(k) % 6];
-    host.innerHTML = html`<p class="note small"><b>${G.source === "runtime" ? "From the runtime's /api/graph." : "Derived in this browser."}</b> ${G.scope || ""} ${G.truncated ? "The runtime truncated this neighbourhood." : ""} Pins: namespace <code>${ref.namespace}</code>, version ${U.sha(ref.version)}. ${G.counts ? `${G.counts.nodes} nodes, ${G.counts.edges} edges.` : ""}</p>
+    host.innerHTML = html`<p class="note small"><b>From the runtime's /api/graph.</b> ${scopeText(G.scope)} ${G.truncated ? "The runtime truncated this neighbourhood." : ""} Pins: namespace <code>${ref.namespace}</code>, version ${U.sha(ref.version)}. ${G.counts ? `${G.counts.nodes} nodes, ${G.counts.edges} edges.` : ""}</p>
       <div class="gtools" role="group" aria-label="Graph view controls"><button class="btn small" type="button" data-z="in">Zoom in</button><button class="btn small" type="button" data-z="out">Zoom out</button><button class="btn small ghost" type="button" data-z="reset">Reset view</button><span class="small faint">Drag to pan, wheel to zoom. Focus a node and use the arrow keys to move between nodes; Enter opens it.</span></div>
       <div class="split graphsplit"><div class="graphhost gview" id="gv" tabindex="-1"></div><div class="detail-col" id="gdetail" tabindex="-1"><div class="detail-empty"><h2 class="eh">Select a node</h2><p>Hover to highlight its links; click or press Enter to see it here.</p></div></div></div>
       <h2 class="eh">Legend</h2><ul class="legend inline">${kinds.length ? kinds.map((k) => html`<li><i class="sw" style="background:${hue(k)}"></i>${EDGE_LEGEND[k] || k}</li>`) : html`<li class="faint">No relationships are recorded for this record.</li>`}</ul>

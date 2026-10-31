@@ -7,11 +7,9 @@
   async function loadClaims(snap) {
     if (cache && cache.live === DF.api.isLive() && Date.now() - cache.t < 120000) return cache;
     const rows = []; let more = false;
-    if (DF.api.isLive()) {
-      let after = "", pages = 0;
-      do { const r = await DF.api.catalog({ kind: "Claim", limit: 50, after }); r.records.forEach((x) => rows.push(x)); after = r.next_cursor || ""; pages++; } while (after && pages < 60);
-      more = !!after;
-    } else snap.claims.forEach((c) => rows.push({ ref: { namespace: "snapshot", kind: "Claim", id: c.id, version: c.record_sha256 }, title: c.label, payload: { statement: c.statement, context: c.context, source: { uri: c.source_url }, prior_review: { category: c.category, source_label: c.source } }, local_status: "snapshot_unreviewed" }));
+    let after = "", pages = 0;                       // the catalog adapter serves the live node or the snapshot with the same exact refs
+    do { const r = await DF.api.catalog({ kind: "Claim", limit: 50, after }); r.records.forEach((x) => rows.push(x)); after = r.next_cursor || ""; pages++; } while (after && pages < 60);
+    more = !!after;
     const items = rows.map((x) => facet(x));
     cache = { t: Date.now(), live: DF.api.isLive(), items, more }; return cache;
   }

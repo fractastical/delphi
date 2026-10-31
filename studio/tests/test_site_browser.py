@@ -437,17 +437,15 @@ def test_claim_browser_filters_cards_and_drills_down(browser, base):
     pg.wait_for_selector(".entmain h2:has-text('Statement')", timeout=15000)
 
 
-def test_graph_view_exists_is_keyboard_operable_and_says_how_it_was_built(browser, base):
+def test_graph_without_a_runtime_does_not_invent_a_neighbourhood(browser, base):
     pg = page(browser)
     pg.goto(base + "#/entity/Claim/turing-ddi")
     pg.wait_for_selector(".entside a:has-text('neighbourhood graph')")
     pg.click(".entside a:has-text('neighbourhood graph')")
-    pg.wait_for_selector("#gv svg .g-node", timeout=15000)
-    assert "Derived in this browser" in pg.locator("#gwrap").inner_text()
-    assert "Zoom in" in pg.locator(".gtools").inner_text()
-    pg.locator("#gv .g-node").first.focus()
-    pg.keyboard.press("Enter")
-    assert "Open the page" in pg.locator("#gdetail").inner_text()
+    pg.wait_for_selector("#gwrap .empty", timeout=15000)
+    txt = pg.locator("#gwrap").inner_text()
+    assert "not available on this node" in txt and "does not guess" in txt
+    assert pg.locator("#gv").count() == 0, "no drawing without the graph service"
     pg.goto(base + "#/graph/Claim/no-such")
     pg.wait_for_selector("text=could not be built", timeout=15000)
 
@@ -522,3 +520,93 @@ def test_project_draft_drives_coverage_and_annotation_drafts_export_in_the_contr
     doc = json.loads(Path(dl.value.path()).read_text())
     assert doc["payload"]["kind"] == "proposed_edit" and doc["payload"]["anchor"]["frame"] == "ui_anchor" and doc["payload"]["anchor"]["record"] is None
     assert "not submitted" in doc["note"].lower()
+
+
+SNAP_REF = lambda: next(c for c in json.loads((ROOT / "site/data/catalog.json").read_text())["records"] if c["ref"]["kind"] == "Claim")["ref"]
+
+
+def test_entity_pin_is_exact_and_never_replaced_by_a_head(browser, base):
+    ref = SNAP_REF()
+    pg = page(browser)
+    pg.goto(base + f"#/entity/Claim/{ref['id']}?v={ref['version']}&ns={ref['namespace']}")
+    pg.wait_for_selector(".entmain", timeout=15000)
+    assert "exact pin from the link" in pg.locator("#entity").inner_text()
+    pg.goto(base + f"#/entity/Claim/{ref['id']}?v={'0' * 64}&ns={ref['namespace']}")
+    pg.wait_for_selector("h1:has-text('Not found')", timeout=15000)
+    assert "not replaced by another version" in pg.locator("#entity").inner_text()
+    pg.goto(base + f"#/entity/Claim/{ref['id']}")
+    pg.wait_for_selector(".entmain", timeout=15000)
+    assert "resolved to the current head" in pg.locator("#entity").inner_text()
+
+
+def test_runtime_graph_renders_object_scope_succinctly_and_with_exact_pins(browser, base):
+    """Renderer test with a canned runtime (the static server has no /api): live health and session, an exact record, and the market graph shape."""
+    ref = SNAP_REF(); other = {"namespace": "node-a", "kind": "Evidence", "id": "ev-1", "version": "b" * 64}
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "snapshot", "results": [], "next_cursor": None}))
+    pg.route("**/api/record*", lambda r: r.fulfill(json={"mode": "live", "record": {"namespace": ref["namespace"], "kind": "Claim", "id": ref["id"], "version": ref["version"], "payload": {"title": "T", "statement": "S"}}, "local_status": "proposed", "is_head": True, "action": None}))
+    pg.route("**/api/graph*", lambda r: r.fulfill(json={"schema": "frontier-graph-0.1", "truncated": False, "counts": {"nodes": 2, "edges": 1},
+        "scope": {"visibility": "public", "edge_origin": {"typed": 1, "derived": 0}, "incoming_edges": ["a"]},
+        "nodes": [{"id": "c", "type": "Claim", "kind": "Claim", "ref": ref, "title": "Centre", "local_status": "proposed", "is_head": True, "distance": 0}, {"id": "e", "type": "Evidence", "kind": "Evidence", "ref": other, "title": "Neighbour", "local_status": "imported_unreviewed", "is_head": True, "distance": 1}],
+        "edges": [{"id": "x", "from": "e", "to": "c", "kind": "targets", "label": "targets"}]}))
+    pg.goto(base + f"#/graph/Claim/{ref['id']}?v={ref['version']}&ns={ref['namespace']}")
+    pg.wait_for_selector("#gv svg .g-node", timeout=15000)
+    txt = pg.locator("#gwrap").inner_text()
+    assert "[object Object]" not in txt and "visibility: public" in txt
+    hrefs = pg.locator("#gdetail a, #gwrap table a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert any(("v=" + "b" * 64) in h and "ns=node-a" in h for h in hrefs), hrefs
+
+
+def _mock_live(pg, run_handler):
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "results": [], "next_cursor": None}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.route("**/api/simulations/run", run_handler)
+
+
+def test_simulation_preview_widget_follows_the_contract_and_never_clamps(browser, base):
+    """Renderer and request-shape test against a canned node: exact envelope, range refusal, completed plot, unknown without frames, safe error text."""
+    seen = []
+    def handler(route):
+        body = json.loads(route.request.post_data); seen.append(body)
+        if body["model"] == "bioelectric" and body["parameters"].get("sodium_scale") == 0.35:
+            route.fulfill(json={"schema": "frontier.simulation.preview/1", "status": "completed", "model": "bioelectric", "evidence_kind": "SimulationResult", "persisted": False, "calibrated": False,
+                "request_sha256": "a" * 64, "effective_request_sha256": "b" * 64, "code_sha256": "c" * 64, "computed_at": "2026-10-31T21:00:00Z", "scope": "Preview only.", "preview_limits": {"duration_ms": [10, 30]},
+                "result": {"time_ms": [0, 1, 2, 3], "voltage_mV": [[-70, -70], [-60, -65], [-40, -50], [-30, -45]]}})
+        elif body["model"] == "mechanobio":
+            route.fulfill(status=429, json={"error": "solver_busy", "message": "Two previews are running."})
+        else:
+            route.fulfill(json={"schema": "frontier.simulation.preview/1", "status": "unknown", "reason": "compute_budget_exhausted", "model": "bioelectric", "persisted": False, "calibrated": False})
+    pg = page(browser)
+    _mock_live(pg, handler)
+    pg.goto(base + "#/studio/flying-fish?scale=cellular")
+    pg.wait_for_selector("#simwidget form", timeout=15000)
+    pg.fill("#sw-duration_ms", "99")
+    pg.click("#simwidget button[type=submit]")
+    assert "not clamped" in pg.locator("#sw-err").inner_text() and not seen, "an out-of-range value must be refused before any request"
+    pg.fill("#sw-duration_ms", "30")
+    pg.click("#simwidget button[type=submit]")
+    pg.wait_for_selector("#sw-out .rescard svg.chart", timeout=15000)
+    out = pg.locator("#sw-out").inner_text().lower()
+    assert "persisted: false" in out and "calibrated: false" in out and "not calibrated" in out and "completed" in out
+    assert set(seen[0]) == {"model", "parameters"} and seen[0]["model"] == "bioelectric" and seen[0]["parameters"]["duration_ms"] == 30
+    pg.fill("#sw-sodium_scale", "0.5")
+    pg.click("#simwidget button[type=submit]")
+    pg.wait_for_selector("#sw-out .rescard .vlabel:has-text('unknown')", timeout=15000)
+    assert "compute budget exhausted" in pg.locator("#sw-out").inner_text().lower() and pg.locator("#sw-out svg.chart").count() == 0
+    pg.select_option("#sw-model", "mechanobio")
+    pg.click("#simwidget button[type=submit]")
+    pg.wait_for_selector("#sw-out .adapter-out.unavailable", timeout=15000)
+    assert "busy" in pg.locator("#sw-out").inner_text().lower() and "429" in pg.locator("#sw-out").inner_text()
+    assert seen[-1] == {"model": "mechanobio", "parameters": {"parameters": {"viscosity_pN_s_nm": 1.0}, "duration_s": 5, "dt_s": 0.01, "frame_count": 101}}
+
+
+def test_simulation_widget_is_disabled_and_honest_without_a_node(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=cellular")
+    pg.wait_for_selector("#simwidget form", timeout=15000)
+    assert pg.locator("#simwidget button[type=submit]").is_disabled()
+    assert "Needs a live node" in pg.locator("#simwidget").inner_text()
