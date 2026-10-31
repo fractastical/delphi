@@ -151,9 +151,9 @@ values mean nothing physiologically.
 Put the number up:
 
 > **A half-millimetre fin plate needs a grid of at least 923 cells to be two cells thick. That is
-> beyond one H100.** At every resolution we can actually afford, the fins come through as
-> 3.7-cell shells. Every one of those samples is tagged `resolved: false`, and the contract
-> **refuses** them — `MEMBER_UNRESOLVED`.
+> beyond one H100.** Our actual case runs at 32 cells — **7.2 mm of grid spacing for a 0.5 mm
+> fin**. Every one of those samples is tagged `resolved: false`, and the contract **refuses**
+> them — `MEMBER_UNRESOLVED`.
 >
 > So the blocker is the grid, not the schedule. More hours would not fix it. What fixes it is a
 > resolved local fin-patch case or a validated sub-grid fin model, and neither exists yet.
@@ -191,19 +191,31 @@ curl -s -X POST https://frontier.morphoswarm.ai/mcp \
 > Ask it to simulate and you get a trajectory back in about a second, carrying the hash of every
 > model file, the hash of your request, and the model's own statement that it is not calibrated.
 
-**Compute, as of the 15:48 reading:** **35 of our own jobs** — 24 completed, 5 failed, 3 cancelled,
-2 running, 1 pulling; 29 on H100s, 6 on CPU. One sampled window shows **96.6% mean GPU
-utilisation** across 52 samples at 454 watts. The record reports kernel-execution seconds as
-**unknown**, because we sampled wall time and not kernels, and it says so rather than guessing.
-Spend is unknown; no dollar figure is inferred from credits.
+**The release is live and checked.** The current release `c1ad527` passed **13 public web checks
+and 35 MCP checks, zero failures**, both receipts stamped **2026-10-31 16:14:54 PDT**. The MCP
+suite's own scope line is worth reading aloud: *"public client connectivity, search, schema
+discovery and anonymous write denial; not scientific acceptance."*
 
-**Receipts:** `results/resources/hackathon-usage.json`, observed 2026-10-31 15:48:44 PDT.
-MCP measured at 16:05 PDT: 19 tools, 1,315 claim versions, 543 artifact declarations
-(`data/research/mcp-probe-2026-10-31/`).
+**Compute, as a snapshot and not a total.** At **16:13 PDT**: **52 team jobs** — 37 in the current
+queue plus 15 from prior team and setup work — with **30 unattributed** in the shared project, and
+**2 of ours running plus 1 pulling** right then. One sampled window shows **96.6% mean GPU
+utilisation** across 52 samples at 454 watts. Kernel-execution seconds are reported as
+**unknown**, because wall time was sampled and not kernels. Spend is unknown; no dollar figure is
+inferred from credits.
+
+> **Say the clock, not a bare number.** This is a shared 16-H100 pool and the tally moves. The
+> figures above are root's corrected count at 16:13 and infra is still reconciling source
+> receipts; quote the snapshot time with them or do not quote them.
+
+**Receipts:** `deploy/receipts/rayfan-public-live-check.json` (13 checks) and
+`rayfan-mcp-live-check.json` (35 checks), both 0 failed at 2026-10-31T23:14:54Z.
+`results/resources/hackathon-usage.json` for the job records. Compute tally relayed from root's
+16:13 correction, not re-derived by me. MCP measured here at 16:15 PDT: 19 tools, 1,315 claim
+versions, 543 artifact declarations.
 
 > **Re-run the catalogue call shortly before the room.** The store is live and the counts move —
-> versions went 1,287 → 1,315 and artifact declarations 451 → 543 within an hour. Quote what the
-> call returns on the day, not what is written here.
+> versions went 1,287 → 1,315 and artifact declarations 451 → 543 inside an hour, then held
+> steady across the release. Quote what the call returns on the day.
 
 ---
 
@@ -224,6 +236,18 @@ MCP measured at 16:05 PDT: 19 tools, 1,315 claim versions, 543 artifact declarat
 **Receipts:** `bench/mispredication/`, probe and withdrawal at 12:05 PDT. The table it falsified
 was imported earlier in the day; the falsification is ours.
 
+**And one repair worth thirty seconds if you have them.** A frozen CFD packet failed its own gate:
+all twelve STL hashes matched, but the float64 candidate hash did not, so no solver ran. The
+reviewer refused an unchanged retry and required a CPU-only exact-image diagnosis. It found
+**NumPy AVX-512 dispatch drifting three candidate fields by one to two units in the last place**,
+while the float32 STLs stayed identical. A declared geometry-only dispatch setting restored
+byte-identical output, and the gates stayed exact.
+
+> "A one-ULP difference is invisible unless something is checking bytes. Ours was."
+
+**Receipt:** job `aijob-e00m8v3m77z86n5ads`, rc 0, 6.2 s, sha256 `53b39302…`;
+`results/capability-agency/coordination-case-studies.md`.
+
 ---
 
 ## 8 · Honest close — 25s
@@ -235,10 +259,24 @@ was imported earlier in the day; the falsification is ours.
 mismatch, 5.95e-14, passed. A precision-only diagnostic retry is preregistered with the **original
 tolerance untouched** and the failed output preserved.
 
-**The collective comparison is not established.** In v2, all **27** requests returned HTTP 200 and
-every single response hit the token ceiling and came back as invalid JSON — **zero valid
-responses, zero scores**, all raw receipts kept. v3 is being built. We have no collective
-advantage to claim, and we will report the null if that is what v3 says.
+**The collective comparison ran, and measured nothing — for a reason we can name.** v3 completed:
+all **27 requests valid**, three conditions — one serial analyst, isolated specialists, specialists
+sharing pinned artifacts. **Every answer and every condition-by-repeat aggregate scored 16 out of
+16.** All three means identical.
+
+> That is a **ceiling**, not a tie. The packet handed each arm the source fit, the stiffness range
+> and the measurement method, so the task was answer-explicit and there was no headroom left to
+> measure a difference. The communication treatment demonstrably ran — nine pinned artifacts to
+> the serial analyst, nine peer artifacts to the collaborators, none to the isolated arm — and the
+> ceiling left nothing for it to move.
+>
+> So we have **no measured collaboration advantage**, and the honest reading is that we measured
+> our benchmark rather than our collective. The next pilot needs a task with room to fail.
+
+**Do not pool v2 with v3.** v2's 27 requests all returned HTTP 200 and all truncated at the token
+ceiling with invalid JSON, scoring zero. Different failure, separate receipt, kept separate.
+Known Google API usage across everything: **103,459 tokens over 57 requests.** Spend unknown — no
+billing meter was available.
 
 > What we do have is an organism you can take apart: geometry traced to a species sheet, growth to
 > a published model, cells to a real simulator, metabolism to a genome-scale solve — and two gaps
@@ -270,8 +308,10 @@ advantage to claim, and we will report the null if that is what v3 says.
 
 - **"Does it fly?"** No. Print-ready meshes exist; nothing has been printed and nothing has flown.
   The fin loads are a ranking under assumed load cases, not a probability.
-- **"Is the collective better?"** Not established. v2 produced zero valid responses on token
-  budget; v3 is coming. An earlier scale study of ours returned a null, 78/100 against 78/100.
+- **"Is the collective better?"** **Not established, and we ran the experiment.** v3 scored 16/16
+  in every arm — a ceiling on an answer-explicit task, so the instrument had no headroom. We have
+  three observational coordination cases where review caught things a single pass did not, but
+  they have **no controlled counterfactual** and we do not count them as evidence of advantage.
 - **"Is this a novel architecture?"** No, and we name the prior work — Prove2Me, ScienceClaw,
   Infinite, ASK; and for the diffusion roadmap, Comlekoglu, Bastek and GenCFD.
 - **"What is yours, versus what you reused?"** The sources and the software are published and

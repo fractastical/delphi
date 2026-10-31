@@ -195,11 +195,22 @@ am not going to guess at this podium.**
 
 **Q2. "Did organizing agents collectively add measurable capability?"**
 
-**Not yet measured.** We have one qualitative instance — a cross-agent falsification that a single
-agent had missed and published — and a preregistered equal-budget comparison (single vs isolated
-vs sharing specialists) that is running with no result. An earlier scale study of ours returned a
-**null**: shared specialists 78/100 against original 78/100. We expect the honest answer to be
-"it depends on verification asymmetry", and we will report whatever the run says.
+**We ran it, and the answer is no — with a cause we can name.** The preregistered equal-budget
+comparison completed: one serial analyst, isolated specialists, and specialists sharing pinned
+artifacts. All **27** requests valid. **Every answer and every condition-by-repeat aggregate scored
+16/16, and all three condition means were identical.**
+
+That is a **ceiling, not a tie.** The packet handed each arm the source fit, the stiffness range
+and the measurement method, so the task was answer-explicit and no treatment had room to move the
+score. The communication treatment demonstrably executed — nine pinned artifacts to the serial
+analyst, nine peer artifacts to the collaborators, none to the isolated arm — and found nothing to
+move. **We measured our benchmark, not our collective**, and the next pilot needs a task with room
+to fail.
+
+We also hold three **observational** coordination cases where review caught what a single pass had
+not. The document recording them says, in its own words, that they provide no controlled
+counterfactual and must not be counted as evidence of advantage. We agree, and we do not count
+them. An earlier scale study of ours returned a separate null: 78/100 against 78/100.
 
 **Q3. "Your fish — does it fly?"**
 

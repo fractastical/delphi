@@ -71,12 +71,19 @@ instance, not the architecture.
 | Claim | Level | Receipt | Status |
 |---|---|---|---|
 | The collective caught an error a single agent had published and shipped | C | mispredication correction notice | **Earned, qualitative, n=1** |
-| Collective beats single agent at **matched budget** | — | preregistration in progress, native `resource_scaling` | **PENDING — no result.** Do not promise a win |
+| Collective beats single agent at **matched budget** | C | **v3 RAN. All 27 requests valid; every answer and every condition-by-repeat aggregate scored 16/16; all three condition means identical.** `results/capability-agency/results-card.md`, commit `92c86683` | **Measured: CEILING / NULL.** No collaboration or agency advantage. The card names the cause: an answer-explicit packet left no headroom |
+| The communication treatment actually executed | C | 9 pinned prior artifacts to the serial analyst, 9 peer artifacts to collaborating specialists, **none** to isolated specialists | **Earned** — the treatment ran; the ceiling left nothing to distinguish |
+| v2 and v3 must not be pooled | C | v2: 27 HTTP 200, all truncated at `MAX_TOKENS`, scored zero, 49,626 tokens. v3: 53,802 tokens. Total known Google API usage **103,459 tokens over 57 requests**; USD spend unknown, no billing meter | **Stated in the card itself** |
+| Three observational coordination cases (CFD packet repair, adapter refusal, viewer regressions) | C | `results/capability-agency/coordination-case-studies.md`, commit `92c86683` | **Observational only.** The document says explicitly they provide no controlled counterfactual and must not count as evidence of advantage |
 | Prior scale study: shared specialists **78/100** vs original **78/100** | R | relayed in the rubric strategy document | **A measured null.** Keep it in the talk |
 | Model-family diversity beats sampling diversity at equal budget | — | — | **NOT RUN.** Proposed only |
 
-**This is the 25% we cannot currently evidence quantitatively, and the pitch must say so in its
-own voice before a judge says it for us.** The script does this at 2:30 and in Q2.
+**We now have a quantitative result, and it is a null of a specific kind.** Not "the collective
+tied" — the benchmark saturated. Every arm scored 16/16 on a task whose packet already stated the
+source fit, the stiffness range and the measurement method, so there was no headroom for any
+treatment to move. The honest sentence is that we measured our benchmark rather than our
+collective, and the next pilot needs a task with room to fail. The pitch says this in its own
+voice before a judge says it for us.
 
 A null result here is still worth presenting: "we ran the experiment the rubric cares most about
 and it said no" is a stronger scientific posture than an unmeasured claim, and it is consistent
@@ -89,13 +96,15 @@ verification asymmetry.
 
 | Claim | Level | Receipt | Status |
 |---|---|---|---|
-| Public MCP live, **18 tools** (manifest: 15 `read`, 3 `write`), protocol 2025-06-18, server `Delphi Frontier MCP` 1.27.0 | M | `tools_list.json`, HTTP 200 at 2026-10-31T22:08:18Z | **Earned** |
+| Public MCP live, **19 tools** (manifest: 15 `read`, 3 `write`), protocol 2025-06-18, server `Delphi Frontier MCP` 1.27.0 | M | `tools_list.json`, HTTP 200 at 2026-10-31T22:08:18Z | **Earned** |
 | **Anonymous reads work**: `frontier_search` returns records with no credential | M | `read_search_anonymous.json` | **Earned** |
 | **Anonymous calculations work**: `frontier_simulate` returns an HH trajectory in 1.10 s, `calibrated: false`, six model-file sha256s, request sha256, full environment | M | `calc_simulate_anonymous.json`, `computed_at` 2026-10-31T22:10:02Z | **Earned** |
 | **Writes are refused**: well-formed `frontier_propose` with no credential → `unauthorized: Authenticated operator token required` | M | `control_write_anonymous_refused.json` | **Earned — this is the must-fail control** |
 | Catalogue: **1,287** claim versions, **1,190** with upstream claim id, **1,214** origin unknown, 451 artifact declarations | M | `catalogue.json` | **Earned** |
 | Catalogue reports its own unknowns as `null` and `0`-means-unchecked | M | `catalogue.json`: `mapped_species: null`, `structured_conditions: null`, `hosted_and_byte_checked: 0` with *"0 is the absence of any check"* | **Earned** |
-| 11 Nebius jobs with ids, UTC windows, in-container rc, returned bytes, sha256 — including **3 failed and 1 cancelled, all kept** | C | `results/compute/RECEIPT.md` on `origin/codex/frontier-demo-20261031` | **Earned** |
+| Live release `c1ad527`: **13 public web checks and 35 MCP checks, 0 failures** | C | `deploy/receipts/rayfan-public-live-check.json`, `rayfan-mcp-live-check.json`, both at 2026-10-31T23:14:54Z | **Earned** |
+| Nebius tally **at 16:13 PDT**: 52 team jobs (37 current queue + 15 prior team/setup), 30 unattributed, 2 ours running + 1 pulling | R | relayed from root's correction; **not re-derived by me**; infra still reconciling source receipts | Speak **with the snapshot time**, never as a timeless total |
+| Earlier job receipts with ids, UTC windows, rc, bytes, sha256 — **failures and cancellations kept** | C | `results/compute/RECEIPT.md` | **Earned** |
 | Cost of those jobs | C | RECEIPT.md: *"unavailable ... this is not zero"* | Honest unknown, keep the wording |
 | 13-part fish model + six print-ready props, geometry hashes shared with renders | R | print worker message | Speak as "reported". **Never "printed forms"** |
 | 26 assurance tests passed, integrated | R | native worker | Speak as "reported" |

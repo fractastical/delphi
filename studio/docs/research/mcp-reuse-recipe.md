@@ -163,8 +163,8 @@ population-genetics limit — then:
 1. `frontier_search` for it, and read `local_status` on every hit.
 2. `frontier_neighborhood` on the version you care about, to see whether it is disputed here.
 3. If it is a reaction-diffusion criterion, read
-   the `bench/mispredication/` directory of our repository (ask us for it; the repo is private,
-   so there is no anonymous link) before using the continuum condition on a finite domain. We published a claim that the criterion is reliable above ~1.5 critical
+   [`bench/mispredication/`](https://github.com/kganjam/delphi-frontier) in our repository — the
+   repo is **public** — before using the continuum condition on a finite domain. We published a claim that the criterion is reliable above ~1.5 critical
    wavelengths and **withdrew it**: the error is windowed, exactly 0 at half-integer multiples of
    the critical wavelength (which is where we had sampled) and 6.22% at 1.25 λc, still 0.58% at
    4.25 λc. If your domain length is not a half-integer multiple of λc, the textbook test can pass
@@ -191,3 +191,12 @@ There is deliberately **no review or accept tool**. `frontier_propose` returns `
 design, not a missing feature.
 
 Ask us for a credential if you need one. Reads and calculations never need one.
+
+---
+
+## The source
+
+`https://github.com/kganjam/delphi-frontier` — public as of 2026-10-31. Verified anonymously:
+the repo API returns `"private": false, "visibility": "public"`, and `README.md` fetches over raw
+with HTTP 200 while a nonexistent path returns 404, so the 200 is a real read and not a
+catch-all.
