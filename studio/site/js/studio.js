@@ -37,6 +37,40 @@
   }
 
   /* Zebrafish life-cycle source layer: what each stage has (size, growth, metabolism, locomotion, fins) and where it is unknown. Danio rerio only. */
+  /* Optional write access. The contributor credential is held in this page's memory only (adapters.js keeps it in a closure): never stored, never in the URL,
+   * never sent to any route but this node's /v1 routes. A browser session does not authorize writes. */
+  function contributionPanel(snap, p) {
+    const live = p.live_project_id && snap.design_review && snap.design_review.current_project;
+    return html`<section class="panel contrib" aria-labelledby="ct-h"><h2 id="ct-h">Contribute (optional)</h2>
+      <p class="note small"><b>Reading needs nothing.</b> To propose an annotation you need a contributor credential. Paste it below: it stays in this page's memory only. It is never stored in the browser (no local storage, session storage, cookie or address), is sent only to this node's proposal routes, and is forgotten when you disconnect, reload or close the page. Being signed in to the site does not authorize a write.</p>
+      <form id="ctform" class="filters" autocomplete="off" aria-label="Connect a contributor credential"><label>Contributor credential <input type="password" id="ctinput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="paste, then Connect"></label>
+        <button class="btn" type="submit" id="ctconnect" ${DF.api.isLive() ? "" : raw("disabled")}>Connect</button><button class="btn ghost" type="button" id="ctdisconnect" hidden>Disconnect</button></form>
+      <p class="small" id="ctstatus" role="status">${DF.api.isLive() ? "Not connected: you can read and keep local drafts; submitting needs a credential." : "No node is connected, so there is nothing to submit to; drafts stay local."}</p>
+      <div id="annotation-host" class="annotation-host"></div></section>`;
+  }
+  function wireContribution(root, snap, p, scale) {
+    const form = root.querySelector("#ctform"); if (!form) return;
+    const input = form.querySelector("#ctinput"), go = form.querySelector("#ctconnect"), off = form.querySelector("#ctdisconnect"), status = root.querySelector("#ctstatus");
+    const api = DF.api; const draw = () => { const on = typeof api.hasContributor === "function" && api.hasContributor(); off.hidden = !on; go.hidden = on; input.hidden = on; input.parentElement.hidden = on; };
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault(); const v = input.value; input.value = "";                      // the field is emptied before anything else happens
+      if (!v.trim()) { status.textContent = "Paste a credential first."; return; }
+      if (typeof api.connectContributor !== "function") { status.textContent = "This build has no contribution adapter; nothing was sent."; return; }
+      go.disabled = true; status.textContent = "Checking the credential with the node…";
+      try { const r = await api.connectContributor(v); status.textContent = "Connected as " + (r && r.principal ? (typeof r.principal === "string" ? r.principal : (r.principal.actor || JSON.stringify(r.principal))) : "an authenticated contributor") + ". Held in memory only. Submissions stay proposed."; }
+      catch (err) { status.textContent = "Not connected: " + err.message; }
+      finally { go.disabled = false; draw(); }
+    });
+    off.addEventListener("click", () => { api.disconnectContributor(); input.value = ""; status.textContent = "Disconnected. The credential was cleared from memory."; draw(); });
+    DF.onLeave(() => { try { if (api.disconnectContributor) api.disconnectContributor(); } catch (e) { /* best effort */ } });   // leaving the page forgets the credential
+    draw();
+    const host = root.querySelector("#annotation-host"); const cp = snap.design_review && snap.design_review.current_project;
+    if (api.isLive() && DF.annotationComposer && p.live_project_id && cp) {
+      const c = DF.annotationComposer.mount(host, { projectId: p.live_project_id, namespace: cp.ref.namespace, api, region: { type: "named_subsystem", name: (snap.mission.scales.find((x) => x.key === scale) || { label: scale }).label } });
+      DF.onLeave(() => { try { c.destroy(); } catch (e) { /* best effort */ } });
+    } else if (host) host.innerHTML = '<p class="small faint">The annotation composer needs a live node and the Project record.</p>';
+  }
+
   function lifecyclePanel(snap) {
     const L = snap.lifecycle;
     if (!L) return html`<section class="panel"><h3>Life cycle</h3><p class="empty">No life-cycle data is present in this snapshot.</p></section>`;
@@ -201,6 +235,7 @@
     return {
       html: html`<section class="pagehead"><p class="eyebrow"><a href="${DF.href("/studio")}">Studio</a> / project</p><h1>${p.title}</h1><p class="lede">${p.goal}</p>${sub}</section>
         ${DF.designReviewPanel(snap, p)}
+        ${contributionPanel(snap, p)}
         ${PD ? projectDraftPanel(PD) : ""}
         <div id="assurance">${DF.assurancePanel(snap.assurance)}</div>
         <div class="studiogrid"><nav aria-label="Subsystems by scale" class="rail"><h2 class="small">Subsystems</h2><ol class="subsyslist">${rail}</ol></nav>
@@ -225,6 +260,7 @@
         root.querySelector("#annsave").addEventListener("click", () => { const ta = root.querySelector("#annbody"); const body = ta.value.trim(); if (!body) return; const dd = drafts(dkey); dd.push({ at: new Date().toISOString().replace("T", " ").slice(0, 16), body, kind: root.querySelector("#annkind").value }); if (!saveDrafts(dkey, dd)) { list.insertAdjacentHTML("afterbegin", '<li class="small empty">This browser would not store the draft; nothing was saved.</li>'); return; } ta.value = ""; draw(); });
         draw(); DF.renderMath(root); DF.mountSimWidget(root.querySelector("#simwidget"));
         DF.designReviewWire(root, snap, p);
+        wireContribution(root, snap, p, scale);
         DF.assuranceWire(root.querySelector("#assurance"), snap.assurance, (anchor) => { const sc = String(anchor).split(":").pop(); DF.go(DF.href("/studio/" + p.id, { scale: sc === "evolutionary" ? "ecological" : sc })); });
       },
     };

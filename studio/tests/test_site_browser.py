@@ -1380,3 +1380,39 @@ def test_recovery_inputs_are_published_exactly_and_the_failed_run_is_not_called_
     href = pg.locator("a[download][href$='primary-runtime-inputs.tar.xz']").get_attribute("href")
     assert href == "artifacts/rd-diffusion/primary-runtime-inputs.tar.xz"
     assert pg.request.get(base + href).status == 200
+
+
+def test_contributor_credential_lives_in_memory_only_and_the_composer_mounts(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    cp = snap["design_review"]["current_project"]["ref"]
+    pg = page(browser)
+    sent = []
+    pg.on("request", lambda r: sent.append((r.url, r.headers.get("authorization"), r.headers.get("cookie"))) if "/v1/" in r.url else None)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": cp["namespace"], "next_cursor": None, "results": [{"record": {**cp, "payload": {"title": "Mission", "members": []}}, "local_status": "proposed", "is_head": True}]}))
+    pg.route("**/api/design/context*", lambda r: r.fulfill(json={"schema": "frontier.project.design-context/1", "project": {}, "members": [], "annotations": [], "withheld_unlicensed": 0, "pagination": {"limit": 50, "returned": 0, "next_cursor": None, "truncated": False}, "interpretation": "x"}))
+    pg.route("**/api/record*", lambda r: r.fulfill(json={"mode": "live", "record": {**cp, "payload": {"title": "Mission", "members": []}}, "local_status": "proposed", "is_head": True}))
+    pg.route("**/v1/read/identity", lambda r: r.fulfill(json={"principal": {"actor": "e2e-actor", "roles": ["contributor"]}}) if r.request.headers.get("authorization") == "Bearer secret-token-1234567890" else r.fulfill(status=401, json={"error": "unauthorized", "message": "no"}))
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#ctform")
+    assert pg.get_attribute("#ctinput", "type") == "password" and pg.get_attribute("#ctinput", "autocomplete") == "off"
+    pg.wait_for_selector(".annotation-composer", timeout=15000)
+    pg.fill("#ctinput", "wrong-token-0000000000"); pg.click("#ctconnect")
+    pg.wait_for_function("document.querySelector('#ctstatus').textContent.includes('Not connected')")
+    assert pg.input_value("#ctinput") == ""
+    pg.fill("#ctinput", "secret-token-1234567890"); pg.click("#ctconnect")
+    pg.wait_for_function("document.querySelector('#ctstatus').textContent.includes('Connected as')")
+    assert pg.input_value("#ctinput") == "" and "e2e-actor" in pg.locator("#ctstatus").text_content()
+    storage = pg.evaluate("JSON.stringify([Object.entries(localStorage), Object.entries(sessionStorage), document.cookie, location.href])")
+    assert "secret-token-1234567890" not in storage, "the credential must live in memory only"
+    assert any(a == "Bearer secret-token-1234567890" and c is None for _, a, c in sent), sent
+    pg.click("#ctdisconnect")
+    pg.wait_for_function("document.querySelector('#ctstatus').textContent.includes('Disconnected')")
+    assert pg.evaluate("DF.api.hasContributor()") is False
+    pg.fill("#ctinput", "secret-token-1234567890"); pg.click("#ctconnect")
+    pg.wait_for_function("DF.api.hasContributor() === true")
+    pg.evaluate("location.hash = '#/knowledge'")
+    pg.wait_for_selector("#cbrowse")
+    assert pg.evaluate("DF.api.hasContributor()") is False, "leaving the page forgets the credential"
