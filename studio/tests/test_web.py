@@ -611,3 +611,172 @@ def test_postgres_scripts_are_unix_socket_only_and_never_touch_other_clusters():
     assert "listen_addresses = ''" in init and "unix_socket_permissions = 0700" in init and "chmod 700" in init
     assert "auth-host=reject" in init and "peer map=frontier" in init
     assert "5432" not in init and "pg_createcluster" not in init and "/var/lib/postgresql" not in init
+
+
+# ------------------------------------------------------------------ /api/artifacts (root's ArtifactIndex) and the gated extension-route hook
+def seed_artifacts(store):
+    from conftest import evidence
+    target = store.submit(TOKENS["alice"], "ac", claim(store))["record"]
+    for i in range(4):
+        d = evidence(store, ref(target))
+        d["id"] = f"e-{i}"
+        d["visibility"] = "private" if i == 3 else "public"
+        d["payload"]["context"] = "geometry roundtrip fixture, not a fish experiment"
+        d["payload"]["artifacts"] = [{"title": f"Mesh {i}", "uri": "https://example.org/mesh.stl" if i == 0 else "urn:sha256:" + str(i) * 64,
+                                      "sha256": str(i) * 64, "byte_size": 256, "media_type": "model/stl", "role": "geometry", "availability": "unavailable"}]
+        store.submit(TOKENS["alice"], f"e-{i}", d)
+
+
+def test_artifacts_endpoint_is_gated_public_only_paged_and_never_fetches(authed):
+    seed_artifacts(authed.store)
+    assert authed.req("GET", "/api/artifacts", cookie=False)[0] == 401
+    s, body, _ = authed.json("GET", "/api/artifacts?q=geometry&role=geometry&limit=2")
+    assert s == 200 and body["mode"] == "live" and len(body["items"]) == 2 and body["next_cursor"]
+    _, rest, _ = authed.json("GET", "/api/artifacts?query=geometry&role=geometry&limit=2&after=" + body["next_cursor"])
+    got = body["items"] + rest["items"]
+    assert len(rest["items"]) == 1 and rest["next_cursor"] is None and {i["artifact"]["sha256"] for i in got} == {str(i) * 64 for i in range(3)}   # the private one never appears
+    assert all(i["artifact_bytes_verified"] is False and i["local_status"] == "proposed" for i in got)
+    assert any(i["artifact"]["uri"] == "https://example.org/mesh.stl" for i in got)            # a declaration is data; the endpoint never opens it
+    from conftest import evidence
+    for hostile in ("file:///etc/passwd", "http://127.0.0.1:1/x", "https://user:pw@example.org/x"):
+        d = evidence(authed.store, ref(authed.store.search(kind="Claim")["results"][0]["ref"]))
+        d["id"] = "hostile"
+        d["payload"]["artifacts"] = [{"title": "x", "uri": hostile, "sha256": "9" * 64, "byte_size": 1, "media_type": "text/plain", "role": "log", "availability": "unavailable"}]
+        with pytest.raises(Exception):
+            authed.store.submit(TOKENS["alice"], "h" + str(abs(hash(hostile))), d)                # the store refuses local/credentialed pointers outright
+    assert authed.json("GET", "/api/artifacts?role=code")[1]["items"] == []
+    assert authed.json("GET", "/api/artifacts?evidence_kind=observed")[1]["items"] == []
+    for bad in ("limit=51", "limit=0", "limit=x", "role=executable", "evidence_kind=guess", "q=" + "x" * 201, "q=a&query=a", "bogus=1", "after=%25%25%25%25",
+                "q=geometry&after=" + body["next_cursor"]):
+        assert authed.json("GET", "/api/artifacts?" + bad)[0] == 400, bad
+
+
+def test_web_and_artifact_modules_have_no_fetch_or_exec_capability():
+    import ast
+    imported, called = set(), set()
+    for name in ("web.py", "artifacts.py"):
+        for node in ast.walk(ast.parse((ROOT / "frontier" / name).read_text())):
+            if isinstance(node, ast.Import):
+                imported |= {a.name for a in node.names}
+            elif isinstance(node, ast.ImportFrom):
+                imported.add(node.module or "")
+            elif isinstance(node, ast.Call):
+                called.add(("builtin:" if isinstance(node.func, ast.Name) else "attr:") + (node.func.id if isinstance(node.func, ast.Name) else getattr(node.func, "attr", "")))
+    assert not imported & {"urllib.request", "http.client", "requests", "httpx", "subprocess", "socket", "importlib", "ctypes", "pickle"}, imported
+    assert not called & {"builtin:eval", "builtin:exec", "builtin:open", "builtin:compile", "builtin:__import__", "attr:system", "attr:popen", "attr:urlopen", "attr:create_connection"}, called
+
+
+def route_web(store, site, handler, **kw):
+    from frontier.web import Route
+    return Web(store, site, routes={"POST /api/engineering/solve": Route(handler, **kw)})
+
+
+def test_extension_route_needs_session_origin_csrf_and_a_small_json_object(store, site):
+    from frontier.store import FrontierError
+    calls = []
+
+    def solver(req):
+        calls.append(req)
+        if req["body"].get("explode"):
+            raise RuntimeError("SECRET-INTERNAL-DETAIL")
+        if req["body"].get("refuse"):
+            err = FrontierError("Unsupported request")
+            err.http_status, err.code = 422, "unsupported"
+            raise err
+        return 200, {"ok": True, "echo": req["body"], "store_namespace": req["store"].namespace}
+    w = route_web(store, site, solver)
+    try:
+        path = "/api/engineering/solve"
+        origin = {"Origin": f"http://127.0.0.1:{w.port}"}
+        assert w.req("POST", path, {"x": 1}, origin, cookie=False)[0] == 401
+        w.login()
+        assert w.req("POST", path, {"x": 1}, {})[0] == 403                                              # no Origin
+        assert w.req("POST", path, {"x": 1}, {"Origin": "https://evil.example", "X-CSRF-Token": w.csrf})[0] == 403
+        assert w.req("POST", path, {"x": 1}, origin)[0] == 403                                          # no CSRF header
+        assert w.req("POST", path, {"x": 1}, {**origin, "X-CSRF-Token": "wrong"})[0] == 403
+        assert calls == []
+        good = {**origin, "X-CSRF-Token": w.csrf}
+        s, body, _ = w.json("POST", path, {"x": 1}, good)
+        assert s == 200 and body["echo"] == {"x": 1} and body["store_namespace"] == store.namespace and calls[-1]["method"] == "POST"
+        assert w.req("POST", path, [1, 2], good)[0] == 400 and w.req("POST", path, "nope", {**good, "Content-Type": "application/json"})[0] == 400
+        assert w.req("POST", path, json.dumps({"x": 1}), {**good, "Content-Type": "text/plain"})[0] == 400
+        assert w.req("POST", path, json.dumps({"pad": "x" * 1100}), {**good, "Content-Type": "application/json"})[0] == 413      # > 1024 bytes
+        assert len(calls) == 1
+        s, body, _ = w.json("POST", path, {"refuse": 1}, good)
+        assert s == 422 and body["error"] == "unsupported"
+        s, _, raw = w.req("POST", path, {"explode": 1}, good)
+        assert s == 500 and b"SECRET-INTERNAL-DETAIL" not in raw
+        assert w.req("GET", path)[0] == 405 and "POST" in w.req("GET", path)[1]["allow"]
+        w.req("DELETE", "/api/session", headers=good)
+        assert w.req("POST", path, {"x": 1}, good)[0] == 401                                          # session gone
+    finally:
+        w.close()
+
+
+def test_extension_route_bounds_concurrency_and_rejects_shadowing(store, site):
+    from threading import Event
+    from frontier.web import Route
+    started, release = Event(), Event()
+
+    def slow(req):
+        started.set()
+        release.wait(10)
+        return 200, {"done": True}
+    w = route_web(store, site, slow, max_concurrent=1)
+    try:
+        w.login()
+        headers = {"Origin": f"http://127.0.0.1:{w.port}", "X-CSRF-Token": w.csrf}
+        first = []
+        t = Thread(target=lambda: first.append(w.req("POST", "/api/engineering/solve", {"a": 1}, headers)[0]))
+        t.start()
+        assert started.wait(5)
+        s, h, _ = w.req("POST", "/api/engineering/solve", {"a": 2}, headers)
+        assert s == 503 and h["retry-after"] == "2"
+        release.set()
+        t.join(10)
+        assert first == [200] and w.req("POST", "/api/engineering/solve", {"a": 3}, headers)[0] == 200      # slot freed
+    finally:
+        release.set()
+        w.close()
+    for key in ("POST /api/catalog", "POST /api/artifacts", "PUT /api/x", "POST /elsewhere", "POST /api/../v1/x", "POST /api/A"):
+        with pytest.raises(ValueError):
+            WebConfig.with_tokens(GATE, routes={key: Route(lambda r: (200, {}))})
+    with pytest.raises(ValueError):
+        Route(lambda r: (200, {}), max_body=10**6)
+
+
+# ------------------------------------------------------------------ engineering solver wiring (root's engineering_api, late import)
+def test_engineering_route_is_a_clear_503_when_the_solver_module_is_absent(authed, monkeypatch):
+    monkeypatch.setitem(sys.modules, "frontier.engineering_api", None)
+    headers = {"Origin": f"http://127.0.0.1:{authed.port}", "X-CSRF-Token": authed.csrf}
+    s, body, _ = authed.json("POST", "/api/engineering/solve", {"rho": "1.2"}, headers)
+    assert s == 503 and body["error"] == "engineering_unavailable" and "result" not in body
+    assert authed.req("POST", "/api/engineering/solve", {"rho": "1.2"}, {}, cookie=False)[0] == 401
+    assert authed.req("POST", "/api/engineering/solve", {"rho": "1.2"}, {"Origin": headers["Origin"]})[0] == 403      # no CSRF
+    assert authed.req("POST", "/api/engineering/solve", json.dumps({"pad": "x" * 1100}), {**headers, "Content-Type": "application/json"})[0] == 413
+
+
+def test_engineering_route_passes_the_solvers_answer_and_typed_errors_through_unchanged(authed, monkeypatch):
+    import types
+    from frontier.store import FrontierError
+    seen = []
+
+    def solve_design(data):
+        seen.append(data)
+        if data.get("busy"):
+            e = FrontierError("Solver busy")
+            e.http_status, e.code = 503, "busy"
+            raise e
+        if data.get("bad"):
+            raise FrontierError("Invalid design request")
+        return {"schema": "frontier.engineering.solve/1", "result": {"echo": data}}
+    monkeypatch.setitem(sys.modules, "frontier.engineering_api", types.SimpleNamespace(solve_design=solve_design))
+    headers = {"Origin": f"http://127.0.0.1:{authed.port}", "X-CSRF-Token": authed.csrf}
+    s, body, _ = authed.json("POST", "/api/engineering/solve", {"rho": "1.2", "relax_envelopes": True}, headers)
+    assert s == 200 and body == {"schema": "frontier.engineering.solve/1", "result": {"echo": {"rho": "1.2", "relax_envelopes": True}}}
+    assert seen == [{"rho": "1.2", "relax_envelopes": True}]
+    assert authed.json("POST", "/api/engineering/solve", {"busy": 1}, headers)[0] == 503
+    s, body, _ = authed.json("POST", "/api/engineering/solve", {"bad": 1}, headers)
+    assert s == 400 and body["error"] == "invalid_request"
+    assert len(seen) == 3
+    assert authed.req("POST", "/api/engineering/solve", [1], headers)[0] == 400 and len(seen) == 3                      # arrays never reach the solver
