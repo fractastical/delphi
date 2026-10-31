@@ -125,6 +125,26 @@ def _proc(path: str, limit=65536) -> str | None:
         return None
 
 
+def release_identity(root: Path, git_sha: str | None) -> dict:
+    """Which release is running. `git rev-parse HEAD` only works in a git checkout; a `git archive` release has no .git, so the release SHA is also read from the
+    directory the code runs from (releases/<40-hex>, set by deploy/release.py through the `app` symlink). That name is checked against the release marker that
+    deploy/release.py writes, but it is still only a name: nothing here re-hashes the files."""
+    real = Path(root).resolve()
+    dir_sha = real.name if SHA40.fullmatch(real.name) and real.parent.name == "releases" else None
+    marker = None
+    if dir_sha:
+        try:
+            mf = real / ".release-complete"                                   # a dotfile on purpose: written by deploy/release.py, outside read_small's allow-list
+            marker = json.loads(mf.read_bytes()[:4096]).get("sha") == dir_sha if mf.is_file() and mf.stat().st_size <= 4096 else None
+        except (OSError, ValueError, AttributeError):
+            marker = None
+    sha = git_sha or dir_sha
+    return {"mode": "measured", "sha": sha, "sha_source": "git" if git_sha else ("release directory name" if dir_sha else None),
+            "checkout_sha": git_sha, "dir_sha": dir_sha, "dir_name_matches_release_marker": marker,
+            "source": "git rev-parse HEAD (fixed command) when the deployed tree is a git checkout; otherwise the name of the releases/<sha> directory the code runs from",
+            "note": None if sha else "not a git checkout and not a releases/<sha> directory, or the git command exceeded its budget"}
+
+
 def host_measurements() -> dict:
     out = {"mode": "measured", "scope": HOST_SCOPE, "cpu_count": os.cpu_count()}
     la = _proc("/proc/loadavg")
@@ -161,9 +181,13 @@ def store_measurements(store) -> dict:
                                LEFT JOIN heads h ON h.version = v.version WHERE v.visibility = 'public' GROUP BY 1, 2 ORDER BY 1, 2""").fetchall()
         ev = c.execute("""SELECT e.event_type, count(*) AS n FROM events e JOIN record_versions v ON v.version = e.event_version
                           WHERE v.visibility = 'public' GROUP BY 1 ORDER BY 1""").fetchall()
+        by_ns = c.execute("SELECT v.namespace, count(*) AS n FROM record_versions v WHERE v.visibility = 'public' GROUP BY 1 ORDER BY 1").fetchall()
         db = c.execute("SELECT pg_database_size(current_database()) AS bytes, extract(epoch FROM now() - pg_postmaster_start_time()) AS up, "
                        "current_setting('server_version') AS version").fetchone()
     return {"mode": "measured", "public_only": True, "namespace": store.namespace,
+            "counts_scope": "ALL public record versions in this database, across every namespace, including records imported from other nodes under their origin "
+                            "namespace. `namespace` is only this node's own; see `versions_by_namespace` for the split.",
+            "versions_by_namespace": [{"namespace": r["namespace"], "versions": r["n"]} for r in by_ns],
             "note": "Public rows only; private records are not counted. Counts are record VERSIONS; `heads` counts the current version of each record.",
             "records_by_kind_and_local_status": [{"kind": r["kind"], "local_status": r["status"], "versions": r["n"], "heads": r["heads"]} for r in by_kind],
             "events_by_type": [{"event_type": r["event_type"], "count": r["n"]} for r in ev],
@@ -221,11 +245,14 @@ def goal_report(root: Path) -> dict:
     return {"mode": "worker_report", "source": "GOAL.md", "sha256": sha256(raw), "title": _clip(title), "summary": _clip(re.sub(r"\s+", " ", body), 1200)}
 
 
-def build_report(root: Path, release_sha: str | None) -> dict:
+AUTHOR_LABEL = "author report: written when the release was cut (by deploy/release.py or by hand). Not verified here."
+
+
+def build_report(root: Path, release_sha: str | None, compared_with: str | None = None) -> dict:
     """`build-info.json` at the checkout root is written by whoever cuts a release; this endpoint only validates its shape."""
     raw, why = read_small(root, "build-info.json")
     if raw is None:
-        return {"mode": "worker_report", "source": "build-info.json", "status": "absent", "reason": why,
+        return {"mode": "worker_report", "label": AUTHOR_LABEL, "source": "build-info.json", "status": "absent", "reason": why,
                 "note": "No build-info file: no release SHA or build checks are reported, and none are invented."}
     try:
         d = json.loads(raw)
@@ -238,12 +265,15 @@ def build_report(root: Path, release_sha: str | None) -> dict:
             checks.append({k: _clip(c.get(k)) if isinstance(c.get(k), str) else c.get(k) for k in ("name", "command", "exit", "passed", "total", "at", "result")
                            if isinstance(c.get(k), (str, int, bool, type(None)))})
     except ValueError:
-        return {"mode": "worker_report", "source": "build-info.json", "sha256": sha256(raw), "status": "invalid",
+        return {"mode": "worker_report", "label": AUTHOR_LABEL, "source": "build-info.json", "sha256": sha256(raw), "status": "invalid",
                 "reason": "needs an object with a 40-hex release_sha and a list of check objects; contents not used"}
-    return {"mode": "worker_report", "source": "build-info.json", "sha256": sha256(raw), "status": "reported", "release_sha": d["release_sha"],
-            "built_at": _clip(d.get("built_at"), 40), "checks": checks,
-            "matches_checkout": None if release_sha is None else release_sha == d["release_sha"],
-            "matches_note": "Compared with `git rev-parse HEAD` of the deployed checkout (measured). Null means the checkout SHA could not be read within the budget."}
+    extra = {k: d[k] for k in ("tree_sha", "archive_sha256", "checks_receipt_sha256") if isinstance(d.get(k), str) and (SHA40.fullmatch(d[k]) or SHA64.fullmatch(d[k]))}
+    if isinstance(d.get("checks_all_passed"), bool):
+        extra["checks_all_passed"] = d["checks_all_passed"]
+    return {"mode": "worker_report", "label": AUTHOR_LABEL, "source": "build-info.json", "sha256": sha256(raw), "status": "reported", "release_sha": d["release_sha"],
+            "built_at": _clip(d.get("built_at"), 40), "checks": checks, **extra,
+            "matches_checkout": None if release_sha is None else release_sha == d["release_sha"], "compared_with": compared_with if release_sha else None,
+            "matches_note": "Compared with the release SHA this service measured for itself (git HEAD, else the releases/<sha> directory name). Null means it could not be measured."}
 
 
 RECEIPT_FIELDS = ("job_id", "job_name", "job_state", "run_tag", "item", "controller_status", "inner_rc", "inner_wall_s", "timed_out",
@@ -333,15 +363,17 @@ class SystemStatus:
                    "process": self._section("process", process_measurements),
                    "host": self._section("host", host_measurements),
                    "services": {"mode": "measured", "source": "systemctl --user show (fixed command, our two units only)", "units": units},
-                   "release": {"mode": "measured", "checkout_sha": sha, "source": "git rev-parse HEAD in the deployed checkout (fixed command)",
-                               "note": None if sha else "unavailable within the 2 s budget or not a git checkout"},
-                   "build": self._section("build", lambda: build_report(self.root, sha)),
+                   "release": self._section("release", lambda: release_identity(self.root, sha)),
+                   "deployed_sha": None,
+                   "build": None,
                    "board": self._section("board", lambda: board_report(self.root)),
                    "specs": self._section("specs", lambda: specs_report(self.root)),
                    "goal": self._section("goal", lambda: goal_report(self.root)),
                    "resources": self._section("resources", lambda: receipts_report(self.root)),
                    "limits": {"read_only": True, "fixed_command_budget_seconds": BUDGET_S, "launches_jobs": False,
                               "not_exposed": ["environment", "tokens", "credential paths", "host name or user names", "other processes' command lines", "other teams' jobs"]}}
+            out["deployed_sha"] = out["release"].get("sha") if isinstance(out["release"], dict) else None
+            out["build"] = self._section("build", lambda: build_report(self.root, out["deployed_sha"], out["release"].get("sha_source") if isinstance(out["release"], dict) else None))
             self.cached = (t, out)
             return {**out, "cache": {"ttl_seconds": self.ttl, "cached": False, "age_seconds": 0.0}}
 

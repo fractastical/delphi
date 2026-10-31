@@ -320,3 +320,58 @@ def test_manifest_cli_has_only_worker_reports_and_measures_nothing(checkout):
     assert m["kind"] == "curated-manifest" and m["measured"].startswith("not measured") and "store" not in m and "host" not in m and "process" not in m
     assert all(m[k]["mode"] == "worker_report" for k in ("board", "specs", "goal", "build", "resources"))
     assert m["build"]["matches_checkout"] is None
+
+
+# ------------------------------------------------------------------ release identity from an archive (no .git), namespace scope, author-report label
+def make_release_layout(tmp_path, sha, marker_sha=None):
+    rel = tmp_path / "svc" / "releases" / sha
+    rel.mkdir(parents=True)
+    (rel / ".release-complete").write_text(json.dumps({"sha": marker_sha or sha}))
+    (rel / "build-info.json").write_text(json.dumps({"release_sha": sha, "built_at": "2026-10-31T19:00:00Z", "tree_sha": "c" * 40, "archive_sha256": "d" * 64,
+                                                    "checks_all_passed": True, "checks_receipt_sha256": "e" * 64, "checks": [{"name": "s", "command": "c", "exit": 0, "at": "t"}]}))
+    app = tmp_path / "svc" / "app"
+    app.symlink_to(rel)
+    return app, rel
+
+
+def test_release_sha_comes_from_the_release_directory_when_there_is_no_git(store, tmp_path):
+    sha = "12" * 20
+    app, rel = make_release_layout(tmp_path, sha)
+    snap = ss.SystemStatus(store, app, runner=Recorder(sha="not-a-sha")).snapshot()          # git cannot answer; the running directory can
+    r = snap["release"]
+    assert r["mode"] == "measured" and r["checkout_sha"] is None and r["dir_sha"] == sha and r["sha"] == sha and r["sha_source"] == "release directory name"
+    assert r["dir_name_matches_release_marker"] is True and snap["deployed_sha"] == sha
+    b = snap["build"]
+    assert b["mode"] == "worker_report" and b["label"].startswith("author report") and b["release_sha"] == sha and b["matches_checkout"] is True and b["compared_with"] == "release directory name"
+    assert b["tree_sha"] == "c" * 40 and b["archive_sha256"] == "d" * 64 and b["checks_all_passed"] is True and b["checks_receipt_sha256"] == "e" * 64
+
+
+def test_git_is_preferred_when_available_and_a_wrong_marker_or_name_is_flagged(store, tmp_path):
+    sha = "12" * 20
+    app, rel = make_release_layout(tmp_path, sha)
+    snap = ss.SystemStatus(store, app, runner=Recorder(sha="9a" * 20)).snapshot()
+    assert snap["release"]["sha"] == "9a" * 20 and snap["release"]["sha_source"] == "git" and snap["release"]["dir_sha"] == sha and snap["build"]["matches_checkout"] is False
+    other = tmp_path / "second"
+    app2, _ = make_release_layout(other, sha, marker_sha="ff" * 20)
+    assert ss.release_identity(app2, None)["dir_name_matches_release_marker"] is False
+    plain = tmp_path / "plain"
+    plain.mkdir()
+    r = ss.release_identity(plain, None)
+    assert r["sha"] is None and r["dir_sha"] is None and r["note"] and ss.release_identity(tmp_path / "notreleases" / ("ab" * 20), None)["dir_sha"] is None
+
+
+def test_the_build_report_is_labelled_as_an_author_report_in_every_state(checkout):
+    assert ss.build_report(checkout, SHA)["label"].startswith("author report: written when the release was cut")
+    (checkout / "build-info.json").write_text("{bad")
+    assert ss.build_report(checkout, SHA)["label"].startswith("author report")
+    (checkout / "build-info.json").unlink()
+    assert ss.build_report(checkout, SHA)["label"].startswith("author report")
+
+
+def test_store_counts_say_they_cover_every_public_namespace(store, checkout):
+    seed(store)
+    snap = ss.SystemStatus(store, checkout, runner=Recorder()).snapshot()["store"]
+    assert "every namespace" in snap["counts_scope"] and "imported from other nodes" in snap["counts_scope"] and snap["namespace"] == store.namespace
+    per = snap["versions_by_namespace"]
+    assert per == [{"namespace": store.namespace, "versions": sum(r["versions"] for r in snap["records_by_kind_and_local_status"])}]
+    assert snap["namespace"] in [p["namespace"] for p in per]

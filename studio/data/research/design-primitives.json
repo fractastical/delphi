@@ -1,0 +1,220 @@
+{
+  "schema": "frontier-design-primitives-0.1",
+  "meta": {
+    "owner": "fable-lead",
+    "generated_utc": "2026-10-31T19:32:17Z",
+    "purpose": "Model/connector index across scales for the UI. Each entry is a design PRIMITIVE with an honest capability state - NOT a claim that we designed one of each.",
+    "capability_states": [
+      "implemented-run",
+      "implemented-unrun",
+      "external-connector",
+      "proposed",
+      "blocked"
+    ],
+    "honesty": "We did NOT build a working designer for each primitive. Most are proposed or external-connector; only a few have a real run. 'provenance' marks verified_by_fable vs asserted_by_project (a run reported by the project / other workers that fable-lead did not independently verify) vs external/none.",
+    "real_runs_named_by_user": {
+      "BioModels Delta-Notch": "prim:cell-circuit",
+      "reaction-diffusion (RD)": "prim:patterning",
+      "fin-beam": "prim:fin-mechanics",
+      "glide": "prim:organism",
+      "ESM2 Kir2.1": "prim:protein",
+      "Evo2": "prim:DNA (PENDING)"
+    },
+    "reviewer_status": "single-reader (fable-lead), NOT Codex-reviewed",
+    "count": 16
+  },
+  "primitives": [
+    {
+      "id": "prim:chemicals",
+      "scale": "molecular",
+      "primitive": "chemicals/small molecules",
+      "capability_state": "external-connector",
+      "engine": "BioModels kinetic schemes / PubChem (external, read-only)",
+      "source_context": "No design engine wired here; kinetics available via BioModels connector",
+      "output_artifact": null,
+      "missing_bridge": "No chemical-design or reaction-prediction engine is run by us",
+      "next_bounded_action": "Wire a read-only kinetics/metabolite connector before claiming any capability",
+      "provenance": "external"
+    },
+    {
+      "id": "prim:enzyme",
+      "scale": "molecular",
+      "primitive": "enzyme",
+      "capability_state": "proposed",
+      "engine": null,
+      "source_context": "External (BRENDA/enzyme-design tools) not wired; no run",
+      "output_artifact": "None",
+      "missing_bridge": "No enzyme-design or kcat/KM-prediction engine run here",
+      "next_bounded_action": "Scope one enzyme question against an external connector; do not build a designer",
+      "provenance": "none"
+    },
+    {
+      "id": "prim:protein",
+      "scale": "macromolecular",
+      "primitive": "protein",
+      "capability_state": "implemented-run",
+      "engine": "ESM2 (protein language model)",
+      "source_context": "Project ESM2 run for Kir2.1 (user-asserted; referenced in messages). Not independently replicated by fable-lead",
+      "output_artifact": "ESM2 variant-effect predictions for Kir2.1 (a sequence-level readout, NOT a validated structure or function)",
+      "missing_bridge": "Predictions are sequence-level only; no wet-lab or structural validation, no coupling to a cell/tissue model",
+      "next_bounded_action": "Pin the run receipt (code/model/env hashes) and get one independent replication before any fidelity claim",
+      "provenance": "asserted_by_project"
+    },
+    {
+      "id": "prim:binder",
+      "scale": "macromolecular",
+      "primitive": "binder",
+      "capability_state": "proposed",
+      "engine": null,
+      "source_context": "Binder-design tools (e.g. diffusion/MPNN) external, not wired; refs in morphoswarm binders-and-sensors",
+      "output_artifact": "None",
+      "missing_bridge": "No binder-design engine run here",
+      "next_bounded_action": "Keep as a proposed connector; do not claim a designed binder",
+      "provenance": "none"
+    },
+    {
+      "id": "prim:integrin",
+      "scale": "subcellular",
+      "primitive": "integrin / mechanotransduction",
+      "capability_state": "proposed",
+      "engine": null,
+      "source_context": "Shenoy multiscale-mechanobiology link (cell<->matrix force transduction); no model wired, no exocoetid data",
+      "output_artifact": "None",
+      "missing_bridge": "No integrin/mechanotransduction model; no organism-specific parameters",
+      "next_bounded_action": "Scope only; a continuum mechano-chemical model would need measured parameters we do not have",
+      "provenance": "none"
+    },
+    {
+      "id": "prim:cell-circuit",
+      "scale": "cellular",
+      "primitive": "cell circuit",
+      "capability_state": "implemented-run",
+      "engine": "BioModels ODE replay (Delta-Notch lateral-inhibition model)",
+      "source_context": "Project BioModels Delta-Notch run (user-asserted real run); BioModels orx Evidence drafts exist (e.g. run c7505835, Claim biomodels-1047) per biomodels-to-dx-corpus",
+      "output_artifact": "Simulated-Evidence draft from an ODE replay (circuit dynamics), not a designed circuit",
+      "missing_bridge": "A single cell-circuit replay, not coupled to tissue or organism scale",
+      "next_bounded_action": "Verify the Delta-Notch run receipt and record it as simulated Evidence; do not claim a designed circuit",
+      "provenance": "asserted_by_project"
+    },
+    {
+      "id": "prim:metabolic-switch",
+      "scale": "cellular",
+      "primitive": "metabolic switch",
+      "capability_state": "external-connector",
+      "engine": "BioModels ODE library (Tiwari et al. 2021: 233/455 models replay as deposited)",
+      "source_context": "Reproducibility index parsed by fable-lead (ebi.ac.uk/biomodels/reproducibility, 455 rows)",
+      "output_artifact": "A library of replayable ODE models; no specific metabolic switch was designed or run as a switch",
+      "missing_bridge": "No bistable-switch instance selected or coupled to a higher scale",
+      "next_bounded_action": "Pick one replayable bistable model and run it with controls before claiming a switch capability",
+      "provenance": "verified_by_fable"
+    },
+    {
+      "id": "prim:RNA",
+      "scale": "macromolecular",
+      "primitive": "RNA",
+      "capability_state": "proposed",
+      "engine": null,
+      "source_context": "External RNA-structure tools not wired",
+      "output_artifact": "None",
+      "missing_bridge": "No RNA structure/design engine run here",
+      "next_bounded_action": "Scope only",
+      "provenance": "none"
+    },
+    {
+      "id": "prim:aptamer",
+      "scale": "macromolecular",
+      "primitive": "aptamer",
+      "capability_state": "proposed",
+      "engine": null,
+      "source_context": "No aptamer-selection/design engine wired",
+      "output_artifact": "None",
+      "missing_bridge": "No aptamer engine run here",
+      "next_bounded_action": "Scope only",
+      "provenance": "none"
+    },
+    {
+      "id": "prim:DNA",
+      "scale": "molecular",
+      "primitive": "DNA / genome",
+      "capability_state": "proposed",
+      "engine": "Evo2 (genome language model) - PENDING (named, not yet run)",
+      "source_context": "User-asserted: Evo2 pending. No run has occurred",
+      "output_artifact": "None yet",
+      "missing_bridge": "No genome-model run; access/compute pending; outputs would be sequence-level only",
+      "next_bounded_action": "Preregister a bounded Evo2 question (acceptance/falsifier/stop) and run only when access is confirmed",
+      "provenance": "asserted_by_project"
+    },
+    {
+      "id": "prim:epigenetic-pattern",
+      "scale": "molecular",
+      "primitive": "epigenetic pattern",
+      "capability_state": "proposed",
+      "engine": null,
+      "source_context": "No chromatin/epigenetic-state engine wired",
+      "output_artifact": "None",
+      "missing_bridge": "No epigenetic-pattern model run here",
+      "next_bounded_action": "Scope only",
+      "provenance": "none"
+    },
+    {
+      "id": "prim:gradient",
+      "scale": "subcellular",
+      "primitive": "morphogen gradient",
+      "capability_state": "implemented-unrun",
+      "engine": "pde_oracle reaction-diffusion solver (gradient mode available)",
+      "source_context": "Solver exists (validated vs the NCA solver at 3e-14 per messages); no gradient-specific run named",
+      "output_artifact": "None for a gradient instance yet (the engine is implemented but this mode is unrun)",
+      "missing_bridge": "No morphogen-gradient instance run or coupled to a tissue readout",
+      "next_bounded_action": "Run one bicoid-style gradient case with a positive/negative control",
+      "provenance": "asserted_by_project"
+    },
+    {
+      "id": "prim:patterning",
+      "scale": "tissue",
+      "primitive": "patterning (reaction-diffusion)",
+      "capability_state": "implemented-run",
+      "engine": "pde_oracle reaction-diffusion / Turing solver (validated vs NCA solver at 3e-14)",
+      "source_context": "Project RD run (user-asserted real run; pde_oracle referenced in messages). Not independently rerun by fable-lead",
+      "output_artifact": "Turing-onset pattern solves (linear-onset regime)",
+      "missing_bridge": "Linear Turing onset can miss the realised nonlinear pattern; not coupled to organ/organism form",
+      "next_bounded_action": "The preregistered nonlinear-PDE ensemble (CPU-first, GPU only past a measured CPU estimate)",
+      "provenance": "asserted_by_project"
+    },
+    {
+      "id": "prim:fin-mechanics",
+      "scale": "organ",
+      "primitive": "fin mechanics",
+      "capability_state": "implemented-run",
+      "engine": "fin-beam (Euler-Bernoulli beam model of a fin ray)",
+      "source_context": "Project fin-beam run (user-asserted real run). Structural model of a fin ray under load",
+      "output_artifact": "Beam deflection/stress under a declared load (a structural readout)",
+      "missing_bridge": "No measured exocoetid fin-ray modulus; parameters do not transfer from the zebrafish jaw-joint class",
+      "next_bounded_action": "Obtain a fin-ray modulus (FF-Q11) before any parameterised fin-mechanics claim",
+      "provenance": "asserted_by_project"
+    },
+    {
+      "id": "prim:behavior",
+      "scale": "organism",
+      "primitive": "behavior",
+      "capability_state": "proposed",
+      "engine": null,
+      "source_context": "No behavior engine; only form-coupled, measurable behavior is in scope (e.g. feeding<->beak)",
+      "output_artifact": "None",
+      "missing_bridge": "No behavior model run here",
+      "next_bounded_action": "Scope only; keep behavior out unless coupled to a measured form",
+      "provenance": "none"
+    },
+    {
+      "id": "prim:organism",
+      "scale": "organism",
+      "primitive": "organism (flying-fish glide envelope)",
+      "capability_state": "implemented-run",
+      "engine": "exocoetid aerodynamic-envelope checker (exocoetid_check.py; 8 constraints C1-C6; 71 tests) - the 'glide' run; owned by codex-03 + guilds",
+      "source_context": "Verified by fable-lead against the Fish 1990 / Park & Choi / Davenport envelopes; see messages/flying-fish-checker.md",
+      "output_artifact": "A REFUTED / NOT_REFUTED / CANNOT-EVALUATE verdict with the first violated inequality and its witnessing number",
+      "missing_bridge": "Envelopes are NOT feasibility laws and C4 stability is configuration-dependent; this flags where a design leaves a sourced envelope, it is not a plausibility verdict",
+      "next_bounded_action": "FF-Q01 aerodynamic calibration (reproduce the 6 genera's measured values within tolerance, with a must-fail mutant)",
+      "provenance": "verified_by_fable"
+    }
+  ]
+}

@@ -1,19 +1,22 @@
 {
   "schema": "frontier-drafts-0.1",
-  "validated_against": "origin/main frontier/models.py (SCHEMA frontier-record-0.1)",
+  "validated_against": "live deploy commit 9e6045e frontier/models.py (SCHEMA frontier-record-0.1)",
   "meta": {
     "owner": "fable-lead",
-    "generated_utc": "2026-10-31T19:08:26Z",
+    "generated_utc": "2026-10-31T19:27:57Z",
     "purpose": "Proposed Frontier Drafts for root review and import. NO acceptance is claimed; these are source-statement Claims and actionable Problem protocols only.",
     "rules_followed": [
-      "<=8 records (5 source-statement Claims + 3 actionable Problem protocols)",
-      "source_statement from a specific primary read, with locator and read-level",
-      "short copyright-compliant quotes; content_sha256 as integrity anchor; content_available=false for copyrighted sources so the licence gate does not fire; public-domain Darwin carries content_available=true + license",
-      "NO bio-transfer inferred: Daane zebrafish phenocopy and flying-fish association are DISTINCT claims and the transfer is posed only as an open Problem",
-      "typed Ref edges are NOT embedded because Ref.version requires a post-submit digest; intended edges are declared in 'couplings' for root to realise at import"
+      "7 source-statement Claims (<=8 cap honoured) + 3 actionable Problem protocols = 10 records",
+      "each Claim carries payload.origin='source_statement'; each Problem carries payload.approach (measurement|theory_fit|design_goal), scales (Scale enum) and context_tags - all in-schema on the deployed 9e6045e model",
+      "ONE short quotation (<=25 words) per source; all other source wording paraphrased; detailed locators and read-levels preserved; value is table/number accuracy, not quote volume",
+      "NO bio-transfer inferred: Daane zebrafish phenocopy and flying-fish association are DISTINCT Claims; transfer is posed only as Problem ff-fin-mechanism-transfer",
+      "copyright-compliant: content_sha256 as integrity anchor; content_available=false for copyrighted sources; public-domain Darwin carries content_available=true + license",
+      "typed Ref edges are declared in 'couplings' (Ref.version needs a post-submit digest); realised at import",
+      "actors/operator local-fleet provenance preserved: namespace=frontier-fable, issuer=fable-lead on every record"
     ],
     "single_reader": "fable-lead, NOT Codex-reviewed, until root review",
-    "update_note": "2026-10-31 update: Daane upgraded to full-text (NOAA repository PDF); added Saro-Cortes 2022 (robotic model) and Park & Choi 2010 (physical model) as source-statement Claims; both QUALIFY C4 (stability is configuration-dependent and trades against lift; Oxyporhamphus refutation survives). Park & Choi provenance corrected (403 is about the client; no OA copy indexed != none exists). Now 7 source-statement Claims + 3 Problem protocols."
+    "record_count_note": "10 records total: 7 source-statement Claims + 3 actionable Problem protocols. The earlier '<=8' referred to the source-statement Claim cap; that cap is honoured (7<=8). The 3 Problems are the design protocols, a separate deliverable.",
+    "update_note": "2026-10-31: validated against live deploy 9e6045e; added in-schema Claim.origin + Problem.approach/scales/context_tags; trimmed to one <=25-word quote per source."
   },
   "drafts": [
     {
@@ -26,11 +29,11 @@
       "predecessor": null,
       "payload": {
         "title": "lat4a x kcnh2a reproduce flying-fish fin PROPORTION in zebrafish (Daane et al. 2021)",
-        "statement": "In zebrafish, a combination of lat4a (L-type amino-acid transporter) and kcnh2a (potassium channel) alleles reproduces the paired-fin proportion ('fin bauplan') characteristic of flying fishes, and ectopic kcnh2a expression alone is sufficient to drive fin overgrowth. Quote: 'a combination of alleles from both genes is sufficient to reproduce the flying fish fin bauplan in the distantly related zebrafish.' This is a fin-size/proportion result in the zebrafish model organism.",
+        "statement": "In zebrafish, combining lat4a (an L-type amino-acid transporter) and kcnh2a (a potassium channel) alleles reproduces the paired-fin proportion characteristic of flying fishes, and ectopic kcnh2a expression alone drives fin overgrowth. The authors state: 'a combination of alleles from both genes is sufficient to reproduce the flying fish fin bauplan in the distantly related zebrafish'. A fin-size/proportion result in the zebrafish model.",
         "context": "Danio rerio (zebrafish); forward-genetic screen + CRISPR against lat4a; readout fin length vs standard length. Concerns fin PROPORTION, not flight; no flight assay performed.",
         "assumptions": [
-          "Read at full-text grade from the NOAA repository PDF (47 pp) + Europe PMC abstract.",
-          "Fig 4 legend, verbatim: 'Intersection of bioelectric and Lat4a-mediated growth pathways is sufficient to phenocopy the evolved flying fish fin allometry'. The double mutant lat4a(nr21/+);kcnh2a(lof/+) shows wild-type-sized medial fins while the paired fins are overgrown. Exact plotted B/C normalized-length values are in Fig 4 panels / Data S1A (not in body text)."
+          "Full text read from the NOAA repository PDF (47 pp) plus the Europe PMC abstract.",
+          "Figure 4 shows the lat4a;kcnh2a double mutant with wild-type-sized medial fins but overgrown paired fins (paraphrased); the exact plotted B/C normalized-length values are in the figure panels / Data S1A, not the body text."
         ],
         "limitations": [
           "Functional demonstration is in zebrafish only.",
@@ -45,7 +48,8 @@
           "content_available": false,
           "access": "NOAA repository full-text PDF (pdftotext, 47 pp) + Europe PMC abstract, read 2026-10-31",
           "license": null
-        }
+        },
+        "origin": "source_statement"
       }
     },
     {
@@ -58,11 +62,11 @@
       "predecessor": null,
       "payload": {
         "title": "Genome-wide signatures across 35 beloniform species associate K+/amino-acid-transport loci with increased paired-fin size (Daane et al. 2021)",
-        "statement": "A phylogenomic analysis of >300,000 loci across 35 species of flying fishes and relatives identifies coding and regulatory signatures associated with convergently increased paired-fin size, including 48 of 17,937 genes with convergent evolutionary-rate shifts, among them potassium- and amino-acid-transport genes.",
+        "statement": "A phylogenomic analysis of over 300,000 loci across 35 species of flying fishes and relatives reports coding and regulatory signatures associated with convergently increased paired-fin size, including 48 of 17,937 genes with convergent evolutionary-rate shifts, among them potassium- and amino-acid-transport genes.",
         "context": "Comparative genomics across Beloniformes (Exocoetidae + relatives); targeted multi-species sequencing of conserved non-coding elements. This is an ASSOCIATION (genomic signatures), not a functional test in any flying fish.",
         "assumptions": [
-          "Convergence called after false-discovery control (per the paper's Results).",
-          "Full text (NOAA PDF) adds: the 'flying halfbeaks' Euleptorhamphus and Oxyporhamphus show a fin-body allometric scaling INTERMEDIATE between halfbeaks and flying fishes (Fig 1B/1C; Data S1A) - living intermediate forms on the fin-size axis."
+          "Convergence called after false-discovery control (paraphrased from the Results).",
+          "Full text also reports that the 'flying halfbeaks' Euleptorhamphus and Oxyporhamphus have pectoral allometry intermediate between halfbeaks and flying fishes - living intermediates on the fin-size axis (paraphrased)."
         ],
         "limitations": [
           "Association only; no functional manipulation in a flying fish.",
@@ -77,7 +81,8 @@
           "content_available": false,
           "access": "NOAA repository full-text PDF (pdftotext, 47 pp) + Europe PMC abstract, read 2026-10-31",
           "license": null
-        }
+        },
+        "origin": "source_statement"
       }
     },
     {
@@ -107,7 +112,8 @@
           "content_available": false,
           "access": "author-hosted PDF, full-text, read 2026-10-31 (pdftotext)",
           "license": null
-        }
+        },
+        "origin": "source_statement"
       }
     },
     {
@@ -137,7 +143,8 @@
           "content_available": false,
           "access": "author-hosted PDF, full-text, read 2026-10-31 (pdftotext)",
           "license": null
-        }
+        },
+        "origin": "source_statement"
       }
     },
     {
@@ -150,10 +157,11 @@
       "predecessor": null,
       "payload": {
         "title": "Darwin's flying-fish passage is an explicit 'imaginary illustration' / conceivability argument (Origin ch. VI)",
-        "statement": "In On the Origin of Species (ch. VI 'Difficulties on Theory'; 1st ed. 1859 p.182 through 6th ed. 1872 p.140) Darwin calls flying fish 'our imaginary illustration' and argues subjunctively that flying-fish 'might have been modified into perfectly winged animals' if selection had run that way. Quote (1859): 'it is conceivable that flying-fish, which now glide far through the air, slightly rising and turning by the aid of their fluttering fins, might have been modified into perfectly winged animals.' It is a conceivability argument against an objection, not a claim that flying fish are en route to flight.",
+        "statement": "In On the Origin of Species (ch. VI; 1st ed. 1859 p.182 through 6th ed. 1872 p.140) Darwin calls flying fish 'our imaginary illustration' and argues only subjunctively that flying fish might, if selection had run that way, have been modified into winged animals. It is a conceivability argument against an objection, not a claim that flying fish are becoming flyers.",
         "context": "Historical text, public domain; stable across all six British editions (variorum). 'Fluttering fins' is a 19th-c conjecture; the modern known mechanism is passive gliding on held-rigid pectorals plus tail taxiing, not flapping fins.",
         "assumptions": [
-          "Verbatim 1859 quote above; page locators from the Darwin Online variorum."
+          "Page locators and cross-edition stability are from the Darwin Online variorum; the wording is stable across all six British editions.",
+          "Darwin's description of 'fluttering fins' is a 19th-century conjecture; the modern mechanism is passive gliding, not flapping (paraphrased, not the source's words)."
         ],
         "limitations": [
           "Darwin never writes 'Exocoetus' in the 1859/1860/1872 editions (independent grep).",
@@ -168,7 +176,8 @@
           "content_available": true,
           "access": "Darwin Online variorum via r.jina.ai + Project Gutenberg (1228/22764/2009), read 2026-10-31",
           "license": "public domain"
-        }
+        },
+        "origin": "source_statement"
       }
     },
     {
@@ -216,7 +225,18 @@
           "access": "author-hosted PDF, full-text, read 2026-10-31 (pdftotext)",
           "license": null
         },
-        "original": {}
+        "original": {},
+        "approach": "measurement",
+        "scales": [
+          "organism",
+          "organ"
+        ],
+        "context_tags": [
+          "biomechanics",
+          "calibration",
+          "wing-loading",
+          "aspect-ratio"
+        ]
       }
     },
     {
@@ -261,7 +281,19 @@
           "access": "NOAA repository full-text PDF (pdftotext, 47 pp) + Europe PMC abstract, read 2026-10-31",
           "license": null
         },
-        "original": {}
+        "original": {},
+        "approach": "theory_fit",
+        "scales": [
+          "molecular",
+          "cellular",
+          "organ"
+        ],
+        "context_tags": [
+          "molecule-to-form",
+          "association-vs-function",
+          "no-flight",
+          "cross-organism-transfer"
+        ]
       }
     },
     {
@@ -305,7 +337,18 @@
           "access": "NOAA repository full-text PDF (pdftotext, 47 pp) + Europe PMC abstract, read 2026-10-31",
           "license": null
         },
-        "original": {}
+        "original": {},
+        "approach": "design_goal",
+        "scales": [
+          "molecular",
+          "organ",
+          "organism"
+        ],
+        "context_tags": [
+          "molecule-to-form",
+          "predicted-vs-observed",
+          "fin-proportion"
+        ]
       }
     },
     {
@@ -318,7 +361,7 @@
       "predecessor": null,
       "payload": {
         "title": "Robotic flying-fish model: a stability-lift trade-off; longitudinal stability only at posterior pelvic positions and negative pitch (Saro-Cortes et al. 2022)",
-        "statement": "A robotic model organism of a four-winged flying fish (Re = 30,000, 9 m/s) has aerodynamic efficiency maximised with the pelvic fin behind the pectoral fin and at positive pelvic pitch, but is 'never stable for theta > 0 deg' and 'never stable with the pelvic fin located below or just behind the pectoral fin at H1, H2, and H3'; longitudinal stability is 'only achieved for negative pelvic fin pitch angles and at H4 and H5'. The authors state there is 'a clear trade-off between stability and lift generation' and that an optimal pelvic-fin configuration depends on the flying-fish locomotion stage.",
+        "statement": "A robotic model of a four-winged flying fish (Reynolds number 30,000) has aerodynamic efficiency maximised with the pelvic fin behind the pectoral and at positive pitch, but is never longitudinally stable at positive pitch and is stable only at the posterior pelvic positions with negative pitch. The authors report 'a clear trade-off between stability and lift generation', with an optimal pelvic configuration that depends on locomotion stage.",
         "context": "Physical ROBOTIC model (not a live fish, not a numerical fish simulation); pelvic position H1-H5 and pitch -10 to +5 deg. Lift coefficient for H5 ~0.4 (0.33-0.52); no L/D values reported.",
         "assumptions": [
           "Read full-text via WebFetch (fetch tool), 2026-10-31; HOST claude-15 confirmed the article URL is browser-reachable (the 403s were path-specific, not paywall)."
@@ -336,7 +379,8 @@
           "content_available": false,
           "access": "full-text via WebFetch (fetch tool), read 2026-10-31; article URL (path mattered, not paywall)",
           "license": null
-        }
+        },
+        "origin": "source_statement"
       }
     },
     {
@@ -367,7 +411,8 @@
           "content_available": false,
           "access": "abstract (free) + facts relayed by HOST claude-15; full text not legally retrieved; no OA copy INDEXED by OpenAlex/Europe PMC (not evidence none exists; no author-page/IR search)",
           "license": null
-        }
+        },
+        "origin": "source_statement"
       }
     }
   ],
