@@ -1,0 +1,42 @@
+{
+  "claim_id": "darwin1859-ch12-13",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-13",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "For endemic vascular plants of oceanic archipelagos, the nearest relative on an independent synthetic phylogeny is, far more often than chance and in most cases, another species native to the same archipelago rather than a species from anywhere else.",
+  "pass_criterion": "Pre-registered: endemics of archipelago A = WCVP accepted non-hybrid species whose non-doubtful native records (introduced = 0) all lie in A. For every genus containing such an endemic, all WCVP accepted species of the genus are matched exactly to the Open Tree taxonomy (TNRS, context 'Land plants', no approximate matching) and the induced subtree of the Open Tree synthetic tree is fetched; tips are labelled A-native or non-A. A focal endemic qualifies if its genus tree has >= 1 other A-native tip and >= 1 non-A tip. Walking up from the focal tip to the first ancestor whose clade holds other tips, the outcome is 'inside' if those tips are all A-native, 'outside' if all non-A, 'tie' if mixed. f_in = inside / (inside + outside). Null per focal tip: the same clade size k drawn at random from the other tips of its genus tree (hypergeometric P_in, P_out); the null distribution of f_in is simulated (10,000 draws, seed 1). Archipelagos with < 10 resolved (inside + outside) endemics are dropped. SUPPORTS if pooled f_in >= 0.67 AND at least 75% of remaining archipelagos have f_in > 0.5 with simulated one-sided p < 0.05.",
+  "fail_criterion": "Pre-registered: REFUTES if pooled f_in <= 0.5, or if in a majority of remaining archipelagos f_in does not exceed its null expectation. Any other outcome is MIXED. Fewer than 5 remaining archipelagos: inconclusive (underpowered). WCVP or Open Tree API unreachable: inconclusive (data-unavailable). The tie fraction (unresolved polytomies, often taxonomy-only placements) is reported.",
+  "planned_datasets": [
+    "wcvp-kew-checklist",
+    "opentree-synthetic-tree-api"
+  ],
+  "interpretation": "Darwin's 'inhabitants of each separate island ... related in an incomparably closer degree to each other than to the inhabitants of any other part of the world' is read for endemic vascular plants: the nearest relative of an endemic should lie in the same archipelago. WCVP level-3 units are whole archipelagos, so 'separate islands' cannot be resolved except for the Mascarenes, which WCVP splits into Mauritius, Réunion and Rodrigues and which are pooled here as one archipelago (MAU+REU+ROD); for the others the test asks whether archipelago endemics cluster with archipelago natives. Relatives are searched within the genus only (genus trees from Open Tree), so endemics whose whole genus is confined to the archipelago contribute nothing. Archipelagos (WCVP level-3 codes): HAW, GAL, CNY, MDR, AZO, CVI, JNF, SCI, MRQ, FIJ, SAM, TUB, VAN, SEY, Mascarenes (MAU+REU+ROD); codes absent from WCVP are dropped. Plants only; Darwin's examples include birds and insects.",
+  "test_contract": {
+    "expected_observation": "Most archipelago endemics have as nearest phylogenetic relative another native of the same archipelago, well above a random-relabelling null.",
+    "disconfirming_observation": "Nearest relatives of archipelago endemics lie outside the archipelago at least as often as inside, or no more often inside than random labelling predicts.",
+    "admissible_datasets": "An expert checklist coding native ranges on a fixed regional scheme, and a phylogeny estimated independently of Darwin's argument covering the relevant genera; open access.",
+    "inference_method": "Nearest-clade composition for each endemic on the genus subtree of the Open Tree synthetic tree; f_in = inside/(inside+outside) compared with a hypergeometric clade-relabelling null simulated per archipelago; thresholds f_in >= 0.67 pooled and p < 0.05 in >= 75% of archipelagos."
+  },
+  "preregistration": {
+    "wcvp_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+    "opentree_tnrs": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+    "opentree_induced_subtree": "https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree",
+    "tnrs_context": "Land plants",
+    "archipelagos": {
+      "HAW": ["HAW"], "GAL": ["GAL"], "CNY": ["CNY"], "MDR": ["MDR"], "AZO": ["AZO"], "CVI": ["CVI"], "JNF": ["JNF"],
+      "SCI": ["SCI"], "MRQ": ["MRQ"], "FIJ": ["FIJ"], "SAM": ["SAM"], "TUB": ["TUB"], "VAN": ["VAN"], "SEY": ["SEY"],
+      "MASCARENES": ["MAU", "REU", "ROD"]
+    },
+    "max_genus_species": 3000,
+    "min_resolved_per_archipelago": 10,
+    "min_archipelagos": 5,
+    "null_draws": 10000,
+    "seed": 1
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
