@@ -10,5 +10,5 @@ PROPOSED and arrive `imported_unreviewed`. Nothing here was written to any store
 - Lifecycle is a source assessment plus one closed-form sizing check: no simulator Action, by design.
 - Kept visible: the scale model's out-of-band `rise_10_90_h`, the synchronous control that does not reproduce the measured
   impairment, and the behavior run's `render.py` hash that differs between its simulation arms and its render.
-- Not a calibration of any fish. Artifacts are `urn:sha256` / `referenced`; no URL, no licence, no secret-like text
-  (`find_secretish` refuses the freeze).
+- Not a calibration of any fish. Artifacts are `urn:sha256` / `referenced`; no URL, no licence, no credential-shaped text
+  (the freeze guard in `run_bundles.py` refuses any).

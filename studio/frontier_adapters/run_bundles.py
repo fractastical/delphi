@@ -365,6 +365,102 @@ def lifecycle_chain(repo: str, commit: str, *, namespace="node-a", issuer="impor
 CHAINS = {"fish3d": fish3d_chain, "scales": scales_chain, "behavior": behavior_chain, "lifecycle": lifecycle_chain}
 
 
+# ------------------------------------------------------------------------------------------------------------------------- BETSE tissue
+BT = "artifacts/bioelectric-tissue"
+BT_CODE = "engineering/bioelectric_tissue"
+BT_SCENARIOS = ("baseline", "k_up", "gj_block", "k_up_gj_block", "baseline_dt")
+BT_CHECKS = ("charge_consistency", "coupling_contrast_expectation", "finite_and_physical", "gj_block_control", "impermeant_P_total_conserved", "k_control_direction_and_reversal", "time_step_sensitivity")
+
+
+def betse_chain(repo: str, commit: str, *, namespace="node-a", issuer="importer", created_at=None) -> AssetChain:
+    """BETSE 1.5.0 generic 2-D cell patch: five scenarios, seven checks, one video. Generic tissue; no fin or fish calibration.
+
+    The summary carries scenario config and trajectory hashes, the BETSE version, the check values and a label. It does NOT carry an exit code, a
+    command, a wall time or an interpreter version, and it states no hash for the video or poster; the Action titles say so, and the video and
+    poster digests are computed here from the blobs (not producer-stated).
+    """
+    created_at = created_at or em._commit_utc(repo, commit)
+    c = AssetChain(repo, commit, namespace, issuer, created_at, "betse")
+    sm = c.jblob(f"{BT}/summary.json")
+    c.check("summary.schema", sm.get("schema") == "frontier.bioelectric-tissue.summary/1" and sm.get("all_checks_ok") is True and sm["label"].startswith("SIMULATED"),
+            f"schema {sm.get('schema')!r} all_checks_ok {sm.get('all_checks_ok')!r} label {sm.get('label')!r}")
+    c.check("summary.scenarios", tuple(sorted(sm["files"])) == tuple(sorted(BT_SCENARIOS)), f"scenarios {sorted(sm['files'])}")
+    c.check("summary.checks", tuple(sorted(sm["checks"])) == BT_CHECKS and all(v["ok"] is True for v in sm["checks"].values()), f"checks {sorted(sm['checks'])} ok {[k for k, v in sm['checks'].items() if not v['ok']]}")
+    blobs = {}
+    for sc, f in sm["files"].items():
+        blobs[f"{sc}.cfg"] = c.same_hash(f"config.{sc}", f"{BT}/{f['config']}", f["config_sha256"])
+        blobs[f"{sc}.traj"] = c.same_hash(f"trajectory.{sc}", f"{BT}/{f['trajectory']}", f["trajectory_sha256"])
+    code = {n: c.blob(f"{BT_CODE}/{n}") for n in ("run.py", "analysis.py", "betse_stage.py", "render.py", "requirements-betse.txt")}
+    smb, itf_b = c.blob(f"{BT}/summary.json"), c.blob(f"{BT}/model_interface.json")
+    itf = json.loads(itf_b)
+    c.check("interface.status", itf["status"].startswith("SIMULATED") and "Fin applicability: UNKNOWN" in itf["status"], itf["status"][:120])
+    mp4, poster = c.blob(f"{BT}/bioelectric_tissue.mp4"), c.blob(f"{BT}/poster.png")
+    tests_b = c.blob("tests/test_bioelectric_tissue.py")
+    n_tests = sum(1 for ln in tests_b.decode().splitlines() if ln.startswith("def test_"))
+    ef, ch, rg = sm["effects"], sm["checks"], sm["reference_ghk"]
+    ku, gj, kg = ef["k_up"], ef["gj_block"], ef["k_up_gj_block"]
+    cands = itf.get("candidate_channel_links", [])
+    lim = [em.IMPORT_NOTE, "GENERIC 2-D tissue patch with BETSE default parameters; no sourced fin or fish tissue parameters. Fin applicability: UNKNOWN. " + NOT_CALIBRATED,
+           f"Temperature is the BETSE default 310 K; a fish fin is not at that temperature.",
+           f"Simulated mean resting Vm is {rg['simulated_mean_resting_Vm_mV']:.1f} mV against a leak-only GHK reference of {rg['ghk_leak_only_mV']:.2f} mV; the producer states the GHK number ignores the pump and gap junctions and the difference is not decomposed. Kept as found.",
+           "Gap-junction conductance in siemens, channel conductance and growth coupling are not exposed (BETSE parameterizes junctions by a surface fraction); their values are UNKNOWN.",
+           "No ion depletion in the environment, no flow, no deformation, no gene regulation."]
+    lim += [f"Channel candidate {x['candidate'].split(' (')[0]}: listed as a source link only; used_to_set_any_parameter {x['used_to_set_any_parameter']}; conductance, gating and copy number UNKNOWN." for x in cands]
+    asm = [f"BETSE {sm['betse']}; {sm['n_cells']} cells, {sm['n_membranes']} membranes, intervention window {sm['intervention_window_s']} s, {sm['samples']} saved samples.",
+           "Scenarios: baseline; k_up (K+ membrane permeability x5 in the 2 cells of the Spot profile, a generic scale, not Kir2.1); gj_block (all gap junctions blocked); k_up_gj_block; baseline_dt (half solver step, a numerical control).",
+           f"Environment pins: {code['requirements-betse.txt'].decode().splitlines()[1]} and the rest of requirements-betse.txt; interpreter NOT RECORDED in the receipt."]
+    claim = _claim(c, "run-betse-claim-k-gap-junction-contrast", "Generic BETSE tissue patch: K+ permeability change spreads through gap junctions and is confined when they are blocked",
+                   (f"In BETSE {sm['betse']} on a {sm['n_cells']}-cell generic patch (default parameters), raising K+ permeability x5 in {ku['n_targeted_cells']} cells over {sm['intervention_window_s']} s moves the targeted cells by at most {ku['targeted_peak_dVm_mV']:.2f} mV "
+                    f"and the {ku['n_other_cells']} other cells by up to {ku['other_peak_dVm_mV']:.2f} mV; with gap junctions blocked as well the targeted cells move by {kg['targeted_peak_dVm_mV']:.1f} mV and the others by {kg['other_peak_dVm_mV']:.2f} mV; "
+                    f"blocking junctions alone moves Vm by at most {max(abs(gj['targeted_peak_dVm_mV']), abs(gj['other_peak_dVm_mV'])):.2f} mV. Simulated mean resting Vm is {rg['simulated_mean_resting_Vm_mV']:.1f} mV."),
+                   "A deterministic simulated outcome of a generic tissue model under declared perturbations; not an observation and not a fish fin. " + sm["label"], asm, lim, f"{BT}/summary.json", smb,
+                   "Summary: per-scenario effects, checks, hashes and the producer's label.")
+    cfg_code = f"git:{em.REPO_LABEL}@{commit}; " + ", ".join(f"{n}:{sha_bytes(b)[:12]}" for n, b in sorted(code.items()) if n != "render.py")
+    act = _action(c, SRC, "run-betse-action-sim", claim,
+                  f"Imported record of a producer-reported run (NOT executed by Frontier): five BETSE {sm['betse'].split()[1]} scenarios; the receipt carries NO exit code, command or wall time (the producer's doc reports about 1-2 min per run)",
+                  [ACCEPT_REPLAY, "An independent reviewer checks the BETSE configuration against tissue sources before any number is applied to a fin."], ["python3.12 with betse==1.5.0 (isolated venv)"],
+                  dict(input="five scenario configs " + ", ".join(f"{k}:{v['config_sha256'][:10]}" for k, v in sorted(sm["files"].items())), code=cfg_code, model=f"{sm['betse']} (ion, pump and gap-junction cell-patch simulator; no language model)",
+                       environment="requirements-betse.txt pins betse==1.5.0 and dependencies; interpreter and platform NOT RECORDED", parameters="BETSE defaults; K_permeability_multiplier 5.0 in the Spot profile; gap-junction block as in the configs",
+                       scope="simulated generic tissue; not a fin"), [])
+    ev = _evidence(c, SRC, "run-betse-evidence-sim", claim, kind="simulated", relation="unspecified", produced_by=act, source=em._source(c, f"{BT}/summary.json", smb, "Summary."),
+                   method=f"BETSE {sm['betse']} runs of five scenarios; effects are differences from the baseline run. " + sm["label"], context="Applicability: this generic patch with BETSE defaults. " + em.IMPORT_NOTE, assumptions=asm,
+                   provenance=_prov(c, betse=sm["betse"], scenarios=sorted(sm["files"]), trajectories_sha256={k: v["trajectory_sha256"] for k, v in sorted(sm["files"].items())}, exit_status_recorded=False, command_recorded=False),
+                   limitations=lim, uncertainty="Deterministic runs; solver-step sensitivity control only (max |dVm| %.2g mV). No parameter or biological uncertainty." % ch["time_step_sensitivity"]["max_abs_dVm_mV"],
+                   artifacts=[c.artifact("output", f"{BT}/{f['trajectory']}", blobs[f"{sc}.traj"], f"scenario {sc}: saved Vm, concentrations, gap-junction state") for sc, f in sorted(sm["files"].items())]
+                   + [c.artifact("input", f"{BT}/{f['config']}", blobs[f"{sc}.cfg"], f"scenario {sc} BETSE configuration") for sc, f in sorted(sm["files"].items())]
+                   + [c.artifact("log", f"{BT}/summary.json", smb, "summary with effects and checks"), c.artifact("protocol", f"{BT}/model_interface.json", itf_b, "model interface: inputs used, outputs, what is not exposed"),
+                      c.artifact("code", f"{BT_CODE}/run.py", code["run.py"]), c.artifact("code", f"{BT_CODE}/betse_stage.py", code["betse_stage.py"]),
+                      c.artifact("environment", f"{BT_CODE}/requirements-betse.txt", code["requirements-betse.txt"], "pinned BETSE environment")])
+    cl2 = _claim(c, "run-betse-claim-checks", "BETSE tissue patch: seven computational checks pass, one of them a definitional consistency and one an expectation",
+                 (f"The producer's {len(ch)} checks all pass: {', '.join(sorted(ch))}. Time-step halving changes Vm by at most {ch['time_step_sensitivity']['max_abs_dVm_mV']:.2g} mV ({ch['time_step_sensitivity']['ratio_to_K_control_peak']:.2g} of the K-control peak); "
+                  f"total impermeant P is conserved to relative range 0 in every scenario; the K control direction and reversal and the gap-junction block control are met."),
+                 "Implementation checks of a simulator output. " + ch["charge_consistency"]["note"] + ". " + ch["coupling_contrast_expectation"]["note"] + ".", asm,
+                 lim + [f"Charge consistency: {ch['charge_consistency']['note']}.", f"Coupling contrast is an expectation, not a law: {ch['coupling_contrast_expectation']['criterion']}.", f"Mass: {ch['impermeant_P_total_conserved']['note']}.",
+                        f"The repository's tests/test_bioelectric_tissue.py defines {n_tests} tests that recompute the committed checks from the committed trajectories; this adapter did not run them or recompute the checks."],
+                 f"{BT}/summary.json", smb, "The checks block with criteria and values.")
+    act2 = _action(c, SRC, "run-betse-action-checks", cl2, "Imported record of producer-reported checks (NOT executed by Frontier): seven predicates over the saved trajectories",
+                   [ACCEPT_REPLAY, "A reviewer reads each criterion and confirms it tests what its name says."], ["python3 with numpy"],
+                   dict(input="saved trajectories of the five scenarios (see the simulation Evidence)", code=f"git:{em.REPO_LABEL}@{commit}; analysis.py {sha_bytes(code['analysis.py'])[:12]}", model="none: numerical predicates",
+                        environment="NOT RECORDED by the producer", parameters="thresholds are check criteria, not statistics", scope="checks of a simulator output"), [ev])
+    _evidence(c, SRC, "run-betse-evidence-checks", cl2, kind="simulated", relation="unspecified", produced_by=act2, source=em._source(c, f"{BT}/summary.json", smb, "Checks block."),
+              method="Seven predicates over saved trajectories; values and criteria are in the summary.", context="Applicability: these trajectories only. " + em.IMPORT_NOTE, assumptions=asm,
+              provenance=_prov(c, checks=sorted(ch), all_checks_ok=sm["all_checks_ok"], repo_test_defs=n_tests, tests_run_by_adapter=False), limitations=lim + ["Producer check, not independent."],
+              artifacts=[c.artifact("certificate", f"{BT}/summary.json", smb, "checks with criteria and values"), c.artifact("code", f"{BT_CODE}/analysis.py", code["analysis.py"]), c.artifact("code", "tests/test_bioelectric_tissue.py", tests_b)])
+    ract = _action(c, SRC, "run-betse-action-render", claim, "Imported record of a producer-reported render (NOT executed by Frontier): video and poster from the saved trajectories; the producer states NO hash for either, so the digests here were computed by this adapter",
+                   ["Re-rendering the trajectories with render.py reproduces the frames; mp4 bytes can differ across ffmpeg builds.", "Pictures are read as views of computed states, not as evidence."], ["python3 with matplotlib; ffmpeg"],
+                   dict(input=f"simulation evidence version {ev['version']}", code=f"git:{em.REPO_LABEL}@{commit}; render.py {sha_bytes(code['render.py'])[:12]}", model="none: deterministic rendering", environment="NOT RECORDED by the producer",
+                        parameters="NOT RECORDED (frame count and fps are not in the receipt)", scope="visualisation of a simulated generic tissue patch"), [ev])
+    _evidence(c, SRC, "run-betse-evidence-render", claim, kind="simulated", relation="context_only", produced_by=ract, source=em._source(c, f"{BT}/model_interface.json", itf_b, "Interface and status label."),
+              method="Producer renders the saved trajectories to a video and poster (render.py). No render receipt exists; hashes are adapter-computed.", context=RENDER_NOTE + " " + em.IMPORT_NOTE, assumptions=asm,
+              provenance=_prov(c, hashes_stated_by_producer=False, mp4_sha256=sha_bytes(mp4), poster_sha256=sha_bytes(poster)), limitations=[em.IMPORT_NOTE, RENDER_NOTE, NOT_CALIBRATED, "No producer-stated hash for the video or poster; the digests are computed from the committed bytes."],
+              artifacts=[c.artifact("output", f"{BT}/bioelectric_tissue.mp4", mp4, "video of simulated states"), c.artifact("output", f"{BT}/poster.png", poster, "poster"), c.artifact("code", f"{BT_CODE}/render.py", code["render.py"])])
+    return c
+
+
+LATER = {"betse": betse_chain}
+ALL_CHAINS = {**CHAINS, **LATER}
+
+
 # ---------------------------------------------------------------------------------------------------------------------------- bundles
 # Root is making the repository public after a credential/history audit: no curated output may carry a presigned URL or a secret-looking field.
 SECRETISH = re.compile(r"X-Amz|Signature=|Expires=|presign|[?&]token=|access[_-]?key|secret|passw(?:or)?d|api[_-]?key|bearer|authorization|AKIA[0-9A-Z]{8}|sk-[A-Za-z0-9]{16}|BEGIN [A-Z ]*PRIVATE|\.credentials|https?://[^\"\s]*\?", re.I)
@@ -429,13 +525,13 @@ def main(argv=None) -> int:
     ap.add_argument("--repo", default=".")
     ap.add_argument("--source-commit", required=True)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--only", nargs="*", choices=sorted(CHAINS), default=sorted(CHAINS))
+    ap.add_argument("--only", nargs="*", choices=sorted(ALL_CHAINS), default=sorted(CHAINS))
     ap.add_argument("--namespace", default="node-a")
     ap.add_argument("--issuer", default="importer")
     ap.add_argument("--created-at", default=None)
     a = ap.parse_args(argv)
     commit = em.resolve_commit(a.repo, a.source_commit)
-    chains = [CHAINS[n](a.repo, commit, namespace=a.namespace, issuer=a.issuer, created_at=a.created_at) for n in a.only]
+    chains = [ALL_CHAINS[n](a.repo, commit, namespace=a.namespace, issuer=a.issuer, created_at=a.created_at) for n in a.only]
     out = write_frozen(a.out, chains)
     print(json.dumps({"chains": {c["name"]: c["counts"] for c in out["report"]["chains"]}, "commit": commit, "out": a.out}))
     return 0

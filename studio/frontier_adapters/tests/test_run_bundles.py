@@ -19,6 +19,9 @@ from frontier_adapters.artifacts import find_abs_paths
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 COMMIT = "10cde736c0d15971b97c35692b0de8ddeea2299b"          # the root tip the producer files were read from
 EXAMPLE = os.path.join(ROOT, "frontier_adapters", "examples", "run_bundles")
+COMMIT_BETSE = "b53e0cd5399f6d7a6657b86f33052cb1ffda00b5"      # root tip that integrated BETSE (4daceb5) and the earlier producers
+EXAMPLE_BETSE = os.path.join(ROOT, "frontier_adapters", "examples", "run_bundles_betse")
+BETSE_PATHS = ["artifacts/bioelectric-tissue", "engineering/bioelectric_tissue", "tests/test_bioelectric_tissue.py"]
 PRODUCER_PATHS = ["artifacts/fish3d", "artifacts/scales", "artifacts/behavior", "data/fish-lifecycle", "engineering/fish3d", "engineering/geometry",
                   "engineering/scales", "engineering/behavior", "engineering/lifecycle", "docs/fish-lifecycle.md"]
 
@@ -28,6 +31,8 @@ def have_commit() -> bool:
 
 
 needs_commit = pytest.mark.skipif(not have_commit(), reason=f"source commit {COMMIT[:12]} not present in this checkout")
+needs_betse = pytest.mark.skipif(subprocess.run(["git", "-C", ROOT, "cat-file", "-e", COMMIT_BETSE + "^{commit}"], capture_output=True).returncode != 0,
+                                 reason=f"BETSE source commit {COMMIT_BETSE[:12]} not present in this checkout")
 
 
 @pytest.fixture(scope="module")
@@ -128,9 +133,10 @@ def test_build_is_deterministic_and_the_committed_bundles_are_reproduced(chains,
     again = [fn(ROOT, COMMIT) for fn in rb.CHAINS.values()]
     assert [r["version"] for c in chains for r in c.records] == [r["version"] for c in again for r in c.records]
     rb.write_frozen(str(tmp_path), chains)
-    for n in sorted(os.listdir(EXAMPLE)):
+    frozen = sorted(n for n in os.listdir(EXAMPLE) if n != "README.md")          # README.md is hand-written, not generated
+    for n in frozen:
         assert open(os.path.join(EXAMPLE, n), "rb").read() == open(tmp_path / n, "rb").read(), f"{n} differs from a fresh build; refreeze with --source-commit {COMMIT[:12]}"
-    assert sorted(os.listdir(EXAMPLE)) == sorted(os.listdir(tmp_path))
+    assert frozen == sorted(os.listdir(tmp_path))
 
 
 @needs_commit
@@ -290,3 +296,106 @@ def test_frozen_bundles_import_into_an_ephemeral_store_with_zero_forks_and_are_s
     geo = idx.search("", role="geometry")["items"]
     assert geo and all(i["artifact"]["availability"] == "referenced" and i["artifact_bytes_verified"] is False and i["local_status"] == "imported_unreviewed" for i in geo)
     assert [i["evidence_kind"] for i in idx.search("states.npz")["items"]] == ["simulated"]
+
+
+# ------------------------------------------------------------------ BETSE tissue chain (own frozen set, own source commit)
+@pytest.fixture(scope="module")
+def betse():
+    return rb.betse_chain(ROOT, COMMIT_BETSE)
+
+
+@pytest.fixture
+def mutate_betse(tmp_path):
+    d = str(tmp_path)
+    subprocess.run(f"git -C {ROOT} archive {COMMIT_BETSE} {' '.join(BETSE_PATHS)} | tar -x -C {d}", shell=True, check=True)
+    _git(d, "init", "-q"); _git(d, "add", "-A"); _git(d, "commit", "-q", "-m", "base")
+    base = _git(d, "rev-parse", "HEAD")
+
+    def go(fn=None):
+        if fn is None:
+            return d, base
+        fn(d)
+        _git(d, "add", "-A"); _git(d, "commit", "-q", "-m", "mutated")
+        return d, _git(d, "rev-parse", "HEAD")
+    return go
+
+
+BT = "artifacts/bioelectric-tissue"
+
+
+@needs_betse
+def test_betse_shape_kinds_and_separate_render(betse):
+    kinds = [r["kind"] for r in betse.records]
+    assert (kinds.count("Claim"), kinds.count("Action"), kinds.count("Evidence")) == (2, 3, 3)
+    ev = {r["id"]: r["payload"] for r in betse.records if r["kind"] == "Evidence"}
+    assert ev["run-betse-evidence-render"]["relation"] == "context_only" and ev["run-betse-evidence-sim"]["relation"] != "supports"
+    assert {r["kind"] for r in betse.records} == {"Claim", "Action", "Evidence"}
+
+
+@needs_betse
+def test_betse_keeps_generic_tissue_no_fin_calibration_and_the_ghk_gap_visible(betse):
+    lim = " ".join(" ".join(r["payload"]["limitations"]) for r in betse.records if r["kind"] in ("Claim", "Evidence"))
+    for must in ("GENERIC 2-D tissue patch", "Fin applicability: UNKNOWN", "Not calibrated to any fish", "310 K", "-23.5 mV", "0.70 mV", "not decomposed", "Kcnj13",
+                 "used_to_set_any_parameter False"):
+        assert must in lim, must
+
+
+@needs_betse
+def test_betse_actions_say_what_the_receipt_lacks_and_hashes_are_labelled(betse):
+    titles = {r["id"]: r["payload"]["title"] for r in betse.records if r["kind"] == "Action"}
+    assert "NO exit code, command or wall time" in titles["run-betse-action-sim"]
+    assert "NO hash for either" in titles["run-betse-action-render"] and "computed by this adapter" in titles["run-betse-action-render"]
+    cl = {r["id"]: r["payload"] for r in betse.records if r["kind"] == "Claim"}["run-betse-claim-checks"]
+    assert "7 tests" in " ".join(cl["limitations"]) and "did not run them" in " ".join(cl["limitations"])
+
+
+@needs_betse
+def test_betse_numbers_in_the_claim_come_from_the_summary(betse):
+    sm = json.loads(subprocess.run(["git", "-C", ROOT, "cat-file", "blob", f"{COMMIT_BETSE}:{BT}/summary.json"], capture_output=True, check=True).stdout)
+    st = {r["id"]: r["payload"] for r in betse.records if r["kind"] == "Claim"}["run-betse-claim-k-gap-junction-contrast"]["statement"]
+    assert f"{sm['effects']['k_up']['targeted_peak_dVm_mV']:.2f} mV" in st and f"{sm['effects']['k_up_gj_block']['targeted_peak_dVm_mV']:.1f} mV" in st
+    assert f"{sm['reference_ghk']['simulated_mean_resting_Vm_mV']:.1f} mV" in st
+
+
+@needs_betse
+def test_betse_bundle_is_deterministic_linked_referenced_and_the_committed_one_is_reproduced(betse, tmp_path):
+    again = rb.betse_chain(ROOT, COMMIT_BETSE)
+    assert [r["version"] for r in betse.records] == [r["version"] for r in again.records]
+    bundle = em.build_bundle([betse], limit=rb.AssetChain.max_records)
+    assert all(x["ok"] for x in em.link_checks(bundle["records"]))
+    assert find_abs_paths(betse.records) == [] and all(a["uri"] == "urn:sha256:" + a["sha256"] and a["availability"] == "referenced" and a["license"] is None
+                                                       for r in betse.records for a in r["payload"].get("artifacts", []))
+    rb.write_frozen(str(tmp_path), [betse])
+    assert sorted(n for n in os.listdir(EXAMPLE_BETSE) if n != "README.md") == sorted(os.listdir(tmp_path))
+    for n in (n for n in os.listdir(EXAMPLE_BETSE) if n != "README.md"):
+        assert open(os.path.join(EXAMPLE_BETSE, n), "rb").read() == open(tmp_path / n, "rb").read(), f"{n} differs; refreeze with --source-commit {COMMIT_BETSE[:12]}"
+    assert all(rb.find_secretish(open(os.path.join(EXAMPLE_BETSE, n)).read()) == [] for n in os.listdir(EXAMPLE_BETSE))
+
+
+@needs_betse
+def test_betse_positive_control_the_unedited_copy_builds(mutate_betse):
+    d, commit = mutate_betse()
+    assert len(rb.betse_chain(d, commit).records) == 8
+
+
+@needs_betse
+@pytest.mark.parametrize("fn,failed_check", [
+    (lambda d: append_byte(f"{d}/{BT}/trajectories/k_up.npz"), "trajectory.k_up"),
+    (lambda d: append_byte(f"{d}/{BT}/configs/gj_block.yaml"), "config.gj_block"),
+    (lambda d: edit_json(f"{d}/{BT}/summary.json", lambda m: m.update(all_checks_ok=False)), "summary.schema"),
+    (lambda d: edit_json(f"{d}/{BT}/summary.json", lambda m: m.update(label="OBSERVED tissue")), "summary.schema"),
+    (lambda d: edit_json(f"{d}/{BT}/summary.json", lambda m: m["checks"]["time_step_sensitivity"].update(ok=False)), "summary.checks"),
+    (lambda d: edit_json(f"{d}/{BT}/summary.json", lambda m: m["files"].pop("baseline_dt")), "summary.scenarios"),
+    (lambda d: edit_json(f"{d}/{BT}/model_interface.json", lambda m: m.update(status="calibrated fin model")), "interface.status"),
+])
+def test_betse_refuses_when_a_hash_label_or_check_does_not_hold(mutate_betse, fn, failed_check):
+    d, commit = mutate_betse(fn)
+    with pytest.raises(em.Refused) as e:
+        rb.betse_chain(d, commit)
+    assert f"check failed: {failed_check}:" in str(e.value), str(e.value)[:300]
+
+
+@needs_betse
+def test_betse_bundle_imports_into_an_ephemeral_store_with_zero_forks(betse, pgstore):
+    out = pgstore.import_bundle("test-only-local-token-for-alice", "run-import-betse", em.build_bundle([betse], limit=rb.AssetChain.max_records))
+    assert len(out["inserted"]) == 8 and out["forks"] == []
