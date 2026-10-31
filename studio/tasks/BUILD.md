@@ -150,8 +150,8 @@ No calibrated whole-fish probability, biological manufacturing feasibility, real
 - [x] Viewer review identified and repaired small-mesh picking precedence, transformed-distance errors and missing destruction on candidate/navigation changes. Source materials and exact geometry hashes are preserved.
 - [x] Root ran19 targeted combined Home/About/mobile/table/error browser checks;50 unrelated cases were deselected. New geometry is not biological validation.
 - [x] Published the selectable ray-fan candidates, critical browser fixes and public-repository labels in release `c1ad527e7c1a0cc1494def66fae3e12db6ef5f92`. Public website 13 checks and MCP 35 checks passed at 4:14:54pm PDT; receipts are in deploy/receipts/rayfan-*.json. Independent critique of this exact release remains in progress.
-- [ ] Integrate returned1ns molecular-dynamics branches with all three frozen-window outcomes, then collect the3D flow and diffusion jobs.
-- [ ] Publish the matched-budget synthesis comparison as a ceiling/null result; all arms16/16 does not establish collective advantage.
+- [x] Integrate returned 1 ns molecular branches with all three frozen-window outcomes and the four-case 3D flow bundle. Primary diffusion training is tracked separately below.
+- [x] Commit the matched-budget synthesis comparison as a ceiling/null result; all arms 16/16 does not establish collective advantage. Website exposure remains part of the next release.
 
 ## Resource attribution correction — October 31, 4:13PM PDT
 
@@ -174,3 +174,41 @@ H100. These are allocation states, not measured GPU utilization. Attribution
 was checked against the prior Delphi job manifest, compute receipts and the
 recorded setup test. The infrastructure owner is correcting the public counter;
 this does not widen cancellation permissions.
+
+## Returned multiscale evidence and contribution checkpoint
+
+- [x] Integrated the returned 3D flow fields, two actual-field videos and twelve
+  surface-pressure arrays. Independent coupling inspection retains failed physical
+  reference, unresolved fins, geometry/frame/unit mismatch and pressure-force
+  closure findings. No whole-fish flight or transferred fin load is claimed.
+- [x] Integrated v3 isolated-fin VLM comparisons. The v3b lattice does not converge;
+  its lift is not accepted. v3a/v3c results remain inviscid attached-flow scenarios.
+- [x] Integrated the versioned per-station tributary-width contract, exact geometry
+  pins and analytic force/moment controls. Unknown stiffness remains unknown.
+- [x] Integrated the zebrafish metabolic network and sweep animation, with the
+  diagnosed internal oxygen source and assumed-medium limitation visible.
+- [x] Root ran 139 targeted CFD, coupling, fin, metabolism and resource tests;
+  independently checked 57 returned input/output/producer hashes. Exact tested
+  commit and scope are in deploy/receipts/multiscale-returned-integration.json.
+- [x] Integrated the independent requirements audit and deployed-site critique.
+  Their timestamps and incomplete requirements remain explicit.
+- [x] Fixed cached MCP text-preview paths and ran all 37 media tests. Added a
+  bearer-only contributor identity endpoint; four targeted real-HTTP tests passed.
+  Browser sessions still grant no persistent write authority.
+- [x] Committed a conditional 24-hour queue with owners, admission and stop gates
+  in results/infra/queue.json. Actual spend remains unavailable.
+- [ ] Publish the integrated artifacts, bounded text preview and identity endpoint
+  together with the gallery/mobile fixes in one exact release.
+- [ ] Connect persisted exact-version project discussion to the Studio contribution
+  interface, using an explicit contributor credential held only in memory.
+- [ ] Finish the new Project membership/import pass and recompute the snapshot.
+- [ ] Demonstrate two actual computations consuming one exact existing Claim and
+  a separate review of their evidence. The current public-head reuse count is zero.
+- [ ] Collect the live primary diffusion job; run the preregistered secondary
+  evaluation only after its checkpoint, completeness audit and transport gates pass.
+
+The fresh provider receipt at 4:33pm PDT records 52 team jobs (41 completed,
+7 failed, 3 cancelled, 1 running) and 30 unmatched jobs. One team GPU job was
+running; no team job was queued or pulling. These are job states, not device
+utilization. Current hosted release is still c1ad527 until the release receipt
+records otherwise.
