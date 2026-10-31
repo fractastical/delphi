@@ -1,0 +1,161 @@
+{
+ "symbols": [
+  {
+   "name": "w_C",
+   "unit": "m",
+   "domain": {
+    "lo": "0",
+    "hi": "1",
+    "lo_open": false,
+    "hi_open": true
+   },
+   "status": "unknown",
+   "source_ref": "tip deflection"
+  },
+  {
+   "name": "P",
+   "unit": "N",
+   "domain": {
+    "lo": "0",
+    "hi": "100",
+    "lo_open": true
+   },
+   "status": "declared",
+   "source_ref": "range chosen by the proposer"
+  },
+  {
+   "name": "L",
+   "unit": "m",
+   "domain": {
+    "lo": "0",
+    "hi": "10",
+    "lo_open": true
+   },
+   "status": "declared",
+   "source_ref": "range chosen by the proposer"
+  },
+  {
+   "name": "E",
+   "unit": "N m^-2",
+   "domain": {
+    "lo": "1e8",
+    "hi": "1e9"
+   },
+   "status": "given",
+   "source_ref": "Alben et al. 2007"
+  },
+  {
+   "name": "I",
+   "unit": "m^4",
+   "domain": {
+    "lo": "1e-14",
+    "hi": "1e-14"
+   },
+   "status": "given",
+   "source_ref": "Alben et al. 2007"
+  },
+  {
+   "name": "B",
+   "unit": "N m^2",
+   "domain": {
+    "lo": "1e-6",
+    "hi": "1e-5"
+   },
+   "status": "given",
+   "source_ref": "Alben et al. 2007"
+  }
+ ],
+ "assumptions": [
+  {
+   "id": "A1",
+   "text": "Converted I from cm^4 to m^4: 10^-6 cm^4 = 10^-6 * (10^-2 m)^4 = 10^-14 m^4.",
+   "kind": "modelling"
+  },
+  {
+   "id": "A2",
+   "text": "The passage equates B to EI. The unit J m is equivalent to N m^2.",
+   "kind": "modelling"
+  }
+ ],
+ "constraints": [
+  {
+   "id": "C1",
+   "kind": "equality",
+   "dimension_check": true,
+   "source_ref": "w_C = PL^3 / (3EI)",
+   "expr": {
+    "op": "==",
+    "lhs": "w_C",
+    "rhs": {
+     "op": "/",
+     "args": [
+      {
+       "op": "*",
+       "args": [
+        "P",
+        {
+         "op": "pow",
+         "base": "L",
+         "exp": 3
+        }
+       ]
+      },
+      {
+       "op": "*",
+       "args": [
+        "3",
+        {
+         "op": "*",
+         "args": [
+          "E",
+          "I"
+         ]
+        }
+       ]
+      }
+     ],
+     "op": "/"
+    }
+   }
+  },
+  {
+   "id": "C2",
+   "kind": "equality",
+   "dimension_check": true,
+   "source_ref": "B = EI",
+   "expr": {
+    "op": "==",
+    "lhs": "B",
+    "rhs": {
+     "op": "*",
+     "args": [
+      "E",
+      "I"
+     ]
+    }
+   }
+  }
+ ],
+ "source_mapping": [
+  {
+   "element": "C1",
+   "quote": "w_C = \\tfrac{PL^3}{3EI}",
+   "locator": "Wikipedia Euler-Bernoulli beam theory"
+  },
+  {
+   "element": "C2",
+   "quote": "B = EI",
+   "locator": "Alben et al. 2007 Section 3"
+  }
+ ],
+ "unresolved": [
+  {
+   "id": "U1",
+   "question": "The previous failure was due to the denominator 3EI being interpreted as (P*L^3/3)*E*I. I have nested the product in the denominator to ensure correct grouping."
+  },
+  {
+   "id": "U2",
+   "question": "The passage provides a range for B (10^-6 to 10^-5 J m) and E (10^8 to 10^9 N m^-2) but a single value for I (10^-6 cm^4). The product of the lower bounds of E and I (10^8 * 10^-14 = 10^-6) matches the lower bound of B, but the upper bound of B (10^-5) is not reached unless I or E varies further."
+  }
+ ]
+}
