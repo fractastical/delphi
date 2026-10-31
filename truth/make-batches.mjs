@@ -3,7 +3,7 @@
 // scores or other assessors' outputs.
 //
 //   node truth/make-batches.mjs [--size 75]
-import { writeFileSync, mkdirSync, rmSync, readdirSync, readFileSync, existsSync } from "node:fs";
+import { writeFileSync, mkdirSync, readdirSync, readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { ROOT, loadClaims } from "../docs/load-claims.mjs";
 
@@ -23,9 +23,12 @@ const todo = loadClaims().filter(c => !scored[c.key] || scored[c.key].size < 2).
   quote: c.quote || undefined, scope: c.scope || undefined, notation: c.notation || undefined, assumptions: assumptions(c.context),
 }));
 
-rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
+const first = Math.max(0, ...readdirSync(OUT).map(f => +(f.match(/^batch-(\d+)\.json$/)?.[1] ?? 0))) + 1;
 const n = Math.ceil(todo.length / SIZE);
-for (let i = 0; i < n; i++)
-  writeFileSync(join(OUT, `batch-${String(i + 1).padStart(2, "0")}.json`), JSON.stringify(todo.slice(i * SIZE, (i + 1) * SIZE), null, 2) + "\n");
-console.log(`${todo.length} claims to score in ${n} batches of up to ${SIZE} (truth/inputs/)`);
+const names = [];
+for (let i = 0; i < n; i++) {
+  names.push(`batch-${String(first + i).padStart(2, "0")}.json`);
+  writeFileSync(join(OUT, names[i]), JSON.stringify(todo.slice(i * SIZE, (i + 1) * SIZE), null, 2) + "\n");
+}
+console.log(`${todo.length} claims to score in ${n} batches of up to ${SIZE}${n ? ` (truth/inputs/${names.join(", ")})` : ""}`);
