@@ -170,6 +170,9 @@ class Store:
     def _validate_refs(self, c, record, principal, current=True):
         for relation, target in references(record):
             referenced = self._raw(c, target, principal, current=current)
+            if record["kind"] == "Evidence" and relation == "produced_by":
+                if referenced["payload"]["target"] != record["payload"]["target"]:
+                    raise Conflict("Producing action and evidence must pin the same target")
             # An action needs acceptance criteria, falsifiers, a next action and a stop bound.
             # A `recorded` problem has none of them, so there is nothing to execute or to stop.
             if record["kind"] == "Action" and relation == "targets" and referenced["kind"] == "Problem":
