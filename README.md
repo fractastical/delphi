@@ -62,6 +62,8 @@ Before building, publishing, or querying nanopubs, read [BEST_PRACTICES.md](BEST
 
 - **Project Delphi Ontology**: [fractastical/project-delphi-ontology](https://github.com/fractastical/project-delphi-ontology)
   - Open pull requests: [project-delphi-ontology/pulls](https://github.com/fractastical/project-delphi-ontology/pulls)
+- **Project Delphi nanopubs**: [knowledgepixels/project-delphi-nanopubs](https://github.com/knowledgepixels/project-delphi-nanopubs)
+  - Agent skills: [`skills/`](https://github.com/knowledgepixels/project-delphi-nanopubs/tree/main/skills), in the open [Agent Skills](https://agentskills.io) format. The [`delphi`](https://github.com/knowledgepixels/project-delphi-nanopubs/blob/main/skills/delphi/SKILL.md) skill sets out the ontology terms, the claim and evidence item templates every record must use, and the rules records follow.
 
 ## Querying nanopubs
 
@@ -73,6 +75,7 @@ To query this project's claims, their math and their assessment rankings, use th
 
 - [Nanodash](https://nanodash.knowledgepixels.com/): browse, search, and publish nanopubs in the browser.
 - [Nanopub Query](https://query.knowledgepixels.com/): SPARQL endpoints over the nanopub network, including a full repository and per-type and per-pubkey repositories.
+- [Nanopub Monitor](https://monitor.nanodash.net/): live status of the nanopub network's services (registries, query servers, Nanodash instances); check here first when publishing or querying fails.
 
 ### SPARQL
 
