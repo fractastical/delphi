@@ -1,0 +1,20 @@
+{
+ "schema": "frontier.rd-ddpm.config/1",
+ "model_family": "schnakenberg",
+ "equations": "u_t = u_xx + (a - u + u^2 v); v_t = d v_xx + (b - u^2 v); zero-flux on [0, L]; model units; tau dimensionless",
+ "solver": {"N": 64, "K_modes": 20, "eps": 0.05, "dt_tau": 0.02, "save_tau": [50, 100, 150, 200], "dtype": "float64", "failed_if": "non-finite or |u| or |v| > 1000"},
+ "prior": {"a": [0.05, 0.30], "b": [0.6, 1.2], "d": [10.0, 40.0], "L": [30.0, 70.0], "t": [0.0, 200.0]},
+ "n_settings": 1750, "settings_rng_seed": 20261031,
+ "splits": {
+  "train": {"setting_ids": [0, 1400], "seed_indices": [0, 1, 2]},
+  "dev": {"setting_ids": [1400, 1450], "seed_indices": [0, 1], "use": "pipeline debugging and smoke control only; never reported as a result"},
+  "test_param": {"setting_ids": [1450, 1750], "seed_indices": [0, 1]},
+  "test_seed": {"setting_ids": [0, 300], "seed_indices": [3], "note": "training settings, initial-condition seeds never used in training"},
+  "ensemble": {"setting_ids": [1450, 1490], "seed_indices": [100, 131], "note": "seed_indices is an inclusive range: 32 seeds per held-out setting"}
+ },
+ "ic_seed_rule": "setting_id * 1000 + seed_index",
+ "model": {"unet_base": 64, "emb": 128, "T_diffusion": 200, "schedule": "cosine s=0.008", "objective": "epsilon prediction, MSE", "condition": ["a", "b", "d", "L", "t"], "condition_scaling": "2*(x-lo)/(hi-lo)-1 with the prior range"},
+ "train": {"steps": 30000, "batch": 256, "lr": 0.0003, "lr_final": 0.00003, "schedule": "cosine", "optimizer": "AdamW wd 1e-4", "ema": 0.999, "grad_clip": 1.0, "seed": 0, "log_every": 100},
+ "eval": {"samples_per_condition": 32, "rollout_dtau": 10.0, "display_conditions": 6, "baseline_nearest_k": [1, 5, 10], "marginal_samples": "1 per held-out condition", "timing_batch": 1024, "timing_warmup": 2, "timing_repeats": 3},
+ "smoke": {"note": "only dev-range setting ids 1400..1449; tiny sizes; produces no reported result", "train_ids": [1400, 1430], "test_ids": [1430, 1450], "steps": 150, "batch": 64, "T_final_tau": 20, "save_tau": [5, 10, 15, 20], "ensemble_seeds": 4, "samples_per_condition": 4}
+}
