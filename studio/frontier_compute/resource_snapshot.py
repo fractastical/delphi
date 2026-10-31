@@ -49,7 +49,52 @@ def telemetry_summary(label: str, path: Path) -> dict:
     }
 
 
-def summarize(document: dict, observed: datetime) -> dict:
+def ownership_class(job, historical=()):
+    """Read-only attribution; this never grants controller cancellation rights."""
+    metadata = job.get("metadata", {})
+    if metadata.get("name", "").startswith(PREFIXES):
+        return "current_frontier"
+    for row in historical:
+        if metadata.get("id") == row["id"]:
+            if metadata.get("name") != row["name"]:
+                raise ValueError("Historical ownership ID/name mismatch")
+            return "historical_team"
+    return "unattributed"
+
+
+def summarize_shared(document, observed, historical=()):
+    if document.get("next_page_token"):
+        raise ValueError("provider listing is paginated; refusing incomplete counts")
+    local = observed.astimezone(ZoneInfo("America/Los_Angeles"))
+    midnight = local.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc)
+    jobs = document.get("items", [])
+
+    def key(job):
+        group = "other_or_unattributed" if ownership_class(job, historical) == "unattributed" else "ours"
+        kind = "gpu" if "gpu" in job.get("spec", {}).get("preset", "") else "cpu_or_unknown"
+        return group, kind, job.get("status", {}).get("state", "UNKNOWN")
+
+    def counts(rows):
+        return [{"group": group, "kind": kind, "state": state, "jobs": count}
+                for (group, kind, state), count in sorted(Counter(map(key, rows)).items())]
+
+    today = [j for j in jobs if datetime.fromisoformat(j["metadata"]["created_at"].replace("Z", "+00:00")) >= midnight]
+    return {
+        "observed_at_utc": observed.isoformat(), "observed_at_seattle": local.strftime("%Y-%m-%d %H:%M:%S %Z"),
+        "classification": "Current Frontier prefixes plus exact historical team IDs verified against preserved source records. Remaining jobs are unattributed, not asserted to belong to another team. Cancellation permissions unchanged.",
+        "listed_total": len(jobs), "today_start_utc": midnight.isoformat(),
+        "ownership_breakdown": dict(Counter(ownership_class(j, historical) for j in jobs)),
+        "earliest_listed_creation": min((j["metadata"]["created_at"] for j in jobs), default=None),
+        "counts": {"all_listed": counts(jobs), "today": counts(today)},
+        "current_gpu_jobs": {group: dict(Counter(key(j)[2] for j in jobs if key(j)[:2] == (group, "gpu") and key(j)[2] not in TERMINAL))
+                             for group in ("ours", "other_or_unattributed")},
+        "owner_field_names_present": sorted({key for j in jobs for key in j.get("metadata", {})
+                                             if any(part in key.lower() for part in ("owner", "creator", "label"))}),
+        "historical_attribution_ledger": "results/resources/team-job-ownership.json",
+    }
+
+
+def summarize(document: dict, observed: datetime, historical=()) -> dict:
     if document.get("next_page_token"):
         raise ValueError("provider listing is paginated; refusing incomplete counts")
     own = []
@@ -70,6 +115,7 @@ def summarize(document: dict, observed: datetime) -> dict:
         })
     active = [row for row in own if row["state"] not in TERMINAL]
     states = dict(Counter(row["state"] for row in own))
+    classes = Counter(ownership_class(j, historical) for j in document.get("items", []))
     return {
         "observed_at_utc": observed.isoformat().replace("+00:00", "Z"),
         "scope": "Own job names beginning delphi-evolve-ops- or bioservices-; other-team state counts only",
@@ -86,6 +132,11 @@ def summarize(document: dict, observed: datetime) -> dict:
             "interpretation": "Requested capacity of nonterminal jobs, including startup. RUNNING is not measured GPU utilization. Kernel utilization is unknown until sampled telemetry is collected.",
         },
         "current_gpu_utilization_pct": None,
+        "current_frontier_job_count": classes["current_frontier"],
+        "historical_team_job_count": classes["historical_team"],
+        "team_job_count": classes["current_frontier"] + classes["historical_team"],
+        "unattributed_job_count": classes["unattributed"],
+        "team_count_scope": "Current Frontier prefix count remains separate from exact-ID historical attribution; no cancellation permissions are changed.",
     }
 
 
@@ -98,7 +149,10 @@ def refresh(path: Path, cli: str) -> dict:
     if result.returncode:
         raise RuntimeError(f"provider read failed with exit {result.returncode}; old snapshot retained")
     observed = datetime.now(timezone.utc)
-    snapshot = summarize(json.loads(result.stdout), observed)
+    document = json.loads(result.stdout)
+    ledger_path = path.parent / "team-job-ownership.json"
+    historical = json.loads(ledger_path.read_text())["historical_jobs"] if ledger_path.exists() else []
+    snapshot = summarize(document, observed, historical)
     snapshot["live_state_request_window_utc"] = [start.isoformat(), observed.isoformat()]
     inventory = json.loads(path.read_text())
     prior = inventory["compute"]["nebius"]
@@ -117,6 +171,12 @@ def refresh(path: Path, cli: str) -> dict:
     temporary = path.with_suffix(".tmp")
     temporary.write_text(json.dumps(inventory, indent=2) + "\n")
     temporary.replace(path)
+    shared_path = path.parent / "shared-job-counts.json"
+    shared = summarize_shared(document, observed, historical)
+    shared["request_window_utc"] = [start.isoformat(), observed.isoformat()]
+    temporary = shared_path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(shared, indent=2) + "\n")
+    temporary.replace(shared_path)
     return snapshot
 
 
