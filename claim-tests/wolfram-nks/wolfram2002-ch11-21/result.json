@@ -2,11 +2,13 @@
   "claim_id": "wolfram2002-ch11-21",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch11-21",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Rule 54, run from each of the first N initial conditions (binary digits of n on a white background, as in NKS p. 697), produces only repetitive or nested patterns: none has the local space-time complexity characteristic of class 3 or class 4 behaviour.",
   "pass_criterion": "Pre-registered. Family: initial conditions n = 1..65536 (16 bits), cell values = binary digits of n placed on an infinite white background (validated against the figure: n = 1 single cell, n = 3 two cells, n = 291 nested); rule 54 run for T = 256 steps on a lattice wide enough that the light cone never reaches the edge. Classifier (frozen before the census): the number D of distinct 6 x 6 space-time tiles whose top-left corner lies in rows 128..250 and inside the light cone (plus 2 cells) of the pattern. Calibration on controls outside the family, disclosed: repetitive and nested rules give D <= 1007 (rule 90 single cell 115, random 14-bit seeds 267-395; rule 150 single 316, random seeds 804-1007; rule 22 single 119; rule 18 random 309-602; rules 250, 108, 184, 62, 41 random 1-178), while class 3/4 controls give D >= 1094 (rule 110 random 14- and 30-bit seeds 1094-1553; rule 30 6801-7166; rule 45 6338-6401), with a few class-3 rules from narrow seeds in between (rule 106: 462 and 2912; rule 126: 130-402; rule 146: 371-413; rule 73: 64-774). The eight rule-54 patterns shown in the book's figure (n = 1, 3, 75, 259, 291, 787, 803, 56549) give D = 10, 37, 315, 315, 286, 391, 391, 370, and a batch of 256 random 14-bit seeds gave max 391. Threshold: D > 1050 (geometric midpoint of 1007 and 1094) = 'more complicated'. Also recorded per initial condition: exact temporal periodicity (period <= 16) of the pattern's core over steps 128..256 ('repetitive'). The claim PASSES if 0 of the 65536 initial conditions has D > 1050. Reported, not decisive: the distribution of D, the fraction that is exactly periodic, the number with D > 700 (a stricter threshold that still clears all rule-54 book examples), and for any initial condition above threshold a re-run with T = 512.",
   "fail_criterion": "Pre-registered. The claim FAILS if at least one initial condition n <= 65536 has D > 1050 and the T = 512 re-run also gives D > 1050 (sustained local complexity comparable to the class 3/4 controls). If some exceed 1050 at T = 256 but not at T = 512 the verdict is 'mixed' (transient complexity). The census is 1/1526 of the book's 10^8 initial conditions; a pass is consistent with the claim but far from exhausting it.",
-  "planned_datasets": ["rule54-initial-condition-census"],
+  "planned_datasets": [
+    "rule54-initial-condition-census"
+  ],
   "interpretation": "The claim is a finite observational statement about the first 10^8 initial conditions; the full census is beyond a few minutes of Python, so this is a scaled census (2^16 initial conditions) with the book's informal judgement 'nothing fundamentally more complicated than repetitive or nested' frozen into a local-complexity classifier. The classifier counts distinct 6 x 6 space-time tiles in the second half of the evolution: self-similar (nested) and periodic patterns have bounded tile vocabularies, whereas class 3 patterns have thousands and class 4 patterns with interacting gliders over a thousand. The threshold was set from controls outside the rule-54 family plus the book's own eight rule-54 examples; it is admittedly coarse, and the random-seed rule 150 controls (nested, up to 1007) show that nested patterns with wide seeds approach it. A failure under this classifier would therefore need the T = 512 confirmation and visual inspection before being read as a counterexample to Wolfram's census.",
   "datasets": [
     {
@@ -20,10 +22,168 @@
       "role": "program family under test"
     }
   ],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/wolfram-nks-claim-tests-106e", "date": "2026-10-31" }
+  "method": "analysis.py evolves rule 54 for 256 steps from every initial condition n = 1..65535 (binary digits of n on white; batches of 512 vectorised in numpy on a lattice wide enough that the light cone never reaches the edge), encodes every 6 x 6 space-time tile with top-left in rows 128..250 inside the light cone as a 36-bit integer and counts distinct tiles D; patterns with D <= 400 are also tested for exact temporal periodicity (period <= 16) of the light-cone core over steps 128..256. The 20 initial conditions with the largest D are re-run for 512 steps. Per-initial-condition values in derived/census.csv.gz; runtime about 3 minutes.",
+  "measured": {
+    "value": 0,
+    "unit": "number of initial conditions n <= 65536 whose rule-54 pattern has more than 1050 distinct 6x6 tiles in steps 128-256",
+    "n": 65535,
+    "uncertainty": "exhaustive over n = 1..65535 (n = 65536 has 17 bits and was not included)",
+    "extra": {
+      "above_theta_700_count": 0,
+      "sustained_above_1050_at_T512": [],
+      "max_tiles": 426,
+      "argmax_n": 52843,
+      "median_tiles": 68.0,
+      "tiles_histogram_by_100": {
+        "0": 50561,
+        "100": 4,
+        "200": 8432,
+        "300": 6324,
+        "400": 214
+      },
+      "exactly_periodic_core_fraction": 0.1724,
+      "period_distribution": {
+        "0": 54238,
+        "4": 11297
+      },
+      "book_examples_tiles": {
+        "1": 10,
+        "3": 37,
+        "75": 315,
+        "259": 315,
+        "291": 286,
+        "787": 391,
+        "803": 391,
+        "56549": 370
+      },
+      "params": {
+        "T": 256,
+        "K": 6,
+        "rows": [
+          128,
+          256
+        ],
+        "theta": 1050,
+        "theta_strict": 700,
+        "N_max": 65536
+      },
+      "runtime_s": 172.4,
+      "recheck_T512_top20": [
+        {
+          "n": 9273,
+          "tiles_T256": 400,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 9615,
+          "tiles_T256": 400,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 18654,
+          "tiles_T256": 400,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 27450,
+          "tiles_T256": 400,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 41251,
+          "tiles_T256": 400,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 44323,
+          "tiles_T256": 400,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 49195,
+          "tiles_T256": 405,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 50419,
+          "tiles_T256": 405,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 51707,
+          "tiles_T256": 405,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 52843,
+          "tiles_T256": 426,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 53027,
+          "tiles_T256": 405,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 53297,
+          "tiles_T256": 400,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 54275,
+          "tiles_T256": 405,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 54703,
+          "tiles_T256": 400,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 54779,
+          "tiles_T256": 405,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 54899,
+          "tiles_T256": 426,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 55181,
+          "tiles_T256": 400,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 55223,
+          "tiles_T256": 400,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 57235,
+          "tiles_T256": 405,
+          "tiles_T512_rows_256_512": 391
+        },
+        {
+          "n": 57259,
+          "tiles_T256": 405,
+          "tiles_T512_rows_256_512": 391
+        }
+      ]
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.6,
+  "caveats": [
+    "Pre-registered decision: 0 of 65,535 initial conditions exceeds the 1050-tile threshold (0 exceed even the stricter 700). The largest vocabulary is 426 tiles (n = 52843) and the twenty largest all fall back to 391 tiles at steps 256-512, the same vocabulary as the book's examples n = 787 and 803; the distribution is strongly clustered (median 68; 50,561 below 100; 214 between 400 and 500), consistent with a small repertoire of repetitive and nested forms. 17.2% of the patterns are exactly periodic in the core with period 4 over steps 128-256.",
+    "This is a scaled census: 2^16 initial conditions rather than the 10^8 of the book, i.e. seeds of at most 16 cells, so wider seeds (where interacting structures are more likely) are untested; a pass here is consistent with Wolfram's census but does not reproduce it.",
+    "'Repetitive or nested' was frozen into a local-complexity classifier (distinct 6 x 6 space-time tiles) with a threshold set from controls outside the family (rule 90/150/22/18 nested, rules 250/108/184/62/41 repetitive, rules 110/30/45 complex) and the book's own eight rule-54 examples. The margin is large (426 observed vs. 1094 for the least complex rule-110 control) but the classifier is coarse: a class-4-like pattern with a small glider repertoire could in principle have a modest tile vocabulary, and nested patterns from wide seeds (rule 150 random 14-bit seeds reach 1007) approach the threshold.",
+    "Finite horizon (256 steps, re-checks to 512): slowly developing complexity, e.g. structures appearing only after thousands of steps, would be missed."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/wolfram-nks-claim-tests-106e",
+    "date": "2026-10-31"
+  }
 }
