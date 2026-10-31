@@ -49,3 +49,52 @@ no experiment, and every artifact here says so.
 
 Three measured nulls today. Each is in the ledger with its witness. A null reported is a result;
 a null buried is the thing that makes the next person repeat it.
+
+## 8. A green status is not a measurement. Ship the control whose answer you already know.
+
+Four times in one day a check reported success while measuring nothing, and **in every case what
+caught it was a control whose expected value was known in advance** — never a re-reading of the
+code, and never a status code.
+
+- **`grep -o` here is ugrep, and it reports only NON-OVERLAPPING matches.** A genome-wide k-mer
+  scan returned "5 matched k-mers" for every label. 5 is exactly the maximum number of
+  non-overlapping 24-mers in a 60 bp and a 94 bp exon. The **positive control** is what said this
+  was wrong: exons 20 and 22 are *known present* at 37/37 and 71/71, so a method returning 5 was
+  not measuring what it claimed. Without it, "5 k-mers found" ships as a number.
+- **`exited with code 0` was `tail`'s status, not the scan's.** The scan had been killed at its
+  900 s cap having covered 93.6% of the genome, printing no tallies. A pipeline's exit status is
+  its last command's.
+- **Every Addgene search page returns HTTP 200, including for gibberish.** Reading the status code
+  would have "confirmed" strains that do not exist. Only a query that *had* to come back empty
+  told the difference, and that single check demoted a problem.
+- **A must-fail control that names a real thing is not a control.** `9ZZZ.cif` was chosen as a
+  bogus PDB accession and returned HTTP 200 — because 9ZZZ is a real entry. Impossible accessions
+  (`0000`, `ZZZZ`) do return 404. The endpoint was fine; the control was badly chosen, and it
+  briefly "proved" the opposite of the truth.
+
+Status-code-as-success and last-command-in-a-pipeline are the same failure wearing two hats.
+
+**So: beside every search, scan or query, run one case whose answer you already know, in both
+directions.** A positive control that must come back found, and a must-fail control that must
+come back empty — and check that the must-fail case is genuinely impossible rather than merely
+unfamiliar. A search that cannot come back empty has not been tested. A number with no control
+beside it is not a measurement, however green the run looked.
+
+## 9. Say whether you retrieved it or remembered it
+
+A claim that makes the result *better* is the one to distrust most, and the one most likely to
+have come from memory.
+
+In the oca2 work, "Tinaja is not albino" was written into a preregistration as background
+knowledge. What had actually been retrieved was a BioSample `ecotype` field reading
+`"Tinaja cave"` — which establishes *cave* and says nothing about *pigment*. The claim went
+unsourced for the whole run and would have upgraded a technical reproduction into a biological
+specificity result on the strength of recall.
+
+Challenged, it was sourced properly (Jeffery 2020, PMC7353729, full text) **and** the competing
+explanation was ruled out from our own data, and the result is stronger for it. The fix was not
+to delete the claim but to **mark the provenance failure in its own subsection** and ship the
+observation at the confidence the evidence supports — post-hoc, n=1 per population, phenotypes
+from a review about populations rather than from the individuals sequenced.
+
+**Label every claim `retrieved` or `remembered` as you write it**, not when someone asks.
