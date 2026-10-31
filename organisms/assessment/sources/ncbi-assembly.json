@@ -1,0 +1,58 @@
+{
+  "source_id": "ncbi-assembly",
+  "label": "NCBI Assembly / NCBI Datasets genome assembly records (GCA_/GCF_ accessions)",
+  "homepage": "https://www.ncbi.nlm.nih.gov/datasets/genome/",
+  "data_paper_or_docs": [
+    "https://doi.org/10.1093/nar/gkv1226",
+    "https://doi.org/10.1038/s41597-024-03571-y",
+    "https://doi.org/10.1093/nar/gkv1189",
+    "https://doi.org/10.1093/nar/gkae979",
+    "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/",
+    "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/api/rest-api/",
+    "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/reference-docs/rest-api/",
+    "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/reference-docs/data-reports/genome-assembly/",
+    "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/policies-annotation/data-model/",
+    "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/policies-annotation/genome-processing/",
+    "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/glossary/",
+    "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/api/api-keys/",
+    "https://www.ncbi.nlm.nih.gov/refseq/about/",
+    "https://www.ncbi.nlm.nih.gov/genbank/wgs/",
+    "https://www.ncbi.nlm.nih.gov/home/about/policies/",
+    "https://www.insdc.org/policy/"
+  ],
+  "data_papers": [
+    {
+      "doi": "10.1093/nar/gkv1226",
+      "citation": "Kitts PA, Church DM, Thibaud-Nissen F, et al. (2016) Assembly: a resource for assembled genomes at NCBI. Nucleic Acids Res 44(D1):D73-D80."
+    },
+    {
+      "doi": "10.1038/s41597-024-03571-y",
+      "citation": "O'Leary NA, Cox E, Holmes JB, et al. (2024) Exploring and retrieving sequence and metadata for species across the tree of life with NCBI Datasets. Sci Data 11:732."
+    },
+    {
+      "doi": "10.1093/nar/gkv1189",
+      "citation": "O'Leary NA, Wright MW, Brister JR, et al. (2016) Reference sequence (RefSeq) database at NCBI: current status, taxonomic expansion, and functional annotation. Nucleic Acids Res 44(D1):D733-D745."
+    },
+    {
+      "doi": "10.1093/nar/gkae979",
+      "citation": "Sayers EW, Beck J, Bolton EE, et al. (2025) Database resources of the National Center for Biotechnology Information in 2025. Nucleic Acids Res 53(D1):D20-D29."
+    }
+  ],
+  "governance": "Operated by the National Center for Biotechnology Information (NCBI, National Library of Medicine, US National Institutes of Health). GenBank assemblies (GCA_) are submitter-deposited through the INSDC partnership (NCBI GenBank, ENA, DDBJ); NCBI validates sequence and metadata (contamination screens, assembly structure) before release but does not peer-review the biology. RefSeq assemblies (GCF_) are NCBI-curated copies of a GenBank assembly selected by NCBI staff, and 'reference genome' / 'representative genome' status is assigned by NCBI (one per species). Assembly metadata (level, N50, chromosome counts, release date, submitter, BioProject, BioSample) is computed or recorded by NCBI, not by the submitter. Data are US Government works in the public domain (NCBI Website and Data Usage Policies); INSDC policy guarantees free and unrestricted access with no use restrictions.",
+  "versioning": "Every assembly has a stable accession with an explicit version (GCA_/GCF_ nine digits, then .N); a new version is issued whenever sequence changes, old versions remain retrievable from Entrez Assembly (E-utilities db=assembly) with status 'replaced' and a pointer to the latest accession, but the Datasets v2 accession endpoint returns an empty report for superseded versions. Assemblies can also be 'suppressed' (withdrawn by submitter or NCBI; the record persists but is excluded from default searches). Reference/representative status for a species can move to a newer assembly at any time, so 'the reference genome of taxon X' is a live designation. Genome counts per taxon (dataset_report total_count) are live and grow as assemblies are released; there is no snapshot identifier for a count query other than the retrieval date. The REST API is versioned (v2 as of 2026) and rate-limited to 3 requests/s without an API key.",
+  "scores": {
+    "source-authority": 1.0,
+    "independence": 0.95,
+    "authenticity": 1.0
+  },
+  "known_issues": [
+    "The Datasets v2 genome/accession/<acc>/dataset_report endpoint returns {} for superseded accession versions (e.g. GCF_000001405.39) rather than a 'replaced' status; the E-utilities assembly esummary must be used to distinguish 'superseded' from 'does not exist'.",
+    "Suppressed assemblies (e.g. GCF_000002315.6, Gallus gallus) are still returned by the accession endpoint with assembly_status 'suppressed'; the organism's current reference is a different accession.",
+    "The reference_only filter on genome/taxon/<taxid>/dataset_report returns one reference assembly per species under the taxon, preferring the RefSeq (GCF_) accession when it exists; a record keyed on the paired GCA_ accession therefore does not appear by its own accession in that result and must be matched via paired_accession.",
+    "Taxon-level counts (all assemblies or reference-only) are live; drift of a few assemblies per month is normal for well-studied taxa (Homo sapiens had 2594 assemblies on 2026-10-31).",
+    "Assembly-level metadata (total_sequence_length, contig_n50, scaffold_n50, number_of_contigs) is stable for a given accession version, but annotation gene counts change with each RefSeq annotation release and BUSCO scores depend on the lineage dataset used.",
+    "No DOI exists for an individual assembly; the accession is the persistent identifier and records correctly leave doi null. The Datasets/Assembly data papers describe the resource, not the individual genomes.",
+    "GenBank-only (GCA_) assemblies include unreviewed, sometimes pre-publication submissions whose quality varies widely; the assembly_level and N50 metadata are reliable descriptors of that quality but the records are not curated the way RefSeq assemblies are."
+  ],
+  "rationale": "Source authority is 1.0: NCBI is a governed international infrastructure with peer-reviewed resource papers (Kitts et al. 2016 for Assembly, O'Leary et al. 2024 for Datasets, annual NAR database issue), stable versioned accessions, documented processing and a public-domain licence. Independence is 0.95 rather than 1.0 because GenBank assemblies are submitter-deposited primary data produced with no relation to this project, but RefSeq 'reference genome' designation and taxon-level counts are NCBI curation decisions layered on those submissions, and genome counts for higher taxa partly reflect sampling effort rather than biology. Authenticity is 1.0: every accession, organism, BioProject and statistic in a dataset_report is machine-generated from the deposited sequence and traceable by accession; nothing in the source is synthetic or templated. All URLs and DOIs above were resolved on 2026-10-31 (HTTP 200; DOIs checked against Crossref metadata)."
+}
