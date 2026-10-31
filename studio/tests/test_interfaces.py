@@ -58,7 +58,7 @@ def test_http_real_authenticated_proposal_and_shared_read(store):
 ROOT = Path(__file__).resolve().parents[1]
 READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_capabilities", "frontier_artifacts",
               "frontier_discover", "frontier_graph", "frontier_catalogue", "frontier_project_inspect", "frontier_artifact_inspect",
-              "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief"}
+              "frontier_design_context", "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief"}
 WRITE_TOOLS = {"frontier_propose", "frontier_lease", "frontier_transition"}
 SECRET_NAMES = {"token", "dsn", "password", "credential", "authorization", "secret", "api_key", "apikey"}
 
@@ -162,6 +162,9 @@ def test_expanded_mcp_surfaces_use_exact_refs_and_bounded_local_calculators(stor
             inspected = val(await session.call_tool("frontier_project_inspect", {"target": ref(project_record)}))
             assert inspected["project"]["record"]["version"] == project_record["version"]
             assert inspected["members"]["members"][0]["pin"] == claim_ref
+            design_context = val(await session.call_tool("frontier_design_context", {"target": ref(project_record), "limit": 5}))
+            assert design_context["project"]["record"]["version"] == project_record["version"]
+            assert design_context["pagination"]["truncated"] is False
             asset = val(await session.call_tool("frontier_artifact_inspect", {"sha256": artifact_sha}))
             assert len(asset["declarations"]) == 1 and asset["preview"] is None
             assert asset["declarations"][0]["artifact"]["sha256"] == artifact_sha
