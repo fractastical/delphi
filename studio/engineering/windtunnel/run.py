@@ -10,6 +10,13 @@ from pathlib import Path
 from .geometry import file_sha
 from .model import PROTOCOL, canonical, no_body_control, run_request
 
+CASES = {
+    "baseline": {},
+    "grid48": {"length_cells": 48},
+    "time24-coarse": {"convective_time": 2.0},
+    "time24-half": {"convective_time": 2.0, "lattice_speed": 0.02},
+}
+
 
 def write(path, value):
     Path(path).write_text(json.dumps(value, indent=2, allow_nan=False) + "\n")
@@ -26,17 +33,9 @@ def run_suite(output_directory, analytic_path):
     write(output / "no-body.json", no_body)
     if not no_body["passed"]:
         raise ValueError("no-body control failed")
-    cases = {
-        "baseline": {},
-        "grid48": {"length_cells": 48},
-        "time24-coarse": {"convective_time": 2.0},
-        "time24-half": {"convective_time": 2.0, "lattice_speed": 0.02},
-    }
-    results = {}
-    for name, request in cases.items():
+    for name, request in CASES.items():
         print(json.dumps({"case": name, "state": "running"}), flush=True)
         result = run_request(request, output / name, analytic_receipt=analytic)
-        results[name] = result
         print(
             json.dumps(
                 {
@@ -48,30 +47,49 @@ def run_suite(output_directory, analytic_path):
             ),
             flush=True,
         )
-        if result["status"] == "FAIL":
-            break
+        # A resource-limited grid case must not suppress an independent time pair.
+    return finalize_suite(output)
+
+
+def finalize_suite(output_directory):
+    output = Path(output_directory)
+    analytic = json.loads((output / "analytic-controls.json").read_text())
+    no_body = json.loads((output / "no-body.json").read_text())
+    results = {
+        name: json.loads((output / name / "result.json").read_text())
+        for name in CASES
+        if (output / name / "result.json").exists()
+    }
     checks = {"analytic": analytic["all_pass"], "no_body": no_body["passed"]}
-    if len(results) == len(cases):
+    complete = {
+        name: r["status"] != "FAIL" and r["completed_steps"] == r["planned_steps"]
+        for name, r in results.items()
+    }
+    grid = time_error = None
+    if all(complete.get(name, False) for name in ("baseline", "grid48")):
         grid = abs(
             results["baseline"]["mean_Cd_last20pct"]
             - results["grid48"]["mean_Cd_last20pct"]
         ) / max(abs(results["grid48"]["mean_Cd_last20pct"]), 1e-12)
+    if all(complete.get(name, False) for name in ("time24-coarse", "time24-half")):
         time_error = abs(
             results["time24-coarse"]["mean_Cd_last20pct"]
             - results["time24-half"]["mean_Cd_last20pct"]
         ) / max(abs(results["time24-half"]["mean_Cd_last20pct"]), 1e-12)
-        checks.update(
-            {
-                "grid_relative_drag_difference_le_20pct": grid <= 0.2,
-                "time_relative_drag_difference_le_10pct": time_error <= 0.1,
-                "drag_sign": results["baseline"]["mean_Cd_last20pct"] > 0,
-                "opposite_force_sign_mutant_rejected": not (
-                    -results["baseline"]["mean_Cd_last20pct"] > 0
-                ),
-            }
-        )
-    else:
-        grid = time_error = None
+    checks.update(
+        {
+            "grid_relative_drag_difference_le_20pct": None
+            if grid is None
+            else grid <= 0.2,
+            "time_relative_drag_difference_le_10pct": None
+            if time_error is None
+            else time_error <= 0.1,
+            "drag_sign": results.get("baseline", {}).get("mean_Cd_last20pct", 0) > 0,
+            "opposite_force_sign_mutant_rejected": not (
+                -results.get("baseline", {}).get("mean_Cd_last20pct", 0) > 0
+            ),
+        }
+    )
     stable = all(
         r["checks"]["stable"] and r["checks"]["positive_drag"] for r in results.values()
     )
@@ -82,7 +100,7 @@ def run_suite(output_directory, analytic_path):
     )
     label = (
         "FAIL"
-        if not stable or len(results) < len(cases)
+        if not stable or len(results) < len(CASES)
         else ("PASS" if all(checks.values()) else "PARTIAL")
     )
     summary = {
@@ -105,6 +123,9 @@ def run_suite(output_directory, analytic_path):
                     "checks",
                     "wall_seconds",
                     "max_mach",
+                    "failure",
+                    "completed_steps",
+                    "planned_steps",
                 )
             }
             for name, r in results.items()
@@ -121,13 +142,29 @@ def run_suite(output_directory, analytic_path):
             "evidence_kind": "simulated",
             "protocol_sha256": file_sha(PROTOCOL),
             "analytic_receipt_sha256": hashlib.sha256(canonical(analytic)).hexdigest(),
+            "physics_code_files": {
+                str(p): file_sha(Path(__file__).parent / p)
+                for p in ("lbm.py", "model.py", "geometry.py")
+            },
             "outputs": {
                 str(p.relative_to(output)): {
                     "sha256": file_sha(p),
                     "byte_size": p.stat().st_size,
                 }
-                for p in sorted(output.rglob("*"))
-                if p.is_file() and p.name != "simulation-manifest.json"
+                for p in [
+                    output / "analytic-controls.json",
+                    output / "no-body.json",
+                    output / "summary.json",
+                    *[
+                        f
+                        for name in results
+                        for f in (
+                            output / name / "result.json",
+                            output / name / "fields.npz",
+                        )
+                        if f.exists()
+                    ],
+                ]
             },
         },
     )
@@ -138,5 +175,12 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser(__doc__)
     p.add_argument("--output", default="artifacts/windtunnel")
     p.add_argument("--analytic-controls", required=True)
+    p.add_argument("--finalize-only", action="store_true")
     args = p.parse_args()
-    print(json.dumps(run_suite(args.output, args.analytic_controls)))
+    print(
+        json.dumps(
+            finalize_suite(args.output)
+            if args.finalize_only
+            else run_suite(args.output, args.analytic_controls)
+        )
+    )

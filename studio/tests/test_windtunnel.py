@@ -1,9 +1,12 @@
 import math
+import json
 
 import pytest
 import torch
 
 from engineering.windtunnel.geometry import mask_from_mesh
+from engineering.windtunnel.geometry import ROOT
+from engineering.windtunnel.lbm import LBM
 from engineering.windtunnel.model import (
     no_body_control,
     request_parameters,
@@ -61,3 +64,29 @@ def test_low_re_physical_mapping_is_consistent_and_requires_real_prerequisite():
     assert math.sqrt(3) * p["lattice_speed"] < 0.3
     with pytest.raises(ValueError, match="analytic"):
         run_request({}, "unused")
+
+
+def test_actual_force_sign_mutant_is_detected_and_cannot_be_rendered(
+    monkeypatch, tmp_path
+):
+    gate = json.loads(
+        (ROOT / "artifacts/windtunnel/analytic-controls.json").read_text()
+    )
+    original = LBM.step
+
+    def reversed_force(self, want_force=False):
+        result = original(self, want_force=want_force)
+        return tuple(-f for f in result) if want_force else result
+
+    monkeypatch.setattr(LBM, "step", reversed_force)
+    result = run_request(
+        {"length_cells": 16, "convective_time": 0.5, "frames": 2},
+        tmp_path / "negative",
+        analytic_receipt=gate,
+    )
+    assert result["status"] == "FAIL"
+    assert result["mean_Cd_last20pct"] < 0
+    from engineering.windtunnel.render import render
+
+    with pytest.raises(ValueError, match="failing"):
+        render(tmp_path, case="negative")
