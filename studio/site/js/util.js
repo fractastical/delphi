@@ -103,6 +103,19 @@
     return new Raw(out.join("\n"));
   }
 
+  /* Exact rational parser for strings like "3/10", "0.25" or "7": no float round trip until display. */
+  function rational(s) {
+    const m = /^(-?\d+)(?:\/(\d+))?$/.exec(String(s).trim()) || /^(-?\d+)\.(\d+)$/.exec(String(s).trim());
+    if (!m) return null;
+    let n, d;
+    if (String(s).includes("/")) { n = BigInt(m[1]); d = BigInt(m[2]); } else if (String(s).includes(".")) { d = 10n ** BigInt(m[2].length); n = BigInt(m[1] + m[2]) * (m[1].startsWith("-") ? 1n : 1n); if (m[1].startsWith("-")) n = BigInt(m[1]) * d - BigInt(m[2]); } else { n = BigInt(m[1]); d = 1n; }
+    if (d === 0n) return null;
+    const gcd = (a, b) => { a = a < 0n ? -a : a; while (b) [a, b] = [b, a % b]; return a || 1n; }; const g = gcd(n, d); n /= g; d /= g;
+    const approx = Number(n * 1000000n / d) / 1e6;
+    return { n, d, text: d === 1n ? String(n) : `${n}/${d}`, approx };
+  }
+  const exact = (s) => { const r = rational(s); return r ? (r.d === 1n ? r.text : `${r.text} (≈ ${DF.fmt(r.approx, 6)})`) : String(s); };
+
   const slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  Object.assign(DF, { raw, esc, html, safeUrl, fmt, num, tex, texSpan, mixedSpan, mixed, renderMath, markdown, slug, Raw, isProse });
+  Object.assign(DF, { rational, exact, raw, esc, html, safeUrl, fmt, num, tex, texSpan, mixedSpan, mixed, renderMath, markdown, slug, Raw, isProse });
 })();

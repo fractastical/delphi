@@ -22,6 +22,7 @@ import secrets
 import sys
 import time
 from collections import deque
+from datetime import datetime, timezone
 from dataclasses import dataclass, field
 from hashlib import sha256
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -34,6 +35,8 @@ from urllib.parse import parse_qs, unquote, urlsplit
 from .artifacts import ArtifactIndex
 from .http import Application
 from .models import KINDS, MAX_BUNDLE_BYTES, Ref, canonical
+from .search import SEARCH_KIND, SearchIndex
+from .system_status import SystemStatus
 from .store import FrontierError, Store
 
 log = logging.getLogger("frontier.web")
@@ -43,7 +46,10 @@ MIME = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", 
         ".txt": "text/plain; charset=utf-8", ".woff2": "font/woff2"}
 # Extra types, served ONLY from <site>/artifacts/ (the guarded artifact subtree), never from the rest of the site.
 ARTIFACT_MIME = {".stl": "model/stl", ".obj": "model/obj", ".glb": "model/gltf-binary", ".csv": "text/csv; charset=utf-8",
-                 ".lean": "text/plain; charset=utf-8", ".trig": "application/trig"}
+                 ".lean": "text/plain; charset=utf-8", ".trig": "application/trig",
+                 ".mp4": "video/mp4", ".webm": "video/webm"}
+STREAMED = {".mp4", ".webm"}                                                  # served by seek+chunk with Range support, never read whole into memory
+MAX_VIDEO_BYTES = 64_000_000
 ARTIFACT_DOWNLOAD = {".stl", ".obj", ".glb"}                                   # binary models download; text types render as text
 SENSITIVE_NAME = re.compile(r"(secret|token|credential|password|passwd|private|apikey|api_key|\.pem|\.key|\.env|id_rsa)", re.I)
 MAX_STATIC_BYTES = 8_000_000
@@ -70,6 +76,14 @@ class WebConfig:
     search_mode: str = "store_lexical"                           # honest label of what /api/catalog actually runs
     catalog_search: Callable | None = None                       # e.g. SearchIndex(store).search once integrated; same keyword signature as Store.search
     artifact_search: Callable | None = None                      # default: ArtifactIndex(store).search
+    attention_build: Callable | None = None                      # default: late import of attention.view.build_view (tests inject a stand-in)
+    attention_module: str = "attention.view"                     # module exposing build_view(records, events, annotations, now); renamed by config if the package is
+    system_root: Path | None = None                              # checkout whose files /api/system describes (default: this checkout)
+    system_runner: Callable | None = None                        # tests only: replaces the two fixed commands' runner
+    system_ttl: int = 30
+    attention_ttl: int = 5                                       # seconds a built view is reused; bounds repeated polling cost
+    attention_max_records: int = 2000                            # public records (all versions) and events the view may be built from; more => 422, never a partial view
+    attention_max_events: int = 5000
     routes: dict = field(default_factory=dict)                   # extension point: {"POST /api/engineering/solve": Route(handler)}
     login_failures: int = 10
     login_window: int = 60
@@ -79,6 +93,7 @@ class WebConfig:
     def __post_init__(self):
         # The engineering solver (root's frontier/engineering_api.py) is wired by default; a caller-supplied route of the same name wins (tests).
         self.routes.setdefault("POST /api/engineering/solve", Route(engineering_handler, max_body=1024, max_concurrent=8))
+        self.routes.setdefault("POST /api/beliefs/solve", Route(beliefs_handler, max_body=32768, max_concurrent=8))
         for key in self.routes:
             method, _, path = key.partition(" ")
             if method not in ("GET", "POST") or not re.fullmatch(r"/api/[a-z0-9][a-z0-9/_-]{0,80}", path) or path in RESERVED_API:
@@ -107,7 +122,96 @@ def engineering_handler(req):
     return 200, solve_design(req["body"])
 
 
-RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts"}
+def _unavailable(code, what):
+    err = FrontierError(f"{what} is not installed on this node")
+    err.http_status, err.code = 503, code
+    return err
+
+
+def beliefs_handler(req):
+    """POST /api/beliefs/solve -> frontier.beliefs_api.solve_scenario(scenario) (the director's adapter; late import). That adapter validates the scenario,
+    runs the solver in its own isolated 8 s child with two slots and labels EVERY answer, including errors, `calibrated: false`; its envelope is passed
+    through unchanged (see `Handler.handle_any`, which serves an exception's `.body` verbatim). If the module is absent: 503 `beliefs_unavailable` and
+    nothing is computed. This adapter never runs the solver in a web thread."""
+    try:
+        from frontier.beliefs_api import solve_scenario
+    except ModuleNotFoundError as e:
+        if e.name != "frontier.beliefs_api":
+            raise
+        raise _unavailable("beliefs_unavailable", "The belief solver") from None
+    return 200, solve_scenario(req["body"])
+
+
+ATTENTION_MODULES = ("attention.view", "frontier_attention.view", "frontier.attention.view", "frontier.attention")
+
+
+def _late_attention(module):
+    """Static late imports from a fixed allow-list (the market package's final name is still being settled); absent -> 503, nothing invented."""
+    try:
+        if module == "attention.view":
+            from attention.view import build_view
+        elif module == "frontier_attention.view":
+            from frontier_attention.view import build_view
+        elif module == "frontier.attention.view":
+            from frontier.attention.view import build_view
+        elif module == "frontier.attention":
+            from frontier.attention import build_view
+        else:
+            raise ValueError("unsupported attention module")
+        return build_view
+    except ModuleNotFoundError as e:
+        if e.name and module.startswith(e.name):
+            raise _unavailable("attention_unavailable", "The attention layer") from None
+        raise                                           # a missing transitive dependency is a real failure, not "not installed"
+    except ImportError:
+        raise _unavailable("attention_unavailable", "The attention layer") from None
+
+
+class AttentionSource:
+    """Builds the deterministic attention view from PUBLIC stored records and events only, reused for `ttl` seconds."""
+
+    def __init__(self, store, cfg):
+        self.store, self.cfg, self.lock, self.cached = store, cfg, Lock(), None
+
+    def inputs(self):
+        with self.store.connection() as c:
+            recs = c.execute("SELECT envelope FROM record_versions WHERE visibility='public' AND kind <> 'Event' ORDER BY created_at, version LIMIT %s",
+                             (self.cfg.attention_max_records + 1,)).fetchall()
+            evs = c.execute("SELECT e.sequence, v.envelope FROM events e JOIN record_versions v ON v.version = e.event_version "
+                            "WHERE v.visibility='public' ORDER BY e.sequence LIMIT %s", (self.cfg.attention_max_events + 1,)).fetchall()
+        if len(recs) > self.cfg.attention_max_records or len(evs) > self.cfg.attention_max_events:
+            err = FrontierError("The public record set is larger than this endpoint will build a view from; no partial view is produced")
+            err.http_status, err.code = 422, "view_too_large"
+            raise err
+        return [r["envelope"] for r in recs], [{"sequence": e["sequence"], "envelope": e["envelope"]} for e in evs]
+
+    def get(self):
+        with self.lock:
+            now = time.monotonic()
+            if self.cached and now - self.cached[0] < self.cfg.attention_ttl:
+                return self.cached[1]
+            build = self.cfg.attention_build
+            if build is None:
+                build = _late_attention(self.cfg.attention_module)
+            records, events = self.inputs()
+            stamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+            view = build(records, events, [], stamp)
+            out = {"mode": "live", "namespace": self.store.namespace, "generated_at": stamp,
+                   "inputs": {"records": len(records), "events": len(events), "annotations": 0, "public_only": True,
+                              "note": "Typed unlock edges and bounded-action models live in annotation documents the store cannot hold; none are loaded here, "
+                                      "so the view shows what the stored records alone support."},
+                   "view": view}
+            self.cached = (now, out)
+            return out
+
+
+def default_search(store):
+    """What the website uses by default: the search index (lexical + exact discovery, the store's own visibility rules). Works without the optional
+    indexes that `python -m frontier.search` creates; they only make it faster."""
+    return SearchIndex(store).query, "search_index"
+
+
+RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts", "/api/attention", "/api/system"}
 
 
 @dataclass
@@ -201,7 +305,8 @@ def resolve_static(site: Path, raw_path: str) -> Path | None:
     target = (root / "/".join(segs)).resolve()
     if not target.is_relative_to(root) or SENSITIVE_NAME.search(target.name) or mime_for(root, target) is None:
         return None
-    limit = MAX_ARTIFACT_BYTES if target.suffix.lower() in ARTIFACT_MIME else MAX_STATIC_BYTES
+    ext = target.suffix.lower()
+    limit = MAX_VIDEO_BYTES if ext in STREAMED else MAX_ARTIFACT_BYTES if ext in ARTIFACT_MIME else MAX_STATIC_BYTES
     try:
         if not target.is_file() or target.stat().st_size > limit:
             return None
@@ -223,6 +328,8 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
     sessions = Sessions(cfg.session_ttl, cfg.max_sessions)
     limiter = FailureLimiter(cfg.login_failures, cfg.login_window)
     cookie_name = ("__Host-" if cfg.cookie_secure else "") + "frontier_session"
+    attention = AttentionSource(store, cfg)
+    system = SystemStatus(store, **({"root": cfg.system_root} if cfg.system_root else {}), ttl=cfg.system_ttl, runner=cfg.system_runner)
 
     class Handler(BaseHTTPRequestHandler):
         server_version = "frontier"
@@ -352,8 +459,12 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
                     return self.api_read(path, parts.query)
                 return self.static(path)
             except FrontierError as e:
-                extra = [("Retry-After", str(cfg.login_window))] if e.http_status == 429 else []
-                self.error(e.http_status, e.code, str(e), extra)
+                extra = [("Retry-After", str(cfg.login_window))] if e.http_status == 429 and e.code == "too_many_attempts" else []
+                body = getattr(e, "body", None)                       # root's solver adapters attach a fully labelled envelope (e.g. calibrated: false)
+                if isinstance(body, dict):
+                    self.json(e.http_status, body, extra)
+                else:
+                    self.error(e.http_status, e.code, str(e), extra)
             except (ValueError, TypeError, KeyError, RecursionError):
                 self.error(400, "invalid_request", "Invalid bounded request")      # pydantic errors can echo input; never forward them
             except Exception:       # noqa: BLE001
@@ -454,10 +565,22 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
                 rows = []
                 for r in found["results"]:
                     got = store.get(r["ref"])
-                    rows.append({"record": got["record"], "local_status": got["local_review"]["status"], "policy_version": got["local_review"]["policy_version"],
-                                 "is_head": got["is_head"], "action": got["action"], "why_matched": r["why_matched"]})
+                    row = {"record": got["record"], "local_status": got["local_review"]["status"], "policy_version": got["local_review"]["policy_version"],
+                           "is_head": got["is_head"], "action": got["action"], "why_matched": r["why_matched"]}
+                    match = {k: r[k] for k in ("score", "matched_fields", "snippet", "snippet_withheld", "curation", "disputes", "evidence_references", "references_complete") if k in r}
+                    if match:
+                        row["match"] = match                      # the search index's own explanation, kept apart from the record
+                    rows.append(row)
                 return self.json(200, {"mode": "live", "namespace": store.namespace, "search_mode": cfg.search_mode, "search_kind": found["search_kind"],
                                        "results": rows, "next_cursor": found["next_cursor"]})
+            if path == "/api/system":
+                if q:
+                    raise FrontierError("This endpoint takes no parameters")
+                return self.json(200, system.snapshot())
+            if path == "/api/attention":
+                if q:
+                    raise FrontierError("This endpoint takes no parameters")
+                return self.json(200, attention.get())
             if path == "/api/artifacts":
                 if set(q) - {"q", "query", "role", "evidence_kind", "limit", "after"} or ("q" in q and "query" in q):
                     raise FrontierError("Unknown or conflicting parameter")
@@ -510,12 +633,53 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
                 route.slots.release()
             self.json(status, obj)
 
+        def stream(self, target):
+            size, st = target.stat().st_size, target.stat()
+            start, end, status = 0, size - 1, 200
+            rng = self.headers.get("Range")
+            if rng:
+                m = re.fullmatch(r"bytes=(\d*)-(\d*)", rng.strip())
+                if not m or not (m.group(1) or m.group(2)):
+                    return self.error(416, "range_not_satisfiable", "Unsupported Range", [("Content-Range", f"bytes */{size}")])
+                if m.group(1):
+                    start = int(m.group(1))
+                    end = min(int(m.group(2)), size - 1) if m.group(2) else size - 1
+                else:
+                    start, end = max(size - int(m.group(2)), 0), size - 1
+                if start > end or start >= size:
+                    return self.error(416, "range_not_satisfiable", "Range outside the file", [("Content-Range", f"bytes */{size}")])
+                status = 206
+            length = end - start + 1
+            self.send_response(status)
+            self.send_header("Content-Type", ARTIFACT_MIME[target.suffix.lower()])
+            self.send_header("Content-Length", str(length))
+            self.send_header("Accept-Ranges", "bytes")
+            self.send_header("Cache-Control", "no-cache")
+            self.send_header("ETag", f'"{st.st_size:x}-{st.st_mtime_ns:x}"')
+            if status == 206:
+                self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
+            self._headers([])
+            self.end_headers()
+            if self.command == "HEAD":
+                return
+            with target.open("rb") as f:
+                f.seek(start)
+                left = length
+                while left > 0:
+                    chunk = f.read(min(65536, left))
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    left -= len(chunk)
+
         def static(self, path):
             if cfg.site_dir is None:
                 return self.error(404, "not_found", "No site configured")
             target = resolve_static(cfg.site_dir, path)
             if target is None:
                 return self.error(404, "not_found", "Not found")
+            if target.suffix.lower() in STREAMED:
+                return self.stream(target)
             body = target.read_bytes()
             extra = [("ETag", '"' + sha256(body).hexdigest()[:16] + '"')]
             if target.suffix.lower() in ARTIFACT_DOWNLOAD:
@@ -569,17 +733,22 @@ def main(argv=None):
     p.add_argument("--site", type=Path, default=Path("site"))
     p.add_argument("--hostname", default="frontier.morphoswarm.ai")
     p.add_argument("--public-site", action="store_true", help="serve the static shell without sign-in; data endpoints stay gated")
+    p.add_argument("--attention-module", default="attention.view", choices=ATTENTION_MODULES, help="module providing build_view (default attention.view); 503 if absent")
+    p.add_argument("--legacy-catalog", action="store_true", help="use the old Store.search instead of the search index (debugging only)")
     p.add_argument("--insecure-cookies", action="store_true", help="local development over plain HTTP only: drop the Secure attribute")
     a = p.parse_args(argv)
     logging.basicConfig(stream=sys.stderr, level=logging.INFO, format="%(asctime)s %(message)s")
     # The access token comes from the service's EnvironmentFile; its value is never printed or logged.
     tokens = [os.environ.get("FRONTIER_ACCESS_TOKEN") or os.environ.get("MORPHOSWARM_STUDIO_TOKEN")]
     try:
-        cfg = WebConfig.with_tokens(*tokens, site_dir=a.site, public_hostname=a.hostname, cookie_secure=not a.insecure_cookies, public_site=a.public_site)
+        cfg = WebConfig.with_tokens(*tokens, site_dir=a.site, public_hostname=a.hostname, cookie_secure=not a.insecure_cookies, public_site=a.public_site, attention_module=a.attention_module)
     except ValueError:
         print("frontier.web: set FRONTIER_ACCESS_TOKEN (or MORPHOSWARM_STUDIO_TOKEN) to a token of at least 16 characters", file=sys.stderr)
         return 2
-    server = make_web_server(Store(os.environ["FRONTIER_DSN"], a.namespace, a.schema), cfg, a.port)
+    store = Store(os.environ["FRONTIER_DSN"], a.namespace, a.schema)
+    if not a.legacy_catalog:
+        cfg.catalog_search, cfg.search_mode = default_search(store)
+    server = make_web_server(store, cfg, a.port)
     log.info("listening 127.0.0.1:%d namespace=%s schema=%s gated=%s", server.server_port, a.namespace, a.schema, True)
     try:
         server.serve_forever()

@@ -19,7 +19,7 @@
     e.preventDefault(); const v = {}; new FormData(form).forEach((val, k) => { if (String(val).trim()) v[k] = String(val).trim(); }); DF.go(build(v));
   }));
 
-  const NAV = [["frontier", "Frontier"], ["knowledge", "Knowledge"], ["engineering", "Engineering"], ["evidence", "Evidence"], ["work", "Work"], ["belief", "Belief"]];
+  const NAV = [["frontier", "Frontier"], ["knowledge", "Knowledge"], ["engineering", "Engineering"], ["simulations", "Simulations"], ["evidence", "Evidence"], ["work", "System"], ["belief", "Belief"]];
   let snap = null; let lastView = null; let opener = null;
 
   function header(route) {
@@ -103,9 +103,11 @@
     }
     if (type === "rec") {
       const [kind, ...r2] = rest; const rid = r2.join(":");
-      const ref = (DF.api.state.catalog.records.find((x) => x.ref.kind === kind && x.ref.id === rid) || {}).ref || { namespace: DF.api.state.catalog.namespace, kind, id: rid, version: "" };
+      let ref = (DF.recRefs && DF.recRefs[id]) || (DF.api.state.catalog.records.find((x) => x.ref.kind === kind && x.ref.id === rid) || {}).ref;
+      if (!ref) { const hit = (await DF.api.catalog({ query: rid, kind, limit: 50 })).records.find((x) => x.ref && x.ref.id === rid); if (hit) ref = hit.ref; }
+      if (!ref) throw new Error("no record with that id is visible to this session");
       const rec = await DF.api.record(ref);
-      return { title: rec.title || rid, body: html`<p class="note small">Full record envelope as the adapter returned it. Local status is separate from any upstream label.</p><pre class="json">${JSON.stringify(rec, null, 2)}</pre>` };
+      return { title: rec.title || rid, body: html`<p class="note small">Full record envelope as the adapter returned it. Local status is separate from any upstream label.</p><pre class="json">${JSON.stringify(rec.raw || rec, null, 2)}</pre>` };
     }
     throw new Error("unknown source type “" + type + "”");
   }
@@ -119,7 +121,7 @@
       document.getElementById("retry").addEventListener("click", () => location.reload()); return;
     }
     const foot = document.getElementById("foot");
-    foot.innerHTML = html`<p><b>${snap.label}</b>${snap.git_commit_time ? " · committed " + snap.git_commit_time : ""} · ${snap.inputs.length} input files hashed · <a href="data/snapshot.json">snapshot.json</a> · <a href="data/catalog.json">catalog.json</a> · KaTeX 0.16.47 (MIT, <a href="vendor/katex/LICENSE">licence</a>)</p>
+    foot.innerHTML = html`<p><b>${snap.label}</b> · ${snap.inputs.length} input files hashed · <a href="data/snapshot.json">snapshot.json</a> · <a href="data/catalog.json">catalog.json</a> · KaTeX 0.16.47 (MIT, <a href="vendor/katex/LICENSE">licence</a>)</p>
       <details><summary>Input files and sha256</summary><div class="tablewrap"><table><tbody>${snap.inputs.map((i) => html`<tr><td><code>${i.path}</code></td><td><code>${i.sha256}</code></td><td>${i.bytes} bytes</td></tr>`)}</tbody></table></div></details>
       <p class="small faint">Geometry is a design visualisation, not an observed fish and not CFD. Calculations are browser arithmetic on published fits. Upstream review labels are assertions, never local acceptance. No live activity, votes, scores or progress figures are shown.</p>`.toString();
     document.addEventListener("click", (e) => { const a = e.target.closest("a[data-src]"); if (a) opener = a; });

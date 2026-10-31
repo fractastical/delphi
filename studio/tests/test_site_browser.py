@@ -162,3 +162,82 @@ def test_malformed_and_missing_data_show_an_error_not_a_blank(browser, tmp_path)
         pg.wait_for_selector("text=Data could not be loaded")
     finally:
         srv.shutdown()
+
+
+def test_artifact_download_link_only_for_declared_downloadable_https(browser, base):
+    """Formatter unit test on synthetic input (the scratch live node holds no artifacts): never links an undeclared file."""
+    pg = page(browser)
+    pg.goto(base + "#/evidence")
+    pg.wait_for_selector("#main h1")
+    rows = pg.evaluate("""() => DF.liveArtifacts([
+      {artifact: {title: 'a', uri: 'https://x.example/a.stl', sha256: 'a'.repeat(64), byte_size: 1, role: 'geometry', availability: 'downloadable'}, relation: 'supports', evidence_kind: 'simulated'},
+      {artifact: {title: 'b', uri: 'https://x.example/b.csv', sha256: 'b'.repeat(64), byte_size: 1, role: 'output', availability: 'referenced'}},
+      {artifact: {title: 'c', uri: 'urn:sha256:' + 'c'.repeat(64), sha256: 'c'.repeat(64), byte_size: 1, role: 'certificate', availability: 'referenced'}}
+    ]).map(r => [r.type, r.download])""")
+    assert rows == [["geometry", "https://x.example/a.stl"], ["data", None], ["proof", None]]
+
+
+def test_recorded_results_show_lean_receipt_scope_and_honest_absence(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/engineering")
+    pg.wait_for_selector("#rr-h")
+    sec = pg.locator("section[aria-labelledby=rr-h]").inner_text().lower()
+    assert "not run by this page" in sec and "not about any fish" in sec
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    if snap["simulation"]:
+        assert "glide simulation" in sec and "authors' own caveat" in sec
+        pg.locator("details.pareto summary").click()
+        pg.locator("[data-pareto]").first.click()
+        assert float(pg.input_value("#f-mass_kg")) > 0 and pg.input_value("#f-standard_length_m") == ""
+    else:
+        assert "no recorded simulation results are present" in sec and "no mesh" in sec
+
+
+def test_simulation_gallery_never_invents_a_video(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector(".simcard, .empty")
+    assert pg.locator("video").count() == 0, "no video file exists in the snapshot, so no player may appear"
+    html = pg.evaluate("""() => DF.views.simulations(Object.assign({}, DF.api.state.snapshot, {simulation: null, simulation_manifests: [
+      {id: 'ok', title: 'ok', scales: ['cellular'], video_state: 'present_verified', video_href: 'artifacts/simulations/ok/v.mp4', manifest: 'm'},
+      {id: 'miss', title: 'miss', scales: ['cellular'], video_state: 'declared_but_missing', manifest: 'm'},
+      {id: 'bad', title: 'bad', scales: ['cellular'], video_state: 'digest_mismatch', manifest: 'm'},
+      {id: 'none', title: 'none', scales: ['cellular'], video_state: 'none', manifest: 'm'}]})).html.toString()""")
+    assert html.count("<video") == 1 and "artifacts/simulations/ok/v.mp4" in html
+    assert html.count("No video file.") == 3 and "does not match its declared sha256" in html
+
+
+def test_attestation_card_states_it_is_not_a_population_rate(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/evidence")
+    pg.wait_for_selector("#ev-att")
+    txt = pg.locator("section[aria-labelledby=ev-att]").inner_text().lower()
+    assert "not a population rate" in txt and "15 of 15" in txt and "4" in txt
+
+
+def test_mcp_tools_come_from_the_document(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=runtime")
+    pg.wait_for_selector("h2:has-text('Declared capabilities')")
+    assert "frontier_artifacts" in pg.locator("#main").inner_text()
+
+
+def test_system_view_keeps_author_report_and_measured_apart(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/work")
+    pg.wait_for_selector("h1:has-text('System')")
+    txt = pg.locator("#main").inner_text().lower()
+    assert "author report" in txt and "measured" in txt and "not reported: a snapshot cannot know it" in txt
+    pg.get_by_role("link", name="Resources").click()
+    pg.wait_for_selector("h2:has-text('actual versus unknown')")
+    assert pg.locator("#main").inner_text().lower().count("unknown") >= 3
+    pg.get_by_role("link", name="Receipts").click()
+    pg.wait_for_selector("h2:has-text('What has been measured')")
+    assert "does not cover" not in pg.locator("#main").inner_text().lower() and "receipt" in pg.locator("#main").inner_text().lower()
+    pg.get_by_role("link", name="Specs and goals").click()
+    pg.wait_for_selector("h2:has-text('SPEC-005 acceptance rows')")
+    pg.get_by_role("link", name="SPEC-005", exact=False).first.click()
+    pg.wait_for_selector("#drawer:not([hidden]) .md")
+    assert "Solver and Lean boundary" in pg.locator("#drawer").inner_text()
+    pg.go_back()
+    pg.wait_for_selector("#drawer", state="hidden")

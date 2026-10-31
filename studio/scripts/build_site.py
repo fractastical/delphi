@@ -15,7 +15,6 @@ import argparse
 import json
 import re
 import shutil
-import subprocess
 import sys
 from hashlib import sha256
 from pathlib import Path
@@ -25,14 +24,17 @@ SITE = ROOT / "site"
 DATA = SITE / "data"
 SCHEMA = "frontier-site-snapshot-0.1"
 NAMESPACE = "snapshot"
-INPUT_DIRS = ("seeds", "results", "specs", "tasks", "docs", "site/content")
 
-CAPABILITY_TOOLS = {
-    "frontier_search": "read", "frontier_get": "read", "frontier_neighborhood": "read",
-    "frontier_events": "read", "frontier_capabilities": "read",
-    "frontier_propose": "write (opt-in)", "frontier_lease": "write (opt-in)",
-    "frontier_transition": "write (opt-in)",
-}
+
+
+def mcp_tools(mcp_text: str) -> list[dict]:
+    """Tool names come from the Tools row of the table in docs/mcp.md, so the page cannot list a tool the document does not."""
+    row = next((l for l in mcp_text.splitlines() if l.startswith("| Tools |")), "")
+    cells = [c.strip() for c in row.strip().strip("|").split("|")]
+    names = lambda c: re.findall(r"`(frontier_[a-z_]+)`", c)
+    read = names(cells[1]) if len(cells) > 2 else []
+    write = [n for n in names(cells[2]) if n not in read] if len(cells) > 2 else []
+    return [{"name": n, "mode": "read", "documented_in_docs_mcp": True} for n in read] + [{"name": n, "mode": "write (opt-in)", "documented_in_docs_mcp": True} for n in write]
 
 
 def digest_bytes(b: bytes) -> str:
@@ -41,14 +43,6 @@ def digest_bytes(b: bytes) -> str:
 
 def canonical(v) -> str:
     return json.dumps(v, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
-
-
-def git(*args) -> str | None:
-    try:
-        r = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=20)
-    except (OSError, subprocess.SubprocessError):
-        return None
-    return r.stdout.strip() if r.returncode == 0 and r.stdout.strip() else None
 
 
 class Inputs:
@@ -117,6 +111,131 @@ def build_catalog(snapshot: dict) -> list[dict]:
     return records
 
 
+SIM_DIR = "engineering/simulation/results"
+SIM_FILES = ("summary.json", "controls.json", "pareto.json", "model_structure_findings.json", "designs.csv", "figure.png")
+LEAN_RECEIPT = "engineering/formal/RECEIPT.json"
+
+
+def recorded_results(ins: Inputs, files: dict) -> tuple[dict | None, dict | None]:
+    """Recorded runs that exist in this tree. A missing file is reported as absent, never filled in."""
+    lean = sim = None
+    if (ROOT / LEAN_RECEIPT).exists():
+        lc = json.loads(ins.read(LEAN_RECEIPT))["lean_checks"]
+        lean = {"path": LEAN_RECEIPT, "sha256": ins.seen[LEAN_RECEIPT]["sha256"], "run": lc.get("lean"), "lean_version": lc.get("lean_version"),
+                "mathlib_rev": lc["provenance"].get("mathlib_rev"), "toolchain": lc["provenance"].get("lean_toolchain_file"),
+                "theory_sha256": lc.get("theory_sha256"), "all_ok": lc.get("all_ok"),
+                "positive": {k: lc["positive"].get(k) for k in ("exit", "seconds", "axioms_used", "only_standard_axioms")},
+                "negative": {"exit": lc["negative"].get("exit"), "seconds": lc["negative"].get("seconds"), "each_block_rejected": lc["negative"].get("each_block_rejected"),
+                             "first_error_message": lc["negative"].get("first_error_message")},
+                "file_hashes": lc["provenance"].get("files")}
+    if (ROOT / SIM_DIR / "summary.json").exists():
+        listing = []
+        for name in SIM_FILES:
+            if (ROOT / SIM_DIR / name).exists():
+                b = ins.read(f"{SIM_DIR}/{name}")
+                files[f"results/{name}"] = b
+                listing.append({"name": name, "path": f"{SIM_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": f"data/results/{name}"})
+        load = lambda n: json.loads((ROOT / SIM_DIR / n).read_text()) if (ROOT / SIM_DIR / n).exists() else None
+        summ, ctrl, find = load("summary.json"), load("controls.json"), load("model_structure_findings.json")
+        sim = {"summary": {k: v for k, v in summ.items() if k != "pareto_designs_selected_dimensions"}, "pareto_selected": summ.get("pareto_designs_selected_dimensions", []),
+               "controls": ctrl, "findings": find, "files": listing}
+    return lean, sim
+
+
+ATT = "findings/attestation-check-15.json"
+ATT_REVIEW = "findings/attestation-facet-review-15.json"
+ATT_README = "findings/README-attestation-check-15.md"
+SIM_MANIFESTS = "site/artifacts/simulations"
+
+
+def attestation_check(ins: Inputs, files: dict, docs: list) -> dict | None:
+    if not all((ROOT / f).exists() for f in (ATT, ATT_REVIEW, ATT_README)):
+        return None
+    mech, rev = json.loads(ins.read(ATT)), json.loads(ins.read(ATT_REVIEW))
+    text = ins.text(ATT_README)
+    files["docs/" + Path(ATT_README).name] = text.encode()
+    docs.append({"id": Path(ATT_README).stem, "title": next(l[2:].strip() for l in text.splitlines() if l.startswith("# ")), "status_line": None, "path": ATT_README,
+                 "sha256": ins.seen[ATT_README]["sha256"], "href": "data/docs/" + Path(ATT_README).name})
+    by = {r["slug"] + str(r["index"]): r for r in mech["results"]}
+    items = []
+    for it in rev["items"]:
+        m = by.get(it["slug"] + str(it["index"]), {})
+        items.append({"slug": it["slug"], "stance": it["stance"], "stratum": it["stratum"], "source": m.get("source"), "article_title": m.get("article_title"), "article_year": m.get("article_year"),
+                      "locator": m.get("locator"), "mechanical_status": m.get("status"), "match": m.get("match"), "supports": it["quote_supports_stance"], "fit": it["fit_to_question"],
+                      "flags": it["flags"], "note": it["note"]})
+    return {"readme": Path(ATT_README).stem, "n": mech["n"], "status_counts": mech["status_counts"], "tally": rev.get("tally"), "reviewer": rev.get("reviewer"), "items": items,
+            "scope": "A fixed 15-item sample chosen by a hashed rule, not a random or representative sample. The counts are not a population rate and verify nothing about the other attestations or the 250 problems."}
+
+
+def simulation_manifests(ins: Inputs) -> list[dict]:
+    """Optional manifests dropped next to their artifacts. A video is playable only if the file exists and matches its declared sha256."""
+    out = []
+    base = ROOT / SIM_MANIFESTS
+    for mf in sorted(base.glob("*/manifest.json")) if base.exists() else []:
+        rel = mf.relative_to(ROOT).as_posix()
+        try:
+            m = json.loads(ins.read(rel))
+        except ValueError:
+            out.append({"id": mf.parent.name, "title": mf.parent.name, "error": "manifest is not valid JSON", "manifest": rel})
+            continue
+        v = m.get("video"); state, href = "none", None
+        if v:
+            f = mf.parent / str(v.get("file", ""))
+            if not f.is_file() or ".." in str(v.get("file", "")):
+                state = "declared_but_missing"
+            else:
+                b = f.read_bytes(); ins.seen[f.relative_to(ROOT).as_posix()] = {"path": f.relative_to(ROOT).as_posix(), "sha256": digest_bytes(b), "bytes": len(b)}
+                state = "present_verified" if v.get("sha256") == digest_bytes(b) else "digest_mismatch"
+                href = f.relative_to(ROOT / "site").as_posix() if state == "present_verified" else None
+        pf = mf.parent / str(m.get("poster", "")) if m.get("poster") else None
+        m["poster_href"] = pf.relative_to(ROOT / "site").as_posix() if pf and pf.is_file() and ".." not in str(m["poster"]) else None
+        m.setdefault("id", mf.parent.name); m["video_state"], m["video_href"], m["manifest"] = state, href, rel
+        out.append(m)
+    return out
+
+
+def checklist(text: str) -> list[dict]:
+    return [{"done": m.group(1) == "x", "text": m.group(2).strip()} for m in re.finditer(r"^- \[([ x])\] (.+)$", text, re.M)]
+
+
+def system_block(ins: Inputs, files: dict, docs: list, board: list, lean, sim, attestation) -> dict:
+    """Two levels, kept apart: what authors wrote (checkboxes, status text) and what a receipt in this tree measured."""
+    goal = checklist(ins.text("GOAL.md")); spec5 = checklist(ins.text("specs/SPEC-005-agentic-engineering-demo.md"))
+    specs = []
+    for p in sorted((ROOT / "specs").glob("*.md")):
+        rel = p.relative_to(ROOT).as_posix(); text = ins.text(rel); name = p.name
+        if f"docs/{name}" not in files:
+            files[f"docs/{name}"] = text.encode()
+            docs.append({"id": p.stem, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}"})
+        did = next((d["id"] for d in docs if d["path"] == rel), p.stem)
+        specs.append({"id": did, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "path": rel, "sha256": ins.seen[rel]["sha256"]})
+    measured = []
+    if lean:
+        measured.append({"what": "Lean check of the constraint certificate (offline run)", "result": "all recorded checks passed" if lean["all_ok"] else "recorded failure", "receipt": lean["path"], "sha256": lean["sha256"], "covers": "three encoded constraints and four mutants; not biology"})
+    if sim:
+        c = (sim.get("controls") or {}).get("all_pass")
+        measured.append({"what": "Glide simulation numerical controls", "result": "all pass" if c else f"all_pass = {c}", "receipt": SIM_DIR + "/controls.json", "sha256": next((f["sha256"] for f in sim["files"] if f["name"] == "controls.json"), None), "covers": "analytic and step-halving controls of a point-mass model; not a fish"})
+    if attestation:
+        measured.append({"what": "Attestation quote check (15 items)", "result": f"{attestation['status_counts'].get('verified', 0)} of {attestation['n']} quotes found; judgment {attestation['tally'].get('clean_yes_and_direct_no_flags')} of {attestation['n']} clean", "receipt": ATT, "sha256": ins.seen[ATT]["sha256"], "covers": "a hand-picked sample; not a population rate"})
+    return {"goal_checklist": goal, "spec005_acceptance": spec5, "specs": specs, "board": board, "measured": measured,
+            "levels": {"author_report": "What the repository's own documents say: checkboxes, status text, owners, plans. Written by the people or agents doing the work.",
+                       "measured": "What a receipt in this tree records: a run with its hash and result. A receipt covers only what it says it covers."},
+            "unknown": ["CPU and GPU job counts, utilisation and cost: no receipt in this tree; provider-billed spend is stated by the board as not yet known", "Which commit is deployed: not derivable from files"]}
+
+
+def belief_example(ins: Inputs) -> dict | None:
+    """The declared illustration shipped with frontier/beliefs.py (stdlib only), used as the default scenario on the Belief page."""
+    if not (ROOT / "frontier/beliefs.py").exists():
+        return None
+    ins.read("frontier/beliefs.py")
+    sys.path.insert(0, str(ROOT))
+    try:
+        from frontier.beliefs import EXAMPLE_SCENARIO
+    finally:
+        sys.path.remove(str(ROOT))
+    return json.loads(json.dumps(EXAMPLE_SCENARIO))
+
+
 def build() -> dict[str, bytes]:
     ins = Inputs()
     seeds = ins.json("seeds/frontier-data.json")
@@ -125,7 +244,7 @@ def build() -> dict[str, bytes]:
     board = parse_board(ins.text("tasks/BUILD.md"))
     spec_text = ins.text("specs/SPEC-005-agentic-engineering-demo.md")
     mcp_text = ins.text("docs/mcp.md")
-    tools = [{"name": n, "mode": m, "documented_in_docs_mcp": n in mcp_text} for n, m in CAPABILITY_TOOLS.items()]
+    tools = mcp_tools(mcp_text)
 
     docs, files = [], {}
     for p in sorted((ROOT / "results").glob("*.md")):
@@ -142,13 +261,17 @@ def build() -> dict[str, bytes]:
         docs.append({"id": ident, "title": title, "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}"})
         files[f"docs/{name}"] = ins.read(rel)
 
-    # Last commit touching an input: stable across unrelated commits, so --check is meaningful.
-    commit = git("log", "-1", "--format=%H", "--", *INPUT_DIRS)
+    # The label is a digest of the input hashes, not a git revision: a commit or merge cannot make --check stale.
+    lean_receipt, simulation = recorded_results(ins, files)
+    attestation = attestation_check(ins, files, docs)
+    manifests = simulation_manifests(ins)
+    belief_ex = belief_example(ins)
+    system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
+    fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
-        "label": f"snapshot of inputs at {commit[:12]}" if commit else "snapshot (git revision unavailable)",
-        "git_commit": commit,
-        "git_commit_time": git("log", "-1", "--format=%cI", "--", *INPUT_DIRS),
+        "label": f"snapshot of inputs {fingerprint[:12]}",
+        "input_fingerprint": fingerprint,
         "inputs": sorted(ins.seen.values(), key=lambda i: i["path"]),
         "scope": {"claims": seeds["scope"], "problems": problems["scope"], "ranking": problems["ranking"], "seed_source_revision": seeds["source_revision"]},
         "claims": seeds["nodes"],
@@ -158,18 +281,25 @@ def build() -> dict[str, bytes]:
         "documents": docs,
         "capabilities": tools,
         "board": board,
+        "lean_receipt": lean_receipt,
+        "simulation": simulation,
+        "attestation_check": attestation,
+        "simulation_manifests": manifests,
+        "system": system,
+        "belief_example": belief_ex,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
     }
     catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}
     out = {"snapshot.json": (json.dumps(snapshot, indent=1, ensure_ascii=False) + "\n").encode(),
            "catalog.json": (json.dumps(catalog, indent=1, ensure_ascii=False) + "\n").encode()}
-    out.update({"docs/" + k.split("/", 1)[1]: v for k, v in files.items()})
+    out.update(files)
     return out
 
 
 def write(out: dict[str, bytes]) -> None:
-    if (DATA / "docs").exists():
-        shutil.rmtree(DATA / "docs")
+    for sub in ("docs", "results"):
+        if (DATA / sub).exists():
+            shutil.rmtree(DATA / sub)
     for name, b in out.items():
         dest = DATA / name
         dest.parent.mkdir(parents=True, exist_ok=True)
@@ -178,8 +308,8 @@ def write(out: dict[str, bytes]) -> None:
 
 def check(out: dict[str, bytes]) -> list[str]:
     stale = [n for n, b in out.items() if not (DATA / n).exists() or (DATA / n).read_bytes() != b]
-    extra = [p.relative_to(DATA).as_posix() for p in (DATA / "docs").glob("*")] if (DATA / "docs").exists() else []
-    return stale + [f"unexpected {e}" for e in extra if "docs/" + Path(e).name not in out]
+    extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
+    return stale + [f"unexpected {e}" for e in extra if e not in out]
 
 
 def main(argv=None) -> int:

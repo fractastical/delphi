@@ -43,6 +43,13 @@ class Missing(FrontierError):
     http_status = 404
 
 
+def _stated_redistribution_license(value):
+    """A declaration gate, not a legal judgement or licence authentication."""
+    return isinstance(value, str) and value.strip().casefold() not in {
+        "", "unknown", "unspecified", "none", "null", "n/a", "na", "no license", "no licence",
+        "all rights reserved", "not for redistribution", "redistribution prohibited"}
+
+
 def _unlicensed_available_content(records):
     """Record ids asserting held content bytes with no stated licence.
 
@@ -55,8 +62,10 @@ def _unlicensed_available_content(records):
 
     A digest is integrity, not permission. Exporting the digest of content you may not
     redistribute is fine; asserting you HOLD that content and shipping it onward is not. So the
-    refusal is narrow by design: it fires only on `content_available=true` together with an
-    absent licence, and never on a reference whose bytes we do not claim to have.
+    refusal covers structured held-content and downloadable-artifact declarations, including
+    nested provenance. Unknown, blank and explicit no-redistribution declarations do not pass.
+    References without available bytes need no licence. Arbitrary prose is not classified;
+    passing this check does not establish ownership or authenticate a permission statement.
 
     Enforced at EVERY boundary, because the first version of this check guarded only
     `export_bundle` and an independent reviewer found the hole within the hour: `/v1/read/get`
@@ -69,11 +78,18 @@ def _unlicensed_available_content(records):
     """
     offenders = []
     for record in records:
-        for key, value in (record.get("payload") or {}).items():
-            if key != "source" or not isinstance(value, dict):
-                continue
-            if value.get("content_available") and not value.get("license"):
-                offenders.append(f'{record["kind"]}/{record["id"]}')
+        pending = [record.get("payload") or {}]
+        while pending:
+            value = pending.pop()
+            if isinstance(value, list):
+                pending.extend(value)
+            elif isinstance(value, dict):
+                available = value.get("content_available") is True or (
+                    value.get("availability") == "downloadable" and "sha256" in value and "uri" in value)
+                if available and not _stated_redistribution_license(value.get("license")):
+                    offenders.append(f'{record["kind"]}/{record["id"]}')
+                    break
+                pending.extend(value.values())
     return offenders
 
 
@@ -85,7 +101,7 @@ def _refuse_unlicensed(offenders, verb):
     more = f" (showing 5 of {len(offenders)})" if len(offenders) > 5 else ""
     raise Forbidden(
         f"Refusing to {verb} content asserted available under an unstated licence: {shown}{more}. "
-        "Set Source.license, or set content_available=false and share the digest only.")
+        "Declare the source/artifact redistribution licence, or share a reference without asserting available bytes.")
 
 
 class Store:
@@ -358,6 +374,8 @@ class Store:
                 raise Conflict("Only locally owned Action versions can execute")
             current = c.execute("SELECT * FROM action_state WHERE version=%s", (record["version"],)).fetchone()
             if state == "ready":
+                if (record["payload"].get("proposal") or {}).get("intent") == "plan":
+                    raise Conflict("A plan describes work; authorize and lease its individual steps")
                 if "coordinator" not in p["roles"] or current["state"] not in {"proposed", "blocked", "expired"}:
                     raise Forbidden("Coordinator readiness gate required")
                 self._validate_refs(c, record, p)
@@ -386,6 +404,8 @@ class Store:
             record = self._raw(c, target, p, current=True)
             if record["kind"] != "Action" or record["namespace"] != self.namespace:
                 raise Conflict("Only local Action versions can be leased")
+            if (record["payload"].get("proposal") or {}).get("intent") == "plan":
+                raise Conflict("A plan describes work; authorize and lease its individual steps")
             self._validate_refs(c, record, p)
             prior = c.execute("SELECT state,lease_until FROM action_state WHERE version=%s", (record["version"],)).fetchone()
             lease_id = str(uuid4())

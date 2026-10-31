@@ -43,6 +43,7 @@ def login():
     s, body, h = jcall("POST", "/api/session", {"token": GATE}, session=False)
     ok(s == 200, "sign in with the access token")
     cookie["c"] = h["set-cookie"].split(";")[0]
+    cookie["csrf"] = body["csrf"]
 
 
 def cred(name):
@@ -79,6 +80,44 @@ if PHASE == "first":
     ok(call("GET", "/other/mesh.stl")[0] == 404, "artifact types are not served outside site/artifacts")
     ok(call("GET", "/artifacts/secret-token.csv")[0] == 404 and call("GET", "/artifacts/../index.html")[0] in (200, 404), "credential-looking names are not served")
     ok(call("GET", "/artifacts/%2e%2e/%2e%2e/etc/passwd")[0] == 404, "traversal refused")
+elif PHASE == "adapters":
+    login()
+    skips = []
+    s, cat, _ = jcall("GET", "/api/catalog?kind=Claim&query=e2e")
+    ok(s == 200 and cat["search_mode"] == "search_index" and cat["results"] and cat["results"][0]["match"]["score"] is not None, "catalog runs on the search index and says so")
+    post_h = {"Origin": f"http://127.0.0.1:{PORT}", "X-CSRF-Token": cookie["csrf"]}
+    s, eng, _ = jcall("POST", "/api/engineering/solve", {"mass": "0.5", "area": "0.1", "span": "0.5", "speed": "10"}, post_h)
+    if s == 503:
+        skips.append("engineering"); print("SKIP engineering solver not installed (503 engineering_unavailable)")
+    else:
+        ok(s == 200 and eng.get("schema") == "frontier.engineering.solve/1", "engineering solver answers through its isolated z3 child (schema frontier.engineering.solve/1)")
+    ok(jcall("POST", "/api/engineering/solve", {"mass": "-1"}, post_h)[0] in (400, 503), "an invalid design request is refused, not computed")
+    s, att, _ = jcall("GET", "/api/attention")
+    if s == 503:
+        skips.append("attention"); print("SKIP attention layer not installed (503 attention_unavailable)")
+    else:
+        ok(s == 200 and att["inputs"]["records"] >= 1 and isinstance(att["view"], dict) and att["inputs"]["public_only"], "attention view built from stored public records and events")
+        ok(GATE not in json.dumps(att) and cred("writer.cred") not in json.dumps(att), "no token appears in the attention view")
+    try:
+        from frontier.beliefs import EXAMPLE_SCENARIO
+    except ImportError:
+        EXAMPLE_SCENARIO = None
+    s, bel, _ = jcall("POST", "/api/beliefs/solve", EXAMPLE_SCENARIO or {"schema": "frontier-beliefs-0.1"}, post_h)
+    if s == 503:
+        skips.append("beliefs"); print("SKIP belief solver not installed (503 beliefs_unavailable)")
+    else:
+        ok(EXAMPLE_SCENARIO is not None and s == 200 and bel.get("status") == "ok" and bel.get("calibrated") is False, "belief solver answers the declared example scenario, labelled calibrated: false")
+        evs = [a.get("expected_value") for a in bel["result"]["decision"]["actions"].values() if "expected_value" in a]
+        ok(any(isinstance(v, str) and "/" in v for v in evs), "exact rationals arrive as strings (e.g. 17/5), not floats")
+        s2, b2, _ = jcall("POST", "/api/beliefs/solve", {"schema": "frontier-beliefs-0.1", "variables": "x"}, post_h)
+        ok(s2 == 400 and b2.get("calibrated") is False, "a malformed scenario is a 400 and its error body is still labelled calibrated: false")
+    s, sy, raw = call("GET", "/api/system")
+    sy = json.loads(raw)
+    ok(s == 200 and all(sy[k]["mode"] == "measured" for k in ("store", "process", "host", "services", "release")) and all(sy[k]["mode"] == "worker_report" for k in ("build", "board", "specs", "goal", "resources")),
+       "system page: measured and worker_report sections are labelled")
+    ok(sy["store"]["public_only"] and any(r["kind"] == "Claim" for r in sy["store"]["records_by_kind_and_local_status"]) and sy["resources"]["actual_cost"]["status"] == "unknown", "system page: real store counts, cost explicitly unknown")
+    ok(GATE not in raw.decode() and cred("writer.cred") not in raw.decode() and os.path.expanduser("~") not in raw.decode(), "system page exposes no token, credential or home path")
+    print("ADAPTER SKIPS: " + (", ".join(skips) or "none"))
 elif PHASE == "after-restart":
     ok(call("GET", "/api/health", session=False)[0] == 200, "health after restarting PostgreSQL and the web service")
     ok(call("GET", "/api/catalog", session=False)[0] == 401, "old sessions do not survive; sign in again")

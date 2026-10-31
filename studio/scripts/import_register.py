@@ -8,7 +8,7 @@ importer reports that count rather than filling them in.
 The register's questions are a CURATOR'S questions. A cited source that calls a facet open
 (an `attestation` with stance "open") is evidence about that facet, not proof that the question
 as the curator phrased it is a primary-literature open problem, so no problem is labelled
-`sourced_field_open_problem`; they import as `project_gap` (CURATOR_KIND). The register's
+`sourced_field_open_problem`; they import as `curated_question` (CURATOR_KIND). The register's
 three provenance fields are kept separate end to end: `why_source`, `references` and
 `attestations`. Every item of each is copied verbatim into `original.register_provenance`
 (which survives even when the whole-record copy is dropped for size), and the report counts
@@ -31,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from frontier.models import ACTIONABILITY, MAX_RECORD_BYTES, Draft, Problem, canonical  # noqa: E402
 
 NAMESPACE = "node-a"
-CURATOR_KIND = "project_gap"  # see the module docstring; SPEC-001 open question 3
+CURATOR_KIND = "curated_question"  # see the module docstring; SPEC-001 open question 3
 MAX_ITEMS = 40
 MAX_SHORT = 3000
 MAX_TEXT = 12000
@@ -78,6 +78,32 @@ def uri_for(entry):
     return None
 
 
+# (slug, attestation index) -> explicit review record, loaded from the checked-in assessments files; empty unless --assessments is given.
+SAMPLE_REVIEWS: dict = {}
+UNREVIEWED = {"status": "unreviewed", "note": "The quote is the curator's transcription; no one has compared it with the source."}
+
+
+def load_sample_reviews(directory):
+    """Read the explicit assessments files (mechanical check + facet review) and key them by (slug, index). Raises if they disagree."""
+    d = Path(directory)
+    check = json.loads((d / "attestation-check-15.json").read_text())
+    facet = json.loads((d / "attestation-facet-review-15.json").read_text())
+    f_by = {(x["slug"], x["index"]): x for x in facet["items"]}
+    out = {}
+    for r in check["results"]:
+        key = (r["slug"], r["index"])
+        f = f_by[key]
+        out[key] = {"status": "sample_checked",
+                    "mechanical_check": {"result": r["status"], "access": r.get("access"), "match": r.get("match"),
+                                         "locator_match": r.get("locator_match"), "article_year": r.get("article_year")},
+                    "facet_review": {k: f[k] for k in ("quote_supports_stance", "fit_to_question", "flags", "note")},
+                    "assessments": ["findings/attestation-check-15.json", "findings/attestation-facet-review-15.json"],
+                    "reviewer": facet["reviewer"],
+                    "scope": "One of 15 items checked. Says nothing about any other quote or about the register."}
+    assert set(out) == set(f_by), "check and facet review cover different items"
+    return out
+
+
 def attestation_items(problem):
     """Every attestation, verbatim and in register order. The quote is copied unmodified (no strip, no truncation).
 
@@ -87,11 +113,12 @@ def attestation_items(problem):
     items = []
     for i, a in enumerate(problem.get("attestations") or []):
         if not isinstance(a, dict):
-            items.append({"index": i, "raw": a, "uri": None, "stance": None})
+            items.append({"index": i, "raw": a, "uri": None, "stance": None, "quote_review": UNREVIEWED})
             continue
         items.append({"index": i, "pmcid": a.get("pmcid"), "url": a.get("url"), "uri": uri_for(a), "locator": a.get("locator"),
                       "quote": a.get("quote"), "kind": a.get("kind"), "stance": a.get("stance"),
                       "quote_checked_against_source": False,
+                      "quote_review": SAMPLE_REVIEWS.get((problem.get("slug"), i), UNREVIEWED),
                       **{k: v for k, v in a.items() if k not in ("pmcid", "url", "locator", "quote", "kind", "stance")}})
     return items
 
@@ -260,7 +287,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("register")
     ap.add_argument("--out")
+    ap.add_argument("--assessments", help="directory holding attestation-check-15.json and attestation-facet-review-15.json; "
+                    "those 15 quotes are marked sample_checked with their assessments, every other quote stays unreviewed")
     args = ap.parse_args()
+    if args.assessments:
+        SAMPLE_REVIEWS.update(load_sample_reviews(args.assessments))
 
     raw = yaml.safe_load(Path(args.register).read_text())
     problems = raw["problems"] if isinstance(raw, dict) else raw
@@ -293,6 +324,10 @@ def main():
         "rejections": rejected[:10],
         "actionable": actionable,
         "problem_kind_used": sorted({d["payload"]["problem_kind"] for d in drafts}),
+        "quote_review": {"sample_checked": sum(1 for d in drafts for x in d["payload"]["original"]["register_provenance"]["attestations"]
+                                               if x.get("quote_review", {}).get("status") == "sample_checked"),
+                         "unreviewed": sum(1 for d in drafts for x in d["payload"]["original"]["register_provenance"]["attestations"]
+                                           if x.get("quote_review", {}).get("status") == "unreviewed")},
         "source_fields_in_register": register_field_counts(problems),
         "source_chosen_for_the_draft": {
             "why_source": chosen["why_source"], "attestation_open_with_locator_and_quote": chosen["attestation"],

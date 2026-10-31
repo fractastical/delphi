@@ -11,7 +11,7 @@ PY="${PYTHON:-python}"
 T="$(mktemp -d /tmp/frontier-verify.XXXXXXXX)"; chmod 700 "$T"
 WEB_PORT=18971; export FRONTIER_PG_ROOT="$T" FRONTIER_PG_PORT=5472
 export FRONTIER_ACCESS_TOKEN="$($PY -c 'import secrets; print("gate-" + secrets.token_urlsafe(32))')"
-export PYTHONPATH="$REPO" OMP_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
+export PYTHONPATH="$REPO${FRONTIER_QA_EXTRA_PYTHONPATH:+:$FRONTIER_QA_EXTRA_PYTHONPATH}" OMP_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1
 WEBPID=""
 stop_web() { [ -z "$WEBPID" ] || { kill "$WEBPID" 2>/dev/null || true; wait "$WEBPID" 2>/dev/null || true; WEBPID=""; }; }
 cleanup() { stop_web; "$PGBIN/pg_ctl" -D "$T/pgdata" -m immediate -w stop >/dev/null 2>&1 || true; rm -rf -- "$T" "${T}-unrelated"; }
@@ -50,6 +50,8 @@ for f in mesh.stl part.obj wing.glb table.csv t.lean x.trig; do echo "fixture $f
 echo x > "$T/site/artifacts/secret-token.csv"; echo x > "$T/site/other/mesh.stl"
 start_web
 $PY "$REPO/deploy/verify_e2e.py" $WEB_PORT "$T" first
+echo "== adapters (search index default, engineering, attention, beliefs); modules not yet merged are reported as SKIP, never faked"
+$PY "$REPO/deploy/verify_e2e.py" $WEB_PORT "$T" adapters
 echo "== backup"
 bash "$REPO/deploy/postgres/backup.sh" "$T" | sed 's#/tmp/frontier-verify\.[A-Za-z0-9]*#<scratch>#'
 echo "== restart PostgreSQL and the web service"

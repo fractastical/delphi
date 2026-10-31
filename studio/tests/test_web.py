@@ -601,6 +601,7 @@ def test_systemd_units_are_bounded_and_carry_no_secrets(unit):
     assert not re.search(r"(?i)(token|password|secret)\s*=\s*\S{8,}", text.replace("EnvironmentFile", ""))
     if unit.endswith("web.service"):
         assert "--port 8971" in text and "OMP_NUM_THREADS=1" in text and "delphi-frontier-postgres.service" in text
+        assert "ExecStart=/data/services/delphi-frontier/venv/bin/python -m frontier.web" in text and "miniconda" not in text
         assert "EnvironmentFile=-%h/.config/delphi-frontier/web.env" in text and "host=/data/services/delphi-frontier/run port=5471 dbname=frontier user=frontier_app" in text
     else:
         assert "-D /data/services/delphi-frontier/pgdata" in text and "UMask=0077" in text and "KillSignal=SIGINT" in text
@@ -780,3 +781,235 @@ def test_engineering_route_passes_the_solvers_answer_and_typed_errors_through_un
     assert s == 400 and body["error"] == "invalid_request"
     assert len(seen) == 3
     assert authed.req("POST", "/api/engineering/solve", [1], headers)[0] == 400 and len(seen) == 3                      # arrays never reach the solver
+
+
+# ------------------------------------------------------------------ runtime2: SearchIndex default, /api/attention, /api/beliefs/solve
+def test_main_defaults_to_the_search_index_and_labels_it(store, site):
+    from frontier.web import default_search
+    fn, label = default_search(store)
+    assert label == "search_index" and fn.__name__ == "query"
+    seed(store)
+    w = Web(store, site, catalog_search=fn, search_mode=label)
+    try:
+        w.login()
+        s, body, _ = w.json("GET", "/api/catalog?kind=Claim&query=claim-a")
+        assert s == 200 and body["search_mode"] == "search_index" and "lexical" in body["search_kind"]
+        row = body["results"][0]
+        assert row["record"]["id"] == "claim-a" and row["local_status"] == "proposed" and row["why_matched"]
+        assert "score" in row["match"] and "curation" in row["match"] and "match" not in row["record"]               # explanation kept apart from the record
+        s, p1, _ = w.json("GET", "/api/catalog?limit=1")
+        assert p1["next_cursor"] and w.json("GET", "/api/catalog?limit=1&after=" + p1["next_cursor"])[0] == 200        # the index's own cursor round-trips
+        for bad in ("limit=51", "kind=Bogus", "status=bogus", "after=not-a-cursor", "bogus=1"):
+            assert w.json("GET", "/api/catalog?" + bad)[0] == 400, bad
+    finally:
+        w.close()
+
+
+def test_cli_default_catalog_uses_the_search_index_and_legacy_flag_restores_the_old_one(store, site):
+    def run_cli(*extra):
+        s = socket.socket()
+        s.bind(("127.0.0.1", 0))
+        port = s.getsockname()[1]
+        s.close()
+        env = {"PATH": os.environ["PATH"], "FRONTIER_DSN": store.dsn, "PYTHONPATH": str(ROOT), "FRONTIER_ACCESS_TOKEN": GATE, "OMP_NUM_THREADS": "1"}
+        p = subprocess.Popen([sys.executable, "-m", "frontier.web", "--namespace", store.namespace, "--schema", store.schema, "--port", str(port),
+                              "--site", str(site), "--insecure-cookies", *extra], env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            import time
+            for _ in range(100):
+                try:
+                    c = http.client.HTTPConnection("127.0.0.1", port, timeout=2)
+                    c.request("GET", "/api/health")
+                    if c.getresponse().status == 200:
+                        break
+                except OSError:
+                    time.sleep(0.1)
+            c = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
+            c.request("POST", "/api/session", json.dumps({"token": GATE}), {"Content-Type": "application/json"})
+            r = c.getresponse()
+            r.read()
+            cookie = r.getheader("Set-Cookie").split(";")[0]
+            c = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
+            c.request("GET", "/api/catalog?limit=1", headers={"Cookie": cookie})
+            return json.loads(c.getresponse().read())["search_mode"]
+        finally:
+            p.terminate()
+            p.wait(10)
+    assert run_cli() == "search_index"
+    assert run_cli("--legacy-catalog") == "store_lexical"
+
+
+def fake_attention(calls):
+    def build_view(records, events, annotations, now):
+        calls.append({"records": records, "events": events, "annotations": annotations, "now": now})
+        return {"stand_in": True, "problems": len([r for r in records if r["kind"] == "Problem"])}
+    return build_view
+
+
+def test_attention_is_gated_public_only_cached_and_parameterless(store, site):
+    calls = []
+    seed(store)
+    store.submit(TOKENS["alice"], "att-priv", claim(store, id="hidden-private", visibility="private"))
+    w = Web(store, site, attention_build=fake_attention(calls), attention_ttl=60)
+    try:
+        assert w.req("GET", "/api/attention", cookie=False)[0] == 401
+        w.login()
+        s, body, _ = w.json("GET", "/api/attention")
+        assert s == 200 and body["mode"] == "live" and body["namespace"] == store.namespace and body["view"]["stand_in"] is True
+        assert body["inputs"]["public_only"] is True and body["inputs"]["annotations"] == 0 and "annotation documents" in body["inputs"]["note"]
+        c = calls[0]
+        assert {r["id"] for r in c["records"]} == {"claim-a", "claim-b"} and all(r["kind"] != "Event" for r in c["records"])       # public records, no events in records
+        assert c["events"] and all("sequence" in e and e["envelope"]["kind"] == "Event" for e in c["events"]) and c["annotations"] == []
+        assert "hidden-private" not in json.dumps(c) and all(re.fullmatch(r"\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\+00:00|Z)", c["now"]) for _ in [0])
+        assert body["inputs"]["records"] == 2 and body["inputs"]["events"] == len(c["events"])
+        w.json("GET", "/api/attention")
+        assert len(calls) == 1                                                                                 # reused within the ttl
+        for bad in ("now=2020-01-01T00:00:00Z", "records=1", "x"):
+            assert w.json("GET", "/api/attention?" + bad)[0] == 400
+        assert w.req("POST", "/api/attention", {})[0] in (405, 400, 403)
+        assert GATE not in json.dumps(body) and TOKENS["alice"] not in json.dumps(body)
+    finally:
+        w.close()
+
+
+def test_attention_refuses_to_build_a_partial_view_and_is_503_when_the_layer_is_absent(store, site, monkeypatch):
+    seed(store)
+    w = Web(store, site, attention_build=fake_attention([]), attention_max_records=1)
+    try:
+        w.login()
+        s, body, _ = w.json("GET", "/api/attention")
+        assert s == 422 and body["error"] == "view_too_large"
+    finally:
+        w.close()
+    monkeypatch.setitem(sys.modules, "attention.view", None)
+    monkeypatch.setitem(sys.modules, "attention", None)
+    w = Web(store, site)
+    try:
+        w.login()
+        s, body, _ = w.json("GET", "/api/attention")
+        assert s == 503 and body["error"] == "attention_unavailable" and "view" not in body
+    finally:
+        w.close()
+
+
+def beliefs_post(w, body, **kw):
+    return w.json("POST", "/api/beliefs/solve", body, {"Origin": f"http://127.0.0.1:{w.port}", "X-CSRF-Token": w.csrf})
+
+
+def test_beliefs_route_is_503_when_the_director_adapter_is_absent(authed, monkeypatch):
+    monkeypatch.setitem(sys.modules, "frontier.beliefs_api", None)
+    s, body, _ = beliefs_post(authed, {"schema": "frontier-beliefs-0.1"})
+    assert s == 503 and body["error"] == "beliefs_unavailable" and "result" not in body and "status" not in body
+
+
+def test_beliefs_route_passes_the_adapters_envelopes_and_labelled_errors_through_verbatim(authed, monkeypatch):
+    import types
+    from frontier.store import FrontierError
+    seen = []
+
+    def solve_scenario(data):
+        seen.append(data)
+        if data.get("bad"):
+            e = FrontierError("Scenario rejected: needs 2..6 states")
+            e.code, e.http_status = "invalid_request", 400
+            e.body = {"schema": "frontier.beliefs.api/1", "status": "error", "calibrated": False, "error": {"code": "invalid_request", "message": e.args[0]}}
+            raise e
+        if data.get("busy"):
+            e = FrontierError("Two belief solves are already running")
+            e.code, e.http_status = "solver_busy", 429
+            e.body = {"schema": "frontier.beliefs.api/1", "status": "error", "calibrated": False, "error": {"code": "solver_busy", "message": "retry"}}
+            raise e
+        return {"schema": "frontier.beliefs.api/1", "status": "unknown", "calibrated": False, "reason": "Compute budget exhausted"} if data.get("slow") else \
+               {"schema": "frontier.beliefs.api/1", "status": "ok", "calibrated": False, "result": {"decision": {"actions": {"a": {"expected_value": "17/5"}}}}}
+    monkeypatch.setitem(sys.modules, "frontier.beliefs_api", types.SimpleNamespace(solve_scenario=solve_scenario))
+    s, body, _ = beliefs_post(authed, {"x": 1})
+    assert s == 200 and body["calibrated"] is False and body["result"]["decision"]["actions"]["a"]["expected_value"] == "17/5" and seen == [{"x": 1}]
+    s, body, _ = beliefs_post(authed, {"slow": 1})
+    assert s == 200 and body["status"] == "unknown"                                  # the adapter's own timeout answer is not turned into an HTTP error
+    s, body, _ = beliefs_post(authed, {"bad": 1})
+    assert s == 400 and body["calibrated"] is False and body["error"]["code"] == "invalid_request" and "2..6 states" in body["error"]["message"]
+    s, body, _ = beliefs_post(authed, {"busy": 1})
+    assert s == 429 and body["error"]["code"] == "solver_busy" and body["calibrated"] is False
+
+
+def test_beliefs_route_against_the_real_adapter_example_and_malformed_inputs(authed):
+    from frontier.beliefs import EXAMPLE_SCENARIO
+    s, body, _ = beliefs_post(authed, EXAMPLE_SCENARIO)
+    assert s == 200 and body["schema"] == "frontier.beliefs.api/1" and body["status"] == "ok" and body["calibrated"] is False and "assumed_scope" in body
+    evs = [a["expected_value"] for a in body["result"]["decision"]["actions"].values() if "expected_value" in a]
+    assert any(isinstance(v, str) and "/" in v for v in evs)                         # exact rationals stay strings
+    s, body, _ = beliefs_post(authed, {"schema": "frontier-beliefs-0.1", "variables": "x"})
+    assert s == 400 and body["calibrated"] is False and body["status"] == "error"
+    s, body, _ = beliefs_post(authed, {"unknown_field": 1})
+    assert s == 400 and body["calibrated"] is False
+
+
+def test_beliefs_route_has_the_same_gate_and_a_32k_body_bound(authed, monkeypatch):
+    import types
+    monkeypatch.setitem(sys.modules, "frontier.beliefs_api", types.SimpleNamespace(solve_scenario=lambda d: {"ok": True}))
+    w = authed
+    path, origin = "/api/beliefs/solve", {"Origin": f"http://127.0.0.1:{w.port}"}
+    assert w.req("POST", path, {"x": 1}, origin, cookie=False)[0] == 401
+    assert w.req("POST", path, {"x": 1}, {})[0] == 403
+    assert w.req("POST", path, {"x": 1}, {"Origin": "https://evil.example", "X-CSRF-Token": w.csrf})[0] == 403
+    assert w.req("POST", path, {"x": 1}, origin)[0] == 403
+    assert w.req("GET", path)[0] == 405
+    good = {**origin, "X-CSRF-Token": w.csrf, "Content-Type": "application/json"}
+    assert w.req("POST", path, json.dumps({"pad": "x" * 40000}), good)[0] == 413
+    assert w.req("POST", path, json.dumps({"pad": "x" * 30000}), good)[0] == 200
+    assert w.req("POST", path, "[1]", good)[0] == 400
+
+
+def test_attention_module_is_an_allow_listed_choice_and_absent_is_503(store, site, monkeypatch):
+    from frontier.web import ATTENTION_MODULES
+    assert ATTENTION_MODULES == ("attention.view", "frontier_attention.view", "frontier.attention.view", "frontier.attention")
+    for name in ATTENTION_MODULES:
+        monkeypatch.setitem(sys.modules, name, None)
+    w = Web(store, site, attention_module="frontier.attention")
+    try:
+        w.login()
+        s, body, _ = w.json("GET", "/api/attention")
+        assert s == 503 and body["error"] == "attention_unavailable"
+    finally:
+        w.close()
+    w = Web(store, site, attention_module="os.path")                  # not on the allow-list: refused, never imported
+    try:
+        w.login()
+        assert w.json("GET", "/api/attention")[0] == 400
+    finally:
+        w.close()
+
+
+def test_video_types_are_served_only_from_guarded_artifacts_with_range_support(authed, site):
+    art = site / "artifacts"
+    art.mkdir(exist_ok=True)
+    payload = bytes(range(256)) * 40
+    (art / "clip.mp4").write_bytes(payload)
+    (art / "clip.webm").write_bytes(payload)
+    (site / "other").mkdir(exist_ok=True)
+    (site / "other" / "clip.mp4").write_bytes(payload)
+    for name, mime in (("clip.mp4", "video/mp4"), ("clip.webm", "video/webm")):
+        s, h, body = authed.req("GET", "/artifacts/" + name)
+        assert s == 200 and h["content-type"] == mime and h["accept-ranges"] == "bytes" and body == payload and "content-disposition" not in h
+        s, h, body = authed.req("GET", "/artifacts/" + name, headers={"Range": "bytes=10-19"})
+        assert s == 206 and body == payload[10:20] and h["content-range"] == f"bytes 10-19/{len(payload)}" and h["content-length"] == "10"
+        s, h, body = authed.req("GET", "/artifacts/" + name, headers={"Range": "bytes=-5"})
+        assert s == 206 and body == payload[-5:]
+        s, h, body = authed.req("GET", "/artifacts/" + name, headers={"Range": f"bytes={len(payload) - 3}-"})
+        assert s == 206 and body == payload[-3:]
+        assert authed.req("GET", "/artifacts/" + name, headers={"Range": "bytes=999999-"})[0] == 416
+        assert authed.req("GET", "/artifacts/" + name, headers={"Range": "bytes=5-2"})[0] == 416
+        assert authed.req("GET", "/artifacts/" + name, headers={"Range": "items=1-2"})[0] == 416
+        assert authed.req("GET", "/artifacts/" + name, headers={"Range": "bytes=0-1,5-6"})[0] == 416
+        assert authed.req("HEAD", "/artifacts/" + name)[2] == b""
+        assert authed.req("GET", "/artifacts/" + name, cookie=False)[0] == 401
+    assert authed.req("GET", "/other/clip.mp4")[0] == 404                       # the same type elsewhere in the site is not served
+    assert authed.req("GET", "/artifacts/%2e%2e/other/clip.mp4")[0] == 404
+    (art / "token-clip.mp4").write_bytes(payload)
+    assert authed.req("GET", "/artifacts/token-clip.mp4")[0] == 404
+    from frontier import web
+    assert web.resolve_static(site, "/artifacts/clip.mp4") is not None
+    big = art / "big.mp4"
+    with big.open("wb") as f:
+        f.truncate(web.MAX_VIDEO_BYTES + 1)                                      # sparse file; refused by size, never read
+    assert web.resolve_static(site, "/artifacts/big.mp4") is None
