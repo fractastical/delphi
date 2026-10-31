@@ -68,6 +68,7 @@
     return html`<section class="panel grounding" aria-labelledby="gr-h"><h2 id="gr-h">Start from real fish anatomy.</h2>
       <p class="note warn small"><b>Not biorealistic and not validated.</b> This is an engineered candidate sized from published measurements. Its flat fin plates (${c.fin_thickness.value} mm), lattice scales and decorative eyes are assumptions, marked below. ${c.label}</p>
       ${snap.fish3d_viewer ? html`<div class="fishchoose"><label for="fishcand"><b>Candidate</b></label> <select id="fishcand">${snap.fish3d_viewer.candidates.map((c, i) => html`<option value="${c.id}" ${i === (snap.fish3d_viewer.candidates.length > 1 ? 1 : 0) ? raw("selected") : ""}>${c.label}</option>`)}</select> <span class="small faint" id="fishknobs"></span></div>
+        <h3 class="sr">Interactive 3D candidate</h3>
         <div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint" id="fishnote">The 3D model is a candidate mesh. Colours and pigment bands are appearance choices, each marked sourced or assumed in the viewer. Not an organism and not an aerodynamic result. The schematic drawing and printable models are below.</p>` : ""}
       <div class="groundgrid"><div><div id="fishmini" class="fishmini"></div></div>
         <div><h3>What the body and fins are sized from</h3>
