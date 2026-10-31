@@ -24,6 +24,8 @@ def test_parameters_are_table1_and_every_one_has_a_status():
         assert table[k]["value"] == v, k
     assert {p["status"] for p in SRC["parameters"]} <= {"fitted-in-source", "from-source", "measured", "assumed", "unknown"}
     assert table["growth.rate_after_peak_per_h"]["value"] == M.Growth().rate_after_peak_per_h
+    assert table["growth.rate_after_peak_per_h"]["status"] == "assumed"      # exponential coupling form is ours
+    assert table["growth.measured_linear_slope_per_h"]["status"] == "measured"
     assert table["growth.window_h"]["status"] == "assumed"
 
 

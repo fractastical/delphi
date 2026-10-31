@@ -1,5 +1,5 @@
 {
- "code_sha256": "890302a2f7eea59404b81fe332142a8f8726ab8143c4d025ca88ec9f62373866",
+ "code_sha256": "914772932665a952361524e80e1b13298067711f5e54bb8aaf7d255f1d811549",
  "controls": {
   "D_quarter": {
    "expect": "trigger-wave scaling v ~ (D/tau)^(1/2) (Hayden 2021): D/4 -> speed x0.5; band 0.4-0.6",
@@ -40,20 +40,37 @@
  "evidence_kind": "SimulationResult (not an observation; not a microscope image)",
  "files": {
   "erk_growth.gif": {
-   "bytes": 773230,
-   "sha256": "073da8c19910d0c674bbaed595caf6f8ca6af080d5757c6ddc8d968f71dd8e32"
+   "bytes": 772270,
+   "sha256": "762338c38b7e780b29b2bd25b08e65fff2f7f40f9228977c57a3915b0f962d61"
   },
   "erk_growth.mp4": {
-   "bytes": 190962,
-   "sha256": "a25a2aa691711b538389d34b6d46d8afc5fa2635ed88df21ad064325e4ace59e"
+   "bytes": 192192,
+   "sha256": "b10d8fb873dd80040c464651868c3631124e87115bbea17d1b4b2994661708e8"
   },
   "poster.png": {
-   "bytes": 105050,
-   "sha256": "42ec29c8dba9d896f68b3c20c6f02feab224955c75c2cd05c05579bbbfc30d24"
+   "bytes": 106097,
+   "sha256": "38e5534f315e1cebf127e06ef0094f28b97bb93f706744ecd7894a46636287d4"
   },
   "states.npz": {
    "bytes": 6075564,
    "sha256": "ea8f41f8abd7dd6469905016a796b944fde3b614446bffc894a33612ae2455fe"
+  }
+ },
+ "growth_coupling": {
+  "assumed": {
+   "form": "exponential: d ln(a)/dt = 0.006 per h while t - t_last_peak <= 24 h, compounding",
+   "note": "not tuned: the area results are those of the assumed exponential form",
+   "per_window_factor_exponential": 1.1548841085249137,
+   "per_window_factor_if_linear": 1.1440000000000001,
+   "status": "ASSUMED (form and window are ours)",
+   "window_h": 24.0
+  },
+  "measured": {
+   "ci68_per_h": 0.002,
+   "n": "89 cells, 3 scales",
+   "quantity": "linear slope of normalised cell area after the Erk peak, d(a/a_peak)/dt",
+   "source": "De Simone 2021 Extended Data Fig. 7b",
+   "value_per_h": 0.006
   }
  },
  "measured_comparison": {
@@ -119,7 +136,7 @@
  "media": {
   "caption": [
    "SIMULATED Erk activity on one regenerating zebrafish scale (520 um radius). Model: Hayden et al. 2021, Table 1 parameters.",
-   "Growth: cell area +0.006/h after each Erk peak (measured, De Simone et al. 2021); 24 h growth window assumed.",
+   "Growth ASSUMED exponential (d ln a/dt = 0.006/h for an assumed 24 h after each Erk peak); measured: linear slope 0.006/h (De Simone 2021 ED7b).",
    "Rendering of model state in reference (material) coordinates, not a microscope image. Transfer to flying-fish scales unknown."
   ],
   "checks": {
@@ -127,9 +144,9 @@
    "within_size_limits": true
   },
   "gif": {
-   "bytes": 773230,
+   "bytes": 772270,
    "file": "erk_growth.gif",
-   "sha256": "073da8c19910d0c674bbaed595caf6f8ca6af080d5757c6ddc8d968f71dd8e32"
+   "sha256": "762338c38b7e780b29b2bd25b08e65fff2f7f40f9228977c57a3915b0f962d61"
   },
   "limits": {
    "gif_max_bytes": 6000000,
@@ -137,7 +154,7 @@
    "poster_max_bytes": 400000
   },
   "poster": "poster.png",
-  "poster_sha256": "42ec29c8dba9d896f68b3c20c6f02feab224955c75c2cd05c05579bbbfc30d24",
+  "poster_sha256": "38e5534f315e1cebf127e06ef0094f28b97bb93f706744ecd7894a46636287d4",
   "poster_sim_time_h": 40.0,
   "settings": {
    "E_cmap": "viridis",
@@ -166,13 +183,13 @@
    "width_px": 960
   },
   "video": {
-   "bytes": 190962,
+   "bytes": 192192,
    "codec": "h264",
    "file": "erk_growth.mp4",
    "fps": 12,
    "height": 540,
    "n_frames": 121,
-   "sha256": "a25a2aa691711b538389d34b6d46d8afc5fa2635ed88df21ad064325e4ace59e",
+   "sha256": "b10d8fb873dd80040c464651868c3631124e87115bbea17d1b4b2994661708e8",
    "sim_hours_per_frame": 1.0,
    "width": 960
   }
@@ -308,10 +325,18 @@
    "value": 0.01
   },
   {
-   "meaning": "normalised osteoblast area slope after the Erk peak (+/-0.002, 68% CI; n=89 cells, 3 scales)",
-   "name": "growth.rate_after_peak_per_h",
-   "source": "De Simone 2021 Extended Data figure caption (cell area vs time from Erk peak)",
+   "meaning": "MEASURED linear slope of normalised osteoblast area after the Erk peak, d(a/a_peak)/dt (+/-0.002, 68% CI; n=89 cells, 3 scales); before the peak -0.002 +/- 0.002",
+   "name": "growth.measured_linear_slope_per_h",
+   "source": "De Simone 2021 Extended Data Fig. 7b (caption of the figure titled 'Erk activity is required for tissue expansion during zebrafish scale hypertrophy')",
    "status": "measured",
+   "unit": "h^-1",
+   "value": 0.006
+  },
+  {
+   "meaning": "log-area growth rate used by the code: d ln(a)/dt during the window after each Erk peak (exponential, compounding)",
+   "name": "growth.rate_after_peak_per_h",
+   "source": "coupling form is ours; its value is taken from growth.measured_linear_slope_per_h",
+   "status": "assumed",
    "unit": "h^-1",
    "value": 0.006
   },
@@ -392,7 +417,7 @@
    "pmid": "33408418",
    "read_level": "full-text",
    "read_via": "NCBI BioC PMC OA (author manuscript text and figure captions; Supplementary Methods not read)",
-   "used_for": "measured wave speed, crossing time, front width, activation/inactivation times, growth after Erk peak, synchronous-activation result"
+   "used_for": "measured wave speed, crossing time, front width, activation/inactivation times, measured linear growth slope after the Erk peak (Ext. Data Fig. 7b), synchronous-activation result"
   },
   {
    "citation": "Cooper RL, Thiery AP, Fletcher AG, et al. An ancient Turing-like patterning mechanism regulates skin denticle development in sharks. Sci Adv 2018;4(11):eaau5484.",
@@ -442,5 +467,5 @@
    ]
   }
  },
- "wall_s": 113.6
+ "wall_s": 180.5
 }

@@ -22,13 +22,20 @@ hours. Every parameter comes from their Table 1, and the numbers match the autho
 copied; it is GPL-3.0). The scale is a 520 µm disc on a 5 µm grid with a 0.01 h step. The simulation starts with
 every species at 0, and the domain edge absorbs activator.
 
-**Growth** (De Simone et al. 2021, *Nature* 590:129, doi 10.1038/s41586-020-03085-8): after the Erk peak, each
-cell's area grows at **0.006 ± 0.002 h⁻¹** (measured; Extended Data caption, n = 89 cells). The growth law is
-ours: a cell grows at that rate for **24 h (assumed)** after each of its own Erk peaks. The waves are computed
-in reference (material) coordinates, and growth does not feed back on them.
+**Growth** (De Simone et al. 2021, *Nature* 590:129, doi 10.1038/s41586-020-03085-8):
+- **Measured.** Extended Data Fig. 7b fits a **linear** slope to normalised cell area after the Erk peak:
+  d(a/a_peak)/dt = **0.006 ± 0.002 h⁻¹** (n = 89 cells, 3 scales).
+- **Assumed: the coupling form.** The code integrates **d ln a/dt = 0.006 h⁻¹**, which is **exponential** growth
+  that uses the measured linear slope as a log-rate. A cell grows this way for **24 h (assumed)** after each of its
+  own Erk peaks, and the growth compounds over successive waves.
+- Over one window the two forms give ×1.155 (exponential) against ×1.144 (linear). The area numbers below are
+  those of the assumed exponential form, and they have not been tuned.
+
+The waves are computed in reference (material) coordinates, and growth does not feed back on them.
 
 `engineering/scales/sources.json` marks every parameter `fitted-in-source`, `from-source`, `measured`,
-`assumed` or `unknown`.
+`assumed` or `unknown`. The measured linear slope (`growth.measured_linear_slope_per_h`) and the assumed
+log-rate the code uses (`growth.rate_after_peak_per_h`) are two separate rows.
 
 ## Results (`artifacts/scales/erk-wave/receipt.json`)
 
@@ -45,7 +52,8 @@ The bands were set from the papers' own wording before the run, and they stay as
 finding, not a failure of the code. One possible cause is the reporter: the measured value comes from an Erk
 KTR translocation reporter, which this model does not include. That cause is untested.
 
-Over 120 h the scale's area grows ×1.55 (effective radius 520 → 647 µm).
+Over 120 h the scale's area grows ×1.55 (effective radius 520 → 647 µm). That figure comes from the
+**assumed** exponential coupling and is not a measured growth curve.
 
 ## Controls (they set the exit code)
 - **no source:** E stays 0 everywhere and the area does not change. Pass.

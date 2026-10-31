@@ -25,7 +25,7 @@ LIMITS = {"mp4_max_bytes": 4_000_000, "gif_max_bytes": 6_000_000, "poster_max_by
 
 CAPTION = [
     "SIMULATED Erk activity on one regenerating zebrafish scale (520 um radius). Model: Hayden et al. 2021, Table 1 parameters.",
-    "Growth: cell area +0.006/h after each Erk peak (measured, De Simone et al. 2021); 24 h growth window assumed.",
+    "Growth ASSUMED exponential (d ln a/dt = 0.006/h for an assumed 24 h after each Erk peak); measured: linear slope 0.006/h (De Simone 2021 ED7b).",
     "Rendering of model state in reference (material) coordinates, not a microscope image. Transfer to flying-fish scales unknown.",
 ]
 

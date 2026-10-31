@@ -13,12 +13,14 @@ scale disc, all species 0 at t = 0, as in the paper's Methods.  This file is an 
 no code was copied from the authors' GPL repository.
 
 Growth (De Simone et al. 2021, Nature 590:129, doi 10.1038/s41586-020-03085-8): during the hypertrophic phase
-osteoblasts barely divide and grow in area after the Erk peak passes.  Their Extended Data caption gives the
-normalised cell-area slope after the peak as 0.006 +/- 0.002 per h (before the peak -0.002 +/- 0.002 per h,
-n = 89 cells, 3 scales).  The growth LAW here is ours: each cell's log-area rises at that measured rate for a
-window W after each time its Erk crosses up through E_peak_threshold.  W is ASSUMED (the paper does not give it
-in its text).  Growth is one-way: the wave field is computed in material (Lagrangian) coordinates and growth
-does not feed back on the waves.
+osteoblasts barely divide and grow in area after the Erk peak passes.  MEASURED: Extended Data Fig. 7b fits a
+LINEAR slope to normalised cell area after the peak, d(a/a_peak)/dt = 0.006 +/- 0.002 per h (before the peak
+-0.002 +/- 0.002 per h; n = 89 cells, 3 scales).
+ASSUMED (ours): the coupling form.  This code integrates d ln(a)/dt = 0.006 per h, i.e. EXPONENTIAL growth that
+uses the measured linear slope as a log-rate, for a window W (ASSUMED, 24 h) after each time a cell's Erk crosses
+up through E_peak_threshold, compounding over successive waves.  Over one 24 h window the two forms differ by
+1.155 (exponential) vs 1.144 (linear) per window; that difference was not tuned or corrected.  Growth is
+one-way: the wave field is computed in material (Lagrangian) coordinates and growth does not feed back on it.
 """
 from __future__ import annotations
 
@@ -63,7 +65,8 @@ class Geometry:
 
 @dataclass(frozen=True)
 class Growth:
-    rate_after_peak_per_h: float = 0.006   # MEASURED, De Simone 2021 Extended Data (normalised cell area slope)
+    rate_after_peak_per_h: float = 0.006   # used as d ln(a)/dt: ASSUMED exponential form; the value is the MEASURED
+    #                                        linear slope of normalised cell area (De Simone 2021 Ext. Data Fig. 7b)
     window_h: float = 24.0                 # ASSUMED: growth lasts this long after each Erk peak
     peak_threshold: float = 0.2            # Hayden 2021 Methods scores an event at Erk prominence > 0.2
 
