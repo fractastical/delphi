@@ -43,14 +43,14 @@ class _Quiet(SimpleHTTPRequestHandler):
         pass
 
 
-def _glb(nodes, meshes, materials, accessors_bytes):
+def _glb(nodes, meshes, materials, spec):
     """Minimal glTF 2.0 binary writer for the synthetic fixtures (NOT fish data)."""
     import struct
-    bin_ = b"".join(accessors_bytes)
+    bin_ = b"".join(b[0] for b in spec)
     g = {"asset": {"version": "2.0"}, "scene": 0, "scenes": [{"nodes": [0]}], "nodes": nodes, "meshes": meshes,
          "buffers": [{"byteLength": len(bin_)}]}
     off, views, accs = 0, [], []
-    for blob, typ, ct, cnt, extra in _SPEC:
+    for blob, typ, ct, cnt, extra in spec:
         views.append({"buffer": 0, "byteOffset": off, "byteLength": len(blob)})
         accs.append({"bufferView": len(views) - 1, "componentType": ct, "count": cnt, "type": typ, **extra})
         off += len(blob)
@@ -64,9 +64,6 @@ def _glb(nodes, meshes, materials, accessors_bytes):
     return struct.pack("<III", 0x46546C67, 2, 12 + len(body)) + body
 
 
-_SPEC = []
-
-
 def _write_synthetic(d):
     """Two tiny variants of one synthetic geometry: a nested node holding a two-primitive mesh (one
     primitive with a BLEND material, one with COLOR_0 vertex colours) beside a mesh with no material."""
@@ -78,10 +75,8 @@ def _write_synthetic(d):
     tri3 = f(0, 0.06, 0, 0.1, 0.06, 0, 0, 0.1, 0)
     col = f(1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1)                  # RGBA float
     idx = struct.pack("<3H", 0, 1, 2)
-    mm = lambda a, i: {"min": [min(a[k::3]) for k in range(3)], "max": [max(a[k::3]) for k in range(3)]} if False else {}
-    global _SPEC
     mins = lambda v: {"min": [0.0, 0.0, v], "max": [0.1, 0.05, v]}
-    _SPEC = [(tri, "VEC3", 5126, 3, mins(0.0)), (tri2, "VEC3", 5126, 3, mins(0.01)),
+    spec = [(tri, "VEC3", 5126, 3, mins(0.0)), (tri2, "VEC3", 5126, 3, mins(0.01)),
              (tri3, "VEC3", 5126, 3, {"min": [0, 0.06, 0], "max": [0.1, 0.1, 0]}),
              (col, "VEC4", 5126, 3, {}), (idx + b"\0\0", "SCALAR", 5123, 3, {})]
     nodes = [{"name": "root", "children": [1, 3]}, {"name": "fan_group", "children": [2]},
@@ -92,7 +87,7 @@ def _write_synthetic(d):
               {"name": "naked", "primitives": [{"attributes": {"POSITION": 2}, "indices": 4}]}]
     mats = [{"name": "membrane", "alphaMode": "BLEND",
              "pbrMetallicRoughness": {"baseColorFactor": [0.8, 0.1, 0.1, 0.35], "metallicFactor": 0, "roughnessFactor": 0.9}}]
-    glb = _glb(nodes, meshes, mats, [b[0] for b in _SPEC])
+    glb = _glb(nodes, meshes, mats, spec)
     comps = {"schema": "synthetic", "components": {"fin_fan": {"params": {"rays": {"status": "assumed", "value": 12, "note": "synthetic"},
                                                                            "outline": {"status": "digitized", "value": "x"}}}}}
     for vid in ("a", "b"):
@@ -103,8 +98,27 @@ def _write_synthetic(d):
         (d / f"appearance-{vid}.json").write_text(json.dumps({
             "glb": f"fish-{vid}.glb", "glb_sha256": h, "label": lab, "title": f"variant {vid}", "schema": "frontier.fish3d.appearance/1",
             "elements": [{"element": "bars", "status": "design choice"}, {"element": "back", "status": "sourced (family)", "source": "x"}]}))
+    _write_nonuniform(d)
     (d / "wrong.json").write_text(json.dumps({"glb": "fish-b.glb", "glb_sha256": "0" * 64}))
     (d / "poster.png").write_bytes((ART / "render/poster.png").read_bytes())
+
+
+def _write_nonuniform(d):
+    """fish-nu.glb: two OVERLAPPING nodes under a root, each a two-sheet box (quads at local z = -0.5 and +0.5),
+    with non-uniform node scales ([2,1,3] and [1,1,0.5]) so a local-frame distance differs from the world one."""
+    import struct
+    f = lambda *v: struct.pack("<%df" % len(v), *v)
+    quad = lambda z: [(-1, -1, z), (1, -1, z), (1, 1, z), (-1, 1, z)]
+    pts = quad(-0.5) + quad(0.5)
+    pos = f(*[c for p in pts for c in p])
+    idx = struct.pack("<12H", 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7)
+    spec = [(pos, "VEC3", 5126, 8, {"min": [-1, -1, -0.5], "max": [1, 1, 0.5]}), (idx, "SCALAR", 5123, 12, {})]
+    nodes = [{"name": "root", "children": [1, 2]},
+             {"name": "slab", "mesh": 0, "scale": [2, 1, 3]},
+             {"name": "plate", "mesh": 1, "scale": [1, 1, 0.5], "translation": [0.3, 0.2, 1.0]}]
+    meshes = [{"name": "slab", "primitives": [{"attributes": {"POSITION": 0}, "indices": 1}]},
+              {"name": "plate", "primitives": [{"attributes": {"POSITION": 0}, "indices": 1}]}]
+    (d / "fish-nu.glb").write_bytes(_glb(nodes, meshes, None, spec))
 
 
 @pytest.fixture(scope="module")
@@ -391,7 +405,6 @@ def test_latency_and_pick_bounds_on_the_real_mesh(page, server):
     meth = page.evaluate("window.__v.state().perf.pick_method")
     assert meth == "cpu-triangle-bounds", meth
     assert pick is not None and pick < 600, f"pick took {pick} ms"
-    assert page.evaluate("window.__v.state().selected") in page.evaluate("window.__v.componentNames()") or True
     t0 = page.evaluate("performance.now()")
     for _ in range(10):
         page.keyboard.press("ArrowRight")
@@ -458,3 +471,24 @@ def test_fast_pick_agrees_with_threes_raycaster_over_a_grid(page, server):
     assert len(hits) >= 8, "grid never touched the mesh, so agreement proves nothing"
     assert [r for r in res if r[0] != r[1]] == [], [r for r in res if r[0] != r[1]]
     assert len({r[1] for r in hits}) >= 2          # more than one component is exercised
+
+
+@pytest.mark.parametrize("heavy", [0, 1000000])      # 0 forces the triangle-bounds path, 1e6 the Raycaster path
+def test_pick_distance_is_world_distance_under_nonuniform_scaled_overlapping_nodes(page, server, heavy):
+    from urllib.parse import quote
+    v = json.dumps([{"id": "nu", "glb": "fish-nu.glb", "poster": "poster.png", "video": None}])
+    page.goto(f"{server}/?lazy=0&heavy={heavy}&base={SYN}&variants={quote(v)}")
+    st = page.evaluate("window.__v.ready.then(() => window.__v.state())")
+    assert st["mode"] == "interactive" and sorted(st["names"]) == ["plate", "slab"], st
+    pts = [(x / 10, y / 10) for x in range(-8, 9) for y in range(-8, 9)]
+    res = page.evaluate("pts => pts.map(([x, y]) => window.__v._pickCompare(x, y))", pts)
+    hits = [r for r in res if r[1] is not None]
+    assert {r[1] for r in hits} == {"plate", "slab"}, "the fixture must exercise both overlapping nodes"
+    assert len(hits) > 40
+    for fast_name, ray_name, fast_d, ray_d in hits:
+        assert fast_name == ray_name
+        assert fast_d == pytest.approx(ray_d, rel=1e-5, abs=1e-9), (fast_name, fast_d, ray_d)
+    assert all(r[0] is None for r in res if r[1] is None)        # no hit where Raycaster has none
+    want = "bounds" if heavy == 0 else "raycaster"                 # the size threshold really selects the path
+    for n in ("plate", "slab"):
+        assert page.evaluate("n => window.__v.componentInfo(n).pickPaths", n) == [want], (n, heavy)
