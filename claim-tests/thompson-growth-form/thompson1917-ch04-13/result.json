@@ -9,7 +9,7 @@
   "planned_datasets": [
     "ccdb-chromosome-counts-database-statistics-api"
   ],
-  "interpretation": "'Germ-nuclei' chromosome number is the reduced (haploid, gametic) number n. Thompson wrote before polyploidy was understood; using the median count per species keeps polyploid cytotypes within a species from counting as extra species. The database covers land plants only, so this decides the plant half of the claim ('plants and animals'); the animal half is not tested. 'Few' and 'fewer still' are read as the two tails of the distribution with the lower tail larger than the upper. Follows the swarm thread's draft plan with the data access route specified.",
+  "interpretation": "'Germ-nuclei' chromosome number is the reduced (haploid, gametic) number n. Thompson wrote before polyploidy was understood; using the median count per species keeps polyploid cytotypes within a species from counting as extra species. The database covers land plants only, so this decides the plant half of the claim ('plants and animals'); the animal half is not tested. 'Few' and 'fewer still' are read as the two tails of the distribution with the lower tail larger than the upper. Follows the swarm thread's draft plan with the data access route specified. READINGS CHECK (added after the result, at the hub's request; the pre-registered rule and thresholds are unchanged). Operationalization: Thompson's 'germ-nuclei' number is the haploid number n; 'organisms' are species; 'few' and 'fewer still' are the two tails of the species distribution, compared with each other and with the 6-16 core. Stated scope: 'plants and animals'; only the plant half is tested (CCDB is plant-only), so the verdict is for plants. Alternative readings computed post hoc: (i) lowest count per species rather than the median, which strips polyploid cytotypes within a species: 30.3% above 16 vs 2.2% below 6, still refuted; (ii) one value per genus (median of species medians), which damps polyploid species radiations: 32.0% of 8414 genera above 16 vs 1.1% below 6, still refuted; (iii) angiosperms only: 33.0% above 16, still refuted. (iv) Animals, untested here: the claim would not be rescued by them, since most vertebrates have n above 16 (humans 23, most birds about 40), but no animal dataset was analysed and this is background knowledge, not evidence from this test. The verdict is 'refutes' under every reading computed.",
   "datasets": [
     {
       "id": "ccdb-chromosome-counts-database-statistics-api",
@@ -106,6 +106,27 @@
         "Oryza sativa": 12.0,
         "Pinus sylvestris": 12.0,
         "Abies alba": 12.0
+      },
+      "post_hoc_sensitivity": {
+        "min_count_per_species": {
+          "n": 69948,
+          "fraction_6_to_16": 0.6746297249385258,
+          "fraction_below_6": 0.022416652370332246,
+          "fraction_above_16": 0.302953622691142,
+          "would_refute_under_rule": true
+        },
+        "genus_level_median": {
+          "n_genera": 8414,
+          "fraction_6_to_16": 0.6684097932018065,
+          "fraction_below_6": 0.011171856429759925,
+          "fraction_above_16": 0.3204183503684336,
+          "would_refute_under_rule": true
+        },
+        "angiosperms_only_species": {
+          "fraction_above_16": 0.3302552204176334,
+          "fraction_below_6": 0.017385924207269914,
+          "would_refute_under_rule": true
+        }
       }
     }
   },
@@ -115,7 +136,8 @@
     "Thompson's central range is roughly right (64% of species have 6 <= n <= 16, mode n = 9), but the upper tail is 20 times larger than the lower tail (34% above 16 versus 1.7% below 6), the opposite of 'fewer still have more than sixteen': polyploidy, unknown in 1917, puts a third of angiosperms and 96% of ferns above 16.",
     "Plants only; the animal half of the claim is untested here (animal karyotype compilations were not pursued in this batch).",
     "The CCDB is a compilation of published counts with uneven taxonomic coverage; the median per species name hides within-species cytotype variation, which is the intended treatment of polyploid races.",
-    "Species with only a sporophytic count: the CCDB statistics service reports counts at the gametophytic level (confirmed on reference species), so no halving was applied."
+    "Species with only a sporophytic count: the CCDB statistics service reports counts at the gametophytic level (confirmed on reference species), so no halving was applied.",
+    "Readings check: the refutation holds whether species are scored by their median or lowest count, whether genera rather than species are counted, and within angiosperms alone; it is a refutation for plants, the only half of Thompson's 'plants and animals' scope that was tested."
   ],
   "agent": {
     "kind": "cloud-agent",
