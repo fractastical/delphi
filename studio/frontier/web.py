@@ -31,6 +31,7 @@ from threading import BoundedSemaphore, Lock
 from typing import Callable
 from urllib.parse import parse_qs, unquote, urlsplit
 
+from .artifacts import ArtifactIndex
 from .http import Application
 from .models import KINDS, MAX_BUNDLE_BYTES, Ref, canonical
 from .store import FrontierError, Store
@@ -40,7 +41,13 @@ MIME = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", 
         ".mjs": "text/javascript; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png",
         ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".webp": "image/webp", ".ico": "image/x-icon",
         ".txt": "text/plain; charset=utf-8", ".woff2": "font/woff2"}
+# Extra types, served ONLY from <site>/artifacts/ (the guarded artifact subtree), never from the rest of the site.
+ARTIFACT_MIME = {".stl": "model/stl", ".obj": "model/obj", ".glb": "model/gltf-binary", ".csv": "text/csv; charset=utf-8",
+                 ".lean": "text/plain; charset=utf-8", ".trig": "application/trig"}
+ARTIFACT_DOWNLOAD = {".stl", ".obj", ".glb"}                                   # binary models download; text types render as text
+SENSITIVE_NAME = re.compile(r"(secret|token|credential|password|passwd|private|apikey|api_key|\.pem|\.key|\.env|id_rsa)", re.I)
 MAX_STATIC_BYTES = 8_000_000
+MAX_ARTIFACT_BYTES = 16_000_000
 MAX_PATH = 2048
 CATALOG_PARAMS = {"query", "kind", "status", "limit", "after"}
 STATUSES = {"proposed", "imported_unreviewed", "accepted", "disputed", "rejected"}
@@ -62,10 +69,20 @@ class WebConfig:
     public_site: bool = False                                    # True: static shell is open, data stays gated
     search_mode: str = "store_lexical"                           # honest label of what /api/catalog actually runs
     catalog_search: Callable | None = None                       # e.g. SearchIndex(store).search once integrated; same keyword signature as Store.search
+    artifact_search: Callable | None = None                      # default: ArtifactIndex(store).search
+    routes: dict = field(default_factory=dict)                   # extension point: {"POST /api/engineering/solve": Route(handler)}
     login_failures: int = 10
     login_window: int = 60
     csp: str = ("default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; "
                 "frame-ancestors 'none'; base-uri 'none'; form-action 'self'; object-src 'none'")
+
+    def __post_init__(self):
+        # The engineering solver (root's frontier/engineering_api.py) is wired by default; a caller-supplied route of the same name wins (tests).
+        self.routes.setdefault("POST /api/engineering/solve", Route(engineering_handler, max_body=1024, max_concurrent=8))
+        for key in self.routes:
+            method, _, path = key.partition(" ")
+            if method not in ("GET", "POST") or not re.fullmatch(r"/api/[a-z0-9][a-z0-9/_-]{0,80}", path) or path in RESERVED_API:
+                raise ValueError("custom routes must be 'GET|POST /api/<name>' and must not shadow a built-in endpoint")
 
     @staticmethod
     def with_tokens(*tokens: str, **kw) -> "WebConfig":
@@ -73,6 +90,42 @@ class WebConfig:
         if not good or any(len(t) < 16 for t in good):
             raise ValueError("an access token of at least 16 characters is required")
         return WebConfig(gate_tokens=tuple(sha256(t.encode()).digest() for t in good), **kw)
+
+
+def engineering_handler(req):
+    """POST /api/engineering/solve -> frontier.engineering_api.solve_design(data) (late import). The solver owns validation, its isolated child
+    process, its 8 s bound and its concurrency cap of 2 (it raises FrontierError for invalid/busy); this adapter adds only the gate, the 1024-byte
+    body bound and the typed error mapping. If the module is absent the answer is a clear 503 and nothing is computed or invented."""
+    try:
+        from frontier.engineering_api import solve_design
+    except ModuleNotFoundError as e:
+        if e.name != "frontier.engineering_api":
+            raise
+        err = FrontierError("The engineering solver is not installed on this node")
+        err.http_status, err.code = 503, "engineering_unavailable"
+        raise err from None
+    return 200, solve_design(req["body"])
+
+
+RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts"}
+
+
+@dataclass
+class Route:
+    """A gated extension endpoint, e.g. the engineering solver. Needs a browser session; POST also needs Origin + CSRF.
+
+    handler(request) receives `{"method", "path", "query": dict, "body": dict | None, "store": Store}` and returns `(status, json_object)`.
+    It may raise FrontierError for a typed 4xx; any other exception becomes a generic 500 and is never echoed. The adapter bounds the body
+    (`max_body` bytes, refused from the header alone) and the number of simultaneous calls (`max_concurrent`, else 503 + Retry-After).
+    """
+    handler: Callable
+    max_body: int = 1024
+    max_concurrent: int = 2
+
+    def __post_init__(self):
+        if not 1 <= self.max_body <= 65536 or not 1 <= self.max_concurrent <= 8:
+            raise ValueError("route bounds out of range")
+        self.slots = BoundedSemaphore(self.max_concurrent)
 
 
 class Sessions:
@@ -146,14 +199,24 @@ def resolve_static(site: Path, raw_path: str) -> Path | None:
         return None
     root = site.resolve()
     target = (root / "/".join(segs)).resolve()
-    if target.suffix.lower() not in MIME or not target.is_relative_to(root):
+    if not target.is_relative_to(root) or SENSITIVE_NAME.search(target.name) or mime_for(root, target) is None:
         return None
+    limit = MAX_ARTIFACT_BYTES if target.suffix.lower() in ARTIFACT_MIME else MAX_STATIC_BYTES
     try:
-        if not target.is_file() or target.stat().st_size > MAX_STATIC_BYTES:
+        if not target.is_file() or target.stat().st_size > limit:
             return None
     except OSError:
         return None
     return target
+
+
+def mime_for(root: Path, target: Path) -> str | None:
+    ext = target.suffix.lower()
+    if ext in MIME:
+        return MIME[ext]
+    if ext in ARTIFACT_MIME and target.is_relative_to(root / "artifacts"):
+        return ARTIFACT_MIME[ext]
+    return None
 
 
 def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Callable[[], int]):
@@ -273,6 +336,11 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
                     return self.login(m, origin)
                 if path.startswith("/v1/"):
                     return self.v1(m, path)
+                allowed = [k.split(" ")[0] for k in cfg.routes if k.endswith(" " + path)]
+                if allowed:
+                    if m not in allowed:
+                        return self.method_not_allowed(", ".join(allowed))
+                    return self.custom(cfg.routes[f"{m} {path}"], path, parts.query, origin)
                 if m not in ("GET", "HEAD"):
                     return self.method_not_allowed("GET, HEAD")
                 sid, sess = self.session()
@@ -390,6 +458,12 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
                                  "is_head": got["is_head"], "action": got["action"], "why_matched": r["why_matched"]})
                 return self.json(200, {"mode": "live", "namespace": store.namespace, "search_mode": cfg.search_mode, "search_kind": found["search_kind"],
                                        "results": rows, "next_cursor": found["next_cursor"]})
+            if path == "/api/artifacts":
+                if set(q) - {"q", "query", "role", "evidence_kind", "limit", "after"} or ("q" in q and "query" in q):
+                    raise FrontierError("Unknown or conflicting parameter")
+                search = cfg.artifact_search or ArtifactIndex(store).search
+                return self.json(200, search(q.get("q", q.get("query", "")), role=q.get("role") or None, evidence_kind=q.get("evidence_kind") or None,
+                                             limit=int(q.get("limit", "20")), cursor=q.get("after", ""), token=None))
             if path == "/api/record":
                 if set(q) != {"namespace", "kind", "id", "version"}:
                     raise FrontierError("A pinned Ref (namespace, kind, id, version) is required")
@@ -414,6 +488,28 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
             data = self.json_body(MAX_BUNDLE_BYTES)
             self.json(200, app.dispatch(path, data, token, self.headers.get("Idempotency-Key")))
 
+        def custom(self, route, path, query, origin):
+            sid, sess = self.session()
+            if not sess:
+                return self.error(401, "unauthorized", "Sign in required")
+            body = None
+            if self.command == "POST":
+                if origin is None:
+                    return self.error(403, "forbidden_origin", "Origin required")
+                if not hmac.compare_digest(self.headers.get("X-CSRF-Token", ""), sess["csrf"]):
+                    return self.error(403, "csrf", "CSRF token missing or wrong")
+                body = self.json_body(route.max_body)
+                if not isinstance(body, dict):
+                    raise FrontierError("JSON object required")
+            q = {k: v[0] for k, v in parse_qs(query, keep_blank_values=True, max_num_fields=12).items()}
+            if not route.slots.acquire(blocking=False):
+                return self.error(503, "busy", "Too many simultaneous requests", [("Retry-After", "2")])
+            try:
+                status, obj = route.handler({"method": self.command, "path": path, "query": q, "body": body, "store": store})
+            finally:
+                route.slots.release()
+            self.json(status, obj)
+
         def static(self, path):
             if cfg.site_dir is None:
                 return self.error(404, "not_found", "No site configured")
@@ -421,7 +517,10 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
             if target is None:
                 return self.error(404, "not_found", "Not found")
             body = target.read_bytes()
-            self.send(200, body, MIME[target.suffix.lower()], extra=[("ETag", '"' + sha256(body).hexdigest()[:16] + '"')])
+            extra = [("ETag", '"' + sha256(body).hexdigest()[:16] + '"')]
+            if target.suffix.lower() in ARTIFACT_DOWNLOAD:
+                extra.append(("Content-Disposition", "attachment"))
+            self.send(200, body, mime_for(cfg.site_dir.resolve(), target), extra=extra)
 
     return Handler
 

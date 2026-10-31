@@ -13,10 +13,18 @@ OSUSER="$(id -un)"
 test "$(id -u)" != 0 || { echo 'run as an unprivileged service user' >&2; exit 2; }
 DATA="$ROOT/pgdata"; RUN="$ROOT/run"
 umask 077
+# Never adopt something that is not ours: a pre-existing, non-empty ROOT or a data directory without our marker is refused untouched.
+if [ -e "$ROOT" ] && [ ! -f "$ROOT/.frontier-instance" ] && [ -n "$(ls -A "$ROOT" 2>/dev/null | grep -vx app)" ]; then
+  echo "refusing: $ROOT exists, is not empty (other than an app/ checkout) and is not a Frontier instance (no .frontier-instance marker); nothing changed" >&2; exit 3
+fi
+if [ -f "$DATA/PG_VERSION" ] && [ ! -f "$ROOT/.frontier-instance" ]; then
+  echo "refusing: $DATA is an existing cluster that this script did not create; nothing changed" >&2; exit 3
+fi
 mkdir -p "$ROOT" "$RUN" "$ROOT/backups" "$ROOT/credentials"
 chmod 700 "$ROOT" "$RUN" "$ROOT/backups" "$ROOT/credentials"
 if [ ! -f "$DATA/PG_VERSION" ]; then
   "$PGBIN/initdb" -D "$DATA" --auth-local=peer --auth-host=reject --no-locale --encoding=UTF8 >/dev/null
+  echo "created by deploy/postgres/init-cluster.sh" > "$ROOT/.frontier-instance"
 fi
 chmod 700 "$DATA"
 conf="$DATA/postgresql.conf"
