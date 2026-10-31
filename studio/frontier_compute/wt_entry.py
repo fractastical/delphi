@@ -13,9 +13,23 @@ for f, m in man["files"].items():
     assert sha(b) == m["sha256"] and len(b) == m["bytes"], f"file hash mismatch: {f}"
 print("bundle verified:", len(man["files"]), "files", flush=True)
 env = dict(os.environ, PYTHONPATH=dst, OMP_NUM_THREADS="2", OPENBLAS_NUM_THREADS="2", PYTHONUNBUFFERED="1")
+protocol = os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else "artifacts/windtunnel/cuda-protocol.json"
+if len(sys.argv) > 1:
+    proposal = json.load(open(protocol))
+    if proposal.get("prerequisite", {}).get("repeat_passed") is not True:
+        raise ValueError("AoA sweep requires a recorded passing CPU/CUDA parity result")
+    if not os.environ.get("PREFLIGHT"):
+        gate = json.load(open("infra-parity-gate.json"))
+        if gate.get("repeat_passed") is not True:
+            raise ValueError("same-allocation CPU/CUDA parity prerequisite failed")
 if os.environ.get("PREFLIGHT"):
     r = subprocess.run([sys.executable, "-c", "import engineering.windtunnel.remote, torch; print('preflight ok: import', torch.__version__)"], cwd=dst, env=env, capture_output=True, text=True)
     print(r.stdout.strip(), r.stderr.strip()[-300:]); sys.exit(r.returncode)
 out = os.path.join(os.environ["COPS_OUT"], "out")
-r = subprocess.run([sys.executable, "-m", "engineering.windtunnel.remote", "run", "artifacts/windtunnel/cuda-protocol.json", "--output", out], cwd=dst, env=env)
+r = subprocess.run([sys.executable, "-m", "engineering.windtunnel.remote", "run", protocol, "--output", out], cwd=dst, env=env)
+if len(sys.argv) == 1 and r.returncode == 0:
+    checks = json.load(open(os.path.join(out, "checks.json")))
+    json.dump(checks, open("infra-parity-gate.json", "w"), indent=2)
+    if checks.get("repeat_passed") is not True:
+        raise ValueError("CPU/CUDA parity failed; subsequent AoA workloads must refuse")
 sys.exit(r.returncode)
