@@ -1,5 +1,24 @@
 # Pre-publication security review
 
+## October 31 returned-artifact increment
+
+Root ran gitleaks 8.30.1 with redaction on `ae6fa6f..fc3cf8d`:
+25 commits, 3.07 MB, two findings. Both are the `weakdeps.oneAPI` package
+UUID in `artifacts/cfd3d/gpu-v1/resolved-Manifest.toml`, under
+AcceleratedKernels and Atomix. Root parsed the TOML and both UUIDs, and checked
+the corresponding oneAPI extension entries. These are dependency identifiers,
+the same class as finding B below, not account credentials. No blanket scanner
+allowlist was added. This incremental history scan does not replace the earlier
+full scans or prove absence of all possible secrets.
+
+The bounded MCP text-preview review found a cached-path policy bypass when a
+public path was replaced with an in-tree symlink to the same previously published
+bytes. The fix preserves the lexical path through no-follow descriptor opening,
+rechecks serving policy and MIME, and still verifies the complete digest. Root
+ran all 37 media tests, including in-tree and escaping symlink regressions. The
+finding did not establish arbitrary new-secret disclosure. This remains a
+limited source and regression review, not a proof of all race freedom.
+
 Sanitised record of the secret scan and the public web/MCP review done before this repository was considered for public visibility.
 **No secret value appears here or in the receipts it cites.** Findings are identified by rule, file, line and commit only.
 This is not a complete penetration test and does not claim the absence of all vulnerabilities or of all credentials.

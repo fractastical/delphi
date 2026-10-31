@@ -201,7 +201,10 @@ this does not widen cancellation permissions.
   together with the gallery/mobile fixes in one exact release.
 - [ ] Connect persisted exact-version project discussion to the Studio contribution
   interface, using an explicit contributor credential held only in memory.
-- [ ] Finish the new Project membership/import pass and recompute the snapshot.
+- [x] Imported 37 new curated records with zero forks and exact readback; submitted
+  Project version 1177c609 with 22 members, retaining all 13 original members and
+  four challenges on the previous version. Records remain unreviewed/proposed.
+- [ ] Recompute the site snapshot and expose prior-version Project discussion.
 - [ ] Demonstrate two actual computations consuming one exact existing Claim and
   a separate review of their evidence. The current public-head reuse count is zero.
 - [ ] Collect the live primary diffusion job; run the preregistered secondary
