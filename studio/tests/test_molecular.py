@@ -182,3 +182,29 @@ def test_exact_failed_state_diagnosis_preserves_h_and_demonstrates_precision():
     assert (
         report["CPU_force_vs_Reference_derivative_at_frozen_h_relative_error"] < 0.005
     )
+
+
+def test_descriptive_seed_analysis_and_render_retain_actual_backend_and_pins():
+    production = ROOT / "artifacts/molecular/cpu-trajectory-final"
+    analysis = json.loads(
+        (ROOT / "artifacts/molecular/cpu-analysis/ensemble.json").read_text()
+    )
+    assert analysis["descriptive_endpoint_CA_RMSD_nm"]["n_runs"] == 1
+    assert analysis["descriptive_endpoint_CA_RMSD_nm"]["sample_SD"] is None
+    assert analysis["biological_success_probability"] is None
+    assert analysis["empirical_accuracy"] == "unknown"
+    assert (
+        analysis["simulation_receipt_sha256"]
+        == hashlib.sha256((production / "receipt.json").read_bytes()).hexdigest()
+    )
+    render = ROOT / "artifacts/molecular/cpu-render"
+    receipt = json.loads((render / "render.json").read_text())
+    assert receipt["backend"] == "CPU"
+    assert receipt["preliminary_thermalization_ps"] == 0.1
+    assert receipt["coordinate_storage_dtype"] == "float32"
+    assert (
+        receipt["render_code_sha256"]
+        == hashlib.sha256((render / "producer-render.py").read_bytes()).hexdigest()
+    )
+    for name, digest in receipt["outputs"].items():
+        assert hashlib.sha256((render / name).read_bytes()).hexdigest() == digest
