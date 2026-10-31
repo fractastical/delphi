@@ -1,9 +1,19 @@
 {
   "claim": "https://w3id.org/delphi/resource/claim/thompson1917-ch02-08",
   "nanopub": "https://w3id.org/np/RAxqjm7-biKiaCKQ2P4Mdz8pNLUVG-RA9tfVDUKVwmyFg",
+  "nanopub_source": "network",
   "label": "Giant Carboniferous insects and pterodactyls imply a denser ancient atmosphere",
-  "grounded_at": "2026-10-31T22:22:34Z",
-  "service": "https://grounding.indra.bio/",
+  "grounded_at": "2026-10-31T23:22:31Z",
+  "services": [
+    "https://grounding.indra.bio/",
+    "https://www.ebi.ac.uk/ols4/"
+  ],
+  "ols_ontologies": [
+    "go",
+    "uberon",
+    "cl",
+    "ncbitaxon"
+  ],
   "min_score": 0.7,
   "allowed_vocabularies": [
     "CHEBI",
@@ -11,10 +21,31 @@
     "GO",
     "HGNC",
     "HP",
+    "NCBITAXON",
     "UBERON",
     "UP"
   ],
-  "plan": "https://github.com/fractastical/delphi/blob/6440bff2df1dbaa866bd9762980d48e30626141d/claim-grounding/build/ground.py",
+  "excluded_branches": {
+    "HP": [
+      "HP:0012823",
+      "HP:0040279"
+    ],
+    "CHEBI": [
+      "CHEBI:50906"
+    ]
+  },
+  "generic_terms": [
+    "CHEBI:23367",
+    "CHEBI:24431",
+    "CHEBI:24433",
+    "CHEBI:24870",
+    "CHEBI:33250",
+    "CHEBI:36342",
+    "CHEBI:59999",
+    "CHEBI:60004",
+    "CHEBI:60027"
+  ],
+  "plan": "https://github.com/fractastical/delphi/blob/b994423eb3ddfc0f94f2326cff447975b48a8119/claim-grounding/build/ground.py",
   "review": {
     "status": "pending",
     "reviewer": null,
@@ -22,16 +53,77 @@
   },
   "candidates": [
     {
-      "db": "CHEBI",
-      "id": "CHEBI:28976",
-      "name": "carbonic acid",
-      "iri": "http://purl.obolibrary.org/obo/CHEBI_28976",
-      "score": 0.7778,
+      "db": "GO",
+      "id": "GO:0040007",
+      "name": "growth",
+      "iri": "http://purl.obolibrary.org/obo/GO_0040007",
+      "score": 1.0,
+      "source": "ols-exact-label",
+      "kept": true,
+      "reason": "allowed vocabulary, score at or above the minimum",
+      "mentions": [
+        {
+          "field": "context",
+          "text": "Growth"
+        }
+      ]
+    },
+    {
+      "db": "NCBITAXON",
+      "id": "NCBITaxon:50557",
+      "name": "Insecta",
+      "iri": "http://purl.obolibrary.org/obo/NCBITaxon_50557",
+      "score": 0.9,
+      "source": "ols-exact-synonym",
+      "kept": true,
+      "reason": "allowed vocabulary, score at or above the minimum",
+      "mentions": [
+        {
+          "field": "label",
+          "text": "insects"
+        },
+        {
+          "field": "context",
+          "text": "insects"
+        }
+      ]
+    },
+    {
+      "db": "NCBITAXON",
+      "id": "NCBITaxon:6962",
+      "name": "Anisoptera <dragonflies & damselflies>",
+      "iri": "http://purl.obolibrary.org/obo/NCBITaxon_6962",
+      "score": 0.9,
+      "source": "ols-exact-synonym",
       "kept": true,
       "reason": "allowed vocabulary, score at or above the minimum",
       "mentions": [
         {
           "field": "description",
+          "text": "dragonflies"
+        }
+      ]
+    },
+    {
+      "db": "CHEBI",
+      "id": "CHEBI:28976",
+      "name": "carbonic acid",
+      "iri": "http://purl.obolibrary.org/obo/CHEBI_28976",
+      "score": 0.7778,
+      "source": "gilda",
+      "kept": true,
+      "reason": "allowed vocabulary, score at or above the minimum",
+      "mentions": [
+        {
+          "field": "description",
+          "text": "carbonic acid"
+        },
+        {
+          "field": "description",
+          "text": "carbonic acid"
+        },
+        {
+          "field": "quoted source",
           "text": "carbonic acid"
         },
         {
@@ -41,11 +133,44 @@
       ]
     },
     {
+      "db": "STATO",
+      "id": "STATO:0000607",
+      "name": "proportion",
+      "iri": null,
+      "score": 1.0,
+      "source": "ols-exact-label",
+      "kept": false,
+      "reason": "namespace STATO is not in the allowed vocabularies",
+      "mentions": [
+        {
+          "field": "quoted source",
+          "text": "proportion"
+        }
+      ]
+    },
+    {
+      "db": "PATO",
+      "id": "PATO:0000587",
+      "name": "decreased size",
+      "iri": null,
+      "score": 0.9,
+      "source": "ols-exact-synonym",
+      "kept": false,
+      "reason": "namespace PATO is not in the allowed vocabularies",
+      "mentions": [
+        {
+          "field": "description",
+          "text": "small"
+        }
+      ]
+    },
+    {
       "db": "MESH",
       "id": "D001272",
       "name": "Atmosphere",
       "iri": null,
       "score": 0.7778,
+      "source": "gilda",
       "kept": false,
       "reason": "namespace MESH is not in the allowed vocabularies",
       "mentions": [
@@ -64,11 +189,60 @@
       ]
     },
     {
+      "db": "MESH",
+      "id": "D000388",
+      "name": "Air",
+      "iri": null,
+      "score": 0.7623,
+      "source": "gilda",
+      "kept": false,
+      "reason": "namespace MESH is not in the allowed vocabularies",
+      "mentions": [
+        {
+          "field": "context",
+          "text": "air"
+        }
+      ]
+    },
+    {
+      "db": "HGNC",
+      "id": "4204",
+      "name": "GCNT2",
+      "iri": null,
+      "score": 0.5556,
+      "source": "gilda",
+      "kept": false,
+      "reason": "score 0.56 is below 0.7",
+      "mentions": [
+        {
+          "field": "context",
+          "text": "II"
+        }
+      ]
+    },
+    {
+      "db": "MESH",
+      "id": "D014495",
+      "name": "Universities",
+      "iri": null,
+      "score": 0.5556,
+      "source": "gilda",
+      "kept": false,
+      "reason": "namespace MESH is not in the allowed vocabularies",
+      "mentions": [
+        {
+          "field": "context",
+          "text": "University"
+        }
+      ]
+    },
+    {
       "db": "CHEBI",
       "id": "CHEBI:133232",
       "name": "imazamox-ammonium",
       "iri": null,
       "score": 0.5401,
+      "source": "gilda",
       "kept": false,
       "reason": "score 0.54 is below 0.7",
       "mentions": [
@@ -80,15 +254,36 @@
     },
     {
       "db": "MESH",
+      "id": "D005580",
+      "name": "Fossils",
+      "iri": null,
+      "score": 0.5401,
+      "source": "gilda",
+      "kept": false,
+      "reason": "namespace MESH is not in the allowed vocabularies",
+      "mentions": [
+        {
+          "field": "context",
+          "text": "fossil"
+        }
+      ]
+    },
+    {
+      "db": "MESH",
       "id": "D007313",
       "name": "Insecta",
       "iri": null,
       "score": 0.5401,
+      "source": "gilda",
       "kept": false,
       "reason": "namespace MESH is not in the allowed vocabularies",
       "mentions": [
         {
           "field": "label",
+          "text": "insects"
+        },
+        {
+          "field": "context",
           "text": "insects"
         }
       ]
