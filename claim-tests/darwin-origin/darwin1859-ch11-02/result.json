@@ -2,54 +2,606 @@
   "claim_id": "darwin1859-ch11-02",
   "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch11-02",
   "project": "darwin-origin",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Across pairs of regions of similar size, the species-level dissimilarity of their terrestrial faunas increases with the impassability and age of the barrier separating them (none < large river < shallow recently-dry strait < mountain range or desert < deep never-bridged strait < ocean basin), and this ordering persists after controlling for the geographic distance between the regions.",
   "pass_criterion": "Pre-registered: 26 fixed region pairs are assigned a barrier rank (0 none, 1 large river, 2 shallow strait dry at glacial low stands, 3 mountain range or desert, 4 deep strait never bridged, 5 ocean basin). For each pair and each of three groups (Rodentia, Squamata, Amphibia) the Sørensen dissimilarity (1 - 2|A∩B|/(|A|+|B|)) of species sets (GBIF occurrences, >= 3 records per species in the box) is computed and averaged over the three groups. SUPPORTS if Spearman's rho between mean dissimilarity and barrier rank is >= 0.5 with p < 0.01 (n = 26), AND the partial Spearman correlation controlling for log centroid distance is > 0 with p < 0.05, AND mean dissimilarity of the rank-0 (no barrier) pairs is lower than that of every barrier class with rank >= 2.",
   "fail_criterion": "Pre-registered: REFUTES if Spearman's rho <= 0, or if the no-barrier pairs are on average at least as dissimilar as the deep-strait and ocean pairs (ranks 4-5). Any other outcome is MIXED. A pair in which any group has fewer than 10 species in either box is dropped for that group; if fewer than 20 pairs retain all three groups, groups are averaged over those available and this is reported; if fewer than 15 pairs remain the result is inconclusive (underpowered).",
-  "planned_datasets": ["gbif-occurrence-search-api"],
+  "planned_datasets": [
+    "gbif-occurrence-search-api"
+  ],
   "interpretation": "Darwin's 'barriers of any kind' are represented by six classes with replicate pairs, ranked by a pre-registered judgement of how impassable and long-standing they are: contiguous land (0), the Amazon main stem (1), straits shallower than ~120 m that were land during Pleistocene low stands (English Channel, Palk Strait, Bass Strait, Malacca Strait, Torres Strait, Gulf of Paria, Sunda Strait) (2), high mountain ranges (Andes twice, Sierra Nevada) and wide deserts (Nullarbor, Sahara) (3), deep straits with no Pleistocene land bridge (Makassar Strait, Lombok Strait, Mozambique Channel, Yucatán Channel) (4), and ocean basins (Atlantic, Indian) (5). 'Difference between the inhabitants' is species-level Sørensen dissimilarity of three terrestrial, non-volant, non-marine vertebrate groups; bats and birds are excluded because they fly over barriers, and marine mammals because the barriers are their habitat. Distance is a confound Darwin himself names ('distance... is of less importance than barriers'), so the partial correlation controlling for distance is part of the criterion. Introduced species (notably Rattus, Mus, Hemidactylus, Rhinella marina) cannot be removed from GBIF data in general; Rattus and Mus species are removed explicitly, the rest remain and bias against the claim by making distant regions look similar.",
-  "datasets": [],
-  "method": "",
-  "measured": {},
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-bdd1", "date": "2026-10-31" },
+  "datasets": [
+    {
+      "id": "gbif-occurrence-search-api",
+      "name": "GBIF occurrence search API (facet counts of speciesKey for Rodentia, Squamata, Amphibia within bounding boxes; GBIF Backbone Taxonomy for keys)",
+      "landing_url": "https://www.gbif.org/developer/occurrence",
+      "doi": null,
+      "version": "live API, retrieved 2026-10-31T04:52:13Z to 2026-10-31T04:54:25Z",
+      "license": "varies by publisher (CC0 / CC BY / CC BY-NC); API output is aggregated counts",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/species/1459",
+          "retrieved_at": "2026-10-31T04:52:13Z",
+          "byte_size": 729,
+          "sha256": "97aec709cb1a7655fa95f231a645ff9de15fedd68b2a4274014f736231d5e3e0"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/11592253",
+          "retrieved_at": "2026-10-31T04:52:14Z",
+          "byte_size": 714,
+          "sha256": "2f2239e91b247aea9f5e533be5be1e22e4e091d24587ff6559741d62bc6422fe"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/species/131",
+          "retrieved_at": "2026-10-31T04:52:14Z",
+          "byte_size": 693,
+          "sha256": "70b7b954eff5b07c6bc9cec83601d26b74f3595fd45f4bbc3d523e53c27bc73f"
+        }
+      ],
+      "files_note": "First three of 265 requests shown; all requests with URL, retrieval time, byte size and SHA-256 are in derived/fetch_log.csv.gz.",
+      "role": "species presence lists (>= 3 records) for the 52 boxes of the 26 region pairs"
+    }
+  ],
+  "method": "For each of 52 pre-registered boxes and three groups (Rodentia minus Rattus and Mus, Squamata, Amphibia) the GBIF occurrence API returned speciesKey facet counts (coordinates present, no geospatial issue, PRESENT, 1900-2026, fossil/living specimens excluded); species with >= 3 records formed the box's set. For each of the 26 pairs the Sørensen dissimilarity was computed per group (pairs with < 10 species in a box were dropped for that group) and averaged over the available groups; the Siberian control pair had too few species in every group and was dropped (n = 25). Spearman's rho between mean dissimilarity and the pre-registered barrier rank, and the partial Spearman correlation controlling for log centroid distance, were computed and compared with the pre-registered thresholds, together with the mean dissimilarity per barrier class.",
+  "measured": {
+    "value": 0.7355,
+    "unit": "Spearman rho between barrier rank and mean species-level Sørensen dissimilarity (Rodentia, Squamata, Amphibia)",
+    "n": 25,
+    "uncertainty": "one-sided p=1.40e-05; partial Spearman controlling log distance rho=0.800, one-sided p=1.34e-06",
+    "extra": {
+      "spearman_p_one_sided": 1.3983138425149794e-05,
+      "partial_rho_given_log_distance": 0.8002612694847734,
+      "partial_p_one_sided": 1.3354945853638611e-06,
+      "spearman_rho_distance_vs_dissim": 0.40076923076923077,
+      "mean_dissim_by_barrier_class": {
+        "none": {
+          "n": 6,
+          "mean_dissim": 0.42470738000299485,
+          "mean_distance_km": 734.757236954211,
+          "rank": 0
+        },
+        "river": {
+          "n": 1,
+          "mean_dissim": 0.6118404118404118,
+          "mean_distance_km": 555.9746332227936,
+          "rank": 1
+        },
+        "shallow-strait": {
+          "n": 7,
+          "mean_dissim": 0.49943461142566886,
+          "mean_distance_km": 375.71418696805057,
+          "rank": 2
+        },
+        "desert": {
+          "n": 2,
+          "mean_dissim": 0.8413250379188142,
+          "mean_distance_km": 2293.289517677312,
+          "rank": 3
+        },
+        "mountains": {
+          "n": 3,
+          "mean_dissim": 0.7346925420710685,
+          "mean_distance_km": 293.06759835664224,
+          "rank": 3
+        },
+        "deep-strait": {
+          "n": 4,
+          "mean_dissim": 0.778365632150863,
+          "mean_distance_km": 499.3706015661352,
+          "rank": 4
+        },
+        "ocean": {
+          "n": 2,
+          "mean_dissim": 0.9932524011506021,
+          "mean_distance_km": 5893.468938531834,
+          "rank": 5
+        }
+      },
+      "none_mean": 0.42470738000299485,
+      "deep_strait_and_ocean_mean": 0.849994555150776,
+      "none_below_every_class_rank_ge2": true,
+      "pairs_with_all_three_groups": 12,
+      "per_group_spearman_rho": {
+        "Rodentia": 0.5078143931353836,
+        "Squamata": 0.7000839203258787,
+        "Amphibia": 0.6985478995145574
+      },
+      "excluded_genus_keys": {
+        "Rodentia": {
+          "Rattus": 2439223,
+          "Mus": 9800657
+        }
+      }
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.8,
+  "caveats": [
+    "Rodentia reached the 10-species minimum in only 13 of 25 pairs (islands and arid regions are thinly recorded), so most pairs are averaged over Squamata and Amphibia; all three groups individually show positive rank correlations (0.51, 0.70, 0.70).",
+    "Distance is only partly controlled: the desert and ocean pairs are much farther apart (2000-8600 km) than the others, and climate differs across the Sahara, Nullarbor and Sierra Nevada pairs. The partial correlation (0.80) and the fact that the mountain and deep-strait pairs (240-910 km) are more dissimilar than the no-barrier pairs at 560-1120 km address but do not remove this.",
+    "Barrier ranks are a pre-registered judgement; replicate counts per class are small (river 1, desert 2, ocean 2, mountains 3).",
+    "Introduced species remain in the data except Rattus and Mus; they lower dissimilarity across the widest barriers and so bias against the claim.",
+    "The Bali-Lombok pair is the least dissimilar deep-strait pair (0.49), consistent with the known weakness of Wallace's line for reptiles and amphibians; it is reported, not removed.",
+    "Boxes are bounding boxes with uneven sampling intensity; poorly sampled boxes inflate dissimilarity regardless of barrier.",
+    "GBIF is a live resource; re-running reproduces the method but counts drift as records are added."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-bdd1",
+    "date": "2026-10-31"
+  },
   "preregistration": {
-    "groups": { "Rodentia": 1459, "Squamata": 11592253, "Amphibia": 131 },
-    "excluded_genera": { "Rodentia": ["Rattus", "Mus"] },
+    "groups": {
+      "Rodentia": 1459,
+      "Squamata": 11592253,
+      "Amphibia": 131
+    },
+    "excluded_genera": {
+      "Rodentia": [
+        "Rattus",
+        "Mus"
+      ]
+    },
     "min_records_per_species": 3,
     "min_species_per_box": 10,
-    "basis_of_record_excluded": ["FOSSIL_SPECIMEN", "LIVING_SPECIMEN"],
+    "basis_of_record_excluded": [
+      "FOSSIL_SPECIMEN",
+      "LIVING_SPECIMEN"
+    ],
     "year_range": "1900,2026",
-    "barrier_ranks": { "none": 0, "river": 1, "shallow-strait": 2, "mountains": 3, "desert": 3, "deep-strait": 4, "ocean": 5 },
+    "barrier_ranks": {
+      "none": 0,
+      "river": 1,
+      "shallow-strait": 2,
+      "mountains": 3,
+      "desert": 3,
+      "deep-strait": 4,
+      "ocean": 5
+    },
     "pairs": [
-      { "id": "guiana-w-e", "barrier": "none", "a": [-62, 1, -59, 4], "b": [-56, 1, -53, 4], "note": "Guiana shield lowland forest, no major barrier" },
-      { "id": "tanzania-kenya", "barrier": "none", "a": [34, -7, 37, -4], "b": [36, -1, 39, 2], "note": "East African savanna" },
-      { "id": "kansas-texas", "barrier": "none", "a": [-100, 37, -97, 40], "b": [-100, 32, -97, 35], "note": "Great Plains" },
-      { "id": "france-germany", "barrier": "none", "a": [-1, 46, 2, 49], "b": [8, 48, 11, 51], "note": "western European lowlands" },
-      { "id": "siberia-w-e", "barrier": "none", "a": [60, 57, 63, 60], "b": [84, 57, 87, 60], "note": "West Siberian taiga, long-distance control" },
-      { "id": "guiana-amapa", "barrier": "none", "a": [-62, 1, -59, 4], "b": [-52, 0, -49, 3], "note": "north bank of the Amazon, long-distance control" },
-      { "id": "nsw-qld-inland", "barrier": "none", "a": [146, -34, 149, -31], "b": [146, -28, 149, -25], "note": "eastern Australian interior" },
-      { "id": "amazon-banks", "barrier": "river", "a": [-62, -2, -58, 0.5], "b": [-62, -7, -58, -4.5], "note": "north vs south bank of the Amazon main stem near Manaus" },
-      { "id": "england-france", "barrier": "shallow-strait", "a": [-3, 50.3, 1, 52], "b": [-1.5, 48, 2, 50], "note": "English Channel" },
-      { "id": "srilanka-india", "barrier": "shallow-strait", "a": [79.5, 5.8, 82, 10], "b": [77, 8, 80, 11.5], "note": "Palk Strait" },
-      { "id": "tasmania-victoria", "barrier": "shallow-strait", "a": [144.5, -43.8, 148.5, -40.5], "b": [143, -39, 147, -36.5], "note": "Bass Strait" },
-      { "id": "sumatra-malaya", "barrier": "shallow-strait", "a": [95, 2, 100, 6], "b": [100, 3, 104, 7], "note": "Strait of Malacca" },
-      { "id": "newguinea-capeyork", "barrier": "shallow-strait", "a": [140, -9.5, 144, -6.5], "b": [141.5, -15, 145, -10.5], "note": "Torres Strait" },
-      { "id": "trinidad-venezuela", "barrier": "shallow-strait", "a": [-62, 10, -60.8, 11], "b": [-64, 8.5, -61.5, 10.5], "note": "Gulf of Paria" },
-      { "id": "java-sumatra", "barrier": "shallow-strait", "a": [105, -7.5, 108, -5.8], "b": [103, -6, 106, -3.5], "note": "Sunda Strait" },
-      { "id": "ecuador-coast-amazon", "barrier": "mountains", "a": [-80.5, -3, -78.8, 0], "b": [-77.5, -3, -75.5, 0], "note": "northern Andes" },
-      { "id": "chile-mendoza", "barrier": "mountains", "a": [-72, -36, -70.3, -33], "b": [-69.5, -36, -67.5, -33], "note": "southern Andes" },
-      { "id": "california-nevada", "barrier": "mountains", "a": [-121.5, 36, -119.5, 38.5], "b": [-118.5, 37, -116.5, 39.5], "note": "Sierra Nevada (climate also differs)" },
-      { "id": "sw-se-australia", "barrier": "desert", "a": [115, -35, 118, -32], "b": [137, -36, 140, -33], "note": "Nullarbor" },
-      { "id": "maghreb-sahel", "barrier": "desert", "a": [7, 34, 11, 37], "b": [6, 11, 10, 14], "note": "Sahara (climate also differs)" },
-      { "id": "borneo-sulawesi", "barrier": "deep-strait", "a": [116, -1, 119, 2.5], "b": [119, -3, 121.5, 0.5], "note": "Makassar Strait (Wallace's line)" },
-      { "id": "bali-lombok", "barrier": "deep-strait", "a": [114.4, -8.9, 115.8, -8], "b": [115.8, -9, 116.8, -8.1], "note": "Lombok Strait (Wallace's line)" },
-      { "id": "madagascar-mozambique", "barrier": "deep-strait", "a": [43.5, -20, 46.5, -16], "b": [35, -19, 38, -15], "note": "Mozambique Channel" },
-      { "id": "cuba-yucatan", "barrier": "deep-strait", "a": [-85, 21.5, -81, 23.3], "b": [-90, 19.5, -86.5, 21.7], "note": "Yucatán Channel" },
-      { "id": "westafrica-brazil", "barrier": "ocean", "a": [-13, 5, -9, 9], "b": [-38, -8, -35, -4], "note": "Atlantic, both humid tropical coasts" },
-      { "id": "cape-swaustralia", "barrier": "ocean", "a": [18, -34.5, 21, -32], "b": [115, -35, 118, -32], "note": "Indian Ocean, both Mediterranean climates" }
+      {
+        "id": "guiana-w-e",
+        "barrier": "none",
+        "a": [
+          -62,
+          1,
+          -59,
+          4
+        ],
+        "b": [
+          -56,
+          1,
+          -53,
+          4
+        ],
+        "note": "Guiana shield lowland forest, no major barrier"
+      },
+      {
+        "id": "tanzania-kenya",
+        "barrier": "none",
+        "a": [
+          34,
+          -7,
+          37,
+          -4
+        ],
+        "b": [
+          36,
+          -1,
+          39,
+          2
+        ],
+        "note": "East African savanna"
+      },
+      {
+        "id": "kansas-texas",
+        "barrier": "none",
+        "a": [
+          -100,
+          37,
+          -97,
+          40
+        ],
+        "b": [
+          -100,
+          32,
+          -97,
+          35
+        ],
+        "note": "Great Plains"
+      },
+      {
+        "id": "france-germany",
+        "barrier": "none",
+        "a": [
+          -1,
+          46,
+          2,
+          49
+        ],
+        "b": [
+          8,
+          48,
+          11,
+          51
+        ],
+        "note": "western European lowlands"
+      },
+      {
+        "id": "siberia-w-e",
+        "barrier": "none",
+        "a": [
+          60,
+          57,
+          63,
+          60
+        ],
+        "b": [
+          84,
+          57,
+          87,
+          60
+        ],
+        "note": "West Siberian taiga, long-distance control"
+      },
+      {
+        "id": "guiana-amapa",
+        "barrier": "none",
+        "a": [
+          -62,
+          1,
+          -59,
+          4
+        ],
+        "b": [
+          -52,
+          0,
+          -49,
+          3
+        ],
+        "note": "north bank of the Amazon, long-distance control"
+      },
+      {
+        "id": "nsw-qld-inland",
+        "barrier": "none",
+        "a": [
+          146,
+          -34,
+          149,
+          -31
+        ],
+        "b": [
+          146,
+          -28,
+          149,
+          -25
+        ],
+        "note": "eastern Australian interior"
+      },
+      {
+        "id": "amazon-banks",
+        "barrier": "river",
+        "a": [
+          -62,
+          -2,
+          -58,
+          0.5
+        ],
+        "b": [
+          -62,
+          -7,
+          -58,
+          -4.5
+        ],
+        "note": "north vs south bank of the Amazon main stem near Manaus"
+      },
+      {
+        "id": "england-france",
+        "barrier": "shallow-strait",
+        "a": [
+          -3,
+          50.3,
+          1,
+          52
+        ],
+        "b": [
+          -1.5,
+          48,
+          2,
+          50
+        ],
+        "note": "English Channel"
+      },
+      {
+        "id": "srilanka-india",
+        "barrier": "shallow-strait",
+        "a": [
+          79.5,
+          5.8,
+          82,
+          10
+        ],
+        "b": [
+          77,
+          8,
+          80,
+          11.5
+        ],
+        "note": "Palk Strait"
+      },
+      {
+        "id": "tasmania-victoria",
+        "barrier": "shallow-strait",
+        "a": [
+          144.5,
+          -43.8,
+          148.5,
+          -40.5
+        ],
+        "b": [
+          143,
+          -39,
+          147,
+          -36.5
+        ],
+        "note": "Bass Strait"
+      },
+      {
+        "id": "sumatra-malaya",
+        "barrier": "shallow-strait",
+        "a": [
+          95,
+          2,
+          100,
+          6
+        ],
+        "b": [
+          100,
+          3,
+          104,
+          7
+        ],
+        "note": "Strait of Malacca"
+      },
+      {
+        "id": "newguinea-capeyork",
+        "barrier": "shallow-strait",
+        "a": [
+          140,
+          -9.5,
+          144,
+          -6.5
+        ],
+        "b": [
+          141.5,
+          -15,
+          145,
+          -10.5
+        ],
+        "note": "Torres Strait"
+      },
+      {
+        "id": "trinidad-venezuela",
+        "barrier": "shallow-strait",
+        "a": [
+          -62,
+          10,
+          -60.8,
+          11
+        ],
+        "b": [
+          -64,
+          8.5,
+          -61.5,
+          10.5
+        ],
+        "note": "Gulf of Paria"
+      },
+      {
+        "id": "java-sumatra",
+        "barrier": "shallow-strait",
+        "a": [
+          105,
+          -7.5,
+          108,
+          -5.8
+        ],
+        "b": [
+          103,
+          -6,
+          106,
+          -3.5
+        ],
+        "note": "Sunda Strait"
+      },
+      {
+        "id": "ecuador-coast-amazon",
+        "barrier": "mountains",
+        "a": [
+          -80.5,
+          -3,
+          -78.8,
+          0
+        ],
+        "b": [
+          -77.5,
+          -3,
+          -75.5,
+          0
+        ],
+        "note": "northern Andes"
+      },
+      {
+        "id": "chile-mendoza",
+        "barrier": "mountains",
+        "a": [
+          -72,
+          -36,
+          -70.3,
+          -33
+        ],
+        "b": [
+          -69.5,
+          -36,
+          -67.5,
+          -33
+        ],
+        "note": "southern Andes"
+      },
+      {
+        "id": "california-nevada",
+        "barrier": "mountains",
+        "a": [
+          -121.5,
+          36,
+          -119.5,
+          38.5
+        ],
+        "b": [
+          -118.5,
+          37,
+          -116.5,
+          39.5
+        ],
+        "note": "Sierra Nevada (climate also differs)"
+      },
+      {
+        "id": "sw-se-australia",
+        "barrier": "desert",
+        "a": [
+          115,
+          -35,
+          118,
+          -32
+        ],
+        "b": [
+          137,
+          -36,
+          140,
+          -33
+        ],
+        "note": "Nullarbor"
+      },
+      {
+        "id": "maghreb-sahel",
+        "barrier": "desert",
+        "a": [
+          7,
+          34,
+          11,
+          37
+        ],
+        "b": [
+          6,
+          11,
+          10,
+          14
+        ],
+        "note": "Sahara (climate also differs)"
+      },
+      {
+        "id": "borneo-sulawesi",
+        "barrier": "deep-strait",
+        "a": [
+          116,
+          -1,
+          119,
+          2.5
+        ],
+        "b": [
+          119,
+          -3,
+          121.5,
+          0.5
+        ],
+        "note": "Makassar Strait (Wallace's line)"
+      },
+      {
+        "id": "bali-lombok",
+        "barrier": "deep-strait",
+        "a": [
+          114.4,
+          -8.9,
+          115.8,
+          -8
+        ],
+        "b": [
+          115.8,
+          -9,
+          116.8,
+          -8.1
+        ],
+        "note": "Lombok Strait (Wallace's line)"
+      },
+      {
+        "id": "madagascar-mozambique",
+        "barrier": "deep-strait",
+        "a": [
+          43.5,
+          -20,
+          46.5,
+          -16
+        ],
+        "b": [
+          35,
+          -19,
+          38,
+          -15
+        ],
+        "note": "Mozambique Channel"
+      },
+      {
+        "id": "cuba-yucatan",
+        "barrier": "deep-strait",
+        "a": [
+          -85,
+          21.5,
+          -81,
+          23.3
+        ],
+        "b": [
+          -90,
+          19.5,
+          -86.5,
+          21.7
+        ],
+        "note": "Yucatán Channel"
+      },
+      {
+        "id": "westafrica-brazil",
+        "barrier": "ocean",
+        "a": [
+          -13,
+          5,
+          -9,
+          9
+        ],
+        "b": [
+          -38,
+          -8,
+          -35,
+          -4
+        ],
+        "note": "Atlantic, both humid tropical coasts"
+      },
+      {
+        "id": "cape-swaustralia",
+        "barrier": "ocean",
+        "a": [
+          18,
+          -34.5,
+          21,
+          -32
+        ],
+        "b": [
+          115,
+          -35,
+          118,
+          -32
+        ],
+        "note": "Indian Ocean, both Mediterranean climates"
+      }
     ]
   }
 }
