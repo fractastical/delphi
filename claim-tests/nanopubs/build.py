@@ -86,13 +86,13 @@ RECORDS = [
          test="Exact two-sided binomial test of fixed versus lost lines against 0.5 among the 58 of 107 lines that had fixed or lost bw75 by the last recorded generation",
          pvalue=("uncertainty", r"p = ([0-9.]+)"), checks=["28", "30", "58", "107", "0.90"],
          dne="Only the neutral limit u(p) = p at p = 0.5 is tested; the selection-dependent formula is untested because the selection coefficient of bw75 is not independently known; 49 lines were still segregating and are censored; the data are a transcription of Buri's table."),
-    dict(id="darwin1859-ch11-13", project="darwin-origin", status="supported",
+    dict(id="darwin1859-ch11-13", dir="darwin1859-ch11-13--delphi-claims", project="darwin-origin", status="supported",
          plain="Ice ages lasted a very long time and happened in both hemispheres at once; the deep-sea record and the Antarctic ice record agree on this.",
          label="Supported: 38% of the last 2.6 million years lies in cold, ice-rich states, 34 such intervals last at least 10 thousand years, the last glacial maximum is among the coldest, and Antarctic temperature tracks global ice volume (correlation 0.88 at a 2 kyr lag)",
          test="Fraction of the 0 to 2600 ka LR04 benthic d18O stack at or above 4.0 per mil; count of contiguous intervals of at least 10 kyr; Pearson correlation of EPICA Dome C temperature with negative LR04 d18O over 0 to 800 ka at lags of -6 to +6 kyr",
          pvalue=None, checks=["0.3798", "34", "4.88", "0.8758", "2"],
          dne="Shows many glacial cycles rather than Darwin's single long Glacial period; simultaneity is shown at orbital resolution for two records (a global benthic stack dominated by northern ice and one Antarctic site), not for the tropics, the ocean surface or millennial-scale bipolar anti-phasing."),
-    dict(id="thompson1917-ch03-07", project="thompson-growth-form", status="supported",
+    dict(id="thompson1917-ch03-07", dir="thompson1917-ch03-07--delphi-claims", project="thompson-growth-form", status="supported",
          plain="As children grow, their weight rises roughly with the cube of their height; a US survey of 2 to 19 year olds gives an exponent of 2.7 to 2.9.",
          label="Supported: the log-log exponent of mean weight on mean height across ages 2 to 19 is 2.74 for males (95% CI 2.59 to 2.89) and 2.86 for females, inside the pre-registered 2.5 to 3.5 band; a pure cubic model explains 98 to 99% of the variance in mean weight",
          test="Ordinary least squares of log mean weight on log mean height over 18 one-year age bins per sex (NHANES 2013 to 2018, survey-weighted means) with a t-based 95% confidence interval; R-squared of the cubic model on the original scale",
@@ -104,7 +104,7 @@ RECORDS = [
          test="Exact one-sided Mann-Whitney U test, pinnipeds (n = 2 species) below terrestrial carnivorans (n = 40), on the withers index (mean relative neural-spine height T1-T4 over T10-T13); cetacean withers index compared with the terrestrial distribution",
          pvalue=("uncertainty", r"WI p = ([0-9.]+)"), checks=["1.023", "1.238", "2.993", "0.0012", "74"],
          dne="Only two pinniped species are available; sirenians and the bird-pelvis half of the claim were not tested; the spines are reduced, not literally vanished; no phylogenetic comparative model was fitted; the two datasets use different spine-height protocols, so only the within-column ratio is compared."),
-    dict(id="thompson1917-ch04-13", project="thompson-growth-form", status="refuted",
+    dict(id="thompson1917-ch04-13", dir="thompson1917-ch04-13--delphi-claims", project="thompson-growth-form", status="refuted",
          plain="Thompson said most species have 6 to 16 chromosomes in their sex cells and very few have more than 16; among plants, a third of species have more than 16.",
          label="Refuted: 34.3% of 69,948 plant species have a haploid chromosome number above 16 against 1.7% below 6; 64.1% lie in 6 to 16",
          test="Proportions of species by haploid-number class from the Chromosome Counts Database (median count per species, gametophytic level confirmed on reference species); binomial standard error below 0.002; post-hoc sensitivity (lowest count per species, genus medians, angiosperms only) all give the same verdict",
@@ -122,13 +122,13 @@ RECORDS = [
          test="Per-series monotonic trend (Spearman |rho| >= 0.7, p < 0.05) and percentage change over ontogeny in conch width index, umbilical width index and whorl expansion rate; classification allometric / intermediate / gnomonic by pre-registered thresholds",
          pvalue=None, checks=["0.939", "179", "177", "168", "10", "1"],
          dne="The refutation is carried almost entirely by the umbilical width index; the whorl expansion rate, which encodes the spiral angle, stays within 25% in 80% of series, so the spiral itself is close to logarithmic; without UWI the rule would give 'mixed'; ammonoids only, from a sample chosen for phased ontogenies; gastropods, bivalves, horns and tusks untested."),
-    dict(id="darwin1859-ch09-03", project="darwin-origin", status="refuted", reading="numeric",
+    dict(id="darwin1859-ch09-03", dir="darwin1859-ch09-03--delphi-claims", project="darwin-origin", status="refuted", reading="numeric",
          plain="Darwin estimated that more than 300 million years had passed since the late Chalk; the modern timescale puts the end of the Chalk at 66 million years ago.",
          label="Refuted: the end of the Chalk (top of the Maastrichtian) is 66.0 Ma, 4.6 times younger than Darwin's 306.7 million years; the Weald-denudation and start-of-Late-Cretaceous readings (100.5 Ma, ratio 3.05) are refuted too",
          test="One-number comparison of ICS chronostratigraphic boundary ages (Macrostrat API, international ages; uncertainties about 0.2 Ma) with the pre-registered threshold of 225 Ma; no sampling test",
          pvalue=None, checks=["66", "306.66", "4.646", "225", "83.6", "72.2", "100.5", "3.05"],
          dne="Does not evaluate Darwin's erosion rate, only the duration he inferred from it; refutes the figure as stated in the first edition, which Darwin withdrew in the third; the qualitative reading that geological time is immense is a separate record (darwin1859-ch09-03--qualitative)."),
-    dict(id="darwin1859-ch09-03", project="darwin-origin", status="inconclusive", reading="qualitative",
+    dict(id="darwin1859-ch09-03", dir="darwin1859-ch09-03--delphi-claims", project="darwin-origin", status="inconclusive", reading="qualitative",
          plain="Darwin's underlying point was that geological time is immense, far longer than the physics of his day allowed; that reading was not put to a pre-registered test.",
          label="Not tested: the qualitative reading of darwin1859-ch09-03 (geological time is immense) had no pre-registered pass or fail criterion, so no verdict is recorded",
          test="None. The readings check (added after the numeric result, no number or threshold changed) notes that the modern timescale is consistent with this reading (the Mesozoic began about 252 Ma; the Earth is about 4.5 Gyr old), but the pre-registered test operationalized only the 300 million year figure",
@@ -184,14 +184,16 @@ def commit_info(sha):
 
 
 def history(relpath):
-    shas = git("log", "--format=%H", "--reverse", "--", relpath).split("\n")
-    return [commit_info(s) for s in shas if s]
+    # --follow keeps the pre-registration commit when a test directory was renamed later.
+    shas = git("log", "--follow", "--format=%H", "--", relpath).split("\n")
+    return [commit_info(s) for s in reversed(shas) if s]
 
 
 def build(rec, now):
-    tdir = os.path.join(TESTS, rec["project"], rec["id"])
-    rel_result = f"claim-tests/{rec['project']}/{rec['id']}/result.json"
-    rel_analysis = f"claim-tests/{rec['project']}/{rec['id']}/analysis.py"
+    tdir_name = rec.get("dir", rec["id"])
+    tdir = os.path.join(TESTS, rec["project"], tdir_name)
+    rel_result = f"claim-tests/{rec['project']}/{tdir_name}/result.json"
+    rel_analysis = f"claim-tests/{rec['project']}/{tdir_name}/analysis.py"
     r = json.load(open(os.path.join(tdir, "result.json"), encoding="utf-8"))
     blob = json.dumps(r)
     for tok in rec["checks"]:
