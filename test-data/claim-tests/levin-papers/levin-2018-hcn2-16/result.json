@@ -1,0 +1,24 @@
+{
+  "claim_id": "levin-2018-hcn2-16",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2018-hcn2-16",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-10-31T19:47:00Z",
+  "related_claims": ["levin-2018-hcn2-12"],
+  "hypothesis": "The GYG->AAA mouse HCN2 construct used in the paper can still co-assemble with wild-type HCN2 subunits (the premise that makes it dominant-negative), so that a construct which fails to disrupt patterning can be read as evidence that native HCN2 activity is not required.",
+  "pass_criterion": "Pre-registered. Model: mouse HCN2 (UniProt O88703) residues 131-520 (assembly region, S1-S6 and C-linker). AlphaFold3 on the Nebius Scientific AI Platform predicts (a) a wild-type homotetramer, (b) a 1 AAA : 3 WT heterotetramer and (c) an AAA homotetramer. stab-ddG on the wild-type tetramer predicts the change in binding energy between chain A and chains B+C+D for G402A/Y403A/G404A on chain A. Supports the premise if ALL of: WT ipTM >= 0.60; heterotetramer ipTM >= WT ipTM - 0.10; AAA binding ddG <= 1.0 kcal/mol; and the sensitivity control (chain-A residue with the most inter-subunit heavy-atom contacts within 4 A, mutated to Arg) gives ddG >= 2.0 kcal/mol.",
+  "fail_criterion": "Pre-registered. Refutes the premise if the sensitivity control passes and either AAA ddG >= 2.0 kcal/mol or heterotetramer ipTM < WT ipTM - 0.20. Inconclusive (reason 'other') if WT ipTM < 0.60 or the sensitivity control gives ddG < 2.0 kcal/mol (assay cannot detect a disrupted interface). Anything else is mixed.",
+  "planned_datasets": [
+    "uniprot-o88703: UniProtKB canonical sequence of mouse HCN2 (the species and gene the paper states it used)",
+    "nebius-alphafold3: AlphaFold 3 v3.0.4 predictions on the Nebius Scientific AI Platform (raw input mode, platform MSA pipeline)",
+    "nebius-stab-ddg: stab-ddG binding-energy predictions on the Nebius Scientific AI Platform"
+  ],
+  "test_contract": {
+    "expected_observation": "The AAA pore mutation sits in the selectivity filter but leaves the subunit interfaces intact: mixed WT/AAA tetramers are predicted as confidently as WT tetramers, and the mutation barely changes predicted inter-subunit binding energy, while a deliberately disruptive interface mutation changes it a lot.",
+    "disconfirming_observation": "AAA subunits are predicted to bind their neighbours much more weakly (ddG >= 2 kcal/mol) or mixed tetramers are predicted with much lower interface confidence, so the construct would be a non-assembling null rather than a dominant-negative and could not suppress native HCN2.",
+    "admissible_datasets": "The sequence of the gene and species the paper used; structure and energy predictors that take only that sequence (and platform MSAs) as input, with an internal sensitivity control.",
+    "inference_method": "AlphaFold3 interface confidence (ipTM) compared between WT and mixed tetramers with fixed margins; stab-ddG binding ddG compared with fixed thresholds, gated on a positive-control mutation that must register as disruptive."
+  },
+  "interpretation": "This tests a premise of the claim, not the claim's phenotype: whether the reagent can do what 'dominant-negative' requires (co-assemble and poison the tetramer). That native HCN2 activity is not needed for brain patterning (levin-2018-hcn2-16), and that rescue needs conductance (levin-2018-hcn2-12), both rest on it. Non-conduction itself is not tested; computational structure predictors are known to be insensitive to pore point mutations, and the paper reports voltage-clamp data for that (Supplementary Fig. 2A).",
+  "agent": { "kind": "local-agent", "model": "claude-opus-5.5", "run": "cursor chat 2026-10-31 nebius structure tests", "date": "2026-10-31" }
+}

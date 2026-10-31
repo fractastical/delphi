@@ -1,0 +1,23 @@
+{
+  "claim_id": "levin-2015-girardia-11",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2015-girardia-11",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-10-31T19:49:00Z",
+  "hypothesis": "Octanol engages a planarian gap-junction channel better than hexanol does, consistent with the paper's premise that hexanol 'does not efficiently block gap junction channels'.",
+  "pass_criterion": "Pre-registered. Receptor: AlphaFold3 (Nebius) model of the smedinx-11 octameric hemichannel (Schmidtea mediterranea innexin, UniProt A7RDN9, residues 1-370). Ligands docked with DiffDock v1.1 (Nebius), 3 seeds x 4 poses each: ethanol (negative), hexanol, heptanol, octanol, carbenoxolone (positive, a documented innexin/pannexin blocker). For each ligand: mean over seeds of the top-pose DiffDock confidence, and fraction of all poses whose centroid lies within 8 A of the channel axis inside the transmembrane span. Supports: octanol confidence exceeds hexanol's by more than 2 x the larger across-seed SD AND octanol's in-pore fraction exceeds hexanol's by >= 0.25, with carbenoxolone ranking above ethanol on confidence.",
+  "fail_criterion": "Pre-registered. Refutes: hexanol confidence >= octanol's and hexanol in-pore fraction >= octanol's. Inconclusive (reason 'not-operationalizable'): carbenoxolone does not outrank ethanol, the hexanol/octanol confidence difference is within 2 x the across-seed SD, or the hemichannel model's ipTM < 0.50. Anything else is mixed.",
+  "planned_datasets": [
+    "uniprot-a7rdn9: UniProtKB sequence of smedinx-11 (Schmidtea mediterranea); no Girardia dorotocephala innexin sequence is in UniProtKB",
+    "nebius-alphafold3: AlphaFold 3 v3.0.4 octamer prediction on the Nebius Scientific AI Platform",
+    "nebius-diffdock: DiffDock v1.1 docking on the Nebius Scientific AI Platform"
+  ],
+  "test_contract": {
+    "expected_observation": "Octanol docks into the hemichannel pore or transmembrane region more confidently and more often than hexanol, with the reference blocker outranking ethanol.",
+    "disconfirming_observation": "Hexanol docks as well as or better than octanol, both in confidence and pore occupancy.",
+    "admissible_datasets": "A planarian innexin with a documented role in regeneration, modelled as the assembled channel; docking that sees only the receptor structure and ligand SMILES; internal positive and negative ligand controls.",
+    "inference_method": "Difference in mean top-pose DiffDock confidence between octanol and hexanol, compared with across-seed variability; difference in pore-region pose fraction against a fixed 0.25 margin; gated on the carbenoxolone > ethanol control."
+  },
+  "interpretation": "Tests only the premise that octanol and hexanol differ in gap-junction engagement; the claim's phenotype (no altered head shapes after hexanol) needs new planarian experiments. Alkanol block of gap junctions is thought to act partly through the membrane rather than a defined binding site, and DiffDock confidence is a pose-quality score, not an affinity, so an inconclusive result is a likely and legitimate outcome. Schmidtea mediterranea substitutes for Girardia dorotocephala (both Tricladida; no Girardia innexin sequences are public).",
+  "agent": { "kind": "local-agent", "model": "claude-opus-5.5", "run": "cursor chat 2026-10-31 nebius structure tests", "date": "2026-10-31" }
+}
