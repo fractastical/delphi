@@ -217,6 +217,27 @@ def test_attestation_card_states_it_is_not_a_population_rate(browser, base):
 
 def test_mcp_tools_come_from_the_document(browser, base):
     pg = page(browser)
+    pg.goto(base + "#/work?tab=runtime")
+    pg.wait_for_selector("h2:has-text('Declared capabilities')")
+    assert "frontier_artifacts" in pg.locator("#main").inner_text()
+
+
+def test_system_view_keeps_author_report_and_measured_apart(browser, base):
+    pg = page(browser)
     pg.goto(base + "#/work")
-    pg.wait_for_selector("#w-c")
-    assert "frontier_artifacts" in pg.locator("section[aria-labelledby=w-c]").inner_text()
+    pg.wait_for_selector("h1:has-text('System')")
+    txt = pg.locator("#main").inner_text().lower()
+    assert "author report" in txt and "measured" in txt and "not reported: a snapshot cannot know it" in txt
+    pg.get_by_role("link", name="Resources").click()
+    pg.wait_for_selector("h2:has-text('actual versus unknown')")
+    assert pg.locator("#main").inner_text().lower().count("unknown") >= 3
+    pg.get_by_role("link", name="Receipts").click()
+    pg.wait_for_selector("h2:has-text('What has been measured')")
+    assert "does not cover" not in pg.locator("#main").inner_text().lower() and "receipt" in pg.locator("#main").inner_text().lower()
+    pg.get_by_role("link", name="Specs and goals").click()
+    pg.wait_for_selector("h2:has-text('SPEC-005 acceptance rows')")
+    pg.get_by_role("link", name="SPEC-005", exact=False).first.click()
+    pg.wait_for_selector("#drawer:not([hidden]) .md")
+    assert "Solver and Lean boundary" in pg.locator("#drawer").inner_text()
+    pg.go_back()
+    pg.wait_for_selector("#drawer", state="hidden")

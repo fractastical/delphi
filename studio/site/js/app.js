@@ -19,7 +19,7 @@
     e.preventDefault(); const v = {}; new FormData(form).forEach((val, k) => { if (String(val).trim()) v[k] = String(val).trim(); }); DF.go(build(v));
   }));
 
-  const NAV = [["frontier", "Frontier"], ["knowledge", "Knowledge"], ["engineering", "Engineering"], ["simulations", "Simulations"], ["evidence", "Evidence"], ["work", "Work"], ["belief", "Belief"]];
+  const NAV = [["frontier", "Frontier"], ["knowledge", "Knowledge"], ["engineering", "Engineering"], ["simulations", "Simulations"], ["evidence", "Evidence"], ["work", "System"], ["belief", "Belief"]];
   let snap = null; let lastView = null; let opener = null;
 
   function header(route) {

@@ -341,46 +341,6 @@
         ${A.items.map((x) => html`<tr><td><b>${x.slug}</b><br><span class="faint small">${x.source || ""}${x.article_year ? " · " + x.article_year : ""}</span></td><td>${x.stance}</td><td>${x.mechanical_status}</td><td>${U.pill(x.supports, x.supports === "yes" ? "ok" : x.supports === "no" ? "no" : "warn")}</td><td>${U.pill(x.fit, x.fit === "direct" ? "ok" : "warn")}</td><td>${(x.flags || []).map((f) => U.pill(f.replace(/_/g, " "), "grp"))}<br><span class="small">${x.note}</span></td></tr>`)}</tbody></table></div></section>`;
   }
 
-  /* ---------------- WORK ---------------- */
-  DF.views.work = function (snap) {
-    const live = DF.api.state.mode === "live";
-    return {
-      html: html`<section class="pagehead"><h1>Work</h1><p class="lede">Agents, capabilities, leases, resources and contributions. This page shows only what a connected runtime reports, plus what the repository declares. It does not draw activity that is not there.</p></section>
-      <section class="panel" aria-labelledby="w-r"><h2 id="w-r">Runtime</h2>
-        <p>${U.pill(live ? "live runtime" : "snapshot only", live ? "ok" : "warn")} ${DF.api.state.reason}.</p>
-        ${live ? html`<p>Namespace: <code>${DF.api.state.health.namespace || "not reported"}</code>.</p>` : html`<p class="note small">No runtime is connected, so there are no agents, leases, resources or contributions to show. Nothing below is simulated.</p>`}</section>
-      <section class="panel" aria-labelledby="w-e"><h2 id="w-e">Events, leases and contributions</h2><div id="events" role="status">Loading…</div></section>
-      ${live ? html`<section class="panel" aria-labelledby="w-n"><h2 id="w-n">What the live store holds</h2><p class="note small">Counts of records by kind, read by paging the catalog (50 per page). These are records, not independent observations: imported claims in particular repeat what their sources assert.</p>
-        <button class="btn small" type="button" id="countrecs">Count records by kind</button><div id="counts" role="status"></div></section>` : ""}
-      <section class="panel" aria-labelledby="w-c"><h2 id="w-c">Declared capabilities (MCP tools)</h2>
-        <p class="note small">Declared in the repository's MCP server, tested only with the official SDK client. A declared tool is not demonstrated competence; availability and observed success are separate facts, and no success receipts are attached here.</p>
-        <div class="tablewrap"><table><thead><tr><th>Tool</th><th>Mode</th><th>Documented in docs/mcp.md</th></tr></thead><tbody>${snap.capabilities.map((t) => html`<tr><td><code>${t.name}</code></td><td>${t.mode}</td><td>${t.documented_in_docs_mcp ? "yes" : "no"}</td></tr>`)}</tbody></table></div>
-        <p class="small">Writes need the <code>--allow-write</code> flag and an operator credential kept outside prompts. Contributions stay <i>proposed</i>; the executor cannot certify its own work. ${U.src("doc:mcp", "Read the MCP document")}</p></section>
-      <section class="panel" aria-labelledby="w-p"><h2 id="w-p">Planned assignments (as written in the repository)</h2>
-        <p class="note small">From <code>tasks/BUILD.md</code> at ${snap.label}. This is a plan with owners and acceptance text, <b>not live status</b>: nothing here says that any item is running, finished or healthy.</p>
-        <div class="tablewrap"><table><thead><tr><th>Priority</th><th>Deliverable</th><th>Owner</th><th>Status text at snapshot</th></tr></thead><tbody>${snap.board.map((r) => html`<tr><td>${r.priority}</td><td>${r.deliverable}</td><td>${r.owner}</td><td>${r.status_text}</td></tr>`)}</tbody></table></div></section>
-      <section class="panel" aria-labelledby="w-h"><h2 id="w-h">How work is counted</h2>
-        <p>Results, reuse and compute counts will appear only when derived from run receipts and recorded edges. Counts of test definitions, generated records or submitted jobs are not successful executions, and this page shows none of them.</p></section>`,
-      async after(root) {
-        const cb = root.querySelector("#countrecs");
-        if (cb) cb.addEventListener("click", async () => {
-          const out = root.querySelector("#counts"); cb.disabled = true; const rows = []; let capped = false;
-          try {
-            for (const kind of ["Claim", "Problem", "Evidence", "Assessment", "Action", "Actor", "ResourceOffer", "Interest", "Event"]) {
-              let n = 0, after = "", pages = 0;
-              do { const r = await DF.api.catalog({ kind, limit: 50, after }); n += r.records.length; after = r.next_cursor || ""; pages++; out.textContent = `Counting ${kind}… ${n}`; } while (after && pages < 200);
-              if (after) capped = true; rows.push([kind, n]);
-            }
-            out.innerHTML = html`<div class="tablewrap"><table><thead><tr><th>Kind</th><th>Records</th></tr></thead><tbody>${rows.map(([k, n]) => html`<tr><td>${k}</td><td>${n}</td></tr>`)}<tr><td><b>Total</b></td><td><b>${rows.reduce((a, r) => a + r[1], 0)}</b></td></tr></tbody></table></div>${capped ? html`<p class="small faint">Stopped at 200 pages for a kind; that count is a lower bound.</p>` : ""}<p class="small faint">Counts read from the live catalog just now; they are not independent observations and not a measure of progress.</p>`.toString();
-          } catch (e) { out.textContent = "Counting failed: " + e.message; } finally { cb.disabled = false; }
-        });
-        const host = root.querySelector("#events");
-        try { const r = await DF.api.events(); host.innerHTML = r.events.length ? html`<p class="small faint">Events are records emitted by the store, in sequence order; they say what was recorded, not that it is correct.</p><div class="tablewrap"><table><thead><tr><th>#</th><th>Kind</th><th>Id</th><th>Issuer</th><th>Created</th></tr></thead><tbody>${r.events.map((e) => html`<tr><td>${e.sequence}</td><td>${e.kind}</td><td><code>${e.id}</code></td><td>${e.issuer || ""}</td><td>${e.created_at || ""}</td></tr>`)}</tbody></table></div>${r.next_cursor ? html`<p class="small faint">More events exist than shown.</p>` : ""}`.toString() : `<p class="empty">${esc(r.note || "The runtime reports no events.")} No agents, leases or contributions are displayed.</p>`; }
-        catch (e) { host.innerHTML = `<p class="empty">Could not read events: ${esc(e.message)}. Nothing is displayed in their place.</p>`; }
-      },
-    };
-  };
-
   /* ---------------- BELIEF ---------------- */
   DF.views.belief = function (snap) {
     return {
@@ -400,9 +360,12 @@
         <p class="note small">Enter your own probabilities that each condition holds. The product assumes the four are independent, which they are not (mass enters C1 and C2 together). It is a way to see the shape of a bet, nothing more. It is not saved, not submitted, and is not scored.</p>
         <form id="scratch" class="scratch" novalidate>${[["v1", "V1 wing loading within envelope"], ["v2", "V2 launch speed reachable"], ["v3", "V3 no stability flag"], ["v4", "V4 no novel-appendage flag"]].map(([k, l]) => html`<div class="field"><label for="p-${k}">${l} <span class="unit">probability 0–1</span></label><input id="p-${k}" name="${k}" type="number" step="0.01" min="0" max="1" placeholder="not entered"></div>`)}</form>
         <p id="scratchout" class="verdictbox" role="status">Enter all four to see the product under independence.</p></section>
-      <section class="panel" aria-labelledby="b-a"><h2 id="b-a">Belief and forecast interface</h2>
-        <p>The belief/forecast service is not connected, so no stored belief appears here.</p>
-        <button class="btn small" type="button" id="beliefreq">Request beliefs for this mission</button><div class="adapter-out" id="beliefout" role="status"></div></section>`,
+      <section class="panel" aria-labelledby="b-a"><h2 id="b-a">Belief solver (declared scenario in, labelled result out)</h2>
+        <p class="note warn small"><b>Uncalibrated.</b> The result is the arithmetic consequence of the priors, factors, utilities and costs written in the scenario. Calibration against outcomes is unknown. It is not a truth score and not a measurement. The scenario below is the module's bundled <b>declared illustration</b>: no variant, assay or paper is referenced, and nothing in it was observed.</p>
+        <label for="scen" class="small"><b>Scenario JSON</b> (schema frontier-beliefs-0.1; numbers are ints or "p/q" strings, never floats)</label>
+        <textarea id="scen" rows="14" spellcheck="false" class="scen"></textarea>
+        <p><button class="btn small" type="button" id="beliefreq">Solve this scenario</button> <button class="btn small ghost" type="button" id="scenreset">Reset to the example</button></p>
+        <div id="beliefout" role="status"></div></section>`,
       after(root) {
         const nodes = [{ id: "V1", label: "V1 C1: wing loading ≤ 208.9", col: 0, row: 0, cls: "cur" }, { id: "V2", label: "V2 C2: launch speed reachable", col: 0, row: 1, cls: "cur" }, { id: "V3", label: "V3 C4: stability flag", col: 0, row: 2, cls: "cur" }, { id: "V4", label: "V4 C6a: novel-appendage flag", col: 0, row: 3, cls: "cur" },
           { id: "F1", label: "F1 rule: no flag raised", col: 1, row: 1, cls: "gen", sub: "factor" }, { id: "V5", label: "V5 no flag raised by these checks", col: 2, row: 1, cls: "cur" }];
@@ -418,12 +381,35 @@
           if (nums.some((n) => !isFinite(n) || n < 0 || n > 1)) { out.textContent = "Each probability must be between 0 and 1."; return; }
           out.textContent = `Product under independence: ${(nums.reduce((a, b) => a * b, 1)).toFixed(3)}. Your own arithmetic; not a forecast, not saved, not truth status.`;
         });
+        const ta = root.querySelector("#scen"); const ex = snap.belief_example;
+        ta.value = ex ? JSON.stringify(ex, null, 2) : "";
+        root.querySelector("#scenreset").addEventListener("click", () => { ta.value = ex ? JSON.stringify(ex, null, 2) : ""; root.querySelector("#beliefout").innerHTML = ""; });
         root.querySelector("#beliefreq").addEventListener("click", async () => {
-          const o = root.querySelector("#beliefout"); try { await DF.api.belief(); } catch (e) { o.className = "adapter-out unavailable"; o.textContent = e.name === "Unavailable" ? `Not connected: ${e.adapter}. ${e.detail}` : "Request failed: " + e.message; }
+          const o = root.querySelector("#beliefout"); let sc;
+          try { sc = JSON.parse(ta.value); } catch (e) { o.className = "adapter-out unavailable"; o.textContent = "The scenario is not valid JSON: " + e.message; return; }
+          o.className = "adapter-out"; o.textContent = "Solving…";
+          try { o.innerHTML = beliefResult(await DF.api.belief(sc)); }
+          catch (e) { o.className = "adapter-out unavailable"; o.innerHTML = html`${e.name === "Unavailable" ? `Not connected: ${e.adapter}. ${e.detail}` : e.message}${e.envelope && e.envelope.assumed_scope ? html`<p class="small">Calibrated: <b>${String(e.envelope.calibrated)}</b>. ${e.envelope.assumed_scope}</p>` : ""}`.toString(); }
         });
       },
     };
   };
+
+  /* Contract (docs/beliefs.md): guard on status === "ok" only; parse "p/q" exactly; an action may be {status: "impossible-under-its-assumptions"}. */
+  function beliefResult(env) {
+    const R = env.result || {}; const ok = env.status === "ok" && R.status === "ok"; const ex = (x) => DF.exact(x);
+    const head = html`<div class="verdictbox"><div class="vlabel">${ok ? "solved" : env.status === "ok" ? R.status : env.status}</div>
+      <p class="small">${env.schema} · calibrated: <b>${String(env.calibrated)}</b> · input <code>${(R.input_hash || "").slice(0, 16)}</code> · output <code>${(R.output_hash || "").slice(0, 16)}</code></p>
+      <p class="note small"><b>Scope.</b> ${env.assumed_scope || ""}</p>${R.metadata && R.metadata.calibration ? html`<p class="small"><b>Calibration.</b> ${R.metadata.calibration}</p>` : ""}</div>`;
+    if (!ok) return html`${head}${(R.reasons || []).length ? html`<h4>Reasons</h4><ul>${R.reasons.map((x) => html`<li>${typeof x === "string" ? x : JSON.stringify(x)}</li>`)}</ul>` : ""}${(R.duplicate_paths || []).length ? html`<h4>Duplicate evidence paths</h4><pre class="json">${JSON.stringify(R.duplicate_paths, null, 1)}</pre>` : ""}${R.diagnostics ? html`<h4>Diagnostics</h4><pre class="json">${JSON.stringify(R.diagnostics, null, 1)}</pre>` : ""}<p class="small faint">No posterior or decision is shown: the solver did not produce one.</p>`.toString();
+    const vars = Object.entries(R.variables || {}); const dec = R.decision || {}; const acts = Object.entries(dec.actions || {});
+    return html`${head}
+      <h4>Posterior (under the declared priors and factors)</h4><div class="tablewrap"><table><thead><tr><th>Variable</th><th>Event and context</th><th>Posterior</th><th>Notes</th></tr></thead><tbody>${vars.map(([id, v]) => html`<tr><td><b>${id}</b></td><td>${v.event}<br><span class="faint small">${v.context}</span></td><td>${Object.entries(v.posterior || {}).map(([s, p]) => html`${s}: ${ex(p)}<br>`)}</td><td class="small">prior: ${v.prior_method}${v.prior_only ? "; no factor touches it" : ""}${(v.ruled_out_states || []).length ? "; ruled out: " + v.ruled_out_states.join(", ") : ""}</td></tr>`)}</tbody></table></div>
+      ${acts.length ? html`<h4>Decision: ${dec.question || dec.id}</h4><div class="tablewrap"><table><thead><tr><th>Action</th><th>Forecast of the outcome</th><th>Expected value</th></tr></thead><tbody>${acts.map(([a, x]) => x && x.expected_value !== undefined ? html`<tr><td><b>${a}</b>${x.assumes && x.assumes.length ? html`<br><span class="small faint">assumes ${JSON.stringify(x.assumes)} (conditioning, not intervention)</span>` : ""}</td><td>${Object.entries(x.forecast || {}).map(([s, p]) => html`${s}: ${ex(p)}<br>`)}</td><td>${ex(x.expected_value)}</td></tr>` : html`<tr><td><b>${a}</b></td><td colspan="2">${U.pill(String((x && x.status) || "no value returned").replace(/-/g, " "), "warn")} No forecast or expected value exists for this action.</td></tr>`)}</tbody></table></div>
+        <p>${(dec.tied || []).length ? html`Tied: ${dec.tied.join(", ")}. No preferred action.` : dec.preferred ? html`Preferred under these assumptions: <b>${dec.preferred}</b>, by an expected-value margin of ${ex(dec.ev_margin_over_runner_up)}.` : "No preferred action."}</p>
+        ${dec.preferred_changes_when ? html`<h4>What would change it</h4>${(dec.preferred_changes_when.breakeven || []).map((b) => html`<p class="small">Preferred action changes to <b>${b.versus}</b> when P(${b.state}) is ${b.preferred_changes_to_hold_when_p_is || "past"} ${ex(b.p_threshold)} (currently ${ex(b.current_p)}).</p>`)}<p class="small">Flipping assumptions: ${(dec.preferred_changes_when.flipping_assumptions || []).join("; ") || "none listed"}.</p><p class="note small">${dec.preferred_changes_when.scope} “No flip listed” is not robustness.</p>` : ""}` : ""}
+      <p class="small faint">Exact rationals shown as written, with a decimal after “≈”. Not stored, not submitted as a claim, not a forecast scored against anything.</p>`.toString();
+  }
 
   /* ---------------- CATALOG / SEARCH ---------------- */
   DF.catalogView = function (snap, route, head, base) {

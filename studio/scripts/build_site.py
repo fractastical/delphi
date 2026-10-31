@@ -194,6 +194,48 @@ def simulation_manifests(ins: Inputs) -> list[dict]:
     return out
 
 
+def checklist(text: str) -> list[dict]:
+    return [{"done": m.group(1) == "x", "text": m.group(2).strip()} for m in re.finditer(r"^- \[([ x])\] (.+)$", text, re.M)]
+
+
+def system_block(ins: Inputs, files: dict, docs: list, board: list, lean, sim, attestation) -> dict:
+    """Two levels, kept apart: what authors wrote (checkboxes, status text) and what a receipt in this tree measured."""
+    goal = checklist(ins.text("GOAL.md")); spec5 = checklist(ins.text("specs/SPEC-005-agentic-engineering-demo.md"))
+    specs = []
+    for p in sorted((ROOT / "specs").glob("*.md")):
+        rel = p.relative_to(ROOT).as_posix(); text = ins.text(rel); name = p.name
+        if f"docs/{name}" not in files:
+            files[f"docs/{name}"] = text.encode()
+            docs.append({"id": p.stem, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}"})
+        did = next((d["id"] for d in docs if d["path"] == rel), p.stem)
+        specs.append({"id": did, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "path": rel, "sha256": ins.seen[rel]["sha256"]})
+    measured = []
+    if lean:
+        measured.append({"what": "Lean check of the constraint certificate (offline run)", "result": "all recorded checks passed" if lean["all_ok"] else "recorded failure", "receipt": lean["path"], "sha256": lean["sha256"], "covers": "three encoded constraints and four mutants; not biology"})
+    if sim:
+        c = (sim.get("controls") or {}).get("all_pass")
+        measured.append({"what": "Glide simulation numerical controls", "result": "all pass" if c else f"all_pass = {c}", "receipt": SIM_DIR + "/controls.json", "sha256": next((f["sha256"] for f in sim["files"] if f["name"] == "controls.json"), None), "covers": "analytic and step-halving controls of a point-mass model; not a fish"})
+    if attestation:
+        measured.append({"what": "Attestation quote check (15 items)", "result": f"{attestation['status_counts'].get('verified', 0)} of {attestation['n']} quotes found; judgment {attestation['tally'].get('clean_yes_and_direct_no_flags')} of {attestation['n']} clean", "receipt": ATT, "sha256": ins.seen[ATT]["sha256"], "covers": "a hand-picked sample; not a population rate"})
+    return {"goal_checklist": goal, "spec005_acceptance": spec5, "specs": specs, "board": board, "measured": measured,
+            "levels": {"author_report": "What the repository's own documents say: checkboxes, status text, owners, plans. Written by the people or agents doing the work.",
+                       "measured": "What a receipt in this tree records: a run with its hash and result. A receipt covers only what it says it covers."},
+            "unknown": ["CPU and GPU job counts, utilisation and cost: no receipt in this tree; provider-billed spend is stated by the board as not yet known", "Which commit is deployed: not derivable from files"]}
+
+
+def belief_example(ins: Inputs) -> dict | None:
+    """The declared illustration shipped with frontier/beliefs.py (stdlib only), used as the default scenario on the Belief page."""
+    if not (ROOT / "frontier/beliefs.py").exists():
+        return None
+    ins.read("frontier/beliefs.py")
+    sys.path.insert(0, str(ROOT))
+    try:
+        from frontier.beliefs import EXAMPLE_SCENARIO
+    finally:
+        sys.path.remove(str(ROOT))
+    return json.loads(json.dumps(EXAMPLE_SCENARIO))
+
+
 def build() -> dict[str, bytes]:
     ins = Inputs()
     seeds = ins.json("seeds/frontier-data.json")
@@ -223,6 +265,8 @@ def build() -> dict[str, bytes]:
     lean_receipt, simulation = recorded_results(ins, files)
     attestation = attestation_check(ins, files, docs)
     manifests = simulation_manifests(ins)
+    belief_ex = belief_example(ins)
+    system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -241,6 +285,8 @@ def build() -> dict[str, bytes]:
         "simulation": simulation,
         "attestation_check": attestation,
         "simulation_manifests": manifests,
+        "system": system,
+        "belief_example": belief_ex,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
     }
     catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}

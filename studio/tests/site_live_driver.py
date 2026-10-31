@@ -29,7 +29,7 @@ with sync_playwright() as p:
     print("RECORD via /api/record:", title[:60]); pg.keyboard.press("Escape")
     pg.goto(base + "/index.html#/search?q=Fisher&tab=catalog"); expect(pg.locator("#ccount")).not_to_have_text("Loading…", timeout=15000)
     print("SEARCH:", pg.locator("#ccount").inner_text()); assert "mode live" in pg.locator("#ccount").inner_text()
-    pg.goto(base + "/index.html#/work"); expect(pg.locator("#events")).not_to_have_text("Loading…", timeout=15000)
+    pg.goto(base + "/index.html#/work?tab=runtime"); expect(pg.locator("#events")).not_to_have_text("Loading…", timeout=15000)
     ev = pg.locator("#events").inner_text(); print("EVENTS:", ev[:120].replace("\n", " "))
     pg.get_by_role("button", name="Count records by kind").click()
     expect(pg.locator("#counts table")).to_be_visible(timeout=60000)
@@ -65,5 +65,26 @@ with sync_playwright() as p:
     assert st in ("unknown", "not decided") or "unset" in txt.lower(), (st, txt[:300])
     rows = pg.locator("[data-out=solve] tr", has_text="rho")
     assert "unknown" in rows.first.inner_text().lower(), rows.first.inner_text()
+    # belief solver: the bundled example (exact rationals), then an impossible action, then a non-ok status
+    import json
+    pg.goto(base + "/index.html#/belief"); pg.wait_for_selector("#scen")
+    pg.get_by_role("button", name="Solve this scenario").click()
+    expect(pg.locator("#beliefout .verdictbox")).to_be_visible(timeout=30000)
+    bt = pg.locator("#beliefout").inner_text(); print("BELIEF:", bt[:200].replace("\n", " | "))
+    assert "solved" in bt.lower() and "3/5" in bt and "17/5" in bt and "5/14" in bt and "advance" in bt and "calibrated: false" in bt, bt[:600]
+    sc = json.loads(pg.input_value("#scen"))
+    sc["factors"][0]["table"] = [["yes", "3"], ["no", "0"]]      # hard zero on 'no'
+    sc["decision"]["actions"]["force_no"] = {"assumes": {"H": "no"}}
+    sc["decision"]["utility"]["force_no"] = {"yes": "0", "no": "0"}; sc["decision"]["cost"]["force_no"] = "0"
+    pg.fill("#scen", json.dumps(sc)); pg.get_by_role("button", name="Solve this scenario").click()
+    expect(pg.locator("#beliefout tr", has_text="force_no")).to_be_visible(timeout=30000)
+    row = pg.locator("#beliefout tr", has_text="force_no").inner_text().lower()
+    print("IMPOSSIBLE ACTION ROW:", row[:120].replace("\n", " ")); assert "impossible" in row and "no forecast" in row
+    sc2 = json.loads(json.dumps(sc)); sc2["priors"] = []
+    pg.fill("#scen", json.dumps(sc2)); pg.get_by_role("button", name="Solve this scenario").click()
+    expect(pg.locator("#beliefout")).not_to_have_text("Solving…", timeout=30000)
+    nt = pg.locator("#beliefout").inner_text().lower(); print("NON-OK:", nt[:160].replace("\n", " "))
+    assert "posterior (under" not in nt and "decision:" not in nt and pg.locator("#beliefout table").count() == 0, nt[:300]
+    att = pg.context.request.get(base + "/api/attention"); print("ATTENTION", att.status, att.text()[:160].replace("\n", " ")); assert att.status in (200, 503)
     assert not errs, errs
     print("ALL LIVE CHECKS PASSED"); b.close()
