@@ -25,9 +25,16 @@ unverified**. Nothing claims a collective or swarm gain. Timing is ~155 words pe
 > The honest numbers: **267 problems, 13 actionable, one closed loop.** Not one novelty claim of
 > ours survived the day — they're all in a refutation ledger with their witnesses.
 >
-> On coordination we make no claim. The organisers benchmarked that themselves and found
-> coordination wins **one task in four**. We'd rather tell you the condition than sell you the
-> capability.
+> On coordination we make no claim, and we can tell you why precisely. The organisers
+> benchmarked it themselves and published a **regime map**: coordination improves discrimination
+> only where evidence is genuinely distributed. Where one channel dominates, it improves
+> *interpretation, provenance and auditability* instead. On their own four tasks it won once,
+> tied at 0.955 against 0.951, was matched by a single channel alone, and on the fourth came in
+> **7.2% worse** than a scripted baseline.
+>
+> Our closed loop was one agent running one exact scan. By their taxonomy that is a
+> dominant-channel setting — so what coordination buys us is the audit trail, not the answer.
+> That is what we built, and it is all we claim.
 
 **~210 words ≈ 85 s**, leaving ~5 s of slack.
 
@@ -55,3 +62,18 @@ unverified**. Nothing claims a collective or swarm gain. Timing is ~155 words pe
 - **Main vs branch**: the store, specs and Lean are on main (18 tests). Search, beliefs, compute,
   engineering, deployment, the forms and the videos are on task branches (demo branch: 182
   tests). Name the branch or don't name the capability.
+
+## The regime map, verbatim — use these words, they are theirs
+
+> "a regime map identifying where coordination matters: **distributed-evidence settings**, where
+> coordination improves discrimination over single-channel baselines; **dominant-channel
+> settings**, where coordination mainly improves interpretation, provenance, and auditability;
+> and **representational-mapping settings**, where coordination changes the object of inference
+> rather than improving prediction." — arXiv:2605.22300
+
+**Coordination made things worse in three measured places**, which is why an unconditional claim
+is unsafe: retrieval@3 **0.2708 against a scripted baseline's 0.2917** (their own framing: "7.2%
+worse on retrieval@3 and 120.0% better on same-class nearest-neighbour coherence"); SwarmWorld's
+Discovery-AUC paired effects where **two of nine are negative and one starred** (asterisks mark
+intervals excluding zero); and full culture **behind for 800 ticks** on best-artifact
+performance, **never** ahead on validated invention count across 3,200.
