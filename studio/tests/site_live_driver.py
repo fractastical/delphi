@@ -3,11 +3,17 @@ import sys
 from playwright.sync_api import expect, sync_playwright
 
 base, token, out = sys.argv[1:4]
+public = len(sys.argv) > 4 and sys.argv[4] == "1"     # public-read node: no sign-in, anonymous session
 with sync_playwright() as p:
     b = p.chromium.launch(); pg = b.new_page(viewport={"width": 1280, "height": 900}); errs = []
     pg.on("pageerror", lambda e: errs.append(str(e)))
-    r = pg.context.request.post(base + "/api/session", data={"token": token}, headers={"Origin": base})
-    assert r.status == 200, (r.status, r.text())
+    if public:
+        s = pg.context.request.get(base + "/api/session"); sj = s.json()
+        assert s.status == 200 and sj.get("public_access") is True and sj.get("authenticated") is False, sj
+        print("PASS public-read node: anonymous session, no sign-in")
+    else:
+        r = pg.context.request.post(base + "/api/session", data={"token": token}, headers={"Origin": base})
+        assert r.status == 200, (r.status, r.text())
     pg.on("response", lambda r: print("HTTP", r.status, r.url.replace(base, "")) if r.status >= 400 else None)
     pg.goto(base + "/index.html#/engineering")
     try:
@@ -16,7 +22,7 @@ with sync_playwright() as p:
         print("URL", pg.url, "BODY", pg.inner_text("body")[:600]); raise
     assert pg.locator(".mode.live").count() == 1, "not in live mode"
     assert pg.locator(".banner").count() == 0, pg.locator(".banner").inner_text()
-    print("PASS live mode, signed in")
+    print("PASS live mode" + (" (public-read, anonymous)" if public else " (signed in)"))
     pg.goto(base + "/index.html#/search?q=&tab=catalog"); expect(pg.locator("#ccount")).not_to_have_text("Loading…", timeout=15000)
     print("catalog:", pg.locator("#ccount").inner_text())
     ct = pg.locator("#ccount").inner_text()
