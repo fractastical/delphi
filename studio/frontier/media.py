@@ -14,7 +14,7 @@ import re
 import stat
 from threading import Lock
 import time
-from urllib.parse import quote
+from urllib.parse import quote, unquote
 
 MAX_FILE_BYTES = 64_000_000
 MAX_INDEX_BYTES = 256_000_000
@@ -225,12 +225,16 @@ class LocalMedia:
                        "limits": {"file_bytes": MAX_TEXT_BYTES, "characters": max_chars},
                        "scope": "Published UTF-8 JSON, plain text or CSV only; no remote fetch or scientific acceptance."}
         for match in result["matches"]:
-            if match["media_type"].split(";", 1)[0] not in TEXT_TYPES:
-                unavailable["status"] = "unsupported_type"
-                continue
             try:
-                path = self.validator(self.root, match["href"])
-                if path is None or not path.is_relative_to(self.artifacts):
+                # Preserve the indexed lexical path. Opening a validator's
+                # resolved target would follow a newly introduced in-tree
+                # symlink, bypassing _open's no-follow component checks.
+                path = self.root / unquote(match["href"], errors="strict").removeprefix("/")
+                if not path.is_relative_to(self.artifacts) or self.validator(self.root, match["href"]) != path:
+                    continue
+                media_type = self.mime_resolver(self.root, path)
+                if media_type is None or media_type.split(";", 1)[0] not in TEXT_TYPES:
+                    unavailable["status"] = "unsupported_type"
                     continue
                 stream, before = self._open(path.relative_to(self.root))
                 with stream:
@@ -242,6 +246,7 @@ class LocalMedia:
                             or _identity(os.fstat(stream.fileno())) != _identity(before)
                             or _identity(path.stat(follow_symlinks=False)) != _identity(before)
                             or self.validator(self.root, match["href"]) != path
+                            or self.mime_resolver(self.root, path) != media_type
                             or sha256(contents).hexdigest() != result["sha256"]):
                         unavailable["status"] = "changed"
                         continue
@@ -250,7 +255,7 @@ class LocalMedia:
                     unavailable["status"] = "unsupported_encoding"
                     continue
                 return {"status": "available", "sha256": result["sha256"], "href": match["href"],
-                        "media_type": match["media_type"], "encoding": "utf-8", "byte_size": len(contents),
+                        "media_type": media_type, "encoding": "utf-8", "byte_size": len(contents),
                         "full_file_hash_verified": True, "text": text[:max_chars],
                         "characters_returned": min(len(text), max_chars), "truncated": len(text) > max_chars,
                         "limits": unavailable["limits"], "scope": unavailable["scope"]}
