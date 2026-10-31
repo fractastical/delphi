@@ -326,6 +326,8 @@ def parse_record(rec: dict, taxa: dict[str, dict]) -> dict:
     p["recorded_release_date"] = (rec.get("extra") or {}).get("release_date") or (rec.get("assembly") or {}).get("release_date") or rec.get("issued")
     text = (rec.get("label", "") + " " + rec.get("measurement_technique", "") + " " + str(rec.get("extra", {}).get("refseq_category", "")) + " " + str(rec.get("assembly", {}).get("refseq_category", ""))).lower()
     p["reference_claimed"] = "reference" in text
+    bp = re.search(r"\b(PRJ[DEN][A-Z]\d+)\b", str(rec.get("is_referenced_by") or "")) or re.search(r"\b(PRJ[DEN][A-Z]\d+)\b", rec.get("bibliographic_citation", ""))
+    p["recorded_bioproject"] = bp.group(1) if bp else None
     return p
 
 
@@ -463,6 +465,15 @@ def recheck_genome(rec: dict, p: dict, ncbi: NCBI) -> dict:
     if p["recorded_release_date"] and obs_date:
         flags["date_match"] = p["recorded_release_date"][:10] == obs_date[:10]
     checks["release_date"] = {"recorded": p["recorded_release_date"], "observed": obs_date, "match": flags["date_match"]}
+    obs_bp = checks.get("bioproject")
+    flags["bioproject_match"] = (p["recorded_bioproject"] == obs_bp) if (p["recorded_bioproject"] and obs_bp) else None
+    checks["bioproject_check"] = {"recorded": p["recorded_bioproject"], "observed": obs_bp, "match": flags["bioproject_match"]}
+    ver = str(rec.get("version") or "")
+    asm_name = checks.get("assembly_name") or (entrez or {}).get("assemblyname")
+    flags["version_consistent"] = None
+    if ver and (asm_name or acc):
+        flags["version_consistent"] = (acc in ver) or bool(asm_name and asm_name.lower() in ver.lower())
+    checks["version_check"] = {"recorded": ver or None, "assembly_name": asm_name, "consistent": flags["version_consistent"]}
 
     # reference status for the organism and for the record's taxon
     ref_check: dict[str, Any] = {"refseq_category_of_accession": refseq_cat}
@@ -596,13 +607,28 @@ def recheck_genomes(rec: dict, p: dict, ncbi: NCBI) -> dict:
     for t in p["taxa"]:
         tm.append({"taxon_key": t["key"], "taxon_name": t["name"], "taxon_ncbi_taxid": t.get("ncbi_taxid"), "same_taxid_as_query": t.get("ncbi_taxid") == tid})
     checks["taxon_checks"] = tm
+    flags["taxon_relation"] = None
     if tm:
-        flags["organism_match"] = any(x["same_taxid_as_query"] for x in tm)
-        if not flags["organism_match"] and node:
-            # accept if the record's taxon is an ancestor/descendant of the queried node
+        if any(x["same_taxid_as_query"] for x in tm):
+            flags["organism_match"] = True
+            flags["taxon_relation"] = "same"
+        elif node:
             lin = set(node.get("lineage") or [])
-            flags["organism_match"] = any(x["taxon_ncbi_taxid"] in lin for x in tm)
+            if any(x["taxon_ncbi_taxid"] in lin for x in tm):
+                flags["organism_match"] = True
+                flags["taxon_relation"] = "queried taxon is nested in the record's taxon"
+            else:
+                for x in tm:
+                    tnode = ncbi.taxonomy(x["taxon_ncbi_taxid"]) if x.get("taxon_ncbi_taxid") else None
+                    if tnode and tid in set(tnode.get("lineage") or []):
+                        flags["organism_match"] = True
+                        flags["taxon_relation"] = "queried taxon is an ancestor of the record's taxon (count covers a broader group)"
+                        break
+                else:
+                    flags["organism_match"] = False
+                    flags["taxon_relation"] = "unrelated"
     checks["organism_matches_record_taxon"] = flags["organism_match"]
+    checks["taxon_relation"] = flags["taxon_relation"]
     url_counts = {}
     for u in p["taxon_urls"]:
         _, c = ncbi.taxon_count_for_url(u["url"])
@@ -700,8 +726,33 @@ def recheck_taxonomy(rec: dict, p: dict, ncbi: NCBI) -> dict:
             n_unchecked += 1
     checks["lookups"] = {"n_ok": n_ok, "n_failed": n_bad, "n_unchecked": n_unchecked, "detail": lookups}
     flags["lookups_ok"] = n_bad == 0 and n_ok > 0
+    # how many distinct taxids do the recorded lookups actually evidence, vs the record's own count?
+    evidenced: set[str] = set()
+    for d, l in zip(rec.get("distributions", []), lookups):
+        if "esearch.fcgi" in d["download_url"]:
+            if l.get("expected_taxid"):
+                evidenced.add(str(l["expected_taxid"]))
+            elif l.get("idlist") and len(l["idlist"]) == 1:
+                evidenced.add(l["idlist"][0])
+        elif "esummary.fcgi" in d["download_url"]:
+            evidenced |= set(parse_qs(urlparse(d["download_url"]).query).get("id", [""])[0].split(","))
+    evidenced.discard("")
     checks["count_recheck"] = None
-    checks["stats_recheck"] = [{"property_id": c.get("property_id"), "recorded": c.get("value"), "observed": None, "within_tolerance": None, "note": "describes the record's own taxon list; not re-checkable against NCBI"} for c in rec.get("counts", [])]
+    stats = []
+    for c in rec.get("counts", []):
+        pid = c.get("property_id")
+        entry = {"property_id": pid, "recorded": c.get("value"), "slice": c.get("slice")}
+        if pid in ("n_taxa_resolved", "n_taxa_matched") and c.get("value") is not None:
+            entry.update({"observed": len(evidenced), "within_tolerance": len(evidenced) >= c["value"] * 0.9,
+                          "note": "observed = distinct taxids evidenced by the recorded E-utilities lookups"})
+            if checks["count_recheck"] is None:
+                checks["count_recheck"] = entry
+                continue
+        else:
+            entry.update({"observed": None, "within_tolerance": None, "note": "describes the record's own taxon list; not re-checkable against NCBI"})
+        stats.append(entry)
+    checks["stats_recheck"] = stats
+    flags["taxa_evidenced"] = len(evidenced)
     cs, cs_all = check_checksums(rec, ncbi, obstacles)
     checks["checksum_match"] = cs_all
     checks["checksums"] = cs
@@ -804,6 +855,15 @@ def score_genome(rec: dict, p: dict, res: dict) -> dict:
     if f["date_match"] is False:
         completeness -= 0.1
         notes.append(f"recorded date {checks['release_date']['recorded']} vs NCBI release date {checks['release_date']['observed']}")
+    if p["recorded_level"] is None:
+        completeness -= 0.05
+        notes.append("assembly level not stated in the record")
+    if f.get("bioproject_match") is False:
+        completeness -= 0.1
+        notes.append(f"recorded BioProject {checks['bioproject_check']['recorded']} vs NCBI {checks['bioproject_check']['observed']}")
+    if f.get("version_consistent") is False:
+        completeness -= 0.05
+        notes.append(f"version '{checks['version_check']['recorded']}' is neither the accession nor NCBI's assembly name '{checks['version_check']['assembly_name']}'")
     if f["unverified"]:
         completeness -= 0.05
     authenticity = scores["authenticity"]
@@ -875,7 +935,11 @@ def score_genomes(rec: dict, p: dict, res: dict) -> dict:
     if f["organism_match"] is False:
         authenticity = 0.5
         completeness -= 0.4
-        notes.append("queried taxid is not the record's taxon")
+        notes.append("queried taxid is unrelated to the record's taxon")
+    elif f.get("taxon_relation", "same") != "same":
+        completeness -= 0.3 if "ancestor" in f["taxon_relation"] else 0.15
+        tn = ", ".join(str(x["taxon_name"]) for x in checks["taxon_checks"])
+        notes.append(f"{f['taxon_relation']}: record counts genomes under {checks['taxon_key_resolves_to']} but is linked to taxon {tn}")
     fl = checks.get("first_listed_reference")
     if fl and fl.get("match") is False:
         completeness -= 0.05
@@ -886,7 +950,7 @@ def score_genomes(rec: dict, p: dict, res: dict) -> dict:
     confidence = 0.9 - (0.2 if obstacles else 0.0)
     rationale = (
         f"NCBI taxid {checks['taxid']} resolves to {checks['taxon_key_resolves_to']} ({checks.get('ncbi_rank')}), "
-        + ("which is the record's taxon. " if f["organism_match"] else "which is not the record's taxon. " if f["organism_match"] is False else "relationship to the record's taxon unverified. ")
+        + ("which is the record's taxon. " if f.get("taxon_relation") == "same" else f"a broader group than the record's linked taxon ({f['taxon_relation']}). " if f["organism_match"] and f.get("taxon_relation") else "which is not the record's taxon. " if f["organism_match"] is False else "relationship to the record's taxon unverified. ")
         + f"The recorded count of {cr.get('recorded')} ({cr.get('property_id')}) re-queried as {cr.get('observed')} "
         + ("(within tolerance). " if cr.get("within_tolerance") else "(outside tolerance). " if cr.get("within_tolerance") is False else "(not re-checkable). ")
         + ("Checksum of the recorded API response matches. " if checks.get("checksum_match") else "Checksum of the live API response differs. " if checks.get("checksum_match") is False else "")
@@ -926,6 +990,10 @@ def score_taxonomy(rec: dict, p: dict, res: dict) -> dict:
     notes += mnotes
     if lk["n_unchecked"]:
         completeness -= 0.05
+    cr = checks.get("count_recheck")
+    if cr and cr.get("within_tolerance") is False:
+        completeness -= 0.4 if cr["observed"] < 0.1 * cr["recorded"] else 0.3
+        notes.append(f"record counts {cr['recorded']} taxa ({cr['property_id']}) but its distributions evidence only {cr['observed']} taxid(s); the count is not cross-checkable")
     ambiguous = sum(1 for d in lk["detail"] if "ambiguous" in str(d.get("note", "")))
     if ambiguous:
         completeness -= 0.1
@@ -937,7 +1005,7 @@ def score_taxonomy(rec: dict, p: dict, res: dict) -> dict:
         f"Identifier {rec['identifier']} resolves (final URL {checks.get('identifier_final_url')}). Of {len(lk['detail'])} recorded E-utilities lookups, "
         f"{lk['n_ok']} reproduce the recorded taxid(s) today, {lk['n_failed']} fail and {lk['n_unchecked']} could not be re-fetched or carry no checksum. "
         + ("All recorded SHA-256 values match. " if checks.get("checksum_match") else "Some response bytes differ from the recorded SHA-256 (live service). " if checks.get("checksum_match") is False else "")
-        + "The counts describe the record's own taxon list and cannot be cross-checked against NCBI. Source scores inherited from the NCBI Taxonomy source assessment."
+        + f"The recorded lookups evidence {f.get('taxa_evidenced', 0)} distinct taxid(s); the record's own taxon counts cannot otherwise be cross-checked against NCBI. Source scores inherited from the NCBI Taxonomy source assessment."
         + (" Issues: " + "; ".join(notes) + "." if notes else "")
     )
     return finish(rec, p, scores, checks, obstacles, rationale, confidence)
