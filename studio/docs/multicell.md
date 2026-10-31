@@ -62,3 +62,31 @@ the frames render. Hashes in `mp4.sha256`.
 `python3 engineering/multicell/run_morpheus.py --clone <morpheus clone> --binary <v2.3.9 binary> --gnuplot <gnuplot> --out <dir> --arm baseline`
 (`--feedback-off`, `--seed N`), then `python3 engineering/multicell/analyze.py --arms <dir> --out artifacts/multicell`.
 Tests: `python3 -m pytest engineering/multicell/tests` (2 tests: division-event parsing; edit refusal). They do not run Morpheus.
+
+## Full horizon (t=2.0), remote, recovered 2026-10-31 15:30 PDT
+Run by infra as job `aijob-e00q8z2et1q0zf5qaq` (4 vCPU, 3 arms x 1 thread, 3000 s cap each) from the frozen packet
+`0d79314` (packet sha256 `994eb831...34f4f7`; receipt `packet_sha256`, `binary_sha256`, `source_commit` match the pins above).
+All three arms exit 0 at t=2.0; each returned `model.xml` is byte-identical to the packet XML (checked here with `cmp`). **No gnuplot,
+so no spatial frames and no full-horizon movie;** the movies above remain the partial (t<=0.46) ones. An earlier remote attempt
+failed in the output wrapper after the sims finished; infra reports it and its repair, and I have not seen that wrapper.
+Analysis here read only the returned `logger.csv` files (raw CSV kept at infra's path, not copied into git; sha256 in
+`artifacts/multicell/full/full_summary.json`), under a 1 CPU / TasksMax 128 / MemoryMax 4G / MemorySwapMax 0 scope. No simulation was rerun.
+
+| arm | rows | cells at t=0.5 / 1.0 / 1.5 / 2.0 | distinct division-event times | final total volume |
+|---|---|---|---|---|
+| baseline (feedback on, seed 3445) | 96,802 | 4 / 32 / 199 / 256 | 96 | 25,111 |
+| feedback-off (seed 3445) | 23,519 | 4 / 8 / 32 / 128 | 7 | 25,052 |
+| seed repeat (feedback on, seed 7) | 98,571 | 4 / 32 / 199 / 263 | 99 | 25,126 |
+
+Reading, for this one generic ODE/CPM/PDE example: with the cytokine term, cells divide faster and lose synchrony (baseline reaches
+256 cells, a power of two by coincidence only; its division events spread over 96 distinct times after ~0.57). Without it, division
+stays synchronised in clean doublings (1 to 128, 7 events, period ~0.3). Total volume stays ~25,000 in every arm, as the volume
+constraint implies. The seed repeat matches the baseline through t=1.5 (199 cells) and differs by 7 cells at t=2.0 (263 vs 256): the
+seed does matter once divisions desynchronise. **This corrects my earlier statement** that the seed repeat was identical: that held
+only for t<=0.46. Two seeds are still not a statistical replicate, and no time-step or lattice refinement (numerical convergence)
+was run. Also corrected: the "cannot fit 600 s locally" estimate came from runs rendering frames while three arms shared a loaded host;
+the remote frame-less arms took ~50 s each by infra's report.
+
+Still true: generic example, NOT calibrated to fish or any tissue, units are the example's own, no dimensional ports, no comparison
+to data, "cells" are model cells, not a growth measurement. `engineering/multicell/analyze_full.py` produced `cell_count.png` (a real
+trajectory of the logged cell counts, log scale).
