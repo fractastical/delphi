@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import shutil
 import subprocess
 
 import httpx
@@ -30,13 +31,14 @@ def digest(value):
     ).hexdigest()
 
 
-def action_draft(protocol, case, plan):
+def action_draft(protocol, case, plan, predecessor=None):
     return Draft(
         namespace=NAMESPACE,
         kind="Action",
         id="agent-fin-reuse-" + case["id"] + "-v1",
         issuer=ACTOR,
         source_uri="urn:frontier:claim-reuse:" + protocol["id"],
+        predecessor=predecessor,
         payload={
             "target": protocol["claim_ref"],
             "inputs": [protocol["claim_ref"]],
@@ -61,12 +63,16 @@ def action_draft(protocol, case, plan):
                     {
                         "claim": protocol["claim_ref"],
                         "request": protocol["source_request_sha256"],
+                        "protocol": sha(ART / "protocol.json"),
                     }
                 ),
-                "code": digest(plan["code_files"]),
+                "code": "git:"
+                + plan["code_commit"]
+                + "; files:"
+                + digest(plan["code_files"]),
                 "model": "existing static Euler-Bernoulli beam and declared load bridge",
                 "environment": sha(ART / "environment.json"),
-                "parameters": digest(case),
+                "parameters": digest({"case": case, "numerics": protocol["numerics"]}),
                 "scope": protocol["scope"],
                 "acceptance_policy": POLICY,
             },
@@ -270,6 +276,7 @@ async def workflow(args):
                     / (
                         "mcp-"
                         + args.phase
+                        + ("-revision" if args.revise_unexecuted else "")
                         + ("-" + args.case if args.case else "")
                         + ".json"
                     ),
@@ -280,6 +287,24 @@ async def workflow(args):
                 ] != ["contributor"]:
                     raise ValueError("Wrong worker principal or roles")
                 if args.phase == "propose":
+                    old = None
+                    if (ART / "execution-plan.json").exists():
+                        if not args.revise_unexecuted:
+                            raise ValueError(
+                                "Existing proposals require explicit unexecuted revision"
+                            )
+                        old = json.loads((ART / "execution-plan.json").read_text())
+                        history = ART / "history" / old["code_commit"][:12]
+                        history.mkdir(parents=True, exist_ok=True)
+                        for name in (
+                            "execution-plan.json",
+                            "code-pin.json",
+                            "environment.json",
+                            "action-draft-below-threshold.json",
+                            "action-draft-above-threshold.json",
+                            "mcp-propose.json",
+                        ):
+                            shutil.copy2(ART / name, history / name)
                     env = {
                         "python": platform.python_version(),
                         "numpy": np.__version__,
@@ -316,13 +341,19 @@ async def workflow(args):
                             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
                         ).strip(),
                         "code_files": {p: sha(ROOT / p) for p in CODE_FILES},
+                        "protocol_sha256": sha(ART / "protocol.json"),
                         "actions": {},
                     }
                     dump(
                         ART / "code-pin.json",
                         {
                             k: plan[k]
-                            for k in ("protocol_commit", "code_commit", "code_files")
+                            for k in (
+                                "protocol_commit",
+                                "protocol_sha256",
+                                "code_commit",
+                                "code_files",
+                            )
                         },
                     )
                     claim = await client.call(
@@ -334,7 +365,19 @@ async def workflow(args):
                             "Exact Claim retrieval returned another record"
                         )
                     for case in protocol["cases"]:
-                        draft = action_draft(protocol, case, plan)
+                        predecessor = None
+                        if old:
+                            previous = await client.call(
+                                "frontier_get", {"target": old["actions"][case["id"]]}
+                            )
+                            if not previous["is_head"] or previous["action"][
+                                "state"
+                            ] not in {"proposed", "ready"}:
+                                raise ValueError(
+                                    "Only unexecuted current proposed/ready Actions may be revised"
+                                )
+                            predecessor = old["actions"][case["id"]]["version"]
+                        draft = action_draft(protocol, case, plan, predecessor)
                         dump(ART / ("action-draft-" + case["id"] + ".json"), draft)
                         proposed = await client.call(
                             "frontier_propose",
@@ -342,6 +385,7 @@ async def workflow(args):
                                 "draft": draft,
                                 "idempotency_key": protocol["id"]
                                 + "-propose-"
+                                + (plan["code_commit"][:12] + "-" if old else "")
                                 + case["id"],
                             },
                         )
@@ -361,6 +405,8 @@ async def workflow(args):
                 elif args.phase == "run":
                     case = next(c for c in protocol["cases"] if c["id"] == args.case)
                     plan = json.loads((ART / "execution-plan.json").read_text())
+                    if sha(ART / "protocol.json") != plan["protocol_sha256"]:
+                        raise ValueError("Frozen protocol changed")
                     target = plan["actions"][case["id"]]
                     if any(sha(ROOT / p) != h for p, h in plan["code_files"].items()):
                         raise ValueError("Frozen execution code changed")
@@ -370,6 +416,13 @@ async def workflow(args):
                             "Execution attempt exists; reconcile rather than duplicate the run"
                         )
                     current = await client.call("frontier_get", {"target": target})
+                    expected = action_draft(protocol, case, plan)["payload"][
+                        "cache_key"
+                    ]
+                    if current["record"]["payload"]["cache_key"] != expected:
+                        raise ValueError(
+                            "Live Action input/code/environment/numerics pins differ"
+                        )
                     if current["action"]["state"] != "ready" or current["record"][
                         "payload"
                     ]["inputs"] != [protocol["claim_ref"]]:
@@ -495,6 +548,7 @@ if __name__ == "__main__":
     parser.add_argument("phase", choices=["propose", "run", "verify"])
     parser.add_argument("--case", choices=["below-threshold", "above-threshold"])
     parser.add_argument("--credential-file", required=True)
+    parser.add_argument("--revise-unexecuted", action="store_true")
     args = parser.parse_args()
     if args.phase == "run" and not args.case:
         parser.error("--case required for run")

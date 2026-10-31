@@ -78,3 +78,19 @@ def test_transcripts_never_include_credentials_or_lease_capabilities(tmp_path):
     assert "secret-fixture-token-value" not in encoded
     assert "secret-fixture-lease-value" not in encoded
     assert "[redacted bearer capability]" in encoded
+
+
+def test_action_cache_pins_numerics_and_code_revision():
+    from engineering.claim_reuse.workflow import action_draft
+
+    _, protocol, case = inputs()
+    plan = {"code_commit": "1" * 40, "code_files": {"fixture.py": "2" * 64}}
+    a = action_draft(protocol, case, plan)["payload"]["cache_key"]
+    modified = copy.deepcopy(protocol)
+    modified["numerics"]["elements"] = [8, 16, 32]
+    b = action_draft(modified, case, plan)["payload"]["cache_key"]
+    assert a["parameters"] != b["parameters"]
+    other = {**plan, "code_commit": "3" * 40}
+    assert (
+        action_draft(protocol, case, other)["payload"]["cache_key"]["code"] != a["code"]
+    )
