@@ -93,8 +93,9 @@ TAXA = [
     dict(slug="canis", name="Canis", rank="genus", vernacular=["dogs and wolves"],
          notes="'the dog-genus'."),
     dict(slug="canis-familiaris", name="Canis familiaris", rank="species", vernacular=["domestic dog"],
-         notes="Breeds named: greyhound, bulldog. 'Dogs', 'dog', 'puppies', 'old dogs'. GBIF treats Canis "
-               "familiaris as a species; NCBI places it under Canis lupus familiaris (taxid 9615)."),
+         notes="Breeds named: greyhound, bulldog. 'Dogs', 'dog', 'puppies', 'old dogs'. GBIF and NCBI both file the "
+               "domestic dog as the subspecies Canis lupus familiaris (GBIF 6164210, NCBI 9615); Wikidata keeps a "
+               "Canis familiaris item."),
     dict(slug="dusicyon-australis", name="Dusicyon australis", rank="species", vernacular=["Falkland Islands wolf", "warrah"],
          notes="'a wolf-like fox' of the Falkland Islands. Extinct (last killed 1876).", extinct=True),
     dict(slug="vulpes", name="Vulpes", rank="genus", vernacular=["foxes"],
