@@ -66,6 +66,104 @@
    "what_we_may_say": "ASK is an unreviewed single-author preprint with no implementation and no conformance definition. We may say our design is INFORMED BY it and cite it. We may NOT say we implement it, conform to it, or that its six dimensions are acceptance criteria - that reading is entirely our construction, and SPEC-087 already says so.",
    "verification_of_our_quotes": "18 quotes used by our two research docs were string-matched against the extracted PDF: all 18 verbatim, with two invented negative controls correctly failing.",
    "count_discrepancies_unresolved": "The reporting agent counted 10 files with 'context-preserving' and 7 with 'conditional execution'; my git grep from the repo root over tracked files returns 6 and 4. Different scopes, not reconciled. The substantive claims were confirmed; these counts were not."
+  },
+  {
+   "id": "buehler-lamm-mit",
+   "name": "Markus Buehler / LAMM MIT: ScienceClaw, Infinite, and the category-theory thread",
+   "why_it_matters": "They wrote the hackathon stack AND they judge it. Overclaiming against them is the worst available error.",
+   "upstream_state_verified_by_claude15": {
+    "checked_utc": "2026-10-31T19:18:07+00:00",
+    "method": "live GitHub API, with a control: a nonexistent lamm-mit repo returns HTTP 404",
+    "scienceclaw": {
+     "head": "894598cd3a",
+     "head_committed": "2026-10-30T22:52:40Z",
+     "our_pin": "ab9aba1302 (2026-08-21)",
+     "behind_by": 2,
+     "new_commit_subjects": [
+      "fix: honor LLM env var precedence, investigate --dry-run",
+      "fix: initialize _script_name and _new_params per skill"
+     ],
+     "consequence": "morphoswarm docs/prior-art/scienceclaw-infinite.md says 'no new commits, last push 2026-08-21'. THAT IS NOW FALSE. The repo became active again on 2026-10-30."
+    },
+    "infinite": {
+     "head": "699b90a422",
+     "head_committed": "2026-04-16T14:52:36Z",
+     "our_pin": "699b90a422",
+     "behind_by": 0,
+     "consequence": "unchanged; that half of our file is still accurate"
+    }
+   },
+   "papers": [
+    {
+     "id": "arXiv:2606.01444v2",
+     "authors": "Wang & Buehler",
+     "date": "2026-05-31, v2 2026-08-21",
+     "title": "Self-Revising Discovery Systems: A Categorical Framework for Agentic AI",
+     "read_level": "full-text (partial): Methods 4.1-4.7 entire, 2.4/2.6/2.8/2.10, 3",
+     "category_theory_is": "REAL MATHEMATICS: copresheaves, categories of elements, left Kan extension (Lan_u + u*), comma categories, 8 propositions with proofs"
+    },
+    {
+     "id": "arXiv:2604.26367v2",
+     "authors": "Marom, Tibbits, Zardini, Buehler",
+     "title": "A Category-Theoretic Framework from Biological Mechanics to Engineered Stimulus-Response Systems",
+     "category_theory_is": "REAL: implementation functor F: Nat->Art, natural transformation, compilation functor to G-code",
+     "and_physically_validated": "fabricated specimens measured against prediction, 4 cases, n=3-4, 0.1-6.6% error, all within one s.d.",
+     "discovery_note": "an abstract-field query for 'category theory' MISSED this; found only by listing the author"
+    },
+    {
+     "id": "arXiv:2403.11996",
+     "category_theory_is": "VOCABULARY: defines graph isomorphism correctly, then fills the mapping with GPT-4"
+    },
+    {
+     "id": "Graph-PReFLexOR",
+     "category_theory_is": "METAPHOR: 'inspired by category theory' means nodes and edges; 'functor' occurs ONCE in 178k chars, in a figure caption"
+    },
+    {
+     "id": "arXiv:2605.22300",
+     "authors": "Wong & Buehler",
+     "date": "2026-05",
+     "title": "Cross-domain benchmarks reveal when coordinated AI agents improve scientific inference",
+     "read_level": "NOT READ - not even the abstract. DISPATCHED.",
+     "risk": "If it supplies the coordination benchmark, our claim that MorphoBench fills an absent-ablation gap is five months stale and asserts a gap the judges themselves closed."
+    }
+   ],
+   "collisions_we_must_not_claim": [
+    {
+     "id": "N1",
+     "claim": "dead ends / refutations as first-class typed artifacts",
+     "status": "ALREADY IMPLEMENTED AND PUBLISHED",
+     "evidence": "categoryscienceclaw/HEA/categorical_discovery_graph.json has a node with status 'rejected', type 'RejectedThresholdOnlyFCGRModel', a rejected_reason string, and it is a PARENT of the accepted model"
+    },
+    {
+     "id": "N2",
+     "claim": "a formal, non-subjective definition of novelty",
+     "status": "TAKEN",
+     "evidence": "arXiv:2606.01444 defines discovery as residual content outside the image of the Kan comparison map, explicitly to separate retrieval/search/discovery 'without subjective novelty'"
+    },
+    {
+     "id": "N7",
+     "claim": "verifying that provenance commutes and that claims have admissible artifact paths",
+     "status": "FRAMING IS THEIRS; IMPLEMENTATION IS OPEN",
+     "evidence": "their section 3 outlook lists as FUTURE WORK that the system 'could verify that provenance diagrams commute, that every public claim has an admissible artifact path, that retractions and supersessions preserve old evidence', plus an Open Problem naming replay, approximate-naturality checking and recording retractions without deleting provenance",
+     "what_we_may_say": "We may say we implemented something they listed as future work. We may NOT say we thought of it, and we must cite them."
+    }
+   ],
+   "gap_that_is_genuinely_open": {
+    "finding": "No machine-checked proof artifact in any of the three repositories",
+    "evidence": "zero .lean/.v/.agda/.thy/.smt2 files, with controls of 569 + 14 + 39 .py files proving the search ran",
+    "their_certificates_are": "type/arity/parent/hash obligations, two of them weak: the hash obligation passes VACUOUSLY on an empty content_hash (`not artifact.content_hash or ...`), and `invariants_ok = bool(payload.get('invariants'))` checks PRESENCE, not truth",
+    "how_it_must_be_stated": "'no .lean/.v/.agda/.thy/.smt2 in these three repositories at these SHAs' - NOT 'they do not do verification'",
+    "UNRESOLVED": "which SHA the code claims were read at. Asked. Until answered these findings may describe a superseded snapshot, and scienceclaw moved two commits on 2026-10-30."
+   },
+   "implemented_vs_claimed_verdict": "Neither direction of the test fires. The code matches the structure, but the categorical layer is a POST-HOC AUDIT over hand-authored schemas (build_schema_iter0..3; 'colimit' appears 0 times in the 851-line Kan file), not a runtime constraint. The authors say so themselves: 'weaker than a software-enforced schema category, and should not be overclaimed'; 'not yet a certified functor in software.'",
+   "dimension_coverage": {
+    "artifact_lineage": "implemented, with rejected nodes as parents of accepted ones",
+    "evidence_contests": "rejection is recorded; contest mechanism not established here",
+    "verification": "no machine-checked proof; obligations are structural and two are weak",
+    "engineering_vs_discovery": "2604.26367 crosses to physical fabrication with measured error",
+    "epistemic_objects_for_plans_experiments_actions": "UNRESOLVED - dispatched",
+    "collective_rl_governance": "UNRESOLVED - dispatched"
+   }
   }
  ]
 }
