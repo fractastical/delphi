@@ -1,0 +1,37 @@
+{
+  "claim_id": "darwin1859-ch11-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch11-03",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "Within one continent, the genus-level composition of the fauna/flora of two strongly contrasting habitats (hot desert vs. humid tropical forest) is more similar than the composition of the same habitat type on two different continents; i.e. geographic region, not habitat, is the primary predictor of taxonomic affinity.",
+  "pass_criterion": "Pre-registered: for each of five taxonomic groups (Mammalia, Aves, Squamata, Amphibia, Magnoliopsida), compute the Sørensen similarity of genus sets (2|A∩B|/(|A|+|B|), GBIF occurrence-derived genus lists, genera with >= 5 records per region) for (i) the 5 within-continent / different-habitat region pairs and (ii) the 20 between-continent / same-habitat region pairs. The claim is SUPPORTED if the mean of (i) exceeds the mean of (ii) in at least 4 of the 5 groups AND a one-sided Mann-Whitney U test pooling all groups' pairs (i) vs (ii) gives p < 0.01.",
+  "fail_criterion": "Pre-registered: REFUTED if the mean of (i) exceeds the mean of (ii) in 2 or fewer of the 5 groups, or if the pooled one-sided Mann-Whitney test in the opposite direction ((ii) > (i)) gives p < 0.05. Any other outcome is MIXED. If fewer than 4 groups have >= 20 genera in every region, the result is inconclusive (underpowered).",
+  "planned_datasets": ["gbif-occurrence-search-api"],
+  "interpretation": "Darwin's 'productions of the same continent' are taken as the native genera recorded in GBIF within fixed bounding boxes on five continents (South America, Africa, Australia, North America incl. Central America, mainland Asia). 'Different stations' is operationalized as two habitat types with the strongest possible contrast on each continent: a hot desert/semi-desert box and a humid tropical forest box. 'Affinity' is operationalized as sharing genera (and, secondarily, families), which is the pre-phylogenetic measure of relatedness Darwin himself used. The 'same sea' half of the claim is not tested here. Regions are fixed before any data are downloaded; genera of domestic and commensal species that humans have spread worldwide (Homo, Rattus, Mus, Canis, Felis, Bos, Ovis, Capra, Sus, Equus, Columba) are excluded, as are fossil and living (zoo/garden) specimen records, because the claim concerns natural distribution.",
+  "datasets": [],
+  "method": "",
+  "measured": {},
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-bdd1", "date": "2026-10-31" },
+  "preregistration": {
+    "regions": {
+      "south-america-desert": { "continent": "South America", "habitat": "desert", "description": "Argentine Monte desert / dry Chaco", "bbox": [-70, -35, -64, -27] },
+      "south-america-forest": { "continent": "South America", "habitat": "forest", "description": "western Amazon basin", "bbox": [-70, -8, -60, 0] },
+      "africa-desert": { "continent": "Africa", "habitat": "desert", "description": "Namib / Kalahari", "bbox": [15, -28, 22, -20] },
+      "africa-forest": { "continent": "Africa", "habitat": "forest", "description": "Congo basin", "bbox": [15, -5, 25, 3] },
+      "australia-desert": { "continent": "Australia", "habitat": "desert", "description": "central Australian deserts", "bbox": [128, -30, 138, -22] },
+      "australia-forest": { "continent": "Australia", "habitat": "forest", "description": "Queensland Wet Tropics and adjacent coast", "bbox": [143, -20, 147, -14] },
+      "north-america-desert": { "continent": "North America", "habitat": "desert", "description": "Sonoran / Chihuahuan deserts", "bbox": [-115, 28, -105, 34] },
+      "north-america-forest": { "continent": "North America", "habitat": "forest", "description": "southern Mexico / Central American humid forest", "bbox": [-92, 14, -84, 20] },
+      "asia-desert": { "continent": "Asia", "habitat": "desert", "description": "Thar desert and adjacent arid Rajasthan / Sindh", "bbox": [69, 24, 75, 30] },
+      "asia-forest": { "continent": "Asia", "habitat": "forest", "description": "Peninsular Malaysia / southern Thailand rainforest (mainland)", "bbox": [100, 2, 104, 8] }
+    },
+    "groups": { "Mammalia": 359, "Aves": 212, "Squamata": 11592253, "Amphibia": 131, "Magnoliopsida": 220 },
+    "min_records_per_genus": 5,
+    "excluded_genera": ["Homo", "Rattus", "Mus", "Canis", "Felis", "Bos", "Ovis", "Capra", "Sus", "Equus", "Columba"],
+    "basis_of_record_excluded": ["FOSSIL_SPECIMEN", "LIVING_SPECIMEN"],
+    "year_range": "1900-2026"
+  }
+}
