@@ -10,7 +10,7 @@ Every parameter carries a `kind`:
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from fractions import Fraction
 
 import manifold3d as mf
@@ -54,6 +54,14 @@ class FormSpec:
     set_id: str = "morphology-v1"
     short: str = ""  # tab label
     wing_factors: tuple[float, float] | None = None  # (area, whole-wing AR) factors on the Fish fit (NCA set)
+    body_profile: str = "v1"  # key of PROFILES; "v1" is the frozen defect the published v1 sets were built with
+
+
+PROFILES = {"v1": M.body_profile_v1, "pointwise": M.body_profile}
+
+
+def profile_of(spec: FormSpec):
+    return PROFILES[spec.body_profile]
 
 
 def P(value, kind, note="", locator=""):
@@ -113,6 +121,17 @@ SETS = {
                 "optimum; range ordering flips with release speed",
         "source": src.NCA_CONTROLLED},
 }
+V2_NOTE = ("v2 corrects the body half-width used at single stations (fin roots, dorsal/anal fins, stand saddle): v1 "
+           "evaluated mesh.body_profile_v1, which normalises by its input's maximum and so returned near full width "
+           "at any single point.  Same sources, solver, print rules and shape parameters as v1; the v1 files stay "
+           "as published.")
+SETS.update({
+    "morphology-v2": {"title": SETS["morphology-v1"]["title"] + " (v2, corrected body profile)",
+                      "note": SETS["morphology-v1"]["note"] + ". " + V2_NOTE, "supersedes": "morphology-v1"},
+    "nca-comparison-v2": {"title": SETS["nca-comparison-v1"]["title"] + " (v2, corrected body profile)",
+                          "note": SETS["nca-comparison-v1"]["note"] + ". " + V2_NOTE, "source": src.NCA_CONTROLLED,
+                          "supersedes": "nca-comparison-v1"},
+})
 
 FORMS = [
     FormSpec(
@@ -163,7 +182,20 @@ FORMS = [
         ("N3-area-x1.3-ar-x1.2", "Comparison N3: wing area x1.3, aspect ratio x1.2", "N3 · area ×1.3, AR ×1.2",
          "N1 with wing area x1.3 and whole-wing b^2/S x1.2 (NCA variant fS 1.3, fAR 1.2)", (1.3, 1.2)))
 ]
-FORMS_BY_ID = {f.id: f for f in FORMS}
+
+
+def _v2(spec: FormSpec) -> FormSpec:
+    """The same form with the pointwise body profile, under a new id and set (v1 ids keep their v1 files)."""
+    return replace(spec, id=spec.id + "-v2", set_id=spec.set_id.replace("-v1", "-v2"), short=spec.short + " · v2",
+                   title=spec.title + " (v2)", body_profile="pointwise",
+                   fin_shape_from=spec.fin_shape_from and spec.fin_shape_from + "-v2",
+                   status_note=(spec.status_note + " " if spec.status_note else "") +
+                   f"v2 of {spec.id}: body half-width at single stations corrected (see the set note).")
+
+
+FORMS_V2 = [_v2(f) for f in FORMS]
+EDITIONS = {"v1": FORMS, "v2": FORMS_V2}  # build.py builds one edition per output directory
+FORMS_BY_ID = {f.id: f for f in FORMS + FORMS_V2}
 
 
 def _v(p):
@@ -183,7 +215,7 @@ def biological_point(spec: FormSpec) -> dict:
     """Sourced biological inputs (SI) before the fin layout is resolved."""
     m = spec.mass_kg
     sl = src.fit(spec.genus, "length", m)
-    mass_loc = (src.COMPARISON_MASS["locator"] if spec.set_id == "morphology-v1" else
+    mass_loc = (src.COMPARISON_MASS["locator"] if spec.set_id.startswith("morphology-") else
                 f"dx-nca comparison protocol mass (work/nca-glide @ {src.NCA_CONTROLLED['commit'][:7]}); inside Fish "
                 "1990's 0.003-0.53 kg specimens")
     out = {"mass_kg": P(m, "functional", locator=mass_loc),
@@ -210,7 +242,7 @@ def biological_point(spec: FormSpec) -> dict:
     return out
 
 
-def body_scale(sl: float, mass: float, rho: float, a: dict, profile=M.body_profile_v1) -> tuple[float, float]:
+def body_scale(sl: float, mass: float, rho: float, a: dict, profile) -> tuple[float, float]:
     """Max half-width W (m) such that the loft's volume equals mass / density.  Returns (W, volume)."""
     s = np.linspace(0, 1, 4001)
     f = profile(s, _v(a["peduncle_fraction"]))
@@ -226,9 +258,11 @@ def _chord_integral(base_frac: float, s_max: float) -> float:
     return float(np.trapezoid(M.fin_chord(x, base_frac, s_max), x))
 
 
-def fin_layout(spec: FormSpec, bio: dict, shape_ref: dict | None = None, profile=M.body_profile_v1) -> dict:
+def fin_layout(spec: FormSpec, bio: dict, shape_ref: dict | None = None, profile=None) -> dict:
     """Fin lengths, areas, chords and body rectangles in SI, before print-only opening/thickening.
-    Fish 1990 wing area = 2 pectoral + 2 pelvic + the body rectangle at each fin base (base chord x body width)."""
+    Fish 1990 wing area = 2 pectoral + 2 pelvic + the body rectangle at each fin base (base chord x body width).
+    `profile` defaults to the spec's (profile_of)."""
+    profile = profile or profile_of(spec)
     a = spec.params
     sl = _v(bio["standard_length_m"])
     W = _v(bio["body_half_width_max_m"])
@@ -269,9 +303,11 @@ def fin_layout(spec: FormSpec, bio: dict, shape_ref: dict | None = None, profile
             "pectoral_length_over_sl": L_p / sl, "pelvic_length_over_sl": L_v / sl}
 
 
-def complete_point(spec: FormSpec, bio: dict, shape_ref: dict | None = None, profile=M.body_profile_v1) -> dict:
+def complete_point(spec: FormSpec, bio: dict, shape_ref: dict | None = None, profile=None) -> dict:
     """Body size from volume = mass / density, then the fin layout; fin_ratio forms get S, b, share from it.
-    `profile` defaults to the frozen v1 function so the published print sets rebuild unchanged (see mesh.py)."""
+    `profile` defaults to the spec's: the frozen v1 function for v1 forms, so the published sets rebuild unchanged
+    (see mesh.py), the pointwise one for v2 forms."""
+    profile = profile or profile_of(spec)
     a = spec.params
     sl = _v(bio["standard_length_m"])
     W, V = body_scale(sl, spec.mass_kg, _v(bio["body_density_kg_m3"]), a, profile)
@@ -384,7 +420,7 @@ def build_prop(spec: FormSpec, bio: dict, scale: float, res: M.Resolution = M.Re
     to_bio_area = 1 / (k * k)
 
     def prof(s):
-        return M.body_profile_v1(np.asarray(s, dtype=float), ped)  # frozen for the published print sets
+        return profile_of(spec)(np.asarray(s, dtype=float), ped)  # v1 forms: the frozen defect (see mesh.py)
 
     # --- body: cosine-clustered stations, half-sizes clamped to the print minimum near the snout
     s = 0.5 * (1 - np.cos(np.linspace(0, np.pi, res.stations)))
@@ -506,5 +542,5 @@ def body_section_mm(spec: FormSpec, bio: dict, scale: float):
     hw, flat, ped = _v(a["body_height_over_width"]), _v(a["ventral_flattening"]), _v(a["peduncle_fraction"])
 
     def f(x):
-        return float(M.body_profile_v1(np.array([min(max(x / sl, 0), 1)]), ped)[0])
+        return float(profile_of(spec)(np.array([min(max(x / sl, 0), 1)]), ped)[0])
     return (lambda x: W * f(x)), (lambda x: -W * hw * flat * f(x))
