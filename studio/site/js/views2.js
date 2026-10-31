@@ -602,10 +602,13 @@
     return { html: html`${cv.html}`, async after(root) {
       const slot = document.createElement("section"); slot.className = "panel"; slot.setAttribute("aria-labelledby", "dr-h"); slot.innerHTML = '<h2 id="dr-h">Ranked results</h2><p role="status" class="small">Searching…</p>';
       root.querySelector("section:last-of-type").before(slot);
+      const weak = (text, items) => { const t = String(text || "").toLowerCase().split(/[^a-z0-9]+/).filter((w) => w.length >= 3); return items.length > 0 && t.length > 0 && !items.some((x) => t.some((w) => ((x.title || "") + " " + (x.snippet || "")).toLowerCase().includes(w))); };
       try {
         const r = await DF.api.discovery(q, { limit: 20 });
-        const eng = r.source === "discovery" ? `engine ${r.mode}${r.index ? " · index " + JSON.stringify(r.index).slice(0, 120) : ""}` : `lexical text match${r.unavailable_reason ? " (" + r.unavailable_reason + ")" : ""}`;
+        const idx = (ix) => Object.entries(ix || {}).filter(([, v]) => v !== null && typeof v !== "object").slice(0, 5).map(([k, v]) => k.replace(/_/g, " ") + " " + v).join(", ");
+        const eng = r.source === "discovery" ? `engine ${r.mode}${r.index ? " · index " + idx(r.index) : ""}` : `lexical text match${r.unavailable_reason ? " (" + r.unavailable_reason + ")" : ""}`;
         slot.innerHTML = html`<h2 id="dr-h">Ranked results</h2><p class="note small"><b>${eng}.</b> ${r.source === "discovery" && r.unavailable_reason ? "Note: " + r.unavailable_reason + ". " : ""}A score is shown only with its kind; a rank is not truth, quality or acceptance.</p>
+          ${weak(q, r.items) ? html`<p class="note warn small" role="status"><b>No result contains your words.</b> These are the nearest items by similarity, which are returned for any text, including nonsense. A high rank here is not a match.</p>` : ""}
           ${r.items.length ? html`<ul class="catalog">${r.items.map((x) => html`<li class="catrow"><div>${U.pill(x.type || "record", "grp")} <a class="srclink" href="${x.ref ? DF.href("/entity/" + x.ref.kind + "/" + x.ref.id, { v: x.ref.version, ns: x.ref.namespace }) : "#/search"}"><b>${x.title || (x.ref && x.ref.id) || "(untitled)"}</b></a> ${x.kind ? html`<span class="faint small">${x.kind}</span>` : ""}</div>
             ${x.snippet ? html`<div class="small">${x.snippet}</div>` : ""}<div class="small faint">${x.local_status ? "local status: " + String(x.local_status).replace(/_/g, " ") + " · " : ""}${x.score !== null && x.score !== undefined ? (x.score_kind || "score") + " " + x.score + " · " : ""}${Array.isArray(x.why_matched) ? "matched: " + x.why_matched.join("; ") : x.why_matched ? "matched: " + x.why_matched : ""}</div></li>`)}</ul>` : html`<p class="empty">No ranked result. ${eng}.</p>`}`.toString();
       } catch (e) { slot.innerHTML = html`<h2 id="dr-h">Ranked results</h2><p class="empty">Ranked results could not be loaded: ${e.message}. The catalog list below still works.</p>`.toString(); }

@@ -142,13 +142,16 @@
     try { return { report: await getJSON("api/attention", 8000) }; } catch (e) { return { unavailable: true, reason: e.message }; }
   }
   /* POST /api/simulations/run {model, parameters} -> frontier.simulation.preview/1 (completed | unknown with reason). 400 invalid, 429 busy, 503 unavailable carry fixed safe messages. */
+  /* An API error may be a string or {code, message}; never print an object. */
+  const errCode = (j) => { const e = j && j.error; const c = e && typeof e === "object" ? e.code : e; return c ? ", " + String(c) : ""; };
+  const errMessage = (j) => { const m = (j && j.message) || (j && j.error && typeof j.error === "object" && j.error.message); return m ? ": " + (typeof m === "string" ? m : JSON.stringify(m)) + "." : "."; };
   async function simulate(body) {
     if (!isLive()) throw new Unavailable("simulation", "No runtime is connected, so nothing ran and no result is shown.");
     if (JSON.stringify(body).length > 8192) throw new Error("the request is larger than the 8192-byte limit");
     const sess = await getJSON("api/session", 5000); if (!sess.csrf) throw new Error("the session did not provide a CSRF token");
     const r = await fetch("api/simulations/run", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json", "X-CSRF-Token": sess.csrf }, body: JSON.stringify(body), cache: "no-store" });
     let j = null; try { j = await r.json(); } catch (e) { /* not JSON */ }
-    if (!r.ok) throw new Error(`${{ 400: "The request was refused as invalid", 404: "This node does not serve simulation previews", 429: "The preview slots are busy; try again shortly", 503: "The simulation runtime is unavailable on this node" }[r.status] || "The request failed"} (HTTP ${r.status}${j && j.error ? ", " + j.error : ""})${j && j.message ? ": " + j.message : ""}.`);
+    if (!r.ok) throw new Error(`${{ 400: "The request was refused as invalid", 404: "This node does not serve simulation previews", 429: "The preview slots are busy; try again shortly", 503: "The simulation runtime is unavailable on this node" }[r.status] || "The request failed"} (HTTP ${r.status}${errCode(j)})${errMessage(j)}`);
     return j;
   }
   const propose = pending("proposal submission");

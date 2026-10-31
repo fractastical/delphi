@@ -18,9 +18,12 @@
     return g + "</svg>" + `<ul class="legend inline">${series.map((s, k) => `<li><i class="sw" style="background:${cols[k % 6]}"></i>${esc(s.name)}</li>`).join("")}</ul>`;
   }
 
+  /* A digest field may be one hash or a map of file to hash. */
+  const shaField = (v) => (v && typeof v === "object" ? html`${Object.entries(v).map(([k, h]) => html`<span class="small">${k}: ${U.sha(h)}</span> `)}` : U.sha(v));
+
   function render(model, r) {
     const res = r.result || {};
-    const meta = html`<p class="small faint">${r.schema} · ${r.status} · evidence kind ${r.evidence_kind} · persisted: <b>${String(r.persisted)}</b> · calibrated: <b>${String(r.calibrated)}</b> · computed ${r.computed_at}<br>request sha256 ${U.sha(r.request_sha256)} · effective request ${U.sha(r.effective_request_sha256)} · code ${U.sha(r.code_sha256)}</p>${r.scope ? html`<p class="note small"><b>Scope.</b> ${r.scope}</p>` : ""}${r.preview_limits ? html`<details><summary class="small">Preview limits</summary><pre class="json">${JSON.stringify(r.preview_limits, null, 1)}</pre></details>` : ""}`;
+    const meta = html`<p class="small faint">${r.schema} · ${r.status} · evidence kind ${r.evidence_kind} · persisted: <b>${String(r.persisted)}</b> · calibrated: <b>${String(r.calibrated)}</b> · computed ${r.computed_at}<br>request sha256 ${U.sha(r.request_sha256)} · effective request ${U.sha(r.effective_request_sha256)} · code ${shaField(r.code_sha256)}</p>${r.scope ? html`<p class="note small"><b>Scope.</b> ${r.scope}</p>` : ""}${r.preview_limits ? html`<details><summary class="small">Preview limits</summary><pre class="json">${JSON.stringify(r.preview_limits, null, 1)}</pre></details>` : ""}`;
     if (r.status !== "completed") return html`<div class="rescard"><div class="resrow"><span class="vlabel">${r.status}</span></div><p>${r.reason ? String(r.reason).replace(/_/g, " ") : "The node did not complete the run."} No result or frames were returned, and none are shown.</p>${meta}</div>`.toString();
     let chart = "", note = "";
     if (model === "bioelectric" && Array.isArray(res.time_ms) && Array.isArray(res.voltage_mV)) {
