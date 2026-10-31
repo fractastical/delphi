@@ -1,0 +1,26 @@
+{
+  "claim_id": "wolfram2002-ch10-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch10-08",
+  "project": "wolfram-nks",
+  "status": "preregistered",
+  "hypothesis": "Six structurally different lossless compression methods (run-length, block Huffman, LZ77/Deflate, LZMA, Burrows-Wheeler/bzip2 and a two-dimensional quadtree code) all strongly compress uniform and repetitive cellular automaton patterns, compress nested patterns at least partly, and achieve little compression of complex patterns from rules 30 and 45, relative to random patterns of the same density.",
+  "pass_criterion": "Pre-registered. Patterns: elementary CAs from a single black cell, T = 2048 steps; window rows 1024-2047, columns -512..511 (1024 x 1024 cells, inside the light cone). Classes: uniform = rule 254; repetitive = rules 50 and 250; nested = rules 90 and 150; complex = rules 30 and 45; exploratory (not in the verdict) = rule 110. Methods: (1) run-length coding of the row-major bit stream with Elias-gamma run lengths; (2) static Huffman code on non-overlapping 8-bit blocks (size = code bits + 256-byte table); (3) zlib level 9; (4) lzma preset 9 extreme; (5) bz2 level 9; (6) quadtree code of the 1024 x 1024 bitmap (1 bit 'split' or 2 bits 'uniform leaf + colour'; 1 bit per single cell). Statistic: r = size(pattern) / size(Bernoulli(d) pattern of the same shape), d = pattern's black fraction clipped to [0.01, 0.99], Bernoulli control from numpy PCG64 seed 20261031. 'supports' if all of: (a) uniform: r <= 0.10 for all 6 methods; (b) each repetitive rule: r <= 0.20 for at least 4 of 6 methods; (c) each nested rule: r <= 0.80 for at least 3 of 6 methods; (d) each complex rule: r >= 0.85 for all 6 methods.",
+  "fail_criterion": "Pre-registered. 'refutes' if any method achieves r < 0.60 on rule 30 or rule 45 (substantial compression of complex behavior by a generic method), or if (b) and (c) both fail (the methods do not share the ability to compress repetition and nesting). 'mixed' otherwise when any of (a)-(d) fails.",
+  "planned_datasets": [
+    "eca-single-cell-patterns-T2048",
+    "bernoulli-reference-pcg64"
+  ],
+  "interpretation": "Wolfram (p. 560-570) compares run-length, block (Huffman), pointer-based (LZ) and two-dimensional schemes on CA patterns and concludes they share the same capabilities. The four families are represented by our own run-length and block-Huffman coders, three standard library compressors (zlib/Deflate and lzma are pointer-based; bzip2 adds a block-sorting family Wolfram does not discuss) and a quadtree code as the two-dimensional scheme. 'Substantial compression' is measured relative to a random pattern of the same density, so that compression explained by an unequal black/white ratio alone does not count; thresholds of 0.85 (little compression) and 0.60 (substantial) are our choice. The universal 'all methods' wording cannot be tested; a purpose-built compressor for a specific rule is outside the claim's scope (generic methods), as the assessors note.",
+  "test_contract": {
+    "expected_observation": "Across all six methods, uniform and repetitive windows compress to a small fraction of a density-matched random window, nested windows compress at least partly, and rule 30 and rule 45 windows compress by at most 15 %.",
+    "disconfirming_observation": "Any generic method compressing a rule 30 or rule 45 window to less than 60 % of a density-matched random window, or the methods failing to compress both repetitive and nested patterns.",
+    "admissible_datasets": "Patterns generated exactly from elementary CA rules by committed code, analysed in a window inside the light cone; generic compressors not tuned to any rule; density-matched seeded random references.",
+    "inference_method": "Compressed size ratio r against a density-matched Bernoulli pattern for each (rule, method), compared with the pre-registered per-class thresholds."
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
