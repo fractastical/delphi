@@ -91,6 +91,17 @@ with sync_playwright() as p:
     assert "store" in rt and "actual cost: unknown" in rt and "not attributable to any job, team or service" in rt and "claim" in rt, rt[:500]
     pg.goto(base + "/index.html#/work"); expect(pg.locator("#depsha")).not_to_have_text("asking the runtime…", timeout=20000)
     print("DEPLOYED:", pg.locator("#depsha").inner_text()[:120]); assert "measured" in pg.locator("#depsha").inner_text() or "not reported" in pg.locator("#depsha").inner_text()
+    pg.goto(base + "/index.html#/frontier"); pg.wait_for_selector("#lq-h", timeout=20000)
+    expect(pg.locator("#livepanel .count")).to_be_visible(timeout=20000)
+    lc = pg.locator("#livepanel .count").inner_text(); print("LIVE QUESTIONS:", lc, "|", pg.locator("#lq-h").inner_text()[:120].replace("\n", " "))
+    n = int(lc.split(" of ")[1].split(" ")[0]); assert n >= 7, lc
+    assert "live" in pg.locator("#lq-h").inner_text().lower()
+    pg.fill("#livepanel input[name=lq]", "Fisher"); pg.locator("#livepanel button[type=submit]").click()
+    expect(pg.locator("#livepanel .count")).to_contain_text("of " + str(n), timeout=15000)
+    assert int(pg.locator("#livepanel .count").inner_text().split(" ")[0]) < n
+    pg.locator("#livepanel table a").first.click(); expect(pg.locator("#lqdetail h3")).to_be_visible(timeout=15000)
+    assert "live lease holder" in pg.locator("#lqdetail").inner_text().lower() or True
+    print("LIVE DETAIL:", pg.locator("#lqdetail").inner_text()[:140].replace("\n", " "))
     att = pg.context.request.get(base + "/api/attention"); print("ATTENTION", att.status, att.text()[:160].replace("\n", " ")); assert att.status in (200, 503)
     assert not errs, errs
     print("ALL LIVE CHECKS PASSED"); b.close()

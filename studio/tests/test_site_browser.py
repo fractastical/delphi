@@ -270,3 +270,11 @@ def test_print_forms_and_videos_match_their_declared_bytes(browser, base):
     assert pg.locator("video").count() == len(vids)
     for m in vids:
         assert (ROOT / "site" / m["video_href"]).is_file()
+
+
+def test_frontier_labels_snapshot_versus_live_views(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector("#livepanel h2")
+    assert "snapshot" in pg.locator("#livepanel").inner_text().lower()
+    assert "curated mission projection from the snapshot" in pg.locator("section.board").inner_text().lower()

@@ -109,6 +109,69 @@
     </article>`;
   }
 
+  /* ---------- live questions: from /api/attention when present, else the live catalog's Problem records ---------- */
+  const val = (x) => (x && typeof x === "object" && "value" in x ? x.value : x);
+  let liveCache = null;
+  async function liveRows() {
+    if (liveCache && Date.now() - liveCache.t < 20000) return liveCache.v;
+    let v;
+    const a = await DF.api.attention();
+    if (!a.unavailable && a.report && a.report.view && Array.isArray(a.report.view.rows)) {
+      v = { source: "attention", generated_at: a.report.generated_at, namespace: a.report.namespace, rows: a.report.view.rows.map((r) => ({
+        id: r.ref.id, ref: r.ref, kind: val(r.store.problem_kind), completeness: val(r.store.completeness), question: r.store.question, known: r.store.known_state, next: r.store.next_action_text,
+        approach: r.store.approach, scales: r.store.scales, tags: r.store.context_tags, ndeps: (r.store.dependencies || []).length, dependents: r.dependents || [], annotation: r.annotation, utility: r.utility,
+        assessment: r.assessment, actions: r.actions || [], interests: r.interest_issuers || {}, why: r.why_priority || [], register: r.register_labels })) };
+    } else {
+      const rows = []; let after = "", pages = 0;
+      do { const r = await DF.api.catalog({ kind: "Problem", limit: 50, after }); r.records.forEach((x) => { const p = x.payload || {}; rows.push({ id: x.ref.id, ref: x.ref, kind: p.problem_kind, completeness: p.completeness, question: p.question, known: p.known_state, next: p.next_action, approach: p.approach, scales: p.scales, tags: p.context_tags, ndeps: (p.dependencies || []).length, dependents: [], annotation: null, utility: null, assessment: null, actions: null, interests: {}, why: [], title: p.title, local_status: x.local_status }); }); after = r.next_cursor || ""; pages++; } while (after && pages < 40);
+      v = { source: "catalog", reason: a.reason, rows };
+    }
+    liveCache = { t: Date.now(), v }; return v;
+  }
+
+  DF.renderLiveQuestions = async function (host, snap, route) {
+    if (!(DF.api.state.mode === "live" && DF.api.state.authenticated)) { host.innerHTML = html`<section class="panel"><h2>Questions ${U.pill("snapshot", "warn")}</h2><p class="small">Only the curated snapshot projection below is available: ${DF.api.state.mode === "live" ? "the runtime is reachable but this session is not signed in." : "no runtime answered."} The live store's questions appear here when the runtime is reachable and you are signed in.</p></section>`.toString(); return; }
+    host.innerHTML = '<section class="panel"><h2>Questions</h2><p role="status">Loading the live questions…</p></section>';
+    let L; try { L = await liveRows(); } catch (e) { host.innerHTML = html`<section class="panel"><h2>Questions</h2><p class="empty">The live questions could not be read: ${e.message}. Nothing is shown in their place.</p></section>`.toString(); return; }
+    const f = { lq: route.params.lq || "", lk: route.params.lk || "", lc: route.params.lc || "", la: route.params.la || "", lw: route.params.lw || "", n: Math.max(40, +route.params.n || 40) };
+    const sel = route.params.live || null; const rows = L.rows;
+    const owner = (r) => (r.actions ? [...new Set(r.actions.filter((x) => x.lease_live_at_now && x.lease_operator).map((x) => x.lease_operator))] : null);
+    const match = (r) => (!f.lk || r.kind === f.lk) && (!f.lc || r.completeness === f.lc) && (!f.la || (r.approach || "none") === f.la) && (!f.lw || (f.lw === "leased" ? (owner(r) || []).length : f.lw === "actions" ? (r.actions || []).length : true)) && (!f.lq || JSON.stringify([r.id, r.question, r.known, r.tags, r.title]).toLowerCase().includes(f.lq.toLowerCase()));
+    const list = rows.filter(match); const shown = list.slice(0, f.n);
+    const uniq = (k) => [...new Set(rows.map((r) => r[k] || (k === "approach" ? "none" : "")).filter(Boolean))].sort();
+    const hrefF = (extra) => DF.href("/frontier", { ...route.params, ...extra });
+    const cur = rows.find((r) => r.id === sel);
+    const row = (r) => { const o = owner(r); return html`<tr class="${r.id === sel ? "on" : ""}"><td><a href="${hrefF({ live: r.id })}" aria-current="${r.id === sel ? "true" : "false"}"><b>${r.id}</b></a></td><td>${r.title || ""}${r.title ? html`<br>` : ""}<span class="small">${String(r.question || "").slice(0, 160)}${String(r.question || "").length > 160 ? "…" : ""}</span></td><td>${U.pill(String(r.completeness || "not stated"), r.completeness === "actionable" ? "ok" : "st-unk")}</td><td>${r.approach ? U.pill(r.approach, "ap-" + r.approach) : html`<span class="faint small">not stated</span>`}</td><td>${o === null ? html`<span class="faint small">needs attention layer</span>` : o.length ? o.join(", ") : html`<span class="faint small">none recorded</span>`}</td><td>${r.actions === null ? "" : (r.actions || []).length}</td></tr>`; };
+    const det = cur ? liveDetail(cur) : html`<div class="detail-empty"><h3>Select a question</h3><p>Pick a row to see what the store declares about it: state, who holds a live lease, actions, dependents, and why it is ranked where it is.</p></div>`;
+    host.innerHTML = html`<section class="panel livepanel" aria-labelledby="lq-h"><h2 id="lq-h">Questions ${U.pill("live", "ok")} <span class="faint small">${rows.length} in the node${L.source === "attention" ? ", via the attention layer" : ", via the catalog (attention layer unavailable, so no owners or actions)"}</span></h2>
+      <p class="small faint">Read just now from the runtime${L.generated_at ? " (" + L.generated_at + ")" : ""}. This is the store's own list, separate from the curated mission projection below. A count of records is not a measure of progress, and priority is not truth.</p>
+      <form class="filters" data-form="frontier" aria-label="Filter the live questions"><label>Search <input type="search" name="lq" value="${f.lq}" placeholder="id, text or tag"></label>
+        <label>Kind <select name="lk"><option value="">all</option>${uniq("kind").map((k) => html`<option ${k === f.lk ? raw("selected") : ""}>${k}</option>`)}</select></label>
+        <label>Completeness <select name="lc"><option value="">all</option>${uniq("completeness").map((k) => html`<option ${k === f.lc ? raw("selected") : ""}>${k}</option>`)}</select></label>
+        <label>Approach <select name="la"><option value="">all</option>${uniq("approach").map((k) => html`<option ${k === f.la ? raw("selected") : ""}>${k}</option>`)}</select></label>
+        ${L.source === "attention" ? html`<label>Work <select name="lw"><option value="">any</option><option value="leased" ${f.lw === "leased" ? raw("selected") : ""}>live lease held</option><option value="actions" ${f.lw === "actions" ? raw("selected") : ""}>has an action</option></select></label>` : ""}
+        <input type="hidden" name="live" value="${sel || ""}"><button class="btn" type="submit">Apply</button>${f.lq || f.lk || f.lc || f.la || f.lw ? html`<a class="btn ghost" href="${DF.href("/frontier", sel ? { live: sel } : {})}">Clear</a>` : ""}</form>
+      <p class="count" role="status">${list.length} of ${rows.length} shown (${shown.length} on screen)</p>
+      <div class="split graphsplit"><div class="tablewrap"><table class="qtable"><thead><tr><th>Id</th><th>Question</th><th>Completeness</th><th>Approach</th><th>Live lease holder</th><th>Actions</th></tr></thead><tbody>${shown.map(row)}</tbody></table>
+        ${list.length > shown.length ? html`<p><a class="btn small" href="${hrefF({ n: f.n + 60 })}">Show 60 more</a></p>` : ""}</div><div class="detail-col" id="lqdetail" tabindex="-1">${det}</div></div></section>`.toString();
+    DF.bindForm(host, "frontier", (vals) => DF.href("/frontier", vals)); DF.renderMath(host);
+  };
+
+  function liveDetail(r) {
+    const o = r.actions ? [...new Set(r.actions.filter((x) => x.lease_live_at_now && x.lease_operator).map((x) => x.lease_operator))] : null;
+    return html`<article class="detail"><p class="eyebrow">${r.id} · ${r.kind || "kind not stated"}</p><h3>${r.title || String(r.question || r.id).slice(0, 120)}</h3>
+      <p>${U.pill(String(r.completeness || "not stated"), r.completeness === "actionable" ? "ok" : "st-unk")} ${r.approach ? U.pill(r.approach, "ap-" + r.approach) : ""} ${U.pill("live", "ok")}</p>
+      ${r.completeness && r.completeness !== "actionable" ? html`<p class="note small">Recorded only: no Action can target it until acceptance criteria, falsifiers, a next action and stop bounds exist.</p>` : ""}
+      <dl class="kv wide"><div><dt>Live lease holder</dt><dd>${o === null ? "needs the attention layer" : o.length ? o.join(", ") : "none recorded"}</dd></div><div><dt>Scales (as the record states)</dt><dd>${(r.scales || []).join(", ") || "not stated"}</dd></div><div><dt>Context tags</dt><dd>${(r.tags || []).join(", ") || "not stated"}</dd></div>
+        <div><dt>Dependencies / dependents</dt><dd>${r.ndeps} / ${(r.dependents || []).length}</dd></div></dl>
+      <h4>The question</h4><p>${r.question}</p><h4>What is known</h4><p>${r.known}</p>${r.next ? html`<h4>Next action (as written)</h4><p>${r.next}</p>` : ""}
+      ${r.actions ? html`<h4>Actions</h4>${r.actions.length ? html`<div class="tablewrap"><table><thead><tr><th>Action</th><th>State</th><th>Live lease</th><th>Operator</th></tr></thead><tbody>${r.actions.map((x) => html`<tr><td><code>${x.id}</code></td><td>${x.state}</td><td>${String(x.lease_live_at_now)}</td><td>${x.lease_operator || ""}</td></tr>`)}</tbody></table></div>` : html`<p class="faint">No action targets it.</p>`}` : ""}
+      ${r.assessment !== undefined && r.assessment !== null ? html`<h4>Assessment (truth, kept separate from priority)</h4><p class="small">${typeof r.assessment === "object" ? JSON.stringify(r.assessment) : r.assessment}</p>` : ""}
+      ${r.utility ? html`<p class="small"><b>Utility:</b> ${r.utility.status}${r.utility.evpi !== null && r.utility.evpi !== undefined ? ", declared value " + r.utility.evpi + " " + (r.utility.unit || "") : ", unknown; nothing is imputed"}.</p>` : ""}
+      ${(r.why || []).length ? html`<details><summary class="small">Why it sits where it does (${r.why.length} reasons)</summary><ul>${r.why.map((w) => html`<li class="small"><code>${w.field}</code> = ${typeof w.value === "object" ? JSON.stringify(w.value) : w.value}: ${w.effect}</li>`)}</ul></details>` : ""}
+      <p class="small faint">${r.ref ? `${r.ref.namespace}/${r.ref.kind}/${r.ref.id}` : ""} ${r.ref ? "version " + String(r.ref.version).slice(0, 12) + "…" : ""}</p></article>`;
+  }
+
   DF.views.frontier = function (snap, route) {
     const wb = note(snap); const m = snap.mission;
     const f = { q: route.params.q || "", approach: route.params.approach || "", dir: route.params.dir || "", scale: route.params.scale || "", state: route.params.state || "" };
@@ -130,9 +193,10 @@
         <div class="herotext"><p class="lede">An open-questions whiteboard where a design goal and the literature meet. <b>Top-down</b>: goal, then constraints, then what is unresolved. <b>Bottom-up</b>: theory and evidence fitted to known biology, then challenged and reconciled. The questions column is where they have to agree.</p>
           <p class="mission"><b>Mission</b> Engineer toward a flying fish.</p></div></section>
 
+      <div id="livepanel"></div>
       <section class="panel board" aria-labelledby="wb-h">
         <h2 id="wb-h">Open-questions whiteboard</h2>
-        <p class="note small">${wb.note}</p>
+        <p class="note small"><b>Curated mission projection from the snapshot.</b> Approach, scales and blockers here are site-assigned until a record states its own (the record's value wins). No owner appears unless a record names one.<details><summary class="small">How these annotations were made</summary><p class="small">${wb.note}</p></details></p>
         <div class="chips" role="group" aria-label="Direction">${dirChips}</div>
         <form class="filters" role="search" aria-label="Filter the whiteboard" data-form="frontier">
           <label>Search <input type="search" name="q" value="${f.q}" placeholder="text, tag or owner"></label>
@@ -153,8 +217,9 @@
         <div class="mv-head"><h2 id="mv">Mission view: eleven scales, one design</h2>
           <p class="note small">Each scale is a way to look at the same design. Showing a scale does not mean an executable model exists there; ${m.scales.filter((s) => s.have.length).length} of 11 have at least one indexed source.</p></div>
         <div class="mv-body"><div class="mv-fish"><div id="fishmini" class="fishmini"></div></div><ol class="scales" aria-label="The eleven MorphoSwarm scales; each opens Engineering at that scale">${scaleChips}</ol></div></section>`,
-      after(root) {
+      async after(root) {
         DF.mountFishMini(root.querySelector("#fishmini"));
+        DF.renderLiveQuestions(root.querySelector("#livepanel"), snap, route);
         const cls = { goal: "goal", con: "con" };
         DF.graph.draw(root.querySelector("#wbgraph"), {
           columns: [{ title: "Design goal" }, { title: "Constraints" }, { title: "Unresolved questions" }, { title: "Literature and theory" }],
