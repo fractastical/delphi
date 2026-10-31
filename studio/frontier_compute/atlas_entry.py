@@ -15,6 +15,9 @@ from frontier_compute.telemetry import Telemetry
 
 A = json.load(open(sys.argv[1]))
 cells = A["cells"]
+selected_arms = set(sys.argv[sys.argv.index("--arms") + 1].split(",")) if "--arms" in sys.argv else {"base", "dt2", "grid2", "perturb"}
+if not selected_arms or not selected_arms <= {"base", "dt2", "grid2", "perturb"}:
+    raise ValueError("unknown atlas arm")
 lim = int(os.environ.get("ATLAS_LIMIT", "0"))
 if lim:
     cells = cells[:lim]
@@ -35,6 +38,8 @@ print("env", json.dumps(meta), flush=True)
 ARMS = [("base", 0.02, 1, 0.0, False), ("dt2", 0.01, 1, 0.0, True), ("grid2", 0.02, 2, 0.0, True), ("perturb", 0.02, 1, 1e-10, True)]
 rows, fields = [], {}
 for arm, dt, gf, pert, subset_only in ARMS:
+    if arm not in selected_arms:
+        continue
     if time.time() - t_start > budget:
         meta["arms"][arm] = {"status": "not_run_out_of_budget"}; print("arm", arm, "NOT RUN (budget)", flush=True); continue
     pool = [c for c in cells if (c["id"] in sub_ids or not subset_only)]
