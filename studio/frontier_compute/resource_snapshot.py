@@ -73,7 +73,7 @@ def summarize(document: dict, observed: datetime) -> dict:
     return {
         "observed_at_utc": observed.isoformat().replace("+00:00", "Z"),
         "scope": "Own job names beginning delphi-evolve-ops- or bioservices-; other-team state counts only",
-        "own_job_count": len(own), "job_states": states, "active_jobs": active,
+        "own_job_count": len(own), "job_states": states, "own_jobs": own, "active_jobs": active,
         "shared_state_counts": dict(shared),
         "active_allocations": {
             "instances": len(active),
