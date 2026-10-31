@@ -1,4 +1,4 @@
-# 90-second pitch — agentic engineering, end to end
+# 90-second pitch — MorphoSwarm Frontier: a design studio on a shared scientific frontier
 
 **Release pitched:** `12eb390` on `codex/frontier-demo-20261031`, the **public deployed
 release** — live at `https://frontier.morphoswarm.ai/` (HTTP 200), API `{"mode":"live",
@@ -12,29 +12,35 @@ presenting; these move.
 
 ## The script
 
-> Take a concrete engineering goal: **design an evolutionarily possible flying fish.**
+> **MorphoSwarm Frontier is a design studio sitting on a shared scientific frontier.**
 >
-> An agent turns that into **sourced constraints** — wing loading, aspect ratio, launch speed,
-> longitudinal stability — each tied to the paper it came from and the population it was measured
-> over. Where no number exists, the constraint says so instead of inventing one.
+> The foundation is **Delphi** — the claims and evidence layer. **912 claims and 261 open
+> problems**, live right now, each a typed record with its source and its scope rather than a
+> paragraph of prose.
 >
-> Those constraints drive **models and simulations**, and the simulations produce **artifacts**:
-> candidate geometries, glide traces, reaction-diffusion fields, mesh files you could take to a
-> printer. Every artifact carries its inputs.
+> The studio is where you bring a design goal. Our **featured project is a flying fish**: can you
+> design one that is *evolutionarily* possible, not merely aerodynamic?
 >
-> Checking the candidates **produces new open problems** — the gaps the constraints couldn't
-> close. Those go back into the store as typed Problems, each carrying what would settle it,
-> what would refute it, and when to stop.
+> An agent turns that goal into **sourced constraints** — wing loading, aspect ratio, launch
+> speed, longitudinal stability — each tied to its paper and to the population it was measured
+> over. Where no published number exists, the constraint says so rather than inventing one.
 >
-> And the evidence is **reusable across projects**, because it's stored as records rather than
-> prose. The same store holds **912 claims and 261 open problems** right now.
+> Constraints drive **models and simulations**, which produce **artifacts**: candidate geometries,
+> glide traces, reaction-diffusion fields, print-ready meshes. Every artifact carries its inputs.
 >
-> Attention is the scarce resource, so it's modelled explicitly: what's known, what's open, what
-> an answer would unlock, and what it would cost.
+> Checking candidates **generates new open problems** — the gaps the constraints could not close.
+> Those return to the frontier as typed Problems carrying what would settle them, what would
+> refute them, and when to stop.
 >
-> On coordination we follow the organisers' own regime map. Where one channel dominates, they
-> found coordination buys interpretation, provenance and auditability — not better
-> discrimination. **That is what we built and that is all we claim.**
+> And because it is all records, **the evidence is reusable by the next project**. The flying fish
+> is one study on a frontier built to hold many.
+>
+> Attention is the scarce resource, so we model it: what is known, what is open, what an answer
+> would unlock, what it would cost.
+>
+> On coordination we follow the organisers' own regime map — where one channel dominates, it buys
+> provenance and auditability rather than better discrimination. That is what we built, and all we
+> claim.
 
 **~215 words ≈ 87 s.**
 
@@ -62,3 +68,16 @@ presenting; these move.
   survived". The ledger is how we work, not what we sell.
 - Where a constraint rests on a source read only at abstract level, the output says so. That is a
   feature; present it as one.
+
+## Framing rules
+
+- **The product is MorphoSwarm Frontier**: a **design studio** plus a **shared scientific
+  frontier**. Lead with that.
+- **Delphi is the foundation** — the claims and evidence layer the studio stands on.
+- **Flying Fish is the FEATURED PROJECT, not the platform's scope.** It demonstrates the loop;
+  it does not define it. If a listener leaves thinking we built a fish simulator, the pitch
+  failed.
+- **Darwin, Thompson and Wolfram are optional secondary lenses**, available if a question invites
+  them. They are **not** the thesis and should not open the pitch.
+- The loop is the thesis: **goal → sourced constraints → models and simulations → artifacts →
+  new open problems → evidence reusable by the next project.**
