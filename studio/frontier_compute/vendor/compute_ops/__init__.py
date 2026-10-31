@@ -4,4 +4,4 @@ Written by the gpuops role. Independent of the TrpB-specific gpu_batch/ package;
 except that jobs named with gpu_batch's prefix are counted (never cancelled) toward our GPU cap.
 """
 OWN_PREFIX = "delphi-evolve-ops-"
-COUNT_PREFIXES = ("delphi-evolve-", "kganjam-")     # counted against our cap; only OWN ids in our manifest are ever cancelled
+COUNT_PREFIXES = ("delphi-evolve-", "kganjam-", "bioservices-")  # counted against our cap; only OWN ids in our manifest are ever cancelled

@@ -57,7 +57,7 @@ async def verify(url: str, expanded: bool = False) -> dict:
                     expected = {"frontier_discover", "frontier_graph", "frontier_catalogue",
                                 "frontier_project_inspect", "frontier_artifact_inspect",
                                 "frontier_simulate", "frontier_engineer", "frontier_formalize",
-                                "frontier_belief"}
+                                "frontier_belief", "frontier_design_context"}
                     check("expanded workspace tools discoverable", expected <= set(names))
                     discovery = value(await session.call_tool("frontier_discover", {"query": "fish"}))
                     check("discovery returns explicit mode without provider calls",
@@ -68,6 +68,13 @@ async def verify(url: str, expanded: bool = False) -> dict:
                     target = projects["results"][0]["ref"]
                     project = value(await session.call_tool("frontier_project_inspect", {"target": target}))
                     check("Project exact pin preserved", project["project"]["record"]["version"] == target["version"])
+                    context = value(await session.call_tool("frontier_design_context", {"target": target, "limit": 20}))
+                    check("design context preserves exact Project and bounded discussion",
+                          context["schema"] == "frontier.project.design-context/1"
+                          and context["project"]["record"]["version"] == target["version"]
+                          and context["pagination"]["returned"] == len(context["annotations"]) <= 20)
+                    responses["design_context"] = {"target": target, "returned": len(context["annotations"]),
+                                                   "sha256": hashlib.sha256(json.dumps(context, sort_keys=True).encode()).hexdigest()}
                     graph = value(await session.call_tool("frontier_graph", {"target": target, "limit": 20}))
                     check("graph exact pin preserved", graph["scope"]["target_ref"] == target)
                     counts = value(await session.call_tool("frontier_catalogue", {}))

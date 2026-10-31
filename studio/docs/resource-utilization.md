@@ -1,5 +1,12 @@
 # Resource utilization snapshot
 
+The live-read refresh is now `python -m frontier_compute.resource_snapshot`.
+It updates only timestamped Nebius allocation state in the inventory and includes
+both compute and bioservices jobs. Other evidence keeps its original sampling
+window. Current dispatch ownership and frozen protocols are in
+[`queue.json`](../results/infra/queue.json). The narrative below is the retained
+13:54 PDT snapshot, not a claim about current utilization.
+
 Observed **2026-10-31 13:54:13 PDT (20:54:13 UTC)**. The machine-readable inventory and schema are [`resource-inventory.json`](../results/resources/resource-inventory.json) and [`resource-inventory.schema.json`](../results/resources/resource-inventory.schema.json).
 
 ## Cloud compute
