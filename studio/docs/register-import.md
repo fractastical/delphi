@@ -19,7 +19,7 @@ Source references, attestations and `why_source` are different things and are co
 
 | field | problems | entries | note |
 |---|---|---|---|
-| `why_source` | 34 | 34 | pmcid, locator and quote on all 34; 33 of the 34 quotes also appear among the attestations |
+| `why_source` | 34 | 34 | pmcid, locator and quote on all 34; for 33 of the 34 the same PMCID is also attested (quote text not compared) |
 | `references` | 74 | 108 | all 108 resolvable (102 pmcid, 6 doi); 0 carry a locator or a quote; 100 distinct sources |
 | `attestations` | 250 | 465 | 416 stance `open`, 49 `settled`; 462 pmcid, 3 url-only; all 465 carry a locator and a quote |
 
