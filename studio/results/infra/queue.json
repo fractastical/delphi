@@ -1,6 +1,6 @@
 {
   "schema": "frontier.compute-queue/1",
-  "observed_at_utc": "2026-10-31T21:44:58.194955Z",
+  "observed_at_utc": "2026-10-31T22:20:19.964367Z",
   "owner": "infra_director",
   "tasks": [
     {
@@ -21,48 +21,86 @@
     },
     {
       "job_id": "aijob-e00h6cqxa1c7cwts6y",
-      "task": "RDdt-quarter81cells",
+      "task": "RD timestep-quarter81cells",
       "owner": "infra_director",
-      "provider_state": "IMAGE_PULLING",
-      "scope": "33previouslychanged+48unchangedcontrols",
-      "protocol": "results/infra/dt4-protocol.json"
+      "provider_state": "COMPLETED",
+      "scope": "33 previously sensitive cells +48 controls;2 patterned-mode differences remain; no biological validity claim",
+      "protocol": "results/infra/dt4-protocol.json",
+      "result": "GPUops frozen analysis at work/frontier-compute commit2a23eb1"
     },
     {
       "job_id": "aijob-e00cqbmnzwmvms8ayr",
-      "task": "Atlasperturbationcompletion405cells",
+      "task": "Atlas missing initial-state perturbation checks",
       "owner": "infra_director",
-      "provider_state": "IMAGE_PULLING",
-      "scope": "357missing+48fixedrepeats",
-      "protocol": "results/infra/perturb-protocol.json"
+      "provider_state": "COMPLETED",
+      "scope": "357 missing relative 1e-10 initial-state noise checks plus48 fixed repeats; not physical parameter robustness",
+      "protocol": "results/infra/perturb-protocol.json",
+      "result": "results/infra/perturb-completion-report.json"
     },
     {
       "job_id": "aijob-e00saz7cewggkp50d2",
-      "task": "FishAoAandP9artifactrecovery",
+      "task": "Fish angle/grid controls and original artifact recovery",
       "owner": "infra_director",
-      "provider_state": "STARTING",
-      "scope": "4serialworkloads,12MBcap,paritygate",
-      "protocol": "results/infra/aoa-protocol.json"
+      "provider_state": "COMPLETED",
+      "scope": "All six angle/grid cases passed frozen numerical bounds; Re80 2D sagittal projection, span ignored",
+      "protocol": "results/infra/aoa-protocol.json",
+      "result": "results/infra/aoa-report.json"
+    },
+    {
+      "job_id": "aijob-e00vga5krqxr3xxc94",
+      "task": "Re100 cylinder outflow and refinement",
+      "owner": "infra_director",
+      "provider_state": "COMPLETED",
+      "scope": "Frozen numerical gates passed; literature bands source-unverified, physical benchmark agreement not established; corrected v2 video retained.",
+      "protocol": "PROTOCOL10.md",
+      "result": "results/compute/infra_cyl/p10_verdict.json"
+    },
+    {
+      "job_id": "aijob-e00a3q798jsc6fdbas",
+      "task": "Collagen MD first attempt",
+      "owner": "infra_director",
+      "provider_state": "FAILED",
+      "scope": "Stopped at finite-difference force control; no production trajectory. Original failure and exact state preserved.",
+      "protocol": "artifacts/molecular/protocol.json",
+      "result": "results/infra/md/recovered/molecular-output/cpu-controls/controls.json"
+    },
+    {
+      "job_id": "aijob-e00h8rra7x8ams6jyn",
+      "task": "Collagen MD derivative-oracle repair",
+      "owner": "infra_director",
+      "provider_state": "COMPLETED",
+      "scope": "Three100ps actualH100CUDA trajectories;303finite savedstates. Numerical controls/parity passed; biological accuracy/cross-scale transfer unknown.",
+      "protocol": "artifacts/molecular/protocol-reference-oracle.json",
+      "result": "results/infra/md-v2-completion.json"
+    },
+    {
+      "job_id": "aijob-e00bqeswtkd7dexff4",
+      "task": "Morpheus full-horizon baseline/feedback-off/seed-repeat",
+      "owner": "infra_director",
+      "provider_state": "RUNNING",
+      "scope": "CPU-only4vCPU,3one-thread arms,3000s each; generic model, nofishcalibration. Prior local partial run retained.",
+      "protocol": "artifacts/multicell/packet/README.md",
+      "result": "results/infra/morpheus-admission.json"
     }
   ],
   "preparation": [
     {
-      "task": "CollagenreferenceMD",
-      "owner": "mechanobio_sim",
-      "state": "CPUcontrol_and_frozenpacket_preparation",
-      "dispatcher": "infra_director",
-      "next_acceptance": "CPUminimization/shorttrajectorycontrols;pinnedOpenMM/publicstructure;finiteenergies;boundedCUDAentry;actualMDtrajectory"
+      "task": "WaterLily controlled3D fish",
+      "owner": "claude04",
+      "state": "packet finalizing",
+      "next_acceptance": "Frozen archive/SHA, safe packaging preflight, bounded total runtime, actual same-job CPU/CUDA gates; existing sphere physical-reference failure preserved."
     },
     {
-      "task": "Cylinderoutflowcontrol",
-      "owner": "GPUops",
-      "state": "CPUdevelopment_control_not_ready",
-      "next_acceptance": "Originalfailedperiodicwakepreserved;outflowboundarycontrolpassesbeforeGPU"
+      "task": "Pressure-to-fin-mechanics bridge",
+      "owner": "claude04",
+      "state": "owner WaterLily controls pending",
+      "next_acceptance": "Pressure Pa to traction N to beam q(s) N/m; analytic integration and spatial/load refinement; assumed EI"
     },
     {
-      "task": "N2N3spancomparison",
+      "task": "N2/N3 wing-span comparison",
       "state": "blocked_model_scope",
       "evidence": "results/infra/mask-distinguishability.json",
-      "reason": "Current2Dsagittalprojectionomitswing-spanchange;noARbenefitclaim"
+      "reason": "Current2D sagittal projection omits span; no aspect-ratio benefit claim"
     }
   ],
   "policies": {

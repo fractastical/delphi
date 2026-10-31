@@ -114,6 +114,8 @@ def solve_scenario(data) -> dict:
 if __name__ == "__main__":
     if sys.argv[1:] != ["--worker"]:
         raise SystemExit("Use the bounded adapter, or --worker with a finite JSON scenario on stdin")
+    from .worker_limits import cap_worker
+    cap_worker()
     try:
         raw = sys.stdin.buffer.read(MAX_REQUEST_BYTES + 1)
         if len(raw) > MAX_REQUEST_BYTES:

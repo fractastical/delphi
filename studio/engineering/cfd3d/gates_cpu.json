@@ -1,0 +1,28 @@
+{
+  "schema": "cfd3d-gates-0.1",
+  "frozen_note": "Written before any solver run. Thresholds are never changed after a result; a FAIL is kept.",
+  "solver": "WaterLily.jl (Weymouth & Font 2025, CPC 109748, arXiv 2407.16032): 3-D incompressible Navier-Stokes, Cartesian grid, BDIM immersed boundary",
+  "controls": {
+    "C0_uniform_no_body": {
+      "what": "periodic-free uniform stream U=1 through an empty 32^3 box, 200 steps, Float64",
+      "pass": {"max_abs_u_minus_U": 1e-8, "max_abs_v_w": 1e-8, "max_abs_div": 1e-8}
+    },
+    "C1_sphere_Re100": {
+      "what": "fixed sphere, Re = U D / nu = 100, domain (6D, 4D, 4D), centre at (1.5D, 2D, 2D), D = 8 and 16 cells, Float32, run to tU/D = 12, Cd = mean over tU/D in [8, 12] of total force_x / (0.5 U^2 pi D^2 / 4)",
+      "reference": "Schiller-Naumann correlation Cd = 24/Re (1 + 0.15 Re^0.687) = 1.092 at Re 100; recalled, not re-read from a primary source here",
+      "pass": {"Cd_D16_in": [0.95, 1.35], "abs_rel_diff_D8_D16_max": 0.15, "wake_steady_Cl_rms_max": 0.05},
+      "band_reasoning": "upper side wider for 4.9% blockage (pi/4 / 16) and coarse BDIM thickening; the band is set before the run"
+    },
+    "C2_mutant_viscosity_x4": {
+      "what": "same as C1 at D = 16 with nu x 4 (Re 25); reference correlation gives 2.27",
+      "pass": {"Cd_outside_C1_band": true},
+      "purpose": "shows the C1 band can fail"
+    }
+  },
+  "fish_gates": {
+    "geometry": "fish3d 994aac4 candidate 4a3b912e: 13 closed STL components in metres, x snout->tail, y left, z dorsal",
+    "resolution_rule": "a component is resolved only if its minimum thickness >= 2 grid cells; otherwise its forces are refused and it is labelled sub-grid",
+    "Re_rule": "only Re (on total length) <= 2000 is run; flight Re (air ~1e5-2e5) is refused as unsupported by these grids",
+    "grid_rule": "every fish force is reported beside the same case at half resolution, with relative difference; no convergence claim unless the pair differs by <= 10%"
+  }
+}
