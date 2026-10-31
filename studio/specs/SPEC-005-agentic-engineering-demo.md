@@ -24,7 +24,7 @@ those same records, not a second source of truth.
 
 ## Schema
 
-The existing nine record envelopes remain authoritative. Domain records below
+The existing record envelopes, including Project and Annotation, remain authoritative. Domain records below
 are versioned payloads/adapters linked to those envelopes; adding fields requires
 backward-compatible validation and coupled tests, not an untyped second database.
 
@@ -121,3 +121,53 @@ OpenResearch for actual run capture when accessible. Sponsor discovery, API
 access and scientific execution have separate receipts. Never infer GPU use from
 a hosted model name. Existing GPU owners coordinate submissions and shared-pool
 capacity. No running jobs or credentials belonging to others are touched.
+
+## Executable multiscale integration
+
+The implementation queue now includes molecular dynamics, source-native protein
+structure prediction, electrodiffusive tissue, metabolic flux, cellular growth,
+reaction-diffusion, fin mechanics and fluid flow. `tasks/BUILD.md` records owners,
+actual run states and missing outputs. A simulator catalogue alone does not meet
+the integration requirement.
+
+Each runnable model exposes a versioned input/output contract containing spatial
+support, coordinates, physical units or explicit model units, time support,
+organism/context, geometry identity, parameter basis, validity domain, saved-state
+schema and numerical checks. Rendered frames are derived from those saved states;
+they cannot replace them. A model available in a service catalogue is distinct
+from a submitted operation, a running computation and a returned checked result.
+
+The first coupled execution targets are:
+
+1. Intracellular ODE -> cell division/mechanics -> extracellular cytokine PDE ->
+   intracellular feedback inside a documented multiscale engine. Compare the
+   baseline with a disabled feedback link using the same initial state and seeds.
+2. Simulated fluid pressure -> integrated traction -> fin-ray line load ->
+   deflection under a declared stiffness interval. Require compatible geometry,
+   units, force/moment conservation and a uniform-pressure analytic control.
+   One-way loading is not two-way fluid-structure interaction.
+3. Oxygen/nutrient boundary conditions -> metabolic feasibility -> a proposed
+   growth-demand constraint. Steady-state biomass flux does not become tissue
+   growth or organism mass without a specified and checked conversion.
+
+A simulator's internally coupled system is one model contract. It does not
+authorize arbitrary concurrent coupling between separate engines. Such a bridge
+needs an explicit exchange algorithm, time-step policy, conservation accounting,
+iteration/convergence criteria and an executed comparison; the current external
+coupling layer continues to refuse unsupported concurrent links.
+
+Bottom-up work estimates model parameters and tests laws against known biology.
+Top-down work translates a design objective into required ranges and constraints.
+They meet in a consistency check: measured context, design requirements and model
+predictions may intersect, conflict or remain indeterminate. Failure generates a
+scoped Problem and a proposed Action, preserving the failed candidate and inputs.
+Neither direction is permitted to fill an unknown biological bridge by assumption
+and then present the result as calibrated.
+
+Before promoting a coupling beyond an assumption-level scenario, record the
+measured calibration dataset, training/validation separation, uncertainty,
+applicability domain and a held-out check. Short peptide MD cannot by itself
+provide a tissue modulus; a predicted channel structure cannot provide membrane
+conductance; a generic growth example cannot validate fish development. The
+missing calibration is part of the frontier and must remain visible beside the
+design control it prevents us from justifying.
