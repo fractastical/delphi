@@ -67,12 +67,24 @@ with this shape, and nothing else:
   },
   "comparison_found": { "found": true|false, "where": "pack path or null", "note": "what the comparison measured, or what is missing" },
   "top_three_fixes": ["ranked: the cheapest changes that raise the weighted total most", "...", "..."],
+  "highest_value_improvement": {
+    "title": "one line",
+    "what": "the single concrete change the team should make, specific enough to start on now",
+    "why_this_one": "why it beats every other candidate on expected gain in the weighted total, given the weights",
+    "expected_score_deltas": { "<criterion-id>": "+N, integers on the 0-10 scale, only criteria that move" },
+    "expected_total_gain": "sum of weight x delta x 10, points on the 0-100 total",
+    "bonus_delta": "0 if the bonus does not move",
+    "effort": "honest hours of team work",
+    "evidence_that_would_prove_it": "the file or table a judge could check"
+  },
   "missing_evidence": ["things you wanted and the pack did not have"],
   "confidence": 0-1,
   "summary": "two or three sentences a judge could read aloud"
 }
 ```
 
-Integers for scores and bonus. Confidence is your confidence in your own scoring given the
+Integers for scores and bonus. `highest_value_improvement` is exactly one change, the one with
+the largest expected gain in the weighted total per hour of effort that is realistically achievable
+before the deadline; make its deltas consistent with the anchors. Confidence is your confidence in your own scoring given the
 evidence, in [0,1]; it is not a probability that the project wins anything. Do not compute the
 weighted total; the pipeline does.

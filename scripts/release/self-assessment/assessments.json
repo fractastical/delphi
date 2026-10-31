@@ -3,7 +3,7 @@
   "commit": "db966bc45986743c3cde6d87ef6b567099bb3b7b",
   "evidence_pack_sha256": "009970e344904cd1546e2f2890cb438667be100be1acd5c62083a4d2cf5dc701",
   "capturedAt": "2026-10-31T22:07:43.964Z",
-  "mergedAt": "2026-10-31T22:14:47.720Z",
+  "mergedAt": "2026-10-31T22:27:48.848Z",
   "stats": {
     "problem-significance": {
       "mean": 8.333333333333334,
@@ -108,6 +108,21 @@
       ],
       "confidence": 0.9,
       "summary": "Delphisci is an extraordinarily productive and technically rigorous epistemic engine that extracted 1,702 biological and mathematical claims, formalized 47 in Lean 4 without `sorry`, tested 133 against empirical and computational data (including a self-correcting negative control that caught Cellpose-SAM segmenter bias), and deployed live nanopublications and a verified MCP server in under 24 hours. However, judged strictly against the Science Claw rubric, its multi-agent workflow is centrally orchestrated by a human planner rather than a decentralized collective (4/10), and it lacks a committed experimental comparison showing that collective agency outperforms a single agent (3/10, 25% weight).",
+      "highest_value_improvement": {
+        "title": "Run and commit a 30-claim 4-arm ablation benchmark (single agent vs. isolated multi-agent vs. routed collective vs. forum-coordinated collective) with autonomous forum handoff",
+        "what": "Extend `plugins/fittest/route.py` and add a reproducible benchmark runner (`test-data/collective-benchmark/run.py`) over a stratified sample of 30 claims from the 99 decisive data tests in `test-data/claim-tests/` (10 Darwin, 10 Thompson, 10 Wolfram/Levin), plus commit the 20-claim 4-arm harness outputs referenced in issue #41 if they exist outside the repo. Evaluate four arms on the exact same 30 claims: (Arm 1: Single Agent) standalone truth/verdict prediction and single-shot test script by one model (GPT-5.6 Sol alone and Grok 4.7 alone); (Arm 2: Isolated Multi-Agent) unrouted mean of GPT-5.6 Sol + Grok 4.7 truth scores and unverified dataset URLs; (Arm 3: Routed Collective) Fittest disagreement + confidence router (`route.py`) triggering data-test execution on flagged claims; and (Arm 4: Decentralized Forum Loop) 30 claims posted as open tasks to `https://science-claw-forum.fly.dev`, autonomously claimed via `node forum/client.mjs offer` by two non-builder agents (e.g., GPT and Grok workers polling `/api/v1/requests` without human chat intervention), tested, and audited by a blind A9 faithfulness agent (issue #40) that logs `delphi_log_test_result` and catches operationalization/segmenter defects. Amit and Kris can run the `route.py` baseline + 30-claim comparison in parallel while an autonomous cron/loop runs the forum claim-and-audit cycle.",
+        "why_this_one": "In `rubric.json`, `collective-capability` (25% weight) and `decentralized-agency` (20% weight) together account for 45% of the entire 100-point score, yet they are the project's two lowest scores (3/10 and 4/10, losing 29.5 weighted points). By contrast, `problem-significance` (8/10), `scientific-impact` (7/10), and `execution-validation` (8/10) are already strong and have diminishing returns. `collective-capability` is at 3/10 specifically because `comparison_found.found` is `false`: moving from no comparison to anchor 10 ('a measured comparison in the snapshot (same task, collective vs single agent or isolated agents) showing a clear gain') unlocks a +6 jump on a 0.25-weight criterion (+15.0 weighted points). Simultaneously, running Arm 4 through autonomous polling and claiming on the already-deployed Science Claw forum (`forum/client.mjs` + `delphi_log_test_result`) replaces scripted human batching (`forum/posts/thompson-ch07-04-arc.json`) with genuine shared-state coordination, moving `decentralized-agency` from below anchor 5 (4/10) to 7/10 (+6.0 weighted points) and adding verified A9 faithfulness checks that raise `execution-validation` by +1 (+1.0 weighted point), for a total gain of +22.0 points in ~3-4 hours (~5.5-7.3 points/hour).",
+        "expected_score_deltas": {
+          "collective-capability": 6,
+          "decentralized-agency": 3,
+          "execution-validation": 1
+        },
+        "expected_total_gain": 22,
+        "bonus_delta": 0,
+        "effort": "3 to 4 team-hours before Sun Nov 1 13:00 (1.5 hours to extend `plugins/fittest/route.py` with single-model arms and commit the 4-arm comparison table over existing data tests; 2 hours to run an autonomous polling loop where GPT/Grok agents claim open requests on `science-claw-forum.fly.dev`, run A9 faithfulness checks on 10-30 claims, and write results back via MCP).",
+        "evidence_that_would_prove_it": "`test-data/collective-benchmark/results.json` and `test-data/collective-benchmark/SUMMARY.md` containing the 4-arm comparison table (Arm x N=30 claims x accuracy vs. ground-truth verdicts x silent-failure rate x valid-URL rate x token cost), updated `plugins/fittest/routing-results.json` showing single-model (GPT-5.6 Sol alone, Grok 4.7 alone) vs. collective accuracy, and `captured/forum-feed.json` / `captured/forum-requests.json` showing non-`delphisci` agent accounts autonomously claiming requests (`status: done`), posting `delphi:test-result` payloads, and writing `test-data/claim-tests/<project>/<id>/faithfulness.json` files.",
+        "computed_total_gain": 22
+      },
       "weighted_total": 57,
       "file": "raw/gemini.json"
     },
@@ -180,6 +195,20 @@
       ],
       "confidence": 0.93,
       "summary": "DELPHI addresses an unusually difficult and meaningful problem and has built a real, queryable scientific system with many claims, proofs and data tests. Its strongest weakness under this rubric is not implementation but evidence that decentralization itself adds capability: the pack contains no measured collective-versus-single comparison and no documented outside-team reuse.",
+      "highest_value_improvement": {
+        "title": "Publish one verified four-arm agent benchmark",
+        "what": "Turn the two 20-claim four-arm experiments asserted in issue #41 into judge-verifiable evidence now: put the frozen task and budget in scripts/release/agent-comparison/PROTOCOL.md, one row per claim and arm (single agent, isolated workers, centralized swarm, decentralized swarm) in results.csv, and quality, verified-dataset rate, defects, wall time, tokens and cost with confidence intervals in RESULTS.md. Amit should rerun one frozen 20-claim task across all four arms; Ashley, who did not run it, should independently verify a blinded sample and sign off on defect and dataset-resolution counts; Joel should only integrate the files. If the old runs cannot be reconstructed exactly, label them exploratory and use only the fresh pre-registered run for the headline.",
+        "why_this_one": "Collective capability carries 25%, is currently the joint-highest-weight criterion and the largest scoring deficit (3/10), and the pack says the harness plus two experiments already exist, making publication or one clean rerun feasible before the deadline. A clear same-task result would move this criterion from below the 5 anchor (anecdote without comparison) to about 8, because it would satisfy the 10 anchor's essential requirement of a measured collective-versus-single comparison while remaining limited to one 20-claim benchmark. The independent rerun and verification would also strengthen execution-validation from 7 to 8, between the running-system anchor and the 10 anchor for reproducible independent checks. By contrast, another claim test has little effect on already-strong impact, architectural decentralization cannot be credibly changed overnight, and outside-team reuse is less controllable and affects the separate bonus rather than the weighted total.",
+        "expected_score_deltas": {
+          "collective-capability": 4,
+          "execution-validation": 1
+        },
+        "expected_total_gain": 11,
+        "bonus_delta": 0,
+        "effort": "8-10 team-hours before Sun Nov 1 13:00: about 5-6 hours for Amit to freeze and run the four arms, 2 hours for Ashley's blinded verification, and 1-2 hours to assemble the CSV, analysis and reproducibility instructions.",
+        "evidence_that_would_prove_it": "scripts/release/agent-comparison/PROTOCOL.md plus results.csv and RESULTS.md, with 80 claim-arm rows for one 20-claim by four-arm run, fixed budgets, per-arm aggregate quality/defect/time/token/cost statistics, the independent verification sample and sign-off, exact run commands and commit, and an explicit collective-minus-single effect estimate.",
+        "computed_total_gain": 11
+      },
       "weighted_total": 60,
       "file": "raw/gpt.json"
     },
@@ -258,6 +287,19 @@
       ],
       "confidence": 0.74,
       "summary": "This is a real claim-audit system, built in about 27 hours: 1702 claims, 63 theorems of which 47 are Lean-checked, 133 data verdicts including sharp refutations of Darwin and Thompson, a public MCP another teammate scored 93/100, and an honest Cellpose bias correction. The scientific bar it sets for itself is not met: faithfulness has run on 0 of 16 data tests, a 6-claim re-run drifted on 3, assessments are not on the network, and 18 later verdicts never entered the audited table. Decisions sit with one planner and several models; a four-arm collective comparison is claimed in issue #41 and not shown, and no other team is documented using the tools in their own result.",
+      "highest_value_improvement": {
+        "title": "Commit the claim-level four-arm comparison that issue #41 says already ran",
+        "what": "Issue #41 says two experiments of 20 claims each already ran on a four-arm harness (single agent, isolated workers, centralized swarm, decentralized swarm) with a pre-registered protocol, a check that claimed datasets resolve, and a cost cap. Joel, who merges and holds the logs, spends the first hour finding those outputs. He then writes test-data/agent-comparison/four-arm.json with, for each experiment, the 20 claim ids, the metric in the words that were pre-registered, the score and the cost of each arm, and the margin of the best collective arm over the single-agent arm. If those logs are not on disk after that hour, Amit runs the substitute the same day on 10 claim ids drawn from the 99 decisive tests in plugins/fittest/README.md (78 supports, 21 refutes): one model answers all 10, two models from different providers answer the same 10 blind, agreement is the pair's verdict, and disagreements stay flagged. Accuracy against the committed data-test verdict is written down before either arm is opened. Same JSON file either way.",
+        "why_this_one": "Collective capability weighs 0.25 and is the low high-weight score, at 4. The 5-anchor is an argument with no measured comparison; the 10-anchor is a same-task comparison that shows a clear gain. A claim-level arm table would move this score from 4 to 8: the comparison would be measured and a gain would be on the page, and 8 withholds the last two points because a 20-claim dump compiled after the runs, or a 10-claim substitute, is still a small study a judge cannot re-run. That is 4 × 0.25 × 10 = 10 points on the 0-100 total, about 2 points per hour over 5 hours. The next criteria cannot match that before Sunday 13:00. Scientific impact, also 0.25, is 6, and a faithfulness pass on five tests plus a summary rebuild would earn +1 from me (2.5 points); a +2 would require the 0-of-16 faithfulness gap and the drifted exec re-run to be closed, which they would not be. Decentralized agency weighs 0.20, so it needs +5 to match 10 points, and one forum handoff still leaves the score on the 5-anchor, where a planner sets the trajectory. Execution weighs 0.10, so each score step is 1 point; a clean re-run of the 47 Lean reports and the 3 drifted Darwin tests, roughly 4 hours, is about 2 points if the score moved from 6 to 8. Problem significance is already 8. A 3-hour single-assessor versus pair table on those same 99 tests would reach only a 6 from me (+2, 5 points): once the 22 flags in plugins/fittest/README.md count as non-answers, unconditional accuracy can fall below the 0.83 mean, so the gain is not the one the 10-anchor asks for.",
+        "expected_score_deltas": {
+          "collective-capability": 4
+        },
+        "expected_total_gain": 10,
+        "bonus_delta": 0,
+        "effort": "5 hours before Sun Nov 1 13:00. One hour to find the two existing run logs, three to write the claim-level table and copy the pre-registered metric, one to check the arithmetic. The 10-claim substitute, used only if the logs are missing, fits in those same 5 hours because the labels already exist.",
+        "evidence_that_would_prove_it": "test-data/agent-comparison/four-arm.json, with two experiment blocks (or one substitute block), each listing its claim ids, each arm's score and cost, the pre-registered metric string, and the margin over the single-agent arm. A judge can match every claim id to repo/test-data/claim-tests/SUMMARY.md or to the 99 decisive labels counted in repo/plugins/fittest/README.md.",
+        "computed_total_gain": 10
+      },
       "weighted_total": 57,
       "file": "raw/grok.json"
     }
