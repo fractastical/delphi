@@ -40,16 +40,18 @@ preserved and no new sequence-generation request is being routed elsewhere.
 - [x] Diagnose the exact metadata difference on remote CPU: NumPy AVX-512
   dispatch changes three float64 widths by one or two ULPs. Disabling that
   dispatch reproduces the original hash. No geometry gate is relaxed.
-- [ ] Admit one repaired CFD packet once its geometry-only setting is frozen.
+- [x] Admit repaired CFD packet7abfc640 at15:45:57PDT with the frozen
+  geometry-only SIMD setting.
   The failed physical sphere reference remains visible independently.
 - [x] Dispatch the conditional RD diffusion training pilot at 15:36:40 PDT.
   The frozen CUDA control must pass before training and held-out evaluation.
 - [ ] Recover the trained checkpoint, hold-out results and baseline/null comparisons.
 - [x] Queue a CPU-only diagnostic for the 3D candidate hash mismatch; preserve
   the exact GPU failure and all three full candidate JSON variants.
-- [ ] Extend the three short MD states only after the exact warm-start archive
-  is public and hash-checked. The frozen question measures remaining structural
-  drift; it does not assert equilibrium or a tissue modulus.
+- [x] Admit three900ps MD branches at15:45:34PDT after publicHTTP200 and
+  exactarchiveSHA. Frozen question measures remaining structural drift,
+  not equilibrium or a tissue modulus.
+- [ ] Collect MD extensions and repaired CFD outputs; preserve failed/null gates.
 
 The angle batch requires a passing parity check in the same allocation. Its
 subsequent workloads reject a missing or failed gate. The original 3 MB return

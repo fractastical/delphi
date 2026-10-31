@@ -10,6 +10,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import statistics
 
 
 CONFIG_SHA = "bc77ebc55010b9c8ac910c2b31868ec0dbf2d1e3785a06ec3ef1aa028ea2b210"
@@ -81,6 +82,22 @@ def audit(output):
         check(all(METRICS <= set(row.get(method, {})) for method in METHODS), label + " lacks required metrics")
         check(all(row.get(method, {}).get("nonfinite_frac") == 0 for method in METHODS),
               label + " includes nonfinite generated samples")
+    if len(rows) == 160 and all(all(METRICS <= set(row.get(method, {})) for method in METHODS) for row in rows):
+        summaries = ensemble.get("summary_median_over_conditions", {})
+        paired = ensemble.get("paired_counts_ddpm_vs_baseline", {})
+        for method in METHODS:
+            key = "conditional_mean_of_nearest10" if method == "nearest10_pooled" else method
+            summary = summaries.get(key, {})
+            for metric in METRICS - {"mode_agree_argmax"}:
+                expected_median = statistics.median(row[method][metric] for row in rows)
+                check(summary.get(metric) == expected_median, key + "/" + metric + " summary disagrees with rows")
+            for metric in ("mode_tv", "amp_w1_rel") if method != "ddpm" else ():
+                counts = paired.get(key, {}).get(metric, {})
+                check(counts == {
+                    "ddpm_lower": sum(row["ddpm"][metric] < row[method][metric] for row in rows),
+                    "tie": sum(row["ddpm"][metric] == row[method][metric] for row in rows),
+                    "ddpm_higher": sum(row["ddpm"][metric] > row[method][metric] for row in rows), "n": 160,
+                }, key + "/" + metric + " paired counts disagree with rows")
     for name, runs in (("test_param", 600), ("test_seed", 300)):
         marginal = report.get("held_out_marginals", {}).get(name, {})
         check(marginal.get("n_runs") == runs and marginal.get("n_rows") == 4 * runs and marginal.get("failed_runs") == 0,

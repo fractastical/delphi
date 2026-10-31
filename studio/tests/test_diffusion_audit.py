@@ -28,6 +28,14 @@ def output(tmp_path):
                                      "by_tau": {str(t): {"n": n, "gen_nonfinite_frac": 0} for t in TAUS}}
                                for name, n in (("test_param", 600), ("test_seed", 300))},
     }
+    keys = ["conditional_mean_of_nearest10" if m == "nearest10_pooled" else m for m in METHODS]
+    report["ensemble_eval"]["summary_median_over_conditions"] = {
+        key: dict.fromkeys(METRICS - {"mode_agree_argmax"}, 0) for key in keys
+    }
+    report["ensemble_eval"]["paired_counts_ddpm_vs_baseline"] = {
+        key: {metric: {"ddpm_lower": 0, "tie": 160, "ddpm_higher": 0, "n": 160}
+              for metric in ("mode_tv", "amp_w1_rel")} for key in keys[1:]
+    }
     (tmp_path / "evaluation.json").write_text(json.dumps(report))
     return tmp_path, report
 
@@ -70,5 +78,12 @@ def test_duplicate_condition_rejects_count_only_match(output):
 def test_nonfinite_samples_reported_by_finite_fraction_fail(output):
     path, report = output
     report["ensemble_eval"]["per_condition"][0]["ddpm"]["nonfinite_frac"] = 1/32
+    (path / "evaluation.json").write_text(json.dumps(report))
+    assert not audit(path)["complete"]
+
+
+def test_summary_cannot_drop_losing_conditions(output):
+    path, report = output
+    report["ensemble_eval"]["paired_counts_ddpm_vs_baseline"]["nearest1_pooled"]["mode_tv"]["n"] = 159
     (path / "evaluation.json").write_text(json.dumps(report))
     assert not audit(path)["complete"]
