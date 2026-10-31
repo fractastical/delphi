@@ -13,6 +13,46 @@ import numpy as np
 from .audit import CONFIGS, PAIRS, ROOT, comparisons, dump, rd, sha
 
 
+def compare_saved_metrics(actual, saved):
+    """Float64 re-evaluation across BLAS builds; identities remain exact.
+
+    This checks recalculation of saved metrics, not PDE convergence/accuracy.
+    Tolerances were fixed before reading any returned numerical endpoints.
+    """
+    errors = []
+
+    def visit(a, b):
+        if isinstance(a, dict):
+            if not isinstance(b, dict) or a.keys() != b.keys():
+                raise ValueError("Paired metric keys changed")
+            for key in a:
+                visit(a[key], b[key])
+        elif isinstance(a, list):
+            if not isinstance(b, list) or len(a) != len(b):
+                raise ValueError("Paired metric dimensions changed")
+            for x, y in zip(a, b):
+                visit(x, y)
+        elif isinstance(a, float):
+            if not isinstance(b, (float, int)) or not np.isclose(
+                a, b, rtol=1e-10, atol=1e-12
+            ):
+                raise ValueError(
+                    "Recomputed floating metric differs beyond roundoff tolerance"
+                )
+            errors.append(abs(a - b))
+        elif type(a) is not type(b) or a != b:
+            raise ValueError("Paired metric identity or categorical outcome changed")
+
+    visit(actual, saved)
+    return {
+        "relative_tolerance": 1e-10,
+        "absolute_tolerance": 1e-12,
+        "floating_values_checked": len(errors),
+        "max_absolute_recalculation_difference": max(errors, default=0.0),
+        "scope": "Cross-BLAS recalculation roundoff only, not numerical-convergence acceptance; all categorical outcomes exact",
+    }
+
+
 def analyze(folder, output):
     folder, out = Path(folder), Path(output)
     out.mkdir(parents=True, exist_ok=True)
@@ -84,8 +124,10 @@ def analyze(folder, output):
         )
     rows = comparisons(folder, complete, ids, seeds, taus)
     saved = json.loads((folder / "paired-discrepancies.json").read_text())
-    if rows != saved or len(rows) != receipt["paired_rows"]:
-        raise ValueError("Saved paired metrics/counts do not match recomputation")
+    metric_check = compare_saved_metrics(rows, saved)
+    original_exact_check = rows == saved
+    if len(rows) != receipt["paired_rows"]:
+        raise ValueError("Saved paired counts do not match recomputation")
     n_pairs = sum(a in complete and b in complete for a, b in PAIRS)
     if len(rows) != n_pairs * 48 * 4:
         raise ValueError("Missing paired conditions")
@@ -197,6 +239,8 @@ def analyze(folder, output):
         "convergence_pass": None,
         "empirical_accuracy": "unknown",
         "source_receipt_sha256": sha(folder / "receipt.json"),
+        "original_bit_for_bit_metric_comparison_equal": original_exact_check,
+        "saved_metric_recalculation": metric_check,
     }
     dump(out / "summary.json", report)
     dump(

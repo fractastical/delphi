@@ -83,3 +83,17 @@ def test_partial_result_remains_incomplete_and_contradictory_claim_is_rejected(
     dump(folder / "receipt.json", receipt)
     with pytest.raises(ValueError, match="Completeness claim"):
         analyze(folder, tmp_path / "bad-analysis")
+
+
+def test_recalculation_tolerance_preserves_exact_modes_and_rejects_material_change():
+    import pytest
+
+    from engineering.rd_numerics.analyze import compare_saved_metrics
+
+    actual = {"metric": 1.0, "mode": 3, "changed": False}
+    check = compare_saved_metrics(actual, {**actual, "metric": 1.0 + 1e-13})
+    assert 0 < check["max_absolute_recalculation_difference"] < 1e-12
+    with pytest.raises(ValueError, match="beyond roundoff"):
+        compare_saved_metrics(actual, {**actual, "metric": 1.01})
+    with pytest.raises(ValueError, match="categorical"):
+        compare_saved_metrics(actual, {**actual, "mode": 4})
