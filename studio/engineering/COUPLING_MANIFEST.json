@@ -1,0 +1,1036 @@
+{
+ "assumptions": [
+  {
+   "id": "A1",
+   "level": "assumption",
+   "owner": "dx-guilds",
+   "text": "glide release speed equals the constraint solver's witness V (the glide model's own default is 1.5 x stall speed)"
+  },
+  {
+   "id": "A2",
+   "level": "assumption",
+   "owner": "dx-guilds",
+   "text": "Notch/Delta lateral-inhibition spacing from a two-cell non-dimensional model sets fin-ray stiffness scale (NO source supports this)"
+  }
+ ],
+ "calibrations_registered": [],
+ "counts": {
+  "composable": 3,
+  "refused": 4,
+  "scenario": 1
+ },
+ "couplings": [
+  {
+   "coupling": {
+    "assumption_ids": [],
+    "calibration_id": null,
+    "factor": null,
+    "from": "flying_fish_constraints.m",
+    "id": "c01_mass",
+    "mapping_kind": "identity",
+    "note": "same quantity, same unit",
+    "time_relation": "static_input",
+    "to": "glide_pointmass.m",
+    "uncertainty_kind": "exact"
+   },
+   "verdict": {
+    "assumption_ids": [],
+    "checks": {
+     "assumptions": "none",
+     "bounds": "pass",
+     "dimension": "pass",
+     "endpoints": "pass",
+     "mapping": "pass",
+     "scope": "pass",
+     "time": "pass",
+     "uncertainty": "pass (exact arithmetic)"
+    },
+    "coupling_id": "c01_mass",
+    "label": "composable: typed, dimension- and scope-checked mapping; no biological correspondence is claimed",
+    "missing_calibrations": [],
+    "reasons": [],
+    "status": "composable"
+   }
+  },
+  {
+   "coupling": {
+    "assumption_ids": [],
+    "calibration_id": null,
+    "factor": null,
+    "from": "flying_fish_constraints.S",
+    "id": "c02_area",
+    "mapping_kind": "identity",
+    "note": "same quantity, same unit",
+    "time_relation": "static_input",
+    "to": "glide_pointmass.S",
+    "uncertainty_kind": "exact"
+   },
+   "verdict": {
+    "assumption_ids": [],
+    "checks": {
+     "assumptions": "none",
+     "bounds": "not checked (a bound is open or unknown); an exact identity/unit conversion of the same quantity adds no new extrapolation",
+     "dimension": "pass",
+     "endpoints": "pass",
+     "mapping": "pass",
+     "scope": "pass",
+     "time": "pass",
+     "uncertainty": "pass (exact arithmetic)"
+    },
+    "coupling_id": "c02_area",
+    "label": "composable: typed, dimension- and scope-checked mapping; no biological correspondence is claimed",
+    "missing_calibrations": [],
+    "reasons": [],
+    "status": "composable"
+   }
+  },
+  {
+   "coupling": {
+    "assumption_ids": [],
+    "calibration_id": null,
+    "factor": null,
+    "from": "flying_fish_constraints.b",
+    "id": "c03_span",
+    "mapping_kind": "identity",
+    "note": "same quantity, same unit",
+    "time_relation": "static_input",
+    "to": "glide_pointmass.b",
+    "uncertainty_kind": "exact"
+   },
+   "verdict": {
+    "assumption_ids": [],
+    "checks": {
+     "assumptions": "none",
+     "bounds": "not checked (a bound is open or unknown); an exact identity/unit conversion of the same quantity adds no new extrapolation",
+     "dimension": "pass",
+     "endpoints": "pass",
+     "mapping": "pass",
+     "scope": "pass",
+     "time": "pass",
+     "uncertainty": "pass (exact arithmetic)"
+    },
+    "coupling_id": "c03_span",
+    "label": "composable: typed, dimension- and scope-checked mapping; no biological correspondence is claimed",
+    "missing_calibrations": [],
+    "reasons": [],
+    "status": "composable"
+   }
+  },
+  {
+   "coupling": {
+    "assumption_ids": [
+     "A1"
+    ],
+    "calibration_id": null,
+    "factor": null,
+    "from": "flying_fish_constraints.V",
+    "id": "c04_speed",
+    "mapping_kind": "assumed",
+    "note": "the glide model defaults to 1.5 x stall speed; identity V -> release speed is an assumption",
+    "time_relation": "static_input",
+    "to": "glide_pointmass.release_speed",
+    "uncertainty_kind": "unknown"
+   },
+   "verdict": {
+    "assumption_ids": [
+     "A1"
+    ],
+    "checks": {
+     "assumptions": "assumption-level: A1",
+     "bounds": "unknown (bounds open or undeclared)",
+     "dimension": "pass",
+     "endpoints": "pass",
+     "mapping": "scenario",
+     "scope": "pass",
+     "time": "pass",
+     "uncertainty": "unknown"
+    },
+    "coupling_id": "c04_speed",
+    "label": "SCENARIO (assumption-level): may run, never evidence about an organism",
+    "missing_calibrations": [],
+    "reasons": [
+     "parameter bounds are unknown on at least one side of a value-transforming mapping",
+     "no uncertainty edge declared",
+     "assumption-level edges: A1"
+    ],
+    "status": "scenario"
+   }
+  },
+  {
+   "coupling": {
+    "assumption_ids": [],
+    "calibration_id": null,
+    "factor": null,
+    "from": "collier1996_two_cell.delta_asymmetry",
+    "id": "c05_notch_to_fin_stiffness",
+    "mapping_kind": "none",
+    "note": "no mapping exists; this is the bridge a reader may be tempted to draw",
+    "time_relation": "unknown",
+    "to": "finbeam_euler_bernoulli.flexural_rigidity",
+    "uncertainty_kind": "unknown"
+   },
+   "verdict": {
+    "assumption_ids": [],
+    "checks": {
+     "assumptions": "none",
+     "bounds": "unknown (bounds open or undeclared)",
+     "dimension": "n/a (no valid mapping)",
+     "endpoints": "fail",
+     "mapping": "fail",
+     "scope": "fail: scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'small deflection, linear elastic (proposed)'",
+     "time": "unknown",
+     "uncertainty": "unknown"
+    },
+    "coupling_id": "c05_notch_to_fin_stiffness",
+    "label": "refused: missing or inconsistent bridge; nothing was composed",
+    "missing_calibrations": [
+     "collier1996_two_cell.delta_asymmetry -> finbeam_euler_bernoulli.flexural_rigidity: calibration bridging scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'small deflection, linear elastic (proposed)'"
+    ],
+    "reasons": [
+     "model 'finbeam_euler_bernoulli' is only PROPOSED: nothing exists to run",
+     "no mapping declared: the bridge is missing and is not invented here",
+     "scope mismatch without a calibration that bridges it: scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'small deflection, linear elastic (proposed)'"
+    ],
+    "status": "refused"
+   }
+  },
+  {
+   "coupling": {
+    "assumption_ids": [
+     "A2"
+    ],
+    "calibration_id": null,
+    "factor": "1",
+    "from": "collier1996_two_cell.delta_asymmetry",
+    "id": "c06_notch_to_fin_stiffness_assumed",
+    "mapping_kind": "assumed",
+    "note": "",
+    "time_relation": "unknown",
+    "to": "finbeam_euler_bernoulli.flexural_rigidity",
+    "uncertainty_kind": "unknown"
+   },
+   "verdict": {
+    "assumption_ids": [
+     "A2"
+    ],
+    "checks": {
+     "assumptions": "assumption-level: A2",
+     "bounds": "unknown (bounds open or undeclared)",
+     "dimension": "scenario: no SI meaning on one side, assumption-level only",
+     "endpoints": "fail",
+     "mapping": "scenario",
+     "scope": "scenario: scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'small deflection, linear elastic (proposed)'",
+     "time": "unknown",
+     "uncertainty": "unknown"
+    },
+    "coupling_id": "c06_notch_to_fin_stiffness_assumed",
+    "label": "refused: missing or inconsistent bridge; nothing was composed",
+    "missing_calibrations": [
+     "collier1996_two_cell.delta_asymmetry -> finbeam_euler_bernoulli.flexural_rigidity: calibration bridging scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'small deflection, linear elastic (proposed)'",
+     "collier1996_two_cell.delta_asymmetry -> finbeam_euler_bernoulli.flexural_rigidity: calibration of model units to N m^2"
+    ],
+    "reasons": [
+     "model 'finbeam_euler_bernoulli' is only PROPOSED: nothing exists to run"
+    ],
+    "status": "refused"
+   }
+  },
+  {
+   "coupling": {
+    "assumption_ids": [],
+    "calibration_id": null,
+    "factor": null,
+    "from": "rdfield_nonlinear_sweep.dominant_mode",
+    "id": "c07_rd_wavelength_to_wing_span",
+    "mapping_kind": "none",
+    "note": "a mode number is dimensionless; the span is in metres; no length scale",
+    "time_relation": "unknown",
+    "to": "glide_pointmass.b",
+    "uncertainty_kind": "unknown"
+   },
+   "verdict": {
+    "assumption_ids": [],
+    "checks": {
+     "assumptions": "none",
+     "bounds": "unknown (bounds open or undeclared)",
+     "dimension": "n/a (no valid mapping)",
+     "endpoints": "pass",
+     "mapping": "fail",
+     "scope": "fail: scale tissue -> organism; context 'abstract kinetics; no organism' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime \"1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength\" -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'",
+     "time": "unknown",
+     "uncertainty": "unknown"
+    },
+    "coupling_id": "c07_rd_wavelength_to_wing_span",
+    "label": "refused: missing or inconsistent bridge; nothing was composed",
+    "missing_calibrations": [
+     "rdfield_nonlinear_sweep.dominant_mode -> glide_pointmass.b: calibration bridging scale tissue -> organism; context 'abstract kinetics; no organism' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime \"1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength\" -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+    ],
+    "reasons": [
+     "no mapping declared: the bridge is missing and is not invented here",
+     "scope mismatch without a calibration that bridges it: scale tissue -> organism; context 'abstract kinetics; no organism' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime \"1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength\" -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+    ],
+    "status": "refused"
+   }
+  },
+  {
+   "coupling": {
+    "assumption_ids": [],
+    "calibration_id": null,
+    "factor": null,
+    "from": "finbeam_euler_bernoulli.tip_deflection",
+    "id": "c08_fin_deflection_to_glide_speed",
+    "mapping_kind": "none",
+    "note": "needs camber -> CL/CD (Park & Choi 2010 tables, PDF not yet read by anyone)",
+    "time_relation": "unknown",
+    "to": "glide_pointmass.release_speed",
+    "uncertainty_kind": "unknown"
+   },
+   "verdict": {
+    "assumption_ids": [],
+    "checks": {
+     "assumptions": "none",
+     "bounds": "unknown (bounds open or undeclared)",
+     "dimension": "n/a (no valid mapping)",
+     "endpoints": "fail",
+     "mapping": "fail",
+     "scope": "fail: scale organ -> organism; regime 'small deflection, linear elastic (proposed)' -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'",
+     "time": "unknown",
+     "uncertainty": "unknown"
+    },
+    "coupling_id": "c08_fin_deflection_to_glide_speed",
+    "label": "refused: missing or inconsistent bridge; nothing was composed",
+    "missing_calibrations": [
+     "finbeam_euler_bernoulli.tip_deflection -> glide_pointmass.release_speed: calibration bridging scale organ -> organism; regime 'small deflection, linear elastic (proposed)' -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+    ],
+    "reasons": [
+     "model 'finbeam_euler_bernoulli' is only PROPOSED: nothing exists to run",
+     "no mapping declared: the bridge is missing and is not invented here",
+     "scope mismatch without a calibration that bridges it: scale organ -> organism; regime 'small deflection, linear elastic (proposed)' -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+    ],
+    "status": "refused"
+   }
+  }
+ ],
+ "manifest_sha256": "4d8105370ab8873367277428ed1948308062c9c8d95a5aa50f07f8ee8754e8b1",
+ "models": [
+  {
+   "engine": "libroadrunner 2.10.0 (CVODE)",
+   "model_id": "collier1996_two_cell",
+   "name": "Collier 1996 two-cell Delta-Notch lateral inhibition (BIOMD0000001047)",
+   "not_established": [
+    "any flying-fish or fin role for Notch/Delta",
+    "SI units",
+    "parameter provenance"
+   ],
+   "ports": [
+    {
+     "bounds": null,
+     "context": "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)",
+     "dim": null,
+     "direction": "in",
+     "kind": "model_units",
+     "name": "parameters_a_b_h_k",
+     "provenance": {
+      "read_level": "file",
+      "source": "values stored in the SBML (a 0.01, b 100, h 2, k 2, mu 1, rho 1); paper not read",
+      "status": "unknown"
+     },
+     "quantity": "feedback parameters",
+     "regime": "two coupled cells; non-dimensional as stored; no time scale",
+     "scale": "cell",
+     "unit": "model units"
+    },
+    {
+     "bounds": null,
+     "context": "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)",
+     "dim": null,
+     "direction": "out",
+     "kind": "model_units",
+     "name": "delta_asymmetry",
+     "provenance": {
+      "read_level": "file",
+      "source": "simulated; horizon 0-60 chosen by the connector, not the file",
+      "status": "simulated"
+     },
+     "quantity": "Delta level difference between the two cells",
+     "regime": "two coupled cells; non-dimensional as stored; no time scale",
+     "scale": "cell",
+     "unit": "model units"
+    }
+   ],
+   "reference": {
+    "branch": "work/biomodels",
+    "commit": "c41188dd2b47",
+    "path": "connectors/biomodels",
+    "read_by": "dx-guilds, from the owner's hand-off note; code not re-read",
+    "repo": "kganjam/delphi-frontier"
+   },
+   "run": {
+    "deterministic": true,
+    "entrypoint": "connectors.biomodels replay"
+   },
+   "schema": "frontier.model.interface/1",
+   "scope": "a published model replayed as written; the replay checks the engine, not the file's fidelity to the paper",
+   "status": "implemented_replayed",
+   "timescale": {
+    "kind": "unknown",
+    "seconds": null,
+    "source": "the file declares none; horizon 0-60 is the connector's"
+   }
+  },
+  {
+   "engine": "none",
+   "model_id": "finbeam_euler_bernoulli",
+   "name": "Fin as an Euler-Bernoulli beam (PROPOSED)",
+   "not_established": [
+    "everything: it does not exist yet"
+   ],
+   "ports": [
+    {
+     "bounds": null,
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 1,
+      "m": 3,
+      "s": -2
+     },
+     "direction": "in",
+     "kind": "dimensional",
+     "name": "flexural_rigidity",
+     "provenance": {
+      "read_level": "none",
+      "source": "proposed slot: no source has been read",
+      "status": "unknown"
+     },
+     "quantity": "fin flexural rigidity EI",
+     "regime": "small deflection, linear elastic (proposed)",
+     "scale": "organ",
+     "unit": "N m^2"
+    },
+    {
+     "bounds": null,
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 0,
+      "m": 1,
+      "s": 0
+     },
+     "direction": "out",
+     "kind": "dimensional",
+     "name": "tip_deflection",
+     "provenance": {
+      "read_level": "none",
+      "source": "proposed slot",
+      "status": "unknown"
+     },
+     "quantity": "tip deflection under load",
+     "regime": "small deflection, linear elastic (proposed)",
+     "scale": "organ",
+     "unit": "m"
+    }
+   ],
+   "reference": null,
+   "run": {
+    "deterministic": null,
+    "entrypoint": null
+   },
+   "schema": "frontier.model.interface/1",
+   "scope": "a slot for a future scoped model; no implementation or source exists",
+   "status": "proposed",
+   "timescale": {
+    "kind": "unknown",
+    "seconds": null,
+    "source": "none"
+   }
+  },
+  {
+   "engine": "z3 5.3.3.0",
+   "model_id": "flying_fish_constraints",
+   "name": "Exact-rational constraint solver (mass, wing area, span, speed)",
+   "not_established": [
+    "organism feasibility",
+    "glide performance",
+    "that any witness is a viable fish"
+   ],
+   "ports": [
+    {
+     "bounds": {
+      "hi": "53/100",
+      "lo": "3/1000",
+      "source": "Fish 1990 p.393 specimen range",
+      "status": "measured"
+     },
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 1,
+      "m": 0,
+      "s": 0
+     },
+     "direction": "out",
+     "kind": "dimensional",
+     "name": "m",
+     "provenance": {
+      "read_level": "full-text",
+      "source": "solver witness; envelope Fish 1990 p.393",
+      "status": "assumed"
+     },
+     "quantity": "body mass",
+     "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+     "scale": "organism",
+     "unit": "kg"
+    },
+    {
+     "bounds": null,
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 0,
+      "m": 2,
+      "s": 0
+     },
+     "direction": "out",
+     "kind": "dimensional",
+     "name": "S",
+     "provenance": {
+      "read_level": "none",
+      "source": "solver witness",
+      "status": "assumed"
+     },
+     "quantity": "wing area",
+     "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+     "scale": "organism",
+     "unit": "m^2"
+    },
+    {
+     "bounds": null,
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 0,
+      "m": 1,
+      "s": 0
+     },
+     "direction": "out",
+     "kind": "dimensional",
+     "name": "b",
+     "provenance": {
+      "read_level": "none",
+      "source": "solver witness",
+      "status": "assumed"
+     },
+     "quantity": "wing span",
+     "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+     "scale": "organism",
+     "unit": "m"
+    },
+    {
+     "bounds": null,
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 0,
+      "m": 1,
+      "s": -1
+     },
+     "direction": "out",
+     "kind": "dimensional",
+     "name": "V",
+     "provenance": {
+      "read_level": "none",
+      "source": "solver witness; level-flight proxy L=W",
+      "status": "assumed"
+     },
+     "quantity": "speed at the level-flight proxy",
+     "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+     "scale": "organism",
+     "unit": "m/s"
+    }
+   ],
+   "reference": {
+    "branch": "work/guilds-engineering",
+    "commit": "948c2e1",
+    "path": "engineering/constraints.py",
+    "read_by": "dx-guilds (author)",
+    "repo": "kganjam/delphi-frontier"
+   },
+   "run": {
+    "deterministic": true,
+    "entrypoint": "engineering.constraints.solve"
+   },
+   "schema": "frontier.model.interface/1",
+   "scope": "exact-rational feasibility of declared constraints; a level-flight proxy, not a glide analysis",
+   "status": "implemented",
+   "timescale": {
+    "kind": "static",
+    "seconds": null,
+    "source": "a design point: the solver has no dynamics"
+   }
+  },
+  {
+   "engine": "numpy RK4",
+   "model_id": "glide_pointmass",
+   "name": "Point-mass glide simulation (RK4)",
+   "not_established": [
+    "biological feasibility",
+    "fin-tissue coupling",
+    "calibrated lift/drag for any fish"
+   ],
+   "ports": [
+    {
+     "bounds": {
+      "hi": "53/100",
+      "lo": "3/1000",
+      "source": "sweep range in nca-to-codex03.md",
+      "status": "assumed"
+     },
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 1,
+      "m": 0,
+      "s": 0
+     },
+     "direction": "in",
+     "kind": "dimensional",
+     "name": "m",
+     "provenance": {
+      "read_level": "none",
+      "source": "candidate from the constraint solver",
+      "status": "assumed"
+     },
+     "quantity": "body mass",
+     "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+     "scale": "organism",
+     "unit": "kg"
+    },
+    {
+     "bounds": null,
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 0,
+      "m": 2,
+      "s": 0
+     },
+     "direction": "in",
+     "kind": "dimensional",
+     "name": "S",
+     "provenance": {
+      "read_level": "none",
+      "source": "candidate",
+      "status": "assumed"
+     },
+     "quantity": "wing area",
+     "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+     "scale": "organism",
+     "unit": "m^2"
+    },
+    {
+     "bounds": null,
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 0,
+      "m": 1,
+      "s": 0
+     },
+     "direction": "in",
+     "kind": "dimensional",
+     "name": "b",
+     "provenance": {
+      "read_level": "none",
+      "source": "candidate",
+      "status": "assumed"
+     },
+     "quantity": "wing span",
+     "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+     "scale": "organism",
+     "unit": "m"
+    },
+    {
+     "bounds": null,
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 0,
+      "m": 1,
+      "s": -1
+     },
+     "direction": "in",
+     "kind": "dimensional",
+     "name": "release_speed",
+     "provenance": {
+      "read_level": "none",
+      "source": "glide default is 1.5 x stall speed; witness V only if the caller opts in",
+      "status": "assumed"
+     },
+     "quantity": "release speed",
+     "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+     "scale": "organism",
+     "unit": "m/s"
+    },
+    {
+     "bounds": null,
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 0,
+      "m": 1,
+      "s": 0
+     },
+     "direction": "out",
+     "kind": "dimensional",
+     "name": "glide_range",
+     "provenance": {
+      "read_level": "none",
+      "source": "simulated, CD0/e/CL_max are declared priors",
+      "status": "simulated"
+     },
+     "quantity": "horizontal glide range",
+     "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+     "scale": "organism",
+     "unit": "m"
+    },
+    {
+     "bounds": null,
+     "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+     "dim": {
+      "kg": 0,
+      "m": 1,
+      "s": -1
+     },
+     "direction": "out",
+     "kind": "dimensional",
+     "name": "sink_rate",
+     "provenance": {
+      "read_level": "none",
+      "source": "simulated",
+      "status": "simulated"
+     },
+     "quantity": "equilibrium sink rate",
+     "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+     "scale": "organism",
+     "unit": "m/s"
+    }
+   ],
+   "reference": {
+    "branch": "work/nca-glide",
+    "commit": "4dee158",
+    "path": "engineering/simulation/{schema,glide,evaluate}.py",
+    "read_by": "dx-guilds, from the owner's hand-off note; code not re-read",
+    "repo": "kganjam/delphi-frontier"
+   },
+   "run": {
+    "deterministic": true,
+    "entrypoint": "engineering.simulation.evaluate",
+    "schema": "frontier.glide.candidate/1"
+   },
+   "schema": "frontier.model.interface/1",
+   "scope": "point-mass flight with declared drag/lift priors (CL_max 0.8-1.6, CD0 0.03-0.12, e 0.6-0.95: priors, not measurements)",
+   "status": "implemented",
+   "timescale": {
+    "kind": "unknown",
+    "seconds": null,
+    "source": "glide duration is an output; no characteristic time is declared"
+   }
+  },
+  {
+   "engine": "spectral Strang + scipy BDF",
+   "model_id": "rdfield_nonlinear_sweep",
+   "name": "Reaction-diffusion field (Schnakenberg, Brusselator) nonlinear sweep",
+   "not_established": [
+    "any fin or fish tissue",
+    "SI length or time scales",
+    "that a real tissue obeys these kinetics"
+   ],
+   "ports": [
+    {
+     "bounds": null,
+     "context": "abstract kinetics; no organism",
+     "dim": {
+      "kg": 0,
+      "m": 0,
+      "s": 0
+     },
+     "direction": "in",
+     "kind": "dimensionless",
+     "name": "L_over_lambda_c",
+     "provenance": {
+      "read_level": "none",
+      "source": "sweep design",
+      "status": "assumed"
+     },
+     "quantity": "domain length / critical wavelength",
+     "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+     "scale": "tissue",
+     "unit": "1"
+    },
+    {
+     "bounds": null,
+     "context": "abstract kinetics; no organism",
+     "dim": null,
+     "direction": "in",
+     "kind": "model_units",
+     "name": "kinetic_parameters",
+     "provenance": {
+      "read_level": "none",
+      "source": "published ranges or a stated prior",
+      "status": "assumed"
+     },
+     "quantity": "kinetic parameters",
+     "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+     "scale": "tissue",
+     "unit": "model units"
+    },
+    {
+     "bounds": null,
+     "context": "abstract kinetics; no organism",
+     "dim": {
+      "kg": 0,
+      "m": 0,
+      "s": 0
+     },
+     "direction": "out",
+     "kind": "dimensionless",
+     "name": "dominant_mode",
+     "provenance": {
+      "read_level": "none",
+      "source": "simulated",
+      "status": "simulated"
+     },
+     "quantity": "dominant mode number",
+     "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+     "scale": "tissue",
+     "unit": "1"
+    },
+    {
+     "bounds": null,
+     "context": "abstract kinetics; no organism",
+     "dim": {
+      "kg": 0,
+      "m": 0,
+      "s": 0
+     },
+     "direction": "out",
+     "kind": "dimensionless",
+     "name": "pattern_flag",
+     "provenance": {
+      "read_level": "none",
+      "source": "simulated",
+      "status": "simulated"
+     },
+     "quantity": "pattern / no pattern / not settled",
+     "regime": "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength",
+     "scale": "tissue",
+     "unit": "1"
+    }
+   ],
+   "reference": {
+    "branch": "work/rethink-nca",
+    "commit": "02346812b93a6ee8c9e67c89b02ae6e2a69e51a7",
+    "path": "scopedesk/oracles/nonlinear_sweep",
+    "read_by": "dx-guilds, from the owner's hand-off note; code not re-read",
+    "repo": "kganjam/delphi-evolve"
+   },
+   "run": {
+    "deterministic": true,
+    "entrypoint": "scopedesk.oracles.nonlinear_sweep"
+   },
+   "schema": "frontier.model.interface/1",
+   "scope": "numerical sweep of two textbook kinetics; linear verdict vs nonlinear outcome",
+   "status": "implemented",
+   "timescale": {
+    "kind": "unknown",
+    "seconds": null,
+    "source": "non-dimensional time; no SI time scale"
+   }
+  }
+ ],
+ "must_display": [
+  "A coupling verdict is about typed interfaces, not biology. 'composable' means the declared mapping is dimensionally and scope-consistent; it does not mean the models describe the same organism. 'scenario' results are assumption-level. No Lean theorem here proves biological correspondence.",
+  "Scenario results carry the label 'assumption-level'.",
+  "Registered calibrations: NONE"
+ ],
+ "must_not_say": [
+  "the models are coupled",
+  "validated multiscale model",
+  "the fin pattern is explained",
+  "Lean proves the biological correspondence"
+ ],
+ "problem_proposals": [
+  {
+   "action_bounds": {
+    "allowed_actions": [
+     "bounded literature/data search by named repository (no whole-filesystem search)",
+     "read the primary paper or dataset and record the read level",
+     "CPU-only exact or numerical fit under systemd caps (MemoryMax=4G, <=2 threads)"
+    ],
+    "forbidden": [
+     "paid model calls",
+     "GPU submission",
+     "contacting other teams",
+     "publishing a nanopub",
+     "presenting a result as an observation"
+    ],
+    "gpu": false,
+    "max_cpu_hours": "2 (declared cap, not an estimate)",
+    "paid_calls": false,
+    "stop_rule": "stop and report on the first of: no dataset found, domain mismatch, cap reached"
+   },
+   "coupling_status": "scenario",
+   "falsifier": "Held-out measurements outside the frozen bound, a calibration domain that does not contain the source model's declared parameter range, or no dataset pairing both quantities in the target context after the bounded search. Any of these closes the Problem as 'no calibration available', which keeps the coupling refused.",
+   "id": "problem-calibration-c04_speed",
+   "kind": "missing_calibration",
+   "missing": [
+    "parameter bounds are unknown on at least one side of a value-transforming mapping",
+    "no uncertainty edge declared",
+    "assumption-level edges: A1"
+   ],
+   "not_a_claim": true,
+   "prerequisites": [],
+   "schema": "frontier.problem.proposal/1",
+   "source_coupling": "c04_speed",
+   "status": "proposed",
+   "success": "A calibration record with a measured or fitted mapping, a data file with a recorded sha256, a declared domain, an uncertainty bound and the scale/context it bridges, read at full-text or data level, that passes validate_coupling as 'calibrated' (structure) AND whose held-out points fall inside the stated bound. The held-out fraction and the bound are frozen BEFORE the fit.",
+   "title": "Calibrate speed at the level-flight proxy (flying_fish_constraints.V) -> release speed (glide_pointmass.release_speed)"
+  },
+  {
+   "action_bounds": {
+    "allowed_actions": [
+     "bounded literature/data search by named repository (no whole-filesystem search)",
+     "read the primary paper or dataset and record the read level",
+     "CPU-only exact or numerical fit under systemd caps (MemoryMax=4G, <=2 threads)"
+    ],
+    "forbidden": [
+     "paid model calls",
+     "GPU submission",
+     "contacting other teams",
+     "publishing a nanopub",
+     "presenting a result as an observation"
+    ],
+    "gpu": false,
+    "max_cpu_hours": "2 (declared cap, not an estimate)",
+    "paid_calls": false,
+    "stop_rule": "stop and report on the first of: no dataset found, domain mismatch, cap reached"
+   },
+   "coupling_status": "refused",
+   "falsifier": "Held-out measurements outside the frozen bound, a calibration domain that does not contain the source model's declared parameter range, or no dataset pairing both quantities in the target context after the bounded search. Any of these closes the Problem as 'no calibration available', which keeps the coupling refused.",
+   "id": "problem-calibration-c05_notch_to_fin_stiffness",
+   "kind": "missing_calibration",
+   "missing": [
+    "collier1996_two_cell.delta_asymmetry -> finbeam_euler_bernoulli.flexural_rigidity: calibration bridging scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'small deflection, linear elastic (proposed)'"
+   ],
+   "not_a_claim": true,
+   "prerequisites": [
+    "finbeam_euler_bernoulli is implemented"
+   ],
+   "schema": "frontier.problem.proposal/1",
+   "source_coupling": "c05_notch_to_fin_stiffness",
+   "status": "proposed",
+   "success": "A calibration record with a measured or fitted mapping, a data file with a recorded sha256, a declared domain, an uncertainty bound and the scale/context it bridges, read at full-text or data level, that passes validate_coupling as 'calibrated' (structure) AND whose held-out points fall inside the stated bound. The held-out fraction and the bound are frozen BEFORE the fit.",
+   "title": "Calibrate Delta level difference between the two cells (collier1996_two_cell.delta_asymmetry) -> fin flexural rigidity EI (finbeam_euler_bernoulli.flexural_rigidity)"
+  },
+  {
+   "action_bounds": {
+    "allowed_actions": [
+     "bounded literature/data search by named repository (no whole-filesystem search)",
+     "read the primary paper or dataset and record the read level",
+     "CPU-only exact or numerical fit under systemd caps (MemoryMax=4G, <=2 threads)"
+    ],
+    "forbidden": [
+     "paid model calls",
+     "GPU submission",
+     "contacting other teams",
+     "publishing a nanopub",
+     "presenting a result as an observation"
+    ],
+    "gpu": false,
+    "max_cpu_hours": "2 (declared cap, not an estimate)",
+    "paid_calls": false,
+    "stop_rule": "stop and report on the first of: no dataset found, domain mismatch, cap reached"
+   },
+   "coupling_status": "refused",
+   "falsifier": "Held-out measurements outside the frozen bound, a calibration domain that does not contain the source model's declared parameter range, or no dataset pairing both quantities in the target context after the bounded search. Any of these closes the Problem as 'no calibration available', which keeps the coupling refused.",
+   "id": "problem-calibration-c06_notch_to_fin_stiffness_assumed",
+   "kind": "missing_calibration",
+   "missing": [
+    "collier1996_two_cell.delta_asymmetry -> finbeam_euler_bernoulli.flexural_rigidity: calibration bridging scale cell -> organ; context 'NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime 'two coupled cells; non-dimensional as stored; no time scale' -> 'small deflection, linear elastic (proposed)'",
+    "collier1996_two_cell.delta_asymmetry -> finbeam_euler_bernoulli.flexural_rigidity: calibration of model units to N m^2"
+   ],
+   "not_a_claim": true,
+   "prerequisites": [
+    "finbeam_euler_bernoulli is implemented"
+   ],
+   "schema": "frontier.problem.proposal/1",
+   "source_coupling": "c06_notch_to_fin_stiffness_assumed",
+   "status": "proposed",
+   "success": "A calibration record with a measured or fitted mapping, a data file with a recorded sha256, a declared domain, an uncertainty bound and the scale/context it bridges, read at full-text or data level, that passes validate_coupling as 'calibrated' (structure) AND whose held-out points fall inside the stated bound. The held-out fraction and the bound are frozen BEFORE the fit.",
+   "title": "Calibrate Delta level difference between the two cells (collier1996_two_cell.delta_asymmetry) -> fin flexural rigidity EI (finbeam_euler_bernoulli.flexural_rigidity)"
+  },
+  {
+   "action_bounds": {
+    "allowed_actions": [
+     "bounded literature/data search by named repository (no whole-filesystem search)",
+     "read the primary paper or dataset and record the read level",
+     "CPU-only exact or numerical fit under systemd caps (MemoryMax=4G, <=2 threads)"
+    ],
+    "forbidden": [
+     "paid model calls",
+     "GPU submission",
+     "contacting other teams",
+     "publishing a nanopub",
+     "presenting a result as an observation"
+    ],
+    "gpu": false,
+    "max_cpu_hours": "2 (declared cap, not an estimate)",
+    "paid_calls": false,
+    "stop_rule": "stop and report on the first of: no dataset found, domain mismatch, cap reached"
+   },
+   "coupling_status": "refused",
+   "falsifier": "Held-out measurements outside the frozen bound, a calibration domain that does not contain the source model's declared parameter range, or no dataset pairing both quantities in the target context after the bounded search. Any of these closes the Problem as 'no calibration available', which keeps the coupling refused.",
+   "id": "problem-calibration-c07_rd_wavelength_to_wing_span",
+   "kind": "missing_calibration",
+   "missing": [
+    "rdfield_nonlinear_sweep.dominant_mode -> glide_pointmass.b: calibration bridging scale tissue -> organism; context 'abstract kinetics; no organism' -> 'Exocoetidae design envelope (Fish 1990 m / wing-loading range)'; regime \"1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength\" -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+   ],
+   "not_a_claim": true,
+   "prerequisites": [],
+   "schema": "frontier.problem.proposal/1",
+   "source_coupling": "c07_rd_wavelength_to_wing_span",
+   "status": "proposed",
+   "success": "A calibration record with a measured or fitted mapping, a data file with a recorded sha256, a declared domain, an uncertainty bound and the scale/context it bridges, read at full-text or data level, that passes validate_coupling as 'calibrated' (structure) AND whose held-out points fall inside the stated bound. The held-out fraction and the bound are frozen BEFORE the fit.",
+   "title": "Calibrate dominant mode number (rdfield_nonlinear_sweep.dominant_mode) -> wing span (glide_pointmass.b)"
+  },
+  {
+   "action_bounds": {
+    "allowed_actions": [
+     "bounded literature/data search by named repository (no whole-filesystem search)",
+     "read the primary paper or dataset and record the read level",
+     "CPU-only exact or numerical fit under systemd caps (MemoryMax=4G, <=2 threads)"
+    ],
+    "forbidden": [
+     "paid model calls",
+     "GPU submission",
+     "contacting other teams",
+     "publishing a nanopub",
+     "presenting a result as an observation"
+    ],
+    "gpu": false,
+    "max_cpu_hours": "2 (declared cap, not an estimate)",
+    "paid_calls": false,
+    "stop_rule": "stop and report on the first of: no dataset found, domain mismatch, cap reached"
+   },
+   "coupling_status": "refused",
+   "falsifier": "Held-out measurements outside the frozen bound, a calibration domain that does not contain the source model's declared parameter range, or no dataset pairing both quantities in the target context after the bounded search. Any of these closes the Problem as 'no calibration available', which keeps the coupling refused.",
+   "id": "problem-calibration-c08_fin_deflection_to_glide_speed",
+   "kind": "missing_calibration",
+   "missing": [
+    "finbeam_euler_bernoulli.tip_deflection -> glide_pointmass.release_speed: calibration bridging scale organ -> organism; regime 'small deflection, linear elastic (proposed)' -> 'point-mass vertical-plane flight; Reynolds/scale validity of the polar not established'"
+   ],
+   "not_a_claim": true,
+   "prerequisites": [
+    "finbeam_euler_bernoulli is implemented"
+   ],
+   "schema": "frontier.problem.proposal/1",
+   "source_coupling": "c08_fin_deflection_to_glide_speed",
+   "status": "proposed",
+   "success": "A calibration record with a measured or fitted mapping, a data file with a recorded sha256, a declared domain, an uncertainty bound and the scale/context it bridges, read at full-text or data level, that passes validate_coupling as 'calibrated' (structure) AND whose held-out points fall inside the stated bound. The held-out fraction and the bound are frozen BEFORE the fit.",
+   "title": "Calibrate tip deflection under load (finbeam_euler_bernoulli.tip_deflection) -> release speed (glide_pointmass.release_speed)"
+  }
+ ],
+ "schema": "frontier.coupling.manifest/1",
+ "scope": "A coupling verdict is about typed interfaces, not biology. 'composable' means the declared mapping is dimensionally and scope-consistent; it does not mean the models describe the same organism. 'scenario' results are assumption-level. No Lean theorem here proves biological correspondence.",
+ "timescale_separation": "10"
+}

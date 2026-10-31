@@ -1,0 +1,120 @@
+{
+ "engine": "z3 5.3.3.0",
+ "model_id": "flying_fish_constraints",
+ "name": "Exact-rational constraint solver (mass, wing area, span, speed)",
+ "not_established": [
+  "organism feasibility",
+  "glide performance",
+  "that any witness is a viable fish"
+ ],
+ "ports": [
+  {
+   "bounds": {
+    "hi": "53/100",
+    "lo": "3/1000",
+    "source": "Fish 1990 p.393 specimen range",
+    "status": "measured"
+   },
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 1,
+    "m": 0,
+    "s": 0
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "m",
+   "provenance": {
+    "read_level": "full-text",
+    "source": "solver witness; envelope Fish 1990 p.393",
+    "status": "assumed"
+   },
+   "quantity": "body mass",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "kg"
+  },
+  {
+   "bounds": null,
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 2,
+    "s": 0
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "S",
+   "provenance": {
+    "read_level": "none",
+    "source": "solver witness",
+    "status": "assumed"
+   },
+   "quantity": "wing area",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "m^2"
+  },
+  {
+   "bounds": null,
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": 0
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "b",
+   "provenance": {
+    "read_level": "none",
+    "source": "solver witness",
+    "status": "assumed"
+   },
+   "quantity": "wing span",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "m"
+  },
+  {
+   "bounds": null,
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": -1
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "V",
+   "provenance": {
+    "read_level": "none",
+    "source": "solver witness; level-flight proxy L=W",
+    "status": "assumed"
+   },
+   "quantity": "speed at the level-flight proxy",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "m/s"
+  }
+ ],
+ "reference": {
+  "branch": "work/guilds-engineering",
+  "commit": "948c2e1",
+  "path": "engineering/constraints.py",
+  "read_by": "dx-guilds (author)",
+  "repo": "kganjam/delphi-frontier"
+ },
+ "run": {
+  "deterministic": true,
+  "entrypoint": "engineering.constraints.solve"
+ },
+ "schema": "frontier.model.interface/1",
+ "scope": "exact-rational feasibility of declared constraints; a level-flight proxy, not a glide analysis",
+ "status": "implemented",
+ "timescale": {
+  "kind": "static",
+  "seconds": null,
+  "source": "a design point: the solver has no dynamics"
+ }
+}
