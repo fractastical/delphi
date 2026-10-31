@@ -31,6 +31,9 @@ establishes arithmetic only.
   - So the blocker is the grid, not the schedule. Those samples will be refused
     (`MEMBER_UNRESOLVED`), and an actual fin load needs a resolved local fin-patch case or a
     validated sub-grid fin model. Neither exists.
+- [x] The returned cfd3d v0.1 3D bundle (job `aijob-e00k0jpm34h4na3b99`) was read under the
+  contract. It is refused at every gate: units, frame, member, resolution, time and stations
+  (see the bundle section below). No fin load comes from it.
 - [ ] A measured EI(x) and a ray section (c, I) for a flying-fish ray (wet lab; no owner).
 - [ ] Fluid-structure feedback. The coupling is one-way and static by design.
 
@@ -203,3 +206,70 @@ gate and the grid are unchanged, and a test pins them.
   `2d-extrusion`, so a `whole_fin_3d` target is refused.
 - **Ownership:** cfd3d owns the solver and its packaging, and infra owns dispatch. Cell counts are
   arithmetic; run time must be measured by the solver owner.
+
+
+## The returned cfd3d v0.1 3D bundle, read under the contract (no solver run)
+
+Files: `engineering/coupled_mechanics/cfd3d_bundle.py`, `artifacts/coupled-mechanics/cfd3d-v2-inspection.json`,
+tests in `tests/test_coupled_mechanics.py`. The raw return is infra's untracked tree
+(`infra-director/results/infra/cfd3d-v2/results/infra22-cfd3d-geometry-dispatch-repair/out`, 48 files).
+The inspection pins every file it read by sha256. CFD04 curates the assets and owns their
+interpretation and the videos.
+
+**Transport.** The archive (1,855,111 B, sha256 `30b9fe61…`) is **not on this host**, so its hash is
+recorded by transport only (`manifest-infra22.json` and `job.log`, both read here) and was not
+recomputed. `status.json` and the platform files are committed in infra-director `5ba6c0e`,
+byte-identical to the raw tree.
+
+**Lineage, recomputed:**
+- The candidate is `4a3b912e`: the sha256 of `geometry/candidate.json`, named by components.json,
+  every case.json and status.json. **It is not v3a `e8c2b666`.** The builder commit (`994aac4`) comes
+  from cfd3d's packet message (`cfd3d-to-infra.md`); the bundle's geometry JSON does not name it.
+  The only commit inside it, `87e72f9`, is the NCA comparison commit that supplied the mass input.
+- Each case's STL hashes match components.json, and the status coefficients equal each case.json's.
+- `render.json` pins case.json. Its 82 slice inputs are not in the bundle, so the videos' frame
+  lineage cannot be re-verified from it.
+- Only `gpu_fish_L128_Re1000` returned surface samples (12 components). The other three cases
+  carry case.json and forces.json only.
+
+**Consistency.** For all four cases, Re = U·L_cells/ν holds exactly (1·64/0.32 = 200 and so on),
+h = L_ref/L_cells, and the fin thickness in cells recomputes as 0.5 mm / h = 0.139, 0.277, 0.277 and
+0.416. Every fin is `resolved: false`, both as declared and by the ≥ 2-cell rule. The medium is
+`none`, and the window means recompute from each case's own force time series (0 relative
+difference). The drift between the two halves of the averaging window is ≤ 0.16%.
+
+**Grid pairs** (cfd3d's rule: no convergence claim unless a pair differs by ≤ 10%; reported against both
+denominators):
+
+| pair | ratio | Cd_total | Cd_pressure | Cz_total |
+|---|---|---|---|---|
+| L64 / L128, Re 200 | 2 | 13.2% / 11.6%: no | 42.6% / 29.9%: no | 122% / 55%: no |
+| L128 / L192, Re 1000 | 1.5 | 9.8% / 8.9%: yes | 28.9% / 22.4%: no | 63% / 38%: no |
+
+Only Cd_total at Re 1000 is inside 10%, and that pair's ratio is 1.5, not the rule's L vs L/2. With
+the C1 sphere reference FAILED (|Cd| 0.875 and 0.857 against 1.092), nothing here is validated.
+
+**Surface samples** (L128, Re 1000):
+- All 12 components have the row counts case.json declares and unit normals, and they close
+  (Σ n·dA = 0 to float precision).
+- Cp_minus is NaN exactly on the closed volumes, and every offset meets cfd3d's rule (2 cells on
+  closed bodies, half-thickness + 1 = 2.866 on fins).
+- The sampled pressures do **not** integrate to the solver's pressure force: −∮Cp·n·dA/L² gives
+  Cd_p 0.0056 over all components against the solver's 0.0229
+  at the final step (0.25×), and 0.0027 on the
+  resolved body alone. A load integrated from these offset samples is therefore not the solver's
+  load, even where the body is resolved.
+- Pectoral one-face jump (the +z face, 203 rows; cfd3d's single-face rule): the area-mean
+  ventral − dorsal ΔCp is 0.0030 (L) and 0.0031 (R), in a range of ±0.04. These are smeared
+  sub-grid shell values, and in water that is about 0.03 mPa.
+
+**Contract.** The pectoral_L samples go in as a `/2` record for the v3a ray-0 target:
+- As delivered, the record is refused at `WRONG_PRESSURE_UNIT` (Cp, medium none).
+- Each refusal was then relabelled away by declaration only, to show that every later limit binds
+  on its own. The chain gives `FRAME_MISMATCH`, `GEOMETRY_MISMATCH` (candidate 4a3b912e),
+  `MEMBER_UNRESOLVED` (0.277 cells), `BAD_TIME` (the sample time is not stated) and
+  `STATION_COVERAGE` (that geometry has no straight ray member).
+- No stage is accepted, and the reader raises if one ever is. These are relabels, not repairs.
+
+**Not established:** any fin or ray load, physical validity, grid convergence, dimensional pressure,
+the v3a geometry, and the flight, taxi or free-surface regime. This reader ran no solver.

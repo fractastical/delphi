@@ -376,3 +376,68 @@ def test_committed_artifacts_are_current(receipt):
     for name, pin in manifest["code_files"].items():
         assert hashlib.sha256((Path(wt.ROOT) / name).read_bytes()).hexdigest() == pin, name
     assert np.isfinite(committed["actual_flow_receipt"]["surface_pressure_force_diagnostic"]["pressure_lift_N_per_m"])
+
+
+# ------------------------------------------------------------------ the returned cfd3d v0.1 3D bundle
+# The raw bundle is an untracked return on this host (infra owns it; CFD04 curates its assets), so the
+# tests that need it skip without it. The committed inspection JSON is checked either way.
+from engineering.coupled_mechanics import cfd3d_bundle as cb  # noqa: E402
+
+RAW = Path("/data/worktrees/delphi-frontier/infra-director/results/infra/cfd3d-v2/results/"
+           "infra22-cfd3d-geometry-dispatch-repair/out")
+INSPECTION = Path(wt.ROOT) / "artifacts" / "coupled-mechanics" / "cfd3d-v2-inspection.json"
+needs_raw = pytest.mark.skipif(not (RAW / "status.json").exists(), reason="raw cfd3d bundle not on this host")
+
+
+@pytest.fixture(scope="module")
+def inspection():
+    return json.loads(INSPECTION.read_text())
+
+
+def test_closed_face_force_sign_and_closure():
+    # unit cube, one sample per face: n outward, area 1
+    n = np.array([[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]], dtype=float)
+    A = np.ones(6)
+    assert np.allclose(cb.closed_face_force(n, A, np.full(6, 0.7), 1.0), 0)  # a gauge constant integrates to 0
+    x_face = np.array([0.5, -0.5, 0, 0, 0, 0])  # Cp = k x at the face centroids
+    # F = -oint Cp n dA = -k V e_x, V = 1: higher pressure downstream pushes the body upstream
+    assert np.allclose(cb.closed_face_force(n, A, 3.0 * x_face, 1.0), [-3.0, 0, 0])
+
+
+def test_surface_row_count_is_checked(tmp_path):
+    d = tmp_path / "c" / "surface"
+    d.mkdir(parents=True)
+    np.zeros(25, dtype="<f4").tofile(d / "fin.f32")  # 2.5 rows of 10 columns
+    with pytest.raises(Refusal, match="BAD_SCHEMA"):
+        cb._surface(tmp_path, "c", "fin", 3)
+
+
+def test_bundle_fin_record_is_refused_at_every_gate(inspection):
+    codes = [a.get("code") for a in inspection["contract"]["attempts"]]
+    assert codes == ["WRONG_PRESSURE_UNIT", "FRAME_MISMATCH", "GEOMETRY_MISMATCH", "MEMBER_UNRESOLVED",
+                     "BAD_TIME", "STATION_COVERAGE"]
+    assert all(a["verdict"] == "refused" for a in inspection["contract"]["attempts"])
+
+
+def test_bundle_limits_are_preserved(inspection):
+    assert inspection["reference_gate"]["C1_sphere_Re100"] == "FAIL"
+    rows = inspection["consistency"]["cases"].values()
+    assert all(r["Re_consistent"] and r["h_equals_L_ref_over_L_cells"] and r["fin_cells_matches_case"] for r in rows)
+    assert not any(r["fins_resolved_declared"] or r["fins_resolved_by_rule"] for r in rows)
+    assert all(r["medium"].startswith("none") for r in rows)
+    assert inspection["lineage"]["transport"]["archive_hash_recomputed"] is False
+    assert inspection["solver_runs_by_this_reader"] == 0
+    re200, re1000 = inspection["grid_pairs"]
+    assert re200["within_cfd3d_10pct_rule"]["Cd_total"] == "no"
+    assert re1000["within_cfd3d_10pct_rule"] == {"Cd_total": "yes", "Cd_pressure": "no", "Cz_total": "no"}
+    # samples 2-2.9 cells off the walls do not integrate to the solver's own pressure drag
+    assert inspection["surface"]["pressure_drag_from_samples"]["all_components_over_solver_final"] < 0.5
+
+
+@needs_raw
+def test_committed_inspection_is_reproduced_from_the_raw_bundle(inspection):
+    transport = RAW.parent.parent.parent
+    doc = json.loads(json.dumps(cb.inspect(RAW, transport), sort_keys=True, default=str))
+    assert doc == inspection
+    for name, sha in inspection["inputs"]["files_read_sha256"].items():
+        assert hashlib.sha256((RAW / name).read_bytes()).hexdigest() == sha, name
