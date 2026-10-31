@@ -2,11 +2,13 @@
   "claim_id": "wolfram2002-ch12-39",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch12-39",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the claim holds, then for every length-preserving involution 'negation' on binary strings and every set S of strings of a given length that a multiway system could eventually generate, S is complete (every string or its negation is in S) and consistent (no string together with its negation is in S) if and only if |S| is exactly half of all strings of that length; in particular more than half implies inconsistent and less than half implies incomplete.",
   "pass_criterion": "Pre-registered. Part 1 (sets): for length n = 3, enumerate all 764 involutions of the 8 strings and all 256 subsets S; for n = 4, take 300 pseudo-random involutions of the 16 strings (numpy seed 20261031, including the complement map, reversal and the identity-on-some-strings cases) and all 65536 subsets. For each (involution, S) record complete, consistent, |S| versus half. Part 2 (multiway systems): enumerate all multiway systems over {A,B} with one or two rules lhs -> rhs, |lhs| in {1,2}, |rhs| in {|lhs|, |lhs|+1} (length-non-decreasing so that the set of generated strings of each length <= 6 stabilises and can be computed exactly), started from the string 'A' taken to represent true; for each system and each length n = 2..6 record the exactly generated set, under negation = complement and under negation = reversal. PASS (supports) if in Part 1 and Part 2 there is no counterexample to either direction of the biconditional (complete and consistent <=> exactly half) for any involution.",
   "fail_criterion": "Pre-registered. REFUTES if the biconditional fails in both directions, or if either of the book's two directional arguments (more than half => inconsistent; less than half => incomplete) has a counterexample. MIXED if the three implications the book argues for (more than half => inconsistent; less than half => incomplete; hence complete and consistent => exactly half) hold without exception but the converse (exactly half => complete and consistent) has counterexamples both among arbitrary sets and among stabilised generated sets of actual multiway systems. The number of counterexamples and the role of involution fixed points are reported.",
-  "planned_datasets": ["multiway-half-criterion-generator"],
+  "planned_datasets": [
+    "multiway-half-criterion-generator"
+  ],
   "interpretation": "The book (pp. 796-797) states the criterion as an equivalence ('the criterion for whether a system is complete and consistent is simply that exactly half ... are eventually generated') but argues only the two contrapositive directions. 'Negation' is taken as the book says: any operation that preserves length and gives back the original when applied twice (a length-preserving involution), including ones with fixed points (strings equal to their own negation), for which the test records separately what happens. 'Complete' = for every string, it or its negation is generated; 'consistent' = for no string are both generated (a fixed point that is generated counts as both). 'Eventually generated' is made exact by restricting to length-non-decreasing rules so that the generated set at each length is a finite closure.",
   "datasets": [
     {
@@ -26,10 +28,130 @@
       "role": "the finite combinatorial objects the criterion is about"
     }
   ],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-wolfram-nks-9241", "date": "2026-10-31" }
+  "method": "analysis.py enumerates all 764 involutions of the 8 binary strings of length 3 against all 256 subsets, and for length 4 the complement, reversal and identity maps plus 300 seeded random involutions against all 65536 subsets, recording for each (involution, set) whether the set is complete, consistent and of size exactly half. It then enumerates all 1485 multiway systems with one or two length-non-decreasing rules (|lhs| 1-2, |rhs| = |lhs| or |lhs|+1) over {A,B}, computes the exact closure of 'A' restricted to strings of length <= 6, and evaluates the same quantities at each length 2-6 under complement and reversal negation. Runtime 2 s.",
+  "measured": {
+    "value": 80,
+    "unit": "stabilised (multiway system, length, negation) cases that generate exactly half of the strings but are not complete and consistent",
+    "n": 14850,
+    "uncertainty": "exact enumeration",
+    "extra": {
+      "forward_implications_counterexamples": {
+        "more_than_half_but_consistent": 0,
+        "less_than_half_but_complete": 0,
+        "complete_and_consistent_but_not_half": 0
+      },
+      "converse_counterexamples_arbitrary_sets": 3941426,
+      "n3_all_involutions": {
+        "n_involutions": 764,
+        "n_fixed_point_free": 105,
+        "n_with_fixed_points": 659,
+        "n_involutions_with_cex_half_but_not_cc": 764
+      },
+      "n3_fixed_point_free": {
+        "complete_and_consistent_sets": 1680,
+        "exactly_half_sets": 7350
+      },
+      "n3_with_fixed_points": {
+        "complete_and_consistent_sets": 0,
+        "exactly_half_sets": 46130
+      },
+      "n4_complement": {
+        "n_complete_and_consistent": 256,
+        "n_exactly_half": 12870,
+        "cex_half_but_not_cc": 12614
+      },
+      "n4_reversal": {
+        "fixed_points": 4,
+        "n_complete_and_consistent": 0,
+        "n_exactly_half": 12870,
+        "cex_half_but_not_cc": 12870
+      },
+      "multiway_complement_by_length": {
+        "2": {
+          "n_cc": 18,
+          "n_half": 24,
+          "cex_half_not_cc": 6
+        },
+        "3": {
+          "n_cc": 12,
+          "n_half": 12,
+          "cex_half_not_cc": 0
+        },
+        "4": {
+          "n_cc": 12,
+          "n_half": 12,
+          "cex_half_not_cc": 0
+        },
+        "5": {
+          "n_cc": 12,
+          "n_half": 12,
+          "cex_half_not_cc": 0
+        },
+        "6": {
+          "n_cc": 12,
+          "n_half": 13,
+          "cex_half_not_cc": 1
+        }
+      },
+      "multiway_reversal_by_length": {
+        "2": {
+          "n_cc": 0,
+          "n_half": 24,
+          "cex_half_not_cc": 24
+        },
+        "3": {
+          "n_cc": 0,
+          "n_half": 12,
+          "cex_half_not_cc": 12
+        },
+        "4": {
+          "n_cc": 0,
+          "n_half": 12,
+          "cex_half_not_cc": 12
+        },
+        "5": {
+          "n_cc": 0,
+          "n_half": 12,
+          "cex_half_not_cc": 12
+        },
+        "6": {
+          "n_cc": 0,
+          "n_half": 13,
+          "cex_half_not_cc": 13
+        }
+      },
+      "multiway_counterexample_complement_length6": {
+        "rules": [
+          "A->BB",
+          "BB->AA"
+        ],
+        "generated": "the 32 length-6 strings with an even number of B's (exactly half); contains both AAAAAA and BBBBBB (inconsistent) and neither ABAAAA nor BABBBB (incomplete)"
+      },
+      "multiway_counterexample_complement_length2": {
+        "rules": [
+          "A->AB",
+          "A->BA"
+        ],
+        "generated": [
+          "AB",
+          "BA"
+        ],
+        "note": "exactly half, both a string and its complement present, AA and BB both absent"
+      }
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.9,
+  "caveats": [
+    "The three implications the book actually argues (more than half => inconsistent; less than half => incomplete; hence complete and consistent => exactly half) hold without exception in every enumerated case, for every length-preserving involution including those with fixed points.",
+    "The converse that makes 'exactly half' a criterion (exactly half => complete and consistent) is false: it fails for 3.94 million of the enumerated (involution, set) pairs and for 80 stabilised cases among the 1485 small multiway systems, e.g. {A -> BB, BB -> AA} from A generates exactly half of the length-6 strings while being both inconsistent and incomplete. The criterion is therefore necessary but not sufficient; it becomes sufficient only if consistency (or completeness) is known independently.",
+    "For any negation with fixed points (e.g. reversal, where palindromes are their own negation) no set is complete and consistent at all (0 of 65536 sets at length 4; 0 of the 659 fixed-point involutions at length 3 admit one), so the 'exactly half' count carries no information about completeness and consistency in that case.",
+    "The multiway enumeration is restricted to length-non-decreasing rules so that 'eventually generated' is exactly computable; this restriction excludes systems whose generated sets at a given length never stabilise, but the counterexamples found are exact."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-wolfram-nks-9241",
+    "date": "2026-10-31"
+  }
 }
