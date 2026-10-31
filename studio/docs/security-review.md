@@ -9,7 +9,7 @@ This is not a complete penetration test and does not claim the absence of all vu
 | Item | Value |
 |---|---|
 | Tool | gitleaks 8.30.1 (`/data/tools/gitleaks-8.30.1/gitleaks version` printed `8.30.1`), default rules, run locally; nothing was uploaded to an external scanner |
-| History scan | `security/gitleaks-history.redacted.json`, sha256 prefix `6bcbfad5b36f956d`. Its tool log (`gitleaks-history.log`) reads "367 commits scanned, leaks found: 20". Root reported 477 commits / 64 remote refs for the run it attributes this to; the log file I could read says 367, and I could not reconcile the two. Root's final rescan of the latest refs supersedes both. |
+| History scan | `security/gitleaks-history.redacted.json`, sha256 prefix `6bcbfad5b36f956d`. Its tool log (`gitleaks-history.log`) reads "367 commits scanned, leaks found: 20". Root's 477 was a reachable-commit count and the scanner's 367 was the number of commits it diffed; these are different quantities (see section 7), not a disagreement. The final rescan in section 7 supersedes this first run. |
 | Current-tree scan | `security/gitleaks-tree.redacted.json`, sha256 prefix `c322d524e2a5a50a`, scan of a copy of commit `b53e0cd` of `codex/frontier-demo-20261031` (log: ~95.8 MB, "leaks found: 16") |
 | Redaction | Every `Secret` field in both JSON receipts is the literal `REDACTED`, and every `Match` field contains `REDACTED` (checked by script, 20 of 20 and 16 of 16). The receipts live under `/data/artifacts/delphi-evolve-rethink/security/` and are not copied into git. |
 
@@ -21,7 +21,7 @@ Reading limits: I read the receipts, the tool logs, and the historical file line
 |---|---|---|---|---|---|
 | A | 15 | generic-api-key | `30b41e3c`, `findings/attestation-sample-15.json`, lines 28, 42, 56 ... 224 (every 14th line) | **Not a secret.** Deterministic SHA-256 sampling keys | For all 15 findings the flagged line holds a `"key": "<64 hex>"` entry, and recomputing `sha256("frontier-attestation-sample-v1\|<slug>\|<index>\|<register_sha256>")`, the rule declared in `findings/select_attestation_sample.py`, from that item's slug and index and the file's own `register_sha256` reproduces the stored key: 15 of 15 equal, 15 distinct lines. The keys are a public, reproducible function of public inputs. |
 | B | 1 | generic-api-key | `609d1cf2`, `engineering/cfd3d/env/Manifest.toml`, line 17 | **Not a secret.** A Julia package UUID | The line has the shape `    oneAPI = "<uuid>"` under `[deps.AcceleratedKernels.weakdeps]`. A Julia `Manifest.toml` lists package UUIDs, which are public identifiers in the General registry. I did not look the UUID up in the registry. The file is not in commit `b53e0cd` (the `engineering/cfd3d/env/` directory is absent there), so it is present only in history. |
-| C | 1 | generic-api-key | `388b19c6`, `tests/test_system_status.py`, line 160 | **Test fixture marker, not a credential.** | `monkeypatch.setenv("FRONTIER_ACCESS_TOKEN", "ENV-SECRET-MARKER-123456")`. The test sets it to prove `/api/system` never echoes the environment, and asserts `"ENV-SECRET-MARKER"` is absent from the response (line 168). Still present in the current tree, which is why the current-tree report has it. |
+| C | 1 | generic-api-key | `388b19c6`, `tests/test_system_status.py`, line 160 | **Test fixture marker, not a credential.** | The test sets the `FRONTIER_ACCESS_TOKEN` environment variable to a literal marker string (not quoted here, because quoting it makes this document a scanner hit). The test sets it to prove `/api/system` never echoes the environment, and asserts `"ENV-SECRET-MARKER"` is absent from the response (line 168). Still present in the current tree, which is why the current-tree report has it. |
 | D | 3 | aws-access-token | `535d5b45`, `data/genomics/flyingfish_receipts.json`, lines 123, 141, 159 | **Expired signed download URLs for a public dataset. No account secret.** | Each line holds an `https://s3-eu-west-1.amazonaws.com/pfigshare-u-files/...` pre-signed redirect (Figshare item 14600634, CC BY 4.0) with parameters `X-Amz-Algorithm, -Credential, -Date, -Expires, -Signature, -SignedHeaders`, `X-Amz-Expires=10` and `X-Amz-Date` 20261031T201827Z / 201830Z / 201834Z (13:18 PDT). They expired ten seconds after issue. The credential id in such a URL belongs to Figshare's storage account, not to this project, and the signature is time-limited. Current files no longer contain them: `git grep` for `X-Amz-Signature`, `X-Amz-Credential` and `AKIA` + 16 characters over the current tree finds none in receipts (see the false positive below). |
 
 Totals: 15 + 1 + 1 + 3 = 20, matching the receipt (17 generic-api-key, 3 aws-access-token).
@@ -50,14 +50,37 @@ Judged sound in what was read: durable writes need a bearer credential (a browse
 Fixed on `public-security`:
 
 1. `/api/media` and the MCP artifact tool rescanned the artifact tree on every anonymous call (57 ms warm here, serialised): now `LocalMedia(scan_ttl=10)`. Test `tests/test_media.py::test_scan_ttl_bounds_rescans_from_anonymous_lookups`.
-2. The engineering and belief workers had no memory or CPU cap, unlike the simulation worker: shared `frontier/worker_limits.cap_worker`. Tests in `tests/test_worker_limits.py`.
+2. The engineering and belief workers had no memory or CPU cap, unlike the simulation worker: shared `frontier/worker_limits.cap_worker`. The first cap (2 GiB) did not guarantee failure before the 1 GiB service MemoryMax, so it was re-sized from measurement: least RLIMIT_AS at which a valid request still completed was bioelectric 158 MiB, mechanobio 268, engineering 127, beliefs 79 (formalize caps at 384); the cap is 384 MiB, and all four adapters share a process-wide budget of two workers (768 MiB together; the web process's own size was not measured). Tests in `tests/test_worker_limits.py`.
 3. Anonymous session minting was unlimited against a 500-entry evicting table: 60 per 600 s per client. Test in `tests/test_web.py`.
 4. The checked-in public web unit no longer loads `studio.env`. The installed unit was not read and is root's to install.
 
-Tests (capped scope, `scripts/test_postgres.sh`): web and media 104 passed; worker limits plus engineering, beliefs and simulation API 84 passed; `test_mcp_remote.py` 27 passed. `tests/test_mcp_demo.py` has 2 failures that also occur with the last commit's edits stashed; cause not investigated.
+Tests (capped scope, `scripts/test_postgres.sh`): web and media 104 passed; worker limits plus engineering, beliefs and simulation API 84 passed; `test_mcp_remote.py` 27 passed. `tests/test_mcp_demo.py` had 2 failures that occur identically on clean `279fff3` (this branch's base) and on the upstream tip `df98621`, so they were not caused by these changes: `scripts/mcp_demo.py` pinned six read tools while the server registers sixteen. Fixed by pinning the sixteen, as `test_mcp_remote.py` and `test_interfaces.py` already do; those tests pass (15).
 
 Open recommendation, not applied: a stricter nginx `limit_req` for the four solver POST routes. The installed config is root's.
 
-## 7. Before any visibility change
+## 7. Final rescan (supersedes sections 1-3 for counts)
+
+| Item | Value |
+|---|---|
+| Scan time | 2026-10-31 15:38-15:40 PDT (22:38-22:40 UTC) |
+| Tool | the same gitleaks 8.30.1 binary, sha256 prefix `88f91962aa2f93ac`; no config file, no `.gitleaksignore` (none is tracked in git history, none in the archived tree); `--redact`, `--max-archive-depth 3`, `--max-decode-depth 3`; run in a scope capped at MemoryMax 4G, MemorySwapMax 0, TasksMax 128, CPUQuota 100% |
+| Tree scanned | `git archive` of `origin/codex/frontier-demo-20261031` at **`87a6844e35f4`** (full: `87a6844e35f4283d01082c3fa07b23a3d5aeabc9`), 1,838 files, 168.65 MB, 15 archive-type files inside it (archive traversal on; none produced a hit of their own). This tip contains `b4b1c43`. |
+| History scanned | `git . --log-opts=--remotes=origin` over the 70 `refs/remotes/origin/*` refs present after `git fetch` at the scan time, and a second run over `--all`. Both found the same 23 fingerprints. |
+| Commit counts, three different quantities | **548** commits reachable from the origin refs (`git rev-list --remotes=origin --count`), of which 127 are merges and **422** are not; gitleaks reported "422 commits scanned" because it scans commit diffs and merge commits carry none. `git rev-list --all` gives 550 (two local-only commits). The tip's own ancestry is 469. Root's 477 was a reachable count at an earlier moment; the first scan's 367 was its diffed (non-merge) count at an earlier moment. |
+| Findings | history: 23; tree at the tip: 20. All `Secret` fields are `REDACTED` and all `Match` fields contain `REDACTED` (checked by script, 23 of 23, 23 of 23 and 20 of 20). |
+| Receipts (local, `/data/artifacts/delphi-evolve-rethink/security/final-20261031/`) | `history-remotes-origin.redacted.json` sha256 prefix `fcc98d7251854102`; `history-all-refs.redacted.json` the same prefix (identical content); `tree-tip.redacted.json` prefix `52a5fcb6b6eb965c`; the `.log` files and `scanned-tip.txt` beside them |
+
+New since section 2 (23 history findings = the 20 above + these 3):
+
+| Count | Location | Classification | Evidence |
+|---|---|---|---|
+| 2 | `f593f0c1`, `engineering/cfd3d/env_gpu/Manifest.toml`, lines 31 and 72 | **Not a secret.** The same Julia `oneAPI` package UUID as class B | Both lines match `^\s*oneAPI = "<36-char uuid>"$`, and the value is identical across these two lines and class B's line in `env/Manifest.toml` (one distinct value; compared by script, not printed). A Manifest lists package UUIDs. These files are in the tree, so the tree report has them (class B's file is in the tree now too: 3 Manifest hits in total). |
+| 1 | `61a44ae4`, `docs/security-review.md`, line 24 | **Not a secret. This document quoted the test marker of class C.** | The flagged span is the test line's `setenv` argument ending in the marker. The line is reworded in this revision so it no longer appears; the history keeps the earlier text. |
+
+The tree's 20 are: 15 class A, 3 oneAPI UUID lines, 1 class C, and 1 line in this document (class C quotation, removed by this revision, so the next tree scan should show 19). The three expired Figshare URLs (class D) are history-only; none is in the tree. No new rule type appeared.
+
+Not covered: nested archives deeper than three levels, content encoded deeper than three levels, files above gitleaks' size limits, and any ref created after 15:38 PDT. The first-run limits in section 5 still apply. This is the receipt for the commit and time above; a later tip needs a new scan.
+
+## 8. Before any visibility change
 
 Root's final rescan of the latest refs, and the nested-archive scan result, are required. This document changes no repository visibility.
