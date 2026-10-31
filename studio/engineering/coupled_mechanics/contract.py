@@ -61,14 +61,31 @@ def _pos(v, name):
     return x
 
 
-def parse_target(t: dict) -> dict:
-    """frontier.coupled.member-target/1: the straight clamped-free ray the load is applied to."""
+def _member_geometry(t: dict):
     if not isinstance(t, dict) or t.get("schema") != SCHEMA_TARGET:
         raise Refusal("BAD_SCHEMA", f"target schema must be {SCHEMA_TARGET}")
     root, tip = _vec(t.get("root_m"), "target.root_m"), _vec(t.get("tip_m"), "target.tip_m")
     L = _norm2(tuple(b - a for a, b in zip(root, tip)))
     if L == 0:
         raise Refusal("ZERO_LENGTH", "target root == tip")
+    return root, tip, L
+
+
+def parse_member(t: dict) -> dict:
+    """The geometry half of a target, for a load-only transfer where EI and the section are unknown.
+
+    Same schema and the same geometry refusals as parse_target; EI, section and n_elements are not
+    read, so nothing downstream can solve a beam from it."""
+    root, tip, L = _member_geometry(t)
+    if t.get("frame_length_unit") != "m":
+        raise Refusal("WRONG_LENGTH_UNIT", f"target.frame_length_unit={t.get('frame_length_unit')!r}, need 'm'")
+    return {"id": t.get("member_id"), "frame_id": t.get("frame_id"), "root": root, "tip": tip,
+            "L2": L, "claim": t.get("claim", "member_scenario")}
+
+
+def parse_target(t: dict) -> dict:
+    """frontier.coupled.member-target/1: the straight clamped-free ray the load is applied to."""
+    root, tip, L = _member_geometry(t)
     ei = t.get("EI") or {}
     lo, hi = _pos(ei.get("lo_Nm2"), "target.EI.lo_Nm2"), _pos(ei.get("hi_Nm2"), "target.EI.hi_Nm2")
     if lo > hi:

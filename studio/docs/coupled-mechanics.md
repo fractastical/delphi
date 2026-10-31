@@ -102,3 +102,73 @@ result = couple.run(member_pressure_record, member_target)   # raises Refusal(co
 Display the `scope` string with every result, and do not say "coupled" for an analytic or
 refused case. When `cfd3d` publishes a 3D record, pass it through `couple.run` against a target
 built from the same mesh feature. Nothing else changes.
+
+
+## The resolved local fin patch on v3a ray 0 (prepared, not run)
+
+Files: `engineering/coupled_mechanics/{fin_geometry,thin_airfoil,fin_patch,fin_patch_run}.py`,
+`tests/test_fin_patch.py`, and `artifacts/fin-patch/{protocol.json, reference.json, poster.png, manifest.json}`.
+
+**Geometry.** The input is fish3d v3a (`8dc5cc4`, candidate `e8c2b666…`).
+- **Pins:** rays, panels, components and the pectoral_L STL are read only after their sha256
+  values match, and the candidate hash must agree across all three JSON files.
+- **The member:** ray 0 is the only straight ray (45 nm off-axis), and it is the fin's leading
+  edge, swept 8.000°. Rays 1–14 branch, so they are not straight members (gap G6).
+- **The frame:** the member sits in an exact ray-local frame (root 0, tip L = `length_m`), whose
+  definition is hashed into its id. This lets real 3D geometry meet the contract's exact-geometry
+  rule without rounding an irrational length.
+
+**Analytic reference first.** Thin-airfoil theory on a flat plate gives
+ΔCp = 4α√((1−ξ)/ξ). Ray 0's strip, from the leading edge to the midpoint toward ray 1, carries
+4α·G(ξ₁), with G(ξ) = √(ξ(1−ξ)) + asin√ξ.
+- **Finite span:** α_eff = α/(1+2/AR), an elliptic lifting-line correction, assumed. AR is
+  3.67, giving α_eff/α = 0.647.
+  The 2D value is kept as the upper bracket.
+- **Declared inputs:** α 5°, U 5 m/s and ρ 1.225 are all assumed and unsourced. The v3a pose itself
+  has α = 0, because the fin plane contains the stream, so its own load is zero.
+
+| s/L | chord mm | local strip mm | strip/chord | share of section lift | q_strip mN/m | cells/chord at h | 2D cells | Re_c |
+|---|---|---|---|---|---|---|---|---|
+| 0.00 | 7.5 | 0.27 | 3.6% | 23.9% | 9.7 | 151 | 0.8 M | 2515 |
+| 0.25 | 24.7 | 0.74 | 3.0% | 21.9% | 29.2 | 495 | 8.6 M | 8243 |
+| 0.50 | 29.6 | 1.21 | 4.1% | 25.6% | 40.8 | 592 | 12.2 M | 9860 |
+| 0.75 | 29.6 | 1.60 | 5.4% | 29.4% | 46.8 | 592 | 12.3 M | 9863 |
+| 1.00 | 24.2 | 1.96 | 8.1% | 35.7% | 46.5 | 484 | 8.2 M | 8070 |
+
+Through the **unchanged** contract (`parse_pressure`), this is accepted as an analytic adapter check.
+- **Force:** F = 3.34 mN.
+- **Deflection and stress:** NOT COMPUTED. EI and the ray section stay unknown.
+- **Contract change:** the only edit to `contract.py` splits the target's geometry check into
+  `parse_member`. Every existing test passes unchanged.
+
+**Gaps, reported rather than fixed** (`reference.json` `gaps`):
+- **G1, fan width:** the contract carries one tributary width per member, while the fan's local
+  width grows from 0.27 to 1.96 mm against a declared mean of 1.25 mm. So the contract load is
+  1.155× the strip force and 0.914× its root moment, and its shape along the ray is
+  inverted: it falls toward the tip where the strip load rises.
+- **G2, section not 3D:** finite span enters only through the assumed α_eff.
+- **G3, leading-edge singularity:** the strip is finite, but a sampled strip under-counts it as
+  √(row width); the tests measure this halving when rows quadruple.
+- **G4, regime:** speed and angle are unsourced; there is no free surface and no body interference.
+- **G5, thickness:** membrane 0.10 mm and ray 0.6 mm are assumed, with the taper unknown.
+- **G6, branched rays:** rays 1–14 are not straight members.
+- **G7, structure:** EI and the ray section are unknown.
+- **G8, global CFD:** cfd3d v1 carries the membrane as a smeared 3.7-cell shell, so it is not used.
+
+**The frozen patch case** (`protocol.json`, sha256 `f2c859e02eee50e3…`):
+- **Sections:** five chordwise sections at the contract stations s/L = 0, ¼, ½, ¾, 1. The contract
+  needs both ends.
+- **Solid:** the membrane plate as a real solid, in two declared variants: membrane only, and
+  membrane plus a 0.6 mm ray-0 rod at the leading edge.
+- **Grid:** h = t/2 = 50 µm coarse and t/3 fine. Both pass the ≥2-cell gate, so no coarse member is
+  ever unresolved.
+- **Gates, frozen:** grid pair ≤ 10%, stationarity ≤ 5%, α = 0 control ≤ 2%, and the jump sign.
+  The analytic ratio is reported, not gated.
+- **Solver reference:** the solver's own reference gate is required. cfd3d's C1 is FAILED, which
+  blocks physical-validation wording.
+- **Output:** each section's surface rows go through `fin_patch.record_from_sections`, which
+  computes resolution from the section's own `h_m` and `thickness_m`. It refuses on an unresolved
+  section, a missing medium, a member hash mismatch, or a missing station. The record is
+  `2d-extrusion`, so a `whole_fin_3d` target is refused.
+- **Ownership:** cfd3d owns the solver and its packaging, and infra owns dispatch. Cell counts are
+  arithmetic; run time must be measured by the solver owner.
