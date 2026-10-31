@@ -1,7 +1,7 @@
 {
  "schema": "frontier-site-snapshot-0.1",
- "label": "snapshot of inputs a3a0ca3b4e70",
- "input_fingerprint": "a3a0ca3b4e709792a90c205ba205d81ec58b5daa1f2ce9454ef93d44c6d75413",
+ "label": "snapshot of inputs eb36f2bf3e30",
+ "input_fingerprint": "eb36f2bf3e307eabc6fc99e8a44ca17cc3e544538568bfbafb73a3a203f16d1d",
  "inputs": [
   {
    "path": "GOAL.md",
@@ -484,9 +484,44 @@
    "bytes": 2287
   },
   {
+   "path": "artifacts/metabolism/basic-nutrients-v3/metabolism_results.json",
+   "sha256": "5dde8e135028cedf8d0a21a9310005a48c1657cfab3262affcdc07143f4cc029",
+   "bytes": 10528
+  },
+  {
+   "path": "artifacts/metabolism/basic-nutrients-v3/o2_atp_biomass.png",
+   "sha256": "74f995a74d83f28e07d8e0c72989c0c9c67607bfae6add46e78fe7decb2b5c0a",
+   "bytes": 85047
+  },
+  {
+   "path": "artifacts/metabolism/manifest.json",
+   "sha256": "8445b56bc3c573b8182e4b1a835cfd30f4dce8d4bc9232504d3d89d5393a5101",
+   "bytes": 3280
+  },
+  {
    "path": "artifacts/molecular/analysis.json",
    "sha256": "179bc71195246e0754efdb29ec6c4ae80b3aa41e8b1b9eebe28a7f6172f5b164",
    "bytes": 926
+  },
+  {
+   "path": "artifacts/molecular/continuation-analysis/summary.json",
+   "sha256": "dccb9f38cde850ed1f0b733ad2f8512703f1c4c65c2c0f8ea3138e1df19f1364",
+   "bytes": 5498
+  },
+  {
+   "path": "artifacts/molecular/continuation-render/poster.png",
+   "sha256": "50c546d1b89c6f8c4b7fa2bec4e4b57536e1391c51552117d58692480e61e597",
+   "bytes": 223106
+  },
+  {
+   "path": "artifacts/molecular/continuation-render/render.json",
+   "sha256": "467d2b4f21ebc0ed24c091c7430e330dfce17abe3e71073b03e6157a593646c8",
+   "bytes": 1406
+  },
+  {
+   "path": "artifacts/molecular/continuation-render/trajectory.mp4",
+   "sha256": "f02c5fa485d376eb4a7db6674c41fabef9b1d635ddc8ec3d6a77eef18e87a264",
+   "bytes": 705618
   },
   {
    "path": "artifacts/molecular/cpu-render/poster.png",
@@ -524,19 +559,14 @@
    "bytes": 652288
   },
   {
-   "path": "artifacts/molecular/warmstart-v3.json",
-   "sha256": "5ca2d6cb8e6ea98a4bd42c780265525b744fbc95a8e8764ec1e8e258ae030596",
-   "bytes": 1899
-  },
-  {
-   "path": "artifacts/molecular/warmstart-v3.tar.xz",
-   "sha256": "4154fcdc3784fa1bfe6c667cdc20fabc346e8c482d9010ad5646a10eea78c3bf",
-   "bytes": 1809144
-  },
-  {
    "path": "artifacts/multicell/baseline.mp4",
    "sha256": "ceaaeabc4adf678830231946353897921e0a4432fa5ccb67b45be5fd442e0efd",
    "bytes": 114262
+  },
+  {
+   "path": "artifacts/multicell/full/full_summary.json",
+   "sha256": "664cd76011ed14bb841ae2fdfc0ff2767b170d337b1225954f1345eb2c17567a",
+   "bytes": 1512
   },
   {
    "path": "artifacts/multicell/mp4.sha256",
@@ -5320,7 +5350,7 @@
    "evidence_kind": "SimulationResult (generic example model)",
    "model": {
     "name": "Morpheus v2.3.9 official multiscale example (cell-cycle ODE, cellular Potts division, cytokine PDE, feedback)",
-    "context": "Three arms ran headless and each hit the 600 s cap at model time 0.456 of a 2.0 horizon. Generic and not calibrated; not fish growth."
+    "context": "The first three arms ran headless and each hit the 600 s cap at model time 0.456 of a 2.0 horizon; a later full-horizon rerun reached t = 2.0 (see the limitations). Generic and not calibrated; not fish growth."
    },
    "time": {
     "units": "model time units (example model)",
@@ -5350,15 +5380,16 @@
    ],
    "parameter_unknowns": [
     "Not calibrated to any organism.",
-    "Run stopped at the 600 s cap; independent seeds, refinement and the full horizon were not run."
+    "The early-window arms stopped at the 600 s cap. Only one seed repeat exists; there is no refinement study."
    ],
    "open_questions": [
-    "Does the feedback-off arm keep fewer cells at the full horizon? Only the early window was observed."
+    "Is the feedback effect on cell count robust across more seeds and a finer time step? One repeat and one step size exist."
    ],
    "limitations": [
     "Generic example, not fish growth.",
     "Seed repeat is one repeat, not an uncertainty estimate.",
-    "Two further arm movies (feedback-off, seed repeat) exist in artifacts/multicell and are not shown here."
+    "Two further arm movies (feedback-off, seed repeat) exist in artifacts/multicell and are not shown here.",
+    "Full horizon (t = 2.0, exit 0): baseline 256 cells, feedback-off 128, seed repeat 263; the movie above is the early window only."
    ],
    "couplings": [],
    "manifest": "artifacts/multicell/summary.json",
@@ -5421,6 +5452,144 @@
    ],
    "couplings": [],
    "manifest": "artifacts/molecular/cuda-render/render.json",
+   "native": true
+  },
+  {
+   "id": "molecular-md-continuation",
+   "title": "Collagen-mimetic trimer: three 900 ps continuations from the 100 ps states (OpenMM, CUDA)",
+   "scales": [
+    "molecular"
+   ],
+   "evidence_kind": "rendered from actual simulation states; conditional branches, not independent samples",
+   "model": {
+    "name": "OpenMM classical MD continued from each parent's final saved state with a new thermostat seed",
+    "context": "3 branches reach global production time 1000 ps. The movie shows seed 11731 (101 saved states over 900 ps, global 100 to 1000 ps). Each branch starts from one shared parent state, so the branches are conditional, not independent."
+   },
+   "time": {
+    "units": "picoseconds of simulated time",
+    "note": "101 frames at 12 fps; rigid alignment for display only. RMSD reference: original parent production start."
+   },
+   "video": {
+    "file": "trajectory.mp4",
+    "sha256": "f02c5fa485d376eb4a7db6674c41fabef9b1d635ddc8ec3d6a77eef18e87a264",
+    "note": ""
+   },
+   "video_state": "present_verified",
+   "video_href": "artifacts/simulations/molecular-md-continuation/trajectory.mp4",
+   "poster_href": "artifacts/simulations/molecular-md-continuation/poster.png",
+   "numerical_checks": [
+    {
+     "name": "branch from seed 1731 (thermostat seed 11731)",
+     "result": "final CA RMSD from the original reference 0.271 nm; CA radius of gyration 2.474 nm; predeclared small-window drift: false (RMSD window means differ by 0.0203 nm)"
+    },
+    {
+     "name": "branch from seed 1732 (thermostat seed 11732)",
+     "result": "final CA RMSD from the original reference 0.171 nm; CA radius of gyration 2.458 nm; predeclared small-window drift: false (RMSD window means differ by 0.0293 nm)"
+    },
+    {
+     "name": "branch from seed 1733 (thermostat seed 11733)",
+     "result": "final CA RMSD from the original reference 0.267 nm; CA radius of gyration 2.412 nm; predeclared small-window drift: TRUE (RMSD window means differ by 0.0005 nm)"
+    },
+    {
+     "name": "predeclared drift diagnostic",
+     "result": "true for 1 of 3 branches; false outcomes are kept"
+    },
+    {
+     "name": "new independent biological samples",
+     "result": "0"
+    }
+   ],
+   "parameter_unknowns": [
+    "Empirical accuracy: unknown.",
+    "Biological success probability: null (not computed).",
+    "Equilibrium and material modulus are not established."
+   ],
+   "open_questions": [
+    "Do longer runs from different starting structures change any observable? These branches share one parent and one Hamiltonian."
+   ],
+   "limitations": [
+    "Descriptive predeclared window diagnostic only; no equilibrium, folding stability, material modulus or biological-success probability. Original reference uses saved float32 parent-start coordinates.",
+    "A true diagnostic does not establish equilibrium; a false one is not hidden.",
+    "Synthetic collagen-mimetic peptide, not a fish protein."
+   ],
+   "couplings": [],
+   "manifest": "artifacts/molecular/continuation-analysis/summary.json",
+   "native": true
+  },
+  {
+   "id": "metabolism-gem",
+   "title": "Generic zebrafish metabolic model: a steady-state flux balance with an assumed medium",
+   "scales": [
+    "subcellular",
+    "cellular"
+   ],
+   "evidence_kind": "computed (flux balance analysis); figure is a plot of stored numbers",
+   "model": {
+    "name": "Zebrafish-GEM (Wang 2021 PNAS, CC-BY-4.0 (as stated by the repo; paper Wang 2021 PNAS doi:10.1073/pnas.2102344118)), commit 846f0b7b3, cobra 0.32.1 with glpk (via optlang)",
+    "context": "A generic Danio rerio network of 12,833 reactions, 8,435 metabolites and 2,709 genes (counts measured from the file). It defines no growth medium, so the medium is ASSUMED: ASSUMED allowlist of basic nutrients (uptake not otherwise limited; glucose capped at 10); not a published or measured medium. A steady-state linear programme, not a time course; not specific to fin, tissue or life stage."
+   },
+   "time": {
+    "units": "none: steady state",
+    "note": "flux units are not declared in the SBML; mmol/gDW/h is the Human-GEM-family convention and is ASSUMED here"
+   },
+   "video": {
+    "file": null,
+    "sha256": null,
+    "note": ""
+   },
+   "video_state": "none",
+   "poster_href": "artifacts/simulations/metabolism-gem/o2_atp_biomass.png",
+   "poster_is_figure": true,
+   "numerical_checks": [
+    {
+     "name": "A source default all exchanges open",
+     "result": "optimal; objective 4.263; max |S v| 4.1e-12"
+    },
+    {
+     "name": "B all uptake closed",
+     "result": "optimal; objective 1.705e-15; max |S v| 1.4e-12"
+    },
+    {
+     "name": "C glucose only",
+     "result": "optimal; objective 8.723e-31; max |S v| 1.6e-12"
+    },
+    {
+     "name": "G unrestricted minimal medium is degenerate",
+     "result": "{\"rich_biomass\": 4.262827945443599, \"components\": 47, \"uses_ATP_uptake\": true, \"uses_UTP_uptake\": true}"
+    },
+    {
+     "name": "D assumed medium free O2",
+     "result": "optimal; objective 0.8672; max |S v| 7.8e-12"
+    },
+    {
+     "name": "E baseline o2 20",
+     "result": "optimal; objective 0.2905; max |S v| 3.1e-12"
+    },
+    {
+     "name": "F objective validity",
+     "result": "{\"objective_ids\": [\"MAR00021\"], \"biomass_flux_equals_objective\": true}"
+    },
+    {
+     "name": "oxygen sweep",
+     "result": "biomass 0.265 at zero oxygen uptake, 0.329 at uptake limit 50: growth barely depends on the oxygen limit"
+    }
+   ],
+   "parameter_unknowns": [
+    "The medium is assumed, not published or measured.",
+    "Flux units are not declared in the SBML; mmol/gDW/h is assumed.",
+    "Uptake is uncapped except glucose."
+   ],
+   "open_questions": [
+    "Which measured medium and uptake bounds would replace the assumed ones? The sweep does not show oxygen dependence because the model can make its own oxygen through a reaction next to uncapped vitamin uptake; the owner's diagnostic is in the branch, not in this tree."
+   ],
+   "limitations": [
+    "Not a measurement of fish oxygen use or oxygen dependence.",
+    "Growth values are model objective fluxes, not physiological growth.",
+    "Not fin- or tissue-specific and says nothing about flying fish.",
+    "The ATP-maintenance slope is not calibrated."
+   ],
+   "couplings": [],
+   "manifest": "artifacts/metabolism/manifest.json",
    "native": true
   },
   {

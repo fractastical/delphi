@@ -863,7 +863,10 @@ def test_design_review_never_attaches_an_unrelated_fish_project(browser, base):
 def test_home_leads_with_sourced_anatomy_assumptions_and_the_actual_candidate(browser, base):
     pg = page(browser, 1700, 900)
     pg.goto(base + "#/home")
-    pg.wait_for_selector(".grounding .region")
+    pg.wait_for_selector(".grounding .region", state="attached")
+    assert pg.evaluate("document.querySelector('.grounding details.regiondet').open") is False, "the per-region cards are collapsed by default"
+    assert pg.locator("#grnote").is_visible() and "not a validated fish" in pg.locator("#grnote").text_content(), "the scientific scope stays visible"
+    assert "N1 baseline reference" in pg.locator(".grounding .groundgrid h3").first.text_content()
     t = pg.locator(".grounding").text_content()
     assert "Start from real fish anatomy." in t and "not a validated fish" in t and "no biological or aerodynamic validation is claimed" in t
     pg.select_option("#fishcand", "fish3d-N1-cypselurus-baseline")
@@ -1025,8 +1028,10 @@ def test_live_question_table_with_long_ids_and_text_stays_inside_its_panel(brows
           return {table: t.getBoundingClientRect().width, wrap: wrap.getBoundingClientRect().width, id: a.getBoundingClientRect().width,
                   rows: [...t.querySelectorAll('tbody tr')].map(r => r.getBoundingClientRect().height), page: document.documentElement.scrollWidth - document.documentElement.clientWidth}; }""")
         assert m["page"] <= 0, (w, m)
-        assert m["id"] <= (230 if w > 500 else 170), (w, m)
-        assert max(m["rows"]) <= 200, (w, m)
+        if w > 500:
+            assert m["id"] <= 230 and max(m["rows"]) <= 200, (w, m)
+        else:
+            assert m["table"] <= m["wrap"] + 1, (w, m)        # phone: stacked cards (see the card test), never wider than the panel
 
 
 def test_phone_knowledge_filters_with_long_facet_values_do_not_widen_the_page(browser, base):
@@ -1063,7 +1068,7 @@ def test_simulation_preview_never_prints_an_object_for_structured_errors_or_dige
             route.fulfill(status=400, json={"error": {"code": "parameter_out_of_range", "message": {"field": "dt_s", "limit": 0.1}}})
         else:
             route.fulfill(json={"schema": "frontier.simulation.preview/1", "status": "completed", "model": "bioelectric", "evidence_kind": "SimulationResult", "persisted": False, "calibrated": False,
-                "request_sha256": "a" * 64, "effective_request_sha256": "b" * 64, "code_sha256": {"model.py": "c" * 64, "run.py": "d" * 64}, "computed_at": "2026-10-31T21:00:00Z", "scope": "Preview only.",
+                "request_sha256": "a" * 64, "effective_request_sha256": "b" * 64, "code_sha256": {"model.py": "c" * 64, "run.py": "d" * 64, "model_files": {"a.py": "e" * 64, "nested": {"b.py": "f" * 64}}}, "computed_at": "2026-10-31T21:00:00Z", "scope": "Preview only.",
                 "result": {"time_ms": [0, 1, 2], "voltage_mV": [[-70, -70], [-60, -65], [-40, -50]]}})
     pg = page(browser)
     _mock_live(pg, handler)
@@ -1073,7 +1078,7 @@ def test_simulation_preview_never_prints_an_object_for_structured_errors_or_dige
     pg.click("#simwidget button[type=submit]")
     pg.wait_for_selector("#sw-out .rescard svg.chart", timeout=15000)
     t = pg.locator("#sw-out").text_content()
-    assert "[object Object]" not in t and "model.py" in t and "run.py" in t
+    assert "[object Object]" not in t and "model.py" in t and "run.py" in t and "model_files" in t and "b.py" in t
     pg.select_option("#sw-model", "mechanobio")
     pg.click("#simwidget button[type=submit]")
     pg.wait_for_selector("#sw-out .adapter-out.unavailable", timeout=15000)
@@ -1244,3 +1249,58 @@ def test_most_edge_labels_stay_visible_after_collision_avoidance(browser, base):
         n = pg.evaluate(f"[document.querySelectorAll('{sel} .g-elabel').length, document.querySelectorAll('{sel} .g-elabel.g-hid').length]")
         print("EDGE-LABELS", route, n)
         assert n[0] == 0 or n[1] <= n[0] * 0.5, (route, n)
+
+
+def test_about_menu_exposes_state_closes_on_escape_and_returns_focus(browser, base):
+    for w in (1280, 400):
+        pg = page(browser, w, 800)
+        pg.goto(base + "#/home"); pg.wait_for_selector(".aboutmenu summary")
+        sm = pg.locator(".aboutmenu summary")
+        assert sm.get_attribute("aria-expanded") == "false" and sm.get_attribute("aria-controls") == "aboutlist"
+        pg.focus(".aboutmenu summary"); pg.keyboard.press("Enter")
+        pg.wait_for_function("document.querySelector('.aboutmenu details').open")
+        pg.wait_for_function("document.querySelector('.aboutmenu summary').getAttribute('aria-expanded') === 'true'")   # the toggle event is asynchronous
+        box = pg.locator(".aboutmenu details[open] > ul").bounding_box()
+        assert box["x"] >= -1 and box["x"] + box["width"] <= w + 1, (w, box)
+        pg.keyboard.press("Escape")
+        pg.wait_for_function("!document.querySelector('.aboutmenu details').open")
+        pg.wait_for_function("document.querySelector('.aboutmenu summary').getAttribute('aria-expanded') === 'false'")
+        assert pg.evaluate("document.activeElement.tagName") == "SUMMARY"
+        pg.click(".aboutmenu summary"); pg.wait_for_function("document.querySelector('.aboutmenu details').open")
+        pg.mouse.click(5, 400)
+        pg.wait_for_function("!document.querySelector('.aboutmenu details').open")
+
+
+def test_phone_question_tables_become_cards_with_every_column_reachable(browser, base):
+    def rec(i):
+        return {"record": {"namespace": "n", "kind": "Problem", "id": f"problem-{i:03d}-" + "x" * 40, "version": "a" * 64, "payload": {"question": "A long question about calibration across scales. " * 4, "known_state": "k", "next_action_text": "n", "problem_kind": "design", "completeness": "actionable", "approach": "top_down", "scales": ["organ"], "context_tags": [], "dependencies": []}}, "local_status": "proposed", "is_head": True}
+    pg = page(browser, 400, 800)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": [rec(i) for i in range(12)]}))
+    pg.goto(base + "#/frontier"); pg.wait_for_selector(".livepanel .qtable tbody tr")
+    for sel in (".livepanel .qtable", ".board .qtable"):
+        m = pg.evaluate(f"""() => {{ const t = document.querySelector('{sel}'); const wrap = t.closest('.tablewrap'); const tr = t.querySelector('tbody tr'); const tds = [...tr.children].map(td => td.getBoundingClientRect()); const w = wrap.getBoundingClientRect();
+            return {{ wrapScroll: wrap.scrollWidth - wrap.clientWidth, within: tds.every(r => r.left >= w.left - 1 && r.right <= w.right + 1), labels: [...tr.children].map(td => td.dataset.label || '') }}; }}""")
+        assert m["wrapScroll"] <= 1 and m["within"] and all(m["labels"]), (sel, m)
+
+
+def test_simulation_gallery_has_filters_a_count_jump_links_and_lazy_players(browser, base):
+    pg = page(browser, 400, 800)
+    pg.goto(base + "#/simulations"); pg.wait_for_selector(".simtools")
+    n_all = pg.locator(".simcard").count()
+    t = pg.locator(".simtools .count").text_content()
+    assert f"Showing {n_all} of {n_all}" in t and "have a player" in t
+    assert pg.locator("video").evaluate_all("els => els.every(v => v.preload === 'none')"), "players must not preload"
+    assert pg.locator(".sjump button").count() == n_all
+    pg.select_option(".simtools select[name=scale]", "molecular"); pg.click(".simtools button[type=submit]")
+    pg.wait_for_function(f"document.querySelectorAll('.simcard').length < {n_all}")
+    n = pg.locator(".simcard").count()
+    assert f"Showing {n} of {n_all}" in pg.locator(".simtools .count").text_content() and "(filtered)" in pg.locator(".simtools .count").text_content()
+    last = pg.locator(".sjump button").last
+    target = last.get_attribute("data-jump"); last.click()
+    pg.wait_for_function(f"document.activeElement && document.activeElement.closest('#{target}')")
+    assert pg.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+    pg.goto(base + "#/simulations?q=zzznotthere"); pg.wait_for_selector(".simtools")
+    assert "No simulation card matches" in pg.locator("#main").text_content() and pg.locator(".simcard").count() == 0

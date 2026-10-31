@@ -533,15 +533,16 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
     d = "artifacts/multicell"
     if (ROOT / d / "summary.json").exists():
         sm = json.loads(ins.read(f"{d}/summary.json")); arms = sm["arms"]; shas = {l.split()[1].split("/")[-1]: l.split()[0] for l in ins.text(f"{d}/mp4.sha256").splitlines() if l.strip()}
+        fh = json.loads(ins.read(f"{d}/full/full_summary.json")) if (ROOT / d / "full/full_summary.json").exists() else None
         st, href = _vid(ins, out, "morpheus-multicell", d, "baseline.mp4", shas.get("baseline.mp4"))
         cards.append({"id": "morpheus-multicell", "title": "Morpheus multicellular growth: cell cycle, division, cytokine feedback (baseline arm)", "scales": ["tissue", "cellular"], "evidence_kind": "SimulationResult (generic example model)",
-            "model": {"name": "Morpheus v2.3.9 official multiscale example (cell-cycle ODE, cellular Potts division, cytokine PDE, feedback)", "context": f"Three arms ran headless and each hit the 600 s cap at model time {sm['common_horizon_t']} of a 2.0 horizon. Generic and not calibrated; not fish growth."},
+            "model": {"name": "Morpheus v2.3.9 official multiscale example (cell-cycle ODE, cellular Potts division, cytokine PDE, feedback)", "context": f"The first three arms ran headless and each hit the 600 s cap at model time {sm['common_horizon_t']} of a 2.0 horizon; a later full-horizon rerun reached t = 2.0 (see the limitations). Generic and not calibrated; not fish growth."},
             "time": {"units": "model time units (example model)", "note": "All arms are compared at the common horizon; none reached the planned end."},
             "video": {"file": "baseline.mp4", "sha256": shas.get("baseline.mp4"), "note": "22 frames"}, "video_state": st, "video_href": href, "poster_href": None,
             "numerical_checks": [{"name": f"arm {a}", "result": f"{v['cells_at_common_horizon']} cells at t={v['reached_t']}; divisions at {v['division_event_times_to_horizon']}; max cdk1 {v['max_cdk1']:.3f}"} for a, v in arms.items()],
-            "parameter_unknowns": ["Not calibrated to any organism.", "Run stopped at the 600 s cap; independent seeds, refinement and the full horizon were not run."],
-            "open_questions": ["Does the feedback-off arm keep fewer cells at the full horizon? Only the early window was observed."],
-            "limitations": ["Generic example, not fish growth.", "Seed repeat is one repeat, not an uncertainty estimate.", "Two further arm movies (feedback-off, seed repeat) exist in artifacts/multicell and are not shown here."], "couplings": [], "manifest": f"{d}/summary.json", "native": True})
+            "parameter_unknowns": ["Not calibrated to any organism.", "The early-window arms stopped at the 600 s cap. Only one seed repeat exists; there is no refinement study."],
+            "open_questions": ["Is the feedback effect on cell count robust across more seeds and a finer time step? One repeat and one step size exist."],
+            "limitations": ["Generic example, not fish growth.", "Seed repeat is one repeat, not an uncertainty estimate.", "Two further arm movies (feedback-off, seed repeat) exist in artifacts/multicell and are not shown here."] + ([f"Full horizon (t = 2.0, exit 0): baseline {fh['baseline']['final_cells']} cells, feedback-off {fh['nofeedback']['final_cells']}, seed repeat {fh['seed2']['final_cells']}; the movie above is the early window only." ] if fh else []), "couplings": [], "manifest": f"{d}/summary.json", "native": True})
     d = "artifacts/molecular"
     if (ROOT / d / "cuda-render/render.json").exists() and (ROOT / d / "cuda-analysis/ensemble.json").exists():
         rr = json.loads(ins.read(f"{d}/cuda-render/render.json")); en = json.loads(ins.read(f"{d}/cuda-analysis/ensemble.json")); o = rr["outputs"]; runs = en["runs"]; ds = en["descriptive_endpoint_CA_RMSD_nm"]
@@ -555,6 +556,34 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "parameter_unknowns": ["Empirical accuracy: " + str(en["empirical_accuracy"]) + ".", "Equilibrated ensemble: " + str(en["equilibrated_ensemble"]) + ".", "Tissue material modulus: not computed (null)."],
             "open_questions": ["Do longer runs from different starting structures change any observable? Warm-start parents for a next job are recorded in warmstart-v3.json."],
             "limitations": [en["scope"], "Biological success probability: null (not computed).", "Synthetic collagen-mimetic peptide, not a fish protein.", "The earlier 0.2 ps CPU setup run is a separate card and is not part of this ensemble."], "couplings": [], "manifest": f"{d}/cuda-render/render.json", "native": True})
+    d = "artifacts/molecular"
+    if (ROOT / d / "continuation-render/render.json").exists() and (ROOT / d / "continuation-analysis/summary.json").exists():
+        rr = json.loads(ins.read(f"{d}/continuation-render/render.json")); an = json.loads(ins.read(f"{d}/continuation-analysis/summary.json")); o = rr["outputs"]
+        st, href = _vid(ins, out, "molecular-md-continuation", f"{d}/continuation-render", "trajectory.mp4", o["trajectory.mp4"]); _, ph = _vid(ins, out, "molecular-md-continuation", f"{d}/continuation-render", "poster.png", o["poster.png"])
+        br = an["branches"]; drift = [b["predeclared_diagnostic"]["small_window_drift"] for b in br]
+        cards.append({"id": "molecular-md-continuation", "title": "Collagen-mimetic trimer: three 900 ps continuations from the 100 ps states (OpenMM, CUDA)", "scales": ["molecular"], "evidence_kind": rr["kind"] + "; conditional branches, not independent samples",
+            "model": {"name": "OpenMM classical MD continued from each parent's final saved state with a new thermostat seed", "context": f"{an['n_parent_branches']} branches reach global production time {br[0]['global_production_end_ps']:.0f} ps. The movie shows seed {rr['seed']} ({rr['frames']} saved states over {rr['simulation_duration_ps']:.0f} ps, global {rr['global_production_time_ps'][0]:.0f} to {rr['global_production_time_ps'][1]:.0f} ps). Each branch starts from one shared parent state, so the branches are conditional, not independent."},
+            "time": {"units": "picoseconds of simulated time", "note": f"{rr['frames']} frames at {rr['display_fps']} fps; rigid alignment for display only. RMSD reference: {rr['RMSD_reference']}."},
+            "video": {"file": "trajectory.mp4", "sha256": o["trajectory.mp4"], "note": ""}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": f"branch from seed {b['parent_seed']} (thermostat seed {b['new_thermostat_seed']})", "result": f"final CA RMSD from the original reference {b['final_original_reference_CA_RMSD_nm']:.3f} nm; CA radius of gyration {b['final_CA_geometric_Rg_nm']:.3f} nm; predeclared small-window drift: {'TRUE' if b['predeclared_diagnostic']['small_window_drift'] else 'false'} (RMSD window means differ by {b['predeclared_diagnostic']['RMSD_window_mean_change_nm']:.4f} nm)"} for b in br]
+                + [{"name": "predeclared drift diagnostic", "result": f"true for {an['small_window_drift_diagnostic_count']} of {an['diagnostic_denominator']} branches; false outcomes are kept"}, {"name": "new independent biological samples", "result": str(an["n_new_independent_biological_samples"])}],
+            "parameter_unknowns": ["Empirical accuracy: " + str(an["empirical_accuracy"]) + ".", "Biological success probability: null (not computed).", "Equilibrium and material modulus are not established."],
+            "open_questions": ["Do longer runs from different starting structures change any observable? These branches share one parent and one Hamiltonian."],
+            "limitations": [an["scope"], "A true diagnostic does not establish equilibrium; a false one is not hidden.", "Synthetic collagen-mimetic peptide, not a fish protein."], "couplings": [], "manifest": f"{d}/continuation-analysis/summary.json", "native": True})
+    d = "artifacts/metabolism"
+    if (ROOT / d / "manifest.json").exists() and (ROOT / d / "basic-nutrients-v3/metabolism_results.json").exists():
+        mf = json.loads(ins.read(f"{d}/manifest.json")); R = json.loads(ins.read(f"{d}/basic-nutrients-v3/metabolism_results.json")); png = next((f for f in mf["files"] if f["path"].endswith("o2_atp_biomass.png")), None)
+        _, ph = _vid(ins, out, "metabolism-gem", f"{d}/basic-nutrients-v3", "o2_atp_biomass.png", png["sha256"]) if png else (None, None)
+        sw = R["o2_sweep"]; C = R["controls"]; m = R["model"]
+        cards.append({"id": "metabolism-gem", "title": "Generic zebrafish metabolic model: a steady-state flux balance with an assumed medium", "scales": ["subcellular", "cellular"], "evidence_kind": "computed (flux balance analysis); figure is a plot of stored numbers",
+            "model": {"name": f"Zebrafish-GEM (Wang 2021 PNAS, {mf['model']['license']}), commit {mf['model']['commit'][:9]}, cobra {mf['software']['cobra']} with {mf['software']['solver']}", "context": f"A generic Danio rerio network of {m['reactions']:,} reactions, {m['metabolites']:,} metabolites and {m['genes']:,} genes (counts measured from the file). It defines no growth medium, so the medium is ASSUMED: " + R["assumed_medium"]["basis"] + ". A steady-state linear programme, not a time course; not specific to fin, tissue or life stage."},
+            "time": {"units": "none: steady state", "note": R["units"]},
+            "video": {"file": None, "sha256": None, "note": ""}, "video_state": "none", "poster_href": ph, "poster_is_figure": True,
+            "numerical_checks": [{"name": k.replace("_", " "), "result": (f"{v['status']}; objective {v['objective']:.4g}; max |S v| {v['max_abs_Sv']:.1e}" if isinstance(v, dict) and "objective" in v else json.dumps(v)[:160])} for k, v in C.items()]
+                + [{"name": "oxygen sweep", "result": f"biomass {sw[0]['biomass']:.3f} at zero oxygen uptake, {sw[-1]['biomass']:.3f} at uptake limit {sw[-1]['o2_uptake_limit']}: growth barely depends on the oxygen limit"}],
+            "parameter_unknowns": ["The medium is assumed, not published or measured.", "Flux units are not declared in the SBML; mmol/gDW/h is assumed.", "Uptake is uncapped except glucose."],
+            "open_questions": ["Which measured medium and uptake bounds would replace the assumed ones? The sweep does not show oxygen dependence because the model can make its own oxygen through a reaction next to uncapped vitamin uptake; the owner's diagnostic is in the branch, not in this tree."],
+            "limitations": ["Not a measurement of fish oxygen use or oxygen dependence.", "Growth values are model objective fluxes, not physiological growth.", "Not fin- or tissue-specific and says nothing about flying fish.", "The ATP-maintenance slope is not calibrated."], "couplings": [], "manifest": f"{d}/manifest.json", "native": True})
     ws = f"{d}/warmstart-v3.tar.xz"
     if (ROOT / ws).exists() and (ROOT / d / "warmstart-v3.json").exists():
         wm = json.loads(ins.read(f"{d}/warmstart-v3.json")); b = ins.read(ws)

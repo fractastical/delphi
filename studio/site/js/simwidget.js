@@ -19,7 +19,7 @@
   }
 
   /* A digest field may be one hash or a map of file to hash. */
-  const shaField = (v) => (v && typeof v === "object" ? html`${Object.entries(v).map(([k, h]) => html`<span class="small">${k}: ${U.sha(h)}</span> `)}` : U.sha(v));
+  const shaField = (v) => (v && typeof v === "object" ? html`${Object.entries(v).map(([k, h]) => html`<span class="small">${k}: ${h && typeof h === "object" ? shaField(h) : U.sha(h)}</span> `)}` : U.sha(v));
 
   function render(model, r) {
     const res = r.result || {};

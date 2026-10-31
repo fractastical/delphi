@@ -1,6 +1,6 @@
 /* Simulations gallery: manifest-only cards. A video element exists only when a video file is present and matches its declared sha256. */
 (function () {
-  const DF = window.DF; const { html, esc, fmt } = DF; const U = DF.ui;
+  const DF = window.DF; const { html, raw, esc, fmt } = DF; const U = DF.ui;
 
   function glideCard(snap) {
     const S = snap.simulation; if (!S) return null; const m = S.summary; const f = S.findings || {}; const c = S.controls || {};
@@ -30,7 +30,7 @@
   function card(snap, c) {
     const scl = (c.scales || []).map((k) => (snap.mission.scales.find((s) => s.key === k) || { label: k }).label);
     const vs = c.video_state; const hasV = (vs === "present_verified" || vs === "present_unpinned") && c.video_href;
-    const media = hasV ? html`<video controls playsinline preload="metadata" ${c.poster_href ? html`poster="${c.poster_href}"` : ""} src="${c.video_href}" aria-label="${c.title}"></video>${c.caption ? html`<p class="small"><b>Caption burned into every frame:</b> ${c.caption}</p>` : ""}<p class="small faint">${vs === "present_unpinned" ? "No sha256 is declared for this file, so it is shown without a digest check." : "Verified against its declared sha256."} ${c.video && c.video.note ? c.video.note : ""} <a class="btn small ghost" href="${c.video_href}" download>Download video</a></p>`
+    const media = hasV ? html`<video controls playsinline preload="none" ${c.poster_href ? html`poster="${c.poster_href}"` : ""} src="${c.video_href}" aria-label="${c.title}"></video>${c.caption ? html`<p class="small"><b>Caption burned into every frame:</b> ${c.caption}</p>` : ""}<p class="small faint">${vs === "present_unpinned" ? "No sha256 is declared for this file, so it is shown without a digest check." : "Verified against its declared sha256."} ${c.video && c.video.note ? c.video.note : ""} <a class="btn small ghost" href="${c.video_href}" download>Download video</a></p>`
       : html`<div class="novideo">${c.poster_href ? html`<img src="${c.poster_href}" alt="${c.poster_is_figure ? "Recorded figure (not a video)" : "Poster frame"}" loading="lazy">` : ""}<p><b>No video file.</b> ${{ none: "None has been provided for this artifact.", declared_but_missing: "A video is declared in the manifest but the file is not present.", digest_mismatch: "A video file is present but does not match its declared sha256, so it is not offered." }[vs] || ""} ${c.poster_is_figure ? "The image is a recorded figure, not a frame of a video." : ""}</p></div>`;
     const list = (a, empty) => (a && a.length ? html`<ul>${a.map((x) => html`<li>${typeof x === "string" ? x : x.name ? html`<b>${x.name}</b>: ${x.result || ""}${x.tolerance !== undefined ? html` <span class="faint">(tolerance ${x.tolerance})</span>` : ""}` : JSON.stringify(x)}</li>`)}</ul>` : html`<p class="faint small">${empty}</p>`);
     return html`<article class="simcard" id="sim-${c.id}"><div class="simhead"><h3>${c.title}</h3><p>${(scl.length ? scl : ["scale not stated"]).map((x) => U.pill(x, "grp"))} ${U.pill(c.evidence_kind || "evidence kind not stated", "ev")} ${c.derived ? U.pill("derived from recorded results; no manifest file", "warn") : U.pill("manifest", "cur")}</p></div>
@@ -67,14 +67,33 @@
       <p class="small">Manifest sha256 ${U.sha(M.file_sha256)} · ${U.src("doc:model-coupling", "Read the coupling document")}</p></section>`;
   }
 
-  DF.views.simulations = function (snap) {
-    const cards = [...(snap.simulation_manifests || []), glideCard(snap)].filter(Boolean);
+  DF.views.simulations = function (snap, route) {
+    const all = [...(snap.simulation_manifests || []), glideCard(snap)].filter(Boolean);
+    const P = (route && route.params) || {}; const f = { scale: P.scale || "", media: P.media || "", q: (P.q || "").trim() };
+    const scaleKeys = [...new Set(all.flatMap((c) => c.scales || []))]; const scaleLabel = (k) => (snap.mission.scales.find((x) => x.key === k) || { label: k }).label;
+    const hasVideo = (c) => (c.video_state === "present_verified" || c.video_state === "present_unpinned") && c.video_href;
+    const cards = all.filter((c) => (!f.scale || (c.scales || []).includes(f.scale)) && (!f.media || (f.media === "video" ? hasVideo(c) : !hasVideo(c))) && (!f.q || JSON.stringify([c.title, c.model, c.evidence_kind]).toLowerCase().includes(f.q.toLowerCase())));
+    const nav = html`<section class="panel simtools" aria-label="Find a simulation"><form class="filters" data-form="sg" role="search">
+        <label>Scale <select name="scale"><option value="">all scales</option>${scaleKeys.map((k) => html`<option value="${k}" ${k === f.scale ? raw("selected") : ""}>${scaleLabel(k)}</option>`)}</select></label>
+        <label>Media <select name="media"><option value="">any</option><option value="video" ${f.media === "video" ? raw("selected") : ""}>has a verified video</option><option value="none" ${f.media === "none" ? raw("selected") : ""}>no video</option></select></label>
+        <label>Search <input type="search" name="q" value="${f.q}" placeholder="title, model or evidence kind"></label>
+        <button class="btn" type="submit">Apply</button>${f.scale || f.media || f.q ? html`<a class="btn ghost" href="${DF.href("/simulations")}">Clear</a>` : ""}</form>
+      <p class="count" role="status">Showing ${cards.length} of ${all.length} simulation cards${f.scale || f.media || f.q ? " (filtered)" : ""}. ${all.filter(hasVideo).length} of ${all.length} have a player.</p>
+      ${cards.length > 1 ? html`<nav aria-label="Jump to a simulation"><ul class="sjump">${cards.map((c) => html`<li><button type="button" class="btn small ghost" data-jump="sim-${c.id}">${c.title.length > 46 ? c.title.slice(0, 45) + "…" : c.title}</button></li>`)}</ul></nav>` : ""}</section>`;
     return {
       html: html`<section class="pagehead"><h1>Simulations</h1><p class="lede">Recorded simulations as manifest cards: what was run, in what time units, against which numerical checks, with which parameters still unknown, and which bridges between scales are still dashed. A card shows a player only when an actual video file is present and matches its declared digest.</p></section>
+      ${nav}
       <section class="panel"><h2 class="sr">Recorded simulations</h2><p class="note small">Nothing here is a live run and nothing is animated by this page. Counts of cards are counts of artifacts in this snapshot (${snap.label}), not of independent observations.</p>
-        ${cards.length ? html`<div class="simgrid">${cards.map((c) => card(snap, c))}</div>` : html`<p class="empty">No simulation artifact or manifest is present in this snapshot. Nothing is shown in its place. A manifest dropped at <code>site/artifacts/simulations/&lt;id&gt;/manifest.json</code> is picked up by the build.</p>`}</section>
+        ${cards.length ? html`<div class="simgrid">${cards.map((c) => card(snap, c))}</div>` : html`<p class="empty">${all.length ? "No simulation card matches these filters." : "No simulation artifact or manifest is present in this snapshot."} Nothing is shown in its place. A manifest dropped at <code>site/artifacts/simulations/&lt;id&gt;/manifest.json</code> is picked up by the build.</p>`}</section>
       ${couplingSection(snap)}
       <section class="panel"><h2>Manifest format</h2><p class="small">Fields the build reads: <code>title</code>, <code>scales[]</code>, <code>evidence_kind</code>, <code>model{name,context}</code>, <code>time{units,note}</code>, <code>video{file,sha256,note}</code>, <code>poster</code>, <code>numerical_checks[]</code>, <code>parameter_unknowns[]</code>, <code>open_questions[]</code>, <code>couplings[{from,to,status}]</code>. The video file must sit beside the manifest. The runtime serves <code>.mp4</code> and <code>.webm</code> under <code>site/artifacts/</code> with range requests; the build copies a video there only when its bytes match the declared sha256.</p></section>`,
+      after(root) {
+        DF.bindForm(root, "sg", (v) => DF.href("/simulations", v));
+        root.querySelectorAll("[data-jump]").forEach((b) => b.addEventListener("click", () => {
+          const el = root.querySelector("#" + b.dataset.jump); if (!el) return; el.scrollIntoView({ block: "start" });
+          const h = el.querySelector("h3"); if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
+        }));
+      },
     };
   };
 })();
