@@ -28,12 +28,20 @@ NAMESPACE = "snapshot"
 
 
 def mcp_tools(mcp_text: str) -> list[dict]:
-    """Tool names come from the Tools row of the table in docs/mcp.md, so the page cannot list a tool the document does not."""
+    """Read named tools from the documentation's capability tables."""
     row = next((l for l in mcp_text.splitlines() if l.startswith("| Tools |")), "")
     cells = [c.strip() for c in row.strip().strip("|").split("|")]
     names = lambda c: re.findall(r"`(frontier_[a-z_]+)`", c)
     read = names(cells[1]) if len(cells) > 2 else []
     write = [n for n in names(cells[2]) if n not in read] if len(cells) > 2 else []
+    section = ""
+    for line in mcp_text.splitlines():
+        if line.startswith("## "):
+            section = line[3:].strip()
+        if section == "Expanded read and calculation tools":
+            match = re.match(r"\| `(frontier_[a-z_]+)` \|", line)
+            if match and match[1] not in read:
+                read.append(match[1])
     return [{"name": n, "mode": "read", "documented_in_docs_mcp": True} for n in read] + [{"name": n, "mode": "write (opt-in)", "documented_in_docs_mcp": True} for n in write]
 
 

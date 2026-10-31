@@ -9,7 +9,8 @@ DEFAULT is read-only (the bounded reads plus a capability manifest). Writes are 
   limits, quotas, idempotency and the append-only/immutability triggers are the store's, not re-implemented here;
 * there is NO review/accept/dispute tool. Acceptance needs an independent operator acting with that operator's own credential
   (HTTP `/v1/reviews`); an agent holding a contributor token cannot reach it through this server. `import_bundle`, `provision`, `initialize`
-  and anything that executes, fetches or publishes are not exposed either (SPEC-002: `provision` is never exposed over MCP).
+  and arbitrary execution, network fetching or publishing are not exposed (SPEC-002: `provision` is never exposed over MCP).
+  Fixed local calculation tools return bounded ephemeral results; they do not create Evidence or accept findings.
 """
 import functools
 import json

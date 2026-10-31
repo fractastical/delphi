@@ -716,7 +716,10 @@ def test_nginx_vhost_is_exact_name_loopback_and_redacted():
     assert re.search(r"server_name\s+frontier\.morphoswarm\.ai\s*;", code) and "*.morphoswarm.ai" not in code and "morphoswarm.ai;" in code
     assert code.count("server_name") == 1 and "listen 443 ssl" in code
     assert "proxy_pass http://127.0.0.1:8971;" in code and "access_log /var/log/nginx/frontier.access.log morphoswarm_redacted;" in code
-    assert "log_format" not in code and "$args" not in code and "$request_uri" not in code and "$http_cookie" not in code and "$http_authorization" not in code
+    assert "log_format" not in code and "$args" not in code and "$request_uri" not in code and "$http_cookie" not in code
+    # The MCP proxy must forward each caller's bearer without logging it.
+    auth_lines = [line.strip() for line in code.splitlines() if "$http_authorization" in line]
+    assert auth_lines == ["proxy_set_header Authorization $http_authorization;"]
     assert "ssl_certificate /etc/ssl/morphoswarm.ai/fullchain.pem;" in code and "ssl_certificate_key /etc/ssl/morphoswarm.ai/privkey.pem;" in code
     assert "proxy_set_header X-Forwarded-For $remote_addr;" in code and "proxy_set_header Host $host;" in code
     assert not re.search(r"(?i)token\s*=|bearer\s+\w{10,}", code)

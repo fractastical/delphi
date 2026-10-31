@@ -221,7 +221,8 @@ def test_mcp_tools_come_from_the_document(browser, base):
     pg = page(browser)
     pg.goto(base + "#/work?tab=runtime")
     pg.wait_for_selector("h2:has-text('Declared capabilities')")
-    assert "frontier_artifacts" in pg.locator("#main").inner_text()
+    for tool in ("frontier_artifacts", "frontier_simulate", "frontier_project_inspect", "frontier_propose"):
+        assert tool in pg.locator("#main").inner_text()
 
 
 def test_system_view_keeps_author_report_and_measured_apart(browser, base):

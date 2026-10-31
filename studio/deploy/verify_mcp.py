@@ -16,7 +16,7 @@ from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
 
-async def verify(url: str) -> dict:
+async def verify(url: str, expanded: bool = False) -> dict:
     checks = []
     responses = {}
 
@@ -47,6 +47,46 @@ async def verify(url: str) -> dict:
                 responses["search_sha256"] = hashlib.sha256(json.dumps(found, sort_keys=True).encode()).hexdigest()
                 schema = await session.read_resource("frontier://schema/Project")
                 check("project schema resource readable", bool(schema.contents))
+                if expanded:
+                    expected = {"frontier_discover", "frontier_graph", "frontier_catalogue",
+                                "frontier_project_inspect", "frontier_artifact_inspect",
+                                "frontier_simulate", "frontier_engineer", "frontier_formalize",
+                                "frontier_belief"}
+                    check("expanded workspace tools discoverable", expected <= set(names))
+                    discovery = value(await session.call_tool("frontier_discover", {"query": "fish"}))
+                    check("discovery returns explicit mode without provider calls",
+                          bool(discovery.get("items")) and discovery["provider_requests"] == 0
+                          and "fallback_used" in discovery)
+                    projects = value(await session.call_tool("frontier_search", {"kind": "Project", "limit": 3}))
+                    check("live Project available", bool(projects.get("results")))
+                    target = projects["results"][0]["ref"]
+                    project = value(await session.call_tool("frontier_project_inspect", {"target": target}))
+                    check("Project exact pin preserved", project["project"]["record"]["version"] == target["version"])
+                    graph = value(await session.call_tool("frontier_graph", {"target": target, "limit": 20}))
+                    check("graph exact pin preserved", graph["scope"]["target_ref"] == target)
+                    counts = value(await session.call_tool("frontier_catalogue", {}))
+                    check("catalogue counted records", counts["scope"]["records_read"] > 0)
+                    simulation = value(await session.call_tool("frontier_simulate", {
+                        "model": "mechanobio", "parameters": {"duration_s": 1, "frame_count": 5}}))
+                    check("simulation actually completed without persistence",
+                          simulation["status"] == "completed" and simulation["persisted"] is False
+                          and bool(simulation["result"]["frames"]))
+                    engineering = value(await session.call_tool("frontier_engineer", {"parameters": {
+                        "rho": "1.225", "cl_max": "1", "mass": "0.05", "area": "0.01", "span": "0.25", "speed": "12"}}))
+                    check("installed solver calculated feasible scoped design",
+                          engineering["result"]["status"] == "feasible" and engineering["persisted"] is False)
+                    from engineering.formalize.cases import cantilever_request
+                    formal = value(await session.call_tool("frontier_formalize", {"request": cantilever_request()}))
+                    check("formalization remains an unaccepted proposal", formal["accepted"] is False and formal["persisted"] is False)
+                    from frontier.beliefs import EXAMPLE_SCENARIO
+                    belief = value(await session.call_tool("frontier_belief", {"scenario": EXAMPLE_SCENARIO}))
+                    check("belief remains conditional and uncalibrated", belief["calibrated"] is False and belief["persisted"] is False)
+                    model = Path(__file__).resolve().parents[1] / "site/artifacts/print/stl/A-precursor-short-fin.stl"
+                    digest = hashlib.sha256(model.read_bytes()).hexdigest()
+                    artifact = value(await session.call_tool("frontier_artifact_inspect", {"sha256": digest}))
+                    check("published print bytes found by exact digest", bool(artifact["local_published_bytes"]["matches"]))
+                    responses["expanded"] = {"project_ref": target, "artifact_sha256": digest,
+                                             "discovery_mode": discovery["mode"], "simulation_status": simulation["status"]}
                 # Deliberately invalid draft cannot become a record even if the
                 # anonymous permission guard regresses. Check the auth error,
                 # rather than accepting schema validation as authorization proof.
@@ -73,8 +113,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default="https://frontier.morphoswarm.ai/mcp")
     parser.add_argument("--receipt", type=Path, required=True)
+    parser.add_argument("--expanded", action="store_true", help="Exercise the deployed workspace tools and bounded calculations")
     args = parser.parse_args()
-    result = asyncio.run(asyncio.wait_for(verify(args.url), timeout=120))
+    result = asyncio.run(asyncio.wait_for(verify(args.url, args.expanded), timeout=120))
     args.receipt.parent.mkdir(parents=True, exist_ok=True)
     args.receipt.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({"checks_passed": len(result["checks"]), "receipt": str(args.receipt)}))
