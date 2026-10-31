@@ -57,6 +57,15 @@ def _unlicensed_available_content(records):
     redistribute is fine; asserting you HOLD that content and shipping it onward is not. So the
     refusal is narrow by design: it fires only on `content_available=true` together with an
     absent licence, and never on a reference whose bytes we do not claim to have.
+
+    Enforced at EVERY boundary, because the first version of this check guarded only
+    `export_bundle` and an independent reviewer found the hole within the hour: `/v1/read/get`
+    returns the full record envelope, so a record `submit` had accepted was refused on export
+    and served on read. The export gate passed its test the whole time. A control that guards
+    one exit of four is not a control, it is a thing that looks like one -- so the rule now
+    refuses at the door (`submit`, `import_bundle`) and again on the way out (`get`,
+    `export_bundle`). Refusing at the door is what actually closes it: a record that is never
+    stored cannot leak through an exit nobody has thought of yet.
     """
     offenders = []
     for record in records:
@@ -66,6 +75,17 @@ def _unlicensed_available_content(records):
             if value.get("content_available") and not value.get("license"):
                 offenders.append(f'{record["kind"]}/{record["id"]}')
     return offenders
+
+
+def _refuse_unlicensed(offenders, verb):
+    """Refuse, naming a bounded sample AND the total, so the message is not read as a full list."""
+    if not offenders:
+        return
+    shown = ", ".join(offenders[:5])
+    more = f" (showing 5 of {len(offenders)})" if len(offenders) > 5 else ""
+    raise Forbidden(
+        f"Refusing to {verb} content asserted available under an unstated licence: {shown}{more}. "
+        "Set Source.license, or set content_available=false and share the digest only.")
 
 
 class Store:
@@ -212,6 +232,7 @@ class Store:
                 if state not in {"proposed", "ready", "cancelled", "failed", "expired"}:
                     raise Conflict("Cannot revise an action with active or completed execution")
             record = make_record(d)
+            _refuse_unlicensed(_unlicensed_available_content([record]), "store")
             self._validate_refs(c, record, p)
             self._insert(c, record, p)
             self._event(c, "record_proposed", record, p)
@@ -226,6 +247,7 @@ class Store:
             action = c.execute("SELECT state,lease_until FROM action_state WHERE version=%s", (record["version"],)).fetchone()
             head = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
                              (record["namespace"], record["kind"], record["id"])).fetchone()
+            _refuse_unlicensed(_unlicensed_available_content([record]), "serve")
             return {"record": record, "local_review": state, "is_head": bool(head and head["version"] == record["version"]),
                     "action": {"state": action["state"], "lease_until": action["lease_until"].isoformat() if action["lease_until"] else None} if action else None}
 
@@ -386,12 +408,7 @@ class Store:
                         versions.append(assessment["version"])
             if len(records) > MAX_BUNDLE_RECORDS:
                 raise FrontierError("Selected records plus dimensional reviews exceed 100-record bundle limit")
-            unlicensed = _unlicensed_available_content(records)
-            if unlicensed:
-                raise Forbidden(
-                    "Refusing to export content asserted available under an unstated licence: "
-                    + ", ".join(unlicensed[:5])
-                    + ". Set Source.license, or set content_available=false and share the digest only.")
+            _refuse_unlicensed(_unlicensed_available_content(records), "export")
             body = {"schema_version": "frontier-bundle-0.1", "exporting_node": self.namespace,
                     "records": records, "review_claims": claims, "policy_version": POLICY,
                     "trust": "Digest proves integrity only; reviews require receiving-node policy."}
@@ -410,6 +427,8 @@ class Store:
         if not 1 <= len(bundle["records"]) <= MAX_BUNDLE_RECORDS or len(bundle["review_claims"]) > 100:
             raise FrontierError("Bundle record/review limit exceeded")
         records = [Record.model_validate(r).model_dump() for r in bundle["records"]]
+        # A peer's assertion that it holds content does not give US the right to hold it.
+        _refuse_unlicensed(_unlicensed_available_content(records), "import")
 
         def operation(c, p):
             inserted, forks = [], []

@@ -8,6 +8,7 @@ importer never invents them, and that the store refuses to execute against a pro
 them.
 """
 import json
+from copy import deepcopy
 from pathlib import Path
 import subprocess
 import sys
@@ -134,38 +135,63 @@ def _claim_with_source(store, id, **source_changes):
     return draft
 
 
-def test_export_refuses_held_content_under_an_unstated_licence(store):
+def test_unlicensed_held_content_is_refused_at_every_boundary(store, stores):
     """A commons built on export/import must not launder redistribution rights.
 
-    An independent review of the Paperclip Evidence API found zero occurrences of licence,
-    copyright, terms-of-use or redistribution in its entire OpenAPI, while its `include_context`
-    option returns article passages. An adapter written against it would set
-    `content_available=true` with `license=None` and ship passages of unknown licence onward
-    inside a bundle that advertises integrity.
+    The FIRST version of this gate guarded only `export_bundle`, and an independent reviewer
+    found the hole within the hour: `store.get` returns the full record envelope, so the same
+    record was refused on export and served on read, while the export test went on passing.
+    That is the shape this repo keeps meeting -- a gate that is off looks exactly like a gate
+    that passed -- so the rule is now enforced at the door and on the way out, and this test
+    checks every boundary rather than the one that was convenient to write.
     """
     from frontier.models import ref
     from frontier.store import Forbidden
 
     offending = _claim_with_source(store, "unlicensed", content_available=True, license=None)
-    saved = store.submit(TOKENS["alice"], "unlicensed", offending)["record"]
-    with pytest.raises(Forbidden, match="unstated licence"):
-        store.export_bundle([ref(saved)])
 
-    # Control 1: the SAME record exports once a licence is stated, so the refusal is caused by
-    # the missing licence and not by the record or by export being broken.
+    # 1. The door. Nothing unlicensed is stored in the first place.
+    with pytest.raises(Forbidden, match="unstated licence"):
+        store.submit(TOKENS["alice"], "unlicensed", offending)
+
+    # 2. The read path -- the exit the first version missed. Exercised directly on the helper,
+    #    since submit now refuses to create such a record for us to read back.
+    from frontier.store import _unlicensed_available_content
+    synthetic = {"kind": "Claim", "id": "smuggled",
+                 "payload": {"source": {"content_available": True, "license": None}}}
+    assert _unlicensed_available_content([synthetic]) == ["Claim/smuggled"]
+    assert _unlicensed_available_content([{"kind": "Claim", "id": "ok", "payload": {
+        "source": {"content_available": True, "license": "CC-BY-4.0"}}}]) == []
+
+    # 3. Import. A peer asserting it holds content does not give us the right to hold it.
     licensed = _claim_with_source(store, "licensed", content_available=True, license="CC-BY-4.0")
     ok = store.submit(TOKENS["alice"], "licensed", licensed)["record"]
-    assert store.export_bundle([ref(ok)])["records"]
+    bundle = store.export_bundle([ref(ok)])
+    tampered = deepcopy(bundle)
+    tampered["records"][0]["payload"]["source"]["license"] = None
+    from frontier.models import digest as _digest
+    tampered["records"][0]["version"] = _digest(
+        {k: v for k, v in tampered["records"][0].items() if k != "version"})
+    body = {k: v for k, v in tampered.items() if k != "bundle_sha256"}
+    tampered["bundle_sha256"] = _digest(body)
+    other = stores("node-b")
+    with pytest.raises(Forbidden, match="unstated licence"):
+        other.import_bundle(TOKENS["bob"], "imp-unlicensed", tampered)
 
-    # Control 2: a reference whose bytes we do NOT claim to hold exports with no licence at all.
+    # Control 1: a stated licence passes the door AND exports.
+    assert store.export_bundle([ref(ok)])["records"]
+    assert store.get(ref(ok), TOKENS["alice"])["record"]
+
+    # Control 2: a reference whose bytes we do NOT claim to hold needs no licence at all.
     # Sharing the digest of something you may not redistribute is exactly what is allowed.
     reference = _claim_with_source(store, "reference-only", content_available=False, license=None)
     pointer = store.submit(TOKENS["alice"], "reference-only", reference)["record"]
     assert store.export_bundle([ref(pointer)])["records"]
+    assert store.get(ref(pointer), TOKENS["alice"])["record"]
 
-    # And the refusal names the offender, so a caller can fix it rather than guess.
+    # Control 3: the refusal names the offender rather than failing anonymously.
     with pytest.raises(Forbidden, match=r"Claim/unlicensed"):
-        store.export_bundle([ref(ok), ref(saved)])
+        store.submit(TOKENS["alice"], "unlicensed-again", offending)
 
 
 PROPOSALS = Path("/data/artifacts/delphi-evolve-rethink/messages/sourced-problems-proposal.json")
