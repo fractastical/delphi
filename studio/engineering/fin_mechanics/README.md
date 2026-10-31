@@ -22,17 +22,17 @@ model, and makes no claim of biological feasibility.
   Europe PMC returned 403; not bypassed), so the HTML has no page numbers and citations are by section/figure.
   An earlier version of this package relied on a summarising fetch tool; the numbers below were then re-checked
   against the primary text and **confirmed**:
-  - Section 3.4 "Physical scalings" (after eq. 3.19): "using three-point bending tests ... the 'composite'
-    Young's modulus ... E ~ 1e8-1e9 N m^-2, with the average area moment of inertia I ~ 1e-6 cm^4. Hence, the
-    measured B = EI ~ 1e-6-1e-5 J m." J m = N m^2, and 1e-6 cm^4 = 1e-14 m^4, so E*I = 1e-6 to 1e-5 N m^2
+  - Section 3.4, after eq. 3.19, estimates a composite modulus E of 1e8–1e9 N/m²
+    from three-point bending and an average area moment I of approximately 1e-6 cm⁴.
+    Their product gives B = EI of approximately 1e-6–1e-5 N m². Converting I to SI
+    gives 1e-14 m⁴, which reproduces that product
     (consistent). This is the gray band. Species bluegill sunfish (*Lepomis macrochirus*); 24 rays from six fish
     (maximum ray length 40.3 +/- 0.8 mm), tested in water within 48 h; the scaling estimate uses L = 4 cm for a
     typical ray. It is an **order-of-magnitude product of a composite E and an average I** (area moments from
     one fin's microCT scan, Section 2); it is not a per-ray or per-position measurement and is not in any table
     or figure. The paper's own scaling argument (eq. 3.19) gave B ~ 1e-6 J m, lower than measured.
   - Section 5.2 and Figure 7 caption: base-clamped ray, vertical point force at about two-thirds of the way along
-    the ray; slope 1.98 N m^-1 with both hemitrich bases clamped, "about 12 times the value when one hemitrich is
-    free". That is a stiffness (N/m) at a point load, not an EI.
+    the ray; slope 1.98 N m^-1 with both hemitrich bases clamped, approximately twelve times the slope with one hemitrich free. That is a stiffness (N/m) at a point load, not an EI.
   - The paper's model is a *bilaminar* elastica with intraray shear (Section 3), not a single beam, and it gives
     no closed-form tip-deflection formula. The band is **not** used to calibrate or validate anything here and
     is drawn in gray hatching as context only.

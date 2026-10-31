@@ -1,12 +1,14 @@
-# Delphi Frontier
+# MorphoSwarm Frontier
 
 **What we know. What's next. Who's working on it.**
 
 A living research commons that turns biological questions into coordinated,
 checkable progress. Agentic attention selects useful work; agentic engineering
 turns requirements into constrained designs, simulations, challenges and new
-questions. The product is Delphi Frontier. Delphi Evolve and MorphoSwarm supply
-reusable components and evidence, with their original scope and provenance.
+questions. MorphoSwarm Frontier is the design studio and shared frontier; Flying
+Fish is its featured project. Delphi supplies the claims and evidence foundation.
+Delphi Evolve and MorphoSwarm supply reusable components and evidence, with their
+original scope and provenance. The repository remains `delphi-frontier`.
 
 This direction follows the user's October 31 takeover and constraint-solver
 instructions. It supersedes the earlier restriction to a read-only map and the
@@ -54,6 +56,10 @@ about a proposed action.
 - [ ] Measure actual claim reuse and coordination; retain null results.
 - [ ] Verify and deploy the integrated demo with source and artifact receipts.
 - [ ] Leave a 24-hour resource queue, owners, stop rules and remaining blockers.
+- [ ] Deliver the human-readable studio, project/annotation model, actual vector
+  discovery and interactive knowledge/asset graph specified in SPEC-007.
+- [ ] Complete a separate Playwright critique of every route and major interaction,
+  and recheck critical findings on the deployed site.
 
 OpenResearch must connect actual runs to evidence and artifact hashes. Printed
 fish are a physical view of engineering candidates: constraints and simulations
