@@ -38,6 +38,7 @@
     const hdr = document.getElementById("hdr"); const main = document.getElementById("main");
     if (!snap) return;
     hdr.innerHTML = header(route).toString();
+    if (DF.attachSearch) DF.attachSearch();
     document.getElementById("gs").addEventListener("submit", (e) => { e.preventDefault(); const q = document.getElementById("gq").value.trim(); DF.go(DF.href("/search", { q, tab: "catalog" })); });
     const fn = DF.views[route.view];
     const y = lastView === route.view ? window.scrollY : 0;

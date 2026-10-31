@@ -330,3 +330,43 @@ def test_archive_release_is_a_claim_not_a_measurement_and_long_cells_are_clipped
 
 def DF_short(pg):
     return pg.evaluate("() => DF.clipCell('short').toString() === 'short'")
+
+
+def test_entity_page_is_readable_with_equation_and_optional_raw_view(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/entity/Claim/turing-ddi")
+    pg.wait_for_selector("#entity h1:has-text('')", timeout=15000)
+    pg.wait_for_selector(".entmain .katex", timeout=15000)
+    txt = pg.locator("#main").inner_text()
+    assert "Statement" in txt and "Context" in txt and "Limitations" in txt and "Assumptions" in txt
+    assert "Imported or upstream labels are assertions" in txt
+    assert pg.locator(".advraw pre").is_hidden(), "the raw envelope is an advanced view, collapsed by default"
+    pg.locator(".advraw summary").click()
+    assert "turing-ddi" in pg.locator(".advraw pre").inner_text()
+    pg.goto(base + "#/entity/Claim/no-such-id")
+    pg.wait_for_selector("h1:has-text('Not found')", timeout=15000)
+
+
+def test_search_autocomplete_is_typed_keyboard_operable_and_honest(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector("#gq")
+    pg.fill("#gq", "f")
+    assert pg.locator("#ac-list").is_hidden(), "one character does not search"
+    pg.fill("#gq", "fisher")
+    pg.wait_for_selector("#ac-list [role=option]", timeout=10000)
+    assert pg.get_attribute("#gq", "aria-expanded") == "true"
+    assert pg.locator("#ac-list .acg").count() >= 1
+    assert "lexical" in pg.locator("#ac-list .acf").inner_text().lower() and "semantic" not in pg.locator("#ac-list .acf").inner_text().lower().replace("semantic index is not connected", "")
+    pg.press("#gq", "ArrowDown")
+    assert pg.get_attribute("#gq", "aria-activedescendant")
+    pg.press("#gq", "Enter")
+    pg.wait_for_selector("#entity h1, .entmain", timeout=10000)
+    assert "/entity/" in pg.url
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector("#gq")
+    pg.fill("#gq", "zzzzqqqq")
+    pg.wait_for_selector("#ac-list .ace", timeout=10000)
+    assert "No match" in pg.locator("#ac-list .ace").inner_text()
+    pg.press("#gq", "Escape")
+    assert pg.locator("#ac-list").is_hidden()

@@ -23,7 +23,7 @@
       try { window.katex.render(src, el, { throwOnError: true, displayMode: !!display, strict: "ignore" }); el.setAttribute("aria-label", src); return true; }
       catch (e) { /* fall through to source */ }
     }
-    el.textContent = src; el.classList.add("tex-fallback"); el.title = "KaTeX could not render this expression; showing TeX source";
+    el.textContent = src; el.classList.add("tex-fallback"); el.title = "KaTeX could not render this expression; showing its TeX source"; el.setAttribute("data-unsupported", "1"); el.setAttribute("aria-label", "Unsupported expression, TeX source: " + src);
     return false;
   }
   /* Split a claim's "math" field (formula with embedded prose) into text and TeX runs. */

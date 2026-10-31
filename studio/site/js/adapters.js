@@ -9,8 +9,9 @@
 
   const isLive = () => state.mode === "live" && (state.publicAccess === true || state.authenticated === true);
 
-  async function getJSON(url, ms = 3000) {
+  async function getJSON(url, ms = 3000, signal = null) {
     const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
+    if (signal) signal.addEventListener("abort", () => ctl.abort(), { once: true });
     try {
       const r = await fetch(url, { signal: ctl.signal, headers: { Accept: "application/json" }, cache: "no-store" });
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -131,5 +132,34 @@
   const simulate = pending("simulation");
   const propose = pending("proposal submission");
 
-  DF.api = { state, isLive, load, catalog, record, artifacts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
+  /* GET /api/discovery?q&kind&limit&mode=hybrid -> {items[{type,ref,artifact_sha256?,title,snippet,kind,local_status,score,score_kind,why_matched}], mode, index metadata, unavailable_reason?}.
+   * Until the runtime serves it, an honest lexical fallback over the catalog and artifact index; the result always says which one ran. */
+  async function discovery(q, { kind = "", limit = 12, signal = null } = {}) {
+    if (isLive() && state.discoveryAbsent !== true) {
+      try {
+        const p = new URLSearchParams({ q, limit: String(limit), mode: "hybrid" }); if (kind) p.set("kind", kind);
+        const r = await getJSON("api/discovery?" + p.toString(), 6000, signal);
+        return { source: "discovery", mode: r.mode || "unknown", items: Array.isArray(r.items) ? r.items : [], unavailable_reason: r.unavailable_reason || null, index: r.index || null };
+      } catch (e) { if (e.name === "AbortError") throw e; if (/HTTP 404/.test(e.message)) state.discoveryAbsent = true; }
+    }
+    const needle = q.trim().toLowerCase(); const items = [];
+    const cat = await catalog({ query: q, kind, limit: Math.min(50, limit * 2) });
+    cat.records.forEach((rec) => items.push({ type: rec.ref.kind === "Problem" ? "question" : rec.ref.kind === "Action" ? "action" : "record", ref: rec.ref, title: rec.title, snippet: String((rec.payload && (rec.payload.statement || rec.payload.question || rec.payload.method || rec.payload.known_state)) || "").slice(0, 140), kind: rec.ref.kind, local_status: rec.local_status, score: null, score_kind: "none", why_matched: rec.why_matched || ["text match"] }));
+    if (isLive() && !kind) {
+      try { const ar = await getJSON("api/artifacts?" + new URLSearchParams({ q, limit: "5" }).toString(), 6000, signal);
+        (ar.items || []).forEach((it) => { const a = it.artifact || {}; items.push({ type: "artifact", ref: it.evidence, artifact_sha256: a.sha256, title: a.title, snippet: `${a.role || ""} · ${a.media_type || ""}`, kind: "Artifact", local_status: it.local_status, score: null, score_kind: "none", why_matched: ["text match"] }); }); } catch (e) { if (e.name === "AbortError") throw e; }
+    }
+    return { source: "lexical-fallback", mode: "lexical", items: items.slice(0, limit), unavailable_reason: state.discoveryAbsent ? "the semantic index is not connected on this node" : null, total_matching: cat.total_matching };
+  }
+
+  /* GET /api/graph?namespace&kind&id&version&depth=1&limit=120 -> {nodes, edges, truncated, scope, counts}; null when the runtime does not serve it. */
+  async function graph(ref, { depth = 1, limit = 120, signal = null } = {}) {
+    if (!isLive() || state.graphAbsent === true) return null;
+    try {
+      const p = new URLSearchParams({ namespace: ref.namespace, kind: ref.kind, id: ref.id, depth: String(depth), limit: String(limit) }); if (ref.version) p.set("version", ref.version);
+      return await getJSON("api/graph?" + p.toString(), 8000, signal);
+    } catch (e) { if (e.name === "AbortError") throw e; if (/HTTP 404/.test(e.message)) { state.graphAbsent = true; return null; } throw e; }
+  }
+
+  DF.api = { state, isLive, load, discovery, graph, catalog, record, artifacts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
 })();

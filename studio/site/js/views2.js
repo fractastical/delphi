@@ -536,7 +536,7 @@
     const upstream = rec.upstream_label ? Object.entries(rec.upstream_label).map(([k, v]) => `${k}: ${v}`).join("; ") : "";
     const why = Array.isArray(rec.why_matched) ? rec.why_matched : null; const cur = rec.curation || null; const dis = rec.disputes || null;
     const disN = dis ? (dis.disputing_reviews || []).length + (dis.cited_evidence || []).length + (dis.diverging_versions || []).length : 0;
-    return html`<li class="catrow"><div><span class="pill k-${r.kind}">${r.kind || "record"}</span> <a class="srclink" href="${DF.hrefWith({ src: key })}" data-src="${key}"><b>${title}</b></a>${rec.is_head === false ? html` ${U.pill("not the current version", "warn")}` : ""}</div>
+    return html`<li class="catrow"><div><span class="pill k-${r.kind}">${r.kind || "record"}</span> <a class="srclink" href="${DF.href("/entity/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace })}"><b>${title}</b></a> <a class="small faint" href="${DF.hrefWith({ src: key })}" data-src="${key}">raw</a>${rec.is_head === false ? html` ${U.pill("not the current version", "warn")}` : ""}</div>
       <div class="small"><span class="pill st-unk">local status: ${String(rec.local_status || "not reported").replace(/_/g, " ")}</span> ${upstream ? html`<span class="faint">upstream assertion → ${upstream}</span>` : ""}</div>
       ${rec.snippet ? html`<div class="small">${rec.snippet}</div>` : ""}
       ${why ? html`<div class="small faint">Matched on: ${why.length ? why.join("; ") : "no reason reported"}. This is lexical matching, not relevance, quality or truth.</div>` : ""}

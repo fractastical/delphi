@@ -29,10 +29,11 @@ with sync_playwright() as p:
     assert "mode live" in ct and ct.split(" ")[0].isdigit() and int(ct.split(" ")[0]) > 0, ct   # seeded records, read from the live node
     first = pg.locator("#clist a.srclink").first
     title = first.inner_text(); first.click()
-    pg.wait_for_selector("#drawer:not([hidden]) pre.json", timeout=15000)   # /api/record, pinned ref
-    env = pg.locator("#drawer pre.json").inner_text()
+    pg.wait_for_selector(".entmain", timeout=15000)                           # entity page, read through /api/record with a pinned ref
+    pg.locator(".advraw summary").click()
+    env = pg.locator(".advraw pre").inner_text()
     assert "site-e2e" in env and "version" in env, env[:200]
-    print("RECORD via /api/record:", title[:60]); pg.keyboard.press("Escape")
+    print("RECORD via /api/record:", title[:60])
     pg.goto(base + "/index.html#/search?q=Fisher&tab=catalog"); expect(pg.locator("#ccount")).not_to_have_text("Loading…", timeout=15000)
     print("SEARCH:", pg.locator("#ccount").inner_text()); assert "mode live" in pg.locator("#ccount").inner_text()
     pg.goto(base + "/index.html#/work?tab=runtime"); expect(pg.locator("#events")).not_to_have_text("Loading…", timeout=15000)
@@ -130,6 +131,10 @@ with sync_playwright() as p:
     if nvid:
         ok = pg.evaluate("""async () => { const v = document.querySelector('video'); v.preload = 'metadata'; v.load(); await new Promise(r => { v.onloadedmetadata = r; v.onerror = r; setTimeout(r, 8000); }); return [v.readyState, v.videoWidth, v.error && v.error.code]; }""")
         print("VIDEO METADATA:", ok)
+    pg.goto(base + "/index.html#/entity/Claim/fisher-ftns"); pg.wait_for_selector(".entmain .katex", timeout=20000)
+    et = pg.locator("#main").inner_text(); print("ENTITY:", et[:100].replace("\n", " ")); assert "Statement" in et and "namespace" not in et.lower()[:10]
+    pg.goto(base + "/index.html#/frontier"); pg.fill("#gq", "Fisher"); pg.wait_for_selector("#ac-list [role=option]", timeout=15000)
+    print("AUTOCOMPLETE:", pg.locator("#ac-list .acf").inner_text().replace("\n", " ")[:120])
     att = pg.context.request.get(base + "/api/attention"); print("ATTENTION", att.status, att.text()[:160].replace("\n", " ")); assert att.status in (200, 503)
     assert not errs, errs
     print("ALL LIVE CHECKS PASSED"); b.close()
