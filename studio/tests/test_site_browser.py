@@ -293,3 +293,22 @@ def test_coupling_manifest_verdicts_are_shown_with_their_scope(browser, base):
     assert "registered calibrations: none" in txt and "not biology" in txt
     assert pg.locator("section[aria-labelledby=cp-h] tbody tr").count() >= len(M["couplings"])
     assert str(M["counts"]["refused"]) + " refused" in txt
+
+
+_AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-label') || e.getAttribute('title') || e.textContent || '').trim();
+  document.querySelectorAll('img').forEach((i) => { if (!i.hasAttribute('alt')) bad.push('img without alt'); });
+  document.querySelectorAll('button,a[href]').forEach((e) => { if (!name(e) && !e.querySelector('img[alt]')) bad.push('control without a name: ' + e.outerHTML.slice(0, 60)); });
+  document.querySelectorAll('input:not([type=hidden]),select,textarea').forEach((e) => { const l = (e.id && document.querySelector('label[for="' + e.id + '"]')) || e.closest('label') || e.getAttribute('aria-label'); if (!l) bad.push('unlabelled field: ' + e.outerHTML.slice(0, 60)); });
+  let prev = 0; document.querySelectorAll('h1,h2,h3,h4').forEach((h) => { const n = +h.tagName[1]; if (prev && n > prev + 1) bad.push('heading jump h' + prev + ' to h' + n); prev = n; });
+  if (document.querySelectorAll('h1').length !== 1) bad.push('h1 count');
+  const ids = {}; document.querySelectorAll('[id]').forEach((e) => { if (ids[e.id]) bad.push('duplicate id ' + e.id); ids[e.id] = 1; });
+  return bad; }"""
+
+
+def test_accessibility_basics_on_every_view(browser, base):
+    pg = page(browser)
+    for route in ["frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+        pg.goto(base + "#/" + route)
+        pg.wait_for_selector("#main h1")
+        pg.wait_for_timeout(500)
+        assert pg.evaluate(_AUDIT) == [], route
