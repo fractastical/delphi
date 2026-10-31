@@ -101,25 +101,52 @@ def test_whole_register_imports_and_none_of_it_is_actionable(store, tmp_path):
         assert draft["payload"]["original"].get("register_record") or \
                draft["payload"]["original"].get("register_record_sha256")
 
-    # Provenance, measured rather than assumed. The first draft of this test asserted that
-    # "the overwhelming majority" carry a source URI, generalised from the first record read.
-    # It is false: most of the register is unsourced, and the test exists to keep that visible.
-    provenance = report["provenance"]
+    # Provenance, measured rather than assumed. The register carries THREE provenance fields; they are counted separately.
+    fields = report["source_fields_in_register"]
+    chosen = report["source_chosen_for_the_draft"]
     with_uri = sum(1 for d in drafts if d["payload"]["source"]["uri"])
-    assert with_uri == provenance["any_source"]
-    assert provenance["with_locator_and_quote"] + provenance["topic_reference_only"] \
-        + provenance["no_source_at_all"] == report["importable"]
-    # The unsourced majority must be labelled as such, never as a sourced open problem.
-    unsourced = [d for d in drafts if d["payload"]["original"]["provenance_path"] == "none"]
-    assert len(unsourced) == provenance["no_source_at_all"] > 0
-    for d in unsourced:
-        assert d["payload"]["source"]["uri"] is None
-        assert "NO source" in d["payload"]["source"]["access"]
-    # And the weak path must not be presented as supporting a specific statement.
+    assert with_uri == chosen["any_source"]
+    assert chosen["why_source"] + chosen["attestation_open_with_locator_and_quote"] + chosen["references_topic_only"] \
+        + chosen["no_resolvable_source"] == report["importable"]
+    assert fields["attestations"]["entries"] == sum(len(d["payload"]["original"]["register_provenance"]["attestations"]) for d in drafts)
+    assert fields["references"]["entries"] == sum(len(d["payload"]["original"]["register_provenance"]["references"]) for d in drafts)
+    # The earlier 148 "no source at all" was the previous importer ignoring `attestations`; it is reproduced, not hidden.
+    prev = report["previous_mapping"]
+    assert prev["why_source"] + prev["references"] + prev["none"] == report["importable"]
+    assert chosen["no_resolvable_source"] <= prev["none"]
+    if report["register_sha256"].startswith("a0155552"):
+        assert (prev["why_source"], prev["references"], prev["none"]) == (34, 68, 148)
+        assert (fields["attestations"]["problems"], fields["attestations"]["entries"], fields["attestations"]["entries_with_pmcid"],
+                fields["attestations"]["entries_with_url_only"]) == (250, 465, 462, 3)
+        assert fields["attestations"]["by_stance"] == {"open": 416, "settled": 49}
+        assert fields["attestations"]["problems_with_a_settled_facet"] == 37
+        assert fields["references"]["problems"] == 74 and fields["references"]["entries"] == 108
+        assert fields["why_source"]["problems"] == 34
+        assert chosen["no_resolvable_source"] == 0 and chosen["attestation_open_with_locator_and_quote"] == 216
+    # A curator's question is never labelled as a primary-literature open problem, and nothing was promoted.
+    assert report["problem_kind_used"] == ["project_gap"]
+    assert all(d["payload"]["problem_kind"] == "project_gap" and d["payload"]["completeness"] == "recorded" for d in drafts)
+    # Citations only: every quote, locator and identifier in a draft is exactly one the register carries.
+    import yaml
+    register = {p["slug"]: p for p in yaml.safe_load(REGISTER.read_text())["problems"]}
     for d in drafts:
-        if d["payload"]["original"]["provenance_path"] == "references":
-            assert d["payload"]["source"]["locator"] is None
-            assert "WEAKER" in d["payload"]["source"]["access"]
+        rec = register[d["id"]]
+        prov = d["payload"]["original"]["register_provenance"]
+        assert [(x["pmcid"], x["url"], x["locator"], x["quote"], x["stance"], x["kind"]) for x in prov["attestations"]] == \
+               [(x.get("pmcid"), x.get("url"), x.get("locator"), x.get("quote"), x.get("stance"), x.get("kind")) for x in rec["attestations"]]
+        assert prov["references"] == (rec.get("references") or []) and prov["why_source"] == (rec.get("why_source") or None)
+        assert all(x["quote_checked_against_source"] is False for x in prov["attestations"])
+    # The path that fed `source` must say what it is, and nothing stronger than it is.
+    for d in drafts:
+        path = d["payload"]["original"]["provenance_path"]
+        src = d["payload"]["source"]
+        if path == "none":
+            assert src["uri"] is None and "NO resolvable source" in src["access"]
+        elif path == "references":
+            assert src["locator"] is None and "WEAKER" in src["access"]
+        elif path == "attestation":
+            assert src["locator"] and "curator's transcription" in src["access"]
+            assert "not that the question as phrased is a primary-literature open problem" in src["access"]
 
     # A real one goes into the store and is still refused an action.
     first = drafts[0] | {"issuer": "alice"}
@@ -244,3 +271,109 @@ def test_sourced_problems_are_actionable_and_close_the_loop(store, tmp_path):
         blocked = action(store, ref(r)) | {"id": "action-against-recorded"}
         with pytest.raises(Conflict, match="recorded, not actionable"):
             store.submit(TOKENS["alice"], "act-sourced-recorded", blocked)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Synthetic registers: the attestation salvage, without depending on the host's register file.
+# ---------------------------------------------------------------------------------------------------------------------
+sys.path.insert(0, str(REPO / "scripts"))
+import import_register as ir  # noqa: E402
+
+
+def entry(slug="q", **changes):
+    p = {"slug": slug, "statement": "Does X cause Y?", "why_it_matters": "Because Z.", "tags": [], "attestations": []}
+    p.update(changes)
+    return p
+
+
+def att(pmcid="PMC1", locator="Results", quote="  A quote, exactly as transcribed — with “marks” and  double  spaces. ", stance="open", kind="research", **extra):
+    return {"pmcid": pmcid, "locator": locator, "quote": quote, "stance": stance, "kind": kind, **extra}
+
+
+def valid(draft):
+    Draft.model_validate(draft)
+    return Problem.model_validate(draft["payload"])
+
+
+def test_attestation_is_salvaged_verbatim_without_promotion_or_a_primary_field_label():
+    q = att()
+    d = ir.to_draft(entry(attestations=[q]))
+    problem = valid(d)
+    assert problem.completeness == "recorded" and not problem.next_action and not problem.falsifiers
+    assert problem.problem_kind == "project_gap" and problem.problem_kind != "sourced_field_open_problem"
+    assert problem.source.uri == "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1/" and problem.source.locator == "Results"
+    assert problem.source.content_available is False and problem.source.content_sha256 is None
+    assert "not checked against the source" in problem.source.access and "primary-literature" in problem.source.access
+    kept = d["payload"]["original"]["register_provenance"]["attestations"][0]
+    assert kept["quote"] == q["quote"], "the quote is copied unmodified: no strip, no normalisation, no truncation"
+    assert kept["quote_checked_against_source"] is False and kept["uri"] == problem.source.uri
+    assert d["payload"]["original"]["provenance_path"] == "attestation"
+
+
+def test_why_source_still_wins_and_references_stay_a_weaker_separate_path():
+    ws = {"pmcid": "PMC9", "locator": "Intro", "quote": "From why_source."}
+    d = ir.to_draft(entry(why_source=ws, attestations=[att()], references=[{"pmcid": "PMC5", "role": "background", "note": "n"}]))
+    assert d["payload"]["original"]["provenance_path"] == "why_source" and d["payload"]["source"]["uri"].endswith("PMC9/")
+    prov = d["payload"]["original"]["register_provenance"]
+    assert prov["why_source"] == ws and len(prov["attestations"]) == 1 and len(prov["references"]) == 1, "the three fields stay separate"
+    d = ir.to_draft(entry(attestations=[], references=[{"pmcid": "PMC5", "role": "background", "note": "n"}]))
+    assert d["payload"]["original"]["provenance_path"] == "references" and d["payload"]["source"]["locator"] is None
+    assert "WEAKER" in d["payload"]["source"]["access"]
+
+
+def test_a_settled_attestation_never_stands_as_the_source_of_openness_but_is_kept_and_counted():
+    d = ir.to_draft(entry(attestations=[att(pmcid="PMC1", stance="settled", quote="settled one"), att(pmcid="PMC2", quote="open one")]))
+    assert d["payload"]["source"]["uri"].endswith("PMC2/") and "entry 1 of 2" in d["payload"]["source"]["access"]
+    assert "1 of 2 attestations have stance settled" in d["payload"]["source"]["access"]
+    only_settled = ir.to_draft(entry(attestations=[att(stance="settled", quote="settled only")]))
+    assert only_settled["payload"]["original"]["provenance_path"] == "none" and only_settled["payload"]["source"]["uri"] is None
+    assert "NO resolvable source" in only_settled["payload"]["source"]["access"]
+    assert only_settled["payload"]["original"]["register_provenance"]["attestations"][0]["quote"] == "settled only"
+    assert "1 settled" in only_settled["payload"]["novelty_status"]
+
+
+def test_url_only_attestation_resolves_and_an_unresolvable_one_is_kept_not_used():
+    d = ir.to_draft(entry(attestations=[{"url": "https://example.org/prize", "locator": "page", "quote": "q", "stance": "open", "kind": "challenge-list"}]))
+    assert d["payload"]["source"]["uri"] == "https://example.org/prize" and d["payload"]["original"]["provenance_path"] == "attestation"
+    nothing = ir.to_draft(entry(attestations=[{"locator": "x", "quote": "q", "stance": "open", "kind": "research"}]))
+    assert nothing["payload"]["original"]["provenance_path"] == "none"
+    assert len(nothing["payload"]["original"]["register_provenance"]["attestations"]) == 1
+    odd = ir.to_draft(entry(attestations=["not a mapping", att()]))
+    assert odd["payload"]["original"]["register_provenance"]["attestations"][0]["raw"] == "not a mapping"
+    assert odd["payload"]["source"]["uri"].endswith("PMC1/"), "an odd entry does not hide a usable one"
+
+
+def test_oversize_record_drops_the_whole_copy_first_then_digests_quotes_but_never_truncates_them():
+    many = [att(pmcid=f"PMC{i}", quote=("q%02d " % i) * 700) for i in range(30)]      # ~2,800 characters each
+    big = entry(attestations=many, tags=["pad"], curator_note="x" * 20000)
+    d = ir.to_draft(big)
+    from frontier.models import canonical
+    assert len(canonical(d).encode()) <= 65536
+    o = d["payload"]["original"]
+    assert "register_record" not in o and o["register_record_omitted"] and len(o["register_record_sha256"]) == 64
+    atts = o["register_provenance"]["attestations"]
+    assert len(atts) == 30 and [x["pmcid"] for x in atts] == [f"PMC{i}" for i in range(30)], "no item disappears"
+    for x, original in zip(atts, many):
+        if x["quote"] is None:
+            assert x["quote_omitted_for_size"] and len(x["quote_sha256"]) == 64
+        else:
+            assert x["quote"] == original["quote"], "a kept quote is whole; a shortened quote would be a fabricated passage"
+    assert any(x["quote"] is None for x in atts)
+
+
+def test_report_counts_the_three_fields_separately():
+    problems = [entry("a", attestations=[att("PMC1"), att("PMC1", stance="settled", quote="s")]),
+                entry("b", attestations=[att("PMC1")], references=[{"pmcid": "PMC7", "role": "r", "note": "n"}, {"role": "no id"}]),
+                entry("c", why_source={"pmcid": "PMC3", "locator": "l", "quote": "q"}),
+                entry("d", attestations=[], references=[{"pmcid": "PMC8", "role": "r", "note": "n"}]),
+                entry("e")]
+    f = ir.register_field_counts(problems)
+    assert f["why_source"] == {"problems": 1, "with_pmcid_locator_quote": 1}
+    assert f["references"]["problems"] == 2 and f["references"]["entries"] == 3 and f["references"]["resolvable_entries"] == 2
+    assert f["references"]["problems_with_a_resolvable_entry"] == 2 and f["references"]["carry_locator_or_quote"] == 0
+    a = f["attestations"]
+    assert (a["problems"], a["entries"], a["distinct_sources"], a["max_problems_sharing_one_source"]) == (2, 3, 1, 2)
+    assert a["by_stance"] == {"open": 2, "settled": 1} and a["problems_with_a_settled_facet"] == 1 and a["problems_with_every_attestation_settled"] == 0
+    assert a["problems_resting_on_exactly_one_distinct_source"] == 2
+    assert f["problems_with_none_of_the_three"] == 1
+    assert [ir.legacy_provenance_path(p) for p in problems] == ["none", "references", "why_source", "references", "none"]
