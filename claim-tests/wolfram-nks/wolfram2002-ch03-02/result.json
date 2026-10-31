@@ -1,0 +1,25 @@
+{
+  "claim_id": "wolfram2002-ch03-02",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch03-02",
+  "project": "wolfram-nks",
+  "status": "preregistered",
+  "hypothesis": "When each of the 256 elementary cellular automata (Wolfram numbering, all 256 counted separately) is run from a single black cell on a white background, the pattern of cells that differ from the (possibly alternating) uniform background stays of bounded width for about two-thirds of the rules (~171) and grows without bound for about one-third (~85); and about 14% of all 256 rules (~36) produce growing patterns that are not space-time periodic, i.e. more complicated than repetition.",
+  "pass_criterion": "Pre-registered: run all 256 rules for T = 4096 steps on a ring of 2T + 64 cells (so the light cone never wraps). Width w(t) = extent of cells differing from the background value at time t, where the background follows b_{t+1} = f(b_t, b_t, b_t). A rule is 'fixed size' if max_{t in [T/2, T]} w(t) equals max_{t in [T/4, T/2]} w(t), otherwise 'growing'. A growing rule is 'repetitive' if some temporal period P <= 16 and spatial shift |s| <= 16 satisfy grid[t + P, x + s] == grid[t, x] for every t in [T/2, T - P] and every x in [-t + 16, t - 16]; otherwise it is 'more complicated than repetition'. The claim passes if the fixed-size fraction lies in [0.60, 0.73], the growing fraction in [0.27, 0.40] and the more-complicated fraction in [0.10, 0.18], and if the three-way classification of every rule is identical for T = 2048 and T = 4096 (no rule changes class with the cutoff).",
+  "fail_criterion": "Pre-registered: 'refutes' if the fixed-size fraction is below 0.55 or above 0.78, or the more-complicated fraction is outside [0.07, 0.21]; 'mixed' if the fractions fall between the pass and refute bands, or if more than 4 rules change class between T = 2048 and T = 4096 (indicating the cutoff, not the rules, decides the shares); 'inconclusive' if the periodicity search is not able to classify the growing patterns (e.g. because the width of the periodic window is inadequate for some rule) in a way that is stable across cutoffs.",
+  "planned_datasets": [
+    "eca-single-cell-census"
+  ],
+  "interpretation": "The 256 rules are counted individually as Wolfram does ('all the cellular automata shown on the last few pages'), without quotienting by the left-right or black-white symmetries. 'Fixed size' includes patterns that die out (rules 0, 128), that flash with the background (7, 127) and that move at constant speed without changing width (2, 103). 'Grow forever' is operationalised as a width that keeps increasing between the third and fourth quarters of the run, which also captures the square-root growth of rule 225 noted in the text (width about 2*sqrt(t)). 'More complicated than repetition' is the complement of space-time periodicity with small period and drift inside the light cone, which is how a purely repetitive growing pattern (rules 50, 109) differs from a nested (22, 60, 90, 225) or random (30, 45) or complex (110) one. The shares are described as approximate ('about'), so a +-0.07 band around 2/3, 1/3 and a +-0.04 band around 14% are used; Wolfram's own count of 24 nested rules is recorded as an exploratory extra, not a criterion.",
+  "datasets": [],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-wolfram-nks-0123",
+    "date": "2026-10-31"
+  }
+}
