@@ -61,3 +61,124 @@ def test_completed_cpu_checks_are_finite_and_kill_wrong_sign():
     assert checks["force_gradient"]["wrong_sign_relative_error"] > 1
     assert len(checks["nve"]) == 2
     assert all(row["energy_drift_over_initial_kinetic"] < 0.02 for row in checks["nve"])
+
+
+def test_native_interface_refuses_length_to_fin_material_transfer():
+    from engineering.coupling import (
+        Coupling,
+        default_registry,
+        model_from_json,
+        validate_coupling,
+    )
+
+    model = model_from_json(
+        json.loads((ROOT / "artifacts/molecular/model-interface.json").read_text())
+    )
+    reg = default_registry()
+    reg.add_model(model)
+    verdict = validate_coupling(
+        reg,
+        Coupling(
+            "test",
+            "collagen_mimetic_md.terminal_CA_distance",
+            "finbeam_euler_bernoulli.flexural_rigidity",
+            mapping_kind="none",
+        ),
+    )
+    assert verdict.status == "refused"
+    assert model.timescale.kind == "unknown"
+    assert model.port("terminal_CA_distance").unit == "nm"
+
+
+def test_delivered_trajectory_and_render_are_actual_pinned_states():
+    folder = ROOT / "artifacts/molecular/cpu-trajectory-final"
+    receipt = json.loads((folder / "receipt.json").read_text())
+    assert (
+        hashlib.sha256((folder / "producer-run.py").read_bytes()).hexdigest()
+        == receipt["code_sha256"]
+    )
+    data = np.load(folder / "trajectory-1731.npz")
+    metrics = json.loads((folder / "metrics-1731.json").read_text())
+    assert len(data["positions_nm"]) == len(metrics) == 101
+    assert np.isfinite(data["positions_nm"]).all()
+    assert np.max(abs(data["positions_nm"][-1] - data["positions_nm"][0])) > 0
+    assert data["times_ps"][-1] == 0.2
+    assert all(np.isfinite(m["kinetic_temperature_K"]) for m in metrics)
+    render = json.loads(
+        (ROOT / "artifacts/molecular/cpu-render/render.json").read_text()
+    )
+    assert (
+        render["trajectory_sha256"]
+        == hashlib.sha256((folder / "trajectory-1731.npz").read_bytes()).hexdigest()
+    )
+    assert render["simulation_duration_ps"] == 0.2 and render["frames"] == 101
+
+
+def test_model_inventory_keeps_proposed_and_executed_distinct():
+    inventory = json.loads((ROOT / "artifacts/molecular/model-index.json").read_text())
+    models = inventory["models"]
+    assert len(models) >= 12 and len({row["id"] for row in models}) == len(models)
+    actual = next(row for row in models if row["id"] == "collagen_mimetic_md")
+    assert actual["biological_success_probability"] is None
+    assert actual["empirical_accuracy"] == "unknown"
+    for row in models:
+        assert row["source"] and row["missing_transfer"] and row["coupling_ports"]
+        if row["status"].startswith("source_only"):
+            assert "artifacts" not in row
+
+
+def test_failed_attempt_and_reference_oracle_repair_keep_original_limits():
+    original = json.loads((ROOT / "artifacts/molecular/protocol.json").read_text())
+    revised = json.loads(
+        (ROOT / "artifacts/molecular/protocol-reference-oracle.json").read_text()
+    )
+    failure = json.loads(
+        (ROOT / "artifacts/molecular/gpu-attempt-1/controls.json").read_text()
+    )
+    repaired = ROOT / "artifacts/molecular/gpu-attempt-1/repaired-controls"
+    result = json.loads((repaired / "controls.json").read_text())
+    assert failure["passed"] is False
+    assert (
+        failure["force_gradient"]["relative_error"]
+        > original["controls"]["gradient_relative_max"]
+    )
+    for field in (
+        "finite_difference_nm",
+        "gradient_relative_max",
+        "nve_duration_ps",
+        "nve_drift_over_kinetic_max",
+    ):
+        assert revised["controls"][field] == original["controls"][field]
+    assert (
+        result["passed"] and result["force_gradient"]["energy_platform"] == "Reference"
+    )
+    assert (
+        result["force_gradient"]["relative_error"]
+        < original["controls"]["gradient_relative_max"]
+    )
+    assert result["force_gradient"]["CPU_Reference_force_relative_L2"] < 0.005
+    assert (
+        hashlib.sha256((repaired / "producer-run.py").read_bytes()).hexdigest()
+        == result["code_sha256"]
+    )
+
+
+def test_exact_failed_state_diagnosis_preserves_h_and_demonstrates_precision():
+    report = json.loads(
+        (
+            ROOT / "artifacts/molecular/gpu-attempt-1/derivative-diagnosis.json"
+        ).read_text()
+    )
+    assert report["component"] == [345, 2]
+    assert (
+        report["state_sha256"]
+        == "fb6ac7d070f975b6547324cbbb4027937968041e1b89e6c4f380ce9d7c470e73"
+    )
+    cpu = report["observations"]["CPU"]["gradient_scan"][1]
+    reference = report["observations"]["Reference"]["gradient_scan"][1]
+    assert cpu["h_nm"] == reference["h_nm"] == 0.00001
+    assert cpu["relative_error"] > 0.005
+    assert reference["relative_error"] < 1e-6
+    assert (
+        report["CPU_force_vs_Reference_derivative_at_frozen_h_relative_error"] < 0.005
+    )

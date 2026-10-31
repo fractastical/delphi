@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import platform
 import random
@@ -19,6 +20,7 @@ import openmm as mm
 from openmm import app, unit as u
 
 CODE_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+CPU_THREADS = min(2, max(1, int(os.environ.get("OPENMM_CPU_THREADS", "2"))))
 
 
 def sha(path):
@@ -101,7 +103,10 @@ def prepare(protocol, output):
     # XML State preserves full coordinate precision; PDB is human-readable only.
     integrator = mm.VerletIntegrator(0.001 * u.picoseconds)
     context = mm.Context(
-        system, integrator, mm.Platform.getPlatformByName("CPU"), {"Threads": "2"}
+        system,
+        integrator,
+        mm.Platform.getPlatformByName("CPU"),
+        {"Threads": str(CPU_THREADS)},
     )
     context.setPositions(model.positions)
     (out / "positions.xml").write_text(
@@ -155,7 +160,7 @@ def prepare(protocol, output):
 def context_from(prepared, integrator, backend):
     system = mm.XmlSerializer.deserialize((prepared / "system.xml").read_text())
     props = (
-        {"Threads": "2"}
+        {"Threads": str(CPU_THREADS)}
         if backend == "CPU"
         else {"Precision": "mixed", "DeterministicForces": "true"}
         if backend == "CUDA"
@@ -197,14 +202,35 @@ def controls(protocol, prepared, output):
     atom, axis = np.unravel_index(
         np.argmax(abs(forces[:atom_count])), forces[:atom_count].shape
     )
+    energy_platform = protocol["controls"].get("gradient_energy_platform", "CPU")
+    if energy_platform not in ("CPU", "Reference"):
+        raise ValueError("Unsupported derivative energy platform")
+    oracle = ctx
+    oracle_integrator = None
+    force_oracle_relative = 0.0
+    if energy_platform == "Reference":
+        oracle_integrator = mm.VerletIntegrator(0.001 * u.picoseconds)
+        oracle = mm.Context(
+            system, oracle_integrator, mm.Platform.getPlatformByName("Reference")
+        )
+        oracle.setState(state)
+        oracle_forces = np.asarray(
+            oracle.getState(getForces=True)
+            .getForces(asNumpy=True)
+            .value_in_unit(u.kilojoule_per_mole / u.nanometer)
+        )
+        force_oracle_relative = float(
+            np.linalg.norm(forces - oracle_forces)
+            / max(np.linalg.norm(oracle_forces), 1)
+        )
     eps = protocol["controls"]["finite_difference_nm"]
     energies = []
     for delta in (-eps, eps):
         q = pos.copy()
         q[atom, axis] += delta
-        ctx.setPositions(q * u.nanometer)
+        oracle.setPositions(q * u.nanometer)
         energies.append(
-            ctx.getState(getEnergy=True)
+            oracle.getState(getEnergy=True)
             .getPotentialEnergy()
             .value_in_unit(u.kilojoule_per_mole)
         )
@@ -212,6 +238,7 @@ def controls(protocol, prepared, output):
     analytic = float(forces[atom, axis])
     relative = abs(numerical - analytic) / max(abs(analytic), 1)
     wrong_sign = abs(numerical + analytic) / max(abs(analytic), 1)
+    del oracle, oracle_integrator
     ctx.setPositions(pos * u.nanometer)
     ctx.setVelocitiesToTemperature(
         protocol["temperature_K"] * u.kelvin, protocol["seeds"][0]
@@ -223,7 +250,10 @@ def controls(protocol, prepared, output):
     for dt in (0.001, 0.0005):
         integrator = mm.VerletIntegrator(dt * u.picoseconds)
         c = mm.Context(
-            system, integrator, mm.Platform.getPlatformByName("CPU"), {"Threads": "2"}
+            system,
+            integrator,
+            mm.Platform.getPlatformByName("CPU"),
+            {"Threads": str(CPU_THREADS)},
         )
         c.setPositions(pos * u.nanometer)
         c.setVelocities(velocities)
@@ -258,6 +288,8 @@ def controls(protocol, prepared, output):
         and minimized <= initial
         and relative < protocol["controls"]["gradient_relative_max"]
         and wrong_sign > 1
+        and force_oracle_relative
+        < protocol["controls"].get("CPU_Reference_force_relative_L2_max", 1)
         and all(
             d["energy_drift_over_initial_kinetic"]
             < protocol["controls"]["nve_drift_over_kinetic_max"]
@@ -275,6 +307,8 @@ def controls(protocol, prepared, output):
             "decreased": bool(minimized <= initial),
         },
         "force_gradient": {
+            "energy_platform": energy_platform,
+            "CPU_Reference_force_relative_L2": force_oracle_relative,
             "atom": int(atom),
             "axis": int(axis),
             "analytic_kJ_mol_nm": analytic,

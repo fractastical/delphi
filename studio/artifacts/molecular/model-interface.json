@@ -1,0 +1,86 @@
+{
+  "schema": "frontier.model.interface/1",
+  "model_id": "collagen_mimetic_md",
+  "name": "Collagen-mimetic atomistic MD (computed)",
+  "engine": "OpenMM8.4 CPU",
+  "status": "implemented",
+  "reference": {
+    "repo": "kganjam/delphi-frontier",
+    "branch": "work/multiscale-md",
+    "commit": "5a4b6fa",
+    "path": "artifacts/molecular/protocol.json,artifacts/molecular/cpu-trajectory-final/producer-run.py",
+    "files": {
+      "artifacts/molecular/protocol.json": "e888b7ef0d50407cc91f48f18e62f90e06a7f7dc3855d8c351b06f1a16e8828b",
+      "artifacts/molecular/cpu-trajectory-final/producer-run.py": "b7feb160ed410abf0b181ee677730f46bf5d1257e88e3c9b0ae4bd2c51d025d3"
+    },
+    "source_sha256": "5efd2d38607201d0262e6b1cdabd302685b1564c7b7bcaad26ad1fbe408b4fc7"
+  },
+  "ports": [
+    {
+      "name": "terminal_CA_distance",
+      "direction": "out",
+      "quantity": "molecular chain terminal separation",
+      "kind": "dimensional",
+      "unit": "nm",
+      "dim": {
+        "kg": 0,
+        "m": 1,
+        "s": 0
+      },
+      "scale": "molecular",
+      "regime": "300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim",
+      "context": "Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only",
+      "provenance": {
+        "source": "Actual saved OpenMM CPU trajectory metrics and exact source snapshot",
+        "status": "simulated",
+        "read_level": "file"
+      },
+      "bounds": null,
+      "caveat": "Three actual chain lengths, not a contour length or material modulus"
+    },
+    {
+      "name": "CA_RMSD",
+      "direction": "out",
+      "quantity": "C-alpha least-squares RMSD from production start",
+      "kind": "dimensional",
+      "unit": "nm",
+      "dim": {
+        "kg": 0,
+        "m": 1,
+        "s": 0
+      },
+      "scale": "molecular",
+      "regime": "300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim",
+      "context": "Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only",
+      "provenance": {
+        "source": "Actual saved OpenMM CPU trajectory metrics and exact source snapshot",
+        "status": "simulated",
+        "read_level": "file"
+      },
+      "bounds": null,
+      "caveat": "Rigid aligned; not an experimental accuracy measure"
+    }
+  ],
+  "timescale": {
+    "kind": "unknown",
+    "seconds": null,
+    "source": "0.2ps trajectory duration is not a physical relaxation-time estimate"
+  },
+  "run": {
+    "receipt": "artifacts/molecular/cpu-trajectory-final/receipt.json",
+    "protocol": "artifacts/molecular/protocol.json",
+    "controls": "artifacts/molecular/cpu-controls/controls.json",
+    "measured_biological_data": null
+  },
+  "scope": "Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only",
+  "not_established": [
+    "native fish collagen sequence",
+    "equilibrated conformational ensemble",
+    "force-field empirical accuracy",
+    "molecular stiffness",
+    "fibril assembly/crosslinking",
+    "tissue Young modulus",
+    "fin bending stiffness",
+    "fish function"
+  ]
+}
