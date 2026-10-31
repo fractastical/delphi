@@ -1,0 +1,34 @@
+{
+  "claim_id": "thompson1917-ch17-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch17-18",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "preregistered_at": "2026-10-31T21:40:00Z",
+  "hypothesis": "Among related teleost species (same family), relative body depth (depth/length) and relative body width (width/length) vary inversely, so that the length-weight coefficient k = W/L^3, a proxy for volume at a given length, varies less across species than either relative transverse dimension.",
+  "pass_criterion": "Pre-registered. Species means from FishShapes v1 specimens (standard length SL, maximum body depth BD, maximum fish width FW, mass M; specimens with all four > 0). Variables per species: d = ln(BD/SL), w = ln(FW/SL), k = ln(M/SL^3). Families with >= 5 species are kept and each variable is centred on its family mean. (A) Spearman rho between family-centred d and w is < 0 with one-sided p < 0.05. (B) the SD of family-centred k is smaller than the SDs of family-centred d and of family-centred w. SUPPORTS if A and B both hold.",
+  "fail_criterion": "Pre-registered. REFUTES if the Spearman rho between family-centred d and w is >= 0 AND the SD of family-centred k is >= the smaller of the SDs of family-centred d and w. Any other outcome is MIXED. Fewer than 20 qualifying families or 200 species: inconclusive (underpowered).",
+  "planned_datasets": [
+    "fishshapes-v1-dryad-vt4b8gtvf"
+  ],
+  "interpretation": "Thompson's 'expansion in one transverse dimension compensated by compression in the other' is read as negative covariation of depth and width at a given length among related fishes; 'related' is operationalized as the same family (FishBase family names used in FishShapes). Length is standard length; 'thickness' is maximum fish width; 'volume at a given length' is mass/SL^3 (Thompson's k uses weight, so mass is the direct quantity). Family-centring removes between-family differences so that the comparison is among related species, as Thompson's haddock/plaice and shark/skate examples are. Because ln k is approximately d + w + ln(density x shape factor), condition B can hold only if d and w covary negatively; it is the 'volume less affected than the linear dimensions' clause. Secondary, reported but not part of the verdict: Thompson's named pair, plaice (Pleuronectes platessa) vs haddock (Melanogrammus aeglefinus), if both are in the data: depth ratio expected ~2, width ratio ~0.5, k ratio ~1. Note they are in different orders, so this pair is not 'related' by the family criterion.",
+  "test_contract": {
+    "expected_observation": "Within fish families, species that are relatively deeper are relatively narrower (negative family-centred correlation of ln(depth/SL) and ln(width/SL)), and ln(mass/SL^3) varies less than either.",
+    "disconfirming_observation": "Relative depth and width covary positively or not at all within families, and mass/SL^3 varies at least as much as the less variable of the two transverse dimensions.",
+    "admissible_datasets": "Measurements of standard length, maximum body depth, maximum body width and mass taken on the same fish specimens, across many species in many families, by a source independent of Thompson; species identified to FishBase taxonomy; public licence.",
+    "inference_method": "Species means, family-centring for families with >= 5 species, Spearman correlation of centred ln depth ratio vs ln width ratio (one-sided test for negative), and comparison of the SDs of centred ln k vs centred ln depth and width ratios, against the pre-registered thresholds."
+  },
+  "preregistration": {
+    "min_species_per_family": 5,
+    "min_families": 20,
+    "min_species": 200,
+    "alpha_one_sided": 0.05,
+    "species_mean": "geometric mean over specimens of each measurement",
+    "pair_check": {"plaice": "Pleuronectes platessa", "haddock": "Melanogrammus aeglefinus", "expected": {"depth_ratio": [1.5, 2.7], "width_ratio": [0.35, 0.7], "k_ratio": [0.8, 1.25]}}
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
