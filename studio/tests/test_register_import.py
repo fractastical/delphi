@@ -124,8 +124,8 @@ def test_whole_register_imports_and_none_of_it_is_actionable(store, tmp_path):
         assert fields["why_source"]["problems"] == 34
         assert chosen["no_resolvable_source"] == 0 and chosen["attestation_open_with_locator_and_quote"] == 216
     # A curator's question is never labelled as a primary-literature open problem, and nothing was promoted.
-    assert report["problem_kind_used"] == ["project_gap"]
-    assert all(d["payload"]["problem_kind"] == "project_gap" and d["payload"]["completeness"] == "recorded" for d in drafts)
+    assert report["problem_kind_used"] == ["curated_question"]
+    assert all(d["payload"]["problem_kind"] == "curated_question" and d["payload"]["completeness"] == "recorded" for d in drafts)
     # Citations only: every quote, locator and identifier in a draft is exactly one the register carries.
     import yaml
     register = {p["slug"]: p for p in yaml.safe_load(REGISTER.read_text())["problems"]}
@@ -300,7 +300,7 @@ def test_attestation_is_salvaged_verbatim_without_promotion_or_a_primary_field_l
     d = ir.to_draft(entry(attestations=[q]))
     problem = valid(d)
     assert problem.completeness == "recorded" and not problem.next_action and not problem.falsifiers
-    assert problem.problem_kind == "project_gap" and problem.problem_kind != "sourced_field_open_problem"
+    assert problem.problem_kind == "curated_question" and problem.problem_kind not in ("sourced_field_open_problem", "project_gap")
     assert problem.source.uri == "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1/" and problem.source.locator == "Results"
     assert problem.source.content_available is False and problem.source.content_sha256 is None
     assert "not checked against the source" in problem.source.access and "primary-literature" in problem.source.access
@@ -377,3 +377,16 @@ def test_report_counts_the_three_fields_separately():
     assert a["problems_resting_on_exactly_one_distinct_source"] == 2
     assert f["problems_with_none_of_the_three"] == 1
     assert [ir.legacy_provenance_path(p) for p in problems] == ["none", "references", "why_source", "references", "none"]
+
+
+def test_curated_question_is_a_new_kind_and_the_existing_kinds_and_completeness_rule_are_unchanged():
+    base = a_recorded_problem(type("S", (), {"namespace": "node-a"})())["payload"]
+    for kind in ("project_gap", "computational_open_question", "sourced_field_open_problem", "resolved_scope_correction", "curated_question"):
+        assert Problem.model_validate(base | {"problem_kind": kind}).problem_kind == kind
+    with pytest.raises(ValueError):
+        Problem.model_validate(base | {"problem_kind": "curated"})
+    # The new kind does not relax actionability: an actionable curated question still needs all four fields.
+    with pytest.raises(ValueError) as caught:
+        Problem.model_validate(base | {"problem_kind": "curated_question", "completeness": "actionable"})
+    assert all(f in str(caught.value) for f in ACTIONABILITY)
+    assert Problem.model_validate(base | {"problem_kind": "curated_question"}).completeness == "recorded"
