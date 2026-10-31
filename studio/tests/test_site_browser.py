@@ -1316,3 +1316,47 @@ def test_cfd3d_cards_keep_the_failed_reference_and_unresolved_fins(browser, base
     import hashlib
     b = (ROOT / "site/artifacts/molecular/warmstart-v3.tar.xz").read_bytes()
     assert hashlib.sha256(b).hexdigest() == "4154fcdc3784fa1bfe6c667cdc20fabc346e8c482d9010ad5646a10eea78c3bf"
+
+
+def test_design_review_shows_challenges_left_on_the_earlier_project_version(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    hist = snap["design_review"]["history"][0]["ref"]; head = snap["design_review"]["current_project"]["ref"]
+    from urllib.parse import urlparse, parse_qs
+    seen = []
+    ch = {"namespace": "delphi-frontier", "kind": "Annotation", "id": "old-challenge", "version": "c" * 64}
+
+    def ctx(route):
+        q = parse_qs(urlparse(route.request.url).query); v = q["version"][0]; seen.append(v)
+        rows = [] if v == head["version"] else [{"ref": ch, "record": {"payload": {"kind": "challenge", "body": "Old-version challenge text.", "anchor": {"record": hist}, "design_review": {"dimension": "validation", "evidence_basis": "unknown", "scope": "s", "alternative": "a", "falsifiable_next_test": "t", "evidence_refs": []}}}, "local_status": "proposed", "anchor_ref": hist, "member_index": None}]
+        route.fulfill(json={"schema": "frontier.project.design-context/1", "annotations": rows, "withheld_unlicensed": 0, "pagination": {"limit": 50, "returned": len(rows), "next_cursor": None, "truncated": False}, "interpretation": "Annotations are authored challenges or replies, not votes."})
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "delphi-frontier", "next_cursor": None, "results": [{"record": {**head, "payload": {"title": "Mission"}}, "local_status": "proposed", "is_head": True}]}))
+    pg.route("**/api/design/context*", ctx)
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector(".drprev .drcard", timeout=20000)
+    t = pg.locator("#drlive").text_content()
+    assert "0</b> challenges" in pg.locator("#drlive .drhead").inner_html() or "0 challenges" in t
+    assert "Earlier version of this Project" in t and "Old-version challenge text." in t and "were not moved" in t and "22 declared members" in t
+    assert head["version"] in seen and hist["version"] in seen, seen
+
+
+def test_home_offers_the_v3_display_props_with_hash_exact_stl_downloads(browser, base):
+    import hashlib
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    assert snap["print_v3"]["refused"] == []
+    for f in snap["print_v3"]["forms"]:
+        for x in f["files"]:
+            b = (ROOT / "site" / x["href"]).read_bytes()
+            assert len(b) == x["bytes"] and hashlib.sha256(b).hexdigest() == x["sha256"], x["href"]
+    pg = page(browser)
+    pg.goto(base + "#/home"); pg.wait_for_selector(".printv3 select")
+    assert pg.locator(".printv3 option").all_inner_texts() == ["fish3d-v3a-fan-prop", "fish3d-v3b-glide-pose-prop"]
+    assert pg.locator(".printv3 .v3links a[download]").count() == 3
+    pg.select_option(".printv3 select", "fish3d-v3b-glide-pose-prop")
+    hrefs = pg.locator(".printv3 .v3links a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert all("fish3d-v3b-glide-pose-prop" in h and h.endswith(".stl") for h in hrefs), hrefs
+    assert "printer and resin unknown" in pg.locator(".printv3").text_content() and "not organisms" in pg.locator(".printv3 .v3info").text_content()
+    assert pg.request.get(base + hrefs[0]).status == 200

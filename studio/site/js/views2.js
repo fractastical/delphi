@@ -60,6 +60,22 @@
       info.textContent = `${f.title}. Bounding box ${(f.bounds_mm || []).map((v) => v.toFixed(1)).join(" × ")} mm at print size. Illustrative print form, not a validated design; the drawing above does not change with this choice.`;
     };
     selEl.addEventListener("change", show); show();
+    const V3 = snap && snap.print_v3 && snap.print_v3.forms.filter((f) => f.files.some((x) => x.kind === "stl_prop"));
+    if (V3 && V3.length) {                                           // v3 display props: three STL files per form, every one hash-checked by the build
+      const id3 = id + "v3"; const b3 = document.createElement("div"); b3.className = "printv3";
+      b3.innerHTML = html`<label for="${id3}"><b>v3 display props</b> (STL, millimetres, display scale)</label> <select id="${id3}">${V3.map((f) => html`<option value="${f.id}">${f.id}</option>`)}</select>
+        <span class="v3links"></span><p class="small faint v3info" aria-live="polite"></p>
+        <details><summary class="small">Print limits (printer and resin unknown, nothing sliced or printed)</summary><ul class="small">${snap.print_v3.limitations.map((x) => html`<li>${x}</li>`)}</ul></details>`.toString();
+      host.appendChild(b3);
+      const sel3 = b3.querySelector("select"), links = b3.querySelector(".v3links"), inf = b3.querySelector(".v3info");
+      const NAMES = { stl_prop: "Download prop STL (smooth, gated)", stl_prop_scale_relief: "Download prop with scale relief STL", stl_stand: "Download stand STL" };
+      const show3 = () => {
+        const f = V3.find((x) => x.id === sel3.value); links.textContent = "";
+        f.files.filter((x) => NAMES[x.kind]).forEach((x) => { const a = document.createElement("a"); a.className = "btn small"; a.href = x.href; a.setAttribute("download", x.href.split("/").pop()); a.textContent = NAMES[x.kind] + ` (${(x.bytes / 1e6).toFixed(1)} MB)`; links.append(a, " "); });
+        inf.textContent = `${f.title}. ${f.prop_size_mm ? "Prop size " + [].concat(f.prop_size_mm).map((v) => (typeof v === "number" ? v.toFixed(1) : v)).join(" × ") + " mm at display scale " + f.display_scale + ". " : ""}Engineered illustrative forms, not organisms; membranes and rays are thickened for printing, not biological thickness.`;
+      };
+      sel3.addEventListener("change", show3); show3();
+    }
   };
 
   /* STL (binary or ASCII) -> triangles in metres in the viewer's frame (x length, y up = STL z, z right = STL y). */
