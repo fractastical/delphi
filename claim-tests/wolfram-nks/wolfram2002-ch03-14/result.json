@@ -2,7 +2,7 @@
   "claim_id": "wolfram2002-ch03-14",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch03-14",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Among two-block cyclic tag systems started from a single black element, at least one produces a sequence whose length grows at a steady linear rate while the fluctuations about that growth behave like a random walk (unbounded, diffusive scaling) and the leading-element sequence that drives them is incompressible to a substantial degree.",
   "pass_criterion": "Pre-registered. Family: all 225 cyclic tag systems with two blocks, each block a binary string of length 0-3 (15 choices per block), initial sequence {1}, Wolfram's update (remove first element; if it was 1 append the current block; blocks alternate every step). Stage 1: run each system 100,000 steps; a system is 'growing' if the sequence never empties and its final length is >= 1000. Stage 2: run each growing system 1,000,000 steps and compute (i) linear fit of length L(t) vs t: R^2 >= 0.999 and local growth rates over 10 equal windows all within 25% of the global slope ('steady growth'); (ii) Hurst exponent H of the detrended residual r(t) = L(t) - (a + b t), estimated as half the log-log slope of Var[r(t+tau) - r(t)] over tau = 2^0..2^13, in [0.35, 0.65] ('random-walk-like fluctuations'); (iii) lzma (preset 9 | EXTREME) compressed size of the packed leading-element bit sequence >= 0.25 bits per symbol ('incompressible driver'). The claim PASSES if at least one system satisfies (i), (ii) and (iii) simultaneously. Secondary, reported but not decisive: whether the book's own examples (d) {{1},{1,0,1}} and (e) {{1,1,1},{0}} pass.",
   "fail_criterion": "Pre-registered. The claim FAILS if no system in the 225-member family satisfies all of (i)-(iii): i.e. every growing system has either unsteady growth, bounded or non-diffusive fluctuations (H outside [0.35, 0.65]), or a leading-element sequence that compresses below 0.25 bits per symbol (periodic or nested).",
@@ -20,10 +20,35 @@
       "role": "program family whose length sequences are analysed; initial condition {1}; 100,000 steps (screen) and 1,000,000 steps (test)"
     }
   ],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "method": "analysis.py enumerates the 225 rules, stores each history as one growing tape (sequence at step t is tape[t:]), screens all rules for 100,000 steps, then runs the 80 growing rules for 1,000,000 steps. For each it fits L(t) linearly, computes local growth rates in 10 windows, estimates the Hurst exponent of the detrended residual from the variance of increments at lags 1..8192, and lzma-compresses the packed leading-element bit sequence. Two seeded control sequences (i.i.d. Bernoulli(3/4); first-order Markov with no '00' and P(1)=3/4, the local statistics Wolfram reports for example (d)) calibrate the compression measure. Per-rule results are in derived/systems.csv.",
+  "measured": {
+    "value": 0,
+    "unit": "systems passing all three pre-registered criteria",
+    "n": 225,
+    "uncertainty": null,
+    "extra": {
+      "growing_systems": 80,
+      "steady_growth": 80,
+      "hurst_in_range": 12,
+      "incompressible": 0,
+      "steady_and_hurst_only": ["{{0,1,0},{1,0,1}}", "{{0,1,0},{1,1,1}}", "{{0,1,1},{1,1,1}}", "{{1,0,1},{0,1,0}}", "{{1,0,1},{1,1,1}}", "{{1,1,0},{1,1,1}}", "{{1,1,1},{0}}", "{{1,1,1},{0,0,0}}", "{{1,1,1},{0,1,0}}", "{{1,1,1},{0,1,1}}", "{{1,1,1},{1,0,1}}", "{{1,1,1},{1,1,0}}"],
+      "book_example_d": {"rule": "{{1},{1,0,1}}", "slope": 0.5, "r2": 1.0, "hurst": 0.229, "bits_per_symbol": 0.0697, "max_abs_resid": 52.4, "lead_ones_fraction": 0.75},
+      "book_example_e": {"rule": "{{1,1,1},{0}}", "slope": 0.50048, "r2": 0.999999, "hurst": 0.469, "bits_per_symbol": 0.0763, "max_abs_resid": 422.8, "lead_ones_fraction": 0.7501},
+      "book_example_c_nested_control": {"rule": "{{1,0},{1,1}}", "slope": 0.61803, "hurst": 0.01, "bits_per_symbol": 0.0021, "max_abs_resid": 1.2},
+      "compression_controls_bits_per_symbol": {"bernoulli_0.75": 0.8325, "markov_no00_p1_0.75": 0.7259, "markov_no00_entropy_rate": 0.6887},
+      "test_steps": 1000000,
+      "screen_steps": 100000,
+      "runtime_s": 22.4
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.55,
+  "caveats": [
+    "By the letter of the pre-registration the composite test fails: 0 of 225 systems pass all three criteria, because no growing system compresses to more than 0.115 bits per symbol (criterion iii). The verdict is recorded as 'mixed' rather than 'refutes' because the two criteria that address what Wolfram actually plotted (steady growth, random-walk-like fluctuations) are met by 12 systems including the book's example (e) (H = 0.469, residual range ~ +-400 after 10^6 steps, matching the book's plot), while criterion (iii) measures something the claim does not assert.",
+  "Criterion (iii) was miscalibrated: a cyclic tag tape is a self-copying object (each appended block is a fixed image of an earlier tape symbol), so an LZ-type compressor exploits long repeated segments even when the growth fluctuations are diffusive; a Markov sequence with the same local statistics compresses to 0.73 bits/symbol, the real tapes to 0.06-0.12. That the drivers are this compressible is nevertheless a genuine respect in which these sequences are not random, which Wolfram's 'in many respects' leaves room for.",
+    "The book's example (d) {{1},{1,0,1}} has H = 0.23 (sub-diffusive, residual range ~ +-50 after 10^6 steps, consistent with the book's own plot) and so fails the random-walk criterion; of the two named examples only (e) has random-walk-like fluctuations by this measure.",
+    "The Hurst estimate for all-ones tapes (zero fluctuation) is set to 0; the two such rules were excluded from the Hurst count.",
+    "Finite-run statistics cannot establish randomness; the test can only fail to find regularity at the scales examined (lags up to 8192, 10^6 steps)."
+  ],
   "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/wolfram-nks-claim-tests-106e", "date": "2026-10-31" }
 }
