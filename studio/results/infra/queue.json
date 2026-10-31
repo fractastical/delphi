@@ -1,6 +1,6 @@
 {
   "schema": "frontier.compute-queue/1",
-  "observed_at_utc": "2026-10-31T22:20:19.964367Z",
+  "observed_at_utc": "2026-10-31T22:33:59.251481Z",
   "owner": "infra_director",
   "tasks": [
     {
@@ -77,30 +77,94 @@
       "job_id": "aijob-e00bqeswtkd7dexff4",
       "task": "Morpheus full-horizon baseline/feedback-off/seed-repeat",
       "owner": "infra_director",
-      "provider_state": "RUNNING",
+      "provider_state": "FAILED",
       "scope": "CPU-only4vCPU,3one-thread arms,3000s each; generic model, nofishcalibration. Prior local partial run retained.",
       "protocol": "artifacts/multicell/packet/README.md",
       "result": "results/infra/morpheus-admission.json"
+    },
+    {
+      "job_id": "aijob-e00q8z2et1q0zf5qaq",
+      "task": "Morpheus all-arm artifact recovery",
+      "owner": "infra_director",
+      "provider_state": "COMPLETED",
+      "result": "results/infra/morpheus-v2-completion.json",
+      "scope": "Allthree arms through originalt2;256/128/263 finalcells; genericmodel, nofishcalibration/convergence."
+    },
+    {
+      "job_id": "aijob-e00s3bqbccez3bjpm9",
+      "task": "Controlled3D WaterLily first packet",
+      "owner": "infra_director",
+      "provider_state": "FAILED",
+      "result": "results/infra/cfd3d-admission.json",
+      "scope": "GeometrymetadataSHA failed despite12matchingSTLs; noCFDran. Ownerdiagnosingexactmetadata difference; no gate relaxation."
+    },
+    {
+      "job_id": "aijob-e00cz0vk0jepf7j2fc",
+      "task": "Conditional RD diffusion control, training and held-out evaluation",
+      "owner": "infra_director",
+      "provider_state": "IMAGE_PULLING",
+      "result": "results/infra/diffusion/manifest-infra19.json",
+      "scope": "One H100, useful run capped30min; actualCUDA control required; dimensionlessRD, nofishcalibration."
+    },
+    {
+      "job_id": "aijob-e00m8v3m77z86n5ads",
+      "task": "CFD candidate metadata CPU-only diagnosis",
+      "owner": "infra_director",
+      "provider_state": "COMPLETED",
+      "result": "results/infra/cfd3d-candidate-difference.json",
+      "scope": "Default cloud reproduces failed hash; disabling specified AVX512 dispatch matches original pin. Three float64 widths differ by1\u20132ULP; allSTLs already matched. No physical CFD validation."
+    },
+    {
+      "job_id": "aijob-e00qxektzctnk69zwg",
+      "task": "Exact-state molecular900ps conditional extensions",
+      "owner": "infra_director",
+      "provider_state": "STARTING",
+      "result": "results/infra/md-v3/manifest-infra21.json",
+      "scope": "Three existing branches100ps\u21921ns total, declarednewRNGseeds, originalCPU/CUDAgates; smallwindowdrift diagnostic not equilibrium."
+    },
+    {
+      "job_id": "aijob-e00k0jpm34h4na3b99",
+      "task": "Controlled3D GPU retry after exact metadata diagnosis",
+      "owner": "infra_director",
+      "provider_state": "PROVISIONING",
+      "result": "results/infra/cfd3d-v2/manifest-infra22.json",
+      "scope": "Geometry-only declaredSIMDsetting repair; exactmesh/candidategates unchanged; C1physicalreference failure remains."
     }
   ],
   "preparation": [
     {
-      "task": "WaterLily controlled3D fish",
+      "task": "Conditional RD diffusion model",
+      "owner": "dx-market-r1",
+      "priority": 1,
+      "state": "dispatched",
+      "budget": "oneH100,atmost30minusefultraining/eval",
+      "next_acceptance": "FrozenrealRDdataset/trainheldoutsplit,CPU/CUDAcontrol,smallDDPMcheckpoint/eval; noheavyhosttraining",
+      "packet_commit": "4a5394f3",
+      "job_id": "aijob-e00cz0vk0jepf7j2fc"
+    },
+    {
+      "task": "Controlled3D metadata repair",
       "owner": "claude04",
-      "state": "packet finalizing",
-      "next_acceptance": "Frozen archive/SHA, safe packaging preflight, bounded total runtime, actual same-job CPU/CUDA gates; existing sphere physical-reference failure preserved."
+      "priority": 1,
+      "state": "repaired_packet_dispatched",
+      "next_acceptance": "ExactcandidateJSONdifference identified; physicalmesh pins preserved; recordfailureandfreezejustifiedrepair",
+      "packet_commit": "7abfc640",
+      "job_id": "aijob-e00k0jpm34h4na3b99"
+    },
+    {
+      "task": "900ps molecular conditional extensions",
+      "owner": "mechanobio_sim",
+      "priority": 2,
+      "state": "dispatched",
+      "packet_commit": "962b088",
+      "next_acceptance": "PublicwarmstartHTTP200+SHA4154fcdc3784fa1bfe6c667cdc20fabc346e8c482d9010ad5646a10eea78c3bf; originalsame-statecontrols+CUDAparity retained",
+      "job_id": "aijob-e00qxektzctnk69zwg"
     },
     {
       "task": "Pressure-to-fin-mechanics bridge",
-      "owner": "claude04",
-      "state": "owner WaterLily controls pending",
-      "next_acceptance": "Pressure Pa to traction N to beam q(s) N/m; analytic integration and spatial/load refinement; assumed EI"
-    },
-    {
-      "task": "N2/N3 wing-span comparison",
-      "state": "blocked_model_scope",
-      "evidence": "results/infra/mask-distinguishability.json",
-      "reason": "Current2D sagittal projection omits span; no aspect-ratio benefit claim"
+      "owner": "claude07",
+      "state": "requiresactualpressurefields",
+      "next_acceptance": "DimensionedpressurePa\u2192tractionN\u2192rayloadN/m withanalytic/refinementcontrols; unknownfishEI staysassumed"
     }
   ],
   "policies": {
@@ -110,5 +174,6 @@
     "provider_cost": "unknown",
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
-  }
+  },
+  "updated_at_utc": "2026-10-31T22:47:10.225911+00:00"
 }

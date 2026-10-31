@@ -121,8 +121,11 @@ function main(case_path, out)
         off = k in CLOSED ? 2.0 : HALF_THK + 1.0
         rows = surface_rows(gdir, k, p, pref, U, L, snout, off)
         writef32(joinpath(out, "surface", "$k.f32"), rows)
+        thk = get(get(comp["components"][k]["params"], "thickness_mm", Dict()), "value", nothing)
         surf[k] = Dict("rows" => size(rows, 2), "offset_cells" => off, "resolved" => k in CLOSED,
-                       "thickness_mm" => get(get(comp["components"][k]["params"], "thickness_mm", Dict()), "value", nothing),
+                       "thickness_mm" => thk, "thickness_m" => thk === nothing ? nothing : thk / 1000,
+                       "half_thk_cells" => k in CLOSED ? nothing : HALF_THK,
+                       "thickness_cells" => thk === nothing ? nothing : thk / 1000 / h_m,
                        "stl_sha256" => comp["components"][k]["stl_sha256"])
     end
     w = ts .>= case["t_avg"]; q = 0.5U^2 * L^2       # coefficients on L_ref^2
