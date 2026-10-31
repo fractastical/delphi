@@ -24,7 +24,7 @@ def diagnose(prepared, state_path, output, component=None):
     force_arrays = {}
     for backend in ("CPU", "Reference"):
         integrator = mm.VerletIntegrator(0.001 * u.picoseconds)
-        properties = {"Threads": "2"} if backend == "CPU" else {}
+        properties = {"Threads": "1"} if backend == "CPU" else {}
         context = mm.Context(
             system, integrator, mm.Platform.getPlatformByName(backend), properties
         )

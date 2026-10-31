@@ -136,3 +136,26 @@ The first exploratory CPU receipt had a source-file hashing race and was exclude
 then rerun with import-time code hashing and an exact saved producer source.
 Its excluded bytes remain outside the release evidence for audit; no result was
 silently substituted. Simulation and render hashes are separate.
+
+## First GPU attempt: preserved numerical gate failure and repair
+
+Job `aijob-e00a3q798jsc6fdbas` stopped before CUDA production. Its CPU finite-
+difference force error was 0.006232 against the frozen 0.005 limit; minimization
+and both NVE checks passed. The [failed controls](../artifacts/molecular/gpu-attempt-1/controls.json)
+remain failed. On the exact recovered minimized state, the diagnostic reproduced
+CPU derivative error 0.006657 at the same 0.00001 nm perturbation. At smaller
+perturbations the CPU error worsened, consistent with cancellation in differences
+of large total energies. The high-precision Reference implementation had derivative
+self-error 4.86e-8 at the original perturbation; CPU force versus that derivative
+had error 6.11e-6. Full CPU/Reference force-vector discrepancy was 4.61e-5.
+
+Protocol revision 2 was committed before repaired-control outputs. It evaluates
+finite-difference energies with the double-precision Reference backend and compares
+them against CPU forces at the same coordinates. The perturbation and original
+0.005 gradient limit remain unchanged; a full-vector force comparison is added.
+The complete repaired control run on the recovered preparation passed: gradient
+error 8.52e-5, full-vector discrepancy 4.60e-5 and NVE drift ratios 0.001411 and
+0.0003601. This repairs the precision of a numerical measurement, not the physical
+model or its empirical validity. No acceptance was relaxed. The first failed job
+is not relabeled as a pass. A subsequent CUDA run still needs its own passing
+same-system CPU/CUDA gate and actual trajectory receipt.
