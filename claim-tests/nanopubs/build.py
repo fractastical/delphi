@@ -389,6 +389,34 @@ def build(rec, now):
                 result_commit=latest["sha"], signed=False, published=False)
 
 
+SUMMARY_OK = re.compile(r"^Summary: 1 valid \(not trusty\);", re.M)
+SUMMARY_BAD = re.compile(r"^Summary: .*\b[1-9]\d* errors?\b|RDF ERROR|Exception", re.M)
+
+
+def np_check(jar, path):
+    """Run `check -v`; validity comes from the anchored Summary line, never from the exit code (1.95.0 exits 0 on parse errors)."""
+    cp = subprocess.run(["java", "-jar", jar, "check", "-v", path], capture_output=True, text=True)
+    out = (cp.stdout + cp.stderr).strip()
+    valid = bool(SUMMARY_OK.search(out)) and not SUMMARY_BAD.search(out)
+    issues = [ln.strip()[2:] for ln in out.split("\n") if ln.strip().startswith("- ")]
+    return valid, cp.returncode, issues, out
+
+
+def selftest(jar):
+    """Negative test: a deliberately broken copy of a draft must come back not valid, or the gate is worthless."""
+    import tempfile
+    src = sorted(os.listdir(OUT))[0]
+    text = open(os.path.join(OUT, src), encoding="utf-8").read()
+    broken = text.replace("sub:assertion {", "sub:assertion {\n  <urn:x> <urn:y> \"unterminated ;", 1)
+    with tempfile.TemporaryDirectory() as td:
+        bp = os.path.join(td, "broken.trig")
+        open(bp, "w", encoding="utf-8").write(broken)
+        valid, code, _, out = np_check(jar, bp)
+    if valid:
+        raise SystemExit("np check self-test FAILED: a broken file was reported valid")
+    return {"broken_file_reported_valid": valid, "exit_code_on_broken_file": code, "summary_line": next((ln for ln in out.split("\n") if ln.startswith("Summary:")), "")}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", metavar="JAR", help="path to nanopub-*-jar-with-dependencies.jar; runs `check` on every output")
@@ -401,12 +429,11 @@ def main():
         log = []
         for e in entries:
             p = os.path.join(HERE, e["file"])
-            cp = subprocess.run(["java", "-jar", args.check, "check", "-v", p], capture_output=True, text=True)
-            out = (cp.stdout + cp.stderr).strip()
-            valid = "Valid (but not trusty)" in out and "RDF ERROR" not in out and "errors" not in out
-            issues = [ln.strip()[2:] for ln in out.split("\n") if ln.strip().startswith("- ")]
-            e["np_check"] = dict(valid=valid, exit_code=cp.returncode, issues=issues)
-            log.append(f"## {e['file']} ({'VALID' if valid else 'NOT VALID'}, exit {cp.returncode})\n{out}\n")
+            valid, code, issues, out = np_check(args.check, p)
+            e["np_check"] = dict(valid=valid, exit_code=code, issues=issues)
+            log.append(f"## {e['file']} ({'VALID' if valid else 'NOT VALID'}, exit {code})\n{out}\n")
+        manifest["np_check_selftest"] = selftest(args.check)
+        log.append(f"## self-test on a deliberately broken copy: {json.dumps(manifest['np_check_selftest'])}\n")
         ver = subprocess.run(["java", "-jar", args.check], capture_output=True, text=True)
         manifest["checked_with"] = (ver.stdout + ver.stderr).strip().split("\n")[-1]
         with open(os.path.join(HERE, "check.log"), "w", encoding="utf-8", newline="\n") as fh:
