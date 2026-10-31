@@ -15,9 +15,12 @@ Don't grep TriG files or hand-write SPARQL first. Use the `delphisci` MCP server
 4. `delphi_graph` for thinker/year/status views and model truth scores (from `docs/claims.json`).
 5. `delphi_organisms` / `delphi_get_organism` for the animal taxa, their vendored datasets and the
    per-taxon dataset-coverage ranking (genome, bioelectric, traits, fossils, …).
+6. `delphi_claim_tests` for tests against data: counts by verdict and data kind, one claim's full
+   `result.json`, pre-registered tests, and `view: "candidates"` for untested claims ranked by
+   testability (what to test next).
 
 Without MCP, the same queries are available as
-`node mcp/cli.mjs <overview|search|claim|rank|graph|organisms|organism|sparql>`.
+`node mcp/cli.mjs <overview|search|claim|rank|graph|tests|organisms|organism|sparql>`.
 Outside the repo, `npx -y github:fractastical/delphi` runs the same server.
 
 Default `source` is `local` (repo files, including unpublished drafts). Pass `source: "network"`

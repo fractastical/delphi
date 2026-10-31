@@ -122,7 +122,7 @@ if (readme.includes(START) && readme.includes(END)) {
     `| tests pre-registered, awaiting data | ${pending.length} |`,
     `| claims neither proved nor tested | ${count(c => c.verification === "untested" && !c.evidence)} |`,
     "",
-    "Every tested claim with its verdict: [`test-data/claim-tests/SUMMARY.md`](test-data/claim-tests/SUMMARY.md). Per-claim fields: [`docs/claims.json`](docs/claims.json) (`evidence`, `data_test`, `theorem`).",
+    "Every tested claim with its verdict: [`test-data/claim-tests/SUMMARY.md`](test-data/claim-tests/SUMMARY.md). Per-claim fields: [`docs/claims.json`](docs/claims.json) (`evidence`, `data_test`, `theorem`). Over MCP: `delphi_claim_tests` (summary, one claim's full result, and untested claims ranked by testability).",
     END].join("\n");
   writeFileSync(README, readme.replace(new RegExp(`${START}[\\s\\S]*?${END}`), block));
   console.log("README.md numbers block updated");

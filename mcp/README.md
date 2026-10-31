@@ -97,6 +97,7 @@ Use `local` while building; use `network` when citing something or checking what
 | `delphi_get_claim` | Get one claim by short id or IRI: all fields (math, assumptions, proposed test, sources) and every assessment with per-dimension scores. |
 | `delphi_rank_claims` | Rank claims by one assessment type. Omit `type` to list the types. |
 | `delphi_graph` | The claim graph ([`docs/claim-graph.html`](../docs/claim-graph.html)). With no arguments: its verification status table per thinker (theorems, math claims, Lean-checked, proved in the literature, partly proved, unverified, refuted) as markdown, every count linking to the page filtered to it. With filters (thinker, work, year, status, `verification`, `math`, `theorem`, kind, truth) or `view: "claims"`: the matching claims, each with a `graph` link; sort by `truth`, `truth-asc`, `disagreement` (max − min p_true across models), `testability` or `year`; or `groupBy` thinker/work/decade/status/verification/kind for counts and means. Links point at the local `docs/`; set `DELPHI_DOCS_URL` to link a hosted copy instead. |
+| `delphi_claim_tests` | Tests of claims against data. No arguments: how many claims are tested, by thinker, verdict (`supports`, `mixed`, `refutes`, `inconclusive`) and data kind (`biological` = organisms, `physical`, `computational`), plus pre-registered tests awaiting data. `view: "list"` with `verdict`/`dataKind`/`thinker`/`status`/`math`/`text` filters: test runs with hypothesis and a GitHub link. `view: "claim", id`: every run for one claim with the full `result.json` (criteria, datasets with checksums, method, measured values, caveats). `view: "candidates"`: untested claims ranked by testability, i.e. what to test next. |
 | `delphi_organisms` | Rank or filter the 782 animal taxa in [`test-data/organisms/merged`](../test-data/organisms/merged) by dataset coverage. Filter by name, class, rank, project, `hasAxis`/`missingAxis` (e.g. `hasAxis: ["genome"], missingAxis: ["traits"]`), `genomeLevel`, score, mentions; sort by `score`, `score-asc`, `mentions`, `datasets`, `name`; `groupBy` class/rank/project/genomeLevel; or `overview: true` for axis totals. |
 | `delphi_get_organism` | One taxon by key (`gbif:2495414`), slug, accepted name or vernacular: identifiers, lineage, names as written, coverage score and missing axes, every dataset record with counts/distributions/integrity, every located mention. |
 | `delphi_sparql` | Anything else. Read-only `SELECT`, `ASK`, `CONSTRUCT` or `DESCRIBE` (the last two return N-Triples); each common prefix is added unless the query declares it. |
@@ -165,6 +166,11 @@ established, by a Lean 4 module that compiled with no `sorry` (`proof: "lean"`, 
 from `claim-sources/math-bio-claims/claims/key-claims.json`); otherwise `untested`, `partial` or `refuted`.
 `theorem` is true only for `math` claims that are `proved`. Truth scores never affect it. Membership
 in `claim-sources/math-bio-claims/` does not make a claim a theorem: 5 of its 21 claims are not `proved`.
+
+`delphi_claim_tests` reads every `result.json` under `test-data/claim-tests/` directly (rescanned
+every 30 s, so new tests show up without a rebuild) and joins it to labels and testability in
+`docs/claims.json`. Its summary counts a claim once even with several runs, matching the claim's
+`evidence` field and [`test-data/claim-tests/SUMMARY.md`](../test-data/claim-tests/SUMMARY.md).
 
 ### Organism coverage scores
 

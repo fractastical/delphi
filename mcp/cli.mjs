@@ -9,6 +9,10 @@
 //   node mcp/cli.mjs graph --group-by thinker
 //   node mcp/cli.mjs graph --math --verification untested --group-by thinker
 //   node mcp/cli.mjs sparql 'SELECT ...'
+//   node mcp/cli.mjs tests                              (claims tested against data, by verdict and data kind)
+//   node mcp/cli.mjs tests list --verdict refutes --data-kind biological
+//   node mcp/cli.mjs tests claim --id darwin1859-ch12-11
+//   node mcp/cli.mjs tests candidates --thinker thompson --math   (untested, by testability)
 //   node mcp/cli.mjs organisms --overview
 //   node mcp/cli.mjs organisms --has-axis genome --missing-axis traits --rank species
 //   node mcp/cli.mjs organisms --group-by class
@@ -23,6 +27,7 @@ import { forumRead, logTestResult, proposeClaim } from "./forum.mjs";
 import { browseClaims, getClaimWithStatus, overviewWithGraph, rankClaimsWithStatus, searchClaimsWithStatus } from "./graph.mjs";
 import { sparql } from "./lib.mjs";
 import { browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
+import { claimTestsTool } from "./tests.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const opts = {};
@@ -48,6 +53,7 @@ const commands = {
     hasAxis: opts.hasAxis ? String(opts.hasAxis).split(",") : [],
     missingAxis: opts.missingAxis ? String(opts.missingAxis).split(",") : [],
   }),
+  tests: () => claimTestsTool({ view: positional[0], ...opts }),
   organism: () => getOrganism({ id: positional[0] ?? opts.id, includeMentions: opts.includeMentions !== false }),
   forum: () => forumRead({ view: positional[0] ?? opts.view ?? "feed", limit: 25, ...opts }),
   "propose-claim": () => proposeClaim(JSON.parse(readFileSync(positional[0], "utf8"))),

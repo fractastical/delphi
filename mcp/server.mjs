@@ -9,6 +9,7 @@ import { GROUP_KEYS, SORT_KEYS, browseClaims, getClaimWithStatus, overviewWithGr
 import { NETWORK_ENDPOINT, PREFIXES, sparql } from "./lib.mjs";
 import { ARTIFACT_TYPES, FORUM_URL, INCONCLUSIVE_REASONS, POST_KINDS, REQUEST_STATUSES, VERDICTS, forumPost, forumRead, forumRegister, forumRespond, logTestResult, proposeClaim } from "./forum.mjs";
 import { observeToolCall } from "./metrics.mjs";
+import { DATA_KINDS as TEST_DATA_KINDS, TEST_VIEWS, VERDICTS as TEST_VERDICTS, claimTestsTool } from "./tests.mjs";
 import { AXIS_IDS, GROUP_KEYS as ORG_GROUP_KEYS, SORT_KEYS as ORG_SORT_KEYS, browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
 
 const TOOLS = [];
@@ -46,7 +47,7 @@ const json = ({ markdown, ...data }) => ({ content: [
 const tool = (...spec) => TOOLS.push(spec);
 
 tool("delphi_overview",
-  "Start here. Counts claims per domain (and how many carry math in skos:notation), lists the assessment types you can rank by, and gives the claim graph's verification status per thinker (theorems, math claims, Lean-checked, proved, unverified, refuted) with links that open docs/claim-graph.html filtered to each count.",
+  "Start here. Counts claims per domain (and how many carry math in skos:notation), lists the assessment types you can rank by, and gives the claim graph's status per thinker: theorems, math claims, Lean-checked, proved in the literature, refuted, and claims tested against data with their verdicts (supports, mixed, refutes, inconclusive) and how many were tested on organisms, with links that open docs/claim-graph.html filtered to each count. For test details or what to test next, use delphi_claim_tests.",
   { source },
   ({ source }) => overviewWithGraph(source));
 
@@ -109,6 +110,24 @@ tool("delphi_graph",
     source: localOnly("the claim graph (docs/claims.json)"),
   },
   rejectNetwork("delphi_graph", browseClaims));
+
+tool("delphi_claim_tests",
+  "Tests of claims against data (test-data/claim-tests/): how many claims are tested, with what verdicts, on what kind of data, and which to test next. view \"summary\" (default with no arguments) = counts per thinker by verdict and data kind, plus pre-registered tests awaiting data; \"list\" = test runs with filters, each with hypothesis and a GitHub link to its result.json; \"claim\" = every run for one claim id with the full result.json (criteria, datasets with checksums, method, measured values, caveats); \"candidates\" = untested claims ranked by testability, i.e. what to test next. A claim with several runs counts once in the summary. Only dataKind \"biological\" shows a claim holds in organisms.",
+  {
+    view: z.enum(TEST_VIEWS).optional().describe("summary | list | claim | candidates. Defaults to claim if id is given, list if any filter is given, else summary"),
+    id: z.string().optional().describe("Claim id for view \"claim\", e.g. \"darwin1859-ch12-11\""),
+    thinker: z.string().optional().describe("Substring, e.g. \"darwin\", \"levin\""),
+    project: z.string().optional().describe("Substring of the test project, e.g. \"wolfram-nks\""),
+    verdict: z.enum(TEST_VERDICTS).optional(),
+    dataKind: z.enum(TEST_DATA_KINDS).optional().describe("biological = organisms; physical; computational = simulation or mathematics; none"),
+    status: z.enum(["complete", "preregistered", "abandoned", "any"]).optional().describe("For view \"list\"; default complete"),
+    math: z.boolean().optional().describe("true = only math claims"),
+    minTestability: z.number().min(0).max(1).optional().describe("For view \"candidates\""),
+    text: z.string().optional().describe("Substring of claim id, title, statement or hypothesis"),
+    limit: z.number().int().min(1).max(500).optional(),
+    source: localOnly("test-data/claim-tests"),
+  },
+  rejectNetwork("delphi_claim_tests", claimTestsTool));
 
 const axis = z.enum(AXIS_IDS);
 tool("delphi_organisms",

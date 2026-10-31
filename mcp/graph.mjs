@@ -128,7 +128,7 @@ export function graphStatus() {
     ...rows.map(r => line(r.thinker, r, r.thinker)),
     line("All", total, null),
     "",
-    `Open: [full graph](${links.graph}) · [theorems only](${links.theorems}) · [math claims awaiting proof](${links.mathUnverified}) · [theorems page](${links.theoremsPage}). Every count above links to the graph filtered to it.`,
+    `Test details, pre-registered tests and what to test next: delphi_claim_tests. Open: [full graph](${links.graph}) · [theorems only](${links.theorems}) · [math claims awaiting proof](${links.mathUnverified}) · [theorems page](${links.theoremsPage}). Every count above links to the graph filtered to it.`,
     "A theorem is a math claim (formal notation, a Lean formalization, or a mathematical kind) that is machine-checked in Lean 4 or proved in the literature. Tested against data is a separate axis: the verdict of a pre-registered test in test-data/claim-tests/, which never makes a claim a theorem. Only tests whose data were measured on organisms (data_kind biological) show that a claim holds in biology; simulation and mathematical enumeration show it holds as mathematics. Assessor truth scores count as neither.",
   ].join("\n");
   return { markdown, built, total, thinkers: rows, links };
