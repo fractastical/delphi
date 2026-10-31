@@ -1,5 +1,12 @@
 # delphi-frontier specs
 
+The product direction and current delivery checklist are in [GOAL](../GOAL.md).
+[SPEC-005](SPEC-005-agentic-engineering-demo.md) adds the user-directed agentic
+engineering, constraint-solving and multiscale demonstration contract. It is an
+implementation target with explicit acceptance checks, not a claim that those
+checks have already passed. SPEC-001–004 below describe the earlier foundation;
+their dated evidence remains evidence about the source they name.
+
 Normative specifications for the Frontier foundation, derived from the implemented, tested code —
 not the other way round. The repository had no `specs/` directory before these; its prior normative
 text was `CONTRIBUTING-VERIFICATION.md` (the seven verification rules), which these specs honor and
