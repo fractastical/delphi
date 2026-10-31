@@ -13,6 +13,7 @@ session, Claude Sonnet 5.5), **not Codex-reviewed**. Nothing here submits, accep
 | `nanopub_draft.py` | Claim / Action / Evidence -> unsigned TriG (four named graphs), deterministic. Refuses private records, unlicensed available content, stored quote text, downloadable artifacts with no licence, malformed IRIs. No publish function. |
 | `bundle.py` | Claims -> Actions -> Evidence pinned by exact version, drafts, `chain.json`, `manifest.json`. |
 | `engineering_manifest.py` | producer receipts (engineering / formal) -> PROPOSED Problem, Claim, Action and Evidence drafts, frozen as an importable `frontier-bundle-0.1`. Added by the market worker; see the section below. |
+| `morpholib.py` | MorphoLib/MorphoEval Tier-A loops -> PROPOSED Claim (`source_statement`), Evidence (`source_assessment`), Problem drafts, equation and model indexes, frozen bundles. Reads git blobs only; runs nothing from upstream. See `docs/morpholib-import.md`. |
 
 ## Example: claims -> evidence -> artifacts (`examples/nca_chain/`)
 Real OpenResearch run `f81c0b68` (local backend, **not hosted compute**): the preregistered analysis of a finished nonlinear
