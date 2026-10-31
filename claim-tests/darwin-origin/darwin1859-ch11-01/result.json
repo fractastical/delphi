@@ -1,0 +1,39 @@
+{
+  "claim_id": "darwin1859-ch11-01",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch11-01",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "Across regions of the world, the taxonomic similarity of their biotas is explained by which land mass they belong to (shared history and barriers) rather than by the similarity of their climates; in particular, climatically matched regions on different continents (e.g. the Mediterranean-climate belts of Australia, South Africa and Chile) share fewer taxa than climatically different regions on the same continent.",
+  "pass_criterion": "Pre-registered. For the 23 regions in derived/regions.csv (5x5 degree boxes, pre-assigned to a continent and to one of six climate classes), genus lists of mammals, birds and vascular plants are taken from GBIF occurrences (genera with >= 3 georeferenced records in the box), and climate from the NASA POWER climatology (annual mean 2 m temperature, annual precipitation, seasonal temperature range at five points per box). For each taxon group, pairwise Jaccard dissimilarity between regions is regressed on standardised climate distance and a same-continent indicator (permutation test over region labels, 2000 permutations). The claim is SUPPORTED if, in at least 2 of the 3 taxon groups, (a) the same-continent effect is significant (p < 0.05) and its partial R-squared exceeds that of climate distance, and (b) the mean Jaccard similarity of climate-matched pairs on different continents is lower than the mean similarity of climate-mismatched pairs on the same continent.",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if, in at least 2 of the 3 taxon groups, climate distance has the larger partial R-squared and the same-continent effect is not significant, or climate-matched cross-continental pairs are more similar than climate-mismatched same-continent pairs. Other outcomes are 'mixed'. If GBIF returns fewer than 20 genera for a region/group, that region is dropped for that group; if fewer than 15 regions remain for a group, the group is not evaluated.",
+  "planned_datasets": ["gbif-occurrence-api", "nasa-power-climatology"],
+  "interpretation": "Darwin's 'inhabitants of various regions' are read as the genus-level composition of three well-recorded groups (Mammalia, Aves, Tracheophyta); 'climatal and other physical conditions' as the NASA POWER temperature and precipitation climatology; 'similarity' as Jaccard similarity of genus lists. His 'accounted for' is read comparatively: climate distance should explain less of the variation in biotic similarity than does being on the same land mass, and his own example (Australia, South Africa, western South America at 25-35 degrees S) is tested directly as the climate-matched cross-continental pairs. The absolute wording ('neither ... nor ... can be accounted for') is not testable as stated because climate obviously limits distributions within a continent; the comparative reading is the one tested. Regions and climate classes were fixed before any data were retrieved. GBIF records include introduced species, which inflate cross-continental similarity and therefore work against the claim.",
+  "datasets": [
+    {
+      "id": "gbif-occurrence-api",
+      "name": "GBIF occurrence search API (genus facets within bounding boxes)",
+      "landing_url": "https://www.gbif.org/occurrence/search",
+      "doi": null,
+      "version": null,
+      "license": "varies by dataset (CC0 / CC BY / CC BY-NC); aggregate counts only",
+      "files": [],
+      "role": "genus lists of mammals, birds and vascular plants per region"
+    },
+    {
+      "id": "nasa-power-climatology",
+      "name": "NASA POWER climatology API (temporal/climatology/point)",
+      "landing_url": "https://power.larc.nasa.gov/",
+      "doi": null,
+      "version": null,
+      "license": "public domain (NASA)",
+      "files": [],
+      "role": "temperature and precipitation climatology per region"
+    }
+  ],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-b201", "date": "2026-10-31" }
+}
