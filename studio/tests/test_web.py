@@ -125,6 +125,57 @@ def test_public_site_option_opens_only_the_static_shell(store, site):
         w.close()
 
 
+def test_public_discovery_uses_one_search_instance_and_preserves_mode(store, site):
+    calls = []
+    def search(query, **kwargs):
+        calls.append((query, kwargs))
+        return {"query": query, "mode": "hybrid", "items": [], "index": {"documents": 3}}
+    w = Web(store, site, public_read=True, discovery_search=search)
+    try:
+        for path in ("/api/discovery?q=fin", "/api/discovery?q=fin&cache_only=1&kind=Claim&limit=4"):
+            status, result, _ = w.json("GET", path, cookie=False)
+            assert status == 200 and result["mode"] == "hybrid"
+        assert calls == [("fin", {"kind": None, "limit": 12, "mode": "hybrid", "cache_only": False}),
+                         ("fin", {"kind": "Claim", "limit": 4, "mode": "hybrid", "cache_only": True})]
+        for suffix in ("&cache_only=yes", "&provider=evil", "&q=duplicate"):
+            assert w.req("GET", "/api/discovery?q=fin" + suffix)[0] == 400
+    finally:
+        w.close()
+
+
+def test_public_graph_requires_pinned_refs_and_does_not_expose_private(store, site):
+    from urllib.parse import urlencode
+    public = store.submit(TOKENS["alice"], "graph-public", claim(store))["record"]
+    private = store.submit(TOKENS["alice"], "graph-private", claim(store, id="private-graph", visibility="private"))["record"]
+    w = Web(store, site, public_read=True)
+    try:
+        status, result, _ = w.json("GET", "/api/graph?" + urlencode(ref(public)))
+        assert status == 200 and result["nodes"] and private["version"] not in json.dumps(result)
+        assert w.req("GET", "/api/graph?" + urlencode(ref(private)))[0] == 404
+        for suffix in ("id=x", "depth=4", "limit=301", "limit=0", "unknown=x"):
+            assert w.req("GET", "/api/graph?" + suffix)[0] == 400
+    finally:
+        w.close()
+
+
+def test_discovery_and_graph_keep_private_mode_gate(web):
+    for path in ("/api/discovery?q=fin", "/api/graph"):
+        assert web.req("GET", path, cookie=False)[0] == 401
+
+
+def test_source_documents_and_result_csv_serve_exact_bytes(web, site):
+    docs = site / "data" / "docs"
+    docs.mkdir(parents=True)
+    (docs / "model.md").write_bytes(b"# Model\nThe source assumption.\n")
+    (site / "data" / "designs.csv").write_bytes(b"id,mass\na,0.3\n")
+    assert web.login()[0] == 200
+    for path, mime in (("/data/docs/model.md", "text/plain"), ("/data/designs.csv", "text/csv")):
+        status, headers, body = web.req("GET", path)
+        assert status == 200 and headers["content-type"].startswith(mime)
+        assert body == (site / path.lstrip("/")).read_bytes()
+    assert web.req("GET", "/.env")[0] == 404
+
+
 def test_public_read_without_gate_opens_public_records_but_never_writes_or_private_data(store, site):
     from urllib.parse import urlencode
     public = store.submit(TOKENS["alice"], "public-read", claim(store))["record"]
