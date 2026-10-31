@@ -1,0 +1,39 @@
+{
+  "claim_id": "darwin1859-ch14-03",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch14-03",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "If all living things share their chemical composition and their basic machinery of growth and reproduction, then the core genes of protein synthesis (the aminoacyl-tRNA synthetases that attach the same 20 amino acids to tRNA, the translation elongation factors and universal ribosomal proteins) should be present in essentially every sequenced genome across Bacteria, Archaea and Eukaryota.",
+  "pass_criterion": "Pre-registered. Twenty marker families are fixed in advance (KEGG Orthology ids): 15 aminoacyl-tRNA synthetases with a single domain-general KO (K01866 Tyr, K01867 Trp, K01868 Thr, K01869 Leu, K01870 Ile, K01872 Ala, K01873 Val, K01874 Met, K01875 Ser, K01876 Asp, K01881 Pro, K01883 Cys, K01887 Arg, K01889 Phe-alpha, K01892 His) and 5 families whose bacterial and archaeal/eukaryotic KOs are pooled (EF-Tu/EF-1alpha K02358+K03231; EF-G/EF-2 K02355+K03234; uS12 K02950+K02973; uL2 K02886+K02938; uS7 K02992+K02993). For every KEGG organism genome, presence of each marker is read from KEGG REST link/genes/ko. The claim is SUPPORTED if, in each of the three domains (Bacteria, Archaea, Eukaryotes as grouped in KEGG BRITE br08601), at least 95% of genomes carry at least 18 of the 20 markers, and every marker is present in at least 90% of the genomes of every domain.",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if in any domain fewer than 50% of genomes carry at least 18 of 20 markers, or if any marker is absent from more than 50% of the genomes of a domain (meaning a major division of life uses a different chemistry or machinery for that function). Other outcomes are 'mixed'. The distribution of marker counts, the identity of genomes with the fewest markers, and per-marker prevalence by domain are reported.",
+  "planned_datasets": ["kegg-rest-ko-genes", "kegg-brite-br08601"],
+  "interpretation": "Darwin's 'chemical composition' and 'laws of growth and reproduction' are read, in modern terms, as the shared genetic-code-based protein synthesis machinery that every cellular organism must use to grow and reproduce; universal presence of the same orthologous enzymes charging the same 20 amino acids is the strongest available genomic evidence of a shared chemistry. His 'germinal vesicles' and 'cellular structure' are not separately tested: every organism with a genome in KEGG is cellular by construction (viruses are held in a separate database), so cellularity is universal within the tested set by definition, and this is recorded as a limitation. The 'same poison' clause is not tested. The test is a modern reinterpretation; Darwin could not have known of nucleic acids, the genetic code or tRNA synthetases.",
+  "datasets": [
+    {
+      "id": "kegg-rest-ko-genes",
+      "name": "KEGG REST API: link/genes/ko:<KO> (genes assigned to each orthology group) and list/genome (organism genomes)",
+      "landing_url": "https://www.kegg.jp/kegg/rest/keggapi.html",
+      "doi": null,
+      "version": null,
+      "license": "KEGG REST API, free for academic use (https://www.kegg.jp/kegg/legal.html)",
+      "files": [],
+      "role": "presence of each marker gene family in each organism genome"
+    },
+    {
+      "id": "kegg-brite-br08601",
+      "name": "KEGG BRITE br08601, KEGG organisms in the taxonomy hierarchy",
+      "landing_url": "https://www.genome.jp/brite/br08601",
+      "doi": null,
+      "version": null,
+      "license": "KEGG, free for academic use",
+      "files": [],
+      "role": "domain (Bacteria / Archaea / Eukaryotes) of each organism code"
+    }
+  ],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-b201", "date": "2026-10-31" }
+}
