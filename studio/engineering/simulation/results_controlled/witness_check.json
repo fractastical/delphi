@@ -1,0 +1,117 @@
+{
+ "solver": "z3-nlsat-tracked v1",
+ "z3_version": "5.3.3",
+ "query": "flying_fish_model(rho=1.225, CL=6/5, assume_pectoral_ar_applies_to_wing=True) + q_speed_max(12)",
+ "solver_status": "feasible",
+ "witness": {
+  "m": "153/512",
+  "S": "1/4",
+  "b": "1",
+  "V": "4"
+ },
+ "witness_wing_loading_N_m2": 11.722011328125,
+ "independent_verify_certificate": {
+  "status": "feasible",
+  "ok": true,
+  "violations": [],
+  "problems": [],
+  "independent": true
+ },
+ "solver_result_sha256": "5e3eee133f244e2959bc4ab77b567efbd81f22974f142db66ed753bfb309a570",
+ "receipt": {
+  "schema": "frontier.glide.receipt/1",
+  "model_version": "glide-pointmass/1",
+  "evidence_kind": "simulated",
+  "not_established": [
+   "biological feasibility of any fin or body",
+   "fin-tissue coupling or any genetic mechanism",
+   "calibrated lift/drag for any fish",
+   "Reynolds-number or scale validity of the drag polar",
+   "unsteady, flapping, taxiing or take-off phases",
+   "wind, waves, ground effect"
+  ],
+  "inputs": {
+   "candidate_sha256": "a845e16e8cd71502d8368b7fa2809c722755f5bc84ba70bd8a6cfb321d1ec000",
+   "assumption_sha256": "d6b71881dfa621b574023f90d816b19267d057bc5b4064ca587970dd8fdd2fda",
+   "assumption_sources": {
+    "rho": "design_assumption",
+    "CL_max": "design_assumption",
+    "CD0": "design_assumption",
+    "e": "design_assumption",
+    "release_height_m": "design_assumption"
+   },
+   "AR": 4.0,
+   "wing_loading_N_m2": 11.722011328125
+  },
+  "results": {
+   "stall_speed_ms": 3.9935341155601582,
+   "CL_commanded": 0.7766503650222797,
+   "equilibrium_glide_ratio_L_over_D": 6.472086375185664,
+   "equilibrium_sink_rate_ms": 0.7535399761648008,
+   "equilibrium_speed_ms": 4.934847067055973,
+   "glide_range_m": 3.518970270667495,
+   "glide_time_s": 0.8380387481967673,
+   "end_reason": 0,
+   "end_reason_key": {
+    "0": "water contact",
+    "1": "time limit",
+    "2": "stalled",
+    "3": "non-finite"
+   },
+   "release_speed_ms": 4.0
+  },
+  "numerics": {
+   "integrator": "RK4",
+   "dt_s": 0.002,
+   "dt_half_range_rel_diff": 2.2568681650588543e-08,
+   "tolerance": 0.0001,
+   "converged": true
+  },
+  "uncertainty": {
+   "method": "Monte Carlo over DECLARED prior ranges (design assumptions, not measurements), paired seed",
+   "priors": {
+    "CL_max": [
+     0.8,
+     1.6
+    ],
+    "CD0": [
+     0.03,
+     0.12
+    ],
+    "e": [
+     0.6,
+     0.95
+    ]
+   },
+   "n": 200,
+   "seed": 20261031,
+   "quantiles_glide_range_m": {
+    "q10": 2.9407771157125104,
+    "q50": 3.5772149623040437,
+    "q90": 4.287104004955008
+   },
+   "fraction_stalled": 0.0,
+   "fraction_nonfinite": 0.0
+  },
+  "counterexample": null,
+  "verdict": "consistent",
+  "receipt_sha256": "0e33db9b13c0334b15c69f0ddaa1f773ee39584d24b181024a50ad4b083e9c35"
+ },
+ "comparison_to_Fish_genus_fit_at_witness_mass": {
+  "Cypselurus": {
+   "S_fit_m2": 0.017959125719754904,
+   "b_fit_m": 0.4138700883566172,
+   "AR_fit": 9.537683109367519,
+   "witness_area_over_fit": 13.920499466463552,
+   "witness_AR": 4.0
+  },
+  "Exocoetus": {
+   "S_fit_m2": 0.01879512164295818,
+   "b_fit_m": 0.48910389259537607,
+   "AR_fit": 12.72791005540402,
+   "witness_area_over_fit": 13.30132386207064,
+   "witness_AR": 4.0
+  }
+ },
+ "reading": "The witness is feasible for the declared constraints but sits at the wing-loading lower bound with a wing area far larger than the Fish genus fit at that mass: a source envelope is not a feasibility region for a real fish. NOT a print candidate."
+}

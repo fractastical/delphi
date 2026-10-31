@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from hashlib import sha256
 import json
 from typing import Annotated, Any, Literal
+from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -82,9 +83,12 @@ class Claim(Model):
     source: Source
     source_record_version: Short | None = None
     prior_review: dict[str, Any] = Field(default_factory=dict)
+    origin: Literal["source_statement", "derived", "hypothesis", "unknown"] = "unknown"
 
 
 ACTIONABILITY = ("acceptance_criteria", "falsifiers", "next_action", "cost_stop_bounds")
+Scale = Literal["molecular", "macromolecular", "subcellular", "cellular", "tissue", "organ", "neural",
+                "organism", "developmental", "collective", "ecological", "evolutionary"]
 
 
 class Problem(Model):
@@ -102,7 +106,11 @@ class Problem(Model):
     title: Short
     known_state: Text
     question: Text
-    problem_kind: Literal["project_gap", "computational_open_question", "sourced_field_open_problem", "resolved_scope_correction"]
+    # `curated_question` is a question a curator wrote down, with citations the curator attached. It does not say the field states
+    # this as an open problem (`sourced_field_open_problem`), nor that the project has this gap (`project_gap`). Added after the
+    # register import labelled 250 curator questions as sourced field problems; the existing values are unchanged.
+    problem_kind: Literal["project_gap", "computational_open_question", "sourced_field_open_problem", "resolved_scope_correction",
+                          "curated_question"]
     novelty_status: Short
     data_access: Text
     completeness: Literal["recorded", "actionable"] = "actionable"
@@ -115,12 +123,46 @@ class Problem(Model):
     dependencies: list[Ref] = Field(default_factory=list, max_length=30)
     source: Source
     original: dict[str, Any] = Field(default_factory=dict)
+    approach: Literal["design_goal", "theory_fit", "literature_gap", "challenge", "measurement", "unknown"] = "unknown"
+    scales: list[Scale] = Field(default_factory=list, max_length=12)
+    context_tags: Strings = Field(default_factory=list)
 
     @model_validator(mode="after")
     def actionability(self):
         absent = [f for f in ACTIONABILITY if not getattr(self, f)]
         if self.completeness == "actionable" and absent:
             raise ValueError("An actionable problem needs all of " + ", ".join(absent))
+        if len(set(self.scales)) != len(self.scales) or len(set(self.context_tags)) != len(self.context_tags):
+            raise ValueError("Repeated problem scales or context tags")
+        return self
+
+
+class ArtifactRef(Model):
+    """A declared artifact pointer. A digest in a record is not a byte verification.
+
+    The store never fetches these URIs. Public HTTPS or content-addressed URNs
+    avoid exporting a worker's local path or embedding access credentials.
+    Availability and licence are assertions by the submitting actor.
+    """
+
+    title: Short
+    uri: Short
+    sha256: Digest
+    byte_size: int = Field(ge=0, le=10**13, strict=True)
+    media_type: Annotated[str, Field(min_length=3, max_length=150, pattern=r"^[\w.+-]+/[\w.+-]+$")]
+    role: Literal["input", "output", "code", "environment", "protocol", "log", "certificate", "geometry"]
+    availability: Literal["referenced", "downloadable", "unavailable"]
+    license: Short | None = None
+
+    @model_validator(mode="after")
+    def artifact_uri(self):
+        parts = urlsplit(self.uri)
+        if self.uri.startswith("urn:sha256:"):
+            if self.uri != "urn:sha256:" + self.sha256 or self.availability == "downloadable":
+                raise ValueError("A content URN must match its digest and is not a download URL")
+        elif (parts.scheme != "https" or not parts.hostname or parts.username or parts.password
+              or parts.query or parts.fragment or any(ord(c) < 33 for c in self.uri)):
+            raise ValueError("Artifact pointers need credential-free HTTPS without query/fragment, or a SHA256 URN")
         return self
 
 
@@ -139,11 +181,18 @@ class Evidence(Model):
     limitations: Strings = Field(min_length=1)
     local_id: Short | None = None
     provider_assessment: dict[str, Any] | None = None
+    relation: Literal["supports", "refutes", "qualifies", "reproduces", "context_only", "unspecified"] = "unspecified"
+    produced_by: Ref | None = None
+    artifacts: list[ArtifactRef] = Field(default_factory=list, max_length=30)
 
     @model_validator(mode="after")
     def target_kind(self):
         if self.target.kind not in {"Claim", "Problem"}:
             raise ValueError("Evidence must pin a Claim or Problem")
+        if self.produced_by is not None and self.produced_by.kind != "Action":
+            raise ValueError("Evidence produced_by must pin an Action")
+        if len({(a.sha256, a.role) for a in self.artifacts}) != len(self.artifacts):
+            raise ValueError("Duplicate artifact digest and role")
         return self
 
 
@@ -172,6 +221,49 @@ class Assessment(Model):
         return self
 
 
+class ActionAlternative(Model):
+    label: Identifier
+    description: Text
+    tradeoff: Text
+
+
+class ActionOutcome(Model):
+    label: Identifier
+    criterion: Text
+    decision_consequence: Text
+
+
+class ActionProposal(Model):
+    """Reasons and prospective outcomes, never an execution permission or result."""
+    intent: Literal["analysis", "simulation", "experiment", "curation", "replication", "formalization", "design", "plan"]
+    method: Text
+    assumptions: Strings
+    alternatives: list[ActionAlternative] = Field(min_length=1, max_length=12)
+    expected_information: Text
+    decision_context: Text
+    expected_outputs: Strings = Field(min_length=1)
+    controls: Strings = Field(min_length=1)
+    analysis_plan: Text
+    outcomes: list[ActionOutcome] = Field(min_length=1, max_length=12)
+    selection_basis: Literal["manual", "declared_utility", "forecast", "policy", "exploration"]
+    selection_rationale: Text
+    limitations: Strings = Field(min_length=1)
+    plan_steps: list[Ref] = Field(default_factory=list, max_length=30)
+
+    @model_validator(mode="after")
+    def coherent(self):
+        for rows in (self.alternatives, self.outcomes):
+            if len({r.label for r in rows}) != len(rows):
+                raise ValueError("Alternative and outcome labels must be unique")
+        if (self.intent == "plan") != bool(self.plan_steps):
+            raise ValueError("Only plan proposals carry steps; a plan needs at least one step")
+        if any(r.kind != "Action" for r in self.plan_steps):
+            raise ValueError("Plan steps must pin Action records")
+        if len({r.version for r in self.plan_steps}) != len(self.plan_steps):
+            raise ValueError("Duplicate plan step version")
+        return self
+
+
 class Action(Model):
     target: Ref
     title: Short
@@ -179,6 +271,8 @@ class Action(Model):
     required_capabilities: Strings
     cost_stop_bounds: Text
     cache_key: dict[str, str]
+    inputs: list[Ref] = Field(default_factory=list, max_length=30)
+    proposal: ActionProposal | None = None
 
     @model_validator(mode="after")
     def complete_cache(self):
@@ -188,6 +282,10 @@ class Action(Model):
             raise ValueError("Cache dimensions must be bounded nonempty strings")
         if self.cache_key["target"] != self.target.version or self.cache_key["acceptance_policy"] != POLICY:
             raise ValueError("Cache target/policy must match action")
+        if any(r.kind not in {"Claim", "Evidence"} for r in self.inputs):
+            raise ValueError("Action inputs must pin Claim or Evidence records")
+        if len({r.version for r in self.inputs}) != len(self.inputs):
+            raise ValueError("Duplicate action input version")
         return self
 
 
@@ -295,6 +393,13 @@ def references(record: dict) -> list[tuple[str, dict]]:
         edges.append(("targets", p["target"]))
     for item in p.get("dependencies", []):
         edges.append(("depends_on", item))
+    if record["kind"] == "Action":
+        for item in p.get("inputs", []):
+            edges.append(("uses", item))
+        for item in (p.get("proposal") or {}).get("plan_steps", []):
+            edges.append(("plans_step", item))
+    if record["kind"] == "Evidence" and p.get("produced_by") is not None:
+        edges.append(("produced_by", p["produced_by"]))
     for dimension in p.get("dimensions", {}).values():
         for item in dimension["evidence_links"]:
             edges.append(("review_evidence", item))

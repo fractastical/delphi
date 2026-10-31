@@ -1,0 +1,130 @@
+{
+  "solver_result": {
+    "status": "unsat",
+    "witness": null,
+    "conflict": [
+      "level_lift_proxy",
+      "q_wl_min",
+      "q_speed_max"
+    ],
+    "core_minimal": true,
+    "missing_parameters": [],
+    "partial_witness": null,
+    "reason": "unsat on a subset of the declared constraints; z3 verdict re-checked by z3 only, no independent proof object",
+    "scope": "within the declared constraints only; not organism feasibility; a source envelope is not a universal feasibility region; the lift constraint is a level-flight proxy (L = W), not a glide analysis (L = W cos(gamma))",
+    "extrapolates_envelope": [],
+    "used_constraints": [
+      "mass_lo",
+      "mass_hi",
+      "wl_lo",
+      "wl_hi",
+      "level_lift_proxy",
+      "q_wl_min",
+      "q_speed_max"
+    ],
+    "provenance": {
+      "level_lift_proxy": {
+        "kind": "physical_law",
+        "source": "0.5*rho*V^2*S*CL >= m*g",
+        "correspondence": "level-flight proxy: lift 0.5*rho*V^2*S*CL >= m*g (gamma = 0). A glide at path angle gamma needs only L = W*cos(gamma); this constraint is NOT a statement that flight or gliding is feasible",
+        "parameters": {
+          "CL": {
+            "value": "1",
+            "kind": "design_assumption",
+            "source": "caller-set (maximum usable) lift coefficient; NOT supplied by any source in this repo"
+          },
+          "g": {
+            "value": "196133/20000",
+            "kind": "physical_law",
+            "source": "standard acceleration of gravity, defined value 9.80665 m/s^2 (CGPM 1901)"
+          },
+          "rho": {
+            "value": "49/40",
+            "kind": "design_assumption",
+            "source": "caller-set air density; NOT supplied by any source in this repo"
+          }
+        }
+      },
+      "q_wl_min": {
+        "kind": "user_query",
+        "source": "caller query",
+        "correspondence": "",
+        "parameters": {
+          "g": {
+            "value": "196133/20000",
+            "kind": "physical_law",
+            "source": "standard acceleration of gravity, defined value 9.80665 m/s^2 (CGPM 1901)"
+          }
+        }
+      },
+      "q_speed_max": {
+        "kind": "user_query",
+        "source": "caller query",
+        "correspondence": "",
+        "parameters": {}
+      }
+    },
+    "checks": {
+      "relax_envelopes": false
+    },
+    "solver": "z3-nlsat-tracked v1",
+    "z3_version": "5.3.3",
+    "lean": "not_run"
+  },
+  "lean_certificate_text": "theorem conflict_instance {m g S V : ℝ} (hS : 0 < S) (hV0 : 0 ≤ V)\n    (hwl : ((150 : ℝ) / 1) ≤ FlyingFish.wingLoading m g S) (hV : V ≤ ((10 : ℝ) / 1))\n    (hlift : 2 * m * g ≤ V ^ 2 * ((49 : ℝ) / 40) * S * ((1 : ℝ) / 1)) : False :=\n  FlyingFish.conflict_of_certificate hS hV0 (by norm_num) (by norm_num) hwl hV hlift (by norm_num)\n",
+  "lean_checks": {
+    "lean": "ran",
+    "lean_version": "Lean (version 4.35.0, x86_64-unknown-linux-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)",
+    "project": "/data/artifacts/mathlib-probe",
+    "provenance": {
+      "files": {
+        "GeometricSimilarity.lean": "17535326ff9f8b1ffd6d59eae5f0989bb211bbf581b5b4a01d17e9a29a992a89",
+        "MutantRefutations.lean": "2ed863acbefcbfd6d721a1629852ad38a3b8eb847d4cfe52c028cab1ea7d4147",
+        "NegativeControls.lean": "c3a485297b03826d3ddcf47495c4e6bf748eb68dea6032f8955e88d8e7c7cd9f",
+        "lean_checks.py": "b2fa538b8dc75d24e89b9ae210db79d690709ddd6c17b3251a3fc7c00e288106",
+        "../constraints.py": "de0acf47ffc7ffbebe5a44d775e007e87b7f4a996256b6c94fc0e188a0fcead1"
+      },
+      "assembled_sources_sha256": {
+        "positive": "063496524920379d5413b27aef4270e45c407f238c6247a1d4948584e6807423",
+        "negative": "e2d1941f60044ae21b82e808370ed06fc90d03fba7c0c6350cf34297a73e50f6",
+        "certificate_text": "c91ece6845e3149d079098ccc6d7d5efa2a05d12af667804b2542ed20a9627ad",
+        "corrupted_certificate_text": "9b049d96af16c34340d289f5fd8da20e4b6d763cac9b976c43d7f0d58a6b0472"
+      },
+      "lean_toolchain_file": "leanprover/lean4:v4.35.0",
+      "mathlib_rev": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+      "lake_manifest_sha256": "81340aac923d17d46dc761408dbb4f105f547f44e3767db83a280b75ebefc1de",
+      "lakefile_sha256": "9ee95c5077b0c3972be82ae80f19fe6bbdc48e4e83dfd8ba71cb1c73d7158507"
+    },
+    "theory_sha256": "17535326ff9f8b1ffd6d59eae5f0989bb211bbf581b5b4a01d17e9a29a992a89",
+    "positive": {
+      "exit": 0,
+      "seconds": 85.6,
+      "n_axiom_prints": 7,
+      "axioms_used": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ],
+      "only_standard_axioms": true,
+      "non_axiom_output": []
+    },
+    "negative": {
+      "exit": 1,
+      "seconds": 26.5,
+      "each_block_rejected": {
+        "wl_k2": true,
+        "mass_exponent": true,
+        "stall_k2": true,
+        "corrupted_certificate": true
+      },
+      "first_error_message": {
+        "wl_k2": "unsolved goals",
+        "mass_exponent": "unsolved goals",
+        "stall_k2": "unsolved goals",
+        "corrupted_certificate": "unsolved goals"
+      },
+      "errors_outside_blocks": []
+    },
+    "all_ok": true
+  }
+}

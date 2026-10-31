@@ -1,181 +1,332 @@
-"""Generate the Frontier coordination site from this repository's own artifacts.
+"""Build the Delphi Frontier site snapshot from tracked repository files.
 
-Every number on the page is read from a committed file at build time. Nothing is typed in by
-hand, so the site cannot drift from the repo, and a figure that has no artifact behind it simply
-cannot appear. The build prints its inputs with their sha256 so a reader can check the page
-against the bytes it was made from.
+Inputs are read only from this checkout (seeds/, results/, specs/, tasks/, docs/, site/content/);
+nothing is read from /home, /data or the network. Every input is recorded with its sha256 so a reader
+can check the snapshot against the bytes it was made from. A statistic with no receipt is not emitted:
+there is deliberately no test count, no job count and no "records in a store" figure, because none of
+those is derivable from a file here.
+
+    python3 scripts/build_site.py            # writes site/data/{snapshot,catalog}.json and site/data/docs/
+    python3 scripts/build_site.py --check    # exit 1 if the committed output differs from a fresh build
 """
 from __future__ import annotations
 
-import html
+import argparse
 import json
-import subprocess
+import re
+import shutil
 import sys
-from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "site"
+SITE = ROOT / "site"
+DATA = SITE / "data"
+SCHEMA = "frontier-site-snapshot-0.1"
+NAMESPACE = "snapshot"
 
 
-def sh(*args):
-    return subprocess.run(args, cwd=ROOT, capture_output=True, text=True).stdout.strip()
+
+def mcp_tools(mcp_text: str) -> list[dict]:
+    """Tool names come from the Tools row of the table in docs/mcp.md, so the page cannot list a tool the document does not."""
+    row = next((l for l in mcp_text.splitlines() if l.startswith("| Tools |")), "")
+    cells = [c.strip() for c in row.strip().strip("|").split("|")]
+    names = lambda c: re.findall(r"`(frontier_[a-z_]+)`", c)
+    read = names(cells[1]) if len(cells) > 2 else []
+    write = [n for n in names(cells[2]) if n not in read] if len(cells) > 2 else []
+    return [{"name": n, "mode": "read", "documented_in_docs_mcp": True} for n in read] + [{"name": n, "mode": "write (opt-in)", "documented_in_docs_mcp": True} for n in write]
 
 
-def digest(p: Path):
-    return sha256(p.read_bytes()).hexdigest() if p.exists() else None
+def digest_bytes(b: bytes) -> str:
+    return sha256(b).hexdigest()
 
 
-def esc(s):
-    return html.escape(str(s))
+def canonical(v) -> str:
+    return json.dumps(v, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
-def run_importer(script, source, out):
-    r = subprocess.run([sys.executable, str(ROOT / "scripts" / script), source, "--out", str(out)],
-                       capture_output=True, text=True, cwd=ROOT)
-    return json.loads(r.stdout) if r.returncode == 0 else None
+class Inputs:
+    """Reads files relative to ROOT and remembers each one's hash."""
+
+    def __init__(self):
+        self.seen: dict[str, dict] = {}
+
+    def read(self, rel: str) -> bytes:
+        b = (ROOT / rel).read_bytes()
+        self.seen[rel] = {"path": rel, "sha256": digest_bytes(b), "bytes": len(b)}
+        return b
+
+    def text(self, rel: str) -> str:
+        return self.read(rel).decode("utf-8")
+
+    def json(self, rel: str):
+        return json.loads(self.read(rel))
 
 
-CSS = """
-:root{--bg:#0f1115;--fg:#e8e9ed;--dim:#9aa0ab;--line:#262a33;--ok:#4ea86b;--no:#c75c5c;--warn:#c79a4e;--acc:#6b8fd6}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-.wrap{max-width:1080px;margin:0 auto;padding:16px}
-h1{font-size:1.9rem;margin:.4em 0 .1em;letter-spacing:-.02em}
-h2{font-size:1.25rem;margin:2em 0 .4em;border-bottom:1px solid var(--line);padding-bottom:.3em}
-.sub{color:var(--dim);margin:0 0 1.4em}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:1em 0}
-.card{border:1px solid var(--line);border-radius:10px;padding:14px;background:#141720}
-.n{font-size:2rem;font-weight:650;line-height:1.1;letter-spacing:-.02em}
-.lbl{color:var(--dim);font-size:.82rem;margin-top:.2em}
-table{border-collapse:collapse;width:100%;font-size:.9rem;display:block;overflow-x:auto}
-th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-th{color:var(--dim);font-weight:600;white-space:nowrap}
-code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em}
-.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.76rem;border:1px solid var(--line)}
-.ok{color:var(--ok);border-color:var(--ok)}.no{color:var(--no);border-color:var(--no)}.warn{color:var(--warn);border-color:var(--warn)}
-a{color:var(--acc)}
-.note{border-left:3px solid var(--warn);padding:.6em 1em;background:#17161f;margin:1em 0;border-radius:0 8px 8px 0}
-footer{color:var(--dim);font-size:.82rem;margin:3em 0 2em;border-top:1px solid var(--line);padding-top:1em}
-@media(max-width:560px){.wrap{padding:16px}.n{font-size:1.6rem}}
-"""
+def doc_meta(rel: str, text: str) -> dict:
+    title = next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), Path(rel).stem)
+    status = None
+    m = re.search(r"\*\*(?:Final status|Verdict):[^\n]*", text)
+    if m:
+        status = re.sub(r"\*\*", "", m.group(0)).strip()
+    return {"id": Path(rel).stem, "title": title, "status_line": status, "path": rel}
 
 
-def main():
-    OUT.mkdir(exist_ok=True)
-    tmp = OUT / ".tmp"; tmp.mkdir(exist_ok=True)
-    inputs = {}
+def parse_board(text: str) -> list[dict]:
+    """The owner table in tasks/BUILD.md. It is a plan as written at the snapshot, not live activity."""
+    rows = []
+    for line in text.splitlines():
+        if not line.startswith("| P"):
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) >= 4:
+            rows.append({"priority": cells[0], "deliverable": cells[1], "owner": cells[2], "status_text": cells[3]})
+    return rows
 
-    register = Path("/home/ubuntu/git/morphoswarm/data/problems/register.yaml")
-    proposals = Path("/data/artifacts/delphi-evolve-rethink/messages/sourced-problems-proposal.json")
-    reg = run_importer("import_register.py", str(register), tmp / "r.jsonl") if register.exists() else None
-    src = run_importer("import_sourced_problems.py", str(proposals), tmp / "s.jsonl") if proposals.exists() else None
-    for p in (register, proposals):
-        if p.exists():
-            inputs[p.name] = digest(p)
 
-    commit = sh("git", "log", "-1", "--format=%H")
-    commit_at = sh("git", "log", "-1", "--format=%cI")
-    ncommits = sh("git", "rev-list", "--count", "HEAD")
-    tests = sh("git", "grep", "-c", "^def test_", "--", "tests/")
-    ntests = sum(int(l.rsplit(":", 1)[1]) for l in tests.splitlines() if ":" in l) if tests else 0
+def build_catalog(snapshot: dict) -> list[dict]:
+    """Envelope-shaped records for the snapshot adapter. Local status is always separate from any upstream label."""
+    records = []
 
-    ledger = (ROOT / "ledger" / "README.md").read_text() if (ROOT / "ledger" / "README.md").exists() else ""
-    ledger_rows = [l for l in ledger.splitlines() if l.startswith("| ") and "---" not in l and not l.startswith("| #")]
-    findings = sorted((ROOT / "findings").glob("README-*.md")) if (ROOT / "findings").exists() else []
-    preregs = sorted((ROOT / "preregistrations").glob("2*.md")) if (ROOT / "preregistrations").exists() else []
-    specs = sorted((ROOT / "specs").glob("SPEC-*.md")) if (ROOT / "specs").exists() else []
+    def add(kind, rid, title, payload, upstream=None):
+        body = {"kind": kind, "id": rid, "title": title, "payload": payload}
+        version = digest_bytes(canonical(body).encode())
+        records.append({
+            "ref": {"namespace": NAMESPACE, "kind": kind, "id": rid, "version": version},
+            "title": title,
+            "payload": payload,
+            "upstream_label": upstream,
+            "local_status": "snapshot_unreviewed",
+        })
 
-    total = (reg["importable"] if reg else 0) + (src["importable"] if src else 0)
-    actionable = (reg["actionable"] if reg else 0) + (src["actionable"] if src else 0)
+    for c in snapshot["claims"]:
+        add("Claim", c["id"], c["label"], c, {"category": c["category"], "review_title": c["review_title"], "note": "Upstream assertion from the seed, not accepted by this site."})
+    for p in snapshot["problems"]:
+        add("Problem", p["id"], p["title"], p, {"state": p["state"]})
+    for s in snapshot["mission"]["sources"]:
+        add("Evidence", "src-" + s["id"], s["cite"], s, {"read_level": s["read_level"]})
+    for d in snapshot["documents"]:
+        add("Evidence", "doc-" + d["id"], d["title"], d, {"status_line": d["status_line"]})
+    records.sort(key=lambda r: (r["ref"]["kind"], r["ref"]["id"]))
+    return records
 
-    def card(n, lbl, cls=""):
-        return f'<div class="card"><div class="n {cls}">{n}</div><div class="lbl">{esc(lbl)}</div></div>'
 
-    rows = ""
-    if reg:
-        pv = reg["provenance"]
-        rows += (f'<tr><td>morphoswarm curated register</td><td>{reg["importable"]}</td>'
-                 f'<td><span class="pill no">{reg["actionable"]}</span></td>'
-                 f'<td>{pv["with_locator_and_quote"]} quote+locator · {pv["topic_reference_only"]} topic-only · '
-                 f'<b>{pv["no_source_at_all"]} no source</b></td>'
-                 f'<td class="mono">{esc(reg["register_sha256"][:16])}…</td></tr>')
-    if src:
-        rows += (f'<tr><td>sourced problem proposals</td><td>{src["importable"]}</td>'
-                 f'<td><span class="pill ok">{src["actionable"]}</span></td>'
-                 f'<td>{src["with_resolvable_source_uri"]} of {src["importable"]} with a resolvable source URI</td>'
-                 f'<td class="mono">{esc(src["proposals_sha256"][:16])}…</td></tr>')
+SIM_DIR = "engineering/simulation/results"
+SIM_FILES = ("summary.json", "controls.json", "pareto.json", "model_structure_findings.json", "designs.csv", "figure.png")
+LEAN_RECEIPT = "engineering/formal/RECEIPT.json"
 
-    led = "".join(f"<tr><td>{esc(c.strip())}</td></tr>" for c in
-                  ["".join(l.split("|")[1:3]).strip() for l in ledger_rows][:20])
 
-    fnd = "".join(
-        f'<tr><td><a href="../findings/{esc(f.name)}">{esc(f.name.replace("README-","").replace(".md",""))}</a></td>'
-        f'<td>{esc(f.read_text().splitlines()[0].lstrip("# ")[:150])}</td></tr>' for f in findings)
+def recorded_results(ins: Inputs, files: dict) -> tuple[dict | None, dict | None]:
+    """Recorded runs that exist in this tree. A missing file is reported as absent, never filled in."""
+    lean = sim = None
+    if (ROOT / LEAN_RECEIPT).exists():
+        lc = json.loads(ins.read(LEAN_RECEIPT))["lean_checks"]
+        lean = {"path": LEAN_RECEIPT, "sha256": ins.seen[LEAN_RECEIPT]["sha256"], "run": lc.get("lean"), "lean_version": lc.get("lean_version"),
+                "mathlib_rev": lc["provenance"].get("mathlib_rev"), "toolchain": lc["provenance"].get("lean_toolchain_file"),
+                "theory_sha256": lc.get("theory_sha256"), "all_ok": lc.get("all_ok"),
+                "positive": {k: lc["positive"].get(k) for k in ("exit", "seconds", "axioms_used", "only_standard_axioms")},
+                "negative": {"exit": lc["negative"].get("exit"), "seconds": lc["negative"].get("seconds"), "each_block_rejected": lc["negative"].get("each_block_rejected"),
+                             "first_error_message": lc["negative"].get("first_error_message")},
+                "file_hashes": lc["provenance"].get("files")}
+    if (ROOT / SIM_DIR / "summary.json").exists():
+        listing = []
+        for name in SIM_FILES:
+            if (ROOT / SIM_DIR / name).exists():
+                b = ins.read(f"{SIM_DIR}/{name}")
+                files[f"results/{name}"] = b
+                listing.append({"name": name, "path": f"{SIM_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": f"data/results/{name}"})
+        load = lambda n: json.loads((ROOT / SIM_DIR / n).read_text()) if (ROOT / SIM_DIR / n).exists() else None
+        summ, ctrl, find = load("summary.json"), load("controls.json"), load("model_structure_findings.json")
+        sim = {"summary": {k: v for k, v in summ.items() if k != "pareto_designs_selected_dimensions"}, "pareto_selected": summ.get("pareto_designs_selected_dimensions", []),
+               "controls": ctrl, "findings": find, "files": listing}
+    return lean, sim
 
-    prg = "".join(
-        f'<tr><td class="mono">{esc(p.name)}</td><td class="mono">{esc(sh("git","log","-1","--format=%cI","--",str(p.relative_to(ROOT)))) or "uncommitted"}</td>'
-        f'<td>{"RESULT RECORDED" if "## Result" in p.read_text() or "## RESULT" in p.read_text() else "<span class=\"pill warn\">awaiting result</span>"}</td></tr>'
-        for p in preregs)
 
-    spc = "".join(f'<tr><td class="mono">{esc(s.name)}</td><td>{esc(s.read_text().splitlines()[0].lstrip("# ")[:110])}</td></tr>' for s in specs)
+ATT = "findings/attestation-check-15.json"
+ATT_REVIEW = "findings/attestation-facet-review-15.json"
+ATT_README = "findings/README-attestation-check-15.md"
+SIM_MANIFESTS = "site/artifacts/simulations"
 
-    page = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Delphi Frontier</title><style>{CSS}</style></head><body><div class="wrap">
-<h1>Delphi Frontier</h1>
-<p class="sub">A store for open problems that records what would settle them &mdash; and counts how many cannot say.
-Every number below is read from a committed file at build time.</p>
 
-<div class="grid">
-{card(total, "problems in the store")}
-{card(actionable, "actionable (state what would settle them)", "ok" if actionable else "no")}
-{card(total - actionable, "recorded only", "warn")}
-{card(0, "solved", "no")}
-{card(ntests, "tests passing")}
-{card(ncommits, "commits")}
-</div>
+def attestation_check(ins: Inputs, files: dict, docs: list) -> dict | None:
+    if not all((ROOT / f).exists() for f in (ATT, ATT_REVIEW, ATT_README)):
+        return None
+    mech, rev = json.loads(ins.read(ATT)), json.loads(ins.read(ATT_REVIEW))
+    text = ins.text(ATT_README)
+    files["docs/" + Path(ATT_README).name] = text.encode()
+    docs.append({"id": Path(ATT_README).stem, "title": next(l[2:].strip() for l in text.splitlines() if l.startswith("# ")), "status_line": None, "path": ATT_README,
+                 "sha256": ins.seen[ATT_README]["sha256"], "href": "data/docs/" + Path(ATT_README).name})
+    by = {r["slug"] + str(r["index"]): r for r in mech["results"]}
+    items = []
+    for it in rev["items"]:
+        m = by.get(it["slug"] + str(it["index"]), {})
+        items.append({"slug": it["slug"], "stance": it["stance"], "stratum": it["stratum"], "source": m.get("source"), "article_title": m.get("article_title"), "article_year": m.get("article_year"),
+                      "locator": m.get("locator"), "mechanical_status": m.get("status"), "match": m.get("match"), "supports": it["quote_supports_stance"], "fit": it["fit_to_question"],
+                      "flags": it["flags"], "note": it["note"]})
+    return {"readme": Path(ATT_README).stem, "n": mech["n"], "status_counts": mech["status_counts"], "tally": rev.get("tally"), "reviewer": rev.get("reviewer"), "items": items,
+            "scope": "A fixed 15-item sample chosen by a hashed rule, not a random or representative sample. The counts are not a population rate and verify nothing about the other attestations or the 250 problems."}
 
-<div class="note"><b>Zero solved is the honest headline.</b> Collecting problems is easy; closing one is not.
-A preregistered test is running now &mdash; its criterion, falsifier, baseline and stop rule were committed
-to git <i>before</i> the result existed, so the timestamps prove it was not fitted afterwards.</div>
 
-<h2>Where the problems came from</h2>
-<table><tr><th>source</th><th>imported</th><th>actionable</th><th>provenance</th><th>source sha256</th></tr>{rows}</table>
-<p class="sub">Same schema both sides. So &ldquo;0 of 250&rdquo; is a statement about how that register was built,
-not about the bar being too high.</p>
+def simulation_manifests(ins: Inputs) -> list[dict]:
+    """Optional manifests dropped next to their artifacts. A video is playable only if the file exists and matches its declared sha256."""
+    out = []
+    base = ROOT / SIM_MANIFESTS
+    for mf in sorted(base.glob("*/manifest.json")) if base.exists() else []:
+        rel = mf.relative_to(ROOT).as_posix()
+        try:
+            m = json.loads(ins.read(rel))
+        except ValueError:
+            out.append({"id": mf.parent.name, "title": mf.parent.name, "error": "manifest is not valid JSON", "manifest": rel})
+            continue
+        v = m.get("video"); state, href = "none", None
+        if v:
+            f = mf.parent / str(v.get("file", ""))
+            if not f.is_file() or ".." in str(v.get("file", "")):
+                state = "declared_but_missing"
+            else:
+                b = f.read_bytes(); ins.seen[f.relative_to(ROOT).as_posix()] = {"path": f.relative_to(ROOT).as_posix(), "sha256": digest_bytes(b), "bytes": len(b)}
+                state = "present_verified" if v.get("sha256") == digest_bytes(b) else "digest_mismatch"
+                href = f.relative_to(ROOT / "site").as_posix() if state == "present_verified" else None
+        pf = mf.parent / str(m.get("poster", "")) if m.get("poster") else None
+        m["poster_href"] = pf.relative_to(ROOT / "site").as_posix() if pf and pf.is_file() and ".." not in str(m["poster"]) else None
+        m.setdefault("id", mf.parent.name); m["video_state"], m["video_href"], m["manifest"] = state, href, rel
+        out.append(m)
+    return out
 
-<h2>Preregistrations</h2>
-<p class="sub">A preregistration committed after the result is a description of what happened, written in the future tense.
-These were committed before.</p>
-<table><tr><th>file</th><th>committed (git)</th><th>state</th></tr>{prg or '<tr><td colspan="3">none yet</td></tr>'}</table>
 
-<h2>Findings &mdash; most of them against us</h2>
-<table><tr><th>finding</th><th>headline</th></tr>{fnd or '<tr><td colspan="2">none</td></tr>'}</table>
+def checklist(text: str) -> list[dict]:
+    return [{"done": m.group(1) == "x", "text": m.group(2).strip()} for m in re.finditer(r"^- \[([ x])\] (.+)$", text, re.M)]
 
-<h2>Refutation ledger &mdash; {len(ledger_rows)} rows</h2>
-<p class="sub">Every candidate headline this team generated was refuted, nulled, or found to have a predecessor.
-The ratio is the most interesting number we produced.</p>
-<table><tr><th>claim, and how it died</th></tr>{led}</table>
 
-<h2>Specifications</h2>
-<p class="sub">Written from the code, which is authoritative. Each clause is VERIFIED by a named test, or marked ASSUMED.</p>
-<table><tr><th>spec</th><th>scope</th></tr>{spc or '<tr><td colspan="2">none</td></tr>'}</table>
+def system_block(ins: Inputs, files: dict, docs: list, board: list, lean, sim, attestation) -> dict:
+    """Two levels, kept apart: what authors wrote (checkboxes, status text) and what a receipt in this tree measured."""
+    goal = checklist(ins.text("GOAL.md")); spec5 = checklist(ins.text("specs/SPEC-005-agentic-engineering-demo.md"))
+    specs = []
+    for p in sorted((ROOT / "specs").glob("*.md")):
+        rel = p.relative_to(ROOT).as_posix(); text = ins.text(rel); name = p.name
+        if f"docs/{name}" not in files:
+            files[f"docs/{name}"] = text.encode()
+            docs.append({"id": p.stem, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}"})
+        did = next((d["id"] for d in docs if d["path"] == rel), p.stem)
+        specs.append({"id": did, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "path": rel, "sha256": ins.seen[rel]["sha256"]})
+    measured = []
+    if lean:
+        measured.append({"what": "Lean check of the constraint certificate (offline run)", "result": "all recorded checks passed" if lean["all_ok"] else "recorded failure", "receipt": lean["path"], "sha256": lean["sha256"], "covers": "three encoded constraints and four mutants; not biology"})
+    if sim:
+        c = (sim.get("controls") or {}).get("all_pass")
+        measured.append({"what": "Glide simulation numerical controls", "result": "all pass" if c else f"all_pass = {c}", "receipt": SIM_DIR + "/controls.json", "sha256": next((f["sha256"] for f in sim["files"] if f["name"] == "controls.json"), None), "covers": "analytic and step-halving controls of a point-mass model; not a fish"})
+    if attestation:
+        measured.append({"what": "Attestation quote check (15 items)", "result": f"{attestation['status_counts'].get('verified', 0)} of {attestation['n']} quotes found; judgment {attestation['tally'].get('clean_yes_and_direct_no_flags')} of {attestation['n']} clean", "receipt": ATT, "sha256": ins.seen[ATT]["sha256"], "covers": "a hand-picked sample; not a population rate"})
+    return {"goal_checklist": goal, "spec005_acceptance": spec5, "specs": specs, "board": board, "measured": measured,
+            "levels": {"author_report": "What the repository's own documents say: checkboxes, status text, owners, plans. Written by the people or agents doing the work.",
+                       "measured": "What a receipt in this tree records: a run with its hash and result. A receipt covers only what it says it covers."},
+            "unknown": ["CPU and GPU job counts, utilisation and cost: no receipt in this tree; provider-billed spend is stated by the board as not yet known", "Which commit is deployed: not derivable from files"]}
 
-<footer>
-Built from commit <span class="mono">{esc(commit[:12])}</span> ({esc(commit_at)}).<br>
-Inputs: {"; ".join(f"{esc(k)} <span class='mono'>{esc(v[:16])}…</span>" for k, v in inputs.items()) or "none"}<br>
-Generated {esc(datetime.now(timezone.utc).isoformat(timespec="seconds"))}. Single-reader; not independently reviewed.
-</footer>
-</div></body></html>"""
 
-    (OUT / "index.html").write_text(page)
-    print(json.dumps({"out": str(OUT / "index.html"), "commit": commit, "problems": total,
-                      "actionable": actionable, "tests": ntests, "ledger_rows": len(ledger_rows),
-                      "findings": len(findings), "preregistrations": len(preregs), "specs": len(specs),
-                      "inputs": inputs}, indent=1))
+def belief_example(ins: Inputs) -> dict | None:
+    """The declared illustration shipped with frontier/beliefs.py (stdlib only), used as the default scenario on the Belief page."""
+    if not (ROOT / "frontier/beliefs.py").exists():
+        return None
+    ins.read("frontier/beliefs.py")
+    sys.path.insert(0, str(ROOT))
+    try:
+        from frontier.beliefs import EXAMPLE_SCENARIO
+    finally:
+        sys.path.remove(str(ROOT))
+    return json.loads(json.dumps(EXAMPLE_SCENARIO))
+
+
+def build() -> dict[str, bytes]:
+    ins = Inputs()
+    seeds = ins.json("seeds/frontier-data.json")
+    problems = ins.json("seeds/frontier-problems.json")
+    mission = ins.json("site/content/mission.json")
+    board = parse_board(ins.text("tasks/BUILD.md"))
+    spec_text = ins.text("specs/SPEC-005-agentic-engineering-demo.md")
+    mcp_text = ins.text("docs/mcp.md")
+    tools = mcp_tools(mcp_text)
+
+    docs, files = [], {}
+    for p in sorted((ROOT / "results").glob("*.md")):
+        rel = p.relative_to(ROOT).as_posix()
+        text = ins.text(rel)
+        meta = doc_meta(rel, text)
+        meta["sha256"] = ins.seen[rel]["sha256"]
+        meta["href"] = f"data/docs/{p.name}"
+        docs.append(meta)
+        files[f"docs/{p.name}"] = text.encode()
+    for rel, ident, title in (("specs/SPEC-005-agentic-engineering-demo.md", "SPEC-005", "SPEC-005 Agentic engineering on a shared biological frontier"),
+                              ("docs/mcp.md", "mcp", "Frontier MCP server")):
+        name = Path(rel).name
+        docs.append({"id": ident, "title": title, "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}"})
+        files[f"docs/{name}"] = ins.read(rel)
+
+    # The label is a digest of the input hashes, not a git revision: a commit or merge cannot make --check stale.
+    lean_receipt, simulation = recorded_results(ins, files)
+    attestation = attestation_check(ins, files, docs)
+    manifests = simulation_manifests(ins)
+    belief_ex = belief_example(ins)
+    system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
+    fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
+    snapshot = {
+        "schema": SCHEMA,
+        "label": f"snapshot of inputs {fingerprint[:12]}",
+        "input_fingerprint": fingerprint,
+        "inputs": sorted(ins.seen.values(), key=lambda i: i["path"]),
+        "scope": {"claims": seeds["scope"], "problems": problems["scope"], "ranking": problems["ranking"], "seed_source_revision": seeds["source_revision"]},
+        "claims": seeds["nodes"],
+        "bridges": seeds["bridges"],
+        "problems": problems["problems"],
+        "mission": mission,
+        "documents": docs,
+        "capabilities": tools,
+        "board": board,
+        "lean_receipt": lean_receipt,
+        "simulation": simulation,
+        "attestation_check": attestation,
+        "simulation_manifests": manifests,
+        "system": system,
+        "belief_example": belief_ex,
+        "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
+    }
+    catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}
+    out = {"snapshot.json": (json.dumps(snapshot, indent=1, ensure_ascii=False) + "\n").encode(),
+           "catalog.json": (json.dumps(catalog, indent=1, ensure_ascii=False) + "\n").encode()}
+    out.update(files)
+    return out
+
+
+def write(out: dict[str, bytes]) -> None:
+    for sub in ("docs", "results"):
+        if (DATA / sub).exists():
+            shutil.rmtree(DATA / sub)
+    for name, b in out.items():
+        dest = DATA / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(b)
+
+
+def check(out: dict[str, bytes]) -> list[str]:
+    stale = [n for n, b in out.items() if not (DATA / n).exists() or (DATA / n).read_bytes() != b]
+    extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
+    return stale + [f"unexpected {e}" for e in extra if e not in out]
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--check", action="store_true")
+    args = ap.parse_args(argv)
+    out = build()
+    if args.check:
+        bad = check(out)
+        print(json.dumps({"stale": bad}))
+        return 1 if bad else 0
+    write(out)
+    snap = json.loads(out["snapshot.json"])
+    print(json.dumps({"label": snap["label"], "inputs": len(snap["inputs"]),
+                      "claims": len(snap["claims"]), "problems": len(snap["problems"]), "documents": len(snap["documents"])}))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -1,0 +1,163 @@
+{
+ "engine": "numpy RK4",
+ "model_id": "glide_pointmass",
+ "name": "Point-mass glide simulation (RK4)",
+ "not_established": [
+  "biological feasibility",
+  "fin-tissue coupling",
+  "calibrated lift/drag for any fish"
+ ],
+ "ports": [
+  {
+   "bounds": {
+    "hi": "53/100",
+    "lo": "3/1000",
+    "source": "sweep range in nca-to-codex03.md",
+    "status": "assumed"
+   },
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 1,
+    "m": 0,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "m",
+   "provenance": {
+    "read_level": "none",
+    "source": "candidate from the constraint solver",
+    "status": "assumed"
+   },
+   "quantity": "body mass",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "kg"
+  },
+  {
+   "bounds": null,
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 2,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "S",
+   "provenance": {
+    "read_level": "none",
+    "source": "candidate",
+    "status": "assumed"
+   },
+   "quantity": "wing area",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "m^2"
+  },
+  {
+   "bounds": null,
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "b",
+   "provenance": {
+    "read_level": "none",
+    "source": "candidate",
+    "status": "assumed"
+   },
+   "quantity": "wing span",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "m"
+  },
+  {
+   "bounds": null,
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": -1
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "release_speed",
+   "provenance": {
+    "read_level": "none",
+    "source": "glide default is 1.5 x stall speed; witness V only if the caller opts in",
+    "status": "assumed"
+   },
+   "quantity": "release speed",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "m/s"
+  },
+  {
+   "bounds": null,
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": 0
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "glide_range",
+   "provenance": {
+    "read_level": "none",
+    "source": "simulated, CD0/e/CL_max are declared priors",
+    "status": "simulated"
+   },
+   "quantity": "horizontal glide range",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "m"
+  },
+  {
+   "bounds": null,
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": -1
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "sink_rate",
+   "provenance": {
+    "read_level": "none",
+    "source": "simulated",
+    "status": "simulated"
+   },
+   "quantity": "equilibrium sink rate",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "m/s"
+  }
+ ],
+ "reference": {
+  "branch": "work/nca-glide",
+  "commit": "4dee158",
+  "path": "engineering/simulation/{schema,glide,evaluate}.py",
+  "read_by": "dx-guilds, from the owner's hand-off note; code not re-read",
+  "repo": "kganjam/delphi-frontier"
+ },
+ "run": {
+  "deterministic": true,
+  "entrypoint": "engineering.simulation.evaluate",
+  "schema": "frontier.glide.candidate/1"
+ },
+ "schema": "frontier.model.interface/1",
+ "scope": "point-mass flight with declared drag/lift priors (CL_max 0.8-1.6, CD0 0.03-0.12, e 0.6-0.95: priors, not measurements)",
+ "status": "implemented",
+ "timescale": {
+  "kind": "unknown",
+  "seconds": null,
+  "source": "glide duration is an output; no characteristic time is declared"
+ }
+}

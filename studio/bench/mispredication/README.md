@@ -8,6 +8,13 @@ conditions. Band edges from the exact quadratic; Neumann modes `q_n = (nπ/L)²`
 unstable on `[0,L]` iff some integer `n ≥ 1` lies strictly inside `(L√q₋/π, L√q₊/π)`. Lengths are
 reported against each system's own critical wavelength `λ_c = 2π/k_c`.
 
+> **Correction notice (independent review, 2026-10-31).** The table below is kept as the historical result. Three limits apply to it.
+> (1) It comes from a **toy ensemble**: its sampling distribution, seed and generating script are not in this repository, so the percentages describe an undeclared
+> prior and say nothing about real Turing systems. (2) The earlier `mispredication_map.json` records `n_systems` 20000 and the table's `mispredication_fine.json` records 30000; the
+> two files are different runs. (3) The rows from 1.50 up were tested only at 1.5, 2, 3 and 5, which are half-integer multiples of λ_c, where a mode sits exactly at the critical
+> wavenumber and the rate is 0 by construction; the former claim that the criterion is "reliable (under 1%) above 1.5 critical wavelengths" is **withdrawn**. A declared-prior probe
+> (`PROBE_DECLARATION.md`, `probe_declared_prior.py`, committed output) finds non-zero rates between the half-integers, see "Declared-prior probe" below.
+
 | L / λ_c | mispredicted |
 |---:|---:|
 | 0.05 | 99.9% |
@@ -22,12 +29,12 @@ reported against each system's own critical wavelength `λ_c = 2π/k_c`.
 | 0.90 | 2.5% |
 | 1.00 | 0.0% |
 | 1.25 | 6.9% |
-| ≥1.50 | 0.0% |
+| 1.5, 2, 3, 5 (half-integers only; 0 by construction) | 0.0% |
 
 **Two things to read off it.**
 
-1. **A crossover.** Above about 1.5 critical wavelengths the textbook criterion is reliable: under
-   1% of passing systems fail to pattern. Below half a wavelength it is wrong most of the time.
+1. **Short domains.** Below half a wavelength the textbook criterion is wrong for most systems in this toy ensemble.
+   *(The former second sentence, a universal "<1% above about 1.5 critical wavelengths", is withdrawn: see the correction notice and the probe below.)*
 2. **It is not monotone.** The rate falls to zero at `0.5 λ_c`, rises again to **21.6% at
    0.7 λ_c**, and reappears at 1.25. These are *windows* between admissible modes — the same
    re-stabilisation that makes the worked example stable at `π`, unstable at `3π/2` and `2π`, and
@@ -69,3 +76,22 @@ follows in two lines from the Neumann eigenvalues. Per-mode critical lengths are
 literature — a reviewer reports Janovský, *Appl. Math.* 67:705 (2022), Def. 3.2 for Schnakenberg,
 **which we have not read**. The map below is ours; the mathematics under it is not, and we decline
 to attach a reference we have not checked supports it.
+
+## Declared-prior probe (replaces the withdrawn "<1% beyond 1.5" statement)
+
+Design committed before the output: `PROBE_DECLARATION.md`. Run: `python3 -I probe_declared_prior.py probe_declared_prior.json` (numpy only, about 20 s, seed 12345,
+20,000 accepted continuum-Turing systems per prior; Jacobian entries uniform on [-2, 2], Du = 1, Dv/Du log-uniform on [1, R]). Percent mispredicted:
+
+| L / λ_c | R = 30 | R = 100 | R = 1000 |
+|---:|---:|---:|---:|
+| 0.1 | 98.51 | 97.11 | 89.53 |
+| 1.25 | 6.22 | 4.90 | 2.69 |
+| 1.75 | 3.41 | 2.69 | 1.46 |
+| 2.25 | 2.15 | 1.69 | 0.86 |
+| 2.75 | 1.54 | 1.13 | 0.63 |
+| 4.25 | 0.58 | 0.48 | 0.23 |
+| 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0 | 0 | 0 | 0 |
+
+- The rate is exactly 0 at every half-integer multiple and non-zero between them; it exceeds 1% at 1.75 λ_c under all three priors, and at 2.25 and 2.75 under two of three. The size of the rate depends on the prior. No threshold above which the textbook criterion is "reliable" is claimed.
+- Controls: half-integers exactly 0 (pass); band-criterion vs direct eigenvalues of `J - q_n D` over 3,000 comparisons, 0 disagreements (pass); the must-fail control (at 0.1 more than 90% mispredicted for every prior) **failed on R = 1000 (89.53%)**; the committed run therefore exited 1, and the declared threshold was not edited (Amendment 1).
+- This is a statement about a toy sampling distribution and a linear one-dimensional criterion, not about any organism.
