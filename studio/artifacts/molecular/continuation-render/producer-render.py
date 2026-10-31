@@ -98,12 +98,17 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
         radius = max(bounds[dim] * 0.58, 0.9)
         setter(middle[dim] - radius, middle[dim] + radius)
     ax.set_box_aspect((max(bounds[0], 1), max(bounds[1], 1.8), max(bounds[2], 1.8)))
-    ax.set_yticks([-0.5, 0, 0.5])
-    ax.set_zticks([-0.5, 0, 0.5])
+    # The narrow principal axes project onto the same screen corner. Keep one
+    # spatial unit caption instead of overprinting their ticks and unit labels.
+    ax.set_yticks([])
+    ax.set_zticks([])
     ax.view_init(elev=15, azim=-70)
-    ax.set_xlabel("nm")
-    ax.set_ylabel("nm")
-    ax.set_zlabel("nm")
+    ax.set_xlabel("")
+    ax.set_ylabel("")
+    ax.set_zlabel("")
+    ax.text2D(
+        0.025, 0.07, "All spatial coordinates in nm", transform=ax.transAxes, fontsize=9
+    )
     ax.legend(loc="upper left", frameon=False)
     ax.set_title("Actual atomistic states · 1K6F collagen mimetic", pad=20)
     rms.plot(plot_times, [m[rmsd_key] for m in metrics], color="#286ca5")
