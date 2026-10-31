@@ -56,14 +56,17 @@ def main() -> int:
     sys.path.insert(0, str(ROOT))
     from frontier import models, store
     rows, rc = read_rows()
-    sha = lambda p: hashlib.sha256((ART / p).read_bytes()).hexdigest()
+    def sha(p):
+        return hashlib.sha256((ART / p).read_bytes()).hexdigest()
     ens = {k: json.loads((ART / f).read_text()) for k, f in (("hom_a", f"ensembl_homology_{LAT4A}.json"), ("hom_b", f"ensembl_homology_{LAT4B}.json"), ("lk_a", f"ensembl_lookup_{LAT4A}.json"), ("lk_b", f"ensembl_lookup_{LAT4B}.json"))}
     zf = {r["symbol"]: r for r in __import__("csv").DictReader(open(OUT / "genes.csv"))}
-    hom = lambda h: [x["id"] for x in h["data"][0]["homologies"] if x["type"] == "ortholog_one2one"]
+    def hom(h):
+        return [x["id"] for x in h["data"][0]["homologies"] if x["type"] == "ortholog_one2one"]
     assert hom(ens["hom_a"]) == [zf["slc43a2a"]["ensembl_gene"]] and hom(ens["hom_b"]) == [zf["slc43a2b"]["ensembl_gene"]] and ens["hom_a"]["data"][0]["id"] == LAT4A
-    G, H, I, J = (rows[k]["rows"] for k in rows)
-    cell = lambda rs, rid: next(r["cells"] for r in rs if rid in r["cells"])
-    assert cell(G, LAT4A)[1:3] == ["lat4a", "F326L"] and cell(H, LAT4A)[1] == "lat4a" and cell(H, LAT4B)[1] == "lat4b" and cell(I, LAT4B)[1] == "slc43a2b"
+    G, H, glider_rows, J = (rows[k]["rows"] for k in rows)
+    def cell(rs, rid):
+        return next(r["cells"] for r in rs if rid in r["cells"])
+    assert cell(G, LAT4A)[1:3] == ["lat4a", "F326L"] and cell(H, LAT4A)[1] == "lat4a" and cell(H, LAT4B)[1] == "lat4b" and cell(glider_rows, LAT4B)[1] == "slc43a2b"
     assert cell(J, LAT4A)[1:] == ["slc43a2a", "acc", 0.00837] and cell(J, LAT4B)[1:] == ["slc43a2b", "acc", 1e-05]
     prev = OUT / "daane2021_supplement_sheets.json"      # keep the first witnessed retrieval time so a rebuild does not change record versions
     first = (json.loads(prev.read_text())["workbook"].get("retrieved_at") if prev.exists() else None) or rc.retrieved_at
@@ -99,12 +102,14 @@ def main() -> int:
     def ens_src(loc, art):
         return {"uri": "https://rest.ensembl.org/", "locator": loc, "source_version": "Ensembl REST (release not stated in the response)", "content_sha256": sha(art), "content_available": False,
                 "access": "public REST GET, no key; response stored by hash; Ensembl terms not read", "license": None}
-    tag = lambda cls, sp: f"[species: {sp}; evidence_class: {cls}; source: Daane 2021 Data S1 + Ensembl REST] "
+    def tag(cls, sp):
+        return f"[species: {sp}; evidence_class: {cls}; source: Daane 2021 Data S1 + Ensembl REST] "
     def claim(id_, title, st, ctx, lim, source, origin, assumptions=None):
         return {"namespace": NS, "kind": "Claim", "id": id_, "issuer": ISSUER, "source_uri": "urn:frontier:connector:genomics", "visibility": "public", "predecessor": None,
                 "payload": {"title": title, "statement": st, "context": ctx, "assumptions": assumptions or [], "limitations": lim, "source": source, "origin": origin}}
     def aref(path, title, role):
-        b = (ROOT / path).read_bytes(); h = hashlib.sha256(b).hexdigest()
+        b = (ROOT / path).read_bytes()
+        h = hashlib.sha256(b).hexdigest()
         return {"title": f"{role}: {path} - {title}"[:3000], "uri": "urn:sha256:" + h, "sha256": h, "byte_size": len(b), "media_type": "application/json", "role": role, "availability": "referenced", "license": None}
     def evid(id_, target, rel, source, method, context, arts, lim, indep, when):
         return {"namespace": NS, "kind": "Evidence", "id": id_, "issuer": ISSUER, "source_uri": "urn:frontier:connector:genomics", "visibility": "public", "predecessor": None,
@@ -143,7 +148,8 @@ def main() -> int:
               (f"data/genomics/artifacts/ensembl_homology_{LAT4A}.json", "Ensembl homology response for the lat4a medaka gene", "input"), (f"data/genomics/artifacts/ensembl_homology_{LAT4B}.json", "Ensembl homology response for the lat4b control", "input")],
               ["Ensembl release not stated in the response.", "The residue check remains inconclusive.", "Orthology is not the authors' accession."], True, ens_when)]
     for e in E:
-        e["payload"]["target"] = models.ref(made[e["payload"]["target"]]); made[e["id"]] = models.make_record(models.Draft.model_validate(e), created_at=CREATED_AT)
+        e["payload"]["target"] = models.ref(made[e["payload"]["target"]])
+        made[e["id"]] = models.make_record(models.Draft.model_validate(e), created_at=CREATED_AT)
     recs = list(made.values())
     bad = store._unlicensed_available_content(recs)
     if bad:

@@ -77,7 +77,9 @@ def test_manifest_obeys_its_schema_and_the_schema_rejects_violations():
     assert not list(v.iter_errors(man))
 
     def broken(edit):
-        m = json.loads(json.dumps(man)); edit(m); return list(v.iter_errors(m))
+        m = json.loads(json.dumps(man))
+        edit(m)
+        return list(v.iter_errors(m))
     assert broken(lambda m: m["files"][0].update(sha256="xyz"))
     assert broken(lambda m: m["unresolved"].clear())
     assert broken(lambda m: m["display_rules"].update(show_species_on_every_row=False))
@@ -400,7 +402,8 @@ def test_manifest_v03_marks_lat4a_supported_not_author_stated_and_pins_the_new_f
 
 def test_a_manifest_that_overclaims_lat4a_is_rejected_by_the_schema():
     jsonschema = pytest.importorskip("jsonschema")
-    v = jsonschema.Draft202012Validator(J("manifest.schema.json")); m = J("manifest.json")
+    v = jsonschema.Draft202012Validator(J("manifest.schema.json"))
+    m = J("manifest.json")
     assert not list(v.iter_errors(m))
     m["inferred"] = ["lat4a = slc43a2a, confirmed by the authors"]
     assert list(v.iter_errors(m)), "the old 'probable' wording and an overclaim must both fail the 0.3 contract"
@@ -418,13 +421,15 @@ def test_lat4a_supplement_rows_chain_and_control():
     assert not [q for q in D.rglob("*.xlsx")], "the workbook is not stored"
     assert r["status"].startswith("SUPPORTED") and "not author" not in r["status"] and "state no ZFIN accession" in r["status"]
     z = {x["symbol"]: x for x in csv.DictReader(open(D / "genes.csv"))}
-    hom = lambda f: [h["id"] for h in json.loads((D / "artifacts" / f).read_text())["data"][0]["homologies"] if h["type"] == "ortholog_one2one"]
+    def hom(f):
+        return [h["id"] for h in json.loads((D / "artifacts" / f).read_text())["data"][0]["homologies"] if h["type"] == "ortholog_one2one"]
     assert hom(f"ensembl_homology_{A}.json") == [z["slc43a2a"]["ensembl_gene"]] == ["ENSDARG00000036848"]
     assert hom(f"ensembl_homology_{B}.json") == [z["slc43a2b"]["ensembl_gene"]] and r["negative_control"]["distinct_from_lat4a"] is True
     assert z["slc43a2a"]["zfin_gff_chr"] == "15" and z["slc43a2b"]["zfin_gff_chr"] == "10"
     import hashlib
     for st in r["chain"]:
-        if "sha256" in st: assert hashlib.sha256((D / "artifacts" / st["artifact"]).read_bytes()).hexdigest() == st["sha256"]
+        if "sha256" in st:
+            assert hashlib.sha256((D / "artifacts" / st["artifact"]).read_bytes()).hexdigest() == st["sha256"]
     assert len(r["still_not_established"]) == 4 and any("inconclusive" in x for x in r["still_not_established"])
 
 
@@ -432,7 +437,8 @@ def test_the_chain_check_fails_if_the_ortholog_or_the_label_is_changed(tmp_path)
     """negative controls: the comparison used above must flag a swapped ortholog and a swapped sheet label."""
     z = {x["symbol"]: x for x in csv.DictReader(open(D / "genes.csv"))}
     hom = json.loads((D / "artifacts" / "ensembl_homology_ENSORLG00000009715.json").read_text())
-    ids = lambda h: [x["id"] for x in h["data"][0]["homologies"]]
+    def ids(h):
+        return [x["id"] for x in h["data"][0]["homologies"]]
     assert ids(hom) == [z["slc43a2a"]["ensembl_gene"]]
     hom["data"][0]["homologies"][0]["id"] = z["slc43a2b"]["ensembl_gene"]
     assert ids(hom) != [z["slc43a2a"]["ensembl_gene"]], "a swapped ortholog is detected"
@@ -451,12 +457,12 @@ def test_the_earlier_lat4a_records_are_unchanged_and_the_new_ones_supersede_stat
     assert old["gx-lat4a-is-probably-slc43a2a"]["payload"]["title"].startswith("Inference (probable, not confirmed): the paper's lat4a is zebrafish slc43a2")
     models_ = pytest.importorskip("frontier.models")
     for rid in ("gx-lat4a-is-probably-slc43a2a", "gx-problem-lat4a-accession"):     # the stored version must still be the digest of the stored content
-        r = old[rid]; assert models_.make_record(models_.Draft.model_validate({k: r[k] for k in ("namespace", "kind", "id", "issuer", "source_uri", "visibility", "predecessor", "payload")}), created_at=r["created_at"])["version"] == r["version"], rid
+        r = old[rid]
+        assert models_.make_record(models_.Draft.model_validate({k: r[k] for k in ("namespace", "kind", "id", "issuer", "source_uri", "visibility", "predecessor", "payload")}), created_at=r["created_at"])["version"] == r["version"], rid
     assert len(old) == 16 and len(new["records"]) == 5 and ids == {"gx-daane-datas1-names-lat4a-as-slc43a2a", "gx-lat4a-is-slc43a2a-supported", "gx-problem-lat4a-residues", "gx-ev-datas1-lat4a-rows", "gx-ev-ensembl-ortholog"}
     assert "append_only_note" in new and "kept" in new["append_only_note"] or "keep their versions" in new["append_only_note"]
     claim = next(r for r in new["records"] if r["id"] == "gx-lat4a-is-slc43a2a-supported")["payload"]
     assert "not author-stated" in claim["title"] and any("authors print no zebrafish accession" in x for x in claim["limitations"]) and any("inconclusive" in x for x in claim["limitations"])
-    models = pytest.importorskip("frontier.models")
     by = {}
     for r in new["records"]:
         by[r["id"]] = r
