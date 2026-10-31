@@ -28,7 +28,7 @@
       <nav aria-label="Views"><ul>${NAV.map(([k, t]) => html`<li><a href="${DF.href("/" + k)}" aria-current="${route.view === k ? "page" : "false"}">${t}</a></li>`)}</ul></nav>
       <form class="gsearch" role="search" id="gs"><label class="sr" for="gq">Search the catalog</label><input id="gq" type="search" placeholder="Search records" value="${route.view === "search" ? route.params.q || "" : ""}"><button class="btn small" type="submit">Search</button></form>
       <span class="mode ${live ? "live" : "snap"}" title="${esc(s.reason)}">${live ? "Live runtime" : "Snapshot"}</span></div>
-      ${live && DF.api.state.authenticated === false ? html`<div class="banner" role="status"><b>Runtime reachable, not signed in.</b> Records need a session: <a href="/login">sign in</a>. Until then the catalog, artifacts and solver are unavailable, and the page shows the snapshot.</div>` : ""}
+      ${live && !s.publicAccess && s.authenticated === false ? html`<div class="banner" role="status"><b>Runtime reachable, not signed in.</b> Records need a session: <a href="/login">sign in</a>. Until then the catalog, artifacts and solver are unavailable, and the page shows the snapshot.</div>` : ""}
       ${live ? "" : html`<div class="banner" role="status"><b>Snapshot, not live.</b> No runtime answered (${s.reason}). Everything shown comes from <code>${snap ? snap.label : "the committed snapshot"}</code>. Local controls are calculations in this browser; nothing is submitted.</div>`}`;
   }
 

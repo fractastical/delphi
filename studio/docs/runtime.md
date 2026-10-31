@@ -1,5 +1,29 @@
 # Frontier runtime: dedicated PostgreSQL instance, website/API adapter, nginx
 
+## Current access policy (October 31, 2026)
+
+The dedicated PostgreSQL instance, web service and exact-host nginx vhost are now
+installed and running. The earlier implementation notes below describe the
+pre-installation state. The first deployed receipt is
+`deploy/receipts/first-live-check.json`.
+
+The owner requested public browsing: the web unit sets `FRONTIER_PUBLIC_READ=1`.
+This opens the site and public record reads without an audience token. Anonymous
+visitors get an automatically issued CSRF session for the bounded engineering and
+belief calculators; it conveys no contributor identity or write permission.
+Private records remain filtered, and contribution, review, import and action
+transitions still require operator bearer credentials and their existing roles.
+`--public-site` retains its older shell-only meaning; private mode is still the
+default when neither `--public-read` nor its environment flag is set.
+
+Frontier's vhost has no IP restriction. Orchestra's separate vhosts retain their
+IP allowlist and application token checks. No Orchestra configuration was changed.
+The legacy audience EnvironmentFiles remain temporarily so rollback to the first
+gated release can still start; public mode ignores those token values.
+
+Check the public deployment with `deploy/verify_live.py --public-read --receipt
+<path> [--screenshots <directory>]` inside the documented bounded systemd scope.
+
 Single-reader (collab), not Codex-reviewed. Root owns install, start and routing. (Updated for root's `085b49c`: search index default, attention, belief adapter, video artifacts, venv unit path.) This document does not switch the apex
 `morphoswarm.ai`, does not touch `studio.morphoswarm.ai`, and changes no nginx global setting.
 

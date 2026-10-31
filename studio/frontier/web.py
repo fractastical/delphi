@@ -3,7 +3,7 @@
 Binds 127.0.0.1 only (nginx terminates TLS in front of it). It reuses `Application` and the `Store`; it adds no store behaviour.
 
 Access model
-* Browser reads (static site + /api/catalog, /api/record, /api/events) need a server-side session created by presenting the access token
+* Browser reads are public when explicitly configured with public_read. Otherwise they need a server-side session created by presenting the access token
   (FRONTIER_ACCESS_TOKEN, else the studio's MORPHOSWARM_STUDIO_TOKEN from the service's EnvironmentFile). Compared in constant time.
   Cookie: HttpOnly; SameSite=Strict; Secure (the `__Host-` prefix when Secure); Path=/. Unsafe cookie-authenticated requests also need the CSRF header and an allowed Origin.
 * A session never authorises a write. POST /v1/proposals, /v1/reviews, ... still need an operator `Authorization: Bearer` credential and an `Idempotency-Key`,
@@ -73,6 +73,7 @@ class WebConfig:
     session_ttl: int = 8 * 3600
     max_sessions: int = 500
     public_site: bool = False                                    # True: static shell is open, data stays gated
+    public_read: bool = False                                    # public records + shell; anonymous CSRF sessions for bounded calculations
     search_mode: str = "store_lexical"                           # honest label of what /api/catalog actually runs
     catalog_search: Callable | None = None                       # e.g. SearchIndex(store).search once integrated; same keyword signature as Store.search
     artifact_search: Callable | None = None                      # default: ArtifactIndex(store).search
@@ -102,7 +103,7 @@ class WebConfig:
     @staticmethod
     def with_tokens(*tokens: str, **kw) -> "WebConfig":
         good = [t for t in tokens if t]
-        if not good or any(len(t) < 16 for t in good):
+        if (not good and not kw.get("public_read")) or any(len(t) < 16 for t in good):
             raise ValueError("an access token of at least 16 characters is required")
         return WebConfig(gate_tokens=tuple(sha256(t.encode()).digest() for t in good), **kw)
 
@@ -451,7 +452,7 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
                 if m not in ("GET", "HEAD"):
                     return self.method_not_allowed("GET, HEAD")
                 sid, sess = self.session()
-                if not sess and not (cfg.public_site and not path.startswith("/api/")):
+                if not sess and not cfg.public_read and not (cfg.public_site and not path.startswith("/api/")):
                     if path.startswith("/api/") or "text/html" not in (self.headers.get("Accept") or ""):
                         return self.error(401, "unauthorized", "Sign in required")
                     return self.send(302, b"", "text/plain", extra=[("Location", "/login")])
@@ -510,6 +511,9 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
         def api_session(self, m, origin):
             sid, sess = self.session()
             if m == "GET":
+                if cfg.public_read:
+                    csrf, extra = (sess["csrf"], []) if sess else self.new_session_headers()
+                    return self.json(200, {"authenticated": False, "public_access": True, "csrf": csrf}, extra)
                 if not sess:
                     return self.error(401, "unauthorized", "No session")
                 return self.json(200, {"authenticated": True, "csrf": sess["csrf"]})
@@ -534,6 +538,8 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
 
         def login(self, m, origin):
             if m in ("GET", "HEAD"):
+                if cfg.public_read:
+                    return self.send(303, b"", "text/plain", extra=[("Location", "/")])
                 return self.send(200, LOGIN_HTML.replace("<!--MSG-->", "").encode(), "text/html; charset=utf-8")
             if m != "POST":
                 return self.method_not_allowed("GET, HEAD, POST")
@@ -606,14 +612,14 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
             token = self.bearer()
             if path in WRITE_PATHS and not token:
                 return self.error(401, "unauthorized", "Operator bearer credential required; a browser session never authorises a write")
-            if path.startswith("/v1/read/") and not token and not self.session()[1]:
+            if path.startswith("/v1/read/") and not token and not cfg.public_read and not self.session()[1]:
                 return self.error(401, "unauthorized", "Sign in or supply a bearer credential")
             data = self.json_body(MAX_BUNDLE_BYTES)
             self.json(200, app.dispatch(path, data, token, self.headers.get("Idempotency-Key")))
 
         def custom(self, route, path, query, origin):
             sid, sess = self.session()
-            if not sess:
+            if not sess and not (cfg.public_read and self.command == "GET"):
                 return self.error(401, "unauthorized", "Sign in required")
             body = None
             if self.command == "POST":
@@ -717,7 +723,7 @@ class WebServer(ThreadingMixIn, HTTPServer):
 
 
 def make_web_server(store: Store, cfg: WebConfig, port: int = 0) -> WebServer:
-    if not cfg.gate_tokens:
+    if not cfg.gate_tokens and not cfg.public_read:
         raise ValueError("refusing to build an ungated website adapter")
     holder = {}
     server = WebServer(("127.0.0.1", port), make_handler(Application(store), store, cfg, lambda: holder["port"]))
@@ -733,15 +739,17 @@ def main(argv=None):
     p.add_argument("--site", type=Path, default=Path("site"))
     p.add_argument("--hostname", default="frontier.morphoswarm.ai")
     p.add_argument("--public-site", action="store_true", help="serve the static shell without sign-in; data endpoints stay gated")
+    p.add_argument("--public-read", action="store_true", default=os.environ.get("FRONTIER_PUBLIC_READ") == "1",
+                   help="public browsing and calculations; contributor writes still require bearer credentials")
     p.add_argument("--attention-module", default="attention.view", choices=ATTENTION_MODULES, help="module providing build_view (default attention.view); 503 if absent")
     p.add_argument("--legacy-catalog", action="store_true", help="use the old Store.search instead of the search index (debugging only)")
     p.add_argument("--insecure-cookies", action="store_true", help="local development over plain HTTP only: drop the Secure attribute")
     a = p.parse_args(argv)
     logging.basicConfig(stream=sys.stderr, level=logging.INFO, format="%(asctime)s %(message)s")
     # The access token comes from the service's EnvironmentFile; its value is never printed or logged.
-    tokens = [os.environ.get("FRONTIER_ACCESS_TOKEN") or os.environ.get("MORPHOSWARM_STUDIO_TOKEN")]
+    tokens = [] if a.public_read else [os.environ.get("FRONTIER_ACCESS_TOKEN") or os.environ.get("MORPHOSWARM_STUDIO_TOKEN")]
     try:
-        cfg = WebConfig.with_tokens(*tokens, site_dir=a.site, public_hostname=a.hostname, cookie_secure=not a.insecure_cookies, public_site=a.public_site, attention_module=a.attention_module)
+        cfg = WebConfig.with_tokens(*tokens, site_dir=a.site, public_hostname=a.hostname, cookie_secure=not a.insecure_cookies, public_site=a.public_site, public_read=a.public_read, attention_module=a.attention_module)
     except ValueError:
         print("frontier.web: set FRONTIER_ACCESS_TOKEN (or MORPHOSWARM_STUDIO_TOKEN) to a token of at least 16 characters", file=sys.stderr)
         return 2
@@ -749,7 +757,7 @@ def main(argv=None):
     if not a.legacy_catalog:
         cfg.catalog_search, cfg.search_mode = default_search(store)
     server = make_web_server(store, cfg, a.port)
-    log.info("listening 127.0.0.1:%d namespace=%s schema=%s gated=%s", server.server_port, a.namespace, a.schema, True)
+    log.info("listening 127.0.0.1:%d namespace=%s schema=%s gated=%s", server.server_port, a.namespace, a.schema, not cfg.public_read)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
