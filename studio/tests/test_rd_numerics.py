@@ -34,6 +34,7 @@ def test_explicit_timestep_controls_actual_wrapper_dynamics():
 
 def test_partial_result_remains_incomplete_and_contradictory_claim_is_rejected(
     tmp_path,
+    monkeypatch,
 ):
     """Synthetic flat software fixture only; never published as solver evidence."""
     import json
@@ -83,6 +84,19 @@ def test_partial_result_remains_incomplete_and_contradictory_claim_is_rejected(
     dump(folder / "receipt.json", receipt)
     with pytest.raises(ValueError, match="Completeness claim"):
         analyze(folder, tmp_path / "bad-analysis")
+    receipt["complete"] = False
+    dump(folder / "receipt.json", receipt)
+
+    def failed_recalculation(*args):
+        raise ValueError("Synthetic derived-metric reproduction failure")
+
+    monkeypatch.setattr(
+        "engineering.rd_numerics.analyze.compare_saved_metrics", failed_recalculation
+    )
+    assert analyze(folder, tmp_path / "retained-failure", True) is False
+    report = json.loads((tmp_path / "retained-failure/summary.json").read_text())
+    assert report["independent_metric_reproduction_status"] == "FAILED"
+    assert report["convergence_pass"] is None
 
 
 def test_recalculation_tolerance_preserves_exact_modes_and_rejects_material_change():

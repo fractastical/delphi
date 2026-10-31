@@ -10,7 +10,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .audit import CONFIGS, PAIRS, ROOT, comparisons, dump, rd, sha
+from .audit import CONFIGS, PAIRS, ROOT, common_grid, comparisons, dump, rd, sha
 
 
 def compare_saved_metrics(actual, saved):
@@ -53,7 +53,7 @@ def compare_saved_metrics(actual, saved):
     }
 
 
-def analyze(folder, output):
+def analyze(folder, output, retain_failed_recalculation=False):
     folder, out = Path(folder), Path(output)
     out.mkdir(parents=True, exist_ok=True)
     receipt = json.loads((folder / "receipt.json").read_text())
@@ -124,8 +124,22 @@ def analyze(folder, output):
         )
     rows = comparisons(folder, complete, ids, seeds, taus)
     saved = json.loads((folder / "paired-discrepancies.json").read_text())
-    metric_check = compare_saved_metrics(rows, saved)
     original_exact_check = rows == saved
+    recalculation_failed = False
+    try:
+        metric_check = compare_saved_metrics(rows, saved)
+    except ValueError as error:
+        if not retain_failed_recalculation:
+            raise
+        recalculation_failed = True
+        metric_check = {
+            "status": "FAILED",
+            "error": str(error),
+            "relative_tolerance": 1e-10,
+            "absolute_tolerance": 1e-12,
+            "scope": "Failure retained; original cloud metrics below are not relabeled as independently reproduced",
+        }
+        rows = saved
     if len(rows) != receipt["paired_rows"]:
         raise ValueError("Saved paired counts do not match recomputation")
     n_pairs = sum(a in complete and b in complete for a, b in PAIRS)
@@ -222,9 +236,63 @@ def analyze(folder, output):
         "Medians across declared 16 settings × 3 shared IC seeds. Gray/missing cells indicate unavailable or invalid comparisons; no convergence PASS threshold.",
         fontsize=8,
     )
+    if recalculation_failed:
+        fig.text(
+            0.02,
+            0.045,
+            "Independent auxiliary-metric reproduction FAILED; original cloud metrics shown, failure retained.",
+            color="#a32125",
+            fontsize=9,
+        )
     fig.tight_layout(rect=(0, 0.04, 1, 0.94))
     fig.savefig(out / "paired-discrepancies.png")
     plt.close(fig)
+    if 0 in complete and 4 in complete:
+        # Scenario rows are not a 2-D tissue: these are 48 paired 1-D fields.
+        coarse = np.load(folder / "config-0.npz")["fields"][:, -1]
+        fine, _ = common_grid(np.load(folder / "config-4.npz")["fields"][:, -1])
+        fig, axes = plt.subplots(2, 3, figsize=(13, 7), dpi=120)
+        for channel, name in enumerate(("u", "v")):
+            a, b = coarse[:, channel], fine[:, channel]
+            extent = (0, 1, 48, 0)
+            low, high = min(a.min(), b.min()), max(a.max(), b.max())
+            for axis, field, title in zip(
+                axes[channel, :2],
+                (a, b),
+                ("N64 / dt .02", "N256 / dt .005 projected to64cosine modes"),
+            ):
+                img = axis.imshow(
+                    field, aspect="auto", extent=extent, vmin=low, vmax=high
+                )
+                axis.set_title(name + ": " + title, fontsize=9)
+                fig.colorbar(img, ax=axis, shrink=0.75)
+            delta = a - b
+            limit = max(float(abs(delta).max()), 1e-15)
+            img = axes[channel, 2].imshow(
+                delta,
+                aspect="auto",
+                extent=extent,
+                cmap="coolwarm",
+                vmin=-limit,
+                vmax=limit,
+            )
+            axes[channel, 2].set_title(name + ": coarse − projected finer", fontsize=9)
+            fig.colorbar(img, ax=axes[channel, 2], shrink=0.75)
+            for axis in axes[channel]:
+                axis.set_xlabel("Normalized spatial coordinate x/L")
+                axis.set_ylabel("Training scenario row (16settings ×3ICs)")
+        fig.suptitle(
+            "Actual paired1-D solver fields at τ200 · concentrations in model units"
+        )
+        fig.text(
+            0.02,
+            0.015,
+            "Rows are simulated scenarios, not a spatial tissue image. Finest solution is not assumed exact; auxiliary-power recalculation failure retained separately.",
+            fontsize=8,
+        )
+        fig.tight_layout(rect=(0, 0.04, 1, 0.95))
+        fig.savefig(out / "actual-fields.png")
+        plt.close(fig)
     report = {
         "schema": "frontier.rd-numerics.analysis/1",
         "complete": complete == list(range(5)),
@@ -241,6 +309,12 @@ def analyze(folder, output):
         "source_receipt_sha256": sha(folder / "receipt.json"),
         "original_bit_for_bit_metric_comparison_equal": original_exact_check,
         "saved_metric_recalculation": metric_check,
+        "independent_metric_reproduction_status": "FAILED"
+        if recalculation_failed
+        else "passed_in_scope",
+        "metric_basis": "Original saved cloud metrics; failed independent recalculation retained"
+        if recalculation_failed
+        else "Independently recomputed from pinned arrays",
     }
     dump(out / "summary.json", report)
     dump(
@@ -257,11 +331,19 @@ def analyze(folder, output):
         },
     )
     print(json.dumps(report, indent=2, allow_nan=False), flush=True)
+    return not recalculation_failed
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("folder")
     parser.add_argument("--output", required=True)
+    parser.add_argument(
+        "--retain-failed-recalculation",
+        action="store_true",
+        help="Write labeled original-metric figures while retaining FAILED status and exit1; does not change any tolerance",
+    )
     args = parser.parse_args()
-    analyze(args.folder, args.output)
+    success = analyze(args.folder, args.output, args.retain_failed_recalculation)
+    if not success:
+        raise SystemExit(1)
