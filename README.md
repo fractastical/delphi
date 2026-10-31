@@ -41,7 +41,7 @@ The hosted server serves `main` as of the last deploy. Tools, CLI usage and rank
 
 ## Progress at a glance
 
-Illustrated summaries of what has been done so far, regenerated as the project moves. All counts come from the repo itself (git history, `delphi_overview`, `organisms/merged/`, `cell-geometry/results/`).
+Illustrated summaries of what has been done so far, regenerated as the project moves. All counts come from the repo itself (git history, `delphi_overview`, `test-data/organisms/merged/`, `claim-sources/cell-geometry/results/`).
 
 ### Everything so far
 
@@ -57,19 +57,27 @@ One frame per commit of the opening evening (18:40 to midnight, Oct 30, 2026): c
 
 ### Organisms overnight
 
-The parallel cloud-agent run that vendored organism reference data for every chapter of Darwin and Thompson: 782 taxa, 3,340 mentions, 1,372 dataset records, merged in [`organisms/`](organisms/README.md).
+The parallel cloud-agent run that vendored organism reference data for every chapter of Darwin and Thompson: 782 taxa, 3,340 mentions, 1,372 dataset records, merged in [`test-data/organisms/`](test-data/organisms/README.md).
 
 ![Organisms overnight run](assets/organisms-overnight.gif)
 
 ### Nebius
 
-Cellpose-SAM on the Nebius Scientific AI Platform segmented micrographs from seven species to test three of Thompson's cell-packing claims; see [`cell-geometry/`](cell-geometry/README.md).
+Cellpose-SAM on the Nebius Scientific AI Platform segmented micrographs from seven species to test three of Thompson's cell-packing claims; see [`claim-sources/cell-geometry/`](claim-sources/cell-geometry/README.md).
 
 ![What we did with Nebius](assets/nebius-snapshot.png)
 
 ## Approach
 
 This project builds on the Project Delphi ontology and uses [nanopublications](https://nanopub.net/) (nanopubs) as the format for publishing and querying small, citable, machine-readable scientific claims.
+
+## Repository layout
+
+- [`claim-sources/`](claim-sources/): where claims come from, one self-contained project per book or paper set (Darwin, Thompson, Wolfram, Levin, math-bio, cell geometry), each with its inputs, extraction, assessments, build scripts and nanopubs.
+- [`test-data/`](test-data/): what claims are tested against: pre-registered claim tests, organism reference datasets and model truth scores.
+- [`scripts/`](scripts/): repo-wide tooling: re-running executable claims, release status and the site build.
+- [`plugins/`](plugins/): integrations with external parties: Nebius, Fittest and the Discord/Moltbook agent.
+- [`mcp/`](mcp/README.md), [`forum/`](forum/README.md) and [`docs/`](docs/) stay at the root: the MCP server, the agent forum and the built claim-graph site.
 
 ## Best practices
 

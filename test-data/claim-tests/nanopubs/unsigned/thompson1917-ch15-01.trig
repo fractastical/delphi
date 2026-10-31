@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch15-01--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch15-01: supports, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "In species-level egg measurements of birds, turtles/tortoises and crocodilians, the polar axis (egg length) is never shorter than the maximum equatorial diameter (egg breadth): no hard-shelled egg is oblate or discoidal." ;
+    delphi:passCriterion "Pre-registered. For each species with a mean egg length L (pole-to-pole) and breadth B (maximum equatorial diameter) in the Deeming & Ruta 2014 amniote egg compilation (Dryad doi:10.5061/dryad.s9227) and the 955-species bird egg-shape compilation (Dryad doi:10.5061/dryad.sj3tx9648), compute the elongation L/B. Groups: birds, Testudines, Crocodylia (hard-shelled, in scope); Squamata reported separately as out of scope (mostly parchment-shelled). Supports if, in every in-scope group, zero species have L/B < 1.00, and the fraction of species within 5% of a sphere (L/B < 1.05) is reported together with the minimum L/B per group." ;
+    delphi:failCriterion "Refutes if any in-scope species has a mean L/B < 0.98 (polar axis robustly shorter than equatorial diameter, beyond ~2% measurement error) in either compilation. Mixed if the smallest in-scope L/B lies in [0.98, 1.00), i.e. a species indistinguishable from oblate within measurement error." ;
+    delphi:expectedObservation "Pre-registered. For each species with a mean egg length L (pole-to-pole) and breadth B (maximum equatorial diameter) in the Deeming & Ruta 2014 amniote egg compilation (Dryad doi:10.5061/dryad.s9227) and the 955-species bird egg-shape compilation (Dryad doi:10.5061/dryad.sj3tx9648), compute the elongation L/B. Groups: birds, Testudines, Crocodylia (hard-shelled, in scope); Squamata reported separately as out of scope (mostly parchment-shelled). Supports if, in every in-scope group, zero species have L/B < 1.00, and the fraction of species within 5% of a sphere (L/B < 1.05) is reported together with the minimum L/B per group." ;
+    delphi:disconfirmingObservation "Refutes if any in-scope species has a mean L/B < 0.98 (polar axis robustly shorter than equatorial diameter, beyond ~2% measurement error) in either compilation. Mixed if the smallest in-scope L/B lies in [0.98, 1.00), i.e. a species indistinguishable from oblate within measurement error." ;
+    delphi:admissibleDatasets "Planned datasets: dryad-s9227-deeming-ruta-2014-amniote-eggs, dryad-sj3tx9648-bird-egg-shape-955spp" ;
+    delphi:inferenceMethod "Downloaded the Amniote Life-History Database CSV (21,322 rows), kept rows with both egg_length_mm and egg_width_mm recorded (594 species), and computed elongation L/B per species. Species were grouped as Aves (167), Testudines (16), Crocodilia (9) in scope and Squamata (402) out of scope. For each group the count of species with L/B < 1.00 (oblate as recorded), L/B < 0.98 (robustly oblate) and L/B < 1.05 (near-spherical) was tabulated with the minimum and quantiles of L/B." ;
+    delphi:preregistered false ;
+    dct:description "Downloaded the Amniote Life-History Database CSV (21,322 rows), kept rows with both egg_length_mm and egg_width_mm recorded (594 species), and computed elongation L/B per species. Species were grouped as Aves (167), Testudines (16), Crocodilia (9) in scope and Squamata (402) out of scope. For each group the count of species with L/B < 1.00 (oblate as recorded), L/B < 0.98 (robustly oblate) and L/B < 1.05 (near-spherical) was tabulated with the minimum and quantiles of L/B." ;
+    rdfs:comment "Measured: 1.0346666666666666 minimum species-mean egg length/breadth among in-scope species (Macrochelys temminckii, 38.8 x 37.5 mm); zero of 192 species have L/B < 1 (n = 192, no oblate species found; in-scope L/B 1st-99th percentile 1.15-1.90). Interpretation: Thompson's 'prolate, never oblate spheroid' is read as: the axis of rotational symmetry (the pole-to-pole length, which in asymmetric eggs runs through the blunt and pointed ends) exceeds the equatorial diameter. Published egg measurements record length and breadth with length along the polar axis, so L/B >= 1 means prolate and L/B < 1 would mean oblate. A limitation stated up front: because measurers conventionally record the longer dimension as length, a truly oblate egg could only reveal itself in such data as L/B at or just below 1 (an apparently spherical egg); the test therefore asks whether any species approaches that boundary, and the fraction of near-spherical eggs is reported as the zone where the data cannot discriminate." ;
+    delphi:evidenceAgainst "Deviation from pre-registration: the two Dryad compilations named in planned_datasets (doi:10.5061/dryad.s9227, doi:10.5061/dryad.sj3tx9648) could not be downloaded because Dryad's file downloads are gated by an interactive anti-bot (proof-of-work) challenge; the Amniote Life-History Database, which carries the same two variables (egg length, egg width) and also covers turtles and crocodilians, was substituted. Criteria and thresholds were not changed." ;
+    delphi:evidenceAgainst "Coverage is modest: only 167 bird, 16 turtle and 9 crocodilian species have both egg length and width in this database, far fewer than the ~1,400 bird species of Stoddard et al. 2017. A rare oblate species could be missed; a universal negative can only be supported, not proven, by a sample." ;
+    delphi:evidenceAgainst "Measurement convention limits discriminating power: because egg length is recorded along the longer (polar) axis, an oblate egg could only appear as L/B at or just below 1. The data show no species near that boundary except the alligator snapping turtle (L/B = 1.03, effectively spherical), so the data are consistent with the claim but cannot exclude an oblate egg disguised as a sphere." ;
+    delphi:evidenceAgainst "One crocodilian row (L/B = 16.9) is an evident unit error in the source (width probably in cm); it does not affect the oblate count and is left as recorded." ;
+    delphi:evidenceAgainst "Squamata (402 species, mostly parchment-shelled, min L/B = 1.00 in a gecko) are outside Thompson's 'hard-shelled' scope and are reported only for completeness." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch15-01--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch15-01/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch15-01--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Amniote Life-History Database (Myhrvold et al. 2015, Ecology 96:3109; Ecological Archives E096-269)" ;
+    dct:description "species-mean egg length and width (mm) for birds, turtles, crocodilians and squamates" ;
+    delphi:hasChecksum "sha256:ae16377ebe8a172949c2b8c200a50c5d0c7fc04d34bd3c9704635da4a4d51f53" ;
+    prov:atLocation <https://esapubs.org/archive/ecol/E096/269/Data_Files/Amniote_Database_Aug_2015.csv> ;
+    prov:wasDerivedFrom <https://esapubs.org/archive/ecol/E096/269/> ;
+    dct:license "CC0" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch15-01> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch15-01--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch15-01/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-thompson-efb7)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.071Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch15-01: supports, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch15-01--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

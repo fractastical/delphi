@@ -131,7 +131,7 @@ const LEVEL = { lean: { v: 1, label: 'Machine-checked in Lean 4', short: 'Lean-c
   untested: { v: 0.45, label: 'Not proved (and not refuted by proof)', short: 'Not proved', col: '#b3b3b3' },
   refuted: { v: 0, label: 'Refuted as stated', short: 'Refuted', col: '#d1232a' } };
 const LEVELS = Object.keys(LEVEL);
-/* ---- evidence: verdict of a test against data in claim-tests/ (load-claims.mjs), a separate axis from proof ---- */
+/* ---- evidence: verdict of a test against data in test-data/claim-tests/ (load-claims.mjs), a separate axis from proof ---- */
 const EV = { supports: { v: 0.85, label: 'Tested against data: supports', short: 'Supports', col: '#1a9e4b' },
   mixed: { v: 0.6, label: 'Tested against data: mixed', short: 'Mixed', col: '#9fd3ae' },
   inconclusive: { v: 0.45, label: 'Tested against data: inconclusive', short: 'Inconclusive', col: '#dedede' },
@@ -400,7 +400,7 @@ function renderOverview() {
   $('ovtable').innerHTML = `<tr class="grp"><th colspan="4"></th><th colspan="${PROOF_COLS.length}">Proof (math claims)</th><th class="gl" colspan="${EVS.length + 1}">Tested against data</th><th class="gl"></th></tr>` +
     `<tr><th>Thinker · claims</th><th class="bar2">Standing</th><th title="Math claims that are Lean-checked or proved in the literature">★ Theorems</th><th title="Has a formal statement or is a mathematical kind of claim">∑ Math</th>
     ${PROOF_COLS.map(s => th(LEVEL[s].label, LEVEL[s].col, LEVEL[s].short)).join('')}
-    <th class="gl" title="Claims with a completed test in claim-tests/">Tested</th>
+    <th class="gl" title="Claims with a completed test in test-data/claim-tests/">Tested</th>
     ${EVS.map(s => th(EV[s].label, EV[s].col, EV[s].short)).join('')}
     ${th(STAND.untested.label, STAND.untested.col, 'Untested', 'gl')}</tr>` +
     THINKERS.map(t => row(t, t, CLAIMS.filter(c => c.thinker === t))).join('') + row('All thinkers', null, CLAIMS);

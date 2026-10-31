@@ -1,0 +1,155 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-18--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch03-18: refutes, confidence 0.85" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.85"^^xsd:double ;
+    delphi:hypothesis "At fixed length, plaice (Pleuronectes platessa) lose weight from about November to March/April (spawning) and regain it from May/June to November, and this cycle is caused wholly by spawning and the rebuilding of tissues and gonads. In the ICES North Sea IBTS, whose Q1 cruises run mid-January to early March (during and just after the North Sea plaice spawning season) and whose Q3 cruises run July to September (recovery), this predicts for MATURE plaice: (P1) the condition factor K = 100 W / L^3 declines with date within Q1; (P2) K rises with date within Q3; (P3) in Q1, spent fish have lower K than maturing or spawning fish of the same length. If spawning is the WHOLE cause, IMMATURE plaice should show (M) no comparable within-Q1 decline." ;
+    delphi:passCriterion "Pre-registered (claim supported). Using NS-IBTS CA records (individual weights, CANoAtLngt = 1, maturity staged, length 15-55 cm) joined to HH records for haul dates, with log10 K regressed on day-of-year with fixed effects for 1-cm length class and sex: (P1) the Q1 slope for mature fish is negative with 95% CI excluding 0 and implies a decline of at least 2% of K per 30 days; (P2) the Q3 slope for mature fish is positive with 95% CI excluding 0; (P3) in Q1, spent fish have mean log10 K at least log10(1.05) below maturing fish at the same length and sex (95% CI excluding 0); and (M) the within-Q1 decline per 30 days in immature fish is less than 50% of that in mature fish (point estimate), or is not distinguishable from 0 at the 95% level." ;
+    delphi:failCriterion "Pre-registered (claim refuted). (P1) fails with the opposite sign (a significant within-Q1 increase in K for mature fish), OR (P1) holds in mature fish but immature fish show a within-Q1 decline per 30 days that is at least 80% of the mature decline with 95% CI excluding 0 (the seasonal cycle is not confined to spawners, so it is not caused wholly by spawning). Any other combination (e.g. the pattern holds but immature fish show 50-80% of the mature decline, or P2 or P3 fails while P1 and M hold) is 'mixed'. If fewer than 500 mature plaice with individual weight, maturity and haul date are available in Q1, the verdict is 'inconclusive' (data-unavailable)." ;
+    delphi:expectedObservation "Pre-registered (claim supported). Using NS-IBTS CA records (individual weights, CANoAtLngt = 1, maturity staged, length 15-55 cm) joined to HH records for haul dates, with log10 K regressed on day-of-year with fixed effects for 1-cm length class and sex: (P1) the Q1 slope for mature fish is negative with 95% CI excluding 0 and implies a decline of at least 2% of K per 30 days; (P2) the Q3 slope for mature fish is positive with 95% CI excluding 0; (P3) in Q1, spent fish have mean log10 K at least log10(1.05) below maturing fish at the same length and sex (95% CI excluding 0); and (M) the within-Q1 decline per 30 days in immature fish is less than 50% of that in mature fish (point estimate), or is not distinguishable from 0 at the 95% level." ;
+    delphi:disconfirmingObservation "Pre-registered (claim refuted). (P1) fails with the opposite sign (a significant within-Q1 increase in K for mature fish), OR (P1) holds in mature fish but immature fish show a within-Q1 decline per 30 days that is at least 80% of the mature decline with 95% CI excluding 0 (the seasonal cycle is not confined to spawners, so it is not caused wholly by spawning). Any other combination (e.g. the pattern holds but immature fish show 50-80% of the mature decline, or P2 or P3 fails while P1 and M hold) is 'mixed'. If fewer than 500 mature plaice with individual weight, maturity and haul date are available in Q1, the verdict is 'inconclusive' (data-unavailable)." ;
+    delphi:admissibleDatasets "Planned datasets: ices-datras-ns-ibts-ca-hh" ;
+    delphi:inferenceMethod "fetch.py downloads the 40 XML files (875 MB, not committed) and derives: (i) plaice cells per quarter x ISO-style week x sex x maturity group x 1-cm length class with n, sum of day-of-year, sum and sum of squares of log10 K (K = 100 W/L^3), after mapping maturity codes as pre-registered and dropping 21 fish with |log10 K - cell mean| > 0.3; (ii) the same per year. analysis.py fits weighted least squares on cell means (weights n; exact individual-level OLS except that day-of-year is the weekly mean) of log10 K on day-of-year with length-class and sex fixed effects, separately for mature (maturing+spawning+spent+resting) and immature fish in Q1 and Q3, plus stage contrasts in Q1 and the adjusted Q3-Q1 difference; the pre-registered rules then give the verdict." ;
+    delphi:preregistered false ;
+    dct:description "fetch.py downloads the 40 XML files (875 MB, not committed) and derives: (i) plaice cells per quarter x ISO-style week x sex x maturity group x 1-cm length class with n, sum of day-of-year, sum and sum of squares of log10 K (K = 100 W/L^3), after mapping maturity codes as pre-registered and dropping 21 fish with |log10 K - cell mean| > 0.3; (ii) the same per year. analysis.py fits weighted least squares on cell means (weights n; exact individual-level OLS except that day-of-year is the weekly mean) of log10 K on day-of-year with length-class and sex fixed effects, separately for mature (maturing+spawning+spent+resting) and immature fish in Q1 and Q3, plus stage contrasts in Q1 and the adjusted Q3-Q1 difference; the pre-registered rules then give the verdict." ;
+    rdfs:comment "Measured: 1.285 ratio of the within-Q1 (Jan-Feb) decline of log10 K per 30 days in immature plaice to that in mature plaice (pre-registered threshold for 'wholly spawning': < 0.5) (n = 17187, mature Q1: -4.44% K per 30 d (95% CI -5.02 to -3.87, n = 13188); immature Q1: -5.67% (CI -6.61 to -4.72, n = 3999)). Interpretation: Thompson's table is for 55-cm fish from the 1909 Plaice Report, month by month. DATRAS does not give monthly coverage of the North Sea (NS-IBTS samples only Q1 and Q3), so the test uses the within-quarter trends that Thompson's smoothed curve predicts (decline Jan->Mar of roughly 7% per month; rise Jul->Sep of roughly 3-4% per month) and the maturity-stage contrast that is the direct signature of his mechanism. The word 'wholly' is tested with immature fish as the control that the assessors proposed: immature plaice do not spawn, so under the claim they should not share the cycle. Feeding and temperature covary with season and would produce a cycle in immature fish too; that is exactly what would refute 'wholly'. Planned years 2015-2024 (10 years, Q1 and Q3). Maturity codes are mapped before the data are seen: immature = {1, 61, A, I}; maturing = {2, 62, B}; spawning = {3, 63, C}; spent = {4, 64, D}; resting/skipped = {5, 65, E}; other codes (-9, 66, 6, F) excluded; mature = maturing + spawning + spent + resting. Length: LngtCode '1' means LngtClass in cm; '.' or '0' means mm (divided by 10). Fish with |residual log10 K| > 0.3 from the length-class/sex means are dropped as recording errors (pre-registered cleaning). A single probe request (NS-IBTS 2019 Q1 CA, HTTP status and first record only, a herring) was made before this pre-registration to confirm that the web service is reachable; no plaice data were inspected." ;
+    delphi:evidenceAgainst "The descriptive half of the claim is strongly confirmed: at fixed length, mature plaice lose about 4.4% of their weight per 30 days through January-February (P1), regain about 4.7% per 30 days through July-September (P2), and in Q1 spent fish are 7.7% lighter than maturing fish of the same length and sex (P3); the adjusted Q3-Q1 difference is +10.9% for mature fish and is positive in every year 2015-2023 (5-14%). What is refuted is the word 'wholly': immature plaice, which do not spawn, show the same cycle (Q1 decline -5.7% per 30 days, 1.29 times the mature decline; Q3 rise +3.3%; Q3-Q1 +9.2%, positive in every year), so most of the seasonal weight cycle at fixed length is somatic (winter fasting and summer feeding), not gonadal. Within mature fish the stage pattern agrees: fish still 'spawning' lose 5.6% per 30 days while 'spent' fish are flat (+0.6%), i.e. the gonadal loss happens at spawning and then stops, whereas the somatic loss continues in all non-spent groups." ;
+    delphi:evidenceAgainst "Thompson's own inference, that the spawning season can be read from length-weight data alone, is therefore not safe in general: an immature stock would show a comparable winter trough without spawning. The maturity-stage contrast (P3) does identify spawning, but it requires dissection, which is what Thompson claimed could be avoided." ;
+    delphi:evidenceAgainst "Within-quarter trends mix calendar date with survey geography (different nations survey different parts of the North Sea at different dates), and fish are treated as independent (haul clustering ignored), so the standard errors are too small; the conclusion does not rest on them but on the comparison of immature with mature fish, which share the same geography and dates, and on the Q3-Q1 contrast, which replicates in every year." ;
+    delphi:evidenceAgainst "Maturity is taken from the DATRAS codes at face value with the pre-registered mapping; 1480 fish with sub-staged old IBTS codes (Ba, Bb, Ca, Cb, Da, Db) and 29084 weighed plaice without a maturity stage were excluded as pre-registered. Some 'immature' fish of 25-35 cm could be mis-staged late maturers, but at that size the immature group is large (hundreds per week) and the pattern holds across weeks." ;
+    delphi:evidenceAgainst "NS-IBTS samples only January-March and July-September, so the months Thompson named for the trough (March-April) and the peak (November) are not observed directly; the test uses the direction of change inside each quarter, which his smoothed curve predicts unambiguously." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-18--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch03-18/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-18--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: ICES DATRAS, North Sea International Bottom Trawl Survey (NS-IBTS): CA (age/weight/maturity) and HH (haul) exchange records, Q1 and Q3, 2015-2024" ;
+    dct:description "individual plaice length, weight, sex, maturity stage and haul date" ;
+    delphi:hasChecksum "sha256:dbd475737936f5fd6ddf36d560dcab2ca50326df5d5bba51fdd61fa0b33b4efe" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2015&quarter=1> ;
+    delphi:hasChecksum "sha256:a945a0e63bafb7b6592ddf73c4513a61c8c4e923f54e80bba34052c5be9ae887" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2015&quarter=1> ;
+    delphi:hasChecksum "sha256:a0fe6d95774ca55452ee7828a36bb87602425b117050e75bd26e93c83415d591" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2015&quarter=3> ;
+    delphi:hasChecksum "sha256:aa78f3bb12a46533b8b9c5fc8346e7c0bf87f5f4c685a491197af9eb897c1b19" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2015&quarter=3> ;
+    delphi:hasChecksum "sha256:4676ed65c4b6e8bdeb59b8edd2e02ed4f0beff6c7c40ea12fe3aba42f5926eb8" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2016&quarter=1> ;
+    delphi:hasChecksum "sha256:d2bbff10ab17df6b29b84e1ea896e441f61ec774bf91fbe2a90e66211ba45ba9" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2016&quarter=1> ;
+    delphi:hasChecksum "sha256:f3e8aec1df4a3d32d9da1742be8b29a8d644cd4b37e7714071712e5cbc3f1983" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2016&quarter=3> ;
+    delphi:hasChecksum "sha256:cffa346d1a6457864ab55da80b6ea5c8c054f6e4e0fcb2acba57719b2b8318ae" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2016&quarter=3> ;
+    delphi:hasChecksum "sha256:18389cf4b732c6bb47f66f69c587d1dcc0e8b74638bfc1b66bbbf1cc71937042" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2017&quarter=1> ;
+    delphi:hasChecksum "sha256:56c5dd3cab313748205e7e9c52615f5084553b7728a26e3f7e40338fbed1e2c9" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2017&quarter=1> ;
+    delphi:hasChecksum "sha256:04e3ae57cc935865c5616fb14c73766d771cc48d90012a9272a85fe8f3470b61" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2017&quarter=3> ;
+    delphi:hasChecksum "sha256:c0831ca122a9233cf82360ae258b75812c47d82b86f422eedfc31403948998e9" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2017&quarter=3> ;
+    delphi:hasChecksum "sha256:cb32f780e6b4f3443c1480d9266aa734cad49f2c1de16dc649e1fd5c7cd302ca" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2018&quarter=1> ;
+    delphi:hasChecksum "sha256:e75067656ec5d16abd34cf435442046bf3eebd98625cbc5e18ac3a5d2d3475ab" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2018&quarter=1> ;
+    delphi:hasChecksum "sha256:9ee3cba07264172f6b1fc64ae2aabe2946f3d113cd0383baf54d5082118f219d" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2018&quarter=3> ;
+    delphi:hasChecksum "sha256:97031868e87ff39a7459b333007054fa021738a86b8f6985f7eed3123dccc2af" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2018&quarter=3> ;
+    delphi:hasChecksum "sha256:f9363d745de26cf6f602e6495eea077ee9a1799b8d04b5e393ffad58b7fe34b6" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2019&quarter=1> ;
+    delphi:hasChecksum "sha256:49d58d2db82d76ae834421faaa3c718f38f97006563c116303fb3024c53d4719" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2019&quarter=1> ;
+    delphi:hasChecksum "sha256:1e3d5111411f54279509cf3987d090a5f70dfbd9220d562211dc189a7d43e273" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2019&quarter=3> ;
+    delphi:hasChecksum "sha256:3833edfea643ba4f7702ec0dfc3e6ea35a64ae6f118c58202ad365e1c0ee908f" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2019&quarter=3> ;
+    delphi:hasChecksum "sha256:7276babf2009ec5f0c574c577c947288c2f0c3f4eedcad5f5d18a5d014b7fba3" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2020&quarter=1> ;
+    delphi:hasChecksum "sha256:7ed23f41de37b6403f851b838795d041c955e97b9805efa0f8d39f1f77e8acc0" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2020&quarter=1> ;
+    delphi:hasChecksum "sha256:c0b42e2a1af6d8e7def78b232f047a428c896b76ffc914b5bcd9acbab4f4af02" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2020&quarter=3> ;
+    delphi:hasChecksum "sha256:0220be5227334b5ac1e849b7237cef375edc15a8d3b67d56689158f1313db4bc" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2020&quarter=3> ;
+    delphi:hasChecksum "sha256:86b81c99343dccce1048e22226dc6fd12ddc309a348dcad3a18cb2c7d0ed63dd" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2021&quarter=1> ;
+    delphi:hasChecksum "sha256:bd82ae1f7612973a5d5b29ad54a87091a0470e809be24b943a717cd1ab4ce217" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2021&quarter=1> ;
+    delphi:hasChecksum "sha256:d0c30d13a10aaeb03f3cd30c76e5a8a283a2c969623ace73f657d1e2c774bab1" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2021&quarter=3> ;
+    delphi:hasChecksum "sha256:838187ea28d0c581e6971d5cf344d68c83c88bba9deee8275dc4edb119613259" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2021&quarter=3> ;
+    delphi:hasChecksum "sha256:51a37676e9932249109931ef1c640d6f55344eeeb1a9a6e804b710ff957e78cf" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2022&quarter=1> ;
+    delphi:hasChecksum "sha256:972a36186026f1d89115d4930fbabc134733b73c81f554d3935dd625fbcd950d" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2022&quarter=1> ;
+    delphi:hasChecksum "sha256:15a02698aca785afac51f11a363abd8e81b0b8ba30bbdc2010f38093f3804063" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2022&quarter=3> ;
+    delphi:hasChecksum "sha256:d5f37b83c495a00b6307073a01770633c615a771e395e4b4385117ae89dd91c9" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2022&quarter=3> ;
+    delphi:hasChecksum "sha256:ef2a0e55d83efa4b19e8aec725892a854e2835176695e7d68c64d869028bace4" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2023&quarter=1> ;
+    delphi:hasChecksum "sha256:f3f4919255fcf0f593e542a20a9e015a52fbb4dd7b72a72031343a1798e3aa9a" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2023&quarter=1> ;
+    delphi:hasChecksum "sha256:b2e064d2e8fa77c5e4df9f8fe7a838f7f2c417eb759fdd0afc54127c07e0046c" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2023&quarter=3> ;
+    delphi:hasChecksum "sha256:13c16a8d51338df6c745680c3d056ec00212b13f64b635e2e6a2b65a874b01bb" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2023&quarter=3> ;
+    delphi:hasChecksum "sha256:ec162445b4b028ee4123ee083b693c98ebb99397c2d3ff9c237b250b9e9ea27a" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2024&quarter=1> ;
+    delphi:hasChecksum "sha256:b6d6ac629eb4d3493c7328764027c12b56c20eb0884278b7a6994f31cabf65cc" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2024&quarter=1> ;
+    delphi:hasChecksum "sha256:547b234d5f5790f63d83eb11c59405a054dd93249c05d9b72d1b9b9f3e04f568" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getHHdata?survey=NS-IBTS&year=2024&quarter=3> ;
+    delphi:hasChecksum "sha256:e85e1ec7bcfebc655992ddf11f34dc9deb361526bb381804ff890988746a1b69" ;
+    prov:atLocation <https://datras.ices.dk/WebServices/DATRASWebService.asmx/getCAdata?survey=NS-IBTS&year=2024&quarter=3> ;
+    prov:wasDerivedFrom <https://datras.ices.dk/> ;
+    dct:license "ICES Data Policy: public, CC BY 4.0 with attribution to ICES and the national institutes" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch03-18> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-18--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch03-18/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5-1-thinking-high; cursor/thompson-claim-tests-6e84)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5-1-thinking-high" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.067Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch03-18: refutes, confidence 0.85" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-18--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

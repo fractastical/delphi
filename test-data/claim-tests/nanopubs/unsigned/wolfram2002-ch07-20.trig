@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch07-20--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch07-20: inconclusive, confidence 0.5" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0.5"^^xsd:double ;
+    delphi:hypothesis "Across exhaustively enumerated families of simple programs, measures of the complexity of a rule's definition are at most weakly rank-correlated with measures of the complexity of the behaviour it produces; some rules of minimal definitional complexity produce behaviour in the top quartile of behavioural complexity, some rules of maximal definitional complexity produce behaviour in the bottom quartile, and a non-negligible fraction of rules that differ in a single table entry differ greatly in behavioural complexity." ;
+    delphi:passCriterion "Pre-registered. Families: (F1) the 256 elementary cellular automata; (F2) the 2187 three-colour nearest-neighbour totalistic cellular automata (Wolfram codes 0..2186). Rule-complexity measures: F1: (a) number of monomials in the algebraic normal form over GF(2), (b) minimal number of two-input gates (AND, OR, XOR, with negation free) computing the rule, found by breadth-first search over truth tables; F2: (c) Shannon entropy in bits of the 7-entry code table, (d) number of table entries that differ from the table's most frequent value. Behaviour-complexity measures: (e) lzma-compressed size (preset 9) of the space-time diagram, one byte per cell, from a random initial condition (width 300, periodic boundary, numpy seed 20260720, steps 200..600 after a 200-step transient); (f) the same for the single-seed pattern (one black / one gray cell, 400 steps, width 801, zero boundary). Statistics: Spearman rank correlation rho for each (rule measure, behaviour measure) pair within each family (8 pairs). 'supports' if max over the 8 pairs of rho <= 0.30, and in each family at least one rule at the minimum value of each rule measure has behaviour measure (e) in the top quartile of its family while at least one rule at the maximum value has (e) in the bottom quartile, and at least 5 % of F1 Hamming-distance-1 rule pairs (1024 pairs) differ in (e) by more than half of the family's range of (e)." ;
+    delphi:failCriterion "Pre-registered. 'refutes' if any of the 8 Spearman correlations is >= 0.60 (a direct, monotone correspondence between rule complexity and behaviour complexity) or if in either family no rule at minimal rule complexity reaches the top quartile of behaviour complexity. Otherwise (e.g. 0.30 < max rho < 0.60, or the Hamming-neighbour fraction below 5 %) -> 'mixed'." ;
+    delphi:expectedObservation "Pre-registered. Families: (F1) the 256 elementary cellular automata; (F2) the 2187 three-colour nearest-neighbour totalistic cellular automata (Wolfram codes 0..2186). Rule-complexity measures: F1: (a) number of monomials in the algebraic normal form over GF(2), (b) minimal number of two-input gates (AND, OR, XOR, with negation free) computing the rule, found by breadth-first search over truth tables; F2: (c) Shannon entropy in bits of the 7-entry code table, (d) number of table entries that differ from the table's most frequent value. Behaviour-complexity measures: (e) lzma-compressed size (preset 9) of the space-time diagram, one byte per cell, from a random initial condition (width 300, periodic boundary, numpy seed 20260720, steps 200..600 after a 200-step transient); (f) the same for the single-seed pattern (one black / one gray cell, 400 steps, width 801, zero boundary). Statistics: Spearman rank correlation rho for each (rule measure, behaviour measure) pair within each family (8 pairs). 'supports' if max over the 8 pairs of rho <= 0.30, and in each family at least one rule at the minimum value of each rule measure has behaviour measure (e) in the top quartile of its family while at least one rule at the maximum value has (e) in the bottom quartile, and at least 5 % of F1 Hamming-distance-1 rule pairs (1024 pairs) differ in (e) by more than half of the family's range of (e)." ;
+    delphi:disconfirmingObservation "Pre-registered. 'refutes' if any of the 8 Spearman correlations is >= 0.60 (a direct, monotone correspondence between rule complexity and behaviour complexity) or if in either family no rule at minimal rule complexity reaches the top quartile of behaviour complexity. Otherwise (e.g. 0.30 < max rho < 0.60, or the Hamming-neighbour fraction below 5 %) -> 'mixed'." ;
+    delphi:admissibleDatasets "Planned datasets: nks-ch07-20-rule-family-generator" ;
+    delphi:inferenceMethod "analysis.py enumerates the 256 elementary rules and the 2187 three-colour totalistic codes, computes the rule-complexity measures (ANF monomial count by Moebius transform; minimal two-input gate count by breadth-first search over all 3-input truth tables with free negation; table entropy; non-default entries) and runs each rule from a random initial condition (width 300, periodic, seed 20260720, 200-step transient, 400 recorded steps) and from a single seed (400 steps, width 801), compressing each space-time diagram with lzma preset 9. Spearman correlations were computed for the 8 (rule measure, behaviour measure) pairs, quartile counterexamples were listed, and the 1024 Hamming-distance-1 pairs of elementary rules were compared on the random-IC compressed size. Run time about 4 minutes." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py enumerates the 256 elementary rules and the 2187 three-colour totalistic codes, computes the rule-complexity measures (ANF monomial count by Moebius transform; minimal two-input gate count by breadth-first search over all 3-input truth tables with free negation; table entropy; non-default entries) and runs each rule from a random initial condition (width 300, periodic, seed 20260720, 200-step transient, 400 recorded steps) and from a single seed (400 steps, width 801), compressing each space-time diagram with lzma preset 9. Spearman correlations were computed for the 8 (rule measure, behaviour measure) pairs, quartile counterexamples were listed, and the 1024 Hamming-distance-1 pairs of elementary rules were compared on the random-IC compressed size. Run time about 4 minutes." ;
+    rdfs:comment "Measured: [object Object] Spearman rho between rule complexity and lzma size of the space-time diagram; fraction of 1024 Hamming-1 ECA pairs whose random-IC lzma sizes differ by more than half the family range (n = [object Object], one random initial condition per rule; lzma sizes in bytes (ECA random-IC range 152..17028)). Interpretation: 'Complexity of underlying rules' is operationalised by syntactic measures of the rule table (ANF size and minimal circuit size for Boolean rules; entropy and non-default entries for totalistic codes), and 'complexity of behaviour' by lossless compressibility of the space-time diagram, which treats both random-looking and structured-but-irregular behaviour as complex (Wolfram's usage also counts class 3 randomness as complex). 'No direct correspondence' is read as the absence of a strong monotone association (rho < 0.3 weak, rho >= 0.6 strong) plus the existence of the counterexamples Wolfram describes. The extension 'and by extension natural systems' is not tested. All patterns are generated by analysis.py; there is no external download." ;
+    delphi:evidenceAgainst "The pre-registered decision rule is degenerate and the verdict is therefore recorded as inconclusive rather than as the 'refutes' it literally produces: the rule required a rule 'at the minimum value of each rule measure' to reach the top behavioural quartile, but the minimum of every measure is attained only by constant rules (rule 0; the three constant totalistic codes; for the gate count, the eight 0-gate projections/negations), which cannot produce complex behaviour under any definition. The condition therefore tests nothing about the claim. This is an error in the pre-registration, discovered only after the run." ;
+    delphi:evidenceAgainst "Post hoc (not pre-registered): at the lowest non-constant complexity levels there are rules in the top behavioural quartile, as the claim asserts: with 2 ANF monomials rules 60, 90 and 102 (nested), with 1 gate the same rules plus 153, 165, 195, and with 2 gates rules 30 and 45 (random-looking, essentially incompressible: 16952 and 16932 bytes vs a maximum of 17028). At the highest gate count (4) rules 77, 104, 232 and 233 sit in the bottom quartile, and 65 maximum-entropy totalistic codes do likewise. Rules differing in one table entry differ by more than half the behavioural range in 19.2 % of the 1024 pairs (e.g. 14/30, 6/22, 2/18), far above the pre-registered 5 %." ;
+    delphi:evidenceAgainst "All eight Spearman correlations are positive but weak to moderate (0.13 to 0.41; the four elementary-rule correlations are 0.13 to 0.41 and the four totalistic ones 0.30 to 0.38). None reaches the pre-registered 0.60 'direct correspondence' threshold, but the maximum (0.41, ANF monomials vs single-seed compressibility) exceeds the 0.30 'weak' threshold, so under the pre-registered thresholds with the degenerate clause removed the outcome would have been 'mixed': there is some statistical association between rule and behaviour complexity, but nothing like a monotone correspondence, and the counterexamples Wolfram describes exist." ;
+    delphi:evidenceAgainst "Compressibility of a random-initial-condition diagram is a poor proxy for behavioural complexity for shift-like class 2 rules (e.g. rule 15 transports the random input and so compresses badly) and for additive rules; the single-seed measure corrects this for those cases but conflates nested with random behaviour less well. Only one random initial condition per rule was used. The 'natural systems' extension of the claim was not tested." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch07-20--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch07-20/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch07-20--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Elementary cellular automata (256 rules, Wolfram numbering) and three-colour nearest-neighbour totalistic cellular automata (2187 codes, Wolfram code numbering: code digit k in base 3 gives the new colour for neighbourhood sum k), generated by analysis.py with the initial conditions, widths, step counts and seed stated in pass_criterion" ;
+    dct:description "the enumerated rule families on which rule complexity and behaviour complexity are compared" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p351--origins-of-simple-behavior/> ;
+    dct:license "generated" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch07-20> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch07-20--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch07-20/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-e5f4)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.079Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch07-20: inconclusive, confidence 0.5" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch07-20--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

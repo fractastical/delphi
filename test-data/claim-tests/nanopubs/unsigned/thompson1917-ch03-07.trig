@@ -1,0 +1,104 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-07--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch03-07: mixed, confidence 0.75" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.75"^^xsd:double ;
+    delphi:hypothesis "Across human growth, body weight scales approximately as the cube of stature (log-log slope near 3), and cubing the stature-versus-age curve removes most of the difference in shape between the stature curve and the weight curve." ;
+    delphi:passCriterion "Pre-registered, on pooled NHANES 2007-2018 individuals aged 0-19.99 yr with measured weight and stature (recumbent length < 24 months, standing height >= 24 months), sexes pooled with sex-specific values reported. (1) Cube tendency: the OLS slope b of log10(weight) on log10(stature) over all individuals satisfies 2.5 <= b <= 3.5 (95% CI reported; reduced-major-axis slope reported as sensitivity), and the same slope fitted to the age-median curve (monthly median weight vs monthly median stature, 0-19 yr) also lies in [2.5, 3.5]. (2) 'Mainly explains the curve difference': with monthly medians H(t), W(t) normalised to their 19-yr values, define D(p) = mean over months of |W(t)/W(19) - (H(t)/H(19))^p|. Supports if D(3)/D(1) <= 0.5, i.e. cubing the stature curve removes at least half of the discrepancy between the stature and weight curves. Both (1) and (2) must hold for 'supports'." ;
+    delphi:failCriterion "Refutes if the individual-level slope b lies outside [2.0, 4.0], or if D(3)/D(1) > 1 (cubing makes the curves less alike). Mixed if b is in [2.0, 2.5) or (3.5, 4.0], or if the slope is in range but 0.5 < D(3)/D(1) <= 1 (the cube explains some but not most of the difference)." ;
+    delphi:expectedObservation "Pre-registered, on pooled NHANES 2007-2018 individuals aged 0-19.99 yr with measured weight and stature (recumbent length < 24 months, standing height >= 24 months), sexes pooled with sex-specific values reported. (1) Cube tendency: the OLS slope b of log10(weight) on log10(stature) over all individuals satisfies 2.5 <= b <= 3.5 (95% CI reported; reduced-major-axis slope reported as sensitivity), and the same slope fitted to the age-median curve (monthly median weight vs monthly median stature, 0-19 yr) also lies in [2.5, 3.5]. (2) 'Mainly explains the curve difference': with monthly medians H(t), W(t) normalised to their 19-yr values, define D(p) = mean over months of |W(t)/W(19) - (H(t)/H(19))^p|. Supports if D(3)/D(1) <= 0.5, i.e. cubing the stature curve removes at least half of the discrepancy between the stature and weight curves. Both (1) and (2) must hold for 'supports'." ;
+    delphi:disconfirmingObservation "Refutes if the individual-level slope b lies outside [2.0, 4.0], or if D(3)/D(1) > 1 (cubing makes the curves less alike). Mixed if b is in [2.0, 2.5) or (3.5, 4.0], or if the slope is in range but 0.5 < D(3)/D(1) <= 1 (the cube explains some but not most of the difference)." ;
+    delphi:admissibleDatasets "Planned datasets: nhanes-demo-2007-2018, nhanes-bmx-2007-2018" ;
+    delphi:inferenceMethod "NHANES DEMO+BMX 2007-2018 merged on SEQN; examined persons under 20 yr with measured weight and stature (recumbent length < 24 months, standing height otherwise), n = 23540. OLS of log10 weight on log10 stature across individuals (95% CI from the regression standard error; RMA slope as sensitivity), and the same regression on the 240 monthly medians (age-median curve). Monthly median stature H(t) and weight W(t) were normalised by their mean over months 228-239 and the discrepancy D(p) = mean_t |W(t) - H(t)^p| computed for p = 1..4 and on a 0.01 grid to find the best exponent. Slopes by age window (0-2, 2-10, 10-20, 2-20 yr) are reported descriptively." ;
+    delphi:preregistered false ;
+    dct:description "NHANES DEMO+BMX 2007-2018 merged on SEQN; examined persons under 20 yr with measured weight and stature (recumbent length < 24 months, standing height otherwise), n = 23540. OLS of log10 weight on log10 stature across individuals (95% CI from the regression standard error; RMA slope as sensitivity), and the same regression on the 240 monthly medians (age-median curve). Monthly median stature H(t) and weight W(t) were normalised by their mean over months 228-239 and the discrepancy D(p) = mean_t |W(t) - H(t)^p| computed for p = 1..4 and on a 0.01 grid to find the best exponent. Slopes by age window (0-2, 2-10, 10-20, 2-20 yr) are reported descriptively." ;
+    rdfs:comment "Measured: 2.4076916540629516 log-log OLS exponent of weight on stature, individuals aged 0-19 (n = 23540, 95% CI [2.399, 2.416]; RMA slope 2.496). Interpretation: Thompson's 'linear dimension' is stature, 'weight' is body mass; 'tend to vary as the cube' is read as a log-log allometric exponent within 0.5 of 3 (his own hedge). The second half of the claim, that cubic scaling 'mainly (though not wholly)' explains why the weight curve differs in shape from the stature curve, is read as: the cube of the normalised stature curve is at least twice as close to the normalised weight curve as the stature curve itself. Humans only; the parenthetical extension to organisms generally is not tested. Cross-sectional data, modern US population." ;
+    delphi:evidenceAgainst "The two halves of the claim come apart. The allometric exponent across growth is 2.41 (CI 2.40-2.42; curve-level 2.46; RMA 2.50), below the pre-registered [2.5, 3.5] window, so weight does not vary as the cube of stature in the strict sense: proportions and composition change with age (window exponents 2.10 at 0-2 yr, 2.36 at 2-10 yr, 3.10 at 10-20 yr)." ;
+    delphi:evidenceAgainst "The second clause passes clearly: cubing the normalised stature curve removes 80% of its discrepancy from the normalised weight curve (D(3)/D(1) = 0.196; best exponent for curve shape 3.35), so the cubic relation does 'mainly, though not wholly' explain why the weight curve differs in shape from the stature curve, as Thompson said." ;
+    delphi:evidenceAgainst "The exponent that best matches curve shapes (3.35) differs from the log-log slope (2.41) because the normalised-curve comparison weights late ages (where W/W19 is near 1) differently from a log-log fit dominated by infancy and childhood; both numbers are reported." ;
+    delphi:evidenceAgainst "Cross-sectional data from a modern US population with high adolescent adiposity, which raises the 10-20 yr exponent; a leaner historical population would likely give a lower overall exponent, not a higher one." ;
+    delphi:evidenceAgainst "Only the human part of the scope was tested; the parenthetical 'organisms generally' was not." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-07--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-07--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-07--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: NHANES Demographic Variables and Sample Weights (DEMO), cycles 2007-2008 to 2017-2018" ;
+    dct:description "sex, age in months at exam (RIDEXAGM; RIDAGEMN for 2007-2010)" ;
+    delphi:hasChecksum "sha256:02b8e97703d04bc99769c751881bece51ac9ba68cf18a2992a45d3bdfb856147" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2007/DataFiles/DEMO_E.xpt> ;
+    delphi:hasChecksum "sha256:78c4d4a6e5eafa9da3bbb24a90d140fef5d8c0cda932a7ff8ee609288d4fae07" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2009/DataFiles/DEMO_F.xpt> ;
+    delphi:hasChecksum "sha256:eaf0525d1952626885af3e935415a1f66ad62c18698080e7354789c125af252d" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2011/DataFiles/DEMO_G.xpt> ;
+    delphi:hasChecksum "sha256:f8f0cbb3085a323d4cde22349b164878fea1e64dbc404e65b5815c7816b547d7" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/DEMO_H.xpt> ;
+    delphi:hasChecksum "sha256:c9297c6c37ae8f78f29be9568fa2a03cf3b112616a39afee04030fc775a66a0d" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/DEMO_I.xpt> ;
+    delphi:hasChecksum "sha256:c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt> ;
+    prov:wasDerivedFrom <https://wwwn.cdc.gov/nchs/nhanes/> ;
+    dct:license "US Government public domain" .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-07--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: NHANES Body Measures (BMX), cycles 2007-2008 to 2017-2018" ;
+    dct:description "measured standing height (BMXHT), recumbent length (BMXRECUM) and weight (BMXWT)" ;
+    delphi:hasChecksum "sha256:b67b50dbd12c9510b49b6348b595b9fd073c422c0c6eac182f90ac57b491a97d" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2007/DataFiles/BMX_E.xpt> ;
+    delphi:hasChecksum "sha256:1fa42e07764037674c3f56e1e76f990e10c32245897597de3d731c57b91d869a" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2009/DataFiles/BMX_F.xpt> ;
+    delphi:hasChecksum "sha256:4814bfc3047ed400b9d43d285f8c3ea7c940ac6489404a9b699579715d158ec3" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2011/DataFiles/BMX_G.xpt> ;
+    delphi:hasChecksum "sha256:fd5e9fc6e6aab0a4aee6e699f51497bbc9b62101f7f43aee924c473e38fd9442" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/BMX_H.xpt> ;
+    delphi:hasChecksum "sha256:d31da84e14212b4e58e8340598a5b8e2144fac83333563e966eb1b332e4141d6" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/BMX_I.xpt> ;
+    delphi:hasChecksum "sha256:8d675e42d8826ac98714b2c3dd4c5138a5e353fb4424f7eff5e6db4a01ce838a" ;
+    prov:atLocation <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/BMX_J.xpt> ;
+    prov:wasDerivedFrom <https://wwwn.cdc.gov/nchs/nhanes/> ;
+    dct:license "US Government public domain" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch03-07> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-07--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-thompson-efb7)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.059Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch03-07: mixed, confidence 0.75" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-07--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

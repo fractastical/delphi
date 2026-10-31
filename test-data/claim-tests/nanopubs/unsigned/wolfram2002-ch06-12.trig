@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch06-12--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch06-12: supports, confidence 0.99" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.99"^^xsd:double ;
+    delphi:hypothesis "For every finite deterministic discrete system we enumerate, every orbit (from every possible state) becomes eventually periodic, and its eventual period is at most N, the total number of possible states of the system (and the transient plus period is also at most N)." ;
+    delphi:passCriterion "Pre-registered: across all enumerated systems and all initial states, 100% of orbits satisfy period <= N and transient + period <= N (zero violations), where N is the exact number of distinct global states of the system." ;
+    delphi:failCriterion "Pre-registered: at least one orbit of at least one enumerated system has eventual period > N, or never repeats within N + 1 steps (impossible to observe without a period > N, so equivalently a measured period exceeding N)." ;
+    delphi:expectedObservation "Pre-registered: across all enumerated systems and all initial states, 100% of orbits satisfy period <= N and transient + period <= N (zero violations), where N is the exact number of distinct global states of the system." ;
+    delphi:disconfirmingObservation "Pre-registered: at least one orbit of at least one enumerated system has eventual period > N, or never repeats within N + 1 steps (impossible to observe without a period > N, so equivalently a measured period exceeding N)." ;
+    delphi:admissibleDatasets "Planned datasets: eca-cyclic-rings-n1-12, tm-2state-2color-cyclic-tape-n1-5, modular-multiplication-maps-n2-200" ;
+    delphi:inferenceMethod "analysis.py builds, for each enumerated system, the complete transition map on its N global states and computes for every state the transient length and the eventual period from the functional graph (in-degree peeling to find cycle nodes, cycle walking for periods, vectorised relaxation for transients). It then counts orbits with period > N or transient + period > N. Families: 256 ECA x ring sizes 1..12 (3072 systems, 2,096,640 orbits), 4096 two-state two-colour Turing machines x cyclic tapes 1..5 (20,480 systems, 2,113,536 orbits), and x -> m x mod n for n = 2..200 (20,099 maps, 2,686,699 orbits). Total 43,651 systems and 6,896,875 orbits; run time about 4 s." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py builds, for each enumerated system, the complete transition map on its N global states and computes for every state the transient length and the eventual period from the functional graph (in-degree peeling to find cycle nodes, cycle walking for periods, vectorised relaxation for transients). It then counts orbits with period > N or transient + period > N. Families: 256 ECA x ring sizes 1..12 (3072 systems, 2,096,640 orbits), 4096 two-state two-colour Turing machines x cyclic tapes 1..5 (20,480 systems, 2,113,536 orbits), and x -> m x mod n for n = 2..200 (20,099 maps, 2,686,699 orbits). Total 43,651 systems and 6,896,875 orbits; run time about 4 s." ;
+    rdfs:comment "Measured: 1 fraction of orbits with eventual period <= N and transient + period <= N (n = 6896875, exact (exhaustive enumeration, no sampling)). Interpretation: Wolfram's 'system of limited size that involves discrete elements and follows definite rules' is read as a deterministic map f on a finite set of N global states, so 'definite rules' means the next state depends only on the current state. 'Eventually exhibit repetitive behavior' is read as: the orbit s, f(s), f(f(s)), ... is eventually periodic, with the eventual period (cycle length) at most N; the text's surrounding argument (p. 255) gives exactly this bound. Three concrete families of finite systems from the book's own repertoire are enumerated: the 256 elementary cellular automata on cyclic rings of n cells (N = 2^n), the 4096 two-state two-color Turing machines on cyclic tapes of n cells (N = 2 * n * 2^n: head state x head position x tape contents), and the modular multiplication maps x -> m x mod n (N = n). For every system every state is used as an initial condition, so the test is exhaustive within the enumerated sizes. The claim is a theorem (pigeonhole principle); the computation checks that the stated bound is never exceeded in these families and records how close observed periods come to it." ;
+    delphi:evidenceAgainst "The claim is a theorem (pigeonhole principle on a finite state set), so a finite enumeration can only fail to refute it; the enumeration here covers three concrete families exhaustively up to the stated sizes and finds the bound tight (period = N in degenerate 1-cell systems, period = N - 1 for x -> 3x mod 199)." ;
+    delphi:evidenceAgainst "Wolfram's bound is on the eventual period; the test also checks the slightly stronger transient + period <= N, which is what the pigeonhole argument actually gives, and it held in every orbit." ;
+    delphi:evidenceAgainst "Systems whose next state depends on more than the current state (external input, randomness, unbounded memory) are outside the claim's scope and were not tested." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-12--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-12--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-12--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch06-12/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-12--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: All 256 elementary cellular automata on cyclic rings of n = 1..12 cells, all 2^n initial states (generated by analysis.py)" ;
+    dct:description "finite deterministic systems with N = 2^n states" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-12--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: All 4096 two-state two-colour Turing machines on cyclic tapes of n = 1..5 cells, all initial configurations (generated by analysis.py)" ;
+    dct:description "finite deterministic systems with N = 2 n 2^n states" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-12--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Maps x -> m x mod n for n = 2..200 and m = 0..n-1, all initial residues (generated by analysis.py)" ;
+    dct:description "finite deterministic systems with N = n states (Wolfram's 'systems based on numbers' of limited size)" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch06-12> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch06-12--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch06-12/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-0123)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.078Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch06-12: supports, confidence 0.99" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch06-12--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

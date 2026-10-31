@@ -1,0 +1,84 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch09-04--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch09-04: mixed, confidence 0.85" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.85"^^xsd:double ;
+    delphi:hypothesis "Clause 1 (absolute): wholly soft-bodied organisms leave no fossils, so animal phyla without mineralised or sclerotised hard parts should have zero fossil occurrences. Clause 2 (bias): the fossil record is strongly biased toward organisms with hard parts, so fossil occurrences per living species should be far higher for biomineralising phyla than for wholly soft-bodied phyla." ;
+    delphi:passCriterion "Pre-registered. Wholly soft-bodied phyla: Ctenophora, Platyhelminthes, Nemertea, Chaetognatha, Priapulida, Onychophora, Nematoda, Nematomorpha, Xenacoelomorpha, Gastrotricha, Placozoa, Rotifera, Tardigrada. Biomineralising phyla: Mollusca, Brachiopoda, Echinodermata, Bryozoa, Porifera, Cnidaria. For each phylum, count fossil occurrences in the Paleobiology Database (occs/list, rowcount) and accepted living species in the GBIF backbone taxonomy. Clause 1 is REFUTED if the soft-bodied phyla together have >= 10 fossil occurrences spread over >= 3 phyla, and SUPPORTED if they have 0. Clause 2 is SUPPORTED if the median of (fossil occurrences / living accepted species) over biomineralising phyla is >= 100 times the median over soft-bodied phyla, and REFUTED if it is < 10 times. Overall verdict: 'supports' if clause 1 supported and clause 2 supported; 'mixed' if clause 1 refuted and clause 2 supported; 'refutes' if clause 2 refuted (whatever clause 1 shows)." ;
+    delphi:failCriterion "Pre-registered. See pass_criterion: clause 1 fails on >= 10 occurrences in >= 3 soft-bodied phyla; clause 2 fails if the biomineralising/soft-bodied ratio of occurrences per living species is < 10. The third sentence of the claim (shells and bones decay where sediment is not accumulating) is not tested here; no public dataset pairs preservation with sedimentation rate at the needed scale, and the two assessors' operationalisations also concentrate on the first two clauses." ;
+    delphi:expectedObservation "Pre-registered. Wholly soft-bodied phyla: Ctenophora, Platyhelminthes, Nemertea, Chaetognatha, Priapulida, Onychophora, Nematoda, Nematomorpha, Xenacoelomorpha, Gastrotricha, Placozoa, Rotifera, Tardigrada. Biomineralising phyla: Mollusca, Brachiopoda, Echinodermata, Bryozoa, Porifera, Cnidaria. For each phylum, count fossil occurrences in the Paleobiology Database (occs/list, rowcount) and accepted living species in the GBIF backbone taxonomy. Clause 1 is REFUTED if the soft-bodied phyla together have >= 10 fossil occurrences spread over >= 3 phyla, and SUPPORTED if they have 0. Clause 2 is SUPPORTED if the median of (fossil occurrences / living accepted species) over biomineralising phyla is >= 100 times the median over soft-bodied phyla, and REFUTED if it is < 10 times. Overall verdict: 'supports' if clause 1 supported and clause 2 supported; 'mixed' if clause 1 refuted and clause 2 supported; 'refutes' if clause 2 refuted (whatever clause 1 shows)." ;
+    delphi:disconfirmingObservation "Pre-registered. See pass_criterion: clause 1 fails on >= 10 occurrences in >= 3 soft-bodied phyla; clause 2 fails if the biomineralising/soft-bodied ratio of occurrences per living species is < 10. The third sentence of the claim (shells and bones decay where sediment is not accumulating) is not tested here; no public dataset pairs preservation with sedimentation rate at the needed scale, and the two assessors' operationalisations also concentrate on the first two clauses." ;
+    delphi:admissibleDatasets "Planned datasets: pbdb-occs-rowcount, gbif-backbone-species-counts" ;
+    delphi:inferenceMethod "For each of 13 pre-registered wholly soft-bodied phyla and 6 biomineralising phyla, the phylum-level taxon was resolved in PBDB (taxa/list match_name, keeping accepted phylum-rank records so that homonyms such as the sloth clade 'Tardigrada' and the crane-fly genus 'Ctenophora' are excluded) and body-fossil occurrences counted with occs/list?base_id=...&pres=regular&rowcount. Accepted species per phylum were counted in the GBIF Backbone (species/search, status ACCEPTED), and living species estimated as total minus species flagged extinct. Occurrences per living species were compared between the two groups by medians; five example occurrences per soft-bodied phylum were saved to derived/soft_bodied_examples.csv." ;
+    delphi:preregistered false ;
+    dct:description "For each of 13 pre-registered wholly soft-bodied phyla and 6 biomineralising phyla, the phylum-level taxon was resolved in PBDB (taxa/list match_name, keeping accepted phylum-rank records so that homonyms such as the sloth clade 'Tardigrada' and the crane-fly genus 'Ctenophora' are excluded) and body-fossil occurrences counted with occs/list?base_id=...&pres=regular&rowcount. Accepted species per phylum were counted in the GBIF Backbone (species/search, status ACCEPTED), and living species estimated as total minus species flagged extinct. Occurrences per living species were compared between the two groups by medians; five example occurrences per soft-bodied phylum were saved to derived/soft_bodied_examples.csv." ;
+    rdfs:comment "Measured: 937 PBDB body-fossil occurrences in the 13 wholly soft-bodied phyla (n = 19, ratio of median occurrences-per-living-species, mineralised/soft = 960.9). Interpretation: Darwin's 'organism wholly soft' is read as membership of an animal phylum whose members have neither biomineralised skeletons nor robust sclerotised cuticles, jaws or tubes (list fixed above; Annelida, Hemichordata, Arthropoda and Chordata are excluded as mixed). 'Preserved' is read as having at least one occurrence recorded in the Paleobiology Database, which records body and trace fossils by taxon; trace fossils are excluded by restricting to body fossils where the API allows (pres=regular). The bias clause is read as the ratio of fossil occurrences to living described species, a crude but standard measure of preservation potential. Modern reinterpretation: the phylum-level classification and the notion of exceptional (Lagerstätte) preservation post-date Darwin." ;
+    delphi:evidenceAgainst "Clause 1 (absolute) is refuted: 937 body-fossil occurrences are recorded for 12 of the 13 soft-bodied phyla, including unambiguous ones such as ctenophores (Chengjiang, Hunsrück), nematodes and nematomorphs in amber, nemerteans (Solnhofen) and rotifers (Dominican amber). Even excluding phyla whose fossils are mostly sclerites or spines (Priapulida incl. palaeoscolecids, Chaetognatha incl. protoconodonts, Onychophora incl. Microdictyon plates), 184 occurrences remain in 9 phyla." ;
+    delphi:evidenceAgainst "Clause 2 (bias) is strongly supported: the median mineralised phylum has 4.6 fossil occurrences per living species, the median soft-bodied phylum 0.005 (ratio ~960; pooled ratio 6.1 vs 0.017). Brachiopoda alone (316 per living species) reflect their far greater past diversity, not only preservation." ;
+    delphi:evidenceAgainst "GBIF Backbone extinct flags are incomplete, so 'living species' (total minus flagged extinct) overestimates living diversity for groups with many unflagged fossil species (Mollusca), which makes the mineralised ratios conservative." ;
+    delphi:evidenceAgainst "Some PBDB identifications of soft-bodied fossils are contested (e.g. the single 'Placozoa' and two 'Xenacoelomorpha' records from the Triassic of Troistedt); the clause-1 refutation does not depend on them." ;
+    delphi:evidenceAgainst "The third clause of the claim (decay of shells and bones on non-depositing sea floor) was not tested; it would need taphonomic field data paired with sedimentation rates." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch09-04--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch09-04--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch09-04/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch09-04--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Paleobiology Database, data service 1.2: occs/list record counts per phylum (body fossils)" ;
+    dct:description "fossil occurrence counts per phylum; example occurrences of soft-bodied phyla" ;
+    delphi:hasChecksum "sha256:f95852a98e9e1af38a4e9831191808c3300a37c0c0bf338def417a23b56e378f" ;
+    rdfs:comment "Location (not a URL): https://paleobiodb.org/data1.2/taxa/list.json?... (one call per phylum; full list with per-call SHA-256 in derived/files.json)" ;
+    prov:wasDerivedFrom <https://paleobiodb.org/> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch09-04--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: GBIF Backbone Taxonomy, accepted species counts per phylum (species/search)" ;
+    dct:description "living (and fossil) accepted species per phylum as denominator" ;
+    delphi:hasChecksum "sha256:e2384f0de1852558e96bbae699acc9bf9d300a7c64c9faeaa820e9fc6f1e1c80" ;
+    rdfs:comment "Location (not a URL): https://api.gbif.org/v1/species/match?... (one call per phylum; full list with per-call SHA-256 in derived/files.json)" ;
+    prov:wasDerivedFrom <https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch09-04> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch09-04--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch09-04/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-b201)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.022Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch09-04: mixed, confidence 0.85" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch09-04--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-14--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch11-14: inconclusive, confidence 0.9" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0.9"^^xsd:double ;
+    delphi:hypothesis "Rule 110 is computationally universal (Cook 2004, Complex Systems 15(1):1-40, doi:10.25088/ComplexSystems.15.1.1). Universality itself is a theorem that no finite simulation can establish, so this test checks the empirical premise the claim rests on: that rule 110 'naturally' produces, from random initial conditions, a background ether with the (time, space) periodicity lattice spanned by (3, 2) and (4, -2) (spatial period 14, temporal period 7), and persistent localized structures (gliders) whose space-time periods are exactly those tabulated by Cook (Figure 5): A (3, 2), B (4, -2), B-bar/B-hat (12, -6), C1-C3 (7, 0), D1-D2 (10, 2), E^n (15, -4), E-bar (30, -8), F (36, -4), G^n (42, -14), H (92, -18); in particular the classes used as components in Cook's construction (C2 tape data, E-bar table data, A moving data, E leaders) must occur." ;
+    delphi:passCriterion "Pre-registered: simulate rule 110 on rings of 1200 cells from 60 uniformly random initial rows (numpy default_rng seed 20261031) for 4000 steps. Ether cells are those whose 7 x 14 neighbourhood is invariant under the lattice translation (t, x) -> (t + 1, x - 4). In rows t = 3000..3900 (every 100 steps), maximal runs of non-ether cells of width <= 60 are 'structures'. For each structure, search for the smallest temporal period P <= 100 and shift |s| <= 50 such that the window (structure plus 14 cells of ether on each side) reappears exactly at (t + P, x + s). Component premise confirmed if: (1) the ether, i.e. the (3,2)/(4,-2) lattice, covers more than 50% of the cells at t >= 3000 in every run; (2) at least 90% of structures resolve to a period, and every resolved period (P, s) is a positive integer combination of Cook's A and B periods that coincides with one of Cook's tabulated glider periods (allowing the period to be a positive integer multiple of a tabulated one, for packets such as A^n); (3) the classes A, B, C, D, E and E-bar are each observed at least once. Because the test replays only the glider inventory and not the cyclic-tag-system emulation, the verdict when all three conditions hold is pre-declared as 'inconclusive' with reason 'not-operationalizable' (universality is settled by proof, not by this computation), with the component results reported as supporting evidence." ;
+    delphi:failCriterion "Pre-registered: 'refutes' if the standard ether does not form (condition 1 fails in a majority of runs), or if the A, C or E-bar classes (the data carriers of Cook's construction) are never observed in 60 random runs, or if resolved structures have space-time periods incompatible with Cook's table (a period that is not an integer combination of (3, 2) and (4, -2) would contradict his lattice argument). Such results would undermine the published construction that the claim cites and would be reported as 'refutes' of the component premise with confidence <= 0.6, since a construction could in principle use rarer gliders." ;
+    delphi:expectedObservation "Pre-registered: simulate rule 110 on rings of 1200 cells from 60 uniformly random initial rows (numpy default_rng seed 20261031) for 4000 steps. Ether cells are those whose 7 x 14 neighbourhood is invariant under the lattice translation (t, x) -> (t + 1, x - 4). In rows t = 3000..3900 (every 100 steps), maximal runs of non-ether cells of width <= 60 are 'structures'. For each structure, search for the smallest temporal period P <= 100 and shift |s| <= 50 such that the window (structure plus 14 cells of ether on each side) reappears exactly at (t + P, x + s). Component premise confirmed if: (1) the ether, i.e. the (3,2)/(4,-2) lattice, covers more than 50% of the cells at t >= 3000 in every run; (2) at least 90% of structures resolve to a period, and every resolved period (P, s) is a positive integer combination of Cook's A and B periods that coincides with one of Cook's tabulated glider periods (allowing the period to be a positive integer multiple of a tabulated one, for packets such as A^n); (3) the classes A, B, C, D, E and E-bar are each observed at least once. Because the test replays only the glider inventory and not the cyclic-tag-system emulation, the verdict when all three conditions hold is pre-declared as 'inconclusive' with reason 'not-operationalizable' (universality is settled by proof, not by this computation), with the component results reported as supporting evidence." ;
+    delphi:disconfirmingObservation "Pre-registered: 'refutes' if the standard ether does not form (condition 1 fails in a majority of runs), or if the A, C or E-bar classes (the data carriers of Cook's construction) are never observed in 60 random runs, or if resolved structures have space-time periods incompatible with Cook's table (a period that is not an integer combination of (3, 2) and (4, -2) would contradict his lattice argument). Such results would undermine the published construction that the claim cites and would be reported as 'refutes' of the component premise with confidence <= 0.6, since a construction could in principle use rarer gliders." ;
+    delphi:admissibleDatasets "Planned datasets: rule110-random-soup-gliders, cook2004-glider-table" ;
+    delphi:inferenceMethod "analysis.py runs rule 110 from 60 random rows on 1200-cell rings for 4208 steps. In rows 3000..3900 (every 100 steps) it marks ether cells by invariance of their 7 x 14 neighbourhood under the ether lattice translation (t, x) -> (t+1, x-4), extracts maximal non-ether runs (structures) of width <= 60, keeps those with 14 cells of ether on each side (isolated), and for each searches the smallest space-time period (P <= 100, |s| <= min(50, P)) at which the structure and its margins recur twice. Each minimal period is compared with the (time, displacement) periods of Cook's Figure 5 (exact match, or an integer multiple for packets) and checked to be a non-negative integer combination of the A period (3, 2) and the B period (4, -2). Two refinements were added after a trial run: |s| <= P (matches with faster-than-light displacement are neighbouring identical gliders, not periods) and recurrence at two consecutive periods. Run time about 15 s including the PDF download." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py runs rule 110 from 60 random rows on 1200-cell rings for 4208 steps. In rows 3000..3900 (every 100 steps) it marks ether cells by invariance of their 7 x 14 neighbourhood under the ether lattice translation (t, x) -> (t+1, x-4), extracts maximal non-ether runs (structures) of width <= 60, keeps those with 14 cells of ether on each side (isolated), and for each searches the smallest space-time period (P <= 100, |s| <= min(50, P)) at which the structure and its margins recur twice. Each minimal period is compared with the (time, displacement) periods of Cook's Figure 5 (exact match, or an integer multiple for packets) and checked to be a non-negative integer combination of the A period (3, 2) and the B period (4, -2). Two refinements were added after a trial run: |s| <= P (matches with faster-than-light displacement are neighbouring identical gliders, not periods) and recurrence at two consecutive periods. Run time about 15 s including the PDF download." ;
+    rdfs:comment "Measured: 0 resolved isolated structures (out of 2674) whose minimal space-time period is not one of Cook's tabulated glider periods (n = 2674, exact). Interpretation: Wolfram's claim is a theorem (Cook's proof, presented in NKS pp. 678-689 and published in 2004). The test does not re-derive the proof or replay the cyclic tag system emulation, which requires Cook's specific glider packets and spacings; it checks the computational premise that rule 110 has a stable ether and naturally occurring gliders with the stated periods, which is the part of the claim that is accessible to a few minutes of simulation. The glider table is taken from Figure 5 of Cook's paper (retrieved PDF; checksum recorded); 'period' is Cook's (time, horizontal displacement) pair for one repetition of the glider." ;
+    delphi:evidenceAgainst "As pre-declared, the verdict is 'inconclusive' because universality is a theorem established by Cook's constructive proof and the cyclic-tag-system emulation was not replayed; the computation can only check the empirical premise of the construction. That premise is confirmed on every pre-registered condition: the standard ether forms in all 60 random runs (at least 70% of cells, median 82%, never below 50%); 92.1% of isolated structures (2674 of 2903) resolve to a space-time period within P <= 100; all 2674 minimal periods are exactly entries of Cook's table (A, B, B-bar/B-hat, C, D, E, E-bar, F, G) and all lie on the A/B lattice; the classes A, B, C, D, E and E-bar required by the construction were observed 186, 270, 234, 53, 590 and 1079 times." ;
+    delphi:evidenceAgainst "The only tabulated glider not seen is H, which Cook himself lists as too rare to arise naturally; no glider absent from his table was found, so the inventory he describes as 'all known gliders' is also consistent with 60 random soups (this does not prove no other glider exists)." ;
+    delphi:evidenceAgainst "Periods are compared as (time, displacement) pairs; distinct gliders with the same period (C1/C2/C3, D1/D2, E^n packets, B-bar vs B-hat) are not separated, and the specific alignment conditions (C2 phases, E-bar spacings) that Cook's construction depends on were not verified. The 229 unresolved isolated structures are mostly structures about to collide within the 100-step search window." ;
+    delphi:evidenceAgainst "Two implementation refinements (|s| <= P and recurrence at two periods) were added after a trial run revealed that matches between neighbouring identical gliders in trains were being reported as spurious periods; they are physical constraints on what a period is, not changes to the pre-registered thresholds." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-14--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-14--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-14/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-14--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Rule 110 from 60 random initial rows on 1200-cell rings, 4208 steps, with ether detection and glider period measurement (generated by analysis.py)" ;
+    dct:description "empirical glider inventory of rule 110" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-14--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: M. Cook, 'Universality in Elementary Cellular Automata', Complex Systems 15(1):1-40 (2004), Figure 5 (glider periods) and Figure 4 (known gliders)" ;
+    dct:description "reference glider periods and the published universality proof the claim rests on" ;
+    delphi:hasChecksum "sha256:c9a2885248ae2811c5825c5bcbaa52ca167a7d5300ba88f87ee832b93b293c03" ;
+    prov:atLocation <https://content.wolfram.com/sites/13/2023/02/15-1-1.pdf> ;
+    prov:wasDerivedFrom <https://www.complex-systems.com/abstracts/v15_i01_a01/> ;
+    dct:license "Complex Systems (publisher); used for table values only" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-14> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-14--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-14/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-0123)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.083Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch11-14: inconclusive, confidence 0.9" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-14--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

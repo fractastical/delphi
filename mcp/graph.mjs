@@ -1,6 +1,6 @@
 // The claim graph as built for docs/claim-graph.html: every claim with thinker, year, proof status,
-// testability and the truth scores from truth/raw, read from docs/claims.json. Rebuild that file
-// with `node docs/build-claim-graph.mjs`.
+// testability and the truth scores from test-data/truth/raw, read from docs/claims.json. Rebuild that file
+// with `node scripts/site/build-claim-graph.mjs`.
 
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
@@ -18,7 +18,7 @@ export function graphUrl(params = {}, page = "claim-graph") {
 }
 const LEVELS = ["lean", "literature", "partial", "untested", "refuted"];
 const LEVEL_LABEL = { lean: "Lean-checked", literature: "Proved (literature)", partial: "Partly proved", untested: "Not proved", refuted: "Refuted" };
-// Verdicts of tests against data (claim-tests/), a separate axis from proof.
+// Verdicts of tests against data (test-data/claim-tests/), a separate axis from proof.
 const EVIDENCE = ["supports", "mixed", "refutes", "inconclusive"];
 
 let cache = null;
@@ -125,7 +125,7 @@ export function graphStatus() {
     line("All", total, null),
     "",
     `Open: [full graph](${links.graph}) · [theorems only](${links.theorems}) · [math claims awaiting proof](${links.mathUnverified}) · [theorems page](${links.theoremsPage}). Every count above links to the graph filtered to it.`,
-    "A theorem is a math claim (formal notation, a Lean formalization, or a mathematical kind) that is machine-checked in Lean 4 or proved in the literature. Tested against data is a separate axis: the verdict of a pre-registered test in claim-tests/, which never makes a claim a theorem. Assessor truth scores count as neither.",
+    "A theorem is a math claim (formal notation, a Lean formalization, or a mathematical kind) that is machine-checked in Lean 4 or proved in the literature. Tested against data is a separate axis: the verdict of a pre-registered test in test-data/claim-tests/, which never makes a claim a theorem. Assessor truth scores count as neither.",
   ].join("\n");
   return { markdown, built, total, thinkers: rows, links };
 }

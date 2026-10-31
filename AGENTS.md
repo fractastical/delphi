@@ -49,51 +49,66 @@ RETURN a.name, r.stmt_type, b.name, r.evidence_count, r.stmt_hash ORDER BY r.evi
 For `turing-ddi` with NODAL/LEFTY1/LEFTY2 this returns the activator–inhibitor loop (LEFTY1 ⊣
 NODAL, 67 evidences; NODAL → LEFTY1/2 and itself).
 
+- `fittest` (`https://fittest-mcp.westus2.cloudapp.azure.com/mcp`, public): says whether to trust
+  an ML interatomic potential (MACE-MPA-0, AIMNet2, Orb-v3) on a molecule or send it to DFT.
+  `check_structures` takes up to 20 isolated molecules of 2–100 atoms as XYZ. Calibrated only for
+  gas-phase C/H/N/O chemistry; nothing at organism level. See `plugins/fittest/README.md`, which
+  also applies its trust-or-escalate routing to our assessor truth scores.
+
 ## "Theorem" is a proof status, not a project
 
 Call a claim a theorem only when it is a mathematical statement whose proof has been established.
-In `docs/claims.json` (built by `docs/load-claims.mjs`) that is `theorem: true`, which requires
+In `docs/claims.json` (built by `scripts/site/load-claims.mjs`) that is `theorem: true`, which requires
 `math` (a formal statement or a mathematical claim kind) and `status: "proved"`, and `proved` is
 assigned in exactly two cases:
 
 - `proof: "lean"`: a `formalized` entry in some `<project>/lean/reports/*.json`, meaning the Lean 4
-  module compiled with no `sorry` and only Lean's standard axioms (`books/thompson-growth-form/lean/INSTRUCTIONS.md`);
-- `proof: "literature"`: the formal status recorded in `math-bio-claims/claims/key-claims.json`
+  module compiled with no `sorry` and only Lean's standard axioms (`claim-sources/thompson-growth-form/lean/INSTRUCTIONS.md`);
+- `proof: "literature"`: the formal status recorded in `claim-sources/math-bio-claims/claims/key-claims.json`
   says the result is proved.
 
 Everything else is a claim, however its author phrased it and whatever directory it lives in. The
-21 claims in `math-bio-claims/` are a selection of claims *about* results by mathematical
+21 claims in `claim-sources/math-bio-claims/` are a selection of claims *about* results by mathematical
 biologists; only the 16 with a recorded proof count, and the Lean-checked Thompson claims count just
 as much. Assessor truth scores are opinions and never promote a claim. `docs/theorems.html` lists
 the `theorem` set and nothing else; `delphi_graph` with `status: "proved"` returns the same set.
 A proof shows a statement follows from its assumptions, not that organisms satisfy them; that is
-what the assessments and `claim-tests/` are for.
+what the assessments and `test-data/claim-tests/` are for.
 
-## Projects
+## Layout
 
-- `books/`: one project per source book, each with `inputs/`, `extraction/`, `claims.json`,
- `assessment/`, `build/` and `nanopubs/`.
- - `books/darwin-origin/`: 247 claims from *On the Origin of Species*, with dataset-resolvability assessments.
- - `books/thompson-growth-form/`: 291 claims from *On Growth and Form*, 47 of them machine-checked
- in Lean 4 (`lean/`). `books/wolfram-nks/`: 321 claims from *A New Kind of Science*. Both are on
+Four top-level folders, plus the services that run from the repo root:
+
+- `claim-sources/`: where claims come from. One project per source, each self-contained with
+ `inputs/`, `extraction/`, `claims.json`, `assessment/`, `build/` and `nanopubs/`.
+ - `darwin-origin/`: 247 claims from *On the Origin of Species*, with dataset-resolvability assessments.
+ - `thompson-growth-form/`: 291 claims from *On Growth and Form*, 47 of them machine-checked
+ in Lean 4 (`lean/`). `wolfram-nks/`: 321 claims from *A New Kind of Science*. Both are on
  production with dataset-resolvability/0.2.0 assessments.
- - `books/levin-papers/`: 310 claims from sixteen CC BY papers by Michael Levin and colleagues
+ - `levin-papers/`: 310 claims from sixteen CC BY papers by Michael Levin and colleagues
  (2014–2025; TAME, bioelectricity, xenobots, anthrobots, competency and evolution), vendored from
  Europe PMC by `build/fetch.py`. One project, many works: each claim carries its `paper` key.
-- `math-bio-claims/`: key claims of five mathematical-biology thinkers, with LaTeX math and a
+ - `math-bio-claims/`: key claims of five mathematical-biology thinkers, with LaTeX math and a
  recorded formal status (proved, partial, refuted, or not a mathematical proposition).
-- `organisms/`: every animal taxon Darwin and Thompson mention (782 taxa, 3,340 located mentions),
-  resolved to GBIF/NCBI/Wikidata/WoRMS/PBDB, with 1,372 provenanced dataset records (occurrence
-  counts, genomes, trait databases). Merged view in `organisms/merged/`; see `organisms/README.md`.
-- `exec/`: executable claims. `npm run claims:manifest` collects every claim with a Lean proof
- (`<project>/lean/reports`) or a data test (`claim-tests/`) into `exec/manifest.json`;
+ - `cell-geometry/`: micrograph segmentation for Thompson's cell-packing claims.
+- `test-data/`: what claims are tested against.
+ - `claim-tests/<project>/<claim-id>/`: pre-registered data tests and their `result.json`.
+ - `organisms/`: every animal taxon Darwin and Thompson mention (782 taxa, 3,340 located mentions),
+ resolved to GBIF/NCBI/Wikidata/WoRMS/PBDB, with 1,372 provenanced dataset records (occurrence
+ counts, genomes, trait databases). Merged view in `test-data/organisms/merged/`; see `test-data/organisms/README.md`.
+ - `truth/`: blinded batches and model truth scores feeding the claim graph.
+- `scripts/`: repo-wide tooling.
+ - `exec/`: executable claims. `npm run claims:manifest` collects every claim with a Lean proof
+ (`<project>/lean/reports`) or a data test (`test-data/claim-tests/`) into `scripts/exec/manifest.json`;
  `npm run claims:exec -- [--kind lean|data] [--claim ID] [--offline] [--jobs N]` re-runs them and
- reports each as reproduced, drifted, failed, unverified or skipped (`exec/runs/latest.json`).
- Files a test writes are restored unless `--update`. Special cases go in `exec/overrides.json`.
-- `agent/`: Discord agent. `docs/`: claim graph site. `chats/`: transcripts of past agent sessions.
-- `forum/`: Science Claw forum, a Moltbook-style board where agents post what they have made
- (`artifact`), ask for collaborators (`request`), and report tests (`result`) tagged with claim ids.
- `npm run forum` then read `http://localhost:8787/skill.md`; CLI in `forum/client.mjs`. See
- [forum/README.md](forum/README.md).
+ reports each as reproduced, drifted, failed, unverified or skipped (`scripts/exec/runs/latest.json`).
+ Files a test writes are restored unless `--update`. Special cases go in `scripts/exec/overrides.json`.
+ - `release/`: `npm run status`, where every record stands. `site/`: builds `docs/` from the repo.
+- `plugins/`: integrations with external parties: `nebius/` (Nebius Scientific AI MCP client),
+ `fittest/`, and `agent/` (Discord, Moltbook and The Colony).
+- Root services: `mcp/` (the `delphisci` MCP server), `forum/` (Science Claw forum, a Moltbook-style
+ board where agents post what they have made, ask for collaborators and report tests tagged with
+ claim ids; `npm run forum` then read `http://localhost:8787/skill.md`, see [forum/README.md](forum/README.md)),
+ `docs/` (claim graph site, built output) and `chats/` (transcripts of past agent sessions).
 
 Publishing signs with the operator's ORCID key and cannot be undone; ask before publishing to production.

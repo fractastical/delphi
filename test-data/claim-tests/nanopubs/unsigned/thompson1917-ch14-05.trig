@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch14-05--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch14-05: supports, confidence 0.9" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.9"^^xsd:double ;
+    delphi:hypothesis "Within one species of sunflower, larger capitula carry higher parastichy pairs: head diameter increases in order across the successive Fibonacci pairs (e.g. 21/34 < 34/55 < 55/89 < 89/144), so parastichy numbers rise with the size of the whole structure." ;
+    delphi:passCriterion "Pre-registered. In the Turing's Sunflowers data (Helianthus annuus), restrict to heads with a recorded head (seedhead) diameter and with both parastichy counts forming an adjacent pair of a Fibonacci-type sequence (Fibonacci, Lucas, double Fibonacci or F4, as defined by Swinton et al. 2016). The Spearman rank correlation between head diameter and the larger parastichy number must be positive with rho >= 0.30 and P < 0.01, and the median head diameter must increase monotonically across successive pair classes of the main Fibonacci sequence that each have n >= 10 heads." ;
+    delphi:failCriterion "Pre-registered. rho <= 0.10, or P >= 0.05, or an inversion of median diameter between adjacent main-sequence pair classes each with n >= 10 (larger pair at smaller heads). 0.10 < rho < 0.30 with P < 0.05 and no inversion is 'mixed'. If the data file carries no head-size measurement, the verdict is 'inconclusive' with reason 'data-unavailable'; if fewer than 50 heads have both diameter and a resolved pair, 'inconclusive' with reason 'underpowered'." ;
+    delphi:expectedObservation "Pre-registered. In the Turing's Sunflowers data (Helianthus annuus), restrict to heads with a recorded head (seedhead) diameter and with both parastichy counts forming an adjacent pair of a Fibonacci-type sequence (Fibonacci, Lucas, double Fibonacci or F4, as defined by Swinton et al. 2016). The Spearman rank correlation between head diameter and the larger parastichy number must be positive with rho >= 0.30 and P < 0.01, and the median head diameter must increase monotonically across successive pair classes of the main Fibonacci sequence that each have n >= 10 heads." ;
+    delphi:disconfirmingObservation "Pre-registered. rho <= 0.10, or P >= 0.05, or an inversion of median diameter between adjacent main-sequence pair classes each with n >= 10 (larger pair at smaller heads). 0.10 < rho < 0.30 with P < 0.05 and no inversion is 'mixed'. If the data file carries no head-size measurement, the verdict is 'inconclusive' with reason 'data-unavailable'; if fewer than 50 heads have both diameter and a resolved pair, 'inconclusive' with reason 'underpowered'." ;
+    delphi:admissibleDatasets "Planned datasets: turings-sunflowers-dryad-f9k77" ;
+    delphi:inferenceMethod "fetch.py obtains the two spreadsheets (Dryad serves downloads behind a browser proof-of-work challenge; files were fetched with headless Chrome, checksummed, and a 49 KB derived table committed under derived/). analysis.py keeps heads with a reported head diameter and an adjacent Fibonacci-type pair (photoreviewed counts first, submitter counts otherwise), computes the Spearman correlation between diameter and the larger parastichy number, and compares median diameters across the main-sequence pair classes 21/34, 34/55, 55/89 and 89/144 (Kruskal-Wallis as a supplementary test)." ;
+    delphi:preregistered false ;
+    dct:description "fetch.py obtains the two spreadsheets (Dryad serves downloads behind a browser proof-of-work challenge; files were fetched with headless Chrome, checksummed, and a 49 KB derived table committed under derived/). analysis.py keeps heads with a reported head diameter and an adjacent Fibonacci-type pair (photoreviewed counts first, submitter counts otherwise), computes the Spearman correlation between diameter and the larger parastichy number, and compares median diameters across the main-sequence pair classes 21/34, 34/55, 55/89 and 89/144 (Kruskal-Wallis as a supplementary test)." ;
+    rdfs:comment "Measured: 0.6744 Spearman rho, head diameter (cm) vs larger parastichy number (n = 401, P = 1.6e-54; photoreviewed-only subset n = 257, rho = 0.700). Interpretation: Thompson's 'size of the entire structure' is mapped to the diameter of the sunflower seedhead as reported by the grower; 'the arrangement' is mapped to the adjacent Fibonacci-type parastichy pair, ordered by its larger member. Primary counts are the photoreviewed counts where available, otherwise the submitter's counts. The claim's extension to other composites is not tested here; only the sunflower disc, which is Thompson's named example, is." ;
+    delphi:evidenceAgainst "Head diameter was measured and reported by the growers themselves (citizen science), with unknown precision and probably mixed conventions (disc versus whole head); such noise biases the correlation towards zero, not away from it." ;
+    delphi:evidenceAgainst "The sample is cultivated Helianthus annuus of many cultivars; the claim's remark about other composites is not tested." ;
+    delphi:evidenceAgainst "Thompson lists 34/55, 55/89 and 89/144 as occurring in one species; here the 89/144 class has only 11 heads, though their median diameter (24 cm) is well above the 55/89 class (14 cm)." ;
+    delphi:evidenceAgainst "Size and developmental stage are confounded in a cross-sectional sample; the claim is about size, and that is what was measured." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch14-05--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch14-05/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch14-05--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Turing's Sunflowers)" ;
+    dct:description "head diameter and parastichy pair for Helianthus annuus heads" ;
+    delphi:hasChecksum "sha256:1ae05773075326e64bd110bdd5dd90a6d78986d2fdff67936532ac51167b883d" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/4662> ;
+    delphi:hasChecksum "sha256:b3df75b467d92c08eb58a5a78576aa2ee5937153de7640b3ef8df14bd143f408" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/4663> ;
+    delphi:hasChecksum "sha256:f0fe52a415366cdd568c260739eaca90e867d3db687878bd800ce731799ab8d4" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/4664> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.f9k77> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch14-05> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch14-05--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch14-05/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5-1-thinking-high; cursor/thompson-claim-tests-6e84)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5-1-thinking-high" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.071Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch14-05: supports, confidence 0.9" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch14-05--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

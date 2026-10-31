@@ -1,0 +1,174 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-09--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch12-09: refutes, confidence 0.9" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.9"^^xsd:double ;
+    delphi:hypothesis "If Darwin is right, no island lying more than 300 statute miles (482.8 km) from a continent or from a great continental island has a native non-volant terrestrial mammal; every non-flying land mammal found on such islands is a human introduction." ;
+    delphi:passCriterion "Among pre-registered island units whose representative point lies > 482.8 km from the nearest landmass of area >= 100,000 km2 (continents and great islands, computed from Natural Earth 1:50m land polygons), zero units have a non-volant, non-marine mammal species endemic to the unit by GBIF occurrence data (>= 10 non-fossil, non-captive records worldwide, >= 95 % inside the unit). Endemism is used as conservative proof of native status; bats (Chiroptera), cetaceans, sirenians, pinnipeds and Homo sapiens are excluded." ;
+    delphi:failCriterion "At least one far unit has >= 2 endemic non-volant terrestrial mammal species, or >= 2 far units each have >= 1: refutes (more than 'a single instance' and not attributable to one doubtful record). Exactly one far unit with exactly one endemic species: mixed. The share of far units with native terrestrial mammals is reported either way." ;
+    delphi:expectedObservation "Among pre-registered island units whose representative point lies > 482.8 km from the nearest landmass of area >= 100,000 km2 (continents and great islands, computed from Natural Earth 1:50m land polygons), zero units have a non-volant, non-marine mammal species endemic to the unit by GBIF occurrence data (>= 10 non-fossil, non-captive records worldwide, >= 95 % inside the unit). Endemism is used as conservative proof of native status; bats (Chiroptera), cetaceans, sirenians, pinnipeds and Homo sapiens are excluded." ;
+    delphi:disconfirmingObservation "At least one far unit has >= 2 endemic non-volant terrestrial mammal species, or >= 2 far units each have >= 1: refutes (more than 'a single instance' and not attributable to one doubtful record). Exactly one far unit with exactly one endemic species: mixed. The share of far units with native terrestrial mammals is reported either way." ;
+    delphi:admissibleDatasets "Planned datasets: natural-earth-50m-land, gbif-occurrence-api-mammalia, gbif-species-api" ;
+    delphi:inferenceMethod "analysis.py downloads Natural Earth 1:50m land polygons, computes spherical areas, keeps the 23 landmasses >= 100,000 km2, and measures the great-circle distance from each pre-registered unit's representative point(s) to the nearest densified vertex of those landmasses (excluding a polygon containing the point). 43 of the 52 units lie beyond 482.8 km. For each far unit it facets GBIF Mammalia occurrences by species (country code or bounding box; fossil and living specimens excluded), drops Chiroptera, Cetacea, Sirenia, pinniped and cetacean families and Hominidae via the species API, and flags a species endemic if it has >= 10 records worldwide and >= 95 % inside the unit (for box units both counts are restricted to georeferenced records without geospatial issues, a correction made after the first run showed un-georeferenced museum specimens deflating the fraction). Verdict follows the pre-registered rule." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py downloads Natural Earth 1:50m land polygons, computes spherical areas, keeps the 23 landmasses >= 100,000 km2, and measures the great-circle distance from each pre-registered unit's representative point(s) to the nearest densified vertex of those landmasses (excluding a polygon containing the point). 43 of the 52 units lie beyond 482.8 km. For each far unit it facets GBIF Mammalia occurrences by species (country code or bounding box; fossil and living specimens excluded), drops Chiroptera, Cetacea, Sirenia, pinniped and cetacean families and Hominidae via the species API, and flags a species endemic if it has >= 10 records worldwide and >= 95 % inside the unit (for box units both counts are restricted to georeferenced records without geospatial issues, a correction made after the first run showed un-georeferenced museum specimens deflating the fraction). Verdict follows the pre-registered rule." ;
+    rdfs:comment "Measured: 1 island units > 300 miles from a continent or great island with >= 1 endemic non-volant terrestrial mammal species (n = 43, distances from 1:50m coastlines and a representative point per unit (tens of km); endemism rule >= 10 records, >= 95 % inside unit; GBIF snapshot counts). Interpretation: Darwin's 'terrestrial mammal' is read as a non-volant, non-marine mammal (he treats bats separately in the next sentence and excludes domesticated animals). 'Continent or great continental island' is operationalised as any landmass polygon of area >= 100,000 km2, which captures the continents plus Greenland, New Guinea, Borneo, Madagascar, Sumatra, Honshu, Britain, Sulawesi, Java, Luzon, New Zealand's islands, Newfoundland, Cuba and Iceland; including a few non-continental large islands can only shorten distances and so makes the test conservative. Distance is the great-circle distance from a representative point of the island unit to the nearest vertex of those polygons (segments densified), excluding the polygon containing the point itself. Pre-registered units (GBIF filter; representative lon/lat): Galapagos (box; -90.5,-0.6), Hawaii (box; -157,21), Bermuda (BM; -64.75,32.3), Azores (box; -25.7,37.75), Madeira (box; -16.9,32.75), Canary Is. (box; -15.5,28.3), Cape Verde (CV; -23.6,15.1), Sao Tome and Principe (ST; 6.6,0.25), St Helena/Ascension/Tristan (SH; -5.7,-15.95 | -14.36,-7.95 | -12.3,-37.1), Fernando de Noronha (box; -32.42,-3.85), Falkland Is. (FK; -59,-51.7), South Georgia (GS; -36.5,-54.3), Juan Fernandez (box; -78.85,-33.65), Easter I. (box; -109.35,-27.1), Pitcairn (PN; -130.1,-25.07), French Polynesia (PF; -149.4,-17.6 | -139.5,-9.5), Cook Is. (CK; -159.8,-21.2), Niue (NU; -169.9,-19.05), Tonga (TO; -175.2,-21.2), Samoa (WS; -172.1,-13.6), American Samoa (AS; -170.7,-14.3), Wallis and Futuna (WF; -176.2,-13.3), Tokelau (TK; -171.8,-9.2), Tuvalu (TV; 179.2,-8.5), Fiji (FJ; 178,-17.8), Kiribati (KI; 173,1.4), Nauru (NR; 166.93,-0.53), Marshall Is. (MH; 171.2,7.1), Micronesia (FM; 158.2,6.9), Palau (PW; 134.5,7.5), Northern Marianas (MP; 145.75,15.2), Guam (GU; 144.8,13.45), Ogasawara (box; 142.2,27.1), Vanuatu (VU; 167.2,-15.9), Solomon Is. (SB; 160,-9.5), New Caledonia (NC; 165.5,-21.3), Norfolk I. (NF; 167.95,-29.03), Lord Howe I. (box; 159.08,-31.55), Christmas I. (CX; 105.65,-10.5), Cocos (Keeling) (CC; 96.85,-12.15), Andaman and Nicobar (box; 92.8,12), Maldives (MV; 73.5,3.2), Chagos (IO; 72.4,-7.3), Seychelles (SC; 55.5,-4.6), Mauritius (MU; 57.55,-20.3), Reunion (RE; 55.5,-21.1), Comoros (KM; 43.8,-12.0), Mayotte (YT; 45.15,-12.8), Socotra (box; 54,12.5), Kerguelen/French Southern (TF; 69.3,-49.3), Iceland (IS; -18.5,65), Faroe Is. (FO; -6.9,62). Units nearer than 482.8 km are excluded from the main count and reported separately. Present-day distances are used, as Darwin did." ;
+    delphi:evidenceAgainst "The Galapagos (1,068 km from Ecuador) carry five endemic rice rats detected by the rule, Aegialomys galapagoensis and Nesoryzomys indefessus, N. narboroughi, N. fernandinae and N. swarthi (all records inside the archipelago), plus N. darwini and Megaoryzomys curioi below the 10-record threshold. Darwin visited the Galapagos and collected Aegialomys galapagoensis and Nesoryzomys darwini himself (Waterhouse 1839 described them), so this is a counterexample he had in hand; he may have regarded their native status as doubtful." ;
+    delphi:evidenceAgainst "The first run used all records as the denominator for box units, which made the Galapagos rodents fall below 95 % because many museum specimens lack coordinates; restricting both numerator and denominator to georeferenced records is a correction of the measurement, not of the criterion, and is recorded here." ;
+    delphi:evidenceAgainst "Only 1 of 43 far units (2.3 %) has detectable native non-volant mammals; the remaining 42 (Hawaii, Bermuda, Azores, Madeira, Cape Verde, Mascarenes, Seychelles, Fiji, Samoa, Tonga, Polynesia, Micronesia, Vanuatu, New Caledonia, Falklands, etc.) show only cosmopolitan introduced species. Darwin's generalisation is very nearly right; the universal is not." ;
+    delphi:evidenceAgainst "The Solomon Islands (1,006 km from New Guinea by this method, since New Britain is below the 100,000 km2 cut-off) have native murids (Solomys, Uromys, Melomys) but each has < 10 GBIF records or records split with Bougainville (politically Papua New Guinea), so the rule does not count them; counting them would strengthen the refutation. The Falkland Islands' extinct native fox Dusicyon australis (642 km) has no modern GBIF occurrence records." ;
+    delphi:evidenceAgainst "Endemism is a sufficient but not necessary proof of native status, so the test under-detects native mammals. GBIF counts are a live snapshot and will drift between runs." ;
+    delphi:evidenceAgainst "Distances are present-day, as Darwin used; Pleistocene sea-level lows do not connect any of the far units to a continent." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-09--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-09--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-09--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch12-09/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-09--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Natural Earth 1:50m Physical Vectors, Land (GeoJSON build from the natural-earth-vector repository)" ;
+    dct:description "land polygons; those >= 100,000 km2 define continents and great islands for the distance calculation" ;
+    delphi:hasChecksum "sha256:e874b27a51d146452be360cafb3cc50c86001074a67d534113e6534682f9826b" ;
+    prov:atLocation <https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_50m_land.geojson> ;
+    prov:wasDerivedFrom <https://www.naturalearthdata.com/downloads/50m-physical-vectors/> ;
+    dct:license "Public domain" .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-09--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: GBIF occurrence search API (class Mammalia, non-fossil, non-captive records), faceted by species per island unit" ;
+    dct:description "species recorded per far island unit and global record counts for the endemism rule" ;
+    delphi:hasChecksum "sha256:cb183a713f9811fd1901f199b891e7c780a2644f67bcc2b212ec9c43bfc2f6c9" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=AS> ;
+    delphi:hasChecksum "sha256:9365659cb9d7b7190044162f0d4c3f04452640edc9723201fe7c0f1e1a1841c1" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&hasGeospatialIssue=false&geometry=POLYGON%28%28-31.5+36.8%2C-24.8+36.8%2C-24.8+39.9%2C-31.5+39.9%2C-31.5+36.8%29%29> ;
+    delphi:hasChecksum "sha256:c71a0e98c20e8f95f8c6ac2ea264a140e070b2c8e1be9c80ccba88fe448930e5" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=BM> ;
+    delphi:hasChecksum "sha256:cbf47f11fd8475969f7ec87d57565f8151710d3f40643f63c00b3a7ca53642e9" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=CV> ;
+    delphi:hasChecksum "sha256:6b108e14ec6d7543e8e36e8d4de20b01106d2fa407ac785ab93cc7adf39d787e" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=IO> ;
+    delphi:hasChecksum "sha256:1b3e7a4fcaab32015cbe01594347dbc05dc1a4a2fe35946fcb268d62f105e78c" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=CC> ;
+    delphi:hasChecksum "sha256:d8dd389dfdc093c3a9050e101962f3d736ce6b73f5b850f7548fc67b7e8d0f5b" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=CK> ;
+    delphi:hasChecksum "sha256:cf68805bce8707bfb0c2609fd4f180fe73be1701cf620826add67018b44618e6" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&hasGeospatialIssue=false&geometry=POLYGON%28%28-109.6+-27.3%2C-109.1+-27.3%2C-109.1+-27.0%2C-109.6+-27.0%2C-109.6+-27.3%29%29> ;
+    delphi:hasChecksum "sha256:61f8905480dd381f193ab1a9c4120a58e7d20cc21a5daac3d4eef622e0f7a99f" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=FK> ;
+    delphi:hasChecksum "sha256:986a3c1bb553c1680ba86f8a4c6f25edd7b1c2ac8066e59a7364503ef1e0f88b" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=FJ> ;
+    delphi:hasChecksum "sha256:4a907baa1323448b73f8235bd0819a9bcf55fae7f573589f5846fa9df600c4f5" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=PF> ;
+    delphi:hasChecksum "sha256:b2fd3744696617047df3345e9e05dfa7f9c5f1253adb6be783d2c94ec374bb79" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&hasGeospatialIssue=false&geometry=POLYGON%28%28-92.2+-1.6%2C-89.0+-1.6%2C-89.0+1.8%2C-92.2+1.8%2C-92.2+-1.6%29%29> ;
+    delphi:hasChecksum "sha256:489e05e7f59337b099b068e85428b8291c16511fd9f13265a5e59670fb78dc6e" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=GU> ;
+    delphi:hasChecksum "sha256:e446d4c27be1b81ed49ab1fc712befad7ee8cf16ab49c9351662e099f95f0564" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&hasGeospatialIssue=false&geometry=POLYGON%28%28-161.0+18.5%2C-154.5+18.5%2C-154.5+22.5%2C-161.0+22.5%2C-161.0+18.5%29%29> ;
+    delphi:hasChecksum "sha256:3ab7c303c73fc7b5cfd5db1335c548164bcec47924a43c1ed69805ee98204af1" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=IS> ;
+    delphi:hasChecksum "sha256:438acce207dc465e4e153d395dc231856d36bcaf6d0bd79bf62e3ea944b93c9f" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&hasGeospatialIssue=false&geometry=POLYGON%28%28-81.0+-34.0%2C-78.5+-34.0%2C-78.5+-33.4%2C-81.0+-33.4%2C-81.0+-34.0%29%29> ;
+    delphi:hasChecksum "sha256:4f4498c3cde8c776d48ffadc70908cac830356e341e255624d775e98bfa15ef0" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=TF> ;
+    delphi:hasChecksum "sha256:e74dd396e39fc0986197dee700b170d4b5a4da58ff4519d3cc541acb54e30663" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=KI> ;
+    delphi:hasChecksum "sha256:74d5cb65c6b3b42c62019672dd1009abbaf33dc62cefe4be595ab7d0fce3f4b6" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&hasGeospatialIssue=false&geometry=POLYGON%28%28159.0+-31.65%2C159.2+-31.65%2C159.2+-31.45%2C159.0+-31.45%2C159.0+-31.65%29%29> ;
+    delphi:hasChecksum "sha256:b4177b86a94f97fcbf5cae9d8a4290596c600d75905189bdb2d4c09e02777ce9" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&hasGeospatialIssue=false&geometry=POLYGON%28%28-17.4+32.3%2C-16.2+32.3%2C-16.2+33.2%2C-17.4+33.2%2C-17.4+32.3%29%29> ;
+    delphi:hasChecksum "sha256:f42b17d613bf506d52595e2f2ca01eec294edbc8bf1dfad67a86c9532d1f7db1" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=MV> ;
+    delphi:hasChecksum "sha256:e538452f8321c9fb6bea0c0f4331dadb536ca53b94452eca9c12707dcd4c284e" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=MH> ;
+    delphi:hasChecksum "sha256:f1e50419291adf4a7c4dd158bdc2c02fefab21810b3cfd8d549e018a79ed151e" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=MU> ;
+    delphi:hasChecksum "sha256:9e641e465f4380cb568d13d285324b8bb9167b85b6b7673a1aab60eef1a70096" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=FM> ;
+    delphi:hasChecksum "sha256:bef621808936a98dc4513c200c39a19dfc8d05478f7dc4125ca2f9c62ebb5232" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=NR> ;
+    delphi:hasChecksum "sha256:5c457a84b8418e36f741c50fb13aa4dfdeedc521f83d9567505ed288658d7433" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=NC> ;
+    delphi:hasChecksum "sha256:5e17eec917dede3f1a3af21fa2820b4aa7c8ce723062db3cb4c70992a3d0c480" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=NU> ;
+    delphi:hasChecksum "sha256:7d4478f2b57db8e0a87490c00e8d1d2250361e56a8b8f0de92d29e60101f3f54" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=NF> ;
+    delphi:hasChecksum "sha256:61a10e3efc52d596d9ee4a6e881affec51a0a704a61d67fb56e924f9b9d90d9e" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=MP> ;
+    delphi:hasChecksum "sha256:c741481516039cd76c9af4de00c4e8e1babc82ff62d8c8c974ff688517218992" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&hasGeospatialIssue=false&geometry=POLYGON%28%28141.8+26.4%2C142.4+26.4%2C142.4+27.8%2C141.8+27.8%2C141.8+26.4%29%29> ;
+    delphi:hasChecksum "sha256:4e914e5dc9d9e4aab45a5d1cf1fff97422a9194766a70bb002f97207f8991150" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=PW> ;
+    delphi:hasChecksum "sha256:138f2aa0dd9a399b6ca18f0246100bae9830eaea9e79954cb2279284d0db2321" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=PN> ;
+    delphi:hasChecksum "sha256:357dd49c288ad5819e369d50ad5f1e795da76992649f4e02674989a17b7107c5" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=RE> ;
+    delphi:hasChecksum "sha256:bd9e6cd369ce8c8bdb4e60227425e57578f28f15ada5e19b833523f874d20ba4" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=WS> ;
+    delphi:hasChecksum "sha256:278a9607d3bb964acd4342c1c288f169ecd018fec5d7d04ca1f1e7519caeab39" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=SC> ;
+    delphi:hasChecksum "sha256:496b3c11f6e5004d70575704858ab2e3aa4ac1622767690f8e37dc35c9dfc49d" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=SB> ;
+    delphi:hasChecksum "sha256:354ac0c634add0355474324e2cd53e05b491e7e1bbacec5f18f4da347bf7f5e5" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=GS> ;
+    delphi:hasChecksum "sha256:c1ed4b3fc4dd7c135fe5b843f7cf9d663fa740ea1ed43c2b5266692bde6410a2" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=SH> ;
+    delphi:hasChecksum "sha256:d26af75b90a97aadf6f0d3d43f220f923baad5ff1ae0045b36991e06f917e0e2" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=TK> ;
+    delphi:hasChecksum "sha256:9de120b087accf45edc43ed55334a3e01a3ebaed286de22da57ab73f50e2faa7" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=TO> ;
+    delphi:hasChecksum "sha256:b49790e9b46988015e018af15584180ad15af6e525c2083ee42391fe2ba83923" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=TV> ;
+    delphi:hasChecksum "sha256:dfef3ecf5d8ad18de62b6fd4d683dc4498b27cabe42e5d5722f3cd9f6d445e15" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=VU> ;
+    delphi:hasChecksum "sha256:a223e44fc3a6ba4d739daa68abf397ce0caf052182d0bf2819200818ff3c58d7" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OCCURRENCE&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=MATERIAL_CITATION&classKey=359&limit=0&facet=speciesKey&facetLimit=1000&country=WF> ;
+    prov:wasDerivedFrom <https://www.gbif.org/occurrence/search?class_key=359> ;
+    dct:license "per-dataset CC0 / CC BY / CC BY-NC (GBIF aggregate terms)" .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-09--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: GBIF species API (backbone taxonomy order and family for each speciesKey)" ;
+    dct:description "exclusion of bats, cetaceans, sirenians, pinnipeds and humans by order/family" ;
+    prov:wasDerivedFrom <https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch12-09> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-09--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch12-09/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-6221)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.031Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch12-09: refutes, confidence 0.9" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-09--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

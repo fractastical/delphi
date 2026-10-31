@@ -1,0 +1,73 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch02-03--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch02-03: supports, confidence 0.9" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.9"^^xsd:double ;
+    delphi:hypothesis "There exists a system with a very short rule and a trivial initial condition whose behaviour is complex by standard operational measures: elementary rule 30 (an 8-bit rule) started from a single black cell produces a centre column that is not eventually periodic, is essentially incompressible, and passes standard randomness tests, and a space-time pattern that is far less compressible than those of nested or repetitive rules of the same description length." ;
+    delphi:passCriterion "Pre-registered. Rule 30 from a single black cell on a lattice wide enough that boundaries never influence the measured cells. (a) Compressibility: the lzma-compressed size of the first 2^16 centre-column bits (packed 8 per byte) is at least 0.95 times the compressed size of 2^16 bits from os.urandom packed the same way. (b) Aperiodicity: no period p <= 2^15 holds from any offset t0 <= 2^15 within the first 2^16 centre-column bits (i.e. for every p there is a t >= 2^15 with x[t] != x[t+p]). (c) Randomness tests on the 2^16 centre-column bits: monobit frequency test p > 0.01, Wald-Wolfowitz runs test p > 0.01, chi-square test on the 256 frequencies of non-overlapping 8-bit blocks p > 0.01. (d) Pattern complexity relative to simple rules: the lzma ratio (compressed/raw bytes of the packed bit image) of the 1001-step single-cell pattern (rows of 2001 cells) is at least 5 times larger for rule 30 than for the nested rule 90 and at least 5 times larger than for the repetitive rule 250. 'Supports' requires (a)-(d). In addition the census of all 256 elementary rules by the same pattern ratio is reported (number of rules with ratio > 0.5 of rule 30's ratio), without bearing on the verdict." ;
+    delphi:failCriterion "Pre-registered. 'Refutes' (for the witness, and hence failing to confirm the existence claim) if the rule-30 centre column is eventually periodic with period <= 2^15 within 2^16 steps, or if its lzma ratio is below 0.5 of the random baseline. Other combinations are 'mixed'." ;
+    delphi:expectedObservation "Pre-registered. Rule 30 from a single black cell on a lattice wide enough that boundaries never influence the measured cells. (a) Compressibility: the lzma-compressed size of the first 2^16 centre-column bits (packed 8 per byte) is at least 0.95 times the compressed size of 2^16 bits from os.urandom packed the same way. (b) Aperiodicity: no period p <= 2^15 holds from any offset t0 <= 2^15 within the first 2^16 centre-column bits (i.e. for every p there is a t >= 2^15 with x[t] != x[t+p]). (c) Randomness tests on the 2^16 centre-column bits: monobit frequency test p > 0.01, Wald-Wolfowitz runs test p > 0.01, chi-square test on the 256 frequencies of non-overlapping 8-bit blocks p > 0.01. (d) Pattern complexity relative to simple rules: the lzma ratio (compressed/raw bytes of the packed bit image) of the 1001-step single-cell pattern (rows of 2001 cells) is at least 5 times larger for rule 30 than for the nested rule 90 and at least 5 times larger than for the repetitive rule 250. 'Supports' requires (a)-(d). In addition the census of all 256 elementary rules by the same pattern ratio is reported (number of rules with ratio > 0.5 of rule 30's ratio), without bearing on the verdict." ;
+    delphi:disconfirmingObservation "Pre-registered. 'Refutes' (for the witness, and hence failing to confirm the existence claim) if the rule-30 centre column is eventually periodic with period <= 2^15 within 2^16 steps, or if its lzma ratio is below 0.5 of the random baseline. Other combinations are 'mixed'." ;
+    delphi:admissibleDatasets "Planned datasets: eca-single-cell-generator" ;
+    delphi:inferenceMethod "analysis.py evolves rule 30 from one black cell on 131075 cells for 65536 steps and records the centre column; compresses the packed bits with lzma (preset 9 extreme) and compares with 65536 bits from os.urandom; checks every period p <= 32768 from offset 32768 for a mismatch; applies the monobit, Wald-Wolfowitz runs and 8-bit block chi-square tests; evolves all 256 rules for 1000 steps on 2003 cells and computes the lzma ratio of the packed pattern, comparing rule 30 with rules 90 and 250 and counting rules whose ratio exceeds half of rule 30's." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py evolves rule 30 from one black cell on 131075 cells for 65536 steps and records the centre column; compresses the packed bits with lzma (preset 9 extreme) and compares with 65536 bits from os.urandom; checks every period p <= 32768 from offset 32768 for a mismatch; applies the monobit, Wald-Wolfowitz runs and 8-bit block chi-square tests; evolves all 256 rules for 1000 steps on 2003 cells and computes the lzma ratio of the packed pattern, comparing rule 30 with rules 90 and 250 and counting rules whose ratio exceeds half of rule 30's." ;
+    rdfs:comment "Measured: 1 lzma size of 2^16 rule-30 centre-column bits divided by lzma size of 2^16 os.urandom bits (threshold 0.95) (n = 65536, exact for rule 30; urandom baseline varies by a few bytes between runs). Interpretation: The claim is a general-principle existence statement ('can nevertheless show'); it is tested on its canonical witness, rule 30, as both assessors propose. 'Simple rule' = 8-bit rule table; 'simple initial condition' = one black cell. 'Highly complex behaviour' is operationalized as incompressibility (lzma), absence of periodicity, and passing standard randomness tests of the centre column, plus a comparison of pattern compressibility with nested (rule 90) and repetitive (rule 250) rules of identical description length. Rule numbering is Wolfram's. A single test battery is used; a sequence can be complex under these tests and simple under others (the assessors' obstacle), and the claim's 'general phenomenon' aspect is only illustrated by the census, not established." ;
+    delphi:evidenceAgainst "Pre-registered criterion (b) was mis-specified at its upper end: for a period p close to 2^15 only n - p - t0 positions can be compared (one position for p = 32767, none for p = 32768), so those two periods 'pass' the literal test vacuously and analysis.py reports preregistered_verdict = 'refutes'. Every period p <= 32766 is contradicted (the hardest, p = 32764, still has a mismatch at index 32768). The post-hoc rule requires at least 64 comparisons for a period to count; under it no period passes and the verdict is 'supports'. Both outcomes are recorded in measured.extra." ;
+    delphi:evidenceAgainst "The complexity tests are a specific battery (lzma, periodicity, three NIST-style tests); rule 30's centre column is known to fail no standard test at this length, but a sequence can be complex under these and simple under others. Compression ratio 1.0 relative to os.urandom means lzma found no exploitable regularity, not that none exists." ;
+    delphi:evidenceAgainst "The claim is a general principle; one witness confirms the existence reading. The census shows that 9 of the 256 elementary rules (30, 45, 73, 75, 86, 89, 101, 135, 149; mostly rule 30's and rule 45's symmetry equivalents) have pattern compressibility within a factor 2 of rule 30, the median rule compressing to 0.08% of raw size." ;
+    delphi:evidenceAgainst "The os.urandom baseline is non-deterministic; the rule-30 compressed size (8252 bytes for 8192 raw bytes) can be compared directly with the raw size: lzma expands it slightly, as it does for random data." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch02-03--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch02-03/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch02-03--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Elementary cellular automata from a single black cell (generated by analysis.py)" ;
+    dct:description "the witness system and the comparison rules" ;
+    dct:license "CC0 (generated data)" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch02-03> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch02-03--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch02-03/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (Claude Fable 5.1 (Cursor cloud agent); cursor/claim-tests-wolfram-nks-f0e1)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-cursor-cloud-agent> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-cursor-cloud-agent> a delphi:LanguageModel ;
+    dct:identifier "Claude Fable 5.1 (Cursor cloud agent)" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.072Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch02-03: supports, confidence 0.9" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch02-03--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

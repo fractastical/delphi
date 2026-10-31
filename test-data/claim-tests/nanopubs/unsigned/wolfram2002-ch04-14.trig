@@ -1,0 +1,104 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch04-14--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch04-14: supports, confidence 0.97" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.97"^^xsd:double ;
+    delphi:hypothesis "In any integer base, every rational p/q has an eventually periodic digit expansion with period at most q - 1 (and preperiod + period at most q), every eventually periodic digit sequence is the expansion of a rational number, and the published digit expansions of irrational constants show no eventual periodicity." ;
+    delphi:passCriterion "Pre-registered: (1) for bases 2, 3 and 10 and all denominators q = 1..20000, the digit expansion of 1/q (and of p/q for all 1 <= p < q when q <= 300) has period <= q - 1 and preperiod + period <= q, with zero violations, and the base-10 periods of 1/q agree with OEIS A007732 for every n covered by its b-file; (2) 100% of 20000 random eventually periodic digit patterns (random preperiod of length 0..20, random non-trivial period block of length 1..30, bases 2, 3, 10) are reproduced exactly when the rational number reconstructed from them is re-expanded by long division; (3) none of the first 10000 decimal digits of sqrt(2), e and pi (OEIS b-files) is eventually periodic in the sense that, for some period p <= N/3, the last 2p digits already repeat with period p." ;
+    delphi:failCriterion "Pre-registered: any rational whose expansion has minimal period > q - 1 or does not become periodic within q digits; any disagreement with A007732; any eventually periodic pattern whose reconstructed rational re-expands differently; or an irrational constant's published digits exhibiting at least two full agreeing periods for some p <= N/3." ;
+    delphi:expectedObservation "Pre-registered: (1) for bases 2, 3 and 10 and all denominators q = 1..20000, the digit expansion of 1/q (and of p/q for all 1 <= p < q when q <= 300) has period <= q - 1 and preperiod + period <= q, with zero violations, and the base-10 periods of 1/q agree with OEIS A007732 for every n covered by its b-file; (2) 100% of 20000 random eventually periodic digit patterns (random preperiod of length 0..20, random non-trivial period block of length 1..30, bases 2, 3, 10) are reproduced exactly when the rational number reconstructed from them is re-expanded by long division; (3) none of the first 10000 decimal digits of sqrt(2), e and pi (OEIS b-files) is eventually periodic in the sense that, for some period p <= N/3, the last 2p digits already repeat with period p." ;
+    delphi:disconfirmingObservation "Pre-registered: any rational whose expansion has minimal period > q - 1 or does not become periodic within q digits; any disagreement with A007732; any eventually periodic pattern whose reconstructed rational re-expands differently; or an irrational constant's published digits exhibiting at least two full agreeing periods for some p <= N/3." ;
+    delphi:admissibleDatasets "Planned datasets: rational-expansions-bases-2-3-10-q-le-20000, oeis-a007732-bfile, random-eventually-periodic-patterns, oeis-a002193-bfile, oeis-a001113-bfile, oeis-a000796-bfile" ;
+    delphi:inferenceMethod "analysis.py (1) runs long division for 1/q, q = 1..20000, and for all p/q with q <= 300, in bases 2, 3 and 10 (64,850 expansions per base), recording preperiod and period from the first repeated remainder and counting violations of period <= q-1 or preperiod + period <= q; base-10 periods of 1/n are compared with the 10,000-term OEIS A007732 b-file. (2) It draws 20,000 random eventually periodic patterns (base in {2,3,10}, preperiod 0-20 digits, block 1-30 digits, all-(b-1) blocks rejected), reconstructs the exact rational with Python Fractions and re-expands it, counting patterns not reproduced digit for digit. (3) It downloads the first 10,000 decimal digits of sqrt(2), e and pi from OEIS and, for every p <= N/3, finds the smallest index after which the digit sequence agrees with its shift by p, flagging any p for which two full periods already agree. Run time about 9 s including downloads." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py (1) runs long division for 1/q, q = 1..20000, and for all p/q with q <= 300, in bases 2, 3 and 10 (64,850 expansions per base), recording preperiod and period from the first repeated remainder and counting violations of period <= q-1 or preperiod + period <= q; base-10 periods of 1/n are compared with the 10,000-term OEIS A007732 b-file. (2) It draws 20,000 random eventually periodic patterns (base in {2,3,10}, preperiod 0-20 digits, block 1-30 digits, all-(b-1) blocks rejected), reconstructs the exact rational with Python Fractions and re-expands it, counting patterns not reproduced digit for digit. (3) It downloads the first 10,000 decimal digits of sqrt(2), e and pi from OEIS and, for every p <= N/3, finds the smallest index after which the digit sequence agrees with its shift by p, flagging any p for which two full periods already agree. Run time about 9 s including downloads." ;
+    rdfs:comment "Measured: 0 rational expansions violating period <= q-1 or preperiod + period <= q (out of 194,550) (n = 194550, exact). Interpretation: Wolfram's 'repetitive digit sequences' are eventually periodic positional expansions in an integer base; the clause 'period at most q - 1' in the claim text is the standard long-division bound (there are only q - 1 non-zero remainders). Terminating expansions are treated as eventually periodic with repeating 0, as the assessors note; period blocks consisting only of the digit b - 1 are excluded from the random patterns because they denote the alternative expansion of a terminating rational and would re-expand in the terminating form. The converse ('rationals are the only numbers with repetitive digit sequences') is tested constructively (every eventually periodic pattern reconstructs to a rational that reproduces it) and, as a sanity check only, on the published digits of three irrational constants; a finite digit string can never prove non-periodicity, so part (3) is a consistency check rather than a proof." ;
+    delphi:evidenceAgainst "Both directions are classical theorems; the computation confirms the forward direction exhaustively for all denominators up to 20,000 in three bases (the bound period = q - 1 is attained, e.g. for full-reptend primes), agrees with OEIS A007732 on all 10,000 tabulated decimal periods, and confirms the converse constructively on 20,000 random eventually periodic patterns." ;
+    delphi:evidenceAgainst "A finite digit string cannot establish that a number is not eventually periodic; part (3) only checks that 10,000 published digits of sqrt(2), e and pi show no two agreeing repeats for any period up to N/3 (the maximal agreement found was 1.33 periods, consistent with chance), which is a consistency check, not a proof of the 'only rationals' clause." ;
+    delphi:evidenceAgainst "Terminating expansions are counted as eventually periodic with repeating 0 (period 1), following OEIS A007732; under the alternative convention (repeating b-1) they are still eventually periodic, so the verdict does not depend on this choice." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-3>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-4>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-5>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-6> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch04-14/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Preperiod and period of 1/q (q <= 20000) and p/q (q <= 300) in bases 2, 3, 10 by long division (generated by analysis.py)" ;
+    dct:description "direction rational => eventually periodic with period <= q - 1" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: OEIS A007732: period of decimal representation of 1/n, b-file" ;
+    dct:description "independent tabulation of decimal periods for cross-checking" ;
+    delphi:hasChecksum "sha256:eb0e8d499b46a8c12bdb8d9f747ca6d09f322a2de1ddd26971b95d4c89dca730" ;
+    prov:atLocation <https://oeis.org/A007732/b007732.txt> ;
+    prov:wasDerivedFrom <https://oeis.org/A007732> ;
+    dct:license "CC BY-SA 4.0 (OEIS)" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: 20000 random eventually periodic digit patterns (numpy default_rng seed 20261031; generated by analysis.py)" ;
+    dct:description "direction eventually periodic => rational (constructive)" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-4> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: OEIS A002193: decimal expansion of sqrt(2), b-file" ;
+    dct:description "irrational sanity check" ;
+    delphi:hasChecksum "sha256:ca6c74f68ed066a0d703ce5bf2eb0f721fa07a7d233596ec9f86355d22a796e8" ;
+    prov:atLocation <https://oeis.org/A002193/b002193.txt> ;
+    prov:wasDerivedFrom <https://oeis.org/A002193> ;
+    dct:license "CC BY-SA 4.0 (OEIS)" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-5> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: OEIS A001113: decimal expansion of e, b-file" ;
+    dct:description "irrational sanity check" ;
+    delphi:hasChecksum "sha256:9eef3a3fe766065b330d8f1f398efc62f19cd3af299af8ca252ef98818a3dc9d" ;
+    prov:atLocation <https://oeis.org/A001113/b001113.txt> ;
+    prov:wasDerivedFrom <https://oeis.org/A001113> ;
+    dct:license "CC BY-SA 4.0 (OEIS)" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-14--claim-test--dataset-6> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: OEIS A000796: decimal expansion of pi, b-file" ;
+    dct:description "irrational sanity check" ;
+    delphi:hasChecksum "sha256:f8772370d624d403f056e3e3d4aadb15fec135d5075b5506053eb86460f4e20b" ;
+    prov:atLocation <https://oeis.org/A000796/b000796.txt> ;
+    prov:wasDerivedFrom <https://oeis.org/A000796> ;
+    dct:license "CC BY-SA 4.0 (OEIS)" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch04-14> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch04-14--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch04-14/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-0123)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.075Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch04-14: supports, confidence 0.97" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch04-14--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

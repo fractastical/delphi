@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch05-09--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch05-09: supports, confidence 0.9" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.9"^^xsd:double ;
+    delphi:hypothesis "Directed networks in which every node is of one type and has exactly two outgoing connections can realize, through the connection pattern alone, structures equivalent to d-dimensional arrays for every d, as well as trees and nested (fractal) structures. 'Equivalent to a d-dimensional array' is taken in Wolfram's two senses: (i) grouping nodes into identical blocks yields exactly the d-dimensional grid (each block connected to its 2d neighbouring blocks), and (ii) the number of nodes reachable within r connection steps grows like r^d (the network dimension criterion of NKS chapter 9)." ;
+    delphi:passCriterion "Pre-registered. (1) Arrays: for d = 1..6 construct the network by one uniform rule: each lattice point x of Z^d is a block of d nodes (x, i), i = 0..d-1, and node (x, i) has exactly two outgoing connections, to (x + e_i, (i+1) mod d) and (x - e_i, (i+1) mod d). Verify (a) every node has out-degree exactly 2 and the rule is identical for every node; (b) exact structural equivalence: on the torus (Z_L)^d with L = 5, contracting each block to a point gives a multigraph whose edge set equals the d-dimensional grid's edge set {x <-> x +- e_i} with every block connected to exactly 2d distinct neighbouring blocks (exact set comparison); (c) dimension criterion: breadth-first search along connections from one node of the infinite network, counting N(r) = nodes within r steps; the growth exponent log2(N(R)/N(R/2)) at R = 20 d must lie within 0.5 of d for d = 1, 2, 3, 4 (so that it rounds to d), and is reported (not scored) for d = 5, 6. (2) Trees: the infinite binary tree (node k connects to 2k+1 and 2k+2) has N(r) = 2^(r+1) - 1 for r <= 15 (exact). (3) Nested: the level-7 Sierpinski gasket graph (3 corner nodes of degree 2, all others of degree 4) is given an Eulerian orientation along an Euler circuit plus a directed 3-cycle through the corners, which must give every node out-degree exactly 2; its undirected growth exponent log2(N(R)/N(R/2)) at R = 64 from a corner must lie within 0.3 of log2(3) = 1.585, the gasket's dimension. 'Supports' if (1a), (1b), (1c), (2) and (3) all hold." ;
+    delphi:failCriterion "Pre-registered. 'Refutes' if the uniform construction fails structurally for some d <= 6 (out-degree not 2, or the block quotient is not the d-dimensional grid), or if the measured growth exponent for some d <= 4 rounds to an integer other than d, or if no out-degree-2 orientation of the gasket exists. 'Mixed' if arrays pass but the tree or nested construction fails its criterion. 'Inconclusive' is not expected: the test is a self-contained computation." ;
+    delphi:expectedObservation "Pre-registered. (1) Arrays: for d = 1..6 construct the network by one uniform rule: each lattice point x of Z^d is a block of d nodes (x, i), i = 0..d-1, and node (x, i) has exactly two outgoing connections, to (x + e_i, (i+1) mod d) and (x - e_i, (i+1) mod d). Verify (a) every node has out-degree exactly 2 and the rule is identical for every node; (b) exact structural equivalence: on the torus (Z_L)^d with L = 5, contracting each block to a point gives a multigraph whose edge set equals the d-dimensional grid's edge set {x <-> x +- e_i} with every block connected to exactly 2d distinct neighbouring blocks (exact set comparison); (c) dimension criterion: breadth-first search along connections from one node of the infinite network, counting N(r) = nodes within r steps; the growth exponent log2(N(R)/N(R/2)) at R = 20 d must lie within 0.5 of d for d = 1, 2, 3, 4 (so that it rounds to d), and is reported (not scored) for d = 5, 6. (2) Trees: the infinite binary tree (node k connects to 2k+1 and 2k+2) has N(r) = 2^(r+1) - 1 for r <= 15 (exact). (3) Nested: the level-7 Sierpinski gasket graph (3 corner nodes of degree 2, all others of degree 4) is given an Eulerian orientation along an Euler circuit plus a directed 3-cycle through the corners, which must give every node out-degree exactly 2; its undirected growth exponent log2(N(R)/N(R/2)) at R = 64 from a corner must lie within 0.3 of log2(3) = 1.585, the gasket's dimension. 'Supports' if (1a), (1b), (1c), (2) and (3) all hold." ;
+    delphi:disconfirmingObservation "Pre-registered. 'Refutes' if the uniform construction fails structurally for some d <= 6 (out-degree not 2, or the block quotient is not the d-dimensional grid), or if the measured growth exponent for some d <= 4 rounds to an integer other than d, or if no out-degree-2 orientation of the gasket exists. 'Mixed' if arrays pass but the tree or nested construction fails its criterion. 'Inconclusive' is not expected: the test is a self-contained computation." ;
+    delphi:admissibleDatasets "Planned datasets: out-degree-2-network-generator, nks-p195-p196-network-systems" ;
+    delphi:inferenceMethod "analysis.py builds the d-dimensional block network from the single rule in the pre-registration for d = 1..6 and checks, on the torus (Z_5)^d, that every node has two outgoing connections and that contracting blocks gives exactly the grid's edge multiset with 2d distinct neighbouring blocks per block. It runs a breadth-first search along connections on the infinite network from node (0,0) and computes the growth exponent log2(N(R)/N(R/2)) at R = 20 d (d <= 4) or 8 d (d = 5, 6), alongside the same exponent for the plain L1 lattice ball at radius R/d as a finite-size reference. It checks N(r) for the infinite binary tree and constructs the level-7 Sierpinski gasket graph (3282 nodes), orients its 6561 edges along an Euler circuit (Hierholzer) and adds a directed 3-cycle through the corners so that every node has out-degree 2, then measures the growth exponent from a corner (undirected and directed)." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py builds the d-dimensional block network from the single rule in the pre-registration for d = 1..6 and checks, on the torus (Z_5)^d, that every node has two outgoing connections and that contracting blocks gives exactly the grid's edge multiset with 2d distinct neighbouring blocks per block. It runs a breadth-first search along connections on the infinite network from node (0,0) and computes the growth exponent log2(N(R)/N(R/2)) at R = 20 d (d <= 4) or 8 d (d = 5, 6), alongside the same exponent for the plain L1 lattice ball at radius R/d as a finite-size reference. It checks N(r) for the infinite binary tree and constructs the level-7 Sierpinski gasket graph (3282 nodes), orients its 6561 edges along an Euler circuit (Hierholzer) and adds a directed 3-cycle through the corners so that every node has out-degree 2, then measures the growth exponent from a corner (undirected and directed)." ;
+    rdfs:comment "Measured: 0.965,1.963,2.957,3.947,4.74,5.654 growth exponent log2(N(R)/N(R/2)) of the out-degree-2 block network for d = 1..6 (pre-registered window: within 0.5 of d for d <= 4) (n = [object Object], exact counts; the exponent is biased below d at finite radius exactly as the plain lattice ball is (reference values given)). Interpretation: The claim is constructive and existential: one explicit family of networks suffices for each d, plus one tree and one nested example. The block-quotient check is the exact sense of 'equivalent to an array'; the growth exponent is Wolfram's own operational notion of network dimension (NKS p. 479 and notes) and adds a check that the effective geometry is d-dimensional without reference to the blocks. Blocks of d nodes connected to 2d neighbouring blocks follow the description on NKS p. 195 ('every block of nodes is connected to four rather than two neighboring blocks'). Growth exponents at finite radius are biased low (the lattice ball itself has local exponent below d at radius ~20), hence the +-0.5 window; the exact quotient check is the decisive part." ;
+    delphi:evidenceAgainst "Deviation from the pre-registration: for d = 5 and 6 (reported, not scored) the BFS radius was reduced from 20d to 8d because the 20d search for d = 6 visited 13 million nodes (68 s and several GB in a first run; it gave exponent 5.756 and the d = 5 run at radius 50 gave 4.815). At radius 8d the exponents are 4.74 and 5.65, still rounding to d and above the plain lattice ball's finite-radius exponents (4.26 and 4.96), so the conclusion is unchanged." ;
+    delphi:evidenceAgainst "The claim is existential and is settled by the exact quotient check for d <= 6 together with the uniform rule, which is defined for every d (the same code runs for any d; only the search radius limits the computation). The growth-exponent check is Wolfram's operational notion of dimension and confirms the effective geometry without using the block structure; its finite-radius bias is quantified by the lattice reference." ;
+    delphi:evidenceAgainst "One construction per structure type is tested (block arrays; binary tree; Eulerian-oriented Sierpinski gasket). The gasket orientation plus corner 3-cycle is one way to get out-degree exactly 2 for every node; the undirected growth exponent 1.612 and directed 1.594 are both within 0.03 of log2(3), the gasket's Hausdorff dimension." ;
+    delphi:evidenceAgainst "Whether the resulting networks are 'equivalent' to arrays in any stronger sense (e.g. as substrates for network cellular automata, NKS p. 1031) was not tested; the block-quotient isomorphism and dimension are the two senses stated in the pre-registration." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-09--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-09--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-09/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-09--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Out-degree-2 networks generated by analysis.py" ;
+    dct:description "the constructed networks" ;
+    dct:license "CC0 (generated data)" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-09--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: NKS pp. 195-196, 'Network Systems' (online edition)" ;
+    dct:description "source of the block description used for the construction" ;
+    delphi:hasChecksum "sha256:d749c52797af90a6974f95258f64373a74b4fbcb1949b1c04d6bbcf3ca389c87" ;
+    prov:atLocation <https://www.wolframscience.com/nks/p195--network-systems/> ;
+    delphi:hasChecksum "sha256:30ecc14b368b5eaabbcbfd50a5d12220b414aaf0506bac5a79f7f81f570d8ede" ;
+    prov:atLocation <https://www.wolframscience.com/nks/p196--network-systems/> ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p195--network-systems/> ;
+    dct:license "copyright Stephen Wolfram LLC" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch05-09> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch05-09--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-09/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (Claude Fable 5.1 (Cursor cloud agent); cursor/claim-tests-wolfram-nks-f0e1)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-cursor-cloud-agent> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-cursor-cloud-agent> a delphi:LanguageModel ;
+    dct:identifier "Claude Fable 5.1 (Cursor cloud agent)" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.077Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch05-09: supports, confidence 0.9" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch05-09--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

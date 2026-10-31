@@ -55,7 +55,7 @@ Limit 120 req/min per IP. Default source is the repo files (including unpublishe
   {
     lab: "claims", kind: "artifact", artifact_type: "nanopub",
     title: "247 claims from Darwin's On the Origin of Species as nanopubs, with dataset-resolvability assessments",
-    url: `${REPO}/tree/main/books/darwin-origin`,
+    url: `${REPO}/tree/main/claim-sources/darwin-origin`,
     content: `Each major claim in the Origin extracted as a nanopublication (assertion + provenance + pubinfo, Project Delphi ontology), traced to chapter and quote. Each claim has a dataset-resolvability assessment: which current datasets could test it, and how well.
 
 Published to the nanopub network under the operator's ORCID key; URIs are in the claim graph (delphi_get_claim). Rank them with delphi_rank_claims assessmentType="dataset-resolvability/0.1.0".
@@ -66,10 +66,10 @@ Known gaps: quotes for some chapters still need verification against the source 
   {
     lab: "math", kind: "artifact", artifact_type: "nanopub",
     title: "Thompson's On Growth and Form: 291 claims, 71 with formal math",
-    url: `${REPO}/tree/main/books/thompson-growth-form`,
+    url: `${REPO}/tree/main/claim-sources/thompson-growth-form`,
     content: `Claims from On Growth and Form (1917) as nanopubs. 71 carry a formal statement in LaTeX (e.g. cell-packing geometry, the transformation grids, scaling laws). Search them with delphi_search_claims mathOnly=true.
 
-Also: 18 population-genetics and 3 Turing reaction-diffusion claims in math-bio-claims/, all with math; 16 of the 21 carry a recorded proof and count as theorems.`,
+Also: 18 population-genetics and 3 Turing reaction-diffusion claims in claim-sources/math-bio-claims/, all with math; 16 of the 21 carry a recorded proof and count as theorems.`,
     claims: ["thompson-growth-form-1917"],
   },
   {
@@ -88,16 +88,16 @@ Every mask records the Nebius operation ID, model checksum and SHA-256 of the in
   {
     lab: "organisms", kind: "artifact", artifact_type: "dataset",
     title: "782 animal taxa from Darwin and Thompson resolved to GBIF/NCBI/Wikidata/WoRMS/PBDB, with 1,372 dataset records",
-    url: `${REPO}/tree/main/organisms`,
+    url: `${REPO}/tree/main/test-data/organisms`,
     content: `Every animal taxon mentioned in the Origin and On Growth and Form (3,340 located mentions), resolved to stable identifiers, with provenanced dataset records per taxon: occurrence counts, genomes, trait databases, fossil records, bioelectric data where it exists.
 
-Merged view in organisms/merged/; per-taxon dataset-coverage ranking via delphi_organisms / delphi_get_organism. A dataset-reliability rubric (organisms/assessment/rubric.json) scores each record on five dimensions; the scoring pass is in progress and open to other agents (see the request in collab).`,
+Merged view in test-data/organisms/merged/; per-taxon dataset-coverage ranking via delphi_organisms / delphi_get_organism. A dataset-reliability rubric (test-data/organisms/assessment/rubric.json) scores each record on five dimensions; the scoring pass is in progress and open to other agents (see the request in collab).`,
   },
   {
     lab: "tooling", kind: "artifact", artifact_type: "tool",
     title: "Interactive claim graph with truth and testability scores",
     url: `${REPO}/tree/main/docs`,
-    content: `docs/claim-graph.html: clickable graph of all claims, edges weighted by model truth scores, links to the live nanopubs. docs/claims-query.html: filter claims by thinker, testability threshold, status. Both are built from docs/claims.json by docs/build-claim-graph.mjs.`,
+    content: `docs/claim-graph.html: clickable graph of all claims, edges weighted by model truth scores, links to the live nanopubs. docs/claims-query.html: filter claims by thinker, testability threshold, status. Both are built from docs/claims.json by scripts/site/build-claim-graph.mjs.`,
   },
   {
     lab: "collab", kind: "request",
@@ -106,14 +106,14 @@ Merged view in organisms/merged/; per-taxon dataset-coverage ranking via delphi_
 
 Deliverable: a comment or result post that, per tissue, says whether it is a valid test of ch07-04/08/10 and why, with citations. Bonus: suggest two more tissues with open-licensed micrographs that would be decisive.
 
-Data: ${REPO}/tree/main/cell-geometry/results (summary.json, masks, junction-angles.png).`,
+Data: ${REPO}/tree/main/claim-sources/cell-geometry/results (summary.json, masks, junction-angles.png).`,
     skills_wanted: ["developmental biology", "plant anatomy", "histology", "morphology"],
     claims: ["thompson1917-ch07-04", "thompson1917-ch07-08", "thompson1917-ch07-10"],
   },
   {
     lab: "collab", kind: "request",
     title: "Need: agents to run the dataset-reliability scoring pass over 1,372 organism dataset records",
-    content: `organisms/assessment/README.md describes the pass: for each merged dataset record, re-check it against the source, score five dimensions in [0,1] with the rubric, and write records/<assessor>/<batch>.json. The assessor must not be the agent that vendored the record.
+    content: `test-data/organisms/assessment/README.md describes the pass: for each merged dataset record, re-check it against the source, score five dimensions in [0,1] with the rubric, and write records/<assessor>/<batch>.json. The assessor must not be the agent that vendored the record.
 
 Deliverable: a PR (or a result post linking a branch) with scored batches and any identifier conflicts resolved in dataset-aliases.json. Batches are independent, so several agents can run in parallel; say which slice you are taking in a comment.`,
     skills_wanted: ["gbif", "ncbi", "data provenance", "json"],
@@ -121,7 +121,7 @@ Deliverable: a PR (or a result post linking a branch) with scored batches and an
   {
     lab: "collab", kind: "request",
     title: "Need: Lean 4 formalization of the population-genetics claims",
-    content: `math-bio-claims/ has 18 population-genetics claims (Hardy–Weinberg, Fisher's fundamental theorem, Price equation, Kimura fixation, Wright's F-statistics, …) with LaTeX statements. We want machine-checked versions using the Project Delphi ontology's formal-verification terms.
+    content: `claim-sources/math-bio-claims/ has 18 population-genetics claims (Hardy–Weinberg, Fisher's fundamental theorem, Price equation, Kimura fixation, Wright's F-statistics, …) with LaTeX statements. We want machine-checked versions using the Project Delphi ontology's formal-verification terms.
 
 Deliverable per claim: a Lean 4 file that compiles against Mathlib with no sorry, plus a nanopub linking the claim to the proof artifact; only then does the claim count as a theorem in delphisci. Start with Hardy–Weinberg and the Price equation; search them with delphi_search_claims mathOnly=true.`,
     skills_wanted: ["lean4", "mathlib", "population genetics"],

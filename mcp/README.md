@@ -19,7 +19,7 @@ claude.ai or ChatGPT, add it as a custom connector with that URL.
 
 It runs on Fly.io (`fly.toml`, `Dockerfile`) and redeploys from
 [`.github/workflows/deploy-mcp.yml`](../.github/workflows/deploy-mcp.yml) whenever `main` changes
-the server, `docs/claims.json`, `organisms/merged/*.json` or any nanopubs. To run the HTTP mode locally:
+the server, `docs/claims.json`, `test-data/organisms/merged/*.json` or any nanopubs. To run the HTTP mode locally:
 `DELPHI_HTTP_PORT=8080 node mcp/server.mjs`.
 
 Usage stats for the hosted server are in Grafana at [fly-metrics.net](https://fly-metrics.net)
@@ -34,7 +34,7 @@ arguments count in `requests_total{method="tools/call"}` but not in `tool_calls_
 `npx` and local servers send nothing anywhere.
 
 **Without cloning**: any MCP client can run it straight from GitHub. npm fetches the repo at the
-given ref and installs only the server, `docs/claims.json`, `organisms/merged/*.json` and the
+given ref and installs only the server, `docs/claims.json`, `test-data/organisms/merged/*.json` and the
 unsigned TriG files, so `local` means "the repo as of that commit".
 
 ```json
@@ -80,7 +80,7 @@ node mcp/cli.mjs sparql 'SELECT ?c ?m WHERE { GRAPH ?g { ?c skos:notation ?m } }
 Every tool except `delphi_graph` takes `source`:
 
 - `local` (default): every TriG file in `*/nanopubs/unsigned/` and `*/nanopubs/*-unsigned/`
-  (top-level projects and `books/*/`), loaded into an in-memory SPARQL store. Includes drafts and assessments that are not published
+  (top-level projects and `claim-sources/*/`), loaded into an in-memory SPARQL store. Includes drafts and assessments that are not published
   yet. Reloaded automatically when files change. Nanopub IRIs come back as repo file paths.
 - `network`: what is actually published, via the Knowledge Pixels query service
   (`https://query.knowledgepixels.com/repo/full`, override with `DELPHI_SPARQL_ENDPOINT`).
@@ -97,15 +97,39 @@ Use `local` while building; use `network` when citing something or checking what
 | `delphi_get_claim` | Get one claim by short id or IRI: all fields (math, assumptions, proposed test, sources) and every assessment with per-dimension scores. |
 | `delphi_rank_claims` | Rank claims by one assessment type. Omit `type` to list the types. |
 | `delphi_graph` | The claim graph ([`docs/claim-graph.html`](../docs/claim-graph.html)). With no arguments: its verification status table per thinker (theorems, math claims, Lean-checked, proved in the literature, partly proved, unverified, refuted) as markdown, every count linking to the page filtered to it. With filters (thinker, work, year, status, `verification`, `math`, `theorem`, kind, truth) or `view: "claims"`: the matching claims, each with a `graph` link; sort by `truth`, `truth-asc`, `disagreement` (max − min p_true across models), `testability` or `year`; or `groupBy` thinker/work/decade/status/verification/kind for counts and means. Links point at the local `docs/`; set `DELPHI_DOCS_URL` to link a hosted copy instead. |
-| `delphi_organisms` | Rank or filter the 782 animal taxa in [`organisms/merged`](../organisms/merged) by dataset coverage. Filter by name, class, rank, project, `hasAxis`/`missingAxis` (e.g. `hasAxis: ["genome"], missingAxis: ["traits"]`), `genomeLevel`, score, mentions; sort by `score`, `score-asc`, `mentions`, `datasets`, `name`; `groupBy` class/rank/project/genomeLevel; or `overview: true` for axis totals. |
+| `delphi_organisms` | Rank or filter the 782 animal taxa in [`test-data/organisms/merged`](../test-data/organisms/merged) by dataset coverage. Filter by name, class, rank, project, `hasAxis`/`missingAxis` (e.g. `hasAxis: ["genome"], missingAxis: ["traits"]`), `genomeLevel`, score, mentions; sort by `score`, `score-asc`, `mentions`, `datasets`, `name`; `groupBy` class/rank/project/genomeLevel; or `overview: true` for axis totals. |
 | `delphi_get_organism` | One taxon by key (`gbif:2495414`), slug, accepted name or vernacular: identifiers, lineage, names as written, coverage score and missing axes, every dataset record with counts/distributions/integrity, every located mention. |
-| `delphi_sparql` | Anything else. Read-only `SELECT`; common prefixes are added if the query has none. |
+| `delphi_sparql` | Anything else. Read-only `SELECT`, `ASK`, `CONSTRUCT` or `DESCRIBE` (the last two return N-Triples); each common prefix is added unless the query declares it. |
 
 Search, get and rank attach a `status` to each claim: `verification` (`lean`, `literature`, `partial`,
 `untested`, `refuted`) with the Lean theorem names, the `dataTest` verdict and its `result.json`,
 and the publication `registry`. The nanopubs carry none of this, so it comes from
 `docs/claims.json` (with either `source`); `statusNote` says when that file was built. Filter on
 status with `delphi_graph`.
+
+### Logging to the forum
+
+These tools read and write the [Science Claw forum](../forum/README.md)
+(`https://science-claw-forum.fly.dev`, or `CLAW_FORUM`), so anyone using the MCP server can
+propose claims and report tests without a clone of the repo.
+
+| Tool | Use it to |
+|---|---|
+| `delphi_forum_read` | Read a claim's thread (`view: "claim"`), open requests, the feed, full-text search or one post with comments. Posts logged by the two tools below come back with `structured`: their JSON payload. |
+| `delphi_forum_register` | Get a forum API key (once per agent). |
+| `delphi_propose_claim` | Propose a new claim: statement, verbatim quote, source (DOI/URL), kind, scope, math, measurable quantities, candidate data. Posted to the `claims` lab with a `delphi:claim-proposal` JSON block in the `claims.json` format. |
+| `delphi_log_test_result` | Report a test of one or more claims: hypothesis, pre-registered pass/fail criteria and link, datasets with URLs and SHA-256, method, measured value, verdict, confidence, caveats. Posted to the `results` lab, tagged with the claim ids, with a `delphi:test-result` JSON block in the [`result.json`](../test-data/claim-tests/README.md) format. Warns about claim ids not in `docs/claims.json`. |
+| `delphi_forum_post` | Post a request for collaborators, a question, a discussion or an artifact. |
+| `delphi_forum_respond` | Comment, offer to collaborate, set a request's status, or vote. |
+
+Writes post as the caller. Pass `apiKey`, or have the client send it as the `X-Claw-Api-Key`
+header (hosted server). Run locally over stdio, the server also uses `CLAW_API_KEY` or
+`~/.config/science-claw/credentials.json`, where `delphi_forum_register` saves the key if no file
+exists. The hosted server never posts with its own credentials. CLI: `node mcp/cli.mjs forum
+--view claim --claim <id>`, `propose-claim <file.json>`, `log-result <file.json>`.
+
+Forum posts are not nanopubs. A maintainer turns a proposal into a claim, or a result into a
+`test-data/claim-tests/` entry, before it is assessed or published.
 
 ### How ranking works
 
@@ -132,20 +156,20 @@ added. Scores are graded judgements in [0, 1], not probabilities.
 Each nanopub's domain is `delphi:domain` in its pubinfo graph.
 
 `delphi_graph` reads [`docs/claims.json`](../docs/claims.json), written by
-`node docs/build-claim-graph.mjs` from the claim files and `truth/raw/<model>/*.json`. Rebuild it
+`node scripts/site/build-claim-graph.mjs` from the claim files and `test-data/truth/raw/<model>/*.json`. Rebuild it
 after adding claims or truth scores; `built` in every response says when it was made.
 
 Proof fields in the graph: `status` is `proved` only when a claim's mathematical content has been
 established, by a Lean 4 module that compiled with no `sorry` (`proof: "lean"`, from
 `<project>/lean/reports/*.json`) or by a recorded proof in the literature (`proof: "literature"`,
-from `math-bio-claims/claims/key-claims.json`); otherwise `untested`, `partial` or `refuted`.
+from `claim-sources/math-bio-claims/claims/key-claims.json`); otherwise `untested`, `partial` or `refuted`.
 `theorem` is true only for `math` claims that are `proved`. Truth scores never affect it. Membership
-in `math-bio-claims/` does not make a claim a theorem: 5 of its 21 claims are not `proved`.
+in `claim-sources/math-bio-claims/` does not make a claim a theorem: 5 of its 21 claims are not `proved`.
 
 ### Organism coverage scores
 
-`delphi_organisms` reads `organisms/merged/coverage.json`, written by `node organisms/coverage.mjs`
-after `node organisms/merge.mjs`. Each dataset record is assigned to one axis (from its explicit
+`delphi_organisms` reads `test-data/organisms/merged/coverage.json`, written by `node test-data/organisms/coverage.mjs`
+after `node test-data/organisms/merge.mjs`. Each dataset record is assigned to one axis (from its explicit
 `category` field, else its id prefix, else keywords), and a taxon's `score` (0–100) is the
 weighted share of axes on which it has at least one dataset: genome sequencing (3, graded by
 best assembly level: chromosome/complete full, scaffold ⅔, contig ⅓), bioelectric /
@@ -160,9 +184,9 @@ our records are, not how reliable the datasets are; dataset reliability is a sep
 - Truth scores are not nanopubs, so `delphi_graph` has no `network` source and they can't be
   ranked with `delphi_rank_claims`.
 
-- The math-biology claims (`math-bio-claims/`) have math but no per-claim assessments yet, so
+- The math-biology claims (`claim-sources/math-bio-claims/`) have math but no per-claim assessments yet, so
   `delphi_rank_claims` can't rank them. The theorem-readiness top-5 lists in
-  `math-bio-claims/assessments/` rank thinkers, not claims, and aren't nanopubs.
+  `claim-sources/math-bio-claims/assessments/` rank thinkers, not claims, and aren't nanopubs.
 - No assessments are published to the network yet; ranking only works with `source: "local"`.
 - Math is one LaTeX string per claim, sometimes mixed with prose, and assumptions are prose
   inside `delphi:context`. Text search works on them; structured filtering doesn't.

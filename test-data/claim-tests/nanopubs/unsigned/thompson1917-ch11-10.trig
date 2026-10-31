@@ -1,0 +1,94 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch11-10--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch11-10: refutes, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "If whorl breadths (equivalently conch diameters one revolution apart) expand by a factor r per whorl, the constant angle is alpha = arccot(ln r / 2 pi) (Thompson's own table: r = 1.5 -> 86.3 deg, 2.0 -> 83.7 deg, 2.5 -> 81.7 deg, 3.0 -> 80.1 deg, 3.5 -> 78.7 deg). The claim then predicts: Nautilus r about 3, alpha about 80 deg; for ordinary ammonoids and typically spiral gastropods alpha is usually between 80 and 85 deg (r between 1.72 and 3.00) and very seldom below 80 deg (r > 3.00)." ;
+    delphi:passCriterion "Pre-registered. (a) Nautilus pompilius: per specimen, the median whorl expansion rate WER (Korn's definition, (dm1/dm2)^2 over half a whorl, which equals the per-revolution diameter ratio r) over all measured post-embryonic stages; the median across specimens, converted to alpha, must lie in [78, 82] deg (r in 2.6-3.5). (b) Ammonoids: per species, the median WER over measured stages with conch diameter >= 5 mm (excluding the embryonic ammonitella), converted to alpha; at least 50% of species must have alpha in [80, 85] deg and at most 10% alpha < 80 deg. (c) Gastropods: per specimen (then averaged per species), the fitted per-revolution whorl expansion rate W from the Collins et al. 2021 helicospiral fits, converted to alpha the same way; at least 50% of species in [80, 85] deg and at most 10% below 80 deg. All three of (a), (b), (c) must hold for 'supports'." ;
+    delphi:failCriterion "Pre-registered. 'refutes' if the Nautilus median alpha is outside [76, 84] deg, or if in either the ammonoid or the gastropod sample fewer than 40% of species fall in [80, 85] deg, or more than 20% fall below 80 deg. Anything between the pass and fail thresholds is 'mixed'. If the gastropod expansion parameter cannot be mapped to a per-revolution ratio from the dataset's documentation, part (c) is reported as not operationalizable and the verdict rests on (a) and (b) with a caveat." ;
+    delphi:expectedObservation "Pre-registered. (a) Nautilus pompilius: per specimen, the median whorl expansion rate WER (Korn's definition, (dm1/dm2)^2 over half a whorl, which equals the per-revolution diameter ratio r) over all measured post-embryonic stages; the median across specimens, converted to alpha, must lie in [78, 82] deg (r in 2.6-3.5). (b) Ammonoids: per species, the median WER over measured stages with conch diameter >= 5 mm (excluding the embryonic ammonitella), converted to alpha; at least 50% of species must have alpha in [80, 85] deg and at most 10% alpha < 80 deg. (c) Gastropods: per specimen (then averaged per species), the fitted per-revolution whorl expansion rate W from the Collins et al. 2021 helicospiral fits, converted to alpha the same way; at least 50% of species in [80, 85] deg and at most 10% below 80 deg. All three of (a), (b), (c) must hold for 'supports'." ;
+    delphi:disconfirmingObservation "Pre-registered. 'refutes' if the Nautilus median alpha is outside [76, 84] deg, or if in either the ammonoid or the gastropod sample fewer than 40% of species fall in [80, 85] deg, or more than 20% fall below 80 deg. Anything between the pass and fail thresholds is 'mixed'. If the gastropod expansion parameter cannot be mapped to a per-revolution ratio from the dataset's documentation, part (c) is reported as not operationalizable and the verdict rests on (a) and (b) with a caveat." ;
+    delphi:admissibleDatasets "Planned datasets: tajika-2018-nautilus-pompilius-dryad-4cb86, walton-korn-2018-ammonoid-ontogeny-dryad-c17p8, collins-2021-helicospiral-gastropods-dryad-p5hqbzknw" ;
+    delphi:inferenceMethod "fetch.py obtains the files (Dryad downloads sit behind a browser proof-of-work challenge; they were fetched with headless Chrome and checksummed) and writes derived tables (committed). analysis.py computes, per Nautilus specimen, the median of dm[i]/dm[i-8] over the 45-degree stations (one revolution; all stations are post-hatching, first dm 18-27 mm); per ammonoid species, the median of dm[n]/dm[n-1] over half-whorl stations with dm >= 5 mm; per gastropod specimen, the median of r[k+2]/r[k] where r is the perpendicular distance of each digitised aperture's centroid from the coiling axis (apertures 180 deg apart; replicate digitisations pooled), then the median per species. Each r is converted to alpha = arccot(ln r / 2 pi) and the pre-registered band fractions are evaluated." ;
+    delphi:preregistered false ;
+    dct:description "fetch.py obtains the files (Dryad downloads sit behind a browser proof-of-work challenge; they were fetched with headless Chrome and checksummed) and writes derived tables (committed). analysis.py computes, per Nautilus specimen, the median of dm[i]/dm[i-8] over the 45-degree stations (one revolution; all stations are post-hatching, first dm 18-27 mm); per ammonoid species, the median of dm[n]/dm[n-1] over half-whorl stations with dm >= 5 mm; per gastropod specimen, the median of r[k+2]/r[k] where r is the perpendicular distance of each digitised aperture's centroid from the coiling axis (apertures 180 deg apart; replicate digitisations pooled), then the median per species. Each r is converted to alpha = arccot(ln r / 2 pi) and the pre-registered band fractions are evaluated." ;
+    rdfs:comment "Measured: 80.48 degrees, median constant angle of Nautilus pompilius (r = 2.87 per revolution) (n = 93, Nautilus IQR 80.27-80.68 deg (r 2.81-2.94); population medians 80.4 (Indonesia), 80.4 (Malaysia), 80.7 (Philippines)). Interpretation: Thompson defines the constant angle through the per-whorl ratio of radii or whorl breadths, r = e^(2 pi cot alpha), and reads the angle off that ratio; the test therefore measures r and converts it with his own formula rather than fitting tangent angles to outlines. Modern 'whorl expansion rate' (Korn: WER = (dm1/dm2)^2 across half a whorl; Raup: W per revolution) is the same quantity for a planispiral shell. 'Ordinary ammonitoid shells' is operationalized as the species in a large published cross-section dataset (Devonian-Jurassic), 'typically spiral gastropods' as the 25 fossil and modern helicospiral species measured by Collins et al. 2021; neither sample was chosen by the tester. Deviation from the pre-registration: Collins et al. publish no per-revolution W (their W_e is a fitted rate of aperture-area increase), so r was computed directly from their raw digitised apertures (distance of the aperture centroid from the coiling axis at 180-degree steps, r = r[k+2]/r[k]), which is Thompson's own quantity; Nautilus r was likewise taken directly as dm[i]/dm[i-8] over the 45-degree stations rather than through WER." ;
+    delphi:evidenceAgainst "The verdict follows the pre-registered rule, which fails because only 32% of ammonoid species (threshold 40%) and 46% of gastropod species fall inside 80-85 deg. The failure is one-sided: no ammonoid and no gastropod species, and only 5% of Nautilus, fall below 80 deg, so 'very seldom less than 80 deg' is strongly supported; the typical ammonoid and gastropod sits at 85-86 deg (r 1.5-1.7), just above Thompson's upper bound rather than inside it." ;
+    delphi:evidenceAgainst "The Nautilus part of the claim ('in the neighbourhood of 80 deg', 'about three times') is confirmed closely: median 80.5 deg, r = 2.87, with very low scatter across 93 specimens and three populations." ;
+    delphi:evidenceAgainst "The ammonoid sample (Walton & Korn 2018) was assembled to study pachyconic and globular conchs and is 82% Palaeozoic; globular Palaeozoic goniatites have low expansion rates, so it is probably biased towards high alpha relative to the Mesozoic ammonites Thompson likely had in mind (the 3 Jurassic and 6 of 11 Permian species are in band)." ;
+    delphi:evidenceAgainst "The gastropod sample is 26 species dominated by four struthiolariid/turritellid species from New Zealand and Australia; species were weighted equally, but it is not a random sample of 'typically spiral' gastropods. r for gastropods was measured on digitised apertures in a single sectioned plane (centroid distance from the axis), which is noisier than CT-based cephalopod diameters." ;
+    delphi:evidenceAgainst "Per-species r is a median over ontogeny; whorl expansion drifts during growth (see thompson1917-ch11-08), so an adult-only or juvenile-only convention would move alpha by a fraction of a degree." ;
+    delphi:evidenceAgainst "Sensitivity (not pre-registered, computed in a side check): the ammonoid in-band fraction is 0.26 with no size threshold, 0.32 at dm >= 5 mm (pre-registered), 0.29 at dm >= 10 mm, 0.26 at dm >= 20 mm, and 0.33 using only each species' last measured revolution; the median alpha stays at 85.5-85.6 deg and the below-80 fraction at 0 throughout, so the verdict does not depend on the threshold." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-10--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-10--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-10--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch11-10/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-10--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data from: Intraspecific variation in cephalopod conchs changes during ontogeny: perspectives from three-dimensional morphometry of Nautilus pompilius" ;
+    dct:description "Nautilus per-revolution expansion ratio" ;
+    delphi:hasChecksum "sha256:db9ee691bc10f3c03ce78340f61c5b6f2fd98f9c3b1a1f3e194b8353aee4bb9f" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/75500> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.4cb86> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-10--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data from: Iterative ontogenetic development of ammonoid conch shapes from the Devonian through to the Jurassic (Walton & Korn)" ;
+    dct:description "ammonoid per-revolution expansion ratio per species" ;
+    delphi:hasChecksum "sha256:fbe2012f1d420ef7b292141ae0ed0ea8d046c4c15303663565dc72e0727ebe40" ;
+    prov:atLocation <https://zenodo.org/api/records/4937032/files/Ontogenetic_Conch_Parameter_Data.xlsx/content> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.c17p8> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-10--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data associated with: Going round the twist - An empirical analysis of shell coiling in helicospiral gastropods" ;
+    dct:description "gastropod per-revolution expansion ratio of the aperture centroid's distance from the coiling axis, per species" ;
+    delphi:hasChecksum "sha256:edab9e356820a43984bcf8130359ec29f7e6c00ca3995292fcd922ba2cb3a2a9" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/547236> ;
+    delphi:hasChecksum "sha256:a034e43eb95a22dffe10b1f8d0e83ab43b0e592e8e1d646513da7ab8dfbc7a39" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/547239> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch11-10> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch11-10--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch11-10/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5-1-thinking-high; cursor/thompson-claim-tests-6e84)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5-1-thinking-high" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.070Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch11-10: refutes, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch11-10--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

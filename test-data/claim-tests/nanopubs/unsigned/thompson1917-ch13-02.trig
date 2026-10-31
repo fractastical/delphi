@@ -1,0 +1,69 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch13-02--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch13-02: inconclusive, confidence null" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0"^^xsd:double ;
+    delphi:hypothesis "In hollow-horned ruminants (Bovidae) the two horns of a pair are conjugate spirals: each is a helico-spiral of the same length, curvature and pitch as its partner but of opposite handedness, so that reflecting one horn in the skull's sagittal plane reproduces the other." ;
+    delphi:passCriterion "Pre-registered (claim supported). For at least 8 bovid crania from public 3D scans spanning at least 4 genera, extract the midline curve of each horn core from the mesh, fit a helico-spiral (constant curvature and torsion in the Frenet sense, i.e. a conical helix) to each, and compare the pair: in at least 80% of specimens the signs of the torsion of the left and right horn are opposite, and the magnitudes of length, mean curvature and mean torsion agree within 15% (|L - R| / mean of the pair)." ;
+    delphi:failCriterion "Pre-registered (claim refuted). In more than 20% of specimens the two horns have torsion of the same sign (both horns coiling the same way, i.e. not conjugate), or the paired magnitudes differ by more than 15% in more than 20% of specimens beyond what the same measurement applied twice to one horn reproduces. If fewer than 8 specimens or fewer than 4 genera can be obtained from public sources without authentication, the verdict is 'inconclusive' with reason 'data-unavailable'." ;
+    delphi:expectedObservation "Pre-registered (claim supported). For at least 8 bovid crania from public 3D scans spanning at least 4 genera, extract the midline curve of each horn core from the mesh, fit a helico-spiral (constant curvature and torsion in the Frenet sense, i.e. a conical helix) to each, and compare the pair: in at least 80% of specimens the signs of the torsion of the left and right horn are opposite, and the magnitudes of length, mean curvature and mean torsion agree within 15% (|L - R| / mean of the pair)." ;
+    delphi:disconfirmingObservation "Pre-registered (claim refuted). In more than 20% of specimens the two horns have torsion of the same sign (both horns coiling the same way, i.e. not conjugate), or the paired magnitudes differ by more than 15% in more than 20% of specimens beyond what the same measurement applied twice to one horn reproduces. If fewer than 8 specimens or fewer than 4 genera can be obtained from public sources without authentication, the verdict is 'inconclusive' with reason 'data-unavailable'." ;
+    delphi:admissibleDatasets "Planned datasets: morphosource-bovid-crania, public-3d-specimen-repositories, bovid-horn-measurement-datasets" ;
+    delphi:inferenceMethod "fetch.py queries the MorphoSource public API for bovid media (10 taxon and part searches), writes every bovid record with its visibility, file size and use-agreement type to derived/candidate_media.csv, and then tries three download routes for the two largest open crania. The API itself answers normally; every download route fails (HTTP 404 for the API download path, and an Anubis 'Access Denied' page for the web download and media pages, also when retried through a headless Chrome browser). MorphoSource downloads additionally require a logged-in account that accepts the specimen's use agreement, which this run must not create. No mesh was obtained, so there is nothing to analyse and no analysis.py." ;
+    delphi:preregistered false ;
+    dct:description "fetch.py queries the MorphoSource public API for bovid media (10 taxon and part searches), writes every bovid record with its visibility, file size and use-agreement type to derived/candidate_media.csv, and then tries three download routes for the two largest open crania. The API itself answers normally; every download route fails (HTTP 404 for the API download path, and an Anubis 'Access Denied' page for the web download and media pages, also when retried through a headless Chrome browser). MorphoSource downloads additionally require a logged-in account that accepts the specimen's use agreement, which this run must not create. No mesh was obtained, so there is nothing to analyse and no analysis.py." ;
+    rdfs:comment "Measured: 0 bovid crania with both horn cores actually obtained (0 of 13 open candidates) (n = 0). Interpretation: Thompson's 'conjugate' means mirror-image, i.e. enantiomorphic: his point is that the two horns are not two copies of one spiral but a left-handed and a right-handed version of the same spiral. The operational quantity is therefore the sign of the torsion (handedness) of each horn's midline, plus the magnitudes of its length, curvature and torsion. Horn cores (bone) rather than sheaths are used because that is what 3D scans of museum crania show; sheath and core differ in length and tip curvature but not in handedness. Asymmetry from injury, wear or captivity is expected in a minority of specimens, hence the 80% threshold. Candidate sources, in order: MorphoSource media with open visibility (bovid crania and horn cores), other public 3D specimen repositories, and any dataset giving paired left/right horn geometry. No specimen measurement has been inspected before this pre-registration; only catalogue hit counts, visibility flags and HTTP status codes." ;
+    delphi:evidenceAgainst "The specimens needed exist and are catalogued: 44 bovid cranium or skull media on MorphoSource, 13 of them flagged 'open' visibility, spanning 6 genera (Ammotragus, Bison, Capra, Oryx, Ovis, Qurliqnoria). What failed is access: every download route returns an Anubis bot-protection page or HTTP 404 from this host, and MorphoSource downloads require an authenticated account that accepts each specimen's use agreement. Under the pre-registered rule ('fewer than 8 specimens or 4 genera obtainable without authentication') the verdict is inconclusive, not a judgement on the claim." ;
+    delphi:evidenceAgainst "Measurement datasets about bovid horns do exist (Dryad: ontogenetic allometry of horn length; horn investment in female bovids), but they record one horn length per individual or species means, so they cannot address left-versus-right mirror symmetry at all." ;
+    delphi:evidenceAgainst "With an account the test as pre-registered looks tractable: the open candidates include Bison bison (15.8 MB mesh), Bison priscus, Ovis ammon polii, Capra ibex, Ammotragus lervia and Oryx gazella CT series, which would give 4-6 genera, short of the pre-registered 8 specimens unless the restricted-download items are added." ;
+    delphi:evidenceAgainst "Horn cores, not sheaths, are what these scans show; Thompson's figures are of sheaths. Handedness is the same in core and sheath, but the quantitative comparison (length, curvature, torsion) would differ between the two, which the pre-registered thresholds do not account for." ;
+    delphi:hasEvidence () ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch13-02/result.json> .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch13-02> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch13-02--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch13-02/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5-1-thinking-high; cursor/thompson-claim-tests-6e84)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5-1-thinking-high" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.071Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch13-02: inconclusive, confidence null" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch13-02--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

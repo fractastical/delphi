@@ -1,0 +1,84 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch06-17--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch06-17: supports, confidence 0.98" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.98"^^xsd:double ;
+    delphi:hypothesis "For every cellular automaton tested and every block of n cells repeated forever as the initial condition, the evolution is eventually time-periodic with period at most k^n (k = number of colours; 2^n for two colours), and the infinite repeated-block configuration evolves exactly as a cyclic ring of n cells." ;
+    delphi:passCriterion "Pre-registered: (1) across all (rule, block) pairs enumerated, 100% have eventual temporal period <= k^n (zero violations); (2) for every (rule, block) pair in the equivalence sample, the central block of a long line made of repeated copies of the block evolves identically to the n-cell ring for all simulated steps (zero mismatching cells)." ;
+    delphi:failCriterion "Pre-registered: any (rule, block) pair whose eventual period exceeds k^n, or any pair for which the repeated-block line evolution differs from the ring evolution inside the region unaffected by the line's ends." ;
+    delphi:expectedObservation "Pre-registered: (1) across all (rule, block) pairs enumerated, 100% have eventual temporal period <= k^n (zero violations); (2) for every (rule, block) pair in the equivalence sample, the central block of a long line made of repeated copies of the block evolves identically to the n-cell ring for all simulated steps (zero mismatching cells)." ;
+    delphi:disconfirmingObservation "Pre-registered: any (rule, block) pair whose eventual period exceeds k^n, or any pair for which the repeated-block line evolution differs from the ring evolution inside the region unaffected by the line's ends." ;
+    delphi:admissibleDatasets "Planned datasets: eca-repeated-blocks-n1-12, totalistic-3colour-repeated-blocks-n1-6, range2-binary-sample-repeated-blocks-n1-10, line-vs-ring-equivalence-sample" ;
+    delphi:inferenceMethod "analysis.py treats a block of n cells repeated forever as an n-cell ring, builds the ring's transition map on all k^n states for each rule and computes the eventual period of every state's orbit from the functional graph (cycle detection by in-degree peeling). Families: all 256 ECA for n = 1..12 (2,096,640 rule-block pairs), all 2187 three-colour totalistic rules for n = 1..6 (2,388,204 pairs, bound 3^n), and 500 seeded random range-2 binary rules for n = 1..10 (1,023,000 pairs). It then checks the reduction itself: for all 256 ECA and all 32,256 blocks of n = 1..6, a line of repeated copies of the block is evolved for 2*2^n steps and its central copy compared cell by cell with the ring evolution (15,845,376 cells). Run time about 18 s." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py treats a block of n cells repeated forever as an n-cell ring, builds the ring's transition map on all k^n states for each rule and computes the eventual period of every state's orbit from the functional graph (cycle detection by in-degree peeling). Families: all 256 ECA for n = 1..12 (2,096,640 rule-block pairs), all 2187 three-colour totalistic rules for n = 1..6 (2,388,204 pairs, bound 3^n), and 500 seeded random range-2 binary rules for n = 1..10 (1,023,000 pairs). It then checks the reduction itself: for all 256 ECA and all 32,256 blocks of n = 1..6, a line of repeated copies of the block is evolved for 2*2^n steps and its central copy compared cell by cell with the ring evolution (15,845,376 cells). Run time about 18 s." ;
+    rdfs:comment "Measured: 1 fraction of (rule, block) pairs whose eventual temporal period is <= k^n (n = 5507844, exact (exhaustive within each family; the range-2 family is a seeded sample of 500 of 2^32 rules)). Interpretation: 'Initial conditions which consist just of a fixed block of cells repeated forever' is a spatially n-periodic configuration on the infinite line. 'Simple repetitive behavior' is read as eventual time-periodicity of the configuration, and the stated bound 2^n is read, following Wolfram's own reasoning and the assessors, as k^n for k colours (2^n in the two-colour case the text has in mind). 'Any cellular automaton' cannot be enumerated, so three families are tested: all 256 elementary rules exhaustively (n = 1..12), all 2187 three-colour nearest-neighbour totalistic rules (n = 1..6, bound 3^n), and a fixed-seed random sample of 500 two-colour range-2 (5-neighbour) rules out of 2^32 (n = 1..10). The reduction 'each block evolves like a finite cyclic system' is tested separately by simulating the actual repeated-block line and comparing it with the ring." ;
+    delphi:evidenceAgainst "The claim quantifies over all cellular automata; three rule families (one exhaustive over all 256 elementary rules, one exhaustive over all 2187 three-colour totalistic rules, one a 500-rule sample of range-2 rules) were tested, and the general statement rests on the finite-state argument that the line-vs-ring check confirms empirically for the elementary rules." ;
+    delphi:evidenceAgainst "The bound k^n is attained only in degenerate cases (n = 1, rules that cycle through every state); for n >= 2 the overwhelming majority of periods are below k^n / 10 (see the histogram), so the bound is loose but never violated." ;
+    delphi:evidenceAgainst "Wolfram writes 2^n for two colours; the three-colour family tests the natural k^n generalisation that the assessors and the book's own argument imply." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-17--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-17--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-17--claim-test--dataset-3>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-17--claim-test--dataset-4> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch06-17/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-17--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: All 256 ECA x all 2^n blocks of n = 1..12 cells repeated forever (generated by analysis.py)" ;
+    dct:description "two-colour nearest-neighbour rules, bound 2^n" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-17--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: All 2187 three-colour nearest-neighbour totalistic rules x all 3^n blocks of n = 1..6 cells (generated by analysis.py)" ;
+    dct:description "three-colour rules, bound 3^n" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-17--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: 500 random two-colour range-2 rules (5-cell neighbourhood, 2^32 rule space; numpy default_rng seed 20261031) x all 2^n blocks of n = 1..10 (generated by analysis.py)" ;
+    dct:description "non-elementary two-colour rules, bound 2^n" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch06-17--claim-test--dataset-4> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: All 256 ECA x all blocks of n = 1..6 cells, repeated on a long line, compared with the ring (generated by analysis.py)" ;
+    dct:description "tests the reduction of the repeated-block line to a finite cyclic system" ;
+    dct:license "" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch06-17> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch06-17--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch06-17/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-0123)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.078Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch06-17: supports, confidence 0.98" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch06-17--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

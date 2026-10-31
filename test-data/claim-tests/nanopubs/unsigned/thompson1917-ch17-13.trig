@@ -1,0 +1,105 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch17-13--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch17-13: refutes, confidence 0.97" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.97"^^xsd:double ;
+    delphi:hypothesis "If the claim holds, Perissodactyla and Leporidae form a clade in the current synthetic mammal phylogeny that excludes the other ungulates (Artiodactyla; also Proboscidea and Hyracoidea in the 1917 sense of Ungulata) and excludes the rodents." ;
+    delphi:passCriterion "Pre-registered. Take the Open Tree of Life synthetic tree (induced_subtree API, current synth version) over these tips: Perissodactyla = Equus caballus, Ceratotherium simum, Tapirus terrestris; other ungulates = Bos taurus, Sus scrofa, Camelus dromedarius (Artiodactyla), Loxodonta africana (Proboscidea), Procavia capensis (Hyracoidea); Leporidae = Oryctolagus cuniculus, Lepus europaeus, Sylvilagus floridanus; other lagomorph = Ochotona princeps; Rodentia = Mus musculus, Rattus norvegicus, Sciurus carolinensis, Cavia porcellus, Castor canadensis; outgroups = Canis lupus, Homo sapiens, Monodelphis domestica. Let C be the smallest clade containing all perissodactyl and all leporid tips. Sub-claim 1 (perissodactyls closer to leporids than to other ungulates) holds iff C contains no artiodactyl tip; sub-claim 2 (leporids closer to perissodactyls than to other rodents) holds iff C contains no rodent tip. Supports if both hold. Independent check: NCBI Taxonomy lineages (efetch) must place Perissodactyla and Leporidae in a shared named clade below Boreoeutheria that excludes Artiodactyla and Rodentia." ;
+    delphi:failCriterion "Refutes if C contains both artiodactyl and rodent tips, i.e. perissodactyls nest with other ungulates and leporids nest with rodents rather than with each other (and NCBI Taxonomy places Perissodactyla in Laurasiatheria with Artiodactyla and Leporidae in Glires with Rodentia). Mixed if exactly one sub-claim holds." ;
+    delphi:expectedObservation "Pre-registered. Take the Open Tree of Life synthetic tree (induced_subtree API, current synth version) over these tips: Perissodactyla = Equus caballus, Ceratotherium simum, Tapirus terrestris; other ungulates = Bos taurus, Sus scrofa, Camelus dromedarius (Artiodactyla), Loxodonta africana (Proboscidea), Procavia capensis (Hyracoidea); Leporidae = Oryctolagus cuniculus, Lepus europaeus, Sylvilagus floridanus; other lagomorph = Ochotona princeps; Rodentia = Mus musculus, Rattus norvegicus, Sciurus carolinensis, Cavia porcellus, Castor canadensis; outgroups = Canis lupus, Homo sapiens, Monodelphis domestica. Let C be the smallest clade containing all perissodactyl and all leporid tips. Sub-claim 1 (perissodactyls closer to leporids than to other ungulates) holds iff C contains no artiodactyl tip; sub-claim 2 (leporids closer to perissodactyls than to other rodents) holds iff C contains no rodent tip. Supports if both hold. Independent check: NCBI Taxonomy lineages (efetch) must place Perissodactyla and Leporidae in a shared named clade below Boreoeutheria that excludes Artiodactyla and Rodentia." ;
+    delphi:disconfirmingObservation "Refutes if C contains both artiodactyl and rodent tips, i.e. perissodactyls nest with other ungulates and leporids nest with rodents rather than with each other (and NCBI Taxonomy places Perissodactyla in Laurasiatheria with Artiodactyla and Leporidae in Glires with Rodentia). Mixed if exactly one sub-claim holds." ;
+    delphi:admissibleDatasets "Planned datasets: opentree-synth-induced-subtree, ncbi-taxonomy-lineages" ;
+    delphi:inferenceMethod "Resolved the 20 pre-registered species to OTT ids with the Open Tree TNRS, requested the induced subtree of the current synthetic tree (synth opentree16.1), parsed the Newick, and found the smallest clade containing all three perissodactyl and all three leporid tips. Sub-claim 1 was scored by whether that clade contains artiodactyl tips, sub-claim 2 by whether it contains rodent tips; the smallest clades for perissodactyls+artiodactyls and leporids+rodents were also extracted. NCBI Taxonomy lineages were fetched by E-utilities and intersected to find named clades shared by Perissodactyla and Leporidae but not by Artiodactyla or Rodentia." ;
+    delphi:preregistered false ;
+    dct:description "Resolved the 20 pre-registered species to OTT ids with the Open Tree TNRS, requested the induced subtree of the current synthetic tree (synth opentree16.1), parsed the Newick, and found the smallest clade containing all three perissodactyl and all three leporid tips. Sub-claim 1 was scored by whether that clade contains artiodactyl tips, sub-claim 2 by whether it contains rodent tips; the smallest clades for perissodactyls+artiodactyls and leporids+rodents were also extracted. NCBI Taxonomy lineages were fetched by E-utilities and intersected to find named clades shared by Perissodactyla and Leporidae but not by Artiodactyla or Rodentia." ;
+    rdfs:comment "Measured: 17 tips (of 20) in the smallest Open Tree clade containing all perissodactyl and leporid tips; it is Boreoeutheria and includes all artiodactyl, rodent, carnivore and primate tips (n = 20, topology from a synthesis of published phylogenies; no branch support values in the synthetic tree). Interpretation: Thompson's 'more closely related' is read as phylogenetic proximity (more recent common ancestry), the standard modern meaning and the one his transformation argument invokes. 'Other ungulates' is taken in the 1917 sense (Artiodactyla, with Proboscidea and Hyracoidea also included and reported separately); 'other rodents' means Rodentia, since lagomorphs were then classed as rodents (Duplicidentata). The Open Tree synthesis integrates published molecular phylogenies independent of the skull-shape argument; NCBI Taxonomy is a curated classification, not an independent inference, and is used only as a consistency check." ;
+    delphi:evidenceAgainst "The Open Tree synthetic tree carries no support values; however the groupings that refute the claim (Perissodactyla with Artiodactyla and Carnivora in Laurasiatheria; Leporidae with Ochotonidae and Rodentia in Glires) are recovered by every large molecular phylogenomic study of placental mammals and are encoded in NCBI Taxonomy, which is a curated classification rather than an independent analysis." ;
+    delphi:evidenceAgainst "Thompson's claim was framed as an inference from a Cartesian transformation of skull outlines; the test addresses only its phylogenetic conclusion, not whether the skull transformation itself is geometrically simple." ;
+    delphi:evidenceAgainst "Proboscidea and Hyracoidea (ungulates in the 1917 sense) fall in Afrotheria, outside the clade shared by perissodactyls and leporids, so for those 'other ungulates' sub-claim 1 would hold trivially; the sub-claim fails for the Artiodactyla, the ungulates Thompson's comparison (horses, rhinoceroses vs other hoofed mammals) most directly concerns." ;
+    delphi:evidenceAgainst "The induced-subtree Newick is saved under data/ and its SHA-256 recorded; re-running against a later synth version may change the version string but not the result unless mammalian phylogeny is overturned." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch17-13--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch17-13--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch17-13/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch17-13--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Open Tree of Life synthetic tree, induced subtree over 20 mammal tips (API v3)" ;
+    dct:description "topology relating Perissodactyla, Artiodactyla, Proboscidea, Hyracoidea, Leporidae, Ochotonidae, Rodentia, Carnivora, Primates, Didelphimorphia" ;
+    delphi:hasChecksum "sha256:43a7ae902684b8f070587eb38be5f7053f3875062de3ab1032f0f4fadf2cd84a" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tnrs/match_names> ;
+    delphi:hasChecksum "sha256:aa8103ee4fe56d946d224583eeccbcc1294fdb6bafbfb2f6ba2c44897c5b317c" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tree_of_life/about> ;
+    delphi:hasChecksum "sha256:46caaf6bd8fb5488418c66595a2e1058b84927cec3bb010fa22d496191bc2bdd" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree> ;
+    prov:wasDerivedFrom <https://tree.opentreeoflife.org/> ;
+    dct:license "CC0 (Open Tree of Life data)" .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch17-13--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: NCBI Taxonomy lineages for Perissodactyla, Leporidae, Artiodactyla, Rodentia, Lagomorpha (E-utilities)" ;
+    dct:description "consistency check of named clades (Laurasiatheria, Glires)" ;
+    delphi:hasChecksum "sha256:a8956e88ac9989e09c7f04d6d9041e67520e8663da830d757c4d0bc491020911" ;
+    rdfs:comment "Location (not a URL): https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=Perissodactyla[Scientific Name]&retmode=json" ;
+    delphi:hasChecksum "sha256:e192e147086ca875ce566332d92db28ca50b102af962f58a9ca81cf7ede29508" ;
+    prov:atLocation <https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id=9787&retmode=xml> ;
+    delphi:hasChecksum "sha256:71ea585eeb61efa81d6feb04f8c73dcf46f9b41e4d7aa5be11271f5cefbf1316" ;
+    rdfs:comment "Location (not a URL): https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=Leporidae[Scientific Name]&retmode=json" ;
+    delphi:hasChecksum "sha256:95d9c3ec603a97d140217411a6f8cc4b4c3ea7e4e2f2ee04a31e01d0dd84022a" ;
+    prov:atLocation <https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id=9979&retmode=xml> ;
+    delphi:hasChecksum "sha256:9c2d24cd70c0e31d7cd5789a02b0b5e4cf006322a2c05c266583a27b12489c11" ;
+    rdfs:comment "Location (not a URL): https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=Artiodactyla[Scientific Name]&retmode=json" ;
+    delphi:hasChecksum "sha256:d783227e921ac6a2939c3e58d4c2da4dfe87782af5a5602bb5b2c07ee562920b" ;
+    prov:atLocation <https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id=91561&retmode=xml> ;
+    delphi:hasChecksum "sha256:db6e90bb0a15a3afec031964f6b25a0ddd7e9ad69af0e1b0acc0f07ac86d37db" ;
+    rdfs:comment "Location (not a URL): https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=Rodentia[Scientific Name]&retmode=json" ;
+    delphi:hasChecksum "sha256:a0d1663d7f8856f98643345004a31a912c3621c9453c739183cf32eb2b3d414f" ;
+    prov:atLocation <https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id=9989&retmode=xml> ;
+    delphi:hasChecksum "sha256:8fce7e35caccbfe2ac26de2315293c9444ac59978a333531e4527aea1a6e60de" ;
+    rdfs:comment "Location (not a URL): https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term=Lagomorpha[Scientific Name]&retmode=json" ;
+    delphi:hasChecksum "sha256:527bf5e7e20db128255acf6491bb170bbd82559036242e4d0237dd8b28049c53" ;
+    prov:atLocation <https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id=9975&retmode=xml> ;
+    prov:wasDerivedFrom <https://www.ncbi.nlm.nih.gov/taxonomy> ;
+    dct:license "US Government public domain" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch17-13> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch17-13--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch17-13/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-thompson-efb7)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T19:53:44.072Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch17-13: refutes, confidence 0.97" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch17-13--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}
