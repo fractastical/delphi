@@ -47,6 +47,8 @@ const rows = claims.map(c => ({ id: c.id, key: c.key, label: c.label, statement:
   work: c.work, chapter: c.section || null, kind: c.kind, status: c.status, proof: c.proof ?? null, verification: c.verification,
   math: c.math, theorem: c.theorem, notation: c.notation || null, lean_theorems: c.lean?.theorems ?? null,
   evidence: c.evidence, evidence_kind: c.evidenceKind, data_test: c.dataTest ? { verdict: c.dataTest.verdict, confidence: c.dataTest.confidence, preregistered: c.dataTest.preregistered, data_kind: c.dataTest.dataKind, path: c.dataTest.path, test_contract: c.dataTest.testContract, revisions: c.dataTest.revisions } : null,
+  morpholib: c.morpholib.map(m => ({ id: m.id, relation: m.relation, note: m.note, label: m.label, organism: m.organism, verdict: m.verdict,
+    score: m.score, thompson_verdict: m.thompsonVerdict, nanopub: m.nanopub, registry: m.registry, report: m.report })),
   testability: c.resolvability ?? null, truth: c.truth,
   truth_by: c.truthBy.map(x => ({ assessor: x.who, p_true: x.p })), assessor_confidence: c.confidence ?? null,
   nanopub: c.uri || null, registry: c.registry || null, draft: !!c.draft }));
@@ -55,6 +57,7 @@ console.log(`${claims.length} claims (${count(c => c.registry === "production")}
 console.log(`verification: ${VERIFICATION.map(v => `${count(c => c.verification === v)} ${v}`).join(", ")}`);
 console.log(`tested against data: ${count(c => c.evidence)} (${EVIDENCE.map(v => `${count(c => c.evidence === v)} ${v}`).join(", ")}); ${count(c => c.verification === "untested" && !c.evidence)} neither proved nor tested`);
 console.log(`data kind of tests: ${DATA_KINDS.map(k => `${count(c => c.evidenceKind === k)} ${k}`).join(", ")}; math claims supported by biological data: ${count(c => c.math && c.evidenceKind === "biological" && c.evidence === "supports")} of ${count(c => c.math)}`);
+console.log(`morpholib: ${count(c => c.morpholib.length)} claims linked to MorphoEval audits (${count(c => c.morpholib.some(m => m.relation === "tests"))} tested by one)`);
 console.log(`${count(c => c.math)} math claims; ${count(c => c.theorem)} theorems (math and proved): ${count(c => c.theorem && c.proof === "lean")} machine-checked in Lean 4, ${count(c => c.theorem && c.proof === "literature")} proved in the literature`);
 
 // Plain-text counts for readers without MCP: test-data/claim-tests/SUMMARY.md, and the block

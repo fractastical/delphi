@@ -11,6 +11,7 @@ import { ARTIFACT_TYPES, FORUM_URL, INCONCLUSIVE_REASONS, POST_KINDS, REQUEST_ST
 import { observeToolCall } from "./metrics.mjs";
 import { DATA_KINDS as TEST_DATA_KINDS, TEST_VIEWS, VERDICTS as TEST_VERDICTS, claimTestsTool } from "./tests.mjs";
 import { AXIS_IDS, GROUP_KEYS as ORG_GROUP_KEYS, SORT_KEYS as ORG_SORT_KEYS, browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
+import { MORPHOLIB_VIEWS, REGISTRIES, RELATIONS, morpholibTool } from "./morpholib.mjs";
 
 const TOOLS = [];
 
@@ -95,6 +96,8 @@ tool("delphi_graph",
       .describe("Data-test verdict; any = tested, none = not tested"),
     evidenceKind: z.enum(["biological", "physical", "computational", "none"]).optional()
       .describe("What the test's data measured: biological = organisms (shows the claim holds in biology), computational = simulation or mathematics. E.g. math: true, evidence: \"supports\", evidenceKind: \"biological\" lists math shown to hold in organisms"),
+    morpholib: z.enum(["tests", "models", "any"]).optional()
+      .describe("Only claims linked to a MorphoEval audit in github.com/fractastical/morpholib: tests = it measured the claim's assertion on specimens, models = it simulates the claim's mechanism"),
     math: z.boolean().optional().describe("true = only math claims (formal notation, a Lean formalization, or a mathematical kind)"),
     theorem: z.boolean().optional().describe("true = only theorems: math claims that are Lean-checked or proved in the literature"),
     kind: z.string().optional().describe("Substring of the claim kind, e.g. \"mechanism\", \"theorem\""),
@@ -128,6 +131,22 @@ tool("delphi_claim_tests",
     source: localOnly("test-data/claim-tests"),
   },
   rejectNetwork("delphi_claim_tests", claimTestsTool));
+
+tool("delphi_morpholib",
+  "MorphoEval audits from github.com/fractastical/morpholib: published morphogenesis models (Turing, Murray, Vogel, Raup, Thompson's transformations, ...) run against real specimens, each a claim nanopub with rubric assessments, and which claims here they test (measured the claim's assertion on specimens) or model (simulate its mechanism). view \"summary\" (default) = counts by registry, verdict and relation; \"list\" = audits with filters; \"audit\" = one audit with its linked claims; \"claim\" = the audits linked to one delphisci claim id; \"live\" = what is published on the network now, and what test-data/morpholib/links.json is missing. An audit's verdict grades the simulation, not the claim; thompsonVerdict is the verdict on Thompson's claim.",
+  {
+    view: z.enum(MORPHOLIB_VIEWS).optional().describe("Defaults to audit or claim if id is given, list if any filter is given, else summary"),
+    id: z.string().optional().describe("Audit id (e.g. \"thompson1917-t1917-027\", \"vogel-phyllotaxis\") or a delphisci claim id (e.g. \"thompson1917-ch11-08\")"),
+    text: z.string().optional().describe("Substring of audit id, label, organism or Thompson claim"),
+    registry: z.enum(REGISTRIES).optional(),
+    verdict: z.string().optional().describe("Substring of the audit verdict, e.g. \"mostly\", \"not faithful\""),
+    relation: z.enum(RELATIONS).optional().describe("tests / models = audits with such a link; any = linked; none = linked to no claim here"),
+    thompson: z.boolean().optional().describe("true = only audits of a specific Thompson (1917) claim"),
+    thinker: z.string().optional().describe("Only audits linked to a claim by this thinker, e.g. \"thompson\""),
+    sort: z.enum(["score", "woe", "links"]).optional().describe("score (default), woe = weight of evidence, links = most linked"),
+    limit: z.number().int().min(1).max(500).optional(),
+  },
+  morpholibTool);
 
 const axis = z.enum(AXIS_IDS);
 tool("delphi_organisms",

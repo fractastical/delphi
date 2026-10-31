@@ -189,7 +189,26 @@ export function loadClaims() {
     }
   }
   if (unkinded.length) throw new Error(`Complete claim tests without data_kind (${DATA_KINDS.join(" | ")}):\n  ${unkinded.join("\n  ")}`);
+  // MorphoEval audits in github.com/fractastical/morpholib that bear on a claim (test-data/morpholib/README.md).
+  // `tests` = the audit measured the claim's own assertion on specimens; `models` = it simulates the
+  // claim's mechanism. Their `verdict` grades the simulation, not the claim; `thompsonVerdict` is the
+  // verdict on Thompson's claim itself. Like truth scores, neither changes `evidence`.
+  const MORPHO = join(ROOT, "test-data/morpholib/links.json");
+  const morpho = {};
+  if (existsSync(MORPHO)) {
+    const { claims: audits, links } = readJson(MORPHO);
+    const byId = Object.fromEntries(audits.map(a => [a.id, a]));
+    const ids = new Set(claims.map(c => c.id));
+    const stale = links.filter(l => !ids.has(l.claim) || !byId[l.morpholib]).map(l => `${l.claim} <- ${l.morpholib}`);
+    if (stale.length) throw new Error(`test-data/morpholib/links.json links unknown claims:\n  ${stale.join("\n  ")}`);
+    for (const l of links) {
+      const a = byId[l.morpholib];
+      (morpho[l.claim] ??= []).push({ id: a.id, relation: l.relation, note: l.note, label: a.label, organism: a.organism,
+        verdict: a.verdict, score: a.score, thompsonVerdict: a.thompson?.verdict ?? null, nanopub: a.nanopub, registry: a.registry, report: a.report });
+    }
+  }
   for (const c of claims) {
+    c.morpholib = morpho[c.id] ?? [];
     c.key = claimKey(c);
     c.verification = c.status === "proved" ? c.proof : c.status;
     c.math = !!(c.notation || c.lean || MATH_KINDS.has(c.kind));

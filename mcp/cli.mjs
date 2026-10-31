@@ -17,6 +17,10 @@
 //   node mcp/cli.mjs organisms --has-axis genome --missing-axis traits --rank species
 //   node mcp/cli.mjs organisms --group-by class
 //   node mcp/cli.mjs organism columba-livia
+//   node mcp/cli.mjs morpholib                         (MorphoEval audits and the claims they test or model)
+//   node mcp/cli.mjs morpholib list --relation tests --thinker thompson
+//   node mcp/cli.mjs morpholib --id thompson1917-ch11-08
+//   node mcp/cli.mjs morpholib live                     (what is published now vs test-data/morpholib/links.json)
 //   node mcp/cli.mjs forum --view claim --claim levin-2022-tame-19
 //   node mcp/cli.mjs forum --view requests
 //   node mcp/cli.mjs propose-claim proposal.json      (fields as in delphi_propose_claim)
@@ -27,6 +31,7 @@ import { forumRead, logTestResult, proposeClaim } from "./forum.mjs";
 import { browseClaims, getClaimWithStatus, overviewWithGraph, rankClaimsWithStatus, searchClaimsWithStatus } from "./graph.mjs";
 import { sparql } from "./lib.mjs";
 import { browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
+import { morpholibTool } from "./morpholib.mjs";
 import { claimTestsTool } from "./tests.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
@@ -54,6 +59,7 @@ const commands = {
     missingAxis: opts.missingAxis ? String(opts.missingAxis).split(",") : [],
   }),
   tests: () => claimTestsTool({ view: positional[0], ...opts }),
+  morpholib: () => morpholibTool({ view: positional[0], ...opts }),
   organism: () => getOrganism({ id: positional[0] ?? opts.id, includeMentions: opts.includeMentions !== false }),
   forum: () => forumRead({ view: positional[0] ?? opts.view ?? "feed", limit: 25, ...opts }),
   "propose-claim": () => proposeClaim(JSON.parse(readFileSync(positional[0], "utf8"))),
