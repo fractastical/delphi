@@ -25,6 +25,7 @@ store = Store(os.environ["FRONTIER_DSN"], "site-e2e", "public")
 n = seed(store, open(sys.argv[1]).read().strip(), "e2e-writer")
 print("seeded", len(n) if hasattr(n, "__len__") else n)
 PYE
-$PY -m frontier.web --namespace site-e2e --schema public --port $PORT --site "$SITE" --insecure-cookies 2>"$T/web.log" & WEBPID=$!
+PUBLIC=""; [ "${SITE_E2E_PUBLIC:-0}" = "1" ] && PUBLIC="--public-read"
+$PY -m frontier.web --namespace site-e2e --schema public --port $PORT --site "$SITE" --insecure-cookies $PUBLIC 2>"$T/web.log" & WEBPID=$!
 for _ in $(seq 100); do curl -fsS "http://127.0.0.1:$PORT/api/health" >/dev/null 2>&1 && break; sleep 0.1; done
-$PY "$SITE/../tests/site_live_driver.py" "http://127.0.0.1:$PORT" "$FRONTIER_ACCESS_TOKEN" "$OUT"
+$PY "$SITE/../tests/site_live_driver.py" "http://127.0.0.1:$PORT" "$FRONTIER_ACCESS_TOKEN" "$OUT" "${SITE_E2E_PUBLIC:-0}"

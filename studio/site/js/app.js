@@ -6,7 +6,7 @@
 
   /* ---- routing: #/view/sel?key=val ---- */
   function parse(hash) {
-    const h = (hash || "").replace(/^#/, "") || "/frontier"; const [path, qs] = h.split("?");
+    const h = (hash || "").replace(/^#/, "") || "/home"; const [path, qs] = h.split("?");
     const parts = path.split("/").filter(Boolean).map((p) => { try { return decodeURIComponent(p); } catch (e) { return p; } });
     const params = {}; new URLSearchParams(qs || "").forEach((v, k) => (params[k] = v));
     return { path: "/" + parts.join("/"), parts: parts.length ? parts : ["frontier"], params, view: (parts[0] || "frontier") };
@@ -19,13 +19,15 @@
     e.preventDefault(); const v = {}; new FormData(form).forEach((val, k) => { if (String(val).trim()) v[k] = String(val).trim(); }); DF.go(build(v));
   }));
 
-  const NAV = [["frontier", "Frontier"], ["knowledge", "Knowledge"], ["engineering", "Engineering"], ["simulations", "Simulations"], ["evidence", "Evidence"], ["work", "System"], ["belief", "Belief"]];
+  const NAV = [["studio", "Studio"], ["frontier", "Frontier"], ["knowledge", "Knowledge"], ["evidence", "Evidence"], ["work", "System"]];
+  const STUDIO_GROUP = new Set(["studio", "engineering", "simulations", "belief"]);       // reached from a project; they highlight Studio
+  const inNav = (k, view) => view === k || (k === "studio" && STUDIO_GROUP.has(view)) || (k === "knowledge" && view === "entity") || (k === "work" && view === "system");
   let snap = null; let lastView = null; let opener = null;
 
   function header(route) {
     const s = DF.api.state; const live = s.mode === "live";
-    return html`<div class="bar"><a class="brand" href="${DF.href("/frontier")}"><span class="mark" aria-hidden="true"></span>Delphi <b>Frontier</b></a>
-      <nav aria-label="Views"><ul>${NAV.map(([k, t]) => html`<li><a href="${DF.href("/" + k)}" aria-current="${route.view === k ? "page" : "false"}">${t}</a></li>`)}</ul></nav>
+    return html`<div class="bar"><a class="brand" href="${DF.href("/home")}"><span class="mark" aria-hidden="true"></span>MorphoSwarm <b>Frontier</b><span class="brandsub">claims and evidence: Delphi</span></a>
+      <nav aria-label="Views"><ul>${NAV.map(([k, t]) => html`<li><a href="${DF.href("/" + k)}" aria-current="${inNav(k, route.view) ? "page" : "false"}">${t}</a></li>`)}</ul></nav>
       <form class="gsearch" role="search" id="gs"><label class="sr" for="gq">Search the catalog</label><input id="gq" type="search" placeholder="Search records" value="${route.view === "search" ? route.params.q || "" : ""}"><button class="btn small" type="submit">Search</button></form>
       <span class="mode ${live ? "live" : "snap"}" title="${esc(s.reason)}">${live ? "Live runtime" : "Snapshot"}</span></div>
       ${live && !s.publicAccess && s.authenticated === false ? html`<div class="banner" role="status"><b>Runtime reachable, not signed in.</b> Records need a session: <a href="/login">sign in</a>. Until then the catalog, artifacts and solver are unavailable, and the page shows the snapshot.</div>` : ""}
@@ -38,10 +40,11 @@
     const hdr = document.getElementById("hdr"); const main = document.getElementById("main");
     if (!snap) return;
     hdr.innerHTML = header(route).toString();
+    if (DF.attachSearch) DF.attachSearch();
     document.getElementById("gs").addEventListener("submit", (e) => { e.preventDefault(); const q = document.getElementById("gq").value.trim(); DF.go(DF.href("/search", { q, tab: "catalog" })); });
     const fn = DF.views[route.view];
     const y = lastView === route.view ? window.scrollY : 0;
-    document.title = (route.view[0].toUpperCase() + route.view.slice(1)) + " · Delphi Frontier";
+    document.title = (route.view[0].toUpperCase() + route.view.slice(1)) + " · MorphoSwarm Frontier";
     if (!fn) { main.innerHTML = html`<section class="pagehead"><h1>Not found</h1><p class="lede">There is no view called “${route.view}”. Choose one from the navigation above.</p></section>`.toString(); }
     else {
       try {
@@ -123,7 +126,7 @@
     const foot = document.getElementById("foot");
     foot.innerHTML = html`<p><b>${snap.label}</b> · ${snap.inputs.length} input files hashed · <a href="data/snapshot.json">snapshot.json</a> · <a href="data/catalog.json">catalog.json</a> · KaTeX 0.16.47 (MIT, <a href="vendor/katex/LICENSE">licence</a>)</p>
       <details><summary>Input files and sha256</summary><div class="tablewrap"><table><tbody>${snap.inputs.map((i) => html`<tr><td><code>${i.path}</code></td><td><code>${i.sha256}</code></td><td>${i.bytes} bytes</td></tr>`)}</tbody></table></div></details>
-      <p class="small faint">Geometry is a design visualisation, not an observed fish and not CFD. Calculations are browser arithmetic on published fits. Upstream review labels are assertions, never local acceptance. No live activity, votes, scores or progress figures are shown.</p>`.toString();
+      <p class="small faint">Geometry is a design visualisation, not an observed fish and not CFD. Calculations are browser arithmetic on published fits. Upstream review labels are assertions, never local acceptance. Live: records, search, questions, System and the solver read the running node when it answers. From the snapshot: the curated mission board, recorded results and media, labelled with the snapshot above. No votes, scores or progress figures are shown.</p>`.toString();
     document.addEventListener("click", (e) => { const a = e.target.closest("a[data-src]"); if (a) opener = a; });
     document.getElementById("dclose").addEventListener("click", closeDrawer);
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !document.getElementById("drawer").hidden) closeDrawer(); });

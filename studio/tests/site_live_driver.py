@@ -3,11 +3,17 @@ import sys
 from playwright.sync_api import expect, sync_playwright
 
 base, token, out = sys.argv[1:4]
+public = len(sys.argv) > 4 and sys.argv[4] == "1"     # public-read node: no sign-in, anonymous session
 with sync_playwright() as p:
     b = p.chromium.launch(); pg = b.new_page(viewport={"width": 1280, "height": 900}); errs = []
     pg.on("pageerror", lambda e: errs.append(str(e)))
-    r = pg.context.request.post(base + "/api/session", data={"token": token}, headers={"Origin": base})
-    assert r.status == 200, (r.status, r.text())
+    if public:
+        s = pg.context.request.get(base + "/api/session"); sj = s.json()
+        assert s.status == 200 and sj.get("public_access") is True and sj.get("authenticated") is False, sj
+        print("PASS public-read node: anonymous session, no sign-in")
+    else:
+        r = pg.context.request.post(base + "/api/session", data={"token": token}, headers={"Origin": base})
+        assert r.status == 200, (r.status, r.text())
     pg.on("response", lambda r: print("HTTP", r.status, r.url.replace(base, "")) if r.status >= 400 else None)
     pg.goto(base + "/index.html#/engineering")
     try:
@@ -16,17 +22,18 @@ with sync_playwright() as p:
         print("URL", pg.url, "BODY", pg.inner_text("body")[:600]); raise
     assert pg.locator(".mode.live").count() == 1, "not in live mode"
     assert pg.locator(".banner").count() == 0, pg.locator(".banner").inner_text()
-    print("PASS live mode, signed in")
+    print("PASS live mode" + (" (public-read, anonymous)" if public else " (signed in)"))
     pg.goto(base + "/index.html#/search?q=&tab=catalog"); expect(pg.locator("#ccount")).not_to_have_text("Loading…", timeout=15000)
     print("catalog:", pg.locator("#ccount").inner_text())
     ct = pg.locator("#ccount").inner_text()
     assert "mode live" in ct and ct.split(" ")[0].isdigit() and int(ct.split(" ")[0]) > 0, ct   # seeded records, read from the live node
     first = pg.locator("#clist a.srclink").first
     title = first.inner_text(); first.click()
-    pg.wait_for_selector("#drawer:not([hidden]) pre.json", timeout=15000)   # /api/record, pinned ref
-    env = pg.locator("#drawer pre.json").inner_text()
+    pg.wait_for_selector(".entmain", timeout=15000)                           # entity page, read through /api/record with a pinned ref
+    pg.locator(".advraw summary").click()
+    env = pg.locator(".advraw pre").inner_text()
     assert "site-e2e" in env and "version" in env, env[:200]
-    print("RECORD via /api/record:", title[:60]); pg.keyboard.press("Escape")
+    print("RECORD via /api/record:", title[:60])
     pg.goto(base + "/index.html#/search?q=Fisher&tab=catalog"); expect(pg.locator("#ccount")).not_to_have_text("Loading…", timeout=15000)
     print("SEARCH:", pg.locator("#ccount").inner_text()); assert "mode live" in pg.locator("#ccount").inner_text()
     pg.goto(base + "/index.html#/work?tab=runtime"); expect(pg.locator("#events")).not_to_have_text("Loading…", timeout=15000)
@@ -36,7 +43,7 @@ with sync_playwright() as p:
     total = int(pg.locator("#counts tr", has_text="Total").inner_text().split()[-1]); print("LIVE COUNT total records:", total); assert total >= 28
     assert "not independent observations" in pg.locator("#counts").inner_text()
     assert "No agents, leases or contributions are displayed" not in ev and "KIND" in ev.upper() and pg.locator("#events tbody tr").count() > 0, "seeded events were not rendered"
-    pg.goto(base + "/index.html#/evidence"); expect(pg.locator("#artifacts")).not_to_have_text("Loading…", timeout=15000)
+    pg.goto(base + "/index.html#/evidence?tab=artifacts"); expect(pg.locator("#artifacts")).not_to_have_text("Loading…", timeout=15000)
     print("artifacts rows:", pg.locator("#artifacts tbody tr").count())
     pg.goto(base + "/index.html#/engineering"); pg.wait_for_selector("#candform")
     pg.locator("details.adv summary").click()                          # advanced settings are collapsed by default
@@ -124,6 +131,23 @@ with sync_playwright() as p:
     if nvid:
         ok = pg.evaluate("""async () => { const v = document.querySelector('video'); v.preload = 'metadata'; v.load(); await new Promise(r => { v.onloadedmetadata = r; v.onerror = r; setTimeout(r, 8000); }); return [v.readyState, v.videoWidth, v.error && v.error.code]; }""")
         print("VIDEO METADATA:", ok)
+    pg.goto(base + "/index.html#/entity/Claim/fisher-ftns"); pg.wait_for_selector(".entmain .katex", timeout=20000)
+    et = pg.locator("#main").inner_text(); print("ENTITY:", et[:100].replace("\n", " ")); assert "Statement" in et and "namespace" not in et.lower()[:10]
+    pg.goto(base + "/index.html#/frontier"); pg.fill("#gq", "Fisher"); pg.wait_for_selector("#ac-list [role=option]", timeout=15000)
+    print("AUTOCOMPLETE:", pg.locator("#ac-list .acf").inner_text().replace("\n", " ")[:120])
+    pg.goto(base + "/index.html#/knowledge"); pg.wait_for_selector(".claimcards .claimcard", timeout=30000)
+    kc = pg.locator("#cbrowse .count").inner_text(); print("CLAIM BROWSER:", kc); assert "read from the live node" in kc and int(kc.split(" ")[0]) >= 21
+    pg.goto(base + "/index.html#/graph/Problem/F001"); pg.wait_for_selector("#gv .g-node", timeout=20000)
+    gt = pg.locator("#gwrap").inner_text(); print("GRAPH:", gt[:120].replace("\n", " ")); assert pg.locator("#gv .g-node").count() >= 2, "F001 depends on F004: two nodes expected"
+    import hashlib as _h
+    snap2 = json.loads(open(__file__.replace("tests/site_live_driver.py", "site/data/snapshot.json")).read()); bad = []
+    for dd in snap2["documents"]:
+        r = pg.context.request.get(base + "/" + dd["href"])
+        if r.status != 200 or _h.sha256(r.body()).hexdigest() != dd["sha256"]: bad.append((dd["href"], r.status))
+    for f in (snap2.get("simulation") or {}).get("files", []):
+        r = pg.context.request.get(base + "/" + f["href"])
+        if r.status != 200 or _h.sha256(r.body()).hexdigest() != f["sha256"]: bad.append((f["href"], r.status))
+    print("DOCS/DOWNLOADS served with declared bytes:", len(snap2["documents"]) + len((snap2.get("simulation") or {}).get("files", [])) - len(bad), "bad:", bad); assert not bad, bad
     att = pg.context.request.get(base + "/api/attention"); print("ATTENTION", att.status, att.text()[:160].replace("\n", " ")); assert att.status in (200, 503)
     assert not errs, errs
     print("ALL LIVE CHECKS PASSED"); b.close()

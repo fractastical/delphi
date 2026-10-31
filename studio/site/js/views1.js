@@ -42,10 +42,11 @@
 
   /* ----------------------------- KNOWLEDGE ----------------------------- */
   DF.views.knowledge = function (snap, route) {
-    const tab = route.params.tab || "claims"; const sel = route.parts[1] || null;
-    const tabs = [["claims", "Claims & equations"], ["graph", "Claim graph"], ["mission", "Flying-fish equations"], ["catalog", "Catalog"]];
+    const sel = route.parts[1] || null; const tab = route.params.tab || (sel ? "claims" : "browse");
+    const tabs = [["browse", "Browse claims"], ["claims", "Seed claims & equations"], ["graph", "Claim graph"], ["mission", "Flying-fish equations"], ["catalog", "Catalog"]];
     const nav = html`<nav class="subnav" aria-label="Knowledge sections">${tabs.map(([k, t]) => html`<a href="${DF.href("/knowledge" + (sel && (k === "claims" || k === "graph") ? "/" + sel : ""), { tab: k })}" aria-current="${tab === k ? "page" : "false"}">${t}</a>`)}</nav>`;
     const head = html`<section class="pagehead"><h1>Knowledge</h1><p class="lede">Claims, equations, proofs, data and the context that bounds them. Equation, evidence kind and assumptions are always shown with the claim. <b>A claim's upstream label is an assertion made elsewhere, not acceptance here.</b></p>${nav}</section>`;
+    if (tab === "browse") return DF.knowledgeBrowse(snap, route, head);
     if (tab === "graph") return knowledgeGraph(snap, route, head, sel);
     if (tab === "mission") return missionEquations(snap, head);
     if (tab === "catalog") return DF.catalogView(snap, route, head, "/knowledge");
@@ -60,7 +61,7 @@
     const row = (x) => html`<li class="qrow ${x.id === sel ? "on" : ""}"><a href="${DF.href("/knowledge/" + x.id, f)}" aria-current="${x.id === sel ? "true" : "false"}"><span class="qid">${x.short}</span><span class="qt">${x.label}</span>
       <span class="qmeta">${U.pill(CATEGORY[x.category].text, CATEGORY[x.category].cls)} ${U.pill(x.group, "grp")}</span></a></li>`;
     return {
-      html: html`${head}<section>
+      html: html`${head}<section><h2 class="sr">Claims and equations</h2>
         <p class="note">${snap.scope.claims}. These are extracted records of classic results; the page shows what the upstream review said about each, plus the statement's own stated assumptions.</p>
         <form class="filters" role="search" data-form="knowledge" aria-label="Filter claims">
           <input type="hidden" name="tab" value="claims">
@@ -107,7 +108,7 @@
       <p><a href="${DF.href("/knowledge/" + sc.from, { tab: "claims" })}">Open ${snap.claims.find((c) => c.id === sc.from).short}</a> · <a href="${DF.href("/knowledge/" + sc.to, { tab: "claims" })}">Open ${snap.claims.find((c) => c.id === sc.to).short}</a></p></article>` : null;
     const detail = edgeDetail || (claim ? claimDetail(claim, snap) : html`<div class="detail-empty"><h3>Select a node or an edge</h3><p>Nodes are claims, grouped by upstream topic. Edges are the ${edges.length} recorded links between them, each labelled by type. The list below is the same graph as text.</p></div>`);
     return {
-      html: html`${head}<section>
+      html: html`${head}<section><h2 class="sr">Claim graph</h2>
         <p class="note">Positions are by topic group only; they carry no other meaning. There are <b>no derivation edges</b> in this seed: every recorded link is a proposed bridge (tentative analogy or transfer) or a scope boundary. Node colour is the upstream review label, not scientific truth.</p>
         <div class="split graphsplit"><div class="graphhost" id="kg"></div><div class="detail-col" id="kdetail" tabindex="-1">${detail}</div></div>
         <h3>The same links as a list</h3>
@@ -131,7 +132,7 @@
       <p>${U.pill(e.kind, "ev")} ${U.src("src:" + e.source, DF.sourceTitle(snap, e.source))}</p>
       <dl><dt>Variables</dt><dd>${e.variables}</dd><dt>Context and limits</dt><dd>${e.context}</dd></dl></article>`;
     return {
-      html: html`${head}<section><p class="note">Equations for the flying-fish mission. Each carries its variables, its context and the source that supports it. Numbers computed from them on the Engineering page are <b>browser arithmetic on published fits</b>, not simulation.</p>
+      html: html`${head}<section><h2 class="sr">Flying-fish equations</h2><p class="note">Equations for the flying-fish mission. Each carries its variables, its context and the source that supports it. Numbers computed from them on the Engineering page are <b>browser arithmetic on published fits</b>, not simulation.</p>
         <div class="eqgrid">${m.equations.map(eq)}</div>
         <h3>Measured wing-loading fits (Fish 1990, Table II)</h3>
         <div class="tablewrap"><table><thead><tr><th>Genus</th><th>n</th><th>Measured WL range (N/m²)</th><th>a</th><th>b</th><th>95% CI on b</th><th>versus isometry (b = 0.33)</th></tr></thead><tbody>

@@ -140,7 +140,7 @@ def test_engineering_checks_never_fake_a_pass(browser, base):
 
 def test_mobile_has_no_horizontal_page_overflow(browser, base):
     pg = page(browser, 400, 860)
-    for route in ["frontier", "knowledge?tab=graph", "engineering", "simulations", "evidence", "work", "work?tab=receipts", "belief"]:
+    for route in ["home", "studio/flying-fish", "studio/flying-fish?scale=organ", "entity/Claim/turing-ddi", "frontier", "knowledge?tab=graph", "engineering", "simulations", "evidence", "work", "work?tab=receipts", "belief"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_timeout(1200)
         assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth"), route
@@ -293,3 +293,232 @@ def test_coupling_manifest_verdicts_are_shown_with_their_scope(browser, base):
     assert "registered calibrations: none" in txt and "not biology" in txt
     assert pg.locator("section[aria-labelledby=cp-h] tbody tr").count() >= len(M["couplings"])
     assert str(M["counts"]["refused"]) + " refused" in txt
+
+
+_AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-label') || e.getAttribute('title') || e.textContent || '').trim();
+  document.querySelectorAll('img').forEach((i) => { if (!i.hasAttribute('alt')) bad.push('img without alt'); });
+  document.querySelectorAll('button,a[href]').forEach((e) => { if (!name(e) && !e.querySelector('img[alt]')) bad.push('control without a name: ' + e.outerHTML.slice(0, 60)); });
+  document.querySelectorAll('input:not([type=hidden]),select,textarea').forEach((e) => { const l = (e.id && document.querySelector('label[for="' + e.id + '"]')) || e.closest('label') || e.getAttribute('aria-label'); if (!l) bad.push('unlabelled field: ' + e.outerHTML.slice(0, 60)); });
+  let prev = 0; document.querySelectorAll('h1,h2,h3,h4').forEach((h) => { const n = +h.tagName[1]; if (prev && n > prev + 1) bad.push('heading jump h' + prev + ' to h' + n); prev = n; });
+  if (document.querySelectorAll('h1').length !== 1) bad.push('h1 count');
+  const ids = {}; document.querySelectorAll('[id]').forEach((e) => { if (ids[e.id]) bad.push('duplicate id ' + e.id); ids[e.id] = 1; });
+  return bad; }"""
+
+
+def test_accessibility_basics_on_every_view(browser, base):
+    pg = page(browser)
+    for route in ["home", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+        pg.goto(base + "#/" + route)
+        pg.wait_for_selector("#main h1")
+        pg.wait_for_timeout(500)
+        assert pg.evaluate(_AUDIT) == [], route
+
+
+def test_archive_release_is_a_claim_not_a_measurement_and_long_cells_are_clipped(browser, base):
+    """Regressions found on the live public site: an archive deployment reports claimed_sha, and declared artifact text can be thousands of characters."""
+    pg = page(browser)
+    pg.goto(base + "#/work")
+    pg.wait_for_selector("h1:has-text('System')")
+    out = pg.evaluate("""() => DF.liveSystem({report: {schema: 'frontier.system/1', generated_at: 'x', claimed_sha: '12eb390c255f362a546ab1b216f801814c1a75d5', deployed_sha: null,
+      release: {mode: 'measured', checkout_sha: null, sha: null, directory_claim: {sha: '12eb390c255f362a546ab1b216f801814c1a75d5', marker_matches_name: true, label: 'claim: dir name',
+      contents: {checked: true, matches_recorded_tree: true, files_hashed: 543, seconds: 0.05, tree_sha_computed: 'abc', meaning: 'm'}}}}}).toString()""")
+    assert "claim, not measured" in out and "12eb390c255f362a546ab1b216f801814c1a75d5" in out and "match" in out
+    assert "Running release (measured)" not in out
+    clipped = pg.evaluate("() => DF.clipCell('x'.repeat(3000)).toString()")
+    assert clipped.count("x") == 220 + 3000 and "show all (3000 characters)" in clipped and DF_short(pg)
+
+
+def DF_short(pg):
+    return pg.evaluate("() => DF.clipCell('short').toString() === 'short'")
+
+
+def test_entity_page_is_readable_with_equation_and_optional_raw_view(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/entity/Claim/turing-ddi")
+    pg.wait_for_selector("#entity h1:has-text('')", timeout=15000)
+    pg.wait_for_selector(".entmain .katex", timeout=15000)
+    txt = pg.locator("#main").inner_text()
+    assert "Statement" in txt and "Context" in txt and "Limitations" in txt and "Assumptions" in txt
+    assert "Imported or upstream labels are assertions" in txt
+    assert pg.locator(".advraw pre").is_hidden(), "the raw envelope is an advanced view, collapsed by default"
+    pg.locator(".advraw summary").click()
+    assert "turing-ddi" in pg.locator(".advraw pre").inner_text()
+    pg.goto(base + "#/entity/Claim/no-such-id")
+    pg.wait_for_selector("h1:has-text('Not found')", timeout=15000)
+
+
+def test_search_autocomplete_is_typed_keyboard_operable_and_honest(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector("#gq")
+    pg.fill("#gq", "f")
+    assert pg.locator("#ac-list").is_hidden(), "one character does not search"
+    pg.fill("#gq", "fisher")
+    pg.wait_for_selector("#ac-list [role=option]", timeout=10000)
+    assert pg.get_attribute("#gq", "aria-expanded") == "true"
+    assert pg.locator("#ac-list .acg").count() >= 1
+    assert "lexical" in pg.locator("#ac-list .acf").inner_text().lower() and "semantic" not in pg.locator("#ac-list .acf").inner_text().lower().replace("semantic index is not connected", "")
+    pg.press("#gq", "ArrowDown")
+    assert pg.get_attribute("#gq", "aria-activedescendant")
+    pg.press("#gq", "Enter")
+    pg.wait_for_selector("#entity h1, .entmain", timeout=10000)
+    assert "/entity/" in pg.url
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector("#gq")
+    pg.fill("#gq", "zzzzqqqq")
+    pg.wait_for_selector("#ac-list .ace", timeout=10000)
+    assert "No match" in pg.locator("#ac-list .ace").inner_text()
+    pg.press("#gq", "Escape")
+    assert pg.locator("#ac-list").is_hidden()
+
+
+def test_two_entry_paths_studio_and_frontier_are_clear_and_cross_linked(browser, base):
+    pg = page(browser)
+    pg.goto(base)
+    pg.wait_for_selector(".paths .path.studio")
+    assert pg.locator(".brand").inner_text().lower().startswith("morphoswarm")
+    nav = pg.locator("header nav a").all_inner_texts()
+    assert nav[:2] == ["Studio", "Frontier"], nav
+    assert pg.locator(".path.studio a:has-text('Open the Flying fish studio')").count() == 1
+    assert pg.locator(".path.frontier a:has-text('Open the Frontier')").count() == 1
+    pg.locator(".path.studio a:has-text('Open the Flying fish studio')").click()
+    pg.wait_for_selector(".studiogrid")
+    assert "/studio/flying-fish" in pg.url
+    assert pg.locator("header nav a[aria-current=page]").inner_text() == "Studio"
+
+
+def test_studio_subsystems_show_models_gaps_questions_and_local_only_drafts(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=cellular")
+    pg.wait_for_selector(".studiogrid")
+    txt = pg.locator(".studiomain").inner_text().lower()
+    assert "collier 1996" in txt or "delta-notch" in txt
+    assert pg.locator(".studiomain video").count() >= 0
+    pg.get_by_role("link", name="Molecular", exact=False).first.click()
+    pg.wait_for_selector("text=No model is attached at this scale")
+    assert "daane" in pg.locator(".studiomain").inner_text().lower()
+    pg.fill("#annbody", "Check the Daane transfer claim")
+    pg.click("#annsave")
+    assert "local draft, not submitted" in pg.locator("#annlist").inner_text()
+    assert "nothing is submitted" in pg.locator("#ann-h ~ .note").inner_text().lower()
+    pg.locator("#annlist [data-del]").first.click()
+    assert "No drafts" in pg.locator("#annlist").inner_text()
+    pg.goto(base + "#/studio/not-a-project")
+    pg.wait_for_selector("h1:has-text('No such project')")
+
+
+def test_goal_text_routes_to_project_subsystem_and_work_without_generating_anything(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/home")
+    pg.wait_for_selector("#goalq")
+    pg.fill("#goalq", "make a fin that can glide")
+    pg.click(".goalform button")
+    pg.wait_for_selector("#gr-h", timeout=15000)
+    txt = pg.locator("#goalout").inner_text().lower()
+    assert "does not design an organism" in txt and "flying fish" in txt and "organism" in txt
+    pg.fill("#goalq", "zzzz qqqq")
+    pg.click(".goalform button")
+    pg.wait_for_selector("text=No project covers this goal", timeout=15000)
+    assert "no open question matches" in pg.locator("#goalout").inner_text().lower()
+
+
+def test_claim_browser_filters_cards_and_drills_down(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/knowledge")
+    pg.wait_for_selector(".claimcards .claimcard")
+    n = int(pg.locator("#cbrowse .count").inner_text().split(" ")[0])
+    assert n >= 21 and "not structured fields" in pg.locator("#cbrowse").inner_text()
+    pg.fill("#cbrowse input[name=q]", "turing")
+    pg.click("#cbrowse button[type=submit]")
+    pg.wait_for_url("**q=turing**")
+    pg.wait_for_selector(".claimcards .claimcard")
+    assert int(pg.locator("#cbrowse .count").inner_text().split(" ")[0]) < n
+    pg.locator(".claimcard a").first.click()
+    pg.wait_for_selector(".entmain h2:has-text('Statement')", timeout=15000)
+
+
+def test_graph_view_exists_is_keyboard_operable_and_says_how_it_was_built(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/entity/Claim/turing-ddi")
+    pg.wait_for_selector(".entside a:has-text('neighbourhood graph')")
+    pg.click(".entside a:has-text('neighbourhood graph')")
+    pg.wait_for_selector("#gv svg .g-node", timeout=15000)
+    assert "Derived in this browser" in pg.locator("#gwrap").inner_text()
+    assert "Zoom in" in pg.locator(".gtools").inner_text()
+    pg.locator("#gv .g-node").first.focus()
+    pg.keyboard.press("Enter")
+    assert "Open the page" in pg.locator("#gdetail").inner_text()
+    pg.goto(base + "#/graph/Claim/no-such")
+    pg.wait_for_selector("text=could not be built", timeout=15000)
+
+
+def test_snapshot_document_and_download_links_use_types_the_runtime_serves(browser, base):
+    """Regression for the live 404s: the runtime serves .md and .csv only in narrow places, so documents ship as .txt and CSVs live under artifacts/."""
+    import os
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    hrefs = [d["href"] for d in snap["documents"]]
+    sim = snap.get("simulation") or {}
+    hrefs += [f["href"] for f in sim.get("files", [])] + [f["href"] for f in (sim.get("controlled") or {}).get("files", [])]
+    for h in hrefs:
+        assert (ROOT / "site" / h).is_file(), h
+        ext = os.path.splitext(h)[1]
+        assert ext != ".md", h
+        assert ext != ".csv" or h.startswith("artifacts/"), h
+    pg = page(browser)
+    pg.goto(base + "#/evidence?src=doc:2026-10-31-oca2-exon21-molino-RESULT")
+    pg.wait_for_selector("#drawer:not([hidden]) .md", timeout=15000)
+
+
+def test_live_style_question_table_row_click_and_id_not_wrapped(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector("#livepanel h2")
+    # snapshot mode shows no live table; the curated table keeps ids on one line and rows are links
+    h = pg.evaluate("() => { const a = document.querySelector('.qtable td:first-child a'); return a ? a.getBoundingClientRect().height : 0; }")
+    assert 0 < h < 30, h
+
+
+def test_evidence_overview_is_short_and_artifacts_have_their_own_paged_tab(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/evidence")
+    pg.wait_for_selector("#ev-a")
+    assert pg.evaluate("document.documentElement.scrollHeight") < 8000
+    pg.click("a:has-text('Open the artifacts index')")
+    pg.wait_for_selector("#artifacts table", timeout=15000)
+    assert pg.locator("#artifacts tbody tr").count() <= 20
+
+
+def test_genomic_slice_is_data_with_receipts_or_an_honest_absence(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=molecular")
+    pg.wait_for_selector(".studiogrid")
+    txt = pg.locator(".studiomain").inner_text().lower()
+    G = snap.get("genomics")
+    if not G:
+        assert "no genomic data slice is present" in txt
+        return
+    assert "data, not a model" in txt and "nothing here is a prediction" in txt
+    assert pg.locator(".studiomain table tbody tr").count() >= len(G["genes"])
+    assert all("?" not in r["url"] for r in G["receipts"]), "signed or query-bearing URLs must not be shipped"
+
+
+def test_project_draft_drives_coverage_and_annotation_drafts_export_in_the_contract_shape(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=molecular")
+    pg.wait_for_selector(".studiogrid")
+    pd = (snap.get("project_drafts") or {}).get("flying-fish")
+    if pd:
+        txt = pg.locator("#main").inner_text().lower()
+        assert "validated but not submitted" in txt and "project record draft" in txt
+        assert "source only" in pg.locator(".studiomain").inner_text().lower()
+    pg.select_option("#annkind", "proposed_edit")
+    pg.fill("#annbody", "Replace the molecular gap text")
+    pg.click("#annsave")
+    assert "proposed_edit" in pg.locator("#annlist").inner_text()
+    with pg.expect_download() as dl:
+        pg.click("#annlist [data-exp]")
+    doc = json.loads(Path(dl.value.path()).read_text())
+    assert doc["payload"]["kind"] == "proposed_edit" and doc["payload"]["anchor"]["frame"] == "ui_anchor" and doc["payload"]["anchor"]["record"] is None
+    assert "not submitted" in doc["note"].lower()

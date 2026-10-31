@@ -133,8 +133,10 @@ def recorded_results(ins: Inputs, files: dict) -> tuple[dict | None, dict | None
         for name in SIM_FILES:
             if (ROOT / SIM_DIR / name).exists():
                 b = ins.read(f"{SIM_DIR}/{name}")
-                files[f"results/{name}"] = b
-                listing.append({"name": name, "path": f"{SIM_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": f"data/results/{name}"})
+                csv = name.endswith(".csv")                      # the runtime serves .csv only under site/artifacts/
+                out_files_key = f"@artifacts/results/{name}" if csv else f"results/{name}"
+                files[out_files_key] = b
+                listing.append({"name": name, "path": f"{SIM_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": (f"artifacts/results/{name}" if csv else f"data/results/{name}")})
         load = lambda n: json.loads((ROOT / SIM_DIR / n).read_text()) if (ROOT / SIM_DIR / n).exists() else None
         summ, ctrl, find = load("summary.json"), load("controls.json"), load("model_structure_findings.json")
         sim = {"summary": {k: v for k, v in summ.items() if k != "pareto_designs_selected_dimensions"}, "pareto_selected": summ.get("pareto_designs_selected_dimensions", []),
@@ -153,9 +155,9 @@ def attestation_check(ins: Inputs, files: dict, docs: list) -> dict | None:
         return None
     mech, rev = json.loads(ins.read(ATT)), json.loads(ins.read(ATT_REVIEW))
     text = ins.text(ATT_README)
-    files["docs/" + Path(ATT_README).name] = text.encode()
+    files["docs/" + Path(ATT_README).name + ".txt"] = text.encode()
     docs.append({"id": Path(ATT_README).stem, "title": next(l[2:].strip() for l in text.splitlines() if l.startswith("# ")), "status_line": None, "path": ATT_README,
-                 "sha256": ins.seen[ATT_README]["sha256"], "href": "data/docs/" + Path(ATT_README).name})
+                 "sha256": ins.seen[ATT_README]["sha256"], "href": "data/docs/" + Path(ATT_README).name + ".txt"})
     by = {r["slug"] + str(r["index"]): r for r in mech["results"]}
     items = []
     for it in rev["items"]:
@@ -198,6 +200,26 @@ PRINT_DIR = "artifacts/print"
 PRINT_OUT = "@artifacts/print"          # site-relative output root (the runtime serves .stl only under site/artifacts/)
 
 
+def print_media(ins: Inputs, out: dict, fid: str) -> dict | None:
+    """Turntable render of a form (optional): files are offered only when their bytes equal the render manifest's declared hashes."""
+    rj = ROOT / PRINT_DIR / "media" / fid / "render.json"
+    if not rj.exists():
+        return None
+    r = json.loads(ins.read(f"{PRINT_DIR}/media/{fid}/render.json")); res = {"evidence_kind": r.get("evidence_kind"), "caveats": r.get("caveats"), "checks": r.get("checks"), "render_sha256": ins.seen[f"{PRINT_DIR}/media/{fid}/render.json"]["sha256"], "video_href": None, "gif_href": None, "poster_href": None, "state": {}}
+    for key, fname, declared in (("video", r["video"]["file"], r["video"].get("sha256")), ("gif", (r.get("gif") or {}).get("file"), (r.get("gif") or {}).get("sha256")), ("poster", r.get("poster"), r.get("poster_sha256"))):
+        if not fname:
+            res["state"][key] = "not declared"; continue
+        f = ROOT / PRINT_DIR / "media" / fid / fname
+        if not f.is_file():
+            res["state"][key] = "declared_but_missing"; continue
+        b = ins.read(f"{PRINT_DIR}/media/{fid}/{fname}")
+        if declared and digest_bytes(b) != declared:
+            res["state"][key] = "digest_mismatch"; continue
+        out[f"{PRINT_OUT}/media/{fid}/{fname}"] = b; res[key + "_href"] = f"artifacts/print/media/{fid}/{fname}"; res["state"][key] = "present_verified"
+    res["video"] = {k: r["video"].get(k) for k in ("duration_s", "fps", "n_frames", "loop", "width", "height")}
+    return res
+
+
 def print_forms(ins: Inputs, out: dict) -> dict | None:
     """Printable form studies, when present: the manifest's own words and receipts, plus the real STL and image files."""
     mf = ROOT / PRINT_DIR / "manifest.json"
@@ -221,8 +243,11 @@ def print_forms(ins: Inputs, out: dict) -> dict | None:
             if (ROOT / PRINT_DIR / rel).exists():
                 entry["files"][key] = copy(rel)
         entry["files"]["design"] = {"sha256": entry["design_sha256"]}
+        entry["display_scale"] = f.get("display_scale"); entry["set"] = f.get("set"); entry["simulation_comparison"] = f.get("simulation_comparison")
+        entry["media"] = print_media(ins, out, fid)
         forms.append(entry)
-    return {"label": man.get("label"), "display_scale": man.get("display_scale"), "display_scale_note": man.get("display_scale_note"), "run": {k: man["run"].get(k) for k in ("box_mm", "launch_speed_query_m_s", "libraries")} | {"solver_commit": (man["run"].get("solver") or {}).get("commit"), "solver_branch": (man["run"].get("solver") or {}).get("branch")}, "forms": forms}
+    sets = {k: {"display_scale": v.get("display_scale"), "forms": v.get("forms", [])} for k, v in (man.get("sets") or {}).items()}
+    return {"label": man.get("label"), "sets": sets, "display_scale_note": man.get("display_scale_note"), "printer_resin": man.get("printer_resin"), "run": {k: man["run"].get(k) for k in ("box_mm", "launch_speed_query_m_s", "libraries")} | {"solver_commit": (man["run"].get("solver") or {}).get("commit"), "solver_branch": (man["run"].get("solver") or {}).get("branch")}, "forms": forms}
 
 
 SIM_OUT = "@artifacts/simulations"
@@ -239,8 +264,8 @@ def controlled_results(ins: Inputs, out: dict) -> dict | None:
     files = []
     for name in ("summary.json", "comparison.csv", "witness_check.json"):
         if (ROOT / CTRL_DIR / name).exists():
-            b = ins.read(f"{CTRL_DIR}/{name}"); out[f"docs/controlled_{name}"] = b
-            files.append({"name": name, "path": f"{CTRL_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": f"data/docs/controlled_{name}"})
+            b = ins.read(f"{CTRL_DIR}/{name}"); csv = name.endswith(".csv"); out[f"@artifacts/results/controlled_{name}" if csv else f"docs/controlled_{name}"] = b
+            files.append({"name": name, "path": f"{CTRL_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": (f"artifacts/results/controlled_{name}" if csv else f"data/docs/controlled_{name}")})
     return {"model_version": s.get("model_version"), "evidence_kind": s.get("evidence_kind"), "protocol": s.get("protocol"), "n_rows": s.get("n_rows"), "n_unconverged": s.get("n_unconverged"),
             "baselines": s.get("baselines", []), "baselines_excluded": s.get("baselines_excluded_wl_outside_genus_range", []),
             "n_baseline_infeasible_scenarios": len(s.get("baseline_infeasible_scenarios", [])), "n_designs": len(designs),
@@ -275,7 +300,7 @@ def native_video_cards(ins: Inputs, out: dict) -> list[dict]:
             "video": {"file": v["file"], "sha256": v.get("sha256"), "note": f"{v['width']}x{v['height']}, {v['duration_s']} s, {v['codec']}"}, "video_state": st, "video_href": href, "poster_href": ph,
             "numerical_checks": [{"name": "replay inputs", "result": f"three scenario CSVs hashed ({len(m['inputs']['csv'])}); model and replay-code hashes recorded"}],
             "parameter_unknowns": ["Model time and concentrations are non-dimensional; no physical units."], "open_questions": ["It does not show: " + "; ".join(m["claims"]["does_not_show"]) + "."],
-            "couplings": [], "manifest": f"{d}/delta_notch_replay_manifest.json", "native": True})
+            "caption": m["claims"]["captions"]["header"] + " | " + m["claims"]["captions"]["footer"], "couplings": [], "manifest": f"{d}/delta_notch_replay_manifest.json", "native": True})
     d = "engineering/fin_mechanics/artifacts"; mf = ROOT / d / "manifest.json"
     if mf.exists():
         m = json.loads(ins.read(f"{d}/manifest.json")); o = m["outputs"]; v = m["video"]
@@ -313,8 +338,8 @@ def coupling_manifest(ins: Inputs, files: dict, docs: list) -> dict | None:
         return None
     m = json.loads(ins.read(COUPLING))
     if (ROOT / "docs/model-coupling.md").exists():
-        t = ins.text("docs/model-coupling.md"); files["docs/model-coupling.md"] = t.encode()
-        docs.append({"id": "model-coupling", "title": next((l[2:].strip() for l in t.splitlines() if l.startswith("# ")), "model-coupling"), "status_line": None, "path": "docs/model-coupling.md", "sha256": ins.seen["docs/model-coupling.md"]["sha256"], "href": "data/docs/model-coupling.md"})
+        t = ins.text("docs/model-coupling.md"); files["docs/model-coupling.md.txt"] = t.encode()
+        docs.append({"id": "model-coupling", "title": next((l[2:].strip() for l in t.splitlines() if l.startswith("# ")), "model-coupling"), "status_line": None, "path": "docs/model-coupling.md", "sha256": ins.seen["docs/model-coupling.md"]["sha256"], "href": "data/docs/model-coupling.md.txt"})
     rows = []
     for c in m["couplings"]:
         cp, v = c["coupling"], c["verdict"]
@@ -324,6 +349,67 @@ def coupling_manifest(ins: Inputs, files: dict, docs: list) -> dict | None:
             "assumptions": m["assumptions"], "calibrations_registered": m["calibrations_registered"], "timescale_separation": m.get("timescale_separation"), "couplings": rows,
             "models": [{"id": x["model_id"], "name": x["name"], "status": x.get("status"), "engine": x.get("engine"), "scope": x.get("scope"), "not_established": x.get("not_established", []), "ports": len(x.get("ports", []))} for x in m["models"]],
             "proposals": [{"id": x["id"], "title": x["title"], "status": x["status"], "coupling": x.get("source_coupling"), "success": x.get("success"), "falsifier": x.get("falsifier"), "not_a_claim": x.get("not_a_claim")} for x in m.get("problem_proposals", [])]}
+
+
+GEN = "data/genomics"
+
+
+def _walk_receipts(d, key, out):
+    """Flatten receipts.json: any dict holding a receipt with a url and sha256 is one retrieval. Query strings are dropped (they can carry signatures)."""
+    if isinstance(d, dict):
+        r = d.get("receipt")
+        if isinstance(r, dict) and r.get("url") and r.get("sha256"):
+            out.append({"key": key, "url": str(r["url"]).split("?")[0], "retrieved_at": r.get("retrieved_at"), "http_status": r.get("http_status"), "bytes": r.get("bytes"), "sha256": r["sha256"], "license": (d.get("license") or {}).get("name") if isinstance(d.get("license"), dict) else None, "kept_rows": d.get("kept_rows")})
+        for k, v in d.items():
+            if k != "receipt" and isinstance(v, dict):
+                _walk_receipts(v, f"{key}/{k}" if key else k, out)
+
+
+def genomics(ins: Inputs) -> dict | None:
+    """The retrieved genomic and cell/tissue data slice, when present: gene identifiers and retrieval receipts. Data, not a model."""
+    if not (ROOT / GEN / "receipts.json").exists():
+        return None
+    rec = json.loads(ins.read(f"{GEN}/receipts.json")); receipts = []
+    _walk_receipts(rec, "", receipts)
+    genes = {}
+    def tsv(name):
+        f = ROOT / GEN / "artifacts" / name
+        return [l.split("\t") for l in ins.read(f"{GEN}/artifacts/{name}").decode().splitlines() if l.strip()] if f.exists() else []
+    for r in tsv("zfin_gene_selected.tsv"):
+        genes[r[2]] = {"symbol": r[2], "zfin": r[0], "ncbi_gene": r[3] if len(r) > 3 else None}
+    for r in tsv("zfin_ensembl_1_to_1_selected.tsv"):
+        genes.setdefault(r[2], {"symbol": r[2], "zfin": r[0]})["ensembl"] = r[3]
+    nf = ROOT / GEN / "artifacts" / "ncbi_gene_summaries.json"
+    if nf.exists():
+        res = json.loads(ins.read(f"{GEN}/artifacts/ncbi_gene_summaries.json")).get("result", {})
+        by = {v.get("nomenclaturesymbol"): v for k, v in res.items() if isinstance(v, dict) and "uid" in v}
+        for sym, g in genes.items():
+            v = by.get(sym)
+            if v:
+                g["description"] = v.get("description"); g["chromosome"] = v.get("chromosome")
+    ff = None
+    if (ROOT / GEN / "flyingfish_receipts.json").exists():
+        f = json.loads(ins.read(f"{GEN}/flyingfish_receipts.json")); _walk_receipts(f.get("files", {}), "flyingfish", receipts)
+        art = f.get("article") or {}
+        ff = {"doi": art.get("doi"), "license": (art.get("license") or {}).get("name"), "published": art.get("published"), "annotation_totals": f.get("annotation_totals"), "selected_genes": len(f.get("selected_genes", [])),
+              "length_consistent": f.get("length_consistent_selected_genes"), "absent_symbols": {k: v.get("queries_with_any_hit") for k, v in (f.get("absent_symbols_any_hit") or {}).items()},
+              "mapping_note": "gene models in the annotation subset are inferred by protein alignment; a symbol with no hit is not evidence that the gene is absent"}
+    return {"genes": sorted(genes.values(), key=lambda g: g["symbol"]), "receipts": receipts, "flyingfish": ff, "receipts_sha256": ins.seen[f"{GEN}/receipts.json"]["sha256"]}
+
+
+def project_drafts(ins: Inputs) -> dict:
+    """Validated, unsubmitted Project drafts (guilds' schema), keyed by file stem. Shown as drafts: a draft is not a store record."""
+    out = {}
+    base = ROOT / "projects"
+    for f in sorted(base.glob("*.draft.json")) if base.exists() else []:
+        rel = f.relative_to(ROOT).as_posix(); d = json.loads(ins.read(rel)); p = d.get("draft", {}).get("payload") or {}
+        if not p:
+            continue
+        out[f.name[: -len(".draft.json")]] = {"path": rel, "sha256": ins.seen[rel]["sha256"], "title": p.get("title"), "mission": p.get("mission"), "limitations": p.get("limitations", []),
+            "scale_coverage": p.get("scale_coverage", []), "requirements": p.get("requirements", []),
+            "open_questions": [{"text": q.get("text"), "problem": (q.get("problem") or {}).get("id"), "blocks": q.get("blocks", [])} for q in p.get("open_questions", [])],
+            "members": [{"subsystem": m.get("subsystem"), "role": m.get("role"), "relationship": m.get("relationship"), "causal_bridge": m.get("causal_bridge"), "applicability": m.get("applicability"), "ref": {k: (m.get("ref") or {}).get(k) for k in ("kind", "id", "namespace")}} for m in p.get("members", [])]}
+    return out
 
 
 def checklist(text: str) -> list[dict]:
@@ -336,9 +422,9 @@ def system_block(ins: Inputs, files: dict, docs: list, board: list, lean, sim, a
     specs = []
     for p in sorted((ROOT / "specs").glob("*.md")):
         rel = p.relative_to(ROOT).as_posix(); text = ins.text(rel); name = p.name
-        if f"docs/{name}" not in files:
-            files[f"docs/{name}"] = text.encode()
-            docs.append({"id": p.stem, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}"})
+        if f"docs/{name}.txt" not in files:
+            files[f"docs/{name}.txt"] = text.encode()
+            docs.append({"id": p.stem, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}.txt"})
         did = next((d["id"] for d in docs if d["path"] == rel), p.stem)
         specs.append({"id": did, "title": next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem), "path": rel, "sha256": ins.seen[rel]["sha256"]})
     measured = []
@@ -373,6 +459,7 @@ def build() -> dict[str, bytes]:
     seeds = ins.json("seeds/frontier-data.json")
     problems = ins.json("seeds/frontier-problems.json")
     mission = ins.json("site/content/mission.json")
+    projects = ins.json("site/content/projects.json")
     board = parse_board(ins.text("tasks/BUILD.md"))
     spec_text = ins.text("specs/SPEC-005-agentic-engineering-demo.md")
     mcp_text = ins.text("docs/mcp.md")
@@ -384,20 +471,22 @@ def build() -> dict[str, bytes]:
         text = ins.text(rel)
         meta = doc_meta(rel, text)
         meta["sha256"] = ins.seen[rel]["sha256"]
-        meta["href"] = f"data/docs/{p.name}"
+        meta["href"] = f"data/docs/{p.name}.txt"
         docs.append(meta)
-        files[f"docs/{p.name}"] = text.encode()
+        files[f"docs/{p.name}.txt"] = text.encode()
     for rel, ident, title in (("specs/SPEC-005-agentic-engineering-demo.md", "SPEC-005", "SPEC-005 Agentic engineering on a shared biological frontier"),
                               ("docs/mcp.md", "mcp", "Frontier MCP server")):
         name = Path(rel).name
-        docs.append({"id": ident, "title": title, "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}"})
-        files[f"docs/{name}"] = ins.read(rel)
+        docs.append({"id": ident, "title": title, "status_line": None, "path": rel, "sha256": ins.seen[rel]["sha256"], "href": f"data/docs/{name}.txt"})
+        files[f"docs/{name}.txt"] = ins.read(rel)
 
     # The label is a digest of the input hashes, not a git revision: a commit or merge cannot make --check stale.
     lean_receipt, simulation = recorded_results(ins, files)
     attestation = attestation_check(ins, files, docs)
     manifests = simulation_manifests(ins)
     belief_ex = belief_example(ins)
+    genomics_slice = genomics(ins)
+    project_recs = project_drafts(ins)
     extra: dict = {}
     prints = print_forms(ins, extra)
     controlled = controlled_results(ins, files)
@@ -417,6 +506,7 @@ def build() -> dict[str, bytes]:
         "bridges": seeds["bridges"],
         "problems": problems["problems"],
         "mission": mission,
+        "projects": projects,
         "documents": docs,
         "capabilities": tools,
         "board": board,
@@ -428,6 +518,8 @@ def build() -> dict[str, bytes]:
         "coupling_manifest": couplings_m,
         "belief_example": belief_ex,
         "print_forms": prints,
+        "genomics": genomics_slice,
+        "project_drafts": project_recs,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
     }
     catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}
@@ -438,7 +530,7 @@ def build() -> dict[str, bytes]:
 
 
 def write(out: dict[str, bytes]) -> None:
-    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print"):
+    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results"):
         if d.exists():
             shutil.rmtree(d)
     for name, b in out.items():
@@ -451,7 +543,7 @@ def check(out: dict[str, bytes]) -> list[str]:
     at = lambda n: SITE / n[1:] if n.startswith("@") else DATA / n
     stale = [n for n, b in out.items() if not at(n).exists() or at(n).read_bytes() != b]
     extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
-    pr = [("@artifacts/print/" + p.relative_to(SITE / "artifacts/print").as_posix()) for p in (SITE / "artifacts/print").rglob("*") if p.is_file()] if (SITE / "artifacts/print").exists() else []
+    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
     return stale + [f"unexpected {e}" for e in extra if e not in out] + [f"unexpected {e}" for e in pr if e not in out]
 
 

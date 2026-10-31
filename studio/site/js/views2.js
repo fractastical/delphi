@@ -76,9 +76,10 @@
     if (!P) return html`<p class="empty">No printable-form study is present in this tree (looked for <code>artifacts/print/manifest.json</code>). No mesh exists to show or download; nothing is drawn in its place.</p>`;
     const chk = (b) => (b === true ? U.pill("yes", "ok") : b === false ? U.pill("no", "no") : U.pill("not reported", "st-unk"));
     return html`<p class="note warn"><b>${P.label}</b></p>
-      <p class="small faint">${P.display_scale_note}. Display scale ${P.display_scale}. Built with solver ${String(P.run.solver_commit || "").slice(0, 9)} (${P.run.solver_branch}); libraries ${Object.entries(P.run.libraries || {}).map(([k, v]) => k + " " + v).join(", ")}. The 3D shapes below are files from that run, not this page's parametric drawing.</p>
+      <p class="small faint">${P.display_scale_note}. ${Object.entries(P.sets || {}).map(([k, x]) => `${k}: display scale ${x.display_scale} (${(x.forms || []).length} forms)`).join("; ")}. Printer and resin: ${P.printer_resin ? P.printer_resin.printer + " / " + P.printer_resin.resin : "unknown"}; nothing has been printed. Built with solver ${String(P.run.solver_commit || "").slice(0, 9)} (${P.run.solver_branch}); libraries ${Object.entries(P.run.libraries || {}).map(([k, v]) => k + " " + v).join(", ")}. The 3D shapes below are files from that run, not this page's parametric drawing.</p>
       <div class="cards">${P.forms.map((f) => html`<article class="card pform"><h3>${f.title}</h3><p class="small">${f.role}</p>
-        ${f.files.image_on_stand ? html`<img src="${f.files.image_on_stand.href}" alt="Rendered image of ${f.title} on its stand, from the study" loading="lazy">` : ""}
+        ${f.media && f.media.video_href ? html`<video class="embed" controls loop muted playsinline preload="metadata" ${f.media.poster_href ? html`poster="${f.media.poster_href}"` : ""} src="${f.media.video_href}" aria-label="Turntable render of ${f.title}"></video><p class="small faint">${f.media.evidence_kind}. ${f.media.caveats ? f.media.caveats.display_scale_meaning + "; " + f.media.caveats.fin_plate_note + "." : ""} <a href="${f.media.gif_href || f.media.video_href}" download>${f.media.gif_href ? "GIF" : "MP4"}</a></p>` : f.files.image_on_stand ? html`<img src="${f.files.image_on_stand.href}" alt="Rendered image of ${f.title} on its stand, from the study" loading="lazy">` : ""}
+        <p class="small faint">Display scale ${f.display_scale === null || f.display_scale === undefined ? "not stated" : f.display_scale}${f.set ? ", set " + f.set : ""}.</p>
         <p>${U.pill("solver: " + f.solver, f.solver === "feasible" ? "warn" : "no")} ${U.pill("glide: " + String(f.glide).replace(/_/g, " "), "st-unk")} ${U.pill("Lean: not run", "st-unk")}</p>
         <p class="small">${f.meaning}${(f.solver_conflict || []).length ? html` Conflict: <code>${f.solver_conflict.join(", ")}</code>.` : ""}</p>
         <p class="small">${f.status_note}</p>
@@ -315,6 +316,7 @@
     return html`<div class="rescard"><div class="resrow"><span class="vlabel">${st}</span> ${U.pill("simulated, encoded model only", "ev")} ${cb ? U.pill("independent check: " + (cb.independent_witness ? (cb.independent_witness.ok === true ? "passed" : "not passed") : "n/a"), cb.independent_witness && cb.independent_witness.ok === true ? "ok" : "st-unk") : ""} ${U.pill("Lean: not run online", "st-unk")}</div>
       <p>${line}</p>
       ${wit ? html`<p class="small witline"><b>Witness</b> ${Object.entries(wit).map(([k, x]) => html`<span class="wv">${k} = ${DF.exact(x)}</span>`)}</p>` : ""}
+      ${wit ? html`<p class="small faint">A witness value can sit at the solver's numerical domain cap (m up to 1000 kg, S up to 1000 m², b up to 100 m, V up to 300 m/s). Those caps are bounds for the search, not claims about any fish.</p>` : ""}
       ${Array.isArray(res.missing_parameters) && res.missing_parameters.length ? html`<p class="small"><b>Unset, so not evaluated:</b> ${res.missing_parameters.join(", ")}</p>` : ""}
       ${res.conflict ? html`<p class="small"><b>Conflict</b> <code>${[].concat(res.conflict).map((x) => (typeof x === "string" ? x : JSON.stringify(x))).join(", ")}</code></p>` : ""}
       ${Array.isArray(res.extrapolates_envelope) && res.extrapolates_envelope.length ? html`<p class="note warn small"><b>Extrapolates a source envelope:</b> ${res.extrapolates_envelope.join(", ")}</p>` : ""}
@@ -351,6 +353,7 @@
   /* ---------------- EVIDENCE ---------------- */
   const readClass = (rl) => (/^full-text/.test(rl) ? "full-text" : /^abstract/.test(rl) ? "abstract" : /parsed/.test(rl) ? "parsed data" : "summary / listing / unread");
   DF.views.evidence = function (snap, route) {
+    if (route.params.tab === "artifacts") return artifactsTab(snap, route);
     const m = snap.mission; const f = { rl: route.params.rl || "" };
     const srcs = m.sources.filter((s) => !f.rl || readClass(s.read_level) === f.rl);
     const classes = [...new Set(m.sources.map((s) => readClass(s.read_level)))];
@@ -360,7 +363,7 @@
       ...m.data_inventory.filter((d) => /not found/.test(d.state)).map((d) => ({ t: d.what, w: d.detail, id: null })),
     ];
     return {
-      html: html`<section class="pagehead"><h1>Evidence</h1><p class="lede">Sources with the grade at which each was actually read, disagreements kept visible, and replayable results, including the one that stopped. Open any source to see what the page rests on.</p></section>
+      html: html`<section class="pagehead"><h1>Evidence</h1><p class="lede">Sources with the grade at which each was actually read, disagreements kept visible, and replayable results, including the one that stopped. Open any source to see what the page rests on.</p><nav class="flow" aria-label="Evidence sections"><ol>${[["ev-s", "Sources"], ["ev-d", "Disagreement"], ["ev-r", "Replayable results"], ["ev-att", "Curation example"], ["ev-a", "Artifacts"], ["ev-n", "Not obtained"]].map(([id, t]) => html`<li><button type="button" class="btn small ghost" data-scroll="${id}">${t}</button></li>`)}</ol></nav></section>
 
       <section class="panel" aria-labelledby="ev-s"><h2 id="ev-s">Sources</h2>
         <form class="filters" data-form="evidence" aria-label="Filter sources"><label>Read level <select name="rl"><option value="">all</option>${classes.map((c) => html`<option ${c === f.rl ? raw("selected") : ""}>${c}</option>`)}</select></label><button class="btn" type="submit">Apply</button>${f.rl ? html`<a class="btn ghost" href="${DF.href("/evidence")}">Clear</a>` : ""}</form>
@@ -378,26 +381,58 @@
 
       ${attestationSection(snap)}
 
-      <section class="panel" aria-labelledby="ev-a"><h2 id="ev-a">Artifacts index</h2>
-        <p class="note small">Data, proofs, simulations, geometry, code and documents, each with its exact source, the context it was made in, the check it passed or failed, any dispute, and the next action. A digest in a record is a declaration, not a byte verification. <b>No simulation or geometry artifact is indexed in this snapshot.</b></p>
-        <form class="filters" data-form="evidence" aria-label="Filter artifacts"><label>Type <select name="at"><option value="">all</option>${["data", "proof", "simulation", "geometry", "protocol", "code", "document"].map((t) => html`<option ${t === (route.params.at || "") ? raw("selected") : ""}>${t}</option>`)}</select></label><input type="hidden" name="rl" value="${f.rl}"><button class="btn" type="submit">Apply</button></form>
-        <div id="artifacts" role="status">Loading…</div></section>
+      <section class="panel" aria-labelledby="ev-a"><h2 id="ev-a">Artifacts</h2><p class="small" id="artsummary" role="status">Counting…</p>
+        <p><a class="btn" href="${DF.href("/evidence", { tab: "artifacts" })}">Open the artifacts index</a></p></section>
 
       <section class="panel" aria-labelledby="ev-n"><h2 id="ev-n">What could not be obtained</h2>
         <p class="note small">Unread sources and unfound data are first-class: they bound what any constraint here can claim.</p>
         <ul class="neg">${neg.map((n) => html`<li><b>${n.t}</b> ${n.w} ${n.id ? U.src(n.id, "Open") : ""}</li>`)}</ul>
         <h3>Data inventory (exocoetid)</h3><div class="tablewrap"><table><thead><tr><th>Dataset</th><th>State</th><th>Detail</th></tr></thead><tbody>${m.data_inventory.map((d) => html`<tr><td>${d.what}</td><td>${U.pill(d.state, /not found/.test(d.state) ? "no" : "ok")}</td><td>${d.detail}</td></tr>`)}</tbody></table></div>
-        <p class="small faint">States separate discovered, retrieved, replayed and validated. Here, nothing has been replayed or validated.</p></section>`,
+        <p class="small faint">${dataStates(m.data_inventory)}</p></section>`,
       async after(root) {
-        DF.bindForm(root, "evidence", (v) => DF.href("/evidence", v));
-        const host = root.querySelector("#artifacts"); const want = route.params.at || "";
-        const rows = DF.artifactIndex(snap);
-        try { const r = await DF.api.artifacts({ limit: 50 }); rows.push(...DF.liveArtifacts(r.items)); } catch (e) { rows.push({ title: "Runtime artifacts could not be read", type: "document", source: e.message, context: "", check: "", dispute: "", next: "", error: true }); }
-        const shown = rows.filter((r) => !want || r.type === want);
-        host.innerHTML = shown.length ? html`<div class="tablewrap"><table class="arttable"><thead><tr><th>Artifact</th><th>Type</th><th>Exact source</th><th>Context</th><th>Check</th><th>Dispute</th><th>Next action</th></tr></thead><tbody>${shown.map((r) => html`<tr><td>${r.doc ? U.src("doc:" + r.doc, r.title) : r.title}</td><td>${U.pill(r.type, "ev")}</td><td>${r.url ? U.ext(r.url, r.source) : r.source}</td><td>${r.context}</td><td>${r.check}</td><td>${r.dispute || ""}</td><td>${r.next}${r.download ? html` <a class="btn small ghost" href="${r.download}" target="_blank" rel="noopener noreferrer" download>Download file</a>` : r.doc ? "" : html` <span class="faint small">no downloadable file is declared</span>`}</td></tr>`)}</tbody></table></div>`.toString() : `<p class="empty">No ${esc(want || "")} artifact is indexed. Nothing is shown in its place.</p>`;
+        DF.bindForm(root, "evidence", (x) => DF.href("/evidence", x));
+        root.querySelectorAll("[data-scroll]").forEach((b) => b.addEventListener("click", () => { const t = root.querySelector("#" + b.dataset.scroll); if (t) { t.scrollIntoView({ block: "start" }); t.setAttribute("tabindex", "-1"); t.focus({ preventScroll: true }); } }));
+        const rows = await artifactRows(snap);
+        root.querySelector("#artsummary").textContent = artSummary(snap, rows);
       },
     };
   };
+
+  async function artifactRows(snap) {
+    const rows = DF.artifactIndex(snap);
+    try { const r = await DF.api.artifacts({ limit: 50 }); rows.push(...DF.liveArtifacts(r.items)); } catch (e) { rows.push({ title: "Runtime artifacts could not be read", type: "document", source: e.message, context: "", check: "", dispute: "", next: "", error: true }); }
+    return rows;
+  }
+  function artSummary(snap, rows) {
+    const byType = rows.reduce((o, r) => ((o[r.type] = (o[r.type] || 0) + 1), o), {}); const dl = rows.filter((r) => r.download).length;
+    return `${rows.length} artifacts indexed: ${Object.entries(byType).map(([t, n]) => `${n} ${t}`).join(", ")}. ${dl} offer a file that is present and hash-checked in this build; the rest are declared pointers. The ${(snap.print_forms ? snap.print_forms.forms.length : 0)} print forms, ${(snap.simulation_manifests || []).filter((m) => m.video_state === "present_verified").length} verified videos and ${snap.simulation ? snap.simulation.files.length : 0} simulation result files are shown under Studio, Engineering and Simulations with their own checks.`;
+  }
+
+  /* One line per artifact; the declared context, check, dispute and next action sit in a details element; the shared caveat is stated once. */
+  function artifactsTab(snap, route) {
+    const want = route.params.at || ""; const per = 20; const pg = Math.max(0, +route.params.p || 0);
+    return {
+      html: html`<section class="pagehead"><p class="eyebrow"><a href="${DF.href("/evidence")}">Evidence</a> / artifacts</p><h1>Artifacts index</h1><p class="lede">Data, proofs, simulations, geometry, code and documents. A digest in a record is a declaration, not a byte verification; a file is offered only when it is present here and matches its hash.</p></section>
+        <section class="panel"><p class="small" id="artsummary" role="status">Loading…</p>
+        <form class="filters" data-form="artf" aria-label="Filter artifacts"><label>Type <select name="at"><option value="">all</option>${["data", "proof", "simulation", "geometry", "protocol", "code", "document"].map((t) => html`<option ${t === want ? raw("selected") : ""}>${t}</option>`)}</select></label><button class="btn" type="submit">Apply</button></form>
+        <div id="artifacts" role="status">Loading…</div></section>`,
+      async after(root) {
+        DF.bindForm(root, "artf", (x) => DF.href("/evidence", { tab: "artifacts", ...x }));
+        const rows = await artifactRows(snap); root.querySelector("#artsummary").textContent = artSummary(snap, rows);
+        const shown = rows.filter((r) => !want || r.type === want); const page = shown.slice(pg * per, pg * per + per); const host = root.querySelector("#artifacts"); host.removeAttribute("role");
+        const lnk = (p) => DF.href("/evidence", { tab: "artifacts", at: want, p });
+        host.innerHTML = shown.length ? html`<div class="tablewrap"><table class="arttable"><thead><tr><th>Artifact</th><th>Type</th><th>Source</th><th>Details</th></tr></thead><tbody>${page.map((r) => html`<tr><td>${r.doc ? U.src("doc:" + r.doc, r.title) : r.title}</td><td>${U.pill(r.type, "ev")}</td><td class="small">${r.url ? U.ext(r.url, String(r.source).slice(0, 60)) : String(r.source).slice(0, 90)}${r.download ? html` <a class="btn small ghost" href="${r.download}" target="_blank" rel="noopener noreferrer" download>Download file</a>` : ""}</td>
+            <td><details><summary class="small">context, check, dispute, next action</summary><p class="small"><b>Context.</b> ${r.context}</p><p class="small"><b>Check.</b> ${r.check}</p>${r.dispute ? html`<p class="small"><b>Dispute.</b> ${r.dispute}</p>` : ""}<p class="small"><b>Next.</b> ${r.next}</p></details></td></tr>`)}</tbody></table></div>
+          <p class="pager">${pg > 0 ? html`<a class="btn small ghost" href="${lnk(pg - 1)}">Previous</a>` : ""} <span class="small">Page ${pg + 1} of ${Math.max(1, Math.ceil(shown.length / per))} (${shown.length} artifacts)</span> ${(pg + 1) * per < shown.length ? html`<a class="btn small" href="${lnk(pg + 1)}">Next</a>` : ""}</p>`.toString() : `<p class="empty">No ${esc(want || "")} artifact is indexed. Nothing is shown in its place.</p>`;
+      },
+    };
+  }
+  /* Long declared text stays available but does not take over the page: first 220 characters, the rest in a details element. */
+  function clipCell(text, n = 220) {
+    const t = String(text ?? ""); if (t.length <= n) return t;
+    return html`${t.slice(0, n)}… <details class="clip"><summary class="small">show all (${t.length} characters)</summary>${t}</details>`;
+  }
+  DF.clipCell = clipCell;
   const ROLE_TYPE = { input: "data", output: "data", code: "code", environment: "code", protocol: "protocol", log: "document", certificate: "proof", geometry: "geometry" };
   DF.artifactIndex = (snap) => {
     const rows = snap.mission.artifacts.map((a) => ({ ...a }));
@@ -409,6 +444,11 @@
   DF.liveArtifacts = (items) => items.map((it) => { const a = it.artifact || {}; return { title: a.title || "(untitled)", type: ROLE_TYPE[a.role] || "document", source: `${a.uri} · sha256 ${String(a.sha256).slice(0, 12)}… · ${a.byte_size} bytes · ${a.availability}${it.is_head === false ? " · superseded version" : ""}`, url: /^https:/.test(a.uri || "") ? a.uri : null,
     context: (it.context || "") + (it.relation ? ` (relation: ${it.relation}; target ${it.target ? it.target.kind + " " + it.target.id : "?"}${it.produced_by ? "; produced by " + it.produced_by.id : ""})` : ""), check: `${it.evidence_kind || "evidence"}; local status ${String(it.local_status || "not reported").replace(/_/g, " ")}; digest declared, bytes ${it.artifact_bytes_verified ? "verified" : "not verified"}`,
     dispute: it.relation === "refutes" ? "This evidence refutes its target." : "", download: a.availability === "downloadable" && /^https:/.test(a.uri || "") ? a.uri : null, next: (it.limitations || []).join("; ") }; });
+
+  function dataStates(inv) {
+    const n = inv.length; const nf = inv.filter((d) => /not found/.test(d.state)).length; const rt = inv.filter((d) => /retrieved/.test(d.state)).length;
+    return `Of the ${n} exocoetid datasets listed here, ${rt} were retrieved (as counts or metadata only) and ${nf} could not be found. None of these has been replayed against a model or validated; replays elsewhere in this site (BioModels, fin mechanics, glide, reaction-diffusion) are of other inputs.`;
+  }
 
   function attestationSection(snap) {
     const A = snap.attestation_check; if (!A) return "";
@@ -516,7 +556,7 @@
             if (!shown) count.textContent = `No record matches (${DF.api.state.mode === "live" ? "the live node returned none" : "the snapshot has none"}). Try fewer words or clear the filters. · mode ${r.mode}${r.namespace ? " · namespace " + r.namespace : ""}`;
             more.innerHTML = r.next_cursor ? `<button class="btn" type="button">Load more</button>` : "";
             const b = more.querySelector("button"); if (b) b.addEventListener("click", () => { b.disabled = true; load(r.next_cursor); });
-          } catch (e) { count.textContent = "The catalog could not be read: " + e.message + ". Nothing is shown in its place."; }
+          } catch (e) { count.textContent = /HTTP 400/.test(e.message) ? "The search was refused, usually because the query is too long (at most 200 characters) or malformed. Nothing is shown in its place." : "The catalog could not be read: " + e.message + ". Nothing is shown in its place."; }
         };
         load("");
       },
@@ -529,7 +569,7 @@
     const upstream = rec.upstream_label ? Object.entries(rec.upstream_label).map(([k, v]) => `${k}: ${v}`).join("; ") : "";
     const why = Array.isArray(rec.why_matched) ? rec.why_matched : null; const cur = rec.curation || null; const dis = rec.disputes || null;
     const disN = dis ? (dis.disputing_reviews || []).length + (dis.cited_evidence || []).length + (dis.diverging_versions || []).length : 0;
-    return html`<li class="catrow"><div><span class="pill k-${r.kind}">${r.kind || "record"}</span> <a class="srclink" href="${DF.hrefWith({ src: key })}" data-src="${key}"><b>${title}</b></a>${rec.is_head === false ? html` ${U.pill("not the current version", "warn")}` : ""}</div>
+    return html`<li class="catrow"><div><span class="pill k-${r.kind}">${r.kind || "record"}</span> <a class="srclink" href="${DF.href("/entity/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace })}"><b>${title}</b></a> <a class="small faint" href="${DF.hrefWith({ src: key })}" data-src="${key}">raw</a>${rec.is_head === false ? html` ${U.pill("not the current version", "warn")}` : ""}</div>
       <div class="small"><span class="pill st-unk">local status: ${String(rec.local_status || "not reported").replace(/_/g, " ")}</span> ${upstream ? html`<span class="faint">upstream assertion → ${upstream}</span>` : ""}</div>
       ${rec.snippet ? html`<div class="small">${rec.snippet}</div>` : ""}
       ${why ? html`<div class="small faint">Matched on: ${why.length ? why.join("; ") : "no reason reported"}. This is lexical matching, not relevance, quality or truth.</div>` : ""}
@@ -541,6 +581,19 @@
 
   DF.views.search = function (snap, route) {
     const head = html`<section class="pagehead"><h1>Search</h1><p class="lede">Search every record the node can read. Results come from the live catalog when a runtime is connected, otherwise from the committed snapshot, and the mode is stated above the list.</p></section>`;
-    return DF.catalogView(snap, route, head, "/search");
+    const cv = DF.catalogView(snap, route, head, "/search"); const q = (route.params.q || "").trim();
+    if (!q) return cv;
+    return { html: html`${cv.html}`, async after(root) {
+      const slot = document.createElement("section"); slot.className = "panel"; slot.setAttribute("aria-labelledby", "dr-h"); slot.innerHTML = '<h2 id="dr-h">Ranked results</h2><p role="status" class="small">Searching…</p>';
+      root.querySelector("section:last-of-type").before(slot);
+      try {
+        const r = await DF.api.discovery(q, { limit: 20 });
+        const eng = r.source === "discovery" ? `engine ${r.mode}${r.index ? " · index " + JSON.stringify(r.index).slice(0, 120) : ""}` : `lexical text match${r.unavailable_reason ? " (" + r.unavailable_reason + ")" : ""}`;
+        slot.innerHTML = html`<h2 id="dr-h">Ranked results</h2><p class="note small"><b>${eng}.</b> ${r.source === "discovery" && r.unavailable_reason ? "Note: " + r.unavailable_reason + ". " : ""}A score is shown only with its kind; a rank is not truth, quality or acceptance.</p>
+          ${r.items.length ? html`<ul class="catalog">${r.items.map((x) => html`<li class="catrow"><div>${U.pill(x.type || "record", "grp")} <a class="srclink" href="${x.ref ? DF.href("/entity/" + x.ref.kind + "/" + x.ref.id, { v: x.ref.version, ns: x.ref.namespace }) : "#/search"}"><b>${x.title || (x.ref && x.ref.id) || "(untitled)"}</b></a> ${x.kind ? html`<span class="faint small">${x.kind}</span>` : ""}</div>
+            ${x.snippet ? html`<div class="small">${x.snippet}</div>` : ""}<div class="small faint">${x.local_status ? "local status: " + String(x.local_status).replace(/_/g, " ") + " · " : ""}${x.score !== null && x.score !== undefined ? (x.score_kind || "score") + " " + x.score + " · " : ""}${Array.isArray(x.why_matched) ? "matched: " + x.why_matched.join("; ") : x.why_matched ? "matched: " + x.why_matched : ""}</div></li>`)}</ul>` : html`<p class="empty">No ranked result. ${eng}.</p>`}`.toString();
+      } catch (e) { slot.innerHTML = html`<h2 id="dr-h">Ranked results</h2><p class="empty">Ranked results could not be loaded: ${e.message}. The catalog list below still works.</p>`.toString(); }
+      await cv.after(root);
+    } };
   };
 })();
