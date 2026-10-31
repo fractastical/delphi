@@ -1,0 +1,39 @@
+{
+  "claim_id": "darwin1859-ch04-13",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch04-13",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "Among flowering plants, species that are trees have separate sexes (dioecy or monoecy, i.e. unisexual flowers) more often than non-woody (herbaceous) species, and this excess recurs across orders rather than being confined to one or two clades.",
+  "pass_criterion": "Pre-registered. Using the GIFT database public API, join the sexual-system trait (3.4.1: dioecious / monoecious / bisexual) to the growth-form trait (1.2.1: tree / shrub / herb / other) for angiosperm species (Angiospermae in the GIFT taxonomy), keeping species whose growth-form value is a single category. 'Separate sexes' = dioecious or monoecious. The claim is SUPPORTED if (i) the odds ratio of separate sexes in trees versus herbs is >= 1.5 with two-sided Fisher exact p < 0.01, and (ii) among orders with at least 10 trees and at least 10 herbs in the joined data, the proportion of species with separate sexes is higher in trees than in herbs in at least two-thirds of orders.",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if the odds ratio is <= 1.0 or p >= 0.05, or if trees exceed herbs in fewer than half of the qualifying orders. Other outcomes are 'mixed'. Supplementary: the same odds ratio for trees vs shrubs, for dioecy alone, and the proportion of separate-sexed species in each growth form.",
+  "planned_datasets": ["gift-api-traits", "gift-api-taxonomy"],
+  "interpretation": "Darwin's 'trees' is read as GIFT growth form 'tree'; 'other plants' primarily as herbs (the claim's scope says 'comparing trees with non-woody plants'), with shrubs reported separately; 'sexes separated' as dioecious or monoecious (both have unisexual flowers, which is what Darwin's argument about cross-pollination needs); 'belonging to all Orders' as the across-order replication test. Darwin's observation was for Britain ('in this country') with Hooker's report of failure in Australia; the GIFT data are global, so the test is of the generalisation rather than the British observation. Modern caveat known in advance: GIFT sexual-system coverage (~3,000 species) is a small, non-random subset of angiosperms, so coverage bias is possible in either direction.",
+  "datasets": [
+    {
+      "id": "gift-api-traits",
+      "name": "GIFT (Global Inventory of Floras and Traits) public API: traits 3.4.1 (Reproduction sexual) and 1.2.1 (Growth form), species list",
+      "landing_url": "https://gift.uni-goettingen.de/",
+      "doi": "10.1111/jbi.13623",
+      "version": null,
+      "license": "CC BY 4.0 (GIFT database terms)",
+      "files": [],
+      "role": "species-level sexual system and growth form"
+    },
+    {
+      "id": "gift-api-taxonomy",
+      "name": "GIFT public API: taxonomy (nested set of genera, families, orders, Angiospermae)",
+      "landing_url": "https://gift.uni-goettingen.de/",
+      "doi": "10.1111/jbi.13623",
+      "version": null,
+      "license": "CC BY 4.0 (GIFT database terms)",
+      "files": [],
+      "role": "assignment of species to orders and to angiosperms"
+    }
+  ],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-b201", "date": "2026-10-31" }
+}
