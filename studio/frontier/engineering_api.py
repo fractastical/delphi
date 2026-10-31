@@ -13,13 +13,13 @@ from pathlib import Path
 import re
 import subprocess
 import sys
-from threading import BoundedSemaphore
 
 from .models import canonical, now
 from .store import FrontierError
+from .worker_limits import Slots
 
 ROOT = Path(__file__).resolve().parents[1]
-SLOTS = BoundedSemaphore(2)
+SLOTS = Slots(2)                 # also draws on the process-wide worker budget in worker_limits
 NUMERIC = {"rho": ("kg/m^3", 10), "cl_max": ("1", 3), "mass": ("kg", 50),
            "area": ("m^2", 10), "span": ("m", 10), "speed": ("m/s", 100),
            "mass_min": ("kg", 50), "wing_loading_min": ("N/m^2", 1000), "speed_max": ("m/s", 100)}

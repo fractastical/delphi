@@ -46,7 +46,12 @@ ACTION_ID = CLAIM_ID + "-action"
 EVIDENCE_ID = CLAIM_ID + "-evidence"
 SECRETISH = re.compile(r"token|dsn|password|secret|credential|authorization|api[_-]?key", re.I)
 FORBIDDEN_TOOL_WORDS = ("review", "accept", "dispute", "import", "provision", "initialize")
-READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_artifacts", "frontier_capabilities"}
+# Kept explicit, and deliberately independent of what frontier.mcp registers: a new tool must be added here by decision. The ten after
+# frontier_capabilities came with frontier.mcp_surfaces (bounded, non-persisting reads and calculations); tests/test_mcp_remote.py and
+# tests/test_interfaces.py already pin the same sixteen names, and this script's copy was left at six.
+READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_artifacts", "frontier_capabilities",
+              "frontier_discover", "frontier_graph", "frontier_catalogue", "frontier_project_inspect", "frontier_design_context",
+              "frontier_artifact_inspect", "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief"}
 WRITE_TOOLS = {"frontier_propose", "frontier_lease", "frontier_transition"}
 EXIT_STOP = 3
 

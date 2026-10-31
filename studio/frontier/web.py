@@ -52,10 +52,10 @@ MIME = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", 
 # Extra types, served ONLY from <site>/artifacts/ (the guarded artifact subtree), never from the rest of the site.
 ARTIFACT_MIME = {".stl": "model/stl", ".obj": "model/obj", ".glb": "model/gltf-binary", ".csv": "text/csv; charset=utf-8",
                  ".lean": "text/plain; charset=utf-8", ".trig": "application/trig",
-                 ".mp4": "video/mp4", ".webm": "video/webm"}
+                 ".mp4": "video/mp4", ".webm": "video/webm", ".xz": "application/x-xz"}
 STREAMED = {".mp4", ".webm"}                                                  # served by seek+chunk with Range support, never read whole into memory
 MAX_VIDEO_BYTES = 64_000_000
-ARTIFACT_DOWNLOAD = {".stl", ".obj", ".glb"}                                   # binary models download; text types render as text
+ARTIFACT_DOWNLOAD = {".stl", ".obj", ".glb", ".xz"}                           # binary models/archives download; text types render as text
 SENSITIVE_NAME = re.compile(r"(secret|token|credential|password|passwd|private|apikey|api_key|\.pem|\.key|\.env|id_rsa)", re.I)
 MAX_STATIC_BYTES = 8_000_000
 MAX_ARTIFACT_BYTES = 16_000_000

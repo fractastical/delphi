@@ -1194,6 +1194,28 @@ def test_video_types_are_served_only_from_guarded_artifacts_with_range_support(a
     assert web.resolve_static(site, "/artifacts/big.mp4") is None
 
 
+def test_warmstart_archive_is_an_opaque_download_only_under_artifacts(authed, site, tmp_path):
+    """Publishing a frozen simulator input must not open arbitrary archives or paths."""
+    import lzma
+
+    art = site / "artifacts"
+    art.mkdir(exist_ok=True)
+    payload = lzma.compress(b"frozen simulation inputs")
+    (art / "warmstart.tar.xz").write_bytes(payload)
+    status, headers, body = authed.req("GET", "/artifacts/warmstart.tar.xz")
+    assert status == 200 and body == payload
+    assert headers["content-type"] == "application/x-xz"
+    assert headers["content-disposition"].split(";", 1)[0] == "attachment"
+    assert headers["x-content-type-options"] == "nosniff"
+    (site / "outside.tar.xz").write_bytes(payload)
+    (art / "credentials.tar.xz").write_bytes(payload)
+    outside = tmp_path / "outside-archive.xz"
+    outside.write_bytes(payload)
+    (art / "linked.xz").symlink_to(outside)
+    for path in ("/outside.tar.xz", "/artifacts/credentials.tar.xz", "/artifacts/linked.xz"):
+        assert authed.req("GET", path)[0] == 404
+
+
 def test_anonymous_session_minting_is_limited_per_client_and_a_cookie_holder_is_not_counted(store, site):
     """The session table is capped and evicts the oldest, so unlimited anonymous minting would sign everyone else out of the calculators."""
     w = Web(store, site, public_read=True, anon_sessions_per_window=3)
