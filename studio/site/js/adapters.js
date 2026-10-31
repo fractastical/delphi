@@ -101,8 +101,6 @@
     return { events: [], source: "snapshot", note: "A snapshot has no event stream." };
   }
 
-  /* Pending interfaces: exact names are not final. Root connects them. */
-  const pending = (name) => async () => { throw new Unavailable(name, "The interface name and schema are pending; nothing was submitted and no result is shown."); };
   /* POST /api/engineering/solve with a session CSRF token from /api/session. Numbers go as decimal strings;
    * rho and cl_max are null (unknown) unless the user typed them; the assumption flags default to false. */
   async function solve(c) {
@@ -164,7 +162,43 @@
     if (!r.ok) throw new Error(`${{ 400: "The request was refused as invalid", 404: "This node does not serve simulation previews", 429: "The preview slots are busy; try again shortly", 503: "The simulation runtime is unavailable on this node" }[r.status] || "The request failed"} (HTTP ${r.status}${errCode(j)})${errMessage(j)}`);
     return j;
   }
-  const propose = pending("proposal submission");
+  // Contributor credentials live only in this closure. Browsing sessions never
+  // authorize a persistent write; no token is put in state, storage or a URL.
+  let contributorToken = null, contributorGeneration = 0;
+  function disconnectContributor() { contributorToken = null; contributorGeneration += 1; }
+  function hasContributor() { return contributorToken !== null; }
+  async function contributionRequest(path, body, token, key = null) {
+    if (!isLive()) throw new Error("No live node is connected.");
+    if (!token) throw new Error("Connect a contributor credential before submitting.");
+    const text = JSON.stringify(body);
+    if (new TextEncoder().encode(text).length > 65536) throw new Error("Contribution exceeds the 65536-byte browser limit.");
+    const headers = { "Content-Type": "application/json", Accept: "application/json", Authorization: "Bearer " + token };
+    if (key) headers["Idempotency-Key"] = key;
+    const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 10000);
+    try {
+      const response = await fetch(path, { method: "POST", headers, body: text, signal: ctl.signal,
+        credentials: "omit", redirect: "error", cache: "no-store" });
+      if (!response.ok) throw new Error("Contributor request refused (HTTP " + response.status + ").");
+      return await response.json();
+    } finally { clearTimeout(timer); }
+  }
+  async function connectContributor(value) {
+    disconnectContributor();
+    const generation = contributorGeneration;
+    if (typeof value !== "string" || !/^[\x21-\x7e]{16,512}$/.test(value.trim())) throw new Error("Enter a valid contributor credential.");
+    const token = value.trim();
+    const result = await contributionRequest("/v1/read/identity", {}, token);
+    if (generation !== contributorGeneration) throw new Error("Contributor connection was cancelled.");
+    if (!result.principal || !result.principal.roles.includes("contributor")) throw new Error("This credential cannot contribute.");
+    contributorToken = token;
+    return result;
+  }
+  const identity = () => contributionRequest("/v1/read/identity", {}, contributorToken);
+  async function propose(draft, key) {
+    if (typeof key !== "string" || !/^[A-Za-z0-9:._-]{1,200}$/.test(key)) throw new Error("A stable idempotency key is required.");
+    if (!draft || draft.kind !== "Annotation") throw new Error("This composer submits Annotation proposals only.");
+    return contributionRequest("/v1/proposals", { draft }, contributorToken, key);
+  }
 
   /* GET /api/discovery?q&kind&limit&mode=hybrid -> {items[{type,ref,artifact_sha256?,title,snippet,kind,local_status,score,score_kind,why_matched}], mode, index metadata, unavailable_reason?}.
    * Until the runtime serves it, an honest lexical fallback over the catalog and artifact index; the result always says which one ran. */
@@ -206,5 +240,6 @@
     return getJSON("api/design/context?" + q.toString(), 5000, signal);
   }
 
-  DF.api = { state, designContext, formalize, isLive, load, discovery, graph, catalog, record, artifacts, media, counts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
+  DF.api = { state, designContext, formalize, isLive, load, discovery, graph, catalog, record, artifacts, media, counts, system, attention, events, solve, belief, simulate, propose,
+    identity, connectContributor, disconnectContributor, hasContributor, Unavailable, getJSON };
 })();
