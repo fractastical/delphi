@@ -1,0 +1,26 @@
+{
+  "claim_id": "wolfram2002-ch11-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch11-14",
+  "project": "wolfram-nks",
+  "status": "preregistered",
+  "hypothesis": "Rule 110 is computationally universal (Cook 2004, Complex Systems 15(1):1-40, doi:10.25088/ComplexSystems.15.1.1). Universality itself is a theorem that no finite simulation can establish, so this test checks the empirical premise the claim rests on: that rule 110 'naturally' produces, from random initial conditions, a background ether with the (time, space) periodicity lattice spanned by (3, 2) and (4, -2) (spatial period 14, temporal period 7), and persistent localized structures (gliders) whose space-time periods are exactly those tabulated by Cook (Figure 5): A (3, 2), B (4, -2), B-bar/B-hat (12, -6), C1-C3 (7, 0), D1-D2 (10, 2), E^n (15, -4), E-bar (30, -8), F (36, -4), G^n (42, -14), H (92, -18); in particular the classes used as components in Cook's construction (C2 tape data, E-bar table data, A moving data, E leaders) must occur.",
+  "pass_criterion": "Pre-registered: simulate rule 110 on rings of 1200 cells from 60 uniformly random initial rows (numpy default_rng seed 20261031) for 4000 steps. Ether cells are those whose 7 x 14 neighbourhood is invariant under the lattice translation (t, x) -> (t + 1, x - 4). In rows t = 3000..3900 (every 100 steps), maximal runs of non-ether cells of width <= 60 are 'structures'. For each structure, search for the smallest temporal period P <= 100 and shift |s| <= 50 such that the window (structure plus 14 cells of ether on each side) reappears exactly at (t + P, x + s). Component premise confirmed if: (1) the ether, i.e. the (3,2)/(4,-2) lattice, covers more than 50% of the cells at t >= 3000 in every run; (2) at least 90% of structures resolve to a period, and every resolved period (P, s) is a positive integer combination of Cook's A and B periods that coincides with one of Cook's tabulated glider periods (allowing the period to be a positive integer multiple of a tabulated one, for packets such as A^n); (3) the classes A, B, C, D, E and E-bar are each observed at least once. Because the test replays only the glider inventory and not the cyclic-tag-system emulation, the verdict when all three conditions hold is pre-declared as 'inconclusive' with reason 'not-operationalizable' (universality is settled by proof, not by this computation), with the component results reported as supporting evidence.",
+  "fail_criterion": "Pre-registered: 'refutes' if the standard ether does not form (condition 1 fails in a majority of runs), or if the A, C or E-bar classes (the data carriers of Cook's construction) are never observed in 60 random runs, or if resolved structures have space-time periods incompatible with Cook's table (a period that is not an integer combination of (3, 2) and (4, -2) would contradict his lattice argument). Such results would undermine the published construction that the claim cites and would be reported as 'refutes' of the component premise with confidence <= 0.6, since a construction could in principle use rarer gliders.",
+  "planned_datasets": [
+    "rule110-random-soup-gliders",
+    "cook2004-glider-table"
+  ],
+  "interpretation": "Wolfram's claim is a theorem (Cook's proof, presented in NKS pp. 678-689 and published in 2004). The test does not re-derive the proof or replay the cyclic tag system emulation, which requires Cook's specific glider packets and spacings; it checks the computational premise that rule 110 has a stable ether and naturally occurring gliders with the stated periods, which is the part of the claim that is accessible to a few minutes of simulation. The glider table is taken from Figure 5 of Cook's paper (retrieved PDF; checksum recorded); 'period' is Cook's (time, horizontal displacement) pair for one repetition of the glider.",
+  "datasets": [],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-wolfram-nks-0123",
+    "date": "2026-10-31"
+  }
+}
