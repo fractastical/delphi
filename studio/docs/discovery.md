@@ -32,7 +32,15 @@ d.search(query, kind=None, limit=12, mode="hybrid", cache_only=False) -> {
 2. `FRONTIER_DSN=... python -m frontier.discovery index --namespace NS [--receipt receipt.json]` creates the tables and embeds what is missing. It is bounded (`--max-requests`, default 100 provider calls), resumable and idempotent: a re-run embeds only new or changed text. `status` and `search` subcommands exist.
 3. The credential for embeddings is read in process from `GEMINI_API_KEY` or `~/.config/morphoswarm/gemini.env` (override: `FRONTIER_GEMINI_ENV_FILE`). The web process needs it only for live query embedding; without it, hybrid falls back to labelled lexical (cached queries still work).
 
-## Measured: indexing receipt on actual data
+## Live index (2026-10-31) and the refresh job
+
+After root enabled pgvector in the dedicated Frontier database, `python -m frontier.discovery index --namespace delphi-frontier --max-requests 100` indexed the live node: **2,444 of 2,444 planned documents embedded, 0 failures, 49 provider requests** (Claim 914, Problem 262, Event 1,200, Evidence 9 plus 51 declared artifacts, Action 8; one model, `gemini-embedding-001`, 768 dimensions). Every indexed version is public (0 non-public; the node held no private record at the time). Receipt: `imports/2026-10-31-discovery-live-index-receipt.json`.
+
+Recurring job: `python -m frontier.discovery refresh --namespace delphi-frontier [--max-requests 20] [--receipt log.jsonl]` embeds only records and artifacts that are new or changed (a run with nothing new makes **zero** provider calls), under a small request budget, with a PostgreSQL advisory lock so overlapping runs skip. Exit code 0 on success or skip, 2 if any document failed, 3 if the provider or extension is unavailable. `deploy/discovery/` has a systemd user service and a 10-minute timer template (placeholders for paths and an environment file; no credential in the repository). Indexing sends up to `--workers` (default 4) provider requests at once.
+
+Latency, measured on the live node (single process, uncached query unless noted): a hybrid search took about 950 ms before and about 270 ms after two changes: the lexical candidate query now uses three index-friendly branches instead of one OR that forced a sequential scan with per-row `to_tsvector` (lexical alone: about 630 ms to about 40 ms; the existing 17 search tests still pass), and the lexical and embedding paths now run concurrently. A repeated query is served from the cache in about 60 ms. The provider call itself is about 200 ms.
+
+## Measured earlier: indexing receipt on a private copy
 
 A private temporary PostgreSQL cluster was loaded with a copy of the live node's 2,375 public head records and indexed (the source node was only read): **2,410 of 2,410 planned documents embedded, 0 failures, 49 provider requests, 51 s**; 2 inputs were truncated at 6,000 characters. By kind: Claim 912, Problem 261, Event 1,191, Evidence 6 plus 35 declared artifacts, Action 5. Manifest sha256 and full coverage: `findings/discovery-index-receipt.json`. The live node itself has not been indexed (it lacks the extension).
 

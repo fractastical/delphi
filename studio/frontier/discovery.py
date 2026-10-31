@@ -20,6 +20,7 @@ import os
 import re
 import sys
 import threading
+from concurrent.futures import ThreadPoolExecutor
 import time
 import urllib.error
 import urllib.request
@@ -221,6 +222,7 @@ class Discovery:
         self._calls: list[float] = []
         self._lock = threading.Lock()
         self.lru_size = lru_size
+        self._pool = ThreadPoolExecutor(max_workers=2, thread_name_prefix="discovery")
 
     # -- connections ---------------------------------------------------------------------------------------------
     def _conn(self):
@@ -288,7 +290,7 @@ class Discovery:
         self._with_conn(run)
         return docs
 
-    def index(self, kinds: Iterable[str] | None = None, *, max_requests: int = 100, batch: int = 50, dry_run: bool = False) -> dict:
+    def index(self, kinds: Iterable[str] | None = None, *, max_requests: int = 100, batch: int = 50, dry_run: bool = False, workers: int = 4) -> dict:
         """Embed every planned document whose (doc_id, input hash, model, dimensions, recipe) is not already stored. Resumable and idempotent.
         Bounded by max_requests provider calls. Failures are recorded per document; coverage is reported as measured."""
         if self.embedder is None:
@@ -309,15 +311,16 @@ class Discovery:
         failures: list[dict] = []
         if dry_run:
             return self._finish(run_id, started, summary, planned, failures, write=False)
-        requests = 0
-        for i in range(0, len(todo), batch):
-            chunk = todo[i:i + batch]
-            if requests >= max_requests:
-                for d in chunk:
-                    failures.append({"doc_id": d["doc_id"], "error_class": "request_budget", "message": f"max_requests={max_requests} reached before this document"})
-                continue
-            vecs, err = self._embed_chunk(chunk)
-            requests += 1
+        chunks = [todo[i:i + batch] for i in range(0, len(todo), batch)]
+        allowed, over = chunks[:max_requests], chunks[max_requests:]
+        for chunk in over:  # beyond the request budget: reported, never silently dropped
+            for d in chunk:
+                failures.append({"doc_id": d["doc_id"], "error_class": "request_budget", "message": f"max_requests={max_requests} reached before this document"})
+        requests = len(allowed)
+        # The provider calls for different batches are independent: run up to `workers` at once. Database writes stay on this thread.
+        with ThreadPoolExecutor(max_workers=max(1, workers)) as ex:
+            results = list(ex.map(self._embed_chunk, allowed))
+        for chunk, (vecs, err) in zip(allowed, results):
             if err and len(chunk) > 1:  # isolate the bad document(s): bounded single-document retries share the same request budget
                 vecs = []
                 for d in chunk:
@@ -338,6 +341,21 @@ class Discovery:
         summary["requests"] = requests
         summary["failed"] = len(failures)
         return self._finish(run_id, started, summary, planned, failures, write=True)
+
+    def refresh(self, *, max_requests: int = 20, workers: int = 4, dry_run: bool = False) -> dict:
+        """The recurring job: embed only records and artifacts that are new or changed since the last run, under a small request budget. An advisory
+        lock makes overlapping runs harmless (the second one skips). Safe to run from a timer; a run with nothing new makes zero provider calls."""
+        lock = int(sha256(b"frontier-discovery-refresh").hexdigest()[:8], 16) & 0x7FFFFFFF  # constant across processes
+
+        def hold(c):
+            return c.execute("SELECT pg_try_advisory_lock(%s) AS ok", (lock,)).fetchone()["ok"]
+        c, cm = self._conn()
+        try:
+            if not hold(c):
+                return {"skipped": "another refresh is running", "requests": 0}
+            return self.index(max_requests=max_requests, workers=workers, dry_run=dry_run)
+        finally:
+            cm.__exit__(None, None, None)
 
     def _embed_chunk(self, chunk: list[dict]):
         delay = 1.0
@@ -489,6 +507,8 @@ class Discovery:
         q = query.strip()
         reason = None
         vec_hits: list[dict] = []
+        # The lexical ranking and the query embedding + vector search are independent: run them concurrently, so latency is the slower of the two.
+        lex_future = self._pool.submit(self._lexical, q, kind) if mode in ("lexical", "hybrid") else None
         if mode in ("vector", "hybrid"):
             try:
                 qv = self.query_vector(q, cache_only=cache_only)
@@ -501,7 +521,9 @@ class Discovery:
                 reason = "vector index unavailable (pgvector extension or discovery tables not installed)"
         used = mode if reason is None else "lexical"
         lex_records, lex_artifacts = ([], [])
-        if used in ("lexical", "hybrid") or reason is not None:
+        if lex_future is not None:
+            lex_records, lex_artifacts = lex_future.result()
+        elif used == "lexical":  # requested vector mode that fell back
             lex_records, lex_artifacts = self._lexical(q, kind)
         items = self._fuse(used, lex_records, lex_artifacts, vec_hits, limit)
         out = {"query": q, "mode": used, "items": items, "index": self.index_info(), "relevance_note": RELEVANCE_NOTE}
@@ -596,12 +618,13 @@ def search(store: Store, query: str, kind: str | None = None, limit: int = 12, m
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Frontier hybrid discovery: index, status, search")
-    ap.add_argument("command", choices=["init", "index", "status", "search"])
+    ap.add_argument("command", choices=["init", "index", "refresh", "status", "search"])
     ap.add_argument("--namespace", required=True)
     ap.add_argument("--schema", default="public")
     ap.add_argument("--kinds", nargs="*")
-    ap.add_argument("--max-requests", type=int, default=100)
+    ap.add_argument("--max-requests", type=int, default=None, help="provider-call budget (index: 100, refresh: 20)")
     ap.add_argument("--batch", type=int, default=50)
+    ap.add_argument("--workers", type=int, default=4, help="concurrent provider requests while indexing")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--receipt", help="write the JSON index receipt here (atomic)")
     ap.add_argument("--query")
@@ -619,9 +642,17 @@ def main(argv=None) -> int:
             print(json.dumps(d.index_info()))
         elif a.command == "search":
             print(json.dumps(d.search(a.query or "", kind=a.kind, limit=a.limit, mode=a.mode), indent=1))
+        elif a.command == "refresh":
+            d.initialize()
+            r = d.refresh(max_requests=a.max_requests or 20, workers=a.workers, dry_run=a.dry_run)
+            if a.receipt and "run_id" in r:
+                with open(a.receipt, "a") as fh:
+                    fh.write(json.dumps({k: r[k] for k in ("run_id", "started_at", "finished_at", "model", "dimensions", "planned", "already_current", "embedded", "failed", "requests")}) + "\n")
+            print(json.dumps({k: r[k] for k in ("skipped", "run_id", "planned", "already_current", "to_embed", "requests", "embedded", "failed") if k in r}))
+            return 2 if r.get("failed") else 0
         else:
             d.initialize()
-            r = d.index(a.kinds, max_requests=a.max_requests, batch=a.batch, dry_run=a.dry_run)
+            r = d.index(a.kinds, max_requests=a.max_requests or 100, batch=a.batch, dry_run=a.dry_run, workers=a.workers)
             if a.receipt:
                 tmp = Path(a.receipt + ".tmp")
                 tmp.write_text(json.dumps(r, indent=1, ensure_ascii=False) + "\n")

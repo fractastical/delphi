@@ -229,6 +229,13 @@ class SearchIndex:
             }
             rows = c.execute("""
                 WITH tsq AS (SELECT websearch_to_tsquery('simple', %(q)s) AS q),
+                -- Candidate versions come from three cheap, separate branches so the GIN full-text index is usable and to_tsvector is not
+                -- evaluated for every row (an OR across them forces a sequential scan and per-row to_tsvector, which dominated latency).
+                hits AS (
+                  SELECT x.version FROM record_versions x WHERE to_tsvector('simple', x.search_text) @@ (SELECT q FROM tsq)
+                  UNION SELECT x.version FROM record_versions x WHERE %(q)s <> '' AND position(%(q)s in x.search_text) > 0
+                  UNION SELECT x.version FROM record_versions x WHERE %(q)s <> '' AND (x.version = %(exact_version)s OR x.record_id = %(raw)s OR lower(x.source_uri) = %(q)s)
+                ),
                 cand AS (
                   SELECT v.version, v.envelope, s.status, (h.version IS NOT NULL) AS is_head,
                          ( GREATEST(
@@ -259,12 +266,7 @@ class SearchIndex:
                          OR (%(scope)s NOT IN ('public', 'private') AND v.namespace = %(scope)s))
                     AND (%(context)s::text IS NULL
                          OR position(%(context)s in lower(coalesce(v.envelope #>> '{payload,context}', ''))) > 0)
-                    AND ( %(q)s = ''
-                          OR v.version = %(exact_version)s
-                          OR v.record_id = %(raw)s
-                          OR lower(v.source_uri) = %(q)s
-                          OR to_tsvector('simple', v.search_text) @@ tsq.q
-                          OR position(%(q)s in v.search_text) > 0 )
+                    AND ( %(q)s = '' OR v.version IN (SELECT version FROM hits) )
                 )
                 SELECT version, envelope, status, is_head, score FROM cand
                 WHERE (%(c_score)s::int IS NULL OR score < %(c_score)s OR (score = %(c_score)s AND version > %(c_version)s))
