@@ -23,6 +23,18 @@ def test_real_default_subprocess_returns_actual_typed_frames(model):
     assert result["evidence_kind"] == "SimulationResult"
     assert result["request_sha256"] == sha256(api._canonical(request).encode()).hexdigest()
     assert result["code_sha256"]["frontier/simulation_api.py"] == sha256(api.Path(api.__file__).read_bytes()).hexdigest()
+    environment = result["environment"]
+    assert environment["python"] == api.platform.python_version()
+    assert environment["numpy"]
+    assert environment["platform"] and environment["machine"]
+    assert bool(environment["scipy"]) == (model == "mechanobio")
+    assert environment["threads"]["OPENBLAS_NUM_THREADS"] == "1"
+    assert result["environment_sha256"] == api._digest(environment)
+    identity = result["execution_identity"]
+    assert identity["request_sha256"] == result["request_sha256"]
+    assert identity["effective_request_sha256"] == result["effective_request_sha256"]
+    assert identity["environment_sha256"] == result["environment_sha256"]
+    assert identity["code_sha256"] == api._digest(result["code_sha256"])
     state = result["result"]
     if model == "bioelectric":
         assert state["time_ms"][0] == 0 and state["time_ms"][-1] == 30
@@ -35,6 +47,22 @@ def test_real_default_subprocess_returns_actual_typed_frames(model):
         assert state["summary"]["mean_traction_pN"] > 0
         assert state["summary"]["max_force_balance_residual_pN"] < 1e-9
     json.dumps(result, allow_nan=False)
+
+
+def test_environment_captured_by_real_child_not_parent_and_excludes_unrelated_versions(monkeypatch):
+    expected_python = api.platform.python_version()
+    monkeypatch.setattr(api.platform, "python_version", lambda: "parent-only-sentinel")
+    monkeypatch.setenv("FRONTIER_FAKE_ENV_SECRET", "do-not-export")
+    result = api.run_preview({"model": "bioelectric", "parameters": {"sodium_scale": .5}})
+    assert result["environment"]["python"] == expected_python
+    assert result["environment"]["scipy"] is None
+    assert "parent-only-sentinel" not in json.dumps(result["environment"])
+    assert "do-not-export" not in json.dumps(result)
+    assert "FRONTIER_FAKE_ENV_SECRET" not in json.dumps(result["environment"])
+    assert result["execution_identity"]["model_input_sha256"] == result["result"]["simulationAction"]["input_sha256"]
+    assert result["execution_identity"]["source_context_sha256"] == api._digest(result["result"]["source_envelope"])
+    changed = dict(result["environment"], numpy="test-only-other-version")
+    assert api._digest(changed) != result["execution_identity"]["environment_sha256"]
 
 
 @pytest.mark.parametrize("payload", [
