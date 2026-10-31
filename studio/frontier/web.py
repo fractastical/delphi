@@ -37,6 +37,7 @@ from .discovery import Discovery, GeminiEmbedder
 from .graph import catalogue_report, view as graph_view
 from .media import LocalMedia
 from .http import Application
+from .design_review import project_design_context
 from .models import KINDS, MAX_BUNDLE_BYTES, Ref, canonical
 from .search import SearchIndex
 from .system_status import SystemStatus
@@ -61,7 +62,7 @@ MAX_ARTIFACT_BYTES = 16_000_000
 MAX_PATH = 2048
 CATALOG_PARAMS = {"query", "kind", "status", "limit", "after"}
 STATUSES = {"proposed", "imported_unreviewed", "accepted", "disputed", "rejected"}
-WRITE_PATHS = ("/v1/proposals", "/v1/reviews", "/v1/actions/lease", "/v1/actions/transition", "/v1/import")
+WRITE_PATHS = ("/v1/proposals", "/v1/reviews", "/v1/design/reviews", "/v1/actions/lease", "/v1/actions/transition", "/v1/import")
 
 
 class Throttled(FrontierError):
@@ -232,7 +233,7 @@ def default_search(store):
     return SearchIndex(store).query, "search_index"
 
 
-RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts", "/api/attention", "/api/system", "/api/discovery", "/api/graph", "/api/media", "/api/counts"}
+RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts", "/api/attention", "/api/system", "/api/discovery", "/api/graph", "/api/media", "/api/counts", "/api/design/context"}
 
 
 @dataclass
@@ -619,6 +620,13 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
                 target = Ref.model_validate({k: q[k] for k in ref_fields}).model_dump() if present else None
                 return self.json(200, graph_view(store, target_ref=target,
                                                 depth=int(q.get("depth", "1")), limit=int(q.get("limit", "120"))))
+            if path == "/api/design/context":
+                ref_fields = {"namespace", "kind", "id", "version"}
+                if not ref_fields <= set(q) or set(q) - (ref_fields | {"limit", "cursor"}):
+                    raise FrontierError("A complete exact Project reference is required")
+                target = Ref.model_validate({k: q[k] for k in ref_fields}).model_dump()
+                return self.json(200, project_design_context(store, target, limit=int(q.get("limit", "20")),
+                                                            cursor=q.get("cursor") or None))
             if path == "/api/catalog":
                 if set(q) - CATALOG_PARAMS:
                     raise FrontierError("Unknown parameter")

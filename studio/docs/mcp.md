@@ -25,6 +25,8 @@ including an actual simulation, constraint solve, formalization, belief calculat
 exact Project lookup and hash-checked print asset lookup. The receipt is
 `deploy/receipts/mcp-expanded-check.json`. These calculations wrote no scientific
 records. Discovery used its explicit lexical fallback in that check.
+The source branch additionally provides `frontier_design_context`; check the
+live capability manifest for its deployment status.
 Start with `frontier_capabilities`, then use exact refs from `frontier_search`,
 `frontier_discover` or `frontier_graph` with `frontier_get`.
 
@@ -104,7 +106,7 @@ the branch handoff; definitions alone are not a run.
 
 | | Default (`python -m frontier mcp ...`) | Opt-in (`... --allow-write`) |
 |---|---|---|
-| Tools | 15 read tools (all `readOnlyHint=true`; listed below) | the 15 above plus `frontier_propose`, `frontier_lease`, `frontier_transition` (`readOnlyHint=false`, `destructiveHint=false`, `idempotentHint=true`) |
+| Tools | 16 read tools (all `readOnlyHint=true`; listed below) | the 16 above plus `frontier_propose`, `frontier_lease`, `frontier_transition` (`readOnlyHint=false`, `destructiveHint=false`, `idempotentHint=true`) |
 | Resources | `frontier://capabilities`, `frontier://schema/{kind}` | same |
 | Acts as | nobody | the principal that owns `FRONTIER_TOKEN` |
 
@@ -125,7 +127,7 @@ action submitted through this MCP server and that a different operator can accep
 
 ## Expanded read and calculation tools
 
-The source branch registers these 15 read-only tools in both stdio and remote
+The source branch registers these 16 read-only tools in both stdio and remote
 modes. Check `frontier_capabilities` on the actual server before relying on a
 tool, because deployment may lag this branch.
 
@@ -141,6 +143,7 @@ tool, because deployment may lag this branch.
 | `frontier_graph` | Bounded public graph overview or a graph rooted at an exact `Ref` | Public records only; exact versions, declared links and truncation are explicit. Depth is at most 3. |
 | `frontier_catalogue` | Counts and coverage report from the existing catalogue adapter | Describes the bounded public catalogue, not all records that may exist elsewhere. |
 | `frontier_project_inspect` | One exact Project envelope and its pinned members | Project pins remain exact; membership does not establish applicability or acceptance. |
+| `frontier_design_context` | Exact Project/member annotations and paginated challenge/reply threads | Every annotation carries its exact anchor and thread pin; authored challenges and replies do not vote, validate, or resolve a design. |
 | `frontier_artifact_inspect` | Exact-hash matching Evidence declarations and guarded local-media matches | Local bytes are checked under the release's public `site/artifacts` tree. Remote URIs are never fetched; no content preview is returned. Declaration alone is not byte verification. |
 | `frontier_simulate` | One allowlisted bioelectric or mechanobiology preview | Fixed bounded local adapter; ephemeral `SimulationResult`, never accepted Evidence. No arbitrary code, cloud job or external inference. |
 | `frontier_engineer` | Existing finite aircraft-constraint calculation | Ephemeral exact-constraint result. The optional Z3 solver must be installed; otherwise the adapter returns a bounded `solver_unavailable` error. No biological validation is implied. |
@@ -175,6 +178,15 @@ separate Evidence. This MCP surface does not claim a calculation was accepted,
 does not add an Action execution queue wrapper, and does not invent a Project
 pin field absent from the current Action schema. Review and acceptance remain
 independent operations through the existing review API.
+
+Structured Project challenges use `POST /v1/design/reviews` with ordinary
+`Annotation` records (or authenticated `frontier_propose`) and the
+optional `design_review` payload. The challenge pins one exact Project version
+through `anchor.record`; an optional `member_index` addresses that Project
+version's pinned member list. It records the review dimension, evidence basis
+and exact Claim/Evidence refs, scope, alternative, and a falsifiable next test.
+Replies are ordinary Annotations using `reply_to`. This discussion carries no
+vote tally, automatic resolution, or claim that a debate settles biology.
 
 ## Credentials
 
