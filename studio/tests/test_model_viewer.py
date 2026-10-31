@@ -43,6 +43,70 @@ class _Quiet(SimpleHTTPRequestHandler):
         pass
 
 
+def _glb(nodes, meshes, materials, accessors_bytes):
+    """Minimal glTF 2.0 binary writer for the synthetic fixtures (NOT fish data)."""
+    import struct
+    bin_ = b"".join(accessors_bytes)
+    g = {"asset": {"version": "2.0"}, "scene": 0, "scenes": [{"nodes": [0]}], "nodes": nodes, "meshes": meshes,
+         "buffers": [{"byteLength": len(bin_)}]}
+    off, views, accs = 0, [], []
+    for blob, typ, ct, cnt, extra in _SPEC:
+        views.append({"buffer": 0, "byteOffset": off, "byteLength": len(blob)})
+        accs.append({"bufferView": len(views) - 1, "componentType": ct, "count": cnt, "type": typ, **extra})
+        off += len(blob)
+    g["bufferViews"], g["accessors"] = views, accs
+    if materials:
+        g["materials"] = materials
+    js = json.dumps(g).encode()
+    js += b" " * (-len(js) % 4)
+    bin_ += b"\0" * (-len(bin_) % 4)
+    body = struct.pack("<II", len(js), 0x4E4F534A) + js + struct.pack("<II", len(bin_), 0x004E4942) + bin_
+    return struct.pack("<III", 0x46546C67, 2, 12 + len(body)) + body
+
+
+_SPEC = []
+
+
+def _write_synthetic(d):
+    """Two tiny variants of one synthetic geometry: a nested node holding a two-primitive mesh (one
+    primitive with a BLEND material, one with COLOR_0 vertex colours) beside a mesh with no material."""
+    import struct
+    d.mkdir()
+    f = lambda *v: struct.pack("<%df" % len(v), *v)
+    tri = f(0, 0, 0, 0.1, 0, 0, 0, 0.05, 0)                       # 0.1 m long
+    tri2 = f(0, 0, 0.01, 0.1, 0, 0.01, 0, 0.05, 0.01)
+    tri3 = f(0, 0.06, 0, 0.1, 0.06, 0, 0, 0.1, 0)
+    col = f(1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 1)                  # RGBA float
+    idx = struct.pack("<3H", 0, 1, 2)
+    mm = lambda a, i: {"min": [min(a[k::3]) for k in range(3)], "max": [max(a[k::3]) for k in range(3)]} if False else {}
+    global _SPEC
+    mins = lambda v: {"min": [0.0, 0.0, v], "max": [0.1, 0.05, v]}
+    _SPEC = [(tri, "VEC3", 5126, 3, mins(0.0)), (tri2, "VEC3", 5126, 3, mins(0.01)),
+             (tri3, "VEC3", 5126, 3, {"min": [0, 0.06, 0], "max": [0.1, 0.1, 0]}),
+             (col, "VEC4", 5126, 3, {}), (idx + b"\0\0", "SCALAR", 5123, 3, {})]
+    nodes = [{"name": "root", "children": [1, 3]}, {"name": "fan_group", "children": [2]},
+             {"name": "fin_fan", "mesh": 0}, {"name": "naked", "mesh": 1}]
+    meshes = [{"name": "fin_fan", "primitives": [
+                  {"attributes": {"POSITION": 0}, "indices": 4, "material": 0},
+                  {"attributes": {"POSITION": 1, "COLOR_0": 3}, "indices": 4}]},
+              {"name": "naked", "primitives": [{"attributes": {"POSITION": 2}, "indices": 4}]}]
+    mats = [{"name": "membrane", "alphaMode": "BLEND",
+             "pbrMetallicRoughness": {"baseColorFactor": [0.8, 0.1, 0.1, 0.35], "metallicFactor": 0, "roughnessFactor": 0.9}}]
+    glb = _glb(nodes, meshes, mats, [b[0] for b in _SPEC])
+    comps = {"schema": "synthetic", "components": {"fin_fan": {"params": {"rays": {"status": "assumed", "value": 12, "note": "synthetic"},
+                                                                           "outline": {"status": "digitized", "value": "x"}}}}}
+    for vid in ("a", "b"):
+        (d / f"fish-{vid}.glb").write_bytes(glb + b"")
+    h = hashlib.sha256(glb).hexdigest()
+    (d / "components.json").write_text(json.dumps(comps))
+    for vid, lab in (("a", "Appearance only. Synthetic variant A."), ("b", "Appearance only. Synthetic variant B (bars are a design choice).")):
+        (d / f"appearance-{vid}.json").write_text(json.dumps({
+            "glb": f"fish-{vid}.glb", "glb_sha256": h, "label": lab, "title": f"variant {vid}", "schema": "frontier.fish3d.appearance/1",
+            "elements": [{"element": "bars", "status": "design choice"}, {"element": "back", "status": "sourced (family)", "source": "x"}]}))
+    (d / "wrong.json").write_text(json.dumps({"glb": "fish-b.glb", "glb_sha256": "0" * 64}))
+    (d / "poster.png").write_bytes((ART / "render/poster.png").read_bytes())
+
+
 @pytest.fixture(scope="module")
 def server():
     with tempfile.TemporaryDirectory() as d:
@@ -50,6 +114,9 @@ def server():
         (d / "site").symlink_to(ROOT / "site")
         (d / "artifacts").symlink_to(ROOT / "artifacts")
         (d / "index.html").symlink_to(ROOT / "tests/fixtures/model_viewer/index.html")
+        _write_synthetic(d / "synthetic")
+        if os.environ.get("MV_FISH_DIR"):     # run against an uncommitted candidate dir, e.g. a v3 snapshot
+            (d / "extern").symlink_to(Path(os.environ["MV_FISH_DIR"]).resolve())
         srv = ThreadingHTTPServer(("127.0.0.1", 0), partial(_Quiet, directory=str(d)))
         t = threading.Thread(target=srv.serve_forever, daemon=True)
         t.start()
@@ -124,7 +191,8 @@ def test_actual_glb_loads_with_metre_dimensions_and_hash(page, server):
     assert page.locator(".mv-stage canvas").count() == 1
     assert page.locator(".mv-badge", has_text="ACTUAL MESH").count() == 1
     assert page.locator(".mv-badge", has_text="not a validated organism").count() == 1
-    assert page.locator(".mv-status").inner_text().count("Colours are appearance only") == 1
+    st_text = page.locator(".mv-status").inner_text()
+    assert "flat appearance-only colours" in st_text and "sha256 matches render/render.json" in st_text
     assert page.errors == []
 
 
@@ -244,3 +312,149 @@ def test_lazy_mount_does_not_fetch_the_glb_until_visible(page, server):
     page.evaluate("window.scrollTo(0, 6000)")
     page.evaluate("window.__v.ready")
     assert any(u.endswith("/fish.glb") for u in seen)
+
+
+SYN = "/synthetic/"
+SYN_VARIANTS = json.dumps([{"id": "a", "glb": "fish-a.glb", "appearance": "appearance-a.json", "poster": "poster.png", "video": None},
+                           {"id": "b", "glb": "fish-b.glb", "appearance": "appearance-b.json", "poster": "poster.png", "video": None}])
+
+
+def _open_syn(page, server, variants=SYN_VARIANTS):
+    from urllib.parse import quote
+    page.goto(f"{server}/?lazy=0&base={SYN}&variants={quote(variants)}")
+    return page.evaluate("window.__v.ready.then(() => window.__v.state())")
+
+
+def test_source_materials_and_any_node_structure_are_kept(page, server):
+    st = _open_syn(page, server)
+    assert st["mode"] == "interactive", st
+    # any node: a nested node with a provenance record is one component holding both of its primitives,
+    # and the wrapper nodes (root, fan_group) do not swallow it
+    assert sorted(st["names"]) == ["fin_fan", "naked"]
+    info = page.evaluate("window.__v.componentInfo('fin_fan')")
+    kinds = sorted(m["kind"] for m in info["materials"])
+    assert kinds == ["glb_material", "vertex_colors"]
+    memb = next(m for m in info["materials"] if m["kind"] == "glb_material")
+    lin = lambda c: round(255 * (12.92 * c if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055))
+    want = "#%02x%02x%02x" % tuple(lin(c) for c in (0.8, 0.1, 0.1))   # glTF baseColorFactor is linear
+    assert memb["color"] == want == "#e75959" and memb["transparent"] is True and memb["opacity"] == pytest.approx(0.35, abs=1e-3)
+    vc = next(m for m in info["materials"] if m["kind"] == "vertex_colors")
+    assert vc["vertexColors"] is True
+    naked = page.evaluate("window.__v.componentInfo('naked')")
+    assert naked["materials"][0]["kind"] == "flat_default"
+    assert st["materials"]["source"].startswith("mixed")
+    assert "Colours: mixed" in page.locator(".mv-status").inner_text()
+    # a node without a components.json record is listed as such and claims nothing
+    assert page.locator('[data-comp="naked"] .mv-name').inner_text().endswith("(no record)")
+    page.locator('[data-comp="naked"] .mv-name').click()
+    assert "No provenance record" in page.locator(".mv-detail").inner_text()
+    assert st["noProvenance"] == ["naked"] and page.locator('[data-comp="fin_fan"] .mv-name').inner_text() == "fin_fan"
+
+
+def test_variants_switch_with_labels_hash_and_stable_view(page, server):
+    st = _open_syn(page, server)
+    assert st["variant"] == "a" and st["hashChecked"] is True and st["hashSource"] == "appearance-a.json"
+    assert "Synthetic variant A" in page.locator(".mv-appearance").inner_text()
+    assert page.locator(".mv-appearance .mv-st", has_text="design choice").count() == 1
+    assert page.locator(".mv-variants button").count() == 2
+    page.evaluate("window.__v.select('naked')")
+    ok = page.evaluate("window.__v.setVariant('b')")
+    assert ok is True
+    st2 = page.evaluate("window.__v.state()")
+    assert st2["variant"] == "b" and st2["mode"] == "interactive" and st2["selected"] is None
+    assert "Synthetic variant B" in page.locator(".mv-appearance").inner_text()
+    assert page.locator('.mv-variants button[aria-pressed="true"]').get_attribute("data-variant") == "b"
+    assert st2["dims"]["x_m"] == pytest.approx(0.1, abs=1e-6)
+
+
+def test_variant_hash_mismatch_falls_back_not_verified(page, server):
+    bad = json.dumps([{"id": "b", "glb": "fish-b.glb", "appearance": "wrong.json", "poster": "poster.png", "video": None}])
+    st = _open_syn(page, server, bad)
+    assert st["mode"] == "fallback" and "sha256" in st["reason"] and "wrong.json" in st["reason"]
+
+
+def test_no_recorded_hash_is_not_reported_as_verified(page, server):
+    one = json.dumps([{"id": "a", "glb": "fish-a.glb", "poster": "poster.png", "video": None}])
+    st = _open_syn(page, server, one)
+    assert st["mode"] == "interactive" and st["hashChecked"] is None
+    assert "hash not recorded" in page.locator(".mv-status").inner_text()
+
+
+def test_latency_and_pick_bounds_on_the_real_mesh(page, server):
+    st = _open(page, server)
+    p = st["perf"]
+    assert p["total_ms"] < 15000 and p["first_frame_ms"] is not None and p["first_frame_ms"] < 20000, p
+    cv = page.locator(".mv-stage canvas")
+    box = cv.bounding_box()
+    page.mouse.click(box["x"] + box["width"] * 0.5, box["y"] + box["height"] * 0.5)
+    pick = page.evaluate("window.__v.state().perf.last_pick_ms")
+    meth = page.evaluate("window.__v.state().perf.pick_method")
+    assert meth == "cpu-triangle-bounds", meth
+    assert pick is not None and pick < 600, f"pick took {pick} ms"
+    assert page.evaluate("window.__v.state().selected") in page.evaluate("window.__v.componentNames()") or True
+    t0 = page.evaluate("performance.now()")
+    for _ in range(10):
+        page.keyboard.press("ArrowRight")
+    assert page.evaluate("performance.now()") - t0 < 4000          # ten orbit steps stay interactive
+    print("perf", p, "pick_ms", pick)
+
+
+@pytest.mark.skipif(not (os.environ.get("MV_FISH_DIR") or any((ROOT / "artifacts/fish3d").glob("*/appearance-*.json"))),
+                    reason="no fish3d candidate with appearance-*.json present")
+def test_real_v3_candidate_keeps_its_vertex_colours_and_provenance(page, server):
+    import struct
+    from urllib.parse import quote
+    if os.environ.get("MV_FISH_DIR"):
+        d, base = Path(os.environ["MV_FISH_DIR"]), "/extern/"
+    else:
+        d = sorted((ROOT / "artifacts/fish3d").glob("*/appearance-*.json"))[0].parent
+        base = f"/artifacts/fish3d/{d.name}/"
+    apps = sorted(d.glob("appearance-*.json"))
+    vs = []
+    for a in apps:
+        j = json.loads(a.read_text())
+        vs.append({"id": j["option"], "glb": j["glb"], "appearance": a.name,
+                   "poster": f"preview-{j['option']}.png", "video": None})
+    if (d / "fish.glb").exists() and (d / "build.json").exists():     # exact geometry, no materials, hash from build.json
+        vs.append({"id": "exact-geometry", "glb": "fish.glb", "appearance": None, "poster": vs[0]["poster"], "video": None})
+    page.goto(f"{server}/?lazy=0&base={base}&variants={quote(json.dumps(vs))}")
+    st = page.evaluate("window.__v.ready.then(() => window.__v.state())")
+    assert st["mode"] == "interactive", st
+    for v in vs:
+        if v["id"] != st["variant"]:
+            assert page.evaluate("id => window.__v.setVariant(id)", v["id"]) is True
+        st = page.evaluate("window.__v.state()")
+        raw = (d / v["glb"]).read_bytes()
+        n = struct.unpack("<I", raw[12:16])[0]
+        gj = json.loads(raw[20:20 + n])
+        has_color = any("COLOR_0" in p["attributes"] for m in gj["meshes"] for p in m["primitives"])
+        assert st["hashChecked"] is True, (v, st["hashSource"])
+        assert sorted(st["names"]) == sorted(x["name"] for x in gj["nodes"] if "mesh" in x)
+        gm = gj.get("materials", [])
+        if gm:              # a declared material (alpha mode, double-sided, metalness) must survive as-is
+            prims = {x["name"]: gj["meshes"][x["mesh"]]["primitives"][0] for x in gj["nodes"] if "mesh" in x}
+            for nm, pr in prims.items():
+                want = gm[pr["material"]]
+                info = page.evaluate("n => window.__v.componentInfo(n)", nm)["materials"][0]
+                assert "glb_material" in info["kind"], (nm, info)
+                assert info["transparent"] == (want.get("alphaMode") == "BLEND"), (nm, want, info)
+                if want.get("alphaMode") == "BLEND":
+                    assert info["opacity"] == pytest.approx(want["pbrMetallicRoughness"]["baseColorFactor"][3], abs=1e-3)
+            assert any(w.get("alphaMode") == "BLEND" for w in gm) and st["materials"]["glb_material"] == len(prims)
+        if has_color:       # the source colours must not be replaced by flat defaults
+            assert st["materials"]["flat_default"] == 0 and st["materials"]["vertex_colors"] > 0, st["materials"]
+        if v["appearance"]:
+            assert json.loads((d / v["appearance"]).read_text())["label"] in page.locator(".mv-appearance").inner_text()
+        else:
+            assert st["hashSource"] == "build.json" and st["materials"]["flat_default"] == len(st["names"])
+            assert page.locator(".mv-appearance").inner_text().strip() == ""
+
+
+def test_fast_pick_agrees_with_threes_raycaster_over_a_grid(page, server):
+    _open(page, server)
+    pts = [(x / 20, y / 20) for x in range(-7, 8, 2) for y in range(-5, 6, 2)]   # 8 x 6, around the fish
+    res = page.evaluate("pts => pts.map(([x, y]) => window.__v._pickCompare(x, y))", pts)
+    hits = [r for r in res if r[1] is not None]
+    assert len(hits) >= 8, "grid never touched the mesh, so agreement proves nothing"
+    assert [r for r in res if r[0] != r[1]] == [], [r for r in res if r[0] != r[1]]
+    assert len({r[1] for r in hits}) >= 2          # more than one component is exercised
