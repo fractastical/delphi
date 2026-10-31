@@ -1,0 +1,1437 @@
+{
+  "schema": "frontier-source-cards-0.1",
+  "meta": {
+    "title": "Flying-fish multiscale source cards and curated questions",
+    "owner": "fable-lead",
+    "generated_utc": "2026-10-31T18:48:52Z",
+    "repo": "kganjam/delphi-frontier",
+    "branch": "work/frontier-specs",
+    "commit_note": "committed on work/frontier-specs; commit id in messages/fable-to-codex03.md",
+    "supports": "SPEC-005-agentic-engineering-demo (Root owns the normative spec; this is input, not the spec)",
+    "based_on": [
+      "SPEC-005",
+      "SPEC-026 scale ladder",
+      "ASK model (Firat)",
+      "Shenoy multiscale mechanobiology"
+    ],
+    "do_not_duplicate": [
+      "messages/flying-fish-checker.md (codex-03, 8 constraints, 71 tests)",
+      "guilds solver commit 6612af6"
+    ],
+    "reviewer_status": "single-reader (fable-lead), NOT Codex-reviewed, until root review",
+    "claims_no_flight": "Genetic/fin-proportion evidence (Daane 2021) concerns fin SIZE/PROPORTION, not flight capability. No flight is demonstrated by any molecular evidence here.",
+    "no_domain_impossibility": "Absences are bounded, dated searches, never universal impossibility. Evidence contest is first-class.",
+    "framing": "Measured ranges here are PROVENANCE-SCOPED EMPIRICAL ENVELOPES of a named sample, NOT feasibility laws and NOT a binary plausibility verdict. A design outside an envelope raises an engineering question and must state a mechanism; it is not thereby 'impossible'. Organism-context transfers (e.g. zebrafish functional results -> exocoetid/halfbeak) are labelled and UNESTABLISHED. Goal is real engineering (what to measure/build next, per curated_questions), not a pass/fail gate.",
+    "ar_reconciliation": "Fish 1990 p.394: AR defined generically as wing span squared / wing area (Lighthill 1977; Norberg 1985). p.395: the range 3.0-16.9 is measured on INDIVIDUAL PECTORAL FINS (max in Exocoetus; Fig 3 shows no significant AR-mass correlation); Table III lists Exocoetus to 19.9. Wing area for WL is pectoral+pelvic+intervening body (p.~? Methods). Applying the pectoral-fin AR bound to a candidate whole-wing b^2/S is a FLAGGED MODELLING CHOICE (guilds 'correspondence'), not the same quantity - the denominators differ. Source re-read from the Fish 1990 PDF (pdftotext) this session + guilds primary re-read; not imported memory."
+  },
+  "vocabularies": {
+    "read_level": [
+      "full-text",
+      "full-text via r.jina.ai",
+      "via fetch tool",
+      "abstract",
+      "listing",
+      "search-summary",
+      "could-not-access"
+    ],
+    "evidence_kind": [
+      "measured",
+      "fitted",
+      "assumed",
+      "design_selected",
+      "cited_source_claim",
+      "independent_rerun",
+      "inference",
+      "missing_bridge"
+    ],
+    "connector_state": [
+      "discovered",
+      "accessible",
+      "retrieved",
+      "replayed",
+      "validated",
+      "dead"
+    ],
+    "approach": [
+      "design_goal",
+      "theory_fit",
+      "literature_gap",
+      "challenge",
+      "measurement"
+    ],
+    "question_group": [
+      "executable_today",
+      "data_missing"
+    ]
+  },
+  "scales": [
+    {
+      "id": "S01",
+      "n": 1,
+      "name": "molecular",
+      "length": "0.1-10 nm",
+      "time": "fs-us",
+      "model_classes": [
+        "kinetic schemes",
+        "docking",
+        "MD"
+      ],
+      "flying_fish": {
+        "status": "claim",
+        "note": "Daane 2021: lat4a (L-type amino-acid transporter) x kcnh2a (K+ channel) regulate paired-fin PROPORTION; phylogenomic signatures across 35 species. No flight. Functional test in zebrafish; exocoetid side is association."
+      }
+    },
+    {
+      "id": "S02",
+      "n": 2,
+      "name": "macromolecular",
+      "length": "10-500 nm",
+      "time": "us-s",
+      "model_classes": [
+        "coarse-grained MD",
+        "polymer physics"
+      ],
+      "flying_fish": {
+        "status": "data_missing",
+        "note": "No exocoetid macromolecular data bearing on fin enlargement."
+      }
+    },
+    {
+      "id": "S03",
+      "n": 3,
+      "name": "subcellular",
+      "length": "0.1-5 um",
+      "time": "ms-min",
+      "model_classes": [
+        "spatial reaction-diffusion",
+        "ion-channel kinetics"
+      ],
+      "flying_fish": {
+        "status": "claim",
+        "note": "Bioelectric Vmem / K+ flux in zebrafish fin cells (kcnh2a, kcnk5b). Candidate mechanism; no exocoetid measurement."
+      }
+    },
+    {
+      "id": "S04",
+      "n": 4,
+      "name": "cellular",
+      "length": "5-50 um",
+      "time": "min-h",
+      "model_classes": [
+        "ODE/Boolean GRN",
+        "cell-state transitions"
+      ],
+      "flying_fish": {
+        "status": "claim",
+        "note": "Zebrafish fin-bud: Vmem + calcineurin set fin size (Daane 2018, Stewart 2021, Jiang 2024). Exocoetid cell data absent."
+      }
+    },
+    {
+      "id": "S05",
+      "n": 5,
+      "name": "tissue",
+      "length": "50 um-1 mm",
+      "time": "min-h",
+      "model_classes": [
+        "continuum mechanics",
+        "vertex/Potts",
+        "growth laws"
+      ],
+      "flying_fish": {
+        "status": "data_missing",
+        "note": "Mechanoregulated anisotropic-growth MODEL CLASS transfers (jaw-joint). Exocoetid fin-ray material/parameters absent; jaw-joint cartilage params do NOT transfer."
+      }
+    },
+    {
+      "id": "S06",
+      "n": 6,
+      "name": "organ",
+      "length": "0.1-10 mm",
+      "time": "h-days",
+      "model_classes": [
+        "continuum mechanics",
+        "growth laws",
+        "aerodynamics"
+      ],
+      "flying_fish": {
+        "status": "executable_today",
+        "note": "Fin/wing geometry: C3 fin-length ratio executable; C4 CG stability qualitative (witness Oxyporhamphus, no measured CG)."
+      }
+    },
+    {
+      "id": "S07",
+      "n": 7,
+      "name": "neural/control",
+      "length": "1 um-10 mm",
+      "time": "ms-s",
+      "model_classes": [
+        "sensorimotor control",
+        "compartmental"
+      ],
+      "flying_fish": {
+        "status": "data_missing",
+        "note": "Launch/glide attitude control ('rising and turning') not modelled or measured for exocoetids."
+      }
+    },
+    {
+      "id": "S08",
+      "n": 8,
+      "name": "whole-organism",
+      "length": "0.1 mm-1 m",
+      "time": "h-lifetime",
+      "model_classes": [
+        "allometric scaling",
+        "flight biomechanics"
+      ],
+      "flying_fish": {
+        "status": "executable_today",
+        "note": "Wing loading, AR, launch speed, size envelope: C1,C2,C5,C6b executable arithmetic (Fish 1990, Park & Choi 2010, FishBase)."
+      }
+    },
+    {
+      "id": "S09",
+      "n": 9,
+      "name": "developmental",
+      "length": "all",
+      "time": "h-weeks",
+      "model_classes": [
+        "positional information",
+        "allometric growth trajectory"
+      ],
+      "flying_fish": {
+        "status": "claim",
+        "note": "Fin allometry measured across clade (Daane Fig 1B; exact values in figures). Juveniles <0.05 m do not glide (Fish 1990). Exocoetid developmental series absent."
+      }
+    },
+    {
+      "id": "S10",
+      "n": 10,
+      "name": "collective",
+      "length": "1 mm-10 m",
+      "time": "h-years",
+      "model_classes": [
+        "agent-based",
+        "active matter"
+      ],
+      "flying_fish": {
+        "status": "not_occupied",
+        "note": "Schooling exists but is not part of the fin-engineering design problem; not occupied here."
+      }
+    },
+    {
+      "id": "S11",
+      "n": 11,
+      "name": "ecological/evolution",
+      "length": "1 m-km",
+      "time": "days-years",
+      "model_classes": [
+        "population dynamics",
+        "phylogenetics"
+      ],
+      "flying_fish": {
+        "status": "executable_today",
+        "note": "C6a: design placeable on time-calibrated tree (Fish Tree of Life). Ancestor RECONSTRUCTED as nested-within-halfbeaks (Lovejoy 2004) - hypothesis, not proven reachable. Predator-escape pressure asserted 167 yr, never quantified (claim, not constraint)."
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "DARWIN-ORIGIN-CH6",
+      "citation": "Darwin, On the Origin of Species, ch. VI 'Difficulties on Theory', eds 1859-1872",
+      "url": "https://darwin-online.org.uk/Variorum/1869/1869-218-dns.html",
+      "locator": "1859 p.182; 1860 p.182; 1861 p.200; 1866 p.210; 1869 p.218; 1872 p.140; 'it is conceivable that flying-fish...'",
+      "read_level": "full-text (Gutenberg 1228/22764/2009) + full-text via r.jina.ai (1869 variorum)",
+      "license": "public domain",
+      "verification": "parsed full text + variorum cross-edition apparatus; 'Exocoetus' never appears (independent_rerun grep)",
+      "evidence_kind": "cited_source_claim",
+      "note": "Conceivability argument ('imaginary illustration'), subjunctive; NOT a prediction of an inevitable path, NOT a claim of actual precursors. 'fluttering fins' is 19th-c conjecture; modern mechanism is passive gliding + tail taxiing, not flapping fins."
+    },
+    {
+      "id": "FISH-1990",
+      "citation": "Fish FE 1990, Wing design and scaling of flying fish, J Zool Lond 221:391-403",
+      "url": "https://health-sciences.wcupa.edu/sciences-mathematics/biology/fFish/documents/1990JZWing%20design.pdf",
+      "locator": "Tables I-IV; n=199 specimens / 33 spp / 6 genera",
+      "read_level": "full-text",
+      "license": "author-hosted copy; publisher (c) J Zool",
+      "verification": "PDF extracted and read",
+      "evidence_kind": "measured",
+      "note": "Source of C1 (WL<=208.9), C2 (V~sqrt WL), C5 (AR 3.0-16.9), hypocaudal 63.1%, pectoral 76-92%. Two internal inconsistencies (AR 16.9 text vs 19.9 Table III; min mass 0.001 vs 0.003 kg)."
+    },
+    {
+      "id": "PARK-CHOI-2010",
+      "citation": "Park H, Choi H 2010, Aerodynamic characteristics of flying fish in gliding flight, J Exp Biol 213:3269-3279",
+      "url": "https://doi.org/10.1242/jeb.046052",
+      "locator": "Cypselurus hiraii; wind tunnel 12 m/s, Re 1.9-2.2e4",
+      "read_level": "full-text, via fetch tool",
+      "license": "(c) JEB",
+      "verification": "two passes over HTML; numeric L/D only in figures (could-not-access)",
+      "evidence_kind": "measured",
+      "note": "Independent pectoral AR 9.0-10.7; pelvic fins >20% lift; ground-effect drag 14% water / 9% solid."
+    },
+    {
+      "id": "DAVENPORT-1992",
+      "citation": "Davenport J 1992, Wing-loading, stability and morphometrics in flying fish, J Mar Biol Assoc UK 72:25-39",
+      "url": "https://doi.org/10.1017/S0025315400048207",
+      "locator": "abstract/extract (Cambridge Core)",
+      "read_level": "abstract, via fetch tool",
+      "license": "(c) JMBA",
+      "verification": "abstract read; full text paywalled",
+      "evidence_kind": "cited_source_claim",
+      "note": "C3 (pectoral <=78-79% SL); C4 (CG-aft instability; living witness Oxyporhamphus); white-muscle launch; four-wingers larger."
+    },
+    {
+      "id": "DAVENPORT-2003",
+      "citation": "Davenport J 2003, Allometric constraints on stability and maximum size in flying fishes, J Fish Biol 62:455-463",
+      "url": "https://doi.org/10.1046/j.1095-8649.2003.00041.x",
+      "locator": "not read (Wiley Cloudflare block)",
+      "read_level": "listing + search-summary",
+      "license": "(c) Wiley",
+      "verification": "bibliography confirmed via Crossref; full text and abstract blocked",
+      "evidence_kind": "cited_source_claim",
+      "note": "The size-limit/stability paper the design problem most needs at full-text. UNREAD - access blocker, not absence."
+    },
+    {
+      "id": "LOVEJOY-2004",
+      "citation": "Lovejoy NR, Iranpour M, Collette BB 2004, Phylogeny and jaw ontogeny of beloniform fishes, Integr Comp Biol 44:366-377",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/21676722/",
+      "locator": "PMID 21676722; abstract",
+      "read_level": "abstract",
+      "license": "(c) OUP",
+      "verification": "PubMed abstract",
+      "evidence_kind": "cited_source_claim",
+      "note": "Flyingfishes nested WITHIN halfbeaks; ancestor = surface beloniform, elongated lower jaw. Ancestral reconstruction, not reachability."
+    },
+    {
+      "id": "XU-2013",
+      "citation": "Xu G-H et al. 2013, Earliest over-water gliding vertebrate (Potanichthys xingyiensis), Proc R Soc B 280:20122261",
+      "url": "https://doi.org/10.1098/rspb.2012.2261",
+      "locator": "Crossref-verified bib; press summaries",
+      "read_level": "listing + search-summary",
+      "license": "(c) Royal Society",
+      "verification": "Crossref record confirmed; content from summaries",
+      "evidence_kind": "cited_source_claim",
+      "note": "Convergent Triassic four-winger ~15 cm. Configuration is an attractor; NOT an ancestor of modern flying fish."
+    },
+    {
+      "id": "FISHTREE",
+      "citation": "Rabosky et al., Fish Tree of Life, actinopt_12k_treePL.tre",
+      "url": "https://fishtreeoflife.org/downloads/actinopt_12k_treePL.tre.xz",
+      "locator": "11,638 tips; 38 exocoetid tips + 5 Hemiramphus",
+      "read_level": "full-text (downloaded, parsed)",
+      "license": "CC BY 4.0 (project stated)",
+      "verification": "decompressed and parsed 11,638 tips with branch lengths",
+      "evidence_kind": "measured",
+      "note": "Time-calibrated tree; the one dataset both public and immediately machine-readable. Basis for C6a placement."
+    },
+    {
+      "id": "NCBI-EXOCO-GENOME",
+      "citation": "NCBI Datasets v2alpha, Exocoetidae genome report",
+      "url": "https://api.ncbi.nlm.nih.gov/datasets/v2alpha/genome/taxon/Exocoetidae/dataset_report",
+      "locator": "GCA_018398805.1 Hirundichthys speculiger, scaffold, 1.04 Gbp",
+      "read_level": "full-text (API)",
+      "license": "NCBI public",
+      "verification": "API read 2026-10-31; total_count=1",
+      "evidence_kind": "measured",
+      "note": "One scaffold-level assembly for the family. Comparative genomics across the clade is nonetheless done by Daane 2021 via targeted sequencing of 35 species."
+    },
+    {
+      "id": "FISHBASE",
+      "citation": "FishBase species pages, family Exocoetidae",
+      "url": "https://www.fishbase.se/Summary/FamilySummary.php?Family=Exocoetidae",
+      "locator": "116 species names; 69 parsed max-lengths",
+      "read_level": "full-text (scraped, parsed)",
+      "license": "FishBase terms",
+      "verification": "scraped 2026-10-31; 10.3-50.0 cm",
+      "evidence_kind": "measured",
+      "note": "Size envelope for C6b. rOpenSci fishbase API is DEAD (curl exit 000)."
+    },
+    {
+      "id": "DAANE-2021",
+      "citation": "Daane JM et al. 2021, Modulation of bioelectric cues in the evolution of flying fishes, Curr Biol 31(24):5052-5061",
+      "url": "https://doi.org/10.1016/j.cub.2021.08.054",
+      "locator": "PMC9172250; Fig 1B (fin-length vs SL), Fig 3 (kcnh2a overgrowth), Fig 4 (lat4a x kcnh2a phenocopy)",
+      "read_level": "full-text via r.jina.ai + abstract (Europe PMC core)",
+      "license": "(c) Elsevier/Cell Press; isOA=N; Europe PMC license 'None'",
+      "verification": "abstract via Europe PMC search API; main text via r.jina.ai (127 KB). fullTextXML HTTP 500; supplementaryFiles empty; author host daanelab.org DNS-unresolvable here - exact Fig 4 ratio NUMBERS not extracted (access failure, see FF-Q07)",
+      "evidence_kind": "cited_source_claim",
+      "note": "Phylogenomics 35 species; >300,000 loci; 48/17,937 genes convergent rate-shift; lat4a x kcnh2a interaction PHENOCOPIES flying-fish fin PROPORTION in zebrafish. Bioelectric + amino-acid transport. NO FLIGHT demonstrated by the genetics; exocoetid side is association, functional test is zebrafish. ORGANISM-CONTEXT TRANSFER (labelled, UNESTABLISHED): the functional phenocopy is in ZEBRAFISH; the flying-fish side is phylogenomic association. This does NOT establish that enlarging a halfbeak's or an exocoetid's paired fins is experimentally grounded - that is a cross-organism transfer hypothesis, not a result."
+    },
+    {
+      "id": "DAANE-2018",
+      "citation": "Daane JM et al. 2018, Bioelectric-calcineurin signaling module regulates allometric growth and size of the zebrafish fin, Sci Rep",
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6039437/",
+      "locator": "PMC6039437",
+      "read_level": "full-text",
+      "license": "CC BY 4.0",
+      "verification": "surveyed in morphoswarm bioelectric-zebrafish-closed-loops.md",
+      "evidence_kind": "cited_source_claim",
+      "note": "Zebrafish fin size set by bioelectric/calcineurin; fin-length/standard-length readout. Model-organism basis for the cellular-scale candidate."
+    },
+    {
+      "id": "STEWART-2021",
+      "citation": "Stewart S et al. 2021, longfin cis-ectopic kcnh2a prolongs fin outgrowth, Development 148",
+      "url": "https://doi.org/10.1242/dev.199384",
+      "locator": "accepted preprint bio_4190e57c6f29",
+      "read_level": "full-text",
+      "license": "(c) Company of Biologists",
+      "verification": "surveyed in morphoswarm bioelectric refs",
+      "evidence_kind": "cited_source_claim",
+      "note": "kcnh2a ectopic expression drives fin overgrowth; mechanistic link used by Daane 2021."
+    },
+    {
+      "id": "JIANG-2024",
+      "citation": "Jiang et al. 2024, pectoral fin bud scale via intercellular K+, Rcan2 and Kcnk5b, PLOS Biol",
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11018282/",
+      "locator": "PMC11018282",
+      "read_level": "full-text",
+      "license": "CC BY",
+      "verification": "surveyed in morphoswarm bioelectric refs",
+      "evidence_kind": "cited_source_claim",
+      "note": "Pectoral fin-bud scaling via intercellular K+ - directly relevant to paired-fin proportion."
+    },
+    {
+      "id": "JAWJOINT-GODIVIER-2024",
+      "citation": "Godivier et al. 2024, Compressive stress gradients direct mechanoregulation of anisotropic growth in the zebrafish jaw joint, PLoS Comput Biol",
+      "url": "https://doi.org/10.1371/journal.pcbi.1010940",
+      "locator": "PMC10880962; Zenodo 7586155; LoadScaling.lean",
+      "read_level": "full-text (paper); full-text (deposit workbook)",
+      "license": "CC BY 4.0 (deposit)",
+      "verification": "workbook recomputes to 2e-16; Lean homogeneity lemma",
+      "evidence_kind": "cited_source_claim",
+      "note": "Mechanoregulated anisotropic-growth MODEL CLASS (transfers); zebrafish jaw cartilage PARAMETERS do NOT transfer to a fin ray."
+    },
+    {
+      "id": "BIOMODELS-TIWARI-2021",
+      "citation": "Tiwari K et al. 2021, Reproducibility in systems biology modelling, Mol Syst Biol",
+      "url": "https://www.ebi.ac.uk/biomodels/reproducibility",
+      "locator": "PMC7901289; 455 ODE models",
+      "read_level": "full-text (455 rows parsed)",
+      "license": "CC BY (open access)",
+      "verification": "parsed 455 rows; R 233 / NRP 169 / RMC 40 / RAH 13",
+      "evidence_kind": "measured",
+      "note": "Replayable ODE library + base rate. No entry couples to a flying-fish scale."
+    },
+    {
+      "id": "ASK-FIRAT",
+      "citation": "Firat M, Active Scientific Knowledge (ASK): A Conceptual Model for Machine-Actionable and Versioned Science",
+      "url": "https://doi.org/10.2139/ssrn.7416579",
+      "locator": "SSRN; ASK Activation Test (six dimensions)",
+      "read_level": "full-text",
+      "license": "SSRN posted",
+      "verification": "PDF sha256 cc709a9... ; analysed in morphoswarm ASK report",
+      "evidence_kind": "cited_source_claim",
+      "note": "Six dimensions map 1:1 onto Frontier primitives; 'missing capacities must remain visible'."
+    },
+    {
+      "id": "SHENOY-LAB",
+      "citation": "Shenoy Lab, Multiscale Mechanobiology & Biomaterials, UPenn",
+      "url": "https://shenoy.engineering.upenn.edu/",
+      "locator": "homepage mission + 4 research areas",
+      "read_level": "via fetch tool",
+      "license": "n/a",
+      "verification": "fetched 2026-10-31 (301 redirect followed)",
+      "evidence_kind": "cited_source_claim",
+      "note": "nucleus->cell->tissue->organ, um-cm; multiphysics continuum. Transferable structure, organism-specific parameters."
+    },
+    {
+      "id": "VAE-2509",
+      "citation": "Tomasev N et al. 2025, Virtual Agent Economies, Google DeepMind",
+      "url": "https://arxiv.org/abs/2509.10147",
+      "locator": "arXiv 2509.10147",
+      "read_level": "search-summary",
+      "license": "arXiv",
+      "verification": "abstract fragments + mirrors; full PDF not parsed here",
+      "evidence_kind": "cited_source_claim",
+      "note": "Sandbox economy origin x permeability; impermeable mission economy; equal endowment; auction allocation."
+    }
+  ],
+  "parameters": [
+    {
+      "id": "P-WL-RANGE",
+      "variable": "wing loading",
+      "symbol": "WL",
+      "unit": "N/m^2",
+      "value_or_range": "11.7-208.9",
+      "organism_context": "6 exocoetid genera, 199 specimens",
+      "source": "FISH-1990",
+      "locator": "Table II; Results",
+      "evidence_kind": "measured",
+      "assumption_scope": "wing area excludes ventral body; biases WL high for flattened Cypselurus",
+      "transfer_limits": "observed envelope of 199 specimens, NOT a feasibility law; top-of-sample, not a demonstrated physical ceiling; wing area = pectoral+pelvic+body (so excludes nothing ventral between fins)"
+    },
+    {
+      "id": "P-WL-FIT",
+      "variable": "wing-loading allometry",
+      "symbol": "WL=a*M^b",
+      "unit": "a in N/m^2, M in kg",
+      "value_or_range": "Cypselurus a=285.015 b=0.400; Hirundichthys a=390.069 b=0.526",
+      "organism_context": "per genus",
+      "source": "FISH-1990",
+      "locator": "Table II r.m.a. fits",
+      "evidence_kind": "fitted",
+      "assumption_scope": "valid within 0.003-0.53 kg",
+      "transfer_limits": "extrapolation beyond 0.53 kg is assumed, not measured"
+    },
+    {
+      "id": "P-AR-PECTORAL-RANGE",
+      "variable": "individual pectoral-fin aspect ratio",
+      "symbol": "AR = (pectoral span)^2 / (pectoral fin area)",
+      "unit": "dimensionless",
+      "value_or_range": "3.0-16.9 (Fish 1990 p.395; Table III to 19.9 for Exocoetus)",
+      "organism_context": "individual pectoral fins, 6 genera (max Exocoetus)",
+      "source": "FISH-1990",
+      "locator": "p.394 (AR definition: span^2/area); p.395 'The aspect ratios (AR) of individual flying fish pectoral fins range from 3.0 to 16.9'; Table III",
+      "evidence_kind": "measured",
+      "assumption_scope": "DEFINITION matters: 3.0-16.9 is INDIVIDUAL PECTORAL-FIN AR, not whole-wing. The checker applies this bound to a candidate whole-wing b^2/S (pectoral+pelvic+body, the wing area used for WL) as a FLAGGED MODELLING CHOICE (guilds correspondence), NOT an identity - denominators differ.",
+      "transfer_limits": "observed envelope of a sample, not a feasibility law; 16.9<AR<=19.9 undetermined (text vs Table III)",
+      "contradiction": "Fish 1990 text max 16.9 vs Table III max 19.9 (both for pectoral fin)"
+    },
+    {
+      "id": "P-AR-PECTORAL",
+      "variable": "pectoral-fin aspect ratio",
+      "symbol": "AR_pec",
+      "unit": "dimensionless",
+      "value_or_range": "9.0-10.7",
+      "organism_context": "Cypselurus hiraii",
+      "source": "PARK-CHOI-2010",
+      "evidence_kind": "measured",
+      "assumption_scope": "pectoral fin only, not whole wing",
+      "transfer_limits": "different definition from P-AR-WHOLEWING; do not conflate",
+      "note": "SAME quantity as P-AR-PECTORAL-RANGE (pectoral-fin AR); Park & Choi 9.0-10.7 corroborates Fish 1990's pectoral range"
+    },
+    {
+      "id": "P-LAUNCH",
+      "variable": "launch (taxi) speed",
+      "symbol": "V",
+      "unit": "m/s",
+      "value_or_range": "10 -> 16-20",
+      "organism_context": "Cypselurus",
+      "source": "FISH-1990",
+      "locator": "relayed from Shoulejkin 1929 et al.",
+      "evidence_kind": "cited_source_claim",
+      "assumption_scope": "V ~ sqrt(WL) is Pennycuick 1972 textbook relation",
+      "transfer_limits": "anchor speed from older literature (relayed), moderate grade"
+    },
+    {
+      "id": "P-FINLEN-RATIO",
+      "variable": "pectoral fin length / standard length ceiling",
+      "symbol": "Lpec/SL",
+      "unit": "dimensionless",
+      "value_or_range": "<= 0.78-0.79",
+      "organism_context": "exocoetid",
+      "source": "DAVENPORT-1992",
+      "evidence_kind": "cited_source_claim",
+      "assumption_scope": "abstract-grade (Davenport 1992); mechanism ('swimming impaired') unread; a REPORTED limit from one abstract, NOT a demonstrated feasibility law",
+      "transfer_limits": "only published numeric wing-geometry ceiling; basis of C3"
+    },
+    {
+      "id": "P-HYPOCAUDAL",
+      "variable": "hypocaudal lobe fraction of caudal area",
+      "symbol": "",
+      "unit": "%",
+      "value_or_range": "63.1 +/- 0.5",
+      "organism_context": "pooled, conserved across genera",
+      "source": "FISH-1990",
+      "locator": "Table; ANOVA n.s. among genera",
+      "evidence_kind": "measured",
+      "assumption_scope": "the launch motor (taxiing), not a flight wing",
+      "transfer_limits": "conserved asymmetry"
+    },
+    {
+      "id": "P-PECT-SHARE",
+      "variable": "pectoral share of total wing area",
+      "symbol": "",
+      "unit": "%",
+      "value_or_range": "75.99-91.83",
+      "organism_context": "6 genera (Exocoetus highest)",
+      "source": "FISH-1990",
+      "locator": "Table IV, ANOVA P<0.0001",
+      "evidence_kind": "measured",
+      "assumption_scope": "",
+      "transfer_limits": ""
+    },
+    {
+      "id": "P-SIZE-ENV",
+      "variable": "max standard/total length (extant)",
+      "symbol": "",
+      "unit": "cm",
+      "value_or_range": "10.3-50.0",
+      "organism_context": "69 of 116 FishBase species",
+      "source": "FISHBASE",
+      "evidence_kind": "measured",
+      "assumption_scope": "observed extant-species envelope (69/116 FishBase names), NOT a physical or feasibility limit",
+      "transfer_limits": "a design above 0.50 m leaves the extant envelope and must state a mechanism; it is not thereby impossible"
+    },
+    {
+      "id": "P-CG-OFFSET",
+      "variable": "centre-of-gravity offset from pectoral centre of pressure",
+      "symbol": "",
+      "unit": "fraction of SL",
+      "value_or_range": "UNKNOWN",
+      "organism_context": "no exocoetid measured",
+      "source": "DAVENPORT-1992",
+      "evidence_kind": "assumed",
+      "assumption_scope": "C4 is qualitative; no numeric CG exists for any exocoetid",
+      "transfer_limits": "do not invent a number; witness Oxyporhamphus"
+    },
+    {
+      "id": "P-GLIDE-DIST",
+      "variable": "single-glide distance",
+      "symbol": "",
+      "unit": "m",
+      "value_or_range": "68 (measured, Breder 1930); 15-92 typical",
+      "organism_context": "Cypselurus",
+      "source": "FISH-1990",
+      "evidence_kind": "cited_source_claim",
+      "assumption_scope": "'400 m' is REJECTED (Fish: 'no consistent data')",
+      "transfer_limits": "do not threshold on 400 m"
+    },
+    {
+      "id": "P-FINALLOM-DAANE",
+      "variable": "fin length vs body size (standard length) across clade",
+      "symbol": "",
+      "unit": "dimensionless allometry",
+      "value_or_range": "measured (exact per-species values in Fig 1B/Fig 4, not extracted)",
+      "organism_context": "beloniform clade incl. flying fishes",
+      "source": "DAANE-2021",
+      "locator": "Figure 1B; Figure 4",
+      "evidence_kind": "measured",
+      "assumption_scope": "exact numbers in figures/source-data; author host unreachable here (FF-Q07)",
+      "transfer_limits": "this is the SAME fin/SL ratio Fish 1990 and zebrafish fin work use - comparable across scales"
+    },
+    {
+      "id": "P-CONVGENES",
+      "variable": "convergent evolutionary-rate-shift genes",
+      "symbol": "",
+      "unit": "count",
+      "value_or_range": "48 of 17,937",
+      "organism_context": "gliding beloniforms",
+      "source": "DAANE-2021",
+      "evidence_kind": "measured",
+      "assumption_scope": "after false-discovery control (text)",
+      "transfer_limits": "association signal; lat4a/kcnh2a are the functionally-tested subset"
+    }
+  ],
+  "constraints_ref": [
+    {
+      "id": "C1",
+      "name": "wing-loading envelope",
+      "expression": "WL = M*g/S <= 209 N/m^2",
+      "source_ids": [
+        "FISH-1990"
+      ],
+      "param_ids": [
+        "P-WL-RANGE",
+        "P-WL-FIT"
+      ],
+      "executable_today": true,
+      "implemented_in": "messages/flying-fish-checker.md + guilds 6612af6",
+      "note": "HIGH empirically, MODERATE as a biological limit",
+      "envelope_not_law": true,
+      "semantics": "outside the sourced envelope -> raises an engineering question / requires a stated mechanism; NOT a universal infeasibility verdict"
+    },
+    {
+      "id": "C2",
+      "name": "launch-speed ratchet",
+      "expression": "V >= 16*sqrt(WL/205.5) m/s",
+      "source_ids": [
+        "FISH-1990"
+      ],
+      "param_ids": [
+        "P-LAUNCH",
+        "P-WL-FIT"
+      ],
+      "executable_today": true,
+      "implemented_in": "checker",
+      "note": "HIGH physics, MODERATE anchor",
+      "envelope_not_law": true,
+      "semantics": "outside the sourced envelope -> raises an engineering question / requires a stated mechanism; NOT a universal infeasibility verdict"
+    },
+    {
+      "id": "C3",
+      "name": "pectoral fin-length ceiling",
+      "expression": "Lpec <= 0.79*SL",
+      "source_ids": [
+        "DAVENPORT-1992"
+      ],
+      "param_ids": [
+        "P-FINLEN-RATIO"
+      ],
+      "executable_today": true,
+      "implemented_in": "checker",
+      "note": "MODERATE (abstract-grade)",
+      "envelope_not_law": true,
+      "semantics": "outside the sourced envelope -> raises an engineering question / requires a stated mechanism; NOT a universal infeasibility verdict"
+    },
+    {
+      "id": "C4",
+      "name": "longitudinal stability",
+      "expression": "CG at/forward of pectoral CoP OR pelvic tailplane",
+      "source_ids": [
+        "DAVENPORT-1992",
+        "DAVENPORT-2003",
+        "PARK-CHOI-2010"
+      ],
+      "param_ids": [
+        "P-CG-OFFSET"
+      ],
+      "executable_today": false,
+      "implemented_in": "checker (qualitative; CANNOT-EVALUATE without CG)",
+      "note": "qualitative-with-witness Oxyporhamphus; no numeric magnitude",
+      "envelope_not_law": true,
+      "semantics": "outside the sourced envelope -> raises an engineering question / requires a stated mechanism; NOT a universal infeasibility verdict"
+    },
+    {
+      "id": "C5",
+      "name": "aspect-ratio envelope",
+      "expression": "pectoral-fin AR in 3.0-16.9 (individual pectoral fin, Fish 1990 p.395); 16.9-19.9 undetermined",
+      "source_ids": [
+        "FISH-1990",
+        "PARK-CHOI-2010"
+      ],
+      "param_ids": [
+        "P-AR-WHOLEWING",
+        "P-AR-PECTORAL"
+      ],
+      "executable_today": true,
+      "implemented_in": "checker",
+      "note": "bound is INDIVIDUAL PECTORAL-FIN AR; checker applies it to whole-wing b^2/S as a flagged correspondence, not an identity (see meta.ar_reconciliation)",
+      "envelope_not_law": true,
+      "semantics": "outside the sourced envelope -> raises an engineering question / requires a stated mechanism; NOT a universal infeasibility verdict"
+    },
+    {
+      "id": "C6a",
+      "name": "reachability from ancestor",
+      "expression": "enlarged fin rays + hypocaudal tail motor only; no novel appendage/flapping/dorsal wing",
+      "source_ids": [
+        "LOVEJOY-2004",
+        "FISH-1990",
+        "DAVENPORT-1992"
+      ],
+      "param_ids": [],
+      "executable_today": true,
+      "implemented_in": "checker + FISHTREE",
+      "note": "ancestor reconstructed, not proven reachable",
+      "envelope_not_law": true,
+      "semantics": "outside the sourced envelope -> raises an engineering question / requires a stated mechanism; NOT a universal infeasibility verdict"
+    },
+    {
+      "id": "C6b",
+      "name": "size envelope",
+      "expression": "max length <= 0.50 m or state why",
+      "source_ids": [
+        "FISHBASE"
+      ],
+      "param_ids": [
+        "P-SIZE-ENV"
+      ],
+      "executable_today": true,
+      "implemented_in": "checker",
+      "note": "extant-species envelope, not a physical limit",
+      "envelope_not_law": true,
+      "semantics": "outside the sourced envelope -> raises an engineering question / requires a stated mechanism; NOT a universal infeasibility verdict"
+    },
+    {
+      "id": "C6c",
+      "name": "no juvenile glide",
+      "expression": "no gliding stage below ~0.05 m body length",
+      "source_ids": [
+        "FISH-1990"
+      ],
+      "param_ids": [],
+      "executable_today": true,
+      "implemented_in": "checker",
+      "note": "relayed Hubbs 1933",
+      "envelope_not_law": true,
+      "semantics": "outside the sourced envelope -> raises an engineering question / requires a stated mechanism; NOT a universal infeasibility verdict"
+    }
+  ],
+  "models_and_bridges": [
+    {
+      "id": "M-JAWJOINT",
+      "name": "mechanoregulated anisotropic-growth law",
+      "scale_from": "S05",
+      "scale_to": "S06",
+      "status": "class_transfers_params_do_not",
+      "transfers": "the growth-law form + replayable workbook + Lean homogeneity lemma",
+      "does_not_transfer": "zebrafish jaw cartilage modulus, point-load BCs, ~57k-cycle load spectrum",
+      "source_ids": [
+        "JAWJOINT-GODIVIER-2024"
+      ]
+    },
+    {
+      "id": "M-BIOELECTRIC-FIN",
+      "name": "bioelectric/amino-acid-transport fin-size control",
+      "scale_from": "S01",
+      "scale_to": "S06",
+      "status": "zebrafish_claim_bridge_to_exocoetid_missing",
+      "transfers": "candidate mechanism (lat4a x kcnh2a; Vmem + calcineurin) for fin PROPORTION",
+      "does_not_transfer": "no exocoetid functional test; no flight; flying-fish side is association",
+      "source_ids": [
+        "DAANE-2021",
+        "DAANE-2018",
+        "STEWART-2021",
+        "JIANG-2024"
+      ],
+      "organism_context_transfer": "zebrafish (functional) -> exocoetid/halfbeak (association only); UNESTABLISHED cross-organism transfer; no flight"
+    },
+    {
+      "id": "M-BIOMODELS",
+      "name": "BioModels ODE library",
+      "scale_from": "S01",
+      "scale_to": "S05",
+      "status": "replayable_library_no_flying_fish_coupling",
+      "transfers": "233/455 replay as deposited",
+      "does_not_transfer": "no entry couples to a flying-fish scale",
+      "source_ids": [
+        "BIOMODELS-TIWARI-2021"
+      ]
+    }
+  ],
+  "connectors": [
+    {
+      "id": "CN-NCBI",
+      "name": "NCBI Datasets / E-utilities",
+      "state": "retrieved",
+      "scale": "S01",
+      "date": "2026-10-31",
+      "note": "Exocoetidae=1 assembly; SRA 53; nuccore 1489"
+    },
+    {
+      "id": "CN-ENA",
+      "name": "EBI ENA fasta",
+      "state": "validated",
+      "scale": "S01",
+      "date": "2026-10-31",
+      "note": "bp counts matched"
+    },
+    {
+      "id": "CN-FISHTREE",
+      "name": "Fish Tree of Life .tre",
+      "state": "replayed",
+      "scale": "S11",
+      "date": "2026-10-31",
+      "note": "11,638 tips parsed"
+    },
+    {
+      "id": "CN-FISHBASE",
+      "name": "FishBase HTML",
+      "state": "replayed",
+      "scale": "S08",
+      "date": "2026-10-31",
+      "note": "69/116 max-lengths"
+    },
+    {
+      "id": "CN-FISHBASE-API",
+      "name": "rOpenSci fishbase API",
+      "state": "dead",
+      "scale": "S08",
+      "date": "2026-10-31",
+      "note": "curl exit 000; 4 control hosts 200"
+    },
+    {
+      "id": "CN-BIOMODELS",
+      "name": "BioModels reproducibility index",
+      "state": "replayed",
+      "scale": "S05",
+      "date": "2026-10-31",
+      "note": "455 rows parsed"
+    },
+    {
+      "id": "CN-EPMC-SEARCH",
+      "name": "Europe PMC search JSON",
+      "state": "retrieved",
+      "scale": "all",
+      "date": "2026-10-31",
+      "note": "Daane abstract + metadata"
+    },
+    {
+      "id": "CN-EPMC-XML",
+      "name": "Europe PMC fullTextXML",
+      "state": "accessible",
+      "scale": "all",
+      "date": "2026-10-31",
+      "note": "HTTP 500 for non-OA PMC9172250; OA records serve XML"
+    },
+    {
+      "id": "CN-JINA",
+      "name": "r.jina.ai public proxy",
+      "state": "retrieved",
+      "scale": "all",
+      "date": "2026-10-31",
+      "note": "Daane full text 127 KB; Darwin variorum recovered from 403"
+    },
+    {
+      "id": "CN-DAANELAB",
+      "name": "author host daanelab.org",
+      "state": "dead",
+      "scale": "S01",
+      "date": "2026-10-31",
+      "note": "DNS no-answer here; Jina 422. Exact Fig 4 ratios NOT extracted - access failure, not absence (FF-Q07)"
+    },
+    {
+      "id": "CN-ZENODO",
+      "name": "Zenodo records API",
+      "state": "replayed",
+      "scale": "S05",
+      "date": "2026-10-31",
+      "note": "jaw-joint 7586155 readable; 5786693 -> 403"
+    },
+    {
+      "id": "CN-DRYAD",
+      "name": "Dryad search API",
+      "state": "retrieved",
+      "scale": "S08",
+      "date": "2026-10-31",
+      "note": "Exocoetidae -> 0; 'flying fish morphometrics' -> 1 (bird-blowfly, irrelevant)"
+    },
+    {
+      "id": "CN-FIGSHARE",
+      "name": "Figshare articles search",
+      "state": "accessible",
+      "scale": "S08",
+      "date": "2026-10-31",
+      "note": "search_for=Exocoetidae returned UNRELATED results - inconclusive, not a clean negative"
+    },
+    {
+      "id": "CN-MORPHOBANK",
+      "name": "MorphoBank API",
+      "state": "dead",
+      "scale": "S08",
+      "date": "2026-10-31",
+      "note": "HTTP 403 - NOT accessed"
+    }
+  ],
+  "bounded_searches": [
+    {
+      "id": "BS-MORPHOMETRICS",
+      "date": "2026-10-31",
+      "goal": "downloadable per-specimen paired pectoral-fin-area + body-mass for exocoetids",
+      "repositories_queried": [
+        "Dryad",
+        "Zenodo",
+        "Figshare",
+        "MorphoBank"
+      ],
+      "queries": [
+        "Dryad q=Exocoetidae (0); Dryad q='flying fish morphometrics' (1 irrelevant)",
+        "Zenodo q=Exocoetidae (353, all taxonomic treatments); q='flying fish wing loading' (empty)",
+        "Figshare search_for=Exocoetidae (8 unrelated - inconclusive)",
+        "MorphoBank API searchterm=Exocoetidae (HTTP 403, not accessed)"
+      ],
+      "result": "no downloadable per-specimen paired fin-area x mass dataset found on these four repositories on this date",
+      "interpretation": "searched-not-found, NOT universal absence; Figshare inconclusive; MorphoBank not accessed",
+      "leads": [
+        "Fish 1990 measured it (199 specimens) but published only r.m.a. coefficients",
+        "Beagle/Voyage flying-fish observation unread (listing)"
+      ]
+    }
+  ],
+  "curated_questions": [
+    {
+      "id": "FF-Q01",
+      "title": "Does a candidate exocoetid-grade form satisfy the aerodynamic envelope?",
+      "approach": "design_goal",
+      "scales": [
+        "S08",
+        "S06"
+      ],
+      "context_tags": [
+        "biomechanics",
+        "refutation",
+        "top-down"
+      ],
+      "dependencies": {
+        "claims": [
+          "FISH-1990",
+          "PARK-CHOI-2010"
+        ],
+        "parameters": [
+          "P-WL-RANGE",
+          "P-WL-FIT",
+          "P-AR-WHOLEWING"
+        ]
+      },
+      "success_criterion": "C1,C2,C5 all PASS on supplied mass/area/span",
+      "rejection_criterion": "any inequality violated; the witnessing number is returned",
+      "needed_data": "candidate mass, wing area, span",
+      "needed_tool": "flying-fish-checker (exists)",
+      "group": "executable_today",
+      "links": {
+        "models": [],
+        "data": [
+          "P-WL-FIT"
+        ],
+        "design_outcomes": [
+          "checker verdict REFUTED/NOT_REFUTED"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q02",
+      "title": "Is a form reachable by enlarging existing fins from a halfbeak ancestor?",
+      "approach": "theory_fit",
+      "scales": [
+        "S11",
+        "S06"
+      ],
+      "context_tags": [
+        "evolvability",
+        "bottom-up",
+        "phylogeny"
+      ],
+      "dependencies": {
+        "claims": [
+          "LOVEJOY-2004",
+          "FISH-1990"
+        ],
+        "parameters": []
+      },
+      "success_criterion": "form uses only enlarged fin rays + hypocaudal motor; placeable among exocoetid tips on the tree",
+      "rejection_criterion": "requires a novel appendage, jointed/flapping wing, dorsal wing, or aerobic flight muscle",
+      "needed_data": "form morphology description",
+      "needed_tool": "checker C6a + FISHTREE",
+      "group": "executable_today",
+      "links": {
+        "models": [],
+        "data": [
+          "FISHTREE"
+        ],
+        "design_outcomes": [
+          "reachable/unreachable label (hypothesis, not proof)"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q03",
+      "title": "Can a >0.50 m form stay within the wing-loading and fin-length limits?",
+      "approach": "challenge",
+      "scales": [
+        "S08",
+        "S06"
+      ],
+      "context_tags": [
+        "size-limit",
+        "top-down"
+      ],
+      "dependencies": {
+        "claims": [
+          "FISH-1990",
+          "FISHBASE"
+        ],
+        "parameters": [
+          "P-SIZE-ENV",
+          "P-WL-FIT",
+          "P-FINLEN-RATIO"
+        ]
+      },
+      "success_criterion": "form states an explicit compensating mechanism for WL and launch speed",
+      "rejection_criterion": "silently exceeds the 50 cm envelope and 209 N/m^2 without mechanism",
+      "needed_data": "Davenport 2003 size-limit argument (FF-Q10)",
+      "needed_tool": "checker",
+      "group": "executable_today",
+      "links": {
+        "models": [],
+        "data": [
+          "P-WL-FIT"
+        ],
+        "design_outcomes": [
+          "bounded or refuted size claim"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q04",
+      "title": "Does the lat4a x kcnh2a fin-proportion mechanism predict the observed exocoetid pectoral allometry?",
+      "approach": "theory_fit",
+      "scales": [
+        "S01",
+        "S06",
+        "S08"
+      ],
+      "context_tags": [
+        "molecule-to-form",
+        "discrepancy",
+        "bottom-up",
+        "predicted-vs-observed"
+      ],
+      "dependencies": {
+        "claims": [
+          "DAANE-2021",
+          "FISH-1990"
+        ],
+        "parameters": [
+          "P-FINALLOM-DAANE",
+          "P-PECT-SHARE",
+          "P-AR-WHOLEWING"
+        ]
+      },
+      "success_criterion": "the zebrafish genetic-model fin proportion matches the measured exocoetid pectoral allometry within stated error",
+      "rejection_criterion": "predicted and observed fin proportions are discrepant beyond error -> a new open question about the missing bridge",
+      "needed_data": "exact Daane Fig 4 ratios (FF-Q07) + raw exocoetid morphometrics (FF-Q06)",
+      "needed_tool": "allometry comparison; NO flight inference",
+      "group": "data_missing",
+      "links": {
+        "models": [
+          "M-BIOELECTRIC-FIN"
+        ],
+        "data": [
+          "P-FINALLOM-DAANE",
+          "P-PECT-SHARE"
+        ],
+        "design_outcomes": [
+          "bridge confirmed or a new discrepancy question"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q05",
+      "title": "Measure a centre-of-gravity offset for at least one exocoetid to give C4 a number",
+      "approach": "measurement",
+      "scales": [
+        "S06",
+        "S08"
+      ],
+      "context_tags": [
+        "stability",
+        "missing-parameter"
+      ],
+      "dependencies": {
+        "claims": [
+          "DAVENPORT-1992"
+        ],
+        "parameters": [
+          "P-CG-OFFSET"
+        ]
+      },
+      "success_criterion": "a measured CG offset (fraction of SL) for >=1 species with uncertainty",
+      "rejection_criterion": "no specimen/measurement obtainable -> C4 stays qualitative",
+      "needed_data": "specimen CG via balance or uCT",
+      "needed_tool": "uCT or physical measurement",
+      "group": "data_missing",
+      "links": {
+        "models": [],
+        "data": [
+          "P-CG-OFFSET"
+        ],
+        "design_outcomes": [
+          "C4 becomes quantitative or stays qualitative-with-witness"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q06",
+      "title": "Find a downloadable per-specimen paired fin-area + body-mass dataset",
+      "approach": "literature_gap",
+      "scales": [
+        "S06",
+        "S08"
+      ],
+      "context_tags": [
+        "raw-data",
+        "bounded-search"
+      ],
+      "dependencies": {
+        "claims": [
+          "FISH-1990"
+        ],
+        "parameters": [
+          "P-WL-RANGE",
+          "P-PECT-SHARE"
+        ]
+      },
+      "success_criterion": "a downloadable per-specimen table (Dryad/Figshare/Zenodo/MorphoBank/other)",
+      "rejection_criterion": "bounded search recorded with repositories+date+queries and stopped (done 2026-10-31: none found; Figshare inconclusive; MorphoBank 403)",
+      "needed_data": "the deposit itself",
+      "needed_tool": "repository search",
+      "group": "data_missing",
+      "links": {
+        "models": [],
+        "data": [
+          "BS-MORPHOMETRICS"
+        ],
+        "design_outcomes": [
+          "organ->organism coupling moves from fitted to measured, or stays fitted"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q07",
+      "title": "Extract the exact Figure 4 fin/body ratios from Daane 2021 source data",
+      "approach": "measurement",
+      "scales": [
+        "S01",
+        "S06"
+      ],
+      "context_tags": [
+        "molecule-to-form",
+        "access-blocker"
+      ],
+      "dependencies": {
+        "claims": [
+          "DAANE-2021"
+        ],
+        "parameters": [
+          "P-FINALLOM-DAANE"
+        ]
+      },
+      "success_criterion": "numeric fin/body ratios (wild-type, single, double mutant, flying-fish) with CI from the supplement/source data",
+      "rejection_criterion": "source data inaccessible from this environment (author host DNS-unresolvable; PMC/EPMC XML blocked for non-OA) - recorded as access failure, NOT absence",
+      "needed_data": "Daane supplement / Current Biology source data",
+      "needed_tool": "institutional access or working author-host route",
+      "group": "data_missing",
+      "links": {
+        "models": [
+          "M-BIOELECTRIC-FIN"
+        ],
+        "data": [
+          "P-FINALLOM-DAANE"
+        ],
+        "design_outcomes": [
+          "quantified molecule->form phenocopy magnitude"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q08",
+      "title": "Is the lat4a/kcnh2a mechanism present and active in an exocoetid (not only zebrafish)?",
+      "approach": "challenge",
+      "scales": [
+        "S01",
+        "S04"
+      ],
+      "context_tags": [
+        "molecule-to-form",
+        "association-vs-function",
+        "no-flight"
+      ],
+      "dependencies": {
+        "claims": [
+          "DAANE-2021",
+          "STEWART-2021"
+        ],
+        "parameters": []
+      },
+      "success_criterion": "exocoetid expression/functional data for lat4a/kcnh2a in the paired fin",
+      "rejection_criterion": "only phylogenomic association exists; functional demonstration remains zebrafish-only",
+      "needed_data": "exocoetid fin transcriptomics/functional assay",
+      "needed_tool": "wet-lab (out of scope here)",
+      "group": "data_missing",
+      "links": {
+        "models": [
+          "M-BIOELECTRIC-FIN"
+        ],
+        "data": [],
+        "design_outcomes": [
+          "bridge confirmed in-organism or stays association"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q09",
+      "title": "Quantify the selective pressure driving gliding (predator-escape vs locomotor-cost)",
+      "approach": "literature_gap",
+      "scales": [
+        "S11"
+      ],
+      "context_tags": [
+        "selection",
+        "unquantified",
+        "contested"
+      ],
+      "dependencies": {
+        "claims": [
+          "DARWIN-ORIGIN-CH6",
+          "FISH-1990"
+        ],
+        "parameters": []
+      },
+      "success_criterion": "a measured selection differential on gliding performance",
+      "rejection_criterion": "only 167-yr assertion found (PubMed-scoped: 33 family papers, 0 measurements)",
+      "needed_data": "field selection study",
+      "needed_tool": "ecological measurement",
+      "group": "data_missing",
+      "links": {
+        "models": [],
+        "data": [],
+        "design_outcomes": [
+          "a design cannot be failed for selective story; keep both hypotheses"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q10",
+      "title": "Read Davenport 2003 size-limit argument at full text",
+      "approach": "literature_gap",
+      "scales": [
+        "S08"
+      ],
+      "context_tags": [
+        "size-limit",
+        "paywall"
+      ],
+      "dependencies": {
+        "claims": [
+          "DAVENPORT-2003"
+        ],
+        "parameters": [
+          "P-SIZE-ENV"
+        ]
+      },
+      "success_criterion": "extract the maximum-size/stability argument -> a real C1/C6b bound",
+      "rejection_criterion": "Wiley Cloudflare block persists (true as of 2026-10-31)",
+      "needed_data": "the paper",
+      "needed_tool": "institutional access",
+      "group": "data_missing",
+      "links": {
+        "models": [],
+        "data": [
+          "P-SIZE-ENV"
+        ],
+        "design_outcomes": [
+          "stronger size constraint or unchanged"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q11",
+      "title": "Re-parametrize the mechanoregulated-growth class for a fin ray under launch/glide load",
+      "approach": "theory_fit",
+      "scales": [
+        "S05",
+        "S06"
+      ],
+      "context_tags": [
+        "mechanobiology",
+        "transfer",
+        "bottom-up"
+      ],
+      "dependencies": {
+        "claims": [
+          "JAWJOINT-GODIVIER-2024"
+        ],
+        "parameters": []
+      },
+      "success_criterion": "a fin-ray growth model with a measured exocoetid modulus and a fin-relevant load spectrum",
+      "rejection_criterion": "no exocoetid fin-ray modulus exists -> model class only, parameters a gap",
+      "needed_data": "fin-ray nanoindentation; launch/glide load spectrum",
+      "needed_tool": "FE model + Lean homogeneity lemma",
+      "group": "data_missing",
+      "links": {
+        "models": [
+          "M-JAWJOINT"
+        ],
+        "data": [],
+        "design_outcomes": [
+          "tissue->organ coupling built or marked gap"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q12",
+      "title": "Resolve the aspect-ratio definition/contradiction inside a design check",
+      "approach": "challenge",
+      "scales": [
+        "S06",
+        "S08"
+      ],
+      "context_tags": [
+        "data-quality",
+        "contradiction"
+      ],
+      "dependencies": {
+        "claims": [
+          "FISH-1990",
+          "PARK-CHOI-2010"
+        ],
+        "parameters": [
+          "P-AR-WHOLEWING",
+          "P-AR-PECTORAL"
+        ]
+      },
+      "success_criterion": "both AR definitions carried; 16.9-19.9 band returns CANNOT-EVALUATE",
+      "rejection_criterion": "a single silent AR threshold is applied",
+      "needed_data": "Fish 1990 raw AR distribution (not published)",
+      "needed_tool": "checker + Constraint object",
+      "group": "executable_today",
+      "links": {
+        "models": [],
+        "data": [
+          "P-AR-WHOLEWING"
+        ],
+        "design_outcomes": [
+          "honest AR check"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q13",
+      "title": "Does a four-winged (pelvic-tailplane) form fix the Oxyporhamphus CG failure?",
+      "approach": "design_goal",
+      "scales": [
+        "S06",
+        "S08"
+      ],
+      "context_tags": [
+        "stability",
+        "top-down",
+        "witness"
+      ],
+      "dependencies": {
+        "claims": [
+          "DAVENPORT-1992",
+          "PARK-CHOI-2010"
+        ],
+        "parameters": [
+          "P-CG-OFFSET"
+        ]
+      },
+      "success_criterion": "form carries a pelvic tailplane aft OR CG forward of pectoral CoP -> C4 passes qualitatively",
+      "rejection_criterion": "pectorals-only form with CG aft -> same failure mode as the living witness Oxyporhamphus",
+      "needed_data": "form pelvic-fin geometry + CG (FF-Q05)",
+      "needed_tool": "checker C4",
+      "group": "data_missing",
+      "links": {
+        "models": [],
+        "data": [
+          "P-CG-OFFSET"
+        ],
+        "design_outcomes": [
+          "stable four-winger vs refuted two-winger"
+        ]
+      }
+    },
+    {
+      "id": "FF-Q14",
+      "title": "Place a candidate on the Fish Tree of Life and report nearest extant tips",
+      "approach": "measurement",
+      "scales": [
+        "S11"
+      ],
+      "context_tags": [
+        "phylogeny",
+        "reachability-context"
+      ],
+      "dependencies": {
+        "claims": [
+          "LOVEJOY-2004"
+        ],
+        "parameters": []
+      },
+      "success_criterion": "nearest exocoetid/halfbeak tips + branch lengths reported for context",
+      "rejection_criterion": "candidate requires a clade not present in the tree",
+      "needed_data": "none (tree in hand)",
+      "needed_tool": "Newick parser (exists)",
+      "group": "executable_today",
+      "links": {
+        "models": [],
+        "data": [
+          "FISHTREE"
+        ],
+        "design_outcomes": [
+          "phylogenetic context for a precursor-inspired form; not a reachability proof"
+        ]
+      }
+    }
+  ]
+}
