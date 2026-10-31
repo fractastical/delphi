@@ -42,10 +42,11 @@
 
   /* ----------------------------- KNOWLEDGE ----------------------------- */
   DF.views.knowledge = function (snap, route) {
-    const tab = route.params.tab || "claims"; const sel = route.parts[1] || null;
-    const tabs = [["claims", "Claims & equations"], ["graph", "Claim graph"], ["mission", "Flying-fish equations"], ["catalog", "Catalog"]];
+    const sel = route.parts[1] || null; const tab = route.params.tab || (sel ? "claims" : "browse");
+    const tabs = [["browse", "Browse claims"], ["claims", "Seed claims & equations"], ["graph", "Claim graph"], ["mission", "Flying-fish equations"], ["catalog", "Catalog"]];
     const nav = html`<nav class="subnav" aria-label="Knowledge sections">${tabs.map(([k, t]) => html`<a href="${DF.href("/knowledge" + (sel && (k === "claims" || k === "graph") ? "/" + sel : ""), { tab: k })}" aria-current="${tab === k ? "page" : "false"}">${t}</a>`)}</nav>`;
     const head = html`<section class="pagehead"><h1>Knowledge</h1><p class="lede">Claims, equations, proofs, data and the context that bounds them. Equation, evidence kind and assumptions are always shown with the claim. <b>A claim's upstream label is an assertion made elsewhere, not acceptance here.</b></p>${nav}</section>`;
+    if (tab === "browse") return DF.knowledgeBrowse(snap, route, head);
     if (tab === "graph") return knowledgeGraph(snap, route, head, sel);
     if (tab === "mission") return missionEquations(snap, head);
     if (tab === "catalog") return DF.catalogView(snap, route, head, "/knowledge");

@@ -30,10 +30,23 @@
     const c = snap.claims.find((x) => x.id === rec.ref.id); return c ? c.math : null;
   }
 
+  /* Imported Delphi claims carry their origin in prior_review.delphi_original; shown readably, with LLM-elicited numbers kept apart and labelled. */
+  function delphiBlock(p) {
+    const d = (p.prior_review || {}).delphi_original; if (!d) return "";
+    const g = d.delphi_graph || {}; const a = d.assessments || {};
+    return html`<h2 class="eh">Where it comes from</h2><dl class="kv wide"><div><dt>Thinker</dt><dd>${g.thinker || "not stated"}</dd></div><div><dt>Work</dt><dd>${g.work || "not stated"}${g.year ? ", " + g.year : ""}</dd></div><div><dt>Chapter</dt><dd>${g.chapter || "not stated"}</dd></div><div><dt>Claim kind</dt><dd>${g.kind || d.kind || "not stated"}</dd></div>
+      <div><dt>Upstream status</dt><dd>${g.status || g.verification || "not stated"}</dd></div><div><dt>Has maths / theorem</dt><dd>${String(g.math)} / ${String(g.theorem)}</dd></div></dl>
+      <p class="note small"><b>Scores are not evidence.</b> ${g.label || ""} ${a.label || ""}</p>
+      ${g.truth !== undefined ? html`<p class="small">Upstream numbers, for orientation only: truth ${g.truth}, testability ${g.testability}, disagreement ${g.disagreement}. These come from LLM assessors in the source corpus; they are not measurements and not local review.</p>` : ""}
+      <p class="small">${g.nanopub ? html`Optional export: <a href="${g.nanopub}" target="_blank" rel="noopener noreferrer">nanopublication</a> (not a requirement of this page).` : ""}</p>
+      <details><summary class="small">Import receipt and permissions</summary><pre class="json">${JSON.stringify({ adapter: (p.prior_review || {}).adapter, permission: d.permission, source_verification: (p.prior_review || {}).source_verification }, null, 1)}</pre></details>`;
+  }
+
   function body(rec, snap, related) {
     const p = rec.payload || {}; const k = rec.ref.kind; const eq = equationFor(rec, snap);
     const eqBlock = eq ? html`<h2 class="eh">Equation</h2>${DF.mixedSpan(eq)}<p class="small faint">Rendered with KaTeX. An expression it cannot render is shown as its TeX source, marked unsupported.</p>` : "";
     if (k === "Claim") return html`<h2 class="eh">Statement</h2>${para(p.statement)}${eqBlock}<h2 class="eh">Context</h2>${para(p.context)}<h2 class="eh">Assumptions</h2>${list(p.assumptions)}<h2 class="eh">Limitations</h2>${list(p.limitations)}<h2 class="eh">Source</h2>${src(p.source)}
+      ${delphiBlock(p)}
       ${p.prior_review && Object.keys(p.prior_review).length ? html`<h2 class="eh">Upstream review (an assertion, not local acceptance)</h2><dl class="kv wide">${Object.entries(p.prior_review).filter(([, v]) => typeof v === "string").map(([a, v]) => html`<div><dt>${a.replace(/_/g, " ")}</dt><dd>${v}</dd></div>`)}</dl>` : ""}`;
     if (k === "Evidence") return html`<h2 class="eh">What was done</h2>${para(p.method)}<h2 class="eh">Result context</h2>${para(p.context)}
       <p>${U.pill("evidence kind: " + p.evidence_kind, "ev")} ${p.relation ? U.pill("relation to target: " + p.relation, "grp") : ""}</p><h2 class="eh">Uncertainty</h2>${para(p.uncertainty)}<h2 class="eh">Limitations</h2>${list(p.limitations)}<h2 class="eh">Assumptions</h2>${list(p.assumptions)}

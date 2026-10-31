@@ -10,6 +10,32 @@
   const claimOf = (snap, id) => snap.claims.find((c) => c.id === id);
   const hasContent = (pan) => (pan.models.length || pan.videos.length || pan.forms || pan.claims.length || pan.equations.length);
 
+  /* ---------------------------------------------------------------- text goal entry: routes a sentence to project, subsystem and open work. It generates nothing. */
+  const KEYS = { "flying-fish": ["fish", "fin", "fins", "flying", "glide", "glider", "wing", "wings", "lift", "aerodynamic", "airborne", "exocoet", "halfbeak", "gliding"] };
+  const SCALE_WORDS = { molecular: ["molecul", "gene", "genom", "protein", "dna", "rna", "sequence"], cellular: ["cell", "notch", "delta", "lateral"], tissue: ["tissue", "pattern", "turing", "reaction", "diffusion", "morphogen"], organ: ["organ", "fin ray", "beam", "stiff", "bend", "elastic"], organism: ["organism", "body", "mass", "wing loading", "aspect", "flight", "glide", "speed"], developmental: ["develop", "growth", "embryo", "ontogen"], ecological: ["evol", "ecolog", "ancest", "predator", "phylogen", "reachab"], neural: ["neural", "brain", "control", "nerve"], collective: ["school", "collective", "swarm"], macromolecular: ["structure", "binding", "affinity", "fold"], subcellular: ["organelle", "subcellular", "membrane"] };
+  function goalForm(value) {
+    return html`<form class="goalform" data-form="goal" role="search" aria-label="Describe a design goal"><label for="goalq"><b>Describe a goal or a question</b> <span class="faint small">in a sentence; it is routed to a project, a subsystem and open work, and nothing is generated</span></label>
+      <div class="goalrow"><input id="goalq" name="goal" type="text" value="${value || ""}" placeholder="e.g. make a fin that can glide, or: how do fin proportions get set?" maxlength="300"><button class="btn" type="submit">Find where this lives</button></div></form>`;
+  }
+  async function goalResults(snap, goal) {
+    const g = goal.toLowerCase(); const out = { project: null, reasons: [], scales: [], questions: [], claims: [] };
+    snap.projects.projects.forEach((p) => { const ws = (KEYS[p.id] || []).filter((k) => g.includes(k)); if (ws.length && !out.project) { out.project = p; out.reasons = ws; } });
+    Object.entries(SCALE_WORDS).forEach(([sc, ws]) => { const hit = ws.filter((w) => g.includes(w)); if (hit.length) out.scales.push({ scale: sc, words: hit }); });
+    const toks = g.split(/[^a-z0-9]+/).filter((t) => t.length > 3);
+    out.questions = DF.questions(snap).filter((q) => toks.some((t) => JSON.stringify([q.title, q.question, q.known || q.known_state]).toLowerCase().includes(t))).slice(0, 6);
+    try { const r = await DF.api.catalog({ query: toks[0] || goal, kind: "Problem", limit: 6 }); out.liveQuestions = r.records; } catch (e) { out.liveQuestions = []; }
+    try { const r = await DF.api.catalog({ query: toks[0] || goal, kind: "Claim", limit: 6 }); out.claims = r.records; } catch (e) { out.claims = []; }
+    return out;
+  }
+  function goalPanel(snap, goal, res) {
+    return html`<section class="panel" aria-labelledby="gr-h"><h2 id="gr-h">Where “${goal}” lives</h2>
+      <p class="note small">This routes your sentence to existing work by keyword and text match. It does not design an organism, a genome or a model from text.</p>
+      ${res.project ? html`<p><b>Project:</b> <a href="${DF.href("/studio/" + res.project.id, { scale: res.scales[0] ? res.scales[0].scale : "organism" })}">${res.project.title}</a> <span class="faint small">matched on: ${res.reasons.join(", ")}</span></p>` : html`<p class="empty">No project covers this goal. Projects exist only as records or authored entries; starting one needs a Project record and a credentialed submission that this page does not make.</p>`}
+      ${res.scales.length ? html`<p><b>Subsystems:</b> ${res.scales.map((s) => html`<a class="pill" href="${DF.href("/studio/" + (res.project ? res.project.id : "flying-fish"), { scale: s.scale })}">${(snap.mission.scales.find((x) => x.key === s.scale) || { label: s.scale }).label}</a> `)}<span class="faint small">by words: ${res.scales.map((s) => s.words.join("/")).join("; ")}</span></p>` : ""}
+      <h3>Open work</h3>${res.questions.length || (res.liveQuestions || []).length ? html`<ul>${res.questions.map((q) => html`<li><a href="${DF.href("/frontier/" + q.id)}"><b>${q.id}</b></a> ${q.title} <span class="faint small">(curated)</span></li>`)}${(res.liveQuestions || []).map((x) => html`<li><a href="${DF.href("/entity/Problem/" + x.ref.id, { v: x.ref.version })}">${x.title}</a> <span class="faint small">(${DF.api.isLive() ? "live node" : "snapshot"})</span></li>`)}</ul>` : html`<p class="empty">No open question matches these words.</p>`}
+      <h3>Claims that mention it</h3>${(res.claims || []).length ? html`<ul>${res.claims.map((x) => html`<li><a href="${DF.href("/entity/Claim/" + x.ref.id, { v: x.ref.version })}">${x.title}</a></li>`)}</ul><p class="small"><a href="${DF.href("/knowledge", { tab: "browse", q: goal.split(/\s+/)[0] })}">Browse the claims</a></p>` : html`<p class="empty">No claim matches these words.</p>`}</section>`;
+  }
+
   /* ---------------------------------------------------------------- home */
   DF.views.home = function (snap) {
     const p = fish(snap); const forms = snap.print_forms ? snap.print_forms.forms : []; const vids = (snap.simulation_manifests || []).filter((m) => m.video_state === "present_verified" && m.poster_href);
@@ -17,6 +43,7 @@
     return {
       html: html`<section class="hero compact"><div><p class="eyebrow">MorphoSwarm Frontier</p><h1>Design together.<br>Know what's open.</h1></div>
         <div class="herotext"><p class="lede">Two ways in, one body of evidence. <b>Studio</b> is where a design goal is worked across scales, with the models, media and gaps in one place. <b>Frontier</b> is the shared list of open questions and who is working on them. Both read the same claims and evidence, kept in the Delphi foundation: what we know, what's next, who's working on it.</p></div></section>
+      <section class="panel goalpanel">${goalForm("")}</section>
       <section class="paths" aria-label="Two entry paths">
         <article class="path studio"><p class="eyebrow">Studio · projects</p><h2>Work a design across scales</h2>
           <p>A project names a goal, breaks it into subsystems by scale, and shows for each the model that exists, its parameters and unknowns, equations, claims, media and open questions. Gaps stay visible.</p>
@@ -31,6 +58,7 @@
       <section class="panel crosslinks"><h2>How they connect</h2><ul><li>Every open question names the scales it touches; from a question you can jump to that subsystem in the studio.</li><li>Every subsystem lists the open questions at its scale and links to them on the Frontier.</li><li>Claims, evidence and artifacts live once, in the Delphi foundation, and both paths link to the same entity pages.</li></ul>
         <p class="small faint">Projects other than Flying fish are added as Project records; none is invented here.</p></section>`,
       async after(root) {
+        DF.bindForm(root, "goal", (v) => DF.href("/studio", { goal: v.goal }));
         try { const L = await DF.liveQuestionCount(); if (L) root.querySelector("#homeq").parentElement.innerHTML = `<b>${L.n}</b> questions in the live node <span class="faint small">(${esc(L.source)})</span>`; } catch (e) { /* the snapshot figure stays */ }
       },
     };
@@ -40,10 +68,16 @@
   DF.views.studio = function (snap, route) {
     const id = route.parts[1];
     if (id) return projectStudio(snap, route, id);
+    const goal = (route.params.goal || "").trim();
     return {
       html: html`<section class="pagehead"><h1>Studio</h1><p class="lede">Design projects, each broken into subsystems by scale. ${snap.projects.note}</p></section>
+        <section class="panel goalpanel">${goalForm(goal)}</section><div id="goalout"></div>
         <section class="panel"><h2 class="sr">Projects</h2>${snap.projects.projects.map((p) => html`<article class="card pform"><h3>${p.title} ${p.featured ? U.pill("featured", "gen") : ""} ${U.pill(p.status, "st-unk")}</h3><p><b>Goal.</b> ${p.goal}</p><p class="small">${p.summary}</p><p><a class="btn" href="${DF.href("/studio/" + p.id)}">Open studio</a></p></article>`)}
         <p class="note small">${snap.projects.other_projects_note}</p><p class="small faint">Starting a new project needs a Project record and a credentialed submission route; this page does not create one.</p></section>`,
+      async after(root) {
+        DF.bindForm(root, "goal", (v) => DF.href("/studio", { goal: v.goal }));
+        if (goal) { const host = root.querySelector("#goalout"); host.innerHTML = '<p role="status" class="small">Looking…</p>'; host.innerHTML = goalPanel(snap, goal, await goalResults(snap, goal)).toString(); }
+      },
     };
   };
 
@@ -85,6 +119,8 @@
           <p class="note warn small"><b>Drafts stay on this browser.</b> Writing here stores a draft locally. Nothing is submitted, no agent is notified and nothing is regenerated. Submitting an annotation needs an operator credential and a route that is not available from this page.</p>
           <label for="annbody" class="small"><b>Comment or proposed change for the ${sc.label} subsystem</b></label><textarea id="annbody" rows="3" class="scen" placeholder="What should change, and why?"></textarea>
           <p><button type="button" class="btn small" id="annsave">Save as a local draft</button></p><ul id="annlist"></ul></section>
+        <section class="panel" aria-labelledby="pl-h"><h2 id="pl-h">Panels waiting for a contract</h2><p class="small">These will appear here when their owners deliver a file contract and data. Until then nothing is shown for them, and nothing is simulated.</p>
+          <ul><li><b>Genomic designer.</b> Waiting for the genomic and cell/tissue data slice (claude-11). No genome, sequence or designer output exists on this site.</li><li><b>Autoformalization.</b> Waiting for bounded proposals and checks (director). A proposal would be shown with its check result; a proposal alone is not a verified statement.</li><li><b>Evo2 candidates.</b> Waiting for candidate outputs (bioservices). Model-generated sequence candidates, if shown, are labelled model output, not designs or observations.</li></ul></section>
         <section class="panel"><h2>Regenerating candidate geometry</h2><p class="small">The recorded STL files are outputs of earlier runs. The bounded solver returns an exact point in the encoded model, not a mesh, and this page generates no geometry. <a href="${DF.href("/engineering")}">Open the solver and the print forms</a> to request a solver run; a solver request and a generated artifact are different things.</p></section></div></div>`,
       after(root) {
         const list = root.querySelector("#annlist"); const draw = () => { const d = drafts(dkey); list.innerHTML = d.length ? d.map((x, i) => `<li class="small"><span class="pill st-unk">local draft, not submitted</span> ${esc(x.at)}: ${esc(x.body)} <button type="button" class="btn small ghost" data-del="${i}">Delete</button></li>`).join("") : '<li class="faint small">No drafts for this subsystem.</li>'; list.querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", () => { const dd = drafts(dkey); dd.splice(+b.dataset.del, 1); saveDrafts(dkey, dd); draw(); })); };

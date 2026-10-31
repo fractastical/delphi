@@ -405,3 +405,33 @@ def test_studio_subsystems_show_models_gaps_questions_and_local_only_drafts(brow
     assert "No drafts" in pg.locator("#annlist").inner_text()
     pg.goto(base + "#/studio/not-a-project")
     pg.wait_for_selector("h1:has-text('No such project')")
+
+
+def test_goal_text_routes_to_project_subsystem_and_work_without_generating_anything(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/home")
+    pg.wait_for_selector("#goalq")
+    pg.fill("#goalq", "make a fin that can glide")
+    pg.click(".goalform button")
+    pg.wait_for_selector("#gr-h", timeout=15000)
+    txt = pg.locator("#goalout").inner_text().lower()
+    assert "does not design an organism" in txt and "flying fish" in txt and "organism" in txt
+    pg.fill("#goalq", "zzzz qqqq")
+    pg.click(".goalform button")
+    pg.wait_for_selector("text=No project covers this goal", timeout=15000)
+    assert "no open question matches" in pg.locator("#goalout").inner_text().lower()
+
+
+def test_claim_browser_filters_cards_and_drills_down(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/knowledge")
+    pg.wait_for_selector(".claimcards .claimcard")
+    n = int(pg.locator("#cbrowse .count").inner_text().split(" ")[0])
+    assert n >= 21 and "not structured fields" in pg.locator("#cbrowse").inner_text()
+    pg.fill("#cbrowse input[name=q]", "turing")
+    pg.click("#cbrowse button[type=submit]")
+    pg.wait_for_url("**q=turing**")
+    pg.wait_for_selector(".claimcards .claimcard")
+    assert int(pg.locator("#cbrowse .count").inner_text().split(" ")[0]) < n
+    pg.locator(".claimcard a").first.click()
+    pg.wait_for_selector(".entmain h2:has-text('Statement')", timeout=15000)
