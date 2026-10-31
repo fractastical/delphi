@@ -1,0 +1,24 @@
+{
+  "schema": "frontier.windtunnel.protocol/1",
+  "frozen_before_runs": true,
+  "solver": "Reused NCA D2Q9 BGK, halfway bounce-back, momentum-exchange force; Torch float64 CPU/CUDA",
+  "source": {"branch": "work/nca-flow", "commit": "37a7559", "lbm_sha256": "ceac0643e74056d07f7981fe8ab4208b9ebe2090b940028f1c67e2c7e9b401c1", "controls_sha256": "20ac979c43f29692265f5bcd937c65b301e8680c8d1f4587f15db376a6cd074c"},
+  "geometry": {"mesh": "artifacts/print/stl/N1-cypselurus-baseline.stl", "mesh_sha256": "7582e66eff22a698f5f5a9710133e9200e5a4d4bc608e1b7f0f9f7ce7ab84043", "mapping": "Union of triangle projections onto sagittal x-z plane, then length/thickness scaling and nose-up pitch. Mesh x runs snout-to-tail. Treat projected silhouette as infinite spanwise extrusion, not a 3D aerodynamic body.", "print_changes": "Source mesh has print-thickened fins, rounded features and display scale; not specimen geometry"},
+  "baseline": {"mesh_id": "N1-cypselurus-baseline", "body_length_m": 0.15, "thickness_scale": 1.0, "aoa_deg": 8.0, "speed_m_s": 0.008, "kinematic_viscosity_m2_s": 0.000015, "density_kg_m3": 1.225, "length_cells": 24, "lattice_speed": 0.04, "convective_time": 4.0, "frames": 81},
+  "domain": {"size_body_lengths": [12, 6], "body_center_body_lengths": [3.5, 3], "boundaries": "Left/top/bottom reset to uniform equilibrium rho1,u=U,v=0. Right zero-gradient population outflow. Rigid no-slip halfway bounce-back on triangle-derived mask.", "initial_condition": "Uniform flow outside body; solid populations held at rest equilibrium. Start-up transient retained."},
+  "request_limits": {"body_length_m": [0.08, 0.25], "thickness_scale": [0.6, 1.5], "aoa_deg": [-15, 15], "speed_m_s": [0.002, 0.02], "kinematic_viscosity_m2_s": [0.00001, 0.001], "density_kg_m3": [1.0, 1.4], "reynolds": [10, 120], "length_cells": [16, 24, 32, 48, 64, 96], "lattice_speed": [0.02, 0.04], "convective_time": [0.5, 12], "frames": [2, 121]},
+  "controls": {
+    "analytic_prerequisite": "Rerun original NCA Poiseuille H16/32/64 and Taylor-Green N32/64/128, exact original criteria, including closed-case mass drift. All must pass before fish-flow artifact generation.",
+    "no_body": {"grid": [48, 24], "steps": 100, "max_velocity_absolute_error": 1e-12, "max_density_absolute_error": 1e-12, "max_force_absolute": 1e-12},
+    "stability": {"max_mach": 0.3, "max_density_deviation": 0.1, "finite": true, "check_every_steps": 20, "failure_policy": "Stop this configuration immediately; no video from a failing stable-domain run"},
+    "drag_sign": {"case": "baseline fish after final20percent transient window", "criterion": "mean drag coefficient >0; opposite force-sign mutant must fail"},
+    "time_pair": {"length_cells": 24, "convective_time": 2.0, "lattice_speeds": [0.04, 0.02], "equal_end_time": true, "relative_mean_drag_difference_max": 0.1, "meaning": "Halve physical timestep at fixed dx, physical Re and exact convective end time; collision viscosity changes consistently"},
+    "grid_pair": {"length_cells": [24, 48], "convective_time": 4.0, "lattice_speed": 0.04, "relative_mean_drag_difference_max": 0.2, "meaning": "Refine both lattice spacing and mapped timestep at fixed physical Re/domain and equal end time; staircase geometry changes recorded"},
+    "stationarity": {"relative_mean_drag_change_last_two20percent_windows_max": 0.05, "failure_label": "unsteady transient; not steady polar"},
+    "flux": {"last20percent_inflow_outflow_relative_difference_max": 0.05, "failure_label": "open-domain flux check failed"},
+    "label": "PASS only if analytic/no-body/stability/drag-sign/grid/time/flux checks pass. PARTIAL for finite stable flow whose grid/time/flux check fails; display exact failures and no calibrated coefficient claim. FAIL for prerequisite/stability/sign failure. Preserve all outcomes; never change bounds after seeing runs."
+  },
+  "not_established": ["3D finite-span flow, lift or flight Reynolds numbers", "measured fish polar or physical validation", "fluid-structure feedback, flexible fins or active propulsion", "genotype-to-geometry mapping", "pitch/heave actuation: interface proposal only; rigid static mask in this run"],
+  "actuation_ports": {"inputs_proposed": [{"name": "pitch_rad", "unit": "rad", "status": "static AoA supported; dynamic pitching not implemented"}, {"name": "heave_m", "unit": "m", "status": "not implemented"}], "outputs": ["drag_N_per_m_span", "lift_N_per_m_span", "pressure_Pa", "velocity_m_s"]},
+  "runtime": {"local_threads_max": 2, "memory_max_GiB": 4, "scope_runtime_max_s": 600, "gpu": "Only GPUops may dispatch a pinned same-code CUDA refinement after CPU controls; no arbitrary occupancy workload"}
+}
