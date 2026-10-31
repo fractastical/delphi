@@ -6,17 +6,18 @@ import argparse, json, math, os, sys, time
 import numpy as np
 import torch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from flow2d.penalized import NS2DPen, disk_mask
+from flow2d.penalized import NS2DPen, disk_mask, fringe_mask
 
 
-def run(N, T, dt, re=100.0, r=0.25, eta=1e-3, device="cpu", frames=0, mask=None, cx=None, cy=None, seed=1, log=None):
+def run(N, T, dt, re=100.0, r=0.25, eta=1e-3, device="cpu", frames=0, mask=None, cx=None, cy=None, seed=1, log=None, fringe=True):
     D, U = 2 * r, 1.0
     nu = U * D / re
     dx = 2 * math.pi / N
-    cx = math.pi / 2 if cx is None else cx
+    cx = 1.3 if cx is None else cx
     cy = (math.pi + 0.3 * dx) if cy is None else cy            # slight off-grid offset breaks the up/down symmetry so shedding can start
     chi = disk_mask(N, cx, cy, r) if mask is None else torch.as_tensor(mask, dtype=torch.float64)
-    s = NS2DPen(N, nu, dt, chi, eta=eta, U0=(U, 0.0), device=device, dynamic_mean=False)
+    fr_mask = fringe_mask(N, 1.5 * math.pi, 1.75 * math.pi) if fringe else None
+    s = NS2DPen(N, nu, dt, chi, eta=eta, U0=(U, 0.0), device=device, dynamic_mean=False, fringe=fr_mask)
     g = torch.Generator().manual_seed(seed)
     w0 = 1e-3 * torch.randn(N, N, generator=g, dtype=torch.float64)       # tiny seeded noise (shedding trigger); zero-mean after dealiasing
     wh = s.to_hat(w0.to(device))

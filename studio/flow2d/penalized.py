@@ -8,8 +8,10 @@ from .solver import NS2D
 
 
 class NS2DPen(NS2D):
-    def __init__(self, N, nu, dt, chi, eta=1e-3, G=(0.0, 0.0), dynamic_mean=False, **kw):
+    def __init__(self, N, nu, dt, chi, eta=1e-3, G=(0.0, 0.0), dynamic_mean=False, fringe=None, eta_f=0.05, **kw):
         super().__init__(N, nu, dt, **kw)
+        # fringe: optional mask (1 = damp the velocity FLUCTUATION toward the uniform stream), an outflow zone for the periodic box; prevents the wake re-entering upstream
+        self.fringe_fac = None if fringe is None else 1.0 / (1.0 + dt * fringe.to(self.dev) / eta_f)
         self.dynamic_mean = dynamic_mean      # True: the domain-mean velocity U0 evolves with the net forcing and penalization (momentum balance); False: U0 is prescribed
         self.chi, self.eta, self.G = chi.to(self.dev), eta, G
         self.fac = 1.0 / (1.0 + dt * self.chi / eta)
@@ -23,6 +25,8 @@ class NS2DPen(NS2D):
         V = v + self.U0[1] + self.dt * self.G[1] * (1 - self.chi)
         U, V = U * self.fac, V * self.fac
         self.last_force = (float((self.chi / self.eta * U).sum() * self.dA), float((self.chi / self.eta * V).sum() * self.dA))
+        if self.fringe_fac is not None and not self.dynamic_mean:
+            U = self.U0[0] + (U - self.U0[0]) * self.fringe_fac; V = self.U0[1] + (V - self.U0[1]) * self.fringe_fac
         if self.dynamic_mean:
             self.U0 = (float(U.mean()), float(V.mean()))
         Uh, Vh = torch.fft.fft2(U - self.U0[0]), torch.fft.fft2(V - self.U0[1])
@@ -57,3 +61,11 @@ def channel_mask(N, h, dtype=torch.float64, smooth=2.0):
     dx = 2 * math.pi / N
     s = _ramp(h - torch.abs(y - math.pi), smooth * dx)
     return s[None, :].expand(N, N).contiguous()
+
+
+def fringe_mask(N, x0, x1, dtype=torch.float64):
+    """x-only damping zone: 0 for x < x0, smoothstep up to 1 at x1, 1 until the right edge (2 pi)."""
+    x = torch.arange(N, dtype=dtype) * (2 * math.pi / N)
+    t = torch.clamp((x - x0) / (x1 - x0), 0.0, 1.0)
+    f = t * t * (3 - 2 * t)
+    return f[:, None].expand(N, N).contiguous()
