@@ -2,11 +2,14 @@
   "claim_id": "wolfram2002-ch05-20",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch05-20",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "The set of 56 allowed 3x3 templates shown on NKS p. 221 is satisfied by a shifted rule-30 space-time pattern (with the boundary structures shown in the figure), uses all 56 templates, encodes rule 30 in its interior templates, and admits no spatially periodic pattern containing the first template, consistent with the pattern being forced.",
   "pass_criterion": "Pre-registered. (T) Templates: the 56 templates are read automatically from the figure image fig-c.png of p. 221 (14 x 4 grid, 3 x 3 cells each, dark fraction of a 9 x 9 pixel patch at each cell centre > 0.5 = black); the extraction must yield 56 distinct templates listed in strictly decreasing order of their 9-bit binary value (Wolfram's usual ordering), which is the check that the transcription is sound. (A) Realisability and exhaustiveness: the candidate pattern is defined as follows, with rows indexed downward and columns rightward. Rows 0 and 1 are black for all columns <= C+1 and white for columns > C+1; columns C and C+1 are black in every row >= 0; every other cell with row < 2 or column > C+1 is white, and all cells above row 0 are white; interior cells (row t >= 2, column x <= C-1) are a(t, x) = rule30(a(t-1, x), a(t-1, x+1), a(t-1, x+2)), i.e. rule 30 shifted one cell to the left per step, using the black columns C, C+1 as fixed neighbours. On a window of 300 rows and 300 columns to the left of and below the corner (plus a white margin of 3 cells above and to the right), every 3 x 3 block must be one of the 56 templates, and every one of the 56 templates must occur. (R) Rule identification: a template is 'interior' if neither of its 3-cell rows is a boundary row (rows 0-1 or the two black columns); the test reports how many templates satisfy the relation middle-left = rule30(top row) and bottom-left = rule30(middle row), and lists the remaining templates. (U) No periodic alternative: for every horizontal period w = 1..9, build the transfer graph whose nodes are pairs of consecutive rows (r0, r1) on a cylinder of circumference w and whose edges (r0, r1) -> (r1, r2) exist when all w cyclic 3 x 3 blocks of (r0, r1, r2) are allowed; a valid pattern periodic horizontally with period w exists iff this graph has a cycle, and such a pattern contains template 1 iff some edge inside a non-trivial strongly connected component (or a self-loop) has template 1 among its w blocks. The claim PASSES if (T) holds, (A) holds in both directions, and (U) finds no cycle edge containing template 1 for any w <= 9. (R) is reported, not decisive.",
   "fail_criterion": "Pre-registered. If (U) finds a cyclic (doubly periodic) pattern containing template 1 the uniqueness part of the claim is REFUTED (a second pattern satisfies the constraint). If (T) fails the result is 'inconclusive' (reason: transcription). If (A) fails in the subset direction (the candidate pattern contains a disallowed block) the result is 'inconclusive' (the pattern definition inferred from the templates is wrong, not the claim), unless the failing blocks are interior rule-30 blocks, in which case the templates do not encode rule 30 and the claim is refuted. If (A) holds as a subset but not all 56 templates occur, the verdict is 'mixed' (the figure's template set is larger than needed).",
-  "planned_datasets": ["nks-p221-templates-figure", "shifted-rule30-pattern"],
+  "planned_datasets": [
+    "nks-p221-templates-figure",
+    "shifted-rule30-pattern"
+  ],
   "interpretation": "The caption on p. 221 states that only the 56 templates may occur anywhere, that the first template must appear at least once, and that the pattern required is a shifted version of the rule-30 evolution. Uniqueness on the infinite plane cannot be verified by finite computation; this test checks (i) that the published template set is actually satisfied by, and derived from, a shifted rule-30 pattern and (ii) the strongest finite consequence of uniqueness that is cheap to check: no spatially periodic competitor exists for periods up to 9 (a doubly periodic pattern containing template 1 would be a counterexample). Disclosed calibration before this pre-registration: the templates were extracted once to design the extraction check (56 distinct, strictly decreasing); a tally found 46 of the 56 templates satisfy the left-target shifted rule-30 relation; and constraint propagation from two black rows over a 45-column window determined rows 2-4 of the pattern (the double black column with white to its right and the rule-30 growth to its left), which is how the candidate pattern above was inferred. No pattern beyond row 4, no exhaustiveness count and no periodic search was computed before pre-registration.",
   "datasets": [
     {
@@ -14,9 +17,16 @@
       "name": "NKS p. 221, figure of the 56 allowed 3x3 templates (fig-c.png, online edition)",
       "landing_url": "https://www.wolframscience.com/nks/p221--systems-based-on-constraints/",
       "doi": null,
-      "version": "online edition image as retrieved",
+      "version": "online edition image as retrieved 2026-10-31T06:01:58+00:00",
       "license": "copyright Stephen Wolfram LLC; image read for research",
-      "files": [{"download_url": "https://www.wolframscience.com/nks/pages/p221--systems-based-on-constraints/fig-c.png", "retrieved_at": null, "byte_size": null, "sha256": null}],
+      "files": [
+        {
+          "download_url": "https://www.wolframscience.com/nks/pages/p221--systems-based-on-constraints/fig-c.png",
+          "retrieved_at": "2026-10-31T06:01:58+00:00",
+          "byte_size": 46304,
+          "sha256": "0d15068337df14af7bde56836a4c9d48677768c80bb0dcf13cf223d020b7c058"
+        }
+      ],
       "role": "source of the 56 templates (transcribed automatically by analysis.py)"
     },
     {
@@ -30,10 +40,130 @@
       "role": "candidate pattern whose 3x3 blocks are compared with the templates"
     }
   ],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/wolfram-nks-claim-tests-106e", "date": "2026-10-31" }
+  "method": "analysis.py downloads fig-c.png (46,304 bytes), reads the 56 templates from the 14 x 4 grid by sampling 9 x 9 pixel patches at the 3 x 3 cell centres, checks that they are distinct and strictly decreasing as 9-bit numbers, builds the candidate pattern (two-row black band, two-column black wall, interior shifted rule 30) on a 300 x 300 window, enumerates its 3 x 3 blocks, tallies the shifted-rule-30 relation over templates, and for horizontal periods w = 1..11 builds the transfer graph on pairs of cylinder rows (4^w nodes), finds strongly connected components with scipy and counts cycle edges containing template 1. Outputs in derived/templates.csv and derived/periodic_search.json; runtime about 4 minutes (w = 11 dominates).",
+  "measured": {
+    "value": 0,
+    "unit": "number of cycle edges (doubly periodic valid patterns, periods 1-9) containing template 1; 0 = no periodic competitor",
+    "n": 1546,
+    "uncertainty": "exhaustive for periods 1-9 (pre-registered) and 10-11 (supplementary)",
+    "extra": {
+      "T_templates_distinct": true,
+      "T_templates_strictly_decreasing": true,
+      "T_ambiguous_cells": 0,
+      "template1_bits": "111111011",
+      "A_blocks_occurring_in_candidate": 56,
+      "A_disallowed_blocks": [],
+      "A_missing_templates": [],
+      "R_templates_satisfying_shifted_rule30": 46,
+      "R_templates_not_satisfying": [
+        1,
+        2,
+        3,
+        10,
+        45,
+        46,
+        47,
+        51,
+        52,
+        53
+      ],
+      "U_supplementary_periods_10_11_cyclic_edges_with_template1": 0,
+      "passes_preregistered_criterion": true,
+      "runtime_s": 246.1,
+      "U_per_period": [
+        {
+          "w": 1,
+          "edges": 5,
+          "cyclic_edges": 5,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 1
+        },
+        {
+          "w": 2,
+          "edges": 7,
+          "cyclic_edges": 7,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 2
+        },
+        {
+          "w": 3,
+          "edges": 11,
+          "cyclic_edges": 5,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 1
+        },
+        {
+          "w": 4,
+          "edges": 23,
+          "cyclic_edges": 15,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 3
+        },
+        {
+          "w": 5,
+          "edges": 45,
+          "cyclic_edges": 10,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 2
+        },
+        {
+          "w": 6,
+          "edges": 91,
+          "cyclic_edges": 7,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 2
+        },
+        {
+          "w": 7,
+          "edges": 187,
+          "cyclic_edges": 96,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 3
+        },
+        {
+          "w": 8,
+          "edges": 383,
+          "cyclic_edges": 55,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 5
+        },
+        {
+          "w": 9,
+          "edges": 794,
+          "cyclic_edges": 248,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 5
+        },
+        {
+          "w": 10,
+          "edges": 1657,
+          "cyclic_edges": 42,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 8
+        },
+        {
+          "w": 11,
+          "edges": 3470,
+          "cyclic_edges": 346,
+          "cyclic_edges_with_template1": 0,
+          "cyclic_components": 3
+        }
+      ],
+      "U_templates_used_on_cycles_union_count": 47
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.8,
+  "caveats": [
+    "Pre-registered decision: all three decisive parts hold. (T) The automatic transcription yields 56 distinct templates in strictly decreasing binary order with no ambiguous cells. (A) The candidate pattern (two-row black band, two-column black wall below its right end, interior a(t,x) = rule30(a(t-1,x), a(t-1,x+1), a(t-1,x+2)) growing leftwards from the wall) contains exactly the 56 templates on a 300 x 300 window: no disallowed block and no unused template, so the published set is precisely the block set of this shifted rule-30 pattern. (U) No horizontally periodic valid pattern of period 1-9 (and, supplementary, 10-11) contains template 1.",
+    "(R) 46 of the 56 templates satisfy the shifted rule-30 relation in both row pairs; the 10 others (templates 1, 2, 3, 10, 45, 46, 47, 51, 52, 53) are the band, wall and corner templates, consistent with the construction being 'derived from rule 30' plus boundary structures.",
+    "Uniqueness on the infinite plane is not finitely verifiable; what was shown is that no spatially periodic alternative with period <= 11 exists. Periodic patterns without template 1 do exist for every period tested (e.g. the all-white plane; 47 distinct templates appear on cycles), which is why the caption requires template 1 to appear at least once. The pattern is unique only up to translation, and its interior is 'largely random' in the sense that rule 30 from this boundary is (not separately tested here).",
+    "The candidate pattern was inferred from the templates by constraint propagation over rows 2-4 before pre-registration (disclosed); the exact figure layout (band thickness, wall) was read from the inset of fig-a and confirmed by (A). Template extraction depends on fixed pixel coordinates for this image version (sha256 recorded)."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/wolfram-nks-claim-tests-106e",
+    "date": "2026-10-31"
+  }
 }
