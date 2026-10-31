@@ -15,3 +15,6 @@ FRONTIER_DSN='host=... port=... dbname=... user=...' python3 -I scripts/submit_d
   --credential-file PATH --expect-actor ACTOR --expect-operator OPERATOR --register-sha256 SHA --receipt receipt.json   # dry run
 ... --execute                                                                                                          # write
 ```
+
+`2026-10-31-mcp-roundtrip-receipt.json`, `mcp-demo-input.json`, `mcp-demo-output.json`: the MCP contribution round trip (a software protocol
+test, not a biological finding); see `docs/mcp-demo.md`. The two JSON files are the exact bytes whose sha256 are the Evidence's input and output digests.
