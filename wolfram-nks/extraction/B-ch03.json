@@ -1,0 +1,301 @@
+[
+  {
+    "label": "Overall behavior types are similar across all kinds of simple programs",
+    "claim": "Whatever kind of underlying rules a simple program uses (cellular automata, mobile automata, Turing machines, substitution systems, tag systems, register machines, symbolic systems), the overall behavior that emerges falls into the same few basic types first seen in elementary cellular automata.",
+    "quote": "whatever kind of underlying rules one uses, the behavior that emerges turns out to be remarkably similar to the basic examples that we have already seen in cellular automata.",
+    "page": 52,
+    "claim_kind": "general-principle",
+    "scope": "simple programs of all the kinds surveyed in chapter 3",
+    "measurable_quantities": [
+      "classification of behavior (repetitive, nested, random, localized structures) across exhaustive or sampled rule spaces of each system type"
+    ],
+    "candidate_data": "Can be checked computationally by enumerating small rule spaces of each system type with public tools such as the Wolfram Language or open-source simulators.",
+    "resolvability_triage": "partly-testable"
+  },
+  {
+    "label": "Most elementary cellular automata give fixed-size patterns from a single black cell",
+    "claim": "Among the 256 elementary (two-color, nearest-neighbor) cellular automata started from a single black cell, about two-thirds produce patterns that stay of fixed size and about one-third produce patterns that grow forever, with about 14% yielding patterns more complicated than repetition.",
+    "quote": "In about two-thirds of all the cellular automata shown on the last few pages [54, 55, 56], the patterns produced remain of a fixed size. But in about one-third of cases, the patterns instead grow forever.",
+    "page": 57,
+    "claim_kind": "computational-observation",
+    "scope": "the 256 elementary cellular automata, single-black-cell initial condition",
+    "measurable_quantities": [
+      "fraction of rules with bounded pattern width",
+      "fraction with growing patterns",
+      "fraction with non-repetitive growing patterns"
+    ],
+    "candidate_data": "Directly computable by simulating all 256 elementary rules, e.g. with the Wolfram Language CellularAutomaton function or any open-source elementary CA simulator.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Ten of the 256 elementary cellular automata produce apparent randomness",
+    "claim": "Of the 256 elementary cellular automata started from a single black cell, 10 produce patterns that seem in many respects random, falling into three basic forms, while 24 produce nested patterns falling into only three fundamentally different forms.",
+    "quote": "And out of the 256 rules discussed here, it turns out that 10 yield such apparent randomness. There are three basic forms, as illustrated on the facing page.",
+    "page": 58,
+    "claim_kind": "computational-observation",
+    "scope": "the 256 elementary cellular automata, single-black-cell initial condition",
+    "measurable_quantities": [
+      "number of rules with random-looking patterns",
+      "number of rules with nested patterns",
+      "number of inequivalent forms of each"
+    ],
+    "candidate_data": "Directly computable by simulating all 256 elementary rules and applying randomness or compression measures to the resulting patterns.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Beyond a threshold, more complex rules do not give more complex behavior",
+    "claim": "At least beyond a certain point, adding complexity to the underlying rules of a system does not lead to more complex overall behavior; in cellular automata, all the ingredients for the most complex behavior already exist in the elementary two-color rules.",
+    "quote": "at least beyond a certain point, adding complexity to the underlying rules for a system does not ultimately lead to more complex overall behavior.",
+    "page": 62,
+    "claim_kind": "general-principle",
+    "scope": "simple programs generally, illustrated by cellular automata with more colors",
+    "measurable_quantities": [
+      "complexity measures (e.g. compressibility, entropy) of behavior as a function of rule size"
+    ],
+    "candidate_data": "Can be probed computationally by sampling cellular automata with increasing numbers of colors or neighbors and comparing behavior-complexity measures.",
+    "resolvability_triage": "partly-testable"
+  },
+  {
+    "label": "About 85% of three-color totalistic cellular automata behave regularly",
+    "claim": "About 85% of the 2187 three-color nearest-neighbor totalistic cellular automata produce behavior that is ultimately quite regular, while the remainder include rules with seemingly random behavior and rules with interacting localized structures like rule 110.",
+    "quote": "About 85% of all three-color totalistic cellular automata produce behavior that is ultimately quite regular.",
+    "page": 65,
+    "claim_kind": "computational-observation",
+    "scope": "three-color nearest-neighbor totalistic cellular automata from a single gray cell",
+    "measurable_quantities": [
+      "fraction of the 2187 rules with ultimately repetitive or nested behavior"
+    ],
+    "candidate_data": "Directly computable by simulating all 2187 three-color totalistic rules with the Wolfram Language or an open-source CA simulator.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "No basic mobile automaton shows behavior beyond repetition or nesting",
+    "claim": "None of the 65,536 two-color mobile automata whose rule updates only the active cell shows behavior more complex than repetition or nesting; complex behavior appears only when the rule can also update the active cell's neighbors, and even then it is rare.",
+    "quote": "Of the 65,536 possible mobile automata with rules of the kind discussed so far it turns out that not a single one shows more complex behavior.",
+    "page": 73,
+    "claim_kind": "computational-observation",
+    "scope": "two-color mobile automata with a single active cell",
+    "measurable_quantities": [
+      "behavior class of each of the 65,536 rules",
+      "fraction of extended (4,294,967,296) rules with nested or random behavior"
+    ],
+    "candidate_data": "Directly computable by exhaustive simulation of the 65,536 rules and random sampling of the extended rule space.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Complex behavior correlates with many cells being active at once",
+    "claim": "In generalized mobile automata, complex behavior almost never occurs unless many cells are active simultaneously, and this correlation between overall activity and complexity helps explain why complexity is much more common in cellular automata than in mobile automata.",
+    "quote": "complex behavior almost never occurs except when large numbers of cells are active at the same time.",
+    "page": 76,
+    "claim_kind": "computational-observation",
+    "scope": "mobile automata, generalized mobile automata and cellular automata",
+    "measurable_quantities": [
+      "number of active cells over time",
+      "behavior complexity per rule",
+      "correlation between the two across sampled rules"
+    ],
+    "candidate_data": "Computable by sampling generalized mobile automaton rules and measuring activity and pattern complexity.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Two- and three-state two-color Turing machines give only repetition or nesting",
+    "claim": "All 4096 two-state, two-color Turing machines, and all of the roughly three million three-state, two-color Turing machines started on a blank tape, ultimately produce only repetitive or nested patterns.",
+    "quote": "all ultimately turn out to yield just repetitive or nested patterns—at least if they are started with all cells white.",
+    "page": 79,
+    "claim_kind": "computational-observation",
+    "scope": "two-color Turing machines with two or three head states, blank initial tape",
+    "measurable_quantities": [
+      "behavior class of every machine in the enumerated rule spaces"
+    ],
+    "candidate_data": "Computable by exhaustive enumeration of small Turing machines, as in published busy-beaver and small-Turing-machine enumeration work.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Four head states suffice for random-looking Turing machine behavior",
+    "claim": "Two-color Turing machines with four head states can produce seemingly random behavior (about five in every million such rules), and allowing more than four states makes apparent randomness only slightly more common without changing the kinds of behavior seen.",
+    "quote": "With four states, however, more complicated behavior immediately becomes possible. Indeed, in about five out of every million rules of this kind, one gets patterns with features that seem in many respects random",
+    "page": 79,
+    "claim_kind": "computational-observation",
+    "scope": "two-color Turing machines with four or more head states, blank initial tape",
+    "measurable_quantities": [
+      "fraction of four-state machines with random-looking patterns",
+      "same fraction for five or more states"
+    ],
+    "candidate_data": "Computable by random sampling of four- and five-state Turing machines with public simulation tools.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Neighbor-independent substitution systems can only produce nested patterns",
+    "claim": "Substitution systems in which each element is replaced according to its own color alone always produce nested patterns, so obtaining behavior more complicated than nesting requires rules that depend on at least one neighboring element.",
+    "quote": "To get behavior that is more complicated than simple nesting, it follows therefore that one must consider substitution systems whose rules depend not only on the color of a single element, but also on the color of at least one of its neighbors.",
+    "page": 85,
+    "claim_kind": "mathematical",
+    "scope": "parallel substitution systems",
+    "measurable_quantities": [],
+    "candidate_data": "Settled by the standard theory of morphic and automatic sequences, and checkable by simulation.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Substitution systems with deletion need three or more colors for complexity",
+    "claim": "Among two-color substitution systems that allow elements to be destroyed, those with slow growth produce only simple repetitive patterns, but allowing three or four colors immediately makes patterns as random-looking as those of cellular automata possible.",
+    "quote": "allowing elements to have three or four colors rather than just two immediately makes much more complicated behavior possible.",
+    "page": 86,
+    "claim_kind": "computational-observation",
+    "scope": "neighbor-dependent substitution systems with creation and destruction of elements",
+    "measurable_quantities": [
+      "behavior class of slow-growth rules with two, three and four colors"
+    ],
+    "candidate_data": "Computable by enumerating or sampling such substitution rules in the Wolfram Language or similar tools.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Text-editor-like search-and-replace rules can generate great complexity",
+    "claim": "Sequential substitution systems, which repeatedly apply the first matching search-and-replace rule like a text editor, give only simple behavior with two replacements and two elements, but with three replacements about one in 10,000 random rules produces seemingly random behavior.",
+    "quote": "just by using the simple operations available even in a very basic text editor, it is still ultimately possible to produce behavior of great complexity.",
+    "page": 90,
+    "claim_kind": "computational-observation",
+    "scope": "sequential substitution (string rewriting) systems",
+    "measurable_quantities": [
+      "fraction of sampled three-replacement rules with random-looking growth"
+    ],
+    "candidate_data": "Computable by sampling string-rewriting rules with the Wolfram Language or any string-processing environment.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "One-element-deletion tag systems reduce to neighbor-independent substitution",
+    "claim": "A tag system that removes only one element per step always acts as a slow version of a neighbor-independent substitution system and so produces only repetitive or nested patterns, whereas removing two elements per step can yield very complicated behavior.",
+    "quote": "if only one element is removed at each step, then a tag system always effectively acts just like a slow version of a neighbor-independent substitution system of the kind we discussed on page 83.",
+    "page": 93,
+    "claim_kind": "mathematical",
+    "scope": "tag systems",
+    "measurable_quantities": [],
+    "candidate_data": "Provable directly from the definitions and checkable by simulating small tag systems.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Simple cyclic tag systems show random fluctuations in sequence growth",
+    "claim": "Some cyclic tag systems with two alternating blocks, started from a single black element, produce sequences whose average growth is steady but whose fluctuations about that growth are in many respects random.",
+    "quote": "if one looks at the fluctuations in this growth, as in the plots on the next page, then one finds that these fluctuations are in many respects random.",
+    "page": 95,
+    "claim_kind": "computational-observation",
+    "scope": "cyclic tag systems with two blocks",
+    "measurable_quantities": [
+      "sequence length versus step",
+      "statistical randomness of deviations from mean growth"
+    ],
+    "candidate_data": "Computable by simulating cyclic tag systems and applying standard randomness tests to the length fluctuations.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Register machines need eight instructions to show complex behavior",
+    "claim": "Among two-register machines with increment and decrement-jump instructions, all programs of up to four instructions behave repetitively, only two five-instruction programs give nesting, none up to seven instructions is substantially more complicated, and 126 of the 11,019,960,576 eight-instruction programs show complex behavior.",
+    "quote": "But with eight instructions, 126 out of the 11,019,960,576 possible programs finally do show more complicated behavior.",
+    "page": 99,
+    "claim_kind": "computational-observation",
+    "scope": "two-register machines with increment and decrement-jump instructions",
+    "measurable_quantities": [
+      "behavior class of every program of length 1 to 8"
+    ],
+    "candidate_data": "Computable by exhaustive enumeration of register machine programs, which is feasible though large at length eight.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Short programs in ordinary low-level languages can behave randomly",
+    "claim": "Because register machines idealize programs in low-level languages such as C, Basic, Java or assembler, searching many millions of short programs in such languages typically yields at least a few with complex, seemingly random behavior.",
+    "quote": "searching through many millions of short programs typically yields at least a few that exhibit complex and seemingly random behavior.",
+    "page": 102,
+    "claim_kind": "computational-observation",
+    "scope": "short programs in practical low-level programming languages",
+    "measurable_quantities": [
+      "fraction of enumerated short programs with random-looking output or register traces"
+    ],
+    "candidate_data": "Could be tested by enumerating short programs in a small language or instruction set and analyzing their traces; no standard corpus is known.",
+    "resolvability_triage": "testable-with-new-data"
+  },
+  {
+    "label": "Combinator-like symbolic rewriting systems can behave randomly",
+    "claim": "Symbolic systems that repeatedly apply a single rewrite rule of the form e[x_][y_] → (expression in x and y) to nested expressions can, like other simple programs, produce behavior that is complex and seemingly random rather than stabilizing.",
+    "quote": "But often—just as in so many other kinds of systems—the behavior is instead complex and seemingly quite random.",
+    "page": 104,
+    "claim_kind": "computational-observation",
+    "scope": "combinator-like symbolic expression rewriting systems",
+    "measurable_quantities": [
+      "expression size versus step",
+      "randomness of size differences"
+    ],
+    "candidate_data": "Computable using the Wolfram Language ReplaceAll operation or any term-rewriting system.",
+    "resolvability_triage": "testable-with-existing-data"
+  },
+  {
+    "label": "Complexity does not depend on the special features of cellular automata",
+    "claim": "Removing the special features of cellular automata, such as a rigid array of cells and parallel updating, does not prevent complex behavior from simple rules, so the phenomenon of complexity is universal and independent of the details of particular systems.",
+    "quote": "So this suggests that in fact the phenomenon of complexity is quite universal—and quite independent of the details of particular systems.",
+    "page": 105,
+    "claim_kind": "general-principle",
+    "scope": "all kinds of simple programs",
+    "measurable_quantities": [
+      "existence of complex behavior in each system class with simple rules"
+    ],
+    "candidate_data": "Partly checkable computationally by surveying rule spaces of many system types.",
+    "resolvability_triage": "partly-testable"
+  },
+  {
+    "label": "The rule-complexity threshold for complex behavior is very low",
+    "claim": "Systems with sufficiently simple rules show only repetition, slightly more complicated rules often add nesting, and complex behavior requires crossing a threshold in rule complexity, but in every kind of system studied this threshold is extremely low.",
+    "quote": "The remarkable discovery that we have made, however, is that this threshold is typically extremely low.",
+    "page": 106,
+    "claim_kind": "general-principle",
+    "scope": "all kinds of simple programs",
+    "measurable_quantities": [
+      "smallest rule size at which repetition, nesting and random-looking behavior first appear in each system class"
+    ],
+    "candidate_data": "Computable by exhaustive enumeration of the smallest rules in each system class.",
+    "resolvability_triage": "partly-testable"
+  },
+  {
+    "label": "Repetition, nesting, randomness and localized structures dominate everywhere",
+    "claim": "The four themes of repetition, nesting, randomness and localized structures are the dominant types of behavior across a vast range of systems, and these overall behavior types are almost independent of the details of the underlying rules.",
+    "quote": "the basic themes of repetition, nesting, randomness and localized structures that we already saw in specific cellular automata in the previous chapter are actually very general, and in fact represent the dominant themes in the behavior of a vast range of different systems.",
+    "page": 106,
+    "claim_kind": "general-principle",
+    "scope": "simple programs and, by extension, a vast range of systems",
+    "measurable_quantities": [
+      "distribution of behavior classes across rule spaces"
+    ],
+    "candidate_data": "Partly checkable computationally; no agreed automatic classifier of the four themes is known.",
+    "resolvability_triage": "partly-testable"
+  },
+  {
+    "label": "Overall behavior of natural systems can be inferred without knowing their details",
+    "claim": "Because the typical types of behavior are independent of rule details, one can make fundamental statements about the overall behavior of a natural system without knowing its internal details, and its important features will usually be ones already seen in very simple programs.",
+    "quote": "even if we do not know all the details of what is inside some specific system in nature, we can still potentially make fundamental statements about its overall behavior.",
+    "page": 108,
+    "claim_kind": "general-principle",
+    "scope": "systems in nature",
+    "measurable_quantities": [],
+    "candidate_data": "none known",
+    "resolvability_triage": "not-empirically-testable"
+  },
+  {
+    "label": "Computer experiments let one discover phenomena not anticipated in advance",
+    "claim": "A methodology based on computer experiments, in which one runs precisely specified programs and observes their behavior, can discover genuinely unexpected phenomena that a traditional approach of constructing examples of predefined behavior would miss, while giving results as precise as mathematical statements.",
+    "quote": "And the great advantage of such an experimental approach is that it does not require one to know in advance exactly what kinds of behavior can occur.",
+    "page": 108,
+    "claim_kind": "conceptual",
+    "scope": "methodology of studying simple programs",
+    "measurable_quantities": [],
+    "candidate_data": "none known",
+    "resolvability_triage": "not-empirically-testable"
+  },
+  {
+    "label": "One can never start a computer experiment with too simple a system",
+    "claim": "Computer experiments should study the simplest possible systems with the simplest possible procedures, because simple systems already show complex behavior, and the most common mistake is studying systems far more complicated than necessary.",
+    "quote": "in my experience the single most common mistake in doing computer experiments is to look at systems that are vastly more complicated than is necessary.",
+    "page": 110,
+    "claim_kind": "conceptual",
+    "scope": "design of computer experiments",
+    "measurable_quantities": [],
+    "candidate_data": "none known",
+    "resolvability_triage": "not-empirically-testable"
+  }
+]
