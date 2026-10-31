@@ -294,6 +294,8 @@
         <p class="note small">These two records were produced by earlier work and are shown with their own caveats. The cavefish result is a reproduction on public data, not a discovery; its biological interpretation is labelled separately in the document. The KCNE1 protocol stopped at its preregistered floor: a failed input gate is evidence about the proposed action.</p>
         <div class="cards">${docs.filter((d) => /results/.test(d.path)).map((d) => html`<article class="card"><h3>${d.title}</h3><p>${d.status_line ? d.status_line : ""}</p><p class="small">${U.src("doc:" + d.id, "Open the full document")} · sha256 ${U.sha(d.sha256)} · <a href="${d.href}">raw file</a></p></article>`)}</div></section>
 
+      ${attestationSection(snap)}
+
       <section class="panel" aria-labelledby="ev-a"><h2 id="ev-a">Artifacts index</h2>
         <p class="note small">Data, proofs, simulations, geometry, code and documents, each with its exact source, the context it was made in, the check it passed or failed, any dispute, and the next action. A digest in a record is a declaration, not a byte verification. <b>No simulation or geometry artifact is indexed in this snapshot.</b></p>
         <form class="filters" data-form="evidence" aria-label="Filter artifacts"><label>Type <select name="at"><option value="">all</option>${["data", "proof", "simulation", "geometry", "protocol", "code", "document"].map((t) => html`<option ${t === (route.params.at || "") ? raw("selected") : ""}>${t}</option>`)}</select></label><input type="hidden" name="rl" value="${f.rl}"><button class="btn" type="submit">Apply</button></form>
@@ -326,6 +328,19 @@
     context: (it.context || "") + (it.relation ? ` (relation: ${it.relation}; target ${it.target ? it.target.kind + " " + it.target.id : "?"}${it.produced_by ? "; produced by " + it.produced_by.id : ""})` : ""), check: `${it.evidence_kind || "evidence"}; local status ${String(it.local_status || "not reported").replace(/_/g, " ")}; digest declared, bytes ${it.artifact_bytes_verified ? "verified" : "not verified"}`,
     dispute: it.relation === "refutes" ? "This evidence refutes its target." : "", download: a.availability === "downloadable" && /^https:/.test(a.uri || "") ? a.uri : null, next: (it.limitations || []).join("; ") }; });
 
+  function attestationSection(snap) {
+    const A = snap.attestation_check; if (!A) return "";
+    const t = A.tally || {}; const sup = t.quote_supports_stance || {}; const fit = t.fit_to_question || {};
+    return html`<section class="panel" aria-labelledby="ev-att"><h2 id="ev-att">Curation example: an exact quote is not an answered question</h2>
+      <p class="note warn"><b>${A.n} items, hand-picked by a hashed rule. Not a population rate.</b> ${A.scope}</p>
+      <div class="four"><article><h3>Check 1: is the quote in the source?</h3><p><b>${A.status_counts.verified || 0} of ${A.n}</b> quotes were found in the retrieved full text, matched exactly after one normalisation. Mechanical, with controls in the script.</p></article>
+        <article><h3>Check 2: does it support the stance?</h3><p>Single-reader judgment from the quote and its section, papers not read in full: supports ${sup.yes || 0}, partly ${sup.partly || 0}, no ${sup.no || 0}.</p></article>
+        <article><h3>Does it cover the question?</h3><p>Direct ${fit.direct || 0}, partial ${fit.partial || 0}. Only <b>${t.clean_yes_and_direct_no_flags}</b> of ${A.n} are a clean yes and direct with no flag.</p></article></div>
+      <p class="small">The gap this shows: a quote can be present and still not state what the stance claims, or answer only part of the question. A hash or a matched string establishes neither. ${U.src("doc:" + A.readme, "Read the full write-up")}</p>
+      <div class="tablewrap"><table><thead><tr><th>Item</th><th>Stance</th><th>Quote in source</th><th>Supports stance</th><th>Covers question</th><th>Flags and the reviewer's note</th></tr></thead><tbody>
+        ${A.items.map((x) => html`<tr><td><b>${x.slug}</b><br><span class="faint small">${x.source || ""}${x.article_year ? " · " + x.article_year : ""}</span></td><td>${x.stance}</td><td>${x.mechanical_status}</td><td>${U.pill(x.supports, x.supports === "yes" ? "ok" : x.supports === "no" ? "no" : "warn")}</td><td>${U.pill(x.fit, x.fit === "direct" ? "ok" : "warn")}</td><td>${(x.flags || []).map((f) => U.pill(f.replace(/_/g, " "), "grp"))}<br><span class="small">${x.note}</span></td></tr>`)}</tbody></table></div></section>`;
+  }
+
   /* ---------------- WORK ---------------- */
   DF.views.work = function (snap) {
     const live = DF.api.state.mode === "live";
@@ -335,6 +350,8 @@
         <p>${U.pill(live ? "live runtime" : "snapshot only", live ? "ok" : "warn")} ${DF.api.state.reason}.</p>
         ${live ? html`<p>Namespace: <code>${DF.api.state.health.namespace || "not reported"}</code>.</p>` : html`<p class="note small">No runtime is connected, so there are no agents, leases, resources or contributions to show. Nothing below is simulated.</p>`}</section>
       <section class="panel" aria-labelledby="w-e"><h2 id="w-e">Events, leases and contributions</h2><div id="events" role="status">Loading…</div></section>
+      ${live ? html`<section class="panel" aria-labelledby="w-n"><h2 id="w-n">What the live store holds</h2><p class="note small">Counts of records by kind, read by paging the catalog (50 per page). These are records, not independent observations: imported claims in particular repeat what their sources assert.</p>
+        <button class="btn small" type="button" id="countrecs">Count records by kind</button><div id="counts" role="status"></div></section>` : ""}
       <section class="panel" aria-labelledby="w-c"><h2 id="w-c">Declared capabilities (MCP tools)</h2>
         <p class="note small">Declared in the repository's MCP server, tested only with the official SDK client. A declared tool is not demonstrated competence; availability and observed success are separate facts, and no success receipts are attached here.</p>
         <div class="tablewrap"><table><thead><tr><th>Tool</th><th>Mode</th><th>Documented in docs/mcp.md</th></tr></thead><tbody>${snap.capabilities.map((t) => html`<tr><td><code>${t.name}</code></td><td>${t.mode}</td><td>${t.documented_in_docs_mcp ? "yes" : "no"}</td></tr>`)}</tbody></table></div>
@@ -345,6 +362,18 @@
       <section class="panel" aria-labelledby="w-h"><h2 id="w-h">How work is counted</h2>
         <p>Results, reuse and compute counts will appear only when derived from run receipts and recorded edges. Counts of test definitions, generated records or submitted jobs are not successful executions, and this page shows none of them.</p></section>`,
       async after(root) {
+        const cb = root.querySelector("#countrecs");
+        if (cb) cb.addEventListener("click", async () => {
+          const out = root.querySelector("#counts"); cb.disabled = true; const rows = []; let capped = false;
+          try {
+            for (const kind of ["Claim", "Problem", "Evidence", "Assessment", "Action", "Actor", "ResourceOffer", "Interest", "Event"]) {
+              let n = 0, after = "", pages = 0;
+              do { const r = await DF.api.catalog({ kind, limit: 50, after }); n += r.records.length; after = r.next_cursor || ""; pages++; out.textContent = `Counting ${kind}… ${n}`; } while (after && pages < 200);
+              if (after) capped = true; rows.push([kind, n]);
+            }
+            out.innerHTML = html`<div class="tablewrap"><table><thead><tr><th>Kind</th><th>Records</th></tr></thead><tbody>${rows.map(([k, n]) => html`<tr><td>${k}</td><td>${n}</td></tr>`)}<tr><td><b>Total</b></td><td><b>${rows.reduce((a, r) => a + r[1], 0)}</b></td></tr></tbody></table></div>${capped ? html`<p class="small faint">Stopped at 200 pages for a kind; that count is a lower bound.</p>` : ""}<p class="small faint">Counts read from the live catalog just now; they are not independent observations and not a measure of progress.</p>`.toString();
+          } catch (e) { out.textContent = "Counting failed: " + e.message; } finally { cb.disabled = false; }
+        });
         const host = root.querySelector("#events");
         try { const r = await DF.api.events(); host.innerHTML = r.events.length ? html`<p class="small faint">Events are records emitted by the store, in sequence order; they say what was recorded, not that it is correct.</p><div class="tablewrap"><table><thead><tr><th>#</th><th>Kind</th><th>Id</th><th>Issuer</th><th>Created</th></tr></thead><tbody>${r.events.map((e) => html`<tr><td>${e.sequence}</td><td>${e.kind}</td><td><code>${e.id}</code></td><td>${e.issuer || ""}</td><td>${e.created_at || ""}</td></tr>`)}</tbody></table></div>${r.next_cursor ? html`<p class="small faint">More events exist than shown.</p>` : ""}`.toString() : `<p class="empty">${esc(r.note || "The runtime reports no events.")} No agents, leases or contributions are displayed.</p>`; }
         catch (e) { host.innerHTML = `<p class="empty">Could not read events: ${esc(e.message)}. Nothing is displayed in their place.</p>`; }

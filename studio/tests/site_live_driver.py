@@ -31,6 +31,10 @@ with sync_playwright() as p:
     print("SEARCH:", pg.locator("#ccount").inner_text()); assert "mode live" in pg.locator("#ccount").inner_text()
     pg.goto(base + "/index.html#/work"); expect(pg.locator("#events")).not_to_have_text("Loading…", timeout=15000)
     ev = pg.locator("#events").inner_text(); print("EVENTS:", ev[:120].replace("\n", " "))
+    pg.get_by_role("button", name="Count records by kind").click()
+    expect(pg.locator("#counts table")).to_be_visible(timeout=60000)
+    total = int(pg.locator("#counts tr", has_text="Total").inner_text().split()[-1]); print("LIVE COUNT total records:", total); assert total >= 28
+    assert "not independent observations" in pg.locator("#counts").inner_text()
     assert "No agents, leases or contributions are displayed" not in ev and "KIND" in ev.upper() and pg.locator("#events tbody tr").count() > 0, "seeded events were not rendered"
     pg.goto(base + "/index.html#/evidence"); expect(pg.locator("#artifacts")).not_to_have_text("Loading…", timeout=15000)
     print("artifacts rows:", pg.locator("#artifacts tbody tr").count())

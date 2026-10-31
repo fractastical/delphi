@@ -191,3 +191,32 @@ def test_recorded_results_show_lean_receipt_scope_and_honest_absence(browser, ba
         assert float(pg.input_value("#f-mass_kg")) > 0 and pg.input_value("#f-standard_length_m") == ""
     else:
         assert "no recorded simulation results are present" in sec and "no mesh" in sec
+
+
+def test_simulation_gallery_never_invents_a_video(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector(".simcard, .empty")
+    assert pg.locator("video").count() == 0, "no video file exists in the snapshot, so no player may appear"
+    html = pg.evaluate("""() => DF.views.simulations(Object.assign({}, DF.api.state.snapshot, {simulation: null, simulation_manifests: [
+      {id: 'ok', title: 'ok', scales: ['cellular'], video_state: 'present_verified', video_href: 'artifacts/simulations/ok/v.mp4', manifest: 'm'},
+      {id: 'miss', title: 'miss', scales: ['cellular'], video_state: 'declared_but_missing', manifest: 'm'},
+      {id: 'bad', title: 'bad', scales: ['cellular'], video_state: 'digest_mismatch', manifest: 'm'},
+      {id: 'none', title: 'none', scales: ['cellular'], video_state: 'none', manifest: 'm'}]})).html.toString()""")
+    assert html.count("<video") == 1 and "artifacts/simulations/ok/v.mp4" in html
+    assert html.count("No video file.") == 3 and "does not match its declared sha256" in html
+
+
+def test_attestation_card_states_it_is_not_a_population_rate(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/evidence")
+    pg.wait_for_selector("#ev-att")
+    txt = pg.locator("section[aria-labelledby=ev-att]").inner_text().lower()
+    assert "not a population rate" in txt and "15 of 15" in txt and "4" in txt
+
+
+def test_mcp_tools_come_from_the_document(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/work")
+    pg.wait_for_selector("#w-c")
+    assert "frontier_artifacts" in pg.locator("section[aria-labelledby=w-c]").inner_text()

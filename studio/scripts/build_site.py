@@ -25,12 +25,16 @@ DATA = SITE / "data"
 SCHEMA = "frontier-site-snapshot-0.1"
 NAMESPACE = "snapshot"
 
-CAPABILITY_TOOLS = {
-    "frontier_search": "read", "frontier_get": "read", "frontier_neighborhood": "read",
-    "frontier_events": "read", "frontier_capabilities": "read",
-    "frontier_propose": "write (opt-in)", "frontier_lease": "write (opt-in)",
-    "frontier_transition": "write (opt-in)",
-}
+
+
+def mcp_tools(mcp_text: str) -> list[dict]:
+    """Tool names come from the Tools row of the table in docs/mcp.md, so the page cannot list a tool the document does not."""
+    row = next((l for l in mcp_text.splitlines() if l.startswith("| Tools |")), "")
+    cells = [c.strip() for c in row.strip().strip("|").split("|")]
+    names = lambda c: re.findall(r"`(frontier_[a-z_]+)`", c)
+    read = names(cells[1]) if len(cells) > 2 else []
+    write = [n for n in names(cells[2]) if n not in read] if len(cells) > 2 else []
+    return [{"name": n, "mode": "read", "documented_in_docs_mcp": True} for n in read] + [{"name": n, "mode": "write (opt-in)", "documented_in_docs_mcp": True} for n in write]
 
 
 def digest_bytes(b: bytes) -> str:
@@ -138,6 +142,58 @@ def recorded_results(ins: Inputs, files: dict) -> tuple[dict | None, dict | None
     return lean, sim
 
 
+ATT = "findings/attestation-check-15.json"
+ATT_REVIEW = "findings/attestation-facet-review-15.json"
+ATT_README = "findings/README-attestation-check-15.md"
+SIM_MANIFESTS = "site/artifacts/simulations"
+
+
+def attestation_check(ins: Inputs, files: dict, docs: list) -> dict | None:
+    if not all((ROOT / f).exists() for f in (ATT, ATT_REVIEW, ATT_README)):
+        return None
+    mech, rev = json.loads(ins.read(ATT)), json.loads(ins.read(ATT_REVIEW))
+    text = ins.text(ATT_README)
+    files["docs/" + Path(ATT_README).name] = text.encode()
+    docs.append({"id": Path(ATT_README).stem, "title": next(l[2:].strip() for l in text.splitlines() if l.startswith("# ")), "status_line": None, "path": ATT_README,
+                 "sha256": ins.seen[ATT_README]["sha256"], "href": "data/docs/" + Path(ATT_README).name})
+    by = {r["slug"] + str(r["index"]): r for r in mech["results"]}
+    items = []
+    for it in rev["items"]:
+        m = by.get(it["slug"] + str(it["index"]), {})
+        items.append({"slug": it["slug"], "stance": it["stance"], "stratum": it["stratum"], "source": m.get("source"), "article_title": m.get("article_title"), "article_year": m.get("article_year"),
+                      "locator": m.get("locator"), "mechanical_status": m.get("status"), "match": m.get("match"), "supports": it["quote_supports_stance"], "fit": it["fit_to_question"],
+                      "flags": it["flags"], "note": it["note"]})
+    return {"readme": Path(ATT_README).stem, "n": mech["n"], "status_counts": mech["status_counts"], "tally": rev.get("tally"), "reviewer": rev.get("reviewer"), "items": items,
+            "scope": "A fixed 15-item sample chosen by a hashed rule, not a random or representative sample. The counts are not a population rate and verify nothing about the other attestations or the 250 problems."}
+
+
+def simulation_manifests(ins: Inputs) -> list[dict]:
+    """Optional manifests dropped next to their artifacts. A video is playable only if the file exists and matches its declared sha256."""
+    out = []
+    base = ROOT / SIM_MANIFESTS
+    for mf in sorted(base.glob("*/manifest.json")) if base.exists() else []:
+        rel = mf.relative_to(ROOT).as_posix()
+        try:
+            m = json.loads(ins.read(rel))
+        except ValueError:
+            out.append({"id": mf.parent.name, "title": mf.parent.name, "error": "manifest is not valid JSON", "manifest": rel})
+            continue
+        v = m.get("video"); state, href = "none", None
+        if v:
+            f = mf.parent / str(v.get("file", ""))
+            if not f.is_file() or ".." in str(v.get("file", "")):
+                state = "declared_but_missing"
+            else:
+                b = f.read_bytes(); ins.seen[f.relative_to(ROOT).as_posix()] = {"path": f.relative_to(ROOT).as_posix(), "sha256": digest_bytes(b), "bytes": len(b)}
+                state = "present_verified" if v.get("sha256") == digest_bytes(b) else "digest_mismatch"
+                href = f.relative_to(ROOT / "site").as_posix() if state == "present_verified" else None
+        pf = mf.parent / str(m.get("poster", "")) if m.get("poster") else None
+        m["poster_href"] = pf.relative_to(ROOT / "site").as_posix() if pf and pf.is_file() and ".." not in str(m["poster"]) else None
+        m.setdefault("id", mf.parent.name); m["video_state"], m["video_href"], m["manifest"] = state, href, rel
+        out.append(m)
+    return out
+
+
 def build() -> dict[str, bytes]:
     ins = Inputs()
     seeds = ins.json("seeds/frontier-data.json")
@@ -146,7 +202,7 @@ def build() -> dict[str, bytes]:
     board = parse_board(ins.text("tasks/BUILD.md"))
     spec_text = ins.text("specs/SPEC-005-agentic-engineering-demo.md")
     mcp_text = ins.text("docs/mcp.md")
-    tools = [{"name": n, "mode": m, "documented_in_docs_mcp": n in mcp_text} for n, m in CAPABILITY_TOOLS.items()]
+    tools = mcp_tools(mcp_text)
 
     docs, files = [], {}
     for p in sorted((ROOT / "results").glob("*.md")):
@@ -165,6 +221,8 @@ def build() -> dict[str, bytes]:
 
     # The label is a digest of the input hashes, not a git revision: a commit or merge cannot make --check stale.
     lean_receipt, simulation = recorded_results(ins, files)
+    attestation = attestation_check(ins, files, docs)
+    manifests = simulation_manifests(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -181,6 +239,8 @@ def build() -> dict[str, bytes]:
         "board": board,
         "lean_receipt": lean_receipt,
         "simulation": simulation,
+        "attestation_check": attestation,
+        "simulation_manifests": manifests,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
     }
     catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}
