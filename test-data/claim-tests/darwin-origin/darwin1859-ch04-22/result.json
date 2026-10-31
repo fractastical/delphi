@@ -1,0 +1,158 @@
+{
+  "claim_id": "darwin1859-ch04-22",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch04-22",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "For a regional flora, the number of genera added by naturalised (introduced) plants, as a proportion of the native genera, exceeds the number of naturalised species as a proportion of native species.",
+  "pass_criterion": "Pre-registered. For every TDWG level-3 botanical country in the World Checklist of Vascular Plants with at least 100 native accepted species and at least 20 introduced accepted species, compute r_sp = (introduced species not native to the area) / (native species) and r_gen = (genera represented only by introduced species) / (genera with at least one native species). The claim is SUPPORTED if r_gen > r_sp in at least 80% of qualifying areas AND the median of r_gen / r_sp across areas is at least 1.25.",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if r_gen > r_sp in 50% or fewer of qualifying areas, or if the median r_gen / r_sp is 1.0 or less. Intermediate outcomes are 'mixed'. As a secondary, non-decisive analysis, the observed number of new genera per area is compared with the expectation when the same number of species is drawn at random from the global pool of species not native to that area (200 draws per area), to show whether the excess is more than a taxonomic-rank artefact.",
+  "planned_datasets": [
+    "kew-wcvp"
+  ],
+  "interpretation": "Darwin's 'naturalisation' is read as the WCVP 'introduced' distribution status (established alien occurrence), his 'flora' as a TDWG level-3 area (the unit of the WCVP distribution table), and 'proportionally with the number of the native genera and species' as the two ratios above. Only accepted species (taxon_rank Species, taxon_status Accepted, no hybrids) are counted; records flagged location_doubtful are excluded. Darwin's own examples are the floras of the United States (Asa Gray's Manual) and Britain; the modern test covers all botanical countries that meet the sample-size rule. Modern reinterpretation: WCVP genus concepts are those of current taxonomy, not of 1859.",
+  "datasets": [
+    {
+      "id": "kew-wcvp",
+      "name": "World Checklist of Vascular Plants (WCVP), Royal Botanic Gardens, Kew",
+      "landing_url": "https://powo.science.kew.org/about-wcvp",
+      "doi": "10.1038/s41597-021-00997-6",
+      "version": "16 (2026-06-04)",
+      "license": "CC BY 3.0 (per README_WCVP.xlsx in the download; the WCVP landing page states CC BY 4.0)",
+      "files": [
+        {
+          "download_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+          "retrieved_at": "2026-10-31T04:32:02Z",
+          "byte_size": 88179649,
+          "sha256": "d32ea2b3a85e489b14e83bcc9eae7274532e1d113753f7be290d4b2dfde573fa"
+        }
+      ],
+      "role": "accepted species names with genus, and species x level-3 area distributions with the introduced flag"
+    }
+  ],
+  "method": "WCVP v16 (zip of 2026-06-04) was downloaded; 358,113 accepted non-hybrid species were joined to the level-3 distribution table (location_doubtful rows excluded; a species both native and introduced to an area counted as native). For each of the 337 botanical countries with >= 100 native and >= 20 introduced species, r_sp = introduced/native species and r_gen = genera represented only by introduced species / genera with native species were computed, with the fraction of areas where r_gen > r_sp and the median r_gen/r_sp as the pre-registered statistics. A null expectation for new genera was obtained by 200 random draws per area of the same number of species from all species not native to that area.",
+  "measured": {
+    "value": 0.822,
+    "unit": "fraction of qualifying level-3 areas with r_gen > r_sp",
+    "n": 337,
+    "uncertainty": "95% Wilson CI [0.778, 0.859]",
+    "extra": {
+      "wcvp_version": "16 (extracted 2026-06-04, per README_WCVP.xlsx in the zip)",
+      "accepted_non_hybrid_species_total": 358113,
+      "median_r_gen_over_r_sp": 1.2535,
+      "iqr_r_gen_over_r_sp": [
+        1.0423,
+        1.5625
+      ],
+      "median_r_sp": 0.1375,
+      "median_r_gen": 0.1839,
+      "areas_with_r_gen_gt_r_sp": 277,
+      "null_model": {
+        "description": "200 random draws per area of the observed number of introduced species from all accepted species not native to the area; seed 20261031",
+        "fraction_of_areas_where_null_r_gen_gt_r_sp": 1.0,
+        "fraction_of_areas_with_observed_new_genera_above_null_mean": 0.0,
+        "median_observed_over_null_new_genera": 0.6113
+      },
+      "by_continent_fraction_r_gen_gt_r_sp": {
+        "AFRICA": 0.859,
+        "ANTARCTICA": 0.0,
+        "ASIA-TEMPERATE": 0.885,
+        "ASIA-TROPICAL": 0.767,
+        "AUSTRALASIA": 0.846,
+        "EUROPE": 0.925,
+        "NORTHERN AMERICA": 0.764,
+        "PACIFIC": 0.556,
+        "SOUTHERN AMERICA": 0.851
+      },
+      "examples": {
+        "Great Britain (GRB)": {
+          "area_code_l3": "GRB",
+          "area": "Great Britain",
+          "region": "Northern Europe",
+          "continent": "EUROPE",
+          "native_species": 2485,
+          "native_genera": 526,
+          "introduced_species": 2166,
+          "introduced_genera": 822,
+          "new_genera": 573,
+          "r_sp": 0.8716297786720322,
+          "r_gen": 1.0893536121673004,
+          "ratio_gen_over_sp": 1.249789347292586,
+          "null_new_genera_mean": 1108.015,
+          "null_new_genera_sd": 20.460398690467017,
+          "null_r_gen_mean": 2.1064923954372627,
+          "obs_over_null_new_genera": 0.5171410134339336
+        },
+        "Illinois (ILL)": {
+          "area_code_l3": "ILL",
+          "area": "Illinois",
+          "region": "North-Central U.S.A.",
+          "continent": "NORTHERN AMERICA",
+          "native_species": 2234,
+          "native_genera": 689,
+          "introduced_species": 1013,
+          "introduced_genera": 495,
+          "new_genera": 304,
+          "r_sp": 0.45344673231871085,
+          "r_gen": 0.4412191582002903,
+          "ratio_gen_over_sp": 0.9730341553992581,
+          "null_new_genera_mean": 583.295,
+          "null_new_genera_sd": 13.654309791395425,
+          "null_r_gen_mean": 0.8465820029027575,
+          "obs_over_null_new_genera": 0.5211771059241036
+        },
+        "New York (NWY)": {
+          "area_code_l3": "NWY",
+          "area": "New York",
+          "region": "Northeastern U.S.A.",
+          "continent": "NORTHERN AMERICA",
+          "native_species": 2252,
+          "native_genera": 658,
+          "introduced_species": 1453,
+          "introduced_genera": 678,
+          "new_genera": 465,
+          "r_sp": 0.6452042628774423,
+          "r_gen": 0.7066869300911854,
+          "ratio_gen_over_sp": 1.095291787037405,
+          "null_new_genera_mean": 790.445,
+          "null_new_genera_sd": 17.181472287023272,
+          "null_r_gen_mean": 1.2012841945288755,
+          "obs_over_null_new_genera": 0.588276224152218
+        },
+        "Hawaii (HAW)": {
+          "area_code_l3": "HAW",
+          "area": "Hawaii",
+          "region": "North-Central Pacific",
+          "continent": "PACIFIC",
+          "native_species": 1251,
+          "native_genera": 276,
+          "introduced_species": 1384,
+          "introduced_genera": 736,
+          "new_genera": 633,
+          "r_sp": 1.1063149480415668,
+          "r_gen": 2.2934782608695654,
+          "ratio_gen_over_sp": 2.0730789771299323,
+          "null_new_genera_mean": 827.67,
+          "null_new_genera_sd": 16.246873684577384,
+          "null_r_gen_mean": 2.998804347826087,
+          "obs_over_null_new_genera": 0.76479756424662
+        }
+      },
+      "rule_based_verdict": "supports"
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.55,
+  "caveats": [
+    "Both pre-registered thresholds are met only marginally (0.822 vs 0.80; median ratio 1.2535 vs 1.25), so the descriptive generalisation holds for most floras but the excess of genera is modest, not 'far more' as Darwin wrote; the 95% CI of the fraction of areas is [0.778, 0.859].",
+    "The secondary null model points the other way from Darwin's interpretation: in every area, drawing the same number of species at random from the non-native global pool would add more new genera than the real naturalised flora does (observed/expected new genera median 0.61). Naturalised plants are thus more concentrated in genera already native to the recipient flora than random species would be; the r_gen > r_sp pattern is largely an arithmetic consequence of genera being fewer than species, not evidence that naturalised plants are generically distinct from natives.",
+    "WCVP 'introduced' covers established aliens as recorded by Kew's editors and is incomplete for some regions (e.g. parts of tropical Asia and the Pacific, where the fraction of supporting areas is lowest); areas are TDWG level-3 units of very unequal size.",
+    "Darwin's examples (Gray's 1856 US flora, Britain) used 1850s genus concepts; current genera are narrower and more numerous."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-b201",
+    "date": "2026-10-31"
+  }
+}

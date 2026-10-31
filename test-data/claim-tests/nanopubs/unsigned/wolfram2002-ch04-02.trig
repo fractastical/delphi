@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch04-02--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch04-02: supports, confidence 0.9" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.9"^^xsd:double ;
+    delphi:hypothesis "Within the family of the simplest arithmetic iterations, repeated multiplication by a fixed small integer m viewed as a base-b digit array (Wolfram's opening example, pp. 116-120), some members produce digit arrays whose interior is incompressible with digit frequencies indistinguishable from uniform, while the trivial members (m a power of b) are detected as highly compressible." ;
+    delphi:passCriterion "Pre-registered. Family: all pairs (m, b) with multiplier m in 2..9 and base b in 2..9, iterating x_{t+1} = m x_t from x_0 = 1 for t = 1..T = 3000 (i.e. the digits of m^t). For each pair build the digit array of rows m^t written in base b; take the interior window of each row consisting of digit positions between 25% and 75% of that row's length (least significant digit = position 0), concatenate all interior digits in row order into one byte string (one digit per byte). Measure (i) bits per digit = 8 * lzma(preset 9|EXTREME) compressed size / number of digits; (ii) maximum absolute deviation of any digit-value frequency from 1/b. A pair is 'complex' if (i) >= 0.8 * log2(b) and (ii) <= 0.02; a pair is 'simple' if (i) < 0.1 * log2(b). The claim PASSES if at least one pair with m not a power of b is 'complex' AND every pair with m a power of b (m = b^j, j >= 1, e.g. (2,2), (4,2), (8,2), (9,3), (3,3), ...) is 'simple' (validity check that the measure separates trivially regular digit arrays). Reported, not decisive: how many of the 64 pairs are complex, and whether the pairs with m and b sharing all prime factors (e.g. (6,2), (4,8), (2,4)) behave differently." ;
+    delphi:failCriterion "Pre-registered. The claim FAILS if no pair with m not a power of b is 'complex' (every such digit array compresses below 0.8 log2(b) bits per digit or has digit frequencies deviating from uniform by more than 0.02). If any trivial pair (m a power of b) is not 'simple', the measure lacks discriminating power and the verdict is inconclusive (not-operationalizable)." ;
+    delphi:expectedObservation "Pre-registered. Family: all pairs (m, b) with multiplier m in 2..9 and base b in 2..9, iterating x_{t+1} = m x_t from x_0 = 1 for t = 1..T = 3000 (i.e. the digits of m^t). For each pair build the digit array of rows m^t written in base b; take the interior window of each row consisting of digit positions between 25% and 75% of that row's length (least significant digit = position 0), concatenate all interior digits in row order into one byte string (one digit per byte). Measure (i) bits per digit = 8 * lzma(preset 9|EXTREME) compressed size / number of digits; (ii) maximum absolute deviation of any digit-value frequency from 1/b. A pair is 'complex' if (i) >= 0.8 * log2(b) and (ii) <= 0.02; a pair is 'simple' if (i) < 0.1 * log2(b). The claim PASSES if at least one pair with m not a power of b is 'complex' AND every pair with m a power of b (m = b^j, j >= 1, e.g. (2,2), (4,2), (8,2), (9,3), (3,3), ...) is 'simple' (validity check that the measure separates trivially regular digit arrays). Reported, not decisive: how many of the 64 pairs are complex, and whether the pairs with m and b sharing all prime factors (e.g. (6,2), (4,8), (2,4)) behave differently." ;
+    delphi:disconfirmingObservation "Pre-registered. The claim FAILS if no pair with m not a power of b is 'complex' (every such digit array compresses below 0.8 log2(b) bits per digit or has digit frequencies deviating from uniform by more than 0.02). If any trivial pair (m a power of b) is not 'simple', the measure lacks discriminating power and the verdict is inconclusive (not-operationalizable)." ;
+    delphi:admissibleDatasets "Planned datasets: nks-powers-digit-arrays" ;
+    delphi:inferenceMethod "analysis.py iterates x -> m x from 1 for 3000 steps for each of the 64 (m, b) pairs using Python integers, converts each power to base-b digits, keeps the interior 25%-75% of digit positions per row, concatenates (one byte per digit) and lzma-compresses; it also computes digit-value frequencies in the window. Per-pair results are in derived/pairs.csv. Runtime about 4 minutes." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py iterates x -> m x from 1 for 3000 steps for each of the 64 (m, b) pairs using Python integers, converts each power to base-b digits, keeps the interior 25%-75% of digit positions per row, concatenates (one byte per digit) and lzma-compresses; it also computes digit-value frequencies in the window. Per-pair results are in derived/pairs.csv. Runtime about 4 minutes." ;
+    rdfs:comment "Measured: 43 pairs (m,b) with m not a power of b whose interior digit array is 'complex' by the pre-registered criteria (n = 53). Interpretation: Wolfram's 'even rather simple systems based on numbers can lead to highly complex behavior' (p. 115) is illustrated by the digit sequences of successive powers (p. 116-120: 2^t in base 2 is trivial, 3^t in base 2 looks random). 'Highly complex behavior' is read as digit arrays that a general-purpose compressor cannot reduce below 80% of their entropy bound and whose digit frequencies are uniform to within 2%, in explicit contrast to the trivial members of the same family that compress to below 10%. The claim is existential; the family is the smallest natural one containing the book's opening examples. The window excludes the leading digits (biased by Benford-type effects) and trailing digits (eventually periodic in t at fixed position, and all zero when b divides m)." ;
+    delphi:evidenceAgainst "The 10 non-complex non-trivial pairs split into two explicable groups: (2,4), (2,8), (4,8), (8,4), (3,9) where m and b are powers of a common integer (the pre-registered 'm is a power of b' control missed this symmetric case; they compress to < 0.001 of the bound, i.e. are trivially regular), and the five m = 6 pairs in bases 2, 3, 4, 8, 9 where the trailing zeros of 6^t = 2^t 3^t occupy 1/log_b(6) of each row and intrude into the fixed 25%-75% window, lowering compression ratios to 0.30-0.83 and biasing digit frequencies." ;
+    delphi:evidenceAgainst "Incompressibility by lzma over about 3.6 million interior digits (for 3^t in base 2: 1.086 bits/digit, digit frequencies within 0.0004 of 1/2) is evidence against periodic or nested structure at these scales, not a proof of normality; the digits of 3^t in base 2 are not proven to be normal." ;
+    delphi:evidenceAgainst "The test covers the book's opening family (powers in positional notation) only; the claim's other illustrations in Chapter 4 (e.g. the 3n/2 system, iterated maps) were not tested." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-02--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch04-02/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-02--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Digit arrays of m^t in base b for m, b in 2..9, t = 1..3000 (generated by analysis.py)" ;
+    dct:description "program family under test" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p116--elementary-arithmetic/> ;
+    dct:license "generated data" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch04-02> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch04-02--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch04-02/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/wolfram-nks-claim-tests-106e)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.685Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch04-02: supports, confidence 0.9" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch04-02--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

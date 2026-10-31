@@ -1,0 +1,86 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch06-10--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch06-10: supports, confidence 0.95" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.95"^^xsd:double ;
+    delphi:hypothesis "Electric organs (Darwin's stated example) occur in fish lineages that are separated on an independently estimated phylogeny by lineages lacking electric organs, so that the organ must have arisen more than once rather than being inherited from one common ancestor; the same holds for light-producing organs in insects (his second example)." ;
+    delphi:passCriterion "Pre-registered: on the Open Tree of Life synthetic tree induced on a fixed list of electric-organ-bearing fish families and a fixed list of non-electric fish families, count (i) the Dollo minimum number of independent origins = number of maximal clades whose tips are all electric, and (ii) the Fitch parsimony minimum number of state changes. SUPPORTS if, for the electric-fish case, (i) >= 3 and (ii) >= 3 (no reconstruction with a single origin and fewer than three changes exists). The insect light-organ case is scored the same way and reported; it does not decide the verdict because the claim is existential ('has sometimes')." ;
+    delphi:failCriterion "Pre-registered: REFUTES if the electric-organ-bearing families form a single clade in the synthetic tree (Dollo origins = 1, Fitch changes = 1). MIXED if Dollo origins = 2, or if the two statistics disagree about whether >= 3 changes are needed. If the Open Tree API is unreachable or fewer than 80% of the listed families map to the tree, the result is inconclusive (data-unavailable)." ;
+    delphi:expectedObservation "Pre-registered: on the Open Tree of Life synthetic tree induced on a fixed list of electric-organ-bearing fish families and a fixed list of non-electric fish families, count (i) the Dollo minimum number of independent origins = number of maximal clades whose tips are all electric, and (ii) the Fitch parsimony minimum number of state changes. SUPPORTS if, for the electric-fish case, (i) >= 3 and (ii) >= 3 (no reconstruction with a single origin and fewer than three changes exists). The insect light-organ case is scored the same way and reported; it does not decide the verdict because the claim is existential ('has sometimes')." ;
+    delphi:disconfirmingObservation "Pre-registered: REFUTES if the electric-organ-bearing families form a single clade in the synthetic tree (Dollo origins = 1, Fitch changes = 1). MIXED if Dollo origins = 2, or if the two statistics disagree about whether >= 3 changes are needed. If the Open Tree API is unreachable or fewer than 80% of the listed families map to the tree, the result is inconclusive (data-unavailable)." ;
+    delphi:admissibleDatasets "Planned datasets: opentree-synthetic-tree-api" ;
+    delphi:inferenceMethod "The pre-registered family names were resolved with the Open Tree TNRS (exact matches only, context Vertebrates / Arthropods) and an induced subtree of the synthetic tree was requested for the matched ott ids. Taxa pruned from the synthesis (Lamnidae) or non-monophyletic in it and mapped to an internal node already containing other sampled tips were dropped; the rest were coded 1 (electric / luminous) or 0 (background). Unary node chains were collapsed, then the number of maximal all-1 clades (Dollo minimum number of independent origins) and the Fitch parsimony minimum number of state changes were computed on the induced tree." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "The pre-registered family names were resolved with the Open Tree TNRS (exact matches only, context Vertebrates / Arthropods) and an induced subtree of the synthetic tree was requested for the matched ott ids. Taxa pruned from the synthesis (Lamnidae) or non-monophyletic in it and mapped to an internal node already containing other sampled tips were dropped; the rest were coded 1 (electric / luminous) or 0 (background). Unary node chains were collapsed, then the number of maximal all-1 clades (Dollo minimum number of independent origins) and the Fitch parsimony minimum number of state changes were computed on the induced tree." ;
+    rdfs:comment "Measured: 6 minimum independent origins (Dollo) of electric organs among fish families on the Open Tree synthetic tree (n = 45, Fitch parsimony minimum changes = 6; 10 electric tips of 45). Interpretation: Darwin's claim has two parts: that similar organs sometimes arose independently in distantly related organisms (testable from a phylogeny) and that natural selection acting on analogous variations produced them (a mechanism not tested here). Only the first, pattern part is tested. 'Electric organs of fishes' = the families with electrogenic organs in the modern literature: Torpedinidae, Narcinidae, Narkidae, Hypnidae (Torpediniformes), Rajidae (skates), Mormyridae and Gymnarchidae (Mormyroidea), Gymnotidae, Apteronotidae, Sternopygidae, Hypopomidae, Rhamphichthyidae (Gymnotiformes), Malapteruridae (electric catfish) and Uranoscopidae (stargazers); Darwin knew Torpedo, Gymnotus and the electric catfish. 'Luminous organs of insects' = Lampyridae, Phengodidae, Rhagophthalmidae, Elateridae (Pyrophorini), Keroplatidae (Arachnocampa, Orfelia). 'Independently estimated phylogeny' = the Open Tree of Life synthetic tree, whose fish and insect backbones derive mostly from molecular studies. Independence is counted on a tree whose tips are families; origins within a family are not counted separately, which makes the count conservative." ;
+    delphi:evidenceAgainst "The six electric clades recovered (Torpediniformes, Rajidae, Mormyroidea, Gymnotiformes, Malapteruridae, Uranoscopidae) are separated by many non-electric families, so the result is insensitive to the exact background sample; it also matches the count in the modern literature, which was not used as input." ;
+    delphi:evidenceAgainst "Only the pattern half of the claim (independent origins) is tested; whether natural selection on 'analogous variations' produced them is not addressed by a phylogeny." ;
+    delphi:evidenceAgainst "Seven of 52 fish names (Narcinidae, Gymnotidae, Sternopygidae, Hypopomidae, Rhinobatidae, Serranidae, Lamnidae) could not be placed as tips because they are non-monophyletic in the synthetic tree or pruned from it; every dropped electric family belongs to a clade (Torpediniformes, Gymnotiformes) that is already represented, so the count is unchanged." ;
+    delphi:evidenceAgainst "The luminous-insect case gives 2 independent origins (Lampyridae + Rhagophthalmidae; Keroplatidae) because Elateridae and Phengodidae could not be placed as tips; the literature count is higher. It was pre-registered as reported-only." ;
+    delphi:evidenceAgainst "The synthetic tree is a supertree whose fish backbone comes mostly from molecular studies; it carries no branch support, so no uncertainty on the origin count is given." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch06-10--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch06-10/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch06-10--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Open Tree of Life synthetic tree opentree16.1 (taxonomy 3.7draft3) via the v3 API: tnrs/match_names and tree_of_life/induced_subtree" ;
+    dct:description "independently estimated family-level phylogeny of fishes and of insects on which the electric / luminous character states were mapped" ;
+    delphi:hasChecksum "sha256:aa8103ee4fe56d946d224583eeccbcc1294fdb6bafbfb2f6ba2c44897c5b317c" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tree_of_life/about> ;
+    delphi:hasChecksum "sha256:b13a704ec122f6ff268afdabe3c1d212423fdd7c4579c7a1f3743ab865821672" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tnrs/match_names> ;
+    delphi:hasChecksum "sha256:830eb15fd0a2f053a3d66e27de7b42e5b8dfc485638b5f983521760c018d43d5" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree> ;
+    delphi:hasChecksum "sha256:c48251d66423673f3b2806d1f5f5b95def5eb9f831fdf27d54e74ba79b50ddfb" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tnrs/match_names> ;
+    delphi:hasChecksum "sha256:d3956a21b5bd886366a664cff91290b2eadeb276f633e7544191f7809af2e339" ;
+    prov:atLocation <https://api.opentreeoflife.org/v3/tree_of_life/induced_subtree> ;
+    prov:wasDerivedFrom <https://tree.opentreeoflife.org/> ;
+    dct:license "CC0 (Open Tree synthesis products)" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch06-10> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch06-10--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch06-10/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-bdd1)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.650Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch06-10: supports, confidence 0.95" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch06-10--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

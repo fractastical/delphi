@@ -1,0 +1,159 @@
+[
+  {
+    "claim_id": "thompson1917-ch13-01",
+    "status": "formalized",
+    "label": "Constant front-to-back growth ratio makes the rhinoceros horn a logarithmic spiral",
+    "notation": "v_{ant}/v_{post} = \\rho = \\text{const},\\ w = \\beta s \\Rightarrow s = s_0 e^{\\theta\\cot\\alpha},\\ \\cot\\alpha = \\beta/(\\rho - 1)",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.hornSpiralRate",
+    "lean_theorems": ["ThompsonLaws.HornsLeavesEggs.hornLength_eq_exp"],
+    "assumptions": "Anterior side grows at a constant multiple rho > 1 of the posterior growth rate; bending through d(theta) lengthens the outer side over the inner by the horn's width (ds_out - ds_in = w d(theta)); width proportional to length (w = beta s, constant taper); posterior length differentiable in the turning angle theta.",
+    "scope_note": "Proves the horn's length grows exponentially in its turning angle, s = s0 e^{theta cot alpha}, which is the intrinsic (Whewell) equation of a logarithmic spiral of constant angle alpha; the claims.json polar form r = a e^{theta cot alpha} is equivalent but was restated in the form actually proved. The plane (untwisted) character follows from the median position by symmetry and is not formalized here (see ch13-06). Whether real horns have constant growth ratio and taper is empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch13-03",
+    "status": "formalized",
+    "label": "Constant unequal growth on opposite sides gives a continuous, self-similar horn spiral",
+    "notation": "v_1/v_2 = \\rho = \\text{const} \\Rightarrow s(\\theta + \\varphi) = e^{\\varphi\\cot\\alpha} s(\\theta),\\ \\cot\\alpha = \\beta/(\\rho - 1)",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.hornSpiralRate",
+    "lean_theorems": [
+      "ThompsonLaws.HornsLeavesEggs.hornLength_selfSimilar",
+      "ThompsonLaws.HornsLeavesEggs.hornSpiralRate_antitone"
+    ],
+    "assumptions": "Same growth model as ch13-01: growth rates on two opposite sides in constant ratio rho > 1 throughout growth, bending equal to width per unit turning, width proportional to length.",
+    "scope_note": "Proves that every further turning through phi multiplies the horn by the same factor at any stage of growth (the spiral is continuous and self-similar), and that the spiral constant cot alpha decreases as the growth inequality rho grows, so nearly equal growth gives a nearly straight horn. The polar notation of claims.json was restated as the self-similarity actually proved. That this holds in the great majority of horns is empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch13-04",
+    "status": "not-formalized",
+    "label": "Goat and sheep horns form a series of homologous spirals of increasing angle",
+    "notation": "\\alpha < 40^\\circ (Oryx), < 70^\\circ (Scinde wild goat), \\approx 75^\\circ (Ovis ammon), > 75^\\circ (Highland ram)",
+    "reason": "Empirical generalization from Thompson's measurements of spiral angles in particular species; there is no mathematical inference to prove, only measured values to check against horn data."
+  },
+  {
+    "claim_id": "thompson1917-ch13-06",
+    "status": "formalized",
+    "label": "Fastest and slowest horn growth share a plane with the axis iff diametrically opposite",
+    "notation": "\\cos\\varphi_1\\sin\\varphi_2 - \\sin\\varphi_1\\cos\\varphi_2 = 0 \\iff \\cos(\\varphi_2 - \\varphi_1) = -1 \\quad (\\varphi_1 \\neq \\varphi_2)",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.growthDirectionsCross",
+    "lean_theorems": ["ThompsonLaws.HornsLeavesEggs.growthDirections_coplanar_iff_opposite"],
+    "assumptions": "The directions of maximal and minimal growth are distinct unit directions (angles phi1, phi2) around the circular basal growth zone; a plane spiral requires both to lie in a single plane through the horn's axis.",
+    "scope_note": "Proves the geometric core: two distinct points of the basal annulus lie in one plane with the axis exactly when they are diametrically opposite. The notation was restated in the form proved. That non-coplanar extremes produce a helical component, and that real horns usually lack such a plane of symmetry, are Thompson's physical assertions and left to a three-dimensional growth model and data."
+  },
+  {
+    "claim_id": "thompson1917-ch13-13",
+    "status": "formalized",
+    "label": "Claws, beaks and teeth grown by unequal accretion are log spirals, conspicuous when long",
+    "notation": "s = s_0 e^{\\theta\\cot\\alpha} \\Rightarrow \\theta = \\tan\\alpha\\,\\log(s/s_0)",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.hornSpiralRate",
+    "lean_theorems": ["ThompsonLaws.HornsLeavesEggs.accretionTurning_eq_log"],
+    "assumptions": "Same accretionary growth model as the horn (ch13-01): permanent increments, constant ratio rho > 1 of growth on opposite sides, width proportional to length, beta > 0, initial length positive.",
+    "scope_note": "Proves the structure is a logarithmic spiral whose turning angle grows only as the logarithm of its length (theta = tan alpha log(s/s0)), so the spiral becomes visible only when the structure is long. The notation was restated as proved. Whether nails, claws, beaks and teeth meet the model's assumptions is empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch14-07",
+    "status": "formalized",
+    "label": "One Fibonacci parastichy pair entails every lower pair down to (1, 1)",
+    "notation": "F_{n+1} = F_n + F_{n-1} (1, 2, 3, 5, 8, 13, \\dots); pair (F_n, F_{n+1}) present \\Rightarrow all lower pairs present",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.taitStep",
+    "lean_theorems": [
+      "ThompsonLaws.HornsLeavesEggs.taitStep_fib",
+      "ThompsonLaws.HornsLeavesEggs.taitStep_iterate_fib",
+      "ThompsonLaws.HornsLeavesEggs.taitStep_reaches_one_one"
+    ],
+    "assumptions": "Tait's construction: in a system with one genetic spiral, a parastichy pair (m, n) implies the pair (n, m - n) in the same system (the leaf S reached by n and m - n steps).",
+    "scope_note": "Proves that Tait's reduction step maps each consecutive Fibonacci pair to the next lower one and that iterating it from (F_{k+2}, F_{k+1}) passes through every lower pair and ends at (1, 1). The geometric step itself (existence of the leaf S on the unwrapped cylinder) is taken as Thompson's construction, not derived from a lattice model."
+  },
+  {
+    "claim_id": "thompson1917-ch14-08",
+    "status": "formalized",
+    "label": "Between two and three leaves per turn (t = 2) gives the Fibonacci parastichy series",
+    "notation": "G_0 = 1,\\ G_1 = t,\\ G_{n+2} = G_n + G_{n+1};\\ t = 2 \\Rightarrow G_n = F_{n+2} (1, 2, 3, 5, 8, \\dots);\\ t = 3 \\Rightarrow 1, 3, 4, 7, \\dots",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.phyllotaxisSeries",
+    "lean_theorems": [
+      "ThompsonLaws.HornsLeavesEggs.phyllotaxisSeries_two",
+      "ThompsonLaws.HornsLeavesEggs.phyllotaxisSeries_three_not_fib"
+    ],
+    "assumptions": "The parastichy series of a system is generated upward from its lowest pair (1, t) by the inverse of Tait's step, (m, n) -> (m + n, m).",
+    "scope_note": "Proves that t = 2 generates exactly the Fibonacci numbers and that t = 3 generates a different series (it contains 4, which is not a Fibonacci number). The notation was restated as the recurrence proved. That t = 2 holds in the great majority of fir-cones and other plants is empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch14-09",
+    "status": "not-formalized",
+    "label": "Which parastichies are conspicuous depends on leaf proportions, not on divergence",
+    "notation": "conspicuous parastichies set by the ratio of the diagonals of the rhomboid circumscribing each leaf-area, not by the divergence angle",
+    "reason": "Conspicuousness is a perceptual property with no mathematical definition, and Thompson states he did not investigate the mathematics; any Lean statement would have to invent the criterion of what the eye catches."
+  },
+  {
+    "claim_id": "thompson1917-ch14-10",
+    "status": "formalized",
+    "label": "Phyllotactic fractions 1/2, 2/3, 3/5, … converge to the golden mean (√5 − 1)/2",
+    "notation": "\\tfrac{1}{2}, \\tfrac{2}{3}, \\tfrac{3}{5}, \\tfrac{5}{8}, \\dots \\to (\\sqrt{5} - 1)/2 \\approx 0.618",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.phyllotacticFraction",
+    "lean_theorems": ["ThompsonLaws.HornsLeavesEggs.phyllotacticFraction_tendsto_goldenMean"],
+    "assumptions": "Phyllotactic fractions are ratios F_n / F_{n+1} of consecutive Fibonacci numbers.",
+    "scope_note": "Proves the mathematical fact Thompson cites: F_n / F_{n+1} tends to (√5 − 1)/2. His conclusion that this is a coincidence without biological significance is a conceptual judgement that mathematics cannot establish."
+  },
+  {
+    "claim_id": "thompson1917-ch15-06",
+    "status": "formalized",
+    "label": "Egg equation p_n + T(1/r + 1/r′) = P: external pressure flattens the egg",
+    "notation": "p_n + T/r + T'/r' = P; with equal tensions p_n + T(1/r + 1/r') = P",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.membraneCurvaturePressure",
+    "lean_theorems": [
+      "ThompsonLaws.HornsLeavesEggs.eggEquation_equalTensions",
+      "ThompsonLaws.HornsLeavesEggs.egg_flatter_where_pressed",
+      "ThompsonLaws.HornsLeavesEggs.egg_uniformPressure_constCurvature"
+    ],
+    "assumptions": "Membrane equilibrium p_n + T(1/r + 1/r') = P holds at each point (taken as the postulate); tension T > 0 and internal pressure P the same over the egg.",
+    "scope_note": "Takes the Laplace membrane equation as the stated law and proves its consequences: it reduces from unequal to equal tensions, a point under greater external pressure has smaller total curvature, and uniform external pressure forces constant total curvature. The equation itself is not derived from membrane mechanics; oviduct pressures and egg curvatures are empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch15-10",
+    "status": "formalized",
+    "label": "Vessel wall thickness ∝ radius at constant pressure, relatively thinner as pressure falls",
+    "notation": "P = T/R,\\ T = \\sigma t \\Rightarrow t = (P/\\sigma) R;\\ P_2 < P_1 \\Rightarrow t_2/R_2 < t_1/R_1",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.vesselWallThickness",
+    "lean_theorems": [
+      "ThompsonLaws.HornsLeavesEggs.vesselWall_eq",
+      "ThompsonLaws.HornsLeavesEggs.vesselWall_relThinner"
+    ],
+    "assumptions": "Cylindrical vessel, external support neglected (P = T/R); tension proportional to wall thickness with the same stress sigma > 0 in all vessels; R > 0.",
+    "scope_note": "Proves wall thickness is proportional to radius at constant pressure and that a vessel at lower pressure has a smaller thickness-to-radius ratio. The notation was extended to state both results. That pressure actually falls from large arteries to capillaries, and by how much, is empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch15-11",
+    "status": "formalized",
+    "label": "Heart wall thickness varies inversely with the chamber's mean curvature",
+    "notation": "t(1/r + 1/r') = C within each cavity of the heart",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.heartWallThickness",
+    "lean_theorems": [
+      "ThompsonLaws.HornsLeavesEggs.heartWall_mul_curvature",
+      "ThompsonLaws.HornsLeavesEggs.heartWall_thinner_where_curved"
+    ],
+    "assumptions": "Uniform pressure P within a cavity; Laplace's law P = T(1/r + 1/r') at each point; tension proportional to wall thickness, T = sigma t with the same sigma > 0 over the wall; positive curvature.",
+    "scope_note": "Proves t(1/r + 1/r') = P/sigma, the same constant C at every point of a cavity, and that the more curved region is thinner. That real myocardium carries equal stress per unit thickness (so that the apex is the thinnest) is empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch15-12",
+    "status": "formalized",
+    "label": "Equally dilated ventricles have wall-thickness ratio equal to their pressure ratio",
+    "notation": "t_L/t_R = P_L/P_R \\text{ at equal curvature};\\ P_L/P_R \\approx 6\\text{--}7 \\text{ (measured)}",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.heartWallThickness",
+    "lean_theorems": ["ThompsonLaws.HornsLeavesEggs.ventricleThickness_ratio"],
+    "assumptions": "Both ventricles dilated to the same curvature (equal and symmetric dilation); same tension per unit thickness sigma > 0; heart-wall law of ch15-11; P_R > 0.",
+    "scope_note": "Proves that at equal curvature the thickness ratio equals the dilating-pressure ratio. The value 6–7 is Thompson's measurement and is left to data; the notation was restated to separate the proved relation from the measured value."
+  },
+  {
+    "claim_id": "thompson1917-ch15-15",
+    "status": "formalized",
+    "label": "Optimal arterial branching angle has cos x = L/L′, trunk-to-branch energy-loss ratio",
+    "notation": "\\cos x = L/L', L and L' the energy loss per unit length in trunk and branch",
+    "lean_declaration": "ThompsonLaws.HornsLeavesEggs.branchEnergyLoss",
+    "lean_theorems": [
+      "ThompsonLaws.HornsLeavesEggs.branchEnergyLoss_hasDerivAt",
+      "ThompsonLaws.HornsLeavesEggs.branchEnergyLoss_stationary_iff"
+    ],
+    "assumptions": "Hess's model: blood travels along a straight trunk at loss L per unit length, then along a straight branch to a target at lateral distance h ≠ 0 at loss L' > 0 per unit length; total loss E(u) = L(D - u) + L' sqrt(u^2 + h^2), with u the remaining axial distance and cos x = u / sqrt(u^2 + h^2).",
+    "scope_note": "Proves the energy loss is stationary in the branching point exactly when cos x = L/L', Thompson's (Hess's) equal-neighbouring-routes argument; global minimality is not proved separately. Real energy losses per unit length and branch angles are empirical."
+  }
+]

@@ -38,13 +38,20 @@ function toLocalPath(iri) {
   return i < 0 ? rest : `${rest.slice(0, i + 5)}${rest.length > i + 6 ? `#${rest.slice(i + 6)}` : ""}`;
 }
 
-// Local store: every */nanopubs/unsigned and */nanopubs/*-unsigned directory. Signed copies are
-// skipped because they duplicate the unsigned content.
+// Local store: every nanopubs/unsigned and nanopubs/*-unsigned directory of a project under
+// claim-sources/ or test-data/. Signed copies are skipped because they duplicate the unsigned content.
+function projectDirs(dir) {
+  try {
+    return readdirSync(dir, { withFileTypes: true })
+      .filter(d => d.isDirectory() && !d.name.startsWith(".") && d.name !== "node_modules")
+      .map(d => join(dir, d.name));
+  } catch { return []; }
+}
+
 function localFiles() {
   const files = [];
-  for (const project of readdirSync(REPO, { withFileTypes: true })) {
-    if (!project.isDirectory() || project.name.startsWith(".") || project.name === "node_modules") continue;
-    const npDir = join(REPO, project.name, "nanopubs");
+  for (const project of [...projectDirs(join(REPO, "claim-sources")), ...projectDirs(join(REPO, "test-data"))]) {
+    const npDir = join(project, "nanopubs");
     let dirs;
     try { dirs = readdirSync(npDir, { withFileTypes: true }); } catch { continue; }
     for (const d of dirs) {
@@ -63,7 +70,7 @@ function localStore() {
   if (cache?.stamp === stamp) return cache.store;
   const store = new oxigraph.Store();
   for (const f of files) {
-    const trig = readFileSync(f, "utf8").replaceAll(TEMP_BASE, `${LOCAL_BASE}${relative(REPO, f)}/`);
+    const trig = readFileSync(f, "utf8").replaceAll(TEMP_BASE, `${LOCAL_BASE}${relative(REPO, f).replaceAll("\\", "/")}/`);
     store.load(trig, { format: "application/trig" });
   }
   cache = { stamp, store, files: files.length };
@@ -75,20 +82,35 @@ export function localFileCount() {
   return cache.files;
 }
 
+// Default prefixes the query does not declare itself. RDF4J (the network endpoint) rejects a
+// prefix declared twice, so declared ones are not repeated.
+function withPrefixes(query) {
+  const declared = new Set([...query.matchAll(/\bPREFIX\s+([\w-]*):/gi)].map(m => m[1]));
+  return PREFIXES.split("\n").filter(l => l && !declared.has(l.match(/^PREFIX (\w+):/)[1])).map(l => l + "\n").join("") + query;
+}
+
+const PROLOGUE = /^(?:\s+|#[^\n]*|PREFIX\s+[\w-]*:\s*<[^>]*>|BASE\s*<[^>]*>)*/i;
+const queryForm = q => q.replace(PROLOGUE, "").match(/^(SELECT|ASK|CONSTRUCT|DESCRIBE)\b/i)?.[1].toUpperCase() ?? "SELECT";
+
+// SELECT returns rows, ASK { boolean }, CONSTRUCT and DESCRIBE { triples } as N-Triples.
 export async function sparql(query, source = "local") {
-  const q = query.includes("PREFIX") ? query : PREFIXES + query;
+  const q = withPrefixes(query);
+  const form = queryForm(q);
+  const graphForm = form === "CONSTRUCT" || form === "DESCRIBE";
+  const parse = json => (form === "ASK" ? { boolean: json.boolean } : simplify(json));
   if (source === "local") {
-    return simplify(JSON.parse(localStore().query(q, { results_format: "application/sparql-results+json" })));
+    if (graphForm) return { triples: localStore().query(q, { results_format: "application/n-triples" }) };
+    return parse(JSON.parse(localStore().query(q, { results_format: "application/sparql-results+json" })));
   }
   if (source !== "network") throw new Error(`Unknown source "${source}" (use "local" or "network")`);
   const res = await fetch(NETWORK_ENDPOINT, {
     method: "POST",
-    headers: { Accept: "application/sparql-results+json", "Content-Type": "application/x-www-form-urlencoded" },
+    headers: { Accept: graphForm ? "application/n-triples" : "application/sparql-results+json", "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ query: q }),
     signal: AbortSignal.timeout(60_000),
   });
   if (!res.ok) throw new Error(`SPARQL endpoint ${NETWORK_ENDPOINT} returned ${res.status}: ${(await res.text()).slice(0, 500)}`);
-  return simplify(await res.json());
+  return graphForm ? { triples: await res.text() } : parse(await res.json());
 }
 
 const lit = s => JSON.stringify(String(s));
@@ -124,7 +146,7 @@ export async function searchClaims({ text, domain, mathOnly = false, limit = 20,
     text && `FILTER(CONTAINS(LCASE(CONCAT(STR(?label), " ", COALESCE(STR(?desc), ""), " ", COALESCE(STR(?notation), ""))), LCASE(${lit(text)})))`,
     domain && `FILTER(CONTAINS(LCASE(STR(?d)), LCASE(${lit(domain)})))`,
   ].filter(Boolean).join("\n  ");
-  return sparql(`
+  const rows = await sparql(`
 SELECT ?claim (SAMPLE(?label) AS ?title) (SAMPLE(?desc) AS ?statement)
        (GROUP_CONCAT(DISTINCT STR(?notation); separator=" || ") AS ?math)
        (SAMPLE(STR(?d)) AS ?domain) (SAMPLE(?np) AS ?nanopub) WHERE {
@@ -137,10 +159,32 @@ SELECT ?claim (SAMPLE(?label) AS ?title) (SAMPLE(?desc) AS ?statement)
   OPTIONAL { GRAPH ?p { ?np delphi:domain ?d . } }
   ${filters}
 } GROUP BY ?claim ORDER BY ?claim LIMIT ${Math.min(Number(limit) || 20, 500)}`, source);
+  // Attach the data-test contract (expected / disconfirming observation, admissible datasets,
+  // inference method) and verdict from test-data/claim-tests/, via docs/claims.json. Repo-only knowledge,
+  // so only for the local source.
+  if (source === "local") {
+    const tests = dataTests();
+    for (const r of rows) {
+      const t = tests.get(String(r.claim).split("/").pop());
+      if (t) { r.evidence = t.verdict; r.evidenceConfidence = t.confidence; r.testContract = t.test_contract; if (t.revisions?.length) r.revisions = t.revisions; }
+    }
+  }
+  return rows;
+}
+
+let testsCache = null;
+function dataTests() {
+  const f = join(REPO, "docs/claims.json");
+  try {
+    const mtime = statSync(f).mtimeMs;
+    if (testsCache?.mtime !== mtime) testsCache = { mtime, map: new Map(JSON.parse(readFileSync(f, "utf8")).claims.filter(c => c.data_test).map(c => [c.id, c.data_test])) };
+    return testsCache.map;
+  } catch { return new Map(); }
 }
 
 export async function getClaim({ id, source = "local" }) {
-  const iri = claimIri(id);
+  const iri = claimIri(String(id).trim());
+  if (!/^https?:\/\/[^\s<>"{}|\\^`]+$/.test(iri)) return { claim: iri, found: false, source, error: "Not a valid claim id or IRI" };
   const triples = await sparql(`
 SELECT DISTINCT ?nanopub ?predicate ?value WHERE {
   GRAPH ?h { ?nanopub np:hasAssertion ?a . }

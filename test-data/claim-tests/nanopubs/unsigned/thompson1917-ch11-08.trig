@@ -1,0 +1,94 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch11-08--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch11-08: mixed, confidence 0.75" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.75"^^xsd:double ;
+    delphi:hypothesis "Along a radius, successive whorl breadths (and hence conch diameters measured at successive half-whorls) of Nautilus, ammonoids and spiral gastropods form a geometric progression: log(diameter) is linear in whorl number, so the whorl expansion rate is constant through ontogeny; for Nautilus the ratio per whole whorl is about 3." ;
+    delphi:passCriterion "Pre-registered. For every specimen with at least four successive half-whorl conch-diameter measurements (ammonoids: stages with diameter >= 5 mm, excluding the embryonic ammonitella; Nautilus: all measured post-embryonic stages): (1) fit log(dm) against half-whorl index by least squares; the median R^2 across specimens must be >= 0.99, and the exponential (geometric) model must have lower residual sum of squares on the dm scale than a straight-line (arithmetic) model in at least 75% of specimens; (2) strict constancy: the median across specimens of the within-specimen relative range of WER, (max - min)/median over post-embryonic stages, must be <= 0.20, and no systematic ontogenetic drift (median within-specimen Spearman correlation of WER with stage between -0.5 and 0.5); (3) the median Nautilus WER (per-revolution diameter ratio) must lie in [2.6, 3.5]. 'supports' requires (1), (2) and (3)." ;
+    delphi:failCriterion "Pre-registered. 'refutes' if the geometric model beats the arithmetic model in fewer than 50% of specimens, or the median R^2 < 0.95, or the median Nautilus WER is outside [2.2, 4.0]. 'mixed' if the geometric progression holds approximately ((1) and (3) pass) but the strict constancy test (2) fails, i.e. WER drifts systematically during growth. Gastropods are included only if a public dataset gives successive whorl measurements per specimen; otherwise the gastropod part is reported as data-unavailable and the verdict rests on nautiloids and ammonoids with a caveat." ;
+    delphi:expectedObservation "Pre-registered. For every specimen with at least four successive half-whorl conch-diameter measurements (ammonoids: stages with diameter >= 5 mm, excluding the embryonic ammonitella; Nautilus: all measured post-embryonic stages): (1) fit log(dm) against half-whorl index by least squares; the median R^2 across specimens must be >= 0.99, and the exponential (geometric) model must have lower residual sum of squares on the dm scale than a straight-line (arithmetic) model in at least 75% of specimens; (2) strict constancy: the median across specimens of the within-specimen relative range of WER, (max - min)/median over post-embryonic stages, must be <= 0.20, and no systematic ontogenetic drift (median within-specimen Spearman correlation of WER with stage between -0.5 and 0.5); (3) the median Nautilus WER (per-revolution diameter ratio) must lie in [2.6, 3.5]. 'supports' requires (1), (2) and (3)." ;
+    delphi:disconfirmingObservation "Pre-registered. 'refutes' if the geometric model beats the arithmetic model in fewer than 50% of specimens, or the median R^2 < 0.95, or the median Nautilus WER is outside [2.2, 4.0]. 'mixed' if the geometric progression holds approximately ((1) and (3) pass) but the strict constancy test (2) fails, i.e. WER drifts systematically during growth. Gastropods are included only if a public dataset gives successive whorl measurements per specimen; otherwise the gastropod part is reported as data-unavailable and the verdict rests on nautiloids and ammonoids with a caveat." ;
+    delphi:admissibleDatasets "Planned datasets: tajika-2018-nautilus-pompilius-dryad-4cb86, walton-korn-2018-ammonoid-ontogeny-dryad-c17p8, collins-2021-helicospiral-gastropods-dryad-p5hqbzknw" ;
+    delphi:inferenceMethod "fetch.py obtains the files and writes derived station tables (committed; identical to those in thompson1917-ch11-10). analysis.py fits, per specimen, log(size) ~ station index (geometric) and size ~ station index (arithmetic) by least squares, compares their residual sums of squares on the size scale, and computes the per-revolution ratio r at each station (lag 8 for Nautilus 45-degree stations, lag 2 for half-whorl ammonoid and 180-degree gastropod stations), its within-specimen relative range (max-min)/median, and the Spearman correlation of r with station (drift). Group summaries are medians across specimens; ammonoid stations with dm < 5 mm are excluded as pre-registered." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "fetch.py obtains the files and writes derived station tables (committed; identical to those in thompson1917-ch11-10). analysis.py fits, per specimen, log(size) ~ station index (geometric) and size ~ station index (arithmetic) by least squares, compares their residual sums of squares on the size scale, and computes the per-revolution ratio r at each station (lag 8 for Nautilus 45-degree stations, lag 2 for half-whorl ammonoid and 180-degree gastropod stations), its within-specimen relative range (max-min)/median, and the Spearman correlation of r with station (drift). Group summaries are medians across specimens; ammonoid stations with dm < 5 mm are excluded as pre-registered." ;
+    rdfs:comment "Measured: 0.9993 median R^2 of log(diameter) vs whorl index per specimen, ammonoids (Nautilus 0.9995; gastropods 0.987) (n = 434, specimens: 93 Nautilus, 177 ammonoid species, 164 gastropods; min R^2 0.9984 / 0.9605 / 0.0867). Interpretation: Thompson's 'breadths of successive whorls along a radius in geometric progression' is tested on its equivalent for measured cross-sections: conch diameters at successive half-whorls, whose ratio is constant if and only if the whorl breadths are in geometric progression (both equal e^(pi cot alpha) per half-whorl for a logarithmic spiral). Korn's WER = (dm1/dm2)^2 is that half-whorl ratio squared, i.e. the per-revolution ratio Thompson quotes as 'about three' for Nautilus. The strict reading (a single constant ratio for the whole shell) and the approximate reading (a logarithmic spiral is a very good description) are both pre-registered so that the verdict distinguishes them. Station spacing differs by dataset (Nautilus 45 deg, ammonoids 180 deg, gastropods 180 deg); the fits use the station index, and the per-revolution ratio uses the appropriate lag (8, 2, 2). For gastropods the measured radius is the perpendicular distance of each digitised aperture's centroid from the coiling axis (Collins et al. 2021 raw tps data), the quantity Thompson's spiral describes for a turbinate shell." ;
+    delphi:evidenceAgainst "For Nautilus and ammonoids the geometric progression is an excellent description (median R^2 0.9995 and 0.9993; the geometric model beats the arithmetic one in 100% of specimens with residuals 1-2% of the arithmetic model's) and the Nautilus per-revolution ratio is 2.87, close to Thompson's 'about three'. Strict constancy nevertheless fails: in Nautilus the ratio rises systematically through the two measured whorls (median Spearman +0.79, though only by 7% of its value), as described by Tajika et al. 2018 and later work on nautilid ontogeny." ;
+    delphi:evidenceAgainst "Gastropods are where the claim is weakest: the geometric model beats the arithmetic model in only 73% of specimens (threshold 75%), median R^2 is 0.987 (threshold 0.99), and the expansion ratio of the aperture's distance from the axis declines through ontogeny in 84% of specimens (median Spearman -0.71, median within-specimen range 17%). This agrees with Collins et al. 2021, who conclude from the same material that the logarithmic-helicospiral assumptions fail in all 25 of their species." ;
+    delphi:evidenceAgainst "The gastropod series are short (4-11 apertures, i.e. 2-5 revolutions) and were digitised on a single sectioned plane; short noisy series depress R^2 and make the arithmetic/geometric comparison less decisive than for the CT-based cephalopod diameters." ;
+    delphi:evidenceAgainst "The ammonoid sample is biased to Palaeozoic pachyconic and globular species; Walton & Korn document multi-phase ontogenetic trajectories in these forms, so the 6% median within-species range of r is, if anything, an overestimate of constancy for ammonoids generally only in the sense that other groups could drift more." ;
+    delphi:evidenceAgainst "No arithmetic-progression alternative is seriously defensible for coiled shells; the informative comparison is between a strictly constant ratio and a slowly drifting one, which is what the 'mixed' verdict records." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-08--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-08--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-08--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch11-08/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-08--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data from: Intraspecific variation in cephalopod conchs changes during ontogeny: perspectives from three-dimensional morphometry of Nautilus pompilius" ;
+    dct:description "Nautilus diameter series" ;
+    delphi:hasChecksum "sha256:db9ee691bc10f3c03ce78340f61c5b6f2fd98f9c3b1a1f3e194b8353aee4bb9f" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/75500> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.4cb86> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-08--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data from: Iterative ontogenetic development of ammonoid conch shapes from the Devonian through to the Jurassic (Walton & Korn)" ;
+    dct:description "ammonoid diameter series" ;
+    delphi:hasChecksum "sha256:fbe2012f1d420ef7b292141ae0ed0ea8d046c4c15303663565dc72e0727ebe40" ;
+    prov:atLocation <https://zenodo.org/api/records/4937032/files/Ontogenetic_Conch_Parameter_Data.xlsx/content> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.c17p8> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-08--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data associated with: Going round the twist - An empirical analysis of shell coiling in helicospiral gastropods" ;
+    dct:description "gastropod aperture-radius series" ;
+    delphi:hasChecksum "sha256:edab9e356820a43984bcf8130359ec29f7e6c00ca3995292fcd922ba2cb3a2a9" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/547236> ;
+    delphi:hasChecksum "sha256:a034e43eb95a22dffe10b1f8d0e83ab43b0e592e8e1d646513da7ab8dfbc7a39" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/547239> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch11-08> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch11-08--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch11-08/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5-1-thinking-high; cursor/thompson-claim-tests-6e84)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5-1-thinking-high" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.674Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch11-08: mixed, confidence 0.75" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch11-08--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

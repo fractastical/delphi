@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-06--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch03-06: supports, confidence 0.85" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.85"^^xsd:double ;
+    delphi:hypothesis "Every one of the 65,536 basic two-colour mobile automata (rule maps the colours of the active cell and its two neighbours to a new colour for the active cell and a move left or right), started from all-white cells, produces a step sequence that is eventually periodic or otherwise highly compressible (nested); no basic rule produces a step sequence whose compressibility is in the range of random or complex sequences. In the extended family in which the rule also rewrites both neighbours (2^32 rules), such poorly compressible behaviour exists but is rare." ;
+    delphi:passCriterion "Pre-registered. Encoding: the behaviour of a mobile automaton is summarised by its step sequence s_t in {0,1,2,3} = 2 * (new colour of the active cell) + (1 if the active cell moves right else 0); for the extended family s_t additionally records the two neighbour colours written (16 symbols), and the sequence of active-cell positions is determined by it. Calibration (performed before the mobile automata are run, on reference sequences only): rho(L) = 8 * lzma_size(sequence of L symbols, one byte each, preset 9) / (L * log2(alphabet size)). References over a 4-symbol alphabet: periodic sequences with periods 1..500 (numpy seed 20260306), nested sequences (Thue-Morse, period-doubling, Fibonacci word, paper-folding, ruler sequence mod 4), and random sequences (numpy random symbols; rule 30 centre bits paired). The complexity threshold tau is the geometric mean of the largest rho(8000) over the periodic and nested references and the smallest rho(8000) over the random references. Stage 1: all 65,536 basic rules, 2000 steps (vectorised); a rule is 'periodic' if its last 1000 symbols have a period p <= 500. Stage 2: every non-periodic rule is run for 16000 steps and rho is computed on symbols 8000..16000 (tail); a rule is 'complex' if rho > tau. Stage 3: any rule flagged complex is re-run for 64000 steps and rho on symbols 32000..64000 is required to still exceed tau (guards against long transients). Extended family: 100,000 rules sampled uniformly (numpy seed 20260306), same three stages with the 16-symbol alphabet and a 16-symbol calibration run analogously. 'supports' if no basic rule is complex after stage 3 and the fraction of complex extended rules is <= 1 %. Secondary check reported but not decisive: the number of basic rules with non-periodic step sequences, which Wolfram gives as 218 (p. 72)." ;
+    delphi:failCriterion "Pre-registered. 'refutes' if at least one basic rule is complex after stage 3 (its tail step sequence compresses no better than the geometric midpoint between nested and random references at 32000 symbols). 'mixed' if no basic rule is complex but the extended family's complex fraction exceeds 1 %. 'inconclusive' with reason 'other' if the calibration fails to separate the reference classes (largest nested/periodic rho >= smallest random rho)." ;
+    delphi:expectedObservation "Pre-registered. Encoding: the behaviour of a mobile automaton is summarised by its step sequence s_t in {0,1,2,3} = 2 * (new colour of the active cell) + (1 if the active cell moves right else 0); for the extended family s_t additionally records the two neighbour colours written (16 symbols), and the sequence of active-cell positions is determined by it. Calibration (performed before the mobile automata are run, on reference sequences only): rho(L) = 8 * lzma_size(sequence of L symbols, one byte each, preset 9) / (L * log2(alphabet size)). References over a 4-symbol alphabet: periodic sequences with periods 1..500 (numpy seed 20260306), nested sequences (Thue-Morse, period-doubling, Fibonacci word, paper-folding, ruler sequence mod 4), and random sequences (numpy random symbols; rule 30 centre bits paired). The complexity threshold tau is the geometric mean of the largest rho(8000) over the periodic and nested references and the smallest rho(8000) over the random references. Stage 1: all 65,536 basic rules, 2000 steps (vectorised); a rule is 'periodic' if its last 1000 symbols have a period p <= 500. Stage 2: every non-periodic rule is run for 16000 steps and rho is computed on symbols 8000..16000 (tail); a rule is 'complex' if rho > tau. Stage 3: any rule flagged complex is re-run for 64000 steps and rho on symbols 32000..64000 is required to still exceed tau (guards against long transients). Extended family: 100,000 rules sampled uniformly (numpy seed 20260306), same three stages with the 16-symbol alphabet and a 16-symbol calibration run analogously. 'supports' if no basic rule is complex after stage 3 and the fraction of complex extended rules is <= 1 %. Secondary check reported but not decisive: the number of basic rules with non-periodic step sequences, which Wolfram gives as 218 (p. 72)." ;
+    delphi:disconfirmingObservation "Pre-registered. 'refutes' if at least one basic rule is complex after stage 3 (its tail step sequence compresses no better than the geometric midpoint between nested and random references at 32000 symbols). 'mixed' if no basic rule is complex but the extended family's complex fraction exceeds 1 %. 'inconclusive' with reason 'other' if the calibration fails to separate the reference classes (largest nested/periodic rho >= smallest random rho)." ;
+    delphi:admissibleDatasets "Planned datasets: nks-ch03-06-mobile-automaton-generator" ;
+    delphi:inferenceMethod "analysis.py first calibrates the compressibility statistic rho(L) = 8*lzma_bytes/(L*log2 A) on reference sequences (periodic with 14 periods up to 500, Thue-Morse, period-doubling, Fibonacci, paper-folding and ruler sequences, numpy random symbols and paired rule 30 centre bits): for A = 4 the non-random references give rho <= 0.162 and the random ones >= 1.27, so tau = 0.454; for A = 16, tau = 0.323. It then simulates all 65,536 basic mobile automata in parallel for 2000 steps from an all-white tape, labels a rule periodic if its last 1000 step symbols have a period <= 500, re-runs the non-periodic rules for 16000 steps and computes rho on the second half, and would re-run any rule above tau for 64000 steps. The same three stages were applied to 100,000 uniformly sampled neighbour-updating rules (seed 20260306) with the 16-symbol alphabet. Run time about one minute." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py first calibrates the compressibility statistic rho(L) = 8*lzma_bytes/(L*log2 A) on reference sequences (periodic with 14 periods up to 500, Thue-Morse, period-doubling, Fibonacci, paper-folding and ruler sequences, numpy random symbols and paired rule 30 centre bits): for A = 4 the non-random references give rho <= 0.162 and the random ones >= 1.27, so tau = 0.454; for A = 16, tau = 0.323. It then simulates all 65,536 basic mobile automata in parallel for 2000 steps from an all-white tape, labels a rule periodic if its last 1000 step symbols have a period <= 500, re-runs the non-periodic rules for 16000 steps and computes rho on the second half, and would re-run any rule above tau for 64000 steps. The same three stages were applied to 100,000 uniformly sampled neighbour-updating rules (seed 20260306) with the 16-symbol alphabet. Run time about one minute." ;
+    rdfs:comment "Measured: [object Object] rule counts; fraction of 100,000 sampled extended rules with tail rho above tau (n = [object Object], basic family exhaustive within the step horizons; extended fraction 0/100000 gives a 95 % upper bound of about 3e-5). Interpretation: 'Behaviour more complex than repetition or nesting' is operationalised by lossless compressibility of the step sequence, which is a complete description of the evolution from the fixed initial condition: periodic sequences compress to a constant, nested (substitution-generated) sequences compress to a slowly growing size, and sequences that are random-like or have irregular localised structures compress poorly. The threshold is fixed by calibration on classical reference sequences, not on the mobile automata themselves. Wolfram's own 'compressed form' (tape shown only when the active cell reaches a new extreme) is replaced by this generic measure. The rule convention is NKS p. 71: the rule reads (left, active, right) and writes the active cell's new colour and a direction; the extended rules (p. 73) also write both neighbours. The initial condition is all white with one active cell. Everything is generated by analysis.py; there is no external download." ;
+    delphi:evidenceAgainst "The universal clause was tested exhaustively: 65,318 basic rules are eventually periodic within 2000 steps (period <= 500) and the remaining 218 (exactly the number Wolfram reports on p. 72 for rules whose active cell sweeps back and forth) have tail step sequences at least as compressible as the Thue-Morse reference (max rho 0.122 vs tau 0.454), i.e. nested, not complex. No basic rule approached the complexity threshold." ;
+    delphi:evidenceAgainst "The extended-family clause was only partly tested: in 100,000 sampled neighbour-updating rules, 882 (0.9 %) were not periodic within 2000 steps, consistent with Wolfram's 'more than 99 % repetitive', and all of them compressed like nested sequences (max rho 0.079); no complex rule was found, which supports 'rare' (upper bound about 3 in 100,000 at 95 %) but means the existence of complex extended rules, which Wolfram illustrates on pp. 74-75, was not independently confirmed here." ;
+    delphi:evidenceAgainst "Compressibility of the step sequence is a proxy: a rule with an extremely long transient (> 2000 steps before periodicity, or > 8000 before a nested regime) would be handled by the later stages only if it was non-periodic at 2000 steps; a rule periodic within 2000 steps but complex later would be missed. The 64000-step confirmation stage was never needed." ;
+    delphi:evidenceAgainst "The threshold tau was fixed by calibration on classical sequences before any mobile automaton was run; random references give rho > 1 because of lzma's fixed overhead at 8000 symbols, which only widens the margin." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch03-06--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch03-06/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch03-06--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: All 65,536 basic two-colour mobile automata and a uniform sample of 100,000 of the 4,294,967,296 neighbour-updating mobile automata (numpy seed 20260306), generated and run by analysis.py from an all-white tape with the active cell at the centre; 2000, 16000 and 64000 steps as described; calibration reference sequences generated in the same script" ;
+    dct:description "the finite rule space the universal clause is about, and the sampled extension for the rarity clause" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p73--mobile-automata/> ;
+    dct:license "generated" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch03-06> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-06--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch03-06/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-e5f4)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.684Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch03-06: supports, confidence 0.85" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-06--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

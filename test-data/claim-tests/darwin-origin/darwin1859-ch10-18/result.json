@@ -1,0 +1,210 @@
+{
+  "claim_id": "darwin1859-ch10-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch10-18",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "If each area's later-Tertiary inhabitants left modified descendants in the same area, then the families of terrestrial mammals recorded as fossils on a continent in the Miocene-Pliocene should have living members on that same continent more often than they have living members on any other continent.",
+  "pass_criterion": "Fossil side: PBDB Miocene-Pliocene (23.03-2.58 Ma) occurrences of Mammalia on each of five continents (Africa, Eurasia = PBDB EUR+ASI, North America, South America, Australia), excluding marine orders/families (Cetacea, Sirenia, Desmostylia, Phocidae, Otariidae, Odobenidae), giving for each continent the set of fossil families with >= 2 occurrences there. Living side: GBIF non-fossil, non-captive occurrence facets by family for Mammalia on each GBIF continent (Europe+Asia merged), a family counting as living on a continent if it has >= 20 such records there (same marine exclusions). For each continent X, S(X) = fraction of X's fossil families that are living on X, and O(X) = mean over the other four continents Y of the fraction of X's fossil families living on Y. Pass if S(X) > O(X) for all five continents AND the pooled ratio mean S / mean O >= 1.2 AND, in a permutation test that randomly reassigns the five living-family sets to continents (all 120 permutations, i.e. exact), the observed sum of S(X) is the maximum or tied maximum (p <= 1/120 + ties). The same statistics at genus level (fossil genera that are extant and living on the same continent) are reported as an extra and do not enter the verdict.",
+  "fail_criterion": "Fails if fossil families are no more likely to survive on their own continent than elsewhere: S(X) <= O(X) for two or more continents, or the pooled ratio is < 1.2, or the observed sum of S(X) is not the maximum over the 120 continent-label permutations. One continent failing with the other conditions met gives 'mixed'.",
+  "planned_datasets": [
+    "pbdb-occurrences-mammalia-miocene-pliocene-by-continent",
+    "gbif-occurrence-facets-mammalia-family-by-continent",
+    "gbif-species-api-family-names"
+  ],
+  "interpretation": "Darwin's 'closely allied' is read as membership in the same family (his examples, marsupials and edentates, are order- or family-level alliances, so family is a conservative choice). 'Later Tertiary' is read as Miocene plus Pliocene. 'Same continent or area' uses modern continents, merging Europe and Asia. Birds and molluscs, also in the stated scope, are not tested because their later-Tertiary fossil record in PBDB is far sparser and their family-level taxonomy less stable; islands are not tested. The GBIF side measures where families live today, which includes recent introductions (e.g. Muridae everywhere), a bias toward sharing with other continents that works against the claim.",
+  "datasets": [
+    {
+      "id": "pbdb-occurrences-mammalia-miocene-pliocene-by-continent",
+      "name": "Paleobiology Database Mammalia occurrences, Miocene-Pliocene, genus-resolved, per continent (AFR, EUR, ASI, NOA, SOA, AUS)",
+      "landing_url": "https://paleobiodb.org/",
+      "doi": null,
+      "version": "live API data1.2, retrieved 2026-10-31",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Miocene%2CPliocene&idreso=genus&cc=AFR&show=class",
+          "retrieved_at": "2026-10-31T04:48:53Z",
+          "byte_size": 886581,
+          "sha256": "16cbf5680b6944104e4c36ee20e811088293d515ecf06a21e17c1e2f23f117fd"
+        },
+        {
+          "download_url": "https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Miocene%2CPliocene&idreso=genus&cc=EUR&show=class",
+          "retrieved_at": "2026-10-31T04:48:55Z",
+          "byte_size": 2188834,
+          "sha256": "2e5f1befcc516073419ec94a017aea7f83dc51e4e692a67c6afe6619cb9e95eb"
+        },
+        {
+          "download_url": "https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Miocene%2CPliocene&idreso=genus&cc=ASI&show=class",
+          "retrieved_at": "2026-10-31T04:48:57Z",
+          "byte_size": 859007,
+          "sha256": "b521d893295bbbac8e0766ac5ad5d836615f4145c4ec50421c251b2144293e94"
+        },
+        {
+          "download_url": "https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Miocene%2CPliocene&idreso=genus&cc=NOA&show=class",
+          "retrieved_at": "2026-10-31T04:49:00Z",
+          "byte_size": 2918417,
+          "sha256": "3c306c9f147b78ff3c90cdc041209181783038d58b56543aa49ed8f82c4e4030"
+        },
+        {
+          "download_url": "https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Miocene%2CPliocene&idreso=genus&cc=SOA&show=class",
+          "retrieved_at": "2026-10-31T04:49:01Z",
+          "byte_size": 1133555,
+          "sha256": "140d079267fbae81939b83401b38c9270495c3492c740fc7b6a16934942a79c4"
+        },
+        {
+          "download_url": "https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Miocene%2CPliocene&idreso=genus&cc=AUS&show=class",
+          "retrieved_at": "2026-10-31T04:49:02Z",
+          "byte_size": 98769,
+          "sha256": "12f888acd8327e0c3bf0ced045837dafa794eb5514cadde45479301c8c40141c"
+        }
+      ],
+      "role": "later-Tertiary fossil families and genera per continent"
+    },
+    {
+      "id": "gbif-occurrence-facets-mammalia-family-by-continent",
+      "name": "GBIF occurrence search API, Mammalia, family and genus facets per continent (non-fossil, non-captive records)",
+      "landing_url": "https://www.gbif.org/occurrence/search",
+      "doi": null,
+      "version": "live index, retrieved 2026-10-31",
+      "license": "mixed per publishing dataset (CC0, CC BY, CC BY-NC)",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?classKey=359&continent=AFRICA&hasCoordinate=true&hasGeospatialIssue=false&limit=0&facetLimit=100000&facet=familyKey&facet=genusKey&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:49:04Z",
+          "byte_size": 35373,
+          "sha256": "d75bcd88874c7085f645f8e0a31b8782d072df050f310ad689d42775d52bbb30"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?classKey=359&continent=EUROPE&hasCoordinate=true&hasGeospatialIssue=false&limit=0&facetLimit=100000&facet=familyKey&facet=genusKey&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:49:05Z",
+          "byte_size": 53052,
+          "sha256": "61906ef99d01d1bd50d6a2952fb19b4a497ad038038e5cd88f1637cbaebad7b8"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?classKey=359&continent=ASIA&hasCoordinate=true&hasGeospatialIssue=false&limit=0&facetLimit=100000&facet=familyKey&facet=genusKey&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:49:05Z",
+          "byte_size": 67231,
+          "sha256": "fc85f38cf378e66a95f50f6aab9dcadcdcc98c00df1b271bd33f43b8d6c3f726"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?classKey=359&continent=NORTH_AMERICA&hasCoordinate=true&hasGeospatialIssue=false&limit=0&facetLimit=100000&facet=familyKey&facet=genusKey&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:49:06Z",
+          "byte_size": 73956,
+          "sha256": "b726b69da9755b24fd14095647bece8329216ab17071cf5ff8efe3715c1a4f6b"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?classKey=359&continent=SOUTH_AMERICA&hasCoordinate=true&hasGeospatialIssue=false&limit=0&facetLimit=100000&facet=familyKey&facet=genusKey&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:49:06Z",
+          "byte_size": 46967,
+          "sha256": "aaaffd7f4eee611b655951b0e3ca117b524e4cc0a350a4f3ed8e0979db5219a7"
+        },
+        {
+          "download_url": "https://api.gbif.org/v1/occurrence/search?classKey=359&continent=OCEANIA&hasCoordinate=true&hasGeospatialIssue=false&limit=0&facetLimit=100000&facet=familyKey&facet=genusKey&basisOfRecord=PRESERVED_SPECIMEN&basisOfRecord=HUMAN_OBSERVATION&basisOfRecord=MATERIAL_SAMPLE&basisOfRecord=OBSERVATION&basisOfRecord=MACHINE_OBSERVATION&basisOfRecord=OCCURRENCE&basisOfRecord=MATERIAL_CITATION",
+          "retrieved_at": "2026-10-31T04:49:07Z",
+          "byte_size": 17145,
+          "sha256": "45ffe6194451eb7fe3ee17c9aa61e6ff2b6c30ce78b29dc5d4cbc8938eb8c236"
+        }
+      ],
+      "role": "living families and genera per continent"
+    },
+    {
+      "id": "gbif-species-api-family-names",
+      "name": "GBIF Backbone Taxonomy species API (names, ranks and orders for family and genus keys)",
+      "landing_url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "doi": "10.15468/39omei",
+      "version": "live, retrieved 2026-10-31",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://api.gbif.org/v1/species/{key}",
+          "retrieved_at": "2026-10-31T04:49:07Z",
+          "byte_size": 5901079,
+          "sha256": "3e3b5302a57f607f319fb6db076411987fa21af8887947f73735f1a61d5b051b",
+          "note": "6606 per-key JSON responses; sha256 of the sorted concatenation of their digests"
+        }
+      ],
+      "role": "map GBIF keys to family/genus names and orders"
+    }
+  ],
+  "method": "Miocene-Pliocene mammal occurrences were downloaded from PBDB for each continent and reduced to families (and genera) with >= 2 occurrences, excluding marine orders and families. Living families (and genera) per continent were taken from GBIF family/genus occurrence facets (>= 20 non-fossil, non-captive records). For each continent the fraction of its fossil families living there today (S) was compared with the mean fraction living on each other continent (O), and the sum of S was compared with all 120 reassignments of living-family sets to continents.",
+  "measured": {
+    "value": 2.390216105285146,
+    "unit": "ratio of mean same-continent survival fraction to mean other-continent survival fraction, later-Tertiary mammal families",
+    "n": 332,
+    "uncertainty": "exact permutation p = 0.0083 (1 of 120 label permutations >= observed)",
+    "extra": {
+      "family_level": {
+        "S": {
+          "Africa": 0.7375,
+          "Eurasia": 0.7692307692307693,
+          "North America": 0.9242424242424242,
+          "South America": 0.7727272727272727,
+          "Australia": 0.7241379310344828
+        },
+        "O": {
+          "Africa": 0.41875000000000007,
+          "Eurasia": 0.42857142857142855,
+          "North America": 0.4356060606060606,
+          "South America": 0.23106060606060605,
+          "Australia": 0.1293103448275862
+        },
+        "n_continents_S_gt_O": 5,
+        "pooled_ratio": 2.390216105285146,
+        "sum_S_observed": 3.927838397234949,
+        "n_permutations_ge_observed": 1,
+        "exact_p": 0.008333333333333333
+      },
+      "genus_level_extra": {
+        "S": {
+          "Africa": 0.4338461538461538,
+          "Eurasia": 0.3505586592178771,
+          "North America": 0.4697855750487329,
+          "South America": 0.16809116809116809,
+          "Australia": 0.3235294117647059
+        },
+        "O": {
+          "Africa": 0.13076923076923078,
+          "Eurasia": 0.0799581005586592,
+          "North America": 0.0594541910331384,
+          "South America": 0.02421652421652422,
+          "Australia": 0.029411764705882353
+        },
+        "n_continents_S_gt_O": 5,
+        "pooled_ratio": 5.391470261660809,
+        "sum_S_observed": 1.7458109679686378,
+        "n_permutations_ge_observed": 1,
+        "exact_p": 0.008333333333333333
+      },
+      "n_fossil_families_by_continent": {
+        "Africa": 80,
+        "Eurasia": 91,
+        "North America": 66,
+        "South America": 66,
+        "Australia": 29
+      },
+      "n_living_families_by_continent": {
+        "Africa": 81,
+        "Eurasia": 166,
+        "North America": 183,
+        "South America": 91,
+        "Australia": 52
+      }
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.8,
+  "caveats": [
+    "Family-level alliance is coarse; cosmopolitan families (Bovidae, Felidae, Canidae, Muridae) raise both same- and other-continent fractions and dilute the signal, while endemic families (marsupial and xenarthran families) carry it, as in Darwin's own examples.",
+    "GBIF 'living on a continent' includes introduced and feral species (e.g. Muridae and Leporidae in Australia), which biases toward sharing with other continents and so against the claim.",
+    "PBDB family assignments and GBIF backbone family names are mostly but not entirely harmonised; mismatched spellings or re-ranked families count as 'not living', equally on all continents.",
+    "The Great American Biotic Interchange (c. 3 Ma) means part of South America's Pliocene fauna is of North American origin, which Darwin could not know; it makes the North/South America comparison conservative.",
+    "Birds, molluscs and islands, also in the claim's scope, were not tested."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-0e75",
+    "date": "2026-10-31"
+  }
+}

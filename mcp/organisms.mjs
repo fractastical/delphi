@@ -1,12 +1,12 @@
 // Organisms: every animal taxon Darwin and Thompson mention, the datasets vendored for each, and
-// the per-taxon dataset-coverage ranking. Reads organisms/merged/{taxa,datasets,mentions,coverage}.json;
-// rebuild with `node organisms/merge.mjs && node organisms/coverage.mjs`.
+// the per-taxon dataset-coverage ranking. Reads test-data/organisms/merged/{taxa,datasets,mentions,coverage}.json;
+// rebuild with `node test-data/organisms/merge.mjs && node test-data/organisms/coverage.mjs`.
 
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { REPO } from "./lib.mjs";
 
-const MERGED = join(REPO, "organisms/merged");
+const MERGED = join(REPO, "test-data/organisms/merged");
 const FILES = ["taxa", "datasets", "mentions", "coverage"];
 
 let cache = null;

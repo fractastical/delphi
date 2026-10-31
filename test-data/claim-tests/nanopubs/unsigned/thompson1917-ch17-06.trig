@@ -1,0 +1,70 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch17-06--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch17-06: inconclusive, confidence null" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0"^^xsd:double ;
+    delphi:hypothesis "The cannon-bones (fused metacarpal III+IV, and likewise metatarsal) of ox, sheep and giraffe differ essentially only by a one-axis stretch: scaled to equal greatest length, the sheep's bone is about two-thirds and the giraffe's about one-third as broad as the ox's, and the residual shape difference after that single transverse scaling is small." ;
+    delphi:passCriterion "Pre-registered (claim supported). Using public osteometric measurements of adult metacarpals (greatest length GL and distal breadth Bd, or the same pair of dimensions however the source names them), with at least 10 specimens for ox (Bos taurus) and sheep (Ovis aries) and at least 3 for giraffe (Giraffa): the species median of Bd/GL, expressed relative to the ox, is 0.67 +/- 0.10 for sheep and 0.33 +/- 0.10 for giraffe. If 3D surface meshes rather than tables are used, GL is the maximum caliper length and Bd the maximum extent perpendicular to the long axis within the distal 15% of the bone, both computed from the mesh." ;
+    delphi:failCriterion "Pre-registered (claim refuted). Either relative breadth ratio falls outside its stated window, or (where a second breadth, e.g. mid-shaft, is available) the two breadth ratios for the same species differ by more than 0.15, which would mean a single transverse scaling does not describe the difference. If the measurements for any of the three species cannot be obtained from public sources without authentication, the verdict is 'inconclusive' with reason 'data-unavailable'." ;
+    delphi:expectedObservation "Pre-registered (claim supported). Using public osteometric measurements of adult metacarpals (greatest length GL and distal breadth Bd, or the same pair of dimensions however the source names them), with at least 10 specimens for ox (Bos taurus) and sheep (Ovis aries) and at least 3 for giraffe (Giraffa): the species median of Bd/GL, expressed relative to the ox, is 0.67 +/- 0.10 for sheep and 0.33 +/- 0.10 for giraffe. If 3D surface meshes rather than tables are used, GL is the maximum caliper length and Bd the maximum extent perpendicular to the long axis within the distal 15% of the bone, both computed from the mesh." ;
+    delphi:disconfirmingObservation "Pre-registered (claim refuted). Either relative breadth ratio falls outside its stated window, or (where a second breadth, e.g. mid-shaft, is available) the two breadth ratios for the same species differ by more than 0.15, which would mean a single transverse scaling does not describe the difference. If the measurements for any of the three species cannot be obtained from public sources without authentication, the verdict is 'inconclusive' with reason 'data-unavailable'." ;
+    delphi:admissibleDatasets "Planned datasets: morphosource-ungulate-metapodials, zooarchaeological-osteometric-archives, futres-geome-trait-records" ;
+    delphi:inferenceMethod "fetch.py runs the pre-registered catalogue searches and records the URL, time, HTTP status, response size, SHA-256 and hit count of each (derived/source_probe.json). Two further sources were probed with a headless Chrome browser because they return bot challenges to plain HTTP clients: the Archaeology Data Service archive page for the Animal Bone Metrical Archive Project (HTTP 403, Cloudflare 'Just a moment...' interstitial) and Open Context (Anubis challenge page, and a dropped connection from a plain client). No measurement file was downloaded, so there is nothing to analyse and no analysis.py." ;
+    delphi:preregistered false ;
+    delphi:dataKind "none" ;
+    dct:description "fetch.py runs the pre-registered catalogue searches and records the URL, time, HTTP status, response size, SHA-256 and hit count of each (derived/source_probe.json). Two further sources were probed with a headless Chrome browser because they return bot challenges to plain HTTP clients: the Archaeology Data Service archive page for the Animal Bone Metrical Archive Project (HTTP 403, Cloudflare 'Just a moment...' interstitial) and Open Context (Anubis challenge page, and a dropped connection from a plain client). No measurement file was downloaded, so there is nothing to analyse and no analysis.py." ;
+    rdfs:comment "Measured: null metacarpal distal breadth / greatest length, relative to ox (n = 0). Interpretation: Thompson's Fig. 346 compares the three cannon-bones drawn to the same length, so the operational quantity is breadth at equal length, i.e. the ratio Bd/GL, and the claim is about the ratio of that quantity between species (sheep/ox = 2/3, giraffe/ox = 1/3). The +/- 0.10 windows come from the within-species spread of metapodial proportions reported in zooarchaeology (breed, sex and age change Bd/GL by a few percent, not by tens of percent). Metacarpals are used because they are what Thompson figures; metatarsals would serve equally if the same three species are measured the same way. Candidate sources, to be queried in this order: MorphoSource (3D meshes), the Animal Bone Metrical Archive Project and other zooarchaeological osteometric archives (ox and sheep), Open Context zooarchaeology, FuTRES/GEOME trait records, and Zenodo/Dryad datasets. No measurements have been inspected before this pre-registration; only hit counts and HTTP status codes from catalogue searches." ;
+    delphi:evidenceAgainst "No public source was found that gives cannon-bone greatest length and breadth, or a measurable 3D mesh, for all three of ox, sheep and giraffe. Ox metacarpal meshes exist on MorphoSource (5 laser scans) but sheep metacarpals return nothing there and the only giraffe media is a cranium; the single Dryad giraffe limb-bone dataset is 8.5 GB of CT imagery of metatarsals with no comparative material." ;
+    delphi:evidenceAgainst "The two large zooarchaeological osteometric archives that would supply ox and sheep (the Animal Bone Metrical Archive Project at the Archaeology Data Service, and Open Context) are behind bot challenges (Cloudflare 403 and Anubis) that a headless browser did not clear in this run; even if cleared, neither contains giraffe, so the giraffe third of the claim would still be missing." ;
+    delphi:evidenceAgainst "The claim is not untestable in principle: measurements of a handful of museum metapodials of the three species, or scans of them, would settle it quickly. The gap is that such measurements are not published as open data. The assessors scored 'data-existence' 0.68-0.86 largely on the expectation that MorphoSource covers ungulate metapodials; for sheep and giraffe it does not." ;
+    delphi:evidenceAgainst "Hit counts in the probe log are as of 2026-10-31 and will change as catalogues grow; the Zenodo 'giraffe metacarpal' query reports 119 hits only because the terms are OR-combined across full text, and its top results are unrelated." ;
+    delphi:hasEvidence () ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch17-06/result.json> .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch17-06> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch17-06--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch17-06/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5-1-thinking-high; cursor/thompson-claim-tests-6e84)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5-1-thinking-high" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.676Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch17-06: inconclusive, confidence null" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch17-06--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

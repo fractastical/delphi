@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-08--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch03-08: supports, confidence 0.8" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.8"^^xsd:double ;
+    delphi:hypothesis "If the claim holds, none of the 4096 two-state and none of the 2,985,984 three-state two-colour Turing machines (NKS conventions: no halt state, head starts in state 1 on an all-white tape) produces a step sequence whose subword complexity stays high after a long transient; every machine's sequence of (head state, colour read) letters becomes eventually periodic (repetitive) or stays of low, nested-type complexity." ;
+    delphi:passCriterion "Pre-registered. Stage 1: run every machine for 1000 steps and record the letters (state, colour read) for steps 201..1000 (alphabet 6 for s = 3, 4 for s = 2); compute the number p(12) of distinct length-12 factors of this 800-letter window; machines with p(12) <= 200 are classed low-complexity (repetitive or nested), the rest are flagged. Stage 2: run flagged machines for 20000 steps and compute p(64) over the letters of steps 10001..20000 (window of 10000; maximum possible 9937): p(64) >= 2500 is 'complex', p(64) <= 1280 (= 20 x 64, a generous linear bound for nested sequences) is low-complexity, otherwise 'unclear'. Stage 3: 'unclear' machines run for 200000 steps with the window of the last 100000 letters: p(64) >= 25000 complex, <= 1280 low-complexity, otherwise unclear. Controls run through the same statistics: a periodic letter sequence, a Thue-Morse (nested) letter sequence, and uniformly random letters, which must be classed low, low and complex respectively. PASS (supports) if no two- or three-state machine is classed complex and no machine remains unclear after Stage 3." ;
+    delphi:failCriterion "Pre-registered. FAIL (refutes) if at least one two- or three-state two-colour machine is classed complex at Stage 2 or Stage 3 (it is reported with its NKS number and complexity profile). MIXED if no machine is complex but some remain unclear after Stage 3, or if the controls are misclassified (criterion not discriminating)." ;
+    delphi:expectedObservation "Pre-registered. Stage 1: run every machine for 1000 steps and record the letters (state, colour read) for steps 201..1000 (alphabet 6 for s = 3, 4 for s = 2); compute the number p(12) of distinct length-12 factors of this 800-letter window; machines with p(12) <= 200 are classed low-complexity (repetitive or nested), the rest are flagged. Stage 2: run flagged machines for 20000 steps and compute p(64) over the letters of steps 10001..20000 (window of 10000; maximum possible 9937): p(64) >= 2500 is 'complex', p(64) <= 1280 (= 20 x 64, a generous linear bound for nested sequences) is low-complexity, otherwise 'unclear'. Stage 3: 'unclear' machines run for 200000 steps with the window of the last 100000 letters: p(64) >= 25000 complex, <= 1280 low-complexity, otherwise unclear. Controls run through the same statistics: a periodic letter sequence, a Thue-Morse (nested) letter sequence, and uniformly random letters, which must be classed low, low and complex respectively. PASS (supports) if no two- or three-state machine is classed complex and no machine remains unclear after Stage 3." ;
+    delphi:disconfirmingObservation "Pre-registered. FAIL (refutes) if at least one two- or three-state two-colour machine is classed complex at Stage 2 or Stage 3 (it is reported with its NKS number and complexity profile). MIXED if no machine is complex but some remain unclear after Stage 3, or if the controls are misclassified (criterion not discriminating)." ;
+    delphi:admissibleDatasets "Planned datasets: nks-turing-machine-census-generator" ;
+    delphi:inferenceMethod "analysis.py evolves every two-state (4096) and three-state (2,985,984) two-colour Turing machine under the NKS numbering (p. 888) from a blank tape with the head in state 1, vectorised over chunks of 100000 machines, and records the letter sequence (state, colour read). Stage 1 computes the number p(12) of distinct length-12 factors of the letters of steps 201-1000 and flags machines with p(12) > 200 for Stage 2 (20000 steps, p(64) over steps 10001-20000; complex if p(64) >= 2500, low if <= 1280) and Stage 3 (200000 steps, p(64) over the last 100000 letters, complex if >= 25000). Periodic, Thue-Morse and uniformly random control sequences pass through the same statistics. As a supplementary (non-criterion) check the 200 highest-p(12) machines of each family are run through Stage 2 anyway, and the single highest-p(64) machine of each family is profiled at Stage-3 scale (p(n) for n = 8..512, lzma ratio, head extent and sweep lengths). Runtime about 4 minutes." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py evolves every two-state (4096) and three-state (2,985,984) two-colour Turing machine under the NKS numbering (p. 888) from a blank tape with the head in state 1, vectorised over chunks of 100000 machines, and records the letter sequence (state, colour read). Stage 1 computes the number p(12) of distinct length-12 factors of the letters of steps 201-1000 and flags machines with p(12) > 200 for Stage 2 (20000 steps, p(64) over steps 10001-20000; complex if p(64) >= 2500, low if <= 1280) and Stage 3 (200000 steps, p(64) over the last 100000 letters, complex if >= 25000). Periodic, Thue-Morse and uniformly random control sequences pass through the same statistics. As a supplementary (non-criterion) check the 200 highest-p(12) machines of each family are run through Stage 2 anyway, and the single highest-p(64) machine of each family is profiled at Stage-3 scale (p(n) for n = 8..512, lzma ratio, head extent and sweep lengths). Runtime about 4 minutes." ;
+    rdfs:comment "Measured: 0 two- or three-state two-colour machines classed complex (or left unclear) under the pre-registered three-stage factor-complexity screen (n = 2990080, exact enumeration; non-detection bounded by the 1000-step Stage-1 window). Interpretation: 'Repetitive or nested' is operationalised through the subword complexity of the machine's step-letter sequence, which determines the whole space-time diagram given the rule: eventually periodic diagrams give bounded complexity and nested (self-similar) diagrams give complexity growing at most linearly in the factor length, whereas random-looking diagrams of the kind the book shows for four-state machines (p. 80-81) give complexity close to the window size. 'Ultimately' is bounded by the run lengths (1000, 20000, 200000 steps) with transients discarded; a machine with a transient longer than 100000 steps would be misclassed, and that limit is stated. The enumeration uses the book's numbering scheme (NKS p. 888) and its conventions (p. 78): s states, 2 colours, rule entries (new state, new colour, move +-1), blank tape, head in state 1." ;
+    delphi:evidenceAgainst "No machine was flagged at Stage 1: the largest p(12) over an 800-letter window is 82 for two states and 123 for three states against a threshold of 200 (the random control gives 789 and saturates p(64) at 9937), so Stages 2 and 3 were never triggered by the pre-registered rule and the verdict follows from Stage 1 plus the controls." ;
+    delphi:evidenceAgainst "Supplementary check outside the criteria: the 200 highest-p(12) three-state machines run to 20000 steps reach at most p(64) = 2021, and 72 of them fall in the pre-registered 'unclear' band 1280 < p(64) < 2500 (none is 'complex'). The top machine (number 964419) at 200000 steps has p(64) = 2243, p(512) = 15319 out of about 99500 positions, lzma ratio 0.005 (random letters: 0.39), and its head performs sweeps of lengths 3,2,2,1,1, 4,5,4,4,3,3,2,2,1,1, 6,7,6,6,5,5,..., extending the visited region by one cell per round and reaching only cells -25..24 in 20000 steps: a regular nested growth with polynomially growing factor complexity, not the saturating complexity of a random-like sequence. The two-state top machine is the binary counter 1953 (p(64) = 786, lzma 0.0025)." ;
+    delphi:evidenceAgainst "'Complex behaviour' is operationalised as high factor complexity of the (state, colour read) sequence; a machine whose complexity appears only after more than 1000 steps, or only in tape patterns rather than in the head's letter sequence, would be missed. The book's statement is specifically about these two families being free of class-3/4 behaviour from a blank tape, which is what is tested; the four-state machines the book exhibits as the first complex ones were not run." ;
+    delphi:evidenceAgainst "Numbering follows NKS p. 888; the test does not depend on the numbering except for reporting machine numbers." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch03-08--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch03-08/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch03-08--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: All 4096 two-state and 2,985,984 three-state two-colour Turing machines (NKS numbering) run from a blank tape, generated by analysis.py" ;
+    dct:description "the computational objects the claim is about" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p79--turing-machines/> ;
+    dct:license "generated by this test" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch03-08> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-08--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch03-08/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-9241)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.684Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch03-08: supports, confidence 0.8" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-08--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

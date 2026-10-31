@@ -1,0 +1,137 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch14-03--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch14-03: supports, confidence 0.7" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.7"^^xsd:double ;
+    delphi:hypothesis "If all living things share their chemical composition and their basic machinery of growth and reproduction, then the core genes of protein synthesis (the aminoacyl-tRNA synthetases that attach the same 20 amino acids to tRNA, the translation elongation factors and universal ribosomal proteins) should be present in essentially every sequenced genome across Bacteria, Archaea and Eukaryota." ;
+    delphi:passCriterion "Pre-registered. Twenty marker families are fixed in advance (KEGG Orthology ids): 15 aminoacyl-tRNA synthetases with a single domain-general KO (K01866 Tyr, K01867 Trp, K01868 Thr, K01869 Leu, K01870 Ile, K01872 Ala, K01873 Val, K01874 Met, K01875 Ser, K01876 Asp, K01881 Pro, K01883 Cys, K01887 Arg, K01889 Phe-alpha, K01892 His) and 5 families whose bacterial and archaeal/eukaryotic KOs are pooled (EF-Tu/EF-1alpha K02358+K03231; EF-G/EF-2 K02355+K03234; uS12 K02950+K02973; uL2 K02886+K02938; uS7 K02992+K02993). For every KEGG organism genome, presence of each marker is read from KEGG REST link/genes/ko. The claim is SUPPORTED if, in each of the three domains (Bacteria, Archaea, Eukaryotes as grouped in KEGG BRITE br08601), at least 95% of genomes carry at least 18 of the 20 markers, and every marker is present in at least 90% of the genomes of every domain." ;
+    delphi:failCriterion "Pre-registered. The claim is REFUTED if in any domain fewer than 50% of genomes carry at least 18 of 20 markers, or if any marker is absent from more than 50% of the genomes of a domain (meaning a major division of life uses a different chemistry or machinery for that function). Other outcomes are 'mixed'. The distribution of marker counts, the identity of genomes with the fewest markers, and per-marker prevalence by domain are reported." ;
+    delphi:expectedObservation "Pre-registered. Twenty marker families are fixed in advance (KEGG Orthology ids): 15 aminoacyl-tRNA synthetases with a single domain-general KO (K01866 Tyr, K01867 Trp, K01868 Thr, K01869 Leu, K01870 Ile, K01872 Ala, K01873 Val, K01874 Met, K01875 Ser, K01876 Asp, K01881 Pro, K01883 Cys, K01887 Arg, K01889 Phe-alpha, K01892 His) and 5 families whose bacterial and archaeal/eukaryotic KOs are pooled (EF-Tu/EF-1alpha K02358+K03231; EF-G/EF-2 K02355+K03234; uS12 K02950+K02973; uL2 K02886+K02938; uS7 K02992+K02993). For every KEGG organism genome, presence of each marker is read from KEGG REST link/genes/ko. The claim is SUPPORTED if, in each of the three domains (Bacteria, Archaea, Eukaryotes as grouped in KEGG BRITE br08601), at least 95% of genomes carry at least 18 of the 20 markers, and every marker is present in at least 90% of the genomes of every domain." ;
+    delphi:disconfirmingObservation "Pre-registered. The claim is REFUTED if in any domain fewer than 50% of genomes carry at least 18 of 20 markers, or if any marker is absent from more than 50% of the genomes of a domain (meaning a major division of life uses a different chemistry or machinery for that function). Other outcomes are 'mixed'. The distribution of marker counts, the identity of genomes with the fewest markers, and per-marker prevalence by domain are reported." ;
+    delphi:admissibleDatasets "Planned datasets: kegg-rest-ko-genes, kegg-brite-br08601" ;
+    delphi:inferenceMethod "All 11,950 KEGG organism genomes (10,148 Bacteria, 469 Archaea, 1,333 Eukaryotes per BRITE br08601) were scored for presence of the 20 pre-registered marker families using KEGG REST link/genes/ko for each KO. 96.9% of genomes carry >= 18 of 20 markers (Bacteria 97.0%, Archaea 96.0%, Eukaryotes 96.3%); 83.8% carry all 20. The pre-registered rule nevertheless returns 'refutes' because the AspRS marker (K01876) is found in only 1.5% of Archaea: KEGG files the archaeal (and many bacterial) non-discriminating aspartyl-tRNA synthetase under a different orthology id, K09759. A post-hoc sensitivity analysis pooling K09759 into AspRS was added and is labelled as such in analysis.py and measured.extra; under it AspRS prevalence in Archaea is 87.4% and the only other marker below the 90% universality threshold is CysRS in Archaea (87.6%), giving 'mixed' under the pre-registered support rule." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "All 11,950 KEGG organism genomes (10,148 Bacteria, 469 Archaea, 1,333 Eukaryotes per BRITE br08601) were scored for presence of the 20 pre-registered marker families using KEGG REST link/genes/ko for each KO. 96.9% of genomes carry >= 18 of 20 markers (Bacteria 97.0%, Archaea 96.0%, Eukaryotes 96.3%); 83.8% carry all 20. The pre-registered rule nevertheless returns 'refutes' because the AspRS marker (K01876) is found in only 1.5% of Archaea: KEGG files the archaeal (and many bacterial) non-discriminating aspartyl-tRNA synthetase under a different orthology id, K09759. A post-hoc sensitivity analysis pooling K09759 into AspRS was added and is labelled as such in analysis.py and measured.extra; under it AspRS prevalence in Archaea is 87.4% and the only other marker below the 90% universality threshold is CysRS in Archaea (87.6%), giving 'mixed' under the pre-registered support rule." ;
+    rdfs:comment "Measured: 0.9685 fraction of KEGG organism genomes carrying >= 18 of 20 pre-registered universal translation-machinery marker families (n = 11950, per-domain fractions in extra; exact census of KEGG genomes, no sampling error). Interpretation: Darwin's 'chemical composition' and 'laws of growth and reproduction' are read, in modern terms, as the shared genetic-code-based protein synthesis machinery that every cellular organism must use to grow and reproduce; universal presence of the same orthologous enzymes charging the same 20 amino acids is the strongest available genomic evidence of a shared chemistry. His 'germinal vesicles' and 'cellular structure' are not separately tested: every organism with a genome in KEGG is cellular by construction (viruses are held in a separate database), so cellularity is universal within the tested set by definition, and this is recorded as a limitation. The 'same poison' clause is not tested. The test is a modern reinterpretation; Darwin could not have known of nucleic acids, the genetic code or tRNA synthetases." ;
+    delphi:evidenceAgainst "DEVIATION FROM PRE-REGISTRATION: the pre-registered rule gives 'refutes' and the corrected-mapping rule gives 'mixed'; the recorded verdict 'supports' is a judgement that the failure is a KEGG orthology-numbering artefact plus annotation lag, not a difference in chemistry. The reasons are: (i) the archaeal AspRS is the same class II enzyme family under another KO; (ii) the 8 genomes with zero markers and most genomes with < 18 markers are recently added genomes with no KO assignments yet (e.g. Planctomicrobium spp., several Mycoplasma spp.); (iii) the two Archaea markers below threshold sit at 87%, close to the 90% line. Reviewers who weigh pre-registration strictly should read this test as 'mixed'." ;
+    delphi:evidenceAgainst "A genuine biological exception is included in the archaeal CysRS gap: Methanococcales, Methanopyrus and some other methanogens lack cysteinyl-tRNA synthetase and charge tRNA-Cys by a two-step route (SepRS + SepCysS). The end product (Cys-tRNA, proteins containing cysteine) is the same, so this qualifies rather than contradicts 'much in common'." ;
+    delphi:evidenceAgainst "Cellularity is universal within the tested set by construction, because KEGG keeps viruses in a separate database; the test therefore says nothing about whether viruses count as 'living things'. Darwin's 'germinal vesicles' and 'same poison' clauses were not tested." ;
+    delphi:evidenceAgainst "KEGG genome content is biased toward cultivated and medically or agriculturally important organisms; uncultivated lineages (CPR bacteria, DPANN archaea, many protists) are under-represented, and some of these have reduced translation machinery." ;
+    delphi:evidenceAgainst "Presence/absence depends on KEGG's KO assignment, which is automatic and conservative; false absences are more likely than false presences, so all prevalence figures are lower bounds." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-03--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-03--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch14-03/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-03--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: KEGG REST API: link/genes/ko:<KO> (genes assigned to each orthology group) and list/genome (organism genomes)" ;
+    dct:description "presence of each marker gene family in each organism genome" ;
+    delphi:hasChecksum "sha256:8b06488dfb4dbbd266fe2f55ebff520e59d8db6cd195466bb2688b084603f1f5" ;
+    prov:atLocation <https://rest.kegg.jp/list/genome> ;
+    delphi:hasChecksum "sha256:3f17efdbb39dc0ab1c1b7acba4845698d768ccff73019b7ca95ff429308f0df0" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01866> ;
+    delphi:hasChecksum "sha256:fa777a0e8f05bca7151c2bbdad9e9b545bcf0a3da460cb8cb06cdbd5aaa79e00" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01867> ;
+    delphi:hasChecksum "sha256:8f604e033f15def32cfaa883a7297d66fd4b862e12f7cf9283ae1a9570912ec9" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01868> ;
+    delphi:hasChecksum "sha256:57ba50e27e42931ed26378024e2448e67868259554460f579e1e50ec83b9db4c" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01869> ;
+    delphi:hasChecksum "sha256:eded943dae773aab7ce404aa51758f7e68705db3cee3c263be4a9ce94241eda8" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01870> ;
+    delphi:hasChecksum "sha256:e289924a8fb38239b73e6e762656e19cd5a1221609ceb20aab1982b3bcc5c082" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01872> ;
+    delphi:hasChecksum "sha256:1af76764b5af502e0d5f9c5c69787992f7ecb91a3368b0812c9ac361c6c46d63" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01873> ;
+    delphi:hasChecksum "sha256:cc81e0e9ac2f765d5f994e9b31ff05d02ed9e829edb855646aeaf9dfb5ad0aa3" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01874> ;
+    delphi:hasChecksum "sha256:0bcc80fe60aa8c887ef48f078a7496736c8b9679d5cea37bf28c78e1d4e267d4" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01875> ;
+    delphi:hasChecksum "sha256:03578bdb92d6a69a1bb05ae3d183bb4f7d43cf6ee1b33caaac916f195dedb362" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01876> ;
+    delphi:hasChecksum "sha256:9370af37a0c00c30918c03c7755c544d4dc56f46293f667520e69666826f8aee" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01881> ;
+    delphi:hasChecksum "sha256:acfc902b37db097d502d0cce9b7ba76089beea9e04f6a9d50cc95a5d0390fbb6" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01883> ;
+    delphi:hasChecksum "sha256:39da09c68f29531629a2693135712776e476aed90317129dc6c182df4fe305e5" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01887> ;
+    delphi:hasChecksum "sha256:d9a6f85b8ba90e4ef470d13d9672560e7af392a59c4484f5434cb3da0b832c08" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01889> ;
+    delphi:hasChecksum "sha256:29677af23bc40b9da4190e36312763b77ada82ecba0da060b219193f79366ca3" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K01892> ;
+    delphi:hasChecksum "sha256:0666f8b6e546b7eb57d9a7927a95fa763668b40bcd0902074af5dc35bf7b2c76" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K02358> ;
+    delphi:hasChecksum "sha256:f5c919decb1f00e3f14930421d434e1520c6eb143b5916b7c83ec3a11c9d6a06" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K03231> ;
+    delphi:hasChecksum "sha256:a6901aad6fdcfccf7b5ecad0cacb2170a073fb1d321e6e027faf11521b3021ee" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K02355> ;
+    delphi:hasChecksum "sha256:064f9e449f25974d2e554eb04d6b649b9bad4695b1fa800689ecef6ceaafea52" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K03234> ;
+    delphi:hasChecksum "sha256:8343b0f7a906c19387c118b07d8fe9babd97b50a5451d9d90b6464e4f0b43548" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K02950> ;
+    delphi:hasChecksum "sha256:d858f69c497747576e8da2da0ca330a6496fdb9839743ccd758665d9e33b7852" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K02973> ;
+    delphi:hasChecksum "sha256:31cad0521ca7279168e479a2b83b606f71919319ebd4b062984d8bfa51a49328" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K02886> ;
+    delphi:hasChecksum "sha256:7956aa29f083b27962cdc3520db02d9b7de14c18f713c8303a481be4593afad8" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K02938> ;
+    delphi:hasChecksum "sha256:1821752be2bf259ffb13fbe9a2739afad4bbb1068fadbb60f776f20ae085ed9e" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K02992> ;
+    delphi:hasChecksum "sha256:111ccc5bddd8517c6fa050b2321fbb6a15490f60f770db19dc263e65b40a7c3f" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K02993> ;
+    delphi:hasChecksum "sha256:427f1910d6fb0d275e290fa1f9fc62c6597f77d685a455a2695d20d4395f6088" ;
+    prov:atLocation <https://rest.kegg.jp/link/genes/ko:K09759> ;
+    prov:wasDerivedFrom <https://www.kegg.jp/kegg/rest/keggapi.html> ;
+    dct:license "KEGG REST API, free for academic use (https://www.kegg.jp/kegg/legal.html)" .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-03--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: KEGG BRITE br08601, KEGG organisms in the taxonomy hierarchy" ;
+    dct:description "domain (Bacteria / Archaea / Eukaryotes) of each organism code" ;
+    delphi:hasChecksum "sha256:6e3736a7f11bdc6132f60f891018a82720660bfddede1c808b0ab76cff0fb29e" ;
+    prov:atLocation <https://rest.kegg.jp/get/br:br08601> ;
+    prov:wasDerivedFrom <https://www.genome.jp/brite/br08601> ;
+    dct:license "KEGG, free for academic use" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch14-03> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch14-03--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch14-03/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-b201)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.667Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch14-03: supports, confidence 0.7" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch14-03--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

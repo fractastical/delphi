@@ -1,0 +1,26 @@
+{
+  "claim_id": "levin-2020-xenobots-06",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2020-xenobots-06",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-10-31T19:10:00Z",
+  "hypothesis": "In a voxel soft-body simulation where each contractile voxel's phase offset is random and fixed per clade (so selection can only change which voxels exist and which are contractile), selection for net displacement yields designs that move much farther than random designs under the same random actuation, and the gain depends on the evolved arrangement of passive and contractile voxels rather than on the particular phases.",
+  "pass_criterion": "Pre-registered, on the second-pass setting (water: reduced gravity plus drag; random fixed phases), over the independent evolutionary trials analysed: (a) the median ratio of final-champion net displacement to the mean displacement of random designs is >= 2, and >= 80% of champions exceed the 95th percentile of random designs; (b) shuffling which of the champion's voxels are contractile (same shape, same number of contractile voxels, same phase field, 20 shuffles) reduces displacement: median over champions of (median shuffled displacement / champion displacement) <= 0.7; (c) re-evaluating each champion's body under fresh random phase fields (20 draws) gives a median displacement above the 95th percentile of random designs for >= 70% of champions. Supports if (a), (b) and (c) all hold.",
+  "fail_criterion": "Pre-registered: refutes if (a) fails badly (median champion/random ratio <= 1.2, or < 50% of champions above the random 95th percentile), or if (b) shows no dependence on material layout (median shuffled/champion ratio >= 0.95) and (c) fails (champions under fresh phases at or below the random-design median for >= 50% of champions). Any other outcome is 'mixed'. If neither published outputs nor a working simulator (original or the simplified re-implementation below) can be run, verdict is inconclusive (data-unavailable or not-operationalizable).",
+  "planned_datasets": [
+    "github-skriegman-reconfigurable_organisms@9a5d685c2f26259122683d304e1ac98d54bac805"
+  ],
+  "planned_method": "Tier A (preferred): use the authors' public repository (cited in the paper's Data Availability, ref. 36; CC0) at the pinned commit. If it contains evolved second-pass designs with their phase fields, and the CPU Voxelyze/VoxCad simulator it ships compiles here, re-simulate those designs, random designs, material-shuffled and fresh-phase variants with the original simulator and settings. If it contains only logged fitness/outputs, analyse those for criterion (a) and report (b)/(c) as not testable from the deposit. Tier B (fallback, if Tier A cannot run): a pre-registered simplified re-implementation in numpy: 3D mass-spring voxel lattice (nodes at voxel corners, springs on edges, face and body diagonals), workspace 5x5x4 voxels, direct encoding (each cell empty / passive / contractile), largest face-connected component kept; contractile voxels scale their spring rest lengths by 1 + A sin(2*pi*2Hz*t + phi) with phi uniform in [-pi/2, pi/2] fixed per workspace location per clade; ground plane with penalty contact and smoothed Coulomb friction; water = gravity x 0.1 plus linear drag on every exposed voxel face; fitness = horizontal displacement of the centre of mass over a 10 s evaluation after a short settle. Evolution: truncation selection with mutation of voxel states, one random immigrant (new clade, new phase field) per generation, population 32, 50 generations, 10 independent trials; generations may be reduced only to keep runtime under ~30 minutes, and that is recorded. Physics constants are fixed before any evolutionary run; only the integration step may be reduced if random bodies are numerically unstable. Random designs: 200 bodies sampled like generation-0 individuals.",
+  "test_contract": {
+    "expected_observation": "Champions evolved under random, clade-fixed phases move far more than random designs under random phases, lose much of that advantage when their contractile/passive layout is shuffled, and keep moving well under fresh random phase fields (motion made coherent by morphology, not by tuned timing).",
+    "disconfirming_observation": "Champions are no better than random designs under random actuation, or their advantage is unaffected by shuffling the material layout and vanishes under fresh phases (the advantage is a lucky phase field, not a derandomizing morphology).",
+    "admissible_datasets": "The paper's own simulator and deposited designs, or a re-implementation that keeps the stated mechanism (voxels present/absent, passive/contractile, random phase offsets from a 2 Hz sine CPG fixed per clade, selection for net displacement). Scope is the simulation, not living organisms.",
+    "inference_method": "Ratios and percentiles of net displacement against 200 random designs; layout-shuffle and fresh-phase controls per champion; thresholds as in pass/fail criteria."
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local session",
+    "date": "2026-10-31"
+  }
+}

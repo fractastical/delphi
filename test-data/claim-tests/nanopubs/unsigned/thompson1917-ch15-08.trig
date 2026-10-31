@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch15-08--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch15-08: refutes, confidence 0.97" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.97"^^xsd:double ;
+    delphi:hypothesis "If lateral-spined (S. mansoni) and terminal-spined (S. haematobium) eggs are mechanical variants produced by one species, then worms assigned to S. mansoni and to S. haematobium belong to one interbreeding lineage: their mitochondrial cox1 sequences should be no more divergent from each other than sequences within either nominal species, and should not form two reciprocally separated clusters." ;
+    delphi:passCriterion "Pre-registered (claim supported). Using GenBank cox1 sequences (up to 40 per nominal species, chosen by a fixed random seed from all records >= 400 bp, hybrids excluded by title), pairwise uncorrected p-distances computed on pairwise alignments over >= 300 overlapping sites: the mean S. mansoni vs S. haematobium distance is <= 0.03, or the distributions overlap (minimum between-group distance smaller than the maximum within-group distance of either species, i.e. no barcode gap)." ;
+    delphi:failCriterion "Pre-registered (claim refuted). The minimum S. mansoni vs S. haematobium distance exceeds the maximum within-species distance of both S. mansoni and S. haematobium (complete barcode gap), the mean between-group distance is >= 0.10, and that mean is at least as large as the mean distance between each of two universally recognised distinct species pairs measured the same way (S. haematobium vs S. bovis; S. mansoni vs S. rodhaini). Any other combination is 'mixed'. If fewer than 10 usable sequences per focal species can be retrieved the verdict is 'inconclusive' (data-unavailable)." ;
+    delphi:expectedObservation "Pre-registered (claim supported). Using GenBank cox1 sequences (up to 40 per nominal species, chosen by a fixed random seed from all records >= 400 bp, hybrids excluded by title), pairwise uncorrected p-distances computed on pairwise alignments over >= 300 overlapping sites: the mean S. mansoni vs S. haematobium distance is <= 0.03, or the distributions overlap (minimum between-group distance smaller than the maximum within-group distance of either species, i.e. no barcode gap)." ;
+    delphi:disconfirmingObservation "Pre-registered (claim refuted). The minimum S. mansoni vs S. haematobium distance exceeds the maximum within-species distance of both S. mansoni and S. haematobium (complete barcode gap), the mean between-group distance is >= 0.10, and that mean is at least as large as the mean distance between each of two universally recognised distinct species pairs measured the same way (S. haematobium vs S. bovis; S. mansoni vs S. rodhaini). Any other combination is 'mixed'. If fewer than 10 usable sequences per focal species can be retrieved the verdict is 'inconclusive' (data-unavailable)." ;
+    delphi:admissibleDatasets "Planned datasets: ncbi-genbank-schistosoma-cox1" ;
+    delphi:inferenceMethod "fetch.py queries NCBI E-utilities for cox1 records of each nominal species, subsamples them with a fixed seed, and writes the FASTA (committed, 128 KB) and an accession list. analysis.py aligns every pair of sequences locally (Biopython PairwiseAligner, both orientations), computes the uncorrected p-distance over aligned A/C/G/T columns (pairs with < 300 such columns discarded; 9354 of 10440 pairs retained), and summarises distances within S. mansoni, within S. haematobium, between them, and between recognised species pairs (S. haematobium vs S. bovis, S. mansoni vs S. rodhaini, and others) for calibration." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "fetch.py queries NCBI E-utilities for cox1 records of each nominal species, subsamples them with a fixed seed, and writes the FASTA (committed, 128 KB) and an accession list. analysis.py aligns every pair of sequences locally (Biopython PairwiseAligner, both orientations), computes the uncorrected p-distance over aligned A/C/G/T columns (pairs with < 300 such columns discarded; 9354 of 10440 pairs retained), and summarises distances within S. mansoni, within S. haematobium, between them, and between recognised species pairs (S. haematobium vs S. bovis, S. mansoni vs S. rodhaini, and others) for calibration." ;
+    rdfs:comment "Measured: 0.1676 mean uncorrected cox1 p-distance, S. mansoni vs S. haematobium (n = 1481, range 0.1475-0.2054 over 1481 sequence pairs (40 x 40 sequences)). Interpretation: Thompson's compound claim has two parts: (i) a mechanism (the lateral spine is moulded in a funnel-shaped part of the uterus), and (ii) the taxonomic conclusion he draws from it, that the two egg forms 'do not shew the existence of a separate species, S. mansoni'. Part (i) is anatomical and is not operationalizable with public data; part (ii) is tested here by genetic species delimitation, which did not exist in 1917 (modern reinterpretation: 'separate species' is read as a separately evolving, reproductively isolated lineage, detectable as a deep, reciprocally separated mitochondrial divergence comparable to that between other accepted Schistosoma species). GenBank species labels for sequenced adult worms rest on life-cycle, host and multilocus data, not only on egg-spine position, which limits the circularity noted by the assessors." ;
+    delphi:evidenceAgainst "Only the taxonomic conclusion of the claim is tested. Whether the lateral spine is moulded in a funnel-shaped part of the ootype/uterus (the mechanism Thompson takes from Looss) is not addressed by sequence data; but since the two egg types belong to lineages about 17% divergent in cox1, more than the divergence between other accepted Schistosoma species, the egg forms cannot be variants of one species whatever their mechanical origin." ;
+    delphi:evidenceAgainst "Mitochondrial distance is one line of evidence; the same conclusion is standard from nuclear genomes, chromosome structure, intermediate-host specificity (Biomphalaria vs Bulinus) and the absence of fertile S. mansoni x S. haematobium hybrids. Those were not re-analysed here." ;
+    delphi:evidenceAgainst "GenBank species labels are taken at face value. A few unusually divergent 'within-species' pairs (max 7.1% within S. mansoni, 6.4% within S. haematobium, one S. japonicum sequence 25% from the rest) probably reflect mislabelled or atypical records; they make the within-species range wider, i.e. work against the verdict, which is nonetheless reached with a wide margin." ;
+    delphi:evidenceAgainst "The sequenced cox1 regions vary between studies; distances were computed only on overlapping aligned columns (>= 300), and 10% of pairs with no sufficient overlap were dropped." ;
+    delphi:evidenceAgainst "The test is a modern reinterpretation: Thompson (following Looss) argued from egg morphology and uterine anatomy; genetic species concepts post-date him." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch15-08--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch15-08/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch15-08--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: NCBI GenBank nucleotide records: Schistosoma cox1 (cytochrome c oxidase subunit I) sequences, 400-2000 bp, sampled 2026-10-31" ;
+    dct:description "mitochondrial divergence within and between nominal Schistosoma species" ;
+    delphi:hasChecksum "sha256:1677f5246fd78f7fab86720802acac068e0aa6843aba958232dd21a005644c09" ;
+    rdfs:comment "Location (not a URL): https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nuccore&rettype=fasta&retmode=text&id=<accessions from derived/accessions.csv>; selection by esearch term \"<species>\"[Organism] AND (cox1[Gene] OR COI[Gene] OR COX1[Gene] OR \"cytochrome c oxidase subunit I\"[Title] OR \"cytochrome oxidase subunit 1\"[Title] OR \"cytochrome c oxidase subunit 1\"[Title]) AND 400:2000[SLEN] NOT hybrid[Title] NOT cDNA[Title] NOT mRNA[Title] NOT EST[Keyword] NOT genome[Title], subsampled with random.Random(20261031)" ;
+    prov:wasDerivedFrom <https://www.ncbi.nlm.nih.gov/nuccore/> ;
+    dct:license "NCBI data are public domain (no restrictions on reuse)" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch15-08> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch15-08--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch15-08/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5-1-thinking-high; cursor/thompson-claim-tests-6e84)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5-1-thinking-high" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.675Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch15-08: refutes, confidence 0.97" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch15-08--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

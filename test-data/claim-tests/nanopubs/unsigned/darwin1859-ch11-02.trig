@@ -1,0 +1,84 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch11-02--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch11-02: supports, confidence 0.8" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.8"^^xsd:double ;
+    delphi:hypothesis "Across pairs of regions of similar size, the species-level dissimilarity of their terrestrial faunas increases with the impassability and age of the barrier separating them (none < large river < shallow recently-dry strait < mountain range or desert < deep never-bridged strait < ocean basin), and this ordering persists after controlling for the geographic distance between the regions." ;
+    delphi:passCriterion "Pre-registered: 26 fixed region pairs are assigned a barrier rank (0 none, 1 large river, 2 shallow strait dry at glacial low stands, 3 mountain range or desert, 4 deep strait never bridged, 5 ocean basin). For each pair and each of three groups (Rodentia, Squamata, Amphibia) the Sørensen dissimilarity (1 - 2|A∩B|/(|A|+|B|)) of species sets (GBIF occurrences, >= 3 records per species in the box) is computed and averaged over the three groups. SUPPORTS if Spearman's rho between mean dissimilarity and barrier rank is >= 0.5 with p < 0.01 (n = 26), AND the partial Spearman correlation controlling for log centroid distance is > 0 with p < 0.05, AND mean dissimilarity of the rank-0 (no barrier) pairs is lower than that of every barrier class with rank >= 2." ;
+    delphi:failCriterion "Pre-registered: REFUTES if Spearman's rho <= 0, or if the no-barrier pairs are on average at least as dissimilar as the deep-strait and ocean pairs (ranks 4-5). Any other outcome is MIXED. A pair in which any group has fewer than 10 species in either box is dropped for that group; if fewer than 20 pairs retain all three groups, groups are averaged over those available and this is reported; if fewer than 15 pairs remain the result is inconclusive (underpowered)." ;
+    delphi:expectedObservation "Pre-registered: 26 fixed region pairs are assigned a barrier rank (0 none, 1 large river, 2 shallow strait dry at glacial low stands, 3 mountain range or desert, 4 deep strait never bridged, 5 ocean basin). For each pair and each of three groups (Rodentia, Squamata, Amphibia) the Sørensen dissimilarity (1 - 2|A∩B|/(|A|+|B|)) of species sets (GBIF occurrences, >= 3 records per species in the box) is computed and averaged over the three groups. SUPPORTS if Spearman's rho between mean dissimilarity and barrier rank is >= 0.5 with p < 0.01 (n = 26), AND the partial Spearman correlation controlling for log centroid distance is > 0 with p < 0.05, AND mean dissimilarity of the rank-0 (no barrier) pairs is lower than that of every barrier class with rank >= 2." ;
+    delphi:disconfirmingObservation "Pre-registered: REFUTES if Spearman's rho <= 0, or if the no-barrier pairs are on average at least as dissimilar as the deep-strait and ocean pairs (ranks 4-5). Any other outcome is MIXED. A pair in which any group has fewer than 10 species in either box is dropped for that group; if fewer than 20 pairs retain all three groups, groups are averaged over those available and this is reported; if fewer than 15 pairs remain the result is inconclusive (underpowered)." ;
+    delphi:admissibleDatasets "Planned datasets: gbif-occurrence-search-api" ;
+    delphi:inferenceMethod "For each of 52 pre-registered boxes and three groups (Rodentia minus Rattus and Mus, Squamata, Amphibia) the GBIF occurrence API returned speciesKey facet counts (coordinates present, no geospatial issue, PRESENT, 1900-2026, fossil/living specimens excluded); species with >= 3 records formed the box's set. For each of the 26 pairs the Sørensen dissimilarity was computed per group (pairs with < 10 species in a box were dropped for that group) and averaged over the available groups; the Siberian control pair had too few species in every group and was dropped (n = 25). Spearman's rho between mean dissimilarity and the pre-registered barrier rank, and the partial Spearman correlation controlling for log centroid distance, were computed and compared with the pre-registered thresholds, together with the mean dissimilarity per barrier class." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "For each of 52 pre-registered boxes and three groups (Rodentia minus Rattus and Mus, Squamata, Amphibia) the GBIF occurrence API returned speciesKey facet counts (coordinates present, no geospatial issue, PRESENT, 1900-2026, fossil/living specimens excluded); species with >= 3 records formed the box's set. For each of the 26 pairs the Sørensen dissimilarity was computed per group (pairs with < 10 species in a box were dropped for that group) and averaged over the available groups; the Siberian control pair had too few species in every group and was dropped (n = 25). Spearman's rho between mean dissimilarity and the pre-registered barrier rank, and the partial Spearman correlation controlling for log centroid distance, were computed and compared with the pre-registered thresholds, together with the mean dissimilarity per barrier class." ;
+    rdfs:comment "Measured: 0.7355 Spearman rho between barrier rank and mean species-level Sørensen dissimilarity (Rodentia, Squamata, Amphibia) (n = 25, one-sided p=1.40e-05; partial Spearman controlling log distance rho=0.800, one-sided p=1.34e-06). Interpretation: Darwin's 'barriers of any kind' are represented by six classes with replicate pairs, ranked by a pre-registered judgement of how impassable and long-standing they are: contiguous land (0), the Amazon main stem (1), straits shallower than ~120 m that were land during Pleistocene low stands (English Channel, Palk Strait, Bass Strait, Malacca Strait, Torres Strait, Gulf of Paria, Sunda Strait) (2), high mountain ranges (Andes twice, Sierra Nevada) and wide deserts (Nullarbor, Sahara) (3), deep straits with no Pleistocene land bridge (Makassar Strait, Lombok Strait, Mozambique Channel, Yucatán Channel) (4), and ocean basins (Atlantic, Indian) (5). 'Difference between the inhabitants' is species-level Sørensen dissimilarity of three terrestrial, non-volant, non-marine vertebrate groups; bats and birds are excluded because they fly over barriers, and marine mammals because the barriers are their habitat. Distance is a confound Darwin himself names ('distance... is of less importance than barriers'), so the partial correlation controlling for distance is part of the criterion. Introduced species (notably Rattus, Mus, Hemidactylus, Rhinella marina) cannot be removed from GBIF data in general; Rattus and Mus species are removed explicitly, the rest remain and bias against the claim by making distant regions look similar." ;
+    delphi:evidenceAgainst "Rodentia reached the 10-species minimum in only 13 of 25 pairs (islands and arid regions are thinly recorded), so most pairs are averaged over Squamata and Amphibia; all three groups individually show positive rank correlations (0.51, 0.70, 0.70)." ;
+    delphi:evidenceAgainst "Distance is only partly controlled: the desert and ocean pairs are much farther apart (2000-8600 km) than the others, and climate differs across the Sahara, Nullarbor and Sierra Nevada pairs. The partial correlation (0.80) and the fact that the mountain and deep-strait pairs (240-910 km) are more dissimilar than the no-barrier pairs at 560-1120 km address but do not remove this." ;
+    delphi:evidenceAgainst "Barrier ranks are a pre-registered judgement; replicate counts per class are small (river 1, desert 2, ocean 2, mountains 3)." ;
+    delphi:evidenceAgainst "Introduced species remain in the data except Rattus and Mus; they lower dissimilarity across the widest barriers and so bias against the claim." ;
+    delphi:evidenceAgainst "The Bali-Lombok pair is the least dissimilar deep-strait pair (0.49), consistent with the known weakness of Wallace's line for reptiles and amphibians; it is reported, not removed." ;
+    delphi:evidenceAgainst "Boxes are bounding boxes with uneven sampling intensity; poorly sampled boxes inflate dissimilarity regardless of barrier." ;
+    delphi:evidenceAgainst "GBIF is a live resource; re-running reproduces the method but counts drift as records are added." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-02--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch11-02/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-02--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: GBIF occurrence search API (facet counts of speciesKey for Rodentia, Squamata, Amphibia within bounding boxes; GBIF Backbone Taxonomy for keys)" ;
+    dct:description "species presence lists (>= 3 records) for the 52 boxes of the 26 region pairs" ;
+    delphi:hasChecksum "sha256:97aec709cb1a7655fa95f231a645ff9de15fedd68b2a4274014f736231d5e3e0" ;
+    prov:atLocation <https://api.gbif.org/v1/species/1459> ;
+    delphi:hasChecksum "sha256:2f2239e91b247aea9f5e533be5be1e22e4e091d24587ff6559741d62bc6422fe" ;
+    prov:atLocation <https://api.gbif.org/v1/species/11592253> ;
+    delphi:hasChecksum "sha256:70b7b954eff5b07c6bc9cec83601d26b74f3595fd45f4bbc3d523e53c27bc73f" ;
+    prov:atLocation <https://api.gbif.org/v1/species/131> ;
+    prov:wasDerivedFrom <https://www.gbif.org/developer/occurrence> ;
+    dct:license "varies by publisher (CC0 / CC BY / CC BY-NC); API output is aggregated counts" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch11-02> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch11-02--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch11-02/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-bdd1)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.656Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch11-02: supports, confidence 0.8" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch11-02--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

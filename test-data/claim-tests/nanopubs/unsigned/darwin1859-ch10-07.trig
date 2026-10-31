@@ -1,0 +1,131 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch10-07--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch10-07: mixed, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "If Tertiary extinctions were gradual and place-by-place rather than catastrophic, the last occurrences of extinct genera should be spread across many Tertiary stages rather than concentrated in one or two, and genera recorded on several continents should usually disappear from those continents at demonstrably different times, more often than genera killed in the known K-Pg catastrophe." ;
+    delphi:passCriterion "Two groups are analysed separately with Paleobiology Database genus-level occurrences from the Campanian through the Pliocene: Mollusca and Mammalia. Clause A (no catastrophic concentration): among PBDB-extinct genera whose global last occurrence (midpoint of its age range) falls in the Tertiary (Danian to Piacenzian, 17 ICS stages), the single stage holding the most last occurrences holds < 1/3 of them, and at least 4 stages are needed to accumulate 50% of them when stages are ranked by count. Clause B (place by place): among those Tertiary-extinct genera that have >= 2 occurrences on each of >= 2 continents (PBDB continent codes), the fraction whose regional last occurrences are staggered (the earliest-vanishing continent's last-occurrence minimum age is older than the last-vanishing continent's last-occurrence maximum age, i.e. non-overlapping age ranges) is > 0.5 AND exceeds the same fraction computed for the K-Pg control set (PBDB-extinct genera whose global last occurrence midpoint falls in the Maastrichtian, using Campanian-Maastrichtian occurrences). A clause passes only if it passes in both groups. Verdict 'supports' if both clauses pass, 'mixed' if exactly one passes, 'refutes' if neither passes." ;
+    delphi:failCriterion "Clause A fails if, in either group, one Tertiary stage holds >= 1/3 of the genus last occurrences or <= 3 stages hold 50% of them. Clause B fails if, in either group, the staggered fraction is <= 0.5 or does not exceed the K-Pg control's staggered fraction (which would mean the apparent staggering is no greater than what incomplete sampling produces in a known simultaneous extinction). Both clauses failing refutes the claim; the K-Pg control itself is outside the claim's Tertiary scope and is used only as a sampling-artefact baseline." ;
+    delphi:expectedObservation "Two groups are analysed separately with Paleobiology Database genus-level occurrences from the Campanian through the Pliocene: Mollusca and Mammalia. Clause A (no catastrophic concentration): among PBDB-extinct genera whose global last occurrence (midpoint of its age range) falls in the Tertiary (Danian to Piacenzian, 17 ICS stages), the single stage holding the most last occurrences holds < 1/3 of them, and at least 4 stages are needed to accumulate 50% of them when stages are ranked by count. Clause B (place by place): among those Tertiary-extinct genera that have >= 2 occurrences on each of >= 2 continents (PBDB continent codes), the fraction whose regional last occurrences are staggered (the earliest-vanishing continent's last-occurrence minimum age is older than the last-vanishing continent's last-occurrence maximum age, i.e. non-overlapping age ranges) is > 0.5 AND exceeds the same fraction computed for the K-Pg control set (PBDB-extinct genera whose global last occurrence midpoint falls in the Maastrichtian, using Campanian-Maastrichtian occurrences). A clause passes only if it passes in both groups. Verdict 'supports' if both clauses pass, 'mixed' if exactly one passes, 'refutes' if neither passes." ;
+    delphi:disconfirmingObservation "Clause A fails if, in either group, one Tertiary stage holds >= 1/3 of the genus last occurrences or <= 3 stages hold 50% of them. Clause B fails if, in either group, the staggered fraction is <= 0.5 or does not exceed the K-Pg control's staggered fraction (which would mean the apparent staggering is no greater than what incomplete sampling produces in a known simultaneous extinction). Both clauses failing refutes the claim; the K-Pg control itself is outside the claim's Tertiary scope and is used only as a sampling-artefact baseline." ;
+    delphi:admissibleDatasets "Planned datasets: pbdb-occurrences-mollusca-mammalia-campanian-pliocene, pbdb-taxa-appearances-extant-flags, pbdb-intervals-ics-stages" ;
+    delphi:inferenceMethod "Genus-resolved PBDB occurrences of Mollusca and Mammalia from the Campanian to the Pliocene were downloaded for each of nine PBDB continents. For each genus flagged extinct in PBDB taxonomy, the last occurrence (smallest minimum age) was located and its age midpoint assigned to an ICS stage; genera whose database-wide last appearance is younger than the Tertiary were excluded. Clause A measured the concentration of Tertiary last occurrences across the 17 Tertiary stages (largest single-stage share; number of ranked stages needed to reach 50%). Clause B took Tertiary-extinct genera with >= 2 occurrences on each of >= 2 continents and called their disappearance staggered when the first-vanishing continent's last-occurrence age range lies entirely before the last-vanishing continent's; the same statistic was computed for genera with a Maastrichtian last occurrence as a K-Pg catastrophe control." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "Genus-resolved PBDB occurrences of Mollusca and Mammalia from the Campanian to the Pliocene were downloaded for each of nine PBDB continents. For each genus flagged extinct in PBDB taxonomy, the last occurrence (smallest minimum age) was located and its age midpoint assigned to an ICS stage; genera whose database-wide last appearance is younger than the Tertiary were excluded. Clause A measured the concentration of Tertiary last occurrences across the 17 Tertiary stages (largest single-stage share; number of ranked stages needed to reach 50%). Clause B took Tertiary-extinct genera with >= 2 occurrences on each of >= 2 continents and called their disappearance staggered when the first-vanishing continent's last-occurrence age range lies entirely before the last-vanishing continent's; the same statistic was computed for genera with a Maastrichtian last occurrence as a K-Pg catastrophe control." ;
+    rdfs:comment "Measured: 0.46764250138350855 mean over the two groups of the fraction of multi-continent Tertiary-extinct genera with staggered regional last occurrences (n = 603). Interpretation: Darwin's 'species and groups of species' are tested at the genus level because genus-level identifications are far more complete and less affected by taxonomic noise in PBDB. 'Disappearing from one spot, then another' is read as non-overlapping last-occurrence age ranges on different continents (modern continents, PBDB cc codes). 'Swept away together by catastrophes' is read as a strong concentration of last occurrences in one or two stages. The Signor-Lipps effect makes any extinction look gradual and staggered in an incomplete record; the Maastrichtian (K-Pg) control set provides an empirical baseline for how staggered a real catastrophe looks in the same database, so clause B requires Tertiary staggering to exceed that baseline. Scope is the Tertiary, as Darwin stated; the K-Pg event itself is not used to judge the claim." ;
+    delphi:evidenceAgainst "Regional staggering is only detectable at the resolution of the occurrence dating: when a genus's last occurrences on two continents are both dated only to the same stage (common for mammals, whose records are often dated to land-mammal ages spanning several stages, and for all Maastrichtian records in the control), the ranges overlap and the genus is scored 'not staggered'. The mammal result for clause B is therefore partly a dating-resolution result, and the K-Pg control's zero staggering reflects the same effect as much as the catastrophe itself." ;
+    delphi:evidenceAgainst "The Mammalia K-Pg control set is empty (no extinct mammal genus with >= 2 Maastrichtian occurrences on each of two continents), so for mammals clause B rests only on the > 0.5 condition." ;
+    delphi:evidenceAgainst "Genus last occurrences in PBDB are truncated by sampling (Signor-Lipps), so both the spread across stages and the regional staggering are biased toward looking gradual; the Maastrichtian control set calibrates this for clause B but not for clause A." ;
+    delphi:evidenceAgainst "The Tertiary window ends at the Piacenzian; genera that actually died out in the Pleistocene but have no PBDB Pleistocene record are counted as Piacenzian extinctions, inflating the youngest stage." ;
+    delphi:evidenceAgainst "Stage assignment uses the midpoint of the last occurrence's age range; poorly dated occurrences spanning several stages add noise to clause A." ;
+    delphi:evidenceAgainst "Modern continents are used as 'places'; a genus vanishing from one basin while persisting in another on the same continent is not visible, which biases clause B toward 'not staggered'." ;
+    delphi:evidenceAgainst "PBDB coverage is heavily weighted to Europe and North America; staggering between continents can reflect unequal sampling rather than real sequential disappearance." ;
+    delphi:evidenceAgainst "The test is at genus level, not species level, and is confined to Darwin's stated Tertiary scope; the K-Pg (Maastrichtian) set shows what a catastrophic horizon looks like in the same data and is deliberately excluded from the verdict." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch10-07--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch10-07--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch10-07--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch10-07/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch10-07--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Paleobiology Database occurrences, Mollusca and Mammalia, Campanian-Pliocene, genus-resolved, per continent" ;
+    dct:description "occurrence ages and continents for last-occurrence timing" ;
+    delphi:hasChecksum "sha256:208c2de111063a22ba6adf09ac808b56be09e0e88d19c86aee07865c3935d1fd" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mollusca&interval=Campanian%2CPliocene&idreso=genus&cc=AFR&show=class> ;
+    delphi:hasChecksum "sha256:dbe1ea12bd80c6f276a43c24e94a8b668e939bb852a2647716bf535fdd317337" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mollusca&interval=Campanian%2CPliocene&idreso=genus&cc=ATA&show=class> ;
+    delphi:hasChecksum "sha256:0e8dd516471d34508578ce57134d264eed6e91cde2b0fa0d3c6fd8a26344550a" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mollusca&interval=Campanian%2CPliocene&idreso=genus&cc=ASI&show=class> ;
+    delphi:hasChecksum "sha256:873fd70ff5ac9f84f8adc9d5d601a697d1a83f6c28a4d266b51a5df89196a1da" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mollusca&interval=Campanian%2CPliocene&idreso=genus&cc=AUS&show=class> ;
+    delphi:hasChecksum "sha256:15573657d81053c241f5eb8bafefd2ffa65efb59d0bf4b06246232485170bc7a" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mollusca&interval=Campanian%2CPliocene&idreso=genus&cc=EUR&show=class> ;
+    delphi:hasChecksum "sha256:ca92920013024a1b83d899f1c7c038ba82da800512ccf8000a2725b5a5b10cc6" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mollusca&interval=Campanian%2CPliocene&idreso=genus&cc=IOC&show=class> ;
+    delphi:hasChecksum "sha256:8290a3dfc1bfdd0429695de0f0d8d1dd8a3ff650d0a59e544bff5fcd0cdb57ef" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mollusca&interval=Campanian%2CPliocene&idreso=genus&cc=NOA&show=class> ;
+    delphi:hasChecksum "sha256:92686519f13862930ce7723a1606f9b8efd0a92e475d2edd03b61cc875e8ff25" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mollusca&interval=Campanian%2CPliocene&idreso=genus&cc=OCE&show=class> ;
+    delphi:hasChecksum "sha256:2114e09b436fe50e05cb958a3aee6101e94c89f1306f0d43a31fb17ea0a9cf62" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mollusca&interval=Campanian%2CPliocene&idreso=genus&cc=SOA&show=class> ;
+    delphi:hasChecksum "sha256:b5a4611ba6f1f62b39be97ff5b0a6cf2689b657c6fc3d04593804506a2d00a6f" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Campanian%2CPliocene&idreso=genus&cc=AFR&show=class> ;
+    delphi:hasChecksum "sha256:7af837ffe36baf2976a163e4eb034e81475de7ef8ded30d58d341ae9959f3a30" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Campanian%2CPliocene&idreso=genus&cc=ATA&show=class> ;
+    delphi:hasChecksum "sha256:e9486041be8af9eda57ff8548a5fc22a2fe690c31feaf934a9fb84ce403ba2f7" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Campanian%2CPliocene&idreso=genus&cc=ASI&show=class> ;
+    delphi:hasChecksum "sha256:2a81071a8b055b7444533c0f57403330e706c418b9f379ed0c780bb7369ddb07" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Campanian%2CPliocene&idreso=genus&cc=AUS&show=class> ;
+    delphi:hasChecksum "sha256:71fe5e71171f4a2cf301fad47fed32df2d202938d01bc66fb1b162a97d0b0cac" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Campanian%2CPliocene&idreso=genus&cc=EUR&show=class> ;
+    delphi:hasChecksum "sha256:daeeacca68ad2692546c7fe85a4d1a3dfb5c1dbf00b8797b0fa476e861b1fad0" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Campanian%2CPliocene&idreso=genus&cc=IOC&show=class> ;
+    delphi:hasChecksum "sha256:9272363e1804eb62c4de3d3e502271588aec9424cb8ed6f02c84ab238a5bac98" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Campanian%2CPliocene&idreso=genus&cc=NOA&show=class> ;
+    delphi:hasChecksum "sha256:9d4939bdd2fa216601969b7f2a5b5967477be77c05437f0672f1852316e88b22" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Campanian%2CPliocene&idreso=genus&cc=OCE&show=class> ;
+    delphi:hasChecksum "sha256:0a6d520febf06afcc685955ee20e0cb23a53fc68207bbdaa38ce61b536aaa962" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/list.csv?base_name=Mammalia&interval=Campanian%2CPliocene&idreso=genus&cc=SOA&show=class> ;
+    prov:wasDerivedFrom <https://paleobiodb.org/> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch10-07--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Paleobiology Database taxa with first/last appearance ages and extant flags (occs/taxa, show=app)" ;
+    dct:description "identify extinct genera and their database-wide last appearance" ;
+    delphi:hasChecksum "sha256:bc5474b98f153616969f6b07e07d23571df147fcca93836b192a66a2966f9af0" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/taxa.json?base_name=Mollusca&interval=Campanian%2CPliocene&rank=genus&show=app&vocab=pbdb> ;
+    delphi:hasChecksum "sha256:198258b2b6625c79aa5982a657444f7dadb412e4ecee326ebc16c62a0021f1b9" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/taxa.json?base_name=Mammalia&interval=Campanian%2CPliocene&rank=genus&show=app&vocab=pbdb> ;
+    prov:wasDerivedFrom <https://paleobiodb.org/> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch10-07--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Paleobiology Database international time scale (scale 1) interval boundaries" ;
+    dct:description "stage boundaries for binning last occurrences" ;
+    delphi:hasChecksum "sha256:54dd5ed0931f697eee70b9ec67a0b90a4748885334c9619318f0507d3dbbe665" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/intervals/list.json?scale=1&vocab=pbdb> ;
+    prov:wasDerivedFrom <https://paleobiodb.org/data1.2/intervals/list_doc.html> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch10-07> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch10-07--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch10-07/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-0e75)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.655Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch10-07: mixed, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch10-07--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

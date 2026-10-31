@@ -1,0 +1,175 @@
+{
+  "claim_id": "thompson1917-ch15-01",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch15-01",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "In species-level egg measurements of birds, turtles/tortoises and crocodilians, the polar axis (egg length) is never shorter than the maximum equatorial diameter (egg breadth): no hard-shelled egg is oblate or discoidal.",
+  "pass_criterion": "Pre-registered. For each species with a mean egg length L (pole-to-pole) and breadth B (maximum equatorial diameter) in the Deeming & Ruta 2014 amniote egg compilation (Dryad doi:10.5061/dryad.s9227) and the 955-species bird egg-shape compilation (Dryad doi:10.5061/dryad.sj3tx9648), compute the elongation L/B. Groups: birds, Testudines, Crocodylia (hard-shelled, in scope); Squamata reported separately as out of scope (mostly parchment-shelled). Supports if, in every in-scope group, zero species have L/B < 1.00, and the fraction of species within 5% of a sphere (L/B < 1.05) is reported together with the minimum L/B per group.",
+  "fail_criterion": "Refutes if any in-scope species has a mean L/B < 0.98 (polar axis robustly shorter than equatorial diameter, beyond ~2% measurement error) in either compilation. Mixed if the smallest in-scope L/B lies in [0.98, 1.00), i.e. a species indistinguishable from oblate within measurement error.",
+  "planned_datasets": [
+    "dryad-s9227-deeming-ruta-2014-amniote-eggs",
+    "dryad-sj3tx9648-bird-egg-shape-955spp"
+  ],
+  "interpretation": "Thompson's 'prolate, never oblate spheroid' is read as: the axis of rotational symmetry (the pole-to-pole length, which in asymmetric eggs runs through the blunt and pointed ends) exceeds the equatorial diameter. Published egg measurements record length and breadth with length along the polar axis, so L/B >= 1 means prolate and L/B < 1 would mean oblate. A limitation stated up front: because measurers conventionally record the longer dimension as length, a truly oblate egg could only reveal itself in such data as L/B at or just below 1 (an apparently spherical egg); the test therefore asks whether any species approaches that boundary, and the fraction of near-spherical eggs is reported as the zone where the data cannot discriminate.",
+  "datasets": [
+    {
+      "id": "amniote-life-history-database-2015",
+      "name": "Amniote Life-History Database (Myhrvold et al. 2015, Ecology 96:3109; Ecological Archives E096-269)",
+      "landing_url": "https://esapubs.org/archive/ecol/E096/269/",
+      "doi": "10.1890/15-0846.1",
+      "version": "Aug 2015",
+      "license": "CC0",
+      "files": [
+        {
+          "download_url": "https://esapubs.org/archive/ecol/E096/269/Data_Files/Amniote_Database_Aug_2015.csv",
+          "retrieved_at": "2026-10-31T04:39:25Z",
+          "byte_size": 4728122,
+          "sha256": "ae16377ebe8a172949c2b8c200a50c5d0c7fc04d34bd3c9704635da4a4d51f53"
+        }
+      ],
+      "role": "species-mean egg length and width (mm) for birds, turtles, crocodilians and squamates"
+    }
+  ],
+  "method": "Downloaded the Amniote Life-History Database CSV (21,322 rows), kept rows with both egg_length_mm and egg_width_mm recorded (594 species), and computed elongation L/B per species. Species were grouped as Aves (167), Testudines (16), Crocodilia (9) in scope and Squamata (402) out of scope. For each group the count of species with L/B < 1.00 (oblate as recorded), L/B < 0.98 (robustly oblate) and L/B < 1.05 (near-spherical) was tabulated with the minimum and quantiles of L/B.",
+  "measured": {
+    "value": 1.0346666666666666,
+    "unit": "minimum species-mean egg length/breadth among in-scope species (Macrochelys temminckii, 38.8 x 37.5 mm); zero of 192 species have L/B < 1",
+    "n": 192,
+    "uncertainty": "no oblate species found; in-scope L/B 1st-99th percentile 1.15-1.90",
+    "extra": {
+      "source_rows": 21322,
+      "rows_with_egg_length_and_width": 594,
+      "reptile_orders_present": {
+        "Squamata": 402,
+        "Testudines": 16,
+        "Crocodilia": 9
+      },
+      "groups": {
+        "Aves": {
+          "n_species": 167,
+          "n_oblate_LB_lt_1.00": 0,
+          "n_robustly_oblate_LB_lt_0.98": 0,
+          "n_near_spherical_LB_lt_1.05": 0,
+          "frac_near_spherical_LB_lt_1.05": 0.0,
+          "min_LB": 1.1307484220018034,
+          "min_LB_species": "Tinamus osgoodi",
+          "median_LB": 1.446808510638298,
+          "max_LB": 1.7168284789644013,
+          "quantiles_LB": {
+            "0.01": 1.1716178824340309,
+            "0.05": 1.2654733524355302,
+            "0.5": 1.446808510638298,
+            "0.95": 1.623208039141007,
+            "0.99": 1.659651825289409
+          }
+        },
+        "Testudines": {
+          "n_species": 16,
+          "n_oblate_LB_lt_1.00": 0,
+          "n_robustly_oblate_LB_lt_0.98": 0,
+          "n_near_spherical_LB_lt_1.05": 1,
+          "frac_near_spherical_LB_lt_1.05": 0.0625,
+          "min_LB": 1.0346666666666666,
+          "min_LB_species": "Macrochelys temminckii",
+          "median_LB": 1.4399254551025245,
+          "max_LB": 1.897590361445783,
+          "quantiles_LB": {
+            "0.01": 1.0599899224806202,
+            "0.05": 1.161282945736434,
+            "0.5": 1.4399254551025245,
+            "0.95": 1.897590361445783,
+            "0.99": 1.897590361445783
+          }
+        },
+        "Crocodylia": {
+          "n_species": 9,
+          "n_oblate_LB_lt_1.00": 0,
+          "n_robustly_oblate_LB_lt_0.98": 0,
+          "n_near_spherical_LB_lt_1.05": 0,
+          "frac_near_spherical_LB_lt_1.05": 0.0,
+          "min_LB": 1.5,
+          "min_LB_species": "Crocodylus acutus",
+          "median_LB": 1.698717948717949,
+          "max_LB": 16.90909090909091,
+          "quantiles_LB": {
+            "0.01": 1.5016,
+            "0.05": 1.508,
+            "0.5": 1.698717948717949,
+            "0.95": 10.869264069264066,
+            "0.99": 15.701125541125542
+          }
+        },
+        "Squamata_out_of_scope": {
+          "n_species": 402,
+          "n_oblate_LB_lt_1.00": 0,
+          "n_robustly_oblate_LB_lt_0.98": 0,
+          "n_near_spherical_LB_lt_1.05": 17,
+          "frac_near_spherical_LB_lt_1.05": 0.04228855721393035,
+          "min_LB": 1.0,
+          "min_LB_species": "Cnemaspis kandiana",
+          "median_LB": 1.3004065040650405,
+          "max_LB": 17.510917030567686,
+          "quantiles_LB": {
+            "0.01": 1.0,
+            "0.05": 1.0591353033772182,
+            "0.5": 1.3004065040650405,
+            "0.95": 2.42257525083612,
+            "0.99": 3.6288887244746966
+          }
+        }
+      },
+      "in_scope_total": {
+        "n_species": 192,
+        "n_oblate_LB_lt_1.00": 0,
+        "n_robustly_oblate_LB_lt_0.98": 0,
+        "n_near_spherical_LB_lt_1.05": 1,
+        "frac_near_spherical_LB_lt_1.05": 0.005208333333333333,
+        "min_LB": 1.0346666666666666,
+        "min_LB_species": "Macrochelys temminckii",
+        "median_LB": 1.4590462764923195,
+        "max_LB": 16.90909090909091,
+        "quantiles_LB": {
+          "0.01": 1.152704260465822,
+          "0.05": 1.225646551724138,
+          "0.5": 1.4590462764923195,
+          "0.95": 1.6823201686456715,
+          "0.99": 1.897590361445783
+        }
+      },
+      "oblate_records_in_scope": [],
+      "criteria": {
+        "zero_species_LB_lt_1.00_in_scope": true,
+        "zero_species_LB_lt_0.98_in_scope": true
+      },
+      "verdict_by_prereg_rule": "supports",
+      "near_spherical_in_scope_species": [
+        {
+          "class": "Reptilia",
+          "order": "Testudines",
+          "family": "Chelydridae",
+          "genus": "Macrochelys",
+          "species": "temminckii",
+          "egg_length_mm": 38.8,
+          "egg_width_mm": 37.5,
+          "LB": 1.0346666666666666
+        }
+      ]
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.6,
+  "caveats": [
+    "Deviation from pre-registration: the two Dryad compilations named in planned_datasets (doi:10.5061/dryad.s9227, doi:10.5061/dryad.sj3tx9648) could not be downloaded because Dryad's file downloads are gated by an interactive anti-bot (proof-of-work) challenge; the Amniote Life-History Database, which carries the same two variables (egg length, egg width) and also covers turtles and crocodilians, was substituted. Criteria and thresholds were not changed.",
+    "Coverage is modest: only 167 bird, 16 turtle and 9 crocodilian species have both egg length and width in this database, far fewer than the ~1,400 bird species of Stoddard et al. 2017. A rare oblate species could be missed; a universal negative can only be supported, not proven, by a sample.",
+    "Measurement convention limits discriminating power: because egg length is recorded along the longer (polar) axis, an oblate egg could only appear as L/B at or just below 1. The data show no species near that boundary except the alligator snapping turtle (L/B = 1.03, effectively spherical), so the data are consistent with the claim but cannot exclude an oblate egg disguised as a sphere.",
+    "One crocodilian row (L/B = 16.9) is an evident unit error in the source (width probably in cm); it does not affect the oblate count and is left as recorded.",
+    "Squamata (402 species, mostly parchment-shelled, min L/B = 1.00 in a gecko) are outside Thompson's 'hard-shelled' scope and are reported only for completeness."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-thompson-efb7",
+    "date": "2026-10-31"
+  }
+}

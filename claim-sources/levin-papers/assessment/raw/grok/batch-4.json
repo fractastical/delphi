@@ -1,0 +1,952 @@
+[
+  {
+    "claim_id": "levin-2022-grn-learning-01",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.85,
+      "data-adequacy": 0.8,
+      "discriminating-power": 0.78,
+      "analysis-feasibility": 0.62
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.74,
+    "operationalization": "Re-simulate the 35 BioModels ODE pathways with the published UCS/CS/response assays and count, for each model, which of the five memory labels appear under the paper's up- and down-regulation criteria. Finding several of those labels across the set would confirm the claim; finding only one label, or none, would refute it.",
+    "candidate_datasets": [
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "public ODE models of the surveyed gene, protein and metabolic pathways"},
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "MATLAB implementation of the memory test suite used on those models"}
+    ],
+    "obstacles": [
+      "Memory labels depend on the paper's twofold up-regulation and half down-regulation cutoffs.",
+      "The repository is an unrefactored MATLAB snapshot and does not include the converted model files."
+    ],
+    "rationale": "The five memory assays and the regulation thresholds are specified in the methods, the pathway models are in BioModels, and the authors' MATLAB suite is public, so re-running the survey is analysis rather than new research. The job is large and cluster-oriented, and the code is described as temporary, but a small team could rerun the suite. Agreement on which memory types occur would settle the claim as stated about these models."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-02",
+    "scores": {
+      "operationalizability": 0.82,
+      "data-existence": 0.8,
+      "data-adequacy": 0.65,
+      "discriminating-power": 0.48,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.7,
+    "operationalization": "Recompute memory-type prevalence, no-memory rates and cross-type correlations for the 35 biological models and for random ODE networks matched on the stated size and centrality measures. A higher biological prevalence on most types, with fewer no-memory cases and stronger correlations, would support the contrast; a matched or reversed pattern would refute it.",
+    "candidate_datasets": [
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "curated biological pathway ODEs used as the biological arm of the comparison"},
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "code that builds the matched random gene-circuit ODEs and scores memory"}
+    ],
+    "obstacles": [
+      "Random networks use a synthetic gene-circuit equation, while the biological set mixes protein and genetic models.",
+      "BioModels is a publication-biased sample, so enrichment need not mean selection for trainability."
+    ],
+    "rationale": "The prevalence contrast can be recomputed from public models and code. It does not cleanly show that generic network dynamics are uninvolved, because the null model is a different dynamical family matched only on a few structural summaries. The comparison tests a restricted version of the claim and leaves the evolutionary reading confounded."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-03",
+    "scores": {
+      "operationalizability": 0.42,
+      "data-existence": 0.45,
+      "data-adequacy": 0.3,
+      "discriminating-power": 0.35,
+      "analysis-feasibility": 0.4
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.62,
+    "operationalization": "In the published pathway ODEs, test whether a stimulation schedule found by the memory search changes a designated response without editing parameters or edges, and compare that in silico control with the absence of any public study in which such a schedule replaces a gene-therapy outcome. In-model control without rewiring would support only the computational half; a therapeutic alternative would require a failed or successful head-to-head that does not yet exist.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "in silico stimulation schedules that alter pathway responses without rewiring"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "pathway models on which those schedules can be re-tested"}
+    ],
+    "obstacles": [
+      "No public dataset compares behaviour-shaping of a pathway with genomic editing on a clinical or cellular endpoint.",
+      "A hedged 'potential alternative' is compatible with both success and failure of future trials."
+    ],
+    "rationale": "The models and code can show that stimulation changes a simulated response without rewiring, which is only a proxy for the biomedical claim. Nothing public tests whether that strategy substitutes for gene therapy against pharmacoresistance or sensitization in cells or patients. The claim as a therapeutic proposal stays only partly testable."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-04",
+    "scores": {
+      "operationalizability": 0.1,
+      "data-existence": 0.0,
+      "data-adequacy": 0.0,
+      "discriminating-power": 0.0,
+      "analysis-feasibility": 0.0
+    },
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.9,
+    "operationalization": "The sentence stipulates a definition of memory rather than a measurable regularity. No observation would confirm or refute the decision to use that definition.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "A stipulated definition has no confirming or refuting measurement."
+    ],
+    "rationale": "The claim states how the authors use the word memory inside their framework. Later assays apply that wording, but this statement itself cannot come out true or false from data. It is definitional."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-05",
+    "scores": {
+      "operationalizability": 0.8,
+      "data-existence": 0.85,
+      "data-adequacy": 0.6,
+      "discriminating-power": 0.55,
+      "analysis-feasibility": 0.6
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.72,
+    "operationalization": "Rerun the memory screen and count how many of the 35 models lack every memory type, then record the node counts of those exceptions and of a broader set of BioModels with fewer than four nodes. All-but-four, with three of the four below four nodes, would confirm the census; memory in most sub-four-node models, or a different exception count, would refute the size suggestion.",
+    "candidate_datasets": [
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "the surveyed pathways and other small ODE models for a size check"},
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "memory screen whose exception count can be recomputed"}
+    ],
+    "obstacles": [
+      "Three small exceptions do not separate 'cannot have memory' from 'this assay missed it'.",
+      "The surveyed set was not built as a systematic sweep of network size."
+    ],
+    "rationale": "The exception count among the 35 models is a direct rerun. The further claim that very small networks cannot or almost never have memory is an extrapolation from three cases and is not covered by a size-balanced public sample. Only the census half is well powered."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-06",
+    "scores": {
+      "operationalizability": 0.88,
+      "data-existence": 0.85,
+      "data-adequacy": 0.75,
+      "discriminating-power": 0.5,
+      "analysis-feasibility": 0.7
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.73,
+    "operationalization": "For each of the 35 models, pair a memory-count with mean node number, edge number, degree and hubness, and test rank correlations. Significant associations would refute the null result; consistently non-significant correlations would reproduce it, without showing that no structural feature matters.",
+    "candidate_datasets": [
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "SBML structure from which node, edge, degree and hubness statistics can be computed"},
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "memory scores and saved matrices to correlate with those statistics"}
+    ],
+    "obstacles": [
+      "Thirty-five models give low power, so a non-significant correlation is a weak null.",
+      "Hubness and degree definitions, and multiple testing across memory types, are easy to vary."
+    ],
+    "rationale": "Topology is in the SBML files and memory scores can be recomputed, so the correlation test is straightforward. A failure to find a significant correlation in this small curated set does not show that no network property indicates memory. The test is informative only inside the original sample and statistic."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-07",
+    "scores": {
+      "operationalizability": 0.55,
+      "data-existence": 0.75,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.64,
+    "operationalization": "Classify feedback loops and hysteresis in the BioModels SBML graphs, then compare memory prevalence in models with and without those loops. Memory enriched in loop-containing models, plus at least some memory in models that lack them, would support the hedged claim; memory absent outside loops, or no enrichment, would count against it.",
+    "candidate_datasets": [
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "reaction graphs in which feedback and cycles can be enumerated"},
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "memory labels to cross-tabulate with loop structure"}
+    ],
+    "obstacles": [
+      "Feedback is common in published pathway models, so co-occurrence is a weak causal test.",
+      "'May be conducive' and 'one way of many' are hard to refute with a binary loop count."
+    ],
+    "rationale": "Loop structure and memory labels are both recoverable from public models and code. The wording is permissive, and the MAPK example does not isolate feedback from other dynamics. The analysis can check co-occurrence, not that loops are a cause or that they are dispensable in general."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-08",
+    "scores": {
+      "operationalizability": 0.88,
+      "data-existence": 0.85,
+      "data-adequacy": 0.8,
+      "discriminating-power": 0.72,
+      "analysis-feasibility": 0.62
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.76,
+    "operationalization": "Rerun associative and other memory assays while logging whether rate parameters and the reaction graph stay fixed, and test whether the response remains altered after the clamp is released. Persistent change with an unchanged model file would confirm dynamical memory; memory that appears only after an edit to parameters or edges would refute it.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "stimulation code that clamps expression without rewriting reactions"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "original ODE definitions against which structural edits can be checked"}
+    ],
+    "obstacles": [
+      "A temporary clamp is an external drive, which a rival description can treat as a transient parameter change."
+    ],
+    "rationale": "The methods fix the ODE system and apply stimuli by clamping a variable, then score persistence after release. Public code and the original models make that contrast re-runnable. If the stored response survives with the same equations, the claim about these pathway models is confirmed or refuted directly."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-09",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.8,
+      "data-adequacy": 0.78,
+      "discriminating-power": 0.72,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.68,
+    "operationalization": "Repeat the memory screen at stimulus amplitudes of 10, 50 and 100 times baseline and compare memory counts per model with the baseline screen. Most models keeping the same count, about 10 percent losing memories, and some gaining memories at weaker stimuli, would confirm the claim; widespread loss at higher amplitudes would refute it.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "stimulus-scaling and memory-evaluation scripts"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "pathway ODEs on which the amplitude sweep is defined"}
+    ],
+    "obstacles": [
+      "The main methods text specifies clamping to each variable's observed max and min, so the 10x, 50x and 100x factors need to be matched in the code or supplement.",
+      "The full combinatorial screen at three amplitudes is computationally heavy."
+    ],
+    "rationale": "The decision rule is a numerical comparison of memory counts across three stated amplitudes, and both the models and the evaluation code are public. Some ambiguity remains about how 'baseline' is scaled in the MATLAB files versus the prose. That is a finite reimplementation check, not a missing experiment."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-10",
+    "scores": {
+      "operationalizability": 0.85,
+      "data-existence": 0.82,
+      "data-adequacy": 0.7,
+      "discriminating-power": 0.6,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.66,
+    "operationalization": "Rerun the memory assays with the repository's stochastic perturbation and compare per-type memory counts with the deterministic runs. Retention in about 83 percent of models and a roughly 20 percent rise, largest for associative memory, would reproduce the numerical claim; a drop, or a rise concentrated in another memory type, would refute it.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "noise-enabled memory evaluator for the ODE pathways"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "deterministic pathway models to which the noise is added"}
+    ],
+    "obstacles": [
+      "One added-noise scheme is not biological noise in cells, so the therapeutic suggestion is not identified.",
+      "The 20 percent average depends on how memory phenotypes are pooled."
+    ],
+    "rationale": "A public noise script can recheck the 83 percent retention and the 20 percent increase inside this simulation. The claim also treats that stochasticity as evidence about biological noise and trainability, which this single noise process does not separate from an artifact of the integrator. The numerical half is testable; the biological reading is not."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-11",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.85,
+      "data-adequacy": 0.82,
+      "discriminating-power": 0.75,
+      "analysis-feasibility": 0.62
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.76,
+    "operationalization": "For the models that show UCS-based memory, rescore the response after delays of 10 and 100 times the initial wait, with and without an intervening recall test. Most models keeping at least half their memories at the longest delay, and recall rarely erasing them, would confirm the claim; majority loss, or recall systematically destroying the trace, would refute it.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "time-lag UCS memory evaluator"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "pathway ODEs whose post-training trajectories are extended"}
+    ],
+    "obstacles": [
+      "The initial waiting period is model-relative, so the 100-fold delay must be taken from the same definition as the code."
+    ],
+    "rationale": "Persistence and recall are defined as delayed readouts of the same response variable, and a dedicated time-lag script is in the public repository along with the source models. Re-running that assay on the UCS-memory subset confirms or refutes both the long-delay retention claim and the claim about recall. The computation is heavy but specified."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-12",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.85,
+      "data-adequacy": 0.8,
+      "discriminating-power": 0.76,
+      "analysis-feasibility": 0.6
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.75,
+    "operationalization": "Train two associative memories in series, and separately two UCS-based memories in series and in parallel, on the biological models and the size-matched random models. Loss of both associative memories in every model, together with retention of paired UCS memories, would confirm the claim; retention of serial associative pairs, or failure of serial UCS pairs, would refute it.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "serial and parallel two-memory evaluation routines"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "biological ODE models paired with size-matched random circuits"}
+    ],
+    "obstacles": [
+      "Catastrophic forgetting is scored only for node triples that already passed the single-memory screen, so the denominator is selected."
+    ],
+    "rationale": "Serial versus parallel training and the four pair types are specified, and the repository implements two-memory tests for biological and size-matched random models. Re-running those pairings decides whether associative pairs are uniformly lost while UCS pairs are not. The result is a property of this protocol, which is exactly the claim's scope."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-13",
+    "scores": {
+      "operationalizability": 0.65,
+      "data-existence": 0.75,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.38,
+      "analysis-feasibility": 0.68
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.7,
+    "operationalization": "Label each of the 35 models by the source taxon class recorded in BioModels and test whether memory prevalence is homogeneous across bacteria, slime mould, yeast, plants, vertebrates and mammals. A clearly uneven distribution would refute uniformity inside this set; a flat distribution would support only that limited census.",
+    "candidate_datasets": [
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "organism annotations for the surveyed pathway models"},
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "per-model memory counts to stratify by taxon"}
+    ],
+    "obstacles": [
+      "Class sizes in a 35-model curated list are too small for a uniformity test to be stable.",
+      "Uniformity among published models does not measure proto-cognitive capacity across living taxa."
+    ],
+    "rationale": "Organism metadata and memory counts are both recoverable, so the distribution inside this list can be rechecked. The list is not a sample of life, and 'roughly uniformly' plus the suggestion about all strata of life outruns what 35 published models can show. The test covers a thin proxy for the stated scope."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-14",
+    "scores": {
+      "operationalizability": 0.92,
+      "data-existence": 0.85,
+      "data-adequacy": 0.82,
+      "discriminating-power": 0.74,
+      "analysis-feasibility": 0.6
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.77,
+    "operationalization": "Apply six lengthening UCS stimulations and score a node pair as habituating when the response falls by at least half at each step. At least one such pair in each of the 27 testable models, with pair fractions between 1 and 50 percent, would confirm the claim; any testable model with zero pairs, or fractions outside that range, would refute it.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "pharmacoresistance and habituation screen, including saved result matrices"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "ODE models on which the six-pulse protocol is run"}
+    ],
+    "obstacles": [
+      "Eight of the 35 models were dropped as untestable, so the 'every model' result is conditional on that filter.",
+      "Habituation here is a 50 percent ODE ratio, not a measured drug response."
+    ],
+    "rationale": "The 50 percent criterion, the six increasing epochs and the 27-model denominator are explicit, and the repository contains the resistance screen plus result matrices. Re-running or reanalysing that screen can confirm or refute both the universal occurrence and the 1–50 percent band. The pharmacoresistance label is the authors' mapping, but the numerical claim is about the ODE assay."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-15",
+    "scores": {
+      "operationalizability": 0.4,
+      "data-existence": 0.55,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.28,
+      "analysis-feasibility": 0.5
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.63,
+    "operationalization": "Compare the distribution of habituating pair fractions in the biological models with the 500 random circuits, using a 30 percent pair-fraction cutoff. A biological distribution shifted above that random ceiling would reproduce the contrast; overlap would remove the stated hint. Neither result identifies evolutionary pressure as the cause.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "habituation scores for biological and random ODE networks"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "published pathway models treated as the evolved arm of the contrast"}
+    ],
+    "obstacles": [
+      "The random circuits are not evolutionarily naive versions of the same pathways.",
+      "Curated published models are enriched for interesting dynamics independently of selection."
+    ],
+    "rationale": "The biological-versus-random habituation contrast can be recomputed. The claim that pharmacoresistance is an adaptation produced by evolutionary pressure does not follow from that contrast, because model-building bias and a mismatched equation class are equally compatible with the same numbers. Only a weak proxy is testable now."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-16",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.85,
+      "data-adequacy": 0.8,
+      "discriminating-power": 0.72,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.74,
+    "operationalization": "After establishing habituation, stimulate each third node for up to three trials and count a model as breakable if any stimulus–response pair loses the 50 percent decline. Breaks in 17 of 27 models would confirm the count; a substantially different model count would refute it.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "third-node pharmacoresistance-breaking search and saved break matrices"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "pathway ODEs whose non-stimulus, non-response nodes are the candidate breakers"}
+    ],
+    "obstacles": [
+      "A third-node clamp in an ODE is not yet a deliverable drug stimulus in cells."
+    ],
+    "rationale": "The breaking rule, the three-trial cap and the 27-model base are specified, and the repository includes the breaking analysis. Re-running it decides whether about 63 percent of the habituating models contain at least one effective third node. That is the claim's actual scope; the therapeutic wording is carried by the same in silico count."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-17",
+    "scores": {
+      "operationalizability": 0.82,
+      "data-existence": 0.8,
+      "data-adequacy": 0.65,
+      "discriminating-power": 0.48,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.69,
+    "operationalization": "Score a pair as sensitizing when the response rises at least 1.5-fold across six lengthening stimulations, and compare the fraction of biological models that have any such pair with the per-model pair rate in the random circuits. Twenty-seven of 35 biological models, against under 10 percent of random pairings, would reproduce the counts; a high random rate would refute uniqueness.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "sensitization screen for biological and random models"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "biological pathway ODEs in the 35-model set"}
+    ],
+    "obstacles": [
+      "The random null uses a different ODE family, so rarity there does not show the behaviour is unique to biology.",
+      "The paper itself allows that more complex random models might show sensitization."
+    ],
+    "rationale": "The 1.5-fold rule and both arms of the comparison can be rerun from public code and BioModels. The biological count is a direct check. The inference that sensitization is unique to biology, or requires more complex random models, is not identified by this null, so the claim is only partly resolved by the rerun."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-18",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.85,
+      "data-adequacy": 0.8,
+      "discriminating-power": 0.74,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.75,
+    "operationalization": "On each sensitizing model, apply the third-node breaking protocol and record whether the 1.5-fold rise is abolished, and for what fraction of pairs. Breaks confined to 8 of 27 models and mostly under 5 percent of pairs, at a lower rate than habituation breaking, would confirm the claim; breaks in most models or in large pair fractions would refute it.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "sensitization-breaking trials comparable to the habituation-breaking trials"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "ODE models in which third-node interventions are simulated"}
+    ],
+    "obstacles": [
+      "The comparison with habituation uses the same style of search, but the pair denominators differ across models."
+    ],
+    "rationale": "Both breaking assays use an explicit ratio rule and a third-node search, and the code covers sensitization as well as pharmacoresistance. Re-running them yields the 8-of-27 count and the pair-fraction comparison directly. The remark about therapies needing other avenues is an interpretation of that same rate difference."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-19",
+    "scores": {
+      "operationalizability": 0.58,
+      "data-existence": 0.75,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.42,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.66,
+    "operationalization": "Generate random ODEs matched on node count, edge count, in- and out-degree, betweenness, PageRank and hubness, then compare their memory rates with the biological models. Similar memory despite the match would refute insufficiency of those features; a large memory gap would support insufficiency only for this generator.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "topology-matched random-network generator and memory scores"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "biological graphs that define the matching targets"}
+    ],
+    "obstacles": [
+      "Matching those summaries does not match kinetics, signs of regulation or motifs.",
+      "Failure of one random generator does not show the features are useless for every design or evolutionary process."
+    ],
+    "rationale": "The matching list and the memory comparison can be recomputed. A gap shows that this particular match is not sufficient inside this generator, which is weaker than the general design-and-evolution claim. Kinetics that were never matched remain a standing confound."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-20",
+    "scores": {
+      "operationalizability": 0.5,
+      "data-existence": 0.7,
+      "data-adequacy": 0.35,
+      "discriminating-power": 0.38,
+      "analysis-feasibility": 0.48
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "Split BioModels ODE pathways into those with and without a strong oscillatory component, rerun the noise memory assay, and test whether the noise-associated memory gain is larger in the oscillatory group. A reliably larger gain would support the hypothesis; a null or reversed difference would count against it.",
+    "candidate_datasets": [
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "cell-cycle, circadian and other oscillatory pathway ODEs beyond the original highlights"},
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "noise assay whose memory gains can be stratified by oscillatory dynamics"}
+    ],
+    "obstacles": [
+      "Only a handful of oscillatory models were singled out, and the paper already notes exceptions.",
+      "'Strong oscillatory component' and 'benefit more' need cutoffs the hypothesis does not fix."
+    ],
+    "rationale": "Public circadian and cell-cycle models plus the noise script can test whether noise-linked memory gains cluster in oscillators. The hypothesis is hedged, the original contrast is tiny, and the authors already report oscillatory models that do not fit. A reanalysis can probe the association, not establish a general resonance rule."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-21",
+    "scores": {
+      "operationalizability": 0.72,
+      "data-existence": 0.78,
+      "data-adequacy": 0.65,
+      "discriminating-power": 0.42,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.67,
+    "operationalization": "Randomly delete and add edges in biological and random models, rescore memory, and compare the drop. A significantly smaller drop for the biological models would confirm the robustness contrast; a similar or larger drop would refute it. The same curves do not test evolutionary pressure.",
+    "candidate_datasets": [
+      {"name": "GRN_ODE", "url": "https://github.com/wesleypclawson/GRN_ODE", "role": "edge-perturbation robustness scripts for biological and random networks"},
+      {"name": "BioModels", "url": "https://www.biomodels.org/", "role": "biological pathway structures that are rewired in the assay"}
+    ],
+    "obstacles": [
+      "Edge add and delete on an ODE needs a rule for new kinetic parameters, which can dominate the memory change.",
+      "Greater robustness is compatible with curation bias as well as with selection."
+    ],
+    "rationale": "A robustness script is public, so the biological-versus-random degradation contrast can be rerun. The claim's causal clause, that the gap is perhaps due to evolutionary pressure to handle changing environments, is not identified by edge edits. The measurable half is the robustness difference alone."
+  },
+  {
+    "claim_id": "levin-2022-grn-learning-22",
+    "scores": {
+      "operationalizability": 0.38,
+      "data-existence": 0.2,
+      "data-adequacy": 0.15,
+      "discriminating-power": 0.22,
+      "analysis-feasibility": 0.18
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.64,
+    "operationalization": "In living cells, record pulsatile signals from one cell and test whether a neighbour's pathway shows a persistent, specific change in a later response that meets the paper's memory criteria and that is absent without the pulses. That paired result would support in vivo behaviour-shaping; pulses without a lasting change in the neighbour would count against it.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "Public pulse-imaging studies do not pair an intercellular pulse train with a later memory assay on the target pathway.",
+      "The role in evolution and development is explicitly left unknown, so phenotype complexity alone does not decide it."
+    ],
+    "rationale": "The in vivo claim needs timed stimuli between cells and a persistent change in the receiver pathway. Existing pathway models show in silico trainability, and pulsatile transcription is reported in the literature, but no public dataset contains both sides of this interaction. A decisive test would be a new, or newly deposited, paired measurement."
+  },
+  {
+    "claim_id": "levin-2023-competency-01",
+    "scores": {
+      "operationalizability": 0.42,
+      "data-existence": 0.55,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.32,
+      "analysis-feasibility": 0.45
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.58,
+    "operationalization": "Test whether identical or near-identical genotypes yield systematically different phenotypes under documented developmental conditions, using variant-to-trait catalogues and regeneration or polyphenism studies. Widespread genotype–phenotype non-isomorphism would support the negative half; a direct, one-to-one encoding across developmental contexts would refute it. Calling developmental physiology the control layer remains a further interpretation.",
+    "candidate_datasets": [
+      {"name": "NHGRI-EBI GWAS Catalog", "url": "https://www.ebi.ac.uk/gwas/", "role": "public variant–trait associations as a proxy for indirect genotype–phenotype maps"}
+    ],
+    "obstacles": [
+      "GWAS misses developmental dynamics, so it cannot show that physiology is the layer selection evaluates.",
+      "Several evo-devo descriptions fit the same genotype–phenotype gaps."
+    ],
+    "rationale": "Public genetic-association data can document that genotypes do not map cleanly onto phenotypes, which is the empirical core of the negative clause. They do not measure developmental physiology as a control layer between genomes and selection. The framework claim is only partly pinned to existing data, and rival wordings fit the same catalogues."
+  },
+  {
+    "claim_id": "levin-2023-competency-02",
+    "scores": {
+      "operationalizability": 0.72,
+      "data-existence": 0.55,
+      "data-adequacy": 0.42,
+      "discriminating-power": 0.5,
+      "analysis-feasibility": 0.48
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "Compile chromosome-count distributions for fissiparous planarians and fragment-level regeneration outcomes from deposited genomes, PlanMine records and published karyotype and amputation series. Variable ploidy together with near-complete restoration of anatomy would support the claim; a stable karyotype, or frequent regeneration failure, would refute the corresponding half.",
+    "candidate_datasets": [
+      {"name": "PlanMine", "url": "https://planmine.mpinat.mpg.de/planmine/begin.do", "role": "Schmidtea genome, transcriptomes and phenotype records for the asexual planarian strain"},
+      {"name": "NCBI Datasets genomes", "url": "https://www.ncbi.nlm.nih.gov/datasets/genome/", "role": "public planarian assemblies whose fragmentation and heterozygosity reflect the difficult genome"}
+    ],
+    "obstacles": [
+      "Mixoploidy is mostly cytogenetic and is scattered across papers rather than stored as a single count dataset.",
+      "Regeneration success is size- and species-dependent, so 'every fragment' is stronger than typical published series."
+    ],
+    "rationale": "Assemblies and PlanMine document a difficult Schmidtea genome, and many regeneration series report reliable restoration, but neither resource is a systematic census of chromosome number per cell or of every fragment. The two halves of the claim can be checked only by compiling biased published measurements. Coverage is a subset of fissiparous planarians, not the full stated scope."
+  },
+  {
+    "claim_id": "levin-2023-competency-03",
+    "scores": {
+      "operationalizability": 0.36,
+      "data-existence": 0.22,
+      "data-adequacy": 0.18,
+      "discriminating-power": 0.25,
+      "analysis-feasibility": 0.22
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.57,
+    "operationalization": "Compare the fitness cost of building a learning nervous system with the marginal cost of cellular sensing, sorting and motility in multicellular species, against the presence of those cellular behaviours in unicellular relatives. Competencies that are phylogenetically ancestral and costless to maintain would support the claim; a measurable extra cost, or independent origin inside metazoans, would count against 'by default'.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "No public dataset prices the marginal cost of cellular competencies against the cost of nervous-system learning.",
+      "Presence of similar behaviours in unicells does not show they were retained for free."
+    ],
+    "rationale": "The contrast is empirical in principle: costs and phylogenetic origins could be measured. Comparative descriptions of unicellular behaviour exist, but they do not contain the cost accounting the claim requires, and the authors note elsewhere that real competency costs are unmeasured. Existing observations do not yet decide it."
+  },
+  {
+    "claim_id": "levin-2023-competency-04",
+    "scores": {
+      "operationalizability": 0.95,
+      "data-existence": 0.9,
+      "data-adequacy": 0.88,
+      "discriminating-power": 0.82,
+      "analysis-feasibility": 0.78
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.84,
+    "operationalization": "Rerun the public 1D embryogeny experiment at the published competency levels, including 400, and at the hardwired setting, and record generations until high phenotypic fitness. Competent populations reaching that fitness faster and more consistently, on the order of under 6 generations versus over 200, would confirm the claim; overlapping times would refute it.",
+    "candidate_datasets": [
+      {"name": "CellularCompetency", "url": "https://github.com/lksshw/CellularCompetency", "role": "Python simulation and hyperparameters for competent versus hardwired 1D embryos"}
+    ],
+    "obstacles": [
+      "Exact generation counts depend on the published mutation rate, selection stringency and fitness definition."
+    ],
+    "rationale": "Fitness is an explicit inversion count, competency is a bounded bubble-sort, and the competent-versus-hardwired experiment is a public script with hyperparameters. A small team can rerun it in days to weeks and compare time-to-fitness. The claim is about this model, and the code covers that scope."
+  },
+  {
+    "claim_id": "levin-2023-competency-05",
+    "scores": {
+      "operationalizability": 0.92,
+      "data-existence": 0.9,
+      "data-adequacy": 0.85,
+      "discriminating-power": 0.78,
+      "analysis-feasibility": 0.75
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.82,
+    "operationalization": "From the same runs, plot genotypic fitness of the best competent individuals against hardwired controls across generations, and compare variance at higher competency. A brief rise then a plateau below the hardwired trajectory, with wider variance at higher competency, would confirm the claim; genotypic fitness tracking phenotypic fitness would refute reduced selective pressure.",
+    "candidate_datasets": [
+      {"name": "CellularCompetency", "url": "https://github.com/lksshw/CellularCompetency", "role": "records genotypic and phenotypic fitness for competent and hardwired populations"}
+    ],
+    "obstacles": [
+      "Plateau height depends on how many bubble-sort steps the competency parameter allows."
+    ],
+    "rationale": "The model stores genotypic order separately from post-sorting phenotypic order, and the public experiment already runs the competency sweep. Reanalysis of those runs confirms or refutes the plateau and the variance pattern. No extra biological dataset is required because the claim is about this simulation."
+  },
+  {
+    "claim_id": "levin-2023-competency-06",
+    "scores": {
+      "operationalizability": 0.93,
+      "data-existence": 0.85,
+      "data-adequacy": 0.72,
+      "discriminating-power": 0.76,
+      "analysis-feasibility": 0.7
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.73,
+    "operationalization": "Rerun mixed populations of 200 embryos at the stated initial competent fractions, including 2.5, 10, 20 and 30 percent, across competency levels, and record whether competent genomes exceed half the population within two or three generations. Dominance thresholds near 75, 40 and 10, and failure at 2.5 percent even at competency 95, would confirm the claim; dominance at 2.5 percent or failure at the higher shares would refute it.",
+    "candidate_datasets": [
+      {"name": "CellularCompetency", "url": "https://github.com/lksshw/CellularCompetency", "role": "mixed-population and minority-competent evolutionary runs"}
+    ],
+    "obstacles": [
+      "The default hyperparameter file does not list every fraction in the claim, so some grid points must be set from the paper."
+    ],
+    "rationale": "Takeover is a head-count in a fully specified genetic algorithm, and the mixed-population script is public. A few fraction-by-competency cells may need to be set from the paper rather than the default JSON, which is still reimplementation of a stated model. The numerical thresholds can be confirmed or refuted by those runs."
+  },
+  {
+    "claim_id": "levin-2023-competency-07",
+    "scores": {
+      "operationalizability": 0.88,
+      "data-existence": 0.8,
+      "data-adequacy": 0.72,
+      "discriminating-power": 0.68,
+      "analysis-feasibility": 0.65
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.7,
+    "operationalization": "Evolve the competency allele from a low initial range over 1000 generations and record the best individual's competency. A rapid rise that plateaus near 470, above the competency needed for maximum fitness, would confirm the trajectory; a low plateau or continued directional climb would refute it.",
+    "candidate_datasets": [
+      {"name": "CellularCompetency", "url": "https://github.com/lksshw/CellularCompetency", "role": "evolvable-competency experiment that logs the competency allele"}
+    ],
+    "obstacles": [
+      "Attributing the excess over the fitness-maximizing value to drift requires showing a fitness plateau, not just a high mean.",
+      "Stochastic runs will not reproduce the exact path up to 485."
+    ],
+    "rationale": "The evolvable-competency script is public and the decision variable is the competency allele itself. Re-running it tests the rapid rise and high plateau. Exact meander values will differ across seeds, but the claimed plateau near 470 versus the fitness threshold is a stable summary a small team can estimate."
+  },
+  {
+    "claim_id": "levin-2023-competency-08",
+    "scores": {
+      "operationalizability": 0.94,
+      "data-existence": 0.82,
+      "data-adequacy": 0.75,
+      "discriminating-power": 0.8,
+      "analysis-feasibility": 0.68
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.78,
+    "operationalization": "In the evolvable-competency runs, compute the correlation of genotypic and phenotypic fitness each generation. A fall to about zero by generation 20, while phenotypic fitness stays high, would confirm the claim; a correlation that remains strongly positive would refute decoupling.",
+    "candidate_datasets": [
+      {"name": "CellularCompetency", "url": "https://github.com/lksshw/CellularCompetency", "role": "paired genotypic and phenotypic fitness time series under evolvable competency"}
+    ],
+    "obstacles": [
+      "The generation at which correlation hits zero is seed-sensitive and should be summarized over repeats."
+    ],
+    "rationale": "Both fitnesses are defined in the model and emitted by the evolvable-competency experiment. A correlation trajectory is a standard calculation on those outputs. If the correlation stays high, the claim that evolving competency blocks selection on structural genes in this model is refuted."
+  },
+  {
+    "claim_id": "levin-2023-competency-09",
+    "scores": {
+      "operationalizability": 0.84,
+      "data-existence": 0.62,
+      "data-adequacy": 0.58,
+      "discriminating-power": 0.7,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "Subtract a penalty proportional to competency, over factors from 1e-7 to 0.5, from fitness in the public evolvable-competency loop, and track structural-gene fitness and the competency allele. Continued structural improvement, declining competency and later genetic assimilation would confirm the simulated Baldwin effect; competency staying high, or structural fitness stalling, would refute it at that cost.",
+    "candidate_datasets": [
+      {"name": "CellularCompetency", "url": "https://github.com/lksshw/CellularCompetency", "role": "base evolutionary loop to which the published competency penalty can be added"}
+    ],
+    "obstacles": [
+      "The public scripts and hyperparameter file do not expose the fitness-penalty experiment as a turnkey run.",
+      "Real organismal costs are unmeasured, so the simulation does not say which penalty factor is biological."
+    ],
+    "rationale": "The penalty rule and the factor range are stated, and the underlying simulator is public, so the Baldwin runs can be reimplemented as an extension rather than a new kind of model. They are not a packaged experiment in the repository, and some controls sit in the supplement. The in silico claim is testable with that extra assembly; it does not measure real competency costs."
+  },
+  {
+    "claim_id": "levin-2023-competency-10",
+    "scores": {
+      "operationalizability": 0.38,
+      "data-existence": 0.48,
+      "data-adequacy": 0.35,
+      "discriminating-power": 0.28,
+      "analysis-feasibility": 0.4
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.55,
+    "operationalization": "Compare planarian genome disorder and anatomical fidelity with other animals, and ask whether lineages with messier genomes and more regenerative competency show the model's signature of weakened selection on structural genes. The messy-genome plus reliable-anatomy pattern can be checked; the historical claim that competency ran away because selection could not see structural genes cannot.",
+    "candidate_datasets": [
+      {"name": "PlanMine", "url": "https://planmine.mpinat.mpg.de/planmine/begin.do", "role": "planarian genome and phenotype resources for the messy-genome half of the pattern"},
+      {"name": "NCBI Datasets genomes", "url": "https://www.ncbi.nlm.nih.gov/datasets/genome/", "role": "comparative assemblies for genome contiguity versus regenerative taxa"}
+    ],
+    "obstacles": [
+      "Asexuality, abundant stem cells and bioelectric control explain the same pattern without a competency ratchet.",
+      "No dataset records historical selective pressure on planarian structural genes."
+    ],
+    "rationale": "Public genomes and regeneration records can reassess the paradoxical pattern the authors want explained. They cannot show that selection shifted onto generic competency because structural defects were hidden. Several non-ratchet histories fit the same present-day facts, so only a proxy pattern is testable."
+  },
+  {
+    "claim_id": "levin-2023-competency-11",
+    "scores": {
+      "operationalizability": 0.68,
+      "data-existence": 0.52,
+      "data-adequacy": 0.42,
+      "discriminating-power": 0.48,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.58,
+    "operationalization": "Search PlanMine phenotype records and the planarian literature for stable, heritable, morphologically abnormal strains, and separate them from RNAi knockdowns and from the bioelectrically induced two-headed line. A heritable morphological mutant line would refute the universal negative; finding only the two-headed bioelectric line would support it under a strict definition of genetic strain.",
+    "candidate_datasets": [
+      {"name": "PlanMine", "url": "https://planmine.mpinat.mpg.de/planmine/begin.do", "role": "planarian gene and RNAi phenotype records to distinguish knockdowns from stable strains"},
+      {"name": "PubMed", "url": "https://pubmed.ncbi.nlm.nih.gov/", "role": "literature index for reports of planarian morphological mutant lines and the two-headed strain"}
+    ],
+    "obstacles": [
+      "RNAi morphological phenotypes are easily counted as genetic strains.",
+      "The negative claim is definition- and date-sensitive, and sexual-strain genetics are sparsely reported."
+    ],
+    "rationale": "Whether abnormal genetic strains have been reported is a census of public records, and PlanMine plus the literature are the right places to look. The census does not cleanly separate stable mutants, clonal anomalies and transient knockdowns, and it cannot show that the model predicted the two-headed line rather than accommodating it. The empirical half is only partly decidable."
+  },
+  {
+    "claim_id": "levin-2023-competency-12",
+    "scores": {
+      "operationalizability": 0.86,
+      "data-existence": 0.85,
+      "data-adequacy": 0.75,
+      "discriminating-power": 0.52,
+      "analysis-feasibility": 0.68
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.64,
+    "operationalization": "In the evolvable-competency runs, attribute each positional change to either the competency allele or one of the fifty structural genes and compare change frequencies. A significantly higher competency-gene rate would reproduce the count; similar rates would refute it. The comparison still has to rule out an artifact of the allele's numeric range.",
+    "candidate_datasets": [
+      {"name": "CellularCompetency", "url": "https://github.com/lksshw/CellularCompetency", "role": "frequency comparison of competency-gene versus structural-gene changes"}
+    ],
+    "obstacles": [
+      "A competency allele ranging toward 500 can register more changes than a positional gene for mechanical reasons.",
+      "Mutation rate and representation are not matched per locus in a way that isolates evolutionary effort."
+    ],
+    "rationale": "The public experiment can plot how often the competency gene changes relative to structural genes, so the reported inequality is re-computable. That inequality does not cleanly mean evolution works on competency more, because one wide-ranged competency locus is not comparable to fifty structural loci without a normalization the claim does not apply. The raw count is testable; the effort interpretation is confounded."
+  },
+  {
+    "claim_id": "levin-2023-competency-13",
+    "scores": {
+      "operationalizability": 0.4,
+      "data-existence": 0.7,
+      "data-adequacy": 0.32,
+      "discriminating-power": 0.28,
+      "analysis-feasibility": 0.62
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "In the 1D model, test whether hiding genotypic defects from selection produces a positive feedback in which competency keeps rising while structural-gene improvement stalls. That loop can be confirmed or refuted in the simulation. No existing dataset measures the same ratchet across real developmental systems or other problem spaces.",
+    "candidate_datasets": [
+      {"name": "CellularCompetency", "url": "https://github.com/lksshw/CellularCompetency", "role": "1D embryogeny model in which the proposed feedback can be re-simulated"}
+    ],
+    "obstacles": [
+      "The model equates competency with bubble-sort steps on a monotonic axis, which is a narrow proxy for intelligence.",
+      "A positive feedback in this GA does not show a ratchet in evolving organisms."
+    ],
+    "rationale": "The suggested ratchet is readable as a dynamical pattern in a public, fully specified toy evolution, so that pattern can be rerun. The claim then generalizes to an intelligence ratchet in developmental evolution and other spaces. Nothing public measures problem-solving competency and structural-gene selection jointly across real lineages, so only the model proxy is testable."
+  },
+  {
+    "claim_id": "levin-2023-competency-14",
+    "scores": {
+      "operationalizability": 0.18,
+      "data-existence": 0.15,
+      "data-adequacy": 0.1,
+      "discriminating-power": 0.12,
+      "analysis-feasibility": 0.15
+    },
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.62,
+    "operationalization": "No public observation separates 'problem-solving competency drove evolution before brains' from the statement that developmental mechanisms affected fitness before nervous systems existed. Fossils and phylogenies show early morphological complexity either way.",
+    "candidate_datasets": [],
+    "obstacles": [
+      "Pre-neural morphological complexity is compatible with competency as a driver and with competency as a label for ordinary development.",
+      "No dataset records problem-solving competency as a causal variable in deep time."
+    ],
+    "rationale": "The authors equate intelligence with problem-solving competency and assert it was an evolutionary driver before brains. A non-cognitive description of the same early bodies and developmental mechanisms fits every available fossil and phylogenetic pattern. The claim does not add a measurement that would decide between those descriptions."
+  },
+  {
+    "claim_id": "levin-2023-goals-01",
+    "scores": {
+      "operationalizability": 0.82,
+      "data-existence": 0.68,
+      "data-adequacy": 0.58,
+      "discriminating-power": 0.62,
+      "analysis-feasibility": 0.42
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.63,
+    "operationalization": "Rerun ES-HyperNEAT on the public 2D neural cellular automaton, with cell reward tied only to energy and stripe match, and measure whether the tissue reaches a three-band French-flag pattern. Reliable high pattern accuracy would support the scaling result in this model; consistent failure to pattern would refute it.",
+    "candidate_datasets": [
+      {"name": "scalefreecognition", "url": "https://github.com/LPioL/scalefreecognition", "role": "Python Mesa and MultiNEAT implementation of the French-flag tissue model"}
+    ],
+    "obstacles": [
+      "The repository sets a debug generation count and analysis expects a parameter file that is not in the tree.",
+      "Evolutionary runs are stochastic, so exact published accuracies need either saved genomes or many full replications."
+    ],
+    "rationale": "Pattern accuracy is a direct fitness readout, and the model code is public, so the French-flag result can be attempted without new biological data. The snapshot is not a complete reproduction package, and ES-HyperNEAT runs are slow and stochastic. A rerun can test whether such collectives arise, not recover every reported percentage from the original seeds."
+  },
+  {
+    "claim_id": "levin-2023-goals-02",
+    "scores": {
+      "operationalizability": 0.74,
+      "data-existence": 0.62,
+      "data-adequacy": 0.48,
+      "discriminating-power": 0.52,
+      "analysis-feasibility": 0.42
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "Initialize the same evolved tissues from a homogeneous cell state and from random cell states and compare final French-flag accuracy. A reliable drop under random initialization would support the simulation half; equal accuracy would refute it. Matching that preference to real embryos is a separate, qualitative analogy.",
+    "candidate_datasets": [
+      {"name": "scalefreecognition", "url": "https://github.com/LPioL/scalefreecognition", "role": "tissue model whose initial cell states can be set homogeneous or random"}
+    ],
+    "obstacles": [
+      "The comparison is described for the evolved system, and champion genomes are not deposited.",
+      "'Less well' is not given a numeric margin, and the embryo analogy is not a measurement in the model."
+    ],
+    "rationale": "The initial-condition contrast is well defined inside the simulator and could be run if a competent genome is in hand. The public code does not include the saved tissues, and the claim also treats the result as what real development does. The simulation contrast is a partial test; the embryological generalization is not resolved by it."
+  },
+  {
+    "claim_id": "levin-2023-goals-03",
+    "scores": {
+      "operationalizability": 0.84,
+      "data-existence": 0.65,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.6,
+      "analysis-feasibility": 0.4
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.62,
+    "operationalization": "Select only on French-flag accuracy over the first 100 steps, then at step 110 flip two columns of the red stripe to white, and separately flip the whole stripe, and score restoration. Recovery from the small edit and failure on the whole stripe would confirm the claim; failure on small edits, or recovery from the whole-stripe edit, would refute the stated boundary.",
+    "candidate_datasets": [
+      {"name": "scalefreecognition", "url": "https://github.com/LPioL/scalefreecognition", "role": "neural cellular automaton in which post-development perturbations can be applied"}
+    ],
+    "obstacles": [
+      "Without deposited genomes, re-evolution may not yield a tissue with the same repair range.",
+      "Fitness must be checked to stop at 100 steps so repair is not accidentally rewarded."
+    ],
+    "rationale": "The perturbation sizes, the timing and the selection window are specified, and the model code exposes cell states. Reproducing the repair result still depends on recovering or re-evolving the tissues, which the repository does not archive. The qualitative repair claim is testable by re-evolution; the exact published boundary is only partly recoverable."
+  },
+  {
+    "claim_id": "levin-2023-goals-04",
+    "scores": {
+      "operationalizability": 0.78,
+      "data-existence": 0.6,
+      "data-adequacy": 0.45,
+      "discriminating-power": 0.48,
+      "analysis-feasibility": 0.4
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.58,
+    "operationalization": "Run an unperturbed evolved tissue past pattern stabilization and test whether each burst of cell-state change is immediately preceded by a spike in the model's stress variable. Spikes leading every remodelling onset would support the temporal claim; remodelling without a prior spike, or spikes that do not lead activity, would refute it. Precedence still would not prove that stress drives the change.",
+    "candidate_datasets": [
+      {"name": "scalefreecognition", "url": "https://github.com/LPioL/scalefreecognition", "role": "simulation logs of stress and cell state over long unperturbed runs"}
+    ],
+    "obstacles": [
+      "The result is reported for a representative individual, not as a pre-registered rate across tissues.",
+      "A spike before movement is compatible with a common cause inside the network."
+    ],
+    "rationale": "Stress and morphogenetic activity are both variables in the public model, so lead-lag can be recomputed on long runs. The published observation is one tissue's trace, and the causal wording goes beyond precedence. Re-simulation can check whether spikes lead remodelling in this system, not that stress is the driver in general."
+  },
+  {
+    "claim_id": "levin-2023-goals-05",
+    "scores": {
+      "operationalizability": 0.85,
+      "data-existence": 0.65,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.62,
+      "analysis-feasibility": 0.4
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.64,
+    "operationalization": "Evolve tissues with fitness evaluated only over 100 steps, then continue selected individuals to 1000 steps and measure pattern accuracy. Maintenance at or above developmental accuracy would support allostasis without direct selection; collapse after step 100 would refute it in this model.",
+    "candidate_datasets": [
+      {"name": "scalefreecognition", "url": "https://github.com/LPioL/scalefreecognition", "role": "developmental simulator whose step limit can be extended past the fitness window"}
+    ],
+    "obstacles": [
+      "Intrinsic dynamics can maintain a pattern for trivial dynamical reasons that are not regenerative capacity.",
+      "Saved adult trajectories are not in the repository, and 1000-step reruns are costly."
+    ],
+    "rationale": "The selection window and the 1000-step probe are explicit, and the code's developmental horizon is the 100-step fitness period. Extending a run tests maintenance. Because champion genomes are not deposited and long ES-HyperNEAT searches are specialist work, the claim is recoverable only by a partial, stochastic re-evolution rather than a direct replay."
+  },
+  {
+    "claim_id": "levin-2023-goals-06",
+    "scores": {
+      "operationalizability": 0.84,
+      "data-existence": 0.58,
+      "data-adequacy": 0.42,
+      "discriminating-power": 0.58,
+      "analysis-feasibility": 0.38
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.57,
+    "operationalization": "On a tissue that uses stress instructively, clamp stress to zero for the whole run and compare pattern accuracy and red-stripe survival with the unclamped run. Accuracy near 82.8 percent versus 95.1 percent at step 90, plus loss of the red stripe, would reproduce the result; unchanged accuracy would refute dependence in that tissue.",
+    "candidate_datasets": [
+      {"name": "scalefreecognition", "url": "https://github.com/LPioL/scalefreecognition", "role": "stress variable that can be clamped as the simulated anxiolytic"}
+    ],
+    "obstacles": [
+      "The percentages belong to one evolved tissue that is not archived in the repository.",
+      "Re-evolved tissues often solve the flag without using stress, so a random rerun may not be the stress-using case."
+    ],
+    "rationale": "Zeroing stress and reading pattern accuracy is a well-specified intervention in the model. The claim is about one stress-using individual and two precise percentages, and those genomes are not public. A new evolution can look for the phenomenon, but it will not reliably replay this tissue, so the stated result is only partly resolvable."
+  },
+  {
+    "claim_id": "levin-2023-goals-07",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.58,
+      "data-adequacy": 0.42,
+      "discriminating-power": 0.48,
+      "analysis-feasibility": 0.38
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.55,
+    "operationalization": "Impose a range of constant stress levels on an already patterned tissue and record the immediate and delayed change in cell state. Effects confined to particular concentrations, including no immediate change at a very high level followed by a later change, would support a level-specific code; graded immediate effects at all levels would refute it.",
+    "candidate_datasets": [
+      {"name": "scalefreecognition", "url": "https://github.com/LPioL/scalefreecognition", "role": "evolved tissue model in which external stress levels can be imposed"}
+    ],
+    "obstacles": [
+      "'Specific concentrations' is illustrated rather than given as a full dose-response criterion.",
+      "The encoding is a property of particular evolved networks, which are not deposited."
+    ],
+    "rationale": "Stress level and cell state are measurable in the simulator, so a dose sweep is possible once a tissue exists. The claim reports one qualitative pattern, delayed change after very high stress, and reads it as an evolved code. Without the original networks, re-evolution tests whether some codes are level-specific, not this reported encoding."
+  },
+  {
+    "claim_id": "levin-2023-goals-08",
+    "scores": {
+      "operationalizability": 0.82,
+      "data-existence": 0.55,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.45,
+      "analysis-feasibility": 0.32
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.52,
+    "operationalization": "Evolve or reload ten high-fitness tissues, disable stress, and count how many die, then change the target morphology mid-run and compare the stress-using tissue with the others. One death in ten, plus a higher score for the stress-using tissue under the target change with p near 0.03, would reproduce the claim; many deaths, or no accuracy gap, would refute it.",
+    "candidate_datasets": [
+      {"name": "scalefreecognition", "url": "https://github.com/LPioL/scalefreecognition", "role": "evolutionary runs that can be repeated with stress clamped and with a mid-run target change"}
+    ],
+    "obstacles": [
+      "The p-value contrasts one stress-using tissue with nine others and will not recur from new seeds.",
+      "Ten full ES-HyperNEAT evolutions are a large compute job, and genomes were not released."
+    ],
+    "rationale": "Death without stress and accuracy after a target change are defined readouts, and the code can express both interventions. The claim's numbers are properties of ten particular evolutionary outcomes that are not in the repository. A new sample can estimate the rates, but it cannot confirm or refute p = 0.0312 for that sample, and the compute is beyond a quick standard analysis."
+  },
+  {
+    "claim_id": "levin-2023-goals-09",
+    "scores": {
+      "operationalizability": 0.88,
+      "data-existence": 0.6,
+      "data-adequacy": 0.48,
+      "discriminating-power": 0.62,
+      "analysis-feasibility": 0.38
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "On the original unperturbed runs, compute transfer entropy from each cell's stress to its own next state and to its neighbours' states. A substantially larger neighbour term would support paracrine dominance; a larger self term would support autocrine dominance and refute the claim.",
+    "candidate_datasets": [
+      {"name": "scalefreecognition", "url": "https://github.com/LPioL/scalefreecognition", "role": "tissue trajectories and analysis code for active information and transfer entropy"}
+    ],
+    "obstacles": [
+      "Transfer entropy depends on binning, history length and which evolved tissue is logged.",
+      "The analysis script expects a general parameter file that is not in the repository, and the trajectories are not archived."
+    ],
+    "rationale": "Paracrine versus autocrine use is operationalized as a comparison of two transfer entropies, which is a standard calculation on simulation logs. Those logs and a complete analysis configuration are not in the public snapshot, so the comparison requires regenerating tissues first. The test is well posed and only partly feasible with what was released."
+  }
+]

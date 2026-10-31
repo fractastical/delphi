@@ -1,0 +1,22 @@
+{
+  "claim_id": "levin-2015-place-06",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2015-place-06",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-10-31T19:20:00Z",
+  "hypothesis": "In the paper's eight-cell active-inference model, if morphogenesis is run for 8 steps, the embryo is cut into a head half and a tail half, each half's cells are replicated (keeping location and partial differentiation) and each half is integrated separately for 32 more steps, then both halves regenerate the full head-body-tail target, after a transient dedifferentiation.",
+  "pass_criterion": "Pre-registered, over 20 random seeds: after the split and 32 further steps, both halves meet the assembly criterion of levin-2015-place-01 (RMS position error under best one-to-one assignment < 0.5 x smallest target spacing, and >= 7/8 cells correctly typed) in at least 16 of 20 runs; and dedifferentiation is seen, i.e. in the majority of runs, for at least one half, mean max identity probability falls below its value at the split during the first 8 post-split steps.",
+  "fail_criterion": "Pre-registered: fewer than 10 of 20 runs have both halves meeting the assembly criterion. Between 10 and 15 is 'mixed'; full regeneration without any measured dedifferentiation dip is reported as supporting the regeneration part and not the dedifferentiation part ('mixed' if the dip criterion fails).",
+  "planned_datasets": [
+    "spm-dem-morphogenesis-main (https://raw.githubusercontent.com/spm/spm/main/toolbox/DEM/DEM_morphogenesis.m; includes a half-split path reportedly switched off by default)",
+    "spm12-dem-morphogenesis (https://raw.githubusercontent.com/spm/spm12/main/toolbox/DEM/DEM_morphogenesis.m; fallback to the spm12 default branch)",
+    "paper model specification: Friston, Levin, Sengupta & Pezzulo 2015, doi:10.1098/rsif.2014.1383 (claim-sources/levin-papers/inputs/2015-place.txt)"
+  ],
+  "test_contract": {
+    "expected_observation": "Both replicated halves of a bisected step-8 embryo converge to the complete 8-cell target (positions and types) in most seeded runs, with a transient fall in identity certainty after the cut.",
+    "disconfirming_observation": "One or both halves stay truncated (e.g. only head or only tail types), collapse, or fail to redifferentiate in most runs.",
+    "admissible_datasets": "The paper's generative model and the bisection procedure as described in the paper and implemented in the public SPM file (split along the body axis, replicate cells of each half, continue integration). MATLAB is unavailable, so an independent Python re-implementation of the model and a gradient-descent free-energy integrator is used; how replicated cells are separated (e.g. small perturbation) follows the SPM file where it specifies one.",
+    "inference_method": "Count of runs in which both halves pass the levin-2015-place-01 assembly criterion, against 16 (pass) and 10 (fail) of 20; fraction of runs with a post-split dip in mean max identity probability."
+  },
+  "agent": { "kind": "local-agent", "model": "claude-opus-5.5", "run": "cursor local session", "date": "2026-10-31" }
+}

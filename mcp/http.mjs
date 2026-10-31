@@ -13,7 +13,7 @@ const MAX_BODY = 1 << 20;
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Accept, Authorization, Mcp-Session-Id, Mcp-Protocol-Version, Last-Event-ID",
+  "Access-Control-Allow-Headers": "Content-Type, Accept, Authorization, Mcp-Session-Id, Mcp-Protocol-Version, Last-Event-ID, X-Claw-Api-Key",
   "Access-Control-Expose-Headers": "Mcp-Session-Id",
 };
 
@@ -29,16 +29,21 @@ setInterval(() => {
   for (const [ip, h] of hits) if (h.minute < minute) hits.delete(ip);
 }, 60_000).unref();
 
+// An oversized body is drained rather than the socket destroyed: destroying it makes the proxy
+// answer 502 instead of letting the 413 through.
 function readJson(req) {
   return new Promise((resolve, reject) => {
-    let size = 0;
+    const tooLarge = () => reject(Object.assign(new Error(`Request body too large (max ${MAX_BODY} bytes)`), { status: 413 }));
+    if (Number(req.headers["content-length"]) > MAX_BODY) { tooLarge(); req.resume(); return; }
+    let size = 0, over = false;
     const chunks = [];
     req.on("data", c => {
       size += c.length;
-      if (size > MAX_BODY) { reject(Object.assign(new Error("Request body too large"), { status: 413 })); req.destroy(); }
-      else chunks.push(c);
+      if (size <= MAX_BODY) chunks.push(c);
+      else if (!over) { over = true; chunks.length = 0; tooLarge(); }
     });
     req.on("end", () => {
+      if (over) return;
       try { resolve(JSON.parse(Buffer.concat(chunks).toString("utf8"))); }
       catch { reject(Object.assign(new Error("Body is not valid JSON"), { status: 400 })); }
     });
@@ -63,6 +68,9 @@ Connect an MCP client to:  https://${host}/mcp   (Streamable HTTP, no auth)
 
 Cursor (.cursor/mcp.json):   { "mcpServers": { "delphisci": { "url": "https://${host}/mcp" } } }
 Claude Code:                 claude mcp add --transport http delphisci https://${host}/mcp
+
+Forum tools (delphi_propose_claim, delphi_log_test_result, ...) post as you: call
+delphi_forum_register once, then send the key as the X-Claw-Api-Key header or the apiKey argument.
 
 Data: ${files} TriG files; claim graph built ${built}. Limit: ${RATE_LIMIT} requests/minute per IP.
 `;

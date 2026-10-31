@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch11-06--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch11-06: refutes, confidence 0.65" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.65"^^xsd:double ;
+    delphi:hypothesis "If every increment of a spirally grown shell is a gnomon to the whole structure before it (the enlarged whole stays similar to itself), then a molluscan shell is geometrically self-similar through growth: dimensionless shape indices of the conch measured at successive diameters along one specimen's ontogeny (conch width index CWI = ww/dm, umbilical width index UWI = uw/dm, whorl expansion rate WER) stay constant, apart from measurement noise, from the end of the embryonic shell to maturity." ;
+    delphi:passCriterion "Pre-registered. Data: Walton & Korn (2018) ontogenetic conch-parameter series for 177 Devonian-Jurassic ammonoid species (Dryad 10.5061/dryad.c17p8), measured on median cross-sections at successive diameters dm. For each species keep the post-embryonic points (dm >= 2 mm) and require at least 4 points spanning at least a fourfold range of dm. For each retained index compute the log-range D = max ln(index) - min ln(index) over the series. A species is 'gnomonic' if D <= ln(1.25) (at most 25% change) for CWI, UWI and WER alike; 'allometric' if D >= ln(1.5) (at least 50% change) for at least one index; otherwise intermediate. SUPPORTS if at least two thirds of the qualifying species are gnomonic. As a secondary descriptor, the fraction of species whose indices show a monotonic trend with ln dm (|Spearman rho| >= 0.7, p < 0.05, for at least one index) is reported; it does not enter the verdict." ;
+    delphi:failCriterion "Pre-registered. REFUTES if at least two thirds of the qualifying species are allometric (at least one shape index changes by 50% or more over post-embryonic growth, so successive increments are not gnomons of the pre-existing conch). Otherwise 'mixed'. Fewer than 30 qualifying species: inconclusive (underpowered). File unobtainable: inconclusive, data-unavailable." ;
+    delphi:expectedObservation "Pre-registered. Data: Walton & Korn (2018) ontogenetic conch-parameter series for 177 Devonian-Jurassic ammonoid species (Dryad 10.5061/dryad.c17p8), measured on median cross-sections at successive diameters dm. For each species keep the post-embryonic points (dm >= 2 mm) and require at least 4 points spanning at least a fourfold range of dm. For each retained index compute the log-range D = max ln(index) - min ln(index) over the series. A species is 'gnomonic' if D <= ln(1.25) (at most 25% change) for CWI, UWI and WER alike; 'allometric' if D >= ln(1.5) (at least 50% change) for at least one index; otherwise intermediate. SUPPORTS if at least two thirds of the qualifying species are gnomonic. As a secondary descriptor, the fraction of species whose indices show a monotonic trend with ln dm (|Spearman rho| >= 0.7, p < 0.05, for at least one index) is reported; it does not enter the verdict." ;
+    delphi:disconfirmingObservation "Pre-registered. REFUTES if at least two thirds of the qualifying species are allometric (at least one shape index changes by 50% or more over post-embryonic growth, so successive increments are not gnomons of the pre-existing conch). Otherwise 'mixed'. Fewer than 30 qualifying species: inconclusive (underpowered). File unobtainable: inconclusive, data-unavailable." ;
+    delphi:admissibleDatasets "Planned datasets: dryad-c17p8-walton-korn-2018-ammonoid-conch-ontogeny" ;
+    delphi:inferenceMethod "fetch.py downloads the Dryad version zip and records its SHA-256. analysis.py reshapes the four parameter sheets to one long table (species, half-whorl, dm, CWI, UWI, WER), keeps post-embryonic points (dm >= 2 mm) and the 179 series with >= 4 points spanning >= 4x in diameter, and for each index computes the log-range over the series (percent change), a Spearman correlation with ln dm, and classifies each series as gnomonic (all three indices change <= 25%), allometric (any index changes >= 50%) or intermediate. Sensitivity runs use dm >= 5 mm and drop UWI." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "fetch.py downloads the Dryad version zip and records its SHA-256. analysis.py reshapes the four parameter sheets to one long table (species, half-whorl, dm, CWI, UWI, WER), keeps post-embryonic points (dm >= 2 mm) and the 179 series with >= 4 points spanning >= 4x in diameter, and for each index computes the log-range over the series (percent change), a Spearman correlation with ln dm, and classifies each series as gnomonic (all three indices change <= 25%), allometric (any index changes >= 50%) or intermediate. Sensitivity runs use dm >= 5 mm and drop UWI." ;
+    rdfs:comment "Measured: 0.939 fraction of qualifying ammonoid series in which at least one conch shape index changes by >= 50% over post-embryonic growth (pre-registered refutes threshold 2/3); fraction gnomonic = 0.006 (supports threshold 2/3) (n = 179 series (177 species), Devonian-Jurassic, 168 allometric, 10 intermediate, 1 gnomonic (Eurites permutus); 93.9% of series show a monotonic trend (|Spearman rho| >= 0.7, p < 0.05) in at least one index). Interpretation: Thompson's gnomon is 'an addition that leaves the enlarged whole similar to what it was before'; for a coiled conch, continued similarity means that the ratios describing its shape are unchanged by growth, which is exactly what constant CWI, UWI and WER along an ontogenetic trajectory express (constant WER is the constant spiral angle; constant CWI and UWI fix the whorl-section proportions and the umbilicus). Ammonoid conchs are molluscan shells, within the stated scope. The embryonic ammonitella (dm below about 1-2 mm) formed inside the egg rather than by the accretion Thompson describes, so points below 2 mm are excluded. Thresholds of 25% and 50% are chosen before analysis to separate measurement noise in cross-sections from genuine shape change; the measurement protocol (Korn 2010) reports typical errors of a few percent." ;
+    delphi:evidenceAgainst "The refutation is carried almost entirely by the umbilical width index: UWI changes by >= 50% in 92% of series (median change 204%), whereas the whorl expansion rate, which encodes the spiral angle, stays within 25% in 80% of series (median change 17%). The spiral itself is therefore close to logarithmic (gnomonic in Thompson's sense), while the whorl section and the degree of involution change through growth, so the enlarged conch is not similar to its earlier self. Dropping UWI, only 34% of series (27% at dm >= 5 mm) are allometric and the pre-registered rule would give 'mixed'." ;
+    delphi:evidenceAgainst "Walton & Korn chose their 177 species to study pachyconic and globular ammonoids with phased ontogenies, so the sample is probably enriched in species with strong ontogenetic shape change relative to ammonoids at large." ;
+    delphi:evidenceAgainst "UWI is the noisiest index at small diameters (small umbilical widths); the 2 mm cut-off and the requirement of a monotonic trend (met by 94% of series) limit but do not remove this effect; at dm >= 5 mm the allometric fraction is still 84%." ;
+    delphi:evidenceAgainst "Scope: Palaeozoic-Jurassic ammonoid conchs only; Thompson's gnomon claim also covers gastropod and bivalve shells, opercula, foraminiferal chambers, horns and tusks, which were not tested. The 25% and 50% thresholds are pre-registered conventions, not derived from Thompson." ;
+    delphi:evidenceAgainst "Thompson himself notes elsewhere (ch. XI, changes of spiral angle with age) that some ammonoids change their spiral angle during growth; this test shows that even where the spiral angle is nearly constant, the conch shape generally is not." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-06--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch11-06/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-06--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data from: Iterative ontogenetic development of ammonoid conch shapes from the Devonian through to the Jurassic (Walton & Korn 2018, Palaeontology 61, doi:10.1111/pala.12308)" ;
+    dct:description "ontogenetic series of conch diameter and the shape indices CWI (ww/dm), UWI (uw/dm) and WER along individual ammonoid cross-sections" ;
+    delphi:hasChecksum "sha256:944359c1887e4aa67867ead469a5e895dd4efe9a0d3d2cc1ae8d7a1518aae077" ;
+    prov:atLocation <https://datadryad.org/api/v2/versions/7242/download> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.c17p8> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch11-06> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch11-06--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch11-06/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-thompson-batch-2216)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.674Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch11-06: refutes, confidence 0.65" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch11-06--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

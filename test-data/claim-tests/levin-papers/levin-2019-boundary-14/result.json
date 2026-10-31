@@ -1,0 +1,22 @@
+{
+  "claim_id": "levin-2019-boundary-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2019-boundary-14",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "preregistered_at": "2026-10-31T19:45:00Z",
+  "hypothesis": "For each of the four senses named (touch, taste, temperature, hearing), at least one ion channel that transduces that sense in animals has a predicted structure containing the fold of a known bacterial ion channel, as measured by TM-score, clearly above the score a non-channel membrane protein reaches against the same bacterial channel.",
+  "pass_criterion": "Pre-registered. Structures for every protein are predicted with ESMFold2 on the Nebius Scientific AI Platform (single-sequence mode, seed 0) and aligned pairwise with TM-align (tmtools); the TM-score is normalised by the length of the bacterial chain. A sense is 'shared' if some channel listed for it reaches TM >= 0.50 against some bacterial channel AND that score exceeds the GLUT1 negative control's score against the same bacterial channel by >= 0.10. Supports: all four senses shared, with both controls behaving (positive control KCNA2 vs KcsA TM >= 0.50; negative controls myoglobin and GLUT1 below 0.50 against every bacterial channel).",
+  "fail_criterion": "Pre-registered. Refutes: no sense is shared. Mixed: one to three senses shared. Inconclusive (reason 'other'): the positive control scores below 0.50, either negative control reaches 0.50 against any bacterial channel, or every channel listed for a sense has mean pLDDT < 50 (that sense is then reported as undetermined and the verdict is at most mixed).",
+  "planned_datasets": [
+    "uniprot-sequences: UniProtKB canonical sequences for the animal panel (human PIEZO2 Q9H5I5, TRPV1 Q8NER1, TRPM8 Q7Z2W7, TRPM5 Q9NZQ8, OTOP1 Q7RTM1, SCNN1A P37088, TMC1 Q8TDI8), the bacterial panel (KcsA P0A334, NaK Q81HW2, NavAb A8EVM5, MscL P0A742, MscS P0C0S1, GLIC Q7NDN8, ELIC P0C7B7) and controls (human KCNA2 P16389, myoglobin P02144, GLUT1 P11166)",
+    "nebius-esmfold2: ESMFold2 (Biohub esm v3.4.0) predictions on the Nebius Scientific AI Platform, one per sequence, operation IDs recorded"
+  ],
+  "test_contract": {
+    "expected_observation": "Each named sense has a transducing channel whose predicted structure aligns to a bacterial channel at TM >= 0.5 (the conventional same-fold threshold), clearly above a non-channel membrane protein's score.",
+    "disconfirming_observation": "Transducing channels for some or all named senses (e.g. Piezo for touch, TMC for hearing, otopetrin for sour taste) align to no bacterial channel better than an unrelated membrane transporter does.",
+    "admissible_datasets": "Canonical UniProtKB sequences of channels with an established role in transducing the named sense, and of bacterial channels with experimentally confirmed channel function; structures predicted by a model that sees only the sequence (no templates from the comparison set).",
+    "inference_method": "Pairwise TM-align on predicted monomer structures, TM-score normalised by the bacterial chain; per-sense maximum compared with a fixed threshold (0.50) and with the GLUT1 negative-control margin (0.10); verdict by count of shared senses."
+  },
+  "interpretation": "'The exact same ion channel mechanisms' is read as shared structural ancestry of the channel protein, the strongest sense in which a mechanism can be 'the same' across 3+ billion years; a shared biophysical principle without homology (e.g. any force-gated pore) would not count. Senses are mapped to the channels that transduce them in mammals: touch to PIEZO2; temperature to TRPV1 (heat) and TRPM8 (cold); taste to OTOP1 (sour), ENaC alpha/SCNN1A (salty) and TRPM5 (sweet, bitter and umami downstream of GPCRs); hearing to TMC1. Monomers are compared because the pore-forming fold lives in a single subunit for all of these families.",
+  "agent": { "kind": "local-agent", "model": "claude-opus-5.5", "run": "cursor chat 2026-10-31 nebius structure tests", "date": "2026-10-31" }
+}

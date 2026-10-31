@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch12-42--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch12-42: mixed, confidence 0.85" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.85"^^xsd:double ;
+    delphi:hypothesis "If the claim holds, the published six-Nand single axiom ((a.b).c).(a.((a.c).a)) = c has exactly the models that Nand-logic has on small domains (on 2 elements only Nand and Nor, on 3 elements none, on 4 elements only the 12 operation tables isomorphic to the Nand of the four-element Boolean algebra); no shorter single axiom of the form X = variable passes even the 2- and 3-element screens; and in a natural enumeration of axiom systems by number of Nands a system passing all screens appears within the first few thousand." ;
+    delphi:passCriterion "Pre-registered. Enumerate all Nand expression trees X with k Nands (k+1 leaves) over variables a, b, c and consider (I) single axioms {X = a} for k <= 6 (34488 systems for k <= 5, 288684 for k = 6, plus the 16896 two-variable systems for k = 6) and (II) two-axiom systems {X = a, a.b = b.a} with k = 4 (3402 systems, 6 Nands in total). Screen each system against all 16 binary operations on {0,1}, all 19683 on {0,1,2} and, by backtracking search, all operations on {0,1,2,3}; a system 'works up to n values' if its models on each domain of size <= n are exactly the operation tables isomorphic to the Nand (or, on 2 elements, Nand or Nor) of a Boolean algebra of that size, i.e. {Nand, Nor} on 2, none on 3, the 12 tables isomorphic to Nand_4 on 4. PASS (supports) if (a) the published axiom works up to 4 values; (b) no single axiom {X = a} with k <= 5 over <= 3 variables works up to 3 values; (c) at least one system of family (II) works up to 4 values, and the number of systems of forms (I) and (II) with at most 6 Nands in total that precede it in the enumeration (fewer Nands first) is below 10000. The book's counts (0 of 16896 two-variable six-Nand systems up to 3 values; 296 of 288684 up to 3 values and 100 up to 4 values; 32 of 3402 in family II) are recorded as cross-checks and do not decide the verdict. If the 4-value search over all 3-value survivors of (I) exceeds 20 minutes it is applied only to the published axiom and to family (II), and the 100-count cross-check is dropped and reported." ;
+    delphi:failCriterion "Pre-registered. FAIL (refutes) if the published six-Nand axiom has a model on 3 elements or a non-Boolean model on 4 elements (then it does not axiomatise Boolean logic), or if no system with at most 6 Nands in total passes the screens up to 4 values (then nothing 'among the simplest few thousand' is a candidate). MIXED if (a) holds but (b) fails (a shorter single axiom survives the screens, undermining 'as short as possible'), or if (c) fails only on the count bound." ;
+    delphi:expectedObservation "Pre-registered. Enumerate all Nand expression trees X with k Nands (k+1 leaves) over variables a, b, c and consider (I) single axioms {X = a} for k <= 6 (34488 systems for k <= 5, 288684 for k = 6, plus the 16896 two-variable systems for k = 6) and (II) two-axiom systems {X = a, a.b = b.a} with k = 4 (3402 systems, 6 Nands in total). Screen each system against all 16 binary operations on {0,1}, all 19683 on {0,1,2} and, by backtracking search, all operations on {0,1,2,3}; a system 'works up to n values' if its models on each domain of size <= n are exactly the operation tables isomorphic to the Nand (or, on 2 elements, Nand or Nor) of a Boolean algebra of that size, i.e. {Nand, Nor} on 2, none on 3, the 12 tables isomorphic to Nand_4 on 4. PASS (supports) if (a) the published axiom works up to 4 values; (b) no single axiom {X = a} with k <= 5 over <= 3 variables works up to 3 values; (c) at least one system of family (II) works up to 4 values, and the number of systems of forms (I) and (II) with at most 6 Nands in total that precede it in the enumeration (fewer Nands first) is below 10000. The book's counts (0 of 16896 two-variable six-Nand systems up to 3 values; 296 of 288684 up to 3 values and 100 up to 4 values; 32 of 3402 in family II) are recorded as cross-checks and do not decide the verdict. If the 4-value search over all 3-value survivors of (I) exceeds 20 minutes it is applied only to the published axiom and to family (II), and the 100-count cross-check is dropped and reported." ;
+    delphi:disconfirmingObservation "Pre-registered. FAIL (refutes) if the published six-Nand axiom has a model on 3 elements or a non-Boolean model on 4 elements (then it does not axiomatise Boolean logic), or if no system with at most 6 Nands in total passes the screens up to 4 values (then nothing 'among the simplest few thousand' is a candidate). MIXED if (a) holds but (b) fails (a shorter single axiom survives the screens, undermining 'as short as possible'), or if (c) fails only on the count bound." ;
+    delphi:admissibleDatasets "Planned datasets: nand-axiom-enumeration-generator" ;
+    delphi:inferenceMethod "analysis.py enumerates every full binary Nand tree with k internal nodes and every leaf labelling over {a,b,c} (or {a,b}), builds the single-axiom systems {X = a} for k = 1..6 (34488 systems for k <= 5, 288684 for k = 6, 16896 two-variable systems for k = 6) and the two-axiom systems {X = a, a.b = b.a} with k = 4 (3402 systems), and screens each against all 16 binary operations on {0,1} and all 19683 on {0,1,2}; survivors of the 3-valued screen (and the published axiom) are then checked on {0,1,2,3} by backtracking over the 4^16 operation tables. A system 'works up to n values' if its models are exactly {Nand, Nor} on 2 elements, none on 3, and (for n = 4) exactly the 12 tables isomorphic to the Nand of the 4-element Boolean algebra. The published axiom ((a.b).c).(a.((a.c).a)) = c is rewritten with the variable on the right as (((b.c).a).(b.((b.a).b))) = a. Runtime about 11 minutes, of which 587 s is the 4-valued check of the 296 six-Nand survivors." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py enumerates every full binary Nand tree with k internal nodes and every leaf labelling over {a,b,c} (or {a,b}), builds the single-axiom systems {X = a} for k = 1..6 (34488 systems for k <= 5, 288684 for k = 6, 16896 two-variable systems for k = 6) and the two-axiom systems {X = a, a.b = b.a} with k = 4 (3402 systems), and screens each against all 16 binary operations on {0,1} and all 19683 on {0,1,2}; survivors of the 3-valued screen (and the published axiom) are then checked on {0,1,2,3} by backtracking over the 4^16 operation tables. A system 'works up to n values' if its models are exactly {Nand, Nor} on 2 elements, none on 3, and (for n = 4) exactly the 12 tables isomorphic to the Nand of the 4-element Boolean algebra. The published axiom ((a.b).c).(a.((a.c).a)) = c is rewritten with the variable on the right as (((b.c).a).(b.((b.a).b))) = a. Runtime about 11 minutes, of which 587 s is the 4-valued check of the 296 six-Nand survivors." ;
+    rdfs:comment "Measured: 100 six-Nand three-variable single axioms {X = a} (of 288684) whose models on domains of size 2, 3 and 4 are exactly those of Boolean Nand (n = 327042, exact enumeration). Interpretation: Finite-model screening is a necessary condition for axiomatising Boolean algebra (every Boolean algebra is a model, and no 3-element algebra is), not a sufficient one; the sufficiency of the six-Nand axiom rests on the equational proof the book presents on pp. 810-811 (found with automated theorem provers) which standard tooling here cannot re-run. The test therefore checks everything about the claim that is checkable by enumeration: that the published axiom is consistent with being an axiom for logic on all domains up to 4 elements, that six Nands is the minimum passing even the weakest screens, and that a screen-passing system appears within the first few thousand systems of the book's own enumeration. 'Simplest few thousand' is read against the book's own ordering (by total number of Nands, systems {X = a} and {X = a, a.b = b.a})." ;
+    delphi:evidenceAgainst "Criterion (a) holds: the published six-Nand axiom has no 3-element model and exactly the 12 Boolean-Nand models on 4 elements, and every count the book reports for its search (0 of 16896, 296 of 288684, 100 up to 4 values, 32 of 3402) is reproduced exactly." ;
+    delphi:evidenceAgainst "Criterion (b) as pre-registered fails: 8 four-Nand and 16 five-Nand single axioms over three variables survive the 2- and 3-valued screens (e.g. ((b.a).(a.(b.c))) = a). All 24 fail on 4 elements (they admit non-Boolean 4-element models), so none is an axiom for logic; the pre-registered 3-valued screen was too weak to separate 'passes a screen' from 'is as short as possible'. Under the 4-valued screen six Nands is indeed the smallest size with any survivor among single axioms {X = a}." ;
+    delphi:evidenceAgainst "Criterion (c) fails only on the count bound, and only because the pre-registered enumeration order places every single axiom with fewer Nands before the two-axiom family: the first family-II system that works up to 4 values is number 1248 of the 3402 family-II systems with 6 Nands (number 1716 counting family-II systems of all sizes), but up to 36204 when all 34956 shorter single axioms are counted first. Whether that is 'the first few thousand' depends on the order chosen; the book's own text counts only the family it searches." ;
+    delphi:evidenceAgainst "Finite-model screening is necessary but not sufficient for axiomatising Boolean algebra; the sufficiency of the published axiom (that it proves all of Boolean algebra) rests on the equational proof the book reports and was not re-derived here. Per the pre-registered rule, (a) true with (b) and (c) failing as described gives 'mixed'; every failure is a calibration artefact of the pre-registered criteria rather than a disagreement with the book's reported search results." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch12-42--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch12-42/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch12-42--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Enumeration of Nand equational axiom systems with up to 6 Nands over 3 variables, with finite-model screening on domains of size 2, 3, 4, generated by analysis.py" ;
+    dct:description "the finite objects the claim's search statements are about" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p808--implications-for-mathematics-and-its-foundations/> ;
+    dct:license "generated by this test" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-42> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch12-42--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch12-42/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-9241)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.696Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch12-42: mixed, confidence 0.85" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch12-42--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

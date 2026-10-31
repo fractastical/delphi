@@ -1,0 +1,86 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch08-02--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch08-02: supports, confidence 0.65" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.65"^^xsd:double ;
+    delphi:hypothesis "If close interbreeding lessens fertility and an occasional cross with a distinct stock increases it, then (i) in a pedigreed wild mammal population, litter size should decline with the mother's inbreeding coefficient, and (ii) in experimentally inbred Drosophila populations, fecundity should be lower than in the outbred control and should rise again when individuals from different inbred populations are crossed (heterosis)." ;
+    delphi:passCriterion "Dataset 1 (Auclair et al. 2025, Pyrenean brown bear, Dryad doi:10.5061/dryad.w9ghx3g1s, file litter_size_dt.csv): the slope of litter size on maternal inbreeding coefficient (ordinary least squares, one row per litter; if the file supplies repeated mothers, a mother-level mean is also reported) is negative with one-sided p < 0.05, or, if the coefficient is categorical, mean litter size of the most inbred category is below that of the least inbred with p < 0.05. Dataset 2 (Pekkala et al. 2014, Drosophila littoralis, Dryad doi:10.5061/dryad.10154): (a) mean fecundity of inbred populations is below the outbred control in at least two of the three population-size treatments (N = 2, 10, 40), and (b) mean fecundity of inter-population crosses exceeds that of within-population matings (heterosis > 0) in a majority of population pairs or treatments for which both are reported. Verdict 'supports' if dataset 1 passes and both 2(a) and 2(b) pass; 'mixed' if dataset 1 passes but only one of 2(a)/2(b), or dataset 1 fails while both 2(a) and 2(b) pass; 'refutes' if litter size does not decline with inbreeding and inbred fecundity is not below control." ;
+    delphi:failCriterion "Refuted if the litter-size slope on inbreeding is >= 0 (or not significantly negative) and inbred Drosophila populations are not less fecund than the outbred control. Clause (ii)(b) failing alone (no heterosis) with the others passing gives 'mixed'. If either Dryad archive cannot be downloaded, that dataset is recorded as unavailable and the verdict rests on the other; if neither can be obtained, the verdict is 'inconclusive' with reason 'data-unavailable'." ;
+    delphi:expectedObservation "Dataset 1 (Auclair et al. 2025, Pyrenean brown bear, Dryad doi:10.5061/dryad.w9ghx3g1s, file litter_size_dt.csv): the slope of litter size on maternal inbreeding coefficient (ordinary least squares, one row per litter; if the file supplies repeated mothers, a mother-level mean is also reported) is negative with one-sided p < 0.05, or, if the coefficient is categorical, mean litter size of the most inbred category is below that of the least inbred with p < 0.05. Dataset 2 (Pekkala et al. 2014, Drosophila littoralis, Dryad doi:10.5061/dryad.10154): (a) mean fecundity of inbred populations is below the outbred control in at least two of the three population-size treatments (N = 2, 10, 40), and (b) mean fecundity of inter-population crosses exceeds that of within-population matings (heterosis > 0) in a majority of population pairs or treatments for which both are reported. Verdict 'supports' if dataset 1 passes and both 2(a) and 2(b) pass; 'mixed' if dataset 1 passes but only one of 2(a)/2(b), or dataset 1 fails while both 2(a) and 2(b) pass; 'refutes' if litter size does not decline with inbreeding and inbred fecundity is not below control." ;
+    delphi:disconfirmingObservation "Refuted if the litter-size slope on inbreeding is >= 0 (or not significantly negative) and inbred Drosophila populations are not less fecund than the outbred control. Clause (ii)(b) failing alone (no heterosis) with the others passing gives 'mixed'. If either Dryad archive cannot be downloaded, that dataset is recorded as unavailable and the verdict rests on the other; if neither can be obtained, the verdict is 'inconclusive' with reason 'data-unavailable'." ;
+    delphi:admissibleDatasets "Planned datasets: dryad-auclair2025-pyrenean-brown-bear-inbreeding, dryad-pekkala2014-drosophila-littoralis-inbreeding-heterosis" ;
+    delphi:inferenceMethod "Bear: ordinary least-squares regression of litter size on the mother's pedigree inbreeding coefficient over 66 litters (29 mothers), one-sided test for a negative slope; the litter's own inbreeding coefficient and mother-level means are reported as extras. Fly: the DATA sheet of the Dryad workbook was parsed; offspring fecundity ('F eggs per vial') of within-population random crosses (type 1) in the inbred treatments was compared with the outbred control, and inter-population crosses (type 2) were compared with within-population crosses in each population-size x generation cell (relative heterosis), plus a pooled one-sided Mann-Whitney test." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "Bear: ordinary least-squares regression of litter size on the mother's pedigree inbreeding coefficient over 66 litters (29 mothers), one-sided test for a negative slope; the litter's own inbreeding coefficient and mother-level means are reported as extras. Fly: the DATA sheet of the Dryad workbook was parsed; offspring fecundity ('F eggs per vial') of within-population random crosses (type 1) in the inbred treatments was compared with the outbred control, and inter-population crosses (type 2) were compared with within-population crosses in each population-size x generation cell (relative heterosis), plus a pooled one-sided Mann-Whitney test." ;
+    rdfs:comment "Measured: -1.2384953568923254 cubs per litter per unit maternal inbreeding coefficient (OLS slope) (n = 66, SE 0.716; one-sided p = 0.0443). Interpretation: Darwin's 'close interbreeding lessens fertility' is read as inbreeding depression in a fertility component (litter size in a wild mammal; fecundity in a laboratory fly), and 'an occasional cross with a distinct individual or variety increases it' as heterosis on crossing distinct inbred populations. The inbreeding coefficient (Wright's F) is a post-Darwinian quantity. The clause attributing the decline of multi-generation hybrids to close interbreeding is not tested; only the general inbreeding-depression and heterosis pattern is. Exact column names and the form of the inbreeding variable were not inspected before pre-registration; the mapping used is stated in 'method'." ;
+    delphi:evidenceAgainst "The pre-registered bear test is marginal (one-sided p = 0.044, n = 66 litters); the litter's own inbreeding coefficient gives a clearer signal (p = 0.001). In the fly data the N = 40 treatment was not less fecund than the N = 500 control, so inbreeding depression in fecundity appears only at the two smallest population sizes, although fecundity declines significantly with the estimated inbreeding coefficient overall." ;
+    delphi:evidenceAgainst "Two datasets only (one wild mammal population of a few dozen mothers; one laboratory Drosophila experiment); Darwin's claim is about plants and animals generally." ;
+    delphi:evidenceAgainst "The pre-registered bear test uses the mother's inbreeding coefficient; the litter's own coefficient (closeness of the parents) is the more literal reading of 'close interbreeding' and is reported as an extra." ;
+    delphi:evidenceAgainst "Bear litter sizes are counts (1-3) observed in the field; detection delay and maternal age are confounders that the simple regression does not model (the source paper fits mixed models with these covariates)." ;
+    delphi:evidenceAgainst "In the fly experiment 'distinct variety' is another inbred laboratory population of the same species, not a distinct variety in Darwin's sense; heterosis there reflects complementation of different fixed deleterious alleles." ;
+    delphi:evidenceAgainst "The clause attributing the decline of hybrids over generations to close interbreeding is not tested." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch08-02--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch08-02--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch08-02/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch08-02--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data from: Inbreeding depression across multiple life history traits in a long-lived mammal (Pyrenean brown bear), file litter_size_dt.csv" ;
+    dct:description "litter size and pedigree inbreeding coefficients of mother and litter" ;
+    delphi:hasChecksum "sha256:790af2d98ca5956b64ca446fb1009840a2d8d0baaa3a0d9ec7e7ccd9c0e70fdd" ;
+    prov:atLocation <https://datadryad.org/api/v2/versions/402719/download> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.w9ghx3g1s> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch08-02--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data from: The effect of inbreeding rate on fitness, inbreeding depression and heterosis over a range of inbreeding coefficients (Drosophila littoralis)" ;
+    dct:description "offspring fecundity for within-population, inter-population and full-sib crosses at three population sizes" ;
+    delphi:hasChecksum "sha256:9a2d5e912742fdd6e8180f9ab3fad2cbc8a92fa7ae5660e49d8fe0c5bf99c183" ;
+    prov:atLocation <https://datadryad.org/api/v2/versions/6545/download> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.10154> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch08-02> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch08-02--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch08-02/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-0e75)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.651Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch08-02: supports, confidence 0.65" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch08-02--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

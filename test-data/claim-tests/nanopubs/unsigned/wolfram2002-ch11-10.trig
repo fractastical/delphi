@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-10--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch11-10: supports, confidence 0.7" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.7"^^xsd:double ;
+    delphi:hypothesis "For at least one of the system types named in the claim (Turing machines), a single uniform construction turns any one-dimensional cellular automaton rule (any number of colours k, any radius r) into a Turing machine that emulates it exactly; applied to rule 110 the construction yields an explicit Turing machine, which is then universal by the universality of rule 110 (Cook, Complex Systems 15 (2004) 1-40), so the system type contains a universal member as the claim asserts." ;
+    delphi:passCriterion "Pre-registered. analysis.py builds, for a given (k, r, rule table), a Turing machine whose tape holds the cellular-automaton configuration on W cells between two end-marker symbols, and whose head performs one left-to-right sweep (reading each old cell value once, carrying the last 2r old values in its state, stepping back r cells to write the new value) followed by a return to the left end, so that one round trip equals one cellular-automaton step with fixed white (0) boundaries. The machine must be a genuine finite table: every (state, symbol) pair reachable in the runs has exactly one transition writing one symbol and moving one cell. Tests: (a) all 256 elementary rules (k = 2, r = 1), W = 48, 40 steps, two random initial conditions each (seed 20261110); (b) 100 random 3-colour radius-1 rules (k = 3, r = 1), same W and steps; (c) 50 random 2-colour radius-2 rules (k = 2, r = 2); (d) 20 random 4-colour radius-1 rules and 10 random 3-colour radius-2 rules. After every round trip the tape between the markers is compared cell-for-cell with the directly computed cellular-automaton configuration (fixed-0 boundary). 'supports' if the total number of mismatching cells over all runs is 0 and the rule-110 machine is produced with a finite, fully specified state table (its state count and transition count reported)." ;
+    delphi:failCriterion "Pre-registered. 'refutes' if any run produces a mismatch (one or more cells differing from the direct evolution) that cannot be traced to a bug in the harness rather than the construction; since the construction is uniform in (k, r, rule), a single irreparable mismatch shows the uniform construction does not emulate every cellular automaton. 'inconclusive' with reason 'other' if the harness cannot complete the runs within the time budget." ;
+    delphi:expectedObservation "Pre-registered. analysis.py builds, for a given (k, r, rule table), a Turing machine whose tape holds the cellular-automaton configuration on W cells between two end-marker symbols, and whose head performs one left-to-right sweep (reading each old cell value once, carrying the last 2r old values in its state, stepping back r cells to write the new value) followed by a return to the left end, so that one round trip equals one cellular-automaton step with fixed white (0) boundaries. The machine must be a genuine finite table: every (state, symbol) pair reachable in the runs has exactly one transition writing one symbol and moving one cell. Tests: (a) all 256 elementary rules (k = 2, r = 1), W = 48, 40 steps, two random initial conditions each (seed 20261110); (b) 100 random 3-colour radius-1 rules (k = 3, r = 1), same W and steps; (c) 50 random 2-colour radius-2 rules (k = 2, r = 2); (d) 20 random 4-colour radius-1 rules and 10 random 3-colour radius-2 rules. After every round trip the tape between the markers is compared cell-for-cell with the directly computed cellular-automaton configuration (fixed-0 boundary). 'supports' if the total number of mismatching cells over all runs is 0 and the rule-110 machine is produced with a finite, fully specified state table (its state count and transition count reported)." ;
+    delphi:disconfirmingObservation "Pre-registered. 'refutes' if any run produces a mismatch (one or more cells differing from the direct evolution) that cannot be traced to a bug in the harness rather than the construction; since the construction is uniform in (k, r, rule), a single irreparable mismatch shows the uniform construction does not emulate every cellular automaton. 'inconclusive' with reason 'other' if the harness cannot complete the runs within the time budget." ;
+    delphi:admissibleDatasets "Planned datasets: nks-ch11-10-tm-emulation-generator" ;
+    delphi:inferenceMethod "analysis.py builds, from any (k, r, rule table), an explicit finite Turing-machine transition table: states ('scan', B, j) carry the last 2r old cell values B during a left-to-right sweep, step back r cells to write each new value, finish the last r cells at the right end-marker with virtual zero reads, and return to the left marker, so one round trip is one cellular-automaton step with fixed-0 boundaries. The machine for each rule was run on W = 48 cells for 40 steps from two random initial conditions (seed 20261110) and the tape compared cell-for-cell with direct evolution after every step: all 256 elementary rules, 100 random k=3 r=1 rules, 50 random k=2 r=2 rules, 20 random k=4 r=1 rules and 10 random k=3 r=2 rules (436 rules, 1,674,240 cell comparisons). A mutation check (machine for rule 110 compared with rule 124) produced 225 mismatches in 10 steps, confirming the harness detects disagreement." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py builds, from any (k, r, rule table), an explicit finite Turing-machine transition table: states ('scan', B, j) carry the last 2r old cell values B during a left-to-right sweep, step back r cells to write each new value, finish the last r cells at the right end-marker with virtual zero reads, and return to the left marker, so one round trip is one cellular-automaton step with fixed-0 boundaries. The machine for each rule was run on W = 48 cells for 40 steps from two random initial conditions (seed 20261110) and the tape compared cell-for-cell with direct evolution after every step: all 256 elementary rules, 100 random k=3 r=1 rules, 50 random k=2 r=2 rules, 20 random k=4 r=1 rules and 10 random k=3 r=2 rules (436 rules, 1,674,240 cell comparisons). A mutation check (machine for rule 110 compared with rule 124) produced 225 mismatches in 10 steps, confirming the harness detects disagreement." ;
+    rdfs:comment "Measured: 0 mismatching cells between Turing-machine tape and direct cellular-automaton evolution, summed over all runs (n = 1674240, exact (deterministic comparison)). Interpretation: The claim is a logical implication (if a system type can emulate every cellular automaton and a universal cellular automaton exists, the type has universal members). The implication itself is not empirical; what can be checked computationally is its first premise for a concrete system type. We check it for Turing machines, the second family named in the claim, by implementing a uniform emulation construction (the sweeping-head scheme NKS describes for Turing machines emulating cellular automata, p. 665-666, written here from scratch rather than copied) and testing it exhaustively on the elementary rules and on random rules with more colours and larger neighbourhoods. The second premise (existence of a universal cellular automaton) is taken from the published proof that rule 110 is universal; it is not re-derived. The other families in the claim (mobile automata, substitution systems, tag and cyclic tag systems, symbolic systems, register machines) are not tested here, so a 'supports' verdict confirms the claim's structure for one family only." ;
+    delphi:evidenceAgainst "Only the Turing-machine family is tested; the claim also names mobile automata, substitution systems, tag and cyclic tag systems, symbolic systems and register machines, whose emulation constructions are not checked here." ;
+    delphi:evidenceAgainst "The construction is tested on finite segments with fixed-0 boundaries for 40 steps; its correctness for arbitrary k and r follows from the uniform scheme rather than from exhaustive testing, and the test covers k <= 4 and r <= 2 only." ;
+    delphi:evidenceAgainst "The conclusion that the resulting rule-110 machine (41 states x 3 symbols, 91 transitions) is universal rests on the published proof that rule 110 is universal (Cook 2004); that proof is not re-verified here, so the implication's second premise is assumed, not tested." ;
+    delphi:evidenceAgainst "The claim is a logical implication; the computation establishes one instance of its premise, not the implication itself, which is immediate once both premises are granted." ;
+    delphi:evidenceAgainst "The Turing machines used here have many states; they are not the small machines NKS discusses elsewhere, and nothing is claimed about minimal size." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-10--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-10/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-10--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Turing machines constructed by analysis.py from cellular-automaton rules (all 256 elementary rules; random rules with k in {2,3,4} and r in {1,2}, seed 20261110), run on W = 48 cells for 40 cellular-automaton steps and compared with direct evolution" ;
+    dct:description "the emulation premise of the implication, for the Turing-machine family" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p665--emulating-cellular-automata-with-other-systems/> ;
+    dct:license "generated" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-10> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-10--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-10/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-e5f4)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.692Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch11-10: supports, confidence 0.7" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-10--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

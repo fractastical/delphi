@@ -1,0 +1,176 @@
+{
+  "claim_id": "darwin1859-ch12-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-05",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "Oceanic islands have few native vascular plant species but a high proportion of them are endemic (found nowhere else), higher than mainland regions have, even though the islands are far smaller.",
+  "pass_criterion": "Pre-registered. Using the World Checklist of Vascular Plants, for every TDWG level-3 area compute the native accepted species count S and the proportion E/S of those species that are native to no other level-3 area. Oceanic islands are the 63 level-3 areas pre-registered as 'oceanic' in derived/island_classes.csv; the mainland comparison set is every level-3 area not listed in that file as any kind of island. Areas (km2) are computed from the TDWG WGSRPD level-3 polygons. The claim is SUPPORTED if (i) the median S of oceanic islands is below the median S of mainland areas ('scanty'), (ii) the median E/S of oceanic islands with at least 20 native species is at least twice the median E/S of mainland areas, and (iii) at least 70% of oceanic islands with at least 20 native species lie above the mainland regression line of logit(E/S) on log10(area) ('extremely large relative to their area'). Islands with fewer than 20 native species are excluded from (ii) and (iii) because a proportion is unstable for them.",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if the median E/S of oceanic islands is not greater than the mainland median, or if fewer than 50% of oceanic islands lie above the mainland area regression line. Other outcomes are 'mixed'. Supplementary: the fraction of oceanic islands with E/S >= 0.25, and the same statistics for the 'other-island' class (continental and arc islands), are reported.",
+  "planned_datasets": [
+    "kew-wcvp",
+    "tdwg-wgsrpd-level3"
+  ],
+  "interpretation": "Darwin's 'oceanic islands' are read as islands of volcanic or coral origin that have never been connected to a continent (list fixed in derived/island_classes.csv before any data were inspected; continental fragments, island arcs adjacent to continents and shelf islands are placed in a separate 'other-island' class). 'Kinds of inhabitants' is restricted to native vascular plant species because that is what WCVP records; introduced species are excluded. 'Found nowhere else in the world' is read as native to exactly one level-3 area, so for mainland areas 'endemic' means endemic to that botanical country, which is the fairest available analogue. Area is included because the claim says the proportion is large relative to the islands' size.",
+  "datasets": [
+    {
+      "id": "kew-wcvp",
+      "name": "World Checklist of Vascular Plants (WCVP), Royal Botanic Gardens, Kew",
+      "landing_url": "https://powo.science.kew.org/about-wcvp",
+      "doi": "10.1038/s41597-021-00997-6",
+      "version": "16 (2026-06-04)",
+      "license": "CC BY 3.0 (per README_WCVP.xlsx in the download)",
+      "files": [
+        {
+          "download_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+          "retrieved_at": "2026-10-31T04:32:02Z",
+          "byte_size": 88179649,
+          "sha256": "d32ea2b3a85e489b14e83bcc9eae7274532e1d113753f7be290d4b2dfde573fa"
+        }
+      ],
+      "role": "native species per level-3 area and single-area endemics"
+    },
+    {
+      "id": "tdwg-wgsrpd-level3",
+      "name": "TDWG World Geographical Scheme for Recording Plant Distributions, level-3 polygons (GeoJSON, github.com/tdwg/wgsrpd)",
+      "landing_url": "https://github.com/tdwg/wgsrpd",
+      "doi": null,
+      "version": "master branch GeoJSON",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://raw.githubusercontent.com/tdwg/wgsrpd/master/geojson/level3.geojson",
+          "retrieved_at": "2026-10-31T05:10:04Z",
+          "byte_size": 1846370,
+          "sha256": "c172bcf6aba20e19477adc60aebf0023068f0175dca8480f0760b090dcf64840"
+        }
+      ],
+      "role": "area of each level-3 unit and the gazetteer used to classify islands"
+    }
+  ],
+  "method": "Native (non-introduced, non-doubtful) occurrences of 358,113 accepted non-hybrid WCVP v16 species were tabulated by TDWG level-3 area; a species native to exactly one area was counted as endemic to it. Areas (km2) were computed from the WGSRPD level-3 GeoJSON by spherical polygon area. Islands were classified in advance (derived/island_classes.csv): 63 oceanic, 61 other islands, the rest mainland (Antarctica excluded). Medians of native richness and endemic proportion were compared between the 60 oceanic islands with >= 20 native species and 247 mainland areas; logit(endemic proportion) was regressed on log10(area) for mainland areas and the fraction of oceanic islands above that line computed; a one-sided Mann-Whitney test compared the distributions.",
+  "measured": {
+    "value": 0.1255,
+    "unit": "median proportion of native vascular plant species endemic to a single level-3 area, oceanic islands with >= 20 native species",
+    "n": 60,
+    "uncertainty": "Mann-Whitney one-sided p vs mainland = 2.32e-05; IQR 0.031-0.248",
+    "extra": {
+      "wcvp_version": "16 (extracted 2026-06-04, per README_WCVP.xlsx in the zip)",
+      "n_oceanic_islands_total": 63,
+      "n_oceanic_islands_ge_20_native": 60,
+      "n_mainland_areas": 247,
+      "n_other_islands": 56,
+      "median_native_species_oceanic": 197.0,
+      "median_native_species_mainland": 2748.0,
+      "median_endemic_proportion_oceanic": 0.1255,
+      "median_endemic_proportion_mainland": 0.0342,
+      "median_endemic_proportion_other_islands": 0.1135,
+      "ratio_oceanic_over_mainland_median": 3.666,
+      "fraction_oceanic_above_mainland_area_regression": 0.8667,
+      "fraction_other_islands_above_mainland_area_regression": 0.9286,
+      "mainland_regression_logit_endemism_on_log10_area": {
+        "slope": 1.2313,
+        "intercept": -10.3836,
+        "r": 0.4318,
+        "p": 1.2273233199973156e-12
+      },
+      "median_oceanic_logit_residual": 5.15,
+      "fraction_oceanic_with_endemism_ge_0.25": 0.25,
+      "median_area_km2_oceanic": 140.7,
+      "median_area_km2_mainland": 249359.3,
+      "top_oceanic_islands": [
+        {
+          "code": "HAW",
+          "name": "Hawaii",
+          "native": 1251,
+          "endemic": 1076,
+          "proportion": 0.86
+        },
+        {
+          "code": "STH",
+          "name": "St.Helena",
+          "native": 86,
+          "endemic": 50,
+          "proportion": 0.581
+        },
+        {
+          "code": "JNF",
+          "name": "Juan Fernández Is.",
+          "native": 259,
+          "endemic": 126,
+          "proportion": 0.486
+        },
+        {
+          "code": "TDC",
+          "name": "Tristan da Cunha",
+          "native": 99,
+          "endemic": 46,
+          "proportion": 0.465
+        },
+        {
+          "code": "DSV",
+          "name": "Desventurados Is.",
+          "native": 28,
+          "endemic": 12,
+          "proportion": 0.429
+        },
+        {
+          "code": "MRQ",
+          "name": "Marquesas",
+          "native": 367,
+          "endemic": 156,
+          "proportion": 0.425
+        },
+        {
+          "code": "ASC",
+          "name": "Ascension",
+          "native": 37,
+          "endemic": 14,
+          "proportion": 0.378
+        },
+        {
+          "code": "CNY",
+          "name": "Canary Is.",
+          "native": 1571,
+          "endemic": 592,
+          "proportion": 0.377
+        },
+        {
+          "code": "SCI",
+          "name": "Society Is.",
+          "native": 623,
+          "endemic": 230,
+          "proportion": 0.369
+        },
+        {
+          "code": "NFK",
+          "name": "Norfolk Is.",
+          "native": 361,
+          "endemic": 131,
+          "proportion": 0.363
+        }
+      ],
+      "conditions": {
+        "scanty_median_S": true,
+        "endemism_ge_2x_mainland": true,
+        "ge_70pct_above_area_regression": true
+      },
+      "rule_based_verdict": "supports"
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.85,
+  "caveats": [
+    "Endemism at level-3 scale for mainland areas depends on political boundaries (e.g. 'Peru', 'India') and is inflated in Scandinavia and other parts of Europe by apomictic microspecies (Hieracium, Taraxacum, Ranunculus auricomus group) that WCVP accepts as species, so the mainland baseline is biased upward and the test is conservative with respect to the claim.",
+    "Eleven oceanic islands, nearly all low coral atolls (Cocos-Keeling, Maldives, Laccadives, Marshall, Tuvalu, Phoenix, Nauru, Howland-Baker, Marcus) or recently glaciated sub-Antarctic islands (Crozet, Heard), have no endemic species; the claim's 'often extremely large' is borne out by the high-island group (Hawaii 86%, St Helena 58%, Juan Fernandez 49%, Tristan da Cunha 47%) rather than by every oceanic island, and 25% of oceanic islands exceed 25% endemism.",
+    "Continental and arc islands (the 'other-island' class) show similar endemism (median 11%), so high endemism is a property of isolation generally, not exclusively of oceanic origin; the claim as stated concerns oceanic islands only and is supported for them.",
+    "Island groups are single level-3 units (e.g. the whole Hawaiian archipelago), so single-island endemics within an archipelago are pooled; this does not affect the comparison with mainland units.",
+    "WCVP inventory completeness is uneven, and a species recorded from only one area may sometimes reflect incomplete recording elsewhere rather than true endemism; this affects islands and mainland alike."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-b201",
+    "date": "2026-10-31"
+  }
+}

@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch05-20--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch05-20: supports, confidence 0.8" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.8"^^xsd:double ;
+    delphi:hypothesis "The set of 56 allowed 3x3 templates shown on NKS p. 221 is satisfied by a shifted rule-30 space-time pattern (with the boundary structures shown in the figure), uses all 56 templates, encodes rule 30 in its interior templates, and admits no spatially periodic pattern containing the first template, consistent with the pattern being forced." ;
+    delphi:passCriterion "Pre-registered. (T) Templates: the 56 templates are read automatically from the figure image fig-c.png of p. 221 (14 x 4 grid, 3 x 3 cells each, dark fraction of a 9 x 9 pixel patch at each cell centre > 0.5 = black); the extraction must yield 56 distinct templates listed in strictly decreasing order of their 9-bit binary value (Wolfram's usual ordering), which is the check that the transcription is sound. (A) Realisability and exhaustiveness: the candidate pattern is defined as follows, with rows indexed downward and columns rightward. Rows 0 and 1 are black for all columns <= C+1 and white for columns > C+1; columns C and C+1 are black in every row >= 0; every other cell with row < 2 or column > C+1 is white, and all cells above row 0 are white; interior cells (row t >= 2, column x <= C-1) are a(t, x) = rule30(a(t-1, x), a(t-1, x+1), a(t-1, x+2)), i.e. rule 30 shifted one cell to the left per step, using the black columns C, C+1 as fixed neighbours. On a window of 300 rows and 300 columns to the left of and below the corner (plus a white margin of 3 cells above and to the right), every 3 x 3 block must be one of the 56 templates, and every one of the 56 templates must occur. (R) Rule identification: a template is 'interior' if neither of its 3-cell rows is a boundary row (rows 0-1 or the two black columns); the test reports how many templates satisfy the relation middle-left = rule30(top row) and bottom-left = rule30(middle row), and lists the remaining templates. (U) No periodic alternative: for every horizontal period w = 1..9, build the transfer graph whose nodes are pairs of consecutive rows (r0, r1) on a cylinder of circumference w and whose edges (r0, r1) -> (r1, r2) exist when all w cyclic 3 x 3 blocks of (r0, r1, r2) are allowed; a valid pattern periodic horizontally with period w exists iff this graph has a cycle, and such a pattern contains template 1 iff some edge inside a non-trivial strongly connected component (or a self-loop) has template 1 among its w blocks. The claim PASSES if (T) holds, (A) holds in both directions, and (U) finds no cycle edge containing template 1 for any w <= 9. (R) is reported, not decisive." ;
+    delphi:failCriterion "Pre-registered. If (U) finds a cyclic (doubly periodic) pattern containing template 1 the uniqueness part of the claim is REFUTED (a second pattern satisfies the constraint). If (T) fails the result is 'inconclusive' (reason: transcription). If (A) fails in the subset direction (the candidate pattern contains a disallowed block) the result is 'inconclusive' (the pattern definition inferred from the templates is wrong, not the claim), unless the failing blocks are interior rule-30 blocks, in which case the templates do not encode rule 30 and the claim is refuted. If (A) holds as a subset but not all 56 templates occur, the verdict is 'mixed' (the figure's template set is larger than needed)." ;
+    delphi:expectedObservation "Pre-registered. (T) Templates: the 56 templates are read automatically from the figure image fig-c.png of p. 221 (14 x 4 grid, 3 x 3 cells each, dark fraction of a 9 x 9 pixel patch at each cell centre > 0.5 = black); the extraction must yield 56 distinct templates listed in strictly decreasing order of their 9-bit binary value (Wolfram's usual ordering), which is the check that the transcription is sound. (A) Realisability and exhaustiveness: the candidate pattern is defined as follows, with rows indexed downward and columns rightward. Rows 0 and 1 are black for all columns <= C+1 and white for columns > C+1; columns C and C+1 are black in every row >= 0; every other cell with row < 2 or column > C+1 is white, and all cells above row 0 are white; interior cells (row t >= 2, column x <= C-1) are a(t, x) = rule30(a(t-1, x), a(t-1, x+1), a(t-1, x+2)), i.e. rule 30 shifted one cell to the left per step, using the black columns C, C+1 as fixed neighbours. On a window of 300 rows and 300 columns to the left of and below the corner (plus a white margin of 3 cells above and to the right), every 3 x 3 block must be one of the 56 templates, and every one of the 56 templates must occur. (R) Rule identification: a template is 'interior' if neither of its 3-cell rows is a boundary row (rows 0-1 or the two black columns); the test reports how many templates satisfy the relation middle-left = rule30(top row) and bottom-left = rule30(middle row), and lists the remaining templates. (U) No periodic alternative: for every horizontal period w = 1..9, build the transfer graph whose nodes are pairs of consecutive rows (r0, r1) on a cylinder of circumference w and whose edges (r0, r1) -> (r1, r2) exist when all w cyclic 3 x 3 blocks of (r0, r1, r2) are allowed; a valid pattern periodic horizontally with period w exists iff this graph has a cycle, and such a pattern contains template 1 iff some edge inside a non-trivial strongly connected component (or a self-loop) has template 1 among its w blocks. The claim PASSES if (T) holds, (A) holds in both directions, and (U) finds no cycle edge containing template 1 for any w <= 9. (R) is reported, not decisive." ;
+    delphi:disconfirmingObservation "Pre-registered. If (U) finds a cyclic (doubly periodic) pattern containing template 1 the uniqueness part of the claim is REFUTED (a second pattern satisfies the constraint). If (T) fails the result is 'inconclusive' (reason: transcription). If (A) fails in the subset direction (the candidate pattern contains a disallowed block) the result is 'inconclusive' (the pattern definition inferred from the templates is wrong, not the claim), unless the failing blocks are interior rule-30 blocks, in which case the templates do not encode rule 30 and the claim is refuted. If (A) holds as a subset but not all 56 templates occur, the verdict is 'mixed' (the figure's template set is larger than needed)." ;
+    delphi:admissibleDatasets "Planned datasets: nks-p221-templates-figure, shifted-rule30-pattern" ;
+    delphi:inferenceMethod "analysis.py downloads fig-c.png (46,304 bytes), reads the 56 templates from the 14 x 4 grid by sampling 9 x 9 pixel patches at the 3 x 3 cell centres, checks that they are distinct and strictly decreasing as 9-bit numbers, builds the candidate pattern (two-row black band, two-column black wall, interior shifted rule 30) on a 300 x 300 window, enumerates its 3 x 3 blocks, tallies the shifted-rule-30 relation over templates, and for horizontal periods w = 1..11 builds the transfer graph on pairs of cylinder rows (4^w nodes), finds strongly connected components with scipy and counts cycle edges containing template 1. Outputs in derived/templates.csv and derived/periodic_search.json; runtime about 4 minutes (w = 11 dominates)." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "analysis.py downloads fig-c.png (46,304 bytes), reads the 56 templates from the 14 x 4 grid by sampling 9 x 9 pixel patches at the 3 x 3 cell centres, checks that they are distinct and strictly decreasing as 9-bit numbers, builds the candidate pattern (two-row black band, two-column black wall, interior shifted rule 30) on a 300 x 300 window, enumerates its 3 x 3 blocks, tallies the shifted-rule-30 relation over templates, and for horizontal periods w = 1..11 builds the transfer graph on pairs of cylinder rows (4^w nodes), finds strongly connected components with scipy and counts cycle edges containing template 1. Outputs in derived/templates.csv and derived/periodic_search.json; runtime about 4 minutes (w = 11 dominates)." ;
+    rdfs:comment "Measured: 0 number of cycle edges (doubly periodic valid patterns, periods 1-9) containing template 1; 0 = no periodic competitor (n = 1546, exhaustive for periods 1-9 (pre-registered) and 10-11 (supplementary)). Interpretation: The caption on p. 221 states that only the 56 templates may occur anywhere, that the first template must appear at least once, and that the pattern required is a shifted version of the rule-30 evolution. Uniqueness on the infinite plane cannot be verified by finite computation; this test checks (i) that the published template set is actually satisfied by, and derived from, a shifted rule-30 pattern and (ii) the strongest finite consequence of uniqueness that is cheap to check: no spatially periodic competitor exists for periods up to 9 (a doubly periodic pattern containing template 1 would be a counterexample). Disclosed calibration before this pre-registration: the templates were extracted once to design the extraction check (56 distinct, strictly decreasing); a tally found 46 of the 56 templates satisfy the left-target shifted rule-30 relation; and constraint propagation from two black rows over a 45-column window determined rows 2-4 of the pattern (the double black column with white to its right and the rule-30 growth to its left), which is how the candidate pattern above was inferred. No pattern beyond row 4, no exhaustiveness count and no periodic search was computed before pre-registration." ;
+    delphi:evidenceAgainst "Pre-registered decision: all three decisive parts hold. (T) The automatic transcription yields 56 distinct templates in strictly decreasing binary order with no ambiguous cells. (A) The candidate pattern (two-row black band, two-column black wall below its right end, interior a(t,x) = rule30(a(t-1,x), a(t-1,x+1), a(t-1,x+2)) growing leftwards from the wall) contains exactly the 56 templates on a 300 x 300 window: no disallowed block and no unused template, so the published set is precisely the block set of this shifted rule-30 pattern. (U) No horizontally periodic valid pattern of period 1-9 (and, supplementary, 10-11) contains template 1." ;
+    delphi:evidenceAgainst "(R) 46 of the 56 templates satisfy the shifted rule-30 relation in both row pairs; the 10 others (templates 1, 2, 3, 10, 45, 46, 47, 51, 52, 53) are the band, wall and corner templates, consistent with the construction being 'derived from rule 30' plus boundary structures." ;
+    delphi:evidenceAgainst "Uniqueness on the infinite plane is not finitely verifiable; what was shown is that no spatially periodic alternative with period <= 11 exists. Periodic patterns without template 1 do exist for every period tested (e.g. the all-white plane; 47 distinct templates appear on cycles), which is why the caption requires template 1 to appear at least once. The pattern is unique only up to translation, and its interior is 'largely random' in the sense that rule 30 from this boundary is (not separately tested here)." ;
+    delphi:evidenceAgainst "The candidate pattern was inferred from the templates by constraint propagation over rows 2-4 before pre-registration (disclosed); the exact figure layout (band thickness, wall) was read from the inset of fig-a and confirmed by (A). Template extraction depends on fixed pixel coordinates for this image version (sha256 recorded)." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-20--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-20--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-20/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-20--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: NKS p. 221, figure of the 56 allowed 3x3 templates (fig-c.png, online edition)" ;
+    dct:description "source of the 56 templates (transcribed automatically by analysis.py)" ;
+    delphi:hasChecksum "sha256:0d15068337df14af7bde56836a4c9d48677768c80bb0dcf13cf223d020b7c058" ;
+    prov:atLocation <https://www.wolframscience.com/nks/pages/p221--systems-based-on-constraints/fig-c.png> ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p221--systems-based-on-constraints/> ;
+    dct:license "copyright Stephen Wolfram LLC; image read for research" .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-20--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Shifted rule-30 pattern with boundary band and column (generated by analysis.py)" ;
+    dct:description "candidate pattern whose 3x3 blocks are compared with the templates" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p221--systems-based-on-constraints/> ;
+    dct:license "generated data" .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch05-20> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch05-20--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-20/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/wolfram-nks-claim-tests-106e)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.687Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch05-20: supports, confidence 0.8" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch05-20--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

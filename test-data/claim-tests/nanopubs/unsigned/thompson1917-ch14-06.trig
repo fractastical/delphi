@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch14-06--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch14-06: supports, confidence 0.85" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.85"^^xsd:double ;
+    delphi:hypothesis "Within one species, heads (or cones) carrying a given parastichy pair are split about equally between the two chiralities: the larger parastichy family runs clockwise in roughly half of specimens and anticlockwise in the other half, as in Thompson's 224 right-handed versus 243 left-handed among 467 five-eight spruce cones." ;
+    delphi:passCriterion "Pre-registered. In the Turing's Sunflowers data (Helianthus annuus), restrict to heads with both a clockwise and an anticlockwise parastichy count that together form an adjacent pair of one Fibonacci-type sequence (Fibonacci, Lucas, double Fibonacci or F4, as defined by Swinton et al. 2016). Define a head as right-handed when its larger family is clockwise. Pooled over all such heads, the proportion p of right-handed heads must satisfy |p - 0.5| <= 0.10 and a two-sided exact binomial test against 0.5 must give P >= 0.05. In addition, in each pair class with n >= 20 heads, |p - 0.5| <= 0.15 or the binomial P >= 0.05. Primary counts are the photoreviewed counts (author's annotation file); the submitter counts are a secondary replication." ;
+    delphi:failCriterion "Pre-registered. Pooled |p - 0.5| > 0.10 with two-sided exact binomial P < 0.01 (a substantial and significant excess of one chirality), or the same pattern in the two most frequent pair classes. Any other outcome is 'mixed' (e.g. a small but significant bias with |p - 0.5| <= 0.10) or 'inconclusive' (fewer than 100 usable heads: underpowered)." ;
+    delphi:expectedObservation "Pre-registered. In the Turing's Sunflowers data (Helianthus annuus), restrict to heads with both a clockwise and an anticlockwise parastichy count that together form an adjacent pair of one Fibonacci-type sequence (Fibonacci, Lucas, double Fibonacci or F4, as defined by Swinton et al. 2016). Define a head as right-handed when its larger family is clockwise. Pooled over all such heads, the proportion p of right-handed heads must satisfy |p - 0.5| <= 0.10 and a two-sided exact binomial test against 0.5 must give P >= 0.05. In addition, in each pair class with n >= 20 heads, |p - 0.5| <= 0.15 or the binomial P >= 0.05. Primary counts are the photoreviewed counts (author's annotation file); the submitter counts are a secondary replication." ;
+    delphi:disconfirmingObservation "Pre-registered. Pooled |p - 0.5| > 0.10 with two-sided exact binomial P < 0.01 (a substantial and significant excess of one chirality), or the same pattern in the two most frequent pair classes. Any other outcome is 'mixed' (e.g. a small but significant bias with |p - 0.5| <= 0.10) or 'inconclusive' (fewer than 100 usable heads: underpowered)." ;
+    delphi:admissibleDatasets "Planned datasets: turings-sunflowers-dryad-f9k77" ;
+    delphi:inferenceMethod "fetch.py downloads the two spreadsheets (Dryad serves them behind a browser proof-of-work challenge; the files were obtained with headless Chrome, checksummed, and a 49 KB derived table committed under derived/). analysis.py parses the photoreviewed counts (best estimate before any parenthesised range), keeps heads whose two counts are adjacent members of the Fibonacci, Lucas, double-Fibonacci or F4 sequence, and scores a head right-handed if the larger family is clockwise. The proportion right-handed is tested against 0.5 with a two-sided exact binomial test, pooled and within each pair class; the submitter counts are analysed the same way as a replication." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "fetch.py downloads the two spreadsheets (Dryad serves them behind a browser proof-of-work challenge; the files were obtained with headless Chrome, checksummed, and a 49 KB derived table committed under derived/). analysis.py parses the photoreviewed counts (best estimate before any parenthesised range), keeps heads whose two counts are adjacent members of the Fibonacci, Lucas, double-Fibonacci or F4 sequence, and scores a head right-handed if the larger family is clockwise. The proportion right-handed is tested against 0.5 with a two-sided exact binomial test, pooled and within each pair class; the submitter counts are analysed the same way as a replication." ;
+    rdfs:comment "Measured: 0.5257 proportion of heads whose larger parastichy family runs clockwise (photoreviewed counts) (n = 272, exact 95% CI 0.465-0.586; two-sided binomial P = 0.43). Interpretation: Thompson's 'direction' of the five-series (right- versus left-handed spiral) is mapped to the chirality of the larger parastichy family of a Fibonacci-type pair, scored as clockwise or anticlockwise in a fixed viewing convention (the seed face of the head as photographed). Thompson's own counts are of Norway spruce cones; no public per-cone table of those counts exists, so the test is a replication in another phyllotactic system (sunflower capitula), which the claim explicitly extends to ('phyllotactic systems generally'). Thompson's own 224:243 split is reported alongside for comparison but is not used as data." ;
+    delphi:evidenceAgainst "The test is on sunflower capitula, not on the Norway spruce cones Thompson cites; his spruce tally is not available as a per-cone dataset and was not re-analysed." ;
+    delphi:evidenceAgainst "The sample is a citizen-science collection of mostly one cultivated species grown in many gardens; counts are subjective, but handedness (which family is larger and which way it runs) is robust to small count errors." ;
+    delphi:evidenceAgainst "Heads whose two counts did not form an adjacent Fibonacci-type pair (about 40% of photoreviewed heads with two counts) were excluded by the pre-registered rule; chirality in disordered heads is not tested." ;
+    delphi:evidenceAgainst "The 21/34 class (n = 29) leans right-handed (20:9, P = 0.06); it passes the pre-registered class rule only through its P value, and the two large classes lean in opposite directions, consistent with chance." ;
+    delphi:evidenceAgainst "The pass criterion tolerates a true bias of up to 10 percentage points; the 95% CI (0.465-0.586) excludes biases larger than about 9 points in either direction." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch14-06--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch14-06/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch14-06--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Data from: Novel Fibonacci and non-Fibonacci structure in the sunflower: results of a citizen science experiment (Turing's Sunflowers)" ;
+    dct:description "chirality of the larger parastichy family in Helianthus annuus heads" ;
+    delphi:hasChecksum "sha256:1ae05773075326e64bd110bdd5dd90a6d78986d2fdff67936532ac51167b883d" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/4662> ;
+    delphi:hasChecksum "sha256:b3df75b467d92c08eb58a5a78576aa2ee5937153de7640b3ef8df14bd143f408" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/4663> ;
+    delphi:hasChecksum "sha256:f0fe52a415366cdd568c260739eaca90e867d3db687878bd800ce731799ab8d4" ;
+    prov:atLocation <https://datadryad.org/downloads/file_stream/4664> ;
+    prov:wasDerivedFrom <https://datadryad.org/dataset/doi:10.5061/dryad.f9k77> ;
+    dct:license "CC0 1.0" .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch14-06> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch14-06--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch14-06/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5-1-thinking-high; cursor/thompson-claim-tests-6e84)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5-1-thinking-high" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.675Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch14-06: supports, confidence 0.85" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch14-06--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

@@ -1,0 +1,91 @@
+{
+  "claim_id": "levin-2022-tame-19",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-tame-19",
+  "project": "levin-papers",
+  "status": "complete",
+  "hypothesis": "Second half of the claim: mouse learning-or-memory genes are over-represented among genes whose mutants show cancer, regeneration or embryogenesis phenotypes, beyond what their depth of phenotyping explains.",
+  "pass_criterion": "Pre-registered: for each of the three outcome categories (cancer, regeneration, embryogenesis), the Mantel-Haenszel odds ratio of the learning-or-memory set versus the outcome set, stratified by deciles of each gene's number of distinct MP phenotype terms, is > 1.5 with one-sided Cochran-Mantel-Haenszel p < 0.001. The claim is supported if all three pass.",
+  "fail_criterion": "Pre-registered: the claim is refuted if the stratified odds ratio is <= 1.2 or p >= 0.05 in at least two of the three categories. Any other outcome (for example one or two categories pass) is 'mixed'. Unstratified odds ratios and raw counts ('memory genes appear at all') are reported but are not decisive, because almost any well-studied gene set 'appears' in large phenotype catalogues.",
+  "planned_datasets": [
+    "go-basic-obo",
+    "mgi-gaf",
+    "mp-obo",
+    "mgi-genepheno"
+  ],
+  "interpretation": "'Genetic studies of cancer, regeneration and embryogenesis' are operationalised as mouse mutant phenotypes curated by MGI (MGI_GenePheno.rpt: genotypes with a mutation in one marker), mapped to genes by MGI marker ID. Outcome sets, each with all MP is_a descendants: cancer = MP:0002006 neoplasm; embryogenesis = MP:0001672 abnormal embryo development or MP:0008762 embryonic lethality; regeneration = every MP term whose label contains 'regenerat' (MP has no single regeneration parent; this includes e.g. MP:0002658 abnormal liver regeneration, MP:0000750 abnormal muscle regeneration, MP:0004858 abnormal nervous system regeneration). 'Memory genes' are defined as in the first-half test (test-data/claim-tests/levin-papers/levin-2022-tame-19): GO:0007611 learning or memory and descendants, experimental evidence codes only, so the memory set is defined independently of the MP outcome annotations. The universe is genes with at least one MP annotation in MGI_GenePheno.rpt and at least one experimental GO BP annotation. The claim's second half has no 'beyond ion channels' qualifier, so the primary analysis does not exclude channel or synaptic genes; the first-half exclusion is repeated as a secondary analysis. Secondary analyses also report the same test with the memory set defined genetically by MP:0002063 abnormal learning/memory/conditioning, and stratified by GO experimental BP depth instead of MP depth. Secondary analyses do not change the verdict.",
+  "datasets": [
+    {
+      "id": "go-basic-obo",
+      "name": "Gene Ontology, basic edition (go-basic.obo)",
+      "landing_url": "https://geneontology.org/docs/download-ontology/",
+      "doi": null,
+      "version": "current release as retrieved",
+      "license": "CC BY 4.0",
+      "files": [{"download_url": "https://purl.obolibrary.org/obo/go/go-basic.obo", "retrieved_at": "2026-10-31T19:08:23Z", "byte_size": 32227785, "sha256": "b08d45b268b8c24ccb2513dbbbc7d4df9f6521c099b413f79eb31e06e0fa3bcc"}],
+      "role": "GO hierarchy for the learning-or-memory set and the channel/synaptic exclusions"
+    },
+    {
+      "id": "mgi-gaf",
+      "name": "Mouse Genome Informatics GO annotations (GAF 2.2), via the GO Consortium",
+      "landing_url": "https://current.geneontology.org/products/pages/downloads.html",
+      "doi": null,
+      "version": "current release as retrieved",
+      "license": "CC BY 4.0",
+      "files": [{"download_url": "https://current.geneontology.org/annotations/mgi.gaf.gz", "retrieved_at": "2026-10-31T19:08:25Z", "byte_size": 14020707, "sha256": "9b7613f786f9f805531a8f6768f310220d28c82095f938e1212c86f39596ce30"}],
+      "role": "experimental BP annotations defining the memory gene set and the GO side of the universe"
+    },
+    {
+      "id": "mp-obo",
+      "name": "Mammalian Phenotype Ontology",
+      "landing_url": "https://obofoundry.org/ontology/mp.html",
+      "doi": null,
+      "version": "releases/2026-09-23",
+      "license": "CC BY 4.0",
+      "files": [{"download_url": "https://purl.obolibrary.org/obo/mp.obo", "retrieved_at": "2026-10-31T19:08:26Z", "byte_size": 7703610, "sha256": "93bacc7a9731aec917377cf8d8f95e22b12e61d7665d180ce2d2a17d195728d3"}],
+      "role": "phenotype hierarchy for the cancer, embryogenesis and regeneration outcome sets and the MP memory set"
+    },
+    {
+      "id": "mgi-genepheno",
+      "name": "MGI genotypes and Mammalian Phenotype annotations, one mutant marker per genotype (MGI_GenePheno.rpt)",
+      "landing_url": "https://www.informatics.jax.org/downloads/reports/index.html",
+      "doi": null,
+      "version": "current release as retrieved",
+      "license": "MGI terms of use (free for research, cite MGI)",
+      "files": [{"download_url": "https://www.informatics.jax.org/downloads/reports/MGI_GenePheno.rpt", "retrieved_at": "2026-10-31T19:08:31Z", "byte_size": 37705919, "sha256": "d697448c852fa7d329f7524760186ac3c070a257e523a5a1fb71c90293668aa5"}],
+      "role": "mouse mutant phenotypes: the 'genetic studies' of cancer, regeneration and embryogenesis"
+    }
+  ],
+  "method": "fetch.py downloads the four files; analysis.py reuses the first-half test's GO parsing and memory-set definition. The universe is the 9,325 genes with both an MP annotation in MGI_GenePheno.rpt and an experimental GO BP annotation. For each outcome set (MP:0002006 neoplasm; MP:0001672 or MP:0008762 for embryogenesis; the 33 MP terms whose label contains 'regenerat'), it computes the unstratified odds ratio and Fisher test, and the Mantel-Haenszel odds ratio with a one-sided continuity-corrected CMH test over deciles of genes ranked by number of distinct MP terms. Secondary runs exclude channel/synaptic genes, stratify by GO depth instead, or define memory genes by MP:0002063.",
+  "measured": {
+    "value": 0.7349,
+    "unit": "Mantel-Haenszel odds ratio (phenotyping-depth deciles), GO learning-or-memory genes vs MP embryogenesis phenotype genes; cancer and regeneration in extra",
+    "n": 9325,
+    "uncertainty": "one-sided CMH p = 9.696e-01",
+    "extra": {
+      "primary_mh_odds_ratio": {"cancer": 0.6522, "embryogenesis": 0.7349, "regeneration": 0.9375},
+      "primary_cmh_p_one_sided": {"cancer": 0.952, "embryogenesis": 0.9696, "regeneration": 0.6539},
+      "primary_overlap_observed_expected": {"cancer": [15, 21.6], "embryogenesis": [45, 56.55], "regeneration": [3, 3.19]},
+      "memory_genes_go": 255,
+      "secondary_mp_memory_regeneration_mh_odds_ratio": 1.9656,
+      "secondary_mp_memory_regeneration_cmh_p": 0.006607,
+      "verdict_by_preregistered_rule": "refutes"
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "refutes",
+  "confidence": 0.65,
+  "caveats": [
+    "Memory genes do 'appear' in all three kinds of study (15 cancer, 45 embryogenesis and 3 regeneration genes in the primary set), as they would for nearly any gene set this size. The pre-registered test asks whether they appear more than expected; they appear slightly less than expected in all three categories once phenotyping depth is controlled, and no primary or GO-defined secondary analysis reaches significance in the claim's direction.",
+    "The one positive signal is secondary: with memory genes defined by mutant phenotype (MP:0002063, 1,248 genes) the regeneration odds ratio is 1.97 (CMH p = 0.007, 21 observed vs 12.5 expected), spread across nervous-system, liver and muscle regeneration terms. It does not meet the pre-registered p < 0.001 and is the kind of result an extension should test properly.",
+    "Viability bias: a mouse that dies as an embryo cannot be tested for learning, which would push the embryogenesis overlap down. The effect looks modest here (11.7% of MP-memory genes are also embryonic lethal against 14.6% of all phenotyped genes, presumably through heterozygous and conditional alleles), but it biases the embryogenesis comparison against the claim.",
+    "MGI phenotype curation is literature-driven: which phenotypes were looked for depends on each lab's interest, so 'not annotated' is not 'tested and normal'. Depth stratification controls only partly for this. A systematic screen such as IMPC, which runs every knockout through the same pipeline, would be a stronger test for viability, though IMPC barely assays learning or tumours.",
+    "Mouse only. TAME's 'genetic studies' could equally mean planarian RNAi regeneration screens, zebrafish fin-regeneration mutants or human cancer driver lists; those are not tested here.",
+    "MP has no single regeneration parent term; the regeneration set is the union of 33 label-matched terms and is small (95 genes), so that comparison is underpowered (3 overlapping genes)."
+  ],
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local session",
+    "date": "2026-10-31"
+  }
+}

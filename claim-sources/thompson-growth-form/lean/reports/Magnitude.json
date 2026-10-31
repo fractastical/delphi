@@ -1,0 +1,184 @@
+[
+  {
+    "claim_id": "thompson1917-ch02-01",
+    "status": "formalized",
+    "label": "Weight–length coefficient k = W/L³ is constant iff the animal's form is unchanged",
+    "notation": "W = kL^3; form unchanged during growth \\iff k constant",
+    "lean_declaration": "ThompsonLaws.Magnitude.weightCoeff",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.weightCoeff_eq",
+      "ThompsonLaws.Magnitude.weightCoeff_const_iff_form_const"
+    ],
+    "assumptions": "Weight W = ρ · c L³ with constant nonzero density ρ and shape factor c(t) standing for the general form; length nonzero.",
+    "scope_note": "Proves k = ρc, so k is constant over growth iff the shape factor is. Whether real fishes change form while growing is left to data."
+  },
+  {
+    "claim_id": "thompson1917-ch02-02",
+    "status": "formalized",
+    "label": "Greenhill: a self-supporting column's diameter must grow as height^{3/2}",
+    "notation": "d \\propto h^{3/2} (no buckling under own weight); h_{max} \\approx 300\\,\\text{ft} for the Kew-flagstaff pine",
+    "lean_declaration": "ThompsonLaws.Magnitude.greenhillCriticalHeight",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.greenhill_stands_iff",
+      "ThompsonLaws.Magnitude.greenhillMinDiameter_scale"
+    ],
+    "assumptions": "Greenhill's critical-height law h_crit = C d^{2/3}, with C > 0 bundling stiffness, density, gravity and the taper/branching assumptions; d, h ≥ 0.",
+    "scope_note": "Takes Greenhill's buckling result h_crit ∝ d^{2/3} as the definition (the elastic-stability derivation is not formalized) and proves that standing requires d ≥ (h/C)^{3/2}, with the minimum diameter scaling as λ^{3/2} when height scales by λ. The 300 ft limit for the Kew pine depends on measured material constants and is not proved."
+  },
+  {
+    "claim_id": "thompson1917-ch02-03",
+    "status": "formalized",
+    "label": "Strength-to-weight ratio falls as 1/L, bounding the size of animals under gravity",
+    "notation": "strength \\propto L^2, W \\propto L^3 \\Rightarrow strength/W \\propto L^{-1}, so L is bounded above under gravity",
+    "lean_declaration": "ThompsonLaws.Magnitude.strengthToWeight",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.strengthToWeight_eq",
+      "ThompsonLaws.Magnitude.strengthToWeight_size_bound"
+    ],
+    "assumptions": "Strength proportional to cross-section (a L²), weight to volume (b L³), with fixed shape; b, L > 0; supporting the body requires strength/weight ≥ r > 0.",
+    "scope_note": "Proves strength/weight = (a/b)/L and that a required ratio r caps size at L ≤ a/(b r). The elephant being near the limit, and whether real strength scales as L², are empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch02-05",
+    "status": "formalized",
+    "label": "Muscular capacity ∝ L³ outgrows respiratory supply ∝ L², favouring large-animal spurts",
+    "notation": "W_{muscle} \\propto L^3; \\dot{E}_{supply} \\propto S \\propto L^2",
+    "lean_declaration": "ThompsonLaws.Magnitude.burstToSupplyRatio",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.burstToSupplyRatio_eq",
+      "ThompsonLaws.Magnitude.burst_advantage_exceeds_supply_advantage"
+    ],
+    "assumptions": "Muscular (burst) capacity a L³ and energy-supply rate b L² for similar animals; a, b > 0; 0 < L₁ < L₂.",
+    "scope_note": "Proves the capacity-to-supply ratio grows linearly in L and that a larger animal's burst advantage (L₂/L₁)³ exceeds its sustained-supply advantage (L₂/L₁)². The predictions about equal yearly distance, fatigue curves and staying power are not derived from these scalings alone and are left to observation."
+  },
+  {
+    "claim_id": "thompson1917-ch02-06",
+    "status": "formalized",
+    "label": "Flight work ∝ L^{7/2} vs muscle work ∝ L³: flight ~1.4× harder per doubling of size",
+    "notation": "V_{min} \\propto L^{1/2}; W_{flight} = mV^2 \\propto L^{7/2}; W_{muscle} \\propto L^3; per doubling of L: 2^{7/2} : 2^3 \\approx 1.4 : 1",
+    "lean_declaration": "ThompsonLaws.Magnitude.flightWork",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.flightSpeed_of_balance",
+      "ThompsonLaws.Magnitude.flightWork_sq",
+      "ThompsonLaws.Magnitude.flightWork_double",
+      "ThompsonLaws.Magnitude.flightDifficulty_double"
+    ],
+    "assumptions": "Thompson's equations: weight c₁ l³ balanced by momentum m V of downthrust air with m = c₂ l² V; flight work m V²; muscular work μ l³; all constants and l positive.",
+    "scope_note": "Proves V = √((c₁/c₂) l), W² = c² k³ l⁷ (W ∝ l^{7/2}), that doubling l multiplies W by 2³√2, and that required/available work rises by √2 ∈ (1.4, 1.42) per doubling. Real birds' aerodynamics beyond Thompson's momentum model are not addressed."
+  },
+  {
+    "claim_id": "thompson1917-ch02-09",
+    "status": "formalized",
+    "label": "Borelli's law: similarly built animals jump to the same actual height",
+    "notation": "impulse \\propto M \\Rightarrow v_0 independent of L; jump height h = v_0^2/2g independent of L",
+    "lean_declaration": "ThompsonLaws.Magnitude.jumpHeight",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.jumpHeight_borelli",
+      "ThompsonLaws.Magnitude.jumpHeight_same_actual"
+    ],
+    "assumptions": "Take-off velocity v₀ = x/M and ballistic height v₀²/2g; impulse x = β M (proportional to muscle volume, hence body mass); M ≠ 0.",
+    "scope_note": "Proves the jump height β²/2g is independent of mass, so any two sizes jump equally high. The advantage of longer levers in larger animals and actual jump data are not modelled."
+  },
+  {
+    "claim_id": "thompson1917-ch02-10",
+    "status": "formalized",
+    "label": "Swimming, flight and pendulum walking all give velocity ∝ √(linear size)",
+    "notation": "V \\propto L^{1/2} for swimming (Froude), flight (minimum speed) and walking (pendulum leg)",
+    "lean_declaration": "ThompsonLaws.Magnitude.VelocityScalesAsSqrt",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.froudeSpeed_sqrt",
+      "ThompsonLaws.Magnitude.flightSpeed_sqrt",
+      "ThompsonLaws.Magnitude.pendulumWalkSpeed_sqrt",
+      "ThompsonLaws.Magnitude.locomotion_speed_sqrt"
+    ],
+    "assumptions": "Swimming at a fixed Froude number V = Fr √(gL); flight speed from the momentum balance V = √(k L); walking with stride a L per pendulum period 2π√(L/g); g > 0, k ≥ 0.",
+    "scope_note": "Proves each of the three speed laws has the form C √L for all L > 0. Differences in mechanical construction (lever use, bent legs in running) that Thompson sets aside are not modelled."
+  },
+  {
+    "claim_id": "thompson1917-ch02-12",
+    "status": "formalized",
+    "label": "Constant surface-to-mass ratio requires a change of form growing with size",
+    "notation": "S/M \\approx \\text{const} maintained by change of form, against S/M \\propto L^{-1} for similar forms",
+    "lean_declaration": "ThompsonLaws.Magnitude.surfaceToMass",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.surfaceToMass_similar",
+      "ThompsonLaws.Magnitude.surfaceToMass_const_iff"
+    ],
+    "assumptions": "Surface σ L² with σ a surface (folding) factor, mass ρ c L³; ρ, c, L nonzero.",
+    "scope_note": "Proves S/M ∝ 1/L for similar forms and that S/M = κ holds iff σ = κ ρ c L, i.e. the folding factor must grow in proportion to size. That villi, spiral valves and brain convolutions actually do this is the empirical part."
+  },
+  {
+    "claim_id": "thompson1917-ch02-15",
+    "status": "formalized",
+    "label": "Cell division raises total surface by n^{1/3} at fixed volume, restoring S/V",
+    "notation": "cell division keeps S/M \\approx \\text{const}; cleavage increases S at constant V and M",
+    "lean_declaration": "ThompsonLaws.Magnitude.sphereSurface",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.division_total_surface",
+      "ThompsonLaws.Magnitude.division_increases_surface",
+      "ThompsonLaws.Magnitude.division_restores_surface_ratio"
+    ],
+    "assumptions": "Cells modelled as spheres, surface (36π)^{1/3} V^{2/3}; division into n equal spheres at unchanged total volume; V > 0.",
+    "scope_note": "Proves division into n spheres multiplies total surface by n^{1/3} (strictly more for n > 1), and that a cell that doubled its volume and divides restores the daughters' S/V to the original. The surface-energy balance and the mechanism triggering division are not formalized."
+  },
+  {
+    "claim_id": "thompson1917-ch03-07",
+    "status": "formalized",
+    "label": "Weight varies as the cube of length whatever the law of linear growth",
+    "notation": "W \\propto L^3 whatever the law of growth L(t)",
+    "lean_declaration": "ThompsonLaws.Magnitude.weightOfLength",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.weightOfLength_ratio",
+      "ThompsonLaws.Magnitude.weightOfLength_hasDerivAt"
+    ],
+    "assumptions": "Fixed form and density, W = k L³ with k ≠ 0; arbitrary length curve L(t), differentiable where the rate is taken.",
+    "scope_note": "Proves W(t)/W(s) = (L(t)/L(s))³ for any growth law and dW/dt = 3kL² dL/dt, so the weight curve's shape differs from the stature curve. The part not explained by the cube law (changes of form and density in humans) is empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch03-17",
+    "status": "not-formalized",
+    "label": "Plaice weight–length coefficient k rises to a maximum near 30 cm, then declines",
+    "notation": "k = W/L^3 not constant in plaice; \\max_L k at L \\approx 30\\,\\text{cm}",
+    "reason": "Purely empirical: the shape of k(L) and the location of its maximum come from plaice measurements. The definition k = W/L³ is already formalized as weightCoeff for thompson1917-ch02-01; nothing further can be proved without data."
+  },
+  {
+    "claim_id": "thompson1917-ch03-21",
+    "status": "formalized",
+    "label": "Van 't Hoff's law: a rise of n degrees multiplies growth rate by xⁿ",
+    "notation": "v(\\theta + n) = x^n v(\\theta) for a rise of n degrees; temperature coefficient of growth x^{10} \\approx 2\\text{--}3",
+    "lean_declaration": "ThompsonLaws.Magnitude.vantHoffRate",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.vantHoffRate_shift",
+      "ThompsonLaws.Magnitude.vantHoffRate_q10"
+    ],
+    "assumptions": "Rate v(θ) = v₀ x^θ with per-degree coefficient x > 0, within the normal temperature range; v₀ ≠ 0.",
+    "scope_note": "Proves v(θ + n) = xⁿ v(θ) and that the ten-degree coefficient is x^{10}. That growth follows this law, and the value 2–3 per 10 °C, are empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch03-23",
+    "status": "formalized",
+    "label": "Seasonal growth as a damped annual sine curve that fades as growth slows",
+    "notation": "L(t) = \\bar{L}(t) + A(t)\\sin(2\\pi t / 1\\,\\text{yr}), A(t) \\to 0 as d\\bar{L}/dt \\to 0 (damped sine)",
+    "lean_declaration": "ThompsonLaws.Magnitude.seasonalGrowth",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.seasonalGrowth_damped",
+      "ThompsonLaws.Magnitude.seasonalGrowth_annual"
+    ],
+    "assumptions": "Length L̄(t) + A(t) sin(2πt) with t in years; amplitude proportional to the growth rate, A(t) = c r(t), with r(t) → 0.",
+    "scope_note": "Proves the seasonal term has a one-year period and that the deviation from the mean curve tends to 0 as the growth rate does. That plaice, haddock and humans grow this way is empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch03-30",
+    "status": "formalized",
+    "label": "Regenerative growth velocity falls as an inverse power of time, V T² ≈ const",
+    "notation": "V^m T^n = \\text{const}; for regenerating tadpole tails V T^2 \\approx \\text{const}",
+    "lean_declaration": "ThompsonLaws.Magnitude.regenVelocity",
+    "lean_theorems": [
+      "ThompsonLaws.Magnitude.regen_log_linear",
+      "ThompsonLaws.Magnitude.regenVelocity_family",
+      "ThompsonLaws.Magnitude.regenVelocity_decreasing"
+    ],
+    "assumptions": "V^m T^n = K with V, T > 0 and m ≠ 0; for tadpole tails m = 1, n = 2, V = C/T² with C > 0.",
+    "scope_note": "Proves the family is linear in log coordinates, log V = (log K − n log T)/m, that V = C/T² is its m = 1, n = 2 member, and that V decreases with T. That tadpole-tail data fit n/m ≈ 2 is empirical."
+  }
+]

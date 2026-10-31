@@ -1,0 +1,83 @@
+{
+  "claim_id": "thompson1917-ch07-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-08",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "If regular hexagonal packing arises only where cells are uniform in size (and forces uniform), then within an epithelium that Thompson names as the showcase of regular hexagons, the retinal pigment epithelium, the local regularity of the cell polygons must track the local uniformity of cell size: regions whose cells are more uniform in area must have a higher fraction of six-sided cells and a lower spread of neighbour numbers than regions whose cells vary more in area.",
+  "pass_criterion": "Pre-registered. For every corrected RPE segmentation ROI of the 10 participants in Granger et al. 2018 (in vivo adaptive-optics imaging of the human RPE mosaic), identify the cells not touching the ROI border, their pixel areas and their numbers of neighbours. For ROIs with >= 30 interior cells compute the coefficient of variation of cell area (CV_A), the fraction of six-sided cells (f6) and the standard deviation of neighbour number (SD_n). The claim is supported if, across ROIs, Spearman's rho between f6 and CV_A is <= -0.3 with p < 0.01, and the mean f6 of the quartile of ROIs with the lowest CV_A exceeds that of the highest-CV_A quartile by at least 0.10 (ten percentage points). SD_n versus CV_A (expected positive) is reported as a consistency check.",
+  "fail_criterion": "Pre-registered. The claim is refuted if Spearman's rho between f6 and CV_A is >= 0, or if the relation is not significant (p >= 0.05) with the quartile difference in f6 below 0.05, i.e. hexagon regularity does not track size uniformity. Intermediate results (e.g. significant but weak, rho in (-0.3, 0)) are 'mixed'. If fewer than 20 ROIs qualify the verdict is inconclusive (underpowered).",
+  "planned_datasets": [
+    "dryad-b41j15h-granger-2018-human-rpe-aoslo-mosaic"
+  ],
+  "interpretation": "Thompson's statement is comparative across tissues: perfectly regular hexagons where cells are uniform (retinal pigment epithelium) and irregular polygons where cell sizes vary (intestinal epithelium, parenchyma). No public dataset gives comparable per-cell segmentations of all three tissues, so the test is run within the tissue he names as the regular case, using natural variation in cell-size uniformity between regions of the human RPE mosaic (different retinal eccentricities and individuals). 'Regular hexagons' is operationalized topologically as the fraction of six-sided cells and the spread of neighbour numbers; 'uniform in size' as the coefficient of variation of apical cell area within the same region. 'Uniform forces' is not measured; the RPE as a non-proliferating monolayer under hydrostatic pressure is Thompson's own example of uniform forces, so the test isolates the size-uniformity part of his claim. Before this pre-registration only the Dryad file listing, the dataset README and the TIFF header tags (image size, bit depth, compression) of one participant's files were inspected, to confirm the segmentation images are readable; no cell outlines or measurements were examined. Post hoc data-cleaning rule (needed once the images were seen): the corrected segmentations cover only part of each 184 x 184 px ROI, leaving one large unsegmented component around the segmented patch; components with area > 3x the median interior cell area were treated as unsegmented regions and cells adjacent to them were excluded because their neighbour counts are incomplete.",
+  "datasets": [
+    {
+      "id": "dryad-b41j15h-granger-2018-human-rpe-aoslo-mosaic",
+      "name": "Data from: Human retinal pigment epithelium: in vivo cell morphometry, multispectral autofluorescence, and relationship to cone mosaic (Granger, Zhang, Liu, Morgan, Rossi, Williams 2018, Invest Ophthalmol Vis Sci 59:5705-5716)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.b41j15h",
+      "doi": "10.5061/dryad.b41j15h",
+      "version": "1 (published 2018)",
+      "license": "CC0 1.0",
+      "files": [
+        {"download_url": "https://datadryad.org/downloads/file_stream/92638", "retrieved_at": "2026-10-31T04:40:00Z", "byte_size": 6982393, "sha256": "c677fbbf0bd1894691bd93b727c6b28e6d3d3732dced5006404ebbb79141ea53"},
+        {"download_url": "https://datadryad.org/downloads/file_stream/92640", "retrieved_at": "2026-10-31T04:40:02Z", "byte_size": 6904757, "sha256": "c7af6e2774c98d8fefd6e131691b6848c8b478e985032861d2648f97b81a16be"},
+        {"download_url": "https://datadryad.org/downloads/file_stream/92642", "retrieved_at": "2026-10-31T04:40:03Z", "byte_size": 8330184, "sha256": "021b5ce4fa25167a7ce6a133583c98643a2a6983c415e271f28e4ddd7c604e6f"},
+        {"download_url": "https://datadryad.org/downloads/file_stream/92644", "retrieved_at": "2026-10-31T04:40:04Z", "byte_size": 9057834, "sha256": "bf7c2fc8401947dad8cb908d134f3a0886f037f4084260369fe414f638a0751b"},
+        {"download_url": "https://datadryad.org/downloads/file_stream/92646", "retrieved_at": "2026-10-31T04:40:06Z", "byte_size": 6823924, "sha256": "bc613d2a7f74793048e703585938212157ee5cc1963fa06313ecd0668650cac1"},
+        {"download_url": "https://datadryad.org/downloads/file_stream/92648", "retrieved_at": "2026-10-31T04:40:08Z", "byte_size": 18551881, "sha256": "62657611b8f3a7f4b1aa44f6b739125fd8764aefd8da73907bbdeca851335d8c"},
+        {"download_url": "https://datadryad.org/downloads/file_stream/92650", "retrieved_at": "2026-10-31T04:40:09Z", "byte_size": 7649502, "sha256": "b8d915c161efda61b015c484aed6c8e1bc7a41e575c2fac02526eec60f8a0654"},
+        {"download_url": "https://datadryad.org/downloads/file_stream/92652", "retrieved_at": "2026-10-31T04:40:10Z", "byte_size": 7250557, "sha256": "d47ea6c78bf0b537d1b188256bd4518218de5a08e3603074eb09f16a967d3ee4"},
+        {"download_url": "https://datadryad.org/downloads/file_stream/92654", "retrieved_at": "2026-10-31T04:40:12Z", "byte_size": 7709815, "sha256": "3b5780f546073ec1117ac77b7cfebe8b4e7535410f05f3574fa57397d58f947f"},
+        {"download_url": "https://datadryad.org/downloads/file_stream/92656", "retrieved_at": "2026-10-31T04:38:40Z", "byte_size": 5112760, "sha256": "0ed12de07fb7b5a8394652eb9a63b98e95c63e7a593acf0122d26280b27faf8c"}
+      ],
+      "role": "Participant archives NOR011, NOR025, NOR047, NOR053, NOR057, NOR062, NOR063, NOR064, NOR065, NOR073; the 'RPE ROIs - Corrected Segmentation' TIFFs (184 x 184 px, ~0.81-0.92 um/px, grader-corrected cell boundaries) were used; 206 ROIs in total"
+    }
+  ],
+  "method": "Each corrected-segmentation TIFF was decoded with a minimal TIFF reader; cells were taken as 4-connected components of non-boundary pixels and two cells counted as neighbours when their labels co-occur in the 3 x 3 neighbourhood of a boundary pixel. Cells touching the image border, oversized components (unsegmented area) and cells adjacent to oversized components were excluded, leaving 813 fully-surrounded cells in the 21 ROIs (8 participants) with at least 30 counted cells. Per ROI, CV of pixel area, fraction of six-sided cells and SD of neighbour number were computed; Spearman correlations across ROIs and the f6 difference between the lowest- and highest-CV_A quartiles were evaluated against the pre-registered thresholds. A non-pre-registered sensitivity analysis repeated the correlation with 15- and 20-cell minimum thresholds.",
+  "measured": {
+    "value": -0.71,
+    "unit": "Spearman rho between fraction of six-sided cells and coefficient of variation of cell area, across RPE regions",
+    "n": 21,
+    "uncertainty": "p = 3.1e-4 (n = 21 ROIs, 813 cells)",
+    "extra": {
+      "spearman_rho_sdsides_vs_cv_area": 0.77,
+      "p_value_sd": 4.4e-05,
+      "f6_lowest_cv_quartile": 0.626,
+      "f6_highest_cv_quartile": 0.478,
+      "f6_quartile_difference": 0.148,
+      "cv_area_quartile_means": [0.235, 0.385],
+      "ols_f6_on_cv_area_slope": -0.667,
+      "ols_r2": 0.286,
+      "overall_mean_f6": 0.541,
+      "overall_mean_cv_area": 0.302,
+      "overall_mean_sides": 5.945,
+      "f6_range": [0.421, 0.768],
+      "cv_area_range": [0.22, 0.508],
+      "n_rois_total": 206,
+      "n_participants": 8,
+      "sensitivity_not_preregistered": {
+        "min_15_cells": {"n_rois": 82, "rho": -0.24, "p": 0.0296, "within_participant_rho_mean": -0.163, "n_participants_with_ge6_rois": 7},
+        "min_20_cells": {"n_rois": 57, "rho": -0.265, "p": 0.0467, "within_participant_rho_mean": -0.145, "n_participants_with_ge6_rois": 6}
+      },
+      "decision": {
+        "pass_rho_le_minus_0_3_and_p_lt_0_01": true,
+        "pass_quartile_diff_ge_0_10": true,
+        "fail_rho_ge_0": false,
+        "fail_nonsignificant_and_small": false,
+        "underpowered": false
+      }
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.65,
+  "caveats": [
+    "Within-tissue test only: the comparative part of Thompson's statement (RPE versus intestinal epithelium and parenchyma) was not tested because no comparable public per-cell segmentations of those tissues were found; what is tested is the stated rule that hexagonal regularity tracks uniformity of cell size, inside the tissue he names as the regular case.",
+    "Only 21 ROIs (8 of 10 participants) reach the pre-registered 30-cell minimum, because the grader-corrected segmentations cover only part of each ROI and peripheral cells adjacent to unsegmented area had to be dropped. With looser thresholds (15 or 20 cells, 57-82 ROIs) the correlation keeps its sign but weakens to rho = -0.24 to -0.27 (p = 0.03-0.05), as expected when per-ROI estimates become noisier; within-participant correlations are also negative but weak (mean rho about -0.15).",
+    "Even the most uniform regions are far from 'perfectly regular': the fraction of six-sided cells ranges 0.42-0.77 (mean 0.54), so Thompson's 'regular hexagons' in the RPE holds only as a statistical tendency.",
+    "A negative relation between area dispersion and side-number dispersion is partly expected from the geometry of space-filling tessellations (Lewis's law and related size-topology relations); this test confirms that geometric regularity, which is what Thompson asserted, without identifying forces.",
+    "Cell areas are pixel counts inside hand-corrected 1-px boundaries at ~0.85 um/px; segmentation error adds noise to both variables, which attenuates rather than inflates the correlation.",
+    "Dryad downloads are served behind a proof-of-work interstitial (Anubis); analysis.py completes it automatically."
+  ],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/thompson-claim-tests-cf12", "date": "2026-10-31" }
+}

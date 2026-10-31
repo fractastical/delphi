@@ -1,0 +1,121 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch09-14--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch09-14: refutes, confidence 0.95" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "refutes" ;
+    delphi:hasConfidence "0.95"^^xsd:double ;
+    delphi:hypothesis "If oceans have occupied their present areas and continents theirs since the earliest Silurian, then at every time from ~440 Ma to the present the geographic locations now occupied by land were occupied by continental land, and the locations now occupied by ocean were ocean." ;
+    delphi:passCriterion "Pre-registered. Using the GPlates Web Service with the Merdith et al. (2021) plate model, the model's coastline polygons are reconstructed to 440, 400, 350, 300, 250, 200, 150, 100 and 50 Ma. On a 2x2 degree global grid (area-weighted by cos latitude), classify each present-day grid cell as land or ocean from the time-0 coastlines. L_all = area fraction of present land cells that fall inside reconstructed coastline polygons at every one of the nine times; O_all = area fraction of present ocean cells that fall outside them at every time. The claim is SUPPORTED if L_all >= 0.75 and O_all >= 0.75." ;
+    delphi:failCriterion "Pre-registered. The claim is REFUTED if L_all < 0.50 or O_all < 0.50. Intermediate outcomes are 'mixed'. For comparison the per-time fractions (L_t, O_t) and the expected overlap for randomly placed continents (equal to the present land fraction) are reported. The PALEOMAP model is run as a robustness check and is not part of the verdict." ;
+    delphi:expectedObservation "Pre-registered. Using the GPlates Web Service with the Merdith et al. (2021) plate model, the model's coastline polygons are reconstructed to 440, 400, 350, 300, 250, 200, 150, 100 and 50 Ma. On a 2x2 degree global grid (area-weighted by cos latitude), classify each present-day grid cell as land or ocean from the time-0 coastlines. L_all = area fraction of present land cells that fall inside reconstructed coastline polygons at every one of the nine times; O_all = area fraction of present ocean cells that fall outside them at every time. The claim is SUPPORTED if L_all >= 0.75 and O_all >= 0.75." ;
+    delphi:disconfirmingObservation "Pre-registered. The claim is REFUTED if L_all < 0.50 or O_all < 0.50. Intermediate outcomes are 'mixed'. For comparison the per-time fractions (L_t, O_t) and the expected overlap for randomly placed continents (equal to the present land fraction) are reported. The PALEOMAP model is run as a robustness check and is not part of the verdict." ;
+    delphi:admissibleDatasets "Planned datasets: gplates-web-service-merdith2021, gplates-web-service-paleomap" ;
+    delphi:inferenceMethod "Coastline polygons of the MERDITH2021 plate model were downloaded from the GPlates Web Service at 0 Ma and at 440, 400, 350, 300, 250, 200, 150, 100 and 50 Ma, and rasterised by even-odd point-in-polygon onto a 2x2 degree grid (16,200 cells, cos-latitude weighted). Present land (28.8% of the globe, matching the real land fraction) was defined from the 0 Ma coastlines. For each past time the fraction of present land cells lying inside reconstructed coastlines (L_t) and of present ocean cells lying outside them (O_t) was computed, and L_all / O_all as the fractions persisting at all nine times. The same was run with the PALEOMAP model." ;
+    delphi:preregistered false ;
+    delphi:dataKind "physical" ;
+    dct:description "Coastline polygons of the MERDITH2021 plate model were downloaded from the GPlates Web Service at 0 Ma and at 440, 400, 350, 300, 250, 200, 150, 100 and 50 Ma, and rasterised by even-odd point-in-polygon onto a 2x2 degree grid (16,200 cells, cos-latitude weighted). Present land (28.8% of the globe, matching the real land fraction) was defined from the 0 Ma coastlines. For each past time the fraction of present land cells lying inside reconstructed coastlines (L_t) and of present ocean cells lying outside them (O_t) was computed, and L_all / O_all as the fractions persisting at all nine times. The same was run with the PALEOMAP model." ;
+    rdfs:comment "Measured: 0.0007 area fraction of present-day land that lies within reconstructed continental coastlines at all nine times 440-50 Ma (MERDITH2021) (n = 16200, O_all (present ocean that was ocean at all times) = 0.3377; PALEOMAP robustness: L_all = 0.0046, O_all = 0.3436). Interpretation: Darwin's 'where our oceans now extend, oceans have extended' and 'where continents now exist, large tracts of land have existed ... since the earliest silurian period' is read as spatial persistence of land and ocean in a fixed geographic (Earth) frame, which is how he and his contemporaries understood it (he explicitly allows 'great oscillations of level' but not lateral movement). Plate reconstructions place continental crust in a palaeomagnetic / mantle reference frame; the coastline polygons of the plate model are used as the outline of continental land at each time. Modern reinterpretation: the claim is tested against reconstructed continental positions, which did not exist as a concept in 1859; palaeolongitude in the Palaeozoic is uncertain, which could shift overlap either way." ;
+    delphi:evidenceAgainst "At 440 Ma only 22% of present land area lay under reconstructed continental land at the same geographic location, less than the 29% expected if continents were placed at random, and 78% of present ocean area was ocean, close to the random expectation of 71%; essentially no present land (0.07%) was land continuously at all nine times, and only 34% of present ocean was ocean throughout (the Pacific). PALEOMAP gives the same picture (0.5% and 34%)." ;
+    delphi:evidenceAgainst "Plate models place continents in a palaeomagnetic or mantle reference frame; palaeolongitude is poorly constrained in the Palaeozoic, so the exact overlap at 440-300 Ma is uncertain, but no reference-frame choice can keep the Atlantic and Indian Ocean basins (which opened after 200 Ma) in place, so the refutation does not depend on the deep-time frame." ;
+    delphi:evidenceAgainst "The coastline polygons are present-day coastlines carried rigidly with their plates, not palaeo-shorelines; they approximate continental crust rather than emergent land, which if anything favours Darwin's 'large tracts of land' reading." ;
+    delphi:evidenceAgainst "The 2 degree grid and even-odd test treat polygon edges coarsely; this affects the fractions at the percent level only." ;
+    delphi:evidenceAgainst "Darwin's inference (no oceanic island bears Palaeozoic or Secondary formations) remains an accurate observation; it is the inference of fixed continents and oceans that modern plate reconstructions contradict." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch09-14--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch09-14--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch09-14/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch09-14--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: GPlates Web Service, reconstruct/coastlines with model MERDITH2021 (Merdith et al. 2021, Earth-Science Reviews 214:103477)" ;
+    dct:description "reconstructed coastline polygons at nine times and at present" ;
+    delphi:hasChecksum "sha256:de76a58d7a1500589d30fc85c6dca6ac4bfc12dd3b3cc350291f6c266f4678cb" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=0&model=MERDITH2021> ;
+    delphi:hasChecksum "sha256:629fd981d456bfb91bc255fac247499b6c473ca80e3c2c9b71404698ebe382c8" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=440&model=MERDITH2021> ;
+    delphi:hasChecksum "sha256:52960e8d884b3cd8ffae439a9f5a723ea49b97bed0f4888b6cfc0748f545e921" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=400&model=MERDITH2021> ;
+    delphi:hasChecksum "sha256:a947efd968359d0cb67f366fa96de2060983b098c1322b61ab3d6cbe6c3476f1" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=350&model=MERDITH2021> ;
+    delphi:hasChecksum "sha256:3ae70c9bea8c36cfa3b26abedd88b514b33352f7ef85a9d3afab9ce63e59d9b8" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=300&model=MERDITH2021> ;
+    delphi:hasChecksum "sha256:f617e89cdd2ba8d857f24acbe36e5480ac00dca54c9f6570fac80701d0481631" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=250&model=MERDITH2021> ;
+    delphi:hasChecksum "sha256:cd0482f483ed42f0d05e4db0e8d115861f689f576da4eed74065dd5f19d63c0e" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=200&model=MERDITH2021> ;
+    delphi:hasChecksum "sha256:b8e668074d8052411a53b278d49748dd10630055f763e5eabb48642353d29fff" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=150&model=MERDITH2021> ;
+    delphi:hasChecksum "sha256:5274606a18db46740e45b63f6902c9cc4f67353c43513d4463443d8bbcfb1db3" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=100&model=MERDITH2021> ;
+    delphi:hasChecksum "sha256:167a8ae44239ce9dcc8a5449a00b9fe1c34020a1e28aa42cb67930d496a46437" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=50&model=MERDITH2021> ;
+    prov:wasDerivedFrom <https://gws.gplates.org/> ;
+    dct:license "CC BY 4.0 (EarthByte plate models)" .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch09-14--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: GPlates Web Service, reconstruct/coastlines with model PALEOMAP (Scotese PALEOMAP PaleoAtlas)" ;
+    dct:description "robustness check with an independent plate model" ;
+    delphi:hasChecksum "sha256:d9069ee3c988798720f60f4303710fad7e55ffd476173592c3b5598549aef99b" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=0&model=PALEOMAP> ;
+    delphi:hasChecksum "sha256:b516baa0fb313d7d9d294bddfa7e3467d3bbabaac7b5675de28769d67ae23081" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=440&model=PALEOMAP> ;
+    delphi:hasChecksum "sha256:84ea9f07426811933294ec89cb6cf1043024991cb791b9f6b79b44d5ee667ec7" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=400&model=PALEOMAP> ;
+    delphi:hasChecksum "sha256:c35b3344382c3a1bc7f705ad0bab43cd757edef7222c3af147a08fd4c482e87c" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=350&model=PALEOMAP> ;
+    delphi:hasChecksum "sha256:23c225e659cf8d6d72f19d00058e77301a0c8a010c9e50c7581d3708882baf4b" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=300&model=PALEOMAP> ;
+    delphi:hasChecksum "sha256:892339e3cd7b05251ed950be9c10250641901e43a88755dd43c170734162ef20" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=250&model=PALEOMAP> ;
+    delphi:hasChecksum "sha256:c89be184639165131c2723564b801e8050e4180be8700b7e3afb79c5ddc6270c" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=200&model=PALEOMAP> ;
+    delphi:hasChecksum "sha256:60ba135d0d6a9a133c5bfe4cc5701a88b222c563fa0b95600dfca2dbeba3656f" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=150&model=PALEOMAP> ;
+    delphi:hasChecksum "sha256:88ac3c784fa8086f1ef16f82b7987c4ffb38b5b8ac9ee795c67fcf192fdd0b8f" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=100&model=PALEOMAP> ;
+    delphi:hasChecksum "sha256:10d91a90234daf1ef563d7cf9e20d29951c57810314f89769767e470f338cfcf" ;
+    prov:atLocation <https://gws.gplates.org/reconstruct/coastlines/?time=50&model=PALEOMAP> ;
+    prov:wasDerivedFrom <https://gws.gplates.org/> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch09-14> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch09-14--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch09-14/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-b201)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T20:08:31.654Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch09-14: refutes, confidence 0.95" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch09-14--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

@@ -1,0 +1,134 @@
+{
+  "claim_id": "darwin1859-ch12-18",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-18",
+  "project": "darwin-origin",
+  "status": "complete",
+  "hypothesis": "If closer relatives are generally nearer in space and time, then (space, living forms) phylogenetic distance between bird species should correlate positively with the geographic distance between their range centroids, with congeneric pairs closer than confamilial pairs and those closer than pairs from different families of the same order; and (time, fossil forms) genera in the same family should have first appearances closer in geological time than genera in different families of the same order.",
+  "pass_criterion": "Space (all extant birds with a range centroid in AVONET and a tip in the BirdTree Hackett MCC tree supplied with AVONET): (S1) the Spearman correlation between patristic distance and great-circle centroid distance across a fixed random sample of 2,000,000 species pairs is positive, and exceeds all of 99 permutations in which centroids are shuffled among species (p <= 0.01); (S2) median centroid distance is strictly ordered congeneric pairs < confamilial non-congeneric pairs < same-order different-family pairs. Time (Paleobiology Database genera of Mammalia and of Mollusca with first-appearance ages and family/order assignments): (T1) in each of the two groups, the median absolute difference in first-appearance midpoint age between pairs of genera in the same family is smaller than between pairs of genera in different families of the same order, and this difference exceeds all of 99 permutations of family labels within orders (p <= 0.01). The space clause passes if S1 and S2 hold; the time clause passes if T1 holds in both groups. Verdict 'supports' if both clauses pass, 'mixed' if one passes, 'refutes' if neither.",
+  "fail_criterion": "The space clause fails if the Spearman correlation is <= 0 or does not exceed the permutation distribution at p <= 0.01, or if the median distances are not strictly ordered by relatedness. The time clause fails if in either group same-family genus pairs are not closer in first-appearance time than different-family same-order pairs, or the difference is not significant at p <= 0.01 against the within-order permutation null. Both failing refutes the claim.",
+  "planned_datasets": [
+    "avonet-tobias2022-figshare",
+    "pbdb-taxa-first-appearances-mammalia-mollusca"
+  ],
+  "interpretation": "'Related by descent' is measured for living birds as patristic distance on a dated molecular supertree (Jetz et al. 2012 BirdTree, Hackett backbone MCC tree as distributed with AVONET), a modern reinterpretation of Darwin's classification-based relatedness, and for fossils by shared family versus shared order in PBDB taxonomy, which is closer to Darwin's own usage. 'Nearer in geographic space' is the great-circle distance between AVONET breeding-range centroids. 'Nearer in time' is the absolute difference between first-appearance ages (midpoints of PBDB first-appearance age ranges) of genera. Only two living/fossil systems are tested, not 'all organisms'; birds are chosen because tree, taxonomy and centroids come from a single curated source, and mammals and molluscs because they are the best-sampled terrestrial and marine fossil records. Sampling and taxonomic-practice confounds (geography informing species limits; fossils concentrated in a few basins) are noted as caveats rather than corrected.",
+  "datasets": [
+    {
+      "id": "avonet-tobias2022-figshare",
+      "name": "AVONET ELEData.zip: TraitData/AVONET1_BirdLife.csv (range centroids, taxonomy), PhylogeneticData/HackettStage1_0001_1000_MCCTreeTargetHeights.nex (BirdTree Hackett MCC tree, 6670 species) and BirdLife-BirdTree crosswalk.csv",
+      "landing_url": "https://figshare.com/articles/dataset/AVONET_morphological_ecological_and_geographical_data_for_all_birds_Tobias_et_al_2021_Ecology_Letters_/16586228",
+      "doi": "10.6084/m9.figshare.16586228.v7",
+      "version": "figshare v7; paper doi:10.1111/ele.13898; tree from Jetz et al. 2012 doi:10.1038/nature11631",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://ndownloader.figshare.com/files/38429873",
+          "retrieved_at": "2026-10-31T04:33:00Z",
+          "byte_size": 17758930,
+          "sha256": "e7e76dbe5c389753ff73a70d8a09b5fa01a15e75f359b34b01e2602b85e88f32"
+        }
+      ],
+      "role": "phylogenetic distance, range centroids and taxonomy of extant birds"
+    },
+    {
+      "id": "pbdb-taxa-first-appearances-mammalia-mollusca",
+      "name": "Paleobiology Database taxa lists (genus rank) with first/last appearance ages and classification for Mammalia and Mollusca",
+      "landing_url": "https://paleobiodb.org/",
+      "doi": null,
+      "version": "live API data1.2, retrieved 2026-10-31",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Mammalia&rank=genus&show=app%2Cclass&vocab=pbdb",
+          "retrieved_at": "2026-10-31T04:39:58Z",
+          "byte_size": 4366654,
+          "sha256": "12d73586398b55b2a2d0a17c09eddab980f2aaf2a566f31c139c9155f37b66d2"
+        },
+        {
+          "download_url": "https://paleobiodb.org/data1.2/taxa/list.json?base_name=Mollusca&rank=genus&show=app%2Cclass&vocab=pbdb",
+          "retrieved_at": "2026-10-31T04:40:03Z",
+          "byte_size": 8201713,
+          "sha256": "49b29a307e691e90dc114703182cade01e09e6cc5fae653e8931006567f9fb9a"
+        }
+      ],
+      "role": "first-appearance ages and family/order of fossil genera"
+    }
+  ],
+  "method": "Space: 5883 bird species with a one-to-one BirdLife-BirdTree name match, a tree tip and an AVONET range centroid. Patristic distances were computed on the MCC tree; 1999655 random species pairs were drawn and the Spearman correlation between patristic and great-circle centroid distance was compared with 99 permutations of centroids among species; medians of centroid distance were tabulated for congeneric, confamilial and same-order pairs. Time: PBDB accepted genera with family, order and first-appearance ages; within each order, genus pairs (all pairs, or 500000 random pairs for very large orders) were split into same-family and different-family, and the difference of medians of |dFAD| was compared with 99 permutations of family labels within orders.",
+  "measured": {
+    "value": 0.026622678561148156,
+    "unit": "Spearman rho between patristic distance and centroid great-circle distance, bird species pairs",
+    "n": 1999655,
+    "uncertainty": "permutation p = 0.010; permuted rho range -0.0071 to 0.0068",
+    "extra": {
+      "space_birds": {
+        "n_species": 5883,
+        "n_pairs": 1999655,
+        "spearman_rho_phylo_vs_geo": 0.026622678561148156,
+        "perm_p": 0.01,
+        "perm_rho_max": 0.0068182668255908,
+        "perm_rho_min": -0.007055441879149859,
+        "median_geo_km_by_relatedness": {
+          "congeneric": 2994.149038957077,
+          "confamilial_not_congeneric": 3533.3205320240354,
+          "same_order_different_family": 10204.643045284856,
+          "different_order": 10016.978920550588
+        },
+        "n_pairs_by_relatedness": {
+          "congeneric": 2698,
+          "confamilial_not_congeneric": 30633,
+          "same_order_different_family": 710088,
+          "different_order": 1256236
+        },
+        "S1_pass": true,
+        "S2_pass": true,
+        "pass": true
+      },
+      "time_fossil": {
+        "Mammalia": {
+          "n_genera": 4710,
+          "n_orders_used": 41,
+          "n_same_family_pairs": 86045,
+          "n_different_family_pairs": 959707,
+          "median_abs_dFAD_same_family_myr": 7.044150000000001,
+          "median_abs_dFAD_different_family_same_order_myr": 14.60415,
+          "difference_myr": 7.56,
+          "perm_p": 0.01,
+          "perm_diff_max": 1.2249999999999996,
+          "pass": true
+        },
+        "Mollusca": {
+          "n_genera": 9664,
+          "n_orders_used": 95,
+          "n_same_family_pairs": 122289,
+          "n_different_family_pairs": 1886223,
+          "median_abs_dFAD_same_family_myr": 25.400000000000006,
+          "median_abs_dFAD_different_family_same_order_myr": 31.779999999999973,
+          "difference_myr": 6.379999999999967,
+          "perm_p": 0.01,
+          "perm_diff_max": -8.863,
+          "pass": true
+        }
+      },
+      "time_clause_pass": true
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.75,
+  "caveats": [
+    "The overall Spearman correlation between patristic and geographic distance is small (about 0.03) although far outside the permutation null; the relationship is concentrated at shallow phylogenetic depth (congeneric and confamilial pairs) and saturates at the order level, where median centroid distance is no smaller within than between orders.",
+    "Pooled permutation nulls for the fossil clause are not centred on zero because orders differ in family structure and age spread; the observed differences are judged against that null, not against zero.",
+    "Space is tested in one class (birds) and time in two fossil groups at genus level; the claim is stated for all organisms, living and fossil.",
+    "Range centroids collapse each species to a point; sister species with adjacent but large ranges can appear far apart, which weakens rather than inflates the correlation.",
+    "Species limits in birds have historically been drawn partly on geography (allopatric forms), which can tighten the congeneric-pair pattern by construction.",
+    "Fossil first appearances are truncated by sampling and concentrated in well-sampled basins and intervals; genera in the same family are often described from the same formations, which can make same-family FADs look closer than they are.",
+    "Family and order assignments in PBDB are of uneven quality, especially for Mollusca; genera with unassigned family or order were dropped.",
+    "Patristic distance on the BirdTree MCC tree is a model-based divergence estimate, a modern proxy for Darwin's relatedness by descent."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-0e75",
+    "date": "2026-10-31"
+  }
+}
