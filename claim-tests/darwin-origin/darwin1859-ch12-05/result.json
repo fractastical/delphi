@@ -1,0 +1,39 @@
+{
+  "claim_id": "darwin1859-ch12-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-05",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "Oceanic islands have few native vascular plant species but a high proportion of them are endemic (found nowhere else), higher than mainland regions have, even though the islands are far smaller.",
+  "pass_criterion": "Pre-registered. Using the World Checklist of Vascular Plants, for every TDWG level-3 area compute the native accepted species count S and the proportion E/S of those species that are native to no other level-3 area. Oceanic islands are the 63 level-3 areas pre-registered as 'oceanic' in derived/island_classes.csv; the mainland comparison set is every level-3 area not listed in that file as any kind of island. Areas (km2) are computed from the TDWG WGSRPD level-3 polygons. The claim is SUPPORTED if (i) the median S of oceanic islands is below the median S of mainland areas ('scanty'), (ii) the median E/S of oceanic islands with at least 20 native species is at least twice the median E/S of mainland areas, and (iii) at least 70% of oceanic islands with at least 20 native species lie above the mainland regression line of logit(E/S) on log10(area) ('extremely large relative to their area'). Islands with fewer than 20 native species are excluded from (ii) and (iii) because a proportion is unstable for them.",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if the median E/S of oceanic islands is not greater than the mainland median, or if fewer than 50% of oceanic islands lie above the mainland area regression line. Other outcomes are 'mixed'. Supplementary: the fraction of oceanic islands with E/S >= 0.25, and the same statistics for the 'other-island' class (continental and arc islands), are reported.",
+  "planned_datasets": ["kew-wcvp", "tdwg-wgsrpd-level3"],
+  "interpretation": "Darwin's 'oceanic islands' are read as islands of volcanic or coral origin that have never been connected to a continent (list fixed in derived/island_classes.csv before any data were inspected; continental fragments, island arcs adjacent to continents and shelf islands are placed in a separate 'other-island' class). 'Kinds of inhabitants' is restricted to native vascular plant species because that is what WCVP records; introduced species are excluded. 'Found nowhere else in the world' is read as native to exactly one level-3 area, so for mainland areas 'endemic' means endemic to that botanical country, which is the fairest available analogue. Area is included because the claim says the proportion is large relative to the islands' size.",
+  "datasets": [
+    {
+      "id": "kew-wcvp",
+      "name": "World Checklist of Vascular Plants (WCVP), Royal Botanic Gardens, Kew",
+      "landing_url": "https://powo.science.kew.org/about-wcvp",
+      "doi": "10.1038/s41597-021-00997-6",
+      "version": null,
+      "license": "CC BY 3.0 (per README_WCVP.xlsx in the download)",
+      "files": [],
+      "role": "native species per level-3 area and single-area endemics"
+    },
+    {
+      "id": "tdwg-wgsrpd-level3",
+      "name": "TDWG World Geographical Scheme for Recording Plant Distributions, level-3 polygons (GeoJSON, github.com/tdwg/wgsrpd)",
+      "landing_url": "https://github.com/tdwg/wgsrpd",
+      "doi": null,
+      "version": "master branch GeoJSON",
+      "license": "CC BY 4.0",
+      "files": [],
+      "role": "area of each level-3 unit and the gazetteer used to classify islands"
+    }
+  ],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-b201", "date": "2026-10-31" }
+}
