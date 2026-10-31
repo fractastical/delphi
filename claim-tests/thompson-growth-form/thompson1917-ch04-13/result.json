@@ -1,0 +1,26 @@
+{
+  "claim_id": "thompson1917-ch04-13",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch04-13",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "hypothesis": "Across plant and animal species, the gametic (haploid) chromosome number n lies mostly between 6 and 16: the fraction of taxa with n < 6 is small and the fraction with n > 16 is smaller still.",
+  "pass_criterion": "Pre-registered. Plants: species-level gametic numbers from the Chromosome Counts Database (CCDB) statistics service for all four major groups (Angiosperms, Gymnosperms, Pteridophytes, Bryophytes), using each species' median parsed n. Animals: the Animal Chromosome Count Database (ACC) table (haploid N where given, else 2N/2), one median value per species. For each kingdom compute f_low = fraction of taxa with n < 6, f_mid = fraction with 6 <= n <= 16, f_high = fraction with n > 16, at two resolutions: species level, and genus level (median of species values per genus, the primary resolution, to damp sampling bias toward well-studied genera). Supports if at genus level, in both kingdoms, f_low <= 0.10 and f_high <= 0.10 and f_high <= f_low.",
+  "fail_criterion": "Refutes if at genus level f_high >= 0.25 in either kingdom (more than a quarter of genera above 16 is not 'fewer still'), or if f_high > f_low in both kingdoms (the upper tail is the larger tail, inverting the claim). Mixed otherwise (e.g. one kingdom satisfies the bounds and the other does not, without reaching the refutation thresholds).",
+  "planned_datasets": [
+    "ccdb-statistics-by-major-group",
+    "acc-animal-chromosome-counts"
+  ],
+  "interpretation": "Thompson's 'germ-nuclei' chromosome number is the gametic number n (half the somatic 2n), which both databases provide or allow (CCDB parses counts to gametophytic n; ACC lists N or 2N). 'Few' and 'fewer still' are read as tail fractions of at most 10%, with the upper tail no larger than the lower. The claim is about organisms generally, so species (or genera) are the units, each counted once, with no phylogenetic weighting; the species-level figures are reported alongside the primary genus-level ones. Databases are biased toward studied taxa (crops, insects, vertebrates), which is noted but not corrected beyond the genus-level aggregation.",
+  "datasets": [],
+  "method": "",
+  "measured": {},
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-thompson-efb7",
+    "date": "2026-10-31"
+  }
+}
