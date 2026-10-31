@@ -60,15 +60,29 @@ def cache_path(url, suffix=".bin"):
     return os.path.join(CACHE, sha256(url.encode())[:24] + suffix)
 
 
-def fetch(url, retries=4, timeout=120, method="GET", json_body=None):
-    """GET url with caching. Returns (bytes, retrieved_at_iso, from_cache)."""
+HOST_INTERVAL = {"eutils.ncbi.nlm.nih.gov": 0.4, "www.wikidata.org": 1.2, "www.itis.gov": 0.3, "api.ncbi.nlm.nih.gov": 0.4}
+_last_call = {}
+
+
+def throttle(url):
+    host = url.split("/")[2]
+    gap = HOST_INTERVAL.get(host, 0.15)
+    wait = _last_call.get(host, 0) + gap - time.time()
+    if wait > 0:
+        time.sleep(wait)
+    _last_call[host] = time.time()
+
+
+def fetch(url, retries=7, timeout=120, method="GET", json_body=None):
+    """GET url with caching and per-host throttling. Returns (bytes, retrieved_at_iso, from_cache)."""
     p = cache_path(url)
     meta = p + ".meta.json"
     if os.path.exists(p) and os.path.exists(meta):
         with open(p, "rb") as f, open(meta) as m:
             return f.read(), json.load(m)["retrieved_at"], True
-    delay = 2
+    delay = 3
     for attempt in range(retries):
+        throttle(url)
         try:
             if method == "POST":
                 r = requests.post(url, json=json_body, headers=UA, timeout=timeout)
@@ -89,6 +103,9 @@ def fetch(url, retries=4, timeout=120, method="GET", json_body=None):
                     json.dump({"url": url, "retrieved_at": ts, "status": r.status_code}, m)
                 return r.content, ts, False
             print(f"  HTTP {r.status_code} for {url}", file=sys.stderr)
+            if r.status_code == 429:
+                ra = r.headers.get("Retry-After")
+                delay = max(delay, int(ra) if ra and ra.isdigit() else 10)
         except requests.RequestException as e:
             print(f"  {type(e).__name__} for {url}: {e}", file=sys.stderr)
         time.sleep(delay)
@@ -202,8 +219,29 @@ def build_mentions():
 
 
 # ----------------------------------------------------------------------------- resolution
+GBIF_RANKS = {"species", "genus", "family", "order", "class", "phylum", "kingdom", "subspecies"}
+BACKBONE = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
+
+
+def expected_kingdoms(t):
+    if t.get("kingdom"):
+        return {t["kingdom"], "Chromista", "Protozoa"} if t.get("group") == "protist" else {t["kingdom"]}
+    return {"Animalia"}
+
+
 def gbif_match(t):
-    params = {"name": t["query"], "strict": "false"}
+    """Match a name against the GBIF backbone.
+
+    The match API reports HIGHERRANK for a bare uninomial even when the canonical name is
+    identical, so the match is accepted only when canonicalName equals the query. When the
+    match API fails, fall back to the backbone name lookup (species?name=) filtered by the
+    kingdom / phylum / class / family hints, preferring accepted usages over synonyms.
+    """
+    query = t["query"]
+    rank = t.get("rank") or ("species" if " " in query else "genus")
+    params = {"name": query, "strict": "false"}
+    if rank in GBIF_RANKS:
+        params["rank"] = rank.upper()
     for k in ("kingdom", "phylum", "order", "family"):
         if t.get(k):
             params[k] = t[k]
@@ -211,40 +249,88 @@ def gbif_match(t):
         params["class"] = t["cls"]
     url = "https://api.gbif.org/v1/species/match?" + "&".join(f"{k}={quote(v)}" for k, v in params.items())
     j, ts, _ = fetch_json(url)
-    res = {"url": url, "retrieved_at": ts, "raw": j}
-    if not j or j.get("matchType") in (None, "NONE"):
+    res = {"url": url, "retrieved_at": ts, "raw": j, "match_type": (j or {}).get("matchType")}
+    got_rank = (j or {}).get("rank", "").lower()
+    rank_ok = (got_rank == rank) if rank in GBIF_RANKS else got_rank not in ("genus", "species", "subspecies")
+    ok = bool(j) and (j.get("canonicalName") or "").lower() == query.lower() and j.get("matchType") in ("EXACT", "HIGHERRANK", "FUZZY") \
+        and j.get("kingdom") in expected_kingdoms(t) and rank_ok
+    if ok:
+        key = j.get("acceptedUsageKey") or j.get("usageKey")
+        res.update(usage_key=j.get("usageKey"), accepted_key=key, rank=j.get("rank", "").lower(), status=j.get("status"),
+                   match_type="EXACT", confidence=j.get("confidence"), canonical=j.get("canonicalName"),
+                   lineage={k: j.get(k) for k in ("kingdom", "phylum", "class", "order", "family") if j.get(k)})
+        if j.get("acceptedUsageKey"):
+            acc, _, _ = fetch_json(f"https://api.gbif.org/v1/species/{key}")
+            if acc:
+                res["accepted_name"] = acc.get("canonicalName")
+                res["lineage"] = {k: acc.get(k) for k in ("kingdom", "phylum", "class", "order", "family") if acc.get(k)}
+        else:
+            res["accepted_name"] = j.get("canonicalName")
         return res
-    key = j.get("acceptedUsageKey") or j.get("usageKey")
-    res.update(usage_key=j.get("usageKey"), accepted_key=key, rank=j.get("rank", "").lower(), status=j.get("status"),
-               match_type=j.get("matchType"), confidence=j.get("confidence"), canonical=j.get("canonicalName"),
-               lineage={k: j.get(k) for k in ("kingdom", "phylum", "class", "order", "family") if j.get(k)})
-    if j.get("acceptedUsageKey"):
+    # fallback: exact-name lookup in the backbone
+    url2 = f"https://api.gbif.org/v1/species?name={quote(query)}&datasetKey={BACKBONE}&limit=50"
+    j2, ts2, _ = fetch_json(url2)
+    cands = []
+    for r in (j2 or {}).get("results", []):
+        if (r.get("canonicalName") or "").lower() != query.lower():
+            continue
+        if r.get("kingdom") not in expected_kingdoms(t):
+            continue
+        if t.get("phylum") and r.get("phylum") and r["phylum"] != t["phylum"]:
+            continue
+        if t.get("cls") and r.get("class") and r["class"] != t["cls"]:
+            continue
+        if t.get("family") and r.get("family") and r["family"] != t["family"]:
+            continue
+        if rank in GBIF_RANKS and (r.get("rank") or "").lower() != rank:
+            continue
+        if rank not in GBIF_RANKS and (r.get("rank") or "").lower() in ("genus", "species", "subspecies"):
+            continue  # a higher group must not be matched to a homonymous genus
+        if r.get("taxonomicStatus") == "PROPARTE_SYNONYM":
+            continue  # e.g. Reptilia -> Crocodylia; no single accepted usage exists
+        cands.append(r)
+    order = {"ACCEPTED": 0, "SYNONYM": 1, "HOMOTYPIC_SYNONYM": 1, "HETEROTYPIC_SYNONYM": 1, "DOUBTFUL": 3}
+    cands.sort(key=lambda r: order.get(r.get("taxonomicStatus"), 4))
+    if not cands:
+        res["url"] = url2
+        res["match_type"] = "NONE"
+        return res
+    r = cands[0]
+    key = r.get("acceptedKey") or r["key"]
+    res.update(url=url2, retrieved_at=ts2, raw=r, usage_key=r["key"], accepted_key=key, rank=(r.get("rank") or "").lower(),
+               status=r.get("taxonomicStatus"), match_type="NAME_LOOKUP", confidence=None, canonical=r.get("canonicalName"),
+               lineage={k: r.get(k) for k in ("kingdom", "phylum", "class", "order", "family") if r.get(k)})
+    if r.get("acceptedKey"):
         acc, _, _ = fetch_json(f"https://api.gbif.org/v1/species/{key}")
         if acc:
             res["accepted_name"] = acc.get("canonicalName")
             res["lineage"] = {k: acc.get(k) for k in ("kingdom", "phylum", "class", "order", "family") if acc.get(k)}
     else:
-        res["accepted_name"] = j.get("canonicalName")
+        res["accepted_name"] = r.get("canonicalName")
     return res
 
 
 def ncbi_lookup(t, names):
+    """NCBI Taxonomy id whose scientific name equals one of the candidate names and whose
+    lineage contains the expected keyword (default Metazoa)."""
+    if "ncbi_name" in t and t["ncbi_name"] is None:
+        return None
     kw = re.compile(t.get("ncbi_kw", "Metazoa"))
+    names = ([t["ncbi_name"]] if t.get("ncbi_name") else []) + list(names)
     for name in names:
         if not name:
             continue
         url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=taxonomy&term={quote(name)}&retmode=json"
         j, ts, _ = fetch_json(url)
         ids = (j or {}).get("esearchresult", {}).get("idlist", [])
-        for tid in ids[:5]:
+        for tid in ids[:10]:
             b, _, _ = fetch(f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=taxonomy&id={tid}&retmode=xml")
             x = b.decode("utf-8", "replace")
             sci = re.search(r"<ScientificName>(.*?)</ScientificName>", x)
             lin = re.search(r"<Lineage>(.*?)</Lineage>", x)
             rank = re.search(r"<Rank>(.*?)</Rank>", x)
-            if sci and lin and kw.search(lin.group(1) + "; " + sci.group(1)):
+            if sci and lin and sci.group(1).lower() == name.lower() and kw.search(lin.group(1) + "; " + sci.group(1)):
                 return {"taxid": int(tid), "name": sci.group(1), "rank": rank.group(1) if rank else None, "lineage": lin.group(1), "url": url}
-        time.sleep(0.12)
     return None
 
 
@@ -336,6 +422,14 @@ def itis_lookup(names):
     return None
 
 
+def safe(fn, *a):
+    try:
+        return fn(*a)
+    except RuntimeError as e:
+        print(f"  lookup failed: {e}", file=sys.stderr)
+        return None
+
+
 def resolve_all():
     mentions = load_json(os.path.join(SLICE, "mentions.json"))
     by_taxon = defaultdict(list)
@@ -356,9 +450,9 @@ def resolve_all():
             if n and n not in seen:
                 seen.add(n)
                 names.append(n)
-        n = ncbi_lookup(t, names)
-        q = wikidata_lookup(names)
-        it = itis_lookup(names)
+        n = safe(ncbi_lookup, t, names)
+        q = safe(wikidata_lookup, names)
+        it = safe(itis_lookup, names)
         resolution[slug] = {"gbif": g, "worms": w, "pbdb": p, "ncbi": n, "wikidata": q, "itis": it}
         time.sleep(0.1)
     dump_json(os.path.join(CACHE, "resolution.json"), resolution)
@@ -367,14 +461,16 @@ def resolve_all():
 
 
 def accepted_name_for(t, r):
-    g, w, p = r["gbif"], r["worms"], r["pbdb"]
+    g, w, p, n = r["gbif"], r["worms"], r["pbdb"], r["ncbi"]
     if w and w.get("valid_name"):
         return w["valid_name"]
-    if g.get("accepted_name") and g.get("match_type") in ("EXACT", "FUZZY") and g.get("rank") == (t.get("rank") or g.get("rank")):
+    if g.get("accepted_name"):
         return g["accepted_name"]
+    if n and n.get("name"):
+        return n["name"]
     if p and p.get("accepted_name"):
         return p["accepted_name"]
-    return g.get("accepted_name") or t["query"]
+    return t["query"]
 
 
 def rank_for(t, r):
@@ -406,6 +502,7 @@ def write_taxa(resolution, by_taxon):
     for fn in os.listdir(tdir):
         if fn.endswith(".json"):
             existing[fn[:-5]] = load_json(os.path.join(tdir, fn))
+            os.remove(os.path.join(tdir, fn))
     for t in TAXA:
         slug = t["slug"]
         if slug not in resolution:
@@ -417,9 +514,13 @@ def write_taxa(resolution, by_taxon):
         claim_ids = sorted({m["source"]["claim_id"] for m in ms if "claim_id" in m["source"]})
         n_text = sum(1 for m in ms if "file" in m["source"])
         notes = [t.get("notes")] if t.get("notes") else []
-        if g.get("match_type") and g.get("match_type") != "EXACT":
-            notes.append(f"GBIF match type {g['match_type']} (confidence {g.get('confidence')}) for '{t['query']}'.")
-        if g.get("status") and g["status"] != "ACCEPTED":
+        if g.get("match_type") == "NAME_LOOKUP":
+            notes.append(f"GBIF usage found by exact-name lookup in the backbone (status {g.get('status')}), not by the match API.")
+        if g.get("status") == "DOUBTFUL":
+            notes.append("GBIF marks this usage doubtful.")
+        elif g.get("match_type") in ("NONE", "HIGHERRANK", None):
+            notes.append(f"No GBIF backbone usage for '{t['query']}'.")
+        if g.get("status") and g["status"] != "ACCEPTED" and g.get("accepted_key") != g.get("usage_key"):
             notes.append(f"GBIF treats '{g.get('canonical')}' as {g['status'].lower()} of '{g.get('accepted_name')}' (usageKey {g.get('usage_key')}, accepted {g.get('accepted_key')}).")
         if w and w.get("status") != "accepted":
             notes.append(f"WoRMS: '{w['matched_name']}' (AphiaID {w['matched_aphia_id']}) is {w['status']}; accepted name {w['valid_name']} (AphiaID {w['valid_aphia_id']}).")
@@ -705,10 +806,15 @@ def ds_pantheria(taxa):
     body, ts, _ = fetch(url)
     df = pd.read_csv(io.BytesIO(body), sep="\t", dtype=str, encoding="latin-1")
     hits = match_rows_by_rank(taxa, df, {"species": "MSW05_Binomial", "genus": "MSW05_Genus", "family": "MSW05_Family", "order": "MSW05_Order"})
-    # class Mammalia covers every row
+    by_slug = {x["slug"]: x for x in TAXA}
     for slug, t in taxa.items():
-        if t["accepted_name"] == "Mammalia":
+        if t["accepted_name"] == "Mammalia":  # class covers every row
             hits[slug] = int(len(df))
+        fams = by_slug.get(slug, {}).get("pantheria_families")
+        if fams:
+            n = int(df["MSW05_Family"].isin(fams).sum())
+            if n:
+                hits[slug] = n
     ok, _ = doi_resolves("10.1890/08-1494.1")
     did = "pantheria-1-0-wr05-2008"
     rec = {
@@ -725,7 +831,7 @@ def ds_pantheria(taxa):
         "distributions": [dist(url, body, ts, media_type="text/tab-separated-values")],
         "counts": [
             {"property_id": "n_species", "value": int(len(df)), "description": "species rows in PanTHERIA_1-0_WR05_Aug2008.txt"},
-            {"property_id": "n_rows_for_taxa", "value": int(sum(hits.values())), "description": "rows whose MSW05_Binomial / Genus / Family / Order equals the accepted name of a taxon in this slice at that rank (Mammalia = all rows)"},
+            {"property_id": "n_rows_for_taxa", "value": int(sum(hits.values())), "description": "rows whose MSW05_Binomial / Genus / Family / Order equals the accepted name of a taxon in this slice at that rank (Mammalia = all rows; Ruminantia = rows in Bovidae, Cervidae, Giraffidae, Antilocapridae, Moschidae, Tragulidae)"},
         ] + [{"property_id": "n_rows_for_taxon", "value": n, "description": f"rows for {slug}"} for slug, n in sorted(hits.items())],
         "measurement_technique": "Literature-compiled species-level life-history, ecological and geographic traits for mammals (body mass, gestation, litter size, longevity, range).",
         "taxa": sorted(hits),

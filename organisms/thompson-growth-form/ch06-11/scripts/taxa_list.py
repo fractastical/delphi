@@ -29,16 +29,16 @@ T("rotalia", "Rotalia", kingdom="Chromista", ncbi_kw="Foraminifera", marine=True
 T("pulvinulina", "Pulvinulina", kingdom="Chromista", ncbi_kw="Foraminifera", marine=True, fossil=True, group="protist",
   notes=RHIZ + " Pulvinulina is an obsolete genus (species now in Globorotalia / Eponides etc.).")
 T("cristellaria", "Cristellaria", kingdom="Chromista", ncbi_kw="Foraminifera", marine=True, fossil=True, group="protist",
-  notes=RHIZ + " Cristellaria is an obsolete name for Lenticulina.")
+  notes=RHIZ + " Cristellaria Lamarck is an obsolete genus; WoRMS and GBIF treat it as a synonym of Peneroplis, although the planispiral form Thompson figures (Fig. 260) corresponds to Lenticulina.")
 T("astrorhiza", "Astrorhiza", [r"\bAstrorhiza\b(?: limicola)?"], kingdom="Chromista", ncbi_kw="Foraminifera", marine=True,
   group="protist", notes=RHIZ)
 T("entosolenia", "Entosolenia", [r"\bEntosolenia\b(?: aspera)?"], kingdom="Chromista", ncbi_kw="Foraminifera", marine=True,
   group="protist", notes=RHIZ + " Entosolenia is an obsolete name (species now in Fissurina / Oolina).")
-T("radiolaria", "Radiolaria", [r"\b[Rr]adiolari\w*"], rank="class", kingdom="Chromista", ncbi_kw="Rhizaria", group="protist",
+T("radiolaria", "Radiolaria", [r"\b[Rr]adiolari\w*"], rank="class", kingdom="Chromista", ncbi_kw="Rhizaria", ncbi_name=None, fossil=True, group="protist",
   notes=RHIZ + " 'Radiolaria' in Thompson covers Polycystinea, Acantharea and Phaeodarea (the last now in Cercozoa).")
 T("nassellaria", "Nassellaria", [r"\b[Nn]assellari\w*"], rank="order", kingdom="Chromista", ncbi_kw="Polycystinea", group="protist", notes=RHIZ)
-T("phaeodaria", "Phaeodaria", kingdom="Chromista", ncbi_kw="Rhizaria", group="protist", notes=RHIZ + " Phaeodaria are now placed in Cercozoa.")
-T("acantharia", "Acantharia", [r"\bAcanthari\w*"], kingdom="Chromista", ncbi_kw="Rhizaria", group="protist", notes=RHIZ + " Modern class Acantharea.")
+T("phaeodaria", "Phaeodaria", kingdom="Chromista", ncbi_kw="Rhizaria", ncbi_name="Phaeodarea", group="protist", notes=RHIZ + " Phaeodaria are now placed in Cercozoa.")
+T("acantharia", "Acantharia", [r"\bAcanthari\w*"], rank="class", kingdom="Protozoa", ncbi_kw="Rhizaria", ncbi_name="Acantharea", group="protist", notes=RHIZ + " Modern class Acantharea.")
 T("acanthometridae", "Acanthometridae", kingdom="Chromista", ncbi_kw="Rhizaria", group="protist", notes=RHIZ)
 T("callimitra", "Callimitra", kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
 T("collosphaera", "Collosphaera", kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
@@ -92,8 +92,8 @@ T("farrea", "Farrea", phylum="Porifera", marine=True, group="sponge")
 T("cnidaria", "Cnidaria", [r"\b[Cc]oelenterat\w*"], rank="phylum", kingdom="Animalia", group="cnidarian",
   notes="Thompson's 'Coelenterata' (which historically also embraced the Ctenophora); resolved to Cnidaria.")
 T("anthozoa", "Anthozoa", [r"\b[Cc]orals?\b", r"\bcorallites?\b", r"\bcolonial corals\b"], rank="class", phylum="Cnidaria", group="cnidarian", vern=["corals"])
-T("octocorallia", "Octocorallia", [r"\bAlcyonari\w*"], rank="subclass", phylum="Cnidaria", group="cnidarian",
-  notes="Thompson's 'Alcyonaria' = modern Octocorallia.")
+T("octocorallia", "Octocorallia", [r"\bAlcyonari\w*"], rank="subclass", phylum="Cnidaria", marine=True, fossil=True, group="cnidarian",
+  notes="Thompson's 'Alcyonaria' = modern Octocorallia. GBIF's backbone has no Octocorallia node.")
 T("alcyonium", "Alcyonium", phylum="Cnidaria", marine=True, group="cnidarian")
 T("siphonogorgia", "Siphonogorgia", phylum="Cnidaria", marine=True, group="cnidarian")
 T("anthogorgia", "Anthogorgia", phylum="Cnidaria", marine=True, group="cnidarian")
@@ -101,9 +101,9 @@ T("eunicea", "Eunicea", phylum="Cnidaria", marine=True, group="cnidarian")
 T("heliopora", "Heliopora", phylum="Cnidaria", marine=True, group="cnidarian")
 T("podocoryna", "Podocoryna", [r"\bPodocoryne\b"], phylum="Cnidaria", marine=True, group="cnidarian", notes="Written 'Podocoryne'.")
 T("hydractinia", "Hydractinia", phylum="Cnidaria", marine=True, group="cnidarian")
-T("myxozoa", "Myxozoa", [r"\bActinomyxidia\b"], kingdom="Animalia", phylum="Cnidaria", ncbi_kw="Myxozoa", group="cnidarian",
+T("myxozoa", "Myxozoa", [r"\bActinomyxidia\b"], rank="class", kingdom="Animalia", phylum="Cnidaria", ncbi_kw="Myxozoa", group="cnidarian",
   notes="Thompson's 'parasitic protozoa, the Actinomyxidia' are the actinospore stage of Myxozoa, now known to be cnidarian animals.")
-T("rugosa", "Rugosa", [r"\bTetracoralla\b", r"\bRugosa\b"], kingdom="Animalia", phylum="Cnidaria", fossil=True, group="cnidarian",
+T("rugosa", "Rugosa", [r"\bTetracoralla\b", r"\bRugosa\b"], rank="order", kingdom="Animalia", phylum="Cnidaria", fossil=True, marine=True, group="cnidarian",
   notes="Extinct Palaeozoic corals; Thompson's 'Tetracoralla'.")
 T("heterophyllia", "Heterophyllia", [r"\bHeterophylli\w*(?: angulata)?"], phylum="Cnidaria", fossil=True, group="cnidarian")
 T("zaphrentis", "Zaphrentis", phylum="Cnidaria", fossil=True, group="cnidarian")
@@ -140,9 +140,9 @@ T("mollusca", "Mollusca", [r"\b[Mm]ollusca\b", r"\b[Mm]olluscs?\b", r"\bmollusca
 T("gastropoda", "Gastropoda", [r"\b[Gg]astropods?\b", r"\bGastropoda\b", r"\b[Ss]nails?\b", r"\bsnail-shell\b"], rank="class", phylum="Mollusca", group="mollusc", vern=["snails"])
 T("bivalvia", "Bivalvia", [r"\b[Ll]amellibranch\w*", r"\b[Bb]ivalves?\b(?! carapace| shell of)", r"\bbivalve shells?\b"], rank="class", phylum="Mollusca", group="mollusc", vern=["bivalves", "lamellibranchs"])
 T("cephalopoda", "Cephalopoda", [r"\b[Cc]ephalopods?\b", r"\bCephalopoda\b", r"\bcuttle-?fish(?:es)?\b"], rank="class", phylum="Mollusca", group="mollusc")
-T("pteropoda", "Pteropoda", [r"\b[Pp]teropods?\b"], kingdom="Animalia", phylum="Mollusca", group="mollusc", notes="Pelagic sea-butterflies; modern order Pteropoda.")
+T("pteropoda", "Pteropoda", [r"\b[Pp]teropods?\b"], rank="order", kingdom="Animalia", phylum="Mollusca", marine=True, group="mollusc", notes="Pelagic sea-butterflies; modern order Pteropoda.")
 T("dentalium", "Dentalium", [r"\bDentalium\b"], phylum="Mollusca", marine=True, group="mollusc", vern=["tusk shells"])
-T("patellogastropoda", "Patellogastropoda", [r"\b[Ll]impets?\b"], kingdom="Animalia", phylum="Mollusca", group="mollusc", vern=["limpets"],
+T("patellogastropoda", "Patellogastropoda", [r"\b[Ll]impets?\b"], rank="order", kingdom="Animalia", phylum="Mollusca", marine=True, group="mollusc", vern=["limpets"],
   notes="'the Limpet' resolved to the true limpets.")
 
 # Cephalopods
@@ -151,7 +151,7 @@ T("nautilus-pompilius", "Nautilus pompilius", [r"\bNautilus pompilius\b", r"\bN\
 T("nautilus-umbilicatus", "Nautilus umbilicatus", [r"\bNautilus umbilicatus\b", r"\bN\. umbilicatus\b"], phylum="Mollusca", marine=True, group="mollusc",
   notes="Nautilus umbilicatus (Lister / Lamarck) is an unaccepted name; WoRMS gives the accepted name.")
 T("ammonoidea", "Ammonoidea", [r"\b[Aa]mmonites?\b(?! \(| \_)", r"\bAmmonitoid\w*", r"\bammonitoid\b", r"\bAmmonoidea\b", r"\bAptych\w*", r"\bAnaptychus\b"],
-  rank="subclass", phylum="Mollusca", fossil=True, group="mollusc",
+  rank="subclass", phylum="Mollusca", fossil=True, marine=True, group="mollusc",
   notes="Thompson's 'Ammonites' (as a genus) and 'Ammonitoid shells'; resolved to the extinct subclass Ammonoidea. The aptychus is an ammonoid structure.")
 T("arcestes", "Arcestes", [r"\bArcestes\b(?: tornatus)?"], phylum="Mollusca", fossil=True, group="mollusc")
 T("oecotraustes", "Oecotraustes", [r"\bOekotraustes\b"], phylum="Mollusca", fossil=True, group="mollusc", notes="Written 'Oekotraustes'.")
@@ -163,7 +163,7 @@ T("orthoceras", "Orthoceras", [r"\bOrthocera\w*"], phylum="Mollusca", fossil=Tru
 T("goniatites", "Goniatites", phylum="Mollusca", fossil=True, group="mollusc")
 T("sonninia", "Sonninia", [r"\bSonninia\b"], phylum="Mollusca", fossil=True, group="mollusc")
 T("pinacoceras", "Pinacoceras", phylum="Mollusca", fossil=True, group="mollusc")
-T("belemnitida", "Belemnitida", [r"\bBelemnites\b"], phylum="Mollusca", fossil=True, group="mollusc", notes="'the Belemnites' resolved to the order.")
+T("belemnitida", "Belemnitida", [r"\bBelemnites\b"], rank="order", phylum="Mollusca", fossil=True, group="mollusc", notes="'the Belemnites' resolved to the order.")
 T("argonauta", "Argonauta", [r"\bArgonauta?\b"], phylum="Mollusca", marine=True, group="mollusc")
 T("spirula", "Spirula", phylum="Mollusca", marine=True, group="mollusc")
 T("sepia", "Sepia", phylum="Mollusca", marine=True, group="mollusc")
@@ -181,7 +181,7 @@ T("trochus", "Trochus", [r"\bTroch(?:us|i)\b(?: niloticus)?", r"\bT\. niloticus\
 T("harpa", "Harpa", phylum="Mollusca", marine=True, group="mollusc")
 T("cypraea", "Cypraea", [r"\bCypraeae?\b"], phylum="Mollusca", marine=True, group="mollusc")
 T("natica", "Natica", [r"\bNatica\b(?: aperta| glaucina)?"], phylum="Mollusca", marine=True, group="mollusc")
-T("architectonica", "Architectonica", [r"\bSolarium\b(?: perspectivum| trochleare| magnificum)?"], phylum="Mollusca", marine=True, group="mollusc",
+T("architectonica", "Architectonica", [r"\bSolarium\b(?: perspectivum| trochleare| magnificum)?"], phylum="Mollusca", family="Architectonicidae", marine=True, group="mollusc",
   worms_name="Solarium", notes="Thompson's 'Solarium' (Lamarck, 1799) = Architectonica (sundial shells).")
 T("cerithium", "Cerithium", [r"\bCerithium\b(?: nodulosum| nodosum| palustre| lignitarum| sulcatum)?"], phylum="Mollusca", marine=True, group="mollusc")
 T("planorbis", "Planorbis", [r"\bPlanorbis\b(?: corneus| corneas)?"], phylum="Mollusca", group="mollusc", notes="Freshwater ramshorn snails; 'Planorbis corneas' is a misprint for P. corneus.")
@@ -203,7 +203,7 @@ T("trophon", "Trophon", phylum="Mollusca", marine=True, group="mollusc")
 T("fusus", "Fusus", [r"\bFusus\b(?: longissimus| antiquus| colosseus)?"], phylum="Mollusca", marine=True, group="mollusc")
 T("buccinum", "Buccinum", [r"\bBuccinum\b", r"\b[Ww]helks?\b"], phylum="Mollusca", marine=True, group="mollusc", vern=["whelk"])
 T("cyclostoma", "Cyclostoma", phylum="Mollusca", group="mollusc", notes="Land operculate snail; Cyclostoma Lamarck = Pomatias in current usage.")
-T("potamides", "Potamides", phylum="Mollusca", marine=True, group="mollusc")
+T("potamides", "Potamides", phylum="Mollusca", marine=True, fossil=True, group="mollusc")
 T("oliva", "Oliva", phylum="Mollusca", marine=True, group="mollusc")
 T("stomatella", "Stomatella", phylum="Mollusca", marine=True, group="mollusc")
 T("capulus", "Capulus", [r"\bPileopsis\b"], phylum="Mollusca", marine=True, group="mollusc", worms_name="Pileopsis", notes="Thompson's 'Pileopsis' = Capulus.")
@@ -215,8 +215,8 @@ T("succinea", "Succinea", phylum="Mollusca", group="mollusc")
 T("cymba", "Cymba", phylum="Mollusca", marine=True, group="mollusc", notes="Cymba Broderip (volutes) is now treated as a synonym of Cymbium / Melo.")
 T("melo", "Melo", [r"\bMelo\b(?: ethiopicus)?"], phylum="Mollusca", marine=True, group="mollusc")
 T("eulima", "Eulima", phylum="Mollusca", marine=True, group="mollusc")
-T("ampullaria", "Pomacea", [r"\bAmpullaria\b", r"\bApple-snails\b"], phylum="Mollusca", group="mollusc", worms_name="Ampullaria",
-  notes="Thompson's 'Ampullaria, or Apple-snails'; Ampullaria Lamarck is an unavailable/suppressed name, apple snails are Ampullariidae (Pomacea, Pila).")
+T("ampullaria", "Ampullaria", [r"\bAmpullaria\b", r"\bApple-snails\b"], phylum="Mollusca", group="mollusc",
+  notes="Thompson's 'Ampullaria, or Apple-snails'; Ampullaria Lamarck is treated by WoRMS and GBIF as a synonym of Pila (Ampullariidae).")
 T("phasianella", "Phasianella", [r"\bPhasianella\b(?: bulloides)?"], phylum="Mollusca", marine=True, group="mollusc")
 T("crepidula", "Crepidula", phylum="Mollusca", marine=True, group="mollusc")
 T("telescopium", "Telescopium", [r"\bTelescopium\b(?: fuscum)?"], phylum="Mollusca", marine=True, group="mollusc")
@@ -295,8 +295,8 @@ T("cyrtina", "Cyrtina", phylum="Brachiopoda", fossil=True, group="brachiopod")
 T("reticularia", "Reticularia", phylum="Brachiopoda", fossil=True, group="brachiopod", pbdb_name="Reticularia",
   notes="The brachiopod Reticularia M'Coy, 1844 (not the slime mould Reticularia Bulliard).")
 T("koninckina", "Koninckina", phylum="Brachiopoda", fossil=True, group="brachiopod")
-T("thecidium", "Thecidellina", [r"\bThecidium\b"], phylum="Brachiopoda", marine=True, fossil=True, group="brachiopod", worms_name="Thecidium", pbdb_name="Thecidium",
-  notes="Thompson's 'Thecidium' (Thecidea / Thecidium) is an old name for recent thecideide brachiopods (Thecidellina, Lacazella).")
+T("thecidium", "Thecidea", [r"\bThecidium\b"], phylum="Brachiopoda", marine=True, fossil=True, group="brachiopod", worms_name="Thecidium", pbdb_name="Thecidium",
+  notes="Thompson's 'Thecidium' is a later spelling of Thecidea Defrance (thecideide brachiopods); the recent species are now mostly in Thecidellina and Lacazella.")
 
 # ---------------------------------------------------------------- Annelida and other worms
 T("annelida", "Annelida", [r"\b[Aa]nnelids?\b", r"\btube worms\b"], rank="phylum", kingdom="Animalia", group="worm")
@@ -326,38 +326,43 @@ T("saturnia-pavonia", "Saturnia pavonia", [r"\bEmperor moth\b"], phylum="Arthrop
   notes="'the Emperor moth' of British usage is Saturnia pavonia.")
 T("iphiclides-podalirius", "Iphiclides podalirius", [r"\bPapilio podalirius\b"], phylum="Arthropoda", group="arthropod")
 T("synanthedon-spheciformis", "Synanthedon spheciformis", [r"\bSesia spheciformis\b"], phylum="Arthropoda", group="arthropod")
-T("crustacea", "Crustacea", [r"\b[Cc]rustacea\b", r"\bcrustacean\b"], kingdom="Animalia", phylum="Arthropoda", group="arthropod")
-T("brachyura", "Brachyura", [r"\bcrab\b"], phylum="Arthropoda", group="arthropod", vern=["crabs"])
+T("crustacea", "Crustacea", [r"\b[Cc]rustacea\b", r"\bcrustacean\b"], rank="subphylum", kingdom="Animalia", phylum="Arthropoda", fossil=True, ncbi_name=None, group="arthropod",
+  notes="GBIF's backbone and NCBI Taxonomy have no Crustacea node (NCBI uses the clade Pancrustacea); identifiers come from Wikidata, ITIS and PBDB.")
+T("brachyura", "Brachyura", [r"\bcrab\b"], rank="infraorder", phylum="Arthropoda", group="arthropod", vern=["crabs"])
 T("branchipus", "Branchipus", phylum="Arthropoda", group="arthropod")
 T("estheria", "Estheria", phylum="Arthropoda", cls="Branchiopoda", fossil=True, group="arthropod",
   notes="Thompson's clam shrimp 'Estheria' (Rüppell, 1837); the living species are now in Cyzicus and allies, the name persists for fossils. Not the tachinid fly genus Estheria Robineau-Desvoidy.")
 
 # ---------------------------------------------------------------- Chordata
-T("tunicata", "Tunicata", [r"\b[Aa]scidians?\b", r"\bascidian\b"], kingdom="Animalia", phylum="Chordata", group="chordate",
+T("tunicata", "Tunicata", [r"\b[Aa]scidians?\b", r"\bascidian\b"], rank="subphylum", kingdom="Animalia", phylum="Chordata", marine=True, group="chordate",
   notes="'Ascidians' resolved to the subphylum Tunicata (class Ascidiacea in older usage).")
 T("pyrosoma", "Pyrosoma", phylum="Chordata", marine=True, group="chordate")
-T("styela", "Styela", [r"\bCynthia\b(?: partita)?"], phylum="Chordata", marine=True, group="chordate", worms_name="Cynthia",
-  notes="Conklin's ascidian 'Cynthia partita' is Styela partita.")
-T("vertebrata", "Vertebrata", [r"\b[Vv]ertebrates?\b"], kingdom="Animalia", phylum="Chordata", group="chordate")
+T("styela-partita", "Styela partita", [r"\bCynthia\b(?: partita)?"], phylum="Chordata", marine=True, group="chordate",
+  notes="Conklin's ascidian 'Cynthia partita' is Styela partita; Cynthia Savigny as a genus is a synonym of Halocynthia.")
+T("vertebrata", "Vertebrata", [r"\b[Vv]ertebrates?\b"], rank="subphylum", kingdom="Animalia", phylum="Chordata", fossil=True, group="chordate",
+  notes="GBIF's backbone has no Vertebrata node (only a red-algal genus of that name); identifiers come from NCBI, Wikidata and PBDB.")
 T("elasmobranchii", "Elasmobranchii", [r"\belasmobranch fishes\b"], rank="class", phylum="Chordata", group="chordate")
-T("actinopterygii", "Actinopterygii", [r"(?<![-\w])\b(?:bony )?fish(?:es)?\b"], rank="class", phylum="Chordata", group="chordate",
+T("actinopterygii", "Actinopterygii", [r"(?<![-\w])\b(?:bony )?fish(?:es)?\b"], rank="class", phylum="Chordata", fossil=True, group="chordate",
   notes="Thompson's 'fish' / 'bony fish' (otoliths, scales, body contour); resolved to the ray-finned fishes, which cover his examples (plaice, cod).")
 T("pleuronectes-platessa", "Pleuronectes platessa", [r"\bPlaice\b"], phylum="Chordata", marine=True, group="chordate", vern=["plaice"])
 T("gadus-morhua", "Gadus morhua", [r"\bcod\b"], phylum="Chordata", marine=True, group="chordate", vern=["cod"])
 T("chaetodontidae", "Chaetodontidae", [r"\bChaetodonts\b"], rank="family", phylum="Chordata", group="chordate", vern=["butterflyfishes"])
 T("anura", "Anura", [r"\b[Ff]rogs?\b"], rank="order", phylum="Chordata", group="chordate", vern=["frogs"],
   notes="'the frog' of Rauber's and Roux's egg-segmentation studies is Rana (R. temporaria / R. esculenta); resolved to the order.")
-T("pelophylax-esculentus", "Pelophylax esculentus", [r"\bRana esculenta\b"], phylum="Chordata", group="chordate", notes="'Rana esculenta' = Pelophylax kl. esculentus.")
-T("reptilia", "Reptilia", [r"\breptiles?\b"], rank="class", phylum="Chordata", group="chordate")
-T("serpentes", "Serpentes", [r"\bsnake\b"], phylum="Chordata", group="chordate", vern=["snakes"])
+T("pelophylax-esculentus", "Pelophylax esculentus", [r"\bRana esculenta\b"], phylum="Chordata", group="chordate", ncbi_name="Pelophylax kl. esculentus", notes="'Rana esculenta' = Pelophylax kl. esculentus (the edible-frog hybridogenetic klepton).")
+T("reptilia", "Reptilia", [r"\breptiles?\b"], rank="class", phylum="Chordata", fossil=True, ncbi_name=None, group="chordate",
+  notes="GBIF treats Reptilia as a pro-parte synonym of Crocodylia, Sphenodontia, Squamata and Testudines, and NCBI uses Sauropsida; identifiers come from Wikidata, ITIS and PBDB.")
+T("serpentes", "Serpentes", [r"\bsnake\b"], rank="suborder", phylum="Chordata", group="chordate", vern=["snakes"])
 T("chamaeleonidae", "Chamaeleonidae", [r"\bchameleon(?:['’]s)?\b"], rank="family", phylum="Chordata", group="chordate", vern=["chameleons"])
 T("aves", "Aves", [r"\bbirds?\b"], rank="class", phylum="Chordata", group="chordate", vern=["birds"])
 T("argusianus-argus", "Argusianus argus", [r"\bArgus\b(?:\s+Pheasant)?"], phylum="Chordata", group="chordate", vern=["great argus"])
 T("mammalia", "Mammalia", [r"\b[Mm]ammal(?:s|ian)?\b"], rank="class", phylum="Chordata", group="chordate")
-T("ruminantia", "Ruminantia", [r"\bruminants?\b"], phylum="Chordata", group="chordate", vern=["ruminants"])
+T("ruminantia", "Ruminantia", [r"\bruminants?\b"], rank="suborder", phylum="Chordata", fossil=True, group="chordate", vern=["ruminants"],
+  pantheria_families=["Bovidae", "Cervidae", "Giraffidae", "Antilocapridae", "Moschidae", "Tragulidae"],
+  notes="GBIF's backbone has no Ruminantia node; PanTHERIA rows are counted over the six ruminant families.")
 T("ovis-aries", "Ovis aries", [r"\bram's horn\b", r"\bram\b"], phylum="Chordata", group="chordate", vern=["sheep", "ram"], notes="'the ram's horn'.")
 T("elephantidae", "Elephantidae", [r"\belephant(?:['’]s)?\b"], rank="family", phylum="Chordata", group="chordate", vern=["elephants"])
-T("simiiformes", "Simiiformes", [r"\bmonkey['’]s\b"], phylum="Chordata", group="chordate", vern=["monkeys"], notes="'a monkey's tail'; resolved to the anthropoid primates.")
+T("simiiformes", "Simiiformes", [r"\bmonkey['’]s\b"], rank="infraorder", phylum="Chordata", fossil=True, group="chordate", vern=["monkeys"], notes="'a monkey's tail'; resolved to the anthropoid primates. GBIF's backbone has no Simiiformes node.")
 T("equus-caballus", "Equus caballus", [r"\bhorse\b"], phylum="Chordata", group="chordate", vern=["horse"])
 T("homo-sapiens", "Homo sapiens", [r"\ba man\b"], phylum="Chordata", group="chordate", vern=["human"])
 T("oryctolagus-cuniculus", "Oryctolagus cuniculus", [r"\brabbit\b"], phylum="Chordata", group="chordate", vern=["rabbit"])
