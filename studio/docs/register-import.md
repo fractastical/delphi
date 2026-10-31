@@ -54,9 +54,11 @@ This does not make any of them better supported; see the limits.
 * **No promotion.** All 250 stay `completeness="recorded"`; the four actionability fields are still empty. `actionable` stays 0.
 * **Not a primary-literature open problem.** The questions are a curator's. A cited source calling a facet open is evidence
   about that facet, not that the question as phrased is an open problem in the field. `problem_kind` is therefore
-  `project_gap` for all 250, not `sourced_field_open_problem` (SPEC-001 open question 3). The enum has no value that says
-  "curator's question"; a distinct value would be a `models.py` change, which this work did not make.
-* **Quotes are unverified.** They are the curator's transcriptions. Whether a quote is in the paper, at the locator, and
+  `curated_question` for all 250 (a structural value added to `Problem.problem_kind`; SPEC-001 open question 3 records the
+  decision), not `sourced_field_open_problem` and not `project_gap`. The first import used `project_gap` as an interim label
+  (commit 18cf168) and the first mapping used `sourced_field_open_problem`; neither said what the register is. The existing
+  values keep their meanings and `completeness` is unchanged.
+* **Quotes are unverified.** (A 15-item sample is checked separately: `findings/README-attestation-check-15.md`; it does not verify the 250.) They are the curator's transcriptions. Whether a quote is in the paper, at the locator, and
   supports the question is unchecked. A reviewer should sample them before any claim rests on them.
 * **Stance is the curator's.** `settled` marks a facet some cited source treats as settled; what that does to the question's
   scope is unreviewed and unstated here.

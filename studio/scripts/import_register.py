@@ -8,7 +8,7 @@ importer reports that count rather than filling them in.
 The register's questions are a CURATOR'S questions. A cited source that calls a facet open
 (an `attestation` with stance "open") is evidence about that facet, not proof that the question
 as the curator phrased it is a primary-literature open problem, so no problem is labelled
-`sourced_field_open_problem`; they import as `project_gap` (CURATOR_KIND). The register's
+`sourced_field_open_problem`; they import as `curated_question` (CURATOR_KIND). The register's
 three provenance fields are kept separate end to end: `why_source`, `references` and
 `attestations`. Every item of each is copied verbatim into `original.register_provenance`
 (which survives even when the whole-record copy is dropped for size), and the report counts
@@ -31,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from frontier.models import ACTIONABILITY, MAX_RECORD_BYTES, Draft, Problem, canonical  # noqa: E402
 
 NAMESPACE = "node-a"
-CURATOR_KIND = "project_gap"  # see the module docstring; SPEC-001 open question 3
+CURATOR_KIND = "curated_question"  # see the module docstring; SPEC-001 open question 3
 MAX_ITEMS = 40
 MAX_SHORT = 3000
 MAX_TEXT = 12000
