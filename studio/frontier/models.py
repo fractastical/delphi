@@ -12,8 +12,10 @@ POLICY = "frontier-independent-review-0.1"
 MAX_RECORD_BYTES = 65536
 MAX_BUNDLE_BYTES = 2_000_000
 MAX_BUNDLE_RECORDS = 100
-KINDS = ("Problem", "Claim", "Evidence", "Assessment", "Action", "Actor", "ResourceOffer", "Interest", "Event")
-Kind = Literal["Problem", "Claim", "Evidence", "Assessment", "Action", "Actor", "ResourceOffer", "Interest", "Event"]
+KINDS = ("Problem", "Claim", "Evidence", "Assessment", "Action", "Actor", "ResourceOffer", "Interest", "Event",
+         "Project", "Annotation")
+Kind = Literal["Problem", "Claim", "Evidence", "Assessment", "Action", "Actor", "ResourceOffer", "Interest", "Event",
+               "Project", "Annotation"]
 Digest = Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
 Identifier = Annotated[str, Field(min_length=1, max_length=160, pattern=r"^[A-Za-z0-9][A-Za-z0-9_.:/-]*$")]
 Short = Annotated[str, Field(min_length=1, max_length=3000)]
@@ -342,7 +344,220 @@ class Event(Model):
     details: dict[str, Any]
 
 
-PAYLOADS = {c.__name__: c for c in (Claim, Problem, Evidence, Assessment, Action, Actor, ResourceOffer, Interest, Event)}
+# ---------------------------------------------------------------------------------------------------------------------
+# Project and Annotation. Both are ordinary append-only records: they are written only through Store.submit (authenticated
+# contributor, issuer == actor), are `proposed` until an independent operator reviews them, and carry no field by which they
+# could mark themselves accepted, resolved, validated or causally bridged. A pin is an exact version; membership declares where
+# a record is applicable, it never infers a causal link between members.
+# ---------------------------------------------------------------------------------------------------------------------
+Unsigned = Annotated[str, Field(pattern=r"^(0|[1-9][0-9]{0,8})(\.[0-9]{1,12})?$")]
+Decimal = Annotated[str, Field(max_length=40, pattern=r"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?$")]
+DottedPath = Annotated[str, Field(min_length=1, max_length=200,
+                                  pattern=r"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_-]+|\[[0-9]{1,4}\]){0,12}$")]
+MemberKinds = {"Claim", "Problem", "Action", "Evidence"}
+BRIDGE_KINDS = {"Evidence", "Claim"}
+
+
+class ArtifactPin(Model):
+    """Evidence ref plus the sha256 of one of ITS declared artifacts. The store checks the digest is listed in that Evidence
+    version's `artifacts`; it never fetches bytes, so this is a pointer check, not a byte verification."""
+    evidence: Ref
+    sha256: Digest
+
+    @model_validator(mode="after")
+    def evidence_kind(self):
+        if self.evidence.kind != "Evidence":
+            raise ValueError("An artifact pin anchors an Evidence ref")
+        return self
+
+
+class ScaleCoverage(Model):
+    scale: Scale
+    status: Literal["implemented_model", "source_only", "unimplemented", "unknown"]
+    note: Short
+
+
+class Member(Model):
+    ref: Ref
+    role: Literal["mission", "subsystem", "evidence", "measurement", "design", "context", "gap"]
+    subsystem: Short
+    scale: Scale | None = None
+    relationship: Literal["supports", "constrains", "depends_on", "informs", "challenges", "implements", "measures",
+                          "context_for"]
+    applicability: Text   # a DECLARATION of where the member applies, never an inferred causal bridge
+    causal_bridge: Literal["none_declared", "assumed", "calibrated"] = "none_declared"
+    calibration: Ref | None = None
+    rationale: Text
+    artifact: ArtifactPin | None = None
+
+    @model_validator(mode="after")
+    def coherent(self):
+        if self.ref.kind not in MemberKinds:
+            raise ValueError("A project member pins a Claim, Problem, Action or Evidence")
+        if (self.causal_bridge == "calibrated") != (self.calibration is not None):
+            raise ValueError("A calibrated bridge needs a calibration ref; any other bridge value must not carry one")
+        if self.calibration is not None and self.calibration.kind not in BRIDGE_KINDS:
+            raise ValueError("A calibration ref pins Evidence or a Claim")
+        if self.artifact is not None and (self.ref.kind != "Evidence" or self.artifact.evidence != self.ref):
+            raise ValueError("A member artifact pin must be the member's own Evidence ref plus a digest")
+        return self
+
+
+class Quantity(Model):
+    name: Short
+    unit: Short
+    comparator: Literal["<=", ">=", "==", "<", ">"]
+    value: Decimal
+
+
+class Requirement(Model):
+    id: Identifier
+    kind: Literal["function", "constraint", "validation", "safety", "non_goal"]
+    text: Text
+    quantity: Quantity | None = None
+    source_member: int | None = Field(default=None, ge=0, le=59)
+    stage: Literal["declared", "proposed"] = "proposed"
+
+
+class OpenQuestion(Model):
+    text: Text
+    problem: Ref | None = None
+    blocks: list[Annotated[int, Field(ge=0, le=59)]] = Field(default_factory=list, max_length=60)
+
+    @model_validator(mode="after")
+    def problem_kind(self):
+        if self.problem is not None and self.problem.kind != "Problem":
+            raise ValueError("An open question links a Problem")
+        if len(set(self.blocks)) != len(self.blocks):
+            raise ValueError("Repeated blocked member index")
+        return self
+
+
+class Project(Model):
+    title: Short
+    mission: Text
+    source: Source
+    limitations: Strings = Field(min_length=1)
+    scale_coverage: list[ScaleCoverage] = Field(min_length=1, max_length=12)
+    members: list[Member] = Field(default_factory=list, max_length=60)
+    requirements: list[Requirement] = Field(default_factory=list, max_length=40)
+    open_questions: list[OpenQuestion] = Field(default_factory=list, max_length=40)
+
+    @model_validator(mode="after")
+    def coherent(self):
+        scales = [c.scale for c in self.scale_coverage]
+        if len(set(scales)) != len(scales):
+            raise ValueError("Repeated scale in scale_coverage")
+        if len({m.ref.version for m in self.members}) != len(self.members):
+            raise ValueError("Repeated member version")
+        if any(m.scale is not None and m.scale not in scales for m in self.members):
+            raise ValueError("A member scale must be one of the declared scale_coverage scales")
+        if len({r.id for r in self.requirements}) != len(self.requirements):
+            raise ValueError("Repeated requirement id")
+        n = len(self.members)
+        if any(r.source_member is not None and r.source_member >= n for r in self.requirements):
+            raise ValueError("Requirement source_member is not a member index")
+        if any(i >= n for q in self.open_questions for i in q.blocks):
+            raise ValueError("Open-question blocks index is not a member index")
+        return self
+
+
+class NamedSubsystem(Model):
+    type: Literal["named_subsystem"]
+    name: Annotated[str, Field(min_length=1, max_length=200)]
+
+
+class MeshPart(Model):
+    type: Literal["mesh_part"]
+    part_id: Annotated[str, Field(min_length=1, max_length=200)]
+    artifact_sha256: Digest | None = None
+
+
+class ImageRect(Model):
+    """Normalized rectangle in [0,1]^2 of the artifact image; exact decimal strings, a UI anchor, not a measurement."""
+    type: Literal["image_rect"]
+    x: Unsigned
+    y: Unsigned
+    w: Unsigned
+    h: Unsigned
+
+    @model_validator(mode="after")
+    def inside_unit_square(self):
+        from fractions import Fraction
+        x, y, w, h = (Fraction(v) for v in (self.x, self.y, self.w, self.h))
+        if w <= 0 or h <= 0 or x + w > 1 or y + h > 1:
+            raise ValueError("Rectangle must have positive size and lie inside the unit square")
+        return self
+
+
+class EquationSymbol(Model):
+    type: Literal["equation_symbol"]
+    symbol: Annotated[str, Field(min_length=1, max_length=80)]
+    equation_id: Annotated[str, Field(min_length=1, max_length=200)] | None = None
+
+
+class ParameterPath(Model):
+    type: Literal["parameter_path"]
+    path: DottedPath
+
+
+Region = Annotated[NamedSubsystem | MeshPart | ImageRect | EquationSymbol | ParameterPath, Field(discriminator="type")]
+
+
+class Anchor(Model):
+    record: Ref
+    artifact: ArtifactPin | None = None
+    region: Region | None = None
+    frame: Literal["ui_anchor", "declared_biological"] = "ui_anchor"
+    frame_declaration: Text | None = None
+
+    @model_validator(mode="after")
+    def coherent(self):
+        if self.record.kind == "Event":
+            raise ValueError("Events are transaction receipts and are not annotated")
+        if self.artifact is not None and (self.record.kind != "Evidence" or self.artifact.evidence != self.record):
+            raise ValueError("An artifact anchor requires the anchored record to be that Evidence")
+        if isinstance(self.region, MeshPart) and self.region.artifact_sha256 is not None and (
+                self.artifact is None or self.artifact.sha256 != self.region.artifact_sha256):
+            raise ValueError("A mesh-part artifact digest must equal the anchored artifact digest")
+        if (self.frame == "declared_biological") != (self.frame_declaration is not None):
+            raise ValueError("Only a declared_biological frame carries a frame_declaration, and it must")
+        if self.frame == "declared_biological" and self.region is None:
+            raise ValueError("A declared biological frame needs a region")
+        return self
+
+
+class ProposedEdit(Model):
+    """A proposal as data. Nothing here changes the anchored record or artifact."""
+    target_path: DottedPath
+    proposed: Any
+    rationale: Text
+
+    @model_validator(mode="after")
+    def bounded(self):
+        if len(canonical(self.proposed)) > 8000:
+            raise ValueError("Proposed value exceeds 8000 bytes")
+        return self
+
+
+class Annotation(Model):
+    kind: Literal["comment", "question", "challenge", "proposed_edit"]
+    body: Text
+    anchor: Anchor
+    reply_to: Ref | None = None
+    proposed_edit: ProposedEdit | None = None
+
+    @model_validator(mode="after")
+    def coherent(self):
+        if (self.kind == "proposed_edit") != (self.proposed_edit is not None):
+            raise ValueError("A proposed_edit annotation carries a proposed_edit, and only it does")
+        if self.reply_to is not None and self.reply_to.kind != "Annotation":
+            raise ValueError("reply_to pins an Annotation")
+        return self
+
+
+PAYLOADS = {c.__name__: c for c in (Claim, Problem, Evidence, Assessment, Action, Actor, ResourceOffer, Interest, Event,
+                                    Project, Annotation)}
 
 
 class Draft(Model):
@@ -403,4 +618,20 @@ def references(record: dict) -> list[tuple[str, dict]]:
     for dimension in p.get("dimensions", {}).values():
         for item in dimension["evidence_links"]:
             edges.append(("review_evidence", item))
+    if record["kind"] == "Project":
+        for m in p["members"]:
+            edges.append(("project_member", m["ref"]))
+            if m.get("calibration"):
+                edges.append(("project_calibration", m["calibration"]))
+            if m.get("artifact"):
+                edges.append(("project_member_artifact", m["artifact"]["evidence"]))
+        for q in p["open_questions"]:
+            if q.get("problem"):
+                edges.append(("project_open_question", q["problem"]))
+    if record["kind"] == "Annotation":
+        edges.append(("annotates", p["anchor"]["record"]))
+        if p["anchor"].get("artifact"):
+            edges.append(("annotates_artifact", p["anchor"]["artifact"]["evidence"]))
+        if p.get("reply_to"):
+            edges.append(("replies_to", p["reply_to"]))
     return edges

@@ -122,6 +122,9 @@ class Store:
     def initialize(self):
         """Operator-only migration, never exposed by HTTP or MCP."""
         with self.connection() as c:
+            # Operator migration on a possibly large store: the connection's 5 s statement cap is for request handling.
+            c.execute("SET statement_timeout = '300s'")
+            c.execute("SET lock_timeout = '30s'")
             c.execute(sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(sql.Identifier(self.schema)))
             c.execute(Path(__file__).with_name("schema.sql").read_text())
             c.execute("INSERT INTO node_config VALUES (1,%s,1) ON CONFLICT DO NOTHING", (self.namespace,))
@@ -183,7 +186,45 @@ class Store:
                 raise Conflict("Stale or forked target version")
         return row["envelope"]
 
+    @staticmethod
+    def _artifact_listed(evidence, sha256):
+        return any(a.get("sha256") == sha256 for a in (evidence["payload"].get("artifacts") or []))
+
+    def _validate_discussion_refs(self, c, record, principal):
+        """Project and Annotation pins. Exact versions must exist and be readable by the author, but need NOT be heads: a
+        discussion may concern a superseded version and a Project pin says exactly which version it means. A PUBLIC record may
+        reference only PUBLIC records, so a public Project/Annotation cannot disclose a private record's coordinates."""
+        found = {}
+        for relation, target in references(record):
+            referenced = self._raw(c, target, principal, current=False)
+            if record["visibility"] == "public" and referenced["visibility"] != "public":
+                raise Conflict(f"A public {record['kind']} may reference only public records")
+            found[(relation, target["version"])] = referenced
+        pl = record["payload"]
+        if record["kind"] == "Project":
+            for m in pl["members"]:
+                art = m.get("artifact")
+                if art and not self._artifact_listed(found[("project_member_artifact", art["evidence"]["version"])], art["sha256"]):
+                    raise Conflict("Pinned artifact digest is not listed by that Evidence version")
+            return
+        anchor = pl["anchor"]
+        anchored = found[("annotates", anchor["record"]["version"])]
+        art = anchor.get("artifact")
+        if art and not self._artifact_listed(found[("annotates_artifact", art["evidence"]["version"])], art["sha256"]):
+            raise Conflict("Anchored artifact digest is not listed by that Evidence version")
+        if pl.get("reply_to"):
+            replied = found[("replies_to", pl["reply_to"]["version"])]
+            same = {k: replied["payload"]["anchor"]["record"][k] for k in ("namespace", "kind", "id")} == \
+                {k: anchor["record"][k] for k in ("namespace", "kind", "id")}
+            if not same:
+                raise Conflict("A reply must anchor the same record as the annotation it answers")
+        edit = pl.get("proposed_edit")
+        if edit and re.split(r"[.\[]", edit["target_path"])[0] not in anchored["payload"]:
+            raise Conflict("Proposed edit path must start at a top-level payload field of the anchored record")
+
     def _validate_refs(self, c, record, principal, current=True):
+        if record["kind"] in ("Project", "Annotation"):
+            return self._validate_discussion_refs(c, record, principal)
         for relation, target in references(record):
             referenced = self._raw(c, target, principal, current=current)
             if record["kind"] == "Evidence" and relation == "produced_by":
@@ -324,6 +365,78 @@ class Store:
                 edges.append({"source": ref(row["envelope"]), "relation": row["relation"], "target": dest})
             return {"edges": edges, "truncated": len(rows) > limit, "depth": 1,
                     "limit": "Typed one-hop relations, including disputed assessments; no implicit support inference."}
+
+    def _edge_heads(self, c, p, relation, kind, target, all_versions, limit):
+        """Head records of `kind` that point at `target` through `relation` (typed edges only, no inference)."""
+        return c.execute("""SELECT v.envelope,s.status FROM typed_edges e
+            JOIN record_versions v ON v.version=e.source_version AND v.kind=%s
+            JOIN heads h ON h.version=v.version JOIN local_states s ON s.version=v.version
+            WHERE e.relation=%s AND ((NOT %s AND e.target_version=%s)
+               OR (%s AND e.target_namespace=%s AND e.target_kind=%s AND e.target_id=%s))
+              AND (v.visibility='public' OR %s::jsonb ? v.namespace)
+            ORDER BY v.created_at,v.version LIMIT %s""",
+            (kind, relation, all_versions, target["version"], all_versions, target["namespace"], target["kind"], target["id"],
+             Jsonb(p["namespaces"] if p else []), limit)).fetchall()
+
+    def _discussion_rows(self, rows):
+        out, withheld = [], 0
+        for r in rows:
+            if _unlicensed_available_content([r["envelope"]]):
+                withheld += 1
+                continue
+            out.append({"record": r["envelope"], "ref": ref(r["envelope"]), "issuer": r["envelope"]["issuer"],
+                        "local_status": r["status"]})
+        return out, withheld
+
+    def annotations_for(self, target: dict, token: str | None = None, limit: int = 50, all_versions: bool = False):
+        """Current annotation heads anchored at an exact version (or at any version of that record id). Read-only; replies are
+        linked by `payload.reply_to`, threading is a display concern. An annotation is not acceptance and not an answer."""
+        if not 1 <= limit <= 100:
+            raise FrontierError("Limit must be 1..100")
+        t = Ref.model_validate(target).model_dump()
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            self._raw(c, t, p)
+            out, withheld = self._discussion_rows(self._edge_heads(c, p, "annotates", "Annotation", t, all_versions, limit))
+            return {"target": t, "all_versions": all_versions, "annotations": out, "withheld_unlicensed": withheld,
+                    "limit": "Current heads only. Author is the authenticated issuer; no field records an answer by anyone else."}
+
+    def projects_for(self, target: dict, token: str | None = None, limit: int = 50, all_versions: bool = False):
+        """Current Project heads that pin the exact version (or any version of the record id) as a member."""
+        if not 1 <= limit <= 100:
+            raise FrontierError("Limit must be 1..100")
+        t = Ref.model_validate(target).model_dump()
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            self._raw(c, t, p)
+            out, withheld = self._discussion_rows(self._edge_heads(c, p, "project_member", "Project", t, all_versions, limit))
+            return {"target": t, "all_versions": all_versions, "projects": out, "withheld_unlicensed": withheld,
+                    "limit": "Membership is a declared pin; it does not establish that the record applies or is accepted."}
+
+    def project_members(self, project: dict, token: str | None = None):
+        """Each pinned member with its availability, whether the pin is the current head, and its LOCAL review status."""
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            record = self._raw(c, project, p)
+            if record["kind"] != "Project":
+                raise FrontierError("Not a Project")
+            rows = []
+            for i, m in enumerate(record["payload"]["members"]):
+                pin = m["ref"]
+                try:
+                    self._raw(c, pin, p)
+                except Missing:
+                    rows.append({"index": i, "pin": pin, "available": False, "is_current": None, "current_version": None,
+                                 "local_status": None})
+                    continue
+                head = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
+                                 (pin["namespace"], pin["kind"], pin["id"])).fetchone()
+                st = c.execute("SELECT status FROM local_states WHERE version=%s", (pin["version"],)).fetchone()
+                rows.append({"index": i, "pin": pin, "available": True, "current_version": head["version"] if head else None,
+                             "is_current": bool(head and head["version"] == pin["version"]),
+                             "local_status": st["status"] if st else None})
+            return {"project": ref(record), "members": rows,
+                    "limit": "Pins are exact versions; a newer head is reported, never substituted."}
 
     def review(self, token, key, assessment: dict):
         a = Assessment.model_validate(assessment)
