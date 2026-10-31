@@ -1,0 +1,230 @@
+{
+ "controls": {
+  "alpha_zero": "same section at alpha 0; symmetric plate gives a jump near 0",
+  "analytic_reference": "thin-airfoil strip mean (reported ratio, not a pass gate: viscous sections at finite Re are expected to differ)"
+ },
+ "cost_estimate_note": "cells only; run time must be measured on a small case by the solver owner",
+ "flow": {
+  "Re_ladder": [
+   1000,
+   "declared-U Re_c per section (see sections)"
+  ],
+  "U_m_s": {
+   "source": "fin_mechanics example_request witness V (declared illustration); unsourced",
+   "status": "assumed",
+   "value": 5.0
+  },
+  "alpha_deg": {
+   "source": "declared; v3a pose has the fin plane containing the stream, so its own alpha is 0",
+   "status": "assumed",
+   "value": 5.0
+  },
+  "alpha_eff_rad_lifting_line": 0.05648454096969436,
+  "alpha_eff_status": "assumed (elliptic lifting line on a non-elliptic fan, AR 3.67)",
+  "medium": "air",
+  "nu_m2_s": {
+   "source": "windtunnel protocol air viscosity (declared)",
+   "status": "assumed",
+   "value": 1.5e-05
+  },
+  "regime_gap": "declared U is unsourced; flight/taxi regimes are not established; no free surface",
+  "rho_kg_m3": {
+   "source": "fin_mechanics example_request rho (design_assumption)",
+   "status": "assumed",
+   "value": 1.225
+  }
+ },
+ "frame_definition": {
+  "b": [
+   -0.9902680524068608,
+   0.138135841130318,
+   0.016960948598139482
+  ],
+  "e_s": [
+   0.13917321718681788,
+   0.9828867981654013,
+   0.12068288035192391
+  ],
+  "fish_frame": "x snout->tail, y left, z dorsal; snout at x=0",
+  "n": [
+   0.0,
+   -0.12186934340514749,
+   0.9925461516413221
+  ],
+  "origin_fish_m": [
+   0.0406162,
+   0.0107359,
+   0.0061743
+  ],
+  "panels_sha256": "1f64a9759de289118e22e6a9edc5d76c63e6daef5c4a5b84e294e80021a1d33d",
+  "rays_sha256": "e644ff48d23e3ab6d616b1bdcbbaea532ed16b36f28970dda5eb75dfa8cb26e8"
+ },
+ "frozen_before_runs": true,
+ "gates": {
+  "grid_pair_rel_diff_max": 0.1,
+  "resolution_cells_across_membrane_min": 2,
+  "sign": "strip-mean jump p_ventral - p_dorsal > 0 for alpha > 0",
+  "stationarity_rel_change_last_two_windows_max": 0.05,
+  "zero_alpha_control_jump_over_alpha_case_max": 0.02
+ },
+ "grid": {
+  "grid_pair": "coarse t/2 and fine t/3 (ratio 1.5); both members of the pair pass the gate, so no coarse result is ever an unresolved one; fine costs 2.25x the cells",
+  "h_fine_m": 3.3333333333333335e-05,
+  "h_m": 5e-05,
+  "h_rule": "coarse h = t_membrane / 2 (the resolution gate)"
+ },
+ "inputs": {
+  "candidate_sha256": "e8c2b666874a0658bf5be95a6603b68463e68dd67ac2c0a0be8728abb7e5763e",
+  "files_sha256": {
+   "components.json": "5ec2c13d65de88d875c1f8c5bc8f5bd202cf058efed900ebf9ffcf02a09574b7",
+   "components/pectoral_L.stl": "220d22253ce104aea9b9be7b23892941e328e7317a19486162f36a2214c309c5",
+   "panels.json": "1f64a9759de289118e22e6a9edc5d76c63e6daef5c4a5b84e294e80021a1d33d",
+   "rays.json": "e644ff48d23e3ab6d616b1bdcbbaea532ed16b36f28970dda5eb75dfa8cb26e8"
+  },
+  "source_commit": "8dc5cc47c9e3b512f8a838d7e3fa9fde8d8bd2c6"
+ },
+ "member": {
+  "frame_id": "fish3d-v3a/pectoral_L/ray0-local@72f9f5c8f253e502",
+  "frame_sha256": "72f9f5c8f253e5029209894e6e46ce38de442dfdc0e3ea482f9f0ff7580ee71e",
+  "member_id": "fish3d-v3a/pectoral_L/ray0",
+  "member_sha256": "baea87d8005083ab03d6c1ad686d79c19475add01fda9c64d3759362062f8c73",
+  "root_m": [
+   "0",
+   "0",
+   "0"
+  ],
+  "tip_m": [
+   "498672778072869/6250000000000000",
+   "0",
+   "0"
+  ]
+ },
+ "not_established": [
+  "a 3D fin load (sections are strips)",
+  "EI(x) or the ray section",
+  "flight regime",
+  "any calibrated organism claim"
+ ],
+ "output_contract": {
+  "case_json_required": [
+   "schema",
+   "station_s_over_L",
+   "member_sha256",
+   "frame_sha256",
+   "candidate_sha256",
+   "h_m",
+   "thickness_m",
+   "medium",
+   "rho_kg_m3",
+   "U_m_s",
+   "alpha_deg",
+   "Re_c",
+   "p_ref",
+   "time_window_s",
+   "gates",
+   "solver",
+   "surface_sha256"
+  ],
+  "per_section_file": "case.json + surface rows, cfd3d 10-column float32 layout, one row per wall segment of the DORSAL face (normal +n), Cp_plus at +offset n, Cp_minus at -(offset + thickness) n, so both faces are sampled outside the wall",
+  "transfer": "engineering.coupled_mechanics.fin_patch.record_from_sections -> member-pressure/2 (dimensionality 2d-extrusion): each section's strip-mean jump times ray 0's own local width at that station (fin_geometry.tributary_v2), never a fan-mean width"
+ },
+ "protocol_sha256": "7e14a21a8ed61aa08eba4d799cf10343f83daf1fe84bffbb08b67c948e7f036c",
+ "purpose": "resolve ray 0's membrane in chordwise sections so the two face pressures exist",
+ "schema": "frontier.coupled.fin-patch-protocol/1",
+ "section_geometry": {
+  "camber": {
+   "status": "assumed",
+   "value": 0.0
+  },
+  "plane": "fin plane (panels.json fin_plane); chord along e_w = +x, normal n = e_w x e_u (dorsal)",
+  "solid": "flat plate of thickness t_membrane over [leading edge, trailing edge] of the outline cut",
+  "thickness_status": "assumed (components.json thickness_mm: membrane 0.10, ray_max 0.6; taper unknown)",
+  "variants": {
+   "membrane_only": {
+    "t_m": 0.0001
+   },
+   "membrane_plus_ray0_rod": {
+    "rod_center": "on the leading edge",
+    "rod_diameter_m": 0.0006,
+    "t_m": 0.0001
+   }
+  }
+ },
+ "sections": [
+  {
+   "Re_c_at_declared_U": 2515.4666666666685,
+   "analytic_reference_strip_mean_jump_Pa": 36.395646188972336,
+   "cells_2d_at_h": 797274.141440001,
+   "cells_along_chord_at_h": 150.92800000000008,
+   "chord_m": 0.007546400000000005,
+   "ray0_at_leading_edge": true,
+   "ray0_width_per_ds_m": 0.000266877241419125,
+   "station_s_over_L": 0.0,
+   "tributary_strip_xi": [
+    0.0,
+    0.035712392664052024
+   ]
+  },
+  {
+   "Re_c_at_declared_U": 8243.457299744292,
+   "analytic_reference_strip_mean_jump_Pa": 39.765907485889834,
+   "cells_2d_at_h": 8562278.119841138,
+   "cells_along_chord_at_h": 494.6074379846575,
+   "chord_m": 0.024730371899232877,
+   "ray0_at_leading_edge": true,
+   "ray0_width_per_ds_m": 0.0007340458383804577,
+   "station_s_over_L": 0.25,
+   "tributary_strip_xi": [
+    0.0,
+    0.029973659059335234
+   ]
+  },
+  {
+   "Re_c_at_declared_U": 9860.086203262865,
+   "analytic_reference_strip_mean_jump_Pa": 33.934483017568105,
+   "cells_2d_at_h": 12249883.791907609,
+   "cells_along_chord_at_h": 591.6051721957718,
+   "chord_m": 0.029580258609788596,
+   "ray0_at_leading_edge": true,
+   "ray0_width_per_ds_m": 0.0012011842361072899,
+   "station_s_over_L": 0.5,
+   "tributary_strip_xi": [
+    0.0,
+    0.04100670624343085
+   ]
+  },
+  {
+   "Re_c_at_declared_U": 9863.473343402382,
+   "analytic_reference_strip_mean_jump_Pa": 29.458904801988997,
+   "cells_2d_at_h": 12258301.40589718,
+   "cells_along_chord_at_h": 591.8084006041429,
+   "chord_m": 0.02959042003020715,
+   "ray0_at_leading_edge": true,
+   "ray0_width_per_ds_m": 0.0015873001390944016,
+   "station_s_over_L": 0.75,
+   "tributary_strip_xi": [
+    0.0,
+    0.05416954079540896
+   ]
+  },
+  {
+   "Re_c_at_declared_U": 8069.512505137881,
+   "analytic_reference_strip_mean_jump_Pa": 24.010588916242593,
+   "cells_2d_at_h": 8204746.040892657,
+   "cells_along_chord_at_h": 484.1707503082729,
+   "chord_m": 0.024208537515413645,
+   "ray0_at_leading_edge": true,
+   "ray0_width_per_ds_m": 0.0019369698214481905,
+   "station_s_over_L": 1.0,
+   "tributary_strip_xi": [
+    0.0,
+    0.08079817107330031
+   ]
+  }
+ ],
+ "solver_requirements": {
+  "owner": "cfd3d (claude-04) chooses the solver; dispatch by infra only",
+  "reference_gate": "the solver's own reference gate must be reported; cfd3d C1 sphere is FAILED as of Update 1 and that blocks any physical-validation wording",
+  "thin_boundary": "resolved solid, >= 2 cells across t_membrane; an immersed-boundary smoothing band wider than the plate is NOT resolution"
+ }
+}

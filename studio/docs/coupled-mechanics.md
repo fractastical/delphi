@@ -11,7 +11,10 @@ its one in-plane strip is a single lattice cell thick. The 3D record from `cfd3d
 yet. Nothing here is a calibrated organism claim, and a passing unit or conservation check
 establishes arithmetic only.
 
-- [x] A port contract (`frontier.coupled.member-pressure/1`) with structured refusals.
+- [x] A port contract with structured refusals. `frontier.coupled.member-pressure/2` is current. It
+  carries a tributary width at every station, with geometry provenance. `/1` (one width per member)
+  is still read for members whose width really is constant (the 2D tunnel strip, the declared
+  uniform rod); for a fan it is superseded (see G1 below).
 - [x] Exact force and root-moment integration, and exact element-mean transfer onto the existing
   `fin_mechanics` FEM. That FEM is reused; no second beam solver was written.
 - [x] Analytic checks: uniform and linear pressure, hand closed forms, grid order 2, force
@@ -28,6 +31,9 @@ establishes arithmetic only.
   - So the blocker is the grid, not the schedule. Those samples will be refused
     (`MEMBER_UNRESOLVED`), and an actual fin load needs a resolved local fin-patch case or a
     validated sub-grid fin model. Neither exists.
+- [x] The returned cfd3d v0.1 3D bundle (job `aijob-e00k0jpm34h4na3b99`) was read under the
+  contract. It is refused at every gate: units, frame, member, resolution, time and stations
+  (see the bundle section below). No fin load comes from it.
 - [ ] A measured EI(x) and a ray section (c, I) for a flying-fish ray (wet lab; no owner).
 - [ ] Fluid-structure feedback. The coupling is one-way and static by design.
 
@@ -36,7 +42,7 @@ establishes arithmetic only.
 | step | formula | unit |
 |---|---|---|
 | traction jump | Δp(s) = p_neg(s) − p_pos(s), acting along the member's unit normal | Pa |
-| line load | q(s) = Δp(s) · w_t, with w_t the declared or geometric tributary width | Pa·m = N/m |
+| line load | q_i = Δp_i · w_i at each station, linear between stations; /2: w_i per station (> 0, aligned by s_m, hashed), /1: one w_t | Pa·m = N/m |
 | resultant | F = ∫₀ᴸ q ds, computed exactly for piecewise-linear q | N |
 | root moment | M₀ = ∫₀ᴸ q s ds = Σ h (q_a(2a+b) + q_b(a+2b)) / 6 | N·m |
 | bending moment | M(x) = ∫ₓᴸ q(t)(t − x) dt, exact | N·m |
@@ -50,6 +56,9 @@ Refused, each with a test:
   stations not covering [0, L] exactly, or a normal that is not a unit vector perpendicular to
   the member.
 - **Bad values:** floats, an undeclared tributary width, or concurrent time.
+- **Bad `/2` widths:** a width that is not > 0 (`NON_POSITIVE`), not in metres, or missing for a
+  station, or whose `s_m` is not its station's (`TRIBUTARY_ALIGNMENT`). Also refused: a scalar
+  `width_m` beside per-station widths, and widths without a geometry hash or a matching widths hash.
 - **Wrong scope:** a 2D section offered for a `whole_fin_3d` target (`SAGITTAL_2D_NOT_3D`).
 - **Unresolved member:** a simulated field with fewer than 2 cells across the member
   (`MEMBER_UNRESOLVED`, a declared minimum).
@@ -102,3 +111,165 @@ result = couple.run(member_pressure_record, member_target)   # raises Refusal(co
 Display the `scope` string with every result, and do not say "coupled" for an analytic or
 refused case. When `cfd3d` publishes a 3D record, pass it through `couple.run` against a target
 built from the same mesh feature. Nothing else changes.
+
+
+## The resolved local fin patch on v3a ray 0 (prepared, not run)
+
+Files: `engineering/coupled_mechanics/{fin_geometry,thin_airfoil,fin_patch,fin_patch_run}.py`,
+`tests/test_fin_patch.py`, and `artifacts/fin-patch/{protocol.json, reference.json, poster.png, manifest.json}`.
+The superseded constant-width version of those four files is kept byte for byte in
+`artifacts/fin-patch/v1-constant-width/` (written by f8ebc13). Both manifests pin it.
+
+**Geometry.** The input is fish3d v3a (`8dc5cc4`, candidate `e8c2b666…`).
+- **Pins:** rays, panels, components and the pectoral_L STL are read only after their sha256
+  values match, and the candidate hash must agree across all three JSON files.
+- **The member:** ray 0 is the only straight ray, and it is the fin's leading edge, swept 8.000°.
+  Its length is L = 79.79 mm (`rays.json` `length_m` 0.07978764). Its polyline departs from the
+  root-tip axis by at most 45 nm (4.54e-8 m), so it is straight to rounding. *(An earlier handoff said
+  "straight ray (45 nm)" without "off-axis", which read as a length. 45 nm is the straightness; the
+  length is 79.79 mm, not 45 mm.)* Rays 1–14 branch, so they are not straight members (gap G6).
+- **The frame:** the member sits in an exact ray-local frame (root 0, tip L = `length_m`), whose
+  definition is hashed into its id. This lets real 3D geometry meet the contract's exact-geometry
+  rule without rounding an irrational length.
+
+**Analytic reference first.** Thin-airfoil theory on a flat plate gives
+ΔCp = 4α√((1−ξ)/ξ). Ray 0's strip, from the leading edge to the midpoint toward ray 1, carries
+4α·G(ξ₁), with G(ξ) = √(ξ(1−ξ)) + asin√ξ.
+- **Finite span:** α_eff = α/(1+2/AR), an elliptic lifting-line correction, assumed. AR is
+  3.67, giving α_eff/α = 0.647.
+  The 2D value is kept as the upper bracket.
+- **Declared inputs:** α 5°, U 5 m/s and ρ 1.225 are all assumed and unsourced. The v3a pose itself
+  has α = 0, because the fin plane contains the stream, so its own load is zero.
+
+| s/L | chord mm | local strip mm | width w_i = dA/ds mm | strip/chord | share of section lift | q_strip mN/m | cells/chord at h | 2D cells | Re_c |
+|---|---|---|---|---|---|---|---|---|---|
+| 0.00 | 7.5 | 0.27 | 0.267 | 3.6% | 23.9% | 9.7 | 151 | 0.8 M | 2515 |
+| 0.25 | 24.7 | 0.74 | 0.734 | 3.0% | 21.9% | 29.2 | 495 | 8.6 M | 8243 |
+| 0.50 | 29.6 | 1.21 | 1.201 | 4.1% | 25.6% | 40.8 | 592 | 12.2 M | 9860 |
+| 0.75 | 29.6 | 1.60 | 1.587 | 5.4% | 29.4% | 46.8 | 592 | 12.3 M | 9863 |
+| 1.00 | 24.2 | 1.96 | 1.937 | 8.1% | 35.7% | 46.5 | 484 | 8.2 M | 8070 |
+
+The width is the strip's area per unit length of ray: the strip is bounded by chordwise lines, so
+over ds of the swept ray it covers cos(8°)·ds of span, and w_i = (chordwise strip) · cos λ
+(`fin_geometry.tributary_v2`, from the pinned outline and ray 1). Each record carries the widths,
+their sha256, and the sha256 of the pinned geometry files.
+
+Through `parse_pressure` as `member-pressure/2`, this is accepted as an analytic adapter check.
+- **Force:** F = 2.889 mN, root moment 0.1344 mN·m (declared U and α; not a flight load).
+- **Station error:** q is linear between stations, and the strip load is not. At five stations F is
+  1.65% and M 1.59% below a 65-station transfer. The error shrinks with every refinement
+  (`station_convergence`).
+- **Deflection and stress:** NOT COMPUTED. EI and the ray section stay unknown.
+- **Contract changes:** `parse_member` (the target's geometry half), and the versioned `/2`
+  tributary. `/1` keeps its refusals and its order. With equal widths, `/2` reproduces `/1`
+  exactly in stations, F, M and deflection (tested).
+
+**Gaps** (`reference.json` `gaps`):
+- **G1, fan width: CLOSED by `/2`** (root decision, 2026-10-31). Under `/1` the contract carried
+  one width per member, the fan mean of 1.25 mm, while the local width grows from 0.27 to 1.96 mm.
+  That made the load 1.155× the strip force (+15.5%) and 0.914× its root moment (−8.6%), with its
+  shape along the ray inverted. Those numbers are retained in `v1-constant-width/` and recomputed
+  from code by a test. Under `/2` both ratios are 1 at the stations, and the station error above
+  is what remains.
+  - **Tests:** a linear width against hand closed forms for F and M, exactly. A quadratic load
+    whose F error equals the trapezoid term L·h²·q″/12, exactly. The constant-width reduction to
+    `/1`. Mutated pairing: reversed values break the closed form, and reversed labels are refused
+    as `TRIBUTARY_ALIGNMENT`. Zero, negative, float, non-metre and unhashed widths are refused.
+  - **Mutants:** six, each caught: reversed widths, index-shifted widths, no alignment check,
+    no cos λ, no positivity check, no widths-hash check.
+- **G2, section not 3D:** finite span enters only through the assumed α_eff.
+- **G3, leading-edge singularity:** the strip is finite, but a sampled strip under-counts it as
+  √(row width); the tests measure this halving when rows quadruple.
+- **G4, regime:** speed and angle are unsourced; there is no free surface and no body interference.
+- **G5, thickness:** membrane 0.10 mm and ray 0.6 mm are assumed, with the taper unknown.
+- **G6, branched rays:** rays 1–14 are not straight members.
+- **G7, structure:** EI and the ray section are unknown.
+- **G8, global CFD:** cfd3d v1 carries the membrane as a smeared 3.7-cell shell, so it is not used.
+
+**The frozen patch case** (`protocol.json`, file sha256 `6c1a0aa6…`, `protocol_sha256` `7e14a21a…`;
+the v1 case `f2c859e0…` is superseded, and no run was made against it). The only change from v1 is
+the output contract: sections now transfer as `/2` with ray 0's own width at each station. Every
+gate and the grid are unchanged, and a test pins them.
+- **Sections:** five chordwise sections at the contract stations s/L = 0, ¼, ½, ¾, 1. The contract
+  needs both ends.
+- **Solid:** the membrane plate as a real solid, in two declared variants: membrane only, and
+  membrane plus a 0.6 mm ray-0 rod at the leading edge.
+- **Grid:** h = t/2 = 50 µm coarse and t/3 fine. Both pass the ≥2-cell gate, so no coarse member is
+  ever unresolved.
+- **Gates, frozen:** grid pair ≤ 10%, stationarity ≤ 5%, α = 0 control ≤ 2%, and the jump sign.
+  The analytic ratio is reported, not gated.
+- **Solver reference:** the solver's own reference gate is required. cfd3d's C1 is FAILED, which
+  blocks physical-validation wording.
+- **Output:** each section's surface rows go through `fin_patch.record_from_sections` (emits `/2`), which
+  computes resolution from the section's own `h_m` and `thickness_m`. It refuses on an unresolved
+  section, a missing medium, a member hash mismatch, or a missing station. The record is
+  `2d-extrusion`, so a `whole_fin_3d` target is refused.
+- **Ownership:** cfd3d owns the solver and its packaging, and infra owns dispatch. Cell counts are
+  arithmetic; run time must be measured by the solver owner.
+
+
+## The returned cfd3d v0.1 3D bundle, read under the contract (no solver run)
+
+Files: `engineering/coupled_mechanics/cfd3d_bundle.py`, `artifacts/coupled-mechanics/cfd3d-v2-inspection.json`,
+tests in `tests/test_coupled_mechanics.py`. The raw return is infra's untracked tree
+(`infra-director/results/infra/cfd3d-v2/results/infra22-cfd3d-geometry-dispatch-repair/out`, 48 files).
+The inspection pins every file it read by sha256. CFD04 curates the assets and owns their
+interpretation and the videos.
+
+**Transport.** The archive (1,855,111 B, sha256 `30b9fe61…`) is **not on this host**, so its hash is
+recorded by transport only (`manifest-infra22.json` and `job.log`, both read here) and was not
+recomputed. `status.json` and the platform files are committed in infra-director `5ba6c0e`,
+byte-identical to the raw tree.
+
+**Lineage, recomputed:**
+- The candidate is `4a3b912e`: the sha256 of `geometry/candidate.json`, named by components.json,
+  every case.json and status.json. **It is not v3a `e8c2b666`.** The builder commit (`994aac4`) comes
+  from cfd3d's packet message (`cfd3d-to-infra.md`); the bundle's geometry JSON does not name it.
+  The only commit inside it, `87e72f9`, is the NCA comparison commit that supplied the mass input.
+- Each case's STL hashes match components.json, and the status coefficients equal each case.json's.
+- `render.json` pins case.json. Its 82 slice inputs are not in the bundle, so the videos' frame
+  lineage cannot be re-verified from it.
+- Only `gpu_fish_L128_Re1000` returned surface samples (12 components). The other three cases
+  carry case.json and forces.json only.
+
+**Consistency.** For all four cases, Re = U·L_cells/ν holds exactly (1·64/0.32 = 200 and so on),
+h = L_ref/L_cells, and the fin thickness in cells recomputes as 0.5 mm / h = 0.139, 0.277, 0.277 and
+0.416. Every fin is `resolved: false`, both as declared and by the ≥ 2-cell rule. The medium is
+`none`, and the window means recompute from each case's own force time series (0 relative
+difference). The drift between the two halves of the averaging window is ≤ 0.16%.
+
+**Grid pairs** (cfd3d's rule: no convergence claim unless a pair differs by ≤ 10%; reported against both
+denominators):
+
+| pair | ratio | Cd_total | Cd_pressure | Cz_total |
+|---|---|---|---|---|
+| L64 / L128, Re 200 | 2 | 13.2% / 11.6%: no | 42.6% / 29.9%: no | 122% / 55%: no |
+| L128 / L192, Re 1000 | 1.5 | 9.8% / 8.9%: yes | 28.9% / 22.4%: no | 63% / 38%: no |
+
+Only Cd_total at Re 1000 is inside 10%, and that pair's ratio is 1.5, not the rule's L vs L/2. With
+the C1 sphere reference FAILED (|Cd| 0.875 and 0.857 against 1.092), nothing here is validated.
+
+**Surface samples** (L128, Re 1000):
+- All 12 components have the row counts case.json declares and unit normals, and they close
+  (Σ n·dA = 0 to float precision).
+- Cp_minus is NaN exactly on the closed volumes, and every offset meets cfd3d's rule (2 cells on
+  closed bodies, half-thickness + 1 = 2.866 on fins).
+- The sampled pressures do **not** integrate to the solver's pressure force: −∮Cp·n·dA/L² gives
+  Cd_p 0.0056 over all components against the solver's 0.0229
+  at the final step (0.25×), and 0.0027 on the
+  resolved body alone. A load integrated from these offset samples is therefore not the solver's
+  load, even where the body is resolved.
+- Pectoral one-face jump (the +z face, 203 rows; cfd3d's single-face rule): the area-mean
+  ventral − dorsal ΔCp is 0.0030 (L) and 0.0031 (R), in a range of ±0.04. These are smeared
+  sub-grid shell values, and in water that is about 0.03 mPa.
+
+**Contract.** The pectoral_L samples go in as a `/2` record for the v3a ray-0 target:
+- As delivered, the record is refused at `WRONG_PRESSURE_UNIT` (Cp, medium none).
+- Each refusal was then relabelled away by declaration only, to show that every later limit binds
+  on its own. The chain gives `FRAME_MISMATCH`, `GEOMETRY_MISMATCH` (candidate 4a3b912e),
+  `MEMBER_UNRESOLVED` (0.277 cells), `BAD_TIME` (the sample time is not stated) and
+  `STATION_COVERAGE` (that geometry has no straight ray member).
+- No stage is accepted, and the reader raises if one ever is. These are relabels, not repairs.
+
+**Not established:** any fin or ray load, physical validity, grid convergence, dimensional pressure,
+the v3a geometry, and the flight, taxi or free-surface regime. This reader ran no solver.

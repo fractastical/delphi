@@ -18,16 +18,32 @@ A flow model publishes `frontier.coupled.member-pressure/1`:
 pressure on the face the unit `normal` points out of, `p_neg_Pa` the pressure on the opposite face.
 The net traction p_neg - p_pos pushes the member along +normal.
 
+`frontier.coupled.member-pressure/2` is the same record with a tributary width at every station:
+
+     "tributary": {"status": "declared"|"from_geometry", "source": str, "unit": "m",
+                   "geometry_sha256": 64-hex,             # what the widths were derived from
+                   "widths": [{"s_m": str, "width_m": str}, ...],   # one per station, same s_m
+                   "widths_sha256": 64-hex}               # canonical sha256 of `widths`
+
+Each width must be > 0 and its s_m must equal the station's s_m exactly, so a width can never be
+paired with another station's jump. q_i = jump_i * width_i at each station and, as in /1, q is
+linear between stations: where jump(s) * width(s) curves, the producer places stations densely
+enough (the reconstruction error is O(h^2) and is measured in the tests, not assumed away).
+Version 1 (one `tributary.width_m` per member) is still read, for members whose width really is
+constant. A fan's width is not, and its producers emit /2.
+
 All physical numbers are exact decimal/rational strings (floats refused, as in fin_mechanics).
 Units are checked, never converted: lattice units, model units or a non-metre frame are refused.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 from fractions import Fraction
 
 from engineering.fin_mechanics.load_bridge import Refusal, exact
 
-from . import SCHEMA_PRESSURE, SCHEMA_TARGET
+from . import SCHEMA_PRESSURE, SCHEMA_PRESSURE_V2, SCHEMA_TARGET
 
 HEX = set("0123456789abcdef")
 
@@ -50,6 +66,10 @@ def _vec(v, name):
     return tuple(exact(c, f"{name}[{i}]") for i, c in enumerate(v))
 
 
+def canonical_sha(obj) -> str:
+    return hashlib.sha256(json.dumps(obj, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
 def _norm2(v):
     return sum(c * c for c in v)
 
@@ -61,14 +81,31 @@ def _pos(v, name):
     return x
 
 
-def parse_target(t: dict) -> dict:
-    """frontier.coupled.member-target/1: the straight clamped-free ray the load is applied to."""
+def _member_geometry(t: dict):
     if not isinstance(t, dict) or t.get("schema") != SCHEMA_TARGET:
         raise Refusal("BAD_SCHEMA", f"target schema must be {SCHEMA_TARGET}")
     root, tip = _vec(t.get("root_m"), "target.root_m"), _vec(t.get("tip_m"), "target.tip_m")
     L = _norm2(tuple(b - a for a, b in zip(root, tip)))
     if L == 0:
         raise Refusal("ZERO_LENGTH", "target root == tip")
+    return root, tip, L
+
+
+def parse_member(t: dict) -> dict:
+    """The geometry half of a target, for a load-only transfer where EI and the section are unknown.
+
+    Same schema and the same geometry refusals as parse_target; EI, section and n_elements are not
+    read, so nothing downstream can solve a beam from it."""
+    root, tip, L = _member_geometry(t)
+    if t.get("frame_length_unit") != "m":
+        raise Refusal("WRONG_LENGTH_UNIT", f"target.frame_length_unit={t.get('frame_length_unit')!r}, need 'm'")
+    return {"id": t.get("member_id"), "frame_id": t.get("frame_id"), "root": root, "tip": tip,
+            "L2": L, "claim": t.get("claim", "member_scenario")}
+
+
+def parse_target(t: dict) -> dict:
+    """frontier.coupled.member-target/1: the straight clamped-free ray the load is applied to."""
+    root, tip, L = _member_geometry(t)
     ei = t.get("EI") or {}
     lo, hi = _pos(ei.get("lo_Nm2"), "target.EI.lo_Nm2"), _pos(ei.get("hi_Nm2"), "target.EI.hi_Nm2")
     if lo > hi:
@@ -88,15 +125,38 @@ def parse_target(t: dict) -> dict:
             "n_elements": int(t.get("n_elements", 64))}
 
 
+def _widths(trib: dict, s: list[Fraction]) -> list[Fraction]:
+    """/2 widths: one positive exact width per station, aligned by s_m, with provenance hashes."""
+    if "width_m" in trib:
+        raise Refusal("TRIBUTARY_WIDTH", "member-pressure/2 carries tributary.widths per station, not a scalar width_m")
+    if trib.get("unit") != "m":
+        raise Refusal("WRONG_LENGTH_UNIT", f"tributary.unit={trib.get('unit')!r}, need 'm'")
+    _hex64(trib.get("geometry_sha256"), "tributary.geometry_sha256")
+    ws = trib.get("widths")
+    if not isinstance(ws, list) or len(ws) != len(s):
+        raise Refusal("TRIBUTARY_ALIGNMENT",
+                      f"need one width per station: {len(ws) if isinstance(ws, list) else ws!r} widths, {len(s)} stations")
+    if _hex64(trib.get("widths_sha256"), "tributary.widths_sha256") != canonical_sha(ws):
+        raise Refusal("BAD_HASH", "tributary.widths_sha256 does not hash tributary.widths")
+    out = []
+    for i, (w, si) in enumerate(zip(ws, s)):
+        if not isinstance(w, dict) or exact(w.get("s_m"), f"tributary.widths[{i}].s_m") != si:
+            raise Refusal("TRIBUTARY_ALIGNMENT",
+                          f"tributary.widths[{i}].s_m != stations[{i}].s_m = {si}; a width is paired with its own station only")
+        out.append(_pos(w.get("width_m"), f"tributary.widths[{i}].width_m"))
+    return out
+
+
 def parse_pressure(rec: dict, target: dict) -> dict:
     """Validate a member-pressure record against the target. Returns stations as exact q(s) [N/m].
 
     Refusal codes (each a test): BAD_SCHEMA, WRONG_PRESSURE_UNIT, WRONG_LENGTH_UNIT, FRAME_MISMATCH,
     GEOMETRY_MISMATCH, BAD_NORMAL, STATION_COVERAGE, MEMBER_UNRESOLVED, SAGITTAL_2D_NOT_3D, BAD_HASH,
-    FLOAT_INPUT, TRIBUTARY_WIDTH, BAD_TIME.
+    FLOAT_INPUT, TRIBUTARY_WIDTH, TRIBUTARY_ALIGNMENT (/2), NON_POSITIVE, BAD_TIME.
     """
-    if not isinstance(rec, dict) or rec.get("schema") != SCHEMA_PRESSURE:
-        raise Refusal("BAD_SCHEMA", f"pressure schema must be {SCHEMA_PRESSURE}")
+    if not isinstance(rec, dict) or rec.get("schema") not in (SCHEMA_PRESSURE, SCHEMA_PRESSURE_V2):
+        raise Refusal("BAD_SCHEMA", f"pressure schema must be {SCHEMA_PRESSURE_V2} or {SCHEMA_PRESSURE}")
+    version = 2 if rec["schema"] == SCHEMA_PRESSURE_V2 else 1
     src = rec.get("source") or {}
     kind = src.get("evidence_kind")
     if kind not in ("simulated", "analytic"):
@@ -158,7 +218,7 @@ def parse_pressure(rec: dict, target: dict) -> dict:
     trib = rec.get("tributary") or {}
     if trib.get("status") not in ("declared", "from_geometry"):
         raise Refusal("TRIBUTARY_WIDTH", "tributary.status must be declared | from_geometry")
-    width = _pos(trib.get("width_m"), "tributary.width_m")
+    width_v1 = _pos(trib.get("width_m"), "tributary.width_m") if version == 1 else None
 
     st = rec.get("stations")
     if not isinstance(st, list) or len(st) < 2:
@@ -168,10 +228,12 @@ def parse_pressure(rec: dict, target: dict) -> dict:
     if s[0] != 0 or s[-1] * s[-1] != target["L2"] or any(b <= a for a, b in zip(s, s[1:])):
         raise Refusal("STATION_COVERAGE",
                       "stations must start at s=0, end exactly at the target length and increase strictly")
+    widths = _widths(trib, s) if version == 2 else [width_v1] * len(s)
     jump = [exact(x.get("p_neg_Pa"), f"stations[{i}].p_neg_Pa") - exact(x.get("p_pos_Pa"), f"stations[{i}].p_pos_Pa")
             for i, x in enumerate(st)]
-    q = [j * width for j in jump]  # Pa * m = N/m, exact
-    return {"s_m": s, "jump_Pa": jump, "q_N_per_m": q, "width_m": width, "L_m": s[-1],
+    q = [j * w for j, w in zip(jump, widths)]  # Pa * m = N/m, exact, station by station
+    return {"s_m": s, "jump_Pa": jump, "q_N_per_m": q, "widths_m": widths,
+            "width_m": width_v1, "contract_version": version, "L_m": s[-1],
             "dimensionality": dim, "evidence_kind": kind, "source": src, "time": t,
             "scope": ("3d member traction" if dim == "3d" else
                       "2d-extrusion section scenario: not a finite 3D fin" if dim == "2d-extrusion" else
