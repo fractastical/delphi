@@ -1,10 +1,13 @@
 // Streamable HTTP transport for the hosted server. Stateless: every POST /mcp gets a fresh
 // McpServer, so any number of machines can serve it. The SPARQL store is module-level and shared.
 
+import { existsSync, readFileSync } from "node:fs";
 import { createServer as createHttpServer } from "node:http";
+import { join } from "node:path";
+import { gzipSync } from "node:zlib";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { browseClaims } from "./graph.mjs";
-import { localFileCount } from "./lib.mjs";
+import { browseClaims, setDocsBase } from "./graph.mjs";
+import { REPO, localFileCount } from "./lib.mjs";
 import { observeRateLimited, observeRequest, observeSession, observeVisitor, renderMetrics } from "./metrics.mjs";
 
 const RATE_LIMIT = Number(process.env.DELPHI_RATE_LIMIT ?? 120); // requests per IP per minute
@@ -72,12 +75,30 @@ Claude Code:                 claude mcp add --transport http delphisci https://$
 Forum tools (delphi_propose_claim, delphi_log_test_result, ...) post as you: call
 delphi_forum_register once, then send the key as the X-Claw-Api-Key header or the apiKey argument.
 
+Claim graph page: https://${host}/docs/claim-graph.html   (theorems: /docs/theorems.html)
+
 Data: ${files} TriG files; claim graph built ${built}. Limit: ${RATE_LIMIT} requests/minute per IP.
 `;
+
+// The built pages that tool results link to. They inline their data, so each is one file.
+const DOC_PAGES = { "claim-graph.html": "text/html", "theorems.html": "text/html", "claims-query.html": "text/html", "claims.json": "application/json" };
+
+function loadDocs() {
+  const docs = new Map();
+  for (const [name, type] of Object.entries(DOC_PAGES)) {
+    const file = join(REPO, "docs", name);
+    if (!existsSync(file)) continue;
+    const body = readFileSync(file);
+    docs.set(`/docs/${name}`, { type: `${type}; charset=utf-8`, body, gzip: gzipSync(body) });
+  }
+  return docs;
+}
 
 export function serveHttp(createServer, port) {
   const files = localFileCount();
   const { built } = browseClaims({ limit: 1 });
+  const docs = loadDocs();
+  if (!process.env.DELPHI_DOCS_URL) setDocsBase(`${(process.env.DELPHI_PUBLIC_URL ?? `http://localhost:${port}`).replace(/\/$/, "")}/docs`);
 
   const http = createHttpServer(async (req, res) => {
     const path = new URL(req.url, "http://x").pathname;
@@ -86,6 +107,14 @@ export function serveHttp(createServer, port) {
     if (req.method === "OPTIONS") { res.writeHead(204, CORS); return res.end(); }
     if (path === "/healthz") return send(res, 200, { ok: true, files, built });
     if (path === "/" && req.method === "GET") return send(res, 200, landing(req.headers.host, files, built), "text/plain; charset=utf-8");
+    if (path === "/docs" || path === "/docs/") { res.writeHead(302, { ...CORS, Location: "/docs/claim-graph.html" }); return res.end(); }
+    if (docs.has(path) && (req.method === "GET" || req.method === "HEAD")) {
+      const page = docs.get(path);
+      const gzip = /\bgzip\b/.test(req.headers["accept-encoding"] ?? "");
+      const body = gzip ? page.gzip : page.body;
+      res.writeHead(200, { ...CORS, "Content-Type": page.type, "Content-Length": body.length, "Cache-Control": "public, max-age=300", Vary: "Accept-Encoding", ...(gzip ? { "Content-Encoding": "gzip" } : {}) });
+      return res.end(req.method === "HEAD" ? undefined : body);
+    }
     if (path !== "/mcp") return send(res, 404, { error: "Not found. The MCP endpoint is /mcp." });
     if (req.method !== "POST") return rpcError(res, 405, "Method not allowed: this server is stateless, use POST /mcp.");
     observeVisitor(ip);

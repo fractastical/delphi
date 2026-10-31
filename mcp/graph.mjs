@@ -9,12 +9,14 @@ import { REPO, getClaim, overview, rankClaims, searchClaims } from "./lib.mjs";
 
 export const CLAIMS_JSON = join(REPO, "docs/claims.json");
 
-// Links into the built pages. DELPHI_DOCS_URL points them at a hosted copy of docs/ instead.
-const DOCS = (process.env.DELPHI_DOCS_URL ?? pathToFileURL(join(REPO, "docs")).href).replace(/\/$/, "");
+// Links into the built pages. DELPHI_DOCS_URL points them at a hosted copy of docs/ instead; the
+// HTTP server sets its own /docs, since file: links would point inside its container.
+let docs = process.env.DELPHI_DOCS_URL ?? pathToFileURL(join(REPO, "docs")).href;
+export const setDocsBase = url => { docs = url; };
 // Query parameters understood by docs/claim-graph.html: level, math (yes|no), thm, thinker, p, t, claim.
 export function graphUrl(params = {}, page = "claim-graph") {
   const q = new URLSearchParams(Object.entries(params).filter(([, v]) => v != null && v !== false && v !== ""));
-  return `${DOCS}/${page}.html${q.size ? `?${q}` : ""}`;
+  return `${docs.replace(/\/$/, "")}/${page}.html${q.size ? `?${q}` : ""}`;
 }
 const LEVELS = ["lean", "literature", "partial", "untested", "refuted"];
 const LEVEL_LABEL = { lean: "Lean-checked", literature: "Proved (literature)", partial: "Partly proved", untested: "Not proved", refuted: "Refuted" };
@@ -136,9 +138,16 @@ export function graphStatus() {
 }
 
 // delphi_overview: the nanopub overview plus the graph's status table and links.
+// The status table always comes from the repo snapshot, so the markdown opens with what the chosen
+// source returned; otherwise local and network look identical in clients that show only the text.
 export async function overviewWithGraph(source) {
   const { markdown, built, total, links } = graphStatus();
-  return { markdown, ...(await overview(source)),
+  const o = await overview(source);
+  const claims = o.domains.reduce((n, d) => n + Number(d.claims), 0);
+  const from = source === "network" ? `published nanopubs at ${o.endpoint}` : `${o.files} TriG files in the repo, including unpublished drafts`;
+  const head = `**Source: ${source}** (${from}): ${claims} claims in ${o.domains.length} domains, ${o.assessmentTypes.length} assessment types. `
+    + `The claim graph table below is the repo snapshot (docs/claims.json) whatever the source.`;
+  return { markdown: `${head}\n\n${markdown}`, ...o,
     claimGraph: { built, total, links, more: "delphi_graph with no arguments returns this table per thinker; add filters to list claims" } };
 }
 
