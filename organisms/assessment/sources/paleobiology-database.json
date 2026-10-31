@@ -1,0 +1,55 @@
+{
+  "source_id": "paleobiology-database",
+  "label": "The Paleobiology Database (PBDB), Data Service 1.2",
+  "homepage": "https://paleobiodb.org/",
+  "data_paper_or_docs": [
+    "https://paleobiodb.org/data1.2/",
+    "https://paleobiodb.org/data1.2/occs/list_doc.html",
+    "https://paleobiodb.org/data1.2/taxa/single_doc.html",
+    "https://paleobiodb.org/data1.2/changelog_doc.html",
+    "https://doi.org/10.1017/pab.2015.39",
+    "https://doi.org/10.5070/P9401160531",
+    "https://doi.org/10.1073/pnas.111144698",
+    "https://doi.org/10.15468/zzoyxi"
+  ],
+  "references": [
+    {
+      "citation": "Peters SE, McClennen M (2016) The Paleobiology Database application programming interface. Paleobiology 42(1):1-7.",
+      "doi": "10.1017/pab.2015.39",
+      "verified": "Crossref metadata for 10.1017/pab.2015.39 returns this title and authors (checked 2026-10-31). Note: the DOI 10.1017/pab.2015.47 sometimes quoted for this paper resolves to Petsios & Bottjer (2016), 'Quantitative analysis of the ecological dominance of benthic disaster taxa...', and must not be used for it."
+    },
+    {
+      "citation": "Uhen MD, Allen B, Behboudi N, Clapham ME, et al. (2023) Paleobiology Database User Guide Version 1.0. PaleoBios 40(11).",
+      "doi": "10.5070/P9401160531",
+      "verified": "Crossref metadata returns this title and authors; the eScholarship landing page answers HTTP 403 to non-browser clients (checked 2026-10-31)."
+    },
+    {
+      "citation": "Alroy J, Marshall CR, Bambach RK, Bezusko K, et al. (2001) Effects of sampling standardization on estimates of Phanerozoic marine diversification. Proc Natl Acad Sci USA 98(11):6261-6266.",
+      "doi": "10.1073/pnas.111144698",
+      "verified": "Crossref metadata returns this title and authors; the PNAS landing page is behind a bot challenge (HTTP 403) for non-browser clients (checked 2026-10-31)."
+    },
+    {
+      "citation": "The Paleobiology Database (2024) The Paleobiology Database. Occurrence dataset registered with GBIF, DOI 10.15468/zzoyxi, licence CC BY 4.0.",
+      "doi": "10.15468/zzoyxi",
+      "verified": "DataCite record and GBIF dataset c33ce2f2-c3cc-43a5-a380-fe4526d63650 both resolve; GBIF records licence http://creativecommons.org/licenses/by/4.0/legalcode (checked 2026-10-31)."
+    }
+  ],
+  "governance": "Non-governmental, non-profit public resource organised and operated by an international, multi-institutional group of palaeontologists (GBIF dataset description: nearly 400 contributing scientists from over 130 institutions in 24 countries). Fossil occurrences are compiled from the published literature by authorised contributors under an authorizer/enterer model and attributed to a reference (ref:N) and an enterer; taxonomic opinions are likewise referenced. Data are released under CC BY 4.0 (stated in the GBIF registration; the PBDB FAQ is a JavaScript page that could not be read by script).",
+  "versioning": "The data service is versioned (1.1 retained, 1.2 is the stable production version with a published change log); the database itself is live and edited continuously, so occurrence counts (records_found, noc) are not tied to a snapshot. Taxon numbers (txn:N) and occurrence numbers (occ:N) are stable identifiers. There is no DOI for a dated snapshot of the whole database; the GBIF registration DOI 10.15468/zzoyxi identifies the dataset as a whole, not a version.",
+  "licensing": "CC BY 4.0 (per the GBIF registration of the PBDB occurrence dataset).",
+  "scores": {
+    "source-authority": 0.9,
+    "independence": 0.9,
+    "authenticity": 1.0
+  },
+  "known_issues": [
+    "Every JSON response embeds an 'elapsed_time' field, so a SHA-256 recorded for an API response can never be reproduced; integrity of PBDB records has to be judged on the re-queried count, not the checksum.",
+    "The classic web pages (paleobiodb.org/classic/checkTaxonInfo?taxon_no=N, basicTaxonInfo) answer HTTP 403 to non-browser clients, so they are unusable as machine-resolvable identifiers; the equivalent data-service URL taxa/single.json?id=txn:N resolves.",
+    "Homonyms: PBDB holds animal names reused across kingdoms and phyla, e.g. Ctenophora is both the comb-jelly phylum (txn:6994) and a tipulid fly genus (txn:139744), and Tardigrada is both the water-bear phylum (txn:67137) and a disused sloth name replaced by Folivora (txn:57074). taxa/single?name= and occs/list?base_name= silently pick one of them; a base_name query for 'Tardigrada' returns sloth occurrences.",
+    "Names that are nomina dubia, nomina nuda or synonyms are resolved to the accepted taxon for base_name queries (field 'tdf' documents the relation), so a count labelled with the queried name may actually be the count of the accepted taxon.",
+    "The 'noc' field of a taxon record and 'records_found' of occs/list?base_name= for the same taxon can differ by a few records (e.g. Dinosauria 37901 vs 37899 on 2026-10-31) because they are computed differently; both are legitimate PBDB numbers.",
+    "Coverage is uneven and literature-driven: many extant taxa have zero or very few occurrences, and counts for higher taxa include everything nested under them, so sums over nested taxa double-count.",
+    "Counts drift as contributors add or re-identify occurrences; a count is only reproducible to within the drift accumulated since the recorded retrieval time."
+  ],
+  "rationale": "PBDB is one of the governed international infrastructures the rubric names explicitly for the 1.0 anchor: it has a peer-reviewed description of its API (Peters & McClennen 2016), a published user guide (Uhen et al. 2023), a CC BY 4.0 licence, stable taxon and occurrence identifiers, a versioned data service with a change log, and a GBIF-registered DOI. It is scored 0.9 rather than 1.0 for source authority because the database content is live and un-snapshotted (an occurrence count cannot be cited to a version) and because the DOI identifies the dataset, not a release. Independence is 0.9: occurrences are curated primary records transcribed from the published literature with no relation to this project, but PBDB is itself a compilation (occurrences and taxonomic opinions contributed by many working groups, some imported in bulk from earlier compilation projects), so independence between its constituent sources is not complete. Authenticity is 1.0: everything served is a real literature-derived record with a reference and an enterer; the fabrication risk lies in how a record cites it (wrong DOIs, homonymous names), which is scored per record."
+}
