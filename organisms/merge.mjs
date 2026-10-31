@@ -112,9 +112,14 @@ for (const { project, slice, dir } of slices()) {
       }
       for (const c of d.counts ?? []) {
         const same = (m.counts ?? []).some((x) => x.property_id === c.property_id && x.value === c.value);
-        if (!same) (m.counts ??= []).push({ ...c, slice: `${project}/${slice}` });
+        if (!same) {
+          const clash = (m.counts ?? []).find((x) => x.property_id === c.property_id && x.value !== c.value && !x.slice);
+          if (clash && /^n_/.test(c.property_id))
+            conflicts.push(`dataset ${d.id}: ${c.property_id} ${clash.value} vs ${c.value} in ${project}/${slice} (check the queried key)`);
+          (m.counts ??= []).push({ ...c, slice: `${project}/${slice}` });
+        }
       }
-      if (m.identifier !== d.identifier) conflicts.push(`dataset ${d.id}: identifier differs in ${project}/${slice}`);
+      if (m.identifier !== d.identifier) m.alternate_identifiers = uniq([...(m.alternate_identifiers ?? []), d.identifier]);
     }
   }
 
