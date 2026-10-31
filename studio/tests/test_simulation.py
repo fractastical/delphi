@@ -97,3 +97,30 @@ def test_mass_drops_out_at_fixed_wing_loading_and_ar():
 def test_pareto_mask_exact():
     objs = np.array([[1, 1, 1], [2, 2, 2], [0, 3, 3], [1, 1, 1.0001]], float)
     assert list(sweep.pareto_mask(objs)) == [True, False, True, False]
+
+
+def test_controlled_baselines_are_dataset_grounded_and_cross_checked():
+    from engineering.simulation import controlled as CT
+    for M in CT.MASSES:
+        b = CT.baseline("Cypselurus", M)
+        assert b["WL_cross_check_rel_diff"] < 0.10 and b["WL_in_range"]          # Table I implied WL within 10% of the separate Table II fit
+    assert not CT.baseline("Exocoetus", 0.4)["WL_in_range"]                    # excluded by the envelope rule, not silently kept
+
+
+def test_controlled_sink_rate_falls_with_area_and_aspect_ratio_independent_of_release_speed():
+    from engineering.simulation import controlled as CT
+    pol = CT.POLARS["P1_nominal"]
+    b = CT.baseline("Cypselurus", 0.05)
+    sinks = []
+    for fs in (0.85, 1.0, 1.3):
+        d = {"m": 0.05, "S": b["S"] * fs, "AR": b["AR"]}
+        sinks.append(CT.metrics(d, 12.0, pol)[2])
+    assert sinks[0] > sinks[1] > sinks[2]
+    d = {"m": 0.05, "S": b["S"], "AR": b["AR"]}
+    assert CT.metrics(d, 12.0, pol)[2] == CT.metrics(d, 20.0, pol)[2]
+
+
+def test_controlled_stall_constraint_marks_heavy_baseline_infeasible_at_12ms():
+    from engineering.simulation import controlled as CT
+    b = CT.baseline("Cypselurus", 0.4)
+    assert CT.metrics(b, 12.0, CT.POLARS["P1_nominal"])[1] > 12.0               # level stall speed exceeds the release speed
