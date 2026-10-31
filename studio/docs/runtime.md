@@ -11,6 +11,13 @@ The owner requested public browsing: the web unit sets `FRONTIER_PUBLIC_READ=1`.
 This opens the site and public record reads without an audience token. Anonymous
 visitors get an automatically issued CSRF session for the bounded engineering and
 belief calculators; it conveys no contributor identity or write permission.
+
+Contributor clients may inspect their own identity with `POST /v1/read/identity`,
+an empty JSON object and an `Authorization: Bearer` header. The response contains
+the principal's actor, operator, roles, namespaces and daily write limit, never
+the token. Public access and a browser session do not authorize this endpoint.
+Use the authenticated actor when composing contributions; ordinary proposal
+authorization, exact-version references and idempotency still apply.
 Private records remain filtered, and contribution, review, import and action
 transitions still require operator bearer credentials and their existing roles.
 `--public-site` retains its older shell-only meaning; private mode is still the
