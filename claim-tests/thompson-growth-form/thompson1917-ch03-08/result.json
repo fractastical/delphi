@@ -2,7 +2,7 @@
   "claim_id": "thompson1917-ch03-08",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch03-08",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Sex-specific population growth-velocity curves (stature, and weight as in Thompson's Fig. 5) have the same sequence of phases and nearly the same shape once shifted in time and scaled in amplitude, with the girls' adolescent acceleration beginning, peaking and ending earlier than the boys'.",
   "pass_criterion": "Pre-registered. From pooled NHANES 2007-2018 measured stature and weight (exam age in months), compute for each sex monthly medians, a weighted smoothing spline, and its derivative (velocity). Primary outcome = stature velocity; secondary = weight velocity. Define for each sex: takeoff age = age of the minimum smoothed velocity between 6 yr and the peak; peak age = age of the maximum smoothed velocity in 8-17 yr; end age = first age after the peak at which stature velocity falls below 1.0 cm/yr (weight: below 50% of the peak). Supports if, for stature, (i) girls' peak age is earlier than boys' by >= 1.0 yr with a 95% bootstrap CI (1000 resamples of individuals) excluding 0, (ii) girls' takeoff and end ages are both earlier than boys', and (iii) shape similarity: after shifting the girls' velocity curve by the peak-age difference and regressing the boys' curve on it over boys' ages 6-17 (monthly grid), Pearson r >= 0.8; and for weight, girls' peak age is earlier by >= 1.0 yr.",
   "fail_criterion": "Refutes if the girls' stature peak age is not earlier than the boys' (difference <= 0 or CI includes 0), or if the aligned curves have r < 0.5 (different shapes), or if the sexes show a different sequence of phases (e.g. no adolescent peak in one sex). Mixed if the stature lead is >= 1 yr but takeoff/end ordering or the weight lead fails, or if 0.5 <= r < 0.8.",
@@ -11,12 +11,228 @@
     "nhanes-bmx-2007-2018"
   ],
   "interpretation": "Thompson's 'acceleration-curve' (mean annual increments) is what is now called a velocity curve; his Fig. 5 is for weight, from Quetelet, and the sentence generalizes to growth. 'Phase' is read as the timing of takeoff, peak and end of the adolescent spurt; 'amplitude' as the velocity level (reported, not scored, since the claim only says it differs). Cross-sectional NHANES medians attenuate and widen each sex's spurt relative to longitudinal curves, but a timing difference between sexes survives this smoothing. Modern US children, not Quetelet's 1830s Belgians.",
-  "datasets": [],
-  "method": "",
-  "measured": {},
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "datasets": [
+    {
+      "id": "nhanes-demo-2007-2018",
+      "name": "NHANES Demographic Variables and Sample Weights (DEMO), cycles 2007-2008 to 2017-2018",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "doi": null,
+      "version": "cycles E-J (2007-2018)",
+      "license": "US Government public domain",
+      "files": [
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2007/DataFiles/DEMO_E.xpt",
+          "retrieved_at": "2026-10-31T04:33:03Z",
+          "byte_size": 3498080,
+          "sha256": "02b8e97703d04bc99769c751881bece51ac9ba68cf18a2992a45d3bdfb856147"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2009/DataFiles/DEMO_F.xpt",
+          "retrieved_at": "2026-10-31T04:33:04Z",
+          "byte_size": 3631600,
+          "sha256": "78c4d4a6e5eafa9da3bbb24a90d140fef5d8c0cda932a7ff8ee609288d4fae07"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2011/DataFiles/DEMO_G.xpt",
+          "retrieved_at": "2026-10-31T04:33:05Z",
+          "byte_size": 3753760,
+          "sha256": "eaf0525d1952626885af3e935415a1f66ad62c18698080e7354789c125af252d"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/DEMO_H.xpt",
+          "retrieved_at": "2026-10-31T04:33:05Z",
+          "byte_size": 3833200,
+          "sha256": "f8f0cbb3085a323d4cde22349b164878fea1e64dbc404e65b5815c7816b547d7"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/DEMO_I.xpt",
+          "retrieved_at": "2026-10-31T04:33:06Z",
+          "byte_size": 3756480,
+          "sha256": "c9297c6c37ae8f78f29be9568fa2a03cf3b112616a39afee04030fc775a66a0d"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt",
+          "retrieved_at": "2026-10-31T04:33:06Z",
+          "byte_size": 3412720,
+          "sha256": "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec"
+        }
+      ],
+      "role": "sex, age in months at exam (RIDEXAGM; RIDAGEMN for 2007-2010)"
+    },
+    {
+      "id": "nhanes-bmx-2007-2018",
+      "name": "NHANES Body Measures (BMX), cycles 2007-2008 to 2017-2018",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "doi": null,
+      "version": "cycles E-J (2007-2018)",
+      "license": "US Government public domain",
+      "files": [
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2007/DataFiles/BMX_E.xpt",
+          "retrieved_at": "2026-10-31T04:33:04Z",
+          "byte_size": 1800240,
+          "sha256": "b67b50dbd12c9510b49b6348b595b9fd073c422c0c6eac182f90ac57b491a97d"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2009/DataFiles/BMX_F.xpt",
+          "retrieved_at": "2026-10-31T04:33:04Z",
+          "byte_size": 1890560,
+          "sha256": "1fa42e07764037674c3f56e1e76f990e10c32245897597de3d731c57b91d869a"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2011/DataFiles/BMX_G.xpt",
+          "retrieved_at": "2026-10-31T04:33:05Z",
+          "byte_size": 1946720,
+          "sha256": "4814bfc3047ed400b9d43d285f8c3ea7c940ac6489404a9b699579715d158ec3"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/BMX_H.xpt",
+          "retrieved_at": "2026-10-31T04:33:05Z",
+          "byte_size": 2045520,
+          "sha256": "fd5e9fc6e6aab0a4aee6e699f51497bbc9b62101f7f43aee924c473e38fd9442"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/BMX_I.xpt",
+          "retrieved_at": "2026-10-31T04:33:06Z",
+          "byte_size": 1989600,
+          "sha256": "d31da84e14212b4e58e8340598a5b8e2144fac83333563e966eb1b332e4141d6"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/BMX_J.xpt",
+          "retrieved_at": "2026-10-31T04:33:06Z",
+          "byte_size": 1466000,
+          "sha256": "8d675e42d8826ac98714b2c3dd4c5138a5e353fb4424f7eff5e6db4a01ce838a"
+        }
+      ],
+      "role": "measured standing height (BMXHT), recumbent length (BMXRECUM) and weight (BMXWT)"
+    }
+  ],
+  "method": "NHANES DEMO+BMX 2007-2018 merged on SEQN; examined persons under 20 yr (stature: boys 12038, girls 11513; weight: boys 12155, girls 11594). For each sex and variable, monthly medians were smoothed with a local-linear Gaussian-kernel regression (SD 0.5 yr, weights = bin size) and the local slope taken as velocity on a monthly grid 0.5-19.5 yr. Takeoff = pre-spurt velocity minimum from 6 yr to the peak; peak = velocity maximum in 8-17 yr; end = first age after the peak with stature velocity < 1 cm/yr (weight: < 50% of peak). The girls' curve was shifted later by the peak-age difference and correlated with the boys' curve over boys' ages 6-17 (Pearson r; regression slope reported as the amplitude ratio). 1000 bootstrap resamples of individuals gave 95% CIs for the sex difference in peak age.",
+  "measured": {
+    "value": 2.0,
+    "unit": "years by which the girls' stature-velocity peak precedes the boys' (boys 12.92 yr, girls 10.92 yr)",
+    "n": 23551,
+    "uncertainty": "95% bootstrap CI [1.67, 4.58] yr",
+    "extra": {
+      "stature": {
+        "peak_age_lead_girls_yr": 2.0,
+        "takeoff_lead_girls_yr": 1.416666666666667,
+        "end_lead_girls_yr": 2.0,
+        "shape_r_after_shift": 0.9322510207587014,
+        "amplitude_slope_boys_on_girls": 0.8850643065277898,
+        "amplitude_intercept": 0.5048436889795622,
+        "peak_velocity_ratio_boys_over_girls": 1.1551534338887905,
+        "peak_age_lead_ci95": [
+          1.666666666666666,
+          4.583333333333336
+        ],
+        "boys": {
+          "takeoff_age": 8.750000000000004,
+          "takeoff_velocity": 4.6367728299915685,
+          "peak_age": 12.916666666666671,
+          "peak_velocity": 8.593584332011682,
+          "end_age": 17.000000000000007,
+          "n": 12038,
+          "velocity_by_year": {
+            "1.0": 15.005,
+            "2.0": 9.881,
+            "3.0": 7.914,
+            "4.0": 7.564,
+            "5.0": 6.613,
+            "6.0": 6.237,
+            "7.0": 6.5,
+            "8.0": 5.607,
+            "9.0": 4.776,
+            "10.0": 6.104,
+            "11.0": 6.052,
+            "12.0": 6.197,
+            "13.0": 8.519,
+            "14.0": 5.129,
+            "15.0": 3.512,
+            "16.0": 1.443,
+            "17.0": 0.972,
+            "18.0": 0.452,
+            "19.0": 0.18
+          }
+        },
+        "girls": {
+          "takeoff_age": 7.333333333333337,
+          "takeoff_velocity": 5.354873617877742,
+          "peak_age": 10.916666666666671,
+          "peak_velocity": 7.439344488707123,
+          "end_age": 15.000000000000007,
+          "n": 11513,
+          "velocity_by_year": {
+            "1.0": 15.438,
+            "2.0": 9.726,
+            "3.0": 8.317,
+            "4.0": 7.572,
+            "5.0": 6.393,
+            "6.0": 6.983,
+            "7.0": 5.585,
+            "8.0": 6.257,
+            "9.0": 6.362,
+            "10.0": 6.081,
+            "11.0": 7.409,
+            "12.0": 4.991,
+            "13.0": 2.813,
+            "14.0": 1.308,
+            "15.0": 0.892,
+            "16.0": 0.413,
+            "17.0": -0.016,
+            "18.0": 0.447,
+            "19.0": 0.315
+          }
+        }
+      },
+      "weight": {
+        "peak_age_lead_girls_yr": 2.083333333333334,
+        "takeoff_lead_girls_yr": -0.583333333333333,
+        "end_lead_girls_yr": 2.666666666666668,
+        "shape_r_after_shift": 0.8172943544297819,
+        "amplitude_slope_boys_on_girls": 0.6651720391004522,
+        "amplitude_intercept": 1.8947332983266778,
+        "peak_velocity_ratio_boys_over_girls": 1.0651444633085112,
+        "peak_age_lead_ci95": [
+          -0.9166666666666679,
+          3.502083333333333
+        ],
+        "boys": {
+          "takeoff_age": 6.000000000000003,
+          "takeoff_velocity": 2.5667185915101123,
+          "peak_age": 13.166666666666671,
+          "peak_velocity": 7.054886932814419,
+          "end_age": 15.500000000000007,
+          "n": 12155
+        },
+        "girls": {
+          "takeoff_age": 6.583333333333336,
+          "takeoff_velocity": 2.5461196859093977,
+          "peak_age": 11.083333333333337,
+          "peak_velocity": 6.623408538313008,
+          "end_age": 12.83333333333334,
+          "n": 11594
+        }
+      },
+      "criteria": {
+        "i_stature_peak_lead_ge_1yr_ci_excl_0": true,
+        "ii_takeoff_and_end_earlier_in_girls": true,
+        "iii_shape_r_ge_0.8": true,
+        "weight_peak_lead_ge_1yr": true
+      },
+      "verdict_by_prereg_rule": "supports",
+      "bandwidth_yr": 0.5
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.85,
+  "caveats": [
+    "Deviation from pre-registration: as in thompson1917-ch03-05, the pre-registered smoothing-spline derivative was numerically unstable on monthly medians, so a fixed-bandwidth (SD 0.5 yr) local-linear kernel smoother on the same monthly medians is used; thresholds unchanged.",
+    "Cross-sectional velocities: population medians spread each sex's spurt, so absolute peak velocities (8.6 cm/yr boys, 7.4 cm/yr girls) are far below longitudinal peak-height velocities, but the between-sex timing difference (2.0 yr) is consistent with longitudinal literature.",
+    "The weight-velocity peak lead (2.1 yr) meets the secondary criterion as a point estimate, but its bootstrap CI [-0.92, 3.50] includes 0 because median weight by month is noisy; weight takeoff is not earlier in girls (-0.6 yr). The verdict rests on the pre-registered primary (stature) outcome.",
+    "Shape similarity (r = 0.93 after a 2.0-yr shift, boys' amplitude 1.16x girls' at the peak) was assessed over ages 6-17 only; infancy and early childhood were not part of the comparison.",
+    "Modern US sample; Thompson's Fig. 5 was Quetelet's 1830s Belgian weight increments. Only the ordering and similarity of phases, not their calendar ages, are claimed."
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "claude-fable-5.1",
