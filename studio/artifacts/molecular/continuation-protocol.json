@@ -1,0 +1,77 @@
+{
+  "schema": "frontier.molecular.continuation-protocol/1",
+  "warmstart_url": "https://frontier.morphoswarm.ai/artifacts/molecular/warmstart-v3.tar.xz",
+  "warmstart_sha256": "4154fcdc3784fa1bfe6c667cdc20fabc346e8c482d9010ad5646a10eea78c3bf",
+  "source_job_id": "aijob-e00h8rra7x8ams6jyn",
+  "parent_protocol_sha256": "945cd8f81926a234c2ff9f817784e70e38754c10eecba83385d2d4e434409da6",
+  "branches": [
+    {
+      "source_seed": 1731,
+      "new_thermostat_seed": 11731,
+      "state_path": "parents/final-state-1731.xml",
+      "baseline_reference_path": "parents/reference-1731.npz",
+      "baseline_metrics_path": "parents/metrics-1731.json",
+      "state_sha256": "d7207d31693291efa96a77c716abfa36c702a26e48b53482ec19acc0eb8bc2e2"
+    },
+    {
+      "source_seed": 1732,
+      "new_thermostat_seed": 11732,
+      "state_path": "parents/final-state-1732.xml",
+      "baseline_reference_path": "parents/reference-1732.npz",
+      "baseline_metrics_path": "parents/metrics-1732.json",
+      "state_sha256": "b1c46e525ebfdbc85ae948888870c3232875c4f88eaf6840afa905749dd9119b"
+    },
+    {
+      "source_seed": 1733,
+      "new_thermostat_seed": 11733,
+      "state_path": "parents/final-state-1733.xml",
+      "baseline_reference_path": "parents/reference-1733.npz",
+      "baseline_metrics_path": "parents/metrics-1733.json",
+      "state_sha256": "bf5b2082f54793f89ff0a6468e2857303bec192c43e2bd47247ff9765c9c0273"
+    }
+  ],
+  "temperature_K": 300,
+  "friction_per_ps": 1,
+  "timestep_ps": 0.001,
+  "additional_production_steps": 900000,
+  "parent_production_ps": 100,
+  "frames_per_branch": 100,
+  "reset_velocities": false,
+  "minimize": false,
+  "extra_thermalization_steps": 0,
+  "constraints": "Same serialized System/HBonds/rigidwater; tolerance1e-6",
+  "random_state_note": "State XML does not preserve integrator RNG state; each conditional branch starts from exact recorded positions/velocities using new declared thermostat seed, not bitwise replay of parent stochastic stream.",
+  "controls": {
+    "finite_difference_nm": 1e-05,
+    "gradient_relative_max": 0.005,
+    "CPU_Reference_force_relative_L2_max": 0.005,
+    "CPU_CUDA_force_relative_L2_max": 0.002,
+    "CPU_CUDA_energy_error_per_atom_max": 0.01,
+    "nve_duration_ps": 0.05,
+    "nve_drift_over_initial_kinetic_max": 0.02
+  },
+  "predeclared_analysis": {
+    "question": "Does slow structural drift persist between the100ps parent and conditional1ns total production?",
+    "RMSD_reference": "Original parent production-start C-alpha coordinates from savedfloat32 frame; referencequantization acknowledged",
+    "radius_of_gyration": "Geometric unweighted C-alpha Rg, nm; not hydrodynamic/mass-weighted Rg",
+    "window_global_production_ps": [
+      [
+        600,
+        800
+      ],
+      [
+        800,
+        1000
+      ]
+    ],
+    "small_window_drift_diagnostic": {
+      "expression": "abs(mean_RMSD_late-mean_RMSD_previous)<0.02nm AND abs(mean_CA_Rg_late-mean_CA_Rg_previous)<0.02nm",
+      "RMSD_threshold_nm": 0.02,
+      "CA_Rg_threshold_nm": 0.02,
+      "meaning": "Descriptive finite-window diagnostic only, not proof of equilibrium; retain false outcomes"
+    },
+    "replicates": "Three conditional branches share structure,forcefield,solvent and parent source; do not count parent+continuation as6independent runs"
+  },
+  "interpretation": "No folding kinetic, equilibrium, modulus, native fish or biological-success claim",
+  "runtime_plan": "Measured18s/100ps suggests~486s GPU plus bounded controls/install/return; max1500s workload,16MB compressed result parts"
+}
