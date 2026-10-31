@@ -258,6 +258,7 @@ def print_forms(ins: Inputs, out: dict) -> dict | None:
     return {"label": man.get("label"), "sets": sets, "display_scale_note": man.get("display_scale_note"), "printer_resin": man.get("printer_resin"), "run": {k: man["run"].get(k) for k in ("box_mm", "launch_speed_query_m_s", "libraries")} | {"solver_commit": (man["run"].get("solver") or {}).get("commit"), "solver_branch": (man["run"].get("solver") or {}).get("branch")}, "forms": forms}
 
 
+EVENT_START_UTC = "2026-10-30T07:00:00"   # 2026-10-30 00:00 PDT; the event window the System page may report on
 SIM_OUT = "@artifacts/simulations"
 CTRL_DIR = "engineering/simulation/results_controlled"
 
@@ -317,12 +318,23 @@ def build_timeline(ins: Inputs) -> dict | None:
         path = f"results/{f.name}"; t = ins.text(path); date = f.name[:10]
         head = next((l for l in t.splitlines() if l.startswith("**")), ""); title = next((l[2:].strip() for l in t.splitlines() if l.startswith("# ")), f.name)
         dated_only.append({"title": title, "outcome": re.sub(r"\*+", "", head).strip()[:260], "ok": None, "path": path, "sha256": sha(path), "date": date})
+    rows = [r for r in rows if r["time"] >= EVENT_START_UTC]       # only dated use inside the event window; no earlier preparation is narrated
     rows.sort(key=lambda r: r["time"])
     po = json.loads(ins.read("results/resources/provider-outcome.json")); n = po["nebius"]; g = po["google_compute"]
     undated = dated_only + [{"title": "Nebius CPU worker request (" + po["task"] + ")", "outcome": f"{n['result']} on quota {n['quota']}: limit {n['limit']}, aggregate requested {n['aggregate_requested']}; no job created", "ok": False, "path": "results/resources/provider-outcome.json", "sha256": sha("results/resources/provider-outcome.json")},
         {"title": "Google compute enable", "outcome": f"{g['error']} ({g['reason']}); no VM created", "ok": False, "path": "results/resources/provider-outcome.json", "sha256": sha("results/resources/provider-outcome.json")}]
     N = R["compute"]["nebius"]
-    return {"observed_at": R["observed_at"], "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
+    mu = R["model_usage"]; emb = mu.get("gemini_embedding_index", {}); bio = mu.get("bioservices_gemini_calls", {}); wi = R["worker_inventory"]; na = wi["native_agents"]
+    tel_s = sum(t["samples"] * t["sample_period_ms"] / 1000 for t in R["historical_gpu_telemetry"])
+    live_states = ", ".join(f"{n} {k.lower().replace('_', ' ')}" for k, n in N["job_states"].items() if n)
+    counters = [
+        {"quantity": "Agents", "value": f"{na['root_coordinator']} root coordinator and {na['child_agents']} child agents reported by the orchestration API; {wi['selected_frontier_tmux_panes']['count']} tmux panes of unknown activity", "status": "partial", "note": "Roles beyond these counts are not recorded in a receipt here. Total distinct agents: unknown.", "source": ri},
+        {"quantity": "Model calls and tokens", "value": f"Embedding index: {emb.get('embedding_requests')} requests, {emb.get('documents_embedded')} documents, {emb.get('failed_requests')} failed. Bioservices ledger: {bio.get('calls')} calls, {bio.get('input_tokens')} input and {bio.get('output_tokens_including_thinking')} output tokens (thinking included)", "status": "partial", "note": "These two receipts only. Total model usage across all workers: unknown.", "source": ri},
+        {"quantity": "GPU jobs", "value": f"{N['own_job_count']} jobs by this project on Nebius: {live_states}", "status": "actual", "note": "Job allocation state at " + N["observed_at_utc"] + "; allocation is requested capacity, not utilisation.", "source": ri},
+        {"quantity": "GPU seconds", "value": f"{tel_s:.0f} s inside {len(R['historical_gpu_telemetry'])} sampled telemetry windows", "status": "partial", "note": "Sampled windows only, a lower bound on measured time. Total GPU seconds across all jobs: unknown.", "source": ri},
+        {"quantity": "CPU jobs and usage", "value": "No CPU counter is recorded", "status": "unknown", "note": "One Nebius CPU worker request was refused (ResourceExhausted); local CPU runs are not metered here.", "source": "results/resources/provider-outcome.json"},
+        {"quantity": "Cost", "value": "Unknown", "status": "unknown", "note": R["cost"]["interpretation"], "source": ri}]
+    return {"observed_at": R["observed_at"], "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
         "unknown": [R["cost"]["interpretation"], "Total provider LLM usage: " + str(R["model_usage"].get("total_provider_llm_usage", "unknown")), "Utilisation of currently allocated GPUs is unknown until sampled."],
         "limitations": R["scope"]["limitations"], "inventory": ri, "inventory_sha256": sha(ri)}
 

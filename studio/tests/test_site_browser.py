@@ -933,3 +933,16 @@ def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, b
     pg2 = page(browser, 400, 800)
     pg2.goto(base + "#/home"); pg2.wait_for_selector(".aboutmenu summary")
     assert not pg2.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+
+
+def test_system_built_tab_reports_counters_only_with_unknowns_and_no_scorecard(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=built")
+    pg.wait_for_selector("#bt-h")
+    t = pg.locator("#main").text_content()
+    for q in ("Agents", "Model calls and tokens", "GPU jobs", "GPU seconds", "CPU jobs and usage", "Cost"):
+        assert q in t, q
+    assert "No CPU counter is recorded" in t and "Total GPU seconds across all jobs: unknown" in t and "Total distinct agents: unknown" in t
+    assert "875 s" in t and "Reuse by anyone outside this team is not recorded" in t
+    assert "%" not in pg.locator(".tablewrap").first.text_content()
+    assert "scorecard" not in t.lower() and "rubric" not in t.lower()
