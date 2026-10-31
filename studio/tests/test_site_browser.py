@@ -943,6 +943,6 @@ def test_system_built_tab_reports_counters_only_with_unknowns_and_no_scorecard(b
     for q in ("Agents", "Model calls and tokens", "GPU jobs", "GPU seconds", "CPU jobs and usage", "Cost"):
         assert q in t, q
     assert "No CPU counter is recorded" in t and "Total GPU seconds across all jobs: unknown" in t and "Total distinct agents: unknown" in t
-    assert "875 s" in t and "Reuse by anyone outside this team is not recorded" in t
+    assert "1037.4 s" in t and "GPU kernel seconds and billed GPU seconds: unknown" in t and "not a count of agents" in t and "Provider COMPLETED means the container ended" in t and "Reuse by anyone outside this team is not recorded" in t
     assert "%" not in pg.locator(".tablewrap").first.text_content()
     assert "scorecard" not in t.lower() and "rubric" not in t.lower()

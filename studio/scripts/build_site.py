@@ -12,6 +12,7 @@ those is derivable from a file here.
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import re
 import shutil
@@ -301,18 +302,20 @@ def build_timeline(ins: Inputs) -> dict | None:
     ri = "results/resources/resource-inventory.json"
     if not (ROOT / ri).exists():
         return None
+    uf = "results/resources/hackathon-usage.json"; U = json.loads(ins.read(uf)) if (ROOT / uf).exists() else None
     R = json.loads(ins.read(ri)); rows = []; sha = lambda path: ins.seen[path]["sha256"] if path in ins.seen else None
     add = lambda t, kind, title, outcome, path, ok=None, scope="", digest=None: rows.append({"time": t, "kind": kind, "title": title, "outcome": outcome, "ok": ok, "path": path, "sha256": digest or sha(path), "scope": scope})
     for f in sorted((ROOT / "deploy/receipts").glob("*.json")):
         path = f"deploy/receipts/{f.name}"; d = json.loads(ins.read(path)); ch = d.get("checks", [])
         npass = sum(1 for c in ch if c.get("passed")); target = d.get("base") or d.get("endpoint") or "public node"
         add(d["checked_at"], "live check", f.stem.replace("-", " ") + " (" + target + ")", f"{npass} of {len(ch)} checks passed", path, npass == len(ch), d.get("scope", ""))
-    for k, u in R["model_usage"].items():
+    for k, u in (U or R)["model_usage"].items():
         if isinstance(u, dict) and u.get("window_utc"):
             out = ", ".join(f"{n.replace('_', ' ')} {u[n]}" for n in ("documents_embedded", "embedding_requests", "failed_requests", "calls", "input_tokens", "output_tokens_including_thinking") if n in u)
             add(u["window_utc"][0], "model usage", f"{u.get('provider', 'provider')} {u.get('model', k.replace('_', ' '))}", out + f"; window {u['window_utc'][0]} to {u['window_utc'][1]}", u["receipt"], u.get("failed_requests", 0) == 0 if "failed_requests" in u else None, u["usage_scope"], u.get("sha256"))
-    for t in R["historical_gpu_telemetry"]:
-        add(t["window_utc"][0], "GPU telemetry", t["task_label"], f"{t['samples']} samples at {t['sample_period_ms']} ms; GPU utilisation mean {t['gpu_utilization_pct_mean']}%, max {t['gpu_utilization_pct_max']}%; memory max {t['gpu_memory_used_mib_max']} of {t['gpu_memory_total_mib']} MiB", t["source"], None, "A sampled historical window, not current utilisation.", t.get("sha256"))
+    for t in (U or R)["historical_gpu_telemetry"]:
+        mem = f"; memory max {t['gpu_memory_used_mib_max']} of {t['gpu_memory_total_mib']} MiB" if t.get("gpu_memory_used_mib_max") is not None and t.get("gpu_memory_total_mib") else ""
+        add(t["window_utc"][0], "GPU telemetry", t["task_label"], f"{t['samples']} samples at {t.get('sample_period_ms', 1000)} ms; GPU utilisation mean {t['gpu_utilization_pct_mean']}%, max {t['gpu_utilization_pct_max']}%" + (f", {t['samples_ge_90']} samples at or above 90%" if t.get("samples_ge_90") is not None else "") + mem, t["source"], None, "A sampled historical window, not current utilisation.", t.get("sha256"))
     dated_only = []
     for f in sorted((ROOT / "results").glob("20*.md")):
         path = f"results/{f.name}"; t = ins.text(path); date = f.name[:10]
@@ -334,7 +337,23 @@ def build_timeline(ins: Inputs) -> dict | None:
         {"quantity": "GPU seconds", "value": f"{tel_s:.0f} s inside {len(R['historical_gpu_telemetry'])} sampled telemetry windows", "status": "partial", "note": "Sampled windows only, a lower bound on measured time. Total GPU seconds across all jobs: unknown.", "source": ri},
         {"quantity": "CPU jobs and usage", "value": "No CPU counter is recorded", "status": "unknown", "note": "One Nebius CPU worker request was refused (ResourceExhausted); local CPU runs are not metered here.", "source": "results/resources/provider-outcome.json"},
         {"quantity": "Cost", "value": "Unknown", "status": "unknown", "note": R["cost"]["interpretation"], "source": ri}]
-    return {"observed_at": R["observed_at"], "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
+    usage = None
+    if U:
+        pdt = lambda iso: (datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")) - datetime.timedelta(hours=7)).strftime("%H:%M:%S PDT")
+        sc = U["own_job_state_counts"]; ag = U["agents"]; mu = U["model_usage"]; emb = mu["gemini_embedding_index"]; bio = mu["bioservices_gemini_calls"]; of = (U.get("hosted_biomodels") or [{}])[0]
+        st = lambda d: ", ".join(f"{n} {k.lower()}" for k, n in d.items() if n)
+        counters = [
+            {"quantity": "Agents", "value": f"{ag['native_running_snapshot']} native agents with orchestrator status running; {ag['known_contributors_in_audited_slice']} identified contributors in the audited {ag['contributor_window_seattle']} slice", "status": "partial", "note": ag["definition"] + " Total distinct agents and currently active agents: unknown. No collective speedup is measured.", "source": uf},
+            {"quantity": "GPU jobs (own H100)", "value": f"{sum(sc['gpu'].values())}: {st(sc['gpu'])}", "status": "actual", "note": f"Own job records from {pdt(U['provider_window_utc'][0])} to {pdt(U['provider_window_utc'][1])} on 2026-10-31. Provider COMPLETED is not a scientific pass. Shared H100 capacity is not our use.", "source": uf},
+            {"quantity": "CPU jobs (own)", "value": f"{sum(sc['cpu'].values())}: {st(sc['cpu'])}", "status": "actual", "note": "CPU seconds are not recorded: unknown.", "source": uf},
+            {"quantity": "GPU container work seconds", "value": f"{U['five_completed_h100_container_work_seconds']} s across five completed H100 jobs", "status": "partial", "note": U["time_definition"] + " GPU kernel seconds and billed GPU seconds: unknown.", "source": uf},
+            {"quantity": "GPU utilisation", "value": f"{len(U['historical_gpu_telemetry'])} sampled windows, listed below; current utilisation unknown", "status": "partial", "note": "Windows include low and zero values; no project-wide average is inferred.", "source": uf},
+            {"quantity": "Model calls and tokens", "value": f"Embedding index: {emb['embedding_requests']} requests, {emb['documents_embedded']} documents, {emb['failed_requests']} failed. Bioservices ledger: {bio['calls']} calls, {bio['input_tokens']} input and {bio['output_tokens_including_thinking']} output tokens (thinking included). Hosted OpenFold2: {of.get('count', 0)} operation, {of.get('final_status', '')}", "status": "partial", "note": "Named ledgers only; embedding and generation units are not merged. Total tokens: unknown. BioNeMo-specific execution: not established.", "source": uf},
+            {"quantity": "Cost", "value": "Unknown (not $0)", "status": "unknown", "note": U["cost"]["interpretation"] + " Google Compute: blocked by an unaccepted terms-of-service step; no VM created.", "source": uf}]
+        usage = {"observed_at_seattle": U["observed_at_seattle"], "jobs": [{"name": j["name"], "kind": "GPU" if "gpu" in j["platform"] else "CPU", "state": j["state"], "created": pdt(j["created_at"]), "capacity": j["requested_capacity"]} for j in sorted(U["own_jobs"], key=lambda j: j["created_at"])],
+            "controller": [{"task": e["task"], "status": e["controller_status"], "wall_s": e["container_wall_s"], "rc": e["result_rc"], "path": e["source"], "sha256": e["sha256"]} for e in U["recent_controller_events"]],
+            "roles": ag["roles"], "credit": U["external_tools_credit"], "limitations": U["limitations"], "sha256": sha(uf)}
+    return {"observed_at": R["observed_at"], "usage": usage, "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
         "unknown": [R["cost"]["interpretation"], "Total provider LLM usage: " + str(R["model_usage"].get("total_provider_llm_usage", "unknown")), "Utilisation of currently allocated GPUs is unknown until sampled."],
         "limitations": R["scope"]["limitations"], "inventory": ri, "inventory_sha256": sha(ri)}
 
