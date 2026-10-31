@@ -115,7 +115,7 @@ for (const { project, slice, dir } of slices()) {
         if (!same) {
           const clash = (m.counts ?? []).find((x) => x.property_id === c.property_id && x.value !== c.value && !x.slice);
           // Counts scoped to the slice's own taxa (n_rows_for_taxa, n_taxa_covered) differ by design.
-          if (clash && /^n_/.test(c.property_id) && !/for_taxa|covered|listed/.test(c.property_id))
+          if (clash && /^n_/.test(c.property_id) && !/for_taxa|covered|listed|matched|resolved/.test(c.property_id))
             conflicts.push(`dataset ${d.id}: ${c.property_id} ${clash.value} vs ${c.value} in ${project}/${slice} (check the queried key)`);
           (m.counts ??= []).push({ ...c, slice: `${project}/${slice}` });
         }
