@@ -54,6 +54,44 @@ Cellpose-SAM on the Nebius Scientific AI Platform segmented micrographs from sev
 
 This project builds on the Project Delphi ontology and uses [nanopublications](https://nanopub.net/) (nanopubs) as the format for publishing and querying small, citable, machine-readable scientific claims.
 
+## ScienceClaw hackathon work (Oct 31 – Nov 1)
+
+Team roles and deadlines are in [#53](https://github.com/fractastical/delphi/issues/53). This section
+covers the genotype–phenotype, validation and MCP-testing work (Amit's row) and the agent threads that
+produce it. Everything below is built from repository files by scripts; no figure is typed by hand.
+
+**Start here:** https://delphi-mission-control.ashenoy000.workers.dev/start/ — one page that reads every
+thread's status live.
+
+| Page | What it shows |
+| --- | --- |
+| [Knowledge graph](https://delphi-mission-control.ashenoy000.workers.dev/graph/) | Claims, data tests from both agent swarms, Lean theorems, datasets, taxa, the flying-fish blueprint, open problems and candidate answers, with provenance on every node. `?view=theorems` clusters open problems by the claims their theorems formalise. |
+| [Claim Book](https://delphi-mission-control.ashenoy000.workers.dev/proofs/) | Each formalised claim end to end: source, data verdict, the Lean source, the prover's own explanation beside each step, the mutations that had to fail, and the faithfulness verdict. |
+| [Figures](https://delphi-mission-control.ashenoy000.workers.dev/figures/) | Every figure with its data source and SHA-256, including the flight phylogeny and gene families. |
+| [Deck](https://delphi-mission-control.ashenoy000.workers.dev/deck/) | The running pitch; unevidenced slides are greyed out. A PowerPoint is built from the same data. |
+| [Lean](https://delphi-mission-control.ashenoy000.workers.dev/t/lean/) | 53 theorems, zero `sorry`, statement-level mutation testing, the constraint checker and the open-problems elimination ledger. |
+
+**Where things live**
+
+| Path | Contents |
+| --- | --- |
+| `lean/` | Lean 4 formalisations, `constraints.json`, the candidate checker (`lean/eliminate/`), certificates |
+| `claim-tests/` | Pre-registered data tests, A9 faithfulness assessments (`assessment/`), OpenResearch logs |
+| `open-problems/` | 215 open problems from named sources, 80 candidate answers, `candidates.formal.json` |
+| `organism-design/` | Ontology-grounded blueprints, including the flying fish, and their nanopub drafts |
+| `swarm/`, `holdout/` | The four-arm agent comparison and the frozen held-out exam |
+| `dashboard/` | The site above and its build scripts; `crosscheck.mjs`, `compliance.mjs`, `make-figures.py` |
+| `*/nanopubs/unsigned/` | Validated, **unsigned** nanopub drafts. Nothing has been signed or published (see #37). |
+
+**Agent threads.** The work is split across parallel Claude sessions, each owning one folder and one
+sub-dashboard, with rules in [`AGENTS.md`](AGENTS.md) and [`dashboard/THREADS.md`](dashboard/THREADS.md):
+claims, lean, holdout, swarm, organism, and new threads for genotype–phenotype mapping, validation and
+MCP testing, and visualisation ([`dashboard/NEW-THREADS.md`](dashboard/NEW-THREADS.md)).
+
+**What is not established.** No wet-lab work. No claim promoted to a theorem of biology: a Lean proof
+checks the mathematics given its stated assumptions. Flying-fish molecular data comes from proxy species
+(medaka, zebrafish) because almost none exists for Exocoetidae itself. The nanopub records are drafts.
+
 ## Best practices
 
 Before building, publishing, or querying nanopubs, read [BEST_PRACTICES.md](BEST_PRACTICES.md). It is adapted from the Project Delphi Ontology's publishing guide.
