@@ -2,7 +2,8 @@
 
 What is checked: finite vertices; no degenerate triangles; every undirected edge used by exactly two faces and
 each directed edge exactly once (closed, consistently oriented 2-manifold); one face-connected component;
-positive signed volume; Euler characteristic and genus; bounds; inward-ray wall thickness on sampled faces.
+positive signed volume; Euler characteristic and genus; bounds; inward-ray wall thickness on sampled faces,
+gated against a minimum wall when one is given.
 What is NOT checked: global self-intersection, slicing, supports, cups, minima, resin-specific thin-wall
 limits.  Those belong to PreForm (see docs/printing.md).
 """
@@ -107,7 +108,8 @@ def thickness_samples(V: np.ndarray, T: np.ndarray, n: int = 3000, seed: int = 7
             "fraction_below_1mm": float((finite < 1.0).mean()) if len(finite) else None}
 
 
-def check(V: np.ndarray, T: np.ndarray, box_mm: float | None = None, thickness: bool = True) -> dict:
+def check(V: np.ndarray, T: np.ndarray, box_mm: float | None = None, thickness: bool = True,
+          min_wall_mm: float | None = None) -> dict:
     r: dict = {}
     r["vertices"], r["triangles"] = int(len(V)), int(len(T))
     r["finite_vertices"] = bool(np.isfinite(V).all())
@@ -146,9 +148,14 @@ def check(V: np.ndarray, T: np.ndarray, box_mm: float | None = None, thickness: 
     r["mesh_sha256"] = mesh_hash(V, T)
     if thickness:
         r["wall_thickness"] = thickness_samples(V, T)
+    if min_wall_mm is not None:
+        w = r.get("wall_thickness") or {}
+        r["min_wall_mm_required"] = min_wall_mm
+        r["min_wall_ok"] = bool(w.get("min_mm") is not None and w["min_mm"] >= min_wall_mm and w["no_hit"] == 0)
+        r["min_wall_scope"] = "sampled faces only; a thinner region between samples can be missed"
     r["self_intersection"] = "not checked"
     r["ok"] = bool(r["finite_vertices"] and r["degenerate_triangles"] == 0 and r["closed_two_manifold"]
                    and r["consistently_oriented"] and r["face_connected_components"] == 1
                    and r["signed_volume_mm3"] > 0 and r["unreferenced_vertices"] == 0
-                   and (box_mm is None or r["fits_box"]))
+                   and (box_mm is None or r["fits_box"]) and r.get("min_wall_ok", True))
     return r

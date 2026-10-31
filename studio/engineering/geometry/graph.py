@@ -34,6 +34,8 @@ NODES = [
     {"id": "A", "label": "Form A: short-fin precursor-inspired\n(solver: rejected)", "group": "engineered"},
     {"id": "B", "label": "Form B: two-wing glider\n(solver: satisfies declared constraints)", "group": "engineered"},
     {"id": "C", "label": "Form C: four-wing glider\n(solver: satisfies declared constraints)", "group": "engineered"},
+    {"id": "N", "label": "N1-N3: wing-area / AR comparison set\n(0.05 kg; dx-nca simulated, not an optimum)",
+     "group": "engineered"},
 ]
 
 EDGES = [
@@ -47,6 +49,7 @@ EDGES = [
     {"from": "daane_s1a", "to": "C", "kind": "informs_design", "label": "Cheilopogon furcatus pelvic / SL"},
     {"from": "exocoetus", "to": "B", "kind": "informs_design", "label": "Table I fits at 0.1 kg"},
     {"from": "cypselurus", "to": "C", "kind": "informs_design", "label": "Table I fits at 0.1 kg"},
+    {"from": "cypselurus", "to": "N", "kind": "informs_design", "label": "Table I fits at 0.05 kg x S, AR factors"},
     {"from": "potanichthys", "to": "C", "kind": "convergent_analogy", "label": "same configuration, unrelated lineage"},
     {"from": "A", "to": "B", "kind": "conjectured_route",
      "label": "conjecture only: not demonstrated, not claimed reachable"},
@@ -61,7 +64,8 @@ STYLE = {
     "conjectured_route": dict(color="#c0392b", ls="--", lw=1.6),
 }
 POS = {"hemiramphidae": (0, 4), "oxyporhamphus": (0, 2.8), "exocoetus": (0, 1.6), "cypselurus": (0, 0.4),
-       "zebrafish": (0, 6.4), "daane_s1a": (0, 5.2), "potanichthys": (0, -0.8), "A": (2.6, 4.4), "B": (2.6, 2.2), "C": (2.6, 0.2)}
+       "zebrafish": (0, 6.4), "daane_s1a": (0, 5.2), "potanichthys": (0, -0.8), "A": (2.6, 4.4), "B": (2.6, 2.2), "C": (2.6, 0.2),
+       "N": (2.6, -1.4)}
 FILL = {"extant": "#e3eefa", "experimental": "#eef7e3", "fossil": "#f6eedc", "engineered": "#fbe6e3"}
 
 
@@ -75,7 +79,7 @@ def graph_json() -> dict:
 
 
 def render_graph(path) -> None:
-    fig, ax = plt.subplots(figsize=(9.5, 7.2), dpi=110)
+    fig, ax = plt.subplots(figsize=(9.5, 7.9), dpi=110)
     for e in EDGES:
         (x0, y0), (x1, y1) = POS[e["from"]], POS[e["to"]]
         st = STYLE[e["kind"]]
@@ -92,7 +96,7 @@ def render_graph(path) -> None:
     handles = [plt.Line2D([0], [0], **{k: v for k, v in STYLE[k2].items() if k in ("color", "lw")},
                           linestyle=STYLE[k2]["ls"], label=k2.replace("_", " ")) for k2 in STYLE]
     ax.legend(handles=handles, loc="lower center", fontsize=7, ncol=4, frameon=False, bbox_to_anchor=(0.5, -0.06))
-    ax.set_xlim(-1.2, 3.8); ax.set_ylim(-1.6, 7.7); ax.axis("off")
+    ax.set_xlim(-1.2, 3.8); ax.set_ylim(-2.4, 7.7); ax.axis("off")
     fig.tight_layout()
     fig.savefig(path, metadata={"Software": None})
     plt.close(fig)
