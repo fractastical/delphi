@@ -11,7 +11,9 @@ Layout (ROOT defaults to /data/services/delphi-frontier):
     prepare   archive an exact committed SHA into releases/<sha> and write build-info.json from a SUPPLIED checks receipt.
     deploy    switch `app` to a prepared release, restart the unit, wait for health; on ANY failure switch back and restart again.
     rollback  switch to app.previous (or --to SHA) with the same restart + health + automatic fall-back.
-    adopt     (plan-first) mark an existing hand-built releases/<sha> as complete so it can be rolled back TO; adds one marker file, nothing else.
+    verify    read-only: recompute the git tree hash of releases/<sha> and compare it with git (--repo) and with build-info.json.
+    adopt     (plan-first) mark an existing hand-built releases/<sha> as complete so it can be rolled back TO, ONLY after its files are shown byte-identical to the
+              commit (build-info.json and __pycache__ are the only allowed extras); adds one marker file, nothing else.
     status    read-only view of the above.
 
 Rules it enforces: only committed content is archived (the working tree can never leak in); a release directory is never edited, replaced or deleted and is made
@@ -62,6 +64,46 @@ def utc() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
+def git_tree_sha(d: Path, ignore_top=frozenset(), ignore_dirs=frozenset({"__pycache__"}), report: list | None = None) -> str | None:
+    """The git tree object id of the files under `d`, computed from the bytes on disk with git's own rules (blob = sha1("blob <n>\\0"+bytes), mode 100644/100755/120000,
+    entries sorted with directories compared as "name/", empty directories omitted). Comparing it with `git rev-parse <sha>^{tree}` shows the directory holds EXACTLY the
+    committed files. `ignore_top` names files ignored at the top level (build metadata); `ignore_dirs` names directories ignored anywhere (bytecode caches). Whatever was ignored
+    is appended to `report`, so an extra is visible, never silent."""
+    def rec(p: Path, rel: str):
+        ents = []
+        for c in sorted(os.scandir(p), key=lambda e: e.name):
+            r = f"{rel}{c.name}"
+            st = c.stat(follow_symlinks=False)
+            if (not rel and c.name in ignore_top) or (stat.S_ISDIR(st.st_mode) and c.name in ignore_dirs):
+                if report is not None:
+                    report.append(r + ("/" if stat.S_ISDIR(st.st_mode) else ""))
+                continue
+            if stat.S_ISLNK(st.st_mode):
+                body = os.readlink(c.path).encode()
+                mode, h = b"120000", hashlib.sha1(b"blob %d\0" % len(body) + body).digest()
+            elif stat.S_ISDIR(st.st_mode):
+                h = rec(Path(c.path), r + "/")
+                if h is None:
+                    continue
+                mode = b"40000"
+            elif stat.S_ISREG(st.st_mode):
+                hh = hashlib.sha1(b"blob %d\0" % st.st_size)
+                with open(c.path, "rb") as f:
+                    for chunk in iter(lambda: f.read(1 << 20), b""):
+                        hh.update(chunk)
+                mode, h = (b"100755" if st.st_mode & 0o111 else b"100644"), hh.digest()
+            else:
+                raise Refused(f"special file in release: {r}")
+            name = c.name.encode()
+            ents.append((name + (b"/" if mode == b"40000" else b""), mode, name, h))
+        if not ents:
+            return None
+        body = b"".join(m + b" " + n + b"\0" + h for _, m, n, h in sorted(ents))
+        return hashlib.sha1(b"tree %d\0" % len(body) + body).digest()
+    out = rec(Path(d), "")
+    return out.hex() if out else None
+
+
 def sha256_file(p: Path) -> str:
     h = hashlib.sha256()
     with p.open("rb") as f:
@@ -73,7 +115,7 @@ def sha256_file(p: Path) -> str:
 # ---------------------------------------------------------------------------------------- the only commands this tool may run
 def check_argv(argv: list, venv_python: str) -> None:
     a = list(argv)
-    ok = (a[:1] == ["git"] and len(a) >= 4 and a[1] == "-C" and a[3] in ("cat-file", "rev-parse", "archive"))
+    ok = (a[:1] == ["git"] and len(a) >= 4 and a[1] == "-C" and a[3] in ("cat-file", "rev-parse", "archive", "ls-tree"))
     ok = ok or (a[:2] == ["systemctl", "--user"] and len(a) >= 4 and a[2] in ("restart", "is-active", "show") and a[3] == UNIT and (a[2] != "show" or a[4:] == ["-p", "ActiveState", "-p", "NRestarts"]) and (a[2] == "show" or len(a) == 4))
     ok = ok or a == [venv_python, "-c", SMOKE]
     ok = ok or (a[:2] == ["sudo", "-n"] and a[2:] in (["nginx", "-t"], ["systemctl", "reload", "nginx"]))
@@ -231,6 +273,8 @@ class Release:
         files = sum(1 for p in tmp.rglob("*") if p.is_file())
         if files == 0:
             raise Refused("the archive was empty")
+        if git_tree_sha(tmp, ignore_dirs=frozenset()) != tree:
+            raise Refused("the extracted files do not hash to the commit's git tree; nothing was installed")
         info_doc = {"schema": "frontier.build-info/1", "release_sha": sha, "tree_sha": tree, "built_at": utc(), "archive_sha256": h.hexdigest(),
                     "files": files, "checks": info["checks"], "checks_all_passed": info["all_passed"], "checks_receipt_sha256": info["receipt_sha256"]}
         (tmp / "build-info.json").write_text(json.dumps(info_doc, indent=1, sort_keys=True) + "\n")
@@ -244,7 +288,59 @@ class Release:
         self.say(step="prepare", result="prepared", sha=sha, files=files, archive_sha256=info_doc["archive_sha256"], checks_all_passed=info["all_passed"])
         return {"result": "prepared", "sha": sha, "archive_sha256": info_doc["archive_sha256"]}
 
-    def adopt(self, sha: str, apply: bool = False) -> dict:
+    META = frozenset({"build-info.json", ".release-complete"})
+
+    def differences(self, repo: str, sha: str, d: Path, limit: int = 10) -> list:
+        """Paths whose bytes differ between git's commit and the directory (diagnostic; never changes anything)."""
+        rc, out = self._run(["git", "-C", repo, "ls-tree", "-r", sha])
+        want = {}
+        for line in out.splitlines():
+            meta, path = line.split("\t", 1)
+            mode, typ, blob = meta.split()
+            want[path] = (mode, blob)
+        diffs, seen = [], set()
+        for p in sorted(d.rglob("*")):
+            rel = p.relative_to(d).as_posix()
+            if p.is_dir() or rel in self.META or "__pycache__" in p.parts:
+                continue
+            seen.add(rel)
+            if rel not in want:
+                diffs.append(f"extra: {rel}")
+            else:
+                data = os.readlink(p).encode() if p.is_symlink() else p.read_bytes()
+                if hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest() != want[rel][1]:
+                    diffs.append(f"differs: {rel}")
+        diffs += [f"missing: {k}" for k in sorted(set(want) - seen)]
+        return diffs[:limit]
+
+    def verify(self, sha: str, repo: str | None = None) -> dict:
+        """Read-only. Does releases/<sha> hold exactly the committed files? Ignores only build metadata and bytecode caches and REPORTS them."""
+        d = self.dest(sha)
+        if not d.is_dir() or d.is_symlink():
+            raise Refused("that release directory does not exist")
+        ignored: list = []
+        dir_tree = git_tree_sha(d, ignore_top=self.META, report=ignored)
+        claimed = None
+        try:
+            claimed = json.loads((d / "build-info.json").read_text()).get("tree_sha")
+        except (OSError, ValueError, AttributeError):
+            pass
+        res = {"sha": sha, "dir_tree_sha": dir_tree, "claimed_tree_sha": claimed, "matches_claimed_tree": (dir_tree == claimed) if claimed else None,
+               "ignored_not_hashed": sorted(set(ignored))}
+        if repo:
+            rc, out = self._run(["git", "-C", repo, "rev-parse", sha + "^{tree}"])
+            git_tree = out.strip() if rc == 0 else None
+            res["git_tree_sha"] = git_tree
+            res["matches_git"] = (dir_tree == git_tree) if git_tree else None
+            if res["matches_git"] is False:
+                res["differences"] = self.differences(repo, sha, d)
+        else:
+            res["matches_git"] = None
+            res["note"] = "no --repo given: only consistency with the tree recorded in build-info.json was checked, not equality with the git commit"
+        self.say(step="verify", **res)
+        return res
+
+    def adopt(self, sha: str, apply: bool = False, repo: str | None = None) -> dict:
         """Mark a release directory that was built by hand (so it has no .release-complete) as a complete release, so it can be rolled back TO. Adds one
         marker file; changes nothing else in the directory, does not make it read-only, and requires a build-info.json that names the same SHA."""
         d = self.dest(sha)
@@ -259,10 +355,17 @@ class Release:
             raise Refused("build-info.json is missing or unreadable; refusing to adopt") from None
         if not isinstance(bi, dict) or bi.get("release_sha") != sha:
             raise Refused("build-info.json does not name this SHA; refusing to adopt")
+        if not repo:
+            raise Refused("adopt needs --repo: a 40-hex directory name is a claim, so the files are compared with the commit before anything is accepted")
+        v = self.verify(sha, repo)
+        if v["matches_git"] is not True:
+            raise Refused("the directory is not byte-identical to the commit (ignoring only build-info.json and __pycache__): " + "; ".join(v.get("differences", ["git tree unavailable"])))
         if not apply:
-            self.say(step="adopt", result="plan_only", sha=sha, note="would add .release-complete marking this directory as an adopted, NOT immutable release")
+            self.say(step="adopt", result="plan_only", sha=sha, verified_against_git=True, ignored=v["ignored_not_hashed"],
+                     note="would add .release-complete marking this directory as an adopted, NOT immutable release")
             return {"result": "plan_only"}
-        marker = {"sha": sha, "adopted": True, "adopted_at": utc(), "note": "built outside deploy/release.py; contents were not archived or sealed by it"}
+        marker = {"sha": sha, "adopted": True, "adopted_at": utc(), "verified_against_git": True, "tree_sha": v["git_tree_sha"], "ignored_not_hashed": v["ignored_not_hashed"],
+                  "note": "built outside deploy/release.py; contents compared with the commit's git tree at adoption, then not sealed read-only"}
         (d / ".release-complete").write_text(json.dumps(marker) + "\n")
         self.log(action="adopt", sha=sha, result="adopted")
         self.say(step="adopt", result="adopted", sha=sha)
@@ -433,7 +536,11 @@ def main(argv=None) -> int:
     r.add_argument("--health-timeout", type=float, default=30.0)
     o = sub.add_parser("adopt", help="mark an existing hand-built release directory as complete so it can be rolled back to")
     o.add_argument("--sha", required=True)
+    o.add_argument("--repo", help="a git repository containing the commit; REQUIRED: the directory is compared byte for byte with it")
     o.add_argument("--apply", action="store_true")
+    v = sub.add_parser("verify", help="read-only: does releases/<sha> hold exactly the committed files?")
+    v.add_argument("--sha", required=True)
+    v.add_argument("--repo")
     sub.add_parser("status")
     args = p.parse_args(argv)
     rel = Release(args.root, port=args.port)
@@ -446,7 +553,9 @@ def main(argv=None) -> int:
                 rel.install_nginx(args.sha, args.apply)
             return {"rolled_back": 10, "failed_no_predecessor": 10, "rollback_failed": 11}.get(res["result"], 0)
         elif args.cmd == "adopt":
-            rel.adopt(args.sha, args.apply)
+            rel.adopt(args.sha, args.apply, args.repo)
+        elif args.cmd == "verify":
+            return 0 if rel.verify(args.sha, args.repo)["matches_git" if args.repo else "matches_claimed_tree"] is True else 3
         elif args.cmd == "rollback":
             res = rel.rollback(args.to, args.apply, args.health_timeout)
             return {"rolled_back": 10, "rollback_failed": 11}.get(res["result"], 0)
