@@ -1,5 +1,14 @@
 # Claims, actions, evidence and artifacts
 
+The content declaration gate covers both `Source.content_available` and
+downloadable artifacts, including structured declarations inside provenance.
+Blank, unknown and explicit no-redistribution statements do not authorize
+available bytes. A pointer marked `referenced` can retain an unknown licence.
+This gate checks declarations; it neither authenticates rights nor classifies
+arbitrary prose. The artifact index checks the same boundary on read. Separate
+tests insert legacy records behind the submit guard to exercise the get, export
+and artifact-index exit guards independently.
+
 An Action may pin `inputs` to exact Claim and Evidence versions. These become
 `uses` edges in the graph. Evidence may pin its producing Action with
 `produced_by`; both must target the same Claim or Problem. The database checks
