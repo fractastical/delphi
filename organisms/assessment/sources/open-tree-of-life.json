@@ -1,0 +1,26 @@
+{
+  "source_id": "open-tree-of-life",
+  "label": "Open Tree of Life API v3: Taxonomic Name Resolution Service over the Open Tree Taxonomy (OTT 3.7)",
+  "homepage": "https://tree.opentreeoflife.org/",
+  "data_paper_or_docs": [
+    "https://doi.org/10.1073/pnas.1423041112",
+    "https://doi.org/10.3897/BDJ.5.e12581",
+    "https://tree.opentreeoflife.org/about/taxonomy-version/ott3.7",
+    "https://tree.opentreeoflife.org/about/licenses",
+    "https://api.opentreeoflife.org/v3/taxonomy/about"
+  ],
+  "governance": "NSF-funded open community project. Synthesis method described in Hinchliff et al. 2015 (PNAS 112:12764-12769) and the taxonomy assembly in Rees & Cranston 2017 (Biodiversity Data Journal 5:e12581); both DOIs resolve (checked 2026-10-31). The licences page dedicates the taxonomy and synthetic tree to the public domain under CC0 1.0. The taxonomy is assembled automatically from NCBI Taxonomy, GBIF, WoRMS, IRMNG, Index Fungorum and curated patches.",
+  "versioning": "Named taxonomy releases. POST /v3/taxonomy/about on 2026-10-31 returned name 'ott', version '3.7', source 'ott3.7draft3'; /v3/tree_of_life/about returned synth_id 'opentree16.1' (date_created 2025-12-20, taxonomy_version 3.7draft3). The 'latest taxonomy release' page redirects to ott3.7.3, i.e. a newer point release than the draft the API serves. TNRS responses are deterministic for a given taxonomy version and request body, so checksums are reproducible when the exact POST body is recorded.",
+  "scores": {
+    "source-authority": 0.9,
+    "independence": 0.6,
+    "authenticity": 1.0
+  },
+  "known_issues": [
+    "TNRS is a POST endpoint: a record that stores only a placeholder such as '[<58 accepted names>]' instead of the JSON body cannot have its checksum reproduced (open-tree-of-life-tnrs-ott3-7-2026-10-31).",
+    "Vendored records describe the version variously as 'ott3.7', 'ott3.7draft3' or 'OTT as served 2026-10-31'; the API's own answer is version 3.7 / source ott3.7draft3.",
+    "One vendored record cites DOI 10.1093/sysbio/syx068 as an Open Tree paper; it resolves to an unrelated Systematic Biology article (67:216-235). The record's is_referenced_by 10.3897/BDJ.5.e12581 is correct.",
+    "OTT ingests NCBI Taxonomy, GBIF and WoRMS, all of which this project vendors separately, so agreement between them is not independent corroboration."
+  ],
+  "rationale": "Peer-reviewed methods papers, a CC0 licence page, named taxonomy releases and a self-describing API justify a high authority score; the lack of a DOI per taxonomy release keeps it below 1.0. Independence is 0.6 because the taxonomy is a synthesis of other databases vendored in this project. All identifiers and DOIs listed resolve, the taxonomy/about response matches what the records claim, and the three recorded TNRS request bodies re-ran with identical match counts, so authenticity is 1.0."
+}

@@ -1,0 +1,24 @@
+{
+  "source_id": "fishbase-hf-parquet",
+  "label": "FishBase backend table snapshots (cboettig/fishbase on Hugging Face, used by rfishbase), release v25.04",
+  "homepage": "https://huggingface.co/datasets/cboettig/fishbase",
+  "data_paper_or_docs": [
+    "https://huggingface.co/api/datasets/cboettig/fishbase",
+    "https://doi.org/10.1111/j.1095-8649.2012.03464.x",
+    "https://www.fishbase.se/search.php"
+  ],
+  "governance": "Third-party mirror curated by Carl Boettiger (rOpenSci rfishbase maintainer). The dataset card states 'Snapshots of FishBase data tables used by the rOpenSci package rfishbase and the FishBase API', sourced 'via exclusive export of backend MySQL databases' of fishbase.org and sealifebase.org, licence 'CC-BY-NC, FishBase.org Team' (card metadata license: cc-by-nc-4.0; checked 2026-10-31). The rfishbase paper (Boettiger, Lang & Wainwright 2012, J. Fish Biol. 81:2030-2039) is the only peer-reviewed description; the parquet snapshots themselves have no DOI.",
+  "versioning": "Versioned directories data/fb/v19.04, v21.06, v23.01, v23.05, v24.07, v25.04 (listed via the HF tree API 2026-10-31; repository lastModified 2025-12-16). Files are content-addressed by git LFS, so a given path is stable. v25.04 species.parquet has 36,132 rows and families.parquet 664 rows (re-derived 2026-10-31; SHA-256 of both files matched the vendored records).",
+  "scores": {
+    "source-authority": 0.75,
+    "independence": 0.7,
+    "authenticity": 0.9
+  },
+  "known_issues": [
+    "Not an official FishBase publication channel: authority rests on the maintainer's statement that the export is exclusive and on rfishbase's long use of it.",
+    "Vendored records give the FishBase website as 'identifier' and the HF dataset only as 'is_referenced_by'; the parquet files, not the website, are what was checksummed.",
+    "Licence inherited from FishBase (CC BY-NC 4.0); one vendored variant records licence null.",
+    "The species table is one row per valid species as of v25.04 and does not carry per-taxon counts for higher taxa without joining families.parquet (FamCode)."
+  ],
+  "rationale": "A stable, versioned and checksummable snapshot of the real FishBase backend, which makes integrity checks fully reproducible, but published by an individual curator without a DOI or formal governance, hence authority 0.75. Independence matches FishBase (literature compilation, 0.7). Authenticity is high because the files, counts and licence all trace to the Hugging Face repository as described."
+}

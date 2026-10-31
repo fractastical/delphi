@@ -1,0 +1,24 @@
+{
+  "source_id": "worms",
+  "label": "World Register of Marine Species (WoRMS) REST API (Aphia records)",
+  "homepage": "https://www.marinespecies.org/",
+  "data_paper_or_docs": [
+    "https://doi.org/10.14284/170",
+    "https://www.marinespecies.org/rest/",
+    "https://www.marinespecies.org/about.php",
+    "https://doi.org/10.1371/journal.pone.0051629"
+  ],
+  "governance": "Governed international taxonomic infrastructure hosted by the Flanders Marine Institute (VLIZ). about.php describes three levels: an elected Steering Committee, the Editorial Board (taxonomic editors responsible for their groups) and the Data Management Team. Data are licensed CC BY 4.0 (about.php: 'Creative Commons Attribution License (CC-BY)'; images CC BY-NC-SA). The database has a DataCite DOI, 10.14284/170 ('World Register of Marine Species. Available from https://www.marinespecies.org at VLIZ. Accessed yyyy-mm-dd'), and a peer-reviewed description (Costello et al. 2013, PLoS ONE 8:e51629). All checked 2026-10-31.",
+  "versioning": "Live, continuously edited database; the citation convention is DOI plus access date. Each Aphia record carries a 'modified' timestamp and a stable AphiaID; records are not deleted but marked unaccepted/deleted with a valid_AphiaID pointer. Query responses (AphiaRecordByAphiaID, AphiaRecordsByName, AphiaIDByName) are deterministic JSON for a given state, so byte checksums are reproducible until a record is edited.",
+  "scores": {
+    "source-authority": 1.0,
+    "independence": 0.9,
+    "authenticity": 1.0
+  },
+  "known_issues": [
+    "Name queries for non-marine or unregistered taxa return HTTP 204 (no content); vendored records store such distributions without a checksum, which is correct but leaves nothing to verify.",
+    "Because the register is live, a record edit changes the response bytes; 415 of 415 recorded response checksums still matched on 2026-10-31, so drift is slow but not zero.",
+    "WoRMS aggregates regional and taxon-specific registers (e.g. ERMS) and shares editors with them; it is also a source for GBIF and Open Tree, which are vendored separately in this project."
+  ],
+  "rationale": "WoRMS is the archetype of the rubric's 1.0 anchor for authority: a governed international infrastructure with editorial board, DOI, documented API and licence. Records are curated primary nomenclatural data, independent of this project; the 0.9 reflects that WoRMS content is itself ingested by other vendored sources (GBIF backbone, Open Tree), so cross-source agreement is not fully independent evidence. Every URL and DOI listed resolves and the API re-queries reproduced the vendored AphiaIDs, names and ranks."
+}
