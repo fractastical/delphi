@@ -162,3 +162,16 @@ def test_malformed_and_missing_data_show_an_error_not_a_blank(browser, tmp_path)
         pg.wait_for_selector("text=Data could not be loaded")
     finally:
         srv.shutdown()
+
+
+def test_artifact_download_link_only_for_declared_downloadable_https(browser, base):
+    """Formatter unit test on synthetic input (the scratch live node holds no artifacts): never links an undeclared file."""
+    pg = page(browser)
+    pg.goto(base + "#/evidence")
+    pg.wait_for_selector("#main h1")
+    rows = pg.evaluate("""() => DF.liveArtifacts([
+      {artifact: {title: 'a', uri: 'https://x.example/a.stl', sha256: 'a'.repeat(64), byte_size: 1, role: 'geometry', availability: 'downloadable'}, relation: 'supports', evidence_kind: 'simulated'},
+      {artifact: {title: 'b', uri: 'https://x.example/b.csv', sha256: 'b'.repeat(64), byte_size: 1, role: 'output', availability: 'referenced'}},
+      {artifact: {title: 'c', uri: 'urn:sha256:' + 'c'.repeat(64), sha256: 'c'.repeat(64), byte_size: 1, role: 'certificate', availability: 'referenced'}}
+    ]).map(r => [r.type, r.download])""")
+    assert rows == [["geometry", "https://x.example/a.stl"], ["data", None], ["proof", None]]
