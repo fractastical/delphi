@@ -8,7 +8,7 @@ Supersedes `archive/demo-narrative-2026-10-31-refusal-led.md`.
 
 ---
 
-# PART 1 — THE SPOKEN SCRIPT (417 words)
+# PART 1 — THE SPOKEN SCRIPT (449 words)
 
 ### Open · on the viewer
 
@@ -30,20 +30,22 @@ about five millivolts, and their neighbours drop too. Block the gap junctions an
 cells drop four times further while the neighbours barely move. That's the coupling, shown by
 removing it.
 
-Down again, to metabolism. We ran a published genome-scale zebrafish model. It ships with no
-medium at all, so we **assumed** one. Growth came out at zero. The reason was specific: the
-biomass pool needed a vitamin E catabolite our assumed medium couldn't supply. We added it and the
-model solved.
+Down again, to metabolism. A published genome-scale zebrafish model, which ships with no medium
+at all — so we **assumed** one. Growth came out at zero, because the biomass pool needed a vitamin
+E catabolite we hadn't supplied. We added it and it solved.
+
+Then we swept oxygen and growth barely moved. Not biology: under our assumed medium the model was
+**making its own oxygen**, one reaction running backwards beside an uncapped vitamin. Block it and
+growth collapses. That sweep measured our medium, not a fish.
 
 ### The edge · where it stops
 
 Now the interesting part. We built the adapter that carries flow pressure onto a fin ray. It
 checks out exactly — force conservation exact, the disabled-load control exactly zero.
 
-And it will not run. Our flow grid is seven millimetres across a cell. The fins are half a
-millimetre. They come through as unresolved shells, and the contract refuses them rather than
-quietly loading them. Our estimate is that resolving one properly needs a grid roughly thirty
-times finer than anything we've run.
+And it will not run. The fins are half a millimetre thick, and on the finest global grid we have
+completed a fin spans **four tenths of one cell**. Our global grid does not resolve fin thickness
+anywhere we have looked, so the contract refuses those samples rather than quietly loading them.
 
 Underneath that sits a second gap: we have not established a sourced stiffness profile for a real
 flying-fish fin ray. That one is a wet lab.
@@ -62,8 +64,9 @@ That's a finding about our benchmark, and the next one needs harder questions.
 
 ---
 
-**Pacing.** 417 words at ~140 wpm ≈ **2:59**. Cut the metabolism paragraph for 2:30. Cut the scale
-paragraph too for 2:00. **Never cut the edge section** — it is the thesis.
+**Pacing.** 449 words: **3:12 at 140 wpm, 3:00 at 150**. If the slot is hard three minutes, either
+speak at 150 or **drop the oxygen paragraph** (−58 words → 2:47 at 140). Cut the whole metabolism
+beat for 2:20, and the scale beat too for 1:55. **Never cut the edge section** — it is the thesis.
 
 ---
 
@@ -114,9 +117,22 @@ Numbers, sources and exact limits. Reach for these in Q&A.
 - **Call it an ASSUMED nutrient medium.** An allowlist of 58 basic nutrients → **biomass 0**. The
   cause: the biomass pool's cofactor-and-vitamin term needs vitamin E catabolites reachable only
   from **gamma-tocopherol**; the allowlist supplied alpha. Adding gamma-tocopherol gives **0.265**
-  (O₂ 0), **0.291** (O₂ 20), **0.329** (O₂ 50).
+  at O₂ uptake 0 and **0.291** at 20.
+- **THE OXYGEN SWEEP IS NOT OXYGEN DEPENDENCE and must never be presented as it.** Under the
+  assumed, **uptake-uncapped** medium the model makes its own O₂ at +1000 through **MAR04071**,
+  pyridoxine oxidase running in reverse beside uncapped vitamin B6 exchanges.
+  - At **zero external O₂** it still grows at **0.265**; **block MAR04071 and it does not grow —
+    3e-16**.
+  - At O₂ uptake 20: **0.291 free versus 0.097 blocked**.
+  - A **model-constraint diagnosis**, found by checking. Blocking MAR04071 is **not** biology.
+- **Must not say:** that this measures oxygen dependence or fish oxygen use; that growth values are
+  physiological (0.29 is a model objective flux); that the model is fin- or tissue-specific.
 - **The glucose cap of 10 and every other uptake bound are uncalibrated assumptions**, as are the
-  medium composition and the flux unit. Absolute growth values mean nothing physiologically.
+  medium composition and the flux unit (mmol/gDW/h — assumed; the SBML does not declare it).
+  Absolute growth values mean nothing physiologically.
+- No flux table is stored at other O₂ conditions. **No new sweep until nutrient bounds have
+  evidence.**
+- `work/zebrafish-metabolism` @ `ee74e2d`; `o2_source_diagnostic.json`, `metabolism_results.json`.
 - Controls: all uptake closed → 0; glucose alone → 0; max |S·v| ≤ 1e-10; no energy-generating
   cycle with uptake closed.
 
@@ -126,18 +142,31 @@ Numbers, sources and exact limits. Reach for these in Q&A.
   `fin_mechanics` FEM. **No second beam solver was written.**
 - Exact checks: uniform and linear pressure against hand closed forms, **grid order 2**, force
   conservation exact, **disabled-load control exactly 0**, deflection scaling exactly **1/EI**.
-- **Measured grid limits:** h = **7.2 mm at L 32**, **0.9 mm at L 256**. Fin plates are **0.5 mm**.
-  The simulated shell is **3.7 cells thick (26.9 mm at L 32)**.
-- **The 923-cell figure is an arithmetic extrapolation**, not a demonstrated hardware limit: it is
-  what L must reach for a 0.5 mm plate to span 2 cells at uniform spacing. **We have not run it
-  and have not established that one H100 cannot.** Say "roughly thirty times finer than anything
-  we have run", and give 923 as the arithmetic if asked.
+- **Completed global GPU cases, and what a fin spans in each** (`summary-gpu-v1.json`). Fin plates
+  are **0.5 mm**:
+
+  | case | L | fin thickness, cells | shell, mm |
+  |---|---|---|---|
+  | `gpu_fish_L64_Re200` | 64 | **0.139** | 13.45 |
+  | `gpu_fish_L128_Re200` | 128 | **0.277** | 6.73 |
+  | `gpu_fish_L128_Re1000` | 128 | **0.277** | 6.73 |
+  | `gpu_fish_L192_Re1000` | 192 | **0.416** | 4.48 |
+
+  **A fin is under half a cell at every resolution completed, including the finest.** That is the
+  statement to make: *the current global grid does not resolve fin thickness.* Do not compare
+  against the older L 32 case, and **do not quote a "times finer" factor** — the global grids have
+  moved and the ratio goes stale.
+- **The 923-cell figure is arithmetic**, not a demonstrated hardware limit: it is what L must reach
+  for a 0.5 mm plate to span 2 cells at uniform spacing. We have not run it and have not
+  established that one H100 cannot. Give it only if asked, as arithmetic.
 - Samples carry `resolved: false` and the contract refuses them — `MEMBER_UNRESOLVED`.
 - **Say "we have not established a sourced flying-fish EI profile"** — not "nobody has measured
   it". We have not searched the literature systematically enough to claim an absence.
-- Related CFD limit: Cd_total 0.175 at L 24 vs 0.137 at L 32 — **27.8% apart, not grid-independent,
-  so no force claim**. Re_L 200 is 13 mm/s in air; intended glide regimes are ~1.5–3×10⁵ and
-  assumed.
+- **Grid-convergence pairs, stated exactly:** Re 200, L64→L128, **13.2% apart, grid rule NOT met**.
+  Re 1000, L128→L192, **9.8% apart, grid rule met**. **Neither supports a physical force claim** —
+  the C1 sphere reference gate **failed** and the fins are sub-grid, and the summary records
+  `physical_force_claim: false` for both. Re_L 200 is 13 mm/s in air; intended glide regimes are
+  assumed and unsourced, a gap factor of roughly 760-1520.
 - `docs/coupled-mechanics.md`, `docs/cfd3d.md`, `artifacts/coupled-mechanics/result.json`.
 
 ## The commons

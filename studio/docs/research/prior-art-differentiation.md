@@ -17,8 +17,12 @@ functions is **not** a count of passing tests; only a recorded run counts.
 
 ## 0. Our own release, and a correction
 
-**The public deployed release is `12eb390` on `codex/frontier-demo-20261031`**, live at
-`frontier.morphoswarm.ai`. `origin/main` is a subset and is not what we show.
+**HISTORICAL SNAPSHOT.** The comparison in this document was made against `12eb390` on
+`codex/frontier-demo-20261031` as it stood when this was written. **That is not the current
+release and this document makes no claim about what is deployed now** — the SHA is kept so the
+comparison can be re-read against the tree it was actually made on. For the current release, see
+`docs/research/rubric-evidence-matrix.md`; as of 2026-10-31 it is `c1ad527`, public, with 13 web
+and 35 MCP checks passing.
 
 **Correction: git commit order is not an independent witness.** Earlier notes of mine treated a
 preregistration timestamp preceding a result as proof the criterion was not fitted afterwards.

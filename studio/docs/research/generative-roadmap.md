@@ -30,7 +30,7 @@ checking into biology. That step is not part of the current pilot.
 
 ## 2. Where this actually stands
 
-### 2.1 The RD-1D pilot: preregistered, coded, packaged, no GPU result
+### 2.1 The RD-1D pilot: controls passed under explicit FP32; training started, no checkpoint
 
 A conditional DDPM surrogate for a **1-D Schnakenberg reaction-diffusion field**.
 
@@ -61,9 +61,10 @@ What is genuinely frozen before any training or held-out evaluation, per `PREREG
   units, no equation satisfaction by the surrogate, no generality beyond the 1-D Schnakenberg
   prior box, and no speed advantage.
 
-Controls that have actually run: the CPU control passes all checks; the torch solver matches the
-numpy solver to 1e-9; `tests/test_rd_diffusion.py` reports 13 passed. The CUDA control has **not**
-run here — this host has no GPU, and that control is the first gate inside the job. The end-to-end
+Controls that have run: the CPU control passes all checks; the torch solver matches the numpy
+solver to 1e-9; `tests/test_rd_diffusion.py` reports 13 passed. **The CUDA control has now run on
+the provider and passed under explicit IEEE FP32** — see §2.2. It was never run on this host,
+which has no GPU. The end-to-end
 CPU smoke output is named `smoke_evaluation_NOT_A_RESULT.json` because it is 150 steps on 30 debug
 settings with an untrained model.
 
@@ -73,6 +74,27 @@ a GPU measurement**, and the packet says so.
 **This pilot already instantiates part of H1** (§3): the equation is reused from registry id
 `eq-rd-schnakenberg` with its claim and problem references kept attached — as **snapshot pins,
 not live-store acceptance**. Whether a *withdrawal* propagates through those pins is untested.
+
+### 2.2 What the provider run established
+
+A paired control in the **same allocation** (job `aijob-e00qazx6sby3vav47b`, control window
+23:09:31Z-23:09:38Z) settled the backend question that stopped the first attempt:
+
+| | network CPU-vs-CUDA parity | verdict |
+|---|---|---|
+| first attempt, default backend | **0.001191914** | **failed** the 0.001 tolerance; stopped before training |
+| same allocation, default backend | **0.001191914** | reproduced |
+| same allocation, **explicit IEEE FP32** | **2.2649765e-06** | **passed**, same unchanged 0.001 tolerance |
+
+Solver parity was **5.95e-14** in both, against a 1e-06 tolerance. The TF32 hypothesis was
+**confirmed by measurement**, not assumed: the first failure was retained, the retry was declared
+in advance in `inputs/diffusion-backend-policy.json`, and **nothing was relaxed** — source, config,
+architecture, optimizer, dataset, splits and the tolerance itself are unchanged.
+
+**Training began 16:09:38 PDT. No checkpoint exists yet and none is claimed.** Held-out evaluation
+runs only after the checkpoint is frozen, by the preregistration's own ordering.
+
+Receipt: `results/infra/diffusion-v2/backend-diagnosis.json`.
 
 ### 2.2 Everything above organism scale
 
@@ -225,22 +247,30 @@ to answer that for one system.
 
 ## 6. Inventory
 
+**Current as of 2026-10-31 16:09:38 PDT.** This table is the one that goes stale; check it against
+§2.2 before quoting it.
+
 | | Organism-scale proposal | RD-1D pilot |
 |---|---|---|
 | Preregistration | — | **frozen, `9c56a927`** |
 | Code and job packet | — | **frozen, `4a5394f3`** |
-| Local controls run | — | **CPU control pass; 13 tests; solver = numpy to 1e-9** |
-| CUDA control | — | not run here (no GPU on this host; first gate inside the job) |
-| Synthetic datasets generated | 0 | generated inside the job; **not yet run** |
-| Models trained | 0 | **0** |
-| Held-out evaluation | 0 | **0** |
+| Local CPU controls | — | **pass; 13 tests; solver = numpy to 1e-9** |
+| **CUDA control** | — | **RAN on the provider and PASSED under explicit IEEE FP32** (2.265e-06 against an unchanged 0.001). The default backend failed at 0.001191914; both outputs retained |
+| **Synthetic datasets** | 0 | **generated inside the running job** — the dataset stage began with training |
+| **Training** | 0 | **STARTED 16:09:38 PDT** |
+| **Checkpoint** | 0 | **none yet, and none claimed** |
+| Held-out evaluation | 0 | **not yet — it runs after the checkpoint is frozen** |
 | Inverse candidates proposed | 0 | 0 — out of scope for the pilot |
 | Candidates screened by an exact solver | 0 | 0 |
 | Real experiments | 0 | 0 |
-| GPU hours spent | 0 | **0** |
+| **GPU hours spent** | **unknown until a receipt exists** | **unknown until a receipt exists** |
+
+> **GPU hours are `unknown`, not `0`.** The job is running on a provider that has not yet returned
+> a usage receipt, so zero would be a claim we cannot support. An earlier version of this table
+> said 0; that was wrong in the same direction the rest of this document warns about.
 
 The simulators in stage 1 do exist and run; several are live on the public MCP and anyone can call
-them with no credential. That is the part of this document with a receipt today.
+them with no credential.
 
 ---
 
@@ -256,3 +286,9 @@ them with no credential. That is the part of this document with a receipt today.
   reference on the page**, so it should not be described as journal-published. (d) Added §4.4 for
   the Gallon et al. paper cited on the live `#/generative` page, verified here. (e) Rewrote §4 and
   §5 as a forward proposal that credits the prior work, replacing phrasing that read as scolding.
+- **2026-10-31, revised again (root's second read).** §6's inventory still said the CUDA control
+  had not run, that no datasets had been generated and that GPU hours were **0**, which
+  contradicted the §2 that had just been rewritten. Every contradictory paragraph and table is
+  updated, §2.2 records the paired-control measurement, and **GPU hours now read "unknown until a
+  receipt exists" rather than 0** — a running provider job has returned no usage receipt, so zero
+  would be a claim we cannot support. The §2.1 heading no longer says "no GPU result".

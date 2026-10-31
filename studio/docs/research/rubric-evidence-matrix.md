@@ -134,7 +134,9 @@ Full document with read-levels: `docs/research/generative-roadmap.md`. Page copy
 | **RD-1D conditional DDPM pilot**: preregistration, solver, model, controller and tests frozen | C | **`9c56a927`**, 2026-10-31 15:32:36 PDT, committed before any training or held-out evaluation |
 | **RD-1D job packet**, hashes, local CPU control receipts | C | **`4a5394f3`**, 15:33:03 PDT; archive sha256 `76eb4a7b…`, 11,526 bytes |
 | RD-1D local controls | C | CPU control all checks ok; torch solver = numpy to 1e-9; `tests/test_rd_diffusion.py` **13 passed**. CUDA control **not run here** (no GPU on this host) |
-| **RD-1D GPU result** | — | **NONE YET.** The 15-25 min runtime in the packet is an estimate scaled from CPU smoke timings, not a GPU measurement |
+| **RD-1D CUDA control** | C | **RAN and PASSED on the provider under explicit IEEE FP32**: 2.2649765e-06 against an unchanged 0.001. Default backend reproduced the 0.001191914 failure in the same allocation; both retained. `results/infra/diffusion-v2/backend-diagnosis.json` | **Earned** — TF32 hypothesis confirmed by measurement, nothing relaxed |
+| **RD-1D training** | C | **began 16:09:38 PDT**; no checkpoint exists and none is claimed; held-out evaluation runs only after the checkpoint is frozen | **In flight** |
+| RD-1D GPU hours | — | **unknown until a receipt exists** — not zero | Honest unknown |
 | Organism-scale pipeline: datasets, models, candidates, solver-screened, real experiments, GPU hours | — | **0 / 0 / 0 / 0 / 0 / 0 — unbuilt** |
 | Diffusion surrogate for a mechanistic **agent-based** biological model (CPM, in vitro vasculogenesis, ~22x) | — | **Published by Comlekoglu et al.**, arXiv:2505.09630 (v1 2025-05-01, v3 2025-10-23), DOI 10.1088/2632-2153/ae11f8, PMC12570967. A close precedent for stages 1-2. Read-level: abstract |
 | Physics residuals inside diffusion training | — | **Published by Bastek, Sun, Kochmann**, arXiv:2403.14404 — **v1 2024-03-21**, v4 2025-03-13, ICLR 2025 per the Comments field. Read-level: abstract for metadata |
@@ -151,9 +153,16 @@ Full document with read-levels: `docs/research/generative-roadmap.md`. Page copy
   unknown.
 - Say **"we have not established a sourced flying-fish EI profile"**, never "nobody has measured
   EI" — we have not searched well enough to claim an absence.
-- The **923-cell figure is an arithmetic extrapolation**, not a demonstrated hardware limit.
-  Measured limits are h = 7.2 mm at L 32 and 0.9 mm at L 256 against a 0.5 mm plate. We have not
-  run it and have not established that one H100 cannot.
+- The **923-cell figure is an arithmetic extrapolation**, not a demonstrated hardware limit. We
+  have not run it and have not established that one H100 cannot.
+- **Do not quote a "times finer" factor against an old L 32 case.** Global grids L64/L128/L192 have
+  completed; a fin spans **0.139 / 0.277 / 0.416 of a cell** respectively. Say *the current global
+  grid does not resolve fin thickness*, with the case context.
+- **The O₂ sweep is NOT oxygen dependence.** Under the assumed uptake-uncapped medium the model
+  makes its own O₂ at +1000 via **MAR04071** (pyridoxine oxidase in reverse). Zero external O₂
+  still grows 0.265; blocked it is **3e-16**. At O₂ 20, **0.291 free vs 0.097 blocked**. It is a
+  model-constraint diagnosis; blocking MAR04071 is not biology.
+- **GPU hours are `unknown until a receipt exists`, never `0`**, while a provider job is running.
 
 **Forbidden:** "first diffusion model for synthetic biology", and any IP claim. The method class is
 published; what we propose is the evidence loop around it.

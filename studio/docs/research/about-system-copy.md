@@ -110,7 +110,8 @@ commit is **2026-10-31 07:49:44 PDT** and **all 508 of its commits are dated tha
 - The mispredication probe, its failed control and the withdrawal it produced: commits `e4ab195`,
   `b9f603b`, `81ca466`, all 12:05 PDT
 - The RD-1D diffusion pilot: preregistration and code `9c56a927`, frozen job packet `4a5394f3`,
-  both 15:32-15:33 PDT. **No GPU result yet.**
+  both 15:32-15:33 PDT; CUDA controls passed on the provider under explicit FP32 and **training
+  began 16:09:38 PDT**. **No checkpoint yet, and GPU hours unknown until a receipt exists.**
 
 ### Brought in, not built here
 
@@ -158,10 +159,13 @@ Every count on the About scorecard comes from that call.
 
 Two precision upgrades available, both verified here on 2026-10-31:
 
-1. The pilot status card reads *"implementation in progress"*. It is now stronger than that:
-   **preregistration and code frozen at `9c56a927`, job packet at `4a5394f3`, local CPU controls
-   and 13 tests passing, no GPU result yet.** "Frozen and awaiting GPU time" is both more accurate
-   and more impressive than "in progress".
+1. The pilot status card reads *"implementation in progress"*. **It has moved twice since then and
+   is now stronger again.** The first CUDA control failed at 0.001191914 against a 0.001 tolerance
+   and stopped before training; a paired control in the same allocation then reproduced that
+   failure under the default backend and **passed under explicit IEEE FP32 at 2.2649765e-06**,
+   against the same unchanged tolerance. **Training began 16:09:38 PDT; there is no checkpoint and
+   none is claimed.** Suggested card line: *"controls passed under explicit FP32; training in
+   flight; no checkpoint yet."* **GPU hours are unknown until a receipt exists — not zero.**
 2. The four related-work citations were checked against their arXiv abstract pages and all four
    are correct, including Gallon et al. 2026 (arXiv:2602.09708, v1 2026-02-10). One refinement:
    Bastek et al. is **v1 2024-03-21**, v4 2025-03-13, with ICLR 2025 from the Comments field — the
