@@ -1,7 +1,7 @@
 {
  "schema": "frontier-site-snapshot-0.1",
- "label": "snapshot of inputs 48ad43d2fd13",
- "input_fingerprint": "48ad43d2fd134bcb0b0dffc1a53adbb460e4cfa9fb9bda54ede4d950e97e4bd7",
+ "label": "snapshot of inputs a6a6bfa36c41",
+ "input_fingerprint": "a6a6bfa36c41cf733a443c917fd55afd1bc31817dca0ad5d71fe46f1cb631f90",
  "inputs": [
   {
    "path": "GOAL.md",
@@ -622,6 +622,11 @@
    "path": "artifacts/multicell/baseline.mp4",
    "sha256": "ceaaeabc4adf678830231946353897921e0a4432fa5ccb67b45be5fd442e0efd",
    "bytes": 114262
+  },
+  {
+   "path": "artifacts/multicell/full/full_horizon_chart.mp4",
+   "sha256": "e182866f34943970c79f71b3b30e89106bd741819fc34e5082bc9706f2ff8361",
+   "bytes": 134928
   },
   {
    "path": "artifacts/multicell/full/full_summary.json",
@@ -5992,6 +5997,59 @@
    ],
    "couplings": [],
    "manifest": "artifacts/cfd3d/gpu-v1/gpu_fish_L192_Re1000/render/render.json",
+   "native": true
+  },
+  {
+   "id": "morpheus-full-horizon-chart",
+   "title": "Morpheus full-horizon logger chart (t to 2.0): a chart of logged counts, not a spatial tissue movie",
+   "scales": [
+    "tissue",
+    "cellular"
+   ],
+   "evidence_kind": "chart rendered from the run's logged data (not a spatial simulation render)",
+   "model": {
+    "name": "Morpheus v2.3.9 official multiscale example, three full-horizon arms",
+    "context": "The chart plots, as t advances to 2.0, the logged cell count (log scale), mean CDK1 per cell and mean g_l per cell for the three arms, from the returned logger file only. It draws no cell shapes or fields: the full-horizon runs saved no spatial frames. The earlier spatial movies cover t up to 0.46 only."
+   },
+   "time": {
+    "units": "model time units (example model)",
+    "note": "100 frames at 12 fps; each frame advances t. Generic example, not calibrated."
+   },
+   "video": {
+    "file": "full_horizon_chart.mp4",
+    "sha256": null,
+    "note": "No digest is declared for this chart video; the build copied the file without a check against a declaration."
+   },
+   "video_state": "present_unpinned",
+   "video_href": "artifacts/simulations/morpheus-full-horizon-chart/full_horizon_chart.mp4",
+   "poster_href": null,
+   "numerical_checks": [
+    {
+     "name": "arm baseline",
+     "result": "reached t = 2.0; 256 cells at the end; 96 division events; max cdk1 0.704; max g_l 0.772"
+    },
+    {
+     "name": "arm nofeedback",
+     "result": "reached t = 2.0; 128 cells at the end; 7 division events; max cdk1 0.518; max g_l 0.396"
+    },
+    {
+     "name": "arm seed2",
+     "result": "reached t = 2.0; 263 cells at the end; 99 division events; max cdk1 0.703; max g_l 0.775"
+    }
+   ],
+   "parameter_unknowns": [
+    "Not calibrated to any organism or tissue; units are the example's own.",
+    "'Cells' are model cells, not a growth measurement."
+   ],
+   "open_questions": [
+    "Why the feedback-on CDK1 oscillation damps after about t = 1.5 as the count levels off near 256 was not investigated."
+   ],
+   "limitations": [
+    "A chart of logged values, not a spatial movie: the remote run saved no spatial frames.",
+    "Generic example, not fish growth; one seed repeat only."
+   ],
+   "couplings": [],
+   "manifest": "artifacts/multicell/full/full_summary.json",
    "native": true
   },
   {

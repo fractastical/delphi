@@ -1360,3 +1360,10 @@ def test_home_offers_the_v3_display_props_with_hash_exact_stl_downloads(browser,
     assert all("fish3d-v3b-glide-pose-prop" in h and h.endswith(".stl") for h in hrefs), hrefs
     assert "printer and resin unknown" in pg.locator(".printv3").text_content() and "not organisms" in pg.locator(".printv3 .v3info").text_content()
     assert pg.request.get(base + hrefs[0]).status == 200
+
+
+def test_morpheus_full_horizon_chart_is_labelled_a_chart_not_a_spatial_movie(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/simulations"); pg.wait_for_selector("#sim-morpheus-full-horizon-chart video")
+    t = pg.locator("#sim-morpheus-full-horizon-chart").text_content()
+    assert "not a spatial tissue movie" in t and "draws no cell shapes or fields" in t and "No sha256 is declared" in t and "256 cells" in t and "128 cells" in t

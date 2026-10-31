@@ -664,6 +664,18 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
                 "parameter_unknowns": ["Fins are " + r["caption"].splitlines()[2 - 1].split("Fins are ")[1].split(": fin flow")[0] + ". Fin flow is not resolved.", "A flying fish glides at Reynolds numbers orders of magnitude above this."],
                 "open_questions": ["Can the C1 reference be brought into its band? Until then no case here supports a quantitative force claim."],
                 "limitations": r["caption"].splitlines()[2:] + ["Low-Re numerical demo: not swimming-, taxiing- or flight-validated."], "couplings": [], "manifest": f"{rd}/render.json", "native": True})
+    d = "artifacts/multicell/full"
+    if (ROOT / d / "full_horizon_chart.mp4").exists() and (ROOT / d / "full_summary.json").exists():
+        fh = json.loads(ins.read(f"{d}/full_summary.json"))
+        st, href = _vid(ins, out, "morpheus-full-horizon-chart", d, "full_horizon_chart.mp4", None, allow_unpinned=True)
+        cards.append({"id": "morpheus-full-horizon-chart", "title": "Morpheus full-horizon logger chart (t to 2.0): a chart of logged counts, not a spatial tissue movie", "scales": ["tissue", "cellular"], "evidence_kind": "chart rendered from the run's logged data (not a spatial simulation render)",
+            "model": {"name": "Morpheus v2.3.9 official multiscale example, three full-horizon arms", "context": "The chart plots, as t advances to 2.0, the logged cell count (log scale), mean CDK1 per cell and mean g_l per cell for the three arms, from the returned logger file only. It draws no cell shapes or fields: the full-horizon runs saved no spatial frames. The earlier spatial movies cover t up to 0.46 only."},
+            "time": {"units": "model time units (example model)", "note": "100 frames at 12 fps; each frame advances t. Generic example, not calibrated."},
+            "video": {"file": "full_horizon_chart.mp4", "sha256": None, "note": "No digest is declared for this chart video; the build copied the file without a check against a declaration."}, "video_state": st, "video_href": href, "poster_href": None,
+            "numerical_checks": [{"name": f"arm {a}", "result": f"reached t = {v['reached_t']}; {v['final_cells']} cells at the end; {v['n_division_event_times']} division events; max cdk1 {v['max_cdk1']:.3f}; max g_l {v['max_g_l']:.3f}"} for a, v in fh.items()],
+            "parameter_unknowns": ["Not calibrated to any organism or tissue; units are the example's own.", "'Cells' are model cells, not a growth measurement."],
+            "open_questions": ["Why the feedback-on CDK1 oscillation damps after about t = 1.5 as the count levels off near 256 was not investigated."],
+            "limitations": ["A chart of logged values, not a spatial movie: the remote run saved no spatial frames.", "Generic example, not fish growth; one seed repeat only."], "couplings": [], "manifest": f"{d}/full_summary.json", "native": True})
     d = "artifacts/behavior"
     if (ROOT / d / "manifest.json").exists() and (ROOT / d / "controls.json").exists():
         m = json.loads(ins.read(f"{d}/manifest.json")); ct = json.loads(ins.read(f"{d}/controls.json")); fl = m["files"]
