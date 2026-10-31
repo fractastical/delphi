@@ -1,0 +1,26 @@
+{
+  "claim_id": "thompson1917-ch03-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch03-05",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "hypothesis": "The population median stature-velocity curve from birth to 20 years shows, in order: a very high velocity in infancy, a lower and nearly steady velocity through childhood, a distinct rise (adolescent spurt) in the early-to-mid teens, and a fall toward zero by the end of the teens.",
+  "pass_criterion": "Pre-registered, evaluated on boys (the subject of Thompson's sentence) with girls reported alongside. Velocities come from pooled NHANES 2007-2018 measured stature (recumbent length < 24 months, standing height >= 24 months) using exam age in months. Model-free yearly velocity v(a) = median(height | age in [a+1,a+2) yr) - median(height | age in [a,a+1) yr), a = 0..18; smoothed velocity = derivative of a weighted smoothing spline through monthly medians. All four must hold for boys: (a) infancy: v(0) >= 2 x mean of v(4..9); (b) childhood steadiness: coefficient of variation of the smoothed velocity over ages 4-10 < 0.15 and max-min of v(4..9) <= 2.0 cm/yr; (c) adolescent quickening: max smoothed velocity in ages 10-17 >= 1.2 x the minimum smoothed velocity in ages 6-10, and the largest v(a) for a in 10..16 exceeds mean v(4..9) by >= 1.0 cm/yr with a 95% bootstrap CI (1000 resamples of individuals) excluding 0; (d) arrest: v(18) (18.5 -> 19.5 yr) < 1.5 cm/yr and < one third of mean v(4..9).",
+  "fail_criterion": "Refutes if (c) fails in boys, i.e. the adolescent peak does not exceed childhood velocity (bootstrap CI of the excess includes 0 or the smoothed ratio < 1.0), or if (a) fails (infancy velocity not above childhood velocity). Any other combination of failed sub-criteria (e.g. an irregular childhood plateau or incomplete arrest by 19.5 yr) gives 'mixed'.",
+  "planned_datasets": [
+    "nhanes-demo-2007-2018",
+    "nhanes-bmx-2007-2018"
+  ],
+  "interpretation": "Thompson's 'curve of growth for length or stature' and its phases are read as the first derivative (velocity, cm/yr) of median stature against age. NHANES is cross-sectional, so the population-median velocity is a smoothed version of individual velocity: the adolescent spurt is attenuated and widened relative to longitudinal curves, which makes criterion (c) conservative. 'Babyhood' is taken as the first two years, 'early boyhood' as 4-10 years, 'teens' as 10-17, 'full height' as 19-20 years. Birth length is not in NHANES, so infancy velocity is measured from the 0-11 month to the 12-23 month median (midpoints ~0.5 and ~1.5 years).",
+  "datasets": [],
+  "method": "",
+  "measured": {},
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-thompson-efb7",
+    "date": "2026-10-31"
+  }
+}
