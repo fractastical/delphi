@@ -5,8 +5,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { GROUP_KEYS, SORT_KEYS, browseClaims } from "./graph.mjs";
-import { NETWORK_ENDPOINT, PREFIXES, getClaim, overview, rankClaims, searchClaims, sparql } from "./lib.mjs";
+import { GROUP_KEYS, SORT_KEYS, browseClaims, getClaimWithStatus, overviewWithGraph, rankClaimsWithStatus, searchClaimsWithStatus } from "./graph.mjs";
+import { NETWORK_ENDPOINT, PREFIXES, sparql } from "./lib.mjs";
 import { observeToolCall } from "./metrics.mjs";
 import { AXIS_IDS, GROUP_KEYS as ORG_GROUP_KEYS, SORT_KEYS as ORG_SORT_KEYS, browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
 
@@ -29,16 +29,21 @@ export function createServer() {
 const source = z.enum(["local", "network"]).default("local").describe(
   `"local" = TriG files in this repo, including unpublished drafts and assessments. "network" = what is published, via ${NETWORK_ENDPOINT}.`);
 
-const json = data => ({ content: [{ type: "text", text: JSON.stringify(data, null, 2) }] });
+// A result with a `markdown` field is sent as that text first, so clients show a readable table,
+// followed by the rest as JSON.
+const json = ({ markdown, ...data }) => ({ content: [
+  ...(markdown ? [{ type: "text", text: markdown }] : []),
+  { type: "text", text: JSON.stringify(data, null, 2) },
+] });
 const tool = (...spec) => TOOLS.push(spec);
 
 tool("delphi_overview",
-  "Start here. Counts claims per domain (and how many carry math in skos:notation), and lists the assessment types you can rank by.",
+  "Start here. Counts claims per domain (and how many carry math in skos:notation), lists the assessment types you can rank by, and gives the claim graph's verification status per thinker (theorems, math claims, Lean-checked, proved, unverified, refuted) with links that open docs/claim-graph.html filtered to each count.",
   { source },
-  ({ source }) => overview(source));
+  ({ source }) => overviewWithGraph(source));
 
 tool("delphi_search_claims",
-  "Find claims by text (matched against title, statement and math) and/or domain. Returns each claim's IRI, title, statement, LaTeX math and nanopub.",
+  "Find claims by text (matched against title, statement and math) and/or domain. Returns each claim's IRI, title, statement, LaTeX math, nanopub and `status`: whether it is proved (Lean-checked or in the literature), its data-test verdict, and whether it is published. To filter by status, use delphi_graph.",
   {
     text: z.string().optional().describe("Case-insensitive substring, e.g. \"fixation\" or \"\\\\sqrt\""),
     domain: z.string().optional().describe("Substring of the domain IRI, e.g. \"math\", \"turing\", \"darwin\""),
@@ -46,18 +51,18 @@ tool("delphi_search_claims",
     limit: z.number().int().min(1).max(500).default(20),
     source,
   },
-  searchClaims);
+  searchClaimsWithStatus);
 
 tool("delphi_get_claim",
-  "Everything about one claim: all assertion fields (statement, math, assumptions/context, proposed test, sources) plus every assessment with its per-dimension scores.",
+  "Everything about one claim: all assertion fields (statement, math, assumptions/context, proposed test, sources), every assessment with its per-dimension scores, and `status`: proof (Lean theorems or literature), data-test verdict with its result file, and publication registry.",
   {
     id: z.string().describe("Claim IRI or its short id, e.g. \"fisher-kpp-speed\" or \"darwin1859-ch09-03\""),
     source,
   },
-  getClaim);
+  getClaimWithStatus);
 
 tool("delphi_rank_claims",
-  "Rank claims by an assessment type: mean overall score across assessors (one score per assessor), with assessor count, spread (max - min, i.e. disagreement) and verdict counts. Omit `type` to list the available types.",
+  "Rank claims by an assessment type: mean overall score across assessors (one score per assessor), with assessor count, spread (max - min, i.e. disagreement), verdict counts and each claim's proof/data-test `status`. Omit `type` to list the available types.",
   {
     type: z.string().optional().describe("Assessment type, e.g. \"dataset-resolvability/0.1.0\""),
     domain: z.string().optional().describe("Substring of the domain IRI"),
@@ -65,11 +70,12 @@ tool("delphi_rank_claims",
     limit: z.number().int().min(1).max(500).default(20),
     source,
   },
-  rankClaims);
+  rankClaimsWithStatus);
 
 tool("delphi_graph",
-  "The claim graph from docs/claim-graph.html: every claim (including drafts) with thinker, year, work, proof status, testability and model truth scores (p_true per model, mean `truth`, `disagreement` = max - min). Filter, then sort or group by thinker/decade/status. Not nanopub-backed: truth scores are unpublished; `built` says when the snapshot was made.",
+  "The claim graph from docs/claim-graph.html. With no arguments, returns its verification status table: per thinker, how many claims are theorems, math claims, Lean-checked, proved in the literature, partly proved, unverified or refuted, as markdown with every count linking to the graph filtered to it. With filters (or view: \"claims\"), lists claims (including drafts) with thinker, year, work, verification, math/theorem flags, testability and model truth scores (p_true per model, mean `truth`, `disagreement` = max - min), each with a `graph` link that opens it in the page; or groupBy for counts and means. Truth scores are unpublished opinions, not verification; `built` says when the snapshot was made.",
   {
+    view: z.enum(["status", "claims"]).optional().describe("status = the per-thinker verification table (default when no filters are given); claims = list claims"),
     text: z.string().optional().describe("Case-insensitive substring of title, statement or quote"),
     thinker: z.string().optional().describe("Substring, e.g. \"darwin\", \"turing\""),
     work: z.string().optional().describe("Substring of the work title"),

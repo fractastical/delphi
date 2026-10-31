@@ -1,7 +1,7 @@
 // Every claim in the repo in one shape: Darwin and the math-bio key claims from their verified
 // files, Thompson and Wolfram from their extraction drafts until a verified claims.json exists.
 // `key` hashes the label and statement, so it survives a draft being given its final id.
-import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -9,6 +9,8 @@ import { fileURLToPath } from "node:url";
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 export const MATH_KINDS = new Set(["mathematical-law", "mathematical", "model-theorem"]);
 export const VERIFICATION = ["refuted", "untested", "partial", "literature", "lean"];
+export const EVIDENCE = ["supports", "mixed", "refutes", "inconclusive"];
+const UNTESTED_NOTE = "Extracted from the text; not yet tested against data.";
 export const claimKey = c => createHash("sha256").update(`${c.label}\n${c.text}`.replace(/\s+/g, " ").trim()).digest("hex").slice(0, 16);
 
 export function loadClaims() {
@@ -93,7 +95,7 @@ export function loadClaims() {
         locator: c.lineStart ? `lines ${c.lineStart}–${c.lineEnd}` : c.line ? `line ${c.line}` : c.pageStart ? `p. ${c.pageStart}` : c.page ? `p. ${c.page}` : "",
         status: l ? "proved" : "untested", proof: l ? "lean" : null,
         statusNote: l ? `Mathematical core machine-checked in Lean 4 (${l.module}: ${l.theorems.join(", ")}). ${l.scopeNote}`.trim()
-          : leanDeclined[c.id] ? `Lean formalization attempted and declined: ${leanDeclined[c.id]}` : "Extracted from the text; not yet tested against data.",
+          : leanDeclined[c.id] ? `Lean formalization attempted and declined: ${leanDeclined[c.id]}` : UNTESTED_NOTE,
         lean: l,
         draft, assess: a, resolvability: mean(a.map(x => x.overall).filter(v => v != null)), confidence: mean(a.map(x => x.confidence).filter(v => v != null)),
         uri, registry,
@@ -156,11 +158,40 @@ export function loadClaims() {
   // verification, so they never raise it. A claim is `math` when it has a formal statement
   // (notation or a Lean formalization) or is a mathematical kind of claim, and a `theorem` only
   // when it is both math and proved.
+  // `evidence` is the second axis: the verdict of a test against data in claim-tests/<project>/<id>/
+  // result.json. It never changes `verification` or `theorem` (a proof is not evidence that
+  // organisms satisfy the assumptions, and a data test is not a proof). claim-tests/README.md
+  // requires pre-registration, so a test counts as pre-registered unless it says otherwise.
+  const tests = {};
+  const TESTS = join(ROOT, "claim-tests");
+  // A claim's folder may hold its result at the top or in one subfolder per test run; the top-level one wins.
+  const isDir = p => statSync(p).isDirectory();
+  for (const p of ls(TESTS, /^[a-z]/).filter(p => isDir(join(TESTS, p)))) for (const id of ls(join(TESTS, p), /^[^.]/)) {
+    const dir = join(TESTS, p, id);
+    if (!isDir(dir)) continue;
+    for (const rel of [".", ...ls(dir, /^[^.]/).filter(d => existsSync(join(dir, d, "result.json")))]) {
+      const f = join(dir, rel, "result.json");
+      if (!existsSync(f)) continue;
+      const r = readJson(f);
+      if (r.status !== "complete" || !EVIDENCE.includes(r.verdict) || tests[r.claim_id]) continue;
+      tests[r.claim_id] = { verdict: r.verdict, confidence: r.confidence ?? null, preregistered: r.preregistered !== false,
+        path: join("claim-tests", p, id, rel, "result.json"), hypothesis: r.hypothesis ?? "", datasets: (r.datasets || []).map(d => d.name),
+        // The four test-contract fields (claim-tests/README.md); `explicit` is false when derived from the pre-registration fields.
+        testContract: { expected_observation: r.test_contract?.expected_observation ?? r.pass_criterion ?? "",
+          disconfirming_observation: r.test_contract?.disconfirming_observation ?? r.fail_criterion ?? "",
+          admissible_datasets: r.test_contract?.admissible_datasets ?? (r.planned_datasets?.length ? `Planned datasets: ${r.planned_datasets.join(", ")}` : ""),
+          inference_method: r.test_contract?.inference_method ?? r.method ?? "", explicit: !!r.test_contract },
+        revisions: (r.revisions || []).map(v => ({ date: v.date, from: v.from, to: v.to, prompted_by: (v.prompted_by || []).map(x => x.agent) })) };
+    }
+  }
   for (const c of claims) {
     c.key = claimKey(c);
     c.verification = c.status === "proved" ? c.proof : c.status;
     c.math = !!(c.notation || c.lean || MATH_KINDS.has(c.kind));
     c.theorem = c.math && c.status === "proved";
+    c.dataTest = tests[c.id] ?? null;
+    c.evidence = c.dataTest?.verdict ?? null;
+    if (c.dataTest && c.statusNote === UNTESTED_NOTE) c.statusNote = "Extracted from the text; not proved.";
   }
   return claims;
 }

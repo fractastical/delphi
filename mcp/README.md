@@ -92,14 +92,20 @@ Use `local` while building; use `network` when citing something or checking what
 
 | Tool | Use it to |
 |---|---|
-| `delphi_overview` | See what exists: claims per domain, how many have math, which assessment types can be ranked. Call this first. |
+| `delphi_overview` | See what exists: claims per domain, how many have math, which assessment types can be ranked, and the claim graph's verification status table with links into the page. Call this first. |
 | `delphi_search_claims` | Find claims by text (title, statement or LaTeX), domain substring (`math`, `turing`, `darwin`), `mathOnly`. |
 | `delphi_get_claim` | Get one claim by short id or IRI: all fields (math, assumptions, proposed test, sources) and every assessment with per-dimension scores. |
 | `delphi_rank_claims` | Rank claims by one assessment type. Omit `type` to list the types. |
-| `delphi_graph` | The claim graph ([`docs/claim-graph.html`](../docs/claim-graph.html)): filter by thinker, work, year, status, kind, truth; sort by `truth`, `truth-asc`, `disagreement` (max − min p_true across models), `testability` or `year`; or `groupBy` thinker/work/decade/status/kind for counts and means. |
+| `delphi_graph` | The claim graph ([`docs/claim-graph.html`](../docs/claim-graph.html)). With no arguments: its verification status table per thinker (theorems, math claims, Lean-checked, proved in the literature, partly proved, unverified, refuted) as markdown, every count linking to the page filtered to it. With filters (thinker, work, year, status, `verification`, `math`, `theorem`, kind, truth) or `view: "claims"`: the matching claims, each with a `graph` link; sort by `truth`, `truth-asc`, `disagreement` (max − min p_true across models), `testability` or `year`; or `groupBy` thinker/work/decade/status/verification/kind for counts and means. Links point at the local `docs/`; set `DELPHI_DOCS_URL` to link a hosted copy instead. |
 | `delphi_organisms` | Rank or filter the 782 animal taxa in [`organisms/merged`](../organisms/merged) by dataset coverage. Filter by name, class, rank, project, `hasAxis`/`missingAxis` (e.g. `hasAxis: ["genome"], missingAxis: ["traits"]`), `genomeLevel`, score, mentions; sort by `score`, `score-asc`, `mentions`, `datasets`, `name`; `groupBy` class/rank/project/genomeLevel; or `overview: true` for axis totals. |
 | `delphi_get_organism` | One taxon by key (`gbif:2495414`), slug, accepted name or vernacular: identifiers, lineage, names as written, coverage score and missing axes, every dataset record with counts/distributions/integrity, every located mention. |
 | `delphi_sparql` | Anything else. Read-only `SELECT`; common prefixes are added if the query has none. |
+
+Search, get and rank attach a `status` to each claim: `verification` (`lean`, `literature`, `partial`,
+`untested`, `refuted`) with the Lean theorem names, the `dataTest` verdict and its `result.json`,
+and the publication `registry`. The nanopubs carry none of this, so it comes from
+`docs/claims.json` (with either `source`); `statusNote` says when that file was built. Filter on
+status with `delphi_graph`.
 
 ### How ranking works
 

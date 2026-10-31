@@ -14,8 +14,8 @@
 //   node mcp/cli.mjs organisms --group-by class
 //   node mcp/cli.mjs organism columba-livia
 
-import { browseClaims } from "./graph.mjs";
-import { getClaim, overview, rankClaims, searchClaims, sparql } from "./lib.mjs";
+import { browseClaims, getClaimWithStatus, overviewWithGraph, rankClaimsWithStatus, searchClaimsWithStatus } from "./graph.mjs";
+import { sparql } from "./lib.mjs";
 import { browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
@@ -31,10 +31,10 @@ for (let i = 0; i < rest.length; i++) {
 }
 
 const commands = {
-  overview: () => overview(opts.source),
-  search: () => searchClaims({ text: positional[0], ...opts }),
-  claim: () => getClaim({ id: positional[0] ?? opts.id, source: opts.source }),
-  rank: () => rankClaims({ type: positional[0], ...opts }),
+  overview: () => overviewWithGraph(opts.source),
+  search: () => searchClaimsWithStatus({ text: positional[0], ...opts }),
+  claim: () => getClaimWithStatus({ id: positional[0] ?? opts.id, source: opts.source }),
+  rank: () => rankClaimsWithStatus({ type: positional[0], ...opts }),
   graph: () => browseClaims({ text: positional[0], ...opts }),
   sparql: () => sparql(positional[0] ?? opts.query, opts.source),
   organisms: () => opts.overview ? organismsOverview() : browseOrganisms({
@@ -50,7 +50,12 @@ if (!commands[cmd]) {
   process.exit(1);
 }
 try {
-  console.log(JSON.stringify(await commands[cmd](), null, 2));
+  const result = await commands[cmd]();
+  // In a terminal, show the markdown table first; piped output stays a single JSON document.
+  if (process.stdout.isTTY && result?.markdown) {
+    const { markdown, ...rest } = result;
+    console.log(`${markdown}\n\n${JSON.stringify(rest, null, 2)}`);
+  } else console.log(JSON.stringify(result, null, 2));
 } catch (e) {
   console.error(e?.message ?? e);
   process.exit(1);

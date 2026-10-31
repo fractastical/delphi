@@ -4,9 +4,22 @@
 
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { REPO } from "./lib.mjs";
+import { pathToFileURL } from "node:url";
+import { REPO, getClaim, overview, rankClaims, searchClaims } from "./lib.mjs";
 
 export const CLAIMS_JSON = join(REPO, "docs/claims.json");
+
+// Links into the built pages. DELPHI_DOCS_URL points them at a hosted copy of docs/ instead.
+const DOCS = (process.env.DELPHI_DOCS_URL ?? pathToFileURL(join(REPO, "docs")).href).replace(/\/$/, "");
+// Query parameters understood by docs/claim-graph.html: level, math (yes|no), thm, thinker, p, t, claim.
+export function graphUrl(params = {}, page = "claim-graph") {
+  const q = new URLSearchParams(Object.entries(params).filter(([, v]) => v != null && v !== false && v !== ""));
+  return `${DOCS}/${page}.html${q.size ? `?${q}` : ""}`;
+}
+const LEVELS = ["lean", "literature", "partial", "untested", "refuted"];
+const LEVEL_LABEL = { lean: "Lean-checked", literature: "Proved (literature)", partial: "Partly proved", untested: "Not proved", refuted: "Refuted" };
+// Verdicts of tests against data (claim-tests/), a separate axis from proof.
+const EVIDENCE = ["supports", "mixed", "refutes", "inconclusive"];
 
 let cache = null;
 
@@ -18,8 +31,40 @@ function load() {
     const p = c.truth_by.map(x => x.p_true);
     c.disagreement = p.length > 1 ? +(Math.max(...p) - Math.min(...p)).toFixed(3) : null;
   }
+  data.byId = new Map(data.claims.map(c => [c.id, c]));
   cache = { mtime, data };
   return data;
+}
+
+// Proof and data-test status of a claim. The nanopubs carry neither, so the claim tools take it
+// from docs/claims.json and attach it to every claim they return.
+function claimStatus(claim) {
+  const c = load().byId.get(String(claim).replace(/^https:\/\/w3id\.org\/delphi\/resource\/claim\//, ""));
+  if (!c) return undefined;
+  const t = c.data_test;
+  return {
+    verification: c.verification, theorem: c.theorem, math: c.math,
+    leanTheorems: c.lean_theorems ?? undefined,
+    dataTest: t ? { verdict: t.verdict, confidence: t.confidence, preregistered: t.preregistered, result: t.path } : undefined,
+    registry: c.registry, graph: graphUrl({ claim: c.id }),
+  };
+}
+
+const STATUS_NOTE = "status: verification = lean (machine-checked in Lean 4), literature (proved in the literature), partial, untested or refuted; dataTest = verdict of a pre-registered test against data; registry = production, test or null (unpublished). From docs/claims.json, built ";
+
+export async function searchClaimsWithStatus(args) {
+  const rows = await searchClaims(args);
+  return { statusNote: STATUS_NOTE + load().built, claims: rows.map(r => ({ ...r, status: claimStatus(r.claim) })) };
+}
+
+export async function getClaimWithStatus(args) {
+  const r = await getClaim(args);
+  return r.found === false ? r : { ...r, status: claimStatus(r.claim), statusNote: STATUS_NOTE + load().built };
+}
+
+export async function rankClaimsWithStatus(args) {
+  const rows = await rankClaims(args);
+  return Array.isArray(rows) ? { statusNote: STATUS_NOTE + load().built, ranked: rows.map(r => ({ ...r, status: claimStatus(r.claim) })) } : rows;
 }
 
 const has = (value, needle) => String(value ?? "").toLowerCase().includes(needle.toLowerCase());
@@ -44,10 +89,65 @@ const GROUPS = {
 };
 export const GROUP_KEYS = Object.keys(GROUPS);
 
-export function browseClaims({
-  text, thinker, work, status, verification, math, theorem, kind, yearFrom, yearTo, minTruth, maxTruth, minTruthAssessors = 0,
-  published, sort = "truth", groupBy, limit = 20,
-} = {}) {
+// The verification table at the top of docs/claim-graph.html, with links that open the graph
+// filtered to each cell.
+export function graphStatus() {
+  const { built, claims } = load();
+  const count = (cs, f) => cs.filter(f).length;
+  const tally = cs => ({
+    claims: cs.length, theorems: count(cs, c => c.theorem), math: count(cs, c => c.math),
+    ...Object.fromEntries(LEVELS.map(l => [l, count(cs, c => c.verification === l)])),
+    mathUnverified: count(cs, c => c.math && c.verification === "untested"),
+    tested: count(cs, c => c.evidence),
+    ...Object.fromEntries(EVIDENCE.map(e => [e, count(cs, c => c.evidence === e)])),
+    neither: count(cs, c => c.verification === "untested" && !c.evidence),
+  });
+  const thinkers = [...new Set([...claims].sort((a, b) => a.year - b.year).map(c => c.thinker))];
+  const rows = thinkers.map(t => ({ thinker: t, ...tally(claims.filter(c => c.thinker === t)), graph: graphUrl({ thinker: t }) }));
+  const total = tally(claims);
+  const links = {
+    graph: graphUrl(),
+    theorems: graphUrl({ thm: 1 }),
+    mathUnverified: graphUrl({ math: "yes", level: "untested" }),
+    leanChecked: graphUrl({ level: "lean" }),
+    theoremsPage: graphUrl({}, "theorems"),
+  };
+  const cell = (n, params) => (n ? `[${n}](${graphUrl(params)})` : "·");
+  const line = (name, r, t) => `| ${t ? `[${name}](${graphUrl({ thinker: t })})` : `**${name}**`} | ${r.claims} | ${cell(r.theorems, { thinker: t, thm: 1 })} | ${cell(r.math, { thinker: t, math: "yes" })} | `
+    + LEVELS.map(l => cell(r[l], { thinker: t, level: l })).join(" | ") + ` | ${cell(r.mathUnverified, { thinker: t, math: "yes", level: "untested" })} | `
+    + cell(r.tested, { thinker: t, ev: "any" }) + " | " + EVIDENCE.map(e => cell(r[e], { thinker: t, ev: e })).join(" | ") + ` | ${cell(r.neither, { thinker: t, level: "untested", ev: "none" })} |`;
+  const markdown = [
+    `**Claim graph, built ${built}:** ${total.claims} claims, **${total.theorems} theorems** (${total.lean} Lean-checked, ${total.literature} proved in the literature), ${total.math} math claims, ${total.mathUnverified} of them not proved. ${total.tested} claims tested against data (${EVIDENCE.map(e => `${total[e]} ${e}`).join(", ")}); ${total.neither} neither proved nor tested.`,
+    "",
+    `| Thinker | Claims | ★ Theorems | ∑ Math | ${LEVELS.map(l => LEVEL_LABEL[l]).join(" | ")} | Math, not proved | Tested | ${EVIDENCE.map(e => `Data: ${e}`).join(" | ")} | Neither |`,
+    `|---|${"---:|".repeat(LEVELS.length + 4 + EVIDENCE.length + 2)}`,
+    ...rows.map(r => line(r.thinker, r, r.thinker)),
+    line("All", total, null),
+    "",
+    `Open: [full graph](${links.graph}) · [theorems only](${links.theorems}) · [math claims awaiting proof](${links.mathUnverified}) · [theorems page](${links.theoremsPage}). Every count above links to the graph filtered to it.`,
+    "A theorem is a math claim (formal notation, a Lean formalization, or a mathematical kind) that is machine-checked in Lean 4 or proved in the literature. Tested against data is a separate axis: the verdict of a pre-registered test in claim-tests/, which never makes a claim a theorem. Assessor truth scores count as neither.",
+  ].join("\n");
+  return { markdown, built, total, thinkers: rows, links };
+}
+
+// delphi_overview: the nanopub overview plus the graph's status table and links.
+export async function overviewWithGraph(source) {
+  const { markdown, built, total, links } = graphStatus();
+  return { markdown, ...(await overview(source)),
+    claimGraph: { built, total, links, more: "delphi_graph with no arguments returns this table per thinker; add filters to list claims" } };
+}
+
+const FILTERS = ["text", "thinker", "work", "status", "verification", "math", "theorem", "kind", "yearFrom", "yearTo", "minTruth", "maxTruth", "published", "groupBy"];
+
+export function browseClaims(args = {}) {
+  const view = args.view ?? (FILTERS.some(k => args[k] != null) || args.minTruthAssessors ? "claims" : "status");
+  if (view === "status") return graphStatus();
+  return listClaims(args);
+}
+
+function listClaims(args) {
+  const { text, thinker, work, status, verification, math, theorem, kind, yearFrom, yearTo, minTruth, maxTruth, minTruthAssessors = 0,
+    published, sort = "truth", groupBy, limit = 20 } = args;
   const { built, claims } = load();
   const hits = claims.filter(c =>
     (!text || has(`${c.label} ${c.statement} ${c.quote ?? ""}`, text))
@@ -65,6 +165,14 @@ export function browseClaims({
     && c.truth_by.length >= minTruthAssessors
     && (published == null || (published ? c.registry === "production" : c.registry !== "production")));
 
+  // The same view in the browser, for the filters the page supports.
+  const names = [...new Set(hits.map(c => c.thinker))];
+  const params = { thinker: thinker && names.length === 1 ? names[0] : null, level: verification ?? (status === "proved" ? null : status),
+    math: math == null ? null : math ? "yes" : "no", thm: theorem ? 1 : null, p: minTruth };
+  const unmapped = ["text", "work", "kind", "yearFrom", "yearTo", "maxTruth", "published"].filter(k => args[k] != null);
+  const graph = graphUrl(params);
+  const graphNote = unmapped.length ? `The graph link cannot apply ${unmapped.join(", ")}; it shows a superset of these results.` : undefined;
+
   if (groupBy) {
     if (!GROUPS[groupBy]) throw new Error(`groupBy must be one of ${GROUP_KEYS.join(", ")}`);
     const groups = new Map();
@@ -73,7 +181,7 @@ export function browseClaims({
       (groups.get(k) ?? groups.set(k, []).get(k)).push(c);
     }
     return {
-      built, matched: hits.length, groupBy,
+      built, matched: hits.length, groupBy, graph, graphNote,
       groups: [...groups].map(([group, cs]) => ({
         group, claims: cs.length,
         meanTruth: mean(cs.map(c => c.truth).filter(v => v != null)),
@@ -90,8 +198,9 @@ export function browseClaims({
 
   if (!SORTS[sort]) throw new Error(`sort must be one of ${SORT_KEYS.join(", ")}`);
   return {
-    built, matched: hits.length,
+    built, matched: hits.length, graph, graphNote,
     claims: [...hits].sort(SORTS[sort]).slice(0, Math.min(Number(limit) || 20, 500)).map(c => ({
+      graph: graphUrl({ claim: c.id }),
       id: c.id, title: c.label, statement: c.statement, thinker: c.thinker, year: c.year, work: c.work, chapter: c.chapter,
       kind: c.kind, status: c.status, verification: c.verification, math: c.math, theorem: c.theorem, notation: c.notation ?? undefined, truth: c.truth, truthBy: c.truth_by, disagreement: c.disagreement,
       testability: c.testability, nanopub: c.nanopub, registry: c.registry, draft: c.draft || undefined,

@@ -102,10 +102,16 @@
   "hypothesis": "If tissue cell walls meet three at a time at 120 degrees regardless of cell size, junction angles in real tissues cluster near 120 degrees more tightly than in a random partition of the plane, T-shaped junctions are rare, four cells do not meet at one point, and angle deviation does not depend on cell size.",
   "pass_criterion": "Exploratory, not pre-registered: the images were segmented and inspected before the pass criterion was written. Treat the verdict as hypothesis-generating; a pre-registered replication on new images is needed before it counts as a test. A tissue conforms if its junction-angle SD and its fraction of T-like junctions (largest angle >= 160 deg) are both below the random-Voronoi control. Supports if every usable tissue conforms; mixed if some do and some do not; refutes if none do.",
   "fail_criterion": "Refutes if no tissue has both an angle SD and a T-junction fraction below the random-Voronoi control.",
+  "test_contract": {
+    "expected_observation": "In planar sections of a cellular tissue, the three angles at each three-way wall junction cluster near 120 degrees: junction-angle SD and T-junction fraction are both below those of a random Voronoi tiling of the same cell count.",
+    "disconfirming_observation": "Junction angles in a tissue are as dispersed as, or more dispersed than, a random Voronoi tiling, or T-junctions (one angle near 180 degrees) are the majority, as in cell-file tissues such as grass epidermis.",
+    "admissible_datasets": "Public micrographs of planar (one-cell-thick or surface) tissue with resolvable cell walls, segmentable to label images; not drawings or diagrams; not images used to illustrate the claim in the source; licence permitting reuse. Segmenter output must be calibrated against synthetic tilings with known junction statistics (see revisions).",
+    "inference_method": "Cellpose-SAM segmentation, three-way junction extraction from the label image, angle SD and T-junction fraction per tissue, compared with a perfect hexagonal lattice and a random Voronoi control; pass if both statistics fall below the random control, with segmenter bias measured on synthetic tilings and subtracted from the margin."
+  },
   "interpretation": "Thompson's 'tissue cell walls' are taken as segmented cell outlines in 2D images of epithelia and epidermes; the angle is the angle between wall directions near the junction. The compound eye is included as a packing of ommatidia, not of single cells.",
   "measured": {
     "value": 4,
-    "unit": "tissues (of those usable) whose junction-angle SD and T-junction fraction are both below the random-Voronoi control",
+    "unit": "tissues (of those usable) whose junction-angle SD and T-junction fraction are both below the random-Voronoi control, as measured on Cellpose-SAM output (see revisions for segmenter bias)",
     "n": 5,
     "uncertainty": "one image per tissue",
     "extra": {
@@ -123,8 +129,8 @@
           "junctions_measured": 229,
           "angle_sd": 9.7,
           "frac_all_within_15deg": 0.747,
-          "frac_T_like": 0.0,
-          "fourfold_or_more_fraction": 0.0,
+          "frac_T_like": 0,
+          "fourfold_or_more_fraction": 0,
           "size_vs_dev_spearman": {
             "rho": 0.082,
             "p": 0.216
@@ -136,7 +142,7 @@
           "angle_sd": 18.6,
           "frac_all_within_15deg": 0.272,
           "frac_T_like": 0.003,
-          "fourfold_or_more_fraction": 0.0,
+          "fourfold_or_more_fraction": 0,
           "size_vs_dev_spearman": {
             "rho": -0.154,
             "p": 0.00271
@@ -148,7 +154,7 @@
           "angle_sd": 17.8,
           "frac_all_within_15deg": 0.188,
           "frac_T_like": 0.027,
-          "fourfold_or_more_fraction": 0.0,
+          "fourfold_or_more_fraction": 0,
           "size_vs_dev_spearman": {
             "rho": -0.086,
             "p": 0.299
@@ -172,7 +178,7 @@
           "angle_sd": 13.9,
           "frac_all_within_15deg": 0.532,
           "frac_T_like": 0.016,
-          "fourfold_or_more_fraction": 0.0,
+          "fourfold_or_more_fraction": 0,
           "size_vs_dev_spearman": {
             "rho": -0.216,
             "p": 0.00297
@@ -183,8 +189,8 @@
       "controls": {
         "hexagonal-lattice": {
           "angle_sd": 1.3,
-          "frac_T_like": 0.0,
-          "fourfold_or_more_fraction": 0.0,
+          "frac_T_like": 0,
+          "fourfold_or_more_fraction": 0,
           "size_vs_dev_spearman": {
             "rho": 0.043,
             "p": 0.265
@@ -192,8 +198,8 @@
         },
         "brick-wall": {
           "angle_sd": 40.5,
-          "frac_T_like": 1.0,
-          "fourfold_or_more_fraction": 0.0,
+          "frac_T_like": 1,
+          "fourfold_or_more_fraction": 0,
           "size_vs_dev_spearman": {
             "rho": -0.014,
             "p": 0.769
@@ -217,12 +223,44 @@
     }
   },
   "verdict": "mixed",
-  "confidence": 0.6,
+  "confidence": 0.35,
   "caveats": [
+    "Segmenter bias (added 2026-10-31 after external review): Cellpose-SAM pulls non-hexagonal packings toward 120-degree junctions (brick wall 100% -> 3-16% T-junctions). Conforming tissues are consistent with 120-degree packing but their margin over the random control is inflated; see revisions[0].",
     "Exploratory, not pre-registered: the images were segmented and inspected before the pass criterion was written. Treat the verdict as hypothesis-generating; a pre-registered replication on new images is needed before it counts as a test.",
     "One image per tissue, all from Wikimedia Commons; tissues were chosen by availability, not sampled.",
     "Four-way junction fractions are upper bounds: the random-Voronoi control, which has no true four-way vertices, scores 8.6% because close three-way junctions merge.",
     "Weak negative size-deviation correlations in some tissues also appear in the random control, so they are attributed to measurement noise in small cells.",
     "The Drosophila eye image is an SEM of a curved surface; projection distorts its angles."
+  ],
+  "revisions": [
+    {
+      "date": "2026-10-31",
+      "from": {
+        "verdict": "mixed",
+        "confidence": 0.6,
+        "summary": "4 of 5 tissues conform"
+      },
+      "to": {
+        "verdict": "mixed",
+        "confidence": 0.35,
+        "summary": "4 of 5 tissues are not cell-file tissues; margin over the random control is inflated by the segmenter"
+      },
+      "reason": "Segmenter-bias null (cell-geometry/segmenter_bias.py, results/segmenter-bias/): the same CPSAM v2 checkpoint turns a brick-wall tiling with 100% T-junctions into 3-16% T-junctions and compresses angle SD from 40.5 to 25-26 degrees; a grass-like cell-file tiling goes from 100% to 48-59% T; random Voronoi goes from 14% to 28-31% of junctions within 15 degrees of 120. Cell counts were exact, so the bias is in boundary shape. The measured 0-3% T fractions in the four conforming tissues are below the segmenter floor for a tissue that truly has 100% T-junctions, and grass (49%) matches the segmented cell-file tiling, so its true T fraction is probably near 100%.",
+      "prompted_by": [
+        {
+          "agent": "vina",
+          "venue": "https://www.moltbook.com/post/e06b5458-f19e-4177-ba05-9b0c990af69f",
+          "comment": "https://www.moltbook.com/post/e06b5458-f19e-4177-ba05-9b0c990af69f#b3696eb0-2271-44af-9d4d-6086324ae860",
+          "contribution": "asked for a null in which the junction statistics are run on segmenter output for synthetic masks with known non-hexagonal packing"
+        },
+        {
+          "agent": "hivefound",
+          "venue": "https://www.moltbook.com/post/e06b5458-f19e-4177-ba05-9b0c990af69f",
+          "comment": "https://www.moltbook.com/post/e06b5458-f19e-4177-ba05-9b0c990af69f#a55aa7a0-cf2b-442b-b58a-8ff6018d4165",
+          "contribution": "proposed that every claim carry a disconfirming observation, admissible dataset constraints and inference method as separate fields"
+        }
+      ],
+      "null_result": "cell-geometry/results/segmenter-bias/summary.json"
+    }
   ]
 }
