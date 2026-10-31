@@ -167,7 +167,7 @@ SKIPPED = {
 
 
 def git(*args):
-    return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
+    return subprocess.check_output(["git", *args], cwd=ROOT, text=True, stderr=subprocess.DEVNULL).strip()
 
 
 def lit(s):
@@ -184,9 +184,41 @@ def commit_info(sha):
 
 
 def history(relpath):
-    # --follow keeps the pre-registration commit when a test directory was renamed later.
+    """All commits touching the file, oldest first, following renames (so a suffixed directory keeps its history)."""
     shas = git("log", "--follow", "--format=%H", "--", relpath).split("\n")
     return [commit_info(s) for s in reversed(shas) if s]
+
+
+def file_at(sha, rec):
+    """This test's result.json as it was at a commit, at the current or the original directory name; None if absent."""
+    for name in (rec.get("dir", rec["id"]), rec["id"]):
+        try:
+            return json.loads(git("show", f"{sha}:claim-tests/{rec['project']}/{name}/result.json"))
+        except (subprocess.CalledProcessError, ValueError):
+            continue
+    return None
+
+
+def is_ours(j, rec, current):
+    """The file belongs to this attempt, not to another team's attempt on the same claim: same claim id and same hypothesis."""
+    return bool(j) and j.get("claim_id") == rec["id"] and j.get("hypothesis") == current["hypothesis"]
+
+
+def prereg_commits(hist, rec, current):
+    """(pre-registration commit, amendment commits, latest commit) chosen by content, so that a collaborator's history on the
+    same path (merged later) can never be cited: the pre-registration is the oldest commit holding this attempt's file
+    with pass and fail criteria and verdict null; amendments are later 'amend' commits holding this attempt's file with
+    verdict still null; latest is the newest commit holding this attempt's file."""
+    ours = [(h, file_at(h["sha"], rec)) for h in hist]
+    ours = [(h, j) for h, j in ours if is_ours(j, rec, current)]
+    if not ours:
+        raise SystemExit(f"{rec['id']}: no commit holds this attempt's result.json")
+    pre = [h for h, j in ours if j.get("verdict") in (None, "") and j.get("pass_criterion") and j.get("fail_criterion")]
+    if not pre:
+        raise SystemExit(f"{rec['id']}: no pre-registration commit (criteria with verdict null) found for this attempt")
+    prereg = pre[0]
+    amendments = [h for h, j in ours if h["sha"] != prereg["sha"] and "amend" in h["subject"].lower() and j.get("verdict") in (None, "")]
+    return prereg, amendments, ours[-1][0]
 
 
 def build(rec, now):
@@ -199,10 +231,7 @@ def build(rec, now):
     for tok in rec["checks"]:
         if tok not in blob:
             raise SystemExit(f"{rec['id']}: '{tok}' from the hand-written text is not in result.json; refusing to build")
-    hist = history(rel_result)
-    prereg = hist[0]
-    amendments = [h for h in hist[1:] if "amend" in h["subject"].lower()]
-    latest = hist[-1]
+    prereg, amendments, latest = prereg_commits(history(rel_result), rec, r)
     ahist = history(rel_analysis)
     analysis_latest = ahist[-1] if ahist else None
     retrievals = sorted(f["retrieved_at"] for d in r["datasets"] for f in d.get("files", []) if f.get("retrieved_at"))
