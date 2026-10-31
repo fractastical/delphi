@@ -99,6 +99,7 @@ class WebConfig:
         # The engineering solver (root's frontier/engineering_api.py) is wired by default; a caller-supplied route of the same name wins (tests).
         self.routes.setdefault("POST /api/engineering/solve", Route(engineering_handler, max_body=1024, max_concurrent=8))
         self.routes.setdefault("POST /api/beliefs/solve", Route(beliefs_handler, max_body=32768, max_concurrent=8))
+        self.routes.setdefault("POST /api/simulations/run", Route(simulation_handler, max_body=8192, max_concurrent=2))
         for key in self.routes:
             method, _, path = key.partition(" ")
             if method not in ("GET", "POST") or not re.fullmatch(r"/api/[a-z0-9][a-z0-9/_-]{0,80}", path) or path in RESERVED_API:
@@ -131,6 +132,12 @@ def _unavailable(code, what):
     err = FrontierError(f"{what} is not installed on this node")
     err.http_status, err.code = 503, code
     return err
+
+
+def simulation_handler(req):
+    """Trusted CPU previews with fixed models, isolated workers and no persistence."""
+    from .simulation_api import run_preview
+    return 200, run_preview(req["body"])
 
 
 def beliefs_handler(req):

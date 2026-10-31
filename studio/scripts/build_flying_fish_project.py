@@ -20,7 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from frontier.models import Draft  # noqa: E402
 
-CATALOG, SNAPSHOT = ROOT / "site/data/catalog.json", ROOT / "site/data/snapshot.json"
+CATALOG = ROOT / "site/data/catalog.json"
+MISSION = ROOT / "site/content/mission.json"
 OUT = ROOT / "projects/flying-fish.draft.json"
 DRAFT_ID = "project-flying-fish-mission"
 
@@ -119,7 +120,7 @@ OPEN_QUESTIONS = [
 
 def load() -> tuple[dict, dict, dict]:
     cat = json.loads(CATALOG.read_text())
-    return cat, json.loads(SNAPSHOT.read_text()), {r["ref"]["id"]: r["ref"] for r in cat["records"]}
+    return cat, {"mission": json.loads(MISSION.read_text())}, {r["ref"]["id"]: r["ref"] for r in cat["records"]}
 
 
 def build() -> dict:
@@ -143,8 +144,8 @@ def build() -> dict:
         "title": "Engineer toward a flying fish",
         "mission": snap["mission"]["title"] + ": explore, with typed models and refusals, what a flying-fish-like glider would require. "
                    "This is a design-studio project on a generic schema; it does not assert that any design is feasible.",
-        "source": {"uri": "https://github.com/kganjam/delphi-frontier", "locator": "site/data/snapshot.json#mission",
-                   "source_version": snap["input_fingerprint"][:12], "content_sha256": hashlib.sha256(SNAPSHOT.read_bytes()).hexdigest(),
+        "source": {"uri": "https://github.com/kganjam/delphi-frontier", "locator": "site/content/mission.json",
+                   "source_version": hashlib.sha256(MISSION.read_bytes()).hexdigest()[:12], "content_sha256": hashlib.sha256(MISSION.read_bytes()).hexdigest(),
                    "content_available": False, "access": "public repository file; member refs are snapshot-catalog refs", "license": None},
         "limitations": ["Every member ref is a snapshot-catalog ref (namespace 'snapshot'), not a live-store version: re-pin before submitting.",
                         "Membership is a declared pin and states where a record applies; it infers no causal link between members.",
@@ -160,8 +161,9 @@ def build() -> dict:
         "draft": draft,
         "grounding": {
             "refs_source": "site/data/catalog.json (snapshot namespace), copied verbatim",
-            "catalog_sha256": hashlib.sha256(CATALOG.read_bytes()).hexdigest(),
-            "snapshot_sha256": hashlib.sha256(SNAPSHOT.read_bytes()).hexdigest(),
+            "member_refs_sha256": hashlib.sha256(json.dumps([m["ref"] for m in members], sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
+            "member_refs_hash_recipe": "SHA256 of ordered member refs, sorted JSON keys, compact separators; excludes the enclosing snapshot label",
+            "mission_file_sha256": hashlib.sha256(MISSION.read_bytes()).hexdigest(),
             "members_grounded": len(members), "members_in_catalog": sum(m["ref"]["id"] in refs for m in members),
             "artifact_pins": "none: the catalog does not list per-record artifact digests, so none is pinned",
             "unimplemented_or_unknown_scales": [s for s, st, _ in COVERAGE if st in ("unimplemented", "unknown")],

@@ -30,6 +30,16 @@ def test_the_draft_validates_against_the_real_contract():
     assert d["kind"] == "Project" and d["visibility"] == "public"
 
 
+def test_project_draft_does_not_depend_on_the_snapshot_that_embeds_it(monkeypatch, tmp_path):
+    baseline = B.build()
+    catalog = json.loads(B.CATALOG.read_text())
+    catalog["snapshot"] = "a new enclosing snapshot fingerprint"
+    path = tmp_path / "catalog.json"
+    path.write_text(json.dumps(catalog))
+    monkeypatch.setattr(B, "CATALOG", path)
+    assert B.build() == baseline
+
+
 def test_every_member_ref_is_copied_verbatim_from_the_catalog_and_none_is_invented():
     cat = json.loads((ROOT / "site/data/catalog.json").read_text())
     by_id = {r["ref"]["id"]: r["ref"] for r in cat["records"]}

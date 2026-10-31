@@ -176,6 +176,23 @@ def test_source_documents_and_result_csv_serve_exact_bytes(web, site):
     assert web.req("GET", "/.env")[0] == 404
 
 
+def test_anonymous_simulation_preview_requires_csrf_and_rejects_untrusted_models(store, site):
+    w = Web(store, site, public_read=True)
+    try:
+        path = "/api/simulations/run"
+        assert w.json("POST", path, {"model": "shell"})[0] == 401
+        _, session, headers = w.json("GET", "/api/session")
+        w.cookie = headers["set-cookie"].split(";")[0]
+        headers = {"Origin": f"http://127.0.0.1:{w.port}", "X-CSRF-Token": session["csrf"]}
+        status, result, _ = w.json("POST", path, {"model": "shell"}, headers)
+        assert status == 400 and result["persisted"] is False
+        status, result, _ = w.json("POST", path, {"model": "bioelectric", "parameters": {"duration_ms": 10}}, headers)
+        assert status == 200 and result["status"] == "completed" and result["persisted"] is False
+        assert result["result"]["voltage_mV"]
+    finally:
+        w.close()
+
+
 def test_public_read_without_gate_opens_public_records_but_never_writes_or_private_data(store, site):
     from urllib.parse import urlencode
     public = store.submit(TOKENS["alice"], "public-read", claim(store))["record"]

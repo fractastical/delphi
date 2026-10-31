@@ -54,11 +54,13 @@ ledger. `node_config.schema_version` is untouched. Tests start from the exact pr
 and assert every old row, head, edge, review and event is identical afterwards.
 
 ## Flying-fish draft
-`python3 scripts/build_flying_fish_project.py` rebuilds `projects/flying-fish.draft.json` from the committed catalog/snapshot. Its 13
+`python3 scripts/build_flying_fish_project.py` rebuilds `projects/flying-fish.draft.json` from the committed catalog and authored mission file. Its 13
 member refs are copied verbatim from `site/data/catalog.json` (namespace `snapshot`); the script refuses to invent one. All twelve
 scales are stated; macromolecular, subcellular, tissue, neural, collective and evolutionary are explicit gaps. Before submitting to a
 live node, `repin(draft, store, token)` rewrites each ref to the node's current head by kind+id or raises. No artifact digest is pinned
-(the catalog lists none) and no causal bridge is declared.
+(the catalog lists none) and no causal bridge is declared. The draft hashes the mission bytes and its ordered member refs,
+not the enclosing snapshot that embeds the draft. The original full-snapshot hashes created a rebuild cycle; the narrower
+provenance breaks that cycle while preserving every exact member version. Rebuild the site after regenerating the draft.
 
 ## Limits
 No resolved/accepted lifecycle for annotations exists (deliberate gap). The existing seven-dimension `Assessment` was written for
