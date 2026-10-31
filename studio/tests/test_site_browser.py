@@ -747,3 +747,21 @@ def test_home_and_frontier_offer_all_six_printable_models_with_stl_download(brow
         assert dl.get_attribute("href").endswith("artifacts/print/stl/N2-area-x1.3.stl") and dl.get_attribute("download") == "N2-area-x1.3.stl"
         info = pg.locator(".printmodels p").inner_text()
         assert " mm" in info and "does not change" in info
+
+
+def test_windtunnel_behavior_and_scale_growth_cards_keep_partial_assumed_and_missed(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    for cid in ("windtunnel-2d", "behavior-cpg", "scale-erk-wave"):
+        pg.wait_for_selector(f"#sim-{cid} video")
+    wt = pg.locator("#sim-windtunnel-2d").text_content()
+    assert "FAIL" in wt and "PARTIAL" in wt and "not validated flight" in wt and "not computed (null)" in wt
+    er = pg.locator("#sim-scale-erk-wave").text_content()
+    assert "ASSUMED" in er and "LINEAR" in er and "MISS" in er and "rise 10 90 h" in er and "synchronous" in er.lower()
+    pg.locator("#sim-scale-erk-wave details.simdet:has-text('Equations')").evaluate("d => d.open = true")
+    pg.wait_for_selector("#sim-scale-erk-wave .eq-math .katex")
+    assert pg.locator("#sim-scale-erk-wave .katex-error").count() == 0
+    assert "no biological or fluid-force success is tested" in pg.locator("#sim-behavior-cpg").text_content()
+    pg.goto(base + "#/studio/flying-fish?scale=neural")
+    pg.wait_for_function("document.querySelector('#main').textContent.includes('Rhythm-generator')")
+    assert pg.locator(".artcard video").count() >= 1
