@@ -10,6 +10,7 @@
  "ports": [
   {
    "bounds": null,
+   "caveat": "",
    "context": "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)",
    "dim": null,
    "direction": "in",
@@ -27,6 +28,7 @@
   },
   {
    "bounds": null,
+   "caveat": "",
    "context": "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)",
    "dim": null,
    "direction": "out",
@@ -34,7 +36,7 @@
    "name": "delta_asymmetry",
    "provenance": {
     "read_level": "file",
-    "source": "simulated; horizon 0-60 chosen by the connector, not the file",
+    "source": "simulated (replay._asym over delta1, delta2); horizon 0-60 chosen by the connector",
     "status": "simulated"
    },
    "quantity": "Delta level difference between the two cells",
@@ -45,14 +47,23 @@
  ],
  "reference": {
   "branch": "work/biomodels",
-  "commit": "c41188dd2b47",
-  "path": "connectors/biomodels",
-  "read_by": "dx-guilds, from the owner's hand-off note; code not re-read",
-  "repo": "kganjam/delphi-frontier"
+  "commit": "abf1838",
+  "files": {
+   "connectors/biomodels/client.py": "36e7bbcc93fb7102458fa43ecab9aa07bf775787577ef9f820ffb64b0691eea6",
+   "connectors/biomodels/receipts/BIOMD0000001047/receipt.json": "731a85a6fe893bd10f86196b5fd7101a64810d0d68ae03ebfa4eee3d2e04bc6e",
+   "connectors/biomodels/replay.py": "c9c017e6fd76aedcce2822de39c77a22349bea560dabc8ca432954f9d1938a8f",
+   "connectors/biomodels/sbml.py": "eda0dcf677cd6d7786e84c0180bec075bc6dbefaa04e7cdcaa0d48c2604d40a8"
+  },
+  "note": "the SBML bytes are not committed; the receipt pins this digest",
+  "path": "connectors/biomodels/client.py, connectors/biomodels/receipts/BIOMD0000001047/receipt.json, connectors/biomodels/replay.py, connectors/biomodels/sbml.py",
+  "read_by": "dx-guilds, read from the source at this commit",
+  "repo": "kganjam/delphi-frontier",
+  "sbml_sha256": "da21ab52edba14b61e41ee87df7a8bb2f367a1206e6e822602f1e75271fae8e2",
+  "source_sha256": "a229adc20ac75c1ee5760736726101f68ab569e052a37a71fff6f10eec955232"
  },
  "run": {
   "deterministic": true,
-  "entrypoint": "connectors.biomodels replay"
+  "entrypoint": "connectors.biomodels.replay.replay_collier1996"
  },
  "schema": "frontier.model.interface/1",
  "scope": "a published model replayed as written; the replay checks the engine, not the file's fidelity to the paper",
