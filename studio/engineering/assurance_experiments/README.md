@@ -9,7 +9,7 @@ Empirical accuracy and biological success probability remain unknown.
 - [x] Pair common correlated draws across three retained candidates.
 - [x] Predeclare deflection/slope limits and preserve counterexamples.
 - [x] Implement analytic, grid, null and altered-speed-law controls.
-- [ ] Run the committed code and render pinned numerical outputs.
+- [x] Run the committed code and render pinned numerical outputs.
 - [ ] Obtain matched held-out measurements and biological transfer evidence.
 
 `protocol.json` predeclares64 independent latent vectors, seed, transforms,

@@ -1,5 +1,6 @@
 import copy
 import json
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -84,3 +85,23 @@ def test_relative_output_paths_have_checkout_relative_receipts(monkeypatch):
     assert output_reference(ROOT / "artifacts/assurance-experiments/all-simulations.json") == "artifacts/assurance-experiments/all-simulations.json"
     with pytest.raises(ValueError):
         output_reference("/outside-checkout/assay.json")
+
+
+def test_saved_ensemble_metrics_pins_and_counts_are_recomputable():
+    p = protocol()
+    root = ROOT / "artifacts/assurance-experiments"
+    saved = json.loads((root / "all-simulations.json").read_text())
+    all_sha = hashlib.sha256((root / "all-simulations.json").read_bytes()).hexdigest()
+    for candidate in saved["candidates"]:
+        bundle = json.loads((root / f"ensemble-{candidate['candidate']['id']}.json").read_text())
+        assert bundle["denominator"] == p["parameter_draws"]
+        assert len(bundle["runs"]) == bundle["denominator"]
+        recomputed = 0
+        for declared, run in zip(bundle["runs"], candidate["runs"], strict=True):
+            passed = all(predicate(case["summary"], p) for case in run["cases"].values())
+            assert declared["passed"] == run["passed"] == passed
+            assert declared["protocol_sha256"] == bundle["protocol"]["sha256"]
+            assert declared["result_artifact"]["sha256"] == all_sha
+            recomputed += int(passed)
+        assert bundle["numerator"] == recomputed
+        assert bundle["biological_success_probability"] is None

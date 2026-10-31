@@ -220,10 +220,12 @@ def run_protocol(protocol_path, output_directory):
                "next_measurements": ["Measure EI(x) under the target clamping/actuation condition.", "Measure spatial pressure/load shape; uniform-versus-tip discrepancy is not a calibrated error bound.", "Measure mass/lifting-area costs before choosing stiffer or shorter candidates."]})
     env = {"python": platform.python_version(), "numpy": np.__version__, "scipy": scipy.__version__, "platform": platform.platform()}
     code_paths = [*Path(__file__).parent.glob("*.py"), ROOT / "engineering/fin_mechanics/beam.py", ROOT / "engineering/fin_mechanics/sweep.py"]
+    numerical_names = ["controls.json", "all-simulations.json", "summary.json",
+                       *[f"ensemble-{entry['candidate']['id']}.json" for entry in ensembles]]
     write_json(output / "simulation-manifest.json", {"schema": "frontier.fin-assurance.simulation-manifest/1",
                "protocol": frozen, "code_revision": all_results["run_code_revision"], "code_files": {str(p.relative_to(ROOT)): sha(p) for p in sorted(code_paths)},
                "environment": env, "environment_sha256": hashlib.sha256(canonical(env)).hexdigest(),
-               "outputs": {p.name: {"sha256": sha(p), "byte_size": p.stat().st_size} for p in sorted(output.glob("*.json")) if p.name != "simulation-manifest.json"}})
+               "outputs": {name: {"sha256": sha(output/name), "byte_size": (output/name).stat().st_size} for name in numerical_names}})
     return {"candidates": len(ensembles), "parameter_draws_per_candidate": len(draws), "protocol": frozen}
 
 
