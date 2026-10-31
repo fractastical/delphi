@@ -37,7 +37,7 @@ T("entosolenia", "Entosolenia", [r"\bEntosolenia\b(?: aspera)?"], kingdom="Chrom
 T("radiolaria", "Radiolaria", [r"\b[Rr]adiolari\w*"], rank="class", kingdom="Chromista", ncbi_kw="Rhizaria", ncbi_name=None, fossil=True, group="protist",
   notes=RHIZ + " 'Radiolaria' in Thompson covers Polycystinea, Acantharea and Phaeodarea (the last now in Cercozoa).")
 T("nassellaria", "Nassellaria", [r"\b[Nn]assellari\w*"], rank="order", kingdom="Chromista", ncbi_kw="Polycystinea", group="protist", notes=RHIZ)
-T("phaeodaria", "Phaeodaria", kingdom="Chromista", ncbi_kw="Rhizaria", ncbi_name="Phaeodarea", group="protist", notes=RHIZ + " Phaeodaria are now placed in Cercozoa.")
+T("phaeodaria", "Phaeodaria", kingdom="Chromista", fossil=True, ncbi_kw="Rhizaria", ncbi_name="Phaeodarea", group="protist", notes=RHIZ + " Phaeodaria are now placed in Cercozoa.")
 T("acantharia", "Acantharia", [r"\bAcanthari\w*"], rank="class", kingdom="Protozoa", ncbi_kw="Rhizaria", ncbi_name="Acantharea", group="protist", notes=RHIZ + " Modern class Acantharea.")
 T("acanthometridae", "Acanthometridae", rank="family", kingdom="Protozoa", ncbi_kw="Rhizaria", group="protist", notes=RHIZ)
 T("callimitra", "Callimitra", kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
@@ -45,7 +45,7 @@ T("collosphaera", "Collosphaera", kingdom="Chromista", ncbi_kw="Rhizaria", marin
 T("aulacantha", "Aulacantha", [r"\bAulacantha\b(?: scolymantha)?"], kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
 T("aulonia", "Aulonia", [r"\bAulonia\b(?: hexagona)?"], kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
 T("actinomma", "Actinomma", [r"\bActinomma\b(?: arcadophorum)?"], kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, fossil=True, group="protist", notes=RHIZ)
-T("ethmosphaera", "Ethmosphaera", [r"\bEthmosphaera\b(?: conosiphonia)?"], kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
+T("ethmosphaera", "Ethmosphaera", [r"\bEthmosphaera\b(?: conosiphonia)?"], kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, fossil=True, group="protist", notes=RHIZ)
 T("cenosphaera", "Cenosphaera", [r"\bCenosphaera\b(?: favosa)?"], kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, fossil=True, group="protist", notes=RHIZ)
 T("aulastrum", "Aulastrum", [r"\bAulastrum\b(?: triceros)?"], kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
 T("circoporus", "Circoporus", [r"\bCircoporus\b(?: sexfurcus)?"], kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
@@ -197,8 +197,8 @@ T("conus", "Conus", [r"\bConus\b(?: virgo| litteratus| betulina| gloria-maris)?"
 T("lamellaria", "Lamellaria", [r"\bLamellaria\b(?: perspicua)?"], phylum="Mollusca", marine=True, group="mollusc")
 T("cassis", "Cassis", phylum="Mollusca", marine=True, group="mollusc")
 T("littorina", "Littorina", [r"\bLittorina\b", r"\b[Pp]eriwinkles?\b"], phylum="Mollusca", marine=True, group="mollusc", vern=["periwinkle"])
-T("babylonia", "Babylonia", [r"\bEburnea\b"], phylum="Mollusca", marine=True, group="mollusc", worms_name="Eburna",
-  notes="Thompson's 'Eburnea' (Eburna Lamarck) = Babylonia.")
+T("eburna", "Eburna", [r"\bEburnea\b"], phylum="Mollusca", marine=True, group="mollusc",
+  notes="Thompson's 'Eburnea' is Eburna Lamarck, 1801, which WoRMS keeps as an accepted genus (Ancillariidae); the banded shells that 19th-century authors placed in Eburna (E. spirata, E. areolata) are now Babylonia. Ambiguous; resolved to Eburna as written.")
 T("trophon", "Trophon", phylum="Mollusca", marine=True, group="mollusc")
 T("fusus", "Fusus", [r"\bFusus\b(?: longissimus| antiquus| colosseus)?"], phylum="Mollusca", marine=True, group="mollusc")
 T("buccinum", "Buccinum", [r"\bBuccinum\b", r"\b[Ww]helks?\b"], phylum="Mollusca", marine=True, group="mollusc", vern=["whelk"])
@@ -349,7 +349,8 @@ T("gadus-morhua", "Gadus morhua", [r"\bcod\b"], phylum="Chordata", marine=True, 
 T("chaetodontidae", "Chaetodontidae", [r"\bChaetodonts\b"], rank="family", phylum="Chordata", group="chordate", vern=["butterflyfishes"])
 T("anura", "Anura", [r"\b[Ff]rogs?\b"], rank="order", phylum="Chordata", group="chordate", vern=["frogs"],
   notes="'the frog' of Rauber's and Roux's egg-segmentation studies is Rana (R. temporaria / R. esculenta); resolved to the order.")
-T("pelophylax-esculentus", "Pelophylax esculentus", [r"\bRana esculenta\b"], phylum="Chordata", group="chordate", ncbi_name="Pelophylax kl. esculentus", notes="'Rana esculenta' = Pelophylax kl. esculentus (the edible-frog hybridogenetic klepton).")
+T("pelophylax-esculentus", "Pelophylax esculentus", [r"\bRana esculenta\b"], phylum="Chordata", group="chordate",
+  notes="'Rana esculenta' is the edible frog, the hybridogenetic klepton Pelophylax kl. esculentus; GBIF and NCBI Taxonomy both file the name under Pelophylax lessonae, which is followed here, while Wikidata keeps a separate item for P. esculentus.")
 T("reptilia", "Reptilia", [r"\breptiles?\b"], rank="class", phylum="Chordata", fossil=True, ncbi_name=None, group="chordate",
   notes="GBIF treats Reptilia as a pro-parte synonym of Crocodylia, Sphenodontia, Squamata and Testudines, and NCBI uses Sauropsida; identifiers come from Wikidata, ITIS and PBDB.")
 T("serpentes", "Serpentes", [r"\bsnake\b"], rank="suborder", phylum="Chordata", group="chordate", vern=["snakes"])

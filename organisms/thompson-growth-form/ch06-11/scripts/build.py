@@ -27,6 +27,8 @@ from urllib.parse import quote
 
 import requests
 
+sys.stdout.reconfigure(line_buffering=True)
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from taxa_list import TAXA  # noqa: E402
 
@@ -225,7 +227,8 @@ BACKBONE = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"
 
 def expected_kingdoms(t):
     if t.get("kingdom"):
-        return {t["kingdom"], "Chromista", "Protozoa"} if t.get("group") == "protist" else {t["kingdom"]}
+        # GBIF parks some unplaced radiolarian genera under Animalia incertae sedis
+        return {t["kingdom"], "Chromista", "Protozoa", "Animalia"} if t.get("group") == "protist" else {t["kingdom"]}
     return {"Animalia"}
 
 
@@ -530,6 +533,10 @@ def write_taxa(resolution, by_taxon):
             notes.append(f"WoRMS: '{w['matched_name']}' (AphiaID {w['matched_aphia_id']}) is {w['status']}; accepted name {w['valid_name']} (AphiaID {w['valid_aphia_id']}).")
         if p and p.get("difference"):
             notes.append(f"PBDB: {p['name']} is {p['difference']} {p['accepted_name']}.")
+        lin = lineage_for(t, r)
+        if t.get("group") in NON_ANIMAL_GROUPS and lin.get("kingdom") == "Animalia":
+            notes.append("GBIF places this genus in Animalia incertae sedis; the kingdom is omitted here because the taxon is a protist.")
+            lin.pop("kingdom")
         entry = {
             "slug": slug,
             "accepted_name": accepted_name_for(t, r),
@@ -544,7 +551,7 @@ def write_taxa(resolution, by_taxon):
                 "worms_aphia_id": w["valid_aphia_id"] if w else None,
                 "pbdb_taxon_id": p["accepted_id"] if p else None,
             },
-            "lineage": lineage_for(t, r),
+            "lineage": lin,
             "mentioned_in": claim_ids,
             "n_text_mentions": n_text,
             "datasets": existing.get(slug, {}).get("datasets", []),
@@ -830,7 +837,7 @@ def ds_pantheria(taxa):
         "is_referenced_by": "https://doi.org/10.1890/08-1494.1",
         "creators": ["Jones KE", "Bielby J", "Cardillo M", "Fritz SA", "O'Dell J", "Orme CDL", "Safi K", "Sechrest W", "Boakes EH", "Carbone C", "Connolly C", "Cutts MJ", "Foster JK", "Grenyer R", "Habib M", "Plaster CA", "Price SA", "Rigby EA", "Rist J", "Teacher A", "Bininda-Emonds ORP", "Gittleman JL", "Mace GM", "Purvis A"],
         "issued": "2009-09",
-        "license": "Ecological Archives data paper; free for non-commercial scientific use with citation (no CC licence stated)",
+        "license": "No licence stated in the distributed file; Ecological Archives data paper E090-184 (Ecology 90:2648), cite the paper when reusing",
         "version": "1.0 (WR05, Aug 2008)",
         "distributions": [dist(url, body, ts, media_type="text/tab-separated-values")],
         "counts": [
@@ -918,6 +925,17 @@ def ds_ncbi_genomes(taxa):
         tj, _, _ = fetch_json(total_url)
         total = (tj or {}).get("total_count")
         did = "ncbi-genome-" + acc.lower().replace("_", "-").replace(".", "-")
+        existing_path = os.path.join(SLICE, "datasets", f"{did}.json")
+        if os.path.exists(existing_path):  # same assembly reached from two taxa (e.g. a genus and its species)
+            rec = load_json(existing_path)
+            rec["taxa"] = sorted(set(rec["taxa"] + [slug]))
+            rec["counts"][1]["value"] = len(rec["taxa"])
+            rec["counts"][1]["description"] = "taxa in this slice for which this assembly is vendored"
+            rec["counts"].append({"property_id": "n_assemblies", "value": total, "description": f"genome assemblies in NCBI Datasets for NCBI taxid {taxid} ({t['accepted_name']}) and nested taxa"})
+            write_dataset(rec)
+            t["datasets"].append(did)
+            n_made += 1
+            continue
         rec = {
             "id": did,
             "label": f"NCBI genome assembly {acc} ({info.get('assembly_name')}) for {rep['organism']['organism_name']}",
@@ -1030,28 +1048,30 @@ def build_report():
     L.append("## Datasets\n")
     L.append("| id | taxa covered | key count |\n|---|---:|---|")
     for did, d in datasets.items():
-        if did.startswith("gbif-occurrences"):
+        if did.startswith("gbif-occurrences") or did.startswith("ncbi-genome"):
             continue
         c0 = d["counts"][0]
         L.append(f"| `{did}` | {len(d['taxa'])} | {c0['property_id']} = {c0['value']} |")
     n_occ = sum(1 for d in datasets if d.startswith("gbif-occurrences"))
     zero = [d["taxa"][0] for d in datasets.values() if d["id"].startswith("gbif-occurrences") and d["counts"][0]["value"] == 0]
-    L.append(f"\nPlus {n_occ} per-taxon `gbif-occurrences-*` records (API count, limit=0). {len(zero)} of them report zero occurrences" + (f": {', '.join(zero)}" if zero else "") + ".\n")
+    L.append(f"\nPlus {n_occ} per-taxon `gbif-occurrences-*` records (API count, limit=0). {len(zero)} of them report zero occurrences" + (f": {', '.join(zero)}" if zero else "") + ".")
+    genomes = {did: d for did, d in datasets.items() if did.startswith("ncbi-genome")}
+    g_taxa = sorted({s for d in genomes.values() for s in d["taxa"]})
+    n_ref = sum(1 for d in genomes.values() if "RefSeq reference" in d["measurement_technique"])
+    L.append(f"\nPlus {len(genomes)} per-assembly `ncbi-genome-*` records ({n_ref} RefSeq reference/representative, {len(genomes) - n_ref} GenBank-only), one per species- or genus-level animal taxon with an NCBI taxid and at least one assembly, covering {len(g_taxa)} taxa: {', '.join(g_taxa)}.\n")
     L.append("Data files (AnAge zip, PanTHERIA txt, AVONET xlsx) were downloaded to the cache, read with pandas, checksummed and **not** committed; "
              "every record carries `byte_size` and `sha256`. API responses are likewise checksummed as retrieved; counts change as the databases grow, so the retrieval date is part of each record id.\n")
     L.append("## Taxa without a usable dataset, and why\n")
-    if no_ds or only_backbone:
-        for s in no_ds + only_backbone:
-            t = taxa[s]
-            why = []
-            if not t["identifiers"].get("gbif_usage_key"):
-                why.append("no GBIF backbone match")
-            if s in only_backbone:
-                why.append("GBIF occurrence count request failed or was skipped")
-            L.append(f"- `{s}` ({t['accepted_name']}): {'; '.join(why) or 'see notes'}. {t.get('notes') or ''}")
+    if no_ds:
+        for s in no_ds:
+            L.append(f"- `{s}` ({taxa[s]['accepted_name']}): no identifier in any database that has a dataset record here. {taxa[s].get('notes') or ''}")
     else:
-        L.append("Every taxon has at least a GBIF occurrence-count record.")
-    L.append("")
+        L.append("Every taxon has at least one dataset record. The taxa **without** a GBIF occurrence count (no GBIF backbone usage exists for the name) and what covers them instead:\n")
+        for s, t in taxa.items():
+            if not t["identifiers"].get("gbif_usage_key"):
+                L.append(f"- `{s}` ({t['accepted_name']}, {t['rank']}): {', '.join('`' + d + '`' for d in t['datasets'])}.")
+    weak = [s for s, t in taxa.items() if t["identifiers"].get("gbif_usage_key") and len(t["datasets"]) == 2]
+    L.append(f"\nTaxa whose only records are the GBIF backbone match and the GBIF occurrence count (no trait, fossil, WoRMS or genome record): {len(weak)}" + (f": {', '.join(weak)}" if weak else "") + ". These are mostly freshwater or terrestrial genera and higher groups outside the scope of the marine (WoRMS), fossil (PBDB), mammal (PanTHERIA), bird (AVONET) and life-history (AnAge) databases used; FishBase and MorphoSource were not reachable or not taxon-filterable (see below).\n")
     L.append("## Non-animal taxa seen (not built)\n")
     L.append("Plants, algae, fungi and other non-animals named in chapters VI-XI, left for a later pass: "
              "Volvox is **not** mentioned in these chapters of the 1917 text; the plant and algal names are "
@@ -1060,13 +1080,21 @@ def build_report():
              "the fungus Mucor; diatoms (Asterolampra, Arachnoidiscus) and the silicoflagellate Dictyocha. "
              "Protists that Thompson treats as animals are built (see above) and flagged `\"animalia\": false`.\n")
     L.append("## Ambiguities and decisions\n")
+    renamed = []
+    for s, t in taxa.items():
+        if by_t.get(s, {}).get("vern"):
+            continue  # vernacular names are not renamings
+        first = t["accepted_name"].split()[0].lower()
+        written = {w.split()[0].lower().rstrip("s") for w in t["names_as_written"]}
+        if first not in written and first.rstrip("s") not in written and t["rank"] in ("genus", "species"):
+            renamed.append(f"{sorted(t['names_as_written'], key=len)[0]} -> {t['accepted_name']}")
     amb = [
         "'Coelenterata' is resolved to Cnidaria (Thompson's usage also embraced the Ctenophora, which are recorded separately).",
         "'Corals'/'corallites' are resolved to Anthozoa; the Palaeozoic corals (Heterophyllia, Zaphrentis, Lithostrotion, Cyathophyllum, 'Streptoplasma' = Streptelasma, Phillipsastraea, Arachnophyllum) are resolved through PBDB and GBIF. 'Monticuliporae' are bryozoans, not corals, and are recorded as such.",
         "'Actinomyxidia' (which Thompson calls parasitic protozoa) are Myxozoa, now known to be cnidarian animals; they are recorded as Animalia.",
         "'Fish'/'bony fish' is resolved to Actinopterygii, 'elasmobranch fishes' to Elasmobranchii; 'the frog' of Rauber and Roux to Anura (Rana esculenta, named once, is recorded separately as Pelophylax esculentus).",
         "'Ammonites' as a genus, 'Ammonitoid', 'Ammonoidea', 'aptychus' and 'Anaptychus' are all recorded under Ammonoidea; named ammonite genera (Arcestes, Scaphites, Macroscaphites, Ancyloceras, Oekotraustes = Oecotraustes, Goniatites, Sonninia, Pinacoceras) have their own files.",
-        "Archaic molluscan genera are resolved through WoRMS/MolluscaBase to the current genus and the taxon file carries the name as written: Solarium -> Architectonica, Dolium -> Tonna, Scalaria -> Epitonium, Hyalaea -> Cavolinia, Cleodora -> Clio, Isocardia -> Glossus, Artemis -> Dosinia, Cyclas -> Sphaerium, Anodon -> Anodonta, Avicula -> Pteria, Modiola -> Modiolus, Psammobia -> Gari, Pileopsis -> Capulus, Sigaretus -> Sinum, Delphinula -> Angaria, Eburnea -> Babylonia, Triton corrugatus -> Charonia, Spirographis -> Sabella, Ampullaria -> Pomacea (apple snails), Caprinella -> Caprinula, Argiope (brachiopod) -> Megathiris, Thecidium -> Thecidellina, Cynthia (ascidian) -> Styela, Eucharis (ctenophore) -> Leucothea, Quadrula (testate amoeba) -> Quadrulella.",
+        "Archaic or superseded names are resolved through WoRMS/MolluscaBase, GBIF and PBDB to the current name, and each taxon file keeps the name as written: " + "; ".join(renamed) + ".",
         "Species named only in the whorl-ratio tables (e.g. Turritella terebellata, Conus virgo, Haliotis excavatus) are recorded as mentions of their genus with the full binomial as `name_as_written`; resolving each archaic binomial individually is left for a later pass. Nautilus pompilius, N. umbilicatus and Rana esculenta are the species-level taxa.",
         "'Pupa' in Thompson's sense (land snails of Draparnaud, now Pupilla/Pupillidae) collides with the marine genus Pupa Röding; the record follows whatever WoRMS/GBIF return for 'Pupa' and the note flags it.",
         "Estheria (clam shrimp) is resolved under Branchiopoda to avoid the tachinid fly homonym; the modern living species are in Cyzicus, the name persists in PBDB.",
