@@ -8,11 +8,11 @@ Every status distinguishes implementation, integration, publication and biologic
 | Priority | Deliverable | Owner | Status / next acceptance |
 | --- | --- | --- | --- |
 | P0 | Public site and separate database | codex-03 | Live at frontier.morphoswarm.ai; PG16 port5471; public reads, credentialed writes; Orchestra still IP/token protected |
-| P0 | Studio, readable claims, graph and semantic search | claude-02 + codex-03 | Integrated; publish current Studio release after exact-pin/browser checks |
+| P0 | Studio, readable claims, graph and semantic search | claude-02 + codex-03 | Public Studio release deployed; exact-pin/browser checks and13 deployed checks passed; independent critique recheck underway |
 | P0 | Live vector index | dx-submit | 2444 public record/artifact documents embedded,49 Gemini requests; pgvector index live; ten-minute bounded refresh installed; API integration tested |
 | P0 | Generic Project and anchored Annotation | guilds completed; codex-03 integrates | Migration applied after backup; old-version/hash tests passed; live project import and authenticated annotation UI pending |
-| P0 | Remote public-read/authenticated-write MCP | native mechanobio worker | Salvaged stalled worker,32 focused tests; root integrated; production service/location deployment pending |
-| P0 | Interactive simulation widgets | native bioelectric worker + site | Actual HH and motor-clutch subprocess previews,35 adapter/HTTP tests; UI integration and live deployment next |
+| P0 | Remote public-read/authenticated-write MCP | native mechanobio worker + codex-03 | Published https://frontier.morphoswarm.ai/mcp; officialSDK12 production checks passed; public reads, individual credentials for writes; receipt deploy/receipts/mcp-public-check.json |
+| P0 | Interactive simulation widgets | native bioelectric worker + site | Actual HH and motor-clutch subprocess previews,35 adapter/HTTP tests; public UI deployed and actual browser preview checked |
 | P0 | Regional assurance, interface matrix, equation registry | native bioelectric worker | SPEC-008; real receipt aggregation underway; unknown empirical accuracy stays unknown |
 | P0 | Adaptive candidate comparison and simulation accuracy | native mechanobio worker | Frozen three-fin-candidate assay with shared parameter draws, grid/model discrepancy, sensitivity and actual rendered outputs |
 | P0 | Complete citations and bidirectional lineage | dx-corpus + codex-03 | Source→Claim→Equation/Model→Action→Evidence/Artifact→Project/region; import remaining bundles and audit missing links |
