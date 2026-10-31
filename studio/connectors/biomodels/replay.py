@@ -35,6 +35,7 @@ for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS"):
     os.environ.setdefault(_v, "1")
 
 import numpy as np  # noqa: E402
+import scipy  # noqa: E402
 
 from .client import sha256_bytes  # noqa: E402
 from .sbml import Model, UnsupportedSBML, inspect_sbml  # noqa: E402
@@ -259,7 +260,7 @@ def replay_collier1996(sbml_bytes: bytes, expected_sha256: str, out_dir: Path, *
         "source": source,
         "supported_subset_check": "passed",
         "engine": {"name": "libroadrunner", "version": rr_mod.__version__, "integrator": "cvode", "rtol": ENGINE_RTOL, "atol": ENGINE_ATOL},
-        "numpy": np.__version__, "python": platform.python_version(),
+        "numpy": np.__version__, "scipy": scipy.__version__, "python": platform.python_version(),
         "time_horizon": {"t_end": T_END, "points": POINTS, "note": "chosen for this replay; the SBML file declares no simulation settings and no time unit"},
         "scenarios": runs,
         "controls": {
@@ -279,7 +280,7 @@ def replay_collier1996(sbml_bytes: bytes, expected_sha256: str, out_dir: Path, *
             "The b=0 run is an added counterfactual, not a result from the source.",
         ],
         "run": {
-            "command": " ".join(argv or sys.argv), "code_sha256": _code_hash(), "git_head": _git("rev-parse", "HEAD"),
+            "command": " ".join("<abs-path-withheld>" if a.startswith("/") else a for a in (argv or sys.argv)), "code_sha256": _code_hash(), "git_head": _git("rev-parse", "HEAD"),
             "git_dirty": bool(_git("status", "--porcelain", "--", ".", ":(exclude)receipts")),
             "hardware": {"machine": platform.machine(), "cpu_count": os.cpu_count(), "threads_requested": 1, "gpu": None},
             "elapsed_s": round(time.monotonic() - started, 3), "finished_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
