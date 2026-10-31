@@ -17,7 +17,7 @@ is a measurement.
 | 6 | our own `finite_domain_stable` theorem | **it was `not_lt`** | compiled, passed the axiom audit, said nothing; caught by independent review, not by us |
 | 7 | an operationalization-fidelity benchmark | prior art | ShadowBench; DriftBench; Benchmarking Agentic Review Systems |
 | 8 | Thompson's 3/2 refuted by a Tallo regression | **scope error + prior art** | it is a buckling envelope; Tallo 2022 already tested 2/3 with mixed models |
-| 9 | agents hallucinate past scope conditions | **measurement** | 24 systems, 12 traps, exact truth: gemini-4-argon 24/24, claude-opus-5 24/24 |
+| 9 | agents hallucinate past scope conditions | **the refutation was itself mis-operationalised** | the 24/24 run asked for nonlinear pattern formation and scored against linear mode admissibility, so it measures neither accuracy nor a ceiling; superseded by the headroom check on the frozen 127-item key (Claude Sonnet 5.5 121/127, Gemini 3.8 flash 110/127) |
 | 10 | the robustness tax as a headline | partial prior art | Marcon 2016; the 2024 network-size work covers the neighbourhood |
 | 11 | no machine-checked biology library with scope conditions exists | **prior art, five hours old** | `facebookresearch/atlas-lean` `MathlibExt/Biology/`, 56 files, zero `sorry`, commits to 2026-10-31 04:32 UTC |
 | 12 | our replacement citation for the finite-domain caveat | **we hadn't read it** | both arXiv abstracts fetched; neither supports the claim |
@@ -25,9 +25,32 @@ is a measurement.
 | 14 | …and the original OLS refutation doesn't hold either | **retracted** | RMA slope 0.780, so 2/3 sits *between* OLS and RMA; cluster bootstrap over 69 studies gives [0.503, 0.697], containing 2/3 |
 
 | 15 | our own four-arm checker is sound | **reproduced defect** | it accepts a frozen `False` once helper text adds a second `False` assumption; elaborated type is `False → False`, with a **clean axiom audit**. Target weakening, not a Lean inconsistency. |
+| 16 | our own Frontier seed questions are actionable | **measured against our own schema** | an independent worker's validator over the committed `seeds/frontier-problems.json` (sha256 `3bf14a9c…`) returns **0 of 7 bounded, 0 ready, 0 with a consequence estimate**, 105 issues. The store cannot hold the fix: `Problem.next_action` is free text and there is no `unlocks` field, under `extra="forbid"`. |
 
 Four killed by prior art, three by counterexample or direct refutation, three by measurement, and
 several of our own by our own checks. **Entries 3, 5, 6, 12 and 14 were mine.**
+
+**This table is a subset.** The critic's `scopedesk/ledger/kill_ledger.json` carries **20** rows
+with per-row timestamps and the interval between a claim being stated and killed; where the two
+disagree, that one is authoritative and this one is the narrative. Its R09 is why row 9 above now
+reads as it does.
+
+### Row 16, reproduced here rather than relayed
+
+```
+python3 -m frontier_attention cards \
+  --problems seeds/frontier-problems.json --now 2026-10-31T16:40:00Z
+```
+
+The validator is `work/market`'s, not this repo's, and it prints the sha256 of the file it read,
+which is how the number is pinned to the committed bytes rather than to a copy. Issue codes:
+`missing` 49, `bad_enum` 14, `untyped_edge` 14, `bad_ref` 14, `unpinned` 7, `bad_estimate` 7.
+
+The finding is **about this repository**, not about the validator. We shipped seven research
+questions and a store to hold them, and not one of the seven carries a stop rule, a typed
+downstream edge or a resource estimate — because the schema we wrote has nowhere to put them. A
+curation gap would be a backlog item; a gap the schema forbids closing is a design defect, and it
+was found by a worker reading our bytes rather than by us reading our own design.
 
 ### Why #15 is the most useful row in this table
 
