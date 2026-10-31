@@ -263,7 +263,7 @@ def main():
 
     os.makedirs(os.path.join(HERE, "derived"), exist_ok=True)
     with gzip.open(os.path.join(HERE, "derived", "axioms.csv.gz"), "wt", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w = csv.DictWriter(f, fieldnames=[c for c in rows[0].keys() if c != "k2_model_set"], extrasaction="ignore")
         w.writeheader()
         w.writerows(rows)
 
@@ -340,7 +340,7 @@ def main():
                                            "single_form_fraction": round(k4_single / max(1, N - k4_none), 4)}}
     print(f"S2 done ({time.time()-t0:.0f}s): {supp['S2']}", file=sys.stderr)
     with gzip.open(os.path.join(HERE, "derived", "axioms.csv.gz"), "wt", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w = csv.DictWriter(f, fieldnames=[c for c in rows[0].keys() if c != "k2_model_set"], extrasaction="ignore")
         w.writeheader()
         w.writerows(rows)
     with open(os.path.join(HERE, "derived", "supplementary.json"), "w") as f:
