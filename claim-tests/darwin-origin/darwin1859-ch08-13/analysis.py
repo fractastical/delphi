@@ -48,7 +48,8 @@ def fetch(url, fname):
         raise RuntimeError(f"could not fetch {url}")
     body = r.content
     meta = {"download_url": url, "retrieved_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "byte_size": len(body), "sha256": hashlib.sha256(body).hexdigest(), "note": "Dryad version zip; redirects to a signed S3 URL"}
+            "byte_size": len(body), "sha256": hashlib.sha256(body).hexdigest(),
+            "note": "Dryad version zip assembled on request (archive hash varies between downloads; member_files hashes are stable); redirects to a signed S3 URL"}
     with open(path, "wb") as fh:
         fh.write(body)
     with open(meta_path, "w") as fh:
@@ -72,7 +73,10 @@ def scaled_variance(x):
 def main():
     zpath = fetch(URL, "dryad_B8QS5T.zip")
     with zipfile.ZipFile(zpath) as z:
-        df = pd.read_csv(io.BytesIO(z.read("Chengjun_Experiment.csv")))
+        raw = z.read("Chengjun_Experiment.csv")
+    # Dryad assembles version zips on request, so the archive hash is not stable; record the member file's hash too
+    FILES[-1]["member_files"] = [{"path": "Chengjun_Experiment.csv", "byte_size": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}]
+    df = pd.read_csv(io.BytesIO(raw))
     df.columns = [c.strip() for c in df.columns]
     df["generation"] = df["generation"].str.strip()
     df["PLANT TYPE"] = df["PLANT TYPE"].str.strip()

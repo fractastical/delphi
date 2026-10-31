@@ -55,7 +55,8 @@ def fetch(url, fname):
         raise RuntimeError(f"could not fetch {url}")
     body = r.content
     meta = {"download_url": url, "retrieved_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "byte_size": len(body), "sha256": hashlib.sha256(body).hexdigest(), "note": "Dryad version zip; redirects to a signed S3 URL"}
+            "byte_size": len(body), "sha256": hashlib.sha256(body).hexdigest(),
+            "note": "Dryad version zip assembled on request (archive hash varies between downloads; member_files hashes are stable); redirects to a signed S3 URL"}
     with open(path, "wb") as fh:
         fh.write(body)
     with open(meta_path, "w") as fh:
@@ -112,7 +113,9 @@ def read_xlsx_sheet(xlsx_bytes, sheet_path="xl/worksheets/sheet1.xml"):
 def bear():
     zpath = fetch(BEAR_URL, "dryad_w9ghx3g1s_v3.zip")
     with zipfile.ZipFile(zpath) as z:
-        df = pd.read_csv(io.BytesIO(z.read("litter_size_dt.csv")))
+        raw = z.read("litter_size_dt.csv")
+    FILES[-1]["member_files"] = [{"path": "litter_size_dt.csv", "byte_size": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}]
+    df = pd.read_csv(io.BytesIO(raw))
     df = df.dropna(subset=["Litter_size", "Inbreeding_mother"])
     x, y = df["Inbreeding_mother"].to_numpy(float), df["Litter_size"].to_numpy(float)
     res = stats.linregress(x, y)
@@ -142,6 +145,7 @@ def fly():
     zpath = fetch(FLY_URL, "dryad_10154.zip")
     with zipfile.ZipFile(zpath) as z:
         xlsx = z.read("Data Pekkala et al EVOL APPL.xlsx")
+    FILES[-1]["member_files"] = [{"path": "Data Pekkala et al EVOL APPL.xlsx", "byte_size": len(xlsx), "sha256": hashlib.sha256(xlsx).hexdigest()}]
     df = read_xlsx_sheet(xlsx, "xl/worksheets/sheet1.xml")
     df.columns = [c.strip() for c in df.columns]
     fec_col = [c for c in df.columns if c.lower().startswith("f eggs")][0]
