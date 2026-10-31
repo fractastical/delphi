@@ -1,0 +1,18 @@
+{
+  "claim_id": "wolfram2002-ch11-27",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27",
+  "project": "wolfram-nks",
+  "status": "preregistered",
+  "hypothesis": "The 2-state, 5-colour Turing machine whose rule is drawn on NKS p. 707, started as described in the note 'Rule 110 Turing machines' (p. 1119: tape = Prepend[4 list, 0] with colour 1 to the left and colour 0 to the right, head on the first tape element in state 1), emulates rule 110: successive 'new rightmost head position' snapshots of the tape, decoded as colour 4 -> black and all other colours -> white, are successive steps of rule 110 applied to the initial list on a white background. Given Cook's published proof that rule 110 is universal, the machine is universal.",
+  "pass_criterion": "Pre-registered. Using the rule table transcribed from the p. 707 figure (10 cases; the transcription is recorded in derived/tm25-rule.json), for the single-cell initial list and for 40 random binary lists of length 10-60 (numpy default_rng seeds 0..39), with a fixed integer offset c determined once from the single-cell run and then held fixed, the k-th new-rightmost snapshot decoded as above equals rule-110 iterate k-c of the initial list for every k from c to c+199, on every cell of the window spanning the full rule-110 pattern (100% of 41 x 200 snapshot comparisons). 'Supports' if this holds.",
+  "fail_criterion": "Pre-registered. 'Refutes' if for any initial list some snapshot differs from the corresponding rule-110 iterate, or if no fixed offset makes the single-cell run match; 'inconclusive / not-operationalizable' if the rule table cannot be read unambiguously from the published figure.",
+  "planned_datasets": ["nks-p707-fig-a-tm25-rule", "nks-note-rule110-turing-machines", "cook2004-rule110-universality"],
+  "interpretation": "The claim has two parts: (i) the 2-state 5-colour machine emulates rule 110 one step per complete sweep, which is tested directly by simulation; (ii) universality follows from (i) and the universality of rule 110 (Cook 2004, Complex Systems 15(1), doi:10.25088/ComplexSystems.15.1.1), which is taken as a published premise and not re-proved here. 'Complete sweep' is operationalized as the moment the head reaches a position further right than ever before (the convention of Wolfram's compressed picture). The rule table is only published as a picture; it was transcribed from the figure's grey levels and arrow orientations (white=0, lightest grey=1, ..., darkest grey=4; the head arrow pointing down is state 1 because that is the state in which the published initial condition yields rule 110, pointing up is state 2). The number of states and colours in the table (2 and 5) is also checked.",
+  "datasets": [],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "Claude Fable 5.1 (Cursor cloud agent)", "run": "cursor/claim-tests-wolfram-nks-f0e1", "date": "2026-10-31" }
+}
