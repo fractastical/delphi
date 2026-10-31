@@ -52,6 +52,18 @@ def main():
             if p and "ddpm" in r: diffs.append(max(abs(r["ddpm"]["amp_w1_rel"] - p["ddpm"]["amp_w1_rel"]), abs(r["ddpm"]["mode_tv"] - p["ddpm"]["mode_tv"])))
         out["reproduction_of_frozen_metrics"] = {"n_compared": len(diffs), "max_abs_diff_amp_w1_rel_or_mode_tv": max(diffs) if diffs else None, "note": "generation is stochastic on GPU; a nonzero difference is reported, not corrected"}
     ok = [r for r in res["per_condition"] if "ddpm" in r]
+    GATE = 1e-3                                           # registered in AMENDMENT_3.md before any trained result: solver median std(u) at or above this counts as "patterned"; numerical audit saw mode flips only at std <= 1.2e-12
+    nT = len(taus_); amp = {}
+    for si in range(fields.shape[0]):
+        for ti in range(nT):
+            okr = ~failed[si]; amp[(si, ti)] = float(np.median(fields[si][okr][:, ti, 0].std(-1))) if okr.any() else None
+    strata = {"patterned": [], "near_uniform": []}
+    for k, r in enumerate(res["per_condition"]):
+        a_ = amp[(k // nT, k % nT)]
+        if "ddpm" in r and a_ is not None: strata["patterned" if a_ >= GATE else "near_uniform"].append(r)
+    out["stratified_by_solver_amplitude"] = {"gate_std_u": GATE, "note": "SECONDARY stratification; dominant mode of a near-uniform field is numerically arbitrary, so mode metrics are only interpretable in the patterned stratum",
+        **{name: {"n_conditions": len(rows), **{mth: {mt: (float(np.median([x[mth][mt] for x in rows])) if rows else None) for mt in ("mode_tv", "amp_w1_rel", "amp_w1_exact_rel")} for mth in ("ddpm", "ddpm_shuffled_condition", "nearest1_pooled", "nearest5_pooled", "nearest10_pooled")}} for name, rows in strata.items()}}
+    out["precision_flags_at_runtime"] = {"cudnn_allow_tf32": torch.backends.cudnn.allow_tf32, "matmul_allow_tf32": torch.backends.cuda.matmul.allow_tf32, "float32_matmul_precision": torch.get_float32_matmul_precision(), "note": "must equal the policy used by the primary run; this tool sets nothing itself"}
     for mth in ("ddpm", "ddpm_shuffled_condition", "nearest1_pooled", "nearest5_pooled", "nearest10_pooled"):
         v = [r[mth]["amp_w1_exact_rel"] for r in ok if r[mth].get("amp_w1_exact_rel") is not None]; out.setdefault("median_amp_w1_exact_rel", {})[mth] = (float(np.median(v)) if v else None); out.setdefault("n_conditions_with_value", {})[mth] = len(v)
     open(os.path.join(a.out, "secondary_evaluation.json"), "w").write(json.dumps(strict(out), indent=1, sort_keys=True, allow_nan=False, default=lambda o: o.item() if hasattr(o, "item") else str(o)))
