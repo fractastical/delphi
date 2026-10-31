@@ -23,3 +23,10 @@ Upstream labels are never local acceptance. Approach/scales on questions are sit
 
 ## Not wired (named, not hidden)
 Beliefs: `frontier/beliefs_api.py` exists but no web route is registered, so the Belief view's request button still reports the adapter as not connected. Attention API: not delivered. Artifact download: the link appears only for an artifact that declares `availability: downloadable` with an https URI; the scratch node holds no artifacts, so only the formatter is unit-tested.
+
+## Live scratch checks (added 2026-10-31)
+
+`tests/test_site_live.sh` runs the site against a scratch PostgreSQL and the real web service. With `SITE_E2E_DESIGN=1` it also writes a Project
+(`project-flying-fish-mission`), a structured challenge and a reply through the Store, and `SITE_E2E_DRIVER=site_live_design_driver.py` checks that the
+design review panel draws them by exact pin with none resolved, and that every About route draws. These are scratch records, not the production node's
+seeded challenges. Mocked-live browser tests (`tests/test_site_browser.py`) cover the shapes the scratch node cannot easily produce (long ids, errors, 503s).

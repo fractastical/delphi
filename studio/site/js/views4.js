@@ -85,7 +85,7 @@
         if (!(DF.api.isLive())) return;
         const r = await DF.api.attention();
         root.querySelector("#attn").innerHTML = (r.unavailable ? html`<section class="panel"><h2>Attention view</h2><p class="empty">Not available (${r.reason}). Nothing is shown in its place.</p></section>`
-          : html`<section class="panel"><h2>Attention view, as received</h2><p class="note small">Built by the attention layer from public stored records and events. Its fields are shown unprocessed: priority here is not truth, and this page has not checked it.</p><pre class="json">${JSON.stringify(r.report, null, 2)}</pre></section>`).toString();
+          : html`<section class="panel"><h2>Attention view, as received</h2><p class="note small">Built by the attention layer from public stored records and events. Its fields are shown unprocessed: priority here is not truth, and this page has not checked it.</p>${rawJson("the attention report", r.report)}</section>`).toString();
       } };
   }
 
@@ -123,7 +123,7 @@
   /* Rendered from the documented frontier.system/1 shape (frontier/system_status.py). Every section carries its own mode label. */
   function liveSystem(r) {
     if (r.unavailable) return html`<section class="panel"><h2>Live system report</h2><p class="empty">Not available (${r.reason}). Nothing is shown in its place.</p></section>`;
-    const R = r.report; if (!R || R.schema !== "frontier.system/1") return html`<section class="panel"><h2>Live system report</h2><p class="note warn small">The runtime answered with an unrecognised schema (${String(R && R.schema)}), so it is shown unprocessed.</p><pre class="json">${JSON.stringify(R, null, 2)}</pre></section>`;
+    const R = r.report; if (!R || R.schema !== "frontier.system/1") return html`<section class="panel"><h2>Live system report</h2><p class="note warn small">The runtime answered with an unrecognised schema (${String(R && R.schema)}), so it is shown unprocessed.</p>${rawJson("the system report", R)}</section>`;
     const st = R.store || {}, pr = R.process || {}, ho = R.host || {}, sv = R.services || {}, rl = R.release || {}, rs = R.resources || {};
     return html`<section class="panel"><h2>Live system report ${MEAS}</h2><p class="small faint">Generated ${R.generated_at}${R.cache ? `, ${R.cache.cached ? "cached " + R.cache.age_seconds + " s" : "fresh"} (reused up to ${R.cache.ttl_seconds} s)` : ""}. ${R.legend ? R.legend.measured : ""}</p>
       <h3>Store ${MODE(st.mode)}</h3>${sect(st) || html`<p class="small">${st.note}</p>${st.counts_scope ? html`<p class="note warn small"><b>Scope.</b> ${st.counts_scope}</p>` : ""}${(st.versions_by_namespace || []).length ? html`<p class="small">By namespace (record versions): ${st.versions_by_namespace.map((n) => `${n.namespace} ${n.versions}`).join(", ")}. This node's own namespace is ${st.namespace}.</p>` : ""}<div class="tablewrap"><table><thead><tr><th>Kind</th><th>Local status</th><th>Versions</th><th>Current heads</th></tr></thead><tbody>${(st.records_by_kind_and_local_status || []).map((x) => html`<tr><td>${x.kind}</td><td>${String(x.local_status).replace(/_/g, " ")}</td><td>${x.versions}</td><td>${x.heads}</td></tr>`)}</tbody></table></div>
@@ -173,6 +173,14 @@
 
   /* /api/counts as received: scalars with their units, nested groups collapsed, and every note or basis string kept right next to the numbers it qualifies. */
   const NOTEKEYS = new Set(["note", "basis", "meaning", "scope", "label"]);
+  /* Large JSON stays out of the page until asked for: collapsed, and filled in only when opened. */
+  const RAW = new Map(); let rawN = 0;
+  function rawJson(label, obj) {
+    const id = "raw" + ++rawN; RAW.set(id, obj); let n = 0; try { n = JSON.stringify(obj).length; } catch (e) { n = 0; }
+    return html`<details class="rawjson" data-raw="${id}"><summary class="small">Show ${label} as received <span class="faint">(about ${n.toLocaleString("en")} characters)</span></summary><pre class="json" aria-label="Raw ${label}"></pre></details>`;
+  }
+  document.addEventListener("toggle", (e) => { const d = e.target; if (d && d.classList && d.classList.contains("rawjson") && d.open) { const pre = d.querySelector("pre"); if (pre && !pre.textContent) pre.textContent = JSON.stringify(RAW.get(d.dataset.raw), null, 2); } }, true);
+
   function tree(o, depth = 0) {
     if (o === null || o === undefined) return html`<span class="faint">none</span>`;
     if (typeof o !== "object") return html`${String(o)}`;

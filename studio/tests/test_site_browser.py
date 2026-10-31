@@ -558,6 +558,8 @@ def test_runtime_graph_renders_object_scope_succinctly_and_with_exact_pins(brows
     assert "[object Object]" not in txt and "visibility: public" in txt
     hrefs = pg.locator("#gdetail a, #gwrap table a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
     assert any(("v=" + "b" * 64) in h and "ns=node-a" in h for h in hrefs), hrefs
+    fills = pg.evaluate("[...document.querySelectorAll('.gsvg .g-node .g-label')].map(e => getComputedStyle(e).fill)")
+    assert fills and all(f != "rgb(255, 255, 255)" for f in fills), fills        # labels sit on the cream canvas: never white
 
 
 def _mock_live(pg, run_handler):
@@ -958,3 +960,170 @@ def test_cuda_md_card_and_warmstart_bytes_are_exact(browser, base):
     t = pg.locator("#sim-molecular-md-cuda").text_content()
     assert "three 100 ps" in t and "Equilibrated ensemble: not established" in t and "not computed (null)" in t and "not a confidence interval" in t
     assert "0.2 ps CPU setup run" in pg.locator("#sim-molecular-md").text_content()
+
+
+def _overflow(pg):
+    return pg.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth")
+
+
+def test_frontier_question_table_keeps_bounded_columns_and_short_rows(browser, base):
+    pg = page(browser, 1280, 900)
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector(".qtable tbody tr")
+    m = pg.evaluate("""() => { const t = document.querySelector('.qtable'); const wrap = t.closest('.tablewrap'); const a = t.querySelector('tbody td:first-child');
+      return {table: t.getBoundingClientRect().width, wrap: wrap.getBoundingClientRect().width, id: a.getBoundingClientRect().width,
+              rows: [...t.querySelectorAll('tbody tr')].map(r => r.getBoundingClientRect().height)}; }""")
+    assert m["table"] <= m["wrap"] + 1, m
+    assert m["id"] <= 180, m
+    assert max(m["rows"]) <= 190, m
+
+
+def test_phone_pages_do_not_widen_and_the_nav_wraps_into_view(browser, base):
+    pg = page(browser, 400, 800)
+    for route in ("#/knowledge", "#/frontier", "#/work?tab=runtime", "#/work?tab=built", "#/studio/flying-fish", "#/simulations"):
+        pg.goto(base + route)
+        pg.wait_for_timeout(1200)
+        assert _overflow(pg) <= 0, (route, _overflow(pg))
+    pg.goto(base + "#/home"); pg.wait_for_selector(".aboutmenu summary")
+    edges = pg.evaluate("[...document.querySelectorAll('nav[aria-label=Views] > ul > li')].map(li => { const r = li.getBoundingClientRect(); return [li.textContent.trim().slice(0, 10), Math.round(r.left), Math.round(r.right)]; })")
+    assert all(l >= 0 and r <= 400 for _, l, r in edges), edges
+    assert [e[0] for e in edges][-2:] == ["System", "About"] or any(e[0].startswith("System") for e in edges), edges
+
+
+def test_large_json_trees_are_collapsed_by_default(browser, base):
+    pg = page(browser)
+    for route in ("#/work?tab=runtime", "#/work?tab=resources", "#/work?tab=built"):
+        pg.goto(base + route); pg.wait_for_timeout(1200)
+        big = pg.evaluate("""() => [...document.querySelectorAll('pre, .tree')].filter(e => e.textContent.length > 2000 && !e.closest('details') ).length""")
+        assert big == 0, (route, big)
+
+
+def test_live_question_table_with_long_ids_and_text_stays_inside_its_panel(browser, base):
+    def rec(i):
+        long_id = f"problem-{i:03d}-" + "x" * 56
+        return {"record": {"namespace": "n", "kind": "Problem", "id": long_id, "version": "a" * 64, "payload": {
+            "question": "Does a very long and detailed open question about cross scale calibration keep its row readable? " * 3,
+            "known_state": "A long statement of what is known. " * 12, "next_action_text": "A bounded next action. " * 6, "problem_kind": "design", "completeness": "actionable",
+            "approach": "top_down", "scales": ["organ", "organism"], "context_tags": ["tag-" + "y" * 30], "dependencies": []}}, "local_status": "proposed", "is_head": True}
+    for w, h in ((1280, 900), (400, 800)):
+        pg = page(browser, w, h)
+        pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+        pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+        pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+        pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": [rec(i) for i in range(30)]}))
+        pg.goto(base + "#/frontier")
+        pg.wait_for_selector(".livepanel table tbody tr")
+        m = pg.evaluate("""() => { const t = document.querySelector('.livepanel table'); const wrap = t.closest('.tablewrap'); const a = t.querySelector('tbody td:first-child');
+          return {table: t.getBoundingClientRect().width, wrap: wrap.getBoundingClientRect().width, id: a.getBoundingClientRect().width,
+                  rows: [...t.querySelectorAll('tbody tr')].map(r => r.getBoundingClientRect().height), page: document.documentElement.scrollWidth - document.documentElement.clientWidth}; }""")
+        assert m["page"] <= 0, (w, m)
+        assert m["id"] <= (230 if w > 500 else 170), (w, m)
+        assert max(m["rows"]) <= 200, (w, m)
+
+
+def test_phone_knowledge_filters_with_long_facet_values_do_not_widen_the_page(browser, base):
+    def rec(i):
+        return {"record": {"namespace": "n", "kind": "Claim", "id": f"c{i:03d}", "version": "a" * 64, "payload": {"title": f"Claim {i}", "statement": "S" * 200, "prior_review": {"delphi_original": {"delphi_graph": {"thinker": "A thinker with an extremely long name " * 3, "work": "A work title that is also far too long for one line " * 3, "year": 1990 + i % 30}}}}}, "local_status": "proposed", "is_head": True}
+    pg = page(browser, 400, 800)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": [rec(i) for i in range(12)]}))
+    pg.goto(base + "#/knowledge")
+    pg.wait_for_selector("#cblist .claimcard")
+    assert _overflow(pg) <= 0, _overflow(pg)
+
+
+def test_attention_json_is_collapsed_and_filled_only_when_opened(browser, base):
+    big = {"schema": "frontier.attention/1", "generated_at": "t", "namespace": "n", "view": {"rows": [{"ref": {"id": f"p{i}"}, "store": {"question": "q" * 400}} for i in range(120)]}}
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": []}))
+    pg.route("**/api/attention", lambda r: r.fulfill(json={"report": big}))
+    pg.goto(base + "#/work?tab=work")
+    pg.wait_for_selector("details.rawjson")
+    assert pg.evaluate("document.querySelector('details.rawjson pre').textContent.length") == 0
+    assert pg.evaluate("document.querySelector('details.rawjson').open") is False
+    pg.click("details.rawjson summary")
+    pg.wait_for_function("document.querySelector('details.rawjson pre').textContent.length > 10000")
+
+
+def test_simulation_preview_never_prints_an_object_for_structured_errors_or_digest_maps(browser, base):
+    def handler(route):
+        body = json.loads(route.request.post_data)
+        if body["model"] == "mechanobio":
+            route.fulfill(status=400, json={"error": {"code": "parameter_out_of_range", "message": {"field": "dt_s", "limit": 0.1}}})
+        else:
+            route.fulfill(json={"schema": "frontier.simulation.preview/1", "status": "completed", "model": "bioelectric", "evidence_kind": "SimulationResult", "persisted": False, "calibrated": False,
+                "request_sha256": "a" * 64, "effective_request_sha256": "b" * 64, "code_sha256": {"model.py": "c" * 64, "run.py": "d" * 64}, "computed_at": "2026-10-31T21:00:00Z", "scope": "Preview only.",
+                "result": {"time_ms": [0, 1, 2], "voltage_mV": [[-70, -70], [-60, -65], [-40, -50]]}})
+    pg = page(browser)
+    _mock_live(pg, handler)
+    pg.goto(base + "#/studio/flying-fish?scale=cellular")
+    pg.wait_for_selector("#simwidget form", timeout=15000)
+    pg.fill("#sw-duration_ms", "30")
+    pg.click("#simwidget button[type=submit]")
+    pg.wait_for_selector("#sw-out .rescard svg.chart", timeout=15000)
+    t = pg.locator("#sw-out").text_content()
+    assert "[object Object]" not in t and "model.py" in t and "run.py" in t
+    pg.select_option("#sw-model", "mechanobio")
+    pg.click("#simwidget button[type=submit]")
+    pg.wait_for_selector("#sw-out .adapter-out.unavailable", timeout=15000)
+    t = pg.locator("#sw-out").text_content()
+    assert "[object Object]" not in t and "parameter_out_of_range" in t and "HTTP 400" in t
+
+
+def test_live_questions_unknown_id_empty_filter_and_assessment_are_readable(browser, base):
+    def rec(i):
+        return {"record": {"namespace": "n", "kind": "Problem", "id": f"q{i}", "version": "a" * 64, "payload": {"question": f"Question {i}?", "known_state": "Known.", "next_action_text": "Do.", "problem_kind": "design", "completeness": "actionable", "approach": "top_down", "scales": ["organ"], "context_tags": [], "dependencies": []}}, "local_status": "proposed", "is_head": True}
+    att = {"report": {"schema": "frontier.attention/1", "generated_at": "t", "namespace": "n", "view": {"rows": [{"ref": {"namespace": "n", "kind": "Problem", "id": "q1", "version": "a" * 64}, "store": {"question": "Question 1?", "known_state": "Known.", "next_action_text": "Do.", "problem_kind": "design", "completeness": "actionable", "approach": "top_down", "scales": ["organ"], "context_tags": [], "dependencies": []},
+        "assessment": {"truth": {"label": "unknown", "evidence": ["e1", "e2"]}, "reviewer": None}, "actions": [], "interest_issuers": {}, "why_priority": [], "register_labels": []}]}}}
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/attention", lambda r: r.fulfill(json=att["report"]))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": [rec(1)]}))
+    pg.goto(base + "#/frontier?live=q1")
+    pg.wait_for_selector("#lqdetail h3, #lqdetail h4")
+    t = pg.locator("#lqdetail").text_content()
+    assert "[object Object]" not in t and "{" not in t and "label: unknown" in t and "e1; e2" in t
+    pg.goto(base + "#/frontier?live=does-not-exist")
+    pg.wait_for_selector("#lqdetail .detail-empty")
+    t = pg.locator("#lqdetail").text_content()
+    assert "No such question" in t and "does-not-exist" in t and "Question 1" not in t
+    pg.goto(base + "#/frontier?lq=zzzz-nothing")
+    pg.wait_for_selector(".livepanel .count")
+    assert "No live question matches these filters" in pg.locator(".livepanel").text_content()
+
+
+def test_ranked_results_say_when_nothing_contains_the_query_and_print_no_raw_index_json(browser, base):
+    items = [{"type": "record", "ref": {"namespace": "n", "kind": "Claim", "id": "c1", "version": "a" * 64}, "title": "Fin allometry", "snippet": "Pectoral length scales with body length.", "kind": "Claim", "local_status": "proposed", "score": 0.62, "score_kind": "cosine", "why_matched": ["embedding"]}]
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": []}))
+    pg.route("**/api/discovery*", lambda r: r.fulfill(json={"items": items, "mode": "hybrid", "index": {"name": "frontier-index", "model": "gemini-embedding-001", "documents": 2444, "nested": {"a": 1}}}))
+    pg.goto(base + "#/search?q=qzxvbnm&tab=catalog")
+    pg.wait_for_selector("#dr-h")
+    pg.wait_for_function("document.querySelector('#main').textContent.includes('Fin allometry')")
+    t = pg.locator("#main").text_content()
+    assert "No result contains your words" in t and "{" not in pg.locator("#dr-h").locator("xpath=..").text_content()
+    assert "documents 2444" in t
+    pg.goto(base + "#/search?q=fin&tab=catalog")
+    pg.wait_for_function("document.querySelector('#main').textContent.includes('Fin allometry')")
+    assert "No result contains your words" not in pg.locator("#main").text_content()
+
+
+def test_malformed_entity_route_makes_no_request_and_navigation_moves_focus_to_main(browser, base):
+    seen = []
+    pg = page(browser)
+    pg.on("request", lambda r: seen.append(r.url) if "/api/" in r.url else None)
+    pg.goto(base + "#/frontier"); pg.wait_for_selector(".board")
+    pg.evaluate("location.hash = '#/entity/Bogus/x'")
+    pg.wait_for_selector("h1:has-text('Not found')")
+    t = pg.locator("#main").text_content()
+    assert "not a record kind this site knows" in t and "HTTP 400" not in t
+    assert not [u for u in seen if "Bogus" in u]
+    pg.evaluate("location.hash = '#/knowledge'"); pg.wait_for_selector("#cbrowse")
+    assert pg.evaluate("document.activeElement && document.activeElement.id") == "main"

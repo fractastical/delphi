@@ -56,6 +56,7 @@
         console.error(e); main.innerHTML = html`<section class="pagehead"><h1>This view could not be drawn</h1><p class="lede">${e.message}</p><p>The data may be malformed. <a href="${DF.href("/frontier")}">Return to Frontier</a>.</p></section>`.toString();
       }
     }
+    if (lastView !== route.view) { try { main.focus({ preventScroll: true }); } catch (e) { /* focus is best effort */ } }   // keyboard and screen-reader users land at the new view, not on the old link
     lastView = route.view; window.scrollTo(0, y);
     await drawer(route);
   }
