@@ -74,8 +74,9 @@ what the assessments and `claim-tests/` are for.
 - `books/`: one project per source book, each with `inputs/`, `extraction/`, `claims.json`,
  `assessment/`, `build/` and `nanopubs/`.
  - `books/darwin-origin/`: 247 claims from *On the Origin of Species*, with dataset-resolvability assessments.
- - `books/thompson-growth-form/`, `books/wolfram-nks/`: in progress. Thompson has 47 claims
-   machine-checked in Lean 4 (`lean/`).
+ - `books/thompson-growth-form/`: 291 claims from *On Growth and Form*, 47 of them machine-checked
+ in Lean 4 (`lean/`). `books/wolfram-nks/`: 321 claims from *A New Kind of Science*. Both are on
+ production with dataset-resolvability/0.2.0 assessments.
 - `math-bio-claims/`: key claims of five mathematical-biology thinkers, with LaTeX math and a
  recorded formal status (proved, partial, refuted, or not a mathematical proposition).
 - `organisms/`: every animal taxon Darwin and Thompson mention (782 taxa, 3,340 located mentions),
