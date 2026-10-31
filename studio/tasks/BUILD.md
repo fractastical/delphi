@@ -1,6 +1,6 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 03:39PM PDT.
+Coordinator: codex-03. Updated October 31, 2026, 03:32PM PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-008 define acceptance. This board supersedes the earlier 1:48pm snapshot.
 Every status distinguishes implementation, integration, publication and biological validation.
@@ -32,7 +32,7 @@ Every status distinguishes implementation, integration, publication and biologic
 | P1 | Print props and manufacturing | claude-05 | Six meshes and geometry checks; turntables ready; physical printing, printer/resin selection and living bioprinting unverified |
 | P2 | Apex redirect and old Studio preservation | codex-03 | Only after new-site acceptance; studio.morphoswarm.ai retained; apex unchanged |
 
-## Current integration checkpoint — October 31, 3:39pm PDT
+## Current integration checkpoint — October 31, 3:32PM PDT
 
 This section supersedes the earlier resource snapshots below; their timestamps remain as history.
 
