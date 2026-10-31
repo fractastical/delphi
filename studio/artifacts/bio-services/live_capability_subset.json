@@ -1,0 +1,175 @@
+{
+  "candidate_tools": [
+    {
+      "description": "Submit a bounded RFdiffusion backbone or motif-scaffolding run. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration.",
+      "name": "submit_rfdiffusion",
+      "operations": [
+        "design-backbone",
+        "scaffold-motif"
+      ],
+      "parameter_names": [
+        "contigs",
+        "diffuser_T",
+        "hotspot_residues",
+        "input_pdb_artifact_id",
+        "length",
+        "motif_ca_rmsd_limit",
+        "num_designs",
+        "operation",
+        "schema",
+        "seed"
+      ],
+      "request_required": [
+        "schema",
+        "operation",
+        "service_class",
+        "input_manifest",
+        "parameters"
+      ]
+    },
+    {
+      "description": "Submit a deployment-authorized AlphaFold 3 structure prediction from a raw fold input. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration.",
+      "name": "submit_alphafold3"
+    },
+    {
+      "description": "Submit a bounded asynchronous BoltzGen design campaign. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response. Restart is stage-level, not mid-fold checkpoint or GPU process restoration.",
+      "name": "submit_boltzgen"
+    },
+    {
+      "description": "Predict biomolecular structures, sample conformations or propagate model dynamics with BioEmu2. Returns raw CIF/XTC and physicality reports; not classical MD or affinity prediction. The platform owns preparation, dependent computation and result delivery. Submit once with an idempotency key and poll the returned durable graph operation. Reuse that key after response loss. Results require all declared stages to succeed. An omitted key creates fresh one-shot work and cannot recover a lost response",
+      "name": "submit_bioemu2"
+    },
+    {
+      "description": "Predict a protein from its sequence; returns ranked structure and confidence values. Portable OpenFold2 with a single-sequence dummy MSA. No external MSA, template or relaxation fields.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files.",
+      "name": "infer_openfold2_native",
+      "properties": {
+        "idempotency_key": {
+          "type": "string"
+        },
+        "output_prefix": {
+          "type": "string"
+        },
+        "relax_prediction": {
+          "default": false
+        },
+        "selected_models": {
+          "default": [
+            1
+          ]
+        },
+        "sequence": {
+          "type": "string"
+        },
+        "wait_seconds": {
+          "maximum": 30,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input_id",
+        "sequence",
+        "selected_models",
+        "relax_prediction"
+      ]
+    },
+    {
+      "description": "Design sequences compatible with a protein backbone PDB; returns sampled sequences and scores. ProteinMPNN v_48_020 portable adapter. Chain existence and PDB structure are checked by the runtime.  Durable operation: submit once with an idempotency key; poll get_operation, then get_operation_result. Transfer failures retry delivery without rerunning inference. Use private immutable artifact references for files.",
+      "name": "infer_proteinmpnn_native",
+      "properties": {
+        "input_pdb": {
+          "description": "Inline PDB with ATOM records; 40\u20132,000,000 UTF-8 bytes (runtime checked). Prefer an artifact reference for nontrivial files so clients never serialize file bytes through an LLM.",
+          "x-fs2-artifact-max-bytes": 2000000
+        },
+        "input_pdb_chains": {
+          "description": "Existing chains to redesign; omitted/null means all chains."
+        },
+        "num_seq_per_target": {
+          "default": 1,
+          "description": "Sequences sampled for the target.",
+          "maximum": 8,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "output_prefix": {
+          "description": "Directory in your assigned bucket for automatic result.json, artifacts and manifest.json delivery. Defaults to runs/<model-id>; the operation ID is appended. Never sent to the model.",
+          "type": "string"
+        },
+        "wait_seconds": {
+          "description": "Wait at most this many seconds; otherwise poll the returned operation ID.",
+          "maximum": 30,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "input_pdb"
+      ]
+    }
+  ],
+  "kinetics_tool_match": null,
+  "models": [
+    {
+      "availability": "available",
+      "capabilities": {
+        "cancelled_graph_resume": false,
+        "cpu_delivery_retry": true,
+        "exact_retained_retry_policy": false,
+        "gpu_classes": [
+          "rtx-pro-6000",
+          "h100",
+          "h200"
+        ],
+        "gpu_snapshot": false,
+        "gpus_per_compute_stage": 1,
+        "mid_fold_checkpoint_resume": false,
+        "native_dag": true,
+        "portable_completed_result": true,
+        "restart_current_stage": true,
+        "result_schema": "fs2-serve.nebius.ai/scientific-run-result/v2",
+        "stages_per_operation": 2
+      },
+      "display_name": "BioEmu2 (Microsoft Research)",
+      "enabled": true,
+      "execution_mode": "scientific-batch",
+      "id": "bioemu2",
+      "model_id": "bioemu2"
+    },
+    {
+      "availability": "available",
+      "capabilities": {
+        "cancelled_graph_resume": false,
+        "cpu_delivery_retry": true,
+        "exact_retained_retry_policy": false,
+        "gpu_classes": [
+          "h100",
+          "h200"
+        ],
+        "gpu_snapshot": false,
+        "gpus_per_compute_stage": 1,
+        "mid_fold_checkpoint_resume": false,
+        "native_dag": true,
+        "portable_completed_result": false,
+        "restart_current_stage": true,
+        "result_schema": "fs2-serve.nebius.ai/scientific-run-result/v2",
+        "stages_per_operation": {
+          "maximum": 66,
+          "minimum": 3
+        }
+      },
+      "display_name": "RFdiffusion v1.1.0",
+      "enabled": true,
+      "execution_mode": "scientific-batch",
+      "id": "rfdiffusion",
+      "model_id": "rfdiffusion"
+    }
+  ],
+  "observed_utc": "2026-10-31T22:05:01.145177+00:00",
+  "scope_note": "Search was limited to tool names/descriptions containing proteinmpnn, rfdiffusion, boltzgen, kinetic, channel, openfold2, bioemu, alphafold3; no kinetic/channel-parameter estimator tool appeared.",
+  "server": {
+    "name": "Nebius Scientific AI",
+    "version": "0.1.0"
+  },
+  "tool_catalog_revision": "c3da2fad237eba580b7f59606aae6f471eba68a6df48157b43f0f4efe2a05de8",
+  "tool_count": 69
+}
