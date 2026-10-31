@@ -132,6 +132,8 @@
           <p class="note small">For each constraint, the unresolved questions that stop it from being strengthened or trusted further. They update with the candidate's results; each opens on the whiteboard.</p>
           <div id="oqlist"></div></section>
 
+        <section class="panel" aria-labelledby="rr-h"><h2 id="rr-h">Recorded results: Lean receipt and simulation</h2>${recordedResults(snap)}</section>
+
         <section class="panel" aria-labelledby="sv-h"><h2 id="sv-h">Solver candidates and simulation</h2>
           <div class="two">
             <article><h3>Solver candidates</h3><p>None attached to this snapshot. A solver returns satisfiable, unsatisfiable, unknown or timeout; the page will show whichever it returns, never a default.</p>
@@ -142,6 +144,34 @@
       after(root) { wireEngineering(root, snap); },
     };
   };
+
+  function recordedResults(snap) {
+    const L = snap.lean_receipt, S = snap.simulation; const fx = (x, d = 4) => (x === null || x === undefined ? "n/a" : fmt(x, d));
+    const lean = L ? html`<article class="card"><h3>Lean check (offline receipt)</h3>
+        <p>${U.pill(L.all_ok ? "all checks as recorded" : "recorded failure", L.all_ok ? "ok" : "no")} ${U.pill("not run by this page", "warn")}</p>
+        <p class="small">${L.lean_version}. Mathlib ${String(L.mathlib_rev).slice(0, 12)}, toolchain ${L.toolchain}. Receipt <code>${L.path}</code> sha256 ${U.sha(L.sha256)}.</p>
+        <ul><li>Positive file: exit <b>${L.positive.exit}</b> in ${L.positive.seconds} s; axioms used ${(L.positive.axioms_used || []).join(", ")}${L.positive.only_standard_axioms ? " (standard only)" : " (NON-standard axiom present)"}.</li>
+        <li>Negative controls (altered law or corrupted certificate): exit ${L.negative.exit}; each block rejected: ${Object.entries(L.negative.each_block_rejected || {}).map(([k, v]) => `${k}: ${v ? "rejected" : "ACCEPTED"}`).join(", ")}.</li></ul>
+        <p class="note small"><b>What this does and does not show.</b> It checks that a specific conflict certificate for three encoded constraints (level-lift proxy, minimum wing loading, maximum speed) is valid, and that mutated laws fail. It is a statement about the encoding of those constraints, not about any fish. The solver's other verdicts are z3 verdicts with no Lean check, and the solve endpoint reports Lean as not run.</p></article>`
+      : html`<article class="card"><h3>Lean check</h3><p class="empty">No Lean receipt is present in this tree. Nothing is shown in its place.</p></article>`;
+    if (!S) return html`<div class="cards">${lean}<article class="card"><h3>Simulation</h3><p class="empty">No recorded simulation results are present in this tree (looked for <code>engineering/simulation/results/summary.json</code>). There is also no mesh or print geometry. Nothing is drawn in their place.</p></article></div>`;
+    const m = S.summary; const c = S.controls || {}; const f = S.findings || {};
+    const ctl = Object.entries(c).filter(([k, v]) => typeof v === "object" && v !== null).map(([k, v]) => html`<tr><td>${k.replace(/_/g, " ")}</td><td>${v.rel_err !== undefined ? fx(v.rel_err, 3) : v.max_rel_drift !== undefined ? fx(v.max_rel_drift, 3) : v.rel_diff !== undefined ? fx(v.rel_diff, 3) : ""}</td><td>${v.tol !== undefined ? v.tol : ""}</td></tr>`);
+    const sim = html`<article class="card"><h3>Glide simulation (${m.model_version}) ${U.pill("simulated", "ev")}</h3>
+        <p class="small">${m.n_designs} designs, ${m.n_pareto} on the Pareto set, ${m.n_unconverged} unconverged; largest step-halving range difference ${fx(m.max_dt_half_rel_diff, 3)}. Monte Carlo n = ${m.mc_n}, seed ${m.mc_seed}.
+          Nominal assumptions: ${Object.entries(m.nominal_assumptions || {}).map(([k, v]) => k + " = " + v).join(", ")}. These coefficients are model assumptions, not measurements.</p>
+        <div class="tablewrap"><table><thead><tr><th>Numerical control</th><th>Error or drift</th><th>Tolerance</th></tr></thead><tbody>${ctl}</tbody></table></div>
+        <p class="small">All controls pass: <b>${String(c.all_pass)}</b>.</p>
+        ${f.interpretation ? html`<p class="note warn small"><b>The authors' own caveat.</b> ${f.interpretation}</p>` : ""}</article>`;
+    const fig = (S.files || []).find((x) => x.name === "figure.png");
+    const par = S.pareto_selected || [];
+    return html`<div class="cards">${lean}${sim}</div>
+      ${fig ? html`<figure class="simfig"><img src="${fig.href}" alt="Recorded simulation figure from the glide sweep" loading="lazy"><figcaption class="small faint">Figure as recorded (<code>${fig.path}</code>, sha256 ${U.sha(fig.sha256)}). Simulated point-mass glides, not a fish and not CFD.</figcaption></figure>` : ""}
+      ${par.length ? html`<details class="pareto"><summary><b>${par.length} selected Pareto designs (simulated)</b>: open the table</summary><p class="small faint">Objectives: ${(m.pareto_objectives || []).join("; ")}. Range quantiles come from the Monte Carlo over the priors above. Use one as the candidate to compare it against the constraint flags; the standard length stays unknown.</p>
+        <div class="tablewrap"><table><thead><tr><th>m (kg)</th><th>S (m²)</th><th>b (m)</th><th>AR</th><th>WL (N/m²)</th><th>range q10 / q50 / q90 (m)</th><th>sink (m/s)</th><th>L/D</th><th></th></tr></thead><tbody>${par.map((d, i) => html`<tr><td>${fx(d.m, 3)}</td><td>${fx(d.S, 3)}</td><td>${fx(d.b, 3)}</td><td>${fx(d.AR, 3)}</td><td>${fx(d.WL, 3)}</td><td>${fx(d.range_q10, 3)} / ${fx(d.range_q50, 3)} / ${fx(d.range_q90, 3)}</td><td>${fx(d.sink_eq_ms, 3)}</td><td>${fx(d.LoD_eq, 3)}</td><td><button class="btn small ghost" type="button" data-pareto="${i}">Use as candidate</button></td></tr>`)}</tbody></table></div></details>` : ""}
+      <p class="small">Files: ${(S.files || []).map((x) => html`<a href="${x.href}">${x.name}</a> (${x.bytes} bytes, ${U.sha(x.sha256)}) `)}</p>
+      <p class="small faint">There is no mesh or print-geometry artifact in this tree; the drawing above is a parametric visualisation, not a validated model.</p>`;
+  }
 
   function readForm(form) {
     const c = F.blank(); const errors = {};
@@ -186,6 +216,13 @@
     root.querySelectorAll("[data-preset]").forEach((b) => b.addEventListener("click", () => {
       const p = m.presets.find((x) => x.id === b.dataset.preset); DF.cand = F.applyPreset(p, m); DF.candLabel = p.name; writeForm(form, DF.cand);
       root.querySelector("#presetnote").textContent = p.name + ": " + p.note; update(false);
+    }));
+    root.querySelectorAll("[data-pareto]").forEach((b) => b.addEventListener("click", () => {
+      const d = snap.simulation.pareto_selected[+b.dataset.pareto]; const c = F.blank();
+      c.mass_kg = +d.m.toPrecision(6); c.span_m = +d.b.toPrecision(6); c.aspect_ratio = +d.AR.toPrecision(6);
+      DF.cand = c; DF.candLabel = `Pareto design ${+b.dataset.pareto + 1} (simulated, glide-pointmass)`; writeForm(form, c);
+      root.querySelector("#presetnote").textContent = DF.candLabel + ": mass, span and aspect ratio from a simulated sweep. Standard length is unknown."; update(false);
+      form.scrollIntoView({ block: "start" });
     }));
     root.querySelector("#resetc").addEventListener("click", () => { DF.cand = F.blank(); DF.candLabel = "nothing declared"; writeForm(form, DF.cand); root.querySelector("#presetnote").textContent = "Cleared. Every check is now unknown."; update(false); });
     root.querySelector("#dlc").addEventListener("click", () => {
@@ -280,6 +317,8 @@
   const ROLE_TYPE = { input: "data", output: "data", code: "code", environment: "code", protocol: "protocol", log: "document", certificate: "proof", geometry: "geometry" };
   DF.artifactIndex = (snap) => {
     const rows = snap.mission.artifacts.map((a) => ({ ...a }));
+    if (snap.simulation) snap.simulation.files.forEach((f) => rows.push({ title: "Glide sweep: " + f.name, type: /png|csv/.test(f.name) ? (f.name.endsWith("csv") ? "data" : "simulation") : "simulation", source: `${f.path} · sha256 ${f.sha256.slice(0, 12)}… · ${f.bytes} bytes`, url: null, download: f.href, context: `${snap.simulation.summary.model_version}; ${snap.simulation.summary.evidence_kind}; assumptions are the model's, not measurements`, check: `step-halving and analytic controls: all pass = ${snap.simulation.controls && snap.simulation.controls.all_pass}`, dispute: "The authors flag release-speed convention and mass dropping out as model artefacts.", next: "Replace constant coefficients with sourced values before reading any trend biologically." }));
+    if (snap.lean_receipt) rows.push({ title: "Lean receipt for the constraint certificate", type: "proof", source: `${snap.lean_receipt.path} · sha256 ${snap.lean_receipt.sha256.slice(0, 12)}…`, url: null, context: `Lean ${snap.lean_receipt.lean_version.split(",")[0]}; offline run`, check: `positive exit ${snap.lean_receipt.positive.exit}, standard axioms only = ${snap.lean_receipt.positive.only_standard_axioms}; all mutants rejected = ${Object.values(snap.lean_receipt.negative.each_block_rejected || {}).every(Boolean)}`, dispute: "Covers three encoded constraints only; not biology.", next: "Extend to further constraints only with their own mutants." });
     snap.claims.forEach((c) => c.evidence.filter((e) => /compilation|formal/.test(e.kind)).forEach((e) => rows.push({ title: e.label, type: "proof", source: e.url, url: e.url, context: c.label + ". " + c.context.slice(0, 200) + (c.context.length > 200 ? "…" : ""), check: e.kind + " (upstream receipt; not re-run here)", dispute: DF.CATEGORY[c.category].text + ". " + (c.category === "unchecked" ? "" : c.finding.slice(0, 160)), next: c.next_action })));
     return rows;
   };

@@ -107,6 +107,37 @@ def build_catalog(snapshot: dict) -> list[dict]:
     return records
 
 
+SIM_DIR = "engineering/simulation/results"
+SIM_FILES = ("summary.json", "controls.json", "pareto.json", "model_structure_findings.json", "designs.csv", "figure.png")
+LEAN_RECEIPT = "engineering/formal/RECEIPT.json"
+
+
+def recorded_results(ins: Inputs, files: dict) -> tuple[dict | None, dict | None]:
+    """Recorded runs that exist in this tree. A missing file is reported as absent, never filled in."""
+    lean = sim = None
+    if (ROOT / LEAN_RECEIPT).exists():
+        lc = json.loads(ins.read(LEAN_RECEIPT))["lean_checks"]
+        lean = {"path": LEAN_RECEIPT, "sha256": ins.seen[LEAN_RECEIPT]["sha256"], "run": lc.get("lean"), "lean_version": lc.get("lean_version"),
+                "mathlib_rev": lc["provenance"].get("mathlib_rev"), "toolchain": lc["provenance"].get("lean_toolchain_file"),
+                "theory_sha256": lc.get("theory_sha256"), "all_ok": lc.get("all_ok"),
+                "positive": {k: lc["positive"].get(k) for k in ("exit", "seconds", "axioms_used", "only_standard_axioms")},
+                "negative": {"exit": lc["negative"].get("exit"), "seconds": lc["negative"].get("seconds"), "each_block_rejected": lc["negative"].get("each_block_rejected"),
+                             "first_error_message": lc["negative"].get("first_error_message")},
+                "file_hashes": lc["provenance"].get("files")}
+    if (ROOT / SIM_DIR / "summary.json").exists():
+        listing = []
+        for name in SIM_FILES:
+            if (ROOT / SIM_DIR / name).exists():
+                b = ins.read(f"{SIM_DIR}/{name}")
+                files[f"results/{name}"] = b
+                listing.append({"name": name, "path": f"{SIM_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": f"data/results/{name}"})
+        load = lambda n: json.loads((ROOT / SIM_DIR / n).read_text()) if (ROOT / SIM_DIR / n).exists() else None
+        summ, ctrl, find = load("summary.json"), load("controls.json"), load("model_structure_findings.json")
+        sim = {"summary": {k: v for k, v in summ.items() if k != "pareto_designs_selected_dimensions"}, "pareto_selected": summ.get("pareto_designs_selected_dimensions", []),
+               "controls": ctrl, "findings": find, "files": listing}
+    return lean, sim
+
+
 def build() -> dict[str, bytes]:
     ins = Inputs()
     seeds = ins.json("seeds/frontier-data.json")
@@ -133,6 +164,7 @@ def build() -> dict[str, bytes]:
         files[f"docs/{name}"] = ins.read(rel)
 
     # The label is a digest of the input hashes, not a git revision: a commit or merge cannot make --check stale.
+    lean_receipt, simulation = recorded_results(ins, files)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -147,18 +179,21 @@ def build() -> dict[str, bytes]:
         "documents": docs,
         "capabilities": tools,
         "board": board,
+        "lean_receipt": lean_receipt,
+        "simulation": simulation,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
     }
     catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}
     out = {"snapshot.json": (json.dumps(snapshot, indent=1, ensure_ascii=False) + "\n").encode(),
            "catalog.json": (json.dumps(catalog, indent=1, ensure_ascii=False) + "\n").encode()}
-    out.update({"docs/" + k.split("/", 1)[1]: v for k, v in files.items()})
+    out.update(files)
     return out
 
 
 def write(out: dict[str, bytes]) -> None:
-    if (DATA / "docs").exists():
-        shutil.rmtree(DATA / "docs")
+    for sub in ("docs", "results"):
+        if (DATA / sub).exists():
+            shutil.rmtree(DATA / sub)
     for name, b in out.items():
         dest = DATA / name
         dest.parent.mkdir(parents=True, exist_ok=True)
@@ -167,8 +202,8 @@ def write(out: dict[str, bytes]) -> None:
 
 def check(out: dict[str, bytes]) -> list[str]:
     stale = [n for n, b in out.items() if not (DATA / n).exists() or (DATA / n).read_bytes() != b]
-    extra = [p.relative_to(DATA).as_posix() for p in (DATA / "docs").glob("*")] if (DATA / "docs").exists() else []
-    return stale + [f"unexpected {e}" for e in extra if "docs/" + Path(e).name not in out]
+    extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
+    return stale + [f"unexpected {e}" for e in extra if e not in out]
 
 
 def main(argv=None) -> int:

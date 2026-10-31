@@ -175,3 +175,19 @@ def test_artifact_download_link_only_for_declared_downloadable_https(browser, ba
       {artifact: {title: 'c', uri: 'urn:sha256:' + 'c'.repeat(64), sha256: 'c'.repeat(64), byte_size: 1, role: 'certificate', availability: 'referenced'}}
     ]).map(r => [r.type, r.download])""")
     assert rows == [["geometry", "https://x.example/a.stl"], ["data", None], ["proof", None]]
+
+
+def test_recorded_results_show_lean_receipt_scope_and_honest_absence(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/engineering")
+    pg.wait_for_selector("#rr-h")
+    sec = pg.locator("section[aria-labelledby=rr-h]").inner_text().lower()
+    assert "not run by this page" in sec and "not about any fish" in sec
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    if snap["simulation"]:
+        assert "glide simulation" in sec and "authors' own caveat" in sec
+        pg.locator("details.pareto summary").click()
+        pg.locator("[data-pareto]").first.click()
+        assert float(pg.input_value("#f-mass_kg")) > 0 and pg.input_value("#f-standard_length_m") == ""
+    else:
+        assert "no recorded simulation results are present" in sec and "no mesh" in sec
