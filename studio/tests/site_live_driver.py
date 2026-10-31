@@ -19,7 +19,19 @@ with sync_playwright() as p:
     print("PASS live mode, signed in")
     pg.goto(base + "/index.html#/search?q=&tab=catalog"); expect(pg.locator("#ccount")).not_to_have_text("Loading…", timeout=15000)
     print("catalog:", pg.locator("#ccount").inner_text())
-    assert "mode live" in pg.locator("#ccount").inner_text()
+    ct = pg.locator("#ccount").inner_text()
+    assert "mode live" in ct and ct.split(" ")[0].isdigit() and int(ct.split(" ")[0]) > 0, ct   # seeded records, read from the live node
+    first = pg.locator("#clist a.srclink").first
+    title = first.inner_text(); first.click()
+    pg.wait_for_selector("#drawer:not([hidden]) pre.json", timeout=15000)   # /api/record, pinned ref
+    env = pg.locator("#drawer pre.json").inner_text()
+    assert "site-e2e" in env and "version" in env, env[:200]
+    print("RECORD via /api/record:", title[:60]); pg.keyboard.press("Escape")
+    pg.goto(base + "/index.html#/search?q=Fisher&tab=catalog"); expect(pg.locator("#ccount")).not_to_have_text("Loading…", timeout=15000)
+    print("SEARCH:", pg.locator("#ccount").inner_text()); assert "mode live" in pg.locator("#ccount").inner_text()
+    pg.goto(base + "/index.html#/work"); expect(pg.locator("#events")).not_to_have_text("Loading…", timeout=15000)
+    ev = pg.locator("#events").inner_text(); print("EVENTS:", ev[:120].replace("\n", " "))
+    assert "No agents, leases or contributions are displayed" not in ev and "KIND" in ev.upper() and pg.locator("#events tbody tr").count() > 0, "seeded events were not rendered"
     pg.goto(base + "/index.html#/evidence"); expect(pg.locator("#artifacts")).not_to_have_text("Loading…", timeout=15000)
     print("artifacts rows:", pg.locator("#artifacts tbody tr").count())
     pg.goto(base + "/index.html#/engineering"); pg.wait_for_selector("#candform")

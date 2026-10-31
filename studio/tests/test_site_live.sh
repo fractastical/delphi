@@ -16,6 +16,15 @@ bash "$REPO/deploy/postgres/init-cluster.sh" "$T" >/dev/null; "$PGBIN/pg_ctl" -D
 bash "$REPO/deploy/postgres/create-db.sh" "$T" >/dev/null
 export FRONTIER_DSN="host=$T/run port=$FRONTIER_PG_PORT dbname=frontier user=frontier_app"
 cd "$REPO"; $PY -m frontier.admin bootstrap --namespace site-e2e --schema public >/dev/null
+$PY -m frontier.admin provision --namespace site-e2e --actor e2e-writer --operator op-writer --roles contributor,coordinator --credential-file "$T/credentials/writer.cred" >/dev/null
+$PY - "$T/credentials/writer.cred" <<'PYE'
+import os, sys
+from frontier.store import Store
+from frontier.seed import seed
+store = Store(os.environ["FRONTIER_DSN"], "site-e2e", "public")
+n = seed(store, open(sys.argv[1]).read().strip(), "e2e-writer")
+print("seeded", len(n) if hasattr(n, "__len__") else n)
+PYE
 $PY -m frontier.web --namespace site-e2e --schema public --port $PORT --site "$SITE" --insecure-cookies 2>"$T/web.log" & WEBPID=$!
 for _ in $(seq 100); do curl -fsS "http://127.0.0.1:$PORT/api/health" >/dev/null 2>&1 && break; sleep 0.1; done
 $PY "$SITE/../tests/site_live_driver.py" "http://127.0.0.1:$PORT" "$FRONTIER_ACCESS_TOKEN" "$OUT"
