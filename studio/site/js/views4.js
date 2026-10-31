@@ -27,6 +27,8 @@
       <section class="panel"><h2>The two levels</h2><div class="two"><article><h3>${AUTHOR}</h3><p>${S.levels.author_report}</p></article><article><h3>${MEAS}</h3><p>${S.levels.measured}</p></article></div></section>`,
       async after(root) { if (!live) return; const r = await DF.api.system(); const el = root.querySelector("#depsha"); const rep = r.report || {}; const k = ["deployed_sha", "git_sha", "commit", "sha", "release"].find((x) => typeof rep[x] === "string");
         const sha = rep.deployed_sha || (rep.release && (rep.release.sha || rep.release.checkout_sha)); const bi = rep.build && rep.build.release_sha;
+        const dcl = rep.release && rep.release.directory_claim; const cl = rep.claimed_sha || (dcl && dcl.sha); const cc = dcl && dcl.contents;
+        if (!sha && cl) { el.textContent = `${cl} (claimed by the release directory name, not measured${cc && cc.checked ? `; files ${cc.matches_recorded_tree ? "match" : "DO NOT match"} the tree hash recorded at release` : ""}; no git checkout to measure)`; return; }
         el.textContent = sha ? `${sha} (running release, measured${rep.release && rep.release.sha_source ? ", from " + rep.release.sha_source : ""})${bi ? `; build-info reports ${bi}, matches: ${rep.build.matches_checkout}` : ""}` : k ? `${rep[k]} (reported by the runtime as “${k}”)` : r.unavailable ? `not reported (system report unavailable: ${r.reason})` : "not reported in the system report"; } };
   }
 
@@ -64,6 +66,7 @@
       } };
   }
 
+  DF.liveSystem = (r) => liveSystem(r);
   const MODE = (m) => (m === "measured" ? MEAS : m === "worker_report" ? AUTHOR : U.pill(String(m || "unlabelled"), "st-unk"));
   const bytes = (n) => (n === null || n === undefined ? "unknown" : n >= 1e9 ? (n / 1e9).toFixed(2) + " GB" : n >= 1e6 ? (n / 1e6).toFixed(1) + " MB" : Math.round(n / 1e3) + " kB");
   const sect = (s) => (s && s.status === "unavailable" ? html`<p class="empty">This section was unavailable on the runtime (${s.section}). Nothing is shown in its place.</p>` : null);
@@ -79,10 +82,19 @@
       <h3>Services ${MODE(sv.mode)}</h3><div class="tablewrap"><table><thead><tr><th>Unit</th><th>State</th><th>Restarts</th><th>Memory</th><th>Tasks</th><th>Active since</th></tr></thead><tbody>${(sv.units || []).map((u) => html`<tr><td><code>${u.unit}</code></td><td>${u.state === "measured" ? `${u.active_state}/${u.sub_state}` : "unavailable"}</td><td>${u.restarts ?? "unknown"}</td><td>${bytes(u.memory_current_bytes)}</td><td>${u.tasks_current ?? "unknown"}</td><td>${u.active_since || ""}</td></tr>`)}</tbody></table></div>
       <h3>This web process ${MODE(pr.mode)}</h3>${sect(pr) || html`<p class="small">${pr.scope}: up ${Math.round(pr.uptime_seconds)} s, ${bytes(pr.resident_memory_kb * 1000)} resident, ${pr.threads} threads, CPU ${pr.cpu_seconds && pr.cpu_seconds.user} s user / ${pr.cpu_seconds && pr.cpu_seconds.system} s system.</p>`}
       <h3>Host ${MODE(ho.mode)}</h3>${sect(ho) || html`<p class="note warn small"><b>${ho.scope}</b></p><p class="small">${ho.cpu_count} CPUs; load ${ho.load_average ? `${ho.load_average["1m"]} / ${ho.load_average["5m"]} / ${ho.load_average["15m"]}` : "unknown"}; memory available ${bytes(ho.memory_kb && ho.memory_kb.MemAvailable * 1000)} of ${bytes(ho.memory_kb && ho.memory_kb.MemTotal * 1000)}${ho.cpu_pressure_some ? `; CPU pressure (some) avg10 ${ho.cpu_pressure_some.avg10}` : ""}.</p>`}
-      <h3>Release ${MODE(rl.mode)}</h3><p>Running release (measured): <code>${R.deployed_sha || rl.sha || rl.checkout_sha || "not available"}</code> <span class="faint small">${rl.sha_source ? "from " + rl.sha_source : ""}</span></p>
+      <h3>Release ${MODE(rl.mode)}</h3>${R.deployed_sha || rl.sha || rl.checkout_sha ? html`<p>Running release (measured): <code>${R.deployed_sha || rl.sha || rl.checkout_sha}</code> <span class="faint small">${rl.sha_source ? "from " + rl.sha_source : ""}</span></p>` : claimBlock(R)}
       <p class="small faint">${rl.checkout_sha ? "" : "No git checkout (an archive was deployed), so the git commit is not measured. "}${rl.dir_sha ? "Release directory name: " + rl.dir_sha + "; matches the release marker: " + String(rl.dir_name_matches_release_marker) + ". " : ""}${rl.note || ""}</p>${buildBlock(R.build)}${workerSections(R)}
       <h3>Provider job receipts ${MODE(rs.mode)}</h3>${resBlock(rs)}</section>`;
   }
+  /* An archive deployment has no .git: the commit is the release directory's claim, checked only against the tree hash the release tool recorded. */
+  function claimBlock(R) {
+    const dc = (R.release && R.release.directory_claim) || {}; const c = dc.contents || {}; const sha = R.claimed_sha || dc.sha;
+    if (!sha) return html`<p>Running release: <b>not reported</b>. The deployed tree is not a git checkout and no release directory claim is present.</p>`;
+    return html`<p>Release directory claims commit <code>${sha}</code> <span class="pill st-unk">claim, not measured</span></p>
+      <p class="small">${c.checked ? html`Files on disk ${c.matches_recorded_tree ? "match" : html`<b>do NOT match</b>`} the git tree hash the release tool recorded (${c.files_hashed} files hashed in ${c.seconds} s; tree <code>${c.tree_sha_computed}</code>).` : "The files were not checked against the recorded tree hash."} ${dc.marker_matches_name === true ? "The release marker agrees with the directory name." : dc.marker_matches_name === false ? html`<b>The release marker disagrees with the directory name.</b>` : ""}</p>
+      <details><summary class="small">What this does and does not show</summary><p class="small">${c.meaning || ""} ${dc.label || ""} No git checkout exists in the deployment, so the commit itself is not measured.</p></details>`;
+  }
+
   function buildBlock(b) {
     if (!b || b.status === "unavailable") return "";
     if (b.status !== "reported") return html`<p class="small">${AUTHOR} Build info: <b>${b.status}</b>. ${b.reason || ""} ${b.note || ""}</p>`;

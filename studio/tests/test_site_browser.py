@@ -312,3 +312,21 @@ def test_accessibility_basics_on_every_view(browser, base):
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
         assert pg.evaluate(_AUDIT) == [], route
+
+
+def test_archive_release_is_a_claim_not_a_measurement_and_long_cells_are_clipped(browser, base):
+    """Regressions found on the live public site: an archive deployment reports claimed_sha, and declared artifact text can be thousands of characters."""
+    pg = page(browser)
+    pg.goto(base + "#/work")
+    pg.wait_for_selector("h1:has-text('System')")
+    out = pg.evaluate("""() => DF.liveSystem({report: {schema: 'frontier.system/1', generated_at: 'x', claimed_sha: '12eb390c255f362a546ab1b216f801814c1a75d5', deployed_sha: null,
+      release: {mode: 'measured', checkout_sha: null, sha: null, directory_claim: {sha: '12eb390c255f362a546ab1b216f801814c1a75d5', marker_matches_name: true, label: 'claim: dir name',
+      contents: {checked: true, matches_recorded_tree: true, files_hashed: 543, seconds: 0.05, tree_sha_computed: 'abc', meaning: 'm'}}}}}).toString()""")
+    assert "claim, not measured" in out and "12eb390c255f362a546ab1b216f801814c1a75d5" in out and "match" in out
+    assert "Running release (measured)" not in out
+    clipped = pg.evaluate("() => DF.clipCell('x'.repeat(3000)).toString()")
+    assert clipped.count("x") == 220 + 3000 and "show all (3000 characters)" in clipped and DF_short(pg)
+
+
+def DF_short(pg):
+    return pg.evaluate("() => DF.clipCell('short').toString() === 'short'")

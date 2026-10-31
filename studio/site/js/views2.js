@@ -315,6 +315,7 @@
     return html`<div class="rescard"><div class="resrow"><span class="vlabel">${st}</span> ${U.pill("simulated, encoded model only", "ev")} ${cb ? U.pill("independent check: " + (cb.independent_witness ? (cb.independent_witness.ok === true ? "passed" : "not passed") : "n/a"), cb.independent_witness && cb.independent_witness.ok === true ? "ok" : "st-unk") : ""} ${U.pill("Lean: not run online", "st-unk")}</div>
       <p>${line}</p>
       ${wit ? html`<p class="small witline"><b>Witness</b> ${Object.entries(wit).map(([k, x]) => html`<span class="wv">${k} = ${DF.exact(x)}</span>`)}</p>` : ""}
+      ${wit ? html`<p class="small faint">A witness value can sit at the solver's numerical domain cap (m up to 1000 kg, S up to 1000 m², b up to 100 m, V up to 300 m/s). Those caps are bounds for the search, not claims about any fish.</p>` : ""}
       ${Array.isArray(res.missing_parameters) && res.missing_parameters.length ? html`<p class="small"><b>Unset, so not evaluated:</b> ${res.missing_parameters.join(", ")}</p>` : ""}
       ${res.conflict ? html`<p class="small"><b>Conflict</b> <code>${[].concat(res.conflict).map((x) => (typeof x === "string" ? x : JSON.stringify(x))).join(", ")}</code></p>` : ""}
       ${Array.isArray(res.extrapolates_envelope) && res.extrapolates_envelope.length ? html`<p class="note warn small"><b>Extrapolates a source envelope:</b> ${res.extrapolates_envelope.join(", ")}</p>` : ""}
@@ -394,10 +395,16 @@
         const rows = DF.artifactIndex(snap);
         try { const r = await DF.api.artifacts({ limit: 50 }); rows.push(...DF.liveArtifacts(r.items)); } catch (e) { rows.push({ title: "Runtime artifacts could not be read", type: "document", source: e.message, context: "", check: "", dispute: "", next: "", error: true }); }
         const shown = rows.filter((r) => !want || r.type === want);
-        host.innerHTML = shown.length ? html`<div class="tablewrap"><table class="arttable"><thead><tr><th>Artifact</th><th>Type</th><th>Exact source</th><th>Context</th><th>Check</th><th>Dispute</th><th>Next action</th></tr></thead><tbody>${shown.map((r) => html`<tr><td>${r.doc ? U.src("doc:" + r.doc, r.title) : r.title}</td><td>${U.pill(r.type, "ev")}</td><td>${r.url ? U.ext(r.url, r.source) : r.source}</td><td>${r.context}</td><td>${r.check}</td><td>${r.dispute || ""}</td><td>${r.next}${r.download ? html` <a class="btn small ghost" href="${r.download}" target="_blank" rel="noopener noreferrer" download>Download file</a>` : r.doc ? "" : html` <span class="faint small">no downloadable file is declared</span>`}</td></tr>`)}</tbody></table></div>`.toString() : `<p class="empty">No ${esc(want || "")} artifact is indexed. Nothing is shown in its place.</p>`;
+        host.innerHTML = shown.length ? html`<div class="tablewrap"><table class="arttable"><thead><tr><th>Artifact</th><th>Type</th><th>Exact source</th><th>Context</th><th>Check</th><th>Dispute</th><th>Next action</th></tr></thead><tbody>${shown.map((r) => html`<tr><td>${r.doc ? U.src("doc:" + r.doc, r.title) : r.title}</td><td>${U.pill(r.type, "ev")}</td><td>${r.url ? U.ext(r.url, r.source) : r.source}</td><td>${clipCell(r.context)}</td><td>${clipCell(r.check)}</td><td>${clipCell(r.dispute || "")}</td><td>${clipCell(r.next)}${r.download ? html` <a class="btn small ghost" href="${r.download}" target="_blank" rel="noopener noreferrer" download>Download file</a>` : r.doc ? "" : html` <span class="faint small">no downloadable file is declared</span>`}</td></tr>`)}</tbody></table></div>`.toString() : `<p class="empty">No ${esc(want || "")} artifact is indexed. Nothing is shown in its place.</p>`;
       },
     };
   };
+  /* Long declared text stays available but does not take over the page: first 220 characters, the rest in a details element. */
+  function clipCell(text, n = 220) {
+    const t = String(text ?? ""); if (t.length <= n) return t;
+    return html`${t.slice(0, n)}… <details class="clip"><summary class="small">show all (${t.length} characters)</summary>${t}</details>`;
+  }
+  DF.clipCell = clipCell;
   const ROLE_TYPE = { input: "data", output: "data", code: "code", environment: "code", protocol: "protocol", log: "document", certificate: "proof", geometry: "geometry" };
   DF.artifactIndex = (snap) => {
     const rows = snap.mission.artifacts.map((a) => ({ ...a }));
