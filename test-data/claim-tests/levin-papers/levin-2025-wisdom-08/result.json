@@ -1,0 +1,28 @@
+{
+  "claim_id": "levin-2025-wisdom-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2025-wisdom-08",
+  "project": "levin-papers",
+  "status": "preregistered",
+  "hypothesis": "Among human disease genes in the Human Phenotype Ontology annotations, numerous ion-channel genes cause both structural patterning defects (craniofacial or limb malformation) and nervous-system phenotypes, and ion-channel disease genes carry patterning phenotypes more often than non-channel disease genes with the same depth of phenotype annotation.",
+  "pass_criterion": "Pre-registered: (a) at least 20 ion-channel genes (GO:0005216 ion channel activity or a descendant, any evidence, human GOA) are annotated in HPO genes_to_phenotype to both a patterning term (HP:0001999 Abnormal facial shape, HP:0000202 Orofacial cleft, HP:0001159 Syndactyly, HP:0010442 Polydactyly or HP:0009815 Aplasia/hypoplasia of the extremities, or any descendant) and a nervous-system term (HP:0000707 Abnormality of the nervous system or descendant); and (b) among all HPO-annotated genes, the Mantel-Haenszel odds ratio for carrying a patterning term, ion-channel vs non-channel genes, stratified by deciles of each gene's number of distinct HPO terms, is > 1.2 with one-sided Cochran-Mantel-Haenszel p < 0.05.",
+  "fail_criterion": "Pre-registered: fewer than 10 ion-channel genes meet (a); or the Mantel-Haenszel odds ratio is < 0.8 with p < 0.05 for depletion and fewer than 20 genes meet (a). Any other outcome (e.g. >= 20 such genes but no depth-adjusted enrichment, or enrichment with 10-19 genes) is pre-registered as 'mixed'.",
+  "planned_datasets": [
+    "HPO genes_to_phenotype.txt (https://github.com/obophenotype/human-phenotype-ontology/releases/latest/download/genes_to_phenotype.txt)",
+    "HPO ontology hp.obo (https://purl.obolibrary.org/obo/hp.obo)",
+    "GO basic ontology (https://purl.obolibrary.org/obo/go/go-basic.obo)",
+    "Human GO annotations goa_human.gaf.gz (https://current.geneontology.org/annotations/goa_human.gaf.gz)"
+  ],
+  "interpretation": "Only the first clause is tested: 'numerous channelopathies that result in patterning defects'. 'Channelopathy' is a human disease gene (any HPO annotation) whose product has GO ion channel activity (GO:0005216, any evidence code, NOT-qualified lines removed). 'Patterning defect' is mapped to five HPO structural-malformation branches of the face and limbs, chosen because they are the craniofacial and limb patterning outcomes Levin's cited examples emphasise; brain malformations are deliberately excluded because they are also nervous-system phenotypes and would make the overlap circular. 'Numerous' is fixed at >= 20 genes. The link to neuroscience is operationalized as co-annotation with a nervous-system phenotype, and the 'deep symmetry' as enrichment of patterning phenotypes in channel genes relative to other disease genes after controlling for how heavily each gene is phenotyped (HPO term count deciles), since syndromic genes accumulate many terms. The second clause (neuroscience tools such as drugs, optogenetics and training applied to morphogenesis) is not in these databases and is not tested.",
+  "test_contract": {
+    "expected_observation": ">= 20 ion-channel genes with both a face/limb malformation and a nervous-system phenotype in HPO, and a depth-adjusted odds ratio > 1.2 (p < 0.05) for patterning phenotypes in channel vs non-channel disease genes.",
+    "disconfirming_observation": "Fewer than 10 such channel genes, or channel genes depleted for patterning phenotypes (MH OR < 0.8, p < 0.05) while fewer than 20 channel genes have them.",
+    "admissible_datasets": "Curated human gene-phenotype annotations (HPO, built from OMIM and Orphanet) and a gene-function annotation defining ion channels independently of phenotype (GO molecular function). Must not be the review's own Table 1 or cited references; current public releases with checksums.",
+    "inference_method": "Count channel genes co-annotated to patterning and nervous-system branches (with ontology descendants); Mantel-Haenszel odds ratio and one-sided CMH test for patterning annotation, channel vs non-channel, over deciles of distinct-HPO-term count; thresholds as in pass/fail criteria."
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
