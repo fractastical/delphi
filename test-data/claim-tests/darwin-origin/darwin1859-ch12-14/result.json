@@ -1,0 +1,35 @@
+{
+  "claim_id": "darwin1859-ch12-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-14",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "In well-documented regional floras, vascular plant species naturalised in a region belong to genera that have no native species there more often than do the species that have naturalised elsewhere in the world but not in that region (the pool of proven colonists that could have joined it).",
+  "pass_criterion": "Pre-registered: using WCVP (World Checklist of Vascular Plants, Kew) accepted non-hybrid species and their non-doubtful TDWG level-3 distribution records, for each of 24 fixed regions R: native genera G_R = genera with >= 1 species recorded native (introduced = 0, extinct = 0) in R; naturalised set N_R = species recorded introduced in R and not native in R; pool P_R = species recorded introduced in >= 1 other level-3 region and with no record (native or introduced) in R. 'Novel' = genus not in G_R. Odds ratio OR_R = odds(novel | N_R) / odds(novel | P_R), Fisher exact test one-sided in each direction. Regions with |N_R| < 50 are dropped. SUPPORTS if, among the remaining regions, at least two thirds have OR_R > 1 with one-sided p < 0.05 (naturalised species over-represented in genera absent from the native flora).",
+  "fail_criterion": "Pre-registered: REFUTES if at least two thirds of the remaining regions have OR_R < 1 with one-sided p < 0.05 (naturalised species significantly more likely than the colonist pool to have native congeners). Any other outcome is MIXED. If fewer than 12 regions remain the result is inconclusive (underpowered); if WCVP cannot be downloaded, inconclusive (data-unavailable). The fraction of naturalised species in novel genera (Darwin's and de Candolle's 'large proportion ... distinct genera') is recorded per region as a descriptive statistic and does not enter the verdict.",
+  "planned_datasets": [
+    "wcvp-kew-checklist"
+  ],
+  "interpretation": "Darwin's 'not closely allied to the aboriginal inhabitants ... belonging in a large proportion of cases ... to distinct genera' is read at the genus level (the level de Candolle used): a naturalised species is 'closely allied' to the natives if its genus has a native species in the region. The claim is comparative in substance (closely allied species 'tend to keep separate'), so the test compares naturalised species with a colonist pool rather than with zero; the pool is all species proven able to naturalise somewhere, which controls for the fact that only some plants become weeds at all. WCVP 'introduced' records are taken as naturalised occurrences. Restricted to vascular plants, the group de Candolle and Darwin discussed; animals are out of scope of this test. The 24 regions are TDWG level-3 units with well-documented floras on every continent and oceanic islands: NZN, NZS, HAW, GRB, IRE, FRA, GER, SPA, ITA, CAL, TEX, FLA, NSW, VIC, WAU, TAS, CPP, CLC, AGE, JAP, MAU, REU, CNY, AZO; codes absent from WCVP are dropped and reported.",
+  "test_contract": {
+    "expected_observation": "Species naturalised in a region are more often in genera absent from its native flora than proven colonists that did not naturalise there.",
+    "disconfirming_observation": "Naturalised species are as likely or significantly more likely than the colonist pool to belong to genera already native to the region.",
+    "admissible_datasets": "A global, expert-curated vascular plant checklist that codes native versus introduced status per region on a fixed geographic scheme, compiled independently of Darwin and de Candolle; open licence; regions with at least 50 naturalised species.",
+    "inference_method": "Per region, Fisher exact test of genus novelty (genus without native species in the region) for naturalised species versus the pool of species naturalised elsewhere but absent from the region; verdict from the share of regions significant (p < 0.05) in each direction, two-thirds threshold."
+  },
+  "preregistration": {
+    "wcvp_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+    "regions_l3": ["NZN", "NZS", "HAW", "GRB", "IRE", "FRA", "GER", "SPA", "ITA", "CAL", "TEX", "FLA", "NSW", "VIC", "WAU", "TAS", "CPP", "CLC", "AGE", "JAP", "MAU", "REU", "CNY", "AZO"],
+    "species_filter": "taxon_rank == Species, taxon_status == Accepted, no genus or species hybrid marker",
+    "distribution_filter": "location_doubtful == 0",
+    "min_naturalised_per_region": 50,
+    "min_regions": 12,
+    "alpha_one_sided": 0.05,
+    "region_share_threshold": 0.6667
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
