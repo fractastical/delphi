@@ -1,0 +1,40 @@
+{
+  "claim_id": "darwin1859-ch11-14",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch11-14",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "The vascular-plant floras of high tropical mountains share a few identical species and many more genera with the temperate lowland floras of both hemispheres, and they share more genera with those temperate floras than the tropical lowlands at the foot of the same mountains do; the temperate lowland floras of the two hemispheres are likewise related at the genus level beyond what tropical lowlands share with them.",
+  "pass_criterion": "Pre-registered. Regions: 4 tropical high-mountain regions M (GBIF records with elevation >= 3500 m in the N Andes and Trans-Mexican volcanic belt, >= 3000 m in the East African mountains and New Guinea highlands), their 4 tropical-lowland controls C (same bounding box, elevation <= 800 m), 3 northern (N) and 3 southern (S) temperate lowland regions L (elevation <= 600 m). Species/genus present if >= 3 records. For a pair (X, L): f_sp = |species(X) ∩ species(L)| / |species(X)|, f_gen = |genera(X) ∩ genera(L)| / |genera(X)|. SUPPORTS requires all of: (A) in >= 20 of the 24 (M, L) pairs, 0 < f_sp < 0.5 f_gen (identical species exist but are the minority of allied relationships); (B) in >= 20 of 24 (M, L) pairs f_gen(M, L) > f_gen(C_M, L) (one-sided binomial sign test vs 0.5, p < 0.01); (C) in >= 7 of the 9 (N, S) pairs f_gen(N, S) exceeds the mean over k of f_gen(C_k, S).",
+  "fail_criterion": "Pre-registered: REFUTES if (B) holds in <= 12 of 24 pairs or (C) holds in <= 4 of 9 pairs. Any other combination is MIXED. If any mountain region yields fewer than 50 species, that region is dropped; with fewer than 3 mountain regions remaining the result is inconclusive (underpowered).",
+  "planned_datasets": ["gbif-occurrence-search-api"],
+  "interpretation": "'Plants' = Tracheophyta (GBIF phylum key 7707728). 'Lofty mountains' including tropical ones = GBIF records above 3500 m (3000 m for Africa and New Guinea, whose summits are lower and more sparsely recorded) inside fixed tropical bounding boxes. 'Temperate lowlands of the northern and southern hemispheres' = fixed lowland boxes at 41-55 N and 34-55 S. 'Identically the same' = same GBIF backbone species; 'specifically distinct though related' = different species in the same genus (Darwin's own unit of alliance). Because 'remarkable' relatedness needs a reference, the tropical lowlands at the foot of each mountain range are the pre-registered control: Darwin's glacial-dispersal explanation implies the alpine flora, not the surrounding tropical lowland flora, is the one allied to temperate floras. Introduced species cannot be excluded from GBIF occurrence data; this inflates species identity (A) and is listed as a caveat.",
+  "datasets": [],
+  "method": "",
+  "measured": {},
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-bdd1", "date": "2026-10-31" },
+  "preregistration": {
+    "taxon_key": 7707728,
+    "min_records": 3,
+    "basis_of_record_excluded": ["FOSSIL_SPECIMEN", "LIVING_SPECIMEN"],
+    "year_range": "1900,2026",
+    "regions": {
+      "M-andes": { "type": "tropical-mountain", "bbox": [-79, -5, -72, 7], "elevation": [3500, 9000], "control": "C-andes" },
+      "C-andes": { "type": "tropical-lowland-control", "bbox": [-79, -5, -72, 7], "elevation": [0, 800] },
+      "M-mexico": { "type": "tropical-mountain", "bbox": [-100, 18.5, -97, 20], "elevation": [3500, 9000], "control": "C-mexico" },
+      "C-mexico": { "type": "tropical-lowland-control", "bbox": [-100, 18.5, -97, 20], "elevation": [0, 800] },
+      "M-eastafrica": { "type": "tropical-mountain", "bbox": [29, -4, 38, 4], "elevation": [3000, 9000], "control": "C-eastafrica" },
+      "C-eastafrica": { "type": "tropical-lowland-control", "bbox": [29, -4, 38, 4], "elevation": [0, 800] },
+      "M-newguinea": { "type": "tropical-mountain", "bbox": [137, -7, 148, -3], "elevation": [3000, 9000], "control": "C-newguinea" },
+      "C-newguinea": { "type": "tropical-lowland-control", "bbox": [137, -7, 148, -3], "elevation": [0, 800] },
+      "N-europe": { "type": "north-temperate-lowland", "bbox": [6, 51, 20, 54.5], "elevation": [0, 600] },
+      "N-neamerica": { "type": "north-temperate-lowland", "bbox": [-85, 41, -70, 46], "elevation": [0, 600] },
+      "N-neasia": { "type": "north-temperate-lowland", "bbox": [125, 35, 142, 45], "elevation": [0, 600] },
+      "S-patagonia": { "type": "south-temperate-lowland", "bbox": [-75, -55, -63, -38], "elevation": [0, 600] },
+      "S-newzealand": { "type": "south-temperate-lowland", "bbox": [166, -47, 179, -34], "elevation": [0, 600] },
+      "S-seaustralia": { "type": "south-temperate-lowland", "bbox": [140, -44, 149, -37], "elevation": [0, 600] }
+    }
+  }
+}
