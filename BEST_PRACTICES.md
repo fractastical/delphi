@@ -38,6 +38,15 @@ is the default route to a published claim:
 - **`assessor != builder`.** The model or agent that built something never scores it.
 - **AI-audited is not expert-validated.** Only describe a finding as validated by an expert
   if a human validation record exists.
+- **At least two assessor providers, none the builder's.** If an assessor's provider fails
+  or stalls, publish with the providers that completed, provided at least two remain, and
+  record the dropped assessor in the commit message and the summary. Never fill its place
+  with the builder's model.
+- **Assessors work blind.** Give them only the claim, its quote, the rubric and the source
+  text, never the builder's own triage or another assessor's output.
+- **A changed rubric is a new rubric version.** Change the version (and its concept IRI)
+  whenever any question, anchor or weight wording changes; scores under different
+  versions are not pooled.
 - When the loop does not fit (a pre-registration, an ontology or template change, an
   inventory or entity nanopub), say so in the nanopub's provenance or the manifest, and
   still apply sections 2–8.
@@ -72,6 +81,16 @@ Use `--extracted` for claims extracted from a paper's text, and `--exempt <file>
 claims with no empirical input (claim IRI, tab, reason). Also open a few signed TriG files
 by hand, chosen at random rather than the first few.
 
+- **Model-proposed identifiers are checked mechanically.** Every URL or DOI an extractor or
+  assessor proposes is resolved by script before publication. One that does not resolve is
+  dropped and listed in a `dropped-*.json` report, even if the site is real but blocks
+  automated requests.
+- **Editing model output.** If text written by a model has to change to pass lint, keep the
+  raw output file untouched, record the edit (old text, new text, reason) in an
+  `edits.json` that the build applies and fails on if the old text no longer matches, and
+  never change the meaning. Do not invent a number to satisfy a lint rule: if the source
+  gives no exact value, drop the number from the text.
+
 ## 3. Publish to the test registry first
 
 As soon as a batch is signed and passes section 2, publish all of it to the test registry
@@ -105,7 +124,16 @@ to production as soon as it passes sections 2 and 3. Its outcome follows the nor
 
 - **Every claim names each dataset it used** with `prov:used delphir:dataset/<id>`. A claim
   extracted from a paper cites the paper with `prov:wasDerivedFrom` its `https://doi.org/` IRI.
-- **Pin versions**: input file SHA-256 or dataset version, and the generator's commit.
+- **Claims from a book or other work without a DOI** cite the edition's Wikidata item, or,
+  if the edition has none, its digitised edition page linked to the Wikidata item for the
+  work. Vendor the exact text file, pin its SHA-256, and give each claim a **verbatim**
+  quote with a line locator into that file (RFC 5147 `#line=a,b`). The build fails if any
+  quote is not found verbatim. Transcriber artefacts (page markers such as `{12}`,
+  footnote markers such as `[3]`) are removed from both quote and text before matching.
+  Record the claim as the author made it, even when modern science considers it wrong.
+- **Pin versions**: input file SHA-256 or dataset version, and the generator's commit. The
+  commit must be pushed and the tree clean for the files the generator reads before
+  anything is signed, so every commit-pinned link in provenance resolves.
 - **Put sample sizes in structured triples**, not only in labels.
 - **Cite secondary sources separately** from the primary data.
 - **State results in the nanopub**: the hypothesis, the pre-registered pass criterion, the
@@ -169,6 +197,19 @@ Use the canonical namespaces from
   `delphi:usesModel` a `delphi:LanguageModel`, and `prov:wasDerivedFrom` for sources. Do not
   emit the deprecated `delphi:Model`, `delphi:assessedBy`, `delphi:derivedFromPaper`, or
   `delphi:Paper`.
+- **Formulas and Lean live on a law concept, not on the claim.** Follow the upstream
+  [formal-verification convention](https://github.com/fractastical/project-delphi-ontology/blob/main/ONTOLOGY.md#formal-verification-convention-v13):
+  each mathematical law is a `delphi:Concept` (`delphir:math-law/<id>`) in its own nanopub,
+  carrying the formula as `skos:notation` (LaTeX), the Lean 4 source as `skos:definition`
+  typed `delphi:lean4`, `delphi:leanDeclaration` / `delphi:leanTheorem` /
+  `delphi:leanVerified`, and commit-pinned `rdfs:seeAlso` links to the Lean module. The
+  claim is linked to it with `<claim> dct:conformsTo <law>`, asserted in the concept's
+  nanopub, so adding a formula or proof never requires republishing a signed claim. Set
+  `leanVerified true` only if the kernel accepted the module with no `sorry` and no added
+  axioms. The Lean statement must encode the stated law, with its physical assumptions as
+  explicit hypotheses (see stub proofs in section 2); whether it is a faithful rendering is
+  an assessment question for an assessor from a different provider than the one that wrote
+  the Lean.
 - **Model agreement is not replication.** Two models agreeing is not independent
   experimental evidence.
 - **Never mint `example.org`, `urn:pkg:`, or `w3id.org/probknow/...` IRIs** in new nanopubs.
