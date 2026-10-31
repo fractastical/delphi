@@ -32,7 +32,8 @@ no negative-search receipt with a stated scope. Either say "we have not found on
 | Claim | Level | Receipt | Status |
 |---|---|---|---|
 | Textbook Turing criterion's finite-domain error is **windowed, not monotone**: exactly 0.0% at every half-integer multiple of λc; 6.22% at 1.25 λc; **0.58% still at 4.25 λc** (prior Dv/Du log-uniform [1,30]) | C | `bench/mispredication/probe_declared_prior.out` on `origin/codex/resource-utilization-20261031` | **Earned**, with the toy-ensemble limit stated |
-| Our own claim *"reliable (under 1%) above 1.5 critical wavelengths"* is **withdrawn** | C | `bench/mispredication/README.md` correction notice, 2026-10-31 | **Earned** — the strongest single artifact |
+| Our own claim *"reliable (under 1%) above 1.5 critical wavelengths"* is **withdrawn** | C | `bench/mispredication/README.md` correction notice, 2026-10-31 12:05 PDT | **Earned** — the strongest single artifact |
+| The historical mispredication table was **imported in the seed commit**, not produced during the event; its generating script is not in the repository | C | `636919a` *"Seed Delphi Frontier with the verified artifacts"*, 07:52 PDT; README limit (1) | **Must be stated** — claiming it as event work is false and `git log` shows it |
 | Probe committed **before** its output; scratch-run motivation disclosed | C | `bench/mispredication/PROBE_DECLARATION.md` | **Earned** |
 | Band criterion vs direct eigenvalues: **3,000 comparisons, 0 disagreements** | C | `probe_declared_prior.json` `band_equals_direct_eigenvalues` | **Earned** (cross-check control passed) |
 | Declared control **failed** (89.53% vs declared >90%), threshold not moved, run shipped at exit 1 | C | `probe_declared_prior.out` `PY_EXIT=1`; Amendment 1 in `PROBE_DECLARATION.md` | **Earned** |
@@ -53,7 +54,7 @@ baseline beat us 96/100 vs 78/100. Keeping these is what makes the Turing result
 
 | Claim | Level | Receipt | Status |
 |---|---|---|---|
-| Agent B falsified agent A's **published** claim through the written commons; no coordinator adjudicated the verdict | C | correction notice + `PROBE_DECLARATION.md` authored by the critic | **Earned — one instance** |
+| An agent falsified a claim the team had **seeded** into the commons; no coordinator adjudicated the verdict | C | correction notice + `PROBE_DECLARATION.md` authored by the critic. Seed `636919a` 07:52 PDT; probe/withdrawal `e4ab195`/`b9f603b`/`81ca466` 12:05 PDT, all 2026-10-31 | **Earned — one instance, event work** |
 | Review status is **node-local and separate** from the record: a record carries `local_status`, acceptance needs an independent operator elsewhere | M | `read_search_anonymous.json` (`"local_status": "imported_unreviewed"`); `capabilities.json` (*"there is no review/accept tool"*) | **Earned** |
 | Each MCP request authenticates as **its own principal**; the server holds no shared token | M | `capabilities.json`: `"principal": null`, *"the server holds no shared token"* | **Earned** |
 | Agents coordinate through the claim graph rather than a dispatcher | — | — | **MISSING as a general claim.** Much of today's work *was* root-dispatched. The one instance above is real; the architecture-wide claim is not measured |
@@ -112,6 +113,43 @@ verification asymmetry.
 The recipe is `docs/research/mcp-reuse-recipe.md`. It is written to be executable by a stranger
 with curl and nothing else. **It has not been given to anyone**, because outreach is not
 authorized.
+
+---
+
+## Generative roadmap — NOT BUILT
+
+Full document with read-levels: `docs/research/generative-roadmap.md`. Page copy: `#/generative`.
+
+| Item | Level | Status |
+|---|---|---|
+| Synthetic datasets generated, models trained, candidates proposed, candidates solver-screened, real experiments, GPU hours | — | **0 / 0 / 0 / 0 / 0 / 0** |
+| Diffusion surrogate for a mechanistic **agent-based** biological model (CPM, in vitro vasculogenesis, ~22x) | — | **Published by Comlekoglu et al.**, arXiv:2505.09630, DOI 10.1088/2632-2153/ae11f8. Stages 1-2 of our roadmap are their result. Read-level: abstract |
+| Physics residuals inside diffusion training | — | **Published by Bastek, Sun, Kochmann**, arXiv:2403.14404, ICLR 2025. Read-level: search-summary |
+| Conditional score-based diffusion over simulator statistics | — | **Published as GenCFD**, arXiv:2409.18359. Read-level: search-summary |
+| Generate → filter → exact-solver gate | — | **Published across several domains, 2025-26.** Read-level: search-summary, no full texts read |
+| H1: a withdrawn claim identifies its own derived synthetic data | — | **Hypothesis.** One web search found no prior art; that is a lead, **not** a demonstration of absence |
+| H2: the exact solver carries its own scope conditions | — | **Hypothesis**, motivated by our own windowed-error measurement |
+
+**Forbidden:** "first diffusion model for synthetic biology", and any IP claim. The architecture is
+published end to end and a judge who knows the literature catches it immediately.
+
+---
+
+## Event work vs brought in — the System page constraint
+
+| Component | Verdict | Evidence |
+|---|---|---|
+| Frontier store, HTTP adapter, MCP, public site | **Built during the event** | repo's first commit `c508a423` 2026-10-31 07:49:44 PDT; **all 508 commits dated 2026-10-31** |
+| Mispredication probe, its failed control, the withdrawal | **Event work** | `e4ab195`, `b9f603b`, `81ca466`, all 12:05 PDT 2026-10-31 |
+| The historical mispredication table | **IMPORTED, not event work** | arrived in seed commit `636919a` 07:52 PDT, *"Seed Delphi Frontier with the verified artifacts"*; its generating script is **not in the repository** |
+| The claims corpus (1,190 with upstream ids) | **Imported** | `frontier_catalogue`; records read `local_status: imported_unreviewed` |
+| morphoswarm repository | **PRE-EVENT** | first commit 2026-10-20, eleven days earlier. **Must not be narrated on the System page as event work** |
+
+**Store facts re-read from source, not from memory:** `KINDS` holds **eleven** record types
+(Problem, Claim, Evidence, Assessment, Action, Actor, ResourceOffer, Interest, Event, Project,
+Annotation) — I had written "nine" from memory and it was stale. The licence gate has **four**
+call sites (`store`, `serve`, `export`, `import`). The Assessment validator requires **all seven**
+named dimensions.
 
 ---
 

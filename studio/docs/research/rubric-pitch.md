@@ -24,10 +24,10 @@ worker's message, not re-run by me). Nothing untagged goes on a slide.
 > simulations **with no credential at all** — one HTTP POST, no account, no token. Writes need a
 > credential; reads and calculations do not. `[measured here]`
 >
-> And it works on us. One of our own agents published a claim: that above about 1.5 critical
-> wavelengths, the textbook Turing criterion predicts pattern formation reliably — under 1% error.
-> A *different* agent attacked it with a probe committed **before** its output existed, and found
-> the claim was an artifact of where we sampled. We had only tested at half-integer multiples of
+> And it works on us. We brought a claim into the commons at the start of the event: that above
+> about 1.5 critical wavelengths, the textbook Turing criterion predicts pattern formation
+> reliably — under 1% error. Four hours later one of our agents attacked it with a probe committed
+> **before** its output existed, and found the claim was an artifact of where we sampled. We had only tested at half-integer multiples of
 > the critical wavelength, where the error is exactly zero by construction. Between those points
 > it is **6.2%**, and it never goes away — still **0.58%** at 4.25 wavelengths. The claim is now
 > formally **withdrawn** in the artifact itself, historical table kept, correction attached.
@@ -43,8 +43,21 @@ worker's message, not re-run by me). Nothing untagged goes on a slide.
 > **What we have not shown:** that the collective beats one agent at matched budget. That
 > comparison is preregistered and running. It has no result yet, and we are not going to pretend
 > it does.
+>
+> **Where this goes.** The simulators that run on that endpoint are a data generator. Sweep them
+> across knob ranges taken from sourced claims, train a conditional generator on the sweeps, and
+> use it to propose candidates that an exact solver then has to reject. **None of that is built —
+> zero datasets, zero models trained — and every piece of it is already published**, by
+> Comlekoglu and colleagues for diffusion surrogates of agent-based biological models, by Bastek
+> and colleagues for physics residuals inside diffusion training, by GenCFD for conditional
+> diffusion over simulator statistics. What we would add is small: the synthetic data carries the
+> version of the claim that licensed its equation, so a **withdrawal propagates into the training
+> set** — and the solver doing the rejecting carries its own scope conditions, because we measured
+> one that is wrong in windows.
 
-**Timing:** ~95 seconds read aloud. Cut the probe's failed control (3rd paragraph) for 90.
+**Timing:** ~95 seconds without the roadmap paragraph, ~125 with it. **Use the short version for a
+90-second slot** and keep the roadmap for the Q&A or a funding conversation; it is a direction, not
+a result, and it must not displace the evidence.
 
 **What this story claims, exactly:** a working public commons, a real scope condition found on a
 classical criterion by cross-agent review, and an honest pending state on the collective question.
@@ -117,12 +130,18 @@ Show, in this order:
    **6.22%** at 1.25 λc and still **0.58%** at 4.25 λc.
 5. `probe_declared_prior.out`: `"x0.1_over_90pct": false` ... `CONTROL FAILED` ... `PY_EXIT=1`.
 
-**Say:** "The reliability we claimed was a property of our grid, not of the criterion. A different
-agent found it, the claim is withdrawn in place, and the probe that found it shipped with its own
-control failing at 89.53% against a declared 90% — because moving the threshold would have been
-the dishonest fix."
+**Say:** "The reliability we claimed was a property of our grid, not of the criterion. We seeded
+that claim into the commons at 07:52 this morning; an agent falsified it at 12:05, the claim is
+withdrawn in place, and the probe that found it shipped with its own control failing at 89.53%
+against a declared 90% — because moving the threshold would have been the dishonest fix."
 
-`[committed receipt: PROBE_DECLARATION.md, probe_declared_prior.out, README.md]`
+> **Say the two timestamps.** The historical mispredication table was **imported** in the seed
+> commit, not produced during the event, and its generating script is not in the repository. The
+> probe, the failed control and the withdrawal are all event work. Claiming the table as event
+> work would be false and is trivially checkable with `git log`.
+
+`[committed receipt: PROBE_DECLARATION.md, probe_declared_prior.out, README.md; seed 636919a
+2026-10-31 07:52 PDT, probe/withdrawal e4ab195, b9f603b, 81ca466 all 12:05 PDT]`
 
 ### 2:30-3:00 — What is real, and what is not
 
@@ -151,11 +170,12 @@ one."
 | 0:00 catalogue nulls | Execution 10, Impact 25 | A running service that returns `null` where it has no typed field |
 | 0:35 anonymous compute | Collaboration +10, Execution 10 | A third party can obtain a result with no account |
 | 1:15 write refused | Execution 10 | The negative control for the beat before it |
-| 1:35 withdrawn claim | **Decentralized Agency 20, Collective Capability 25** | Agent B falsified agent A's published claim; no coordinator ruled on it |
+| 1:35 withdrawn claim | **Decentralized Agency 20, Collective Capability 25** | An agent falsified a claim the team had seeded; no coordinator ruled on the verdict |
 | 2:30 honest column | Impact 25, Significance 20 | Failed and cancelled jobs kept in the receipt table |
 
 **The 1:35 beat is doing the heavy lifting for 45% of the score.** It is a single instance, not a
-curve, and §4 Q2 says so out loud before a judge has to ask.
+curve; the falsified claim was seeded rather than produced by an agent; and §4 Q2 says both out
+loud before a judge has to ask.
 
 ---
 
@@ -204,8 +224,9 @@ the continuum criterion's error is not monotone in domain length and does not va
 lengths — it is **windowed**, exactly zero at half-integer multiples of the critical wavelength and
 non-zero between them, 6.22% at 1.25 λc and 0.58% still at 4.25 λc. The honest framing is that
 this is a **toy ensemble** with a declared prior; it says nothing about how often real Turing
-systems mispredict, nothing about nonlinear outcomes, and nothing about any organism. Its value is
-that it falsified our own published claim.
+systems mispredict, nothing about nonlinear outcomes, and nothing about any organism. Its value is that an agent
+falsified our own claim during the event, and that the generating script for the original table is
+not in the repository — which is itself one of the three limits the correction notice records.
 
 **Q6. "Did an AI solve Navier-Stokes?"**
 
@@ -218,7 +239,44 @@ Wikipedia describes it as proposed, and the Clay Institute still lists the probl
 calculations work, and there is a one-page recipe (`mcp-reuse-recipe.md`). Until another team runs
 it and we hold their receipt, it counts for nothing and we will say so.
 
-**Q8. "Why should I believe your counts?"**
+**Q8. "What would you do with funding?"**
+
+Turn the simulators into a data generator: sweep them over knob ranges taken from sourced claims,
+train a conditional diffusion model or latent operator on the sweeps, propose inverse candidates,
+and gate them on an exact solver and then on real experiments. **Nothing of this is built** — zero
+datasets, zero trained models, zero screened candidates, zero GPU hours.
+
+**And the architecture is not ours.** Comlekoglu et al. (arXiv:2505.09630, *Mach. Learn.: Sci.
+Technol.*) already trained a DDPM surrogate for a **Cellular-Potts model** of in vitro
+vasculogenesis at ~22x speedup — that is the forward half of our pipeline, in biology, on the same
+class of model we run. Bastek, Sun and Kochmann (ICLR 2025) published physics residuals inside
+diffusion training. GenCFD published conditional score-based diffusion over simulator statistics.
+Generate-then-verify with a solver gate is a 2025-26 literature across several domains. **We will
+not claim a first in diffusion for synthetic biology, and we are not asserting any IP position.**
+
+What we would add is narrow: every synthetic datum carries the version hash of the claim whose
+equation licensed it, so a withdrawn claim identifies its own derived data and the models trained
+on it; and the exact solver carries scope conditions, because we have measured a textbook
+criterion that is wrong in windows. One web search found no prior art for retraction propagating
+into derived synthetic data — **that is a lead, not a proof that nobody has done it.**
+
+Full version with read-levels: `docs/research/generative-roadmap.md`.
+
+**Q9. "Isn't that circular? You train on your simulator and verify with your own solver."**
+
+**Yes, and we will say so before you do.** Everything upstream of a wet-lab measurement is
+model-consistency checking, not biology. The circularity is not removed by solver rigour; it is
+broken only by real experiments, which we have not done. The same objection is already live in the
+literature — a reviewer note on a diffusion-based electromagnetic inverse-design paper raises it,
+and the standard reply is that one forward solver for both is common practice, which is a
+description of the convention rather than a defence of it.
+
+What the commons adds is that the circularity is **declared**: the claim that licensed the
+equation, its review status and its scope conditions ride along with the generated data, so a
+reader can see which model's consistency was checked. That is worth something. It is not worth
+calling a validated result.
+
+**Q10. "Why should I believe your counts?"**
 
 Do not. Run `frontier_catalogue` yourself against `https://frontier.morphoswarm.ai/mcp` with no
 credential, from your laptop, right now. Every count on our slides comes from that call, and the
@@ -230,6 +288,9 @@ call reports its own unknowns as `null`.
 
 - No "we built a novel multi-agent architecture." Prior art is published and a judge who knows it
   catches us in two minutes.
+- No "first diffusion model for synthetic biology", and **no IP claim of any kind** on the
+  generative roadmap. Comlekoglu et al. published the diffusion-surrogate-for-biological-ABM
+  result; the roadmap is a direction we have not built.
 - No swarm-gain assertion without the matched-budget run.
 - No "printed forms" — no physical print has occurred; the phrase is **print-ready meshes**.
 - No count of agents as a capability claim. Agent count earns nothing.
