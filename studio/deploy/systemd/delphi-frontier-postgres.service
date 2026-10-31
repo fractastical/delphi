@@ -1,0 +1,20 @@
+# Dedicated PostgreSQL 16 INSTANCE for Delphi Frontier (own data, socket and config; Unix-socket only). USER unit, like the other morphoswarm services.
+# NOT INSTALLED by the branch that added it. Prepare first with deploy/postgres/init-cluster.sh; install steps are in docs/runtime.md.
+[Unit]
+Description=Delphi Frontier PostgreSQL 16 (dedicated instance, Unix socket only)
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/postgresql/16/bin/postgres -D /data/services/delphi-frontier/pgdata
+KillSignal=SIGINT
+TimeoutStopSec=90
+Restart=on-failure
+RestartSec=5
+UMask=0077
+MemoryMax=2G
+MemorySwapMax=0
+TasksMax=64
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=default.target

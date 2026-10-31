@@ -1,0 +1,33 @@
+{
+  "schema": "frontier.site.design-review-prompts/1",
+  "note": "Source-only review prompts written from this repository's own project projection and model-coupling report. They are not challenges by reviewers, not new findings and not biological observations. Replace them with Project records and real annotations when the node serves them.",
+  "dimensions": ["biology", "geometry", "aerodynamics", "genotype_bridge", "manufacturing", "materials", "physiology", "behavior", "ecology", "validation", "other"],
+  "evidence_basis": ["observed", "source", "simulation", "formal", "assumption", "unknown"],
+  "meaning": "A design review is an authored, falsifiable challenge attached to one exact Project version. It is not a vote, consensus score, answer, scientific adjudication or project resolution. A reply does not change the challenged Project.",
+  "source_prompts": [
+    {"id": "load-to-beam", "dimension": "aerodynamics", "scale": "organ", "title": "Fin-beam load bridge is scenario-level",
+     "observation": "The organ panel calls the fin-beam model a scoped elastic surrogate. docs/model-coupling.md marks the load-to-beam bridge scenario-level: mean lift-pressure proxy times a declared tributary width, a declared ray-length fraction and an assumed EI. There is no calibrated fin stiffness or measured ray pressure.",
+     "ask": "Which loading regime and measured stiffness would falsify this bridge?",
+     "source": "docs/model-coupling.md; site/content/projects.json"},
+    {"id": "notch-delta-stiffness", "dimension": "genotype_bridge", "scale": "cellular", "title": "Notch/Delta to fin stiffness is refused",
+     "observation": "The coupling report refuses the Collier Notch/Delta to fin-stiffness bridge: there is no mapping, and the transfer spans cell-to-organ and taxon contexts.",
+     "ask": "What exact, context-matched developmental or tissue measurement would be required before this counts as a biological bridge?",
+     "source": "docs/model-coupling.md"},
+    {"id": "daane-transfer", "dimension": "genotype_bridge", "scale": "developmental", "title": "Zebrafish interaction phenocopies fin proportion; transfer to halfbeaks unestablished",
+     "observation": "The Daane 2021 zebrafish interaction phenocopies flying-fish fin proportion, but transfer to halfbeaks is unestablished and no developmental model connects adult proportions to a program.",
+     "ask": "Which test separates correlation from the asserted genotype-to-fin pathway, with exact source and model pins?",
+     "source": "site/content/projects.json; docs/model-coupling.md"},
+    {"id": "release-convention", "dimension": "aerodynamics", "scale": "organism", "title": "Glide release convention drives much of the range",
+     "observation": "The glide report uses a release at 1.5 times stall speed from 1 m, equivalent to release heights from about 1.8 m to 32.6 m. It says this convention drives much of the range and is a model artifact.",
+     "ask": "Compare a sourced fixed-speed or fixed-height release; what observable would reject either?",
+     "source": "engineering/simulation/results/summary.json; site/data/snapshot.json (glide findings)"}
+  ],
+  "general_prompts": [
+    {"dimension": "biology", "text": "Identify which measured animal, life stage and loading regime justify the modeled fin stiffness; if none is pinned, say unknown and propose a test."},
+    {"dimension": "geometry", "text": "Challenge a ray-to-fin mapping at a specific Project member and cite an exact mesh or source record; say whether the geometry is measured, reconstructed or illustrative."},
+    {"dimension": "aerodynamics", "text": "Separate a level-flight lift constraint from glide and sink predictions; name the regime and the evidence that would falsify the proxy."},
+    {"dimension": "genotype_bridge", "text": "Require an exact developmental or genetic Evidence pin before treating a morphology correlation as a causal genotype-to-fin link."},
+    {"dimension": "manufacturing", "text": "State print material, orientation, minimum feature size and a physical test that could reject the design claim."}
+  ],
+  "prompts_note": "These are dimensions to inspect. They do not assert that the current Project has any particular flaw."
+}

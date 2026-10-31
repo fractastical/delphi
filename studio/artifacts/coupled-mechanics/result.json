@@ -1,0 +1,703 @@
+{
+ "actual_flow_receipt": {
+  "attempts": {
+   "declared_pectoral_ray_from_this_field": {
+    "code": "FRAME_MISMATCH",
+    "detail": "pressure frame 'windtunnel/N1-cypselurus-baseline/lattice-xz-metres' != target frame 'coupled-mechanics/declared-ray-frame/1'",
+    "verdict": "refused"
+   },
+   "tail_strip_as_2d_section_member": {
+    "code": "MEMBER_UNRESOLVED",
+    "detail": "cells_across_member_thickness=1 < 2 (declared minimum): the field does not resolve the member, so its two face pressures are not defined",
+    "verdict": "refused"
+   },
+   "tail_strip_as_whole_fin_3d": {
+    "code": "SAGITTAL_2D_NOT_3D",
+    "detail": "target claims whole_fin_3d but the field is '2d-extrusion'; a 2D section is not a 3D fin",
+    "verdict": "refused"
+   }
+  },
+  "pressure_mapping": {
+   "Pa_per_unit_lattice_density_excess": 0.01633333333333334,
+   "formula": "Pa above freestream = density_kg_m3*(speed_m_s/lattice_speed)^2*(rho_lattice-1)/3",
+   "time_mean_frames": 17,
+   "time_mean_window_s": [
+    60.0,
+    75.0
+   ]
+  },
+  "receipt": {
+   "Re": 79.99999999999999,
+   "fields_sha256": "10c2f41799507791b65c74502b9fa6cb1624a943d1a9a57af9a77eaf8f8148e5",
+   "geometry_sha256": "7582e66eff22a698f5f5a9710133e9200e5a4d4bc608e1b7f0f9f7ce7ab84043",
+   "pins_checked": "fields.npz vs receipt fields_sha256; result.json and fields.npz vs artifacts/windtunnel/simulation-manifest.json outputs",
+   "request": {
+    "aoa_deg": 8.0,
+    "body_length_m": 0.15,
+    "convective_time": 4.0,
+    "density_kg_m3": 1.225,
+    "frames": 81,
+    "kinematic_viscosity_m2_s": 1.5e-05,
+    "lattice_speed": 0.04,
+    "length_cells": 24,
+    "mesh_id": "N1-cypselurus-baseline",
+    "speed_m_s": 0.008,
+    "thickness_scale": 1.0
+   },
+   "result_sha256": "b9b208f1ec209e7466efa8908e03b4ec8f42740622dccc94033a327e4b592994",
+   "status": "SIMULATED_PENDING_REFINEMENT"
+  },
+  "surface_pressure_force_diagnostic": {
+   "faces": 68,
+   "note": "pressure-only staircase-face integral of the time-mean field vs the receipt's momentum-exchange force; a units/bookkeeping diagnostic, not a validation",
+   "pressure_drag_N_per_m": 1.6327457173782243e-06,
+   "pressure_lift_N_per_m": 4.2383170522311165e-06,
+   "pressure_over_receipt_drag": 0.43946494573017114,
+   "pressure_over_receipt_lift": 0.9699044160263884,
+   "receipt_drag_N_per_m": 3.715303651046426e-06,
+   "receipt_lift_N_per_m": 4.36982962671221e-06
+  },
+  "tail_strip": {
+   "cells_across": 1,
+   "columns": [
+    {
+     "col": 52,
+     "solid_rows": [
+      35
+     ]
+    },
+    {
+     "col": 53,
+     "solid_rows": [
+      35
+     ]
+    },
+    {
+     "col": 54,
+     "solid_rows": [
+      35
+     ]
+    }
+   ],
+   "fluid_on_both_faces": true
+  },
+  "tail_strip_record_stations": [
+   {
+    "p_neg_Pa": "-1.1346351866628614e-06",
+    "p_pos_Pa": "-2.2807524484746605e-05",
+    "s_m": "0"
+   },
+   {
+    "p_neg_Pa": "8.311762529260975e-07",
+    "p_pos_Pa": "-2.213503566442752e-05",
+    "s_m": "1/160"
+   },
+   {
+    "p_neg_Pa": "-2.5400297314512972e-06",
+    "p_pos_Pa": "-1.99729695039637e-05",
+    "s_m": "1/80"
+   }
+  ],
+  "verdict": "ACTUAL COUPLING BLOCKED: the only completed flow field is a 2D sagittal extrusion whose one in-plane strip is 1 cell thick, and it contains no pectoral fin; the 3D member-pressure record from cfd3d does not exist yet"
+ },
+ "analytic_cases": {
+  "root_heavy": {
+   "EI_interval": {
+    "hi_Nm2": "1/100000",
+    "lo_Nm2": "1/1000000",
+    "source": "Alben, Madden & Lauder 2007 J R Soc Interface 4:243, Sec. 3.4: composite E x mean I, bluegill sunfish, order of magnitude; not a flying-fish or per-ray measurement",
+    "status": "context_only"
+   },
+   "L_m": "3/20",
+   "conservation": {
+    "mesh_force_rel_diff": 0.0,
+    "mesh_root_moment_rel_diff": 0.0001220703125,
+    "note": "element-mean transfer keeps force exactly; the root-moment difference is O(h^2)"
+   },
+   "coupling": "one-way static: the flow field is not updated by the deflection",
+   "deflection": {
+    "EI_hi": {
+     "EI_Nm2": "1/100000",
+     "max_abs_slope_rad": 4.307692057401918,
+     "tip_m": 0.5169020194723539,
+     "tip_moment_area_reference_m": 0.5167968749999998,
+     "tip_rel_error_vs_reference": 0.00020345415663378726,
+     "validity": {
+      "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+      "max_slope_rad": 4.307692057401918,
+      "slope_limit_rad": 0.2,
+      "slope_ok": false,
+      "tip_ok": false,
+      "tip_over_L": 3.4460134631490265,
+      "tip_over_L_limit": 0.1,
+      "valid": false
+     }
+    },
+    "EI_lo": {
+     "EI_Nm2": "1/1000000",
+     "max_abs_slope_rad": 43.076920543609866,
+     "tip_m": 5.1690201932488495,
+     "tip_moment_area_reference_m": 5.167968749999999,
+     "tip_rel_error_vs_reference": 0.00020345387128171502,
+     "validity": {
+      "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+      "max_slope_rad": 43.076920543609866,
+      "slope_limit_rad": 0.2,
+      "slope_ok": false,
+      "tip_ok": false,
+      "tip_over_L": 34.460134621659,
+      "tip_over_L_limit": 0.1,
+      "valid": false
+     }
+    }
+   },
+   "dimensionality": "analytic",
+   "evidence_kind": "analytic",
+   "frame_id": "coupled-mechanics/declared-ray-frame/1",
+   "max_abs_bending_moment_Nm": 0.0011484375,
+   "max_moment_at_m": "0",
+   "member_id": "declared-pectoral-ray-1",
+   "model_version": "coupled-pressure-to-eb-ray-one-way-static/1",
+   "n_elements": 64,
+   "not_established": [
+    "biological validity of the load, the member or EI",
+    "fluid-structure feedback (one-way only)",
+    "that a 2D section field describes a finite 3D fin"
+   ],
+   "resultants_exact": {
+    "F_N": "147/6400",
+    "M_root_Nm": "147/128000"
+   },
+   "resultants_float": {
+    "F_N": 0.02296875,
+    "M_root_Nm": 0.0011484375
+   },
+   "schema": "frontier.coupled.result/1",
+   "scope": "analytic pressure: adapter check only, no flow model",
+   "source": {
+    "evidence_kind": "analytic",
+    "fields_sha256": null,
+    "geometry_sha256": null,
+    "producer": "analytic:root_heavy from fin_mechanics declared illustration",
+    "receipt_sha256": "f100fcd9e8e43940632f16560c6c1e3d1bd9b8e212564b4b1aa91a5bc1dda3da"
+   },
+   "stations": {
+    "jump_Pa": [
+     "245/8",
+     "1715/64",
+     "735/32",
+     "1225/64",
+     "245/16",
+     "735/64",
+     "245/32",
+     "245/64",
+     "0"
+    ],
+    "q_N_per_m": [
+     "49/160",
+     "343/1280",
+     "147/640",
+     "49/256",
+     "49/320",
+     "147/1280",
+     "49/640",
+     "49/1280",
+     "0"
+    ],
+    "s_m": [
+     "0",
+     "3/160",
+     "3/80",
+     "9/160",
+     "3/40",
+     "3/32",
+     "9/80",
+     "21/160",
+     "3/20"
+    ]
+   },
+   "stress": null,
+   "stress_status": "SECTION_NOT_DECLARED: stress needs c and I, which are not inferable from EI",
+   "time": {
+    "kind": "static",
+    "window_s": null
+   },
+   "tributary_width_m": "1/100",
+   "unit_derivation": "q [N/m] = (p_neg - p_pos) [Pa] * tributary width [m]; F [N] = int q ds; M_root [N m] = int q s ds"
+  },
+  "tip_heavy": {
+   "EI_interval": {
+    "hi_Nm2": "1/100000",
+    "lo_Nm2": "1/1000000",
+    "source": "Alben, Madden & Lauder 2007 J R Soc Interface 4:243, Sec. 3.4: composite E x mean I, bluegill sunfish, order of magnitude; not a flying-fish or per-ray measurement",
+    "status": "context_only"
+   },
+   "L_m": "3/20",
+   "conservation": {
+    "mesh_force_rel_diff": 0.0,
+    "mesh_root_moment_rel_diff": 6.103515625e-05,
+    "note": "element-mean transfer keeps force exactly; the root-moment difference is O(h^2)"
+   },
+   "coupling": "one-way static: the flow field is not updated by the deflection",
+   "deflection": {
+    "EI_hi": {
+     "EI_Nm2": "1/100000",
+     "max_abs_slope_rad": 12.918870466625465,
+     "tip_m": 1.4210862639824768,
+     "tip_moment_area_reference_m": 1.4211914062499993,
+     "tip_rel_error_vs_reference": 7.398177828831858e-05,
+     "validity": {
+      "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+      "max_slope_rad": 12.918870466625465,
+      "slope_limit_rad": 0.2,
+      "slope_ok": false,
+      "tip_ok": false,
+      "tip_over_L": 9.473908426549846,
+      "tip_over_L_limit": 0.1,
+      "valid": false
+     }
+    },
+    "EI_lo": {
+     "EI_Nm2": "1/1000000",
+     "max_abs_slope_rad": 129.18870458195354,
+     "tip_m": 14.210862635675484,
+     "tip_moment_area_reference_m": 14.211914062499995,
+     "tip_rel_error_vs_reference": 7.398207024658581e-05,
+     "validity": {
+      "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+      "max_slope_rad": 129.18870458195354,
+      "slope_limit_rad": 0.2,
+      "slope_ok": false,
+      "tip_ok": false,
+      "tip_over_L": 94.73908423783656,
+      "tip_over_L_limit": 0.1,
+      "valid": false
+     }
+    }
+   },
+   "dimensionality": "analytic",
+   "evidence_kind": "analytic",
+   "frame_id": "coupled-mechanics/declared-ray-frame/1",
+   "max_abs_bending_moment_Nm": 0.002296875,
+   "max_moment_at_m": "0",
+   "member_id": "declared-pectoral-ray-1",
+   "model_version": "coupled-pressure-to-eb-ray-one-way-static/1",
+   "n_elements": 64,
+   "not_established": [
+    "biological validity of the load, the member or EI",
+    "fluid-structure feedback (one-way only)",
+    "that a 2D section field describes a finite 3D fin"
+   ],
+   "resultants_exact": {
+    "F_N": "147/6400",
+    "M_root_Nm": "147/64000"
+   },
+   "resultants_float": {
+    "F_N": 0.02296875,
+    "M_root_Nm": 0.002296875
+   },
+   "schema": "frontier.coupled.result/1",
+   "scope": "analytic pressure: adapter check only, no flow model",
+   "source": {
+    "evidence_kind": "analytic",
+    "fields_sha256": null,
+    "geometry_sha256": null,
+    "producer": "analytic:tip_heavy from fin_mechanics declared illustration",
+    "receipt_sha256": "146f883d3e3e4b96caada67d2b24152f6c0229ab0a016121145b7eeb5e1030b5"
+   },
+   "stations": {
+    "jump_Pa": [
+     "0",
+     "245/64",
+     "245/32",
+     "735/64",
+     "245/16",
+     "1225/64",
+     "735/32",
+     "1715/64",
+     "245/8"
+    ],
+    "q_N_per_m": [
+     "0",
+     "49/1280",
+     "49/640",
+     "147/1280",
+     "49/320",
+     "49/256",
+     "147/640",
+     "343/1280",
+     "49/160"
+    ],
+    "s_m": [
+     "0",
+     "3/160",
+     "3/80",
+     "9/160",
+     "3/40",
+     "3/32",
+     "9/80",
+     "21/160",
+     "3/20"
+    ]
+   },
+   "stress": null,
+   "stress_status": "SECTION_NOT_DECLARED: stress needs c and I, which are not inferable from EI",
+   "time": {
+    "kind": "static",
+    "window_s": null
+   },
+   "tributary_width_m": "1/100",
+   "unit_derivation": "q [N/m] = (p_neg - p_pos) [Pa] * tributary width [m]; F [N] = int q ds; M_root [N m] = int q s ds"
+  },
+  "uniform": {
+   "EI_interval": {
+    "hi_Nm2": "1/100000",
+    "lo_Nm2": "1/1000000",
+    "source": "Alben, Madden & Lauder 2007 J R Soc Interface 4:243, Sec. 3.4: composite E x mean I, bluegill sunfish, order of magnitude; not a flying-fish or per-ray measurement",
+    "status": "context_only"
+   },
+   "L_m": "3/20",
+   "conservation": {
+    "mesh_force_rel_diff": 0.0,
+    "mesh_root_moment_rel_diff": 0.0,
+    "note": "element-mean transfer keeps force exactly; the root-moment difference is O(h^2)"
+   },
+   "coupling": "one-way static: the flow field is not updated by the deflection",
+   "deflection": {
+    "EI_hi": {
+     "EI_Nm2": "1/100000",
+     "max_abs_slope_rad": 8.613281262013682,
+     "tip_m": 0.9689941417274144,
+     "tip_moment_area_reference_m": 0.968994140625,
+     "tip_rel_error_vs_reference": 1.1376894201782294e-09,
+     "validity": {
+      "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+      "max_slope_rad": 8.613281262013682,
+      "slope_limit_rad": 0.2,
+      "slope_ok": false,
+      "tip_ok": false,
+      "tip_over_L": 6.4599609448494295,
+      "tip_over_L_limit": 0.1,
+      "valid": false
+     }
+    },
+    "EI_lo": {
+     "EI_Nm2": "1/1000000",
+     "max_abs_slope_rad": 86.1328125627817,
+     "tip_m": 9.689941414462165,
+     "tip_moment_area_reference_m": 9.689941406250002,
+     "tip_rel_error_vs_reference": 8.474936069740916e-10,
+     "validity": {
+      "flag": "LINEAR_MODEL_INVALID_SMALL_DEFORMATION_VIOLATED",
+      "max_slope_rad": 86.1328125627817,
+      "slope_limit_rad": 0.2,
+      "slope_ok": false,
+      "tip_ok": false,
+      "tip_over_L": 64.59960942974777,
+      "tip_over_L_limit": 0.1,
+      "valid": false
+     }
+    }
+   },
+   "dimensionality": "analytic",
+   "evidence_kind": "analytic",
+   "frame_id": "coupled-mechanics/declared-ray-frame/1",
+   "max_abs_bending_moment_Nm": 0.00172265625,
+   "max_moment_at_m": "0",
+   "member_id": "declared-pectoral-ray-1",
+   "model_version": "coupled-pressure-to-eb-ray-one-way-static/1",
+   "n_elements": 64,
+   "not_established": [
+    "biological validity of the load, the member or EI",
+    "fluid-structure feedback (one-way only)",
+    "that a 2D section field describes a finite 3D fin"
+   ],
+   "resultants_exact": {
+    "F_N": "147/6400",
+    "M_root_Nm": "441/256000"
+   },
+   "resultants_float": {
+    "F_N": 0.02296875,
+    "M_root_Nm": 0.00172265625
+   },
+   "schema": "frontier.coupled.result/1",
+   "scope": "analytic pressure: adapter check only, no flow model",
+   "source": {
+    "evidence_kind": "analytic",
+    "fields_sha256": null,
+    "geometry_sha256": null,
+    "producer": "analytic:uniform from fin_mechanics declared illustration",
+    "receipt_sha256": "5a59fd36ebc7e880ea1258033fed5160092358fcd9cfb72e773ff49d85be3e14"
+   },
+   "stations": {
+    "jump_Pa": [
+     "245/16",
+     "245/16",
+     "245/16",
+     "245/16",
+     "245/16",
+     "245/16",
+     "245/16",
+     "245/16",
+     "245/16"
+    ],
+    "q_N_per_m": [
+     "49/320",
+     "49/320",
+     "49/320",
+     "49/320",
+     "49/320",
+     "49/320",
+     "49/320",
+     "49/320",
+     "49/320"
+    ],
+    "s_m": [
+     "0",
+     "3/160",
+     "3/80",
+     "9/160",
+     "3/40",
+     "3/32",
+     "9/80",
+     "21/160",
+     "3/20"
+    ]
+   },
+   "stress": null,
+   "stress_status": "SECTION_NOT_DECLARED: stress needs c and I, which are not inferable from EI",
+   "time": {
+    "kind": "static",
+    "window_s": null
+   },
+   "tributary_width_m": "1/100",
+   "unit_derivation": "q [N/m] = (p_neg - p_pos) [Pa] * tributary width [m]; F [N] = int q ds; M_root [N m] = int q s ds"
+  }
+ },
+ "blocked": [
+  {
+   "contract": "engineering/coupled_mechanics/contract.py; messages/coupled-mechanics-to-cfd3d.md",
+   "needs": "frontier.coupled.member-pressure/1 with dimensionality 3d and >= 2 cells across the ray",
+   "owner": "cfd3d (claude-04)",
+   "what": "3D pressure on a resolved fin ray"
+  },
+  {
+   "needs": "fin_mechanics MEASUREMENT_QUESTION; the interval used is bluegill context only",
+   "owner": "none (wet lab)",
+   "what": "measured EI(x) of a flying-fish ray"
+  },
+  {
+   "needs": "micro-CT section of the target ray; stress is refused without it",
+   "owner": "none",
+   "what": "ray section c and I for stress"
+  }
+ ],
+ "disabled_load_control": {
+  "EI_interval": {
+   "hi_Nm2": "1/100000",
+   "lo_Nm2": "1/1000000",
+   "source": "Alben, Madden & Lauder 2007 J R Soc Interface 4:243, Sec. 3.4: composite E x mean I, bluegill sunfish, order of magnitude; not a flying-fish or per-ray measurement",
+   "status": "context_only"
+  },
+  "L_m": "3/20",
+  "conservation": {
+   "mesh_force_rel_diff": 0.0,
+   "mesh_root_moment_rel_diff": 0.0,
+   "note": "element-mean transfer keeps force exactly; the root-moment difference is O(h^2)"
+  },
+  "coupling": "one-way static: the flow field is not updated by the deflection",
+  "deflection": {
+   "EI_hi": {
+    "EI_Nm2": "1/100000",
+    "max_abs_slope_rad": 0.0,
+    "tip_m": 0.0,
+    "tip_moment_area_reference_m": 0.0,
+    "tip_rel_error_vs_reference": 0.0,
+    "validity": {
+     "flag": "OK",
+     "max_slope_rad": 0.0,
+     "slope_limit_rad": 0.2,
+     "slope_ok": true,
+     "tip_ok": true,
+     "tip_over_L": 0.0,
+     "tip_over_L_limit": 0.1,
+     "valid": true
+    }
+   },
+   "EI_lo": {
+    "EI_Nm2": "1/1000000",
+    "max_abs_slope_rad": 0.0,
+    "tip_m": 0.0,
+    "tip_moment_area_reference_m": 0.0,
+    "tip_rel_error_vs_reference": 0.0,
+    "validity": {
+     "flag": "OK",
+     "max_slope_rad": 0.0,
+     "slope_limit_rad": 0.2,
+     "slope_ok": true,
+     "tip_ok": true,
+     "tip_over_L": 0.0,
+     "tip_over_L_limit": 0.1,
+     "valid": true
+    }
+   }
+  },
+  "dimensionality": "analytic",
+  "evidence_kind": "analytic",
+  "frame_id": "coupled-mechanics/declared-ray-frame/1",
+  "max_abs_bending_moment_Nm": 0.0,
+  "max_moment_at_m": "0",
+  "member_id": "declared-pectoral-ray-1",
+  "model_version": "coupled-pressure-to-eb-ray-one-way-static/1",
+  "n_elements": 64,
+  "not_established": [
+   "biological validity of the load, the member or EI",
+   "fluid-structure feedback (one-way only)",
+   "that a 2D section field describes a finite 3D fin"
+  ],
+  "resultants_exact": {
+   "F_N": "0",
+   "M_root_Nm": "0"
+  },
+  "resultants_float": {
+   "F_N": 0.0,
+   "M_root_Nm": 0.0
+  },
+  "schema": "frontier.coupled.result/1",
+  "scope": "analytic pressure: adapter check only, no flow model",
+  "source": {
+   "evidence_kind": "analytic",
+   "fields_sha256": null,
+   "geometry_sha256": null,
+   "producer": "analytic:uniform from fin_mechanics declared illustration [LOAD DISABLED CONTROL]",
+   "receipt_sha256": "5a59fd36ebc7e880ea1258033fed5160092358fcd9cfb72e773ff49d85be3e14"
+  },
+  "stations": {
+   "jump_Pa": [
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "q_N_per_m": [
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0",
+    "0"
+   ],
+   "s_m": [
+    "0",
+    "3/160",
+    "3/80",
+    "9/160",
+    "3/40",
+    "3/32",
+    "9/80",
+    "21/160",
+    "3/20"
+   ]
+  },
+  "stress": null,
+  "stress_status": "SECTION_NOT_DECLARED: stress needs c and I, which are not inferable from EI",
+  "time": {
+   "kind": "static",
+   "window_s": null
+  },
+  "tributary_width_m": "1/100",
+  "unit_derivation": "q [N/m] = (p_neg - p_pos) [Pa] * tributary width [m]; F [N] = int q ds; M_root [N m] = int q s ds"
+ },
+ "evidence_kind": "analytic+simulated",
+ "grid_study_tip_heavy": {
+  "levels": [
+   {
+    "moment_rel_diff": 0.00390625,
+    "n_elements": 8,
+    "tip_rel_error": 0.004738547585435384
+   },
+   {
+    "moment_rel_diff": 0.0009765625,
+    "n_elements": 16,
+    "tip_rel_error": 0.0011839433136945172
+   },
+   {
+    "moment_rel_diff": 0.000244140625,
+    "n_elements": 32,
+    "tip_rel_error": 0.0002959424210807708
+   },
+   {
+    "moment_rel_diff": 6.103515625e-05,
+    "n_elements": 64,
+    "tip_rel_error": 7.398207024658581e-05
+   },
+   {
+    "moment_rel_diff": 1.52587890625e-05,
+    "n_elements": 128,
+    "tip_rel_error": 1.8496058622313117e-05
+   }
+  ],
+  "observed_order": [
+   2.000844918229602,
+   2.0002115917206007,
+   2.000068933447934,
+   1.999957796578508
+  ]
+ },
+ "model_version": "coupled-pressure-to-eb-ray-one-way-static/1",
+ "not_established": [
+  "any calibrated organism claim",
+  "fluid-structure feedback",
+  "that unit or conservation checks say anything about biological transfer"
+ ],
+ "one_way_comparison": {
+  "adapter_equals_baseline_exactly": true,
+  "adapter_uniform_q_N_per_m": "49/320",
+  "baseline": "fin_mechanics load_bridge mean lift-pressure proxy (uniform q), the existing one-way chain",
+  "baseline_q_line_N_per_m": "49/320",
+  "disabled_load_tip_m": {
+   "EI_hi": 0.0,
+   "EI_lo": 0.0
+  },
+  "meaning": "same total force, different analytic distribution: load shape alone changes the tip; no flow model produced these pressures",
+  "tip_ratio_vs_uniform_at_EI_hi": {
+   "root_heavy": 0.53344184160998,
+   "tip_heavy": 1.466558158390022,
+   "uniform": 1.0
+  }
+ },
+ "provenance": {
+  "code_files": {
+   "engineering/coupled_mechanics/__init__.py": "543feb960feba027e49418cbf61a9c6fadcd8e754614c6a317d21e9582c6e2ca",
+   "engineering/coupled_mechanics/cases.py": "012ee6cc0e1feb6a8c0299854091dabd72fbb6d650ffefbcdab80bd3fa8fc7bb",
+   "engineering/coupled_mechanics/contract.py": "9b96676089cec6215daefba1c05224b2ff9f1656903b750bb7322428fd237c28",
+   "engineering/coupled_mechanics/couple.py": "d942ed010083c0d92feda92e78cc6a2fbc94a2630862fa8ad6f5ef91b702a1f4",
+   "engineering/coupled_mechanics/run.py": "a5f3c1c4b3106a3a2b9369bd591163ce5d6bb37093b9ae0fea6469e8edd8d98c",
+   "engineering/coupled_mechanics/traction.py": "41078a28f2585702017686b4d469c07ee5e4735d7545abbed25d5372d85363b4",
+   "engineering/coupled_mechanics/windtunnel_receipt.py": "062db28417f467d285fbec766c3211efae40283b796c003a3d20a71660203120",
+   "engineering/fin_mechanics/beam.py": "4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d",
+   "engineering/fin_mechanics/load_bridge.py": "743d85121d2804fbed690a310d31f7ac7eec7fab9c8b06e776eee30fb4a97a11",
+   "engineering/fin_mechanics/sweep.py": "31529bac797c4563190f68b180ddd31fe9537a13535a364f5918ac4dd885c8ec"
+  },
+  "environment": {
+   "numpy": "2.4.4",
+   "python": "3.13.12",
+   "scipy": "1.17.1"
+  },
+  "inputs": {
+   "artifacts/windtunnel/baseline/fields.npz": "10c2f41799507791b65c74502b9fa6cb1624a943d1a9a57af9a77eaf8f8148e5",
+   "artifacts/windtunnel/baseline/result.json": "b9b208f1ec209e7466efa8908e03b4ec8f42740622dccc94033a327e4b592994",
+   "artifacts/windtunnel/simulation-manifest.json": "6cb05940f0073e6e9bbc256106166d567b37ecab4276032041e52dbd6ee2847b",
+   "engineering/fin_mechanics/example_request.json": "943b8f645a068e76f168bd99933f09210eedd49cf2a3ec1cb0eba547df7381d4"
+  }
+ },
+ "schema": "frontier.coupled.result/1#run"
+}

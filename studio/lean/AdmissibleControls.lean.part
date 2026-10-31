@@ -1,0 +1,40 @@
+-- Controls appended to lean/Admissible.lean (minus its axiom-audit section) by tests/test_admissible_lean.py.
+-- Each `mutant:` block states a FALSE variant of a `twin:` block that has the same proof script; the twin must
+-- compile, the mutant must be rejected by Lean. The test checks that every error lies inside a mutant block.
+open Admissible
+
+-- BEGIN twin:D_two_pi_value
+example : D worked (neumannMode (2 * Real.pi) 1) = -1/8 := by
+  rw [worked_D, neumannMode_two_pi_one]; norm_num
+-- END
+-- BEGIN mutant:D_two_pi_wrong_value
+example : D worked (neumannMode (2 * Real.pi) 1) = -1/4 := by
+  rw [worked_D, neumannMode_two_pi_one]; norm_num
+-- END
+
+-- BEGIN twin:D_pi_mode1_positive
+example : 0 < D worked (neumannMode Real.pi 1) := by
+  rw [worked_D, neumannMode_pi]; norm_num
+-- END
+-- BEGIN mutant:D_pi_mode1_claimed_negative
+example : D worked (neumannMode Real.pi 1) < 0 := by
+  rw [worked_D, neumannMode_pi]; norm_num
+-- END
+
+-- BEGIN twin:modeStable_pi_mode1
+example : ModeStable worked (neumannMode Real.pi 1) := by
+  refine ⟨?_, ?_⟩ <;> simp only [T, D, worked, neumannMode_pi] <;> norm_num
+-- END
+-- BEGIN mutant:modeStable_two_pi_mode1_claimed
+example : ModeStable worked (neumannMode (2 * Real.pi) 1) := by
+  refine ⟨?_, ?_⟩ <;> simp only [T, D, worked, neumannMode_two_pi_one] <;> norm_num
+-- END
+
+-- BEGIN twin:positive_root_forces_negative_det_with_negative_trace
+example : ∀ lam T D : ℝ, T < 0 → 0 < lam → lam^2 - T*lam + D = 0 → D < 0 := by
+  intro lam T D hT hl hr; nlinarith [sq_nonneg lam]
+-- END
+-- BEGIN mutant:same_without_trace_hypothesis
+example : ∀ lam T D : ℝ, 0 < lam → lam^2 - T*lam + D = 0 → D < 0 := by
+  intro lam T D hl hr; nlinarith [sq_nonneg lam]
+-- END

@@ -1,5 +1,12 @@
 # delphi-frontier specs
 
+The product direction and current delivery checklist are in [GOAL](../GOAL.md).
+[SPEC-005](SPEC-005-agentic-engineering-demo.md) adds the user-directed agentic
+engineering, constraint-solving and multiscale demonstration contract. It is an
+implementation target with explicit acceptance checks, not a claim that those
+checks have already passed. SPEC-001–004 below describe the earlier foundation;
+their dated evidence remains evidence about the source they name.
+
 Normative specifications for the Frontier foundation, derived from the implemented, tested code —
 not the other way round. The repository had no `specs/` directory before these; its prior normative
 text was `CONTRIBUTING-VERIFICATION.md` (the seven verification rules), which these specs honor and
@@ -22,13 +29,16 @@ papered over.
 
 | Spec | Subject |
 |---|---|
-| [SPEC-001](SPEC-001-record-types.md) | The nine record types and their exact field contracts; the `recorded`/`actionable` Problem split; the register finding (250/250 import, 0 actionable, 148/250 unsourced); the remaining no-typed-`unlocks` defect |
+| [SPEC-001](SPEC-001-record-types.md) | The nine record types and their exact field contracts; the `recorded`/`actionable` Problem split; the register finding (250/250 import, 0 actionable; the first mapping's 148/250 "unsourced" was an omission of the `attestations` field, since corrected); the remaining no-typed-`unlocks` defect |
 | [SPEC-002](SPEC-002-contribution-review-lifecycle.md) | Provisioning and roles; the authenticated write path; the five review statuses, seven dimensions, independence, the acceptance gate; why there is deliberately no composite truth score |
 | [SPEC-003](SPEC-003-action-execution-and-leases.md) | The eight-dimension cache key; the `action_state` machine; atomic leasing, expiry and owner fencing; readiness gate; review adjudication; why a `recorded` Problem cannot be actioned |
 | [SPEC-004](SPEC-004-bundles-and-federation.md) | Export/import bundles; `imported_unreviewed`; fork-on-conflict; review receipts as untrusted assertions; why a digest is integrity and not a signature, timestamp, or acceptance |
+| [SPEC-005](SPEC-005-agentic-engineering-demo.md) | Current multiscale engineering delivery contract and explicit applicability boundaries |
+| [SPEC-006](SPEC-006-action-epistemics-and-learning.md) | Typed action proposals, alternatives, outcomes and plans; allocation and learning requirements separate from acceptance |
 
 **Verification run (this session), bounded:**
 `systemd-run --user --scope -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=600
 bash scripts/test_postgres.sh` → **16 passed, exit 0.** The register importer was also run against
 `/home/ubuntu/git/morphoswarm/data/problems/register.yaml` (sha256 `a0155552…`) → exit 0, 250/250
-importable, 0 actionable, provenance 34 / 68 / 148.
+importable, 0 actionable. The historical provenance split 34 / 68 / 148 omitted
+attestation sources; it is not the current source coverage result (see SPEC-001).

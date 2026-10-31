@@ -80,7 +80,7 @@ store never fetches or hashes the source bytes (`submit` returns `"artifact_byte
 
 **Problem** (90): `title: Short`, `known_state: Text`, `question: Text`, `problem_kind:
 "project_gap" | "computational_open_question" | "sourced_field_open_problem" |
-"resolved_scope_correction"`, `novelty_status: Short`, `data_access: Text`, **`completeness:
+"resolved_scope_correction" | "curated_question"`, `novelty_status: Short`, `data_access: Text`, **`completeness:
 "recorded" | "actionable"` (default `"actionable"`, line 108)**, `acceptance_criteria: Strings = []`,
 `falsifiers: Strings = []`, `next_action: Text | None = None`, `required_capabilities: Strings`,
 `cost_stop_bounds: Text | None = None`, `downstream_uses: Strings`, `dependencies: list[Ref] (max 30)
@@ -195,9 +195,11 @@ The design above exists to carry a real result. I ran `scripts/import_register.p
 
 This corrects an earlier generalization (that each of the 250 carries a PMC id, a locator and a
 verbatim quote) that was true only of the first record read; the whole-register count is above and
-is pinned by the register test. The 148 unsourced problems are labelled in the record's own
+is pinned by the register test. **Correction (importer reading `attestations`):** the 148 below is the
+output of the first mapping, which did not read the register's `attestations` field. It was a mapping
+omission, not a property of the register; see open question 3. The 148 were labelled in the record's own
 `source.access` as "a curator's statement, not a sourced field-level open problem, and must not be
-presented as one" (`import_register.py` line 97), and the 68 topic-reference-only ones are labelled
+presented as one", and the 68 topic-reference-only ones are labelled
 "WEAKER … supports the problem's topic and not any specific statement" (line 92). An evidence layer
 built on this register **must** carry those labels forward. (The `import_register.py` docstring line
 74 says "74" for the references path; the code counts, and the test pins, **68** — the docstring is a
@@ -229,10 +231,17 @@ questions.
    fields that turn a recorded problem actionable, or whether that supply should itself be reviewed.
    An unreviewed promotion is an unreviewed scientific judgement about what would settle a question.
    Should promotion require an independent review (SPEC-002), or at least an Event?
-3. **The 148 unsourced problems.** They import today as `sourced_field_open_problem` with
-   `provenance_path: "none"` and an access note that says they are not sourced. Is `problem_kind`
-   itself wrong for them — should an unsourced curator statement get a distinct `problem_kind` so the
-   label is structural, not only prose in `access`?
+3. **The 148 "unsourced" problems: answered.** They imported as `sourced_field_open_problem` with
+   `provenance_path: "none"`. Two things were wrong, and neither was the register. (a) The "148" was a
+   mapper omission: the importer read `why_source` and `references` and ignored `attestations`, which all
+   250 problems carry (465 entries); with attestations read, 0 problems lack a citation. The 34 / 68 / 148
+   split is kept above as the historical output of that mapping (it is reproduced as `previous_mapping` in
+   the importer's report). (b) `problem_kind` was wrong for all 250, not only the 148: they are a curator's
+   questions, and a cited source calling a facet open does not make the question as phrased a field-stated
+   open problem. The register now imports as the structural value `curated_question`. `completeness` is
+   unchanged (all 250 `recorded`, 0 actionable). `project_gap` and `sourced_field_open_problem` keep their
+   meanings. Whether the cited quotes say what the curator's stance claims is a separate, unaudited matter;
+   see `findings/README-attestation-check-15.md` for a 15-item sample, which is not a verification of the 250.
 4. **`content_available` / `artifact_bytes_verified`.** Both are submitter-asserted or constant
    `False`. Is there ever a tier where the store (or a separate checker) fetches and hashes source
    bytes, or is that permanently out of scope by design?

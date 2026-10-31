@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>fish3d actual GLB viewer fixture</title>
+<link rel="stylesheet" href="/site/css/model-viewer.css">
+<style>body{margin:0;padding:16px;background:#f6f1e7}</style></head>
+<body><main><div id="v"></div></main>
+<script type="module">
+import { mountFishViewer } from "/site/js/model-viewer.js";
+const q = new URLSearchParams(location.search);
+document.getElementById("v").style.marginTop = (q.get("pad") || 0) + "px";
+window.__v = mountFishViewer(document.getElementById("v"), {
+  base: q.get("base") || "/artifacts/fish3d/fish3d-N1-cypselurus-baseline/", layout: q.get("layout") || "hero",
+  lazy: q.get("lazy") !== "0", heavyTris: q.get("heavy") != null ? Number(q.get("heavy")) : undefined, variants: q.get("variants") ? JSON.parse(q.get("variants")) : undefined });
+</script></body></html>

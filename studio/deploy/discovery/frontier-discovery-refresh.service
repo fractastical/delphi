@@ -1,0 +1,17 @@
+# Template. Embeds only new or changed public records and artifacts (zero provider calls when nothing changed). Bounded; overlapping runs skip.
+# Root installs and edits the three placeholders; no credential is stored in this file. Install under ~/.config/systemd/user/ and run
+# `systemctl --user daemon-reload && systemctl --user enable --now frontier-discovery-refresh.timer`.
+[Unit]
+Description=Frontier discovery index refresh (bounded)
+
+[Service]
+Type=oneshot
+WorkingDirectory=/PATH/TO/delphi-frontier
+# EnvironmentFile holds FRONTIER_DSN=... and GEMINI_API_KEY=... (mode 600, outside the repository)
+EnvironmentFile=/PATH/TO/frontier-discovery.env
+Environment=PYTHONPATH=/PATH/TO/delphi-frontier OMP_NUM_THREADS=1
+ExecStart=/usr/bin/python3 -m frontier.discovery refresh --namespace delphi-frontier --max-requests 20 --receipt /PATH/TO/refresh-log.jsonl
+TasksMax=128
+MemoryMax=2G
+MemorySwapMax=0
+RuntimeMaxSec=300

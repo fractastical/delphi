@@ -1,0 +1,186 @@
+{
+ "all_checks_ok": true,
+ "betse": "BETSE 1.5.0 (Nicest Nestor)",
+ "checks": {
+  "charge_consistency": {
+   "criterion": "rho = F*sum(z c) within 1e-4 and Vm = rho*V/(Cm*A) within 1e-9",
+   "max_rel_diff_Vm_vs_rho_vol_over_Cm_area": 3.2174302788430417e-16,
+   "max_rel_diff_rho_vs_F_sum_z_c": 3.4421937025284826e-06,
+   "note": "Vm is defined this way inside BETSE; the check confirms the saved fields agree, not that the model is right",
+   "ok": true
+  },
+  "coupling_contrast_expectation": {
+   "criterion": "expectation (not a law): blocking gap junctions should reduce the voltage change seen by cells that were not targeted",
+   "k_up": {
+    "other_peak_dVm_mV": -2.6176911927210216,
+    "targeted_peak_dVm_mV": -4.674012681584506
+   },
+   "k_up_gj_block": {
+    "other_peak_dVm_mV": 0.16247667746011746,
+    "targeted_peak_dVm_mV": -19.820574865446662
+   },
+   "note": "ok=false would be reported as a result, not hidden",
+   "ok": true
+  },
+  "finite_and_physical": {
+   "criterion": "all values finite; every concentration > 0; -150 mV < Vm < 50 mV",
+   "min_concentration_mmol_L": 11.76460024318593,
+   "ok": true,
+   "vm_range_mV": [
+    -43.13314230636501,
+    -23.07598688163233
+   ]
+  },
+  "gj_block_control": {
+   "criterion": "mean gap-junction open fraction < 0.05 inside the window and > 90 % of baseline at the end",
+   "gj_open_at_end": 0.9666790444232363,
+   "gj_open_baseline": 0.9667893456056198,
+   "gj_open_in_window_min": 1.6964340519652193e-11,
+   "ok": true
+  },
+  "impermeant_P_total_conserved": {
+   "criterion": "relative range of total P amount < 1e-12",
+   "note": "Na, K and M exchange with the ideal bath by design, so their totals are not conserved; only P gives a closed-budget test here",
+   "ok": true,
+   "relative_range_by_scenario": {
+    "baseline": 0.0,
+    "baseline_dt": 0.0,
+    "gj_block": 0.0,
+    "k_up": 0.0,
+    "k_up_gj_block": 0.0
+   }
+  },
+  "k_control_direction_and_reversal": {
+   "criterion": "raising K+ permeability makes targeted cells more negative, more than the others, and the effect after the window is < 25 % of the peak",
+   "late_max_abs_dVm_mV": 0.4093349828704247,
+   "note": "direction expected from a K+ reversal potential below rest; the magnitude is not compared with any measurement",
+   "ok": true,
+   "other_peak_dVm_mV": -2.6176911927210216,
+   "targeted_peak_dVm_mV": -4.674012681584506
+  },
+  "time_step_sensitivity": {
+   "criterion": "max |dVm| < 1e-3 mV and < 1 % of the K-permeability control peak effect",
+   "dt_s": 0.001,
+   "half_dt_s": 0.0005,
+   "max_abs_dVm_mV": 3.8183339299419083e-05,
+   "max_rel_dConc": 1.3898090792496416e-07,
+   "note": "sample times differ by <1 microsecond between dt and dt/2; arrays are compared index by index",
+   "ok": true,
+   "ratio_to_K_control_peak": 8.169284488649443e-06
+  }
+ },
+ "effects": {
+  "gj_block": {
+   "late_max_abs_dVm_mV": 0.011071837530272216,
+   "late_time_from_s": 3.5,
+   "mean_gj_open_fraction_at_end": 0.9666790444232363,
+   "mean_gj_open_fraction_baseline": 0.9667893456056198,
+   "mean_gj_open_fraction_in_window_min": 1.6964340519652193e-11,
+   "n_other_cells": 64,
+   "n_targeted_cells": 2,
+   "other_peak_dVm_mV": 0.16247738507645798,
+   "other_peak_time_s": 2.900725181295324,
+   "targeted_dK_mmol_L_at_window_end": -2.261099230338459e-05,
+   "targeted_dNa_mmol_L_at_window_end": 1.4130271217105417e-05,
+   "targeted_peak_dVm_mV": -0.027698104970504123,
+   "targeted_peak_time_s": 2.900725181295324
+  },
+  "k_up": {
+   "late_max_abs_dVm_mV": 0.4093349828704247,
+   "late_time_from_s": 3.5,
+   "mean_gj_open_fraction_at_end": 0.9667615844387953,
+   "mean_gj_open_fraction_baseline": 0.9667893456056198,
+   "mean_gj_open_fraction_in_window_min": 0.9641521138308676,
+   "n_other_cells": 64,
+   "n_targeted_cells": 2,
+   "other_peak_dVm_mV": -2.6176911927210216,
+   "other_peak_time_s": 2.7006751687921984,
+   "targeted_dK_mmol_L_at_window_end": -0.0077866547904790195,
+   "targeted_dNa_mmol_L_at_window_end": 0.004522199902046609,
+   "targeted_peak_dVm_mV": -4.674012681584506,
+   "targeted_peak_time_s": 2.6006501625406355
+  },
+  "k_up_gj_block": {
+   "late_max_abs_dVm_mV": 0.4371462848164892,
+   "late_time_from_s": 3.5,
+   "mean_gj_open_fraction_at_end": 0.9666459191324305,
+   "mean_gj_open_fraction_baseline": 0.9667893456056198,
+   "mean_gj_open_fraction_in_window_min": 1.6285842683829143e-11,
+   "n_other_cells": 64,
+   "n_targeted_cells": 2,
+   "other_peak_dVm_mV": 0.16247667746011746,
+   "other_peak_time_s": 2.900725181295324,
+   "targeted_dK_mmol_L_at_window_end": -0.02040331786699312,
+   "targeted_dNa_mmol_L_at_window_end": 0.013160098900399042,
+   "targeted_peak_dVm_mV": -19.820574865446662,
+   "targeted_peak_time_s": 2.7006751687921984
+  }
+ },
+ "files": {
+  "baseline": {
+   "config": "configs/baseline.yaml",
+   "config_sha256": "e65a5350621c5fc6c828d109a4ca160e7ca92b46e612feb5d5eef13676643dcf",
+   "trajectory": "trajectories/baseline.npz",
+   "trajectory_sha256": "520955df2cd82d568315aa78d6346b1353ec99568bc4f73f22c88f73b4bd44e8"
+  },
+  "baseline_dt": {
+   "config": "configs/baseline_dt.yaml",
+   "config_sha256": "e96a2bbca23502ea0695e1aa17a6b10b2fb3e465150ea2fd7657870711ed871e",
+   "trajectory": "trajectories/baseline_dt.npz",
+   "trajectory_sha256": "7d9c9dc83d39465107f464aea82c4f5c30ddd88d924dc6fc1ba8495ad189db29"
+  },
+  "gj_block": {
+   "config": "configs/gj_block.yaml",
+   "config_sha256": "92f716a8417dd2d44cc8970e647447f0a25caf5ea4e7045a769c5fed143da0d6",
+   "trajectory": "trajectories/gj_block.npz",
+   "trajectory_sha256": "eaf93211d3d9b76d53a94d22744013b9717ad947fe17c722c2b225b0f36984fd"
+  },
+  "k_up": {
+   "config": "configs/k_up.yaml",
+   "config_sha256": "d9e0006425aafdf1f3aeef4fa557f0399dfa3b783365fb18ea17e83b76c5aadd",
+   "trajectory": "trajectories/k_up.npz",
+   "trajectory_sha256": "c9c188aa532f070d644f3a00a9c312978da3b520250a59cd3289e5508f2ebaaf"
+  },
+  "k_up_gj_block": {
+   "config": "configs/k_up_gj_block.yaml",
+   "config_sha256": "335f740c4f5b815daca1d1f44f135ab383b455dfcdde73e5a5497cccee835510",
+   "trajectory": "trajectories/k_up_gj_block.npz",
+   "trajectory_sha256": "bfab9e1d7df06dfd783ef8106f5d1adf8b11c14831a78a3a8c5697a3ae9faded"
+  }
+ },
+ "intervention_window_s": [
+  1.0,
+  3.0
+ ],
+ "label": "SIMULATED (BETSE 1.5.0 numerical output); not observed; not calibrated; not a fish fin",
+ "n_cells": 66,
+ "n_membranes": 364,
+ "reference_ghk": {
+  "default_Dm_m2_s": {
+   "K": 1e-18,
+   "M": 1e-18,
+   "Na": 2e-18
+  },
+  "extracellular_mmol_L": {
+   "K": 4.99979978802577,
+   "M": 139.99997075291566,
+   "Na": 145.00018338833897,
+   "P": 10.0
+  },
+  "ghk_leak_only_mV": 0.7032309112639379,
+  "intracellular_mmol_L_t0": {
+   "K": 139.08208593322217,
+   "M": 16.011994031342983,
+   "Na": 11.924813954899063,
+   "P": 135.0
+  },
+  "note": "informational only: the GHK number ignores the pump and gap junctions; the difference to the simulation is not decomposed here",
+  "simulated_mean_resting_Vm_mV": -23.479444959054458
+ },
+ "samples": 39,
+ "schema": "frontier.bioelectric-tissue.summary/1",
+ "time_s": [
+  0.1000250062515629,
+  3.900975243810953
+ ]
+}

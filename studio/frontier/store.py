@@ -43,6 +43,13 @@ class Missing(FrontierError):
     http_status = 404
 
 
+def _stated_redistribution_license(value):
+    """A declaration gate, not a legal judgement or licence authentication."""
+    return isinstance(value, str) and value.strip().casefold() not in {
+        "", "unknown", "unspecified", "none", "null", "n/a", "na", "no license", "no licence",
+        "all rights reserved", "not for redistribution", "redistribution prohibited"}
+
+
 def _unlicensed_available_content(records):
     """Record ids asserting held content bytes with no stated licence.
 
@@ -55,8 +62,10 @@ def _unlicensed_available_content(records):
 
     A digest is integrity, not permission. Exporting the digest of content you may not
     redistribute is fine; asserting you HOLD that content and shipping it onward is not. So the
-    refusal is narrow by design: it fires only on `content_available=true` together with an
-    absent licence, and never on a reference whose bytes we do not claim to have.
+    refusal covers structured held-content and downloadable-artifact declarations, including
+    nested provenance. Unknown, blank and explicit no-redistribution declarations do not pass.
+    References without available bytes need no licence. Arbitrary prose is not classified;
+    passing this check does not establish ownership or authenticate a permission statement.
 
     Enforced at EVERY boundary, because the first version of this check guarded only
     `export_bundle` and an independent reviewer found the hole within the hour: `/v1/read/get`
@@ -69,11 +78,18 @@ def _unlicensed_available_content(records):
     """
     offenders = []
     for record in records:
-        for key, value in (record.get("payload") or {}).items():
-            if key != "source" or not isinstance(value, dict):
-                continue
-            if value.get("content_available") and not value.get("license"):
-                offenders.append(f'{record["kind"]}/{record["id"]}')
+        pending = [record.get("payload") or {}]
+        while pending:
+            value = pending.pop()
+            if isinstance(value, list):
+                pending.extend(value)
+            elif isinstance(value, dict):
+                available = value.get("content_available") is True or (
+                    value.get("availability") == "downloadable" and "sha256" in value and "uri" in value)
+                if available and not _stated_redistribution_license(value.get("license")):
+                    offenders.append(f'{record["kind"]}/{record["id"]}')
+                    break
+                pending.extend(value.values())
     return offenders
 
 
@@ -85,7 +101,7 @@ def _refuse_unlicensed(offenders, verb):
     more = f" (showing 5 of {len(offenders)})" if len(offenders) > 5 else ""
     raise Forbidden(
         f"Refusing to {verb} content asserted available under an unstated licence: {shown}{more}. "
-        "Set Source.license, or set content_available=false and share the digest only.")
+        "Declare the source/artifact redistribution licence, or share a reference without asserting available bytes.")
 
 
 class Store:
@@ -106,6 +122,9 @@ class Store:
     def initialize(self):
         """Operator-only migration, never exposed by HTTP or MCP."""
         with self.connection() as c:
+            # Operator migration on a possibly large store: the connection's 5 s statement cap is for request handling.
+            c.execute("SET statement_timeout = '300s'")
+            c.execute("SET lock_timeout = '30s'")
             c.execute(sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(sql.Identifier(self.schema)))
             c.execute(Path(__file__).with_name("schema.sql").read_text())
             c.execute("INSERT INTO node_config VALUES (1,%s,1) ON CONFLICT DO NOTHING", (self.namespace,))
@@ -138,6 +157,16 @@ class Store:
             raise Forbidden("Required role missing")
         return p
 
+    def principal(self, token: str) -> dict:
+        """Who a credential belongs to, WITHOUT the credential. Read-only; raises Unauthorized for a missing or unknown token.
+
+        Public replacement for callers that reached into `_auth` (the MCP server's startup check and manifest, the admin tool).
+        Changes no other store behaviour."""
+        with self.connection() as c:
+            p = self._auth(c, token)
+        return {"actor": p["actor"], "operator": p["operator"], "roles": list(p["roles"]), "namespaces": list(p["namespaces"]),
+                "daily_write_limit": p["daily_write_limit"]}
+
     def _read_principal(self, c, token):
         return self._auth(c, token) if token else None
 
@@ -157,9 +186,59 @@ class Store:
                 raise Conflict("Stale or forked target version")
         return row["envelope"]
 
+    @staticmethod
+    def _artifact_listed(evidence, sha256):
+        return any(a.get("sha256") == sha256 for a in (evidence["payload"].get("artifacts") or []))
+
+    def _validate_discussion_refs(self, c, record, principal):
+        """Project and Annotation pins. Exact versions must exist and be readable by the author, but need NOT be heads: a
+        discussion may concern a superseded version and a Project pin says exactly which version it means. A PUBLIC record may
+        reference only PUBLIC records, so a public Project/Annotation cannot disclose a private record's coordinates."""
+        found = {}
+        for relation, target in references(record):
+            referenced = self._raw(c, target, principal, current=False)
+            if record["visibility"] == "public" and referenced["visibility"] != "public":
+                raise Conflict(f"A public {record['kind']} may reference only public records")
+            found[(relation, target["version"])] = referenced
+        pl = record["payload"]
+        if record["kind"] == "Project":
+            for m in pl["members"]:
+                art = m.get("artifact")
+                if art and not self._artifact_listed(found[("project_member_artifact", art["evidence"]["version"])], art["sha256"]):
+                    raise Conflict("Pinned artifact digest is not listed by that Evidence version")
+            return
+        anchor = pl["anchor"]
+        anchored = found[("annotates", anchor["record"]["version"])]
+        design_review = pl.get("design_review")
+        if design_review is not None:
+            if anchored["kind"] != "Project":
+                raise Conflict("A structured design review must anchor an exact Project version")
+            member_index = design_review.get("member_index")
+            if member_index is not None and member_index >= len(anchored["payload"]["members"]):
+                raise Conflict("Design-review member_index is outside the pinned Project member list")
+        art = anchor.get("artifact")
+        if art and not self._artifact_listed(found[("annotates_artifact", art["evidence"]["version"])], art["sha256"]):
+            raise Conflict("Anchored artifact digest is not listed by that Evidence version")
+        if pl.get("reply_to"):
+            replied = found[("replies_to", pl["reply_to"]["version"])]
+            same = {k: replied["payload"]["anchor"]["record"][k] for k in ("namespace", "kind", "id")} == \
+                {k: anchor["record"][k] for k in ("namespace", "kind", "id")}
+            if not same:
+                raise Conflict("A reply must anchor the same record as the annotation it answers")
+            if replied["payload"].get("design_review") is not None and replied["payload"]["anchor"]["record"] != anchor["record"]:
+                raise Conflict("A design-review reply must anchor the same exact Project version")
+        edit = pl.get("proposed_edit")
+        if edit and re.split(r"[.\[]", edit["target_path"])[0] not in anchored["payload"]:
+            raise Conflict("Proposed edit path must start at a top-level payload field of the anchored record")
+
     def _validate_refs(self, c, record, principal, current=True):
+        if record["kind"] in ("Project", "Annotation"):
+            return self._validate_discussion_refs(c, record, principal)
         for relation, target in references(record):
             referenced = self._raw(c, target, principal, current=current)
+            if record["kind"] == "Evidence" and relation == "produced_by":
+                if referenced["payload"]["target"] != record["payload"]["target"]:
+                    raise Conflict("Producing action and evidence must pin the same target")
             # An action needs acceptance criteria, falsifiers, a next action and a stop bound.
             # A `recorded` problem has none of them, so there is nothing to execute or to stop.
             if record["kind"] == "Action" and relation == "targets" and referenced["kind"] == "Problem":
@@ -296,6 +375,98 @@ class Store:
             return {"edges": edges, "truncated": len(rows) > limit, "depth": 1,
                     "limit": "Typed one-hop relations, including disputed assessments; no implicit support inference."}
 
+    def _edge_heads(self, c, p, relation, kind, target, all_versions, limit, offset=0):
+        """Head records of `kind` that point at `target` through `relation` (typed edges only, no inference)."""
+        return c.execute("""SELECT v.envelope,s.status FROM typed_edges e
+            JOIN record_versions v ON v.version=e.source_version AND v.kind=%s
+            JOIN heads h ON h.version=v.version JOIN local_states s ON s.version=v.version
+            WHERE e.relation=%s AND ((NOT %s AND e.target_version=%s)
+               OR (%s AND e.target_namespace=%s AND e.target_kind=%s AND e.target_id=%s))
+              AND (v.visibility='public' OR %s::jsonb ? v.namespace)
+            ORDER BY v.created_at,v.version LIMIT %s OFFSET %s""",
+            (kind, relation, all_versions, target["version"], all_versions, target["namespace"], target["kind"], target["id"],
+             Jsonb(p["namespaces"] if p else []), limit, offset)).fetchall()
+
+    def _discussion_rows(self, rows):
+        out, withheld = [], 0
+        for r in rows:
+            if _unlicensed_available_content([r["envelope"]]):
+                withheld += 1
+                continue
+            out.append({"record": r["envelope"], "ref": ref(r["envelope"]), "issuer": r["envelope"]["issuer"],
+                        "local_status": r["status"]})
+        return out, withheld
+
+    def head_ref(self, kind: str, record_id: str, token: str | None = None, namespace: str | None = None):
+        """Exact ref of the CURRENT head of one record id in a namespace (default: this node), visibility-checked. Read-only.
+        Used to re-pin a project draft written against another namespace; it substitutes nothing silently."""
+        r = Ref(namespace=namespace or self.namespace, kind=kind, id=record_id, version="0" * 64)
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            row = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
+                            (r.namespace, r.kind, r.id)).fetchone()
+            if row is None:
+                raise Missing("No such record head")
+            target = {"namespace": r.namespace, "kind": r.kind, "id": r.id, "version": row["version"]}
+            self._raw(c, target, p)
+            return {"ref": target}
+
+    def annotations_for(self, target: dict, token: str | None = None, limit: int = 50, all_versions: bool = False, offset: int = 0):
+        """Current annotation heads anchored at an exact version (or at any version of that record id). Read-only; replies are
+        linked by `payload.reply_to`, threading is a display concern. An annotation is not acceptance and not an answer."""
+        if not 1 <= limit <= 100 or type(offset) is not int or not 0 <= offset <= 10000:
+            raise FrontierError("Limit must be 1..100 and offset must be 0..10000")
+        t = Ref.model_validate(target).model_dump()
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            self._raw(c, t, p)
+            rows = self._edge_heads(c, p, "annotates", "Annotation", t, all_versions, limit + 1, offset)
+            page = rows[:limit]
+            out, withheld = self._discussion_rows(page)
+            truncated = len(rows) > limit
+            scanned = len(page)
+            return {"target": t, "all_versions": all_versions, "annotations": out, "withheld_unlicensed": withheld,
+                    "truncated": truncated, "scanned": scanned,
+                    "next_offset": offset + scanned if truncated else None,
+                    "limit": "Current heads only. Author is the authenticated issuer; no field records an answer by anyone else."}
+
+    def projects_for(self, target: dict, token: str | None = None, limit: int = 50, all_versions: bool = False):
+        """Current Project heads that pin the exact version (or any version of the record id) as a member."""
+        if not 1 <= limit <= 100:
+            raise FrontierError("Limit must be 1..100")
+        t = Ref.model_validate(target).model_dump()
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            self._raw(c, t, p)
+            out, withheld = self._discussion_rows(self._edge_heads(c, p, "project_member", "Project", t, all_versions, limit))
+            return {"target": t, "all_versions": all_versions, "projects": out, "withheld_unlicensed": withheld,
+                    "limit": "Membership is a declared pin; it does not establish that the record applies or is accepted."}
+
+    def project_members(self, project: dict, token: str | None = None):
+        """Each pinned member with its availability, whether the pin is the current head, and its LOCAL review status."""
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            record = self._raw(c, project, p)
+            if record["kind"] != "Project":
+                raise FrontierError("Not a Project")
+            rows = []
+            for i, m in enumerate(record["payload"]["members"]):
+                pin = m["ref"]
+                try:
+                    self._raw(c, pin, p)
+                except Missing:
+                    rows.append({"index": i, "pin": pin, "available": False, "is_current": None, "current_version": None,
+                                 "local_status": None})
+                    continue
+                head = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
+                                 (pin["namespace"], pin["kind"], pin["id"])).fetchone()
+                st = c.execute("SELECT status FROM local_states WHERE version=%s", (pin["version"],)).fetchone()
+                rows.append({"index": i, "pin": pin, "available": True, "current_version": head["version"] if head else None,
+                             "is_current": bool(head and head["version"] == pin["version"]),
+                             "local_status": st["status"] if st else None})
+            return {"project": ref(record), "members": rows,
+                    "limit": "Pins are exact versions; a newer head is reported, never substituted."}
+
     def review(self, token, key, assessment: dict):
         a = Assessment.model_validate(assessment)
         if a.decision == "unreviewed":
@@ -345,6 +516,8 @@ class Store:
                 raise Conflict("Only locally owned Action versions can execute")
             current = c.execute("SELECT * FROM action_state WHERE version=%s", (record["version"],)).fetchone()
             if state == "ready":
+                if (record["payload"].get("proposal") or {}).get("intent") == "plan":
+                    raise Conflict("A plan describes work; authorize and lease its individual steps")
                 if "coordinator" not in p["roles"] or current["state"] not in {"proposed", "blocked", "expired"}:
                     raise Forbidden("Coordinator readiness gate required")
                 self._validate_refs(c, record, p)
@@ -373,6 +546,8 @@ class Store:
             record = self._raw(c, target, p, current=True)
             if record["kind"] != "Action" or record["namespace"] != self.namespace:
                 raise Conflict("Only local Action versions can be leased")
+            if (record["payload"].get("proposal") or {}).get("intent") == "plan":
+                raise Conflict("A plan describes work; authorize and lease its individual steps")
             self._validate_refs(c, record, p)
             prior = c.execute("SELECT state,lease_until FROM action_state WHERE version=%s", (record["version"],)).fetchone()
             lease_id = str(uuid4())

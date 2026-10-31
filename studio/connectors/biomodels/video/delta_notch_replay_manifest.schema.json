@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:frontier:connector:biomodels:video-manifest-0.1",
+  "title": "biomodels-video-manifest-0.1 (connector-local contract; not a root schema)",
+  "description": "Describes one rendered simulation video. A consumer must check every sha256 against the file it names and must show the captions; it must not describe the video as observed cell shape, tissue or a fin.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_schema", "evidence_kind", "claims", "inputs", "render", "time_mapping", "dimensions", "video", "poster"],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "file": {"type": "object", "required": ["file", "sha256", "bytes"], "properties": {"file": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"}, "sha256": {"$ref": "#/$defs/sha256"}, "bytes": {"type": "integer", "minimum": 1}}}
+  },
+  "properties": {
+    "manifest_schema": {"const": "biomodels-video-manifest-0.1 (connector-local)"},
+    "evidence_kind": {"type": "string", "pattern": "^simulated: "},
+    "claims": {
+      "type": "object", "additionalProperties": false, "required": ["shows", "does_not_show", "captions"],
+      "properties": {
+        "shows": {"type": "string"},
+        "does_not_show": {"type": "array", "minItems": 5, "items": {"type": "string"}, "allOf": [
+          {"contains": {"const": "observed cell shape or morphology"}}, {"contains": {"const": "tissue"}}, {"contains": {"const": "a fin"}},
+          {"contains": {"const": "any flying-fish structure"}}, {"contains": {"const": "real time or physical concentration units"}}]},
+        "captions": {"type": "object", "additionalProperties": false, "required": ["header", "footer"], "properties": {
+          "header": {"type": "string", "pattern": "SIMULATION"}, "footer": {"type": "string", "pattern": "not an observation.*non-dimensional.*not tissue, not a fin"}}}
+      }
+    },
+    "inputs": {
+      "type": "object", "additionalProperties": false, "required": ["model_sha256", "receipt_sha256", "replay_code_sha256", "csv"],
+      "properties": {
+        "model_sha256": {"$ref": "#/$defs/sha256"}, "receipt_sha256": {"$ref": "#/$defs/sha256"}, "replay_code_sha256": {"$ref": "#/$defs/sha256"},
+        "csv": {"type": "object", "minProperties": 3, "maxProperties": 3, "additionalProperties": {
+          "type": "object", "additionalProperties": false, "required": ["sha256", "bytes", "rows", "scenario"],
+          "properties": {"sha256": {"$ref": "#/$defs/sha256"}, "bytes": {"type": "integer"}, "rows": {"type": "integer", "minimum": 2}, "scenario": {"enum": ["as_published", "symmetric_baseline", "no_notch_feedback_b0"]}}}}
+      }
+    },
+    "render": {
+      "type": "object", "additionalProperties": false,
+      "required": ["code_file", "code_sha256", "matplotlib", "numpy", "python", "ffmpeg", "threads", "frames_sha256", "frames_sha256_note"],
+      "properties": {"code_file": {"const": "connectors/biomodels/render.py"}, "code_sha256": {"$ref": "#/$defs/sha256"}, "frames_sha256": {"$ref": "#/$defs/sha256"},
+                     "matplotlib": {"type": "string"}, "numpy": {"type": "string"}, "python": {"type": "string"}, "ffmpeg": {"type": "string"},
+                     "threads": {"type": "integer", "minimum": 1}, "frames_sha256_note": {"type": "string"}}
+    },
+    "time_mapping": {
+      "type": "object", "additionalProperties": false,
+      "required": ["fps", "motion_frames", "hold_frames", "total_frames", "model_time_range", "csv_rows", "rule", "model_time_per_motion_frame", "interpolation", "linear_in_model_time", "note"],
+      "properties": {"fps": {"type": "integer", "minimum": 1}, "motion_frames": {"type": "integer", "minimum": 2}, "hold_frames": {"type": "integer", "minimum": 0},
+                     "total_frames": {"type": "integer"}, "model_time_range": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2},
+                     "csv_rows": {"type": "integer"}, "rule": {"type": "string"}, "model_time_per_motion_frame": {"type": "number"},
+                     "interpolation": {"type": "string", "pattern": "^none"}, "linear_in_model_time": {"type": "boolean"}, "note": {"type": "string"}}
+    },
+    "dimensions": {"type": "object", "additionalProperties": false, "required": ["width", "height", "dpi"], "properties": {"width": {"type": "integer"}, "height": {"type": "integer"}, "dpi": {"type": "integer"}}},
+    "video": {
+      "allOf": [{"$ref": "#/$defs/file"}], "type": "object", "additionalProperties": false,
+      "required": ["file", "sha256", "bytes", "codec", "pix_fmt", "width", "height", "frames", "r_frame_rate", "duration_s"],
+      "properties": {"file": {"type": "string"}, "sha256": {"type": "string"}, "bytes": {"type": "integer", "exclusiveMaximum": 8000000}, "codec": {"const": "h264"}, "pix_fmt": {"const": "yuv420p"},
+                     "width": {"type": "integer"}, "height": {"type": "integer"}, "frames": {"type": "integer"}, "r_frame_rate": {"type": "string"},
+                     "duration_s": {"type": "number", "minimum": 10, "maximum": 20}}
+    },
+    "poster": {
+      "allOf": [{"$ref": "#/$defs/file"}], "type": "object", "additionalProperties": false, "required": ["file", "sha256", "bytes", "width", "height", "frame"],
+      "properties": {"file": {"type": "string"}, "sha256": {"type": "string"}, "bytes": {"type": "integer"}, "width": {"type": "integer"}, "height": {"type": "integer"}, "frame": {"type": "string"}}
+    }
+  }
+}

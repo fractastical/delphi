@@ -9,6 +9,9 @@ A theorem that compiles with a clean axiom audit can still say nothing.
 
 - Ours shipped `finite_domain_stable`, which assumed `¬(det < 0)` and concluded `0 ≤ det`. That is
   `not_lt`. It compiled. The axiom audit was clean. An independent reviewer caught it.
+- Its replacement still carried two over-labelled names, found on independent review: `unstable_iff_pos_eigenvalue` proved one direction only, and `worked_stable_on_pi` proved `not unstable`
+  (allowing `D = 0`), not stability. Both were renamed, the true iff and the strict statement added, an actual `L = 2 pi` statement added, and false-twin controls added
+  (`lean/README.md`, `tests/test_admissible_lean.py`).
 - Our experiment checker accepted a frozen `False` once helper text added a second `False`
   assumption — elaborated type `False → False`, clean audit again.
 
@@ -91,8 +94,10 @@ knowledge. What had actually been retrieved was a BioSample `ecotype` field read
 unsourced for the whole run and would have upgraded a technical reproduction into a biological
 specificity result on the strength of recall.
 
-Challenged, it was sourced properly (Jeffery 2020, PMC7353729, full text) **and** the competing
-explanation was ruled out from our own data, and the result is stronger for it. The fix was not
+Challenged, it was sourced properly (Jeffery 2020, PMC7353729, full text) **and** one competing
+explanation (another oca2 lesion in the Tinaja fish) was checked in our own three single-fish assemblies,
+which does not rule it out at population level; the specificity reading was then withdrawn on independent
+review (RESULT section 14.4). The fix was not
 to delete the claim but to **mark the provenance failure in its own subsection** and ship the
 observation at the confidence the evidence supports — post-hoc, n=1 per population, phenotypes
 from a review about populations rather than from the individuals sequenced.

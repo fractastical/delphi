@@ -1,0 +1,715 @@
+{
+ "bundle_sha256": "4fc606fd5620f98b08a41bd81a23efc14144cb4e517e1dcc4ca42dde23a0d94b",
+ "exporting_node": "node-a",
+ "policy_version": "frontier-independent-review-0.1",
+ "records": [
+  {
+   "created_at": "2026-10-31T22:10:51+00:00",
+   "id": "run-betse-claim-k-gap-junction-contrast",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "BETSE BETSE 1.5.0 (Nicest Nestor); 66 cells, 364 membranes, intervention window [1.0, 3.0] s, 39 saved samples.",
+     "Scenarios: baseline; k_up (K+ membrane permeability x5 in the 2 cells of the Spot profile, a generic scale, not Kir2.1); gj_block (all gap junctions blocked); k_up_gj_block; baseline_dt (half solver step, a numerical control).",
+     "Environment pins: betse==1.5.0 and the rest of requirements-betse.txt; interpreter NOT RECORDED in the receipt."
+    ],
+    "context": "A deterministic simulated outcome of a generic tissue model under declared perturbations; not an observation and not a fish fin. SIMULATED (BETSE 1.5.0 numerical output); not observed; not calibrated; not a fish fin",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "GENERIC 2-D tissue patch with BETSE default parameters; no sourced fin or fish tissue parameters. Fin applicability: UNKNOWN. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "Temperature is the BETSE default 310 K; a fish fin is not at that temperature.",
+     "Simulated mean resting Vm is -23.5 mV against a leak-only GHK reference of 0.70 mV; the producer states the GHK number ignores the pump and gap junctions and the difference is not decomposed. Kept as found.",
+     "Gap-junction conductance in siemens, channel conductance and growth coupling are not exposed (BETSE parameterizes junctions by a surface fraction); their values are UNKNOWN.",
+     "No ion depletion in the environment, no flow, no deformation, no gene regulation.",
+     "Channel candidate Kcnj13: listed as a source link only; used_to_set_any_parameter False; conductance, gating and copy number UNKNOWN."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Summary: per-scenario effects, checks, hashes and the producer's label.",
+     "content_available": false,
+     "content_sha256": "e933fe749e411afd7a776f2517cc25a35917cb176039536b99c0b6989f540d13",
+     "license": null,
+     "locator": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/summary.json",
+     "source_version": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "In BETSE BETSE 1.5.0 (Nicest Nestor) on a 66-cell generic patch (default parameters), raising K+ permeability x5 in 2 cells over [1.0, 3.0] s moves the targeted cells by at most -4.67 mV and the 64 other cells by up to -2.62 mV; with gap junctions blocked as well the targeted cells move by -19.8 mV and the others by 0.16 mV; blocking junctions alone moves Vm by at most 0.16 mV. Simulated mean resting Vm is -23.5 mV.",
+    "title": "Generic BETSE tissue patch: K+ permeability change spreads through gap junctions and is confined when they are blocked"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "a6d9673dd2145400bcc840bae468e8a9ad76c0a00eef28d3a9e242885a94c73d",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:10:51+00:00",
+   "id": "run-betse-action-sim",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code reproduces the digests the receipt lists.",
+     "An independent reviewer checks the BETSE configuration against tissue sources before any number is applied to a fin."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5; analysis.py:87b3814fa3d9, betse_stage.py:3648273f1e6f, requirements-betse.txt:d4b38736d904, run.py:97e39397c1a5",
+     "environment": "requirements-betse.txt pins betse==1.5.0 and dependencies; interpreter and platform NOT RECORDED",
+     "input": "five scenario configs baseline:e65a535062, baseline_dt:e96a2bbca2, gj_block:92f716a841, k_up:d9e0006425, k_up_gj_block:335f740c4f",
+     "model": "BETSE 1.5.0 (Nicest Nestor) (ion, pump and gap-junction cell-patch simulator; no language model)",
+     "parameters": "BETSE defaults; K_permeability_multiplier 5.0 in the Spot profile; gap-junction block as in the configs",
+     "scope": "simulated generic tissue; not a fin",
+     "target": "a6d9673dd2145400bcc840bae468e8a9ad76c0a00eef28d3a9e242885a94c73d"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "python3.12 with betse==1.5.0 (isolated venv)"
+    ],
+    "target": {
+     "id": "run-betse-claim-k-gap-junction-contrast",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "a6d9673dd2145400bcc840bae468e8a9ad76c0a00eef28d3a9e242885a94c73d"
+    },
+    "title": "Imported record of a producer-reported run (NOT executed by Frontier): five BETSE 1.5.0 scenarios; the receipt carries NO exit code, command or wall time (the producer's doc reports about 1-2 min per run)"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "9760fef9d75352e639e845fd885537c528ae9c0872244030f7d5b0d491acc010",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:10:51+00:00",
+   "id": "run-betse-evidence-sim",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 183045,
+      "license": null,
+      "media_type": "application/x-npz",
+      "role": "output",
+      "sha256": "520955df2cd82d568315aa78d6346b1353ec99568bc4f73f22c88f73b4bd44e8",
+      "title": "output: artifacts/bioelectric-tissue/trajectories/baseline.npz [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/trajectories/baseline.npz]",
+      "uri": "urn:sha256:520955df2cd82d568315aa78d6346b1353ec99568bc4f73f22c88f73b4bd44e8"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 183114,
+      "license": null,
+      "media_type": "application/x-npz",
+      "role": "output",
+      "sha256": "7d9c9dc83d39465107f464aea82c4f5c30ddd88d924dc6fc1ba8495ad189db29",
+      "title": "output: artifacts/bioelectric-tissue/trajectories/baseline_dt.npz [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/trajectories/baseline_dt.npz]",
+      "uri": "urn:sha256:7d9c9dc83d39465107f464aea82c4f5c30ddd88d924dc6fc1ba8495ad189db29"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 187052,
+      "license": null,
+      "media_type": "application/x-npz",
+      "role": "output",
+      "sha256": "eaf93211d3d9b76d53a94d22744013b9717ad947fe17c722c2b225b0f36984fd",
+      "title": "output: artifacts/bioelectric-tissue/trajectories/gj_block.npz [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/trajectories/gj_block.npz]",
+      "uri": "urn:sha256:eaf93211d3d9b76d53a94d22744013b9717ad947fe17c722c2b225b0f36984fd"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 188813,
+      "license": null,
+      "media_type": "application/x-npz",
+      "role": "output",
+      "sha256": "c9c188aa532f070d644f3a00a9c312978da3b520250a59cd3289e5508f2ebaaf",
+      "title": "output: artifacts/bioelectric-tissue/trajectories/k_up.npz [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/trajectories/k_up.npz]",
+      "uri": "urn:sha256:c9c188aa532f070d644f3a00a9c312978da3b520250a59cd3289e5508f2ebaaf"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 188436,
+      "license": null,
+      "media_type": "application/x-npz",
+      "role": "output",
+      "sha256": "bfab9e1d7df06dfd783ef8106f5d1adf8b11c14831a78a3a8c5697a3ae9faded",
+      "title": "output: artifacts/bioelectric-tissue/trajectories/k_up_gj_block.npz [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/trajectories/k_up_gj_block.npz]",
+      "uri": "urn:sha256:bfab9e1d7df06dfd783ef8106f5d1adf8b11c14831a78a3a8c5697a3ae9faded"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 63316,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "input",
+      "sha256": "e65a5350621c5fc6c828d109a4ca160e7ca92b46e612feb5d5eef13676643dcf",
+      "title": "input: artifacts/bioelectric-tissue/configs/baseline.yaml [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/configs/baseline.yaml]",
+      "uri": "urn:sha256:e65a5350621c5fc6c828d109a4ca160e7ca92b46e612feb5d5eef13676643dcf"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 63316,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "input",
+      "sha256": "e96a2bbca23502ea0695e1aa17a6b10b2fb3e465150ea2fd7657870711ed871e",
+      "title": "input: artifacts/bioelectric-tissue/configs/baseline_dt.yaml [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/configs/baseline_dt.yaml]",
+      "uri": "urn:sha256:e96a2bbca23502ea0695e1aa17a6b10b2fb3e465150ea2fd7657870711ed871e"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 63316,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "input",
+      "sha256": "92f716a8417dd2d44cc8970e647447f0a25caf5ea4e7045a769c5fed143da0d6",
+      "title": "input: artifacts/bioelectric-tissue/configs/gj_block.yaml [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/configs/gj_block.yaml]",
+      "uri": "urn:sha256:92f716a8417dd2d44cc8970e647447f0a25caf5ea4e7045a769c5fed143da0d6"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 63316,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "input",
+      "sha256": "d9e0006425aafdf1f3aeef4fa557f0399dfa3b783365fb18ea17e83b76c5aadd",
+      "title": "input: artifacts/bioelectric-tissue/configs/k_up.yaml [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/configs/k_up.yaml]",
+      "uri": "urn:sha256:d9e0006425aafdf1f3aeef4fa557f0399dfa3b783365fb18ea17e83b76c5aadd"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 63316,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "input",
+      "sha256": "335f740c4f5b815daca1d1f44f135ab383b455dfcdde73e5a5497cccee835510",
+      "title": "input: artifacts/bioelectric-tissue/configs/k_up_gj_block.yaml [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/configs/k_up_gj_block.yaml]",
+      "uri": "urn:sha256:335f740c4f5b815daca1d1f44f135ab383b455dfcdde73e5a5497cccee835510"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 7068,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "e933fe749e411afd7a776f2517cc25a35917cb176039536b99c0b6989f540d13",
+      "title": "log: artifacts/bioelectric-tissue/summary.json [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/summary.json]",
+      "uri": "urn:sha256:e933fe749e411afd7a776f2517cc25a35917cb176039536b99c0b6989f540d13"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 3867,
+      "license": null,
+      "media_type": "application/json",
+      "role": "protocol",
+      "sha256": "b93df7cc2f5ca8a4b635bfdaf284d86f9aa7d77620dea0c07e71d22e345c0f77",
+      "title": "protocol: artifacts/bioelectric-tissue/model_interface.json [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/model_interface.json]",
+      "uri": "urn:sha256:b93df7cc2f5ca8a4b635bfdaf284d86f9aa7d77620dea0c07e71d22e345c0f77"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2500,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "97e39397c1a56537e3e516720fa04290225a11804a44e7b70f83fecf2b0926d0",
+      "title": "code: engineering/bioelectric_tissue/run.py [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:engineering/bioelectric_tissue/run.py]",
+      "uri": "urn:sha256:97e39397c1a56537e3e516720fa04290225a11804a44e7b70f83fecf2b0926d0"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 6976,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "3648273f1e6feb3e7c08a0d0839c2f4f4764e983d83cce789e016fc1af1c3ea4",
+      "title": "code: engineering/bioelectric_tissue/betse_stage.py [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:engineering/bioelectric_tissue/betse_stage.py]",
+      "uri": "urn:sha256:3648273f1e6feb3e7c08a0d0839c2f4f4764e983d83cce789e016fc1af1c3ea4"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 270,
+      "license": null,
+      "media_type": "text/plain",
+      "role": "environment",
+      "sha256": "d4b38736d90456df53249ac2af6df9c52858c0afe434e50d177ae82927aaba20",
+      "title": "environment: engineering/bioelectric_tissue/requirements-betse.txt [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:engineering/bioelectric_tissue/requirements-betse.txt]",
+      "uri": "urn:sha256:d4b38736d90456df53249ac2af6df9c52858c0afe434e50d177ae82927aaba20"
+     }
+    ],
+    "assumptions": [
+     "BETSE BETSE 1.5.0 (Nicest Nestor); 66 cells, 364 membranes, intervention window [1.0, 3.0] s, 39 saved samples.",
+     "Scenarios: baseline; k_up (K+ membrane permeability x5 in the 2 cells of the Spot profile, a generic scale, not Kir2.1); gj_block (all gap junctions blocked); k_up_gj_block; baseline_dt (half solver step, a numerical control).",
+     "Environment pins: betse==1.5.0 and the rest of requirements-betse.txt; interpreter NOT RECORDED in the receipt."
+    ],
+    "context": "Applicability: this generic patch with BETSE defaults. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "GENERIC 2-D tissue patch with BETSE default parameters; no sourced fin or fish tissue parameters. Fin applicability: UNKNOWN. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "Temperature is the BETSE default 310 K; a fish fin is not at that temperature.",
+     "Simulated mean resting Vm is -23.5 mV against a leak-only GHK reference of 0.70 mV; the producer states the GHK number ignores the pump and gap junctions and the difference is not decomposed. Kept as found.",
+     "Gap-junction conductance in siemens, channel conductance and growth coupling are not exposed (BETSE parameterizes junctions by a surface fraction); their values are UNKNOWN.",
+     "No ion depletion in the environment, no flow, no deformation, no gene regulation.",
+     "Channel candidate Kcnj13: listed as a source link only; used_to_set_any_parameter False; conductance, gating and copy number UNKNOWN."
+    ],
+    "local_id": null,
+    "method": "BETSE BETSE 1.5.0 (Nicest Nestor) runs of five scenarios; effects are differences from the baseline run. SIMULATED (BETSE 1.5.0 numerical output); not observed; not calibrated; not a fish fin",
+    "produced_by": {
+     "id": "run-betse-action-sim",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "9760fef9d75352e639e845fd885537c528ae9c0872244030f7d5b0d491acc010"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "betse": "BETSE 1.5.0 (Nicest Nestor)",
+     "command_recorded": false,
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "exit_status_recorded": false,
+     "scenarios": [
+      "baseline",
+      "baseline_dt",
+      "gj_block",
+      "k_up",
+      "k_up_gj_block"
+     ],
+     "source_commit": "b53e0cd5399f6d7a6657b86f33052cb1ffda00b5",
+     "trajectories_sha256": {
+      "baseline": "520955df2cd82d568315aa78d6346b1353ec99568bc4f73f22c88f73b4bd44e8",
+      "baseline_dt": "7d9c9dc83d39465107f464aea82c4f5c30ddd88d924dc6fc1ba8495ad189db29",
+      "gj_block": "eaf93211d3d9b76d53a94d22744013b9717ad947fe17c722c2b225b0f36984fd",
+      "k_up": "c9c188aa532f070d644f3a00a9c312978da3b520250a59cd3289e5508f2ebaaf",
+      "k_up_gj_block": "bfab9e1d7df06dfd783ef8106f5d1adf8b11c14831a78a3a8c5697a3ae9faded"
+     }
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T22:10:51+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Summary.",
+     "content_available": false,
+     "content_sha256": "e933fe749e411afd7a776f2517cc25a35917cb176039536b99c0b6989f540d13",
+     "license": null,
+     "locator": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/summary.json",
+     "source_version": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "run-betse-claim-k-gap-junction-contrast",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "a6d9673dd2145400bcc840bae468e8a9ad76c0a00eef28d3a9e242885a94c73d"
+    },
+    "uncertainty": "Deterministic runs; solver-step sensitivity control only (max |dVm| 3.8e-05 mV). No parameter or biological uncertainty."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "92142cccf92b77f4ab76fbd21a431a76ddf1cb15ca1cc4d0f655b3772dfde23f",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:10:51+00:00",
+   "id": "run-betse-claim-checks",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "BETSE BETSE 1.5.0 (Nicest Nestor); 66 cells, 364 membranes, intervention window [1.0, 3.0] s, 39 saved samples.",
+     "Scenarios: baseline; k_up (K+ membrane permeability x5 in the 2 cells of the Spot profile, a generic scale, not Kir2.1); gj_block (all gap junctions blocked); k_up_gj_block; baseline_dt (half solver step, a numerical control).",
+     "Environment pins: betse==1.5.0 and the rest of requirements-betse.txt; interpreter NOT RECORDED in the receipt."
+    ],
+    "context": "Implementation checks of a simulator output. Vm is defined this way inside BETSE; the check confirms the saved fields agree, not that the model is right. ok=false would be reported as a result, not hidden.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "GENERIC 2-D tissue patch with BETSE default parameters; no sourced fin or fish tissue parameters. Fin applicability: UNKNOWN. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "Temperature is the BETSE default 310 K; a fish fin is not at that temperature.",
+     "Simulated mean resting Vm is -23.5 mV against a leak-only GHK reference of 0.70 mV; the producer states the GHK number ignores the pump and gap junctions and the difference is not decomposed. Kept as found.",
+     "Gap-junction conductance in siemens, channel conductance and growth coupling are not exposed (BETSE parameterizes junctions by a surface fraction); their values are UNKNOWN.",
+     "No ion depletion in the environment, no flow, no deformation, no gene regulation.",
+     "Channel candidate Kcnj13: listed as a source link only; used_to_set_any_parameter False; conductance, gating and copy number UNKNOWN.",
+     "Charge consistency: Vm is defined this way inside BETSE; the check confirms the saved fields agree, not that the model is right.",
+     "Coupling contrast is an expectation, not a law: expectation (not a law): blocking gap junctions should reduce the voltage change seen by cells that were not targeted.",
+     "Mass: Na, K and M exchange with the ideal bath by design, so their totals are not conserved; only P gives a closed-budget test here.",
+     "The repository's tests/test_bioelectric_tissue.py defines 7 tests that recompute the committed checks from the committed trajectories; this adapter did not run them or recompute the checks."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. The checks block with criteria and values.",
+     "content_available": false,
+     "content_sha256": "e933fe749e411afd7a776f2517cc25a35917cb176039536b99c0b6989f540d13",
+     "license": null,
+     "locator": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/summary.json",
+     "source_version": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "The producer's 7 checks all pass: charge_consistency, coupling_contrast_expectation, finite_and_physical, gj_block_control, impermeant_P_total_conserved, k_control_direction_and_reversal, time_step_sensitivity. Time-step halving changes Vm by at most 3.8e-05 mV (8.2e-06 of the K-control peak); total impermeant P is conserved to relative range 0 in every scenario; the K control direction and reversal and the gap-junction block control are met.",
+    "title": "BETSE tissue patch: seven computational checks pass, one of them a definitional consistency and one an expectation"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "5a4eafc0317b5b53fa236e3cd2ad2e96dffb68d201412a2a3c179a81becae389",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:10:51+00:00",
+   "id": "run-betse-action-checks",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code reproduces the digests the receipt lists.",
+     "A reviewer reads each criterion and confirms it tests what its name says."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5; analysis.py 87b3814fa3d9",
+     "environment": "NOT RECORDED by the producer",
+     "input": "saved trajectories of the five scenarios (see the simulation Evidence)",
+     "model": "none: numerical predicates",
+     "parameters": "thresholds are check criteria, not statistics",
+     "scope": "checks of a simulator output",
+     "target": "5a4eafc0317b5b53fa236e3cd2ad2e96dffb68d201412a2a3c179a81becae389"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "run-betse-evidence-sim",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "92142cccf92b77f4ab76fbd21a431a76ddf1cb15ca1cc4d0f655b3772dfde23f"
+     }
+    ],
+    "required_capabilities": [
+     "python3 with numpy"
+    ],
+    "target": {
+     "id": "run-betse-claim-checks",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "5a4eafc0317b5b53fa236e3cd2ad2e96dffb68d201412a2a3c179a81becae389"
+    },
+    "title": "Imported record of producer-reported checks (NOT executed by Frontier): seven predicates over the saved trajectories"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "ed42af5095a00a00c51b915dbbd16e481382db6d6ff4bcbd1abbac731f20790e",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:10:51+00:00",
+   "id": "run-betse-evidence-checks",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 7068,
+      "license": null,
+      "media_type": "application/json",
+      "role": "certificate",
+      "sha256": "e933fe749e411afd7a776f2517cc25a35917cb176039536b99c0b6989f540d13",
+      "title": "certificate: artifacts/bioelectric-tissue/summary.json [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/summary.json]",
+      "uri": "urn:sha256:e933fe749e411afd7a776f2517cc25a35917cb176039536b99c0b6989f540d13"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 11248,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "87b3814fa3d997927fa61020824ee3b9dd2c7cee6ef80dc5a51566a4f1f6ad1a",
+      "title": "code: engineering/bioelectric_tissue/analysis.py [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:engineering/bioelectric_tissue/analysis.py]",
+      "uri": "urn:sha256:87b3814fa3d997927fa61020824ee3b9dd2c7cee6ef80dc5a51566a4f1f6ad1a"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 8933,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "fcef3a572b5534e72640d59068542f09c5e87d8d6b051c57f87d9966ea87f92f",
+      "title": "code: tests/test_bioelectric_tissue.py [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:tests/test_bioelectric_tissue.py]",
+      "uri": "urn:sha256:fcef3a572b5534e72640d59068542f09c5e87d8d6b051c57f87d9966ea87f92f"
+     }
+    ],
+    "assumptions": [
+     "BETSE BETSE 1.5.0 (Nicest Nestor); 66 cells, 364 membranes, intervention window [1.0, 3.0] s, 39 saved samples.",
+     "Scenarios: baseline; k_up (K+ membrane permeability x5 in the 2 cells of the Spot profile, a generic scale, not Kir2.1); gj_block (all gap junctions blocked); k_up_gj_block; baseline_dt (half solver step, a numerical control).",
+     "Environment pins: betse==1.5.0 and the rest of requirements-betse.txt; interpreter NOT RECORDED in the receipt."
+    ],
+    "context": "Applicability: these trajectories only. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "GENERIC 2-D tissue patch with BETSE default parameters; no sourced fin or fish tissue parameters. Fin applicability: UNKNOWN. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "Temperature is the BETSE default 310 K; a fish fin is not at that temperature.",
+     "Simulated mean resting Vm is -23.5 mV against a leak-only GHK reference of 0.70 mV; the producer states the GHK number ignores the pump and gap junctions and the difference is not decomposed. Kept as found.",
+     "Gap-junction conductance in siemens, channel conductance and growth coupling are not exposed (BETSE parameterizes junctions by a surface fraction); their values are UNKNOWN.",
+     "No ion depletion in the environment, no flow, no deformation, no gene regulation.",
+     "Channel candidate Kcnj13: listed as a source link only; used_to_set_any_parameter False; conductance, gating and copy number UNKNOWN.",
+     "Producer check, not independent."
+    ],
+    "local_id": null,
+    "method": "Seven predicates over saved trajectories; values and criteria are in the summary.",
+    "produced_by": {
+     "id": "run-betse-action-checks",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "ed42af5095a00a00c51b915dbbd16e481382db6d6ff4bcbd1abbac731f20790e"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "all_checks_ok": true,
+     "checks": [
+      "charge_consistency",
+      "coupling_contrast_expectation",
+      "finite_and_physical",
+      "gj_block_control",
+      "impermeant_P_total_conserved",
+      "k_control_direction_and_reversal",
+      "time_step_sensitivity"
+     ],
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "repo_test_defs": 7,
+     "source_commit": "b53e0cd5399f6d7a6657b86f33052cb1ffda00b5",
+     "tests_run_by_adapter": false
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T22:10:51+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Checks block.",
+     "content_available": false,
+     "content_sha256": "e933fe749e411afd7a776f2517cc25a35917cb176039536b99c0b6989f540d13",
+     "license": null,
+     "locator": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/summary.json",
+     "source_version": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "run-betse-claim-checks",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "5a4eafc0317b5b53fa236e3cd2ad2e96dffb68d201412a2a3c179a81becae389"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "6b57fc8a0f56034abef1eb4c3ab39c7dba7d46dc8f4ee247e56601f64d1e9281",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:10:51+00:00",
+   "id": "run-betse-action-render",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "Re-rendering the trajectories with render.py reproduces the frames; mp4 bytes can differ across ffmpeg builds.",
+     "Pictures are read as views of computed states, not as evidence."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5; render.py 3b61239a8064",
+     "environment": "NOT RECORDED by the producer",
+     "input": "simulation evidence version 92142cccf92b77f4ab76fbd21a431a76ddf1cb15ca1cc4d0f655b3772dfde23f",
+     "model": "none: deterministic rendering",
+     "parameters": "NOT RECORDED (frame count and fps are not in the receipt)",
+     "scope": "visualisation of a simulated generic tissue patch",
+     "target": "a6d9673dd2145400bcc840bae468e8a9ad76c0a00eef28d3a9e242885a94c73d"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "run-betse-evidence-sim",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "92142cccf92b77f4ab76fbd21a431a76ddf1cb15ca1cc4d0f655b3772dfde23f"
+     }
+    ],
+    "required_capabilities": [
+     "python3 with matplotlib; ffmpeg"
+    ],
+    "target": {
+     "id": "run-betse-claim-k-gap-junction-contrast",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "a6d9673dd2145400bcc840bae468e8a9ad76c0a00eef28d3a9e242885a94c73d"
+    },
+    "title": "Imported record of a producer-reported render (NOT executed by Frontier): video and poster from the saved trajectories; the producer states NO hash for either, so the digests here were computed by this adapter"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "d1a508fc5919f323ab95f8f699cd66d1bb77ddc1acca73bd9c3a44bbec7a549a",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:10:51+00:00",
+   "id": "run-betse-evidence-render",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 136977,
+      "license": null,
+      "media_type": "video/mp4",
+      "role": "output",
+      "sha256": "a5e084e0f8a5c2dc00406f7d2fbfce767e15a2275d908ef07577db780786bc08",
+      "title": "output: artifacts/bioelectric-tissue/bioelectric_tissue.mp4 [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/bioelectric_tissue.mp4]",
+      "uri": "urn:sha256:a5e084e0f8a5c2dc00406f7d2fbfce767e15a2275d908ef07577db780786bc08"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 194953,
+      "license": null,
+      "media_type": "image/png",
+      "role": "output",
+      "sha256": "ce07f42539670a87810e8e08f83b2e59092bc4c62e8667617e9f8156c1ea1a15",
+      "title": "output: artifacts/bioelectric-tissue/poster.png [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/poster.png]",
+      "uri": "urn:sha256:ce07f42539670a87810e8e08f83b2e59092bc4c62e8667617e9f8156c1ea1a15"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 3662,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "3b61239a8064729e24cbafca9d5f0d454e1d62f8e54a9bc8df43020721fdc0ac",
+      "title": "code: engineering/bioelectric_tissue/render.py [git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:engineering/bioelectric_tissue/render.py]",
+      "uri": "urn:sha256:3b61239a8064729e24cbafca9d5f0d454e1d62f8e54a9bc8df43020721fdc0ac"
+     }
+    ],
+    "assumptions": [
+     "BETSE BETSE 1.5.0 (Nicest Nestor); 66 cells, 364 membranes, intervention window [1.0, 3.0] s, 39 saved samples.",
+     "Scenarios: baseline; k_up (K+ membrane permeability x5 in the 2 cells of the Spot profile, a generic scale, not Kir2.1); gj_block (all gap junctions blocked); k_up_gj_block; baseline_dt (half solver step, a numerical control).",
+     "Environment pins: betse==1.5.0 and the rest of requirements-betse.txt; interpreter NOT RECORDED in the receipt."
+    ],
+    "context": "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right.",
+     "Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "No producer-stated hash for the video or poster; the digests are computed from the committed bytes."
+    ],
+    "local_id": null,
+    "method": "Producer renders the saved trajectories to a video and poster (render.py). No render receipt exists; hashes are adapter-computed.",
+    "produced_by": {
+     "id": "run-betse-action-render",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "d1a508fc5919f323ab95f8f699cd66d1bb77ddc1acca73bd9c3a44bbec7a549a"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "hashes_stated_by_producer": false,
+     "mp4_sha256": "a5e084e0f8a5c2dc00406f7d2fbfce767e15a2275d908ef07577db780786bc08",
+     "poster_sha256": "ce07f42539670a87810e8e08f83b2e59092bc4c62e8667617e9f8156c1ea1a15",
+     "source_commit": "b53e0cd5399f6d7a6657b86f33052cb1ffda00b5"
+    },
+    "provider_assessment": null,
+    "relation": "context_only",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T22:10:51+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Interface and status label.",
+     "content_available": false,
+     "content_sha256": "b93df7cc2f5ca8a4b635bfdaf284d86f9aa7d77620dea0c07e71d22e345c0f77",
+     "license": null,
+     "locator": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5:artifacts/bioelectric-tissue/model_interface.json",
+     "source_version": "git:delphi-frontier@b53e0cd5399f6d7a6657b86f33052cb1ffda00b5",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "run-betse-claim-k-gap-junction-contrast",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "a6d9673dd2145400bcc840bae468e8a9ad76c0a00eef28d3a9e242885a94c73d"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "55dbbf74386b593ca080d0db9e876cd43cfb638dd282be5813cf28176f39a5b9",
+   "visibility": "public"
+  }
+ ],
+ "review_claims": [],
+ "schema_version": "frontier-bundle-0.1",
+ "trust": "Digest proves integrity only; reviews require receiving-node policy."
+}
