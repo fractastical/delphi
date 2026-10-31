@@ -31,9 +31,19 @@ preserved and no new sequence-generation request is being routed elsewhere.
   one-thread arms continue the original full horizon; earlier local partials remain.
 - [x] Integrate GPUops' frozen cylinder interpretation and corrected field videos.
   Cylinder numeric gates passed; the literature bands remain source-unverified.
-- [ ] Collect the Morpheus full-horizon or explicitly partial result.
-- [ ] Dispatch the forthcoming controlled 3D WaterLily packet after its packaging,
-  runtime and status contracts are frozen. The failed physical reference stays visible.
+- [x] Collect all three Morpheus arms through the full t=2 horizon. Thirteen
+  output hashes matched; final cell counts were 256, 128 and 263. The first
+  wrapper failure remains distinct from the successful recovery attempt.
+- [x] Dispatch the controlled 3D WaterLily packet after its packaging, runtime
+  and status contracts were frozen. It stopped at the candidate metadata hash:
+  all twelve STL hashes matched, but candidate JSON differed. No CFD ran.
+- [ ] Diagnose that exact metadata difference before any CFD retry. The failed
+  physical sphere reference remains visible independently of the packaging issue.
+- [ ] Dispatch the newly requested conditional RD diffusion training pilot when
+  its preregistered dataset, split, controls and compact packet are ready.
+- [ ] Extend the three short MD states only after the exact warm-start archive
+  is public and hash-checked. The frozen question measures remaining structural
+  drift; it does not assert equilibrium or a tissue modulus.
 
 The angle batch requires a passing parity check in the same allocation. Its
 subsequent workloads reject a missing or failed gate. The original 3 MB return
