@@ -29,7 +29,7 @@ from .search import SEARCH_KIND, SearchIndex
 from .artifacts import ArtifactIndex
 from .store import FrontierError, Store, Unauthorized
 
-MANIFEST_VERSION = "frontier-mcp-capabilities-0.1"
+MANIFEST_VERSION = "frontier-mcp-capabilities-0.2"
 READ = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False)
 # Append-only store: nothing is destroyed; a retry with the same idempotency key and request returns the stored response.
 WRITE = ToolAnnotations(readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False)
@@ -39,7 +39,9 @@ TransitionState = Literal["ready", "running", "submitted", "blocked", "cancelled
 NOT_AVAILABLE = [
     "review / accept / dispute: independent reviewers act through HTTP POST /v1/reviews with their own operator credential",
     "import_bundle, provision, initialize (operator-only)",
-    "job execution, network fetch, publication (the store coordinates and records; it runs nothing)",
+    "cloud or durable job execution, arbitrary code, network fetch, publication, and external model inference",
+    "the fixed local calculation tools are bounded previews only; they do not create or accept Actions or Evidence",
+    "proposed Actions are stored as proposed; a worker must use the existing authorized lease/transition flow and record real outputs separately",
 ]
 
 
@@ -120,6 +122,7 @@ def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = Non
     server = FastMCP("Delphi Frontier MCP", log_level="ERROR", **remote_kwargs, instructions=(
         "Bounded access to a Delphi Frontier node. Call frontier_capabilities first: it states the mode, the calling principal (never the credential), "
         "the exact tools and what is deliberately not available. Exact versions, source assertions and node-local review status stay separate. "
+        "Discovery uses cached embeddings only and falls back explicitly to lexical search; fixed calculation tools return ephemeral results and do not call external inference providers. "
         + (f"WRITE MODE: frontier_propose, frontier_lease and frontier_transition act as {acts_as}; the store's role checks decide what that principal may do; "
            "there is no review/accept tool and acceptance needs an independent operator elsewhere." if allow_write else "READ-ONLY: no write tools are registered.")))
 
@@ -165,6 +168,10 @@ def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = Non
 
     for f in (frontier_search, frontier_get, frontier_neighborhood, frontier_events, frontier_artifacts):
         register(f, READ, "read", None)
+
+    from .mcp_surfaces import register_surfaces
+    register_surfaces(server, store, register, read_annotations=READ,
+                      public_host=public_host if remote else None)
 
     def manifest() -> dict:
         who = principal
