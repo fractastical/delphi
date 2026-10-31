@@ -14,6 +14,8 @@ from frontier_compute import gpu_neumann as G
 from frontier_compute.telemetry import Telemetry
 
 cells = json.load(open(sys.argv[1]))["cells"]
+if os.environ.get("PREFLIGHT"):
+    print("preflight ok: imports and cell file load,", len(cells), "cells"); sys.exit(0)
 arms = (sys.argv[sys.argv.index("--arms") + 1] if "--arms" in sys.argv else "base").split(",")
 budget = float(sys.argv[sys.argv.index("--budget-s") + 1]) if "--budget-s" in sys.argv else 480.0
 out = os.environ.get("COPS_OUT", ".")

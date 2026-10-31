@@ -8,6 +8,8 @@ OUT = os.environ.get("COPS_OUT", ".")
 BUDGET = float(os.environ.get("EVO2_BUDGET_S", "3000"))
 REV = "bda0089f92582d5baabf0f22d9fc85f3588f6b58"
 LFS_SHA = "c66645929dc1b9c631f5be656da8726f38946315dc9167000a615dd626fcecf4"
+if os.environ.get("PREFLIGHT"):
+    assert os.path.exists(os.environ.get("EVO2_FASTA", "inputs/evo2_ecoli_NC_000913.3_c364500-362455.fa")); print("preflight ok: script parses, fasta present"); sys.exit(0)
 R = {"stages": {}, "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "budget_s": BUDGET}
 
 
@@ -85,10 +87,30 @@ def install():
     return {"steps": steps, "pip_after": [l for l in pl.splitlines() if any(k in l.lower() for k in ("torch", "flash", "transformer", "vtx", "evo2"))]}
 
 
+def pick_cache():
+    import shutil
+    cands = [os.environ.get("EVO2_CACHE", ""), "/root/.cache", "/tmp", "/work", "/mnt", "/dev/shm", os.getcwd()]
+    table = {}
+    best = None
+    for c in cands:
+        if c and os.path.isdir(c):
+            fr = shutil.disk_usage(c).free / 1e9
+            table[c] = round(fr, 1)
+            if fr >= 22 and best is None:
+                best = c
+    R["disk_free_gb_by_dir"] = table
+    return best
+
+
 @stage("weights")
 def weights():
     from huggingface_hub import hf_hub_download
-    p = hf_hub_download("arcinstitute/evo2_7b", "evo2_7b.pt", revision=REV)
+    base = pick_cache()
+    if base is None:
+        raise RuntimeError("no directory with >= 22 GB free; see disk_free_gb_by_dir")
+    cache = os.path.join(base, "hf_evo2"); os.makedirs(cache, exist_ok=True)
+    os.environ["HF_HOME"] = cache
+    p = hf_hub_download("arcinstitute/evo2_7b", "evo2_7b.pt", revision=REV, cache_dir=cache)
     h = hashlib.sha256()
     with open(p, "rb") as f:
         for ch in iter(lambda: f.read(1 << 24), b""):

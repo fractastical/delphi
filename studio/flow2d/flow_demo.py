@@ -14,6 +14,8 @@ DT = float(os.environ.get("FLOW_DT", "1.2e-3")); NF = int(os.environ.get("FLOW_N
 NC = int(os.environ.get("FLOW_CHK_N", "512")); TC = float(os.environ.get("FLOW_CHK_T", "2.0"))
 dev = "cuda" if torch.cuda.is_available() else "cpu"
 T0 = time.time()
+if os.environ.get("PREFLIGHT"):
+    np.load("flow2d/flow_cpu_ref_rand64.npy"); print("preflight ok: imports and reference file"); sys.exit(0)
 R = {"check_grid": [NC, 2 * NC], "check_T": TC, "device": dev, "torch": torch.__version__, "params": {"N": N, "T": T, "nu": NU, "dt": DT, "nframes": NF}}
 if dev == "cuda":
     R["gpu"] = torch.cuda.get_device_name(0)
