@@ -1,0 +1,67 @@
+@prefix this: <https://w3id.org/np/RAoz5PsxFltJDevOZx0PyARgYVgGfG87L4WoUReiiDhss>.
+@prefix sub: <https://w3id.org/np/RAoz5PsxFltJDevOZx0PyARgYVgGfG87L4WoUReiiDhss/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/darwin1859-ch11-14> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Throughout the world, plants growing on high mountains (including tropical ones) and on the temperate lowlands of the northern and southern hemispheres are sometimes identical species but much more often distinct yet closely related species.";
+    dc:type "empirical-generalization";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Plants of high mountains and temperate lowlands worldwide are identical or closely related";
+    <https://w3id.org/delphi/ontology/context> "Charles Darwin, On the Origin of Species (1st ed., London: John Murray, 1859), Chapter XI, “Geographical Distribution”; section “Dispersal during the Glacial period co-extensive with the world”. Scope: flowering plants of temperate lowlands and tropical and temperate mountains"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-darwin-origin-extractor>;
+    prov:wasDerivedFrom sub:quote, <http://www.wikidata.org/entity/Q20968204>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-darwin-origin-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Origin of Species claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://www.gutenberg.org/cache/epub/1228/pg1228.txt#line=11283,11289>;
+    prov:wasQuotedFrom <http://www.wikidata.org/entity/Q20968204>;
+    <https://schema.org/text> "Hence we see that throughout the world, the plants growing on the more lofty mountains, and on the temperate lowlands of the northern and southern hemispheres, are sometimes identically the same; but they are much oftener specifically distinct, though related to each other in a most remarkable manner.".
+<http://www.wikidata.org/entity/Q20968204> dc:creator <http://www.wikidata.org/entity/Q1035>;
+    dc:date "1859"^^xsd:gYear;
+    dc:title "On the Origin of Species by Means of Natural Selection, or the Preservation of Favoured Races in the Struggle for Life";
+    <https://schema.org/bookEdition> "1";
+    <https://schema.org/exampleOfWork> <http://www.wikidata.org/entity/Q20124>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://www.gutenberg.org/cache/epub/1228/pg1228.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-darwin-origin-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://www.gutenberg.org/cache/epub/1228/pg1228.txt#line=11283,11289> <https://schema.org/isPartOf> <https://www.gutenberg.org/cache/epub/1228/pg1228.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/c8b4ec9b7403f34b5c30c0c971c7660a9c868767/darwin-origin/build/generate.mjs>.
+<https://www.gutenberg.org/cache/epub/1228/pg1228.txt> <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <http://www.wikidata.org/entity/Q20968204>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "362142cb7c6f90850477520cfe2a62fe423ae92ea8eb6d9cd8b30ddb39de60b9"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Darwin 1859 claim: Plants of high mountains and temperate lowlands worldwide are identical or closely related";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-30T23:25:03.644Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/darwin1859-ch11-14>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/darwin-origin-1859>.
+<https://w3id.org/delphi/resource/domain/darwin-origin-1859> <http://www.w3.org/2000/01/rdf-schema#label> "darwin-origin-1859".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "oKwAapixDqY5TUWIm/m5H7CdX3g0xeOyePO91icMFgOxnCQF1XzZISWkpYdhfMSifJvlXgmTuyjrzXghMOPYOCOcJSD3Drb57PQdE+Q8HWEz+t3wWQ4YMXyGJmIf2X2KU+HZHo6zh0BbjTJIsPHBRRv4xi/5AUnqMKXhdsmTv8Fg3zFhii06z/Ltw9Kx8iS5rjM0bqCbpFrJkcrYhDDUt7AM5a29UTTJ5bNxgWagTzwDo6Fp9LeBd2pMx5D+I25jQwPphU918XeB/poBp33QONaSSI3aUQpA4C2rYVuq0/dgXXdTAgiU/Ly6kD47C8+/GfZcdZ2jHP0CEb6FhFzEzA=="
+}

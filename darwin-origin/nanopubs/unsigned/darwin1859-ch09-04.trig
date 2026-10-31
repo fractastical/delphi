@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch09-04> a delphi:Claim ;
+    rdfs:label "Soft-bodied organisms and remains on non-depositing sea floor are not preserved" ;
+    dct:description "Wholly soft-bodied organisms are not preserved as fossils, and shells and bones decay and disappear where they lie on parts of the sea floor where sediment is not accumulating, so the fossil record is strongly biased." ;
+    delphi:context "Charles Darwin, On the Origin of Species (1st ed., London: John Murray, 1859), Chapter IX, “On the Imperfection of the Geological Record”; section “On the poorness of our palæontological collections”. Scope: fossil preservation of marine and other organisms" ;
+    dct:type "empirical-generalization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <http://www.wikidata.org/entity/Q20968204> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-darwin-origin-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "No organism wholly soft can be preserved. Shells and bones will decay and disappear when left on the bottom of the sea, where sediment is not accumulating." ;
+    prov:wasQuotedFrom <http://www.wikidata.org/entity/Q20968204> ;
+    prov:hadPrimarySource <https://www.gutenberg.org/cache/epub/1228/pg1228.txt#line=8728,8731> .
+
+  <https://www.gutenberg.org/cache/epub/1228/pg1228.txt#line=8728,8731> schema:isPartOf <https://www.gutenberg.org/cache/epub/1228/pg1228.txt> .
+
+  <http://www.wikidata.org/entity/Q20968204> dct:title "On the Origin of Species by Means of Natural Selection, or the Preservation of Favoured Races in the Struggle for Life" ;
+    dct:creator <http://www.wikidata.org/entity/Q1035> ;
+    dct:date "1859"^^xsd:gYear ;
+    schema:bookEdition "1" ;
+    schema:exampleOfWork <http://www.wikidata.org/entity/Q20124> .
+
+  <https://www.gutenberg.org/cache/epub/1228/pg1228.txt> schema:about <http://www.wikidata.org/entity/Q20968204> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "362142cb7c6f90850477520cfe2a62fe423ae92ea8eb6d9cd8b30ddb39de60b9" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://www.gutenberg.org/cache/epub/1228/pg1228.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-darwin-origin-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/c8b4ec9b7403f34b5c30c0c971c7660a9c868767/darwin-origin/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-darwin-origin-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci Origin of Species claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-30T23:25:03.644Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Darwin 1859 claim: Soft-bodied organisms and remains on non-depositing sea floor are not preserved" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/darwin1859-ch09-04> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+  <https://w3id.org/delphi/resource/domain/darwin-origin-1859> rdfs:label "darwin-origin-1859" .
+}

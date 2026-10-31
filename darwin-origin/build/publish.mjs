@@ -20,7 +20,8 @@ const REGISTRIES = {
 const registry = arg("--registry");
 if (!REGISTRIES[registry]) throw new Error("--registry must be test or production");
 const dir = join(ROOT, arg("--dir", "nanopubs/unsigned"));
-const signedDir = join(dir, "..", basename(dir).replace(/^unsigned/, "signed"));
+const signedDir = join(dir, "..", basename(dir).replace("unsigned", "signed"));
+if (signedDir === dir) throw new Error("--dir must name an *unsigned* directory");
 const dryRun = process.argv.includes("--dry-run");
 const MANIFEST = join(ROOT, "nanopubs/manifest.jsonl");
 
