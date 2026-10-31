@@ -6,6 +6,22 @@ graph's model truth scores — from any agent, without writing SPARQL. Available
 
 ## Setup
 
+**Hosted (nothing to install)**: point any MCP client that supports Streamable HTTP at
+`https://delphisci-mcp.fly.dev/mcp`. No auth; 120 requests per minute per IP. It serves `main` as
+of the last deploy (see `https://delphisci-mcp.fly.dev/healthz`), so unpushed drafts aren't there.
+
+```json
+{ "mcpServers": { "delphisci": { "url": "https://delphisci-mcp.fly.dev/mcp" } } }
+```
+
+Claude Code: `claude mcp add --transport http delphisci https://delphisci-mcp.fly.dev/mcp`. In
+claude.ai or ChatGPT, add it as a custom connector with that URL.
+
+It runs on Fly.io (`fly.toml`, `Dockerfile`) and redeploys from
+[`.github/workflows/deploy-mcp.yml`](../.github/workflows/deploy-mcp.yml) whenever `main` changes
+the server, `docs/claims.json` or any nanopubs. To run the HTTP mode locally:
+`DELPHI_HTTP_PORT=8080 node mcp/server.mjs`.
+
 **Without cloning**: any MCP client can run it straight from GitHub. npm fetches the repo at the
 given ref and installs only the server, `docs/claims.json` and the unsigned TriG files (~750 KB),
 so `local` means "the repo as of that commit".

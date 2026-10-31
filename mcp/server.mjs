@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// MCP server (stdio) exposing delphisci claims, their math and their assessment rankings.
+// MCP server exposing delphisci claims, their math, their assessment rankings and the claim graph.
+// Runs over stdio, or over Streamable HTTP at /mcp when DELPHI_HTTP_PORT is set (see mcp/http.mjs).
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -7,17 +8,24 @@ import { z } from "zod";
 import { GROUP_KEYS, SORT_KEYS, browseClaims } from "./graph.mjs";
 import { NETWORK_ENDPOINT, PREFIXES, getClaim, overview, rankClaims, searchClaims, sparql } from "./lib.mjs";
 
-const server = new McpServer({ name: "delphisci", version: "0.1.0" });
+const TOOLS = [];
+
+export function createServer() {
+  const server = new McpServer({ name: "delphisci", version: "0.2.0" });
+  for (const [name, description, inputSchema, fn] of TOOLS) {
+    server.registerTool(name, { description, inputSchema, annotations: { readOnlyHint: true } }, async args => {
+      try { return json(await fn(args)); }
+      catch (e) { return { isError: true, content: [{ type: "text", text: String(e?.message ?? e) }] }; }
+    });
+  }
+  return server;
+}
 
 const source = z.enum(["local", "network"]).default("local").describe(
   `"local" = TriG files in this repo, including unpublished drafts and assessments. "network" = what is published, via ${NETWORK_ENDPOINT}.`);
 
 const json = data => ({ content: [{ type: "text", text: JSON.stringify(data, null, 2) }] });
-const tool = (name, description, inputSchema, fn) =>
-  server.registerTool(name, { description, inputSchema, annotations: { readOnlyHint: true } }, async args => {
-    try { return json(await fn(args)); }
-    catch (e) { return { isError: true, content: [{ type: "text", text: String(e?.message ?? e) }] }; }
-  });
+const tool = (...spec) => TOOLS.push(spec);
 
 tool("delphi_overview",
   "Start here. Counts claims per domain (and how many carry math in skos:notation), and lists the assessment types you can rank by.",
@@ -79,4 +87,9 @@ tool("delphi_sparql",
   { query: z.string(), source },
   ({ query, source }) => sparql(query, source));
 
-await server.connect(new StdioServerTransport());
+if (process.env.DELPHI_HTTP_PORT) {
+  const { serveHttp } = await import("./http.mjs");
+  serveHttp(createServer, Number(process.env.DELPHI_HTTP_PORT));
+} else {
+  await createServer().connect(new StdioServerTransport());
+}
