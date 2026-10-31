@@ -126,7 +126,7 @@
     const foot = document.getElementById("foot");
     foot.innerHTML = html`<p><b>${snap.label}</b> · ${snap.inputs.length} input files hashed · <a href="data/snapshot.json">snapshot.json</a> · <a href="data/catalog.json">catalog.json</a> · KaTeX 0.16.47 (MIT, <a href="vendor/katex/LICENSE">licence</a>)</p>
       <details><summary>Input files and sha256</summary><div class="tablewrap"><table><tbody>${snap.inputs.map((i) => html`<tr><td><code>${i.path}</code></td><td><code>${i.sha256}</code></td><td>${i.bytes} bytes</td></tr>`)}</tbody></table></div></details>
-      <p class="small faint">Geometry is a design visualisation, not an observed fish and not CFD. Calculations are browser arithmetic on published fits. Upstream review labels are assertions, never local acceptance. No live activity, votes, scores or progress figures are shown.</p>`.toString();
+      <p class="small faint">Geometry is a design visualisation, not an observed fish and not CFD. Calculations are browser arithmetic on published fits. Upstream review labels are assertions, never local acceptance. Live: records, search, questions, System and the solver read the running node when it answers. From the snapshot: the curated mission board, recorded results and media, labelled with the snapshot above. No votes, scores or progress figures are shown.</p>`.toString();
     document.addEventListener("click", (e) => { const a = e.target.closest("a[data-src]"); if (a) opener = a; });
     document.getElementById("dclose").addEventListener("click", closeDrawer);
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !document.getElementById("drawer").hidden) closeDrawer(); });

@@ -555,7 +555,7 @@
             if (!shown) count.textContent = `No record matches (${DF.api.state.mode === "live" ? "the live node returned none" : "the snapshot has none"}). Try fewer words or clear the filters. · mode ${r.mode}${r.namespace ? " · namespace " + r.namespace : ""}`;
             more.innerHTML = r.next_cursor ? `<button class="btn" type="button">Load more</button>` : "";
             const b = more.querySelector("button"); if (b) b.addEventListener("click", () => { b.disabled = true; load(r.next_cursor); });
-          } catch (e) { count.textContent = "The catalog could not be read: " + e.message + ". Nothing is shown in its place."; }
+          } catch (e) { count.textContent = /HTTP 400/.test(e.message) ? "The search was refused, usually because the query is too long (at most 200 characters) or malformed. Nothing is shown in its place." : "The catalog could not be read: " + e.message + ". Nothing is shown in its place."; }
         };
         load("");
       },
