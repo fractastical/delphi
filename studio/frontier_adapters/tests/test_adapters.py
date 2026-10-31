@@ -540,3 +540,19 @@ class BulkImport(unittest.TestCase):
         with tempfile.TemporaryDirectory() as out:
             cp = b.run(Bad(), out)
             self.assertIn("catalog control failed", cp["stopped"]); self.assertEqual(cp["done"], [])
+
+    def test_catalog_phase_requests_are_in_the_receipt_log(self):
+        """Regression: receipts were once taken only after the catalog phase, silently omitting ~12 requests per wave."""
+        from frontier_adapters import delphi_bulk as b
+        with tempfile.TemporaryDirectory() as out:
+            m = self.fake(["a0"])
+            m.receipts = []
+            orig_text = m.text
+
+            def text(name, args):
+                m.receipts.append({"n": len(m.receipts) + 1, "tool": name, "http": 200})      # a catalog-phase request
+                return orig_text(name, args)
+            m.text = text
+            b.run(m, out)
+            with open(os.path.join(out, "receipts.jsonl")) as fh:
+                self.assertIn("delphi_overview", [json.loads(l)["tool"] for l in fh])

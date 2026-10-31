@@ -102,6 +102,7 @@ def _append(path, obj):
 def run(mcp: Delphi, out_dir: str, *, limit: int | None = None, batch: int = 25, shard: int = 100, entries: list | None = None) -> dict:
     """Retrieve and map up to `limit` NEW claims (in priority order), resuming from out_dir/checkpoint.json."""
     os.makedirs(out_dir, exist_ok=True)
+    start_receipt, started = len(mcp.receipts), iso_utc()          # BEFORE the catalog phase, so its requests are logged too
     cp_path = os.path.join(out_dir, "checkpoint.json")
     cp = json.load(open(cp_path)) if os.path.exists(cp_path) else {"done": [], "counts": {}, "stopped": None, "waves": []}
     if entries is None:
@@ -109,6 +110,8 @@ def run(mcp: Delphi, out_dir: str, *, limit: int | None = None, batch: int = 25,
         cp["catalog_control"] = ctl
         if not ctl["count_matches_overview"] or ctl["must_fail_nonexistent_thinker_matched"] != 0:
             cp["stopped"] = "catalog control failed; not importing"
+            for r in mcp.receipts[start_receipt:]:
+                _append(os.path.join(out_dir, "receipts.jsonl"), r)
             json.dump(cp, open(cp_path, "w"), indent=1, sort_keys=True)
             return cp
     cp["catalog_sha256"] = sha_obj([e["id"] for e in entries])
@@ -116,7 +119,6 @@ def run(mcp: Delphi, out_dir: str, *, limit: int | None = None, batch: int = 25,
     todo = [e for e in entries if e["id"] not in done]
     if limit is not None:
         todo = todo[:limit]
-    start_receipt, started = len(mcp.receipts), iso_utc()
     try:
         for i in range(0, len(todo), batch):
             chunk = todo[i:i + batch]
