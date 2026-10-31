@@ -33,9 +33,10 @@ def base():
     server.shutdown()
 
 
-def make_project(store):
-    target = store.submit(TOKENS["alice"], "composer-claim", claim(store, id="composer-target"))["record"]
-    member_ref = ref(target)
+def make_project(store, member_ref=None):
+    if member_ref is None:
+        target = store.submit(TOKENS["alice"], "composer-claim", claim(store, id="composer-target"))["record"]
+        member_ref = ref(target)
     project = {
         "namespace": store.namespace, "kind": "Project", "id": "composer-project", "issuer": "alice",
         "source_uri": "urn:frontier:annotation-browser-test", "visibility": "public", "predecessor": None,
@@ -118,4 +119,31 @@ def test_wrong_bearer_cannot_submit_annotation_from_composer(store, browser, bas
     with pytest.raises(Unauthorized):
         store.principal(wrong)
     assert not store.search(kind="Annotation")["results"]
+    page.close()
+
+
+def test_foreign_imported_member_annotation_is_written_in_project_namespace(stores, browser, base):
+    origin, project_store = stores("node-a"), stores("node-b")
+    target = origin.submit(TOKENS["alice"], "foreign-target", claim(origin, id="foreign-composer-target"))["record"]
+    project_store.import_bundle(TOKENS["alice"], "foreign-import", origin.export_bundle([ref(target)]))
+    project_record, member_ref = make_project(project_store, ref(target))
+    project_only_token = "project-only-composer-contributor-token"
+    project_store.provision(project_only_token, "studio-contributor", "studio-operator", ["contributor"],
+                            [project_store.namespace], 20)
+
+    page, calls = mount(browser, base, project_store, project_record, member_ref, project_only_token)
+    page.get_by_label("Comment, question, or challenge").fill("Cross-namespace member remains exactly pinned")
+    page.get_by_role("button", name="Save local draft").click()
+    page.get_by_role("button", name="Submit this proposal").click()
+    page.wait_for_selector(".local-draft:has-text('submitted as a proposal')")
+    assert len(calls) == 1
+    draft, key = calls[0]
+    assert draft["namespace"] == project_record["namespace"] == project_store.namespace
+    assert draft["namespace"] != member_ref["namespace"]
+    assert draft["issuer"] == "studio-contributor"
+    assert draft["payload"]["anchor"]["record"] == member_ref
+    result = project_store.submit(project_only_token, key, draft)  # same idempotency key returns the real write
+    exact = ref(result["record"])
+    assert project_store.get(exact)["record"]["payload"]["body"] == "Cross-namespace member remains exactly pinned"
+    assert any(item["ref"] == exact for item in project_store.annotations_for(member_ref)["annotations"])
     page.close()

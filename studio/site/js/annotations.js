@@ -106,6 +106,7 @@
       savedList.replaceChildren();
       appendAnnotations(savedList, annotationItems(), "No saved annotations are visible on the Project/member pins read so far.");
       more.hidden = !cursor || loading;
+      more.disabled = loading;
     };
     const drawDrafts = () => {
       localList.replaceChildren(); drafts = readDrafts(key);
@@ -119,7 +120,7 @@
         const row = el("div", null, "annotation-actions");
         const edit = el("button", "Edit draft", "btn small ghost"); edit.type = "button"; edit.dataset.edit = String(i); row.appendChild(edit);
         const remove = el("button", draft.submitted ? "Hide local proposal receipt" : "Delete local draft", "btn small ghost"); remove.type = "button"; remove.dataset.delete = String(i); row.appendChild(remove);
-        const submit = el("button", draft.submitted ? "Already submitted" : "Submit this proposal", "btn small"); submit.type = "button"; submit.dataset.submit = String(i); submit.disabled = !!draft.submitted || typeof api.identity !== "function" || typeof api.propose !== "function"; row.appendChild(submit);
+        const submit = el("button", draft.submitted ? "Already submitted" : "Submit this proposal", "btn small"); submit.type = "button"; submit.dataset.submit = String(i); submit.disabled = !!draft.submitted || !projectRef || typeof api.identity !== "function" || typeof api.propose !== "function"; row.appendChild(submit);
         card.appendChild(row); localList.appendChild(card);
       });
       if (typeof api.identity !== "function" || typeof api.propose !== "function") {
@@ -185,7 +186,8 @@
         if (typeof api.identity !== "function" || typeof api.propose !== "function") throw new Error("Site proposal adapters are not connected.");
         const identity = await api.identity(); const principal = identity && identity.principal;
         if (!principal || typeof principal.actor !== "string" || !Array.isArray(principal.roles) || !principal.roles.includes("contributor")) throw new Error("A contributor bearer credential is required; no proposal was sent.");
-        const targetNamespace = draft.payload.anchor.record.namespace;
+        // Discussion belongs to the selected Project's Store; the exact anchor may be a public imported member from another namespace.
+        const targetNamespace = projectRef.namespace;
         if (!Array.isArray(principal.namespaces) || !principal.namespaces.includes(targetNamespace)) throw new Error("The authenticated contributor is not authorized for this namespace; no proposal was sent.");
         const envelope = { namespace: targetNamespace, kind: "Annotation", id: draft.local_id, issuer: principal.actor, source_uri: sourceUri,
           visibility: "public", predecessor: null, payload: draft.payload };
