@@ -353,7 +353,7 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
     attention = AttentionSource(store, cfg)
     discovery_search = cfg.discovery_search or Discovery(store, GeminiEmbedder(timeout=8)).search
     discovery_slots = BoundedSemaphore(4)
-    media = LocalMedia(cfg.site_dir) if cfg.site_dir else None
+    media = LocalMedia(cfg.site_dir, scan_ttl=10) if cfg.site_dir else None
     counts_lock, counts_cache = Lock(), {}
     system = SystemStatus(store, **({"root": cfg.system_root} if cfg.system_root else {}), ttl=cfg.system_ttl, runner=cfg.system_runner)
 

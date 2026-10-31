@@ -244,13 +244,8 @@ def run_preview(data):
 def _worker():
     # Service cgroup bounds the whole tree; these additional per-child limits
     # bound memory/CPU even when this adapter is called outside that service.
-    import resource
-    for key, cap in [(resource.RLIMIT_AS, 2 * 1024**3), (resource.RLIMIT_CPU, 8)]:
-        soft, hard = resource.getrlimit(key)
-        value = min(cap, hard) if hard != resource.RLIM_INFINITY else cap
-        if soft != resource.RLIM_INFINITY:
-            value = min(value, soft)
-        resource.setrlimit(key, (value, value))
+    from .worker_limits import cap_worker
+    cap_worker()
     raw = sys.stdin.buffer.read(MAX_REQUEST_BYTES + 1)
     if len(raw) > MAX_REQUEST_BYTES:
         raise _Invalid("Request too large")

@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 import stat
 from threading import Lock
+import time
 from urllib.parse import quote
 
 MAX_FILE_BYTES = 64_000_000
@@ -51,7 +52,10 @@ class LocalMedia:
     does not silently mix two releases in one index; create a new instance then.
     """
 
-    def __init__(self, site_dir, *, validator=None, mime_resolver=None):
+    def __init__(self, site_dir, *, validator=None, mime_resolver=None, scan_ttl=0.0):
+        # scan_ttl: seconds a finished scan answers further lookups. 0 rescans on every call (tests, offline tools); the public web
+        # adapter sets it so anonymous /api/media requests cannot each force a serialised walk and stat of the whole artifact tree.
+        self.scan_ttl, self._scanned = float(scan_ttl), None
         self.root = Path(site_dir).resolve()
         self.artifacts = self.root / "artifacts"
         self.validator = validator or _default_validator
@@ -194,7 +198,10 @@ class LocalMedia:
             raise FrontierError("sha256 must contain exactly 64 hexadecimal characters")
         digest = digest.lower()
         with self._lock:
-            by_digest, coverage = self._scan()
+            now = time.monotonic()
+            if self._scanned is None or now - self._scanned[0] >= self.scan_ttl:
+                self._scanned = (now, *self._scan())
+            _, by_digest, coverage = self._scanned
             matches = sorted(by_digest.get(digest, []), key=lambda row: row["href"])
         return {"sha256": digest, "matches": matches, "scope": SCOPE, "index": coverage,
                 "note": "Matching bytes were checked in this local published release; this is availability projection, not scientific acceptance. "

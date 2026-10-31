@@ -189,3 +189,21 @@ def test_release_symlink_is_pinned_to_one_resolved_root(tmp_path):
     assert projection.lookup(sha256(b"one").hexdigest())["matches"]
     assert not projection.lookup(sha256(b"two").hexdigest())["matches"]
     assert media.LocalMedia(current).lookup(sha256(b"two").hexdigest())["matches"]
+
+
+def test_scan_ttl_bounds_rescans_from_anonymous_lookups(tmp_path):
+    """The public adapter sets scan_ttl so repeated /api/media requests share one walk of the artifact tree."""
+    put(tmp_path, "artifacts/a.png", b"first")
+    projection = media.LocalMedia(tmp_path, scan_ttl=3600)
+    scans = []
+    real = projection._scan
+    projection._scan = lambda: (scans.append(1), real())[1]
+    for _ in range(25):
+        projection.lookup("0" * 64)
+    assert len(scans) == 1                      # control below: ttl 0 (the default) still rescans every call
+    fresh = media.LocalMedia(tmp_path)
+    fresh_scans, real = [], fresh._scan
+    fresh._scan = lambda: (fresh_scans.append(1), real())[1]
+    for _ in range(3):
+        fresh.lookup("0" * 64)
+    assert len(fresh_scans) == 3
