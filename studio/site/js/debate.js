@@ -5,6 +5,7 @@
   const DF = window.DF; const { html, raw, esc } = DF; const U = DF.ui;
   const KEY = (pid) => `frontier-design-review-draft:${pid}`;
   const refHref = (r) => DF.href("/entity/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace });
+  const key = (r) => JSON.stringify([r.namespace, r.kind, r.id, r.version]);   // one canonical key: property order in a stored ref must not matter
   const same = (a, b) => a && b && a.namespace === b.namespace && a.kind === b.kind && a.id === b.id && a.version === b.version;
   const word = (s) => String(s || "").replace(/_/g, " ");
 
@@ -73,22 +74,24 @@
     if (!DF.api.isLive()) { host.innerHTML = `<p class="empty">No node is connected, so there are no challenge threads to show and none are invented. Live threads appear here when a node serves a Project record and its design context.</p>`; host.removeAttribute("role"); return; }
     (async () => {
       try {
-        const cat = await DF.api.catalog({ kind: "Project", limit: 50 });
-        const cands = cat.records.filter((r) => r.ref.id === p.id || r.ref.id === "flying-fish" || /fish/i.test(r.title || ""));
+        const want = p.live_project_id;
+        if (!want) { host.innerHTML = `<p class="empty">The site's project metadata names no live Project id, so no Project is looked up and nothing is guessed.</p>`; host.removeAttribute("role"); return; }
+        const cat = await DF.api.catalog({ kind: "Project", query: want, limit: 50 });
+        const cands = cat.records.filter((r) => r.ref.id === want);          // exact id only: no title or fuzzy match
         project = cands.find((r) => r.is_head) || cands[0];
-        if (!project) { host.innerHTML = `<p class="empty">The node serves no Project record for this design yet, so challenges cannot anchor to an exact version. Nothing is shown in its place.</p>`; host.removeAttribute("role"); return; }
+        if (!project) { host.innerHTML = `<p class="empty">The node serves no Project record with id "${esc(want)}" yet, so challenges cannot anchor to an exact version. Nothing is shown in its place.</p>`; host.removeAttribute("role"); return; }
         const roots = [], replies = new Map(); let wh = 0, interp = "", total = 0, cursor = "", more = false;
         const out = document.createElement("div"); host.innerHTML = ""; host.removeAttribute("role"); host.appendChild(out);
         const head = document.createElement("p"); head.className = "drhead"; out.appendChild(head); const list = document.createElement("div"); out.appendChild(list); const foot = document.createElement("div"); out.appendChild(foot);
         const paint = () => {
           head.innerHTML = `<b>${roots.length}</b> challenge${roots.length === 1 ? "" : "s"} on Project <code>${esc(project.ref.id)}</code> at exact version <code>${esc(project.ref.version.slice(0, 12))}…</code>${more ? " (more pages exist)" : ""}. ${U.pill("none resolved: the contract has no resolution state", "warn").toString()}${wh ? ` <span class="faint">${wh} withheld by licence or visibility</span>` : ""}`;
-          list.innerHTML = roots.length ? roots.map((r) => thread(r, replies.get(JSON.stringify(r.ref)) || [])).join("") : `<p class="empty">No challenge is recorded against this exact Project version${more ? " on the pages read so far" : ""}.</p>`;
+          list.innerHTML = roots.length ? roots.map((r) => thread(r, replies.get(key(r.ref)) || [])).join("") : `<p class="empty">No challenge is recorded against this exact Project version${more ? " on the pages read so far" : ""}.</p>`;
           foot.innerHTML = (interp ? `<p class="small faint">${esc(interp)}</p>` : "") + (more ? `<button type="button" class="btn small" data-drmore>Load more</button>` : "");
           DF.renderMath(list);
         };
         const read = async () => {
           const r = await DF.api.designContext(project.ref, { cursor, limit: 50 }); total++;
-          for (const it of r.annotations || []) { const pl = (it.record || {}).payload || {}; if (!it.ref) continue; if (pl.reply_to) { const k = JSON.stringify(pl.reply_to); replies.set(k, [...(replies.get(k) || []), it]); } else if (pl.kind === "challenge") roots.push(it); }
+          for (const it of r.annotations || []) { const pl = (it.record || {}).payload || {}; if (!it.ref) continue; if (pl.reply_to) { const k = key(pl.reply_to); replies.set(k, [...(replies.get(k) || []), it]); } else if (pl.kind === "challenge") roots.push(it); }
           wh += r.withheld_unlicensed || 0; interp = r.interpretation || interp; cursor = (r.pagination || {}).next_cursor || ""; more = !!cursor; paint();
         };
         foot.addEventListener("click", async (e) => { if (e.target.closest("[data-drmore]")) { try { await read(); } catch (x) { foot.insertAdjacentHTML("beforeend", `<p class="empty" role="alert">Could not load more: ${esc(x.message)}</p>`); } } });

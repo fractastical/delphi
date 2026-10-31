@@ -44,6 +44,9 @@
     const cap = document.createElement("p"); cap.className = "caption";
     cap.innerHTML = `Drawing: candidate <b>${esc(DF.candLabel || "custom")}</b>, a schematic from the Engineering parameters, not one of the printable STL models below. Dimensions are arithmetic or illustration, not a measured fish. <a href="${DF.href("/engineering")}">Change it in Engineering</a>.`;
     host.appendChild(cap);
+    const t3 = snap && (snap.simulation_manifests || []).find((m) => m.id === "fish3d-render" && m.video_state === "present_verified");
+    if (t3) { const tv = document.createElement("div"); tv.className = "turntable"; tv.innerHTML = html`<h3 class="small">3D model turntable</h3><video controls loop muted playsinline preload="metadata" ${t3.poster_href ? html`poster="${t3.poster_href}"` : ""} src="${t3.video_href}" aria-label="Turntable of the 3D model of candidate N1"></video>
+      <p class="small faint">Path-traced render of the N1 candidate mesh, with assumed fin thickness and an assumed scale lattice: not an organism and not an aerodynamic result. <a href="${t3.video_href}" download="fish3d-N1-turntable.mp4">Download MP4</a> · <a href="${DF.href("/simulations")}#sim-fish3d-render">limits and hashes</a></p>`.toString(); host.appendChild(tv); }
     const forms = ((snap && snap.print_forms && snap.print_forms.forms) || []).filter((f) => f.files && f.files.stl);
     if (!forms.length) return;
     const id = "pm" + Math.random().toString(36).slice(2, 7);

@@ -294,6 +294,22 @@ def _vid(ins, out, vid, src_dir, fname, declared, bytes_declared=None):
     return "present_verified", f"artifacts/simulations/{vid}/{fname}"
 
 
+def lifecycle_block(ins: Inputs) -> dict | None:
+    """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
+    d = "data/fish-lifecycle"
+    if not (ROOT / d / "assurance.json").exists():
+        return None
+    A = json.loads(ins.read(f"{d}/assurance.json")); S = json.loads(ins.read(f"{d}/stages.json")); E = json.loads(ins.read(f"{d}/equations.json")); N = json.loads(ins.read(f"{d}/nutrient_diffusion_check.json"))
+    M = json.loads(ins.read(f"{d}/manifest.json"))
+    st = lambda v: v.get("status") if isinstance(v, dict) else v
+    return {"organism": A["organism"], "status": M["status"], "stage_order": A["stages"], "statuses": A["statuses"], "claims_not_made": A["claims_not_made"], "gaps_first": A["gaps_first"], "temperature_c": S["temperature_reference_c"], "stage_note": S["note"],
+        "stages": [{"id": x["id"], "name": x["name"], "time": x.get("time"), "definition": (x.get("definition") or {}).get("quote"), "axes": {k: st(x.get(k)) for k in ("size", "growth", "metabolism", "locomotion", "fins_and_scales")}} for x in S["stages"]],
+        "processes": {k: {sg: {"status": v[sg]["status"], "note": v[sg].get("note", ""), "sources": v[sg].get("sources", "")} for sg in A["stages"] if sg in v} for k, v in A["processes"].items()},
+        "equations": [{"id": q["id"], "name": q["name"], "form": q["form"], "context": q.get("context", ""), "not_established_here": q.get("not_established_here", ""), "claimed_by_source": q.get("claimed_by_source", "")} for q in E["equations"]],
+        "diffusion": {"status": N["status"], "derived": N["derived"], "inputs": N["inputs"], "assumptions": N["geometry_assumptions"], "not_known": N["not_known"], "reading": N["comparison_with_fish_body_height"]["reading"], "rows": N["comparison_with_fish_body_height"]["rows"]},
+        "manifest": f"{d}/manifest.json", "doc": "docs/fish-lifecycle.md"}
+
+
 def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
     """Wind-tunnel, behavior controller and scale-growth manifests as gallery cards, with equations, sources and limitations.
     Every number is copied from the worker's own receipt; verdicts and misses are carried, never softened."""
@@ -316,6 +332,19 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "sources": [{"label": "Solver, protocol and controls", "locator": f"{d}/protocol sha256 {sm['protocol_sha256'][:12]}…, analytic-controls.json (Poiseuille, Taylor-Green)"}, {"label": "Geometry", "locator": f"{rm['mesh']['path']} sha256 {rm['mesh']['sha256'][:12]}…"}],
             "limitations": [rm["mesh"]["geometry_warning"], sm["scope"], "biological_success_probability: null (not computed)."],
             "couplings": [], "manifest": f"{d}/render-manifest.json", "native": True})
+    d = "artifacts/fish3d/fish3d-N1-cypselurus-baseline/render"
+    if (ROOT / d / "render.json").exists():
+        r = json.loads(ins.read(f"{d}/render.json")); v = r["video"]
+        st, href = _vid(ins, out, "fish3d-render", d, "turntable.mp4", v["sha256"]); _, ph = _vid(ins, out, "fish3d-render", d, "poster.png", r["poster_sha256"])
+        cards.append({"id": "fish3d-render", "title": "Candidate N1 as a 3D model: path-traced turntable", "scales": ["organism"], "evidence_kind": r["evidence_kind"],
+            "model": {"name": r["schema"], "context": " ".join(r["caption"])},
+            "time": {"units": "none: a camera orbit around a static model", "note": f"{v['n_frames']} frames at {v['fps']} fps, looping; {v['width']}x{v['height']}"},
+            "video": {"file": "turntable.mp4", "sha256": v["sha256"], "note": f"{v['bytes']} bytes"}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": k.replace("_", " "), "result": "passed" if val else "FAILED"} for k, val in r["checks"].items()],
+            "parameter_unknowns": ["Fin thickness, eyes and gill covers are assumed.", "Scales are an assumed lattice (50 along the body), not a grown or measured pattern."],
+            "open_questions": ["What measured fin camber, ray structure and thickness would replace the assumed ones?"],
+            "limitations": ["Not claimed: " + x for x in r["not_claimed"]] + [f"The mesh itself (fish.glb, sha256 {r['glb_sha256'][:12]}…) is in artifacts/fish3d and is not served by this site."],
+            "couplings": [], "manifest": f"{d}/render.json", "native": True})
     d = "artifacts/behavior"
     if (ROOT / d / "manifest.json").exists() and (ROOT / d / "controls.json").exists():
         m = json.loads(ins.read(f"{d}/manifest.json")); ct = json.loads(ins.read(f"{d}/controls.json")); fl = m["files"]
@@ -427,9 +456,10 @@ def coupling_manifest(ins: Inputs, files: dict, docs: list) -> dict | None:
     if not (ROOT / COUPLING).exists():
         return None
     m = json.loads(ins.read(COUPLING))
-    if (ROOT / "docs/model-coupling.md").exists():
-        t = ins.text("docs/model-coupling.md"); files["docs/model-coupling.md.txt"] = t.encode()
-        docs.append({"id": "model-coupling", "title": next((l[2:].strip() for l in t.splitlines() if l.startswith("# ")), "model-coupling"), "status_line": None, "path": "docs/model-coupling.md", "sha256": ins.seen["docs/model-coupling.md"]["sha256"], "href": "data/docs/model-coupling.md.txt"})
+    for name in ("model-coupling", "fish-lifecycle"):
+        if (ROOT / f"docs/{name}.md").exists():
+            t = ins.text(f"docs/{name}.md"); files[f"docs/{name}.md.txt"] = t.encode()
+            docs.append({"id": name, "title": next((l[2:].strip() for l in t.splitlines() if l.startswith("# ")), name), "status_line": None, "path": f"docs/{name}.md", "sha256": ins.seen[f"docs/{name}.md"]["sha256"], "href": f"data/docs/{name}.md.txt"})
     rows = []
     for c in m["couplings"]:
         cp, v = c["coupling"], c["verdict"]
@@ -624,6 +654,7 @@ def build() -> dict[str, bytes]:
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     design_review = ins.json("site/content/design-review.json")
+    lifecycle = lifecycle_block(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -651,6 +682,7 @@ def build() -> dict[str, bytes]:
         "project_drafts": project_recs,
         "assurance": assurance,
         "design_review": design_review,
+        "lifecycle": lifecycle,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
