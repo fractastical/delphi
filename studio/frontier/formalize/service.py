@@ -13,7 +13,6 @@ import os
 import signal
 import subprocess
 import sys
-import threading
 import time
 from pathlib import Path
 
@@ -22,8 +21,9 @@ from . import leangen, refusals
 from .grammar import (LIMITS, SCHEMA_ERROR, SCHEMA_RESPONSE, GrammarError, canonical, is_literal, parse_literal,
                       sha256_obj, term_to_text, validate_request)
 from .solve import Model, check, holds
+from ..worker_limits import Slots
 
-SLOTS = threading.BoundedSemaphore(2)
+SLOTS = Slots(2)                 # also draws on the process-wide worker budget in worker_limits
 REPO_ROOT = Path(__file__).resolve().parents[2]
 WORKER_ARGV = [sys.executable, "-s", "-m", "frontier.formalize.worker"]  # tests may point this at a labelled stub
 ASSUMED_SCOPE = ("Only the constraints exactly as written, under the declared symbols, units and domains. Not a claim that the "
