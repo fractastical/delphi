@@ -9,7 +9,8 @@ from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-RUN = HERE / "runs" / "capability-agency-pilot-20261031-v1"
+PREREG = json.loads((HERE / "preregistration.json").read_text())
+RUN = HERE / "runs" / PREREG["experiment_id"]
 
 
 def median(values: list[float]) -> float | None:

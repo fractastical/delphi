@@ -1,32 +1,36 @@
 {
   "schema": "frontier.capability-agency.preregistration/1",
   "status": "FROZEN_BEFORE_MODEL_CALLS",
-  "registered_utc": "2026-10-31T22:39:47Z",
-  "experiment_id": "capability-agency-pilot-20261031-v1",
+  "registered_utc": "2026-10-31T22:50:35Z",
+  "experiment_id": "capability-agency-pilot-20261031-v2",
+  "supersedes": {
+    "experiment_id": "capability-agency-pilot-20261031-v1",
+    "preregistration_sha256": "f2b39b81ad8c81d68bda13e42993b84cfe1c884b23ae93cd67b08734fd034ee1",
+    "reason": "No model requests were sent under v1 because its OpenRouter credential preflight failed. V2 uses the existing authorized direct Gemini API route; tasks, arms, rubric, and call count are unchanged."
+  },
   "scope": "A small exploratory comparison of evidence synthesis and action selection across one serial analyst, three isolated specialists, and the same three specialists exchanging pinned notes.",
   "claim_limit": "This pilot cannot establish a scaling law or general agent superiority. Task A's source states the core facts; the pilot measures evidence synthesis and verification, not discovery. All actor roles are fresh stateless calls to the same pinned model; role prompts do not establish cognitive independence or distinct-worker effects.",
   "public_input_packet": "results/capability-agency/public_input_packet.json",
+  "model_access_probe": "results/capability-agency/gemini_model_probe.json",
   "runner": "results/capability-agency/run_pilot.py",
   "deterministic_scorer": "results/capability-agency/score_pilot.py",
   "prompt_specification": "results/capability-agency/prompt_template.md",
   "privacy": {
     "model_inputs": "The public input packet only. It contains open-access paper facts and deterministic arithmetic/unit outputs.",
     "excluded": ["private repository code", "private prompts", "credentials", "unpublished model outputs", "user or agent private context"],
-    "provider_data_class": "public"
+    "provider_data_class": "public",
+    "credential_handling": "Read only GEMINI_API_KEY from the existing mode-0600 Gemini env file; send it only in x-goog-api-key header; never put it in a URL, argv, prompt, log, or artifact."
   },
   "model_selection": {
-    "model": "google/gemini-3.8-flash",
-    "provider_route": "OpenRouter chat completions; exact model ID pinned",
-    "catalog_observed_utc": "2026-10-31T22:39:47Z",
+    "model": "models/gemini-3.8-flash",
+    "provider_route": "Google Generative Language API v1beta models/gemini-3.8-flash:generateContent; exact model ID pinned",
+    "catalog_observed_utc": "2026-10-31T22:46:09Z",
     "live_catalog_context_tokens": 1048576,
-    "live_catalog_prompt_usd_per_million": 0.75,
-    "live_catalog_completion_usd_per_million": 3.75,
-    "lowest_flex_route_prompt_usd_per_million": 0.375,
-    "lowest_flex_route_completion_usd_per_million": 1.875,
-    "catalog_source": "https://openrouter.ai/api/v1/models/google/gemini-3.8-flash/endpoints",
-    "selection_reason": "The live OpenRouter endpoint catalog shows a 1M-token context. Its lowest-price Flex route is $0.375/M input and $1.875/M output, while the standard route shown is $0.75/M and $3.75/M. The Orchestra model registry scores the corresponding Gemini Flash model 8/10 analysis and reasoning. It clears the evidence-synthesis task floor without using Anthropic. The spend ceiling uses the higher standard rates to cover routing fallback. This is metered OpenRouter usage, not an NIM call or prepaid Google API usage.",
-    "maximum_cost_usd": 0.25,
-    "cost_basis": "Conservative ceiling: 27 calls x a 9,600-token input upper bound and 400 output tokens, at the higher observed standard rates ($0.75/M and $3.75/M), is approximately $0.235. The rendered prompt is capped at 9,000 UTF-8 bytes; adding the fixed system message and chat overhead remains within the 9,600-token bound under byte-fallback tokenization. Actual per-call provider usage will be retained."
+    "live_catalog_output_tokens": 65536,
+    "catalog_source": "https://generativelanguage.googleapis.com/v1beta/models",
+    "selection_reason": "The authenticated Google model list returned models/gemini-3.8-flash with generateContent support, 1,048,576 input tokens, and 65,536 output tokens. It preserves the model selected in v1 while using the already-authorized Gemini API credential. API token usage metadata will be recorded. USD pricing and actual charge are unknown because no billing meter is available in this work context; the pilot is bounded to 27 requests with 9,600 input and 400 output tokens per request.",
+    "maximum_cost_usd": null,
+    "cost_basis": "Actual USD spend unavailable; do not report zero. Bounded request usage: 27 calls maximum, each with a 9,600-token input limit and 400-token output limit, for at most 270,000 configured input+output tokens. Provider usageMetadata is retained per call."
   },
   "conditions": {
     "single_serial_analyst": {
@@ -52,19 +56,20 @@
     "tasks_per_response": 2,
     "model_calls_per_condition": 9,
     "total_model_calls": 27,
-    "model_and_parameters": {"model": "google/gemini-3.8-flash", "temperature": 0, "max_tokens_per_call": 400, "seed_per_repeat": [41031, 41032, 41033]},
+    "model_and_parameters": {"model": "models/gemini-3.8-flash", "temperature": 0, "max_tokens_per_call": 400, "seed_per_repeat": [41031, 41032, 41033]},
     "per_call_input_ceiling_tokens": 9600,
     "per_call_output_ceiling_tokens": 400,
-    "same_inputs_and_tools": "Every actor receives the identical full public packet and identical calculator/unit-algebra results. No source information is withheld from any condition. Peer/self artifacts are the only information difference in the communication treatment; their tokens count toward the same input ceiling. The runner rejects any rendered user prompt above 9,000 UTF-8 bytes before sending; this plus the fixed system message and bounded chat overhead is below the conservative 9,600-token request ceiling. Actual provider input tokens are recorded; any reported usage above 9,600 is a protocol deviation.",
+    "same_inputs_and_tools": "Every actor receives the identical full public packet and identical calculator/unit-algebra results. No source information is withheld from any condition. Peer/self artifacts are the only information difference in the communication treatment; their tokens count toward the same input ceiling. The runner rejects any rendered user prompt above 9,000 UTF-8 bytes before sending and sends maxOutputTokens=400; provider input/output token usage is retained, and any reported input usage above 9,600 is a protocol deviation.",
+    "condition_label": "Condition IDs are stored with results but omitted from model prompts. Isolated and collaborating specialist roles and turn numbers are identical; the only prompt difference is whether prior response artifacts are included.",
     "tooling": "Two precomputed, deterministic tools in the packet: calculator-v1 and unit-algebra-v1. No web or other model calls are allowed during the pilot.",
-    "execution": "Serial calls; no retries, repair calls, or extra adjudication calls. A failed or malformed response consumes its scheduled slot and scores zero. The runner checks its worst-case priced token ceiling before each call and stops if the $0.25 total ceiling would be exceeded."
+    "execution": "Serial calls; no retries, repair calls, or extra adjudication calls. A failed or malformed response consumes its scheduled slot and scores zero. The runner enforces a 9,000-byte rendered-prompt ceiling, requests at most 400 output tokens, reserves 10,000 tokens per call and 270,000 total, then stops if provider usage exceeds a per-call ceiling. USD spend is unknown because no billing meter is available."
   },
   "aggregation": {
     "same_rule_for_all_conditions": true,
     "numeric_fields": "median of valid replies; missing if no valid reply",
     "boolean_and_categorical_fields": "strict majority; ties or fewer than two valid replies yield null",
     "primary_comparison": "mean deterministic rubric score of the field-wise aggregate per replicate, then mean across three replicates",
-    "secondary": ["mean per-reply deterministic score", "turn 1-to-3 correction trajectory", "number of prior response hashes actually passed to later calls", "actual input/output tokens and provider-reported cost"],
+    "secondary": ["mean per-reply deterministic score", "turn 1-to-3 correction trajectory", "number of prior response hashes actually passed to later calls", "actual input/output/total tokens; USD charge unknown"],
     "language_model_judging": false
   },
   "scoring": {
@@ -97,5 +102,5 @@
     "repeat_2": ["isolated_specialists", "collaborating_specialists", "single_serial_analyst"],
     "repeat_3": ["collaborating_specialists", "single_serial_analyst", "isolated_specialists"]
   },
-  "outcome_reporting": ["report every scheduled response, including errors and malformed JSON", "report actual provider usage; distinguish account-wide deltas from per-request usage", "preserve null results and ties", "do not claim statistical significance from three repeats", "do not infer biological discovery or general scaling from this pilot"]
+  "outcome_reporting": ["report every scheduled response, including errors and malformed JSON", "report per-request token usage; USD spend is unknown", "preserve null results and ties", "do not claim statistical significance from three repeats", "do not infer biological discovery or general scaling from this pilot"]
 }

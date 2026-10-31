@@ -5,8 +5,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
-import sys
 import time
 import urllib.error
 import urllib.request
@@ -14,14 +12,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-API = "https://openrouter.ai/api/v1/chat/completions"
-MODEL = "google/gemini-3.8-flash"
+API = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent"
+MODEL = "models/gemini-3.8-flash"
 MAX_INPUT = 9600
 MAX_OUTPUT = 400
-MAX_SPEND = 0.25
-IN_RATE = 0.75 / 1_000_000
-OUT_RATE = 3.75 / 1_000_000
 MAX_PROMPT_BYTES = 9000
+MAX_TOTAL_TOKENS = 270_000
 
 
 def canonical(value: object) -> str:
@@ -37,19 +33,25 @@ def now() -> str:
 
 
 def auth_key() -> str:
-    sys.path.insert(0, "/home/ubuntu/Orchestra")
-    from orchestra.interactive_cli import session_env
+    path = Path.home() / ".config/morphoswarm/gemini.env"
+    if not path.exists() or path.stat().st_mode & 0o077:
+        raise RuntimeError("Gemini credential file missing or permissions are broader than 0600")
+    with path.open() as stream:
+        for line in stream:
+            if line.startswith("GEMINI_API_KEY="):
+                key = line.split("=", 1)[1].strip().strip("\"'")
+                if key:
+                    return key
+    raise RuntimeError("GEMINI_API_KEY not found in configured credential file")
 
-    return session_env("openrouter", "codex", None, "default")["OPENROUTER_API_KEY"]
 
-
-def prompt_for(packet: dict, condition: str, rep: int, turn: int, role: str,
+def prompt_for(packet: dict, rep: int, turn: int, role: str,
                earlier: list[dict]) -> str:
     prior = []
     for item in earlier:
-        prior.append({"sha256": item["sha256"], "response": item["parsed"]})
+        prior.append({"turn_id": item["turn"], "actor_role": item["role"],
+                      "sha256": item["sha256"], "response": item["parsed"]})
     payload = {
-        "condition_id": condition,
         "replicate_id": rep,
         "turn_id": turn,
         "actor_role": role,
@@ -66,31 +68,28 @@ def prompt_for(packet: dict, condition: str, rep: int, turn: int, role: str,
 
 def call_model(key: str, prompt: str, seed: int) -> tuple[dict | None, dict]:
     body = {
-        "model": MODEL,
-        "messages": [
-            {
-                "role": "system",
-                "content": (
-                    "You are one analyst in a controlled public-data science evaluation. "
-                    "Use only the supplied public input packet and deterministic outputs. "
-                    "Do not browse, call tools, inspect files, or add outside facts. "
-                    "Return one JSON object matching the response contract exactly, with "
-                    "both task objects. Cite each task using its DOI. Choose only a "
-                    "decision_code listed in the packet. No markdown or prose outside JSON."
-                ),
-            },
-            {"role": "user", "content": prompt},
-        ],
-        "temperature": 0,
-        "max_tokens": MAX_OUTPUT,
-        "seed": seed,
-        "response_format": {"type": "json_object"},
-        "provider": {"sort": "price", "data_collection": "allow", "require_parameters": True},
+        "systemInstruction": {
+            "parts": [{"text": (
+                "You are one analyst in a controlled public-data science evaluation. "
+                "Use only the supplied public input packet and deterministic outputs. "
+                "Do not browse, call tools, inspect files, or add outside facts. "
+                "Return one JSON object matching the response contract exactly, with "
+                "both task objects. Cite each task using its DOI. Choose only a "
+                "decision_code listed in the packet. No markdown or prose outside JSON."
+            )}]
+        },
+        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "temperature": 0,
+            "maxOutputTokens": MAX_OUTPUT,
+            "seed": seed,
+            "responseMimeType": "application/json",
+        },
     }
     req = urllib.request.Request(
         API,
         data=json.dumps(body, ensure_ascii=False).encode(),
-        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+        headers={"x-goog-api-key": key, "Content-Type": "application/json"},
         method="POST",
     )
     started = time.monotonic()
@@ -99,14 +98,20 @@ def call_model(key: str, prompt: str, seed: int) -> tuple[dict | None, dict]:
             raw = response.read(1_000_000)
             status = response.status
         decoded = json.loads(raw)
-        content = decoded.get("choices", [{}])[0].get("message", {}).get("content")
-        parsed = json.loads(content) if isinstance(content, str) else None
+        candidates = decoded.get("candidates", [])
+        parts = candidates[0].get("content", {}).get("parts", []) if candidates else []
+        content = "".join(part.get("text", "") for part in parts if isinstance(part, dict))
+        try:
+            parsed = json.loads(content) if isinstance(content, str) else None
+        except json.JSONDecodeError:
+            parsed = None
         meta = {
             "http_status": status,
-            "provider_response_id": decoded.get("id"),
-            "model_returned": decoded.get("model"),
-            "provider_returned": decoded.get("provider"),
-            "usage": decoded.get("usage"),
+            "provider_response_id": decoded.get("responseId"),
+            "model_returned": decoded.get("modelVersion", MODEL),
+            "provider_returned": "Google Generative Language API",
+            "candidate_finish_reason": candidates[0].get("finishReason") if candidates else None,
+            "usage": decoded.get("usageMetadata"),
             "elapsed_seconds": round(time.monotonic() - started, 3),
             "response_text": content,
             "response_sha256": sha((content or "").encode()),
@@ -121,6 +126,9 @@ def call_model(key: str, prompt: str, seed: int) -> tuple[dict | None, dict]:
 
 def main() -> int:
     prereg = json.loads((HERE / "preregistration.json").read_text())
+    if prereg.get("status") != "FROZEN_BEFORE_MODEL_CALLS" or "PENDING" in prereg.get("registered_utc", ""):
+        print(json.dumps({"error": "preregistration_not_frozen"}))
+        return 1
     packet_path = HERE / "public_input_packet.json"
     packet = json.loads(packet_path.read_text())
     packet_hash = sha(packet_path.read_bytes())
@@ -140,8 +148,8 @@ def main() -> int:
     }
     order = prereg["call_order_by_repeat"]
     all_calls: list[dict] = []
-    spend_upper = 0.0
-    reported_spend = 0.0
+    reserved_tokens = 0
+    stop_after_current = False
     for rep in range(1, 4):
         rep_key = f"repeat_{rep}"
         seed = prereg["matched_budget_and_access"]["model_and_parameters"]["seed_per_repeat"][rep - 1]
@@ -150,17 +158,28 @@ def main() -> int:
             roles = role_sets[condition]
             for turn, role in enumerate(roles, start=1):
                 visible_prior = [] if condition == "isolated_specialists" else earlier
-                prompt = prompt_for(packet, condition, rep, turn, role, visible_prior)
+                prompt = prompt_for(packet, rep, turn, role, visible_prior)
                 if len(prompt.encode()) > MAX_PROMPT_BYTES:
                     print(json.dumps({"error": "prompt_byte_limit", "repeat": rep, "condition": condition, "turn": turn}))
                     return 3
                 # Reserve the preregistered worst-case token ceiling before any network request.
-                reserve = MAX_INPUT * IN_RATE + MAX_OUTPUT * OUT_RATE
-                if spend_upper + reserve > MAX_SPEND:
-                    print(json.dumps({"error": "spend_ceiling", "repeat": rep, "condition": condition, "turn": turn}))
+                reserve = MAX_INPUT + MAX_OUTPUT
+                if reserved_tokens + reserve > MAX_TOTAL_TOKENS:
+                    print(json.dumps({"error": "token_ceiling", "repeat": rep, "condition": condition, "turn": turn}))
                     return 4
-                spend_upper += reserve
+                reserved_tokens += reserve
                 parsed, meta = call_model(key, prompt, seed)
+                usage = meta.get("usage") if isinstance(meta.get("usage"), dict) else {}
+                input_tokens = usage.get("promptTokenCount")
+                output_tokens = usage.get("candidatesTokenCount")
+                total_tokens = usage.get("totalTokenCount")
+                usage_over_ceiling = (
+                    isinstance(input_tokens, int) and input_tokens > MAX_INPUT
+                ) or (
+                    isinstance(output_tokens, int) and output_tokens > MAX_OUTPUT
+                ) or (
+                    isinstance(total_tokens, int) and total_tokens > MAX_INPUT + MAX_OUTPUT
+                )
                 call = {
                     "repeat": rep,
                     "condition": condition,
@@ -173,25 +192,29 @@ def main() -> int:
                     "preregistration_sha256": prereg_hash,
                     "visible_prior_response_sha256": [item["sha256"] for item in visible_prior],
                     "prompt_bytes": len(prompt.encode()),
+                    "usage_protocol_deviation": usage_over_ceiling,
                     "response": parsed,
                     **meta,
                 }
                 path = outdir / f"r{rep}-{condition}-t{turn}.json"
                 path.write_text(json.dumps(call, indent=2, ensure_ascii=False) + "\n")
                 all_calls.append(call)
-                usage = meta.get("usage")
-                if isinstance(usage, dict) and isinstance(usage.get("cost"), (int, float)):
-                    reported_spend += float(usage["cost"])
                 print(json.dumps({"repeat": rep, "condition": condition, "turn": turn,
                                   "http_status": meta.get("http_status"),
                                   "valid_json": meta.get("parse_valid_json", False),
+                                  "usage_protocol_deviation": usage_over_ceiling,
                                   "usage": meta.get("usage")}, ensure_ascii=False), flush=True)
-                if reported_spend > MAX_SPEND:
-                    print(json.dumps({"error": "provider_reported_spend_ceiling", "reported_spend_usd": round(reported_spend, 6)}), flush=True)
-                    return 5
+                if usage_over_ceiling:
+                    stop_after_current = True
+                    break
                 if parsed is not None:
                     response_text = meta.get("response_text") or ""
-                    earlier.append({"sha256": sha(response_text.encode()), "parsed": parsed})
+                    earlier.append({"turn": turn, "role": role,
+                                    "sha256": sha(response_text.encode()), "parsed": parsed})
+            if stop_after_current:
+                break
+        if stop_after_current:
+            break
     summary = {
         "experiment_id": prereg["experiment_id"],
         "completed_utc": now(),
@@ -199,13 +222,14 @@ def main() -> int:
         "packet_sha256": packet_hash,
         "scheduled_calls": 27,
         "actual_recorded_calls": len(all_calls),
-        "worst_case_reserved_cost_usd": round(spend_upper, 6),
-        "provider_reported_cost_sum_usd": round(reported_spend, 6) if reported_spend else None,
+        "maximum_reserved_tokens": reserved_tokens,
+        "actual_provider_cost_usd": None,
+        "provider_billing_meter_available": False,
         "usage": [c.get("usage") for c in all_calls],
         "call_files": sorted(p.name for p in outdir.glob("*.json")),
     }
     (outdir / "run_manifest.json").write_text(json.dumps(summary, indent=2) + "\n")
-    return 0
+    return 6 if stop_after_current else 0
 
 
 if __name__ == "__main__":
