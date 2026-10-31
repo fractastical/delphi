@@ -6,6 +6,7 @@ session, Claude Sonnet 5.5), **not Codex-reviewed**. Nothing here submits, accep
 | module | does |
 |---|---|
 | `delphi_claim.py` | Delphi claim -> `Claim` draft. Keeps the original id/IRI, nanopub URI and registry (production / test / null = unpublished). Never keeps quote text (digest + locator only). Carries Delphi's source hash only after re-verifying it. Upstream verification labels travel as labelled assertions, never as acceptance. |
+| `delphi_live.py` | live Delphi run: server inventory, a per-claim diff against the versions Frontier imported (new / unchanged / relocated / labels_changed / content_changed / removed / withheld), claim-test nanopubs -> `source_assessment` Evidence, and a readable claim-context index. Imports nothing. |
 | `delphi_mcp.py` | read-only Delphi client: request budget, wall budget, `Retry-After`, stop on persistent 429 / 401 / 403, a receipt per request. |
 | `orx_evidence.py` | OpenResearch (`orx`) run -> `Evidence` and `Action` drafts. Reads a live store (`read_store_run`) or an export (`read_run`). Refuses failed runs, tampered snapshots, and kinds other than simulated/predicted. Records per field who supplied it. |
 | `orx_replay.py` | EXPLICIT re-execution (`trust_code=True`), with a mutation control that must change the output. `replay_external` handles runs whose inputs/outputs live outside the snapshot. |
@@ -51,3 +52,20 @@ executes producer code; producing a bundle is not importing it (corpus owns impo
 
 Freeze: `python3 -m frontier_adapters.engineering_manifest --repo . --source-commit <rev> --out <dir>` (records pinned to the commit's time; same input, same bytes). Checked on an ephemeral
 store: the bundle imports (all `imported_unreviewed`) and `ArtifactIndex` then finds the certificate and the three simulation outputs.
+
+
+## Live Delphi ingestion (`delphi_live.py`; run record in `examples/delphi_live/`)
+Read-only and keyless, through the same budgeted client. The forum and proposal tools the server also offers are listed in the
+inventory and **never called**. One run: `python -m frontier_adapters.delphi_live --out DIR --baseline-drafts <frozen bulk drafts>...
+--imported-plan examples/live_import/plan-claims.json --imported-records examples/nca_chain/records.json`.
+
+* **Baseline first.** The frozen drafts must rebuild the exact versions Frontier imported (`reproduce_imported`); otherwise the
+  diff would compare against something Frontier does not hold.
+* **Diff by kind of change, not by count.** Repository path moves (`relocated`) and label/opinion moves (`labels_changed`) make
+  no successor version. A `content_changed` claim becomes a successor whose `predecessor` is the imported version, in a SEPARATE
+  plan: `Store.import_bundle` records it as a fork and leaves the head alone (SPEC-004), so applying it is the importer's choice.
+* **Claim tests are Evidence, not acceptance.** `evidence_kind: source_assessment`; the upstream verdict, confidence, data kind and
+  preregistration flag stay raw in `provider_assessment`; `relation` only for a literal `supports`/`refutes`. Dataset checksums are
+  Delphi's declarations (`bytes_checked: false`), so no `ArtifactRef` is made.
+* Output: `records-new-claims-and-tests.json` (exact Records for `import_cli build --records`), `records-updates-FORK.json`,
+  `claim-diff.json`, `claim-context.jsonl` (the readable field contract), `inventory.json`, `receipts.jsonl`, `summary.json`.

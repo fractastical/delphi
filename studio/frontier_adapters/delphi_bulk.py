@@ -99,8 +99,12 @@ def _append(path, obj):
         fh.write(json.dumps(obj, sort_keys=True) + "\n")
 
 
-def run(mcp: Delphi, out_dir: str, *, limit: int | None = None, batch: int = 25, shard: int = 100, entries: list | None = None) -> dict:
-    """Retrieve and map up to `limit` NEW claims (in priority order), resuming from out_dir/checkpoint.json."""
+def run(mcp: Delphi, out_dir: str, *, limit: int | None = None, batch: int = 25, shard: int = 100, entries: list | None = None,
+        local_backed: frozenset | set = frozenset()) -> dict:
+    """Retrieve and map up to `limit` NEW claims (in priority order), resuming from out_dir/checkpoint.json.
+
+    `local_backed`: ids whose catalog entry has no registry/nanopub URI but which DO have a local unsigned nanopub (Levin, build
+    2026-10-31 20:10). They are read from their nanopub rows and written as `local-unsigned`, never as `production`."""
     os.makedirs(out_dir, exist_ok=True)
     start_receipt, started = len(mcp.receipts), iso_utc()          # BEFORE the catalog phase, so its requests are logged too
     cp_path = os.path.join(out_dir, "checkpoint.json")
@@ -122,7 +126,7 @@ def run(mcp: Delphi, out_dir: str, *, limit: int | None = None, batch: int = 25,
     try:
         for i in range(0, len(todo), batch):
             chunk = todo[i:i + batch]
-            backed = [e for e in chunk if e.get("nanopub") or e.get("registry")]
+            backed = [e for e in chunk if e.get("nanopub") or e.get("registry") or e["id"] in local_backed]
             rows_by, assessors, rn = {}, {}, None
             if backed:
                 ids = [e["id"] for e in backed]
@@ -145,7 +149,7 @@ def run(mcp: Delphi, out_dir: str, *, limit: int | None = None, batch: int = 25,
                     snap["integrity_problems"] = integrity(snap)
                     draft = dc.to_claim_draft(snap, verification={"performed": False, "reason": "not performed in bulk import"})
                     validate_draft(draft)                                   # real models + licence gate; failure is recorded, not hidden
-                    kind = "unpublished" if snap["kind"] == "catalog" else (snap["registry"] or "production")
+                    kind = "unpublished" if snap["kind"] == "catalog" else (snap["registry"] or "local-unsigned")
                     n = cp["counts"].get(kind, 0)
                     _append(os.path.join(out_dir, f"claims-{kind}-{n // shard + 1:03d}.jsonl"), draft)
                     _append(os.path.join(out_dir, "snapshots.jsonl"), snap)

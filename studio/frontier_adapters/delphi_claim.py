@@ -68,6 +68,8 @@ FIELD_P = {  # predicates of the claim itself (subject = claim IRI, assertion gr
     "https://w3id.org/delphi/ontology/hasEvidence": "delphi:hasEvidence",
 }
 MULTI = {"rdfs:seeAlso", "delphi:hasEvidence"}
+RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+LANGUAGE_MODEL = "https://w3id.org/delphi/ontology/LanguageModel"
 GRAPH_DROP = {"graph", "id", "title", "statement"}   # `graph` is a file:///app link that resolves nowhere outside Delphi
 
 
@@ -85,6 +87,14 @@ def claim_rows_query(claim_ids: list[str]) -> str:
     alt = "|".join(_rx(c) for c in claim_ids)
     return ('SELECT ?g ?s ?p ?o WHERE { GRAPH ?g { ?s ?p ?o } '
             f'FILTER(REGEX(STR(?g),"/nanopubs/unsigned/({alt})[.]trig")) }} ORDER BY ?g ?s ?p ?o LIMIT 3000')
+
+
+def domain_dir_of(nanopub_path: str | None) -> str | None:
+    """The directory above `nanopubs/`: `darwin-origin` for `books/darwin-origin/nanopubs/...`, `math-bio-claims` for
+    `math-bio-claims/nanopubs/...`, and the same for the layout seen from build 2026-10-31 20:10, `claim-sources/<dir>/nanopubs/...`.
+    (Before that build this field was the FIRST path segment, so books read as `books`; records imported then keep that value.)"""
+    m = re.search(r"(?:^|/)([^/]+)/nanopubs/", nanopub_path or "")
+    return m.group(1) if m else None
 
 
 def _claim_of_graph(g: str) -> str | None:
@@ -105,8 +115,13 @@ def snapshot_from_rows(claim_id: str, rows: list[dict], graph_entry: dict, asses
     missing = {"Head", "assertion", "provenance", "pubinfo"} - graphs
     if missing:
         raise LookupError(f"claim {claim_id!r}: nanopub graphs incomplete, missing {sorted(missing)}")
+    # Provenance graphs now (build 2026-10-31 20:10) also describe the extracting LanguageModel, whose dct:identifier is a
+    # model name; read as a source identifier it became the "isbn". Rows about those nodes are not source metadata.
+    models = {r["s"] for r in mine if r["p"] == RDF_TYPE and r["o"] == LANGUAGE_MODEL}
     by = defaultdict(list)
     for r in mine:
+        if r["s"] in models:
+            continue
         name = P.get(r["p"])
         if name:
             by[name].append(r["o"])
@@ -138,7 +153,7 @@ def snapshot_from_rows(claim_id: str, rows: list[dict], graph_entry: dict, asses
         "assessments": {"count": len(assessors or []), "assessors": sorted(assessors or []),
                         "label": "dataset-resolvability ratings by LLM assessors: NOT evidence, NOT truth ratings"},
     }
-    snap["domain_dir"] = (nanopub_path or "").split("/")[0] or None
+    snap["domain_dir"] = domain_dir_of(nanopub_path)
     if literature:
         ps = by["primary_source"][0]
         base, _, frag = ps.partition("#")
@@ -297,6 +312,7 @@ def to_claim_draft(snap: dict, *, namespace: str = "node-a", issuer: str = "impo
         "registry": snap["registry"], "nanopub_path": snap["nanopub_path"], "domain_dir": snap["domain_dir"],
         "publication_state": ("unpublished_catalog_entry" if catalog else
                               "delphi_test_registry: test/unreviewed, kept separate from production" if snap["registry"] == "test"
+                              else "delphi_local_unsigned_nanopub: in Delphi's repository, on no registry" if not snap["registry"]
                               else "delphi_production_registry"),
         "record": snap["record"], "kind": snap["kind"],
         "unmapped_fields": {k: f[k] for k in ("dct:type", "skos:notation", "delphi:hypothesisType", "delphi:proposedTest",
