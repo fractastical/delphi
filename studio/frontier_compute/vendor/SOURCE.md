@@ -3,7 +3,7 @@
 | What | Origin | Pin |
 |---|---|---|
 | `scopedesk/oracles/{pde,kinetics,linear}.py`, `nonlinear_sweep/{ensemble,solvers,run}.py`, `nonlinear_sweep/PREREG.md` | delphi-evolve worktree `rethink-nca` (author `delphi-rethink-nca`) | commit `cb27cf2` (PREREG committed before any scored cell) |
-| `compute_ops/*` (batch.py updated: 40 KiB chunks, no __pycache__), `pde_oracle/*` | delphi-evolve branch `work/gpuops` (author dx-gpuops) | commit `f7e92c740b119a83e9cc12118da714b33f2d67ff` |
+| `compute_ops/*` (batch.py updated: 40 KiB chunks, no __pycache__), `pde_oracle/*` | delphi-evolve branch `work/gpuops` (author dx-gpuops) | commit `e8073cf2eaa5f2fb9a93ede794d39ad8d67b696b` |
 
 Licence: Apache-2.0, copied unchanged as `LICENSE` and `NOTICE` (the NOTICE of the origin repository: original work for the ScienceClaw 2026 hackathon; third-party data and papers are NOT relicensed).
 `scopedesk/__init__.py` is an empty file I created (the origin commit has none, the package is used as a namespace).
