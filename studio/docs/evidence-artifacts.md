@@ -36,6 +36,26 @@ They do not prove either action ran or benefited. The demonstration must join
 actual run receipts and output artifacts to those actions before reporting
 executed reuse; a controlled comparison is needed for a claim of benefit.
 
+`ArtifactIndex(store).search()` discovers artifact declarations by literal text,
+role and evidence kind, with bounded pages and query-bound cursors. Every result
+includes the Evidence version, target, producing action, applicability context,
+assumptions, limitations, source dependence and local review status. It respects
+the same namespace visibility as record reads. It includes historical versions
+and marks whether each remains a head. Repeated bytes in different contexts are
+kept separate; the count is declarations, not independent observations. The first
+implementation scans stored JSON metadata; large-corpus performance is unmeasured.
+
+The questions whiteboard uses optional Problem `approach`, `scales` and
+`context_tags`. `design_goal` asks what a desired capability requires;
+`theory_fit` asks whether a model explains known biology. `literature_gap`,
+`challenge` and `measurement` connect sources, disagreement and discriminating
+tests. Existing `dependencies` link exact records, and Action `inputs` record
+reuse. These directions complement each other: a proposed explanation can become
+a design constraint, whose failed prediction opens a new challenge. The tags do
+not make a recorded question actionable; its acceptance, falsifiers, next action
+and stop bounds are still required. Developmental and evolutionary layers are
+process contexts rather than spatial length scales.
+
 For printed fish, artifact provenance must distinguish biological dimensions and
 mass from display scale, resin volume and deliberately thickened fins. Candidate
 selection follows the constraint and simulation results. Printable geometry is

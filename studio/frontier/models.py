@@ -87,6 +87,8 @@ class Claim(Model):
 
 
 ACTIONABILITY = ("acceptance_criteria", "falsifiers", "next_action", "cost_stop_bounds")
+Scale = Literal["molecular", "macromolecular", "subcellular", "cellular", "tissue", "organ", "neural",
+                "organism", "developmental", "collective", "ecological", "evolutionary"]
 
 
 class Problem(Model):
@@ -117,12 +119,17 @@ class Problem(Model):
     dependencies: list[Ref] = Field(default_factory=list, max_length=30)
     source: Source
     original: dict[str, Any] = Field(default_factory=dict)
+    approach: Literal["design_goal", "theory_fit", "literature_gap", "challenge", "measurement", "unknown"] = "unknown"
+    scales: list[Scale] = Field(default_factory=list, max_length=12)
+    context_tags: Strings = Field(default_factory=list)
 
     @model_validator(mode="after")
     def actionability(self):
         absent = [f for f in ACTIONABILITY if not getattr(self, f)]
         if self.completeness == "actionable" and absent:
             raise ValueError("An actionable problem needs all of " + ", ".join(absent))
+        if len(set(self.scales)) != len(self.scales) or len(set(self.context_tags)) != len(self.context_tags):
+            raise ValueError("Repeated problem scales or context tags")
         return self
 
 

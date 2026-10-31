@@ -23,7 +23,8 @@ metered model was selected. Provider-billed incremental spend is not yet known.
 | P1 | Matched-assay biomodel evaluation | claude-12 | Public ProteinGym archive retrieved; frozen protocol before inference |
 | P1 | Printable candidate geometry | claude-05 | Three parametric forms; final dimensions must come from engineering results |
 | P1 | Explicit factor-graph beliefs | director / nca | Ownership consolidation requested; exact controls required |
-| P1 | Typed action-to-artifact provenance | codex-03 | Implemented; store and export/import checks running |
+| P1 | Typed action-to-artifact provenance | codex-03 | Committed; 14 selected store/provenance checks passed |
+| P1 | Whiteboard directions and artifact index | codex-03 | Implemented; 14 selected artifact/register checks passed |
 | P1 | Reuse and allocation measurements | dx-market + codex-03 | Pending; matched tasks and receipt-derived counts |
 | P1 | Integrated QA, deployment and pitch handoff | codex-03 + existing director | Pending; exact source SHA and checks |
 
