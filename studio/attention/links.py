@@ -18,8 +18,27 @@ def _ref(r):
     return {k: r[k] for k in ("namespace", "kind", "id", "version")}
 
 
-def coupled_links(problem_heads: dict, claim_heads: dict) -> dict:
-    """problem_heads / claim_heads: {(namespace, id): head record}. Keys keep the namespace, so equal ids on different nodes stay distinct."""
+def resolve_ref(ref: dict, versions: set | None, heads_by_key: dict | None, namespaces_read: set | None) -> dict:
+    """Where does an exact reference point, relative to what this snapshot actually read?
+    exact_version_present | namespace_head_is_other_version | namespace_not_read | not_found | unknown_scope (when no scope was supplied)."""
+    if versions is None:
+        return {"status": "unknown_scope"}
+    key = (ref["namespace"], ref["kind"], ref["id"], ref["version"])
+    if key in versions:
+        return {"status": "exact_version_present"}
+    if namespaces_read is not None and ref["namespace"] not in namespaces_read:
+        return {"status": "namespace_not_read", "namespace": ref["namespace"]}
+    h = (heads_by_key or {}).get((ref["namespace"], ref["kind"], ref["id"]))
+    if h is not None:
+        return {"status": "namespace_head_is_other_version", "head_version": h}
+    return {"status": "not_found"}
+
+
+def coupled_links(problem_heads: dict, claim_heads: dict, *, all_versions: set | None = None, heads_by_key: dict | None = None,
+                  namespaces_read: set | None = None) -> dict:
+    """problem_heads / claim_heads: {(namespace, id): head record}. Keys keep the namespace, so equal ids on different nodes stay distinct.
+    A claim id resolves ONLY inside the Problem's own namespace; the same id in another namespace is listed as `same_id_elsewhere`, never linked.
+    Every typed reference carries a `resolution` saying whether its exact target was read (cross-namespace references are never assumed)."""
     links, issues = [], []
     by_claim = defaultdict(list)
     for pkey in sorted(problem_heads):
@@ -35,14 +54,18 @@ def coupled_links(problem_heads: dict, claim_heads: dict) -> dict:
             if c is None:
                 issues.append({"problem": pid, "issue": f"claim id {cid!r} in original.claim_ids has no Claim in this namespace"})
                 continue
-            links.append({"link_kind": "concerns_claim", "from": _ref(rec), "to": _ref(c), "source_field": "payload.original.claim_ids", "role": role})
+            elsewhere = sorted(({"namespace": k[0], "version": v["version"]} for k, v in claim_heads.items() if k[1] == cid and k[0] != rec["namespace"]),
+                               key=lambda x: (x["namespace"], x["version"]))
+            links.append({"link_kind": "concerns_claim", "from": _ref(rec), "to": _ref(c), "source_field": "payload.original.claim_ids", "role": role,
+                          "resolution": resolve_ref(_ref(c), all_versions, heads_by_key, namespaces_read), "same_id_elsewhere": elsewhere})
             by_claim[(rec["namespace"], cid)].append(pid)
         store_dep_ids = []
         for d in p.get("dependencies", []):
             store_dep_ids.append(d["id"])
             links.append({"link_kind": "depends_on", "from": _ref(rec), "to": {k: d[k] for k in ("namespace", "kind", "id", "version")},
                           "source_field": "payload.dependencies", "role": role,
-                          "pinned_to_current_head": d["kind"] == "Problem" and (d["namespace"], d["id"]) in problem_heads and problem_heads[(d["namespace"], d["id"])]["version"] == d["version"]})
+                          "pinned_to_current_head": d["kind"] == "Problem" and (d["namespace"], d["id"]) in problem_heads and problem_heads[(d["namespace"], d["id"])]["version"] == d["version"],
+                          "cross_namespace": d["namespace"] != rec["namespace"], "resolution": resolve_ref(d, all_versions, heads_by_key, namespaces_read)})
         if sorted(store_dep_ids) != sorted(orig.get("depends_on", []) or []):
             issues.append({"problem": pid, "issue": f"store dependencies {sorted(store_dep_ids)} differ from original.depends_on {sorted(orig.get('depends_on', []) or [])}"})
         for u in orig.get("unlocks", []) or []:

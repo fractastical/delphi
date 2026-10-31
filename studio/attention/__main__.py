@@ -25,7 +25,7 @@ def main(argv=None) -> int:
     v = sub.add_parser("view"); v.add_argument("--records", required=True); v.add_argument("--events"); v.add_argument("--annotations", nargs="*", default=[]); v.add_argument("--now"); v.add_argument("--out")
     s = sub.add_parser("score-events"); [s.add_argument(f"--{a}", required=True) for a in ("specs", "forecasts", "resolutions", "now")]
     e = sub.add_parser("evaluate"); e.add_argument("--rows", required=True); e.add_argument("--frozen", required=True); e.add_argument("--arms", required=True)
-    n = sub.add_parser("snapshot"); n.add_argument("--dsn", required=True); n.add_argument("--namespace", required=True); n.add_argument("--schema")
+    n = sub.add_parser("snapshot"); n.add_argument("--dsn", required=True); n.add_argument("--namespace", action="append"); n.add_argument("--all-namespaces", action="store_true"); n.add_argument("--schema")
     n.add_argument("--annotations", nargs="*", default=[]); n.add_argument("--demo", action="store_true"); n.add_argument("--now"); n.add_argument("--out", required=True)
     g = sub.add_parser("trace-gate"); g.add_argument("--commons-runs", required=True); g.add_argument("--out")
     a = ap.parse_args(argv)
@@ -35,7 +35,9 @@ def main(argv=None) -> int:
         out["rankings"] = rank.all_baselines(out["rows"])
     elif a.cmd == "snapshot":
         from . import demo, pg, snapshot
-        read = pg.read_store(a.dsn, a.namespace, schema=a.schema)
+        if bool(a.namespace) == bool(a.all_namespaces):
+            raise SystemExit("give --namespace NS (repeatable) or --all-namespaces, not both and not neither")
+        read = pg.read_store(a.dsn, None if a.all_namespaces else a.namespace, schema=a.schema)
         now = a.now or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         anns = [_load(p) for p in a.annotations] + (demo.demo_annotations(read["records"]) if a.demo else [])
         out = snapshot.build_snapshot(read, anns, now, "with_demo_annotations" if a.demo else "actual")
