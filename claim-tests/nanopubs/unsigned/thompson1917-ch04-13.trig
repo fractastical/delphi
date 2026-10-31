@@ -1,0 +1,107 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix nt: <https://w3id.org/np/o/ntemplate/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch04-13> delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/claim-test-thompson1917-ch04-13> .
+  <https://w3id.org/delphi/resource/evidence/claim-test-thompson1917-ch04-13> a delphi:EvidenceItem ;
+    rdfs:label "Refuted: 34.3% of 69,948 plant species have a haploid chromosome number above 16 against 1.7% below 6; 64.1% lie in 6 to 16" ;
+    dct:description "Pre-registered test of the claim. Hypothesis as tested: If chromosome numbers of germ-nuclei mostly lie between six and sixteen, with few below six and fewer still above sixteen, then across plant species the haploid (gametic) number n has most of its mass in 6 <= n <= 16, a small lower tail (n < 6) and a still smaller upper tail (n > 16)." ;
+    delphi:statisticalTest "Proportions of species by haploid-number class from the Chromosome Counts Database (median count per species, gametophytic level confirmed on reference species); binomial standard error below 0.002; post-hoc sensitivity (lowest count per species, genus medians, angiosperms only) all give the same verdict" ;
+    schema:additionalProperty sub:plain, sub:status, sub:doesNotEstablish, sub:measured, sub:n, sub:uncertainty, sub:preregRule ;
+    rdfs:comment "Thompson's central range is roughly right (64% of species have 6 <= n <= 16, mode n = 9), but the upper tail is 20 times larger than the lower tail (34% above 16 versus 1.7% below 6), the opposite of 'fewer still have more than sixteen': polyploidy, unknown in 1917, puts a third of angiosperms and 96% of ferns above 16." ;
+    rdfs:comment "Plants only; the animal half of the claim is untested here (animal karyotype compilations were not pursued in this batch)." ;
+    rdfs:comment "The CCDB is a compilation of published counts with uneven taxonomic coverage; the median per species name hides within-species cytotype variation, which is the intended treatment of polyploid races." ;
+    rdfs:comment "Species with only a sporophytic count: the CCDB statistics service reports counts at the gametophytic level (confirmed on reference species), so no halving was applied." ;
+    rdfs:comment "Readings check: the refutation holds whether species are scored by their median or lowest count, whether genera rather than species are counted, and within angiosperms alone; it is a refutation for plants, the only half of Thompson's 'plants and animals' scope that was tested." ;
+    prov:used <https://w3id.org/delphi/resource/dataset/ccdb-chromosome-counts-database-statistics-api> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/6f99bc46323977f4ecfdfb94bcf39e6578b897e2/claim-tests/thompson-growth-form/thompson1917-ch04-13/result.json> .
+  sub:plain a schema:PropertyValue ; schema:propertyID "plain_language_statement" ; schema:value "Thompson said most species have 6 to 16 chromosomes in their sex cells and very few have more than 16; among plants, a third of species have more than 16." ; schema:description "The tested claim and its outcome in one sentence for a general reader." .
+  sub:status a schema:PropertyValue ; schema:propertyID "status" ; schema:value "refuted" ; schema:description "Outcome under the pre-registered decision rule. result.json verdict field: refutes" .
+  sub:measured a schema:PropertyValue ; schema:propertyID "measured_value" ; schema:value "0.3426545433750786"^^xsd:double ; schema:unitText "share of plant species with haploid number n > 16 (claim: 'fewer still' than the share with n < 6, which is given in extra)" ; schema:description "Observation: the primary pre-registered quantity, computed by analysis.py from the retrieved files; further computed quantities are in result.json measured.extra." .
+  sub:n a schema:PropertyValue ; schema:propertyID "sample" ; schema:value "69948 species with a count" ; schema:description "Observation: what was analysed after the pre-registered filters." .
+  sub:uncertainty a schema:PropertyValue ; schema:propertyID "uncertainty" ; schema:value "binomial standard error below 0.002 at this sample size" ; schema:description "Observation: uncertainty or secondary statistics as reported in result.json." .
+  sub:preregRule a schema:PropertyValue ; schema:propertyID "pre_registered_rule" ; schema:value "PASS: Pre-registered. Data: the Chromosome Counts Database (CCDB, Rice et al. 2015), 'statistics' API output (one row per resolved species name with the median gametophytic/sporophytic counts) retrieved per major group (Angiosperms, Gymnosperms, Pteridophytes, Bryophytes) in CSV. One n per species: the median resolved gametophytic count; where only a sporophytic (2n) count is given, n = 2n/2; species with no usable count excluded. SUPPORTS if all three hold: (a) at least 70% of species have 6 <= n <= 16; (b) fewer than 15% have n < 6; (c) the share with n > 16 is smaller than the share with n < 6. FAIL: Pre-registered. REFUTES if any holds: fewer than 50% of species have 6 <= n <= 16; the share with n > 16 is >= the share with n < 6; or the share with n > 16 is >= 15%. MIXED otherwise. INCONCLUSIVE (data-unavailable) if the API cannot be read; INCONCLUSIVE (underpowered) if fewer than 1000 species have a usable n." ; schema:description "Assumption and decision rule fixed before the data were opened (see the pre-registration commit in the provenance graph); not an observation." .
+  sub:doesNotEstablish a schema:PropertyValue ; schema:propertyID "does_not_establish" ; schema:value "Plants only: the animal half of Thompson's 'plants and animals' is untested; the central range is roughly right (mode n = 9); the upper tail is driven by polyploidy, unknown in 1917; the CCDB is a compilation with uneven coverage." ; schema:description "Interpretation: the limits of what this evidence shows." .
+  sub:ds1Nfiles a schema:PropertyValue ; schema:propertyID "n_files" ; schema:value 4 ; schema:description "Files of this dataset that the test retrieved and checksummed (the distributions listed here)." .
+  sub:ds1Nbytes a schema:PropertyValue ; schema:propertyID "byte_size_total" ; schema:value 2678245 ; schema:description "Total byte size of the retrieved files." .
+  <https://w3id.org/delphi/resource/dataset/ccdb-chromosome-counts-database-statistics-api> a dcat:Dataset ;
+    rdfs:label "Chromosome Counts Database (CCDB, Rice et al. 2015), 'statistics' API output per major plant group (one row per resolved species name with minimum, median and maximum count)" ;
+    schema:additionalProperty sub:ds1Nfiles, sub:ds1Nbytes ;
+    dct:identifier "10.1111/nph.13191" ;
+    owl:sameAs <https://doi.org/10.1111/nph.13191> ;
+    dcat:landingPage <http://ccdb.tau.ac.il/> ;
+    dcat:version "live database as served 2026-10-31" ;
+    dct:rights "not stated on the site; community database, cite the paper" ;
+    dct:license "not stated on the site; community database, cite the paper" ;
+    rdfs:comment "Role in this test: median gametophytic (n) count per species" ;
+    dcat:distribution sub:ds1f1, sub:ds1f2, sub:ds1f3, sub:ds1f4 .
+  sub:ds1f1 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <http://ccdb.tau.ac.il/services/statistics/?majorGroup=Angiosperms&format=csv> ;
+    dcat:byteSize "2467253"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:11Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f1sum .
+  sub:ds1f1sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "c97736983a98cca240ddce9af3db1ecc5d020534a0dd84f2637f09105e1fdfc2"^^xsd:hexBinary .
+  sub:ds1f2 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <http://ccdb.tau.ac.il/services/statistics/?majorGroup=Gymnosperms&format=csv> ;
+    dcat:byteSize "18444"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:19Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f2sum .
+  sub:ds1f2sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "4711c9757315b9f8f791586a67211176ee677bba50a885bf21cd2a033630317d"^^xsd:hexBinary .
+  sub:ds1f3 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <http://ccdb.tau.ac.il/services/statistics/?majorGroup=Pteridophytes&format=csv> ;
+    dcat:byteSize "101653"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:21Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f3sum .
+  sub:ds1f3sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "a6a6c7cce021a960711a00c52069687d55b9e82527eedbd2dc971b32cd2cb141"^^xsd:hexBinary .
+  sub:ds1f4 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <http://ccdb.tau.ac.il/services/statistics/?majorGroup=Bryophytes&format=csv> ;
+    dcat:byteSize "90895"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:22Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f4sum .
+  sub:ds1f4sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "20d9ea1b469199d13c5e94dab13c4c09549bc7a796126f66c7a7f47c1b3c6028"^^xsd:hexBinary .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/6f99bc46323977f4ecfdfb94bcf39e6578b897e2/claim-tests/thompson-growth-form/thompson1917-ch04-13/result.json>, <https://github.com/fractastical/delphisci/commit/2a9d8d16d205177000098cb60c36c203c32a3f80> ;
+    prov:wasGeneratedBy sub:test .
+  <https://github.com/fractastical/delphisci/blob/6f99bc46323977f4ecfdfb94bcf39e6578b897e2/claim-tests/thompson-growth-form/thompson1917-ch04-13/result.json> dct:title "claim-tests/thompson-growth-form/thompson1917-ch04-13/result.json at commit 6f99bc4 (2026-10-31T06:19:12Z)" ;
+    rdfs:comment "Result file with verdict, measured values, dataset checksums and caveats. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  <https://github.com/fractastical/delphisci/commit/2a9d8d16d205177000098cb60c36c203c32a3f80> a prov:Entity ; dct:title "claim-tests: pre-register 4 Darwin/Thompson tests (ICS ages, LR04+EDC, NHANES, CCDB)" ; dct:date "2026-10-31T06:13:26Z"^^xsd:dateTime ; rdfs:comment "Pre-registration: pass and fail criteria with verdict null, committed 2026-10-31T06:13:26Z; the first data file for this test was retrieved at 2026-10-31T06:14:11Z, 45 s later. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  sub:test a prov:Activity ; prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:used <https://w3id.org/delphi/resource/dataset/ccdb-chromosome-counts-database-statistics-api>, <https://github.com/fractastical/delphisci/blob/6f99bc46323977f4ecfdfb94bcf39e6578b897e2/claim-tests/thompson-growth-form/thompson1917-ch04-13/analysis.py> ; prov:qualifiedAssociation sub:plan .
+  sub:plan a prov:Association ; prov:agent <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:hadPlan <https://github.com/fractastical/delphisci/blob/2a9d8d16d205177000098cb60c36c203c32a3f80/claim-tests/thompson-growth-form/thompson1917-ch04-13/result.json> .
+  <https://github.com/fractastical/delphisci/blob/2a9d8d16d205177000098cb60c36c203c32a3f80/claim-tests/thompson-growth-form/thompson1917-ch04-13/result.json> rdfs:comment "The pre-registered plan: result.json as first committed, before any download." .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> a prov:SoftwareAgent ; rdfs:label "delphisci claim-tests runner (claims thread)" ; rdfs:comment "Run: scienceclaw-c4 (claims thread, ScienceClaw hack); drafts by the swarm thread (claude-sonnet-5-5) were used as starting points where noted; model claude-fable-5-1; 2026-10-31" ; delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5.1> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5.1> a delphi:LanguageModel ; rdfs:label "Claude Fable 5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T14:03:16Z"^^xsd:dateTime ;
+    dct:creator <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    rdfs:label "Evidence for thompson1917-ch04-13: refuted" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:EvidenceItem ;
+    npx:introduces <https://w3id.org/delphi/resource/evidence/claim-test-thompson1917-ch04-13> ;
+    nt:wasCreatedFromProvenanceTemplate <https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA> ;
+    rdfs:comment "UNSIGNED DRAFT prepared 2026-10-31 by the claims thread of the DELPHI team: not signed, not published to any registry. Intended for the nanopub TEST registry first; production publication needs the ORCID key owner's explicit approval. No human owner is named in this draft: dct:creator is the software agent, and the ORCID of the key holder is added only when that person approves and signs. Built by claim-tests/nanopubs/build.py from result.json." ;
+    rdfs:comment "No assertion template is declared. The template that would otherwise apply, the published Project Delphi evidence item template https://w3id.org/np/RAk4kcX4zA_touv8CeKku9tTUnbR5xiTLSLwFbrKSl3BE (dct:created 2026-10-01), still carries the legacy https://w3id.org/probknow/ontology/ namespace (1 occurrence, checked 2026-10-31 on the live network), and its required statements cannot be instantiated with Delphi ontology 2.0 terms, so this hand-authored record was not created from it and does not claim to be. The provenance template https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA is declared because it carries no legacy IRI (0 occurrences, same check). No pubinfo template is declared. See claim-tests/nanopubs/DECISIONS.md (2026-10-31)." .
+}

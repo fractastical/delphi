@@ -1,0 +1,91 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix nt: <https://w3id.org/np/o/ntemplate/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch10-02> delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/claim-test-thompson1917-ch10-02> .
+  <https://w3id.org/delphi/resource/evidence/claim-test-thompson1917-ch10-02> a delphi:EvidenceItem ;
+    rdfs:label "Refuted: observed whorl counts exceed the maximum number of turns a conical geodesic can make in all 34 Turritella specimens (median ratio 2.5, range 1.63 to 3.39)" ;
+    dct:description "Pre-registered test of the claim. Hypothesis as tested: If the sutural line of a turreted shell such as Turritella is a geodesic of the shell's enveloping right cone, then the number of whorls the suture makes cannot exceed the number of turns a conical geodesic can make: a geodesic on a right cone of apical angle alpha develops into a straight line on a sector of angle 2*pi*sin(alpha/2), sweeps at most pi of that sector, and therefore turns at most N_geo = 1/(2 sin(alpha/2)) times in total (and only half of that while approaching the apex). Measured whorl counts of Turritella shells must therefore satisfy N_obs <= N_geo." ;
+    delphi:statisticalTest "Deterministic bound N_obs <= 1/(2 sin(alpha/2)) per specimen from apical angle and whorl number; no sampling test (every specimen exceeds the bound, also after subtracting two early whorls)" ;
+    schema:additionalProperty sub:plain, sub:status, sub:doesNotEstablish, sub:measured, sub:n, sub:uncertainty, sub:preregRule ;
+    rdfs:comment "The test refutes the identification of the suture with a geodesic of the enveloping right cone; it does not test Thompson's purely geometric statement that a conical geodesic coils more closely toward the apex (true) nor whether the suture is locally geodesic-like over a fraction of a whorl." ;
+    rdfs:comment "The bound assumes the shell envelope is a right circular cone, which is what Thompson states; real turritellid envelopes are slightly convex or concave, but the Clairaut relation on any such surface of revolution still forbids a geodesic from winding many times toward a narrowing apex unless the sides are almost parallel." ;
+    rdfs:comment "Specimens are Neogene fossils from West Java, not the type species Turritella terebra; fossil apices are often incomplete, so whorl counts are if anything underestimates, which makes the test conservative. Apical angles are the authors' gross measurements to 0.5 degree." ;
+    rdfs:comment "Whorl counts include early whorls where the cone approximation is roughest; subtracting two whorls from every count leaves all 34 specimens above the bound." ;
+    rdfs:comment "The published tables list 50 specimens in the text but 49 rows were present (Table 6 lacks a specimen 5B); 15 rows lack an apical angle and were excluded." ;
+    rdfs:comment "Transcription from the PDF needs pdfplumber (not in the standard tool list); the transcribed table is committed so analysis.py runs with pandas and numpy only." ;
+    prov:used <https://w3id.org/delphi/resource/dataset/pandita-2013-west-java-turritellidae-biometrics> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/269fc31bee1b594321bca3218ebcfb6307c22083/claim-tests/thompson-growth-form/thompson1917-ch10-02/result.json> .
+  sub:plain a schema:PropertyValue ; schema:propertyID "plain_language_statement" ; schema:value "Thompson said the seam between the whorls of a Turritella shell follows the shortest path on a cone; real shells wind about two and a half times more than such a path could." ; schema:description "The tested claim and its outcome in one sentence for a general reader." .
+  sub:status a schema:PropertyValue ; schema:propertyID "status" ; schema:value "refuted" ; schema:description "Outcome under the pre-registered decision rule. result.json verdict field: refutes" .
+  sub:measured a schema:PropertyValue ; schema:propertyID "measured_value" ; schema:value "2.5"^^xsd:double ; schema:unitText "median ratio of observed whorl number to the maximum number of turns a conical geodesic can make (R = N_obs / N_geo); R > 1 is impossible for a geodesic" ; schema:description "Observation: the primary pre-registered quantity, computed by analysis.py from the retrieved files; further computed quantities are in result.json measured.extra." .
+  sub:n a schema:PropertyValue ; schema:propertyID "sample" ; schema:value "34" ; schema:description "Observation: what was analysed after the pre-registered filters." .
+  sub:uncertainty a schema:PropertyValue ; schema:propertyID "uncertainty" ; schema:value "R ranges from 1.63 to 3.39 across all 34 specimens (4 species); every specimen exceeds the bound" ; schema:description "Observation: uncertainty or secondary statistics as reported in result.json." .
+  sub:preregRule a schema:PropertyValue ; schema:propertyID "pre_registered_rule" ; schema:value "PASS: Pre-registered. From published per-specimen measurements of Turritellidae giving both the apical angle alpha and the total whorl number N_obs (Pandita et al. 2013, Int. J. Geosciences 4:777-784, Tables 2-6, 50 specimens of 5 species), compute N_geo = 1/(2 sin(alpha/2)) and the ratio R = N_obs / N_geo for every specimen with both values. SUPPORTS if at least 90% of specimens have R <= 1 (whorl count within the geodesic bound). FAIL: Pre-registered. REFUTES if at least 90% of specimens have R > 1, i.e. the suture coils more times than any geodesic of the enveloping cone can, so the sutural line cannot be a conical geodesic. Between 10% and 90% is 'mixed'. If the tables cannot be retrieved or parsed, inconclusive with reason data-unavailable. The claim's first part (coils tighten toward the apex) is shared by a geodesic and by the logarithmic helico-spiral and is not discriminating; the verdict rests on the identification of the suture with a geodesic." ; schema:description "Assumption and decision rule fixed before the data were opened (see the pre-registration commit in the provenance graph); not an observation." .
+  sub:doesNotEstablish a schema:PropertyValue ; schema:propertyID "does_not_establish" ; schema:value "Refutes the identification of the suture with a geodesic of the enveloping right cone, not Thompson's geometric statement that a conical geodesic coils more closely toward the apex (which is true); Neogene fossil Turritella from Java, not the type species; apical angles are the source's gross measurements." ; schema:description "Interpretation: the limits of what this evidence shows." .
+  sub:ds1Nfiles a schema:PropertyValue ; schema:propertyID "n_files" ; schema:value 1 ; schema:description "Files of this dataset that the test retrieved and checksummed (the distributions listed here)." .
+  sub:ds1Nbytes a schema:PropertyValue ; schema:propertyID "byte_size_total" ; schema:value 534536 ; schema:description "Total byte size of the retrieved files." .
+  sub:ds1Nspecimens a schema:PropertyValue ; schema:propertyID "n_specimens" ; schema:value 34 ; schema:description "Count of specimens as stated in this record's text, taken from result.json." .
+  <https://w3id.org/delphi/resource/dataset/pandita-2013-west-java-turritellidae-biometrics> a dcat:Dataset ;
+    rdfs:label "Pandita, Zaim, Aswan & Rizal (2013) Relationship of Biometrical Aspect of Turritellidae with Geochronological Aspect in West Java, Int. J. Geosciences 4:777-784, Tables 2-6 (biometric measurements of 49 turritellid specimens from five Neogene localities)" ;
+    schema:additionalProperty sub:ds1Nfiles, sub:ds1Nbytes, sub:ds1Nspecimens ;
+    dct:identifier "10.4236/ijg.2013.44071" ;
+    owl:sameAs <https://doi.org/10.4236/ijg.2013.44071> ;
+    dcat:landingPage <https://www.scirp.org/journal/paperinformation?paperid=33473> ;
+    dcat:version "published article PDF, 2013" ;
+    dct:rights "CC BY (stated in the article)" ;
+    dct:license "CC BY (stated in the article)" ;
+    rdfs:comment "Role in this test: per-specimen apical angle (alpha) and total whorl number for Turritella sp., T. bantamensis, T. simplex and T. javana (34 specimens with both values; T. djadjariensis has no alpha values)" ;
+    dcat:distribution sub:ds1f1 .
+  sub:ds1f1 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://www.scirp.org/pdf/ijg_2013062114170109.pdf> ;
+    dcat:byteSize "534536"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T04:38:23Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f1sum .
+  sub:ds1f1sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "77c735fa2cf1cd0315b8d3fe848de9f56cbfbfe0b8d0d2e7d3a3a47fc8fb11f5"^^xsd:hexBinary .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/269fc31bee1b594321bca3218ebcfb6307c22083/claim-tests/thompson-growth-form/thompson1917-ch10-02/result.json>, <https://github.com/fractastical/delphisci/commit/ebeeb317907e7b366cc6e69fb125565165835f5c> ;
+    prov:wasGeneratedBy sub:test .
+  <https://github.com/fractastical/delphisci/blob/269fc31bee1b594321bca3218ebcfb6307c22083/claim-tests/thompson-growth-form/thompson1917-ch10-02/result.json> dct:title "claim-tests/thompson-growth-form/thompson1917-ch10-02/result.json at commit 269fc31 (2026-10-31T04:39:45Z)" ;
+    rdfs:comment "Result file with verdict, measured values, dataset checksums and caveats." .
+  <https://github.com/fractastical/delphisci/commit/ebeeb317907e7b366cc6e69fb125565165835f5c> a prov:Entity ; dct:title "claim-tests: pre-register thompson1917-ch10-02" ; dct:date "2026-10-31T04:37:09Z"^^xsd:dateTime ; rdfs:comment "Pre-registration: pass and fail criteria with verdict null, committed 2026-10-31T04:37:09Z; the first data file for this test was retrieved at 2026-10-31T04:38:23Z, 74 s later." .
+  sub:test a prov:Activity ; prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:used <https://w3id.org/delphi/resource/dataset/pandita-2013-west-java-turritellidae-biometrics>, <https://github.com/fractastical/delphisci/blob/76d95e831d9552b5b79bf58e56d387493417c0b1/claim-tests/thompson-growth-form/thompson1917-ch10-02/analysis.py> ; prov:qualifiedAssociation sub:plan .
+  sub:plan a prov:Association ; prov:agent <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:hadPlan <https://github.com/fractastical/delphisci/blob/ebeeb317907e7b366cc6e69fb125565165835f5c/claim-tests/thompson-growth-form/thompson1917-ch10-02/result.json> .
+  <https://github.com/fractastical/delphisci/blob/ebeeb317907e7b366cc6e69fb125565165835f5c/claim-tests/thompson-growth-form/thompson1917-ch10-02/result.json> rdfs:comment "The pre-registered plan: result.json as first committed, before any download." .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> a prov:SoftwareAgent ; rdfs:label "delphisci claim-tests runner (claims thread)" ; rdfs:comment "Run: cursor/claim-tests-thompson-batch-2216; model claude-fable-5.1; 2026-10-31" ; delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5.1> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5.1> a delphi:LanguageModel ; rdfs:label "Claude Fable 5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T14:03:16Z"^^xsd:dateTime ;
+    dct:creator <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    rdfs:label "Evidence for thompson1917-ch10-02: refuted" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:EvidenceItem ;
+    npx:introduces <https://w3id.org/delphi/resource/evidence/claim-test-thompson1917-ch10-02> ;
+    nt:wasCreatedFromProvenanceTemplate <https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA> ;
+    rdfs:comment "UNSIGNED DRAFT prepared 2026-10-31 by the claims thread of the DELPHI team: not signed, not published to any registry. Intended for the nanopub TEST registry first; production publication needs the ORCID key owner's explicit approval. No human owner is named in this draft: dct:creator is the software agent, and the ORCID of the key holder is added only when that person approves and signs. Built by claim-tests/nanopubs/build.py from result.json." ;
+    rdfs:comment "No assertion template is declared. The template that would otherwise apply, the published Project Delphi evidence item template https://w3id.org/np/RAk4kcX4zA_touv8CeKku9tTUnbR5xiTLSLwFbrKSl3BE (dct:created 2026-10-01), still carries the legacy https://w3id.org/probknow/ontology/ namespace (1 occurrence, checked 2026-10-31 on the live network), and its required statements cannot be instantiated with Delphi ontology 2.0 terms, so this hand-authored record was not created from it and does not claim to be. The provenance template https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA is declared because it carries no legacy IRI (0 occurrences, same check). No pubinfo template is declared. See claim-tests/nanopubs/DECISIONS.md (2026-10-31)." .
+}

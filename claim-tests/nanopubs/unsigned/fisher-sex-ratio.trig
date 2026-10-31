@@ -1,0 +1,89 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix nt: <https://w3id.org/np/o/ntemplate/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/fisher-sex-ratio> delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/claim-test-fisher-sex-ratio> .
+  <https://w3id.org/delphi/resource/evidence/claim-test-fisher-sex-ratio> a delphi:EvidenceItem ;
+    rdfs:label "Partially supported: every one of 4222 country-years lies within 10% of equality (criterion B holds), but the median sex ratio at birth is 105.2 males per 100 females, outside the pre-registered 5% band (criterion A fails)" ;
+    dct:description "Pre-registered test of the claim. Hypothesis as tested: If parents are selected to invest equally in sons and daughters and a son costs the same as a daughter, then the primary (birth) sex ratio of human populations should be close to one male per female and should not vary widely between populations." ;
+    delphi:statisticalTest "Median and band fractions of the UN World Population Prospects 2024 sex ratio at birth over country-years 1950 to 1979 with population at least 1 million; no inferential test" ;
+    schema:additionalProperty sub:plain, sub:status, sub:doesNotEstablish, sub:measured, sub:n, sub:uncertainty, sub:preregRule, sub:supportedComponent, sub:unsupportedComponent ;
+    rdfs:comment "Verdict is 'mixed' by the pre-registered rule: every one of 4222 country-years lies within 10% of equality (criterion B, the strong-constraint prediction, holds with no exceptions), but the median is 105.2, just outside the 5% band of criterion A, and the excess of male births is systematic (minimum country mean 101.0)." ;
+    rdfs:comment "The standard Fisherian reading of the 5% male excess is that boys die more often before the end of parental investment, so investment is nearer equality than births are; this test did not measure sex-specific child mortality and so cannot confirm that reconciliation." ;
+    rdfs:comment "WPP values are UN estimates reconstructed from censuses and registration systems, smoothed and not independent across years within a country; the effective sample size is far below 4222." ;
+    rdfs:comment "Only humans were tested, and only the 'equal cost' case; Fisher's principle predicts equal investment, which the birth ratio measures only approximately." ;
+    prov:used <https://w3id.org/delphi/resource/dataset/un-wpp-2024-demographic-indicators-medium> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/fisher-sex-ratio/result.json> .
+  sub:plain a schema:PropertyValue ; schema:propertyID "plain_language_statement" ; schema:value "Fisher argued that parents should produce about as many sons as daughters; across 146 countries from 1950 to 1979 about 105 boys were born per 100 girls, close to equal but consistently above it." ; schema:description "The tested claim and its outcome in one sentence for a general reader." .
+  sub:status a schema:PropertyValue ; schema:propertyID "status" ; schema:value "partially supported" ; schema:description "Outcome under the pre-registered decision rule. result.json verdict field: mixed" .
+  sub:measured a schema:PropertyValue ; schema:propertyID "measured_value" ; schema:value "105.2"^^xsd:double ; schema:unitText "median sex ratio at birth, males per 100 females, country-years 1950-1979 (equal numbers = 100)" ; schema:description "Observation: the primary pre-registered quantity, computed by analysis.py from the retrieved files; further computed quantities are in result.json measured.extra." .
+  sub:n a schema:PropertyValue ; schema:propertyID "sample" ; schema:value "4222 country-years from 146 countries" ; schema:description "Observation: what was analysed after the pre-registered filters." .
+  sub:uncertainty a schema:PropertyValue ; schema:propertyID "uncertainty" ; schema:value "5th-95th percentile 102.5-107.0; SD 1.41; range 100.5-109.8" ; schema:description "Observation: uncertainty or secondary statistics as reported in result.json." .
+  sub:preregRule a schema:PropertyValue ; schema:propertyID "pre_registered_rule" ; schema:value "PASS: Pre-registered. Data: United Nations World Population Prospects 2024, Demographic Indicators, medium variant CSV (WPP2024_Demographic_Indicators_Medium.csv.gz), variable SRB (sex ratio at birth, males per 100 female births), rows with LocTypeName == 'Country/Area', years 1950 to 1979 inclusive (before prenatal sex determination was widely available, so the ratio reflects biology rather than sex-selective abortion), country-years with total mid-year population >= 1 million. Criterion A (equality): the median SRB across qualifying country-years lies in [95, 105] (within 5% of equal numbers). Criterion B (uniform near-equality): at least 95% of qualifying country-years lie in [90, 110]. SUPPORTS if A and B both hold. FAIL: Pre-registered. REFUTES if the median SRB lies outside [90, 110] OR fewer than 80% of qualifying country-years lie in [90, 110]. MIXED otherwise (for example a consistent small excess of one sex between 5% and 10%, with B holding). INCONCLUSIVE (data-unavailable) if the file cannot be downloaded or has no SRB column." ; schema:description "Assumption and decision rule fixed before the data were opened (see the pre-registration commit in the provenance graph); not an observation." .
+  sub:doesNotEstablish a schema:PropertyValue ; schema:propertyID "does_not_establish" ; schema:value "Tests numbers at birth, not parental investment, which is what Fisher's principle concerns; it cannot confirm the usual reconciliation (higher boy mortality before the end of parental care brings investment nearer equality) because child mortality by sex was not measured; humans only, equal-cost case only; UN estimates are smoothed and not independent across years." ; schema:description "Interpretation: the limits of what this evidence shows." .
+  sub:supportedComponent a schema:PropertyValue ; schema:propertyID "supported_component" ; schema:value "Criterion B: 100% of 4222 country-years from 146 countries lie within [90, 110] males per 100 females; no population departs widely from equal numbers at birth." ; schema:description "The part of the pre-registered prediction that the data meet." .
+  sub:unsupportedComponent a schema:PropertyValue ; schema:propertyID "unsupported_component" ; schema:value "Criterion A: the median is 105.2 (5th to 95th percentile 102.5 to 107.0) and lies outside [95, 105]; the male excess is systematic, the lowest country mean being 101.0, and only 47% of country-years fall within the 5% band." ; schema:description "The part of the pre-registered prediction that the data do not meet." .
+  sub:ds1Nfiles a schema:PropertyValue ; schema:propertyID "n_files" ; schema:value 1 ; schema:description "Files of this dataset that the test retrieved and checksummed (the distributions listed here)." .
+  sub:ds1Nbytes a schema:PropertyValue ; schema:propertyID "byte_size_total" ; schema:value 16557272 ; schema:description "Total byte size of the retrieved files." .
+  <https://w3id.org/delphi/resource/dataset/un-wpp-2024-demographic-indicators-medium> a dcat:Dataset ;
+    rdfs:label "United Nations World Population Prospects 2024, Demographic Indicators, medium variant (CSV)" ;
+    schema:additionalProperty sub:ds1Nfiles, sub:ds1Nbytes ;
+    dct:identifier "https://population.un.org/wpp/" ;
+    dcat:landingPage <https://population.un.org/wpp/> ;
+    dcat:version "WPP 2024 (July 2024 release)" ;
+    dct:rights "CC BY 3.0 IGO" ;
+    dct:license "CC BY 3.0 IGO" ;
+    rdfs:comment "Role in this test: sex ratio at birth (SRB, males per 100 female births) and mid-year population by country and year" ;
+    dcat:distribution sub:ds1f1 .
+  sub:ds1f1 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Demographic_Indicators_Medium.csv.gz> ;
+    dcat:byteSize "16557272"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T05:57:47Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f1sum .
+  sub:ds1f1sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "286ac36bb1415e2e1ade03acfef0a29f0e4c087e2f78e38c48f50c5df89082bc"^^xsd:hexBinary .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/fisher-sex-ratio/result.json>, <https://github.com/fractastical/delphisci/commit/9b73128702b7eb3eaae988df99ee2de68e122ebd> ;
+    prov:wasGeneratedBy sub:test .
+  <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/fisher-sex-ratio/result.json> dct:title "claim-tests/math-bio-theorems/fisher-sex-ratio/result.json at commit c330f91 (2026-10-31T06:04:25Z)" ;
+    rdfs:comment "Result file with verdict, measured values, dataset checksums and caveats. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  <https://github.com/fractastical/delphisci/commit/9b73128702b7eb3eaae988df99ee2de68e122ebd> a prov:Entity ; dct:title "claim-tests: pre-register 8 tests of proved math-bio laws against public data" ; dct:date "2026-10-31T05:55:32Z"^^xsd:dateTime ; rdfs:comment "Pre-registration: pass and fail criteria with verdict null, committed 2026-10-31T05:55:32Z; the first data file for this test was retrieved at 2026-10-31T05:57:47Z, 135 s later. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  sub:test a prov:Activity ; prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:used <https://w3id.org/delphi/resource/dataset/un-wpp-2024-demographic-indicators-medium>, <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/fisher-sex-ratio/analysis.py> ; prov:qualifiedAssociation sub:plan .
+  sub:plan a prov:Association ; prov:agent <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:hadPlan <https://github.com/fractastical/delphisci/blob/9b73128702b7eb3eaae988df99ee2de68e122ebd/claim-tests/math-bio-theorems/fisher-sex-ratio/result.json> .
+  <https://github.com/fractastical/delphisci/blob/9b73128702b7eb3eaae988df99ee2de68e122ebd/claim-tests/math-bio-theorems/fisher-sex-ratio/result.json> rdfs:comment "The pre-registered plan: result.json as first committed, before any download." .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> a prov:SoftwareAgent ; rdfs:label "delphisci claim-tests runner (claims thread)" ; rdfs:comment "Run: scienceclaw-c4 (claims thread, ScienceClaw hack); model claude-fable-5-1; 2026-10-31" ; delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5.1> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5.1> a delphi:LanguageModel ; rdfs:label "Claude Fable 5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T14:03:16Z"^^xsd:dateTime ;
+    dct:creator <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    rdfs:label "Evidence for fisher-sex-ratio: partially supported" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:EvidenceItem ;
+    npx:introduces <https://w3id.org/delphi/resource/evidence/claim-test-fisher-sex-ratio> ;
+    nt:wasCreatedFromProvenanceTemplate <https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA> ;
+    rdfs:comment "UNSIGNED DRAFT prepared 2026-10-31 by the claims thread of the DELPHI team: not signed, not published to any registry. Intended for the nanopub TEST registry first; production publication needs the ORCID key owner's explicit approval. No human owner is named in this draft: dct:creator is the software agent, and the ORCID of the key holder is added only when that person approves and signs. Built by claim-tests/nanopubs/build.py from result.json." ;
+    rdfs:comment "No assertion template is declared. The template that would otherwise apply, the published Project Delphi evidence item template https://w3id.org/np/RAk4kcX4zA_touv8CeKku9tTUnbR5xiTLSLwFbrKSl3BE (dct:created 2026-10-01), still carries the legacy https://w3id.org/probknow/ontology/ namespace (1 occurrence, checked 2026-10-31 on the live network), and its required statements cannot be instantiated with Delphi ontology 2.0 terms, so this hand-authored record was not created from it and does not claim to be. The provenance template https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA is declared because it carries no legacy IRI (0 occurrences, same check). No pubinfo template is declared. See claim-tests/nanopubs/DECISIONS.md (2026-10-31)." .
+}
