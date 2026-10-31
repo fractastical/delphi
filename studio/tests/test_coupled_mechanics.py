@@ -1,0 +1,198 @@
+"""Pressure -> fin-ray traction -> line load -> deflection: contract, conservation and controls.
+
+Every expected value here is computed independently of the code under test (closed forms written
+out by hand, or the existing fin_mechanics bridge), so a mutated integrator is detected.
+"""
+import copy
+from fractions import Fraction
+
+import pytest
+
+from engineering.coupled_mechanics import cases, couple, traction
+from engineering.coupled_mechanics.contract import parse_pressure, parse_target
+from engineering.fin_mechanics import beam
+from engineering.fin_mechanics.load_bridge import Refusal
+
+
+def refused(code, rec, tgt=None):
+    with pytest.raises(Refusal) as e:
+        couple.run(rec, tgt or cases.target())
+    assert e.value.code == code, e.value
+
+
+# ------------------------------------------------------------------ analytic integration
+def test_uniform_pressure_reproduces_the_existing_bridge_exactly():
+    b = cases.illustration_bridge()
+    r = couple.run(cases.analytic_record("uniform"), cases.target())
+    assert all(Fraction(x) == Fraction(b["exact"]["q_line_N_per_m"]) for x in r["stations"]["q_N_per_m"])
+    assert Fraction(r["resultants_exact"]["F_N"]) == Fraction(b["exact"]["F_total_N"])
+    L = Fraction(b["exact"]["L_ray_m"])
+    assert Fraction(r["resultants_exact"]["M_root_Nm"]) == Fraction(b["exact"]["F_total_N"]) * L / 2
+    q, EI = float(Fraction(b["exact"]["q_line_N_per_m"])), 1e-6
+    assert r["deflection"]["EI_lo"]["tip_m"] == pytest.approx(q * float(L) ** 4 / (8 * EI), rel=1e-9)
+
+
+@pytest.mark.parametrize("profile,centroid", [("root_heavy", Fraction(1, 3)), ("tip_heavy", Fraction(2, 3))])
+def test_linear_pressure_keeps_force_and_puts_the_moment_at_the_centroid(profile, centroid):
+    b = cases.illustration_bridge()
+    F = Fraction(b["exact"]["F_total_N"])
+    L = Fraction(b["exact"]["L_ray_m"])
+    r = couple.run(cases.analytic_record(profile), cases.target())
+    assert Fraction(r["resultants_exact"]["F_N"]) == F
+    assert Fraction(r["resultants_exact"]["M_root_Nm"]) == F * centroid * L
+
+
+def test_linear_load_tip_matches_hand_closed_forms():
+    # q = q0 (1 - s/L): w(L) = q0 L^4 / (30 EI);  q = q0 s/L: w(L) = 11 q0 L^4 / (120 EI)
+    b = cases.illustration_bridge()
+    q0 = 2 * float(Fraction(b["exact"]["q_line_N_per_m"]))
+    L = float(Fraction(b["exact"]["L_ray_m"]))
+    EI = 1e-5
+    for profile, coef in (("root_heavy", 1 / 30), ("tip_heavy", 11 / 120)):
+        r = couple.run(cases.analytic_record(profile), cases.target(n_elements=128))
+        ref = coef * q0 * L**4 / EI
+        assert r["deflection"]["EI_hi"]["tip_moment_area_reference_m"] == pytest.approx(ref, rel=1e-12)
+        assert r["deflection"]["EI_hi"]["tip_m"] == pytest.approx(ref, rel=1e-4)
+
+
+def test_mesh_transfer_conserves_force_exactly_and_moment_to_second_order():
+    g = couple.grid_study(cases.analytic_record("tip_heavy"), cases.target())
+    for lev in g["levels"]:
+        r = couple.run(cases.analytic_record("tip_heavy"), cases.target(n_elements=lev["n_elements"]))
+        assert r["conservation"]["mesh_force_rel_diff"] == 0.0
+    assert all(1.8 < o < 2.2 for o in g["observed_order"]), g
+
+
+def test_bending_moment_is_exact_statics():
+    s = [Fraction(0), Fraction(1, 2), Fraction(1)]
+    q = [Fraction(3), Fraction(3), Fraction(3)]
+    # uniform q on [0,1]: M(x) = q (1-x)^2 / 2
+    for x in (Fraction(0), Fraction(1, 4), Fraction(3, 4), Fraction(1)):
+        assert traction.bending_moment(s, q, x) == 3 * (1 - x) ** 2 / 2
+
+
+# ------------------------------------------------------------------ controls
+def test_disabled_load_gives_exactly_zero():
+    r = couple.run(couple.disabled_load(cases.analytic_record("uniform")), cases.target())
+    assert r["resultants_float"] == {"F_N": 0.0, "M_root_Nm": 0.0}
+    for end in r["deflection"].values():
+        assert end["tip_m"] == 0.0 and end["max_abs_slope_rad"] == 0.0
+
+
+def test_EI_interval_scales_exactly_inverse():
+    r = couple.run(cases.analytic_record("root_heavy"), cases.target())
+    lo, hi = r["deflection"]["EI_lo"], r["deflection"]["EI_hi"]
+    ratio = float(Fraction(hi["EI_Nm2"]) / Fraction(lo["EI_Nm2"]))
+    assert lo["tip_m"] / hi["tip_m"] == pytest.approx(ratio, rel=1e-9)
+    assert lo["tip_m"] > hi["tip_m"] > 0
+
+
+def test_small_deformation_flag_is_carried_not_repaired():
+    r = couple.run(cases.analytic_record("uniform"), cases.target())
+    lo = r["deflection"]["EI_lo"]
+    tip_over_L = abs(lo["tip_m"]) / float(Fraction(r["L_m"]))
+    assert lo["validity"]["valid"] == (tip_over_L <= 0.1 and lo["max_abs_slope_rad"] <= 0.2)
+
+
+def test_stress_needs_a_declared_section():
+    r = couple.run(cases.analytic_record("uniform"), cases.target())
+    assert r["stress"] is None and r["stress_status"].startswith("SECTION_NOT_DECLARED")
+    sec = {"c_m": "1/2000", "I_m4": "1e-14", "status": "assumed"}
+    r = couple.run(cases.analytic_record("uniform"), cases.target(section=sec))
+    b = cases.illustration_bridge()
+    M = float(Fraction(b["exact"]["F_total_N"]) * Fraction(b["exact"]["L_ray_m"]) / 2)
+    assert r["stress"]["sigma_max_Pa"] == pytest.approx(M * 5e-4 / 1e-14, rel=1e-12)
+
+
+# ------------------------------------------------------------------ refusals
+def _patch(path, value, profile="uniform"):
+    rec = cases.analytic_record(profile)
+    d = rec
+    keys = path.split(".")
+    for k in keys[:-1]:
+        d = d[int(k)] if isinstance(d, list) else d[k]
+    d[keys[-1]] = value
+    return rec
+
+
+@pytest.mark.parametrize("path,value,code", [
+    ("pressure.unit", "lattice", "WRONG_PRESSURE_UNIT"),
+    ("pressure.kind", "model_units", "WRONG_PRESSURE_UNIT"),
+    ("frame.length_unit", "mm", "WRONG_LENGTH_UNIT"),
+    ("frame.id", "windtunnel/sagittal-xz", "FRAME_MISMATCH"),
+    ("member.tip_m", ["0.1", "0", "0"], "GEOMETRY_MISMATCH"),
+    ("member.root_m", ["0", "0", "1/1000"], "GEOMETRY_MISMATCH"),
+    ("member.normal", ["1", "0", "0"], "BAD_NORMAL"),
+    ("member.normal", ["0", "0", "2"], "BAD_NORMAL"),
+    ("stations.0.p_neg_Pa", 1.5, "FLOAT_INPUT"),
+    ("tributary.status", "guessed", "TRIBUTARY_WIDTH"),
+    ("tributary.width_m", "0", "NON_POSITIVE"),
+    ("time.kind", "concurrent", "BAD_TIME"),
+    ("schema", "frontier.coupled.member-pressure/0", "BAD_SCHEMA"),
+])
+def test_wrong_unit_or_geometry_is_refused(path, value, code):
+    refused(code, _patch(path, value))
+
+
+def test_stations_must_cover_exactly_the_member():
+    rec = cases.analytic_record()
+    rec["stations"] = rec["stations"][:-1]
+    refused("STATION_COVERAGE", rec)
+    rec = cases.analytic_record()
+    rec["stations"][0]["s_m"] = "1/1000"
+    refused("STATION_COVERAGE", rec)
+    rec = cases.analytic_record()
+    rec["stations"][2], rec["stations"][3] = rec["stations"][3], rec["stations"][2]
+    refused("STATION_COVERAGE", rec)
+
+
+def test_a_2d_section_cannot_stand_in_for_a_whole_3d_fin():
+    rec = cases.analytic_record()
+    rec["source"].update(evidence_kind="simulated", fields_sha256="a" * 64, geometry_sha256="b" * 64)
+    rec["dimensionality"] = "2d-extrusion"
+    rec["resolution"]["cells_across_member_thickness"] = 4
+    refused("SAGITTAL_2D_NOT_3D", rec, cases.target(claim="whole_fin_3d"))
+    r = couple.run(rec, cases.target())
+    assert r["scope"].startswith("2d-extrusion section scenario")
+
+
+def test_simulated_field_must_resolve_the_member():
+    rec = cases.analytic_record()
+    rec["source"].update(evidence_kind="simulated", fields_sha256="a" * 64, geometry_sha256="b" * 64)
+    rec["dimensionality"] = "3d"
+    for across in (None, 0, 1):
+        rec["resolution"]["cells_across_member_thickness"] = across
+        refused("MEMBER_UNRESOLVED", copy.deepcopy(rec))
+    rec["resolution"]["cells_across_member_thickness"] = 2
+    assert couple.run(rec, cases.target(claim="whole_fin_3d"))["scope"] == "3d member traction"
+
+
+def test_simulated_source_needs_field_and_geometry_hashes():
+    rec = cases.analytic_record()
+    rec["source"]["evidence_kind"] = "simulated"
+    rec["dimensionality"] = "3d"
+    rec["resolution"]["cells_across_member_thickness"] = 3
+    refused("BAD_HASH", rec)
+
+
+def test_target_refuses_bad_EI_and_units():
+    t = cases.target()
+    t["EI"] = dict(t["EI"], lo_Nm2="1e-4", hi_Nm2="1e-6")
+    with pytest.raises(Refusal, match="BAD_EI_RANGE"):
+        parse_target(t)
+    t = cases.target()
+    t["frame_length_unit"] = "mm"
+    with pytest.raises(Refusal, match="WRONG_LENGTH_UNIT"):
+        parse_target(t)
+
+
+def test_parse_pressure_converts_Pa_times_m_to_N_per_m():
+    rec = cases.analytic_record("uniform")
+    p = parse_pressure(rec, parse_target(cases.target()))
+    b = cases.illustration_bridge()
+    assert p["q_N_per_m"][0] == Fraction(b["exact"]["p_Pa"]) * Fraction(b["exact"]["w_t_m"])
+
+
+def test_beam_module_is_the_existing_one():
+    # The coupling must reuse fin_mechanics' FEM, not a second solver.
+    assert couple.beam is beam
