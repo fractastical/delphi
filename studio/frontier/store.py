@@ -388,6 +388,20 @@ class Store:
                         "local_status": r["status"]})
         return out, withheld
 
+    def head_ref(self, kind: str, record_id: str, token: str | None = None, namespace: str | None = None):
+        """Exact ref of the CURRENT head of one record id in a namespace (default: this node), visibility-checked. Read-only.
+        Used to re-pin a project draft written against another namespace; it substitutes nothing silently."""
+        r = Ref(namespace=namespace or self.namespace, kind=kind, id=record_id, version="0" * 64)
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            row = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
+                            (r.namespace, r.kind, r.id)).fetchone()
+            if row is None:
+                raise Missing("No such record head")
+            target = {"namespace": r.namespace, "kind": r.kind, "id": r.id, "version": row["version"]}
+            self._raw(c, target, p)
+            return {"ref": target}
+
     def annotations_for(self, target: dict, token: str | None = None, limit: int = 50, all_versions: bool = False):
         """Current annotation heads anchored at an exact version (or at any version of that record id). Read-only; replies are
         linked by `payload.reply_to`, threading is a display concern. An annotation is not acceptance and not an answer."""

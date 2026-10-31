@@ -296,3 +296,16 @@ def test_a_fresh_store_has_the_new_kinds_and_one_migration_row(store):
         ck = c.execute("""SELECT pg_get_constraintdef(oid) AS d FROM pg_constraint WHERE conrelid=to_regclass('record_versions')
                           AND contype='c'""").fetchall()
     assert any("'Project'" in r["d"] and "'Annotation'" in r["d"] for r in ck)
+
+
+def test_head_ref_respects_visibility_and_reports_the_current_head(store):
+    priv = sub(store, "alice", "pc", {**claim(store, id="hidden"), "visibility": "private"})
+    with pytest.raises(Missing):
+        store.head_ref("Claim", "hidden")                              # an anonymous reader cannot even learn the version
+    assert store.head_ref("Claim", "hidden", TOKENS["alice"])["ref"] == ref(priv)
+    pub = sub(store, "alice", "pub", claim(store, id="shown"))
+    d = claim(store, id="shown")
+    d["predecessor"] = pub["version"]
+    d["payload"]["title"] = "Revised"
+    new = store.submit(TOKENS["alice"], "pub2", d)["record"]
+    assert store.head_ref("Claim", "shown")["ref"] == ref(new)         # the CURRENT head, not the pin that was asked about
