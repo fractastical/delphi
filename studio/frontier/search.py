@@ -20,8 +20,8 @@ from typing import Any, Iterable, Sequence
 
 from psycopg.types.json import Jsonb
 
-from .models import KINDS, canonical, ref
-from .store import FrontierError, Store, _unlicensed_available_content
+from .models import KINDS, Ref, canonical, ref
+from .store import FrontierError, Missing, Store, _refuse_unlicensed, _unlicensed_available_content
 
 STATUSES = ("proposed", "imported_unreviewed", "accepted", "disputed", "rejected")
 MAX_QUERY = 200
@@ -187,6 +187,46 @@ class SearchIndex:
         """Operator-only and idempotent: adds indexes over the existing tables. Run after Store.initialize()."""
         with self.store.connection() as c:
             c.execute(Path(__file__).with_name("search_schema.sql").read_text())
+
+    def get_many(self, targets: Sequence[dict], token: str | None = None) -> list[dict]:
+        """Hydrate one bounded catalog page with the policies and shape of ``Store.get``.
+
+        Exact pins, order and duplicates are preserved. Reviews, leases and head flags
+        are read together without a cache; an unavailable or unlicensed item refuses
+        the whole batch, just as the corresponding individual read would.
+        """
+        if not isinstance(targets, (list, tuple)) or len(targets) > 50:
+            raise FrontierError("At most 50 exact record references required")
+        pins = [Ref.model_validate(target).model_dump() for target in targets]
+        if not pins:
+            return []
+        with self.store.connection() as c:
+            principal = self.store._read_principal(c, token)
+            rows = c.execute("""SELECT v.envelope, s.status, s.policy_version,
+                    a.state AS action_state, a.lease_until, h.version AS head_version
+                FROM record_versions v
+                LEFT JOIN local_states s ON s.version=v.version
+                LEFT JOIN action_state a ON a.version=v.version
+                LEFT JOIN heads h ON h.namespace=v.namespace AND h.kind=v.kind AND h.record_id=v.record_id
+                WHERE v.version=ANY(%s)
+                    AND (v.visibility='public' OR %s::jsonb ? v.namespace)""",
+                ([pin["version"] for pin in pins], Jsonb(principal["namespaces"] if principal else []))).fetchall()
+            by_version = {row["envelope"]["version"]: row for row in rows}
+            results = []
+            for pin in pins:
+                row = by_version.get(pin["version"])
+                if row is None or ref(row["envelope"]) != pin or not self.store._can_read(row["envelope"], principal):
+                    raise Missing("Exact record version unavailable")
+                record = row["envelope"]
+                _refuse_unlicensed(_unlicensed_available_content([record]), "serve")
+                results.append({"record": record,
+                    "local_review": {"status": row["status"], "policy_version": row["policy_version"]}
+                        if row["status"] is not None else None,
+                    "is_head": row["head_version"] == record["version"],
+                    "action": {"state": row["action_state"],
+                        "lease_until": row["lease_until"].isoformat() if row["lease_until"] else None}
+                        if row["action_state"] is not None else None})
+            return results
 
     def search(self, query: str = "", *, kinds: str | Sequence[str] | None = None, status: str | Sequence[str] | None = None,
                source: str | None = None, scope: str | None = None, context: str | None = None,
