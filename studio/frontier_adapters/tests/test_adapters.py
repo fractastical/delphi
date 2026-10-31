@@ -68,6 +68,8 @@ class DelphiClient(unittest.TestCase):
 
     def test_overview_style_markdown_preface_then_json(self):
         self.assertEqual(json_from_text("**Claim graph:** 1190 claims\n\n| t |\n\n{\n  \"files\": 3\n}"), {"files": 3})
+        self.assertEqual(json_from_text("...count as neither.{\n  \"files\": 3\n}"), {"files": 3})        # no newline before the object (seen live)
+        self.assertEqual(json_from_text("a {not json} then\n{\n  \"k\": [1]\n}"), {"k": [1]})            # a stray brace is skipped
         with self.assertRaises(NonJson):
             json_from_text("just prose")
 
@@ -434,3 +436,107 @@ class NanopubDraft(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BulkImport(unittest.TestCase):
+    """delphi_bulk against a fake client: ordering, controls, resume, stop-on-refusal, separation, nothing silently dropped."""
+
+    @staticmethod
+    def rows(cid, registry="production", quote="Q" * 10, drop=()):
+        iri = "https://w3id.org/delphi/resource/claim/" + cid
+        base = f"books/x/nanopubs/unsigned/{cid}.trig"
+        rs = [(base + "#Head", base, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", "http://www.nanopub.org/nschema#Nanopublication"),
+              (base + "#assertion", iri, "http://www.w3.org/2000/01/rdf-schema#label", "T " + cid),
+              (base + "#assertion", iri, "http://purl.org/dc/terms/description", "S " + cid),
+              (base + "#assertion", iri, "https://w3id.org/delphi/ontology/context", "C " + cid),
+              (base + "#provenance", base + "#quote", "https://schema.org/text", quote),
+              (base + "#provenance", base + "#quote", "http://www.w3.org/ns/prov#hadPrimarySource", "https://www.gutenberg.org/cache/epub/1/pg1.txt#line=1,2"),
+              (base + "#provenance", "w", "http://spdx.org/rdf/terms#checksumValue", "a" * 64),
+              (base + "#pubinfo", base, "http://purl.org/dc/terms/license", "https://creativecommons.org/licenses/by/4.0/")]
+        return [{"g": g, "s": s, "p": p, "o": o} for g, s, p, o in rs if not any(g.endswith("#" + d) for d in drop)]
+
+    def fake(self, ids, stop_after=None, registry=None):
+        outer = self
+        entries = {i: {"id": i, "title": "T " + i, "statement": "S " + i, "thinker": "Alan Turing" if i.startswith("a") else "Stephen Wolfram",
+                       "nanopub": "https://w3id.org/np/RA" + i, "registry": registry or "production", "math": True} for i in ids}
+
+        class F:
+            requests, min_interval, max_requests, max_wall_s = 0, 1.0, 100, 3600
+            receipts = []
+            calls = 0
+            drop = {}
+
+            def text(self, name, args):
+                return json.dumps({"claimGraph": {"total": {"claims": len(ids)}}}) if name == "delphi_overview" else "{}", 0
+            def tool(self, name, args):
+                if name == "delphi_graph":
+                    return {"matched": 0, "claims": []} if "Zzyzx" in args.get("thinker", "") else \
+                        {"matched": 1, "claims": [e for e in entries.values() if e["thinker"] == args["thinker"]]}
+                raise AssertionError(name)
+            def sparql(self, q, source="local"):
+                F.calls += 1
+                if stop_after is not None and F.calls > stop_after:
+                    raise RetrievalStopped("persistent HTTP 429 (3 consecutive); stopping, not bypassing")
+                if "assessments-unsigned" in q:
+                    return []
+                out = []
+                for i in ids:
+                    if f"({i})" in q or f"|{i}" in q or f"{i}|" in q:
+                        out += outer.rows(i, drop=self.drop.get(i, ()))
+                return out
+        return F()
+
+    def run_bulk(self, ids, out, **kw):
+        from frontier_adapters import delphi_bulk as b
+        m = self.fake(ids, **{k: kw.pop(k) for k in ("stop_after", "registry") if k in kw})
+        entries = [e for e in (m.tool("delphi_graph", {"thinker": t})["claims"] for t in ("Alan Turing", "Stephen Wolfram"))]
+        flat = sorted([e for g in entries for e in g], key=lambda e: (b.tier(e), e["id"]))
+        return m, b.run(m, out, entries=flat, **kw)
+
+    def test_priority_order_math_before_the_rest(self):
+        from frontier_adapters import delphi_bulk as b
+        order = [b.tier({"thinker": t, "math": m}) for t, m in (("Alan Turing", True), ("D'Arcy W", True), ("D'Arcy W", False), ("Michael Levin", False), ("Charles Darwin", False), ("Stephen Wolfram", False))]
+        self.assertEqual(order, [1, 2, 3, 4, 5, 6])
+
+    def test_first_checkpoint_respects_the_limit_and_resume_does_not_redo_work(self):
+        ids = [f"a{i}" for i in range(6)] + [f"w{i}" for i in range(4)]
+        with tempfile.TemporaryDirectory() as out:
+            _, cp = self.run_bulk(ids, out, limit=4, batch=2)
+            self.assertEqual(len(cp["done"]), 4); self.assertEqual(cp["done"], sorted(i for i in ids if i.startswith("a"))[:4])   # math first
+            _, cp2 = self.run_bulk(ids, out, batch=3)
+            self.assertEqual(len(cp2["done"]), 10); self.assertEqual(len(set(cp2["done"])), 10)
+            with open(os.path.join(out, "snapshots.jsonl")) as fh:
+                self.assertEqual(len(fh.readlines()), 10)                                         # none written twice
+
+    def test_stops_on_persistent_429_recording_why_and_keeping_progress(self):
+        ids = [f"a{i}" for i in range(6)]
+        with tempfile.TemporaryDirectory() as out:
+            _, cp = self.run_bulk(ids, out, batch=2, stop_after=2)        # first batch needs 2 sparql calls, the second batch is refused
+            self.assertIn("persistent HTTP 429", cp["stopped"]); self.assertEqual(len(cp["done"]), 2)
+
+    def test_incomplete_record_goes_to_errors_not_silently_dropped(self):
+        ids = ["a0", "a1"]
+        with tempfile.TemporaryDirectory() as out:
+            from frontier_adapters import delphi_bulk as b
+            m = self.fake(ids); m.drop = {"a1": ("provenance",)}
+            ent = sorted([e for t in ("Alan Turing",) for e in m.tool("delphi_graph", {"thinker": t})["claims"]], key=lambda e: e["id"])
+            cp = b.run(m, out, entries=ent, batch=2)
+            self.assertEqual(sorted(cp["done"]), ["a0", "a1"]); self.assertEqual(cp["counts"].get("errors"), 1)
+            with open(os.path.join(out, "errors.jsonl")) as fh:
+                self.assertIn("a1", fh.read())
+
+    def test_test_registry_records_are_kept_in_their_own_files(self):
+        with tempfile.TemporaryDirectory() as out:
+            self.run_bulk(["a0", "a1"], out, registry="test", batch=2)
+            names = sorted(os.listdir(out))
+            self.assertTrue(any(n.startswith("claims-test-") for n in names)); self.assertFalse(any(n.startswith("claims-production-") for n in names))
+
+    def test_catalog_control_failure_imports_nothing(self):
+        from frontier_adapters import delphi_bulk as b
+        class Bad:
+            requests, min_interval, max_requests, max_wall_s, receipts = 0, 1.0, 10, 60, []
+            def text(self, n, a): return json.dumps({"claimGraph": {"total": {"claims": 999}}}), 0
+            def tool(self, n, a): return {"matched": 0, "claims": []}
+        with tempfile.TemporaryDirectory() as out:
+            cp = b.run(Bad(), out)
+            self.assertIn("catalog control failed", cp["stopped"]); self.assertEqual(cp["done"], [])

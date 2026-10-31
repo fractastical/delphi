@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import email.utils
 import json
+import re
 import time
 import urllib.error
 import urllib.request
@@ -41,14 +42,23 @@ def rows_of(r) -> list[dict]:
 
 
 def json_from_text(text: str):
-    """Tool results are JSON, or (delphi_overview) a Markdown preface followed by the JSON object."""
+    """Tool results are JSON, or (delphi_overview) a Markdown preface followed by the JSON object, sometimes with no separating
+    newline ("...count as neither.{"). Each candidate `{` is tried with a real decoder; the first that decodes is used."""
     s = text.lstrip()
     if s[:1] in "[{":
-        return json.loads(s)
-    i = text.find("\n{\n")
-    if i < 0:
-        raise NonJson(f"response is not JSON and has no JSON object after a preface: {text[:120]!r}")
-    return json.loads(text[i + 1:])
+        try:
+            return json.loads(s)
+        except ValueError:
+            pass
+    dec = json.JSONDecoder()
+    for m in re.finditer(r"\{\s*\n\s*\"", text):
+        try:
+            obj, end = dec.raw_decode(text, m.start())
+        except ValueError:
+            continue
+        if text[end:].strip() == "":
+            return obj
+    raise NonJson(f"response is not JSON and has no JSON object after a preface: {text[:120]!r}")
 
 
 def _retry_after(h) -> float | None:

@@ -25,3 +25,9 @@ Build it: `PYTHONPATH=. ORX_STORE=<openresearch data dir> NCA_REPO=<delphi-evolv
 `python3 -m pytest frontier_adapters/tests -q` (bounded: `systemd-run --user --scope -p MemoryMax=4G -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=600 ...`).
 Offline by default. `NCA_REPO` and `ORX_STORE` enable live re-hashing of the artifacts and a live store read; `rdflib` enables an
 independent TriG parse. Each is reported as **skipped with its reason** when absent, never as passed.
+
+## Bulk import (`delphi_bulk.py`, `delphi_curate.py`; run record in `examples/bulk_run/`)
+Read-only, checkpointed, resumable; limits are parameters (`min_interval`, `max_requests`, `max_wall_s`); stops on persistent 429 or any 401/403.
+Priority order: math -> Thompson math claims -> Thompson rest -> Levin -> Darwin -> Wolfram (an order, not a judgement). Output is
+**proposed** `Claim` drafts in separate files by registry (production / test / unpublished); a draft that fails validation goes to `errors.jsonl`,
+not away. Bulk output (about 6 MB) is not committed; the checkpoint, receipts and curation report are.
