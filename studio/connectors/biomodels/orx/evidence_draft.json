@@ -1,0 +1,153 @@
+{
+ "id": "orx-run-simulated-evidence",
+ "issuer": "biomodels-worker",
+ "kind": "Evidence",
+ "namespace": "node-a",
+ "payload": {
+  "assumptions": [
+   "The SBML file is as published by BioModels revision 3.",
+   "Time horizon 0..60 chosen for this replay.",
+   "Pinned environment: libroadrunner 2.10.0, numpy 2.4.4, scipy 1.17.1, python 3.13.12 (stated by the author; orx does not record it)."
+  ],
+  "context": "Simulation of the two-cell Delta-Notch model as encoded in BIOMD0000001047. Non-dimensional; no organism observation; no claim about flying fish.",
+  "created_time": {
+   "basis": "witnessed",
+   "value": "2026-10-31T18:46:20.589000+00:00"
+  },
+  "evidence_kind": "simulated",
+  "limitations": [
+   "OpenResearch does not record the execution environment (interpreter, OS, packages, hardware); local runs use the host's own environment and container images are mutable tags, so the record alone does not say how to reproduce the environment.",
+   "Inputs outside the committed git snapshot and any random seeds are not recorded; only the command string and the committed code are.",
+   "OpenResearch does not hash or register run outputs; the content digest in this record was computed by the adapter from a mutable local run directory at retrieval time.",
+   "Run, experiment and project ids are random UUIDs local to one machine's store: there is no shared registry, and the run can be deleted by its owner (`orx exp delete`).",
+   "A run reaching status 'done' means the process exited 0. It says nothing about scientific validity and has not been reviewed.",
+   "The database exit_code was NULL for this local run; the exit code was read from the run directory's exit_code file instead.",
+   "Same author wrote the model replay and ran this capture: this is a repeat, not independent replication.",
+   "The independent evaluator in the controls reads the same SBML file.",
+   "The run fetched the SBML over the network; its digest is verified against BioModels' declared hash, but orx does not record that input.",
+   "Fidelity of the file to the paper was not checked (paper full text not read).",
+   "Does not bear on any flying-fish tissue."
+  ],
+  "local_id": "c7505835-922b-4abd-b58a-40103e4fa95e",
+  "method": "Local OpenResearch run of `python3 run_replay.py`, which fetches BIOMD0000001047 from BioModels (sha256-verified), runs the libroadrunner replay with its controls, and writes out/receipt.json and four output files. A second execution of the same code, not a different method: its outputs were compared byte-for-byte with the receipt committed in delphi-frontier.",
+  "provenance": {
+   "action_ref": {
+    "id": "biomodels-1047-replay",
+    "kind": "Action",
+    "namespace": "node-a",
+    "version": "eccbb010de262ce6e0430b75c22fe06231077b1e6f70523a3057c4921699a386"
+   },
+   "adapter": {
+    "id": "frontier_adapters.orx_evidence",
+    "version": "0.1.0"
+   },
+   "artifacts": [],
+   "backend_kind": "local_job",
+   "command": "python3 run_replay.py",
+   "command_scrubbed": false,
+   "command_verbatim_sha256": "3b368b016c22abb08e882c0b510d5d0610e1033fc5af58979657794c708b2f90",
+   "commit_sha": "1d58fa06ae07ccfda397018d2cd1ea50c324791b",
+   "db_exit_code": null,
+   "exit_code_file": 0,
+   "experiment_id": "be6426e3-71df-47aa-a6ac-0ffa8c76b74c",
+   "field_origin": {
+    "action_ref": "author",
+    "assumptions": "author",
+    "context": "author",
+    "created_time": "orx",
+    "evidence_kind": "author",
+    "limitations": "adapter+author",
+    "local_id": "orx",
+    "method": "author",
+    "provenance": "adapter+orx",
+    "provider_assessment": "absent",
+    "retrieved_time": "adapter",
+    "source": "adapter+orx",
+    "source_dependence": "author",
+    "target": "author",
+    "uncertainty": "author"
+   },
+   "link_checks": [],
+   "log_sha256": "48b560355504a2d363d65667b5d82f8d1a5515191fb14f8e98a3b5707aee0c97",
+   "openresearch_source_read": "alphaXiv/OpenResearch@703fd4bba66311625cf7e0b0776a0f949d3f4c73",
+   "orx_version": "orx 0.2.23",
+   "outputs": [
+    {
+     "bytes": 8214,
+     "path": "out/model_inventory.json",
+     "sha256": "e865c0c5f4243812c323f7ab7855d63f7601f4bf9eb40d4f7a6e637d2183829e"
+    },
+    {
+     "bytes": 6500,
+     "path": "out/receipt.json",
+     "sha256": "fe6675ffe29813aea4bb121b6605b6af1a74d998533e40b97d8c3ee0bd392546"
+    },
+    {
+     "bytes": 57128,
+     "path": "out/trajectory_as_published.csv",
+     "sha256": "18d72480c7856d0d8b162e940be66b7afc439001bd09510ef4c69ae984a9ed72"
+    },
+    {
+     "bytes": 57128,
+     "path": "out/trajectory_no_notch_feedback_b0.csv",
+     "sha256": "373d6783e5e9b1de7ffd9ef17b7735b0e8a677b6545db4a8e9e09801249a740f"
+    },
+    {
+     "bytes": 57128,
+     "path": "out/trajectory_symmetric_baseline.csv",
+     "sha256": "2079523158221f313eea181e3a6ab5fd41260434daf54ccbeeae3b8274ee0d75"
+    }
+   ],
+   "project_id": "9382bfc7-08c5-417e-8374-1c9d5ed00c1e",
+   "replay": {
+    "kind": "second execution in an orx sandbox snapshot vs the committed receipt",
+    "outputs_identical": {
+     "all_checks_passed_in_orx_run": true,
+     "model_inventory.json": true,
+     "receipt_code_sha256_equal": true,
+     "trajectory_as_published.csv": true,
+     "trajectory_no_notch_feedback_b0.csv": true,
+     "trajectory_symmetric_baseline.csv": true
+    },
+    "performed": true
+   },
+   "run_id": "c7505835-922b-4abd-b58a-40103e4fa95e",
+   "source_tar_sha256": "1d649558770c0e4a2f3c6b629046aa9f6dd3499ca4a2df18dac725566da45050",
+   "status": "done",
+   "system": "alphaXiv/OpenResearch orx",
+   "time_witness": "ended_at is the local orx supervisor's clock on the producing machine; uncorroborated"
+  },
+  "provider_assessment": null,
+  "retrieved_time": {
+   "basis": "witnessed",
+   "value": "2026-10-31T18:46:48.148816+00:00"
+  },
+  "source": {
+   "access": "Local-only: held in the producing machine's OpenResearch store; not published or served. Only the digest of the result file is carried. OpenResearch (MIT) licenses its software, not the content of a user's runs, so no licence for this content is stated.",
+   "content_available": false,
+   "content_sha256": "fe6675ffe29813aea4bb121b6605b6af1a74d998533e40b97d8c3ee0bd392546",
+   "license": null,
+   "locator": "orx-run:c7505835-922b-4abd-b58a-40103e4fa95e/out/receipt.json",
+   "source_version": "git:1d58fa06ae07ccfda397018d2cd1ea50c324791b; source-tar-sha256:1d649558770c0e4a2f3c6b629046aa9f6dd3499ca4a2df18dac725566da45050",
+   "uri": null
+  },
+  "source_dependence": {
+   "declared": true,
+   "depends_on": [
+    "BioModels BIOMD0000001047 file sha256 da21ab52edba14b61e41ee87df7a8bb2f367a1206e6e822602f1e75271fae8e2",
+    "the committed receipt's code"
+   ],
+   "independent_of_author": false
+  },
+  "target": {
+   "id": "biomodels-1047-model-behaviour",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "version": "2949c24658a49888a6d3b9d107ed30f5f711996dc51393782160fa235a4d309c"
+  },
+  "uncertainty": "No uncertainty analysis. Numerical agreement is reported in the receipt (rtol convergence 3e-9; LSODA agreement <= 3.5e-9); parameter uncertainty was not studied."
+ },
+ "predecessor": null,
+ "source_uri": "urn:frontier:adapter:openresearch-local-run",
+ "visibility": "public"
+}

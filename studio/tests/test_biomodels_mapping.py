@@ -78,3 +78,25 @@ def test_requirements_match_the_pins_in_the_mapping():
 def test_negative_control_an_observed_record_would_be_caught(doc):
     bad = [dict(r, payload=dict(r["payload"], evidence_kind="observed")) for r in doc["records"] if r["kind"] == "Evidence"]
     assert any(r["payload"]["evidence_kind"] == "observed" for r in bad)  # the check in the first test would fail on this
+
+
+@pytest.fixture(scope="module")
+def full():
+    return fm.build()
+
+
+def test_committed_mapping_is_not_stale(full):
+    committed = json.loads((Path(fm.PACKAGE) / "mapping" / f"{fm.ACCESSION}.mapping.json").read_text())
+    assert committed == json.loads(json.dumps(full)), "rebuild with: python -m connectors.biomodels.frontier_mapping"
+
+
+def test_simulated_evidence_pins_the_model_claim_and_is_never_observed(full):
+    r = by_id(full)
+    ev = r["orx-run-simulated-evidence"]["payload"]
+    assert ev["evidence_kind"] == "simulated" and ev["target"]["version"] == r["biomodels-1047-model-behaviour"]["version"]
+    assert ev["source"]["content_available"] is False and ev["source"]["license"] is None
+    assert ev["provenance"]["exit_code_file"] == 0 and ev["provenance"]["action_ref"]["id"] == "biomodels-1047-replay"
+    assert all(ev["provenance"]["replay"]["outputs_identical"].values())
+    assert any("not independent replication" in s for s in ev["limitations"])
+    assert not ABS.search(json.dumps(full))
+    assert "observed" not in {x["payload"]["evidence_kind"] for x in full["records"] if x["kind"] == "Evidence"}

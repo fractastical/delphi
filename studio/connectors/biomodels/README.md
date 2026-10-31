@@ -111,3 +111,25 @@ coupling, needing at least:
 4. A cell-neighbourhood geometry; this model has exactly two cells.
 5. Parameter values (or ranges) for the target, with source and uncertainty; none transfer from the file.
 6. An independent check that the pattern, not just the equations, appears in a proxy or target tissue.
+
+## Dependency pins
+
+`requirements.txt`: libroadrunner 2.10.0, numpy 2.4.4, scipy 1.17.1 (pytest 9.0.2 for tests); Python 3.13.12.
+The receipt records the engine, numpy, scipy and Python versions it ran with. Root's `pyproject.toml` does not declare them.
+
+## Frontier mapping (proposed drafts; no root schema changed)
+
+`mapping/BIOMD0000001047.mapping.json`, built by `python -m connectors.biomodels.frontier_mapping` (a test fails if the committed file is stale).
+It holds 7 records validated against `frontier.models`, 4 edges, artifacts with sha256, and a `separation` block:
+
+* **source assertions** (paper/curators, abstract-level): two Claims and a `source_assessment` Evidence;
+* **simulation** (this connector): the model-behaviour Claim, the replay Action, and the simulated Evidence;
+* **unknown**: flying-fish applicability, as a `recorded` Problem with `status: unknown`, not as a Claim;
+* `observed_evidence` is empty on purpose.
+
+## OpenResearch capture
+
+`orx/capture.py` reads one local `orx` run through the corpus session's read-only adapter (delphi-frontier branch
+`work/corpus-adapters`, not modified) and writes `orx/orx_facts.json` and `orx/evidence_draft.json`. The run was a second
+execution of the same code from an orx snapshot; its four outputs and code hash equal the committed receipt's. It is a repeat by
+the same author, not independent replication, and orx did not record the environment, seeds or the network input.
