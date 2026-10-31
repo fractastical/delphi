@@ -114,7 +114,8 @@ def core_records() -> list[dict]:
     claim_a, claim_b = (m.ref(records[i]) for i in ("biomodels-1047-source-model-claim", "biomodels-1047-model-behaviour"))
     receipt = json.loads((RECEIPT_DIR / "receipt.json").read_text())
     action = _draft("Action", "biomodels-1047-replay", {
-        "target": claim_b, "title": "Replay BIOMD0000001047 with libroadrunner, with independent-integrator and mutation controls",
+        "target": claim_b, "inputs": [claim_a],
+        "title": "Replay BIOMD0000001047 with libroadrunner, with independent-integrator and mutation controls",
         "acceptance_criteria": [
             "Re-execution from the pinned file reproduces the recorded trajectory CSV and inventory hashes byte-for-byte.",
             "All receipt controls pass, and the mutated-evaluator control is rejected.",
@@ -126,11 +127,11 @@ def core_records() -> list[dict]:
                       "model": "none: deterministic ODE integration, no language model",
                       "environment": "; ".join(f"{k} {v}" for k, v in PINS.items() if k != "pytest") + "; 1 thread",
                       "parameters": "file values; T=0..60, 601 points; cvode rtol 1e-10 atol 1e-14",
-                      "scope": "two-cell Delta-Notch system as encoded; no biological applicability claimed",
+                      "scope": "two-cell Delta-Notch system as encoded; no biological applicability claimed; the input Claim names the source whose model file was replayed (identity, not numerical consumption)",
                       "acceptance_policy": m.POLICY}})
     records[action["id"]] = m.make_record(m.Draft.model_validate(action), created_at=CREATED_AT)
     ev = _draft("Evidence", "biomodels-1047-source-assessment", {
-        "target": claim_a, "evidence_kind": "source_assessment", "source": PAPER,
+        "target": claim_a, "evidence_kind": "source_assessment", "relation": "context_only", "source": PAPER,
         "created_time": {"value": None, "basis": "unknown"}, "retrieved_time": {"value": "2026-10-31T18:30:00+00:00", "basis": "declared"},
         "method": "Read BioModels' metadata for the entry (curation status CURATED, publication synopsis). The paper's full text was not accessed.",
         "context": "Establishes only that BioModels carries this entry with this synopsis; it does not assess whether the paper is right.",
@@ -165,9 +166,7 @@ def build(orx_dir: Path | None = None) -> dict:
         rec = m.make_record(m.Draft.model_validate(draft), created_at=json.loads((orx_dir / "orx_facts.json").read_text())["evidence_created_at"])
         sim_evidence = rec
         by_id[rec["id"]] = rec
-    edges = [{"type": "targets", "from": r["id"], "to": r["payload"]["target"]["id"]} for r in by_id.values() if "target" in r["payload"]]
-    if sim_evidence:
-        edges.append({"type": "produced_by_action", "from": sim_evidence["id"], "to": "biomodels-1047-replay", "note": "mapping-level edge; the root schema has no such typed field"})
+    edges = [{"type": t, "from": r["id"], "to": ref["id"], "to_version": ref["version"]} for r in by_id.values() for t, ref in m.references(r)]
     return {
         "mapping_schema": "biomodels-frontier-mapping-0.1 (connector-local; no root schema changed)",
         "status": "proposed drafts only; nothing submitted, reviewed or accepted",

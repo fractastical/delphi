@@ -278,6 +278,8 @@ def replay_collier1996(sbml_bytes: bytes, expected_sha256: str, out_dir: Path, *
             "The paper's full text was not read; parameter provenance (measured/fitted/assumed) is unknown from the file.",
             "Units: none are referenced by any quantity; the model is non-dimensional as stored.",
             "The b=0 run is an added counterfactual, not a result from the source.",
+            "receipt.json cannot hash itself, so it is absent from output_sha256; run.git_head names the code commit, and the receipt is committed after it.",
+            "Versions recorded here (engine, numpy, scipy, python) are those of the producing environment; the SBML bytes were fetched from BioModels and are not stored in this repository.",
         ],
         "run": {
             "command": " ".join("<abs-path-withheld>" if a.startswith("/") else a for a in (argv or sys.argv)), "code_sha256": _code_hash(), "git_head": _git("rev-parse", "HEAD"),

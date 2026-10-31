@@ -34,12 +34,21 @@ re-fetches them and refuses any file whose size and sha256 differ from BioModels
 
 ## Interface
 
+Run from the repository root (or any directory that contains the `connectors/` package) with the pinned versions in
+`requirements.txt` installed; nothing refers to this checkout's location:
+
 ```
-PYTHONPATH=. python3 -m connectors.biomodels search "lateral inhibition" --limit 5
-PYTHONPATH=. python3 -m connectors.biomodels metadata BIOMD0000001047
-PYTHONPATH=. python3 -m connectors.biomodels fetch BIOMD0000001047 --dest <dir>
-PYTHONPATH=. python3 -m connectors.biomodels replay BIOMD0000001047 --dest <dir> --out connectors/biomodels/receipts/BIOMD0000001047
+cd "$(git rev-parse --show-toplevel)"          # or the directory holding connectors/
+export PYTHONPATH="$PWD"
+python3 -m connectors.biomodels search "lateral inhibition" --limit 5
+python3 -m connectors.biomodels metadata BIOMD0000001047
+python3 -m connectors.biomodels fetch BIOMD0000001047 --dest "$(mktemp -d)"
+python3 -m connectors.biomodels replay BIOMD0000001047 --dest "$(mktemp -d)" --out "$(mktemp -d)"
 ```
+
+`--out` may be any empty directory; the committed receipt lives in `receipts/BIOMD0000001047/`. To check a replay, compare the new
+`receipt.json`'s `output_sha256` and `run.code_sha256` with the committed receipt's. A live-gated test
+(`BIOMODELS_LIVE=1`) does this from a copy of the package in a different directory.
 
 Exit 0 = done and every control passed, 1 = replay ran and a control failed, 2 = refused (reason on stderr as JSON).
 
@@ -126,6 +135,11 @@ It holds 7 records validated against `frontier.models`, 4 edges, artifacts with 
 * **simulation** (this connector): the model-behaviour Claim, the replay Action, and the simulated Evidence;
 * **unknown**: flying-fish applicability, as a `recorded` Problem with `status: unknown`, not as a Claim;
 * `observed_evidence` is empty on purpose.
+
+Links use the root's typed fields: `Action.inputs` pins the source Claim whose model was replayed (identity, not numerical
+consumption); `Evidence.produced_by` pins the replay Action; `Evidence.relation` is `supports` for the simulation and `context_only`
+for the source assessment; `Evidence.artifacts` are typed `ArtifactRef`s, digest and locator only. Edges in the mapping come from
+`frontier.models.references`. The raw SBML is referenced by sha256 and BioModels' own URL and is not committed or redistributed.
 
 ## OpenResearch capture
 

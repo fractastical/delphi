@@ -84,3 +84,21 @@ def test_control_values_not_just_flags(receipt):
     assert c["symmetric_jacobian_real_eigenvalues"][-1] > 1e-3
     assert all(3.0 < o < 5.0 for o in c["rk4_observed_orders"])
     assert c["patterned_state_max_abs_rate"] < 1e-8
+
+
+def test_replay_runs_from_a_relocated_copy_and_reproduces_the_committed_hashes(tmp_path):
+    """The README command must not depend on this checkout: copy the package elsewhere and run it from there."""
+    import shutil
+    import subprocess
+
+    src = Path(__file__).resolve().parents[1] / "connectors" / "biomodels"
+    root = tmp_path / "elsewhere"
+    shutil.copytree(src, root / "connectors" / "biomodels", ignore=shutil.ignore_patterns("receipts", "orx", "mapping", "__pycache__"))
+    out = tmp_path / "out"
+    proc = subprocess.run([sys.executable, "-m", "connectors.biomodels", "replay", ACC, "--dest", str(tmp_path / "dl"), "--out", str(out)],
+                          cwd=root, env={**os.environ, "PYTHONPATH": str(root)}, capture_output=True, text=True, timeout=300)
+    assert proc.returncode == 0, proc.stderr[-500:]
+    new = json.loads((out / "receipt.json").read_text())
+    old = json.loads((src / "receipts" / ACC / "receipt.json").read_text())
+    assert new["output_sha256"] == old["output_sha256"] and new["run"]["code_sha256"] == old["run"]["code_sha256"]
+    assert str(tmp_path) not in json.dumps(new), "the receipt must not embed this machine's paths"

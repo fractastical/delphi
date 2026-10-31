@@ -95,8 +95,41 @@ def test_simulated_evidence_pins_the_model_claim_and_is_never_observed(full):
     ev = r["orx-run-simulated-evidence"]["payload"]
     assert ev["evidence_kind"] == "simulated" and ev["target"]["version"] == r["biomodels-1047-model-behaviour"]["version"]
     assert ev["source"]["content_available"] is False and ev["source"]["license"] is None
-    assert ev["provenance"]["exit_code_file"] == 0 and ev["provenance"]["action_ref"]["id"] == "biomodels-1047-replay"
+    assert ev["provenance"]["exit_code_file"] == 0 and "action_ref" not in ev["provenance"]
     assert all(ev["provenance"]["replay"]["outputs_identical"].values())
     assert any("not independent replication" in s for s in ev["limitations"])
     assert not ABS.search(json.dumps(full))
     assert "observed" not in {x["payload"]["evidence_kind"] for x in full["records"] if x["kind"] == "Evidence"}
+
+
+def test_typed_links_replace_provenance_pointers(full):
+    r = by_id(full)
+    ev, act = r["orx-run-simulated-evidence"]["payload"], r["biomodels-1047-replay"]["payload"]
+    assert ev["relation"] == "supports" and ev["produced_by"]["id"] == "biomodels-1047-replay"
+    assert ev["produced_by"]["version"] == r["biomodels-1047-replay"]["version"]
+    assert [i["id"] for i in act["inputs"]] == ["biomodels-1047-source-model-claim"]
+    assert act["inputs"][0]["version"] == r["biomodels-1047-source-model-claim"]["version"]
+    assert r["biomodels-1047-source-assessment"]["payload"]["relation"] == "context_only"
+    edges = {(e["type"], e["from"], e["to"]) for e in full["edges"]}
+    assert ("uses", "biomodels-1047-replay", "biomodels-1047-source-model-claim") in edges
+    assert ("produced_by", "orx-run-simulated-evidence", "biomodels-1047-replay") in edges
+
+
+def test_artifacts_are_typed_digest_only_and_the_sbml_is_not_redistributed(full):
+    ev = by_id(full)["orx-run-simulated-evidence"]["payload"]
+    arts = ev["artifacts"]
+    assert {a["role"] for a in arts} >= {"input", "output", "log", "code", "environment"}
+    assert all(a["availability"] == "referenced" and a["license"] is None for a in arts)
+    sbml_in = [a for a in arts if a["role"] == "input"]
+    assert len(sbml_in) == 1 and sbml_in[0]["sha256"] == fm.MODEL_SHA256 and sbml_in[0]["uri"].startswith("https://www.biomodels.org/")
+    manifest = json.loads((Path(fm.PACKAGE) / "orx" / "artifact-manifest.json").read_text())
+    assert manifest["bytes_included"] is False and manifest["hosting"]["hosted"] is False
+    assert {a["sha256"] for a in arts} == {a["sha256"] for a in manifest["artifacts"]}
+    stray = [p for p in Path(fm.PACKAGE).rglob("*") if p.is_file() and p.suffix != ".py" and b"<sbml" in p.read_bytes()[:20000]]
+    assert not stray, f"raw SBML must not be committed: {stray}"
+
+
+def test_negative_control_stray_sbml_would_be_detected(tmp_path):
+    f = tmp_path / "x.xml"
+    f.write_bytes(b'<?xml version="1.0"?><sbml level="2"/>')
+    assert b"<sbml" in f.read_bytes()[:20000]
