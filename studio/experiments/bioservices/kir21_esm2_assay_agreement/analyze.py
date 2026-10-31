@@ -149,8 +149,13 @@ def _cluster_bootstrap(pred, surf, func, positions, n: int, seed: int, ci: float
     can therefore understate the variance of delta_rho.
 
     This is reported beside the pre-registered variant-level interval, not
-    instead of it. It is the more conservative of the two, so it cannot
-    manufacture support for H1; if the two disagree, the wider one governs.
+    instead of it. Where they disagree the wider interval governs.
+
+    It is NOT automatically the wider one -- a positive control measured the
+    clustered interval coming out narrower (0.143 against 0.171) when each
+    position carries substantial independent noise, because drawing whole
+    clusters keeps the design balanced. It is the *appropriate* interval when
+    clusters are dependent, which is a different claim from conservative.
     """
     rng = np.random.default_rng(seed)
     by_pos: dict[int, list[int]] = {}

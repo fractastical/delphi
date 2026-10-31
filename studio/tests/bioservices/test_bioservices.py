@@ -290,3 +290,132 @@ class TestScorerGuards:
         scores = scorer.score_many(variants)
         assert len(scores) == len(variants)
         assert scorer.forward_passes - before <= 1
+
+
+class TestAnalysisStatistics:
+    """Positive controls on the statistics, using data whose answer is known.
+
+    The evaluation's conclusion rests on these functions, so each is checked
+    against a case where the right answer is fixed in advance -- and, for the
+    difference tests, against a null case they must NOT call significant.
+    """
+
+    @staticmethod
+    def _rng():
+        import numpy as np
+
+        return np.random.default_rng(12345)
+
+    def test_spearman_matches_scipy_including_ties(self):
+        np = pytest.importorskip("numpy")
+        from scipy.stats import spearmanr
+
+        from experiments.bioservices.kir21_esm2_assay_agreement import analyze
+
+        rng = self._rng()
+        a = rng.normal(size=200)
+        b = 0.6 * a + rng.normal(size=200)
+        assert analyze._spearman(a, b) == pytest.approx(spearmanr(a, b).statistic, abs=1e-10)
+        # Heavy ties: rounding collapses many values onto the same rank.
+        at, bt = np.round(a), np.round(b)
+        assert analyze._spearman(at, bt) == pytest.approx(spearmanr(at, bt).statistic, abs=1e-10)
+
+    def test_bootstrap_interval_brackets_a_known_difference(self):
+        """pred is built to track `strong` better than `weak`; delta must be > 0."""
+        pytest.importorskip("numpy")
+        from experiments.bioservices.kir21_esm2_assay_agreement import analyze
+
+        rng = self._rng()
+        n = 400
+        pred = rng.normal(size=n)
+        strong = 0.9 * pred + 0.3 * rng.normal(size=n)
+        weak = 0.2 * pred + 1.0 * rng.normal(size=n)
+        bs, bf, bd, _ = analyze._paired_bootstrap(pred, strong, weak, 600, 0, 0.95)
+        assert bs["bootstrap_mean"] > bf["bootstrap_mean"]
+        assert bd["ci_low"] > 0, "a real difference must not produce an interval spanning zero"
+
+    def test_bootstrap_interval_spans_zero_when_there_is_no_difference(self):
+        """The null case. A test that only ever fires is not a test."""
+        pytest.importorskip("numpy")
+        from experiments.bioservices.kir21_esm2_assay_agreement import analyze
+
+        rng = self._rng()
+        n = 400
+        pred = rng.normal(size=n)
+        a = 0.5 * pred + rng.normal(size=n)
+        b = 0.5 * pred + rng.normal(size=n)
+        _, _, bd, _ = analyze._paired_bootstrap(pred, a, b, 600, 0, 0.95)
+        assert bd["ci_low"] < 0 < bd["ci_high"]
+
+    def test_williams_and_paired_permutation_agree_on_a_real_difference(self):
+        pytest.importorskip("numpy")
+        from experiments.bioservices.kir21_esm2_assay_agreement import analyze
+
+        rng = self._rng()
+        n = 400
+        pred = rng.normal(size=n)
+        strong = 0.9 * pred + 0.3 * rng.normal(size=n)
+        weak = 0.2 * pred + 1.0 * rng.normal(size=n)
+        delta = analyze._spearman(pred, strong) - analyze._spearman(pred, weak)
+        w = analyze._williams_test(pred, strong, weak)
+        p = analyze._paired_permutation_delta(pred, strong, weak, 600, 0, delta)
+        assert w["applicable"] and w["p_two_sided"] < 0.01
+        assert p["p_two_sided"] < 0.01
+
+    def test_paired_permutation_does_not_fire_on_the_null(self):
+        pytest.importorskip("numpy")
+        from experiments.bioservices.kir21_esm2_assay_agreement import analyze
+
+        rng = self._rng()
+        n = 400
+        pred = rng.normal(size=n)
+        a = 0.5 * pred + rng.normal(size=n)
+        b = 0.5 * pred + rng.normal(size=n)
+        delta = analyze._spearman(pred, a) - analyze._spearman(pred, b)
+        assert analyze._paired_permutation_delta(pred, a, b, 600, 0, delta)["p_two_sided"] > 0.05
+
+    def test_clustering_widens_the_interval_under_full_intra_cluster_dependence(self):
+        """With variants at a position perfectly dependent, effective n is the
+        number of POSITIONS. A variant-level bootstrap then badly understates the
+        variance of delta_rho and the clustered one must be wider.
+
+        Measured caveat, kept because the first version of this test asserted the
+        stronger claim and failed: clustering is **not** universally wider. With
+        substantial independent within-position noise (0.3 and 0.9 on the two
+        outcomes, 10 variants per position, seed 12345) the clustered interval
+        came out *narrower* -- 0.143 against 0.171 -- because drawing whole
+        clusters keeps the design balanced while variant-level resampling lets
+        per-position counts vary and adds variance of its own. So the clustered
+        interval is the APPROPRIATE one when clusters are dependent, not the
+        automatically conservative one, and both are reported.
+        """
+        pytest.importorskip("numpy")
+        import numpy as np
+
+        from experiments.bioservices.kir21_esm2_assay_agreement import analyze
+
+        rng = self._rng()
+        n_pos, per_pos = 40, 10
+        positions, pred, a, b = [], [], [], []
+        for p in range(n_pos):
+            x = rng.normal()
+            ya = 0.8 * x + 0.3 * rng.normal()
+            yb = 0.3 * x + 0.9 * rng.normal()
+            for _ in range(per_pos):  # identical within a position: perfect dependence
+                positions.append(p)
+                pred.append(x)
+                a.append(ya)
+                b.append(yb)
+        pred, a, b = np.array(pred), np.array(a), np.array(b)
+        _, _, bd, _ = analyze._paired_bootstrap(pred, a, b, 400, 0, 0.95)
+        cb = analyze._cluster_bootstrap(pred, a, b, positions, 400, 0, 0.95)
+        assert cb["n_clusters"] == n_pos
+        assert (cb["delta_ci_high"] - cb["delta_ci_low"]) > (bd["ci_high"] - bd["ci_low"])
+
+    def test_the_verdict_rule_reads_the_interval_not_the_point(self):
+        from experiments.bioservices.kir21_esm2_assay_agreement import analyze
+
+        assert analyze._verdict({"ci_low": 0.1, "ci_high": 0.3})[0] == "supported"
+        assert analyze._verdict({"ci_low": -0.3, "ci_high": -0.1})[0] == "falsified"
+        assert analyze._verdict({"ci_low": -0.3, "ci_high": 0.0})[0] == "falsified"
+        assert analyze._verdict({"ci_low": -0.05, "ci_high": 0.3})[0] == "undetermined"
