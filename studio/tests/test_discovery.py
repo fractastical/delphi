@@ -198,6 +198,15 @@ def test_contract_shape_hybrid_fusion_and_semantic_only_match(seeded):
     assert all(i["score_kind"] == "lexical_rank_reciprocal" for i in d.search("automobile", mode="lexical")["items"])
 
 
+def test_an_exact_identifier_is_kept_at_the_top_by_the_lexical_side_of_the_fusion(seeded):
+    store, d, recs = seeded
+    index(d)
+    res = d.search("other-claim", mode="hybrid")
+    assert res["items"][0]["ref"]["id"] == "other-claim" and any(w.startswith("lexical rank 1") for w in res["items"][0]["why_matched"])
+    pinned = d.search(recs["heart"]["version"], mode="hybrid")
+    assert pinned["items"][0]["ref"]["version"] == recs["heart"]["version"], "an exact version pin is found whatever the vector side says"
+
+
 def test_private_records_are_never_returned_by_any_mode(seeded):
     store, d, recs = seeded
     index(d)
