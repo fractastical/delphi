@@ -1,0 +1,31 @@
+{
+ "claim_id": "maynardsmith-hitchhiking",
+ "test_dir": "claim-tests/math-bio-theorems/maynardsmith-hitchhiking",
+ "rubric": "analysis-faithfulness/0.1.0",
+ "role": "A9",
+ "assessor": {
+  "provider": "openai",
+  "via": "openai",
+  "model": "gpt-5-2025-08-07",
+  "date": "2026-10-31T15:06:11.519Z",
+  "blind": true,
+  "withheld": [
+   "measured",
+   "verdict",
+   "confidence",
+   "caveats",
+   "interpretation"
+  ],
+  "seconds": 24.9
+ },
+ "scores": {
+  "right_variables": 0.75,
+  "modality_appropriate": 1,
+  "assumptions_compatible": 0.5,
+  "rule_discriminates": 0.25,
+  "scope_stated": 1
+ },
+ "verdict": "representative-with-caveats",
+ "reasons": "The test measures nucleotide diversity per base (pi) from allele frequencies and local recombination rate from a genetic map across 200 kb windows, which are the right observable quantities for a key implication of hitchhiking. However, the pass/fail rule relies solely on a positive correlation between diversity and recombination, which is not specific to selective sweeps: background selection and mutation-rate variation (both known to correlate with recombination and genomic context) can generate the same signal. The analysis pools all 1000 Genomes populations, so structure and accessibility variation may influence pi, and the Spearman p-values assume independence across adjacent windows, potentially inflating significance. The data modality (human population genomic variants plus a recombination map on a single chromosome) is appropriate for a correlational test, and the scope narrowing to human chr22 is clearly stated. Overall, the variables match a necessary implication of the claim, but the decision rule does not distinguish sweeps from plausible alternatives.",
+ "what_would_change_it": "Control for mutation rate and background selection (e.g., analyze pi normalized by interspecies divergence, include GC/CpG and accessibility covariates, or compare to a background selection map) and require the partial correlation with recombination to be positive. Alternatively, test a sweep-specific signature jointly with diversity (e.g., SFS-based sweep statistics or haplotype-based sweep measures) and require that diversity–recombination correlation holds in regions showing sweep signals."
+}
