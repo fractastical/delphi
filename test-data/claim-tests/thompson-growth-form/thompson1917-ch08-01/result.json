@@ -1,0 +1,40 @@
+{
+  "claim_id": "thompson1917-ch08-01",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch08-01",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "preregistered_at": "2026-10-31T21:40:00Z",
+  "hypothesis": "In dividing plant cells, the new wall cuts across the mother cell's longest axis (its normal is near-parallel to that axis), and when two successive divisions are both recent, the second wall is near-perpendicular to the first.",
+  "pass_criterion": "Pre-registered. Data: the same 8 Arabidopsis shoot-apex archives as thompson1917-ch08-02 (first 8 archive names, alphabetical, of Zenodo record 18711581). Sister pairs = the two cells separated by a wall in *_new_walls.tif; mother = their union; sisters >= 40 um^3, not touching the border. Part 1 (longest axis): theta = angle between the new wall's normal (smallest principal axis of the shared-interface voxel coordinates, in um) and the mother's longest principal axis (largest-variance axis of its voxel coordinates, in um); analysed for elongated mothers (sqrt(lambda1/lambda2) >= 1.2), all mothers reported too. Under random orientation the median theta is 60 deg. Part 1 passes if median theta <= 30 deg and >= 60% of elongated mothers have theta <= 30 deg. Part 2 (alternation): triples X, Y1, Y2 where Y1|Y2 is a new wall and Y1 and Y2 each also share a new wall with the same cell X (so Y divided after X|Y formed); phi = angle between the normals of wall Y1|Y2 and wall X|(Y1 u Y2), folded to [0, 90]. Part 2 passes if median phi >= 75 deg and >= 50% of triples have phi >= 70 deg. SUPPORTS if both parts pass.",
+  "fail_criterion": "Pre-registered. Part 1 fails if median theta >= 50 deg; Part 2 fails if median phi <= 60 deg. REFUTES if both parts fail. MIXED for any other combination of pass/fail/neither. If Part 2 has fewer than 15 triples it is underpowered; the verdict is then Part 1's outcome (supports if it passes, refutes if it fails, mixed otherwise) with that limitation noted and confidence capped at 0.6. If Part 1 has fewer than 30 elongated mothers: inconclusive (underpowered). Secondary, reported but not used for the verdict: in eLife 79224 Figure 8 source data 2 (Laruelle et al. 2022, Arabidopsis embryo apical cells at 16C), the fraction of horizontally dividing cells whose longitudinal length exceeds their maximal radial length, and of longitudinally dividing cells whose longitudinal length is below it.",
+  "planned_datasets": [
+    "zenodo-18711581-yates-2026-arabidopsis-sam-segmentations",
+    "elife-79224-fig8-data2"
+  ],
+  "interpretation": "Thompson derives the rule for an ideal rectangular parallelepiped bisected by a least-area plane: the plane is perpendicular to the longest edge, and successive bisections alternate at right angles. Real meristem cells are not rectangular, so 'longest axis' is the largest principal axis of the cell volume and the test is restricted to mothers that are measurably elongated (principal-axis ratio >= 1.2), where the axis is defined. Successive divisions are identified only where both walls are still flagged as recent in one snapshot, so Part 2 samples rapid successive divisions. Division orientation in the shoot apex is also influenced by tissue stress, which can mimic or mask the geometric rule; the test measures the outcome, not the cause.",
+  "test_contract": {
+    "expected_observation": "New-wall normals cluster near the mother's longest axis (median angle <= 30 deg, versus 60 deg for random planes), and successive recent walls meet near 90 deg.",
+    "disconfirming_observation": "New-wall normals are oriented no better than random relative to the longest axis (median angle >= 50 deg), and successive walls are no closer to perpendicular than random (median <= 60 deg).",
+    "admissible_datasets": "3D segmentations of dividing plant cells with identifiable sister pairs and known voxel size; independent of Thompson; public licence.",
+    "inference_method": "Principal axes of the reconstructed mother and of the interface; angle statistics compared with the random-orientation expectation and the pre-registered thresholds."
+  },
+  "preregistration": {
+    "archives": "first 8 archive file names of Zenodo record 18711581 in alphabetical order",
+    "min_sister_volume_um3": 40,
+    "elongation_min": 1.2,
+    "part1_pass_median_deg": 30,
+    "part1_pass_fraction_le30": 0.6,
+    "part1_fail_median_deg": 50,
+    "part2_pass_median_deg": 75,
+    "part2_pass_fraction_ge70": 0.5,
+    "part2_fail_median_deg": 60,
+    "min_part1": 30,
+    "min_part2": 15
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
