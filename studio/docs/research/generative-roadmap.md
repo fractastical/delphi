@@ -1,194 +1,258 @@
-# Forward-generation roadmap: synthetic data from sourced mechanism, conditional generators, solver-gated inverse screening
+# Generative roadmap: mechanistic simulators as training data, conditional generators, solver-gated inverse design
 
-**Status: a roadmap and a hypothesis. Nothing here is built.** No dataset has been generated, no
-model has been trained, no candidate has been screened. Every forward-looking sentence below is a
-proposal. This document exists so the pitch can describe the direction without any reader
-mistaking it for a result.
+**Status.** One bounded pilot is frozen and awaiting GPU time. The broad organism-scale proposal is
+unbuilt. The sections below separate the two, and §6 gives the counts.
 
-Read-levels, per `docs/research/README.md` convention: `full-text` | `abstract` | `search-summary`.
-Each prior-art entry carries its own.
+Read-levels, per `docs/research/README.md`: `full-text` | `abstract` | `search-summary`. Each
+prior-art entry carries its own, and every date below was read from the arXiv abstract page on
+2026-10-31 rather than from a search summary.
+
+Companion pages: `#/generative` (the public thesis, live) and `#/about`.
 
 ---
 
-## 1. The pipeline, in four stages
+## 1. The proposal, in four stages
 
-1. **Forward — synthesise.** Take mechanistic equations and their knob ranges **from sourced claim
-   records in the commons**, not from memory. Sweep the simulators we already run (BETSE ion/pump/
-   gap-junction, Morpheus CPM/ODE/PDE, zebrafish-GEM metabolic, the bounded bioelectric and
-   mechanobio models already exposed on the public MCP) across those ranges. Each synthetic datum
-   carries the version hash of the claim that licensed its equation and the hash of the request
-   that produced it.
-2. **Train — conditional generator.** Fit a conditional diffusion model or a latent neural
-   operator on those sweeps, conditioned on the knobs and on the regime labels.
+1. **Forward — synthesise.** Take mechanistic equations and their knob ranges from **sourced claim
+   records**, not from memory. Sweep the simulators we already run across those ranges. Each
+   synthetic datum carries the version of the claim that licensed its equation and the hash of the
+   request that produced it.
+2. **Train — conditional generator.** Fit a conditional diffusion model or latent operator on
+   those sweeps, conditioned on the knobs and on regime labels.
 3. **Inverse — propose.** Condition on a target morphology or behaviour; sample candidate
    parameter sets and fields.
-4. **Screen — gate.** Reject candidates with the exact solver, then with real experiments.
+4. **Screen — gate.** Put candidates back through the exact solver, then through real experiments.
 
-Stage 4 is where the claim of usefulness lives, and stage 4 is the part nobody has funded.
-
----
-
-## 2. Prior art: every stage is already published, and we say so first
-
-### 2.1 Diffusion surrogates for mechanistic biological models — *the closest work to stage 1-2*
-
-**Comlekoglu T, Toledo-Marín JQ, DeSimone DW, Peirce SM, Fox G, Glazier JA.**
-*"Generative diffusion model surrogates for mechanistic agent-based biological models."*
-arXiv:2505.09630 (v1 2025-05-01, v3 2025-10-23); *Machine Learning: Science and Technology*,
-DOI 10.1088/2632-2153/ae11f8; PMID 41170496. Code: `github.com/tc2fh/CPM_DDPM_Surrogate`.
-**Read-level: abstract** (arXiv abstract page fetched 2026-10-31; full text not read).
-
-> **Note the exact title.** It is *"mechanistic **agent-based** biological models"*, not
-> "mechanistic biological simulations". The brief that pointed us here used the looser phrase, and
-> the precise one matters: this paper is about agent-based models specifically.
-
-They train a denoising diffusion probabilistic model as a surrogate for a **Cellular-Potts Model**
-of in vitro vasculogenesis, and use an image classifier to aid surrogate selection and
-verification. They report roughly a **22x reduction in computational time** generating
-configurations 20,000 timesteps ahead of a reference. Their stated motivation is that CPM
-simulations are stochastic, so a deterministic network is ill-posed as a surrogate and a
-generative one is the right class.
-
-**What this means for us, stated bluntly: stage 1-2 of our roadmap is their published result, in
-biology, on a Cellular-Potts model — and we run Morpheus CPM.** We do not get to call the forward
-half novel. If we build it, we are replicating and extending their work, and the honest word is
-"replicating".
-
-### 2.2 Physics residuals inside diffusion training — *constrains stage 2*
-
-**Bastek J-H, Sun W, Kochmann DM.** *"Physics-Informed Diffusion Models."* arXiv:2403.14404,
-ICLR 2025. Code under `github.com/jhbastek`.
-**Read-level: search-summary** (abstract listing and conference page; full text not read).
-
-A physics/PDE residual term is added to the denoising objective so samples are pushed to satisfy
-the governing equations. Reported: residual error reduced by up to two orders of magnitude against
-prior work in a fluid-flow case study, and the extra objective acts as regularisation against
-overfitting. Handles equality and inequality constraints.
-
-**For us:** the idea of making the generator respect the mechanism rather than only the data is
-published. We would be applying it, not inventing it.
-
-### 2.3 Conditional score-based diffusion for simulator statistics — *the shape of stage 2-3*
-
-**Molinaro R, Lanthaler S, Raonić B, et al.** *"Generative AI for fast and accurate statistical
-computation of fluids"* (GenCFD). arXiv:2409.18359 (submitted 2024-09-27, revised Feb 2025).
-Code: `github.com/camlab-ethz/GenCFD`.
-**Read-level: search-summary** (abstract listing; full text not read).
-
-Conditional score-based diffusion for 3D turbulent flow statistics, reporting a complex 3D
-turbulent flow generated in about one second. Their motivation is directly relevant to us:
-deterministic ensembles trained on mean-squared error **collapse toward the mean flow**, which
-destroys exactly the variability a biological design study needs.
-
-### 2.4 Generate-then-verify with an exact solver — *stage 4 is also not ours*
-
-A 2025-2026 literature already does propose-filter-verify with a solver as the final gate, across
-several domains: a pore-scale flow pipeline where generators propose, exact topology checks
-reject, a surrogate screens and a lattice-Boltzmann solver verifies; dual-constrained diffusion
-for nonlinear microstructure inverse design with direct evaluation; forward-model error
-thresholding for microwave-filter coupling matrices; and adjoint-gradient guidance injected at
-each denoising step for photonic inverse design.
-**Read-level: search-summary only** (one extended web search, 2026-10-31; no full texts read, and
-I did not verify individual claims in these papers).
-
-**So the architecture — forward sweeps, conditional generator, inverse proposal, solver gate — is
-prior art end to end.** Anyone claiming it as new at this hackathon is wrong, and we will not.
+Stage 4's second half, real measurement, is what converts any of this from model-consistency
+checking into biology. That step is not part of the current pilot.
 
 ---
 
-## 3. What we would actually be claiming, and how small it is
+## 2. Where this actually stands
 
-Two things, and we state them as **hypotheses about a combination**, not as results:
+### 2.1 The RD-1D pilot: preregistered, coded, packaged, no GPU result
 
-**H1 — Provenance reaches into the training set.** Every synthetic datum carries the version hash
-of the sourced claim whose equation and knob range produced it. When a claim is **withdrawn**, the
-data generated under it is identifiable and the models trained on it are flagged. We have a live
-instance of a withdrawal to test this against: the mispredication correction withdrew our own
-Turing-reliability claim in place (`bench/mispredication/README.md`), and the commons already
-carries versioned records with a separate node-local review status.
-
-*Scope of the negative:* one standard web search on 2026-10-31 over the ML training-data
-provenance literature returned work on **detecting** whether synthetic data was used
-(dataset-inference methods; TrainProVe, CVPR 2025) and **nothing** on retraction propagating into
-derived synthetic data. That is a lead, **not** a demonstration that nobody has done it. The
-honest sentence is "we have not found prior art for this, and here is what we searched" — not
-"this is new".
-
-**H2 — The exact solver carries its own validity domain.** The generate-then-verify literature
-treats the solver as the oracle. Our own measured result says that is unsafe: the textbook Turing
-criterion's error on a finite domain is **windowed**, exactly 0% at half-integer multiples of the
-critical wavelength and 6.22% at 1.25 λc, still 0.58% at 4.25 λc. A verifier that is wrong in
-windows will certify candidates that sit in those windows. So the gate must carry scope conditions,
-and those scope conditions are the thing our commons is already built to hold.
-
-That is the whole claim. It is modest. It is not "first diffusion model in synthetic biology",
-it is not an IP position, and nobody should put either phrase on a slide.
-
----
-
-## 4. The objection that will be put to us, and the honest answer
-
-**"You generate training data from your simulator, then verify candidates with a solver built on
-the same equations. You have proved consistency with your own model, not with biology."**
-
-That objection is correct, it is already live in the literature — a reviewer note on a
-diffusion-based electromagnetic inverse-design paper raises exactly it, and the authors' reply is
-that one forward solver for both is standard practice — and we should concede it immediately
-rather than defend it.
-
-**Our answer, in full:** the circularity is real and it is not removed by any amount of solver
-rigour. It is broken only at stage 4's second half, **real experiments**, which we have not done
-and are not funded to do. Everything upstream of a wet-lab measurement is model-consistency
-checking, and we will label it that way. What the commons adds is that the circularity is
-*declared*: the claim that licensed the equation, its review status, and its scope conditions are
-all attached to the generated data, so a reader can see which model's consistency was checked.
-
-A second honest concession: §2.3's finding that MSE-trained deterministic surrogates collapse to
-the mean is a reason to use a generative model, **and** a warning that a generative surrogate's
-apparent diversity can be an artifact of the sampler rather than of the mechanism. We have not
-measured that distinction and would need to before reporting any sweep.
-
----
-
-## 5. What would have to be true, stated before any run
-
-Preregistration-shaped, so a later result cannot be graded against a moved target:
-
-- **Falsifier for the surrogate.** If the generator's samples do not reproduce held-out simulator
-  statistics at a stated tolerance on parameter sets withheld from training, the surrogate is
-  rejected. A surrogate that only interpolates within its sweep is reported as such.
-- **Must-fail control.** A deliberately wrong knob range must produce samples the classifier or
-  the solver rejects. A screen that cannot reject anything has not been tested.
-- **Positive control.** A parameter set with a known simulator outcome must pass end to end.
-- **Stop rule.** If the solver gate accepts candidates at a rate indistinguishable from random
-  draws over the same knob ranges, the pipeline adds nothing and we report that null.
-- **INCONCLUSIVE band declared in advance**, not after seeing the numbers.
-- **No composite score.** Formal correctness, numerical accuracy and empirical accuracy stay
-  separate, as everywhere else in this project. There is no single number for whether a generated
-  organism works.
-
----
-
-## 6. Current state, for the avoidance of doubt
+A conditional DDPM surrogate for a **1-D Schnakenberg reaction-diffusion field**.
 
 | | |
 |---|---|
-| Synthetic datasets generated | **0** |
-| Models trained | **0** |
-| Inverse candidates proposed | **0** |
-| Candidates screened by an exact solver | **0** |
-| Real experiments | **0** |
-| GPU hours spent on this | **0** |
+| Preregistration + solver + model + controller + tests | commit **`9c56a927`**, 2026-10-31 15:32:36 PDT |
+| Frozen job packet, hashes, local CPU control receipts | commit **`4a5394f3`**, 2026-10-31 15:33:03 PDT |
+| Branch | `work/rd-diffusion` |
+| Packet archive sha256 | `76eb4a7b273f71db51d6f8d35481dfe94a36b49414372c919d3387e67d75821c` (11,526 bytes, deterministic tar) |
+| **GPU result** | **none yet** |
 
-The simulators in stage 1 **do** exist and run — several are live on the public MCP and anyone can
-call them with no credential. That is the only part of this document with a receipt.
+What is genuinely frozen before any training or held-out evaluation, per `PREREG.md`:
+
+- **Architecture and schedule**, so nothing can be tuned on the holdouts: 1-D U-Net, 1.35 M
+  parameters, replicate padding for zero-flux ends; ε-prediction DDPM, T = 200, cosine schedule,
+  30,000 steps, EMA 0.999, seed 0. No physics loss and no guidance — conditioning does not
+  guarantee the equations hold, so the evaluation **measures** consistency rather than assuming it.
+- **Splits by whole setting or whole seed**, tested so no `(setting, seed)` pair appears in two
+  splits, with a `test_param` set of 300 settings never trained on and a `test_seed` set of unseen
+  initial conditions on training settings. Normalisation is fitted on training rows only.
+- **A shuffled-condition null** among the baselines, alongside nearest-setting, nearest-5 and a
+  deterministic conditional-mean baseline. A run in which the DDPM loses to a baseline or to the
+  null is reported as such.
+- **Data generated inside the job by the frozen solver.** No digitised or fabricated fields.
+  Non-finite or diverging runs are flagged `failed`, excluded from training and **counted in the
+  receipts**.
+- **An explicit non-claims list**: no biological validity, no fin or fish model, no calibrated
+  units, no equation satisfaction by the surrogate, no generality beyond the 1-D Schnakenberg
+  prior box, and no speed advantage.
+
+Controls that have actually run: the CPU control passes all checks; the torch solver matches the
+numpy solver to 1e-9; `tests/test_rd_diffusion.py` reports 13 passed. The CUDA control has **not**
+run here — this host has no GPU, and that control is the first gate inside the job. The end-to-end
+CPU smoke output is named `smoke_evaluation_NOT_A_RESULT.json` because it is 150 steps on 30 debug
+settings with an untrained model.
+
+The 15-25 minute runtime figure in the packet is an **estimate scaled from CPU smoke timings, not
+a GPU measurement**, and the packet says so.
+
+**This pilot already instantiates part of H1** (§3): the equation is reused from registry id
+`eq-rd-schnakenberg` with its claim and problem references kept attached — as **snapshot pins,
+not live-store acceptance**. Whether a *withdrawal* propagates through those pins is untested.
+
+### 2.2 Everything above organism scale
+
+Unbuilt. The pipeline in §1 applied to a whole organism is a proposal, and §6's table is the
+honest inventory.
+
+---
+
+## 3. What we are proposing to add
+
+The method class is established (§4). Our contribution is an integration, stated as two
+hypotheses so that a later result can be graded against something fixed:
+
+**H1 — provenance reaches into the training set.** Every synthetic datum carries the version of
+the sourced claim whose equation and knob range produced it, so when a claim's status changes the
+data generated under it is identifiable and the models trained on it are flagged. We have a live
+instance to test this against: the mispredication correction withdrew a Turing-reliability claim
+in place, and the commons already carries versioned records with a separate node-local review
+status. The RD-1D pilot attaches claim refs today; propagation of a withdrawal is the open part.
+
+*Scope of the negative:* one standard web search on 2026-10-31 over the ML training-data
+provenance literature returned work on **detecting** whether synthetic data was used
+(dataset-inference methods; TrainProVe, CVPR 2025) and nothing on retraction propagating into
+derived synthetic data. That is a lead. It is not a demonstration that nobody has done it, and the
+honest sentence is "we have not found prior art for this, and here is what we searched".
+
+**H2 — the verifier carries its own validity domain.** The generate-then-verify literature treats
+the exact solver as the oracle. Our own measurement argues for qualifying that: the textbook
+Turing criterion's error on a finite domain is **windowed**, exactly 0% at half-integer multiples
+of the critical wavelength and 6.22% at 1.25 λc, still 0.58% at 4.25 λc. A verifier that is wrong
+in windows will certify candidates sitting in those windows, so the gate should carry scope
+conditions — which is what the commons is built to hold.
+
+Both are hypotheses about a combination. Neither is a result.
+
+---
+
+## 4. Related work, and what each contributes
+
+Physics-informed generation and learning from mechanistic simulators are an active field with
+strong published results. The roadmap builds on them directly.
+
+### 4.1 Diffusion surrogates for mechanistic biological models — the closest precedent
+
+**Comlekoglu T, Toledo-Marín JQ, DeSimone DW, Peirce SM, Fox G, Glazier JA.** *"Generative
+diffusion model surrogates for mechanistic agent-based biological models."* arXiv:2505.09630
+(v1 2025-05-01, v3 2025-10-23); *Machine Learning: Science and Technology*,
+DOI 10.1088/2632-2153/ae11f8; PMID 41170496; PMC12570967.
+Code: `github.com/tc2fh/CPM_DDPM_Surrogate`.
+**Read-level: abstract** — arXiv abstract page fetched 2026-10-31; full text not read.
+
+> **Cite the exact title.** It reads *"mechanistic **agent-based** biological models"*. The looser
+> phrase "mechanistic biological simulations" has been used in briefs here; the precise title
+> matters because the paper is specifically about agent-based models.
+
+A denoising diffusion probabilistic model is trained as a surrogate for a **Cellular-Potts Model**
+of in vitro vasculogenesis, with an image classifier aiding surrogate selection and verification,
+reporting roughly a **22x reduction in computational time** generating configurations 20,000
+timesteps ahead. Their motivation is that CPM simulations are stochastic, so a deterministic
+network is ill-posed as a surrogate and a generative one is the right class.
+
+**This is a close biological precedent for stages 1-2, on a model class we also run (Morpheus
+CPM).** The RD-1D pilot's own preregistration cites it as an existing method class and states that
+it claims no new diffusion methodology. Our extension is the evidence loop around it, not the
+surrogate itself.
+
+### 4.2 Physics residuals inside diffusion training
+
+**Bastek J-H, Sun W, Kochmann DM.** *"Physics-Informed Diffusion Models."* arXiv:2403.14404
+(v1 2024-03-21, v4 2025-03-13; Comments field: *"ICLR 2025 camera ready contribution"*).
+Code under `github.com/jhbastek`.
+**Read-level: abstract** — arXiv abstract page fetched 2026-10-31 for title, authors and dates;
+findings below are at search-summary level and the full text is not read.
+
+A physics/PDE residual is added to the denoising objective so samples are pushed toward satisfying
+the governing equations; reported residual-error reduction of up to two orders of magnitude in a
+fluid-flow case study, with the extra objective acting as regularisation. Handles equality and
+inequality constraints.
+
+**Relevance:** the RD-1D pilot deliberately uses **no** physics loss, so that the evaluation can
+measure consistency rather than impose it. This is the natural next arm once a baseline exists.
+
+### 4.3 Conditional score-based diffusion over simulator statistics
+
+**Molinaro R, Lanthaler S, Raonić B, Rohner T, Armegioiu V, Simonis S, Grund D, Ramic Y, Wan ZY,
+Sha F, Mishra S, Zepeda-Núñez L.** *"Generative AI for fast and accurate statistical computation
+of fluids"* (GenCFD). arXiv:2409.18359 (v1 2024-09-27, v2 2025-02-03; Comments: 120 pages, 33
+figures; no journal reference on the page).
+Code: `github.com/camlab-ethz/GenCFD`.
+**Read-level: abstract** for title, authors and dates; findings at search-summary level.
+
+Conditional score-based diffusion for 3D turbulent flow statistics, reporting a complex 3D
+turbulent flow generated in about one second.
+
+**Relevance, and a warning we took:** their motivation is that deterministic ensembles trained on
+mean-squared error **collapse toward the mean flow**. That is a reason to use a generative model —
+and equally a reason to check that a generative surrogate's apparent diversity reflects the
+mechanism rather than the sampler. The RD-1D evaluation compares conditional ensembles against
+32-seed solver ensembles for exactly this.
+
+### 4.4 Physics-informed diffusion in spectral space
+
+**Gallon D, von Wurstemberger P, Cheridito P, Jentzen A.** *"Physics-informed diffusion models in
+spectral space."* arXiv:2602.09708 (v1 2026-02-10, v2 2026-06-02).
+**Read-level: abstract** — arXiv abstract page fetched 2026-10-31 (title, authors, dates only).
+Cited on the live `#/generative` page; verified here.
+
+### 4.5 Generate-then-verify with a solver gate
+
+A 2025-2026 literature already pairs a generator with a solver as the final gate: a pore-scale
+flow pipeline where generators propose, exact topology checks reject and a lattice-Boltzmann
+solver verifies; dual-constrained diffusion for nonlinear microstructure inverse design with
+direct evaluation; forward-model error thresholding for microwave-filter coupling matrices; and
+adjoint-gradient guidance injected at each denoising step for photonic inverse design.
+**Read-level: search-summary only** — one extended web search, 2026-10-31; no full texts read and
+individual claims not verified.
+
+**So stage 4's structure is established too.** What we are proposing is not a new pipeline shape;
+it is what the pipeline is wired into.
+
+---
+
+## 5. The sharpest objection, and our answer
+
+**"You generate training data from your simulator, then verify candidates with a solver built on
+the same equations. That tests consistency with your model, not with biology."**
+
+The objection is correct and we put it on the page ourselves. The same question is live in the
+field — a reviewer note on a diffusion-based electromagnetic inverse-design paper raises it, and
+the usual reply is that one forward solver for both is standard practice, which describes the
+convention rather than settling it.
+
+Our answer has three parts.
+
+1. **Concede the scope.** Everything upstream of a real measurement is model-consistency checking.
+   No amount of solver rigour changes that, and the RD-1D preregistration's non-claims list says so
+   for the pilot specifically.
+2. **Make the circularity legible.** The claim that licensed the equation, its review status and
+   its scope conditions travel with the generated data, so a reader can see *which* model's
+   consistency was checked. That is a real improvement over a surrogate whose training distribution
+   is undocumented.
+3. **Put the break where it belongs.** Calibration against real measurement is a milestone in its
+   own right, and until it happens the surrogate's accuracy claims are bounded by the simulator.
+
+A second honest limit: §4.3's mean-collapse finding cuts both ways, and we have not yet measured
+whether generated diversity tracks the mechanism or the sampler. The RD-1D evaluation is designed
+to answer that for one system.
+
+---
+
+## 6. Inventory
+
+| | Organism-scale proposal | RD-1D pilot |
+|---|---|---|
+| Preregistration | — | **frozen, `9c56a927`** |
+| Code and job packet | — | **frozen, `4a5394f3`** |
+| Local controls run | — | **CPU control pass; 13 tests; solver = numpy to 1e-9** |
+| CUDA control | — | not run here (no GPU on this host; first gate inside the job) |
+| Synthetic datasets generated | 0 | generated inside the job; **not yet run** |
+| Models trained | 0 | **0** |
+| Held-out evaluation | 0 | **0** |
+| Inverse candidates proposed | 0 | 0 — out of scope for the pilot |
+| Candidates screened by an exact solver | 0 | 0 |
+| Real experiments | 0 | 0 |
+| GPU hours spent | 0 | **0** |
+
+The simulators in stage 1 do exist and run; several are live on the public MCP and anyone can call
+them with no credential. That is the part of this document with a receipt today.
 
 ---
 
 ## 7. Revisions
 
-- **2026-10-31** — created. Prior art verified against primary sources on the same day: arXiv
-  abstract page for 2505.09630 (exact title, authors, dates, 22x figure, DOI); web search for
-  2403.14404 and 2409.18359 (abstract-level only). The brief that commissioned this document gave
-  the third paper's title as "...for mechanistic biological simulations"; the exact title is
-  "...for mechanistic **agent-based** biological models", corrected here.
+- **2026-10-31, created.** Prior art verified against primary sources the same day.
+- **2026-10-31, revised.** (a) Removed the sentence calling stage 4 "the part nobody has funded" —
+  **we have no information about funding** and the claim was unsupported. (b) Added §2 with the
+  RD-1D pilot's frozen commits and the explicit "no GPU result yet". (c) Upgraded every date to a
+  direct reading of the arXiv abstract page: Bastek v1 is **2024-03-21** (the 2403 identifier is
+  March 2024, not 2025) with v4 2025-03-13 and the ICLR 2025 reference taken from the Comments
+  field; GenCFD v1 2024-09-27, v2 2025-02-03, with all twelve authors named and **no journal
+  reference on the page**, so it should not be described as journal-published. (d) Added §4.4 for
+  the Gallon et al. paper cited on the live `#/generative` page, verified here. (e) Rewrote §4 and
+  §5 as a forward proposal that credits the prior work, replacing phrasing that read as scolding.

@@ -122,16 +122,24 @@ Full document with read-levels: `docs/research/generative-roadmap.md`. Page copy
 
 | Item | Level | Status |
 |---|---|---|
-| Synthetic datasets generated, models trained, candidates proposed, candidates solver-screened, real experiments, GPU hours | — | **0 / 0 / 0 / 0 / 0 / 0** |
-| Diffusion surrogate for a mechanistic **agent-based** biological model (CPM, in vitro vasculogenesis, ~22x) | — | **Published by Comlekoglu et al.**, arXiv:2505.09630, DOI 10.1088/2632-2153/ae11f8. Stages 1-2 of our roadmap are their result. Read-level: abstract |
-| Physics residuals inside diffusion training | — | **Published by Bastek, Sun, Kochmann**, arXiv:2403.14404, ICLR 2025. Read-level: search-summary |
-| Conditional score-based diffusion over simulator statistics | — | **Published as GenCFD**, arXiv:2409.18359. Read-level: search-summary |
+| **RD-1D conditional DDPM pilot**: preregistration, solver, model, controller and tests frozen | C | **`9c56a927`**, 2026-10-31 15:32:36 PDT, committed before any training or held-out evaluation |
+| **RD-1D job packet**, hashes, local CPU control receipts | C | **`4a5394f3`**, 15:33:03 PDT; archive sha256 `76eb4a7b…`, 11,526 bytes |
+| RD-1D local controls | C | CPU control all checks ok; torch solver = numpy to 1e-9; `tests/test_rd_diffusion.py` **13 passed**. CUDA control **not run here** (no GPU on this host) |
+| **RD-1D GPU result** | — | **NONE YET.** The 15-25 min runtime in the packet is an estimate scaled from CPU smoke timings, not a GPU measurement |
+| Organism-scale pipeline: datasets, models, candidates, solver-screened, real experiments, GPU hours | — | **0 / 0 / 0 / 0 / 0 / 0 — unbuilt** |
+| Diffusion surrogate for a mechanistic **agent-based** biological model (CPM, in vitro vasculogenesis, ~22x) | — | **Published by Comlekoglu et al.**, arXiv:2505.09630 (v1 2025-05-01, v3 2025-10-23), DOI 10.1088/2632-2153/ae11f8, PMC12570967. A close precedent for stages 1-2. Read-level: abstract |
+| Physics residuals inside diffusion training | — | **Published by Bastek, Sun, Kochmann**, arXiv:2403.14404 — **v1 2024-03-21**, v4 2025-03-13, ICLR 2025 per the Comments field. Read-level: abstract for metadata |
+| Conditional score-based diffusion over simulator statistics | — | **GenCFD**, arXiv:2409.18359, v1 2024-09-27, v2 2025-02-03, 12 authors, **no journal reference on the page**. Read-level: abstract for metadata |
+| Physics-informed diffusion in spectral space | — | Gallon, von Wurstemberger, Cheridito, Jentzen, arXiv:2602.09708 (v1 2026-02-10, v2 2026-06-02). Cited on the live `#/generative` page; **verified correct here** |
 | Generate → filter → exact-solver gate | — | **Published across several domains, 2025-26.** Read-level: search-summary, no full texts read |
 | H1: a withdrawn claim identifies its own derived synthetic data | — | **Hypothesis.** One web search found no prior art; that is a lead, **not** a demonstration of absence |
 | H2: the exact solver carries its own scope conditions | — | **Hypothesis**, motivated by our own windowed-error measurement |
 
-**Forbidden:** "first diffusion model for synthetic biology", and any IP claim. The architecture is
-published end to end and a judge who knows the literature catches it immediately.
+**Forbidden:** "first diffusion model for synthetic biology", and any IP claim. The method class is
+published; what we propose is the evidence loop around it.
+
+**Removed as unsupported, 2026-10-31:** the roadmap previously called stage 4 "the part nobody has
+funded". We have no information about funding, and the sentence is gone.
 
 ---
 
@@ -140,6 +148,8 @@ published end to end and a judge who knows the literature catches it immediately
 | Component | Verdict | Evidence |
 |---|---|---|
 | Frontier store, HTTP adapter, MCP, public site | **Built during the event** | repo's first commit `c508a423` 2026-10-31 07:49:44 PDT; **all 508 commits dated 2026-10-31** |
+| Root About + `#/generative` pages | **Built during the event** | `df98621` 2026-10-31 15:29:05 PDT (`site/js/about.js`, `site/js/generative.js`, `site/css/about.css`) |
+| RD-1D diffusion pilot (prereg, code, packet) | **Built during the event** | `9c56a927` 15:32:36 PDT, `4a5394f3` 15:33:03 PDT. **No GPU result yet** |
 | Mispredication probe, its failed control, the withdrawal | **Event work** | `e4ab195`, `b9f603b`, `81ca466`, all 12:05 PDT 2026-10-31 |
 | The historical mispredication table | **IMPORTED, not event work** | arrived in seed commit `636919a` 07:52 PDT, *"Seed Delphi Frontier with the verified artifacts"*; its generating script is **not in the repository** |
 | The claims corpus (1,190 with upstream ids) | **Imported** | `frontier_catalogue`; records read `local_status: imported_unreviewed` |

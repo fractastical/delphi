@@ -246,35 +246,44 @@ train a conditional diffusion model or latent operator on the sweeps, propose in
 and gate them on an exact solver and then on real experiments. **Nothing of this is built** — zero
 datasets, zero trained models, zero screened candidates, zero GPU hours.
 
-**And the architecture is not ours.** Comlekoglu et al. (arXiv:2505.09630, *Mach. Learn.: Sci.
-Technol.*) already trained a DDPM surrogate for a **Cellular-Potts model** of in vitro
-vasculogenesis at ~22x speedup — that is the forward half of our pipeline, in biology, on the same
-class of model we run. Bastek, Sun and Kochmann (ICLR 2025) published physics residuals inside
-diffusion training. GenCFD published conditional score-based diffusion over simulator statistics.
-Generate-then-verify with a solver gate is a 2025-26 literature across several domains. **We will
-not claim a first in diffusion for synthetic biology, and we are not asserting any IP position.**
+**One bounded pilot is already frozen.** A conditional DDPM surrogate for a 1-D Schnakenberg
+reaction-diffusion field: preregistration, solver, model and tests committed at **`9c56a927`**,
+the job packet and local CPU control receipts at **`4a5394f3`**, both this afternoon. Splits are
+by whole setting and whole seed, a shuffled-condition null sits among the baselines, and the
+non-claims list is written down. CPU controls pass and 13 tests pass; **there is no GPU result
+yet**, and everything above organism scale is unbuilt.
 
-What we would add is narrow: every synthetic datum carries the version hash of the claim whose
-equation licensed it, so a withdrawn claim identifies its own derived data and the models trained
-on it; and the exact solver carries scope conditions, because we have measured a textbook
-criterion that is wrong in windows. One web search found no prior art for retraction propagating
-into derived synthetic data — **that is a lead, not a proof that nobody has done it.**
+**We build on published work and we name it.** Comlekoglu et al. (arXiv:2505.09630,
+DOI 10.1088/2632-2153/ae11f8) trained a DDPM surrogate for a **Cellular-Potts model** of in vitro
+vasculogenesis at ~22x — a close biological precedent for the forward half, on a model class we
+also run. Bastek, Sun and Kochmann (arXiv:2403.14404, ICLR 2025) added physics residuals to
+diffusion training. GenCFD (arXiv:2409.18359) did conditional score-based diffusion over simulator
+statistics. Generate-then-verify with a solver gate is its own 2025-26 literature. **No first in
+diffusion for synthetic biology is claimed, and no IP position is asserted.**
 
-Full version with read-levels: `docs/research/generative-roadmap.md`.
+Our contribution is the loop around the surrogate: every synthetic datum carries the version of
+the claim whose equation licensed it, so a change in that claim's status identifies its own
+derived data; and the solver doing the rejecting carries scope conditions, because we measured a
+textbook criterion that is wrong in windows. One web search found no prior art for retraction
+propagating into derived synthetic data — **a lead, not a proof of absence.**
+
+Full version with read-levels and the pilot's frozen hashes:
+`docs/research/generative-roadmap.md`. Live page: `#/generative`.
 
 **Q9. "Isn't that circular? You train on your simulator and verify with your own solver."**
 
-**Yes, and we will say so before you do.** Everything upstream of a wet-lab measurement is
-model-consistency checking, not biology. The circularity is not removed by solver rigour; it is
-broken only by real experiments, which we have not done. The same objection is already live in the
-literature — a reviewer note on a diffusion-based electromagnetic inverse-design paper raises it,
-and the standard reply is that one forward solver for both is common practice, which is a
-description of the convention rather than a defence of it.
+**Yes, within the simulator's scope, and that is on our own page.** Everything upstream of a real
+measurement is model-consistency checking. The same question is live in the field — a reviewer note
+on a diffusion-based electromagnetic inverse-design paper raises it, and the usual reply is that
+one forward solver for both is standard practice, which describes the convention rather than
+settling it.
 
-What the commons adds is that the circularity is **declared**: the claim that licensed the
-equation, its review status and its scope conditions ride along with the generated data, so a
-reader can see which model's consistency was checked. That is worth something. It is not worth
-calling a validated result.
+Three things follow. The pilot's preregistration states its non-claims explicitly, so the scope is
+fixed before any result exists. The claim that licensed the equation, its review status and its
+scope conditions travel with the generated data, so a reader can see *which* model's consistency
+was checked — a real improvement over a surrogate whose training distribution is undocumented. And
+calibration against real measurement is a milestone in its own right, which is where the loop
+closes.
 
 **Q10. "Why should I believe your counts?"**
 
