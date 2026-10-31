@@ -1,6 +1,6 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 02:34PM PDT.
+Coordinator: codex-03. Updated October 31, 2026, 02:41PM PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-008 define acceptance. This board supersedes the earlier 1:48pm snapshot.
 Every status distinguishes implementation, integration, publication and biological validation.
@@ -37,9 +37,9 @@ Every status distinguishes implementation, integration, publication and biologic
 - [x] Dedicated infrastructure lead assigned: native infra_director owns the ready queue, dispatch coordination, dated provider snapshots and useful utilization. GPUops and bioservices retain their current jobs; no duplicate dispatch.
 - [x] Knowledge bottleneck measured: the client waited for 27 catalogue requests (~7.3 MB) before rendering. Backend hydration separately opens one connection per result. These are measured causes, not an assumed overload.
 - [x] Site branch ba436d1 implements cursor infinite scroll, abort/retry/loading/end states and accessible Load more; 43 browser tests reported by its author. Root integration/deployment pending.
-- [x] Same branch puts the fish above Frontier questions and adds the six-model printable selector to both Home and Frontier. STL downloads were individually fetched and digest checked on the live site; printer preparation remains unverified.
+- [x] Deployed branch puts the fish above Frontier questions and adds the six-model printable selector to both Home and Frontier. STL downloads were individually fetched and digest checked on the live site; printer preparation remains unverified.
 - [x] MCP branch b97f88c adds nine bounded discovery/project/artifact/calculation tools; author reports 34 official SDK tests. Root integration/deployment pending. Existing public endpoint passed 12 root production checks at 2:07pm PDT.
-- [ ] Deploy and independently check one exact combined release, including the Knowledge fixes, fish/download placement and expanded MCP.
+- [x] Deployed exact release c804b317b2afe3e6d180141de134e03606c2e910. Root 43 browser checks and scratch runtime checks passed; public web 8 checks and expanded MCP 33 checks passed (18 tools, actual bounded calculations). Native performance read: first 50 claims 322.7 ms, one 274089-byte request; previous 26 requests / 7.09 MB and~10.14 s. These are single captured samples, not latency guarantees.
 - [ ] Add exact-version project/subsystem design challenges, cited evidence, alternatives and falsifiable next tests. Native resource_scaling owns contract/API/MCP; root owns web integration; site owner owns readable project discussion. Debate does not establish biological plausibility.
 - [ ] Publish the prepared wind-tunnel, data-derived controls, scale-growth, lifecycle, behavior and assurance surfaces after checking lineage and numerical limits.
 - [ ] Finish corpus imports for new genomics, behavior, lifecycle, assurance and render evidence; audit all Project pins and remaining artifact gaps.
@@ -47,7 +47,7 @@ Every status distinguishes implementation, integration, publication and biologic
 
 ## Current resource evidence
 
-Provider read at 2:32:40pm PDT, October 31: Evo2 arm B aijob-e00pywdm4ta362pwrh RUNNING; wind-tunnel P9 aijob-e00se2hy8rdykbfrbf IMAGE_PULLING. Four active jobs across the shared project. This is allocation state, not GPU kernel utilization. Prior telemetry retains its own time window.
+Provider read at 2:37:31pm PDT: Evo2 arm B completed; our P9 wind-tunnel and dt/4 jobs were pulling images (zero of ours computing then). Infrastructure lead subsequently dispatched aijob-e00cqbmnzwmvms8ayr: 357 missing perturbations + 48 fixed repeats. Our startup/run pipeline now contains three jobs, not a claim of three busy GPUs. Next prepared packet: actual N1 mesh at angles of attack 0/4/12 degrees, 24/48 grids, conditional on CUDA parity; remains 2D low-Re and cannot establish flight aerodynamics. Prior telemetry retains its own time window.
 
 - [x] Canonical Delphi import: all 1,190 Claims in the latest fetched catalogue are present, imported_unreviewed. Root independently queried that count. This does not establish scientific acceptance or future upstream completeness.
 - [x] Corpus recovery reports 1,543 imported_unreviewed records, zero forks, all 13 Project members pinned and 73 MorphoLib records imported; exact receipts c324e10/7ac62ae/b58006c. Two MorphoLib models have no remediation Problem, so the correct total is 73, not 75.
@@ -67,7 +67,7 @@ Provider read at 2:32:40pm PDT, October 31: Evo2 arm B aijob-e00pywdm4ta362pwrh 
 - [x] Project migration/store checks passed; circular snapshot dependency fixed,12 project tests and build check passed.
 - [ ] Finish new combined integration run: one old graph fixture used Project as an unknown kind; now updated to FutureRecord because Project became real. Re-run that criterion.
 - [ ] Commit/rebuild current site snapshot, run public scratch browser, publish ONE exact SHA, verify live, send independent critic the release.
-- [ ] Deploy remote MCP at /mcp using that same release; verify public reads and per-request authenticated writes.
+- [x] Deploy remote MCP at /mcp using the same release; public reads and invalid/anonymous write rejection checked. Typed authenticated proposal/lease flow exercised in isolated SDK tests; shared contributor identity checked against production without a scientific write.
 - [ ] Import genomic/simulation/render/geometry bundles and a repinned Project; link locally hosted media by actual digest.
 - [ ] Ship equation/assurance registry, candidate comparison, regional overlay and open-question/action links.
 - [ ] Ship bounded scale-growth and lifecycle/bioprint constraint slice with explicit missing mechanisms.

@@ -19,9 +19,12 @@ HTTPS; anonymous writes and an invalid supplied token were rejected. The twelve
 checks are recorded in `deploy/receipts/mcp-public-check.json`. No scientific
 record was written. A plain browser GET receives405: use an MCP client.
 
-The currently deployed endpoint exposes six read tools and three credentialed
-contribution tools. This source branch adds nine bounded read/calculation tools;
-the deployed endpoint will expose them only after the owner deploys this branch.
+The endpoint at release `c804b31` exposes fifteen read/calculation tools and three
+credentialed contribution tools. The official public client completed 33 checks,
+including an actual simulation, constraint solve, formalization, belief calculation,
+exact Project lookup and hash-checked print asset lookup. The receipt is
+`deploy/receipts/mcp-expanded-check.json`. These calculations wrote no scientific
+records. Discovery used its explicit lexical fallback in that check.
 Start with `frontier_capabilities`, then use exact refs from `frontier_search`,
 `frontier_discover` or `frontier_graph` with `frontier_get`.
 

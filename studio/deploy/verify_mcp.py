@@ -10,10 +10,16 @@ from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
+import sys
 
 import httpx
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
+
+# Running this file directly puts deploy/, rather than the checkout, on sys.path.
+# Expanded checks reuse the repository's fixed request fixtures.
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 
 
 async def verify(url: str, expanded: bool = False) -> dict:
