@@ -137,6 +137,8 @@ with sync_playwright() as p:
     print("AUTOCOMPLETE:", pg.locator("#ac-list .acf").inner_text().replace("\n", " ")[:120])
     pg.goto(base + "/index.html#/knowledge"); pg.wait_for_selector(".claimcards .claimcard", timeout=30000)
     kc = pg.locator("#cbrowse .count").inner_text(); print("CLAIM BROWSER:", kc); assert "read from the live node" in kc and int(kc.split(" ")[0]) >= 21
+    pg.goto(base + "/index.html#/graph/Problem/F001"); pg.wait_for_selector("#gv .g-node", timeout=20000)
+    gt = pg.locator("#gwrap").inner_text(); print("GRAPH:", gt[:120].replace("\n", " ")); assert pg.locator("#gv .g-node").count() >= 2, "F001 depends on F004: two nodes expected"
     att = pg.context.request.get(base + "/api/attention"); print("ATTENTION", att.status, att.text()[:160].replace("\n", " ")); assert att.status in (200, 503)
     assert not errs, errs
     print("ALL LIVE CHECKS PASSED"); b.close()

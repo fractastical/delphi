@@ -307,7 +307,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["home", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -435,3 +435,18 @@ def test_claim_browser_filters_cards_and_drills_down(browser, base):
     assert int(pg.locator("#cbrowse .count").inner_text().split(" ")[0]) < n
     pg.locator(".claimcard a").first.click()
     pg.wait_for_selector(".entmain h2:has-text('Statement')", timeout=15000)
+
+
+def test_graph_view_exists_is_keyboard_operable_and_says_how_it_was_built(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/entity/Claim/turing-ddi")
+    pg.wait_for_selector(".entside a:has-text('neighbourhood graph')")
+    pg.click(".entside a:has-text('neighbourhood graph')")
+    pg.wait_for_selector("#gv svg .g-node", timeout=15000)
+    assert "Derived in this browser" in pg.locator("#gwrap").inner_text()
+    assert "Zoom in" in pg.locator(".gtools").inner_text()
+    pg.locator("#gv .g-node").first.focus()
+    pg.keyboard.press("Enter")
+    assert "Open the page" in pg.locator("#gdetail").inner_text()
+    pg.goto(base + "#/graph/Claim/no-such")
+    pg.wait_for_selector("text=could not be built", timeout=15000)
