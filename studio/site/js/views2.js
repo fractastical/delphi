@@ -132,6 +132,8 @@
           <p class="note small">For each constraint, the unresolved questions that stop it from being strengthened or trusted further. They update with the candidate's results; each opens on the whiteboard.</p>
           <div id="oqlist"></div></section>
 
+        <section class="panel" aria-labelledby="rr-h"><h2 id="rr-h">Recorded results: Lean receipt and simulation</h2>${recordedResults(snap)}</section>
+
         <section class="panel" aria-labelledby="sv-h"><h2 id="sv-h">Solver candidates and simulation</h2>
           <div class="two">
             <article><h3>Solver candidates</h3><p>None attached to this snapshot. A solver returns satisfiable, unsatisfiable, unknown or timeout; the page will show whichever it returns, never a default.</p>
@@ -142,6 +144,34 @@
       after(root) { wireEngineering(root, snap); },
     };
   };
+
+  function recordedResults(snap) {
+    const L = snap.lean_receipt, S = snap.simulation; const fx = (x, d = 4) => (x === null || x === undefined ? "n/a" : fmt(x, d));
+    const lean = L ? html`<article class="card"><h3>Lean check (offline receipt)</h3>
+        <p>${U.pill(L.all_ok ? "all checks as recorded" : "recorded failure", L.all_ok ? "ok" : "no")} ${U.pill("not run by this page", "warn")}</p>
+        <p class="small">${L.lean_version}. Mathlib ${String(L.mathlib_rev).slice(0, 12)}, toolchain ${L.toolchain}. Receipt <code>${L.path}</code> sha256 ${U.sha(L.sha256)}.</p>
+        <ul><li>Positive file: exit <b>${L.positive.exit}</b> in ${L.positive.seconds} s; axioms used ${(L.positive.axioms_used || []).join(", ")}${L.positive.only_standard_axioms ? " (standard only)" : " (NON-standard axiom present)"}.</li>
+        <li>Negative controls (altered law or corrupted certificate): exit ${L.negative.exit}; each block rejected: ${Object.entries(L.negative.each_block_rejected || {}).map(([k, v]) => `${k}: ${v ? "rejected" : "ACCEPTED"}`).join(", ")}.</li></ul>
+        <p class="note small"><b>What this does and does not show.</b> It checks that a specific conflict certificate for three encoded constraints (level-lift proxy, minimum wing loading, maximum speed) is valid, and that mutated laws fail. It is a statement about the encoding of those constraints, not about any fish. The solver's other verdicts are z3 verdicts with no Lean check, and the solve endpoint reports Lean as not run.</p></article>`
+      : html`<article class="card"><h3>Lean check</h3><p class="empty">No Lean receipt is present in this tree. Nothing is shown in its place.</p></article>`;
+    if (!S) return html`<div class="cards">${lean}<article class="card"><h3>Simulation</h3><p class="empty">No recorded simulation results are present in this tree (looked for <code>engineering/simulation/results/summary.json</code>). There is also no mesh or print geometry. Nothing is drawn in their place.</p></article></div>`;
+    const m = S.summary; const c = S.controls || {}; const f = S.findings || {};
+    const ctl = Object.entries(c).filter(([k, v]) => typeof v === "object" && v !== null).map(([k, v]) => html`<tr><td>${k.replace(/_/g, " ")}</td><td>${v.rel_err !== undefined ? fx(v.rel_err, 3) : v.max_rel_drift !== undefined ? fx(v.max_rel_drift, 3) : v.rel_diff !== undefined ? fx(v.rel_diff, 3) : ""}</td><td>${v.tol !== undefined ? v.tol : ""}</td></tr>`);
+    const sim = html`<article class="card"><h3>Glide simulation (${m.model_version}) ${U.pill("simulated", "ev")}</h3>
+        <p class="small">${m.n_designs} designs, ${m.n_pareto} on the Pareto set, ${m.n_unconverged} unconverged; largest step-halving range difference ${fx(m.max_dt_half_rel_diff, 3)}. Monte Carlo n = ${m.mc_n}, seed ${m.mc_seed}.
+          Nominal assumptions: ${Object.entries(m.nominal_assumptions || {}).map(([k, v]) => k + " = " + v).join(", ")}. These coefficients are model assumptions, not measurements.</p>
+        <div class="tablewrap"><table><thead><tr><th>Numerical control</th><th>Error or drift</th><th>Tolerance</th></tr></thead><tbody>${ctl}</tbody></table></div>
+        <p class="small">All controls pass: <b>${String(c.all_pass)}</b>.</p>
+        ${f.interpretation ? html`<p class="note warn small"><b>The authors' own caveat.</b> ${f.interpretation}</p>` : ""}</article>`;
+    const fig = (S.files || []).find((x) => x.name === "figure.png");
+    const par = S.pareto_selected || [];
+    return html`<div class="cards">${lean}${sim}</div>
+      ${fig ? html`<figure class="simfig"><img src="${fig.href}" alt="Recorded simulation figure from the glide sweep" loading="lazy"><figcaption class="small faint">Figure as recorded (<code>${fig.path}</code>, sha256 ${U.sha(fig.sha256)}). Simulated point-mass glides, not a fish and not CFD.</figcaption></figure>` : ""}
+      ${par.length ? html`<details class="pareto"><summary><b>${par.length} selected Pareto designs (simulated)</b>: open the table</summary><p class="small faint">Objectives: ${(m.pareto_objectives || []).join("; ")}. Range quantiles come from the Monte Carlo over the priors above. Use one as the candidate to compare it against the constraint flags; the standard length stays unknown.</p>
+        <div class="tablewrap"><table><thead><tr><th>m (kg)</th><th>S (m²)</th><th>b (m)</th><th>AR</th><th>WL (N/m²)</th><th>range q10 / q50 / q90 (m)</th><th>sink (m/s)</th><th>L/D</th><th></th></tr></thead><tbody>${par.map((d, i) => html`<tr><td>${fx(d.m, 3)}</td><td>${fx(d.S, 3)}</td><td>${fx(d.b, 3)}</td><td>${fx(d.AR, 3)}</td><td>${fx(d.WL, 3)}</td><td>${fx(d.range_q10, 3)} / ${fx(d.range_q50, 3)} / ${fx(d.range_q90, 3)}</td><td>${fx(d.sink_eq_ms, 3)}</td><td>${fx(d.LoD_eq, 3)}</td><td><button class="btn small ghost" type="button" data-pareto="${i}">Use as candidate</button></td></tr>`)}</tbody></table></div></details>` : ""}
+      <p class="small">Files: ${(S.files || []).map((x) => html`<a href="${x.href}">${x.name}</a> (${x.bytes} bytes, ${U.sha(x.sha256)}) `)}</p>
+      <p class="small faint">There is no mesh or print-geometry artifact in this tree; the drawing above is a parametric visualisation, not a validated model.</p>`;
+  }
 
   function readForm(form) {
     const c = F.blank(); const errors = {};
@@ -186,6 +216,13 @@
     root.querySelectorAll("[data-preset]").forEach((b) => b.addEventListener("click", () => {
       const p = m.presets.find((x) => x.id === b.dataset.preset); DF.cand = F.applyPreset(p, m); DF.candLabel = p.name; writeForm(form, DF.cand);
       root.querySelector("#presetnote").textContent = p.name + ": " + p.note; update(false);
+    }));
+    root.querySelectorAll("[data-pareto]").forEach((b) => b.addEventListener("click", () => {
+      const d = snap.simulation.pareto_selected[+b.dataset.pareto]; const c = F.blank();
+      c.mass_kg = +d.m.toPrecision(6); c.span_m = +d.b.toPrecision(6); c.aspect_ratio = +d.AR.toPrecision(6);
+      DF.cand = c; DF.candLabel = `Pareto design ${+b.dataset.pareto + 1} (simulated, glide-pointmass)`; writeForm(form, c);
+      root.querySelector("#presetnote").textContent = DF.candLabel + ": mass, span and aspect ratio from a simulated sweep. Standard length is unknown."; update(false);
+      form.scrollIntoView({ block: "start" });
     }));
     root.querySelector("#resetc").addEventListener("click", () => { DF.cand = F.blank(); DF.candLabel = "nothing declared"; writeForm(form, DF.cand); root.querySelector("#presetnote").textContent = "Cleared. Every check is now unknown."; update(false); });
     root.querySelector("#dlc").addEventListener("click", () => {
@@ -257,6 +294,8 @@
         <p class="note small">These two records were produced by earlier work and are shown with their own caveats. The cavefish result is a reproduction on public data, not a discovery; its biological interpretation is labelled separately in the document. The KCNE1 protocol stopped at its preregistered floor: a failed input gate is evidence about the proposed action.</p>
         <div class="cards">${docs.filter((d) => /results/.test(d.path)).map((d) => html`<article class="card"><h3>${d.title}</h3><p>${d.status_line ? d.status_line : ""}</p><p class="small">${U.src("doc:" + d.id, "Open the full document")} · sha256 ${U.sha(d.sha256)} · <a href="${d.href}">raw file</a></p></article>`)}</div></section>
 
+      ${attestationSection(snap)}
+
       <section class="panel" aria-labelledby="ev-a"><h2 id="ev-a">Artifacts index</h2>
         <p class="note small">Data, proofs, simulations, geometry, code and documents, each with its exact source, the context it was made in, the check it passed or failed, any dispute, and the next action. A digest in a record is a declaration, not a byte verification. <b>No simulation or geometry artifact is indexed in this snapshot.</b></p>
         <form class="filters" data-form="evidence" aria-label="Filter artifacts"><label>Type <select name="at"><option value="">all</option>${["data", "proof", "simulation", "geometry", "protocol", "code", "document"].map((t) => html`<option ${t === (route.params.at || "") ? raw("selected") : ""}>${t}</option>`)}</select></label><input type="hidden" name="rl" value="${f.rl}"><button class="btn" type="submit">Apply</button></form>
@@ -280,6 +319,8 @@
   const ROLE_TYPE = { input: "data", output: "data", code: "code", environment: "code", protocol: "protocol", log: "document", certificate: "proof", geometry: "geometry" };
   DF.artifactIndex = (snap) => {
     const rows = snap.mission.artifacts.map((a) => ({ ...a }));
+    if (snap.simulation) snap.simulation.files.forEach((f) => rows.push({ title: "Glide sweep: " + f.name, type: /png|csv/.test(f.name) ? (f.name.endsWith("csv") ? "data" : "simulation") : "simulation", source: `${f.path} · sha256 ${f.sha256.slice(0, 12)}… · ${f.bytes} bytes`, url: null, download: f.href, context: `${snap.simulation.summary.model_version}; ${snap.simulation.summary.evidence_kind}; assumptions are the model's, not measurements`, check: `step-halving and analytic controls: all pass = ${snap.simulation.controls && snap.simulation.controls.all_pass}`, dispute: "The authors flag release-speed convention and mass dropping out as model artefacts.", next: "Replace constant coefficients with sourced values before reading any trend biologically." }));
+    if (snap.lean_receipt) rows.push({ title: "Lean receipt for the constraint certificate", type: "proof", source: `${snap.lean_receipt.path} · sha256 ${snap.lean_receipt.sha256.slice(0, 12)}…`, url: null, context: `Lean ${snap.lean_receipt.lean_version.split(",")[0]}; offline run`, check: `positive exit ${snap.lean_receipt.positive.exit}, standard axioms only = ${snap.lean_receipt.positive.only_standard_axioms}; all mutants rejected = ${Object.values(snap.lean_receipt.negative.each_block_rejected || {}).every(Boolean)}`, dispute: "Covers three encoded constraints only; not biology.", next: "Extend to further constraints only with their own mutants." });
     snap.claims.forEach((c) => c.evidence.filter((e) => /compilation|formal/.test(e.kind)).forEach((e) => rows.push({ title: e.label, type: "proof", source: e.url, url: e.url, context: c.label + ". " + c.context.slice(0, 200) + (c.context.length > 200 ? "…" : ""), check: e.kind + " (upstream receipt; not re-run here)", dispute: DF.CATEGORY[c.category].text + ". " + (c.category === "unchecked" ? "" : c.finding.slice(0, 160)), next: c.next_action })));
     return rows;
   };
@@ -287,31 +328,18 @@
     context: (it.context || "") + (it.relation ? ` (relation: ${it.relation}; target ${it.target ? it.target.kind + " " + it.target.id : "?"}${it.produced_by ? "; produced by " + it.produced_by.id : ""})` : ""), check: `${it.evidence_kind || "evidence"}; local status ${String(it.local_status || "not reported").replace(/_/g, " ")}; digest declared, bytes ${it.artifact_bytes_verified ? "verified" : "not verified"}`,
     dispute: it.relation === "refutes" ? "This evidence refutes its target." : "", download: a.availability === "downloadable" && /^https:/.test(a.uri || "") ? a.uri : null, next: (it.limitations || []).join("; ") }; });
 
-  /* ---------------- WORK ---------------- */
-  DF.views.work = function (snap) {
-    const live = DF.api.state.mode === "live";
-    return {
-      html: html`<section class="pagehead"><h1>Work</h1><p class="lede">Agents, capabilities, leases, resources and contributions. This page shows only what a connected runtime reports, plus what the repository declares. It does not draw activity that is not there.</p></section>
-      <section class="panel" aria-labelledby="w-r"><h2 id="w-r">Runtime</h2>
-        <p>${U.pill(live ? "live runtime" : "snapshot only", live ? "ok" : "warn")} ${DF.api.state.reason}.</p>
-        ${live ? html`<p>Namespace: <code>${DF.api.state.health.namespace || "not reported"}</code>.</p>` : html`<p class="note small">No runtime is connected, so there are no agents, leases, resources or contributions to show. Nothing below is simulated.</p>`}</section>
-      <section class="panel" aria-labelledby="w-e"><h2 id="w-e">Events, leases and contributions</h2><div id="events" role="status">Loading…</div></section>
-      <section class="panel" aria-labelledby="w-c"><h2 id="w-c">Declared capabilities (MCP tools)</h2>
-        <p class="note small">Declared in the repository's MCP server, tested only with the official SDK client. A declared tool is not demonstrated competence; availability and observed success are separate facts, and no success receipts are attached here.</p>
-        <div class="tablewrap"><table><thead><tr><th>Tool</th><th>Mode</th><th>Documented in docs/mcp.md</th></tr></thead><tbody>${snap.capabilities.map((t) => html`<tr><td><code>${t.name}</code></td><td>${t.mode}</td><td>${t.documented_in_docs_mcp ? "yes" : "no"}</td></tr>`)}</tbody></table></div>
-        <p class="small">Writes need the <code>--allow-write</code> flag and an operator credential kept outside prompts. Contributions stay <i>proposed</i>; the executor cannot certify its own work. ${U.src("doc:mcp", "Read the MCP document")}</p></section>
-      <section class="panel" aria-labelledby="w-p"><h2 id="w-p">Planned assignments (as written in the repository)</h2>
-        <p class="note small">From <code>tasks/BUILD.md</code> at ${snap.label}. This is a plan with owners and acceptance text, <b>not live status</b>: nothing here says that any item is running, finished or healthy.</p>
-        <div class="tablewrap"><table><thead><tr><th>Priority</th><th>Deliverable</th><th>Owner</th><th>Status text at snapshot</th></tr></thead><tbody>${snap.board.map((r) => html`<tr><td>${r.priority}</td><td>${r.deliverable}</td><td>${r.owner}</td><td>${r.status_text}</td></tr>`)}</tbody></table></div></section>
-      <section class="panel" aria-labelledby="w-h"><h2 id="w-h">How work is counted</h2>
-        <p>Results, reuse and compute counts will appear only when derived from run receipts and recorded edges. Counts of test definitions, generated records or submitted jobs are not successful executions, and this page shows none of them.</p></section>`,
-      async after(root) {
-        const host = root.querySelector("#events");
-        try { const r = await DF.api.events(); host.innerHTML = r.events.length ? html`<p class="small faint">Events are records emitted by the store, in sequence order; they say what was recorded, not that it is correct.</p><div class="tablewrap"><table><thead><tr><th>#</th><th>Kind</th><th>Id</th><th>Issuer</th><th>Created</th></tr></thead><tbody>${r.events.map((e) => html`<tr><td>${e.sequence}</td><td>${e.kind}</td><td><code>${e.id}</code></td><td>${e.issuer || ""}</td><td>${e.created_at || ""}</td></tr>`)}</tbody></table></div>${r.next_cursor ? html`<p class="small faint">More events exist than shown.</p>` : ""}`.toString() : `<p class="empty">${esc(r.note || "The runtime reports no events.")} No agents, leases or contributions are displayed.</p>`; }
-        catch (e) { host.innerHTML = `<p class="empty">Could not read events: ${esc(e.message)}. Nothing is displayed in their place.</p>`; }
-      },
-    };
-  };
+  function attestationSection(snap) {
+    const A = snap.attestation_check; if (!A) return "";
+    const t = A.tally || {}; const sup = t.quote_supports_stance || {}; const fit = t.fit_to_question || {};
+    return html`<section class="panel" aria-labelledby="ev-att"><h2 id="ev-att">Curation example: an exact quote is not an answered question</h2>
+      <p class="note warn"><b>${A.n} items, hand-picked by a hashed rule. Not a population rate.</b> ${A.scope}</p>
+      <div class="four"><article><h3>Check 1: is the quote in the source?</h3><p><b>${A.status_counts.verified || 0} of ${A.n}</b> quotes were found in the retrieved full text, matched exactly after one normalisation. Mechanical, with controls in the script.</p></article>
+        <article><h3>Check 2: does it support the stance?</h3><p>Single-reader judgment from the quote and its section, papers not read in full: supports ${sup.yes || 0}, partly ${sup.partly || 0}, no ${sup.no || 0}.</p></article>
+        <article><h3>Does it cover the question?</h3><p>Direct ${fit.direct || 0}, partial ${fit.partial || 0}. Only <b>${t.clean_yes_and_direct_no_flags}</b> of ${A.n} are a clean yes and direct with no flag.</p></article></div>
+      <p class="small">The gap this shows: a quote can be present and still not state what the stance claims, or answer only part of the question. A hash or a matched string establishes neither. ${U.src("doc:" + A.readme, "Read the full write-up")}</p>
+      <div class="tablewrap"><table><thead><tr><th>Item</th><th>Stance</th><th>Quote in source</th><th>Supports stance</th><th>Covers question</th><th>Flags and the reviewer's note</th></tr></thead><tbody>
+        ${A.items.map((x) => html`<tr><td><b>${x.slug}</b><br><span class="faint small">${x.source || ""}${x.article_year ? " · " + x.article_year : ""}</span></td><td>${x.stance}</td><td>${x.mechanical_status}</td><td>${U.pill(x.supports, x.supports === "yes" ? "ok" : x.supports === "no" ? "no" : "warn")}</td><td>${U.pill(x.fit, x.fit === "direct" ? "ok" : "warn")}</td><td>${(x.flags || []).map((f) => U.pill(f.replace(/_/g, " "), "grp"))}<br><span class="small">${x.note}</span></td></tr>`)}</tbody></table></div></section>`;
+  }
 
   /* ---------------- BELIEF ---------------- */
   DF.views.belief = function (snap) {
@@ -332,9 +360,12 @@
         <p class="note small">Enter your own probabilities that each condition holds. The product assumes the four are independent, which they are not (mass enters C1 and C2 together). It is a way to see the shape of a bet, nothing more. It is not saved, not submitted, and is not scored.</p>
         <form id="scratch" class="scratch" novalidate>${[["v1", "V1 wing loading within envelope"], ["v2", "V2 launch speed reachable"], ["v3", "V3 no stability flag"], ["v4", "V4 no novel-appendage flag"]].map(([k, l]) => html`<div class="field"><label for="p-${k}">${l} <span class="unit">probability 0–1</span></label><input id="p-${k}" name="${k}" type="number" step="0.01" min="0" max="1" placeholder="not entered"></div>`)}</form>
         <p id="scratchout" class="verdictbox" role="status">Enter all four to see the product under independence.</p></section>
-      <section class="panel" aria-labelledby="b-a"><h2 id="b-a">Belief and forecast interface</h2>
-        <p>The belief/forecast service is not connected, so no stored belief appears here.</p>
-        <button class="btn small" type="button" id="beliefreq">Request beliefs for this mission</button><div class="adapter-out" id="beliefout" role="status"></div></section>`,
+      <section class="panel" aria-labelledby="b-a"><h2 id="b-a">Belief solver (declared scenario in, labelled result out)</h2>
+        <p class="note warn small"><b>Uncalibrated.</b> The result is the arithmetic consequence of the priors, factors, utilities and costs written in the scenario. Calibration against outcomes is unknown. It is not a truth score and not a measurement. The scenario below is the module's bundled <b>declared illustration</b>: no variant, assay or paper is referenced, and nothing in it was observed.</p>
+        <label for="scen" class="small"><b>Scenario JSON</b> (schema frontier-beliefs-0.1; numbers are ints or "p/q" strings, never floats)</label>
+        <textarea id="scen" rows="14" spellcheck="false" class="scen"></textarea>
+        <p><button class="btn small" type="button" id="beliefreq">Solve this scenario</button> <button class="btn small ghost" type="button" id="scenreset">Reset to the example</button></p>
+        <div id="beliefout" role="status"></div></section>`,
       after(root) {
         const nodes = [{ id: "V1", label: "V1 C1: wing loading ≤ 208.9", col: 0, row: 0, cls: "cur" }, { id: "V2", label: "V2 C2: launch speed reachable", col: 0, row: 1, cls: "cur" }, { id: "V3", label: "V3 C4: stability flag", col: 0, row: 2, cls: "cur" }, { id: "V4", label: "V4 C6a: novel-appendage flag", col: 0, row: 3, cls: "cur" },
           { id: "F1", label: "F1 rule: no flag raised", col: 1, row: 1, cls: "gen", sub: "factor" }, { id: "V5", label: "V5 no flag raised by these checks", col: 2, row: 1, cls: "cur" }];
@@ -350,12 +381,35 @@
           if (nums.some((n) => !isFinite(n) || n < 0 || n > 1)) { out.textContent = "Each probability must be between 0 and 1."; return; }
           out.textContent = `Product under independence: ${(nums.reduce((a, b) => a * b, 1)).toFixed(3)}. Your own arithmetic; not a forecast, not saved, not truth status.`;
         });
+        const ta = root.querySelector("#scen"); const ex = snap.belief_example;
+        ta.value = ex ? JSON.stringify(ex, null, 2) : "";
+        root.querySelector("#scenreset").addEventListener("click", () => { ta.value = ex ? JSON.stringify(ex, null, 2) : ""; root.querySelector("#beliefout").innerHTML = ""; });
         root.querySelector("#beliefreq").addEventListener("click", async () => {
-          const o = root.querySelector("#beliefout"); try { await DF.api.belief(); } catch (e) { o.className = "adapter-out unavailable"; o.textContent = e.name === "Unavailable" ? `Not connected: ${e.adapter}. ${e.detail}` : "Request failed: " + e.message; }
+          const o = root.querySelector("#beliefout"); let sc;
+          try { sc = JSON.parse(ta.value); } catch (e) { o.className = "adapter-out unavailable"; o.textContent = "The scenario is not valid JSON: " + e.message; return; }
+          o.className = "adapter-out"; o.textContent = "Solving…";
+          try { o.innerHTML = beliefResult(await DF.api.belief(sc)); }
+          catch (e) { o.className = "adapter-out unavailable"; o.innerHTML = html`${e.name === "Unavailable" ? `Not connected: ${e.adapter}. ${e.detail}` : e.message}${e.envelope && e.envelope.assumed_scope ? html`<p class="small">Calibrated: <b>${String(e.envelope.calibrated)}</b>. ${e.envelope.assumed_scope}</p>` : ""}`.toString(); }
         });
       },
     };
   };
+
+  /* Contract (docs/beliefs.md): guard on status === "ok" only; parse "p/q" exactly; an action may be {status: "impossible-under-its-assumptions"}. */
+  function beliefResult(env) {
+    const R = env.result || {}; const ok = env.status === "ok" && R.status === "ok"; const ex = (x) => DF.exact(x);
+    const head = html`<div class="verdictbox"><div class="vlabel">${ok ? "solved" : env.status === "ok" ? R.status : env.status}</div>
+      <p class="small">${env.schema} · calibrated: <b>${String(env.calibrated)}</b> · input <code>${(R.input_hash || "").slice(0, 16)}</code> · output <code>${(R.output_hash || "").slice(0, 16)}</code></p>
+      <p class="note small"><b>Scope.</b> ${env.assumed_scope || ""}</p>${R.metadata && R.metadata.calibration ? html`<p class="small"><b>Calibration.</b> ${R.metadata.calibration}</p>` : ""}</div>`;
+    if (!ok) return html`${head}${(R.reasons || []).length ? html`<h4>Reasons</h4><ul>${R.reasons.map((x) => html`<li>${typeof x === "string" ? x : JSON.stringify(x)}</li>`)}</ul>` : ""}${(R.duplicate_paths || []).length ? html`<h4>Duplicate evidence paths</h4><pre class="json">${JSON.stringify(R.duplicate_paths, null, 1)}</pre>` : ""}${R.diagnostics ? html`<h4>Diagnostics</h4><pre class="json">${JSON.stringify(R.diagnostics, null, 1)}</pre>` : ""}<p class="small faint">No posterior or decision is shown: the solver did not produce one.</p>`.toString();
+    const vars = Object.entries(R.variables || {}); const dec = R.decision || {}; const acts = Object.entries(dec.actions || {});
+    return html`${head}
+      <h4>Posterior (under the declared priors and factors)</h4><div class="tablewrap"><table><thead><tr><th>Variable</th><th>Event and context</th><th>Posterior</th><th>Notes</th></tr></thead><tbody>${vars.map(([id, v]) => html`<tr><td><b>${id}</b></td><td>${v.event}<br><span class="faint small">${v.context}</span></td><td>${Object.entries(v.posterior || {}).map(([s, p]) => html`${s}: ${ex(p)}<br>`)}</td><td class="small">prior: ${v.prior_method}${v.prior_only ? "; no factor touches it" : ""}${(v.ruled_out_states || []).length ? "; ruled out: " + v.ruled_out_states.join(", ") : ""}</td></tr>`)}</tbody></table></div>
+      ${acts.length ? html`<h4>Decision: ${dec.question || dec.id}</h4><div class="tablewrap"><table><thead><tr><th>Action</th><th>Forecast of the outcome</th><th>Expected value</th></tr></thead><tbody>${acts.map(([a, x]) => x && x.expected_value !== undefined ? html`<tr><td><b>${a}</b>${x.assumes && x.assumes.length ? html`<br><span class="small faint">assumes ${JSON.stringify(x.assumes)} (conditioning, not intervention)</span>` : ""}</td><td>${Object.entries(x.forecast || {}).map(([s, p]) => html`${s}: ${ex(p)}<br>`)}</td><td>${ex(x.expected_value)}</td></tr>` : html`<tr><td><b>${a}</b></td><td colspan="2">${U.pill(String((x && x.status) || "no value returned").replace(/-/g, " "), "warn")} No forecast or expected value exists for this action.</td></tr>`)}</tbody></table></div>
+        <p>${(dec.tied || []).length ? html`Tied: ${dec.tied.join(", ")}. No preferred action.` : dec.preferred ? html`Preferred under these assumptions: <b>${dec.preferred}</b>, by an expected-value margin of ${ex(dec.ev_margin_over_runner_up)}.` : "No preferred action."}</p>
+        ${dec.preferred_changes_when ? html`<h4>What would change it</h4>${(dec.preferred_changes_when.breakeven || []).map((b) => html`<p class="small">Preferred action changes to <b>${b.versus}</b> when P(${b.state}) is ${b.preferred_changes_to_hold_when_p_is || "past"} ${ex(b.p_threshold)} (currently ${ex(b.current_p)}).</p>`)}<p class="small">Flipping assumptions: ${(dec.preferred_changes_when.flipping_assumptions || []).join("; ") || "none listed"}.</p><p class="note small">${dec.preferred_changes_when.scope} “No flip listed” is not robustness.</p>` : ""}` : ""}
+      <p class="small faint">Exact rationals shown as written, with a decimal after “≈”. Not stored, not submitted as a claim, not a forecast scored against anything.</p>`.toString();
+  }
 
   /* ---------------- CATALOG / SEARCH ---------------- */
   DF.catalogView = function (snap, route, head, base) {

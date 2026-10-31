@@ -77,6 +77,12 @@
     return { items: Array.isArray(r.items) ? r.items : [], next_cursor: r.next_cursor || null, source: "runtime" };
   }
 
+  /* GET /api/system: shape not yet specified by the runtime owner, so it is returned as received and shown as received. */
+  async function system() {
+    if (!isLive()) return { unavailable: true, reason: "no live runtime" };
+    try { return { report: await getJSON("api/system") }; } catch (e) { return { unavailable: true, reason: e.message }; }
+  }
+
   async function events() {
     if (isLive()) { const r = await getJSON("api/events?limit=50"); return { events: (r.events || []).map((e) => ({ sequence: e.sequence, kind: (e.envelope || {}).kind, id: (e.envelope || {}).id, version: (e.envelope || {}).version, issuer: (e.envelope || {}).issuer, created_at: (e.envelope || {}).created_at })), next_cursor: r.next_cursor || null, source: "runtime" }; }
     return { events: [], source: "snapshot", note: "A snapshot has no event stream." };
@@ -108,9 +114,22 @@
     }
     const out = await r.json(); out._submitted = body; return out;
   }
-  const belief = pending("belief / forecast");
+  /* POST /api/beliefs/solve with the scenario JSON; the envelope (including error bodies) comes back as the adapter built it. */
+  async function belief(scenario) {
+    if (!isLive()) throw new Unavailable("belief solver", "No runtime is connected, so nothing was solved and no result is shown.");
+    const sess = await getJSON("api/session", 5000); const csrf = sess.csrf;
+    if (!csrf) throw new Error("the session did not provide a CSRF token");
+    const r = await fetch("api/beliefs/solve", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json", "X-CSRF-Token": csrf }, body: JSON.stringify(scenario), cache: "no-store" });
+    let body = null; try { body = await r.json(); } catch (e) { /* not JSON */ }
+    if (!r.ok) { const e = new Error(`the belief solver refused the request (HTTP ${r.status}${body && body.error && body.error.code ? ", " + body.error.code : body && body.error ? ", " + body.error : ""})${body && body.error && body.error.message ? ": " + body.error.message : body && body.message ? ": " + body.message : ""}`); e.envelope = body; throw e; }
+    return body;
+  }
+  async function attention() {
+    if (!isLive()) return { unavailable: true, reason: "no live runtime" };
+    try { return { report: await getJSON("api/attention", 8000) }; } catch (e) { return { unavailable: true, reason: e.message }; }
+  }
   const simulate = pending("simulation");
   const propose = pending("proposal submission");
 
-  DF.api = { state, load, catalog, record, artifacts, events, solve, belief, simulate, propose, Unavailable, getJSON };
+  DF.api = { state, load, catalog, record, artifacts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
 })();
