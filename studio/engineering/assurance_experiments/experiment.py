@@ -37,6 +37,10 @@ def git(*args):
     return subprocess.check_output(["git", "-C", str(ROOT), *args], text=True).strip()
 
 
+def output_reference(path):
+    return str(Path(path).resolve().relative_to(ROOT))
+
+
 def protocol_receipt(path):
     path = Path(path).resolve()
     if path != ROOT / PROTOCOL_PATH:
@@ -166,7 +170,8 @@ def controls(protocol):
 
 def run_protocol(protocol_path, output_directory):
     protocol, frozen = protocol_receipt(protocol_path)
-    output = Path(output_directory)
+    output = Path(output_directory).resolve()
+    output_reference(output)  # Published references must remain inside this checkout.
     output.mkdir(parents=True, exist_ok=True)
     if git("status", "--porcelain", "--", "engineering/assurance_experiments", "engineering/fin_mechanics"):
         raise ValueError("commit model/assay code before producing published result artifacts")
@@ -177,14 +182,17 @@ def run_protocol(protocol_path, output_directory):
     draws = sample_parameters(protocol)
     results = [{"candidate": candidate, "runs": [trial(draw, candidate, protocol) for draw in draws]}
                for candidate in protocol["candidates"]]
-    context = [simulate_case({"L_m": .04, "EI_Nm2": draw["context_E_Pa"] * 1e-14, "q_N_m": .01}, "uniform", protocol)
+    context_settings = protocol["context_only"]
+    context = [simulate_case({"L_m": context_settings["source_values"]["typical_ray_length_m"],
+                             "EI_Nm2": draw["context_E_Pa"] * context_settings["source_values"]["I_average_m4"],
+                             "q_N_m": context_settings["declared_test_load_N_m"]}, "uniform", protocol)
                for draw in draws]
     all_results = {"schema": "frontier.fin-assurance.simulations/1", "evidence_kind": "simulated",
                    "protocol": frozen, "run_code_revision": git("rev-parse", "HEAD"), "draws": draws,
                    "candidates": results, "source_context_cases": context,
                    "context_scope": protocol["context_only"], "biological_success_probability": None}
     write_json(output / "all-simulations.json", all_results)
-    result_path = str((output / "all-simulations.json").relative_to(ROOT))
+    result_path = output_reference(output / "all-simulations.json")
     result_sha = sha(output / "all-simulations.json")
     ensembles = []
     for ci, candidate_result in enumerate(results):

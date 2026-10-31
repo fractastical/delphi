@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from engineering.assurance_experiments.experiment import (
-    controls, physical_inputs, predicate, protocol_receipt, sample_parameters, simulate_case, trial, wilson,
+    ROOT, controls, output_reference, physical_inputs, predicate, protocol_receipt, sample_parameters, simulate_case, trial, wilson,
 )
 
 PROTOCOL = Path(__file__).resolve().parents[1] / "engineering/assurance_experiments/protocol.json"
@@ -76,3 +76,11 @@ def test_conditional_interval_refuses_empty_ensemble():
     low, high = wilson(32, 64)
     assert 0 < low < .5 < high < 1
     assert wilson(0, 64)[0] == pytest.approx(0)
+
+
+def test_relative_output_paths_have_checkout_relative_receipts(monkeypatch):
+    monkeypatch.chdir(ROOT)
+    assert output_reference("artifacts/assurance-experiments/all-simulations.json") == "artifacts/assurance-experiments/all-simulations.json"
+    assert output_reference(ROOT / "artifacts/assurance-experiments/all-simulations.json") == "artifacts/assurance-experiments/all-simulations.json"
+    with pytest.raises(ValueError):
+        output_reference("/outside-checkout/assay.json")
