@@ -16,6 +16,7 @@ import json
 import math
 import os
 from pathlib import Path
+import platform
 import signal
 import subprocess
 import sys
@@ -185,10 +186,29 @@ def _calculate(data):
         except (ValueError, TypeError):
             raise _Invalid("Mechanobio parameters are outside the model envelope") from None
         source_files = result["provenance"]["code_files"]
+    # Capture only explicit runtime facts inside this actual numerical child.
+    # Never export os.environ, credentials, parent-only metadata or packages the
+    # selected model did not use. This identity is not a validation/calibration.
+    import numpy
+    scipy_version = None
+    if model == "mechanobio":
+        import scipy
+        scipy_version = scipy.__version__
+    environment = {"python": platform.python_version(), "python_implementation": platform.python_implementation(),
+                   "numpy": numpy.__version__, "scipy": scipy_version, "platform": platform.platform(), "machine": platform.machine(),
+                   "threads": {key: os.environ.get(key) for key in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "NUMEXPR_NUM_THREADS")},
+                   "capture_scope": "actual isolated simulation worker after model imports; scipy null means not used by this model"}
+    code = {"frontier/simulation_api.py": sha256(Path(__file__).read_bytes()).hexdigest(), "model_files": source_files}
+    model_input = result["simulationAction"]["input_sha256"] if model == "bioelectric" else result["provenance"]["input_sha256"]
+    source_context = result["source_envelope"] if model == "bioelectric" else {"model": result["model"], "source_receipt_sha256": result["provenance"].get("source_receipt_sha256")}
+    identity = {"request_sha256": _digest(data), "effective_request_sha256": _digest(effective),
+                "model_input_sha256": model_input, "code_sha256": _digest(code),
+                "source_context_sha256": _digest(source_context), "environment_sha256": _digest(environment),
+                "scope_sha256": _digest(SCOPE)}
     return _envelope("completed", model=model, result=result, request_sha256=_digest(data),
                      effective_request_sha256=_digest(effective), effective_request=effective,
-                     code_sha256={"frontier/simulation_api.py": sha256(Path(__file__).read_bytes()).hexdigest(),
-                                  "model_files": source_files},
+                     code_sha256=code, environment=environment, environment_sha256=identity["environment_sha256"],
+                     execution_identity=identity,
                      preview_limits=PREVIEW_LIMITS[model], elapsed_s=time.perf_counter() - started,
                      computed_at=datetime.now(timezone.utc).isoformat())
 
