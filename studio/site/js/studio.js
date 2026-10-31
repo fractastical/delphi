@@ -129,6 +129,7 @@
     const dkey = DRAFT_KEY(p.id, scale);
     return {
       html: html`<section class="pagehead"><p class="eyebrow"><a href="${DF.href("/studio")}">Studio</a> / project</p><h1>${p.title}</h1><p class="lede">${p.goal}</p>${sub}</section>
+        ${DF.designReviewPanel(snap, p)}
         ${PD ? projectDraftPanel(PD) : ""}
         <div id="assurance">${DF.assurancePanel(snap.assurance)}</div>
         <div class="studiogrid"><nav aria-label="Subsystems by scale" class="rail"><h2 class="small">Subsystems</h2><ol class="subsyslist">${rail}</ol></nav>
@@ -152,6 +153,7 @@
         const list = root.querySelector("#annlist"); const draw = () => { const d = drafts(dkey); list.innerHTML = d.length ? d.map((x, i) => `<li class="small"><span class="pill st-unk">local draft, not submitted</span> <b>${esc(x.kind || "comment")}</b> ${esc(x.at)}: ${esc(x.body)} <button type="button" class="btn small ghost" data-exp="${i}">Download as Annotation JSON</button> <button type="button" class="btn small ghost" data-del="${i}">Delete</button></li>`).join("") : '<li class="faint small">No drafts for this subsystem.</li>'; list.querySelectorAll("[data-exp]").forEach((b) => b.addEventListener("click", () => { const x = drafts(dkey)[+b.dataset.exp]; const doc = { note: "LOCAL DRAFT in the shape of guilds' Annotation payload. Not submitted: submitting needs an operator credential and a route; anchor.record must be pinned to an exact record version first.", payload: { kind: x.kind || "comment", body: x.body, anchor: { record: null, region: { named_subsystem: { name: p.id + ":" + scale } }, frame: "ui_anchor" } }, drafted_at: x.at }; const url = URL.createObjectURL(new Blob([JSON.stringify(doc, null, 2)], { type: "application/json" })); const a = document.createElement("a"); a.href = url; a.download = "annotation-draft.json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000); })); list.querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", () => { const dd = drafts(dkey); dd.splice(+b.dataset.del, 1); saveDrafts(dkey, dd); draw(); })); };
         root.querySelector("#annsave").addEventListener("click", () => { const ta = root.querySelector("#annbody"); const body = ta.value.trim(); if (!body) return; const dd = drafts(dkey); dd.push({ at: new Date().toISOString().replace("T", " ").slice(0, 16), body, kind: root.querySelector("#annkind").value }); if (!saveDrafts(dkey, dd)) { list.insertAdjacentHTML("afterbegin", '<li class="small empty">This browser would not store the draft; nothing was saved.</li>'); return; } ta.value = ""; draw(); });
         draw(); DF.renderMath(root); DF.mountSimWidget(root.querySelector("#simwidget"));
+        DF.designReviewWire(root, snap, p);
         DF.assuranceWire(root.querySelector("#assurance"), snap.assurance, (anchor) => { const sc = String(anchor).split(":").pop(); DF.go(DF.href("/studio/" + p.id, { scale: sc === "evolutionary" ? "ecological" : sc })); });
       },
     };

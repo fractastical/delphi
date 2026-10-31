@@ -765,3 +765,52 @@ def test_windtunnel_behavior_and_scale_growth_cards_keep_partial_assumed_and_mis
     pg.goto(base + "#/studio/flying-fish?scale=neural")
     pg.wait_for_function("document.querySelector('#main').textContent.includes('Rhythm-generator')")
     assert pg.locator(".artcard video").count() >= 1
+
+
+def test_design_review_prompts_and_local_challenge_draft_in_the_contract_shape(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#designreview")
+    t = pg.locator("#designreview").text_content()
+    assert "not a vote" in t.lower() and "source-only prompt" in t and "No node is connected" in t and "never holds a credential" in t
+    assert pg.locator("#designreview .drprompts .drcard").count() == 4
+    pg.click("[data-seed=release-convention]")
+    assert pg.input_value("#drform select[name=dimension]") == "aerodynamics"
+    pg.fill("#drform textarea[name=scope]", "Organism-scale glide model only.")
+    pg.fill("#drform textarea[name=alternative]", "A sourced fixed release.")
+    pg.fill("#drform input[name=member_index]", "3")
+    pg.click("#drform button[type=submit]")
+    d = pg.evaluate("() => JSON.parse(localStorage.getItem('frontier-design-review-draft:flying-fish'))")
+    pl = d[0]["payload"]
+    assert pl["kind"] == "challenge" and pl["design_review"]["dimension"] == "aerodynamics" and pl["design_review"]["member_index"] == 3 and pl["design_review"]["evidence_refs"] == []
+    assert pl["anchor"]["record"]["kind"] == "Project" and pl["anchor"]["record"]["version"].startswith("UNPINNED")
+    assert "not submitted" in pg.locator("#drdrafts").text_content()
+    pg.fill("#drform textarea[name=evidence_refs]", "not-a-pin")
+    pg.fill("#drform textarea[name=body]", "x"); pg.fill("#drform textarea[name=scope]", "s"); pg.fill("#drform textarea[name=alternative]", "a"); pg.fill("#drform textarea[name=falsifiable_next_test]", "t")
+    pg.click("#drform button[type=submit]")
+    assert "Not an exact pin" in pg.locator("#drerr").inner_text()
+
+
+def test_design_review_shows_live_challenges_with_replies_and_no_resolution(browser, base):
+    v = "b" * 64
+    proj = {"namespace": "n", "kind": "Project", "id": "flying-fish", "version": v}
+    ch = {"namespace": "n", "kind": "Annotation", "id": "ann-1", "version": "c" * 64}
+
+    def ann(ref, payload, mi=None):
+        return {"ref": ref, "record": {"payload": payload}, "local_status": "proposed", "anchor_ref": proj, "member_index": mi, "thread_root_ref": ref}
+    ctx = {"schema": "frontier.project.design-context/1", "project": {}, "members": [], "withheld_unlicensed": 2,
+           "annotations": [ann(ch, {"kind": "challenge", "body": "Stiffness measured in one regime is assumed in another.", "anchor": {"record": proj}, "design_review": {"dimension": "biology", "evidence_basis": "assumption", "scope": "Member 3 glide model.", "alternative": "Depends on strain rate.", "falsifiable_next_test": "Static vs cyclic loads.", "evidence_refs": []}}, 3),
+                           ann({"namespace": "n", "kind": "Annotation", "id": "ann-2", "version": "d" * 64}, {"kind": "comment", "body": "Agreed, which fin?", "anchor": {"record": proj}, "reply_to": ch})],
+           "pagination": {"limit": 50, "returned": 2, "next_cursor": None, "truncated": False}, "interpretation": "Annotations are authored challenges or replies, not votes."}
+    seen = []
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": [{"record": {**proj, "payload": {"title": "Flying fish"}}, "local_status": "proposed", "is_head": True}]}))
+    pg.route("**/api/design/context*", lambda r: (seen.append(r.request.url), r.fulfill(json=ctx))[1])
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#drlive .drcard")
+    t = pg.locator("#drlive").inner_text()
+    assert "1 challenge" in t and "none resolved" in t and "open: no resolution state exists" in t.lower() and "1 reply" in t and "2 withheld" in t
+    assert "Stiffness measured" in t and "Falsifiable next test" in t and "member 3" in t.lower()
+    assert seen and f"version={v}" in seen[0] and "kind=Project" in seen[0]

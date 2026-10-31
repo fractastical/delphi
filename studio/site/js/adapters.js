@@ -186,5 +186,12 @@
     } catch (e) { if (e.name === "AbortError") throw e; if (/HTTP 404/.test(e.message)) { state.graphAbsent = true; return null; } throw e; }
   }
 
-  DF.api = { state, isLive, load, discovery, graph, catalog, record, artifacts, media, counts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
+  /* GET /api/design/context?namespace&kind=Project&id&version&limit&cursor -> frontier.project.design-context/1. Exact pin only; no head is substituted. */
+  async function designContext(ref, { cursor = "", limit = 50, signal = null } = {}) {
+    if (!isLive()) throw new Unavailable("no runtime is connected");
+    const q = new URLSearchParams({ namespace: ref.namespace, kind: "Project", id: ref.id, version: ref.version, limit: String(limit) }); if (cursor) q.set("cursor", cursor);
+    return getJSON("api/design/context?" + q.toString(), 5000, signal);
+  }
+
+  DF.api = { state, designContext, isLive, load, discovery, graph, catalog, record, artifacts, media, counts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
 })();

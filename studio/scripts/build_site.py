@@ -623,6 +623,7 @@ def build() -> dict[str, bytes]:
     manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra)
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
+    design_review = ins.json("site/content/design-review.json")
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -649,6 +650,7 @@ def build() -> dict[str, bytes]:
         "genomics": genomics_slice,
         "project_drafts": project_recs,
         "assurance": assurance,
+        "design_review": design_review,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
