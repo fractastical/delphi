@@ -29,7 +29,7 @@ papered over.
 
 | Spec | Subject |
 |---|---|
-| [SPEC-001](SPEC-001-record-types.md) | The nine record types and their exact field contracts; the `recorded`/`actionable` Problem split; the register finding (250/250 import, 0 actionable, 148/250 unsourced); the remaining no-typed-`unlocks` defect |
+| [SPEC-001](SPEC-001-record-types.md) | The nine record types and their exact field contracts; the `recorded`/`actionable` Problem split; the register finding (250/250 import, 0 actionable; the first mapping's 148/250 "unsourced" was an omission of the `attestations` field, since corrected); the remaining no-typed-`unlocks` defect |
 | [SPEC-002](SPEC-002-contribution-review-lifecycle.md) | Provisioning and roles; the authenticated write path; the five review statuses, seven dimensions, independence, the acceptance gate; why there is deliberately no composite truth score |
 | [SPEC-003](SPEC-003-action-execution-and-leases.md) | The eight-dimension cache key; the `action_state` machine; atomic leasing, expiry and owner fencing; readiness gate; review adjudication; why a `recorded` Problem cannot be actioned |
 | [SPEC-004](SPEC-004-bundles-and-federation.md) | Export/import bundles; `imported_unreviewed`; fork-on-conflict; review receipts as untrusted assertions; why a digest is integrity and not a signature, timestamp, or acceptance |

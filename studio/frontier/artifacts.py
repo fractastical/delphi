@@ -11,7 +11,7 @@ import re
 from psycopg.types.json import Jsonb
 
 from .models import ArtifactRef, canonical, ref
-from .store import FrontierError, Store
+from .store import FrontierError, Store, _refuse_unlicensed, _unlicensed_available_content
 
 ROLES = ("input", "output", "code", "environment", "protocol", "log", "certificate", "geometry")
 EVIDENCE_KINDS = ("observed", "predicted", "simulated", "formal", "source_assessment")
@@ -62,6 +62,7 @@ class ArtifactIndex:
                   "sha": after[0], "version": after[1], "arole": after[2], "n": limit + 1}).fetchall()
             items = []
             for row in rows[:limit]:
+                _refuse_unlicensed(_unlicensed_available_content([row["envelope"]]), "index")
                 env, artifact = row["envelope"], ArtifactRef.model_validate(row["artifact"]).model_dump()
                 p = env["payload"]
                 items.append({"artifact": artifact, "evidence": ref(env), "target": p["target"],

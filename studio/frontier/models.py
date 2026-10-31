@@ -106,7 +106,11 @@ class Problem(Model):
     title: Short
     known_state: Text
     question: Text
-    problem_kind: Literal["project_gap", "computational_open_question", "sourced_field_open_problem", "resolved_scope_correction"]
+    # `curated_question` is a question a curator wrote down, with citations the curator attached. It does not say the field states
+    # this as an open problem (`sourced_field_open_problem`), nor that the project has this gap (`project_gap`). Added after the
+    # register import labelled 250 curator questions as sourced field problems; the existing values are unchanged.
+    problem_kind: Literal["project_gap", "computational_open_question", "sourced_field_open_problem", "resolved_scope_correction",
+                          "curated_question"]
     novelty_status: Short
     data_access: Text
     completeness: Literal["recorded", "actionable"] = "actionable"
