@@ -3,12 +3,27 @@
 // nanopubs.
 //
 //   node docs/build-claim-graph.mjs
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { ROOT, loadClaims } from "./load-claims.mjs";
 
 const HERE = join(ROOT, "docs");
 const claims = loadClaims();
+
+// Truth scores from truth/raw/<assessor>/*.json, matched by content key.
+const TRUTH = join(ROOT, "truth/raw");
+const LABEL = { gpt: "GPT-5.6 Sol", grok: "Grok 4.7", gemini: "Gemini 4 Argon" };
+const truth = {};
+for (const who of existsSync(TRUTH) ? readdirSync(TRUTH) : []) {
+  for (const f of readdirSync(join(TRUTH, who)).filter(f => f.endsWith(".json"))) {
+    let rows; try { rows = JSON.parse(readFileSync(join(TRUTH, who, f), "utf8")); } catch { console.warn(`skipping unparsable ${who}/${f}`); continue; }
+    for (const r of rows) if (typeof r.p_true === "number") (truth[r.key] ??= []).push({ who: LABEL[who] ?? who, p: r.p_true, rationale: r.rationale });
+  }
+}
+for (const c of claims) {
+  c.truthBy = truth[c.key] ?? [];
+  c.truth = c.truthBy.length ? Math.round(1000 * c.truthBy.reduce((s, x) => s + x.p, 0) / c.truthBy.length) / 1000 : null;
+}
 const DATA = { claims, built: new Date().toISOString().slice(0, 16).replace("T", " ") };
 const seal = readFileSync(join(ROOT, "assets/logo.svg"), "utf8").trim();
 const html = readFileSync(join(HERE, "claim-graph.template.html"), "utf8")
