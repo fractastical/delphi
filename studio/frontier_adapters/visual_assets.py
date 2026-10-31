@@ -42,9 +42,23 @@ RENDER_NOTE = ("A picture, video or mesh of what was computed. It adds no suppor
                "rendering it successfully says nothing about whether the model is right.")
 
 
+# Media types for the pointers THIS module and sim_bundles emit. Kept here, not in the shared artifacts.py, so market's frozen engineering chain
+# (already imported, byte-reproduced by its own test) is not changed by this work. The type says nothing about whether any bytes are served.
+MEDIA_TYPES = {"mp4": "video/mp4", "webm": "video/webm", "mov": "video/quicktime", "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg",
+               "gif": "image/gif", "webp": "image/webp", "svg": "image/svg+xml", "glb": "model/gltf-binary", "gltf": "model/gltf+json", "stl": "model/stl",
+               "npz": "application/x-npz", "csv": "text/csv", "html": "text/html"}
+
+
 class AssetChain(em.Chain):
-    """market's Chain with a larger record cap (several forms per bundle). Checks, blobs and artifact pointers are inherited."""
+    """market's Chain with a larger record cap (several forms per bundle) and typed media. Checks and blobs are inherited."""
     max_records = 100
+
+    def artifact(self, role: str, path: str, data: bytes | None = None, note: str | None = None) -> dict:
+        ref = super().artifact(role, path, data, note)
+        ext = path.rsplit(".", 1)[-1].lower() if "." in path.rsplit("/", 1)[-1] else ""
+        if ext in MEDIA_TYPES:
+            ref["media_type"] = MEDIA_TYPES[ext]
+        return ref
 
     def add(self, draft: dict) -> dict:
         if len(self.records) >= self.max_records:
