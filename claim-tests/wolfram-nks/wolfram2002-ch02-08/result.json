@@ -2,7 +2,7 @@
   "claim_id": "wolfram2002-ch02-08",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch02-08",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Rule 110 evolved from a single black cell becomes exactly time-periodic (in the fixed frame in which the right edge of the pattern stays at x = 0) with minimal period 240 steps, and the periodic regime begins about 2780 steps after the start.",
   "pass_criterion": "Pre-registered: the smallest P in 1..2000 for which a(t+P, x) = a(t, x) for every cell x in the light cone [-t, 0] and every t from some onset t0 to the end of the run equals 240, and that onset t0 (the smallest t from which the relation holds for all later t up to T - P) lies in [2500, 3060], i.e. within 10% of 2780.",
   "fail_criterion": "Pre-registered: no P <= 2000 makes the pattern periodic on the light cone for the last 2000 steps of an 8000-step run and 240 is not a period even on the fixed right-edge windows [-500, 0], [-1000, 0] and [-2000, 0]; or the minimal period is not a divisor of 240; or 240 is a period but the onset lies outside [2000, 3500]. Intermediate outcomes (minimal period a proper divisor of 240; periodicity holds only on a restricted window; onset in [2000, 2500) or (3060, 3500]) are pre-registered as 'mixed'.",
@@ -19,15 +19,64 @@
       "version": "generated",
       "license": null,
       "generator": "analysis.py",
-      "program_family": "elementary cellular automaton, Wolfram rule number 110; initial condition: single black cell at x = 0 on a line of cells x = -8010..10, white boundaries never reached; steps t = 0..7999; the full space-time array a(t, x) is kept in memory",
+      "program_family": "elementary cellular automaton, Wolfram rule number 110; initial condition: single black cell at x = 0 on a line of cells x = -8010..200, white boundaries never reached; steps t = 0..7999; the full space-time array a(t, x) is kept in memory",
       "files": [],
       "role": "the evolution whose transient length and period are measured"
     }
   ],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-wolfram-nks-0123", "date": "2026-10-31" }
+  "method": "analysis.py evolves rule 110 from one black cell for 8000 steps (boundary never reached; rows 0-4 checked against the standard 1, 11, 111, 1101, 11111). Part A (pre-registered): for P = 1..2000 it tests exact fixed-frame recurrence a(t+P,x) = a(t,x) over the light cone [-t,0] and over the right-edge windows [-500,0], [-1000,0], [-2000,0] across the last 2000 steps; no P qualifies (the leading edge and the drifting structure break every fixed-frame recurrence). Part B (diagnostic, after A): the P = 240 mismatch is recounted excluding the 300 leading-edge cells, which isolates a single cluster of 9-24 cells that drifts left at -0.0846 cells/step; an exhaustive (P, shift) search in windows of +-40 and +-150 cells around that cluster finds its exact space-time period to be (213 steps, -18 cells), with (240, 0) and (240, -20) never matching; the fixed-frame recurrence of the right-edge windows [-50,0] and [-100,0] and of the stripe region is measured for P in {7, 71, 80, 213, 240, 480}, and the onset times of each regime are determined.",
+  "measured": {
+    "value": 213,
+    "unit": "steps (exact minimal space-time period of the surviving localized structure, with a shift of -18 cells per period)",
+    "n": 8000,
+    "uncertainty": "exact (deterministic simulation)",
+    "extra": {
+      "A_minimal_fixed_frame_period_full_light_cone": null,
+      "A_fixed_frame_period_on_windows_500_1000_2000": {
+        "500": null,
+        "1000": null,
+        "2000": null
+      },
+      "B_structure_shift_per_period_cells": -18,
+      "B_structure_drift_cells_per_step": -0.08464,
+      "B_structure_regime_onset_step": 2819,
+      "B_P240_fixed_frame_mismatch_cells_after_transient_min_max": [
+        9,
+        24
+      ],
+      "B_P240_mismatch_drops_to_final_level_after_step": 2830,
+      "B_right_edge_window_50_exact_fixed_frame_period": 240,
+      "B_right_edge_window_50_period_240_onset_step": 2852,
+      "B_right_edge_window_100_period_240_onset_step": 3101,
+      "B_right_edge_windows_period_213_holds": false,
+      "B_stripe_region_fixed_frame_periods": [
+        80,
+        160,
+        240
+      ],
+      "B_stripe_region_lattice_vector": [
+        3,
+        2
+      ],
+      "B_structure_window_mismatch_cells": {
+        "(240,0)": 17,
+        "(240,-20)": 129,
+        "(213,-18)": 0
+      }
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.85,
+  "caveats": [
+    "The onset part of the claim is confirmed: the last transient collision ends at step 2819-2852 (structure regime from 2819, right-edge 240-periodicity from 2852, P = 240 mismatch count at its final level from 2831), within 3% of 'about 2780'.",
+    "The period part is only partly confirmed. In the fixed frame the whole pattern except the surviving structure's 9-24-cell neighbourhood (and the leading edge) repeats exactly every 240 steps: the right-edge region [-50,0] has exact period 240 (not 7, 71, 80 or 213), and the stripe train coming from the left has fixed-frame period 80 and lattice vector (3 steps, +2 cells), i.e. a train of speed-2/3 gliders. But the surviving structure itself drifts left at 18 cells per 213 steps and its exact space-time period is (213, -18); it is not 240-periodic in any frame, and no frame makes the whole pattern periodic. 'Behavior that repeats every 240 steps' is therefore accurate for the stripes and the right-edge interaction but not for the surviving structure.",
+    "The pre-registered primary criterion (exact recurrence on the full light cone) cannot be met by any growing pattern because the leading edge moves; this was a flaw in the pre-registration, and the diagnostic recount excluding 300 leading-edge cells was added after seeing that result. The pre-registered 'mixed' category (periodicity only on restricted windows) is what the data show.",
+    "Results are for the single evolution the claim describes; 8000 steps were simulated, so the regimes were verified over roughly 5000 steps (about 24 structure periods, 21 periods of 240)."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-wolfram-nks-0123",
+    "date": "2026-10-31"
+  }
 }
