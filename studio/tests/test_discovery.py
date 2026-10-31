@@ -336,3 +336,58 @@ def test_vec_literal_round_trips_through_pgvector(store):
         pass
     got = d._with_conn(lambda c: c.execute("SELECT (%s::vector <=> %s::vector) AS dist", (vec_literal(v), vec_literal(v))).fetchone()["dist"])
     assert abs(got) < 1e-9
+
+
+# ---- the recurring refresh job and concurrent provider use ----------------------------------------------------------------
+def test_refresh_embeds_only_what_is_new_makes_no_call_when_nothing_changed_and_skips_when_locked(seeded):
+    store, d, recs = seeded
+    first = d.refresh(max_requests=10)
+    assert first["failed"] == 0 and first["embedded"] == first["planned"] and first["requests"] >= 1
+    calls = d.embedder.calls["batches"]
+    quiet = d.refresh()
+    assert quiet["to_embed"] == 0 and quiet["requests"] == 0 and d.embedder.calls["batches"] == calls, "nothing new: zero provider calls"
+    put(store, "late-arrival", "A late arrival about zebrafish", "newly proposed text")
+    inc = d.refresh()
+    assert inc["to_embed"] >= 1 and inc["embedded"] == inc["to_embed"] and inc["already_current"] == quiet["planned"]
+    # an overlapping run is harmless: the lock holder runs, the other one skips
+    import psycopg
+    held, cm = d._conn()
+    try:
+        held.execute("SELECT pg_try_advisory_lock(%s)", (int(sha256(b"frontier-discovery-refresh").hexdigest()[:8], 16) & 0x7FFFFFFF,))
+        other = Discovery(store, Double())
+        assert other.refresh() == {"skipped": "another refresh is running", "requests": 0}
+    finally:
+        cm.__exit__(None, None, None)
+
+
+def test_refresh_respects_its_small_request_budget_and_reports_the_remainder(store):
+    for i in range(30):
+        put(store, f"r-{i}", f"Record {i}", "text")  # 30 records plus 30 events = 60 documents, more than one 50-document batch
+    d = Discovery(store, Double())
+    d.initialize()
+    r = d.refresh(max_requests=1)
+    assert r["requests"] == 1 and r["embedded"] == 50 and r["failed"] == r["planned"] - 50 and r["failure_classes"] == {"request_budget": r["failed"]}
+    full = d.refresh(max_requests=20)
+    assert full["failed"] == 0 and full["coverage"]["documents_indexed"] == full["coverage"]["documents_planned"]
+
+
+def test_parallel_workers_give_the_same_index_as_serial(store):
+    for i in range(9):
+        put(store, f"p-{i}", f"Parallel record {i}", f"statement {i} about cardiac cells")
+    d1, d2 = Discovery(store, Double()), None
+    d1.initialize()
+    a = d1.index(batch=3, workers=4)
+    with store.connection() as c:
+        n1 = c.execute("SELECT count(*) AS n, count(DISTINCT doc_id) AS u FROM discovery_documents").fetchone()
+    assert a["failed"] == 0 and n1["n"] == n1["u"] == a["planned"] and a["requests"] == -(-a["planned"] // 3)
+    again = d1.index(batch=3, workers=4)
+    assert again["to_embed"] == 0
+
+
+def test_hybrid_runs_lexical_and_embedding_concurrently(seeded):
+    store, d, recs = seeded
+    index(d)
+    slow = Discovery(store, Double(delay=0.6), query_timeout=5)
+    t0 = time.monotonic()
+    r = slow.search("automobile braking", mode="hybrid")
+    assert r["mode"] == "hybrid" and time.monotonic() - t0 < 1.2
