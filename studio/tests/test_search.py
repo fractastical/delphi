@@ -274,6 +274,72 @@ def test_explicit_opposing_and_disputed_references(store, index):
     assert again["disputes"]["disputing_reviews"] == [] and again["local_status"] == "proposed"
 
 
+def test_ranking_tiers_are_lexicographic_not_additive(store, index):
+    """Adversarial: competitors satisfy several LOWER categories at once (source + title + literal text); under an additive
+    score they would outrank the exact match. Exact version > id > source URI > title equals > title contains > literal text."""
+    target = save(store, claim_with(store, "tier-target", "plain statement"))
+    pin = target["version"]
+    decoy = claim_with(store, "tier-decoy-1", f"mentions {pin} in the text", title=pin, source_uri=pin)
+    save(store, decoy)
+    res = index.search(pin)["results"]
+    assert res[0]["ref"]["id"] == "tier-target" and res[0]["score"] >= 9000, [(r["ref"]["id"], r["score"]) for r in res]
+    decoy_row = next(r for r in res if r["ref"]["id"] == "tier-decoy-1")
+    assert 7000 <= decoy_row["score"] < 8000 and res[0]["score"] > decoy_row["score"]
+
+    # exact id beats a record that matches the same string as source URI + title + text
+    save(store, claim_with(store, "needle-id", "unrelated words"))
+    save(store, claim_with(store, "needle-decoy", "needle-id needle-id needle-id", title="needle-id", source_uri="needle-id"))
+    res = index.search("needle-id")["results"]
+    assert res[0]["ref"]["id"] == "needle-id" and 8000 <= res[0]["score"] < 9000
+    by = {r["ref"]["id"]: r["score"] for r in res}
+    assert 7000 <= by["needle-decoy"] < 8000
+
+    # exact source URI beats title-equals + literal text
+    save(store, claim_with(store, "src-hit", "other words", source_uri="urn:tier:source"))
+    save(store, claim_with(store, "title-hit", "urn:tier:source urn:tier:source", title="urn:tier:source"))
+    res = index.search("urn:tier:source")["results"]
+    assert [r["ref"]["id"] for r in res][:2] == ["src-hit", "title-hit"]
+    assert 7000 <= res[0]["score"] < 8000 and 6000 <= res[1]["score"] < 7000
+
+    # title equals > title contains > literal text only > full-text only; the secondary bucket never crosses a tier
+    save(store, claim_with(store, "t-eq", "x", title="tiersharedterm"))
+    save(store, claim_with(store, "t-in", "x", title="the tiersharedterm title"))
+    save(store, claim_with(store, "t-txt", "tiersharedterm " * 30, title="no match in the title"))
+    res = index.search("tiersharedterm")["results"]
+    assert [r["ref"]["id"] for r in res] == ["t-eq", "t-in", "t-txt"]
+    assert [r["score"] // 1000 for r in res] == [6, 5, 4]
+    save(store, claim_with(store, "fts-only", "tiersharedterm and other words in a different order", title="no match here either"))
+    ft = index.search("other tiersharedterm")["results"]  # words not adjacent: no literal match, full-text only
+    assert ft and next(r for r in ft if r["ref"]["id"] == "fts-only")["score"] // 1000 == 1
+
+
+def test_reference_lists_flag_truncation_per_result_instead_of_dropping_silently(store, index):
+    crowded = save(store, claim_with(store, "crowded", "crowdedterm statement one"))
+    quiet = save(store, claim_with(store, "quiet", "crowdedterm statement two"))
+    for i in range(MAX_REFS_PER_RESULT + 3):
+        e = evidence(store, ref(crowded))
+        e["id"] = f"crowd-ev-{i}"
+        save(store, e)
+    e = evidence(store, ref(quiet))
+    e["id"] = "quiet-ev"
+    save(store, e)
+    res = {r["ref"]["id"]: r for r in index.search("crowdedterm")["results"]}
+    assert len(res["crowded"]["evidence_references"]) == MAX_REFS_PER_RESULT
+    assert res["crowded"]["reference_truncation"]["evidence_references"] is True and res["crowded"]["references_complete"] is False
+    # another result is not starved by the crowded one, and reports completeness
+    assert [x["evidence"]["id"] for x in res["quiet"]["evidence_references"]] == ["quiet-ev"]
+    assert res["quiet"]["reference_truncation"]["evidence_references"] is False and res["quiet"]["references_complete"] is True
+    assert res["quiet"]["disputes"]["truncated"] is False
+    # exactly at the cap is complete (not flagged)
+    exact = save(store, claim_with(store, "exactcap", "exactcapterm statement"))
+    for i in range(MAX_REFS_PER_RESULT):
+        e = evidence(store, ref(exact))
+        e["id"] = f"cap-ev-{i}"
+        save(store, e)
+    row = index.search("exactcapterm")["results"][0]
+    assert len(row["evidence_references"]) == MAX_REFS_PER_RESULT and row["references_complete"] is True
+
+
 def test_dispute_reference_lists_are_bounded_and_flag_truncation(store, index):
     target = save(store, claim_with(store, "crowded", "crowdedterm statement"))
     for i in range(MAX_REFS_PER_RESULT + 3):
@@ -282,6 +348,19 @@ def test_dispute_reference_lists_are_bounded_and_flag_truncation(store, index):
         save(store, e)
     row = index.search("crowdedterm")["results"][0]
     assert len(row["evidence_references"]) == MAX_REFS_PER_RESULT
+
+
+def test_dispute_lists_truncate_conservatively_and_flag_dependent_evidence(store, index):
+    target = save(store, claim_with(store, "many-disputes", "manydisputeterm statement"))
+    for i in range(MAX_REFS_PER_RESULT + 2):
+        a = assessment(ref(target), reviewer="bob", decision="disputed")
+        a["dimensions"]["independent_replication"]["status"] = "failed"
+        store.review(TOKENS["bob"], f"many-{i}", a)
+    row = index.search("manydisputeterm")["results"][0]
+    assert len(row["disputes"]["disputing_reviews"]) == MAX_REFS_PER_RESULT
+    assert row["reference_truncation"]["disputing_reviews"] is True and row["disputes"]["truncated"] is True
+    assert row["reference_truncation"]["cited_evidence"] is True, "evidence cited by the cut-off reviews is incomplete too"
+    assert row["references_complete"] is False
 
 
 def test_a_private_evidence_link_inside_a_dispute_is_not_shown_to_others(store, index):

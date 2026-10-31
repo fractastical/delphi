@@ -35,9 +35,12 @@ _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 _CURSOR = re.compile(r"^(?P<score>[0-9]{1,6})\.(?P<version>[0-9a-f]{64})\.(?P<pid>[0-9a-f]{8})$")
 
 # Integer rank tiers. They only order candidates; they say nothing about correctness.
+# The score is LEXICOGRAPHIC: the best single category a record satisfies (a MAX, never a sum), times 1000, plus a secondary
+# full-text relevance bucket of at most 999. So a higher category always outranks a lower one however many lower categories
+# a record also satisfies (a record matching source + title + literal text cannot outrank an exact version pin).
 T_EXACT_VERSION, T_EXACT_ID, T_EXACT_SOURCE = 9000, 8000, 7000
-T_TITLE_EQUALS, T_TITLE_CONTAINS, T_LITERAL = 3000, 2000, 1500
-T_LEXICAL_MAX = 999
+T_TITLE_EQUALS, T_TITLE_CONTAINS, T_LITERAL, T_LEXICAL = 6000, 5000, 4000, 1000
+T_SECONDARY_MAX = 999
 
 
 def _as_tuple(value: str | Sequence[str] | None, allowed: Iterable[str], what: str) -> tuple[str, ...] | None:
@@ -221,13 +224,15 @@ class SearchIndex:
                 WITH tsq AS (SELECT websearch_to_tsquery('simple', %(q)s) AS q),
                 cand AS (
                   SELECT v.version, v.envelope, s.status, (h.version IS NOT NULL) AS is_head,
-                         ( CASE WHEN %(exact_version)s::text IS NOT NULL AND v.version = %(exact_version)s THEN 9000 ELSE 0 END
-                         + CASE WHEN %(raw)s <> '' AND v.record_id = %(raw)s THEN 8000 ELSE 0 END
-                         + CASE WHEN %(q)s <> '' AND lower(v.source_uri) = %(q)s THEN 7000 ELSE 0 END
-                         + CASE WHEN %(q)s <> '' AND lower(v.envelope #>> '{payload,title}') = %(q)s THEN 3000
-                                WHEN %(q)s <> '' AND position(%(q)s in lower(coalesce(v.envelope #>> '{payload,title}', ''))) > 0 THEN 2000
-                                ELSE 0 END
-                         + CASE WHEN %(q)s <> '' AND position(%(q)s in v.search_text) > 0 THEN 1500 ELSE 0 END
+                         ( GREATEST(
+                              CASE WHEN %(exact_version)s::text IS NOT NULL AND v.version = %(exact_version)s THEN 9000 ELSE 0 END,
+                              CASE WHEN %(raw)s <> '' AND v.record_id = %(raw)s THEN 8000 ELSE 0 END,
+                              CASE WHEN %(q)s <> '' AND lower(v.source_uri) = %(q)s THEN 7000 ELSE 0 END,
+                              CASE WHEN %(q)s <> '' AND lower(v.envelope #>> '{payload,title}') = %(q)s THEN 6000
+                                   WHEN %(q)s <> '' AND position(%(q)s in lower(coalesce(v.envelope #>> '{payload,title}', ''))) > 0 THEN 5000
+                                   ELSE 0 END,
+                              CASE WHEN %(q)s <> '' AND position(%(q)s in v.search_text) > 0 THEN 4000 ELSE 0 END,
+                              CASE WHEN %(q)s <> '' THEN 1000 ELSE 0 END )
                          + CASE WHEN %(q)s <> '' THEN LEAST(999, floor(1000 * ts_rank_cd(to_tsvector('simple', v.search_text), tsq.q, 1))::int)
                                 ELSE 0 END ) AS score
                   FROM record_versions v
@@ -265,6 +270,7 @@ class SearchIndex:
                 env = r["envelope"]
                 reasons, fields, snippet = explain_match(env, q, raw, exact_version)
                 src = source_view(env["payload"])
+                rel = related[r["version"]]
                 withheld = bool(_unlicensed_available_content([env]))
                 results.append({
                     "ref": ref(env), "is_head": r["is_head"], "title": env["payload"].get("title", env["id"]),
@@ -274,9 +280,12 @@ class SearchIndex:
                     "snippet": None if withheld else snippet,
                     "snippet_withheld": "content asserted available with no stated licence" if withheld else None,
                     "source": src, "curation": curation_labels(env, r["status"]),
-                    "disputes": {**related.get(r["version"], {"disputing_reviews": [], "cited_evidence": [], "diverging_versions": [],
-                                                              "truncated": False}), "local_status": r["status"]},
-                    "evidence_references": related.get((r["version"], "evidence"), []),
+                    "disputes": {"local_status": r["status"], "disputing_reviews": rel["disputing_reviews"], "cited_evidence": rel["cited_evidence"],
+                                 "diverging_versions": rel["diverging_versions"],
+                                 "truncated": any(rel["truncation"][k] for k in ("disputing_reviews", "cited_evidence", "diverging_versions"))},
+                    "evidence_references": rel["evidence_references"],
+                    "reference_truncation": rel["truncation"],
+                    "references_complete": not any(rel["truncation"].values()),
                 })
             more = len(rows) > limit
             last = page[-1] if page else None
@@ -287,60 +296,83 @@ class SearchIndex:
 
     def _related(self, c, principal, versions: list[str]) -> dict:
         """Explicit relations only: recorded disputing/rejecting reviews, the evidence those reviews cite, diverging imported
-        versions, and Evidence records that target a result. Nothing is inferred from text or from the absence of a dispute."""
+        versions, and Evidence records that target a result. Nothing is inferred from text or from the absence of a dispute.
+
+        Every list is bounded PER RESULT (window functions; MAX_REFS_PER_RESULT + 1 rows fetched per result) so a crowded result
+        can never starve another result of its references, and an omission is reported rather than silent: ``truncation[list]`` is
+        true when more visible references exist than are returned, or when an upstream list that feeds it was itself cut.
+        References the caller may not see are simply absent, with no flag (a flag would reveal that they exist)."""
+        cap = MAX_REFS_PER_RESULT
+        names = ("disputing_reviews", "cited_evidence", "diverging_versions", "evidence_references")
+        out: dict = {v: {**{n: [] for n in names}, "truncation": {n: False for n in names}} for v in versions}
         if not versions:
-            return {}
+            return out
         ns = Jsonb(principal["namespaces"] if principal else [])
-        out: dict = {}
 
-        def slot(v):
-            return out.setdefault(v, {"local_status": None, "disputing_reviews": [], "cited_evidence": [], "diverging_versions": [], "truncated": False})
-
-        def add(bucket: list, item: dict, v: str):
-            if len(bucket) >= MAX_REFS_PER_RESULT:
-                slot(v)["truncated"] = True
+        def add(version: str, name: str, item: dict):
+            if len(out[version][name]) >= cap:
+                out[version]["truncation"][name] = True
             else:
-                bucket.append(item)
+                out[version][name].append(item)
 
-        reviews = c.execute("""SELECT r.target_version, r.assessment_version, r.decision, a.envelope
-            FROM reviews r JOIN record_versions a ON a.version = r.assessment_version
-            WHERE r.target_version = ANY(%s) AND r.decision IN ('disputed','rejected')
-              AND (a.visibility = 'public' OR %s::jsonb ? a.namespace)
-            ORDER BY r.target_version, r.assessment_version LIMIT 500""", (versions, ns)).fetchall()
+        reviews = c.execute("""SELECT target_version, assessment_version, decision, envelope FROM (
+              SELECT r.target_version, r.assessment_version, r.decision, a.envelope,
+                     row_number() OVER (PARTITION BY r.target_version ORDER BY r.assessment_version) AS rn
+              FROM reviews r JOIN record_versions a ON a.version = r.assessment_version
+              WHERE r.target_version = ANY(%s) AND r.decision IN ('disputed','rejected')
+                AND (a.visibility = 'public' OR %s::jsonb ? a.namespace)) x
+            WHERE rn <= %s ORDER BY target_version, assessment_version""", (versions, ns, cap + 1)).fetchall()
         by_assessment: dict[str, list[str]] = {}
         for r in reviews:
-            by_assessment.setdefault(r["assessment_version"], []).append(r["target_version"])
-            add(slot(r["target_version"])["disputing_reviews"],
+            before = len(out[r["target_version"]]["disputing_reviews"])
+            add(r["target_version"], "disputing_reviews",
                 {"assessment": ref(r["envelope"]), "decision": r["decision"],
-                 "note": "recorded review receipt; an uploaded Assessment without a receipt is not counted"}, r["target_version"])
+                 "note": "recorded review receipt; an uploaded Assessment without a receipt is not counted"})
+            if len(out[r["target_version"]]["disputing_reviews"]) > before:
+                by_assessment.setdefault(r["assessment_version"], []).append(r["target_version"])
+        for v in versions:  # the evidence cited by reviews that were cut off is incomplete too
+            if out[v]["truncation"]["disputing_reviews"]:
+                out[v]["truncation"]["cited_evidence"] = True
         if by_assessment:
-            cited = c.execute("""SELECT e.source_version, ev.envelope FROM typed_edges e
-                JOIN record_versions ev ON ev.version = e.target_version
-                WHERE e.source_version = ANY(%s) AND e.relation = 'review_evidence'
-                  AND (ev.visibility = 'public' OR %s::jsonb ? ev.namespace)
-                ORDER BY e.source_version, e.target_version LIMIT 500""", (list(by_assessment), ns)).fetchall()
+            cited = c.execute("""SELECT source_version, envelope FROM (
+                  SELECT e.source_version, ev.envelope, row_number() OVER (PARTITION BY e.source_version ORDER BY e.target_version) AS rn
+                  FROM typed_edges e JOIN record_versions ev ON ev.version = e.target_version
+                  WHERE e.source_version = ANY(%s) AND e.relation = 'review_evidence'
+                    AND (ev.visibility = 'public' OR %s::jsonb ? ev.namespace)) x
+                WHERE rn <= %s ORDER BY source_version, rn""", (list(by_assessment), ns, cap + 1)).fetchall()
+            seen: dict[str, int] = {}
             for e in cited:
+                seen[e["source_version"]] = seen.get(e["source_version"], 0) + 1
                 for target in by_assessment[e["source_version"]]:
-                    add(slot(target)["cited_evidence"],
-                        {"evidence": ref(e["envelope"]), "cited_by_assessment": e["source_version"],
-                         "evidence_kind": e["envelope"]["payload"].get("evidence_kind"),
-                         "note": "cited by the disputing review; its direction is the review's, not inferred here"}, target)
-        forks = c.execute("""SELECT f.local_version, f.imported_version, lv.envelope AS local_env, iv.envelope AS imported_env
-            FROM forks f JOIN record_versions lv ON lv.version = f.local_version JOIN record_versions iv ON iv.version = f.imported_version
-            WHERE f.local_version = ANY(%s) OR f.imported_version = ANY(%s) ORDER BY f.local_version, f.imported_version LIMIT 200""",
-                          (versions, versions)).fetchall()
+                    if seen[e["source_version"]] > cap:  # this one review cites more than the cap
+                        out[target]["truncation"]["cited_evidence"] = True
+                    else:
+                        add(target, "cited_evidence",
+                            {"evidence": ref(e["envelope"]), "cited_by_assessment": e["source_version"],
+                             "evidence_kind": e["envelope"]["payload"].get("evidence_kind"),
+                             "note": "cited by the disputing review; its direction is the review's, not inferred here"})
+        forks = c.execute("""SELECT mine, other_env FROM (
+              SELECT f.local_version AS mine, iv.envelope AS other_env,
+                     row_number() OVER (PARTITION BY f.local_version ORDER BY f.imported_version) AS rn
+              FROM forks f JOIN record_versions iv ON iv.version = f.imported_version
+              WHERE f.local_version = ANY(%(v)s) AND (iv.visibility = 'public' OR %(ns)s::jsonb ? iv.namespace)
+              UNION ALL
+              SELECT f.imported_version, lv.envelope,
+                     row_number() OVER (PARTITION BY f.imported_version ORDER BY f.local_version)
+              FROM forks f JOIN record_versions lv ON lv.version = f.local_version
+              WHERE f.imported_version = ANY(%(v)s) AND (lv.visibility = 'public' OR %(ns)s::jsonb ? lv.namespace)) x
+            WHERE rn <= %(cap)s ORDER BY mine""", {"v": versions, "ns": ns, "cap": cap + 1}).fetchall()
         for f in forks:
-            for mine, other_env in ((f["local_version"], f["imported_env"]), (f["imported_version"], f["local_env"])):
-                if mine in versions and (other_env["visibility"] == "public" or (principal and other_env["namespace"] in principal["namespaces"])):
-                    add(slot(mine)["diverging_versions"], {"version": ref(other_env), "note": "a different version of the same record id is held as a fork"}, mine)
-        evidence = c.execute("""SELECT e.target_version, ev.envelope FROM typed_edges e JOIN record_versions ev ON ev.version = e.source_version
-            WHERE e.target_version = ANY(%s) AND e.relation = 'targets' AND ev.kind = 'Evidence'
-              AND (ev.visibility = 'public' OR %s::jsonb ? ev.namespace)
-            ORDER BY e.target_version, e.source_version LIMIT 500""", (versions, ns)).fetchall()
+            add(f["mine"], "diverging_versions", {"version": ref(f["other_env"]), "note": "a different version of the same record id is held as a fork"})
+        evidence = c.execute("""SELECT target_version, envelope FROM (
+              SELECT e.target_version, ev.envelope, row_number() OVER (PARTITION BY e.target_version ORDER BY e.source_version) AS rn
+              FROM typed_edges e JOIN record_versions ev ON ev.version = e.source_version
+              WHERE e.target_version = ANY(%s) AND e.relation = 'targets' AND ev.kind = 'Evidence'
+                AND (ev.visibility = 'public' OR %s::jsonb ? ev.namespace)) x
+            WHERE rn <= %s ORDER BY target_version, rn""", (versions, ns, cap + 1)).fetchall()
         for e in evidence:
-            bucket = out.setdefault((e["target_version"], "evidence"), [])
-            if len(bucket) < MAX_REFS_PER_RESULT:
-                bucket.append({"evidence": ref(e["envelope"]), "evidence_kind": e["envelope"]["payload"].get("evidence_kind"),
-                               "source_fidelity": source_fidelity(source_view(e["envelope"]["payload"])),
-                               "note": "targets this version; whether it supports or opposes is not inferred"})
+            add(e["target_version"], "evidence_references",
+                {"evidence": ref(e["envelope"]), "evidence_kind": e["envelope"]["payload"].get("evidence_kind"),
+                 "source_fidelity": source_fidelity(source_view(e["envelope"]["payload"])),
+                 "note": "targets this version; whether it supports or opposes is not inferred"})
         return out

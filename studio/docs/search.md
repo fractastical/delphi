@@ -1,7 +1,6 @@
 # Search: indexed lexical and exact discovery
 
-Status: implemented on branch `work/frontier-search`; 14 tests in `tests/test_search.py` pass, with the 18 existing tests
-(32 total) under `bash scripts/test_postgres.sh` in the bounded scope. Single-reader, not independently reviewed. Performance was not
+Status: implemented on branch `work/frontier-search`; 17 tests in `tests/test_search.py` pass, with the 18 existing tests under `bash scripts/test_postgres.sh` in the bounded scope. Single-reader, not independently reviewed. Performance was not
 measured; the store holds a few hundred records and no scaling claim is made.
 
 ## What it is, and what it is not
@@ -56,16 +55,21 @@ vocabularies.
     "curation": {"source_fidelity": "no_source|reference_only|locator_present|not_applicable", "labels": [str], "promoted": false},
     "disputes": {"local_status", "disputing_reviews": [{assessment, decision}], "cited_evidence": [{evidence, cited_by_assessment, evidence_kind}],
                  "diverging_versions": [{version}], "truncated": bool},
-    "evidence_references": [{evidence, evidence_kind, source_fidelity}] } ],
+    "evidence_references": [{evidence, evidence_kind, source_fidelity}],
+    "reference_truncation": {disputing_reviews, cited_evidence, diverging_versions, evidence_references: bool}, "references_complete": bool } ],
  "next_cursor": str|None, "search_kind": "...", "ordering": "...", "limit": int, "heads_only": bool}
 ```
 
-## Ranking (integer tiers, deterministic)
+## Ranking (lexicographic integer tiers, deterministic)
 
-Exact version 9000, exact record id 8000, exact source URI 7000, title equals the query 3000, title contains it 2000, whole-query
-literal match in the record text 1500, plus a full-text rank bucket 0..999 (`ts_rank_cd`, scaled and floored). Ties break on version
-ascending. Pagination is a keyset on `(score DESC, version ASC)`, so a record inserted between pages can neither duplicate nor
-drop a record already listed (tested). The literal fallback is what finds equations and symbols that the tokenizer splits or drops
+`score = best_category * 1 + secondary`, where `best_category` is the single highest category a record satisfies (a **maximum, never a
+sum**) and `secondary` is a full-text relevance bucket of 0..999 (`ts_rank_cd`, scaled and floored). Categories: exact version 9000,
+exact record id 8000, exact source URI 7000, title equals the query 6000, title contains it 5000, whole-query literal match in the
+record text 4000, full-text match only 1000. Because the secondary bucket stays below 1000, a higher category always outranks a lower
+one however many lower categories a record also satisfies: a record that matches the same string as source URI, title and text cannot
+outrank the exact version, id or source it imitates (adversarial fixture in `test_ranking_tiers_are_lexicographic_not_additive`).
+Ties break on version ascending. Pagination is a keyset on `(score DESC, version ASC)`, so a record inserted between pages can neither
+duplicate nor drop a record already listed (tested). The literal fallback finds equations and symbols the tokenizer splits or drops
 (for example `2n^2 < (L/π)^2 < 5n^2`, or `<` alone); non-ASCII text is stored unescaped, so Unicode literals match.
 
 ## Explicit opposing and disputed references
@@ -79,7 +83,12 @@ Only explicit relations, never inferred from text or from the absence of a dispu
 * **diverging_versions**: a different version of the same record id held as an import fork.
 * **evidence_references**: Evidence records that target the result. Listed neutrally; for or against is not inferred.
 
-Every referenced record obeys the same visibility rule as the result. Lists are capped at 10 per result with a `truncated` flag.
+Every referenced record obeys the same visibility rule as the result. Each list is capped at 10 **per result** (window functions, not a
+global limit, so a crowded result cannot starve another). An omission is never silent: `reference_truncation` has one boolean per list
+(`disputing_reviews`, `cited_evidence`, `diverging_versions`, `evidence_references`), `disputes.truncated` summarises the first three,
+and `references_complete` is true only if nothing was cut. Evidence cited by reviews that were themselves cut is flagged incomplete.
+References the caller may not see are absent with no flag, since a flag would reveal that they exist. An empty list with
+`references_complete: true` means none visible were found, not that none exist.
 
 ## Source-aware curation labels
 
