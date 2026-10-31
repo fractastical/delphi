@@ -13,7 +13,9 @@ Datasets built:
 Downloads go to /tmp/delphi-organisms-data; files under 1 MB are also vendored into
 <slice>/data/. Nothing is scored here.
 
-Usage: python3 fetch_datasets.py [gbif|pbdb|ncbi|shared|all]
+  * one NCBI Datasets reference-genome count per taxon above species rank
+
+Usage: python3 fetch_datasets.py [gbif|pbdb|ncbi|ncbi-counts|shared|all]
 """
 import datetime as dt
 import hashlib
@@ -94,6 +96,13 @@ def download(url, fname):
 
 
 def url_resolves(url):
+    # DOIs are checked against the Handle System directly; publisher landing pages often block bots.
+    if url.startswith("https://doi.org/"):
+        try:
+            r = requests.get("https://doi.org/api/handles/" + url[len("https://doi.org/"):], headers=UA, timeout=60)
+            return r.status_code == 200 and r.json().get("responseCode") == 1
+        except (requests.RequestException, ValueError):
+            return False
     try:
         r = requests.head(url, headers=UA, timeout=60, allow_redirects=True)
         if r.status_code in (403, 405):
@@ -304,6 +313,57 @@ def build_ncbi(taxa):
         time.sleep(0.4)
 
 
+def build_ncbi_counts(taxa):
+    """For taxa above species rank: how many NCBI reference genomes exist under the taxon."""
+    for slug, t in taxa.items():
+        taxid = t["identifiers"].get("ncbi_taxid")
+        if t["rank"] == "species" or not taxid:
+            continue
+        url = f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/{taxid}/dataset_report?filters.reference_only=true&page_size=1"
+        r = fetch_bytes(url)
+        retrieved = now()
+        body = r.json()
+        total = int(body.get("total_count") or 0)
+        example = (body.get("reports") or [{}])[0]
+        rec = {
+            "id": f"ncbi-genomes-{slug}-{TODAY}",
+            "label": f"NCBI Datasets reference-genome count for {t['accepted_name']} (NCBI taxid {taxid}), {TODAY}",
+            "identifier": f"https://www.ncbi.nlm.nih.gov/datasets/taxonomy/{taxid}/",
+            "doi": None,
+            "bibliographic_citation": f"NCBI Datasets ({TODAY}) genome dataset report for taxon {taxid} ({t['accepted_name']}), reference genomes only. {url}",
+            "is_referenced_by": "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/",
+            "creators": ["National Center for Biotechnology Information"],
+            "issued": TODAY,
+            "license": "NCBI public-domain data; https://www.ncbi.nlm.nih.gov/home/about/policies/",
+            "version": TODAY,
+            "distributions": [{
+                "download_url": url,
+                "media_type": "application/json",
+                "byte_size": len(r.content),
+                "sha256": sha256_bytes(r.content),
+                "retrieved_at": retrieved,
+                "inspected": True,
+            }],
+            "counts": [{
+                "property_id": "n_reference_genomes",
+                "value": total,
+                "description": f"RefSeq/GenBank reference genome assemblies for species classified under NCBI taxon {taxid} ({t['accepted_name']}) on {TODAY}",
+            }],
+            "measurement_technique": "Count of assemblies flagged as reference genomes in NCBI Datasets v2 (one per species), from the taxon dataset_report endpoint with page_size=1.",
+            "taxa": [slug],
+            "role": f"availability of reference genome assemblies within {t['accepted_name']}"
+                    + (f"; first listed: {example.get('accession')} ({example.get('organism', {}).get('organism_name')})" if example else ""),
+            "integrity": {
+                "identifier_resolves": url_resolves(f"https://api.ncbi.nlm.nih.gov/datasets/v2/taxonomy/taxon/{taxid}"),
+                "checksum_verified": True,
+                "checked_at": retrieved,
+            },
+            "vendored_by": VENDORED_BY,
+        }
+        write_ds(rec)
+        time.sleep(0.4)
+
+
 # ---------------------------------------------------------------------------------------------
 # Shared trait databases
 # ---------------------------------------------------------------------------------------------
@@ -317,6 +377,7 @@ GROUPS = {
                                                  "Physeteridae", "Platanistidae", "Pontoporiidae", "Ziphiidae"]},
     "vertebrata": {"class": ["Mammalia", "Aves", "Reptilia", "Amphibia", "Actinopterygii", "Chondrichthyes", "Sarcopterygii",
                              "Teleostei", "Cephalaspidomorphi", "Myxini", "Coelacanthi", "Dipnoi"]},
+    "actinopterygii": {"class": ["Teleostei", "Holostei", "Chondrostei", "Cladistii"]},
     "crustacea": {"class": ["Malacostraca", "Branchiopoda", "Maxillopoda", "Hexanauplia", "Thecostraca", "Ostracoda",
                             "Copepoda", "Remipedia", "Cephalocarida"]},
     "papilionoidea": {"family": ["Papilionidae", "Pieridae", "Nymphalidae", "Lycaenidae", "Riodinidae", "Hesperiidae", "Hedylidae"]},
@@ -431,7 +492,7 @@ def build_shared(taxa):
     pantheria_fam_order = dict(zip(df["MSW05_Family"], df["MSW05_Order"]))
     shared_record(
         "pantheria-1-0-wr05-2008", "PanTHERIA 1.0: species-level life history, ecology and geography of extant and recently extinct mammals (MSW05 taxonomy, Aug 2008)",
-        "https://esapubs.org/archive/ecol/E090/184/", doi, info["authors"], citation(doi, info),
+        f"https://doi.org/{doi}", doi, info["authors"], citation(doi, info),
         "2009-09", "not stated in the archive (ESA Ecological Archives E090-184 data paper)", "1.0 (WR05, August 2008)", [dist],
         len(df), "species rows (Wilson & Reeder 2005 taxonomy) in PanTHERIA_1-0_WR05_Aug2008.txt",
         "Literature-compiled species traits: adult body mass, longevity, gestation, litter size, home range, population density, geographic range, diet breadth.",
@@ -442,11 +503,11 @@ def build_shared(taxa):
     df = pd.read_csv(p, dtype=str)
     df["binomial"] = df["genus"] + " " + df["species"]
     fr = normalise(df, binomial="binomial", genus="genus", family="family", order="order", klass="class")
-    doi = "10.1890/15-0846.1"
+    doi = "10.1890/15-0846R.1"
     info = crossref(doi)
     shared_record(
         "amniote-life-history-db-2015", "Amniote Life-History Database (Myhrvold et al. 2015), Aug 2015 release",
-        "https://esapubs.org/archive/ecol/E096/269/", doi, info["authors"], citation(doi, info),
+        f"https://doi.org/{doi}", doi, info["authors"], citation(doi, info),
         "2015-11", "not stated in the archive (ESA Ecological Archives E096-269 data paper)", "August 2015", [dist],
         len(df), "species rows in Amniote_Database_Aug_2015.csv (birds, mammals, reptiles)",
         "Literature-compiled life-history traits for amniotes: body mass, longevity, maturity, clutch/litter size, incubation/gestation, egg mass.",
@@ -466,7 +527,7 @@ def build_shared(taxa):
     info = crossref(doi)
     shared_record(
         "eltontraits-1-0-2014", "EltonTraits 1.0: species-level foraging attributes of the world's birds and mammals",
-        "https://esapubs.org/archive/ecol/E095/178/", doi, info["authors"], citation(doi, info),
+        f"https://doi.org/{doi}", doi, info["authors"], citation(doi, info),
         "2014-07", "not stated in the archive (ESA Ecological Archives E095-178 data paper)", "1.0", [dist_b, dist_m],
         len(birds) + len(mams), f"species rows: {len(birds)} birds (BirdFuncDat.txt) + {len(mams)} mammals (MamFuncDat.txt)",
         "Literature-compiled diet composition, foraging stratum, activity period and body mass per species.",
@@ -551,6 +612,8 @@ def main():
         build_pbdb(taxa)
     if what in ("ncbi", "all"):
         build_ncbi(taxa)
+    if what in ("ncbi-counts", "all"):
+        build_ncbi_counts(taxa)
     if what in ("shared", "all"):
         build_shared(taxa)
     link_taxa(load_taxa())
