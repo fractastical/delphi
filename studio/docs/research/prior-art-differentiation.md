@@ -1,149 +1,107 @@
-# Prior-art differentiation
+# Prior-art differentiation — feature-level
 
-**What this is:** the compact matrix. The raw research sits in
-`/data/artifacts/delphi-evolve-rethink/messages/` (ASK 466 lines, Buehler 1,097 lines) and is a
-working artifact, not a deliverable. Machine-readable form: `data/research/prior-art.json`.
+**Scope.** A narrow, feature-level comparison of what is *implemented* in each system. It is not
+a novelty argument. Raw research (ASK 466 lines, Buehler 1,097 lines) is in
+`/data/artifacts/delphi-evolve-rethink/messages/`; machine-readable form in
+`data/research/prior-art.json`.
 
-**Evidence basis.** Every row carries a current commit SHA, the command that produced a count
-(with a control wherever a zero is reported), and a read-level for every paper. **No broad
-novelty claim, no baseline claim inferred from a snippet, and no swarm or collective gain
-assertion appears anywhere in this document.**
+**Evidence basis.** Commit SHA per claim, the command behind every count, a control wherever a
+zero is reported, and a read-level per paper. Paper passages are **paraphrased**; quotation is
+held under 25 words per source.
+
+**Two standing rules.** An absent keyword is **not** evidence a system lacks a capability —
+where a check was keyword-based, the row says so and claims nothing further. And a count of test
+functions is **not** a count of passing tests; only a recorded run counts.
 
 ---
 
-## 0. A correction that changes how we may describe our own work
+## 0. Our own release, and a correction
 
-**Git commit order is not an independent witness.** I repeatedly wrote that a preregistration at
-`10:29:30` preceding a result at `10:52:30` proves the criterion was not fitted afterwards. **It
-does not.** Commit timestamps are author-supplied and we control both the clock and the history.
-That is a *self-attestation*.
+**The public deployed release is `12eb390` on `codex/frontier-demo-20261031`**, live at
+`frontier.morphoswarm.ai`. `origin/main` is a subset and is not what we show.
 
-What survives is the **content** check, which is the real evidence: the committed preregistration
-contains no result section, and its acceptance criterion and inconclusive band are byte-identical
-to the ones reported against (`sha256 affabcd2…`). That demonstrates **internal consistency, not
-priority**.
-
-An independent witness would be a third-party timestamp — OpenTimestamps, a public registry, a
-signed receipt from a service we do not control. **We have none.** Until we do, the phrase is
+**Correction: git commit order is not an independent witness.** Earlier notes of mine treated a
+preregistration timestamp preceding a result as proof the criterion was not fitted afterwards.
+Timestamps are author-supplied and we control the history, so that is self-attestation. What
+holds is the content check — the committed file carries no result section and its criterion is
+byte-identical to the one reported against. Internal consistency, not priority. Say
 **"self-attested preregistration"**.
 
----
+## 1. Entities, from primary sources
 
-## 1. The three entities, identified from primary sources
-
-| | what it is | status |
+| | identity | read-level |
 |---|---|---|
-| **ASK** | *Active Scientific Knowledge*, **Mehmet Fırat, sole author**, Anadolu University. DOI `10.2139/ssrn.7416579`, deposited 2026-09-14 | **unreviewed preprint, 0 citations**, read at **full-text** |
-| **ScienceClaw** | `lamm-mit/scienceclaw` — Buehler's LAMM group at MIT, who judge this hackathon | main `894598cd3a` (2026-10-30); categorical code only on branch `38b2f681e8` |
-| **Infinite** | `lamm-mit/infinite` — publication and discourse layer | `699b90a422` (2026-04-16), **unchanged** |
+| **ASK** | *Active Scientific Knowledge*, Mehmet Fırat, sole author, Anadolu University. `10.2139/ssrn.7416579`, 2026-09-14, unreviewed preprint | full text |
+| **ScienceClaw** | `lamm-mit/scienceclaw`, Buehler's LAMM group, MIT | main `894598cd3a`; categorical code on branch `38b2f681e8` |
+| **Infinite** | `lamm-mit/infinite` | `699b90a422`, unchanged since 2026-04-16 |
 
-**Citation hazard:** Crossref *and* OpenAlex record ASK's author as "Mehmet anon". And the arXiv
-API returns **"Fiona Y. Wong"** where the paper's own title block says **Wang** — she is first
-author on the categorical framework, ScienceClaw and the MRS perspective. Cite the byline, never
-the metadata.
+**Citation hazards.** Crossref and OpenAlex both render ASK's author as "Mehmet anon". The arXiv
+API returns *Wong* where the paper's title block reads **Wang** — Fiona Y. Wang is first author on
+the categorical framework, ScienceClaw and the MRS perspective. Use the byline.
 
-## 2. Inherited record versus current
+**Inherited vs current.** Our prior-art file recorded scienceclaw as unchanged since 2026-08-21;
+it moved on 2026-10-30 (2 commits, 9 files — LLM-client, JWT and dry-run fixes plus 4 test files),
+touching nothing under `artifacts/`, the pressure formula, the mutator, the needs layer or the
+type vocabulary. Infinite's record is still accurate. `categoryscienceclaw/` is not on main; it is
+a branch diverged since 2026-05-21, and is the URL the paper itself cites.
 
-| | inherited | current | consequence |
+## 2. Feature matrix — implemented, at the SHAs named
+
+`✔` implemented · `◐` implemented in a bounded form · `✘` not found by the stated check · `—` out of scope
+
+| feature | ASK (paper) | ScienceClaw / Infinite | **Ours, `12eb390`** |
 |---|---|---|---|
-| scienceclaw | `ab9aba1302`, "no new commits" | **`894598cd3a`, 2026-10-30** | **inherited record is now FALSE** |
-| infinite | `699b90a422` | `699b90a422` | inherited record still accurate |
-
-The scienceclaw move is 2 commits / 9 files — LLM-client, JWT and dry-run fixes plus 4 test files
-— touching **nothing** under `artifacts/`, the pressure formula, the mutator, the needs layer or
-the type vocabulary. Code findings therefore survive, **stated as a diff rather than assumed**.
-`categoryscienceclaw/` does not exist on main at all (contents API "Not Found" at `894598cd3a`;
-20 entries at `38b2f681e8` as the control); it is a branch **diverged** since 2026-05-21, and is
-the URL arXiv:2606.01444 itself cites.
-
-One inherited criticism **went stale yesterday**: "only one test file exercises project-specific
-core behaviour" — 503 lines of project-specific tests landed 2026-10-30 and have not been read.
-
-## 3. Feature matrix — implemented versus claimed
-
-`✔` implemented and verified · `◐` present but weaker than it reads · `✘` absent, measured with a
-control · `—` not addressed
-
-| dimension | ASK (paper) | ScienceClaw / Infinite | Ours |
-|---|---|---|---|
-| question routing | — | `/api/discovery` ranks by `desc(createdAt)`, **pure recency** | ✘ not implemented |
-| model coupling, typed contexts | ✘ conceptual only | ✔ real: copresheaves, categories of elements, left Kan extension, 8 proved propositions (2606.01444) | ✘ |
-| evidence contests | ◐ proposed, no mechanism | ✔ `cite/contradict/extend/replicate`, multi-validator consensus | ◐ dispute/fork implemented, unexercised |
-| artifact lineage | ✔ central to the model | ✔ **rejected nodes parent accepted ones**, with `rejected_reason` | ✔ append-only versioned store (main) |
+| typed record store | — conceptual | ✔ artifact DAG, typed vocabulary | ✔ 9 record types, PostgreSQL, live |
+| question routing | — | ◐ `/api/discovery` orders by recency | ◐ attention profiles + typed links (`attention/`) |
+| model coupling, typed contexts | — | ✔ substantial: copresheaves, Kan extension, proved propositions | ◐ bounded: typed scope on records; no categorical layer |
+| evidence contests | ◐ proposed | ✔ `cite/contradict/extend/replicate`, multi-validator consensus | ◐ dispute and fork implemented; bounded use |
+| artifact lineage | ✔ central | ✔ rejected nodes parent accepted ones | ✔ append-only versioned store |
 | active learning | ✘ | ✘ | ✘ |
-| multi-operator federation | ✔ one of its six dimensions | ◐ Infinite threads | ✘ **bundle test runs two stores in one process** |
-| verification (machine-checked) | — | ✘ **zero** `.lean/.v/.thy/.agda/.smt2/.mlw`; their certificates are structural and two are weak | ✔ Lean on main; mutation-killed tests |
-| engineering vs discovery | — | ✔ 2604.26367 **fabricates specimens**, 4 cases, 0.1–6.6% error | ◐ 3 print forms, 4 videos — **demo branch only** |
-| **epistemic objects for plans / experiments / actions** | ✘ closed list of seven; no plan, no experiment | ◐ `Need`, `HypothesisIteration`, SwarmWorld bounded plan — **but gates live in the accepted artifact** | ✔ Action carries acceptance criteria, falsifier, stop rule |
-| **collective-RL governance** | ✘ all ten terms zero | ✘ **ruled out deliberately** | ✘ not implemented |
+| multi-operator federation | ✔ one of its dimensions | ◐ Infinite threads | ◐ export/import bundles; two stores in one process, not two hosts |
+| machine-checked verification | — | ✘ no proof-assistant files at these SHAs | ✔ Lean + mutation-killed checks |
+| engineering → physical | — | ✔ fabricated specimens, measured against prediction | ◐ 12 STL mesh files, **not printed** |
+| decision rule attached to the question | ✘ | ◐ gates exist, recorded in the accepted artifact | ✔ Action carries acceptance criteria, falsifier, stop rule |
+| collective-RL governance | ✘ | ✘ excluded by design | ✘ |
 
-**Controls behind the zeros.** ASK: `reinforcement/reward/feedback/policy/bandit/active learning/
-optimiz*/prioriti*/allocat*/incentive` all 0 across 11 pages; `conformance/conform/compliant/
-specification/acceptance` all 0. ScienceClaw: zero proof-assistant files against **544 `.py` /
-999 `.md` / 91 `.json`** on main (2,177 blobs) and again on the branch; `acceptance_criteri` 0
-files, `stop_rule` 0, `preregist` 0, `falsifi` only inside LLM prompt strings.
+**What the ✘ rows do and do not mean.** ScienceClaw's verification row is a file-extension census
+— zero `.lean/.v/.thy/.agda/.smt2/.mlw` across 2,177 blobs on main and again on the branch, with
+544 `.py` / 999 `.md` / 91 `.json` as controls. It means **no proof-assistant artifact is present
+at those SHAs**. It does **not** mean they do not verify; their certificates are structural
+obligations in code. ASK's zeros are keyword counts over 11 pages and mean only that the paper
+does not use those terms.
 
-## 4. What we may and may not say
+## 3. The feature-level difference worth stating
 
-**MAY — the one defensible sentence:**
-> **They have the objects; we add the decision rule to the object, before the result exists.**
+**We attach the decision rule to the question before the result exists.** A Problem carries what
+would settle it, what would refute it and a stop rule; an Action cannot be leased against one that
+does not. In ScienceClaw the equivalent gate is recorded inside the accepted artifact, so the
+criterion travels with the winner.
 
-Their gates are real but live in code and in the **accepted** artifact's payload — the HEA
-`gate_rule` is recorded *inside the winning model*, so the criterion is written **after the
-verdict, by the winner**. Ours is a typed `Action` carrying acceptance criteria, a falsifier and
-a stop rule, written before. *(With §0's caveat: self-attested, not independently witnessed.)*
+That is one feature. It is not a claim that typed objects, independent review, dead-ends-as-
+artifacts or a formal novelty definition are ours — **all four are theirs, implemented and
+published, and must be cited.** Their published outlook also already frames verifying that
+provenance composes and that claims have admissible artifact paths; we may say we implemented
+something on their list, not that we conceived it.
 
-**MAY — machine-checked verification**, stated narrowly: *no `.lean/.v/.thy/.agda/.smt2/.mlw` in
-these three repositories at these SHAs* — **not** "they do not do verification".
+## 4. Coordination: their result, in context
 
-**MAY NOT — any collective or swarm gain claim.** See §5.
+Wang & Buehler's cross-domain benchmark (arXiv:2605.22300) is a careful rig — 19 comparator and
+ablation arms, 11 controls, 28 metrics, frozen matched panels of 24–32 — and it reports a **regime
+map** rather than a verdict. Paraphrasing: coordination improves discrimination where evidence is
+genuinely distributed; where one channel dominates it improves interpretation, provenance and
+auditability instead; and in representational settings it changes what is being inferred rather
+than improving prediction.
 
-**MAY NOT — typed research objects, independent review, or dead-ends-as-artifacts as ours.**
-Already implemented and published: a node with `status: "rejected"` and a `rejected_reason`,
-**parenting the accepted model**.
+Across four tasks it wins once (Climate-Vector, AUROC 0.944, +0.208), ties once (Cosmic Filter,
+0.955 vs 0.951 on 12 pairs), is matched by a single channel once, and on a chemistry retrieval
+task scores below a scripted baseline while improving nearest-neighbour coherence.
 
-**MAY NOT — a formal non-subjective novelty definition as ours.** 2606.01444 defines discovery as
-residual content outside the image of the Kan comparison map, explicitly to avoid "subjective
-novelty".
+**This is a mature, self-critical result, not a failure.** Publishing a regime map that limits
+your own thesis is the behaviour we should imitate and cite. The consequence for us is specific:
+our closed loop was one agent running one exact scan — a dominant-channel setting by their
+taxonomy — so what coordination buys us is the audit trail, not the answer. We assert no
+discrimination gain.
 
-**MAY NOT — "we thought of verifying provenance".** Their §3 outlook already lists as future work
-that the system *"could verify that provenance diagrams commute, that every public claim has an
-admissible artifact path, that retractions and supersessions preserve old evidence."* We may say
-we implemented something they listed as future work. **We must cite them.**
-
-**MAY NOT — ASK conformance.** ASK defines none, has no implementation, and the six-dimensions-as-
-acceptance-criteria reading is **entirely our construction**. SPEC-087 already says so.
-
-**A trap to expect:** *"Publication under ASK can be understood as a proposal to change a shared
-knowledge state"* — the paper's only use of "proposal". It means a **diff to the knowledge
-graph**, not an action proposal. It does not say what it looks like it says.
-
-**Records over voting.** Our ordering is by typed record content. We implement no vote, and
-Infinite's reputation gates *who may post*, not what gets attempted.
-
-## 5. Collective capability — the judges measured it and mostly refuted it
-
-**arXiv:2605.22300** (F. Y. Wang & Buehler): coordinated vs single-agent on the same tasks,
-comparator matched on inputs, 19 arms, 11 controls, 28 metrics, frozen panels of 24–32.
-
-| task | coordinated | single-agent | verdict |
-|---|---|---|---|
-| Climate-Vector | AUROC 0.944 | +0.208 worse | **wins** |
-| Cosmic Filter | 0.955 | 0.951 | **tie** |
-| Computational Kuhn | 0.9688 | 0.969 | **no gain** |
-| Sound of Molecules | retrieval@3 0.2708 | loses to chemistry baseline | **non-predictive** |
-
-Their Discussion: *"Multi-agent decomposition does not automatically outperform a strong
-single-agent combined baseline … These results argue against treating agent count or
-decomposition as intrinsically valuable."*
-
-**Collective Capability is 25% of the rubric, and the judges' own published answer is
-conditional.** A confident claim from us is refuted by their data before we speak. The honest
-move is to present **the condition**, cite them, and say what we think separates the one win from
-the three non-wins. Engaging with their negative result is the strongest available signal that we
-read their work.
-
-**Required elsewhere:** morphoswarm `docs/prior-art/scienceclaw-infinite.md` §4 item 6 says
-*"MorphoBench (SPEC-006) supplies the missing measurement rig."* They closed that gap in May. The
-first half ("2603.14312 reports qualitative outcomes only") stays true; the second must go.
-Another repo's file — not edited from here.
+**Correction owed elsewhere:** morphoswarm's `docs/prior-art/scienceclaw-infinite.md` §4 item 6
+claims MorphoBench supplies a missing measurement rig. That rig exists as of May. Another repo's
+file; not edited from here.
