@@ -22,6 +22,9 @@ MAX_FILES = 2000
 MAX_ENTRIES = 4000  # Also bound unsupported files/directories, not just accepted media.
 MAX_DEPTH = 20
 CHUNK_BYTES = 1024 * 1024
+MAX_TEXT_BYTES = 1_000_000
+MAX_TEXT_CHARS = 16_000
+TEXT_TYPES = {"application/json", "text/plain", "text/csv"}
 HEX = re.compile(r"^[0-9a-fA-F]{64}$")
 # Stricter than the static guard's basename rule: refuse sensitive directory
 # components too. This projection must not discover private-directory assets.
@@ -206,3 +209,53 @@ class LocalMedia:
         return {"sha256": digest, "matches": matches, "scope": SCOPE, "index": coverage,
                 "note": "Matching bytes were checked in this local published release; this is availability projection, not scientific acceptance. "
                         "An absent match makes no claim about remote or unindexed artifacts."}
+
+    def text_preview(self, digest, *, max_chars=8000):
+        """Read a bounded UTF-8 excerpt after rechecking the complete file digest.
+
+        Only already published JSON/plain-text/CSV artifacts qualify. Reopen with
+        the same no-follow guards as indexing; a cached match never licenses new
+        bytes at a changed path. No path or URI is supplied by the caller.
+        """
+        if type(max_chars) is not int or not 1 <= max_chars <= MAX_TEXT_CHARS:
+            from .store import FrontierError
+            raise FrontierError(f"max_chars must be an integer from 1 to {MAX_TEXT_CHARS}")
+        result = self.lookup(digest)
+        unavailable = {"status": "unavailable", "sha256": result["sha256"], "text": None,
+                       "limits": {"file_bytes": MAX_TEXT_BYTES, "characters": max_chars},
+                       "scope": "Published UTF-8 JSON, plain text or CSV only; no remote fetch or scientific acceptance."}
+        for match in result["matches"]:
+            if match["media_type"].split(";", 1)[0] not in TEXT_TYPES:
+                unavailable["status"] = "unsupported_type"
+                continue
+            try:
+                path = self.validator(self.root, match["href"])
+                if path is None or not path.is_relative_to(self.artifacts):
+                    continue
+                stream, before = self._open(path.relative_to(self.root))
+                with stream:
+                    if before.st_size > MAX_TEXT_BYTES:
+                        unavailable["status"] = "too_large"
+                        continue
+                    contents = stream.read(MAX_TEXT_BYTES + 1)
+                    if (len(contents) != before.st_size or len(contents) > MAX_TEXT_BYTES
+                            or _identity(os.fstat(stream.fileno())) != _identity(before)
+                            or _identity(path.stat(follow_symlinks=False)) != _identity(before)
+                            or self.validator(self.root, match["href"]) != path
+                            or sha256(contents).hexdigest() != result["sha256"]):
+                        unavailable["status"] = "changed"
+                        continue
+                text = contents.decode("utf-8")
+                if "\x00" in text:
+                    unavailable["status"] = "unsupported_encoding"
+                    continue
+                return {"status": "available", "sha256": result["sha256"], "href": match["href"],
+                        "media_type": match["media_type"], "encoding": "utf-8", "byte_size": len(contents),
+                        "full_file_hash_verified": True, "text": text[:max_chars],
+                        "characters_returned": min(len(text), max_chars), "truncated": len(text) > max_chars,
+                        "limits": unavailable["limits"], "scope": unavailable["scope"]}
+            except UnicodeError:
+                unavailable["status"] = "unsupported_encoding"
+            except (OSError, ValueError):
+                unavailable["status"] = "unavailable"
+        return unavailable
