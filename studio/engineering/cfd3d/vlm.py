@@ -55,7 +55,7 @@ def lattice(poly_uw, origin, e_u, e_w, n_up, ns=20, nc=6, normal_fn=None, colloc
     u_lo, u_hi = poly_uw[:, 0].min(), poly_uw[:, 0].max()
     t = 0.5 * (1 - np.cos(np.linspace(0, math.pi, ns + 1)))
     ue = u_lo + (u_hi - u_lo) * np.clip(t, 1e-6, 1 - 1e-6)
-    to3 = lambda u, w: origin + u * e_u + w * e_w  # noqa: E731
+    to3 = lambda u, w: origin + u * e_u + w * e_w
     A, B, C, N, area, strip, uw = [], [], [], [], [], [], []
     for i in range(ns):
         c0, c1, cm = chord_at(poly_uw, ue[i]), chord_at(poly_uw, ue[i + 1]), chord_at(poly_uw, 0.5 * (ue[i] + ue[i + 1]))
@@ -63,7 +63,7 @@ def lattice(poly_uw, origin, e_u, e_w, n_up, ns=20, nc=6, normal_fn=None, colloc
             continue
         for j in range(nc):
             f0, f1 = j / nc, (j + 1) / nc
-            w = lambda c, f: c[0] + f * (c[1] - c[0])  # noqa: E731
+            w = lambda c, f: c[0] + f * (c[1] - c[0])
             fq = f0 + 0.25 * (f1 - f0)
             A.append(to3(ue[i], w(c0, fq)))
             B.append(to3(ue[i + 1], w(c1, fq)))
@@ -118,7 +118,7 @@ def elliptic(ar: float, ns=40, nc=12, colloc=0.75):
 
 
 def cl_of(lat, S, alpha):
-    _, F, _, V = solve(lat, alpha)
+    _, F, _, _ = solve(lat, alpha)
     a = math.radians(alpha)
     lift_dir = np.array([-math.sin(a), 0, math.cos(a)])
     return float(F.sum(axis=0) @ lift_dir / (0.5 * S)), F
@@ -127,8 +127,8 @@ def cl_of(lat, S, alpha):
 def controls() -> dict:
     g = json.loads((Path(__file__).parent / "gates_vlm.json").read_text())["controls"]
     r = {}
-    helm = lambda A: 2 * math.pi * A / (2 + math.sqrt(A * A + 4))  # noqa: E731
-    ll = lambda A: 2 * math.pi * A / (A + 2)  # noqa: E731
+    helm = lambda A: 2 * math.pi * A / (2 + math.sqrt(A * A + 4))
+    ll = lambda A: 2 * math.pi * A / (A + 2)
     lat6, S6 = elliptic(6)
     cla6 = cl_of(lat6, S6, 4)[0] / math.radians(4)
     r["V1_elliptic_AR6"] = {"CL_alpha": cla6, "reference": helm(6), "rel_err": abs(cla6 / helm(6) - 1)}
@@ -143,7 +143,9 @@ def controls() -> dict:
     r["V3_refinement"]["pass"] = r["V3_refinement"]["rel_change"] <= g["V3_refinement"]["pass"]["rel_change_max"]
     m, AR = 0.04, 20.0
     poly = np.array([[-AR / 2, 0.0], [AR / 2, 0.0], [AR / 2, 1.0], [-AR / 2, 1.0]])
-    nfn = lambda u, w, f: (lambda s: np.array([-s, 0, 1.0]) / math.hypot(s, 1))(4 * m * (1 - 2 * w))  # noqa: E731
+    def nfn(u, w, f):
+        s = 4 * m * (1 - 2 * w)
+        return np.array([-s, 0, 1.0]) / math.hypot(s, 1)
     latc = lattice(poly, np.zeros(3), np.array([0, 1.0, 0]), np.array([1.0, 0, 0]), np.array([0, 0, 1.0]), 40, 12,
                    normal_fn=nfn)
     latr = lattice(poly, np.zeros(3), np.array([0, 1.0, 0]), np.array([1.0, 0, 0]), np.array([0, 0, 1.0]), 40, 12)
@@ -159,7 +161,7 @@ def controls() -> dict:
     # V6: two half-elliptic wings with +-20 deg dihedral, the right one the mirror of the left; at zero
     # sideslip the summed side force must vanish (a planar wing gives zero side force trivially, so dihedral)
     d = math.radians(20)
-    half = lambda sgn: lattice(  # noqa: E731
+    half = lambda sgn: lattice(
         np.vstack([np.c_[np.linspace(0, .5, 201), -np.sqrt(np.clip(1 - (np.linspace(0, .5, 201) / .5) ** 2, 0, 1)) * .053],
                    np.c_[np.linspace(.5, 0, 201), 3 * np.sqrt(np.clip(1 - (np.linspace(.5, 0, 201) / .5) ** 2, 0, 1)) * .053]]),
         np.zeros(3), np.array([0, sgn * math.cos(d), math.sin(d)]), np.array([1.0, 0, 0]),
@@ -281,14 +283,14 @@ def fish(panels_path: Path, comps_path: Path, outdir: Path, source: str = "", ns
            "panels_sha256": hashlib.sha256(panels_path.read_bytes()).hexdigest(),
            "components_sha256": hashlib.sha256(comps_path.read_bytes()).hexdigest(), "source": source,
            "method": "horseshoe VLM, rho=1 |V|=1; gates_vlm.json; isolated paired fins, no body, no median fins",
-           "lattice": {"spanwise": ns, "chordwise": nc, "panels": int(len(allp["area"])), "S_lattice_m2": S,
+           "lattice": {"spanwise": ns, "chordwise": nc, "panels": len(allp["area"]), "S_lattice_m2": S,
                        "S_fin_flat_m2": {f: panels["fins"][f]["area_flat_m2"] for f in PAIRED}},
            "membrane": {f: _thk(comps, f) for f in PAIRED},
            "resolution_note": ("membrane and rays are not resolved by any grid here; VLM models each fin as a "
                                "zero-thickness surface (the approximation), so no thickness or ray stiffness enters"),
            "regimes": _regimes(L_body), "speeds": SPEEDS, "media": MEDIA, "cases": {}}
     for alpha in json.loads((Path(__file__).parent / "gates_vlm.json").read_text())["fish_rules"]["angle_of_attack_deg"]:
-        g, F, dcp, V = solve(allp, alpha)
+        _, F, _, _ = solve(allp, alpha)
         a = math.radians(alpha)
         lift_dir = np.array([-math.sin(a), 0, math.cos(a)])
         case = {"alpha_deg": alpha, "CL_paired_fins_on_S_lattice": float(F.sum(axis=0) @ lift_dir / (0.5 * S)),
@@ -328,7 +330,7 @@ def fish(panels_path: Path, comps_path: Path, outdir: Path, source: str = "", ns
 
 def _refine(panels, ns, nc, base, alpha=4, k=1.5):
     """Same fins at k x the lattice in each direction: change in CL and in the transferred quad dCp."""
-    n2, c2 = int(round(ns * k)), int(round(nc * k))
+    n2, c2 = round(ns * k), round(nc * k)
     lats, geos = {}, {}
     for f in PAIRED:
         lats[f], geos[f] = fin_setup(panels["fins"][f], n2, c2)

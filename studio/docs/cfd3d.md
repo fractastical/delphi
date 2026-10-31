@@ -70,6 +70,32 @@ Curated in `artifacts/cfd3d/gpu-v1/` with `receipt.json`. The transport hash was
 - **Videos.** `gpu_fish_L128_Re1000` and `gpu_fish_L192_Re1000` `render/flow.mp4` are from actual solver
   slices. Their captions carry the hash, sub-grid fins, low-Re and C1 FAILED.
 
+## v3 paired fins: thin-surface VLM (CPU, `engineering/cfd3d/vlm.py`)
+- **Why VLM.** The v3 membrane (0.10 mm) is 0.06–0.11 cells at L 128–256, and 2 cells would need
+  L ≥ 4,614, so no WaterLily grid here resolves it. The VLM treats pectoral_L/R and pelvic_L/R as
+  zero-thickness lifting surfaces. That is the approximation, not a resolution: inviscid, attached flow,
+  Re-independent, no body, median fins left out.
+- **Gates.** Frozen in `gates_vlm.json` (`1719b7d`) before the code existed. V1–V6 all PASS
+  (`artifacts/cfd3d/vlm/controls.json`):
+  - Helmbold, AR 6: 1.3%;
+  - lifting line, AR 20: 0.08%;
+  - refinement: 0.36%;
+  - camber: 1.1%;
+  - mutant fails;
+  - mirror symmetry to 3e-16.
+- **Transfer to claude-05's `panels.json` quads.** Panel force is split by sampled overlap area, so the vector
+  sum is conserved to 1e-15. Quad dCp is the normal component. A pressure-only (membrane) load misses the
+  tangential, suction part: about 7% of gross at 4° and 15% at 8°.
+- **v3a and v3c** (48×16 lattice; at 72×24, CL changes 0.5% / 2.9% and pectoral quad dCp 5.1% / 8.3% RMS):
+  - paired-fin CL on own area at 4°: 0.248 / 0.251; at 8°: 0.494 / 0.501;
+  - area 52.9 / 67.7 cm²;
+  - lift at 16 m/s in air (assumed speed): 0.20 / 0.26 N.
+- **v3b does NOT converge.** CL at 0° goes −0.070 / +0.007 / +0.072 at 24×8 / 36×12 / 48×16 with either
+  normal rule, while the input slope stays fixed. Its quad normals tilt up to 19° from the fin plane. No v3b
+  lift is claimed. Geometry only: its pectoral mid-surface rises 3.55° toward the tail.
+- **Regimes.** dCp converts to Pa per medium as dCp × ½ρU², tabled in each `vlm.json` (air 10/16/20 m/s;
+  water 5/10 m/s, assumed). Applicability at glide Re_c 2–4×10⁴ assumes attached flow, which is untested here.
+
 ## Limits that decide every reading
 1. **Fins are sub-grid.** Plates are 0.5 mm, while h is 7.2 mm at L 32 and 0.9 mm at L 256. A fin needs
    L ≥ 923 cells to be 2 cells thick. The simulated shell is 3.7 cells thick (26.9 mm at L 32). Fin loads are

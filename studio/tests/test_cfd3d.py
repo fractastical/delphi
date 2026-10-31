@@ -173,3 +173,10 @@ def test_gpu_bundle_matches_its_receipt_and_keeps_the_failed_gate():
 def test_gpu_grid_pairs_never_make_a_force_claim():
     s = json.loads((ART / "summary-gpu-v1.json").read_text())
     assert len(s["grid_pairs"]) == 2 and all(p["physical_force_claim"] is False for p in s["grid_pairs"])
+
+
+def test_vlm_v3b_is_flagged_not_converged():
+    r = json.loads((VLM / "fish3d-v3b-glide-pose" / "vlm.json").read_text())
+    assert r["status"].startswith("NOT CONVERGED")
+    cl0 = [v[0] for v in r["convergence_sweep"]["bilinear_surface_normal"].values()]
+    assert min(cl0) < 0 < max(cl0)                     # the sign itself is lattice-dependent
