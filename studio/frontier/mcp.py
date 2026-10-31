@@ -22,6 +22,7 @@ from pydantic import Field, ValidationError
 
 from .models import KINDS, MAX_BUNDLE_RECORDS, MAX_RECORD_BYTES, PAYLOADS, POLICY, SCHEMA, Ref
 from .search import SEARCH_KIND, SearchIndex
+from .artifacts import ArtifactIndex
 from .store import FrontierError, Store
 
 MANIFEST_VERSION = "frontier-mcp-capabilities-0.1"
@@ -111,7 +112,12 @@ def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = Non
         """Read an append-only public event page; consumers deduplicate event versions."""
         return store.events(after=after, limit=limit)
 
-    for f in (frontier_search, frontier_get, frontier_neighborhood, frontier_events):
+    def frontier_artifacts(query: str = "", role: str | None = None, evidence_kind: str | None = None,
+                           limit: int = 20, cursor: str = "") -> dict:
+        """Find public artifact declarations with evidence, action, context and review links. Does not fetch or verify bytes."""
+        return ArtifactIndex(store).search(query, role=role, evidence_kind=evidence_kind, limit=limit, cursor=cursor)
+
+    for f in (frontier_search, frontier_get, frontier_neighborhood, frontier_events, frontier_artifacts):
         register(f, READ, "read", None)
 
     def manifest() -> dict:
@@ -120,6 +126,7 @@ def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = Non
                 "credentials": "Process environment only (FRONTIER_DSN; FRONTIER_TOKEN with --allow-write). Never accepted as a tool argument, never returned.",
                 "tools": tools, "not_available": NOT_AVAILABLE, "record_kinds": list(KINDS),
                 "schema_resources": "frontier://schema/{kind} returns that kind's payload JSON schema",
+                "payload_extensions": ["Claim.origin", "Problem.approach/scales/context_tags", "Action.inputs", "Evidence.relation/produced_by/artifacts"],
                 "limits": {"max_record_bytes": MAX_RECORD_BYTES, "max_bundle_records": MAX_BUNDLE_RECORDS, "search_page_max": 50, "lease_seconds": [1, 600]},
                 "search": {"engine": SEARCH_KIND, "filters": ["kind|kinds", "status", "source (URI prefix)", "scope", "context", "include_history"], "exact_pins": ["version", "record id", "source URI"], "pagination": "opaque next_cursor, pass back as cursor (or legacy after)"},
                 "transition_states_via_mcp": ["ready (coordinator only)", "running", "submitted", "blocked", "cancelled", "failed"],

@@ -1,12 +1,12 @@
 # Frontier MCP server
 
-Single-reader (collab), not Codex-reviewed. Official `mcp` SDK 1.27.0, stdio transport. Tested only with the official SDK client; **not tested with Claude Code, Codex or any other MCP client**.
+Official `mcp` SDK 1.27.0, stdio transport. The root integrator has run the official-client interface controls; the initial smoke transcript below is the collab worker's earlier report. **Not yet tested with a live Claude Code or Codex MCP client.**
 
 ## Modes
 
 | | Default (`python -m frontier mcp ...`) | Opt-in (`... --allow-write`) |
 |---|---|---|
-| Tools | `frontier_search`, `frontier_get`, `frontier_neighborhood`, `frontier_events`, `frontier_capabilities` (all `readOnlyHint=true`) | the five above plus `frontier_propose`, `frontier_lease`, `frontier_transition` (`readOnlyHint=false`, `destructiveHint=false`, `idempotentHint=true`) |
+| Tools | `frontier_search`, `frontier_get`, `frontier_neighborhood`, `frontier_events`, `frontier_artifacts`, `frontier_capabilities` (all `readOnlyHint=true`) | the six above plus `frontier_propose`, `frontier_lease`, `frontier_transition` (`readOnlyHint=false`, `destructiveHint=false`, `idempotentHint=true`) |
 | Resources | `frontier://capabilities`, `frontier://schema/{kind}` | same |
 | Acts as | nobody | the principal that owns `FRONTIER_TOKEN` |
 
@@ -36,6 +36,12 @@ action submitted through this MCP server and that a different operator can accep
 
 `frontier_capabilities` (tool) and `frontier://capabilities` (resource) return: `mode`, `namespace`, `principal` (actor, operator, roles, namespaces, daily write limit; never the credential),
 the exact `tools` with `kind` and `requires_role`, `not_available`, `record_kinds`, limits, the allowed transition states and the lease note. Payload JSON schemas: `frontier://schema/{kind}`.
+
+`frontier_artifacts` searches declared artifact metadata and returns the exact
+Evidence and producing Action links, context, assumptions, limitations and review
+state. It never downloads or verifies bytes. The `payload_extensions` manifest
+lists the optional provenance and whiteboard fields. Older strict clients may
+reject these fields; do not strip them from an immutable record to force import.
 
 ## Exact start-up and smoke instructions
 
@@ -69,7 +75,7 @@ echo "--- read-only smoke"; python -m frontier mcp-smoke --namespace demo-node -
 echo "--- write-enabled smoke (still writes nothing)"; python -m frontier mcp-smoke --namespace demo-node --schema demo --allow-write
 ```
 
-Output (abridged; full run: both smokes `"ok": true`):
+Earlier worker smoke output, before the artifact tool was added (abridged; reported both smokes `"ok": true`):
 * read-only: `"mode": "read_only"`, `"principal": null`, five tools, all `readOnly: true`.
 * with `--allow-write`: `"mode": "write_enabled"`, principal `agent-1` / `operator-1` / `["contributor"]`, eight tools, three with `readOnly: false`, no credential in the output.
 

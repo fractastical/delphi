@@ -64,3 +64,13 @@ def test_question_directions_preserve_existing_contract(store):
     bad["payload"]["scales"] = ["organ", "organ"]
     with pytest.raises(ValidationError):
         Draft.model_validate(bad)
+
+
+def test_artifact_http_application_preserves_access_boundary(store):
+    from frontier.http import Application
+    seed(store)
+    app = Application(store)
+    assert len(app.dispatch("/v1/read/artifacts", {})["items"]) == 3
+    assert len(app.dispatch("/v1/read/artifacts", {}, token=TOKENS["alice"])["items"]) == 4
+    with pytest.raises(FrontierError):
+        app.dispatch("/v1/read/artifacts", {"token": TOKENS["alice"]})

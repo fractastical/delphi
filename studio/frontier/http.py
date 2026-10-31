@@ -9,6 +9,7 @@ from pydantic import ValidationError
 
 from .models import MAX_BUNDLE_BYTES, canonical
 from .search import SearchIndex
+from .artifacts import ArtifactIndex
 from .store import FrontierError, Store
 
 
@@ -21,6 +22,7 @@ class Application:
         if not isinstance(data, dict):
             raise FrontierError("JSON object required")
         read = {"/v1/read/get": self.store.get, "/v1/read/search": self.search.query,
+                "/v1/read/artifacts": ArtifactIndex(self.store).search,
                 "/v1/read/neighborhood": self.store.neighborhood, "/v1/read/events": self.store.events,
                 "/v1/read/export": self.store.export_bundle}
         write = {"/v1/proposals": self.store.submit, "/v1/reviews": self.store.review,
