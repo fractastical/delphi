@@ -1,0 +1,28 @@
+{
+  "schema": "frontier.capability-agency.neutral-smoke-summary/1",
+  "purpose": "Validate exact Gemini API generation configuration before v3 protocol freeze; unrelated to either scientific task and excluded from scoring.",
+  "model": "models/gemini-3.8-flash",
+  "attempts": [
+    {
+      "file": "neutral_schema_smoke.json",
+      "http_status": 400,
+      "result": "thinkingLevel=minimal rejected; initial smoke runner did not retain the error message"
+    },
+    {
+      "file": "neutral_schema_smoke_attempt1.json",
+      "http_status": 400,
+      "result": "API error stated MINIMAL is unsupported for this exact model"
+    },
+    {
+      "file": "neutral_schema_smoke_attempt2.json",
+      "http_status": 200,
+      "finish_reason": "STOP",
+      "schema_check_passed": true,
+      "usage": {"promptTokenCount": 19, "candidatesTokenCount": 12, "totalTokenCount": 31}
+    }
+  ],
+  "selected_parameters": {"thinkingLevel": "low", "maxOutputTokens": 1200, "responseMimeType": "application/json"},
+  "smoke_requests": 3,
+  "successful_generations": 1,
+  "failed_http_requests_have_usage_metadata": false
+}

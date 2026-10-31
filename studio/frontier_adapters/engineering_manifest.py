@@ -416,12 +416,13 @@ def link_checks(records: list[dict]) -> list[dict]:
     return checks
 
 
-def build_bundle(chains: list[Chain], *, exporting_node: str | None = None) -> dict:
+def build_bundle(chains: list[Chain], *, exporting_node: str | None = None, limit: int | None = None) -> dict:
     """A frozen, importable `frontier-bundle-0.1` (same body construction as Store.export_bundle). Nothing is written to any store."""
     from frontier.models import MAX_BUNDLE_BYTES, MAX_BUNDLE_RECORDS, POLICY, Record, digest
     records = [r for ch in chains for r in ch.records]
-    if len(records) > MAX_RECORDS:
-        raise Refused(f"{len(records)} records exceeds the first-slice limit of {MAX_RECORDS}")
+    limit = MAX_RECORDS if limit is None else limit            # read at call time: tests (and callers) may patch MAX_RECORDS
+    if len(records) > limit:
+        raise Refused(f"{len(records)} records exceeds the {'first-slice' if limit == MAX_RECORDS else 'slice'} limit of {limit}")
     if len(records) > MAX_BUNDLE_RECORDS:
         raise Refused("exceeds the store's bundle record limit")
     for r in records:

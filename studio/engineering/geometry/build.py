@@ -1,6 +1,9 @@
 """Build every printable form, its stand, its checks and its receipts into artifacts/print/.
 
-    python -m engineering.geometry.build [--out artifacts/print] [--solver-repo .] [--skip-thickness]
+    python -m engineering.geometry.build [--edition v1|v2] [--out DIR] [--solver-repo .] [--skip-thickness]
+
+One edition per output directory: v1 (default) -> artifacts/print, the published sets with their frozen body-profile
+defect; v2 -> artifacts/print-v2, the same forms under new ids with the corrected profile (forms.FORMS_V2).
 
 Run under a capped scope, e.g.
     systemd-run --user --scope -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=600 ...
@@ -111,13 +114,15 @@ def b64(a: np.ndarray, dtype) -> str:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default="artifacts/print")
+    ap.add_argument("--edition", choices=sorted(F.EDITIONS), default="v1")
+    ap.add_argument("--out", default=None, help="default: artifacts/print (v1) or artifacts/print-<edition>")
     ap.add_argument("--solver-repo", default=".")
     ap.add_argument("--solver-rev", default=SB.GUILDS_COMMIT)
     ap.add_argument("--nca-repo", default=None, help="clone holding dx-nca's commit (default: --solver-repo)")
     ap.add_argument("--skip-thickness", action="store_true")
     a = ap.parse_args(argv)
-    out = Path(a.out).resolve()
+    out = Path(a.out or ("artifacts/print" if a.edition == "v1" else f"artifacts/print-{a.edition}")).resolve()
+    forms = F.EDITIONS[a.edition]
     for d in ("design", "solver", "glide", "stl", "web", "img"):
         (out / d).mkdir(parents=True, exist_ok=True)
 
@@ -125,20 +130,28 @@ def main(argv=None) -> int:
     run = {"code_sha256": code_hash(), "libraries": library_versions(), "solver": solver_prov,
            "launch_speed_query_m_s": str(LAUNCH_SPEED), "box_mm": BOX_MM}
 
-    bios = F.complete_all()
+    bios = F.complete_all(forms)
     sets = {}
     for sid, meta in F.SETS.items():
-        members = [(s, b) for s, b in zip(F.FORMS, bios) if s.set_id == sid]
+        members = [(s, b) for s, b in zip(forms, bios) if s.set_id == sid]
+        if not members:
+            continue
         sc, aim = F.display_scale(members)
         sets[sid] = {"title": meta["title"], "note": meta["note"], "display_scale": sc, "length_aim": aim,
                      "forms": [s.id for s, _ in members]}
+        if "supersedes" in meta:
+            sets[sid]["supersedes"] = meta["supersedes"]
     manifest = {"schema": "frontier.print.manifest/2", "run": run, "sets": sets,
                 "display_scale_note": "one scale per set, so sizes compare within a set; sets have different masses",
                 "printer_resin": PRINTER_RESIN, "label": F.LABEL, "forms": {}, "files": {}}
+    if a.edition != "v1":
+        manifest["edition"] = {"id": a.edition, "body_profile": sorted({f.body_profile for f in forms}),
+                               "supersedes": {f.id: v1.id for f, v1 in zip(forms, F.FORMS)},
+                               "v1_directory": "artifacts/print", "note": F.V2_NOTE}
     viewer_designs, viewer_meshes = [], []
     nca_repo = Path(a.nca_repo or a.solver_repo)
 
-    for spec, bio in zip(F.FORMS, bios):
+    for spec, bio in zip(forms, bios):
         scale = sets[spec.set_id]["display_scale"]
         # 1. solver judges the biological design point
         m_, S_, b_ = (SB.rational(bio["mass_kg"]["value"]), SB.rational(bio["wing_area_m2"]["value"]),
@@ -301,9 +314,16 @@ def _check_summary(v: dict) -> dict:
             "mesh_sha256": v["mesh_sha256"]}
 
 
+def _base(out: Path) -> str:
+    try:
+        return f"{out.relative_to(HERE.parents[1]).as_posix()}/"
+    except ValueError:
+        return f"{out.as_posix()}/"
+
+
 def downloads(out: Path, designs: list[dict], sets: dict, run: dict) -> dict:
     """What a site may offer for download: every file with size and sha256, the mesh checks it passed, and the
-    limits that travel with it.  Paths are relative to artifacts/print/."""
+    limits that travel with it.  Paths are relative to `base` (the output directory, e.g. artifacts/print/)."""
     def entry(kind, rel, units=None):
         p = out / rel
         e = {"kind": kind, "path": rel, "bytes": p.stat().st_size, "sha256": sha(p)}
@@ -326,7 +346,7 @@ def downloads(out: Path, designs: list[dict], sets: dict, run: dict) -> dict:
             "prop_checks": _check_summary(d["validation"]),
             "stand_checks": _check_summary(d["stand"]["validation"]),
         })
-    return {"schema": "frontier.print.downloads/1", "code_sha256": run["code_sha256"], "base": "artifacts/print/",
+    return {"schema": "frontier.print.downloads/1", "code_sha256": run["code_sha256"], "base": _base(out),
             "sets": sets, "printer_resin": PRINTER_RESIN, "forms": forms,
             "viewer": entry("html_viewer", "viewer.html"),
             "limitations": [

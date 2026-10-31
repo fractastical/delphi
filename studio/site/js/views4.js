@@ -2,19 +2,57 @@
  * author_report (what documents and people say) and measured (what a receipt in the tree records). */
 (function () {
   const DF = window.DF; const { html, raw, esc } = DF; const U = DF.ui;
-  const TABS = [["overview", "Overview"], ["specs", "Specs and goals"], ["work", "Work and bottlenecks"], ["resources", "Resources"], ["receipts", "Receipts"], ["runtime", "Runtime and tools"], ["connect", "Connect and share"]];
+  const TABS = [["overview", "Overview"], ["built", "How it was built"], ["specs", "Specs and goals"], ["work", "Work and bottlenecks"], ["resources", "Resources"], ["receipts", "Receipts"], ["runtime", "Runtime and tools"], ["connect", "Connect and share"]];
   const AUTHOR = html`<span class="pill lvl-a" title="Written by the authors of the work">author report</span>`;
   const MEAS = html`<span class="pill lvl-m" title="A receipt in the tree records this">measured</span>`;
   const BLOCK = /blocked|failed|authentication|repair|requested|pending|recovery|not yet|unknown/i;
 
   DF.views.work = DF.views.system = function (snap, route) {
+    RAW.clear();                                   // raw-JSON closures belong to the page being drawn; none survive a route change
     const tab = route.params.tab || "overview"; const S = snap.system; const live = DF.api.isLive();
     const nav = html`<nav class="subnav" aria-label="System sections">${TABS.map(([k, t]) => html`<a href="${DF.href("/work", { tab: k })}" aria-current="${tab === k ? "page" : "false"}">${t}</a>`)}</nav>`;
     const head = html`<section class="pagehead"><h1>System</h1><p class="lede">What is being built, by whom, against which spec, and what has actually been measured. Two levels stay apart: ${AUTHOR} (documents and status text) and ${MEAS} (a run with a receipt). Nothing here is live activity, and no step is claimed to have built itself.</p>${nav}</section>`;
-    const body = { overview, specs, work, resources, receipts, runtime, connect }[tab] || overview;
+    const body = { overview, built, specs, work, resources, receipts, runtime, connect }[tab] || overview;
     const out = body(snap, S, live, route);
     return { html: html`${head}${out.html}`, after: out.after };
   };
+
+  /* How it was built: dated receipts, usage windows, provider outcomes and preregistered verdicts, each with its file and sha256. Spend and total usage stay unknown. */
+  function built(snap) {
+    const T = snap.timeline;
+    if (!T) return { html: html`<section class="panel"><h2>How it was built</h2><p class="empty">No resource inventory or receipts are present in this snapshot.</p></section>` };
+    const tone = (ok) => (ok === true ? U.pill("passed", "ok") : ok === false ? U.pill("failed", "no") : U.pill("recorded", "st-unk"));
+    const ev = (r) => html`<code class="small">${r.path}</code> ${r.sha256 ? U.sha(r.sha256) : html`<span class="faint small">no digest recorded</span>`}`;
+    const N = T.nebius; const kinds = [...new Set(T.rows.map((r) => r.kind))];
+    return { html: html`<section class="panel" aria-labelledby="bt-h"><h2 id="bt-h">How it was built ${AUTHOR}</h2>
+      <p class="note small"><b>Source repository:</b> <a href="https://github.com/kganjam/delphi-frontier" rel="noopener">github.com/kganjam/delphi-frontier</a> ${U.pill("public source", "ok")}. Browse the code, model inputs and recorded checks without signing in.</p>
+      <p class="small">Every row is a file in the tree with its sha256. Times are UTC as recorded; Seattle local time is UTC−7 (PDT) on 2026-10-31. A row shows what that file records, not that the work was correct, independent or complete. Inventory observed ${T.observed_at.seattle}.</p>
+      <h3>Recorded counters (event window from ${T.event_window_start_utc.slice(0, 10)})</h3>
+      <div class="tablewrap"><table><caption class="sr">Counters recorded in receipts; unknown where no counter exists</caption><thead><tr><th scope="col">Quantity</th><th scope="col">Recorded</th><th scope="col">Status</th><th scope="col">Limit and source</th></tr></thead><tbody>${T.counters.map((c) => html`<tr><th scope="row">${c.quantity}</th><td>${c.value}</td><td>${U.pill(c.status, c.status === "actual" ? "ok" : c.status === "unknown" ? "no" : "warn")}</td><td class="small">${c.note}<br><code>${c.source}</code></td></tr>`)}</tbody></table></div>
+      <p class="small">Counts cover use recorded inside the event window only. Earlier work is not narrated here; where a result rests on published sources or earlier data, its card cites them with their hashes and licences.</p>
+      <h3>Reuse</h3>
+      <p class="small">What others can take and check: the claims and evidence through the <a href="${DF.href("/work", { tab: "connect" })}">public read interface and MCP tools</a>, every simulation with its manifest and limits on the <a href="${DF.href("/simulations")}">simulations page</a>, printable models and the 3D mesh on <a href="${DF.href("/home")}">Home</a>, and exact record pins on each entity page. Reuse by anyone outside this team is not recorded.</p>
+      ${T.usage ? html`<h3>Roles recorded (a count of contributors, not a count of agents)</h3>
+      <div class="tablewrap"><table><caption class="sr">Identified roles and their recorded status</caption><thead><tr><th scope="col">Contributor</th><th scope="col">Kind</th><th scope="col">Role</th><th scope="col">Status as recorded</th></tr></thead><tbody>${T.usage.roles.map((r) => html`<tr><td><code>${r.id}</code></td><td>${r.kind}</td><td class="small">${r.role}</td><td class="small">${r.status}</td></tr>`)}</tbody></table></div>
+      <h3>Own provider jobs (${T.usage.jobs.length}, ${T.usage.observed_at_seattle})</h3>
+      <details><summary class="small">Show every job record</summary><div class="tablewrap"><table><caption class="sr">Own GPU and CPU job records</caption><thead><tr><th scope="col">Created</th><th scope="col">Kind</th><th scope="col">Job</th><th scope="col">Provider state</th></tr></thead><tbody>${T.usage.jobs.map((j) => html`<tr><td class="small">${j.created}</td><td>${j.kind}</td><td><code class="small">${j.name}</code></td><td>${U.pill(j.state.toLowerCase(), j.state === "FAILED" ? "no" : j.state === "COMPLETED" ? "st-unk" : "warn")}</td></tr>`)}</tbody></table></div></details>
+      <p class="small faint">Provider COMPLETED means the container ended, not that a scientific check passed. Failed jobs stay failed.</p>
+      <h3>Controller outcomes for recent GPU tasks</h3>
+      <ul class="small">${T.usage.controller.map((e) => html`<li>${U.pill(e.status, e.status === "failed" ? "no" : "st-unk")} <b>${e.task}</b>: container wall ${e.wall_s === null ? "not recorded" : e.wall_s + " s"}, return code ${e.rc === null ? "not recorded" : e.rc}. <code>${e.path}</code> ${U.sha(e.sha256)}</li>`)}</ul>
+      <p class="small"><b>External tools credited:</b> ${T.usage.credit.join(", ")}. These are not authored in the event window.</p>
+      <ul class="small">${T.usage.limitations.map((x) => html`<li>${x}</li>`)}</ul>` : ""}
+      <h3>Providers and jobs</h3>
+      <ul class="small"><li><b>Nebius (GPU jobs):</b> ${N.own_job_count} jobs by this project: ${Object.entries(N.job_states).filter(([, n]) => n).map(([k, n]) => n + " " + k.toLowerCase().replace(/_/g, " ")).join(", ")} (observed ${N.observed_at_utc}). Allocation is requested capacity, not utilisation.</li>
+        <li><b>Google Generative Language:</b> ${T.rows.filter((r) => r.kind === "model usage").map((r) => r.title + ": " + r.outcome.split(";")[0]).join("; ")}.</li>
+        <li><b>Live checks of the public node:</b> ${T.rows.filter((r) => r.kind === "live check").length} recorded, ${T.rows.filter((r) => r.kind === "live check" && r.ok).length} with every check passed.</li></ul>
+      <p class="note warn small"><b>Unknown:</b> ${T.unknown.join(" ")}</p>
+      <h3>Dated record (${T.rows.length} rows; ${kinds.join(", ")})</h3>
+      <div class="tablewrap"><table><caption class="sr">Dated build and run records</caption><thead><tr><th scope="col">Time (UTC)</th><th scope="col">Kind</th><th scope="col">What</th><th scope="col">Outcome</th><th scope="col">Evidence</th></tr></thead><tbody>${T.rows.map((r) => html`<tr><td class="small">${r.time.replace("T", " ").replace(/\.\d+Z?$/, "").replace("+00:00", "")}</td><td>${U.pill(r.kind, "grp")}</td><td>${r.title}</td><td class="small">${tone(r.ok)} ${r.outcome}${r.scope ? html`<br><span class="faint">${r.scope}</span>` : ""}</td><td>${ev(r)}</td></tr>`)}</tbody></table></div>
+      <h3>Results, stops and failures, with what checked them</h3>
+      <ul>${T.undated.map((r) => html`<li>${tone(r.ok)} <b>${r.title}</b>${r.date ? " (" + r.date + ", date only)" : ""}: ${r.outcome}<br>${ev(r)}</li>`)}</ul>
+      <h3>Limits of this record</h3><ul class="small">${T.limitations.map((x) => html`<li>${x}</li>`)}</ul>
+      <p class="small faint">Inventory ${T.inventory} ${U.sha(T.inventory_sha256)}. Agent activity beyond these files is not reconstructed here.</p></section>` };
+  }
 
   function overview(snap, S, live) {
     const open = S.goal_checklist.filter((g) => !g.done).length;
@@ -48,7 +86,7 @@
         if (!(DF.api.isLive())) return;
         const r = await DF.api.attention();
         root.querySelector("#attn").innerHTML = (r.unavailable ? html`<section class="panel"><h2>Attention view</h2><p class="empty">Not available (${r.reason}). Nothing is shown in its place.</p></section>`
-          : html`<section class="panel"><h2>Attention view, as received</h2><p class="note small">Built by the attention layer from public stored records and events. Its fields are shown unprocessed: priority here is not truth, and this page has not checked it.</p><pre class="json">${JSON.stringify(r.report, null, 2)}</pre></section>`).toString();
+          : html`<section class="panel"><h2>Attention view, as received</h2><p class="note small">Built by the attention layer from public stored records and events. Its fields are shown unprocessed: priority here is not truth, and this page has not checked it.</p>${rawJson("the attention report", r.report)}</section>`).toString();
       } };
   }
 
@@ -86,7 +124,7 @@
   /* Rendered from the documented frontier.system/1 shape (frontier/system_status.py). Every section carries its own mode label. */
   function liveSystem(r) {
     if (r.unavailable) return html`<section class="panel"><h2>Live system report</h2><p class="empty">Not available (${r.reason}). Nothing is shown in its place.</p></section>`;
-    const R = r.report; if (!R || R.schema !== "frontier.system/1") return html`<section class="panel"><h2>Live system report</h2><p class="note warn small">The runtime answered with an unrecognised schema (${String(R && R.schema)}), so it is shown unprocessed.</p><pre class="json">${JSON.stringify(R, null, 2)}</pre></section>`;
+    const R = r.report; if (!R || R.schema !== "frontier.system/1") return html`<section class="panel"><h2>Live system report</h2><p class="note warn small">The runtime answered with an unrecognised schema (${String(R && R.schema)}), so it is shown unprocessed.</p>${rawJson("the system report", R)}</section>`;
     const st = R.store || {}, pr = R.process || {}, ho = R.host || {}, sv = R.services || {}, rl = R.release || {}, rs = R.resources || {};
     return html`<section class="panel"><h2>Live system report ${MEAS}</h2><p class="small faint">Generated ${R.generated_at}${R.cache ? `, ${R.cache.cached ? "cached " + R.cache.age_seconds + " s" : "fresh"} (reused up to ${R.cache.ttl_seconds} s)` : ""}. ${R.legend ? R.legend.measured : ""}</p>
       <h3>Store ${MODE(st.mode)}</h3>${sect(st) || html`<p class="small">${st.note}</p>${st.counts_scope ? html`<p class="note warn small"><b>Scope.</b> ${st.counts_scope}</p>` : ""}${(st.versions_by_namespace || []).length ? html`<p class="small">By namespace (record versions): ${st.versions_by_namespace.map((n) => `${n.namespace} ${n.versions}`).join(", ")}. This node's own namespace is ${st.namespace}.</p>` : ""}<div class="tablewrap"><table><thead><tr><th>Kind</th><th>Local status</th><th>Versions</th><th>Current heads</th></tr></thead><tbody>${(st.records_by_kind_and_local_status || []).map((x) => html`<tr><td>${x.kind}</td><td>${String(x.local_status).replace(/_/g, " ")}</td><td>${x.versions}</td><td>${x.heads}</td></tr>`)}</tbody></table></div>
@@ -136,6 +174,14 @@
 
   /* /api/counts as received: scalars with their units, nested groups collapsed, and every note or basis string kept right next to the numbers it qualifies. */
   const NOTEKEYS = new Set(["note", "basis", "meaning", "scope", "label"]);
+  /* Large JSON stays out of the page until asked for: collapsed, and filled in only when opened. */
+  const RAW = new Map(); let rawN = 0;
+  function rawJson(label, obj) {
+    const id = "raw" + ++rawN; RAW.set(id, obj); let n = 0; try { n = JSON.stringify(obj).length; } catch (e) { n = 0; }
+    return html`<details class="rawjson" data-raw="${id}"><summary class="small">Show ${label} as received <span class="faint">(about ${n.toLocaleString("en")} characters)</span></summary><pre class="json" aria-label="Raw ${label}"></pre></details>`;
+  }
+  document.addEventListener("toggle", (e) => { const d = e.target; if (d && d.classList && d.classList.contains("rawjson") && d.open) { const pre = d.querySelector("pre"); if (pre && !pre.textContent) pre.textContent = JSON.stringify(RAW.get(d.dataset.raw), null, 2); } }, true);
+
   function tree(o, depth = 0) {
     if (o === null || o === undefined) return html`<span class="faint">none</span>`;
     if (typeof o !== "object") return html`${String(o)}`;
