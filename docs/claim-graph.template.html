@@ -23,6 +23,8 @@ input{font:inherit;font-size:13px;padding:6px 14px;border:1px solid var(--line);
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:8px}
 .toolbar .lab{font-family:var(--serif);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
 .sep{width:1px;height:22px;background:var(--line)}
+input[type=range]{width:110px;padding:0;border:none;background:none;accent-color:var(--gold);vertical-align:middle}
+.thr{display:inline-flex;align-items:center;gap:6px}.thr b{font-size:12px;min-width:30px;font-variant-numeric:tabular-nums}
 .legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--mut);margin:0 4px 10px}
 .tri{display:inline-block;width:12px;height:12px;clip-path:polygon(0 0,100% 0,0 100%);margin-right:5px;vertical-align:middle}
 .pill{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:3px;font-variant-numeric:tabular-nums}
@@ -60,6 +62,12 @@ code{font-size:12px;color:var(--gold2);background:rgba(229,192,123,.08);padding:
  <span class="sep"></span>
  <input id="search" type="search" placeholder="Search claims…" aria-label="Search claims">
  <span class="small mut" id="searchinfo"></span>
+ <span class="sep"></span>
+ <span class="lab">Show only</span>
+ <label class="thr" title="Minimum truth probability (P)"><span class="pill pP">P ≥</span><input id="minP" type="range" min="0" max="1" step="0.05" value="0"><b id="minPv">any</b></label>
+ <label class="thr" title="Minimum testability score (T). Only Darwin's claims have T scores so far."><span class="pill pT">T ≥</span><input id="minT" type="range" min="0" max="1" step="0.05" value="0"><b id="minTv">any</b></label>
+ <button id="clearthr" onclick="setThresholds(0, 0)" style="display:none">Clear</button>
+ <span class="small mut" id="shown"></span>
 </div>
 <div class="legend" id="legend"></div>
 
@@ -98,16 +106,19 @@ $('legend').innerHTML = `<span><b>Corner triangle</b> = proof status:</span>` +
   `<span>· <b>On each edge</b>: <span class="pill pT">T</span>testability, how far today's open data could settle it · <span class="pill pP">P</span>truth, blind GPT and Grok assessors' mean probability that it is true${truthN ? '' : ' (not scored yet)'} · 0–1</span>`;
 
 /* ---- tree model: root → group (thinker or decade) → chapter (books) → claim ---- */
-const S = { mode: 'thinker', sel: null, q: '' };
+const S = { mode: 'thinker', sel: null, q: '', minP: 0, minT: 0 };
 const OPEN = new Set();
 let TREE = null;
+// Unscored claims fail any non-zero threshold.
+const passes = c => (!S.minP || (c.truth ?? -1) >= S.minP) && (!S.minT || (c.resolvability ?? -1) >= S.minT);
+const filtering = () => S.minP > 0 || S.minT > 0;
 function buildTree(mode) {
   const gkey = c => mode === 'thinker' ? c.thinker : `${Math.floor(c.year / 10) * 10}s`;
-  const groups = new Map();
-  for (const c of CLAIMS) { const k = gkey(c); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(c); }
+  const groups = new Map(), CS = CLAIMS.filter(passes), liveN = CS.filter(c => c.registry === 'production').length;
+  for (const c of CS) { const k = gkey(c); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(c); }
   const gl = [...groups.entries()].map(([k, cs]) => ({ k, cs: cs.slice().sort((a, b) => a.year - b.year), year: Math.min(...cs.map(c => c.year)) }))
     .sort((a, b) => a.year - b.year);
-  const root = { id: 'root', kind: 'root', label: 'All claims', sub: `${CLAIMS.length} claims · ${live} live`, claims: CLAIMS, children: [] };
+  const root = { id: 'root', kind: 'root', label: 'All claims', sub: `${filtering() ? `${CS.length} of ${CLAIMS.length}` : CLAIMS.length} claims · ${liveN} live`, claims: CS, children: [] };
   for (const g of gl) {
     const thinkers = [...new Set(g.cs.map(c => c.thinker))], years = [...new Set(g.cs.map(c => c.year))];
     const gn = { id: `g:${g.k}`, kind: 'group', label: g.k, claims: g.cs, children: [],
@@ -260,11 +271,26 @@ function selectClaim(id) {
 }
 $('search').addEventListener('input', e => {
   S.q = e.target.value.trim().toLowerCase();
-  const n = S.q ? CLAIMS.filter(matches).length : 0;
+  const n = S.q ? CLAIMS.filter(c => passes(c) && matches(c)).length : 0;
   $('searchinfo').textContent = S.q ? `${plural(n, 'match')}${n ? ' · Enter opens the first' : ''}` : '';
   draw();
 });
-$('search').addEventListener('keydown', e => { if (e.key === 'Enter') { const c = CLAIMS.find(matches); if (c) selectClaim(c.id); } });
+$('search').addEventListener('keydown', e => { if (e.key === 'Enter') { const c = CLAIMS.find(c => passes(c) && matches(c)); if (c) selectClaim(c.id); } });
+
+function setThresholds(p, t) {
+  S.minP = +p; S.minT = +t; $('minP').value = S.minP; $('minT').value = S.minT;
+  $('minPv').textContent = S.minP ? S.minP.toFixed(2) : 'any'; $('minTv').textContent = S.minT ? S.minT.toFixed(2) : 'any';
+  $('clearthr').style.display = filtering() ? '' : 'none';
+  TREE = buildTree(S.mode);
+  if (S.sel && !findNode(S.sel)) { S.sel = null; $('drawer').style.display = 'none'; }
+  const n = TREE.claims.length;
+  $('shown').textContent = filtering() ? `${n} of ${CLAIMS.length} claims shown${S.minT ? ' · only Darwin has T scores so far' : ''}` : '';
+  const q = new URLSearchParams(location.search); S.minP ? q.set('p', S.minP) : q.delete('p'); S.minT ? q.set('t', S.minT) : q.delete('t');
+  history.replaceState(null, '', `${location.pathname}${q.size ? `?${q}` : ''}${location.hash}`);
+  draw();
+}
+$('minP').addEventListener('input', e => setThresholds(e.target.value, S.minT));
+$('minT').addEventListener('input', e => setThresholds(S.minP, e.target.value));
 
 /* ---- inspector ---- */
 const badge = (t, c) => `<span class="badge" style="background:${c}">${esc(t)}</span>`;
@@ -298,7 +324,8 @@ function claimHtml(c) {
   ${c.scope ? `<h3>Scope</h3><p>${esc(c.scope)}</p>` : ''}`;
 }
 function listHtml(n) {
-  const cs = n.claims, by = s => cs.filter(c => c.status === s).length;
+  const cs = filtering() ? n.claims.slice().sort((a, b) => (S.minT && !S.minP ? (b.resolvability ?? -1) - (a.resolvability ?? -1) : (b.truth ?? -1) - (a.truth ?? -1))) : n.claims;
+  const by = s => cs.filter(c => c.status === s).length;
   return `<h2>${esc(n.kind === 'root' ? 'All claims' : n.label)}</h2><p class="small mut" style="margin:0">${esc(n.sub)} · ${cs.filter(c => c.registry === 'production').length} live · ${Object.keys(STATUS).filter(by).map(s => `${by(s)} ${STATUS[s].label.toLowerCase()}`).join(' · ')}</p>
   <h3>${plural(cs.length, 'claim')}</h3>` + cs.map(c => `<button class="clickable" onclick="selectClaim('${esc(c.id)}')"><i class="tri" style="background:${scol(c.status)};flex:none"></i>${esc(c.label)}<span class="r"><span class="pill pT">${fmt(c.resolvability)}</span><span class="pill pP">${fmt(c.truth)}</span></span></button>`).join('');
 }
@@ -308,5 +335,5 @@ function openDrawer(n) {
 }
 function closeDrawer() { $('drawer').style.display = 'none'; if (S.sel) { S.sel = null; draw(); } }
 
-TREE = buildTree('thinker'); draw();
+{ const q = new URLSearchParams(location.search); setThresholds(q.get('p') || 0, q.get('t') || 0); }
 </script></body></html>
