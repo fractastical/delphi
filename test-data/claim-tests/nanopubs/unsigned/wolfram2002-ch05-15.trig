@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: sft-k2-w2-all, sft-k2-w3-all, sft-k2-w4-all, sft-k3-w2-all, sft-k4-w2-all, sft-k2-w5-sample, sft-k3-w3-sample" ;
     delphi:inferenceMethod "analysis.py encodes each constraint system as a bitmask of allowed length-w words. Satisfiability is decided by iterating a reachability vector over the k^(w-1) de Bruijn vertices for 4V + 1 edge steps (existence of a valid word of length 4V + w). Independently, every period word u with |u| <= V is enumerated (sum of k^p over p = 1..V candidates, each stored as the bitmask of its cyclic length-w windows) and u^infinity is accepted iff its window mask is contained in the allowed set. The two indicators are compared for all 138,856 systems (exhaustive for (k,w) = (2,2), (2,3), (2,4), (3,2), (4,2); seeded samples of 2000 and 5000 for (2,5) and (3,3)); minimal periods are tabulated. Run time about 3 s." ;
     delphi:preregistered false ;
+    delphi:dataKind "computational" ;
     dct:description "analysis.py encodes each constraint system as a bitmask of allowed length-w words. Satisfiability is decided by iterating a reachability vector over the k^(w-1) de Bruijn vertices for 4V + 1 edge steps (existence of a valid word of length 4V + w). Independently, every period word u with |u| <= V is enumerated (sum of k^p over p = 1..V candidates, each stored as the bitmask of its cyclic length-w windows) and u^infinity is accepted iff its window mask is contained in the allowed set. The two indicators are compared for all 138,856 systems (exhaustive for (k,w) = (2,2), (2,3), (2,4), (3,2), (4,2); seeded samples of 2000 and 5000 for (2,5) and (3,3)); minimal periods are tabulated. Run time about 3 s." ;
     rdfs:comment "Measured: 1 fraction of satisfiable constraint systems that have a periodic solution with period <= k^(w-1) (n = 129939, exact for the exhaustive families; the two sampled families are 2000 and 5000 seeded draws). Interpretation: Wolfram's 'local set of constraints' on a one-dimensional array of coloured cells (p. 210-211: each cell's neighbourhood must be one of a given set of allowed configurations) is a one-dimensional subshift of finite type: a set of allowed words of a fixed window length w over k colours. 'Can be satisfied at all' is read as the existence of a bi-infinite arrangement all of whose windows are allowed; by compactness this is equivalent to the existence of arbitrarily long valid finite words, and operationally it is tested by the existence of a valid word of length 4V + w (any valid word longer than V must revisit a de Bruijn vertex, so this length is far beyond the threshold, and the check is done by a reachability iteration, not a cycle search). 'Simple and purely repetitive arrangement' is read as a periodic configuration, found by brute-force enumeration of all period words u with |u| <= V = k^(w-1) and checking all cyclic windows. All constraint systems are enumerated exhaustively for (k, w) in {(2,2), (2,3), (2,4), (3,2), (4,2)} and sampled with a fixed seed for (2,5) and (3,3)." ;
     delphi:evidenceAgainst "The claim is a theorem (a non-empty one-dimensional shift of finite type contains a periodic point, from a cycle in its de Bruijn graph); the computation confirms it exhaustively for all two-colour constraints with windows up to 4 and all four-colour constraints with window 2, and by sampling for windows 5 (two colours) and 3 (three colours). The maximal minimal period found (8 for k = 2, w = 4; exactly the two de Bruijn-cycle constraint sets) matches the bound V = k^(w-1)." ;
@@ -37,7 +38,7 @@ sub:assertion {
     delphi:evidenceAgainst "Wolfram's 'simple' is read as 'periodic'; the observed minimal periods are small (at most V), but 'simple' is not otherwise quantified." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-15--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-15--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-15--claim-test--dataset-3>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-15--claim-test--dataset-4>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-15--claim-test--dataset-5>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-15--claim-test--dataset-6>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-15--claim-test--dataset-7> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-15/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-15/result.json> .
   <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-15--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: All 16 allowed-word sets, 2 colours, window 2 (generated by analysis.py)" ;
     dct:description "exhaustive" ;
@@ -71,12 +72,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-15/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-15/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-0123)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -86,7 +87,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.077Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.687Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of wolfram2002-ch05-15: supports, confidence 0.97" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

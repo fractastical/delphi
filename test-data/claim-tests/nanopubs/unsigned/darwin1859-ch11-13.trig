@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: margo-2009-lgm-sst-anomaly-grid" ;
     delphi:inferenceMethod "analysis.py downloads the MARGO supplementary zip, parses Table S9 (307 ocean grid cells with LGM reconstructions), computes cooling = modern WOA98 SST minus LGM SST per cell (the table's own 'anomaly' column is LGM minus modern despite the caption, so the two temperature columns are used directly), and evaluates the fraction of cooler cells, the cosine-latitude weighted mean cooling and a one-sided t-test globally, per hemisphere, per 30-degree latitude band and per ocean basin (basins assigned from longitude). The verdict follows the pre-registered thresholds." ;
     delphi:preregistered false ;
+    delphi:dataKind "physical" ;
     dct:description "analysis.py downloads the MARGO supplementary zip, parses Table S9 (307 ocean grid cells with LGM reconstructions), computes cooling = modern WOA98 SST minus LGM SST per cell (the table's own 'anomaly' column is LGM minus modern despite the caption, so the two temperature columns are used directly), and evaluates the fraction of cooler cells, the cosine-latitude weighted mean cooling and a one-sided t-test globally, per hemisphere, per 30-degree latitude band and per ocean basin (basins assigned from longitude). The verdict follows the pre-registered thresholds." ;
     rdfs:comment "Measured: 0.8436 fraction of 5x5 degree ocean grid cells with LGM (19-23 ka) annual SST below modern (n = 307, area-weighted mean cooling 2.063 C; 0.433 of cells cooler by more than the stated total error). Interpretation: Darwin's 'Glacial period' is read as the last glaciation and 'this period' as its culmination; the MARGO project's LGM chronozone (19-23 ka, defined on independent radiocarbon and stratigraphic age models) is the standard operationalisation of a single simultaneous interval, so testing whether cooling is found in every region within that window tests simultaneity directly. 'Temperature of the whole world' is tested with sea-surface temperature because the ocean compilation is global, gridded and has quantified errors; land temperatures are not tested here. Darwin's own hedge ('or at least along broad longitudinal belts') is covered by the per-band and per-basin criteria. A cell counts as 'cooler' if the central anomaly estimate is positive; a sensitivity count using only cells whose anomaly exceeds its total error is reported but is not part of the rule." ;
     delphi:evidenceAgainst "Within the single LGM chronozone 84.4 % of 307 ocean cells were cooler than today (area-weighted mean cooling 2.06 C, p = 2e-39), both hemispheres (82 % and 88 %), every latitude band and every basin cooled on average with p < 1e-9, except the 60-90 N band (50 % of cells, p = 0.10). No subset shows majority warming, so the refutation condition is far from met; the 'supports' thresholds (>= 90 % globally, >= 80 % in every subset) are missed by the global figure, the Atlantic (79.5 %), the Pacific (79.3 %) and the Nordic Seas. Darwin's hedged version ('along broad longitudinal belts from pole to pole') is clearly supported; the literal 'whole world' is supported as a mean statement but not cell by cell." ;
@@ -39,7 +40,7 @@ sub:assertion {
     delphi:evidenceAgainst "The first run used the table's anomaly column with the sign read from the captions, which inverted every result; the sign was verified against the raw temperature columns and the script now derives cooling from those columns. The pre-registered criterion was not changed." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-13--claim-test--dataset-1> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch11-13/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch11-13/result.json> .
   <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-13--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: MARGO Project Members (2009) Constraints on the magnitude and patterns of ocean cooling at the Last Glacial Maximum, Nature Geoscience 2:127-132; supplementary Table S9 (MARGO_all_LGM_SST, 5x5 degree grid), archived at PANGAEA" ;
     dct:description "modern (WOA98) and LGM (19-23 ka) annual SST per 5x5 degree cell with total error, number of records and proxies" ;
@@ -52,12 +53,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch11-13/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch11-13/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-6221)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -67,7 +68,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.027Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.661Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of darwin1859-ch11-13: mixed, confidence 0.75" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

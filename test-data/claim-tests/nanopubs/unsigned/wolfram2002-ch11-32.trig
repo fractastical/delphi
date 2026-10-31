@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: nks-combinator-constructions-p1121" ;
     delphi:inferenceMethod "analysis.py implements hash-consed S/K terms with a memoised one-pass ReplaceAll step (whole expression first, then head and argument, replaced parts not re-scanned) and full normalisation by iterating passes to a fixed point. It (A) evolves s[s[s]][s][s][s][s] for 40 steps and fits log2 LeafCount on steps 10-40; (C) implements ToC bracket abstraction, p, inc, num, cr, the rule-110 cell combinator f (size 62, book: 61) and the step combinator w (size 674) from the note, encodes all 56 binary lists of length 3-5, applies w up to three times and decodes with the pair selectors; (B) runs the exhaustive census of the 109,824 size-8 expressions (60 steps or LeafCount > 20,000) and, as validation of the rewrite semantics, the 16,896 size-7 expressions, comparing with the counts printed in the note 'Combinator properties'. Full output in derived/census.json; runtime about 8 s." ;
     delphi:preregistered false ;
+    delphi:dataKind "computational" ;
     dct:description "analysis.py implements hash-consed S/K terms with a memoised one-pass ReplaceAll step (whole expression first, then head and argument, replaced parts not re-scanned) and full normalisation by iterating passes to a fixed point. It (A) evolves s[s[s]][s][s][s][s] for 40 steps and fits log2 LeafCount on steps 10-40; (C) implements ToC bracket abstraction, p, inc, num, cr, the rule-110 cell combinator f (size 62, book: 61) and the step combinator w (size 674) from the note, encodes all 56 binary lists of length 3-5, applies w up to three times and decodes with the pair selectors; (B) runs the exhaustive census of the 109,824 size-8 expressions (60 steps or LeafCount > 20,000) and, as validation of the rewrite semantics, the 16,896 size-7 expressions, comparing with the counts printed in the note 'Combinator properties'. Full output in derived/census.json; runtime about 8 s." ;
     rdfs:comment "Measured: [object Object] pre-registered components A and C (C under the pre-registered reading and under the alternative reading of 'padding with 0 on either side') (n = [object Object]). Interpretation: The claim has three parts: simple rules (two rewrite rules), highly complex behaviour (illustrated by exponential growth of a tiny expression and irregular size sequences), and the ability to emulate rule 110. The first two are tested through the book's own exhibit (the shortest unboundedly growing expression) and the exhaustive size-8 census; 'seemingly random internal structure' is not given a decisive statistical test here because the structures involved have at most a few hundred steps, too short for the compression-based criteria used elsewhere; it is reported descriptively. The emulation is tested as an exact computational reproduction of the published construction. Evaluation order follows the book's note 'Combinator properties' (expr /. crules per step); fixed points do not depend on order (Church-Rosser) but intermediate sizes do." ;
     delphi:evidenceAgainst "Component C failed under the pre-registered reading of 'padding with 0 on either side' (evolve the zero-padded list): 84 of 168 cases differ, but every mismatch is a list starting with 1 and differs only in the leftmost output cell. Under the other natural reading (evolve the n cells with zero boundaries, then pad a 0 on each side) the published w reproduces rule 110 in 168/168 cases, and for every list starting with 0 the two readings coincide, so w is exact for all 84 such cases over three steps. Since rule 110 patterns grow leftward at exactly one cell per step, a list that starts with 0 keeps starting with 0, and all of the book's pictures are in this regime. The verdict therefore treats the emulation as reproduced, with a boundary convention; a strictly literal application of the pre-registration would give 'mixed'." ;
@@ -39,7 +40,7 @@ sub:assertion {
     delphi:evidenceAgainst "Growth rate 2^0.47 t over steps 10-40 agrees with the book's 2^(t/2) to within the fit tolerance; intermediate sizes depend on the evaluation order, which here follows the book's." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-32--claim-test--dataset-1> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-32/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-32/result.json> .
   <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-32--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: S/K combinator rules, size-8 census and rule-110 combinator from NKS pp. 712-713 and notes pp. 1121-1123 (generated by analysis.py)" ;
     dct:description "rewrite rules, initial expressions and the emulation construction under test" ;
@@ -50,12 +51,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-32/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-32/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/wolfram-nks-claim-tests-106e)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -65,7 +66,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.084Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.694Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of wolfram2002-ch11-32: supports, confidence 0.8" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: tajika-2018-nautilus-pompilius-dryad-4cb86, walton-korn-2018-ammonoid-ontogeny-dryad-c17p8, collins-2021-helicospiral-gastropods-dryad-p5hqbzknw" ;
     delphi:inferenceMethod "fetch.py obtains the files (Dryad downloads sit behind a browser proof-of-work challenge; they were fetched with headless Chrome and checksummed) and writes derived tables (committed). analysis.py computes, per Nautilus specimen, the median of dm[i]/dm[i-8] over the 45-degree stations (one revolution; all stations are post-hatching, first dm 18-27 mm); per ammonoid species, the median of dm[n]/dm[n-1] over half-whorl stations with dm >= 5 mm; per gastropod specimen, the median of r[k+2]/r[k] where r is the perpendicular distance of each digitised aperture's centroid from the coiling axis (apertures 180 deg apart; replicate digitisations pooled), then the median per species. Each r is converted to alpha = arccot(ln r / 2 pi) and the pre-registered band fractions are evaluated." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "fetch.py obtains the files (Dryad downloads sit behind a browser proof-of-work challenge; they were fetched with headless Chrome and checksummed) and writes derived tables (committed). analysis.py computes, per Nautilus specimen, the median of dm[i]/dm[i-8] over the 45-degree stations (one revolution; all stations are post-hatching, first dm 18-27 mm); per ammonoid species, the median of dm[n]/dm[n-1] over half-whorl stations with dm >= 5 mm; per gastropod specimen, the median of r[k+2]/r[k] where r is the perpendicular distance of each digitised aperture's centroid from the coiling axis (apertures 180 deg apart; replicate digitisations pooled), then the median per species. Each r is converted to alpha = arccot(ln r / 2 pi) and the pre-registered band fractions are evaluated." ;
     rdfs:comment "Measured: 80.48 degrees, median constant angle of Nautilus pompilius (r = 2.87 per revolution) (n = 93, Nautilus IQR 80.27-80.68 deg (r 2.81-2.94); population medians 80.4 (Indonesia), 80.4 (Malaysia), 80.7 (Philippines)). Interpretation: Thompson defines the constant angle through the per-whorl ratio of radii or whorl breadths, r = e^(2 pi cot alpha), and reads the angle off that ratio; the test therefore measures r and converts it with his own formula rather than fitting tangent angles to outlines. Modern 'whorl expansion rate' (Korn: WER = (dm1/dm2)^2 across half a whorl; Raup: W per revolution) is the same quantity for a planispiral shell. 'Ordinary ammonitoid shells' is operationalized as the species in a large published cross-section dataset (Devonian-Jurassic), 'typically spiral gastropods' as the 25 fossil and modern helicospiral species measured by Collins et al. 2021; neither sample was chosen by the tester. Deviation from the pre-registration: Collins et al. publish no per-revolution W (their W_e is a fitted rate of aperture-area increase), so r was computed directly from their raw digitised apertures (distance of the aperture centroid from the coiling axis at 180-degree steps, r = r[k+2]/r[k]), which is Thompson's own quantity; Nautilus r was likewise taken directly as dm[i]/dm[i-8] over the 45-degree stations rather than through WER." ;
     delphi:evidenceAgainst "The verdict follows the pre-registered rule, which fails because only 32% of ammonoid species (threshold 40%) and 46% of gastropod species fall inside 80-85 deg. The failure is one-sided: no ammonoid and no gastropod species, and only 5% of Nautilus, fall below 80 deg, so 'very seldom less than 80 deg' is strongly supported; the typical ammonoid and gastropod sits at 85-86 deg (r 1.5-1.7), just above Thompson's upper bound rather than inside it." ;
@@ -40,7 +41,7 @@ sub:assertion {
     delphi:evidenceAgainst "Sensitivity (not pre-registered, computed in a side check): the ammonoid in-band fraction is 0.26 with no size threshold, 0.32 at dm >= 5 mm (pre-registered), 0.29 at dm >= 10 mm, 0.26 at dm >= 20 mm, and 0.33 using only each species' last measured revolution; the median alpha stays at 85.5-85.6 deg and the below-80 fraction at 0 throughout, so the verdict does not depend on the threshold." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-10--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-10--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-10--claim-test--dataset-3> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch11-10/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch11-10/result.json> .
   <https://w3id.org/delphi/resource/evidence/thompson1917-ch11-10--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Data from: Intraspecific variation in cephalopod conchs changes during ontogeny: perspectives from three-dimensional morphometry of Nautilus pompilius" ;
     dct:description "Nautilus per-revolution expansion ratio" ;
@@ -69,12 +70,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch11-10/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch11-10/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5-1-thinking-high; cursor/thompson-claim-tests-6e84)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> ;
@@ -84,7 +85,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.070Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.674Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of thompson1917-ch11-10: refutes, confidence 0.6" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

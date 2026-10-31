@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: wcvp-world-checklist-vascular-plants, tdwg-wgsrpd-level3" ;
     delphi:inferenceMethod "analysis.py computes the spherical area and area-weighted centroid latitude of each of the 369 TDWG level-3 units and marks a unit 'continental' if any boundary point lies within 2 km of another unit's boundary (241 units after excluding Antarctica), 'oceanic' if in the pre-registered list, and 'other island' otherwise. Native richness per unit is the number of accepted WCVP species with a distribution record flagged neither introduced, extinct nor doubtful. An OLS fit log10 S = a + b log10 A + c |lat| on continental units (b = 0.199, c = -0.0088, R2 = 0.33) predicts richness for each oceanic unit; 28 of 60 oceanic units fall inside the continental area range (196 to 3.84 million km2) and enter the test. The measured value is the median observed/predicted ratio; the rule also requires the fraction below prediction and a one-sided Wilcoxon test." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "analysis.py computes the spherical area and area-weighted centroid latitude of each of the 369 TDWG level-3 units and marks a unit 'continental' if any boundary point lies within 2 km of another unit's boundary (241 units after excluding Antarctica), 'oceanic' if in the pre-registered list, and 'other island' otherwise. Native richness per unit is the number of accepted WCVP species with a distribution record flagged neither introduced, extinct nor doubtful. An OLS fit log10 S = a + b log10 A + c |lat| on continental units (b = 0.199, c = -0.0088, R2 = 0.33) predicts richness for each oceanic unit; 28 of 60 oceanic units fall inside the continental area range (196 to 3.84 million km2) and enter the test. The measured value is the median observed/predicted ratio; the rule also requires the fraction below prediction and a one-sided Wilcoxon test." ;
     rdfs:comment "Measured: 0.4393 median ratio of observed native vascular plant species on oceanic island units to the richness predicted for a continental area of equal size and latitude (n = 28, Wilcoxon one-sided p = 3.73e-09; interquartile range of ratio 0.185-0.612). Interpretation: 'Species of all kinds' is tested for vascular plants, the group Darwin cites de Candolle for and the only group with a complete, native-status-coded global checklist at consistent regional units. 'Oceanic islands' are the TDWG level-3 units that are volcanic hot-spot islands, atolls or intra-oceanic arc islands never joined to a continent: AZO, MDR, SEL, CNY, CVI, STH, ASC, TDC, BER, GAL, HAW, MID, FIJ, SAM, TON, SCI, MRQ, TUA, TUB, COO, NUE, PIT, EAS, JNF, VAN, NFK, MAU, REU, ROD, COM, GGI, CRL, MRN, MRS, GIL, LIN, PHX, WAL, TOK, TVL, NRU, WAK, HBI, KER, CRZ, ASP, HMD, MPE, BOU, ICE, OGA, KZN, MCS, CGS, MDV, LDV, XMS, CKI, SGE, TRT, SOL (Solomon Is., oceanic arc), SCZ (Santa Cruz Is.), ALD (Aldabra). Units that are continental fragments or shelf islands (e.g. NWC New Caledonia, SEY Seychelles, FAL, NZN, NZS, MDG, GRB, JAP, SRL, CUB, FOR) are excluded from both groups; 'continental' means a level-3 unit whose polygons lie within 2 km of another unit's polygons (i.e. part of a connected mainland block), Antarctica excluded. Area is the spherical area of each unit's polygons; |latitude| of the area-weighted centroid is the only 'physical condition' covariate available at this resolution, so the physical-conditions clause is only crudely addressed. Native richness counts accepted species (rank Species) with a WCVP distribution record that is not introduced, extinct or doubtful. Small continental units (city-states, small countries) and the smallest oceanic islands may be undersampled in different ways; this is noted rather than corrected." ;
     delphi:evidenceAgainst "All 28 oceanic island units (Hawaii 0.52, Fiji 0.66, Galapagos 0.21, Vanuatu 0.58, Samoa 0.46, Iceland 0.58, South Georgia 0.03, Canary Is. 1.00, ...) lie at or below the continental prediction; median ratio 0.44 (IQR 0.19-0.61), Wilcoxon p = 3.7e-9. The area-only model gives the same answer (median 0.45). Shelf and continental-fragment islands (n = 66, median 0.80, 61 % below) show a much weaker deficit, which matches Darwin's distinction between oceanic and continental islands." ;
@@ -40,7 +41,7 @@ sub:assertion {
     delphi:evidenceAgainst "The Solomon and Santa Cruz Islands and Iceland are counted as oceanic on geological grounds; removing them would not change the median materially (all three are below prediction)." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-04--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-04--claim-test--dataset-2> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch12-04/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch12-04/result.json> .
   <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-04--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: World Checklist of Vascular Plants (WCVP), Royal Botanic Gardens, Kew: wcvp_names.csv and wcvp_distribution.csv in wcvp.zip" ;
     dct:description "accepted species and native (non-introduced, non-extinct, non-doubtful) distribution per TDWG level-3 unit" ;
@@ -60,12 +61,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch12-04/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch12-04/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-6221)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -75,7 +76,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.029Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.663Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of darwin1859-ch12-04: supports, confidence 0.9" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

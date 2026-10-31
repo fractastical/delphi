@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: rgg-constant-curvature-generator" ;
     delphi:inferenceMethod "analysis.py builds, for 3 seeds each, random geometric graphs with density 3183 and epsilon 0.045 on the flat 2-torus (40000 nodes), unit 2-sphere (40000), 2-sphere of radius 1.5 (90000) and hyperbolic plane (curvature -1, disk of hyperbolic radius 2.2, 71356 nodes), and with density 7600 and epsilon 0.086 on the flat 3-torus and unit 3-sphere (150018 nodes each); runs BFS from 500 sources per graph (hyperbolic: sources within hyperbolic radius 1.0 of the centre), averages the shell counts S(r), measures on the flat graphs the mean geodesic radius s(r) of hop-r nodes, and over hops with 0.25 <= s(r) <= 0.7 computes the relative correction Q(r) = S_curved/S_flat - 1, its sign, the log-log slope of S_curved - S_flat against r, and the through-origin coefficient k in Q = k s(r)^2 compared with the continuum value -R/(6d)." ;
     delphi:preregistered false ;
+    delphi:dataKind "computational" ;
     dct:description "analysis.py builds, for 3 seeds each, random geometric graphs with density 3183 and epsilon 0.045 on the flat 2-torus (40000 nodes), unit 2-sphere (40000), 2-sphere of radius 1.5 (90000) and hyperbolic plane (curvature -1, disk of hyperbolic radius 2.2, 71356 nodes), and with density 7600 and epsilon 0.086 on the flat 3-torus and unit 3-sphere (150018 nodes each); runs BFS from 500 sources per graph (hyperbolic: sources within hyperbolic radius 1.0 of the centre), averages the shell counts S(r), measures on the flat graphs the mean geodesic radius s(r) of hop-r nodes, and over hops with 0.25 <= s(r) <= 0.7 computes the relative correction Q(r) = S_curved/S_flat - 1, its sign, the log-log slope of S_curved - S_flat against r, and the through-origin coefficient k in Q = k s(r)^2 compared with the continuum value -R/(6d)." ;
     rdfs:comment "Measured: 1.008 fitted curvature coefficient k divided by the continuum prediction -R/(6d) (hyperbolic plane); other geometries in extra (n = 4, shell-count SD across 3 graphs is 0.2-1% of S in the fit range (derived/measured.json S_sd)). Interpretation: Wolfram's count is of nodes reached by going r connections, i.e. the shell at graph distance r (claims.json paraphrases it as 'within distance r'; the test follows the book's wording and the r^(d+1) exponent, which is the shell exponent). 'Large network approximating d-dimensional space' is realised as random geometric graphs on constant-curvature model spaces, whose hop distance approximates geodesic distance up to a stretch factor that is measured on the flat graph of the same density and applied to the curved ones. Proportionality to the Ricci scalar is tested against the continuum coefficient -R/(6d) of the geodesic-sphere area expansion (Gray 2004, Tubes, ch. 3) across R = 8/9, 2, -2 (d = 2) and R = 6 (d = 3); only constant-curvature spaces are used, so the claim that no other curvature invariant enters at leading order is tested only through the coefficient, not through anisotropic examples." ;
     delphi:evidenceAgainst "Deviation from the pre-registration: the hyperbolic patch was pre-registered as a disk of hyperbolic radius 1.8 with sources within 0.2 of the centre. That region contains only about 400 nodes, so the 500 'sources' were essentially one overlapping sample and the hyperbolic shell counts fluctuated by 2-4% between seeds (the first run gave Q(8) = -0.001 and exponent 4.9, failing (a) and (b) on noise). The patch was enlarged to radius 2.2 with sources within radius 1.0 (about 10900 candidate nodes) before any threshold was changed; all other parameters and all criteria are as pre-registered. First-run hyperbolic numbers for the record: Q over hops 8-18 = [-0.0014, 0.0123, 0.0239, 0.0361, 0.0463, 0.0584, 0.0606, 0.0715, 0.0757, 0.0725, 0.0696], slope 4.93, k ratio 1.18, S(1) = 19.9 versus 20.4 on the torus." ;
@@ -39,7 +40,7 @@ sub:assertion {
     delphi:evidenceAgainst "The fitted coefficients are 8% below the continuum value for the spheres and 1% above for the hyperbolic plane; the shortfall is within the pre-registered tolerance and is consistent with the finite width of hop shells and the O(s^4) terms, but was not modelled." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch09-24--claim-test--dataset-1> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch09-24/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch09-24/result.json> .
   <https://w3id.org/delphi/resource/evidence/wolfram2002-ch09-24--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Random geometric graphs on flat tori, spheres and the hyperbolic plane (generated by analysis.py)" ;
     dct:description "networks whose shell counts are measured" ;
@@ -49,12 +50,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch09-24/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch09-24/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (Claude Fable 5.1 (Cursor cloud agent); cursor/claim-tests-wolfram-nks-f0e1)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-cursor-cloud-agent> ;
@@ -64,7 +65,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.079Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.690Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of wolfram2002-ch09-24: supports, confidence 0.85" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

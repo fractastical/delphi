@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: lcg-historical-parameters, lcg-generator-output" ;
     delphi:inferenceMethod "analysis.py: for each generator builds the dual lattice of consecutive d-tuples (basis (m,0,..), (-a^i mod m, e_i)), LLL-reduces it exactly and enumerates all short vectors (Fincke-Pohst) to obtain the exact spectral test value nu_d, the normalised figure of merit S_d and the minimal L1 norm (number of parallel hyperplanes containing every d-tuple of the whole period) for d = 2, 3, 4; generates 2^20 consecutive states from seed 12345, projects each triple (x_i, x_{i+1}, x_{i+2})/m onto the minimal-L1 dual vector and counts distinct values (rounded to 1e-9), repeating the same projections on 2^20 64-bit words from os.urandom; runs the two-dimensional birthday-spacings test (32 replications of 2^15 non-overlapping pairs in 2^21 x 2^21 cells, expected 2 collisions each, total compared with Poisson(64)) on every generator and on os.urandom." ;
     delphi:preregistered false ;
+    delphi:dataKind "computational" ;
     dct:description "analysis.py: for each generator builds the dual lattice of consecutive d-tuples (basis (m,0,..), (-a^i mod m, e_i)), LLL-reduces it exactly and enumerates all short vectors (Fincke-Pohst) to obtain the exact spectral test value nu_d, the normalised figure of merit S_d and the minimal L1 norm (number of parallel hyperplanes containing every d-tuple of the whole period) for d = 2, 3, 4; generates 2^20 consecutive states from seed 12345, projects each triple (x_i, x_{i+1}, x_{i+2})/m onto the minimal-L1 dual vector and counts distinct values (rounded to 1e-9), repeating the same projections on 2^20 64-bit words from os.urandom; runs the two-dimensional birthday-spacings test (32 replications of 2^15 non-overlapping pairs in 2^21 x 2^21 cells, expected 2 collisions each, total compared with Poisson(64)) on every generator and on os.urandom." ;
     rdfs:comment "Measured: 2280 largest number of parallel planes containing all consecutive triples, over the 7 historical generators with m <= 2^32 (threshold 3000; each has 2^29 to 2^32 triples) (n = 7, exact (lattice computation)). Interpretation: 'Constructed to have maximal repetition period' is operationalized as the set of full-period historical generators listed, with RANDU included as maximal for its multiplicative class (it is Wolfram's own example in the NKS note). 'Very substantial deviations from perfect randomness' is operationalized as (i) the exact lattice structure (number of covering hyperplanes, Marsaglia/Knuth spectral test), (ii) its visibility at a sample size (2^20) far below the period, with a cryptographic source as the randomness baseline under the identical statistic, and (iii) rejection by a standard test from the TestU01 family that random sources pass. The lattice is analysed on the full state recurrence; generators that output only high-order bits (ANSI C, drand48) are analysed on the state, which is the sequence whose stripes Wolfram's pictures show. The MMIX 64-bit generator is outside 'over the years' up to 2002 as a deployed generator and is reported for contrast only." ;
     delphi:evidenceAgainst "Borland's generator is listed with modulus 2^31 by Wikipedia and 2^32 by other sources; 2^32 was used as pre-registered (both are full period and share the low 31 bits)." ;
@@ -39,7 +40,7 @@ sub:assertion {
     delphi:evidenceAgainst "The birthday-spacings statistic is applied to the full generator state; ANSI C and drand48 output only high-order bits, which does not remove the lattice (the hyperplane statement holds for the state sequence) but changes which empirical tests fail first." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch07-07--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch07-07--claim-test--dataset-2> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch07-07/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch07-07/result.json> .
   <https://w3id.org/delphi/resource/evidence/wolfram2002-ch07-07--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Parameters of historical linear congruential generators" ;
     dct:description "multipliers, increments and moduli of the generators tested" ;
@@ -56,12 +57,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch07-07/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch07-07/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (Claude Fable 5.1 (Cursor cloud agent); cursor/claim-tests-wolfram-nks-f0e1)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-cursor-cloud-agent> ;
@@ -71,7 +72,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.078Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.689Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of wolfram2002-ch07-07: supports, confidence 0.95" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

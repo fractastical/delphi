@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: ices-datras-ns-ibts-ca-hh" ;
     delphi:inferenceMethod "fetch.py downloads the 40 XML files (875 MB, not committed) and derives: (i) plaice cells per quarter x ISO-style week x sex x maturity group x 1-cm length class with n, sum of day-of-year, sum and sum of squares of log10 K (K = 100 W/L^3), after mapping maturity codes as pre-registered and dropping 21 fish with |log10 K - cell mean| > 0.3; (ii) the same per year. analysis.py fits weighted least squares on cell means (weights n; exact individual-level OLS except that day-of-year is the weekly mean) of log10 K on day-of-year with length-class and sex fixed effects, separately for mature (maturing+spawning+spent+resting) and immature fish in Q1 and Q3, plus stage contrasts in Q1 and the adjusted Q3-Q1 difference; the pre-registered rules then give the verdict." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "fetch.py downloads the 40 XML files (875 MB, not committed) and derives: (i) plaice cells per quarter x ISO-style week x sex x maturity group x 1-cm length class with n, sum of day-of-year, sum and sum of squares of log10 K (K = 100 W/L^3), after mapping maturity codes as pre-registered and dropping 21 fish with |log10 K - cell mean| > 0.3; (ii) the same per year. analysis.py fits weighted least squares on cell means (weights n; exact individual-level OLS except that day-of-year is the weekly mean) of log10 K on day-of-year with length-class and sex fixed effects, separately for mature (maturing+spawning+spent+resting) and immature fish in Q1 and Q3, plus stage contrasts in Q1 and the adjusted Q3-Q1 difference; the pre-registered rules then give the verdict." ;
     rdfs:comment "Measured: 1.285 ratio of the within-Q1 (Jan-Feb) decline of log10 K per 30 days in immature plaice to that in mature plaice (pre-registered threshold for 'wholly spawning': < 0.5) (n = 17187, mature Q1: -4.44% K per 30 d (95% CI -5.02 to -3.87, n = 13188); immature Q1: -5.67% (CI -6.61 to -4.72, n = 3999)). Interpretation: Thompson's table is for 55-cm fish from the 1909 Plaice Report, month by month. DATRAS does not give monthly coverage of the North Sea (NS-IBTS samples only Q1 and Q3), so the test uses the within-quarter trends that Thompson's smoothed curve predicts (decline Jan->Mar of roughly 7% per month; rise Jul->Sep of roughly 3-4% per month) and the maturity-stage contrast that is the direct signature of his mechanism. The word 'wholly' is tested with immature fish as the control that the assessors proposed: immature plaice do not spawn, so under the claim they should not share the cycle. Feeding and temperature covary with season and would produce a cycle in immature fish too; that is exactly what would refute 'wholly'. Planned years 2015-2024 (10 years, Q1 and Q3). Maturity codes are mapped before the data are seen: immature = {1, 61, A, I}; maturing = {2, 62, B}; spawning = {3, 63, C}; spent = {4, 64, D}; resting/skipped = {5, 65, E}; other codes (-9, 66, 6, F) excluded; mature = maturing + spawning + spent + resting. Length: LngtCode '1' means LngtClass in cm; '.' or '0' means mm (divided by 10). Fish with |residual log10 K| > 0.3 from the length-class/sex means are dropped as recording errors (pre-registered cleaning). A single probe request (NS-IBTS 2019 Q1 CA, HTTP status and first record only, a herring) was made before this pre-registration to confirm that the web service is reachable; no plaice data were inspected." ;
     delphi:evidenceAgainst "The descriptive half of the claim is strongly confirmed: at fixed length, mature plaice lose about 4.4% of their weight per 30 days through January-February (P1), regain about 4.7% per 30 days through July-September (P2), and in Q1 spent fish are 7.7% lighter than maturing fish of the same length and sex (P3); the adjusted Q3-Q1 difference is +10.9% for mature fish and is positive in every year 2015-2023 (5-14%). What is refuted is the word 'wholly': immature plaice, which do not spawn, show the same cycle (Q1 decline -5.7% per 30 days, 1.29 times the mature decline; Q3 rise +3.3%; Q3-Q1 +9.2%, positive in every year), so most of the seasonal weight cycle at fixed length is somatic (winter fasting and summer feeding), not gonadal. Within mature fish the stage pattern agrees: fish still 'spawning' lose 5.6% per 30 days while 'spent' fish are flat (+0.6%), i.e. the gonadal loss happens at spawning and then stops, whereas the somatic loss continues in all non-spent groups." ;
@@ -39,7 +40,7 @@ sub:assertion {
     delphi:evidenceAgainst "NS-IBTS samples only January-March and July-September, so the months Thompson named for the trough (March-April) and the peak (November) are not observed directly; the test uses the direction of change inside each quarter, which his smoothed curve predicts unambiguously." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-18--claim-test--dataset-1> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch03-18/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch03-18/result.json> .
   <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-18--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: ICES DATRAS, North Sea International Bottom Trawl Survey (NS-IBTS): CA (age/weight/maturity) and HH (haul) exchange records, Q1 and Q3, 2015-2024" ;
     dct:description "individual plaice length, weight, sex, maturity stage and haul date" ;
@@ -130,12 +131,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch03-18/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch03-18/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking-high> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5-1-thinking-high; cursor/thompson-claim-tests-6e84)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking-high> ;
@@ -145,7 +146,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.067Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.672Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of thompson1917-ch03-18: refutes, confidence 0.85" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

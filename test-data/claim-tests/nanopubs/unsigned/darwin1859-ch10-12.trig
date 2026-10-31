@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: pbdb-occs-taxa-by-stage-and-continent" ;
     delphi:inferenceMethod "PBDB data service 1.2: ICS stage list (intervals/list.json?scale=1, type 'age'; 95 stages with duration >= 1 Myr) and, for each stage and each of six PBDB continents (cc=NOA, SOA, EUR, AFR, ASI, AUS), the marine Metazoa genus list from occs/taxa.json (rank=genus, envtype=marine, timerule=major): 570 API calls, cached and hashed individually (derived/files.json). (A) For every continent-stage with >= 100 genera (357 of them), the Jaccard similarity of its genus list with the pooled genus list of the other five continents was computed for all 95 stages and the best-matching stage recorded (derived/stage_matching.csv). (B) For every continent, proportional genus loss between consecutive stages (1 - |G_i & G_i+1| / |G_i|, both stages >= 100 genera) was computed; Spearman correlation of these series between every continent pair with >= 10 shared boundaries (13 pairs), and a permutation test of the mean pairwise rho (stage order permuted independently within each continent, 2000 permutations, seed fixed in analysis.py). Verdict follows the pre-registered rule: supported requires (A) >= 85% same-or-adjacent and (B) mean rho > 0 with p < 0.01; refuted if (A) < 60% or (B) mean rho <= 0; otherwise mixed." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "PBDB data service 1.2: ICS stage list (intervals/list.json?scale=1, type 'age'; 95 stages with duration >= 1 Myr) and, for each stage and each of six PBDB continents (cc=NOA, SOA, EUR, AFR, ASI, AUS), the marine Metazoa genus list from occs/taxa.json (rank=genus, envtype=marine, timerule=major): 570 API calls, cached and hashed individually (derived/files.json). (A) For every continent-stage with >= 100 genera (357 of them), the Jaccard similarity of its genus list with the pooled genus list of the other five continents was computed for all 95 stages and the best-matching stage recorded (derived/stage_matching.csv). (B) For every continent, proportional genus loss between consecutive stages (1 - |G_i & G_i+1| / |G_i|, both stages >= 100 genera) was computed; Spearman correlation of these series between every continent pair with >= 10 shared boundaries (13 pairs), and a permutation test of the mean pairwise rho (stage order permuted independently within each continent, 2000 permutations, seed fixed in analysis.py). Verdict follows the pre-registered rule: supported requires (A) >= 85% same-or-adjacent and (B) mean rho > 0 with p < 0.01; refuted if (A) < 60% or (B) mean rho <= 0; otherwise mixed." ;
     rdfs:comment "Measured: 0.7843 fraction of continent-stages (>= 100 genera) whose fauna best matches the same or an adjacent stage on the other continents (n = 357, 95% Wilson CI [0.739, 0.824]). Interpretation: Darwin's 'forms of life change almost simultaneously throughout the world' is operationalised by its own consequence, which he states: that formations in distant regions can be correlated by their fossils. Test (A) is that correlation exercise done with genera: a continent's fauna from one stage should pick out the same stage elsewhere in the world. Test (B) checks that the amount of change between consecutive stages co-varies across continents (synchronous turnover). 'Almost simultaneously, in a broad geological sense' is read as within one stage (typically 2-10 Myr). PBDB continents are the geographic units; marine environments only. Known limitation stated up front: PBDB stage assignments rest partly on biostratigraphic correlation, which makes some agreement across continents expected by construction; a failure of test (A) would nevertheless be possible if faunas were strongly provincial, and test (B) uses magnitudes of change that are not used in dating." ;
     delphi:evidenceAgainst "Test (A) fell short of the pre-registered 85% bar: 78.4% (95% Wilson CI 73.9-82.4%) of continent-stages are best matched by the same or an adjacent stage elsewhere (53.8% exact, 87.4% within two stages, median offset 0). Test (B) passed clearly: mean pairwise Spearman rho of proportional genus loss = 0.31, permutation p = 0.0005; 12 of 13 continent pairs positive. The pre-registered rule therefore gives 'mixed'." ;
@@ -39,7 +40,7 @@ sub:assertion {
     delphi:evidenceAgainst "Darwin's claim is about marine forms changing 'almost simultaneously throughout the world'; it is here reduced to genus composition of marine Metazoa on six continental units at stage resolution (typically 2-10 Myr). It does not test synchrony at finer than stage resolution." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch10-12--claim-test--dataset-1> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch10-12/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch10-12/result.json> .
   <https://w3id.org/delphi/resource/evidence/darwin1859-ch10-12--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Paleobiology Database, data service 1.2: occs/taxa (marine Metazoa genera per stage and continent) and intervals/list (stage ages)" ;
     dct:description "genus lists per stage per continent" ;
@@ -54,12 +55,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch10-12/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch10-12/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-b201)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -69,7 +70,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.023Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.655Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of darwin1859-ch10-12: mixed, confidence 0.6" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

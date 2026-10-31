@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: kegg-rest-ko-genes, kegg-brite-br08601" ;
     delphi:inferenceMethod "All 11,950 KEGG organism genomes (10,148 Bacteria, 469 Archaea, 1,333 Eukaryotes per BRITE br08601) were scored for presence of the 20 pre-registered marker families using KEGG REST link/genes/ko for each KO. 96.9% of genomes carry >= 18 of 20 markers (Bacteria 97.0%, Archaea 96.0%, Eukaryotes 96.3%); 83.8% carry all 20. The pre-registered rule nevertheless returns 'refutes' because the AspRS marker (K01876) is found in only 1.5% of Archaea: KEGG files the archaeal (and many bacterial) non-discriminating aspartyl-tRNA synthetase under a different orthology id, K09759. A post-hoc sensitivity analysis pooling K09759 into AspRS was added and is labelled as such in analysis.py and measured.extra; under it AspRS prevalence in Archaea is 87.4% and the only other marker below the 90% universality threshold is CysRS in Archaea (87.6%), giving 'mixed' under the pre-registered support rule." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "All 11,950 KEGG organism genomes (10,148 Bacteria, 469 Archaea, 1,333 Eukaryotes per BRITE br08601) were scored for presence of the 20 pre-registered marker families using KEGG REST link/genes/ko for each KO. 96.9% of genomes carry >= 18 of 20 markers (Bacteria 97.0%, Archaea 96.0%, Eukaryotes 96.3%); 83.8% carry all 20. The pre-registered rule nevertheless returns 'refutes' because the AspRS marker (K01876) is found in only 1.5% of Archaea: KEGG files the archaeal (and many bacterial) non-discriminating aspartyl-tRNA synthetase under a different orthology id, K09759. A post-hoc sensitivity analysis pooling K09759 into AspRS was added and is labelled as such in analysis.py and measured.extra; under it AspRS prevalence in Archaea is 87.4% and the only other marker below the 90% universality threshold is CysRS in Archaea (87.6%), giving 'mixed' under the pre-registered support rule." ;
     rdfs:comment "Measured: 0.9685 fraction of KEGG organism genomes carrying >= 18 of 20 pre-registered universal translation-machinery marker families (n = 11950, per-domain fractions in extra; exact census of KEGG genomes, no sampling error). Interpretation: Darwin's 'chemical composition' and 'laws of growth and reproduction' are read, in modern terms, as the shared genetic-code-based protein synthesis machinery that every cellular organism must use to grow and reproduce; universal presence of the same orthologous enzymes charging the same 20 amino acids is the strongest available genomic evidence of a shared chemistry. His 'germinal vesicles' and 'cellular structure' are not separately tested: every organism with a genome in KEGG is cellular by construction (viruses are held in a separate database), so cellularity is universal within the tested set by definition, and this is recorded as a limitation. The 'same poison' clause is not tested. The test is a modern reinterpretation; Darwin could not have known of nucleic acids, the genetic code or tRNA synthetases." ;
     delphi:evidenceAgainst "DEVIATION FROM PRE-REGISTRATION: the pre-registered rule gives 'refutes' and the corrected-mapping rule gives 'mixed'; the recorded verdict 'supports' is a judgement that the failure is a KEGG orthology-numbering artefact plus annotation lag, not a difference in chemistry. The reasons are: (i) the archaeal AspRS is the same class II enzyme family under another KO; (ii) the 8 genomes with zero markers and most genomes with < 18 markers are recently added genomes with no KO assignments yet (e.g. Planctomicrobium spp., several Mycoplasma spp.); (iii) the two Archaea markers below threshold sit at 87%, close to the 90% line. Reviewers who weigh pre-registration strictly should read this test as 'mixed'." ;
@@ -39,7 +40,7 @@ sub:assertion {
     delphi:evidenceAgainst "Presence/absence depends on KEGG's KO assignment, which is automatic and conservative; false absences are more likely than false presences, so all prevalence figures are lower bounds." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-03--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-03--claim-test--dataset-2> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch14-03/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch14-03/result.json> .
   <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-03--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: KEGG REST API: link/genes/ko:<KO> (genes assigned to each orthology group) and list/genome (organism genomes)" ;
     dct:description "presence of each marker gene family in each organism genome" ;
@@ -111,12 +112,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch14-03/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch14-03/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-b201)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -126,7 +127,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.053Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.667Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of darwin1859-ch14-03: supports, confidence 0.7" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

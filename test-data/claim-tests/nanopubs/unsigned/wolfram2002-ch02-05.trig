@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: nks-ch02-05-rule30-center-column-generator, oeis-a051023-bfile" ;
     delphi:inferenceMethod "analysis.py evolves rule 30 from a single black cell for 10^6 steps with bit-packed numpy (uint64 words), updating only the words inside the light cone of the centre cell at the final step, and records the centre cell at every step (generation 17 s). The first 100,001 bits were compared with the OEIS A051023 b-file. Eventual periodicity was tested for every p <= 500000 by computing the length of the longest suffix with x[t] = x[t-p] using big-integer XOR, counting a period when that length is at least p and at least 64 bits. Fifteen NIST SP 800-22 statistics (frequency, block frequency M=128, runs, longest run M=10000, 32x32 matrix rank, DFT, non-overlapping template 000000001, overlapping template m=9, Maurer universal L=7/Q=1280, linear complexity M=500 via Berlekamp-Massey, serial m=16 (2), approximate entropy m=10, cumulative sums forward/backward) were implemented in numpy/scipy from the NIST specification and validated on numpy pseudo-random bits before use; random excursions were not applicable (J = 340 cycles < 500)." ;
     delphi:preregistered false ;
+    delphi:dataKind "computational" ;
     dct:description "analysis.py evolves rule 30 from a single black cell for 10^6 steps with bit-packed numpy (uint64 words), updating only the words inside the light cone of the centre cell at the final step, and records the centre cell at every step (generation 17 s). The first 100,001 bits were compared with the OEIS A051023 b-file. Eventual periodicity was tested for every p <= 500000 by computing the length of the longest suffix with x[t] = x[t-p] using big-integer XOR, counting a period when that length is at least p and at least 64 bits. Fifteen NIST SP 800-22 statistics (frequency, block frequency M=128, runs, longest run M=10000, 32x32 matrix rank, DFT, non-overlapping template 000000001, overlapping template m=9, Maurer universal L=7/Q=1280, linear complexity M=500 via Berlekamp-Massey, serial m=16 (2), approximate entropy m=10, cumulative sums forward/backward) were implemented in numpy/scipy from the NIST specification and validated on numpy pseudo-random bits before use; random excursions were not applicable (J = 340 cycles < 500)." ;
     rdfs:comment "Measured: [object Object] count of periods p <= 500000 with at least two full periods (>= 64 bits) at the end of the sequence; NIST p-values (n = 1000000, deterministic sequence; p-values are those of the NIST statistics). Interpretation: 'Never repeats' is read as 'is not eventually periodic within the first million steps' (an eventually periodic sequence shows at least two full periods before the end). 'Statistical tests show no meaningful deviation from perfect randomness' is read relative to the fixed, public NIST SP 800-22 battery at alpha = 0.01, as the assessors suggested; passing it cannot establish randomness, only the absence of the deviations those tests detect, so the test can refute but only weakly confirm. The battery is implemented from the NIST specification in analysis.py rather than by running the NIST C code, so the p-values are reproducible from a clean checkout." ;
     delphi:evidenceAgainst "Deviation from the literal pre-registration, decided on synthetic random bits before the rule 30 sequence was examined: the periodicity criterion 'suffix length >= p' flags chance matches at tiny p (a random sequence ending in 0101 has two full periods of p = 2), so a minimum matching-suffix length of 64 bits was added. For rule 30 the longest periodic suffix over all p is 17 bits (at p = 166992), so the verdict is the same under either version of the criterion." ;
@@ -38,7 +39,7 @@ sub:assertion {
     delphi:evidenceAgainst "Black-cell frequency over the million steps is 0.50077 (frequency-test p = 0.12), consistent with the claim's implicit 50/50 balance." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch02-05--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch02-05--claim-test--dataset-2> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch02-05/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch02-05/result.json> .
   <https://w3id.org/delphi/resource/evidence/wolfram2002-ch02-05--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Centre column of elementary cellular automaton rule 30 from a single black cell, steps 0..999999, computed exactly by analysis.py (bit-packed numpy evolution restricted to the light cone of the centre cell at step 10^6)" ;
     dct:description "the sequence under test" ;
@@ -56,12 +57,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch02-05/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch02-05/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-e5f4)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -71,7 +72,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.072Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.679Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of wolfram2002-ch02-05: supports, confidence 0.85" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

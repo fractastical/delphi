@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: nks-p221-templates-figure, shifted-rule30-pattern" ;
     delphi:inferenceMethod "analysis.py downloads fig-c.png (46,304 bytes), reads the 56 templates from the 14 x 4 grid by sampling 9 x 9 pixel patches at the 3 x 3 cell centres, checks that they are distinct and strictly decreasing as 9-bit numbers, builds the candidate pattern (two-row black band, two-column black wall, interior shifted rule 30) on a 300 x 300 window, enumerates its 3 x 3 blocks, tallies the shifted-rule-30 relation over templates, and for horizontal periods w = 1..11 builds the transfer graph on pairs of cylinder rows (4^w nodes), finds strongly connected components with scipy and counts cycle edges containing template 1. Outputs in derived/templates.csv and derived/periodic_search.json; runtime about 4 minutes (w = 11 dominates)." ;
     delphi:preregistered false ;
+    delphi:dataKind "computational" ;
     dct:description "analysis.py downloads fig-c.png (46,304 bytes), reads the 56 templates from the 14 x 4 grid by sampling 9 x 9 pixel patches at the 3 x 3 cell centres, checks that they are distinct and strictly decreasing as 9-bit numbers, builds the candidate pattern (two-row black band, two-column black wall, interior shifted rule 30) on a 300 x 300 window, enumerates its 3 x 3 blocks, tallies the shifted-rule-30 relation over templates, and for horizontal periods w = 1..11 builds the transfer graph on pairs of cylinder rows (4^w nodes), finds strongly connected components with scipy and counts cycle edges containing template 1. Outputs in derived/templates.csv and derived/periodic_search.json; runtime about 4 minutes (w = 11 dominates)." ;
     rdfs:comment "Measured: 0 number of cycle edges (doubly periodic valid patterns, periods 1-9) containing template 1; 0 = no periodic competitor (n = 1546, exhaustive for periods 1-9 (pre-registered) and 10-11 (supplementary)). Interpretation: The caption on p. 221 states that only the 56 templates may occur anywhere, that the first template must appear at least once, and that the pattern required is a shifted version of the rule-30 evolution. Uniqueness on the infinite plane cannot be verified by finite computation; this test checks (i) that the published template set is actually satisfied by, and derived from, a shifted rule-30 pattern and (ii) the strongest finite consequence of uniqueness that is cheap to check: no spatially periodic competitor exists for periods up to 9 (a doubly periodic pattern containing template 1 would be a counterexample). Disclosed calibration before this pre-registration: the templates were extracted once to design the extraction check (56 distinct, strictly decreasing); a tally found 46 of the 56 templates satisfy the left-target shifted rule-30 relation; and constraint propagation from two black rows over a 45-column window determined rows 2-4 of the pattern (the double black column with white to its right and the rule-30 growth to its left), which is how the candidate pattern above was inferred. No pattern beyond row 4, no exhaustiveness count and no periodic search was computed before pre-registration." ;
     delphi:evidenceAgainst "Pre-registered decision: all three decisive parts hold. (T) The automatic transcription yields 56 distinct templates in strictly decreasing binary order with no ambiguous cells. (A) The candidate pattern (two-row black band, two-column black wall below its right end, interior a(t,x) = rule30(a(t-1,x), a(t-1,x+1), a(t-1,x+2)) growing leftwards from the wall) contains exactly the 56 templates on a 300 x 300 window: no disallowed block and no unused template, so the published set is precisely the block set of this shifted rule-30 pattern. (U) No horizontally periodic valid pattern of period 1-9 (and, supplementary, 10-11) contains template 1." ;
@@ -38,7 +39,7 @@ sub:assertion {
     delphi:evidenceAgainst "The candidate pattern was inferred from the templates by constraint propagation over rows 2-4 before pre-registration (disclosed); the exact figure layout (band thickness, wall) was read from the inset of fig-a and confirmed by (A). Template extraction depends on fixed pixel coordinates for this image version (sha256 recorded)." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-20--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-20--claim-test--dataset-2> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-20/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-20/result.json> .
   <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-20--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: NKS p. 221, figure of the 56 allowed 3x3 templates (fig-c.png, online edition)" ;
     dct:description "source of the 56 templates (transcribed automatically by analysis.py)" ;
@@ -56,12 +57,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-20/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch05-20/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/wolfram-nks-claim-tests-106e)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -71,7 +72,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.078Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.687Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of wolfram2002-ch05-20: supports, confidence 0.8" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

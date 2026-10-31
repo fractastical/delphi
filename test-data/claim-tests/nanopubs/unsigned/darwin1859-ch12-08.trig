@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: gbif-occurrence-api-amphibia, gbif-backbone-taxonomy" ;
     delphi:inferenceMethod "analysis.py queries the GBIF occurrence API for class Amphibia (classKey 131) within each of 41 pre-registered oceanic island units (ISO territory code or WGS84 bounding box), excluding fossil and living/captive specimens, and facets by speciesKey. For each species recorded in a unit it fetches the species' global record count (for bounding-box units both counts are restricted to georeferenced records without geospatial issues, so that un-georeferenced museum specimens do not deflate the fraction) and flags the species endemic to the unit if it has >= 10 records worldwide and >= 95 % of them inside the unit. The measured value is the number of units with at least one endemic amphibian; the verdict follows the pre-registered rule (0 supports, 1 mixed, >= 2 refutes)." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "analysis.py queries the GBIF occurrence API for class Amphibia (classKey 131) within each of 41 pre-registered oceanic island units (ISO territory code or WGS84 bounding box), excluding fossil and living/captive specimens, and facets by speciesKey. For each species recorded in a unit it fetches the species' global record count (for bounding-box units both counts are restricted to georeferenced records without geospatial issues, so that un-georeferenced museum specimens do not deflate the fraction) and flags the species endemic to the unit if it has >= 10 records worldwide and >= 95 % of them inside the unit. The measured value is the number of units with at least one endemic amphibian; the verdict follows the pre-registered rule (0 supports, 1 mixed, >= 2 refutes)." ;
     rdfs:comment "Measured: 3 oceanic island units with >= 1 endemic (hence native) amphibian species (n = 41, endemism rule: >= 10 records worldwide and >= 95 % inside the unit; counts are GBIF snapshot values at retrieval time). Interpretation: Darwin's 'islands with which the great oceans are studded' is read as geologically oceanic islands, which he distinguishes from continental islands elsewhere in the chapter (he explicitly excludes New Zealand and the Falklands as continental). Batrachians = class Amphibia (GBIF classKey 131). 'Never been found' is read as no native population; introductions, which Darwin himself discusses (Madeira, Azores, Mauritius), are excluded by requiring endemism. Pre-registered oceanic units (ISO code or bounding box): Fiji FJ, Samoa WS, American Samoa AS, Tonga TO, Palau PW, Micronesia FM, Marshall Is. MH, Northern Marianas MP, Guam GU, French Polynesia PF, Cook Is. CK, Vanuatu VU, Niue NU, Tuvalu TV, Kiribati KI, Nauru NR, Wallis & Futuna WF, Tokelau TK, Pitcairn PN, Norfolk I. NF, Bermuda BM, St Helena/Ascension/Tristan SH, Iceland IS, Sao Tome & Principe ST, Cape Verde CV, Comoros KM, Mayotte YT, Mauritius MU, Reunion RE, Christmas I. CX, Cocos (Keeling) CC, Hawaii (box), Galapagos (box), Canary Is. (box), Azores (box), Madeira (box), Juan Fernandez (box), Fernando de Noronha (box), Ogasawara/Bonin (box), Easter I. (box), Lord Howe I. (box). Excluded as continental fragments or shelf islands: New Zealand, Seychelles (granitic), Socotra, New Caledonia, Solomon Is., Bioko, Falklands, Faroes, Japan, Sri Lanka, Madagascar, Taiwan, British Isles, Caribbean Greater Antilles. Classification follows the standard volcanic/arc versus continental distinction used in island biogeography (e.g. Weigelt et al. 2013 PNAS) and is a judgement made before any data were examined." ;
     delphi:evidenceAgainst "Three independent oceanic units have endemic, hence native, amphibians: Fiji (Cornufer vitiensis, 207 of 210 records; C. vitianus at 86 % narrowly misses the rule), Palau (Cornufer pelewensis, 1482 of 1505) and Sao Tome and Principe (six endemic species including the caecilian Schistometopum thomense). Mayotte's Boophis nauticus (93 %) and Blommersia transmarina (89 %) fall just under the 95 % rule and are not counted, so the count of 3 is conservative." ;
@@ -40,7 +41,7 @@ sub:assertion {
     delphi:evidenceAgainst "GBIF counts are a live snapshot; occurrence totals will drift between runs, but the identity of endemic species is stable. Species-level misidentifications in GBIF are mitigated by the >= 10 record rule." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-08--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-08--claim-test--dataset-2> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch12-08/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch12-08/result.json> .
   <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-08--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: GBIF occurrence search API (class Amphibia, non-fossil, non-captive records), faceted by species per island unit" ;
     dct:description "per-unit amphibian species lists and per-species global record counts used to compute endemism" ;
@@ -138,12 +139,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch12-08/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch12-08/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-6221)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -153,7 +154,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.030Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.664Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of darwin1859-ch12-08: refutes, confidence 0.93" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

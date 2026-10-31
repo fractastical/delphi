@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: noaa-etopo-2022-ncei-imageserver" ;
     delphi:inferenceMethod "ETOPO 2022 (60 arc-second, surface) was fetched from the NCEI THREDDS NetCDF Subset Service in six 60-degree longitude bands with horizStride=6, giving a 1800 x 3600 global grid at 0.1 degree (nearest-sample subsampling; the six NetCDF files, 26 MB in total, are cached in data/ and hashed in result.json). Cells with elevation >= -130 m were labelled into 4-connected components with longitude wrap-around (scipy.ndimage.label plus union-find across the +-180 meridian). Six continent seed cells and 45 oceanic and 20 continental islands are listed in derived/sites.csv; each island is located by the nearest present-day land cell (z >= 0) within +-5 cells, or failing that the nearest cell emergent at -130 m (its bank). An island is 'connected' if its -130 m component contains a continent seed. Five continental gaps were tested for connectivity at -130 m, each restricted to the relevant ocean: T1 Eurasia-North America on cells north of 20 N with the Bering region (lat > 55 N, lon 160 E to 160 W) masked; T2 Africa-South America on cells south of 30 N; T3 Eurasia-Australia, T4 Antarctica-South America and T5 Antarctica-Australia on the full grid. For every gap, the Bering connection and every island, the sill depth (shallowest sea level at which the pair joins) was found by bisection on the threshold (14 steps, lower bound -6000 m for gaps and -1000 m for islands). Outputs: derived/island_connectivity.csv and derived/measured.json. Verdict by the pre-registered rule." ;
     delphi:preregistered false ;
+    delphi:dataKind "physical" ;
     dct:description "ETOPO 2022 (60 arc-second, surface) was fetched from the NCEI THREDDS NetCDF Subset Service in six 60-degree longitude bands with horizStride=6, giving a 1800 x 3600 global grid at 0.1 degree (nearest-sample subsampling; the six NetCDF files, 26 MB in total, are cached in data/ and hashed in result.json). Cells with elevation >= -130 m were labelled into 4-connected components with longitude wrap-around (scipy.ndimage.label plus union-find across the +-180 meridian). Six continent seed cells and 45 oceanic and 20 continental islands are listed in derived/sites.csv; each island is located by the nearest present-day land cell (z >= 0) within +-5 cells, or failing that the nearest cell emergent at -130 m (its bank). An island is 'connected' if its -130 m component contains a continent seed. Five continental gaps were tested for connectivity at -130 m, each restricted to the relevant ocean: T1 Eurasia-North America on cells north of 20 N with the Bering region (lat > 55 N, lon 160 E to 160 W) masked; T2 Africa-South America on cells south of 30 N; T3 Eurasia-Australia, T4 Antarctica-South America and T5 Antarctica-Australia on the full grid. For every gap, the Bering connection and every island, the sill depth (shallowest sea level at which the pair joins) was found by bisection on the threshold (14 steps, lower bound -6000 m for gaps and -1000 m for islands). Outputs: derived/island_connectivity.csv and derived/measured.json. Verdict by the pre-registered rule." ;
     rdfs:comment "Measured: 1 fraction of pre-registered oceanic islands whose emergent component at -130 m contains no continent seed (n = 45, 36 of 45 islands resolved as present-day land on the 0.1-degree grid (the rest located by their -130 m bank); 0 of 5 continental gaps connected at -130 m; 43 of 45 oceanic islands not joined to any continent even at -1000 m). Interpretation: 'The recent period' / 'period of existing species' is read as the Quaternary, for which the maximum glacio-eustatic sea-level fall (about 120-130 m below present) is the most generous possible allowance for land exposure; a gap that remains submerged at -130 m cannot have been bridged by land at any time in that period without vertical crustal movement, which Darwin's opponents (Forbes) invoked and Darwin doubted. 'Oceanic islands' are the volcanic and coral islands listed in derived/sites.csv (one representative point each). 'Continuously or almost continuously united' is approximated by connectivity at the extreme lowstand; connections that exist only near -130 m were at most intermittent, which already satisfies Darwin's denial, so the test is conservative with respect to the claim. The 0.1-degree grid (about 11 km) cannot resolve straits narrower than a cell; bilinear resampling smooths sills, which is noted as a limitation." ;
     delphi:evidenceAgainst "Deviation from the pre-registration, disclosed: the plan named the NCEI ArcGIS ImageServer (DEM_all mosaic) exportImage as the access route; it was replaced by the NCEI THREDDS subset service of the ETOPO 2022 60 arc-second file itself because the ImageServer mosaic blends ETOPO with higher-resolution coastal DEMs and resamples bilinearly, whereas the THREDDS route delivers unmodified ETOPO 2022 samples. The dataset (ETOPO 2022, DOI 10.25921/fd45-gt74), grid resolution and all analysis rules are as pre-registered." ;
@@ -40,7 +41,7 @@ sub:assertion {
     delphi:evidenceAgainst "The ETOPO 2022 surface layer includes ice-sheet and ice-shelf surfaces around Antarctica and Greenland; this can only enlarge the Antarctic component and so works against the claim for T4 and T5, which nevertheless remain unconnected." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-08--claim-test--dataset-1> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch11-08/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch11-08/result.json> .
   <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-08--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: NOAA NCEI ETOPO 2022 Global Relief Model, 60 arc-second surface elevation (ETOPO_2022_v1_60s_N90W180_surface.nc), accessed through the NCEI THREDDS NetCDF Subset Service with horizStride=6 (0.1-degree nearest-sample grid)" ;
     dct:description "global elevation/bathymetry on a 0.1-degree grid (six 60-degree longitude bands)" ;
@@ -63,12 +64,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch11-08/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch11-08/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-b201)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -78,7 +79,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.026Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.660Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of darwin1859-ch11-08: supports, confidence 0.9" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

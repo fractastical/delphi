@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: ccdb-statistics-by-major-group, acc-animal-chromosome-counts" ;
     delphi:inferenceMethod "Fetched the CCDB statistics CSV for each of the four plant major groups (69,948 species rows; median parsed n per species) and parsed the ACC data table embedded in its download page (12,221 animal records; haploid N where given, else 2N/2). Collapsed to one median value per species and per genus, then computed the fractions of taxa with n < 6, 6 <= n <= 16 and n > 16 for plants and animals at both resolutions, plus breakdowns by plant major group and animal phylum and a histogram (derived/histograms.csv)." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "Fetched the CCDB statistics CSV for each of the four plant major groups (69,948 species rows; median parsed n per species) and parsed the ACC data table embedded in its download page (12,221 animal records; haploid N where given, else 2N/2). Collapsed to one median value per species and per genus, then computed the fractions of taxa with n < 6, 6 <= n <= 16 and n > 16 for plants and animals at both resolutions, plus breakdowns by plant major group and animal phylum and a histogram (derived/histograms.csv)." ;
     rdfs:comment "Measured: 0.4119205298013245 fraction of animal genera with haploid n > 16 (plant genera: 0.320); fraction with n < 6: animals 0.080, plants 0.011 (n = 13699, database census; genus-level n = 8414 plant and 5285 animal genera, species-level n = 64926 and 12221). Interpretation: Thompson's 'germ-nuclei' chromosome number is the gametic number n (half the somatic 2n), which both databases provide or allow (CCDB parses counts to gametophytic n; ACC lists N or 2N). 'Few' and 'fewer still' are read as tail fractions of at most 10%, with the upper tail no larger than the lower. The claim is about organisms generally, so species (or genera) are the units, each counted once, with no phylogenetic weighting; the species-level figures are reported alongside the primary genus-level ones. Databases are biased toward studied taxa (crops, insects, vertebrates), which is noted but not corrected beyond the genus-level aggregation." ;
     delphi:evidenceAgainst "The lower bound holds (only 1.1% of plant genera and 8.0% of animal genera have n < 6) and the modal haploid number (9-13) sits inside Thompson's 6-16 window, so the claim is half right; what fails is the upper bound: 32% of plant genera and 41% of animal genera have n > 16, so the upper tail is roughly 30 and 5 times larger than the lower tail, the reverse of 'fewer still'." ;
@@ -38,7 +39,7 @@ sub:assertion {
     delphi:evidenceAgainst "Thompson wrote in 1917 from a handful of counted species; the finding reflects a century of counting rather than an error in his reading of the data available to him." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch04-13--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch04-13--claim-test--dataset-2> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch04-13/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch04-13/result.json> .
   <https://w3id.org/delphi/resource/evidence/thompson1917-ch04-13--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Chromosome Counts Database (CCDB), species-level statistics for Angiosperms, Gymnosperms, Pteridophytes, Bryophytes" ;
     dct:description "median parsed gametophytic chromosome number n per plant species" ;
@@ -64,12 +65,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/thompson-growth-form/thompson1917-ch04-13/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/thompson-growth-form/thompson1917-ch04-13/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-thompson-efb7)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -79,7 +80,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.068Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.672Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of thompson1917-ch04-13: refutes, confidence 0.9" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

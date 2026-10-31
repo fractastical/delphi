@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: gbif-occurrence-search-api" ;
     delphi:inferenceMethod "For each of 5 groups (Mammalia, Aves, Squamata, Amphibia, Magnoliopsida) and 10 pre-registered regions (a hot-desert and a humid-forest box on each of 5 continents) the GBIF occurrence API was queried for facet counts of genusKey and familyKey (hasCoordinate, no geospatial issue, PRESENT, 1900-2026, fossil and living specimens excluded). Genera with >= 5 records formed the regional genus set; 11 domestic/commensal genera were removed. Sørensen similarity was computed for all 45 region pairs per group and pairs were classed as within-continent/different-habitat (5 per group), between-continent/same-habitat (20) or between-continent/different-habitat (20). Means were compared per group and a pooled one-sided Mann-Whitney U test (within-continent/different-habitat > between-continent/same-habitat) was run on the 25 vs 100 genus-level pair similarities." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "For each of 5 groups (Mammalia, Aves, Squamata, Amphibia, Magnoliopsida) and 10 pre-registered regions (a hot-desert and a humid-forest box on each of 5 continents) the GBIF occurrence API was queried for facet counts of genusKey and familyKey (hasCoordinate, no geospatial issue, PRESENT, 1900-2026, fossil and living specimens excluded). Genera with >= 5 records formed the regional genus set; 11 domestic/commensal genera were removed. Sørensen similarity was computed for all 45 region pairs per group and pairs were classed as within-continent/different-habitat (5 per group), between-continent/same-habitat (20) or between-continent/different-habitat (20). Means were compared per group and a pooled one-sided Mann-Whitney U test (within-continent/different-habitat > between-continent/same-habitat) was run on the 25 vs 100 genus-level pair similarities." ;
     rdfs:comment "Measured: 4 groups (of 5) where within-continent/different-habitat mean genus Sørensen > between-continent/same-habitat mean (n = 225, pooled one-sided Mann-Whitney (within > between-same-habitat), genus level: U=2086, p=1.22e-07). Interpretation: Darwin's 'productions of the same continent' are taken as the native genera recorded in GBIF within fixed bounding boxes on five continents (South America, Africa, Australia, North America incl. Central America, mainland Asia). 'Different stations' is operationalized as two habitat types with the strongest possible contrast on each continent: a hot desert/semi-desert box and a humid tropical forest box. 'Affinity' is operationalized as sharing genera (and, secondarily, families), which is the pre-phylogenetic measure of relatedness Darwin himself used. The 'same sea' half of the claim is not tested here. Regions are fixed before any data are downloaded; genera of domestic and commensal species that humans have spread worldwide (Homo, Rattus, Mus, Canis, Felis, Bos, Ovis, Capra, Sus, Equus, Columba) are excluded, as are fossil and living (zoo/garden) specimen records, because the claim concerns natural distribution." ;
     delphi:evidenceAgainst "Magnoliopsida is the one group where the same habitat on another continent is as similar (0.307) as a different habitat on the same continent (0.295); introduced weeds and genuinely cosmopolitan plant genera both contribute, and GBIF cannot flag introductions reliably." ;
@@ -41,7 +42,7 @@ sub:assertion {
     delphi:evidenceAgainst "GBIF is a live resource; re-running reproduces the method but counts drift as records are added. Response checksums at retrieval time are in derived/fetch_log.json." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-03--claim-test--dataset-1> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch11-03/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch11-03/result.json> .
   <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-03--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: GBIF occurrence search API (facet counts of genusKey/familyKey within bounding boxes; GBIF Backbone Taxonomy for keys)" ;
     dct:description "genus and family presence lists (>= 5 records) for 10 regions x 5 taxonomic groups; genus-key lookups for the excluded commensal genera" ;
@@ -284,12 +285,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch11-03/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch11-03/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-bdd1)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -299,7 +300,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.024Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.658Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of darwin1859-ch11-03: supports, confidence 0.85" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

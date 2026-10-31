@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: gbif-occurrence-api-chiroptera, gbif-occurrence-api-aves, gbif-species-api" ;
     delphi:inferenceMethod "analysis.py reads the 43 far island units (> 482.8 km from any landmass >= 100,000 km2) and their GBIF filters from ../darwin1859-ch12-09/derived/units.json. For each unit it counts GBIF bird records (survey proxy, threshold 500), then facets Chiroptera records by speciesKey; for each bat species it fetches the global record count (georeferenced-only for bounding-box units, all records for country-code units) and flags endemism at >= 10 records and >= 95 % inside the unit. A surveyed unit has bats if any species has >= 5 records in it. The pre-registered rule compares the occupancy fraction (thresholds 0.80 / 0.50) and the fraction of bat-occupied units with an endemic bat (0.33 / 0.10). Sensitivities: any single record counts as presence; endemism at >= 80 %." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "analysis.py reads the 43 far island units (> 482.8 km from any landmass >= 100,000 km2) and their GBIF filters from ../darwin1859-ch12-09/derived/units.json. For each unit it counts GBIF bird records (survey proxy, threshold 500), then facets Chiroptera records by speciesKey; for each bat species it fetches the global record count (georeferenced-only for bounding-box units, all records for country-code units) and flags endemism at >= 10 records and >= 95 % inside the unit. A surveyed unit has bats if any species has >= 5 records in it. The pre-registered rule compares the occupancy fraction (thresholds 0.80 / 0.50) and the fraction of bat-occupied units with an endemic bat (0.33 / 0.10). Sensitivities: any single record counts as presence; endemism at >= 80 %." ;
     rdfs:comment "Measured: 0.625 fraction of surveyed far island units (>= 500 GBIF bird records) with a bat species having >= 5 GBIF records (n = 40, GBIF snapshot counts; endemism rule >= 10 records and >= 95 % inside unit; units are archipelago-level). Interpretation: Darwin's 'almost every island' is read as 'almost every remote oceanic island group that naturalists have actually searched', since he was generalising from the islands then known; the Aves-record threshold is a proxy for survey effort independent of bats. 'Their own species' is operationalised as GBIF endemism at the unit level; subspecies-level endemics (e.g. the Hawaiian hoary bat, treated by GBIF as Lasiurus cinereus or Aeorestes semotus depending on the backbone) are counted only if the backbone treats them as species. 'Remote' uses the ch12-09 distance rule (> 482.8 km from any landmass >= 100,000 km2), so the test is on the same 43 units for which the absence of terrestrial mammals was tested. Units are archipelago-level (country codes or bounding boxes), so a bat endemic to one island within a group counts as endemic to the unit. The threshold of >= 5 records per species is intended to exclude storm-blown vagrants (e.g. North American bats recorded in Iceland or Bermuda) while keeping genuinely resident but poorly recorded species; a sensitivity with >= 1 record is reported." ;
     delphi:evidenceAgainst "Occupancy: 25 of 40 surveyed far units (62.5 %) have a bat species with >= 5 records, between the supports (80 %) and refutes (50 %) thresholds; counting any single record gives 32 of 43 units (74 %). Bats are nearly universal on tropical Pacific and Indian Ocean archipelagos but absent from the remotest eastern Polynesian groups (French Polynesia, Pitcairn, Easter Island), from the South Atlantic islands (St Helena, Ascension, Tristan da Cunha, Falklands, South Georgia), from the subantarctic (Kerguelen) and from Iceland, so 'almost every island' is an overstatement for the most isolated islands Darwin did not know well." ;
@@ -41,7 +42,7 @@ sub:assertion {
     delphi:evidenceAgainst "Units are archipelago-level (country codes or boxes), so 'island' here means island group; bat-free individual islands within occupied groups are not counted against the claim." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-10--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-10--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-10--claim-test--dataset-3> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch12-10/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch12-10/result.json> .
   <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-10--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: GBIF occurrence search API (order Chiroptera, non-fossil, non-captive records), faceted by species per island unit" ;
     dct:description "bat species recorded per unit with record counts; per-species global counts (one call per species, listed in derived/requests.json) give the fraction inside the unit" ;
@@ -234,12 +235,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch12-10/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch12-10/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-6221)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -249,7 +250,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.032Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.665Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of darwin1859-ch12-10: mixed, confidence 0.7" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

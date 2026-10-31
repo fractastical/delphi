@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: nks-notes-11-4-universal-cellular-automaton, nks-ch11-04-uca-complexity-generator" ;
     delphi:inferenceMethod "analysis.py imports the parser, lookup-table builder, encoder and stepper from the ch11-06 test, fetches the published rule list (same page, SHA-256 recorded), and runs the fixed 19-colour rule on a cyclic array of 128 encoded blocks (2560 cells) for 128 emulated steps (6784 universal steps) from a single black cell, with the encoded target being rule 250, 90, 110, 30 or the seed-drawn rule 10. At each 53-step checkpoint the decoded colour cells were compared with the directly computed target, and lzma compressibility was measured for the decoded 128 x 128 pattern (rho_dec), the direct target pattern (rho_ref) and the raw 128 x 2560 universal-automaton checkpoint array (rho_raw, normalised by log2 19). All decoded patterns equal the targets (0 mismatches), so rho_dec = rho_ref exactly: 0.10 (250), 0.15 (90), 0.52 (110), 0.97 (30), 0.06 (10). Raw: 0.0022 (250) < 0.0029 (90) < 0.0172 (110) < 0.0208 (30); ratio 30/250 = 9.32, above the pre-registered 2." ;
     delphi:preregistered false ;
+    delphi:dataKind "computational" ;
     dct:description "analysis.py imports the parser, lookup-table builder, encoder and stepper from the ch11-06 test, fetches the published rule list (same page, SHA-256 recorded), and runs the fixed 19-colour rule on a cyclic array of 128 encoded blocks (2560 cells) for 128 emulated steps (6784 universal steps) from a single black cell, with the encoded target being rule 250, 90, 110, 30 or the seed-drawn rule 10. At each 53-step checkpoint the decoded colour cells were compared with the directly computed target, and lzma compressibility was measured for the decoded 128 x 128 pattern (rho_dec), the direct target pattern (rho_ref) and the raw 128 x 2560 universal-automaton checkpoint array (rho_raw, normalised by log2 19). All decoded patterns equal the targets (0 mismatches), so rho_dec = rho_ref exactly: 0.10 (250), 0.15 (90), 0.52 (110), 0.97 (30), 0.06 (10). Raw: 0.0022 (250) < 0.0029 (90) < 0.0172 (110) < 0.0208 (30); ratio 30/250 = 9.32, above the pre-registered 2." ;
     rdfs:comment "Measured: 9.32 ratio of raw universal-automaton compressibility rho_raw when emulating rule 30 to that when emulating rule 250 (same rule, different initial condition) (n = 5, deterministic for the fixed initial conditions). Interpretation: Wolfram's statement is an implication: universality (ability to emulate any system) entails the ability to produce behaviour as complex as that of any system. Taken literally it is a consequence of the definition of emulation plus the existence of universal systems, and the 'arbitrarily' part (no upper bound) cannot be tested by a finite run. We test the concrete content for one universal system and one complexity measure: that the same fixed rule, changing only the initial condition, realises behaviour matching the complexity of targets across the four Wolfram classes, measured both after decoding and on the universal system's raw pattern. 'Complex' is operationalised as lzma incompressibility of the space-time pattern, which Wolfram uses himself (NKS ch. 10) as a proxy for apparent complexity. The 'in a sense' qualification is honoured by reporting both the decoded and raw measures. The claim's second reading noted by one assessor (complex behaviour from simple initial conditions) is not tested: the initial conditions here encode the target rule and are not simple." ;
     delphi:evidenceAgainst "The claim is close to a tautology once 'universal' is defined by emulation; this test shows the concrete consequence for one universal system and one complexity proxy (lzma compressibility), not the unbounded 'arbitrarily complex', which no finite run can establish." ;
@@ -40,7 +41,7 @@ sub:assertion {
     delphi:evidenceAgainst "Cyclic boundaries with N = 128 cells and 128 steps: rule 30's pattern wraps after 64 steps, which does not affect the comparison (both systems wrap identically) but makes rho_dec for rule 30 slightly higher than for an unbounded array." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-04--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-04--claim-test--dataset-2> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-04/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-04/result.json> .
   <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-04--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: NKS online, notes for Chapter 11 Section 4, 'Universal cellular automaton' (rule list and block encoding); same source as claim-test wolfram2002-ch11-06" ;
     dct:description "the fixed universal rule" ;
@@ -58,12 +59,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-04/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-04/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-e5f4)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -73,7 +74,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.080Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.691Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of wolfram2002-ch11-04: supports, confidence 0.6" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

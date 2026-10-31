@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: shift-map-exact-orbits, oeis-a004539-bfile, oeis-a010060-bfile, oeis-a030190-bfile, control-3x-mod-1-orbit" ;
     delphi:inferenceMethod "analysis.py computes exact orbits of the doubling map with Python Fractions. (1) For 2000 random reduced fractions p/q (odd q <= 10^5) the 2000-step itinerary is compared bit for bit with the binary digits of p/q from long division; for seeds whose digits are OEIS b-files (A004539 sqrt(2), A010060 Thue-Morse, A030190 Champernowne) truncated to a dyadic rational, the itinerary is compared with the published digits, and the A004539 digits are cross-checked against math.isqrt. (2) For every odd q in 3..2000 the exact orbit of 1/q is walked until it repeats and its period and preperiod are compared with the multiplicative order of 2 mod q; 1/2^k is iterated for k <= 60. (3) lzma compression ratios of seed digits and of the 10000-bit itinerary are compared for Thue-Morse, Champernowne, sqrt(2), random bits, 1/1999 and 1/7, against 200 random-bit references; the NIST serial test (m = 8) is applied to each itinerary. (4) Control: the exact orbit of 3x mod 1 from 1/2^60 for 10000 steps, with compression ratio, pair frequencies and serial test. Run time about 15 s including downloads." ;
     delphi:preregistered false ;
+    delphi:dataKind "computational" ;
     dct:description "analysis.py computes exact orbits of the doubling map with Python Fractions. (1) For 2000 random reduced fractions p/q (odd q <= 10^5) the 2000-step itinerary is compared bit for bit with the binary digits of p/q from long division; for seeds whose digits are OEIS b-files (A004539 sqrt(2), A010060 Thue-Morse, A030190 Champernowne) truncated to a dyadic rational, the itinerary is compared with the published digits, and the A004539 digits are cross-checked against math.isqrt. (2) For every odd q in 3..2000 the exact orbit of 1/q is walked until it repeats and its period and preperiod are compared with the multiplicative order of 2 mod q; 1/2^k is iterated for k <= 60. (3) lzma compression ratios of seed digits and of the 10000-bit itinerary are compared for Thue-Morse, Champernowne, sqrt(2), random bits, 1/1999 and 1/7, against 200 random-bit references; the NIST serial test (m = 8) is applied to each itinerary. (4) Control: the exact orbit of 3x mod 1 from 1/2^60 for 10000 steps, with compression ratio, pair frequencies and serial test. Run time about 15 s including downloads." ;
     rdfs:comment "Measured: 0 itinerary bits differing from the seed's binary digits (out of 4,020,999 compared) (n = 4020999, exact). Interpretation: Wolfram's 'shift map' is x -> 2x mod 1 (NKS p. 149, 'doubling modulo 1'), and 'moving digits leftward' refers to the base-2 expansion; the output of the map is taken to be the coarse itinerary (which half of the interval x_t lies in), which is the standard symbolic coding and is what Wolfram's pictures show. 'Randomness' is operationalised as incompressibility by a general-purpose compressor (lzma) plus block-frequency uniformity, following the assessors' remark that the claim locates randomness in the digit sequence. Dyadic rationals have two binary expansions; the itinerary follows the terminating one (x_t = 1/2 gives bit 1 then zeros), so seeds are compared with that convention. All orbits are computed with exact rational arithmetic; a floating-point implementation would collapse to 0 after 53 steps, which is noted but not used." ;
     delphi:evidenceAgainst "Parts (1)-(3) passed exactly as pre-registered: 0 of 4,020,999 itinerary bits differ from the seed digits; all 999 odd denominators q <= 2000 give purely periodic itineraries whose period equals the multiplicative order of 2 mod q (max 1996 = q - 3 for q = 1999); every seed class has identical lzma ratio for seed and itinerary (the itinerary is literally the digit string); periodic seeds compress to 0.011-0.019 and Thue-Morse to 0.017 against a random reference of 0.168-0.171, while a random-bit seed gives 0.170." ;
@@ -38,7 +39,7 @@ sub:assertion {
     delphi:evidenceAgainst "The claim is an exact identity (2x mod 1 deletes the leading binary digit), so computation can only illustrate it; the test's value is in confirming the identity with independent implementations (Fraction orbit vs long division vs OEIS digits) and in showing that the output's compressibility is exactly the seed's. In float64 the orbit of 0.1 collapses to exactly 0 after 55 steps, which is why exact arithmetic was used." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-19--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-19--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-19--claim-test--dataset-3>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-19--claim-test--dataset-4>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-19--claim-test--dataset-5> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch04-19/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch04-19/result.json> .
   <https://w3id.org/delphi/resource/evidence/wolfram2002-ch04-19--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Exact orbits of x -> 2x mod 1 (Python Fractions) and binary digits by long division (generated by analysis.py)" ;
     dct:description "transcription identity, periodic seeds, compressibility of seed vs itinerary" ;
@@ -73,12 +74,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch04-19/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch04-19/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-0123)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -88,7 +89,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.075Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.685Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of wolfram2002-ch04-19: supports, confidence 0.95" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

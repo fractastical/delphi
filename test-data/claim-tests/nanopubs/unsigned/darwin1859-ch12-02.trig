@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: fishbase-2024-07-species, fishbase-2024-07-country, fishbase-2024-07-countref" ;
     delphi:inferenceMethod "analysis.py downloads the FishBase 24.07 species, country and countref CSVs, keeps species flagged fresh-water only (Fresh, not Brack, not Saltwater) whose AnaCat is not anadromous/catadromous/amphidromous/oceanodromous (16,213 species, 16,174 with native country records), joins their native/endemic country records to FishBase's Continent field, collapses Europe+Asia into Eurasia, and counts species with native records on both sides of each ocean-separated landmass pair. A species is 'robust' if it has >= 2 native countries on each side. Two post-hoc checks, labelled as such in measured.extra.post_hoc, were added after inspecting the output: removing Indonesia/Timor-Leste from the Asian side of the Eurasia|Oceania pair (Indonesian Papua is on New Guinea), and re-running the Eurasia|North America pair with brackish-tolerant non-diadromous species admitted." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "analysis.py downloads the FishBase 24.07 species, country and countref CSVs, keeps species flagged fresh-water only (Fresh, not Brack, not Saltwater) whose AnaCat is not anadromous/catadromous/amphidromous/oceanodromous (16,213 species, 16,174 with native country records), joins their native/endemic country records to FishBase's Continent field, collapses Europe+Asia into Eurasia, and counts species with native records on both sides of each ocean-separated landmass pair. A species is 'robust' if it has >= 2 native countries on each side. Two post-hoc checks, labelled as such in measured.extra.post_hoc, were added after inspecting the output: removing Indonesia/Timor-Leste from the Asian side of the Eurasia|Oceania pair (Indonesian Papua is on New Guinea), and re-running the Eurasia|North America pair with brackish-tolerant non-diadromous species admitted." ;
     rdfs:comment "Measured: 6 strictly fresh-water, non-diadromous fish species native (>= 2 countries each side) on both sides of an ocean-separated continent pair (n = 16174, exact count from FishBase 24.07 status fields; FishBase status errors can move single species in or out). Interpretation: Darwin's 'fresh-water fish' is mapped to FishBase species that are flagged fresh-water only and are not diadromous, because he treats migratory marine-linked fishes separately and the claim concerns fish confined to fresh water. 'Distant continents' is mapped to continents separated by sea today; Eurasia is one landmass and North and South America are joined, so those pairs are not 'distant' for this test (a sensitivity count over all pairs of FishBase's six continents is also reported). Native status comes from FishBase's country status field (native, endemic), which excludes introductions, the main modern confound Darwin could not have foreseen. The second clause (within a continent, river systems share some species and not others) is near-tautological and is not tested here." ;
     delphi:evidenceAgainst "The pre-registered mechanical count is 6 robust species (>= 5, 'refutes'), but inspection shows that count is partly artefactual: Upeneus guttatus is a marine goatfish mis-flagged as fresh-water only, Cichlasoma bimaculatum's 'native' Eurasian records are status errors, and three Indo-Pacific gobies/pipefishes (Glossogobius clitellus, Redigobius oyensi, Lophocampus retzii) reach Oceania from the Philippines/Indonesia; such island gobioids have marine larval phases that FishBase does not always code as amphidromous. 72 of the 77 Eurasia|Oceania 'shared' species are Indonesian-Papua vs Papua New Guinea/Australia records on the single landmass of New Guinea/Sahul, an artefact of FishBase filing Indonesia under Asia." ;
@@ -40,7 +41,7 @@ sub:assertion {
     delphi:evidenceAgainst "FishBase is licensed CC BY-NC; the data are not redistributed here, only fetched and summarised." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-02--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-02--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-02--claim-test--dataset-3> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch12-02/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch12-02/result.json> .
   <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-02--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: FishBase species table (v24.07), CSV export distributed by rfishbase" ;
     dct:description "Fresh/Brack/Saltwater habitat flags and AnaCat migratory category per species" ;
@@ -67,12 +68,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch12-02/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch12-02/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-6221)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -82,7 +83,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.029Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.663Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of darwin1859-ch12-02: refutes, confidence 0.8" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

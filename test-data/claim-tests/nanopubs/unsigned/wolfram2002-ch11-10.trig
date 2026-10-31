@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: nks-ch11-10-tm-emulation-generator" ;
     delphi:inferenceMethod "analysis.py builds, from any (k, r, rule table), an explicit finite Turing-machine transition table: states ('scan', B, j) carry the last 2r old cell values B during a left-to-right sweep, step back r cells to write each new value, finish the last r cells at the right end-marker with virtual zero reads, and return to the left marker, so one round trip is one cellular-automaton step with fixed-0 boundaries. The machine for each rule was run on W = 48 cells for 40 steps from two random initial conditions (seed 20261110) and the tape compared cell-for-cell with direct evolution after every step: all 256 elementary rules, 100 random k=3 r=1 rules, 50 random k=2 r=2 rules, 20 random k=4 r=1 rules and 10 random k=3 r=2 rules (436 rules, 1,674,240 cell comparisons). A mutation check (machine for rule 110 compared with rule 124) produced 225 mismatches in 10 steps, confirming the harness detects disagreement." ;
     delphi:preregistered false ;
+    delphi:dataKind "computational" ;
     dct:description "analysis.py builds, from any (k, r, rule table), an explicit finite Turing-machine transition table: states ('scan', B, j) carry the last 2r old cell values B during a left-to-right sweep, step back r cells to write each new value, finish the last r cells at the right end-marker with virtual zero reads, and return to the left marker, so one round trip is one cellular-automaton step with fixed-0 boundaries. The machine for each rule was run on W = 48 cells for 40 steps from two random initial conditions (seed 20261110) and the tape compared cell-for-cell with direct evolution after every step: all 256 elementary rules, 100 random k=3 r=1 rules, 50 random k=2 r=2 rules, 20 random k=4 r=1 rules and 10 random k=3 r=2 rules (436 rules, 1,674,240 cell comparisons). A mutation check (machine for rule 110 compared with rule 124) produced 225 mismatches in 10 steps, confirming the harness detects disagreement." ;
     rdfs:comment "Measured: 0 mismatching cells between Turing-machine tape and direct cellular-automaton evolution, summed over all runs (n = 1674240, exact (deterministic comparison)). Interpretation: The claim is a logical implication (if a system type can emulate every cellular automaton and a universal cellular automaton exists, the type has universal members). The implication itself is not empirical; what can be checked computationally is its first premise for a concrete system type. We check it for Turing machines, the second family named in the claim, by implementing a uniform emulation construction (the sweeping-head scheme NKS describes for Turing machines emulating cellular automata, p. 665-666, written here from scratch rather than copied) and testing it exhaustively on the elementary rules and on random rules with more colours and larger neighbourhoods. The second premise (existence of a universal cellular automaton) is taken from the published proof that rule 110 is universal; it is not re-derived. The other families in the claim (mobile automata, substitution systems, tag and cyclic tag systems, symbolic systems, register machines) are not tested here, so a 'supports' verdict confirms the claim's structure for one family only." ;
     delphi:evidenceAgainst "Only the Turing-machine family is tested; the claim also names mobile automata, substitution systems, tag and cyclic tag systems, symbolic systems and register machines, whose emulation constructions are not checked here." ;
@@ -39,7 +40,7 @@ sub:assertion {
     delphi:evidenceAgainst "The Turing machines used here have many states; they are not the small machines NKS discusses elsewhere, and nothing is claimed about minimal size." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-10--claim-test--dataset-1> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-10/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-10/result.json> .
   <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-10--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Turing machines constructed by analysis.py from cellular-automaton rules (all 256 elementary rules; random rules with k in {2,3,4} and r in {1,2}, seed 20261110), run on W = 48 cells for 40 cellular-automaton steps and compared with direct evolution" ;
     dct:description "the emulation premise of the implication, for the Turing-machine family" ;
@@ -50,12 +51,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-10/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/wolfram-nks/wolfram2002-ch11-10/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-e5f4)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -65,7 +66,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.083Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.692Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of wolfram2002-ch11-10: supports, confidence 0.7" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

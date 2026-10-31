@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: go-basic-obo, mgi-gaf" ;
     delphi:inferenceMethod "fetch.py downloads go-basic.obo and the MGI GAF. analysis.py drops NOT-qualified and obsolete-term lines, builds each gene's set of experimental BP terms and their is_a/part_of ancestors, removes 612 genes annotated to ion channel, gap junction or neurotransmission terms, and tests overlap of GO:0007611 and GO:0009653 in the remaining 10,243 genes with a one-sided Fisher exact test. Annotation depth is controlled by a Mantel-Haenszel odds ratio over ten equal-sized strata of genes ranked by their number of distinct experimental BP terms. Specificity is the percentile of the odds ratio among the 327 BP terms of 128-286 genes that are neither ancestors nor descendants of either term." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "fetch.py downloads go-basic.obo and the MGI GAF. analysis.py drops NOT-qualified and obsolete-term lines, builds each gene's set of experimental BP terms and their is_a/part_of ancestors, removes 612 genes annotated to ion channel, gap junction or neurotransmission terms, and tests overlap of GO:0007611 and GO:0009653 in the remaining 10,243 genes with a one-sided Fisher exact test. Annotation depth is controlled by a Mantel-Haenszel odds ratio over ten equal-sized strata of genes ranked by their number of distinct experimental BP terms. Specificity is the percentile of the odds ratio among the 327 BP terms of 128-286 genes that are neither ancestors nor descendants of either term." ;
     rdfs:comment "Measured: 2.6573 odds ratio, learning-or-memory vs anatomical-structure-morphogenesis gene sets (mouse, experimental BP annotations, channel/synaptic genes excluded) (n = 10243, one-sided Fisher exact p = 1.140e-09). Interpretation: TAME's prediction is phrased across animals; the test uses the mouse because MGI curation gives the deepest experimental annotation of both developmental and behavioural phenotypes in a single species. 'Genes involved in morphogenesis' is GO:0009653 anatomical structure morphogenesis and 'memory and learning categories' is GO:0007611 learning or memory, each with is_a and part_of descendants. Only experimental evidence codes (EXP, IDA, IPI, IMP, IGI, IEP, HTP, HDA, HMP, HGI, HEP) are used, so electronic or sequence-similarity annotations cannot create the overlap. The universe is every gene with at least one such BP annotation, after removing NOT-qualified lines. 'Beyond the known shared ion channels, connexins and neurotransmitter machinery' is implemented by excluding from the universe every gene annotated (any evidence) to GO:0005216 ion channel activity, GO:0005243 gap junction channel activity, GO:0005921 gap junction, GO:0007268 chemical synaptic transmission, GO:0001505 regulation of neurotransmitter levels or GO:0030594 neurotransmitter receptor activity, with descendants. Only the first part of the claim is tested; its second part (memory genes appearing in cancer, regeneration and embryogenesis screens) is out of scope here." ;
     delphi:evidenceAgainst "The crude overlap is real: 69 genes against 34 expected (odds ratio 2.66, p = 1.1e-9), and removing channel, gap-junction and neurotransmission genes barely changes it (2.64 before exclusion). It does not survive control for annotation depth: learning-or-memory genes sit almost entirely in the most-annotated strata, and within the top decile (13-167 BP terms) 43 of 63 of them (68%) are morphogenesis genes against 621 of 961 other genes (65%). The pre-registered fail rule is met by the Mantel-Haenszel odds ratio (0.94 <= 1.2). The control comparison (64.5th percentile) fails pass criterion (c) but does not by itself meet the fail rule, since 2.66 is above the control median of 1.87." ;
@@ -40,7 +41,7 @@ sub:assertion {
     delphi:evidenceAgainst "The GO release is 'current' at retrieval time and is not versioned in the URL; re-running later will fetch a newer release, so exact numbers will drift. The SHA-256 above identifies the files used." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--dataset-2> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/levin-papers/levin-2022-tame-19/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/levin-papers/levin-2022-tame-19/result.json> .
   <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Gene Ontology, basic edition (go-basic.obo)" ;
     dct:description "term hierarchy (is_a and part_of) used to propagate annotations and define the gene sets" ;
@@ -60,12 +61,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/levin-papers/levin-2022-tame-19/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/levin-papers/levin-2022-tame-19/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-opus-5.5; cursor local session)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
@@ -75,7 +76,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.056Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.668Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of levin-2022-tame-19: refutes, confidence 0.7" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;

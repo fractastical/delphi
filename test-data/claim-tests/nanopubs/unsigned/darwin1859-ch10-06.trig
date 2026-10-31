@@ -30,6 +30,7 @@ sub:assertion {
     delphi:admissibleDatasets "Planned datasets: paleobiodb-data1.2-api" ;
     delphi:inferenceMethod "For each of 9 higher taxa the accepted extinct families with occurrences were listed from PBDB taxa/list. For every family whose recorded span was >= 5 Myr, occs/diversity (count=genera, time_reso=stage) gave per-stage counts; range-through richness R = X_bt + X_Ft + X_bL + X_FL was taken from the first to the last stage with R > 0, and the number of genera = sum(X_Ft + X_FL). Families with >= 10 genera and >= 6 stage bins qualified (n = 313). Each trajectory was scored for low start (R_first <= 0.5 max), low end (R_last <= 0.5 max) and a single peak (bins with R > 0.5 max contiguous); the fraction scoring all three was compared with the pre-registered thresholds (>= 0.667 supports, < 0.5 refutes), with a Clopper-Pearson 95% CI." ;
     delphi:preregistered false ;
+    delphi:dataKind "biological" ;
     dct:description "For each of 9 higher taxa the accepted extinct families with occurrences were listed from PBDB taxa/list. For every family whose recorded span was >= 5 Myr, occs/diversity (count=genera, time_reso=stage) gave per-stage counts; range-through richness R = X_bt + X_Ft + X_bL + X_FL was taken from the first to the last stage with R > 0, and the number of genera = sum(X_Ft + X_FL). Families with >= 10 genera and >= 6 stage bins qualified (n = 313). Each trajectory was scored for low start (R_first <= 0.5 max), low end (R_last <= 0.5 max) and a single peak (bins with R > 0.5 max contiguous); the fraction scoring all three was compared with the pre-registered thresholds (>= 0.667 supports, < 0.5 refutes), with a Clopper-Pearson 95% CI." ;
     rdfs:comment "Measured: 0.5847 fraction of qualifying extinct families with low start, low end and a single peak (n = 313, 95% Clopper-Pearson CI [0.528, 0.640]). Interpretation: Darwin's 'group' is read as a family and 'number of species' as number of genera per stage (the level with usable fossil coverage, as both assessors note). 'Gradual increase to a maximum, then gradual decrease' is operationalised as the three shape conditions (a)-(c): low start, low end, single peak. The sampled higher taxa are fixed in advance: Trilobita, Brachiopoda, Cephalopoda, Bivalvia, Gastropoda, Crinoidea, Anthozoa, Echinoidea, Bryozoa. Only extinct families are used because the decline-to-extinction half of the claim is only observable for them. Counts are raw range-through counts from the Paleobiology Database diversity endpoint at stage resolution; no sampling standardisation is applied, which is recorded as a caveat." ;
     delphi:evidenceAgainst "The two 'gradual' components of the claim are strongly supported: 93% of families start and 95% end at <= half their maximum genus richness, and only 2.6% peak in their first and 1.0% in their last stage. What fails is the single-maximum component: 34% of families have two or more separate peaks above half-maximum, so the overall fraction (0.58) falls in the pre-registered MIXED band." ;
@@ -41,7 +42,7 @@ sub:assertion {
     delphi:evidenceAgainst "The PBDB is a live resource; re-running reproduces the method but counts drift as occurrences are added. Response checksums at retrieval time are in derived/fetch_log.csv.gz." ;
     delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch10-06--claim-test--dataset-1> ;
     prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch10-06/result.json> .
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch10-06/result.json> .
   <https://w3id.org/delphi/resource/evidence/darwin1859-ch10-06--claim-test--dataset-1> a delphi:EvidenceItem ;
     rdfs:label "Dataset: Paleobiology Database data service 1.2: taxa/list (family sampling frame) and occs/diversity (range-through genus counts per stage)" ;
     dct:description "extinct families of nine marine invertebrate higher taxa and their genus richness per stage" ;
@@ -70,12 +71,12 @@ sub:assertion {
 
 sub:provenance {
   sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
-    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/darwin-origin/darwin1859-ch10-06/result.json> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/darwin-origin/darwin1859-ch10-06/result.json> ;
     prov:wasGeneratedBy sub:test .
   sub:test a prov:Activity ;
     prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
     prov:qualifiedAssociation sub:plan .
-  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/f0720a27be6412b9705e2f221a1710c8442283e3/test-data/claim-tests/README.md> .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ad1bcb137661aae2fecd70fc14b1ae33fda5f2c9/test-data/claim-tests/README.md> .
   <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
     rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-bdd1)" ;
     delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
@@ -85,7 +86,7 @@ sub:provenance {
 }
 
 sub:pubinfo {
-  this: dct:created "2026-10-31T19:53:44.022Z"^^xsd:dateTime ;
+  this: dct:created "2026-10-31T20:08:31.654Z"^^xsd:dateTime ;
     dct:creator <https://orcid.org/0009-0007-4948-9192> ;
     rdfs:label "Claim test of darwin1859-ch10-06: mixed, confidence 0.7" ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
