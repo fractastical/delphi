@@ -294,6 +294,62 @@ def _vid(ins, out, vid, src_dir, fname, declared, bytes_declared=None):
     return "present_verified", f"artifacts/simulations/{vid}/{fname}"
 
 
+def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
+    """Wind-tunnel, behavior controller and scale-growth manifests as gallery cards, with equations, sources and limitations.
+    Every number is copied from the worker's own receipt; verdicts and misses are carried, never softened."""
+    cards = []
+    d = "artifacts/windtunnel"
+    if (ROOT / d / "render-manifest.json").exists() and (ROOT / d / "summary.json").exists():
+        rm = json.loads(ins.read(f"{d}/render-manifest.json")); sm = json.loads(ins.read(f"{d}/summary.json")); o = rm["outputs"]
+        st, href = _vid(ins, out, "windtunnel-2d", d, "windtunnel.mp4", o["windtunnel.mp4"]["sha256"]); _, ph = _vid(ins, out, "windtunnel-2d", d, "poster.png", o["poster.png"]["sha256"])
+        cs = sm["cases"]
+        cards.append({"id": "windtunnel-2d", "title": "2D low-Reynolds flow past the N1 silhouette (lattice-Boltzmann), verdict " + sm["label"], "scales": ["organism", "organ"], "evidence_kind": sm["evidence_kind"] + " (video: " + rm["evidence_kind"] + ")",
+            "model": {"name": "D2Q9 BGK lattice-Boltzmann, Guo forcing, bounce-back on a staircase mask of the N1 print silhouette", "context": sm["scope"] + ". Status is PARTIAL: no grid-refinement verdict and not validated flight."},
+            "time": {"units": "lattice steps, shown as convective times; see the case request", "note": f"{rm['n_frames']} frames at {rm['fps']} fps from case {rm['case']}"},
+            "video": {"file": "windtunnel.mp4", "sha256": o["windtunnel.mp4"]["sha256"], "note": f"{o['windtunnel.mp4']['byte_size']} bytes"}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": k.replace("_", " "), "result": "not computed (null)" if v is None else ("passed" if v else "FAILED")} for k, v in sm["checks"].items()]
+                + [{"name": f"case {k}", "result": f"{c['status']}; Re {c['Re']:.0f}; mean Cd {c['mean_Cd_last20pct']:.3f}, Cl {c['mean_Cl_last20pct']:.3f} (last 20%)" + (f"; {c['failure']}" if c.get("failure") else "")} for k, c in cs.items()]
+                + [{"name": "time refinement", "result": f"relative drag difference {sm['time_relative_drag_difference']:.4f}"}],
+            "parameter_unknowns": ["Re about 80 at 8 mm/s on a 0.15 m body; a flying fish glides at orders of magnitude higher Re.", "Geometry is a print-modified candidate silhouette extruded infinitely in 2D; span is ignored."],
+            "open_questions": ["Does the grid-48 case finish within budget to give a grid-refinement verdict?", "What 3D, high-Re, free-surface simulation or measurement would test lift and drag?"] + [x if isinstance(x, str) else json.dumps(x) for x in rm.get("not_established", [])][:6],
+            "equations": [{"label": "Lattice-Boltzmann update (BGK)", "tex": "f_i(\\mathbf{x}+\\mathbf{c}_i,t+1)-f_i(\\mathbf{x},t)=-\\tfrac{1}{\\tau}\\left[f_i-f_i^{eq}\\right]+F_i", "source": "engineering/windtunnel/lbm.py"}, {"label": "Viscosity and Reynolds number", "tex": "\\nu=\\tfrac{\\tau-1/2}{3},\\qquad \\mathrm{Re}=\\tfrac{U L}{\\nu}", "source": "engineering/windtunnel/lbm.py"}],
+            "sources": [{"label": "Solver, protocol and controls", "locator": f"{d}/protocol sha256 {sm['protocol_sha256'][:12]}…, analytic-controls.json (Poiseuille, Taylor-Green)"}, {"label": "Geometry", "locator": f"{rm['mesh']['path']} sha256 {rm['mesh']['sha256'][:12]}…"}],
+            "limitations": [rm["mesh"]["geometry_warning"], sm["scope"], "biological_success_probability: null (not computed)."],
+            "couplings": [], "manifest": f"{d}/render-manifest.json", "native": True})
+    d = "artifacts/behavior"
+    if (ROOT / d / "manifest.json").exists() and (ROOT / d / "controls.json").exists():
+        m = json.loads(ins.read(f"{d}/manifest.json")); ct = json.loads(ins.read(f"{d}/controls.json")); fl = m["files"]
+        st, href = _vid(ins, out, "behavior-cpg", d, "behavior.mp4", fl["behavior.mp4"]["sha256"]); _, ph = _vid(ins, out, "behavior-cpg", d, "poster.png", fl["poster.png"]["sha256"])
+        probs = json.loads(ins.read(f"{d}/problems.json"))["problems"]
+        cards.append({"id": "behavior-cpg", "title": "Rhythm-generator controller driving a designed joint servo (eight segments)", "scales": ["neural", "organ", "organism"], "evidence_kind": m["evidence_kind"],
+            "model": {"name": m["schema"] if "schema" in m else "frontier.behavior", "context": "Source-form phase and amplitude oscillators plus a designed joint servo. Eight coarse segments, not somites; independent plant joints; no hydrodynamics. Biological accuracy: " + m["biological_accuracy"] + "."},
+            "time": {"units": "seconds (2 s run, 0.2 ms step)", "note": m["control_scope"]},
+            "video": {"file": "behavior.mp4", "sha256": fl["behavior.mp4"]["sha256"], "note": f"{fl['behavior.mp4']['byte_size']} bytes"}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": c["name"].replace("_", " "), "result": "passed" if c["passed"] else "FAILED"} for c in ct["checks"]],
+            "parameter_unknowns": ["Joint inertia, damping, stiffness and feedback gains are engineering values, not measured fish values.", "No target-species circuit or kinematic recording constrains frequency, phase lag or amplitude."],
+            "open_questions": [f"{p['question']} (blocks: {p['blocks']})" for p in probs],
+            "equations": [{"label": "Phase oscillator with phase-biased coupling (source form)", "tex": "\\dot\\theta_i=2\\pi\\nu_i+\\sum_j w_{ij}\\sin(\\theta_j-\\theta_i-\\varphi_{ij})", "source": "Ijspeert et al. 2007, doi 10.1126/science.1138353 (salamander model)"}, {"label": "Amplitude relaxation, closed form checked", "tex": "r(t)=1-\\left(1+\\tfrac{a t}{2}\\right)e^{-a t/2}", "source": "controls.json amplitude_closed_form, max error 4e-11"}],
+            "sources": [{"label": "Oscillator form", "locator": "Ijspeert 2007, p1416 equations; salamander and robot, not zebrafish"}, {"label": "Protocol", "locator": f"{d}/protocol.json sha256 {m['protocol_sha256'][:12]}…"}],
+            "limitations": [m["control_scope"], "Controls test frozen numerical predicates only; no biological or fluid-force success is tested.", "The wind tunnel is static; the moving-fluid bridge does not exist."],
+            "couplings": [], "manifest": f"{d}/manifest.json", "native": True})
+    d = "artifacts/scales/erk-wave"
+    if (ROOT / d / "receipt.json").exists():
+        r = json.loads(ins.read(f"{d}/receipt.json")); fl = r["files"]; gc = r["growth_coupling"]; mc = r["measured_comparison"]; ctl = r["controls"]
+        st, href = _vid(ins, out, "scale-erk-wave", d, "erk_growth.mp4", fl["erk_growth.mp4"]["sha256"]); _, ph = _vid(ins, out, "scale-erk-wave", d, "poster.png", fl["poster.png"]["sha256"])
+        cards.append({"id": "scale-erk-wave", "title": "Erk trigger waves and wave-gated growth on one regenerating zebrafish scale", "scales": ["tissue", "developmental"], "evidence_kind": r["evidence_kind"],
+            "model": {"name": r["model"], "context": "Zebrafish regenerating scale, Hayden 2021 Table 1 parameters (fitted in the source). Transfer to flying-fish scales is unknown."},
+            "time": {"units": "hours; 120 h run, 1 h per video frame", "note": "Rendering of model state in reference coordinates, not a microscope image."},
+            "video": {"file": "erk_growth.mp4", "sha256": fl["erk_growth.mp4"]["sha256"], "note": f"{fl['erk_growth.mp4']['bytes']} bytes"}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": "control " + k.replace("_", " "), "result": "not gated; reported" if v.get("pass") is None else ("passed" if v["pass"] else "FAILED")} for k, v in ctl.items()]
+                + [{"name": "vs measured: " + k.replace("_", " "), "result": f"simulated {v['simulated']} vs band {v['band'][0]} to {v['band'][1]}: {'in band' if v['in_band'] else 'MISS'} ({v['measured_source']})"} for k, v in mc.items()],
+            "parameter_unknowns": [f"Growth coupling is ASSUMED: {gc['assumed']['form']}. Measured is a LINEAR slope {gc['measured']['value_per_h']} per h (68% CI {gc['measured']['ci68_per_h']}, {gc['measured']['n']}).", f"Per 24 h window: exponential {gc['assumed']['per_window_factor_exponential']:.3f} vs linear {gc['assumed']['per_window_factor_if_linear']:.3f}; not tuned."],
+            "open_questions": [f"Misses retained: {', '.join(r['measured_comparison_misses'])} (simulated {mc['rise_10_90_h']['simulated']} h vs measured about 3 h).", "Synchronous activation does not reproduce the measured impairment of scale growth (area ratio " + f"{ctl['synchronous']['area_ratio']:.2f} vs standard {ctl['synchronous']['standard_area_ratio']:.2f}); the growth law cannot tell a wave from a synchronous pulse."],
+            "equations": [{"label": "Erk activity", "tex": "\\dot E=\\alpha_1\\tfrac{A^2}{\\beta^2+A^2}(1-E)-E(\\gamma_1 I+\\gamma_e)", "source": "Hayden 2021, doi 10.1016/j.bpj.2021.05.004"}, {"label": "Activator with diffusion", "tex": "\\dot A=\\alpha_2[\\text{source}]+\\alpha_3E-\\gamma_2A+D\\nabla^2A", "source": "Hayden 2021"}, {"label": "Inhibitor", "tex": "\\dot I=\\gamma_3(\\alpha_4E-I)", "source": "Hayden 2021"}, {"label": "Growth coupling (ASSUMED exponential form)", "tex": "\\frac{d\\ln a}{dt}=0.006\\ \\mathrm{h^{-1}}\\ \\text{for}\\ t-t_{\\text{peak}}\\le 24\\ \\mathrm{h}", "source": "assumption; measured form is linear, De Simone 2021 Ext. Data Fig. 7b"}],
+            "sources": [{"label": s_["citation"], "locator": f"doi {s_['doi']}; read level {s_['read_level']}; {s_.get('used_for', '')}"} for s_ in r["sources"] if not s_.get("used_for", "").startswith("NOT YET")],
+            "limitations": r["not_claimed"], "couplings": [], "manifest": f"{d}/receipt.json", "native": True})
+    return cards
+
+
 def native_video_cards(ins: Inputs, out: dict) -> list[dict]:
     """Map each worker's own manifest to the gallery card shape. Nothing is invented: absent fields stay absent."""
     cards = []
@@ -564,9 +620,10 @@ def build() -> dict[str, bytes]:
     controlled = controlled_results(ins, files)
     if simulation is not None:
         simulation["controlled"] = controlled
-    manifests = manifests + native_video_cards(ins, extra)
+    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra)
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
+    design_review = ins.json("site/content/design-review.json")
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -593,6 +650,7 @@ def build() -> dict[str, bytes]:
         "genomics": genomics_slice,
         "project_drafts": project_recs,
         "assurance": assurance,
+        "design_review": design_review,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
