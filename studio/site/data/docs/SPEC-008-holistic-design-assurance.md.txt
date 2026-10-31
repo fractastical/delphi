@@ -62,6 +62,30 @@ audit reports orphaned artifacts, unpinned equations and missing producers inste
 of silently displaying them as grounded. Identical evidence reused in several
 places retains one source-dependence identity.
 
+## Controls, genotype and behavior
+
+A mathematical law exposes relevant variables as controls or observables, not an
+assertion that each variable is biologically editable. Each control names its unit,
+admissible range, source data or assumption, context and affected downstream
+equations. Distinguish a published range from a fitted relation and from a raw
+observation dataset. A fitted control needs its actual observations, method,
+residuals, uncertainty, validation split when available, and extrapolation flag.
+Do not describe a range copied from a paper as a relation learned from many fish.
+
+Genotype-to-shape views distinguish comparative association, a tested perturbation,
+observed morphology and an untested mechanistic bridge. A fin-proportion phenotype
+does not establish flight. Whole-genome availability does not establish an editable
+genotype-to-organism map; fetched sequence subsets and unresolved identifiers are
+reported as such. Molecular sequence likelihood is not an expression or function
+measurement.
+
+Behavior adds neural/controller state, actuation, sensing and feedback to the
+equation graph. A designed oscillator/controller can be simulated without being a
+validated fish neural circuit. Its frequency, phase, joint angle and torque ports
+must declare units, bounds and physical correspondence. Moving-body hydrodynamic
+coupling requires its own implementation and checks; an animated hinge alone
+does not establish swimming, flight or an integrated brain/body design.
+
 ## Regional assurance vector
 
 Display separate axes; no uncalibrated weighted average masquerades as a probability.

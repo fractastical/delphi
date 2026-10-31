@@ -13,7 +13,7 @@ import pytest
 
 from frontier.http import BoundedHTTPServer, make_server
 from frontier.models import ref
-from conftest import TOKENS, action, claim
+from conftest import TOKENS, action, claim, evidence, source
 
 
 def test_http_real_authenticated_proposal_and_shared_read(store):
@@ -56,7 +56,9 @@ def test_http_real_authenticated_proposal_and_shared_read(store):
 
 
 ROOT = Path(__file__).resolve().parents[1]
-READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_capabilities", "frontier_artifacts"}
+READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_capabilities", "frontier_artifacts",
+              "frontier_discover", "frontier_graph", "frontier_catalogue", "frontier_project_inspect", "frontier_artifact_inspect",
+              "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief"}
 WRITE_TOOLS = {"frontier_propose", "frontier_lease", "frontier_transition"}
 SECRET_NAMES = {"token", "dsn", "password", "credential", "authorization", "secret", "api_key", "apikey"}
 
@@ -110,6 +112,125 @@ def test_official_mcp_stdio_reads_same_persisted_record(store):
             schema = json.loads((await session.read_resource("frontier://schema/Claim")).contents[0].text)
             assert "statement" in schema["properties"]
             assert json.loads((await session.read_resource("frontier://capabilities")).contents[0].text)["mode"] == "read_only"
+    run(exercise())
+
+
+def test_expanded_mcp_surfaces_use_exact_refs_and_bounded_local_calculators(store):
+    claim_record = store.submit(TOKENS["alice"], "surface-claim", claim(store, id="surface-claim"))["record"]
+    claim_ref = ref(claim_record)
+    problem = {"namespace": store.namespace, "kind": "Problem", "id": "surface-problem", "issuer": "alice",
+               "source_uri": "urn:frontier:mcp-test", "payload": {
+                   "title": "Software research question", "known_state": "A protocol fixture only.",
+                   "question": "Can this bounded test request be replayed?", "problem_kind": "computational_open_question",
+                   "novelty_status": "fixture", "data_access": "No external data.", "completeness": "actionable",
+                   "acceptance_criteria": ["The MCP queue stores a proposed Action"], "falsifiers": ["Action state is not proposed"],
+                   "next_action": "Run the isolated protocol test", "required_capabilities": ["local-test"],
+                   "cost_stop_bounds": "One local test run; no provider calls.", "downstream_uses": ["Protocol coverage"],
+                   "dependencies": [], "source": source(), "approach": "unknown", "scales": ["organism"], "context_tags": ["test"]}}
+    problem_record = store.submit(TOKENS["alice"], "surface-problem", problem)["record"]
+    problem_ref = ref(problem_record)
+    project = {"namespace": store.namespace, "kind": "Project", "id": "surface-project", "issuer": "alice",
+               "source_uri": "urn:frontier:mcp-test", "payload": {
+                   "title": "MCP surface fixture", "mission": "Exercise project pins only.", "source": source(),
+                   "limitations": ["Software fixture; no scientific claim."],
+                   "scale_coverage": [{"scale": "organism", "status": "unknown", "note": "Test-only."}],
+                   "members": [{"ref": claim_ref, "role": "mission", "subsystem": "test fixture", "relationship": "informs",
+                                "applicability": "Protocol tests only.", "rationale": "Exercise exact project-member pins."}],
+                   "requirements": [], "open_questions": [{"text": "A pinned test question.", "problem": problem_ref, "blocks": []}]}}
+    project_record = store.submit(TOKENS["alice"], "surface-project", project)["record"]
+    artifact_sha = "a" * 64
+    evidence_draft = evidence(store, claim_ref)
+    evidence_draft["id"] = "surface-evidence"
+    evidence_draft["payload"]["artifacts"] = [{"title": "Declared test output", "uri": "https://example.org/test-output.json",
+        "sha256": artifact_sha, "byte_size": 12, "media_type": "application/json", "role": "output",
+        "availability": "referenced", "license": None}]
+    store.submit(TOKENS["alice"], "surface-evidence", evidence_draft)
+
+    async def exercise():
+        async with session_for(store) as session:
+            names = {tool.name for tool in (await session.list_tools()).tools}
+            assert names == READ_TOOLS
+            discovered = val(await session.call_tool("frontier_discover", {"query": "Protocol fixture", "mode": "hybrid"}))
+            assert discovered["provider_requests"] == 0 and "fallback_used" in discovered
+            if discovered["fallback_used"]:
+                assert discovered.get("unavailable_reason")
+            assert discovered["items"]
+            graph = val(await session.call_tool("frontier_graph", {"target": problem_ref, "depth": 2, "limit": 30}))
+            assert graph["scope"]["target_ref"] == problem_ref and graph["counts"]["public_records_available"] >= 3
+            counts = val(await session.call_tool("frontier_catalogue", {}))
+            assert counts["scope"]["records_read"] >= 4
+            inspected = val(await session.call_tool("frontier_project_inspect", {"target": ref(project_record)}))
+            assert inspected["project"]["record"]["version"] == project_record["version"]
+            assert inspected["members"]["members"][0]["pin"] == claim_ref
+            asset = val(await session.call_tool("frontier_artifact_inspect", {"sha256": artifact_sha}))
+            assert len(asset["declarations"]) == 1 and asset["preview"] is None
+            assert asset["declarations"][0]["artifact"]["sha256"] == artifact_sha
+            sim = val(await session.call_tool("frontier_simulate", {"model": "mechanobio", "parameters": {"duration_s": 1, "frame_count": 5}}))
+            assert sim["status"] == "completed" and sim["persisted"] is False and sim["evidence_kind"] == "SimulationResult"
+            assert sim["result"]["frames"]
+            engineering_result = await session.call_tool("frontier_engineer", {"parameters": {
+                "rho": "1.225", "cl_max": "1", "mass": "0.05", "area": "0.01", "span": "0.25", "speed": "12"}})
+            if engineering_result.isError:
+                # The solver is an existing optional dependency. Its adapter must fail closed
+                # with a fixed error when that extra is absent, without leaking child details.
+                assert "solver_unavailable" in engineering_result.content[0].text
+                assert "ModuleNotFoundError" not in engineering_result.content[0].text
+            else:
+                engineering = val(engineering_result)
+                assert engineering["result"]["status"] == "feasible" and engineering["persisted"] is False
+            from engineering.formalize.cases import cantilever_request
+            formal = val(await session.call_tool("frontier_formalize", {"request": cantilever_request()}))
+            assert formal["persisted"] is False and formal["accepted"] is False
+            from frontier.beliefs import EXAMPLE_SCENARIO
+            belief = val(await session.call_tool("frontier_belief", {"scenario": EXAMPLE_SCENARIO}))
+            assert belief["calibrated"] is False and belief["persisted"] is False and belief["accepted"] is False
+            unauth_write = await session.call_tool("frontier_propose", {"draft": claim(store), "idempotency_key": "read-only-denied"})
+            assert unauth_write.isError
+
+    run(exercise(), timeout=120)
+
+
+def test_authorized_mcp_queues_action_but_does_not_execute_or_accept(store):
+    claim_draft = claim(store, id="queued-claim")
+
+    async def exercise():
+        async with session_for(store, token=TOKENS["alice"], allow_write=True) as session:
+            claim_queued = val(await session.call_tool("frontier_propose", {"draft": claim_draft, "idempotency_key": "typed-claim"}))
+            target = ref(claim_queued["record"])
+            problem_draft = {"namespace": store.namespace, "kind": "Problem", "id": "queued-problem", "issuer": "alice",
+                "source_uri": "urn:frontier:mcp-test", "payload": {
+                    "title": "Test research question", "known_state": "Protocol fixture only.",
+                    "question": "Can this typed draft be queued?", "problem_kind": "computational_open_question",
+                    "novelty_status": "fixture", "data_access": "No external data.", "completeness": "actionable",
+                    "acceptance_criteria": ["The draft is proposed"], "falsifiers": ["No proposal is returned"],
+                    "next_action": "Inspect the proposal", "required_capabilities": ["local-test"],
+                    "cost_stop_bounds": "No provider calls; one store submission.", "downstream_uses": ["MCP protocol test"],
+                    "dependencies": [], "source": source(), "approach": "unknown", "scales": ["organism"], "context_tags": ["test"]}}
+            project_draft = {"namespace": store.namespace, "kind": "Project", "id": "queued-project", "issuer": "alice",
+                "source_uri": "urn:frontier:mcp-test", "payload": {"title": "Test project", "mission": "Exercise typed proposal.",
+                    "source": source(), "limitations": ["Protocol fixture, not a scientific result."],
+                    "scale_coverage": [{"scale": "organism", "status": "unknown", "note": "Test-only."}],
+                    "members": [{"ref": target, "role": "mission", "subsystem": "test", "relationship": "informs",
+                                 "applicability": "Test only.", "rationale": "Exercise exact project pin."}],
+                    "requirements": [], "open_questions": []}}
+            annotation_draft = {"namespace": store.namespace, "kind": "Annotation", "id": "queued-annotation", "issuer": "alice",
+                "source_uri": "urn:frontier:mcp-test", "payload": {"kind": "comment", "body": "A protocol-test annotation.", "anchor": {"record": target}}}
+            drafts = [claim_draft, problem_draft, evidence(store, target), project_draft, annotation_draft, action(store, target)]
+            expected_kinds = {"Claim", "Problem", "Evidence", "Project", "Annotation", "Action"}
+            queued_kinds = set()
+            for draft in drafts:
+                result = val(await session.call_tool("frontier_propose", {
+                    "draft": draft, "idempotency_key": "typed-" + draft["kind"].lower()}))
+                assert result["local_status"] == "proposed"
+                queued_kinds.add(result["record"]["kind"])
+                if draft["kind"] == "Action":
+                    state = val(await session.call_tool("frontier_get", {"target": ref(result["record"])}))
+                    assert state["action"]["state"] == "proposed"
+            assert queued_kinds == expected_kinds
+            caps = val(await session.call_tool("frontier_capabilities", {}))
+            assert "review" in " ".join(caps["not_available"])
+            assert "frontier_review" not in {tool["name"] for tool in caps["tools"]}
+
     run(exercise())
 
 

@@ -44,6 +44,7 @@
       html: html`<section class="hero compact"><div><p class="eyebrow">MorphoSwarm Frontier</p><h1>Design together.<br>Know what's open.</h1></div>
         <div class="herotext"><p class="lede">Two ways in, one body of evidence. <b>Studio</b> is where a design goal is worked across scales, with the models, media and gaps in one place. <b>Frontier</b> is the shared list of open questions and who is working on them. Both read the same claims and evidence, kept in the Delphi foundation: what we know, what's next, who's working on it.</p></div></section>
       <section class="panel goalpanel">${goalForm("")}</section>
+      <section class="panel missionview" aria-labelledby="hfish"><h2 id="hfish">The current design</h2><div class="mv-fish"><div id="fishmini" class="fishmini"></div></div></section>
       <section class="paths" aria-label="Two entry paths">
         <article class="path studio"><p class="eyebrow">Studio · projects</p><h2>Work a design across scales</h2>
           <p>A project names a goal, breaks it into subsystems by scale, and shows for each the model that exists, its parameters and unknowns, equations, claims, media and open questions. Gaps stay visible.</p>
@@ -58,6 +59,7 @@
       <section class="panel crosslinks"><h2>How they connect</h2><ul><li>Every open question names the scales it touches; from a question you can jump to that subsystem in the studio.</li><li>Every subsystem lists the open questions at its scale and links to them on the Frontier.</li><li>Claims, evidence and artifacts live once, in the Delphi foundation, and both paths link to the same entity pages.</li></ul>
         <p class="small faint">Projects other than Flying fish are added as Project records; none is invented here.</p></section>`,
       async after(root) {
+        DF.mountFishMini(root.querySelector("#fishmini"), snap);
         DF.bindForm(root, "goal", (v) => DF.href("/studio", { goal: v.goal }));
         try { const L = await DF.liveQuestionCount(); if (L) root.querySelector("#homeq").parentElement.innerHTML = `<b>${L.n}</b> questions in the live node <span class="faint small">(${esc(L.source)})</span>`; } catch (e) { /* the snapshot figure stays */ }
       },

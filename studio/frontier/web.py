@@ -38,7 +38,7 @@ from .graph import catalogue_report, view as graph_view
 from .media import LocalMedia
 from .http import Application
 from .models import KINDS, MAX_BUNDLE_BYTES, Ref, canonical
-from .search import SEARCH_KIND, SearchIndex
+from .search import SearchIndex
 from .system_status import SystemStatus
 from .store import FrontierError, Store
 
@@ -630,8 +630,8 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
                     raise FrontierError("Unknown kind or status")
                 found = (cfg.catalog_search or store.search)(query=q.get("query", ""), kind=kind, status=status, limit=limit, after=q.get("after", ""))
                 rows = []
-                for r in found["results"]:
-                    got = store.get(r["ref"])
+                hydrated = SearchIndex(store).get_many([r["ref"] for r in found["results"]])
+                for r, got in zip(found["results"], hydrated):
                     row = {"record": got["record"], "local_status": got["local_review"]["status"], "policy_version": got["local_review"]["policy_version"],
                            "is_head": got["is_head"], "action": got["action"], "why_matched": r["why_matched"]}
                     match = {k: r[k] for k in ("score", "matched_fields", "snippet", "snippet_withheld", "curation", "disputes", "evidence_references", "references_complete") if k in r}

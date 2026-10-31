@@ -19,10 +19,14 @@ HTTPS; anonymous writes and an invalid supplied token were rejected. The twelve
 checks are recorded in `deploy/receipts/mcp-public-check.json`. No scientific
 record was written. A plain browser GET receives405: use an MCP client.
 
-The remote endpoint exposes six read tools and three credentialed contribution
-tools. Start with `frontier_capabilities`, then `frontier_search` and
-`frontier_get`. `frontier_artifacts` finds linked evidence assets. Search is
-currently lexical through MCP; the website also has a separate vector index.
+The endpoint at release `c804b31` exposes fifteen read/calculation tools and three
+credentialed contribution tools. The official public client completed 33 checks,
+including an actual simulation, constraint solve, formalization, belief calculation,
+exact Project lookup and hash-checked print asset lookup. The receipt is
+`deploy/receipts/mcp-expanded-check.json`. These calculations wrote no scientific
+records. Discovery used its explicit lexical fallback in that check.
+Start with `frontier_capabilities`, then use exact refs from `frontier_search`,
+`frontier_discover` or `frontier_graph` with `frontier_get`.
 
 Repeat the deployed connectivity check with:
 
@@ -100,7 +104,7 @@ the branch handoff; definitions alone are not a run.
 
 | | Default (`python -m frontier mcp ...`) | Opt-in (`... --allow-write`) |
 |---|---|---|
-| Tools | `frontier_search`, `frontier_get`, `frontier_neighborhood`, `frontier_events`, `frontier_artifacts`, `frontier_capabilities` (all `readOnlyHint=true`) | the six above plus `frontier_propose`, `frontier_lease`, `frontier_transition` (`readOnlyHint=false`, `destructiveHint=false`, `idempotentHint=true`) |
+| Tools | 15 read tools (all `readOnlyHint=true`; listed below) | the 15 above plus `frontier_propose`, `frontier_lease`, `frontier_transition` (`readOnlyHint=false`, `destructiveHint=false`, `idempotentHint=true`) |
 | Resources | `frontier://capabilities`, `frontier://schema/{kind}` | same |
 | Acts as | nobody | the principal that owns `FRONTIER_TOKEN` |
 
@@ -118,6 +122,59 @@ A token in the environment does **not** enable writes. Only the `--allow-write` 
 **Deliberately absent:** review/accept/dispute, `import_bundle`, `provision`, `initialize`, job execution, network fetch, publication. Acceptance requires an independent
 operator acting with that operator's own credential (HTTP `POST /v1/reviews`); a test shows that the same-operator `alias` reviewer is refused by the store for an
 action submitted through this MCP server and that a different operator can accept it. `lease_id` is a bearer capability for that lease: keep it inside the leasing agent's session.
+
+## Expanded read and calculation tools
+
+The source branch registers these 15 read-only tools in both stdio and remote
+modes. Check `frontier_capabilities` on the actual server before relying on a
+tool, because deployment may lag this branch.
+
+| Tool | What it returns | Important scope |
+|---|---|---|
+| `frontier_search` | Existing lexical record search | Exact versions and local status are kept separate. |
+| `frontier_get` | One exact version | Does not substitute a newer head. |
+| `frontier_neighborhood` | Existing depth-one typed links | Bounded by the existing Store API. |
+| `frontier_events` | Existing node events | Node-local event history. |
+| `frontier_artifacts` | Declared artifact metadata | Does not fetch or verify remote bytes. |
+| `frontier_capabilities` | Mode, roles, tools, limits and unavailable operations | Never includes credentials. |
+| `frontier_discover` | Lexical or hybrid results | Hybrid uses cached query embeddings only; when a matching vector is unavailable it explicitly reports lexical fallback. It makes zero embedding-provider requests. Relevance is not truth. |
+| `frontier_graph` | Bounded public graph overview or a graph rooted at an exact `Ref` | Public records only; exact versions, declared links and truncation are explicit. Depth is at most 3. |
+| `frontier_catalogue` | Counts and coverage report from the existing catalogue adapter | Describes the bounded public catalogue, not all records that may exist elsewhere. |
+| `frontier_project_inspect` | One exact Project envelope and its pinned members | Project pins remain exact; membership does not establish applicability or acceptance. |
+| `frontier_artifact_inspect` | Exact-hash matching Evidence declarations and guarded local-media matches | Local bytes are checked under the release's public `site/artifacts` tree. Remote URIs are never fetched; no content preview is returned. Declaration alone is not byte verification. |
+| `frontier_simulate` | One allowlisted bioelectric or mechanobiology preview | Fixed bounded local adapter; ephemeral `SimulationResult`, never accepted Evidence. No arbitrary code, cloud job or external inference. |
+| `frontier_engineer` | Existing finite aircraft-constraint calculation | Ephemeral exact-constraint result. The optional Z3 solver must be installed; otherwise the adapter returns a bounded `solver_unavailable` error. No biological validation is implied. |
+| `frontier_formalize` | Existing finite expression/formalization proposal | Ephemeral proposal; not a persisted or accepted formal Evidence record. |
+| `frontier_belief` | Existing finite scenario calculation | Conditional on declared inputs and explicitly uncalibrated; ephemeral and not accepted. |
+
+Example calls through the official MCP SDK:
+
+```python
+await session.call_tool("frontier_discover", {
+    "query": "ion-channel recovery after stimulation",
+    "mode": "hybrid",  # cached vectors if available, otherwise explicit lexical fallback
+})
+
+await session.call_tool("frontier_project_inspect", {
+    "target": {"namespace": "NODE", "kind": "Project", "id": "project-id", "version": "<64-hex-version>"},
+})
+
+await session.call_tool("frontier_simulate", {
+    "model": "bioelectric",
+    "parameters": {"duration_ms": 30, "frame_count": 31},
+})
+```
+
+Calculations return ephemeral outputs. To make a durable, reviewable
+contribution, an authenticated contributor can submit a typed `Evidence` or
+`Action` draft with `frontier_propose`. The store validates its existing schema,
+actor, namespace, exact target/input refs, idempotency key, quota and any
+`cost_stop_bounds`; the resulting Action remains `proposed`. Workers must then
+use the existing lease and transition tools and record actual outputs as
+separate Evidence. This MCP surface does not claim a calculation was accepted,
+does not add an Action execution queue wrapper, and does not invent a Project
+pin field absent from the current Action schema. Review and acceptance remain
+independent operations through the existing review API.
 
 ## Credentials
 
