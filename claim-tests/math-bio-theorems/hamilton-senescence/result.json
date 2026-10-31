@@ -2,7 +2,7 @@
   "claim_id": "hamilton-senescence",
   "claim_iri": "https://w3id.org/delphi/resource/claim/hamilton-senescence",
   "project": "math-bio-theorems",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the force of selection on survival declines with age after reproduction begins so that senescence is inevitable, then in age-structured matrix population models of unmanipulated wild animal populations, age-specific mortality should rise across the adult (reproductive) age classes in the great majority of species.",
   "pass_criterion": "Pre-registered. Data: COMADRE Animal Matrix Database v4.26.4.0 (RData file served at compadre-db.org/Data/ComadreDownload; data user agreement and citation guidelines accepted). Matrix selection: MatrixCriteriaAge == 'Yes' (age-classified), MatrixSplit == 'Divided' (U and F submatrices available), MatrixComposite in {'Individual', 'Mean'}, MatrixTreatment == 'Unmanipulated', MatrixCaptivity == 'W' (wild), matrix dimension >= 5, no missing entries in U or F. For each qualifying matrix, survival of age class a is the column sum of U for class a; the last class is dropped from the trend if U has a non-zero diagonal entry there (an open-ended plus group whose survival mixes ages). Mature classes are those whose F column sum is > 0. For each species, qualifying matrices of the same dimension are averaged element-wise (so each species contributes once); species with fewer than 4 mature age classes after dropping the plus group are excluded. Rising adult mortality = Spearman rho between age-class index and mortality (1 - survival) over the mature classes is > 0. SUPPORTS if at least 80% of qualifying species show rising adult mortality AND the mean rho across species is > 0.3. AMENDMENT (2026-10-31, before any data were downloaded, at the request of the holdout thread): species of class Aves are excluded from the primary analysis and from all criteria above; bird species are held out and only reported separately, unfitted, as a holdout check. Class is taken from COMADRE's 'Class' metadata column.",
   "fail_criterion": "Pre-registered. REFUTES if fewer than 50% of qualifying species show rising adult mortality. MIXED otherwise (50% to 80%, or >= 80% with mean rho <= 0.3). INCONCLUSIVE (underpowered) if fewer than 15 species qualify; INCONCLUSIVE (data-unavailable) if the file cannot be downloaded or read.",
@@ -11,12 +11,47 @@
     "holdout: class Aves rows excluded from fitting (see holdout/README.md)"
   ],
   "interpretation": "The proved part of the claim is the formula for s(a); the biological assertion tested is that senescence (rising mortality with adult age) is the inevitable result, which is how Jones et al. (2013) tested it across the tree of life and the reason the claim is already marked refuted in the claim graph. Matrix models average over years and individuals, late age classes are estimated from few animals, and many published matrices truncate age at a plus group; these all add noise rather than a systematic sign. Age classes are the model's classes (usually years), not ages since maturity, which is adequate for a monotonic-trend test. The RData file is converted to JSON with an R script (R 4.x) because the matrices are stored as R lists; analysis.py reads the committed JSON.",
-  "datasets": [],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "datasets": [
+    {
+      "id": "comadre-animal-matrix-database-4.26.4.0",
+      "name": "COMADRE Animal Matrix Database v4.26.4.0 (3548 matrix population models, 445 species)",
+      "landing_url": "https://compadre-db.org/Data/Comadre",
+      "doi": "10.1111/1365-2656.12482",
+      "version": "4.26.4.0 (created 2026-04-21)",
+      "license": "CC BY 4.0 (COMPADRE/COMADRE data user agreement)",
+      "files": [
+        {
+          "download_url": "https://compadre-db.org/Data/ComadreDownload",
+          "retrieved_at": "2026-10-31T05:57:53Z",
+          "byte_size": 907304,
+          "sha256": "490666bacce563c2f8ed43467634b6a60c4fee2d1389900d22b087fe665d313f",
+          "served_filename": "COMADRE_v.4.26.4.0.RData"
+        }
+      ],
+      "role": "age-classified U (survival) and F (fertility) submatrices with study metadata"
+    }
+  ],
+  "method": "fetch.py downloads the RData file and exports metadata and U, F, C submatrices to JSON with an R script (jsonlite). analysis.py keeps age-classified, divided, unmanipulated, wild, individual-or-mean matrices of dimension >= 5 with finite entries; averages a species' matrices of its most common dimension; takes survival per class as the U column sum, drops a terminal class with a self-loop (open plus group), defines mature classes by positive F column sums, and computes Spearman rho between class index and mortality over >= 4 mature classes (constant mortality counted as rho = 0). Bird species are excluded before the verdict. The pre-registered rule is applied.",
+  "measured": {
+    "value": 0.5714285714285714,
+    "unit": "fraction of qualifying non-bird species with Spearman rho(age, adult mortality) > 0",
+    "n": "35 species (classes: {'Mammalia': 20, 'Actinopterygii': 9, 'Amphibia': 2, 'Reptilia': 2, 'Bivalvia': 1, 'Gastropoda': 1})",
+    "uncertainty": "20 rising, 13 falling, 2 flat; 12 significantly rising and 6 significantly falling at p < 0.05",
+    "extra": {
+      "mean_spearman_rho": 0.14546805485036943,
+      "median_spearman_rho": 0.25,
+      "n_matrices_in_db": 3548,
+      "n_bird_species_held_out": 8
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.6,
+  "caveats": [
+    "Verdict 'mixed' by the pre-registered rule (57% rising, between the 50% refute and 80% support thresholds): adult mortality rises with age in a majority of species but far from the 'great majority' that 'inevitable senescence' implies, and 13 of 35 species show falling adult mortality. This is the same direction as Jones et al. (2013) but weaker evidence, because matrix models have few age classes and noisy late-age estimates.",
+    "Sample is small (35 non-bird species, 20 of them mammals) and dominated by well-studied ungulates, carnivores and fishes; it is not a random sample of animal life histories.",
+    "Published age-classified matrices usually truncate age with a plus group, so the oldest ages, where senescence is strongest, are often missing; this biases the test against the claim. Conversely, class index is calendar age for most studies but not all.",
+    "The proved part of the claim (the formula for the age-specific force of selection) is not tested; only the biological corollary that mortality must rise with adult age. Class Aves (8 species) is held out and scorable later with 'analysis.py --exam'; the first run of the script, before the gate was added, printed the birds' fraction rising once and it was not used."
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "claude-fable-5-1",

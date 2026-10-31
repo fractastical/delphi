@@ -2,7 +2,7 @@
   "claim_id": "fisher-infinitesimal",
   "claim_iri": "https://w3id.org/delphi/resource/claim/fisher-infinitesimal",
   "project": "math-bio-theorems",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If adult height is governed by many Mendelian loci of small additive effect, then (a) a child's height given the parents' heights is approximately Gaussian with a residual variance (segregation plus environment) that does not depend on the parental mean, and (b) full siblings are correlated at least as strongly as parent and offspring, because dominance and shared environment add to the sibling covariance but not to the parent-offspring covariance.",
   "pass_criterion": "Pre-registered. Data: Galton's 1886 family height records as distributed in the R HistData package (GaltonFamilies: 934 adult children in 205 families with father, mother and child heights in inches and child sex). Female child heights are multiplied by 1.08, as Galton did, to put both sexes on a common scale; mid-parent height is (father + 1.08*mother)/2. Residuals r are taken from the ordinary-least-squares regression of adjusted child height on mid-parent height. Criterion A (homoscedasticity): Levene's test (median-centred, Brown-Forsythe) of residual variance across the three mid-parent terciles gives p > 0.05 AND the ratio of the largest to the smallest tercile residual variance is < 1.5. Criterion B (normality): residual sample skewness |g1| < 0.5 and excess kurtosis |g2| < 1.0. Criterion C (sibling vs parent-offspring): the full-sibling intraclass correlation of adjusted height (one-way random-effects ANOVA estimator over families with >= 2 children) is >= r_po - 0.05, where r_po is the single-parent-offspring correlation implied by the child-on-mid-parent correlation r_mp as r_po = r_mp / sqrt(2) (which assumes uncorrelated parents). SUPPORTS if A, B and C all hold.",
   "fail_criterion": "Pre-registered. REFUTES if A fails strongly (variance ratio > 2 or Levene p < 0.001) OR B fails strongly (|g1| > 1 or |g2| > 2) OR the sibling correlation is more than 0.15 below r_po. MIXED otherwise. INCONCLUSIVE (data-unavailable) if the file cannot be downloaded.",
@@ -10,12 +10,62 @@
     "galton1886-families-histdata"
   ],
   "interpretation": "Fisher (1918) derived the covariances between relatives from Mendelian inheritance at many loci and showed they reproduce the biometric correlations; Galton's and Pearson's height data were among the biometric facts he reconciled, so this is an in-sample test of the model's distributional predictions on classic data, not an out-of-sample test. Environmental variance cannot be separated here, so criterion A tests the joint prediction that neither segregation variance nor environmental variance depends on the parental mean. Assortative mating (positive parent-parent correlation) inflates r_mp relative to sqrt(2)*r_po and so makes criterion C harder, not easier, to pass. Galton's 1.08 female adjustment is applied because the dataset is the raw one.",
-  "datasets": [],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "datasets": [
+    {
+      "id": "galton1886-families-histdata",
+      "name": "Galton's 1886 family height records (934 adult children of 205 families), as distributed in the R package HistData (GaltonFamilies), via the Rdatasets CSV mirror",
+      "landing_url": "https://vincentarelbundock.github.io/Rdatasets/doc/HistData/GaltonFamilies.html",
+      "doi": null,
+      "version": "Rdatasets master, retrieved 2026-10-31",
+      "license": "GPL (HistData package); the 1886 data are public domain",
+      "files": [
+        {
+          "download_url": "https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/HistData/GaltonFamilies.csv",
+          "retrieved_at": "2026-10-31T05:57:48Z",
+          "byte_size": 34722,
+          "sha256": "b1fc91e4d4b9604661967dcc62ff1055eaa3020c4d5c42d1f9d588f74b9b3317"
+        }
+      ],
+      "role": "father, mother and adult child heights (inches) with child sex and family id"
+    }
+  ],
+  "method": "fetch.py downloads the CSV. analysis.py multiplies female child and mother heights by 1.08 (Galton's adjustment), forms mid-parent height, regresses adjusted child height on it, and tests the residuals: Brown-Forsythe Levene test and variance ratio across mid-parent terciles (A), sample skewness and excess kurtosis (B), and the one-way ANOVA intraclass correlation of siblings against the single-parent correlation implied by the mid-parent correlation (C). The pre-registered rule is applied.",
+  "measured": {
+    "value": 1.07764604189515,
+    "unit": "ratio of largest to smallest residual variance across mid-parent terciles (model predicts 1)",
+    "n": "934 children in 205 families (172 families with 2+ children)",
+    "uncertainty": "Levene p = 0.956",
+    "extra": {
+      "tercile_residual_variances": [
+        4.976650362537617,
+        4.858628272424429,
+        5.235881526818056
+      ],
+      "residual_skew_g1": -0.11662140711406176,
+      "residual_excess_kurtosis_g2": 0.4614836260149193,
+      "sibling_icc": 0.3941499647542556,
+      "r_po_implied": 0.35144073468707404,
+      "r_midparent": 0.4970122533648248,
+      "r_father_child": 0.40923847720950707,
+      "r_mother_child": 0.3145028832353671,
+      "r_father_mother": 0.09689933710372438,
+      "slope_child_on_midparent": 0.7125849916953034,
+      "residual_sd_inches": 2.242358043396958,
+      "criteria": {
+        "A": true,
+        "B": true,
+        "C": true
+      }
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.75,
+  "caveats": [
+    "In-sample classic data: Fisher (1918) built the model to explain exactly these biometric regularities, so the test shows the model's distributional predictions hold on Galton's families, not that they hold out of sample.",
+    "The sibling correlation (0.39) exceeds the implied parent-offspring correlation (0.35) as predicted, but shared family environment, not only dominance, can produce that excess; the two are not separable here.",
+    "Heteroscedasticity could be masked by the modest sample (about 311 children per tercile) and by Galton's rounding of heights; the variance ratio of 1.08 is nonetheless close to 1.",
+    "Galton's 1.08 female adjustment and the assumption of uncorrelated parents (observed father-mother r = 0.10) are approximations."
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "claude-fable-5-1",
