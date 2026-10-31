@@ -34,6 +34,9 @@ Test coverage: `tests/test_bioelectric_tissue.py` recomputes every committed che
 ## Mathematical interface (see `artifacts/bioelectric-tissue/model_interface.json`)
 Outputs: Vm (per cell and membrane), cytosolic ion concentrations, gap-junction open fraction, cell centres/volumes/areas. Inputs used: K-permeability multiplier, gap-junction block, cell size. **Gap conductance in siemens and channel conductance are UNKNOWN**: BETSE uses a junction surface fraction and membrane diffusion constants, and no conversion is made here. **Growth coupling is an assumption/open question** with no sourced mapping.
 
+## Kcnj13 candidate link (source link only)
+Zebrafish Kcnj13 (UniProt Q0KIZ7 / NCBI BAF03613.1) is listed in `model_interface.json` as an **unparameterized, unverified channel candidate; conductance and gating are unknown**. The hosted OpenFold2 monomer (provider confidence 52.86, pTM 0.273, no membrane, tetramer or ligand; see `artifacts/bio-services/kcnj13_openfold2/bioelectric_handoff.md` on the integration branch) is a weak structural hypothesis and was **not** used to set or calibrate any BETSE parameter. The K+ permeability scale in `k_up` is a generic control, unrelated to Kcnj13. The RefSeq NP_001429136.1 source discrepancy stays open.
+
 ## Limits
 Not a fin, not zebrafish or any measured tissue; T = 310 K is the BETSE default (a fish fin is not at 37 °C). No ion depletion in the environment, no flow, no deformation, no gene regulation, no Kir2.1 or other gene-regulatory-network channels. One seed, one patch size, one intervention strength: no sensitivity sweep. BETSE itself has no independent re-implementation here, and not every BETSE equation was re-derived. The video is a rendering of saved samples (one frame per sample, 5 fps), not a separate computation.
 
