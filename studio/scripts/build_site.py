@@ -392,21 +392,42 @@ def home_biology(ins: Inputs) -> dict | None:
 
 
 def fish3d_files(ins: Inputs, out: dict) -> dict | None:
-    """Copy the actual fish3d GLB, component provenance, render files and component STLs for the viewer, each only if its bytes equal the declared sha256."""
+    """Copy the actual fish3d candidates for the viewer: the baseline (fish.glb + render files) and the v3 variants (adult-fao GLB, appearance record,
+    preview, components). Each file is copied only if its bytes equal the declared sha256; refusals are listed."""
     cid = "fish3d-N1-cypselurus-baseline"; d = f"artifacts/fish3d/{cid}"
     if not (ROOT / d / "render/render.json").exists():
         return None
-    r = json.loads(ins.read(f"{d}/render/render.json")); comps = json.loads(ins.read(f"{d}/components.json"))["components"]; state = {"copied": [], "refused": []}
-    def put(rel, declared=None):
-        b = ins.read(f"{d}/{rel}") if (ROOT / d / rel).exists() else None
+    state = {"copied": [], "refused": []}
+    def put(cdir, rel, declared=None):
+        b = ins.read(f"artifacts/fish3d/{cdir}/{rel}") if (ROOT / "artifacts/fish3d" / cdir / rel).exists() else None
         if b is None or (declared and digest_bytes(b) != declared):
-            state["refused"].append(rel); return
-        out[f"@artifacts/fish3d/{cid}/{rel}"] = b; state["copied"].append(rel)
-    put("fish.glb", r["glb_sha256"]); put("components.json"); put("render/render.json"); put("render/poster.png", r["poster_sha256"]); put("render/turntable.mp4", r["video"]["sha256"])
-    for n, v in comps.items():
+            state["refused"].append(f"{cdir}/{rel}"); return False
+        out[f"@artifacts/fish3d/{cdir}/{rel}"] = b; state["copied"].append(f"{cdir}/{rel}"); return True
+    r = json.loads(ins.read(f"{d}/render/render.json")); comps = json.loads(ins.read(f"{d}/components.json"))["components"]
+    put(cid, "fish.glb", r["glb_sha256"]); put(cid, "components.json"); put(cid, "render/render.json"); put(cid, "render/poster.png", r["poster_sha256"]); put(cid, "render/turntable.mp4", r["video"]["sha256"])
+    for v in comps.values():
         if v.get("stl"):
-            put(v["stl"], v.get("stl_sha256"))
-    return {"base": f"artifacts/fish3d/{cid}/", "glb_sha256": r["glb_sha256"], **state}
+            put(cid, v["stl"], v.get("stl_sha256"))
+    candidates = [{"id": cid, "label": "N1 baseline (flat fin plates)", "base": f"artifacts/fish3d/{cid}/", "variants": [], "knobs": None, "candidate_sha256": json.loads(ins.read(f"{d}/candidate.json")).get("candidate_sha256")}]
+    ix = "artifacts/fish3d/v3-index.json"
+    if (ROOT / ix).exists():
+        V = json.loads(ins.read(ix))
+        for vid, meta in V["candidates"].items():
+            vd = f"artifacts/fish3d/{vid}"
+            if not (ROOT / vd / "appearance-adult-fao.json").exists():
+                continue
+            ap = json.loads(ins.read(f"{vd}/appearance-adult-fao.json")); vc = json.loads(ins.read(f"{vd}/components.json"))["components"]
+            ok = put(vid, "fish-adult-fao.glb", ap["glb_sha256"]) and put(vid, "appearance-adult-fao.json") and put(vid, "preview-adult-fao.png") and put(vid, "components.json") and put(vid, "build.json") and put(vid, "candidate.json")
+            for c in vc.values():
+                if c.get("stl"):
+                    put(vid, c["stl"], c.get("stl_sha256"))
+            if ok:
+                candidates.append({"id": vid, "label": vid.replace("fish3d-", ""), "base": f"artifacts/fish3d/{vid}/", "knobs": meta["knobs"], "candidate_sha256": meta["candidate_sha256"],
+                                   "variants": [{"id": "adult-fao", "glb": "fish-adult-fao.glb", "appearance": "appearance-adult-fao.json", "poster": "preview-adult-fao.png"}]})
+        shared = V.get("shared")
+    else:
+        shared = None
+    return {"base": f"artifacts/fish3d/{cid}/", "glb_sha256": r["glb_sha256"], "candidates": candidates, "shared": shared, **state}
 
 
 def lifecycle_block(ins: Inputs) -> dict | None:

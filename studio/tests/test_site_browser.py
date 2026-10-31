@@ -897,13 +897,17 @@ def test_home_mounts_the_actual_glb_viewer_with_a_working_fallback(browser, base
     pg = page(browser)
     pg.goto(base + "#/home")
     pg.wait_for_selector("#fish-viewer.mv")
+    ids = pg.locator("#fishcand option").evaluate_all("els => els.map(e => e.value)")
+    assert ids[0] == "fish3d-N1-cypselurus-baseline" and ids[1:] == ["fish3d-v3a-fan", "fish3d-v3b-glide-pose", "fish3d-v3c-daane-length"]
+    assert pg.input_value("#fishcand") == "fish3d-v3a-fan"
+    assert "pectoral camber" in pg.locator("#fishknobs").text_content()
     pg.locator("#fish-viewer").scroll_into_view_if_needed()
-    pg.wait_for_function("document.querySelector('#fish-viewer .mv-badges') && document.querySelector('#fish-viewer').textContent.length > 40", timeout=20000)
-    t = pg.locator("#fish-viewer").text_content()
-    assert "not claimed" in t.lower() or "fallback" in t.lower() or "interactive" in t.lower() or "sha256" in t.lower()
+    pg.wait_for_function("document.querySelector('#fish-viewer').textContent.length > 40", timeout=20000)
+    pg.select_option("#fishcand", "fish3d-N1-cypselurus-baseline")
+    pg.wait_for_function("document.querySelector('#fishknobs').textContent.includes('flat fin plates')")
     assert pg.errors == []
-    for rel in ("fish.glb", "components.json", "render/render.json"):
-        r = pg.request.get(base + "artifacts/fish3d/fish3d-N1-cypselurus-baseline/" + rel)
+    for rel in ("fish3d-N1-cypselurus-baseline/fish.glb", "fish3d-v3a-fan/fish-adult-fao.glb", "fish3d-v3b-glide-pose/appearance-adult-fao.json", "fish3d-v3c-daane-length/components.json"):
+        r = pg.request.get(base + "artifacts/fish3d/" + rel)
         assert r.status == 200, rel
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
