@@ -117,13 +117,13 @@ def analyze(extension, parent, protocol_path, output):
         axis.grid(alpha=0.18)
     axes[1, 0].axhline(300, color="gray", lw=0.8)
     fig.suptitle(
-        "Three conditional molecular branches · recorded-state restart at100ps",
+        "Three conditional molecular branches · recorded-state restart at 100 ps",
         fontsize=14,
     )
     fig.text(
         0.025,
         0.015,
-        "New thermostat streams; parents + extensions are3branches, not6independent samples. Small finite-window drift does not prove equilibrium.",
+        "New thermostat streams; three parent branches plus extensions remain three branches. Small window drift does not prove equilibrium.",
         fontsize=9,
     )
     fig.tight_layout(rect=(0, 0.04, 1, 0.95))
@@ -142,7 +142,7 @@ def analyze(extension, parent, protocol_path, output):
             s["predeclared_diagnostic"]["small_window_drift"] for s in summaries
         ),
         "diagnostic_denominator": len(summaries),
-        "scope": "Descriptive predeclared window diagnostic only; no equilibrium, folding stability, material modulus or biological-success probability. Original reference uses savedfloat32 parent-start coordinates.",
+        "scope": "Descriptive predeclared window diagnostic only; no equilibrium, folding stability, material modulus or biological-success probability. Original reference uses saved float32 parent-start coordinates.",
         "empirical_accuracy": "unknown",
         "biological_success_probability": None,
     }
