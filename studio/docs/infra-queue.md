@@ -45,13 +45,21 @@ preserved and no new sequence-generation request is being routed elsewhere.
   The failed physical sphere reference remains visible independently.
 - [x] Dispatch the conditional RD diffusion training pilot at 15:36:40 PDT.
   The frozen CUDA control must pass before training and held-out evaluation.
-- [ ] Recover the trained checkpoint, hold-out results and baseline/null comparisons.
+- [x] Preserve the first RD CUDA-control failure: network maxdifference
+  0.001191914 exceeded0.001; no training or holdouts ran.
+- [x] Admit a preregistered precision-only diagnosis and conditional retry.
+  The source/config/tolerance remain fixed; explicitFP32 controls must pass.
+- [ ] Recover trained checkpoint and full hold-out comparisons if controls pass.
+- [x] Admit a separate training-only RD discretization audit, five axial
+  grid/timestep settings, hard900s; no network/holdout changes.
 - [x] Queue a CPU-only diagnostic for the 3D candidate hash mismatch; preserve
   the exact GPU failure and all three full candidate JSON variants.
 - [x] Admit three900ps MD branches at15:45:34PDT after publicHTTP200 and
   exactarchiveSHA. Frozen question measures remaining structural drift,
   not equilibrium or a tissue modulus.
-- [ ] Collect MD extensions and repaired CFD outputs; preserve failed/null gates.
+- [x] Collect MD extensions:33filehashes,303finite savedstates, original
+  controls passed; frozen window-drift resultsFALSE,FALSE,TRUE retained.
+- [ ] Collect repaired CFD and RD audit/precision-run outputs; preserve failures.
 
 The angle batch requires a passing parity check in the same allocation. Its
 subsequent workloads reject a missing or failed gate. The original 3 MB return
