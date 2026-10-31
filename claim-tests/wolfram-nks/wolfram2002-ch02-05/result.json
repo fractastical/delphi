@@ -1,0 +1,46 @@
+{
+  "claim_id": "wolfram2002-ch02-05",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch02-05",
+  "project": "wolfram-nks",
+  "status": "preregistered",
+  "hypothesis": "The first 1,000,000 values of the centre column of elementary rule 30 started from a single black cell are not eventually periodic within that range, and the bit sequence passes the NIST SP 800-22 statistical test battery at the standard significance level.",
+  "pass_criterion": "Pre-registered. (1) Non-repetition: for every period p in 1..500000, the final matching suffix of x[t] = x[t - p] has length less than p (no tail of the million-step sequence consists of at least two full periods of any period p <= N/2). (2) Randomness: run the following tests, implemented in numpy following NIST SP 800-22 rev. 1a, on the 1,000,000-bit sequence: frequency (monobit), block frequency (M = 128), runs, longest run of ones (M = 10000), binary matrix rank (32 x 32), discrete Fourier transform, non-overlapping template matching (m = 9, template 000000001, N = 8 blocks), overlapping template matching (m = 9, M = 1032), Maurer's universal (L = 7, Q = 1280), linear complexity (M = 500), serial (m = 16; two p-values), approximate entropy (m = 10), cumulative sums (forward and backward), random excursions (8 states) and random excursions variant (18 states), i.e. about 41 p-values. 'supports' if (1) holds, no p-value is below 1e-4, and at most 2 p-values are below 0.01 (the NIST alpha; with 41 p-values the chance of 3 or more below 0.01 under randomness is about 0.8 %). Cross-check (not part of the verdict): the first 100,000 computed bits must agree with the OEIS A051023 b-file; a disagreement means the generator is wrong and the verdict becomes 'inconclusive' with reason 'other'.",
+  "fail_criterion": "Pre-registered. 'refutes' if any period is found under (1), or if any p-value is below 1e-6, or if 4 or more p-values are below 0.01. Otherwise (e.g. exactly 3 p-values below 0.01, or one between 1e-6 and 1e-4) -> 'mixed'. Random-excursions tests are only applied if the number of cycles J >= 500 as NIST requires; if not applicable they are simply omitted from the count.",
+  "planned_datasets": ["nks-ch02-05-rule30-center-column-generator", "oeis-a051023-bfile"],
+  "interpretation": "'Never repeats' is read as 'is not eventually periodic within the first million steps' (an eventually periodic sequence shows at least two full periods before the end). 'Statistical tests show no meaningful deviation from perfect randomness' is read relative to the fixed, public NIST SP 800-22 battery at alpha = 0.01, as the assessors suggested; passing it cannot establish randomness, only the absence of the deviations those tests detect, so the test can refute but only weakly confirm. The battery is implemented from the NIST specification in analysis.py rather than by running the NIST C code, so the p-values are reproducible from a clean checkout.",
+  "datasets": [
+    {
+      "id": "nks-ch02-05-rule30-center-column-generator",
+      "name": "Centre column of elementary cellular automaton rule 30 from a single black cell, steps 0..999999, computed exactly by analysis.py (bit-packed numpy evolution restricted to the light cone of the centre cell at step 10^6)",
+      "landing_url": "https://www.wolframscience.com/nks/p28--how-do-simple-programs-behave/",
+      "doi": null,
+      "version": "analysis.py in this directory",
+      "license": "generated",
+      "files": [],
+      "role": "the sequence under test"
+    },
+    {
+      "id": "oeis-a051023-bfile",
+      "name": "OEIS A051023 (centre column of rule 30), b-file with 100001 terms",
+      "landing_url": "https://oeis.org/A051023",
+      "doi": null,
+      "version": "as retrieved",
+      "license": "CC BY-SA 4.0 (OEIS)",
+      "files": [
+        {
+          "download_url": "https://oeis.org/A051023/b051023.txt",
+          "retrieved_at": null,
+          "byte_size": null,
+          "sha256": null
+        }
+      ],
+      "role": "independent published copy of the first 100,000 terms, used to validate the generator"
+    }
+  ],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-wolfram-nks-e5f4", "date": "2026-10-31" }
+}
