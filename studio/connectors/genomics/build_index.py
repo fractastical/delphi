@@ -22,7 +22,7 @@ from .genes import GENES
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "data" / "genomics"
 ART = OUT / "artifacts"
-FIN = re.compile(r"fin|pectoral|apical|actinotrichia|lepidotrichia", re.I)
+FIN = re.compile(r"\bfins?\b|fin fold|fin bud|fin ray|pectoral|actinotrichia|lepidotrichia|apical ectodermal", re.I)   # word-bounded: a bare "fin" would match "definitive"
 
 
 def sha(p: Path) -> str:
@@ -85,7 +85,7 @@ def main() -> int:
         c, st, en, strand = loc.get(z, (None, None, None, None))
         nl = ncbi_loc[sym]
         e, p = exp_by[sym], [ph_fields(r) for r in ph_by[sym]]
-        ffg = [g for g in ff_by.get(sym, []) if g["mapping_status"].startswith("inferred; length")]
+        ffg = [g for g in ff_by.get(sym, []) if g["usable"]]
         genes_out.append([sym, role, z, ens.get(sym, ""), ncbi_id[sym], c or "", st or "", en or "", strand or "", len(e), sum(1 for r in e if FIN.search(r[4] + r[6])),
                           len(p), sum(1 for x in p if FIN.search(x["structure"])), nl[0] or "", nl[1] or "", nl[2] or "", len(ffg)])
     write_csv("genes.csv", ["symbol", "role", "zfin_id", "ensembl_gene", "ncbi_gene_id", "zfin_gff_chr", "zfin_gff_start", "zfin_gff_end", "zfin_gff_strand", "zfin_expression_rows",

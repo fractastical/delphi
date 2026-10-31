@@ -83,7 +83,7 @@ def correlations(gene: str, k: int = 12):
 
 def flyingfish_hits():
     fly = json.loads((OUT / "flyingfish_receipts.json").read_text())
-    good = [g for g in fly["selected_genes"] if g["mapping_status"].startswith("inferred; length")]
+    good = [g for g in fly["selected_genes"] if g["usable"]]
     good.sort(key=lambda g: (g["zebrafish_gene"], -g["identity_pct"]))
     fig, ax = plt.subplots(figsize=(7.4, 0.26 * len(good) + 2.0))
     ax.barh(range(len(good)), [g["identity_pct"] for g in good], color="#009E73")

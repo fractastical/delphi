@@ -1,0 +1,179 @@
+{
+ "$defs": {
+  "sha256": {
+   "pattern": "^[0-9a-f]{64}$",
+   "type": "string"
+  }
+ },
+ "$id": "urn:frontier:connector:genomics:manifest-0.1",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "properties": {
+  "counts": {
+   "properties": {
+    "files": {
+     "type": "integer"
+    },
+    "genes": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "plots": {
+     "minimum": 1,
+     "type": "integer"
+    },
+    "records": {
+     "required": [
+      "Claim",
+      "Evidence",
+      "Problem"
+     ],
+     "type": "object"
+    },
+    "sources": {
+     "type": "integer"
+    }
+   },
+   "required": [
+    "genes",
+    "records",
+    "sources",
+    "files",
+    "plots"
+   ],
+   "type": "object"
+  },
+  "display_rules": {
+   "properties": {
+    "must_not_say": {
+     "minItems": 5,
+     "type": "array"
+    },
+    "show_evidence_class_label_on_every_row": {
+     "const": true
+    },
+    "show_species_on_every_row": {
+     "const": true
+    },
+    "unresolved_identifiers": {
+     "contains": {
+      "const": "lat4a"
+     },
+     "type": "array"
+    }
+   },
+   "required": [
+    "show_species_on_every_row",
+    "show_evidence_class_label_on_every_row",
+    "cross_species_statements",
+    "missing_values",
+    "unresolved_identifiers",
+    "must_not_say",
+    "licence_rule"
+   ],
+   "type": "object"
+  },
+  "files": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "bytes": {
+      "minimum": 1,
+      "type": "integer"
+     },
+     "evidence_class": {
+      "enum": [
+       "expression_correlation",
+       "genotype_phenotype",
+       "causal_intervention",
+       "sequence_annotation",
+       "source_assessment",
+       "all"
+      ]
+     },
+     "path": {
+      "pattern": "^data/genomics/[A-Za-z0-9_./-]+$",
+      "type": "string"
+     },
+     "role": {
+      "enum": [
+       "index",
+       "table",
+       "plot",
+       "plot_manifest",
+       "records",
+       "sources",
+       "receipts",
+       "check",
+       "raw_artifact"
+      ]
+     },
+     "sha256": {
+      "$ref": "#/$defs/sha256"
+     },
+     "species": {
+      "enum": [
+       "Danio rerio",
+       "Hirundichthys speculiger",
+       "multi"
+      ]
+     }
+    },
+    "required": [
+     "path",
+     "sha256",
+     "bytes",
+     "role",
+     "species",
+     "evidence_class"
+    ],
+    "type": "object"
+   },
+   "minItems": 10,
+   "type": "array"
+  },
+  "manifest_schema": {
+   "const": "genomics-manifest-0.1 (connector-local)"
+  },
+  "namespace": {
+   "type": "string"
+  },
+  "not_fetched": {
+   "items": {
+    "type": "string"
+   },
+   "minItems": 1,
+   "type": "array"
+  },
+  "retrieved": {
+   "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+   "type": "string"
+  },
+  "status": {
+   "pattern": "^proposed",
+   "type": "string"
+  },
+  "unresolved": {
+   "contains": {
+    "pattern": "^lat4a"
+   },
+   "items": {
+    "type": "string"
+   },
+   "type": "array"
+  }
+ },
+ "required": [
+  "manifest_schema",
+  "retrieved",
+  "namespace",
+  "status",
+  "counts",
+  "unresolved",
+  "not_fetched",
+  "display_rules",
+  "files"
+ ],
+ "title": "genomics-manifest-0.1 (connector-local contract; not a root schema)",
+ "type": "object"
+}
