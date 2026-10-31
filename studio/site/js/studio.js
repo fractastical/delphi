@@ -81,6 +81,17 @@
     };
   };
 
+  /* Retrieved data slice (claude-11's connector). Identifiers and receipts only: no model output, no sequence design, no inference from absence. */
+  function genomicsPanel(snap) {
+    const G = snap.genomics;
+    if (!G) return html`<h3>Genomic data</h3><p class="empty">No genomic data slice is present in this tree. No gene, sequence or designer output is shown or implied.</p>`;
+    const ff = G.flyingfish;
+    return html`<h3>Retrieved genomic data slice ${U.pill("data, not a model", "warn")}</h3><p class="small">${G.genes.length} zebrafish genes chosen for fin development, bioelectric proportion, mechanosensation and regeneration, with identifiers from ZFIN and NCBI. Each source retrieval is receipted below with its hash; nothing here is a prediction or a designed sequence.</p>
+      <div class="tablewrap"><table><thead><tr><th>Gene</th><th>Description</th><th>ZFIN</th><th>Ensembl</th><th>NCBI Gene</th><th>Chr</th></tr></thead><tbody>${G.genes.map((g) => html`<tr><td><b>${g.symbol}</b></td><td class="small">${g.description || ""}</td><td class="small">${g.zfin || ""}</td><td class="small">${g.ensembl || ""}</td><td class="small">${g.ncbi_gene || ""}</td><td>${g.chromosome || ""}</td></tr>`)}</tbody></table></div>
+      ${ff ? html`<p class="small"><b>Flying-fish annotation subset</b> (Hirundichthys speculiger, figshare ${ff.doi}, ${ff.license}, published ${ff.published}): ${ff.annotation_totals ? Object.entries(ff.annotation_totals).map(([k, v]) => `${v} ${k.replace(/_/g, " ")}`).join("; ") : ""}. ${ff.selected_genes} of the chosen genes were located by protein alignment (${ff.length_consistent} length-consistent). ${ff.mapping_note}. Symbols with no hit: ${Object.entries(ff.absent_symbols).map(([k, v]) => `${k} (${v} queries with any hit)`).join(", ") || "none"}.</p>` : ""}
+      <details><summary class="small">${G.receipts.length} retrieval receipts</summary><div class="tablewrap"><table><thead><tr><th>Source</th><th>Retrieved</th><th>HTTP</th><th>Bytes</th><th>sha256</th></tr></thead><tbody>${G.receipts.map((r) => html`<tr><td class="small">${r.key}<br><a href="${r.url}" target="_blank" rel="noopener noreferrer">${r.url}</a>${r.license ? html`<br>licence ${r.license}` : ""}</td><td class="small">${r.retrieved_at}</td><td>${r.http_status}</td><td>${r.bytes}</td><td>${U.sha(r.sha256)}</td></tr>`)}</tbody></table></div><p class="small faint">Query strings are removed from the URLs shown. Receipts file sha256 ${U.sha(G.receipts_sha256)}.</p></details>`;
+  }
+
   /* ---------------------------------------------------------------- one project */
   const DRAFT_KEY = (pid, scale) => `frontier-annotation-draft:${pid}:${scale}`;
   const drafts = (k) => { try { return JSON.parse(localStorage.getItem(k) || "[]"); } catch (e) { return []; } };
@@ -112,7 +123,7 @@
           <h3>Model</h3>${models}<h3>Media</h3>${media}<h3>Equations and claims</h3>${eqHtml}
           <h3>Parameters and unknowns</h3>${unknowns.length ? html`<ul>${unknowns.map((u) => html`<li>${u}</li>`)}</ul>` : html`<p class="faint small">No parameter list is attached at this scale.</p>`}
           ${srcs.length ? html`<h3>Sources</h3><ul>${srcs.map((s) => html`<li>${U.src("src:" + s.id, s.cite)} ${U.pill(s.read_level, "rl")}</li>`)}</ul>` : ""}
-          <h3>Open questions at this scale</h3>${qs.length ? html`<ul>${qs.map((q) => html`<li><a href="${DF.href("/frontier/" + q.id)}"><b>${q.id}</b></a> ${q.title} ${U.pill(DF.annotate(q, snap).approach.replace(/_/g, " "), "ap-" + DF.annotate(q, snap).approach)}</li>`)}</ul>` : html`<p class="faint small">No curated question names this scale.</p>`}<p class="small"><a href="${DF.href("/frontier", { scale })}">Filter the Frontier to this scale</a></p>
+          ${scale === "molecular" ? genomicsPanel(snap) : ""}<h3>Open questions at this scale</h3>${qs.length ? html`<ul>${qs.map((q) => html`<li><a href="${DF.href("/frontier/" + q.id)}"><b>${q.id}</b></a> ${q.title} ${U.pill(DF.annotate(q, snap).approach.replace(/_/g, " "), "ap-" + DF.annotate(q, snap).approach)}</li>`)}</ul>` : html`<p class="faint small">No curated question names this scale.</p>`}<p class="small"><a href="${DF.href("/frontier", { scale })}">Filter the Frontier to this scale</a></p>
           <h3>Couplings</h3>${here.length ? html`<ul>${here.map((c) => html`<li><code>${c.id}</code> ${U.pill(c.status, { composable: "ok", scenario: "warn", refused: "no" }[c.status] || "st-unk")} ${c.from} → ${c.to}</li>`)}</ul><p class="small"><a href="${DF.href("/simulations")}">Reasons and missing calibrations</a></p>` : mc.length ? html`<ul>${mc.map((c) => html`<li>${U.pill(c.status, c.status === "absent" ? "no" : "warn")} ${c.text}</li>`)}</ul>` : html`<p class="faint small">None recorded.</p>`}
         </section>
         <section class="panel" aria-labelledby="ann-h"><h2 id="ann-h">Comments and proposed edits for this subsystem</h2>

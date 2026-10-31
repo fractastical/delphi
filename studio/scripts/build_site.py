@@ -351,6 +351,52 @@ def coupling_manifest(ins: Inputs, files: dict, docs: list) -> dict | None:
             "proposals": [{"id": x["id"], "title": x["title"], "status": x["status"], "coupling": x.get("source_coupling"), "success": x.get("success"), "falsifier": x.get("falsifier"), "not_a_claim": x.get("not_a_claim")} for x in m.get("problem_proposals", [])]}
 
 
+GEN = "data/genomics"
+
+
+def _walk_receipts(d, key, out):
+    """Flatten receipts.json: any dict holding a receipt with a url and sha256 is one retrieval. Query strings are dropped (they can carry signatures)."""
+    if isinstance(d, dict):
+        r = d.get("receipt")
+        if isinstance(r, dict) and r.get("url") and r.get("sha256"):
+            out.append({"key": key, "url": str(r["url"]).split("?")[0], "retrieved_at": r.get("retrieved_at"), "http_status": r.get("http_status"), "bytes": r.get("bytes"), "sha256": r["sha256"], "license": (d.get("license") or {}).get("name") if isinstance(d.get("license"), dict) else None, "kept_rows": d.get("kept_rows")})
+        for k, v in d.items():
+            if k != "receipt" and isinstance(v, dict):
+                _walk_receipts(v, f"{key}/{k}" if key else k, out)
+
+
+def genomics(ins: Inputs) -> dict | None:
+    """The retrieved genomic and cell/tissue data slice, when present: gene identifiers and retrieval receipts. Data, not a model."""
+    if not (ROOT / GEN / "receipts.json").exists():
+        return None
+    rec = json.loads(ins.read(f"{GEN}/receipts.json")); receipts = []
+    _walk_receipts(rec, "", receipts)
+    genes = {}
+    def tsv(name):
+        f = ROOT / GEN / "artifacts" / name
+        return [l.split("\t") for l in ins.read(f"{GEN}/artifacts/{name}").decode().splitlines() if l.strip()] if f.exists() else []
+    for r in tsv("zfin_gene_selected.tsv"):
+        genes[r[2]] = {"symbol": r[2], "zfin": r[0], "ncbi_gene": r[3] if len(r) > 3 else None}
+    for r in tsv("zfin_ensembl_1_to_1_selected.tsv"):
+        genes.setdefault(r[2], {"symbol": r[2], "zfin": r[0]})["ensembl"] = r[3]
+    nf = ROOT / GEN / "artifacts" / "ncbi_gene_summaries.json"
+    if nf.exists():
+        res = json.loads(ins.read(f"{GEN}/artifacts/ncbi_gene_summaries.json")).get("result", {})
+        by = {v.get("nomenclaturesymbol"): v for k, v in res.items() if isinstance(v, dict) and "uid" in v}
+        for sym, g in genes.items():
+            v = by.get(sym)
+            if v:
+                g["description"] = v.get("description"); g["chromosome"] = v.get("chromosome")
+    ff = None
+    if (ROOT / GEN / "flyingfish_receipts.json").exists():
+        f = json.loads(ins.read(f"{GEN}/flyingfish_receipts.json")); _walk_receipts(f.get("files", {}), "flyingfish", receipts)
+        art = f.get("article") or {}
+        ff = {"doi": art.get("doi"), "license": (art.get("license") or {}).get("name"), "published": art.get("published"), "annotation_totals": f.get("annotation_totals"), "selected_genes": len(f.get("selected_genes", [])),
+              "length_consistent": f.get("length_consistent_selected_genes"), "absent_symbols": {k: v.get("queries_with_any_hit") for k, v in (f.get("absent_symbols_any_hit") or {}).items()},
+              "mapping_note": "gene models in the annotation subset are inferred by protein alignment; a symbol with no hit is not evidence that the gene is absent"}
+    return {"genes": sorted(genes.values(), key=lambda g: g["symbol"]), "receipts": receipts, "flyingfish": ff, "receipts_sha256": ins.seen[f"{GEN}/receipts.json"]["sha256"]}
+
+
 def checklist(text: str) -> list[dict]:
     return [{"done": m.group(1) == "x", "text": m.group(2).strip()} for m in re.finditer(r"^- \[([ x])\] (.+)$", text, re.M)]
 
@@ -424,6 +470,7 @@ def build() -> dict[str, bytes]:
     attestation = attestation_check(ins, files, docs)
     manifests = simulation_manifests(ins)
     belief_ex = belief_example(ins)
+    genomics_slice = genomics(ins)
     extra: dict = {}
     prints = print_forms(ins, extra)
     controlled = controlled_results(ins, files)
@@ -455,6 +502,7 @@ def build() -> dict[str, bytes]:
         "coupling_manifest": couplings_m,
         "belief_example": belief_ex,
         "print_forms": prints,
+        "genomics": genomics_slice,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
     }
     catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}

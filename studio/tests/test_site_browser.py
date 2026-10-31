@@ -486,3 +486,18 @@ def test_evidence_overview_is_short_and_artifacts_have_their_own_paged_tab(brows
     pg.click("a:has-text('Open the artifacts index')")
     pg.wait_for_selector("#artifacts table", timeout=15000)
     assert pg.locator("#artifacts tbody tr").count() <= 20
+
+
+def test_genomic_slice_is_data_with_receipts_or_an_honest_absence(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=molecular")
+    pg.wait_for_selector(".studiogrid")
+    txt = pg.locator(".studiomain").inner_text().lower()
+    G = snap.get("genomics")
+    if not G:
+        assert "no genomic data slice is present" in txt
+        return
+    assert "data, not a model" in txt and "nothing here is a prediction" in txt
+    assert pg.locator(".studiomain table tbody tr").count() >= len(G["genes"])
+    assert all("?" not in r["url"] for r in G["receipts"]), "signed or query-bearing URLs must not be shipped"
