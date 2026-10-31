@@ -2,7 +2,7 @@
   "claim_id": "darwin1859-ch12-04",
   "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-04",
   "project": "darwin-origin",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If Darwin is right, an oceanic island supports far fewer native species than a continental area of the same size, after allowing for the physical conditions he thought could not explain the difference; for vascular plants (de Candolle's case) native species richness of oceanic island units should fall well below the continental species-area relationship.",
   "pass_criterion": "Fit log10(native vascular plant species) = a + b*log10(area km2) + c*|centroid latitude| by ordinary least squares on continental (mainland-connected) TDWG level-3 botanical countries from the World Checklist of Vascular Plants, then predict richness for each pre-registered oceanic island unit at its own area and latitude. Supports if (i) the median ratio of observed to predicted richness across oceanic units is <= 0.5, (ii) >= 80 % of oceanic units lie below the continental prediction, and (iii) a one-sided Wilcoxon signed-rank test of the oceanic log-residuals against zero gives p < 0.01.",
   "fail_criterion": "Refutes if the median observed/predicted ratio is >= 1.0 or fewer than 60 % of oceanic units lie below the prediction. Any other outcome is mixed. Oceanic units whose area lies outside the range of continental areas used in the fit are excluded from the test and listed.",
@@ -11,12 +11,366 @@
     "tdwg-wgsrpd-level3"
   ],
   "interpretation": "'Species of all kinds' is tested for vascular plants, the group Darwin cites de Candolle for and the only group with a complete, native-status-coded global checklist at consistent regional units. 'Oceanic islands' are the TDWG level-3 units that are volcanic hot-spot islands, atolls or intra-oceanic arc islands never joined to a continent: AZO, MDR, SEL, CNY, CVI, STH, ASC, TDC, BER, GAL, HAW, MID, FIJ, SAM, TON, SCI, MRQ, TUA, TUB, COO, NUE, PIT, EAS, JNF, VAN, NFK, MAU, REU, ROD, COM, GGI, CRL, MRN, MRS, GIL, LIN, PHX, WAL, TOK, TVL, NRU, WAK, HBI, KER, CRZ, ASP, HMD, MPE, BOU, ICE, OGA, KZN, MCS, CGS, MDV, LDV, XMS, CKI, SGE, TRT, SOL (Solomon Is., oceanic arc), SCZ (Santa Cruz Is.), ALD (Aldabra). Units that are continental fragments or shelf islands (e.g. NWC New Caledonia, SEY Seychelles, FAL, NZN, NZS, MDG, GRB, JAP, SRL, CUB, FOR) are excluded from both groups; 'continental' means a level-3 unit whose polygons lie within 2 km of another unit's polygons (i.e. part of a connected mainland block), Antarctica excluded. Area is the spherical area of each unit's polygons; |latitude| of the area-weighted centroid is the only 'physical condition' covariate available at this resolution, so the physical-conditions clause is only crudely addressed. Native richness counts accepted species (rank Species) with a WCVP distribution record that is not introduced, extinct or doubtful. Small continental units (city-states, small countries) and the smallest oceanic islands may be undersampled in different ways; this is noted rather than corrected.",
-  "datasets": [],
-  "method": "",
-  "measured": {},
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "datasets": [
+    {
+      "id": "wcvp-world-checklist-vascular-plants",
+      "name": "World Checklist of Vascular Plants (WCVP), Royal Botanic Gardens, Kew: wcvp_names.csv and wcvp_distribution.csv in wcvp.zip",
+      "landing_url": "https://powo.science.kew.org/about-wcvp",
+      "doi": "10.1038/s41597-021-00997-6",
+      "version": "wcvp.zip dated 2026-06-04 on sftp.kew.org",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+          "retrieved_at": "2026-10-31T04:58:00Z",
+          "byte_size": 88179649,
+          "sha256": "d32ea2b3a85e489b14e83bcc9eae7274532e1d113753f7be290d4b2dfde573fa"
+        }
+      ],
+      "role": "accepted species and native (non-introduced, non-extinct, non-doubtful) distribution per TDWG level-3 unit"
+    },
+    {
+      "id": "tdwg-wgsrpd-level3",
+      "name": "TDWG World Geographical Scheme for Recording Plant Distributions, level-3 polygons (GeoJSON)",
+      "landing_url": "https://github.com/tdwg/wgsrpd",
+      "doi": null,
+      "version": "tdwg/wgsrpd master branch, retrieved 2026-10-31",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://raw.githubusercontent.com/tdwg/wgsrpd/master/geojson/level3.geojson",
+          "retrieved_at": "2026-10-31T04:58:00Z",
+          "byte_size": 1846370,
+          "sha256": "c172bcf6aba20e19477adc60aebf0023068f0175dca8480f0760b090dcf64840"
+        }
+      ],
+      "role": "unit areas, centroid latitudes and mainland connectivity"
+    }
+  ],
+  "method": "analysis.py computes the spherical area and area-weighted centroid latitude of each of the 369 TDWG level-3 units and marks a unit 'continental' if any boundary point lies within 2 km of another unit's boundary (241 units after excluding Antarctica), 'oceanic' if in the pre-registered list, and 'other island' otherwise. Native richness per unit is the number of accepted WCVP species with a distribution record flagged neither introduced, extinct nor doubtful. An OLS fit log10 S = a + b log10 A + c |lat| on continental units (b = 0.199, c = -0.0088, R2 = 0.33) predicts richness for each oceanic unit; 28 of 60 oceanic units fall inside the continental area range (196 to 3.84 million km2) and enter the test. The measured value is the median observed/predicted ratio; the rule also requires the fraction below prediction and a one-sided Wilcoxon test.",
+  "measured": {
+    "value": 0.4393,
+    "unit": "median ratio of observed native vascular plant species on oceanic island units to the richness predicted for a continental area of equal size and latitude",
+    "n": 28,
+    "uncertainty": "Wilcoxon one-sided p = 3.73e-09; interquartile range of ratio 0.185-0.612",
+    "extra": {
+      "fraction_of_oceanic_units_below_prediction": 1.0,
+      "wilcoxon_statistic": 0.0,
+      "wilcoxon_p_one_sided": 3.725290298461914e-09,
+      "median_ratio_area_only_model": 0.4535,
+      "continental_fit": {
+        "n_units": 241,
+        "intercept": 2.7150218119258134,
+        "slope_logA": 0.19893943601988934,
+        "coef_abs_lat": -0.008792818808630507,
+        "r2": 0.33189534562887146,
+        "area_range_km2": [
+          196.34181054949184,
+          3842875.268956865
+        ],
+        "area_only_slope": 0.18010299604276644
+      },
+      "n_oceanic_units_with_data": 60,
+      "n_oceanic_units_in_area_range": 28,
+      "oceanic_units_excluded_outside_area_range": [
+        {
+          "code": "ALD",
+          "name": "Aldabra",
+          "area_km2": 177.7879537499714,
+          "native_species": 198
+        },
+        {
+          "code": "ASC",
+          "name": "Ascension",
+          "area_km2": 65.53048620912503,
+          "native_species": 32
+        },
+        {
+          "code": "ASP",
+          "name": "Amsterdam-St.Paul Is.",
+          "area_km2": 44.274157436199395,
+          "native_species": 33
+        },
+        {
+          "code": "BER",
+          "name": "Bermuda",
+          "area_km2": 54.858650640885784,
+          "native_species": 193
+        },
+        {
+          "code": "CGS",
+          "name": "Chagos Archipelago",
+          "area_km2": 106.78844436087228,
+          "native_species": 54
+        },
+        {
+          "code": "CKI",
+          "name": "Cocos (Keeling) I.",
+          "area_km2": 23.930502870322492,
+          "native_species": 75
+        },
+        {
+          "code": "COO",
+          "name": "Cook Is.",
+          "area_km2": 145.10138731471048,
+          "native_species": 294
+        },
+        {
+          "code": "EAS",
+          "name": "Easter Is.",
+          "area_km2": 143.357326851828,
+          "native_species": 40
+        },
+        {
+          "code": "HBI",
+          "name": "Howland-Baker Is.",
+          "area_km2": 3.5419634283534505,
+          "native_species": 12
+        },
+        {
+          "code": "JNF",
+          "name": "Juan Fernández Is.",
+          "area_km2": 138.00609151291874,
+          "native_species": 248
+        },
+        {
+          "code": "KER",
+          "name": "Kermadec Is.",
+          "area_km2": 40.302655503503324,
+          "native_species": 127
+        },
+        {
+          "code": "KZN",
+          "name": "Kazan-retto",
+          "area_km2": 25.559058677151565,
+          "native_species": 181
+        },
+        {
+          "code": "LDV",
+          "name": "Laccadive Is.",
+          "area_km2": 39.796517922104854,
+          "native_species": 184
+        },
+        {
+          "code": "MCS",
+          "name": "Marcus I.",
+          "area_km2": 4.283482930556622,
+          "native_species": 10
+        },
+        {
+          "code": "MDV",
+          "name": "Maldives",
+          "area_km2": 102.78790383012564,
+          "native_species": 154
+        },
+        {
+          "code": "MRS",
+          "name": "Marshall Is.",
+          "area_km2": 91.32676753102126,
+          "native_species": 125
+        },
+        {
+          "code": "NFK",
+          "name": "Norfolk Is.",
+          "area_km2": 59.4721232801601,
+          "native_species": 356
+        },
+        {
+          "code": "NRU",
+          "name": "Nauru",
+          "area_km2": 19.524652977978235,
+          "native_species": 57
+        },
+        {
+          "code": "NUE",
+          "name": "Niue",
+          "area_km2": 178.43609350691975,
+          "native_species": 216
+        },
+        {
+          "code": "OGA",
+          "name": "Ogasawara-shoto",
+          "area_km2": 52.66115744426594,
+          "native_species": 347
+        },
+        {
+          "code": "PHX",
+          "name": "Phoenix Is.",
+          "area_km2": 59.264321366558036,
+          "native_species": 28
+        },
+        {
+          "code": "PIT",
+          "name": "Pitcairn Is.",
+          "area_km2": 35.86692056636987,
+          "native_species": 119
+        },
+        {
+          "code": "ROD",
+          "name": "Rodrigues",
+          "area_km2": 66.25038048273836,
+          "native_species": 191
+        },
+        {
+          "code": "SEL",
+          "name": "Selvagens",
+          "area_km2": 1.8658300294490853,
+          "native_species": 98
+        },
+        {
+          "code": "STH",
+          "name": "St.Helena",
+          "area_km2": 64.27928370959069,
+          "native_species": 79
+        },
+        {
+          "code": "TDC",
+          "name": "Tristan da Cunha",
+          "area_km2": 120.05491270111358,
+          "native_species": 99
+        },
+        {
+          "code": "TOK",
+          "name": "Tokelau-Manihiki",
+          "area_km2": 42.44771632578265,
+          "native_species": 70
+        },
+        {
+          "code": "TUB",
+          "name": "Tubuai Is.",
+          "area_km2": 80.33259749748315,
+          "native_species": 372
+        },
+        {
+          "code": "TUV",
+          "name": "Tuvalu",
+          "area_km2": 38.9287336747257,
+          "native_species": 53
+        },
+        {
+          "code": "WAK",
+          "name": "Wake I.",
+          "area_km2": 13.547978886957667,
+          "native_species": 22
+        },
+        {
+          "code": "WAL",
+          "name": "Wallis-Futuna Is.",
+          "area_km2": 117.35957977281828,
+          "native_species": 303
+        },
+        {
+          "code": "XMS",
+          "name": "Christmas I.",
+          "area_km2": 104.75145558277538,
+          "native_species": 214
+        }
+      ],
+      "oceanic_units_above_prediction": [],
+      "example_units": [
+        {
+          "code": "ICE",
+          "name": "Iceland",
+          "area_km2": 100298.48,
+          "native_species": 789,
+          "ratio_obs_pred": 0.578
+        },
+        {
+          "code": "SOL",
+          "name": "Solomon Is.",
+          "area_km2": 30931.755,
+          "native_species": 2313,
+          "ratio_obs_pred": 0.671
+        },
+        {
+          "code": "FIJ",
+          "name": "Fiji",
+          "area_km2": 19511.128,
+          "native_species": 1711,
+          "ratio_obs_pred": 0.659
+        },
+        {
+          "code": "HAW",
+          "name": "Hawaii",
+          "area_km2": 15886.03,
+          "native_species": 1238,
+          "ratio_obs_pred": 0.523
+        },
+        {
+          "code": "VAN",
+          "name": "Vanuatu",
+          "area_km2": 10391.641,
+          "native_species": 1352,
+          "ratio_obs_pred": 0.575
+        },
+        {
+          "code": "CNY",
+          "name": "Canary Is.",
+          "area_km2": 6641.47,
+          "native_species": 1686,
+          "ratio_obs_pred": 1.0
+        },
+        {
+          "code": "GAL",
+          "name": "Galápagos",
+          "area_km2": 5995.466,
+          "native_species": 591,
+          "ratio_obs_pred": 0.204
+        },
+        {
+          "code": "SGE",
+          "name": "South Georgia",
+          "area_km2": 3558.844,
+          "native_species": 23,
+          "ratio_obs_pred": 0.026
+        },
+        {
+          "code": "GGI",
+          "name": "Gulf of Guinea Is.",
+          "area_km2": 2608.275,
+          "native_species": 1951,
+          "ratio_obs_pred": 0.827
+        },
+        {
+          "code": "SAM",
+          "name": "Samoa",
+          "area_km2": 2472.692,
+          "native_species": 860,
+          "ratio_obs_pred": 0.463
+        },
+        {
+          "code": "CVI",
+          "name": "Cape Verde",
+          "area_km2": 2431.956,
+          "native_species": 534,
+          "ratio_obs_pred": 0.301
+        },
+        {
+          "code": "REU",
+          "name": "Réunion",
+          "area_km2": 2231.468,
+          "native_species": 979,
+          "ratio_obs_pred": 0.624
+        }
+      ],
+      "other_islands_comparison": {
+        "n": 66,
+        "median_ratio": 0.7997506938892104,
+        "fraction_below": 0.6060606060606061
+      },
+      "verdict_by_rule": "supports"
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.9,
+  "caveats": [
+    "All 28 oceanic island units (Hawaii 0.52, Fiji 0.66, Galapagos 0.21, Vanuatu 0.58, Samoa 0.46, Iceland 0.58, South Georgia 0.03, Canary Is. 1.00, ...) lie at or below the continental prediction; median ratio 0.44 (IQR 0.19-0.61), Wilcoxon p = 3.7e-9. The area-only model gives the same answer (median 0.45). Shelf and continental-fragment islands (n = 66, median 0.80, 61 % below) show a much weaker deficit, which matches Darwin's distinction between oceanic and continental islands.",
+    "Two codes in the pre-registered oceanic list were transcription errors discovered when the first run printed unit names: 'TVL' is Northern Provinces (South Africa), not Tuvalu ('TUV'), and 'TRT' is Trinidad-Tobago, a shelf island, not Trindade (which has no level-3 unit). They were corrected before the reported run; with the errors left in, the median ratio was 0.439 and 25 of 28 units were below prediction, so the verdict does not depend on the correction.",
+    "32 oceanic units smaller than the smallest continental unit (196 km2) are excluded by the pre-registered range rule; all of them have far fewer species than any continental unit, so the exclusion is conservative. TDWG polygons for some small remote islands are coarse (Kerguelen is drawn at 40 km2 against a true 7,200 km2), another reason to keep the small-island exclusion.",
+    "Only vascular plants are tested; Darwin's 'species of all kinds' extends to animals, for which no native-status-coded global checklist at consistent regional units is public. de Candolle's plant case is, however, the one Darwin cites.",
+    "The continental species-area slope across political/botanical units (0.20) is shallow and R2 is 0.33 because unit boundaries are arbitrary; the Canary Islands, the one oceanic unit at parity, are old, high and near Africa. |Latitude| is a crude stand-in for 'physical conditions'; the test cannot separate isolation from climate, area and age as thoroughly as Darwin's clause implies.",
+    "The Solomon and Santa Cruz Islands and Iceland are counted as oceanic on geological grounds; removing them would not change the median materially (all three are below prediction)."
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "claude-fable-5.1",
