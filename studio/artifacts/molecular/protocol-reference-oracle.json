@@ -1,0 +1,43 @@
+{
+  "schema": "frontier.molecular.protocol/1",
+  "model": "1K6F assembly1 collagen mimetic (Pro-Pro-Gly) trimer; modeled29 residues per chain, not native fish collagen",
+  "source_url": "https://files.rcsb.org/download/1K6F.pdb1.gz",
+  "source_path": "artifacts/molecular/inputs/1k6f-assembly1.pdb",
+  "source_sha256": "c7bd91d32075e11be4bef9f41036465e1784db0c4fd2a2d4a22340b0ef3dc8a4",
+  "forcefield_files": [
+    "amber14/protein.ff14SB.xml",
+    "amber14/tip3p.xml"
+  ],
+  "temperature_K": 300,
+  "pH": 7.0,
+  "salt_molar": 0.1,
+  "padding_nm": 1.0,
+  "cutoff_nm": 0.9,
+  "ewald_error_tolerance": 0.0005,
+  "timestep_ps": 0.001,
+  "friction_per_ps": 1.0,
+  "preparation_seed": 1731,
+  "seeds": [
+    1731,
+    1732,
+    1733
+  ],
+  "minimization_max_iterations": 200,
+  "equilibration_steps": 10000,
+  "production_steps": 100000,
+  "frames": 100,
+  "restraints": "none; free charged termini; HBonds constraints and rigid water only",
+  "controls": {
+    "finite_difference_nm": 1e-05,
+    "gradient_relative_max": 0.005,
+    "nve_duration_ps": 0.05,
+    "nve_drift_over_kinetic_max": 0.02,
+    "gradient_energy_platform": "Reference",
+    "CPU_Reference_force_relative_L2_max": 0.005
+  },
+  "parameter_basis": "assumed demonstration conditions, not paper reproduction: ff14SB family supported by Hartmann2021 Methods; water TIP3P differs from that paper OPC; no H mass repartitioning;1fs rather than4fs; short100ps production rather than1us; folded starting state and no nucleus restraint",
+  "interpretation": "No claim of equilibrated ensemble, folding kinetics, collagen modulus, empirical accuracy or fish tissue function. Replicates share one structure/forcefield and are dependent evidence.",
+  "revision": "2: high-precision derivative measurement; original acceptance and physical model unchanged",
+  "parent_protocol_sha256": "e888b7ef0d50407cc91f48f18e62f90e06a7f7dc3855d8c351b06f1a16e8828b",
+  "repair_basis": "Original CUDA-attempt CPU gate retained as FAIL: total CPU energy finite differences at1e-5nm suffer cancellation. Evaluate derivative energies in double-precision Reference, compare against CPU analytic force at SAME coordinates, retain h1e-5nm and relative0.005. Add full-vector CPU/Reference force comparison. No physical parameters/minimization/acceptance limits relaxed."
+}

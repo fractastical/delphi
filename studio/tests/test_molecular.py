@@ -125,3 +125,60 @@ def test_model_inventory_keeps_proposed_and_executed_distinct():
         assert row["source"] and row["missing_transfer"] and row["coupling_ports"]
         if row["status"].startswith("source_only"):
             assert "artifacts" not in row
+
+
+def test_failed_attempt_and_reference_oracle_repair_keep_original_limits():
+    original = json.loads((ROOT / "artifacts/molecular/protocol.json").read_text())
+    revised = json.loads(
+        (ROOT / "artifacts/molecular/protocol-reference-oracle.json").read_text()
+    )
+    failure = json.loads(
+        (ROOT / "artifacts/molecular/gpu-attempt-1/controls.json").read_text()
+    )
+    repaired = ROOT / "artifacts/molecular/gpu-attempt-1/repaired-controls"
+    result = json.loads((repaired / "controls.json").read_text())
+    assert failure["passed"] is False
+    assert (
+        failure["force_gradient"]["relative_error"]
+        > original["controls"]["gradient_relative_max"]
+    )
+    for field in (
+        "finite_difference_nm",
+        "gradient_relative_max",
+        "nve_duration_ps",
+        "nve_drift_over_kinetic_max",
+    ):
+        assert revised["controls"][field] == original["controls"][field]
+    assert (
+        result["passed"] and result["force_gradient"]["energy_platform"] == "Reference"
+    )
+    assert (
+        result["force_gradient"]["relative_error"]
+        < original["controls"]["gradient_relative_max"]
+    )
+    assert result["force_gradient"]["CPU_Reference_force_relative_L2"] < 0.005
+    assert (
+        hashlib.sha256((repaired / "producer-run.py").read_bytes()).hexdigest()
+        == result["code_sha256"]
+    )
+
+
+def test_exact_failed_state_diagnosis_preserves_h_and_demonstrates_precision():
+    report = json.loads(
+        (
+            ROOT / "artifacts/molecular/gpu-attempt-1/derivative-diagnosis.json"
+        ).read_text()
+    )
+    assert report["component"] == [345, 2]
+    assert (
+        report["state_sha256"]
+        == "fb6ac7d070f975b6547324cbbb4027937968041e1b89e6c4f380ce9d7c470e73"
+    )
+    cpu = report["observations"]["CPU"]["gradient_scan"][1]
+    reference = report["observations"]["Reference"]["gradient_scan"][1]
+    assert cpu["h_nm"] == reference["h_nm"] == 0.00001
+    assert cpu["relative_error"] > 0.005
+    assert reference["relative_error"] < 1e-6
+    assert (
+        report["CPU_force_vs_Reference_derivative_at_frozen_h_relative_error"] < 0.005
+    )
