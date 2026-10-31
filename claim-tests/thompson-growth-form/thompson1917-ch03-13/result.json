@@ -2,17 +2,268 @@
   "claim_id": "thompson1917-ch03-13",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch03-13",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "The coefficient of variation (CV = SD / mean) of human stature and of weight at a given age tracks the mean rate of growth at that age: it falls through childhood as growth decelerates, rises again during the adolescent growth spurt, and falls after it. Hence, across ages, CV should be positively associated with growth velocity, within childhood as well as over the whole span, and the CV peak should coincide with the velocity peak.",
   "pass_criterion": "Pre-registered (claim supported). Using the CDC 2000 growth-chart LMS reference tables for stature-for-age and weight-for-age (2-20 years, half-month grid, each sex), compute at each age the CV of the fitted Box-Cox distribution (mean and SD obtained by numerical integration over z in [-4, 4]; the LMS S parameter is reported as a check) and the growth velocity dM/dt (central differences of the median M, per year). For each of the four series (stature boys, stature girls, weight boys, weight girls), over ages 2.5-19.5 years: (T1) Spearman rho between CV and velocity is positive with P < 0.01; (T2) the age of maximum CV between 8 and 19 years lies within 1.5 years of the age of peak velocity (the adolescent spurt), and CV at that peak exceeds the pre-pubertal minimum CV (ages 4-11) by at least 5% of its value; (T3) within childhood, from 2.5 years to the age of minimum velocity before the spurt, Spearman rho between CV and velocity is positive (CV falls as growth decelerates). The claim is supported if T1, T2 and T3 all hold in at least 3 of the 4 series.",
   "fail_criterion": "Pre-registered (claim refuted). T1 fails (rho <= 0, or P >= 0.01) in at least 3 of the 4 series, or T3 shows a significant negative rho (CV rising while growth decelerates, P < 0.01) in at least 3 of the 4 series. Any other combination is 'mixed' (e.g. the adolescent rise T2 holds everywhere but the childhood decline T3 does not). If the CDC tables cannot be retrieved the verdict is 'inconclusive' (data-unavailable).",
-  "planned_datasets": ["cdc-growth-charts-2000-lms", "who-growth-reference-2007-lms"],
+  "planned_datasets": [
+    "cdc-growth-charts-2000-lms",
+    "who-growth-reference-2007-lms"
+  ],
   "interpretation": "Thompson's evidence was Bowditch's and Boas & Wissler's cross-sectional CVs of Boston schoolchildren, ages 5-18 (stature CV about 4.8% at 5, 4.4% at 9, 5.8% at 14, 3.7% at 18). Modern reference charts are smoothed cross-sectional distributions of the same kind, so the LMS S parameter (approximately the CV) by age is the direct analogue. 'Rate of growth' is read as the absolute velocity of the median (cm/yr, kg/yr), Thompson's own usage (his Fig. 4 is the curve of annual increments). The WHO 2007 reference (5-19 years, height-for-age, both sexes) is a secondary replication, and the CDC infant tables (length and weight for age, 0-36 months) a descriptive check of Pearson's statement that variability decreases from birth; neither enters the verdict. Known confound (assessors): the adolescent CV rise is produced largely by variation in the timing of the spurt rather than by the rate itself; this does not affect the empirical association tested here. Before this pre-registration a reachability probe fetched statage.csv and wtage.csv and printed their header and first two rows (age 24 and 24.5 months); nothing else was inspected.",
-  "datasets": [],
-  "method": "",
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5-1-thinking-high", "run": "cursor/thompson-claim-tests-6e84", "date": "2026-10-31" }
+  "datasets": [
+    {
+      "id": "cdc-growth-charts-2000-lms",
+      "name": "CDC Growth Charts 2000: LMS parameters for stature-for-age and weight-for-age (2-20 years) and length/weight-for-age (0-36 months)",
+      "landing_url": "https://www.cdc.gov/growthcharts/cdc-data-files.htm",
+      "doi": null,
+      "version": "CDC 2000 (data files as served 2026-10-31)",
+      "license": "US federal government work, public domain",
+      "files": [
+        {
+          "name": "statage.csv",
+          "download_url": "https://www.cdc.gov/growthcharts/data/zscore/statage.csv",
+          "retrieved_at": "2026-10-31T05:16:14Z",
+          "byte_size": 66087,
+          "sha256": "45130d2a9d7c50c54a47e7ba626b66c61d4554bc2d901198cedd9419a53f7251",
+          "role": "stature-for-age LMS, half-month grid, both sexes (primary)"
+        },
+        {
+          "name": "wtage.csv",
+          "download_url": "https://www.cdc.gov/growthcharts/data/zscore/wtage.csv",
+          "retrieved_at": "2026-10-31T05:16:14Z",
+          "byte_size": 66456,
+          "sha256": "3406c9d125bcb69c062a9e84eb8c0209bfe9346542bdc1d308643750dcc241b7",
+          "role": "weight-for-age LMS, half-month grid, both sexes (primary)"
+        },
+        {
+          "name": "lenageinf.csv",
+          "download_url": "https://www.cdc.gov/growthcharts/data/zscore/lenageinf.csv",
+          "retrieved_at": "2026-10-31T05:16:14Z",
+          "byte_size": 11232,
+          "sha256": "a334b86bc0ecde80d12cdc172dde17b4390ca53ac372b26dd0d72d8502ac2687",
+          "role": "length-for-age LMS 0-36 months (secondary, descriptive)"
+        },
+        {
+          "name": "wtageinf.csv",
+          "download_url": "https://www.cdc.gov/growthcharts/data/zscore/wtageinf.csv",
+          "retrieved_at": "2026-10-31T05:16:14Z",
+          "byte_size": 11446,
+          "sha256": "73221dd4de82eb9a70c1e6dd45c9b9e285fa1a3d7fff4971c3b85c1be6e5feed",
+          "role": "weight-for-age LMS 0-36 months (secondary, descriptive)"
+        }
+      ],
+      "role": "age-specific coefficient of variation (S) and median velocity (dM/dt)"
+    },
+    {
+      "id": "who-growth-reference-2007-lms",
+      "name": "WHO Growth Reference 2007, height-for-age 5-19 years, expanded monthly LMS tables (z-scores)",
+      "landing_url": "https://www.who.int/tools/growth-reference-data-for-5to19-years/indicators/height-for-age",
+      "doi": null,
+      "version": "WHO 2007 expanded tables",
+      "license": "WHO; free for non-commercial use with attribution",
+      "files": [
+        {
+          "name": "hfa-boys-z-who-2007-exp.xlsx",
+          "download_url": "https://cdn.who.int/media/docs/default-source/child-growth/growth-reference-5-19-years/height-for-age-(5-19-years)/hfa-boys-z-who-2007-exp.xlsx",
+          "retrieved_at": "2026-10-31T05:16:14Z",
+          "byte_size": 30017,
+          "sha256": "d78fa8cafcab77dcb5f03d71506d92bdcb28f89c642816b6bb0eef466b007466",
+          "role": "boys height-for-age LMS by month (secondary replication)"
+        },
+        {
+          "name": "hfa-girls-z-who-2007-exp.xlsx",
+          "download_url": "https://cdn.who.int/media/docs/default-source/child-growth/growth-reference-5-19-years/height-for-age-(5-19-years)/hfa-girls-z-who-2007-exp.xlsx",
+          "retrieved_at": "2026-10-31T05:16:14Z",
+          "byte_size": 29837,
+          "sha256": "df07ee16d3d2916569f1d869b7c874d7b880a41321d871215ed0254cb16679b3",
+          "role": "girls height-for-age LMS by month (secondary replication)"
+        }
+      ],
+      "role": "independent reference population for the stature tests"
+    }
+  ],
+  "method": "fetch.py downloads the six files and writes derived/lms.csv (series, sex, age, L, M, S). analysis.py uses the LMS S parameter as the age-specific coefficient of variation and the central-difference derivative of the median M as growth velocity (cm/yr, kg/yr); for each of the four primary series (CDC stature and weight, boys and girls, ages 2.5-19.5) it computes T1 (Spearman rho of CV vs velocity over all ages), T2 (age of the CV maximum in 8-19 y within 1.5 y of the age of peak velocity in 8-19 y, CV peak >= 5% above the pre-pubertal minimum in 4-11 y) and T3 (Spearman rho of CV vs velocity from 2.5 y to the age of minimum velocity before the spurt). Deviation from the pre-registration: the pre-registered 'exact CV by numerical integration of the Box-Cox distribution' is used only as a check for stature (L between -0.39 and 2.24, where it agrees with S to 4 decimals and gives identical test outcomes) because for weight L is -0.21 to -1.87 and the Box-Cox distribution has infinite variance for L <= -0.5, so that CV does not exist. WHO height (5.5-18.5 y) and CDC infant tables are secondary and do not enter the verdict.",
+  "measured": {
+    "value": 4,
+    "unit": "primary series (of 4) in which CV rises into the adolescent spurt (T1 and T2 pass); 0 of 4 pass the childhood test T3",
+    "n": 204,
+    "uncertainty": "half-month age grid, 204 ages per series; T1 P-values 2.8e-6 to 2.2e-75; T3 (stature) P = 1e-97 (boys) and 9e-19 (girls) in the wrong direction",
+    "extra": {
+      "T1_spearman_cv_velocity_2.5_19.5y": {
+        "cdc_stature_M": 0.3215,
+        "cdc_stature_F": 0.67,
+        "cdc_weight_M": 0.9015,
+        "cdc_weight_F": 0.7411
+      },
+      "T2_age_cv_peak_vs_age_peak_velocity": {
+        "cdc_stature_M": [
+          12.875,
+          13.375
+        ],
+        "cdc_stature_F": [
+          11.208333,
+          11.625
+        ],
+        "cdc_weight_M": [
+          12.541667,
+          13.708333
+        ],
+        "cdc_weight_F": [
+          11.625,
+          11.375
+        ]
+      },
+      "cv_prepubertal_min_and_peak": {
+        "cdc_stature_M": [
+          0.0413,
+          0.0504
+        ],
+        "cdc_stature_F": [
+          0.0433,
+          0.0506
+        ],
+        "cdc_weight_M": [
+          0.12,
+          0.1975
+        ],
+        "cdc_weight_F": [
+          0.1318,
+          0.2029
+        ]
+      },
+      "T3_childhood_spearman_cv_velocity": {
+        "cdc_stature_M": [
+          -0.996,
+          95
+        ],
+        "cdc_stature_F": [
+          -0.7912,
+          82
+        ],
+        "cdc_weight_M": [
+          null,
+          1
+        ],
+        "cdc_weight_F": [
+          null,
+          1
+        ]
+      },
+      "age_of_minimum_velocity_before_spurt": {
+        "cdc_stature_M": 10.375,
+        "cdc_stature_F": 9.291667,
+        "cdc_weight_M": 2.541667,
+        "cdc_weight_F": 2.541667
+      },
+      "stature_boys_S_by_age": {
+        "2.5": 0.041,
+        "4": 0.0413,
+        "6": 0.0437,
+        "8": 0.0451,
+        "10": 0.0476,
+        "12": 0.0499,
+        "14": 0.0489,
+        "16": 0.0431,
+        "18": 0.0406,
+        "19.5": 0.0404
+      },
+      "stature_boys_velocity_cm_per_yr": {
+        "2.5": 8.35,
+        "4": 6.86,
+        "6": 6.44,
+        "8": 5.88,
+        "10": 4.9,
+        "12": 6.28,
+        "14": 7.2,
+        "16": 2.43,
+        "18": 0.59,
+        "19.5": 0.24
+      },
+      "weight_boys_S_by_age": {
+        "2.5": 0.109,
+        "4": 0.12,
+        "6": 0.139,
+        "8": 0.156,
+        "10": 0.179,
+        "12": 0.197,
+        "14": 0.191,
+        "16": 0.173,
+        "18": 0.162,
+        "19.5": 0.16
+      },
+      "weight_boys_velocity_kg_per_yr": {
+        "2.5": 1.63,
+        "4": 2.07,
+        "6": 2.33,
+        "8": 2.73,
+        "10": 3.68,
+        "12": 4.9,
+        "14": 5.42,
+        "16": 4.14,
+        "18": 2.17,
+        "19.5": 1.49
+      },
+      "who_height_secondary": {
+        "who_height_M": {
+          "T1_rho": 0.5667,
+          "T2": true,
+          "T3_rho": -1.0
+        },
+        "who_height_F": {
+          "T1_rho": 0.9339,
+          "T2": false,
+          "T3_rho": -1.0
+        }
+      },
+      "cdc_infant_0_36mo_secondary": {
+        "cdc_infant_length_M": {
+          "cv_birth": 0.0531,
+          "cv_36mo": 0.0407,
+          "spearman_cv_velocity": -0.2928
+        },
+        "cdc_infant_length_F": {
+          "cv_birth": 0.0501,
+          "cv_36mo": 0.042,
+          "spearman_cv_velocity": -0.3696
+        },
+        "cdc_infant_weight_M": {
+          "cv_birth": 0.1524,
+          "cv_36mo": 0.1116,
+          "spearman_cv_velocity": 0.6759
+        },
+        "cdc_infant_weight_F": {
+          "cv_birth": 0.1421,
+          "cv_36mo": 0.1189,
+          "spearman_cv_velocity": 0.2084
+        }
+      },
+      "exact_cv_check_stature": {
+        "cdc_stature_M": {
+          "T1_rho": 0.3145,
+          "T2": true,
+          "T3_rho": -0.9956
+        },
+        "cdc_stature_F": {
+          "T1_rho": 0.6704,
+          "T2": true,
+          "T3_rho": -0.7912
+        }
+      }
+    }
+  },
+  "verdict": "mixed",
+  "confidence": 0.8,
+  "caveats": [
+    "The adolescent half of the claim is confirmed cleanly: in all four CDC series and in WHO boys the CV peaks within 0.5-1.2 years of peak velocity and 17-54% above its pre-pubertal minimum, and CV is positively correlated with velocity over the whole 2.5-19.5 y span (rho 0.32-0.90). The childhood half is contradicted: between 2.5 y and the pre-spurt velocity minimum (10.4 y boys, 9.3 y girls), stature CV rises monotonically (0.041 to 0.048) while velocity falls from 8.4 to 4.9 cm/yr (rho -0.996 boys, -0.79 girls; WHO: -1.0 both sexes), the opposite of Thompson's 'descends when the rate of growth diminishes'. For weight no childhood deceleration exists in the 2-20 y reference (velocity rises steadily from 1.6 kg/yr at 2.5 y to the spurt), so T3 is undefined and the childhood claim cannot be tested for weight there; in the CDC infant tables (0-36 months) weight CV does fall with falling velocity (0.15 to 0.11, rho 0.68 boys, 0.05 girls), while length CV falls (0.053 to 0.041) but not monotonically with velocity (rho -0.29, -0.37).",
+    "Deviation from the pre-registration: the CV is taken as the LMS S parameter rather than the quadrature CV of the Box-Cox distribution, because that distribution has infinite variance for L <= -0.5, which holds for weight at essentially all ages. For stature both definitions agree to 4 decimals and give identical outcomes. The verdict rule itself was applied as pre-registered; under it the weight series could never pass T3, so 'supports' was unreachable once stature failed T3, and the pre-registered 'refutes' condition (3 of 4 series with significantly negative childhood rho) could not be met either because only 2 series have a defined T3. The honest summary is: adolescent part supported, childhood part refuted for stature and untestable for weight in this range.",
+    "Thompson's own table (Bowditch) shows stature CV falling from 4.76 at age 5 to 4.40 at age 9; the modern US and WHO references show the opposite trend over the same ages (CDC boys 0.0425 at 5 to 0.0462 at 9). Bowditch's values are cross-sectional school data of the 1870s with small per-age samples; the LMS references are smoothed and much larger, and pool secular trend and mixed ancestry, which may inflate childhood variance.",
+    "Reference LMS curves are smoothed fits, not raw sample statistics, and the S curve is itself smoothed over age; Spearman P-values on a half-month grid treat each grid point as an observation and overstate the evidence, so they are reported for the sign and ordering, not as exact probabilities. The adolescent CV rise is widely attributed to variation in the timing of the spurt rather than to the rate of growth per se (the assessors' confound); this test cannot separate the two."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1-thinking-high",
+    "run": "cursor/thompson-claim-tests-6e84",
+    "date": "2026-10-31"
+  }
 }
