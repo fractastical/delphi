@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Query Claims — delphisci</title>
+<meta name="description" content="Query every claim extracted in delphisci by thinker, proof status, truth and testability score, and export the results.">
+<link rel="icon" href="data:image/svg+xml,/*__SEAL_URI__*/">
+<style>
+:root{--bg:#0e1830;--navy:#14213d;--panel:#16243f;--panel2:#1b2b4d;--gold:#e5c07b;--gold2:#f2dba6;--goldline:rgba(229,192,123,.38);--goldfaint:rgba(229,192,123,.14);
+ --ink:#efe6cf;--mut:#a7b0c2;--line:rgba(229,192,123,.26);--serif:Georgia,'Times New Roman',serif;--sans:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sans);color:var(--ink);background:radial-gradient(1200px 600px at 50% -200px,#1d2f57 0%,var(--bg) 60%) fixed,var(--bg)}
+main{max-width:1640px;margin:0 auto;padding:18px 18px 40px}
+h1,h2,h3{font-family:var(--serif);color:var(--gold)}
+h1{font-size:26px;margin:0;letter-spacing:4px;text-transform:uppercase}
+h3{font-size:12px;margin:14px 0 6px;letter-spacing:2px;text-transform:uppercase}
+p{font-size:13.5px;line-height:1.55}.mut{color:var(--mut)}.small{font-size:12px}b{color:var(--gold2)}
+.masthead{display:flex;gap:16px;align-items:center;padding:0 0 12px}
+.masthead svg{width:58px;height:58px;flex:none;filter:drop-shadow(0 4px 12px rgba(0,0,0,.45))}
+.subtitle{font-family:var(--serif);font-style:italic;color:var(--gold2);font-size:15px;margin:4px 0 0}
+.nav{margin-left:auto;display:flex;gap:8px}
+a{color:var(--gold2);text-decoration-color:rgba(229,192,123,.5)}a:hover{color:#fff}
+button,.btn{font:inherit;font-size:12.5px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);cursor:pointer;text-decoration:none;white-space:nowrap}
+button:hover,.btn:hover{border-color:var(--gold);color:var(--gold2)}
+.panel{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:10px}
+#q{font:inherit;font-family:ui-monospace,Menlo,monospace;font-size:14px;width:100%;padding:9px 14px;border:1px solid var(--goldline);border-radius:10px;background:var(--navy);color:var(--ink)}
+#q:focus{outline:none;border-color:var(--gold)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:9px}
+.lab{font-family:var(--serif);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.ex{font-family:ui-monospace,Menlo,monospace;font-size:11.5px}
+#err{color:#e8a64e;font-size:12.5px}
+details.help{font-size:12.5px;color:var(--mut);margin-top:9px}details.help summary{cursor:pointer;color:var(--gold2)}
+details.help table{border-collapse:collapse;margin-top:6px}details.help td{padding:3px 12px 3px 0;vertical-align:top}
+code{font-size:12px;color:var(--gold2);background:rgba(229,192,123,.08);padding:0 4px;border-radius:3px}
+table.res{width:100%;border-collapse:collapse;font-size:13px}
+table.res th{position:sticky;top:0;background:var(--navy);text-align:left;font-family:var(--serif);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);padding:8px;border-bottom:1px solid var(--goldline);cursor:pointer;user-select:none;white-space:nowrap}
+table.res th.num,table.res td.num{text-align:right}
+table.res td{padding:7px 8px;border-bottom:1px solid rgba(229,192,123,.1);vertical-align:top}
+table.res tr.c{cursor:pointer}table.res tr.c:hover td{background:rgba(229,192,123,.05)}
+table.res tr.open td{background:rgba(229,192,123,.07)}
+.tri{display:inline-block;width:12px;height:12px;clip-path:polygon(0 0,100% 0,0 100%);vertical-align:middle}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;border-radius:4px;font-variant-numeric:tabular-nums;color:#14213d}
+.pT{background:#e5c07b}.pP{background:#8fb7ff}.pN{background:#2a3a5e;color:#a7b0c2}
+.sub{font-size:11.5px;color:var(--mut)}
+.detail td{padding:4px 14px 14px 28px!important}
+.detail blockquote{margin:8px 0;padding:6px 12px;border-left:2px solid var(--gold);color:var(--gold2);font-family:var(--serif);font-style:italic;font-size:13px}
+.assess{border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin:6px 0;background:#18284a;font-size:12.5px}
+.live{color:#6cc29a;font-size:12px;white-space:nowrap}
+.footer{text-align:center;margin-top:22px;font-family:var(--serif);font-size:11px;letter-spacing:3px;color:var(--gold);opacity:.7}
+@media(max-width:760px){main{padding:10px}h1{font-size:20px}.hide-m{display:none}}
+</style></head><body><main>
+<header class="masthead"><!--__SEAL__--><div>
+<h1>Query Claims</h1>
+<p class="subtitle" id="subtitle"></p></div>
+<nav class="nav"><a class="btn" href="claim-graph.html">Claim graph</a><a class="btn" href="claims.json" title="Every claim with its scores as plain JSON">claims.json</a></nav></header>
+
+<div class="panel">
+ <input id="q" type="search" spellcheck="false" autocomplete="off" placeholder='e.g.  p>=0.8 thinker:darwin status:untested "natural selection"' aria-label="Query">
+ <div class="row"><span class="lab">Try</span><span id="examples" class="row" style="margin:0"></span></div>
+ <details class="help"><summary>Query syntax</summary><table>
+  <tr><td><code>selection</code> <code>"rate of growth"</code></td><td>Words or quoted phrases, matched in the label, statement, quote, chapter and work</td></tr>
+  <tr><td><code>p&gt;=0.8</code> <code>t&lt;0.4</code> <code>gap&gt;0.3</code> <code>year&lt;1900</code></td><td>Numbers with <code>&gt; &gt;= &lt; &lt;= =</code>. <b>p</b> = truth probability, <b>t</b> = testability, <b>conf</b> = assessor confidence, <b>gap</b> = disagreement between the truth assessors</td></tr>
+  <tr><td><code>thinker:darwin,thompson</code></td><td>Field match (substring, any of the comma-separated values). Fields: <b>thinker work chapter status kind verdict id</b></td></tr>
+  <tr><td><code>status:proved</code></td><td>Status is one of <b>proved partial untested refuted</b></td></tr>
+  <tr><td><code>is:live</code> <code>is:draft</code> <code>has:t</code> <code>has:p</code></td><td>Published to production; unverified draft; has a testability or truth score</td></tr>
+  <tr><td><code>-thinker:wolfram</code> <code>-is:live</code></td><td>A leading <code>-</code> negates any term. All terms must hold.</td></tr>
+  <tr><td><code>sort:-p</code> <code>sort:year</code></td><td>Sort (<code>-</code> = descending). Clicking a column header does the same.</td></tr>
+ </table></details>
+ <div class="row"><span id="count" class="lab"></span><span id="err"></span><span style="margin-left:auto"></span>
+  <button onclick="exportRows('csv')">Export CSV</button><button onclick="exportRows('json')">Export JSON</button><button onclick="copyLink(this)">Copy link</button></div>
+</div>
+
+<div class="panel" style="padding:0;overflow:auto;max-height:calc(100vh - 120px)"><table class="res"><thead><tr id="head"></tr></thead><tbody id="body"></tbody></table></div>
+<p class="mut small" id="more" style="text-align:center"></p>
+<div class="footer">✦ Decentralized Epistemic Layer for Probabilistic Hypothesis Inference ✦</div>
+</main>
+<script>
+const DATA = /*__DATA__*/null;
+const CLAIMS = DATA.claims;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fmt = v => v == null ? '–' : v.toFixed(2);
+
+const STATUS = { refuted: { v: 0, label: 'Refuted as stated' }, untested: { v: 0.45, label: 'Not yet proven or tested' },
+  partial: { v: 0.75, label: 'Partly proved' }, proved: { v: 1, label: 'Proved (within its model)' } };
+const STOPS = [[0,[224,87,79]],[0.45,[229,184,75]],[1,[79,192,127]]];
+const ramp = v => { let i = 0; while (i < STOPS.length - 2 && v > STOPS[i+1][0]) i++;
+  const [a, ca] = STOPS[i], [b, cb] = STOPS[i+1], t = Math.max(0, Math.min(1, (v - a) / (b - a)));
+  return `rgb(${ca.map((x, k) => Math.round(x + (cb[k] - x) * t)).join(',')})`; };
+
+for (const c of CLAIMS) {
+  const ps = (c.truthBy || []).map(x => x.p);
+  c.gap = ps.length > 1 ? Math.round(100 * (Math.max(...ps) - Math.min(...ps))) / 100 : null;
+  c.hay = `${c.label} ${c.text} ${c.quote || ''} ${c.section || ''} ${c.work} ${c.notation || ''}`.toLowerCase();
+}
+$('subtitle').textContent = `${CLAIMS.length} claims · ${CLAIMS.filter(c => c.registry === 'production').length} live as nanopubs · built ${DATA.built}`;
+
+/* ---- query language ---- */
+const NUM = { p: c => c.truth, t: c => c.resolvability, conf: c => c.confidence, gap: c => c.gap, year: c => c.year };
+const FIELD = { thinker: c => c.thinker, work: c => c.work, chapter: c => c.section, section: c => c.section, status: c => c.status,
+  kind: c => c.kind, verdict: c => (c.assess || []).map(a => a.verdict).join(' '), id: c => c.id };
+const IS = { live: c => c.registry === 'production', test: c => c.registry === 'test', published: c => !!c.registry, draft: c => !!c.draft };
+const HAS = { t: c => c.resolvability != null, p: c => c.truth != null, quote: c => !!c.quote, math: c => !!c.notation, gap: c => c.gap != null };
+const SORTS = { p: c => c.truth, t: c => c.resolvability, conf: c => c.confidence, gap: c => c.gap, year: c => c.year,
+  claim: c => c.label.toLowerCase(), thinker: c => c.thinker, status: c => STATUS[c.status].v };
+
+function parse(q) {
+  const terms = [], tokens = q.match(/-?[a-z]+:"[^"]*"|-?"[^"]*"|\S+/gi) || [];
+  let sort = null;
+  for (let tok of tokens) {
+    const neg = tok.startsWith('-') && tok.length > 1; if (neg) tok = tok.slice(1);
+    let m;
+    if ((m = tok.match(/^sort:(-?)(\w+)$/i))) {
+      if (!SORTS[m[2].toLowerCase()]) throw `Unknown sort "${m[2]}". Use one of: ${Object.keys(SORTS).join(', ')}`;
+      sort = { key: m[2].toLowerCase(), desc: !!m[1] }; continue;
+    }
+    if ((m = tok.match(/^(\w+)(>=|<=|>|<|=)(.*)$/))) {
+      const f = NUM[m[1].toLowerCase()]; if (!f) throw `Unknown number field "${m[1]}". Use one of: ${Object.keys(NUM).join(', ')}`;
+      const op = m[2], v = m[3] === '' ? NaN : +m[3];
+      if (Number.isNaN(v)) throw `"${m[3]}" is not a number`;
+      terms.push({ neg, test: c => { const x = f(c); if (x == null) return false;
+        return op === '>' ? x > v : op === '>=' ? x >= v : op === '<' ? x < v : op === '<=' ? x <= v : Math.abs(x - v) < 1e-9; } });
+      continue;
+    }
+    if ((m = tok.match(/^(\w+):(.+)$/))) {
+      const k = m[1].toLowerCase(), vals = m[2].replace(/^"|"$/g, '').toLowerCase().split(',').filter(Boolean);
+      if (k === 'is' || k === 'has') {
+        const tab = k === 'is' ? IS : HAS;
+        for (const v of vals) if (!tab[v]) throw `Unknown ${k}:${v}. Use one of: ${Object.keys(tab).map(x => `${k}:${x}`).join(', ')}`;
+        terms.push({ neg, test: c => vals.some(v => tab[v](c)) }); continue;
+      }
+      const f = FIELD[k]; if (!f) throw `Unknown field "${m[1]}". Use one of: ${Object.keys(FIELD).join(', ')}, is, has`;
+      terms.push({ neg, test: c => { const x = String(f(c) ?? '').toLowerCase(); return vals.some(v => x.includes(v)); } });
+      continue;
+    }
+    const w = tok.replace(/^"|"$/g, '').toLowerCase(); if (!w) continue;
+    terms.push({ neg, test: c => c.hay.includes(w) });
+  }
+  return { terms, sort };
+}
+
+/* ---- results ---- */
+const COLS = [
+  { key: 'status', label: '', cls: '' },
+  { key: 'claim', label: 'Claim', cls: '' },
+  { key: 'thinker', label: 'Thinker', cls: 'hide-m' },
+  { key: 'year', label: 'Year', cls: 'num hide-m' },
+  { key: 't', label: 'T', cls: 'num', title: 'Testability: how far open datasets could settle it' },
+  { key: 'p', label: 'P', cls: 'num', title: 'Truth: assessors’ mean probability it is true' },
+  { key: 'gap', label: 'Gap', cls: 'num hide-m', title: 'Disagreement between the truth assessors' },
+  { key: null, label: 'Nanopub', cls: 'hide-m' },
+];
+const PAGE = 300;
+let ROWS = [], SORT = { key: 'p', desc: true }, OPENROW = null, LIMIT = PAGE;
+const short = t => /Maynard Smith$/.test(t) ? 'Maynard Smith' : t.split(' ').slice(-1)[0];
+
+function run() {
+  const q = $('q').value;
+  let parsed; try { parsed = parse(q); $('err').textContent = ''; } catch (e) { $('err').textContent = e; return; }
+  const sort = parsed.sort || SORT, f = SORTS[sort.key];
+  ROWS = CLAIMS.filter(c => parsed.terms.every(t => t.test(c) !== t.neg));
+  ROWS.sort((a, b) => { const x = f(a), y = f(b); if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+    return (x < y ? -1 : x > y ? 1 : 0) * (sort.desc ? -1 : 1); });
+  const live = ROWS.filter(c => c.registry === 'production').length, mean = k => { const v = ROWS.map(NUM[k]).filter(x => x != null); return v.length ? (v.reduce((s, x) => s + x, 0) / v.length).toFixed(2) : '–'; };
+  $('count').textContent = `${ROWS.length} of ${CLAIMS.length} claims · ${live} live · mean P ${mean('p')} · mean T ${mean('t')}`;
+  $('head').innerHTML = COLS.map(c => `<th class="${c.cls}" ${c.key ? `onclick="sortBy('${c.key}')"` : ''} title="${esc(c.title || '')}">${c.label}${c.key === sort.key ? (sort.desc ? ' ▼' : ' ▲') : ''}</th>`).join('');
+  render();
+  const u = new URLSearchParams(); if (q.trim()) u.set('q', q.trim()); if (!parsed.sort && (SORT.key !== 'p' || !SORT.desc)) u.set('sort', `${SORT.desc ? '-' : ''}${SORT.key}`);
+  history.replaceState(null, '', `${location.pathname}${u.size ? `?${u}` : ''}`);
+}
+function render() {
+  const pill = (v, cls) => `<span class="pill ${v == null ? 'pN' : cls}">${fmt(v)}</span>`;
+  $('body').innerHTML = ROWS.slice(0, LIMIT).map(c => {
+    const row = `<tr class="c${OPENROW === c.id ? ' open' : ''}" onclick="toggle('${esc(c.id)}')">
+      <td><i class="tri" style="background:${ramp(STATUS[c.status].v)}" title="${esc(STATUS[c.status].label)}"></i></td>
+      <td><b>${esc(c.label)}</b>${c.draft ? ' <span class="sub">(draft)</span>' : ''}<div class="sub"><i>${esc(c.work)}</i>${c.section && !c.section.startsWith(c.work) ? ` · ${esc(c.section)}` : ''}</div></td>
+      <td class="hide-m">${esc(short(c.thinker))}</td><td class="num hide-m">${c.year}</td>
+      <td class="num">${pill(c.resolvability, 'pT')}</td><td class="num">${pill(c.truth, 'pP')}</td>
+      <td class="num hide-m">${c.gap == null ? '–' : `<span style="color:${c.gap > 0.3 ? '#e8a64e' : 'inherit'}">${fmt(c.gap)}</span>`}</td>
+      <td class="hide-m">${c.registry === 'production' ? `<a class="live" href="${esc(c.uri)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">● live ↗</a>` : c.registry === 'test' ? `<a href="${esc(c.uri)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">test ↗</a>` : '<span class="sub">unpublished</span>'}</td></tr>`;
+    return OPENROW === c.id ? row + `<tr class="detail"><td></td><td colspan="${COLS.length - 1}">${detail(c)}</td></tr>` : row;
+  }).join('');
+  $('more').innerHTML = ROWS.length > LIMIT ? `Showing ${LIMIT} of ${ROWS.length}. <button onclick="LIMIT+=${PAGE};render()">Show more</button>` : '';
+}
+function detail(c) {
+  const t = c.truthBy || [], a = c.assess || [];
+  return `<p>${esc(c.text)}</p>${c.quote ? `<blockquote>“${esc(c.quote)}”</blockquote>` : ''}${c.notation ? `<p><code>${esc(c.notation)}</code></p>` : ''}
+    <p class="small mut">${esc(STATUS[c.status].label)}${c.statusNote ? ` — ${esc(c.statusNote)}` : ''}${c.locator ? ` · ${esc(c.locator)}` : ''} · <a href="claim-graph.html?claim=${encodeURIComponent(c.id)}">Show in graph</a>${c.doi ? ` · <a href="https://doi.org/${esc(c.doi)}" target="_blank" rel="noopener">doi:${esc(c.doi)}</a>` : ''}</p>
+    ${t.map(x => `<div class="assess"><b>${esc(x.who)}</b> · truth ${fmt(x.p)} — ${esc(x.rationale)}</div>`).join('')}
+    ${a.map(x => `<div class="assess"><b>${esc(x.who)}</b> · ${esc(x.verdict)} · testability ${fmt(x.overall)}${x.operationalization ? ` — ${esc(x.operationalization)}` : ''}${x.datasets?.length ? `<br><span class="small">Datasets: ${x.datasets.map(d => `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>`).join(' · ')}</span>` : ''}</div>`).join('')}`;
+}
+function toggle(id) { OPENROW = OPENROW === id ? null : id; render(); }
+function sortBy(k) {
+  $('q').value = $('q').value.replace(/\s*-?sort:-?\w+/gi, '').trim();
+  SORT = SORT.key === k ? { key: k, desc: !SORT.desc } : { key: k, desc: !['claim', 'thinker', 'year'].includes(k) };
+  run();
+}
+
+/* ---- export ---- */
+function exportRows(kind) {
+  const rows = ROWS.map(c => ({ id: c.id, label: c.label, statement: c.text, quote: c.quote || '', thinker: c.thinker, year: c.year, work: c.work,
+    chapter: c.section || '', status: c.status, testability: c.resolvability, truth: c.truth, truth_gap: c.gap, assessor_confidence: c.confidence,
+    nanopub: c.uri || '', registry: c.registry || '', draft: !!c.draft }));
+  let blob;
+  if (kind === 'json') blob = new Blob([JSON.stringify(rows, null, 2)], { type: 'application/json' });
+  else { const keys = Object.keys(rows[0] || { id: '' }), cell = v => v == null ? '' : /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v);
+    blob = new Blob([[keys.join(','), ...rows.map(r => keys.map(k => cell(r[k])).join(','))].join('\n')], { type: 'text/csv' }); }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `delphi-claims.${kind}`; a.click(); URL.revokeObjectURL(a.href);
+}
+function copyLink(b) { navigator.clipboard.writeText(location.href).then(() => { b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy link', 1200); }); }
+
+const EXAMPLES = ['p>=0.8 sort:-p', 'gap>0.3 sort:-gap', 't>=0.6 p>=0.7', 'status:refuted', 'thinker:thompson p<0.3', 'has:math sort:year', 'is:live -thinker:darwin', 'selection sort:-t'];
+$('examples').innerHTML = EXAMPLES.map(e => `<button class="ex" onclick="$('q').value=this.textContent;LIMIT=PAGE;run()">${esc(e)}</button>`).join('');
+let timer; $('q').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => { LIMIT = PAGE; run(); }, 120); });
+{ const u = new URLSearchParams(location.search); $('q').value = u.get('q') || '';
+  const s = u.get('sort'); if (s && SORTS[s.replace(/^-/, '')]) SORT = { key: s.replace(/^-/, ''), desc: s.startsWith('-') }; }
+run();
+</script></body></html>
