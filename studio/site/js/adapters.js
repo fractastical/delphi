@@ -95,8 +95,11 @@
     const sess = await getJSON("api/session", 5000); const csrf = sess.csrf || sess.csrf_token || sess.token;
     if (!csrf) throw new Error("the session did not provide a CSRF token");
     const r = await fetch("api/engineering/solve", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json", "X-CSRF-Token": csrf }, body: JSON.stringify(body), cache: "no-store" });
-    if (!r.ok) throw new Error("solver answered HTTP " + r.status);
-    return r.json();
+    if (!r.ok) {
+      let e = null; try { e = await r.json(); } catch (x) { /* not JSON */ }
+      throw new Error(`the solver refused the request (HTTP ${r.status}${e && e.error ? ", " + e.error : ""})${e && e.message ? ": " + e.message : ""}. Submitted: ${JSON.stringify(body)}`);
+    }
+    const out = await r.json(); out._submitted = body; return out;
   }
   const belief = pending("belief / forecast");
   const simulate = pending("simulation");
