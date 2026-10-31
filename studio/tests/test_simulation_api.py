@@ -187,14 +187,19 @@ def test_dependency_or_spawn_failure_is_503(monkeypatch):
 
 def test_worker_does_not_relax_inherited_memory_limits():
     # Test-only child inspects resource limits without importing/running a model.
+    from frontier.worker_limits import DEFAULT_ADDRESS_SPACE
     program = """
 import io,json,resource,sys
 import frontier.simulation_api as api
-resource.setrlimit(resource.RLIMIT_AS,(1024**3,1024**3))
-api._calculate=lambda data: {'limits':resource.getrlimit(resource.RLIMIT_AS)}
-sys.stdin=io.TextIOWrapper(io.BytesIO(b'{}'))
+resource.setrlimit(resource.RLIMIT_AS,({inherited},{inherited}))
+api._calculate=lambda data: {{'limits':resource.getrlimit(resource.RLIMIT_AS)}}
+sys.stdin=io.TextIOWrapper(io.BytesIO(b'{{}}'))
 api._worker()
 """
-    process = subprocess.run([sys.executable, "-c", program], capture_output=True, text=True, cwd=api.ROOT, timeout=5)
-    assert process.returncode == 0
-    assert json.loads(process.stdout)["limits"] == [1024**3, 1024**3]
+    def limits(inherited):
+        process = subprocess.run([sys.executable, "-c", program.format(inherited=inherited)], capture_output=True, text=True, cwd=api.ROOT, timeout=5)
+        assert process.returncode == 0
+        return json.loads(process.stdout)["limits"]
+    lower = DEFAULT_ADDRESS_SPACE // 2
+    assert limits(lower) == [lower, lower]                                  # a lower inherited limit is never raised
+    assert limits(1024**3) == [DEFAULT_ADDRESS_SPACE] * 2                   # a higher one is lowered to the worker cap
