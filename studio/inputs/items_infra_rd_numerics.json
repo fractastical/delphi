@@ -1,0 +1,30 @@
+{
+  "run_tag": "infra24",
+  "items": [
+    {
+      "id": "rd-training-only-discretization",
+      "script": "frontier_compute/portable_entry.py",
+      "kind": "gpu",
+      "image": "nvcr.io/nvidia/pytorch:25.12-py3",
+      "args": [
+        "artifacts/rd-numerics/portable-audit.tar.xz",
+        "artifacts/rd-numerics/portable-audit.json"
+      ],
+      "files": [
+        "artifacts/rd-numerics/portable-audit.tar.xz",
+        "artifacts/rd-numerics/portable-audit.json"
+      ],
+      "env": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NVIDIA_TF32_OVERRIDE": "0",
+        "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": "0"
+      },
+      "timeout": "40m",
+      "inner_timeout_s": 1000,
+      "max_result_bytes": 12000000,
+      "priority": 1
+    }
+  ]
+}
