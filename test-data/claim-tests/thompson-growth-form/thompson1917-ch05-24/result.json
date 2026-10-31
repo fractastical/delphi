@@ -1,0 +1,39 @@
+{
+  "claim_id": "thompson1917-ch05-24",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch05-24",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "preregistered_at": "2026-10-31T21:40:00Z",
+  "hypothesis": "Measured red blood cells have a biconcave thickness profile whose upper surface has mean curvature of opposite sign at the central dimple and at the rim crest, so the cell surface is not of constant mean curvature (not a liquid-drop equilibrium figure), whereas rigid spheres imaged and analysed the same way show no such sign change.",
+  "pass_criterion": "Pre-registered. Data: ground-truth quantitative phase maps of red blood cells (gt_phase1.mat ... gt_phase100.mat, red_blood_cell/train) and of 3 um polystyrene beads (gt_phase1.mat ... gt_phase50.mat, polystyrene_bead/train) from Figshare 21378744. Phase is proportional to optical thickness; the upper surface is taken as z = t/2 (cell symmetric about its mid-plane). Isolated objects are segmented by thresholding the background-subtracted phase, keeping connected components not touching the patch border, with aspect ratio <= 1.3 and footprint diameter >= 12 px. For each object the azimuthally averaged profile t(r) is computed about its centroid; r_crest = radius of maximum t; the centre curvature sign is the sign of b in a fit t(r) = a + b r^2 over r <= 0.3 r_crest. On the upper surface the mean curvature at the crest is negative (convex, since t'(r_crest) = 0 and t'' < 0) and at the centre it is positive (concave) when b > 0 and r_crest >= 0.25 r_edge; that sign change does not depend on the lateral or phase-to-height calibration. SUPPORTS if >= 70% of analysable RBCs show the sign change and <= 10% of analysable beads do.",
+  "fail_criterion": "Pre-registered. REFUTES if <= 30% of analysable RBCs show the sign change while <= 10% of beads do (RBCs are dome-like, consistent with a drop). MIXED if between 30% and 70%. INCONCLUSIVE (underpowered) if fewer than 30 analysable RBCs or 10 analysable beads; INCONCLUSIVE (other) if > 10% of beads show a sign change (the method manufactures dimples).",
+  "planned_datasets": [
+    "figshare-21378744-holographic-rbc-bead"
+  ],
+  "interpretation": "Thompson's argument is that a fluid drop held by surface tension alone must have constant mean curvature 1/r1 + 1/r2 everywhere, and the biconcave corpuscle does not. We test the geometric premise on measured cells: a closed surface whose upper face is concave at the centre and convex at the rim cannot have constant mean curvature. The thickness map from quantitative phase imaging is used with the standard mid-plane symmetry assumption. The second clause, that corpuscles become spherical in diluted blood, and the suggested osmotic or fluid-crystal causes are not tested here. Species of the donor blood is taken from the data source's description; scope is mammalian red cells.",
+  "test_contract": {
+    "expected_observation": "Most isolated red cells in quantitative phase maps have a central thickness minimum and a rim maximum, giving opposite-sign mean curvature at centre and rim on the same face; spheres analysed identically do not.",
+    "disconfirming_observation": "Red cells have dome-like (centrally maximal) thickness profiles like the spheres, i.e. no centre-rim sign change in mean curvature, consistent with a constant-mean-curvature drop.",
+    "admissible_datasets": "Quantitative thickness or phase maps, or 3D reconstructions, of individual unfixed or lightly fixed mammalian red cells at a resolution of >= 12 pixels across a cell, together with a sphere control imaged on the same instrument; public licence; independent of Thompson.",
+    "inference_method": "Segmentation of isolated objects, azimuthal thickness profile, sign of the central quadratic coefficient vs the crest curvature, fraction of cells with a sign change compared with the bead control against the pre-registered 70%/30%/10% thresholds."
+  },
+  "preregistration": {
+    "rbc_files": "red_blood_cell/train/gt_phase/gt_phase{1..100}.mat",
+    "bead_files": "polystyrene_bead/train/gt_phase/gt_phase{1..50}.mat",
+    "max_aspect_ratio": 1.3,
+    "min_diameter_px": 12,
+    "centre_fit_max_r_over_rcrest": 0.3,
+    "min_rcrest_over_redge": 0.25,
+    "pass_rbc_fraction": 0.7,
+    "fail_rbc_fraction": 0.3,
+    "max_bead_fraction": 0.1,
+    "min_rbc": 30,
+    "min_beads": 10
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
