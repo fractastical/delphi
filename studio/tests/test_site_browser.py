@@ -501,3 +501,24 @@ def test_genomic_slice_is_data_with_receipts_or_an_honest_absence(browser, base)
     assert "data, not a model" in txt and "nothing here is a prediction" in txt
     assert pg.locator(".studiomain table tbody tr").count() >= len(G["genes"])
     assert all("?" not in r["url"] for r in G["receipts"]), "signed or query-bearing URLs must not be shipped"
+
+
+def test_project_draft_drives_coverage_and_annotation_drafts_export_in_the_contract_shape(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=molecular")
+    pg.wait_for_selector(".studiogrid")
+    pd = (snap.get("project_drafts") or {}).get("flying-fish")
+    if pd:
+        txt = pg.locator("#main").inner_text().lower()
+        assert "validated but not submitted" in txt and "project record draft" in txt
+        assert "source only" in pg.locator(".studiomain").inner_text().lower()
+    pg.select_option("#annkind", "proposed_edit")
+    pg.fill("#annbody", "Replace the molecular gap text")
+    pg.click("#annsave")
+    assert "proposed_edit" in pg.locator("#annlist").inner_text()
+    with pg.expect_download() as dl:
+        pg.click("#annlist [data-exp]")
+    doc = json.loads(Path(dl.value.path()).read_text())
+    assert doc["payload"]["kind"] == "proposed_edit" and doc["payload"]["anchor"]["frame"] == "ui_anchor" and doc["payload"]["anchor"]["record"] is None
+    assert "not submitted" in doc["note"].lower()

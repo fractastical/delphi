@@ -397,6 +397,21 @@ def genomics(ins: Inputs) -> dict | None:
     return {"genes": sorted(genes.values(), key=lambda g: g["symbol"]), "receipts": receipts, "flyingfish": ff, "receipts_sha256": ins.seen[f"{GEN}/receipts.json"]["sha256"]}
 
 
+def project_drafts(ins: Inputs) -> dict:
+    """Validated, unsubmitted Project drafts (guilds' schema), keyed by file stem. Shown as drafts: a draft is not a store record."""
+    out = {}
+    base = ROOT / "projects"
+    for f in sorted(base.glob("*.draft.json")) if base.exists() else []:
+        rel = f.relative_to(ROOT).as_posix(); d = json.loads(ins.read(rel)); p = d.get("draft", {}).get("payload") or {}
+        if not p:
+            continue
+        out[f.name[: -len(".draft.json")]] = {"path": rel, "sha256": ins.seen[rel]["sha256"], "title": p.get("title"), "mission": p.get("mission"), "limitations": p.get("limitations", []),
+            "scale_coverage": p.get("scale_coverage", []), "requirements": p.get("requirements", []),
+            "open_questions": [{"text": q.get("text"), "problem": (q.get("problem") or {}).get("id"), "blocks": q.get("blocks", [])} for q in p.get("open_questions", [])],
+            "members": [{"subsystem": m.get("subsystem"), "role": m.get("role"), "relationship": m.get("relationship"), "causal_bridge": m.get("causal_bridge"), "applicability": m.get("applicability"), "ref": {k: (m.get("ref") or {}).get(k) for k in ("kind", "id", "namespace")}} for m in p.get("members", [])]}
+    return out
+
+
 def checklist(text: str) -> list[dict]:
     return [{"done": m.group(1) == "x", "text": m.group(2).strip()} for m in re.finditer(r"^- \[([ x])\] (.+)$", text, re.M)]
 
@@ -471,6 +486,7 @@ def build() -> dict[str, bytes]:
     manifests = simulation_manifests(ins)
     belief_ex = belief_example(ins)
     genomics_slice = genomics(ins)
+    project_recs = project_drafts(ins)
     extra: dict = {}
     prints = print_forms(ins, extra)
     controlled = controlled_results(ins, files)
@@ -503,6 +519,7 @@ def build() -> dict[str, bytes]:
         "belief_example": belief_ex,
         "print_forms": prints,
         "genomics": genomics_slice,
+        "project_drafts": project_recs,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
     }
     catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}

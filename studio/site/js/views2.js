@@ -581,6 +581,19 @@
 
   DF.views.search = function (snap, route) {
     const head = html`<section class="pagehead"><h1>Search</h1><p class="lede">Search every record the node can read. Results come from the live catalog when a runtime is connected, otherwise from the committed snapshot, and the mode is stated above the list.</p></section>`;
-    return DF.catalogView(snap, route, head, "/search");
+    const cv = DF.catalogView(snap, route, head, "/search"); const q = (route.params.q || "").trim();
+    if (!q) return cv;
+    return { html: html`${cv.html}`, async after(root) {
+      const slot = document.createElement("section"); slot.className = "panel"; slot.setAttribute("aria-labelledby", "dr-h"); slot.innerHTML = '<h2 id="dr-h">Ranked results</h2><p role="status" class="small">Searching…</p>';
+      root.querySelector("section:last-of-type").before(slot);
+      try {
+        const r = await DF.api.discovery(q, { limit: 20 });
+        const eng = r.source === "discovery" ? `engine ${r.mode}${r.index ? " · index " + JSON.stringify(r.index).slice(0, 120) : ""}` : `lexical text match${r.unavailable_reason ? " (" + r.unavailable_reason + ")" : ""}`;
+        slot.innerHTML = html`<h2 id="dr-h">Ranked results</h2><p class="note small"><b>${eng}.</b> ${r.source === "discovery" && r.unavailable_reason ? "Note: " + r.unavailable_reason + ". " : ""}A score is shown only with its kind; a rank is not truth, quality or acceptance.</p>
+          ${r.items.length ? html`<ul class="catalog">${r.items.map((x) => html`<li class="catrow"><div>${U.pill(x.type || "record", "grp")} <a class="srclink" href="${x.ref ? DF.href("/entity/" + x.ref.kind + "/" + x.ref.id, { v: x.ref.version, ns: x.ref.namespace }) : "#/search"}"><b>${x.title || (x.ref && x.ref.id) || "(untitled)"}</b></a> ${x.kind ? html`<span class="faint small">${x.kind}</span>` : ""}</div>
+            ${x.snippet ? html`<div class="small">${x.snippet}</div>` : ""}<div class="small faint">${x.local_status ? "local status: " + String(x.local_status).replace(/_/g, " ") + " · " : ""}${x.score !== null && x.score !== undefined ? (x.score_kind || "score") + " " + x.score + " · " : ""}${Array.isArray(x.why_matched) ? "matched: " + x.why_matched.join("; ") : x.why_matched ? "matched: " + x.why_matched : ""}</div></li>`)}</ul>` : html`<p class="empty">No ranked result. ${eng}.</p>`}`.toString();
+      } catch (e) { slot.innerHTML = html`<h2 id="dr-h">Ranked results</h2><p class="empty">Ranked results could not be loaded: ${e.message}. The catalog list below still works.</p>`.toString(); }
+      await cv.after(root);
+    } };
   };
 })();

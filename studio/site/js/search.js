@@ -40,7 +40,7 @@
     const run = async (q) => {
       if (ctl) ctl.abort(); ctl = new AbortController(); const mine = ctl;
       box.hidden = false; box.innerHTML = `<div class="ace" role="status">Searching…</div>`; input.setAttribute("aria-expanded", "true");
-      try { const r = await DF.api.discovery(q, { limit: 12, signal: mine.signal }); if (mine.signal.aborted) return; render(r, q); }
+      try { const r = await DF.api.discovery(q, { limit: 12, signal: mine.signal, cacheOnly: true }); if (mine.signal.aborted) return; render(r, q); }
       catch (e) { if (e.name === "AbortError" || mine.signal.aborted) return; box.innerHTML = `<div class="ace" role="alert">Suggestions could not be loaded: ${esc(e.message)}. Press Enter to search the catalog instead.</div>`; }
     };
     input.addEventListener("input", () => { clearTimeout(timer); const q = input.value.trim(); if (q.length < 2) { if (ctl) ctl.abort(); close(); return; } timer = setTimeout(() => run(q), 220); });

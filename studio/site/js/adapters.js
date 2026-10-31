@@ -134,11 +134,15 @@
 
   /* GET /api/discovery?q&kind&limit&mode=hybrid -> {items[{type,ref,artifact_sha256?,title,snippet,kind,local_status,score,score_kind,why_matched}], mode, index metadata, unavailable_reason?}.
    * Until the runtime serves it, an honest lexical fallback over the catalog and artifact index; the result always says which one ran. */
-  async function discovery(q, { kind = "", limit = 12, signal = null } = {}) {
+  async function discovery(q, { kind = "", limit = 12, signal = null, cacheOnly = false } = {}) {
     if (isLive() && state.discoveryAbsent !== true) {
       try {
         const p = new URLSearchParams({ q, limit: String(limit), mode: "hybrid" }); if (kind) p.set("kind", kind);
-        const r = await getJSON("api/discovery?" + p.toString(), 6000, signal);
+        let r;
+        if (cacheOnly && state.cacheOnlyRejected !== true) {            // typed suggestions may use cached embeddings only; a node that rejects the parameter gets the plain request
+          try { r = await getJSON("api/discovery?" + p.toString() + "&cache_only=1", 6000, signal); } catch (e) { if (e.name === "AbortError") throw e; if (/HTTP 400/.test(e.message)) state.cacheOnlyRejected = true; else throw e; }
+        }
+        if (!r) r = await getJSON("api/discovery?" + p.toString(), 8000, signal);
         return { source: "discovery", mode: r.mode || "unknown", items: Array.isArray(r.items) ? r.items : [], unavailable_reason: r.unavailable_reason || null, index: r.index || null };
       } catch (e) { if (e.name === "AbortError") throw e; if (/HTTP 404/.test(e.message)) state.discoveryAbsent = true; }
     }
