@@ -8,63 +8,64 @@ Supersedes `archive/demo-narrative-2026-10-31-refusal-led.md`.
 
 ---
 
-# PART 1 — THE SPOKEN SCRIPT (449 words)
+# PART 1 — THE SPOKEN SCRIPT (451 words)
 
 ### Open · on the viewer
 
-Designing a whole organism end to end is a way of finding out what we don't know.
+Designing a whole organism end to end forces a decision at every scale — and shows you which ones
+the evidence can't yet support.
 
-This is our flying fish, version three. Every fin is a fan of tapered rays. The ray counts aren't
-artistic — fifteen pectoral rays, thirteen dorsal, ten anal — they're read out of an FAO species
-sheet. The builder refuses any candidate that breaks the sheet's rule for where the pelvic fins
-sit.
+This is our flying fish, version three. The ray counts aren't artistic: fifteen pectoral, thirteen
+dorsal, ten anal, read out of an FAO species sheet that we reuse as a record, not a citation. The
+builder **refuses** any candidate breaking that sheet's rule for where the pelvic fins sit — the
+first decision, made by the sheet.
 
 ### Drill · down through it
 
-Zoom into one scale. This is a published model of Erk trigger waves driving bone growth in a
-regenerating zebrafish scale — every parameter from the authors' own table.
+Zoom into one scale. A published model of Erk trigger waves driving bone growth in a regenerating
+zebrafish scale — every parameter from the authors' own table.
 
-Down again, to cells. This is BETSE, the real package, running a **generic** tissue patch — not a
-fish fin, and we don't claim it is one. Raise potassium permeability in two cells and they drop
-about five millivolts, and their neighbours drop too. Block the gap junctions and the targeted
-cells drop four times further while the neighbours barely move. That's the coupling, shown by
-removing it.
+Down again, to cells. BETSE, the real package, on a **generic** patch — not a fish fin, and we
+don't claim it is. Raise potassium permeability in two cells and they drop about five millivolts;
+so do their neighbours. Block the gap junctions and those two drop four times further while the
+neighbours barely move. That's the coupling, shown by removing it.
 
-Down again, to metabolism. A published genome-scale zebrafish model, which ships with no medium
-at all — so we **assumed** one. Growth came out at zero, because the biomass pool needed a vitamin
-E catabolite we hadn't supplied. We added it and it solved.
+Down again, to metabolism. A genome-scale zebrafish model that ships with no medium, so we
+**assumed** one. Growth came out zero — the biomass pool needed a vitamin E catabolite we hadn't
+supplied. We added it; it solved.
 
 Then we swept oxygen and growth barely moved. Not biology: under our assumed medium the model was
 **making its own oxygen**, one reaction running backwards beside an uncapped vitamin. Block it and
-growth collapses. That sweep measured our medium, not a fish.
+growth collapses. That measured our medium, not a fish.
 
 ### The edge · where it stops
 
-Now the interesting part. We built the adapter that carries flow pressure onto a fin ray. It
-checks out exactly — force conservation exact, the disabled-load control exactly zero.
+Now the interesting part. We built the adapter carrying flow pressure onto a fin ray. It checks
+out exactly — force conservation exact, the disabled-load control exactly zero.
 
-And it will not run. The fins are half a millimetre thick, and on the finest global grid we have
-completed a fin spans **four tenths of one cell**. Our global grid does not resolve fin thickness
-anywhere we have looked, so the contract refuses those samples rather than quietly loading them.
+And it will not run. Fins are half a millimetre thick, and on our finest completed grid a fin
+spans **four tenths of one cell**. The global grid doesn't resolve fin thickness anywhere we've
+looked, so the contract refuses those samples rather than quietly loading them.
 
-Underneath that sits a second gap: we have not established a sourced stiffness profile for a real
-flying-fish fin ray. That one is a wet lab.
+Underneath sits a second gap: we have not established a sourced stiffness profile for a real
+flying-fish fin ray. That one's a wet lab.
 
-**Two gaps, with numbers on them, found by trying to connect a flow solver to a beam.** That's
-what the design is for.
+**Two gaps with numbers on them, found by connecting a flow solver to a beam.** That's what the
+design is for.
 
 ### Close · the commons
 
-All of it is public. Repository, site, and an endpoint with nineteen tools where reads and
-calculations need no account — thirty-five checks passing on the current release.
+Every one of those decisions is a record in a shared graph, with the claim that licensed it
+attached — so the next project inherits the refusal, not just the result. All of it is public:
+repository, site, and nineteen tools where reads and calculations need no account.
 
-One honest result. We ran a preregistered comparison of a single analyst against collaborating
-agents. Every arm scored full marks, so we measured no advantage — the task had no room to fail.
-That's a finding about our benchmark, and the next one needs harder questions.
+One honest result. We preregistered a comparison of a single analyst against collaborating agents.
+**Every arm scored full marks**, so we measured **no advantage** — the task had no room to fail.
+A null about our benchmark, not evidence that agents coordinate better.
 
 ---
 
-**Pacing.** 449 words: **3:12 at 140 wpm, 3:00 at 150**. If the slot is hard three minutes, either
+**Pacing.** 451 words: **3:13 at 140 wpm, 3:00 at 150**. If the slot is hard three minutes, either
 speak at 150 or **drop the oxygen paragraph** (−58 words → 2:47 at 140). Cut the whole metabolism
 beat for 2:20, and the scale beat too for 1:55. **Never cut the edge section** — it is the thesis.
 
