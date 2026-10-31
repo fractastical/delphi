@@ -1,6 +1,7 @@
 """Compute-controller entry: verify/extract frozen packet, install pinned runtime, execute."""
 
 import hashlib
+import importlib
 import json
 import os
 from pathlib import Path
@@ -12,6 +13,12 @@ import tarfile
 def main():
     archive = Path("inputs/molecular/portable-md.tar.xz")
     manifest = json.loads(Path("inputs/molecular/portable-md.json").read_text())
+    module = manifest.get("module", "engineering.molecular.remote")
+    if module not in (
+        "engineering.molecular.remote",
+        "engineering.molecular.continuation",
+    ):
+        raise ValueError("Unsupported molecular workload module")
     if hashlib.sha256(archive.read_bytes()).hexdigest() != manifest["archive_sha256"]:
         raise ValueError("MD packet hash mismatch")
     destination = Path(os.environ.get("COPS_OUT", ".")) / "md-work"
@@ -29,8 +36,7 @@ def main():
         if os.environ.get("MD_DEPS_DIR"):
             sys.path.insert(0, os.environ["MD_DEPS_DIR"])
         os.chdir(destination)
-        from engineering.molecular.remote import main as remote_main
-
+        remote_main = importlib.import_module(module).main
         sys.argv = [sys.argv[0], "--output", "preflight-output"]
         remote_main()
         return
@@ -59,7 +65,7 @@ def main():
         [
             sys.executable,
             "-m",
-            "engineering.molecular.remote",
+            module,
             "--output",
             str((Path(os.environ["COPS_OUT"]) / "molecular-output").resolve()),
         ],

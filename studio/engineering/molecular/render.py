@@ -14,6 +14,8 @@ from mpl_toolkits.mplot3d.art3d import Line3DCollection
 import numpy as np
 from openmm.app import PDBFile
 
+RENDER_SOURCE = Path(__file__).read_bytes()
+
 
 def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -27,9 +29,18 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
     indices = data["atom_indices"]
     times = data["times_ps"]
     metrics = json.loads(Path(metrics_path).read_text())
+    receipt_path = Path(metrics_path).parent / "receipt.json"
+    receipt = json.loads(receipt_path.read_text())
+    run = next(item for item in receipt["runs"] if item["seed"] == seed)
     atoms = json.loads(Path(atoms_path).read_text())
     lookup = {int(index): i for i, index in enumerate(indices)}
     assert len(frames) == len(metrics) == len(times) and np.isfinite(frames).all()
+    if not np.allclose(
+        times, [item["time_ps"] for item in metrics], rtol=0, atol=1e-12
+    ):
+        raise ValueError("Trajectory and metric times differ")
+    if not np.isclose(float(times[-1]), run["production_ps"]):
+        raise ValueError("Trajectory and simulation receipt duration differ")
     pdb = PDBFile(str(prepared_pdb))
     bonds = [
         (lookup[a.index], lookup[b.index])
@@ -84,6 +95,8 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
         radius = max(bounds[dim] * 0.58, 0.9)
         setter(middle[dim] - radius, middle[dim] + radius)
     ax.set_box_aspect((max(bounds[0], 1), max(bounds[1], 1.8), max(bounds[2], 1.8)))
+    ax.set_yticks([-0.5, 0, 0.5])
+    ax.set_zticks([-0.5, 0, 0.5])
     ax.view_init(elev=15, azim=-70)
     ax.set_xlabel("nm")
     ax.set_ylabel("nm")
@@ -115,8 +128,7 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
     fig.text(
         0.05,
         0.04,
-        "CPU setup trajectory · ff14SB / explicit TIP3P · 300 K target · 1 fs timestep · seed "
-        + str(seed),
+        f"{run['backend']} short trajectory · ff14SB / explicit TIP3P · 300 K target · 1 fs timestep · seed {seed}",
         fontsize=11,
     )
     fig.text(
@@ -127,7 +139,7 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
         color="#555",
     )
     writer = FFMpegWriter(
-        fps=12, codec="libx264", extra_args=["-pix_fmt", "yuv420p", "-threads", "2"]
+        fps=12, codec="libx264", extra_args=["-pix_fmt", "yuv420p", "-threads", "1"]
     )
     with writer.saving(fig, str(out / "trajectory.mp4"), 100):
         for k, frame in enumerate(aligned):
@@ -144,6 +156,7 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
                 fig.savefig(out / "poster.png", dpi=100)
             writer.grab_frame()
     plt.close(fig)
+    (out / "producer-render.py").write_bytes(RENDER_SOURCE)
     manifest = {
         "schema": "frontier.molecular.render/1",
         "kind": "rendered from actual simulation states",
@@ -151,7 +164,12 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
         "metrics_sha256": sha(metrics_path),
         "atoms_sha256": sha(atoms_path),
         "topology_PDB_sha256": sha(prepared_pdb),
-        "render_code_sha256": sha(__file__),
+        "render_code_sha256": hashlib.sha256(RENDER_SOURCE).hexdigest(),
+        "simulation_receipt_sha256": sha(receipt_path),
+        "backend": run["backend"],
+        "seed": seed,
+        "preliminary_thermalization_ps": run["equilibration_ps"],
+        "coordinate_storage_dtype": str(frames.dtype),
         "frames": len(frames),
         "simulation_duration_ps": float(times[-1]),
         "display_fps": 12,
@@ -174,5 +192,6 @@ if __name__ == "__main__":
     p.add_argument("--atoms", default="artifacts/molecular/prepared/atoms.json")
     p.add_argument("--pdb", default="artifacts/molecular/prepared/prepared.pdb")
     p.add_argument("--output", default="artifacts/molecular/cpu-render")
+    p.add_argument("--seed", type=int, default=1731)
     a = p.parse_args()
-    render(a.trajectory, a.metrics, a.atoms, a.pdb, a.output)
+    render(a.trajectory, a.metrics, a.atoms, a.pdb, a.output, a.seed)

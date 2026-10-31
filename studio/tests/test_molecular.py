@@ -182,3 +182,134 @@ def test_exact_failed_state_diagnosis_preserves_h_and_demonstrates_precision():
     assert (
         report["CPU_force_vs_Reference_derivative_at_frozen_h_relative_error"] < 0.005
     )
+
+
+def test_descriptive_seed_analysis_and_render_retain_actual_backend_and_pins():
+    production = ROOT / "artifacts/molecular/cpu-trajectory-final"
+    analysis = json.loads(
+        (ROOT / "artifacts/molecular/cpu-analysis/ensemble.json").read_text()
+    )
+    assert analysis["descriptive_endpoint_CA_RMSD_nm"]["n_runs"] == 1
+    assert analysis["descriptive_endpoint_CA_RMSD_nm"]["sample_SD"] is None
+    assert analysis["biological_success_probability"] is None
+    assert analysis["empirical_accuracy"] == "unknown"
+    assert (
+        analysis["simulation_receipt_sha256"]
+        == hashlib.sha256((production / "receipt.json").read_bytes()).hexdigest()
+    )
+    render = ROOT / "artifacts/molecular/cpu-render"
+    receipt = json.loads((render / "render.json").read_text())
+    assert receipt["backend"] == "CPU"
+    assert receipt["preliminary_thermalization_ps"] == 0.1
+    assert receipt["coordinate_storage_dtype"] == "float32"
+    assert (
+        receipt["render_code_sha256"]
+        == hashlib.sha256((render / "producer-render.py").read_bytes()).hexdigest()
+    )
+    for name, digest in receipt["outputs"].items():
+        assert hashlib.sha256((render / name).read_bytes()).hexdigest() == digest
+
+
+def test_actual_cuda_result_three_nonempty_pinned_runs_and_backend_parity():
+    folder = ROOT / "artifacts/molecular/cuda-v2"
+    receipt = json.loads((folder / "production/receipt.json").read_text())
+    assert len(receipt["runs"]) == 3
+    assert {run["seed"] for run in receipt["runs"]} == {1731, 1732, 1733}
+    assert all(
+        run["backend"] == "CUDA"
+        and run["production_ps"] == 100
+        and run["frames"] == 101
+        for run in receipt["runs"]
+    )
+    assert all(
+        "H100" in run["platform_properties"]["DeviceName"] for run in receipt["runs"]
+    )
+    for name, digest in receipt["files"].items():
+        assert (
+            hashlib.sha256((folder / "production" / name).read_bytes()).hexdigest()
+            == digest
+        )
+    parity = json.loads((folder / "cpu-cuda-parity.json").read_text())
+    assert parity["passed"]
+    assert parity["energy_abs_difference_kJ_mol_per_atom"] < 0.01
+    assert parity["force_relative_L2_difference"] < 0.002
+    summary = json.loads(
+        (ROOT / "artifacts/molecular/cuda-analysis/ensemble.json").read_text()
+    )
+    assert summary["descriptive_endpoint_CA_RMSD_nm"]["n_runs"] == 3
+    assert summary["descriptive_endpoint_CA_RMSD_nm"]["sample_SD"] > 0
+    assert summary["biological_success_probability"] is None
+
+
+def test_molecular_assurance_keeps_empirical_and_functional_robustness_unknown():
+    assurance = json.loads(
+        (ROOT / "artifacts/molecular/design-assurance.json").read_text()
+    )
+    assert assurance["vector"]["numerical_fidelity"]["status"] == "checked_in_scope"
+    for name in ("empirical_validation", "cross_scale_transfer", "ensemble_robustness"):
+        assert assurance["vector"][name]["status"] == "unknown"
+    assert assurance["biological_success_probability"] is None
+    for axis in assurance["vector"].values():
+        for item in axis["evidence"]:
+            assert (
+                hashlib.sha256((ROOT / item["path"]).read_bytes()).hexdigest()
+                == item["sha256"]
+            )
+
+
+def test_continuation_protocol_preserves_parent_states_and_declares_new_rng():
+    import tarfile
+
+    protocol = json.loads(
+        (ROOT / "artifacts/molecular/continuation-protocol.json").read_text()
+    )
+    archive = ROOT / "artifacts/molecular/warmstart-v3.tar.xz"
+    assert (
+        hashlib.sha256(archive.read_bytes()).hexdigest() == protocol["warmstart_sha256"]
+    )
+    assert protocol["additional_production_steps"] == 900000
+    assert protocol["minimize"] is False and protocol["reset_velocities"] is False
+    assert protocol["extra_thermalization_steps"] == 0
+    assert len(protocol["branches"]) == 3
+    with tarfile.open(archive) as tar:
+        manifest = json.load(tar.extractfile("warmstart-files.json"))
+        for name, digest in manifest["files"].items():
+            assert hashlib.sha256(tar.extractfile(name).read()).hexdigest() == digest
+        for branch in protocol["branches"]:
+            assert branch["new_thermostat_seed"] != branch["source_seed"]
+            assert (
+                hashlib.sha256(tar.extractfile(branch["state_path"]).read()).hexdigest()
+                == branch["state_sha256"]
+            )
+
+
+def test_continuation_window_drift_diagnostic_keeps_negative_outcome():
+    from engineering.molecular.continuation import small_window_drift
+
+    protocol = json.loads(
+        (ROOT / "artifacts/molecular/continuation-protocol.json").read_text()
+    )
+    # Synthetic software fixture for the reporting rule, never a measured series.
+    metrics = [
+        {
+            "global_production_time_ps": t,
+            "CA_RMSD_from_original_production_start_nm": 0.1,
+            "CA_geometric_Rg_nm": 2.3,
+        }
+        for t in (600, 650, 700, 750, 800, 850, 900, 950, 1000)
+    ]
+    assert small_window_drift(metrics, protocol)["small_window_drift"]
+    changed = [
+        {
+            **m,
+            "CA_RMSD_from_original_production_start_nm": 0.3
+            if m["global_production_time_ps"] >= 850
+            else 0.1,
+        }
+        for m in metrics
+    ]
+    assert not small_window_drift(changed, protocol)["small_window_drift"]
+    assert (
+        "does not establish equilibrium"
+        in small_window_drift(metrics, protocol)["meaning"]
+    )

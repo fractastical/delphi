@@ -2,18 +2,18 @@
   "schema": "frontier.model.interface/1",
   "model_id": "collagen_mimetic_md",
   "name": "Collagen-mimetic atomistic MD (computed)",
-  "engine": "OpenMM8.4 CPU",
+  "engine": "OpenMM8.4 CPU and H100 CUDA mixed precision",
   "status": "implemented",
   "reference": {
     "repo": "kganjam/delphi-frontier",
     "branch": "work/multiscale-md",
-    "commit": "5a4b6fa",
-    "path": "artifacts/molecular/protocol.json,artifacts/molecular/cpu-trajectory-final/producer-run.py",
+    "commit": "31e6c23",
+    "path": "artifacts/molecular/protocol-reference-oracle.json,engineering/molecular/run.py",
     "files": {
-      "artifacts/molecular/protocol.json": "e888b7ef0d50407cc91f48f18e62f90e06a7f7dc3855d8c351b06f1a16e8828b",
-      "artifacts/molecular/cpu-trajectory-final/producer-run.py": "b7feb160ed410abf0b181ee677730f46bf5d1257e88e3c9b0ae4bd2c51d025d3"
+      "artifacts/molecular/protocol-reference-oracle.json": "945cd8f81926a234c2ff9f817784e70e38754c10eecba83385d2d4e434409da6",
+      "engineering/molecular/run.py": "f8f7cc34306bd92c8ddbde32a57b7b6d16a40b8810c97783874e9adb12d47a0d"
     },
-    "source_sha256": "5efd2d38607201d0262e6b1cdabd302685b1564c7b7bcaad26ad1fbe408b4fc7"
+    "source_sha256": "9bc3ddebc05fb28ce3ea84418057d3622972e84809ce2fa39360a9524b95476e"
   },
   "ports": [
     {
@@ -28,10 +28,10 @@
         "s": 0
       },
       "scale": "molecular",
-      "regime": "300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim",
-      "context": "Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only",
+      "regime": "300K target; CUDA 10ps preliminary thermalization +100ps production per seed; no equilibrium claim",
+      "context": "Synthetic 1K6F collagen mimetic; 87 residues; ff14SB/TIP3P; CPU setup and three CUDA 100ps trajectories",
       "provenance": {
-        "source": "Actual saved OpenMM CPU trajectory metrics and exact source snapshot",
+        "source": "Actual saved OpenMM CPU/CUDA trajectory metrics, exact source and input pins",
         "status": "simulated",
         "read_level": "file"
       },
@@ -50,10 +50,10 @@
         "s": 0
       },
       "scale": "molecular",
-      "regime": "300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim",
-      "context": "Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only",
+      "regime": "300K target; CUDA 10ps preliminary thermalization +100ps production per seed; no equilibrium claim",
+      "context": "Synthetic 1K6F collagen mimetic; 87 residues; ff14SB/TIP3P; CPU setup and three CUDA 100ps trajectories",
       "provenance": {
-        "source": "Actual saved OpenMM CPU trajectory metrics and exact source snapshot",
+        "source": "Actual saved OpenMM CPU/CUDA trajectory metrics, exact source and input pins",
         "status": "simulated",
         "read_level": "file"
       },
@@ -64,15 +64,17 @@
   "timescale": {
     "kind": "unknown",
     "seconds": null,
-    "source": "0.2ps trajectory duration is not a physical relaxation-time estimate"
+    "source": "100ps trajectory duration is not a physical relaxation-time estimate"
   },
   "run": {
-    "receipt": "artifacts/molecular/cpu-trajectory-final/receipt.json",
-    "protocol": "artifacts/molecular/protocol.json",
-    "controls": "artifacts/molecular/cpu-controls/controls.json",
+    "receipt": "artifacts/molecular/cuda-v2/production/receipt.json",
+    "protocol": "artifacts/molecular/protocol-reference-oracle.json",
+    "controls": "artifacts/molecular/cuda-v2/cpu-controls/controls.json",
+    "CPU_CUDA_parity": "artifacts/molecular/cuda-v2/cpu-cuda-parity.json",
+    "seed_variation": "artifacts/molecular/cuda-analysis/ensemble.json",
     "measured_biological_data": null
   },
-  "scope": "Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only",
+  "scope": "Synthetic 1K6F collagen mimetic; 87 residues; ff14SB/TIP3P; CPU setup and three CUDA 100ps trajectories",
   "not_established": [
     "native fish collagen sequence",
     "equilibrated conformational ensemble",
