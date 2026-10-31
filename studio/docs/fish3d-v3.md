@@ -108,6 +108,11 @@ The appearance options never enter `candidate.json`, so the geometry hash is the
 `preview-<option>.png` gives top, side and three-quarter views, flat-shaded with matplotlib from the exported
 triangles in about 10 s. No path tracing was done.
 
+## Printable props
+Display props of v3a and v3b are in `artifacts/print-v3/` (`docs/printing.md`, "v3 ray-fan display props"). They are
+at display scale 0.55, with thickened membranes and rays, a rounded fin rim and fused scale relief. They are built
+from these candidates' exact hashes and never replace them: flow and the fin-ray adapter keep the 1:1 files.
+
 ## Not claimed
 - Aerodynamic or hydrodynamic validity, or measured fin stiffness.
 - A validated pigment-pattern map.
