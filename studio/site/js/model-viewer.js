@@ -14,6 +14,7 @@
 // matched by name to components.json, and nodes without a record are shown as having none.
 // The expected sha256 comes from opts/variant, the variant's appearance JSON, render.json or
 // build.json (in that order); if none records one the status says "hash not recorded".
+// Metadata files are dispatched from the variant schema and never probed (see metadataFor).
 // three.js 0.170.0 is vendored (site/vendor/three/VENDOR.json).  All data text uses textContent.
 
 const THREE_URL = new URL("../vendor/three/lib/three.module.js", import.meta.url).href;
@@ -31,15 +32,12 @@ const el = (tag, cls, text) => {
   if (text != null) e.textContent = text;
   return e;
 };
-const fetchJson = async (url, optional = false) => {
-  try {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`);
-    return await r.json();
-  } catch (e) {
-    if (optional) return null;
-    throw e;
-  }
+// Every file the viewer fetches is one the variant's schema declares, so a declared file that fails is a
+// build error and says so; nothing is probed for existence (probes show up as console 404s).
+const fetchJson = async (url) => {
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`${url}: HTTP ${r.status}`);
+  return r.json();
 };
 const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 const short = (v) => {
@@ -356,6 +354,19 @@ export function mountFishViewer(host, opts = {}) {
     canvas.addEventListener("webglcontextlost", (e) => { e.preventDefault(); fallback("WebGL context lost"); });
   }
 
+  // Which metadata files exist for this candidate, from the variant schema (never probed):
+  //   v.metadata / opts.metadata  {components, render, candidate, build}: relative paths; an omitted key is absent. Wins.
+  //   a variant with `appearance`  -> v3 layout: components.json, candidate.json, build.json (no render.json)
+  //   a variant without            -> print/N1 layout: components.json, render/render.json
+  // Candidate-level files are read once, from the first variant. A site builder that copies a different set should
+  // pass `metadata` built from what it actually copied.
+  function metadataFor(v) {
+    const m = v.metadata || opts.metadata;
+    if (m) return { components: m.components || null, render: m.render || null, candidate: m.candidate || null, build: m.build || null };
+    return v.appearance ? { components: "components.json", candidate: "candidate.json", build: "build.json", render: null }
+      : { components: "components.json", render: "render/render.json", candidate: null, build: null };
+  }
+
   // expected sha256 of this variant's GLB, and where it was recorded
   function expectedHash(v) {
     if (v.expectedSha256) return [v.expectedSha256, "variant option"];
@@ -430,7 +441,7 @@ export function mountFishViewer(host, opts = {}) {
   async function loadVariant(v, T, GLTFLoader) {
     const t0 = performance.now(); S.perf = { _t0: t0 };
     S.variant = v.id; S.hashChecked = null; S.hashSource = null;
-    ctx.appearance = v.appearance ? await fetchJson(base + v.appearance, true) : null;
+    ctx.appearance = v.appearance ? await fetchJson(base + v.appearance) : null;
     const glbBuf = await fetch(base + v.glb).then((r) => { if (!r.ok) throw new Error(`${v.glb}: HTTP ${r.status}`); return r.arrayBuffer(); });
     S.perf.fetch_ms = ms(t0);
     const [want, src] = expectedHash(v);
@@ -510,9 +521,8 @@ export function mountFishViewer(host, opts = {}) {
       const [T, { GLTFLoader }, { OrbitControls }] = await Promise.all([import(THREE_URL), import(GLTF_URL), import(ORBIT_URL)]);
       three = T; libs = { T, GLTFLoader };
       const v = variants[0];
-      const [cj, rj, cand, bj] = await Promise.all([
-        fetchJson(base + "components.json", true), fetchJson(base + "render/render.json", true),
-        fetchJson(base + "candidate.json", true), fetchJson(base + "build.json", true)]);
+      const md = metadataFor(v), get = (rel) => (rel ? fetchJson(base + rel) : null);
+      const [cj, rj, cand, bj] = await Promise.all([get(md.components), get(md.render), get(md.candidate), get(md.build)]);
       comps = (cj && cj.components) || {};
       ctx = { ...ctx, render: rj, candidate: cand, build: bj };
       const got = await loadVariant(v, T, GLTFLoader);

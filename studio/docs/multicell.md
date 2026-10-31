@@ -90,3 +90,13 @@ the remote frame-less arms took ~50 s each by infra's report.
 Still true: generic example, NOT calibrated to fish or any tissue, units are the example's own, no dimensional ports, no comparison
 to data, "cells" are model cells, not a growth measurement. `engineering/multicell/analyze_full.py` produced `cell_count.png` (a real
 trajectory of the logged cell counts, log scale).
+
+### Full-horizon chart video (not a spatial movie)
+`artifacts/multicell/full/full_horizon_chart.mp4` (100 frames, 12 fps, 8.3 s) plots, as t advances to 2.0, the logged cell count
+(log), mean CDK1 per cell and mean `g_l` per cell for the three arms. Rendered by `engineering/multicell/render_full.py` from the
+returned `logger.csv` only, with one worker under the 1 CPU scope (38 s). It draws **no cell shapes or fields**: the remote run
+saved no spatial frames. It is distinct from the earlier `{baseline,nofeedback,seed2}.mp4`, which are real spatial frames but
+**partial (t<=0.46)**. I looked at the last frame. Visible in the data: the feedback-off CDK1 oscillation stays regular, the
+feedback-on one speeds up then damps after ~t=1.5 as the count levels off near 256; I did not investigate why (crowding under the
+volume/division condition is a guess, untested). The feedback-off `g_l` curve is still simulated and logged but is multiplied by 0
+in the CDK1 equation, so it does not act on the cell cycle. Mean values are plain averages over cells at each logged time.

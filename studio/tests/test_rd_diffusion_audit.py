@@ -1,12 +1,18 @@
 """Tests for the post-run tools (exact W1, fail-closed audit, strict JSON). Fixtures are CODE-BUILT SOFTWARE FIXTURES, not results of any model or solver."""
 
 import json
+import os
+import subprocess
+import sys
+from pathlib import Path
 
 import numpy as np
 import pytest
 
 from engineering.rd_diffusion import audit_result as AU
 from engineering.rd_diffusion.exact_w1 import exact_w1
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_exact_w1_hand_worked():
@@ -34,8 +40,10 @@ def test_the_frozen_w1_is_an_approximation_that_differs_on_the_review_counterexa
 
     n = 64
     sign = np.where(np.arange(n) % 2 == 0, 1.0, -1.0)
+
     def field(amp):
         return np.stack([amp * sign, np.ones(n)])  # std of u over x equals amp
+
     sol = np.stack([field(1.0)] * 32)
     gen = np.stack([field(0.0)] * 31 + [field(32.0)])
     frozen = R.ens_metrics(gen, sol, R.dct_matrix(n))["amp_w1_rel"]
@@ -72,3 +80,84 @@ def test_secondary_json_is_strict(tmp_path):
         and out["b"][1] == 1.0
     )
     json.dumps(out, allow_nan=False, default=lambda o: o.item())
+
+
+def test_secondary_stratification_uses_the_registered_amplitude_gate():
+    from engineering.rd_diffusion import secondary_eval as SE
+
+    def row(m):
+        return {
+            k: {"mode_tv": m, "amp_w1_rel": m, "amp_w1_exact_rel": m}
+            for k in SE.METHODS
+        }
+
+    n = 16
+    u_hi = np.cos(np.pi * (np.arange(n) + 0.5) / n)  # std ~0.707
+    fields = np.zeros((3, 2, 1, 2, n))  # 3 conditions, 2 solver runs, 1 tau
+    fields[0, :, 0, 0] = u_hi
+    fields[1, :, 0, 0] = 1e-6 * u_hi  # below the 1e-3 gate
+    fields[2, :, 0, 0] = u_hi  # failed: excluded
+    failed = np.array([[False, False], [False, False], [True, True]])
+    out = SE.stratify([row(0.1), row(0.9), row(0.5)], fields, failed, 1)
+    assert (
+        out["gate_std_u"] == 1e-3
+        and out["patterned"]["n_conditions"] == 1
+        and out["near_uniform"]["n_conditions"] == 1
+    )
+    assert out["patterned"]["ddpm"]["mode_tv"] == pytest.approx(0.1) and out[
+        "near_uniform"
+    ]["ddpm"]["mode_tv"] == pytest.approx(0.9)
+    empty = SE.stratify([row(0.1)], fields[:1] * 0 + 1, np.array([[True, True]]), 1)
+    assert (
+        empty["patterned"]["n_conditions"] == 0
+        and empty["patterned"]["ddpm"]["mode_tv"] is None
+    )
+
+
+def test_secondary_policy_matches_infras_recorded_explicit_fp32_policy_and_refuses_default(
+    tmp_path,
+):
+    from engineering.rd_diffusion import secondary_eval as SE
+
+    assert SE.POLICY == {
+        "NVIDIA_TF32_OVERRIDE": "0",
+        "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": "0",
+        "torch.backends.cuda.matmul.allow_tf32": False,
+        "torch.backends.cudnn.allow_tf32": False,
+        "torch.set_float32_matmul_precision": "highest",
+    }
+    r = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "engineering/rd_diffusion/secondary_eval.py"),
+            "--ckpt",
+            "x",
+            "--out",
+            str(tmp_path),
+        ],
+        capture_output=True,
+        text=True,
+        env={**os.environ, "NVIDIA_TF32_OVERRIDE": "1"},
+    )
+    assert r.returncode != 0 and "numerical policy mismatch" in (
+        r.stderr + r.stdout
+    )  # default/other policy: refused, not merely recorded
+
+
+def test_launcher_sets_the_policy_before_torch_and_refuses_if_torch_is_already_loaded():
+    code = (
+        "import sys; sys.argv=['x']; sys.path.insert(0, %r); import launch_secondary as L; import torch; L.main(['x','control'])"
+        % str(ROOT / "engineering/rd_diffusion")
+    )
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    assert r.returncode != 0 and "imported before" in (r.stderr + r.stdout)
+    probe = (
+        "import os, sys; sys.path.insert(0, %r); import launch_secondary as L; os.environ.update(L.ENV); import torch; torch.backends.cudnn.allow_tf32=False; print(os.environ['NVIDIA_TF32_OVERRIDE'], L.ENV)"
+        % str(ROOT / "engineering/rd_diffusion")
+    )
+    assert (
+        "0"
+        in subprocess.run(
+            [sys.executable, "-c", probe], capture_output=True, text=True
+        ).stdout
+    )
