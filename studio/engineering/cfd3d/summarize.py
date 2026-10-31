@@ -62,7 +62,9 @@ def main(root: Path, out: Path, ids: list[str]) -> dict:
             d = abs(cb - ca) / abs(cb)
             pairs.append({"Re_L": re_, "coarse": a, "fine": b, "Cd_coarse": ca, "Cd_fine": cb, "rel_diff": d,
                           "grid_rule_met": d <= 0.10,
-                          "reading": "pair within 10%" if d <= 0.10 else "NOT grid-independent: no force claim"})
+                          "reading": "pair within 10%" if d <= 0.10 else "NOT grid-independent: no force claim",
+                          "physical_force_claim": False,
+                          "why_no_claim": "C1 sphere reference gate FAILED; fins sub-grid; low-Re numerical demo"})
     s = {"schema": "cfd3d-summary-0.1", "cases": cases, "grid_pairs": pairs}
     out.write_text(json.dumps(s, indent=1))
     return s

@@ -22,6 +22,7 @@ Single reader, not Codex-reviewed. Branch `work/cfd3d`.
 | `engineering/cfd3d/render.py` | video from the actual solver slices (no interpolated frames) |
 | `engineering/cfd3d/summarize.py` | grid pairs, time-window stationarity, simulated vs intended Reynolds regime |
 | `engineering/cfd3d/gpu_entry.py`, `cfd3d_launch.py`, `build_packet.py`, `packet.json` | portable GPU packet (infra dispatches) |
+| `engineering/cfd3d/vlm.py`, `gates_vlm.json` | thin-surface vortex lattice for the v3 paired fins (CPU), analytic controls V1–V6 |
 | `tests/test_cfd3d.py` | packet/artifact/summary checks (no solver run) |
 
 ## Results so far (CPU, this host, measured)
@@ -40,6 +41,60 @@ Single reader, not Codex-reviewed. Branch `work/cfd3d`.
   - An L 32 re-run reproduced the coefficients exactly.
 - **Sign.** WaterLily's `pressure_force` is +∑ p·n·ds with an outward n (force on the fluid). Reported
   coefficients are body forces (−F).
+
+## GPU results (infra job `aijob-e00k0jpm34h4na3b99`, H100, packet `5af94b3f`, rc 0, complete)
+Curated in `artifacts/cfd3d/gpu-v1/` with `receipt.json`. The transport hash was re-derived here from job.log
+(1,855,111 B, `30b9fe61…`), and the 48 files are byte-identical to infra's raw copy. The candidate is `4a3b912e`
+(v1 fish, fish3d `994aac4`).
+- **Platform gates.**
+  - CPU D8 equals its pin exactly.
+  - CUDA D8/D16 match the CPU pins to 8e-6 / 2.4e-5 (relative): model behaviour reproduced, nothing more.
+- **C1 sphere Re 100 stays FAILED.** |Cd| against 1.092 (recalled):
+  - standard domain: 0.857 / 0.875 / 0.918 at D 8/16/32;
+  - big domain: 0.839 (D 16) and 0.881 (D 32).
+  - Resolution raises |Cd| by ~5% per doubling, and blockage adds ~4% at D 32. The bias is unexplained.
+- **Fish, Cd_total on L_ref²** (`summary-gpu-v1.json`; all stationary within 0.2%):
+  - Re 200: 0.1008 (L64) and 0.0890 (L128). The pair differs by 13.2%, so it is not grid-independent.
+    Including the CPU cases, the sequence is 0.175 / 0.137 / 0.101 / 0.089 for L 24/32/64/128, roughly
+    first-order.
+  - Re 1000: 0.0403 (L128) and 0.0367 (L192), 9.8%. That is inside the 10% rule but **not** grid independence
+    of a fixed body: the fin shells are a fixed 1.866 cells half-thick, so the simulated fins thin from 6.7 to
+    4.5 mm as h shrinks.
+  - **No physical force claim in either case** (C1 FAIL, sub-grid fins).
+- **Surface-pressure closure fails.**
+  - Summing the surface Cp rows recovers only 0.10 (L32) / 0.20 (L128) of the solver's own pressure force.
+  - Body Cp_max is about 0.6, where stagnation should give about 1.
+  - The rows are sampled 2–2.9 cells off the wall: attenuated near-wall values, not wall pressures.
+  - Use them as a qualitative distribution only. A future packet must extrapolate to the wall and pass a
+    frozen closure gate.
+- **Videos.** `gpu_fish_L128_Re1000` and `gpu_fish_L192_Re1000` `render/flow.mp4` are from actual solver
+  slices. Their captions carry the hash, sub-grid fins, low-Re and C1 FAILED.
+
+## v3 paired fins: thin-surface VLM (CPU, `engineering/cfd3d/vlm.py`)
+- **Why VLM.** The v3 membrane (0.10 mm) is 0.06–0.11 cells at L 128–256, and 2 cells would need
+  L ≥ 4,614, so no WaterLily grid here resolves it. The VLM treats pectoral_L/R and pelvic_L/R as
+  zero-thickness lifting surfaces. That is the approximation, not a resolution: inviscid, attached flow,
+  Re-independent, no body, median fins left out.
+- **Gates.** Frozen in `gates_vlm.json` (`1719b7d`) before the code existed. V1–V6 all PASS
+  (`artifacts/cfd3d/vlm/controls.json`):
+  - Helmbold, AR 6: 1.3%;
+  - lifting line, AR 20: 0.08%;
+  - refinement: 0.36%;
+  - camber: 1.1%;
+  - mutant fails;
+  - mirror symmetry to 3e-16.
+- **Transfer to claude-05's `panels.json` quads.** Panel force is split by sampled overlap area, so the vector
+  sum is conserved to 1e-15. Quad dCp is the normal component. A pressure-only (membrane) load misses the
+  tangential, suction part: about 7% of gross at 4° and 15% at 8°.
+- **v3a and v3c** (48×16 lattice; at 72×24, CL changes 0.5% / 2.9% and pectoral quad dCp 5.1% / 8.3% RMS):
+  - paired-fin CL on own area at 4°: 0.248 / 0.251; at 8°: 0.494 / 0.501;
+  - area 52.9 / 67.7 cm²;
+  - lift at 16 m/s in air (assumed speed): 0.20 / 0.26 N.
+- **v3b does NOT converge.** CL at 0° goes −0.070 / +0.007 / +0.072 at 24×8 / 36×12 / 48×16 with either
+  normal rule, while the input slope stays fixed. Its quad normals tilt up to 19° from the fin plane. No v3b
+  lift is claimed. Geometry only: its pectoral mid-surface rises 3.55° toward the tail.
+- **Regimes.** dCp converts to Pa per medium as dCp × ½ρU², tabled in each `vlm.json` (air 10/16/20 m/s;
+  water 5/10 m/s, assumed). Applicability at glide Re_c 2–4×10⁴ assumes attached flow, which is untested here.
 
 ## Limits that decide every reading
 1. **Fins are sub-grid.** Plates are 0.5 mm, while h is 7.2 mm at L 32 and 0.9 mm at L 256. A fin needs

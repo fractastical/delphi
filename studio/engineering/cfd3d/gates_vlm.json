@@ -1,0 +1,27 @@
+{
+  "schema": "cfd3d-vlm-gates-0.1",
+  "frozen_note": "Written before vlm.py existed or ran. Thresholds are never changed after a result; a FAIL is kept.",
+  "method": "steady horseshoe vortex-lattice method (Katz & Plotkin, Low-Speed Aerodynamics, 2nd ed., ch. 12; recalled, not re-read here): bound vortex on each panel's 1/4-chord, collocation at 3/4-chord, trailing legs to infinity along the free stream, camber through the boundary-condition normal, Kutta-Joukowski force per bound segment",
+  "validity": "inviscid, attached flow, small angle of attack, thin lifting surface; no thickness, no viscosity, no separation, no free surface; Reynolds-number independent",
+  "controls": {
+    "V1_elliptic_AR6": {"what": "flat elliptic wing AR 6 at 4 deg, 12 chordwise x 40 spanwise (cosine)",
+      "reference": "Helmbold CL_alpha = 2 pi A / (2 + sqrt(A^2 + 4)) = 4.528 /rad (recalled)", "pass": {"rel_err_max": 0.03}},
+    "V2_elliptic_AR20": {"what": "flat elliptic wing AR 20 at 4 deg",
+      "reference": "lifting line CL_alpha = 2 pi A / (A + 2) = 5.712 /rad (recalled)", "pass": {"rel_err_max": 0.03}},
+    "V3_refinement": {"what": "V1 with panels doubled each way", "pass": {"rel_change_max": 0.01}},
+    "V4_camber": {"what": "rectangular AR 20 wing at 0 deg with parabolic camber 4% (via BC normals)",
+      "reference": "thin-airfoil zero-lift angle -2 m rad, so CL(0) = CL_alpha * 2 m with CL_alpha from the same wing at 4 deg",
+      "pass": {"rel_err_max": 0.05}},
+    "V5_mutant_collocation_quarter_chord": {"what": "V1 with collocation moved to 1/4 chord (wrong rule)", "pass": {"must_fail_V1": true}},
+    "V6_symmetry": {"what": "left/right mirror fins at 0 sideslip", "pass": {"abs_side_force_over_lift_max": 1e-9}}
+  },
+  "fish_rules": {
+    "geometry": "fish3d-v3 panels.json (membrane mid-surface) from 8dc5cc4; candidate_sha256 checked against components.json",
+    "lifting_surfaces": "pectoral_L/R and pelvic_L/R only; median fins (dorsal, anal, caudal) carry no lift at zero sideslip and are left out, stated",
+    "body": "not modelled: isolated fins, no wing-body carry-over; stated beside every number",
+    "angle_of_attack_deg": [0, 4, 8],
+    "aoa_limit": "results above 8 deg are not produced: a thin plate at Re ~1e5 separates; VLM would over-predict",
+    "membrane_thickness_rule": "membrane 0.10 mm and rays 0.60 mm are below any 3-D grid here; VLM treats the fin as a zero-thickness surface, which is the approximation, not a resolution of the membrane",
+    "output": "per claude-07 quad: dCp = Cp_lower - Cp_upper along the upper normal, area, normal, candidate_sha256"
+  }
+}
