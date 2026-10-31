@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/levin-2024-anthrobots-07> a delphi:Claim ;
+    rdfs:label "Anthrobot motility onset follows a sigmoidal time course peaking around day 10" ;
+    dct:description "After release from the matrix, the number of motile Anthrobots rises along a sigmoidal curve over three weeks, with the largest change in motility on day 10, and this rise reflects a morphological reorganization that exposes cilia on the surface." ;
+    delphi:context "Gumuskaya G, Srivastava P, Cooper BG, Lesser H, Semegran B, Garnier S, Levin M, “Motile Living Biobots Self-Construct from Adult Human Somatic Progenitor Seed Cells”, Advanced science (Weinheim, Baden-Wurttemberg, Germany) (2024), doi:10.1002/advs.202303575; section “Results › Human Bronchial Epithelial Cells Self‐Construct into Multicellular Motile Living Architectures”. Scope: NHBE-derived Anthrobots in vitro, first 3 weeks after matrix dissolution" ;
+    dct:type "experimental-result" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <https://doi.org/10.1002/advs.202303575> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "To characterize the temporal dynamics of motility initiation, we periodically (every other day) counted the number of motile spheroids for 3 weeks following dissolution and observed a sigmoidal motility profile with peak change in motility on day 10 (Figure 1C)." ;
+    prov:wasQuotedFrom <https://doi.org/10.1002/advs.202303575> ;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-anthrobots.txt#line=29,30> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-anthrobots.txt#line=29,30> schema:isPartOf <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-anthrobots.txt> .
+
+  <https://doi.org/10.1002/advs.202303575> a schema:ScholarlyArticle ;
+    dct:title "Motile Living Biobots Self-Construct from Adult Human Somatic Progenitor Seed Cells" ;
+    dct:creator <http://www.wikidata.org/entity/Q39444955> ;
+    dct:bibliographicCitation "Gumuskaya G, Srivastava P, Cooper BG, Lesser H, Semegran B, Garnier S, Levin M. Motile Living Biobots Self-Construct from Adult Human Somatic Progenitor Seed Cells. Advanced science (Weinheim, Baden-Wurttemberg, Germany) (2024). doi:10.1002/advs.202303575" ;
+    dct:date "2024"^^xsd:gYear ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    schema:sameAs <https://europepmc.org/article/PMC/PMC10811512> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-anthrobots.txt> schema:about <https://doi.org/10.1002/advs.202303575> ;
+    prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10811512/fullTextXML> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "ba51e46dba97e1e292c405a16e688a318dc26009ea2b8fca3279582e9cd645a1" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-anthrobots.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci Levin papers claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Levin 2024 claim: Anthrobot motility onset follows a sigmoidal time course peaking around day 10" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2024-anthrobots-07> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+  <https://w3id.org/delphi/resource/domain/levin-papers> rdfs:label "levin-papers" .
+}

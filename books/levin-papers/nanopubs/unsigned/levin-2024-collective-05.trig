@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/levin-2024-collective-05> a delphi:Claim ;
+    rdfs:label "Targeting instructor-cell voltage converts tadpole melanocytes to a melanoma-like state" ;
+    dct:description "In Xenopus tadpoles, briefly targeting the bioelectric state of a small population of instructor cells (with a chloride channel activator or a GlyCl mutant), in the absence of carcinogens, oncogenes or DNA damage, converts melanocytes throughout the animal, including distant ones, into an over-proliferative, invasive melanoma-like phenotype via disruption of serotonergic signalling." ;
+    delphi:context "McMillen P, Levin M, “Collective intelligence: A unifying concept for integrating biology across scales and substrates”, Communications biology (2024), doi:10.1038/s42003-024-06037-4; section “Introduction › From normal melanocytes to a melanoma phenotype: a collective decision”. Scope: Xenopus laevis tadpoles" ;
+    dct:type "empirical-generalization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <https://doi.org/10.1038/s42003-024-06037-4> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "This could be achieved in the absence of classical carcinogens, oncogenes, or DNA damage, by brief exposure to chemical (chloride ion channel activator drug) or molecular-genetic (GlyCl mutant) targeting of the bioelectric state of a specific cell population: instructor cells which normally keep the melanocytes in their healthy state via serotonergic signaling118." ;
+    prov:wasQuotedFrom <https://doi.org/10.1038/s42003-024-06037-4> ;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt#line=40,41> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt#line=40,41> schema:isPartOf <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt> .
+
+  <https://doi.org/10.1038/s42003-024-06037-4> a schema:ScholarlyArticle ;
+    dct:title "Collective intelligence: A unifying concept for integrating biology across scales and substrates" ;
+    dct:creator <http://www.wikidata.org/entity/Q39444955> ;
+    dct:bibliographicCitation "McMillen P, Levin M. Collective intelligence: A unifying concept for integrating biology across scales and substrates. Communications biology (2024). doi:10.1038/s42003-024-06037-4" ;
+    dct:date "2024"^^xsd:gYear ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    schema:sameAs <https://europepmc.org/article/PMC/PMC10978875> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt> schema:about <https://doi.org/10.1038/s42003-024-06037-4> ;
+    prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10978875/fullTextXML> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "8f0e83775f3f814dbf827776d94a018c5bcdf1389e44e6be1b0678692278f8fd" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci Levin papers claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Levin 2024 claim: Targeting instructor-cell voltage converts tadpole melanocytes to a melanoma-like state" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2024-collective-05> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+  <https://w3id.org/delphi/resource/domain/levin-papers> rdfs:label "levin-papers" .
+}

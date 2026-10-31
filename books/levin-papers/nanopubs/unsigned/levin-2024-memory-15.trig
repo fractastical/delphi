@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/levin-2024-memory-15> a delphi:Claim ;
+    rdfs:label "Training associative memories may increase integration of composite systems" ;
+    dct:description "Levin proposes that memories belonging to a collective (e.g. a rat's lever–reward association, which no single cell experiences) may help reify the collective Self, and that training associative memories into gene regulatory networks should be tested for increases in integrated information (self-coherence)." ;
+    delphi:context "Levin M, “Self-Improvising Memory: A Perspective on Memories as Agential, Dynamically Reinterpreting Cognitive Glue”, Entropy (Basel, Switzerland) (2024), doi:10.3390/e26060481; section “7. A Continuum: From Thoughts to Thinkers”. Scope: Gene regulatory network models and other composite systems" ;
+    dct:type "prediction" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <https://doi.org/10.3390/e26060481> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "This is currently being investigated in the context of our training of associative memories into gene-regulatory networks and other substrates, with measures of integrated information to determine if the forming of memories increases the self-coherence of composite systems." ;
+    prov:wasQuotedFrom <https://doi.org/10.3390/e26060481> ;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-memory.txt#line=70,71> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-memory.txt#line=70,71> schema:isPartOf <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-memory.txt> .
+
+  <https://doi.org/10.3390/e26060481> a schema:ScholarlyArticle ;
+    dct:title "Self-Improvising Memory: A Perspective on Memories as Agential, Dynamically Reinterpreting Cognitive Glue" ;
+    dct:creator <http://www.wikidata.org/entity/Q39444955> ;
+    dct:bibliographicCitation "Levin M. Self-Improvising Memory: A Perspective on Memories as Agential, Dynamically Reinterpreting Cognitive Glue. Entropy (Basel, Switzerland) (2024). doi:10.3390/e26060481" ;
+    dct:date "2024"^^xsd:gYear ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    schema:sameAs <https://europepmc.org/article/PMC/PMC11203334> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-memory.txt> schema:about <https://doi.org/10.3390/e26060481> ;
+    prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11203334/fullTextXML> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "e7962aa9a30671bf549d2c45a2b5fca76c73bc97c6409eff2976e63c6bef3697" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-memory.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci Levin papers claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Levin 2024 claim: Training associative memories may increase integration of composite systems" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2024-memory-15> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+  <https://w3id.org/delphi/resource/domain/levin-papers> rdfs:label "levin-papers" .
+}

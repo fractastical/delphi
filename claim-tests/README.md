@@ -23,7 +23,9 @@ Projects: `darwin-origin`, `thompson-growth-form`, `wolfram-nks`, `levin-papers`
    standard tooling (`python3` with `requests`, `pandas`, `numpy`, `scipy`; or Node 20+) and
    reproduce `measured` in `result.json`.
 5. **Do not touch** the claim files, assessments or nanopubs, and never sign or publish
-   anything. Tests become evidence nanopubs later, through the normal test-then-production path.
+   anything. `node claim-tests/build-test-nanopubs.mjs [claim-id]` turns completed tests into
+   unsigned evidence nanopubs in `claim-tests/nanopubs/unsigned/`; signing and publishing follow
+   the normal test-then-production path and are a human decision.
 6. **Scope as stated.** Test the claim as the author stated it and within its stated scope
    (`delphi:context`). If a test is only possible after modern reinterpretation, say so in
    `interpretation`.
@@ -69,6 +71,25 @@ Projects: `darwin-origin`, `thompson-growth-form`, `wolfram-nks`, `levin-papers`
 }
 ```
 
+- `test_contract` (recommended; required for new tests): the four fields that make a test
+  auditable before it is run, separate from the prose:
+  ```json
+  "test_contract": {
+    "expected_observation": "What the data should show if the claim holds, as a measurable statement.",
+    "disconfirming_observation": "What the data would show if the claim is false. If nothing could, say so and mark the test not-operationalizable.",
+    "admissible_datasets": "Constraints a dataset must satisfy to count (scope, resolution, independence from the claim's source, licence), not a list of names.",
+    "inference_method": "How the observation is turned into a verdict: the statistic, the control or null it is compared with, and the threshold."
+  }
+  ```
+  `pass_criterion` and `fail_criterion` remain the pre-registered thresholds; the contract is
+  the general statement they instantiate. Where `test_contract` is absent, builders fall back to
+  `pass_criterion`, `fail_criterion`, `planned_datasets` and `method`. The contract is emitted on
+  the evidence nanopub and exposed as `testContract` by `delphi_search_claims` / `delphi_graph`.
+  (Fields proposed by hivefound on Moltbook, 2026-10-31.)
+- `revisions` (optional): never edit a completed verdict in place. Append
+  `{ date, from: {verdict, confidence, summary}, to: {...}, reason, null_result, prompted_by: [{agent, venue, comment, contribution}] }`
+  and update the top-level `verdict`/`confidence` to match the last entry. Each revision becomes a
+  `prov:Activity` on the evidence nanopub and the prompting agents become `dct:contributor`s.
 - `status`: `preregistered` | `complete` | `abandoned`.
 - `verdict`: `supports` | `refutes` | `inconclusive` | `mixed`. `inconclusive` carries `reason`:
   `data-unavailable`, `underpowered`, `not-operationalizable`, `other`.

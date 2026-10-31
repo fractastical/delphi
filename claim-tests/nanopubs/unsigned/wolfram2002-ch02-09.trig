@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch02-09--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch02-09: supports, confidence 0.97" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.97"^^xsd:double ;
+    delphi:hypothesis "Under the single local rule of elementary cellular automaton rule 110, random initial configurations settle into one dominant periodic background (the 'ether') while other finite configurations embedded in it evolve as persistent localized structures with several distinct, exactly periodic signatures (different velocities), so one rule produces qualitatively different kinds of collective behavior." ;
+    delphi:passCriterion "Pre-registered. (A) Background: there is a configuration on a 14-cell ring that rule 110 maps, after 7 steps, onto a rotation of itself (a spatially 14-periodic, temporally 7-periodic background), and in 20 independent random-initial-condition runs (density 0.5, cyclic lattice of 700 cells, 3000 steps) the mean fraction of cells whose 14-cell neighbourhood matches that background (any phase) over steps 1000-3000 is at least 0.50. (B) Structures: across the same runs, tracks of non-background cells that persist for at least 300 steps and are exactly periodic (the window around the track at time t equals the window at time t+p shifted by s cells, for 5 consecutive periods) exist with at least 3 distinct velocities s/p (pairwise differing by more than 0.05 cells/step). Both (A) and (B) must hold for 'supports'." ;
+    delphi:failCriterion "Pre-registered. 'Refutes' if no 7-step periodic 14-cell background exists or the mean background fraction is below 0.25, or if fewer than 2 distinct exactly periodic localized-structure velocities are found across all runs. Anything between (background fraction 0.25-0.50, or exactly 2 velocities) is 'mixed'." ;
+    delphi:expectedObservation "Pre-registered. (A) Background: there is a configuration on a 14-cell ring that rule 110 maps, after 7 steps, onto a rotation of itself (a spatially 14-periodic, temporally 7-periodic background), and in 20 independent random-initial-condition runs (density 0.5, cyclic lattice of 700 cells, 3000 steps) the mean fraction of cells whose 14-cell neighbourhood matches that background (any phase) over steps 1000-3000 is at least 0.50. (B) Structures: across the same runs, tracks of non-background cells that persist for at least 300 steps and are exactly periodic (the window around the track at time t equals the window at time t+p shifted by s cells, for 5 consecutive periods) exist with at least 3 distinct velocities s/p (pairwise differing by more than 0.05 cells/step). Both (A) and (B) must hold for 'supports'." ;
+    delphi:disconfirmingObservation "Pre-registered. 'Refutes' if no 7-step periodic 14-cell background exists or the mean background fraction is below 0.25, or if fewer than 2 distinct exactly periodic localized-structure velocities are found across all runs. Anything between (background fraction 0.25-0.50, or exactly 2 velocities) is 'mixed'." ;
+    delphi:admissibleDatasets "Planned datasets: eca-rule110-random-ic-generator" ;
+    delphi:inferenceMethod "analysis.py enumerates all 16384 configurations of a 14-cell ring under rule 110 and finds those that return to a rotation of themselves after 7 steps; the only non-uniform orbit (14 rotations of 00010011011111, shift 0 after 7 steps, basin 51.5% of ring states) is the ether. Twenty random initial conditions on a 700-cell ring are run for 3000 steps; a cell is 'background' when its 14-cell window equals one of the ether's window codes. Non-background cells are clustered (gap <= 3), clusters are linked across steps (centre moves <= 6 cells), and each track of >= 300 steps is tested for exact periodicity (window at t equals window at t+p shifted by s for 5 consecutive periods, p <= 60). Distinct rational velocities s/p differing by > 0.05 are counted." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py enumerates all 16384 configurations of a 14-cell ring under rule 110 and finds those that return to a rotation of themselves after 7 steps; the only non-uniform orbit (14 rotations of 00010011011111, shift 0 after 7 steps, basin 51.5% of ring states) is the ether. Twenty random initial conditions on a 700-cell ring are run for 3000 steps; a cell is 'background' when its 14-cell window equals one of the ether's window codes. Non-background cells are clustered (gap <= 3), clusters are linked across steps (centre moves <= 6 cells), and each track of >= 300 steps is tested for exact periodicity (window at t equals window at t+p shifted by s for 5 consecutive periods, p <= 60). Distinct rational velocities s/p differing by > 0.05 are counted." ;
+    rdfs:comment "Measured: 7 distinct localized-structure velocities (cells/step) (n = 143, exact (deterministic computation); background fraction range over runs 0.619-0.886). Interpretation: Wolfram's statement is read as an existence claim about rule 110 (his stated example): the same cell rule, applied to different local configurations, yields (i) a regular periodic background and (ii) several distinct localized structures. 'Regular background' is operationalized as a spatially and temporally periodic configuration; 'localized structure' as a bounded cluster of non-background cells that persists and is exactly periodic up to a shift, so that its velocity s/p is a rational number. Distinct velocities are taken as evidence of 'different kinds of behavior'. No reinterpretation beyond this is needed; the test is computational and the 'dataset' is generated by analysis.py." ;
+    delphi:evidenceAgainst "Background matching uses a 14-cell window, so cells within 13 cells of a structure are flagged as non-background; the 0.80 background fraction is therefore a lower bound." ;
+    delphi:evidenceAgainst "Tracks that collide or split are cut, so the 143 periodic tracks are a sample, not a census, of structures; the velocities found (2/3, -1/2, 0, 1/5, -4/15, -1/3, -1/9) coincide with Cook's gliders A, B, C, D, E, G, F but that catalogue was not used in the detection." ;
+    delphi:evidenceAgainst "The test covers rule 110 (Wolfram's stated example); the claim's general wording about cellular automata is supported only by this witness." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch02-09--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch02-09/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch02-09--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Elementary cellular automaton rule 110, random initial conditions (generated by analysis.py)" ;
+    dct:description "spacetime patterns in which background and localized structures are detected" ;
+
+    dct:license "CC0 (generated data)" ;
+    prov:wasDerivedFrom <null> .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch02-09> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch02-09--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch02-09/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (Claude Fable 5.1 (Cursor cloud agent); cursor/claim-tests-wolfram-nks-f0e1)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-cursor-cloud-agent> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-cursor-cloud-agent> a delphi:LanguageModel ;
+    dct:identifier "Claude Fable 5.1 (Cursor cloud agent)" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.461Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch02-09: supports, confidence 0.97" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch02-09--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

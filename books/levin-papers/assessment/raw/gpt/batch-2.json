@@ -1,0 +1,452 @@
+[
+  {
+    "claim_id": "levin-2018-hcn2-03",
+    "scores": {"operationalizability": 0.95, "data-existence": 0.35, "data-adequacy": 0.3, "discriminating-power": 0.85, "analysis-feasibility": 0.85},
+    "verdict": "partially-resolvable",
+    "confidence": 0.78,
+    "operationalization": "Reanalyse calibrated neural-plate voltage images and electrophysiology for nicotine-treated and control stage-15 embryos, estimate the treatment contrast in millivolts, and compare its confidence interval with the model's approximately 15 mV prediction.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus resource that can locate related experimental records and independent studies"}],
+    "obstacles": ["The paper does not identify an open repository containing embryo-level voltage measurements.", "A figure-level estimate is not an independent test."],
+    "rationale": "The variables and numerical decision criterion are direct, and a standard reanalysis would be decisive if embryo-level measurements were available. Publicly indexed Xenopus literature exists, but the batch provides no deposited raw voltage data, so only replication or restricted published measurements appear currently usable."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-04",
+    "scores": {"operationalizability": 0.72, "data-existence": 0.35, "data-adequacy": 0.28, "discriminating-power": 0.58, "analysis-feasibility": 0.72},
+    "verdict": "partially-resolvable",
+    "confidence": 0.7,
+    "operationalization": "Fit competing causal models linking nicotine exposure, neural-tube Vmem contrast, and later brain defects, and test whether disruption of Vmem mediates the exposure effect and whether restoring the contrast rescues morphology.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "index of Xenopus developmental and phenotype evidence relevant to nicotine and brain patterning"}, {"name": "BETSE", "url": "https://github.com/betsee/betse", "role": "public simulator for reproducing the proposed bioelectric mechanism"}],
+    "obstacles": ["A causal mediation test needs matched embryo-level voltage and morphology data.", "Nicotine has multiple endogenous targets."],
+    "rationale": "The mechanism has measurable intermediates and interventions, but model fit alone does not establish that Vmem disruption causes the defects. Existing public software and scattered experimental evidence can test parts of the chain, while the full matched dataset is not identified."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-05",
+    "scores": {"operationalizability": 0.88, "data-existence": 0.42, "data-adequacy": 0.35, "discriminating-power": 0.78, "analysis-feasibility": 0.74},
+    "verdict": "partially-resolvable",
+    "confidence": 0.76,
+    "operationalization": "Compare brain morphology, proliferation, apoptosis, and marker expression after independently reducing neural-tube hyperpolarization or hyperpolarizing lateral tissue, and test whether defect severity tracks spatial Vmem contrast rather than absolute voltage.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus phenotype and expression resource for relevant perturbation studies"}],
+    "obstacles": ["The required spatially targeted perturbations are scattered across studies.", "Absolute voltage and spatial contrast may be correlated."],
+    "rationale": "The contrast hypothesis is explicit and can be distinguished from absolute-voltage alternatives using reciprocal perturbations. Published studies may cover parts of this design, but no open, unified embryo-level dataset with all four readouts is identified."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-06",
+    "scores": {"operationalizability": 0.98, "data-existence": 0.82, "data-adequacy": 0.78, "discriminating-power": 0.92, "analysis-feasibility": 0.9},
+    "verdict": "resolvable-now",
+    "confidence": 0.86,
+    "operationalization": "Reimplement or rerun the specified BETSE neurula model with and without HCN2, sweep initial Vmem gradients, and test whether HCN2 activation steepens the neural-to-lateral voltage difference while leaving depolarized regions nearly unchanged.",
+    "candidate_datasets": [{"name": "BETSE", "url": "https://github.com/betsee/betse", "role": "public codebase for reproducing the simulation and testing parameter sensitivity"}],
+    "obstacles": ["Exact paper-specific configuration files may not be deposited.", "Results may depend on assumed HCN2 kinetics and ionic medium."],
+    "rationale": "This is a quantitative simulation claim with explicit channel behavior, geometry, and expected output. Public simulation software and the paper's parameter specification should permit reproduction and robustness testing within weeks."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-07",
+    "scores": {"operationalizability": 0.98, "data-existence": 0.82, "data-adequacy": 0.78, "discriminating-power": 0.92, "analysis-feasibility": 0.9},
+    "verdict": "resolvable-now",
+    "confidence": 0.86,
+    "operationalization": "Run the specified BETSE model under control, nicotine, HCN2, and nicotine-plus-HCN2 conditions and compare neural-tube versus lateral Vmem patterns; maintenance under combined treatment confirms the simulation result.",
+    "candidate_datasets": [{"name": "BETSE", "url": "https://github.com/betsee/betse", "role": "public codebase for reproducing the nicotine and HCN2 model conditions"}],
+    "obstacles": ["Paper-specific configuration files may need reconstruction from the supplement.", "Parameter uncertainty could permit multiple outcomes."],
+    "rationale": "The model conditions and predicted spatial voltage output make this directly computationally testable. Public BETSE code and published parameterization are likely adequate, although reconstructing an exact configuration may introduce uncertainty."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-08",
+    "scores": {"operationalizability": 0.97, "data-existence": 0.42, "data-adequacy": 0.38, "discriminating-power": 0.9, "analysis-feasibility": 0.86},
+    "verdict": "partially-resolvable",
+    "confidence": 0.8,
+    "operationalization": "Estimate the injected-versus-control neural Vmem difference from embryo-level calibrated measurements and reproduce the matching model condition, then test whether observed and predicted effects are near 15 and 30 mV respectively.",
+    "candidate_datasets": [{"name": "BETSE", "url": "https://github.com/betsee/betse", "role": "public simulator for reproducing the approximately 30 mV model prediction"}, {"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "index for locating related Xenopus HCN2 experimental evidence"}],
+    "obstacles": ["Raw voltage measurements are not linked to an open repository.", "The model side is more reproducible than the in-vivo side."],
+    "rationale": "The claimed discrepancy is numerically precise and the simulation can be rerun. The in-vivo estimate cannot be fully audited without embryo-level calibrated imaging or recordings, so present resources resolve only part of the comparison."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-09",
+    "scores": {"operationalizability": 0.95, "data-existence": 0.35, "data-adequacy": 0.3, "discriminating-power": 0.88, "analysis-feasibility": 0.84},
+    "verdict": "partially-resolvable",
+    "confidence": 0.78,
+    "operationalization": "Quantify calibrated spatial Vmem maps across control, nicotine, HCN2, and combined groups and test whether HCN2 restores the neural-to-lateral voltage contrast suppressed by nicotine.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus resource for locating independent or deposited evidence"}],
+    "obstacles": ["No open embryo-level voltage-image dataset is specified.", "Injection and imaging batches may confound group differences."],
+    "rationale": "The intervention, readout, and restoration criterion are direct. However, public access to the required raw calibrated images is uncertain, leaving only the reported aggregate evidence and possible related studies."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-10",
+    "scores": {"operationalizability": 0.98, "data-existence": 0.3, "data-adequacy": 0.25, "discriminating-power": 0.82, "analysis-feasibility": 0.9},
+    "verdict": "needs-new-data",
+    "confidence": 0.8,
+    "operationalization": "Using blinded embryo-level morphology scores, compare minor-defect proportions between untreated and Hcn2-injected embryos and test the stated reduction from roughly 9% to 1.5% with uncertainty and batch controls.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus phenotype resource for related evidence"}],
+    "obstacles": ["Minor deviation scoring is subjective and requires blinded raw observations.", "No open individual-level morphology dataset is identified."],
+    "rationale": "The proportion contrast is straightforward to test, but the unusually strict morphology endpoint depends on underlying blinded classifications rather than figure summaries. Without deposited individual observations or an independent replication, a decisive reanalysis would require new data."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-11",
+    "scores": {"operationalizability": 0.98, "data-existence": 0.35, "data-adequacy": 0.3, "discriminating-power": 0.9, "analysis-feasibility": 0.92},
+    "verdict": "partially-resolvable",
+    "confidence": 0.8,
+    "operationalization": "Reanalyse blinded embryo-level defect calls for untreated, nicotine, and nicotine-plus-HCN2 groups, testing both the reduction from about 60% to 6% and equivalence of rescue to the approximately 7% control level.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus phenotype resource for locating corroborating studies"}],
+    "obstacles": ["No openly deposited embryo-level scores are identified.", "Failure to reject a difference is not sufficient to establish equivalence."],
+    "rationale": "The effect and proper equivalence criterion are highly operational. Published measurements can support a restricted check, but verifying complete rescue requires raw counts, batch structure, and a prespecified equivalence margin."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-12",
+    "scores": {"operationalizability": 0.95, "data-existence": 0.32, "data-adequacy": 0.28, "discriminating-power": 0.78, "analysis-feasibility": 0.9},
+    "verdict": "needs-new-data",
+    "confidence": 0.79,
+    "operationalization": "Compare blinded brain-defect rates in nicotine-treated embryos receiving wild-type HCN2, dominant-negative HCN2, or injection control, and test whether rescue occurs only with the conducting channel.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus resource for mutant-channel and phenotype evidence"}],
+    "obstacles": ["Dominant-negative expression may differ from wild-type expression.", "No open embryo-level defect dataset is identified."],
+    "rationale": "The negative-control comparison is clear and informative about conductance, though expression and off-target effects remain. The particular matched perturbation data appear confined to the reported experiment, so an independent resolution likely needs new observations."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-13",
+    "scores": {"operationalizability": 0.97, "data-existence": 0.32, "data-adequacy": 0.27, "discriminating-power": 0.88, "analysis-feasibility": 0.88},
+    "verdict": "needs-new-data",
+    "confidence": 0.8,
+    "operationalization": "Apply the same landmark-based geometric morphometrics to raw stage-45 images from control, nicotine, and nicotine-plus-HCN2 tadpoles, then test treatment separation and equivalence of rescued animals to controls.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus morphology resource for related evidence"}],
+    "obstacles": ["Raw landmarkable images and specimen metadata are not identified as public.", "Shape equivalence requires a prespecified tolerance."],
+    "rationale": "Geometric morphometrics offers a direct and reproducible test if specimen images are available. Since no public image collection is named and paper figures cannot substitute for raw specimens, decisive analysis likely requires new or newly released data."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-14",
+    "scores": {"operationalizability": 0.97, "data-existence": 0.3, "data-adequacy": 0.22, "discriminating-power": 0.82, "analysis-feasibility": 0.9},
+    "verdict": "needs-new-data",
+    "confidence": 0.82,
+    "operationalization": "Using trial-level red-light assay trajectories, apply a prespecified learning criterion to control, nicotine, and nicotine-plus-HCN2 tadpoles and compare learning proportions and acquisition curves.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus resource for behavioral and developmental evidence"}],
+    "obstacles": ["Trial-level behavioral data are not identified as publicly deposited.", "Small sample size and exclusion of malformed animals limit generalization."],
+    "rationale": "Learning is explicitly operationalized by a standardized avoidance assay, so the claim is empirically clean. The necessary individual trial records are not named as public, and aggregate percentages alone cannot audit classification or acquisition dynamics."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-15",
+    "scores": {"operationalizability": 0.93, "data-existence": 0.4, "data-adequacy": 0.32, "discriminating-power": 0.78, "analysis-feasibility": 0.85},
+    "verdict": "partially-resolvable",
+    "confidence": 0.76,
+    "operationalization": "Quantify blinded otx2 and xbf1 expression intensity and spatial pattern in control, nicotine, and nicotine-plus-HCN2 embryos, testing suppression or mispatterning by nicotine and restoration by HCN2.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus gene-expression and developmental resource"}, {"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "repository to search for relevant Xenopus perturbation expression datasets"}],
+    "obstacles": ["Whole-mount spatial patterns may not be represented in transcriptomic repositories.", "No raw image accession is provided."],
+    "rationale": "The two markers and restoration contrast are measurable, and public expression resources can test related parts of the result. Exact spatial rescue under the three experimental conditions likely requires raw in-situ images that are not identified as deposited."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-16",
+    "scores": {"operationalizability": 0.92, "data-existence": 0.3, "data-adequacy": 0.24, "discriminating-power": 0.62, "analysis-feasibility": 0.88},
+    "verdict": "needs-new-data",
+    "confidence": 0.75,
+    "operationalization": "Compare blinded brain morphology after validated HCN2 loss of function against matched controls, while confirming channel inhibition, and test whether defect incidence and shape remain within equivalence bounds.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus gene-function and phenotype resource"}],
+    "obstacles": ["A null phenotype cannot show dispensability unless inhibition is complete.", "No open raw loss-of-function dataset is identified."],
+    "rationale": "The claim is testable, but inferring non-requirement from a dominant-negative null result is vulnerable to incomplete inhibition and compensation. Public resources may provide related evidence, yet the decisive validated loss-of-function and morphology records are not identified."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-17",
+    "scores": {"operationalizability": 0.62, "data-existence": 0.28, "data-adequacy": 0.15, "discriminating-power": 0.6, "analysis-feasibility": 0.45},
+    "verdict": "needs-new-data",
+    "confidence": 0.82,
+    "operationalization": "Across multiple teratogens and defined genetic or physiological lesions, compare brain morphology with and without HCN2 expression and test whether rescue is reproducible across lesion classes rather than nicotine-specific.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus phenotype resource for surveying lesion and HCN2 evidence"}],
+    "obstacles": ["The proposed scope spans many unspecified lesions.", "Comparable HCN2 rescue arms are unlikely to exist across teratogens."],
+    "rationale": "A cross-lesion rescue program can operationalize the prediction, but the claim is broad and underspecified. Existing nicotine and control observations are weak proxies for generality; the required comparative perturbation series would mostly be new data."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-18",
+    "scores": {"operationalizability": 0.7, "data-existence": 0.45, "data-adequacy": 0.3, "discriminating-power": 0.6, "analysis-feasibility": 0.7},
+    "verdict": "partially-resolvable",
+    "confidence": 0.72,
+    "operationalization": "Define border sharpness as the spatial Vmem gradient between compartments, quantify how candidate reagents change that gradient, and test whether increased sharpness predicts improved morphology across interventions.",
+    "candidate_datasets": [{"name": "BETSE", "url": "https://github.com/betsee/betse", "role": "public simulator for testing border-sharpening interventions"}, {"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus phenotype resource for in-vivo corroboration"}],
+    "obstacles": ["HCN2 is only one reagent and cannot establish the class-wide rule.", "Border sharpness and normal patterning require explicit metrics."],
+    "rationale": "The HCN2 case and model can test the proposed relationship in one setting. The broader reagent-class mechanism is only partially covered and may conflate border sharpening with other channel effects."
+  },
+  {
+    "claim_id": "levin-2019-boundary-01",
+    "scores": {"operationalizability": 0.18, "data-existence": 0.05, "data-adequacy": 0.02, "discriminating-power": 0.08, "analysis-feasibility": 0.15},
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.9,
+    "operationalization": "The statement could be adopted as a definition and used to map measured sensing and action ranges, but no observation can establish that this particular boundary is the uniquely correct demarcation of a Self.",
+    "candidate_datasets": [],
+    "obstacles": ["Self and cognitive light cone are stipulated constructs.", "Alternative agent boundaries can fit the same behavior."],
+    "rationale": "This is chiefly a proposed definition for comparing agents. Measurements can instantiate the definition, but they cannot discriminate it from rival definitions of individuality without additional empirical consequences."
+  },
+  {
+    "claim_id": "levin-2019-boundary-02",
+    "scores": {"operationalizability": 0.42, "data-existence": 0.48, "data-adequacy": 0.2, "discriminating-power": 0.3, "analysis-feasibility": 0.42},
+    "verdict": "partially-resolvable",
+    "confidence": 0.7,
+    "operationalization": "Compare homologous sensing, signaling, learning-like response, and collective pattern-repair mechanisms across unicellular relatives and metazoan somatic cells, reconstructing whether capacities were retained and redeployed for organ-scale outcomes.",
+    "candidate_datasets": [{"name": "UniProt", "url": "https://www.uniprot.org/", "role": "public comparative protein annotations for conserved signaling machinery"}, {"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "public cell-state expression data across unicellular and metazoan systems"}],
+    "obstacles": ["Behavioral plasticity and larger goals have competing operationalizations.", "Deep ancestral capacities cannot be directly observed."],
+    "rationale": "Comparative molecular and behavioral evidence can test retention of particular capacities, but not the broad claim that they were scaled to pursue anatomical goals as stated. Sparse taxonomic coverage and historical inference substantially limit discrimination."
+  },
+  {
+    "claim_id": "levin-2019-boundary-03",
+    "scores": {"operationalizability": 0.68, "data-existence": 0.55, "data-adequacy": 0.38, "discriminating-power": 0.52, "analysis-feasibility": 0.58},
+    "verdict": "partially-resolvable",
+    "confidence": 0.75,
+    "operationalization": "For public regeneration and regulative-development series, quantify convergence toward a reference organ morphology after perturbation and compare collective correction with local cell-autonomous or passive-mechanical models.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus developmental phenotype and expression evidence"}, {"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "public regeneration and developmental perturbation datasets"}],
+    "obstacles": ["Target pursuit is an interpretation of morphological convergence.", "Named examples span species and incompatible measurements."],
+    "rationale": "Return toward organ-level morphology is measurable and existing studies cover several examples. The stronger language of pursuing a target macrostate is not uniquely distinguished from distributed local rules, and available data cover only a subset of the stated generalization."
+  },
+  {
+    "claim_id": "levin-2019-boundary-04",
+    "scores": {"operationalizability": 0.88, "data-existence": 0.5, "data-adequacy": 0.4, "discriminating-power": 0.82, "analysis-feasibility": 0.72},
+    "verdict": "partially-resolvable",
+    "confidence": 0.78,
+    "operationalization": "Use spatial single-embryo outcome maps to compare observed within-domain concordance of left-right identity or melanocyte conversion with an independent-cell Bernoulli model, accounting for lineage and shared exposure.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus asymmetry and melanocyte phenotype evidence"}],
+    "obstacles": ["Raw spatial cell-level outcomes may not be deposited.", "Shared upstream signals can coordinate outcomes without a domain-level decision process."],
+    "rationale": "Whole-domain concordance versus cell-independent mosaics gives a clear statistical test. Published evidence can test the phenomenon in selected systems, but the decision interpretation and cross-system generalization remain partly confounded."
+  },
+  {
+    "claim_id": "levin-2019-boundary-05",
+    "scores": {"operationalizability": 0.35, "data-existence": 0.4, "data-adequacy": 0.18, "discriminating-power": 0.25, "analysis-feasibility": 0.35},
+    "verdict": "partially-resolvable",
+    "confidence": 0.68,
+    "operationalization": "Reconstruct the evolutionary history of neural and developmental bioelectric modules and test whether motor-control mechanisms are derived from homologous ancestral morphogenetic control circuits rather than independently recruited channel components.",
+    "candidate_datasets": [{"name": "UniProt", "url": "https://www.uniprot.org/", "role": "public comparative sequence and functional annotations for ion-channel systems"}, {"name": "InterPro", "url": "https://www.ebi.ac.uk/interpro/", "role": "public protein-family data for reconstructing component histories"}],
+    "obstacles": ["Exaptation of a system-level role is difficult to infer from shared components.", "Relevant phenotypes leave no direct fossil record."],
+    "rationale": "Comparative genomics can evaluate homology and timing of molecular components, but it poorly resolves whether neural motor control specifically exapted morphospace navigation. Existing data therefore address only molecular proxies."
+  },
+  {
+    "claim_id": "levin-2019-boundary-06",
+    "scores": {"operationalizability": 0.4, "data-existence": 0.65, "data-adequacy": 0.38, "discriminating-power": 0.32, "analysis-feasibility": 0.52},
+    "verdict": "partially-resolvable",
+    "confidence": 0.72,
+    "operationalization": "Define a graded set of computational capacities and compare their mechanisms across bacteria, unicellular eukaryotes, non-neural metazoans, and nervous systems, testing phylogenetic continuity and homologous molecular implementation.",
+    "candidate_datasets": [{"name": "UniProt", "url": "https://www.uniprot.org/", "role": "public cross-species annotations of ion channels and neurotransmitter machinery"}, {"name": "InterPro", "url": "https://www.ebi.ac.uk/interpro/", "role": "public protein-family and domain evolution data"}],
+    "obstacles": ["Cognition and computation admit competing definitions.", "Molecular conservation does not by itself establish continuity of cognitive capacity."],
+    "rationale": "Large comparative databases can test conservation of mechanisms and selected functional capacities. The broad continuum claim is interpretive, and many rival accounts predict the same molecular homology."
+  },
+  {
+    "claim_id": "levin-2019-boundary-07",
+    "scores": {"operationalizability": 0.78, "data-existence": 0.65, "data-adequacy": 0.48, "discriminating-power": 0.6, "analysis-feasibility": 0.62},
+    "verdict": "partially-resolvable",
+    "confidence": 0.76,
+    "operationalization": "Across perturbations of gap junctions, membrane voltage, and long-range physiological coupling, estimate effects on transformation and tumour burden, and compare rescue by restored coupling against genomic-damage and cell-autonomous models.",
+    "candidate_datasets": [{"name": "Genomic Data Commons", "url": "https://portal.gdc.cancer.gov/", "role": "public tumour molecular and clinical data for communication-pathway associations"}, {"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "public perturbation expression datasets involving junctional and bioelectric pathways"}],
+    "obstacles": ["Human observational data confound communication loss with tumour progression.", "Amphibian intervention data may not be deposited or broadly generalizable."],
+    "rationale": "Communication and tumour phenotypes can be measured, and public cancer datasets permit association and some perturbation analyses. The causal trigger-and-suppression prediction requires interventions and spatial physiology that current public datasets cover incompletely."
+  },
+  {
+    "claim_id": "levin-2019-boundary-08",
+    "scores": {"operationalizability": 0.93, "data-existence": 0.42, "data-adequacy": 0.32, "discriminating-power": 0.78, "analysis-feasibility": 0.8},
+    "verdict": "partially-resolvable",
+    "confidence": 0.77,
+    "operationalization": "Compare blinded melanocyte transformation and tumour outcomes after depolarizing or hyperpolarizing interventions versus matched controls, including oncogene-positive animals, and estimate sufficiency and prevention effects.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus oncogene, melanocyte, and phenotype evidence"}],
+    "obstacles": ["Raw animal-level outcomes from the cited perturbations may not be public.", "Channel manipulations may have non-voltage-specific effects."],
+    "rationale": "The directional interventions and phenotypic outcomes are explicit and potentially discriminating. Published Xenopus evidence can resolve selected cases, but open raw records and controls needed to isolate voltage from channel-specific effects are uncertain."
+  },
+  {
+    "claim_id": "levin-2019-boundary-09",
+    "scores": {"operationalizability": 0.15, "data-existence": 0.05, "data-adequacy": 0.03, "discriminating-power": 0.08, "analysis-feasibility": 0.12},
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.9,
+    "operationalization": "Information-flow range and cooperative behavior could be measured, but describing all cells as equally selfish and assigning the beneficiary as the relevant Self is definitional rather than an independently testable consequence.",
+    "candidate_datasets": [],
+    "obstacles": ["Selfishness and Self are redefined to make the statement hold.", "The same data permit non-agentic descriptions."],
+    "rationale": "The claim reframes whose interests cellular behavior serves rather than predicting a distinct observation. Information flow can be mapped, but it cannot establish equality of selfishness or uniquely identify the proposed Self."
+  },
+  {
+    "claim_id": "levin-2019-boundary-10",
+    "scores": {"operationalizability": 0.25, "data-existence": 0.15, "data-adequacy": 0.06, "discriminating-power": 0.12, "analysis-feasibility": 0.2},
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.85,
+    "operationalization": "One could infer nested clusters from multiscale information flow and control, but whether each cluster counts as a Self depends on the framework's chosen individuation criterion.",
+    "candidate_datasets": [],
+    "obstacles": ["No unique measurable threshold defines a Self.", "Nested causal modules do not uniquely imply nested selves."],
+    "rationale": "Multiscale biological organization is measurable, but the move from modules to multiple Selves is conceptual. Without a criterion that differs from the definition itself, observations cannot distinguish the claim from rival ontologies."
+  },
+  {
+    "claim_id": "levin-2019-boundary-11",
+    "scores": {"operationalizability": 0.18, "data-existence": 0.05, "data-adequacy": 0.03, "discriminating-power": 0.08, "analysis-feasibility": 0.15},
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.91,
+    "operationalization": "Feedback set points and coordinated parts can be measured, but treating their scale and type as constitutive of an Individual is a proposed definition with no independent confirming observation.",
+    "candidate_datasets": [],
+    "obstacles": ["Individual and goal are defined within the proposal.", "Different individuation criteria can classify the same system differently."],
+    "rationale": "The statement explicitly proposes a definition of individuality. Data can be classified under it, but cannot confirm that this definition rather than reproductive, evolutionary, or physiological alternatives is correct."
+  },
+  {
+    "claim_id": "levin-2019-boundary-12",
+    "scores": {"operationalizability": 0.38, "data-existence": 0.5, "data-adequacy": 0.2, "discriminating-power": 0.3, "analysis-feasibility": 0.3},
+    "verdict": "partially-resolvable",
+    "confidence": 0.68,
+    "operationalization": "Define cognitive-light-cone volume from measurable sensing horizons, memory duration, and action reach across extant taxa, reconstruct ancestral values, and test for a temporal trend with lineage-specific contractions.",
+    "candidate_datasets": [{"name": "Open Tree of Life", "url": "https://tree.opentreeoflife.org/", "role": "public phylogenetic backbone for comparative reconstruction"}, {"name": "TRY Plant Trait Database", "url": "https://www.try-db.org/", "role": "large trait database illustrating available comparative organismal measurements"}],
+    "obstacles": ["Comparable cognition-range traits are not assembled across life.", "Ancestral reconstruction is sensitive to survivorship and trait definitions."],
+    "rationale": "A comparative proxy analysis is conceivable and phylogenies are public. However, the core multivariate trait is not standardized, taxonomic coverage would be highly biased, and broad historical expansion cannot be cleanly resolved."
+  },
+  {
+    "claim_id": "levin-2019-boundary-13",
+    "scores": {"operationalizability": 0.35, "data-existence": 0.38, "data-adequacy": 0.18, "discriminating-power": 0.22, "analysis-feasibility": 0.38},
+    "verdict": "partially-resolvable",
+    "confidence": 0.67,
+    "operationalization": "Identify developmental systems where a compact, persistent physiological state triggers a complex morphological program, then test whether the state was acquired by learning-like history and functions as a compressed representation rather than an ordinary regulatory switch.",
+    "candidate_datasets": [{"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "public developmental time-course and perturbation expression datasets"}],
+    "obstacles": ["Memory, learning, compression, and modularity have competing mappings.", "A simple trigger is equally predicted by conventional gene-regulatory control."],
+    "rationale": "Existing developmental datasets can identify compact triggers and downstream modules. They generally cannot distinguish learned memory compression from evolved regulatory switching, so only a proxy for the mechanism is currently testable."
+  },
+  {
+    "claim_id": "levin-2019-boundary-14",
+    "scores": {"operationalizability": 0.9, "data-existence": 0.95, "data-adequacy": 0.72, "discriminating-power": 0.86, "analysis-feasibility": 0.8},
+    "verdict": "resolvable-now",
+    "confidence": 0.88,
+    "operationalization": "For ion channels mediating each named animal sense, identify bacterial homologues, reconstruct their evolutionary relationships, and compare conserved domains, gating mechanisms, and sensory functions; absence of homologous mechanisms for major modalities would refute the broad statement.",
+    "candidate_datasets": [{"name": "UniProt", "url": "https://www.uniprot.org/", "role": "public cross-species protein sequences and functional annotations"}, {"name": "InterPro", "url": "https://www.ebi.ac.uk/interpro/", "role": "public ion-channel family, domain, and homology annotations"}],
+    "obstacles": ["Exact same mechanism may mean homology, biophysical principle, or molecular identity.", "Functional annotation quality varies strongly in bacteria."],
+    "rationale": "The claim maps to standard comparative sequence and channel-function analyses supported by large public databases. Its universal wording needs interpretation, but broad coverage and direct homolog tests make it resolvable now."
+  },
+  {
+    "claim_id": "levin-2019-boundary-15",
+    "scores": {"operationalizability": 0.48, "data-existence": 0.62, "data-adequacy": 0.35, "discriminating-power": 0.25, "analysis-feasibility": 0.55},
+    "verdict": "partially-resolvable",
+    "confidence": 0.69,
+    "operationalization": "Fit explicit active-inference models and matched non-predictive control models to public time-series of cellular responses during development, then compare out-of-sample prediction of state updates and estimated variational free energy.",
+    "candidate_datasets": [{"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "public developmental cell-state time series for model fitting"}, {"name": "BioStudies", "url": "https://www.ebi.ac.uk/biostudies/", "role": "public repository of biological studies and associated data"}],
+    "obstacles": ["Free-energy formulations can be flexible enough to fit nearly any dynamics.", "Cellular surprise is model-dependent rather than directly observed."],
+    "rationale": "Public time series permit tests of specified predictive models in selected developmental systems. The sweeping law and its contrast with ordinary dynamical models are weakly discriminating unless model classes and priors are tightly prespecified."
+  },
+  {
+    "claim_id": "levin-2019-boundary-16",
+    "scores": {"operationalizability": 0.3, "data-existence": 0.45, "data-adequacy": 0.16, "discriminating-power": 0.2, "analysis-feasibility": 0.28},
+    "verdict": "partially-resolvable",
+    "confidence": 0.72,
+    "operationalization": "Across independent origins of multicellularity, quantify information-gathering range and predictive performance before and after transitions and test whether increases precede or predict morphological complexity better than ecological and energetic alternatives.",
+    "candidate_datasets": [{"name": "Open Tree of Life", "url": "https://tree.opentreeoflife.org/", "role": "public phylogenetic framework for comparative analyses"}, {"name": "UniProt", "url": "https://www.uniprot.org/", "role": "public comparative molecular annotations for sensing and connectivity machinery"}],
+    "obstacles": ["Greedy infotaxis is not uniquely operationalized at evolutionary scale.", "Extant taxa provide biased proxies for ancient transitions."],
+    "rationale": "Comparative data can evaluate pieces such as sensory and connectivity expansion. They cannot presently establish that surprise-minimizing information collection drove multicellularity and complexity rather than accompanying them."
+  },
+  {
+    "claim_id": "levin-2019-boundary-17",
+    "scores": {"operationalizability": 0.55, "data-existence": 0.5, "data-adequacy": 0.3, "discriminating-power": 0.38, "analysis-feasibility": 0.58},
+    "verdict": "partially-resolvable",
+    "confidence": 0.7,
+    "operationalization": "Measure information transfer, shared stimulus access, and coordinated action before and after gap-junction coupling or uncoupling, and test whether coupling expands the range of stimuli that predict collective responses.",
+    "candidate_datasets": [{"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "public perturbation datasets involving connexins and tissue coordination"}],
+    "obstacles": ["A larger Self is an interpretation of increased coordination.", "Gap junctions are not the only route for shared sensing."],
+    "rationale": "Communication range and coordinated response are measurable in existing cell-network studies. Those observations do not uniquely establish a unified Self or gap junctions as the general binding mechanism, so the central claim is only partly resolvable."
+  },
+  {
+    "claim_id": "levin-2019-boundary-18",
+    "scores": {"operationalizability": 0.9, "data-existence": 0.82, "data-adequacy": 0.55, "discriminating-power": 0.72, "analysis-feasibility": 0.72},
+    "verdict": "resolvable-now",
+    "confidence": 0.84,
+    "operationalization": "Compile commonly used plant and animal anesthetics, quantify evidence that each uncouples gap junctions at anesthetic concentrations, and test whether a majority meet that criterion relative to appropriate non-anesthetic compounds.",
+    "candidate_datasets": [{"name": "PubChem", "url": "https://pubchem.ncbi.nlm.nih.gov/", "role": "public compound, bioassay, and literature-linked activity records"}, {"name": "ChEMBL", "url": "https://www.ebi.ac.uk/chembl/", "role": "public bioactivity data for anesthetic targets and connexin-related assays"}],
+    "obstacles": ["Plant anesthesia and cognition are contested categories.", "Gap-junction effects may occur only above clinically relevant concentrations."],
+    "rationale": "The majority claim is directly checkable against public pharmacology and literature-linked assay data. Coverage is imperfect, especially for plants, but a systematic analysis can confirm or refute the stated generalization."
+  },
+  {
+    "claim_id": "levin-2019-boundary-19",
+    "scores": {"operationalizability": 0.7, "data-existence": 0.6, "data-adequacy": 0.42, "discriminating-power": 0.45, "analysis-feasibility": 0.62},
+    "verdict": "partially-resolvable",
+    "confidence": 0.72,
+    "operationalization": "Apply matched decision tasks that instantiate named biases to ants, slime molds, and vertebrates, and compare whether deviations from an explicit rational benchmark have the same qualitative signature.",
+    "candidate_datasets": [{"name": "Dryad", "url": "https://datadryad.org/", "role": "public repository containing behavioral datasets that can be searched for collective decision experiments"}],
+    "obstacles": ["Similar aggregate errors can arise from different mechanisms.", "Tasks are difficult to equate across species and collectives."],
+    "rationale": "Specific choice anomalies and rational benchmarks are measurable, and published behavioral datasets cover some taxa. Existing observations can test examples but not the broad prediction of the same kinds of illusions across swarm organisms."
+  },
+  {
+    "claim_id": "levin-2019-boundary-20",
+    "scores": {"operationalizability": 0.55, "data-existence": 0.4, "data-adequacy": 0.22, "discriminating-power": 0.38, "analysis-feasibility": 0.52},
+    "verdict": "partially-resolvable",
+    "confidence": 0.69,
+    "operationalization": "Across controlled communication strengths in multicellular or multi-agent networks, quantify integration, modular differentiation, and collective task performance and test for an interior optimum rather than monotonic improvement.",
+    "candidate_datasets": [{"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "public datasets for communication and junction perturbations in tissues"}],
+    "obstacles": ["Formation of a Self lacks an independent outcome metric.", "Few public datasets systematically sweep communication strength."],
+    "rationale": "An intermediate optimum in integration and differentiation is testable in models and selected biological datasets. Calling that optimum Self formation is conceptual, and existing empirical sweeps are too sparse for the stated generality."
+  },
+  {
+    "claim_id": "levin-2019-boundary-21",
+    "scores": {"operationalizability": 0.48, "data-existence": 0.68, "data-adequacy": 0.42, "discriminating-power": 0.35, "analysis-feasibility": 0.58},
+    "verdict": "partially-resolvable",
+    "confidence": 0.72,
+    "operationalization": "Measure long-range physiological connectivity, proliferation, and migration during transformation and reversal, testing whether restoring connectivity precedes and predicts phenotypic normalization beyond genomic and local signaling covariates.",
+    "candidate_datasets": [{"name": "Genomic Data Commons", "url": "https://portal.gdc.cancer.gov/", "role": "public tumour molecular and clinical data for connectivity-pathway analyses"}, {"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "public cancer perturbation and reversal datasets"}],
+    "obstacles": ["Computational boundary is not directly measurable.", "Communication loss may be a consequence rather than a cause of cancer."],
+    "rationale": "Public cancer data can test associations and some perturbational consequences of physiological isolation. The shrinking-Self interpretation is not uniquely distinguished from standard signaling models, so only its measurable causal components are resolvable."
+  },
+  {
+    "claim_id": "levin-2019-boundary-22",
+    "scores": {"operationalizability": 0.3, "data-existence": 0.45, "data-adequacy": 0.15, "discriminating-power": 0.2, "analysis-feasibility": 0.28},
+    "verdict": "partially-resolvable",
+    "confidence": 0.7,
+    "operationalization": "Map the phylogenetic appearance of homeostatic feedback, persistent state, predictive control, and distributed networks, and test whether their inferred ordering matches the proposed sequence and correlates with expanded behavioral capacities.",
+    "candidate_datasets": [{"name": "Open Tree of Life", "url": "https://tree.opentreeoflife.org/", "role": "public phylogenetic framework for ancestral-state reconstruction"}, {"name": "UniProt", "url": "https://www.uniprot.org/", "role": "public comparative molecular annotations for signaling and network components"}],
+    "obstacles": ["Abstract capacities do not map one-to-one onto genes.", "Ancient evolutionary ordering is weakly recoverable from extant systems."],
+    "rationale": "Public phylogenetic and molecular data can test a coarse ordering of component innovations. They cannot establish the proposed active-inference driver or a single universal scaling path for agency."
+  },
+  {
+    "claim_id": "levin-2019-boundary-23",
+    "scores": {"operationalizability": 0.58, "data-existence": 0.48, "data-adequacy": 0.28, "discriminating-power": 0.42, "analysis-feasibility": 0.4},
+    "verdict": "partially-resolvable",
+    "confidence": 0.7,
+    "operationalization": "For developmental perturbations and mutations, quantify anatomical variance and fitness with intact versus impaired regulative responses, then test whether regulation reduces phenotypic effect sizes and increases viable mutational neighborhoods.",
+    "candidate_datasets": [{"name": "International Mouse Phenotyping Consortium", "url": "https://www.mousephenotype.org/", "role": "public genotype-phenotype data for estimating buffering of anatomical mutations"}, {"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public developmental perturbation and phenotype evidence"}],
+    "obstacles": ["Goal-directedness is not uniquely separated from developmental robustness.", "Datasets rarely measure regulation, anatomy, and fitness together."],
+    "rationale": "Phenotypic buffering and fitness-landscape smoothing have measurable consequences in public genotype-phenotype resources. Existing datasets can test subsets, but attributing the effect specifically to morphogenetic goal-directedness and calling it a major ratchet are broader than current coverage."
+  },
+  {
+    "claim_id": "levin-2019-boundary-24",
+    "scores": {"operationalizability": 0.9, "data-existence": 0.38, "data-adequacy": 0.28, "discriminating-power": 0.7, "analysis-feasibility": 0.78},
+    "verdict": "partially-resolvable",
+    "confidence": 0.76,
+    "operationalization": "Analyse trial-level visual discrimination behavior and neural connectivity in tadpoles with tail-positioned eyes, comparing performance with eyeless and normally eyed controls and testing whether spinally connected ectopic eyes support above-chance vision.",
+    "candidate_datasets": [{"name": "Xenbase", "url": "https://www.xenbase.org/", "role": "public Xenopus developmental and behavioral evidence"}],
+    "obstacles": ["Trial-level behavioral and connectivity data may not be deposited.", "The broad conclusion that brains ascertain body structure exceeds the ectopic-eye result."],
+    "rationale": "The ectopic-eye visual-performance result has clear controls and a measurable decision criterion. Public evidence may resolve that example, but raw data access is uncertain and the general claim about non-hardwired brain programs is only indirectly supported."
+  },
+  {
+    "claim_id": "levin-2019-boundary-25",
+    "scores": {"operationalizability": 0.68, "data-existence": 0.52, "data-adequacy": 0.34, "discriminating-power": 0.5, "analysis-feasibility": 0.58},
+    "verdict": "partially-resolvable",
+    "confidence": 0.73,
+    "operationalization": "Track head-number outcomes over repeated regeneration after transient bioelectric perturbation, confirm absence of sequence edits, and compare persistence with conventional genetic interventions and alternative injury-memory mechanisms.",
+    "candidate_datasets": [{"name": "PlanMine", "url": "https://planmine.mpi-cbg.de/", "role": "public planarian genomic and transcriptomic resource"}, {"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "public planarian regeneration expression datasets"}],
+    "obstacles": ["Public molecular datasets may not link individual worms across regeneration rounds.", "The regenerative-medicine superiority claim requires comparative interventions."],
+    "rationale": "Public planarian resources can examine genomic stability and molecular correlates, while published outcomes address persistent morphology. They only partly resolve whether a set point was edited and do not establish that this is a better general medical strategy."
+  },
+  {
+    "claim_id": "levin-2019-boundary-26",
+    "scores": {"operationalizability": 0.82, "data-existence": 0.72, "data-adequacy": 0.55, "discriminating-power": 0.7, "analysis-feasibility": 0.78},
+    "verdict": "resolvable-now",
+    "confidence": 0.82,
+    "operationalization": "Construct or reuse ion-channel and gap-junction dynamical models, identify multiple stable physiological attractors, and demonstrate switching by transient inputs while parameters representing channel-encoding DNA remain fixed.",
+    "candidate_datasets": [{"name": "BioModels", "url": "https://www.ebi.ac.uk/biomodels/", "role": "public repository of executable biological dynamical models"}, {"name": "BETSE", "url": "https://github.com/betsee/betse", "role": "public platform for simulating multicellular bioelectric networks"}],
+    "obstacles": ["Existence in selected circuits does not show all bioelectric networks are multistable.", "Software is a metaphor beyond the stated dynamical properties."],
+    "rationale": "Multistability and transient switching are standard dynamical properties testable with public models and software. The mechanistic core can be resolved now, although the software analogy itself is not empirical."
+  },
+  {
+    "claim_id": "levin-2019-boundary-27",
+    "scores": {"operationalizability": 0.52, "data-existence": 0.35, "data-adequacy": 0.18, "discriminating-power": 0.4, "analysis-feasibility": 0.45},
+    "verdict": "needs-new-data",
+    "confidence": 0.76,
+    "operationalization": "In early multicellular models and stem/somatic co-cultures, manipulate opioid signaling and measure stable aggregation, separation costs, and repeated preference, then compare evolutionary conservation with neural reward pathways.",
+    "candidate_datasets": [{"name": "ChEMBL", "url": "https://www.ebi.ac.uk/chembl/", "role": "public opioid ligand and target bioactivity data"}, {"name": "UniProt", "url": "https://www.uniprot.org/", "role": "public comparative annotations for opioid-related signaling proteins"}],
+    "obstacles": ["Addictiveness has no direct equivalent in cell collectives.", "Existing molecular homology cannot establish the proposed ancient function."],
+    "rationale": "The hypothesis can be made testable through defined adhesion and preference phenotypes, but the crucial early-multicellularity experiments are not represented by known public datasets. Existing pharmacology and sequence data provide context rather than a decisive test."
+  },
+  {
+    "claim_id": "levin-2019-boundary-28",
+    "scores": {"operationalizability": 0.78, "data-existence": 0.15, "data-adequacy": 0.08, "discriminating-power": 0.7, "analysis-feasibility": 0.5},
+    "verdict": "needs-new-data",
+    "confidence": 0.86,
+    "operationalization": "Engineer a unicellular organism with specified electrogenic and junctional proteins and quantify stable multicellular body formation, differentiation, and coordinated morphology; separately perturb bioelectric dynamics in a metazoan and measure reversible body disintegration.",
+    "candidate_datasets": [],
+    "obstacles": ["The required engineered organisms and matched controls are not known to exist publicly.", "Appropriate proteins and a metazoan-like body criterion are underspecified."],
+    "rationale": "Both directional predictions have observable outcomes and strong intervention logic. They call for specific engineering and organismal perturbations not supplied by current public data, so they require new experiments."
+  },
+  {
+    "claim_id": "levin-2019-boundary-29",
+    "scores": {"operationalizability": 0.82, "data-existence": 0.82, "data-adequacy": 0.55, "discriminating-power": 0.65, "analysis-feasibility": 0.62},
+    "verdict": "partially-resolvable",
+    "confidence": 0.8,
+    "operationalization": "Compile regeneration time-course transcriptomes from damaged bacterial biofilms, plants, and animals, harmonize orthologous electrogenic genes, and test for consistent differential use beyond generic injury and stress responses.",
+    "candidate_datasets": [{"name": "Gene Expression Omnibus", "url": "https://www.ncbi.nlm.nih.gov/geo/", "role": "public cross-kingdom transcriptomic studies of injury and regeneration"}, {"name": "BioStudies", "url": "https://www.ebi.ac.uk/biostudies/", "role": "public repository for plant, microbial, and animal functional-genomics studies"}, {"name": "UniProt", "url": "https://www.uniprot.org/", "role": "public orthology and functional annotation support for electrogenic proteins"}],
+    "obstacles": ["Regeneration protocols and sampled stages differ across kingdoms.", "Ion-channel expression may reflect generic stress rather than cooperative morphogenesis."],
+    "rationale": "Many relevant public transcriptomes and annotation resources exist, making a cross-kingdom meta-analysis feasible. Coverage of damaged biofilms and matched regenerative stages is uneven, and transcript abundance alone only partially tests the proposed conserved functional role."
+  }
+]

@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-01> a delphi:Claim ;
+    rdfs:label "Published ODE models of gene and protein pathways show several kinds of memory" ;
+    dct:description "In simulations of 35 published ODE models of gene regulatory networks and protein/metabolic pathways from BioModels, the networks show several distinct kinds of memory (UCS-based, pairing, transfer, associative and consolidation memory) in response to patterns of node stimulation." ;
+    delphi:context "Biswas S, Clawson W, Levin M, “Learning in Transcriptional Network Models: Computational Discovery of Pathway-Level Memory and Effective Interventions”, International journal of molecular sciences (2022), doi:10.3390/ijms24010285; section “Abstract”. Scope: 35 ODE pathway models from BioModels (bacteria, slime mould, yeast, plants, vertebrates, mammals)" ;
+    dct:type "simulation-result" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <https://doi.org/10.3390/ijms24010285> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "Here, we characterize biological gene regulatory circuit models and protein pathways and find them capable of several different kinds of memory." ;
+    prov:wasQuotedFrom <https://doi.org/10.3390/ijms24010285> ;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-grn-learning.txt#line=8,9> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-grn-learning.txt#line=8,9> schema:isPartOf <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-grn-learning.txt> .
+
+  <https://doi.org/10.3390/ijms24010285> a schema:ScholarlyArticle ;
+    dct:title "Learning in Transcriptional Network Models: Computational Discovery of Pathway-Level Memory and Effective Interventions" ;
+    dct:creator <http://www.wikidata.org/entity/Q39444955> ;
+    dct:bibliographicCitation "Biswas S, Clawson W, Levin M. Learning in Transcriptional Network Models: Computational Discovery of Pathway-Level Memory and Effective Interventions. International journal of molecular sciences (2022). doi:10.3390/ijms24010285" ;
+    dct:date "2022"^^xsd:gYear ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    schema:sameAs <https://europepmc.org/article/PMC/PMC9820177> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-grn-learning.txt> schema:about <https://doi.org/10.3390/ijms24010285> ;
+    prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC9820177/fullTextXML> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "601c1b3b66cccb975359193687889fc0fd2457a1ad5764643d24b84d1396bf58" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-grn-learning.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci Levin papers claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Levin 2022 claim: Published ODE models of gene and protein pathways show several kinds of memory" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-01> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+  <https://w3id.org/delphi/resource/domain/levin-papers> rdfs:label "levin-papers" .
+}

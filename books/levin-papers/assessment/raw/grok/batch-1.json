@@ -1,0 +1,809 @@
+[
+  {
+    "claim_id": "levin-2015-place-01",
+    "scores": {
+      "operationalizability": 0.86,
+      "data-existence": 0.9,
+      "data-adequacy": 0.7,
+      "discriminating-power": 0.78,
+      "analysis-feasibility": 0.8
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.72,
+    "operationalization": "Run the public active-inference morphogenesis routine from a shared generative model and undifferentiated initial state, and score whether cells migrate and differentiate into the target pattern while ensemble free energy falls. Failure to assemble under that shared model would refute the reported proof of principle.",
+    "candidate_datasets": [
+      {"name": "SPM DEM_morphogenesis", "url": "https://github.com/spm/spm/blob/main/toolbox/DEM/DEM_morphogenesis.m", "role": "public MATLAB implementation of the active-inference self-assembly simulation, invoked through the DEM toolbox"},
+      {"name": "Statistical Parametric Mapping", "url": "https://www.fil.ion.ucl.ac.uk/spm/", "role": "official SPM distribution that the paper says reproduces the simulations via the morphogenesis button"},
+      {"name": "Knowing one's place", "url": "https://doi.org/10.1098/rsif.2014.1383", "role": "published precisions, time-step count, and target-morphology specification for the 2015 runs"}
+    ],
+    "obstacles": ["The current public script defaults to 16 cells and a target mask that is not the paper's eight-cell head–body–tail figure.", "MATLAB is required to run the solver as distributed."],
+    "rationale": "The claim is about a stated simulation, and the paper points to a public SPM routine that still implements shared-model self-assembly. Re-running it can confirm or refute that outcome. The default target in the current file has drifted from the 2015 head–body–tail illustration, so the eight-cell case needs the published target mask rather than the file's present bitmap."
+  },
+  {
+    "claim_id": "levin-2015-place-02",
+    "scores": {
+      "operationalizability": 0.18,
+      "data-existence": 0.05,
+      "data-adequacy": 0.05,
+      "discriminating-power": 0.08,
+      "analysis-feasibility": 0.15
+    },
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.78,
+    "operationalization": "The sentence offers an interpretation of genetic parameters as a generative model and of signalling-dependent transcription as inversion of that model. No measurement is specified that would accept this reading and reject an ordinary gene-regulatory description of the same signals.",
+    "candidate_datasets": [],
+    "obstacles": ["The mapping from genome and epigenesis onto a generative model is stipulated rather than tied to a distinct observable.", "Competing mechanistic descriptions fit the same signalling facts."],
+    "rationale": "This is a proposed reading of morphogenesis, phrased as an interpretation. Any coordinated signalling system can be redescribed as a generative model and its inversion, so existing expression or imaging data do not separate the reading from a non-cognitive account of the same molecular events."
+  },
+  {
+    "claim_id": "levin-2015-place-03",
+    "scores": {
+      "operationalizability": 0.3,
+      "data-existence": 0.12,
+      "data-adequacy": 0.1,
+      "discriminating-power": 0.12,
+      "analysis-feasibility": 0.22
+    },
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.7,
+    "operationalization": "A decisive test would need a fixed definition of an implicit place-model, then a morphogenetic system that reaches its target anatomy with no internal state that meets that definition. Under the paper's good-regulator reading, successful patterning itself counts as possessing the model.",
+    "candidate_datasets": [],
+    "obstacles": ["Several formalizations of an implicit model count ordinary intracellular states as the model.", "The necessity claim then holds for every system that already achieves a target form."],
+    "rationale": "The necessity claim uses an implicit model of place as the requirement for morphogenetic self-organization. Because the paper treats any adequate regulator as a model of what it regulates, a gene-regulatory or chemotactic account of the same successful patterning is counted as the model rather than as a rival. No public observation separates the two descriptions."
+  },
+  {
+    "claim_id": "levin-2015-place-04",
+    "scores": {
+      "operationalizability": 0.8,
+      "data-existence": 0.85,
+      "data-adequacy": 0.58,
+      "discriminating-power": 0.52,
+      "analysis-feasibility": 0.68
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.62,
+    "operationalization": "From the published generative model and the public solver, record variational free energy against cell locations and identity beliefs over random initial states. A converged run whose free energy is minimal at a duplicated or mis-assigned place, or a run that fails to reach the target under the stated assumptions, would refute the uniqueness-and-guarantee claim for that model.",
+    "candidate_datasets": [
+      {"name": "SPM DEM_morphogenesis", "url": "https://github.com/spm/spm/blob/main/toolbox/DEM/DEM_morphogenesis.m", "role": "public solver that returns ensemble free energy, locations, and identity expectations"},
+      {"name": "Knowing one's place", "url": "https://doi.org/10.1098/rsif.2014.1383", "role": "equations and precision settings that define the free-energy minimum being asserted"}
+    ],
+    "obstacles": ["The minimum sits at the target largely because the target is encoded as the model's parameters.", "Finite reruns can produce a counterexample, while a universal guarantee needs an analytic argument the demo does not print out."],
+    "rationale": "The statement is a mathematical claim about a fully specified active-inference model, and the public code exposes free energy and inferred place. Reruns and inspection of the energy can refute unconditional convergence or a non-unique minimum. They do not by themselves prove the guarantee for every target, and the energy is defined so that the encoded target is the low-energy state."
+  },
+  {
+    "claim_id": "levin-2015-place-05",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.88,
+      "data-adequacy": 0.72,
+      "discriminating-power": 0.75,
+      "analysis-feasibility": 0.8
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.7,
+    "operationalization": "Re-run the published ensemble from a shared undifferentiated start and record migration time, the time step at which cell-type expectations separate, and ensemble free energy. Differentiation far from the reported eighth step, or free energy that does not fall as identities resolve, would refute the reported trajectory.",
+    "candidate_datasets": [
+      {"name": "SPM DEM_morphogenesis", "url": "https://github.com/spm/spm/blob/main/toolbox/DEM/DEM_morphogenesis.m", "role": "public 32-step simulation with free-energy plots and time-dependent differentiation gain"},
+      {"name": "Knowing one's place", "url": "https://doi.org/10.1098/rsif.2014.1383", "role": "reported timing, free-energy trajectory, and initial conditions for the 2015 ensemble"}
+    ],
+    "obstacles": ["The current default target mask differs from the 2015 head–body–tail pattern, which can shift timing.", "Identity resolution is read from the model's expectation variables, which are defined by the same generative model."],
+    "rationale": "Timing, free-energy decline, and fate resolution are direct outputs of a public solver the paper tells the reader to run. A short rerun can match or miss the reported eighth-step differentiation. The test resolves the simulation trajectory, and the current target bitmap is a version caveat rather than a missing method."
+  },
+  {
+    "claim_id": "levin-2015-place-06",
+    "scores": {
+      "operationalizability": 0.88,
+      "data-existence": 0.86,
+      "data-adequacy": 0.74,
+      "discriminating-power": 0.76,
+      "analysis-feasibility": 0.78
+    },
+    "verdict": "resolvable-now",
+    "confidence": 0.68,
+    "operationalization": "Enable the script's half-split path, which copies the upper or lower half of a partially differentiated ensemble at time step 8 and continues integration. Recovery of the full target by both halves confirms the reported regeneration result; a half that stays truncated or fails to redifferentiate refutes it.",
+    "candidate_datasets": [
+      {"name": "SPM DEM_morphogenesis", "url": "https://github.com/spm/spm/blob/main/toolbox/DEM/DEM_morphogenesis.m", "role": "public split-half procedure that duplicates partially differentiated cells and re-solves"},
+      {"name": "Knowing one's place", "url": "https://doi.org/10.1098/rsif.2014.1383", "role": "description of the bisection intervention and the expected return to the target morphology"}
+    ],
+    "obstacles": ["The split path is present but switched off in the current file, so the run needs that flag set.", "The default target is no longer the paper's head–body–tail embryo."],
+    "rationale": "Bisection, duplication, and re-integration are implemented in the same public file that the paper identifies as the reproduction route. Turning on the existing flag and scoring return to the target is a rerun. The flag's default and the updated target mask are the main limits on an exact figure match."
+  },
+  {
+    "claim_id": "levin-2015-place-07",
+    "scores": {
+      "operationalizability": 0.64,
+      "data-existence": 0.55,
+      "data-adequacy": 0.38,
+      "discriminating-power": 0.42,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "In the public model, lower the precision or gain on the head-associated chemotactic signal and, separately, raise intracellular-signal precision, then measure segment size, migration, and differentiation. The in-model phenotypes can be confirmed or refuted that way; the pharmacological reading for real embryos needs embryo cohorts that pair those signal changes with anatomy.",
+    "candidate_datasets": [
+      {"name": "SPM DEM_morphogenesis", "url": "https://github.com/spm/spm/blob/main/toolbox/DEM/DEM_morphogenesis.m", "role": "public model whose signal precisions and chemotactic channels can be edited and re-integrated"},
+      {"name": "Knowing one's place", "url": "https://doi.org/10.1098/rsif.2014.1383", "role": "qualitative specification of the sensitivity interventions and the reported dysmorphologies"}
+    ],
+    "obstacles": ["The head-shrinking and failed-migration cases are described in prose, not as named switches in the current script.", "No public embryo dataset maps this model's signal channels onto a drug and an anatomical readout."],
+    "rationale": "The in-model half can be probed by editing precisions in the public solver, although the exact 2015 sensitivity settings have to be reconstructed from the paper. The further claim that the same manipulations are predictions for pharmacological treatment of real embryos has no matching public perturbation series, so only the simulation half is testable now."
+  },
+  {
+    "claim_id": "levin-2015-place-08",
+    "scores": {
+      "operationalizability": 0.42,
+      "data-existence": 0.32,
+      "data-adequacy": 0.22,
+      "discriminating-power": 0.28,
+      "analysis-feasibility": 0.38
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.58,
+    "operationalization": "Fit the same dynamic-causal-model class to neural time series and to time-resolved bioelectric recordings from non-neural tissue during patterning, then compare model evidence. Shared structure that beats unstructured alternatives would support the proposed commonality; a systematic failure on morphogenesis recordings would count against it.",
+    "candidate_datasets": [
+      {"name": "OpenNeuro", "url": "https://openneuro.org/", "role": "public neural time series on which dynamic causal models are already fit"},
+      {"name": "Statistical Parametric Mapping", "url": "https://www.fil.ion.ucl.ac.uk/spm/", "role": "public implementation of dynamic causal modelling for the neural side of the comparison"}
+    ],
+    "obstacles": ["Public morphogenesis voltage time series with the sampling DCM needs are not deposited.", "Significant commonality is not given a numerical model-comparison threshold."],
+    "rationale": "Neural recordings and DCM software are public, so one side of the proposed comparison can be prepared. The claim is about dynamics shared with bioelectric patterning networks, and those tissue voltage time series are not in an open dataset. Until they are, the comparison cannot be run."
+  },
+  {
+    "claim_id": "levin-2015-place-09",
+    "scores": {
+      "operationalizability": 0.68,
+      "data-existence": 0.72,
+      "data-adequacy": 0.5,
+      "discriminating-power": 0.48,
+      "analysis-feasibility": 0.62
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "Sweep ensemble size above and below four clones in the public model with the exogenous gradient present and removed, and score orientation error and failure rate against a pre-specified robustness statistic. A flat or reversed size effect would refute the reported threshold.",
+    "candidate_datasets": [
+      {"name": "SPM DEM_morphogenesis", "url": "https://github.com/spm/spm/blob/main/toolbox/DEM/DEM_morphogenesis.m", "role": "public model with an exogenous-cause input and a target mask that sets ensemble size"},
+      {"name": "Knowing one's place", "url": "https://doi.org/10.1098/rsif.2014.1383", "role": "statement of the gradient comparison and the more-than-four-clone regime"}
+    ],
+    "obstacles": ["Robustness is not given a numeric definition in the claim.", "The current script fixes the exogenous cause at zero and does not ship the size sweep."],
+    "rationale": "Ensemble size and an exogenous input are parameters of a public, specified model, so the comparison can be recomputed. The published file does not contain the sweep, and the claim does not fix the robustness measure, so the result is only partly pinned down by what is already runnable."
+  },
+  {
+    "claim_id": "levin-2015-place-10",
+    "scores": {
+      "operationalizability": 0.28,
+      "data-existence": 0.12,
+      "data-adequacy": 0.1,
+      "discriminating-power": 0.12,
+      "analysis-feasibility": 0.2
+    },
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.66,
+    "operationalization": "Permanent two-headed regeneration after a brief gap-junction change shows that a non-genetic physiological state can reset target anatomy. That observation is also what a bioelectric-memory description predicts, so it does not single out active inference as the indispensable process.",
+    "candidate_datasets": [],
+    "obstacles": ["Active inference is identified with epigenetic patterning by definition in the sentence.", "The planarian phenotype is compatible with several physiological accounts."],
+    "rationale": "The indispensable-process claim equates epigenetic patterning with active inference and then cites stable planarian target change as agreement. The same phenotype is expected from any account in which a transient physiological perturbation rewrites a non-genetic target. No existing measurement separates the free-energy identification from those rivals."
+  },
+  {
+    "claim_id": "levin-2015-girardia-01",
+    "scores": {
+      "operationalizability": 0.82,
+      "data-existence": 0.32,
+      "data-adequacy": 0.28,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.32
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.7,
+    "operationalization": "On decapitated Girardia dorotocephala pre-tail fragments, compare blinded head-shape classes after 123 µM octanol for three days with water controls, using landmarks against reference Schmidtea, Dugesia, and Polycelis heads. Stochastic assignment to those reference shapes, absent in controls, would support the result; only wild-type or disorganized heads would refute it.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published images, doses, and group sizes for the octanol head-shape result; raw landmarks are not deposited"}
+    ],
+    "obstacles": ["Individual images and landmark coordinates are not in a public repository.", "Species labels were assigned by resemblance before quantitative comparison."],
+    "rationale": "Head shape after a stated octanol regimen is a clear experimental variable, and the paper reports the outcome with group sizes. The images are figures rather than a deposited landmark set, and no independent public replication supplies the same perturbation and readout. Confirming or refuting the species match requires those records or a new assay."
+  },
+  {
+    "claim_id": "levin-2015-girardia-02",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.52,
+      "data-adequacy": 0.42,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.64,
+    "operationalization": "Recompute Procrustes distances among the published groups, or, if raw landmarks become available, recompute them from the stated landmarks. Distances from each induced group to its reference species smaller than distances to wild-type Girardia would support the claim; the opposite ordering would refute it.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "Table 1 publishes the Procrustes distances and group sample sizes used in the comparison"}
+    ],
+    "obstacles": ["Raw landmark coordinates are not deposited, so distances cannot be recomputed from images.", "Groups were predefined by the resemblance the distances are then used to demonstrate."],
+    "rationale": "The comparison is a standard morphometric inequality, and the distance table is published with sample sizes. A reader can check the reported ordering and the published ANOVA. Without the landmarks, placement, semi-landmark sliding, and the circularity of assigning groups by eye stay unauditable, so the table supports only a partial check."
+  },
+  {
+    "claim_id": "levin-2015-girardia-03",
+    "scores": {
+      "operationalizability": 0.68,
+      "data-existence": 0.55,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.35,
+      "analysis-feasibility": 0.58
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "Rebuild the 18S or rRNA tree for Girardia, Schmidtea, Dugesia, and Polycelis from public sequences, and rank the paper's reported shape frequencies against patristic distance. A rank correlation in the stated direction would support the frequency claim; a reversed or null ranking would refute the rough association.",
+    "candidate_datasets": [
+      {"name": "NCBI Nucleotide", "url": "https://www.ncbi.nlm.nih.gov/nuccore", "role": "public rRNA sequences for rebuilding the planarian distance ranking"},
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published shape-class frequencies under one octanol regimen"}
+    ],
+    "obstacles": ["Animal-level class counts are in a figure rather than a deposited table.", "Rough correlation and post-hoc shape bins leave the association weakly specified."],
+    "rationale": "Public sequences can re-estimate evolutionary distance among the four planarians, which is half of the comparison. The frequencies come from one treatment series reported in the paper, with small groups and bins defined by resemblance. The association can be re-ranked at that limited scope and is not a strong test of a general frequency–distance law."
+  },
+  {
+    "claim_id": "levin-2015-girardia-04",
+    "scores": {
+      "operationalizability": 0.78,
+      "data-existence": 0.32,
+      "data-adequacy": 0.28,
+      "discriminating-power": 0.38,
+      "analysis-feasibility": 0.32
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.66,
+    "operationalization": "Measure brain length-to-width ratio from synapsin-stained heads, blinded to external shape class, and test whether induced Girardia brains cluster with the reference species they resemble. A null or reversed clustering would refute the co-transformation.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published staining images and an ANOVA p-value; individual length-to-width ratios are not deposited"}
+    ],
+    "obstacles": ["Per-animal brain measurements are not in a public file.", "External head class and brain class were scored in the same animals, so the resemblance judgment can couple the two readouts."],
+    "rationale": "Brain aspect ratio is a standard morphometric variable, and the paper reports a significant group difference. The ratios and images needed to recompute it are not deposited, and no independent staining dataset repeats the octanol comparison. The result stays testable only with those measurements or a new assay."
+  },
+  {
+    "claim_id": "levin-2015-girardia-05",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.3,
+      "data-adequacy": 0.25,
+      "discriminating-power": 0.35,
+      "analysis-feasibility": 0.3
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.64,
+    "operationalization": "Count phospho-histone H3-positive cells in the anterior sixth and compare their spatial distribution across induced head classes and wild-type reference species. A shift of the induced animals toward the reference species' pattern would support co-transformation; no class-linked shift would refute it.",
+    "candidate_datasets": [
+      {"name": "PlanMine", "url": "https://planmine.mpinat.mpg.de/planmine/begin.do", "role": "public planarian gene and anatomy resources for neoblast markers, without this octanol spatial series"}
+    ],
+    "obstacles": ["The paper's anterior mitotic counts and positions are not deposited.", "Head shape and neoblast distribution can share downstream causes, so a matching distribution does not show that the same patterning process organizes both."],
+    "rationale": "Anterior mitotic pattern is measurable, and PlanMine documents planarian stem-cell markers in general. It does not contain this octanol-treated spatial series. The further conclusion that gap-junction-sensitive patterning organizes the stem cells needs paired shape and count data that are not public."
+  },
+  {
+    "claim_id": "levin-2015-girardia-06",
+    "scores": {
+      "operationalizability": 0.84,
+      "data-existence": 0.34,
+      "data-adequacy": 0.3,
+      "discriminating-power": 0.42,
+      "analysis-feasibility": 0.34
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.66,
+    "operationalization": "Apply the paper's five-cluster segmentation to flat-fielded DiBAC images and compare isopotential-region counts at day 10 and day 30 between octanol-treated and control worms. More regions at day 10 and a return to control counts at day 30 would support the time course; no difference, or no return, would refute it.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "methods for the region count and a summary figure; raw voltage images are not deposited"}
+    ],
+    "obstacles": ["Raw DiBAC images and per-animal region counts are not public.", "The count depends on a five-cluster threshold and a 15-pixel size filter."],
+    "rationale": "The region-count procedure is specified well enough to repeat on images, including the cluster count and size filter. Those images and the animal-level counts are not in a public archive. Re-reading the summary figure cannot replace that reanalysis, so the time course still needs the raw recordings or a new imaging series."
+  },
+  {
+    "claim_id": "levin-2015-girardia-07",
+    "scores": {
+      "operationalizability": 0.8,
+      "data-existence": 0.32,
+      "data-adequacy": 0.3,
+      "discriminating-power": 0.45,
+      "analysis-feasibility": 0.32
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.68,
+    "operationalization": "Track individual induced animals from day 10 to day 30 without further injury and test whether Procrustes distance to wild-type Girardia falls after regeneration is scored complete. A stable induced shape, or continued regenerative growth, would refute remodeling of an already completed head.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published daily-remodeling description and example images; longitudinal landmark series are not deposited"}
+    ],
+    "obstacles": ["Paired day-10 and day-30 landmarks for the same animals are not public.", "Ongoing size change and posture can mimic a return toward the species shape."],
+    "rationale": "Return toward the species head after a stated post-regeneration window is a direct longitudinal measurement. The paper describes that window with example images, and the coordinate series needed to recompute the distances is not deposited. An independent public time series of this protocol is also absent."
+  },
+  {
+    "claim_id": "levin-2015-girardia-08",
+    "scores": {
+      "operationalizability": 0.74,
+      "data-existence": 0.34,
+      "data-adequacy": 0.28,
+      "discriminating-power": 0.38,
+      "analysis-feasibility": 0.32
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.6,
+    "operationalization": "Recompute the canonical variate space from the landmarks and test whether Dugesia lies between Girardia and Schmidtea and whether individual trajectories move in that order. A different between-species order, or trajectories that skip or reverse that path, would refute the reported route.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published canonical-variate plot of the remodeling path; axis scores are not deposited"}
+    ],
+    "obstacles": ["Canonical variate scores depend on the predefined groups and are not in a public table.", "With a few animals per class, axis order is sensitive to landmark choice."],
+    "rationale": "The between-species order and the remodeling path are geometric claims about one shape space. The plot is published, and the scores and landmarks needed to rebuild the axes are not. Small group sizes make that ordering hard to audit from the figure alone."
+  },
+  {
+    "claim_id": "levin-2015-girardia-09",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.42,
+      "data-adequacy": 0.35,
+      "discriminating-power": 0.38,
+      "analysis-feasibility": 0.4
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.55,
+    "operationalization": "Reimplement the two-cell reaction-diffusion and elastic-boundary model from the paper and supplement, deactivate subsets of the static signalling cells, and compare outline shape to the four observed heads with the same landmarks. Failure to recover those four outlines under the published rules would refute the quantitative claim.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published agent rules, force law, and supplementary model figures; the C++ source is not released"}
+    ],
+    "obstacles": ["The original C++ program and its parameter file are not in a public repository.", "Deactivating chosen subsets can be tuned until four shapes appear, so a match needs the published parameter set."],
+    "rationale": "The cell types, repulsion, and deactivation rule are described in the paper, with further detail deferred to the supplement, so a reimplementation is analysis if those details are complete. The executable source is unpublished. Without it, a quantitative match to the four heads can be missed for reasons of parameter reconstruction, which limits how far the result can be resolved now."
+  },
+  {
+    "claim_id": "levin-2015-girardia-10",
+    "scores": {
+      "operationalizability": 0.68,
+      "data-existence": 0.32,
+      "data-adequacy": 0.28,
+      "discriminating-power": 0.42,
+      "analysis-feasibility": 0.32
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.62,
+    "operationalization": "Score regenerated heads as reference-species shapes, wild-type Girardia, regeneration failure, or disorganized growth, and test whether octanol yields only the coherent classes with no intermediate shapes. A substantial fraction of failures, tumors, or intermediate outlines would refute the instructive-outcome claim.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published statement that intermediate and failed morphologies were absent; animal-level class lists are not deposited"}
+    ],
+    "obstacles": ["Absence of intermediates is an author-reported negative, without a deposited classification of every animal.", "Octanol has pharmacological actions besides gap-junction block, so coherent shapes still need the hexanol and dose evidence to speak to mechanism."],
+    "rationale": "Coherent species-like heads versus failed or disorganized regeneration is an observable classification. The paper reports that only the coherent classes occurred. The animal-level classifications are not public, so the negative observation cannot be re-tallied, and a new scored cohort would be required to test it."
+  },
+  {
+    "claim_id": "levin-2015-girardia-11",
+    "scores": {
+      "operationalizability": 0.84,
+      "data-existence": 0.3,
+      "data-adequacy": 0.28,
+      "discriminating-power": 0.48,
+      "analysis-feasibility": 0.3
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.67,
+    "operationalization": "Apply the same three-day exposure and seven-day water regeneration to matched fragments in hexanol and octanol, and compare rates of non-Girardia head shapes. Hexanol rates at the water-control baseline, with octanol elevated, would support channel-specific dependence; hexanol reproducing the octanol shapes would refute it.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published hexanol negative-control statement and a supplementary figure; counts are not deposited"}
+    ],
+    "obstacles": ["Hexanol group size and shape counts are not in a public table.", "Hexanol and octanol differ in properties other than gap-junction potency."],
+    "rationale": "A same-schedule alcohol control is a direct contrast, and the paper reports no shape change after hexanol. The counts behind that negative result are not deposited. The control also leaves other chemical differences between the two alcohols unseparated, so both the missing counts and that confound block a present-day resolution."
+  },
+  {
+    "claim_id": "levin-2015-girardia-12",
+    "scores": {
+      "operationalizability": 0.62,
+      "data-existence": 0.32,
+      "data-adequacy": 0.28,
+      "discriminating-power": 0.38,
+      "analysis-feasibility": 0.32
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.6,
+    "operationalization": "Hold genotype fixed by sequencing treated and control fragments, perturb gap-junction connectivity, and test whether head shape moves among the reference species forms. Shape change with an unchanged genome would support a physiological input; sequence differences tracking the new shapes, or no shape change, would refute it.",
+    "candidate_datasets": [
+      {"name": "NCBI Nucleotide", "url": "https://www.ncbi.nlm.nih.gov/nuccore", "role": "public reference sequences for the named planarians, not genotypes of the treated cohort"},
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published wild-type colony description and morphological outcomes"}
+    ],
+    "obstacles": ["Treated animals were not deposited as sequenced genotypes paired with head shape.", "Octanol can alter shape through non-bioelectric toxicity, so shape change alone does not identify the network as the input."],
+    "rationale": "Same-genome, different-anatomy is testable by pairing sequence with shape. Public nucleotide records identify the species and do not include the treated cohort. The paper's wild-type premise and the morphological outcome are published summaries, not a dataset that can confirm the physiological input."
+  },
+  {
+    "claim_id": "levin-2015-girardia-13",
+    "scores": {
+      "operationalizability": 0.58,
+      "data-existence": 0.28,
+      "data-adequacy": 0.22,
+      "discriminating-power": 0.32,
+      "analysis-feasibility": 0.28
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.58,
+    "operationalization": "Measure octanol remaining in tissue after washout, gap-junction conductance, and the later voltage pattern in the same animals. Persistent voltage change after the drug is gone, tracking a changed coupling topology, would support the memory claim; residual drug or unchanged coupling would refute it.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "cites a prior washout result and reports later voltage patterns; paired drug, coupling, and voltage measurements are not deposited"}
+    ],
+    "obstacles": ["Tissue octanol and direct gap-junction conductance were not measured in this cohort.", "A later voltage change is compatible with several persistent injuries besides a rewritten network topology."],
+    "rationale": "Separating residual drug from a persistent change in coupling requires chemical, conductance, and voltage measurements on the same animals. This paper cites a washout interval from earlier work and shows later voltage images. Those paired measurements are not public, so the mechanism remains untested with existing data."
+  },
+  {
+    "claim_id": "levin-2015-girardia-14",
+    "scores": {
+      "operationalizability": 0.32,
+      "data-existence": 0.12,
+      "data-adequacy": 0.1,
+      "discriminating-power": 0.15,
+      "analysis-feasibility": 0.22
+    },
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.63,
+    "operationalization": "The sentence infers partial gap-junction shutdown from the variability of the voltage effect and treats that partial shutdown as agreeing with stochastic head shapes. Any stochastic outcome is compatible with some unknown fraction of junctions blocked and with other noise sources.",
+    "candidate_datasets": [],
+    "obstacles": ["No fraction of blocked junctions is stated as a quantity that would refute the inference.", "Shape noise and voltage noise can arise independently of partial blockade."],
+    "rationale": "Partial effectiveness is inferred from variability and then said to agree with morphological stochasticity. Because the blocked fraction is not measured, every spread of outcomes fits the statement and also fits injury, dose, or expression noise. The agreement has no distinguishing observation."
+  },
+  {
+    "claim_id": "levin-2015-girardia-15",
+    "scores": {
+      "operationalizability": 0.52,
+      "data-existence": 0.25,
+      "data-adequacy": 0.2,
+      "discriminating-power": 0.38,
+      "analysis-feasibility": 0.28
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.6,
+    "operationalization": "Predict head class from single-time voltage images and from time-resolved voltage features in the same animals. Higher out-of-sample accuracy for the time-resolved features would support time-dependent encoding; equal or better accuracy from the snapshots would refute that preference.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "single-time voltage images and the authors' report of no simple shape correspondence; movies are not deposited"}
+    ],
+    "obstacles": ["No public time series of planarian voltage paired with later head shape exists for this protocol.", "Several non-voltage gap-junction signals remain compatible with a failed snapshot correlation."],
+    "rationale": "A head-to-head comparison of snapshot versus time-varying voltage features would decide the encoding claim. The paper reports single images and the absence of a simple correspondence, and it does not deposit movies. That comparison therefore waits on new or newly released time-resolved recordings."
+  },
+  {
+    "claim_id": "levin-2015-girardia-16",
+    "scores": {
+      "operationalizability": 0.6,
+      "data-existence": 0.3,
+      "data-adequacy": 0.28,
+      "discriminating-power": 0.38,
+      "analysis-feasibility": 0.3
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.58,
+    "operationalization": "After regeneration is complete, measure distance of each head to the species target over days 10 to 17 and test for a return that is absent in animals that already match the target. Return only from the mismatched heads would support a setpoint; indistinguishable drift in both groups would refute a distinct homeostatic correction.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published remodeling window and example images; longitudinal shape distances are not deposited"}
+    ],
+    "obstacles": ["The internal assessment step is not observed separately from the shape change.", "Continued morphallaxis can move heads toward the species form without a repeated comparison to a target."],
+    "rationale": "A setpoint is operationalized here as return toward species shape after a deviant regenerate, once large-scale regeneration has ended. The paper describes that return. The longitudinal measurements that would separate it from ongoing growth are not public, so the homeostatic reading cannot be resolved from existing records."
+  },
+  {
+    "claim_id": "levin-2015-girardia-17",
+    "scores": {
+      "operationalizability": 0.55,
+      "data-existence": 0.25,
+      "data-adequacy": 0.2,
+      "discriminating-power": 0.32,
+      "analysis-feasibility": 0.28
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.62,
+    "operationalization": "Interrupt candidate gap-junction-dependent signals from differentiated tissue to neoblasts or their progeny during regeneration and measure whether new tissue shape and neoblast position change while neoblast-intrinsic programs are held fixed. Loss of directed shaping only when that soma-to-neoblast path is blocked would support the proposal.",
+    "candidate_datasets": [
+      {"name": "PlanMine", "url": "https://planmine.mpinat.mpg.de/planmine/begin.do", "role": "public planarian expression and neoblast-marker resources, without a soma-to-neoblast signalling perturbation series"}
+    ],
+    "obstacles": ["No public dataset pairs a targeted somatic gap-junction block with neoblast position and final head shape.", "The instructive signal's molecular identity is left open, so several blocks could be counted as tests."],
+    "rationale": "Direction of an instructive signal from soma to stem cells is a perturbation claim with a shape and stem-cell readout. PlanMine covers planarian gene expression and does not contain this signalling interruption. The proposal stays dependent on new cell-type-resolved experiments."
+  },
+  {
+    "claim_id": "levin-2015-girardia-18",
+    "scores": {
+      "operationalizability": 0.22,
+      "data-existence": 0.08,
+      "data-adequacy": 0.06,
+      "discriminating-power": 0.1,
+      "analysis-feasibility": 0.18
+    },
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.74,
+    "operationalization": "The proposal asks the reader to treat somatic cells as a slower neural-like network obeying the brain's statistical dynamics. No statistic is named that would accept that description and reject an ordinary physiological network with the same coupling.",
+    "candidate_datasets": [],
+    "obstacles": ["Which brain statistics are supposed to match is unspecified.", "A slower non-neural gap-junction network fits the same regenerative outcomes."],
+    "rationale": "This is a suggested conceptualization of gap-junction connectivity and regenerative outcomes. Without a named shared statistic, neural recordings and planarian voltage images can always be described either as the same dynamics or as merely analogous. The proposal does not set a distinguishing observation."
+  },
+  {
+    "claim_id": "levin-2015-girardia-19",
+    "scores": {
+      "operationalizability": 0.5,
+      "data-existence": 0.25,
+      "data-adequacy": 0.2,
+      "discriminating-power": 0.34,
+      "analysis-feasibility": 0.28
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.55,
+    "operationalization": "Estimate the voltage-and-shape state of regenerating animals and test for a small set of stable head shapes, return after small perturbations, and switching among those shapes after gap-junction block. A continuous cloud of shapes, or no return to discrete states, would refute an attractor account of the observed heads.",
+    "candidate_datasets": [
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "published discrete head classes and later remodeling, without state-space trajectories"}
+    ],
+    "obstacles": ["Discrete outcome classes can be produced by thresholds that are not attractors of a bioelectric network.", "No public time series links network state to the evolutionary morphospace regions named in the hypothesis."],
+    "rationale": "Multistability, return, and perturbation-induced switching are measurable signatures of attractors, so the hypothesis is testable in principle. The paper reports discrete shapes and later remodeling, and it does not provide the state trajectories that would separate attractors from other routes to a few head classes. Those recordings are still required."
+  },
+  {
+    "claim_id": "levin-2015-girardia-20",
+    "scores": {
+      "operationalizability": 0.3,
+      "data-existence": 0.12,
+      "data-adequacy": 0.08,
+      "discriminating-power": 0.12,
+      "analysis-feasibility": 0.2
+    },
+    "verdict": "not-empirically-resolvable",
+    "confidence": 0.68,
+    "operationalization": "Return from an induced head to Girardia shape over three to four weeks is a shape trajectory. Calling the induced shapes local free-energy minima and the species shape the global minimum restates that trajectory unless an energy is defined independently of the shape score.",
+    "candidate_datasets": [],
+    "obstacles": ["No free-energy observable is defined apart from morphological closeness to the species target.", "Any temporary deviant shape that later normalizes fits the local-minimum story."],
+    "rationale": "The energetic wording redescribes amputation, regeneration, and later return to the species head. Morphology is both the phenomenon and the stand-in for free energy, so a non-energetic account of the same remodeling predicts the same observations. Existing shape records cannot separate the two."
+  },
+  {
+    "claim_id": "levin-2015-girardia-21",
+    "scores": {
+      "operationalizability": 0.52,
+      "data-existence": 0.5,
+      "data-adequacy": 0.35,
+      "discriminating-power": 0.3,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.57,
+    "operationalization": "Estimate phylogenetic distance from public planarian rRNA and compare it with the rate at which a standardized gap-junction block moves each species into the other species' head states. A monotone relation between distance and that transition rate would support the suggestion; no relation, or a relation that reverses after controlling for morphology, would weaken it.",
+    "candidate_datasets": [
+      {"name": "NCBI Nucleotide", "url": "https://www.ncbi.nlm.nih.gov/nuccore", "role": "public rRNA sequences for Girardia, Dugesia, Schmidtea, and Polycelis"},
+      {"name": "Gap junctional blockade in Girardia dorotocephala", "url": "https://doi.org/10.3390/ijms161126065", "role": "one-species shape frequencies proposed as a proxy for ease of shifting a shared network"}
+    ],
+    "obstacles": ["Only Girardia was pharmacologically shifted, so ease of transition is not measured in the other species.", "A frequency ranking can track raw morphological similarity rather than network distance."],
+    "rationale": "Public sequences can rebuild the distance half of the suggestion. The ease-of-shifting half is represented only by shape frequencies from one treated species, not by reciprocal perturbations across the clade. The phylogenetic ranking is therefore checkable now, and the network-evolution claim is not."
+  },
+  {
+    "claim_id": "levin-2014-tumor-01",
+    "scores": {
+      "operationalizability": 0.78,
+      "data-existence": 0.48,
+      "data-adequacy": 0.38,
+      "discriminating-power": 0.42,
+      "analysis-feasibility": 0.5
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.64,
+    "operationalization": "Score tumor-like-structure incidence when oncogene mRNA and a hyperpolarizing reagent are placed in separate blastomeres, with voltage confirmed at the remote site. A lower incidence only when the remote site is hyperpolarized would support a long-range voltage requirement; no change, or a requirement for local voltage only, would refute it.",
+    "candidate_datasets": [
+      {"name": "Long-range Vmem control of tumorigenesis", "url": "https://doi.org/10.18632/oncotarget.1935", "role": "published incidence contrasts, sample sizes, and p-values for remote hyperpolarization in Xenopus; embryo-level tables are not deposited"}
+    ],
+    "obstacles": ["Embryo-level voltage and tumor scores are not in a public file.", "Blastomere separation is a fate-map proxy for distance, and mRNA injections carry nonspecific effects."],
+    "rationale": "Remote hyperpolarization versus tumor incidence is a concrete contrast, and the paper publishes the summary rates for more than one oncogene. Those summaries can be checked for direction and reported significance. They cannot be recomputed from raw embryos, and they cover one amphibian assay rather than tumorigenesis in general, so the broad claim is only partly resolvable."
+  },
+  {
+    "claim_id": "levin-2014-tumor-02",
+    "scores": {
+      "operationalizability": 0.72,
+      "data-existence": 0.35,
+      "data-adequacy": 0.3,
+      "discriminating-power": 0.38,
+      "analysis-feasibility": 0.32
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.63,
+    "operationalization": "In oncogene-induced tadpole structures, quantify proliferation, nuclear area, hypoxia, intracellular pH, and leukocyte markers against stage-matched tissue. A joint elevation matching the stated human-tumor hallmarks would support the resemblance; absence of several of those readouts would refute it.",
+    "candidate_datasets": [
+      {"name": "Long-range Vmem control of tumorigenesis", "url": "https://doi.org/10.18632/oncotarget.1935", "role": "published description and images of induced tumor-like structures; assay values are not a deposited table"}
+    ],
+    "obstacles": ["The five hallmark measurements are not available as animal-level public data.", "Tadpole induced structures can share some stains with human tumors while differing in others that were not scored."],
+    "rationale": "Each named hallmark has a standard assay, so the resemblance claim is testable. The paper reports that the induced structures showed them, and the quantitative stain values are not deposited. Human tumor archives do not contain this Xenopus induction series, so the comparison cannot be redone from open data."
+  },
+  {
+    "claim_id": "levin-2014-tumor-03",
+    "scores": {
+      "operationalizability": 0.9,
+      "data-existence": 0.52,
+      "data-adequacy": 0.42,
+      "discriminating-power": 0.45,
+      "analysis-feasibility": 0.55
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.7,
+    "operationalization": "Compare induced-tumor incidence at stage 34 for Xrel3 and for Gli1 with and without Kv1.5 mRNA in a distant blastomere. Reductions near the reported 35% and 29%, with voltage changed only at the remote site, would support the result; no reduction for either oncogene would refute non-specificity across these two drivers.",
+    "candidate_datasets": [
+      {"name": "Long-range Vmem control of tumorigenesis", "url": "https://doi.org/10.18632/oncotarget.1935", "role": "published percent reductions, N=225 and N=292, and t-test results for the two oncogenes"}
+    ],
+    "obstacles": ["Raw embryo scores underlying the percentages are not public.", "A t-test on incidence proportions is a weak summary, and remote voltage was not archived animal by animal."],
+    "rationale": "The two effect sizes, sample sizes, and significance calls are published measurements of a clearly defined contrast. They can be checked for the stated direction and for consistency across Xrel3 and Gli1. Without embryo-level data, injection failures and the voltage of the distant site cannot be re-audited, so the result is only partly resolvable."
+  },
+  {
+    "claim_id": "levin-2014-tumor-04",
+    "scores": {
+      "operationalizability": 0.88,
+      "data-existence": 0.5,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.48,
+      "analysis-feasibility": 0.52
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.66,
+    "operationalization": "Compare KRASG12D tumor-like-structure incidence in normal medium and in 70 mM chloride, with membrane voltage measured through native chloride conductance and with Kv1.5 absent. A reduction near the reported 38% that tracks hyperpolarization would support ion-independent voltage dependence; no change, or a change without hyperpolarization, would refute it.",
+    "candidate_datasets": [
+      {"name": "Long-range Vmem control of tumorigenesis", "url": "https://doi.org/10.18632/oncotarget.1935", "role": "published 37.5% decrease, N=349, and t-test for high-chloride suppression of KRASG12D structures"}
+    ],
+    "obstacles": ["High external chloride also changes osmolarity and chloride chemical driving force.", "Animal-level voltages and incidence records are not deposited."],
+    "rationale": "The chloride contrast is a published numerical result aimed at separating voltage from the Kv1.5 protein. The percentage and sample size can be inspected directly. Osmotic and ionic confounds, and the lack of raw voltage traces, keep the ion-independence conclusion from being fully resolvable on the published summary."
+  },
+  {
+    "claim_id": "levin-2014-tumor-05",
+    "scores": {
+      "operationalizability": 0.72,
+      "data-existence": 0.45,
+      "data-adequacy": 0.35,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.42
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "Under 70 mM chloride, compare KRASG12D incidence with remote wild-type CLIC1 versus remote CLIC1C24S, and measure whether only the wild-type channel hyperpolarizes the remote tissue. Loss of suppression specifically with the dominant-negative construct would support a native CLIC1 requirement; suppression despite the mutant would refute it.",
+    "candidate_datasets": [
+      {"name": "Long-range Vmem control of tumorigenesis", "url": "https://doi.org/10.18632/oncotarget.1935", "role": "published wild-type versus CLIC1C24S contrast, including N=336 for the mutant block"}
+    ],
+    "obstacles": ["Dominant-negative overexpression can disrupt more than CLIC1 conductance.", "Expression level and remote voltage for each embryo are not in a public table."],
+    "rationale": "The wild-type versus point-mutant contrast is a published measurement bearing on whether chloride-driven suppression uses CLIC1. The sample size for the blocking construct is stated. Off-target effects of the dominant-negative protein, and missing per-embryo expression and voltage, leave the requirement claim only partly checked."
+  },
+  {
+    "claim_id": "levin-2014-tumor-06",
+    "scores": {
+      "operationalizability": 0.75,
+      "data-existence": 0.48,
+      "data-adequacy": 0.38,
+      "discriminating-power": 0.4,
+      "analysis-feasibility": 0.48
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.58,
+    "operationalization": "Under hyperpolarizing high-chloride conditions, express dominant-negative HDAC1 remote from KRASG12D and compare tumor-like-structure incidence with a control construct. An increase near the reported 36% would support an HDAC1 step; no increase, or an increase with HDAC1 activity intact, would refute HDAC1 as the necessary transducer.",
+    "candidate_datasets": [
+      {"name": "Long-range Vmem control of tumorigenesis", "url": "https://doi.org/10.18632/oncotarget.1935", "role": "published 35.6% incidence increase and chi-square result for remote dominant-negative HDAC1"}
+    ],
+    "obstacles": ["A single dominant-negative construct does not show that HDAC1 is the main transducer rather than one contributing factor.", "Acetylation and remote voltage were not deposited animal by animal."],
+    "rationale": "The remote dominant-negative HDAC1 contrast is numerically published and can be checked for direction and reported significance. Calling HDAC1 the main transduction step goes beyond that one intervention. Acetylation readouts that would tie the incidence change to HDAC1 activity are not in a public dataset."
+  },
+  {
+    "claim_id": "levin-2014-tumor-07",
+    "scores": {
+      "operationalizability": 0.7,
+      "data-existence": 0.48,
+      "data-adequacy": 0.35,
+      "discriminating-power": 0.35,
+      "analysis-feasibility": 0.45
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.6,
+    "operationalization": "Compare oncogene-induced tumor incidence after novobiocin and after the stated gram-positive-targeting cocktail versus vehicle, and pair the incidence change with measured loss of butyrate-producing bacteria. An incidence increase only when those bacteria decline would support the implication; an increase without a microbiome change would leave the bacterial reading unsupported.",
+    "candidate_datasets": [
+      {"name": "Long-range Vmem control of tumorigenesis", "url": "https://doi.org/10.18632/oncotarget.1935", "role": "published 26.2% incidence increase and chi-square result for the antibiotic cocktail"}
+    ],
+    "obstacles": ["Antibiotics change more than gram-positive, butyrate-producing taxa.", "Bacterial composition and butyrate were not deposited for these embryo cohorts."],
+    "rationale": "The incidence increase after the named cocktail is a published contrast with a sample statistic. The inference that native butyrate-producing bacteria normally restrain the tumors is not carried by that contrast alone, because the paper does not include a public microbiome or butyrate measurement for the same animals. Only the incidence half can be inspected now."
+  },
+  {
+    "claim_id": "levin-2014-tumor-08",
+    "scores": {
+      "operationalizability": 0.62,
+      "data-existence": 0.3,
+      "data-adequacy": 0.22,
+      "discriminating-power": 0.3,
+      "analysis-feasibility": 0.3
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.58,
+    "operationalization": "In the same Xenopus oncogene model, jointly measure remote voltage, butyrate at the prospective tumor site, HDAC1 activity, and tumor incidence under hyperpolarization, antibiotics, and dominant-negative HDAC1. The chain is supported only if incidence tracks butyrate-dependent HDAC1 inhibition downstream of voltage.",
+    "candidate_datasets": [
+      {"name": "Long-range Vmem control of tumorigenesis", "url": "https://doi.org/10.18632/oncotarget.1935", "role": "separate published contrasts for voltage, antibiotics, and dominant-negative HDAC1; the joint butyrate measurement is not included"}
+    ],
+    "obstacles": ["Butyrate concentration in the tadpoles is not a public variable.", "The three interventions were not deposited as a single paired dataset that could identify the mediator."],
+    "rationale": "The mediator claim requires voltage, bacterial butyrate, HDAC1 activity, and tumor incidence in one design. The paper reports related incidence contrasts separately and does not deposit butyrate or acetylation measurements. Biochemical literature on butyrate and HDAC in other systems does not supply this Xenopus chain."
+  },
+  {
+    "claim_id": "levin-2014-tumor-09",
+    "scores": {
+      "operationalizability": 0.48,
+      "data-existence": 0.18,
+      "data-adequacy": 0.12,
+      "discriminating-power": 0.28,
+      "analysis-feasibility": 0.25
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.55,
+    "operationalization": "Record bioelectric signals at a distance from induced tumors, with connectivity intact and interrupted, and test whether a remote signature predicts tumor state and disappears when the path is cut. A connectivity-dependent remote signature would support outward emission; no remote signal above controls would refute it.",
+    "candidate_datasets": [],
+    "obstacles": ["The emitted signal and the distance at which it should be detectable are unspecified.", "No public dataset pairs remote non-neural voltage with these induced structures."],
+    "rationale": "Outward bioelectric emission is testable once a remote signal and a disconnection control are defined, which the speculation leaves open. No deposited recording set contains that pair for the Xenopus structures or a mammalian counterpart. The detection claim therefore waits on new measurements."
+  },
+  {
+    "claim_id": "levin-2014-tumor-10",
+    "scores": {
+      "operationalizability": 0.74,
+      "data-existence": 0.5,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.42,
+      "analysis-feasibility": 0.5
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.62,
+    "operationalization": "Match the degree of hyperpolarization achieved by a potassium channel and by chloride loading, and test whether tumor suppression follows voltage rather than channel identity. Equal suppression at equal voltage, and loss of suppression when voltage is clamped back, would support the systems-level claim.",
+    "candidate_datasets": [
+      {"name": "Long-range Vmem control of tumorigenesis", "url": "https://doi.org/10.18632/oncotarget.1935", "role": "published suppression by both Kv1.5 and high-chloride hyperpolarization in the same Xenopus assay"}
+    ],
+    "obstacles": ["The two treatments were not published as voltage-matched dose responses.", "Chloride loading and potassium-channel expression can share non-voltage effects."],
+    "rationale": "Suppression by two different ionic routes is published and is the right kind of evidence for a voltage-level rather than a channel-identity cause. The summaries are not a voltage-matched series, and raw voltages are not public. The Xenopus contrasts therefore speak to part of the general causal claim and leave the matched test incomplete."
+  },
+  {
+    "claim_id": "levin-2014-tumor-11",
+    "scores": {
+      "operationalizability": 0.66,
+      "data-existence": 0.22,
+      "data-adequacy": 0.18,
+      "discriminating-power": 0.3,
+      "analysis-feasibility": 0.25
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.64,
+    "operationalization": "Map butyrate-producing bacteria, surface charge or membrane voltage, local butyrate, histone acetylation, and cell-cycle state across hyperpolarized host tissue and depolarized oncogene cells. Skew of viable bacteria and butyrate toward the depolarized cells, with HDAC inhibition there, would support the spatial model.",
+    "candidate_datasets": [],
+    "obstacles": ["No public spatial microbiome or butyrate map exists for these tadpoles.", "Bacterial attachment and bacterial viability can respond differently to surface charge, so both need to be measured."],
+    "rationale": "The proposed skew of butyrate-producing bacteria toward depolarized oncogene cells is a spatial prediction with chemical and histological readouts. Those maps were not deposited with the incidence results, and general butyrate–HDAC datasets from other species lack the embryo geometry. The distribution model needs new or newly released measurements."
+  },
+  {
+    "claim_id": "levin-2014-tumor-12",
+    "scores": {
+      "operationalizability": 0.48,
+      "data-existence": 0.22,
+      "data-adequacy": 0.18,
+      "discriminating-power": 0.28,
+      "analysis-feasibility": 0.3
+    },
+    "verdict": "needs-new-data",
+    "confidence": 0.6,
+    "operationalization": "In mammalian tumor models, change resting potential of host tissue remote from the tumor, preferably with clinically used channel drugs, and test detection and tumor-growth endpoints against voltage-clamped controls. Conservation would appear as a remote-voltage effect on detection or growth; its absence in adequately powered models would refute conservation.",
+    "candidate_datasets": [
+      {"name": "IUPHAR/BPS Guide to Pharmacology", "url": "https://www.guidetopharmacology.org/", "role": "catalog of ion-channel drugs, including agents already used in humans, without remote-voltage cancer outcomes"}
+    ],
+    "obstacles": ["Mammalian studies do not publicly pair remote host Vmem with tumor incidence under these interventions.", "Approved channel drugs have extensive non-voltage pharmacology, so a clinical association would not identify the Xenopus mechanism."],
+    "rationale": "The prediction is conditional on conservation in mammalian models and on a therapeutic effect of voltage modulation. Channel-drug catalogs list candidate reagents and do not contain the remote-voltage experiments. Cancer genomics portals likewise lack this physiological exposure, so the conservation claim still requires new mammalian data."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-01",
+    "scores": {
+      "operationalizability": 0.88,
+      "data-existence": 0.45,
+      "data-adequacy": 0.4,
+      "discriminating-power": 0.5,
+      "analysis-feasibility": 0.42
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.68,
+    "operationalization": "Score stage-45 tadpoles for absent nostrils, forebrain, or midbrain and for misformed hindbrain after 0.1 mg/mL nicotine from stages 10 to 35, against untreated siblings. A major-defect rate near 55% versus near 6% in controls would support the result; overlapping rates would refute it.",
+    "candidate_datasets": [
+      {"name": "HCN2 voltage pre-patterns", "url": "https://doi.org/10.1038/s41467-018-03334-5", "role": "published approximate incidence contrast and scoring criteria; individual embryo scores are available from the authors on request rather than as an open file"}
+    ],
+    "obstacles": ["The data-availability statement leaves raw scores with the corresponding author.", "The published rates are approximate, and nicotine has several targets besides the brain-voltage pattern."],
+    "rationale": "The defect classes, dose, stages, and approximate rates are explicit published measurements. They can be checked for a large treated-versus-control gap. Because the embryo-level scores and images are not openly deposited, the percentages cannot be recomputed or audited for scoring bias, which leaves the result partly resolvable."
+  },
+  {
+    "claim_id": "levin-2018-hcn2-02",
+    "scores": {
+      "operationalizability": 0.84,
+      "data-existence": 0.68,
+      "data-adequacy": 0.55,
+      "discriminating-power": 0.58,
+      "analysis-feasibility": 0.62
+    },
+    "verdict": "partially-resolvable",
+    "confidence": 0.58,
+    "operationalization": "Rebuild the stage-15 anterior neurula in BETSE with the published ion concentrations, regional potassium and chloride leak, and Kir conductance, and test whether neural-tube Vmem is near −50 mV while folds and ectoderm stay near −5 mV. Closing Kir, or equalizing the leaks, should remove that contrast if the stated mechanism is required.",
+    "candidate_datasets": [
+      {"name": "BETSE", "url": "https://github.com/betsee/betse", "role": "public bioelectric tissue simulator, including neurula geometry masks; the 2018 Nature Communications YAML is not in the repository"},
+      {"name": "HCN2 voltage pre-patterns", "url": "https://doi.org/10.1038/s41467-018-03334-5", "role": "Table 1 initial concentrations, permeability description, and supplementary modeling note"},
+      {"name": "Channelpedia", "url": "https://channelpedia.epfl.ch/", "role": "public Kir and leak channel parameters of the sort BETSE uses for conductance models"}
+    ],
+    "obstacles": ["The spatial leak map is described with a figure and supplement rather than a deposited configuration file.", "Agreement with embryonic voltages uses the paper's own images, which are not an independent recording archive."],
+    "rationale": "BETSE and neurula geometries are public, and the paper tabulates starting concentrations and the leak-and-Kir mechanism, so the voltage pattern can be recomputed. The exact 2018 configuration is not a file in the repository, and the match to real embryos rests on the paper's images. The simulation half is therefore testable with reconstruction, short of a turnkey reproduction of the published run."
+  }
+]

@@ -96,7 +96,8 @@ by hand, chosen at random rather than the first few.
 As soon as a batch is signed and passes section 2, publish all of it to the test registry
 (`https://test.registry.knowledgepixels.com/`), then check:
 
-- `np check` (nanopub-java) passes on the signed files.
+- `np check` (the nanopub-py CLI, `pipx install nanopub`) passes on the signed files, and
+  nanopub-js `verifySignature` accepts them (the publish scripts run it before upload).
 - A sample renders correctly in [Nanodash](https://nanodash.knowledgepixels.com/), and its
   links and cited identifiers resolve.
 - A [Nanopub Query](https://query.knowledgepixels.com/) count matches the number of files

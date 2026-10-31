@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-13--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch03-13: supports, confidence 0.93" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.93"^^xsd:double ;
+    delphi:hypothesis "For every tag system that removes one element per step (Wolfram's convention: remove n elements from the front, append the block assigned to the removed n-tuple), running |s| steps from a sequence s yields exactly the neighbour-independent substitution image of s, so its long-run sequences are substitutive (eventually periodic or nested, with linear factor complexity); whereas among tag systems removing two elements per step some produce non-terminating, non-recurring evolution whose length series is nearly incompressible." ;
+    delphi:passCriterion "Pre-registered. (1) Equivalence: for all 225 one-deletion two-colour tag systems with blocks of length 0-3, all 62 initial sequences of length 1-5, and 4 consecutive passes, the sequence after each pass of |s| steps equals the substitution-system iterate exactly (100% of cases). (2) Simplicity: for every one-deletion rule started from the sequences 1, 11 and 10 and run for up to 400 passes, either the state space is finite (the sequence empties or an exact state recurs, i.e. repetitive) or the sequence reaches >= 2000 symbols and its factor complexity p(10) (number of distinct length-10 subwords) is <= 60 (nested, linear complexity). (3) Complexity with two deletions: at least one of the 50625 two-deletion two-colour tag systems with blocks of length 0-3, started from the pair 11, runs 50000 steps without emptying and without any exact state recurrence, and the lzma-compressed size of its length-difference series over steps 10000-50000 is at least 60% of the median compressed size of 5 random shuffles of the same series. 'Supports' requires (1), (2) and (3)." ;
+    delphi:failCriterion "Pre-registered. 'Refutes' if (1) fails in any case, or if any one-deletion rule reaches >= 2000 symbols with p(10) > 200, or if no two-deletion rule meets (3). Other combinations are 'mixed'." ;
+    delphi:expectedObservation "Pre-registered. (1) Equivalence: for all 225 one-deletion two-colour tag systems with blocks of length 0-3, all 62 initial sequences of length 1-5, and 4 consecutive passes, the sequence after each pass of |s| steps equals the substitution-system iterate exactly (100% of cases). (2) Simplicity: for every one-deletion rule started from the sequences 1, 11 and 10 and run for up to 400 passes, either the state space is finite (the sequence empties or an exact state recurs, i.e. repetitive) or the sequence reaches >= 2000 symbols and its factor complexity p(10) (number of distinct length-10 subwords) is <= 60 (nested, linear complexity). (3) Complexity with two deletions: at least one of the 50625 two-deletion two-colour tag systems with blocks of length 0-3, started from the pair 11, runs 50000 steps without emptying and without any exact state recurrence, and the lzma-compressed size of its length-difference series over steps 10000-50000 is at least 60% of the median compressed size of 5 random shuffles of the same series. 'Supports' requires (1), (2) and (3)." ;
+    delphi:disconfirmingObservation "Pre-registered. 'Refutes' if (1) fails in any case, or if any one-deletion rule reaches >= 2000 symbols with p(10) > 200, or if no two-deletion rule meets (3). Other combinations are 'mixed'." ;
+    delphi:admissibleDatasets "Planned datasets: tag-system-enumeration-generator" ;
+    delphi:inferenceMethod "analysis.py (1) runs every one-deletion rule for |s| steps from every sequence s of length 1-5 and compares with the substitution image, over 4 passes; (2) iterates every one-deletion rule from 1, 11 and 10 as a substitution system until the state recurs or empties (finite state space) or the sequence reaches 2000 symbols, where the number of distinct length-10 subwords p(10) is computed; (3) runs all 50625 two-deletion rules from 11 for 2000 steps, classifies them as emptied, recurrent or running, then runs the 400 running rules with the smallest length (and NKS p. 94 case (a)) for 50000 steps with exact state-recurrence detection and compares the lzma size of the length-difference series over steps 10000-50000 with that of its shuffles." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py (1) runs every one-deletion rule for |s| steps from every sequence s of length 1-5 and compares with the substitution image, over 4 passes; (2) iterates every one-deletion rule from 1, 11 and 10 as a substitution system until the state recurs or empties (finite state space) or the sequence reaches 2000 symbols, where the number of distinct length-10 subwords p(10) is computed; (3) runs all 50625 two-deletion rules from 11 for 2000 steps, classifies them as emptied, recurrent or running, then runs the 400 running rules with the smallest length (and NKS p. 94 case (a)) for 50000 steps with exact state-recurrence detection and compares the lzma size of the length-difference series over steps 10000-50000 with that of its shuffles." ;
+    rdfs:comment "Measured: 376 two-deletion rules meeting the pre-registered complexity criterion (of 400 fully tested) (n = 50625, exact (deterministic computation)). Interpretation: Tag systems follow NKS p. 93-94 and the implementation note (p. 894): at each step n elements are removed from the front and a block determined by the removed n elements is appended; a sequence shorter than n becomes empty. 'Neighbor-independent substitution system' is the map replacing each symbol by its block (NKS p. 83). 'Repetitive or nested' is operationalized as finite state space (eventual periodicity) or linear factor complexity (p(10) <= 60 for a two-letter sequence; the Thue-Morse sequence has p(10) = 28). 'Very complicated' is operationalized as non-terminating, non-recurring evolution with a length series that lzma cannot compress much better than its own shuffle. The test is computational; the program family is generated by analysis.py." ;
+    delphi:evidenceAgainst "Part 2 'undetermined' (20 of 675 cases) are rules whose sequence exceeded 200000 symbols before reaching 2000 or recurring; these are exponentially growing substitutions with constant blocks, not evidence against the claim." ;
+    delphi:evidenceAgainst "The complexity criterion is applied to the length series, so a tag system whose length grows steadily but whose contents are complex (e.g. NKS p. 94 case (a), ratio 0.028) does not count as 'complicated' here; the existence clause is nevertheless met by 376 other rules." ;
+    delphi:evidenceAgainst "Only the 400 survivors with the smallest length after 2000 steps were run to 50000 steps; the 376 count is therefore a lower bound on complicated rules in the family." ;
+    delphi:evidenceAgainst "p(10) <= 60 is a proxy for 'nested or repetitive' (linear factor complexity); the maximum observed was 43 (rule 0->0, 1->011), well within the nested range, and no rule exceeded the 200 refutation threshold." ;
+    delphi:evidenceAgainst "Run time is about 6 minutes on one core, mostly the 50625-rule census." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch03-13--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch03-13/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch03-13--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Two-colour tag systems with blocks of length 0-3 (generated by analysis.py)" ;
+    dct:description "enumerated program family whose behaviour is classified" ;
+
+    dct:license "CC0 (generated data)" ;
+    prov:wasDerivedFrom <null> .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch03-13> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-13--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch03-13/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-cursor-cloud-agent> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (Claude Fable 5.1 (Cursor cloud agent); cursor/claim-tests-wolfram-nks-f0e1)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-cursor-cloud-agent> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-cursor-cloud-agent> a delphi:LanguageModel ;
+    dct:identifier "Claude Fable 5.1 (Cursor cloud agent)" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.465Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch03-13: supports, confidence 0.93" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-13--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

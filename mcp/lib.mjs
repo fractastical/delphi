@@ -131,7 +131,7 @@ export async function searchClaims({ text, domain, mathOnly = false, limit = 20,
     text && `FILTER(CONTAINS(LCASE(CONCAT(STR(?label), " ", COALESCE(STR(?desc), ""), " ", COALESCE(STR(?notation), ""))), LCASE(${lit(text)})))`,
     domain && `FILTER(CONTAINS(LCASE(STR(?d)), LCASE(${lit(domain)})))`,
   ].filter(Boolean).join("\n  ");
-  return sparql(`
+  const rows = await sparql(`
 SELECT ?claim (SAMPLE(?label) AS ?title) (SAMPLE(?desc) AS ?statement)
        (GROUP_CONCAT(DISTINCT STR(?notation); separator=" || ") AS ?math)
        (SAMPLE(STR(?d)) AS ?domain) (SAMPLE(?np) AS ?nanopub) WHERE {
@@ -144,6 +144,27 @@ SELECT ?claim (SAMPLE(?label) AS ?title) (SAMPLE(?desc) AS ?statement)
   OPTIONAL { GRAPH ?p { ?np delphi:domain ?d . } }
   ${filters}
 } GROUP BY ?claim ORDER BY ?claim LIMIT ${Math.min(Number(limit) || 20, 500)}`, source);
+  // Attach the data-test contract (expected / disconfirming observation, admissible datasets,
+  // inference method) and verdict from claim-tests/, via docs/claims.json. Repo-only knowledge,
+  // so only for the local source.
+  if (source === "local") {
+    const tests = dataTests();
+    for (const r of rows) {
+      const t = tests.get(String(r.claim).split("/").pop());
+      if (t) { r.evidence = t.verdict; r.evidenceConfidence = t.confidence; r.testContract = t.test_contract; if (t.revisions?.length) r.revisions = t.revisions; }
+    }
+  }
+  return rows;
+}
+
+let testsCache = null;
+function dataTests() {
+  const f = join(REPO, "docs/claims.json");
+  try {
+    const mtime = statSync(f).mtimeMs;
+    if (testsCache?.mtime !== mtime) testsCache = { mtime, map: new Map(JSON.parse(readFileSync(f, "utf8")).claims.filter(c => c.data_test).map(c => [c.id, c.data_test])) };
+    return testsCache.map;
+  } catch { return new Map(); }
 }
 
 export async function getClaim({ id, source = "local" }) {

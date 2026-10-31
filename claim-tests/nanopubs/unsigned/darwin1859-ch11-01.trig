@@ -1,0 +1,84 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch11-01--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch11-01: supports, confidence 0.75" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.75"^^xsd:double ;
+    delphi:hypothesis "Across regions of the world, the taxonomic similarity of their biotas is explained by which land mass they belong to (shared history and barriers) rather than by the similarity of their climates; in particular, climatically matched regions on different continents (e.g. the Mediterranean-climate belts of Australia, South Africa and Chile) share fewer taxa than climatically different regions on the same continent." ;
+    delphi:passCriterion "Pre-registered. For the 23 regions in derived/regions.csv (5x5 degree boxes, pre-assigned to a continent and to one of six climate classes), genus lists of mammals, birds and vascular plants are taken from GBIF occurrences (genera with >= 3 georeferenced records in the box), and climate from the NASA POWER climatology (annual mean 2 m temperature, annual precipitation, seasonal temperature range at five points per box). For each taxon group, pairwise Jaccard dissimilarity between regions is regressed on standardised climate distance and a same-continent indicator (permutation test over region labels, 2000 permutations). The claim is SUPPORTED if, in at least 2 of the 3 taxon groups, (a) the same-continent effect is significant (p < 0.05) and its partial R-squared exceeds that of climate distance, and (b) the mean Jaccard similarity of climate-matched pairs on different continents is lower than the mean similarity of climate-mismatched pairs on the same continent." ;
+    delphi:failCriterion "Pre-registered. The claim is REFUTED if, in at least 2 of the 3 taxon groups, climate distance has the larger partial R-squared and the same-continent effect is not significant, or climate-matched cross-continental pairs are more similar than climate-mismatched same-continent pairs. Other outcomes are 'mixed'. If GBIF returns fewer than 20 genera for a region/group, that region is dropped for that group; if fewer than 15 regions remain for a group, the group is not evaluated." ;
+    delphi:expectedObservation "Pre-registered. For the 23 regions in derived/regions.csv (5x5 degree boxes, pre-assigned to a continent and to one of six climate classes), genus lists of mammals, birds and vascular plants are taken from GBIF occurrences (genera with >= 3 georeferenced records in the box), and climate from the NASA POWER climatology (annual mean 2 m temperature, annual precipitation, seasonal temperature range at five points per box). For each taxon group, pairwise Jaccard dissimilarity between regions is regressed on standardised climate distance and a same-continent indicator (permutation test over region labels, 2000 permutations). The claim is SUPPORTED if, in at least 2 of the 3 taxon groups, (a) the same-continent effect is significant (p < 0.05) and its partial R-squared exceeds that of climate distance, and (b) the mean Jaccard similarity of climate-matched pairs on different continents is lower than the mean similarity of climate-mismatched pairs on the same continent." ;
+    delphi:disconfirmingObservation "Pre-registered. The claim is REFUTED if, in at least 2 of the 3 taxon groups, climate distance has the larger partial R-squared and the same-continent effect is not significant, or climate-matched cross-continental pairs are more similar than climate-mismatched same-continent pairs. Other outcomes are 'mixed'. If GBIF returns fewer than 20 genera for a region/group, that region is dropped for that group; if fewer than 15 regions remain for a group, the group is not evaluated." ;
+    delphi:admissibleDatasets "Planned datasets: gbif-occurrence-api, nasa-power-climatology" ;
+    delphi:inferenceMethod "Genus lists for Mammalia, Aves and Tracheophyta were obtained for the 23 pre-registered 5x5 degree regions from GBIF genus facets (genera with >= 3 georeferenced, non-flagged, present records); climate was summarised from NASA POWER climatology at five points per box (annual mean T2M, annual precipitation, seasonal temperature range), standardised (log precipitation) and converted to Euclidean climate distance. Pairwise Jaccard dissimilarity (253 pairs) was regressed on climate distance and a same-continent indicator with a Mantel-type permutation test (2000 permutations of region labels), and partial R-squared values compared; separately, the mean similarity of climate-matched cross-continental pairs was compared with climate-mismatched same-continent pairs. Central Arabia was dropped for mammals (17 genera < 20)." ;
+    delphi:preregistered false ;
+    dct:description "Genus lists for Mammalia, Aves and Tracheophyta were obtained for the 23 pre-registered 5x5 degree regions from GBIF genus facets (genera with >= 3 georeferenced, non-flagged, present records); climate was summarised from NASA POWER climatology at five points per box (annual mean T2M, annual precipitation, seasonal temperature range), standardised (log precipitation) and converted to Euclidean climate distance. Pairwise Jaccard dissimilarity (253 pairs) was regressed on climate distance and a same-continent indicator with a Mantel-type permutation test (2000 permutations of region labels), and partial R-squared values compared; separately, the mean similarity of climate-matched cross-continental pairs was compared with climate-mismatched same-continent pairs. Central Arabia was dropped for mammals (17 genera < 20)." ;
+    rdfs:comment "Measured: 2 taxon groups (of 3) in which same-continent membership outweighs climate distance and climate-matched cross-continental pairs are less similar than climate-mismatched same-continent pairs (n = 253, permutation p-values per group in extra). Interpretation: Darwin's 'inhabitants of various regions' are read as the genus-level composition of three well-recorded groups (Mammalia, Aves, Tracheophyta); 'climatal and other physical conditions' as the NASA POWER temperature and precipitation climatology; 'similarity' as Jaccard similarity of genus lists. His 'accounted for' is read comparatively: climate distance should explain less of the variation in biotic similarity than does being on the same land mass, and his own example (Australia, South Africa, western South America at 25-35 degrees S) is tested directly as the climate-matched cross-continental pairs. The absolute wording ('neither ... nor ... can be accounted for') is not testable as stated because climate obviously limits distributions within a continent; the comparative reading is the one tested. Regions and climate classes were fixed before any data were retrieved. GBIF records include introduced species, which inflate cross-continental similarity and therefore work against the claim." ;
+    delphi:evidenceAgainst "For vascular plants the result is reversed: climate distance explains more of the genus-level dissimilarity (partial R2 0.36) than continent (0.08), although the same-continent effect is still significant and climate-matched cross-continental pairs are still (non-significantly) less similar than mismatched same-continent pairs. Genus-level plant composition is strongly shared across continents (cosmopolitan and Holarctic genera, plus introduced species in GBIF), so the claim holds for mammals and birds but not, at genus rank, for plants." ;
+    delphi:evidenceAgainst "GBIF occurrences include introduced and vagrant taxa and uneven sampling; the >= 3 record filter removes only the rarest. Introduced species inflate cross-continental similarity and bias the test against the claim." ;
+    delphi:evidenceAgainst "Climate is summarised by three variables from a 0.5 degree reanalysis-based climatology at five points per box; finer climatic structure (soils, topography) is not represented. The 'same continent' indicator also absorbs geographic distance, which Darwin treated as part of the same explanation (barriers and history)." ;
+    delphi:evidenceAgainst "Darwin's own triad (SW Australia, Western Cape, central Chile) shares a mean of 16% of mammal genera and 24% of bird genera, versus 30% and 57% for climatically different regions on the same continent." ;
+    delphi:evidenceAgainst "The absolute wording of the claim is not tested; the comparative reading (continent outweighs climate) is." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-01--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-01--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/darwin-origin/darwin1859-ch11-01/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-01--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: GBIF occurrence search API (genus facets within bounding boxes)" ;
+    dct:description "genus lists of mammals, birds and vascular plants per region" ;
+    delphi:hasChecksum "sha256:e6f0c7cf9813bd30da63586c080fe606f83eeaa1fbed018b5592b23f292ab8c7" ;
+    prov:atLocation <https://api.gbif.org/v1/occurrence/search?...%20(one%20call%20per%20region/group;%20full%20list%20with%20per-call%20SHA-256%20in%20derived/files.json)> ;
+    dct:license "varies by dataset (CC0 / CC BY / CC BY-NC); aggregate counts only" ;
+    prov:wasDerivedFrom <https://www.gbif.org/occurrence/search> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch11-01--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: NASA POWER climatology API (temporal/climatology/point)" ;
+    dct:description "temperature and precipitation climatology per region" ;
+    delphi:hasChecksum "sha256:18a1f490a5e95eecfce74a592281932a743dfa018ba869d57b587cb1808c3a28" ;
+    prov:atLocation <https://power.larc.nasa.gov/api/temporal/climatology/point?...%20(one%20call%20per%20region/group;%20full%20list%20with%20per-call%20SHA-256%20in%20derived/files.json)> ;
+    dct:license "public domain (NASA)" ;
+    prov:wasDerivedFrom <https://power.larc.nasa.gov/> .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch11-01> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch11-01--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/darwin-origin/darwin1859-ch11-01/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-b201)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.282Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch11-01: supports, confidence 0.75" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch11-01--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

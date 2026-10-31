@@ -118,7 +118,8 @@ See the [nanopub-query repository](https://github.com/knowledgepixels/nanopub-qu
 
 ### Libraries and tooling
 
-- [nanopub-py](https://github.com/fair-workflows/nanopub): Python library for searching, fetching, and publishing nanopubs.
+- [nanopub-js](https://github.com/Nanopublication/nanopub-js): JavaScript library; this repo's publish scripts use it to sign, verify and publish.
+- [nanopub-py](https://github.com/fair-workflows/nanopub): Python library for searching, fetching, and publishing nanopubs. Its `np` CLI is what we use for `np check`.
 - [nanopub-java](https://github.com/Nanopublication/nanopub-java): Java library and CLI.
 - [Nanopub registry](https://github.com/knowledgepixels/nanopub-registry): the decentralized registry that stores and serves nanopubs.
 

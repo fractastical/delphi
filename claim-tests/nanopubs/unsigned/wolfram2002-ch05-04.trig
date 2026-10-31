@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch05-04--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch05-04: supports, confidence 0.85" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.85"^^xsd:double ;
+    delphi:hypothesis "The 8-neighbour outer-totalistic 2D cellular automaton 'a cell becomes black when exactly three of its eight neighbours are black, otherwise it is unchanged' (NKS code 174826, Life-like notation B3/S012345678), started from a row of eleven black cells, keeps growing for 1000 steps while the normalised outline of the whole pattern keeps changing on the scale of the pattern itself and never settles to a simple geometric form (circle, square, diamond or octagon), whereas simple growth rules settle to a fixed simple outline." ;
+    delphi:passCriterion "Pre-registered. Run the rule for T = 1000 steps from a row of 11 black cells. Let rho_t(theta) be the outer radius of the occupied set from the pattern centroid in 360 angular bins, normalised by its mean, and D(t1,t2) the mean absolute difference between rho_t1 and rho_t2. PASS (supports) if all three hold: (a) growth continues: mean radius R(1000) >= 1.5 * R(500) and the population is larger at step 1000 than at step 500; (b) the outline keeps changing: D(500,1000) >= 0.05 and D(750,1000) >= 0.03, while both control rules (8-neighbour 'black if any neighbour black', which grows a square, and 4-neighbour 'black if any neighbour black', which grows a diamond) give D(500,1000) <= 0.02; (c) the outline at step 1000 is not a simple form: the minimum over the reference family {circle, axis-aligned square, 45-degree square, regular octagon at 0 and 22.5 degrees} of the mean absolute difference between rho_1000 and the reference profile is >= 0.05, while for each control rule the same minimum is <= 0.03." ;
+    delphi:failCriterion "Pre-registered. FAIL (refutes) if growth stops (population unchanged over steps 900-1000) or if the outline converges to a simple form: D(500,1000) < 0.02 and the minimum simple-shape distance at step 1000 is < 0.03. Any other combination is 'mixed' (e.g. shape still changing but growth slowing, or controls not behaving as expected, which would mean the descriptor is not discriminating)." ;
+    delphi:expectedObservation "Pre-registered. Run the rule for T = 1000 steps from a row of 11 black cells. Let rho_t(theta) be the outer radius of the occupied set from the pattern centroid in 360 angular bins, normalised by its mean, and D(t1,t2) the mean absolute difference between rho_t1 and rho_t2. PASS (supports) if all three hold: (a) growth continues: mean radius R(1000) >= 1.5 * R(500) and the population is larger at step 1000 than at step 500; (b) the outline keeps changing: D(500,1000) >= 0.05 and D(750,1000) >= 0.03, while both control rules (8-neighbour 'black if any neighbour black', which grows a square, and 4-neighbour 'black if any neighbour black', which grows a diamond) give D(500,1000) <= 0.02; (c) the outline at step 1000 is not a simple form: the minimum over the reference family {circle, axis-aligned square, 45-degree square, regular octagon at 0 and 22.5 degrees} of the mean absolute difference between rho_1000 and the reference profile is >= 0.05, while for each control rule the same minimum is <= 0.03." ;
+    delphi:disconfirmingObservation "Pre-registered. FAIL (refutes) if growth stops (population unchanged over steps 900-1000) or if the outline converges to a simple form: D(500,1000) < 0.02 and the minimum simple-shape distance at step 1000 is < 0.03. Any other combination is 'mixed' (e.g. shape still changing but growth slowing, or controls not behaving as expected, which would mean the descriptor is not discriminating)." ;
+    delphi:admissibleDatasets "Planned datasets: nks-code-174826-row11-generator" ;
+    delphi:inferenceMethod "analysis.py evolves NKS code 174826 (B3/S012345678) from a row of 11 black cells for 1000 steps on a dynamically padded numpy grid, and at 8 checkpoints records population, mean radius, convex-hull solidity and the normalised outer-radius profile rho_t(theta) in 360 angular bins about the pattern centroid. It computes D(t1,t2) = mean |rho_t1 - rho_t2| between checkpoints and the distance from rho_1000 to five reference profiles (circle, two squares, two octagons). The same pipeline is run on two simple-growth controls (8-neighbour and 4-neighbour 'black if any neighbour black') and on code 175850 from a row of 7 for comparison. Runtime about 20 s." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py evolves NKS code 174826 (B3/S012345678) from a row of 11 black cells for 1000 steps on a dynamically padded numpy grid, and at 8 checkpoints records population, mean radius, convex-hull solidity and the normalised outer-radius profile rho_t(theta) in 360 angular bins about the pattern centroid. It computes D(t1,t2) = mean |rho_t1 - rho_t2| between checkpoints and the distance from rho_1000 to five reference profiles (circle, two squares, two octagons). The same pipeline is run on two simple-growth controls (8-neighbour and 4-neighbour 'black if any neighbour black') and on code 175850 from a row of 7 for comparison. Runtime about 20 s." ;
+    rdfs:comment "Measured: 0.1541 mean |rho_500 - rho_1000| (dimensionless, normalised radius) (n = 1000, exact deterministic computation; descriptor resolution 1 degree). Interpretation: Wolfram's claim (pp. 176, 181) is existential: this one rule from this one seed produces an overall shape that 'seems continually to go on changing, with no simple overall form'. 'Overall shape' is mapped to the normalised angular outer-radius profile of the occupied set, so interior texture is ignored; 'no simple form' is mapped to distance from a small pre-declared family of simple convex shapes and to non-convergence of the outline between steps 500, 750 and 1000. 'Continually' can only be bounded by the run length; a finite run cannot exclude eventual regularity. Code 175850 (the '3 or 5 of 8' rule from p. 177, row of 7), which the book says is rough on small scales but smooth on large scales, is run as an additional comparison but is not part of the criterion." ;
+    delphi:evidenceAgainst "A 1000-step run bounds 'continually' but cannot exclude eventual regularity of the outline; growth was still linear (mean radius 128 -> 251 cells between steps 500 and 1000, about 0.25 cells per step) and the outline change between checkpoints showed no downward trend (0.08-0.39)." ;
+    delphi:evidenceAgainst "'Simple form' was operationalised as a pre-declared family of five convex shapes plus convergence of the outline; a shape could in principle be 'simple' in a sense not covered (e.g. a fixed irregular polygon), but the outline also failed to converge (D(750,1000) = 0.16), which no fixed limiting shape allows." ;
+    delphi:evidenceAgainst "The outline descriptor is the outer radius per angular bin, so interior holes (solidity 0.49 of the convex hull) are ignored, as the claim requires." ;
+    delphi:evidenceAgainst "The comparison rule code 175850 behaves as the book describes (D(500,1000) = 0.0066, closest to a circle at distance 0.025), which supports the discriminating power of the descriptor but is not part of the criterion." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-04--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch05-04/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch05-04--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Enumerated evolution of the 2D outer-totalistic 8-neighbour cellular automaton, NKS code 174826 (birth on exactly 3 black neighbours, otherwise unchanged), generated by analysis.py" ;
+    dct:description "the computational object the claim is about" ;
+
+    dct:license "generated by this test; rule definition from NKS p. 176" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p176--cellular-automata/> .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch05-04> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch05-04--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch05-04/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-9241)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.468Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch05-04: supports, confidence 0.85" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch05-04--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

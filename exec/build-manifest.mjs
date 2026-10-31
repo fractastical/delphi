@@ -76,7 +76,7 @@ for (const project of dirs(join(ROOT, "claim-tests"))) {
     const scanned = [script, fetch].filter(Boolean).map((f) => readFileSync(join(dir, f), "utf8")).join("\n");
 
     entries.push({
-      id: `data:${result.claim_id ?? claimId}`,
+      id: `data:${claimId}`,
       claim_id: result.claim_id ?? claimId,
       kind: "data",
       project,
@@ -87,6 +87,9 @@ for (const project of dirs(join(ROOT, "claim-tests"))) {
       network: o.network ?? NETWORK.test(scanned),
       timeout_s: o.timeout_s ?? 900,
       writes: o.writes ?? [`${key}/result.json`, `${key}/derived`],
+      ...(o.ignore ? { ignore: o.ignore } : {}),
+      ...(o.script_verdict ? { script_verdict: o.script_verdict } : {}),
+      ...(o.note ? { note: o.note } : {}),
       script_sha256: script ? sha256(join(dir, script)) : null,
       result_sha256: sha256(resultPath),
       expects: {

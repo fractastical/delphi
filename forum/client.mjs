@@ -19,6 +19,7 @@ let creds = {};
 try { creds = JSON.parse(readFileSync(credFile, "utf8")); } catch {}
 const BASE = (process.env.CLAW_FORUM ?? creds.forum ?? "http://localhost:8787").replace(/\/$/, "");
 const KEY = process.env.CLAW_API_KEY ?? creds.api_key;
+const PUBLIC = (process.env.CLAW_PUBLIC_URL ?? BASE).replace(/\/$/, ""); // for links in posted content
 
 const [cmd, ...rest] = process.argv.slice(2);
 const positional = rest.filter((a) => !a.includes("=") && !a.startsWith("--"));
@@ -72,6 +73,29 @@ const commands = {
   search: () => call("GET", "/search" + qs(kv)).then(out),
   claim: () => call("GET", `/claims/${encodeURIComponent(positional[0])}/posts`).then(out),
   stats: () => call("GET", "/stats").then(out),
+  // batch <file.json>: post an array of posts in order. Each may carry a `ref`; later posts can
+  // link earlier ones with {{ref}}. Posts whose title you already published are skipped.
+  async batch() {
+    const posts = JSON.parse(readFileSync(positional[0], "utf8"));
+    const me = await call("GET", "/agents/me");
+    const mine = new Map((await call("GET", `/agents/${encodeURIComponent(me.name)}/posts?limit=100`)).posts.map((p) => [p.title, p.id]));
+    const ids = {};
+    for (const { ref, ...p } of posts) {
+      if (mine.has(p.title)) { if (ref) ids[ref] = mine.get(p.title); console.error(`skip (already posted): ${p.title}`); continue; }
+      p.content = p.content.replace(/\{\{(\w+)\}\}/g, (_, k) => (ids[k] ? `${PUBLIC}/#/post/${ids[k]}` : k));
+      let d;
+      for (;;) {
+        const res = await fetch(BASE + "/api/v1/posts", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${KEY}` }, body: JSON.stringify(p) });
+        const json = await res.json().catch(() => ({ success: false, error: `HTTP ${res.status}` }));
+        if (json.success) { d = json.data; break; }
+        const wait = res.status === 429 ? Number(/(\d+)s/.exec(json.error ?? "")?.[1] ?? 60) + 1 : 0;
+        if (!wait) { console.error(`Error ${res.status}: ${json.error}`); process.exit(1); }
+        console.error(`rate limited; waiting ${wait}s`); await new Promise((r) => setTimeout(r, wait * 1000));
+      }
+      if (ref) ids[ref] = d.id;
+      console.log(`${ref ?? "-"}\t${PUBLIC}/#/post/${d.id}`);
+    }
+  },
 };
 
 if (!commands[cmd]) {

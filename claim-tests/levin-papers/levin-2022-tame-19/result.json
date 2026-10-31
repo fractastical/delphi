@@ -2,7 +2,7 @@
   "claim_id": "levin-2022-tame-19",
   "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-tame-19",
   "project": "levin-papers",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Among mouse genes with experimental Gene Ontology biological-process annotations, genes annotated to learning or memory are over-represented among genes annotated to anatomical structure morphogenesis, even after removing ion channels, gap-junction channels and neurotransmission genes, and this overlap is larger than the overlap of morphogenesis with other biological-process terms of similar size.",
   "pass_criterion": "Pre-registered: after exclusions, (a) the one-sided Fisher exact test of overlap between the learning-or-memory set (GO:0007611 and is_a/part_of descendants) and the morphogenesis set (GO:0009653 and descendants) gives odds ratio > 1.5 and p < 0.001; (b) the Mantel-Haenszel odds ratio stratified by deciles of each gene's number of experimental BP annotations is > 1.5; (c) the unstratified odds ratio is above the 75th percentile of odds ratios between the morphogenesis set and every control BP term whose post-exclusion gene count is within a factor of 1.5 of the learning-or-memory set's and which is neither an ancestor nor a descendant of GO:0007611 or GO:0009653.",
   "fail_criterion": "Pre-registered: unstratified odds ratio <= 1.2 or p >= 0.05, or Mantel-Haenszel odds ratio <= 1.2, or the odds ratio at or below the median of the size-matched control terms. Outcomes meeting neither criterion are pre-registered as 'mixed' (overlap present but not specific, or explained by annotation depth).",
@@ -11,12 +11,72 @@
     "mgi-gaf"
   ],
   "interpretation": "TAME's prediction is phrased across animals; the test uses the mouse because MGI curation gives the deepest experimental annotation of both developmental and behavioural phenotypes in a single species. 'Genes involved in morphogenesis' is GO:0009653 anatomical structure morphogenesis and 'memory and learning categories' is GO:0007611 learning or memory, each with is_a and part_of descendants. Only experimental evidence codes (EXP, IDA, IPI, IMP, IGI, IEP, HTP, HDA, HMP, HGI, HEP) are used, so electronic or sequence-similarity annotations cannot create the overlap. The universe is every gene with at least one such BP annotation, after removing NOT-qualified lines. 'Beyond the known shared ion channels, connexins and neurotransmitter machinery' is implemented by excluding from the universe every gene annotated (any evidence) to GO:0005216 ion channel activity, GO:0005243 gap junction channel activity, GO:0005921 gap junction, GO:0007268 chemical synaptic transmission, GO:0001505 regulation of neurotransmitter levels or GO:0030594 neurotransmitter receptor activity, with descendants. Only the first part of the claim is tested; its second part (memory genes appearing in cancer, regeneration and embryogenesis screens) is out of scope here.",
-  "datasets": [],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "datasets": [
+    {
+      "id": "go-basic-obo",
+      "name": "Gene Ontology, basic edition (go-basic.obo)",
+      "landing_url": "https://geneontology.org/docs/download-ontology/",
+      "doi": null,
+      "version": "current release as retrieved",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://purl.obolibrary.org/obo/go/go-basic.obo",
+          "retrieved_at": "2026-10-31T18:19:00Z",
+          "byte_size": 32227785,
+          "sha256": "b08d45b268b8c24ccb2513dbbbc7d4df9f6521c099b413f79eb31e06e0fa3bcc"
+        }
+      ],
+      "role": "term hierarchy (is_a and part_of) used to propagate annotations and define the gene sets"
+    },
+    {
+      "id": "mgi-gaf",
+      "name": "Mouse Genome Informatics GO annotations (GAF 2.2), via the GO Consortium",
+      "landing_url": "https://current.geneontology.org/products/pages/downloads.html",
+      "doi": null,
+      "version": "current release as retrieved",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://current.geneontology.org/annotations/mgi.gaf.gz",
+          "retrieved_at": "2026-10-31T18:19:31Z",
+          "byte_size": 14020707,
+          "sha256": "9b7613f786f9f805531a8f6768f310220d28c82095f938e1212c86f39596ce30"
+        }
+      ],
+      "role": "experimental biological-process annotations of mouse genes (gene sets and universe) and any-evidence annotations (exclusions)"
+    }
+  ],
+  "method": "fetch.py downloads go-basic.obo and the MGI GAF. analysis.py drops NOT-qualified and obsolete-term lines, builds each gene's set of experimental BP terms and their is_a/part_of ancestors, removes 612 genes annotated to ion channel, gap junction or neurotransmission terms, and tests overlap of GO:0007611 and GO:0009653 in the remaining 10,243 genes with a one-sided Fisher exact test. Annotation depth is controlled by a Mantel-Haenszel odds ratio over ten equal-sized strata of genes ranked by their number of distinct experimental BP terms. Specificity is the percentile of the odds ratio among the 327 BP terms of 128-286 genes that are neither ancestors nor descendants of either term.",
+  "measured": {
+    "value": 2.6573,
+    "unit": "odds ratio, learning-or-memory vs anatomical-structure-morphogenesis gene sets (mouse, experimental BP annotations, channel/synaptic genes excluded)",
+    "n": 10243,
+    "uncertainty": "one-sided Fisher exact p = 1.140e-09",
+    "extra": {
+      "learning_or_memory_genes": 191,
+      "morphogenesis_genes": 1833,
+      "overlap": 69,
+      "expected_overlap": 34.18,
+      "odds_ratio_before_exclusion": 2.6439,
+      "mantel_haenszel_odds_ratio_by_annotation_depth_decile": 0.9365,
+      "control_terms": 327,
+      "control_odds_ratio_median": 1.8666,
+      "control_odds_ratio_p75": 3.8927,
+      "percentile_among_controls": 64.53,
+      "verdict_by_preregistered_rule": "refutes"
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.7,
+  "caveats": [
+    "The crude overlap is real: 69 genes against 34 expected (odds ratio 2.66, p = 1.1e-9), and removing channel, gap-junction and neurotransmission genes barely changes it (2.64 before exclusion). It does not survive control for annotation depth: learning-or-memory genes sit almost entirely in the most-annotated strata, and within the top decile (13-167 BP terms) 43 of 63 of them (68%) are morphogenesis genes against 621 of 961 other genes (65%). The pre-registered fail rule is met by the Mantel-Haenszel odds ratio (0.94 <= 1.2). The control comparison (64.5th percentile) fails pass criterion (c) but does not by itself meet the fail rule, since 2.66 is above the control median of 1.87.",
+    "Size-matched control terms include developmental processes adjacent to morphogenesis (axon, limb, cardiac chamber, neural tube development) with very high odds ratios, which raises the 75th-percentile bar; the depth-stratified result does not depend on this choice.",
+    "GO annotations reflect what has been studied: genes are annotated to learning or memory largely because they were knocked out and tested behaviourally, which happens mostly to genes already well studied in development. Annotation-depth stratification addresses this only approximately.",
+    "Mouse only and experimental evidence only. TAME frames the prediction across animals; other species or inclusion of inferred annotations could differ.",
+    "Only the first half of the claim is tested. Whether memory genes appear in cancer, regeneration and embryogenesis screens is not addressed.",
+    "The GO release is 'current' at retrieval time and is not versioned in the URL; re-running later will fetch a newer release, so exact numbers will drift. The SHA-256 above identifies the files used."
+  ],
   "agent": {
     "kind": "local-agent",
     "model": "claude-opus-5.5",

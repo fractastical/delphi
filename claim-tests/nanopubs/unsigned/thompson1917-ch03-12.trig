@@ -1,0 +1,94 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-12--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch03-12: supports, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "If the human curve of growth in body length has its point of inflection about the fifth month of intra-uterine life, then the velocity of body-length growth (d length / d gestational age) must still be increasing through the end of the first trimester and must already be decreasing through the third trimester, so that the velocity maximum lies between the end of the first trimester and the start of the third (about 14 to 24 completed weeks of gestation, i.e. months 4-6, centred on month 5)." ;
+    delphi:passCriterion "Pre-registered. Using the 50th-centile curves of international (INTERGROWTH-21st) standards for fetal crown-rump length (9+0 to 14+0 weeks) and for newborn crown-heel length by gestational age at birth (24 to 42 weeks), compute growth velocity in mm/week by finite differences of the median curve. The claim is supported if (a) median CRL velocity averaged over weeks 13-14 exceeds that averaged over weeks 9-10 (length growth still accelerating at 14 weeks), and (b) median crown-heel-length velocity averaged over weeks 24-28 exceeds that averaged over weeks 36-40 and the 24-40 velocity series has a negative linear trend (growth already decelerating from 24 weeks). (a) and (b) together bracket the velocity maximum within 14-24 weeks, which contains 'about the fifth month'. As a secondary check, the gestational age of peak velocity of INTERGROWTH-21st fetal femur length (14-40 weeks) is reported; a femur peak within 14-24 weeks or at the 14-week boundary is consistent with the claim." ;
+    delphi:failCriterion "Pre-registered. The claim is refuted if median CRL velocity is already lower at weeks 13-14 than at weeks 9-10 (velocity maximum before month 4, i.e. before 14 weeks), or if median crown-heel-length velocity at weeks 36-40 is not lower than at weeks 24-28 (velocity maximum after month 6), or if neither measure shows a change of sign in acceleration anywhere in 9-42 weeks (no inflection). A femur-length velocity peak later than 24 weeks also counts against the claim. Any other combination is 'mixed'." ;
+    delphi:expectedObservation "Pre-registered. Using the 50th-centile curves of international (INTERGROWTH-21st) standards for fetal crown-rump length (9+0 to 14+0 weeks) and for newborn crown-heel length by gestational age at birth (24 to 42 weeks), compute growth velocity in mm/week by finite differences of the median curve. The claim is supported if (a) median CRL velocity averaged over weeks 13-14 exceeds that averaged over weeks 9-10 (length growth still accelerating at 14 weeks), and (b) median crown-heel-length velocity averaged over weeks 24-28 exceeds that averaged over weeks 36-40 and the 24-40 velocity series has a negative linear trend (growth already decelerating from 24 weeks). (a) and (b) together bracket the velocity maximum within 14-24 weeks, which contains 'about the fifth month'. As a secondary check, the gestational age of peak velocity of INTERGROWTH-21st fetal femur length (14-40 weeks) is reported; a femur peak within 14-24 weeks or at the 14-week boundary is consistent with the claim." ;
+    delphi:disconfirmingObservation "Pre-registered. The claim is refuted if median CRL velocity is already lower at weeks 13-14 than at weeks 9-10 (velocity maximum before month 4, i.e. before 14 weeks), or if median crown-heel-length velocity at weeks 36-40 is not lower than at weeks 24-28 (velocity maximum after month 6), or if neither measure shows a change of sign in acceleration anywhere in 9-42 weeks (no inflection). A femur-length velocity peak later than 24 weeks also counts against the claim. Any other combination is 'mixed'." ;
+    delphi:admissibleDatasets "Planned datasets: intergrowth21st-fetal-crl-standard-via-gigs, intergrowth21st-newborn-size-length-standards-via-gigs, intergrowth21st-fetal-femur-length-equations-via-gigs" ;
+    delphi:inferenceMethod "Median CRL (daily rows, 9+0 to 14+0 weeks) was differentiated numerically (np.gradient) to give velocity in mm/week and averaged over weeks 9-10 and 13-14. Median birth length of girls and boys (daily rows, 24+0 to 42+6 weeks) was averaged across sexes, converted to mm, differentiated, averaged by completed week, and compared between weeks 24-28 and 36-40, with an OLS trend over weeks 24-40. The femur-length median equation was differentiated analytically over 14-40 weeks and the age of maximum velocity located. The pre-registered decision rules were then applied." ;
+    delphi:preregistered false ;
+    dct:description "Median CRL (daily rows, 9+0 to 14+0 weeks) was differentiated numerically (np.gradient) to give velocity in mm/week and averaged over weeks 9-10 and 13-14. Median birth length of girls and boys (daily rows, 24+0 to 42+6 weeks) was averaged across sexes, converted to mm, differentiated, averaged by completed week, and compared between weeks 24-28 and 36-40, with an OLS trend over weeks 24-40. The femur-length median equation was differentiated analytically over 14-40 weeks and the age of maximum velocity located. The pre-registered decision rules were then applied." ;
+    rdfs:comment "Measured: 14 lower bound (weeks of gestation) of the bracket containing the body-length velocity maximum; upper bound 24 weeks by criterion (b) (n = 169, bracket 14-24 weeks from the pre-registered tests; the newborn series actually shows a plateau of ~12.5-13.5 mm/week from 24 to 33 weeks before velocity falls, so the data alone only place the maximum somewhere in 14-33 weeks). Interpretation: Thompson plots 'length' of the human foetus (crown-heel body length from His and other nineteenth-century sources) against age in months and locates an inflection about month five. No modern public standard measures crown-heel length continuously across gestation: ultrasound gives crown-rump length to 14 weeks and skeletal lengths afterwards, and body length is measured directly only at birth. The test therefore brackets the velocity peak from two body-length measures of the same consortium's population: crown-rump length (first trimester) and crown-heel length of newborns by gestational age at birth (24-42 weeks). Gestational ages are menstrual weeks; Thompson's 'fifth month' is taken as roughly 17-22 menstrual weeks, so months 4-6 (14-24 weeks) is the window consistent with 'about the fifth month'. Velocities of the median curve are used because the published standards are smoothed centile tables, not individual-level data. The rOpenSci gigs package redistributes the INTERGROWTH-21st published tables and equations as machine-readable files; those files are used, with the primary publications cited. No data values were inspected before this pre-registration." ;
+    delphi:evidenceAgainst "Both pre-registered pass conditions hold, but condition (b) is met only because velocity drops after 33 weeks: median birth length grows at an almost constant 12.5-13.5 mm/week from 24 to 33 weeks. The data therefore locate the velocity maximum somewhere between 14 and about 33 weeks (months 4-8), not sharply at month 5; Thompson's 'velocity tends to fall away' after month five is at best a gentle plateau until month 8." ;
+    delphi:evidenceAgainst "The two body-length measures differ (crown-rump length before 14 weeks; crown-heel length at birth after 24 weeks) and there is a 10-week gap with no direct body-length standard, so no single smooth curve could be fitted." ;
+    delphi:evidenceAgainst "Birth length by gestational age for 24-32 weeks comes from preterm births (a reference, not a prescriptive standard); preterm neonates may be smaller than fetuses of the same age still in utero, which would flatten the apparent early-third-trimester velocity." ;
+    delphi:evidenceAgainst "Femur length, the only skeletal length standard spanning 14-40 weeks, has monotonically decreasing velocity from 14 weeks (peak at or before 14 weeks), i.e. a skeletal-segment inflection earlier than month 5; only whole-body length is tested as Thompson stated it." ;
+    delphi:evidenceAgainst "The INTERGROWTH-21st tables are smoothed population centiles, so no individual-level uncertainty could be attached to the velocity estimates." ;
+    delphi:evidenceAgainst "Gestational age conventions differ: INTERGROWTH-21st uses menstrual age; Thompson's nineteenth-century sources were probably dated from conception, a ~2-week offset that does not change the bracket." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-12--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-12--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-12--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/thompson-growth-form/thompson1917-ch03-12/result.json> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-12--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: INTERGROWTH-21st international standard for early fetal size: crown-rump length for gestational age, centile table (Papageorghiou et al. 2014, Ultrasound Obstet Gynecol 44:641-648), as redistributed in the rOpenSci gigs R package" ;
+    dct:description "daily 50th-centile crown-rump length (mm), 9+0 to 14+0 weeks: first-trimester body-length velocity" ;
+    delphi:hasChecksum "sha256:93af76b58e280c2511b8653a9845c55d9278d29e962ec7100e08155c328d37e4" ;
+    prov:atLocation <https://raw.githubusercontent.com/ropensci/gigs/fb58fe6596d4b289d5362c5efe00f882984d3186/data-raw/tables/ig_fet/ig_fet_crlfga_centiles.txt> ;
+    dct:license "GPL-3.0 (gigs); INTERGROWTH-21st tables published open access" ;
+    prov:wasDerivedFrom <https://github.com/ropensci/gigs> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-12--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: INTERGROWTH-21st newborn size standards (Villar et al. 2014, Lancet 384:857-868) and very preterm size at birth references (Villar et al. 2016, Lancet Glob Health 4:e681-e691): birth length by gestational age, centile tables by sex, as redistributed in gigs" ;
+    dct:description "daily 50th-centile crown-heel length at birth (cm) by sex, 24+0 to 42+6 weeks: body-length velocity in the second half of gestation" ;
+    delphi:hasChecksum "sha256:a2ce9801720415d15f5e3fc917727fa13641cb71bf166c353003ebfab16624b7" ;
+    prov:atLocation <https://raw.githubusercontent.com/ropensci/gigs/fb58fe6596d4b289d5362c5efe00f882984d3186/data-raw/tables/ig_nbs/ig_nbs_len_female_percentiles.csv> ;
+    delphi:hasChecksum "sha256:53c9c5663c7594b7ffdfbcdc8cd00f166fd7b8070f71e1bf80ae90ce52864ba4" ;
+    prov:atLocation <https://raw.githubusercontent.com/ropensci/gigs/fb58fe6596d4b289d5362c5efe00f882984d3186/data-raw/tables/ig_nbs/ig_nbs_len_male_percentiles.csv> ;
+    dct:license "GPL-3.0 (gigs); INTERGROWTH-21st tables published open access" ;
+    prov:wasDerivedFrom <https://github.com/ropensci/gigs> .
+  <https://w3id.org/delphi/resource/evidence/thompson1917-ch03-12--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: INTERGROWTH-21st fetal growth standards, femur-length median equation (Papageorghiou et al. 2014, Lancet 384:869-879), as coded in gigs R/ig_fet.R" ;
+    dct:description "median femur length mu(GA) = -39.9616 + 4.32298 GA - 0.0380156 GA^2 (mm, 14-40 weeks): secondary skeletal-length velocity" ;
+    delphi:hasChecksum "sha256:2335ba623ef76b140db8526df93505a52555d42f6a69993cffa788a6d54be2b2" ;
+    prov:atLocation <https://raw.githubusercontent.com/ropensci/gigs/fb58fe6596d4b289d5362c5efe00f882984d3186/R/ig_fet.R> ;
+    dct:license "GPL-3.0 (gigs)" ;
+    prov:wasDerivedFrom <https://github.com/ropensci/gigs> .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch03-12> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-12--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/thompson-growth-form/thompson1917-ch03-12/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/thompson-claim-tests-cf12)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.433Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch03-12: supports, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-12--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

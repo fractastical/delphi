@@ -1,0 +1,99 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch14-12--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch14-12: supports, confidence 0.85" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.85"^^xsd:double ;
+    delphi:hypothesis "If no cataclysm ever desolated the whole world and the succession by generation was never broken, then at every stage boundary of the Phanerozoic a substantial share of the marine animal genera present must cross into the next stage, and survivors must be found in every major animal phylum even at the worst boundary." ;
+    delphi:passCriterion "Using PBDB occs/diversity stage-level tables for marine Animalia genera (Phanerozoic) and the same table for each of nine marine animal phyla/classes (Mollusca, Brachiopoda, Arthropoda, Echinodermata, Cnidaria, Bryozoa, Porifera, Annelida, Chordata), define for each stage i the boundary-crossing fraction C_i = (X_bt + X_Ft) / (X_bt + X_Ft + X_bL + X_FL), the share of genera present in stage i that are also recorded after it (range-through or first-appearing and continuing). Exclude the two youngest stages (Recent edge). Pass if (1) the minimum C_i over all retained Phanerozoic stage boundaries is >= 0.10 (at no point did fewer than one in ten marine genera survive), AND (2) at the stage with the minimum C_i, at least 7 of the 9 phyla/classes have C_i > 0 (survivors in at least seven major lineages), AND (3) the median C_i over all stages is >= 0.5. Verdict 'supports' if all three hold; 'mixed' if (1) and (2) hold but (3) fails, or if (1) fails only marginally (0.05 <= min C_i < 0.10) while (2) holds; 'refutes' if any boundary has min C_i < 0.05 or fewer than 7 of 9 lineages have survivors at the worst boundary." ;
+    delphi:failCriterion "Refuted if the fossil record contains a stage boundary across which fewer than 5% of marine animal genera persist, or at which survivors are absent from three or more of the nine major lineages, which would indicate a near-total biotic reset incompatible with unbroken descent. The Precambrian part of the claim ('long before the Silurian') cannot be tested with this data and is excluded from the verdict." ;
+    delphi:expectedObservation "Using PBDB occs/diversity stage-level tables for marine Animalia genera (Phanerozoic) and the same table for each of nine marine animal phyla/classes (Mollusca, Brachiopoda, Arthropoda, Echinodermata, Cnidaria, Bryozoa, Porifera, Annelida, Chordata), define for each stage i the boundary-crossing fraction C_i = (X_bt + X_Ft) / (X_bt + X_Ft + X_bL + X_FL), the share of genera present in stage i that are also recorded after it (range-through or first-appearing and continuing). Exclude the two youngest stages (Recent edge). Pass if (1) the minimum C_i over all retained Phanerozoic stage boundaries is >= 0.10 (at no point did fewer than one in ten marine genera survive), AND (2) at the stage with the minimum C_i, at least 7 of the 9 phyla/classes have C_i > 0 (survivors in at least seven major lineages), AND (3) the median C_i over all stages is >= 0.5. Verdict 'supports' if all three hold; 'mixed' if (1) and (2) hold but (3) fails, or if (1) fails only marginally (0.05 <= min C_i < 0.10) while (2) holds; 'refutes' if any boundary has min C_i < 0.05 or fewer than 7 of 9 lineages have survivors at the worst boundary." ;
+    delphi:disconfirmingObservation "Refuted if the fossil record contains a stage boundary across which fewer than 5% of marine animal genera persist, or at which survivors are absent from three or more of the nine major lineages, which would indicate a near-total biotic reset incompatible with unbroken descent. The Precambrian part of the claim ('long before the Silurian') cannot be tested with this data and is excluded from the verdict." ;
+    delphi:admissibleDatasets "Planned datasets: pbdb-occs-diversity-marine-genera-by-stage, pbdb-occs-diversity-marine-genera-by-stage-per-phylum" ;
+    delphi:inferenceMethod "For each of 96 Phanerozoic stages (two youngest dropped) the fraction of marine animal genera present that are also recorded after the stage (X_bt + X_Ft over all present) was computed from the PBDB diversity table. The stage with the lowest crossing fraction (Stage 4) was identified and the same table was retrieved for nine major lineages to count survivors across that boundary." ;
+    delphi:preregistered false ;
+    dct:description "For each of 96 Phanerozoic stages (two youngest dropped) the fraction of marine animal genera present that are also recorded after the stage (X_bt + X_Ft over all present) was computed from the PBDB diversity table. The stage with the lowest crossing fraction (Stage 4) was identified and the same table was retrieved for nine major lineages to count survivors across that boundary." ;
+    rdfs:comment "Measured: 0.29391304347826086 minimum stage-boundary crossing fraction of marine animal genera (Phanerozoic) (n = 96). Interpretation: Darwin's 'cataclysm desolating the whole world' is read as an event after which (nearly) no lineages persist, detectable as a stage boundary crossed by very few genera in very few lineages. 'The ordinary succession by generation has never once been broken' is tested only for the Phanerozoic marine record, where stage-level genus ranges exist; the Precambrian ancestry 'long before the Silurian' is outside what occurrence data can show. Boundary-crossing fractions are biased downward by incomplete sampling (Signor-Lipps and Lazarus effects), which makes the test conservative with respect to the claim. Thresholds of 10% and 7/9 lineages are deliberately lenient about mass extinctions, which Darwin did not deny in degree, and strict about total desolation, which he denied." ;
+    delphi:evidenceAgainst "Only the Phanerozoic marine record is tested; the claim's Precambrian ancestry statement and terrestrial life are untested." ;
+    delphi:evidenceAgainst "Boundary-crossing fractions are depressed by incomplete sampling (Signor-Lipps, Lazarus taxa) and by stage boundaries having been drawn at faunal breaks; both biases work against the claim, so a pass is conservative." ;
+    delphi:evidenceAgainst "Genus-level survival understates species-level loss; Darwin's claim concerns continuity of descent, for which any surviving lineage suffices, so genus level is appropriate." ;
+    delphi:evidenceAgainst "Stage-level resolution cannot distinguish a single instantaneous event from a protracted crisis within one stage." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-12--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-12--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/darwin-origin/darwin1859-ch14-12/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-12--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Paleobiology Database occs/diversity: marine Animalia genus range categories per stage, Phanerozoic" ;
+    dct:description "overall boundary-crossing fractions" ;
+    delphi:hasChecksum "sha256:e69eb14ca490331dc5e44aee5a83c599c3c46ec1db01ed0d47076bc5993f75f1" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Animalia&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    dct:license "CC BY 4.0" ;
+    prov:wasDerivedFrom <https://paleobiodb.org/data1.2/occs/diversity_doc.html> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-12--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Paleobiology Database occs/diversity for nine marine animal lineages (Mollusca, Brachiopoda, Arthropoda, Echinodermata, Cnidaria, Bryozoa, Porifera, Annelida, Chordata)" ;
+    dct:description "survivors per lineage at the worst boundary" ;
+    delphi:hasChecksum "sha256:771b074f1a2e376b082d9ba331383af6201e96e9f7f5c443d21c1da1e310acd1" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Mollusca&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    delphi:hasChecksum "sha256:34d5c8c6f16aa858533a5a8c8c603b6b849c95c8ffca5d6abc690a314bc36f2d" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Brachiopoda&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    delphi:hasChecksum "sha256:0a7fc753e2f597f1b522c1c4d72b08b5b43a9c0f93c7904526fe7295304b88f1" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Arthropoda&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    delphi:hasChecksum "sha256:af5a4f3c1e4d0253976d3967c760b8cbc19eef8e8e13e266fdc84ddd1e28704f" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Echinodermata&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    delphi:hasChecksum "sha256:4893e2278f3b86d93deed54eb5997f99f53bb2d0226d6390126daf2280c1e791" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Cnidaria&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    delphi:hasChecksum "sha256:efd8409a30bc50555fc0d30e3031434e2a3d519c26b5998b91c6400014c78209" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Bryozoa&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    delphi:hasChecksum "sha256:5a4ea7db9d3811a429f2d0b9de1f10a3d932d67938fad452baef86f32c5f5f50" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Porifera&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    delphi:hasChecksum "sha256:f4a444d65d71de2c09c39af6ba18a4904f53e62a67be0482f37d939af4bea0e5" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Annelida&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    delphi:hasChecksum "sha256:908459e340027d6392f4770280385c3ae8679fe5f8c593a0db26308973a87368" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Chordata&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    dct:license "CC BY 4.0" ;
+    prov:wasDerivedFrom <https://paleobiodb.org/data1.2/occs/diversity_doc.html> .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch14-12> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch14-12--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/darwin-origin/darwin1859-ch14-12/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-0e75)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.386Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch14-12: supports, confidence 0.85" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch14-12--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/levin-2022-tame-17> a delphi:Claim ;
+    rdfs:label "Newt kidney tubules keep correct lumen size when cell size changes" ;
+    dct:description "Newt kidney tubules normally made of 8 to 10 cells in cross-section are built from fewer cells when cell size is experimentally enlarged, and from a single cell wrapping around itself when cells are made very large, showing that different molecular mechanisms (cell-cell interactions vs cytoskeletal deformation) can be deployed to reach the same anatomical outcome." ;
+    delphi:context "Levin M, “Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds”, Frontiers in systems neuroscience (2022), doi:10.3389/fnsys.2022.768201; section “Somatic Cognition: An Example of Unconventional Agency in Detail › Multi-Scale Competency of Growth and Form”. Scope: Polyploid newt larvae (Fankhauser's experiments)" ;
+    dct:type "empirical-generalization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <https://doi.org/10.3389/fnsys.2022.768201> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "Even more remarkable than the scaling of the cell number to unexpected size changes (on an ontogenetic, not evolutionary, timescale) is the fact that if the cells are made really huge, just one cell wraps around itself and still makes a proper lumen (Figure 6D)." ;
+    prov:wasQuotedFrom <https://doi.org/10.3389/fnsys.2022.768201> ;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt#line=96,97> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt#line=96,97> schema:isPartOf <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt> .
+
+  <https://doi.org/10.3389/fnsys.2022.768201> a schema:ScholarlyArticle ;
+    dct:title "Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds" ;
+    dct:creator <http://www.wikidata.org/entity/Q39444955> ;
+    dct:bibliographicCitation "Levin M. Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds. Frontiers in systems neuroscience (2022). doi:10.3389/fnsys.2022.768201" ;
+    dct:date "2022"^^xsd:gYear ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    schema:sameAs <https://europepmc.org/article/PMC/PMC8988303> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt> schema:about <https://doi.org/10.3389/fnsys.2022.768201> ;
+    prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8988303/fullTextXML> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "2f99ca3a21299e41167f7f1bbd6bc7c86dbc7a1a357f7835f8571033b7c63ff3" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci Levin papers claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Levin 2022 claim: Newt kidney tubules keep correct lumen size when cell size changes" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2022-tame-17> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+  <https://w3id.org/delphi/resource/domain/levin-papers> rdfs:label "levin-papers" .
+}

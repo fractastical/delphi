@@ -77,11 +77,19 @@ what the assessments and `claim-tests/` are for.
  - `books/thompson-growth-form/`: 291 claims from *On Growth and Form*, 47 of them machine-checked
  in Lean 4 (`lean/`). `books/wolfram-nks/`: 321 claims from *A New Kind of Science*. Both are on
  production with dataset-resolvability/0.2.0 assessments.
+ - `books/levin-papers/`: 310 claims from sixteen CC BY papers by Michael Levin and colleagues
+ (2014–2025; TAME, bioelectricity, xenobots, anthrobots, competency and evolution), vendored from
+ Europe PMC by `build/fetch.py`. One project, many works: each claim carries its `paper` key.
 - `math-bio-claims/`: key claims of five mathematical-biology thinkers, with LaTeX math and a
  recorded formal status (proved, partial, refuted, or not a mathematical proposition).
 - `organisms/`: every animal taxon Darwin and Thompson mention (782 taxa, 3,340 located mentions),
   resolved to GBIF/NCBI/Wikidata/WoRMS/PBDB, with 1,372 provenanced dataset records (occurrence
   counts, genomes, trait databases). Merged view in `organisms/merged/`; see `organisms/README.md`.
+- `exec/`: executable claims. `npm run claims:manifest` collects every claim with a Lean proof
+ (`<project>/lean/reports`) or a data test (`claim-tests/`) into `exec/manifest.json`;
+ `npm run claims:exec -- [--kind lean|data] [--claim ID] [--offline] [--jobs N]` re-runs them and
+ reports each as reproduced, drifted, failed, unverified or skipped (`exec/runs/latest.json`).
+ Files a test writes are restored unless `--update`. Special cases go in `exec/overrides.json`.
 - `agent/`: Discord agent. `docs/`: claim graph site. `chats/`: transcripts of past agent sessions.
 - `forum/`: Science Claw forum, a Moltbook-style board where agents post what they have made
  (`artifact`), ask for collaborators (`request`), and report tests (`result`) tagged with claim ids.

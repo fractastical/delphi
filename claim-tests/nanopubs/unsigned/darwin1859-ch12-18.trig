@@ -1,0 +1,89 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-18--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch12-18: supports, confidence 0.75" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.75"^^xsd:double ;
+    delphi:hypothesis "If closer relatives are generally nearer in space and time, then (space, living forms) phylogenetic distance between bird species should correlate positively with the geographic distance between their range centroids, with congeneric pairs closer than confamilial pairs and those closer than pairs from different families of the same order; and (time, fossil forms) genera in the same family should have first appearances closer in geological time than genera in different families of the same order." ;
+    delphi:passCriterion "Space (all extant birds with a range centroid in AVONET and a tip in the BirdTree Hackett MCC tree supplied with AVONET): (S1) the Spearman correlation between patristic distance and great-circle centroid distance across a fixed random sample of 2,000,000 species pairs is positive, and exceeds all of 99 permutations in which centroids are shuffled among species (p <= 0.01); (S2) median centroid distance is strictly ordered congeneric pairs < confamilial non-congeneric pairs < same-order different-family pairs. Time (Paleobiology Database genera of Mammalia and of Mollusca with first-appearance ages and family/order assignments): (T1) in each of the two groups, the median absolute difference in first-appearance midpoint age between pairs of genera in the same family is smaller than between pairs of genera in different families of the same order, and this difference exceeds all of 99 permutations of family labels within orders (p <= 0.01). The space clause passes if S1 and S2 hold; the time clause passes if T1 holds in both groups. Verdict 'supports' if both clauses pass, 'mixed' if one passes, 'refutes' if neither." ;
+    delphi:failCriterion "The space clause fails if the Spearman correlation is <= 0 or does not exceed the permutation distribution at p <= 0.01, or if the median distances are not strictly ordered by relatedness. The time clause fails if in either group same-family genus pairs are not closer in first-appearance time than different-family same-order pairs, or the difference is not significant at p <= 0.01 against the within-order permutation null. Both failing refutes the claim." ;
+    delphi:expectedObservation "Space (all extant birds with a range centroid in AVONET and a tip in the BirdTree Hackett MCC tree supplied with AVONET): (S1) the Spearman correlation between patristic distance and great-circle centroid distance across a fixed random sample of 2,000,000 species pairs is positive, and exceeds all of 99 permutations in which centroids are shuffled among species (p <= 0.01); (S2) median centroid distance is strictly ordered congeneric pairs < confamilial non-congeneric pairs < same-order different-family pairs. Time (Paleobiology Database genera of Mammalia and of Mollusca with first-appearance ages and family/order assignments): (T1) in each of the two groups, the median absolute difference in first-appearance midpoint age between pairs of genera in the same family is smaller than between pairs of genera in different families of the same order, and this difference exceeds all of 99 permutations of family labels within orders (p <= 0.01). The space clause passes if S1 and S2 hold; the time clause passes if T1 holds in both groups. Verdict 'supports' if both clauses pass, 'mixed' if one passes, 'refutes' if neither." ;
+    delphi:disconfirmingObservation "The space clause fails if the Spearman correlation is <= 0 or does not exceed the permutation distribution at p <= 0.01, or if the median distances are not strictly ordered by relatedness. The time clause fails if in either group same-family genus pairs are not closer in first-appearance time than different-family same-order pairs, or the difference is not significant at p <= 0.01 against the within-order permutation null. Both failing refutes the claim." ;
+    delphi:admissibleDatasets "Planned datasets: avonet-tobias2022-figshare, pbdb-taxa-first-appearances-mammalia-mollusca" ;
+    delphi:inferenceMethod "Space: 5883 bird species with a one-to-one BirdLife-BirdTree name match, a tree tip and an AVONET range centroid. Patristic distances were computed on the MCC tree; 1999655 random species pairs were drawn and the Spearman correlation between patristic and great-circle centroid distance was compared with 99 permutations of centroids among species; medians of centroid distance were tabulated for congeneric, confamilial and same-order pairs. Time: PBDB accepted genera with family, order and first-appearance ages; within each order, genus pairs (all pairs, or 500000 random pairs for very large orders) were split into same-family and different-family, and the difference of medians of |dFAD| was compared with 99 permutations of family labels within orders." ;
+    delphi:preregistered false ;
+    dct:description "Space: 5883 bird species with a one-to-one BirdLife-BirdTree name match, a tree tip and an AVONET range centroid. Patristic distances were computed on the MCC tree; 1999655 random species pairs were drawn and the Spearman correlation between patristic and great-circle centroid distance was compared with 99 permutations of centroids among species; medians of centroid distance were tabulated for congeneric, confamilial and same-order pairs. Time: PBDB accepted genera with family, order and first-appearance ages; within each order, genus pairs (all pairs, or 500000 random pairs for very large orders) were split into same-family and different-family, and the difference of medians of |dFAD| was compared with 99 permutations of family labels within orders." ;
+    rdfs:comment "Measured: 0.026622678561148156 Spearman rho between patristic distance and centroid great-circle distance, bird species pairs (n = 1999655, permutation p = 0.010; permuted rho range -0.0071 to 0.0068). Interpretation: 'Related by descent' is measured for living birds as patristic distance on a dated molecular supertree (Jetz et al. 2012 BirdTree, Hackett backbone MCC tree as distributed with AVONET), a modern reinterpretation of Darwin's classification-based relatedness, and for fossils by shared family versus shared order in PBDB taxonomy, which is closer to Darwin's own usage. 'Nearer in geographic space' is the great-circle distance between AVONET breeding-range centroids. 'Nearer in time' is the absolute difference between first-appearance ages (midpoints of PBDB first-appearance age ranges) of genera. Only two living/fossil systems are tested, not 'all organisms'; birds are chosen because tree, taxonomy and centroids come from a single curated source, and mammals and molluscs because they are the best-sampled terrestrial and marine fossil records. Sampling and taxonomic-practice confounds (geography informing species limits; fossils concentrated in a few basins) are noted as caveats rather than corrected." ;
+    delphi:evidenceAgainst "The overall Spearman correlation between patristic and geographic distance is small (about 0.03) although far outside the permutation null; the relationship is concentrated at shallow phylogenetic depth (congeneric and confamilial pairs) and saturates at the order level, where median centroid distance is no smaller within than between orders." ;
+    delphi:evidenceAgainst "Pooled permutation nulls for the fossil clause are not centred on zero because orders differ in family structure and age spread; the observed differences are judged against that null, not against zero." ;
+    delphi:evidenceAgainst "Space is tested in one class (birds) and time in two fossil groups at genus level; the claim is stated for all organisms, living and fossil." ;
+    delphi:evidenceAgainst "Range centroids collapse each species to a point; sister species with adjacent but large ranges can appear far apart, which weakens rather than inflates the correlation." ;
+    delphi:evidenceAgainst "Species limits in birds have historically been drawn partly on geography (allopatric forms), which can tighten the congeneric-pair pattern by construction." ;
+    delphi:evidenceAgainst "Fossil first appearances are truncated by sampling and concentrated in well-sampled basins and intervals; genera in the same family are often described from the same formations, which can make same-family FADs look closer than they are." ;
+    delphi:evidenceAgainst "Family and order assignments in PBDB are of uneven quality, especially for Mollusca; genera with unassigned family or order were dropped." ;
+    delphi:evidenceAgainst "Patristic distance on the BirdTree MCC tree is a model-based divergence estimate, a modern proxy for Darwin's relatedness by descent." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-18--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-18--claim-test--dataset-2> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/darwin-origin/darwin1859-ch12-18/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-18--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: AVONET ELEData.zip: TraitData/AVONET1_BirdLife.csv (range centroids, taxonomy), PhylogeneticData/HackettStage1_0001_1000_MCCTreeTargetHeights.nex (BirdTree Hackett MCC tree, 6670 species) and BirdLife-BirdTree crosswalk.csv" ;
+    dct:description "phylogenetic distance, range centroids and taxonomy of extant birds" ;
+    delphi:hasChecksum "sha256:e7e76dbe5c389753ff73a70d8a09b5fa01a15e75f359b34b01e2602b85e88f32" ;
+    prov:atLocation <https://ndownloader.figshare.com/files/38429873> ;
+    dct:license "CC BY 4.0" ;
+    prov:wasDerivedFrom <https://figshare.com/articles/dataset/AVONET_morphological_ecological_and_geographical_data_for_all_birds_Tobias_et_al_2021_Ecology_Letters_/16586228> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch12-18--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Paleobiology Database taxa lists (genus rank) with first/last appearance ages and classification for Mammalia and Mollusca" ;
+    dct:description "first-appearance ages and family/order of fossil genera" ;
+    delphi:hasChecksum "sha256:12d73586398b55b2a2d0a17c09eddab980f2aaf2a566f31c139c9155f37b66d2" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/taxa/list.json?base_name=Mammalia&rank=genus&show=app%2Cclass&vocab=pbdb> ;
+    delphi:hasChecksum "sha256:49b29a307e691e90dc114703182cade01e09e6cc5fae653e8931006567f9fb9a" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/taxa/list.json?base_name=Mollusca&rank=genus&show=app%2Cclass&vocab=pbdb> ;
+    dct:license "CC BY 4.0" ;
+    prov:wasDerivedFrom <https://paleobiodb.org/> .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch12-18> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-18--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/darwin-origin/darwin1859-ch12-18/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-0e75)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.366Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch12-18: supports, confidence 0.75" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-18--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

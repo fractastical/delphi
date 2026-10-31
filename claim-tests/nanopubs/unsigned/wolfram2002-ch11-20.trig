@@ -1,0 +1,89 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-20--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch11-20: supports, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "If the claim's premise holds, every additive elementary cellular automaton (the eight rules linear over GF(2): 0, 60, 90, 102, 150, 170, 204, 240) satisfies, for every initial condition and every k, that the configuration after 2^k steps is exactly the XOR superposition of copies of the initial condition shifted by 2^k times the offsets in the rule's support (rule 90: offsets -1 and +1; rule 150: -1, 0, +1); the empirical additivity screen picks out exactly these rules; the class-3/4 rules the book contrasts them with (18, 22, 30, 45, 54, 73, 110, 122) never return to such a superposition form at any power-of-two step; and the nested single-cell patterns of rules 90 and 150 have row populations matching the independently tabulated OEIS sequences A001316 and A071053." ;
+    delphi:passCriterion "Pre-registered. (a) For each of the eight linear rules, each cyclic lattice size N in {1023, 2048}, 20 seeded random initial conditions of density 1/2 plus the single-cell initial condition, and each k = 0..10, the configuration after 2^k steps equals bit-for-bit the XOR of the initial condition shifted by d*2^k over the offsets d in the rule's support (the support is read off the rule table as the cells on which the one-step response to a single 1 is nonzero). (b) An additivity screen T(x xor y) = T(x) xor T(y) on 200 seeded random pairs at N = 256 identifies exactly the eight linear rules, and the affine screen T(x xor y) = T(x) xor T(y) xor T(0) exactly the eight linear plus the eight complementary rules (255, 195, 165, 153, 105, 85, 51, 15). (c) For each of the eight control rules 18, 22, 30, 45, 54, 73, 110, 122 and each k = 0..8, the 2^k-step map fails additivity on at least one of 50 seeded random pairs at N = 256 (so the state after 2^k steps is not a superposition of shifted copies of the initial condition for generic initial conditions). (d) The number of nonzero cells in row t of the single-cell pattern of rule 90 (t = 0..T) equals term t of OEIS A001316 and that of rule 150 equals term t of A071053, for every term available in the OEIS b-files up to t = 4095 (the b-files are fetched and their sha256 recorded). PASS (supports the claim's checkable premise) if (a), (b), (c) and (d) all hold. The non-universality conclusion itself is a proof-type statement (a map that is linear over GF(2) at every power-of-two step cannot emulate the non-linear behaviour an arbitrary computation requires under the encodings the book considers) and is not decided by this test; its evidential weight is recorded in the confidence." ;
+    delphi:failCriterion "Pre-registered. FAIL (refutes the premise) if (a) fails for any linear rule, k, lattice size or initial condition (the stated superposition property is false), or if (d) fails for rule 90 or rule 150 (the single-cell patterns are not the nested patterns the claim describes). MIXED if (a) and (d) hold but (b) or (c) fails (the superposition property is true of rules 90 and 150 but does not cleanly separate additive from complex rules as the book's argument requires). INCONCLUSIVE with reason data-unavailable only for part (d) if the OEIS b-files cannot be retrieved; (a)-(c) are then still reported and the verdict rests on them with reduced confidence." ;
+    delphi:expectedObservation "Pre-registered. (a) For each of the eight linear rules, each cyclic lattice size N in {1023, 2048}, 20 seeded random initial conditions of density 1/2 plus the single-cell initial condition, and each k = 0..10, the configuration after 2^k steps equals bit-for-bit the XOR of the initial condition shifted by d*2^k over the offsets d in the rule's support (the support is read off the rule table as the cells on which the one-step response to a single 1 is nonzero). (b) An additivity screen T(x xor y) = T(x) xor T(y) on 200 seeded random pairs at N = 256 identifies exactly the eight linear rules, and the affine screen T(x xor y) = T(x) xor T(y) xor T(0) exactly the eight linear plus the eight complementary rules (255, 195, 165, 153, 105, 85, 51, 15). (c) For each of the eight control rules 18, 22, 30, 45, 54, 73, 110, 122 and each k = 0..8, the 2^k-step map fails additivity on at least one of 50 seeded random pairs at N = 256 (so the state after 2^k steps is not a superposition of shifted copies of the initial condition for generic initial conditions). (d) The number of nonzero cells in row t of the single-cell pattern of rule 90 (t = 0..T) equals term t of OEIS A001316 and that of rule 150 equals term t of A071053, for every term available in the OEIS b-files up to t = 4095 (the b-files are fetched and their sha256 recorded). PASS (supports the claim's checkable premise) if (a), (b), (c) and (d) all hold. The non-universality conclusion itself is a proof-type statement (a map that is linear over GF(2) at every power-of-two step cannot emulate the non-linear behaviour an arbitrary computation requires under the encodings the book considers) and is not decided by this test; its evidential weight is recorded in the confidence." ;
+    delphi:disconfirmingObservation "Pre-registered. FAIL (refutes the premise) if (a) fails for any linear rule, k, lattice size or initial condition (the stated superposition property is false), or if (d) fails for rule 90 or rule 150 (the single-cell patterns are not the nested patterns the claim describes). MIXED if (a) and (d) hold but (b) or (c) fails (the superposition property is true of rules 90 and 150 but does not cleanly separate additive from complex rules as the book's argument requires). INCONCLUSIVE with reason data-unavailable only for part (d) if the OEIS b-files cannot be retrieved; (a)-(c) are then still reported and the verdict rests on them with reduced confidence." ;
+    delphi:admissibleDatasets "Planned datasets: elementary-ca-additivity-generator, oeis-A001316, oeis-A071053" ;
+    delphi:inferenceMethod "analysis.py implements elementary CA rules on cyclic lattices. (a) For each of the eight GF(2)-linear rules it reads the support offsets off the rule table and checks, for N = 1023 and 2048, 20 seeded random initial conditions plus a single cell, and k = 0..10, that the configuration after 2^k steps equals the XOR of the initial condition shifted by d*2^k over the support (462 checks per rule). (b) It screens all 256 rules for additivity T(x xor y) = T(x) xor T(y) and affinity on 200 random pairs at N = 256. (c) For the eight class-3/4 control rules it counts, for k = 0..8, how many of 50 random pairs violate additivity of the 2^k-step map. (d) It computes the row populations of the single-cell patterns of rules 90 and 150 for 4096 rows and compares them term by term with the OEIS b-files of A001316 and A071053 fetched over HTTPS (sha256 recorded). Runtime 15 s." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py implements elementary CA rules on cyclic lattices. (a) For each of the eight GF(2)-linear rules it reads the support offsets off the rule table and checks, for N = 1023 and 2048, 20 seeded random initial conditions plus a single cell, and k = 0..10, that the configuration after 2^k steps equals the XOR of the initial condition shifted by d*2^k over the support (462 checks per rule). (b) It screens all 256 rules for additivity T(x xor y) = T(x) xor T(y) and affinity on 200 random pairs at N = 256. (c) For the eight class-3/4 control rules it counts, for k = 0..8, how many of 50 random pairs violate additivity of the 2^k-step map. (d) It computes the row populations of the single-cell patterns of rules 90 and 150 for 4096 rows and compares them term by term with the OEIS b-files of A001316 and A071053 fetched over HTTPS (sha256 recorded). Runtime 15 s." ;
+    rdfs:comment "Measured: 0 failures of the power-of-two-step superposition identity over 3696 (rule, lattice, initial condition, k) checks for the eight additive rules (n = 3696, exact bitwise comparison). Interpretation: The claim bundles a precise mathematical premise (power-of-two-step superposition for additive rules) with an informal class ('essentially nested' rules) and a non-universality conclusion. The test checks the premise exactly, checks that it discriminates additive rules from the complex rules the book contrasts them with, and cross-checks the nested single-cell patterns against externally tabulated sequences (Gould's sequence for rule 90, and the rule-150 analogue). It does not prove non-universality; a rule's universality depends on permitted encodings and no finite computation can exclude it, so 'supports' here means the premise and the discriminating contrast hold, not that the conclusion has been verified." ;
+    delphi:evidenceAgainst "What is verified is the claim's mathematical premise and its discriminating contrast: the eight additive elementary rules satisfy the superposition identity exactly at every power-of-two step tested (rule 90 with offsets -1,+1; rule 150 with -1,0,+1), the additivity screen recovers exactly these eight rules (and exactly the eight complementary affine rules), the class-3/4 rules 18, 22, 30, 45, 54, 73, 110, 122 violate additivity on 46-50 of 50 random pairs at every k = 0..8, and the nested single-cell patterns of rules 90 and 150 reproduce OEIS A001316 and A071053 for all 4096 terms." ;
+    delphi:evidenceAgainst "The non-universality conclusion is not decided by this test: universality is a statement about all encodings and all initial conditions, which no finite enumeration can exclude. The confidence reflects that the premise checked here is the whole of the book's stated argument for additive rules (a map linear over GF(2) at every power-of-two step cannot emulate non-linear behaviour) but that the inference from premise to non-universality is a proof-type step taken on the book's word." ;
+    delphi:evidenceAgainst "The informal class of rules 'whose patterns are essentially nested' is not formalised in the claim and was not tested beyond the additive rules; the verdict applies to the additive part of the claim." ;
+    delphi:evidenceAgainst "Cyclic lattices of size 1023 and 2048 were used; the identity on an infinite lattice follows from the same local argument, and both an odd and a power-of-two size were included so that boundary wrap-around cannot mask or manufacture agreement." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-20--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-20--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-20--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch11-20/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-20--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Elementary cellular automata on cyclic lattices with power-of-two-step superposition and additivity screens, generated by analysis.py" ;
+    dct:description "the computational objects the claim is about" ;
+
+    dct:license "generated by this test" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p696--the-threshold-of-universality-in-cellular-automata/> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-20--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: OEIS A001316 Gould's sequence: number of odd entries in row n of Pascal's triangle = number of nonzero cells in row n of rule 90 from a single cell" ;
+    dct:description "independent tabulation of the rule 90 single-cell row populations" ;
+    delphi:hasChecksum "sha256:0a486c591414cef502eab46ea9873d1fc022e2862799f73b5ff3ba660f594777" ;
+    prov:atLocation <https://oeis.org/A001316/b001316.txt> ;
+    dct:license "CC BY-SA 4.0 (OEIS)" ;
+    prov:wasDerivedFrom <https://oeis.org/A001316> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-20--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: OEIS A071053: number of ON cells at generation n of rule 150 from a single ON cell" ;
+    dct:description "independent tabulation of the rule 150 single-cell row populations" ;
+    delphi:hasChecksum "sha256:03cb82a4319267a5a00d3ad4a2d6e98fe10f55fbdd46c415c3484d117f0300e3" ;
+    prov:atLocation <https://oeis.org/A071053/b071053.txt> ;
+    dct:license "CC BY-SA 4.0 (OEIS)" ;
+    prov:wasDerivedFrom <https://oeis.org/A071053> .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-20> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-20--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch11-20/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-9241)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.487Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch11-20: supports, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-20--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

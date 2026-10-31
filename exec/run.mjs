@@ -8,7 +8,7 @@
 
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -18,6 +18,7 @@ const ROOT = dirname(HERE);
 const RUNS = join(HERE, "runs");
 const LOGS = join(RUNS, "logs");
 const STD_AXIOMS = new Set(["propext", "Classical.choice", "Quot.sound"]);
+const WALL_CLOCK = /(^|[._])(seconds|secs|elapsed|runtime|duration|wall_?time|timing)s?($|[._[])/i;
 const PY_DEPS = ["numpy", "scipy", "pandas", "requests", "biopython", "pillow"];
 
 const args = process.argv.slice(2);
@@ -100,13 +101,13 @@ function leaves(x, path = "", out = new Map()) {
   return out;
 }
 
-function compare(before, after) {
+function compare(before, after, ignore) {
   const a = leaves(before);
   const b = leaves(after);
   const mismatches = [];
   let compared = 0;
   for (const [k, v] of a) {
-    if (!b.has(k)) continue;
+    if (!b.has(k) || WALL_CLOCK.test(k) || ignore?.test(k)) continue;
     compared++;
     const w = b.get(k);
     const same = typeof v === "number" && typeof w === "number" ? Math.abs(v - w) <= opt.atol + opt.rtol * Math.abs(v) : v === w;
@@ -192,28 +193,35 @@ async function runData(e) {
     return { status: "failed", reason: failure, ...out };
   }
 
-  const fresh = readJsonMaybe(resultPath);
-  const resultRewritten = fresh && JSON.stringify(fresh) !== JSON.stringify(committed);
-  const freshMeasured = existsSync(measuredPath) && statSync(measuredPath).mtimeMs >= started ? readJsonMaybe(measuredPath) : null;
+  const rewritten = (p) => existsSync(p) && statSync(p).mtimeMs >= started;
+  const fresh = rewritten(resultPath) ? readJsonMaybe(resultPath) : null;
   const printed = lastJson(stdout);
+  const ignore = e.ignore ? new RegExp(e.ignore) : null;
 
   const checks = [];
   const add = (source, before, after) => {
     if (before == null || after == null) return;
-    const c = compare(before, after);
+    const c = compare(before, after, ignore);
     if (c.compared) checks.push({ source, ...c });
   };
-  if (resultRewritten) add("result.json", committed.measured, fresh.measured);
-  if (freshMeasured) add("derived/measured.json", committedMeasured ?? committed?.measured, freshMeasured);
+  if (fresh) add("result.json", committed?.measured, fresh.measured);
+  const derivedDir = join(dir, "derived");
+  const derivedBackup = saved.find(([p]) => p === derivedDir)?.[1];
+  const freshDerived = existsSync(derivedDir) ? readdirSync(derivedDir).filter((f) => f.endsWith(".json") && rewritten(join(derivedDir, f))) : [];
+  for (const f of freshDerived) {
+    const before = derivedBackup && existsSync(join(derivedBackup, f)) ? readJsonMaybe(join(derivedBackup, f)) : f === "measured.json" ? committed?.measured : null;
+    add(`derived/${f}`, before, readJsonMaybe(join(derivedDir, f)));
+  }
   if (printed) {
     const p = printed.measured ?? printed;
     const options = [committed?.measured, committed?.measured?.extra, committedMeasured?.measured ?? committedMeasured].filter(Boolean);
-    const best = options.map((o) => ({ o, c: compare(o, p) })).sort((x, y) => y.c.compared - x.c.compared)[0];
-    if (best?.c.compared) checks.push({ source: "stdout", ...best.c });
+    const best = options.map((o) => compare(o, p, ignore)).sort((x, y) => y.compared - x.compared)[0];
+    if (best?.compared) checks.push({ source: "stdout", ...best });
   }
 
-  const nowVerdict = (resultRewritten && fresh.verdict) || findVerdict(freshMeasured) || findVerdict(printed);
-  const verdictChanged = nowVerdict && committed?.verdict && nowVerdict !== committed.verdict;
+  const nowVerdict = fresh?.verdict || findVerdict(rewritten(measuredPath) ? readJsonMaybe(measuredPath) : null) || findVerdict(printed);
+  const expectedVerdict = e.script_verdict ?? committed?.verdict;
+  const verdictChanged = nowVerdict && expectedVerdict && nowVerdict !== expectedVerdict;
 
   if (opt.update) {
     rmSync(backup, { recursive: true, force: true });
@@ -224,7 +232,7 @@ async function runData(e) {
   const status = verdictChanged || mismatches.length ? "drifted" : compared ? "reproduced" : "unverified";
   return {
     status,
-    verdict: { committed: committed?.verdict ?? null, now: nowVerdict ?? null },
+    verdict: { committed: committed?.verdict ?? null, now: nowVerdict ?? null, ...(e.script_verdict ? { script_expected: e.script_verdict } : {}) },
     compared,
     sources: checks.map((c) => c.source),
     ...(mismatches.length ? { mismatches: mismatches.slice(0, 10), mismatch_count: mismatches.length } : {}),
@@ -297,7 +305,7 @@ mkdirSync(LOGS, { recursive: true });
 const results = new Map();
 const report = (e, r) => {
   results.set(e.id, r);
-  const detail = r.reason ?? (r.mismatches ? `${r.mismatch_count} numbers differ, e.g. ${r.mismatches[0].path}: ${r.mismatches[0].committed} -> ${r.mismatches[0].now}` : r.verdict ? `verdict ${r.verdict.committed}${r.verdict.now && r.verdict.now !== r.verdict.committed ? ` -> ${r.verdict.now}` : ""}, ${r.compared} numbers checked` : "");
+  const detail = r.reason ?? (r.mismatches ? `${r.mismatch_count} numbers differ, e.g. ${r.mismatches[0].path}: ${r.mismatches[0].committed} -> ${r.mismatches[0].now}` : r.verdict ? `verdict ${r.verdict.committed}${r.verdict.script_expected ? ` (script rule: ${r.verdict.now})` : r.verdict.now && r.verdict.now !== r.verdict.committed ? ` -> ${r.verdict.now}` : ""}, ${r.compared} numbers checked` : "");
   console.log(`${r.status.padEnd(10)} ${e.id.padEnd(34)} ${r.seconds != null ? `${r.seconds.toFixed(0).padStart(4)} s ` : "       "}${detail}`);
 };
 

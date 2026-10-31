@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch09-17--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch09-17: supports, confidence 0.93" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.93"^^xsd:double ;
+    delphi:hypothesis "For every string substitution system whose left-hand-side blocks can never overlap themselves or each other, every possible order of performing replacements from a given initial string yields the same causal network (up to isomorphism), whereas systems with overlapping blocks can yield different causal networks for different orders." ;
+    delphi:passCriterion "Pre-registered: among all enumerated (rule set, initial string) pairs whose rule set is syntactically non-overlapping and which admit at least two distinct complete evolutions, 100% have exactly one causal-network isomorphism class (and one final string) over all complete evolutions; and at least 10% of the overlapping rule sets exhibit at least two non-isomorphic causal networks for some initial string (otherwise the test has no discriminating power and the verdict is 'inconclusive', reason 'not-operationalizable')." ;
+    delphi:failCriterion "Pre-registered: at least one non-overlapping (rule set, initial string) pair whose complete evolutions produce two or more non-isomorphic causal networks." ;
+    delphi:expectedObservation "Pre-registered: among all enumerated (rule set, initial string) pairs whose rule set is syntactically non-overlapping and which admit at least two distinct complete evolutions, 100% have exactly one causal-network isomorphism class (and one final string) over all complete evolutions; and at least 10% of the overlapping rule sets exhibit at least two non-isomorphic causal networks for some initial string (otherwise the test has no discriminating power and the verdict is 'inconclusive', reason 'not-operationalizable')." ;
+    delphi:disconfirmingObservation "Pre-registered: at least one non-overlapping (rule set, initial string) pair whose complete evolutions produce two or more non-isomorphic causal networks." ;
+    delphi:admissibleDatasets "Planned datasets: shrinking-substitution-systems-2-letters-exhaustive" ;
+    delphi:inferenceMethod "analysis.py enumerates all 2305 one- and two-rule systems over {A,B} with lhs length 1-3 and strictly shorter rhs, classifies each syntactically as non-overlapping (37 systems; lhs sets {A}, {B}, {A,B}, {AB}, {BA}, {AAB}, {ABB}, {BAA}, {BBA}) or overlapping (2268), and for each of the 62 initial strings of length 1-5 generates every complete evolution by depth-first search over all possible replacement choices, tracking element identities so that each event is identified by (rule, consumed elements) and the causal network by its identity-labelled edges. Networks from different orders are compared first for identity and then, if they differ, up to isomorphism by brute force over event permutations. A supplementary (not pre-registered) run covers all 127 non-overlapping systems with lhs length up to 4 (which includes genuinely non-overlapping pairs such as {AAB, BBBA} and {AABB, BBAA}) from all 126 initial strings of length 1-6. Run time about 3 s." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py enumerates all 2305 one- and two-rule systems over {A,B} with lhs length 1-3 and strictly shorter rhs, classifies each syntactically as non-overlapping (37 systems; lhs sets {A}, {B}, {A,B}, {AB}, {BA}, {AAB}, {ABB}, {BAA}, {BBA}) or overlapping (2268), and for each of the 62 initial strings of length 1-5 generates every complete evolution by depth-first search over all possible replacement choices, tracking element identities so that each event is identified by (rule, consumed elements) and the causal network by its identity-labelled edges. Networks from different orders are compared first for identity and then, if they differ, up to isomorphism by brute force over event permutations. A supplementary (not pre-registered) run covers all 127 non-overlapping systems with lhs length up to 4 (which includes genuinely non-overlapping pairs such as {AAB, BBBA} and {AABB, BBAA}) from all 126 initial strings of length 1-6. Run time about 3 s." ;
+    rdfs:comment "Measured: 1 fraction of non-overlapping (rule set, initial string) pairs with >= 2 complete evolutions whose causal networks all coincide (n = 186, exact (exhaustive within the family)). Interpretation: Wolfram's generalized substitution systems (NKS pp. 497-503) replace one occurrence of a left-hand block at a time; which occurrence, and when, is the free choice of 'order'. A causal network has one node per replacement event and an edge from event P to event E whenever E's matched block contains an element that P produced; the initial condition is represented by a node 0 that 'produces' the initial elements. Two orders give 'the same causal network' if the networks are isomorphic as node-labelled directed graphs (labels = rule applied, node 0 fixed). Non-overlap is the syntactic condition of p. 503: no non-empty proper suffix of any block equals a prefix of any block (including the block itself), and no block is a substring of another. To compare complete histories across orders, the enumeration is restricted to systems whose every rule strictly shortens the string (|rhs| < |lhs|), so every evolution terminates after finitely many events; all complete evolutions (all choices at every step) from every initial string of length <= 5 over {A, B} are generated exhaustively. Wolfram's weaker condition (no overlap among strings actually generated) is not tested." ;
+    delphi:evidenceAgainst "The enumeration is restricted to terminating (strictly shrinking) systems so that complete histories can be compared; for non-terminating systems the statement concerns infinite causal networks and was not tested. Within the family the result is exhaustive: all 186 (primary) and 524 (supplementary) non-overlapping cases with a genuine choice of order gave identical, not merely isomorphic, causal networks and identical final strings, while 96.6% of overlapping rule sets showed order-dependent networks for some initial string, so the non-overlap condition is doing real work." ;
+    delphi:evidenceAgainst "Within the pre-registered family (lhs length <= 3) every non-overlapping rule set has a single multi-letter block or only single-letter blocks; non-overlapping pairs of multi-letter blocks appear only in the supplementary run with blocks of length 4, which was added after the primary run and is reported separately." ;
+    delphi:evidenceAgainst "Wolfram's weaker condition (no overlaps among the strings actually generated) and his extension to network rewriting systems were not tested; the causal-network definition (edge from the event that produced an element to the event that consumes it, with an 'init' node for the initial condition) follows pp. 497-503 but the book gives it only pictorially." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch09-17--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch09-17/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch09-17--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: All one- and two-rule string substitution systems over {A,B} with left-hand blocks of length 1-3 and strictly shorter right-hand sides, all initial strings of length 1-5, all complete evolutions (generated by analysis.py)" ;
+    dct:description "exhaustive finite family; non-overlapping systems are the test set, overlapping ones the control" ;
+
+    dct:license "" ;
+    prov:wasDerivedFrom <null> .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch09-17> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch09-17--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch09-17/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-0123)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.476Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch09-17: supports, confidence 0.93" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch09-17--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

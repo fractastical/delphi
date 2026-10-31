@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch14-07--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch14-07: supports, confidence 0.7" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.7"^^xsd:double ;
+    delphi:hypothesis "If the amount of organic change between consecutive faunas is a fair though imperfect measure of elapsed time, then across the Phanerozoic the proportion of marine animal genera present in a stage that do not continue into the next stage should increase with the radiometric duration of the stage, and this should hold after controlling for sampling intensity." ;
+    delphi:passCriterion "Using Paleobiology Database stage-level diversity tables for marine animal genera (occs/diversity, count=genera, time_reso=stage, Phanerozoic, marine environments), turnover T_i for each stage i = (X_bL + X_FL) / (X_bt + X_bL + X_Ft + X_FL), the fraction of genera sampled in or ranging through stage i that make their last appearance in it, and duration D_i = early age minus late age of the stage (PBDB/ICS ages). The last two stages (Pleistocene edge, where last appearances are distorted by the Recent) are excluded. Pass if (1) the Spearman correlation between T_i and D_i across stages is positive with p < 0.05, AND (2) the partial Spearman correlation controlling for log(number of occurrences in the stage) is also positive with p < 0.05, AND (3) the correlation remains positive (point estimate > 0) when the five stages with the highest turnover (mass-extinction stages) are removed, so that the relation is not carried by catastrophes alone. 'Fair though imperfect' is operationalised as rho between 0.2 and 0.9: a rho >= 0.2 that meets (1)-(3) supports; the verdict is 'mixed' if (1) holds but (2) or (3) fails, 'refutes' if (1) fails." ;
+    delphi:failCriterion "Refuted if turnover between consecutive stages does not increase with stage duration (Spearman rho <= 0 or p >= 0.05), which would mean faunal change carries no information about elapsed time. Mixed if the raw correlation is positive but disappears when sampling intensity is controlled or is carried entirely by the five highest-turnover stages." ;
+    delphi:expectedObservation "Using Paleobiology Database stage-level diversity tables for marine animal genera (occs/diversity, count=genera, time_reso=stage, Phanerozoic, marine environments), turnover T_i for each stage i = (X_bL + X_FL) / (X_bt + X_bL + X_Ft + X_FL), the fraction of genera sampled in or ranging through stage i that make their last appearance in it, and duration D_i = early age minus late age of the stage (PBDB/ICS ages). The last two stages (Pleistocene edge, where last appearances are distorted by the Recent) are excluded. Pass if (1) the Spearman correlation between T_i and D_i across stages is positive with p < 0.05, AND (2) the partial Spearman correlation controlling for log(number of occurrences in the stage) is also positive with p < 0.05, AND (3) the correlation remains positive (point estimate > 0) when the five stages with the highest turnover (mass-extinction stages) are removed, so that the relation is not carried by catastrophes alone. 'Fair though imperfect' is operationalised as rho between 0.2 and 0.9: a rho >= 0.2 that meets (1)-(3) supports; the verdict is 'mixed' if (1) holds but (2) or (3) fails, 'refutes' if (1) fails." ;
+    delphi:disconfirmingObservation "Refuted if turnover between consecutive stages does not increase with stage duration (Spearman rho <= 0 or p >= 0.05), which would mean faunal change carries no information about elapsed time. Mixed if the raw correlation is positive but disappears when sampling intensity is controlled or is carried entirely by the five highest-turnover stages." ;
+    delphi:admissibleDatasets "Planned datasets: pbdb-occs-diversity-marine-genera-by-stage" ;
+    delphi:inferenceMethod "The PBDB diversity table for marine animal genera at stage resolution was downloaded for the whole Phanerozoic; for each of the 96 stages retained (two youngest dropped) turnover was computed as the share of genera present that make their last appearance in the stage, and stage duration as the difference of its PBDB/ICS boundary ages. Spearman correlation of turnover with duration, the partial Spearman correlation controlling log occurrences, and the correlation after removing the five highest-turnover stages (Stage 4, Changhsingian, Drumian, Guzhangian, Katian) were computed." ;
+    delphi:preregistered false ;
+    dct:description "The PBDB diversity table for marine animal genera at stage resolution was downloaded for the whole Phanerozoic; for each of the 96 stages retained (two youngest dropped) turnover was computed as the share of genera present that make their last appearance in the stage, and stage duration as the difference of its PBDB/ICS boundary ages. Spearman correlation of turnover with duration, the partial Spearman correlation controlling log occurrences, and the correlation after removing the five highest-turnover stages (Stage 4, Changhsingian, Drumian, Guzhangian, Katian) were computed." ;
+    rdfs:comment "Measured: 0.4858584625848877 Spearman rho, stage turnover vs stage duration (Myr) (n = 96, p = 5.223e-07). Interpretation: Darwin's 'amount of organic change in the fossils of consecutive formations' is read as the proportion of genera that fail to pass from one stage to the next (taxonomic turnover), and 'time elapsed' as the radiometrically calibrated stage duration, a measurement unavailable to Darwin. Stages, not lithostratigraphic formations, are the units because global turnover can only be computed on a correlated time scale; the claim's use (estimating blank intervals between formations) is tested indirectly through its premise that change tracks time. Marine animals are used because their stage-level record is the most complete and standardised." ;
+    delphi:evidenceAgainst "Turnover measured on stages correlated by biostratigraphy is partly circular: stage boundaries were historically placed at faunal changes, which inflates turnover at boundaries regardless of duration; the test asks whether, given those boundaries, longer stages still show more change." ;
+    delphi:evidenceAgainst "Stage-level genus ranges are affected by uneven sampling across stages; the partial correlation controls only for occurrence count, not for facies or geographic coverage." ;
+    delphi:evidenceAgainst "Taxonomic turnover is a proxy for Darwin's 'amount of organic change', which he meant morphologically; a few stages with mass extinctions dominate the upper tail of turnover." ;
+    delphi:evidenceAgainst "The claim's practical use (estimating blank intervals between formations) is tested only through its premise that change tracks time." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-07--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/darwin-origin/darwin1859-ch14-07/result.json> .
+  <https://w3id.org/delphi/resource/evidence/darwin1859-ch14-07--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Paleobiology Database occs/diversity: marine Animalia genus counts per stage (Phanerozoic), with Foote range categories" ;
+    dct:description "per-stage genus range categories (X_Ft, X_bL, X_FL, X_bt), occurrence counts and stage ages" ;
+    delphi:hasChecksum "sha256:f80dce2c9a854de321a14be3f1a8bbc1e289e9f6be287983b2e945d03a210ded" ;
+    prov:atLocation <https://paleobiodb.org/data1.2/occs/diversity.json?base_name=Animalia&interval=Phanerozoic&envtype=marine&count=genera&time_reso=stage&vocab=pbdb> ;
+    dct:license "CC BY 4.0" ;
+    prov:wasDerivedFrom <https://paleobiodb.org/data1.2/occs/diversity_doc.html> .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch14-07> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch14-07--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/darwin-origin/darwin1859-ch14-07/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-darwin-batch-0e75)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.385Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch14-07: supports, confidence 0.7" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch14-07--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-02--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch03-02: supports, confidence 0.95" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.95"^^xsd:double ;
+    delphi:hypothesis "When each of the 256 elementary cellular automata (Wolfram numbering, all 256 counted separately) is run from a single black cell on a white background, the pattern of cells that differ from the (possibly alternating) uniform background stays of bounded width for about two-thirds of the rules (~171) and grows without bound for about one-third (~85); and about 14% of all 256 rules (~36) produce growing patterns that are not space-time periodic, i.e. more complicated than repetition." ;
+    delphi:passCriterion "Pre-registered: run all 256 rules for T = 4096 steps on a ring of 2T + 64 cells (so the light cone never wraps). Width w(t) = extent of cells differing from the background value at time t, where the background follows b_{t+1} = f(b_t, b_t, b_t). A rule is 'fixed size' if max_{t in [T/2, T]} w(t) equals max_{t in [T/4, T/2]} w(t), otherwise 'growing'. A growing rule is 'repetitive' if some temporal period P <= 16 and spatial shift |s| <= 16 satisfy grid[t + P, x + s] == grid[t, x] for every t in [T/2, T - P] and every x in [-t + 16, t - 16]; otherwise it is 'more complicated than repetition'. The claim passes if the fixed-size fraction lies in [0.60, 0.73], the growing fraction in [0.27, 0.40] and the more-complicated fraction in [0.10, 0.18], and if the three-way classification of every rule is identical for T = 2048 and T = 4096 (no rule changes class with the cutoff)." ;
+    delphi:failCriterion "Pre-registered: 'refutes' if the fixed-size fraction is below 0.55 or above 0.78, or the more-complicated fraction is outside [0.07, 0.21]; 'mixed' if the fractions fall between the pass and refute bands, or if more than 4 rules change class between T = 2048 and T = 4096 (indicating the cutoff, not the rules, decides the shares); 'inconclusive' if the periodicity search is not able to classify the growing patterns (e.g. because the width of the periodic window is inadequate for some rule) in a way that is stable across cutoffs." ;
+    delphi:expectedObservation "Pre-registered: run all 256 rules for T = 4096 steps on a ring of 2T + 64 cells (so the light cone never wraps). Width w(t) = extent of cells differing from the background value at time t, where the background follows b_{t+1} = f(b_t, b_t, b_t). A rule is 'fixed size' if max_{t in [T/2, T]} w(t) equals max_{t in [T/4, T/2]} w(t), otherwise 'growing'. A growing rule is 'repetitive' if some temporal period P <= 16 and spatial shift |s| <= 16 satisfy grid[t + P, x + s] == grid[t, x] for every t in [T/2, T - P] and every x in [-t + 16, t - 16]; otherwise it is 'more complicated than repetition'. The claim passes if the fixed-size fraction lies in [0.60, 0.73], the growing fraction in [0.27, 0.40] and the more-complicated fraction in [0.10, 0.18], and if the three-way classification of every rule is identical for T = 2048 and T = 4096 (no rule changes class with the cutoff)." ;
+    delphi:disconfirmingObservation "Pre-registered: 'refutes' if the fixed-size fraction is below 0.55 or above 0.78, or the more-complicated fraction is outside [0.07, 0.21]; 'mixed' if the fractions fall between the pass and refute bands, or if more than 4 rules change class between T = 2048 and T = 4096 (indicating the cutoff, not the rules, decides the shares); 'inconclusive' if the periodicity search is not able to classify the growing patterns (e.g. because the width of the periodic window is inadequate for some rule) in a way that is stable across cutoffs." ;
+    delphi:admissibleDatasets "Planned datasets: eca-single-cell-census" ;
+    delphi:inferenceMethod "analysis.py evolves each of the 256 rules for 4096 steps from a single black cell on an 8256-cell ring, tracks the background value from a cell outside the light cone (odd rules make it alternate), and measures the width of the pattern (cells differing from the background) in every row. A rule is fixed-size if the maximum width over rows 2048..4096 equals the maximum over rows 1024..2048; otherwise growing. For growing rules it searches temporal periods P <= 16 and shifts |s| <= 16 such that the space-time pattern repeats over rows 2048..4096-P inside the interior mask; a growing rule with such a period is repetitive, otherwise more complicated. Two interior masks are evaluated: the pre-registered light-cone mask |x| <= t - 16, and an extent mask (inside the pattern's actual extent at time t minus 16 cells each side), added after the first run showed that for rules 57 and 99, whose patterns grow at half a cell per step, the light-cone mask includes background cells that the growing pattern later overwrites, so their period-3 interiors were being scored as non-periodic. The whole classification is repeated with cutoff T = 2048 using the first 2048 rows. Run time about 3 minutes." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py evolves each of the 256 rules for 4096 steps from a single black cell on an 8256-cell ring, tracks the background value from a cell outside the light cone (odd rules make it alternate), and measures the width of the pattern (cells differing from the background) in every row. A rule is fixed-size if the maximum width over rows 2048..4096 equals the maximum over rows 1024..2048; otherwise growing. For growing rules it searches temporal periods P <= 16 and shifts |s| <= 16 such that the space-time pattern repeats over rows 2048..4096-P inside the interior mask; a growing rule with such a period is repetitive, otherwise more complicated. Two interior masks are evaluated: the pre-registered light-cone mask |x| <= t - 16, and an extent mask (inside the pattern's actual extent at time t minus 16 cells each side), added after the first run showed that for rules 57 and 99, whose patterns grow at half a cell per step, the light-cone mask includes background cells that the growing pattern later overwrites, so their period-3 interiors were being scored as non-periodic. The whole classification is repeated with cutoff T = 2048 using the first 2048 rows. Run time about 3 minutes." ;
+    rdfs:comment "Measured: 0.6641 fraction of the 256 rules whose pattern stays of fixed size (170/256) (n = 256, exact for the given cutoffs and periodicity bounds). Interpretation: The 256 rules are counted individually as Wolfram does ('all the cellular automata shown on the last few pages'), without quotienting by the left-right or black-white symmetries. 'Fixed size' includes patterns that die out (rules 0, 128), that flash with the background (7, 127) and that move at constant speed without changing width (2, 103). 'Grow forever' is operationalised as a width that keeps increasing between the third and fourth quarters of the run, which also captures the square-root growth of rule 225 noted in the text (width about 2*sqrt(t)). 'More complicated than repetition' is the complement of space-time periodicity with small period and drift inside the light cone, which is how a purely repetitive growing pattern (rules 50, 109) differs from a nested (22, 60, 90, 225) or random (30, 45) or complex (110) one. The shares are described as approximate ('about'), so a +-0.07 band around 2/3, 1/3 and a +-0.04 band around 14% are used; Wolfram's own count of 24 nested rules is recorded as an exploratory extra, not a criterion." ;
+    delphi:evidenceAgainst "All pre-registered bands are met: 170/256 = 66.4% fixed size (band 60-73%), 86/256 = 33.6% growing (27-40%), and 37/256 = 14.5% (extent mask) or 39/256 = 15.2% (pre-registered light-cone mask) more complicated than repetition (10-18%); no rule changes class between the T = 2048 and T = 4096 cutoffs under either mask." ;
+    delphi:evidenceAgainst "Deviation from pre-registration: the light-cone interior mask was found to be inappropriate for patterns growing slower than one cell per step (rules 57 and 99 grow at speed 1/2 and have period-3 interiors), so an extent-based mask was added and is treated as the primary classification; both masks give verdict 'supports' and are reported." ;
+    delphi:evidenceAgainst "The 37 more-complicated rules comprise the 12 rules in the equivalence classes of rules 30, 45 and 110 plus 25 others; Wolfram states that 24 rules give nested patterns, so the census agrees with his 24 + 12 = 36 up to one rule (rule 73, whose single-cell pattern is non-periodic for every period below 600 but is not usually listed as nested)." ;
+    delphi:evidenceAgainst "Fixed-size versus growing and periodic versus non-periodic are decided at a finite cutoff (4096 steps, periods <= 16, shifts <= 16); the stability of every rule's class between 2048 and 4096 steps supports but does not prove the asymptotic classification. Rule 225's width (50, 97, 98 cells at 1024, 2048, 4096 steps) grows irregularly, consistent with Wolfram's square-root remark, and is correctly scored as growing." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch03-02--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch03-02/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch03-02--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: All 256 elementary cellular automata from a single black cell, 4096 steps (generated by analysis.py)" ;
+    dct:description "complete census" ;
+    delphi:hasChecksum "sha256:undefined" ;
+    prov:atLocation <undefined> ;
+    dct:license "" ;
+    prov:wasDerivedFrom <null> .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch03-02> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-02--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch03-02/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-0123)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.462Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch03-02: supports, confidence 0.95" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch03-02--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

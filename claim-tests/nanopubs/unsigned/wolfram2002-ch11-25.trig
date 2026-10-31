@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-25--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch11-25: inconclusive, confidence 0.5" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0.5"^^xsd:double ;
+    delphi:hypothesis "With a single-step block-emulation scheme of the kind shown on NKS pp. 703-705 (fixed background blocks of width w between single input cells, t steps of the underlying rule, output read at a fixed offset), the underlying rules 22, 30 and 110 can realise, as the induced map from (x[i-1], x[i], x[i+1]) to the output under cell i, every one of the 256 elementary rules once w is large enough, whereas rules 90 and 184 realise only a small number of them at the same widths." ;
+    delphi:passCriterion "Pre-registered. Scheme: the initial condition is periodic with period w+1: one input cell x[i] in {0,1} followed by a fixed background block B in {0,1}^w. The underlying rule f is run for t steps with w+1 <= t <= 2w+2 and the output for cell i is read at offset d in 0..w to the right of x[i]'s position. For each (w, B, t, d) the output is computed for all 32 assignments of (x[i-2], ..., x[i+2]) in a window padded on both sides with t+2 further background cells (input positions in the padding set to 0; they lie outside the light cone). If the output depends only on (x[i-1], x[i], x[i+1]) (the 4 assignments of the outer inputs agree for each of the 8 inner triples), the induced 3-input truth table is an elementary rule g that f emulates for one step at width w. E(f, W) = the set of g realised for some w <= W. Widths searched: W = 1..6. 'supports' if |E(f, 6)| = 256 for each f in {22, 30, 110} and |E(f, 6)| <= 32 for each f in {90, 184}." ;
+    delphi:failCriterion "Pre-registered. 'refutes' if |E(90, 6)| >= 128 or |E(184, 6)| >= 128 (a 'simple' rule emulates at least half of all elementary rules), or if min over f in {22, 30, 110} of |E(f, 6)| is smaller than max over f in {90, 184} of |E(f, 6)| (the contrast is reversed). 'inconclusive' with reason 'other' if neither condition holds, e.g. because 22, 30 or 110 do not reach 256 within W = 6 under this scheme: Wolfram's figure uses a scheme whose exact readout and width conventions are not fully recoverable from the online text, so a shortfall under the reconstructed scheme does not refute the claim. In every case the counts for all 256 underlying rules at W = 6 are reported." ;
+    delphi:expectedObservation "Pre-registered. Scheme: the initial condition is periodic with period w+1: one input cell x[i] in {0,1} followed by a fixed background block B in {0,1}^w. The underlying rule f is run for t steps with w+1 <= t <= 2w+2 and the output for cell i is read at offset d in 0..w to the right of x[i]'s position. For each (w, B, t, d) the output is computed for all 32 assignments of (x[i-2], ..., x[i+2]) in a window padded on both sides with t+2 further background cells (input positions in the padding set to 0; they lie outside the light cone). If the output depends only on (x[i-1], x[i], x[i+1]) (the 4 assignments of the outer inputs agree for each of the 8 inner triples), the induced 3-input truth table is an elementary rule g that f emulates for one step at width w. E(f, W) = the set of g realised for some w <= W. Widths searched: W = 1..6. 'supports' if |E(f, 6)| = 256 for each f in {22, 30, 110} and |E(f, 6)| <= 32 for each f in {90, 184}." ;
+    delphi:disconfirmingObservation "Pre-registered. 'refutes' if |E(90, 6)| >= 128 or |E(184, 6)| >= 128 (a 'simple' rule emulates at least half of all elementary rules), or if min over f in {22, 30, 110} of |E(f, 6)| is smaller than max over f in {90, 184} of |E(f, 6)| (the contrast is reversed). 'inconclusive' with reason 'other' if neither condition holds, e.g. because 22, 30 or 110 do not reach 256 within W = 6 under this scheme: Wolfram's figure uses a scheme whose exact readout and width conventions are not fully recoverable from the online text, so a shortfall under the reconstructed scheme does not refute the claim. In every case the counts for all 256 underlying rules at W = 6 are reported." ;
+    delphi:admissibleDatasets "Planned datasets: nks-ch11-25-single-step-emulation-search" ;
+    delphi:inferenceMethod "analysis.py builds, for each underlying rule f, each background width w = 1..6 and each of the 2^w background blocks, a periodic initial condition with one input cell per period, runs f for t = w+1..2w+2 steps on all 32 assignments of five consecutive inputs (numpy, vectorised over assignments), reads the output at each offset d = 0..w below the central input, and records the induced 3-input truth table whenever the output is independent of the two outer inputs. The cumulative number of distinct elementary rules so obtained was computed for all 256 underlying rules (25 s). After seeing that the counts were still rising at w = 6, the same search was continued post hoc to w = 12 for rules 22, 30, 45, 90, 110 and 184 (a further 2 minutes)." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py builds, for each underlying rule f, each background width w = 1..6 and each of the 2^w background blocks, a periodic initial condition with one input cell per period, runs f for t = w+1..2w+2 steps on all 32 assignments of five consecutive inputs (numpy, vectorised over assignments), reads the output at each offset d = 0..w below the central input, and records the induced 3-input truth table whenever the output is independent of the two outer inputs. The cumulative number of distinct elementary rules so obtained was computed for all 256 underlying rules (25 s). After seeing that the counts were still rising at w = 6, the same search was continued post hoc to w = 12 for rules 22, 30, 45, 90, 110 and 184 (a further 2 minutes)." ;
+    rdfs:comment "Measured: [object Object] number of the 256 elementary rules emulated for one step with background width <= 6 (pre-registered range) (n = [object Object], exhaustive within the reconstructed scheme and searched range; none). Interpretation: The claim concerns one-step emulation under block encodings, which Wolfram himself distinguishes from universality. The test reconstructs the p. 703-704 scheme from its caption (fixed initial conditions except at input positions; blocks of 3 cells between inputs for the rule 30 to Xor example; blocks 5 cells wide for all 256 rules) with the output position and step count as free parameters searched over a bounded range. 'A few' is given the threshold 32 of 256 (one eighth). Positive emulations are exact finite certificates; negative counts are relative to the scheme and the searched widths. All computation is in analysis.py; there is no external download." ;
+    delphi:evidenceAgainst "Under the pre-registered rule the outcome is inconclusive: at width <= 6 none of rules 22, 30, 110 reaches all 256 targets under the reconstructed scheme (117, 229 and 55 respectively), while the refutation conditions are far from met (rules 90 and 184 emulate only 14 each, and every complex rule exceeds them). The pre-registered width limit of 6 was too small for this scheme." ;
+    delphi:evidenceAgainst "Post hoc (not pre-registered, not decisive): continuing the identical search to width 12, rule 30 emulates all 256 elementary rules from width 7, rule 45 from width 8 and rule 22 from width 10, whereas rule 90 saturates at 16 and rule 184 at 14 by width 4-9 and never grows further. This matches the claim's contrast exactly for 22, 30, 90 and 184. Rule 110 reaches 167 of 256 by width 12 and is still rising; whether it reaches 256 at larger widths under this scheme was not determined (Wolfram's figure shows it doing so under his scheme)." ;
+    delphi:evidenceAgainst "The scheme is a reconstruction from the figure captions (single-cell inputs separated by fixed blocks, free readout offset and step count); Wolfram's exact conventions may differ, so the widths at which 256 is reached are not directly comparable with his figure, and negative counts are scheme-relative. Positive emulations are exact and independently checkable certificates." ;
+    delphi:evidenceAgainst "One-step emulation is, as Wolfram himself notes, much weaker than universality; the claim's inference to 'arbitrarily sophisticated computations' is a heuristic and was not tested." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-25--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch11-25/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch11-25--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Exhaustive single-step block-emulation search over elementary cellular automata generated by analysis.py: underlying rules f = 0..255, background widths w = 1..6 (all 2^w blocks), steps t = w+1..2w+2, readout offsets d = 0..w, 32 input assignments per configuration" ;
+    dct:description "the search whose outcome is the number of elementary rules each underlying rule can emulate for one step" ;
+
+    dct:license "generated" ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p705--the-threshold-of-universality-in-cellular-automata/> .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-25> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-25--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch11-25/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-e5f4)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.488Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch11-25: inconclusive, confidence 0.5" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch11-25--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}

@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/wolfram2002-ch09-15--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of wolfram2002-ch09-15: inconclusive, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "For graphs that are discretisations of ordinary d-dimensional space (hypercubic lattices Z^d) the number of nodes within graph distance r grows like r^d, while for tree-like and randomly connected graphs the growth is exponential, so no finite exponent d exists; the biconditional ('precisely') additionally requires that polynomial growth of degree d occur only for networks corresponding to ordinary d-dimensional space." ;
+    delphi:passCriterion "Pre-registered. Primary (necessity and the tree/random clause): for the hypercubic lattices Z^1, Z^2, Z^3, Z^4 the growth exponent, estimated as the ordinary-least-squares slope of log N(r) against log r over r in [R/2, R] (R = 32 for d <= 3, R = 20 for d = 4), lies within 0.15 of d; for the infinite 3-regular tree (R = 13) and for a random 4-regular graph on n = 300000 nodes (R = largest radius with N(R) <= n/10) the same slope estimated over r in [R/2, R] exceeds 5, and log N(r) is better fit (higher R^2) by a straight line in r than in log r. If every one of these six conditions holds the primary test passes. Secondary (sufficiency / 'precisely'): the Cayley graph of the discrete Heisenberg group with generators x, y and inverses is known not to be quasi-isometric to any Z^d (Pansu 1983), yet has polynomial growth of degree 4 (Bass 1972 / Guivarc'h 1973). If its measured slope over r in [12, 24] lies in [3.5, 4.5], then a network with r^d growth exists that does not correspond to ordinary d-dimensional space in the strict sense. Verdict rule: primary passes and secondary slope in [3.5, 4.5] -> 'mixed' (the necessity direction and the tree/random clause hold; the sufficiency direction holds only if 'corresponds to ordinary d-dimensional space' is read as 'has growth dimension d'); primary passes and secondary slope outside [3.5, 4.5] -> 'supports'." ;
+    delphi:failCriterion "Pre-registered. 'refutes' if any lattice exponent differs from d by more than 0.5, or if either the tree or the random 4-regular graph has a slope below 3 over the stated range (i.e. appears to have a small finite dimension), or if log N(r) for the tree or random graph is better fit by a straight line in log r than in r. Any other outcome (e.g. a lattice exponent off by between 0.15 and 0.5) -> 'inconclusive' with reason 'other'." ;
+    delphi:expectedObservation "Pre-registered. Primary (necessity and the tree/random clause): for the hypercubic lattices Z^1, Z^2, Z^3, Z^4 the growth exponent, estimated as the ordinary-least-squares slope of log N(r) against log r over r in [R/2, R] (R = 32 for d <= 3, R = 20 for d = 4), lies within 0.15 of d; for the infinite 3-regular tree (R = 13) and for a random 4-regular graph on n = 300000 nodes (R = largest radius with N(R) <= n/10) the same slope estimated over r in [R/2, R] exceeds 5, and log N(r) is better fit (higher R^2) by a straight line in r than in log r. If every one of these six conditions holds the primary test passes. Secondary (sufficiency / 'precisely'): the Cayley graph of the discrete Heisenberg group with generators x, y and inverses is known not to be quasi-isometric to any Z^d (Pansu 1983), yet has polynomial growth of degree 4 (Bass 1972 / Guivarc'h 1973). If its measured slope over r in [12, 24] lies in [3.5, 4.5], then a network with r^d growth exists that does not correspond to ordinary d-dimensional space in the strict sense. Verdict rule: primary passes and secondary slope in [3.5, 4.5] -> 'mixed' (the necessity direction and the tree/random clause hold; the sufficiency direction holds only if 'corresponds to ordinary d-dimensional space' is read as 'has growth dimension d'); primary passes and secondary slope outside [3.5, 4.5] -> 'supports'." ;
+    delphi:disconfirmingObservation "Pre-registered. 'refutes' if any lattice exponent differs from d by more than 0.5, or if either the tree or the random 4-regular graph has a slope below 3 over the stated range (i.e. appears to have a small finite dimension), or if log N(r) for the tree or random graph is better fit by a straight line in log r than in r. Any other outcome (e.g. a lattice exponent off by between 0.15 and 0.5) -> 'inconclusive' with reason 'other'." ;
+    delphi:admissibleDatasets "Planned datasets: nks-ch09-15-graph-family-generator" ;
+    delphi:inferenceMethod "analysis.py generates each graph implicitly (lattices, tree, Heisenberg Cayley graph) or explicitly (configuration-model random 4-regular graph, n = 300000, numpy seed 20261031) and counts the closed ball N(r) around the origin by breadth-first search. The growth exponent is the OLS slope of log N(r) on log r over r in [R/2, R] with R = 32 (Z^1..Z^3), 20 (Z^4), 13 (tree), 8 (random graph; largest r with N(r) <= n/10) and 24 (Heisenberg). For the tree and random graph the fit of log N(r) linear in r is compared with the log-log fit by R^2. Exact closed-form ball sizes of Z^d were used post hoc to check the BFS counts and to show how the slope estimator converges." ;
+    delphi:preregistered false ;
+    dct:description "analysis.py generates each graph implicitly (lattices, tree, Heisenberg Cayley graph) or explicitly (configuration-model random 4-regular graph, n = 300000, numpy seed 20261031) and counts the closed ball N(r) around the origin by breadth-first search. The growth exponent is the OLS slope of log N(r) on log r over r in [R/2, R] with R = 32 (Z^1..Z^3), 20 (Z^4), 13 (tree), 8 (random graph; largest r with N(r) <= n/10) and 24 (Heisenberg). For the tree and random graph the fit of log N(r) linear in r is compared with the log-log fit by R^2. Exact closed-form ball sizes of Z^d were used post hoc to check the BFS counts and to show how the slope estimator converges." ;
+    rdfs:comment "Measured: [object Object] log-log slope of N(r) over r in [R/2, R] (growth-exponent estimate) (n = [object Object], exact counts; slopes are OLS fits with R^2 >= 0.988 (log-log) for every graph). Interpretation: Wolfram's 'number of nodes that appear out to distance r' is the size N(r) of the closed ball of graph-distance radius r around a node. 'Grows in some limiting sense like r^d' is operationalised as the local log-log slope of N(r) at the largest radii computed, which for an exact polynomial of degree d tends to d from below. 'Corresponds to ordinary d-dimensional space' is taken, for the primary test, as 'is the nearest-neighbour graph of Z^d'; for the secondary test we use the standard geometric-group-theory meaning (quasi-isometric to R^d) and rely on published theorems for the Heisenberg group's status. 'Tree-like or randomly connected' is operationalised as the infinite 3-regular tree (BFS-generated) and a configuration-model random 4-regular graph. All graphs are generated by analysis.py; there is no external download." ;
+    delphi:evidenceAgainst "The verdict follows the pre-registered rule literally: the Z^4 slope at R = 20 (3.831) misses the pre-registered 0.15 tolerance by 0.019, which the rule maps to 'inconclusive'. The tolerance was set too tight for the finite radius chosen; this is a flaw of the pre-registration, not evidence against the claim." ;
+    delphi:evidenceAgainst "Post hoc (not pre-registered): the closed-form ball sizes of Z^d reproduce the BFS counts exactly, and the same slope estimator at R = 200 gives 0.997, 1.993, 2.989, 3.986 for d = 1..4, i.e. the estimator converges to d from below as the claim's 'limiting sense' requires. Had the tolerance been 0.2, the primary test would have passed and the pre-registered verdict would have been 'mixed'." ;
+    delphi:evidenceAgainst "Every other pre-registered condition held: Z^1..Z^3 within 0.07 of d; the 3-regular tree and the random 4-regular graph have slopes above 6 that keep rising with r, and log N(r) is fit perfectly (R^2 = 1.000) by a line in r, i.e. exponential growth with no finite dimension, as the claim says of tree-like and random networks." ;
+    delphi:evidenceAgainst "The Heisenberg Cayley graph has measured growth exponent 3.994 (degree 4, as proved by Bass 1972 and Guivarc'h 1973) although the group is not quasi-isometric to any Z^d (Pansu 1983). Under the strict reading of 'corresponds to ordinary d-dimensional space', r^d growth is therefore necessary but not sufficient; under Wolfram's own usage, in which dimension is defined by growth, the sentence is close to definitional. This bears on the 'precisely' (biconditional) wording and was the reason the pre-registered best outcome was 'mixed' rather than 'supports'." ;
+    delphi:evidenceAgainst "The random 4-regular graph is a configuration-model multigraph; self-loops and multi-edges were not removed. They can only reduce N(r), so they bias against the exponential-growth conclusion that was nevertheless reached." ;
+    delphi:evidenceAgainst "'Corresponds to ordinary space' was not measured independently of the growth exponent; the status of each test graph was taken from its construction (lattice) or from the cited theorems (Heisenberg)." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/wolfram2002-ch09-15--claim-test--dataset-1> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch09-15/result.json> .
+  <https://w3id.org/delphi/resource/evidence/wolfram2002-ch09-15--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Graph families generated by analysis.py: hypercubic lattices Z^1..Z^4 (nearest-neighbour, L1 adjacency), infinite 3-regular tree, random 4-regular configuration-model graph (n = 300000, numpy seed 20261031), discrete Heisenberg group Cayley graph (generators x, y and inverses)" ;
+    dct:description "ball sizes N(r) measured by breadth-first search from the origin node; radii up to R = 32 (Z^1..Z^3), 20 (Z^4), 24 (Heisenberg), and until N(r) > n/10 for the tree and random graph" ;
+
+    dct:license "generated" ;
+    prov:wasDerivedFrom <null> .
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch09-15> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/wolfram2002-ch09-15--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/wolfram-nks/wolfram2002-ch09-15/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/e8db5c0ff7bdf0952fd48de14292904d08564ea6/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5.1; cursor/claim-tests-wolfram-nks-e5f4)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T18:16:46.475Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of wolfram2002-ch09-15: inconclusive, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/wolfram2002-ch09-15--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+}
