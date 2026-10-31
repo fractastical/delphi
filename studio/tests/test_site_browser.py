@@ -856,3 +856,23 @@ def test_design_review_never_attaches_an_unrelated_fish_project(browser, base):
     pg.wait_for_selector("#drlive")
     pg.wait_for_function("document.querySelector('#drlive').textContent.includes('project-flying-fish-mission')")
     assert "no Project record" in pg.locator("#drlive").text_content() and not seen
+
+
+def test_home_leads_with_sourced_anatomy_assumptions_and_the_actual_candidate(browser, base):
+    pg = page(browser, 1700, 900)
+    pg.goto(base + "#/home")
+    pg.wait_for_selector(".grounding .region")
+    t = pg.locator(".grounding").text_content()
+    assert "Start from real fish anatomy." in t and "Not biorealistic and not validated" in t
+    assert "flat fin plates" in t and "lattice scales" in t and "decorative eyes" in t
+    assert "length ∝ SL" in t and "R² 0.98" in t and "raw data unavailable" in t.lower() or "UNAVAILABLE" in t
+    assert "not 51 empirically learned laws" in t
+    assert pg.locator(".grounding .region").count() == 9 and pg.locator(".grounding .region .assumed").count() >= 5
+    assert pg.locator(".grounding .printmodels select").count() == 1 and pg.locator(".grounding .turntable video").count() == 1
+    y_ground = pg.locator(".grounding").bounding_box()["y"]; y_paths = pg.locator(".paths").bounding_box()["y"]
+    assert y_ground < y_paths
+    # wide desktop uses the room; paragraphs stay readable; no horizontal overflow
+    assert pg.locator("main").bounding_box()["width"] > 1400
+    assert pg.evaluate("document.querySelector('.lede').getBoundingClientRect().width") <= 900
+    assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
+    assert pg.locator("svg.mark").count() == 1

@@ -294,6 +294,37 @@ def _vid(ins, out, vid, src_dir, fname, declared, bytes_declared=None):
     return "present_verified", f"artifacts/simulations/{vid}/{fname}"
 
 
+def home_biology(ins: Inputs) -> dict | None:
+    """Sourced anatomy and parameter provenance for the Home page: per-component parameter statuses from the fish3d candidate, the
+    fitted relations with their context, and the evidence categories kept separate. Nothing is combined into one count of laws."""
+    f3 = "artifacts/fish3d/fish3d-N1-cypselurus-baseline"; fc = "data/fish-controls"
+    if not ((ROOT / f3 / "components.json").exists() and (ROOT / fc / "knobs.json").exists()):
+        return None
+    comps = json.loads(ins.read(f"{f3}/components.json"))["components"]; cand = json.loads(ins.read(f"{f3}/candidate.json")); K = json.loads(ins.read(f"{fc}/knobs.json")); SRC = json.loads(ins.read(f"{fc}/sources.json"))["sources"]; F90 = json.loads(ins.read(f"{fc}/fish1990_tables.json"))
+    group = lambda n: n.split("_")[0]
+    regions = {}
+    for n, v in comps.items():
+        r = regions.setdefault(group(n), {"id": group(n), "params": {}, "notes": []})
+        for k, pv in v.get("params", {}).items():
+            if isinstance(pv, dict) and "status" in pv:
+                r["params"].setdefault(k, pv["status"])
+                if pv.get("note") and pv["note"] not in r["notes"]:
+                    r["notes"].append(pv["note"])
+    for n, v in comps.items():
+        for k, pv in v.get("params", {}).items():
+            if k == "note" and isinstance(pv, str) and pv not in regions[group(n)]["notes"]:
+                regions[group(n)]["notes"].append(pv)
+    fitted = [{"id": x["id"], "variable": x["variable"], "group": x["taxon_context"]["group"], "species": x["taxon_context"]["species"], "material": x["taxon_context"]["material"], "n": x["fit"]["n"], "r2": x["fit"]["r2"], "b": x["fit"]["b"], "b_ci95": x["fit"]["bootstrap"]["b_ci95"], "quality": x["fit_quality"], "unit": x["unit"], "limits": x["limits"][:2]}
+              for x in K["knobs"] if x["kind"] == "observed_and_fitted_here"]
+    counts = {k: sum(1 for x in K["knobs"] if x["kind"] == k) for k in K["kinds"]}
+    bio = cand["biology"]
+    return {"candidate": {"label": cand["label"], "id": cand["id"], "mass_kg": cand["mass_kg"], "standard_length_mm": bio["standard_length_m"]["value"] * 1000, "wing_span_mm": bio["wing_span_m"]["value"] * 1000, "wing_area_mm2": bio["wing_area_m2"]["value"] * 1e6, "fin_thickness": cand["fidelity"]["fin_thickness_mm"]},
+        "regions": sorted(regions.values(), key=lambda r: r["id"]), "fitted": fitted, "evidence_counts": counts, "kinds": K["kinds"], "no_cross_source_conversion": K["no_cross_source_conversion"], "knobs_status": K["status"],
+        "fish1990": {"specimens": F90["specimens"], "raw_data": F90["raw_data"], "pectoral_share_pct_mean_se": F90["pectoral_share_of_wing_area_pct_mean_se_from_text"], "hypocaudal_share_pct_mean_se": F90["hypocaudal_share_pooled_pct_mean_se"], "inconsistencies": F90["inconsistencies_in_the_paper"]},
+        "sources": [{"id": x["id"], "citation": x["citation"], "read_level": x.get("read_level"), "licence": (x["license"].get("note") or x["license"].get("article_record") or "not stated") if isinstance(x.get("license"), dict) else str(x.get("license"))} for x in SRC],
+        "manifest": f"{fc}/manifest.json"}
+
+
 def lifecycle_block(ins: Inputs) -> dict | None:
     """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
     d = "data/fish-lifecycle"
@@ -655,6 +686,7 @@ def build() -> dict[str, bytes]:
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     design_review = ins.json("site/content/design-review.json")
     lifecycle = lifecycle_block(ins)
+    home_biology_block = home_biology(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -683,6 +715,7 @@ def build() -> dict[str, bytes]:
         "assurance": assurance,
         "design_review": design_review,
         "lifecycle": lifecycle,
+        "home_biology": home_biology_block,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
