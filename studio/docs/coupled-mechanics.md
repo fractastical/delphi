@@ -20,6 +20,14 @@ establishes arithmetic only.
   a pressure-face force diagnostic, and the real tail strip refused through the contract.
 - [x] The input contract sent to the CFD owner (`messages/coupled-mechanics-to-cfd3d.md`).
 - [ ] A 3D member-pressure record with at least 2 cells across a fin ray (owner: cfd3d).
+  This is reported by cfd3d (contract v0.1, `messages/cfd3d-to-coupled-mechanics.md`, 15:02 PDT,
+  2026-10-31) and not re-measured here.
+  - Fins are sub-grid at every planned resolution: a 0.5 mm plate needs L ≥ 923 cells to be
+    2 cells thick, beyond one H100.
+  - The fins enter as 3.7-cell shells, and every fin sample carries `resolved: false`.
+  - So the blocker is the grid, not the schedule. Those samples will be refused
+    (`MEMBER_UNRESOLVED`), and an actual fin load needs a resolved local fin-patch case or a
+    validated sub-grid fin model. Neither exists.
 - [ ] A measured EI(x) and a ray section (c, I) for a flying-fish ray (wet lab; no owner).
 - [ ] Fluid-structure feedback. The coupling is one-way and static by design.
 
