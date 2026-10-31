@@ -12,6 +12,7 @@ import csv
 from datetime import datetime, timezone
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 import subprocess
@@ -25,26 +26,37 @@ TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "CANCELED", "STOPPED", "DELETED"
 def telemetry_summary(label: str, path: Path) -> dict:
     """Summarize actual device samples, retaining their original time window."""
     with path.open() as stream:
-        rows = list(csv.DictReader(stream))
+        rows = [{key.strip().split(" [")[0]: value.strip() for key, value in row.items()}
+                for row in csv.DictReader(stream)]
     if not rows:
         raise ValueError("empty telemetry")
-    utilization = [float(row["utilization.gpu"]) for row in rows]
+    def number(row, key):
+        value = float(row[key].split()[0])
+        if not math.isfinite(value):
+            raise ValueError("invalid GPU telemetry sample")
+        return value
+
+    utilization = [number(row, "utilization.gpu") for row in rows]
     if not all(0 <= value <= 100 for value in utilization):
         raise ValueError("invalid GPU utilization sample")
 
-    def stamp(value):
-        return datetime.strptime(value.strip(), "%Y/%m/%d %H:%M:%S.%f").replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
+    times = [datetime.strptime(row["timestamp"], "%Y/%m/%d %H:%M:%S.%f").replace(tzinfo=timezone.utc)
+             for row in rows]
+    intervals_ms = [(later - earlier).total_seconds() * 1000 for earlier, later in zip(times, times[1:])]
+    if any(interval <= 0 for interval in intervals_ms):
+        raise ValueError("GPU telemetry timestamps are not strictly increasing")
 
     return {
         "task_label": label, "source": str(path),
         "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-        "window_utc": [stamp(rows[0]["timestamp"]), stamp(rows[-1]["timestamp"])],
-        "samples": len(rows), "sample_period_ms": 1000,
+        "window_utc": [time.isoformat().replace("+00:00", "Z") for time in (times[0], times[-1])],
+        "samples": len(rows), "sample_period_ms": statistics.median(intervals_ms) if intervals_ms else None,
+        "sample_period_definition": "Median observed interval, not an assumed polling rate",
         "gpu_utilization_pct_mean": statistics.mean(utilization),
         "gpu_utilization_pct_max": max(utilization),
         "gpu_samples_ge90pct": sum(value >= 90 for value in utilization),
-        "gpu_memory_used_mib_max": max(float(row["memory.used"]) for row in rows),
-        "power_w_mean": statistics.mean(float(row["power.draw"]) for row in rows),
+        "gpu_memory_used_mib_max": max(number(row, "memory.used") for row in rows),
+        "power_w_mean": statistics.mean(number(row, "power.draw") for row in rows),
         "interpretation": "Historical sampled allocation window, including setup and artifact emission; not current utilization or a project-wide average.",
     }
 
