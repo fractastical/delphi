@@ -535,6 +535,29 @@ def test_protocol_reads_accept_a_session_or_a_bearer_but_not_nothing(authed):
     assert authed.json("POST", "/v1/read/get", body, {"Authorization": "Bearer " + TOKENS["alice"]}, cookie=False)[0] == 200
 
 
+@pytest.mark.parametrize("public_read", [False, True])
+def test_identity_requires_its_own_bearer_even_with_public_access_or_session(store, site, public_read):
+    w = Web(store, site, public_read=public_read)
+    try:
+        if not public_read:
+            assert w.login()[0] == 200
+        assert w.json("POST", "/v1/read/identity", {})[0] == 401
+        assert w.json("POST", "/v1/read/identity", {}, {"Authorization": "Bearer unknown"})[0] == 401
+        headers = {"Authorization": "Bearer " + TOKENS["alice"]}
+        status, body, response_headers = w.json("POST", "/v1/read/identity", {}, headers)
+        assert status == 200 and body == {"principal": store.principal(TOKENS["alice"])}
+        assert response_headers["cache-control"] == "no-store"
+        assert TOKENS["alice"] not in json.dumps(body)
+        assert w.json("POST", "/v1/read/identity", {"actor": "bob"}, headers)[0] == 400
+        assert w.json("POST", "/v1/read/identity", {"token": TOKENS["alice"]})[0] == 400
+        assert w.json("POST", "/v1/proposals", {"draft": claim(store)},
+                      {"Idempotency-Key": "identity-is-not-session-auth"})[0] == 401
+        bob = {"Authorization": "Bearer " + TOKENS["bob"]}
+        assert w.json("POST", "/v1/read/identity", {}, bob)[1]["principal"]["actor"] == "bob"
+    finally:
+        w.close()
+
+
 # ------------------------------------------------------------------ logs and persistence
 def test_logs_carry_method_path_status_and_never_secrets(store, site, caplog):
     caplog.set_level(logging.INFO, logger="frontier.web")
@@ -739,7 +762,7 @@ DEPLOY = ROOT / "deploy"
 
 def test_nginx_vhost_is_exact_name_loopback_and_redacted():
     conf = (DEPLOY / "nginx" / "frontier.morphoswarm.ai.conf").read_text()
-    code = "\n".join(l for l in conf.splitlines() if not l.strip().startswith("#"))
+    code = "\n".join(line for line in conf.splitlines() if not line.strip().startswith("#"))
     assert re.search(r"server_name\s+frontier\.morphoswarm\.ai\s*;", code) and "*.morphoswarm.ai" not in code and "morphoswarm.ai;" in code
     assert code.count("server_name") == 1 and "listen 443 ssl" in code
     assert "proxy_pass http://127.0.0.1:8971;" in code and "access_log /var/log/nginx/frontier.access.log morphoswarm_redacted;" in code
@@ -770,7 +793,7 @@ def test_systemd_units_are_bounded_and_carry_no_secrets(unit):
 
 
 def test_postgres_scripts_are_unix_socket_only_and_never_touch_other_clusters():
-    init = "\n".join(l for l in (DEPLOY / "postgres" / "init-cluster.sh").read_text().splitlines() if not l.strip().startswith("#"))
+    init = "\n".join(line for line in (DEPLOY / "postgres" / "init-cluster.sh").read_text().splitlines() if not line.strip().startswith("#"))
     assert "listen_addresses = ''" in init and "unix_socket_permissions = 0700" in init and "chmod 700" in init
     assert "auth-host=reject" in init and "peer map=frontier" in init
     assert "5432" not in init and "pg_createcluster" not in init and "/var/lib/postgresql" not in init

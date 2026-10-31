@@ -70,6 +70,31 @@ def server_env(store, token=None, dsn=None):
     return env
 
 
+def test_mcp_artifact_text_reads_verified_published_bytes(store, tmp_path, monkeypatch):
+    from hashlib import sha256
+    from frontier import mcp_surfaces
+    from frontier.media import LocalMedia
+
+    contents = b'{"units":"Pa","pressure":12.5}'
+    path = tmp_path / "artifacts" / "output.json"
+    path.parent.mkdir()
+    path.write_bytes(contents)
+    projection = LocalMedia(tmp_path)
+    monkeypatch.setattr(mcp_surfaces, "LocalMedia", lambda *args, **kwargs: projection)
+    registered = {}
+    def register(function, *args):
+        registered[function.__name__] = function
+    mcp_surfaces.register_surfaces(None, store, register, read_annotations={}, public_host="example.org")
+    inspect = registered["frontier_artifact_inspect"]
+    digest = sha256(contents).hexdigest()
+    metadata = inspect(digest)
+    assert metadata["preview"] is None and metadata["declarations"] == []
+    result = inspect(digest, include_text=True, max_chars=10)
+    assert result["preview"]["text"] == contents.decode()[:10]
+    assert result["preview"]["full_file_hash_verified"] and result["preview"]["truncated"]
+    assert result["local_published_bytes"]["matches"][0]["public_url"] == "https://example.org/artifacts/output.json"
+
+
 @asynccontextmanager
 async def session_for(store, token=None, allow_write=False, errlog=None):
     from mcp import ClientSession, StdioServerParameters
@@ -168,6 +193,10 @@ def test_expanded_mcp_surfaces_use_exact_refs_and_bounded_local_calculators(stor
             asset = val(await session.call_tool("frontier_artifact_inspect", {"sha256": artifact_sha}))
             assert len(asset["declarations"]) == 1 and asset["preview"] is None
             assert asset["declarations"][0]["artifact"]["sha256"] == artifact_sha
+            preview = val(await session.call_tool("frontier_artifact_inspect", {"sha256": artifact_sha, "include_text": True, "max_chars": 100}))
+            assert preview["preview"]["status"] == "unavailable" and preview["preview"]["text"] is None
+            bad_preview = await session.call_tool("frontier_artifact_inspect", {"sha256": artifact_sha, "include_text": True, "max_chars": 16001})
+            assert bad_preview.isError
             sim = val(await session.call_tool("frontier_simulate", {"model": "mechanobio", "parameters": {"duration_s": 1, "frame_count": 5}}))
             assert sim["status"] == "completed" and sim["persisted"] is False and sim["evidence_kind"] == "SimulationResult"
             assert sim["result"]["frames"]

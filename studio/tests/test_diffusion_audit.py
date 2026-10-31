@@ -11,11 +11,13 @@ from frontier_compute.diffusion_audit import CODE_SHA, CONFIG_SHA, METHODS, METR
 @pytest.fixture
 def output(tmp_path):
     checkpoint = b"fixture, not model weights"
+    (tmp_path / "control.json").write_text(json.dumps({"ok": True, "env": {"cuda_available": True}}))
     (tmp_path / "checkpoint.pt").write_bytes(checkpoint)
     (tmp_path / "examples.npz").write_bytes(b"fixture, not field data")
     (tmp_path / "train_loss.jsonl").write_text("\n".join(json.dumps({"step": i}) for i in [1, *range(100, 30001, 100)]))
     report = {
         "smoke": False, "env": {"device": "cuda"},
+        "timings": {"batch": 1024, "ddpm_sampling_seconds": [1, 1, 1]},
         "dataset": {"code_sha256": CODE_SHA, "config_sha256": CONFIG_SHA,
                     "train": {"runs": 4200, "failed_runs": 0, "rows": 16800, "n_settings": 1400}},
         "train": {"steps": 30000, "frozen_before_holdout_generation": True,
@@ -85,5 +87,51 @@ def test_nonfinite_samples_reported_by_finite_fraction_fail(output):
 def test_summary_cannot_drop_losing_conditions(output):
     path, report = output
     report["ensemble_eval"]["paired_counts_ddpm_vs_baseline"]["nearest1_pooled"]["mode_tv"]["n"] = 159
+    (path / "evaluation.json").write_text(json.dumps(report))
+    assert not audit(path)["complete"]
+
+
+@pytest.mark.parametrize("token", ["NaN", "Infinity", "1e999"])
+def test_located_nonfinite_can_never_be_complete(output, token):
+    from engineering.rd_diffusion.audit_result import audit as publication_audit
+
+    path, _ = output
+    original = (path / "evaluation.json").read_text()
+    (path / "evaluation.json").write_text(original.replace('"amp_w1_rel": 0', '"amp_w1_rel": ' + token, 1))
+    for result in (audit(path), publication_audit(path)):
+        assert not result["complete"]
+        assert result["nonfinite_paths"][0].endswith("/amp_w1_rel")
+
+
+def test_publication_adapter_preserves_complete_core_result(output):
+    from engineering.rd_diffusion.audit_result import audit as publication_audit
+
+    path, _ = output
+    result = publication_audit(path)
+    assert result["complete"]
+    assert result["problems"] == result["failures"] == []
+
+
+def test_separate_control_part_is_required_and_supported(output):
+    path, _ = output
+    control = path / "separate-control.json"
+    (path / "control.json").rename(control)
+    assert not audit(path)["complete"]
+    assert audit(path, control)["complete"]
+    control.write_text('{"ok": false, "env": {"cuda_available": true}}')
+    assert not audit(path, control)["complete"]
+
+
+@pytest.mark.parametrize("change", ["batch", "repeats", "duration", "loss_steps"])
+def test_timing_and_actual_training_steps_are_checked(output, change):
+    path, report = output
+    if change == "batch":
+        report["timings"]["batch"] = 64
+    elif change == "repeats":
+        report["timings"]["ddpm_sampling_seconds"].pop()
+    elif change == "duration":
+        report["timings"]["ddpm_sampling_seconds"][0] = 0
+    else:
+        (path / "train_loss.jsonl").write_text("\n".join(json.dumps({"step": i}) for i in range(301)))
     (path / "evaluation.json").write_text(json.dumps(report))
     assert not audit(path)["complete"]

@@ -12,6 +12,7 @@ import csv
 from datetime import datetime, timezone
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 import subprocess
@@ -25,31 +26,87 @@ TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "CANCELED", "STOPPED", "DELETED"
 def telemetry_summary(label: str, path: Path) -> dict:
     """Summarize actual device samples, retaining their original time window."""
     with path.open() as stream:
-        rows = list(csv.DictReader(stream))
+        rows = [{key.strip().split(" [")[0]: value.strip() for key, value in row.items()}
+                for row in csv.DictReader(stream)]
     if not rows:
         raise ValueError("empty telemetry")
-    utilization = [float(row["utilization.gpu"]) for row in rows]
+    def number(row, key):
+        value = float(row[key].split()[0])
+        if not math.isfinite(value):
+            raise ValueError("invalid GPU telemetry sample")
+        return value
+
+    utilization = [number(row, "utilization.gpu") for row in rows]
     if not all(0 <= value <= 100 for value in utilization):
         raise ValueError("invalid GPU utilization sample")
 
-    def stamp(value):
-        return datetime.strptime(value.strip(), "%Y/%m/%d %H:%M:%S.%f").replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
+    times = [datetime.strptime(row["timestamp"], "%Y/%m/%d %H:%M:%S.%f").replace(tzinfo=timezone.utc)
+             for row in rows]
+    intervals_ms = [(later - earlier).total_seconds() * 1000 for earlier, later in zip(times, times[1:])]
+    if any(interval <= 0 for interval in intervals_ms):
+        raise ValueError("GPU telemetry timestamps are not strictly increasing")
 
     return {
         "task_label": label, "source": str(path),
         "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-        "window_utc": [stamp(rows[0]["timestamp"]), stamp(rows[-1]["timestamp"])],
-        "samples": len(rows), "sample_period_ms": 1000,
+        "window_utc": [time.isoformat().replace("+00:00", "Z") for time in (times[0], times[-1])],
+        "samples": len(rows), "sample_period_ms": statistics.median(intervals_ms) if intervals_ms else None,
+        "sample_period_definition": "Median observed interval, not an assumed polling rate",
         "gpu_utilization_pct_mean": statistics.mean(utilization),
         "gpu_utilization_pct_max": max(utilization),
         "gpu_samples_ge90pct": sum(value >= 90 for value in utilization),
-        "gpu_memory_used_mib_max": max(float(row["memory.used"]) for row in rows),
-        "power_w_mean": statistics.mean(float(row["power.draw"]) for row in rows),
+        "gpu_memory_used_mib_max": max(number(row, "memory.used") for row in rows),
+        "power_w_mean": statistics.mean(number(row, "power.draw") for row in rows),
         "interpretation": "Historical sampled allocation window, including setup and artifact emission; not current utilization or a project-wide average.",
     }
 
 
-def summarize(document: dict, observed: datetime) -> dict:
+def ownership_class(job, historical=()):
+    """Read-only attribution; this never grants controller cancellation rights."""
+    metadata = job.get("metadata", {})
+    if metadata.get("name", "").startswith(PREFIXES):
+        return "current_frontier"
+    for row in historical:
+        if metadata.get("id") == row["id"]:
+            if metadata.get("name") != row["name"]:
+                raise ValueError("Historical ownership ID/name mismatch")
+            return "historical_team"
+    return "unattributed"
+
+
+def summarize_shared(document, observed, historical=()):
+    if document.get("next_page_token"):
+        raise ValueError("provider listing is paginated; refusing incomplete counts")
+    local = observed.astimezone(ZoneInfo("America/Los_Angeles"))
+    midnight = local.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc)
+    jobs = document.get("items", [])
+
+    def key(job):
+        group = "other_or_unattributed" if ownership_class(job, historical) == "unattributed" else "ours"
+        kind = "gpu" if "gpu" in job.get("spec", {}).get("preset", "") else "cpu_or_unknown"
+        return group, kind, job.get("status", {}).get("state", "UNKNOWN")
+
+    def counts(rows):
+        return [{"group": group, "kind": kind, "state": state, "jobs": count}
+                for (group, kind, state), count in sorted(Counter(map(key, rows)).items())]
+
+    today = [j for j in jobs if datetime.fromisoformat(j["metadata"]["created_at"].replace("Z", "+00:00")) >= midnight]
+    return {
+        "observed_at_utc": observed.isoformat(), "observed_at_seattle": local.strftime("%Y-%m-%d %H:%M:%S %Z"),
+        "classification": "Current Frontier prefixes plus exact historical team IDs verified against preserved source records. Remaining jobs are unattributed, not asserted to belong to another team. Cancellation permissions unchanged.",
+        "listed_total": len(jobs), "today_start_utc": midnight.isoformat(),
+        "ownership_breakdown": dict(Counter(ownership_class(j, historical) for j in jobs)),
+        "earliest_listed_creation": min((j["metadata"]["created_at"] for j in jobs), default=None),
+        "counts": {"all_listed": counts(jobs), "today": counts(today)},
+        "current_gpu_jobs": {group: dict(Counter(key(j)[2] for j in jobs if key(j)[:2] == (group, "gpu") and key(j)[2] not in TERMINAL))
+                             for group in ("ours", "other_or_unattributed")},
+        "owner_field_names_present": sorted({key for j in jobs for key in j.get("metadata", {})
+                                             if any(part in key.lower() for part in ("owner", "creator", "label"))}),
+        "historical_attribution_ledger": "results/resources/team-job-ownership.json",
+    }
+
+
+def summarize(document: dict, observed: datetime, historical=()) -> dict:
     if document.get("next_page_token"):
         raise ValueError("provider listing is paginated; refusing incomplete counts")
     own = []
@@ -70,6 +127,7 @@ def summarize(document: dict, observed: datetime) -> dict:
         })
     active = [row for row in own if row["state"] not in TERMINAL]
     states = dict(Counter(row["state"] for row in own))
+    classes = Counter(ownership_class(j, historical) for j in document.get("items", []))
     return {
         "observed_at_utc": observed.isoformat().replace("+00:00", "Z"),
         "scope": "Own job names beginning delphi-evolve-ops- or bioservices-; other-team state counts only",
@@ -86,6 +144,11 @@ def summarize(document: dict, observed: datetime) -> dict:
             "interpretation": "Requested capacity of nonterminal jobs, including startup. RUNNING is not measured GPU utilization. Kernel utilization is unknown until sampled telemetry is collected.",
         },
         "current_gpu_utilization_pct": None,
+        "current_frontier_job_count": classes["current_frontier"],
+        "historical_team_job_count": classes["historical_team"],
+        "team_job_count": classes["current_frontier"] + classes["historical_team"],
+        "unattributed_job_count": classes["unattributed"],
+        "team_count_scope": "Current Frontier prefix count remains separate from exact-ID historical attribution; no cancellation permissions are changed.",
     }
 
 
@@ -98,7 +161,10 @@ def refresh(path: Path, cli: str) -> dict:
     if result.returncode:
         raise RuntimeError(f"provider read failed with exit {result.returncode}; old snapshot retained")
     observed = datetime.now(timezone.utc)
-    snapshot = summarize(json.loads(result.stdout), observed)
+    document = json.loads(result.stdout)
+    ledger_path = path.parent / "team-job-ownership.json"
+    historical = json.loads(ledger_path.read_text())["historical_jobs"] if ledger_path.exists() else []
+    snapshot = summarize(document, observed, historical)
     snapshot["live_state_request_window_utc"] = [start.isoformat(), observed.isoformat()]
     inventory = json.loads(path.read_text())
     prior = inventory["compute"]["nebius"]
@@ -117,6 +183,12 @@ def refresh(path: Path, cli: str) -> dict:
     temporary = path.with_suffix(".tmp")
     temporary.write_text(json.dumps(inventory, indent=2) + "\n")
     temporary.replace(path)
+    shared_path = path.parent / "shared-job-counts.json"
+    shared = summarize_shared(document, observed, historical)
+    shared["request_window_utc"] = [start.isoformat(), observed.isoformat()]
+    temporary = shared_path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(shared, indent=2) + "\n")
+    temporary.replace(shared_path)
     return snapshot
 
 

@@ -20,29 +20,70 @@ METHODS = ("ddpm", "ddpm_shuffled_condition", "nearest1_pooled", "nearest5_poole
 METRICS = {"mode_tv", "mode_agree_argmax", "amp_w1_rel", "amp_mean_rel_err", "nonfinite_frac", "negative_frac"}
 
 
-def finite_json(text):
-    def reject(value):
-        raise ValueError("Nonfinite JSON token: " + value)
+class NonFinite(dict):
+    """Display-only marker; its presence always fails the collection audit."""
 
-    value = json.loads(text, parse_constant=reject)
 
-    def walk(item):
+def marked_json(text):
+    value = json.loads(text, parse_constant=lambda token: NonFinite(status="nonfinite", token=token))
+    paths = []
+
+    def walk(item, path):
+        if isinstance(item, NonFinite):
+            paths.append(path)
+            return item
         if isinstance(item, float) and not math.isfinite(item):
-            raise ValueError("Nonfinite JSON number")
+            paths.append(path)
+            return NonFinite(status="nonfinite", token=str(item))
         if isinstance(item, dict):
-            for child in item.values():
-                walk(child)
-        elif isinstance(item, list):
-            for child in item:
-                walk(child)
+            return {key: walk(child, f"{path}/{key}") for key, child in item.items()}
+        if isinstance(item, list):
+            return [walk(child, f"{path}[{index}]") for index, child in enumerate(item)]
+        return item
 
-    walk(value)
+    return walk(value, ""), paths
+
+
+def load_strict(path):
+    """Locate invalid constants and overflowing numeric literals without dropping them."""
+    return marked_json(Path(path).read_text())
+
+
+def finite_json(text):
+    value, paths = marked_json(text)
+    if paths:
+        raise ValueError("Nonfinite JSON number at " + ", ".join(paths))
     return value
 
 
-def audit(output):
+def audit(output, control_path=None):
+    """Fail closed, including malformed files; optionally use the separate control part."""
     output = Path(output)
-    report = finite_json((output / "evaluation.json").read_text())
+    failures = []
+    nonfinite_paths = []
+    control = Path(control_path) if control_path is not None else output / "control.json"
+    required = [control, *(output / name for name in (
+        "evaluation.json", "checkpoint.pt", "examples.npz", "train_loss.jsonl"))]
+    for path in required:
+        if not path.is_file():
+            failures.append("missing file " + str(path))
+    if not failures:
+        try:
+            report, paths = load_strict(output / "evaluation.json")
+            ctl, control_paths = load_strict(control)
+            nonfinite_paths = ["evaluation.json" + p for p in paths] + ["control.json" + p for p in control_paths]
+            if nonfinite_paths:
+                failures.append("Nonfinite JSON values: " + ", ".join(nonfinite_paths))
+            else:
+                return _audit_finite(output, report, ctl)
+        except (OSError, ValueError, TypeError, KeyError, AttributeError) as error:
+            failures.append(str(error))
+    return {"schema": "frontier.rd-ddpm.collection-audit/1", "complete": False,
+            "failures": failures, "nonfinite_paths": nonfinite_paths}
+
+
+def _audit_finite(output, report, control):
+    output = Path(output)
     failures = []
 
     def check(condition, label):
@@ -51,6 +92,8 @@ def audit(output):
 
     check(report.get("smoke") is False, "smoke run is not a trained result")
     check(report.get("env", {}).get("device") == "cuda", "CUDA training receipt missing")
+    check(control.get("ok") is True and control.get("env", {}).get("cuda_available") is True,
+          "control gate not ok on CUDA")
     data = report.get("dataset", {})
     check(data.get("config_sha256") == CONFIG_SHA, "config hash differs from frozen protocol")
     check(data.get("code_sha256") == CODE_SHA, "code hash differs from frozen protocol")
@@ -108,8 +151,14 @@ def audit(output):
         check(all(r.get("gen_nonfinite_frac") == 0 for r in by_tau.values()),
               name + " includes nonfinite generated samples")
     check((output / "examples.npz").is_file(), "actual generated/solver example archive missing")
+    timing = report.get("timings", {})
+    durations = timing.get("ddpm_sampling_seconds", [])
+    check(timing.get("batch") == 1024 and len(durations) == 3
+          and all(isinstance(value, (int, float)) and value > 0 for value in durations),
+          "timing protocol requires three positive durations at batch 1024")
     return {
         "schema": "frontier.rd-ddpm.collection-audit/1", "complete": not failures, "failures": failures,
+        "nonfinite_paths": [],
         "evaluation_sha256": hashlib.sha256((output / "evaluation.json").read_bytes()).hexdigest(),
         "scope": "Frozen run completeness and artifact identity only; no performance or biological validity claim. Quantile W1 is an approximation.",
         "training_failed_runs": failed,
@@ -119,9 +168,10 @@ def audit(output):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--control", type=Path, help="Control JSON from the separately returned control part")
     args = parser.parse_args()
     try:
-        result = audit(args.output)
+        result = audit(args.output, args.control)
     except (OSError, ValueError, TypeError, KeyError) as error:
         result = {"complete": False, "failures": [str(error)]}
     print(json.dumps(result, indent=2, allow_nan=False))

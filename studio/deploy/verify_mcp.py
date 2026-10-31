@@ -98,7 +98,17 @@ async def verify(url: str, expanded: bool = False) -> dict:
                     digest = hashlib.sha256(model.read_bytes()).hexdigest()
                     artifact = value(await session.call_tool("frontier_artifact_inspect", {"sha256": digest}))
                     check("published print bytes found by exact digest", bool(artifact["local_published_bytes"]["matches"]))
+                    text_bytes = (ROOT / "site/artifacts/fish3d/fish3d-v3a-fan/candidate.json").read_bytes()
+                    text_digest = hashlib.sha256(text_bytes).hexdigest()
+                    text_artifact = value(await session.call_tool("frontier_artifact_inspect", {
+                        "sha256": text_digest, "include_text": True, "max_chars": 128}))
+                    preview = text_artifact["preview"]
+                    check("published candidate text matches verified bytes with explicit truncation",
+                          preview["status"] == "available" and preview["full_file_hash_verified"] is True
+                          and preview["text"] == text_bytes.decode("utf-8")[:128]
+                          and preview["truncated"] is True and preview["characters_returned"] == 128)
                     responses["expanded"] = {"project_ref": target, "artifact_sha256": digest,
+                                             "text_artifact_sha256": text_digest, "preview_characters": 128,
                                              "discovery_mode": discovery["mode"], "simulation_status": simulation["status"]}
                 # Deliberately invalid draft cannot become a record even if the
                 # anonymous permission guard regresses. Check the auth error,

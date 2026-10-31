@@ -1,6 +1,6 @@
 {
   "schema": "frontier.compute-queue/1",
-  "observed_at_utc": "2026-10-31T22:33:59.251481Z",
+  "observed_at_utc": "2026-10-31T23:26:01.517271Z",
   "owner": "infra_director",
   "tasks": [
     {
@@ -126,15 +126,15 @@
       "job_id": "aijob-e00k0jpm34h4na3b99",
       "task": "Controlled3D GPU retry after exact metadata diagnosis",
       "owner": "infra_director",
-      "provider_state": "PROVISIONING",
-      "result": "results/infra/cfd3d-v2/manifest-infra22.json",
-      "scope": "Geometry-only declaredSIMDsetting repair; exactmesh/candidategates unchanged; C1physicalreference failure remains."
+      "provider_state": "COMPLETED",
+      "result": "results/infra/cfd3d-v2-completion.json",
+      "scope": "Four controlled3D numerical cases,12pressure arrays,2actual videos; exactgeometry/platformgates pass. PhysicalsphereC1FAIL retained; noflightvalidation."
     },
     {
       "job_id": "aijob-e00qazx6sby3vav47b",
       "task": "DDPM default-vs-explicitFP32 control and conditional training",
       "owner": "infra_director",
-      "provider_state": "ADMITTED",
+      "provider_state": "RUNNING",
       "result": "results/infra/diffusion-v2/manifest-infra23.json",
       "scope": "Originalsource/config/tolerances fixed; backendpolicy preregistered; trainingonlyafterunchangedstrictcontrolpasses."
     },
@@ -142,45 +142,101 @@
       "job_id": "aijob-e00qzdzsh5mj8pvbd2",
       "task": "Training-only RD five-point discretization audit",
       "owner": "infra_director",
-      "provider_state": "ADMITTED",
-      "result": "results/infra/rd-numerics/manifest-infra24.json",
-      "scope": "48training-onlyICs\u00d75axialconfigs,900s; preservepartial/failedfields, noholdouts/training, noarbitraryconvergencePASS."
+      "provider_state": "COMPLETED",
+      "result": "artifacts/rd-numerics/artifact-manifest.json",
+      "scope": "Five training-only configs,960rows returned. Independent full metric reproduction FAILED at66near-uniform power ratios; original ratios/modes retained; no convergence PASS."
     }
   ],
   "preparation": [
     {
-      "task": "Conditional RD diffusion model",
-      "owner": "dx-market-r1",
+      "task": "Collect primary trained RD model",
+      "owner": "infra_director / dx-market-r1",
       "priority": 1,
-      "state": "dispatched",
-      "budget": "oneH100,atmost30minusefultraining/eval",
-      "next_acceptance": "FrozenrealRDdataset/trainheldoutsplit,CPU/CUDAcontrol,smallDDPMcheckpoint/eval; noheavyhosttraining",
-      "packet_commit": "4a5394f3",
-      "job_id": "aijob-e00cz0vk0jepf7j2fc"
+      "state": "running",
+      "job_id": "aijob-e00qazx6sby3vav47b",
+      "packet": "inputs/items_infra_diffusion_v2.json",
+      "earliest_next_action": "On return, or original hard1800s deadline around16:39:38PDT; estimate excludes provider transport",
+      "next_acceptance": "Run shared strict auditor4700a78 against returned checkpoint/evaluation and separate same-allocation control;301loggedsteps ending30000;160unique conditions, all5methods, exactsource/config/checkpoint hashes, no missing/nonfiniteholdouts",
+      "stop_gate": "Any missing file, timeout, failed/control/nonfinite/completeness check remains failed/partial; no threshold change or retraining on holdouts"
     },
     {
-      "task": "Controlled3D metadata repair",
-      "owner": "claude04",
-      "priority": 1,
-      "state": "repaired_packet_dispatched",
-      "next_acceptance": "ExactcandidateJSONdifference identified; physicalmesh pins preserved; recordfailureandfreezejustifiedrepair",
-      "packet_commit": "7abfc640",
-      "job_id": "aijob-e00k0jpm34h4na3b99"
-    },
-    {
-      "task": "900ps molecular conditional extensions",
-      "owner": "mechanobio_sim",
+      "task": "Secondary exact empirical W1 and full ensemble retention",
+      "owner": "dx-market-r1 prepares / infra_director dispatches",
       "priority": 2,
-      "state": "dispatched",
-      "packet_commit": "962b088",
-      "next_acceptance": "PublicwarmstartHTTP200+SHA4154fcdc3784fa1bfe6c667cdc20fabc346e8c482d9010ad5646a10eea78c3bf; originalsame-statecontrols+CUDAparity retained",
-      "job_id": "aijob-e00qxektzctnk69zwg"
+      "state": "source_preregistered_waiting_primary_checkpoint",
+      "source": "engineering/rd_diffusion/AMENDMENT_1.md; engineering/rd_diffusion/secondary_eval.py; exact_w1.py",
+      "prepared_source_commit": "0f79f603",
+      "earliest_next_action": "Within30min of a valid primary return, subject to frozen packet and actualCPUcontrol; estimate",
+      "budget": "oneH100,initial30min hardbound, no additionaltraining",
+      "next_acceptance": "Exact checkpoint SHA/public transport gate; source hashes frozen before secondary outputs; explicit FP32 flags matching actualprimary; fixedseeds; exactW1softwarefixture; fullgenerated+referenceensembles retained; unchanged primarymetrics compared and differences reported",
+      "stop_gate": "Invalidprimary checkpoint, missingprimaryidentity, failedcontrol, changedweights, nonfinite/truncatedoutput, or sharedforeignqueueddemand => do notadmit/stopasprotocolspecifies"
     },
     {
-      "task": "Pressure-to-fin-mechanics bridge",
-      "owner": "claude07",
-      "state": "requiresactualpressurefields",
-      "next_acceptance": "DimensionedpressurePa\u2192tractionN\u2192rayloadN/m withanalytic/refinementcontrols; unknownfishEI staysassumed"
+      "task": "Curate controlled3D pressure/video artifacts",
+      "owner": "claude-04",
+      "priority": 1,
+      "state": "returned_owner_processing",
+      "source": "results/infra/cfd3d-v2-completion.json",
+      "budget": "oneCPU capped local or one4vCPU remote if packet ready",
+      "next_acceptance": "Trace allfourcases and pressureframes to exactgeometry/source; retain C1FAIL and smoothed/subgridfinlimits; actual-fieldvideos only",
+      "stop_gate": "Never label platform parity as physicalvalidation"
+    },
+    {
+      "task": "Pressure-to-fin mechanical interface",
+      "owner": "claude-07 coordinated with claude-04",
+      "priority": 2,
+      "state": "returned_pressure_available_contract_validation",
+      "protocol_commit": "f8ebc13",
+      "source": "artifacts/cfd3d and actualreturned Cp arrays",
+      "next_acceptance": "Preserve Re=UL/nu when mapping Cp toPa; analytictraction integration N and rayloadN/m; loadgridrefinement; tributarywidth/leadingedge/sectionvs3D contracts; EI remainsassumed",
+      "stop_gate": "Unknownloadtransfer, unresolvedfins or physicalreferenceFAIL => reportdiagnosticinterface, notvalidatedflightload"
+    },
+    {
+      "task": "Resolved local fin-section CFD packet",
+      "owner": "claude-07 / claude-04",
+      "priority": 3,
+      "state": "not_gpu_ready_CPUcontrol_and_runtime_pending",
+      "protocol_commit": "f8ebc13",
+      "earliest_next_action": "1\u20136h conditional planning window, not an admittedjob",
+      "budget": "oneH100 bounded packet only after measuredCPUruntime and frozencriteria",
+      "next_acceptance": "Freeze geometry/resolution/sectionprotocol, run analytic CPUcontrol and measuredruntime; explicitly handlefailedphysicalreference beforeinterpretation",
+      "stop_gate": "No extraGPU occupancy without readypacket/controls; retain sectionvswholefish limits"
+    },
+    {
+      "task": "Training-only RD numerical audit publication",
+      "owner": "mechanobio_sim",
+      "priority": 1,
+      "state": "complete_with_retained_reproduction_failure",
+      "source_commit": "47897b7",
+      "source": "artifacts/rd-numerics/artifact-manifest.json",
+      "budget": "no newcloudcompute",
+      "next_acceptance": "Publish originalrawfields and exact66failurepaths alongside near-uniform diagnosis; retain18modechanges withamplitudes; noholdout/modeladjustment"
+    },
+    {
+      "task": "3variant vortex-lattice CPU refinement",
+      "owner": "claude-04",
+      "priority": 3,
+      "state": "owner_existing_CPUrun",
+      "next_acceptance": "Recover owner48x16 and72x24 panel results; source/geometry/assumptions explicit; do notduplicate",
+      "budget": "oneCPU bounded; remoteCPU onlyifowner supplies usefulfrozencontinuationpacket"
+    },
+    {
+      "task": "Existing molecular trajectory publication",
+      "owner": "mechanobio_sim / root",
+      "priority": 1,
+      "state": "complete",
+      "source_commit": "9e24f10",
+      "source": "artifacts/molecular/continuation-analysis/summary.json",
+      "next_acceptance": "All120hashes retained; actual101framevideo; driftFALSE,FALSE,TRUE visible",
+      "budget": "no additionalMDjob requested"
+    },
+    {
+      "task": "6\u201324h evidence-driven follow-up selection",
+      "owner": "root scientificdirector + infra_director",
+      "priority": 4,
+      "state": "conditional_not_admitted",
+      "next_acceptance": "Choose an unresolved measuredscientificgap from above; preregister observables/controls/parameterdomains, usablepacket, runtime/outputs and termination beforedispatch",
+      "stop_gate": "No fillerload, duplicatedownerjobs, unsupportedwholeorganismclaims, automaticsequencegenerationreroute, or arbitrarylongerMD"
     }
   ],
   "policies": {
@@ -191,5 +247,9 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-10-31T23:00:17.808281+00:00"
+  "updated_at_utc": "2026-10-31T23:28:04.655084+00:00",
+  "planning_horizon_utc": [
+    "2026-10-31T23:28:04.655084+00:00",
+    "2026-11-01T23:28:04.655084+00:00"
+  ]
 }

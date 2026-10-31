@@ -1,0 +1,143 @@
+{
+ "schema": "cfd3d-gpu-status-0.2",
+ "packet_sha256": "5af94b3fb597839f6242501c3156eb91c317fb437bdab6efc17907433f830c5a",
+ "science": "model diagnostics only; C1 physical reference gate FAILED (see reference_gate)",
+ "reference_gate": {
+  "C1_sphere_Re100": "FAIL",
+  "evidence": "artifacts/cfd3d/controls/cpu_controls.json: |Cd| 0.875 (D16), 0.857 (D8) vs 1.092 correlation; band [0.95,1.35] frozen in 609d1cf",
+  "diagnostic_D1": "10x6x6 D domain + exit BC: |Cd| 0.839 (bias not from blockage)",
+  "consequence": "no physical-validation claim from any case in this packet; platform gates reproduce model behaviour only"
+ },
+ "completion": "complete",
+ "rc": 0,
+ "stages": {
+  "telemetry": {
+   "ok": true,
+   "t_s": 0.1
+  },
+  "julia": {
+   "ok": true,
+   "t_s": 3.9,
+   "sha256": "4e7e9e776634d24835250de67cde39b0d4af15bc432eb20697e6be6c28ea69e8"
+  },
+  "geometry": {
+   "ok": true,
+   "t_s": 46.4,
+   "rc": 0,
+   "candidate": "4a3b912eb346e7036994bc549677a0f4f39d7bb978782b30367fec35f1c7b35a",
+   "numpy_env": {
+    "NPY_DISABLE_CPU_FEATURES": "X86_V4 AVX512_ICL AVX512_SPR",
+    "scope": "fish3d geometry rebuild only (not render, not Julia)",
+    "why": "cloud diagnostic aijob-e00m8v3m77z86n5ads (AMD EPYC-Genoa, AVX-512): default numpy dispatch gives candidate 52d15c7c (3 float64 fields 1-2 ULP off: body_half_width_max_m, body_width_at_fins_m.pectoral/.pelvic); with these groups disabled the candidate is byte-identical to the pin 4a3b912e. The exact-byte gate is unchanged.",
+    "evidence": "artifacts/cfd3d/diagnostics/candidate-avx512/"
+   },
+   "mismatched": [],
+   "tail": ""
+  },
+  "env": {
+   "ok": true,
+   "t_s": 333.4,
+   "rc": 0,
+   "tail": "\u250c Warning: Using WaterLily in serial (ie. JULIA_NUM_THREADS=1) is not recommended because it defaults to serial CPU execution.\n\u2502 Use JULIA_NUM_THREADS=auto, or any number of threads greater than 1, to allow multi-threading in CPU backends.\n\u2502 For a low-overhead single-threaded CPU only backend set: WaterLily.set_backend(\"SIMD\")\n\u2514 @ WaterLily /work/cfd3d/depot/packages/WaterLily/V6kyE/src/WaterLily.jl:218\nCANON d1a8e00741a5d1733be9e007b49bb2844fff2bdd232ccb993c1838319ed926bc\nCUDA functional true"
+  },
+  "cpu_gate": {
+   "ok": true,
+   "t_s": 365.0,
+   "rc": 0,
+   "D8": -0.8567057668389457,
+   "pin": -0.8567057668389457
+  },
+  "cuda_gate": {
+   "ok": true,
+   "t_s": 448.6,
+   "rc": 0,
+   "device": "NVIDIA H100 80GB HBM3",
+   "D8": -0.8566986928033135,
+   "D16": -0.8745087013630217,
+   "tail": ""
+  },
+  "diag": {
+   "ok": true,
+   "t_s": 537.3,
+   "rc": 0
+  },
+  "fish:gpu_fish_L64_Re200": {
+   "ok": true,
+   "t_s": 619.4,
+   "rc": 0,
+   "render_rc": null,
+   "coeffs": {
+    "Cd_pressure": 0.05037324518192238,
+    "Cd_total": 0.10075012825164698,
+    "Cy_total": 0.002256867956833413,
+    "Cz_total": 0.014546285657599795,
+    "avg_window_tUL": [
+     3.0,
+     4.00108528137207
+    ],
+    "reference_area": "L_ref^2",
+    "sign": "coefficients are forces on the body (= -WaterLily total_force)"
+   }
+  },
+  "fish:gpu_fish_L128_Re200": {
+   "ok": true,
+   "t_s": 851.8,
+   "rc": 0,
+   "render_rc": null,
+   "coeffs": {
+    "Cd_pressure": 0.03531790704418642,
+    "Cd_total": 0.08903028670316324,
+    "Cy_total": 0.0008144497081117991,
+    "Cz_total": 0.0065589501083685225,
+    "avg_window_tUL": [
+     3.0,
+     4.001532554626465
+    ],
+    "reference_area": "L_ref^2",
+    "sign": "coefficients are forces on the body (= -WaterLily total_force)"
+   }
+  },
+  "fish:gpu_fish_L128_Re1000": {
+   "ok": true,
+   "t_s": 1024.8,
+   "rc": 0,
+   "render_rc": 0,
+   "coeffs": {
+    "Cd_pressure": 0.022866622837334333,
+    "Cd_total": 0.04029441101725351,
+    "Cy_total": 0.0006923640986554835,
+    "Cz_total": 0.002908662314583894,
+    "avg_window_tUL": [
+     3.0,
+     4.002355575561523
+    ],
+    "reference_area": "L_ref^2",
+    "sign": "coefficients are forces on the body (= -WaterLily total_force)"
+   }
+  },
+  "fish:gpu_fish_L192_Re1000": {
+   "ok": true,
+   "t_s": 1548.4,
+   "rc": 0,
+   "render_rc": 0,
+   "coeffs": {
+    "Cd_pressure": 0.017742751348525918,
+    "Cd_total": 0.036691229950733505,
+    "Cy_total": 0.00026046958863162753,
+    "Cz_total": 0.001789301074160611,
+    "avg_window_tUL": [
+     3.0,
+     4.0000386238098145
+    ],
+    "reference_area": "L_ref^2",
+    "sign": "coefficients are forces on the body (= -WaterLily total_force)"
+   }
+  },
+  "output": {
+   "ok": true,
+   "t_s": 1548.4,
+   "bytes": 3245288
+  }
+ },
+ "packet_json_sha256": "e29b81244fb783c68b74c99862b5b8cda17720afb7588b12837620032a5cb098"
+}

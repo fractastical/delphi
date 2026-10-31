@@ -29,6 +29,10 @@ class Application:
         # Authentication/key fields come solely from transport, never body overrides.
         if "token" in data or "key" in data:
             raise FrontierError("Authentication and idempotency belong in headers")
+        if path == "/v1/read/identity":
+            if data:
+                raise FrontierError("Identity requests have an empty body")
+            return {"principal": self.store.principal(token)}
         if path in read:
             return read[path](**data, token=token)
         if path == "/v1/read/design-context":

@@ -8,8 +8,8 @@ from fractions import Fraction
 
 import pytest
 
-from engineering.coupled_mechanics import cases, couple, traction
-from engineering.coupled_mechanics.contract import parse_pressure, parse_target
+from engineering.coupled_mechanics import SCHEMA_PRESSURE_V2, cases, couple, traction
+from engineering.coupled_mechanics.contract import canonical_sha, parse_pressure, parse_target
 from engineering.fin_mechanics import beam
 from engineering.fin_mechanics.load_bridge import Refusal
 
@@ -198,6 +198,105 @@ def test_beam_module_is_the_existing_one():
     assert couple.beam is beam
 
 
+# ------------------------------------------------------------------ member-pressure/2: per-station widths
+# Closed forms below are written out by hand for q(s) = jump(s) * w(s) with w linear in s:
+#   w(s) = w0 + (w1 - w0) u,  u = s/L
+#   uniform jump p:      F = p L (w0 + w1)/2,             M = p L^2 (w0/6 + w1/3)
+#   tip-heavy 2 p u:     F = 2 p L (w0/2 + (w1 - w0)/3),  M = 2 p L^2 (w0/3 + (w1 - w0)/4)
+# The tip-heavy q is quadratic, so the contract's linear-between-stations F has the trapezoid error
+# L h^2 q''/12 exactly, with q'' = 4 p (w1 - w0)/L^2.
+def _bridge_pwL():
+    b = cases.illustration_bridge()
+    return Fraction(b["exact"]["p_Pa"]), Fraction(b["exact"]["w_t_m"]), Fraction(b["exact"]["L_ray_m"])
+
+
+def v2(rec, width_of_u, s_labels=None):
+    """A /1 analytic record rewritten as /2 with w(u) at each station (test helper, not a producer)."""
+    rec = copy.deepcopy(rec)
+    L = Fraction(rec["member"]["tip_m"][0])
+    s = [st["s_m"] for st in rec["stations"]]
+    widths = [{"s_m": lab, "width_m": str(width_of_u(Fraction(x) / L))} for x, lab in zip(s, s_labels or s)]
+    rec["schema"] = SCHEMA_PRESSURE_V2
+    rec["tributary"] = {"status": "declared", "unit": "m", "source": "test: linear width",
+                        "geometry_sha256": "a" * 64, "widths": widths, "widths_sha256": canonical_sha(widths)}
+    return rec
+
+
+def _linear_width():
+    _, w, _ = _bridge_pwL()
+    w0, w1 = w / 2, 3 * w / 2
+    return w0, w1, (lambda u: w0 + (w1 - w0) * u)
+
+
+def test_v2_variable_width_matches_closed_form_force_and_moment():
+    p, _, L = _bridge_pwL()
+    w0, w1, wf = _linear_width()
+    r = couple.run(v2(cases.analytic_record("uniform", n_stations=4), wf), cases.target())
+    assert Fraction(r["resultants_exact"]["F_N"]) == p * L * (w0 + w1) / 2
+    assert Fraction(r["resultants_exact"]["M_root_Nm"]) == p * L * L * (w0 / 6 + w1 / 3)
+    assert r["tributary_width_m"] == [str(wf(Fraction(i, 3))) for i in range(4)]
+
+
+@pytest.mark.parametrize("n", [5, 9, 17])
+def test_v2_curved_load_error_is_the_trapezoid_term_exactly(n):
+    p, _, L = _bridge_pwL()
+    w0, w1, wf = _linear_width()
+    r = couple.run(v2(cases.analytic_record("tip_heavy", n_stations=n), wf), cases.target())
+    F_closed = 2 * p * L * (w0 / 2 + (w1 - w0) / 3)
+    h = L / (n - 1)
+    assert Fraction(r["resultants_exact"]["F_N"]) - F_closed == L * h * h * (4 * p * (w1 - w0) / (L * L)) / 12
+    M_closed = 2 * p * L * L * (w0 / 3 + (w1 - w0) / 4)
+    assert abs(Fraction(r["resultants_exact"]["M_root_Nm"]) / M_closed - 1) < Fraction(1, (n - 1) ** 2)
+
+
+def test_v2_constant_width_reduces_to_v1_exactly():
+    _, w, _ = _bridge_pwL()
+    for profile in ("uniform", "root_heavy", "tip_heavy"):
+        a = couple.run(cases.analytic_record(profile), cases.target())
+        b = couple.run(v2(cases.analytic_record(profile), lambda u: w), cases.target())
+        assert a["stations"] == b["stations"] and a["resultants_exact"] == b["resultants_exact"]
+        assert a["deflection"]["EI_lo"]["tip_m"] == b["deflection"]["EI_lo"]["tip_m"]
+        assert a["tributary_width_m"] == str(w) and b["tributary_width_m"] == [str(w)] * 9
+
+
+def test_v2_mutated_width_pairing_is_caught():
+    p, _, L = _bridge_pwL()
+    w0, w1, wf = _linear_width()
+    base = cases.analytic_record("uniform", n_stations=4)
+    # values reversed against their stations, labels kept: the contract cannot know, the closed form does
+    rev = v2(base, lambda u: wf(1 - u))
+    r = couple.run(rev, cases.target())
+    assert Fraction(r["resultants_exact"]["M_root_Nm"]) != p * L * L * (w0 / 6 + w1 / 3)
+    # labels that travel with the reversed values no longer align with the stations: refused
+    s = [st["s_m"] for st in base["stations"]]
+    refused("TRIBUTARY_ALIGNMENT", v2(base, wf, s_labels=s[::-1]))
+    short = v2(base, wf)
+    short["tributary"]["widths"] = short["tributary"]["widths"][:-1]
+    short["tributary"]["widths_sha256"] = canonical_sha(short["tributary"]["widths"])
+    refused("TRIBUTARY_ALIGNMENT", short)
+
+
+@pytest.mark.parametrize("edit,code", [
+    (lambda t: t["widths"][1].update(width_m="0"), "NON_POSITIVE"),
+    (lambda t: t["widths"][2].update(width_m="-1/1000"), "NON_POSITIVE"),
+    (lambda t: t["widths"][0].update(width_m=0.001), "FLOAT_INPUT"),
+    (lambda t: t.update(unit="mm"), "WRONG_LENGTH_UNIT"),
+    (lambda t: t.update(geometry_sha256=None), "BAD_HASH"),
+    (lambda t: t.update(width_m="1/1000"), "TRIBUTARY_WIDTH"),
+])
+def test_v2_widths_must_be_positive_exact_metres_with_provenance(edit, code):
+    rec = v2(cases.analytic_record("uniform", n_stations=4), _linear_width()[2])
+    edit(rec["tributary"])
+    rec["tributary"]["widths_sha256"] = canonical_sha(rec["tributary"]["widths"])
+    refused(code, rec)
+
+
+def test_v2_widths_hash_is_checked():
+    rec = v2(cases.analytic_record("uniform", n_stations=4), _linear_width()[2])
+    rec["tributary"]["widths"][1]["width_m"] = "1/100"  # edited after hashing
+    refused("BAD_HASH", rec)
+
+
 # ------------------------------------------------------------------ the actual 2D flow receipt
 import hashlib  # noqa: E402
 import json  # noqa: E402
@@ -277,3 +376,68 @@ def test_committed_artifacts_are_current(receipt):
     for name, pin in manifest["code_files"].items():
         assert hashlib.sha256((Path(wt.ROOT) / name).read_bytes()).hexdigest() == pin, name
     assert np.isfinite(committed["actual_flow_receipt"]["surface_pressure_force_diagnostic"]["pressure_lift_N_per_m"])
+
+
+# ------------------------------------------------------------------ the returned cfd3d v0.1 3D bundle
+# The raw bundle is an untracked return on this host (infra owns it; CFD04 curates its assets), so the
+# tests that need it skip without it. The committed inspection JSON is checked either way.
+from engineering.coupled_mechanics import cfd3d_bundle as cb  # noqa: E402
+
+RAW = Path("/data/worktrees/delphi-frontier/infra-director/results/infra/cfd3d-v2/results/"
+           "infra22-cfd3d-geometry-dispatch-repair/out")
+INSPECTION = Path(wt.ROOT) / "artifacts" / "coupled-mechanics" / "cfd3d-v2-inspection.json"
+needs_raw = pytest.mark.skipif(not (RAW / "status.json").exists(), reason="raw cfd3d bundle not on this host")
+
+
+@pytest.fixture(scope="module")
+def inspection():
+    return json.loads(INSPECTION.read_text())
+
+
+def test_closed_face_force_sign_and_closure():
+    # unit cube, one sample per face: n outward, area 1
+    n = np.array([[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]], dtype=float)
+    A = np.ones(6)
+    assert np.allclose(cb.closed_face_force(n, A, np.full(6, 0.7), 1.0), 0)  # a gauge constant integrates to 0
+    x_face = np.array([0.5, -0.5, 0, 0, 0, 0])  # Cp = k x at the face centroids
+    # F = -oint Cp n dA = -k V e_x, V = 1: higher pressure downstream pushes the body upstream
+    assert np.allclose(cb.closed_face_force(n, A, 3.0 * x_face, 1.0), [-3.0, 0, 0])
+
+
+def test_surface_row_count_is_checked(tmp_path):
+    d = tmp_path / "c" / "surface"
+    d.mkdir(parents=True)
+    np.zeros(25, dtype="<f4").tofile(d / "fin.f32")  # 2.5 rows of 10 columns
+    with pytest.raises(Refusal, match="BAD_SCHEMA"):
+        cb._surface(tmp_path, "c", "fin", 3)
+
+
+def test_bundle_fin_record_is_refused_at_every_gate(inspection):
+    codes = [a.get("code") for a in inspection["contract"]["attempts"]]
+    assert codes == ["WRONG_PRESSURE_UNIT", "FRAME_MISMATCH", "GEOMETRY_MISMATCH", "MEMBER_UNRESOLVED",
+                     "BAD_TIME", "STATION_COVERAGE"]
+    assert all(a["verdict"] == "refused" for a in inspection["contract"]["attempts"])
+
+
+def test_bundle_limits_are_preserved(inspection):
+    assert inspection["reference_gate"]["C1_sphere_Re100"] == "FAIL"
+    rows = inspection["consistency"]["cases"].values()
+    assert all(r["Re_consistent"] and r["h_equals_L_ref_over_L_cells"] and r["fin_cells_matches_case"] for r in rows)
+    assert not any(r["fins_resolved_declared"] or r["fins_resolved_by_rule"] for r in rows)
+    assert all(r["medium"].startswith("none") for r in rows)
+    assert inspection["lineage"]["transport"]["archive_hash_recomputed"] is False
+    assert inspection["solver_runs_by_this_reader"] == 0
+    re200, re1000 = inspection["grid_pairs"]
+    assert re200["within_cfd3d_10pct_rule"]["Cd_total"] == "no"
+    assert re1000["within_cfd3d_10pct_rule"] == {"Cd_total": "yes", "Cd_pressure": "no", "Cz_total": "no"}
+    # samples 2-2.9 cells off the walls do not integrate to the solver's own pressure drag
+    assert inspection["surface"]["pressure_drag_from_samples"]["all_components_over_solver_final"] < 0.5
+
+
+@needs_raw
+def test_committed_inspection_is_reproduced_from_the_raw_bundle(inspection):
+    transport = RAW.parent.parent.parent
+    doc = json.loads(json.dumps(cb.inspect(RAW, transport), sort_keys=True, default=str))
+    assert doc == inspection
+    for name, sha in inspection["inputs"]["files_read_sha256"].items():
+        assert hashlib.sha256((RAW / name).read_bytes()).hexdigest() == sha, name

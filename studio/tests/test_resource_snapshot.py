@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 import json
 import pytest
 
-from frontier_compute.resource_snapshot import summarize, telemetry_summary
+from frontier_compute.resource_snapshot import ownership_class, summarize, summarize_shared, telemetry_summary
 
 
 def test_allocation_counts_include_bioservices_without_leaking_specs():
@@ -67,3 +67,37 @@ def test_telemetry_refuses_unmeasured_values(tmp_path):
                     "2026/10/31 21:00:00.000,NaN,10,50\n")
     with pytest.raises(ValueError, match="invalid"):
         telemetry_summary("fixture", path)
+
+
+def test_native_smi_units_and_observed_five_second_interval(tmp_path):
+    path = tmp_path / "samples.csv"
+    path.write_text("timestamp, utilization.gpu [%], memory.used [MiB], power.draw [W]\n"
+                    "2026/10/31 21:00:00.000, 0 %, 10 MiB, 50 W\n"
+                    "2026/10/31 21:00:05.003, 100 %, 20 MiB, 400 W\n")
+    result = telemetry_summary("fixture", path)
+    assert result["sample_period_ms"] == 5003
+    assert result["gpu_utilization_pct_mean"] == 50
+    assert result["gpu_memory_used_mib_max"] == 20
+
+
+def test_historical_attribution_is_exact_and_keeps_current_scope_separate():
+    old = {"id": "old-owned", "name": "prior-scale"}
+    jobs = {"items": [
+        {"metadata": {**old, "created_at": "2026-10-30T20:00:00Z"}, "status": {"state": "COMPLETED"}},
+        {"metadata": {"id": "current", "name": "delphi-evolve-ops-current", "created_at": "2026-10-31T20:00:00Z"}, "status": {"state": "RUNNING"}},
+        {"metadata": {"id": "unattributed-private-id", "name": "prior-scale-similar", "created_at": "2026-10-31T20:00:00Z"}, "status": {"state": "RUNNING"}},
+    ]}
+    observed = datetime(2026, 10, 31, 23, tzinfo=timezone.utc)
+    result = summarize(jobs, observed, [old])
+    assert result["own_job_count"] == result["current_frontier_job_count"] == 1
+    assert result["team_job_count"] == 2 and result["historical_team_job_count"] == 1
+    assert result["unattributed_job_count"] == 1
+    shared = summarize_shared(jobs, observed, [old])
+    assert shared["ownership_breakdown"] == {"historical_team": 1, "current_frontier": 1, "unattributed": 1}
+    assert sum(row["jobs"] for row in shared["counts"]["today"] if row["group"] == "ours") == 1
+    assert "unattributed-private-id" not in json.dumps(shared)
+
+
+def test_historical_identity_mismatch_refuses_attribution():
+    with pytest.raises(ValueError, match="ID/name mismatch"):
+        ownership_class({"metadata": {"id": "old", "name": "changed"}}, [{"id": "old", "name": "original"}])
