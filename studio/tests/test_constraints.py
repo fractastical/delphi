@@ -367,3 +367,41 @@ def test_forged_unsat_result_or_false_side_condition_gets_no_certificate():
                                      conflict=["q_wl_min", "q_speed_max", "level_lift_proxy"]), Q) is None
     M3, Q3, r3 = _cert_case()
     assert lean_conflict_certificate(M3, r3, Q3 + [Q3[0]]) is None
+
+
+def test_certificate_accepts_a_generator_query_and_materialises_it_once():
+    M, Q, r = _cert_case()
+    good = lean_conflict_certificate(M, r, Q)
+    assert good is not None
+    assert lean_conflict_certificate(M, r, (c for c in Q)) == good          # one-shot iterator
+    assert lean_conflict_certificate(M, r, iter(Q)) == good
+    # the iterator must not be silently half-consumed into a false 'duplicate'/'missing' verdict
+    assert lean_conflict_certificate(M, r, (c for c in Q + Q)) is None       # real duplicates still rejected
+
+
+def test_certificate_returns_none_for_a_dimension_invalid_model_or_query():
+    M, Q, r = _cert_case()
+    bad_q = Constraint("q_extra", "user_query", poly((1, {"m": 1}), (-1, {}, dim(m=1))), ">=", "x")  # kg vs m
+    assert lean_conflict_certificate(M, r, Q + [bad_q]) is None
+    M2 = fm()                                    # break the model AFTER building it: wrong unit on g
+    M2.parameters["g"] = Parameter("g", "m/s^2", dim(m=1), Fraction(980665, 100000), "physical_law", "x")
+    assert lean_conflict_certificate(M2, r, Q) is None
+    M3 = fm()
+    M3.parameters["rho"] = Parameter("rho", "kg/m^3", dim(kg=1, m=-3), Fraction(-1), "design_assumption", "x")
+    assert lean_conflict_certificate(M3, r, Q) is None
+
+
+@pytest.mark.parametrize("bad", ["x\ny", "a b", "a.b", "x:=0", "1abc", "", "foo;sorry", "theorem", "sorry", "by",
+                                 "x -- c", "α\u0307", "x)"])
+def test_unsafe_lean_identifier_is_refused_not_emitted(bad):
+    M, Q, r = _cert_case()
+    with pytest.raises(ValueError, match="unsafe Lean identifier"):
+        lean_conflict_certificate(M, r, Q, name=bad)
+
+
+def test_safe_names_and_unsupported_forms_still_behave():
+    M, Q, r = _cert_case()
+    t = lean_conflict_certificate(M, r, Q, name="my_conflict_1'")
+    assert t.startswith("theorem my_conflict_1' ")
+    assert lean_conflict_certificate(M, solve(M, [q_mass_min(1)]), [q_mass_min(1)]) is None   # other core
+    assert lean_conflict_certificate(M, r.to_json(), Q) == lean_conflict_certificate(M, r, Q)
