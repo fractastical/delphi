@@ -615,8 +615,40 @@ def recheck_worms(rec: dict, dist_results: list[dict]) -> dict:
             entry["ok"] = True
         comps.append(entry)
     n_ok = sum(1 for c in comps if c.get("ok"))
-    return {"n_queries_rerun": len(comps), "n_ok": n_ok, "n_no_content_204": n_no_content,
-            "failures": [c for c in comps if not c.get("ok")][:40]}
+    out = {"n_queries_rerun": len(comps), "n_ok": n_ok, "n_no_content_204": n_no_content,
+           "failures": [c for c in comps if not c.get("ok")][:40]}
+    # Records that vendored only an example query but claim "n_taxa_resolved": re-run
+    # AphiaRecordsByName for every listed taxon and count the names WoRMS holds.
+    recorded_resolved = next((c["value"] for c in rec.get("counts", []) or []
+                              if isinstance(c, dict) and c.get("property_id") == "n_taxa_resolved"), None)
+    if recorded_resolved is not None and len(rec["distributions"]) < len(rec.get("taxa", [])):
+        taxa = load_taxa()
+        resolved, unresolved, errors = 0, [], 0
+        for slug in record_taxon_slugs(rec, taxa):
+            name, _rank = taxon_name_rank(slug, taxa)
+            if not name:
+                continue
+            url = ("https://www.marinespecies.org/rest/AphiaRecordsByName/"
+                   + requests.utils.quote(name) + "?like=false&marine_only=false")
+            r = fetch(url, sleep=0.3, retries=3)
+            if r["status"] == 200:
+                try:
+                    j = json.loads(r["bytes"])
+                except json.JSONDecodeError:
+                    j = []
+                if isinstance(j, list) and j:
+                    resolved += 1
+                else:
+                    unresolved.append(name)
+            elif r["status"] == 204:
+                unresolved.append(name)
+            else:
+                errors += 1
+        out["taxa_resolution"] = {"recorded_n_taxa_resolved": recorded_resolved, "n_taxa_in_record": len(rec.get("taxa", [])),
+                                  "observed_names_with_aphia_records": resolved, "n_http_errors": errors,
+                                  "unresolved_names": unresolved[:60],
+                                  **within_tolerance(recorded_resolved, resolved)}
+    return out
 
 
 def _p225_values(entity: dict) -> set[str]:
