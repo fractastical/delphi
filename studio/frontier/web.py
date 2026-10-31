@@ -33,6 +33,8 @@ from typing import Callable
 from urllib.parse import parse_qs, unquote, urlsplit
 
 from .artifacts import ArtifactIndex
+from .discovery import Discovery, GeminiEmbedder
+from .graph import view as graph_view
 from .http import Application
 from .models import KINDS, MAX_BUNDLE_BYTES, Ref, canonical
 from .search import SEARCH_KIND, SearchIndex
@@ -43,7 +45,8 @@ log = logging.getLogger("frontier.web")
 MIME = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
         ".mjs": "text/javascript; charset=utf-8", ".json": "application/json", ".svg": "image/svg+xml", ".png": "image/png",
         ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".webp": "image/webp", ".ico": "image/x-icon",
-        ".txt": "text/plain; charset=utf-8", ".woff2": "font/woff2"}
+        ".txt": "text/plain; charset=utf-8", ".md": "text/plain; charset=utf-8",
+        ".csv": "text/csv; charset=utf-8", ".woff2": "font/woff2"}
 # Extra types, served ONLY from <site>/artifacts/ (the guarded artifact subtree), never from the rest of the site.
 ARTIFACT_MIME = {".stl": "model/stl", ".obj": "model/obj", ".glb": "model/gltf-binary", ".csv": "text/csv; charset=utf-8",
                  ".lean": "text/plain; charset=utf-8", ".trig": "application/trig",
@@ -77,6 +80,7 @@ class WebConfig:
     search_mode: str = "store_lexical"                           # honest label of what /api/catalog actually runs
     catalog_search: Callable | None = None                       # e.g. SearchIndex(store).search once integrated; same keyword signature as Store.search
     artifact_search: Callable | None = None                      # default: ArtifactIndex(store).search
+    discovery_search: Callable | None = None                     # one persistent Discovery instance by default
     attention_build: Callable | None = None                      # default: late import of attention.view.build_view (tests inject a stand-in)
     attention_module: str = "attention.view"                     # module exposing build_view(records, events, annotations, now); renamed by config if the package is
     system_root: Path | None = None                              # checkout whose files /api/system describes (default: this checkout)
@@ -212,7 +216,7 @@ def default_search(store):
     return SearchIndex(store).query, "search_index"
 
 
-RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts", "/api/attention", "/api/system"}
+RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts", "/api/attention", "/api/system", "/api/discovery", "/api/graph"}
 
 
 @dataclass
@@ -330,6 +334,8 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
     limiter = FailureLimiter(cfg.login_failures, cfg.login_window)
     cookie_name = ("__Host-" if cfg.cookie_secure else "") + "frontier_session"
     attention = AttentionSource(store, cfg)
+    discovery_search = cfg.discovery_search or Discovery(store, GeminiEmbedder(timeout=8)).search
+    discovery_slots = BoundedSemaphore(4)
     system = SystemStatus(store, **({"root": cfg.system_root} if cfg.system_root else {}), ttl=cfg.system_ttl, runner=cfg.system_runner)
 
     class Handler(BaseHTTPRequestHandler):
@@ -558,6 +564,28 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
             if any(len(v) != 1 for v in q.values()):
                 raise FrontierError("Repeated parameters are not accepted")
             q = {k: v[0] for k, v in q.items()}
+            if path == "/api/discovery":
+                if set(q) - {"q", "kind", "limit", "mode", "cache_only"} or q.get("cache_only", "0") not in {"0", "1"}:
+                    raise FrontierError("Unknown discovery parameter or invalid cache_only flag")
+                if not discovery_slots.acquire(blocking=False):
+                    return self.error(429, "discovery_busy", "Search is busy; retry shortly", [("Retry-After", "2")])
+                try:
+                    result = discovery_search(q.get("q", ""), kind=q.get("kind") or None,
+                                              limit=int(q.get("limit", "12")), mode=q.get("mode", "hybrid"),
+                                              cache_only=q.get("cache_only", "0") == "1")
+                finally:
+                    discovery_slots.release()
+                return self.json(200, result)
+            if path == "/api/graph":
+                ref_fields = {"namespace", "kind", "id", "version"}
+                if set(q) - (ref_fields | {"depth", "limit"}):
+                    raise FrontierError("Unknown graph parameter")
+                present = ref_fields & set(q)
+                if present and present != ref_fields:
+                    raise FrontierError("A graph target requires a complete pinned Ref")
+                target = Ref.model_validate({k: q[k] for k in ref_fields}).model_dump() if present else None
+                return self.json(200, graph_view(store, target_ref=target,
+                                                depth=int(q.get("depth", "1")), limit=int(q.get("limit", "120"))))
             if path == "/api/catalog":
                 if set(q) - CATALOG_PARAMS:
                     raise FrontierError("Unknown parameter")
