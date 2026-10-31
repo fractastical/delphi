@@ -56,6 +56,8 @@ This project builds on the Project Delphi ontology and uses [nanopublications](h
 
 ## ScienceClaw hackathon work (Oct 31 – Nov 1)
 
+**All data and biology products are indexed in [DATA.md](DATA.md)**: anatomy model, genotype-phenotype maps, pathways, causal chains, physics and physiology, Lean audit, claim tests. Large files are committed gzipped; copyrighted paper texts and third-party datasets are not (manifests record their sources).
+
 Team roles and deadlines are in [#53](https://github.com/fractastical/delphi/issues/53). This section
 covers the genotype–phenotype, validation and MCP-testing work (Amit's row) and the agent threads that
 produce it. Everything below is built from repository files by scripts; no figure is typed by hand.
