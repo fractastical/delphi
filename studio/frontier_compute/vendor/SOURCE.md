@@ -1,4 +1,10 @@
-# Vendored pinned sources (read-only copies; do not edit)
+# Vendored scientific sources and the local dispatch fork
+
+The scientific solver copies remain pinned. `compute_ops` is a local operational
+fork: subsequent commits added bounded warm batches and provider recovery. The
+infra lead also included the team's `bioservices-` prefix in allocation counts;
+this does not grant cancellation ownership over those jobs. The table and hashes
+below describe the original freeze, not every subsequent operational patch.
 
 | What | Origin | Pin |
 |---|---|---|

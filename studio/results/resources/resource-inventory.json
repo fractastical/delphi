@@ -2,43 +2,82 @@
   "$schema": "resource-inventory.schema.json",
   "schema_version": "frontier.resource-inventory/1",
   "observed_at": {
-    "utc": "2026-10-31T20:54:13Z",
-    "seattle": "2026-10-31 13:54:13 PDT (UTC-07:00)"
+    "utc": "2026-10-31T21:46:24.785276Z",
+    "seattle": "2026-10-31 14:46:24 PDT (UTC-07:00)"
   },
   "scope": {
     "project": "delphi-frontier",
-    "nebius_filter": "only job names with the delphi-evolve-ops- prefix in workshop-30-10",
+    "nebius_filter": "Own job names beginning delphi-evolve-ops- or bioservices-; other-team state counts only",
     "limitations": [
       "Provider preset allocations are requested capacity, not measured utilization.",
       "Telemetry records are historical sampled windows; they do not represent current GPU utilization.",
       "Provider billing meter was not queried; actual spend is unknown.",
-      "Other workers may have provider usage, so the recorded Gemini requests are not total project or account usage."
+      "Other workers may have provider usage, so the recorded Gemini requests are not total project or account usage.",
+      "Only Nebius job allocation state was refreshed at observed_at; other evidence retains its own original timestamp."
     ]
   },
   "compute": {
     "nebius": {
       "project_id": "project-e00p797qpr0049snsqvf0k",
-      "observed_at_utc": "2026-10-31T20:52:15Z",
-      "own_job_count": 17,
+      "observed_at_utc": "2026-10-31T21:46:24.785276Z",
+      "own_job_count": 25,
       "job_states": {
-        "COMPLETED": 13,
-        "CANCELLED": 3,
-        "FAILED": 1,
-        "RUNNING": 0,
-        "PULLING": 0
+        "IMAGE_PULLING": 3,
+        "COMPLETED": 17,
+        "FAILED": 2,
+        "CANCELLED": 3
       },
       "active_allocations": {
-        "instances": 0,
+        "instances": 3,
         "running_instances": 0,
-        "pulling_instances": 0,
-        "preset": null,
-        "gpu_model": null,
-        "gpus": 0,
-        "vcpus": 0,
-        "memory_gb": 0,
-        "interpretation": "No nonterminal jobs were returned in the live query. Historical telemetry below is not current utilization."
+        "pulling_instances": 3,
+        "gpus": 3,
+        "vcpus": 48,
+        "memory_gb": 600,
+        "jobs_with_unknown_capacity": 0,
+        "interpretation": "Requested capacity of nonterminal jobs, including startup. RUNNING is not measured GPU utilization. Kernel utilization is unknown until sampled telemetry is collected."
       },
-      "active_jobs": [],
+      "active_jobs": [
+        {
+          "id": "aijob-e00saz7cewggkp50d2",
+          "name": "delphi-evolve-ops-infra12-fish-aoa-grid-pairs-a1",
+          "created_at": "2026-10-31T21:43:57.276473Z",
+          "state": "IMAGE_PULLING",
+          "platform": "gpu-h100-sxm",
+          "preset": "1gpu-16vcpu-200gb",
+          "requested_capacity": {
+            "gpu": 1,
+            "vcpu": 16,
+            "gb": 200
+          }
+        },
+        {
+          "id": "aijob-e00cqbmnzwmvms8ayr",
+          "name": "delphi-evolve-ops-infra11-atlas-perturb-completion-a1",
+          "created_at": "2026-10-31T21:38:47.835471Z",
+          "state": "IMAGE_PULLING",
+          "platform": "gpu-h100-sxm",
+          "preset": "1gpu-16vcpu-200gb",
+          "requested_capacity": {
+            "gpu": 1,
+            "vcpu": 16,
+            "gb": 200
+          }
+        },
+        {
+          "id": "aijob-e00h6cqxa1c7cwts6y",
+          "name": "delphi-evolve-ops-infra10-frozen-subset-dt4-a1",
+          "created_at": "2026-10-31T21:34:37.630873Z",
+          "state": "IMAGE_PULLING",
+          "platform": "gpu-h100-sxm",
+          "preset": "1gpu-16vcpu-200gb",
+          "requested_capacity": {
+            "gpu": 1,
+            "vcpu": 16,
+            "gb": 200
+          }
+        }
+      ],
       "cpu_worker_attempt": {
         "preset": "4vcpu-16gb",
         "timeout": "2h",
@@ -51,9 +90,18 @@
         "price": "unavailable"
       },
       "live_state_request_window_utc": [
-        "2026-10-31T20:52:14Z",
-        "2026-10-31T20:52:15Z"
-      ]
+        "2026-10-31T21:46:23.655203+00:00",
+        "2026-10-31T21:46:24.785276+00:00"
+      ],
+      "scope": "Own job names beginning delphi-evolve-ops- or bioservices-; other-team state counts only",
+      "shared_state_counts": {
+        "IMAGE_PULLING": 3,
+        "COMPLETED": 44,
+        "RUNNING": 2,
+        "FAILED": 8,
+        "CANCELLED": 5
+      },
+      "current_gpu_utilization_pct": null
     },
     "google_compute": {
       "project_id": "scienceclaw26bos-3016",
