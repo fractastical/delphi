@@ -11,7 +11,7 @@
     },
     "numerical_fidelity": {
       "status": "checked_in_scope",
-      "summary": "Reference derivative/sign control, paired1fs/0.5fs50fsNVE and same-systemCPU/CUDAforce+energy parity passed",
+      "summary": "Reference derivative/sign control, paired1fs/0.5fs50fsNVE and same-state CPU/CUDA force+energy parity passed before each ofthree900ps conditional extensions",
       "evidence": [
         {
           "path": "artifacts/molecular/cuda-v2/cpu-controls/controls.json",
@@ -22,9 +22,24 @@
           "path": "artifacts/molecular/cuda-v2/cpu-cuda-parity.json",
           "sha256": "61d2907d1177f5bf379eb6864e1455f5a797ca027abea59fd8bacdd7c921e98d",
           "selector": "$"
+        },
+        {
+          "path": "artifacts/molecular/cuda-v3/controls-1731/controls.json",
+          "sha256": "f4e74eeebc19d83b2b5ee25fe5c59cfd77f7fc5699b45a3891ac8fbc3fe6fbd0",
+          "selector": "$"
+        },
+        {
+          "path": "artifacts/molecular/cuda-v3/controls-1732/controls.json",
+          "sha256": "9c3a4212699e5f44301222ff6853c349fa9858ed08bb5029299f0ba7307a983e",
+          "selector": "$"
+        },
+        {
+          "path": "artifacts/molecular/cuda-v3/controls-1733/controls.json",
+          "sha256": "2a2c7c667e1fa715037af511116c971779b96bfe396720f78442df5403773c55",
+          "selector": "$"
         }
       ],
-      "scope": "One force-gradient component/full-vector backend comparison and short NVE check; not global100ps trajectory accuracy"
+      "scope": "Local same-state force-gradient/backend and short NVE checks; not global1000ps trajectory accuracy, equilibrium or empirical validity"
     },
     "empirical_validation": {
       "status": "unknown",
@@ -34,12 +49,17 @@
     },
     "parameter_coverage": {
       "status": "declared_ensemble",
-      "summary": "Three velocity/thermostat seeds at one assumed300K/0.1M condition, sharing one structure and Hamiltonian",
+      "summary": "Three shared-structure/Hamiltonian velocity/thermostat parents, each continued with one fresh declared RNG stream to1000ps; these remain three branches,not six biological samples",
       "evidence": [
         {
           "path": "artifacts/molecular/cuda-analysis/ensemble.json",
           "sha256": "a87297f8ecbb5fbfebbafc82ee0ab679912f5274c2ddf9edf128b72b8ae31e08",
           "selector": "$"
+        },
+        {
+          "path": "artifacts/molecular/continuation-analysis/summary.json",
+          "sha256": "dccb9f38cde850ed1f0b733ad2f8512703f1c4c65c2c0f8ea3138e1df19f1364",
+          "selector": "$.branches"
         }
       ],
       "scope": "Descriptive seed spread; no native fish population or force-field coverage"
@@ -50,7 +70,7 @@
       "evidence": [
         {
           "path": "artifacts/molecular/cross-scale-gate.json",
-          "sha256": "400fe47def92dc41bb40cbf891c29acb5de7b76d923b900496e3020500c4e966",
+          "sha256": "46220d68123b044d6bf5f06cfba755d035733ac218f107644f8440da8348d6b9",
           "selector": "$.couplings[0].verdict"
         }
       ],
@@ -58,7 +78,7 @@
     },
     "ensemble_robustness": {
       "status": "unknown",
-      "summary": "No predeclared functional success predicate; three actual seed trajectories are not a biological-success fraction",
+      "summary": "No functional biological predicate tested. Frozen finite-window structural-drift diagnostic was false,false,true; it is descriptive and does not establish equilibrium or biological robustness.",
       "evidence": [
         {
           "path": "artifacts/molecular/cuda-analysis/ensemble.json",

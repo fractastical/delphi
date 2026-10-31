@@ -1,6 +1,6 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 04:06PM PDT.
+Coordinator: codex-03. Updated October 31, 2026, 04:15PM PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-008 define acceptance. This board supersedes the earlier 1:48pm snapshot.
 Every status distinguishes implementation, integration, publication and biological validation.
@@ -149,6 +149,28 @@ No calibrated whole-fish probability, biological manufacturing feasibility, real
 - [x] Full-horizon tissue analysis, metabolic solves, pressure-transfer refusals, diffusion controls and resource receipts integrated; root ran117 focused checks.
 - [x] Viewer review identified and repaired small-mesh picking precedence, transformed-distance errors and missing destruction on candidate/navigation changes. Source materials and exact geometry hashes are preserved.
 - [x] Root ran19 targeted combined Home/About/mobile/table/error browser checks;50 unrelated cases were deselected. New geometry is not biological validation.
-- [ ] Publish the next exact site release with the selectable ray-fan candidates, critical browser fixes and public-repository label; recheck production and independent critique.
+- [x] Published the selectable ray-fan candidates, critical browser fixes and public-repository labels in release `c1ad527e7c1a0cc1494def66fae3e12db6ef5f92`. Public website 13 checks and MCP 35 checks passed at 4:14:54pm PDT; receipts are in deploy/receipts/rayfan-*.json. Independent critique of this exact release remains in progress.
 - [ ] Integrate returned1ns molecular-dynamics branches with all three frozen-window outcomes, then collect the3D flow and diffusion jobs.
 - [ ] Publish the matched-budget synthesis comparison as a ceiling/null result; all arms16/16 does not establish collective advantage.
+
+## Resource attribution correction — October 31, 4:13PM PDT
+
+The live shared-project listing contained 82 job records. 52 were attributable to
+our team: 37 current Frontier/BioServices jobs plus 15 earlier Delphi/setup jobs.
+The remaining 30 were unattributed to us; provider metadata does not identify
+each other team. Earlier prefix-only totals missed our historical jobs.
+
+| Status | Our team | Other/unattributed |
+| --- | ---: | ---: |
+| RUNNING | 2 | 1 |
+| IMAGE_PULLING | 1 | 0 |
+| COMPLETED | 39 | 18 |
+| FAILED | 7 | 9 |
+| CANCELLED | 3 | 2 |
+
+Our running jobs were 3D CFD and the precision-controlled reaction-diffusion
+DDPM; the training-only discretization audit was pulling. Each requested one
+H100. These are allocation states, not measured GPU utilization. Attribution
+was checked against the prior Delphi job manifest, compute receipts and the
+recorded setup test. The infrastructure owner is correcting the public counter;
+this does not widen cancellation permissions.

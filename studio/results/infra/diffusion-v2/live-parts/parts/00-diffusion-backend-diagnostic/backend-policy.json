@@ -1,0 +1,27 @@
+{
+  "schema": "frontier.rd-ddpm.backend-policy/1",
+  "registered_at_utc": "2026-10-31T22:54:45.339239+00:00",
+  "first_failed_job": "aijob-e00cz0vk0jepf7j2fc",
+  "first_control_sha256": "6f63e77cdb0c00d5db6def6176bc378f51a10ee8c8905762d068070fe833a299",
+  "observed_network_max_abs": 0.0011919140815734863,
+  "unchanged_tolerance": 0.001,
+  "hypothesis": "TF32 backend arithmetic caused the network CPU/CUDA control mismatch; not established before diagnostic.",
+  "diagnostic": "Repeat frozen control under original image defaults, then explicit IEEE FP32 backend. Preserve both outputs regardless of outcome.",
+  "training_gate": "All original controls must pass under explicitFP32 in sameallocation; no threshold/architecture/optimizer/dataset/split/source changes. No prior training or heldouts ran.",
+  "backend": {
+    "NVIDIA_TF32_OVERRIDE": "0",
+    "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": "0",
+    "torch.backends.cuda.matmul.allow_tf32": false,
+    "torch.backends.cudnn.allow_tf32": false,
+    "torch.set_float32_matmul_precision": "highest"
+  },
+  "frozen_source_sha256": "25455430ef138b49e6bac151a144e338269a81ce5c2f576387f8805bbb1a400a",
+  "frozen_config_sha256": "bc77ebc55010b9c8ac910c2b31868ec0dbf2d1e3785a06ec3ef1aa028ea2b210",
+  "artifact_packet_sha256": "76eb4a7b273f71db51d6f8d35481dfe94a36b49414372c919d3387e67d75821c",
+  "useful_training_evaluation_timeout_s": 1800,
+  "primary_sources": [
+    "https://developer.nvidia.com/blog/accelerating-ai-training-with-tf32-tensor-cores/",
+    "https://docs.pytorch.org/docs/main/notes/numerical_accuracy.html",
+    "https://docs.pytorch.org/docs/stable/cuda_environment_variables.html"
+  ]
+}
