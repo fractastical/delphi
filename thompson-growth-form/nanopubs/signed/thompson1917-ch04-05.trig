@@ -1,0 +1,68 @@
+@prefix this: <https://w3id.org/np/RABnkAzfYhJZuq006JmjUz8EgilkRqftsiZsx1LXMrKkw>.
+@prefix sub: <https://w3id.org/np/RABnkAzfYhJZuq006JmjUz8EgilkRqftsiZsx1LXMrKkw/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/thompson1917-ch04-05> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "The alveolar 'reticulum' seen in the nucleus and cytoplasm is a froth or foam produced by the interacting surface tensions of two intermixed fluids of similar density striving to separate, and is not inherent in the nature of protoplasm.";
+    dc:type "mechanism";
+    <http://www.w3.org/2000/01/rdf-schema#label> "The alveolar meshwork of nucleus and cytoplasm is a surface-tension froth";
+    <https://w3id.org/delphi/ontology/context> "D’Arcy Wentworth Thompson, On Growth and Form (1st ed., Cambridge: Cambridge University Press, 1917), Chapter IV, “On the Internal Form and Structure of the Cell”; topic “Alveolar meshwork as a froth”. Scope: nuclear and cytoplasmic alveolar meshworks of cells"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://www.gutenberg.org/ebooks/55264>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci On Growth and Form claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://www.gutenberg.org/cache/epub/55264/pg55264.txt#line=6373,6378>;
+    prov:wasQuotedFrom <https://www.gutenberg.org/ebooks/55264>;
+    <https://schema.org/text> "This phenomenon is nothing else than what we call in ordinary language, a “froth” or a “foam.” It is a surface-tension phenomenon, due to the interacting surface-tensions of two intermixed fluids, not very different in density, as they strive to separate.".
+<https://www.gutenberg.org/ebooks/55264> dc:creator <http://www.wikidata.org/entity/Q739438>;
+    dc:date "1917"^^xsd:gYear;
+    dc:title "On Growth and Form";
+    <https://schema.org/bookEdition> "1";
+    <https://schema.org/exampleOfWork> <http://www.wikidata.org/entity/Q19902738>;
+    <https://schema.org/publisher> "Cambridge University Press".
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://www.gutenberg.org/cache/epub/55264/pg55264.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://www.gutenberg.org/cache/epub/55264/pg55264.txt#line=6373,6378> <https://schema.org/isPartOf> <https://www.gutenberg.org/cache/epub/55264/pg55264.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee86522eb8ca0bb806d1edcf46697739c71e1621/thompson-growth-form/build/generate.mjs>.
+<https://www.gutenberg.org/cache/epub/55264/pg55264.txt> <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://www.gutenberg.org/ebooks/55264>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "5870af4e15469b6280bf44520c4125a3a40dc97012fb14cbbe7913e66ecf7246"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Thompson 1917 claim: The alveolar meshwork of nucleus and cytoplasm is a surface-tension froth";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T03:08:31.546Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/thompson1917-ch04-05>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917>.
+<https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> <http://www.w3.org/2000/01/rdf-schema#label> "thompson-growth-form-1917".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "DqdqIBjEGOqh2xe/GecTtL4HLu0xhdSnLuI5Sd36JzI/Gt9F2eFYMAaFwqQLMxEbzNpmZtkG5bFcl4ZEN1wm9vZ+0iVYPIfNtUpNhoV32S0Bblrg59MuXuk40uzyRnP0D9xWT75NVgkMJIsD56hyvCqr43O2IzblUbCEmVo3Eza0GXoKFrSOjuKAyHJGFPyhosukgJPeTzV6jaWnVuKLeBs0K/o7W1h2hZK5WkJjT5jJLuAdOSsxX3hGqtZF0yxTYzfMD6NkhrMNIxlsS7IQnWiU/VNAy+DP26kYBXAPD5ebaCnnTyE74kf0x3LBhiEpgAcdDlrPp/Ey2W18JCwayw=="
+}

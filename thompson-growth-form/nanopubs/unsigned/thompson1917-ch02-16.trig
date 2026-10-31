@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch02-16> a delphi:Claim ;
+    rdfs:label "Cells of each kind vary little about a mean size, whatever the body size" ;
+    dct:description "Cells of each kind vary little about a characteristic mean size and have absolute size limits, so dwarf and giant individuals of a species (e.g. Crepidula, sea-urchin larvae) differ in cell number rather than cell size." ;
+    delphi:context "D’Arcy Wentworth Thompson, On Growth and Form (1st ed., Cambridge: Cambridge University Press, 1917), Chapter II, “On Magnitude”; topic “Fixed cell size”. Scope: tissue cells of animals, compared across individuals of different body size" ;
+    dct:type "empirical-generalization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <https://www.gutenberg.org/ebooks/55264> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "An immediate and remarkable result of the principles just described is a tendency on the part of all cells, according to their kind, to vary but little about a certain mean size, and to have, in fact, certain absolute limitations of magnitude." ;
+    prov:wasQuotedFrom <https://www.gutenberg.org/ebooks/55264> ;
+    prov:hadPrimarySource <https://www.gutenberg.org/cache/epub/55264/pg55264.txt#line=2109,2113> .
+
+  <https://www.gutenberg.org/cache/epub/55264/pg55264.txt#line=2109,2113> schema:isPartOf <https://www.gutenberg.org/cache/epub/55264/pg55264.txt> .
+
+  <https://www.gutenberg.org/ebooks/55264> dct:title "On Growth and Form" ;
+    dct:creator <http://www.wikidata.org/entity/Q739438> ;
+    dct:date "1917"^^xsd:gYear ;
+    schema:publisher "Cambridge University Press" ;
+    schema:bookEdition "1" ;
+    schema:exampleOfWork <http://www.wikidata.org/entity/Q19902738> .
+
+  <https://www.gutenberg.org/cache/epub/55264/pg55264.txt> schema:about <https://www.gutenberg.org/ebooks/55264> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "5870af4e15469b6280bf44520c4125a3a40dc97012fb14cbbe7913e66ecf7246" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://www.gutenberg.org/cache/epub/55264/pg55264.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee86522eb8ca0bb806d1edcf46697739c71e1621/thompson-growth-form/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci On Growth and Form claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T03:08:31.546Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Thompson 1917 claim: Cells of each kind vary little about a mean size, whatever the body size" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/thompson1917-ch02-16> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+  <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> rdfs:label "thompson-growth-form-1917" .
+}

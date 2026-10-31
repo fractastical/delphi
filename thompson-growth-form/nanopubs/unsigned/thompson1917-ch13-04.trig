@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch13-04> a delphi:Claim ;
+    rdfs:label "Goat and sheep horns form a series of homologous spirals of increasing angle" ;
+    dct:description "Horns of wild goats and sheep form a series of homologous logarithmic spirals with increasing constant angle: under 40° in Oryx, under 70° in the Scinde wild goat, about 75° in Ovis ammon and a little more in the Highland ram." ;
+    skos:notation "\\alpha < 40^\\circ (Oryx), < 70^\\circ (Scinde wild goat), \\approx 75^\\circ (Ovis ammon), > 75^\\circ (Highland ram)" ;
+    delphi:context "D’Arcy Wentworth Thompson, On Growth and Form (1st ed., Cambridge: Cambridge University Press, 1917), Chapter XIII, “The Shapes of Horns, and of Teeth or Tusks: with a Note on Torsion”; topic “Spiral angle of horns”. Scope: horns of Oryx, Capra and Ovis species" ;
+    dct:type "empirical-generalization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <https://www.gutenberg.org/ebooks/55264> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "we may easily arrange a series of forms, such for example as the Siberian ibex, the moufflon, _Ovis Ammon_, etc., and ending with the long-horned Highland ram: in which, as we pass from one to another, we recognise precisely homologous spirals, with an increasing angular constant, the spiral angle being, for instance, about 75° or rather less in _Ovis Ammon_, and in the Highland ram a very little more." ;
+    prov:wasQuotedFrom <https://www.gutenberg.org/ebooks/55264> ;
+    prov:hadPrimarySource <https://www.gutenberg.org/cache/epub/55264/pg55264.txt#line=20430,20436> .
+
+  <https://www.gutenberg.org/cache/epub/55264/pg55264.txt#line=20430,20436> schema:isPartOf <https://www.gutenberg.org/cache/epub/55264/pg55264.txt> .
+
+  <https://www.gutenberg.org/ebooks/55264> dct:title "On Growth and Form" ;
+    dct:creator <http://www.wikidata.org/entity/Q739438> ;
+    dct:date "1917"^^xsd:gYear ;
+    schema:publisher "Cambridge University Press" ;
+    schema:bookEdition "1" ;
+    schema:exampleOfWork <http://www.wikidata.org/entity/Q19902738> .
+
+  <https://www.gutenberg.org/cache/epub/55264/pg55264.txt> schema:about <https://www.gutenberg.org/ebooks/55264> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "5870af4e15469b6280bf44520c4125a3a40dc97012fb14cbbe7913e66ecf7246" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://www.gutenberg.org/cache/epub/55264/pg55264.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee86522eb8ca0bb806d1edcf46697739c71e1621/thompson-growth-form/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci On Growth and Form claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T03:08:31.546Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Thompson 1917 claim: Goat and sheep horns form a series of homologous spirals of increasing angle" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/thompson1917-ch13-04> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+  <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> rdfs:label "thompson-growth-form-1917" .
+}

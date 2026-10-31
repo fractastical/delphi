@@ -1,0 +1,69 @@
+@prefix this: <https://w3id.org/np/RAWzdTuzN01K6ijMh6Q_EM0AJgu4fdlAIOrvnIYrS_0W8>.
+@prefix sub: <https://w3id.org/np/RAWzdTuzN01K6ijMh6Q_EM0AJgu4fdlAIOrvnIYrS_0W8/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/thompson1917-ch13-01> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "The rhinoceros horn grows faster anteriorly than posteriorly in a constant ratio, so it curves as a logarithmic spiral; lying in the median plane, it has no lateral twist and forms a plane spiral.";
+    dc:type "mathematical-law";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Rhinoceros horn is a plane logarithmic spiral from constant front-to-back growth ratio";
+    <http://www.w3.org/2004/02/skos/core#notation> "v_{ant}/v_{post} = \\text{const} \\Rightarrow plane spiral r = a e^{\\theta\\cot\\alpha}";
+    <https://w3id.org/delphi/ontology/context> "D’Arcy Wentworth Thompson, On Growth and Form (1st ed., Cambridge: Cambridge University Press, 1917), Chapter XIII, “The Shapes of Horns, and of Teeth or Tusks: with a Note on Torsion”; topic “The rhinoceros horn”. Scope: rhinoceros horns"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://www.gutenberg.org/ebooks/55264>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci On Growth and Form claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://www.gutenberg.org/cache/epub/55264/pg55264.txt#line=20309,20313>;
+    prov:wasQuotedFrom <https://www.gutenberg.org/ebooks/55264>;
+    <https://schema.org/text> "Its longitudinal growth proceeds with a maximum velocity anteriorly, and a minimum posteriorly; and the ratio of these velocities being constant, the horn curves into the form of a logarithmic spiral in the manner that we have already studied.".
+<https://www.gutenberg.org/ebooks/55264> dc:creator <http://www.wikidata.org/entity/Q739438>;
+    dc:date "1917"^^xsd:gYear;
+    dc:title "On Growth and Form";
+    <https://schema.org/bookEdition> "1";
+    <https://schema.org/exampleOfWork> <http://www.wikidata.org/entity/Q19902738>;
+    <https://schema.org/publisher> "Cambridge University Press".
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://www.gutenberg.org/cache/epub/55264/pg55264.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://www.gutenberg.org/cache/epub/55264/pg55264.txt#line=20309,20313> <https://schema.org/isPartOf> <https://www.gutenberg.org/cache/epub/55264/pg55264.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee86522eb8ca0bb806d1edcf46697739c71e1621/thompson-growth-form/build/generate.mjs>.
+<https://www.gutenberg.org/cache/epub/55264/pg55264.txt> <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://www.gutenberg.org/ebooks/55264>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "5870af4e15469b6280bf44520c4125a3a40dc97012fb14cbbe7913e66ecf7246"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Thompson 1917 claim: Rhinoceros horn is a plane logarithmic spiral from constant front-to-back growth ratio";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T03:08:31.546Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/thompson1917-ch13-01>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917>.
+<https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> <http://www.w3.org/2000/01/rdf-schema#label> "thompson-growth-form-1917".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "Is9eYbhoKVhy+fAR6pXtr5xq2gLKKHqD+QZrOOaW92sCLtj2rMmJl3rsNh0lOdlFEPplL+lzGZFp2TbqRPfg/rC73dpOB/JYubUhtj1tvsTh1E9lz2KYVJ1v0yhu4kCmm5zhChD6f7h5zi7h8/JFbvsXO9Og8JLidsiy/1VBp1vZ0pYBL59M85sKO74OxSOUVgCwGROl1DawIO+COYugkF1XztqsTCwQADTLzxGS5olfCJapseS/GXs/I9jkoublWwcULXVHvQXRRzLs67B+OYR7Vh0EEdTtOcuRUb5BgD4FIVS9ZObrF3FVFiU3SQkGtPeBQ7baA1R3ckhQ/azbxg=="
+}

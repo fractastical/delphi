@@ -1,0 +1,68 @@
+@prefix this: <https://w3id.org/np/RAVfZbNrDntl2eTrvwLAIVNOfCM52X_LfsYaAp5pZ1GRw>.
+@prefix sub: <https://w3id.org/np/RAVfZbNrDntl2eTrvwLAIVNOfCM52X_LfsYaAp5pZ1GRw/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/thompson1917-ch14-03> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "There is no subtle mystery in phyllotaxis: the steady production of similar parts, similarly placed, at similar successive intervals of time necessarily produces symmetrical patterns (helices on a cylinder, logarithmic spirals on a surface containing the pole), which are a secondary mathematical result rather than a primary phenomenon.";
+    dc:type "mechanism";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Phyllotactic spirals follow inevitably from similar parts produced at regular intervals";
+    <https://w3id.org/delphi/ontology/context> "D’Arcy Wentworth Thompson, On Growth and Form (1st ed., Cambridge: Cambridge University Press, 1917), Chapter XIV, “On Leaf-Arrangement, or Phyllotaxis”; topic “Church's theory of phyllotaxis”. Scope: phyllotaxis of leaves, florets, bracts and scales"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://www.gutenberg.org/ebooks/55264>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci On Growth and Form claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://www.gutenberg.org/cache/epub/55264/pg55264.txt#line=21231,21235>;
+    prov:wasQuotedFrom <https://www.gutenberg.org/ebooks/55264>;
+    <https://schema.org/text> "I, for my part, see no subtle mystery in the matter, other than what lies in the steady production of similar growing parts, similarly situated, at similar successive intervals of time.".
+<https://www.gutenberg.org/ebooks/55264> dc:creator <http://www.wikidata.org/entity/Q739438>;
+    dc:date "1917"^^xsd:gYear;
+    dc:title "On Growth and Form";
+    <https://schema.org/bookEdition> "1";
+    <https://schema.org/exampleOfWork> <http://www.wikidata.org/entity/Q19902738>;
+    <https://schema.org/publisher> "Cambridge University Press".
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://www.gutenberg.org/cache/epub/55264/pg55264.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://www.gutenberg.org/cache/epub/55264/pg55264.txt#line=21231,21235> <https://schema.org/isPartOf> <https://www.gutenberg.org/cache/epub/55264/pg55264.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee86522eb8ca0bb806d1edcf46697739c71e1621/thompson-growth-form/build/generate.mjs>.
+<https://www.gutenberg.org/cache/epub/55264/pg55264.txt> <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://www.gutenberg.org/ebooks/55264>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "5870af4e15469b6280bf44520c4125a3a40dc97012fb14cbbe7913e66ecf7246"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Thompson 1917 claim: Phyllotactic spirals follow inevitably from similar parts produced at regular intervals";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T03:08:31.546Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/thompson1917-ch14-03>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917>.
+<https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> <http://www.w3.org/2000/01/rdf-schema#label> "thompson-growth-form-1917".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "RRiR/QnuPtGhVeehbQFL95xcxOYSr8fdHhily6CYnD0I2kxsZLjFGuQDuasMQaWKqu7MVXcR91322SvD8Foalrl7Jk4eXT9aICKVMLGn3yBzAUuyziJKIWZix2v0k3yl5YOkq6Wg1odX90JiCS1lkZ22/8v45CrwmOXao6620v2+kVhipyAfIcnw0UIae0GQiyvBlXJT8TpV8O17q3u+jws8iLPs/5JkLOPKCdghtf9lc6fJkDHV8XV5Cy/Xhw0sZnPVL2MYjcqcCC7QWdDHPUJloYenMyhObMbQzzf4I0yiKRsnielExUE8i0fsdPDuKOneuvhIemynAdsReQKoGQ=="
+}
