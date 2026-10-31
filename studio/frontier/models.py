@@ -221,6 +221,49 @@ class Assessment(Model):
         return self
 
 
+class ActionAlternative(Model):
+    label: Identifier
+    description: Text
+    tradeoff: Text
+
+
+class ActionOutcome(Model):
+    label: Identifier
+    criterion: Text
+    decision_consequence: Text
+
+
+class ActionProposal(Model):
+    """Reasons and prospective outcomes, never an execution permission or result."""
+    intent: Literal["analysis", "simulation", "experiment", "curation", "replication", "formalization", "design", "plan"]
+    method: Text
+    assumptions: Strings
+    alternatives: list[ActionAlternative] = Field(min_length=1, max_length=12)
+    expected_information: Text
+    decision_context: Text
+    expected_outputs: Strings = Field(min_length=1)
+    controls: Strings = Field(min_length=1)
+    analysis_plan: Text
+    outcomes: list[ActionOutcome] = Field(min_length=1, max_length=12)
+    selection_basis: Literal["manual", "declared_utility", "forecast", "policy", "exploration"]
+    selection_rationale: Text
+    limitations: Strings = Field(min_length=1)
+    plan_steps: list[Ref] = Field(default_factory=list, max_length=30)
+
+    @model_validator(mode="after")
+    def coherent(self):
+        for rows in (self.alternatives, self.outcomes):
+            if len({r.label for r in rows}) != len(rows):
+                raise ValueError("Alternative and outcome labels must be unique")
+        if (self.intent == "plan") != bool(self.plan_steps):
+            raise ValueError("Only plan proposals carry steps; a plan needs at least one step")
+        if any(r.kind != "Action" for r in self.plan_steps):
+            raise ValueError("Plan steps must pin Action records")
+        if len({r.version for r in self.plan_steps}) != len(self.plan_steps):
+            raise ValueError("Duplicate plan step version")
+        return self
+
+
 class Action(Model):
     target: Ref
     title: Short
@@ -229,6 +272,7 @@ class Action(Model):
     cost_stop_bounds: Text
     cache_key: dict[str, str]
     inputs: list[Ref] = Field(default_factory=list, max_length=30)
+    proposal: ActionProposal | None = None
 
     @model_validator(mode="after")
     def complete_cache(self):
@@ -352,6 +396,8 @@ def references(record: dict) -> list[tuple[str, dict]]:
     if record["kind"] == "Action":
         for item in p.get("inputs", []):
             edges.append(("uses", item))
+        for item in (p.get("proposal") or {}).get("plan_steps", []):
+            edges.append(("plans_step", item))
     if record["kind"] == "Evidence" and p.get("produced_by") is not None:
         edges.append(("produced_by", p["produced_by"]))
     for dimension in p.get("dimensions", {}).values():

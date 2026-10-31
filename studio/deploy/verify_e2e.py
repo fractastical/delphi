@@ -111,6 +111,12 @@ elif PHASE == "adapters":
         ok(any(isinstance(v, str) and "/" in v for v in evs), "exact rationals arrive as strings (e.g. 17/5), not floats")
         s2, b2, _ = jcall("POST", "/api/beliefs/solve", {"schema": "frontier-beliefs-0.1", "variables": "x"}, post_h)
         ok(s2 == 400 and b2.get("calibrated") is False, "a malformed scenario is a 400 and its error body is still labelled calibrated: false")
+    s, sy, raw = call("GET", "/api/system")
+    sy = json.loads(raw)
+    ok(s == 200 and all(sy[k]["mode"] == "measured" for k in ("store", "process", "host", "services", "release")) and all(sy[k]["mode"] == "worker_report" for k in ("build", "board", "specs", "goal", "resources")),
+       "system page: measured and worker_report sections are labelled")
+    ok(sy["store"]["public_only"] and any(r["kind"] == "Claim" for r in sy["store"]["records_by_kind_and_local_status"]) and sy["resources"]["actual_cost"]["status"] == "unknown", "system page: real store counts, cost explicitly unknown")
+    ok(GATE not in raw.decode() and cred("writer.cred") not in raw.decode() and os.path.expanduser("~") not in raw.decode(), "system page exposes no token, credential or home path")
     print("ADAPTER SKIPS: " + (", ".join(skips) or "none"))
 elif PHASE == "after-restart":
     ok(call("GET", "/api/health", session=False)[0] == 200, "health after restarting PostgreSQL and the web service")

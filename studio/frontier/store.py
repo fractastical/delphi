@@ -374,6 +374,8 @@ class Store:
                 raise Conflict("Only locally owned Action versions can execute")
             current = c.execute("SELECT * FROM action_state WHERE version=%s", (record["version"],)).fetchone()
             if state == "ready":
+                if (record["payload"].get("proposal") or {}).get("intent") == "plan":
+                    raise Conflict("A plan describes work; authorize and lease its individual steps")
                 if "coordinator" not in p["roles"] or current["state"] not in {"proposed", "blocked", "expired"}:
                     raise Forbidden("Coordinator readiness gate required")
                 self._validate_refs(c, record, p)
@@ -402,6 +404,8 @@ class Store:
             record = self._raw(c, target, p, current=True)
             if record["kind"] != "Action" or record["namespace"] != self.namespace:
                 raise Conflict("Only local Action versions can be leased")
+            if (record["payload"].get("proposal") or {}).get("intent") == "plan":
+                raise Conflict("A plan describes work; authorize and lease its individual steps")
             self._validate_refs(c, record, p)
             prior = c.execute("SELECT state,lease_until FROM action_state WHERE version=%s", (record["version"],)).fetchone()
             lease_id = str(uuid4())

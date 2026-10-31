@@ -1,0 +1,358 @@
+"""System page snapshot: what this node is doing and what is reported about the project, with every datum labelled `measured` or `worker_report`.
+
+* `measured`: computed by THIS code, now, from the database (public rows only), this process, /proc totals and two fixed commands.
+* `worker_report`: read from a file somebody wrote (the build board, specs, GOAL, a build-info file, pinned provider receipts). The file's sha256 is shown;
+  nothing in it is checked against reality here.
+
+Read-only and bounded: SELECTs inside a READ ONLY transaction, no job is launched, at most two FIXED commands (`git rev-parse HEAD`, `systemctl --user show` of
+our two units) sharing a 2 s budget, result cached 30 s. Never output: environment, tokens, credential paths, host name or user names, other processes' command
+lines, other teams' jobs. Utilization and spend are never inferred: provider receipts are pinned files (path + sha256) describing OUR jobs, a mismatching file is
+withheld, and actual cost is stated as unknown unless a pinned receipt carries a billed figure (none does today).
+"""
+import argparse
+import hashlib
+import json
+import os
+import re
+import resource
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+from threading import Lock
+
+SCHEMA = "frontier.system/1"
+ROOT = Path(__file__).resolve().parents[1]
+SERVICE_UNITS = ("delphi-frontier-web.service", "delphi-frontier-postgres.service")      # fixed; never taken from a request
+GIT_CMD = ("git", "rev-parse", "HEAD")
+SYSTEMCTL_CMD = ("systemctl", "--user", "show", *SERVICE_UNITS, "--no-pager", "-p", "Id", "-p", "LoadState", "-p", "ActiveState", "-p", "SubState",
+                 "-p", "NRestarts", "-p", "MemoryCurrent", "-p", "TasksCurrent", "-p", "ActiveEnterTimestamp")
+BUDGET_S = 2.0
+TTL_S = 30
+MAX_FILE = 262144
+STARTED = time.monotonic()
+STARTED_AT = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+LEGEND = {"measured": "Computed by this service at the time shown from the database (public rows only), this process, /proc totals and fixed commands.",
+          "worker_report": "Read from a file written by a person or worker. The file's sha256 is shown; its contents are not verified against anything."}
+HOST_SCOPE = "Shared host totals. Not attributable to any job, team or service of ours."
+SHA40 = re.compile(r"^[0-9a-f]{40}$")
+SHA64 = re.compile(r"^[0-9a-f]{64}$")
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def _clip(value, n=300):
+    return value[:n] if isinstance(value, str) else value
+
+
+def read_small(root: Path, rel: str, limit: int = MAX_FILE) -> tuple[bytes | None, str]:
+    """Read a repo-relative file that stays inside `root` (no absolute paths, no `..`, no dotfiles, no symlink escape). Returns (bytes|None, reason)."""
+    p = Path(rel)
+    if p.is_absolute() or any(part in ("", ".", "..") or part.startswith(".") for part in p.parts) or not p.parts:
+        return None, "path not allowed"
+    root = root.resolve()
+    target = (root / p).resolve()
+    if not target.is_relative_to(root):
+        return None, "path not allowed"
+    try:
+        if not target.is_file():
+            return None, "not present in this checkout"
+        if target.stat().st_size > limit:
+            return None, "file larger than the bound"
+        return target.read_bytes(), "ok"
+    except OSError:
+        return None, "unreadable"
+
+
+def sha256(b: bytes) -> str:
+    return hashlib.sha256(b).hexdigest()
+
+
+# ------------------------------------------------------------------ fixed commands (shared 2 s budget)
+class Fixed:
+    """Runs only the fixed argv tuples above, with an explicit minimal environment, shell never, and one shared deadline."""
+
+    def __init__(self, root: Path, runner=None):
+        self.root, self.runner = root, runner or self._run
+        self.deadline = time.monotonic() + BUDGET_S
+
+    def _run(self, argv, timeout):
+        uid = os.getuid()
+        env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "XDG_RUNTIME_DIR": f"/run/user/{uid}",
+               "DBUS_SESSION_BUS_ADDRESS": f"unix:path=/run/user/{uid}/bus", "LC_ALL": "C"}
+        done = subprocess.run(list(argv), capture_output=True, text=True, timeout=timeout, env=env, cwd=self.root)
+        return done.returncode, done.stdout
+
+    def call(self, argv: tuple):
+        if argv not in (GIT_CMD, SYSTEMCTL_CMD):
+            raise ValueError("only the fixed commands may run")
+        left = self.deadline - time.monotonic()
+        if left <= 0.05:
+            return None
+        try:
+            rc, out = self.runner(argv, left)
+        except (subprocess.TimeoutExpired, OSError, FileNotFoundError):
+            return None
+        return out if rc == 0 else None
+
+
+def parse_systemctl(text: str | None) -> list[dict]:
+    units = {u: {"unit": u, "state": "unavailable"} for u in SERVICE_UNITS}
+    if text:
+        for block in re.split(r"\n\s*\n", text.strip()):
+            kv = dict(line.split("=", 1) for line in block.splitlines() if "=" in line)
+            uid = kv.get("Id")
+            if uid not in units:
+                continue
+
+            def num(v):
+                return int(v) if v and v.isdigit() and int(v) < 2**62 else None        # "[not set]" and 2**64-1 are not measurements
+            units[uid] = {"unit": uid, "state": "measured", "load_state": _clip(kv.get("LoadState"), 40), "active_state": _clip(kv.get("ActiveState"), 40),
+                          "sub_state": _clip(kv.get("SubState"), 40), "restarts": num(kv.get("NRestarts")), "memory_current_bytes": num(kv.get("MemoryCurrent")),
+                          "tasks_current": num(kv.get("TasksCurrent")), "active_since": _clip(kv.get("ActiveEnterTimestamp") or None, 60)}
+    return [units[u] for u in SERVICE_UNITS]
+
+
+# ------------------------------------------------------------------ /proc (measured)
+def _proc(path: str, limit=65536) -> str | None:
+    try:
+        with Path(path).open("rb") as f:
+            return f.read(limit).decode("ascii", "replace")
+    except OSError:
+        return None
+
+
+def host_measurements() -> dict:
+    out = {"mode": "measured", "scope": HOST_SCOPE, "cpu_count": os.cpu_count()}
+    la = _proc("/proc/loadavg")
+    if la:
+        a = la.split()
+        out["load_average"] = {"1m": float(a[0]), "5m": float(a[1]), "15m": float(a[2])}
+    mem = _proc("/proc/meminfo")
+    if mem:
+        kv = {m.group(1): int(m.group(2)) for m in re.finditer(r"^(MemTotal|MemAvailable|SwapTotal|SwapFree):\s+(\d+) kB", mem, re.M)}
+        out["memory_kb"] = {k: kv.get(k) for k in ("MemTotal", "MemAvailable", "SwapTotal", "SwapFree")}
+    psi = _proc("/proc/pressure/cpu")
+    if psi:
+        m = re.search(r"some avg10=([\d.]+) avg60=([\d.]+) avg300=([\d.]+)", psi)
+        if m:
+            out["cpu_pressure_some"] = {"avg10": float(m.group(1)), "avg60": float(m.group(2)), "avg300": float(m.group(3)), "note": "share of time some task waited for CPU"}
+    return out
+
+
+def process_measurements() -> dict:
+    st = _proc("/proc/self/status") or ""
+    rss = re.search(r"^VmRSS:\s+(\d+) kB", st, re.M)
+    thr = re.search(r"^Threads:\s+(\d+)", st, re.M)
+    ru = resource.getrusage(resource.RUSAGE_SELF)
+    return {"mode": "measured", "scope": "this web process only", "started_at": STARTED_AT, "uptime_seconds": round(time.monotonic() - STARTED, 1),
+            "resident_memory_kb": int(rss.group(1)) if rss else None, "threads": int(thr.group(1)) if thr else None,
+            "cpu_seconds": {"user": round(ru.ru_utime, 2), "system": round(ru.ru_stime, 2)}, "python": sys.version.split()[0]}
+
+
+# ------------------------------------------------------------------ database (measured, public rows only, READ ONLY transaction)
+def store_measurements(store) -> dict:
+    with store.connection() as c:
+        c.execute("SET TRANSACTION READ ONLY")
+        by_kind = c.execute("""SELECT v.kind, s.status, count(*) AS n, count(h.version) AS heads FROM record_versions v JOIN local_states s USING(version)
+                               LEFT JOIN heads h ON h.version = v.version WHERE v.visibility = 'public' GROUP BY 1, 2 ORDER BY 1, 2""").fetchall()
+        ev = c.execute("""SELECT e.event_type, count(*) AS n FROM events e JOIN record_versions v ON v.version = e.event_version
+                          WHERE v.visibility = 'public' GROUP BY 1 ORDER BY 1""").fetchall()
+        db = c.execute("SELECT pg_database_size(current_database()) AS bytes, extract(epoch FROM now() - pg_postmaster_start_time()) AS up, "
+                       "current_setting('server_version') AS version").fetchone()
+    return {"mode": "measured", "public_only": True, "namespace": store.namespace,
+            "note": "Public rows only; private records are not counted. Counts are record VERSIONS; `heads` counts the current version of each record.",
+            "records_by_kind_and_local_status": [{"kind": r["kind"], "local_status": r["status"], "versions": r["n"], "heads": r["heads"]} for r in by_kind],
+            "events_by_type": [{"event_type": r["event_type"], "count": r["n"]} for r in ev],
+            "database": {"size_bytes": int(db["bytes"]), "uptime_seconds": round(float(db["up"]), 1), "server_version": db["version"]}}
+
+
+# ------------------------------------------------------------------ worker reports from files
+def board_report(root: Path) -> dict:
+    raw, why = read_small(root, "tasks/BUILD.md")
+    if raw is None:
+        return {"mode": "worker_report", "source": "tasks/BUILD.md", "status": "absent", "reason": why}
+    text = raw.decode("utf-8", "replace")
+    rows, header = [], None
+    for line in text.splitlines():
+        if line.startswith("|") and line.rstrip().endswith("|"):
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if all(set(c) <= set("-: ") for c in cells):
+                continue
+            if header is None:
+                header = [re.sub(r"[^a-z]+", "_", c.lower()).strip("_") for c in cells]
+            elif len(cells) == len(header) and len(rows) < 100:
+                rows.append({k: _clip(v) for k, v in zip(header, cells)})
+    findings, grab = [], False
+    for line in text.splitlines():
+        if line.startswith("## "):
+            grab = line.lower().startswith("## findings")
+        elif grab and line.startswith("- ") and len(findings) < 30:
+            findings.append(_clip(line[2:].strip(), 400))
+        elif grab and line.startswith("  ") and findings:
+            findings[-1] = _clip(findings[-1] + " " + line.strip(), 400)
+    return {"mode": "worker_report", "source": "tasks/BUILD.md", "sha256": sha256(raw), "rows": rows, "findings_to_correct": findings}
+
+
+def specs_report(root: Path) -> dict:
+    items = []
+    d = (root / "specs")
+    for p in sorted(d.glob("SPEC-*.md"))[:40] if d.is_dir() else []:
+        raw, _ = read_small(root, f"specs/{p.name}")
+        if raw is None:
+            continue
+        text = raw.decode("utf-8", "replace")
+        title = next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), p.stem)
+        status = next((l.strip() for l in text.splitlines() if l.lstrip().startswith("**Status:**")), None)
+        items.append({"id": re.match(r"SPEC-\d+", p.stem).group(0), "file": p.name, "title": _clip(title), "status_line": _clip(status, 300), "sha256": sha256(raw)})
+    return {"mode": "worker_report", "source": "specs/SPEC-*.md", "specs": items}
+
+
+def goal_report(root: Path) -> dict:
+    raw, why = read_small(root, "GOAL.md")
+    if raw is None:
+        return {"mode": "worker_report", "source": "GOAL.md", "status": "absent", "reason": why}
+    lines = raw.decode("utf-8", "replace").splitlines()
+    title = next((l[2:].strip() for l in lines if l.startswith("# ")), None)
+    body = " ".join(l.strip() for l in lines if l.strip() and not l.startswith("#"))
+    return {"mode": "worker_report", "source": "GOAL.md", "sha256": sha256(raw), "title": _clip(title), "summary": _clip(re.sub(r"\s+", " ", body), 1200)}
+
+
+def build_report(root: Path, release_sha: str | None) -> dict:
+    """`build-info.json` at the checkout root is written by whoever cuts a release; this endpoint only validates its shape."""
+    raw, why = read_small(root, "build-info.json")
+    if raw is None:
+        return {"mode": "worker_report", "source": "build-info.json", "status": "absent", "reason": why,
+                "note": "No build-info file: no release SHA or build checks are reported, and none are invented."}
+    try:
+        d = json.loads(raw)
+        if not isinstance(d, dict) or not SHA40.fullmatch(str(d.get("release_sha", ""))):
+            raise ValueError
+        checks = []
+        for c in (d.get("checks") or [])[:40]:
+            if not isinstance(c, dict):
+                raise ValueError
+            checks.append({k: _clip(c.get(k)) if isinstance(c.get(k), str) else c.get(k) for k in ("name", "command", "exit", "passed", "total", "at", "result")
+                           if isinstance(c.get(k), (str, int, bool, type(None)))})
+    except ValueError:
+        return {"mode": "worker_report", "source": "build-info.json", "sha256": sha256(raw), "status": "invalid",
+                "reason": "needs an object with a 40-hex release_sha and a list of check objects; contents not used"}
+    return {"mode": "worker_report", "source": "build-info.json", "sha256": sha256(raw), "status": "reported", "release_sha": d["release_sha"],
+            "built_at": _clip(d.get("built_at"), 40), "checks": checks,
+            "matches_checkout": None if release_sha is None else release_sha == d["release_sha"],
+            "matches_note": "Compared with `git rev-parse HEAD` of the deployed checkout (measured). Null means the checkout SHA could not be read within the budget."}
+
+
+RECEIPT_FIELDS = ("job_id", "job_name", "job_state", "run_tag", "item", "controller_status", "inner_rc", "inner_wall_s", "timed_out",
+                  "returned_bundle_bytes", "returned_bundle_sha256")
+
+
+def receipts_report(root: Path, pins_rel: str = "deploy/system/receipt-pins.json") -> dict:
+    out = {"mode": "worker_report", "source": "pinned provider receipts (deploy/system/receipt-pins.json)", "receipt_files": [], "jobs": [],
+           "actual_cost": {"status": "unknown", "spend_usd": None,
+                           "reason": "No pinned receipt carries a billed amount; spend is not estimated or inferred."},
+           "utilization": {"status": "not_computed", "reason": "No provider usage receipt exists; job-reported wall seconds are not billed time or capacity utilization."}}
+    raw, why = read_small(root, pins_rel)
+    if raw is None:
+        out["status"] = "no pins file: " + why
+        return out
+    try:
+        pins = json.loads(raw)["pins"]
+        assert isinstance(pins, list) and len(pins) <= 20
+    except (ValueError, KeyError, AssertionError, TypeError):
+        out["status"] = "pins file invalid; nothing read"
+        return out
+    for pin in pins:
+        entry = {"id": _clip(pin.get("id"), 80), "path": _clip(pin.get("path"), 200), "pinned_sha256": pin.get("sha256"), "description": _clip(pin.get("description"), 300),
+                 "pinned_from": _clip(pin.get("pinned_from"), 120)}
+        data, why = read_small(root, str(pin.get("path", "")))
+        if data is None:
+            entry["status"] = why
+        elif sha256(data) != pin.get("sha256"):
+            entry.update(status="changed since it was pinned; contents withheld until the pin is updated", actual_sha256=sha256(data))
+        else:
+            entry.update(status="verified against its pin", actual_sha256=sha256(data))
+            try:
+                d = json.loads(data)
+                for j in (d["jobs"] if isinstance(d.get("jobs"), list) else [])[:50]:
+                    ev = [e for e in j.get("events", []) if isinstance(e, dict)]
+                    job = {k: j[k] for k in RECEIPT_FIELDS if isinstance(j.get(k), (str, int, float, bool))}
+                    job["kind"] = next((e["kind"] for e in ev if isinstance(e.get("kind"), str)), None)
+                    stamps = [e["t"] for e in ev if isinstance(e.get("t"), str)]
+                    job["first_event_at"], job["last_event_at"], job["receipt_id"] = (stamps[0] if stamps else None), (stamps[-1] if stamps else None), entry["id"]
+                    out["jobs"].append({k: _clip(v) for k, v in job.items()})
+                for k in ("price", "note"):
+                    if isinstance(d.get(k), str):
+                        entry[k] = _clip(d[k], 400)
+                        if k == "price":
+                            out["actual_cost"]["reason"] = _clip(d[k], 400)
+            except (ValueError, TypeError, AttributeError):
+                entry["status"] = "verified against its pin but not a receipts document; contents not used"
+        out["receipt_files"].append(entry)
+    walls = [j["inner_wall_s"] for j in out["jobs"] if isinstance(j.get("inner_wall_s"), (int, float))]
+    out["jobs_reported"] = len(out["jobs"])
+    out["sum_job_reported_wall_seconds"] = round(sum(walls), 1) if walls else None
+    out["sum_note"] = "Sum of wall seconds the jobs reported about themselves. Not billed time, not capacity utilization."
+    out["status"] = "ok" if out["receipt_files"] else "no pins"
+    return out
+
+
+def curated_manifest(root: Path = ROOT) -> dict:
+    """The worker_report sections only, for the UI to fetch as a static file when /api/system is not ready. Nothing in it is measured."""
+    return {"schema": SCHEMA, "generated_at": now_iso(), "kind": "curated-manifest", "legend": LEGEND,
+            "measured": "not measured: this is a static manifest; load /api/system for measurements",
+            "board": board_report(root), "specs": specs_report(root), "goal": goal_report(root), "build": build_report(root, None), "resources": receipts_report(root)}
+
+
+# ------------------------------------------------------------------ the snapshot
+class SystemStatus:
+    def __init__(self, store, root: Path = ROOT, ttl: int = TTL_S, runner=None):
+        self.store, self.root, self.ttl, self.runner = store, Path(root), ttl, runner
+        self.lock, self.cached = Lock(), None
+
+    def _section(self, name, fn):
+        try:
+            return fn()
+        except Exception:       # noqa: BLE001 - a failing section degrades alone; no exception text is exported
+            return {"mode": "measured", "status": "unavailable", "section": name}
+
+    def snapshot(self) -> dict:
+        with self.lock:
+            t = time.monotonic()
+            if self.cached and t - self.cached[0] < self.ttl:
+                return {**self.cached[1], "cache": {"ttl_seconds": self.ttl, "cached": True, "age_seconds": round(t - self.cached[0], 1)}}
+            fixed = Fixed(self.root, self.runner)
+            sha = fixed.call(GIT_CMD)
+            sha = sha.strip() if sha and SHA40.fullmatch(sha.strip()) else None
+            units = parse_systemctl(fixed.call(SYSTEMCTL_CMD))
+            out = {"schema": SCHEMA, "generated_at": now_iso(), "legend": LEGEND,
+                   "store": self._section("store", lambda: store_measurements(self.store)),
+                   "process": self._section("process", process_measurements),
+                   "host": self._section("host", host_measurements),
+                   "services": {"mode": "measured", "source": "systemctl --user show (fixed command, our two units only)", "units": units},
+                   "release": {"mode": "measured", "checkout_sha": sha, "source": "git rev-parse HEAD in the deployed checkout (fixed command)",
+                               "note": None if sha else "unavailable within the 2 s budget or not a git checkout"},
+                   "build": self._section("build", lambda: build_report(self.root, sha)),
+                   "board": self._section("board", lambda: board_report(self.root)),
+                   "specs": self._section("specs", lambda: specs_report(self.root)),
+                   "goal": self._section("goal", lambda: goal_report(self.root)),
+                   "resources": self._section("resources", lambda: receipts_report(self.root)),
+                   "limits": {"read_only": True, "fixed_command_budget_seconds": BUDGET_S, "launches_jobs": False,
+                              "not_exposed": ["environment", "tokens", "credential paths", "host name or user names", "other processes' command lines", "other teams' jobs"]}}
+            self.cached = (t, out)
+            return {**out, "cache": {"ttl_seconds": self.ttl, "cached": False, "age_seconds": 0.0}}
+
+
+def main(argv=None):
+    p = argparse.ArgumentParser(description="Print the curated worker_report manifest (static fallback for the System page). Measures nothing.")
+    p.add_argument("--manifest", action="store_true", required=True)
+    p.add_argument("--root", type=Path, default=ROOT)
+    a = p.parse_args(argv)
+    print(json.dumps(curated_manifest(a.root), indent=1, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

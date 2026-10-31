@@ -149,10 +149,15 @@ def _final(traj, ids):
     return {i: float(traj[-1, j + 1]) for j, i in enumerate(ids)}
 
 
+# The modules whose bytes decide a replay's result and its records. Explicit, so that adding an unrelated module
+# (for example the video renderer) does not silently change the hash a committed receipt carries.
+REPLAY_MODULES = ("__init__.py", "__main__.py", "client.py", "frontier_mapping.py", "replay.py", "sbml.py")
+
+
 def _code_hash() -> str:
     h = hashlib.sha256()
-    for p in sorted(PACKAGE_DIR.glob("*.py")):
-        h.update(p.name.encode() + b"\0" + p.read_bytes())
+    for name in REPLAY_MODULES:
+        h.update(name.encode() + b"\0" + (PACKAGE_DIR / name).read_bytes())
     return h.hexdigest()
 
 

@@ -36,6 +36,7 @@ from .artifacts import ArtifactIndex
 from .http import Application
 from .models import KINDS, MAX_BUNDLE_BYTES, Ref, canonical
 from .search import SEARCH_KIND, SearchIndex
+from .system_status import SystemStatus
 from .store import FrontierError, Store
 
 log = logging.getLogger("frontier.web")
@@ -77,6 +78,9 @@ class WebConfig:
     artifact_search: Callable | None = None                      # default: ArtifactIndex(store).search
     attention_build: Callable | None = None                      # default: late import of attention.view.build_view (tests inject a stand-in)
     attention_module: str = "attention.view"                     # module exposing build_view(records, events, annotations, now); renamed by config if the package is
+    system_root: Path | None = None                              # checkout whose files /api/system describes (default: this checkout)
+    system_runner: Callable | None = None                        # tests only: replaces the two fixed commands' runner
+    system_ttl: int = 30
     attention_ttl: int = 5                                       # seconds a built view is reused; bounds repeated polling cost
     attention_max_records: int = 2000                            # public records (all versions) and events the view may be built from; more => 422, never a partial view
     attention_max_events: int = 5000
@@ -207,7 +211,7 @@ def default_search(store):
     return SearchIndex(store).query, "search_index"
 
 
-RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts", "/api/attention"}
+RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts", "/api/attention", "/api/system"}
 
 
 @dataclass
@@ -325,6 +329,7 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
     limiter = FailureLimiter(cfg.login_failures, cfg.login_window)
     cookie_name = ("__Host-" if cfg.cookie_secure else "") + "frontier_session"
     attention = AttentionSource(store, cfg)
+    system = SystemStatus(store, **({"root": cfg.system_root} if cfg.system_root else {}), ttl=cfg.system_ttl, runner=cfg.system_runner)
 
     class Handler(BaseHTTPRequestHandler):
         server_version = "frontier"
@@ -568,6 +573,10 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
                     rows.append(row)
                 return self.json(200, {"mode": "live", "namespace": store.namespace, "search_mode": cfg.search_mode, "search_kind": found["search_kind"],
                                        "results": rows, "next_cursor": found["next_cursor"]})
+            if path == "/api/system":
+                if q:
+                    raise FrontierError("This endpoint takes no parameters")
+                return self.json(200, system.snapshot())
             if path == "/api/attention":
                 if q:
                     raise FrontierError("This endpoint takes no parameters")
