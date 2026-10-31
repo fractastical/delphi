@@ -3,6 +3,13 @@ primary_region = "iad"
 
 [env]
   DELPHI_HTTP_PORT = "8080"
+  DELPHI_METRICS_PORT = "9091"
+
+# Fly scrapes this privately (port 9091 is not exposed) into its managed Prometheus; view in
+# Grafana at https://fly-metrics.net. Series are named delphi_mcp_*; see mcp/metrics.mjs.
+[metrics]
+  port = 9091
+  path = "/metrics"
 
 [http_service]
   internal_port = 8080

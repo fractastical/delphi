@@ -7,6 +7,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { GROUP_KEYS, SORT_KEYS, browseClaims } from "./graph.mjs";
 import { NETWORK_ENDPOINT, PREFIXES, getClaim, overview, rankClaims, searchClaims, sparql } from "./lib.mjs";
+import { observeToolCall } from "./metrics.mjs";
 import { AXIS_IDS, GROUP_KEYS as ORG_GROUP_KEYS, SORT_KEYS as ORG_SORT_KEYS, browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
 
 const TOOLS = [];
@@ -15,8 +16,11 @@ export function createServer() {
   const server = new McpServer({ name: "delphisci", version: "0.2.0" });
   for (const [name, description, inputSchema, fn] of TOOLS) {
     server.registerTool(name, { description, inputSchema, annotations: { readOnlyHint: true } }, async args => {
+      const start = performance.now();
+      let ok = true;
       try { return json(await fn(args)); }
-      catch (e) { return { isError: true, content: [{ type: "text", text: String(e?.message ?? e) }] }; }
+      catch (e) { ok = false; return { isError: true, content: [{ type: "text", text: String(e?.message ?? e) }] }; }
+      finally { observeToolCall(name, ok, (performance.now() - start) / 1000); }
     });
   }
   return server;

@@ -22,6 +22,17 @@ It runs on Fly.io (`fly.toml`, `Dockerfile`) and redeploys from
 the server, `docs/claims.json`, `organisms/merged/*.json` or any nanopubs. To run the HTTP mode locally:
 `DELPHI_HTTP_PORT=8080 node mcp/server.mjs`.
 
+Usage stats for the hosted server are in Grafana at [fly-metrics.net](https://fly-metrics.net)
+(app `delphisci-mcp`), from counters in [`metrics.mjs`](metrics.mjs) that Fly scrapes from a
+private port: `delphi_mcp_tool_calls_total{tool,status}`, `delphi_mcp_tool_call_seconds`,
+`delphi_mcp_sessions_total{client}` (client name from `initialize`),
+`delphi_mcp_requests_total{method}`, `delphi_mcp_rate_limited_total` and
+`delphi_mcp_unique_visitors_today` (salted IP hashes, salt rotated daily, nothing stored).
+Counters reset on deploy, so use `increase()` in queries, e.g.
+`sum by (tool) (increase(delphi_mcp_tool_calls_total[7d]))`. Calls rejected for invalid
+arguments count in `requests_total{method="tools/call"}` but not in `tool_calls_total`. The
+`npx` and local servers send nothing anywhere.
+
 **Without cloning**: any MCP client can run it straight from GitHub. npm fetches the repo at the
 given ref and installs only the server, `docs/claims.json`, `organisms/merged/*.json` and the
 unsigned TriG files, so `local` means "the repo as of that commit".

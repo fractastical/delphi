@@ -5,6 +5,7 @@ import { createServer as createHttpServer } from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { browseClaims } from "./graph.mjs";
 import { localFileCount } from "./lib.mjs";
+import { observeRateLimited, observeRequest, observeSession, observeVisitor, renderMetrics } from "./metrics.mjs";
 
 const RATE_LIMIT = Number(process.env.DELPHI_RATE_LIMIT ?? 120); // requests per IP per minute
 const MAX_BODY = 1 << 20;
@@ -79,7 +80,9 @@ export function serveHttp(createServer, port) {
     if (path === "/" && req.method === "GET") return send(res, 200, landing(req.headers.host, files, built), "text/plain; charset=utf-8");
     if (path !== "/mcp") return send(res, 404, { error: "Not found. The MCP endpoint is /mcp." });
     if (req.method !== "POST") return rpcError(res, 405, "Method not allowed: this server is stateless, use POST /mcp.");
+    observeVisitor(ip);
     if (limited(ip)) {
+      observeRateLimited();
       res.setHeader("Retry-After", "60");
       return rpcError(res, 429, `Rate limit: ${RATE_LIMIT} requests per minute per IP.`);
     }
@@ -87,6 +90,10 @@ export function serveHttp(createServer, port) {
     let body;
     try { body = await readJson(req); }
     catch (e) { return rpcError(res, e.status ?? 400, e.message); }
+    for (const msg of Array.isArray(body) ? body : [body]) {
+      observeRequest(msg?.method);
+      if (msg?.method === "initialize") observeSession(msg.params?.clientInfo?.name);
+    }
 
     const server = createServer();
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
@@ -102,6 +109,15 @@ export function serveHttp(createServer, port) {
   });
 
   http.listen(port, () => console.log(`delphisci MCP on :${port}/mcp (${files} TriG files, claim graph ${built})`));
+
+  const metricsPort = Number(process.env.DELPHI_METRICS_PORT ?? 0);
+  if (metricsPort) {
+    createHttpServer((req, res) => {
+      if (new URL(req.url, "http://x").pathname !== "/metrics") { res.writeHead(404); return res.end(); }
+      res.writeHead(200, { "Content-Type": "text/plain; version=0.0.4" });
+      res.end(renderMetrics());
+    }).listen(metricsPort, () => console.log(`metrics on :${metricsPort}/metrics`));
+  }
   for (const sig of ["SIGINT", "SIGTERM"]) process.on(sig, () => {
     http.close(() => process.exit(0));
     setTimeout(() => process.exit(0), 5_000).unref();
