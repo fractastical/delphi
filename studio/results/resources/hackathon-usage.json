@@ -1,13 +1,64 @@
 {
   "schema": "frontier.hackathon-usage/1",
-  "observed_at_utc": "2026-10-31T22:33:59.251481Z",
-  "observed_at_seattle": "2026-10-31 15:33:59 PDT (UTC-07:00)",
+  "observed_at_utc": "2026-10-31T22:48:44.222579Z",
+  "observed_at_seattle": "2026-10-31 15:48:44 PDT (UTC-07:00)",
   "provider_window_utc": [
     "2026-10-31T13:12:34.526160Z",
-    "2026-10-31T22:33:59.251481Z"
+    "2026-10-31T22:48:44.222579Z"
   ],
   "scope": "Actual Delphi Frontier hackathon job records created October31,2026; own prefixes only. Shared16H100 capacity is not usage.",
   "own_jobs": [
+    {
+      "id": "aijob-e00k0jpm34h4na3b99",
+      "name": "delphi-evolve-ops-infra22-cfd3d-geometry-dispatch-repair-a1",
+      "created_at": "2026-10-31T22:45:52.347519Z",
+      "state": "RUNNING",
+      "platform": "gpu-h100-sxm",
+      "preset": "1gpu-16vcpu-200gb",
+      "requested_capacity": {
+        "gpu": 1,
+        "vcpu": 16,
+        "gb": 200
+      }
+    },
+    {
+      "id": "aijob-e00qxektzctnk69zwg",
+      "name": "delphi-evolve-ops-infra21-collagen-md-conditional-extensions",
+      "created_at": "2026-10-31T22:45:29.202081Z",
+      "state": "RUNNING",
+      "platform": "gpu-h100-sxm",
+      "preset": "1gpu-16vcpu-200gb",
+      "requested_capacity": {
+        "gpu": 1,
+        "vcpu": 16,
+        "gb": 200
+      }
+    },
+    {
+      "id": "aijob-e00m8v3m77z86n5ads",
+      "name": "delphi-evolve-ops-infra20-candidate-cpu-diagnostic-a1",
+      "created_at": "2026-10-31T22:39:52.646426Z",
+      "state": "COMPLETED",
+      "platform": "cpu-d3",
+      "preset": "4vcpu-16gb",
+      "requested_capacity": {
+        "vcpu": 4,
+        "gb": 16
+      }
+    },
+    {
+      "id": "aijob-e00cz0vk0jepf7j2fc",
+      "name": "delphi-evolve-ops-infra19-rd-ddpm-training-a1",
+      "created_at": "2026-10-31T22:36:35.008689Z",
+      "state": "IMAGE_PULLING",
+      "platform": "gpu-h100-sxm",
+      "preset": "1gpu-16vcpu-200gb",
+      "requested_capacity": {
+        "gpu": 1,
+        "vcpu": 16,
+        "gb": 200
+      }
+    },
     {
       "id": "aijob-e00s3bqbccez3bjpm9",
       "name": "delphi-evolve-ops-infra18-cfd3d-controlled-fish-a1",
@@ -409,22 +460,24 @@
   ],
   "own_job_state_counts": {
     "gpu": {
+      "RUNNING": 2,
+      "IMAGE_PULLING": 1,
       "FAILED": 4,
       "COMPLETED": 19,
       "CANCELLED": 3
     },
     "cpu": {
-      "COMPLETED": 4,
+      "COMPLETED": 5,
       "FAILED": 1
     }
   },
   "active_allocations": {
-    "instances": 0,
-    "running_instances": 0,
-    "pulling_instances": 0,
-    "gpus": 0,
-    "vcpus": 0,
-    "memory_gb": 0,
+    "instances": 3,
+    "running_instances": 2,
+    "pulling_instances": 1,
+    "gpus": 3,
+    "vcpus": 48,
+    "memory_gb": 600,
     "jobs_with_unknown_capacity": 0,
     "interpretation": "Requested capacity of nonterminal jobs, including startup. RUNNING is not measured GPU utilization. Kernel utilization is unknown until sampled telemetry is collected."
   },
@@ -682,6 +735,46 @@
       "source": "results/resources/usage-event-snapshots/20261031T223359Z/manifest-infra18.json",
       "sha256": "d32d778635308f3314bdece32c74fb69996e33eb0bb4c40c403d1c95c41aeaa0",
       "original_live_source": "results/infra/cfd3d/manifest-infra18.json"
+    },
+    {
+      "task": "diffusion",
+      "job_id": "aijob-e00cz0vk0jepf7j2fc",
+      "controller_status": "running",
+      "container_wall_s": null,
+      "result_rc": null,
+      "source": "results/resources/usage-event-snapshots/20261031T224844Z/manifest-infra19.json",
+      "sha256": "4af818680ba6cd8392a6a9b23880397f2f10700131087c33c7f9e3c66fe05e88",
+      "original_live_source": "results/infra/diffusion/manifest-infra19.json"
+    },
+    {
+      "task": "cfd3d-diagnostic",
+      "job_id": "aijob-e00m8v3m77z86n5ads",
+      "controller_status": "done",
+      "container_wall_s": 6.2,
+      "result_rc": 0,
+      "source": "results/resources/usage-event-snapshots/20261031T224844Z/manifest-infra20.json",
+      "sha256": "e38fe4ecb613629ff45a0875eef089ffdb60cf9d0c1f4147a5ffb856fa05120f",
+      "original_live_source": "results/infra/cfd3d-diagnostic/manifest-infra20.json"
+    },
+    {
+      "task": "md-v3",
+      "job_id": "aijob-e00qxektzctnk69zwg",
+      "controller_status": "running",
+      "container_wall_s": null,
+      "result_rc": null,
+      "source": "results/resources/usage-event-snapshots/20261031T224844Z/manifest-infra21.json",
+      "sha256": "b846be0b7665a5d2ee6df1a54031bfa14aba72dd9a9b4a6867ae9955911dd928",
+      "original_live_source": "results/infra/md-v3/manifest-infra21.json"
+    },
+    {
+      "task": "cfd3d-v2",
+      "job_id": "aijob-e00k0jpm34h4na3b99",
+      "controller_status": "running",
+      "container_wall_s": null,
+      "result_rc": null,
+      "source": "results/resources/usage-event-snapshots/20261031T224844Z/manifest-infra22.json",
+      "sha256": "74e742dcbd4f5481b4c856c2c5d242a0c4ecc16b8b1b5f81e7a66b90f6c7aeb8",
+      "original_live_source": "results/infra/cfd3d-v2/manifest-infra22.json"
     }
   ],
   "five_completed_h100_container_work_seconds": 1037.4,
@@ -829,17 +922,17 @@
     "No preparation or earlier in-house project origin narrative is part of this usage record."
   ],
   "cpu_completion_receipt": "results/infra/morpheus-v2-completion.json",
-  "latest_cfd_status": "Failed geometry candidate metadata SHA; all12STL bytehashes matched; no CFD ran; diagnosis pending. Original failure preserved.",
+  "latest_cfd_status": "First attempt failed candidate hash; CPU diagnostic reproduced default failure and restored exactpin with declaredSIMDsetting. Repaired GPU attempt admitted; geometry/platform controls pending. PhysicalC1reference remainsFAILED.",
   "local_host": {
-    "observed_at_utc": "2026-10-31T22:33:59.298527+00:00",
+    "observed_at_utc": "2026-10-31T22:49:33.011271+00:00",
     "logical_cpus": 8,
     "load_1_5_15": [
-      6.81103515625,
-      9.736328125,
-      13.56884765625
+      5.625,
+      9.3291015625,
+      10.998046875
     ],
-    "cpu_pressure": "some avg10=6.97 avg60=12.58 avg300=18.19 total=2713715188600\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
-    "memory_available_kib": 38735624,
-    "interpretation": "Instant host readings, not measured per-agent CPU consumption."
+    "cpu_pressure": "some avg10=53.13 avg60=51.86 avg300=46.14 total=2714120735832\nfull avg10=0.00 avg60=0.00 avg300=0.00 total=0",
+    "memory_available_kib": 39222260,
+    "interpretation": "Instant host readings, not per-agent CPU consumption."
   }
 }
