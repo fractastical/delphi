@@ -51,7 +51,10 @@ def build_snapshot(read: dict, annotations: list[dict], now: str, kind: str = "a
     h = heads(records)
     prob = {(k[0], k[2]): x["head"] for k, x in h.items() if k[1] == "Problem"}
     claim = {(k[0], k[2]): x["head"] for k, x in h.items() if k[1] == "Claim"}
-    L = coupled_links(prob, claim)
+    all_versions = {(r["namespace"], r["kind"], r["id"], r["version"]) for r in records}
+    heads_by_key = {k: x["head"]["version"] for k, x in h.items()}
+    L = coupled_links(prob, claim, all_versions=all_versions, heads_by_key=heads_by_key,
+                      namespaces_read=set(read["meta"].get("scope", {}).get("namespaces_read", [])) or None)
     concerned = {}
     for lk in L["links"]:
         if lk["link_kind"] == "concerns_claim":
@@ -76,6 +79,9 @@ def build_snapshot(read: dict, annotations: list[dict], now: str, kind: str = "a
     return {
         "snapshot_kind": kind,
         "store": read["meta"], "now": now,
+        "scope_statement": _scope_statement(read["meta"]),
+        "n_actions": sum(1 for r in records if r["kind"] == "Action"), "n_evidence": sum(1 for r in records if r["kind"] == "Evidence"),
+        "n_claims_all": sum(1 for r in records if r["kind"] == "Claim"),
         "local_status_counts": dict(Counter(status.values())),
         "n_problems": v["n_problems"], "n_claims": len(claims),
         "problems": v["rows"], "claims": claims, "whiteboard_facets": v["whiteboard_facets"],
@@ -87,3 +93,12 @@ def build_snapshot(read: dict, annotations: list[dict], now: str, kind: str = "a
         "note": ("Nothing is rated. 'unplaced' in a ranking means the inputs are missing, not that the item is low priority. "
                  "Record states are reported as stored; an assessment is shown as an assertion with its issuer, never as truth."),
     }
+
+
+def _scope_statement(meta: dict) -> str:
+    sc = meta.get("scope", {})
+    ex = sc.get("excluded_by_scope", [])
+    base = f"Counts below are scoped to namespaces {sc.get('namespaces_read')} ({sc.get('mode')}), public records only."
+    if ex:
+        base += " NOT READ: " + "; ".join(f"{e['namespace']}/{e['kind']} x{e['record_versions']}" for e in ex) + "."
+    return base + " Nothing here is a statement about the whole database unless mode is all_namespaces."
