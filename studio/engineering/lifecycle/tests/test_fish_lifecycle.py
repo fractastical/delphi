@@ -201,3 +201,17 @@ def test_pelvic_abbreviation_is_expanded_and_the_dash_markers_are_missing_values
     pb = next(m for m in mil if m["milestone"] == "PB")
     assert "pelvic" in pb["description"] and pb["ssl_mm"] == 7.2
     assert next(m for m in mil if m["milestone"] == "pSB")["sl_p50_mm"] is None
+
+
+def test_citations_are_generated_from_the_stored_europe_pmc_record_not_typed():
+    for c in J("sources.json")["cards"]:
+        assert re.fullmatch(r"[0-9a-f]{64}", c["citation_metadata_sha256"]), c["id"]
+        f = c["citation_fields"]
+        assert c["citation"].startswith(f["authorString"].rstrip(".")) and c["citation"].endswith("doi:" + f["doi"]), c["id"]
+        if c["text_in_repo"]:
+            raw = (D / "artifacts" / f"europepmc_{c['pmcid']}.json").read_bytes()
+            m = json.loads(raw)["resultList"]["result"][0]
+            assert hashlib.sha256(raw).hexdigest() == c["citation_metadata_sha256"] and m["authorString"] == f["authorString"] and m["doi"] == f["doi"]
+    by = {c["id"]: c for c in J("sources.json")["cards"]}
+    assert "Chan SS." in by["stackley2011"]["citation"] and "Edwards KS" in by["konadu2023"]["citation"] and "physical activity recovery" in by["konadu2023"]["citation"]
+    assert "Chan SSL" not in by["stackley2011"]["citation"] and "and strain" not in by["konadu2023"]["citation"]

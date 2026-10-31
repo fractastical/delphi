@@ -49,10 +49,22 @@ def q(T, sid, quote, locator, where="text"):
     return {"source": sid, "quote": n, "locator": locator, "verified_verbatim": True}
 
 
+def citation_from(meta_path: Path) -> tuple[str, str, dict]:
+    """A citation built only from a Europe PMC core record (authors, title, journal, volume, pages, year, doi), plus the record's hash."""
+    raw = meta_path.read_bytes()
+    m = json.loads(raw)["resultList"]["result"][0]
+    ji = m.get("journalInfo") or {}
+    j = (ji.get("journal") or {}).get("medlineAbbreviation") or m.get("journalTitle")
+    title = re.sub(r"<[^>]+>", "", m["title"]).rstrip(".")
+    cite = f"{m['authorString'].rstrip('.')}. {title}. {j} {ji.get('volume')}:{m.get('pageInfo')} ({m['pubYear']}). doi:{m['doi']}"
+    return cite, hashlib.sha256(raw).hexdigest(), {"authorString": m["authorString"], "doi": m["doi"], "title": title}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--noredist", type=Path, required=True)
-    T = texts(ap.parse_args().noredist)
+    args = ap.parse_args()
+    T = texts(args.noredist)
     Q = lambda *a, **k: q(T, *a, **k)
     meta = {sid: json.loads((ART / f"europepmc_{pmc}.json").read_text())["resultList"]["result"][0] for sid, (pmc, inrepo) in SRC.items() if inrepo}
     cards = [
@@ -60,27 +72,30 @@ def main() -> int:
          "pmcid": "PMC3030279", "species": "Danio rerio", "evidence_class": "measured_in_fish", "license": None, "license_note": "Europe PMC: not open access; full text came from NCBI PMC efetch (NIH author manuscript); no licence stated, so the text is NOT stored here",
          "read_level": "full-text (author manuscript via efetch)", "full_text_sha256": T["parichy2009"]["sha256"], "full_text_bytes": T["parichy2009"]["bytes"], "text_in_repo": False, "retrieved": RETRIEVED,
          "limits": ["Table 4 values are means of laboratory cohorts at the stated temperatures; strain and rearing differences are discussed in the paper", "SL and SSL are different measures: the text gives squamation beginning at ~8.1 mm SL while Table 4 lists SP at 9.6 SSL"]},
-        {"id": "aman2018", "citation": "Aman AJ, Fulbright AN, Parichy DM. Wnt/beta-catenin regulates an ancient signaling network during zebrafish scale development. eLife 7:e37001 (2018). doi:10.7554/eLife.37001", "pmcid": "PMC6072442",
+        {"id": "aman2018", "pmcid": "PMC6072442",
          "species": "Danio rerio", "evidence_class": "observed_qualitative", "license": "CC BY (Europe PMC)", "license_note": "from Europe PMC metadata", "read_level": "full-text", "text_in_repo": True, "retrieved": RETRIEVED,
          "limits": ["live imaging of individual fish: sequence and staging, no growth equation"]},
-        {"id": "daane2018", "citation": "Daane JM, Lanni J, Rothenberg I, Seebohm G, Higdon CW, Johnson SL, Harris MP. Bioelectric-calcineurin signaling module regulates allometric growth and size of the zebrafish fin. Sci Rep 8:10391 (2018). doi:10.1038/s41598-018-28450-6", "pmcid": "PMC6039437",
+        {"id": "daane2018", "pmcid": "PMC6039437",
          "species": "Danio rerio", "evidence_class": "observed_qualitative", "license": "CC BY (Europe PMC)", "license_note": "from Europe PMC metadata", "read_level": "full-text", "text_in_repo": True, "retrieved": RETRIEVED,
          "limits": ["pharmacology and mutants on fin regeneration; no allometric coefficient or growth law was found in the text read"]},
-        {"id": "mateus2020", "citation": "Mateus R, Holtzer L, Seum C, Hadjivasiliou Z, Dubois M, Julicher F, Gonzalez-Gaitan M. BMP signaling gradient scaling in the zebrafish pectoral fin. Cell Rep 30:4292-4302.e7 (2020). doi:10.1016/j.celrep.2020.03.024", "pmcid": "PMC7109522",
+        {"id": "mateus2020", "pmcid": "PMC7109522",
          "species": "Danio rerio", "evidence_class": "modelled_and_fit_to_fish_data", "license": "CC BY-NC-ND (Europe PMC)", "license_note": "no-derivatives and non-commercial: full text NOT stored here; short quotes and a hash only", "read_level": "full-text (not stored)",
          "full_text_sha256": T["mateus2020"]["sha256"], "full_text_bytes": T["mateus2020"]["bytes"], "text_in_repo": False, "retrieved": RETRIEVED, "limits": ["pectoral fin bud, 48-78 hpf only; the exponential fit fails after 78 hpf by the authors' account", "theory section and STAR Methods equations not extracted here"]},
-        {"id": "stackley2011", "citation": "Stackley KD, Beeson CC, Rahn JJ, Chan SSL. Bioenergetic profiling of zebrafish embryonic development. PLoS One 6:e25652 (2011). doi:10.1371/journal.pone.0025652", "pmcid": "PMC3183059", "species": "Danio rerio",
+        {"id": "stackley2011", "pmcid": "PMC3183059", "species": "Danio rerio",
          "evidence_class": "measured_in_fish", "license": "CC BY (Europe PMC)", "license_note": "from Europe PMC metadata", "read_level": "full-text (text only: per-stage values are in figures that were not read)", "text_in_repo": True, "retrieved": RETRIEVED,
          "limits": ["per-stage pmol/min/embryo values are plotted, not stated in the text, so none are recorded here"]},
-        {"id": "grimes2014", "citation": "Grimes DR, Kelly C, Bloch K, Partridge M. A method for estimating the oxygen consumption rate in multicellular tumour spheroids. J R Soc Interface 11:20131124 (2014). doi:10.1098/rsif.2013.1124", "pmcid": "PMC3899881",
+        {"id": "grimes2014", "pmcid": "PMC3899881",
          "species": "Homo sapiens (DLD1 colorectal carcinoma spheroids)", "evidence_class": "borrowed_nonfish", "license": "CC BY (Europe PMC)", "license_note": "from Europe PMC metadata", "read_level": "full-text (typeset equations are images: text not read)", "text_in_repo": True, "retrieved": RETRIEVED,
          "limits": ["tumour spheroids, not fish tissue and not a bioink", "D is assumed close to water, not measured in these spheroids", "constant consumption assumed; Michaelis-Menten variant mentioned and found negligibly different"]},
-        {"id": "mukasheva2024", "citation": "Mukasheva F, Adilova L, Dyussenbinov A, Yernaimanova B, Abilev M, Akilbekova D. Optimizing scaffold pore size for tissue engineering: insights across various tissue types. Front Bioeng Biotechnol 12:1444986 (2024). doi:10.3389/fbioe.2024.1444986", "pmcid": "PMC11588461",
+        {"id": "mukasheva2024", "pmcid": "PMC11588461",
          "species": "multiple (review; not fish)", "evidence_class": "borrowed_nonfish", "license": "CC BY (Europe PMC)", "license_note": "from Europe PMC metadata", "read_level": "full-text", "text_in_repo": True, "retrieved": RETRIEVED,
          "limits": ["a review: ranges come from other studies and disagree; no fish tissue", "stiffness and degradation kinetics were not extracted"]},
-        {"id": "konadu2023", "citation": "Konadu B, Hosler JP, Gibert Y, et al. Analysis of oxygen consumption rates in zebrafish reveals differences based on sex, age and strain. Front Physiol 14:1272366 (2023). doi:10.3389/fphys.2023.1272366", "pmcid": "PMC10534073", "species": "Danio rerio",
+        {"id": "konadu2023", "pmcid": "PMC10534073", "species": "Danio rerio",
          "evidence_class": "measured_in_fish", "license": "CC BY (Europe PMC)", "license_note": "from Europe PMC metadata", "read_level": "full-text", "text_in_repo": True, "retrieved": RETRIEVED,
          "limits": ["pooled animals per chamber (60 embryos, 5 larvae, 1 adult)", "the adult value looks unit- or normalisation-suspect; see assurance map"]}]
+    for c in cards:   # citations come from the Europe PMC record, never from memory
+        mp = (ART / f"europepmc_{c['pmcid']}.json") if c["text_in_repo"] else (args.noredist / f"europepmc_{c['pmcid']}.json")
+        c["citation"], c["citation_metadata_sha256"], c["citation_fields"] = citation_from(mp)
     for c in cards:
         if c["text_in_repo"]:
             m = meta[c["id"]]
