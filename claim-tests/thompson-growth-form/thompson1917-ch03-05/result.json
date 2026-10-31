@@ -2,7 +2,7 @@
   "claim_id": "thompson1917-ch03-05",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch03-05",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "The population median stature-velocity curve from birth to 20 years shows, in order: a very high velocity in infancy, a lower and nearly steady velocity through childhood, a distinct rise (adolescent spurt) in the early-to-mid teens, and a fall toward zero by the end of the teens.",
   "pass_criterion": "Pre-registered, evaluated on boys (the subject of Thompson's sentence) with girls reported alongside. Velocities come from pooled NHANES 2007-2018 measured stature (recumbent length < 24 months, standing height >= 24 months) using exam age in months. Model-free yearly velocity v(a) = median(height | age in [a+1,a+2) yr) - median(height | age in [a,a+1) yr), a = 0..18; smoothed velocity = derivative of a weighted smoothing spline through monthly medians. All four must hold for boys: (a) infancy: v(0) >= 2 x mean of v(4..9); (b) childhood steadiness: coefficient of variation of the smoothed velocity over ages 4-10 < 0.15 and max-min of v(4..9) <= 2.0 cm/yr; (c) adolescent quickening: max smoothed velocity in ages 10-17 >= 1.2 x the minimum smoothed velocity in ages 6-10, and the largest v(a) for a in 10..16 exceeds mean v(4..9) by >= 1.0 cm/yr with a 95% bootstrap CI (1000 resamples of individuals) excluding 0; (d) arrest: v(18) (18.5 -> 19.5 yr) < 1.5 cm/yr and < one third of mean v(4..9).",
   "fail_criterion": "Refutes if (c) fails in boys, i.e. the adolescent peak does not exceed childhood velocity (bootstrap CI of the excess includes 0 or the smoothed ratio < 1.0), or if (a) fails (infancy velocity not above childhood velocity). Any other combination of failed sub-criteria (e.g. an irregular childhood plateau or incomplete arrest by 19.5 yr) gives 'mixed'.",
@@ -11,12 +11,262 @@
     "nhanes-bmx-2007-2018"
   ],
   "interpretation": "Thompson's 'curve of growth for length or stature' and its phases are read as the first derivative (velocity, cm/yr) of median stature against age. NHANES is cross-sectional, so the population-median velocity is a smoothed version of individual velocity: the adolescent spurt is attenuated and widened relative to longitudinal curves, which makes criterion (c) conservative. 'Babyhood' is taken as the first two years, 'early boyhood' as 4-10 years, 'teens' as 10-17, 'full height' as 19-20 years. Birth length is not in NHANES, so infancy velocity is measured from the 0-11 month to the 12-23 month median (midpoints ~0.5 and ~1.5 years).",
-  "datasets": [],
-  "method": "",
-  "measured": {},
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "datasets": [
+    {
+      "id": "nhanes-demo-2007-2018",
+      "name": "NHANES Demographic Variables and Sample Weights (DEMO), cycles 2007-2008 to 2017-2018",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "doi": null,
+      "version": "cycles E-J (2007-2018)",
+      "license": "US Government public domain",
+      "files": [
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2007/DataFiles/DEMO_E.xpt",
+          "retrieved_at": "2026-10-31T04:31:04Z",
+          "byte_size": 3498080,
+          "sha256": "02b8e97703d04bc99769c751881bece51ac9ba68cf18a2992a45d3bdfb856147"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2009/DataFiles/DEMO_F.xpt",
+          "retrieved_at": "2026-10-31T04:31:05Z",
+          "byte_size": 3631600,
+          "sha256": "78c4d4a6e5eafa9da3bbb24a90d140fef5d8c0cda932a7ff8ee609288d4fae07"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2011/DataFiles/DEMO_G.xpt",
+          "retrieved_at": "2026-10-31T04:31:06Z",
+          "byte_size": 3753760,
+          "sha256": "eaf0525d1952626885af3e935415a1f66ad62c18698080e7354789c125af252d"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/DEMO_H.xpt",
+          "retrieved_at": "2026-10-31T04:31:06Z",
+          "byte_size": 3833200,
+          "sha256": "f8f0cbb3085a323d4cde22349b164878fea1e64dbc404e65b5815c7816b547d7"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/DEMO_I.xpt",
+          "retrieved_at": "2026-10-31T04:31:07Z",
+          "byte_size": 3756480,
+          "sha256": "c9297c6c37ae8f78f29be9568fa2a03cf3b112616a39afee04030fc775a66a0d"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt",
+          "retrieved_at": "2026-10-31T04:31:07Z",
+          "byte_size": 3412720,
+          "sha256": "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec"
+        }
+      ],
+      "role": "sex, age in months at exam (RIDEXAGM; RIDAGEMN for 2007-2010)"
+    },
+    {
+      "id": "nhanes-bmx-2007-2018",
+      "name": "NHANES Body Measures (BMX), cycles 2007-2008 to 2017-2018",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "doi": null,
+      "version": "cycles E-J (2007-2018)",
+      "license": "US Government public domain",
+      "files": [
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2007/DataFiles/BMX_E.xpt",
+          "retrieved_at": "2026-10-31T04:31:05Z",
+          "byte_size": 1800240,
+          "sha256": "b67b50dbd12c9510b49b6348b595b9fd073c422c0c6eac182f90ac57b491a97d"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2009/DataFiles/BMX_F.xpt",
+          "retrieved_at": "2026-10-31T04:31:05Z",
+          "byte_size": 1890560,
+          "sha256": "1fa42e07764037674c3f56e1e76f990e10c32245897597de3d731c57b91d869a"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2011/DataFiles/BMX_G.xpt",
+          "retrieved_at": "2026-10-31T04:31:06Z",
+          "byte_size": 1946720,
+          "sha256": "4814bfc3047ed400b9d43d285f8c3ea7c940ac6489404a9b699579715d158ec3"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/BMX_H.xpt",
+          "retrieved_at": "2026-10-31T04:31:06Z",
+          "byte_size": 2045520,
+          "sha256": "fd5e9fc6e6aab0a4aee6e699f51497bbc9b62101f7f43aee924c473e38fd9442"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/BMX_I.xpt",
+          "retrieved_at": "2026-10-31T04:31:07Z",
+          "byte_size": 1989600,
+          "sha256": "d31da84e14212b4e58e8340598a5b8e2144fac83333563e966eb1b332e4141d6"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/BMX_J.xpt",
+          "retrieved_at": "2026-10-31T04:31:07Z",
+          "byte_size": 1466000,
+          "sha256": "8d675e42d8826ac98714b2c3dd4c5138a5e353fb4424f7eff5e6db4a01ce838a"
+        }
+      ],
+      "role": "measured standing height (BMXHT), recumbent length (BMXRECUM) and weight (BMXWT)"
+    }
+  ],
+  "method": "Downloaded NHANES DEMO and BMX files for the six 2007-2018 cycles, merged on SEQN, kept examined persons under 20 years with a stature measurement (recumbent length below 24 months, standing height from 24 months; n = 23551, boys 12038, girls 11513). For each sex, median stature by completed year of age gave the model-free yearly velocity v(a); a local-linear Gaussian-kernel smoother (SD 0.5 yr; 0.75 and 1.0 yr as sensitivity) on monthly medians gave the smoothed velocity curve on a monthly grid. Bootstrap over individuals (1000 resamples) gave 95% CIs for the infancy velocity, the adolescent excess over childhood velocity and the velocity at 18.5-19.5 yr. The four pre-registered sub-criteria were evaluated on boys and reported for girls.",
+  "measured": {
+    "value": 3.283333333333333,
+    "unit": "cm/yr (boys' adolescent peak yearly velocity minus mean childhood velocity, ages 4-10)",
+    "n": 12038,
+    "uncertainty": "95% bootstrap CI [1.80, 4.42]",
+    "extra": {
+      "boys": {
+        "v0_infancy": 14.0,
+        "child_mean_v4_9": 6.066666666666666,
+        "child_range_v4_9": 2.0,
+        "adolescent_peak_v10_16": 9.35,
+        "adolescent_peak_age_bin": 12,
+        "v18_arrest": 0.65,
+        "smooth_child_cv_4_10": 0.11892625626303864,
+        "smooth_child_min_6_10": 4.6367728299915685,
+        "smooth_teen_peak_10_17": 8.593584332011682,
+        "smooth_teen_peak_age": 12.916666666666671,
+        "smooth_peak_to_childmin_ratio": 1.8533546169065411,
+        "smooth_v_at_19": 0.1799367799146637,
+        "ci95": {
+          "v0_infancy": [
+            13.399999999999991,
+            14.700000000000003
+          ],
+          "excess_peak_over_child": [
+            1.7995833333333282,
+            4.417083333333331
+          ],
+          "v18_arrest": [
+            -0.8012500000000116,
+            1.8012500000000098
+          ]
+        },
+        "criteria": {
+          "a_infancy": true,
+          "b_steady": true,
+          "c_quickening": true,
+          "d_arrest": true
+        },
+        "bandwidth_sensitivity": {
+          "0.75": {
+            "child_cv_4_10": 0.10268813679713716,
+            "peak_to_childmin_ratio": 1.4572382681085847,
+            "teen_peak_age": 12.83333333333334
+          },
+          "1.0": {
+            "child_cv_4_10": 0.09622843560788961,
+            "peak_to_childmin_ratio": 1.280896740154181,
+            "teen_peak_age": 12.666666666666671
+          }
+        },
+        "yearly_velocity_cm_per_yr": {
+          "0": 14.0,
+          "1": 10.0,
+          "2": 7.6,
+          "3": 7.2,
+          "4": 6.6,
+          "5": 6.7,
+          "6": 6.4,
+          "7": 5.7,
+          "8": 4.7,
+          "9": 6.3,
+          "10": 6.1,
+          "11": 5.75,
+          "12": 9.35,
+          "13": 4.9,
+          "14": 3.9,
+          "15": 0.75,
+          "16": 1.0,
+          "17": 0.3,
+          "18": 0.65
+        },
+        "smooth_velocity_by_year": {
+          "1.0": 15.005,
+          "2.0": 9.881,
+          "3.0": 7.914,
+          "4.0": 7.564,
+          "5.0": 6.613,
+          "6.0": 6.237,
+          "7.0": 6.5,
+          "8.0": 5.607,
+          "9.0": 4.776,
+          "10.0": 6.104,
+          "11.0": 6.052,
+          "12.0": 6.197,
+          "13.0": 8.519,
+          "14.0": 5.129,
+          "15.0": 3.512,
+          "16.0": 1.443,
+          "17.0": 0.972,
+          "18.0": 0.452,
+          "19.0": 0.18
+        }
+      },
+      "girls": {
+        "v0_infancy": 14.55,
+        "child_mean_v4_9": 6.399999999999999,
+        "child_range_v4_9": 1.3,
+        "adolescent_peak_v10_16": 7.3,
+        "adolescent_peak_age_bin": 10,
+        "v18_arrest": 0.45,
+        "smooth_child_cv_4_10": 0.08846509205692121,
+        "smooth_teen_peak_10_17": 7.439344488707123,
+        "smooth_teen_peak_age": 10.916666666666671,
+        "smooth_peak_to_childmin_ratio": 1.3892661189743454,
+        "ci95": {
+          "v0_infancy": [
+            13.950000000000003,
+            15.251249999999999
+          ],
+          "excess_peak_over_child": [
+            -0.18375000000001795,
+            2.117083333333338
+          ],
+          "v18_arrest": [
+            -0.8999999999999779,
+            1.650000000000034
+          ]
+        },
+        "criteria": {
+          "a_infancy": true,
+          "b_steady": true,
+          "c_quickening": false,
+          "d_arrest": true
+        },
+        "yearly_velocity_cm_per_yr": {
+          "0": 14.55,
+          "1": 9.05,
+          "2": 8.2,
+          "3": 7.3,
+          "4": 6.9,
+          "5": 6.9,
+          "6": 5.6,
+          "7": 6.4,
+          "8": 6.3,
+          "9": 6.3,
+          "10": 7.3,
+          "11": 4.95,
+          "12": 2.55,
+          "13": 1.6,
+          "14": 0.9,
+          "15": 0.15,
+          "16": 0.05,
+          "17": 0.3,
+          "18": 0.45
+        }
+      },
+      "verdict_by_prereg_rule_boys": "supports"
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.8,
+  "caveats": [
+    "Deviation from pre-registration: the pre-registered 'weighted smoothing spline' derivative on monthly medians was numerically unstable (adjacent-year smoothed velocities swung between 2.7 and 13.8 cm/yr), so the smoothed velocity uses a fixed-bandwidth (SD 0.5 yr) local-linear Gaussian-kernel smoother on the same monthly medians; thresholds were not changed. Results at bandwidths 0.75 and 1.0 yr are reported and give the same sub-criterion outcomes for boys.",
+    "Criterion (b) is met at the threshold: the range of boys' yearly velocities between ages 4 and 10 is exactly 2.0 cm/yr (allowed <= 2.0), driven by a pre-pubertal dip to 4.7 cm/yr at 8.5-9.5 yr. Childhood velocity in boys declines slowly (7.6 -> 4.8 cm/yr smoothed, ages 3-9) rather than being flat; 'nearly steady' holds only relative to infancy and adolescence.",
+    "Cross-sectional data: population medians attenuate and spread the adolescent spurt; in girls the spurt (peak 10.9 yr) is so attenuated that its excess over childhood velocity (0.9 cm/yr) has a bootstrap CI including 0, so criterion (c) fails for girls even though the pattern is visible. Thompson's sentence is about boys, which is why the verdict is scored on boys.",
+    "Birth length is absent from NHANES, so 'infancy' velocity is measured between the 0-11 and 12-23 month medians (about 14 cm/yr), which understates the true first-year velocity.",
+    "Modern US population (2007-2018), not the 19th-century European boys Thompson drew on; timing of the spurt differs between populations but the sequence of phases is what was tested."
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "claude-fable-5.1",
