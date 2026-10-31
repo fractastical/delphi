@@ -51,6 +51,9 @@ class FormSpec:
     fin_shape_from: str | None = None  # fin_ratio forms borrow area/length^2 from this form's layout
     status_note: str = ""
     params: dict = field(default_factory=dict)
+    set_id: str = "morphology-v1"
+    short: str = ""  # tab label
+    wing_factors: tuple[float, float] | None = None  # (area, whole-wing AR) factors on the Fish fit (NCA set)
 
 
 def P(value, kind, note="", locator=""):
@@ -87,11 +90,34 @@ def aesthetic_defaults(**over) -> dict:
 
 
 _B_SHAPE = dict(body_height_over_width=P(1.2, "aesthetic", "streamlined, after Breder 1930 via Fish 1990 p.397"))
+_C_SHAPE = dict(
+    ventral_flattening=P(0.62, "aesthetic", "Cypselurus body is 'ventrally flattened' (Fish 1990 p.394, after "
+                         "Breder 1930); the factor is ours"),
+    body_height_over_width=P(1.05, "aesthetic"), pectoral_sweep_deg=P(16.0, "aesthetic"),
+    pectoral_dihedral_deg=P(7.0, "aesthetic"), pelvic_sweep_deg=P(30.0, "aesthetic"),
+    pelvic_dihedral_deg=P(4.0, "aesthetic"), pelvic_root_height=P(-0.35, "aesthetic"),
+    pelvic_base_fraction=P(0.35, "aesthetic"), pelvic_s_max=P(0.3, "aesthetic"))
+_CHEILOPOGON = ("Pelvic length / SL is from Cheilopogon furcatus (four-wing; Cypselurus is not in Daane S1A): "
+                "a cross-genus substitution.")
+
+# Sets are versioned and never overwritten: a new dimension set gets new form ids, its own display scale and its own
+# candidates, and the earlier set's files stay as they were.
+SETS = {
+    "morphology-v1": {
+        "title": "Morphology set: three body plans at 0.1 kg",
+        "note": "A, B, C compare body plans at one mass (Fish 1990 p.399 comparison mass)"},
+    "nca-comparison-v1": {
+        "title": "Wing-geometry comparison set: Cypselurus at 0.05 kg (dx-nca controlled run)",
+        "note": "N1-N3 vary only wing area and whole-wing aspect ratio on one Cypselurus body. A comparison set "
+                "for a geometry-effect test (equilibrium sink falls with S and AR in NCA's simulation), not an "
+                "optimum; range ordering flips with release speed",
+        "source": src.NCA_CONTROLLED},
+}
 
 FORMS = [
     FormSpec(
         id="A-precursor-short-fin",
-        title="Precursor-inspired short-fin form (rejected glider candidate)",
+        title="Precursor-inspired short-fin form (rejected glider candidate)", short="A · short-fin precursor-inspired",
         role="Form B's body at 0.1 kg with the paired-fin lengths measured on non-gliding halfbeaks; isolates fin "
              "length, and the solver rejects it",
         genus="Exocoetus", mass_kg=0.1, fins_from="fin_ratio",
@@ -104,7 +130,7 @@ FORMS = [
     ),
     FormSpec(
         id="B-two-wing-glider",
-        title="Enlarged-pectoral two-wing glider (Exocoetus-type proportions)",
+        title="Enlarged-pectoral two-wing glider (Exocoetus-type proportions)", short="B · two-wing",
         role="monoplane design: pectorals carry 91.8% of wing area (Fish 1990 Table IV)",
         genus="Exocoetus", mass_kg=0.1, fins_from="fish_fit",
         pectoral_share=src.TABLE_IV["Exocoetus"]["pectoral_pct"] / 100,
@@ -113,21 +139,29 @@ FORMS = [
     ),
     FormSpec(
         id="C-four-wing-glider",
-        title="Enlarged pectoral + pelvic four-wing glider (Cypselurus-type proportions)",
+        title="Enlarged pectoral + pelvic four-wing glider (Cypselurus-type proportions)", short="C · four-wing",
         role="biplane design: pectorals 76.0%, pelvics + body the rest (Fish 1990 Table IV)",
         genus="Cypselurus", mass_kg=0.1, fins_from="fish_fit",
         pectoral_share=src.TABLE_IV["Cypselurus"]["pectoral_pct"] / 100,
         pelvic_ratio_key="flying fish | Cheilopogon furcatus",
-        status_note="Pelvic length / SL is from Cheilopogon furcatus (four-wing; Cypselurus is not in Daane S1A): "
-                    "a cross-genus substitution.",
-        params=aesthetic_defaults(
-            ventral_flattening=P(0.62, "aesthetic", "Cypselurus body is 'ventrally flattened' (Fish 1990 p.394, "
-                                 "after Breder 1930); the factor is ours"),
-            body_height_over_width=P(1.05, "aesthetic"), pectoral_sweep_deg=P(16.0, "aesthetic"),
-            pectoral_dihedral_deg=P(7.0, "aesthetic"), pelvic_sweep_deg=P(30.0, "aesthetic"),
-            pelvic_dihedral_deg=P(4.0, "aesthetic"), pelvic_root_height=P(-0.35, "aesthetic"),
-            pelvic_base_fraction=P(0.35, "aesthetic"), pelvic_s_max=P(0.3, "aesthetic")),
+        status_note=_CHEILOPOGON,
+        params=aesthetic_defaults(**_C_SHAPE),
     ),
+] + [
+    FormSpec(
+        id=fid, title=title, short=short, set_id="nca-comparison-v1",
+        role=role, genus="Cypselurus", mass_kg=0.05, fins_from="fish_fit",
+        pectoral_share=src.TABLE_IV["Cypselurus"]["pectoral_pct"] / 100,
+        pelvic_ratio_key="flying fish | Cheilopogon furcatus", wing_factors=wf,
+        status_note=_CHEILOPOGON + " Body, fins and shape parameters as Form C; only S and b differ within the set.",
+        params=aesthetic_defaults(**_C_SHAPE))
+    for fid, title, short, role, wf in (
+        ("N1-cypselurus-baseline", "Comparison N1: Cypselurus baseline, 0.05 kg", "N1 · baseline",
+         "Fish 1990 Cypselurus wing-area and span fits at 0.05 kg (NCA baseline)", (1.0, 1.0)),
+        ("N2-area-x1.3", "Comparison N2: wing area x1.3, same aspect ratio", "N2 · area ×1.3",
+         "N1 with wing area x1.3 at the same whole-wing b^2/S (NCA variant fS 1.3, fAR 1.0)", (1.3, 1.0)),
+        ("N3-area-x1.3-ar-x1.2", "Comparison N3: wing area x1.3, aspect ratio x1.2", "N3 · area ×1.3, AR ×1.2",
+         "N1 with wing area x1.3 and whole-wing b^2/S x1.2 (NCA variant fS 1.3, fAR 1.2)", (1.3, 1.2)))
 ]
 FORMS_BY_ID = {f.id: f for f in FORMS}
 
@@ -149,13 +183,18 @@ def biological_point(spec: FormSpec) -> dict:
     """Sourced biological inputs (SI) before the fin layout is resolved."""
     m = spec.mass_kg
     sl = src.fit(spec.genus, "length", m)
-    out = {"mass_kg": P(m, "functional", locator=src.COMPARISON_MASS["locator"]),
+    mass_loc = (src.COMPARISON_MASS["locator"] if spec.set_id == "morphology-v1" else
+                f"dx-nca comparison protocol mass (work/nca-glide @ {src.NCA_CONTROLLED['commit'][:7]}); inside Fish "
+                "1990's 0.003-0.53 kg specimens")
+    out = {"mass_kg": P(m, "functional", locator=mass_loc),
            "standard_length_m": P(sl, "functional", locator=f"Fish 1990 Table I, {spec.genus} length fit")}
     if spec.fins_from == "fish_fit":
-        out["wing_area_m2"] = P(src.fit(spec.genus, "area", m), "functional",
-                                locator=f"Fish 1990 Table I, {spec.genus} wing-area fit")
-        out["wing_span_m"] = P(src.fit(spec.genus, "span", m), "functional",
-                               locator=f"Fish 1990 Table I, {spec.genus} wing-span fit")
+        S0, b0 = src.fit(spec.genus, "area", m), src.fit(spec.genus, "span", m)
+        fS, fAR = spec.wing_factors or (1.0, 1.0)
+        S, b = fS * S0, math.sqrt(fAR * b0 ** 2 / S0 * fS * S0)
+        tag = "" if spec.wing_factors is None else f" x area {fS:g}, whole-wing AR x{fAR:g} (NCA comparison variant)"
+        out["wing_area_m2"] = P(S, "functional", locator=f"Fish 1990 Table I, {spec.genus} wing-area fit{tag}")
+        out["wing_span_m"] = P(b, "functional", locator=f"Fish 1990 Table I, {spec.genus} wing-span fit{tag}")
         out["pectoral_share"] = P(spec.pectoral_share, "functional", locator=f"Fish 1990 Table IV, {spec.genus}")
     else:
         out["pectoral_length_over_sl"] = daane_ratio(spec.pectoral_ratio_key, "pectoral")
@@ -293,33 +332,42 @@ def caudal_lengths(sl, ped_half, a, hypo_area, hypo_share):
     return x0, up, lo
 
 
-def built_extents(spec: FormSpec, bio: dict, trial: float = 1 / 3, res: M.Resolution | None = None) -> dict:
-    """Length and span (m, biological) of a coarse trial build, used to choose the display scale.  Measured on
-    the built solid because an estimate from the fin and lobe formulas overshot built lengths by ~12%.  Print-only
-    features (plate thickness, opening radius) do not scale, so the result is close to, not exactly, linear."""
-    m, _ = build_prop(spec, bio, trial, res or M.Resolution(36, 24, 24, 16))
+def built_extents(spec: FormSpec, bio: dict, scale: float, res: M.Resolution | None = None) -> dict:
+    """Length and span (prop mm) of a coarse trial build AT `scale`.  Measured at the candidate scale itself:
+    print-only features (plate thickness, the 1 mm opening of fin and lobe tips) do not scale, so a trial at another
+    scale misjudged lengths by ~4 % (88.5 mm predicted, 92.5 mm built, for N1 at 9/20)."""
+    m, _ = build_prop(spec, bio, scale, res or M.Resolution(36, 24, 24, 16))
     bb = m.bounding_box()
-    k = 1000 * trial
-    return {"length_m": (bb[3] - bb[0]) / k, "span_m": (bb[4] - bb[1]) / k}
+    return {"length_mm": bb[3] - bb[0], "span_mm": bb[4] - bb[1]}
 
 
-NICE_SCALES = (Fraction(1, 2), Fraction(2, 5), Fraction(3, 8), Fraction(7, 20), Fraction(1, 3), Fraction(3, 10),
-               Fraction(1, 4), Fraction(1, 5))
+NICE_SCALES = (Fraction(1, 2), Fraction(9, 20), Fraction(2, 5), Fraction(3, 8), Fraction(7, 20), Fraction(1, 3),
+               Fraction(3, 10), Fraction(1, 4), Fraction(1, 5))
 
 
-def display_scale(extents: list[dict]) -> float:
-    """One scale for every form (same 0.1 kg mass, so sizes compare directly): the largest round ratio whose
-    longest length or span stays within max_extent_mm while every form is at least min_length_mm long.
-    Extents come from `built_extents`; the final built bounds are checked again by the build and the tests."""
+def display_scale(members: list[tuple[FormSpec, dict]]) -> tuple[float, dict]:
+    """One scale per set (so sizes within a set compare directly).  Hard rule: every length and span <=
+    max_extent_mm.  Aim: every form >= min_length_mm long.  Scales are tried largest first on coarse trial builds;
+    the first meeting both is used.  If none does, the largest that meets the hard rule is used and the shortfall
+    is reported with the measurements, never hidden.  Final built bounds are re-checked by the build and tests."""
     top, low = PRINT["max_extent_mm"]["value"], PRINT["min_length_mm"]["value"]
-    need = max(max(e["length_m"], e["span_m"]) for e in extents) * 1000
-    shortest = min(e["length_m"] for e in extents) * 1000
+    tried, fallback = [], None
     for s in NICE_SCALES:
-        if need * s <= top:
-            if shortest * s < low:
-                raise ValueError(f"scale {s} fits the box but the shortest form is {shortest * s:.1f} mm long")
-            return float(s)
-    raise ValueError("no listed display scale fits")
+        ext = [built_extents(spec, bio, float(s)) for spec, bio in members]
+        longest = max(max(e["length_mm"], e["span_mm"]) for e in ext)
+        shortest = min(e["length_mm"] for e in ext)
+        tried.append({"scale": str(s), "longest_mm": round(longest, 2), "shortest_length_mm": round(shortest, 2)})
+        if longest > top:
+            continue
+        fallback = fallback or (s, shortest, longest)
+        if shortest >= low:
+            return float(s), {"min_length_mm": low, "max_extent_mm": top, "met": True, "trials": tried}
+    if fallback is None:
+        raise ValueError(f"no listed display scale fits: {tried}")
+    s, shortest, longest = fallback
+    return float(s), {"min_length_mm": low, "max_extent_mm": top, "met": False, "trials": tried,
+                      "reason": f"no listed scale gives every form >= {low:g} mm long with every extent <= {top:g} mm; "
+                                f"at {s} the shortest is {shortest:.1f} mm"}
 
 
 def build_prop(spec: FormSpec, bio: dict, scale: float, res: M.Resolution = M.Resolution()) -> tuple[mf.Manifold, dict]:

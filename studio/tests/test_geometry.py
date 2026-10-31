@@ -99,6 +99,14 @@ def test_thickness_sampler_measures_a_known_slab():
     assert t["no_hit"] == 0 and t["min_mm"] == pytest.approx(1.0, abs=1e-3)
 
 
+def test_min_wall_gate_fails_a_thin_slab():
+    V, T = cube()
+    V = V * np.array([20.0, 20.0, 0.5])  # a 0.5 mm slab against a 1 mm requirement
+    r = VAL.check(V, T, min_wall_mm=1.0)
+    assert r["closed_two_manifold"] and not r["min_wall_ok"] and not r["ok"]
+    assert VAL.check(V * np.array([1, 1, 3.0]), T, min_wall_mm=1.0)["ok"]  # 1.5 mm passes
+
+
 def test_stl_roundtrip_and_weld():
     V, T = cube()
     V2, T2 = VAL.read_stl(VAL.stl_bytes(V, T, "cube"))
@@ -129,7 +137,9 @@ def test_design_records_its_checks(form_id):
     assert d["convergence"]["converged"]
     length, span, _height = v["bounds_mm"]["size"]
     assert 90 <= length <= 120 and span <= 120
-    assert v["wall_thickness"]["min_mm"] >= 1.0 and d["stand"]["validation"]["wall_thickness"]["min_mm"] >= 1.0
+    for w in (v, d["stand"]["validation"]):
+        assert w["min_wall_mm_required"] == 1.0 and w["min_wall_ok"] and w["wall_thickness"]["min_mm"] >= 1.0
+    assert d["printer_resin"]["printer"] == "unknown" and d["printer_resin"]["resin"] == "unknown"
     assert v["self_intersection"] == "not checked"
     # The saddle is cut by the prop itself, so they share a contact surface; simplify() moves surfaces < 1 um,
     # which leaves an overlap of order contact area x 1 um (measured ~1e-4 mm^3).  A real clash is >> 0.01.
@@ -141,7 +151,7 @@ def test_design_records_its_checks(form_id):
 def test_prop_rebuilds_from_its_design_json(form_id):
     """The design JSON is the whole input: rebuilding from it gives the committed mesh, byte for byte."""
     d = design(form_id)
-    solid, _ = F.build_prop(F.FORMS_BY_ID[form_id], d["biological_design_SI"], MANIFEST["display_scale"])
+    solid, _ = F.build_prop(F.FORMS_BY_ID[form_id], d["biological_design_SI"], d["prop_mm"]["display_scale"])
     V, T, _ = B.mesh_arrays(solid)
     assert VAL.mesh_hash(V, T) == d["validation"]["mesh_sha256"]
 
@@ -159,8 +169,9 @@ def test_biology_scale_and_resin_stay_separate():
     for form_id in FORM_IDS:
         d = design(form_id)
         mm = d["prop_mm"]
-        assert d["biological_design_SI"]["mass_kg"]["value"] == pytest.approx(0.1)
-        assert mm["display_scale"] == MANIFEST["display_scale"]
+        mass = {"morphology-v1": 0.1, "nca-comparison-v1": 0.05}[d["set"]["id"]]
+        assert d["biological_design_SI"]["mass_kg"]["value"] == pytest.approx(mass)
+        assert mm["display_scale"] == MANIFEST["sets"][d["set"]["id"]]["display_scale"]
         assert "slicer" in mm["resin"]
         built = mm["built"]
         assert built["pectoral_prop_area_exaggeration"] == pytest.approx(1.0, abs=0.02)
@@ -171,7 +182,8 @@ def test_biology_scale_and_resin_stay_separate():
 def test_solver_statuses_and_candidates():
     status = {k: v["solver"] for k, v in MANIFEST["forms"].items()}
     assert status == {"A-precursor-short-fin": "unsat", "B-two-wing-glider": "feasible",
-                      "C-four-wing-glider": "feasible"}
+                      "C-four-wing-glider": "feasible", "N1-cypselurus-baseline": "feasible",
+                      "N2-area-x1.3": "feasible", "N3-area-x1.3-ar-x1.2": "feasible"}
     for form_id in FORM_IDS:
         d = design(form_id)
         cand = d["glide_candidate"]
@@ -241,3 +253,59 @@ def test_graph_keeps_conjecture_apart():
 def test_artifacts_were_built_by_this_code():
     """A geometry edit without a rebuild leaves artifacts describing other code; rebuild with build.py."""
     assert MANIFEST["run"]["code_sha256"] == B.code_hash()
+
+
+# ---- sets, the NCA comparison set and the site's download manifest ----
+
+def test_every_set_meets_the_length_aim_at_one_scale():
+    for sid, s in MANIFEST["sets"].items():
+        assert s["length_aim"]["met"], (sid, s["length_aim"])
+        assert {MANIFEST["forms"][f]["display_scale"] for f in s["forms"]} == {s["display_scale"]}
+
+
+def test_comparison_set_is_ncas_geometry():
+    """N1-N3 are dx-nca's three geometries (Fish Cypselurus fit at 0.05 kg, S x fS, whole-wing AR x fAR), and the
+    quoted simulation rows come from NCA's committed CSV with the recorded sha256."""
+    from engineering.geometry import sources as src
+    expect = {"N1-cypselurus-baseline": (0.005699, 0.2117), "N2-area-x1.3": (0.007409, 0.2414),
+              "N3-area-x1.3-ar-x1.2": (0.007409, 0.2644)}  # nca-to-print.md table, written out independently
+    for form_id, (S, b) in expect.items():
+        d = design(form_id)
+        bio = d["biological_design_SI"]
+        assert bio["wing_area_m2"]["value"] == pytest.approx(S, abs=5e-7)
+        assert bio["wing_span_m"]["value"] == pytest.approx(b, abs=5e-5)
+        sim = d["simulation_comparison"]
+        assert sim["geometry_matches"] and sim["sha256"] == src.NCA_CONTROLLED["comparison_csv_sha256"]
+        assert sim["evidence_kind"] == "simulated" and len(sim["rows"]) == 6
+    sink = [float(design(f)["simulation_comparison"]["rows"][0]["sink_eq_ms"]) for f in expect]
+    assert sink[0] > sink[1] > sink[2]  # NCA's one robust effect, as recorded, not re-derived here
+
+
+def test_morphology_set_files_are_preserved():
+    """A new dimension set gets new ids; the merged v1 meshes, solver runs and candidates stay byte-identical."""
+    try:
+        listed = subprocess.run(["git", "-C", str(REPO), "ls-tree", "-r", "--name-only", "3c97a38", "--",
+                                 "artifacts/print/stl", "artifacts/print/glide", "artifacts/print/web",
+                                 "artifacts/print/solver"], check=True, capture_output=True, text=True).stdout.split()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        pytest.skip("commit 3c97a38 is not in this clone")
+    assert len(listed) == 14
+    for path in listed:
+        old = subprocess.run(["git", "-C", str(REPO), "show", f"3c97a38:{path}"], check=True,
+                             capture_output=True).stdout
+        assert (REPO / path).read_bytes() == old, path
+
+
+def test_download_manifest_matches_the_files():
+    dl = json.loads((OUT / "downloads.json").read_text())
+    assert dl["printer_resin"]["printer"] == "unknown" and any("Printer and resin are unknown" in x
+                                                              for x in dl["limitations"])
+    assert [f["id"] for f in dl["forms"]] == FORM_IDS
+    for f in dl["forms"]:
+        assert {e["kind"] for e in f["files"]} >= {"stl_prop", "stl_stand", "glb_prop"}
+        for e in f["files"]:
+            data = (OUT / e["path"]).read_bytes()
+            assert len(data) == e["bytes"] and hashlib.sha256(data).hexdigest() == e["sha256"]
+        for c in (f["prop_checks"], f["stand_checks"]):
+            assert c["ok"] and c["closed_two_manifold"] and c["consistently_oriented"] and c["min_wall_ok"]
+            assert c["face_connected_components"] == 1 and c["self_intersection"] == "not checked"

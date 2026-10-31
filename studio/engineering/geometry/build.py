@@ -21,13 +21,17 @@ import manifold3d as mf
 import numpy as np
 
 from . import forms as F
-from . import graph, render, solver_bridge as SB, stand as ST, validate as VAL, viewer
+from . import graph, nca_link as NCA, render, solver_bridge as SB, stand as ST, validate as VAL, viewer
 from .mesh import Resolution
 
 HERE = Path(__file__).resolve().parent
 LAUNCH_SPEED = Fraction(16)  # m/s; lower end of the 16-20 m/s take-off speed Fish 1990 p.397 relays
 RESOLUTIONS = {"coarse": Resolution(36, 24, 24, 16), "default": Resolution(), "fine": Resolution(144, 96, 96, 64)}
 BOX_MM = 120.0
+MIN_WALL_MM = 1.0  # provisional prop choice (brief: walls >= ~1 mm), not a certified printer setting
+PRINTER_RESIN = {"printer": "unknown", "resin": "unknown", "layer_height": "unknown",
+                 "note": "not chosen by the user yet; Formlabs minimums read here are stated for Form 2, Clear, "
+                         "100 um and are not assumed to apply; run the docs/printing.md checklist in PreForm"}
 CONVERGENCE_TOL = 0.01  # relative volume / extent change default -> fine
 
 
@@ -108,6 +112,7 @@ def main(argv=None) -> int:
     ap.add_argument("--out", default="artifacts/print")
     ap.add_argument("--solver-repo", default=".")
     ap.add_argument("--solver-rev", default=SB.GUILDS_COMMIT)
+    ap.add_argument("--nca-repo", default=None, help="clone holding dx-nca's commit (default: --solver-repo)")
     ap.add_argument("--skip-thickness", action="store_true")
     a = ap.parse_args(argv)
     out = Path(a.out).resolve()
@@ -119,13 +124,20 @@ def main(argv=None) -> int:
            "launch_speed_query_m_s": str(LAUNCH_SPEED), "box_mm": BOX_MM}
 
     bios = F.complete_all()
-    scale = F.display_scale([F.built_extents(s, b) for s, b in zip(F.FORMS, bios)])
-    manifest = {"schema": "frontier.print.manifest/1", "run": run, "display_scale": scale,
-                "display_scale_note": "one scale for all forms (same 0.1 kg biological mass), so sizes compare",
-                "label": F.LABEL, "forms": {}, "files": {}}
+    sets = {}
+    for sid, meta in F.SETS.items():
+        members = [(s, b) for s, b in zip(F.FORMS, bios) if s.set_id == sid]
+        sc, aim = F.display_scale(members)
+        sets[sid] = {"title": meta["title"], "note": meta["note"], "display_scale": sc, "length_aim": aim,
+                     "forms": [s.id for s, _ in members]}
+    manifest = {"schema": "frontier.print.manifest/2", "run": run, "sets": sets,
+                "display_scale_note": "one scale per set, so sizes compare within a set; sets have different masses",
+                "printer_resin": PRINTER_RESIN, "label": F.LABEL, "forms": {}, "files": {}}
     viewer_designs, viewer_meshes = [], []
+    nca_repo = Path(a.nca_repo or a.solver_repo)
 
     for spec, bio in zip(F.FORMS, bios):
+        scale = sets[spec.set_id]["display_scale"]
         # 1. solver judges the biological design point
         m_, S_, b_ = (SB.rational(bio["mass_kg"]["value"]), SB.rational(bio["wing_area_m2"]["value"]),
                       SB.rational(bio["wing_span_m"]["value"]))
@@ -152,7 +164,7 @@ def main(argv=None) -> int:
         conv = convergence(spec, bio, scale)
         solid, built = F.build_prop(spec, bio, scale)
         V, T, weld = mesh_arrays(solid)
-        checks = VAL.check(V, T, BOX_MM, thickness=not a.skip_thickness)
+        checks = VAL.check(V, T, BOX_MM, thickness=not a.skip_thickness, min_wall_mm=MIN_WALL_MM)
         checks["float32_weld"] = weld
         stl = VAL.stl_bytes(V, T, f"Delphi Frontier print form {spec.id}, units mm")
         stl_path = out / "stl" / f"{spec.id}.stl"
@@ -162,7 +174,7 @@ def main(argv=None) -> int:
         hw_at, bottom_at = F.body_section_mm(spec, bio, scale)
         stand_m, stand_info = ST.build_stand(solid, V, T, hw_at, bottom_at)
         SV, STt, sweld = mesh_arrays(stand_m)
-        stand_checks = VAL.check(SV, STt, BOX_MM, thickness=not a.skip_thickness)
+        stand_checks = VAL.check(SV, STt, BOX_MM, thickness=not a.skip_thickness, min_wall_mm=MIN_WALL_MM)
         stand_checks["float32_weld"] = sweld
         stand_path = out / "stl" / f"{spec.id}-stand.stl"
         stand_path.write_bytes(VAL.stl_bytes(SV, STt, f"Delphi Frontier stand for {spec.id}, units mm"))
@@ -178,10 +190,15 @@ def main(argv=None) -> int:
         img_s = out / "img" / f"{spec.id}-on-stand.png"
         render.render([(V, T, (0.32, 0.55, 0.78)), (SV, STt, (0.7, 0.7, 0.66))], img_s, spec.title + " (on stand)")
 
+        sim = None
+        if spec.wing_factors is not None:
+            sim = NCA.controlled_rows(nca_repo, spec.genus, spec.mass_kg, *spec.wing_factors,
+                                      bio["wing_area_m2"]["value"], bio["wing_span_m"]["value"])
         k = 1000 * scale
         design = {
-            "schema": "frontier.print.design/1", "id": spec.id, "title": spec.title, "role": spec.role,
-            "label": F.LABEL, "status_note": spec.status_note or None,
+            "schema": "frontier.print.design/2", "id": spec.id, "title": spec.title, "short": spec.short,
+            "role": spec.role, "set": {"id": spec.set_id, **{kk: sets[spec.set_id][kk] for kk in ("title", "note")}},
+            "label": F.LABEL, "status_note": spec.status_note or None, "printer_resin": PRINTER_RESIN,
             "engineering_status": {
                 "solver": status,
                 "solver_conflict": srun["default"]["conflict"],
@@ -194,6 +211,7 @@ def main(argv=None) -> int:
                 "may_not_say": ["feasible organism", "viable", "evolutionarily reachable", "ancestor",
                                 "flight-tested", "aerodynamically faithful"],
             },
+            "simulation_comparison": sim,
             "biological_design_SI": bio,
             "solver_run": {"path": str(sp.relative_to(out)), "sha256": sha(sp)},
             "glide_candidate": {"path": str(cp.relative_to(out)), "sha256": sha(cp)} if cp else None,
@@ -230,7 +248,11 @@ def main(argv=None) -> int:
         dp = out / "design" / f"{spec.id}.json"
         wjson(dp, design)
         manifest["forms"][spec.id] = {
+            "set": spec.set_id, "display_scale": scale,
             "design": str(dp.relative_to(out)), "solver": status, "glide": glide["status"],
+            "simulation_comparison": None if sim is None else {"evidence_kind": sim["evidence_kind"],
+                                                               "commit": sim["commit"], "rows": len(sim["rows"]),
+                                                               "geometry_matches": sim["geometry_matches"]},
             "valid": checks["ok"], "stand_valid": stand_checks["ok"], "converged": conv["converged"],
             "bounds_mm": checks["bounds_mm"]["size"], "volume_mm3": checks["signed_volume_mm3"],
             "mesh_sha256": checks["mesh_sha256"], "stl_sha256": sha(stl_path)}
@@ -241,19 +263,78 @@ def main(argv=None) -> int:
     wjson(out / "species-graph.json", gj)
     graph.render_graph(out / "img" / "species-graph.png")
     (out / "viewer.html").write_text(viewer.page(viewer_designs, viewer_meshes,
-                                                  (out / "img" / "species-graph.png").read_bytes(), F.LABEL, run, scale))
+                                                  (out / "img" / "species-graph.png").read_bytes(), F.LABEL, run, sets))
+    wjson(out / "downloads.json", downloads(out, viewer_designs, sets, run))
     for p in sorted(out.rglob("*")):
         if p.is_file() and p.name != "manifest.json":
             manifest["files"][str(p.relative_to(out))] = sha(p)
     wjson(out / "manifest.json", manifest)
-    lo_mm, hi_mm = F.PRINT["min_length_mm"]["value"], BOX_MM
-    bad = [k for k, v in manifest["forms"].items() if not (v["valid"] and v["stand_valid"] and v["converged"]
-                                                           and lo_mm <= v["bounds_mm"][0] <= hi_mm)]
-    print(json.dumps({k: {kk: v[kk] for kk in ("solver", "glide", "valid", "stand_valid", "converged", "bounds_mm",
-                                                "volume_mm3", "mesh_sha256")} for k, v in manifest["forms"].items()},
-                     indent=1))
-    print("display_scale", scale, "code_sha256", run["code_sha256"])
+    bad = [k for k, v in manifest["forms"].items() if not form_passes(v, sets[v["set"]]["length_aim"])]
+    print(json.dumps({k: {kk: v[kk] for kk in ("set", "solver", "glide", "valid", "stand_valid", "converged",
+                                                "bounds_mm", "volume_mm3", "mesh_sha256")}
+                      for k, v in manifest["forms"].items()}, indent=1))
+    print("scales", {k: v["display_scale"] for k, v in sets.items()}, "code_sha256", run["code_sha256"])
+    print("FAILED:", bad) if bad else None
     return 1 if bad else 0
+
+
+def form_passes(row: dict, aim: dict) -> bool:
+    """Valid prop and stand, converged, inside the box; at least min_length_mm long whenever a listed scale met
+    the set's length aim (a set where none did carries the reason in the manifest and fails nothing silently)."""
+    length = row["bounds_mm"][0]
+    length_ok = length >= aim["min_length_mm"] if aim["met"] else True
+    return bool(row["valid"] and row["stand_valid"] and row["converged"] and length <= BOX_MM and length_ok)
+
+
+def _check_summary(v: dict) -> dict:
+    w = v.get("wall_thickness") or {}
+    return {"ok": v["ok"], "closed_two_manifold": v["closed_two_manifold"],
+            "consistently_oriented": v["consistently_oriented"],
+            "face_connected_components": v["face_connected_components"],
+            "degenerate_triangles": v["degenerate_triangles"], "signed_volume_mm3": v["signed_volume_mm3"],
+            "genus": v["genus"], "fits_box_mm": v["fits_box_mm"], "fits_box": v["fits_box"],
+            "min_wall_mm_required": v.get("min_wall_mm_required"), "min_wall_ok": v.get("min_wall_ok"),
+            "min_sampled_wall_mm": w.get("min_mm"), "wall_samples": w.get("samples"),
+            "min_wall_scope": v.get("min_wall_scope"), "self_intersection": v["self_intersection"],
+            "mesh_sha256": v["mesh_sha256"]}
+
+
+def downloads(out: Path, designs: list[dict], sets: dict, run: dict) -> dict:
+    """What a site may offer for download: every file with size and sha256, the mesh checks it passed, and the
+    limits that travel with it.  Paths are relative to artifacts/print/."""
+    def entry(kind, rel, units=None):
+        p = out / rel
+        e = {"kind": kind, "path": rel, "bytes": p.stat().st_size, "sha256": sha(p)}
+        return {**e, "units": units} if units else e
+    forms = []
+    for d in designs:
+        f = d["files"]
+        forms.append({
+            "id": d["id"], "short": d["short"], "title": d["title"], "set": d["set"]["id"], "label": d["label"],
+            "solver": d["engineering_status"]["solver"], "glide_sim": d["engineering_status"]["glide"]["status"],
+            "simulation_comparison": None if d["simulation_comparison"] is None else
+            {"evidence_kind": "simulated", "commit": d["simulation_comparison"]["commit"],
+             "path": d["simulation_comparison"]["path"]},
+            "display_scale": d["prop_mm"]["display_scale"], "biological_mass_kg": d["prop_mm"]["biological_mass_kg"],
+            "prop_size_mm": d["validation"]["bounds_mm"]["size"],
+            "files": [entry("stl_prop", f["stl"]["path"], "mm"), entry("stl_stand", d["stand"]["stl"]["path"], "mm"),
+                      entry("glb_prop", f["glb"]["path"], "mm"), entry("png_prop", f["image"]["path"]),
+                      entry("png_on_stand", f["image_on_stand"]["path"]),
+                      entry("design_json", f"design/{d['id']}.json")],
+            "prop_checks": _check_summary(d["validation"]),
+            "stand_checks": _check_summary(d["stand"]["validation"]),
+        })
+    return {"schema": "frontier.print.downloads/1", "code_sha256": run["code_sha256"], "base": "artifacts/print/",
+            "sets": sets, "printer_resin": PRINTER_RESIN, "forms": forms,
+            "viewer": entry("html_viewer", "viewer.html"),
+            "limitations": [
+                "Printer and resin are unknown; nothing has been sliced, loaded into PreForm or printed.",
+                "Minimum wall (>= 1.0 mm, our provisional prop choice, not a certified setting) is checked on "
+                "sampled faces only; a thinner region between samples can be missed.",
+                "Closed, oriented, single-component manifold, positive volume and box fit are checked on every "
+                "file; global self-intersection is not checked.",
+                "Fins are thickened print plates, not biological thickness; no aerodynamic fidelity is claimed.",
+                "Engineered illustrative forms: not ancestors, viable organisms or demonstrated evolutionary paths."]}
 
 
 if __name__ == "__main__":
