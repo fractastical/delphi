@@ -1,0 +1,39 @@
+{
+  "claim_id": "wolfram2002-ch11-07",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch11-07",
+  "project": "wolfram-nks",
+  "status": "preregistered",
+  "hypothesis": "The explicit cellular-automaton constructions Wolfram publishes for emulating mobile automata, Turing machines, neighbour-independent substitution systems, register machines and logic circuits (NKS notes pp. 1111-1112) reproduce the evolution of every instance of those systems exactly, under the decoding implied by each construction.",
+  "pass_criterion": "Pre-registered. Five system types are tested with the rule lists given in the NKS notes, transcribed into analysis.py (first matching rule wins, as in Mathematica). (1) Mobile automata (MAToCA, 4 colours, range 2): all 65536 two-colour mobile automata in Wolfram's {colours, displacements} numbering, from the all-white initial condition and from one seeded random initial condition each; 60 steps; exact if at every step the CA colours mod 2 equal the mobile automaton's cells and the unique dark cell sits at the active position. (2) Turing machines (TMToCA, k(s+1) colours, range 1): all 4096 machines with s = 2, k = 2 and 4096 seeded random machines for each of (s,k) = (3,2), (2,3), (4,2), (3,3), each from a blank tape and from a seeded random tape; 60 steps; exact if tape, head position and head state agree at every step. (3) Substitution systems (SSToCA, 12 colours): all 36 neighbour-independent systems on {0,1} whose two blocks have length 1 or 2, from initial strings {0} and {1}; the CA is run until it has produced 8 'sweep-start' configurations (exactly one r cell, no p or m[0|1] cells), whose decoded strings must equal the substitution system's strings at steps 0..7; a run exceeding 3000 CA steps or reaching the array edge counts as not exact. (4) Register machines (RMToCA, m+7 colours): 300 seeded random programs with m = 2..6 instructions over two registers (i[r], d[r,q]) and initial registers a, b in 0..3, keeping only programs that run at least 20 steps without halting (the construction has no colour for a program counter past the end); the sequence of distinct decoded CA states (program-counter colour, r1 = #(m+2) + 2#(m+3), r2 = #(m+5) + 2#(m+6)) must equal the register machine's trajectory for up to 40 steps. Both the published construction and a one-rule repair described below are run. (5) Logic circuits (the 5-colour rule of p. 1112): 400 seeded random And/Or/Not expressions of depth <= 4 over constants, encoded with the published initial-condition rule and run for the published number of steps; exact if the final configuration has a single non-zero cell equal to 2 for false and 4 for true. The measured value is the number of system types (out of 5) for which 100% of tested instances are emulated exactly, using for register machines the repaired construction. The claim PASSES if the value is 5 and additionally at least 4 of the 5 published constructions are exact as printed.",
+  "fail_criterion": "Pre-registered. If some system type has fewer than 95% exact instances even with the repaired construction the verdict is 'inconclusive' (a failing construction does not show that no construction exists, so an existence claim cannot be refuted this way; reason: construction-failure). If every type is >= 95% but not all are 100%, or if two or more of the published constructions are not exact as printed, the verdict is 'mixed'.",
+  "planned_datasets": ["nks-emulation-constructions", "emulation-test-instances"],
+  "interpretation": "The claim is existential ('cellular automata can be set up to emulate ...'). The strongest finite test is to take the constructions the book itself supplies, run them against independent direct simulations of each emulated system, and look for counterexamples. Sequential substitution systems, tag systems, the multiplication CA, the RAM emulation and 'a practical computer' are not tested (the first two constructions use symbolic cell states whose decoding is not specified; the last is schematic), so a pass covers five of the eight named system types. Calibration before this pre-registration, disclosed here: the book's own examples (mobile automaton {35,57}, the 3-state Turing machine of p. 78, the substitution system {1 -> 10, 0 -> 01}, the register machine program of p. 99 and eight hand-written logic expressions) were used to fix the decodings. In that calibration the published register-machine construction failed on 14 of 60 and then 26 of 150 random programs. Tracing showed the cause: when an increment instruction fires while the register's only remaining cell is a pending-decrement signal (colour m+1 with background to its left, i.e. register value 0 whose deletion is still in flight), the published rule {_, _, p} -> m+3 converts the signal into an increment signal (worth two cells) instead of one cell. The repair adds one rule per increment instruction, {0, m+1, p} -> m+2 for i[1] and {p, m+4, 0} -> m+5 for i[2], placed before the published rules; 150/150 calibration programs were then exact. The main run uses a fresh seed.",
+  "datasets": [
+    {
+      "id": "nks-emulation-constructions",
+      "name": "Wolfram, A New Kind of Science, notes to 'Emulating Other Systems with Cellular Automata' (MAToCA, TMToCA, SSToCA, RMToCA, logic-circuit rule)",
+      "landing_url": "https://www.wolframscience.com/nks/notes-11-5--mobile-automata-from-cellular-automata/",
+      "doi": null,
+      "version": "online edition as retrieved 2026-10-31",
+      "license": "copyright Stephen Wolfram LLC; rule lists transcribed for research",
+      "files": [],
+      "role": "the constructions under test, transcribed into analysis.py"
+    },
+    {
+      "id": "emulation-test-instances",
+      "name": "Mobile automata, Turing machines, substitution systems, register machine programs and logic expressions (generated by analysis.py)",
+      "landing_url": "https://www.wolframscience.com/nks/p656--emulating-other-systems-with-cellular-automata/",
+      "doi": null,
+      "version": "generator in analysis.py; numpy default_rng seed 20261034",
+      "license": "generated data",
+      "files": [],
+      "role": "instances whose direct evolution is compared with the decoded CA evolution"
+    }
+  ],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/wolfram-nks-claim-tests-106e", "date": "2026-10-31" }
+}
