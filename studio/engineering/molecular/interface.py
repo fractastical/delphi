@@ -22,13 +22,13 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def molecular_model():
     paths = [
-        "artifacts/molecular/protocol.json",
-        "artifacts/molecular/cpu-trajectory-final/producer-run.py",
+        "artifacts/molecular/protocol-reference-oracle.json",
+        "engineering/molecular/run.py",
     ]
     files = {name: sha(ROOT / name) for name in paths}
-    scope = "Synthetic 1K6F modeled collagen-mimetic trimer;87residues;ff14SB/TIP3P;CPU setup trajectory only"
+    scope = "Synthetic 1K6F collagen mimetic; 87 residues; ff14SB/TIP3P; CPU setup and three CUDA 100ps trajectories"
     provenance = Provenance(
-        "Actual saved OpenMM CPU trajectory metrics and exact source snapshot",
+        "Actual saved OpenMM CPU/CUDA trajectory metrics, exact source and input pins",
         "simulated",
         "file",
     )
@@ -41,7 +41,7 @@ def molecular_model():
             "nm",
             dim(m=1),
             "molecular",
-            "300K target;0.1ps preliminary thermalization +0.2ps production;no equilibrium claim",
+            "300K target; CUDA 10ps preliminary thermalization +100ps production per seed; no equilibrium claim",
             scope,
             provenance,
             None,
@@ -63,12 +63,12 @@ def molecular_model():
     return ModelSpec(
         "collagen_mimetic_md",
         "Collagen-mimetic atomistic MD (computed)",
-        "OpenMM8.4 CPU",
+        "OpenMM8.4 CPU and H100 CUDA mixed precision",
         "implemented",
         {
             "repo": "kganjam/delphi-frontier",
             "branch": "work/multiscale-md",
-            "commit": "5a4b6fa",
+            "commit": "31e6c23",
             "path": ",".join(paths),
             "files": files,
             "source_sha256": tree_sha256(files),
@@ -77,7 +77,7 @@ def molecular_model():
         Timescale(
             "unknown",
             None,
-            "0.2ps trajectory duration is not a physical relaxation-time estimate",
+            "100ps trajectory duration is not a physical relaxation-time estimate",
         ),
         scope,
         (
@@ -91,9 +91,11 @@ def molecular_model():
             "fish function",
         ),
         {
-            "receipt": "artifacts/molecular/cpu-trajectory-final/receipt.json",
-            "protocol": "artifacts/molecular/protocol.json",
-            "controls": "artifacts/molecular/cpu-controls/controls.json",
+            "receipt": "artifacts/molecular/cuda-v2/production/receipt.json",
+            "protocol": "artifacts/molecular/protocol-reference-oracle.json",
+            "controls": "artifacts/molecular/cuda-v2/cpu-controls/controls.json",
+            "CPU_CUDA_parity": "artifacts/molecular/cuda-v2/cpu-cuda-parity.json",
+            "seed_variation": "artifacts/molecular/cuda-analysis/ensemble.json",
             "measured_biological_data": None,
         },
     )

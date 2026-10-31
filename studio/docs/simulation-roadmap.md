@@ -2,8 +2,8 @@
 
 The first new atomistic result is an **actual OpenMM simulation of the experimental
 1K6F collagen-mimetic triple helix**. Its CPU numerical controls passed; its short
-CPU trajectory and movie exist. The three-seed CUDA job has been submitted by the
-infra owner, not yet returned at this checkpoint. Execution state and biological
+CPU trajectory and movie exist. The three-seed CUDA job completed on an H100 after the first attempt stopped at
+a numerical measurement gate; both attempts and the justified repair are retained. Execution state and biological
 applicability are separate fields in the [model index](../artifacts/molecular/model-index.json).
 The table below is a queue, not a claim that every simulator has been installed.
 
@@ -66,7 +66,7 @@ until their pinned receipts are inspected. Existing models should be reused.
 
 | Priority / model | Biological scope and actual inputs | Coupling ports; missing bridge | Compute / setup / readiness |
 |---|---|---|---|
-|1 OpenMM1K6F MD | Synthetic collagen-mimetic structure, ff14SB/TIP3P, explicit assumptions | Atom positionsnm, Cα RMSDnm, chain distancesnm; no fibril/tissue law | CPU control complete;1 H100 job submitted; setup done |
+|1 OpenMM1K6F MD | Synthetic collagen-mimetic structure, ff14SB/TIP3P, explicit assumptions | Atom positionsnm, Cα RMSDnm, chain distancesnm; no fibril/tissue law | CPU and H100 CUDA runs complete; setup done |
 |2 [Morpheus cell-cycle example](https://morpheus.gitlab.io/courses/multiscale-models/example/) | Source ODE→CPM division→cytokine PDE→ODE loop | CDK1/APC, cell shapes/division, local cytokine; source model units are not fish calibration | CPU; moderate setup; claude06 owns baseline/feedback knockout |
 |3 [BETSE](https://github.com/betsee/betse) | Ion concentrations, channels, pumps, gap junctions,2D tissue geometry | VmV, concentrationmol/m³, junction current; channel density and fish tissue geometry missing | CPU; moderate setup; dx-market-r1 owns control/intervention |
 |4 [Zebrafish-GEM](https://github.com/SysBioChalmers/Zebrafish-GEM) | Actual generic Danio SBML, exchange bounds and objective | O₂/ATP/biomass fluxmmol/gDW/h; biomass is not fish growth, flux is not ATP concentration | CPU LP; low–moderate setup; claude11 owns FBA |
@@ -99,7 +99,7 @@ infra owner serializes GPU use and records actual job IDs, image digests and spe
 
 | Order / scientific question | Inputs and paired intervention | Numerical gate | Measurable result / artifacts / resource cap |
 |---|---|---|---|
-|Now: does the actual molecular system run consistently onCUDA? | Frozen1K6F packet; same generated System/State onCPU andCUDA;3seeds | Frozen CPU gradient/sign/NVE checks; forceL2 relative<0.002 and energy error/atom<0.01kJ/mol before production |100 ps/seed coordinates, RMSD/end distances/temperature traces; inputXML,NPZ,JSON,MP4;1 H100,1500 s workload cap,16 MB output parts; infra job receipt controls truth |
+|Completed: does the molecular system run consistently on CUDA? | Frozen1K6F packet; same generated System/State onCPU andCUDA;3seeds | Frozen CPU gradient/sign/NVE checks; forceL2 relative<0.002 and energy error/atom<0.01kJ/mol before production |100 ps/seed coordinates, RMSD/end distances/temperature traces; inputXML,NPZ,JSON,MP4;1 H100,1500 s workload cap,16 MB output parts; infra job receipt controls truth |
 |Next: does a genuine intracellular/tissue feedback link change division dynamics? | Morpheus source example versus disabled cytokine→cell-cycle term, same initial state/seeds | ODE tolerance and timestep comparison; PDE diffusion control; cell/field bookkeeping; retain model-unit limits | Cell counts/division times and cytokine fields, paired differences; XML/CSV/frames/MP4; CPU 2 threads,600 s initial cap; claude06 |
 |Next: do gap junctions transmit an imposed local ionic perturbation? | BETSE baseline versus blocked junction conductance, fixed geometry/channels/pump setup | Charge/ion balance where appropriate, no-coupling control, timestep refinement; actual simulator constraints retained | Vm spreadmV, ionic balances, propagation/relaxation time; YAML/CSV/NPZ/movie; CPU 2 threads,600 s first slice; dx-market-r1 |
 |Next: how does oxygen availability constrain model ATP support? | Exact Zebrafish-GEM SBML, bounded oxygen exchanges, fixed medium; objective/treatment separated | LP optimality, Sv residual, bound satisfaction, infeasible cases retained, ATP/biomass objective distinctions | Feasible ATP/biomass flux envelopes, alternate-optimum/FVA ranges if supported; SBML hash/fluxCSV/JSON; CPU 2 threads,600 s; claude11 |
@@ -157,5 +157,37 @@ The complete repaired control run on the recovered preparation passed: gradient
 error 8.52e-5, full-vector discrepancy 4.60e-5 and NVE drift ratios 0.001411 and
 0.0003601. This repairs the precision of a numerical measurement, not the physical
 model or its empirical validity. No acceptance was relaxed. The first failed job
-is not relabeled as a pass. A subsequent CUDA run still needs its own passing
-same-system CPU/CUDA gate and actual trajectory receipt.
+is not relabeled as a pass. At that checkpoint, a subsequent CUDA run still needed its own passing
+same-system CPU/CUDA gate and actual trajectory receipt; the completed result is
+recorded below.
+
+## Actual CUDA result returned
+
+The justified retry `aijob-e00h8rra7x8ams6jyn` completed all three 100 ps production
+runs on an NVIDIA H100 80GB HBM3 with CUDA mixed precision, after 10 ps preliminary
+thermalization each. I independently verified all 20 returned job-file SHA256
+values. The same-system CPU/CUDA comparison passed: energy difference per atom
+1.394e-5 kJ/mol and relative force L2 difference 2.015e-5, against the unchanged
+0.01 and 0.002 limits. Remote Reference force-gradient and paired NVE checks passed.
+Production took approximately 18 seconds per seed; installation, preparation,
+controls and result return are separate costs.
+
+Each trajectory contains 101 actual heavy-atom coordinate frames. Final aligned
+Cα RMSD from each run's own production start was 0.14648, 0.14659 and 0.16546 nm;
+the descriptive sample SD is 0.01093 nm over these three shared-model seeds.
+Last-20%-window kinetic temperature means were 300.01, 300.10 and 301.44 K.
+The short trajectories do not establish an equilibrated conformational ensemble,
+a molecular/tissue modulus, or native fish performance. No biological success
+probability is assigned.
+
+[CUDA actual-state video](../artifacts/molecular/cuda-render/trajectory.mp4),
+[poster](../artifacts/molecular/cuda-render/poster.png),
+[three-seed traces](../artifacts/molecular/cuda-analysis/ensemble.png),
+[descriptive analysis](../artifacts/molecular/cuda-analysis/ensemble.json),
+[full simulation receipt](../artifacts/molecular/cuda-v2/production/receipt.json),
+[backend parity](../artifacts/molecular/cuda-v2/cpu-cuda-parity.json),
+[regional-assurance-compatible vector](../artifacts/molecular/design-assurance.json).
+The first failed attempt remains distinct. A longer conditional continuation is
+being proposed because the 100 ps structural traces still exhibit slow drift;
+that observation is not evidence for organism function or an invitation to infer
+material constants from RMSD.

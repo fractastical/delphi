@@ -208,3 +208,50 @@ def test_descriptive_seed_analysis_and_render_retain_actual_backend_and_pins():
     )
     for name, digest in receipt["outputs"].items():
         assert hashlib.sha256((render / name).read_bytes()).hexdigest() == digest
+
+
+def test_actual_cuda_result_three_nonempty_pinned_runs_and_backend_parity():
+    folder = ROOT / "artifacts/molecular/cuda-v2"
+    receipt = json.loads((folder / "production/receipt.json").read_text())
+    assert len(receipt["runs"]) == 3
+    assert {run["seed"] for run in receipt["runs"]} == {1731, 1732, 1733}
+    assert all(
+        run["backend"] == "CUDA"
+        and run["production_ps"] == 100
+        and run["frames"] == 101
+        for run in receipt["runs"]
+    )
+    assert all(
+        "H100" in run["platform_properties"]["DeviceName"] for run in receipt["runs"]
+    )
+    for name, digest in receipt["files"].items():
+        assert (
+            hashlib.sha256((folder / "production" / name).read_bytes()).hexdigest()
+            == digest
+        )
+    parity = json.loads((folder / "cpu-cuda-parity.json").read_text())
+    assert parity["passed"]
+    assert parity["energy_abs_difference_kJ_mol_per_atom"] < 0.01
+    assert parity["force_relative_L2_difference"] < 0.002
+    summary = json.loads(
+        (ROOT / "artifacts/molecular/cuda-analysis/ensemble.json").read_text()
+    )
+    assert summary["descriptive_endpoint_CA_RMSD_nm"]["n_runs"] == 3
+    assert summary["descriptive_endpoint_CA_RMSD_nm"]["sample_SD"] > 0
+    assert summary["biological_success_probability"] is None
+
+
+def test_molecular_assurance_keeps_empirical_and_functional_robustness_unknown():
+    assurance = json.loads(
+        (ROOT / "artifacts/molecular/design-assurance.json").read_text()
+    )
+    assert assurance["vector"]["numerical_fidelity"]["status"] == "checked_in_scope"
+    for name in ("empirical_validation", "cross_scale_transfer", "ensemble_robustness"):
+        assert assurance["vector"][name]["status"] == "unknown"
+    assert assurance["biological_success_probability"] is None
+    for axis in assurance["vector"].values():
+        for item in axis["evidence"]:
+            assert (
+                hashlib.sha256((ROOT / item["path"]).read_bytes()).hexdigest()
+                == item["sha256"]
+            )

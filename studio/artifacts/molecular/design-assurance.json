@@ -1,0 +1,82 @@
+{
+  "schema": "frontier.design-assurance/1",
+  "region_ids": [],
+  "scale_anchor": "flying-fish:molecular",
+  "vector": {
+    "formal_properties": {
+      "status": "not_attempted",
+      "summary": "No formal theorem about the molecular trajectory or biological transfer",
+      "evidence": [],
+      "scope": "formal proof"
+    },
+    "numerical_fidelity": {
+      "status": "checked_in_scope",
+      "summary": "Reference derivative/sign control, paired1fs/0.5fs50fsNVE and same-systemCPU/CUDAforce+energy parity passed",
+      "evidence": [
+        {
+          "path": "artifacts/molecular/cuda-v2/cpu-controls/controls.json",
+          "sha256": "1408f8cdca33823c661beef2bad4357046334dad22c3ffbbb729912f3023d69a",
+          "selector": "$"
+        },
+        {
+          "path": "artifacts/molecular/cuda-v2/cpu-cuda-parity.json",
+          "sha256": "61d2907d1177f5bf379eb6864e1455f5a797ca027abea59fd8bacdd7c921e98d",
+          "selector": "$"
+        }
+      ],
+      "scope": "One force-gradient component/full-vector backend comparison and short NVE check; not global100ps trajectory accuracy"
+    },
+    "empirical_validation": {
+      "status": "unknown",
+      "summary": "No held-out molecular dynamics or mechanical assay; crystal coordinates are starting input, not independent validation",
+      "evidence": [],
+      "scope": "Synthetic motif only, not fish tissue calibration"
+    },
+    "parameter_coverage": {
+      "status": "declared_ensemble",
+      "summary": "Three velocity/thermostat seeds at one assumed300K/0.1M condition, sharing one structure and Hamiltonian",
+      "evidence": [
+        {
+          "path": "artifacts/molecular/cuda-analysis/ensemble.json",
+          "sha256": "a87297f8ecbb5fbfebbafc82ee0ab679912f5274c2ddf9edf128b72b8ae31e08",
+          "selector": "$"
+        }
+      ],
+      "scope": "Descriptive seed spread; no native fish population or force-field coverage"
+    },
+    "cross_scale_transfer": {
+      "status": "unknown",
+      "summary": "Molecular chain distance cannot set fin EI without fibril/tissue constitutive calibration",
+      "evidence": [
+        {
+          "path": "artifacts/molecular/cross-scale-gate.json",
+          "sha256": "400fe47def92dc41bb40cbf891c29acb5de7b76d923b900496e3020500c4e966",
+          "selector": "$.couplings[0].verdict"
+        }
+      ],
+      "scope": "Synthetic motif only, not fish tissue calibration"
+    },
+    "ensemble_robustness": {
+      "status": "unknown",
+      "summary": "No predeclared functional success predicate; three actual seed trajectories are not a biological-success fraction",
+      "evidence": [
+        {
+          "path": "artifacts/molecular/cuda-analysis/ensemble.json",
+          "sha256": "a87297f8ecbb5fbfebbafc82ee0ab679912f5274c2ddf9edf128b72b8ae31e08",
+          "selector": "$"
+        }
+      ],
+      "scope": "Synthetic motif only, not fish tissue calibration"
+    }
+  },
+  "dimensions": [
+    "formal_properties",
+    "numerical_fidelity",
+    "empirical_validation",
+    "parameter_coverage",
+    "cross_scale_transfer",
+    "ensemble_robustness"
+  ],
+  "biological_success_probability": null,
+  "region_membership": "No anatomically calibrated region mapping for this synthetic motif"
+}
