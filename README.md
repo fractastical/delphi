@@ -62,7 +62,7 @@ Before building, publishing, or querying nanopubs, read [BEST_PRACTICES.md](BEST
 
 - **Project Delphi Ontology**: [fractastical/project-delphi-ontology](https://github.com/fractastical/project-delphi-ontology)
   - Open pull requests: [project-delphi-ontology/pulls](https://github.com/fractastical/project-delphi-ontology/pulls)
-- **Project Delphi nanopubs**: [knowledgepixels/project-delphi-nanopubs](https://github.com/knowledgepixels/project-delphi-nanopubs)
+- **Project Delphi Nanopubs skills**: [knowledgepixels/project-delphi-nanopubs](https://github.com/knowledgepixels/project-delphi-nanopubs)
   - Agent skills: [`skills/`](https://github.com/knowledgepixels/project-delphi-nanopubs/tree/main/skills), in the open [Agent Skills](https://agentskills.io) format. The [`delphi`](https://github.com/knowledgepixels/project-delphi-nanopubs/blob/main/skills/delphi/SKILL.md) skill sets out the ontology terms, the claim and evidence item templates every record must use, and the rules records follow.
 
 ## Querying nanopubs
@@ -100,7 +100,7 @@ See the [nanopub-query repository](https://github.com/knowledgepixels/nanopub-qu
 
 ### Libraries and tooling
 
-- [nanopub-py](https://github.com/fair-workflows/nanopub): Python library for searching, fetching, and publishing nanopubs.
+- [nanopub-py](https://github.com/Nanopublication/nanopub-py): Python library for searching, fetching, and publishing nanopubs.
 - [nanopub-java](https://github.com/Nanopublication/nanopub-java): Java library and CLI.
 - [Nanopub registry](https://github.com/knowledgepixels/nanopub-registry): the decentralized registry that stores and serves nanopubs.
 
