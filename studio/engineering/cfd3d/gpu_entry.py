@@ -156,11 +156,15 @@ def main() -> int:
     rc = rc or run([str(gv / "bin/python"), "-I", "-c",
                     "import sys; sys.path.insert(0, sys.argv[1]); from engineering.fish3d.build import main; "
                     "sys.exit(main(['--out', sys.argv[2]]))", str(JOB / "fish3d_src"), str(gout)], 600,
-                   log_to=OUT / "logs/fish3d_build.log")
+                   env=dict(os.environ, **PK["geometry"]["numpy_env"]), log_to=OUT / "logs/fish3d_build.log")
     pins, got, cand = PK["geometry"]["stl_sha256"], {}, None
     gdir = WORK / "geometry"
     if rc == 0:
         built = next(gout.iterdir())
+        (OUT / "geometry").mkdir(parents=True, exist_ok=True)
+        for f in ("candidate.json", "components.json", "build.json"):   # always returned, pass or fail
+            if (built / f).exists():
+                shutil.copy(built / f, OUT / "geometry" / f)
         gdir.mkdir(exist_ok=True)
         shutil.copy(built / "components.json", gdir / "components.json")
         for k in pins:
@@ -170,7 +174,8 @@ def main() -> int:
                 shutil.copy(src, gdir / f"{k}.stl")
         cand = json.loads((built / "components.json").read_text())["candidate_sha256"]
     ok = rc == 0 and got == pins and cand == PK["geometry"]["candidate_sha256"]
-    if not stage("geometry", ok, rc=rc, candidate=cand, mismatched=[k for k in pins if got.get(k) != pins[k]],
+    if not stage("geometry", ok, rc=rc, candidate=cand, numpy_env=PK["geometry"]["numpy_env"],
+                 mismatched=[k for k in pins if got.get(k) != pins[k]],
                  tail=tail(OUT / "logs/fish3d_build.log", 4) if rc else ""):
         return finish(3)
     # 4. julia env from exact pins, digest-checked against the local Manifest

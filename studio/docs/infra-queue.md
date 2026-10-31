@@ -31,9 +31,27 @@ preserved and no new sequence-generation request is being routed elsewhere.
   one-thread arms continue the original full horizon; earlier local partials remain.
 - [x] Integrate GPUops' frozen cylinder interpretation and corrected field videos.
   Cylinder numeric gates passed; the literature bands remain source-unverified.
-- [ ] Collect the Morpheus full-horizon or explicitly partial result.
-- [ ] Dispatch the forthcoming controlled 3D WaterLily packet after its packaging,
-  runtime and status contracts are frozen. The failed physical reference stays visible.
+- [x] Collect all three Morpheus arms through the full t=2 horizon. Thirteen
+  output hashes matched; final cell counts were 256, 128 and 263. The first
+  wrapper failure remains distinct from the successful recovery attempt.
+- [x] Dispatch the controlled 3D WaterLily packet after its packaging, runtime
+  and status contracts were frozen. It stopped at the candidate metadata hash:
+  all twelve STL hashes matched, but candidate JSON differed. No CFD ran.
+- [x] Diagnose the exact metadata difference on remote CPU: NumPy AVX-512
+  dispatch changes three float64 widths by one or two ULPs. Disabling that
+  dispatch reproduces the original hash. No geometry gate is relaxed.
+- [x] Admit repaired CFD packet7abfc640 at15:45:57PDT with the frozen
+  geometry-only SIMD setting.
+  The failed physical sphere reference remains visible independently.
+- [x] Dispatch the conditional RD diffusion training pilot at 15:36:40 PDT.
+  The frozen CUDA control must pass before training and held-out evaluation.
+- [ ] Recover the trained checkpoint, hold-out results and baseline/null comparisons.
+- [x] Queue a CPU-only diagnostic for the 3D candidate hash mismatch; preserve
+  the exact GPU failure and all three full candidate JSON variants.
+- [x] Admit three900ps MD branches at15:45:34PDT after publicHTTP200 and
+  exactarchiveSHA. Frozen question measures remaining structural drift,
+  not equilibrium or a tissue modulus.
+- [ ] Collect MD extensions and repaired CFD outputs; preserve failed/null gates.
 
 The angle batch requires a passing parity check in the same allocation. Its
 subsequent workloads reject a missing or failed gate. The original 3 MB return

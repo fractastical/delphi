@@ -1,0 +1,19 @@
+{
+  "queue_id": "infra-collagen-md-conditional-v3",
+  "max_wall_s": 1800,
+  "margin_s": 60,
+  "max_part_bytes": 16000000,
+  "workloads": [
+    {
+      "id": "collagen-md-v3-900ps-branches",
+      "argv": [
+        "python3",
+        "-I",
+        "-c",
+        "from pathlib import Path; import shutil,runpy; Path('inputs/molecular').mkdir(parents=True,exist_ok=True); shutil.copyfile('artifacts/molecular/portable-md-v3.tar.xz','inputs/molecular/portable-md.tar.xz'); shutil.copyfile('artifacts/molecular/portable-md-v3.json','inputs/molecular/portable-md.json'); runpy.run_path('engineering/molecular/entry.py',run_name='__main__')"
+      ],
+      "timeout_s": 1500,
+      "max_part_bytes": 16000000
+    }
+  ]
+}
