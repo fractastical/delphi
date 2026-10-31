@@ -294,6 +294,39 @@ def _vid(ins, out, vid, src_dir, fname, declared, bytes_declared=None):
     return "present_verified", f"artifacts/simulations/{vid}/{fname}"
 
 
+def build_timeline(ins: Inputs) -> dict | None:
+    """Evidence-linked record of how the work ran: dated live checks, model-usage windows, GPU telemetry windows, provider launch outcomes
+    and preregistered result verdicts. Every row names the file and its sha256; undated rows are listed apart, spend stays unknown."""
+    ri = "results/resources/resource-inventory.json"
+    if not (ROOT / ri).exists():
+        return None
+    R = json.loads(ins.read(ri)); rows = []; sha = lambda path: ins.seen[path]["sha256"] if path in ins.seen else None
+    add = lambda t, kind, title, outcome, path, ok=None, scope="", digest=None: rows.append({"time": t, "kind": kind, "title": title, "outcome": outcome, "ok": ok, "path": path, "sha256": digest or sha(path), "scope": scope})
+    for f in sorted((ROOT / "deploy/receipts").glob("*.json")):
+        path = f"deploy/receipts/{f.name}"; d = json.loads(ins.read(path)); ch = d.get("checks", [])
+        npass = sum(1 for c in ch if c.get("passed")); target = d.get("base") or d.get("endpoint") or "public node"
+        add(d["checked_at"], "live check", f.stem.replace("-", " ") + " (" + target + ")", f"{npass} of {len(ch)} checks passed", path, npass == len(ch), d.get("scope", ""))
+    for k, u in R["model_usage"].items():
+        if isinstance(u, dict) and u.get("window_utc"):
+            out = ", ".join(f"{n.replace('_', ' ')} {u[n]}" for n in ("documents_embedded", "embedding_requests", "failed_requests", "calls", "input_tokens", "output_tokens_including_thinking") if n in u)
+            add(u["window_utc"][0], "model usage", f"{u.get('provider', 'provider')} {u.get('model', k.replace('_', ' '))}", out + f"; window {u['window_utc'][0]} to {u['window_utc'][1]}", u["receipt"], u.get("failed_requests", 0) == 0 if "failed_requests" in u else None, u["usage_scope"], u.get("sha256"))
+    for t in R["historical_gpu_telemetry"]:
+        add(t["window_utc"][0], "GPU telemetry", t["task_label"], f"{t['samples']} samples at {t['sample_period_ms']} ms; GPU utilisation mean {t['gpu_utilization_pct_mean']}%, max {t['gpu_utilization_pct_max']}%; memory max {t['gpu_memory_used_mib_max']} of {t['gpu_memory_total_mib']} MiB", t["source"], None, "A sampled historical window, not current utilisation.", t.get("sha256"))
+    dated_only = []
+    for f in sorted((ROOT / "results").glob("20*.md")):
+        path = f"results/{f.name}"; t = ins.text(path); date = f.name[:10]
+        head = next((l for l in t.splitlines() if l.startswith("**")), ""); title = next((l[2:].strip() for l in t.splitlines() if l.startswith("# ")), f.name)
+        dated_only.append({"title": title, "outcome": re.sub(r"\*+", "", head).strip()[:260], "ok": None, "path": path, "sha256": sha(path), "date": date})
+    rows.sort(key=lambda r: r["time"])
+    po = json.loads(ins.read("results/resources/provider-outcome.json")); n = po["nebius"]; g = po["google_compute"]
+    undated = dated_only + [{"title": "Nebius CPU worker request (" + po["task"] + ")", "outcome": f"{n['result']} on quota {n['quota']}: limit {n['limit']}, aggregate requested {n['aggregate_requested']}; no job created", "ok": False, "path": "results/resources/provider-outcome.json", "sha256": sha("results/resources/provider-outcome.json")},
+        {"title": "Google compute enable", "outcome": f"{g['error']} ({g['reason']}); no VM created", "ok": False, "path": "results/resources/provider-outcome.json", "sha256": sha("results/resources/provider-outcome.json")}]
+    N = R["compute"]["nebius"]
+    return {"observed_at": R["observed_at"], "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
+        "unknown": [R["cost"]["interpretation"], "Total provider LLM usage: " + str(R["model_usage"].get("total_provider_llm_usage", "unknown")), "Utilisation of currently allocated GPUs is unknown until sampled."],
+        "limitations": R["scope"]["limitations"], "inventory": ri, "inventory_sha256": sha(ri)}
+
+
 def home_biology(ins: Inputs) -> dict | None:
     """Sourced anatomy and parameter provenance for the Home page: per-component parameter statuses from the fish3d candidate, the
     fitted relations with their context, and the evidence categories kept separate. Nothing is combined into one count of laws."""
@@ -687,6 +720,7 @@ def build() -> dict[str, bytes]:
     design_review = ins.json("site/content/design-review.json")
     lifecycle = lifecycle_block(ins)
     home_biology_block = home_biology(ins)
+    timeline = build_timeline(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -716,6 +750,7 @@ def build() -> dict[str, bytes]:
         "design_review": design_review,
         "lifecycle": lifecycle,
         "home_biology": home_biology_block,
+        "timeline": timeline,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),

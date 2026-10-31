@@ -876,3 +876,16 @@ def test_home_leads_with_sourced_anatomy_assumptions_and_the_actual_candidate(br
     assert pg.evaluate("document.querySelector('.lede').getBoundingClientRect().width") <= 900
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
     assert pg.locator("svg.mark").count() == 1
+
+
+def test_system_built_tab_links_evidence_keeps_failures_and_labels_the_repo_private(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=built")
+    pg.wait_for_selector("#bt-h")
+    t = pg.locator("#main").text_content()
+    assert "private until the operator confirms it is public" in t and "github.com/kganjam/delphi-frontier" in t
+    assert "ResourceExhausted" in t and "UREQ_TOS_NOT_ACCEPTED" in t and "INCONCLUSIVE" in t and "POSITIVE" in t
+    assert "actual spend" in t.lower() or "Unknown" in t
+    assert pg.locator("tbody tr").count() >= 13
+    assert pg.locator(".tablewrap td:has-text('preregistered')").count() == 0   # date-only verdicts are not placed on the dated timeline
+    assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
