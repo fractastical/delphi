@@ -1,6 +1,6 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 03:32PM PDT.
+Coordinator: codex-03. Updated October 31, 2026, 03:50PM PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-008 define acceptance. This board supersedes the earlier 1:48pm snapshot.
 Every status distinguishes implementation, integration, publication and biological validation.
@@ -11,7 +11,7 @@ Every status distinguishes implementation, integration, publication and biologic
 | P0 | Studio, readable claims, graph and semantic search | claude-02 + codex-03 | Public Studio release deployed; exact-pin/browser checks and13 deployed checks passed; independent critique recheck underway |
 | P0 | Live vector index | dx-submit | 2444 public record/artifact documents embedded,49 Gemini requests; pgvector index live; ten-minute bounded refresh installed; API integration tested |
 | P0 | Generic Project and anchored Annotation | guilds completed; codex-03 integrates | Migration applied after backup; old-version/hash tests passed; live project import and authenticated annotation UI pending |
-| P0 | Remote public-read/authenticated-write MCP | native mechanobio worker + codex-03 | Published https://frontier.morphoswarm.ai/mcp; officialSDK12 production checks passed; public reads, individual credentials for writes; receipt deploy/receipts/mcp-public-check.json |
+| P0 | Remote public-read/authenticated-write MCP | native mechanobio worker + codex-03 | Published https://frontier.morphoswarm.ai/mcp; 19 tools, 35 official SDK production checks passed at 3:45pm PDT; public reads, credentialed writes; receipt deploy/receipts/about-mcp-live-check.json |
 | P0 | Interactive simulation widgets | native bioelectric worker + site | Actual HH and motor-clutch subprocess previews,35 adapter/HTTP tests; public UI deployed and actual browser preview checked |
 | P0 | Regional assurance, interface matrix, equation registry | native bioelectric worker | SPEC-008; real receipt aggregation underway; unknown empirical accuracy stays unknown |
 | P0 | Adaptive candidate comparison and simulation accuracy | native mechanobio worker | Frozen three-fin-candidate assay with shared parameter draws, grid/model discrepancy, sensitivity and actual rendered outputs |
@@ -59,12 +59,23 @@ System reporting must use dated actual hackathon receipts: available shared capa
 - [x] MCP branch b97f88c adds nine bounded discovery/project/artifact/calculation tools; author reports 34 official SDK tests. Root integration/deployment pending. Existing public endpoint passed 12 root production checks at 2:07pm PDT.
 - [x] Deployed exact release c804b317b2afe3e6d180141de134e03606c2e910. Root 43 browser checks and scratch runtime checks passed; public web 8 checks and expanded MCP 33 checks passed (18 tools, actual bounded calculations). Native performance read: first 50 claims 322.7 ms, one 274089-byte request; previous 26 requests / 7.09 MB and~10.14 s. These are single captured samples, not latency guarantees.
 - [x] Implement exact-version project/subsystem challenges: contract/API/MCP plus web GET context are integrated at a77d35b; 88 focused tests passed. Four source-context challenges were submitted as proposed Annotations and anonymously read back through exact Project context. Receipt: imports/2026-10-31-design-challenges-receipt.json. These are authored critiques, not independent reviews or accepted conclusions.
-- [ ] Deploy the design-context API and readable project discussion together. Site owner is integrating the UI; deployed c804b31 still exposes the preceding 18-tool MCP surface.
+- [x] Deploy the design-context API and readable project discussion together. The About release exposes 19 MCP tools, including exact-version design context. Four proposed challenges remain authored critiques rather than independent reviews. Production readback is recorded in deploy/receipts/about-mcp-live-check.json.
 - [ ] Publish the prepared wind-tunnel, data-derived controls, scale-growth, lifecycle, behavior and assurance surfaces after checking lineage and numerical limits.
 - [ ] Finish corpus imports for new genomics, behavior, lifecycle, assurance and render evidence; audit all Project pins and remaining artifact gaps.
 - [ ] Complete independent Playwright review of every route and major interaction on the new public release.
 
 ## Current resource evidence
+
+### Latest checkpoint: October 31, 3:50pm PDT
+
+- [x] The About release is live, including the generative-model roadmap, team and documentation routes, actual GLB viewer, simulation media and System build evidence. Exact release SHA and check provenance are in deploy/receipts/about-release-checks.json. At 3:45pm PDT, 13 public web checks and 35 official MCP SDK checks passed; the latter discovered 19 tools. These checks do not establish biological validity or resolve every usability finding.
+- [x] Imported five immutable multiscale bundles: 39 records (9 Claims, 14 Actions and 16 Evidence) covering geometry, scale growth, behavior, lifecycle and BETSE. Exact-version readback found all 39 imported_unreviewed, no forks and no readback problems. Actions remain proposed; importing them did not launch work. Receipts and frozen plans are under imports/2026-10-31-multiscale/. Three lineage warnings remain: a geometry output, a check certificate and a comparison log do not use the generic output role. Existing Project pins were preserved.
+- [x] Infrastructure's 3:50:19pm PDT provider snapshot lists 80 shared jobs: 35 confirmed ours and 45 other/unattributed. Ours: 24 completed, 5 failed, 3 cancelled, 2 running and 1 pulling an image. Other/unattributed: 32 completed, 10 failed, 2 cancelled and 1 running. Ownership is determined from our recorded IDs/prefixes; the provider returned no owner fields. This is a job census, not measured GPU saturation.
+- [ ] Current useful GPU work: conditional molecular-dynamics continuation and repaired 3D flow job running; reaction-diffusion DDPM job pulling its image. Setup and numerical controls precede kernels. Collect actual results before claiming training, scientific success or utilization.
+- [ ] Critical independent browser findings still need closure: Frontier table width, mobile Knowledge overflow, mobile navigation access, and large raw System detail expansion. Recheck each fix on the published release.
+- [ ] Complete final secret review, land the integrated branch and make the repository public as authorized. Historical scans found no active account credential in their stated scope; later commits still require a final scan. No public visibility claim yet.
+
+Earlier snapshots below retain their original observation times and are superseded for current-state reporting by this checkpoint.
 
 Infrastructure lead's provider read at 2:51:49pm PDT: dt/4 RUNNING; perturbation and angle-of-attack jobs IMAGE_PULLING; cylinder STARTING. Molecular dynamics was created at 2:55:36pm PDT. Five jobs are in the infrastructure pipeline; this is not five occupied GPUs. The separate hosted OpenFold2 operation reported QUEUED at 2:56:54pm PDT. Prior telemetry retains its own time window.
 
