@@ -69,6 +69,17 @@ def test_telemetry_refuses_unmeasured_values(tmp_path):
         telemetry_summary("fixture", path)
 
 
+def test_native_smi_units_and_observed_five_second_interval(tmp_path):
+    path = tmp_path / "samples.csv"
+    path.write_text("timestamp, utilization.gpu [%], memory.used [MiB], power.draw [W]\n"
+                    "2026/10/31 21:00:00.000, 0 %, 10 MiB, 50 W\n"
+                    "2026/10/31 21:00:05.003, 100 %, 20 MiB, 400 W\n")
+    result = telemetry_summary("fixture", path)
+    assert result["sample_period_ms"] == 5003
+    assert result["gpu_utilization_pct_mean"] == 50
+    assert result["gpu_memory_used_mib_max"] == 20
+
+
 def test_historical_attribution_is_exact_and_keeps_current_scope_separate():
     old = {"id": "old-owned", "name": "prior-scale"}
     jobs = {"items": [
