@@ -19,6 +19,7 @@ static int *order;                   /* entry assignment order */
 static int *count;                   /* colour counts */
 static int *edge_to;                 /* de Bruijn: node u, colour c -> node v */
 static int *edge_entry;              /* de Bruijn: node u, colour c -> entry index */
+static int *pred_node, *pred_c;      /* de Bruijn: node u, j -> predecessor node w and colour c with edge_to[w,c] == u */
 static long long found = 0, nodes = 0;
 static FILE *out = NULL;
 
@@ -66,20 +67,18 @@ static int violates(void) {
                 if (alive[q] && --indeg[q] == 0) { alive[q] = 0; remaining--; stack[sp++] = q; }
             }
         }
-        /* predecessors: nodes (w1,w2) with edges into (u1,u2): w such that edge_to[w*K+c] == u */
-        for (int w1 = 0; w1 < NB; w1++) for (c1 = 0; c1 < K; c1++) {
-            if (edge_to[w1 * K + c1] != u1) continue;
+        /* predecessors: nodes (w1,w2) with definite edges into (u1,u2) */
+        for (int j1 = 0; j1 < K; j1++) {
+            int w1 = pred_node[u1 * K + j1]; c1 = pred_c[u1 * K + j1];
             int l1 = table[edge_entry[w1 * K + c1]];
             if (l1 < 0) continue;
-            for (int w2 = 0; w2 < NB; w2++) {
+            for (int j2 = 0; j2 < K; j2++) {
+                int w2 = pred_node[u2 * K + j2]; c2 = pred_c[u2 * K + j2];
                 if (w1 == w2) continue;
-                for (c2 = 0; c2 < K; c2++) {
-                    if (edge_to[w2 * K + c2] != u2) continue;
-                    int l2 = table[edge_entry[w2 * K + c2]];
-                    if (l2 != l1) continue;
-                    int q = w1 * NB + w2;
-                    if (alive[q] && --outdeg[q] == 0) { alive[q] = 0; remaining--; stack[sp++] = q; }
-                }
+                int l2 = table[edge_entry[w2 * K + c2]];
+                if (l2 != l1) continue;
+                int q = w1 * NB + w2;
+                if (alive[q] && --outdeg[q] == 0) { alive[q] = 0; remaining--; stack[sp++] = q; }
             }
         }
     }
@@ -151,9 +150,14 @@ int main(int argc, char **argv) {
     for (int i = 0; i < NE; i++) table[i] = -1;
     /* de Bruijn node u = word of length N-1 (most significant = leftmost); appending colour c
        gives entry index e = u*K + c (word of length N), next node v = e mod K^(N-1) */
+    pred_node = malloc(NB * K * sizeof(int)); pred_c = malloc(NB * K * sizeof(int));
     for (int u = 0; u < NB; u++) for (int c = 0; c < K; c++) {
         edge_entry[u * K + c] = u * K + c;
         edge_to[u * K + c] = (u * K + c) % NB;
+    }
+    for (int u = 0; u < NB; u++) {
+        int j = 0;
+        for (int w = 0; w < NB; w++) for (int c = 0; c < K; c++) if (edge_to[w * K + c] == u) { pred_node[u * K + j] = w; pred_c[u * K + j] = c; j++; }
     }
     /* assignment order: entries sorted by minimal period of the window as a periodic word */
     int *per = malloc(NE * sizeof(int));
