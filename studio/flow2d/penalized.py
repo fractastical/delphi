@@ -8,8 +8,9 @@ from .solver import NS2D
 
 
 class NS2DPen(NS2D):
-    def __init__(self, N, nu, dt, chi, eta=1e-3, G=(0.0, 0.0), **kw):
+    def __init__(self, N, nu, dt, chi, eta=1e-3, G=(0.0, 0.0), dynamic_mean=False, **kw):
         super().__init__(N, nu, dt, **kw)
+        self.dynamic_mean = dynamic_mean      # True: the domain-mean velocity U0 evolves with the net forcing and penalization (momentum balance); False: U0 is prescribed
         self.chi, self.eta, self.G = chi.to(self.dev), eta, G
         self.fac = 1.0 / (1.0 + dt * self.chi / eta)
         self.dA = (2 * math.pi / N) ** 2
@@ -22,6 +23,8 @@ class NS2DPen(NS2D):
         V = v + self.U0[1] + self.dt * self.G[1] * (1 - self.chi)
         U, V = U * self.fac, V * self.fac
         self.last_force = (float((self.chi / self.eta * U).sum() * self.dA), float((self.chi / self.eta * V).sum() * self.dA))
+        if self.dynamic_mean:
+            self.U0 = (float(U.mean()), float(V.mean()))
         Uh, Vh = torch.fft.fft2(U - self.U0[0]), torch.fft.fft2(V - self.U0[1])
         return (1j * self.kx * Vh - 1j * self.ky * Uh) * self.mask         # w = v_x - u_y
 

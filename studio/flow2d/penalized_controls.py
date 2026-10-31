@@ -12,12 +12,12 @@ G = 2 * NU * UMAX / H ** 2                       # u(y) = G/(2 nu) (h^2 - (y-pi)
 
 def run(N, eta=1e-4, T=30.0, dt=0.01, nu_scale=1.0, G_scale=1.0, wall=True):
     chi = channel_mask(N, H) if wall else torch.zeros(N, N, dtype=torch.float64)
-    s = NS2DPen(N, NU * nu_scale, dt, chi, eta=eta, G=(G * G_scale, 0.0), dealias=True)
+    s = NS2DPen(N, NU * nu_scale, dt, chi, eta=eta, G=(G * G_scale, 0.0), dealias=True, dynamic_mean=True)
     wh = torch.zeros(N, N, dtype=torch.complex128)
     for _ in range(int(round(T / dt))):
         wh = s.step(wh)
     u, _ = s.vel(wh)
-    return u[0].numpy() if False else u[0], s
+    return u[0] + s.U0[0], s
 
 
 def err(N, **kw):
