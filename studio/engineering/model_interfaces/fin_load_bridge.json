@@ -1,0 +1,245 @@
+{
+ "engine": "python Fraction",
+ "model_id": "fin_load_bridge",
+ "name": "Load bridge: declared flight load -> line load on one fin ray (exact rational)",
+ "not_established": [
+  "a measured fin pressure",
+  "fluid-structure interaction",
+  "that the tributary width or ray length is real",
+  "that p*S balances weight (reported, not enforced)"
+ ],
+ "ports": [
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "b",
+   "provenance": {
+    "read_level": "file",
+    "source": "candidate witness.b (load_bridge.bridge)",
+    "status": "assumed"
+   },
+   "quantity": "wing span",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "m"
+  },
+  {
+   "bounds": null,
+   "caveat": "speed from the level-flight proxy (L = W); not a measured or glide-derived flight speed",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": -1
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "V",
+   "provenance": {
+    "read_level": "file",
+    "source": "candidate witness.V used as the flight speed",
+    "status": "assumed"
+   },
+   "quantity": "speed at the level-flight proxy",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "m/s"
+  },
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 1,
+    "m": -3,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "rho",
+   "provenance": {
+    "read_level": "file",
+    "source": "flight_assumptions.rho: design assumption",
+    "status": "assumed"
+   },
+   "quantity": "air density",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "kg/m^3"
+  },
+  {
+   "bounds": {
+    "hi": "3",
+    "lo": null,
+    "source": "load_bridge refuses CL outside (0, 3]",
+    "status": "assumed"
+   },
+   "caveat": "",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 0,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensionless",
+   "name": "CL",
+   "provenance": {
+    "read_level": "file",
+    "source": "CL_max or fin.CL override: design assumption",
+    "status": "assumed"
+   },
+   "quantity": "lift coefficient",
+   "regime": "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established",
+   "scale": "organism",
+   "unit": "1"
+  },
+  {
+   "bounds": {
+    "hi": "1",
+    "lo": null,
+    "source": "load_bridge refuses a fraction > 1",
+    "status": "assumed"
+   },
+   "caveat": "",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 0,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensionless",
+   "name": "ray_length_fraction",
+   "provenance": {
+    "read_level": "file",
+    "source": "fin.ray_length_fraction_of_semispan: DECLARED",
+    "status": "assumed"
+   },
+   "quantity": "ray length / semispan",
+   "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+   "scale": "organ",
+   "unit": "1"
+  },
+  {
+   "bounds": null,
+   "caveat": "",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": 0
+   },
+   "direction": "in",
+   "kind": "dimensional",
+   "name": "tributary_width",
+   "provenance": {
+    "read_level": "file",
+    "source": "fin.tributary_width_m or b/n_rays: DECLARED",
+    "status": "assumed"
+   },
+   "quantity": "tributary width per ray",
+   "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+   "scale": "organ",
+   "unit": "m"
+  },
+  {
+   "bounds": null,
+   "caveat": "derived from a mean lift-pressure PROXY (0.5*rho*V^2*CL) and a declared width; not a measured ray load",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 1,
+    "m": -1,
+    "s": -2
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "p_lift_proxy",
+   "provenance": {
+    "read_level": "file",
+    "source": "0.5*rho*V^2*CL: a proxy, not a measured fin pressure",
+    "status": "assumed"
+   },
+   "quantity": "mean lift-pressure proxy",
+   "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+   "scale": "organ",
+   "unit": "Pa"
+  },
+  {
+   "bounds": null,
+   "caveat": "derived from a mean lift-pressure PROXY (0.5*rho*V^2*CL) and a declared width; not a measured ray load",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 1,
+    "m": 0,
+    "s": -2
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "q_line",
+   "provenance": {
+    "read_level": "file",
+    "source": "p_lift_proxy * tributary_width (declared width)",
+    "status": "assumed"
+   },
+   "quantity": "line load on one fin ray",
+   "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+   "scale": "organ",
+   "unit": "N/m"
+  },
+  {
+   "bounds": null,
+   "caveat": "a DECLARED fraction/length, not a measurement",
+   "context": "Exocoetidae design envelope (Fish 1990 m / wing-loading range)",
+   "dim": {
+    "kg": 0,
+    "m": 1,
+    "s": 0
+   },
+   "direction": "out",
+   "kind": "dimensional",
+   "name": "L_ray",
+   "provenance": {
+    "read_level": "file",
+    "source": "ray_length_fraction * b / 2 (declared fraction)",
+    "status": "assumed"
+   },
+   "quantity": "fin ray length",
+   "regime": "static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, not a measured fin pressure",
+   "scale": "organ",
+   "unit": "m"
+  }
+ ],
+ "reference": {
+  "branch": "work/fin-mechanics",
+  "commit": "72df07c",
+  "files": {
+   "engineering/fin_mechanics/load_bridge.py": "743d85121d2804fbed690a310d31f7ac7eec7fab9c8b06e776eee30fb4a97a11"
+  },
+  "path": "engineering/fin_mechanics/load_bridge.py",
+  "read_by": "dx-guilds, read from the source at this commit",
+  "repo": "kganjam/delphi-frontier",
+  "source_sha256": "9d1a720671b4ed9e0d8bbc6d71a8d61b0781bb6ddc2234d2bf16d2ba5af9f2d6"
+ },
+ "run": {
+  "deterministic": true,
+  "entrypoint": "engineering.fin_mechanics.load_bridge.bridge",
+  "schema": "frontier.finmech.request/1"
+ },
+ "schema": "frontier.model.interface/1",
+ "scope": "exact derivation of a line load from DECLARED rho, V, CL, ray fraction and tributary width",
+ "status": "implemented",
+ "timescale": {
+  "kind": "static",
+  "seconds": null,
+  "source": "algebra: no time dependence"
+ }
+}

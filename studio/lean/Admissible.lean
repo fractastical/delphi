@@ -39,11 +39,45 @@ theorem D_eq (q : ℝ) :
     `λ² - T λ + D` then has one positive real root regardless of the sign of `T`. -/
 def Unstable (q : ℝ) : Prop := D S q < 0
 
-/-- With a negative trace, `D q < 0` is exactly the condition for a positive eigenvalue. -/
-theorem unstable_iff_pos_eigenvalue (q lam : ℝ) (hT : T S q < 0)
+/-- ONE direction only: with a negative trace, a positive root of the mode polynomial forces `D q < 0`.
+    (Renamed from `unstable_iff_pos_eigenvalue`, which promised an "iff" it did not prove; the converse is
+    `exists_pos_eigenvalue_of_unstable` below, and the real iff is `unstable_iff_exists_pos_eigenvalue`.) -/
+theorem unstable_of_pos_eigenvalue (q lam : ℝ) (hT : T S q < 0)
     (hroot : lam^2 - T S q * lam + D S q = 0) (hpos : 0 < lam) : Unstable S q := by
   unfold Unstable
   nlinarith [sq_nonneg lam, sq_nonneg (lam - T S q)]
+
+/-- The converse, with NO trace hypothesis: `D q < 0` always yields a positive real root of
+    `lam^2 - T lam + D = 0`, namely `(T + sqrt (T^2 - 4 D)) / 2`. -/
+theorem exists_pos_eigenvalue_of_unstable (q : ℝ) (h : Unstable S q) :
+    ∃ lam : ℝ, 0 < lam ∧ lam^2 - T S q * lam + D S q = 0 := by
+  unfold Unstable at h
+  have hdisc : 0 ≤ T S q ^ 2 - 4 * D S q := by nlinarith [sq_nonneg (T S q)]
+  refine ⟨(T S q + Real.sqrt (T S q ^ 2 - 4 * D S q)) / 2, ?_, ?_⟩
+  · have hsq : Real.sqrt (T S q ^ 2 - 4 * D S q) ^ 2 = T S q ^ 2 - 4 * D S q := Real.sq_sqrt hdisc
+    have hs0 : 0 ≤ Real.sqrt (T S q ^ 2 - 4 * D S q) := Real.sqrt_nonneg _
+    have hlt : |T S q| < Real.sqrt (T S q ^ 2 - 4 * D S q) := by
+      apply abs_lt_of_sq_lt_sq _ hs0
+      nlinarith
+    have := neg_abs_le (T S q)
+    linarith [abs_lt.mp hlt]
+  · have hsq : Real.sqrt (T S q ^ 2 - 4 * D S q) ^ 2 = T S q ^ 2 - 4 * D S q := Real.sq_sqrt hdisc
+    nlinarith [hsq]
+
+/-- **The honest iff.** With a negative trace, the mode is unstable exactly when the mode polynomial has a
+    positive real root. The trace hypothesis is necessary: see `trace_hypothesis_needed`. -/
+theorem unstable_iff_exists_pos_eigenvalue (q : ℝ) (hT : T S q < 0) :
+    Unstable S q ↔ ∃ lam : ℝ, 0 < lam ∧ lam^2 - T S q * lam + D S q = 0 := by
+  constructor
+  · exact exists_pos_eigenvalue_of_unstable S q
+  · rintro ⟨lam, hpos, hroot⟩
+    exact unstable_of_pos_eigenvalue S q lam hT hroot hpos
+
+/-- Why `hT` cannot be dropped: with trace `3 > 0` and determinant `2 > 0` the polynomial `lam^2 - 3 lam + 2`
+    has the positive root `1`, yet the determinant is not negative. -/
+theorem trace_hypothesis_needed :
+    ∃ T D lam : ℝ, 0 < T ∧ 0 < D ∧ 0 < lam ∧ lam^2 - T * lam + D = 0 :=
+  ⟨3, 2, 1, by norm_num, by norm_num, by norm_num, by norm_num⟩
 
 /-- **Uniform-state stability**: with no diffusion the steady state is stable. -/
 def WellMixedStable : Prop := S.a + S.d < 0 ∧ 0 < S.a * S.d - S.b * S.c
@@ -123,16 +157,26 @@ theorem worked_unstable_iff (q : ℝ) : Unstable worked q ↔ (1/5 < q ∧ q < 1
   · intro h; constructor <;> nlinarith
   · rintro ⟨h1, h2⟩; nlinarith
 
-/-- **On `L = π` the admissible modes are `q = n²`, and NONE is in the band.**
-    So the continuum conditions hold and the finite domain is still stable. -/
-theorem worked_stable_on_pi (n : ℕ) : ¬ Unstable worked (neumannMode Real.pi n) := by
+/-- On `L = π` the admissible modes are `q = n²`. -/
+theorem neumannMode_pi (n : ℕ) : neumannMode Real.pi n = (n : ℝ)^2 := by
+  have hpi : (0:ℝ) < Real.pi := Real.pi_pos
+  unfold neumannMode
+  field_simp
+
+/-- On `L = 2π` the admissible modes are `q = (n/2)²`; mode `n = 1` is `q = 1/4`. -/
+theorem neumannMode_two_pi_one : neumannMode (2 * Real.pi) 1 = 1/4 := by
+  have hpi : (0:ℝ) < Real.pi := Real.pi_pos
+  unfold neumannMode
+  field_simp
+  norm_num
+
+/-- **On `L = π`, NO admissible mode is unstable** (labelled honestly: this is `¬ Unstable`, i.e. `D ≥ 0`,
+    which by itself allows the marginal `D = 0`; the strict statement is `worked_modeStable_on_pi`).
+    (Renamed from `worked_stable_on_pi`.) -/
+theorem worked_not_unstable_on_pi (n : ℕ) : ¬ Unstable worked (neumannMode Real.pi n) := by
   rw [worked_unstable_iff]
   rintro ⟨h1, h2⟩
-  have hpi : (0:ℝ) < Real.pi := Real.pi_pos
-  have hq : neumannMode Real.pi n = (n : ℝ)^2 := by
-    unfold neumannMode
-    field_simp
-  rw [hq] at h1 h2
+  rw [neumannMode_pi] at h1 h2
   -- n² < 1/2 forces n = 0, but then n² = 0 which is not > 1/5
   have hn : (n : ℝ) = 0 := by
     by_contra hne
@@ -142,15 +186,62 @@ theorem worked_stable_on_pi (n : ℕ) : ¬ Unstable worked (neumannMode Real.pi 
     nlinarith
   rw [hn] at h1; norm_num at h1
 
+/-- Strictly positive determinant at every admissible mode of `L = π` (`D(n²) = (5n²-1)(2n²-1) > 0`). -/
+theorem worked_D_pos_on_pi (n : ℕ) : 0 < D worked (neumannMode Real.pi n) := by
+  rw [worked_D, neumannMode_pi]
+  by_cases h0 : n = 0
+  · subst h0; norm_num
+  · have h1 : (1:ℝ) ≤ (n:ℝ) := by exact_mod_cast Nat.one_le_iff_ne_zero.mpr h0
+    have hx : (1:ℝ) ≤ (n:ℝ)^2 := by nlinarith
+    exact mul_pos (by linarith) (by linarith)
+
+/-- **On `L = π` every admissible mode is linearly asymptotically stable** (negative trace AND positive
+    determinant), obtained by instantiating `finite_domain_linearly_stable` for the worked system. -/
+theorem worked_modeStable_on_pi (n : ℕ) : ModeStable worked (neumannMode Real.pi n) :=
+  finite_domain_linearly_stable worked Real.pi worked_wellmixed worked_D_pos_on_pi n
+
+/-- **On `L = 2π`, mode `n = 1` (`q = 1/4`) has determinant `-1/8`.** -/
+theorem worked_D_two_pi_one : D worked (neumannMode (2 * Real.pi) 1) = -1/8 := by
+  rw [worked_D, neumannMode_two_pi_one]
+  norm_num
+
+/-- **On `L = 2π` the admissible mode `n = 1` is unstable** (determinant `-1/8 < 0`). -/
+theorem worked_unstable_on_two_pi : Unstable worked (neumannMode (2 * Real.pi) 1) := by
+  unfold Unstable
+  rw [worked_D_two_pi_one]
+  norm_num
+
+/-- ... and it is therefore not linearly stable. -/
+theorem worked_not_modeStable_on_two_pi : ¬ ModeStable worked (neumannMode (2 * Real.pi) 1) := by
+  rintro ⟨_, hD⟩
+  rw [worked_D_two_pi_one] at hD
+  norm_num at hD
+
+/-- **On `L = 2π` there is an actual growing eigenvalue** for mode `n = 1`: a positive real root of
+    `lam^2 - T lam + D`, with `T = -19/4 < 0` (so the trace hypothesis of the iff holds). -/
+theorem worked_growth_on_two_pi :
+    ∃ lam : ℝ, 0 < lam ∧ lam^2 - T worked (neumannMode (2 * Real.pi) 1) * lam
+      + D worked (neumannMode (2 * Real.pi) 1) = 0 :=
+  exists_pos_eigenvalue_of_unstable worked _ worked_unstable_on_two_pi
+
 end Admissible
 
 section AxiomAudit
 open Admissible
 #print axioms D_eq
+#print axioms unstable_of_pos_eigenvalue
+#print axioms exists_pos_eigenvalue_of_unstable
+#print axioms unstable_iff_exists_pos_eigenvalue
+#print axioms trace_hypothesis_needed
 #print axioms finite_domain_linearly_stable
 #print axioms trace_neg_of_wellmixed
 #print axioms real_eigenvalue_neg_of_modeStable
 #print axioms worked_continuum
 #print axioms worked_unstable_iff
-#print axioms worked_stable_on_pi
+#print axioms worked_not_unstable_on_pi
+#print axioms worked_modeStable_on_pi
+#print axioms worked_D_two_pi_one
+#print axioms worked_unstable_on_two_pi
+#print axioms worked_not_modeStable_on_two_pi
+#print axioms worked_growth_on_two_pi
 end AxiomAudit

@@ -60,6 +60,11 @@ SCOPE_NOTE = ("A coupling verdict is about typed interfaces, not biology. 'compo
               "'scenario' results are assumption-level. No Lean theorem here proves biological correspondence.")
 
 
+def tree_sha256(files: Mapping[str, str]) -> str:
+    """Hash over 'path<TAB>sha256' lines sorted by path: one digest for a set of source files."""
+    return hashlib.sha256("".join(f"{p}\t{files[p]}\n" for p in sorted(files)).encode()).hexdigest()
+
+
 class CouplingError(ValueError):
     """Malformed port/model/contract (a programming or data error, not a refusal verdict)."""
 
@@ -112,6 +117,7 @@ class Port:
     context: str
     provenance: Provenance
     bounds: Bounds | None = None
+    caveat: str = ""   # why this quantity must not be read as the target's measured quantity (proxy, declared value, ...)
 
     def __post_init__(self):
         if self.direction not in ("in", "out"):
@@ -151,7 +157,7 @@ class ModelSpec:
     name: str
     engine: str
     status: str                     # implemented_replayed | implemented | proposed
-    reference: Mapping[str, str] | None
+    reference: Mapping[str, object] | None
     ports: tuple[Port, ...]
     timescale: Timescale
     scope: str
@@ -161,8 +167,16 @@ class ModelSpec:
     def __post_init__(self):
         if self.status not in MODEL_STATUS:
             raise CouplingError(f"{self.model_id}: bad status")
-        if self.status != "proposed" and not self.reference:
-            raise CouplingError(f"{self.model_id}: an implemented model needs a reference (repo/branch/commit/path)")
+        if self.status != "proposed":
+            ref = self.reference or {}
+            need = ("repo", "branch", "commit", "path", "files", "source_sha256")
+            if any(k not in ref for k in need):
+                raise CouplingError(f"{self.model_id}: an implemented model needs a reference with {need}")
+            files = ref["files"]
+            if not isinstance(files, Mapping) or not files or any(not HEX64.match(str(v)) for v in files.values()):
+                raise CouplingError(f"{self.model_id}: reference.files must map paths to 64-hex sha256")
+            if ref["source_sha256"] != tree_sha256(files):
+                raise CouplingError(f"{self.model_id}: reference.source_sha256 does not match its files")
         names = [p.name for p in self.ports]
         if len(names) != len(set(names)):
             raise CouplingError(f"{self.model_id}: duplicate port names")
@@ -282,7 +296,8 @@ def _port_json(p: Port) -> dict:
             "bounds": None if p.bounds is None else {
                 "lo": None if p.bounds.lo is None else str(p.bounds.lo),
                 "hi": None if p.bounds.hi is None else str(p.bounds.hi),
-                "source": p.bounds.source, "status": p.bounds.status}}
+                "source": p.bounds.source, "status": p.bounds.status},
+            "caveat": p.caveat}
 
 
 def model_to_json(m: ModelSpec) -> dict:
@@ -306,7 +321,7 @@ def model_from_json(o: Mapping) -> ModelSpec:
     ports = []
     for q in o["ports"]:
         if set(q) - {"name", "direction", "quantity", "kind", "unit", "dim", "scale", "regime", "context",
-                     "provenance", "bounds"}:
+                     "provenance", "bounds", "caveat"}:
             raise CouplingError(f"unknown port keys in {q.get('name')}")
         b = q.get("bounds")
         ports.append(Port(
@@ -314,7 +329,8 @@ def model_from_json(o: Mapping) -> ModelSpec:
             None if q["dim"] is None else {u: int(q["dim"][u]) for u in BASE_UNITS},
             q["scale"], q["regime"], q["context"],
             Provenance(**q["provenance"]),
-            None if b is None else Bounds(_f(b["lo"]), _f(b["hi"]), b["source"], b["status"])))
+            None if b is None else Bounds(_f(b["lo"]), _f(b["hi"]), b["source"], b["status"]),
+            q.get("caveat", "")))
     t = o["timescale"]
     return ModelSpec(o["model_id"], o["name"], o["engine"], o["status"], o.get("reference"), tuple(ports),
                      Timescale(t["kind"], _f(t.get("seconds")), t.get("source", "")), o["scope"],
@@ -454,6 +470,10 @@ def validate_coupling(reg: Registry, c: Coupling) -> Verdict:
                 refuse.append(f"dimension mismatch: {pf.unit} -> {pt.unit} not consistent with the mapping")
     checks.setdefault("dimension", "n/a (no valid mapping)")
 
+    if kind == "assumed":
+        checks["validity"] = ("NOT established: consistent dimensions are necessary, not sufficient; this mapping "
+                              "is valid only under the named assumptions")
+
     # ---- scope: scale, context, regime
     scope_gaps = []
     if pf.scale != pt.scale:
@@ -469,9 +489,14 @@ def validate_coupling(reg: Registry, c: Coupling) -> Verdict:
             if a != b) and pf.regime == pt.regime
         if bridged:
             checks["scope"] = "pass (calibration declares the bridge)"
-        elif kind == "assumed":
+        elif kind == "assumed" and not [g for g in scope_gaps if g.startswith(("scale", "context"))]:
             checks["scope"] = "scenario: " + "; ".join(scope_gaps)
-            downgrade.append("scope differs (" + "; ".join(scope_gaps) + ") and is bridged only by assumption")
+            downgrade.append("regime differs (" + "; ".join(scope_gaps) + ") and is bridged only by assumption")
+            missing.append(f"{c.from_ref} -> {c.to_ref}: calibration bridging " + "; ".join(scope_gaps))
+        elif kind == "assumed":
+            checks["scope"] = "fail: " + "; ".join(scope_gaps)
+            refuse.append("an assumption cannot stand in for a transfer across biological scale or context "
+                          "(that needs a calibration): " + "; ".join(scope_gaps))
             missing.append(f"{c.from_ref} -> {c.to_ref}: calibration bridging " + "; ".join(scope_gaps))
         else:
             checks["scope"] = "fail: " + "; ".join(scope_gaps)
@@ -529,6 +554,15 @@ def validate_coupling(reg: Registry, c: Coupling) -> Verdict:
             checks["time"] = "unknown"
             downgrade.append("time relation or time scale unknown")
 
+    # ---- port caveats: a proxy or declared quantity cannot be composed by identity / unit conversion
+    cav = [f"{ref}.{pt_.name}: {pt_.caveat}" for ref, pt_ in ((c.from_ref.split(".")[0], pf), (c.to_ref.split(".")[0], pt))
+           if pt_.caveat]
+    if cav and kind in ("identity", "unit_conversion"):
+        checks["caveats"] = "scenario: " + " | ".join(cav)
+        downgrade.append("port caveat (needs a calibration to be composable): " + " | ".join(cav))
+    else:
+        checks["caveats"] = ("noted: " + " | ".join(cav)) if cav else "none"
+
     # ---- uncertainty
     uk = c.uncertainty_kind
     if uk == "unknown":
@@ -562,6 +596,24 @@ def validate_coupling(reg: Registry, c: Coupling) -> Verdict:
     return Verdict(c.id, "composable",
                    "composable: typed, dimension- and scope-checked mapping; no biological correspondence is claimed",
                    [], checks, missing, asm_ids)
+
+
+def verify_reference_sources(m: ModelSpec, git_dir) -> dict:
+    """Recompute every file hash in `m.reference` from the commit in a local git object store. Reads code; runs
+    nothing. {"ok": bool|None, ...}: ok is None when the commit is not in this store (not verified, not failed)."""
+    import subprocess
+    if m.status == "proposed":
+        return {"model": m.model_id, "ok": None, "reason": "proposed: no source"}
+    ref, bad, missing = m.reference, [], []
+    for path, want in ref["files"].items():
+        r = subprocess.run(["git", "-C", str(git_dir), "show", f"{ref['commit']}:{path}"], capture_output=True)
+        if r.returncode != 0:
+            missing.append(path)
+        elif hashlib.sha256(r.stdout).hexdigest() != want:
+            bad.append(path)
+    if missing and not bad:
+        return {"model": m.model_id, "ok": None, "reason": "commit or path not in this object store", "missing": missing}
+    return {"model": m.model_id, "ok": not bad and not missing, "mismatched": bad, "missing": missing}
 
 
 # ---- Problem proposals for missing calibrations -------------------------------------------------------------
@@ -644,108 +696,229 @@ def build_manifest(reg: Registry, couplings: Iterable[Coupling]) -> dict:
     return body
 
 
-# ---- the registry of models that exist today (read from the hand-off notes; code NOT re-read here) -----------------
+# ---- the registry of models that exist today: ports read from the CODE at the exact commits below ------------------
 
-def _ref(repo, branch, commit, path, read_by="dx-guilds, from the owner's hand-off note; code not re-read"):
-    return {"repo": repo, "branch": branch, "commit": commit, "path": path, "read_by": read_by}
+FRONTIER = "kganjam/delphi-frontier"
+
+
+def _ref(branch, commit, files, extra=None, repo=FRONTIER, read_by="dx-guilds, read from the source at this commit"):
+    ref = {"repo": repo, "branch": branch, "commit": commit, "path": ", ".join(sorted(files)),
+           "files": dict(files), "source_sha256": tree_sha256(files), "read_by": read_by}
+    ref.update(extra or {})
+    return ref
+
+
+FILES = {
+    "constraints": {
+    "engineering/constraints.py":
+        "de0acf47ffc7ffbebe5a44d775e007e87b7f4a996256b6c94fc0e188a0fcead1",
+},
+    "glide": {
+    "engineering/simulation/schema.py":
+        "94b4f003be514ac5055ed184b0e2695a68bf0de8689e387238e9583c8e62b944",
+    "engineering/simulation/glide.py":
+        "1f6a04baaf5a7cda589f80907ba00ac93f5b20fd458211a2340f3ec44de79fa7",
+    "engineering/simulation/evaluate.py":
+        "0a793951b8812a9093a637c61d79f3f4fea5e93f07a92825e46601c8e84357fc",
+},
+    "rd": {
+    "engineering/simulation/rd_frames.py":
+        "ee4ed03de805265bfbd1f7673a10b8b2d6eff2a71e0609d86a3e036796a85d12",
+    "engineering/simulation/rd/receipt.json":
+        "a3af348c151336721c4f844028b0f7f585e02c34684bc8cdcc085bd0dc4048dc",
+    "engineering/simulation/rd/cells.json":
+        "f74184cb56ba36e4face9978c96c2c00ae728a471183294c3f9d866eb066d6b6",
+},
+    "collier": {
+    "connectors/biomodels/replay.py":
+        "c9c017e6fd76aedcce2822de39c77a22349bea560dabc8ca432954f9d1938a8f",
+    "connectors/biomodels/sbml.py":
+        "eda0dcf677cd6d7786e84c0180bec075bc6dbefaa04e7cdcaa0d48c2604d40a8",
+    "connectors/biomodels/client.py":
+        "36e7bbcc93fb7102458fa43ecab9aa07bf775787577ef9f820ffb64b0691eea6",
+    "connectors/biomodels/receipts/BIOMD0000001047/receipt.json":
+        "731a85a6fe893bd10f86196b5fd7101a64810d0d68ae03ebfa4eee3d2e04bc6e",
+},
+    "fin_bridge": {
+    "engineering/fin_mechanics/load_bridge.py":
+        "743d85121d2804fbed690a310d31f7ac7eec7fab9c8b06e776eee30fb4a97a11",
+},
+    "fin_beam": {
+    "engineering/fin_mechanics/beam.py":
+        "4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d",
+    "engineering/fin_mechanics/sweep.py":
+        "17e2e1835d9f67c47b68e8285ae118b1b585c4d2b9a955bd13c598fbc498fa6e",
+},
+}
+
+FISH_CTX = "Exocoetidae design envelope (Fish 1990 m / wing-loading range)"
+FISH_RG = "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established"
+FIN_RG = ("static clamped-free Euler-Bernoulli ray, small deflection; the load is a mean lift-pressure PROXY, "
+          "not a measured fin pressure")
+RD_RG = "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength"
+RD_CTX = "abstract kinetics; no organism"
+CELL_RG = "two coupled cells; non-dimensional as stored; no time scale"
+CELL_CTX = "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)"
+SIM = Provenance("simulated", "simulated", "none")
+PA = dim(kg=1, m=-1, s=-2)        # Pa
+NPM = dim(kg=1, s=-2)             # N/m
+NM2 = dim(kg=1, m=3, s=-2)        # N m^2
+
+
+CAV_LEVEL = "speed from the level-flight proxy (L = W); not a measured or glide-derived flight speed"
+CAV_PROXY = "derived from a mean lift-pressure PROXY (0.5*rho*V^2*CL) and a declared width; not a measured ray load"
+CAV_DECL = "a DECLARED fraction/length, not a measurement"
+CAV_EI = "ASSUMED stiffness range; no calibrated fin stiffness exists"
+
+
+def _p(name, direction, quantity, kind, unit, d, scale, regime, context, prov, bounds=None, caveat=""):
+    return Port(name, direction, quantity, kind, unit, d, scale, regime, context, prov, bounds, caveat)
 
 
 def default_registry() -> Registry:
-    """Four models + the one assumption-level edge. Every port detail comes from the owners' hand-off notes in
-    messages/ (biomodels-to-codex03*.md, nca-to-codex03.md, glide-interface-to-guilds.md, nca-to-gpuops.md)."""
-    FISH_CTX = "Exocoetidae design envelope (Fish 1990 m / wing-loading range)"
-    FISH_RG = "point-mass vertical-plane flight; Reynolds/scale validity of the polar not established"
-    note = "owner hand-off note"
+    """Six models and five assumptions. Ports are read from the SOURCE at the commits in each reference (file hashes
+    are recomputed by verify_reference_sources); the owners' hand-off notes were used only to locate the code."""
     reg = Registry()
+    mass_bounds = Bounds(Fraction(3, 1000), Fraction(53, 100), "Fish 1990 p.393 specimen range", "measured")
     reg.add_model(ModelSpec(
         "flying_fish_constraints", "Exact-rational constraint solver (mass, wing area, span, speed)", "z3 5.3.3.0",
-        "implemented", _ref("kganjam/delphi-frontier", "work/guilds-engineering", "948c2e1", "engineering/constraints.py",
-                            "dx-guilds (author)"),
-        (Port("m", "out", "body mass", "dimensional", "kg", dim(kg=1), "organism", FISH_RG, FISH_CTX,
-              Provenance("solver witness; envelope Fish 1990 p.393", "assumed", "full-text"),
-              Bounds(Fraction(3, 1000), Fraction(53, 100), "Fish 1990 p.393 specimen range", "measured")),
-         Port("S", "out", "wing area", "dimensional", "m^2", dim(m=2), "organism", FISH_RG, FISH_CTX,
-              Provenance("solver witness", "assumed", "none"), None),
-         Port("b", "out", "wing span", "dimensional", "m", dim(m=1), "organism", FISH_RG, FISH_CTX,
-              Provenance("solver witness", "assumed", "none"), None),
-         Port("V", "out", "speed at the level-flight proxy", "dimensional", "m/s", dim(m=1, s=-1), "organism", FISH_RG,
-              FISH_CTX, Provenance("solver witness; level-flight proxy L=W", "assumed", "none"), None)),
+        "implemented", _ref("work/guilds-engineering", "948c2e1", FILES["constraints"], read_by="dx-guilds (author)"),
+        (_p("m", "out", "body mass", "dimensional", "kg", dim(kg=1), "organism", FISH_RG, FISH_CTX,
+            Provenance("solver witness; envelope Fish 1990 p.393", "assumed", "full-text"), mass_bounds),
+         _p("S", "out", "wing area", "dimensional", "m^2", dim(m=2), "organism", FISH_RG, FISH_CTX,
+            Provenance("solver witness", "assumed", "none")),
+         _p("b", "out", "wing span", "dimensional", "m", dim(m=1), "organism", FISH_RG, FISH_CTX,
+            Provenance("solver witness", "assumed", "none")),
+         _p("V", "out", "speed at the level-flight proxy", "dimensional", "m/s", dim(m=1, s=-1), "organism", FISH_RG,
+            FISH_CTX, Provenance("solver witness; level-flight proxy L=W", "assumed", "none"), caveat=CAV_LEVEL)),
         Timescale("static", None, "a design point: the solver has no dynamics"),
         "exact-rational feasibility of declared constraints; a level-flight proxy, not a glide analysis",
         ("organism feasibility", "glide performance", "that any witness is a viable fish"),
         {"entrypoint": "engineering.constraints.solve", "deterministic": True}))
     reg.add_model(ModelSpec(
         "glide_pointmass", "Point-mass glide simulation (RK4)", "numpy RK4", "implemented",
-        _ref("kganjam/delphi-frontier", "work/nca-glide", "4dee158", "engineering/simulation/{schema,glide,evaluate}.py"),
-        (Port("m", "in", "body mass", "dimensional", "kg", dim(kg=1), "organism", FISH_RG, FISH_CTX,
-              Provenance("candidate from the constraint solver", "assumed", "none"),
-              Bounds(Fraction(3, 1000), Fraction(53, 100), "sweep range in nca-to-codex03.md", "assumed")),
-         Port("S", "in", "wing area", "dimensional", "m^2", dim(m=2), "organism", FISH_RG, FISH_CTX,
-              Provenance("candidate", "assumed", "none"), None),
-         Port("b", "in", "wing span", "dimensional", "m", dim(m=1), "organism", FISH_RG, FISH_CTX,
-              Provenance("candidate", "assumed", "none"), None),
-         Port("release_speed", "in", "release speed", "dimensional", "m/s", dim(m=1, s=-1), "organism", FISH_RG,
-              FISH_CTX, Provenance("glide default is 1.5 x stall speed; witness V only if the caller opts in",
-                                   "assumed", "none"), None),
-         Port("glide_range", "out", "horizontal glide range", "dimensional", "m", dim(m=1), "organism", FISH_RG,
-              FISH_CTX, Provenance("simulated, CD0/e/CL_max are declared priors", "simulated", "none"), None),
-         Port("sink_rate", "out", "equilibrium sink rate", "dimensional", "m/s", dim(m=1, s=-1), "organism", FISH_RG,
-              FISH_CTX, Provenance("simulated", "simulated", "none"), None)),
+        _ref("work/nca-glide", "87e72f9", FILES["glide"]),
+        (_p("m", "in", "body mass", "dimensional", "kg", dim(kg=1), "organism", FISH_RG, FISH_CTX,
+            Provenance("candidate from the constraint solver (schema.parse_candidate)", "assumed", "file"), mass_bounds),
+         _p("S", "in", "wing area", "dimensional", "m^2", dim(m=2), "organism", FISH_RG, FISH_CTX,
+            Provenance("candidate", "assumed", "file")),
+         _p("b", "in", "wing span", "dimensional", "m", dim(m=1), "organism", FISH_RG, FISH_CTX,
+            Provenance("candidate", "assumed", "file")),
+         _p("release_speed", "in", "release speed", "dimensional", "m/s", dim(m=1, s=-1), "organism", FISH_RG,
+            FISH_CTX, Provenance("evaluate.py: default 1.5 x stall speed; the witness V is used only when "
+                                 "release_speed_from_witness is set", "assumed", "file")),
+         _p("rho", "in", "air density", "dimensional", "kg/m^3", dim(kg=1, m=-3), "organism", FISH_RG, FISH_CTX,
+            Provenance("flight_assumptions.rho: design assumption, schema bound (0, 2)", "assumed", "file")),
+         _p("CL_max", "in", "maximum usable lift coefficient", "dimensionless", "1", dim(), "organism", FISH_RG,
+            FISH_CTX, Provenance("flight_assumptions.CL_max: design assumption, schema bound (0, 3)", "assumed", "file")),
+         _p("glide_range", "out", "horizontal glide range", "dimensional", "m", dim(m=1), "organism", FISH_RG,
+            FISH_CTX, Provenance("simulated; CD0/e/CL_max are declared priors, not measurements", "simulated", "file")),
+         _p("sink_rate", "out", "equilibrium sink rate", "dimensional", "m/s", dim(m=1, s=-1), "organism", FISH_RG,
+            FISH_CTX, SIM)),
         Timescale("unknown", None, "glide duration is an output; no characteristic time is declared"),
-        "point-mass flight with declared drag/lift priors (CL_max 0.8-1.6, CD0 0.03-0.12, e 0.6-0.95: priors, not measurements)",
-        ("biological feasibility", "fin-tissue coupling", "calibrated lift/drag for any fish"),
-        {"entrypoint": "engineering.simulation.evaluate", "deterministic": True, "schema": "frontier.glide.candidate/1"}))
-    REG_RD = "1-D zero-flux (Neumann) field; domain length in units of the model's own critical wavelength"
+        "point-mass flight with declared drag/lift priors (priors, not measurements); controlled-launch comparison exists",
+        ("biological feasibility", "fin-tissue coupling", "calibrated lift/drag for any fish (Park & Choi 2010 unread)"),
+        {"entrypoint": "engineering.simulation.evaluate.evaluate", "deterministic": True,
+         "schema": "frontier.glide.candidate/1"}))
     reg.add_model(ModelSpec(
-        "rdfield_nonlinear_sweep", "Reaction-diffusion field (Schnakenberg, Brusselator) nonlinear sweep",
-        "spectral Strang + scipy BDF", "implemented",
-        _ref("kganjam/delphi-evolve", "work/rethink-nca", "02346812b93a6ee8c9e67c89b02ae6e2a69e51a7",
-             "scopedesk/oracles/nonlinear_sweep"),
-        (Port("L_over_lambda_c", "in", "domain length / critical wavelength", "dimensionless", "1", dim(), "tissue",
-              REG_RD, "abstract kinetics; no organism", Provenance("sweep design", "assumed", "none"), None),
-         Port("kinetic_parameters", "in", "kinetic parameters", "model_units", "model units", None, "tissue", REG_RD,
-              "abstract kinetics; no organism", Provenance("published ranges or a stated prior", "assumed", "none"), None),
-         Port("dominant_mode", "out", "dominant mode number", "dimensionless", "1", dim(), "tissue", REG_RD,
-              "abstract kinetics; no organism", Provenance("simulated", "simulated", "none"), None),
-         Port("pattern_flag", "out", "pattern / no pattern / not settled", "dimensionless", "1", dim(), "tissue",
-              REG_RD, "abstract kinetics; no organism", Provenance("simulated", "simulated", "none"), None)),
-        Timescale("unknown", None, "non-dimensional time; no SI time scale"),
-        "numerical sweep of two textbook kinetics; linear verdict vs nonlinear outcome",
+        "fin_load_bridge", "Load bridge: declared flight load -> line load on one fin ray (exact rational)",
+        "python Fraction", "implemented", _ref("work/fin-mechanics", "72df07c", FILES["fin_bridge"]),
+        (_p("b", "in", "wing span", "dimensional", "m", dim(m=1), "organism", FISH_RG, FISH_CTX,
+            Provenance("candidate witness.b (load_bridge.bridge)", "assumed", "file")),
+         _p("V", "in", "speed at the level-flight proxy", "dimensional", "m/s", dim(m=1, s=-1), "organism", FISH_RG,
+            FISH_CTX, Provenance("candidate witness.V used as the flight speed", "assumed", "file"), caveat=CAV_LEVEL),
+         _p("rho", "in", "air density", "dimensional", "kg/m^3", dim(kg=1, m=-3), "organism", FISH_RG, FISH_CTX,
+            Provenance("flight_assumptions.rho: design assumption", "assumed", "file")),
+         _p("CL", "in", "lift coefficient", "dimensionless", "1", dim(), "organism", FISH_RG, FISH_CTX,
+            Provenance("CL_max or fin.CL override: design assumption", "assumed", "file"),
+            Bounds(None, Fraction(3), "load_bridge refuses CL outside (0, 3]", "assumed")),
+         _p("ray_length_fraction", "in", "ray length / semispan", "dimensionless", "1", dim(), "organ", FIN_RG,
+            FISH_CTX, Provenance("fin.ray_length_fraction_of_semispan: DECLARED", "assumed", "file"),
+            Bounds(None, Fraction(1), "load_bridge refuses a fraction > 1", "assumed")),
+         _p("tributary_width", "in", "tributary width per ray", "dimensional", "m", dim(m=1), "organ", FIN_RG,
+            FISH_CTX, Provenance("fin.tributary_width_m or b/n_rays: DECLARED", "assumed", "file")),
+         _p("p_lift_proxy", "out", "mean lift-pressure proxy", "dimensional", "Pa", PA, "organ", FIN_RG, FISH_CTX,
+            Provenance("0.5*rho*V^2*CL: a proxy, not a measured fin pressure", "assumed", "file"), caveat=CAV_PROXY),
+         _p("q_line", "out", "line load on one fin ray", "dimensional", "N/m", NPM, "organ", FIN_RG, FISH_CTX,
+            Provenance("p_lift_proxy * tributary_width (declared width)", "assumed", "file"), caveat=CAV_PROXY),
+         _p("L_ray", "out", "fin ray length", "dimensional", "m", dim(m=1), "organ", FIN_RG, FISH_CTX,
+            Provenance("ray_length_fraction * b / 2 (declared fraction)", "assumed", "file"), caveat=CAV_DECL)),
+        Timescale("static", None, "algebra: no time dependence"),
+        "exact derivation of a line load from DECLARED rho, V, CL, ray fraction and tributary width",
+        ("a measured fin pressure", "fluid-structure interaction", "that the tributary width or ray length is real",
+         "that p*S balances weight (reported, not enforced)"),
+        {"entrypoint": "engineering.fin_mechanics.load_bridge.bridge", "deterministic": True,
+         "schema": "frontier.finmech.request/1"}))
+    reg.add_model(ModelSpec(
+        "finbeam_euler_bernoulli", "Elastic fin-ray surrogate: clamped-free Euler-Bernoulli cantilever (SIMULATED)",
+        "numpy + scipy.sparse Hermite-cubic FEM", "implemented", _ref("work/fin-mechanics", "72df07c", FILES["fin_beam"]),
+        (_p("q_line", "in", "line load on one fin ray", "dimensional", "N/m", NPM, "organ", FIN_RG, FISH_CTX,
+            Provenance("uniform line load from the load bridge (or the same force at the tip)", "assumed", "file"), caveat=CAV_PROXY),
+         _p("L_ray", "in", "fin ray length", "dimensional", "m", dim(m=1), "organ", FIN_RG, FISH_CTX,
+            Provenance("from the load bridge", "assumed", "file"), caveat=CAV_DECL),
+         _p("flexural_rigidity", "in", "fin ray flexural rigidity EI", "dimensional", "N m^2", NM2, "organ", FIN_RG,
+            FISH_CTX, Provenance("elastic.EI_status = ASSUMED_RANGE_NOT_MEASURED; bluegill 1e-6..1e-5 J m (Alben et "
+                                 "al. 2007) is context only, read through a summarising tool", "assumed", "none"),
+            Bounds(Fraction(1, 10**6), Fraction(1), "example_request.json assumed sweep range", "assumed"), caveat=CAV_EI),
+         _p("tip_deflection", "out", "tip deflection under load", "dimensional", "m", dim(m=1), "organ", FIN_RG,
+            FISH_CTX, SIM),
+         _p("critical_stiffness", "out", "EI below which the declared load breaks the small-deformation limits",
+            "dimensional", "N m^2", NM2, "organ", FIN_RG, FISH_CTX, SIM)),
+        Timescale("static", None, "static problem: no time step"),
+        "linear static beam with an ASSUMED stiffness range; no shear, no bilaminar structure, load uncoupled to deformation",
+        ("a calibrated fin stiffness", "that any real ray lies in the assumed EI range", "fluid-structure interaction",
+         "biological feasibility"),
+        {"entrypoint": "engineering.fin_mechanics.sweep", "deterministic": True,
+         "schema": "frontier.finmech.request/1"}))
+    reg.add_model(ModelSpec(
+        "rdfield_nonlinear_sweep", "Reaction-diffusion field (Schnakenberg, Brusselator): saved-state rerun",
+        "numpy Strang splitting + DCT-II diffusion + RK4", "implemented",
+        _ref("work/nca-glide", "87e72f9", FILES["rd"], extra={
+            "upstream_repo": "kganjam/delphi-evolve", "upstream_branch": "work/rethink-nca",
+            "upstream_prereg_commit": "cb27cf24521b7eb77f784bc266d2f3f584f049ff", "upstream_results_commit": "1067cdb",
+            "upstream_rows_sha256": "a32c2bf7dd3c10162317974ae6a0ecbefa06c1c180a6886dea1bcb8ea4d4c882",
+            "note": "rd_frames.py is pinned-source reuse of solver A; rd/receipt.json compares two reruns with frozen rows"}),
+        (_p("L_over_lambda_c", "in", "domain length / critical wavelength", "dimensionless", "1", dim(), "tissue",
+            RD_RG, RD_CTX, Provenance("sweep design", "assumed", "file")),
+         _p("kinetic_parameters", "in", "kinetic parameters", "model_units", "model units", None, "tissue", RD_RG,
+            RD_CTX, Provenance("published ranges or a stated prior", "assumed", "file")),
+         _p("dominant_mode", "out", "dominant mode number", "dimensionless", "1", dim(), "tissue", RD_RG, RD_CTX, SIM),
+         _p("pattern_flag", "out", "pattern / no pattern / not settled", "dimensionless", "1", dim(), "tissue", RD_RG,
+            RD_CTX, SIM)),
+        Timescale("unknown", None, "tau = gamma*t is dimensionless model time, unrelated to glide seconds"),
+        "numerical rerun of two frozen sweep cells with every saved state kept; textbook kinetics only",
         ("any fin or fish tissue", "SI length or time scales", "that a real tissue obeys these kinetics"),
-        {"entrypoint": "scopedesk.oracles.nonlinear_sweep", "deterministic": True}))
+        {"entrypoint": "engineering.simulation.rd_frames", "deterministic": True}))
     reg.add_model(ModelSpec(
         "collier1996_two_cell", "Collier 1996 two-cell Delta-Notch lateral inhibition (BIOMD0000001047)",
         "libroadrunner 2.10.0 (CVODE)", "implemented_replayed",
-        _ref("kganjam/delphi-frontier", "work/biomodels", "c41188dd2b47", "connectors/biomodels"),
-        (Port("parameters_a_b_h_k", "in", "feedback parameters", "model_units", "model units", None, "cell",
-              "two coupled cells; non-dimensional as stored; no time scale",
-              "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)",
-              Provenance("values stored in the SBML (a 0.01, b 100, h 2, k 2, mu 1, rho 1); paper not read",
-                         "unknown", "file"), None),
-         Port("delta_asymmetry", "out", "Delta level difference between the two cells", "model_units", "model units",
-              None, "cell", "two coupled cells; non-dimensional as stored; no time scale",
-              "NCBI taxon 7215 as annotated in the SBML (name unresolved by the connector owner)",
-              Provenance("simulated; horizon 0-60 chosen by the connector, not the file", "simulated", "file"), None)),
+        _ref("work/biomodels", "abf1838", FILES["collier"], extra={
+            "sbml_sha256": "da21ab52edba14b61e41ee87df7a8bb2f367a1206e6e822602f1e75271fae8e2",
+            "note": "the SBML bytes are not committed; the receipt pins this digest"}),
+        (_p("parameters_a_b_h_k", "in", "feedback parameters", "model_units", "model units", None, "cell", CELL_RG,
+            CELL_CTX, Provenance("values stored in the SBML (a 0.01, b 100, h 2, k 2, mu 1, rho 1); paper not read",
+                                 "unknown", "file")),
+         _p("delta_asymmetry", "out", "Delta level difference between the two cells", "model_units", "model units",
+            None, "cell", CELL_RG, CELL_CTX,
+            Provenance("simulated (replay._asym over delta1, delta2); horizon 0-60 chosen by the connector", "simulated", "file"))),
         Timescale("unknown", None, "the file declares none; horizon 0-60 is the connector's"),
         "a published model replayed as written; the replay checks the engine, not the file's fidelity to the paper",
         ("any flying-fish or fin role for Notch/Delta", "SI units", "parameter provenance"),
-        {"entrypoint": "connectors.biomodels replay", "deterministic": True}))
-    reg.add_model(ModelSpec(
-        "finbeam_euler_bernoulli", "Fin as an Euler-Bernoulli beam (PROPOSED)", "none", "proposed", None,
-        (Port("flexural_rigidity", "in", "fin flexural rigidity EI", "dimensional", "N m^2", dim(kg=1, m=3, s=-2),
-              "organ", "small deflection, linear elastic (proposed)", FISH_CTX,
-              Provenance("proposed slot: no source has been read", "unknown", "none"), None),
-         Port("tip_deflection", "out", "tip deflection under load", "dimensional", "m", dim(m=1), "organ",
-              "small deflection, linear elastic (proposed)", FISH_CTX,
-              Provenance("proposed slot", "unknown", "none"), None)),
-        Timescale("unknown", None, "none"),
-        "a slot for a future scoped model; no implementation or source exists",
-        ("everything: it does not exist yet",), {"entrypoint": None, "deterministic": None}))
+        {"entrypoint": "connectors.biomodels.replay.replay_collier1996", "deterministic": True}))
     reg.add_assumption(Assumption(
         "A1", "glide release speed equals the constraint solver's witness V (the glide model's own default is 1.5 x stall speed)",
         "assumption", "dx-guilds"))
     reg.add_assumption(Assumption(
         "A2", "Notch/Delta lateral-inhibition spacing from a two-cell non-dimensional model sets fin-ray stiffness scale (NO source supports this)",
+        "assumption", "dx-guilds"))
+    reg.add_assumption(Assumption(
+        "A3", "the mean lift-pressure proxy p = 0.5*rho*V^2*CL, built from declared rho, V and CL, is the pressure carried by one fin ray "
+              "(it is not a measured fin pressure; V is the solver's level-flight-proxy speed)", "assumption", "dx-guilds"))
+    reg.add_assumption(Assumption(
+        "A4", "ray length fraction and tributary width are declared values, not measurements (fin_mechanics example: 1/5 of the semispan, 1/100 m)",
+        "assumption", "dx-guilds"))
+    reg.add_assumption(Assumption(
+        "A5", "the flexural-rigidity range is ASSUMED, not measured or calibrated: no calibrated fin stiffness exists in this repository",
         "assumption", "dx-guilds"))
     return reg
 
@@ -764,14 +937,33 @@ def default_couplings() -> list[Coupling]:
                  note="no mapping exists; this is the bridge a reader may be tempted to draw"),
         Coupling("c06_notch_to_fin_stiffness_assumed", "collier1996_two_cell.delta_asymmetry",
                  "finbeam_euler_bernoulli.flexural_rigidity", mapping_kind="assumed", assumption_ids=("A2",),
-                 factor=Fraction(1), factor_dim=dim(kg=1, m=3, s=-2), time_relation="unknown",
-                 uncertainty_kind="unknown"),
+                 factor=Fraction(1), factor_dim=NM2, time_relation="unknown", uncertainty_kind="unknown",
+                 note="an assumption cannot stand in for a cross-scale, cross-taxon transfer"),
         Coupling("c07_rd_wavelength_to_wing_span", "rdfield_nonlinear_sweep.dominant_mode", "glide_pointmass.b",
                  mapping_kind="none", note="a mode number is dimensionless; the span is in metres; no length scale"),
         Coupling("c08_fin_deflection_to_glide_speed", "finbeam_euler_bernoulli.tip_deflection",
                  "glide_pointmass.release_speed", mapping_kind="none",
                  note="needs camber -> CL/CD (Park & Choi 2010 tables, PDF not yet read by anyone)"),
+        Coupling("c09_span_to_fin_bridge", "flying_fish_constraints.b", "fin_load_bridge.b",
+                 note="the bridge reads witness.b as the span", **ident),
+        Coupling("c10_speed_to_fin_bridge", "flying_fish_constraints.V", "fin_load_bridge.V",
+                 mapping_kind="identity", assumption_ids=("A3",), time_relation="static_input", uncertainty_kind="exact",
+                 note="SCENARIO: the bridge reads witness.V as the flight speed, but it is a level-flight-proxy speed"),
+        Coupling("c11_load_proxy_to_beam", "fin_load_bridge.q_line", "finbeam_euler_bernoulli.q_line",
+                 mapping_kind="identity", assumption_ids=("A3", "A4"), time_relation="static_input",
+                 uncertainty_kind="unknown",
+                 note="SCENARIO: same quantity and unit, but the load is a mean lift-pressure proxy times a declared "
+                      "width; there is no calibrated fin stiffness and no measured ray pressure"),
+        Coupling("c12_ray_length_to_beam", "fin_load_bridge.L_ray", "finbeam_euler_bernoulli.L_ray",
+                 mapping_kind="identity", assumption_ids=("A4",), time_relation="static_input",
+                 uncertainty_kind="unknown", note="SCENARIO: ray length is a declared fraction of the semispan"),
+        Coupling("c13_pressure_to_line_load_dimension_only", "fin_load_bridge.p_lift_proxy",
+                 "finbeam_euler_bernoulli.q_line", mapping_kind="assumed", assumption_ids=("A3", "A4"),
+                 factor=Fraction(1, 100), factor_dim=dim(m=1), time_relation="static_input", uncertainty_kind="unknown",
+                 note="Pa x m = N/m matches in dimension; that is necessary, NOT evidence that a ray carries the mean "
+                      "pressure over this width. Scenario only."),
     ]
+
 
 
 # ---- CLI: write the manifest and the per-model interface JSON -------------------------------------------------------

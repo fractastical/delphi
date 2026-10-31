@@ -12,6 +12,7 @@ session, Claude Sonnet 5.5), **not Codex-reviewed**. Nothing here submits, accep
 | `artifacts.py` | artifact pointers (sha256 + git blob id + size), the store's typed `ArtifactRef`, the downloadable-style manifest, and the absolute-path scrubber/scanner. |
 | `nanopub_draft.py` | Claim / Action / Evidence -> unsigned TriG (four named graphs), deterministic. Refuses private records, unlicensed available content, stored quote text, downloadable artifacts with no licence, malformed IRIs. No publish function. |
 | `bundle.py` | Claims -> Actions -> Evidence pinned by exact version, drafts, `chain.json`, `manifest.json`. |
+| `engineering_manifest.py` | producer receipts (engineering / formal) -> PROPOSED Problem, Claim, Action and Evidence drafts, frozen as an importable `frontier-bundle-0.1`. Added by the market worker; see the section below. |
 
 ## Example: claims -> evidence -> artifacts (`examples/nca_chain/`)
 Real OpenResearch run `f81c0b68` (local backend, **not hosted compute**): the preregistered analysis of a finished nonlinear
@@ -31,3 +32,22 @@ Read-only, checkpointed, resumable; limits are parameters (`min_interval`, `max_
 Priority order: math -> Thompson math claims -> Thompson rest -> Levin -> Darwin -> Wolfram (an order, not a judgement). Output is
 **proposed** `Claim` drafts in separate files by registry (production / test / unpublished); a draft that fails validation goes to `errors.jsonl`,
 not away. Bulk output (about 6 MB) is not committed; the checkpoint, receipts and curation report are.
+
+
+## Engineering and formal receipts (`engineering_manifest.py`; frozen output in `examples/engineering_manifest/`)
+Market worker, single-reader, **not Codex-reviewed, not independently reviewed**. Reads immutable git blobs at a pinned commit and never writes to a store or
+executes producer code; producing a bundle is not importing it (corpus owns imports). First slice, 9 records (limit 16):
+
+* **fin mechanics** (6): Claim (derived critical stiffness `EI_crit = 1323/2048000 N m^2` for a *declared illustration* request) -> Action(sim) -> Evidence(sim, `unspecified`)
+  -> Action(render, `inputs` pin the simulation Evidence) -> Evidence(render, `context_only`) ; Problem (the producer's measurement question, `recorded`, nothing invented).
+  Simulation and render are separate Actions because they have different code and different output hashes; the producer records no creation time for either, and the bundle says so.
+* **Lean certificate** (3): Claim (three declared constraints have no common solution) -> Action(Lean kernel check) -> Evidence(`formal`, `supports` declared by the adapter, statement
+  fidelity unreviewed). The z3 search that produced the certificate is in provenance, labelled "re-checked by z3 only"; it is not separate evidence.
+* **Every hash the producer states is recomputed from the blob** (outputs, code files, combined code hash, request, Lean sources, certificate text) and a mismatch refuses the whole
+  chain naming the check; 15 must-fail controls edit a throwaway copy. Lean positive exit 0, standard axioms only, and all four negative blocks rejected are re-read, not trusted.
+* Imported Actions say "NOT executed by Frontier". Evidence says the same producer made claim and result (`independent_of_claim: false`). All artifacts are the store's `ArtifactRef` via
+  `artifacts.to_artifact_ref`: `urn:sha256`, availability `referenced`, no licence, no URL, no bytes. Nothing is claimed about site hosting.
+* Not in this slice: glide fixed-launch and RD video manifests, and the print manifest. **Printer slicing is unknown** in the producer's material.
+
+Freeze: `python3 -m frontier_adapters.engineering_manifest --repo . --source-commit <rev> --out <dir>` (records pinned to the commit's time; same input, same bytes). Checked on an ephemeral
+store: the bundle imports (all `imported_unreviewed`) and `ArtifactIndex` then finds the certificate and the three simulation outputs.

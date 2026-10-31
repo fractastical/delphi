@@ -27,6 +27,13 @@ metered model was selected. Provider-billed incremental spend is not yet known.
 | P1 | Whiteboard directions and artifact index | codex-03 | Implemented; 14 selected artifact/register checks passed |
 | P1 | Reuse and allocation measurements | dx-market + codex-03 | One source run with two claim references documented; no reuse-benefit or scaling-law measurement |
 | P1 | Integrated QA, deployment and pitch handoff | codex-03 + existing director | First live release recorded; next media release and prior-art pitch in progress |
+| P0 | Actual vector/hybrid discovery and indexing | dx-submit | Assigned SPEC-007; pgvector available; provider/model and coverage receipt pending |
+| P0 | Project and anchored Annotation records | dx-guilds | Assigned generic studio model and additive migration; writes retain credentials |
+| P0 | Public knowledge/artifact neighborhoods and reuse | dx-market-r1 | Graph projection and reproducible pinned-input reuse measurement assigned |
+| P0 | Human-readable studio and typed search UI | claude-02 | MorphoSwarm studio plus shared frontier; Flying Fish featured; implementation in progress |
+| P0 | Independent Playwright page audit | dx-critic-r1 | Separate from implementation; every route/tab and major interaction, desktop/mobile; findings pending |
+| P1 | Multiscale design atlas and historical lenses | dx-fable-lead | Sourced assets/gaps across all scales; Darwin/Thompson/Wolfram secondary to working tools |
+| P1 | Mesh turntable media | claude-05 | Actual six meshes, renderer/input/output provenance; no physical print claimed |
 
 ## Integration update — October 31, 12:25 PDT
 
@@ -106,7 +113,9 @@ job needs a documented limit. CPU threads <=2. Raw GPU jobs remain with their
 assigned owner, one GPU per job, at most the previously authorized ten in total,
 yielding to other teams; never cancel others' work. Do not consume reset grants.
 
-No website publication broadens the existing audience. New Sites start private.
+The owner authorized public Frontier browsing on October 31; it is live without
+an audience token or IP restriction. Contributor writes retain credentials and
+roles. Orchestra remains protected by its separate IP allowlist and authentication.
 No external emails or team outreach are authorized by this build board.
 
 ## Current communication protocol

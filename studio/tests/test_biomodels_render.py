@@ -95,3 +95,20 @@ def test_committed_video_matches_its_manifest_and_makes_no_morphology_claim():
 def test_ffmpeg_decodes_the_committed_video_without_error():
     r = subprocess.run([rd.FFMPEG, "-v", "error", "-i", str(VIDEO_DIR / "delta_notch_replay.mp4"), "-f", "null", "-"], capture_output=True, text=True)
     assert r.returncode == 0 and r.stderr == ""
+
+
+def test_manifest_obeys_the_published_schema_and_the_schema_rejects_known_violations():
+    jsonschema = pytest.importorskip("jsonschema")
+    schema = json.loads((VIDEO_DIR / "delta_notch_replay_manifest.schema.json").read_text())
+    man = json.loads((VIDEO_DIR / "delta_notch_replay_manifest.json").read_text())
+    jsonschema.Draft202012Validator.check_schema(schema)
+    v = jsonschema.Draft202012Validator(schema)
+    assert not list(v.iter_errors(man))
+    def broken(edit):
+        m = json.loads(json.dumps(man)); edit(m); return list(v.iter_errors(m))
+    assert broken(lambda m: m["claims"]["does_not_show"].remove("a fin"))
+    assert broken(lambda m: m["video"].update(sha256="xyz"))
+    assert broken(lambda m: m["video"].update(duration_s=25.0))
+    assert broken(lambda m: m["claims"]["captions"].update(footer="a pretty video"))
+    assert broken(lambda m: m["inputs"]["csv"].pop(next(iter(m["inputs"]["csv"]))))
+    assert broken(lambda m: m.update(extra="x"))

@@ -9,7 +9,7 @@ from fractions import Fraction
 import pytest
 
 from engineering.coupling import (
-    BASE_UNITS, Assumption, Bounds, Calibration, Coupling, CouplingError, ModelSpec, Port, Provenance, Registry,
+    BASE_UNITS, tree_sha256, verify_reference_sources, FILES, Assumption, Bounds, Calibration, Coupling, CouplingError, ModelSpec, Port, Provenance, Registry,
     Timescale, build_manifest, default_couplings, default_registry, dim, model_from_json, model_to_json,
     problem_proposal, validate_coupling,
 )
@@ -25,7 +25,9 @@ def port(name, direction, quantity="length", kind="dimensional", unit="m", d=Non
 
 
 def model(mid, ports, status="implemented", ts=Timescale("static")):
-    ref = None if status == "proposed" else {"repo": "synthetic", "branch": "x", "commit": "y", "path": "z"}
+    files = {"synthetic.py": "b" * 64}
+    ref = None if status == "proposed" else {"repo": "synthetic", "branch": "x", "commit": "y", "path": "synthetic.py",
+                                              "files": files, "source_sha256": tree_sha256(files)}
     return ModelSpec(mid, mid, "synthetic", status, ref, tuple(ports), ts, "synthetic test fixture", ("everything",))
 
 
@@ -54,10 +56,16 @@ def test_default_registry_has_no_real_calibration_and_the_expected_verdict_count
     reg = default_registry()
     assert reg.calibrations == {}
     m = build_manifest(reg, default_couplings())
-    assert m["counts"] == {"composable": 3, "scenario": 1, "refused": 4}
+    assert m["counts"] == {"composable": 4, "scenario": 5, "refused": 4}
     by = {r["coupling"]["id"]: r["verdict"] for r in m["couplings"]}
-    assert [k for k, v in by.items() if v["status"] == "composable"] == ["c01_mass", "c02_area", "c03_span"]
-    assert by["c04_speed"]["status"] == "scenario" and "assumption-level" in by["c04_speed"]["label"]
+    assert [k for k, v in by.items() if v["status"] == "composable"] == [
+        "c01_mass", "c02_area", "c03_span", "c09_span_to_fin_bridge"]
+    assert [k for k, v in by.items() if v["status"] == "scenario"] == [
+        "c04_speed", "c10_speed_to_fin_bridge", "c11_load_proxy_to_beam", "c12_ray_length_to_beam",
+        "c13_pressure_to_line_load_dimension_only"]
+    for k in ("c04_speed", "c10_speed_to_fin_bridge", "c11_load_proxy_to_beam", "c12_ray_length_to_beam",
+              "c13_pressure_to_line_load_dimension_only"):
+        assert "assumption-level" in by[k]["label"]
     for k in ("c05_notch_to_fin_stiffness", "c06_notch_to_fin_stiffness_assumed", "c07_rd_wavelength_to_wing_span",
               "c08_fin_deflection_to_glide_speed"):
         assert by[k]["status"] == "refused"
@@ -68,7 +76,8 @@ def test_default_registry_has_no_real_calibration_and_the_expected_verdict_count
 def test_the_notch_to_fin_bridge_cannot_be_made_even_by_naming_an_assumption():
     reg = default_registry()
     v = validate_coupling(reg, [c for c in default_couplings() if c.id == "c06_notch_to_fin_stiffness_assumed"][0])
-    assert v.status == "refused" and any("PROPOSED" in r for r in v.reasons)
+    assert v.status == "refused" and any("cannot stand in" in r for r in v.reasons)   # fin beam now EXISTS; still refused
+    assert v.checks["scope"].startswith("fail") and v.missing_calibrations
     v5 = validate_coupling(reg, [c for c in default_couplings() if c.id == "c05_notch_to_fin_stiffness"][0])
     assert any("scope mismatch" in r for r in v5.reasons) and v5.missing_calibrations
 
@@ -301,15 +310,15 @@ def test_problem_proposals_exist_for_every_non_composable_coupling_and_invent_no
     m = build_manifest(reg, default_couplings())
     ids = {p["source_coupling"] for p in m["problem_proposals"]}
     assert ids == {"c04_speed", "c05_notch_to_fin_stiffness", "c06_notch_to_fin_stiffness_assumed",
-                   "c07_rd_wavelength_to_wing_span", "c08_fin_deflection_to_glide_speed"}
+                   "c07_rd_wavelength_to_wing_span", "c08_fin_deflection_to_glide_speed", "c10_speed_to_fin_bridge",
+                   "c11_load_proxy_to_beam", "c12_ray_length_to_beam", "c13_pressure_to_line_load_dimension_only"}
     for p in m["problem_proposals"]:
         assert p["status"] == "proposed" and p["not_a_claim"] is True
         assert p["success"] and p["falsifier"] and p["action_bounds"]["gpu"] is False
         assert p["action_bounds"]["paid_calls"] is False and "GPU submission" in p["action_bounds"]["forbidden"]
         assert "frozen BEFORE" in p["success"]                       # thresholds are slots, not invented values
         assert "whole-filesystem" in " ".join(p["action_bounds"]["allowed_actions"])
-    p8 = [p for p in m["problem_proposals"] if p["source_coupling"] == "c08_fin_deflection_to_glide_speed"][0]
-    assert any("finbeam_euler_bernoulli is implemented" in x for x in p8["prerequisites"])
+    assert all(p["prerequisites"] == [] for p in m["problem_proposals"])         # every endpoint model now exists
 
 
 def test_module_is_stdlib_only_and_units_match_the_constraint_solver():
@@ -342,3 +351,180 @@ def test_committed_manifest_and_interfaces_are_not_stale(tmp_path):
     assert names == sorted(p.name for p in (root / "model_interfaces").iterdir())
     for n in names:
         assert (root / "model_interfaces" / n).read_text() == (tmp_path / "model_interfaces" / n).read_text()
+
+
+# ======================= fin mechanics bridge: scenario only; dimension match is not validity =====================
+
+from engineering.coupling import NM2, NPM, PA  # noqa: E402
+
+REPO = __import__("pathlib").Path(__file__).resolve().parents[1]
+
+
+def _verdicts():
+    reg = default_registry()
+    return reg, {c.id: (c, validate_coupling(reg, c)) for c in default_couplings()}
+
+
+def test_load_proxy_to_beam_is_a_scenario_with_the_stated_assumptions_and_never_composable():
+    reg, vs = _verdicts()
+    for cid in ("c11_load_proxy_to_beam", "c12_ray_length_to_beam"):
+        c, v = vs[cid]
+        assert v.status == "scenario" and "assumption-level" in v.label
+        assert set(v.assumption_ids) <= {"A3", "A4"} and v.assumption_ids
+        assert v.checks["mapping"] == "pass" and v.checks["dimension"] == "pass"     # the interface matches ...
+    # removing the named assumptions and claiming exact arithmetic does NOT make the load proxy composable:
+    # the PORT CAVEATS (proxy-derived load, declared length) block composition without a calibration
+    for cid in ("c10_speed_to_fin_bridge", "c11_load_proxy_to_beam", "c12_ray_length_to_beam"):
+        c = vs[cid][0]
+        v = validate_coupling(reg, replace(c, assumption_ids=(), uncertainty_kind="exact"))
+        assert v.status == "scenario", cid
+        assert v.checks["caveats"].startswith("scenario:") and "proxy" in v.checks["caveats"].lower() or \
+            "declared" in v.checks["caveats"].lower() or "level-flight" in v.checks["caveats"]
+
+
+def test_pressure_to_line_load_matching_dimensions_is_flagged_not_established():
+    reg, vs = _verdicts()
+    c13, v13 = vs["c13_pressure_to_line_load_dimension_only"]
+    assert v13.status == "scenario" and v13.checks["dimension"] == "pass"
+    assert v13.checks["validity"].startswith("NOT established")
+    assert "necessary, NOT evidence" in c13.note
+    # PA * m == N/m exactly, and a wrong factor dimension is refused (so 'dimension pass' is not vacuous)
+    assert {u: PA[u] + dim(m=1)[u] for u in BASE_UNITS} == NPM
+    assert validate_coupling(reg, replace(c13, factor_dim=dim(m=2))).status == "refused"
+    assert validate_coupling(reg, replace(c13, factor=None)).status == "refused"       # different units need a stated factor
+    # a CALIBRATED pressure -> line-load map needs a registered calibration: none exists, so it is a missing bridge
+    cal_c = replace(c13, mapping_kind="calibrated", factor=None, factor_dim=None, calibration_id="ray_pressure_cal",
+                    uncertainty_kind="calibration_relative_bound")
+    v = validate_coupling(reg, cal_c)
+    assert v.status == "refused" and v.missing_calibrations == ["ray_pressure_cal"]
+
+
+def test_assumptions_never_bridge_scale_or_context_only_regime():
+    reg = pair(port("o", "out", quantity="q", scale="cell"), port("i", "in", quantity="q", scale="organ"))
+    reg.add_assumption(Assumption("A", "fixture"))
+    mk = lambda r: validate_coupling(r, Coupling("c", "src.o", "dst.i", mapping_kind="assumed", assumption_ids=("A",),
+                                                 time_relation="static_input", uncertainty_kind="unknown"))
+    assert mk(reg).status == "refused"
+    reg2 = pair(port("o", "out", quantity="q", context="fly"), port("i", "in", quantity="q", context="fish"))
+    reg2.add_assumption(Assumption("A", "fixture"))
+    assert mk(reg2).status == "refused"
+    reg3 = pair(port("o", "out", quantity="q", regime="r1"), port("i", "in", quantity="q", regime="r2"))
+    reg3.add_assumption(Assumption("A", "fixture"))
+    v = mk(reg3)
+    assert v.status == "scenario" and v.checks["scope"].startswith("scenario")
+
+
+def test_biological_couplings_stay_refused_now_that_every_endpoint_model_exists():
+    reg, vs = _verdicts()
+    assert all(m.status != "proposed" for m in reg.models.values())
+    for cid in ("c05_notch_to_fin_stiffness", "c06_notch_to_fin_stiffness_assumed", "c07_rd_wavelength_to_wing_span",
+                "c08_fin_deflection_to_glide_speed"):
+        assert vs[cid][1].status == "refused", cid
+        assert vs[cid][1].missing_calibrations, cid
+
+
+# ======================= registry facts are tied to the actual code =============================================
+
+def test_implemented_models_need_exact_commit_files_and_a_matching_tree_hash():
+    base = model_to_json(default_registry().models["glide_pointmass"])
+    for mut in (lambda r: r.pop("commit"), lambda r: r.pop("files"), lambda r: r.pop("source_sha256"),
+                lambda r: r.update(source_sha256="0" * 64),
+                lambda r: r["files"].update({"x.py": "nothex"}), lambda r: r.update(files={})):
+        o = json.loads(json.dumps(base))
+        mut(o["reference"])
+        with pytest.raises(CouplingError):
+            model_from_json(o)
+    assert model_from_json(json.loads(json.dumps(base))).reference["source_sha256"] == tree_sha256(base["reference"]["files"])
+
+
+def test_default_models_point_at_the_exact_branches_and_commits_named_by_root():
+    refs = {m.model_id: (m.reference["branch"], m.reference["commit"]) for m in default_registry().models.values()}
+    assert refs == {
+        "flying_fish_constraints": ("work/guilds-engineering", "948c2e1"),
+        "glide_pointmass": ("work/nca-glide", "87e72f9"),
+        "fin_load_bridge": ("work/fin-mechanics", "72df07c"),
+        "finbeam_euler_bernoulli": ("work/fin-mechanics", "72df07c"),
+        "rdfield_nonlinear_sweep": ("work/nca-glide", "87e72f9"),
+        "collier1996_two_cell": ("work/biomodels", "abf1838")}
+    rd = default_registry().models["rdfield_nonlinear_sweep"].reference
+    assert rd["upstream_rows_sha256"].startswith("a32c2bf7") and rd["upstream_prereg_commit"].startswith("cb27cf2")
+
+
+def _git_has(commit):
+    import subprocess
+    return subprocess.run(["git", "-C", str(REPO), "cat-file", "-e", commit], capture_output=True).returncode == 0
+
+
+def test_every_recorded_file_hash_matches_the_commit_when_the_commit_is_available():
+    seen = 0
+    for m in default_registry().models.values():
+        r = verify_reference_sources(m, REPO)
+        assert r["ok"] is not False, r                      # never a mismatch; None only when the commit is absent
+        seen += r["ok"] is True
+    if not _git_has("72df07c"):
+        pytest.skip("source commits are not in this object store; hashes not re-verified")
+    assert seen == 6
+
+
+def test_a_tampered_file_hash_is_detected():
+    if not _git_has("72df07c"):
+        pytest.skip("source commits are not in this object store")
+    base = model_to_json(default_registry().models["fin_load_bridge"])
+    path = next(iter(base["reference"]["files"]))
+    base["reference"]["files"][path] = "0" * 64
+    base["reference"]["source_sha256"] = tree_sha256(base["reference"]["files"])   # internally consistent forgery
+    forged = model_from_json(base)
+    assert verify_reference_sources(forged, REPO)["ok"] is False
+
+
+ANCHORS = {   # a string from each model's declared ports that must appear in the referenced source text
+    "flying_fish_constraints": ("def solve", "level_lift_proxy"),
+    "glide_pointmass": ("release_speed_from_witness", "CL_max", "1.5 *"),
+    "fin_load_bridge": ("p_lift_proxy", "q_line", "L_ray", "ray_length_fraction_of_semispan", "tributary_width_m"),
+    "finbeam_euler_bernoulli": ("def solve_checked", "def tip_deflection_uniform", "ASSUMED_RANGE_NOT_MEASURED"),
+    "rdfield_nonlinear_sweep": ("SAVE_EVERY_TAU", "dimensionless", "zero-flux"),
+    "collier1996_two_cell": ("replay_collier1996", "delta1", "delta2", "_asym"),
+}
+
+
+def test_declared_ports_are_anchored_in_the_referenced_source_text():
+    import subprocess
+    if not _git_has("72df07c"):
+        pytest.skip("source commits are not in this object store")
+    reg = default_registry()
+    extra = {"finbeam_euler_bernoulli": ["engineering/fin_mechanics/README.md"]}
+    for mid, needles in ANCHORS.items():
+        ref = reg.models[mid].reference
+        paths = list(ref["files"]) + extra.get(mid, [])
+        text = "".join(subprocess.run(["git", "-C", str(REPO), "show", f"{ref['commit']}:{p}"], capture_output=True,
+                                      text=True).stdout for p in paths)
+        for n in needles:
+            assert n in text, (mid, n)
+
+
+def test_port_caveat_blocks_identity_composition_but_not_a_calibration():
+    ok = pair(port("o", "out", quantity="q"), port("i", "in", quantity="q"))
+    assert validate_coupling(ok, Coupling("c", "src.o", "dst.i", **IDENT)).status == "composable"
+    for side in ("o", "i"):
+        kw = {"o": dict(), "i": dict()}
+        src = replace(port("o", "out", quantity="q"), caveat="proxy" if side == "o" else "")
+        dst = replace(port("i", "in", quantity="q"), caveat="declared" if side == "i" else "")
+        v = validate_coupling(pair(src, dst), Coupling("c", "src.o", "dst.i", **IDENT))
+        assert v.status == "scenario" and v.checks["caveats"].startswith("scenario:"), side
+    # a registered, structurally complete calibration CAN compose a caveated pair
+    src = replace(port("o", "out", kind="model_units", unit="model units", quantity="pattern wavelength", d=None,
+                       bounds=B0(1, 5)), caveat="proxy")
+    dst = port("i", "in", quantity="pattern wavelength", unit="mm", d=dim(m=1), bounds=B0(0, 10000))
+    reg = pair(src, dst)
+    reg.add_calibration(cal())
+    v = validate_coupling(reg, CAL_C)
+    assert v.status == "composable" and v.checks["caveats"].startswith("noted:")
+
+
+def test_caveat_round_trips_through_the_interface_json_and_defaults_to_empty():
+    m = default_registry().models["fin_load_bridge"]
+    j = json.loads(json.dumps(model_to_json(m)))
+    assert any(p["caveat"] for p in j["ports"]) and model_from_json(j) == m
+    for p in j["ports"]:
+        p.pop("caveat")
+    assert all(p.caveat == "" for p in model_from_json(j).ports)       # older files without the key still parse

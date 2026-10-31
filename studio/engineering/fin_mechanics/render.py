@@ -96,7 +96,7 @@ def _scalar_axes(ax, res):
     ax.text(crit * 0.8, 800, "linear model INVALID\n(flagged, left of EI_crit)", color=RED, fontsize=8, va="top", ha="right")
     b0, b1 = res["EI_context_only"]["bluegill_sunfish_B_range_Nm2"]
     ax.axvspan(b0, b1, facecolor="none", edgecolor=GREY, hatch="///", alpha=0.6, lw=0)
-    ax.text(np.sqrt(b0 * b1), 2e-4, "context only: bluegill B\n(Alben+ 2007, other species,\nnot a calibration)",
+    ax.text(np.sqrt(b0 * b1), 2e-4, "context only: bluegill B~1e-6..1e-5\n(Alben+ 2007 Sec. 3.4: composite E x\naverage I; not a calibration)",
             fontsize=7, color=GREY, ha="center", va="bottom")
     ax.set_xlabel("bending stiffness EI  [N m^2]   (ASSUMED log-spaced range, not measured)", fontsize=9)
     ax.set_ylabel("tip deflection / L  [1]\n(simulated)", fontsize=9)
@@ -209,7 +209,7 @@ def make_poster(res: dict, out_png: Path):
     fig.text(0.05, 0.062, textwrap.fill("NOT ESTABLISHED: " + "; ".join(res["not_established"][:5]) + ".", 230),
              fontsize=8.5, color=GREY, va="center")
     fig.text(0.05, 0.012, f"inputs sha256 {res['inputs_sha256'][:16]}...  code sha256 {res['code_sha256'][:16]}...  "
-             "evidence_kind: simulated.  Context band (gray) = bluegill B from Alben, Madden & Lauder 2007, not a calibration.",
+             "evidence_kind: simulated.  Gray hatched band = bluegill B=EI ~1e-6-1e-5 N m^2, Alben, Madden & Lauder 2007 Sec. 3.4 (order of magnitude, other species), not a calibration.",
              fontsize=8, color=GREY)
     fig.savefig(out_png, dpi=100)
     plt.close(fig)

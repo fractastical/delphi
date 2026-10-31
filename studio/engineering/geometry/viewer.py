@@ -67,7 +67,7 @@ code { font-family: var(--mono); font-size: 0.8rem; overflow-wrap: anywhere; }
 <main>
   <header style="display:grid;gap:6px">
     <h1>Flying-fish print forms</h1>
-    <p class="muted">Three parametric props at one biological mass (0.1 kg), drawn from the exported STL triangles. Biological values are in SI; the prop is 1 m = __K__ mm, with thickened fins.</p>
+    <p class="muted">Parametric props drawn from the exported STL triangles, in two sets. __SETS__ Biological values are in SI; fins are thickened print plates. Printer and resin are not chosen yet, and nothing has been sliced or printed.</p>
   </header>
   <div class="banner" role="note">
     <strong>Form studies pending a validated candidate.</strong>
@@ -93,7 +93,8 @@ code { font-family: var(--mono); font-size: 0.8rem; overflow-wrap: anywhere; }
   <section class="card"><h2>Not checked</h2><ul>
     <li>Global self-intersection, slicing, supports, cups and minima. These depend on printer, resin and orientation, and PreForm checks them.</li>
     <li>No physical print and no PreForm run. Resin volume and print time come only from the slicer.</li>
-    <li>Aerodynamics of the prop or the design. Visual likeness is not aerodynamic fidelity, and the glide simulation has not run on these candidates.</li>
+    <li>Aerodynamics of the prop. Visual likeness is not aerodynamic fidelity. A–C have no glide simulation; N1–N3 carry dx-nca's point-mass simulation with assumed polars, which compares S and AR and calibrates nothing.</li>
+    <li>Wall thickness is checked against 1 mm (our provisional prop choice) on sampled faces only.</li>
     <li>Biological feasibility, ancestry and evolutionary reachability. None are claimed.</li>
   </ul></section>
   <p class="muted" style="font-size:0.8rem">Build code sha256 <code>__CODE__</code>. Sources: Fish 1990 J. Zool. 221:391-403 (full text, sha256 1efed334…); Daane et al. 2021 Curr. Biol. 31:5052 Data S1A (per-specimen fin lengths, recomputed); Formlabs Design Specs and PreForm API pages (read 2026-10-31).</p>
@@ -175,7 +176,8 @@ def form_payload(design: dict, mesh_b64: dict) -> dict:
     v = design["validation"]
     chips = [("solver: " + st["solver"] + (" {" + ", ".join(st["solver_conflict"]) + "}" if st["solver_conflict"] else ""),
               "good" if st["solver"] == "feasible" else "bad"),
-             ("glide sim: " + st["glide"]["status"].replace("_", " "), "neutral"),
+             (("NCA sim: simulated comparison, assumed polars" if design.get("simulation_comparison") else
+               "glide sim: " + st["glide"]["status"].replace("_", " ")), "neutral"),
              ("mesh checks: " + ("pass" if v["ok"] else "FAIL"), "good" if v["ok"] else "bad"),
              ("stand checks: " + ("pass" if design["stand"]["validation"]["ok"] else "FAIL"),
               "good" if design["stand"]["validation"]["ok"] else "bad"),
@@ -201,20 +203,30 @@ def form_payload(design: dict, mesh_b64: dict) -> dict:
         ["Fin thickness", "not modelled", f"{design['print_parameters']['fin_thickness_mm']['value']} mm plate",
          f"print choice (= {design['prop_mm']['fin_thickness_exaggeration']['equivalent_biological_mm']:.1f} mm at "
          "biological scale)"],
+        ["Display scale", "", f"1 m = {k:.0f} mm", design["set"]["title"]],
         ["Prop extent", "", f"{size[0]:.1f} × {size[1]:.1f} × {size[2]:.1f} mm", "fits a 120 mm box"],
         ["Prop solid volume", "", f"{v['signed_volume_mm3']:.0f} mm³", "solid, no internal cavity"],
-        ["Sampled wall min", "", f"{v['wall_thickness']['min_mm']:.2f} mm", f"{v['wall_thickness']['samples']} inward rays"],
+        ["Sampled wall min", "", f"{v['wall_thickness']['min_mm']:.2f} mm",
+         f"{v['wall_thickness']['samples']} inward rays; required >= {v.get('min_wall_mm_required', 1.0):g} mm: "
+         + ("pass" if v.get("min_wall_ok") else "FAIL")],
         ["Mesh sha256", "", v["mesh_sha256"][:16] + "…", "canonical vertex/face hash"],
     ]
-    short = {"A": "A · short-fin precursor-inspired", "B": "B · two-wing", "C": "C · four-wing"}[design["id"][0]]
-    return {"short": short, "title": design["title"], "role": design["role"], "note": design.get("status_note") or "",
+    sim = design.get("simulation_comparison")
+    if sim:
+        for r in sim["rows"]:
+            rows.append([f"NCA sim {r['polar'].split('_')[0]}, release {float(r['V0']):g} m/s",
+                         f"sink {float(r['sink_eq_ms']):.2f} m/s, range {float(r['range_m']):.1f} m",
+                         "n/a", f"simulated (glide-pointmass/1, {sim['commit'][:7]}); range ratio vs N1 "
+                         f"{float(r['range_ratio']):.3f}; stall-feasible {r['stall_feasible']}"])
+    return {"short": design["short"], "title": design["title"], "role": design["role"], "note": design.get("status_note") or "",
             "chips": chips, "rows": rows, **mesh_b64}
 
 
-def page(designs: list[dict], meshes: list[dict], graph_png: bytes, label: str, run: dict, scale: float) -> str:
+def page(designs: list[dict], meshes: list[dict], graph_png: bytes, label: str, run: dict, sets: dict) -> str:
     data = [form_payload(d, m) for d, m in zip(designs, meshes)]
     out = PAGE.replace("__DATA__", json.dumps(data).replace("</", "<\\/"))
     out = out.replace("__GRAPH__", base64.b64encode(graph_png).decode())
-    out = out.replace("__LABEL__", html.escape(label.replace("Form study pending a validated candidate. ", ""))).replace("__K__", f"{1000 * scale:.0f}")
+    out = out.replace("__LABEL__", html.escape(label.replace("Form study pending a validated candidate. ", ""))).replace(
+        "__SETS__", html.escape(" ".join(f"{v['title']}; 1 m = {1000 * v['display_scale']:.0f} mm." for v in sets.values())))
     out = out.replace("__SOLVER__", run["solver"]["commit"][:7]).replace("__BLOB__", run["solver"]["blob_sha256"][:16] + "…")
     return out.replace("__CODE__", run["code_sha256"])

@@ -73,6 +73,25 @@ BODY_DENSITY = {
              "1025 kg/m^3 is a typical seawater density chosen by us, not a measured exocoetid density",
 }
 
+# dx-nca's controlled glide comparison (file-only handoff messages/nca-to-print.md, 2026-10-31T19:21Z).  The three
+# geometries are the Fish Cypselurus fit at 0.05 kg with wing area x fS and whole-wing AR x fAR.  The build reads
+# the committed CSV from this commit and checks its sha256; a sink rate or range quoted in a design JSON is
+# NCA's simulated output, not an observation.
+NCA_CONTROLLED = {
+    "repo": "kganjam/delphi-frontier", "branch": "work/nca-glide",
+    "commit": "87e72f9fbc29bf97452af249fe1ba7bf48ae9dcc",
+    "comparison_csv": "engineering/simulation/results_controlled/comparison.csv",
+    "comparison_csv_sha256": "6c434c4a7b09e5897c3ad043f706d1a8b2e5f41b52b62d2650b4dcfd45f0343d",
+    "protocol": "engineering/simulation/PROTOCOL_CONTROLLED.md",
+    "protocol_sha256": "0099463326f19aa301130844a9c94d92d7bd8bf8f5ea7e2df1d9e6e385a4f6d0",
+    "evidence_kind": "simulated",
+    "model_version": "glide-pointmass/1",
+    "caveats": ["polars are assumptions (P1 CD0 0.06 e 0.8 CL_max 1.2; P2 CD0 0.25 CL_max 1.03), not calibrated",
+                "point mass: no pitch, stability or flapping; a printed model's Reynolds number differs",
+                "0 robust winners of 144 variants; only equilibrium sink falling with S and AR is robust",
+                "a comparison set for a geometry-effect test, not an optimum"],
+}
+
 FORMLABS = {
     "design_specs": {
         "url": "https://support.formlabs.com/s/article/Design-Specs",
@@ -119,4 +138,8 @@ def table_cross_check(genus: str, mass_kg: float) -> dict:
 @functools.lru_cache(maxsize=1)
 def daane_summary() -> dict:
     """Fin/SL ratios recomputed from Daane et al. 2021 Data S1A by `engineering.geometry.daane_s1`."""
+    if not DAANE_SUMMARY.exists():
+        raise FileNotFoundError(f"{DAANE_SUMMARY} not found: engineering.geometry runs from a repository checkout "
+                                "(the summary lives in artifacts/print/sources/), not from an installed wheel; "
+                                "install with `pip install -e '.[geometry]'` and run from the repo root")
     return json.loads(DAANE_SUMMARY.read_text())

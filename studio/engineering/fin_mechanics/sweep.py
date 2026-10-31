@@ -1,9 +1,10 @@
 """Sweep an ASSUMED, log-spaced range of bending stiffness EI over a declared load and report validity.
 
 EI of a fish fin ray is UNKNOWN to this package.  The sweep range is an explicit assumption with no
-biological calibration.  The only sourced EI number read (Alben, Madden & Lauder 2007, bluegill sunfish,
-three-point bending: B = EI ~ 1e-6 to 1e-5 J m = N m^2) is carried as CONTEXT ONLY, for a different
-species, scale, medium (water) and boundary condition; it is not used to set any result.
+biological calibration.  The only sourced EI number read (Alben, Madden & Lauder 2007, Section 3.4,
+bluegill sunfish, composite E from three-point bending times average I: B = EI ~ 1e-6 to 1e-5 J m = N m^2) is
+carried as CONTEXT ONLY, for a different species, scale, medium (water) and boundary condition; it is not
+used to set any result.
 
 CLI:  python -m engineering.fin_mechanics.sweep REQUEST.json RESULT.json
 """
@@ -26,14 +27,25 @@ PKG = Path(__file__).resolve().parent
 SOURCES_READ = [
     {"ref": "Alben S, Madden PG, Lauder GV (2007) The mechanics of active fin-shape control in ray-finned "
             "fishes. J R Soc Interface 4(13):243-256, doi:10.1098/rsif.2006.0181 (PMC2359861)",
-     "read": "FULL-TEXT PAGE on PMC, fetched through a summarising fetch tool (not raw PDF); abstract and "
-             "sections 3.4, 5.2, 5.3 consulted through that tool's answers. Numbers below are as relayed "
-             "by the tool and should be re-checked against the PDF before any publication use.",
-     "used_for": ["context-only EI scale: B = EI ~ 1e-6 to 1e-5 J m (N m^2) for bluegill sunfish rays via "
-                  "three-point bending (composite E ~ 1e8-1e9 N/m^2, I ~ 1e-6 cm^4)",
-                  "boundary-condition sensitivity: cantilever force-displacement slope with both "
-                  "hemitrichs clamped ~1.98 N/m, about 12x the one-hemitrich-free value",
-                  "the paper's model is a BILAMINAR elastica with intraray shear, not a single "
+     "read": "FULL TEXT (publisher text as hosted on PMC), downloaded as HTML with curl (https://pmc.ncbi.nlm.nih.gov/articles/PMC2359861/, "
+             "HTTP 200, 213,488 bytes, sha256 3ee6a0ea892638fb4a23336f815d236e2293021c504ebaa960dc00dccd9b7854) and "
+             "text-extracted with python -I (70,538 characters). Not a summarising tool. The PDF was NOT obtained "
+             "(PMC served a proof-of-work page; royalsocietypublishing.org and Europe PMC returned HTTP 403), so the "
+             "HTML has no page numbers: citations below are by section, equation and figure.",
+     "used_for": ["context-only EI scale, Section 3.4 'Physical scalings' (text after eq. 3.19): 'using three-point "
+                  "bending tests ... the composite Young's modulus ... E ~ 1e8-1e9 N m^-2, with the average area "
+                  "moment of inertia I ~ 1e-6 cm^4. Hence, the measured B = EI ~ 1e-6-1e-5 J m' (J m = N m^2; "
+                  "1e-6 cm^4 = 1e-14 m^4, so E*I = 1e-6 to 1e-5 N m^2, consistent). Species: bluegill sunfish "
+                  "(Lepomis macrochirus); 24 rays from six fish, maximum ray length 40.3 +/- 0.8 mm; rays tested "
+                  "submerged in water within 48 h; the scaling estimate uses L = 4 cm for a typical ray. It is an "
+                  "order-of-magnitude product of a composite E and an average I (area moments from a microCT scan "
+                  "of one fin, Section 2), NOT a per-ray or per-position measurement and not tabulated; no table "
+                  "or figure reports B. The paper's own scaling argument (eq. 3.19) gave B ~ 1e-6 J m, lower than measured.",
+                  "boundary-condition sensitivity, Section 5.2 and Figure 7 caption: ray clamped at the base, vertical point "
+                  "force at about two-thirds of the way from base to tip; with both hemitrich bases clamped the "
+                  "force-displacement slope is 1.98 N m^-1, 'about 12 times the value when one hemitrich is free'. "
+                  "This is a stiffness (N/m) at a point load, not an EI.",
+                  "the paper's model is a BILAMINAR elastica with intraray shear (Section 3), not a single "
                   "Euler-Bernoulli beam; this package's single-beam EI is an effective-stiffness proxy"],
      "not_used_for": "any numerical result, calibration or validation of this surrogate"},
     {"ref": "Wikipedia, 'Euler-Bernoulli beam theory' (secondary source)",
@@ -59,7 +71,7 @@ MEASUREMENT_QUESTION = {
                  "as a function of distance from its base, under the clamping condition that matches its "
                  "in-fin boundary condition, and is it above or below EI_crit_Nm2 of this request?"),
     "apparatus": ("Clamp the ray base (state whether both hemitrichs or one is clamped; Alben et al. 2007 "
-                  "report ~12x stiffness difference between these), load the free end with a calibrated "
+                  "Fig. 7 report ~12x stiffness difference between these, for a point force at 2/3 of the ray), load the free end with a calibrated "
                   "micro-force transducer (resolution <= 1 microN) or a calibrated cantilever probe, "
                   "track tip displacement optically (resolution <= 1 micrometre), keep the specimen "
                   "hydrated, record force-displacement for tip/L < 0.1 (inside the linear range), and "
@@ -216,6 +228,7 @@ def run(request: dict) -> dict:
             "EI_assumed_range": {"status": "ASSUMED_RANGE_NOT_MEASURED", "min_Nm2": str(ei_min),
                                  "max_Nm2": str(ei_max), "n_points": n_ei, "spacing": "log10-uniform"},
             "EI_context_only": {"bluegill_sunfish_B_range_Nm2": CONTEXT_EI_BLUEGILL_NM2,
+                                "source": "Alben, Madden & Lauder 2007, Section 3.4 (text read in full as HTML; PDF not obtained); order-of-magnitude, composite E x average I",
                                 "warning": "different species, length, medium, boundary condition; context only, "
                                            "see sources_read; not a calibration of this surrogate"},
             "critical_stiffness": crit,
