@@ -1,0 +1,59 @@
+{
+  "record": {
+    "id": "eng-finmech-claim-ei-crit",
+    "kind": "Claim",
+    "issuer": "importer",
+    "payload": {
+      "title": "Declared-load critical bending stiffness of a single clamped-free ray (linear small-deformation surrogate)",
+      "origin": "derived",
+      "source": {
+        "uri": null,
+        "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Claim statement is the producer's critical_stiffness field.",
+        "license": null,
+        "locator": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/artifacts/result.json",
+        "content_sha256": "971aa0056f0879b9bf38907a533727d324cc26cfea31f74d83e1e08266cf1f36",
+        "source_version": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+        "content_available": false
+      },
+      "context": "Producer-derived number from exact rational arithmetic on DECLARED inputs (rho, V, CL, tributary width, ray length, validity thresholds). It is a threshold of the surrogate, not a property of any fish. Decision rule stated by the producer: If measured EI >= EI_crit_Nm2 the declared load stays inside the small-deformation limit for this geometry; if EI < EI_crit_Nm2 the linear model is invalid at the declared load and a large-deformation model (or a lower load) is required.",
+      "statement": "For the producer's declared request (canonical sha256 f276a86069b8577d...), in a linear static Euler-Bernoulli cantilever with a uniform line load from a declared lift-pressure proxy, the bending stiffness below which the declared small-deformation limits are exceeded is EI_crit = 1323/2048000 N m^2 (binding limit: tip_over_L).",
+      "assumptions": [
+        "Euler-Bernoulli (no shear deformation), linear elastic, static, constant EI along the ray",
+        "single clamped-free cantilever ray; clamped base; free tip",
+        "load = mean aerodynamic lift-pressure proxy p = 0.5*rho*V^2*CL from DECLARED rho, V, CL; uniform along the ray and normal to it; NOT a measured fin pressure",
+        "line load q_line = p * tributary width (width declared, see load_bridge.inputs)",
+        "EI swept over an ASSUMED log-spaced range [1/1000000, 1] N m^2, 61 points; no biological calibration",
+        "small-deformation validity limits are DECLARED thresholds, not derived from material"
+      ],
+      "limitations": [
+        "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+        "The request is labelled by its producer: DECLARED ILLUSTRATION: not produced by the dx-guilds solver; numbers are test values, not a design claim. Its numbers are test values, not a design claim.",
+        "EI is an ASSUMED log-spaced range (1/1000000 to 1 N m^2), not a measurement of any fin ray.",
+        "Producer states it does not establish: biological feasibility of any fin, ray or flight design",
+        "Producer states it does not establish: the stiffness EI of any real fish fin ray (it is an assumed range here)",
+        "Producer states it does not establish: fluid-structure interaction: the load is a fixed mean pressure proxy, not coupled to deformation",
+        "Producer states it does not establish: fin membrane, bilaminar hemitrich shear, active muscle control, ray taper, joints or viscoelasticity",
+        "Producer states it does not establish: large-deformation (elastica) behaviour: results beyond the declared small-deformation limit are flagged invalid",
+        "Producer states it does not establish: calibration of rho, CL, tributary width or ray length (all declared, none measured)",
+        "Producer states it does not establish: that the glide package's candidate is flyable (owned by the glide receipt, not by this package)"
+      ],
+      "prior_review": {
+        "status": "none: not reviewed by anyone"
+      },
+      "source_record_version": null
+    },
+    "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+    "namespace": "node-a",
+    "created_at": "2026-10-31T19:32:00+00:00",
+    "source_uri": "urn:frontier:adapter:engineering-manifest:fin-mechanics",
+    "visibility": "public",
+    "predecessor": null,
+    "schema_version": "frontier-record-0.1"
+  },
+  "local_review": {
+    "status": "imported_unreviewed",
+    "policy_version": "frontier-independent-review-0.1"
+  },
+  "is_head": true,
+  "action": null
+}
