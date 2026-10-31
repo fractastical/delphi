@@ -2,8 +2,8 @@
 
 Source: D'Arcy Thompson, *On Growth and Form* (1917), Chapters XII–XIV (The Spiral Shells of the
 Foraminifera; The Shapes of Horns, and of Teeth or Tusks; On Leaf-arrangement, or Phyllotaxis),
-`thompson-growth-form/inputs/pg55264.txt` lines 19561–21574, plus the 41 claims
-`thompson1917-ch12-*`, `thompson1917-ch13-*`, `thompson1917-ch14-*` in `thompson-growth-form/claims.json`.
+`books/thompson-growth-form/inputs/pg55264.txt` lines 19561–21574, plus the 41 claims
+`thompson1917-ch12-*`, `thompson1917-ch13-*`, `thompson1917-ch14-*` in `books/thompson-growth-form/claims.json`.
 Built on 2026-10-31 by a Cursor cloud agent (model `claude-fable-5.1`, branch
 `cursor/organisms-thompson-ch12-14-5199`). Only files inside `organisms/thompson-growth-form/ch12-14/` were written.
 

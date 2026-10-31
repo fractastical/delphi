@@ -1,8 +1,8 @@
 # Organisms: *On Growth and Form* (1917), Chapters XII–XVII and Epilogue
 
 Slice `ch12-epilogue` of project `thompson-growth-form`. Source text
-`thompson-growth-form/inputs/pg55264.txt` lines 19561 (heading "CHAPTER XII") to 25432 (last line of
-the Epilogue); claims from `thompson-growth-form/claims.json` with `chapter` in XII, XIII, XIV, XV,
+`books/thompson-growth-form/inputs/pg55264.txt` lines 19561 (heading "CHAPTER XII") to 25432 (last line of
+the Epilogue); claims from `books/thompson-growth-form/claims.json` with `chapter` in XII, XIII, XIV, XV,
 XVI, XVII, Epilogue (95 claims). Footnotes for these chapters live in the NOTES block after line
 25432 and were not swept.
 

@@ -2,8 +2,8 @@
 
 Slice `ch11-14` of project `darwin-origin`: Geographical Distribution (XI, XII), Mutual Affinities /
 Morphology / Embryology / Rudimentary Organs (XIII), Recapitulation and Conclusion (XIV).
-Text: `darwin-origin/inputs/pg1228.txt`, lines 10412–14617 (the Index that follows is excluded).
-Claims: the 74 rows of `darwin-origin/claims.json` whose `chapter` is XI, XII, XIII or XIV.
+Text: `books/darwin-origin/inputs/pg1228.txt`, lines 10412–14617 (the Index that follows is excluded).
+Claims: the 74 rows of `books/darwin-origin/claims.json` whose `chapter` is XI, XII, XIII or XIV.
 
 Built by a Cursor cloud agent (Claude Fable 5.1) on branch `cursor/darwin-ch11-14-organisms-de91`,
 2026-10-31. Nothing was scored, no claim/assessment/nanopub file was touched, nothing was published.

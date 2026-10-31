@@ -1,8 +1,8 @@
 # thompson-growth-form / ch11 — Chapter XI, The Logarithmic Spiral
 
-Source text: `thompson-growth-form/inputs/pg55264.txt` lines 16507–19560 (Project Gutenberg #55264,
+Source text: `books/thompson-growth-form/inputs/pg55264.txt` lines 16507–19560 (Project Gutenberg #55264,
 *On Growth and Form*, 1917). Claims: the 23 `thompson1917-ch11-*` entries in
-`thompson-growth-form/claims.json`. Built 2026-10-31 by a cloud agent (`vendored_by` in every dataset
+`books/thompson-growth-form/claims.json`. Built 2026-10-31 by a cloud agent (`vendored_by` in every dataset
 record); no record carries an `assessment`.
 
 In this edition Chapter XI covers shells (univalves, bivalves, brachiopods, pteropods, septa and

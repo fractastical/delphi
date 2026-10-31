@@ -38,7 +38,7 @@ REPO = os.path.abspath(os.path.join(SLICE, "..", "..", ".."))
 PROJECT = "thompson-growth-form"
 SLICE_NAME = "ch06-11"
 CHAPTERS = ["VI", "VII", "VIII", "IX", "X", "XI"]
-TEXT_FILE = f"{PROJECT}/inputs/pg55264.txt"
+TEXT_FILE = f"books/{PROJECT}/inputs/pg55264.txt"
 TEXT_RANGE = (9882, 19560)  # 1-based inclusive line range of chapters VI-XI
 CACHE = os.environ.get("ORGANISMS_CACHE", "/tmp/organisms-cache/ch06-11")
 os.makedirs(CACHE, exist_ok=True)
@@ -148,7 +148,7 @@ def read_text_lines():
 
 
 def claims_in_scope():
-    data = load_json(os.path.join(REPO, PROJECT, "claims.json"))
+    data = load_json(os.path.join(REPO, "books", PROJECT, "claims.json"))
     return [c for c in data["claims"] if c.get("chapter") in CHAPTERS]
 
 

@@ -30,7 +30,7 @@ def window(text, start, end, width=90):
 
 
 def claim_mentions():
-    claims = json.load(open(REPO / "darwin-origin/claims.json", encoding="utf-8"))["claims"]
+    claims = json.load(open(REPO / "books/darwin-origin/claims.json", encoding="utf-8"))["claims"]
     by_id = {c["id"]: c for c in claims}
     out = []
     for cid, items in seed.CLAIM_MENTIONS.items():

@@ -305,7 +305,7 @@ def main(slugs):
             },
             "lineage": (ginfo or {}).get("lineage", {}),
             "mentioned_in": claim_ids,
-            "text_mentions": {"file": "darwin-origin/inputs/pg1228.txt", "n": len(lines), "lines": lines},
+            "text_mentions": {"file": "books/darwin-origin/inputs/pg1228.txt", "n": len(lines), "lines": lines},
             "datasets": [],
             "notes": seed.get("notes", ""),
             "resolution_notes": notes,

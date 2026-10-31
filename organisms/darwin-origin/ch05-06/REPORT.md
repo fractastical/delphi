@@ -1,6 +1,6 @@
 # darwin-origin / ch05-06 — animal taxa in Chapters V–VI of *On the Origin of Species*
 
-Slice: `darwin-origin/inputs/pg1228.txt` lines 4140–6369 (Chapter V "Laws of Variation", Chapter VI
+Slice: `books/darwin-origin/inputs/pg1228.txt` lines 4140–6369 (Chapter V "Laws of Variation", Chapter VI
 "Difficulties on Theory") and claims `darwin1859-ch05-*` (17) and `darwin1859-ch06-*` (17).
 Built 2026-10-31 by a cloud agent (`claude-fable-5.1`, branch `cursor/organisms-darwin-ch05-06-5739`).
 No `assessment` fields were written; nothing was signed or published.

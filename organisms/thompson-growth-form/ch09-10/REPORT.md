@@ -1,7 +1,7 @@
 # thompson-growth-form / ch09-10 — organism reference data
 
 Slice: *On Growth and Form* (1917) Chapters IX (On Concretions, Spicules, and Spicular Skeletons)
-and X (A Parenthetic Note on Geodetics), `thompson-growth-form/inputs/pg55264.txt` lines
+and X (A Parenthetic Note on Geodetics), `books/thompson-growth-form/inputs/pg55264.txt` lines
 14082–16506; claims `thompson1917-ch09-01` … `thompson1917-ch09-19`, `thompson1917-ch10-01` …
 `thompson1917-ch10-06` (25 claims). The chapter footnotes [406]–[494] sit outside the slice's
 line range and were not mined for taxa.

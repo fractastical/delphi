@@ -1,6 +1,6 @@
 # thompson-growth-form / ch03 — Chapter III, The Rate of Growth
 
-Source: `thompson-growth-form/inputs/pg55264.txt`, lines 2580–5906 (Project Gutenberg #55264,
+Source: `books/thompson-growth-form/inputs/pg55264.txt`, lines 2580–5906 (Project Gutenberg #55264,
 D'Arcy Thompson, *On Growth and Form*, 1917). Claims: `thompson1917-ch03-01` … `-35` (35 claims).
 Vendored 2026-10-31 by a cloud agent (`claude-fable-5.1`, branch `cursor/organisms-thompson-ch03-9300`).
 Footnotes for this chapter sit outside the line range and were not mined.

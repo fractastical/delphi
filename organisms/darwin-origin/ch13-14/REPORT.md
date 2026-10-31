@@ -1,6 +1,6 @@
 # darwin-origin / ch13-14: Chapters XIII–XIV (Mutual Affinities, Morphology, Embryology, Rudimentary Organs; Recapitulation)
 
-Text: `darwin-origin/inputs/pg1228.txt` lines 12301–14617. Claims: `darwin1859-ch13-01` … `darwin1859-ch13-25`,
+Text: `books/darwin-origin/inputs/pg1228.txt` lines 12301–14617. Claims: `darwin1859-ch13-01` … `darwin1859-ch13-25`,
 `darwin1859-ch14-01` … `darwin1859-ch14-14` (39 claims). Built 2026-10-31 by a cloud agent
 (`vendored_by.run` = `cursor/organisms-darwin-ch13-14-4b24`). Validator: `node organisms/validate.mjs darwin-origin/ch13-14`
 → 232 mentions, 76 taxa, 90 datasets, 0 errors, 67 warnings (explained below).

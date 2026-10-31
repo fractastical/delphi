@@ -24,7 +24,7 @@ const TEXT_FILE = "https://www.gutenberg.org/cache/epub/1228/pg1228.txt";
 const AGENT = "https://w3id.org/delphi/resource/agent/delphisci-darwin-origin-extractor";
 const MODEL = "https://w3id.org/delphi/resource/model/claude-opus-5.5";
 const OWNER = "https://orcid.org/0009-0007-4948-9192";
-const GENERATOR = `https://github.com/fractastical/delphisci/blob/${commit}/darwin-origin/build/generate.mjs`;
+const GENERATOR = `https://github.com/fractastical/delphisci/blob/${commit}/books/darwin-origin/build/generate.mjs`;
 const DOMAIN = "darwin-origin-1859";
 
 const CHAPTER_TITLES = {

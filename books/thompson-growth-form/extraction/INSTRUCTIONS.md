@@ -1,6 +1,6 @@
 # Claim extraction instructions: On Growth and Form (1917, 1st ed.)
 
-Source text: `thompson-growth-form/inputs/pg55264.txt` (Project Gutenberg eBook #55264,
+Source text: `books/thompson-growth-form/inputs/pg55264.txt` (Project Gutenberg eBook #55264,
 D'Arcy Wentworth Thompson, *On Growth and Form*, Cambridge University Press, 1917). Line
 numbers below refer to this file. The table of contents is at lines 166–209. The main text
 runs from line 980 (Chapter I) to line 25437 (end of the Epilogue); the footnotes are

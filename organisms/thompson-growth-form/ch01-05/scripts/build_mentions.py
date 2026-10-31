@@ -23,8 +23,8 @@ REPO = SLICE.parents[2]
 sys.path.insert(0, str(HERE))
 from taxa_table import TAXA  # noqa: E402
 
-TEXT_FILE = "thompson-growth-form/inputs/pg55264.txt"
-CLAIMS_FILE = REPO / "thompson-growth-form" / "claims.json"
+TEXT_FILE = "books/thompson-growth-form/inputs/pg55264.txt"
+CLAIMS_FILE = REPO / "books" / "thompson-growth-form" / "claims.json"
 CHAPTERS = {"I", "II", "III", "IV", "V"}
 LINE_START, LINE_END = 980, 9881  # CHAPTER I heading .. line before CHAPTER VI heading
 

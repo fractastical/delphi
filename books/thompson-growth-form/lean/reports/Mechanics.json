@@ -1,0 +1,99 @@
+[
+  {
+    "claim_id": "thompson1917-ch16-04",
+    "status": "formalized",
+    "label": "Uniform-stress tube wall thickness tracks the bending moment, maximal at mid-shaft",
+    "notation": "wall thickness t(x) \\propto bending moment M(x), maximal at mid-shaft",
+    "lean_declaration": "ThompsonLaws.Mechanics.uniformStressThickness",
+    "lean_theorems": [
+      "ThompsonLaws.Mechanics.uniformStressThickness_stress",
+      "ThompsonLaws.Mechanics.uniformStressThickness_prop",
+      "ThompsonLaws.Mechanics.uniformStressThickness_max_mid"
+    ],
+    "assumptions": "Thin-walled tube of fixed mean radius r with section modulus π r² t; wall thickness chosen so peak bending stress equals a fixed working stress σ₀ at every section; for the mid-shaft maximum, a simply supported beam of length L under uniform load w ≥ 0, so M(x) = w x (L − x)/2.",
+    "scope_note": "Proves that the economical (uniform-stress) thickness is M/(π r² σ₀), hence proportional to M, and that under uniform loading it peaks at x = L/2. Whether real femoral cortical thickness follows the in-vivo bending moment, and whether the femur's loading resembles this beam case, is left to CT and loading data."
+  },
+  {
+    "claim_id": "thompson1917-ch16-05",
+    "status": "formalized",
+    "label": "Principal stress directions are perpendicular, so stress trajectories cross at 90°",
+    "notation": "trabeculae lie along the principal stress trajectories \\sigma_1, \\sigma_2, crossing at 90^\\circ",
+    "lean_declaration": "ThompsonLaws.Mechanics.stressAction",
+    "lean_theorems": [
+      "ThompsonLaws.Mechanics.principalDirections_orthogonal"
+    ],
+    "assumptions": "Plane stress represented by a symmetric 2×2 tensor [[a, b], [b, c]]; principal directions are its eigenvectors, belonging to distinct principal stresses λ ≠ μ.",
+    "scope_note": "Proves the geometric part: trajectories that follow the two principal stress directions must cross at right angles. That trabeculae actually align with these trajectories in the femoral head is empirical and left to micro-CT fabric and finite-element data."
+  },
+  {
+    "claim_id": "thompson1917-ch16-10",
+    "status": "formalized",
+    "label": "Girder web depth (vertebral spine height) is proportional to the bending moment",
+    "notation": "height of vertebral spine h(x) \\propto bending moment M(x)",
+    "lean_declaration": "ThompsonLaws.Mechanics.spineHeight",
+    "lean_theorems": [
+      "ThompsonLaws.Mechanics.spineHeight_balances",
+      "ThompsonLaws.Mechanics.spineHeight_ratio"
+    ],
+    "assumptions": "The backbone acts as a girder whose tie (ligament) and compression member (vertebral bodies) each carry a fixed force F₀ ≠ 0; the moment resisted is the couple F₀ · h, with h the depth of the web (spine height).",
+    "scope_note": "Proves that the depth h = M/F₀ balances the moment and that heights at two points stand in the ratio of the moments there. Whether neural spine heights actually follow computed bending-moment diagrams along real backbones is left to skeletal and body-mass data."
+  },
+  {
+    "claim_id": "thompson1917-ch16-14",
+    "status": "formalized",
+    "label": "Three struts at 120° give bending stiffness that is the same in every direction",
+    "notation": "three series of processes at \\approx 120^\\circ to one another",
+    "lean_declaration": "ThompsonLaws.Mechanics.threeStrutStiffness",
+    "lean_theorems": [
+      "ThompsonLaws.Mechanics.threeStrutStiffness_isotropic",
+      "ThompsonLaws.Mechanics.threeStrutStiffness_uniform"
+    ],
+    "assumptions": "Three equal struts along unit vectors at 120° to one another; each contributes to stiffness about a bending direction n in proportion to its squared projection onto n.",
+    "scope_note": "Proves the 'most uniform strength' part: the summed stiffness is (3/2)|n|², identical for every direction. It does not prove that 120° maximises strength among other arrangements, and whether fish and whale processes are in fact set near 120° is a measurement question."
+  },
+  {
+    "claim_id": "thompson1917-ch17-04",
+    "status": "not-formalized",
+    "label": "Related organisms differ by simple, symmetrical Cartesian transformations",
+    "notation": "F_2 = \\phi(F_1), \\phi : (x, y) \\mapsto (x', y') a simple, symmetrical deformation of Cartesian coordinates",
+    "reason": "The claim is a general empirical thesis that related forms are in fact mapped onto one another by simple deformations; 'simple and symmetrical' has no fixed mathematical definition in the text, and any theorem about coordinate maps (e.g. that affine maps compose) would be generic arithmetic rather than the stated law. Specific instances are formalized under thompson1917-ch17-06 and thompson1917-ch17-08."
+  },
+  {
+    "claim_id": "thompson1917-ch17-06",
+    "status": "formalized",
+    "label": "A length-axis stretch by s becomes a breadth factor 1/s at equal length (sheep, giraffe)",
+    "notation": "(x, y) \\mapsto (x, cy): at equal length c \\approx 2/3 (sheep), c \\approx 1/3 (giraffe) relative to ox",
+    "lean_declaration": "ThompsonLaws.Mechanics.lengthStretch",
+    "lean_theorems": [
+      "ThompsonLaws.Mechanics.lengthStretch_equalLength",
+      "ThompsonLaws.Mechanics.lengthStretch_sheep_giraffe"
+    ],
+    "assumptions": "The sheep's (giraffe's) cannon-bone is the ox's stretched along the length axis by s, with breadth unchanged; comparison at equal length means rescaling uniformly by 1/s.",
+    "scope_note": "Proves that after rescaling to equal length the stretched bone is the ox's with breadth multiplied by c = 1/s and length unchanged, giving c = 2/3 for s = 3/2 and c = 1/3 for s = 3. In the notation, y is the breadth coordinate and x the length. That the bones differ only by such a stretch, and the values of s, are empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch17-08",
+    "status": "formalized",
+    "label": "Angular stretch θ ↦ kθ makes angles to equal radii on the two leaf halves proportional",
+    "notation": "\\theta' = k\\theta for angles to equal radii on the two halves of the leaf",
+    "lean_declaration": "ThompsonLaws.Mechanics.unequalHalf",
+    "lean_theorems": [
+      "ThompsonLaws.Mechanics.unequalHalf_equalRadii"
+    ],
+    "assumptions": "In radial coordinates from the leaf base, one half is r = f(θ) with f injective in θ; the other half is its image under (r, θ) ↦ (r, kθ), k ≠ 0, i.e. r = f(θ/k).",
+    "scope_note": "Proves that points at equal radii on the two halves have angles θ' = kθ. Whether real Begonia leaf halves are related by such an angular stretch (unequal growth) is left to leaf-outline measurements."
+  },
+  {
+    "claim_id": "thompson1917-ch17-18",
+    "status": "formalized",
+    "label": "Inverse depth and thickness scaling leaves the length-weight coefficient k unchanged",
+    "notation": "plaice vs haddock: depth \\times 2, thickness \\times \\tfrac{1}{2}, k = W/L^3 nearly equal",
+    "lean_declaration": "ThompsonLaws.Mechanics.lengthWeightCoeff",
+    "lean_theorems": [
+      "ThompsonLaws.Mechanics.lengthWeightCoeff_scale",
+      "ThompsonLaws.Mechanics.lengthWeightCoeff_inverse"
+    ],
+    "assumptions": "Weight W = ρ c L D T for length L, depth D, thickness T, density ρ and a fixed shape factor c; k = W/L³.",
+    "scope_note": "Proves that scaling depth by a and thickness by b multiplies k by ab, so inverse variation (a = 2, b = 1/2) leaves k exactly unchanged. That plaice and haddock actually differ this way and have nearly equal k, and that the shape factor stays fixed, are empirical and left to FishBase-type data."
+  }
+]

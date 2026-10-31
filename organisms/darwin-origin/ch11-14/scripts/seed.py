@@ -1,7 +1,7 @@
 """Seed data for the darwin-origin ch11-14 organism slice.
 
 TAXA: every animal taxon named in Chapters XI-XIV of *On the Origin of Species* (1859,
-Project Gutenberg #1228 text vendored at darwin-origin/inputs/pg1228.txt), with the
+Project Gutenberg #1228 text vendored at books/darwin-origin/inputs/pg1228.txt), with the
 scientific name used to query the authorities and the forms Darwin wrote.
 
 TEXT_PATTERNS: regexes applied to the chapter text (lines 10412-14617) to produce
@@ -9,10 +9,10 @@ mentions with file/line sources. EXCLUDE lists (line, slug) pairs that are false
 positives of a pattern (e.g. "bear" as a verb).
 
 CLAIM_MENTIONS: taxa named in the `claim` or `quote` field of each chapter XI-XIV claim
-in darwin-origin/claims.json.
+in books/darwin-origin/claims.json.
 """
 
-BOOK = "darwin-origin/inputs/pg1228.txt"
+BOOK = "books/darwin-origin/inputs/pg1228.txt"
 CH_START, CH_END = 10412, 14617
 
 # slug, query name (scientific), rank, vernacular, notes, flags

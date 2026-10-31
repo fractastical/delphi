@@ -5,8 +5,8 @@ Slice `ch01-05` of project `thompson-growth-form`. Built on branch
 
 Sources:
 
-- claims: `thompson-growth-form/claims.json`, the 106 rows with `chapter` I–V (fields `claim` and `quote`);
-- text: `thompson-growth-form/inputs/pg55264.txt`, lines 980–9881 (CHAPTER I heading to the line
+- claims: `books/thompson-growth-form/claims.json`, the 106 rows with `chapter` I–V (fields `claim` and `quote`);
+- text: `books/thompson-growth-form/inputs/pg55264.txt`, lines 980–9881 (CHAPTER I heading to the line
   before CHAPTER VI), with Gutenberg italics markers `_…_`, page markers `{n}` and footnote markers
   `[n]` stripped from quotes.
 
@@ -157,5 +157,5 @@ the green alga Micromonas is not what Thompson means.
 - **Spelling in the text**: "Bonel" for Borrel (Micromonas mesnili), "Rheophax" for Reophax,
   "Globiocephalus" for Globicephala, "Trichodina pedicidus" for T. pediculus.
 
-Nothing in `thompson-growth-form/claims.json`, any assessment or any nanopublication was modified,
+Nothing in `books/thompson-growth-form/claims.json`, any assessment or any nanopublication was modified,
 and nothing was published. No `assessment` fields were written.

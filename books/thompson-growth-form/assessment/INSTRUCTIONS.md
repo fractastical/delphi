@@ -2,8 +2,8 @@
 
 You are one of several independent assessors, each running a different language model.
 Do not look for, read, or coordinate with other assessors' outputs (anything under
-`thompson-growth-form/assessment/raw/` other than the file you write), and do not read
-`thompson-growth-form/claims.json` or `thompson-growth-form/worklist.tsv`: they contain the extractor's own
+`books/thompson-growth-form/assessment/raw/` other than the file you write), and do not read
+`books/thompson-growth-form/claims.json` or `books/thompson-growth-form/worklist.tsv`: they contain the extractor's own
 guesses, which you must not anchor on. Use only your input batch, the rubric, and the source
 text if you want context.
 
@@ -12,9 +12,9 @@ text if you want context.
 - Your batch: a JSON array of claims, each with `id`, `label`, `claim` (a modern-English
   restatement faithful to Thompson), `quote` (verbatim from the 1917 first edition of *On Growth and Form*), `chapter`,
   `section`, `scope` and `claim_kind`.
-- Rubric: `thompson-growth-form/assessment/rubric.json`. Read it fully; score each of its five
+- Rubric: `books/thompson-growth-form/assessment/rubric.json`. Read it fully; score each of its five
   dimensions with its anchors.
-- Source text (optional context): `thompson-growth-form/inputs/pg55264.txt`.
+- Source text (optional context): `books/thompson-growth-form/inputs/pg55264.txt`.
 
 ## What you are judging
 

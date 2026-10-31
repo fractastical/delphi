@@ -5,7 +5,7 @@
 //   node docs/build-claim-graph.mjs
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, loadClaims } from "./load-claims.mjs";
+import { ROOT, VERIFICATION, loadClaims } from "./load-claims.mjs";
 
 const HERE = join(ROOT, "docs");
 const claims = loadClaims();
@@ -24,22 +24,32 @@ for (const c of claims) {
   c.truthBy = truth[c.key] ?? [];
   c.truth = c.truthBy.length ? Math.round(1000 * c.truthBy.reduce((s, x) => s + x.p, 0) / c.truthBy.length) / 1000 : null;
 }
-const DATA = { claims, built: new Date().toISOString().slice(0, 16).replace("T", " ") };
-const seal = readFileSync(join(ROOT, "assets/logo.svg"), "utf8").trim();
+const built = new Date().toISOString().slice(0, 16).replace("T", " ");
 const count = f => claims.filter(f).length;
-for (const page of ["claim-graph", "claims-query"]) {
+const DATA = { claims, built };
+// docs/theorems.html lists exactly the claims with `theorem` set (see load-claims.mjs), from any
+// project: a math claim that has reached proof, not a claim from math-bio-claims/.
+const THEOREMS = { claims: claims.filter(c => c.theorem), total: claims.length, math: count(c => c.math), built };
+const seal = readFileSync(join(ROOT, "assets/logo.svg"), "utf8").trim();
+const inline = svg => svg.replace(/<svg[^>]*>/, t => t.replace(/\s(width|height)="\d+"/g, "")).replace("<svg ", '<svg role="img" aria-label="DELPHI seal" ');
+for (const [page, data] of [["claim-graph", DATA], ["claims-query", DATA], ["theorems", THEOREMS]]) {
   const html = readFileSync(join(HERE, `${page}.template.html`), "utf8")
-    .replace("<!--__SEAL__-->", seal.replace(/<svg[^>]*>/, t => t.replace(/\s(width|height)="\d+"/g, "")).replace("<svg ", '<svg role="img" aria-label="DELPHI seal" '))
+    .replace("<!--__SEAL__-->", inline(seal))
+    .replace("<!--__SEAL_MONO__-->", inline(seal.replace(/#14213d/gi, "#000").replace(/#e5c07b/gi, "#fff")))
     .replace("/*__SEAL_URI__*/", encodeURIComponent(seal))
-    .replace("/*__DATA__*/null", JSON.stringify(DATA).replace(/</g, "\\u003c"));
+    .replace("/*__DATA__*/null", JSON.stringify(data).replace(/</g, "\\u003c"));
   writeFileSync(join(HERE, `${page}.html`), html);
   console.log(`docs/${page}.html: ${(html.length / 1024).toFixed(0)} KB`);
 }
 
 // Flat export for scripts: one row per claim with its scores.
 const rows = claims.map(c => ({ id: c.id, key: c.key, label: c.label, statement: c.text, quote: c.quote || null, thinker: c.thinker, year: c.year,
-  work: c.work, chapter: c.section || null, kind: c.kind, status: c.status, testability: c.resolvability ?? null, truth: c.truth,
+  work: c.work, chapter: c.section || null, kind: c.kind, status: c.status, proof: c.proof ?? null, verification: c.verification,
+  math: c.math, theorem: c.theorem, notation: c.notation || null, lean_theorems: c.lean?.theorems ?? null,
+  testability: c.resolvability ?? null, truth: c.truth,
   truth_by: c.truthBy.map(x => ({ assessor: x.who, p_true: x.p })), assessor_confidence: c.confidence ?? null,
   nanopub: c.uri || null, registry: c.registry || null, draft: !!c.draft }));
 writeFileSync(join(HERE, "claims.json"), JSON.stringify({ built: DATA.built, claims: rows }, null, 1) + "\n");
 console.log(`${claims.length} claims (${count(c => c.registry === "production")} in production, ${count(c => c.registry === "test")} test only, ${count(c => !c.registry)} unpublished, ${count(c => c.draft)} drafts); docs/claims.json written`);
+console.log(`verification: ${VERIFICATION.map(v => `${count(c => c.verification === v)} ${v}`).join(", ")}`);
+console.log(`${count(c => c.math)} math claims; ${count(c => c.theorem)} theorems (math and proved): ${count(c => c.theorem && c.proof === "lean")} machine-checked in Lean 4, ${count(c => c.theorem && c.proof === "literature")} proved in the literature`);

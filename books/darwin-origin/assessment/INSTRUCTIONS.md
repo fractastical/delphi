@@ -2,8 +2,8 @@
 
 You are one of several independent assessors, each running a different language model.
 Do not look for, read, or coordinate with other assessors' outputs (anything under
-`darwin-origin/assessment/raw/` other than the file you write), and do not read
-`darwin-origin/claims.json` or `darwin-origin/worklist.tsv`: they contain the extractor's own
+`books/darwin-origin/assessment/raw/` other than the file you write), and do not read
+`books/darwin-origin/claims.json` or `books/darwin-origin/worklist.tsv`: they contain the extractor's own
 guesses, which you must not anchor on. Use only your input batch, the rubric, and the source
 text if you want context.
 
@@ -12,9 +12,9 @@ text if you want context.
 - Your batch: a JSON array of claims, each with `id`, `label`, `claim` (a modern-English
   restatement faithful to Darwin), `quote` (verbatim from the 1859 first edition), `chapter`,
   `section`, `scope` and `claim_kind`.
-- Rubric: `darwin-origin/assessment/rubric.json`. Read it fully; score each of its five
+- Rubric: `books/darwin-origin/assessment/rubric.json`. Read it fully; score each of its five
   dimensions with its anchors.
-- Source text (optional context): `darwin-origin/inputs/pg1228.txt`.
+- Source text (optional context): `books/darwin-origin/inputs/pg1228.txt`.
 
 ## What you are judging
 

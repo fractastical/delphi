@@ -84,7 +84,7 @@ Array, one entry per mention:
 ```
 
 For mentions found in the book text but not in a claim, `source` is
-`{ "file": "darwin-origin/inputs/pg1228.txt", "line_start": 1234, "line_end": 1236 }`.
+`{ "file": "books/darwin-origin/inputs/pg1228.txt", "line_start": 1234, "line_end": 1236 }`.
 
 ## `taxa/<slug>.json`
 
@@ -175,6 +175,32 @@ morphology, phylogeny, occurrences, fossils, conservation status, taxonomic reso
 with no records yet (bioelectric, barcodes) are kept so the gap is visible per organism;
 `COVERAGE.md` lists the taxa with known electrophysiology sources as leads for that pass.
 Dataset records may set `"category": "<axis id>"` to override the id/keyword classification.
+
+## Images and timelines
+
+```sh
+node organisms/images.mjs       # -> organisms/images/thumbs/<slug>.*, images/manifest.json, merged/timeline.json
+python3 organisms/timeline.py   # -> organisms/images/timelines/<slug>.png, images/timeline-summary.png, images/mosaic.jpg
+```
+
+`images.mjs` vendors one representative picture per merged taxon: the Wikidata item's P18 image
+(else the page image of its English Wikipedia article) rendered as a 160 px Commons thumbnail,
+with the Commons licence and author recorded next to the file's size and sha256 in
+`images/manifest.json`. Taxa with no picture on Commons fall back to GBIF's first still image.
+It also collects the dates for a per-taxon timeline into `merged/timeline.json`: the
+Paleobiology Database first/last appearance range (`taxa/list?show=app`, for the name itself,
+with a rank-matching record preferred among homonyms), the year of formal description from GBIF
+authorship, the release years of the NCBI assemblies we hold, and the books that mention the
+taxon. Re-runs only fetch what is missing; `--refresh` re-queries everything.
+
+`timeline.py` (matplotlib + Pillow) draws a card per taxon — picture, Phanerozoic range bar on
+ICS period colours, and a 1735–2030 axis with description, Darwin 1859, Thompson 1917 and genome
+markers — and two summaries: `timeline-summary.png` (ranges of all 700 ranged taxa by class,
+with the most-mentioned taxa pictured at their first appearance, plus descriptions and genome
+releases per decade) and `mosaic.jpg` (every thumbnail, ordered by first appearance, with a
+period-colour stripe). The per-taxon cards are gitignored (~110 MB); thumbnails, manifest,
+timeline data and the two summaries are committed. Image licences are CC/public domain as
+reported by Commons; check `manifest.json` before reusing a picture outside this repo.
 
 `merge.mjs` unifies taxa across slices and projects by GBIF key (else Wikidata QID, else NCBI
 taxid), unions names, mentions and datasets, merges shared-database records by id, and lists

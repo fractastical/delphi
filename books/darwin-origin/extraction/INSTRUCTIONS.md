@@ -1,6 +1,6 @@
 # Claim extraction instructions: On the Origin of Species (1859, 1st ed.)
 
-Source text: `darwin-origin/inputs/pg1228.txt` (Project Gutenberg eBook #1228, the 1859
+Source text: `books/darwin-origin/inputs/pg1228.txt` (Project Gutenberg eBook #1228, the 1859
 first edition). Line numbers below refer to this file. The analytical table of contents
 (Darwin's own section headings per chapter) is at lines 100–306.
 

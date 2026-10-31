@@ -1,0 +1,5 @@
+import ThompsonLaws.Magnitude
+import ThompsonLaws.Cells
+import ThompsonLaws.Spirals
+import ThompsonLaws.HornsLeavesEggs
+import ThompsonLaws.Mechanics

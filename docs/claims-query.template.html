@@ -51,7 +51,7 @@ table.res tr.open td{background:rgba(229,192,123,.07)}
 <header class="masthead"><!--__SEAL__--><div>
 <h1>Query Claims</h1>
 <p class="subtitle" id="subtitle"></p></div>
-<nav class="nav"><a class="btn" href="claim-graph.html">Claim graph</a><a class="btn" href="claims.json" title="Every claim with its scores as plain JSON">claims.json</a></nav></header>
+<nav class="nav"><a class="btn" href="claim-graph.html">Claim graph</a><a class="btn" href="theorems.html">Theorems</a><a class="btn" href="claims.json" title="Every claim with its scores as plain JSON">claims.json</a></nav></header>
 
 <div class="panel">
  <input id="q" type="search" spellcheck="false" autocomplete="off" placeholder='e.g.  p>=0.8 thinker:darwin status:untested "natural selection"' aria-label="Query">
@@ -59,8 +59,9 @@ table.res tr.open td{background:rgba(229,192,123,.07)}
  <details class="help"><summary>Query syntax</summary><table>
   <tr><td><code>selection</code> <code>"rate of growth"</code></td><td>Words or quoted phrases, matched in the label, statement, quote, chapter and work</td></tr>
   <tr><td><code>p&gt;=0.8</code> <code>t&lt;0.4</code> <code>gap&gt;0.3</code> <code>year&lt;1900</code></td><td>Numbers with <code>&gt; &gt;= &lt; &lt;= =</code>. <b>p</b> = truth probability, <b>t</b> = testability, <b>conf</b> = assessor confidence, <b>gap</b> = disagreement between the truth assessors</td></tr>
-  <tr><td><code>thinker:darwin,thompson</code></td><td>Field match (substring, any of the comma-separated values). Fields: <b>thinker work chapter status kind verdict id</b></td></tr>
-  <tr><td><code>status:proved</code></td><td>Status is one of <b>proved partial untested refuted</b></td></tr>
+  <tr><td><code>thinker:darwin,thompson</code></td><td>Field match (substring, any of the comma-separated values). Fields: <b>thinker work chapter status verification kind verdict id</b></td></tr>
+  <tr><td><code>status:proved</code> <code>verification:lean</code></td><td>Status is one of <b>proved partial untested refuted</b>; verification splits proved into <b>lean literature</b></td></tr>
+  <tr><td><code>is:theorem</code> <code>is:math</code> <code>is:lean</code></td><td>Theorem (math claim that is proved); math claim (formal statement, Lean formalization or mathematical kind); machine-checked in Lean 4</td></tr>
   <tr><td><code>is:live</code> <code>is:draft</code> <code>has:t</code> <code>has:p</code></td><td>Published to production; unverified draft; has a testability or truth score</td></tr>
   <tr><td><code>-thinker:wolfram</code> <code>-is:live</code></td><td>A leading <code>-</code> negates any term. All terms must hold.</td></tr>
   <tr><td><code>sort:-p</code> <code>sort:year</code></td><td>Sort (<code>-</code> = descending). Clicking a column header does the same.</td></tr>
@@ -96,9 +97,10 @@ $('subtitle').textContent = `${CLAIMS.length} claims · ${CLAIMS.filter(c => c.r
 
 /* ---- query language ---- */
 const NUM = { p: c => c.truth, t: c => c.resolvability, conf: c => c.confidence, gap: c => c.gap, year: c => c.year };
-const FIELD = { thinker: c => c.thinker, work: c => c.work, chapter: c => c.section, section: c => c.section, status: c => c.status,
+const FIELD = { thinker: c => c.thinker, work: c => c.work, chapter: c => c.section, section: c => c.section, status: c => c.status, verification: c => c.verification,
   kind: c => c.kind, verdict: c => (c.assess || []).map(a => a.verdict).join(' '), id: c => c.id };
-const IS = { live: c => c.registry === 'production', test: c => c.registry === 'test', published: c => !!c.registry, draft: c => !!c.draft };
+const IS = { live: c => c.registry === 'production', test: c => c.registry === 'test', published: c => !!c.registry, draft: c => !!c.draft,
+  theorem: c => c.theorem, math: c => c.math, lean: c => c.verification === 'lean' };
 const HAS = { t: c => c.resolvability != null, p: c => c.truth != null, quote: c => !!c.quote, math: c => !!c.notation, gap: c => c.gap != null };
 const SORTS = { p: c => c.truth, t: c => c.resolvability, conf: c => c.confidence, gap: c => c.gap, year: c => c.year,
   claim: c => c.label.toLowerCase(), thinker: c => c.thinker, status: c => STATUS[c.status].v };
@@ -208,7 +210,7 @@ function exportRows(kind) {
 }
 function copyLink(b) { navigator.clipboard.writeText(location.href).then(() => { b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy link', 1200); }); }
 
-const EXAMPLES = ['p>=0.8 sort:-p', 'gap>0.3 sort:-gap', 't>=0.6 p>=0.7', 'status:refuted', 'thinker:thompson p<0.3', 'has:math sort:year', 'is:live -thinker:darwin', 'selection sort:-t'];
+const EXAMPLES = ['p>=0.8 sort:-p', 'gap>0.3 sort:-gap', 't>=0.6 p>=0.7', 'status:refuted', 'is:theorem sort:year', 'is:math status:untested sort:-p', 'thinker:thompson p<0.3', 'has:math sort:year', 'is:live -thinker:darwin', 'selection sort:-t'];
 $('examples').innerHTML = EXAMPLES.map(e => `<button class="ex" onclick="$('q').value=this.textContent;LIMIT=PAGE;run()">${esc(e)}</button>`).join('');
 let timer; $('q').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => { LIMIT = PAGE; run(); }, 120); });
 { const u = new URLSearchParams(location.search); $('q').value = u.get('q') || '';

@@ -7,6 +7,7 @@
 //   node mcp/cli.mjs rank --type dataset-resolvability/0.1.0 --limit 10
 //   node mcp/cli.mjs graph --thinker turing --sort disagreement
 //   node mcp/cli.mjs graph --group-by thinker
+//   node mcp/cli.mjs graph --math --verification untested --group-by thinker
 //   node mcp/cli.mjs sparql 'SELECT ...'
 //   node mcp/cli.mjs organisms --overview
 //   node mcp/cli.mjs organisms --has-axis genome --missing-axis traits --rank species

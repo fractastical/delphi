@@ -1,7 +1,7 @@
 # Organisms in *On Growth and Form* (1917), Chapter VIII (The Forms of Tissues, or Cell-aggregates, continued)
 
-Slice `thompson-growth-form/ch08`: lines 12092–14081 of `thompson-growth-form/inputs/pg55264.txt`
-and claims `thompson1917-ch08-01` … `thompson1917-ch08-17` (17 claims) in `thompson-growth-form/claims.json`.
+Slice `thompson-growth-form/ch08`: lines 12092–14081 of `books/thompson-growth-form/inputs/pg55264.txt`
+and claims `thompson1917-ch08-01` … `thompson1917-ch08-17` (17 claims) in `books/thompson-growth-form/claims.json`.
 Built 2026-10-31 by a cloud agent (branch `cursor/organisms-thompson-ch08-621e`); every identifier
 and count was retrieved live from the APIs named below on that date. Nothing here is scored.
 

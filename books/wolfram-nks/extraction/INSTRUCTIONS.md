@@ -1,6 +1,6 @@
 # Claim extraction instructions: A New Kind of Science (Wolfram, 2002)
 
-Source text: `wolfram-nks/inputs/cache/nks.txt`, the main text (pages 1–846, chapters 1–12)
+Source text: `books/wolfram-nks/inputs/cache/nks.txt`, the main text (pages 1–846, chapters 1–12)
 of the online edition at https://www.wolframscience.com/nks/. Each printed page starts with
 a marker line `=== pN ===` (N = printed page number). Within a page, `# ` and `## ` lines are
 chapter and section headings, `[Caption] ` lines are figure captions, and every other line is

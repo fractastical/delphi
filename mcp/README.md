@@ -79,8 +79,8 @@ node mcp/cli.mjs sparql 'SELECT ?c ?m WHERE { GRAPH ?g { ?c skos:notation ?m } }
 
 Every tool except `delphi_graph` takes `source`:
 
-- `local` (default): every TriG file in `*/nanopubs/unsigned/` and `*/nanopubs/*-unsigned/`,
-  loaded into an in-memory SPARQL store. Includes drafts and assessments that are not published
+- `local` (default): every TriG file in `*/nanopubs/unsigned/` and `*/nanopubs/*-unsigned/`
+  (top-level projects and `books/*/`), loaded into an in-memory SPARQL store. Includes drafts and assessments that are not published
   yet. Reloaded automatically when files change. Nanopub IRIs come back as repo file paths.
 - `network`: what is actually published, via the Knowledge Pixels query service
   (`https://query.knowledgepixels.com/repo/full`, override with `DELPHI_SPARQL_ENDPOINT`).
@@ -129,6 +129,13 @@ Each nanopub's domain is `delphi:domain` in its pubinfo graph.
 `node docs/build-claim-graph.mjs` from the claim files and `truth/raw/<model>/*.json`. Rebuild it
 after adding claims or truth scores; `built` in every response says when it was made.
 
+Proof fields in the graph: `status` is `proved` only when a claim's mathematical content has been
+established, by a Lean 4 module that compiled with no `sorry` (`proof: "lean"`, from
+`<project>/lean/reports/*.json`) or by a recorded proof in the literature (`proof: "literature"`,
+from `math-bio-claims/claims/key-claims.json`); otherwise `untested`, `partial` or `refuted`.
+`theorem` is true only for `math` claims that are `proved`. Truth scores never affect it. Membership
+in `math-bio-claims/` does not make a claim a theorem: 5 of its 21 claims are not `proved`.
+
 ### Organism coverage scores
 
 `delphi_organisms` reads `organisms/merged/coverage.json`, written by `node organisms/coverage.mjs`
@@ -147,9 +154,9 @@ our records are, not how reliable the datasets are; dataset reliability is a sep
 - Truth scores are not nanopubs, so `delphi_graph` has no `network` source and they can't be
   ranked with `delphi_rank_claims`.
 
-- The math-biology claims (`math-bio-theorems/`) have math but no per-claim assessments yet, so
+- The math-biology claims (`math-bio-claims/`) have math but no per-claim assessments yet, so
   `delphi_rank_claims` can't rank them. The theorem-readiness top-5 lists in
-  `math-bio-theorems/assessments/` rank thinkers, not claims, and aren't nanopubs.
+  `math-bio-claims/assessments/` rank thinkers, not claims, and aren't nanopubs.
 - No assessments are published to the network yet; ranking only works with `source: "local"`.
 - Math is one LaTeX string per claim, sometimes mixed with prose, and assumptions are prose
   inside `delphi:context`. Text search works on them; structured filtering doesn't.

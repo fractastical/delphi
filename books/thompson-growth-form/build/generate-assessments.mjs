@@ -19,7 +19,7 @@ const claims = Object.fromEntries(JSON.parse(readFileSync(join(ROOT, "claims.jso
 const git = cmd => execSync(`git ${cmd}`, { cwd: ROOT, encoding: "utf8" }).trim();
 const commit = git("rev-parse HEAD");
 const dirty = git("status --porcelain -- build assessment claims.json") !== "";
-const blob = path => `https://github.com/fractastical/delphisci/blob/${commit}/thompson-growth-form/${path}`;
+const blob = path => `https://github.com/fractastical/delphisci/blob/${commit}/books/thompson-growth-form/${path}`;
 
 const R = "https://w3id.org/delphi/resource/";
 const OWNER = "https://orcid.org/0009-0007-4948-9192";

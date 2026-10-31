@@ -39,12 +39,13 @@ const GROUPS = {
   work: c => c.work,
   decade: c => `${Math.floor(c.year / 10) * 10}s`,
   status: c => c.status,
+  verification: c => c.verification,
   kind: c => c.kind,
 };
 export const GROUP_KEYS = Object.keys(GROUPS);
 
 export function browseClaims({
-  text, thinker, work, status, kind, yearFrom, yearTo, minTruth, maxTruth, minTruthAssessors = 0,
+  text, thinker, work, status, verification, math, theorem, kind, yearFrom, yearTo, minTruth, maxTruth, minTruthAssessors = 0,
   published, sort = "truth", groupBy, limit = 20,
 } = {}) {
   const { built, claims } = load();
@@ -53,6 +54,9 @@ export function browseClaims({
     && (!thinker || has(c.thinker, thinker))
     && (!work || has(c.work, work))
     && (!status || c.status === status)
+    && (!verification || c.verification === verification)
+    && (math == null || c.math === math)
+    && (theorem == null || c.theorem === theorem)
     && (!kind || has(c.kind, kind))
     && (yearFrom == null || c.year >= yearFrom)
     && (yearTo == null || c.year <= yearTo)
@@ -77,6 +81,9 @@ export function browseClaims({
         meanTestability: mean(cs.map(c => c.testability).filter(v => v != null)),
         published: cs.filter(c => c.registry === "production").length,
         statuses: cs.reduce((m, c) => ({ ...m, [c.status]: (m[c.status] ?? 0) + 1 }), {}),
+        verification: cs.reduce((m, c) => ({ ...m, [c.verification]: (m[c.verification] ?? 0) + 1 }), {}),
+        math: cs.filter(c => c.math).length,
+        theorems: cs.filter(c => c.theorem).length,
       })).sort((a, b) => b.claims - a.claims),
     };
   }
@@ -86,7 +93,7 @@ export function browseClaims({
     built, matched: hits.length,
     claims: [...hits].sort(SORTS[sort]).slice(0, Math.min(Number(limit) || 20, 500)).map(c => ({
       id: c.id, title: c.label, statement: c.statement, thinker: c.thinker, year: c.year, work: c.work, chapter: c.chapter,
-      kind: c.kind, status: c.status, truth: c.truth, truthBy: c.truth_by, disagreement: c.disagreement,
+      kind: c.kind, status: c.status, verification: c.verification, math: c.math, theorem: c.theorem, notation: c.notation ?? undefined, truth: c.truth, truthBy: c.truth_by, disagreement: c.disagreement,
       testability: c.testability, nanopub: c.nanopub, registry: c.registry, draft: c.draft || undefined,
     })),
   };

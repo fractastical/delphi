@@ -1,6 +1,6 @@
 # darwin-origin / ch09-10 — Chapters IX–X (geological record; geological succession)
 
-Text: `darwin-origin/inputs/pg1228.txt` lines 8461–10411. Claims: `darwin1859-ch09-01` … `darwin1859-ch10-18`
+Text: `books/darwin-origin/inputs/pg1228.txt` lines 8461–10411. Claims: `darwin1859-ch09-01` … `darwin1859-ch10-18`
 (32 claims). Built 2026-10-31 by a cloud agent (`claude-fable-5.1`, branch
 `cursor/organisms-darwin-ch09-10-00c8`). All identifiers and counts below were retrieved live from the
 authorities' APIs on 2026-10-31; every API response used is checksummed in the dataset records.

@@ -1,7 +1,7 @@
 # Organisms in *On Growth and Form* (1917), Chapters I–II (Introductory; On Magnitude)
 
-Slice `thompson-growth-form/ch01-02`: lines 980–2579 of `thompson-growth-form/inputs/pg55264.txt`
-and claims `thompson1917-ch01-01` … `thompson1917-ch02-18` (27 claims) in `thompson-growth-form/claims.json`.
+Slice `thompson-growth-form/ch01-02`: lines 980–2579 of `books/thompson-growth-form/inputs/pg55264.txt`
+and claims `thompson1917-ch01-01` … `thompson1917-ch02-18` (27 claims) in `books/thompson-growth-form/claims.json`.
 Built 2026-10-31 by a cloud agent (branch `cursor/organisms-thompson-ch01-02-efbc`); all identifiers
 and counts were retrieved live from the APIs named below on that date. Nothing here is scored.
 

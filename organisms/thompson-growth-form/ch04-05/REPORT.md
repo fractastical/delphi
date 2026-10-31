@@ -1,7 +1,7 @@
 # thompson-growth-form/ch04-05 — organism reference data
 
 Slice: D'Arcy Thompson, *On Growth and Form* (1917), Chapters IV ("On the Internal Form and
-Structure of the Cell") and V ("The Forms of Cells"); `thompson-growth-form/inputs/pg55264.txt`
+Structure of the Cell") and V ("The Forms of Cells"); `books/thompson-growth-form/inputs/pg55264.txt`
 lines 5907–9881; claims `thompson1917-ch04-*` and `thompson1917-ch05-*` (44 claims).
 
 Built 2026-10-31 by a cloud agent (Claude Fable 5.1, branch `cursor/thompson-ch04-05-organisms-85d7`).

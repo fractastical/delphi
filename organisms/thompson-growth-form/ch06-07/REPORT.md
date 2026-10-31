@@ -1,8 +1,8 @@
 # Organisms: Thompson, *On Growth and Form* (1917), Chapters VI–VII
 
 Slice `ch06-07`: Chapter VI (A Note on Adsorption) and Chapter VII (The Forms of Tissues, or
-Cell-aggregates), lines 9882–12091 of `thompson-growth-form/inputs/pg55264.txt`, plus the 25 claims
-`thompson1917-ch06-*` and `thompson1917-ch07-*` in `thompson-growth-form/claims.json`.
+Cell-aggregates), lines 9882–12091 of `books/thompson-growth-form/inputs/pg55264.txt`, plus the 25 claims
+`thompson1917-ch06-*` and `thompson1917-ch07-*` in `books/thompson-growth-form/claims.json`.
 
 Built 2026-10-31 by a cloud agent (`vendored_by.run` = `cursor/thompson-ch06-07-organisms-6681`).
 No `assessment` fields were written.

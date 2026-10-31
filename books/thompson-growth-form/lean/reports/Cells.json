@@ -1,0 +1,216 @@
+[
+  {
+    "claim_id": "thompson1917-ch05-10",
+    "status": "not-formalized",
+    "label": "Spheres, cylinders and unduloids are the commonest forms of small cells",
+    "notation": "1/r_1 + 1/r_2 = \\text{const}; surfaces of revolution: plane, sphere, cylinder, catenoid, unduloid, nodoid",
+    "reason": "The claim is an empirical generalization about which constant-mean-curvature forms occur most often in unicellular organisms and how often transitions occur. The only mathematical content, that these six surfaces of revolution have constant mean curvature, is Plateau's background result rather than Thompson's inference; the Laplace relation it rests on is used in thompson1917-ch05-11."
+  },
+  {
+    "claim_id": "thompson1917-ch05-11",
+    "status": "formalized",
+    "label": "Spherical cap on a cylindrical cell has twice its radius, a 60° cone and height R(2 − √3)",
+    "notation": "R_{cap} = 2R; cap subtends a cone of 60^\\circ; cap height = R(2 - \\sqrt{3}) \\approx 0.27R",
+    "lean_declaration": "ThompsonLaws.Cells.laplacePressure",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.cylinderCap_geometry",
+      "ThompsonLaws.Cells.capHeight_bounds"
+    ],
+    "assumptions": "Uniform wall tension T > 0 and uniform internal pressure; Laplace pressure T(κ₁ + κ₂) with curvatures (1/R, 0) on the cylinder and (1/ρ, 1/ρ) on the spherical cap; the cap stands on the cylinder's circular rim.",
+    "scope_note": "Proves ρ = 2R, that the cap's half-angle arcsin(R/ρ) is π/6 (a 60° cone), that its height is R(2 − √3), and that R/4 < R(2 − √3) < 0.27R. Whether Spirogyra end cells actually have these proportions is an observation."
+  },
+  {
+    "claim_id": "thompson1917-ch05-12",
+    "status": "formalized",
+    "label": "A liquid cylinder is unstable to undulations longer than its circumference",
+    "notation": "liquid cylinder of radius r unstable for length l > 2\\pi r; breaks into equal, equally spaced beads",
+    "lean_declaration": "ThompsonLaws.Cells.undulatedAreaBound",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.liquidCylinder_unstable"
+    ],
+    "assumptions": "Varicose undulation r(z) = a + ε cos(2πz/L) at constant volume (a = √(r₀² − ε²/2)); the area integral ∫2πr√(1 + r'²) dz is bounded above using √(1 + x) ≤ 1 + x/2 and evaluated by hand to 2πLa(1 + ε²k²/4), k = 2π/L; 0 < ε, ε² < 2r₀².",
+    "scope_note": "Proves that for wavelength L > 2πr₀ any such undulation has less surface than the cylinder of the same length and volume, so the cylinder is unstable (Plateau–Rayleigh limit). The integral evaluation is done by hand in the definition's docstring, not in Lean. The stability of shorter wavelengths, the break-up into equal beads, the satellite beads and the effect of viscosity and core drag on spacing are not proved."
+  },
+  {
+    "claim_id": "thompson1917-ch05-17",
+    "status": "not-formalized",
+    "label": "Vorticella bells form a graded series of unduloids between two unequal rings",
+    "notation": "1/r_1 + 1/r_2 = \\text{const} (unduloid between two unequal supporting rings)",
+    "reason": "The claim identifies observed cup shapes of Vorticella species with unduloids and says the species differ only in degree; that identification is empirical. A faithful statement of the unduloid itself needs Delaunay's surfaces (solutions of a curvature ODE), which would not express Thompson's comparative inference."
+  },
+  {
+    "claim_id": "thompson1917-ch05-23",
+    "status": "not-formalized",
+    "label": "Undulating membrane of trypanosomes is a liquid film drawn up along the flagellum",
+    "notation": "1/r_1 + 1/r_2 = \\text{const} (undulating membrane as a liquid film)",
+    "reason": "A proposed mechanism for how the membrane forms and why it undulates; it has no mathematical consequence that can be stated and proved without modelling the film and flagellum, which Thompson does not do."
+  },
+  {
+    "claim_id": "thompson1917-ch05-24",
+    "status": "formalized",
+    "label": "Biconcave red blood corpuscle is not a fluid drop in surface-tension equilibrium",
+    "notation": "biconcave corpuscle: 1/r_1 + 1/r_2 \\neq \\text{const}, so not a fluid drop in equilibrium under surface tension alone",
+    "lean_declaration": "ThompsonLaws.Cells.laplacePressure",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.biconcave_not_equilibrium"
+    ],
+    "assumptions": "Uniform tension T > 0; at the rim both principal curvatures are positive, in the dimple both are negative (Thompson's points A and C, Fig. 93).",
+    "scope_note": "Proves that the Laplace pressure at the rim differs from that in the dimple, so no single internal pressure balances surface tension alone. The curvature signs are read from the corpuscle's shape; the alternative forces (osmotic, fluid-crystal) and the change to a sphere in diluted blood are not addressed."
+  },
+  {
+    "claim_id": "thompson1917-ch07-02",
+    "status": "formalized",
+    "label": "Sachs's rule: a fluid partition meets a rigid wall at right angles",
+    "notation": "fluid partition meets a rigid wall at 90^\\circ (Sachs's rule)",
+    "lean_declaration": "ThompsonLaws.Cells.tangentialPull",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.sachsRule"
+    ],
+    "assumptions": "The partition has tension T > 0 and meets the rigid wall at angle θ ∈ (0, π); its foot can slide along the wall, so equilibrium requires the tangential component T cos θ to vanish (the rigid wall supplies any normal reaction).",
+    "scope_note": "Proves θ = π/2 and that the angles on either side are equal. That earlier walls in plant tissue have usually solidified before later partitions form is a biological observation."
+  },
+  {
+    "claim_id": "thompson1917-ch07-04",
+    "status": "formalized",
+    "label": "Cell walls meet three at a time at 120°; cell size sets only wall curvature",
+    "notation": "walls meet three at a time at 120^\\circ, independent of cell size; relative sizes set only wall curvature",
+    "lean_declaration": "ThompsonLaws.Cells.junctionBalanced",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.junction_inner",
+      "ThompsonLaws.Cells.cos_two_pi_div_three",
+      "ThompsonLaws.Cells.tripleJunction_120",
+      "ThompsonLaws.Cells.partitionCurvature_eq"
+    ],
+    "assumptions": "Three walls of equal tension T pull along unit directions u, v, w in the section plane and balance (T u + T v + T w = 0). For curvature: planar section, Laplace pressure T/r in a cell of radius r, wall curvature (p₁ − p₂)/T.",
+    "scope_note": "Proves every pair of walls meets at 2π/3, with no dependence on cell size, and that the curvature of a shared wall is 1/r₁ − 1/r₂, zero exactly for equal cells. That three and not four walls meet at a point (instability of fourfold junctions) is not proved; that tissues behave like froths is empirical."
+  },
+  {
+    "claim_id": "thompson1917-ch07-06",
+    "status": "formalized",
+    "label": "Higher cell–cell tension narrows the outer angle below 120°, or gives point contact",
+    "notation": "T_{cc} > T_{cm} \\Rightarrow external angle < 120^\\circ; T_{cc} \\ge T_{cm} + T'_{cm} \\Rightarrow contact only at a point",
+    "lean_declaration": "ThompsonLaws.Cells.junctionBalanced",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.junction_inner",
+      "ThompsonLaws.Cells.external_angle_lt_120",
+      "ThompsonLaws.Cells.contact_at_point"
+    ],
+    "assumptions": "Neumann's triangle: cell–medium tensions T₁, T₂ > 0 along unit directions u, v and cell–cell tension T₃ along w balance at the junction. The external angle is the angle between u and v.",
+    "scope_note": "Proves that T₃ > T₁ and T₃ > T₂ give an external angle below 120°, and that T₃ ≥ T₁ + T₂ forces T₃ = T₁ + T₂ with u = v direction (angle 0), i.e. no finite contact wall; a strictly larger T₃ admits no equilibrium. Effects of external pressure and the biological examples are not modelled."
+  },
+  {
+    "claim_id": "thompson1917-ch07-09",
+    "status": "formalized",
+    "label": "Close-packed cells of equal size form hexagons with 120° corners",
+    "notation": "uniform pressure on similar cylinders or spheres \\Rightarrow hexagons, 6 neighbours, angles 120^\\circ",
+    "lean_declaration": "ThompsonLaws.Cells.polygonAngleSum",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.hexagon_of_120"
+    ],
+    "assumptions": "Each cell in section is a convex polygon with straight walls (equal-sized neighbours, so zero wall curvature by thompson1917-ch07-04) and every corner is a triple junction of 120°.",
+    "scope_note": "Proves that a polygon whose interior angles are all 120° has exactly six sides, hence six neighbours. That uniform pressure brings similar cylinders or spheres into complete contact with only triple junctions is the physical premise and is not proved."
+  },
+  {
+    "claim_id": "thompson1917-ch07-11",
+    "status": "formalized",
+    "label": "Bee's cell closed by rhombi at 109° 28′ has least area in the classical family",
+    "notation": "hexagonal prism closed by three rhombic facets at 109^\\circ 28' (\\cos\\theta = -1/3); minimal surface for given volume",
+    "lean_declaration": "ThompsonLaws.Cells.beeCellArea",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.beeCellArea_min",
+      "ThompsonLaws.Cells.beeCell_rhombus_angle"
+    ],
+    "assumptions": "Hexagonal prism of side s and height h closed by three congruent rhombi inclined at θ ∈ (0, π/2) to the axis, with area 6sh − (3/2)s² cot θ + (3√3/2)s² csc θ (Maraldi–Koenig); the enclosed volume does not depend on θ. Rhombus diagonals s√3 and s/sin θ.",
+    "scope_note": "Proves the area is at least 6sh + (3√2/2)s², with equality exactly when cos θ = 1/√3, and that the optimal rhombus has apex angle with cosine −1/3 (109° 28′). Minimality is only within this one-parameter family: Fejes Tóth (1964) found closings of slightly smaller area, so 'least surface for a given volume' holds only in this restricted sense. That bees build this form is an observation."
+  },
+  {
+    "claim_id": "thompson1917-ch08-01",
+    "status": "formalized",
+    "label": "Least bisecting wall of a box crosses its longest axis; successive walls are perpendicular",
+    "notation": "minimal bisecting partition of a rectangular cell \\perp longest axis; successive partitions mutually \\perp",
+    "lean_declaration": "ThompsonLaws.Cells.boxCutArea",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.boxCut_longest_minimal",
+      "ThompsonLaws.Cells.successive_bisection_perpendicular"
+    ],
+    "assumptions": "Box with positive edges; candidate partitions are the three plane walls through the centre, each perpendicular to an edge, with area equal to the product of the other two edges. For successive divisions, edges c ≤ b ≤ a ≤ 2b.",
+    "scope_note": "Proves the wall across the longest edge has least area among the three, and that for c ≤ b ≤ a ≤ 2b the daughter's least wall crosses a different axis, perpendicular to the first. Curved partitions and boxes with a > 2b (where the rule fails) are not covered; whether cells divide this way is observation."
+  },
+  {
+    "claim_id": "thompson1917-ch08-02",
+    "status": "formalized",
+    "label": "Errera's least-area rule for cell partitions contains Sachs's rule as a special case",
+    "notation": "partition \\Sigma = \\arg\\min |\\Sigma| subject to dividing V in the given ratio",
+    "lean_declaration": "ThompsonLaws.Cells.boxCutArea",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.errera_implies_sachs"
+    ],
+    "assumptions": "Errera's principle applied to a box with positive edges and restricted to the three central plane walls: the chosen wall has least area among them.",
+    "scope_note": "Proves that a least-area wall in this class must cross the longest edge, so Sachs's rule follows from Errera's (with thompson1917-ch08-01, the two are equivalent for boxes). The principle itself, that dividing cells minimise partition area over all surfaces, is a physical postulate and is not proved."
+  },
+  {
+    "claim_id": "thompson1917-ch08-03",
+    "status": "formalized",
+    "label": "Unequal division of a cube: quarter-cylinder below ~0.32, spherical octant below ~0.155",
+    "notation": "unequal division of a unit cube: quarter-cylinder beats a plane wall iff V_{small}/V < 1/\\pi \\approx 0.32; spherical octant beats the quarter-cylinder iff V_{small}/V < 4\\pi/81 \\approx 0.155",
+    "lean_declaration": "ThompsonLaws.Cells.quarterCylArea",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.quarterCyl_lt_plane",
+      "ThompsonLaws.Cells.octant_lt_quarterCyl",
+      "ThompsonLaws.Cells.corner_thresholds"
+    ],
+    "assumptions": "Unit cube; a plane wall has area 1 whatever volume it cuts off; a quarter-cylinder of radius r along an edge has wall area πr/2 and volume πr²/4; a spherical octant of radius r in a corner has wall area πr²/2 and volume πr³/6.",
+    "scope_note": "Proves the exact thresholds 1/π (Thompson's 'about three-tenths') and 4π/81 (his 'about 0.15'), with 0.31 < 1/π < 0.32 and 0.15 < 4π/81 < 0.16. Notation made precise with the exact thresholds. Other partition shapes are not compared, and the examples in Fucus, mosses and stomata are observations."
+  },
+  {
+    "claim_id": "thompson1917-ch08-04",
+    "status": "formalized",
+    "label": "A quadrant cell is best bisected by an orthogonal arc, not a radial or concentric wall",
+    "notation": "bisecting a quadrant: circular arc \\perp side and periphery, cutting off 55^\\circ 22' of the arc, starting \\approx 0.3r from the centre",
+    "lean_declaration": "ThompsonLaws.Cells.anticlinalCutArea",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.quadrant_bisected",
+      "ThompsonLaws.Cells.anticlinal_shortest"
+    ],
+    "assumptions": "Unit quadrant; the partition is a circular arc meeting side and periphery at right angles, with Thompson's angle θ (Fig. 146); the area it cuts off is ½(π/2 − θ + θ cot²θ − cot θ) (his derivation) and its length θ cot θ; the periclinal alternative is the concentric arc at radius 1/√2.",
+    "scope_note": "Proves that some θ in (30°, 45°) makes the arc bisect the quadrant (so it cuts off between 45° and 60° of the periphery), and that every such arc is shorter than a radial wall, which is shorter than the bisecting periclinal arc π/(2√2). The values 55° 22′ and OM ≈ 0.30 come from Thompson's numerical table and are not proved; the area formula is taken from his derivation."
+  },
+  {
+    "claim_id": "thompson1917-ch08-05",
+    "status": "formalized",
+    "label": "Wide sector cells divide anticlinally, narrow ones periclinally",
+    "notation": "sector cell divides anticlinally iff 62\\tfrac{1}{2}^\\circ \\lesssim \\theta \\le 90^\\circ, otherwise periclinally",
+    "lean_declaration": "ThompsonLaws.Cells.periclinalLength",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.periclinal_bisects",
+      "ThompsonLaws.Cells.anticlinal_lt_periclinal"
+    ],
+    "assumptions": "Unit-radius sector of angle α; the periclinal wall is the concentric arc at radius 1/√2, which bisects the sector; the anticlinal wall is an orthogonal arc of length θ cot θ with θ ∈ (0, π/2), as in thompson1917-ch08-04.",
+    "scope_note": "Proves the periclinal arc bisects any sector with length α/√2, and that for α ≥ √2 rad (about 81°) an anticlinal arc is always shorter. The crossover at about 62½° below which the periclinal wall wins rests on Thompson's numerical plot and is not proved."
+  },
+  {
+    "claim_id": "thompson1917-ch08-06",
+    "status": "formalized",
+    "label": "Uniform disc growth makes the triangular daughter cell reach division size first",
+    "notation": "after bisecting a quadrant: triangular cell reaches division size at 1.345r, quadrilateral at 1.517r",
+    "lean_declaration": "ThompsonLaws.Cells.doublingRadius",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.doublingRadius_spec",
+      "ThompsonLaws.Cells.triangular_divides_first"
+    ],
+    "assumptions": "Unit quadrant bisected by an anticlinal arc with θ < 45° (thompson1917-ch08-04); the disc grows uniformly and each cell's increment is the sector margin over its own arc (π/2 − θ for the triangle, θ for the quadrilateral); a cell divides when its added area equals its original area π/8.",
+    "scope_note": "Proves the triangular cell reaches division size at a disc radius below √2 and the quadrilateral above √2, so uniform growth gives unequal division times. The values 1.345 and 1.517 follow from Thompson's θ ≈ 34° 38′ and are not proved; the margin-increment model is his simplifying assumption."
+  },
+  {
+    "claim_id": "thompson1917-ch08-09",
+    "status": "formalized",
+    "label": "n surface cells meeting three at a time need n − 3 intermediate partitions",
+    "notation": "n cells meeting three at a time with a common outer boundary need n - 3 partitions",
+    "lean_declaration": "ThompsonLaws.Cells.intermediatePartitions",
+    "lean_theorems": [
+      "ThompsonLaws.Cells.intermediatePartitions"
+    ],
+    "assumptions": "A disc divided into n cells that all reach the boundary, every vertex of degree 3; j interior junctions, n boundary points, e interior wall segments and n boundary arcs satisfy Euler's formula V − E + F = 2 (outside counted as a face).",
+    "scope_note": "Proves j = n − 2 junctions, e = 2n − 3 wall segments and e − n = n − 3 partitions not reaching the boundary. Notation shortened to this part: the count of thirteen types for n = 8 is not proved. Such arrangements are dual to triangulations of an n-gon, and an octagon has 12 triangulations up to rotation and reflection (OEIS A000207), so Thompson's thirteen depends on how he distinguished types."
+  }
+]

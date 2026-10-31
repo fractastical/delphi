@@ -1,9 +1,9 @@
 # Organism reference data: `thompson-growth-form` / `ch15-epilogue`
 
 Slice: D'Arcy Thompson, *On Growth and Form* (1917), Chapters XV–XVII and the Epilogue.
-Text: `thompson-growth-form/inputs/pg55264.txt`, main text lines 21575–25434 and the
+Text: `books/thompson-growth-form/inputs/pg55264.txt`, main text lines 21575–25434 and the
 footnotes belonging to these chapters, lines 28405–28917 (footnotes [586]–[663]).
-Claims: the 54 entries in `thompson-growth-form/claims.json` whose ids begin
+Claims: the 54 entries in `books/thompson-growth-form/claims.json` whose ids begin
 `thompson1917-ch15-`, `-ch16-`, `-ch17-` or `-epilogue-`.
 
 All records were built on 2026-10-31 from live API queries (GBIF, NCBI E-utilities, NCBI

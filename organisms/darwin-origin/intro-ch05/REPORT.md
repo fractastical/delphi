@@ -1,9 +1,9 @@
 # Organism reference data: Darwin, *On the Origin of Species* (1859), Introduction and Chapters I–V
 
-Slice `intro-ch05` of project `darwin-origin`. Source text: `darwin-origin/inputs/pg1228.txt`
+Slice `intro-ch05` of project `darwin-origin`. Source text: `books/darwin-origin/inputs/pg1228.txt`
 (Project Gutenberg #1228, 1st edition), lines 313–5289 (Introduction 313–481, I 482–1588,
 II 1589–2063, III 2064–2635, IV 2636–4139, V 4140–5289). Claims: the 94 rows of
-`darwin-origin/claims.json` with `chapter` in {Introduction, I, II, III, IV, V}.
+`books/darwin-origin/claims.json` with `chapter` in {Introduction, I, II, III, IV, V}.
 
 Everything here was produced by the scripts in `scripts/` (see "Reproducing" below). All counts
 were retrieved on 2026-10-31; dates in dataset ids and `retrieved_at` fields are UTC.

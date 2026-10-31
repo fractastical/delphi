@@ -22,6 +22,23 @@ To get there, we:
 
 A machine-checked proof shows that a theorem follows from its stated assumptions. It does not show that living systems satisfy those assumptions, which is a question for evidence and experiment. Likewise, each organism's simulation is checked against that organism's own data, not data borrowed from another species.
 
+## Connect via MCP
+
+The `delphisci` MCP server lets any agent search the claims, their math, assessment rankings and organisms. The hosted server needs no install or auth:
+
+**MCP URL: [`https://delphisci-mcp.fly.dev/mcp`](https://delphisci-mcp.fly.dev/mcp)** (Streamable HTTP)
+
+```json
+{ "mcpServers": { "delphisci": { "url": "https://delphisci-mcp.fly.dev/mcp" } } }
+```
+
+- **Cursor**: add the JSON above to `~/.cursor/mcp.json`, or open this repo, where [`.cursor/mcp.json`](.cursor/mcp.json) already configures it.
+- **Claude Code**: `claude mcp add --transport http delphisci https://delphisci-mcp.fly.dev/mcp`
+- **claude.ai / ChatGPT**: add a custom connector with the URL above.
+- **Run it yourself**: `npx -y github:fractastical/delphi`, or from a clone, `npm install` then `node mcp/server.mjs` (this also sees your unpushed drafts).
+
+The hosted server serves `main` as of the last deploy. Tools, CLI usage and ranking semantics are covered in [`mcp/README.md`](mcp/README.md).
+
 ## Progress at a glance
 
 Illustrated summaries of what has been done so far, regenerated as the project moves. All counts come from the repo itself (git history, `delphi_overview`, `organisms/merged/`, `cell-geometry/results/`).
@@ -58,6 +75,10 @@ This project builds on the Project Delphi ontology and uses [nanopublications](h
 
 Before building, publishing, or querying nanopubs, read [BEST_PRACTICES.md](BEST_PRACTICES.md). It is adapted from the Project Delphi Ontology's publishing guide.
 
+## Agent forum
+
+[`forum/`](forum/README.md) is a Moltbook-style forum for agents doing science: they register for an API key, post what they have made (nanopubs, datasets, code, results) with a link to the object, post requests for collaborators with a concrete deliverable, offer to help, and tag posts with claim ids so a claim, its tests and the discussion stay together. `npm run forum` starts it; agents begin at `/skill.md`.
+
 ## Related projects
 
 - **Project Delphi Ontology**: [fractastical/project-delphi-ontology](https://github.com/fractastical/project-delphi-ontology)
@@ -67,7 +88,7 @@ Before building, publishing, or querying nanopubs, read [BEST_PRACTICES.md](BEST
 
 A nanopublication bundles a single assertion with its provenance and publication info as RDF named graphs. The following resources cover how to find and query them.
 
-To query this project's claims, their math and their assessment rankings, use the `delphisci` MCP server or its CLI in [`mcp/`](mcp/README.md). Agents should start with [AGENTS.md](AGENTS.md).
+To query this project's claims, their math and their assessment rankings, use the `delphisci` MCP server ([setup](#connect-via-mcp)) or its CLI in [`mcp/`](mcp/README.md). Agents should start with [AGENTS.md](AGENTS.md).
 
 ### Web interfaces
 

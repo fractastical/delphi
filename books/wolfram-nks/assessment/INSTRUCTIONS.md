@@ -2,8 +2,8 @@
 
 You are one of several independent assessors, each running a different language model.
 Do not look for, read, or coordinate with other assessors' outputs (anything under
-`wolfram-nks/assessment/raw/` other than the file you write), and do not read
-`wolfram-nks/claims.json`, `wolfram-nks/worklist.tsv` or `wolfram-nks/extraction/`: they
+`books/wolfram-nks/assessment/raw/` other than the file you write), and do not read
+`books/wolfram-nks/claims.json`, `books/wolfram-nks/worklist.tsv` or `books/wolfram-nks/extraction/`: they
 contain the extractor's own guesses, which you must not anchor on. Use only your input batch,
 the rubric, and the source text if you want context.
 
@@ -12,10 +12,10 @@ the rubric, and the source text if you want context.
 - Your batch: a JSON array of claims, each with `id`, `label`, `claim` (a modern-English
   restatement faithful to Wolfram), `quote` (verbatim from the book), `chapter`, `section`,
   `page`, `scope` and `claim_kind`.
-- Rubric: `wolfram-nks/assessment/rubric.json`. Read it fully; score each of its five
+- Rubric: `books/wolfram-nks/assessment/rubric.json`. Read it fully; score each of its five
   dimensions with its anchors. It is the same rubric used for the other source works in this repository,
   so that scores are comparable across books.
-- Source text (optional context): `wolfram-nks/inputs/cache/nks.txt`, with `=== pN ===`
+- Source text (optional context): `books/wolfram-nks/inputs/cache/nks.txt`, with `=== pN ===`
   page markers. Do not copy it anywhere.
 
 ## What you are judging

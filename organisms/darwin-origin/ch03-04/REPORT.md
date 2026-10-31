@@ -1,6 +1,6 @@
 # darwin-origin / ch03-04 — Chapters III (Struggle for Existence) and IV (Natural Selection)
 
-Text: `darwin-origin/inputs/pg1228.txt` lines 2064–4139. Claims: `darwin1859-ch03-01` … `ch03-14`,
+Text: `books/darwin-origin/inputs/pg1228.txt` lines 2064–4139. Claims: `darwin1859-ch03-01` … `ch03-14`,
 `darwin1859-ch04-01` … `ch04-26` (40 claims). Built 2026-10-31 by a cloud agent
 (`vendored_by.run = cursor/organisms-darwin-ch03-04-30cb`); every identifier, count and checksum below was
 retrieved live from the named API or file on that date. Response bodies were saved outside the repo and

@@ -28,7 +28,7 @@ const PERMISSIONS = "https://www.wolframscience.com/nks/piv--copyright/";
 const AGENT = "https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor";
 const MODEL = "https://w3id.org/delphi/resource/model/claude-opus-5.5";
 const OWNER = "https://orcid.org/0009-0007-4948-9192";
-const blob = path => `https://github.com/fractastical/delphisci/blob/${commit}/wolfram-nks/${path}`;
+const blob = path => `https://github.com/fractastical/delphisci/blob/${commit}/books/wolfram-nks/${path}`;
 const DOMAIN = "wolfram-nks-2002";
 const RIGHTS = "Verbatim quotation from A New Kind of Science, © 2002 Stephen Wolfram, LLC, all rights reserved; quoted for scholarly purposes with citation, as the book's copyright notice permits.";
 

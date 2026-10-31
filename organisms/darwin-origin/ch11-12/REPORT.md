@@ -1,6 +1,6 @@
 # darwin-origin / ch11-12 — Chapters XI–XII (Geographical Distribution)
 
-Text: `darwin-origin/inputs/pg1228.txt` lines 10412–12300. Claims: `darwin1859-ch11-01` … `ch11-17`,
+Text: `books/darwin-origin/inputs/pg1228.txt` lines 10412–12300. Claims: `darwin1859-ch11-01` … `ch11-17`,
 `darwin1859-ch12-01` … `ch12-18` (35 claims). Built 2026-10-31 by a cloud agent
 (`cursor/organisms-darwin-ch11-12-9aca`, model `claude-fable-5.1`). No `assessment` fields anywhere.
 

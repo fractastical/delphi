@@ -4,7 +4,7 @@ Scores every dataset record in `organisms/merged/datasets.json` on the five dime
 `rubric.json` (source authority, integrity, completeness, independence, authenticity), as the
 ontology's dataset convention requires. The assessor is never the agent that vendored the
 record. Nothing here is a nanopub yet; these files are the raw assessor outputs that the
-nanopub builder will consume, mirroring `darwin-origin/assessment/raw/`.
+nanopub builder will consume, mirroring `books/darwin-origin/assessment/raw/`.
 
 ## Inputs
 
@@ -97,6 +97,26 @@ canonical id so the nanopub builder publishes each dataset once:
 ```
 
 Choose the canonical id as the one with the fullest metadata; do not edit the slice files.
+
+## Calibration seeds and conflicting scores
+
+Each batch handed to an outside assessor contains two or three records that have already
+been scored by the project, not marked as such. Agreement on the seeds (every dimension within
+0.15) is the condition for trusting the assessor's other scores in that batch; disagreement on
+a seed is reported as a rubric issue naming the dimension, because two assessors reading one
+record differently is evidence the anchor text is ambiguous, not that one of them is wrong.
+Seed scores are kept in `seeds.json` (not shared with assessors) and compared by script.
+
+When two assessors score the same record:
+
+- all five dimensions within 0.15: the scores are averaged and both originals are kept under
+  `assessments[]` in the merged record;
+- any dimension further apart: a third assessor, who sees both score sets and both rationales,
+  writes a resolution note and a final score; the originals stay in the record as provenance;
+- still unresolved: the record is marked `verdict: "disputed"` and the disagreement becomes an
+  issue against `rubric.json`, not a score.
+
+No assessor's output is overwritten; later passes add to `records/`, they do not replace.
 
 ## Rules
 

@@ -5,7 +5,7 @@ Each directory `claim-tests/<project>/<claim-id>/` holds one attempt to resolve 
 operationalization proposed in that claim's dataset-resolvability assessments. These are the
 empirical tests the README's goal calls for; they are not nanopubs yet.
 
-Projects: `darwin-origin`, `thompson-growth-form`, `wolfram-nks`.
+Projects: `darwin-origin`, `thompson-growth-form`, `wolfram-nks`, `levin-papers`.
 
 ## Rules
 

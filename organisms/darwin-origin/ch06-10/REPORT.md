@@ -1,8 +1,8 @@
 # darwin-origin / ch06-10: animals of *Origin* chapters VI–X
 
 Slice built 2026-10-31 on branch `cursor/organisms-darwin-ch06-10-f86c` from
-`darwin-origin/claims.json` (79 claims with `chapter` ∈ {VI, VII, VIII, IX, X}) and
-`darwin-origin/inputs/pg1228.txt` lines 5290–10411 (from the heading `CHAPTER VI.` to the line
+`books/darwin-origin/claims.json` (79 claims with `chapter` ∈ {VI, VII, VIII, IX, X}) and
+`books/darwin-origin/inputs/pg1228.txt` lines 5290–10411 (from the heading `CHAPTER VI.` to the line
 before `CHAPTER XI.`). Everything was produced by the scripts in `scripts/` (see "How it was
 built"); nothing was scored and nothing was published.
 

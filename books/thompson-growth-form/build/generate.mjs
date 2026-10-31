@@ -24,7 +24,7 @@ const TEXT_FILE = "https://www.gutenberg.org/cache/epub/55264/pg55264.txt";
 const AGENT = "https://w3id.org/delphi/resource/agent/delphisci-thompson-growth-form-extractor";
 const MODEL = "https://w3id.org/delphi/resource/model/claude-opus-5.5";
 const OWNER = "https://orcid.org/0009-0007-4948-9192";
-const GENERATOR = `https://github.com/fractastical/delphisci/blob/${commit}/thompson-growth-form/build/generate.mjs`;
+const GENERATOR = `https://github.com/fractastical/delphisci/blob/${commit}/books/thompson-growth-form/build/generate.mjs`;
 const DOMAIN = "thompson-growth-form-1917";
 
 const CHAPTER_TITLES = {

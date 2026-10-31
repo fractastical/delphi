@@ -2,60 +2,95 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Claim Graph — delphisci</title>
-<meta name="description" content="Every claim extracted in delphisci, grouped by thinker or by date, coloured by proof status, with testability and truth scores on the edges and links to the live nanopubs.">
+<meta name="description" content="Every claim extracted in delphisci, grouped by thinker or by date, coloured by verification status (Lean-checked, proved in the literature, unverified, refuted), with the math claims and theorems marked, testability and truth scores on the edges and links to the live nanopubs.">
 <link rel="icon" href="data:image/svg+xml,/*__SEAL_URI__*/">
 <style>
-:root{--bg:#0e1830;--navy:#14213d;--panel:#16243f;--panel2:#1b2b4d;--gold:#e5c07b;--gold2:#f2dba6;--goldline:rgba(229,192,123,.38);--goldfaint:rgba(229,192,123,.14);
- --ink:#efe6cf;--mut:#a7b0c2;--line:rgba(229,192,123,.26);--serif:Georgia,'Times New Roman',serif;--sans:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+:root{--ink:#000;--ink2:#2a2a2a;--mut:#6f6f6f;--grey:#b3b3b3;--line:#e3e3e3;--faint:#f3f3f3;--blue:#0f3bff;--green:#1a9e4b;--red:#d1232a;--amber:#e0a100;
+ --sans:'Helvetica Neue',Helvetica,Arial,sans-serif}
 *{box-sizing:border-box}
-body{margin:0;font-family:var(--sans);color:var(--ink);background:radial-gradient(1200px 600px at 50% -200px,#1d2f57 0%,var(--bg) 60%) fixed,var(--bg)}
-main{max-width:1640px;margin:0 auto;padding:18px 18px 40px}
-h1,h2,h3{font-family:var(--serif);color:var(--gold)}
-h1{font-size:26px;margin:0;letter-spacing:4px;text-transform:uppercase}
-h2{font-size:19px;margin:8px 0 4px;line-height:1.3}h3{font-size:12px;margin:16px 0 6px;letter-spacing:2px;text-transform:uppercase}
-p{font-size:13.5px;line-height:1.55}.mut{color:var(--mut)}.small{font-size:12px}b{color:var(--gold2)}
-.masthead{display:flex;gap:16px;align-items:center;padding:0 0 12px}
-.masthead svg{width:58px;height:58px;flex:none;filter:drop-shadow(0 4px 12px rgba(0,0,0,.45))}
-.subtitle{font-family:var(--serif);font-style:italic;color:var(--gold2);font-size:15px;margin:4px 0 0}
-button{font:inherit;font-size:12.5px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);cursor:pointer}
-button:hover{border-color:var(--gold);color:var(--gold2)}button.on{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:700}
-input{font:inherit;font-size:13px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink);width:240px}
-.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:8px}
-.toolbar .lab{font-family:var(--serif);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+body{margin:0;font-family:var(--sans);color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased}
+main{max-width:1640px;margin:0 auto;padding:22px 48px 32px}
+h1,h2,h3{color:var(--ink);font-weight:700}
+h1{font-size:46px;line-height:1.05;margin:0;letter-spacing:-.02em}
+h2{font-size:21px;margin:8px 0 4px;line-height:1.25;letter-spacing:-.01em}
+h3{font-size:11px;margin:18px 0 6px;letter-spacing:.06em;text-transform:uppercase}
+p{font-size:14px;line-height:1.5}.mut{color:var(--mut)}.small{font-size:12.5px}b{color:var(--ink)}
+.topbar{display:flex;align-items:center;gap:18px;padding-bottom:7px;border-bottom:1.5px solid var(--ink2);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
+.topbar .right{margin-left:auto;display:flex;gap:18px;align-items:center}
+.topbar a{color:var(--ink2);text-decoration:none}.topbar a:hover{color:var(--blue)}
+.masthead{display:flex;gap:24px;align-items:center;padding:16px 0 18px}
+.masthead svg{width:66px;height:66px;flex:none;margin-left:auto}
+.subtitle{color:var(--mut);font-size:16px;margin:8px 0 0}
+button{font:inherit;font-size:12.5px;padding:5px 11px;border:1px solid var(--grey);border-radius:2px;background:#fff;color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--ink)}button.on{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:700}
+input{font:inherit;font-size:13px;padding:6px 11px;border:1px solid var(--grey);border-radius:2px;background:#fff;color:var(--ink);width:240px}
+input:focus{outline:none;border-color:var(--ink)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.lab{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
 .sep{width:1px;height:22px;background:var(--line)}
-input[type=range]{width:110px;padding:0;border:none;background:none;accent-color:var(--gold);vertical-align:middle}
+input[type=range]{width:110px;padding:0;border:none;background:none;accent-color:var(--ink);vertical-align:middle}
 .thr{display:inline-flex;align-items:center;gap:6px}.thr b{font-size:12px;min-width:30px;font-variant-numeric:tabular-nums}
-.legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--mut);margin:0 4px 10px}
+.chips{display:inline-flex;gap:4px;flex-wrap:wrap}
+.dot{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px}
+.overview{padding:0 0 12px}
+.overview summary{cursor:pointer;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 0}
+.overview summary span{font-weight:400;font-size:13px;letter-spacing:0;text-transform:none;color:var(--mut);margin-left:10px}
+.ovwrap{overflow-x:auto}
+table.ov{border-collapse:collapse;width:100%;margin:10px 0 4px;font-size:14px;font-variant-numeric:tabular-nums}
+table.ov th{font-weight:400;color:var(--mut);text-align:right;padding:4px 6px;border-bottom:1px solid var(--ink2);white-space:nowrap;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase}
+table.ov td{text-align:right;padding:3px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+table.ov th:first-child,table.ov td:first-child,table.ov td.bar2,table.ov th.bar2{text-align:left}
+table.ov td:first-child button{font-weight:700}
+table.ov tr.total td{border-top:1.5px solid var(--ink2);border-bottom:none;font-weight:700}
+table.ov button{border-color:transparent;padding:2px 7px;font-size:14px}
+table.ov button.sub{font-size:11px;color:var(--mut);padding:1px 5px}table.ov button.sub.on{color:#fff}
+table.ov .zero{color:var(--grey);padding:2px 7px}
+.stack{display:flex;width:200px;height:12px;background:var(--faint)}
+.ovnote{font-size:13px;color:var(--mut);margin:8px 0 0}.ovnote button{font-size:13px;padding:1px 8px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--mut);padding:10px 0;border-top:1px solid var(--line)}
 .tri{display:inline-block;width:12px;height:12px;clip-path:polygon(0 0,100% 0,0 100%);margin-right:5px;vertical-align:middle}
-.pill{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:4px;margin-right:3px;font-variant-numeric:tabular-nums}
-.pT{background:#e5c07b;color:#14213d}.pP{background:#8fb7ff;color:#14213d}
-#graphwrap{overflow:hidden;background:var(--navy);border:1px solid var(--goldline);border-radius:12px;position:relative;box-shadow:inset 0 0 0 5px var(--navy),inset 0 0 0 6px var(--goldfaint),0 10px 30px rgba(0,0,0,.35)}
-#graph{cursor:grab;touch-action:none;display:block;width:100%;height:auto;background-image:radial-gradient(rgba(229,192,123,.10) 1px,transparent 1.2px);background-size:22px 22px}#graph:active{cursor:grabbing}
-.zoomctl{position:absolute;top:12px;right:12px;z-index:20;display:flex;gap:4px;align-items:center;background:rgba(20,33,61,.92);border:1px solid var(--goldline);border-radius:999px;padding:4px}
+.pill{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:2px;margin-right:3px;font-variant-numeric:tabular-nums;color:#fff}
+.pT{background:var(--ink)}.pP{background:var(--blue)}
+#graphwrap{overflow:hidden;background:#fff;border-top:1.5px solid var(--ink2);border-bottom:1px solid var(--line);position:relative}
+#graph{cursor:grab;touch-action:none;display:block;width:100%;height:auto;background-image:radial-gradient(#e7e7e7 1px,transparent 1.2px);background-size:22px 22px}#graph:active{cursor:grabbing}
+.zoomctl{position:absolute;top:12px;right:0;z-index:20;display:flex;gap:4px;align-items:center;background:#fff;border:1px solid var(--grey);border-radius:2px;padding:3px}
 .zoomctl button{font-size:15px;font-weight:700;line-height:1;padding:5px 11px;border-color:transparent}.zoomctl .zlab{font-size:11.5px;padding:5px 8px}
-#zoompct{font-family:var(--serif);font-size:12px;font-weight:700;min-width:44px;text-align:center;color:var(--gold)}
-#drawer{position:fixed;top:14px;right:14px;width:620px;max-width:calc(100vw - 28px);max-height:calc(100vh - 28px);overflow-y:auto;z-index:60;background:var(--navy);border:1.5px solid var(--gold);border-radius:12px;padding:18px;display:none;box-shadow:inset 0 0 0 5px var(--navy),inset 0 0 0 6px var(--goldfaint),0 14px 40px rgba(0,0,0,.55)}
-.badge{display:inline-block;color:var(--navy);font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:10px;white-space:nowrap}
-.badge.ghost{background:transparent;color:var(--ink);border:1px dashed var(--mut)}
-.clickable{cursor:pointer;border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin:5px 0;background:var(--panel2);color:var(--ink);text-align:left;width:100%;display:flex;gap:8px;align-items:center}
-.clickable:hover{border-color:var(--gold)}.clickable .r{margin-left:auto;white-space:nowrap}
-.assess{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin:8px 0;background:#18284a}.assess p{font-size:12.5px;margin:5px 0}
+#zoompct{font-size:12px;font-weight:700;min-width:44px;text-align:center}
+#drawer{position:fixed;top:14px;right:14px;width:620px;max-width:calc(100vw - 28px);max-height:calc(100vh - 28px);overflow-y:auto;z-index:60;background:#fff;border:1.5px solid var(--ink);padding:20px 22px;display:none;box-shadow:0 18px 50px rgba(0,0,0,.18)}
+.badge{display:inline-block;color:#fff;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:2px;white-space:nowrap;letter-spacing:.02em}
+.badge.ghost{background:#fff;color:var(--ink);border:1px dashed var(--mut)}
+.clickable{cursor:pointer;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:8px 2px;margin:0;background:#fff;color:var(--ink);text-align:left;width:100%;display:flex;gap:8px;align-items:center;font-size:13px}
+.clickable:hover{background:var(--faint)}.clickable .r{margin-left:auto;white-space:nowrap}
+.assess{border-top:1px solid var(--line);padding:9px 0;margin:0}.assess p{font-size:13px;margin:5px 0}
 .num{display:flex;align-items:center;gap:8px;font-size:13px;margin:5px 0}.num .l{width:150px;color:var(--mut)}
-.bar{display:inline-block;width:130px;height:7px;background:#2a3a5e;border-radius:4px;overflow:hidden}.bar>i{display:block;height:7px}
-blockquote{margin:8px 0;padding:6px 12px;border-left:2px solid var(--gold);color:var(--gold2);font-family:var(--serif);font-style:italic;font-size:13px;background:rgba(229,192,123,.05)}
-a{color:var(--gold2);text-decoration-color:rgba(229,192,123,.5)}a:hover{color:#fff}
-.np{display:block;margin:10px 0;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);font-size:13px;text-decoration:none}
-a.np{border-color:var(--gold)}a.np:hover{background:#22355d}
-code{font-size:12px;color:var(--gold2);background:rgba(229,192,123,.08);padding:0 4px;border-radius:3px;word-break:break-word}
-.footer{text-align:center;margin-top:22px;font-family:var(--serif);font-size:11px;letter-spacing:3px;color:var(--gold);opacity:.7}
-::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:#2c3d63;border-radius:6px}::-webkit-scrollbar-track{background:transparent}
-@media(max-width:760px){main{padding:10px}h1{font-size:20px}input{width:150px}#drawer{top:0;right:0;width:100%;max-width:100%;height:100dvh;max-height:100dvh;border-radius:0;border:none}}
+.bar{display:inline-block;width:150px;height:10px;background:var(--faint)}.bar>i{display:block;height:10px}
+blockquote{margin:10px 0;padding:4px 14px;border-left:3px solid var(--ink);color:var(--ink2);font-style:italic;font-size:14px}
+a{color:var(--ink);text-decoration-color:var(--grey);text-underline-offset:2px}a:hover{color:var(--blue);text-decoration-color:var(--blue)}
+.np{display:block;margin:12px 0;padding:10px 12px;border:1px solid var(--line);font-size:13px;text-decoration:none}
+a.np{border-color:var(--ink)}a.np:hover{background:var(--faint);color:var(--ink)}
+code{font-size:12px;color:var(--ink);background:var(--faint);padding:1px 4px;border-radius:2px;word-break:break-word}
+.footer{display:flex;align-items:center;gap:18px;margin-top:28px;padding-top:9px;border-top:1px solid var(--line);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
+.footer a{color:var(--ink2);text-decoration:none}.footer .right{margin-left:auto;color:var(--mut)}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:#cfcfcf;border-radius:0}::-webkit-scrollbar-track{background:transparent}
+@media(max-width:760px){main{padding:12px 14px}h1{font-size:30px}.masthead svg{width:48px;height:48px}input{width:150px}#drawer{top:0;right:0;width:100%;max-width:100%;height:100dvh;max-height:100dvh;border:none}}
 </style></head><body><main>
-<header class="masthead"><!--__SEAL__--><div>
-<h1>Claim Graph</h1>
-<p class="subtitle" id="subtitle"></p></div>
-<a href="claims-query.html" style="margin-left:auto;font-size:12.5px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none">Query claims →</a></header>
+<div class="topbar"><span>DELPHI &nbsp;·&nbsp; Claim graph</span><span class="right"><a href="theorems.html">Theorems</a><a href="claims-query.html">Query claims</a><a href="claims.json">claims.json</a><span id="asof"></span></span></div>
+<header class="masthead"><div>
+<h1>Where every claim stands</h1>
+<p class="subtitle" id="subtitle"></p></div><!--__SEAL_MONO__--></header>
 
+<details class="overview" open><summary>Verification status<span id="ovsum"></span></summary>
+<div class="ovwrap"><table class="ov" id="ovtable"></table></div>
+<p class="ovnote" id="ovnote"></p></details>
+
+<div class="toolbar">
+ <span class="lab">Verification</span><span class="chips" id="f-level"></span>
+ <span class="sep"></span>
+ <span class="lab">Math</span><span class="chips" id="f-math"></span>
+ <span class="sep"></span>
+ <button id="f-thm" onclick="setFilter({ thm: !S.thm })" title="Math claims that are machine-checked in Lean 4 or proved in the literature">★ Theorems only</button>
+ <span class="chips" id="f-thinker"></span>
+</div>
 <div class="toolbar">
  <span class="lab">Group by</span><button id="m-thinker" class="on" onclick="setMode('thinker')">Thinker</button><button id="m-date" onclick="setMode('date')">Date</button>
  <span class="sep"></span>
@@ -67,7 +102,7 @@ code{font-size:12px;color:var(--gold2);background:rgba(229,192,123,.08);padding:
  <span class="lab">Show only</span>
  <label class="thr" title="Minimum truth probability (P)"><span class="pill pP">P ≥</span><input id="minP" type="range" min="0" max="1" step="0.05" value="0"><b id="minPv">any</b></label>
  <label class="thr" id="minTlab" title="Minimum testability score (T)"><span class="pill pT">T ≥</span><input id="minT" type="range" min="0" max="1" step="0.05" value="0"><b id="minTv">any</b></label>
- <button id="clearthr" onclick="setThresholds(0, 0)" style="display:none">Clear</button>
+ <button id="clearthr" onclick="clearFilters()" style="display:none">Clear filters</button>
  <span class="small mut" id="shown"></span>
 </div>
 <div class="legend" id="legend"></div>
@@ -77,7 +112,7 @@ code{font-size:12px;color:var(--gold2);background:rgba(229,192,123,.08);padding:
 <button class="zlab" onclick="fitView()" title="Fit (F)">Fit</button><button class="zlab" onclick="resetView()" title="Reset (0)">Reset</button></div></div>
 <p class="mut small" style="margin:6px 2px 0">Click any card to open it. Click a chapter to show its claims as cards. Pinch or ⌘-scroll zooms, drag pans, <b>F</b> fits, <b>Esc</b> closes the inspector.</p>
 <div id="drawer"></div>
-<div class="footer">✦ Distributed Epistemic Layer for Probabilistic Hypothesis Inference ✦</div>
+<div class="footer"><a href="https://github.com/fractastical/delphi">github.com/fractastical/delphi</a><span class="right">Distributed Epistemic Layer for Probabilistic Hypothesis Inference</span></div>
 </main>
 <script>
 const DATA = /*__DATA__*/null;
@@ -85,41 +120,50 @@ const CLAIMS = DATA.claims, byId = Object.fromEntries(CLAIMS.map(c => [c.id, c])
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-/* ---- proof status, red to green ---- */
-const STATUS = { refuted: { v: 0, label: 'Refuted as stated' }, untested: { v: 0.45, label: 'Not yet proven or tested' },
-  partial: { v: 0.75, label: 'Partly proved' }, proved: { v: 1, label: 'Proved (within its model)' } };
-const STOPS = [[0,[224,87,79]],[0.45,[229,184,75]],[1,[79,192,127]]];
+/* ---- verification level (load-claims.mjs), strongest first; red to green ---- */
+const LEVEL = { lean: { v: 1, label: 'Machine-checked in Lean 4', short: 'Lean-checked', col: '#e0a100' },
+  literature: { v: 0.9, label: 'Proved in the literature', short: 'Proved in literature', col: '#efc65a' },
+  partial: { v: 0.72, label: 'Partly proved', short: 'Partly proved', col: '#f6e2a8' },
+  untested: { v: 0.45, label: 'Unverified: not yet proved or tested', short: 'Unverified', col: '#b3b3b3' },
+  refuted: { v: 0, label: 'Refuted as stated', short: 'Refuted', col: '#d1232a' } };
+const LEVELS = Object.keys(LEVEL);
+const STOPS = [[0,[209,35,42]],[0.45,[179,179,179]],[1,[224,161,0]]];
 const ramp = v => { let i = 0; while (i < STOPS.length - 2 && v > STOPS[i+1][0]) i++;
   const [a, ca] = STOPS[i], [b, cb] = STOPS[i+1], t = Math.max(0, Math.min(1, (v - a) / (b - a)));
   return `rgb(${ca.map((x, k) => Math.round(x + (cb[k] - x) * t)).join(',')})`; };
-const scol = s => ramp(STATUS[s].v);
-const meanStatus = cs => cs.reduce((s, c) => s + STATUS[c.status].v, 0) / cs.length;
+const scol = s => LEVEL[s].col;
+const meanStatus = cs => cs.reduce((s, c) => s + LEVEL[c.verification].v, 0) / cs.length;
+const corner = cs => cs.every(c => c.verification === cs[0].verification) ? scol(cs[0].verification) : ramp(meanStatus(cs));
+const mark = c => c.theorem ? '★' : c.math ? '∑' : '';
 const fmt = v => v == null ? '–' : v.toFixed(2);
 const short = t => /Maynard Smith$/.test(t) ? 'Maynard Smith' : t.split(' ').slice(-1)[0];
 const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
 const live = CLAIMS.filter(c => c.registry === 'production').length;
 const truthN = CLAIMS.filter(c => c.truth != null).length;
-$('subtitle').textContent = `${CLAIMS.length} claims from ${new Set(CLAIMS.map(c => c.thinker)).size} thinkers · ${live} live as nanopubs · built ${DATA.built}`;
-$('legend').innerHTML = `<span><b>Corner triangle</b> = proof status:</span>` +
-  Object.entries(STATUS).map(([s, d]) => `<span><i class="tri" style="background:${scol(s)}"></i>${d.label} (${CLAIMS.filter(c => c.status === s).length})</span>`).join('') +
-  `<span>· dashed card = draft, not published</span>` +
+$('subtitle').textContent = `${CLAIMS.length} claims from ${new Set(CLAIMS.map(c => c.thinker)).size} thinkers, by how far each has been verified: machine-checked, proved, unverified or refuted. ${live} are live as nanopubs.`;
+$('asof').textContent = `As of ${new Date(DATA.built.replace(' ', 'T') + 'Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+$('legend').innerHTML = `<span><b>Corner triangle</b> = verification:</span>` +
+  LEVELS.map(s => `<span><i class="tri" style="background:${scol(s)}"></i>${LEVEL[s].short}</span>`).join('') +
+  `<span>· <b style="color:#e0a100">★</b> theorem · <b style="color:#6f6f6f">∑</b> math, not yet proved · dashed card = draft, not published</span>` +
   `<span>· <b>On each edge</b>: <span class="pill pT">T</span>testability, how far today's open data could settle it · <span class="pill pP">P</span>truth, blind GPT and Grok assessors' mean probability that it is true${truthN ? '' : ' (not scored yet)'} · 0–1</span>`;
 
 /* ---- tree model: root → group (thinker or decade) → chapter (books) → claim ---- */
-const S = { mode: 'thinker', sel: null, q: '', minP: 0, minT: 0 };
+const S = { mode: 'thinker', sel: null, q: '', minP: 0, minT: 0, level: null, math: null, thm: false, thinker: null };
 const OPEN = new Set();
 let TREE = null;
 // Unscored claims fail any non-zero threshold.
-const passes = c => (!S.minP || (c.truth ?? -1) >= S.minP) && (!S.minT || (c.resolvability ?? -1) >= S.minT);
-const filtering = () => S.minP > 0 || S.minT > 0;
+const passes = c => (!S.minP || (c.truth ?? -1) >= S.minP) && (!S.minT || (c.resolvability ?? -1) >= S.minT)
+  && (!S.level || c.verification === S.level) && (!S.math || (S.math === 'yes') === c.math) && (!S.thm || c.theorem) && (!S.thinker || c.thinker === S.thinker);
+const filtering = () => S.minP > 0 || S.minT > 0 || !!S.level || !!S.math || S.thm || !!S.thinker;
 function buildTree(mode) {
   const gkey = c => mode === 'thinker' ? c.thinker : `${Math.floor(c.year / 10) * 10}s`;
   const groups = new Map(), CS = CLAIMS.filter(passes), liveN = CS.filter(c => c.registry === 'production').length;
   for (const c of CS) { const k = gkey(c); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(c); }
   const gl = [...groups.entries()].map(([k, cs]) => ({ k, cs: cs.slice().sort((a, b) => a.year - b.year), year: Math.min(...cs.map(c => c.year)) }))
     .sort((a, b) => a.year - b.year);
-  const root = { id: 'root', kind: 'root', label: 'All claims', sub: `${filtering() ? `${CS.length} of ${CLAIMS.length}` : CLAIMS.length} claims · ${liveN} live`, claims: CS, children: [] };
+  const root = { id: 'root', kind: 'root', label: 'All claims', claims: CS, children: [],
+    sub: `${filtering() ? `${CS.length} of ${CLAIMS.length}` : CLAIMS.length} claims · ★ ${CS.filter(c => c.theorem).length} · ${liveN} live` };
   for (const g of gl) {
     const thinkers = [...new Set(g.cs.map(c => c.thinker))], years = [...new Set(g.cs.map(c => c.year))];
     const gn = { id: `g:${g.k}`, kind: 'group', label: g.k, claims: g.cs, children: [],
@@ -153,8 +197,9 @@ function layout() {
   const place = (n, x, y) => { n.x = x; n.y = y; NODES.push(n); };
   place(root, WIDTH / 2 - W / 2, TOP);
   let maxY = 0;
+  const left = (WIDTH - cols * COLW) / 2;
   root.children.forEach((g, i) => {
-    const x = 20 + i * COLW + (COLW - W) / 2;
+    const x = left + i * COLW + (COLW - W) / 2;
     place(g, x, TOP + H + 70);
     EDGES.push({ from: root, to: g, kind: 'tree' });
     let y = g.y + H + GAP, prev = g;
@@ -189,12 +234,12 @@ function draw() {
     const a = e.from, b = e.to, x1 = a.x + W / 2, y1 = a.y + H, x2 = b.x + W / 2, y2 = b.y, mid = (y1 + y2) / 2;
     const d = Math.abs(x1 - x2) < 4 ? `M${x1},${y1} L${x2},${y2}` : `M${x1},${y1} C${x1},${mid} ${x2},${mid} ${x2},${y2}`;
     const faded = S.q && !hit(b);
-    mk('path', { d, fill: 'none', stroke: e.kind === 'claim' ? 'rgba(229,192,123,.55)' : 'rgba(229,192,123,.28)', 'stroke-width': e.kind === 'claim' ? 1.4 : 1.2, opacity: faded ? .2 : 1 });
+    mk('path', { d, fill: 'none', stroke: e.kind === 'claim' ? '#6f6f6f' : '#b3b3b3', 'stroke-width': e.kind === 'claim' ? 1.4 : 1.2, opacity: faded ? .2 : 1 });
     if (e.kind === 'claim') {
       const c = b.claim, py = y2 - GAP / 2, g = mk('g', { opacity: faded ? .2 : 1 });
-      const pill = (x, lab, v, fill) => { mk('rect', { x, y: py - 7.5, width: 46, height: 15, rx: 4, fill: v == null ? '#2a3a5e' : fill }, g);
-        const t = mk('text', { x: x + 23, y: py + 3.5, 'text-anchor': 'middle', 'font-size': 9.5, 'font-weight': 700, fill: v == null ? '#a7b0c2' : '#14213d' }, g); t.textContent = `${lab} ${fmt(v)}`; };
-      pill(x2 - 49, 'T', c.resolvability, '#e5c07b'); pill(x2 + 3, 'P', c.truth, '#8fb7ff');
+      const pill = (x, lab, v, fill) => { mk('rect', { x, y: py - 7.5, width: 46, height: 15, rx: 2, fill: v == null ? '#ededed' : fill }, g);
+        const t = mk('text', { x: x + 23, y: py + 3.5, 'text-anchor': 'middle', 'font-size': 9.5, 'font-weight': 700, fill: v == null ? '#6f6f6f' : '#fff' }, g); t.textContent = `${lab} ${fmt(v)}`; };
+      pill(x2 - 49, 'T', c.resolvability, '#000'); pill(x2 + 3, 'P', c.truth, '#0f3bff');
     }
   }
   for (const n of NODES) {
@@ -203,25 +248,29 @@ function draw() {
     const root = n.kind === 'root', sel = S.sel === n.id, draft = n.claim?.draft, open = OPEN.has(n.id);
     const faded = S.q && !hit(n);
     g.setAttribute('opacity', faded ? .25 : 1);
-    mk('rect', { x: n.x, y: n.y, width: W, height: H, rx: root ? 38 : 8, fill: root ? '#14213d' : n.kind === 'claim' ? '#1c2c4f' : '#22355d',
-      stroke: sel ? '#f2dba6' : root ? '#e5c07b' : S.q && hit(n) ? '#f2dba6' : 'rgba(229,192,123,.42)', 'stroke-width': sel ? 2.6 : root ? 2.4 : 1.2, 'stroke-dasharray': draft ? '5 3' : '' }, g);
-    if (root) mk('rect', { x: n.x + 5, y: n.y + 5, width: W - 10, height: H - 10, rx: 33, fill: 'none', stroke: '#e5c07b', 'stroke-width': 1, 'stroke-dasharray': '2 4' }, g);
-    else mk('path', { d: `M${n.x + 1},${n.y + 1} h18 L${n.x + 1},${n.y + 19} z`, fill: ramp(meanStatus(n.claims)) }, g);
+    mk('rect', { x: n.x, y: n.y, width: W, height: H, rx: 2, fill: root ? '#000' : '#fff',
+      stroke: sel ? '#0f3bff' : root ? '#000' : S.q && hit(n) ? '#0f3bff' : n.kind === 'group' ? '#000' : n.kind === 'chapter' ? '#6f6f6f' : '#b3b3b3', 'stroke-width': sel ? 2.6 : n.kind === 'group' ? 1.6 : 1, 'stroke-dasharray': draft ? '5 3' : '' }, g);
+    if (!root && n.claims.length) mk('path', { d: `M${n.x + 1},${n.y + 1} h18 L${n.x + 1},${n.y + 19} z`, fill: corner(n.claims) }, g);
     const lines = wrap(n.label, root ? 12 : 23).slice(0, 2);
     if (wrap(n.label, 23).length > 2) lines[1] = lines[1].replace(/.{0,2}$/, '…');
     lines.forEach((l, k) => { const t = mk('text', { x: n.x + W / 2, y: n.y + 20 + k * 12.5, 'text-anchor': 'middle', 'font-size': root ? 12 : 11, 'font-weight': 700,
-      fill: root ? '#e5c07b' : '#f3ead2', 'font-family': 'Georgia,serif', 'letter-spacing': root ? 2 : 0.2 }, g); t.textContent = root ? l.toUpperCase() : l; });
-    const sub = mk('text', { x: n.x + W / 2, y: n.y + 20 + lines.length * 12.5 + 3, 'text-anchor': 'middle', 'font-size': 9, fill: root ? '#f2dba6' : '#a7b0c2', 'font-style': root ? 'italic' : 'normal' }, g);
+      fill: root ? '#fff' : '#000', 'font-family': "'Helvetica Neue',Helvetica,Arial,sans-serif", 'letter-spacing': root ? 1.5 : 0 }, g); t.textContent = root ? l.toUpperCase() : l; });
+    const sub = mk('text', { x: n.x + W / 2, y: n.y + 20 + lines.length * 12.5 + 3, 'text-anchor': 'middle', 'font-size': 9, fill: root ? '#d6d6d6' : '#6f6f6f' }, g);
     sub.textContent = n.sub;
     if (n.kind !== 'claim' && !root) {
-      // Bottom strip: share of the card's claims at each proof status.
+      // Bottom strip: share of the card's claims at each verification level.
       let x = n.x + 1; const total = n.claims.length;
-      for (const s of ['refuted', 'untested', 'partial', 'proved']) { const k = n.claims.filter(c => c.status === s).length; if (!k) continue;
+      for (const s of LEVELS) { const k = n.claims.filter(c => c.verification === s).length; if (!k) continue;
         const w = (W - 2) * k / total; mk('rect', { x, y: n.y + H - 7, width: w, height: 6, fill: scol(s) }, g); x += w; }
+      const nm = n.claims.filter(c => c.math).length, nt = n.claims.filter(c => c.theorem).length;
+      if (nm) { const t = mk('text', { x: n.x + 8, y: n.y + H - 12, 'font-size': 9.5, 'font-weight': 700, fill: '#000' }, g); t.textContent = `★ ${nt}  ∑ ${nm}`; }
     }
-    if (n.kind === 'chapter') { const t = mk('text', { x: n.x + W - 8, y: n.y + H - 12, 'text-anchor': 'end', 'font-size': 9.5, 'font-weight': 700, fill: '#e5c07b' }, g); t.textContent = open ? '▲ hide' : `▼ ${n.claims.length}`; }
-    if (n.kind === 'claim' && n.claim.registry === 'production') { const t = mk('text', { x: n.x + W - 7, y: n.y + H - 7, 'text-anchor': 'end', 'font-size': 9, fill: '#6cc29a' }, g); t.textContent = '● live'; }
-    const tl = document.createElementNS(NS, 'title'); tl.textContent = n.kind === 'claim' ? `${n.label} — ${STATUS[n.claim.status].label}` : `${n.label} — ${n.sub}`; g.appendChild(tl);
+    if (n.kind === 'claim' && mark(n.claim)) { const t = mk('text', { x: n.x + 8, y: n.y + H - 7, 'font-size': 9, 'font-weight': 700, fill: n.claim.theorem ? '#e0a100' : '#6f6f6f' }, g);
+      t.textContent = n.claim.theorem ? '★ theorem' : '∑ math'; }
+    if (n.kind === 'chapter') { const t = mk('text', { x: n.x + W - 8, y: n.y + H - 12, 'text-anchor': 'end', 'font-size': 9.5, 'font-weight': 700, fill: '#000' }, g); t.textContent = open ? '▲ hide' : `▼ ${n.claims.length}`; }
+    if (n.kind === 'claim' && n.claim.registry === 'production') { const t = mk('text', { x: n.x + W - 7, y: n.y + H - 7, 'text-anchor': 'end', 'font-size': 9, fill: '#1a9e4b' }, g); t.textContent = '● live'; }
+    const tl = document.createElementNS(NS, 'title'); tl.textContent = n.kind === 'claim' ? `${n.label} — ${LEVEL[n.claim.verification].label}${n.claim.theorem ? ' · theorem' : n.claim.math ? ' · math' : ''}`
+      : `${n.label} — ${n.sub} · ${n.claims.filter(c => c.theorem).length} theorems, ${n.claims.filter(c => c.math).length} math claims`; g.appendChild(tl);
   }
   applyView();
 }
@@ -281,20 +330,67 @@ $('search').addEventListener('keydown', e => { if (e.key === 'Enter') { const c 
 const T_ONLY = (() => { const all = new Set(CLAIMS.map(c => c.thinker)), has = [...new Set(CLAIMS.filter(c => c.resolvability != null).map(c => c.thinker))];
   return has.length && has.length < all.size ? `${has.map(short).join(' and ')}'s claims` : ''; })();
 $('minTlab').title += T_ONLY ? `. Only ${T_ONLY} have T scores so far.` : '';
-function setThresholds(p, t) {
-  S.minP = +p; S.minT = +t; $('minP').value = S.minP; $('minT').value = S.minT;
+function setThresholds(p, t) { setFilter({ minP: +p, minT: +t }); }
+function clearFilters() { setFilter({ minP: 0, minT: 0, level: null, math: null, thm: false, thinker: null }); }
+// Small filtered sets open every chapter so the matching claims are visible without clicking.
+const AUTO_OPEN = 150;
+function setFilter(patch) {
+  Object.assign(S, patch);
+  $('minP').value = S.minP; $('minT').value = S.minT;
   $('minPv').textContent = S.minP ? S.minP.toFixed(2) : 'any'; $('minTv').textContent = S.minT ? S.minT.toFixed(2) : 'any';
   $('clearthr').style.display = filtering() ? '' : 'none';
   TREE = buildTree(S.mode);
   if (S.sel && !findNode(S.sel)) { S.sel = null; $('drawer').style.display = 'none'; }
   const n = TREE.claims.length;
+  if (filtering() && n <= AUTO_OPEN) walk(TREE, x => x.kind === 'chapter' && OPEN.add(x.id));
   $('shown').textContent = filtering() ? `${n} of ${CLAIMS.length} claims shown${S.minT && T_ONLY ? ` · only ${T_ONLY} have T scores so far` : ''}` : '';
-  const q = new URLSearchParams(location.search); S.minP ? q.set('p', S.minP) : q.delete('p'); S.minT ? q.set('t', S.minT) : q.delete('t');
+  const q = new URLSearchParams(location.search);
+  for (const [k, v] of [['p', S.minP], ['t', S.minT], ['level', S.level], ['math', S.math], ['thm', S.thm ? 1 : 0], ['thinker', S.thinker]]) v ? q.set(k, v) : q.delete(k);
   history.replaceState(null, '', `${location.pathname}${q.size ? `?${q}` : ''}${location.hash}`);
-  draw();
+  syncFilters(); draw();
 }
 $('minP').addEventListener('input', e => setThresholds(e.target.value, S.minT));
 $('minT').addEventListener('input', e => setThresholds(S.minP, e.target.value));
+
+/* ---- verification overview and filter chips ---- */
+const THINKERS = [...new Set(CLAIMS.slice().sort((a, b) => a.year - b.year).map(c => c.thinker))];
+const nOf = f => CLAIMS.filter(f).length;
+const js = v => esc(JSON.stringify(v));
+const isOn = p => Object.entries({ ...NO_FILTER, ...p }).every(([k, v]) => S[k] === v);
+// One clickable count; clicking an active cell clears it.
+const NO_FILTER = { level: null, math: null, thm: false, thinker: null };
+function cell(n, patch, cls = '', label = n) {
+  if (!n) return `<span class="zero">·</span>`;
+  const on = Object.values(patch).some(v => v) && isOn(patch);
+  return `<button class="${cls}${on ? ' on' : ''}" onclick='setFilter(${js(on ? NO_FILTER : { ...NO_FILTER, ...patch })})'>${label}</button>`;
+}
+function renderOverview() {
+  const row = (label, t, cs) => {
+    const stack = LEVELS.map(s => { const k = cs.filter(c => c.verification === s).length; return k ? `<i style="width:${100 * k / cs.length}%;background:${scol(s)}" title="${k} ${LEVEL[s].short.toLowerCase()}"></i>` : ''; }).join('');
+    return `<tr class="${t ? '' : 'total'}"><td>${cell(cs.length, { thinker: t }, '', `${esc(label)} <span class="mut">${cs.length}</span>`)}</td>
+      <td class="bar2"><span class="stack">${stack}</span></td>
+      <td>${cell(cs.filter(c => c.theorem).length, { thinker: t, thm: true })}</td>
+      <td>${cell(cs.filter(c => c.math).length, { thinker: t, math: 'yes' })}</td>
+      ${LEVELS.map(s => { const k = cs.filter(c => c.verification === s), km = k.filter(c => c.math).length;
+        return `<td>${km && km < k.length ? cell(km, { thinker: t, level: s, math: 'yes' }, 'sub', `∑${km}`) : ''}${cell(k.length, { thinker: t, level: s })}</td>`; }).join('')}</tr>`;
+  };
+  $('ovtable').innerHTML = `<tr><th>Thinker · claims</th><th class="bar2">Verification</th><th title="Math claims that are Lean-checked or proved in the literature">★ Theorems</th><th title="Has a formal statement or is a mathematical kind of claim">∑ Math</th>
+    ${LEVELS.map(s => `<th title="${esc(LEVEL[s].label)}"><i class="dot" style="background:${scol(s)}"></i>${LEVEL[s].short}</th>`).join('')}</tr>` +
+    THINKERS.map(t => row(t, t, CLAIMS.filter(c => c.thinker === t))).join('') + row('All thinkers', null, CLAIMS);
+  const queue = nOf(c => c.math && c.verification === 'untested');
+  $('ovsum').textContent = `${nOf(c => c.theorem)} theorems · ${nOf(c => c.math)} math claims · ${nOf(c => c.verification === 'lean')} Lean-checked · ${nOf(c => c.verification === 'untested')} unverified of ${CLAIMS.length}`;
+  $('ovnote').innerHTML = `A <b>theorem</b> is a math claim (formal notation, a Lean formalization, or a mathematical kind of claim) whose content is machine-checked in Lean 4 or proved in the literature; see <a href="theorems.html">Theorems</a>. ` +
+    `Assessor truth scores (P) are opinions and never count as verification. <b>∑</b> under a level counts its math claims: ` +
+    `${cell(queue, { level: 'untested', math: 'yes' }, 'sub', `${queue} math claims are unverified`)} and are the candidates for formalization. Click any count to filter the graph.`;
+}
+function syncFilters() {
+  const chip = (label, patch, on, title = '') => `<button class="${on ? 'on' : ''}" title="${esc(title)}" onclick='setFilter(${js(patch)})'>${label}</button>`;
+  $('f-level').innerHTML = chip('All', { level: null }, !S.level) + LEVELS.map(s => chip(`<i class="dot" style="background:${scol(s)}"></i>${LEVEL[s].short} ${nOf(c => c.verification === s)}`, { level: S.level === s ? null : s }, S.level === s, LEVEL[s].label)).join('');
+  $('f-math').innerHTML = chip('Any', { math: null }, !S.math) + chip(`∑ Has math ${nOf(c => c.math)}`, { math: S.math === 'yes' ? null : 'yes' }, S.math === 'yes') + chip(`No math ${nOf(c => !c.math)}`, { math: S.math === 'no' ? null : 'no' }, S.math === 'no');
+  $('f-thm').classList.toggle('on', S.thm); $('f-thm').textContent = `★ Theorems only (${nOf(c => c.theorem)})`;
+  $('f-thinker').innerHTML = S.thinker ? chip(`${esc(short(S.thinker))} ✕`, { thinker: null }, true, 'Clear the thinker filter') : '';
+  renderOverview();
+}
 
 /* ---- inspector ---- */
 const badge = (t, c) => `<span class="badge" style="background:${c}">${esc(t)}</span>`;
@@ -306,32 +402,36 @@ function npBlock(c) {
 }
 function claimHtml(c) {
   const a = c.assess || [], t = c.truthBy || [];
-  return `${badge(STATUS[c.status].label, scol(c.status))} ${c.draft ? '<span class="badge ghost">draft</span>' : ''}
+  return `${badge(LEVEL[c.verification].label, scol(c.verification))}
+  ${c.theorem ? `<a class="badge" style="background:#e0a100;text-decoration:none" href="theorems.html#${encodeURIComponent(c.id)}">★ Theorem ↗</a>` : c.math ? '<span class="badge ghost">∑ math, not yet proved</span>' : ''}
+  ${c.draft ? '<span class="badge ghost">draft</span>' : ''}
   <h2>${esc(c.label)}</h2>
   <p class="small mut" style="margin:0">${esc(c.thinker)} · <i>${esc(c.work)}</i> (${c.year})${c.section && !c.section.startsWith(c.work) ? ` · ${esc(c.section)}` : ''}${c.locator ? ` · ${esc(c.locator)}` : ''}</p>
   ${npBlock(c)}
   <p>${esc(c.text)}</p>
   ${c.quote ? `<blockquote>“${esc(c.quote)}”</blockquote>` : ''}
-  ${c.notation ? `<p><code>${esc(c.notation)}</code></p>` : ''}
+  ${c.notation ? `<h3>Formal statement</h3><p><code>${esc(c.notation)}</code></p>` : ''}
+  ${c.statusNote || c.lean ? `<h3>Verification</h3><p>${esc(c.statusNote)}</p>` : ''}
+  ${c.lean ? `<p class="small"><code>${esc(c.lean.module)}</code><br>${c.lean.theorems.map(t => `<code>${esc(t)}</code>`).join(' ')}</p>` : ''}
   <h3>Edge scores</h3>
-  ${num('<span class="pill pT">T</span> Testability', c.resolvability, '#e5c07b')}
-  ${num('<span class="pill pP">P</span> Truth', c.truth, '#8fb7ff')}
+  ${num('<span class="pill pT">T</span> Testability', c.resolvability, '#000')}
+  ${num('<span class="pill pP">P</span> Truth', c.truth, '#0f3bff')}
   <p class="small mut">Testability: how far today's open datasets could confirm or refute the claim (rubric score, mean of ${a.length || 'no'} blind assessors). Truth: the assessors' probability that the claim, as stated, is true${t.length ? ` (mean of ${t.length})` : '; not scored yet'}.</p>
-  ${t.length > 1 && Math.max(...t.map(x => x.p)) - Math.min(...t.map(x => x.p)) > 0.3 ? `<p class="small" style="color:#e8a64e">The assessors disagree on this claim's truth by more than 0.3; treat the mean with care.</p>` : ''}
+  ${t.length > 1 && Math.max(...t.map(x => x.p)) - Math.min(...t.map(x => x.p)) > 0.3 ? `<p class="small" style="color:#d1232a">The assessors disagree on this claim's truth by more than 0.3; treat the mean with care.</p>` : ''}
   ${t.map(x => `<div class="assess"><b>${esc(x.who)}</b> · truth ${fmt(x.p)}<p>${esc(x.rationale)}</p></div>`).join('')}
   ${a.map(x => `<div class="assess"><b>${esc(x.who)}</b> · ${esc(x.verdict)} · testability ${fmt(x.overall)} · confidence ${fmt(x.confidence)}
     ${x.operationalization ? `<p>${esc(x.operationalization)}</p>` : ''}
     ${x.datasets.length ? `<p class="small">Datasets: ${x.datasets.map(d => `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>`).join(' · ')}</p>` : ''}</div>`).join('')}
-  ${c.statusNote ? `<h3>Proof status</h3><p>${esc(c.statusNote)}</p>` : ''}
   ${c.test ? `<h3>Proposed test</h3><p>${esc(c.test)}</p>` : ''}
   ${c.doi ? `<p class="small">Source: <a href="https://doi.org/${esc(c.doi)}" target="_blank" rel="noopener">doi:${esc(c.doi)}</a></p>` : ''}
   ${c.scope ? `<h3>Scope</h3><p>${esc(c.scope)}</p>` : ''}`;
 }
 function listHtml(n) {
   const cs = filtering() ? n.claims.slice().sort((a, b) => (S.minT && !S.minP ? (b.resolvability ?? -1) - (a.resolvability ?? -1) : (b.truth ?? -1) - (a.truth ?? -1))) : n.claims;
-  const by = s => cs.filter(c => c.status === s).length;
-  return `<h2>${esc(n.kind === 'root' ? 'All claims' : n.label)}</h2><p class="small mut" style="margin:0">${esc(n.sub)} · ${cs.filter(c => c.registry === 'production').length} live · ${Object.keys(STATUS).filter(by).map(s => `${by(s)} ${STATUS[s].label.toLowerCase()}`).join(' · ')}</p>
-  <h3>${plural(cs.length, 'claim')}</h3>` + cs.map(c => `<button class="clickable" onclick="selectClaim('${esc(c.id)}')"><i class="tri" style="background:${scol(c.status)};flex:none"></i>${esc(c.label)}<span class="r"><span class="pill pT">${fmt(c.resolvability)}</span><span class="pill pP">${fmt(c.truth)}</span></span></button>`).join('');
+  const by = s => cs.filter(c => c.verification === s).length;
+  return `<h2>${esc(n.kind === 'root' ? 'All claims' : n.label)}</h2><p class="small mut" style="margin:0">${esc(n.sub)} · ${cs.filter(c => c.registry === 'production').length} live</p>
+  <p class="small" style="margin:6px 0">★ ${cs.filter(c => c.theorem).length} theorems · ∑ ${cs.filter(c => c.math).length} math claims · ${LEVELS.filter(by).map(s => `<i class="dot" style="background:${scol(s)}"></i>${by(s)} ${LEVEL[s].short.toLowerCase()}`).join(' · ')}</p>
+  <h3>${plural(cs.length, 'claim')}</h3>` + cs.map(c => `<button class="clickable" onclick="selectClaim('${esc(c.id)}')"><i class="tri" style="background:${scol(c.verification)};flex:none"></i>${mark(c) ? `<b style="color:${c.theorem ? '#e0a100' : '#6f6f6f'}">${mark(c)}</b>` : ''}${esc(c.label)}<span class="r"><span class="pill pT">${fmt(c.resolvability)}</span><span class="pill pP">${fmt(c.truth)}</span></span></button>`).join('');
 }
 function openDrawer(n) {
   $('drawer').innerHTML = `<div style="display:flex;justify-content:flex-end"><button onclick="closeDrawer()">✕ Close</button></div>` + (n.kind === 'claim' ? claimHtml(n.claim) : listHtml(n));
@@ -339,5 +439,8 @@ function openDrawer(n) {
 }
 function closeDrawer() { $('drawer').style.display = 'none'; if (S.sel) { S.sel = null; draw(); } }
 
-{ const q = new URLSearchParams(location.search); setThresholds(q.get('p') || 0, q.get('t') || 0); if (q.get('claim')) selectClaim(q.get('claim')); }
+{ const q = new URLSearchParams(location.search);
+  setFilter({ minP: +(q.get('p') || 0), minT: +(q.get('t') || 0), level: LEVEL[q.get('level')] ? q.get('level') : null,
+    math: ['yes', 'no'].includes(q.get('math')) ? q.get('math') : null, thm: q.get('thm') === '1', thinker: THINKERS.includes(q.get('thinker')) ? q.get('thinker') : null });
+  if (q.get('claim')) selectClaim(q.get('claim')); }
 </script></body></html>

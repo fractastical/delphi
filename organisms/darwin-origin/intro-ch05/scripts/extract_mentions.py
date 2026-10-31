@@ -2,9 +2,9 @@
 """Build organisms/darwin-origin/intro-ch05/mentions.json.
 
 Two sweeps, both driven by PATTERNS in taxa_seed.py:
-  1. claims: every row of darwin-origin/claims.json whose chapter is Introduction
+  1. claims: every row of books/darwin-origin/claims.json whose chapter is Introduction
      or I-V; `claim` and `quote` fields are scanned.
-  2. text: lines 313-5289 of darwin-origin/inputs/pg1228.txt (Introduction through
+  2. text: lines 313-5289 of books/darwin-origin/inputs/pg1228.txt (Introduction through
      the end of Chapter V).
 
 Usage: python3 extract_mentions.py   (run from anywhere; paths are repo-relative)
@@ -20,7 +20,7 @@ SLICE = HERE.parent
 sys.path.insert(0, str(HERE))
 from taxa_seed import PATTERNS, TAXA  # noqa: E402
 
-TEXT_FILE = "darwin-origin/inputs/pg1228.txt"
+TEXT_FILE = "books/darwin-origin/inputs/pg1228.txt"
 LINE_START, LINE_END = 313, 5289          # inclusive, 1-based
 CHAPTERS = {"Introduction", "I", "II", "III", "IV", "V"}
 
@@ -50,7 +50,7 @@ def scan(text, key):
 
 
 def main():
-    claims = json.loads((ROOT / "darwin-origin/claims.json").read_text(encoding="utf-8"))["claims"]
+    claims = json.loads((ROOT / "books/darwin-origin/claims.json").read_text(encoding="utf-8"))["claims"]
     sel = [c for c in claims if c["chapter"] in CHAPTERS]
     mentions = []
     seen = set()

@@ -14,8 +14,8 @@ from taxa_terms import TAXA  # noqa: E402
 
 REPO = HERE.parents[3]
 SLICE = HERE.parent
-TEXT_PATH = "thompson-growth-form/inputs/pg55264.txt"
-CLAIMS_PATH = "thompson-growth-form/claims.json"
+TEXT_PATH = "books/thompson-growth-form/inputs/pg55264.txt"
+CLAIMS_PATH = "books/thompson-growth-form/claims.json"
 CHAPTERS = {"XII", "XIII", "XIV", "XV", "XVI", "XVII", "Epilogue"}
 LINE_START, LINE_END = 19561, 25432  # "CHAPTER XII" heading .. last line of the Epilogue
 

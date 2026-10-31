@@ -18,8 +18,8 @@ from taxa_seed import TAXA, TEXT_START, TEXT_END, CHAPTERS  # noqa: E402
 
 ROOT = HERE.parents[3]
 SLICE = HERE.parent
-TEXT = ROOT / "darwin-origin" / "inputs" / "pg1228.txt"
-CLAIMS = ROOT / "darwin-origin" / "claims.json"
+TEXT = ROOT / "books" / "darwin-origin" / "inputs" / "pg1228.txt"
+CLAIMS = ROOT / "books" / "darwin-origin" / "claims.json"
 
 
 def compile_patterns(taxon):
@@ -86,7 +86,7 @@ def text_mentions(lines):
                 out.append({
                     "taxon_slug": t["slug"],
                     "name_as_written": re.sub(r"\s+", " ", m.group(0)),
-                    "source": {"file": "darwin-origin/inputs/pg1228.txt", "line_start": ls, "line_end": le},
+                    "source": {"file": "books/darwin-origin/inputs/pg1228.txt", "line_start": ls, "line_end": le},
                     "quote": quote,
                 })
     out.sort(key=lambda x: (x["source"]["line_start"], x["taxon_slug"]))

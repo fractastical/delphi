@@ -1,7 +1,7 @@
 # Slice report: darwin-origin / intro-ch02
 
 Introduction and Chapters I–II of *On the Origin of Species* (Project Gutenberg #1228,
-`darwin-origin/inputs/pg1228.txt` lines 313–2063). Claims in scope: the 37 claims whose id
+`books/darwin-origin/inputs/pg1228.txt` lines 313–2063). Claims in scope: the 37 claims whose id
 starts with `darwin1859-intro-`, `darwin1859-ch01-` or `darwin1859-ch02-`.
 
 Built by a cloud agent (`claude-fable-5.1`, branch `cursor/organisms-darwin-intro-ch02-e496`)

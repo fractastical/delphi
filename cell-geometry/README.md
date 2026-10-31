@@ -59,6 +59,21 @@ Too few measurable junctions (fewer than 30), reported in `summary.json` but not
 
 **`ch07-10`, close-packed cells are hexagonal on average: confirmed, but forced by topology.** Mean neighbour number is 5.94–5.99 in four tissues. Euler's formula, however, forces an average of six for any plane tiling where three cells meet at each vertex; the random control gives 5.94 too. So this confirms the claim without saying anything specifically biological. Grass is lower (5.29), most likely because unsegmented stomata and hairs hide some neighbours. Thompson's own example, coral corallites, is not tested here.
 
+## Segmenter bias (added after review)
+
+The three controls above calibrate the geometry code, not the segmenter: they were label masks that Cellpose never saw. After a reviewer on Moltbook (vina, 2026-10-31) pointed out that a boundary model may impose Voronoi-like packing where the signal is weak, `segmenter_bias.py` rendered the tilings, plus a grass-like **cell-files** tiling, as bright-field-like images at three noise levels, segmented them with the same CPSAM v2 checkpoint, and compared against ground truth. Results are in `results/segmenter-bias/` (masks, overlays, Nebius operation IDs, `summary.json`, `segmenter-bias.png`).
+
+| Tiling | Truth: T-junctions / angle SD | Segmented (SNR 12 / 4 / 2): T-junctions | angle SD |
+|---|---|---|---|
+| Brick wall | 100% / 40.5° | 3% / 10% / 16% | 25–26° |
+| Cell files (grass-like) | 100% / 40.2° | 48% / 54% / 59% | 28–29° |
+| Random Voronoi | 14% / 26.6° | 0.4% / 0.4% / 0.4% | 19° |
+| Hexagonal lattice | 0% / 1.3° | 0% / 0% / 0% | 2.7–2.9° |
+
+Cell counts were exact or within 2%, so this is boundary-shape bias, not missed cells: Cellpose rounds corners into Y-junctions and pulls a brick wall, and even a random partition, toward 120°. The bias is strongest on clean images.
+
+**Consequences for the verdicts above.** `ch07-04` is weaker than stated: the 0–3% T-junction fractions in cornea, *Aloe*, moss and the eye are below the segmenter's floor for a tissue that actually has 100% T-junctions (3–16%), so they are consistent with 120° packing but the margin is not what the table suggests, and the angle spreads of 10–19° are compressed. Grass at 49% T-junctions matches the segmented cell-files tiling (48–59%), so its true T fraction is probably near 100%. The defensible reading is "four tissues are not cell-file tissues", not "Thompson confirmed". `ch07-10` is unaffected (neighbour counts came through exactly); `ch07-08` is slightly affected (hexagon fraction inflated 0.27 → 0.30 on random Voronoi). The `ch07-04` assessment should be downgraded citing this; the next step is wall tracing from the intensity ridge, independent of Cellpose boundaries.
+
 ## Limits
 
 - One image per tissue, and only the tissues available under open licenses on Wikimedia Commons; each tissue appears once.

@@ -5,7 +5,7 @@ Slice `ch06-11` of project `thompson-growth-form`, built 2026-10-31 by a cloud a
 ## Counts
 
 - Claims in scope (chapters VI, VII, VIII, IX, X, XI): **90**.
-- Mentions: **1010** (84 in claim `claim`/`quote` fields, 926 in the book text, lines 9882-19560 of `thompson-growth-form/inputs/pg55264.txt`; one mention per taxon per claim or per line).
+- Mentions: **1010** (84 in claim `claim`/`quote` fields, 926 in the book text, lines 9882-19560 of `books/thompson-growth-form/inputs/pg55264.txt`; one mention per taxon per claim or per line).
 - Distinct taxa with a `taxa/` file: **268**, of which 229 are Animalia and 39 are protists Thompson treats as animals (Foraminifera, Radiolaria, testate amoebae, heliozoans, ciliates; see notes in each file).
 - Taxa named in claims (required set): **51**; all have a taxon file, 51 have at least one dataset record.
 - Resolved to GBIF usageKey: **254**; NCBI Taxonomy: **201**; Wikidata: **256**; WoRMS AphiaID: **124**; ITIS: **180**; PBDB: **69**.

@@ -38,13 +38,20 @@ function toLocalPath(iri) {
   return i < 0 ? rest : `${rest.slice(0, i + 5)}${rest.length > i + 6 ? `#${rest.slice(i + 6)}` : ""}`;
 }
 
-// Local store: every */nanopubs/unsigned and */nanopubs/*-unsigned directory. Signed copies are
-// skipped because they duplicate the unsigned content.
+// Local store: every */nanopubs/unsigned and */nanopubs/*-unsigned directory, plus the same under
+// books/*/. Signed copies are skipped because they duplicate the unsigned content.
+function projectDirs(dir) {
+  try {
+    return readdirSync(dir, { withFileTypes: true })
+      .filter(d => d.isDirectory() && !d.name.startsWith(".") && d.name !== "node_modules")
+      .map(d => join(dir, d.name));
+  } catch { return []; }
+}
+
 function localFiles() {
   const files = [];
-  for (const project of readdirSync(REPO, { withFileTypes: true })) {
-    if (!project.isDirectory() || project.name.startsWith(".") || project.name === "node_modules") continue;
-    const npDir = join(REPO, project.name, "nanopubs");
+  for (const project of [...projectDirs(REPO), ...projectDirs(join(REPO, "books"))]) {
+    const npDir = join(project, "nanopubs");
     let dirs;
     try { dirs = readdirSync(npDir, { withFileTypes: true }); } catch { continue; }
     for (const d of dirs) {
