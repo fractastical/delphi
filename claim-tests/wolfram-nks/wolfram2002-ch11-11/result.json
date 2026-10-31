@@ -2,11 +2,13 @@
   "claim_id": "wolfram2002-ch11-11",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch11-11",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "For any two-register machine in Wolfram's sense (program of L instructions, each 'increment register r and go to the next instruction' or 'if register r is nonzero decrement it and jump to instruction j, else go to the next instruction', cyclic program), there is an arithmetic system n -> (p*n + q)/s whose branch is chosen by n mod 6L such that, with the state (i, a, b) encoded as n = i + L * 2^a * 3^b (Wolfram's encoding on p. 673 with L = 5 and modulus 30), the integer trajectory decodes step for step to the register machine's trajectory.",
   "pass_criterion": "Pre-registered. analysis.py compiles each register machine into the remainder-selected arithmetic map, then runs machine and map side by side. Test set: (a) all 200 register machines drawn with numpy seed 20261111 from the family with L = 5 and two registers (instruction type, register and jump target uniform), each from the state (1, 0, 0) and from one random state with registers in [0, 20], for 10000 steps; (b) three hand-written programs with L in {3, 5, 7} that move or copy register contents so that the registers grow without bound, 20000 steps each. 'supports' if at every step of every run the decoded (i, a, b) equals the directly simulated register-machine state (0 mismatches out of all compared steps) and, as a check that the comparison can fail, a deliberately perturbed map (one branch's additive constant changed by 1) produces a mismatch within 10000 steps on at least one of the hand-written programs. Universality of the arithmetic systems then follows from the universality of two-register machines (Minsky 1967), which is cited, not tested.",
   "fail_criterion": "Pre-registered. 'refutes' if any run of the correctly compiled map disagrees with the register machine at any step. 'inconclusive' with reason 'other' if the perturbation check fails to produce a mismatch (the comparison would then be too weak to count).",
-  "planned_datasets": ["nks-ch11-11-register-machine-compiler"],
+  "planned_datasets": [
+    "nks-ch11-11-register-machine-compiler"
+  ],
   "interpretation": "Wolfram's 'system that takes a whole number, computes Mod[n, 30], and applies one of several arithmetic operations chosen by that remainder' is the family of generalised Collatz maps n -> (p*n + q)/s with the branch chosen by n mod M. The specific register machine of Wolfram's figure is not transcribed in the online text, so instead of checking his single example the test checks the general construction he describes (encoding n = i + L * 2^a * 3^b, modulus 6L; for L = 5 this is his modulus 30) on a random sample of register machines plus growth programs. Register-machine conventions follow NKS Chapter 3 (pp. 97-102): decrement of a zero register is a no-op that moves to the next instruction, and the program wraps around cyclically. The 'therefore universal' clause is a theorem of Minsky's and is outside what this computation establishes.",
   "datasets": [
     {
@@ -20,10 +22,71 @@
       "role": "trajectories compared step by step between the register machine and the arithmetic system"
     }
   ],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-wolfram-nks-e5f4", "date": "2026-10-31" }
+  "method": "analysis.py compiles each two-register machine (program length L) into a table of 6L branches (p, q, s), one per residue n mod 6L, of the form n -> (p*n + q)/s with p, s in {1, 2, 3}: increments multiply the 2^a 3^b part by 2 or 3, decrements of a nonzero register divide it by 2 or 3 (the residue mod 6L tells whether the register is nonzero), and the additive constant moves the program position. Register machine and arithmetic map were run side by side in exact Python integers: 200 random L = 5 programs (numpy seed 20261111) from two starting states each for 10000 steps, and three hand-written growth programs (L = 3, 5, 7; moduli 18, 30, 42) for 20000 steps. At every step the integer n was compared with the encoding i + L * 2^a * 3^b of the simulated machine state (equivalent to decoding, since the encoding is injective). A perturbed map with one additive constant changed by one was run as a check that the comparison can fail.",
+  "measured": {
+    "value": 0,
+    "unit": "steps at which the arithmetic-system value differs from the encoding of the register-machine state",
+    "n": 4060000,
+    "uncertainty": "exact integer arithmetic; none",
+    "extra": {
+      "programs": {
+        "random_L5": 200,
+        "random_L5_runs": 400,
+        "hand_written": [
+          "L3_move",
+          "L5_double",
+          "L7_copy"
+        ]
+      },
+      "modulus": {
+        "L3": 18,
+        "L5": 30,
+        "L7": 42
+      },
+      "largest_n_bits": 14695,
+      "perturbation_detected": true,
+      "perturbation_first_mismatch_step": {
+        "L3_move": 1,
+        "L5_double": 1,
+        "L7_copy": 1
+      },
+      "hand_final_states_(i,(a,b))": {
+        "L3_move": [
+          3,
+          [
+            0,
+            6667
+          ]
+        ],
+        "L5_double": [
+          1,
+          [
+            1,
+            4000
+          ]
+        ],
+        "L7_copy": [
+          2,
+          [
+            2,
+            2857
+          ]
+        ]
+      }
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.9,
+  "caveats": [
+    "What was verified is the emulation half of the claim: the described class of arithmetic systems (remainder modulo 6L selects one of 6L affine-rational operations) tracks arbitrary two-register machines exactly, over 4.06 million compared steps with register values up to several thousand and integers up to 14695 bits. The construction is general (it works for every program in the family, with L = 5 giving Wolfram's modulus 30), not a transcription of the particular 5-instruction machine in Wolfram's figure, whose program is not in the online text.",
+    "The 'therefore universal' clause rests on the universality of two-register machines (Minsky 1967), which is cited, not re-proved; the compiled maps inherit universality from it only if one accepts that theorem. The closing remark that universality in arithmetic is unsurprising is an opinion and was not tested.",
+    "Finite traces cannot prove the emulation for all time, but the branch table is derived symbolically from the instruction semantics, so the trace check is a consistency test of that derivation rather than a sample-based estimate.",
+    "Register-machine conventions (cyclic program, decrement of zero is a no-op) follow NKS Chapter 3; a different convention would change the compiled table but not the construction."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-wolfram-nks-e5f4",
+    "date": "2026-10-31"
+  }
 }
