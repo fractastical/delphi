@@ -4,6 +4,10 @@ Runs arms in the order given; an arm not started before the budget is recorded a
 import json, os, platform, subprocess, sys, time
 import numpy as np
 import torch
+try:
+    import scipy  # noqa: F401  (vendored NCA solvers.py imports scipy at module level)
+except ImportError:
+    print('pip install scipy rc', subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'scipy'], capture_output=True).returncode, flush=True)
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from frontier_compute import gpu_neumann as G

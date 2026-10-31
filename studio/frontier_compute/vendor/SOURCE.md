@@ -3,20 +3,20 @@
 | What | Origin | Pin |
 |---|---|---|
 | `scopedesk/oracles/{pde,kinetics,linear}.py`, `nonlinear_sweep/{ensemble,solvers,run}.py`, `nonlinear_sweep/PREREG.md` | delphi-evolve worktree `rethink-nca` (author `delphi-rethink-nca`) | commit `cb27cf2` (PREREG committed before any scored cell) |
-| `compute_ops/*`, `pde_oracle/*` | delphi-evolve branch `work/gpuops` (author dx-gpuops) | commit `b61b8b40cf37ac2e7780ff9ae6940dc33288bc81` |
+| `compute_ops/*` (batch.py updated: 40 KiB chunks, no __pycache__), `pde_oracle/*` | delphi-evolve branch `work/gpuops` (author dx-gpuops) | commit `1760198ad4246450fc9c2d61bd267aebd63d16c7` |
 
 Licence: Apache-2.0, copied unchanged as `LICENSE` and `NOTICE` (the NOTICE of the origin repository: original work for the ScienceClaw 2026 hackathon; third-party data and papers are NOT relicensed).
 `scopedesk/__init__.py` is an empty file I created (the origin commit has none, the package is used as a namespace).
 `pde_oracle` is used only for its reaction terms (`reaction`); its periodic FFT solver is not used here because the frozen protocol uses Neumann ends.
 
-File sha256 (first 16 hex shown; full values recomputable with `sha256sum`):
+File sha256 (first 16 hex shown; full values recomputable with `sha256sum`), as of freeze 2:
 
 | file | sha256 |
 |---|---|
 | `LICENSE` | `31e96d04f17a8212…` |
 | `NOTICE` | `d7308cd898555fb7…` |
 | `compute_ops/__init__.py` | `91dc31a215d069c6…` |
-| `compute_ops/batch.py` | `7407d546a139e903…` |
+| `compute_ops/batch.py` | `442f52c6eef6320b…` |
 | `compute_ops/cops_run.py` | `5ea507e9d792f34c…` |
 | `pde_oracle/__init__.py` | `10ddcdbb3a4c1c96…` |
 | `pde_oracle/solver.py` | `44466ec43697c8c4…` |
