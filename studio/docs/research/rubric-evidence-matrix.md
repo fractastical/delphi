@@ -16,7 +16,7 @@ first. Mixing levels in one table without marking them is the failure this colum
 
 | Claim | Level | Receipt | Status |
 |---|---|---|---|
-| Decisions linked to the exact claims and evidence behind them | C (one instance) | **Persisted today:** the RD-1D pilot's equation carries its claim and problem refs into the run, as snapshot pins. **An audit found most Action inputs absent and curation is pending**, so this is a direction with one worked example, not a property of the graph | **Partly earned — do not generalise** |
+| Decisions linked to the exact claims and evidence behind them | **C (one instance)** | **Persisted:** Project `project-flying-fish-mission` version `1177c609…` pins **22 members** (molecular and genomic evidence among them), **13 preserved** from predecessor `a4953d50…`; `imports/2026-10-31-curated-v2/project-receipt.json`, 23:39:09Z — **read directly**. Curated import: **37 verified, 0 problems**, store at 3,882 versions and **0 forks** | **Partly earned — do not generalise.** `local_status: "proposed"`, **not accepted**; its scope says "no causal bridge or biological review". An audit found most Action inputs absent; curation pending. **Do not cite the RD execution graph as persisted** — its DB ref is unread |
 | Whole-organism design maps knowledge gaps; each gap becomes a pinned Problem/Action | C | `frontier/models.py` `completeness` discriminator; `recorded` vs `actionable` with four required fields | **Earned** |
 | 250 morphoswarm register problems imported, **0 actionable** | C | `scripts/import_register.py` run output | **Earned** — and the zero is the point |
 | 17 sourced proposals, **13 actionable**, 17/17 resolvable URI | C | `scripts/import_sourced_problems.py` | **Earned** (corrected down from 15 after data-access verification) |
@@ -41,8 +41,8 @@ no negative-search receipt with a stated scope. Either say "we have not found on
 | oca2 exon 21 absent from all 1,361,196,561 bp of the Molino assembly; flanking exons present once each | C | `results/2026-10-31-oca2-exon21-molino-RESULT.md` | **Earned** (positive closure) |
 | KCNE1 test **stopped**, not failed: 20.27% coverage vs a 75% preregistered floor | C | `results/2026-10-31-kcne1-binding-ddg-STOPPED.md` | **Earned** (a stop is a result) |
 | Scale-Erk model reproduces 5 source bands, misses the rise and synchrony-growth impairment; **retained** | R | worker message | Speak as "reported" |
-| 357 initial-state perturbation checks at 1e-10, 48 repeats, 0 divergences, max repeat delta 1.32e-14 | R | codex03 message only; **I found no committed receipt** | **Do not put on a slide until a path exists** |
-| OpenFold2 zebrafish Kcnj13 362 aa: mean pLDDT 52.86, pTM 0.2728, PAE 22.91 Å | R | codex03 message only; no corroborating file found | Speak as "reported"; the low confidence is the honest reading |
+| Perturbation: **357** completions, **48** repeats, **405** rows, **0** omitted / divergent / flag-changed, repeat max delta **1.318e-14** vs 1e-06, 0 failures | **C** | `results/infra/perturb-completion-report.json` — **read directly** | **Earned.** The file states `biological_validity: null` and scopes itself to the frozen model envelope; carry both |
+| OpenFold2 Kcnj13: 362 aa, chain A, `sequence_exact_match: true`, op `op-5ba1d104dbbcd293`; **50.6% of residues below pLDDT 50, 18.2% at or above 70** | **C** | `artifacts/bio-services/kcnj13_openfold2/metrics.json` + `result.json` — **read directly** | **Earned.** Prefer the fractions to a mean. `epistemic_status: PREDICTED`; confidence and PAE are model-internal, **not** calibrated probability; establishes no conductance, gating or phenotype |
 | OpenMM 10,491-atom CPU trajectory, 101 states + MP4 | R | codex03 message | Speak as "reported" |
 
 **Honest weak point.** The headline comparisons we ran and lost are real and should stay in: an
@@ -205,9 +205,10 @@ named dimensions.
 2. **Decentralized Agency (20%) is asserted more broadly than it was practised today.** Mitigation:
    claim the one instance that genuinely went through the commons, not the architecture.
 3. **Three Impact numbers sit at level R with no committed path** (the 357 perturbation checks, the
-   OpenFold2 confidence figures, the OpenMM trajectory). **Paths now exist** under
-   `artifacts/molecular/` and `deploy/receipts/science-integration-20261031.json` on main
-   `8790824`. **I read that integration receipt; I did not open the individual artifacts.** So say
+   OpenFold2 confidence figures, the OpenMM trajectory). **Two of the three are now inspected and
+   promoted to C:** perturbation at `results/infra/perturb-completion-report.json` and OpenFold2 at
+   `artifacts/bio-services/kcnj13_openfold2/{metrics,result}.json` — **not** under
+   `artifacts/molecular/`, which was my error. **The OpenMM trajectory remains uninspected**; say
    "recorded at <path>", not "verified".
 4. ~~The "no machine-checked library of mathematical biology" claim.~~ **RESOLVED by cutting
    it**, 2026-10-31. Never systematically searched, so it could not be supported. Significance

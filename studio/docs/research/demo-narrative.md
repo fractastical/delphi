@@ -8,7 +8,7 @@ Supersedes `archive/demo-narrative-2026-10-31-refusal-led.md`.
 
 ---
 
-# PART 1 — THE SPOKEN SCRIPT (452 words)
+# PART 1 — THE SPOKEN SCRIPT (450 words)
 
 ### Open · on the viewer
 
@@ -55,10 +55,10 @@ design is for.
 
 ### Close · the commons
 
-We are linking those decisions to the exact claims behind them. One is persisted today: the
-diffusion pilot's governing equation carries its claim and problem references into the run.
-**Most aren't curated yet** — that's the work, and it's why the graph is public: repository, site,
-and nineteen tools where reads and calculations need no account.
+We are linking those decisions to the exact claims behind them. One is persisted: the flying-fish
+Project pins **twenty-two members**, molecular and genomic evidence among them, carrying thirteen
+forward from its previous version. It's **proposed, not accepted**, and most decisions aren't
+curated yet — that's the work, and it's why the graph is public.
 
 One honest result. We preregistered a comparison of a single analyst against collaborating agents.
 **Every arm scored full marks**, so **this task did not distinguish them.** That's a null about
@@ -66,7 +66,7 @@ our benchmark, not evidence that agents coordinate better.
 
 ---
 
-**Pacing.** 452 words: **3:14 at 140 wpm, 3:01 at 150**. If the slot is hard three minutes, either
+**Pacing.** 450 words: **3:13 at 140 wpm, 3:00 at 150**. If the slot is hard three minutes, either
 speak at 150 or **drop the oxygen paragraph** (−58 words → 2:47 at 140). Cut the whole metabolism
 beat for 2:20, and the scale beat too for 1:55. **Never cut the edge section** — it is the thesis.
 
@@ -207,6 +207,21 @@ Numbers, sources and exact limits. Reach for these in Q&A.
   controlled counterfactual** and must not count as evidence of advantage. We don't count them.
 - `results/capability-agency/results-card.md`, commit `92c86683`.
 
+## The persisted linking example — inspected
+
+- **Project `project-flying-fish-mission`, version `1177c609…`**, predecessor `a4953d50…`.
+  **22 members**, **13 preserved** from the predecessor, 4 old-version annotations.
+  `imports/2026-10-31-curated-v2/project-receipt.json`, recorded 2026-10-31T23:39:09Z.
+- **`local_status: "proposed"` — not accepted.** Its own scope line: *"additive declared
+  membership; no causal bridge or biological review."* **Say proposed.**
+- Curated import: **37 verified, 0 problems**, all 37 `imported_unreviewed`
+  (`imports/2026-10-31-curated-v2/verification.json`). Store at that moment: **3,882 versions,
+  0 forks**, 1,943 events, 357 write receipts in 24h.
+- A failed attempt is retained in the receipt: a record-to-draft conversion carried
+  `schema_version` and was **rejected by Draft before any Project write**, then corrected.
+- **Do not claim the RD execution graph is persisted** — I have not read its DB ref. The Project
+  above is the example to use.
+
 ## The diffusion pilot — current status
 
 - The first CUDA control **failed** and stopped before training: network CPU/GPU parity
@@ -247,10 +262,27 @@ artifacts under it, so treat the per-item science as recorded-by-that-check, not
 - **Retained failure, kept in the receipt:** the first molecular collection stopped for missing
   OpenMM in the root venv; re-run on the isolated dependency path
 
-`artifacts/molecular/` holds the simulation receipts (CPU controls, CPU trajectory, CUDA v2 and v3
-parity, job receipts, production receipts, return verification). **The 357-perturbation-check, the
-OpenFold2 confidence figures and the OpenMM 101-state trajectory now have real paths under here,
-but I have not opened them.** Say "recorded at" and name the path; do not say "verified".
+### The three that had no path — now inspected, with exact paths
+
+**Perturbation** — `results/infra/perturb-completion-report.json`. **Read directly.**
+**357** completions requested, **48** repeats, **405** rows returned. Omitted, divergent,
+pattern-flag-change, patterned-mode-change and settled-flag-change lists are **all empty**. Relative
+initial-state noise **1e-10**; repeat max absolute difference **1.318e-14** against a 1e-06
+tolerance, **0 repeat failures**. `biological_validity: null` — the file says so itself. Scope is
+the **frozen model envelope**, not biology.
+
+**OpenFold2** — `artifacts/bio-services/kcnj13_openfold2/metrics.json` and `result.json`.
+**Read directly.** 362 residues, chain A, `sequence_exact_match: true`, operation
+`op-5ba1d104dbbcd293`. `epistemic_status: "PREDICTED; computational model output, not observed
+structure or function"`. **Better than quoting a mean pLDDT: 50.6% of residues are below pLDDT 50,
+and only 18.2% reach 70.** Its own limits list: dummy single-sequence MSA, monomer only, no
+membrane or tetramer or ligands; confidence and PAE are **model-internal metrics, not calibrated
+probability**; it establishes **no** conductance, gating or phenotype; the provider reported
+upstream-source-not-nim and returned no hardware allocation.
+
+**OpenMM trajectory** — under `artifacts/molecular/` (CPU controls, CPU trajectory, CUDA v2/v3
+parity, job and production receipts, return verification). **Not opened by me.** Say "recorded at",
+not "verified".
 
 ## If a judge interrupts
 
