@@ -1,0 +1,40 @@
+{
+  "claim_id": "thompson1917-ch15-12",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch15-12",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "preregistered_at": "2026-10-31T21:40:00Z",
+  "hypothesis": "In normal mammalian (here human) hearts the left-ventricular wall is six to seven times as thick as the right-ventricular wall, and the left-ventricular systolic pressure is six to seven times the right, so the two ratios match.",
+  "pass_criterion": "Pre-registered. Thickness ratio R_t = (mean LV free-wall thickness) / (mean RV free-wall thickness), computed separately for males and females from the published per-sex means of morphologically normal autopsy hearts (Westaby et al. 2022, Cardiovasc Pathol, n = 1,062); LV free wall = mean of the reported LV wall sites excluding the septum; RV free wall = mean of the reported RV wall sites excluding the outflow tract. Pressure ratio R_p = median systolic blood pressure of NHANES 2017-2018 adults aged 20-59 not taking blood-pressure medication (brachial systolic as the proxy for LV peak systolic pressure) divided by 20 mmHg, the midpoint of the healthy-subject RV systolic range 15-25 mmHg (Table 1 of PMC9487613), with the range ends 15 and 25 reported as bounds. SUPPORTS if, for both sexes, R_t is in [5.0, 8.5], R_p is in [5.0, 8.5] and R_t / R_p is in [0.75, 1.33].",
+  "fail_criterion": "Pre-registered. REFUTES if, for both sexes, R_t < 4.5 or R_t > 9.5, or R_t / R_p is outside [0.6, 1.67] (thickness not 'in the same proportion' as pressure). Any other outcome is MIXED. If the autopsy table cannot be obtained: inconclusive (data-unavailable).",
+  "planned_datasets": [
+    "westaby-2022-normal-heart-autopsy-table2",
+    "nhanes-2017-2018-bpx-bpq-demo",
+    "pmc9487613-table1-rv-systolic-range"
+  ],
+  "interpretation": "Thompson's figures come from applying Laplace's law to the two ventricles; we test whether real hearts have the stated wall-thickness ratio and whether it matches the real pressure ratio. 'Thickness of the walls' is free-wall thickness measured at autopsy (the septum is shared by both ventricles and excluded). Peak LV systolic pressure is approximated by brachial systolic pressure (close in healthy adults without aortic stenosis); RV systolic pressure is not available as a public per-person dataset, so the published healthy range is used. Scope is 'mammalian hearts'; only human data are used, which can refute a general mammalian proportion but cannot confirm it for other species. Disclosure: before this pre-registration, web-search snippets shown while locating datasets displayed summary values from these sources (autopsy LV wall about 12 mm and RV walls about 2.7-3.6 mm; RV systolic 15-25 mmHg). The thresholds above are set from the claim's stated 6-7 with symmetric tolerance, not from those values.",
+  "test_contract": {
+    "expected_observation": "LV/RV free-wall thickness ratio of about 6-7 in normal hearts, and LV/RV systolic pressure ratio of about 6-7, with the two ratios within a third of each other.",
+    "disconfirming_observation": "LV/RV free-wall thickness ratio well below 6 (< 4.5) or well above 7 (> 9.5) in normal hearts, or a thickness ratio that differs from the pressure ratio by more than ~1.67-fold.",
+    "admissible_datasets": "Measured wall thickness of both ventricles in morphologically normal mammalian hearts (autopsy or imaging), with sample sizes reported; measured systemic and pulmonary/RV systolic pressures in healthy individuals of the same species; sources independent of Thompson; publicly accessible.",
+    "inference_method": "Ratios of published per-sex means (thickness) and of measured population medians / published normal ranges (pressure), compared with the pre-registered intervals around 6-7."
+  },
+  "preregistration": {
+    "R_t_pass": [5.0, 8.5],
+    "R_p_pass": [5.0, 8.5],
+    "ratio_of_ratios_pass": [0.75, 1.33],
+    "R_t_fail_outside": [4.5, 9.5],
+    "ratio_of_ratios_fail_outside": [0.6, 1.67],
+    "rv_systolic_midpoint_mmHg": 20,
+    "rv_systolic_range_mmHg": [15, 25],
+    "nhanes_age_range": [20, 59],
+    "nhanes_exclude": "BPQ050A == 1 (now taking prescribed medicine for hypertension)",
+    "nhanes_sbp": "mean of available readings BPXSY1-BPXSY4 per person"
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
