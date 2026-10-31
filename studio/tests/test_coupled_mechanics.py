@@ -196,3 +196,84 @@ def test_parse_pressure_converts_Pa_times_m_to_N_per_m():
 def test_beam_module_is_the_existing_one():
     # The coupling must reuse fin_mechanics' FEM, not a second solver.
     assert couple.beam is beam
+
+
+# ------------------------------------------------------------------ the actual 2D flow receipt
+import hashlib  # noqa: E402
+import json  # noqa: E402
+import shutil  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+import numpy as np  # noqa: E402
+
+from engineering.coupled_mechanics import windtunnel_receipt as wt  # noqa: E402
+
+ART = Path(wt.ROOT) / "artifacts" / "coupled-mechanics"
+
+
+@pytest.fixture(scope="module")
+def receipt():
+    return wt.load()
+
+
+def test_receipt_pins_are_checked_and_fail_closed(tmp_path):
+    d = tmp_path / "baseline"
+    shutil.copytree(wt.RECEIPT_DIR, d)
+    res = json.loads((d / "result.json").read_text())
+    res["mean_Cl_last20pct"] = 9.0
+    (d / "result.json").write_text(json.dumps(res))
+    with pytest.raises(wt.ReceiptError, match="manifest pin"):
+        wt.load(d, wt.MANIFEST)
+
+
+def test_Pa_mapping_is_the_receipts_own(receipt):
+    req = receipt["request"]
+    assert receipt["pa_per_lattice_density"] == pytest.approx(
+        req["density_kg_m3"] * (req["speed_m_s"] / receipt["result"]["lattice_speed"]) ** 2 / 3, rel=1e-15)
+    assert receipt["window"].sum() == 17  # convective time 3.2..4.0, the last 20 percent
+
+
+def test_tail_strip_is_rederived_from_the_mask(receipt):
+    s = receipt["solid"]
+    one_cell = [i for i in range(s.shape[0]) if s[i].sum() == 1 and s[i, wt.TAIL_ROW]
+                and not s[i, wt.TAIL_ROW + 1] and not s[i, wt.TAIL_ROW - 1]]
+    assert tuple(one_cell) == wt.TAIL_COLUMNS
+    strip = wt.tail_strip(receipt)
+    assert strip["cells_across"] == 1 and strip["fluid_on_both_faces"]
+
+
+def test_actual_field_is_refused_for_every_fin_member(receipt):
+    rec, tgt = wt.tail_record_and_target(receipt)
+    assert rec["pressure"]["unit"] == "Pa" and rec["source"]["fields_sha256"] == receipt["sha256"]["fields"]
+    refused("MEMBER_UNRESOLVED", rec, tgt)
+    refused("SAGITTAL_2D_NOT_3D", rec, dict(tgt, claim="whole_fin_3d"))
+    refused("FRAME_MISMATCH", rec, cases.target(claim="whole_fin_3d"))
+    # Only the resolution blocks the 2D-section scenario: a mutated record claiming 2 cells passes,
+    # which is why the count must come from the mask and not from the producer's say-so.
+    fake = copy.deepcopy(rec)
+    fake["resolution"]["cells_across_member_thickness"] = 2
+    assert couple.run(fake, tgt)["scope"].startswith("2d-extrusion")
+
+
+def test_pressure_face_integral_has_the_receipts_lift_sign_and_scale(receipt):
+    f = wt.surface_pressure_force(receipt)
+    assert f["pressure_lift_N_per_m"] > 0 and f["receipt_lift_N_per_m"] > 0
+    assert f["pressure_drag_N_per_m"] > 0
+    # Diagnostic only: pressure-only is not expected to equal the momentum-exchange total.
+    assert 0.1 < f["pressure_over_receipt_lift"] < 10
+
+
+def test_committed_artifacts_are_current(receipt):
+    from engineering.coupled_mechanics import run as runner
+    result, _ = runner.build()
+    committed = json.loads((ART / "result.json").read_text())
+    assert committed["actual_flow_receipt"]["attempts"] == result["actual_flow_receipt"]["attempts"]
+    assert committed["one_way_comparison"] == json.loads(json.dumps(result["one_way_comparison"]))
+    manifest = json.loads((ART / "manifest.json").read_text())
+    for name, pin in manifest["outputs"].items():
+        assert hashlib.sha256((ART / name).read_bytes()).hexdigest() == pin["sha256"], name
+    for name, pin in manifest["inputs"].items():
+        assert hashlib.sha256((Path(wt.ROOT) / name).read_bytes()).hexdigest() == pin, name
+    for name, pin in manifest["code_files"].items():
+        assert hashlib.sha256((Path(wt.ROOT) / name).read_bytes()).hexdigest() == pin, name
+    assert np.isfinite(committed["actual_flow_receipt"]["surface_pressure_force_diagnostic"]["pressure_lift_N_per_m"])
