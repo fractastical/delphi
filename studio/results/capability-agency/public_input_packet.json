@@ -1,0 +1,78 @@
+{
+  "schema": "frontier.capability-agency.public-input/1",
+  "experiment": "two-source evidence synthesis and model-coupling pilot",
+  "task_type": "evidence synthesis and verification, not discovery",
+  "evidence_scope": "Only facts from the two open-access papers below and deterministic calculations from their published inputs. No private repository code, private prompts, credentials, or unpublished model outputs are included.",
+  "tasks": {
+    "A_growth_rate_translation": {
+      "question": "A published post-ERK-peak cell-area slope is being considered for use in two 24 h update forms: linear A(t)/A(0)=1+k*t and exponential A(t)/A(0)=exp(k*t). Is the exponential form directly measured by the cited experiment, how do the two central 24 h factors compare, and what does the experiment report about periodic synchronous tissue-wide ERK activation? Choose a next action that preserves the source's uncertainty.",
+      "public_facts": {
+        "source_doi": "10.1038/s41586-020-03085-8",
+        "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7864885/",
+        "measured_quantity": "Average single-cell area normalized to its area at the ERK peak, as a function of time from the peak.",
+        "reported_fit": "The post-peak normalized-area slope is reported as a linear fit of 0.006 +/- 0.002 per hour, with a 68% confidence interval; 89 cells from 3 scales and 3 fish in one trial.",
+        "synchrony_result": "Daily synchronous, tissue-wide ERK activation in place of traveling waves was reported to impair scale tissue growth.",
+        "scope_note": "The source reports the empirical fit and its uncertainty; the two update equations in the question are candidate mathematical forms to compare."
+      },
+      "shared_deterministic_tool_result": {
+        "tool": "calculator-v1",
+        "inputs": {"k_per_h": 0.006, "k_ci68_per_h": [0.004, 0.008], "duration_h": 24},
+        "outputs": {
+          "linear_factor": 1.144,
+          "exponential_factor": 1.154964,
+          "absolute_factor_difference": 0.010964,
+          "relative_difference_percent_of_linear": 0.9588,
+          "linear_factor_68pct_slope_band": [1.096, 1.192],
+          "exponential_factor_68pct_slope_band": [1.10075, 1.21168],
+          "bands_overlap": true
+        },
+        "description": "Deterministic arithmetic from the public paper's central slope, stated CI, and a 24 h interval. Rounded to the displayed precision."
+      }
+    },
+    "B_fin_load_coupling": {
+      "question": "A modeler proposes turning a pressure p into a ray line-load q by multiplying by an effective width w. The dimensions are p in Pa and w in m. Does the cited zebrafish fin study validate calling q a measured in vivo ray load? State what the paper actually measured and choose a defensible next action.",
+      "public_facts": {
+        "source_doi": "10.1242/jeb.171777",
+        "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5868929/",
+        "organism_and_tissue": "Adult Danio rerio caudal fins.",
+        "measured_result": "The study reports in-vivo bending stiffness EI values in the approximate range 1.5e-9 to 4e-9 N m^2 along the proximal-distal axis.",
+        "method": "The investigators applied a calibrated mechanical force through a deflection pin and measured fin deflection; the force-deflection relation was used to determine bending stiffness.",
+        "additional_context": "The discussion identifies force extent over time and space and coupled elasto-hydrodynamic simulation as relevant to relating tissue mechanics to swimming."
+      },
+      "shared_deterministic_tool_result": {
+        "tool": "unit-algebra-v1",
+        "inputs": {"pressure_unit": "Pa", "width_unit": "m"},
+        "outputs": {"pressure_dimension": "M L^-1 T^-2", "width_dimension": "L", "product_dimension": "M T^-2", "product_unit": "N/m"},
+        "description": "Dimensional multiplication only. It establishes unit compatibility and does not establish a measured biological mapping."
+      }
+    }
+  },
+  "response_contract": {
+    "format": "one JSON object per call; no markdown fences",
+    "fields": {
+      "task_a": {
+        "source_doi": "string",
+        "published_fit_form": "one of: linear, exponential, not_reported",
+        "exponential_log_form_directly_measured": "boolean",
+        "linear_factor_24h": "number",
+        "exponential_factor_24h": "number",
+        "relative_difference_percent": "number",
+        "uncertainty_bands_overlap": "boolean",
+        "synchrony_effect": "one of: impairs_growth, enhances_growth, not_reported",
+        "decision_code": "one of: use_exponential_form_as_direct_measurement, keep_exponential_form_as_assumption_and_test_sensitivity, discard_growth_evidence"
+      },
+      "task_b": {
+        "source_doi": "string",
+        "pressure_width_product_unit": "unit string",
+        "dimensions_are_compatible": "boolean",
+        "source_measured_bending_stiffness": "boolean",
+        "pressure_to_ray_load_calibration_in_source": "boolean",
+        "measured_EI_min_N_m2": "number",
+        "measured_EI_max_N_m2": "number",
+        "measurement_method": "one of: mechanical_force_deflection, pressure_measurement, other",
+        "decision_code": "one of: treat_dimensions_as_biological_calibration, retain_as_assumption_until_hydrodynamic_load_is_measured_or_validated, reject_pressure_width_unit_conversion"
+      }
+    },
+    "source_ids": "Use the two DOI strings as identifiers; explanations are optional and are not graded by a language model."
+  }
+}
