@@ -1304,3 +1304,15 @@ def test_simulation_gallery_has_filters_a_count_jump_links_and_lazy_players(brow
     assert pg.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
     pg.goto(base + "#/simulations?q=zzznotthere"); pg.wait_for_selector(".simtools")
     assert "No simulation card matches" in pg.locator("#main").text_content() and pg.locator(".simcard").count() == 0
+
+
+def test_cfd3d_cards_keep_the_failed_reference_and_unresolved_fins(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    for cid in ("cfd3d-gpu-L128-Re1000", "cfd3d-gpu-L192-Re1000"):
+        pg.wait_for_selector(f"#sim-{cid} video")
+        t = pg.locator(f"#sim-{cid}").text_content()
+        assert "C1 sphere reference" in t and "FAILED" in t and "sub-grid shells" in t and "Fin flow is not resolved" in t and "not swimming-, taxiing- or flight-validated" in t
+    import hashlib
+    b = (ROOT / "site/artifacts/molecular/warmstart-v3.tar.xz").read_bytes()
+    assert hashlib.sha256(b).hexdigest() == "4154fcdc3784fa1bfe6c667cdc20fabc346e8c482d9010ad5646a10eea78c3bf"

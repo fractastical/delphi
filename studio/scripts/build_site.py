@@ -584,7 +584,7 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "parameter_unknowns": ["The medium is assumed, not published or measured.", "Flux units are not declared in the SBML; mmol/gDW/h is assumed.", "Uptake is uncapped except glucose."],
             "open_questions": ["Which measured medium and uptake bounds would replace the assumed ones? The sweep does not show oxygen dependence because the model can make its own oxygen through a reaction next to uncapped vitamin uptake; the owner's diagnostic is in the branch, not in this tree."],
             "limitations": ["Not a measurement of fish oxygen use or oxygen dependence.", "Growth values are model objective fluxes, not physiological growth.", "Not fin- or tissue-specific and says nothing about flying fish.", "The ATP-maintenance slope is not calibrated."], "couplings": [], "manifest": f"{d}/manifest.json", "native": True})
-    ws = f"{d}/warmstart-v3.tar.xz"
+    d = "artifacts/molecular"; ws = f"{d}/warmstart-v3.tar.xz"          # d was reassigned by the cards above; set it explicitly
     if (ROOT / ws).exists() and (ROOT / d / "warmstart-v3.json").exists():
         wm = json.loads(ins.read(f"{d}/warmstart-v3.json")); b = ins.read(ws)
         if digest_bytes(b) == wm["sha256"] and len(b) == wm["bytes"]:
@@ -627,6 +627,23 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "open_questions": ["What measured fin camber, ray structure and thickness would replace the assumed ones?"],
             "limitations": ["Not claimed: " + x for x in r["not_claimed"]] + [f"The mesh itself (fish.glb, sha256 {r['glb_sha256'][:12]}…) is in artifacts/fish3d and is not served by this site."],
             "couplings": [], "manifest": f"{d}/render.json", "native": True})
+    d = "artifacts/cfd3d/gpu-v1"
+    if (ROOT / d / "status.json").exists() and (ROOT / d / "receipt.json").exists():
+        stt = json.loads(ins.read(f"{d}/status.json")); rc = json.loads(ins.read(f"{d}/receipt.json")); gate = stt["reference_gate"]
+        for tag, cid in (("L128_Re1000", "cfd3d-gpu-L128-Re1000"), ("L192_Re1000", "cfd3d-gpu-L192-Re1000")):
+            rd = f"{d}/gpu_fish_{tag}/render"
+            if not (ROOT / rd / "render.json").exists():
+                continue
+            r = json.loads(ins.read(f"{rd}/render.json")); cs = json.loads(ins.read(f"{d}/gpu_fish_{tag}/case.json"))["case"]
+            st, href = _vid(ins, out, cid, rd, "flow.mp4", r["video"]["sha256"]); _, ph = _vid(ins, out, cid, rd, r["poster"], r["poster_sha256"])
+            cards.append({"id": cid, "title": f"3D flow past the fish3d candidate, Re = {cs['Re']}, {cs['L_cells']} cells along the body (WaterLily, H100)", "scales": ["organism"], "evidence_kind": "simulated (numerical demo; video is a render of solver slices)",
+                "model": {"name": "WaterLily 1.10.0 three-dimensional Navier-Stokes, fixed rigid body, candidate 4a3b912eb346", "context": r["what"] + ". " + " ".join(r["caption"].splitlines()[1:2])},
+                "time": {"units": "convective time units", "note": f"{r['frames']} frames at {r['fps']} fps; case runs to t = {cs['t_end']}, averaging over the last {cs['t_avg']}. Container wall {rc['container_wall_s']} s on {rc['device']} for the whole packet (all four cases), not for this case alone."},
+                "video": {"file": "flow.mp4", "sha256": r["video"]["sha256"], "note": ""}, "video_state": st, "video_href": href, "poster_href": ph,
+                "numerical_checks": [{"name": "C1 sphere reference (Re 100)", "result": f"FAILED: |Cd| {gate['evidence'].split('|Cd| ')[1].split(' vs')[0]} against correlation 1.092, band [0.95, 1.35]; no physical-validation claim"}, {"name": "platform gates", "result": "reproduce model behaviour only (" + gate["consequence"] + ")"}],
+                "parameter_unknowns": ["Fins are " + r["caption"].splitlines()[2 - 1].split("Fins are ")[1].split(": fin flow")[0] + ". Fin flow is not resolved.", "A flying fish glides at Reynolds numbers orders of magnitude above this."],
+                "open_questions": ["Can the C1 reference be brought into its band? Until then no case here supports a quantitative force claim."],
+                "limitations": r["caption"].splitlines()[2:] + ["Low-Re numerical demo: not swimming-, taxiing- or flight-validated."], "couplings": [], "manifest": f"{rd}/render.json", "native": True})
     d = "artifacts/behavior"
     if (ROOT / d / "manifest.json").exists() and (ROOT / d / "controls.json").exists():
         m = json.loads(ins.read(f"{d}/manifest.json")); ct = json.loads(ins.read(f"{d}/controls.json")); fl = m["files"]
