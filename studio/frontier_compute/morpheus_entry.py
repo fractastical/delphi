@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import shutil
@@ -18,6 +19,21 @@ URL = "https://gitlab.com/morpheus.lab/morpheus/-/package_files/178666119/downlo
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def last_logged_time(path):
+    last = None
+    if path.exists():
+        with path.open() as stream:
+            for line in stream:
+                if line.strip() and not line.startswith('"t"'):
+                    last = line
+    if last is None:
+        return None
+    value = float(last.split()[0])
+    if not math.isfinite(value):
+        raise ValueError("Nonfinite logger time")
+    return value
 
 
 def main():
@@ -46,7 +62,9 @@ def main():
         binary.chmod(0o755)
         env = {**os.environ, "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "ARM_TIMEOUT_S": "3000"}
         completed = subprocess.run(["bash", "run_packet.sh", str(data)], cwd=work, env=env, timeout=3100, check=False)
-        arms = []
+        # Preserve every arm before parsing any one arm. A receipt error must not
+        # discard the other completed outputs when the temporary directory closes.
+        shutil.copyfile(work / "morpheus-packet-result.tgz", out / "all-arms-original.tar.gz")
         for name in ("baseline", "nofeedback", "seed2"):
             source = data / name
             destination = out / name
@@ -54,9 +72,12 @@ def main():
             for filename in ("logger.csv", "model.xml", "stdout.log", "exit.txt"):
                 if (source / filename).exists():
                     shutil.copyfile(source / filename, destination / filename)
+        arms = []
+        for name in ("baseline", "nofeedback", "seed2"):
+            source = data / name
             exit_code = int((source / "exit.txt").read_text().strip().split("=")[1])
             log = source / "logger.csv"
-            last_time = float(log.read_text().splitlines()[-1].split()[0]) if log.exists() else None
+            last_time = last_logged_time(log)
             arms.append({"arm": name, "exit_code": exit_code, "last_time": last_time,
                          "full_horizon": exit_code == 0 and last_time is not None and last_time >= 2.0})
         receipt = {"schema": "frontier.morpheus.continuation/1", "packet_sha256": PACKET_SHA,
