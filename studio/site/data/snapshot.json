@@ -1,7 +1,7 @@
 {
  "schema": "frontier-site-snapshot-0.1",
- "label": "snapshot of inputs 99a5eafc690b",
- "input_fingerprint": "99a5eafc690b9b1b7a376406a00c3ac8116b32697bdc8c3959055c8df5c127cc",
+ "label": "snapshot of inputs b199afdb5260",
+ "input_fingerprint": "b199afdb5260547c2dfcdbeade2297c22307e509ebcbde9d9cf9a45a1eb3a56c",
  "inputs": [
   {
    "path": "GOAL.md",
@@ -9,9 +9,39 @@
    "bytes": 4762
   },
   {
+   "path": "connectors/biomodels/video/delta_notch_replay.mp4",
+   "sha256": "2fb5ab69267be62d7a0c50c116227857a1706b8847cf208d582f0897eb62059d",
+   "bytes": 296736
+  },
+  {
+   "path": "connectors/biomodels/video/delta_notch_replay_manifest.json",
+   "sha256": "f0145be6f017862579d2203e2280596d1311dbbb78f879a0007e357f1b0c2a5a",
+   "bytes": 3480
+  },
+  {
+   "path": "connectors/biomodels/video/delta_notch_replay_poster.png",
+   "sha256": "011eb783a77fd560b248c375e83e2e009acbd59ffbeed87eb1270869e08521db",
+   "bytes": 125439
+  },
+  {
    "path": "docs/mcp.md",
    "sha256": "7c6c81cb629557c457f33396d23cd82824d46c813cca24449538673d8dfd6d62",
    "bytes": 8613
+  },
+  {
+   "path": "engineering/fin_mechanics/artifacts/fin_mechanics.mp4",
+   "sha256": "f4080da6514b6e7a374927f7e40ac6ccff7ae33d62fe2ecd96318a2fb7c7ac17",
+   "bytes": 327971
+  },
+  {
+   "path": "engineering/fin_mechanics/artifacts/manifest.json",
+   "sha256": "179f6f910d4e1c58a3241569171fc3bd924d2336982c4b23e1d522f49dbde461",
+   "bytes": 1691
+  },
+  {
+   "path": "engineering/fin_mechanics/artifacts/poster.png",
+   "sha256": "df0e4804e57cda604ac66f8bb49681a9105b930dd1a078d15ce505209030cf95",
+   "bytes": 348646
   },
   {
    "path": "engineering/formal/RECEIPT.json",
@@ -2460,7 +2490,90 @@
   ],
   "scope": "A fixed 15-item sample chosen by a hashed rule, not a random or representative sample. The counts are not a population rate and verify nothing about the other attestations or the 250 problems."
  },
- "simulation_manifests": [],
+ "simulation_manifests": [
+  {
+   "id": "biomodels-delta-notch",
+   "title": "Two-cell Delta-Notch replay (BioModels BIOMD0000001047)",
+   "scales": [
+    "cellular"
+   ],
+   "evidence_kind": "simulated: a rendering of replay output; not an observation of any biological system",
+   "model": {
+    "name": "BIOMD0000001047, Collier et al. 1996, replayed from the published SBML",
+    "context": "two-cell Delta-Notch concentrations vs model time and (Notch, Delta) phase portraits for three replay scenarios. SIMULATION computed from the published SBML model; not an observation.  Time and concentrations are non-dimensional (model time).  Two abstract cells: this is not tissue, not a fin, and no cell shape is modelled or observed."
+   },
+   "time": {
+    "units": "non-dimensional model time, 0 to 60",
+    "note": "frame k < motion_frames shows csv row round(k*(rows-1)/(motion_frames-1)); later frames repeat the last row. most of the change happens before model time 30; the second half of the video is the settled state"
+   },
+   "video": {
+    "file": "delta_notch_replay.mp4",
+    "sha256": "2fb5ab69267be62d7a0c50c116227857a1706b8847cf208d582f0897eb62059d",
+    "note": "1280x720, 16.0 s, h264"
+   },
+   "video_state": "present_verified",
+   "video_href": "artifacts/simulations/biomodels-delta-notch/delta_notch_replay.mp4",
+   "poster_href": "artifacts/simulations/biomodels-delta-notch/delta_notch_replay_poster.png",
+   "numerical_checks": [
+    {
+     "name": "replay inputs",
+     "result": "three scenario CSVs hashed (3); model and replay-code hashes recorded"
+    }
+   ],
+   "parameter_unknowns": [
+    "Model time and concentrations are non-dimensional; no physical units."
+   ],
+   "open_questions": [
+    "It does not show: observed cell shape or morphology; tissue; a fin; any flying-fish structure; real time or physical concentration units."
+   ],
+   "couplings": [],
+   "manifest": "connectors/biomodels/video/delta_notch_replay_manifest.json",
+   "native": true
+  },
+  {
+   "id": "fin-mechanics",
+   "title": "Elastic fin-ray surrogate (Euler-Bernoulli cantilever)",
+   "scales": [
+    "organ"
+   ],
+   "evidence_kind": "simulated",
+   "model": {
+    "name": "frontier.finmech.manifest/1",
+    "context": "Frames from beam.solve_checked (Hermite FEM) per frame; closed form overlaid for comparison. A scoped elastic surrogate, not a fin."
+   },
+   "time": {
+    "units": "not a physical time axis; see the manifest",
+    "note": "mp4 bytes can differ across ffmpeg builds; frames_data_sha256 hashes the computed numeric frames and is the reproducible quantity"
+   },
+   "video": {
+    "file": "fin_mechanics.mp4",
+    "sha256": "f4080da6514b6e7a374927f7e40ac6ccff7ae33d62fe2ecd96318a2fb7c7ac17",
+    "note": "15.0 s at 24 fps, 360 frames"
+   },
+   "video_state": "present_verified",
+   "video_href": "artifacts/simulations/fin-mechanics/fin_mechanics.mp4",
+   "poster_href": "artifacts/simulations/fin-mechanics/poster.png",
+   "numerical_checks": [
+    {
+     "name": "frames flagged invalid by the beam checker",
+     "result": "179 of 360"
+    },
+    {
+     "name": "reproducible quantity",
+     "result": "frames_data_sha256 bf71352706d690e9…"
+    }
+   ],
+   "parameter_unknowns": [
+    "Material and geometry come from the request file, not from a measured fin."
+   ],
+   "open_questions": [
+    "Which loads on a real fin ray would the load bridge need from the glide model, and with what uncertainty?"
+   ],
+   "couplings": [],
+   "manifest": "engineering/fin_mechanics/artifacts/manifest.json",
+   "native": true
+  }
+ ],
  "system": {
   "goal_checklist": [
    {
