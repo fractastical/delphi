@@ -152,6 +152,83 @@ the 3-D fish (`docs/fish3d.md`).
 **Not changed by v2.** The 3-D fish (`artifacts/fish3d/`) already used the pointwise profile. Its candidate is not
 the v2 print candidate: it is built at 1:1 from the biological point, without the solver's rational witness.
 
+## v3 ray-fan display props (`artifacts/print-v3/`)
+
+```
+python -m engineering.fishprop.build [--only a-fan|b-glide-pose] [--min-wall-mm 1.0]   # ~2 min, both props
+pytest --noconftest tests/test_fishprop.py
+```
+
+Two props, one from `fish3d-v3a-fan` (`e8c2b666…`) and one from `fish3d-v3b-glide-pose` (`57874f86…`), each in
+its own `engineering.fishprop` build. These replace the flat-plate forms above as the props that show the v3 fins.
+Those forms and their files are unchanged.
+
+**Source.** The builder refuses to run unless the committed `artifacts/fish3d/<id>/candidate.json` is
+byte-identical to what `engineering.fishv3` produces, and unless that candidate's `build.json` names the same hash.
+It also refuses if any ray's length changes under the alterations. The rays, outlines, placement, pose and camber
+all come from the candidate. Flow, the fin-ray adapter and the viewer keep reading the 1:1 candidate files; a prop
+is never a flow input.
+
+**Known issue in v3b, which the prop reproduces.** v3b's camber knob raises the fins' distal margin, by up to
+4.8 mm on the pectoral (`panels.json`); the leading and trailing rays stay in the fin plane. So outboard streamwise
+sections are nose-down (cfd3d fitted 3.55°), not airfoil-cambered. The camber shape is assumed. A chordwise-camber
+variant would need a new candidate id and has not been built.
+
+**Display scale 0.55** (1 mm of fish = 0.55 mm of prop; SL 159 → 87.5 mm). It is one scale for both props, so the
+largest v3 extent (199 mm, v3a span) becomes 109 mm and fits the provisional 120 mm box.
+
+**Manufacturing alterations.** Each is listed in the design JSON with its candidate value:
+
+| part | candidate | prop | why |
+|---|---|---|---|
+| fin membrane | 0.10 mm | 1.2 mm (1.2 × wall rule); 22× the scaled thickness | the wall rule |
+| fin rays | 0.60 → 0.14 mm diameter | 2.2 → 1.6 mm (× wall rule) | stand proud of the membrane, so they read as rays and never meet it at a grazing angle |
+| fin margin | square edge | rounded rim, 1.3 × membrane | a thickened, cambered membrane bent by the candidate's vertical offset gets acute edge walls that fail the rule (v3b measured 0.09 mm before the rim) |
+| scales | 0.12 mm shingles floating 0.02 mm off the body | relief 0.2 mm (front edge) to 0.42 mm (back edge, the candidate's tilt), sunk 0.35 mm | fused, with no overhang and no loose part |
+| gill cover | 0.3 mm shell, lifted | 0.3 mm relief, sunk 0.35 mm | fused |
+| assembly | 13 overlapping parts | one boolean union | one printable solid |
+
+**Two files per prop.**
+- **`<id>-prop.stl` (smooth): body, eyes, membranes and rays.** The wall rule is gated on this file. The minimum
+  sampled wall is 1.20 mm (v3a) and 1.08 mm (v3b), against a 1.0 mm rule.
+- **`<id>-prop-scales.stl`: the same plus the scale and gill-cover relief.** The relief is texture, below the
+  wall rule by design, and is **not gated** by it. Sampled minima are 0.13 mm and 0.02 mm, and both sit in relief.
+  Whether 0.2–0.4 mm relief resolves depends on the printer, which is unknown. The structure under the relief is
+  the smooth file, and a union only adds material to it.
+
+Both files are closed, consistently oriented, one face-connected piece with no degenerate triangles, positive
+volume, inside the box, and round-trip through STL. Two details of the mesh clean-up:
+- Vertices are snapped to a 10 nm grid before the float32 weld. Without the snap, the relief boolean leaves about
+  58 zero-area slivers made of vertex pairs about 1e-6 mm apart.
+- The union of about 1,300 reliefs leaves two zero-volume shells, which are dropped and recorded. Any shell with
+  more than 1e-3 mm³ refuses the build.
+
+**Stand.** The stand is `engineering.geometry.stand`, cut from a smooth envelope: the body grown by the tallest
+relief, plus the fins. So both files drop into the saddle, and the scale texture does not groove the saddle below
+the wall rule.
+- `stand.py`'s own search samples only 1,500 faces. The full check here samples every face, so it can catch a lip
+  where a fin root meets the saddle end.
+- When the full check fails, shorter saddles are tried and every attempt is recorded. v3a needed a 4.5 mm saddle
+  half-length; v3b kept the default 6 mm.
+- The stand is 60 × 60 × 26 mm, with zero overlap with either prop. Balance on the saddle is not tested.
+
+**Files.**
+- `stl/` holds the smooth prop, the `-scales` prop and the stand, in mm.
+- `web/<id>-prop-scales.glb` is in mm.
+- `img/` has `<id>-prop-scales.png` and `<id>-prop-on-stand.png`, flat-shaded from the exported triangles.
+- `design/<id>-prop.json`, `downloads.json` (`frontier.print.downloads/1`, base `artifacts/print-v3/`, the same
+  shape as below) and `manifest.json`.
+
+**Sizes.** v3a: smooth STL 2.3 MB, scales STL 10.3 MB, GLB 3.7 MB. v3b: smooth STL 3.0 MB, scales STL 11.0 MB,
+GLB 4.0 MB. A second build reproduced every STL, the GLB and the PNG byte for byte.
+
+**Not claimed.**
+- Print preparation is unvalidated: printer and resin are unknown, and nothing has been sliced, loaded into
+  PreForm or printed.
+- The 1.0 mm wall rule is a provisional prop choice (`--min-wall-mm`). It is checked on 3,000 sampled faces, not
+  proven, and is not a printer setting.
+- No aerodynamic fidelity, no biological thickness, and not a living or bio-printed construct.
+
 ## Downloads for the site
 
 `artifacts/print/downloads.json` (`frontier.print.downloads/1`) is the file list a site may offer. All paths
