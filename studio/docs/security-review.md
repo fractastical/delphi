@@ -117,3 +117,20 @@ Not covered: refs or commits after 16:00 PDT, nested archives or encodings deepe
 ## 8. Before any visibility change
 
 Root's final rescan of the latest refs, and the nested-archive scan result, are required. This document changes no repository visibility.
+
+## 9. Publication checkpoint
+
+At 4:06pm PDT on October31, the repository visibility was changed to public after
+PR7 merged. Anonymous GitHub metadata and current-main README requests succeeded;
+`deploy/receipts/public-repository-check.json` records those checks. Public read
+access does not grant collaborator write permission.
+
+The final incremental scan, completed at 2026-10-31T23:05:32.544774+00:00, covered
+23 additional reachable commits after section7b's frozen refs and
+69 changed tree files through `0ad318877a583d4870bae1f720c952a99397fc54`.
+Gitleaks8.30.1 reported 0 new history findings and
+0 changed-tree findings. Redacted reports and the exact ref set
+are retained under `/data/artifacts/delphi-evolve-rethink/security/publication-final/`.
+This supplements the full-history/current-tree scan above; it does not replace
+its classifications or extend coverage beyond archive/decode depth3. Later pushes
+require their own review. No claim of complete vulnerability coverage is made.
