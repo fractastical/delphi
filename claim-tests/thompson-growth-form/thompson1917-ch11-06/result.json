@@ -2,17 +2,103 @@
   "claim_id": "thompson1917-ch11-06",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch11-06",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If every increment of a spirally grown shell is a gnomon to the whole structure before it (the enlarged whole stays similar to itself), then a molluscan shell is geometrically self-similar through growth: dimensionless shape indices of the conch measured at successive diameters along one specimen's ontogeny (conch width index CWI = ww/dm, umbilical width index UWI = uw/dm, whorl expansion rate WER) stay constant, apart from measurement noise, from the end of the embryonic shell to maturity.",
   "pass_criterion": "Pre-registered. Data: Walton & Korn (2018) ontogenetic conch-parameter series for 177 Devonian-Jurassic ammonoid species (Dryad 10.5061/dryad.c17p8), measured on median cross-sections at successive diameters dm. For each species keep the post-embryonic points (dm >= 2 mm) and require at least 4 points spanning at least a fourfold range of dm. For each retained index compute the log-range D = max ln(index) - min ln(index) over the series. A species is 'gnomonic' if D <= ln(1.25) (at most 25% change) for CWI, UWI and WER alike; 'allometric' if D >= ln(1.5) (at least 50% change) for at least one index; otherwise intermediate. SUPPORTS if at least two thirds of the qualifying species are gnomonic. As a secondary descriptor, the fraction of species whose indices show a monotonic trend with ln dm (|Spearman rho| >= 0.7, p < 0.05, for at least one index) is reported; it does not enter the verdict.",
   "fail_criterion": "Pre-registered. REFUTES if at least two thirds of the qualifying species are allometric (at least one shape index changes by 50% or more over post-embryonic growth, so successive increments are not gnomons of the pre-existing conch). Otherwise 'mixed'. Fewer than 30 qualifying species: inconclusive (underpowered). File unobtainable: inconclusive, data-unavailable.",
-  "planned_datasets": ["dryad-c17p8-walton-korn-2018-ammonoid-conch-ontogeny"],
+  "planned_datasets": [
+    "dryad-c17p8-walton-korn-2018-ammonoid-conch-ontogeny"
+  ],
   "interpretation": "Thompson's gnomon is 'an addition that leaves the enlarged whole similar to what it was before'; for a coiled conch, continued similarity means that the ratios describing its shape are unchanged by growth, which is exactly what constant CWI, UWI and WER along an ontogenetic trajectory express (constant WER is the constant spiral angle; constant CWI and UWI fix the whorl-section proportions and the umbilicus). Ammonoid conchs are molluscan shells, within the stated scope. The embryonic ammonitella (dm below about 1-2 mm) formed inside the egg rather than by the accretion Thompson describes, so points below 2 mm are excluded. Thresholds of 25% and 50% are chosen before analysis to separate measurement noise in cross-sections from genuine shape change; the measurement protocol (Korn 2010) reports typical errors of a few percent.",
-  "datasets": [],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-thompson-batch-2216", "date": "2026-10-31" }
+  "datasets": [
+    {
+      "id": "dryad-c17p8-walton-korn-2018-ammonoid-conch-ontogeny",
+      "name": "Data from: Iterative ontogenetic development of ammonoid conch shapes from the Devonian through to the Jurassic (Walton & Korn 2018, Palaeontology 61, doi:10.1111/pala.12308)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.c17p8",
+      "doi": "10.5061/dryad.c17p8",
+      "version": "Dryad version id 7242 = dataset version 1 (published 2018-05-16), the only publicly listed version",
+      "license": "CC0 1.0",
+      "files": [
+        {
+          "download_url": "https://datadryad.org/api/v2/versions/7242/download",
+          "retrieved_at": "2026-10-31T04:42:46Z",
+          "byte_size": 215481,
+          "sha256": "944359c1887e4aa67867ead469a5e895dd4efe9a0d3d2cc1ae8d7a1518aae077",
+          "note": "zip assembly of the version containing Ontogenetic_Conch_Parameter_Data.xlsx (215182 bytes; sheets Species, dm, CWI, UWI, WER; 179 series for 177 species, values at successive half-whorls)"
+        }
+      ],
+      "role": "ontogenetic series of conch diameter and the shape indices CWI (ww/dm), UWI (uw/dm) and WER along individual ammonoid cross-sections"
+    }
+  ],
+  "method": "fetch.py downloads the Dryad version zip and records its SHA-256. analysis.py reshapes the four parameter sheets to one long table (species, half-whorl, dm, CWI, UWI, WER), keeps post-embryonic points (dm >= 2 mm) and the 179 series with >= 4 points spanning >= 4x in diameter, and for each index computes the log-range over the series (percent change), a Spearman correlation with ln dm, and classifies each series as gnomonic (all three indices change <= 25%), allometric (any index changes >= 50%) or intermediate. Sensitivity runs use dm >= 5 mm and drop UWI.",
+  "measured": {
+    "value": 0.939,
+    "unit": "fraction of qualifying ammonoid series in which at least one conch shape index changes by >= 50% over post-embryonic growth (pre-registered refutes threshold 2/3); fraction gnomonic = 0.006 (supports threshold 2/3)",
+    "n": "179 series (177 species), Devonian-Jurassic",
+    "uncertainty": "168 allometric, 10 intermediate, 1 gnomonic (Eurites permutus); 93.9% of series show a monotonic trend (|Spearman rho| >= 0.7, p < 0.05) in at least one index",
+    "extra": {
+      "n_allometric": 168,
+      "n_intermediate": 10,
+      "n_gnomonic": 1,
+      "median_pct_change_over_ontogeny": {
+        "CWI": 39.9,
+        "UWI": 204.2,
+        "WER": 16.7
+      },
+      "fraction_series_index_changes_ge_50pct": {
+        "CWI": 0.324,
+        "UWI": 0.916,
+        "WER": 0.022
+      },
+      "fraction_series_index_changes_le_25pct": {
+        "CWI": 0.229,
+        "UWI": 0.011,
+        "WER": 0.804
+      },
+      "fraction_with_monotonic_trend_any_index": 0.939,
+      "by_period_fraction_allometric": {
+        "Carboniferous": 0.913,
+        "Devonian": 0.967,
+        "Jurassic": 1.0,
+        "Permian": 1.0,
+        "Triassic": 1.0
+      },
+      "by_period_n": {
+        "Carboniferous": 115,
+        "Devonian": 30,
+        "Jurassic": 5,
+        "Permian": 11,
+        "Triassic": 18
+      },
+      "sensitivity": {
+        "dm_min_5mm_all_indices": {
+          "n": 108,
+          "fraction_allometric": 0.843
+        },
+        "dm_min_2mm_CWI_and_WER_only": {
+          "n": 179,
+          "fraction_allometric": 0.341
+        },
+        "dm_min_5mm_CWI_and_WER_only": {
+          "n": 108,
+          "fraction_allometric": 0.269
+        }
+      }
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.65,
+  "caveats": [
+    "The refutation is carried almost entirely by the umbilical width index: UWI changes by >= 50% in 92% of series (median change 204%), whereas the whorl expansion rate, which encodes the spiral angle, stays within 25% in 80% of series (median change 17%). The spiral itself is therefore close to logarithmic (gnomonic in Thompson's sense), while the whorl section and the degree of involution change through growth, so the enlarged conch is not similar to its earlier self. Dropping UWI, only 34% of series (27% at dm >= 5 mm) are allometric and the pre-registered rule would give 'mixed'.",
+    "Walton & Korn chose their 177 species to study pachyconic and globular ammonoids with phased ontogenies, so the sample is probably enriched in species with strong ontogenetic shape change relative to ammonoids at large.",
+    "UWI is the noisiest index at small diameters (small umbilical widths); the 2 mm cut-off and the requirement of a monotonic trend (met by 94% of series) limit but do not remove this effect; at dm >= 5 mm the allometric fraction is still 84%.",
+    "Scope: Palaeozoic-Jurassic ammonoid conchs only; Thompson's gnomon claim also covers gastropod and bivalve shells, opercula, foraminiferal chambers, horns and tusks, which were not tested. The 25% and 50% thresholds are pre-registered conventions, not derived from Thompson.",
+    "Thompson himself notes elsewhere (ch. XI, changes of spiral angle with age) that some ammonoids change their spiral angle during growth; this test shows that even where the spiral angle is nearly constant, the conch shape generally is not."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-thompson-batch-2216",
+    "date": "2026-10-31"
+  }
 }
