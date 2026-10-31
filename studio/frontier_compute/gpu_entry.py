@@ -11,12 +11,17 @@ except ImportError:
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from frontier_compute import gpu_neumann as G
+from frontier_compute.telemetry import Telemetry
 
 cells = json.load(open(sys.argv[1]))["cells"]
+if os.environ.get("PREFLIGHT"):
+    print("preflight ok: imports and cell file load,", len(cells), "cells"); sys.exit(0)
 arms = (sys.argv[sys.argv.index("--arms") + 1] if "--arms" in sys.argv else "base").split(",")
 budget = float(sys.argv[sys.argv.index("--budget-s") + 1]) if "--budget-s" in sys.argv else 480.0
 out = os.environ.get("COPS_OUT", ".")
 t_start = time.time()
+tel = Telemetry(out, max_s=int(budget) + 300)
+tel.__enter__()
 dev = "cuda" if torch.cuda.is_available() else "cpu"
 meta = {"torch": torch.__version__, "device": dev, "python": platform.python_version(), "numpy": np.__version__, "arms": {}, "budget_s": budget}
 if dev == "cuda":
@@ -51,6 +56,7 @@ with open(os.path.join(out, "gpu_results.jsonl"), "w") as fh:
     for r in rows:
         fh.write(json.dumps(r, sort_keys=True) + "\n")
 np.savez_compressed(os.path.join(out, "gpu_fields.npz"), **fields)
+tel.__exit__(None, None, None)
 meta["total_wall_s"] = round(time.time() - t_start, 1)
 json.dump(meta, open(os.path.join(out, "gpu_meta.json"), "w"), indent=1)
 print("done", len(rows), "rows", meta["total_wall_s"], "s", flush=True)

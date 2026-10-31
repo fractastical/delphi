@@ -34,6 +34,7 @@ CPU_IMAGE = "python:3.12-slim"
 DEFAULTS = {"gpu": ("gpu-h100-sxm", "1gpu-16vcpu-200gb"), "cpu": ("cpu-d3", "16vcpu-64gb")}
 CHUNK = 40 * 1024            # injected files: API rejects >64 KiB plaintext AFTER encoding; 61 KB raw chunks failed live (11:30 PDT), so stay at 40 KiB (x4/3 = 54 KiB)
 MAX_CHUNKS = 16
+MAX_TOTAL_ENCODED = 60_000    # inferred bound on the summed, base64-encoded inject files (API error: plaintext must not exceed 65536 bytes); inferred from 3 observations, not documented
 TERMINAL = {"COMPLETED", "FAILED", "CANCELLED", "CANCELED", "STOPPED", "DELETED", "ERROR", "SUCCEEDED"}
 WAITING = {"PENDING", "QUEUED", "WAITING", "SCHEDULING", "CREATING", "PROVISIONING", "INITIALIZING"}
 OUTDIR = ROOT / "artifacts/gpuops"
@@ -79,7 +80,7 @@ def create_argv(item: dict, name: str, base: Path, tmpdir: Path) -> list[str]:
     platform, preset = item.get("platform", platform), item.get("preset", preset)
     image = item.get("image", GPU_IMAGE if kind == "gpu" else CPU_IMAGE)
     timeout = item.get("timeout", "10m")
-    inner = max(30, parse_dur(timeout) - 120)
+    inner = int(item.get("inner_timeout_s") or max(30, parse_dur(timeout) - 120))    # item may shorten it (e.g. when the image pull eats the server timeout)
     py = item.get("python", "python3")
     argv_in = [py, item["script"], *map(str, item.get("args", []))]
     spec = {"item": item["id"], "argv": argv_in, "inner_timeout": inner,
@@ -92,7 +93,11 @@ def create_argv(item: dict, name: str, base: Path, tmpdir: Path) -> list[str]:
     for k, v in (item.get("env") or {}).items():
         a += ["--env", f"{k}={v}"]
     tmpdir.mkdir(parents=True, exist_ok=True)
-    for i, part in enumerate(chunk_bundle(build_bundle(item, base))):
+    parts = chunk_bundle(build_bundle(item, base))
+    total_raw = sum(map(len, parts)) + (HERE / "cops_run.py").stat().st_size
+    if total_raw * 4 / 3 > MAX_TOTAL_ENCODED:        # observed live: the API rejected 50,147 B (x4/3 = 66.9 KB) and 63,554 B in total, accepted 28.9 KB: the limit is on the SUM of injected files
+        raise ValueError(f"injected files total {total_raw} B raw (about {int(total_raw * 4 / 3)} B encoded) > {MAX_TOTAL_ENCODED}; shrink the file list")
+    for i, part in enumerate(parts):
         p = tmpdir / f"part-{i:03d}"
         p.write_bytes(part)
         a += ["--inject-file", f"{p}:/work/_b/part-{i:03d}"]
@@ -204,10 +209,11 @@ def save(p, obj):
 
 class Batch:
     def __init__(self, spec, cloud=None, outdir=OUTDIR, base=Path("."), max_parallel=1, gpu_cap=10, poll=20,
-                 max_requeues=1, grace=180, deadline_s=None, sleep=time.sleep, clock=time.time):
+                 max_requeues=1, grace=180, deadline_s=None, sleep=time.sleep, clock=time.time, pool_size=16, wait_grace_s=300):
         self.spec, self.cloud, self.outdir, self.base = spec, cloud or Cloud(), Path(outdir), Path(base)
         self.max_parallel, self.gpu_cap, self.poll, self.max_requeues = max_parallel, gpu_cap, poll, max_requeues
         self.grace, self.sleep, self.clock = grace, sleep, clock
+        self.pool_size, self.wait_grace_s = pool_size, wait_grace_s
         self.tag = spec.get("run_tag") or dt.datetime.now(dt.timezone.utc).strftime("%m%d%H%M%S")
         self.deadline = clock() + deadline_s if deadline_s else None
         items = sorted(enumerate(spec["items"]), key=lambda t: (t[1].get("priority", t[0]), t[0]))
@@ -236,10 +242,30 @@ class Batch:
                 n += w.gpus
         return n
 
+    def pool_active_h100(self, snap):
+        return sum(w.gpus for w in snap if w.platform.startswith("gpu-h100") and w.active and w.state not in WAITING) \
+            + sum(w.gpus for w in snap if w.platform.startswith("gpu-h100") and w.state in WAITING)
+
+    @staticmethod
+    def _age_s(created_at, now):
+        try:
+            c = re.sub(r"(\.\d{6})\d*", r"\1", created_at).replace("Z", "+00:00")
+            return now - dt.datetime.fromisoformat(c).timestamp()
+        except Exception:
+            return 0.0                                  # unknown age counts as brand new (never triggers the time rule)
+
     def foreign_waiting(self, snap):
+        """Foreign H100 workloads that are plausibly BLOCKED by us: in a waiting state AND (the pool is full, i.e. active+waiting >= pool_size, OR the
+        workload has waited longer than wait_grace_s). A provisioning job in a mostly idle pool is normal startup, not a reason to cancel running work
+        (a false trigger cancelled our job at the finish line at 13:13 PDT Oct 31; the result was recovered from the log)."""
         own = self.owned_ids()
-        return [w for w in snap if w.platform.startswith("gpu-h100") and w.state in WAITING
+        cand = [w for w in snap if w.platform.startswith("gpu-h100") and w.state in WAITING
                 and w.id not in own and not w.name.startswith(COUNT_PREFIXES)]
+        if not cand:
+            return []
+        full = self.pool_active_h100(snap) >= self.pool_size
+        now = self.clock()
+        return [w for w in cand if full or self._age_s(w.created_at, now) >= self.wait_grace_s]
 
     def running(self): return [r for r in self.runs if r.status == "running"]
     def pending(self): return [r for r in self.runs if r.status == "pending"]

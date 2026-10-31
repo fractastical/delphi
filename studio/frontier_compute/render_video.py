@@ -9,7 +9,7 @@ import numpy as np
 from matplotlib.animation import FFMpegWriter
 
 
-def main(cells_path, gpu_dir, out, job, ids=None):
+def main(cells_path, gpu_dir, out, job, ids=None, label=""):
     cells = {c["id"]: c for c in json.load(open(cells_path))["cells"]}
     F = np.load(f"{gpu_dir}/gpu_fields.npz")
     have = sorted({int(k.split("_")[0]) for k in F.files if k.endswith("_frames_u")})
@@ -37,7 +37,9 @@ def main(cells_path, gpu_dir, out, job, ids=None):
         cur = ak.axvline(t[0], color="w", lw=1)
         ak.set_xlabel("time (tau)", fontsize=8); ak.set_ylabel("x", fontsize=8); ak.tick_params(labelsize=7)
         data[i] = (U, t, line, cur)
-    fig.suptitle(f"Simulated reaction-diffusion trajectories (declared model, 1-D Neumann, float64, GPU job {job}); not tissue.\nFrames file sha256 {fr_sha[:16]}...; evidence kind: simulated", fontsize=8)
+    import textwrap
+    cap = f"Simulated reaction-diffusion trajectories (declared model, 1-D Neumann, float64, GPU job {job}); not tissue. Frames file sha256 {fr_sha[:16]}...; evidence kind: simulated. {label}"
+    fig.suptitle("\n".join(textwrap.wrap(cap, 150)), fontsize=8)
     fig.tight_layout(rect=(0, 0, 1, 0.94))
     nf = min(d[0].shape[0] for d in data.values())
     w = FFMpegWriter(fps=8, codec="libx264", extra_args=["-pix_fmt", "yuv420p"])
@@ -51,4 +53,4 @@ def main(cells_path, gpu_dir, out, job, ids=None):
 
 if __name__ == "__main__":
     a = sys.argv[1:]
-    main(a[0], a[1], a[2], a[a.index("--job") + 1], [int(x) for x in a[a.index("--ids") + 1].split(",")] if "--ids" in a else None)
+    main(a[0], a[1], a[2], a[a.index("--job") + 1], [int(x) for x in a[a.index("--ids") + 1].split(",")] if "--ids" in a else None, a[a.index("--label") + 1] if "--label" in a else "")
