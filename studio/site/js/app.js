@@ -119,7 +119,7 @@
       document.getElementById("retry").addEventListener("click", () => location.reload()); return;
     }
     const foot = document.getElementById("foot");
-    foot.innerHTML = html`<p><b>${snap.label}</b>${snap.git_commit_time ? " · committed " + snap.git_commit_time : ""} · ${snap.inputs.length} input files hashed · <a href="data/snapshot.json">snapshot.json</a> · <a href="data/catalog.json">catalog.json</a> · KaTeX 0.16.47 (MIT, <a href="vendor/katex/LICENSE">licence</a>)</p>
+    foot.innerHTML = html`<p><b>${snap.label}</b> · ${snap.inputs.length} input files hashed · <a href="data/snapshot.json">snapshot.json</a> · <a href="data/catalog.json">catalog.json</a> · KaTeX 0.16.47 (MIT, <a href="vendor/katex/LICENSE">licence</a>)</p>
       <details><summary>Input files and sha256</summary><div class="tablewrap"><table><tbody>${snap.inputs.map((i) => html`<tr><td><code>${i.path}</code></td><td><code>${i.sha256}</code></td><td>${i.bytes} bytes</td></tr>`)}</tbody></table></div></details>
       <p class="small faint">Geometry is a design visualisation, not an observed fish and not CFD. Calculations are browser arithmetic on published fits. Upstream review labels are assertions, never local acceptance. No live activity, votes, scores or progress figures are shown.</p>`.toString();
     document.addEventListener("click", (e) => { const a = e.target.closest("a[data-src]"); if (a) opener = a; });
