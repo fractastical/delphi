@@ -252,6 +252,37 @@ class TestScorerGuards:
         with pytest.raises(ValueError, match="outside"):
             scorer.score_many([v])
 
+    def test_each_batched_row_carries_exactly_one_mask(self, scorer):
+        """Batching must be 4 copies with 1 mask each, not 1 copy with 4 masks.
+
+        An independent critique raised the second reading as a defect that would
+        silently replace single-mask marginals with a joint multi-mask quantity.
+        It would still produce plausible numbers, so it is checked here against
+        the tensor the model is actually given rather than argued about.
+        """
+        captured = {}
+        real = scorer.model
+
+        class Spy:
+            def __call__(self, input_ids=None, attention_mask=None, **kw):
+                captured["input_ids"] = input_ids.clone()
+                return real(input_ids=input_ids, attention_mask=attention_mask, **kw)
+
+            def __getattr__(self, name):
+                return getattr(real, name)
+
+        scorer.model = Spy()
+        try:
+            wt = REFERENCE[7]
+            scorer.score_many([proteingym.Variant(f"{wt}8A", wt, 8, "A", float("nan"))])
+        finally:
+            scorer.model = real
+
+        ids = captured["input_ids"]
+        mask_id = scorer.tokenizer.mask_token_id
+        per_row = (ids == mask_id).sum(dim=1).tolist()
+        assert per_row and all(n == 1 for n in per_row), f"masks per row were {per_row}, expected all 1"
+
     def test_one_forward_pass_serves_every_variant_at_a_position(self, scorer):
         wt = REFERENCE[5]
         before = scorer.forward_passes

@@ -187,8 +187,48 @@ tested anything, so a non-raising N1 or N2 fails the pilot and stops the run.
 - Sponsor service usage is recorded only for a toolkit, service or machine that
   actually executed work.
 
-## 11. What this cannot establish
+## 11. Amendments after independent critique
 
+An independent critique of §1–§11 was obtained from Gemini (`gemini-3.1-pro-preview`,
+and an earlier accidental call to an image model — see the audit receipts). Its output
+is model opinion and every point below was checked here before being acted on.
+
+**When.** The critique arrived while scoring was still running, with 61 of 256 variants
+scored and **`analyze.py` never yet executed**: no ρ, no Δρ and no correlation of any
+kind existed. So none of these changes could have been chosen to suit an outcome.
+**The falsifier in §8 is unchanged**, and the pre-registered variant-level bootstrap
+remains the primary interval.
+
+| Raised | Checked | Action |
+| --- | --- | --- |
+| Batching 4 positions may compute a joint multi-mask marginal | **Refuted.** The code repeats the sequence into 4 rows and masks one position per row. A test now asserts exactly one mask per row against the tensor handed to the model | Test added, no code change |
+| Token index off by one because ESM-2 prepends a token *(raised by the image model)* | **Refuted.** §5 states the mapping in 1-based terms, and `_verify_position_mapping` asserts it at three positions; the pilot passed. The later text model agreed the mapping is right | None |
+| The orientation check might flip a sign using the data | **Refuted.** It compares mean score by `DMS_score_bin` and returns pass/fail. Nothing in the pipeline flips a sign; the expected sign is positive for both assays | None |
+| No null was defined for Δρ, only for each ρ | **Valid.** Both critique runs raised it independently | Added a paired permutation test: rank-transform each assay, then exchange a variant's two values at random. Reported beside the interval |
+| A variant-level bootstrap understates variance, since variants at one position are dependent | **Valid and the best point made.** They share a residue, an environment and one forward pass | Added a bootstrap clustered on position. It is the more conservative of the two, so it cannot manufacture support; where they disagree the wider interval governs |
+| A step-down to the 150M checkpoint would void the comparison with ProteinGym's 650M reference | **Valid in principle, did not bind.** The pilot projected 21.3 min against a 25-minute threshold, so no step-down occurred and the reported numbers are 650M | Recorded; had it triggered, the external reference would have been void |
+| A two-sided 95% interval tests a directional hypothesis at an effective α of 0.025 | **Valid, cosmetic.** | Recorded, not changed. Altering a pre-registered decision rule mid-run is worse than an over-strict one |
+| Ties in the assay scores are not addressed | Already handled: ranks use average-tie `rankdata`, cross-checked against `scipy.stats.spearmanr` | Stated |
+| What happens to a variant with a missing value is unspecified | **Valid gap.** §8's floor says how many must survive, not what to do with the rest | Rule stated: complete cases only — prediction and *both* outcomes finite — applied identically to both assays, with the dropped list reported |
+| Function is biologically downstream of surface expression | **Valid and important.** A channel cannot conduct if it is not at the membrane | Added to §12 as a limitation on interpretation |
+| Institutional URL without a DOI; UniProt entries can be revised; the HF checkpoint could move | Valid replication risks | Checksums are recorded for the archive and both members, the UniProt sequence version (`SV=1`) is in the receipt, and the checkpoint id is pinned |
+
+The data-access audit returned `UNVERIFIABLE` for the archive URL and for ProteinGym's
+published ESM-2 numbers, which is the honest answer from a model working from memory.
+Both were checked here directly instead: the URL returned HTTP 206 with a 43,021,128-byte
+archive, and the two reference values were read from the repository's own copy of
+ProteinGym's table.
+
+## 12. What this cannot establish
+
+- **The two assays are not independent faculties of the protein.** Channel function is
+  measured downstream of surface expression: a variant that never reaches the membrane
+  cannot conduct, so the function assay carries the trafficking signal inside it. This
+  design therefore cannot separate "the model predicts gating" from "the model predicts
+  trafficking, which gating inherits". A difference in ρ between the two assays is
+  evidence about the two *measurements*, not about two separable capabilities. Any
+  reading of the result that treats function as a clean gating readout is wrong, and
+  the assay-to-assay correlation is reported so the dependence is visible.
 - Agreement between a sequence model and an assay is not a mechanism, and neither
   assay outcome is a claim about a whole organism.
 - The surface and function assays measure different things with different dynamic
