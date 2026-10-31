@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Live end-to-end of the site against a SCRATCH runtime (dedicated PostgreSQL instance in /tmp, loopback web service, deleted at the end).
 #   FRONTIER_REPO=<tree with frontier/web.py (+ frontier/engineering_api.py)> PYTHON=<python with z3 and playwright> \
-#   systemd-run --user --scope -p TasksMax=256 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=600 bash tests/test_site_live.sh
+#   systemd-run --user --scope -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=600 bash tests/test_site_live.sh
 set -euo pipefail
 test -n "${INVOCATION_ID:-}" || { echo 'run inside the bounded systemd scope' >&2; exit 2; }
 SITE="$(cd "$(dirname "$0")/../site" && pwd)"; REPO="${FRONTIER_REPO:?set FRONTIER_REPO}"; PY="${PYTHON:-python}"

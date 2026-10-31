@@ -140,7 +140,7 @@ def test_engineering_checks_never_fake_a_pass(browser, base):
 
 def test_mobile_has_no_horizontal_page_overflow(browser, base):
     pg = page(browser, 400, 860)
-    for route in ["frontier", "knowledge?tab=graph", "engineering", "evidence", "work", "belief"]:
+    for route in ["frontier", "knowledge?tab=graph", "engineering", "simulations", "evidence", "work", "work?tab=receipts", "belief"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_timeout(1200)
         assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth"), route
@@ -278,3 +278,18 @@ def test_frontier_labels_snapshot_versus_live_views(browser, base):
     pg.wait_for_selector("#livepanel h2")
     assert "snapshot" in pg.locator("#livepanel").inner_text().lower()
     assert "curated mission projection from the snapshot" in pg.locator("section.board").inner_text().lower()
+
+
+def test_coupling_manifest_verdicts_are_shown_with_their_scope(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector("#cp-h, h2:has-text('Couplings between the models')")
+    txt = pg.locator("#main").inner_text().lower()
+    M = snap.get("coupling_manifest")
+    if not M:
+        assert "no coupling manifest is present" in txt
+        return
+    assert "registered calibrations: none" in txt and "not biology" in txt
+    assert pg.locator("section[aria-labelledby=cp-h] tbody tr").count() >= len(M["couplings"])
+    assert str(M["counts"]["refused"]) + " refused" in txt

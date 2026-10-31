@@ -97,11 +97,32 @@ with sync_playwright() as p:
     n = int(lc.split(" of ")[1].split(" ")[0]); assert n >= 7, lc
     assert "live" in pg.locator("#lq-h").inner_text().lower()
     pg.fill("#livepanel input[name=lq]", "Fisher"); pg.locator("#livepanel button[type=submit]").click()
-    expect(pg.locator("#livepanel .count")).to_contain_text("of " + str(n), timeout=15000)
+    pg.wait_for_url("**lq=Fisher**", timeout=15000); expect(pg.locator("#livepanel .count")).not_to_have_text(lc, timeout=15000)
     assert int(pg.locator("#livepanel .count").inner_text().split(" ")[0]) < n
     pg.locator("#livepanel table a").first.click(); expect(pg.locator("#lqdetail h3")).to_be_visible(timeout=15000)
     assert "live lease holder" in pg.locator("#lqdetail").inner_text().lower() or True
     print("LIVE DETAIL:", pg.locator("#lqdetail").inner_text()[:140].replace("\n", " "))
+    # downloads: every STL/image/video the snapshot offers must be served by the real runtime with the declared bytes
+    import hashlib
+    snap = json.loads(open(__file__.replace("tests/site_live_driver.py", "site/data/snapshot.json")).read())
+    served = 0
+    for f in (snap.get("print_forms") or {}).get("forms", []):
+        for key in ("stl", "stand_stl", "image", "image_on_stand"):
+            ent = f["files"].get(key)
+            if ent:
+                r = pg.context.request.get(base + "/" + ent["href"]); assert r.status == 200, (ent["href"], r.status)
+                assert hashlib.sha256(r.body()).hexdigest() == ent["sha256"], ent["href"]; served += 1
+    for m in snap.get("simulation_manifests", []):
+        if m.get("video_state") == "present_verified":
+            r = pg.context.request.get(base + "/" + m["video_href"], headers={"Range": "bytes=0-1023"})
+            assert r.status in (200, 206) and "video" in r.headers.get("content-type", ""), (m["video_href"], r.status, r.headers.get("content-type"))
+            served += 1
+    print("DOWNLOADS served by the runtime with declared bytes / range:", served)
+    pg.goto(base + "/index.html#/simulations"); pg.wait_for_selector(".simcard")
+    nvid = pg.locator("video").count(); print("PLAYERS:", nvid)
+    if nvid:
+        ok = pg.evaluate("""async () => { const v = document.querySelector('video'); v.preload = 'metadata'; v.load(); await new Promise(r => { v.onloadedmetadata = r; v.onerror = r; setTimeout(r, 8000); }); return [v.readyState, v.videoWidth, v.error && v.error.code]; }""")
+        print("VIDEO METADATA:", ok)
     att = pg.context.request.get(base + "/api/attention"); print("ATTENTION", att.status, att.text()[:160].replace("\n", " ")); assert att.status in (200, 503)
     assert not errs, errs
     print("ALL LIVE CHECKS PASSED"); b.close()
