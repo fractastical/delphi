@@ -16,3 +16,10 @@ def test_training_refuses_failed_or_other_packet_gate(tmp_path, gate):
     path.write_text(json.dumps(gate))
     with pytest.raises(RuntimeError, match="failed or belongs"):
         require_gate(path)
+
+
+def test_training_refuses_other_backend_policy(tmp_path):
+    path = tmp_path / "gate.json"
+    path.write_text(json.dumps({"ok": True, "packet_sha256": PACKET_SHA, "backend_policy_sha256": "old"}))
+    with pytest.raises(RuntimeError, match="another numerical backend"):
+        require_gate(path, "new")
