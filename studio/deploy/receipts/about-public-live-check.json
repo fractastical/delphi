@@ -1,0 +1,316 @@
+{
+  "checked_at": "2026-10-31T22:45:44.207402+00:00",
+  "base": "https://frontier.morphoswarm.ai",
+  "read_only": true,
+  "checks": [
+    {
+      "name": "public health",
+      "passed": true
+    },
+    {
+      "name": "anonymous catalog",
+      "passed": true
+    },
+    {
+      "name": "anonymous public session",
+      "passed": true
+    },
+    {
+      "name": "anonymous contribution refused",
+      "passed": true
+    },
+    {
+      "name": "catalog returns JSON",
+      "passed": true
+    },
+    {
+      "name": "artifacts returns JSON",
+      "passed": true
+    },
+    {
+      "name": "attention returns JSON",
+      "passed": true
+    },
+    {
+      "name": "system returns JSON",
+      "passed": true
+    },
+    {
+      "name": "browser frontier uses live data",
+      "passed": true
+    },
+    {
+      "name": "browser engineering uses live data",
+      "passed": true
+    },
+    {
+      "name": "browser simulations uses live data",
+      "passed": true
+    },
+    {
+      "name": "browser system uses live data",
+      "passed": true
+    },
+    {
+      "name": "browser routes without JavaScript exceptions",
+      "passed": true
+    }
+  ],
+  "responses": {
+    "catalog": {
+      "response_sha256": "f4e7293aedfb4836eefd38b285608cbe1602d8588cded715fafda136fa00daa7"
+    },
+    "artifacts": {
+      "response_sha256": "3ecc372867b5c6b2282d1ec150886dd03a4f6d282e4792c469fb57c6bca278c0"
+    },
+    "attention": {
+      "response_sha256": "3b647fbffd02600527899a8ff217038ec08f8782cf9f3932526a0fb3a2d7faaf",
+      "inputs": {
+        "annotations": 0,
+        "events": 1845,
+        "note": "Typed unlock edges and bounded-action models live in annotation documents the store cannot hold; none are loaded here, so the view shows what the stored records alone support.",
+        "public_only": true,
+        "records": 1841
+      }
+    },
+    "system": {
+      "response_sha256": "b9d805339a049e8ca14974eb8f54c728eb75aee6dee0326daa5fd114f189942d",
+      "build": {
+        "archive_sha256": "5a0777b6d1f00d1136d8f2f6d4f4478eb31ce863ff5086e06509ef1eabf8ffa8",
+        "built_at": "2026-10-31T22:44:27Z",
+        "checks": [
+          {
+            "at": "2026-10-31T22:44:24.898131+00:00",
+            "command": ".venv/bin/python -m pytest tests/test_site_browser.py tests/test_model_viewer.py -q",
+            "exit": 0,
+            "name": "site browser and actual GLB viewer",
+            "passed": 65,
+            "result": "65 passed; site and build code byte-identical to release commit (git diff checked)",
+            "total": 65
+          },
+          {
+            "at": "2026-10-31T22:44:24.898131+00:00",
+            "command": "SITE_E2E_PUBLIC=1 bash tests/test_site_live.sh",
+            "exit": 0,
+            "name": "scratch public runtime integration",
+            "passed": null,
+            "result": "ALL LIVE CHECKS PASSED;37downloads,22documents,14players,solver,belief,live preview",
+            "total": null
+          },
+          {
+            "at": "2026-10-31T22:44:24.898131+00:00",
+            "command": "bash scripts/test_postgres.sh tests/test_web.py tests/test_media.py tests/test_worker_limits.py tests/test_mcp_demo.py tests/test_mcp_remote.py",
+            "exit": 0,
+            "name": "web, media and MCP regression",
+            "passed": 137,
+            "result": "137 passed; newer worker-budget implementation checked separately",
+            "total": 137
+          },
+          {
+            "at": "2026-10-31T22:44:24.898131+00:00",
+            "command": ".venv/bin/python -m pytest tests/test_worker_limits.py tests/test_engineering_api.py tests/test_beliefs_api.py tests/test_simulation_api.py -q",
+            "exit": 0,
+            "name": "shared numerical worker budget",
+            "passed": 66,
+            "result": "66 passed in5.80s",
+            "total": 66
+          },
+          {
+            "at": "2026-10-31T22:44:24.898131+00:00",
+            "command": ".venv/bin/python -m pytest tests/test_autoformalization.py -q",
+            "exit": 0,
+            "name": "autoformalization adapter",
+            "passed": 50,
+            "result": "50 passed,1 skipped; optional external check not run",
+            "total": 51
+          },
+          {
+            "at": "2026-10-31T22:44:24.898131+00:00",
+            "command": "Playwright direct route/menu/equation/document/viewport checks",
+            "exit": 0,
+            "name": "About interaction checks",
+            "passed": null,
+            "result": "Five routes at1440px and390px, six equation controls, documentation drawer and About menu passed; desktop/mobile screenshots inspected",
+            "total": null
+          },
+          {
+            "at": "2026-10-31T22:44:24.898131+00:00",
+            "command": ".venv/bin/python scripts/build_site.py --check",
+            "exit": 0,
+            "name": "snapshot current",
+            "passed": null,
+            "result": "stale=[]",
+            "total": null
+          },
+          {
+            "at": "2026-10-31T22:44:24.898131+00:00",
+            "command": ".venv/bin/python -m ruff check frontier/worker_limits.py frontier/web.py frontier/mcp_surfaces.py frontier/media.py frontier/engineering_api.py frontier/beliefs_api.py frontier/simulation_api.py frontier/formalize/service.py deploy/verify_mcp.py",
+            "exit": 0,
+            "name": "changed service lint",
+            "passed": null,
+            "result": "All checks passed",
+            "total": null
+          }
+        ],
+        "checks_all_passed": true,
+        "checks_receipt_sha256": "4003ef5fb9986038269a1426f947d3d2b3e8206320f58fbd1dfa95820884891c",
+        "compared_with": null,
+        "label": "author report: written when the release was cut (by deploy/release.py or by hand). Not verified here.",
+        "matches_checkout": null,
+        "matches_directory_claim": true,
+        "matches_note": "`matches_checkout` compares with the SHA this service measured through git; null means no git checkout, so nothing was measured. `matches_directory_claim` compares with the releases/<sha> directory NAME, which is only a claim.",
+        "mode": "worker_report",
+        "release_sha": "0f8eadcbdc5906f7c922b0f321a69a2c3215c80f",
+        "sha256": "6adfa4d6019acf6f37965add0f60c2453ec9fa6aa9d0db8e6836499458f85a8e",
+        "source": "build-info.json",
+        "status": "reported",
+        "tree_sha": "61d1e5e6b8d501469cd6e7fc5fdc3b31211b81f5"
+      },
+      "store": {
+        "counts_scope": "ALL public record versions in this database, across every namespace, including records imported from other nodes under their origin namespace. `namespace` is only this node's own; see `versions_by_namespace` for the split.",
+        "database": {
+          "server_version": "16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+          "size_bytes": 92019735,
+          "uptime_seconds": 14285.9
+        },
+        "events_by_type": [
+          {
+            "count": 1,
+            "event_type": "action_leased"
+          },
+          {
+            "count": 1,
+            "event_type": "action_ready"
+          },
+          {
+            "count": 1,
+            "event_type": "action_running"
+          },
+          {
+            "count": 1,
+            "event_type": "action_submitted"
+          },
+          {
+            "count": 1543,
+            "event_type": "record_imported"
+          },
+          {
+            "count": 298,
+            "event_type": "record_proposed"
+          }
+        ],
+        "mode": "measured",
+        "namespace": "delphi-frontier",
+        "note": "Public rows only; private records are not counted. Counts are record VERSIONS; `heads` counts the current version of each record.",
+        "public_only": true,
+        "records_by_kind_and_local_status": [
+          {
+            "heads": 39,
+            "kind": "Action",
+            "local_status": "imported_unreviewed",
+            "versions": 39
+          },
+          {
+            "heads": 1,
+            "kind": "Action",
+            "local_status": "proposed",
+            "versions": 1
+          },
+          {
+            "heads": 4,
+            "kind": "Annotation",
+            "local_status": "proposed",
+            "versions": 4
+          },
+          {
+            "heads": 1258,
+            "kind": "Claim",
+            "local_status": "imported_unreviewed",
+            "versions": 1258
+          },
+          {
+            "heads": 29,
+            "kind": "Claim",
+            "local_status": "proposed",
+            "versions": 29
+          },
+          {
+            "heads": 1845,
+            "kind": "Event",
+            "local_status": "proposed",
+            "versions": 1845
+          },
+          {
+            "heads": 216,
+            "kind": "Evidence",
+            "local_status": "imported_unreviewed",
+            "versions": 216
+          },
+          {
+            "heads": 1,
+            "kind": "Evidence",
+            "local_status": "proposed",
+            "versions": 1
+          },
+          {
+            "heads": 29,
+            "kind": "Problem",
+            "local_status": "imported_unreviewed",
+            "versions": 29
+          },
+          {
+            "heads": 260,
+            "kind": "Problem",
+            "local_status": "proposed",
+            "versions": 263
+          },
+          {
+            "heads": 1,
+            "kind": "Project",
+            "local_status": "imported_unreviewed",
+            "versions": 1
+          }
+        ],
+        "versions_by_namespace": [
+          {
+            "namespace": "delphi-frontier",
+            "versions": 2164
+          },
+          {
+            "namespace": "node-a",
+            "versions": 1522
+          }
+        ]
+      },
+      "services": {
+        "mode": "measured",
+        "source": "systemctl --user show (fixed command, our two units only)",
+        "units": [
+          {
+            "active_since": "Sat 2026-10-31 15:44:53 PDT",
+            "active_state": "active",
+            "load_state": "loaded",
+            "memory_current_bytes": 87834624,
+            "restarts": 0,
+            "state": "measured",
+            "sub_state": "running",
+            "tasks_current": 3,
+            "unit": "delphi-frontier-web.service"
+          },
+          {
+            "active_since": "Sat 2026-10-31 11:47:27 PDT",
+            "active_state": "active",
+            "load_state": "loaded",
+            "memory_current_bytes": 146731008,
+            "restarts": 0,
+            "state": "measured",
+            "sub_state": "running",
+            "tasks_current": 7,
+            "unit": "delphi-frontier-postgres.service"
+          }
+        ]
+      }
+    }
+  },
+  "scope": "HTTP access and rendering; no scientific acceptance or biological validation"
+}

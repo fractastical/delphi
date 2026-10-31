@@ -1,0 +1,78 @@
+{
+  "schema": "frontier.release.checks/1",
+  "sha": "0f8eadcbdc5906f7c922b0f321a69a2c3215c80f",
+  "checks": [
+    {
+      "name": "site browser and actual GLB viewer",
+      "command": ".venv/bin/python -m pytest tests/test_site_browser.py tests/test_model_viewer.py -q",
+      "exit": 0,
+      "at": "2026-10-31T22:44:24.898131+00:00",
+      "tested_commit": "87a6844e35f4283d01082c3fa07b23a3d5aeabc9",
+      "result": "65 passed; site and build code byte-identical to release commit (git diff checked)",
+      "passed": 65,
+      "total": 65
+    },
+    {
+      "name": "scratch public runtime integration",
+      "command": "SITE_E2E_PUBLIC=1 bash tests/test_site_live.sh",
+      "exit": 0,
+      "at": "2026-10-31T22:44:24.898131+00:00",
+      "tested_commit": "87a6844e35f4283d01082c3fa07b23a3d5aeabc9",
+      "result": "ALL LIVE CHECKS PASSED;37downloads,22documents,14players,solver,belief,live preview"
+    },
+    {
+      "name": "web, media and MCP regression",
+      "command": "bash scripts/test_postgres.sh tests/test_web.py tests/test_media.py tests/test_worker_limits.py tests/test_mcp_demo.py tests/test_mcp_remote.py",
+      "exit": 0,
+      "at": "2026-10-31T22:44:24.898131+00:00",
+      "tested_commit": "87a6844e35f4283d01082c3fa07b23a3d5aeabc9",
+      "result": "137 passed; newer worker-budget implementation checked separately",
+      "passed": 137,
+      "total": 137
+    },
+    {
+      "name": "shared numerical worker budget",
+      "command": ".venv/bin/python -m pytest tests/test_worker_limits.py tests/test_engineering_api.py tests/test_beliefs_api.py tests/test_simulation_api.py -q",
+      "exit": 0,
+      "at": "2026-10-31T22:44:24.898131+00:00",
+      "tested_commit": "f57c47c810394473db504f4a386737047c54f877",
+      "result": "66 passed in5.80s",
+      "passed": 66,
+      "total": 66
+    },
+    {
+      "name": "autoformalization adapter",
+      "command": ".venv/bin/python -m pytest tests/test_autoformalization.py -q",
+      "exit": 0,
+      "at": "2026-10-31T22:44:24.898131+00:00",
+      "tested_commit": "0f8eadcbdc5906f7c922b0f321a69a2c3215c80f",
+      "result": "50 passed,1 skipped; optional external check not run",
+      "passed": 50,
+      "total": 51
+    },
+    {
+      "name": "About interaction checks",
+      "command": "Playwright direct route/menu/equation/document/viewport checks",
+      "exit": 0,
+      "at": "2026-10-31T22:44:24.898131+00:00",
+      "tested_commit": "87a6844e35f4283d01082c3fa07b23a3d5aeabc9",
+      "result": "Five routes at1440px and390px, six equation controls, documentation drawer and About menu passed; desktop/mobile screenshots inspected"
+    },
+    {
+      "name": "snapshot current",
+      "command": ".venv/bin/python scripts/build_site.py --check",
+      "exit": 0,
+      "at": "2026-10-31T22:44:24.898131+00:00",
+      "tested_commit": "0f8eadcbdc5906f7c922b0f321a69a2c3215c80f",
+      "result": "stale=[]"
+    },
+    {
+      "name": "changed service lint",
+      "command": ".venv/bin/python -m ruff check frontier/worker_limits.py frontier/web.py frontier/mcp_surfaces.py frontier/media.py frontier/engineering_api.py frontier/beliefs_api.py frontier/simulation_api.py frontier/formalize/service.py deploy/verify_mcp.py",
+      "exit": 0,
+      "at": "2026-10-31T22:44:24.898131+00:00",
+      "tested_commit": "0f8eadcbdc5906f7c922b0f321a69a2c3215c80f",
+      "result": "All checks passed"
+    }
+  ]
+}
