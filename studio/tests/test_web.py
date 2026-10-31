@@ -193,6 +193,28 @@ def test_anonymous_simulation_preview_requires_csrf_and_rejects_untrusted_models
         w.close()
 
 
+def test_public_media_projection_matches_served_bytes_and_counts_remain_public(store, site):
+    from hashlib import sha256
+    data = b"a declared computed result\n"
+    (site / "artifacts").mkdir()
+    (site / "artifacts" / "result.txt").write_bytes(data)
+    store.submit(TOKENS["alice"], "count-public", claim(store))
+    private = store.submit(TOKENS["alice"], "count-private", claim(store, id="hidden-count", visibility="private"))["record"]
+    w = Web(store, site, public_read=True)
+    try:
+        status, result, _ = w.json("GET", "/api/media?sha256=" + sha256(data).hexdigest())
+        assert status == 200 and len(result["matches"]) == 1
+        match = result["matches"][0]
+        assert match["bytes_verified"] and w.req("GET", match["href"])[2] == data
+        assert w.req("GET", "/api/media?sha256=../secret")[0] == 400
+        status, result, _ = w.json("GET", "/api/counts")
+        assert status == 200 and result["scope"]["records_read"] == 1
+        assert private["version"] not in json.dumps(result)
+        assert result["cache_seconds"] == 30
+    finally:
+        w.close()
+
+
 def test_public_read_without_gate_opens_public_records_but_never_writes_or_private_data(store, site):
     from urllib.parse import urlencode
     public = store.submit(TOKENS["alice"], "public-read", claim(store))["record"]

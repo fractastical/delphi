@@ -34,7 +34,8 @@ from urllib.parse import parse_qs, unquote, urlsplit
 
 from .artifacts import ArtifactIndex
 from .discovery import Discovery, GeminiEmbedder
-from .graph import view as graph_view
+from .graph import catalogue_report, view as graph_view
+from .media import LocalMedia
 from .http import Application
 from .models import KINDS, MAX_BUNDLE_BYTES, Ref, canonical
 from .search import SEARCH_KIND, SearchIndex
@@ -223,7 +224,7 @@ def default_search(store):
     return SearchIndex(store).query, "search_index"
 
 
-RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts", "/api/attention", "/api/system", "/api/discovery", "/api/graph"}
+RESERVED_API = {"/api/health", "/api/session", "/api/catalog", "/api/record", "/api/events", "/api/artifacts", "/api/attention", "/api/system", "/api/discovery", "/api/graph", "/api/media", "/api/counts"}
 
 
 @dataclass
@@ -343,6 +344,8 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
     attention = AttentionSource(store, cfg)
     discovery_search = cfg.discovery_search or Discovery(store, GeminiEmbedder(timeout=8)).search
     discovery_slots = BoundedSemaphore(4)
+    media = LocalMedia(cfg.site_dir) if cfg.site_dir else None
+    counts_lock, counts_cache = Lock(), {}
     system = SystemStatus(store, **({"root": cfg.system_root} if cfg.system_root else {}), ttl=cfg.system_ttl, runner=cfg.system_runner)
 
     class Handler(BaseHTTPRequestHandler):
@@ -571,6 +574,21 @@ def make_handler(app: Application, store: Store, cfg: WebConfig, server_port: Ca
             if any(len(v) != 1 for v in q.values()):
                 raise FrontierError("Repeated parameters are not accepted")
             q = {k: v[0] for k, v in q.items()}
+            if path == "/api/media":
+                if set(q) != {"sha256"}:
+                    raise FrontierError("One SHA256 digest is required")
+                if media is None:
+                    raise _unavailable("media_unavailable", "The local media index")
+                return self.json(200, media.lookup(q["sha256"]))
+            if path == "/api/counts":
+                if q:
+                    raise FrontierError("This endpoint takes no parameters")
+                with counts_lock:
+                    if time.monotonic() - counts_cache.get("at", float("-inf")) > 30:
+                        counts_cache["value"] = {**catalogue_report(store), "read_at": datetime.now(timezone.utc).isoformat(), "cache_seconds": 30}
+                        counts_cache["at"] = time.monotonic()
+                    result = counts_cache["value"]
+                return self.json(200, result)
             if path == "/api/discovery":
                 if set(q) - {"q", "kind", "limit", "mode", "cache_only"} or q.get("cache_only", "0") not in {"0", "1"}:
                     raise FrontierError("Unknown discovery parameter or invalid cache_only flag")

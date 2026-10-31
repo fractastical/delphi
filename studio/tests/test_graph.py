@@ -96,11 +96,11 @@ def test_unknown_record_kind_is_handled_generically_without_duplicating_known_fi
         body = {"namespace": "n", "kind": kind, "id": id_, "issuer": "i", "source_uri": "u", "visibility": "public", "predecessor": None, "payload": payload}
         return {**body, "created_at": "t", "version": graph.digest(body)}
     c = mk("Claim", "c", {"title": "claim"})
-    proj = mk("Project", "p1", {"name": "A project", "members": [rec_ref(c)], "target": rec_ref(c)})       # a kind this module has never heard of
+    proj = mk("FutureRecord", "p1", {"name": "A future kind", "members": [rec_ref(c)], "target": rec_ref(c)})  # Project is now a known, validated kind
     out = graph.project({c["version"]: c, proj["version"]: proj}, {}, set(), {}, public_present={c["version"], proj["version"]}, budget=10)
     kinds = sorted((e["kind"], e["origin"]["field"]) for e in out["edges"])
     assert kinds == [("refers_to", "payload.members[0]"), ("targets", "payload.target")]                   # the known 'target' is not also emitted as refers_to
-    assert any(n["type"] == "Project" and n["title"] == "A project" for n in out["nodes"])
+    assert any(n["type"] == "FutureRecord" and n["title"] == "A future kind" for n in out["nodes"])
 
 
 def test_tentative_claim_id_edges_are_marked_and_never_called_exact(store):

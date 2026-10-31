@@ -1,8 +1,83 @@
 # Frontier MCP server
 
-Official `mcp` SDK 1.27.0, stdio transport. The root integrator has run the official-client interface controls; the initial smoke transcript below is the collab worker's earlier report. **Not yet tested with a live Claude Code or Codex MCP client.**
+Official `mcp` SDK 1.27.0, stdio and stateless Streamable HTTP transports. Remote
+support salvages the collab worker's unfinished implementation, with additional
+request-budget, actual-body-byte and authentication-context checks. The earlier
+stdio smoke transcript below remains attributed to its original worker. Product
+client configuration and a deployed remote connection require separate receipts.
 
-## Modes
+## Remote endpoint
+
+The prepared user service binds `127.0.0.1:8972`; an exact nginx `/mcp` location
+proxies HTTPS requests. Deployment files are in `deploy/mcp/`. They are prepared
+configuration; this branch does not install them, reload nginx or start services.
+
+```bash
+python -m frontier mcp --namespace NODE --schema public --transport http \
+  --mcp-port 8972 --public-host frontier.morphoswarm.ai --public-read --allow-write
+```
+
+`FRONTIER_DSN` is server-side database configuration. Remote mode ignores
+`FRONTIER_TOKEN`, even if inherited. `--public-read` permits anonymous reads of
+public records, capabilities, artifacts and payload schemas. Without that flag,
+every request needs a valid bearer. `--allow-write` registers the existing proposal,
+lease and lifecycle tools; it does not authorize anonymous callers or confer roles.
+
+Every remote write requires `Authorization: Bearer <the calling operator's own
+credential>`. The SDK bearer backend resolves `Store.principal`, and request-local
+authentication context supplies that exact bearer to Store methods. Those methods
+enforce identity, namespace, roles, quota, lease ownership and idempotency. Invalid
+supplied credentials return401 even in public mode; they never become anonymous.
+Public reads remain public-only even for an authenticated caller. No shared
+contributor credential, browser cookie authentication, OAuth server, self-service
+provisioning, review/import/execution tool or job runner is added.
+
+Transport uses stateless HTTP and JSON responses; no session id is issued. A
+session header cannot borrow another principal's identity. POST `/mcp` is served;
+GET and other methods return405, other paths404. Query strings are refused,
+including token queries. Requests are bounded to131072 actual body bytes,8 active
+requests including body/authentication work, and a60s asynchronous deadline.
+Store connections/statements retain their own5s limits. Blocking transaction
+threads are not abandoned at the deadline, so an in-flight transaction can finish
+before cancellation is observed; retries must use the original idempotency key.
+Host and Origin are allow-listed by the SDK. Logs record method, fixed route label
+and status, omitting query strings, credential headers and unmatched path contents.
+
+Official SDK client shape for anonymous reads:
+
+```python
+from mcp import ClientSession
+from mcp.client.streamable_http import streamable_http_client
+
+async with streamable_http_client("https://frontier.morphoswarm.ai/mcp") as (read, write, _):
+    async with ClientSession(read, write) as session:
+        await session.initialize()
+        result = await session.call_tool("frontier_capabilities", {})
+```
+
+For a provisioned contributor, supply the credential only as an Authorization
+header through the client/secret manager, never in a URL, tool argument, repository
+file or process argument. Header support in other clients must be checked with
+those clients. Capabilities derive `record_kinds` from current KINDS, and
+`frontier://schema/{kind}` derives schemas from current PAYLOADS; new kinds do not
+need a separate hard-coded remote vocabulary.
+
+Targeted verification command (isolated PostgreSQL, official SDK clients):
+
+```bash
+systemd-run --user --scope -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0 \
+  -p RuntimeMaxSec=600 env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
+  bash scripts/test_postgres.sh tests/test_mcp_remote.py tests/test_interfaces.py
+```
+
+The focused tests exercise public/private reads, two distinct interleaved writers,
+issuer spoofing, wrong roles, idempotent retries/conflicts, lease ownership,
+missing/malformed credentials, process-token rejection, session-header isolation,
+dynamic schemas, body/host/origin/path/method bounds, verifier concurrency,
+deadline handling and fixed-text storage failures. Actual run counts belong in
+the branch handoff; definitions alone are not a run.
+
+## Stdio modes
 
 | | Default (`python -m frontier mcp ...`) | Opt-in (`... --allow-write`) |
 |---|---|---|
@@ -105,7 +180,7 @@ registered, principal check removed) each fail a test.
 
 ## Coupling and open points for the Frontier owner
 
-* `frontier/mcp.py` calls the private `Store._auth` to resolve the configured principal for the manifest and the startup check. A public read-only `Store.principal(token)` would remove that; not added here (`store.py` is not mine).
+* The earlier stdio implementation called private `Store._auth`. Both transports now use the existing public `Store.principal(token)`; store behavior is unchanged.
 * Quota: every write counts against the principal's `daily_write_limit`; a retry with the same key does not consume more.
 * A review tool is a separate decision. If wanted, it should be a distinct flag, require a reviewer-only token, and still go through `Store.review` unchanged.
 * `site/` and `specs/` still describe the MCP server as read-only; SPEC text is not updated here.

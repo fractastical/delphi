@@ -24,6 +24,21 @@ constraint problem, inspect a candidate, simulate its behavior, challenge the
 result, and see the next measurement or computation it needs. Export a candidate
 geometry for physical examination without calling it a flight-tested design.
 
+Organism design is also an active test of the knowledge substrate: attempting
+the entire sequence from development and growth to adult function exposes
+missing mechanisms, incompatible contexts and unresolved interventions. The
+holistic fish is a graph of equations, parameters, geometry, evidence and
+executable model interfaces. Selecting any designed element must reveal its
+equation stack and the uncertainty carried across its connections. New evidence
+changes both the design and the frontier of work needed to improve it.
+
+SPEC-008 adds regional design assurance, numerical-versus-empirical accuracy,
+candidate ensembles, an interface uncertainty matrix and adaptive next actions.
+The full-cycle vision includes scale formation, fin growth, nutrient transport,
+material mechanics, maintenance and locomotion. Living bioprinting introduces
+viability and maturation requirements; the current printable meshes are props,
+not evidence that a living organism can be manufactured.
+
 The cavefish assembly reproduction is a separate worked result demonstrating a
 loop on public data. Its recorded result is a reproduction, not a new discovery;
 its post-hoc biological interpretation remains separately labeled. The stopped
@@ -48,18 +63,28 @@ about a proposed action.
 - [x] Assign separate worktrees to existing harnesses and record ownership.
 - [x] Commit an executable design/constraint/evidence contract (SPEC-005).
 - [ ] Deliver the multiscale website with working exploration and source views.
-- [ ] Exercise a persistent node and an agent MCP contribution round trip.
+- [x] Exercise a persistent node and an agent MCP contribution round trip.
 - [x] Run solver controls and a scoped Lean check with a failing mutant.
 - [x] Run a bounded simulation, numerical controls and uncertainty analysis.
 - [x] Produce an inspectable candidate geometry and downloadable print artifact.
 - [x] Connect evidence adapters, source indexes and nanopublication draft export.
-- [ ] Measure actual claim reuse and coordination; retain null results.
+- [x] Measure actual claim reuse and coordination; retain null results.
 - [ ] Verify and deploy the integrated demo with source and artifact receipts.
 - [ ] Leave a 24-hour resource queue, owners, stop rules and remaining blockers.
 - [ ] Deliver the human-readable studio, project/annotation model, actual vector
   discovery and interactive knowledge/asset graph specified in SPEC-007.
 - [ ] Complete a separate Playwright critique of every route and major interaction,
   and recheck critical findings on the deployed site.
+- [ ] Display equations and parameters for every implemented fish subsystem,
+  with explicit unsupported connections across scales (SPEC-008).
+- [ ] Display regional assurance and interface uncertainty from actual checks;
+  compare multiple candidates and direct the next evidence-producing action.
+- [ ] Model a sourced developmental/lifecycle slice, scale formation and fin
+  mechanics; record living-bioprint requirements and unresolved feasibility.
+
+Current owners, evidence and blockers are tracked in `tasks/BUILD.md`. A checked
+implementation is distinct from deployment, and either is distinct from biological
+validation. The active goal remains unfinished while these acceptance items remain.
 
 OpenResearch must connect actual runs to evidence and artifact hashes. Printed
 fish are a physical view of engineering candidates: constraints and simulations
