@@ -1,6 +1,6 @@
 # Frontier runtime: dedicated PostgreSQL instance, website/API adapter, nginx
 
-Single-reader (collab), not Codex-reviewed. **Prepared, not installed or started.** Root owns install, start and routing. This document does not switch the apex
+Single-reader (collab), not Codex-reviewed. Root owns install, start and routing. (Updated for root's `085b49c`: search index default, attention, belief adapter, video artifacts, venv unit path.) This document does not switch the apex
 `morphoswarm.ai`, does not touch `studio.morphoswarm.ai`, and changes no nginx global setting.
 
 ## What exists
@@ -31,17 +31,19 @@ All responses carry `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-refe
 | `GET /api/health` | none | `{"status","service","mode":"live"}`, 503 if the database is unreachable; nothing else |
 | `POST /api/session` `{"token"}`; `GET`; `DELETE` | token compared in constant time; 10 failures/60 s per client then 429 | cookie `__Host-frontier_session` (`frontier_session` with `--insecure-cookies`), `HttpOnly; SameSite=Strict; Path=/; Secure; Max-Age=8h`; server-side session; `DELETE` needs Origin + `X-CSRF-Token` |
 | `GET/POST /login` | none | plain HTML form, no script; `?token=` sign-in links are deliberately **not** supported (URL secrets leak into history and Referer) |
-| `GET /api/catalog?query&kind&status&limit<=50&after` | session | full record envelopes, `local_status` kept separate, `next_cursor`, `namespace`, `mode: live`, `search_mode` (what actually ran; `store_lexical` until a search index is wired through `WebConfig.catalog_search`). Events are records and are listed unless you filter by `kind`. |
+| `GET /api/catalog?query&kind&status&limit<=50&after` | session | full record envelopes, `local_status` kept separate, `next_cursor`, `namespace`, `mode: live`, `search_mode`: **`search_index`** by default (`SearchIndex(store).query`; the index's own explanation is in each row's `match`, apart from the record), `store_lexical` only with `--legacy-catalog`. `after` accepts the index's `next_cursor` or a bare 64-hex version for an empty query. Events are records and are listed unless you filter by `kind`. |
+| `GET /api/attention` (no parameters) | session | `{mode, namespace, generated_at, inputs{records, events, annotations: 0, public_only}, view}` where `view = attention.view.build_view(records, events, [], now)` built from PUBLIC stored records and events only, reused for 5 s; **422 `view_too_large`** (never a partial view) above 2000 records / 5000 events; **503 `attention_unavailable`** if the module is absent. Module name is configuration from an allow-list (`--attention-module`, default `attention.view`; also `frontier_attention.view`, `frontier.attention.view`, `frontier.attention`). No annotation documents are loaded (the store cannot hold them), so unlock edges are absent from this view. |
 | `GET /api/record?namespace&kind&id&version` | session | pinned Ref only; 404 for private or absent |
 | `GET /api/events?after&limit<=50` | session | |
 | `GET /api/artifacts?q\|query&role&evidence_kind&limit<=50&after` | session | root's `ArtifactIndex`; declarations only, `artifact_bytes_verified: false`; no URL is ever fetched |
 | `POST /api/engineering/solve` (<= 1024 B JSON object) | session + Origin + CSRF | late import of `frontier.engineering_api.solve_design(data)`; its answer and its `FrontierError`s (invalid, busy) pass through; **503 `engineering_unavailable`** if the module is absent, with nothing computed |
+| `POST /api/beliefs/solve` (<= 32 KB JSON object) | session + Origin + CSRF | late import of `frontier.beliefs_api.solve_scenario(data)` (director's adapter: validation, isolated 8 s child, two slots). Its envelope (`schema frontier.beliefs.api/1`, `status`, `calibrated: false`, `assumed_scope`, `result`) is passed through verbatim, **including its error bodies** (400 `invalid_request`, 413, 429 `solver_busy`, 503), which are served as the adapter built them. **503 `beliefs_unavailable`** if the module is absent. This adapter never runs the solver in a web thread. |
 | `POST /v1/*` | reads: session or bearer; **writes: operator `Authorization: Bearer` + `Idempotency-Key` only** | a browser session never authorises a write; same `Application` as the loopback protocol adapter (`frontier/http.py`, unchanged) |
 | anything else `GET/HEAD` | session (or `--public-site` for the static shell only) | static files from `site/`, see below |
 
 Extension point: `WebConfig(routes={"POST /api/<name>": Route(handler, max_body=1024, max_concurrent=2)})`; gated like the solver (session, Origin, CSRF for POST); a custom route cannot shadow a built-in. Handlers return `(status, object)` and may raise `FrontierError`; any other exception becomes a generic 500 and is never echoed.
 
-Static files: only inside `site/`, extension allow-list, no dotfiles, no symlink escapes, no directory listings, <= 8 MB; names containing secret/token/credential/password/private/.pem/.key/.env are never served. Under **`site/artifacts/` only**, also `.stl` (`model/stl`, downloaded), `.obj` (`model/obj`, downloaded), `.glb` (`model/gltf-binary`, downloaded), `.csv`, `.lean` (`text/plain`), `.trig` (`application/trig`), <= 16 MB; the same names elsewhere in `site/` are 404.
+Static files: only inside `site/`, extension allow-list, no dotfiles, no symlink escapes, no directory listings, <= 8 MB; names containing secret/token/credential/password/private/.pem/.key/.env are never served. Under **`site/artifacts/` only**, also `.stl` (`model/stl`, downloaded), `.obj` (`model/obj`, downloaded), `.glb` (`model/gltf-binary`, downloaded), `.csv`, `.lean` (`text/plain`), `.trig` (`application/trig`), <= 16 MB, and `.mp4` (`video/mp4`) / `.webm` (`video/webm`), <= 64 MB, streamed from disk in 64 KB chunks with single-range support (`Accept-Ranges: bytes`, `206`/`416`; Safari needs this) and never read whole into memory; the same names elsewhere in `site/` are 404, and no endpoint takes a path.
 
 Logs: `METHOD PATH STATUS` only. Never the query string, a header, a cookie or a body. nginx uses the existing `morphoswarm_redacted` format (`$uri`, never the query string).
 
@@ -65,7 +67,7 @@ export FRONTIER_DSN="host=/data/services/delphi-frontier/run port=5471 dbname=fr
 python -m frontier.admin bootstrap --namespace delphi-frontier --schema public
 python -m frontier.admin provision --namespace delphi-frontier --actor <writer> --operator <op-a> --roles contributor,coordinator --credential-file /data/services/delphi-frontier/credentials/<writer>.cred
 python -m frontier.admin provision --namespace delphi-frontier --actor <reviewer> --operator <op-b> --roles reviewer --credential-file /data/services/delphi-frontier/credentials/<reviewer>.cred
-# 3. web
+# 3. web (the unit's ExecStart is root's venv: /data/services/delphi-frontier/venv/bin/python; no new venv is created by this branch)
 cp deploy/systemd/delphi-frontier-web.service ~/.config/systemd/user/ && systemctl --user daemon-reload && systemctl --user enable --now delphi-frontier-web
 curl -sS http://127.0.0.1:8971/api/health
 # 4. nginx (root)
@@ -87,6 +89,7 @@ The namespace (`delphi-frontier` in the unit) is fixed by the first `bootstrap`;
 
 * Nothing installed, started or reloaded; the real instance has no role or database yet.
 * The studio gate was not read or changed. Whether the studio's `MORPHOSWARM_STUDIO_TOKEN` is the right audience token is root's call; a dedicated `FRONTIER_ACCESS_TOKEN` is supported and preferred for a smaller blast radius.
-* `engineering_api.py` and `SearchIndex` are root's; the adapter only wires them (late import; `WebConfig.catalog_search`).
+* `engineering_api.py`, `beliefs_api.py`, `SearchIndex` and the market `attention` package are not mine; the adapter only wires them (late imports; `WebConfig.catalog_search`). Root's venv python is a symlink into `/home/ubuntu/miniconda3/bin`, so the service still depends on that conda interpreter even though its packages are in the venv.
+* Measured 2026-10-31, in-process, inside `frontier.beliefs`'s own caps: seeded random scenarios of 13.9 KB and 28 KB took 24 s and 232 s. That is why a web thread must never call `solve` directly. `beliefs_api` bounds it with its isolated 8 s child; this is a fact about the module, not a defect in the adapter.
 * No TLS test against the real certificate (root-only files), no load test, no browser test; sessions are in memory (a restart signs everyone out); the sign-in throttle is per client address and in memory.
 * systemd sandboxing beyond `NoNewPrivileges` (`ProtectSystem`, `PrivateTmp`) is not enabled because it needs user namespaces in a user manager; candidate hardening once root confirms the host supports it.
