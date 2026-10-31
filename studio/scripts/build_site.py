@@ -478,6 +478,39 @@ def formalize_examples(ins: Inputs) -> dict | None:
     return {"examples": ex, "schema": "frontier.formalize.request/1", "limits": {"max_bytes": 16384}}
 
 
+def print_v3_block(ins: Inputs, out: dict) -> dict | None:
+    """The v3 display props (STL prop, scale-relief variant, stand, preview images) copied only when each file's sha256 equals the declared digest."""
+    d = "artifacts/print-v3"
+    if not (ROOT / d / "downloads.json").exists():
+        return None
+    D = json.loads(ins.read(f"{d}/downloads.json")); forms = []; refused = []
+    for f in D["forms"]:
+        files = []
+        for x in f["files"]:
+            if x["kind"] in ("glb_prop", "design_json"):
+                continue                                           # the GLB prop and design JSON stay in the artifact tree; downloads here are STL and preview images
+            b = ins.read(f"{d}/{x['path']}") if (ROOT / d / x["path"]).exists() else None
+            if b is None or digest_bytes(b) != x["sha256"] or len(b) != x["bytes"]:
+                refused.append(x["path"]); continue
+            out[f"@artifacts/print-v3/{x['path']}"] = b
+            files.append({"kind": x["kind"], "href": f"artifacts/print-v3/{x['path']}", "bytes": x["bytes"], "sha256": x["sha256"], "units": x.get("units")})
+        forms.append({"id": f["id"], "title": f.get("title") or f["id"], "short": f.get("short"), "display_scale": f["display_scale"], "prop_size_mm": f.get("prop_size_mm"), "source_candidate": f.get("source_candidate"), "source_candidate_sha256": f.get("source_candidate_sha256"), "files": files})
+    return {"forms": forms, "limitations": D["limitations"], "printer_resin": D["printer_resin"], "refused": refused}
+
+
+def recovery_inputs(ins: Inputs, out: dict) -> dict | None:
+    """The fixed public copy of the failed primary DDPM run's checkpoint inputs: published only if the archive's size and sha256 equal the sidecar's, never described as an evaluation."""
+    d = "artifacts/rd-diffusion"; sc = f"{d}/primary-runtime-inputs.json"; ar = f"{d}/primary-runtime-inputs.tar.xz"
+    if not ((ROOT / sc).exists() and (ROOT / ar).exists()):
+        return None
+    m = json.loads(ins.read(sc)); b = ins.read(ar)
+    ok = len(b) == m["bytes"] and digest_bytes(b) == m["archive_sha256"]
+    if ok:
+        out["@artifacts/rd-diffusion/primary-runtime-inputs.tar.xz"] = b; out["@artifacts/rd-diffusion/primary-runtime-inputs.json"] = ins.read(sc)
+    return {"published": ok, "href": "artifacts/rd-diffusion/primary-runtime-inputs.tar.xz" if ok else None, "bytes": m["bytes"], "sha256": m["archive_sha256"], "status": m["status"], "training_steps": m["training_steps"], "checkpoint_sha256": m["checkpoint_sha256"],
+            "primary_full_run_status": m["primary_full_run_status"], "original_primary_job_id": m["original_primary_job_id"], "next_admission": m["next_admission"], "members": m["files"], "sidecar": sc}
+
+
 def lifecycle_block(ins: Inputs) -> dict | None:
     """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
     d = "data/fish-lifecycle"
@@ -644,6 +677,18 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
                 "parameter_unknowns": ["Fins are " + r["caption"].splitlines()[2 - 1].split("Fins are ")[1].split(": fin flow")[0] + ". Fin flow is not resolved.", "A flying fish glides at Reynolds numbers orders of magnitude above this."],
                 "open_questions": ["Can the C1 reference be brought into its band? Until then no case here supports a quantitative force claim."],
                 "limitations": r["caption"].splitlines()[2:] + ["Low-Re numerical demo: not swimming-, taxiing- or flight-validated."], "couplings": [], "manifest": f"{rd}/render.json", "native": True})
+    d = "artifacts/multicell/full"
+    if (ROOT / d / "full_horizon_chart.mp4").exists() and (ROOT / d / "full_summary.json").exists():
+        fh = json.loads(ins.read(f"{d}/full_summary.json"))
+        st, href = _vid(ins, out, "morpheus-full-horizon-chart", d, "full_horizon_chart.mp4", None, allow_unpinned=True)
+        cards.append({"id": "morpheus-full-horizon-chart", "title": "Morpheus full-horizon logger chart (t to 2.0): a chart of logged counts, not a spatial tissue movie", "scales": ["tissue", "cellular"], "evidence_kind": "chart rendered from the run's logged data (not a spatial simulation render)",
+            "model": {"name": "Morpheus v2.3.9 official multiscale example, three full-horizon arms", "context": "The chart plots, as t advances to 2.0, the logged cell count (log scale), mean CDK1 per cell and mean g_l per cell for the three arms, from the returned logger file only. It draws no cell shapes or fields: the full-horizon runs saved no spatial frames. The earlier spatial movies cover t up to 0.46 only."},
+            "time": {"units": "model time units (example model)", "note": "100 frames at 12 fps; each frame advances t. Generic example, not calibrated."},
+            "video": {"file": "full_horizon_chart.mp4", "sha256": None, "note": "No digest is declared for this chart video; the build copied the file without a check against a declaration."}, "video_state": st, "video_href": href, "poster_href": None,
+            "numerical_checks": [{"name": f"arm {a}", "result": f"reached t = {v['reached_t']}; {v['final_cells']} cells at the end; {v['n_division_event_times']} division events; max cdk1 {v['max_cdk1']:.3f}; max g_l {v['max_g_l']:.3f}"} for a, v in fh.items()],
+            "parameter_unknowns": ["Not calibrated to any organism or tissue; units are the example's own.", "'Cells' are model cells, not a growth measurement."],
+            "open_questions": ["Why the feedback-on CDK1 oscillation damps after about t = 1.5 as the count levels off near 256 was not investigated."],
+            "limitations": ["A chart of logged values, not a spatial movie: the remote run saved no spatial frames.", "Generic example, not fish growth; one seed repeat only."], "couplings": [], "manifest": f"{d}/full_summary.json", "native": True})
     d = "artifacts/behavior"
     if (ROOT / d / "manifest.json").exists() and (ROOT / d / "controls.json").exists():
         m = json.loads(ins.read(f"{d}/manifest.json")); ct = json.loads(ins.read(f"{d}/controls.json")); fl = m["files"]
@@ -953,11 +998,18 @@ def build() -> dict[str, bytes]:
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     design_review = ins.json("site/content/design-review.json")
+    pr_path = "imports/2026-10-31-curated-v2/project-receipt.json"
+    if (ROOT / pr_path).exists():
+        pr = json.loads(ins.read(pr_path))
+        design_review["history"] = [{"ref": pr["predecessor_ref"], "label": "Earlier version of this Project", "note": f"The current version ({pr['project_ref']['version'][:12]}…) has {pr['members']} declared members, {pr['preserved_members']} preserved from this one. {pr['old_version_annotations']} challenges stay anchored here on their original exact version; they were not moved. {pr['scope']}"}]
+        design_review["current_project"] = {"ref": pr["project_ref"], "members": pr["members"], "preserved_members": pr["preserved_members"], "receipt": pr_path, "receipt_sha256": ins.seen[pr_path]["sha256"], "local_status": pr["local_status"]}
     lifecycle = lifecycle_block(ins)
     home_biology_block = home_biology(ins)
     timeline = build_timeline(ins)
     fish3d_viewer = fish3d_files(ins, extra)
     formalize_ex = formalize_examples(ins)
+    print_v3 = print_v3_block(ins, extra)
+    recovery_in = recovery_inputs(ins, extra)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -990,6 +1042,8 @@ def build() -> dict[str, bytes]:
         "timeline": timeline,
         "fish3d_viewer": fish3d_viewer,
         "formalize": formalize_ex,
+        "print_v3": print_v3,
+        "recovery_inputs": recovery_in,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
@@ -1002,7 +1056,7 @@ def build() -> dict[str, bytes]:
 
 
 def write(out: dict[str, bytes]) -> None:
-    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results", SITE / "artifacts" / "fish3d", SITE / "artifacts" / "molecular"):
+    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results", SITE / "artifacts" / "fish3d", SITE / "artifacts" / "molecular", SITE / "artifacts" / "print-v3", SITE / "artifacts" / "rd-diffusion"):
         if d.exists():
             shutil.rmtree(d)
     for name, b in out.items():
@@ -1015,7 +1069,7 @@ def check(out: dict[str, bytes]) -> list[str]:
     at = lambda n: SITE / n[1:] if n.startswith("@") else DATA / n
     stale = [n for n, b in out.items() if not at(n).exists() or at(n).read_bytes() != b]
     extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
-    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results", "fish3d", "molecular") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
+    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results", "fish3d", "molecular", "print-v3", "rd-diffusion") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
     return stale + [f"unexpected {e}" for e in extra if e not in out] + [f"unexpected {e}" for e in pr if e not in out]
 
 

@@ -96,6 +96,16 @@
         };
         foot.addEventListener("click", async (e) => { if (e.target.closest("[data-drmore]")) { try { await read(); } catch (x) { foot.insertAdjacentHTML("beforeend", `<p class="empty" role="alert">Could not load more: ${esc(x.message)}</p>`); } } });
         await read();
+        // Challenges written against an earlier exact version stay on that version; show them, labelled, and never move them to the current one.
+        for (const h of (R.history || [])) {
+          const sec = document.createElement("section"); sec.className = "drprev"; sec.setAttribute("aria-label", "Challenges on an earlier Project version"); out.appendChild(sec);
+          try {
+            const r = await DF.api.designContext(h.ref, { limit: 50 }); const rts = [], rps = new Map();
+            for (const it of r.annotations || []) { const pl = (it.record || {}).payload || {}; if (!it.ref) continue; if (pl.reply_to) { const k = key(pl.reply_to); rps.set(k, [...(rps.get(k) || []), it]); } else if (pl.kind === "challenge") rts.push(it); }
+            sec.innerHTML = `<h3>${esc(h.label)}: <code>${esc(h.ref.version.slice(0, 12))}…</code></h3><p class="small">${esc(h.note)} ${U.pill(rts.length + " challenge" + (rts.length === 1 ? "" : "s") + ", none resolved", "warn").toString()}${(r.pagination || {}).next_cursor ? " (more pages exist)" : ""}</p>` + rts.map((x) => thread(x, rps.get(key(x.ref)) || [])).join("");
+            DF.renderMath(sec);
+          } catch (e) { sec.innerHTML = `<p class="empty">Could not read the earlier version (${esc(e.message)}). Nothing is shown in its place.</p>`; }
+        }
       } catch (e) { host.innerHTML = `<p class="empty">Design context is not available from this node (${esc(e.message)}). Nothing is shown in its place.</p>`; host.removeAttribute("role"); }
     })();
   };
