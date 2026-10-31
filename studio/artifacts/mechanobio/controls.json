@@ -1,0 +1,70 @@
+{
+  "evidence_kind": "computational_check",
+  "replicates": 12,
+  "analytic_elastic_no_rupture": {
+    "max_error_pN": 1.0373923942097463e-12,
+    "tolerance_pN": 1e-09,
+    "equation": "F=Nm*Fm*(1-exp(-vu*k_series*t/(Nm*Fm)))",
+    "passed": true
+  },
+  "independent_viscoelastic_integration": {
+    "max_error_pN": 2.7421265258453786e-10,
+    "tolerance_pN": 1e-07,
+    "reference": "solve_ivp direct paper Eq2 in [actin,substrate] coordinates",
+    "passed": true
+  },
+  "zero_binding": {
+    "max_force_pN": 0.0,
+    "passed": true
+  },
+  "zero_motor_velocity": {
+    "max_force_pN": 0.0,
+    "passed": true
+  },
+  "force_balance": {
+    "max_residual_pN": 5.329070518200751e-15,
+    "passed": true
+  },
+  "bell_law_mutant": {
+    "mutation": "replace exp(force/Fb) with 1",
+    "same_seed": 19,
+    "parameters": {
+      "long_term_stiffness_pN_nm": 1.0,
+      "clutches": 5,
+      "rupture_force_pN": 1.0,
+      "others": "Parameters defaults"
+    },
+    "baseline_mean_pN": 1.8493414899562504,
+    "mutant_mean_pN": 35.56806550304945,
+    "absolute_change_pN": 33.7187240130932,
+    "detection_threshold_pN": 1.0,
+    "detected": true
+  },
+  "timestep_screen": {
+    "statistics": {
+      "0.02": {
+        "mean_pN": 31.22741370434326,
+        "sd_pN": 0.08727125443245491,
+        "se_pN": 0.025193041119547083,
+        "n": 12
+      },
+      "0.01": {
+        "mean_pN": 31.18249808361527,
+        "sd_pN": 0.13668660021625367,
+        "se_pN": 0.03945802271473441,
+        "n": 12
+      },
+      "0.005": {
+        "mean_pN": 31.137525032742644,
+        "sd_pN": 0.19731246187312973,
+        "se_pN": 0.056959201488459614,
+        "n": 12
+      }
+    },
+    "coarse_fine_difference_pN": 0.04497305087262404,
+    "declared_tolerance_pN": 3.3216264451641395,
+    "passed": true,
+    "scope": "ensemble mean traction for default parameters over 10 s; not uniform convergence of all settings"
+  },
+  "passed": true
+}
