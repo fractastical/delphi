@@ -1,0 +1,48 @@
+{
+  "source_id": "ncbi-taxonomy",
+  "label": "NCBI Taxonomy (Entrez Taxonomy via E-utilities and NCBI Datasets taxonomy endpoints)",
+  "homepage": "https://www.ncbi.nlm.nih.gov/taxonomy",
+  "data_paper_or_docs": [
+    "https://doi.org/10.1093/database/baaa062",
+    "https://doi.org/10.1093/nar/gkr1178",
+    "https://doi.org/10.1093/nar/gkae979",
+    "https://www.ncbi.nlm.nih.gov/books/NBK53758/",
+    "https://www.ncbi.nlm.nih.gov/books/NBK25501/",
+    "https://www.ncbi.nlm.nih.gov/books/NBK25497/",
+    "https://www.ncbi.nlm.nih.gov/datasets/docs/v2/reference-docs/data-reports/taxonomy/",
+    "https://www.ncbi.nlm.nih.gov/datasets/taxonomy/tree/",
+    "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/",
+    "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/taxdump_readme.txt",
+    "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/new_taxdump/",
+    "https://www.ncbi.nlm.nih.gov/home/about/policies/"
+  ],
+  "data_papers": [
+    {
+      "doi": "10.1093/database/baaa062",
+      "citation": "Schoch CL, Ciufo S, Domrachev M, et al. (2020) NCBI Taxonomy: a comprehensive update on curation, resources and tools. Database 2020:baaa062."
+    },
+    {
+      "doi": "10.1093/nar/gkr1178",
+      "citation": "Federhen S (2012) The NCBI Taxonomy database. Nucleic Acids Res 40(D1):D136-D143."
+    },
+    {
+      "doi": "10.1093/nar/gkae979",
+      "citation": "Sayers EW, Beck J, Bolton EE, et al. (2025) Database resources of the National Center for Biotechnology Information in 2025. Nucleic Acids Res 53(D1):D20-D29."
+    }
+  ],
+  "governance": "Curated by the NCBI Taxonomy group (National Library of Medicine, US NIH). Names and ranks are maintained by professional curators from primary taxonomic literature and from nomenclatural authorities (ICZN, ICN, ICTV, LPSN, WoRMS, Catalogue of Life etc.); every organism with sequence in INSDC must have a taxid, so coverage is driven by what has been sequenced, not by a complete species list. Taxids are stable integers; when nodes are merged the old taxid is kept in merged.dmp and resolves to the new node; deleted taxids are listed in delnodes.dmp. Data are US Government works in the public domain.",
+  "versioning": "Live database updated continuously; the full dump (taxdump.tar.gz, new_taxdump) is regenerated daily and monthly archives are kept under pub/taxonomy/taxdump_archive/ (e.g. taxdmp_2026-10-01.zip), so any lookup can be reproduced against a dated dump. E-utilities (esearch/esummary db=taxonomy) and the Datasets v2 taxonomy endpoints query the live tree; a record of lookups is only reproducible as of its retrieval date. Scientific names can change (e.g. Crustacea 6657 was merged into Pancrustacea 197562) and some widely used higher taxa are not nodes at all (Reptilia has no NCBI node of its own; an unfielded esearch for 'Reptilia' matched three unrelated uids through the All Names index on 2026-10-31), which the records in this batch note.",
+  "scores": {
+    "source-authority": 1.0,
+    "independence": 0.85,
+    "authenticity": 1.0
+  },
+  "known_issues": [
+    "Not a complete taxonomy: taxa with no sequence data (most extinct genera, many Darwin-era names) have no taxid; absence of a node is not evidence the taxon is invalid.",
+    "Paraphyletic or informal groups used by Darwin and Thompson (Reptilia, Pisces, Crustacea as a class, Vermes) are either absent or mapped to a different circumscription.",
+    "esearch by bare name without the [Scientific Name] field can hit synonyms, common names or homonyms across kingdoms (e.g. Proteus, Hydra, Mya) and return more than one uid; records that recorded an unfielded term are more fragile than those that used the [Scientific Name] qualifier.",
+    "E-utilities are rate-limited to 3 requests/s without an API key and return HTTP 429 above that.",
+    "The NCBI Taxonomy classification lags and sometimes differs from GBIF backbone and WoRMS, so cross-database identifiers for the same taxon record can disagree in rank or circumscription."
+  ],
+  "rationale": "Source authority is 1.0: a governed international infrastructure with peer-reviewed data papers (Schoch et al. 2020; Federhen 2012; annual NAR database issue), stable identifiers, documented curation, and dated dumps that make any lookup reproducible. Independence is 0.85: NCBI Taxonomy is a curated compilation that deliberately ingests other nomenclatural databases (WoRMS, Catalogue of Life, LPSN, ICTV) and so is not fully independent of the other taxonomic sources used in this repository (GBIF backbone, WoRMS), though it is entirely independent of this project's models and claims. Authenticity is 1.0: taxids, names, ranks and lineages are real curated records; nothing is synthetic. All URLs and DOIs listed were resolved on 2026-10-31 (HTTP 200; DOIs confirmed against Crossref metadata; the taxonomy homepage redirects 301 to https://www.ncbi.nlm.nih.gov/datasets/taxonomy/)."
+}
