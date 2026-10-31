@@ -121,11 +121,11 @@ def test_artifacts_are_typed_digest_only_and_the_sbml_is_not_redistributed(full)
     assert {a["role"] for a in arts} >= {"input", "output", "log", "code", "environment"}
     assert all(a["availability"] == "referenced" and a["license"] is None for a in arts)
     sbml_in = [a for a in arts if a["role"] == "input"]
-    assert len(sbml_in) == 1 and sbml_in[0]["sha256"] == fm.MODEL_SHA256 and sbml_in[0]["uri"].startswith("https://www.biomodels.org/")
+    assert len(sbml_in) == 1 and sbml_in[0]["sha256"] == fm.MODEL_SHA256 and sbml_in[0]["uri"] == "https://www.biomodels.org/BIOMD0000001047"
     manifest = json.loads((Path(fm.PACKAGE) / "orx" / "artifact-manifest.json").read_text())
     assert manifest["bytes_included"] is False and manifest["hosting"]["hosted"] is False
     assert {a["sha256"] for a in arts} == {a["sha256"] for a in manifest["artifacts"]}
-    stray = [p for p in Path(fm.PACKAGE).rglob("*") if p.is_file() and p.suffix != ".py" and b"<sbml" in p.read_bytes()[:20000]]
+    stray = [p for p in Path(fm.PACKAGE).rglob("*") if p.is_file() and p.suffix not in (".py", ".pyc") and "__pycache__" not in p.parts and b"<sbml" in p.read_bytes()[:20000]]
     assert not stray, f"raw SBML must not be committed: {stray}"
 
 

@@ -103,7 +103,9 @@ def main() -> int:
     refs = [art.to_artifact_ref(e) for e in entries]
     for r, e in zip(refs, entries):
         if e["role"] == "input":
-            r["uri"] = "https://www.biomodels.org/model/download/BIOMD0000001047?filename=delta_notch.xml"   # BioModels' own public URL
+            # BioModels' own public model page; root refuses a query string, so the download URL cannot be used
+            r["uri"] = "https://www.biomodels.org/BIOMD0000001047"
+            r["title"] = r["title"] + " (uri is the model page; file delta_notch.xml, main file)"
     draft["payload"]["artifacts"] = refs
     draft["payload"]["provenance"]["artifacts"] = entries
     draft["payload"]["provenance"]["field_origin"]["artifacts"] = "adapter (typed refs built from the entries above)"
