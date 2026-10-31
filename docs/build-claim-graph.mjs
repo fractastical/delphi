@@ -29,7 +29,7 @@ const seal = readFileSync(join(ROOT, "assets/logo.svg"), "utf8").trim();
 const count = f => claims.filter(f).length;
 for (const page of ["claim-graph", "claims-query"]) {
   const html = readFileSync(join(HERE, `${page}.template.html`), "utf8")
-    .replace("<!--__SEAL__-->", seal.replace(/\s(width|height)="\d+"/g, "").replace("<svg ", '<svg role="img" aria-label="DELPHI seal" '))
+    .replace("<!--__SEAL__-->", seal.replace(/<svg[^>]*>/, t => t.replace(/\s(width|height)="\d+"/g, "")).replace("<svg ", '<svg role="img" aria-label="DELPHI seal" '))
     .replace("/*__SEAL_URI__*/", encodeURIComponent(seal))
     .replace("/*__DATA__*/null", JSON.stringify(DATA).replace(/</g, "\\u003c"));
   writeFileSync(join(HERE, `${page}.html`), html);
