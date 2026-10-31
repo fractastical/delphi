@@ -84,22 +84,44 @@ class Claim(Model):
     prior_review: dict[str, Any] = Field(default_factory=dict)
 
 
+ACTIONABILITY = ("acceptance_criteria", "falsifiers", "next_action", "cost_stop_bounds")
+
+
 class Problem(Model):
+    """A sourced question. `completeness` separates having a problem from being able to act on it.
+
+    A curated open-problems register states what is unknown and why it matters; it does not say
+    what would settle the question, what would refute an answer, what to do next, or when to stop.
+    Those four fields are what an Action needs, and they are the real frontier. Requiring them at
+    import time does not create them -- it only keeps sourced problems out of the store. So a
+    `recorded` Problem may omit all four, an `actionable` Problem must carry all four, and
+    `Store.submit` refuses an Action whose target is still `recorded`. The gap is then a count
+    this node can report about itself rather than an absence nobody can see.
+    """
+
     title: Short
     known_state: Text
     question: Text
     problem_kind: Literal["project_gap", "computational_open_question", "sourced_field_open_problem", "resolved_scope_correction"]
     novelty_status: Short
     data_access: Text
-    acceptance_criteria: Strings = Field(min_length=1)
-    falsifiers: Strings = Field(min_length=1)
-    next_action: Text
+    completeness: Literal["recorded", "actionable"] = "actionable"
+    acceptance_criteria: Strings = Field(default_factory=list)
+    falsifiers: Strings = Field(default_factory=list)
+    next_action: Text | None = None
     required_capabilities: Strings
-    cost_stop_bounds: Text
+    cost_stop_bounds: Text | None = None
     downstream_uses: Strings
     dependencies: list[Ref] = Field(default_factory=list, max_length=30)
     source: Source
     original: dict[str, Any] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def actionability(self):
+        absent = [f for f in ACTIONABILITY if not getattr(self, f)]
+        if self.completeness == "actionable" and absent:
+            raise ValueError("An actionable problem needs all of " + ", ".join(absent))
+        return self
 
 
 class Evidence(Model):

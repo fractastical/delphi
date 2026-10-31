@@ -113,8 +113,13 @@ class Store:
         return row["envelope"]
 
     def _validate_refs(self, c, record, principal, current=True):
-        for _, target in references(record):
-            self._raw(c, target, principal, current=current)
+        for relation, target in references(record):
+            referenced = self._raw(c, target, principal, current=current)
+            # An action needs acceptance criteria, falsifiers, a next action and a stop bound.
+            # A `recorded` problem has none of them, so there is nothing to execute or to stop.
+            if record["kind"] == "Action" and relation == "targets" and referenced["kind"] == "Problem":
+                if referenced["payload"].get("completeness") == "recorded":
+                    raise Conflict("Target problem is recorded, not actionable; supply the four actionability fields first")
 
     def _write(self, token, key, request, role, operation):
         if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", key):
