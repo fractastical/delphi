@@ -48,9 +48,9 @@ about a proposed action.
 - [ ] Deliver the multiscale website with working exploration and source views.
 - [ ] Exercise a persistent node and an agent MCP contribution round trip.
 - [ ] Run solver controls and a scoped Lean check with a failing mutant.
-- [ ] Run a bounded simulation, numerical controls and uncertainty analysis.
+- [x] Run a bounded simulation, numerical controls and uncertainty analysis.
 - [ ] Produce an inspectable candidate geometry and downloadable print artifact.
-- [ ] Connect evidence adapters, source indexes and nanopublication draft export.
+- [x] Connect evidence adapters, source indexes and nanopublication draft export.
 - [ ] Measure actual claim reuse and coordination; retain null results.
 - [ ] Verify and deploy the integrated demo with source and artifact receipts.
 - [ ] Leave a 24-hour resource queue, owners, stop rules and remaining blockers.

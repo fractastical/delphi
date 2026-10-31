@@ -28,6 +28,60 @@ metered model was selected. Provider-billed incremental spend is not yet known.
 | P1 | Reuse and allocation measurements | dx-market + codex-03 | Pending; matched tasks and receipt-derived counts |
 | P1 | Integrated QA, deployment and pitch handoff | codex-03 + existing director | Pending; exact source SHA and checks |
 
+## Integration update — October 31, 12:25 PDT
+
+This section supersedes the kickoff statuses above. It is a coordinator report;
+the System endpoint separately measures database and service state.
+
+- [x] First gated release at https://frontier.morphoswarm.ai, source
+  `9e6045ed5f219fc6aa82ccafa18eb53fe7d3c0ef`, with a separate persistent PG16
+  service. Nine deployed access/rendering checks passed; see
+  `deploy/receipts/first-live-check.json`. The apex has not been redirected.
+- [x] Live read paths: catalog, lexical search, records, events, artifacts,
+  attention, System. Scratch browser also exercised feasible, unsatisfiable and
+  unknown engineering results, and exact-rational belief scenarios including
+  impossible actions and missing priors. Beliefs are not calibrated forecasts.
+- [x] Imported 880 Delphi claims plus two source Actions and two Evidence
+  records, all imported_unreviewed. The 21 local claims remain separate versions
+  in a different namespace. Imported Action state does not certify execution.
+- [x] Imported 250 curated questions, proposed and recorded; together with the
+  seven local seed questions the deployed node had 257. No import accepts a claim.
+- [x] Typed action proposals and non-executable aggregate plans: 21 selected
+  proposal/store/provenance checks passed. A real MCP round trip is still assigned
+  to dx-submit; it will be labelled a software integration diagnostic.
+- [x] BioModels replay, fin-ray beam simulation, fixed-launch glide comparison,
+  reaction–diffusion animations, typed coupling contracts and three print forms
+  are integrated in the task branch. Integration is not deployment or biological
+  validation. The initial glide Pareto ranking is diagnostic, not a recommendation.
+- [x] Numerical coupling/simulation integration checks: 59 passed. Geometry
+  checks initially skipped for a missing dependency; their separate run is pending.
+- [ ] Finish publishing actual videos, artifact downloads and model-source cards
+  (claude-02); show live questions alongside the authored mission diagram.
+- [ ] Complete exact-source Lean checks and mesh verification (codex-03).
+- [ ] Import the BioModels replay/render lineage and newly sourced flying-fish
+  claims/questions after validating their final mappings (dx-corpus, claude-11,
+  dx-fable-lead). Rendering has its own Action, separate from numerical replay.
+- [ ] Finish System panels and a reproducible release/rollback command
+  (claude-02, dx-collab). Root owns deployment and the canonical release SHA.
+- [ ] Record a reuse measurement from actual pinned inputs (dx-market-r1).
+  The existing allocation experiment is blocked; no collective advantage claimed.
+- [ ] Publish the reviewed prior-art comparison and pitch (claude-15).
+
+## Active bounded research queue
+
+| Work | Owner | Current state and bound |
+| --- | --- | --- |
+| Held-out RD CPU/GPU agreement | dx-gpuops-r1 | CPU reference completed; H100 validation submitted. The CPU step-convergence failure makes the experiment inconclusive regardless of GPU agreement. No conditional expansion. |
+| Kir2.1 paired-assay evaluation | claude-12 | 256-variant CPU evaluation completed; hypothesis undetermined. Expanded 6,789-variant follow-up authorized with a new frozen protocol, at most 60 CPU minutes or 30 minutes on one H100. |
+| Evo2 regulatory candidate demonstration | claude-12 + dx-gpuops-r1 | Proposed bounded 7B run: at most 32 candidates of at most 2 kb, one H100, 60 minutes including setup, two failures then stop. No functional-expression claim. |
+| Two-dimensional fluid simulation | delphi-rethink-nca + dx-gpuops-r1 | Assigned; analytic and conservation controls first, at most 90 minutes implementation plus a 30-minute one-H100 job. Idealized laminar model, no calibrated flying-fish aerodynamics. |
+| Typed model and design-primitive index | dx-fable-lead + dx-guilds | Extend current interfaces with explicit implemented, external and missing capabilities. No inferred biological bridge from matching units. |
+| Historical claim corrections | dx-critic-r1 | Finite-domain ensemble and cavefish wording corrected, original records retained. Older Lean theorem naming/strict-stability checks in progress. |
+
+Provider-billed spend remains unavailable. The completed GPU pilot failed its
+original criterion; its post-hoc interpretation does not change that verdict.
+Shared-host load is not attributed to our project or used as utilization evidence.
+
 ## Findings to correct during integration
 
 - The earlier site builder counted `def test_` lines as passing tests. Replace
