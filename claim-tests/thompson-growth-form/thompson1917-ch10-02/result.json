@@ -1,0 +1,81 @@
+{
+  "claim_id": "thompson1917-ch10-02",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch10-02",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "If the sutural line of a turreted shell such as Turritella is a geodesic of the shell's enveloping right cone, then the number of whorls the suture makes cannot exceed the number of turns a conical geodesic can make: a geodesic on a right cone of apical angle alpha develops into a straight line on a sector of angle 2*pi*sin(alpha/2), sweeps at most pi of that sector, and therefore turns at most N_geo = 1/(2 sin(alpha/2)) times in total (and only half of that while approaching the apex). Measured whorl counts of Turritella shells must therefore satisfy N_obs <= N_geo.",
+  "pass_criterion": "Pre-registered. From published per-specimen measurements of Turritellidae giving both the apical angle alpha and the total whorl number N_obs (Pandita et al. 2013, Int. J. Geosciences 4:777-784, Tables 2-6, 50 specimens of 5 species), compute N_geo = 1/(2 sin(alpha/2)) and the ratio R = N_obs / N_geo for every specimen with both values. SUPPORTS if at least 90% of specimens have R <= 1 (whorl count within the geodesic bound).",
+  "fail_criterion": "Pre-registered. REFUTES if at least 90% of specimens have R > 1, i.e. the suture coils more times than any geodesic of the enveloping cone can, so the sutural line cannot be a conical geodesic. Between 10% and 90% is 'mixed'. If the tables cannot be retrieved or parsed, inconclusive with reason data-unavailable. The claim's first part (coils tighten toward the apex) is shared by a geodesic and by the logarithmic helico-spiral and is not discriminating; the verdict rests on the identification of the suture with a geodesic.",
+  "planned_datasets": [
+    "pandita-2013-west-java-turritellidae-biometrics"
+  ],
+  "interpretation": "Thompson's 'spiral geodetic' on a right cone is taken literally (a curve of zero geodesic curvature on the enveloping cone), and 'the sutural line ... such as Turritella ... is a geodetic of this kind' as the claim that the suture follows such a curve. The enveloping surface of a turritellid is close to a right circular cone whose apical angle is the measured alpha. The test uses only two gross measurements per shell, apical angle and whorl number, because the geodesic bound on the number of turns depends on nothing else. Whorl counts in the source include the early (protoconch/juvenile) whorls, where the cone approximation is roughest; the result is checked for sensitivity by also subtracting two whorls from every count.",
+  "datasets": [
+    {
+      "id": "pandita-2013-west-java-turritellidae-biometrics",
+      "name": "Pandita, Zaim, Aswan & Rizal (2013) Relationship of Biometrical Aspect of Turritellidae with Geochronological Aspect in West Java, Int. J. Geosciences 4:777-784, Tables 2-6 (biometric measurements of 49 turritellid specimens from five Neogene localities)",
+      "landing_url": "https://www.scirp.org/journal/paperinformation?paperid=33473",
+      "doi": "10.4236/ijg.2013.44071",
+      "version": "published article PDF, 2013",
+      "license": "CC BY (stated in the article)",
+      "files": [
+        {
+          "download_url": "https://www.scirp.org/pdf/ijg_2013062114170109.pdf",
+          "retrieved_at": "2026-10-31T04:38:23Z",
+          "byte_size": 534536,
+          "sha256": "77c735fa2cf1cd0315b8d3fe848de9f56cbfbfe0b8d0d2e7d3a3a47fc8fb11f5"
+        }
+      ],
+      "role": "per-specimen apical angle (alpha) and total whorl number for Turritella sp., T. bantamensis, T. simplex and T. javana (34 specimens with both values; T. djadjariensis has no alpha values)"
+    }
+  ],
+  "method": "fetch.py downloads the article PDF, records its SHA-256 and transcribes Tables 2-6 with pdfplumber into derived/pandita2013_turritellidae.csv (49 rows; all published ratio columns Wang:L and Wsut:L were recomputed from the transcribed measurements and agree, confirming the transcription). analysis.py computes for each of the 34 specimens with both apical angle and whorl number the maximum number of turns of a geodesic on a right cone of that apical angle, N_geo = 1/(2 sin(alpha/2)), the ratio R = whorls/N_geo, the same ratio after subtracting two whorls (allowance for the protoconch/early whorls), and the apical angle that would have been needed for the observed whorl count to fit a geodesic.",
+  "measured": {
+    "value": 2.5,
+    "unit": "median ratio of observed whorl number to the maximum number of turns a conical geodesic can make (R = N_obs / N_geo); R > 1 is impossible for a geodesic",
+    "n": 34,
+    "uncertainty": "R ranges from 1.63 to 3.39 across all 34 specimens (4 species); every specimen exceeds the bound",
+    "extra": {
+      "fraction_specimens_R_gt_1": 1.0,
+      "fraction_specimens_R_gt_1_after_subtracting_2_whorls": 1.0,
+      "fraction_specimens_exceeding_apex_approaching_bound_N_geo_over_2": 1.0,
+      "apical_angle_deg_range": [
+        8.0,
+        21.0
+      ],
+      "whorl_number_range": [
+        8.0,
+        14.0
+      ],
+      "N_geo_total_range": [
+        2.744,
+        7.168
+      ],
+      "median_apical_angle_deg_that_would_permit_observed_whorls": 4.78,
+      "per_species_median_R": {
+        "Turritella bantamensis (BOJ3)": 2.266,
+        "Turritella javana (CJR02B)": 2.109,
+        "Turritella simplex (CLN01-A)": 3.28,
+        "Turritella sp. (MNT13)": 2.943
+      },
+      "n_rows_transcribed": 49,
+      "n_rows_passing_ratio_check": 49
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.85,
+  "caveats": [
+    "The test refutes the identification of the suture with a geodesic of the enveloping right cone; it does not test Thompson's purely geometric statement that a conical geodesic coils more closely toward the apex (true) nor whether the suture is locally geodesic-like over a fraction of a whorl.",
+    "The bound assumes the shell envelope is a right circular cone, which is what Thompson states; real turritellid envelopes are slightly convex or concave, but the Clairaut relation on any such surface of revolution still forbids a geodesic from winding many times toward a narrowing apex unless the sides are almost parallel.",
+    "Specimens are Neogene fossils from West Java, not the type species Turritella terebra; fossil apices are often incomplete, so whorl counts are if anything underestimates, which makes the test conservative. Apical angles are the authors' gross measurements to 0.5 degree.",
+    "Whorl counts include early whorls where the cone approximation is roughest; subtracting two whorls from every count leaves all 34 specimens above the bound.",
+    "The published tables list 50 specimens in the text but 49 rows were present (Table 6 lacks a specimen 5B); 15 rows lack an apical angle and were excluded.",
+    "Transcription from the PDF needs pdfplumber (not in the standard tool list); the transcribed table is committed so analysis.py runs with pandas and numpy only."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-thompson-batch-2216",
+    "date": "2026-10-31"
+  }
+}
