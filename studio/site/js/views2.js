@@ -59,6 +59,9 @@
     ["launch_speed", "Declared launch speed", "m/s", "18", "Observed Cypselurus taxi speeds are 16–20 m/s; never assumed"],
     ["rho", "Air density (optional)", "kg/m³", "1.225", "Blank = unknown. Used only by the solver, never defaulted"],
     ["cl_max", "Maximum lift coefficient (optional)", "", "1.0", "Blank = unknown. Used only by the solver, never defaulted"],
+    ["mass_min", "Solver requirement: minimum mass", "kg", "0.2", "Sent only to the solver as a design requirement"],
+    ["wing_loading_min", "Solver requirement: minimum wing loading", "N/m²", "100", "Sent only to the solver as a design requirement"],
+    ["speed_max", "Solver requirement: maximum speed", "m/s", "20", "Sent only to the solver as a design requirement"],
   ];
   const TRI = [["four_winged", "Pelvic fins as a second pair of wings (four-winged)"], ["cg_aft", "Centre of gravity aft of the pectoral fins (qualitative flag)"], ["novel_appendage", "Declare: needs a novel appendage (metadata flag)"], ["powered_flapping", "Declare: needs powered flapping (metadata flag)"], ["assume_pect_ar_wing", "ASSUMPTION: whole-wing aspect ratio can be compared with Fish's fin-level range (off unless yes)"], ["assume_taxi_flight", "ASSUMPTION: the Cypselurus taxi speed anchor applies as a flight bound (off unless yes)"]];
 
@@ -142,7 +145,7 @@
 
   function readForm(form) {
     const c = F.blank(); const errors = {};
-    ["mass_kg", "standard_length_m", "span_m", "aspect_ratio", "pectoral_fin_m", "launch_speed", "rho", "cl_max"].forEach((n) => {
+    ["mass_kg", "standard_length_m", "span_m", "aspect_ratio", "pectoral_fin_m", "launch_speed", "rho", "cl_max", "mass_min", "wing_loading_min", "speed_max"].forEach((n) => {
       const raw = form.elements[n].value.trim(); if (raw === "") { c[n] = null; return; }
       const v = Number(raw); if (!isFinite(v) || v <= 0) { c[n] = null; errors[n] = "Enter a positive number, or leave blank for unknown."; } else c[n] = v;
     });
@@ -160,7 +163,7 @@
     const fish = DF.mountFishCanvas(root.querySelector("#fishbig"), { getCand: () => DF.cand });
     writeForm(form, DF.cand);
     function update(fromForm) {
-      if (fromForm) { const { c, errors } = readForm(form); DF.cand = c; DF.candLabel = "custom"; ["mass_kg", "standard_length_m", "span_m", "aspect_ratio", "pectoral_fin_m", "launch_speed", "rho", "cl_max", "pect_share"].forEach((n) => { const e = root.querySelector("#e-" + n); if (e) { e.textContent = errors[n] || ""; form.elements[n].setAttribute("aria-invalid", errors[n] ? "true" : "false"); } }); }
+      if (fromForm) { const { c, errors } = readForm(form); DF.cand = c; DF.candLabel = "custom"; ["mass_kg", "standard_length_m", "span_m", "aspect_ratio", "pectoral_fin_m", "launch_speed", "rho", "cl_max", "mass_min", "wing_loading_min", "speed_max", "pect_share"].forEach((n) => { const e = root.querySelector("#e-" + n); if (e) { e.textContent = errors[n] || ""; form.elements[n].setAttribute("aria-invalid", errors[n] ? "true" : "false"); } }); }
       const c = DF.cand; const d = F.derive(c); const res = F.checks(c, m); const v = F.verdict(res);
       root.querySelector("#derived").innerHTML = html`<h3>Derived (arithmetic)</h3><dl class="kv">
         <div><dt>Wing area S = span² / AR</dt><dd>${d.area === null ? "unknown" : fmt(d.area, 4) + " m²"}</dd></div>
@@ -200,11 +203,19 @@
   }
 
   function solveResult(r) {
-    const res = r.result || {}; const fu = r.followup_questions || [];
-    return html`<div class="verdictbox"><div class="vlabel">${res.status || "no status returned"}</div>
+    const res = r.result || {}; const man = r.ui_manifest || r.manifest || null; const fu = r.followup_questions || [];
+    const list = (a) => (a && a.length ? html`<ul>${a.map((x) => html`<li>${typeof x === "string" ? x : JSON.stringify(x)}</li>`)}</ul>` : "");
+    const rows = man && Array.isArray(man.rows) ? man.rows : [];
+    return html`<div class="verdictbox"><div class="vlabel">${(man && man.badge) || res.status || "no status returned"}</div>
+      ${man && man.headline ? html`<p><b>${man.headline}</b></p>` : ""}
       <p class="small">${r.schema || ""} · checked by ${r.checked_by || "not reported"} · computed ${r.computed_at || "not reported"} · request sha256 <code>${r.request_sha256 || "not reported"}</code></p>
-      ${res.conflict ? html`<h4>Conflict</h4><pre class="json">${JSON.stringify(res.conflict, null, 1)}</pre>` : ""}${res.witness ? html`<h4>Witness (a candidate in the encoded model, not a validated design)</h4><pre class="json">${JSON.stringify(res.witness, null, 1)}</pre>` : ""}
-      <h4>Parameters used</h4><pre class="json">${JSON.stringify(r.parameters || {}, null, 1)}</pre>${fu.length ? html`<h4>Follow-up questions</h4><ul>${fu.map((q) => html`<li>${typeof q === "string" ? q : JSON.stringify(q)}</li>`)}</ul>` : ""}</div>`.toString();
+      ${man && man.must_display && man.must_display.length ? html`<h4>The solver requires this to be shown</h4>${list(man.must_display)}` : ""}
+      ${man && man.must_not_say && man.must_not_say.length ? html`<h4>Must not be said</h4>${list(man.must_not_say)}` : ""}
+      ${res.conflict ? html`<h4>Conflict</h4><pre class="json">${JSON.stringify(res.conflict, null, 1)}</pre>` : ""}${res.witness ? html`<h4>Witness (a candidate in the encoded model only, not a validated design)</h4><pre class="json">${JSON.stringify(man && man.witness ? man.witness : res.witness, null, 1)}</pre>` : ""}
+      ${rows.length ? html`<h4>Constraints considered</h4><div class="tablewrap"><table><thead><tr><th>Constraint</th><th>Kind</th><th>In force</th><th>In conflict</th><th>Source</th><th>Correspondence / assumption</th></tr></thead><tbody>${rows.map((x) => html`<tr><td>${x.name || x.id || ""}</td><td>${x.kind}</td><td>${String(x.in_force)}</td><td>${String(x.in_conflict)}</td><td>${x.source || ""}</td><td>${x.correspondence || ""}${x.opt_in_assumption ? " (opt-in assumption)" : ""}${x.parameters_missing && x.parameters_missing.length ? " Missing: " + x.parameters_missing.join(", ") : ""}</td></tr>`)}</tbody></table></div>` : ""}
+      ${man && man.verification ? html`<h4>Independent verification</h4><pre class="json">${JSON.stringify(man.verification, null, 1)}</pre>` : ""}
+      ${man && man.lean ? html`<h4>Lean</h4><p class="small">Run by this solver: <b>${String(man.lean.run_by_this_solver)}</b>. No online Lean status is produced; any Lean receipt is separate and offline.</p>${man.lean.covers ? html`<p class="small"><b>Covers:</b> ${JSON.stringify(man.lean.covers)}</p>` : ""}${man.lean.does_not_cover ? html`<p class="small"><b>Does not cover:</b> ${JSON.stringify(man.lean.does_not_cover)}</p>` : ""}` : ""}
+      <h4>Parameters used</h4><pre class="json">${JSON.stringify(r.parameters || {}, null, 1)}</pre>${fu.length ? html`<h4>Follow-up questions</h4>${list(fu)}` : ""}</div>`.toString();
   }
 
   /* ---------------- EVIDENCE ---------------- */
@@ -355,7 +366,7 @@
             const r = await DF.api.catalog({ query: f.q, kind: f.kind, status: f.status, limit: 20, after });
             list.insertAdjacentHTML("beforeend", r.records.map((rec) => recordRow(rec)).join("")); shown += r.records.length;
             count.textContent = `${shown} record${shown === 1 ? "" : "s"} shown${r.total_matching !== undefined ? ` of ${r.total_matching} matching` : ""} · mode ${r.mode}${r.namespace ? " · namespace " + r.namespace : ""}`;
-            if (!shown) count.textContent = "No record matches. Try fewer words or clear the filters.";
+            if (!shown) count.textContent = `No record matches (${DF.api.state.mode === "live" ? "the live node returned none" : "the snapshot has none"}). Try fewer words or clear the filters. · mode ${r.mode}${r.namespace ? " · namespace " + r.namespace : ""}`;
             more.innerHTML = r.next_cursor ? `<button class="btn" type="button">Load more</button>` : "";
             const b = more.querySelector("button"); if (b) b.addEventListener("click", () => { b.disabled = true; load(r.next_cursor); });
           } catch (e) { count.textContent = "The catalog could not be read: " + e.message + ". Nothing is shown in its place."; }

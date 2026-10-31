@@ -6,7 +6,7 @@
   const G = 9.81;
   const LIM = { WL_MAX: 208.9, AR_MIN: 3.0, AR_MAX: 16.9, AR_MAX_TABLE: 19.9, FIN_MAX: 0.79, SL_MAX: 0.5, SL_MIN: 0.05, V_ANCHOR: 16, WL_ANCHOR: 205.5, MASS_MIN: 0.003, MASS_MAX: 0.53 };
   const known = (x) => x !== null && x !== undefined && x !== "" && isFinite(x);
-  const FIELDS = ["mass_kg", "standard_length_m", "span_m", "aspect_ratio", "pectoral_fin_m", "launch_speed", "four_winged", "cg_aft", "novel_appendage", "powered_flapping", "pect_share", "assume_pect_ar_wing", "assume_taxi_flight", "rho", "cl_max"];
+  const FIELDS = ["mass_kg", "standard_length_m", "span_m", "aspect_ratio", "pectoral_fin_m", "launch_speed", "four_winged", "cg_aft", "novel_appendage", "powered_flapping", "pect_share", "assume_pect_ar_wing", "assume_taxi_flight", "rho", "cl_max", "mass_min", "wing_loading_min", "speed_max"];
 
   function blank() { const c = {}; FIELDS.forEach((f) => (c[f] = null)); c.pect_share = 0.8; return c; }
 

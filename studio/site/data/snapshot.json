@@ -1,13 +1,13 @@
 {
  "schema": "frontier-site-snapshot-0.1",
- "label": "snapshot of inputs at ba6c1af27946",
- "git_commit": "ba6c1af27946516cad7b4b06dcc59585773fe293",
- "git_commit_time": "2026-10-31T11:29:51-07:00",
+ "label": "snapshot of inputs at ba99155ef0b9",
+ "git_commit": "ba99155ef0b98b0edb67f517c6ec53976f159c6e",
+ "git_commit_time": "2026-10-31T11:50:25-07:00",
  "inputs": [
   {
    "path": "docs/mcp.md",
-   "sha256": "5cecdf6f31e14ea165dfa5930372d091747045ba93c441c20328d3e3f3ec15ca",
-   "bytes": 8080
+   "sha256": "7c6c81cb629557c457f33396d23cd82824d46c813cca24449538673d8dfd6d62",
+   "bytes": 8613
   },
   {
    "path": "results/2026-10-31-kcne1-binding-ddg-STOPPED.md",
@@ -31,8 +31,8 @@
   },
   {
    "path": "site/content/mission.json",
-   "sha256": "5b16196ca13d20048910666d268271ffa81dd8d4af0d9ef9e68ef17c9f7e099d",
-   "bytes": 36893
+   "sha256": "60565012f5996394200c1c5ad355c8b4dd9a17da04862ca247d3cc413d820aff",
+   "bytes": 40422
   },
   {
    "path": "specs/SPEC-005-agentic-engineering-demo.md",
@@ -41,8 +41,8 @@
   },
   {
    "path": "tasks/BUILD.md",
-   "sha256": "3410c6101346b2a3ef2618a4526836fd3eca9a29b9c9f94a913d2fcaf3bc6fb4",
-   "bytes": 3296
+   "sha256": "b9d0b01a44c86260f72f33889d440022ed54b69d21a1a8f3d5c590c3e3bc1276",
+   "bytes": 4638
   }
  ],
  "scope": {
@@ -713,16 +713,18 @@
     "key": "molecular",
     "label": "Molecular",
     "tab": "Molecular",
-    "have": [],
-    "open": "No molecular source is indexed in this snapshot. A newer molecule-to-fin source (Daane 2021) has been reported available by the research lead but is not yet included here; this is not a claim that no molecular evidence exists. Which genes or proteins set pectoral-fin elongation is not known to this build; it was not searched.",
-    "coupling_out": "No executable coupling to macromolecular structure."
+    "have": [
+     "daane2021"
+    ],
+    "open": "One molecule-to-fin source is indexed: Daane et al. 2021 shows a lat4a x kcnh2a interaction that phenocopies flying-fish fin proportion in zebrafish, with genome-wide association signatures across 35 species. The flying-fish side is association, not demonstration, and transfer to a halfbeak is an unestablished hypothesis. No parameter links it to wing area or loading.",
+    "coupling_out": "No executable coupling to macromolecular structure or to fin geometry."
    },
    {
     "key": "macromolecular",
     "label": "Macromolecular",
     "tab": "Molecular",
     "have": [],
-    "open": "No structure or binding-affinity input for any fin-patterning protein. The stopped KCNE1 protocol shows what happens when a structure covers only 20.27% of an assay: the test is stopped, not run. Newer molecule-to-fin evidence (Daane 2021) is reported available but not yet in this snapshot.",
+    "open": "No structure or binding-affinity input for any fin-patterning protein. The stopped KCNE1 protocol shows what happens when a structure covers only 20.27% of an assay: the test is stopped, not run.",
     "coupling_out": "No executable coupling to subcellular organisation."
    },
    {
@@ -737,8 +739,10 @@
     "key": "cellular",
     "label": "Cellular",
     "tab": "Cell",
-    "have": [],
-    "open": "Nothing indexed for exocoetid fin or muscle cells. Newer molecule-to-fin evidence (Daane 2021) is reported available but not yet in this snapshot.",
+    "have": [
+     "daane2021"
+    ],
+    "open": "Daane et al. 2021 describes bioelectric and amino-acid-transport signalling that affects fin proportion in zebrafish; no exocoetid cell-level measurement is indexed. The bridge to exocoetid fins is unestablished.",
     "coupling_out": "No executable coupling to tissue mechanics or patterning."
    },
    {
@@ -826,6 +830,12 @@
   "couplings": [
    {
     "from": "molecular",
+    "to": "organ",
+    "status": "qualitative",
+    "text": "Association only: lat4a x kcnh2a phenocopies fin proportion in zebrafish (Daane 2021); transfer to exocoetids is an unestablished hypothesis and no parameter maps it to wing area."
+   },
+   {
+    "from": "molecular",
     "to": "macromolecular",
     "status": "absent",
     "text": "No executable model maps sequence change to structure or affinity for this mission."
@@ -907,7 +917,8 @@
     "note": "n = 199 preserved specimens, 33 species, 6 genera. The report read the extracted PDF text directly.",
     "caveats": [
      "Text gives overall maximum pectoral aspect ratio 16.9; Table III gives Exocoetus 8.9-19.9. They disagree; both are shown.",
-     "Results text gives a 0.001 kg Hirundichthys as the lowest wing loading while the stated specimen range starts at 0.003 kg. Unresolved."
+     "Results text gives a 0.001 kg Hirundichthys as the lowest wing loading while the stated specimen range starts at 0.003 kg. Unresolved.",
+     "Re-read from the PDF (p.395) by the research lead: 3.0-16.9 is the INDIVIDUAL pectoral-fin aspect ratio; Table III reaches 19.9 for Exocoetus. Park & Choi measured 9.0-10.7 for the same quantity."
     ],
     "short": "Fish 1990"
    },
@@ -995,6 +1006,20 @@
      "Scraped values; not independently re-checked here."
     ],
     "short": "FishBase lengths"
+   },
+   {
+    "id": "daane2021",
+    "short": "Daane 2021",
+    "cite": "Daane, J. M. et al. (2021). Curr. Biol. PMC9172250: lat4a x kcnh2a interaction phenocopying flying-fish fin proportion in zebrafish; genome-wide signatures across 35 species.",
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9172250/",
+    "read_level": "full-text, via r.jina.ai (fable-lead)",
+    "kind": "observed",
+    "note": "A bioelectric and amino-acid-transport signalling interaction (lat4a, kcnh2a) that phenocopies flying-fish fin proportion in ZEBRAFISH, plus genome-wide signatures across 35 species. The functional demonstration is in zebrafish; the flying-fish side is association.",
+    "caveats": [
+     "Cross-organism transfer: this does not establish that enlarging a halfbeak's fins is experimentally grounded. It is an unestablished transfer hypothesis.",
+     "A testable mechanism for a bigger paired fin; no flight is implied.",
+     "Title and author list are not restated here because the card did not carry them; only the journal, year and PMC id were given."
+    ]
    }
   ],
   "disagreements": [
@@ -1243,7 +1268,7 @@
     ],
     "source": "davenport1992",
     "confidence": "Moderate",
-    "note": "Davenport reports longer fins impair swimming. Abstract-level source."
+    "note": "Davenport (1992, abstract) reports swimming is impaired beyond about 78-79% of standard length. Treat it as a reported envelope, not a demonstrated ceiling."
    },
    {
     "id": "C4",
@@ -1254,7 +1279,7 @@
     ],
     "source": "davenport1992",
     "confidence": "Qualitative; no numeric centre-of-gravity data exist",
-    "note": "Davenport reports CG-behind-pectorals as why Oxyporhamphus cannot take off. Without a numeric CG offset and a threshold the page cannot return a pass; it can only show the flag. Davenport 2003 is unread."
+    "note": "Davenport reports CG-behind-pectorals as why Oxyporhamphus cannot take off. Without a numeric CG offset and a threshold the page cannot return a pass; it can only show the flag. Davenport 2003 is unread. No measured centre-of-gravity number exists for any exocoetid; Oxyporhamphus is the one living illustration."
    },
    {
     "id": "C5",
@@ -1278,7 +1303,7 @@
     ],
     "source": "lovejoy2004",
     "confidence": "Metadata only. NOT a reachability check",
-    "note": "No check on this page establishes evolutionary reachability from a beloniform ancestor. The developmental and evolutionary bridge is unestablished and is an open question."
+    "note": "A dorsal wing, jointed or flapping wing, novel skeletal element or sustained powered flapping falls outside the route sourced from the exocoetid literature (enlarged fin rays plus an axial/tail launch motor; flyingfishes nested in halfbeaks). That means unsupported by the sourced envelope: state your mechanism. It does not mean impossible. No check on this page establishes reachability; the developmental and evolutionary bridge is unestablished."
    },
    {
     "id": "C6b",
@@ -1462,6 +1487,25 @@
     "depends_on": [],
     "scale": "organism",
     "origin": "Read-level could-not-access on numeric L/D"
+   },
+   {
+    "id": "EQ6",
+    "title": "Does the lat4a x kcnh2a fin mechanism transfer from zebrafish to a halfbeak or flying fish?",
+    "kind": "generated_engineering_question",
+    "state": "open",
+    "known": "Daane et al. 2021 phenocopy flying-fish fin proportion with a lat4a x kcnh2a interaction in zebrafish and report genome-wide signatures across 35 species. The flying-fish side is association.",
+    "question": "What measurement in a beloniform would show the same mechanism sets paired-fin size, and how much fin enlargement would it explain?",
+    "settles_by": "A pre-specified measurement in a beloniform (or a documented negative), with organism context stated, linked to a fin-area parameter with units.",
+    "next_action": "Specify the beloniform measurement and what a null result would mean before any experiment or data pull.",
+    "needs": [
+     "developmental biology review",
+     "comparative genomics access (only one scaffold-level exocoetid assembly exists)"
+    ],
+    "depends_on": [
+     "EQ2"
+    ],
+    "scale": "molecular",
+    "origin": "Daane 2021 card from the research lead; cross-organism transfer flagged as unestablished"
    }
   ],
   "whiteboard": {
@@ -1647,6 +1691,25 @@
      "about": [
       "parkchoi2010"
      ]
+    },
+    "EQ6": {
+     "approach": "theory_fit",
+     "scales": [
+      "molecular",
+      "cellular",
+      "organ"
+     ],
+     "tags": [
+      "bioelectric",
+      "cross-organism transfer",
+      "fin size"
+     ],
+     "limits": [
+      "C6a"
+     ],
+     "about": [
+      "daane2021"
+     ]
     }
    },
    "grounded_in": {
@@ -1667,7 +1730,8 @@
      "fish1990"
     ],
     "C6a": [
-     "lovejoy2004"
+     "lovejoy2004",
+     "daane2021"
     ],
     "C6b": [
      "fishbase"
@@ -1762,7 +1826,7 @@
    "title": "Frontier MCP server",
    "status_line": null,
    "path": "docs/mcp.md",
-   "sha256": "5cecdf6f31e14ea165dfa5930372d091747045ba93c441c20328d3e3f3ec15ca",
+   "sha256": "7c6c81cb629557c457f33396d23cd82824d46c813cca24449538673d8dfd6d62",
    "href": "data/docs/mcp.md"
   }
  ],
@@ -1825,13 +1889,13 @@
    "priority": "P0",
    "deliverable": "Constraint solver + meaningful Lean boundary",
    "owner": "dx-guilds",
-   "status_text": "Assigned; candidate, conflict, unknown and mutant controls"
+   "status_text": "Delivered; root requested certificate and parameter-correspondence repairs before integration"
   },
   {
    "priority": "P0",
    "deliverable": "Flying-fish sourced constraint checker",
    "owner": "claude-15's flying-fish-research",
-   "status_text": "Running; handoff via messages/flying-fish-checker.md"
+   "status_text": "Handoff delivered; source-envelope scope needs integration review"
   },
   {
    "priority": "P0",
@@ -1843,25 +1907,37 @@
    "priority": "P0",
    "deliverable": "MCP contribution tools",
    "owner": "dx-collab",
-   "status_text": "Working; real client against isolated Postgres"
+   "status_text": "Integrated; root ran 8 interface tests on integrated code, exit 0"
   },
   {
    "priority": "P0",
    "deliverable": "Typed attention and action adapter",
-   "owner": "dx-market",
-   "status_text": "Authentication failed; recovery requested, not running"
+   "owner": "dx-market-r1",
+   "status_text": "Managed authentication recovered; port in progress"
   },
   {
    "priority": "P0",
    "deliverable": "Persistent node + site data/export",
-   "owner": "codex-03",
-   "status_text": "Pending implementation"
+   "owner": "dx-collab",
+   "status_text": "Implementing separate PG16 instance and gated web runtime"
+  },
+  {
+   "priority": "P0",
+   "deliverable": "Multiscale website",
+   "owner": "claude-02",
+   "status_text": "Implementing portable data build and functional views"
   },
   {
    "priority": "P1",
    "deliverable": "Data/tool indexes and multiscale source cards",
    "owner": "dx-fable-lead",
-   "status_text": "Working; primary-source research and explicit coupling gaps"
+   "status_text": "Darwin primary texts, precursor hypotheses and source cards in progress"
+  },
+  {
+   "priority": "P1",
+   "deliverable": "Indexed search and explicit curation",
+   "owner": "dx-submit",
+   "status_text": "Delivered; ranking and truncation review repairs requested"
   },
   {
    "priority": "P1",
@@ -1872,14 +1948,44 @@
   {
    "priority": "P1",
    "deliverable": "Nebius/Google live inventory and bounded execution",
-   "owner": "dx-gpuops",
-   "status_text": "Authentication failed; recovery requested, no submission"
+   "owner": "dx-gpuops-r1",
+   "status_text": "Managed authentication recovered; bounded Neumann PDE replay authorized"
+  },
+  {
+   "priority": "P1",
+   "deliverable": "BioModels model replay",
+   "owner": "claude-11",
+   "status_text": "Retrieving public SBML and checking reproducible solver options"
+  },
+  {
+   "priority": "P1",
+   "deliverable": "Matched-assay biomodel evaluation",
+   "owner": "claude-12",
+   "status_text": "Public ProteinGym archive retrieved; frozen protocol before inference"
   },
   {
    "priority": "P1",
    "deliverable": "Printable candidate geometry",
+   "owner": "claude-05",
+   "status_text": "Three parametric forms; final dimensions must come from engineering results"
+  },
+  {
+   "priority": "P1",
+   "deliverable": "Explicit factor-graph beliefs",
+   "owner": "director / nca",
+   "status_text": "Ownership consolidation requested; exact controls required"
+  },
+  {
+   "priority": "P1",
+   "deliverable": "Typed action-to-artifact provenance",
    "owner": "codex-03",
-   "status_text": "Pending; dimensions/manifold controls and scope label"
+   "status_text": "Committed; 14 selected store/provenance checks passed"
+  },
+  {
+   "priority": "P1",
+   "deliverable": "Whiteboard directions and artifact index",
+   "owner": "codex-03",
+   "status_text": "Implemented; 14 selected artifact/register checks passed"
   },
   {
    "priority": "P1",

@@ -97,9 +97,9 @@ def test_direction_filter_and_search(browser, base):
     pg.goto(base + "#/frontier")
     pg.get_by_role("link", name="bottom-up (theory fit, literature gap)").click()
     pg.wait_for_selector(".count")
-    assert "of 12 questions shown" in pg.locator(".count").inner_text()
-    shown = int(pg.locator(".count").inner_text().split(" ")[0])
-    assert 0 < shown < 12
+    text = pg.locator(".count").inner_text()
+    shown, total = int(text.split(" ")[0]), int(text.split(" of ")[1].split(" ")[0])
+    assert 0 < shown < total
     pg.goto(base + "#/frontier?q=zzzznothing")
     pg.wait_for_selector("text=No question matches")
 

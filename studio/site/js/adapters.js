@@ -7,6 +7,8 @@
   }
   const state = { mode: "snapshot", health: null, reason: "not probed", snapshot: null, catalog: null };
 
+  const isLive = () => state.mode === "live" && state.authenticated === true;
+
   async function getJSON(url, ms = 3000) {
     const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
     try {
@@ -25,7 +27,10 @@
     state.snapshot = snap; state.catalog = cat;
     try {
       const h = await getJSON("api/health", 2500);
-      if (h && (h.status === "ok" || h.ok === true || h.status === "live")) { state.mode = "live"; state.health = h; state.reason = "runtime answered /api/health"; }
+      if (h && (h.status === "ok" || h.ok === true || h.status === "live")) {
+        state.mode = "live"; state.health = h; state.reason = "runtime answered /api/health";
+        try { const s = await getJSON("api/session", 3000); state.authenticated = !!s.authenticated; } catch (e) { state.authenticated = false; }
+      }
       else { state.reason = "/api/health answered but did not report ok"; }
     } catch (e) { state.reason = "runtime unavailable (" + (e.name === "AbortError" ? "timeout" : e.message) + ")"; }
     return state;
@@ -34,7 +39,7 @@
   /* Catalog: GET /api/catalog?query&kind&status&limit<=50&after -> {records, next_cursor, namespace, mode}. */
   async function catalog({ query = "", kind = "", status = "", limit = 20, after = "" } = {}) {
     limit = Math.max(1, Math.min(50, limit | 0 || 20));
-    if (state.mode === "live") {
+    if (isLive()) {
       const q = new URLSearchParams(); if (query) q.set("query", query); if (kind) q.set("kind", kind); if (status) q.set("status", status); q.set("limit", String(limit)); if (after) q.set("after", after);
       const r = await getJSON("api/catalog?" + q.toString());
       return { records: r.records || r.items || [], next_cursor: r.next_cursor || null, namespace: r.namespace || null, mode: r.mode || "live", source: "runtime" };
@@ -48,7 +53,7 @@
   }
 
   async function record(ref) {
-    if (state.mode === "live") {
+    if (isLive()) {
       const q = new URLSearchParams({ namespace: ref.namespace, kind: ref.kind, id: ref.id, version: ref.version });
       return getJSON("api/record?" + q.toString());
     }
@@ -59,14 +64,14 @@
 
   /* GET /api/artifacts?limit&after -> {items:[{artifact,evidence,target,produced_by,evidence_kind,relation,context,limitations,local_status,is_head,artifact_bytes_verified}], next_cursor} */
   async function artifacts({ limit = 50, after = "" } = {}) {
-    if (state.mode !== "live") return { items: [], next_cursor: null, source: "snapshot" };
+    if (!isLive()) return { items: [], next_cursor: null, source: "snapshot" };
     const q = new URLSearchParams({ limit: String(Math.min(50, limit)) }); if (after) q.set("after", after);
     const r = await getJSON("api/artifacts?" + q.toString());
     return { items: Array.isArray(r.items) ? r.items : [], next_cursor: r.next_cursor || null, source: "runtime" };
   }
 
   async function events() {
-    if (state.mode === "live") return { events: (await getJSON("api/events")).events || [], source: "runtime" };
+    if (isLive()) return { events: (await getJSON("api/events")).events || [], source: "runtime" };
     return { events: [], source: "snapshot", note: "A snapshot has no event stream." };
   }
 
@@ -75,11 +80,11 @@
   /* POST /api/engineering/solve with a session CSRF token from /api/session. Numbers go as decimal strings;
    * rho and cl_max are null (unknown) unless the user typed them; the assumption flags default to false. */
   async function solve(c) {
-    if (state.mode !== "live") throw new Unavailable("constraint solver", "No runtime is connected, so no solver ran and no result is shown.");
+    if (!isLive()) throw new Unavailable("constraint solver", "No runtime is connected, so no solver ran and no result is shown.");
     const dec = (x) => (x === null || x === undefined || !isFinite(x) ? null : String(x));
     const area = c.span_m && c.aspect_ratio ? (c.span_m * c.span_m) / c.aspect_ratio : null;
     const body = { rho: dec(c.rho), cl_max: dec(c.cl_max), mass: dec(c.mass_kg), area: dec(area), span: dec(c.span_m), speed: dec(c.launch_speed),
-      relax_envelopes: false, assume_pectoral_ar_applies_to_wing: c.assume_pect_ar_wing === true, assume_taxi_speed_applies_to_flight: c.assume_taxi_flight === true };
+      mass_min: dec(c.mass_min), wing_loading_min: dec(c.wing_loading_min), speed_max: dec(c.speed_max), relax_envelopes: false, assume_pectoral_ar_applies_to_wing: c.assume_pect_ar_wing === true, assume_taxi_speed_applies_to_flight: c.assume_taxi_flight === true };
     Object.keys(body).forEach((k) => { if (body[k] === null && !["rho", "cl_max"].includes(k)) delete body[k]; });
     const sess = await getJSON("api/session", 5000); const csrf = sess.csrf || sess.csrf_token || sess.token;
     if (!csrf) throw new Error("the session did not provide a CSRF token");
