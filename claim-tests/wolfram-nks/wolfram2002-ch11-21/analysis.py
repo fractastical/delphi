@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Test of wolfram2002-ch11-21: scaled census of rule 54 from initial conditions 1..65536.
 
-Run: python3 analysis.py   (writes derived/census.csv.gz and derived/summary.json, prints measured block; ~4 min)
+Run: python3 analysis.py   (writes derived/census.csv.xz and derived/summary.json, prints measured block; ~4 min)
 """
 import csv
-import gzip
+import lzma
 import json
 import os
 import sys
@@ -113,7 +113,7 @@ def main():
         recheck.append({"n": int(n), "tiles_T256": int(tiles[n - 1]), "tiles_T512_rows_256_512": tile_count(st, 256, 513)})
     sustained = [r for r in recheck if r["tiles_T256"] > THETA and r["tiles_T512_rows_256_512"] > THETA]
 
-    with gzip.open(os.path.join(HERE, "derived", "census.csv.gz"), "wt", newline="") as f:
+    with lzma.open(os.path.join(HERE, "derived", "census.csv.xz"), "wt", newline="", preset=9 | lzma.PRESET_EXTREME) as f:
         w = csv.DictWriter(f, fieldnames=["n", "bits", "tiles", "period"])
         w.writeheader()
         w.writerows(rows)
