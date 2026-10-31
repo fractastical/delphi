@@ -136,42 +136,65 @@ def test_negative_control_stray_sbml_would_be_detected(tmp_path):
     assert b"<sbml" in f.read_bytes()[:20000]
 
 
-def preserved(v1, v2):
-    """v2 keeps every v1 artifact and every replay hash, and changes nothing else about the Evidence."""
-    keep = {(a["sha256"], a["role"]) for a in v1["payload"]["artifacts"]} <= {(a["sha256"], a["role"]) for a in v2["payload"]["artifacts"]}
-    same = all(v1["payload"][k] == v2["payload"][k] for k in ("target", "evidence_kind", "relation", "produced_by", "source", "method", "context", "assumptions", "uncertainty"))
-    return keep and same and v2["predecessor"] == v1["version"] and (v1["namespace"], v1["kind"], v1["id"]) == (v2["namespace"], v2["kind"], v2["id"])
+def replay_evidence_unchanged(before, after):
+    """The replay Evidence must be exactly what frontier_mapping made: same version, so same content and artifacts."""
+    return before == after and after["predecessor"] is None and not any(a["role"] == "output" and a["media_type"] in ("video/mp4", "image/png") for a in after["payload"]["artifacts"])
 
 
-def test_evidence_v2_chains_to_v1_and_preserves_the_replay_hashes(full):
-    v1, v2 = full["superseded_versions"][0], by_id(full)["orx-run-simulated-evidence"]
-    assert preserved(v1, v2) and v1["version"] != v2["version"]
-    chain = full["chains"][0]
-    assert chain["versions"] == [v1["version"], v2["version"]] and chain["head"] == v2["version"]
-    receipt = json.loads((Path(fm.PACKAGE) / "receipts" / fm.ACCESSION / "receipt.json").read_text())
-    kept = v2["payload"]["provenance"]["replay_hashes_preserved"]
-    assert kept["model_sha256"] == fm.MODEL_SHA256 == receipt["model"]["sha256"] and kept["replay_code_sha256"] == receipt["run"]["code_sha256"]
-    assert kept["csv"] == {k: v for k, v in receipt["output_sha256"].items() if k.endswith(".csv")}
-    assert [r["id"] for r in full["records"]].count("orx-run-simulated-evidence") == 1, "only the head is in records"
+def test_replay_evidence_is_unchanged_and_does_not_carry_the_video(full):
+    before = {r["id"]: r for r in fm.build()["records"]}["orx-run-simulated-evidence"]
+    after = by_id(full)["orx-run-simulated-evidence"]
+    assert replay_evidence_unchanged(before, after)
+    assert after["payload"]["produced_by"]["id"] == "biomodels-1047-replay"
+    manifest = json.loads((Path(fm.PACKAGE) / "orx" / "artifact-manifest.json").read_text())
+    assert {a["sha256"] for a in after["payload"]["artifacts"]} == {a["sha256"] for a in manifest["artifacts"]}
+    assert "withdrawn_versions" in full and full["withdrawn_versions"][0]["version"] != after["version"]
+    assert "superseded_versions" not in full and "chains" not in full
 
 
-def test_v2_links_video_poster_manifest_and_render_code_as_typed_artifacts(full):
-    v2 = by_id(full)["orx-run-simulated-evidence"]["payload"]
-    video = json.loads((Path(fm.PACKAGE) / "video" / "delta_notch_replay_manifest.json").read_text())
-    by_sha = {(a["sha256"], a["role"]): a for a in v2["artifacts"]}
-    assert (video["video"]["sha256"], "output") in by_sha and by_sha[(video["video"]["sha256"], "output")]["media_type"] == "video/mp4"
-    assert (video["poster"]["sha256"], "output") in by_sha
+def test_negative_control_attaching_the_video_to_the_replay_evidence_is_detected(full):
+    after = json.loads(json.dumps(by_id(full)["orx-run-simulated-evidence"]))
+    before = json.loads(json.dumps(after))
+    after["payload"]["artifacts"].append(by_id(full)["biomodels-1047-render-evidence"]["payload"]["artifacts"][0])
+    assert not replay_evidence_unchanged(before, after)
+
+
+def test_render_action_has_exact_inputs_and_targets_the_same_claim(full):
+    r = by_id(full)
+    act = r["biomodels-1047-render"]["payload"]
+    replay_ev, claim = r["orx-run-simulated-evidence"], r["biomodels-1047-model-behaviour"]
+    assert act["target"]["version"] == claim["version"] == r["biomodels-1047-replay"]["payload"]["target"]["version"]
+    assert [(i["kind"], i["id"], i["version"]) for i in act["inputs"]] == [("Evidence", replay_ev["id"], replay_ev["version"]), ("Claim", claim["id"], claim["version"])]
+    ck = act["cache_key"]
+    assert ck["target"] == claim["version"] and replay_ev["version"] in ck["input"] and fm.MODEL_SHA256 in ck["input"]
     render_sha = mv2.hashlib.sha256((Path(fm.PACKAGE) / "render.py").read_bytes()).hexdigest()
+    assert render_sha in ck["code"] and "no simulation" in ck["model"]
+    csv = json.loads((Path(fm.PACKAGE) / "video" / "delta_notch_replay_manifest.json").read_text())["inputs"]["csv"]
+    assert len(csv) == 3 and all(v["sha256"] in ck["input"] for v in csv.values())
+
+
+def test_render_evidence_is_context_only_and_produced_by_the_render_action(full):
+    r = by_id(full)
+    ev, act = r["biomodels-1047-render-evidence"], r["biomodels-1047-render"]
+    p = ev["payload"]
+    assert p["relation"] == "context_only" and p["produced_by"]["id"] == "biomodels-1047-render" and p["produced_by"]["version"] == act["version"]
+    assert p["target"]["version"] == r["biomodels-1047-model-behaviour"]["version"] and ev["predecessor"] is None
+    video = json.loads((Path(fm.PACKAGE) / "video" / "delta_notch_replay_manifest.json").read_text())
+    by_sha = {(a["sha256"], a["role"]): a for a in p["artifacts"]}
     man_sha = mv2.hashlib.sha256((Path(fm.PACKAGE) / "video" / "delta_notch_replay_manifest.json").read_bytes()).hexdigest()
-    assert (render_sha, "code") in by_sha and (man_sha, "log") in by_sha
-    assert any("not produced by the replay Action" in s for s in v2["limitations"])
-    assert all(a["availability"] == "referenced" and a["license"] is None for a in v2["artifacts"])
+    render_sha = mv2.hashlib.sha256((Path(fm.PACKAGE) / "render.py").read_bytes()).hexdigest()
+    assert by_sha[(video["video"]["sha256"], "output")]["media_type"] == "video/mp4" and (video["poster"]["sha256"], "output") in by_sha
+    assert (man_sha, "log") in by_sha and (render_sha, "code") in by_sha and len(p["artifacts"]) == 4
+    assert all(a["availability"] == "referenced" and a["license"] is None for a in p["artifacts"])
+    text = " ".join(p["limitations"])
+    assert "same operator" in text.lower() and "No independent review" in text and "context_only" in text
+    assert p["source_dependence"]["independent_of_author"] is False and "no separate run receipt" in p["method"]
 
 
-def test_negative_control_a_successor_that_drops_an_artifact_is_not_preserved(full):
-    v1, v2 = full["superseded_versions"][0], by_id(full)["orx-run-simulated-evidence"]
-    bad = json.loads(json.dumps(v2))
-    bad["payload"]["artifacts"] = bad["payload"]["artifacts"][1:]
-    assert not preserved(v1, bad)
-    bad2 = json.loads(json.dumps(v2)); bad2["predecessor"] = "0" * 64
-    assert not preserved(v1, bad2)
+def test_the_replay_action_does_not_claim_the_video_and_the_render_action_does_not_claim_a_result(full):
+    r = by_id(full)
+    assert "video" not in json.dumps(r["biomodels-1047-replay"]["payload"]).lower()
+    assert "adds no scientific result" in r["biomodels-1047-render"]["payload"]["cache_key"]["scope"]
+    edges = {(e["type"], e["from"], e["to"]) for e in full["edges"]}
+    assert ("uses", "biomodels-1047-render", "orx-run-simulated-evidence") in edges and ("produced_by", "biomodels-1047-render-evidence", "biomodels-1047-render") in edges
+    assert ("produced_by", "orx-run-simulated-evidence", "biomodels-1047-replay") in edges
