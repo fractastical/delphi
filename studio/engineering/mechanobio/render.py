@@ -96,7 +96,7 @@ def render(directory):
     fig.colorbar(image, ax=ax, label="time-mean traction (pN)")
     fig.text(0.5, 0.01, "Monte Carlo variation only · not biological uncertainty · no modulus conversion or fish calibration", ha="center", fontsize=9)
     fig.tight_layout(rect=(0, 0.04, 1, 1))
-    fig.savefig(root / "response-surface.png")
+    fig.savefig(root / "response-surface.png", bbox_inches="tight", pad_inches=0.15)
     plt.close(fig)
     manifest = {"schema": "frontier.mechanobio.render-manifest/1", "evidence_kind": "render_of_simulation",
                 "input_trajectory": artifact(trajectory_path, "input"),
