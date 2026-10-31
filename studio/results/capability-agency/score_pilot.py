@@ -3,14 +3,13 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import statistics
 from collections import Counter
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-PREREG = json.loads((HERE / "preregistration.json").read_text())
-RUN = HERE / "runs" / PREREG["experiment_id"]
 
 
 def median(values: list[float]) -> float | None:
@@ -93,7 +92,12 @@ def aggregate(responses: list[dict | None]) -> dict | None:
 
 
 def main() -> int:
-    call_paths = sorted(p for p in RUN.glob("r[1-3]-*-t[1-3].json") if p.is_file())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--preregistration", default="preregistration.json")
+    args = parser.parse_args()
+    prereg = json.loads((HERE / args.preregistration).read_text())
+    run_dir = HERE / "runs" / prereg["experiment_id"]
+    call_paths = sorted(p for p in run_dir.glob("r[1-3]-*-t[1-3].json") if p.is_file())
     calls = [json.loads(p.read_text()) for p in call_paths]
     grouped: dict[tuple[int, str], list[dict | None]] = {}
     report_calls = []
@@ -115,7 +119,7 @@ def main() -> int:
            "condition_means": {condition: statistics.mean([a["score"]["total"] for a in aggregates
                                                              if a["condition"] == condition])
                                for condition in sorted({a["condition"] for a in aggregates})}}
-    (RUN / "scored_results.json").write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n")
+    (run_dir / "scored_results.json").write_text(json.dumps(out, indent=2, ensure_ascii=False) + "\n")
     print(json.dumps(out["condition_means"], sort_keys=True))
     return 0
 

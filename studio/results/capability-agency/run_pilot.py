@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import argparse
 import json
 import time
 import urllib.error
@@ -14,10 +15,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 API = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent"
 MODEL = "models/gemini-3.8-flash"
-MAX_INPUT = 9600
-MAX_OUTPUT = 400
 MAX_PROMPT_BYTES = 9000
-MAX_TOTAL_TOKENS = 270_000
 
 
 def canonical(value: object) -> str:
@@ -66,7 +64,8 @@ def prompt_for(packet: dict, rep: int, turn: int, role: str,
     return canonical(payload)
 
 
-def call_model(key: str, prompt: str, seed: int) -> tuple[dict | None, dict]:
+def call_model(key: str, prompt: str, seed: int, max_output_tokens: int,
+               thinking_level: str | None) -> tuple[dict | None, dict]:
     body = {
         "systemInstruction": {
             "parts": [{"text": (
@@ -81,11 +80,13 @@ def call_model(key: str, prompt: str, seed: int) -> tuple[dict | None, dict]:
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
         "generationConfig": {
             "temperature": 0,
-            "maxOutputTokens": MAX_OUTPUT,
+            "maxOutputTokens": max_output_tokens,
             "seed": seed,
             "responseMimeType": "application/json",
         },
     }
+    if thinking_level:
+        body["generationConfig"]["thinkingConfig"] = {"thinkingLevel": thinking_level}
     req = urllib.request.Request(
         API,
         data=json.dumps(body, ensure_ascii=False).encode(),
@@ -110,6 +111,8 @@ def call_model(key: str, prompt: str, seed: int) -> tuple[dict | None, dict]:
             "provider_response_id": decoded.get("responseId"),
             "model_returned": decoded.get("modelVersion", MODEL),
             "provider_returned": "Google Generative Language API",
+            "configured_max_output_tokens": max_output_tokens,
+            "configured_thinking_level": thinking_level,
             "candidate_finish_reason": candidates[0].get("finishReason") if candidates else None,
             "usage": decoded.get("usageMetadata"),
             "elapsed_seconds": round(time.monotonic() - started, 3),
@@ -125,14 +128,18 @@ def call_model(key: str, prompt: str, seed: int) -> tuple[dict | None, dict]:
 
 
 def main() -> int:
-    prereg = json.loads((HERE / "preregistration.json").read_text())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--preregistration", default="preregistration.json")
+    args = parser.parse_args()
+    prereg_path = (HERE / args.preregistration).resolve()
+    prereg = json.loads(prereg_path.read_text())
     if prereg.get("status") != "FROZEN_BEFORE_MODEL_CALLS" or "PENDING" in prereg.get("registered_utc", ""):
         print(json.dumps({"error": "preregistration_not_frozen"}))
         return 1
     packet_path = HERE / "public_input_packet.json"
     packet = json.loads(packet_path.read_text())
     packet_hash = sha(packet_path.read_bytes())
-    prereg_hash = sha((HERE / "preregistration.json").read_bytes())
+    prereg_hash = sha(prereg_path.read_bytes())
     try:
         key = auth_key()
     except Exception as exc:
@@ -147,12 +154,18 @@ def main() -> int:
         "collaborating_specialists": ["quantitative_analyst", "source_auditor", "model_coupler"],
     }
     order = prereg["call_order_by_repeat"]
+    params = prereg["matched_budget_and_access"]["model_and_parameters"]
+    max_output_tokens = int(params["max_tokens_per_call"])
+    thinking_level = params.get("thinking_level")
+    input_ceiling = int(prereg["matched_budget_and_access"]["per_call_input_ceiling_tokens"])
+    total_call_ceiling = int(prereg["matched_budget_and_access"]["total_model_calls"])
+    max_total_tokens = total_call_ceiling * (input_ceiling + max_output_tokens)
     all_calls: list[dict] = []
     reserved_tokens = 0
     stop_after_current = False
     for rep in range(1, 4):
         rep_key = f"repeat_{rep}"
-        seed = prereg["matched_budget_and_access"]["model_and_parameters"]["seed_per_repeat"][rep - 1]
+        seed = params["seed_per_repeat"][rep - 1]
         for condition in order[rep_key]:
             earlier: list[dict] = []
             roles = role_sets[condition]
@@ -163,22 +176,22 @@ def main() -> int:
                     print(json.dumps({"error": "prompt_byte_limit", "repeat": rep, "condition": condition, "turn": turn}))
                     return 3
                 # Reserve the preregistered worst-case token ceiling before any network request.
-                reserve = MAX_INPUT + MAX_OUTPUT
-                if reserved_tokens + reserve > MAX_TOTAL_TOKENS:
+                reserve = input_ceiling + max_output_tokens
+                if reserved_tokens + reserve > max_total_tokens:
                     print(json.dumps({"error": "token_ceiling", "repeat": rep, "condition": condition, "turn": turn}))
                     return 4
                 reserved_tokens += reserve
-                parsed, meta = call_model(key, prompt, seed)
+                parsed, meta = call_model(key, prompt, seed, max_output_tokens, thinking_level)
                 usage = meta.get("usage") if isinstance(meta.get("usage"), dict) else {}
                 input_tokens = usage.get("promptTokenCount")
                 output_tokens = usage.get("candidatesTokenCount")
                 total_tokens = usage.get("totalTokenCount")
                 usage_over_ceiling = (
-                    isinstance(input_tokens, int) and input_tokens > MAX_INPUT
+                    isinstance(input_tokens, int) and input_tokens > input_ceiling
                 ) or (
-                    isinstance(output_tokens, int) and output_tokens > MAX_OUTPUT
+                    isinstance(output_tokens, int) and output_tokens > max_output_tokens
                 ) or (
-                    isinstance(total_tokens, int) and total_tokens > MAX_INPUT + MAX_OUTPUT
+                    isinstance(total_tokens, int) and total_tokens > input_ceiling + max_output_tokens
                 )
                 call = {
                     "repeat": rep,
@@ -223,6 +236,7 @@ def main() -> int:
         "scheduled_calls": 27,
         "actual_recorded_calls": len(all_calls),
         "maximum_reserved_tokens": reserved_tokens,
+        "maximum_configured_tokens": max_total_tokens,
         "actual_provider_cost_usd": None,
         "provider_billing_meter_available": False,
         "usage": [c.get("usage") for c in all_calls],
