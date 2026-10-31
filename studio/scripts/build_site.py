@@ -12,6 +12,7 @@ those is derivable from a file here.
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import re
 import shutil
@@ -301,18 +302,20 @@ def build_timeline(ins: Inputs) -> dict | None:
     ri = "results/resources/resource-inventory.json"
     if not (ROOT / ri).exists():
         return None
+    uf = "results/resources/hackathon-usage.json"; U = json.loads(ins.read(uf)) if (ROOT / uf).exists() else None
     R = json.loads(ins.read(ri)); rows = []; sha = lambda path: ins.seen[path]["sha256"] if path in ins.seen else None
     add = lambda t, kind, title, outcome, path, ok=None, scope="", digest=None: rows.append({"time": t, "kind": kind, "title": title, "outcome": outcome, "ok": ok, "path": path, "sha256": digest or sha(path), "scope": scope})
     for f in sorted((ROOT / "deploy/receipts").glob("*.json")):
         path = f"deploy/receipts/{f.name}"; d = json.loads(ins.read(path)); ch = d.get("checks", [])
         npass = sum(1 for c in ch if c.get("passed")); target = d.get("base") or d.get("endpoint") or "public node"
         add(d["checked_at"], "live check", f.stem.replace("-", " ") + " (" + target + ")", f"{npass} of {len(ch)} checks passed", path, npass == len(ch), d.get("scope", ""))
-    for k, u in R["model_usage"].items():
+    for k, u in (U or R)["model_usage"].items():
         if isinstance(u, dict) and u.get("window_utc"):
             out = ", ".join(f"{n.replace('_', ' ')} {u[n]}" for n in ("documents_embedded", "embedding_requests", "failed_requests", "calls", "input_tokens", "output_tokens_including_thinking") if n in u)
             add(u["window_utc"][0], "model usage", f"{u.get('provider', 'provider')} {u.get('model', k.replace('_', ' '))}", out + f"; window {u['window_utc'][0]} to {u['window_utc'][1]}", u["receipt"], u.get("failed_requests", 0) == 0 if "failed_requests" in u else None, u["usage_scope"], u.get("sha256"))
-    for t in R["historical_gpu_telemetry"]:
-        add(t["window_utc"][0], "GPU telemetry", t["task_label"], f"{t['samples']} samples at {t['sample_period_ms']} ms; GPU utilisation mean {t['gpu_utilization_pct_mean']}%, max {t['gpu_utilization_pct_max']}%; memory max {t['gpu_memory_used_mib_max']} of {t['gpu_memory_total_mib']} MiB", t["source"], None, "A sampled historical window, not current utilisation.", t.get("sha256"))
+    for t in (U or R)["historical_gpu_telemetry"]:
+        mem = f"; memory max {t['gpu_memory_used_mib_max']} of {t['gpu_memory_total_mib']} MiB" if t.get("gpu_memory_used_mib_max") is not None and t.get("gpu_memory_total_mib") else ""
+        add(t["window_utc"][0], "GPU telemetry", t["task_label"], f"{t['samples']} samples at {t.get('sample_period_ms', 1000)} ms; GPU utilisation mean {t['gpu_utilization_pct_mean']}%, max {t['gpu_utilization_pct_max']}%" + (f", {t['samples_ge_90']} samples at or above 90%" if t.get("samples_ge_90") is not None else "") + mem, t["source"], None, "A sampled historical window, not current utilisation.", t.get("sha256"))
     dated_only = []
     for f in sorted((ROOT / "results").glob("20*.md")):
         path = f"results/{f.name}"; t = ins.text(path); date = f.name[:10]
@@ -334,7 +337,23 @@ def build_timeline(ins: Inputs) -> dict | None:
         {"quantity": "GPU seconds", "value": f"{tel_s:.0f} s inside {len(R['historical_gpu_telemetry'])} sampled telemetry windows", "status": "partial", "note": "Sampled windows only, a lower bound on measured time. Total GPU seconds across all jobs: unknown.", "source": ri},
         {"quantity": "CPU jobs and usage", "value": "No CPU counter is recorded", "status": "unknown", "note": "One Nebius CPU worker request was refused (ResourceExhausted); local CPU runs are not metered here.", "source": "results/resources/provider-outcome.json"},
         {"quantity": "Cost", "value": "Unknown", "status": "unknown", "note": R["cost"]["interpretation"], "source": ri}]
-    return {"observed_at": R["observed_at"], "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
+    usage = None
+    if U:
+        pdt = lambda iso: (datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")) - datetime.timedelta(hours=7)).strftime("%H:%M:%S PDT")
+        sc = U["own_job_state_counts"]; ag = U["agents"]; mu = U["model_usage"]; emb = mu["gemini_embedding_index"]; bio = mu["bioservices_gemini_calls"]; of = (U.get("hosted_biomodels") or [{}])[0]
+        st = lambda d: ", ".join(f"{n} {k.lower()}" for k, n in d.items() if n)
+        counters = [
+            {"quantity": "Agents", "value": f"{ag['native_running_snapshot']} native agents with orchestrator status running; {ag['known_contributors_in_audited_slice']} identified contributors in the audited {ag['contributor_window_seattle']} slice", "status": "partial", "note": ag["definition"] + " Total distinct agents and currently active agents: unknown. No collective speedup is measured.", "source": uf},
+            {"quantity": "GPU jobs (own H100)", "value": f"{sum(sc['gpu'].values())}: {st(sc['gpu'])}", "status": "actual", "note": f"Own job records from {pdt(U['provider_window_utc'][0])} to {pdt(U['provider_window_utc'][1])} on 2026-10-31. Provider COMPLETED is not a scientific pass. Shared H100 capacity is not our use.", "source": uf},
+            {"quantity": "CPU jobs (own)", "value": f"{sum(sc['cpu'].values())}: {st(sc['cpu'])}", "status": "actual", "note": "CPU seconds are not recorded: unknown.", "source": uf},
+            {"quantity": "GPU container work seconds", "value": f"{U['five_completed_h100_container_work_seconds']} s across five completed H100 jobs", "status": "partial", "note": U["time_definition"] + " GPU kernel seconds and billed GPU seconds: unknown.", "source": uf},
+            {"quantity": "GPU utilisation", "value": f"{len(U['historical_gpu_telemetry'])} sampled windows, listed below; current utilisation unknown", "status": "partial", "note": "Windows include low and zero values; no project-wide average is inferred.", "source": uf},
+            {"quantity": "Model calls and tokens", "value": f"Embedding index: {emb['embedding_requests']} requests, {emb['documents_embedded']} documents, {emb['failed_requests']} failed. Bioservices ledger: {bio['calls']} calls, {bio['input_tokens']} input and {bio['output_tokens_including_thinking']} output tokens (thinking included). Hosted OpenFold2: {of.get('count', 0)} operation, {of.get('final_status', '')}", "status": "partial", "note": "Named ledgers only; embedding and generation units are not merged. Total tokens: unknown. BioNeMo-specific execution: not established.", "source": uf},
+            {"quantity": "Cost", "value": "Unknown (not $0)", "status": "unknown", "note": U["cost"]["interpretation"] + " Google Compute: blocked by an unaccepted terms-of-service step; no VM created.", "source": uf}]
+        usage = {"observed_at_seattle": U["observed_at_seattle"], "jobs": [{"name": j["name"], "kind": "GPU" if "gpu" in j["platform"] else "CPU", "state": j["state"], "created": pdt(j["created_at"]), "capacity": j["requested_capacity"]} for j in sorted(U["own_jobs"], key=lambda j: j["created_at"])],
+            "controller": [{"task": e["task"], "status": e["controller_status"], "wall_s": e["container_wall_s"], "rc": e["result_rc"], "path": e["source"], "sha256": e["sha256"]} for e in U["recent_controller_events"]],
+            "roles": ag["roles"], "credit": U["external_tools_credit"], "limitations": U["limitations"], "sha256": sha(uf)}
+    return {"observed_at": R["observed_at"], "usage": usage, "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
         "unknown": [R["cost"]["interpretation"], "Total provider LLM usage: " + str(R["model_usage"].get("total_provider_llm_usage", "unknown")), "Utilisation of currently allocated GPUs is unknown until sampled."],
         "limitations": R["scope"]["limitations"], "inventory": ri, "inventory_sha256": sha(ri)}
 
@@ -453,11 +472,29 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "open_questions": ["Does the feedback-off arm keep fewer cells at the full horizon? Only the early window was observed."],
             "limitations": ["Generic example, not fish growth.", "Seed repeat is one repeat, not an uncertainty estimate.", "Two further arm movies (feedback-off, seed repeat) exist in artifacts/multicell and are not shown here."], "couplings": [], "manifest": f"{d}/summary.json", "native": True})
     d = "artifacts/molecular"
+    if (ROOT / d / "cuda-render/render.json").exists() and (ROOT / d / "cuda-analysis/ensemble.json").exists():
+        rr = json.loads(ins.read(f"{d}/cuda-render/render.json")); en = json.loads(ins.read(f"{d}/cuda-analysis/ensemble.json")); o = rr["outputs"]; runs = en["runs"]; ds = en["descriptive_endpoint_CA_RMSD_nm"]
+        st, href = _vid(ins, out, "molecular-md-cuda", f"{d}/cuda-render", "trajectory.mp4", o["trajectory.mp4"]); _, ph = _vid(ins, out, "molecular-md-cuda", f"{d}/cuda-render", "poster.png", o["poster.png"])
+        cards.append({"id": "molecular-md-cuda", "title": "Collagen-mimetic trimer: three 100 ps molecular dynamics runs on an H100 (OpenMM, CUDA)", "scales": ["molecular"], "evidence_kind": rr["kind"] + "; computed ensemble of declared seeds",
+            "model": {"name": "OpenMM classical atomistic MD, CUDA backend, ff14SB with TIP3P water", "context": f"{len(runs)} runs (seeds {', '.join(str(r['seed']) for r in runs)}), each {runs[0]['production_ps']:.0f} ps production after {runs[0]['preliminary_thermalization_ps']:.0f} ps thermalization, {runs[0]['frames']} saved states per run. The movie shows seed {rr['seed']}. One structure, one solvent system, one force field and one assumed 300 K condition are shared by all runs."},
+            "time": {"units": "picoseconds of simulated time", "note": f"{rr['frames']} frames at {rr['display_fps']} fps; rigid alignment for display only. Duration is not a relaxation time."},
+            "video": {"file": "trajectory.mp4", "sha256": o["trajectory.mp4"], "note": ""}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": f"seed {r['seed']}", "result": f"CA RMSD from production start {r['final_CA_RMSD_from_production_start_nm']:.3f} nm; kinetic temperature {r['kinetic_temperature_range_K'][0]:.0f} to {r['kinetic_temperature_range_K'][1]:.0f} K; last 20% mean {r['last_20_percent_sampled_temperature_mean_K']:.1f} ± {r['last_20_percent_sampled_temperature_SD_K']:.1f} K"} for r in runs]
+                + [{"name": "endpoint CA RMSD across seeds", "result": f"mean {ds['mean']:.3f} nm, sample SD {ds['sample_SD']:.3f} nm, range {ds['minimum']:.3f} to {ds['maximum']:.3f} nm (n = {ds['n_runs']})"}],
+            "parameter_unknowns": ["Empirical accuracy: " + str(en["empirical_accuracy"]) + ".", "Equilibrated ensemble: " + str(en["equilibrated_ensemble"]) + ".", "Tissue material modulus: not computed (null)."],
+            "open_questions": ["Do longer runs from different starting structures change any observable? Warm-start parents for a next job are recorded in warmstart-v3.json."],
+            "limitations": [en["scope"], "Biological success probability: null (not computed).", "Synthetic collagen-mimetic peptide, not a fish protein.", "The earlier 0.2 ps CPU setup run is a separate card and is not part of this ensemble."], "couplings": [], "manifest": f"{d}/cuda-render/render.json", "native": True})
+    ws = f"{d}/warmstart-v3.tar.xz"
+    if (ROOT / ws).exists() and (ROOT / d / "warmstart-v3.json").exists():
+        wm = json.loads(ins.read(f"{d}/warmstart-v3.json")); b = ins.read(ws)
+        if digest_bytes(b) == wm["sha256"] and len(b) == wm["bytes"]:
+            out["@artifacts/molecular/warmstart-v3.tar.xz"] = b
+    d = "artifacts/molecular"
     if (ROOT / d / "cpu-render/render.json").exists():
         rr = json.loads(ins.read(f"{d}/cpu-render/render.json")); an = json.loads(ins.read(f"{d}/analysis.json")); o = rr["outputs"]
         st, href = _vid(ins, out, "molecular-md", f"{d}/cpu-render", "trajectory.mp4", o["trajectory.mp4"]); _, ph = _vid(ins, out, "molecular-md", f"{d}/cpu-render", "poster.png", o["poster.png"])
         lo, hi = an["kinetic_temperature_observed_range_K"]
-        cards.append({"id": "molecular-md", "title": "Collagen-mimetic trimer: classical molecular dynamics (OpenMM, CPU), rendered from saved states", "scales": ["molecular"], "evidence_kind": rr["kind"] + "; " + an["kind"],
+        cards.append({"id": "molecular-md", "title": "Collagen-mimetic trimer: 0.2 ps CPU setup run (OpenMM), the earlier short run", "scales": ["molecular"], "evidence_kind": rr["kind"] + "; " + an["kind"],
             "model": {"name": "OpenMM 8.4 classical atomistic MD of a synthetic collagen-mimetic (Pro-Pro-Gly) trimer", "context": f"{an['frames']} saved states, {an['production_ps']} ps production after {an['preliminary_thermalization_ps']} ps preliminary thermalization, seed {an['seed']}. Rigid alignment for display only; no deformation invented."},
             "time": {"units": "picoseconds of simulated time", "note": f"{rr['frames']} frames at {rr['display_fps']} fps; trajectory duration is not a relaxation time."},
             "video": {"file": "trajectory.mp4", "sha256": o["trajectory.mp4"], "note": ""}, "video_state": st, "video_href": href, "poster_href": ph,
@@ -846,7 +883,7 @@ def build() -> dict[str, bytes]:
 
 
 def write(out: dict[str, bytes]) -> None:
-    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results", SITE / "artifacts" / "fish3d"):
+    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print", SITE / "artifacts" / "results", SITE / "artifacts" / "fish3d", SITE / "artifacts" / "molecular"):
         if d.exists():
             shutil.rmtree(d)
     for name, b in out.items():
@@ -859,7 +896,7 @@ def check(out: dict[str, bytes]) -> list[str]:
     at = lambda n: SITE / n[1:] if n.startswith("@") else DATA / n
     stale = [n for n, b in out.items() if not at(n).exists() or at(n).read_bytes() != b]
     extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
-    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results", "fish3d") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
+    pr = [("@artifacts/" + sub + "/" + p.relative_to(SITE / "artifacts" / sub).as_posix()) for sub in ("print", "results", "fish3d", "molecular") for p in (SITE / "artifacts" / sub).rglob("*") if p.is_file()] if (SITE / "artifacts").exists() else []
     return stale + [f"unexpected {e}" for e in extra if e not in out] + [f"unexpected {e}" for e in pr if e not in out]
 
 
