@@ -1,0 +1,20 @@
+{
+  "claim_id": "thompson1917-ch07-08",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch07-08",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "hypothesis": "If regular hexagonal packing arises only where cells are uniform in size (and forces uniform), then within an epithelium that Thompson names as the showcase of regular hexagons, the retinal pigment epithelium, the local regularity of the cell polygons must track the local uniformity of cell size: regions whose cells are more uniform in area must have a higher fraction of six-sided cells and a lower spread of neighbour numbers than regions whose cells vary more in area.",
+  "pass_criterion": "Pre-registered. For every corrected RPE segmentation ROI of the 10 participants in Granger et al. 2018 (in vivo adaptive-optics imaging of the human RPE mosaic), identify the cells not touching the ROI border, their pixel areas and their numbers of neighbours. For ROIs with >= 30 interior cells compute the coefficient of variation of cell area (CV_A), the fraction of six-sided cells (f6) and the standard deviation of neighbour number (SD_n). The claim is supported if, across ROIs, Spearman's rho between f6 and CV_A is <= -0.3 with p < 0.01, and the mean f6 of the quartile of ROIs with the lowest CV_A exceeds that of the highest-CV_A quartile by at least 0.10 (ten percentage points). SD_n versus CV_A (expected positive) is reported as a consistency check.",
+  "fail_criterion": "Pre-registered. The claim is refuted if Spearman's rho between f6 and CV_A is >= 0, or if the relation is not significant (p >= 0.05) with the quartile difference in f6 below 0.05, i.e. hexagon regularity does not track size uniformity. Intermediate results (e.g. significant but weak, rho in (-0.3, 0)) are 'mixed'. If fewer than 20 ROIs qualify the verdict is inconclusive (underpowered).",
+  "planned_datasets": [
+    "dryad-b41j15h-granger-2018-human-rpe-aoslo-mosaic"
+  ],
+  "interpretation": "Thompson's statement is comparative across tissues: perfectly regular hexagons where cells are uniform (retinal pigment epithelium) and irregular polygons where cell sizes vary (intestinal epithelium, parenchyma). No public dataset gives comparable per-cell segmentations of all three tissues, so the test is run within the tissue he names as the regular case, using natural variation in cell-size uniformity between regions of the human RPE mosaic (different retinal eccentricities and individuals). 'Regular hexagons' is operationalized topologically as the fraction of six-sided cells and the spread of neighbour numbers; 'uniform in size' as the coefficient of variation of apical cell area within the same region. 'Uniform forces' is not measured; the RPE as a non-proliferating monolayer under hydrostatic pressure is Thompson's own example of uniform forces, so the test isolates the size-uniformity part of his claim. Before this pre-registration only the Dryad file listing, the dataset README and the TIFF header tags (image size, bit depth, compression) of one participant's files were inspected, to confirm the segmentation images are readable; no cell outlines or measurements were examined.",
+  "datasets": [],
+  "method": "",
+  "measured": {},
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/thompson-claim-tests-cf12", "date": "2026-10-31" }
+}
