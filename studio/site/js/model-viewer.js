@@ -266,7 +266,8 @@ export function mountFishViewer(host, opts = {}) {
   // scales mesh has ~230k triangles, so a click cost 200-330 ms (measured, software GL). For heavy meshes
   // keep one axis-aligned box per triangle and run a cheap slab test first, then the exact triangle test
   // on the few survivors. Same hit as the Raycaster (checked in tests), a fraction of the time.
-  const HEAVY_TRIS = 20000;
+  const HEAVY_TRIS = opts.heavyTris ?? 20000;      // option exists so tests can force either path
+  const triCount = (g) => (g.index ? g.index.count : g.attributes.position.count) / 3;
   function triBounds(mesh) {
     const g = mesh.geometry, pos = g.attributes.position, idx = g.index, n = (idx ? idx.count : pos.count) / 3;
     const bb = new Float32Array(n * 6), at = (i) => (idx ? idx.getX(i) : i);
@@ -281,10 +282,12 @@ export function mountFishViewer(host, opts = {}) {
   }
   function pickMesh(mesh, ray) {            // nearest hit {distance} in world units, or null
     const T = three, g = mesh.geometry;
-    if (!(g.index ? g.index.count : g.attributes.position.count) / 3 > HEAVY_TRIS) {
+    if (triCount(g) <= HEAVY_TRIS) {
+      mesh.userData.mvPickPath = "raycaster";
       const h = new T.Raycaster(ray.origin, ray.direction).intersectObject(mesh, false)[0];
       return h ? { distance: h.distance } : null;
     }
+    mesh.userData.mvPickPath = "bounds";
     mesh.updateWorldMatrix(true, false);
     const inv = mesh.matrixWorld.clone().invert(), lr = ray.clone().applyMatrix4(inv);
     const bb = mesh.userData.mvTriBounds || (mesh.userData.mvTriBounds = triBounds(mesh));
@@ -303,18 +306,19 @@ export function mountFishViewer(host, opts = {}) {
       if (t0 > t1 || t1 < 0) continue;
       A.fromBufferAttribute(pos, at(3 * t)); B.fromBufferAttribute(pos, at(3 * t + 1)); C.fromBufferAttribute(pos, at(3 * t + 2));
       if (lr.intersectTriangle(A, B, C, false, hit)) {
-        const dist = hit.sub(o).length();            // local distance; the ray was transformed, not renormalised
-        const wd = dist * (ray.direction.length() / d.length() || 1);
+        // hit is in the mesh's local frame; Ray.applyMatrix4 renormalised the direction, so a local distance
+        // is not a world distance under a scaled node. Measure it in world space, as Raycaster does.
+        const wd = hit.clone().applyMatrix4(mesh.matrixWorld).distanceTo(ray.origin);
         if (wd < best) best = wd;
       }
     }
-    return best < Infinity ? { distance: best * 1 } : null;
+    return best < Infinity ? { distance: best } : null;
   }
-  function cpuPick(meshes) {
+  function cpuPick(meshes, withDistance) {
     const ray = raycaster.ray;
     let best = null;
     meshes.forEach((m) => { const h = pickMesh(m, ray); if (h && (!best || h.distance < best.distance)) best = { ...h, name: m.userData.mvName }; });
-    return best ? best.name : null;
+    return withDistance ? best : best ? best.name : null;
   }
 
   function wireInput(canvas) {
@@ -471,7 +475,7 @@ export function mountFishViewer(host, opts = {}) {
     S.perf.total_ms = ms(got.t0);
     dirty = true;
     // build the per-triangle bounds now (idle), so the first click is as fast as the rest
-    const heavy = S.names.flatMap(meshesOf).filter((m) => (m.geometry.index ? m.geometry.index.count : m.geometry.attributes.position.count) / 3 > HEAVY_TRIS);
+    const heavy = S.names.flatMap(meshesOf).filter((m) => triCount(m.geometry) > HEAVY_TRIS);
     const warm = (i) => { if (disposed || i >= heavy.length) return; const m = heavy[i]; if (m.geometry) m.userData.mvTriBounds = m.userData.mvTriBounds || triBounds(m); setTimeout(() => warm(i + 1), 0); };
     setTimeout(() => warm(0), 0);
   }
@@ -557,14 +561,15 @@ export function mountFishViewer(host, opts = {}) {
     bodyExtentX: (n = "body") => { if (!nodes[n]) return null; const b = new three.Box3().setFromObject(nodes[n].group); return b.max.x - b.min.x; },
     // per-component facts read from the loaded scene (triangles, the materials actually in use)
     componentInfo: (n) => nodes[n] && { triangles: nodes[n].triangles, record: !!comps[n],
+      pickPaths: nodes[n].meshes.map((m) => m.userData.mvPickPath || null),   // which pick path last ran: "bounds" | "raycaster"
       materials: nodes[n].meshes.map((m) => ({ kind: m.userData.mvKind, color: "#" + (m.material.color ? m.material.color.getHexString() : "none"),
         vertexColors: !!m.material.vertexColors, transparent: !!m.material.transparent, opacity: m.material.opacity,
         alphaTest: m.material.alphaTest, hasMap: !!m.material.map })) },
     // diagnostic: the fast pick and three's Raycaster at one NDC point, as component names (they must agree)
     _pickCompare: (nx, ny) => { const T = three; raycaster.setFromCamera(new T.Vector2(nx, ny), camera);
       const ms_ = S.names.filter((n) => nodes[n].group.visible).flatMap(meshesOf);
-      const h = raycaster.intersectObjects(ms_, false)[0];
-      return [cpuPick(ms_), h ? h.object.userData.mvName : null]; },
+      const h = raycaster.intersectObjects(ms_, false)[0], f = cpuPick(ms_, true);
+      return [f ? f.name : null, h ? h.object.userData.mvName : null, f ? f.distance : null, h ? h.distance : null]; },
     componentNames: () => [...S.names], variantIds: () => variants.map((v) => v.id),
     appearance: () => ctx.appearance, setVariant, select, setVisible, reset,
     destroy() {
