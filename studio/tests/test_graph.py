@@ -348,3 +348,80 @@ def test_a_ref_must_match_the_stored_record_exactly(store):
     for change in ({"id": "other"}, {"namespace": "node-b"}, {"kind": "Problem"}):
         with pytest.raises(Missing):
             graph.view(store, {**rec_ref(c), **change})
+
+
+# ------------------------------------------------------------------ catalogue counts (hand-worked) with explicit unknown / unstructured categories
+def _claim(ns, id_, extra=None, assumptions=None, prior=None, version_tag=""):
+    payload = {"title": id_ + version_tag, "assumptions": assumptions if assumptions is not None else [], "origin": "unknown"}
+    if prior is not None:
+        payload["prior_review"] = prior
+    payload.update(extra or {})
+    return _mk("Claim", id_, "i", payload, ns=ns)
+
+
+def _upstream_prior(cid, kind="literature", notation=None, absent=()):
+    d = {"claim_id": cid, "kind": kind, "unmapped_fields": ({"skos:notation": notation} if notation else {}), "absent_in_record": list(absent)}
+    return {"delphi_original": d}
+
+
+def test_catalogue_counts_hand_worked():
+    a1 = _claim("n1", "a", version_tag="v1", prior=_upstream_prior("U1", "math", "u_t = f(u)"), assumptions=["See exact source context; no review"])
+    a2 = _claim("n1", "a", version_tag="v2", prior=_upstream_prior("U1", "math", "u_t = f(u)"), assumptions=["See exact source context; no review"])   # a second VERSION of record n1/a
+    b = _claim("n1", "b", prior=_upstream_prior("U2", absent=("assumptions",)))
+    a_other_ns = _claim("n2", "a", assumptions=["x holds"])                                                          # same id, other namespace, no upstream id
+    plain = _claim("n2", "c")
+    P = _mk("Problem", "p1", "i", {"original": {"register_record": {"organisms": ["ncbitaxon:7227", "NCBITaxon:7955", "fruit fly"]}}}, ns="n1")
+    P2 = _mk("Problem", "p2", "i", {"original": {"register_record": {"organisms": ["ncbitaxon:7227"]}}}, ns="n1")
+    P3 = _mk("Problem", "p3", "i", {"original": {"register_record": {"organisms": []}}}, ns="n1")
+    P4 = _mk("Problem", "p4", "i", {"title": "mentions Drosophila melanogaster in prose only"}, ns="n1")
+    E1 = _mk("Evidence", "e1", "i", {"evidence_kind": "formal", "target": rec_ref(a2), "artifacts": [art("1" * 64, "certificate"), art("2" * 64, "code")]})
+    E2 = _mk("Evidence", "e2", "i", {"evidence_kind": "simulated", "target": rec_ref(b), "artifacts": [art("2" * 64, "code"), art("3" * 64, "output"), art("1" * 64, "input"),
+                                                                                                          {**art("4" * 64, "output"), "uri": "https://example.org/f", "availability": "downloadable"}]})
+    recs = [a1, a2, b, a_other_ns, plain, P, P2, P3, P4, E1, E2]
+    m = graph.catalogue_counts(recs, {a2["version"], b["version"], a_other_ns["version"], plain["version"]})
+    c = m["claims"]
+    # 5 Claim versions; records by namespace+id: n1/a, n1/b, n2/a, n2/c = 4; distinct ids a,b,c = 3; id 'a' lives in two namespaces
+    assert (c["versions"], c["distinct_records_namespace_and_id"], c["distinct_ids_across_namespaces"], c["ids_present_in_more_than_one_namespace"]) == (5, 4, 3, 1)
+    assert (c["head_versions"], c["non_head_versions"]) == (4, 1) and c["by_namespace"] == {"n1": {"versions": 3, "distinct_records": 2}, "n2": {"versions": 2, "distinct_records": 2}}
+    assert (c["with_upstream_claim_id"], c["distinct_upstream_claim_ids"], c["without_upstream_identity_unknown"]) == (3, 2, 2)           # U1 twice (two versions), U2 once
+    cm = m["conditions_and_math"]
+    assert (cm["assumptions_empty"], cm["assumptions_importer_placeholder"], cm["assumptions_declared_text"]) == (2, 2, 1)                  # b and c empty; a1,a2 placeholder; a_other_ns text
+    assert cm["claims_whose_upstream_record_lacks_assumptions"] == 1 and cm["structured_conditions"]["count"] is None
+    assert cm["math_representation_text_present"] == {"claims": 2, "of_which_upstream_kind_math": 2, "upstream_kind_math_total": 2,
+                                                       "field": "payload.prior_review.delphi_original.unmapped_fields['skos:notation'] (untyped text)", "structured": False}
+    assert (cm["formal_check"]["evidence_records_kind_formal"], cm["formal_check"]["distinct_claims_with_formal_evidence"], cm["formal_check"]["certificate_role_artifact_declarations"],
+            cm["formal_check"]["receipt_contents_read_by_this_module"]) == (1, 1, 1, 0)
+    a = m["artifacts"]
+    # declarations: e1 has 2, e2 has 4 = 6; digests 1,2,2,3,1,4 -> 4 unique; (digest,role) pairs: (1,cert)(2,code)(3,out)(1,input)(4,out) = 5
+    assert (a["declarations"], a["unique_digests"], a["unique_digest_role_pairs"], a["evidence_records_declaring"]) == (6, 4, 5, 2)
+    assert a["by_availability"] == {"downloadable": 1, "referenced": 5} and a["https_pointers"] == 1 and a["urn_pointers"] == 5 and a["declared_downloadable"] == 1
+    assert a["hosted_and_byte_checked"]["count"] == 0 and a["records_other_than_evidence_declaring_artifacts"] == 0
+
+
+def test_species_are_never_counted_as_mapped_and_text_mentions_never_counted():
+    P = _mk("Problem", "p1", "i", {"original": {"register_record": {"organisms": ["ncbitaxon:7227", "NCBITaxon:7955", "fruit fly"]}}})
+    P2 = _mk("Problem", "p2", "i", {"original": {"register_record": {"organisms": ["ncbitaxon:7227"]}}})
+    P3 = _mk("Problem", "p3", "i", {"title": "Drosophila melanogaster and zebrafish in prose only"})
+    sp = graph.catalogue_counts([P, P2, P3], set())["species"]
+    assert sp["mapped_species"]["count"] is None and "registry is pending" in sp["mapped_species"]["status"]                  # no number, however many id-like tokens exist
+    t = sp["taxon_id_tokens_in_untyped_source_field"]
+    # problems with a non-empty organisms list: p1, p2 = 2; register record present: 2; p3 has none; tokens: ncbitaxon:7227, NCBITaxon:7955, fruit fly = 3 distinct
+    assert (t["problems_with_the_field_nonempty"], t["problems_with_a_register_record"], t["problems_without_a_register_record"], t["distinct_tokens"]) == (2, 2, 1, 3)
+    assert t["tokens_formatted_as_ncbitaxon_id"] == 2 and t["tokens_not_formatted_as_id"] == ["fruit fly"] and "UNMAPPED" in t["status"]
+    assert sp["free_text_organism_mentions_counted"] is False
+
+
+def test_empty_store_reports_zeros_and_keeps_the_unknown_list():
+    m = graph.catalogue_counts([], set())
+    assert m["claims"]["versions"] == 0 and m["artifacts"]["declarations"] == 0 and m["species"]["mapped_species"]["count"] is None
+    assert "mapped species (no typed taxon field; registry pending)" in m["unknown_or_unstructured"] and len(m["unknown_or_unstructured"]) == 6
+
+
+def test_catalogue_report_on_a_real_store(store):
+    c = submit(store, "c", claim(store, "c1"))
+    submit(store, "e", ev_draft(store, rec_ref(c), "ev1", evidence_kind="formal", artifacts=[art("a" * 64, "certificate", "receipt.json"), art("a" * 64, "output", "same bytes")]))
+    rep = graph.catalogue_report(store)
+    assert rep["claims"]["versions"] == 1 and rep["claims"]["head_versions"] == 1 and rep["scope"]["records_read"] == 2
+    assert (rep["artifacts"]["declarations"], rep["artifacts"]["unique_digests"], rep["artifacts"]["unique_digest_role_pairs"]) == (2, 1, 2)         # same bytes declared twice: 2 declarations, 1 digest
+    assert rep["conditions_and_math"]["formal_check"]["evidence_records_kind_formal"] == 1 and rep["conditions_and_math"]["formal_check"]["certificate_role_artifact_declarations"] == 1
+    assert graph.receipt(store)["catalogue"]["claims"]["versions"] == 1

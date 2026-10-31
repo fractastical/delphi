@@ -411,6 +411,106 @@ def reuse_report(store, *, max_records: int = 5000, max_events: int = 20000) -> 
     return out
 
 
+TAXON_TOKEN = re.compile(r"^ncbitaxon:\d+$", re.I)
+PLACEHOLDER_ASSUMPTION = "See exact source context"
+
+
+def _upstream(rec: dict) -> dict:
+    d = (rec["payload"].get("prior_review") or {})
+    d = d.get("delphi_original") if isinstance(d, dict) else None
+    return d if isinstance(d, dict) else {}
+
+
+def _register(rec: dict) -> dict | None:
+    o = rec["payload"].get("original")
+    r = o.get("register_record") if isinstance(o, dict) else None
+    return r if isinstance(r, dict) else None
+
+
+def catalogue_counts(records: list[dict], head_versions: set) -> dict:
+    """Measured counts over PUBLIC non-Event records, with every category that cannot be measured named as unknown or unstructured.
+    Nothing is inferred from free text: a species counts as MAPPED only through a typed taxon-id field linked to a pinned record, and the store has no such field."""
+    claims = [r for r in records if r["kind"] == "Claim"]
+    by_ns = defaultdict(list)
+    for r in claims:
+        by_ns[r["namespace"]].append(r)
+    ids_ns = defaultdict(set)
+    for r in claims:
+        ids_ns[r["id"]].add(r["namespace"])
+    up = [(r, _upstream(r)) for r in claims]
+    upstream_ids = [d.get("claim_id") for _, d in up if d.get("claim_id")]
+    with_up = [(r, d) for r, d in up if d.get("claim_id")]
+    asm_empty = sum(1 for r in claims if not r["payload"].get("assumptions"))
+    asm_placeholder = sum(1 for r in claims if r["payload"].get("assumptions") and all(str(a).startswith(PLACEHOLDER_ASSUMPTION) for a in r["payload"]["assumptions"]))
+    notation = [(r, d) for r, d in up if (d.get("unmapped_fields") or {}).get("skos:notation")]
+    problems = [r for r in records if r["kind"] == "Problem"]
+    reg = [(p, _register(p)) for p in problems]
+    reg_with_org = [(p, g) for p, g in reg if g and g.get("organisms")]
+    tokens = Counter(t for _, g in reg_with_org for t in g["organisms"] if isinstance(t, str))
+    id_tokens = {t for t in tokens if TAXON_TOKEN.match(t)}
+    evidence = [r for r in records if r["kind"] == "Evidence"]
+    decls = [(e, a) for e in evidence for a in artifacts_of(e)]
+    formal = [e for e in evidence if e["payload"].get("evidence_kind") == "formal"]
+    formal_claims = {(e["payload"]["target"]["namespace"], e["payload"]["target"]["id"]) for e in formal if e["payload"].get("target", {}).get("kind") == "Claim"}
+    cert = [(e, a) for e, a in decls if a.get("role") == "certificate"]
+    return {
+        "claims": {
+            "versions": len(claims), "distinct_records_namespace_and_id": len({(r["namespace"], r["id"]) for r in claims}),
+            "distinct_ids_across_namespaces": len({r["id"] for r in claims}), "head_versions": sum(1 for r in claims if r["version"] in head_versions),
+            "non_head_versions": sum(1 for r in claims if r["version"] not in head_versions),
+            "by_namespace": {ns: {"versions": len(rs), "distinct_records": len({r["id"] for r in rs})} for ns, rs in sorted(by_ns.items())},
+            "ids_present_in_more_than_one_namespace": sum(1 for v in ids_ns.values() if len(v) > 1),
+            "with_upstream_claim_id": len(with_up), "distinct_upstream_claim_ids": len(set(upstream_ids)), "without_upstream_identity_unknown": len(claims) - len(with_up),
+            "origin_declared": dict(sorted(Counter(r["payload"].get("origin", "unknown") for r in claims).items())),
+            "note": "a Claim id present in two namespaces is two distinct records; whether they are the same upstream claim is only known where an upstream claim id is carried"},
+        "species": {
+            "mapped_species": {"count": None, "status": "unknown: the store has no typed taxon-identifier field linking a taxon to a pinned record, and the genomic registry is pending; no number is invented"},
+            "taxon_id_tokens_in_untyped_source_field": {
+                "field": "payload.original.register_record.organisms (untyped list inside the register's own record)", "problems_with_the_field_nonempty": len(reg_with_org),
+                "problems_with_a_register_record": sum(1 for _, g in reg if g), "problems_without_a_register_record": sum(1 for _, g in reg if not g),
+                "distinct_tokens": len(tokens), "tokens_formatted_as_ncbitaxon_id": len(id_tokens), "tokens_not_formatted_as_id": sorted(t for t in tokens if t not in id_tokens),
+                "status": "UNVERIFIED and UNMAPPED: well-formed id-like strings in a source field; not checked against any registry, not a typed link, not a count of mapped species"},
+            "free_text_organism_mentions_counted": False},
+        "artifacts": {
+            "declarations": len(decls), "evidence_records_declaring": len({(e["namespace"], e["id"]) for e, _ in decls}),
+            "unique_digests": len({a["sha256"] for _, a in decls}), "unique_digest_role_pairs": len({(a["sha256"], a.get("role")) for _, a in decls}),
+            "by_availability": dict(sorted(Counter(a.get("availability") for _, a in decls).items())), "by_role": dict(sorted(Counter(a.get("role") for _, a in decls).items())),
+            "https_pointers": sum(1 for _, a in decls if str(a.get("uri", "")).startswith("https://")), "urn_pointers": sum(1 for _, a in decls if str(a.get("uri", "")).startswith("urn:sha256:")),
+            "declared_downloadable": sum(1 for _, a in decls if a.get("availability") == "downloadable"),
+            "hosted_and_byte_checked": {"count": 0, "basis": "no byte-check receipt record exists in the store and this module never fetches a URI; 0 is the absence of any check, not a finding that hosted files are wrong or right"},
+            "records_other_than_evidence_declaring_artifacts": sum(1 for r in records if r["kind"] != "Evidence" and artifacts_of(r))},
+        "conditions_and_math": {
+            "claims": len(claims), "assumptions_empty": asm_empty, "assumptions_importer_placeholder": asm_placeholder,
+            "assumptions_declared_text": len(claims) - asm_empty - asm_placeholder,
+            "claims_whose_upstream_record_lacks_assumptions": sum(1 for _, d in up if "assumptions" in (d.get("absent_in_record") or [])),
+            "structured_conditions": {"count": None, "status": "unknown: conditions are free-text lists; the store has no machine-checkable condition field"},
+            "math_representation_text_present": {
+                "claims": len(notation), "of_which_upstream_kind_math": sum(1 for _, d in notation if d.get("kind") == "math"), "upstream_kind_math_total": sum(1 for _, d in up if d.get("kind") == "math"),
+                "field": "payload.prior_review.delphi_original.unmapped_fields['skos:notation'] (untyped text)", "structured": False},
+            "formal_check": {"evidence_records_kind_formal": len(formal), "distinct_claims_with_formal_evidence": len(formal_claims), "certificate_role_artifact_declarations": len(cert),
+                             "receipt_contents_read_by_this_module": 0,
+                             "note": "a formal Evidence record and a certificate pointer are declarations; their bytes are not stored or checked here, so the number of VERIFIED formal receipts is unknown"}},
+        "problems": {"versions": len(problems), "distinct_records": len({(p["namespace"], p["id"]) for p in problems})},
+        "unknown_or_unstructured": [
+            "mapped species (no typed taxon field; registry pending)", "structured conditions (free text only)", "math representations as typed objects (untyped text only)",
+            "verified formal receipts (pointers only)", "byte-checked hosted artifacts (no check mechanism)", "upstream identity of claims without a carried upstream id"],
+    }
+
+
+def catalogue_report(store, *, max_records: int = 20000) -> dict:
+    """Read PUBLIC non-Event records (read-only) and return catalogue_counts with the read scope. Refuses above the cap; never partial."""
+    with store.connection() as c:
+        c.execute("SET TRANSACTION READ ONLY")
+        rows = c.execute(f"SELECT v.envelope, (h.version IS NOT NULL) AS is_head FROM record_versions v LEFT JOIN heads h ON h.version = v.version WHERE {PUB} "
+                         f"ORDER BY v.created_at, v.version LIMIT %s", (max_records + 1,)).fetchall()
+    if len(rows) > max_records:
+        raise FrontierError("The public record set is larger than this report will read; no partial result is produced")
+    records = [r["envelope"] for r in rows]
+    out = catalogue_counts(records, {r["envelope"]["version"] for r in rows if r["is_head"]})
+    out["scope"] = {"records_read": len(records), "namespaces": sorted({r["namespace"] for r in records}), "visibility": "public, non-Event records only", "cap": max_records}
+    return out
+
+
 def receipt(store, *, overview_limit: int = DEFAULT_LIMIT, focus_kind: str = "Action", focus_depth: int = 2) -> dict:
     """An actual graph + reuse receipt from a live (read-only) store: overview counts, one real neighborhood, and the reuse measurement with its per-edge trace."""
     ov = view(store, limit=overview_limit)
@@ -419,7 +519,7 @@ def receipt(store, *, overview_limit: int = DEFAULT_LIMIT, focus_kind: str = "Ac
         row = c.execute(f"SELECT v.envelope FROM record_versions v WHERE {PUB} AND v.kind = %s ORDER BY v.created_at, v.version LIMIT 1", (focus_kind,)).fetchone()
     focus = view(store, _ref(row["envelope"]), depth=focus_depth, limit=60) if row else None
     return {"schema": "frontier-graph-reuse-receipt-0.1", "overview": {k: ov[k] for k in ("counts", "truncated", "scope")}, "focus_neighborhood": focus,
-            "reuse": reuse_report(store),
+            "reuse": reuse_report(store), "catalogue": catalogue_report(store),
             "statement": ("A pinned input is a declaration, an imported Action is the producer's declaration and not work done here, and a dependency edge is not time saved. "
                           "Nothing in this receipt measures time, cost, benefit or a swarm/scaling advantage; no controlled comparison exists.")}
 
