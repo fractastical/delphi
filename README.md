@@ -1,4 +1,10 @@
+<p align="center">
+  <img src="assets/logo.svg" alt="DELPHI seal" width="220">
+</p>
+
 # delphisci
+
+**DELPHI**: **D**istributed **E**pistemic **L**ayer for **P**robabilistic **H**ypothesis **I**nference.
 
 This project was created for **Science Claw Hack @ MIT**.
 
@@ -10,10 +16,11 @@ To get there, we:
 
 - extract candidate laws from the literature as claims, each traced back to its source papers and datasets;
 - formalize them where possible, for example as Lean 4 theorems using the ontology's formal-verification terms;
-- test them against real empirical data, and record the evidence and our assessments of it;
+- simulate them across many organisms, not just one model system, since a law that holds in only one organism is not fundamental;
+- test them against real empirical data for each organism, and record the evidence and our assessments of it;
 - publish each step as a nanopublication, so every candidate law, test, and assessment can be cited, queried, and challenged.
 
-A machine-checked proof shows that a theorem follows from its stated assumptions. It does not show that living systems satisfy those assumptions, which is a question for evidence and experiment.
+A machine-checked proof shows that a theorem follows from its stated assumptions. It does not show that living systems satisfy those assumptions, which is a question for evidence and experiment. Likewise, each organism's simulation is checked against that organism's own data, not data borrowed from another species.
 
 ## Approach
 
@@ -31,6 +38,8 @@ Before building, publishing, or querying nanopubs, read [BEST_PRACTICES.md](BEST
 ## Querying nanopubs
 
 A nanopublication bundles a single assertion with its provenance and publication info as RDF named graphs. The following resources cover how to find and query them.
+
+To query this project's claims, their math and their assessment rankings, use the `delphisci` MCP server or its CLI in [`mcp/`](mcp/README.md). Agents should start with [AGENTS.md](AGENTS.md).
 
 ### Web interfaces
 
