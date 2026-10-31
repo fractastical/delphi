@@ -36,13 +36,20 @@
     return state;
   }
 
+  /* Live rows are {record:{namespace,kind,id,version,payload,...}, local_status, is_head, action, why_matched}; the page uses one shape for both modes. */
+  function norm(row) {
+    const rec = row.record || row; const p = rec.payload || {};
+    return { ref: { namespace: rec.namespace, kind: rec.kind, id: rec.id, version: rec.version }, title: p.title || rec.id, payload: p, local_status: row.local_status, is_head: row.is_head,
+      why_matched: row.why_matched === undefined ? undefined : [].concat(row.why_matched), policy_version: row.policy_version, issuer: rec.issuer, source_uri: rec.source_uri, action: row.action, raw: row };
+  }
+
   /* Catalog: GET /api/catalog?query&kind&status&limit<=50&after -> {records, next_cursor, namespace, mode}. */
   async function catalog({ query = "", kind = "", status = "", limit = 20, after = "" } = {}) {
     limit = Math.max(1, Math.min(50, limit | 0 || 20));
     if (isLive()) {
       const q = new URLSearchParams(); if (query) q.set("query", query); if (kind) q.set("kind", kind); if (status) q.set("status", status); q.set("limit", String(limit)); if (after) q.set("after", after);
       const r = await getJSON("api/catalog?" + q.toString());
-      return { records: r.records || r.items || [], next_cursor: r.next_cursor || null, namespace: r.namespace || null, mode: r.mode || "live", source: "runtime" };
+      return { records: (r.results || []).map(norm), next_cursor: r.next_cursor || null, namespace: r.namespace || null, mode: r.mode || "live", search_mode: r.search_mode || null, source: "runtime" };
     }
     const needle = query.trim().toLowerCase();
     const rows = state.catalog.records.filter((rec) => (!kind || rec.ref.kind === kind) && (!status || rec.local_status === status) &&
@@ -55,7 +62,7 @@
   async function record(ref) {
     if (isLive()) {
       const q = new URLSearchParams({ namespace: ref.namespace, kind: ref.kind, id: ref.id, version: ref.version });
-      return getJSON("api/record?" + q.toString());
+      const r = await getJSON("api/record?" + q.toString()); const n = norm(r); n.raw = r; return n;
     }
     const hit = state.catalog.records.find((r) => r.ref.kind === ref.kind && r.ref.id === ref.id && (!ref.version || r.ref.version === ref.version));
     if (!hit) throw new Error("record not in snapshot");
@@ -71,7 +78,7 @@
   }
 
   async function events() {
-    if (isLive()) return { events: (await getJSON("api/events")).events || [], source: "runtime" };
+    if (isLive()) { const r = await getJSON("api/events?limit=50"); return { events: (r.events || []).map((e) => ({ sequence: e.sequence, kind: (e.envelope || {}).kind, id: (e.envelope || {}).id, version: (e.envelope || {}).version, issuer: (e.envelope || {}).issuer, created_at: (e.envelope || {}).created_at })), next_cursor: r.next_cursor || null, source: "runtime" }; }
     return { events: [], source: "snapshot", note: "A snapshot has no event stream." };
   }
 

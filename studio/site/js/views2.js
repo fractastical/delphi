@@ -307,7 +307,7 @@
         <p>Results, reuse and compute counts will appear only when derived from run receipts and recorded edges. Counts of test definitions, generated records or submitted jobs are not successful executions, and this page shows none of them.</p></section>`,
       async after(root) {
         const host = root.querySelector("#events");
-        try { const r = await DF.api.events(); host.innerHTML = r.events.length ? html`<ul class="evlist">${r.events.slice(0, 50).map((e) => html`<li><pre>${JSON.stringify(e, null, 1)}</pre></li>`)}</ul>`.toString() : `<p class="empty">${esc(r.note || "The runtime reports no events.")} No agents, leases or contributions are displayed.</p>`; }
+        try { const r = await DF.api.events(); host.innerHTML = r.events.length ? html`<p class="small faint">Events are records emitted by the store, in sequence order; they say what was recorded, not that it is correct.</p><div class="tablewrap"><table><thead><tr><th>#</th><th>Kind</th><th>Id</th><th>Issuer</th><th>Created</th></tr></thead><tbody>${r.events.map((e) => html`<tr><td>${e.sequence}</td><td>${e.kind}</td><td><code>${e.id}</code></td><td>${e.issuer || ""}</td><td>${e.created_at || ""}</td></tr>`)}</tbody></table></div>${r.next_cursor ? html`<p class="small faint">More events exist than shown.</p>` : ""}`.toString() : `<p class="empty">${esc(r.note || "The runtime reports no events.")} No agents, leases or contributions are displayed.</p>`; }
         catch (e) { host.innerHTML = `<p class="empty">Could not read events: ${esc(e.message)}. Nothing is displayed in their place.</p>`; }
       },
     };
@@ -366,7 +366,7 @@
         <form class="filters" role="search" data-form="catalog" aria-label="Search the catalog"><input type="hidden" name="tab" value="catalog">
           <label>Query <input type="search" name="q" value="${f.q}" placeholder="words in a record"></label>
           <label>Kind <select name="kind"><option value="">all</option>${kinds.map((k) => html`<option ${k === f.kind ? raw("selected") : ""}>${k}</option>`)}</select></label>
-          <label>Local status <select name="status"><option value="">any</option><option value="snapshot_unreviewed" ${f.status ? raw("selected") : ""}>snapshot, unreviewed</option></select></label>
+          <label>Local status <select name="status"><option value="">any</option>${(DF.api.state.mode === "live" && DF.api.state.authenticated ? ["proposed", "imported_unreviewed", "accepted", "disputed", "rejected"] : ["snapshot_unreviewed"]).map((s) => html`<option value="${s}" ${s === f.status ? raw("selected") : ""}>${s.replace(/_/g, " ")}</option>`)}</select></label>
           <button class="btn" type="submit">Search</button>${f.q || f.kind || f.status ? html`<a class="btn ghost" href="${DF.href(base, { tab: "catalog" })}">Clear</a>` : ""}</form>
         <p class="count" id="ccount" role="status">Loading…</p><ul class="catalog" id="clist"></ul><div id="cmore"></div></section>`,
       async after(root) {
@@ -376,7 +376,7 @@
           try {
             const r = await DF.api.catalog({ query: f.q, kind: f.kind, status: f.status, limit: 20, after });
             list.insertAdjacentHTML("beforeend", r.records.map((rec) => recordRow(rec)).join("")); shown += r.records.length;
-            count.textContent = `${shown} record${shown === 1 ? "" : "s"} shown${r.total_matching !== undefined ? ` of ${r.total_matching} matching` : ""} · mode ${r.mode}${r.namespace ? " · namespace " + r.namespace : ""}`;
+            count.textContent = `${shown} record${shown === 1 ? "" : "s"} shown${r.total_matching !== undefined ? ` of ${r.total_matching} matching` : ""} · mode ${r.mode}${r.namespace ? " · namespace " + r.namespace : ""}${r.search_mode ? " · search " + String(r.search_mode).replace(/_/g, " ") : ""}`;
             if (!shown) count.textContent = `No record matches (${DF.api.state.mode === "live" ? "the live node returned none" : "the snapshot has none"}). Try fewer words or clear the filters. · mode ${r.mode}${r.namespace ? " · namespace " + r.namespace : ""}`;
             more.innerHTML = r.next_cursor ? `<button class="btn" type="button">Load more</button>` : "";
             const b = more.querySelector("button"); if (b) b.addEventListener("click", () => { b.disabled = true; load(r.next_cursor); });
@@ -386,11 +386,20 @@
       },
     };
   };
+  DF.recRefs = DF.recRefs || {};
   function recordRow(rec) {
-    const r = rec.ref || {}; const title = rec.title || (rec.payload && rec.payload.title) || r.id || "(untitled record)";
+    const r = rec.ref || {}; const p = rec.payload || {}; const title = rec.title || p.title || r.id || "(untitled record)";
+    const key = `rec:${r.kind}:${r.id}`; DF.recRefs[key] = r;
     const upstream = rec.upstream_label ? Object.entries(rec.upstream_label).map(([k, v]) => `${k}: ${v}`).join("; ") : "";
-    return html`<li class="catrow"><div><span class="pill k-${r.kind}">${r.kind || "record"}</span> <a class="srclink" href="${DF.hrefWith({ src: "rec:" + r.kind + ":" + r.id })}" data-src="rec:${r.kind}:${r.id}"><b>${title}</b></a></div>
+    const why = Array.isArray(rec.why_matched) ? rec.why_matched : null; const cur = rec.curation || null; const dis = rec.disputes || null;
+    const disN = dis ? (dis.disputing_reviews || []).length + (dis.cited_evidence || []).length + (dis.diverging_versions || []).length : 0;
+    return html`<li class="catrow"><div><span class="pill k-${r.kind}">${r.kind || "record"}</span> <a class="srclink" href="${DF.hrefWith({ src: key })}" data-src="${key}"><b>${title}</b></a>${rec.is_head === false ? html` ${U.pill("not the current version", "warn")}` : ""}</div>
       <div class="small"><span class="pill st-unk">local status: ${String(rec.local_status || "not reported").replace(/_/g, " ")}</span> ${upstream ? html`<span class="faint">upstream assertion → ${upstream}</span>` : ""}</div>
+      ${rec.snippet ? html`<div class="small">${rec.snippet}</div>` : ""}
+      ${why ? html`<div class="small faint">Matched on: ${why.length ? why.join("; ") : "no reason reported"}. This is lexical matching, not relevance, quality or truth.</div>` : ""}
+      ${cur ? html`<div class="small faint">Source fidelity: <b>${String(cur.source_fidelity || "not reported").replace(/_/g, " ")}</b>${cur.source_fidelity === "locator_present" ? " (a locator exists; that does not mean the source supports the text)" : ""}${(cur.labels || []).length ? " · labels: " + cur.labels.join(", ") : ""}</div>` : ""}
+      ${dis && disN ? html`<div class="small"><span class="pill warn">disputed or diverging: ${disN}</span>${dis.truncated ? " more exist than shown" : ""}</div>` : ""}
+      ${rec.references_complete === false ? html`<div class="small faint">More references exist than are shown. An empty list means none visible found, not none.</div>` : ""}
       <div class="small faint"><code>${r.namespace}/${r.kind}/${r.id}</code> · version ${U.sha(r.version)}</div></li>`.toString();
   }
 

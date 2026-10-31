@@ -103,9 +103,11 @@
     }
     if (type === "rec") {
       const [kind, ...r2] = rest; const rid = r2.join(":");
-      const ref = (DF.api.state.catalog.records.find((x) => x.ref.kind === kind && x.ref.id === rid) || {}).ref || { namespace: DF.api.state.catalog.namespace, kind, id: rid, version: "" };
+      let ref = (DF.recRefs && DF.recRefs[id]) || (DF.api.state.catalog.records.find((x) => x.ref.kind === kind && x.ref.id === rid) || {}).ref;
+      if (!ref) { const hit = (await DF.api.catalog({ query: rid, kind, limit: 50 })).records.find((x) => x.ref && x.ref.id === rid); if (hit) ref = hit.ref; }
+      if (!ref) throw new Error("no record with that id is visible to this session");
       const rec = await DF.api.record(ref);
-      return { title: rec.title || rid, body: html`<p class="note small">Full record envelope as the adapter returned it. Local status is separate from any upstream label.</p><pre class="json">${JSON.stringify(rec, null, 2)}</pre>` };
+      return { title: rec.title || rid, body: html`<p class="note small">Full record envelope as the adapter returned it. Local status is separate from any upstream label.</p><pre class="json">${JSON.stringify(rec.raw || rec, null, 2)}</pre>` };
     }
     throw new Error("unknown source type “" + type + "”");
   }
