@@ -18,6 +18,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
+import { compareVersions } from '../provenance.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../..');
@@ -93,12 +95,13 @@ ${onBehalf}    delphi:usesModel <${BUILDER_MODEL}> .
     rdfs:label "Claude Fable 5.1" ;
     dct:identifier "claude-fable-5-1" .
 }`;
-const pubinfo = (label, type, introduces, templates = []) => `sub:pubinfo {
+const pubinfo = (label, type, introduces, templates = [], citedPaths = []) => `sub:pubinfo {
   this: dct:created "${now}"^^xsd:dateTime ;
     dct:creator <${BUILDER_AGENT}> ;
 ${owner ? '' : '    rdfs:comment "Owner ORCID not yet set: the key owner passes --owner <orcid> to lean/nanopubs/build.mjs at signing time; until then no human is named in this record." ;\n'}    rdfs:label ${lit(label)} ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     npx:hasNanopubType <${type}> ;
+    rdfs:comment ${lit(urlNoteFor(citedPaths))} ;
 ${templateNotes(templates)}${introduces ? `    npx:introduces <${introduces}> ;\n` : ''}    delphi:domain <${DOMAIN}> .
   <${DOMAIN}> rdfs:label "math-population-genetics-and-evolutionary-theory" .
 }`;
@@ -137,7 +140,121 @@ const plain = { "genotype-genetic-code": "In the standard genetic code, turning 
   'thompson1917-ch02-10': 'Minimum flight speed under isometry and speed at equal Froude number both scale as the square root of the linear dimension.',
   'favored-fixation-lower-bound': 'In an absorbing chain on 0..M gene copies whose expected copy number never decreases (neutral, or selection for the mutant), including Wright-Fisher sampling with relative fitness 1+s for any s >= 0, a lineage of i copies is eventually fixed with probability at least i/M; so the expected number of substitutions over T generations is at least mu T and at most M mu T.'
 };
-const notEstablished = 'Does not establish: anything about organisms. The theorem is exact inside the stated model and silent outside it; strict neutrality, constant population size, Wright-Fisher reproduction and independent mutant fates (Kimura), fixed fitnesses and haploid inheritance (Fisher), equal fecundity and a 1:1 sex ratio (Maynard Smith) are assumptions written in the module header, not conclusions. Kernel-checked is not expert-validated: no human expert has validated these statements. Whether the Lean statement faithfully renders the paper is a separate assessment record, and so far only one assessor provider has run.';
+// What the kernel checked, NEVER the source's claim. The old label appended "(Lean 4, kernel-checked)" to
+// the claim as the paper states it, so a record about Thompson's model read as a checked fact about ostriches
+// and moa. For a claim with a paper the label now states the theorem; the paper's claim is kept beside it in
+// skos:note, marked as not what was checked.
+const firstSentence = x => { const m = String(x || '').match(/^([\s\S]*?[.])(\s|$)/); return (m ? m[1] : String(x || '')).trim(); };
+// Where delphi:leanDeclaration names a NAMED HYPOTHESIS rather than a definition, the scope text says so in
+// one clause, so a reader cannot take the premise for the law.
+const HYPOTHESIS_DECLS = {
+  'Delphi.MusclePowerLaw': "Thompson's muscle premise (power available proportional to muscle mass at a constant mass-specific power), which is contested and is never asserted here",
+  'Delphi.Genotype.HaldaneCost': "Haldane 1957's cost-of-selection accounting, contested since it was published",
+  'Delphi.Altitude.Atmosphere': 'a monotone atmosphere: that air density and oxygen partial pressure both fall with height'
+};
+const declClause = f => HYPOTHESIS_DECLS[leanDecl[f.claim_id]]
+  ? ` The declaration in delphi:leanDeclaration (${leanDecl[f.claim_id]}) is a NAMED HYPOTHESIS this theorem takes as an argument, not a definition the law rests on: it is ${HYPOTHESIS_DECLS[leanDecl[f.claim_id]]}, so the premise must not be read as the law.`
+  : '';
+const provedLabel = f => f.paper
+  ? `Kernel-checked Lean 4 statement about a model: ${firstSentence(plain[f.claim_id])}`
+  : `${f.label} (Lean 4, kernel-checked)`;
+const sourceClaimNote = f => f.paper
+  ? `The claim as the source states it, which is NOT what the kernel checked: "${f.label}" (${f.paper.title}, ${f.paper.year}). What was checked is the statement in dct:description, which is about a model.`
+  : null;
+// The assumptions of THIS claim, from its own proof scope, instead of one shared list copied everywhere.
+const notEstablished = f => 'Does not establish: anything about organisms. The theorem is exact inside the stated model and silent outside it. The assumptions it rests on, written in the module header and never proved, are: '
+  + f.proofScope.assumed.map(a => String(a).replace(/\s+$/, '').replace(/[.]$/, '')).join('; ')
+  + '. Kernel-checked is not expert-validated: no human expert has validated these statements. Whether the Lean statement faithfully renders the source is a separate assessment record, and so far only one assessor provider has run.';
+
+// Each source URL pins a commit, so two things have to hold: the file must EXIST at that commit, and the URL
+// must fetch. Both are checked, per path, and each record reports its own result.
+//   - existence is checked locally with git, which is exact;
+//   - reachability with a ranged GET, never HEAD: github.com answers 404 to HEAD on some blob URLs, which is
+//     what made an earlier version of this builder report every citation as unreachable when it was not.
+// GitHub serves any commit in a fork network by SHA, so a commit pushed to a fork resolves from this
+// repository too even when it is on none of its branches.
+const checkUrls = !process.argv.includes('--no-url-check');
+const pathExistsAtRef = p => spawnSync('git', ['cat-file', '-e', `${ref}:${p}`], { cwd: root }).status === 0;
+const urlStatus = new Map();
+async function probe(u) {
+  if (urlStatus.has(u)) return urlStatus.get(u);
+  let st = null;
+  try {
+    const c = new AbortController(); const t = setTimeout(() => c.abort(), 10000);
+    const r = await fetch(u, { method: 'GET', headers: { Range: 'bytes=0-0' }, signal: c.signal, redirect: 'follow' });
+    clearTimeout(t); st = r.status;
+  } catch (e) { st = 'unreachable: ' + e.message; }
+  urlStatus.set(u, st);
+  return st;
+}
+const pathState = new Map();
+const gitOut = (args) => { const r = spawnSync('git', args, { cwd: root, encoding: 'utf8' }); return r.status === 0 ? String(r.stdout).trim() : null; };
+async function statePath(rel) {
+  if (pathState.has(rel)) return pathState.get(rel);
+  const exists = pathExistsAtRef(rel);
+  const url = blob(rel);
+  const status = checkUrls ? await probe(url) : null;
+  // Does the pinned revision hold the bytes this build read? A URL that resolves but shows a different
+  // version is still a false citation, and it is the likelier failure once a file is regenerated.
+  const pinnedBlob = exists ? gitOut(['rev-parse', `${ref}:${rel}`]) : null;
+  const buildBlob = fs.existsSync(path.join(root, rel)) ? gitOut(['hash-object', rel]) : null;
+  const contentMatchesBuild = exists && pinnedBlob && buildBlob ? pinnedBlob === buildBlob : null;
+  // A difference in bytes is not automatically a difference a reader would notice: some cited artefacts are
+  // regenerated every run and carry a build timestamp. Tell the two apart.
+  let driftKind = null, driftFields = [];
+  if (contentMatchesBuild === false) {
+    const pinnedText = gitOut(['show', `${ref}:${rel}`]);
+    let nowText = null; try { nowText = fs.readFileSync(path.join(root, rel), 'utf8'); } catch (e) {}
+    const cmp = pinnedText !== null && nowText !== null ? compareVersions(pinnedText, nowText) : null;
+    driftKind = cmp ? (cmp.identical ? 'none' : cmp.onlyTimestamps ? 'timestamp-only' : 'substantive') : 'unknown';
+    driftFields = cmp ? cmp.fields : [];
+  }
+  const st = { path: rel, url, existsAtCommit: exists, httpStatus: status, contentMatchesBuild, driftKind, driftFields, pinnedBlob, buildBlob,
+    ok: exists && (contentMatchesBuild !== false || driftKind === 'timestamp-only' || driftKind === 'none') && (!checkUrls || status === 200 || status === 206) };
+  pathState.set(rel, st);
+  return st;
+}
+// Pre-check every path any record can cite: the modules, and the fixed files the other record kinds use.
+const CITED = [...new Set([
+  ...R.formalized.map(f => f.module),
+  'lean/mutations.json', 'lean/Delphi/Audit.lean', 'lean/bound/parameters.json', 'lean/bound/result.json',
+  'lean/bound/compute.mjs', 'lean/Delphi/Favored.lean', 'lean/assessment/prompt.md',
+  ...assessments.flatMap(a => [`lean/assessment/prompts/${a.claim_id}.md`, `lean/assessment/results/${a.claim_id}.${a.assessor.provider}.json`]),
+  ...((R.blueprintCertificates || []).filter(c => c.verified && c.current).flatMap(c => [c.leanModule, c.theory, `lean/blueprint/certificates/${c.name}.json`, `lean/blueprint/data/${c.name}.taxon.json`, c.blueprint.file]))
+].filter(Boolean))];
+for (const rel of CITED) await statePath(rel);
+const siteStatus = checkUrls ? await probe(`${SITE}/lean.json`) : null;
+const checkedAt = new Date().toISOString();
+const originMainFetched = (() => { try { return fs.statSync(path.join(root, '.git/refs/remotes/origin/main')).mtime.toISOString(); } catch (e) { return null; } })();
+const onDefaultBranch = spawnSync('git', ['merge-base', '--is-ancestor', ref, 'origin/main'], { cwd: root }).status === 0;
+const branchNote = commit
+  ? ` The pinned commit is reachable by SHA from ${REPO} (GitHub serves any commit in a fork network by SHA), but it is ${onDefaultBranch ? 'an ancestor of' : 'NOT an ancestor of'} that repository's main branch as fetched ${originMainFetched || 'at an unknown time'}: ${onDefaultBranch ? 'the work is merged' : 'the work is on a branch and unmerged, so "the citation resolves" is not "the change is merged"'}.`
+  : '';
+const urlReport = { checked: checkUrls, at: checkUrls ? checkedAt : null, method: 'git cat-file for existence at the commit, ranged GET for reachability', commit: commit || null, ref, repository: REPO,
+  siteStatus, onDefaultBranch, originMainFetched, paths: [...pathState.values()], missingAtCommit: [...pathState.values()].filter(x => !x.existsAtCommit).map(x => x.path),
+  contentDrift: [...pathState.values()].filter(x => x.contentMatchesBuild === false && x.driftKind !== 'timestamp-only').map(x => x.path),
+  timestampOnlyDrift: [...pathState.values()].filter(x => x.driftKind === 'timestamp-only').map(x => ({ path: x.path, fields: x.driftFields })),
+  note: 'A commit pushed to any repository in this fork network resolves from this one by SHA, so reachability and presence-on-a-branch are different questions; only reachability matters for a citation.' };
+// The sentence each record carries, about ITS OWN citations.
+const urlNoteFor = (paths) => {
+  if (!checkUrls) return 'Source URLs were not checked in this build (--no-url-check), so whether they resolve is unknown.' + branchNote;
+  if (!paths.filter(Boolean).length) return 'The source URLs in this record were not individually checked in this build, so nothing here claims they resolve.' + branchNote;
+  const sts = paths.filter(Boolean).map(x => pathState.get(x)).filter(Boolean);
+  const absent = sts.filter(x => !x.existsAtCommit).map(x => x.path);
+  const unreachable = sts.filter(x => x.existsAtCommit && x.httpStatus !== 200 && x.httpStatus !== 206).map(x => `${x.path} (HTTP ${x.httpStatus})`);
+  const drifted = sts.filter(x => x.contentMatchesBuild === false && x.driftKind !== 'timestamp-only' && x.driftKind !== 'none').map(x => x.path);
+  const stamped = sts.filter(x => x.driftKind === 'timestamp-only');
+  const parts = [];
+  if (absent.length) parts.push(`${absent.join(' and ')} did NOT exist at the pinned commit ${ref} (added later), so ${absent.length > 1 ? 'those URLs do' : 'that URL does'} not resolve; pinning a commit that contains ${absent.length > 1 ? 'them' : 'it'} would fix the citation`);
+  if (unreachable.length) parts.push(`${unreachable.join(' and ')} exists at that commit but did not fetch when checked`);
+  if (drifted.length) parts.push(`${drifted.join(' and ')} resolves, but the version at the pinned commit is NOT the one this record was built from (the file was regenerated after that commit), so the URL shows different content than the numbers quoted here`);
+  const stampClause = stamped.length ? ` ${stamped.map(x => `${x.path} differs from the pinned version only in ${x.driftFields.length ? 'its ' + x.driftFields.join(' and ') + ' field' : 'a build timestamp'}, which is rewritten on every run; its substantive content is the content this record was built from`).join('; ')}.` : '';
+  if (!parts.length) {
+    const blobShort = sts.filter(x => x.buildBlob).map(x => `${x.path} at git blob ${String(x.buildBlob).slice(0, 10)}`).join(', ');
+    return `Every source URL in this record was fetched when it was built and resolved, and each file's content at the pinned commit ${ref} is the content this record was built from (checked ${checkedAt}${blobShort ? `; ${blobShort}` : ''}). A reader can check that claim with git cat-file.` + stampClause + branchNote;
+  }
+  return `Checked ${checkedAt}: ${parts.join('; ')}. The record's other URLs resolved, including the dashboard snapshot.` + stampClause + branchNote;
+};
 
 for (const f of R.formalized) {
   const id = f.claim_id, law = `${DELPHIR}math-law/${id}`, claim = `${DELPHIR}claim/${id}`, ev = `${DELPHIR}evidence/lean-kernel-check-${id}`;
@@ -148,10 +265,10 @@ for (const f of R.formalized) {
   const leanSrc = (main.decl?.doc ? `/-- ${main.decl.doc} -/\n` : '') + (main.decl?.statement || '');
   const muts = M.results.filter(r => r.kind === 'mutation' && r.claim_id === id);
   const axioms = [...new Set(thms.flatMap(t => t.audit.axioms))].sort();
-  const receipt = `Build receipt. ${R.versions.lean}; toolchain ${R.versions.toolchain}; Mathlib ${R.versions.mathlib.inputRev} (${R.versions.mathlib.rev}). lake build exit ${R.build.exit} in ${R.build.seconds} s with ${R.build.errors} errors; ${mod.sorries} sorry in ${f.module} (${mod.lines} lines). #print axioms for ${thms.map(t => t.name).join(', ')}: ${axioms.join(', ')} only (Lean's standard axioms; no sorryAx). Mutation evidence (lean/mutate.mjs, ${M.summary.run}): ${muts.length} deliberate change(s) to the statement or the model were each rejected by the compiler: ${muts.map(m => `[${m.id}] ${m.description} Rejected with ${m.errors} error(s): ${m.firstError}`).join(' ')} Controls: ${M.summary.controlsPassed} of ${M.summary.controls} unmodified modules accepted by the same command.`;
+  const receipt = `Build receipt. ${R.versions.lean}; toolchain ${R.versions.toolchain}; Mathlib ${R.versions.mathlib.inputRev} (${R.versions.mathlib.rev}). lake build exit ${R.build.exit} in ${R.build.seconds} s with ${R.build.errors} errors; ${mod.sorries} sorry in ${f.module} (${mod.lines} lines). #print axioms for ${thms.map(t => t.name).join(', ')}: ${axioms.join(', ')} only (Lean's standard axioms; no sorryAx). Mutation evidence (lean/mutate.mjs, ${M.summary.run}): ${muts.length ? `${muts.length} deliberate change(s) to this statement or its model were each rejected by the compiler: ${muts.map(m => `[${m.id}] ${m.description} Rejected with ${m.errors} error(s): ${m.firstError}`).join(' ')}` : `NONE. The suite's ${M.summary.mutations} mutants target other theorems, so for this statement mutation evidence is ABSENT, which is not the same as negative: nobody has tried to break this statement and failed.`} Controls: ${M.summary.controlsPassed} of ${M.summary.controls} unmodified modules accepted by the same command.`;
   const assertion = `sub:assertion {
   <${law}> a delphi:Concept, skos:Concept ;
-    rdfs:label ${lit(`${f.label} (Lean 4, kernel-checked)`)} ;
+    rdfs:label ${lit(provedLabel(f))} ;
     dct:description ${lit(plain[id])} ;
 ${f.paper ? `    dct:source ${lit(`${f.paper.title} (${f.paper.year})`)} ;\n` : `    dct:source ${lit(f.claim_id === 'blueprint-well-formedness' ? 'Proved in this project (lean/Delphi/Blueprint.lean) for the organism thread\'s text-to-blueprint tool; structural well-formedness, no paper states it.' : f.claim_id.startsWith('flight-') || f.claim_id === 'aerobic-power-bound' ? 'Proved in this project (lean/Delphi/Flight.lean) for the flying-fish audit and the physics thread\'s coupled simulator (hub items 3 and 4, 2026-10-31); hypotheses named, no paper states it in this form.' : f.claim_id.startsWith('scaling-') ? 'Proved in this project (lean/Delphi/Scaling.lean) from the physics thread\'s formal statements (physics/FORMAL-STATEMENTS.md, 2026-10-31; Galileo 1638 and Thompson 1917 ch. II for the idea); hypotheses named, no paper states it in this form.' : 'Proved in this project (lean/Delphi/Favored.lean) as an extension of the neutral case of Kimura (1962) to non-opposing selection; no paper states it in this form.')} ;\n`}${f.paper?.doi ? `    prov:wasDerivedFrom <https://doi.org/${f.paper.doi}> ;\n` : ''}    skos:notation ${lit(f.notation)} ;
     skos:definition ${longlit(leanSrc)}^^delphi:lean4 ;
@@ -159,31 +276,32 @@ ${f.paper ? `    dct:source ${lit(`${f.paper.title} (${f.paper.year})`)} ;\n` : 
     delphi:leanDeclaration ${lit(leanDecl[id])} ;
     delphi:leanTheorem ${thms.map(t => lit(t.name)).join(', ')} ;
     delphi:leanVerified "true"^^xsd:boolean ;
-    skos:scopeNote ${lit(f.note || 'As stated in the module header.')} ;
-    rdfs:comment ${lit('Status: kernel-checked (Lean 4 accepted the module with zero sorry and standard axioms only). Not expert-validated. ' + notEstablished)} ;
+    skos:scopeNote ${lit((f.note || 'As stated in the module header.') + declClause(f))} ;
+${sourceClaimNote(f) ? `    skos:note ${lit(sourceClaimNote(f))} ;\n` : ''}
+    rdfs:comment ${lit('Status: kernel-checked (Lean 4 accepted the module with zero sorry and standard axioms only). Not expert-validated. ' + notEstablished(f))} ;
     rdfs:seeAlso <${blob(f.module)}>, <${SITE}/lean.json>, <${SITE}/> .
   <${claim}> dct:conformsTo <${law}> ;
     delphi:hasEvidence <${ev}> .
   <${ev}> a delphi:EvidenceItem ;
-    rdfs:label ${lit(`Lean 4 kernel accepted ${main.name} with zero sorry and standard axioms, and rejected ${muts.length} deliberately broken variant(s)`)} ;
+    rdfs:label ${lit(`Lean 4 kernel accepted ${main.name} with zero sorry and standard axioms; ${muts.length ? `it also rejected ${muts.length} deliberately broken variant(s) of this statement or its model` : 'NO mutant in the suite targets this statement, so it has no mutation evidence'}`)} ;
     dct:description ${lit(receipt)} ;
     dct:subject <${law}> ;
-    rdfs:comment ${lit('This evidence item establishes that the stated theorem follows from the stated model. ' + notEstablished)} ;
+    rdfs:comment ${lit('This evidence item establishes that the stated theorem follows from the stated model. ' + notEstablished(f))} ;
     prov:wasDerivedFrom <${SITE}/lean.json>, <${blob('lean/mutations.json')}>, <${blob('lean/Delphi/Audit.lean')}> .
 }`;
-  write(`law-${id}.trig`, trig(assertion, builderProv([blob(f.module), `${SITE}/lean.json`, blob('lean/mutations.json')]), pubinfo(`${f.label}: machine-checked in Lean 4`, `${DELPHI}Concept`, law, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]])),
+  write(`law-${id}.trig`, trig(assertion, builderProv([blob(f.module), `${SITE}/lean.json`, blob('lean/mutations.json')]), pubinfo(provedLabel(f), `${DELPHI}Concept`, law, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], [f.module, 'lean/mutations.json', 'lean/Delphi/Audit.lean'])),
     { kind: 'law', claim, law, evidence: ev, theorems: thms.map(t => t.name), axioms, mutantsRejected: muts.length });
 
   // Proof scope: kernel-checked vs assumed, as separate statements on the law.
   const ps = f.proofScope;
   const scope = `sub:assertion {
-  <${law}> dct:description ${lit(`Proof scope of ${f.label}: ${ps.kernelChecked.length} statement(s) the Lean kernel checked and ${ps.assumed.length} assumption(s) stated in the module header and not proved.`)} ;
+  <${law}> dct:description ${lit(`Proof scope of the kernel-checked statement recorded as ${id}: ${ps.kernelChecked.length} statement(s) the Lean kernel checked and ${ps.assumed.length} assumption(s) stated in the module header and not proved.${f.paper ? ` The source's claim ("${f.label}", ${f.paper.title} ${f.paper.year}) is what the statement was written FROM, not what was checked.` : ''}`)} ;
 ${ps.kernelChecked.map(x => `    skos:scopeNote ${lit('Kernel-checked: ' + x)} ;`).join('\n')}
 ${ps.assumed.map(x => `    skos:scopeNote ${lit('Assumed, not proved: ' + x)} ;`).join('\n')}
-    rdfs:comment ${lit('The kernel-checked statements are theorems of the model; the assumptions are the model. ' + notEstablished)} ;
+    rdfs:comment ${lit('The kernel-checked statements are theorems of the model; the assumptions are the model. ' + notEstablished(f))} ;
     rdfs:seeAlso <${blob(f.module)}> .
 }`;
-  write(`scope-${id}.trig`, trig(scope, builderProv([blob(f.module), `${SITE}/lean.json`]), pubinfo(`Proof scope of ${f.label}`, `${DELPHI}Concept`, null, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]])),
+  write(`scope-${id}.trig`, trig(scope, builderProv([blob(f.module), `${SITE}/lean.json`]), pubinfo(`Proof scope of the kernel-checked statement ${id}`, `${DELPHI}Concept`, null, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], [f.module])),
     { kind: 'proof-scope', law, kernelChecked: ps.kernelChecked.length, assumed: ps.assumed.length });
 }
 
@@ -221,7 +339,7 @@ ${links.blueprintClaim ? `    skos:related <${links.blueprintClaim}> ;\n    rdfs
     rdfs:comment "This evidence item establishes only that the numbers follow from the named theorems' formulas and the named parameter values. It is not evidence that the parameters are right for Exocoetidae, and not evidence about wings." ;
     prov:wasDerivedFrom <${SITE}/lean.json>, <${blob('lean/bound/parameters.json')}>, <${blob('lean/bound/result.json')}> .
 }`;
-  write('bound-exocoetidae-substitution-budget.trig', trig(assertion, builderProv([blob('lean/bound/parameters.json'), blob('lean/bound/compute.mjs'), blob('lean/Delphi/Favored.lean'), `${SITE}/lean.json`]), pubinfo('Substitution budget of the flying-fish lineage from the machine-checked fixation theorems: inconclusive', `${DELPHI}Hypothesis`, HYP, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]])),
+  write('bound-exocoetidae-substitution-budget.trig', trig(assertion, builderProv([blob('lean/bound/parameters.json'), blob('lean/bound/compute.mjs'), blob('lean/Delphi/Favored.lean'), `${SITE}/lean.json`]), pubinfo('Substitution budget of the flying-fish lineage from the machine-checked fixation theorems: inconclusive', `${DELPHI}Hypothesis`, HYP, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], ['lean/bound/parameters.json', 'lean/bound/result.json', 'lean/bound/compute.mjs', 'lean/Delphi/Favored.lean'])),
     { kind: 'bound', hypothesis: HYP, evidence: BEV, verdict: B.comparison.verdict, blueprintLinked: !!links.blueprintClaim, publishable: 'after signing by the key owner, test registry first; rebuild with lean/bound/links.json once the organism thread\'s blueprint record exists' });
 }
 
@@ -254,7 +372,7 @@ ${c.assumed.map(x => `    skos:scopeNote ${lit('Assumed, not proved: ' + x)} ;`)
     rdfs:comment "This evidence item establishes that the checker accepts the pinned data and that the generic theorems apply. It is not evidence about any organism." ;
     prov:wasDerivedFrom <${SITE}/lean.json>, <${blob(`lean/blueprint/certificates/${c.name}.json`)}>, <${blob(`lean/blueprint/data/${c.name}.taxon.json`)}> .
 }`;
-  write(`certificate-blueprint-${c.name}.trig`, trig(assertion, builderProv([blob(c.leanModule), blob(c.theory), blob(`lean/blueprint/certificates/${c.name}.json`), `${SITE}/lean.json`]), pubinfo(`Well-formedness certificate for the "${c.blueprint.description}" blueprint`, `${DELPHI}Hypothesis`, HYP, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]])),
+  write(`certificate-blueprint-${c.name}.trig`, trig(assertion, builderProv([blob(c.leanModule), blob(c.theory), blob(`lean/blueprint/certificates/${c.name}.json`), `${SITE}/lean.json`]), pubinfo(`Well-formedness certificate for the "${c.blueprint.description}" blueprint`, `${DELPHI}Hypothesis`, HYP, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], [c.leanModule, c.theory, `lean/blueprint/certificates/${c.name}.json`, `lean/blueprint/data/${c.name}.taxon.json`])),
     { kind: 'certificate', hypothesis: HYP, evidence: CEV, blueprint: c.blueprint.file, blueprintSha256: c.blueprint.sha256, related, publishable: 'after signing by the key owner, test registry first; regenerate when the blueprint is rebuilt' });
 }
 
@@ -278,7 +396,7 @@ ${dims.map(([k, l, d]) => `  <${dimIri(k)}> a delphi:Concept, skos:Concept ;
     dct:description ${lit(d)} ;
     skos:broader <${RUBRIC}> .`).join('\n')}
 }`;
-write('rubric-lean-faithfulness-0.1.0.trig', trig(rubricAssertion, builderProv([blob('lean/assessment/prompt.md')]), pubinfo('Rubric lean-faithfulness/0.1.0', `${DELPHI}Concept`, RUBRIC, [['wasCreatedFromTemplate', TEMPLATES.rubric], ['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]])), { kind: 'rubric', rubric: RUBRIC });
+write('rubric-lean-faithfulness-0.1.0.trig', trig(rubricAssertion, builderProv([blob('lean/assessment/prompt.md')]), pubinfo('Rubric lean-faithfulness/0.1.0', `${DELPHI}Concept`, RUBRIC, [['wasCreatedFromTemplate', TEMPLATES.rubric], ['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], ['lean/assessment/prompt.md'])), { kind: 'rubric', rubric: RUBRIC });
 
 // One assessment record per claim per assessor, verdict literal.
 for (const a of assessments) {
@@ -326,12 +444,12 @@ ${onBehalf}    delphi:usesModel <${MODEL}> .
     prov:qualifiedAssociation sub:assessmentPlan .
   sub:assessmentPlan prov:hadPlan <${blob('lean/assessment/prompt.md')}> .
 }`;
-  write(`assessment-${id}--${provider}.trig`, trig(assertion, provenance, pubinfo(`${modelId} on the Lean statement of ${id}: ${a.verdict}`, `${DELPHI}LLMClaimAssessment`, A, [['wasCreatedFromTemplate', TEMPLATES.rubricAssessment], ['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]])),
+  write(`assessment-${id}--${provider}.trig`, trig(assertion, provenance, pubinfo(`${modelId} on the Lean statement of ${id}: ${a.verdict}`, `${DELPHI}LLMClaimAssessment`, A, [['wasCreatedFromTemplate', TEMPLATES.rubricAssessment], ['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], [`lean/assessment/prompts/${id}.md`, `lean/assessment/results/${id}.${provider}.json`, 'lean/assessment/prompt.md'])),
     { kind: 'assessment', claim, assessment: A, provider, model: modelId, verdict: a.verdict, scores: a.scores, providersForClaim: nProv, publishable: nProv >= 2 ? 'yes: two providers' : 'hold: one provider only' });
 }
 
 fs.writeFileSync(path.join(here, 'manifest.json'), JSON.stringify({
-  built: now, commit, commitPinned: !!commit, repository: REPO,
+  built: now, commit, commitPinned: !!commit, repository: REPO, urlCheck: urlReport,
   owner: owner, ownerSet: !!owner, ownerNote: owner ? null : 'No human named. The key owner sets --owner <orcid IRI> at signing time; that single value populates prov:actedOnBehalfOf on both agents.',
   creator: BUILDER_AGENT, signerIdentity: 'to be decided by the key owner: a bot identity with its own key pair and introduction nanopub is the intended shape (nanopub skill); never a human ORCID as signer without that person\'s approval',
   note: commit ? null : 'Links point at the branch; rerun with --commit <hash> once lean/ is committed and before signing.',
