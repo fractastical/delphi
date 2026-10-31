@@ -148,6 +148,12 @@ with sync_playwright() as p:
         r = pg.context.request.get(base + "/" + f["href"])
         if r.status != 200 or _h.sha256(r.body()).hexdigest() != f["sha256"]: bad.append((f["href"], r.status))
     print("DOCS/DOWNLOADS served with declared bytes:", len(snap2["documents"]) + len((snap2.get("simulation") or {}).get("files", [])) - len(bad), "bad:", bad); assert not bad, bad
+    if "simulations/run" in open(__file__.replace("tests/site_live_driver.py", "frontier/web.py")).read():
+        pg.goto(base + "/index.html#/studio/flying-fish?scale=cellular"); pg.wait_for_selector("#simwidget form", timeout=20000)
+        pg.fill("#sw-duration_ms", "10"); pg.click("#simwidget button[type=submit]")
+        expect(pg.locator("#sw-out .rescard, #sw-out .adapter-out")).to_be_visible(timeout=60000)
+        so = pg.locator("#sw-out").inner_text().lower(); print("SIMULATION PREVIEW:", so[:140].replace("\n", " "))
+        assert ("completed" in so and "persisted: false" in so) or "unknown" in so or "unavailable" in so, so[:300]
     att = pg.context.request.get(base + "/api/attention"); print("ATTENTION", att.status, att.text()[:160].replace("\n", " ")); assert att.status in (200, 503)
     assert not errs, errs
     print("ALL LIVE CHECKS PASSED"); b.close()
