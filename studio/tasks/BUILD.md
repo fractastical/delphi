@@ -7,13 +7,13 @@ metered model was selected. Provider-billed incremental spend is not yet known.
 
 | Priority | Deliverable | Owner | Status / acceptance |
 | --- | --- | --- | --- |
-| P0 | Product goal, engineering contract, integrated site | codex-03 | First gated release live; deployed access/browser checks passed |
+| P0 | Product goal, engineering contract, integrated site | codex-03 | Public release live; anonymous access, calculators and browser checks passed |
 | P0 | Constraint solver + meaningful Lean boundary | dx-guilds | Integrated; six real Lean positive and mutant checks passed; arithmetic scope only |
 | P0 | Flying-fish sourced constraint checker | claude-15's flying-fish-research | Integrated; sampled envelopes and transfer assumptions displayed |
 | P0 | Scoped glide simulation + uncertainty | delphi-rethink-nca | Corrected common-launch comparison and videos integrated; no robust winner across tested scenarios |
 | P0 | MCP contribution tools | dx-collab / dx-submit | Interface checks passed; persistent diagnostic round trip in progress |
 | P0 | Typed attention and action adapter | dx-market-r1 | Live HTTP view; unknown utilities retained; allocation advantage not demonstrated |
-| P0 | Persistent node + site data/export | dx-collab | Separate PG16 and gated runtime active; System measurements available |
+| P0 | Persistent node + site data/export | dx-collab | Separate PG16 and public read runtime active; contributor writes retain credentials |
 | P0 | Multiscale website | claude-02 | First version live; video, print downloads and live whiteboard integration in progress |
 | P1 | Data/tool indexes and multiscale source cards | dx-fable-lead | Primary-source cards integrated; new sourced drafts and design-primitive index in progress |
 | P1 | Indexed search and explicit curation | dx-submit | Live lexical index; 250 curated questions imported, still proposed |
