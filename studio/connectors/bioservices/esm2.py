@@ -120,3 +120,34 @@ class Esm2MaskedMarginalScorer:
             wt_id = self.tokenizer.convert_tokens_to_ids(v.wt_aa)
             scores[v.mutant] = float(lp[mut_id] - lp[wt_id])
         return scores
+
+    def position_log_probs(self, positions: list[int]) -> dict[int, dict]:
+        """Per-position log-probabilities over the 20 standard residues.
+
+        Exposed so a run can *persist* what the in-process cache holds. The 256
+        -variant run saved only per-variant scores, which cannot be inverted back
+        into a position's full distribution, so extending it to more variants at
+        the same positions cost a full recomputation. Saving this makes any later
+        extension free.
+
+        Each entry carries a sha256 of the exact masked input row, so a later run
+        can show it fed the model the same thing rather than assuming it did.
+        """
+        import hashlib
+
+        self._masked_log_probs(sorted(set(positions)))
+        out: dict[int, dict] = {}
+        for pos in sorted(set(positions)):
+            lp = self._log_probs[pos]
+            masked = self._input_ids.clone()
+            masked[0, pos] = self.tokenizer.mask_token_id
+            row = ",".join(str(int(v)) for v in masked[0].tolist())
+            out[pos] = {
+                "wt_aa": self.reference[pos - 1],
+                "log_probs": {
+                    aa: float(lp[self.tokenizer.convert_tokens_to_ids(aa)])
+                    for aa in "ACDEFGHIKLMNPQRSTVWY"
+                },
+                "input_ids_sha256": hashlib.sha256(row.encode()).hexdigest(),
+            }
+        return out
