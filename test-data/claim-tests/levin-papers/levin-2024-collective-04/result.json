@@ -2,7 +2,7 @@
   "claim_id": "levin-2024-collective-04",
   "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2024-collective-04",
   "project": "levin-papers",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "In published measurements of fish keratocytes in a direct-current electric field, intact cells move toward the cathode (positive directedness, cos theta > 0 with the cathode at 0 degrees) and cell fragments in the same field conditions move toward the anode (negative directedness).",
   "pass_criterion": "Pre-registered: in the published primary measurements (Sun et al. 2013, Current Biology, doi:10.1016/j.cub.2013.02.026, or other published measurements of fish keratocytes and their fragments), at the same field strength (a) the mean directedness of intact cells is >= +0.5 and (b) the mean directedness of fragments is <= -0.3, with each mean differing from 0 at p < 0.01 (one-sample test from the reported mean, dispersion and n; if only a mean and n are reported, a sign test on n is not possible and (a)/(b) must instead be supported by a reported test of the authors).",
   "fail_criterion": "Pre-registered: fragments have mean directedness >= 0 (no anodal migration) or intact cells have mean directedness <= 0 in the published measurements. Means in the right direction but below the magnitude thresholds or without p < 0.01 are pre-registered as 'mixed'. If no published numbers for both cells and fragments can be retrieved, the verdict is 'inconclusive' (data-unavailable).",
@@ -16,6 +16,56 @@
     "admissible_datasets": "Published quantitative measurements (text, tables, figure legends or supplementary data) of migration direction of fish epidermal keratocytes and their fragments in applied DC fields; the review the claim comes from is excluded as it reports no data.",
     "inference_method": "Read the reported mean directedness, dispersion and n for cells and fragments at matched field strength; one-sample z/t test against 0 where dispersion is reported; apply the pass/fail thresholds."
   },
+  "datasets": [
+    {
+      "id": "sun2013-curr-biol-table-s1",
+      "name": "Sun et al. 2013, Current Biology 23:569-574, Supplemental Information (Table S1: directedness and speed of keratocytes and fragments under various EF conditions)",
+      "landing_url": "https://doi.org/10.1016/j.cub.2013.02.026",
+      "doi": "10.1016/j.cub.2013.02.026",
+      "version": "published supplement (mmc1.pdf); author manuscript PMC3732310",
+      "license": "Elsevier open-archive user license (https://www.elsevier.com/open-access/userlicense/1.0/)",
+      "files": [
+        {
+          "download_url": "https://ars.els-cdn.com/content/image/1-s2.0-S0960982213001978-mmc1.pdf",
+          "retrieved_at": "2026-10-31T21:33:04Z",
+          "byte_size": 735856,
+          "sha256": "86efb46b6a50bcb821cc45b49688e9c2b467c3e52d5b5c86c33de384807af3e1"
+        }
+      ],
+      "role": "per-condition n, mean directedness and SE of intact keratocytes and fragments (Table S1), transcribed into analysis.py and verified against the PDF text"
+    }
+  ],
+  "method": "analysis.py downloads the Sun et al. 2013 supplement, checks its SHA-256, extracts the text of its compressed PDF streams with the standard library and confirms that all 20 transcribed 'mean ± SE' directedness values of Table S1 (field-strength series 0-6 V/cm plus the 4 V/cm DMSO and pH 7.4 controls) occur in it. For each field strength it computes a one-sample z = mean/SE for cells and fragments and applies the pre-registered thresholds (cells >= +0.5, fragments <= -0.3, both p < 0.01), with the fail rule checked at 4 and 6 V/cm, the strengths of the paper's main experiments (Figure 1 is at 6 V/cm).",
+  "measured": {
+    "value": [0.77, -0.59],
+    "unit": "mean directedness (cos angle to field, + = cathode) of keratocytes and fragments at 6 V/cm (Figure 1 conditions)",
+    "n": 190,
+    "uncertainty": "SE 0.05 each; z = 15.4 (cells), -11.8 (fragments)",
+    "extra": {
+      "cells_n_6V": 39,
+      "fragments_n_6V": 151,
+      "at_4V_cells_fragments": [0.81, -0.65],
+      "at_4V_z_cells_fragments": [11.57, -5.42],
+      "fields_meeting_pass": ["4", "6"],
+      "fields_with_opposite_signs_cells_pos_fragments_neg_V_per_cm": ["0.5", "1", "2", "4", "6"],
+      "no_field_cells_fragments": [0.06, -0.13],
+      "controls_4V_DMSO_cells_fragments": [0.65, -0.66],
+      "controls_4V_pH7.4_cells_fragments": [0.74, -0.83],
+      "transcribed_values_not_found_in_pdf": [],
+      "verdict_by_preregistered_rule": "supports"
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.85,
+  "caveats": [
+    "The sign reversal is large and clean at the paper's working field strengths: at 6 V/cm cells average +0.77 (n = 39) and fragments -0.59 (n = 151), at 4 V/cm +0.81 and -0.65, all |z| > 5; the vehicle and pH 7.4 controls at 4 V/cm repeat it. Cells are positive and fragments negative at every field from 0.5 V/cm up.",
+    "Not an independent replication: this is the primary experiment the review cites (a different lab from Levin's, so independent of the claim's author, but the same data). Table S1 is labelled 'data from a representative experiment', so n counts cells within one experiment, not independent experiments.",
+    "The pre-registration said 'at the same field strength' without naming one; the rule was applied to every strength and is met at 4 and 6 V/cm, the strengths of the main figures. Below 2 V/cm cell directedness is weak (<= 0.2), so 'whole keratocytes migrate to the cathode' holds for fields of a few V/cm, not for every field.",
+    "Without a field, fragments show a slight anodal bias (-0.13 ± 0.05, z = -2.6), which is small compared with -0.59 at 6 V/cm.",
+    "z tests use the reported SE and treat cells as independent; raw trajectories are not deposited, so the summary statistics could not be recomputed from tracks.",
+    "Only the directional claim is tested; the interpretation that this illustrates hard-to-predict collective behaviour is not a measurable quantity here."
+  ],
   "agent": {
     "kind": "local-agent",
     "model": "claude-opus-5.5",
