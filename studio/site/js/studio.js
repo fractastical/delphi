@@ -67,7 +67,9 @@
     const f = H.fitted[0]; const c = H.candidate; const sh = Object.entries(H.fish1990.pectoral_share_pct_mean_se).sort((x, y) => x[1][0] - y[1][0]); const lo = sh[0], hi = sh[sh.length - 1]; const cm = (snap.coupling_manifest || {}).counts; const SOFT = new Set(["aesthetic", "assumed", "numerical", "assumed transfer", "design_assumption"]);
     return html`<section class="panel grounding" aria-labelledby="gr-h"><h2 id="gr-h">Start from real fish anatomy.</h2>
       <p class="note warn small"><b>Not biorealistic and not validated.</b> This is an engineered candidate sized from published measurements. Its flat fin plates (${c.fin_thickness.value} mm), lattice scales and decorative eyes are assumptions, marked below. ${c.label}</p>
-      ${snap.fish3d_viewer ? html`<div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint">The 3D model is the candidate mesh (fish.glb, sha256 ${snap.fish3d_viewer.glb_sha256.slice(0, 12)}…). Colours are appearance only. The schematic drawing and printable models are below.</p>` : ""}
+      ${snap.fish3d_viewer ? html`<div class="fishchoose"><label for="fishcand"><b>Candidate</b></label> <select id="fishcand">${snap.fish3d_viewer.candidates.map((c, i) => html`<option value="${c.id}" ${i === (snap.fish3d_viewer.candidates.length > 1 ? 1 : 0) ? raw("selected") : ""}>${c.label}</option>`)}</select> <span class="small faint" id="fishknobs"></span></div>
+        <h3 class="sr">Interactive 3D candidate</h3>
+        <div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint" id="fishnote">The 3D model is a candidate mesh. Colours and pigment bands are appearance choices, each marked sourced or assumed in the viewer. Not an organism and not an aerodynamic result. The schematic drawing and printable models are below.</p>` : ""}
       <div class="groundgrid"><div><div id="fishmini" class="fishmini"></div></div>
         <div><h3>What the body and fins are sized from</h3>
           <p>Candidate N1: standard length ${c.standard_length_mm.toFixed(1)} mm, wing span ${c.wing_span_mm.toFixed(1)} mm, wing area ${Math.round(c.wing_area_mm2)} mm², mass ${c.mass_kg} kg.</p>
@@ -109,7 +111,17 @@
         <p class="small faint">Projects other than Flying fish are added as Project records; none is invented here.</p></section>`,
       async after(root) {
         DF.mountFishMini(root.querySelector("#fishmini"), snap);
-        if (snap.fish3d_viewer && root.querySelector("#fish-viewer")) import("./model-viewer.js").then((m) => { const v = m.mountFishViewer(root.querySelector("#fish-viewer"), { base: snap.fish3d_viewer.base, layout: "hero" }); DF.onLeave(() => v.dispose && v.dispose()); }).catch((e) => { root.querySelector("#fish-viewer").textContent = "The 3D viewer could not load (" + e.message + "). The turntable and drawing remain below."; });
+        if (snap.fish3d_viewer && root.querySelector("#fish-viewer")) {
+          const host = root.querySelector("#fish-viewer"), sel = root.querySelector("#fishcand"); let viewer = null, gen = 0;
+          const mount = async () => {
+            const my = ++gen; const c = snap.fish3d_viewer.candidates.find((x) => x.id === sel.value);
+            root.querySelector("#fishknobs").textContent = c.knobs ? Object.entries(c.knobs).map(([k, v]) => k.replace(/_/g, " ") + " " + v).join(" · ") : "baseline: flat fin plates, assumed thickness";
+            try { const m = await import("./model-viewer.js"); if (my !== gen) return; if (viewer && viewer.dispose) viewer.dispose(); host.textContent = ""; host.className = "fishviewer";
+              viewer = m.mountFishViewer(host, { base: c.base, layout: "hero", ...(c.variants.length ? { variants: c.variants } : {}) }); }
+            catch (e) { host.textContent = "The 3D viewer could not load (" + e.message + "). The turntable and drawing remain below."; }
+          };
+          sel.addEventListener("change", mount); DF.onLeave(() => { gen++; if (viewer && viewer.dispose) viewer.dispose(); }); mount();
+        }
         DF.bindForm(root, "goal", (v) => DF.href("/studio", { goal: v.goal }));
         try { const L = await DF.liveQuestionCount(); if (L) root.querySelector("#homeq").parentElement.innerHTML = `<b>${L.n}</b> questions in the live node <span class="faint small">(${esc(L.source)})</span>`; } catch (e) { /* the snapshot figure stays */ }
       },
