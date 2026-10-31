@@ -1,0 +1,39 @@
+{
+  "claim_id": "darwin1859-ch05-06",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch05-06",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "In a phylogeny containing obligate cave (troglobitic/stygobitic) animals and surface animals from North America and Europe, each cave lineage is nested among, or sister to, taxa of its own continent; American and European cave taxa do not form clades with each other to the exclusion of surface taxa.",
+  "pass_criterion": "Pre-registered. Using the Open Tree of Life synthetic tree induced on the taxa listed in derived/taxa.csv (continent assignment verified with GBIF occurrences), for every cave taxon compute the node-count distance to the nearest same-continent taxon (cave or surface, d_same) and to the nearest other-continent cave taxon (d_othercave). The claim is SUPPORTED if (i) d_same <= d_othercave for at least 70% of cave taxa, and (ii) the induced tree contains no clade that includes at least one North American and at least one European cave taxon while containing no surface taxon ('exclusive transcontinental cave clade').",
+  "fail_criterion": "Pre-registered. The claim is REFUTED if fewer than 50% of cave taxa satisfy d_same <= d_othercave, or if two or more independent exclusive transcontinental cave clades occur (in different taxonomic groups). Results between the two thresholds, or a single such clade, are recorded as 'mixed'. If fewer than 10 cave taxa (across at least 3 groups) can be placed in the tree, the verdict is inconclusive/underpowered.",
+  "planned_datasets": ["open-tree-of-life-synth-v15", "gbif-occurrence-api"],
+  "interpretation": "Darwin's 'cave-animals of America' and 'of Europe' are read as obligate subterranean species of North America and Europe; 'affinities to the other inhabitants of that continent' is read as phylogenetic relationship (sister-group or nesting) to surface lineages of the same continent, versus the alternative he rejects, that the two continents' cave faunas are specially allied to each other. Taxa were chosen before any tree was inspected and are listed in derived/taxa.csv; groups are Amphibia (Urodela), Amphipoda, Isopoda, Coleoptera (Trechini and Leiodidae) and Orthoptera (Rhaphidophoridae), the groups in which both continents have well-known troglobites. Continent assignment of each species is verified post hoc against GBIF: a species is kept only if at least 90% of its GBIF occurrences on the two continents fall on the pre-registered continent; names that the Open Tree TNRS cannot match are dropped. Phylogenetic 'affinity' is measured by node counts on the synthetic tree because it has no branch lengths; polytomies produce ties, which count in favour of whichever criterion they satisfy (a tie between a same-continent and an other-continent cave neighbour satisfies d_same <= d_othercave).",
+  "datasets": [
+    {
+      "id": "open-tree-of-life-synth-v15",
+      "name": "Open Tree of Life synthetic tree (current version via API v3)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "doi": null,
+      "version": null,
+      "license": "CC0 1.0",
+      "files": [],
+      "role": "phylogenetic placement of cave and surface taxa (induced subtree, TNRS matching)"
+    },
+    {
+      "id": "gbif-occurrence-api",
+      "name": "GBIF occurrence search API (continent facet)",
+      "landing_url": "https://www.gbif.org/occurrence/search",
+      "doi": null,
+      "version": null,
+      "license": "varies by dataset (CC0 / CC BY / CC BY-NC); counts only used here",
+      "files": [],
+      "role": "verification of the continent of each sampled species"
+    }
+  ],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-darwin-batch-b201", "date": "2026-10-31" }
+}
