@@ -59,7 +59,9 @@ def render(art: Path) -> dict:
     cap = (f"fish3d candidate {case['candidate_sha256'][:12]} | WaterLily {case['solver']['WaterLily']} 3-D NS, "
            f"fixed rigid body, Re_L={case['nondim']['Re_L']}, L={L} cells (h={h*1e3:.2f} mm)\n"
            f"Fins are sub-grid shells ({case['resolution']['shell_simulated_thickness_mm']:.1f} mm simulated vs 0.5 mm): "
-           "fin flow is not resolved. Slow water, not swimming or flight.")
+           "fin flow is not resolved. Low-Re numerical demo: not swimming-, taxiing- or flight-validated.\n"
+           f"{case['case'].get('reference_gate', 'Reference gate: C1 sphere Re100 FAILED locally (|Cd| 20% low)')}; "
+           "no physical-validation claim.")
     for k, fz in enumerate(frames):
         if st == 1:
             a = read_slice(fz, nx + 2, ny + 2)[1:-1, 1:-1]
