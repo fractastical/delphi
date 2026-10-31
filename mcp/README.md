@@ -19,12 +19,12 @@ claude.ai or ChatGPT, add it as a custom connector with that URL.
 
 It runs on Fly.io (`fly.toml`, `Dockerfile`) and redeploys from
 [`.github/workflows/deploy-mcp.yml`](../.github/workflows/deploy-mcp.yml) whenever `main` changes
-the server, `docs/claims.json` or any nanopubs. To run the HTTP mode locally:
+the server, `docs/claims.json`, `organisms/merged/*.json` or any nanopubs. To run the HTTP mode locally:
 `DELPHI_HTTP_PORT=8080 node mcp/server.mjs`.
 
 **Without cloning**: any MCP client can run it straight from GitHub. npm fetches the repo at the
-given ref and installs only the server, `docs/claims.json` and the unsigned TriG files (~750 KB),
-so `local` means "the repo as of that commit".
+given ref and installs only the server, `docs/claims.json`, `organisms/merged/*.json` and the
+unsigned TriG files, so `local` means "the repo as of that commit".
 
 ```json
 {
@@ -86,6 +86,8 @@ Use `local` while building; use `network` when citing something or checking what
 | `delphi_get_claim` | Get one claim by short id or IRI: all fields (math, assumptions, proposed test, sources) and every assessment with per-dimension scores. |
 | `delphi_rank_claims` | Rank claims by one assessment type. Omit `type` to list the types. |
 | `delphi_graph` | The claim graph ([`docs/claim-graph.html`](../docs/claim-graph.html)): filter by thinker, work, year, status, kind, truth; sort by `truth`, `truth-asc`, `disagreement` (max − min p_true across models), `testability` or `year`; or `groupBy` thinker/work/decade/status/kind for counts and means. |
+| `delphi_organisms` | Rank or filter the 782 animal taxa in [`organisms/merged`](../organisms/merged) by dataset coverage. Filter by name, class, rank, project, `hasAxis`/`missingAxis` (e.g. `hasAxis: ["genome"], missingAxis: ["traits"]`), `genomeLevel`, score, mentions; sort by `score`, `score-asc`, `mentions`, `datasets`, `name`; `groupBy` class/rank/project/genomeLevel; or `overview: true` for axis totals. |
+| `delphi_get_organism` | One taxon by key (`gbif:2495414`), slug, accepted name or vernacular: identifiers, lineage, names as written, coverage score and missing axes, every dataset record with counts/distributions/integrity, every located mention. |
 | `delphi_sparql` | Anything else. Read-only `SELECT`; common prefixes are added if the query has none. |
 
 ### How ranking works
@@ -115,6 +117,19 @@ Each nanopub's domain is `delphi:domain` in its pubinfo graph.
 `delphi_graph` reads [`docs/claims.json`](../docs/claims.json), written by
 `node docs/build-claim-graph.mjs` from the claim files and `truth/raw/<model>/*.json`. Rebuild it
 after adding claims or truth scores; `built` in every response says when it was made.
+
+### Organism coverage scores
+
+`delphi_organisms` reads `organisms/merged/coverage.json`, written by `node organisms/coverage.mjs`
+after `node organisms/merge.mjs`. Each dataset record is assigned to one axis (from its explicit
+`category` field, else its id prefix, else keywords), and a taxon's `score` (0–100) is the
+weighted share of axes on which it has at least one dataset: genome sequencing (3, graded by
+best assembly level: chromosome/complete full, scaffold ⅔, contig ⅓), bioelectric /
+electrophysiology (3), trait tables (2), DNA barcodes, 3D morphology, phylogeny, occurrences,
+fossils (1 each), conservation status and taxonomic resolution (½ each). Bioelectric and barcode
+axes have no records yet and are kept so the gap shows per organism. This measures how complete
+our records are, not how reliable the datasets are; dataset reliability is a separate assessment.
+`generated` in every response says when the coverage snapshot was made.
 
 ## Current gaps
 

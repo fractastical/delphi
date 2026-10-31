@@ -7,6 +7,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { GROUP_KEYS, SORT_KEYS, browseClaims } from "./graph.mjs";
 import { NETWORK_ENDPOINT, PREFIXES, getClaim, overview, rankClaims, searchClaims, sparql } from "./lib.mjs";
+import { AXIS_IDS, GROUP_KEYS as ORG_GROUP_KEYS, SORT_KEYS as ORG_SORT_KEYS, browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
 
 const TOOLS = [];
 
@@ -81,6 +82,35 @@ tool("delphi_graph",
     limit: z.number().int().min(1).max(500).default(20),
   },
   browseClaims);
+
+const axis = z.enum(AXIS_IDS);
+tool("delphi_organisms",
+  "Rank or filter the animal taxa Darwin and Thompson mention (organisms/merged) by dataset coverage: score 0-100 = weighted share of data axes with a vendored dataset (genome graded by assembly level, bioelectric, barcode, traits, morphology3d, phylogeny, occurrence, fossil, conservation, taxonomy). Call with no filters for the overview, or e.g. hasAxis=[genome] missingAxis=[traits]. Measures completeness of our records, not dataset reliability.",
+  {
+    text: z.string().optional().describe("Substring of accepted name or slug"),
+    taxonClass: z.string().optional().describe("Substring of class/phylum, e.g. \"Aves\", \"Gastropoda\""),
+    rank: z.string().optional().describe("Exact rank, e.g. \"species\", \"genus\", \"family\""),
+    project: z.string().optional().describe("\"darwin\" or \"thompson\""),
+    hasAxis: z.array(axis).default([]).describe("Only taxa covered on all these axes"),
+    missingAxis: z.array(axis).default([]).describe("Only taxa with no dataset on any of these axes"),
+    genomeLevel: z.enum(["complete", "chromosome", "scaffold", "contig", "none"]).optional(),
+    minScore: z.number().min(0).max(100).optional(),
+    maxScore: z.number().min(0).max(100).optional(),
+    minMentions: z.number().int().min(0).default(0),
+    sort: z.enum(ORG_SORT_KEYS).default("score").describe("score (high first), score-asc, mentions, datasets, name"),
+    groupBy: z.enum(ORG_GROUP_KEYS).optional().describe("Return per-group counts, mean score and axis coverage instead of taxa"),
+    overview: z.boolean().default(false).describe("Return axis-level totals for the whole set instead of taxa"),
+    limit: z.number().int().min(1).max(1000).default(20),
+  },
+  ({ overview, ...args }) => (overview ? organismsOverview() : browseOrganisms(args)));
+
+tool("delphi_get_organism",
+  "One taxon: identifiers (GBIF/NCBI/Wikidata/WoRMS), lineage, names as written, coverage score and missing axes, every dataset record (with counts, distributions, integrity) and every located mention in the books.",
+  {
+    id: z.string().describe("Taxon key (gbif:2495414), slug (columba-livia), accepted name or vernacular"),
+    includeMentions: z.boolean().default(true),
+  },
+  getOrganism);
 
 tool("delphi_sparql",
   `Run a read-only SPARQL SELECT. Nanopubs are named graphs: join GRAPH ?h { ?np np:hasAssertion ?a } with GRAPH ?a { ... }. These prefixes are added if the query has none:\n${PREFIXES}`,
