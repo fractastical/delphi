@@ -13,66 +13,19 @@ Don't grep TriG files or hand-write SPARQL first. Use the `delphisci` MCP server
 2. `delphi_search_claims` (`mathOnly: true` for formal statements) or `delphi_get_claim`.
 3. `delphi_rank_claims` with an assessment type, e.g. `dataset-resolvability/0.1.0`.
 4. `delphi_graph` for thinker/year/status views and model truth scores (from `docs/claims.json`).
-5. `delphi_organisms` / `delphi_get_organism` for the animal taxa, their vendored datasets and the
-   per-taxon dataset-coverage ranking (genome, bioelectric, traits, fossils, …).
 
-Without MCP, the same queries are available as
-`node mcp/cli.mjs <overview|search|claim|rank|graph|organisms|organism|sparql>`.
+Without MCP, the same queries are available as `node mcp/cli.mjs <overview|search|claim|rank|graph|sparql>`.
 Outside the repo, `npx -y github:fractastical/delphi` runs the same server.
 
 Default `source` is `local` (repo files, including unpublished drafts). Pass `source: "network"`
 for what is actually published. Details, ranking semantics and known gaps:
 [mcp/README.md](mcp/README.md).
 
-## Lean laws: one source, every surface (enforced)
-
-Get Lean laws from the API, never from a list you copied. Agents use the `lean_*` MCP tools:
-`lean_laws_list`, `lean_law_get`, `lean_lawset_get`, `lean_check`, `lean_verify`, and `lean_propose`
-(local stdio only). They are on the hosted `delphisci` server, on `sim-engine/server.mjs`, and on the
-sim-engine HTTP bridge (`POST /tool/lean_*`). Without MCP, use `node mcp/cli.mjs laws|law|lawset|check|verify`
-or `node sim-engine/lean-cli.mjs ...`. Pages use `dashboard/public/blueprint3d/lean-client.js`, which reads the
-live bridge if one is configured and otherwise the static mirror `/api/lean/`. Never paste law ids, statuses or
-statements into a page.
-
-All of these read laws through one loader, `lib/lean-source.mjs`. Its source is the versioned registry
-`lean/registry/` (one file per law, lawsets under `lean/registry/lawsets/`), with `lean/laws.json` +
-`lean/constraints.json` as the fallback until the registry exists.
-
-**Any new Lean law, empirical constraint or eliminating lemma (`*_rules_out`) must be added to the registry
-and exposed through the MCP tools, the CLI and the static API in the same change.** In practice:
-
-1. Register the law: `node lean/registry/propose.mjs <file.lean> --meta meta.json --write`. It never
-   auto-accepts; acceptance is a human approval recorded in the law file.
-2. Map every new constraint to that law (`constraints` in the law file).
-3. Regenerate: `node dashboard/build-lean-api.mjs`, and `node sim-engine/server.mjs --dump-contract > sim-engine/contract.json`
-   if tools changed.
-4. Run `node lean/registry/check-exposed.mjs`. It must pass.
-
-`check-exposed.mjs` fails if any law in the Lean modules, `laws.json`, `constraints.json`, `empirical.json` or
-the registry is missing from the registry, from `lean_laws_list`, from `/api/lean/`, from either CLI or from the
-hosted MCP server's tools. It also fails if the mirror or `contract.json` is stale. It runs as a pre-commit hook
-(enable once per clone with `git config core.hooksPath .githooks`) and in CI
-(`.github/workflows/lean-exposed.yml`). A Lean module that holds no law goes into `INFRASTRUCTURE` in
-`check-exposed.mjs` with a reason; do not delete laws to make the check pass (laws are retired, never removed).
-To mark a new theorem as a law before its registry entry exists, put `-- @law <law_id>` next to it. The check then
-holds you to registering that id.
-
-## Everything is modifiable, as long as it is versioned (Amit, Oct 31)
-
-No folder in this repo is off limits, including `mcp/` (the hosted server). Do not build a parallel copy of a component
-to avoid touching it: change it in place and version the change (a commit, plus a version bump and a CHANGELOG entry
-where the component has a version: `mcp/` via package.json, `sim-engine/` via `contract_version`, Lean laws via
-the registry's per-law version and lawsets). Folder ownership between running agents still applies for coordination;
-it is about not clobbering live work, not about permission.
-
 ## Projects
 
 - `darwin-origin/`: 247 claims from *On the Origin of Species*, with dataset-resolvability assessments.
 - `math-bio-theorems/`: key theorem claims of mathematical-biology thinkers, with LaTeX math.
 - `thompson-growth-form/`, `wolfram-nks/`: in progress.
-- `organisms/`: every animal taxon Darwin and Thompson mention (782 taxa, 3,340 located mentions),
-  resolved to GBIF/NCBI/Wikidata/WoRMS/PBDB, with 1,372 provenanced dataset records (occurrence
-  counts, genomes, trait databases). Merged view in `organisms/merged/`; see `organisms/README.md`.
 - `agent/`: Discord agent. `docs/`: claim graph site. `chats/`: transcripts of past agent sessions.
 
 Publishing signs with the operator's ORCID key and cannot be undone; ask before publishing to production.
@@ -567,30 +520,3 @@ only**, and leave production for the ORCID key owner's explicit approval, each t
 project lead to record findings is not the same as the key owner authorising an irreversible signature.
 Until that approval exists, every record is an **unsigned draft** and says so. Corrections use `supersede`
 and withdrawals use `retract`, both signed by the same agent identity, so plan for them before publishing.
-
-### Standing order: every new idea is researched, or labelled as what it is
-
-Added Oct 31 at the project lead's instruction. Applies to every role and every session.
-
-Before a new change or idea is adopted, it is either **backed by a research run** or **labelled honestly**.
-Every idea is recorded in `decisions/ideas.json`, and the knowledge graph shows each one as a node linked
-to what it affects. An idea carries exactly one of three origins:
-
-| origin | meaning | what it needs |
-|---|---|---|
-| `researched` | A research agent searched for prior work and the idea survived it | The run's report path, the works it found with resolvable identifiers, and whether prior work already does it |
-| `reach-synthesis` | Synthesised by an agent or person from other sources, not yet independently researched | The sources it draws on, and a note that it has not been checked against prior art |
-| `serendipitous` | Arose by accident: a check that caught something, an overlap nobody planned | What was being done when it surfaced, and the evidence that it is real |
-
-Rules:
-1. **A `reach-synthesis` idea may be used, but must be presented as one.** It never appears in a pitch or a
-   record as established method.
-2. **Research before novelty.** No idea is described as new or first until a research run has looked for
-   prior art and recorded what it found. Most ideas will turn out to have precedent; citing it is the
-   point, not a failure.
-3. **Research runs log their searches.** Every query, its time and its result go in the run's
-   `SEARCHES.md`. Citations come only from searches that returned them, never from memory.
-4. **Never send personal identifiers** (an email, a name, an account id) as a parameter to an outside
-   service. A research agent sent the project lead's email to NCBI as an etiquette parameter; that is now
-   prohibited.
-5. **A choice between alternatives is an idea too.** Record what was chosen, what was rejected, and why.
