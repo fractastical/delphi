@@ -1,0 +1,791 @@
+{
+ "bundle_sha256": "b75c5d82f9a43f575e19fdeef55081d02b5761867cbd910dcc6d25cf5bbf6941",
+ "exporting_node": "node-a",
+ "policy_version": "frontier-independent-review-0.1",
+ "records": [
+  {
+   "created_at": "2026-10-31T19:32:00+00:00",
+   "id": "eng-finmech-claim-ei-crit",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "Euler-Bernoulli (no shear deformation), linear elastic, static, constant EI along the ray",
+     "single clamped-free cantilever ray; clamped base; free tip",
+     "load = mean aerodynamic lift-pressure proxy p = 0.5*rho*V^2*CL from DECLARED rho, V, CL; uniform along the ray and normal to it; NOT a measured fin pressure",
+     "line load q_line = p * tributary width (width declared, see load_bridge.inputs)",
+     "EI swept over an ASSUMED log-spaced range [1/1000000, 1] N m^2, 61 points; no biological calibration",
+     "small-deformation validity limits are DECLARED thresholds, not derived from material"
+    ],
+    "context": "Producer-derived number from exact rational arithmetic on DECLARED inputs (rho, V, CL, tributary width, ray length, validity thresholds). It is a threshold of the surrogate, not a property of any fish. Decision rule stated by the producer: If measured EI >= EI_crit_Nm2 the declared load stays inside the small-deformation limit for this geometry; if EI < EI_crit_Nm2 the linear model is invalid at the declared load and a large-deformation model (or a lower load) is required.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "The request is labelled by its producer: DECLARED ILLUSTRATION: not produced by the dx-guilds solver; numbers are test values, not a design claim. Its numbers are test values, not a design claim.",
+     "EI is an ASSUMED log-spaced range (1/1000000 to 1 N m^2), not a measurement of any fin ray.",
+     "Producer states it does not establish: biological feasibility of any fin, ray or flight design",
+     "Producer states it does not establish: the stiffness EI of any real fish fin ray (it is an assumed range here)",
+     "Producer states it does not establish: fluid-structure interaction: the load is a fixed mean pressure proxy, not coupled to deformation",
+     "Producer states it does not establish: fin membrane, bilaminar hemitrich shear, active muscle control, ray taper, joints or viscoelasticity",
+     "Producer states it does not establish: large-deformation (elastica) behaviour: results beyond the declared small-deformation limit are flagged invalid",
+     "Producer states it does not establish: calibration of rho, CL, tributary width or ray length (all declared, none measured)",
+     "Producer states it does not establish: that the glide package's candidate is flyable (owned by the glide receipt, not by this package)"
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Claim statement is the producer's critical_stiffness field.",
+     "content_available": false,
+     "content_sha256": "971aa0056f0879b9bf38907a533727d324cc26cfea31f74d83e1e08266cf1f36",
+     "license": null,
+     "locator": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/artifacts/result.json",
+     "source_version": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "For the producer's declared request (canonical sha256 f276a86069b8577d...), in a linear static Euler-Bernoulli cantilever with a uniform line load from a declared lift-pressure proxy, the bending stiffness below which the declared small-deformation limits are exceeded is EI_crit = 1323/2048000 N m^2 (binding limit: tip_over_L).",
+    "title": "Declared-load critical bending stiffness of a single clamped-free ray (linear small-deformation surrogate)"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:engineering-manifest:fin-mechanics",
+   "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T19:32:00+00:00",
+   "id": "eng-finmech-action-sim",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code and the pinned request file reproduces result.json byte-for-byte, and the producer's controls pass.",
+     "An independent reviewer checks the surrogate's assumptions against the claim before it is used for anything."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619; code_sha256 16c006be07a266f45385507a74a9d5cc37991f58617ddc6c10aaa3b807c481c5; files __init__.py:8ff9253d5eb8, beam.py:4dfceb004a2e, load_bridge.py:743d85121d28, sweep.py:17e2e1835d9f",
+     "environment": "NOT RECORDED by the producer (interpreter, package versions, hardware)",
+     "input": "request 943b8f645a068e76f168bd99933f09210eedd49cf2a3ec1cb0eba547df7381d4; canonical f276a86069b8577d188afadc18cd162f210f89b9dac3c86bd829f560907b79cc",
+     "model": "finmech-eb-cantilever-linear-static/1 (deterministic surrogate, no language model)",
+     "parameters": "request file as pinned; EI sweep 61 log-spaced points over the assumed range; 64 elements",
+     "scope": "simulated surrogate on declared inputs; not a measurement and not a design claim",
+     "target": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded in its manifest. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "python3 with numpy (versions NOT recorded by the producer)"
+    ],
+    "target": {
+     "id": "eng-finmech-claim-ei-crit",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+    },
+    "title": "Imported record of a producer-reported run (NOT executed by Frontier): fin-mechanics EI sweep and critical-stiffness computation"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:engineering-manifest:fin-mechanics",
+   "version": "16b0d353e95428b623b287237f24c320475868475a537e6e930f5eb46cc5d3fc",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T19:32:00+00:00",
+   "id": "eng-finmech-evidence-sim",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 44169,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "971aa0056f0879b9bf38907a533727d324cc26cfea31f74d83e1e08266cf1f36",
+      "title": "output: engineering/fin_mechanics/artifacts/result.json [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/artifacts/result.json]",
+      "uri": "urn:sha256:971aa0056f0879b9bf38907a533727d324cc26cfea31f74d83e1e08266cf1f36"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1160,
+      "license": null,
+      "media_type": "application/json",
+      "role": "input",
+      "sha256": "943b8f645a068e76f168bd99933f09210eedd49cf2a3ec1cb0eba547df7381d4",
+      "title": "input: engineering/fin_mechanics/example_request.json [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/example_request.json]",
+      "uri": "urn:sha256:943b8f645a068e76f168bd99933f09210eedd49cf2a3ec1cb0eba547df7381d4"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 390,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "8ff9253d5eb8e401cf2f2fbc573ad9580189531f9ee72d735d91e5194e800541",
+      "title": "code: engineering/fin_mechanics/__init__.py [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/__init__.py]",
+      "uri": "urn:sha256:8ff9253d5eb8e401cf2f2fbc573ad9580189531f9ee72d735d91e5194e800541"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 8191,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d",
+      "title": "code: engineering/fin_mechanics/beam.py [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/beam.py]",
+      "uri": "urn:sha256:4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 7099,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "743d85121d2804fbed690a310d31f7ac7eec7fab9c8b06e776eee30fb4a97a11",
+      "title": "code: engineering/fin_mechanics/load_bridge.py [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/load_bridge.py]",
+      "uri": "urn:sha256:743d85121d2804fbed690a310d31f7ac7eec7fab9c8b06e776eee30fb4a97a11"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 14886,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "17e2e1835d9f67c47b68e8285ae118b1b585c4d2b9a955bd13c598fbc498fa6e",
+      "title": "code: engineering/fin_mechanics/sweep.py [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/sweep.py]",
+      "uri": "urn:sha256:17e2e1835d9f67c47b68e8285ae118b1b585c4d2b9a955bd13c598fbc498fa6e"
+     }
+    ],
+    "assumptions": [
+     "Euler-Bernoulli (no shear deformation), linear elastic, static, constant EI along the ray",
+     "single clamped-free cantilever ray; clamped base; free tip",
+     "load = mean aerodynamic lift-pressure proxy p = 0.5*rho*V^2*CL from DECLARED rho, V, CL; uniform along the ray and normal to it; NOT a measured fin pressure",
+     "line load q_line = p * tributary width (width declared, see load_bridge.inputs)",
+     "EI swept over an ASSUMED log-spaced range [1/1000000, 1] N m^2, 61 points; no biological calibration",
+     "small-deformation validity limits are DECLARED thresholds, not derived from material"
+    ],
+    "context": "Applicability: the surrogate's own critical stiffness for a declared illustration request. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "The request is labelled by its producer: DECLARED ILLUSTRATION: not produced by the dx-guilds solver; numbers are test values, not a design claim. Its numbers are test values, not a design claim.",
+     "EI is an ASSUMED log-spaced range (1/1000000 to 1 N m^2), not a measurement of any fin ray.",
+     "Producer states it does not establish: biological feasibility of any fin, ray or flight design",
+     "Producer states it does not establish: the stiffness EI of any real fish fin ray (it is an assumed range here)",
+     "Producer states it does not establish: fluid-structure interaction: the load is a fixed mean pressure proxy, not coupled to deformation",
+     "Producer states it does not establish: fin membrane, bilaminar hemitrich shear, active muscle control, ray taper, joints or viscoelasticity",
+     "Producer states it does not establish: large-deformation (elastica) behaviour: results beyond the declared small-deformation limit are flagged invalid",
+     "Producer states it does not establish: calibration of rho, CL, tributary width or ray length (all declared, none measured)",
+     "Producer states it does not establish: that the glide package's candidate is flyable (owned by the glide receipt, not by this package)",
+     "0.525 of the assumed EI range is inside the small-deformation limit; the rest is flagged invalid, not hidden."
+    ],
+    "local_id": null,
+    "method": "Producer's deterministic surrogate: finmech-eb-cantilever-linear-static/1. Controls reported by the producer: FEM vs analytic max relative difference 3.7e-09; analytic residuals vs independent quadrature <= 1.85e-16.",
+    "produced_by": {
+     "id": "eng-finmech-action-sim",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "16b0d353e95428b623b287237f24c320475868475a537e6e930f5eb46cc5d3fc"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.engineering_manifest",
+      "version": "0.1.0"
+     },
+     "checks_performed_by_adapter": [
+      "manifest.schema",
+      "manifest.evidence_kind",
+      "output.result_json",
+      "output.mp4",
+      "output.poster",
+      "output.size.result.json",
+      "output.size.fin_mechanics.mp4",
+      "output.size.poster.png",
+      "code.__init__.py",
+      "code.beam.py",
+      "code.load_bridge.py",
+      "code.render.py",
+      "code.sweep.py",
+      "code.combined",
+      "input.request_file",
+      "result.schema",
+      "result.inputs_sha256",
+      "result.code_sha256",
+      "result.evidence_kind",
+      "result.critical_stiffness",
+      "video.counts",
+      "request.declared_illustration"
+     ],
+     "code_sha256": "16c006be07a266f45385507a74a9d5cc37991f58617ddc6c10aaa3b807c481c5",
+     "execution": "reported by the producer; not executed or replayed by this adapter",
+     "inputs_sha256": "f276a86069b8577d188afadc18cd162f210f89b9dac3c86bd829f560907b79cc",
+     "source_commit": "a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+     "system": "engineering/fin_mechanics (producer code in this repository)",
+     "validity": {
+      "any_invalid": true,
+      "fraction_of_assumed_range_valid_uniform": 0.5245901639344263,
+      "policy": "FLAG: every row carries valid/flag; invalid rows are reported, not hidden; beam.require_valid()/solve_checked(strict=True) raise SmallDeformationViolation"
+     }
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T19:32:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Primary result file.",
+     "content_available": false,
+     "content_sha256": "971aa0056f0879b9bf38907a533727d324cc26cfea31f74d83e1e08266cf1f36",
+     "license": null,
+     "locator": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/artifacts/result.json",
+     "source_version": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer and same code produced the claim and this result",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "eng-finmech-claim-ei-crit",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+    },
+    "uncertainty": "Not quantified by the producer beyond numerical controls; the input range is an assumption."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:engineering-manifest:fin-mechanics",
+   "version": "f603df41d519d89ff20afcbda48c2b1059b330e34ddb8a6426a5365105001775",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T19:32:00+00:00",
+   "id": "eng-finmech-action-render",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "Re-rendering from the pinned code and the simulation result reproduces the numeric frames (frames_data_sha256); mp4 bytes may differ across ffmpeg builds.",
+     "The video is read as a picture of the computed frames, not as additional evidence."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619; render.py sha256 58a94ae5adc185ef427654a7b0ff99fa8bf0c994edcb6ba6e10371a687dae171; code_sha256 16c006be07a266f45385507a74a9d5cc37991f58617ddc6c10aaa3b807c481c5",
+     "environment": "NOT RECORDED by the producer (ffmpeg build, matplotlib, fonts)",
+     "input": "simulation evidence version f603df41d519d89ff20afcbda48c2b1059b330e34ddb8a6426a5365105001775; result.json sha256 971aa0056f0879b9bf38907a533727d324cc26cfea31f74d83e1e08266cf1f36",
+     "model": "none: deterministic rendering of computed frames",
+     "parameters": "360 frames, 24 fps, 15.0 s, 1280x720",
+     "scope": "visualisation of a simulated surrogate; creation time and order relative to the simulation are NOT recorded",
+     "target": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's render are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "eng-finmech-evidence-sim",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "f603df41d519d89ff20afcbda48c2b1059b330e34ddb8a6426a5365105001775"
+     }
+    ],
+    "required_capabilities": [
+     "python3 with numpy and matplotlib; ffmpeg (versions NOT recorded by the producer)"
+    ],
+    "target": {
+     "id": "eng-finmech-claim-ei-crit",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+    },
+    "title": "Imported record of a producer-reported render (NOT executed by Frontier): video and poster from the computed frames"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:engineering-manifest:fin-mechanics",
+   "version": "2ce84b9068184df208140fe18aaa339c38e6bded34b15717c8869f267f67f0b4",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T19:32:00+00:00",
+   "id": "eng-finmech-evidence-render",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 327971,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "output",
+      "sha256": "f4080da6514b6e7a374927f7e40ac6ccff7ae33d62fe2ecd96318a2fb7c7ac17",
+      "title": "output: engineering/fin_mechanics/artifacts/fin_mechanics.mp4 [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/artifacts/fin_mechanics.mp4]",
+      "uri": "urn:sha256:f4080da6514b6e7a374927f7e40ac6ccff7ae33d62fe2ecd96318a2fb7c7ac17"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 348646,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "output",
+      "sha256": "df0e4804e57cda604ac66f8bb49681a9105b930dd1a078d15ce505209030cf95",
+      "title": "output: engineering/fin_mechanics/artifacts/poster.png [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/artifacts/poster.png]",
+      "uri": "urn:sha256:df0e4804e57cda604ac66f8bb49681a9105b930dd1a078d15ce505209030cf95"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 13301,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "58a94ae5adc185ef427654a7b0ff99fa8bf0c994edcb6ba6e10371a687dae171",
+      "title": "code: engineering/fin_mechanics/render.py [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/render.py]",
+      "uri": "urn:sha256:58a94ae5adc185ef427654a7b0ff99fa8bf0c994edcb6ba6e10371a687dae171"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1691,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "179f6f910d4e1c58a3241569171fc3bd924d2336982c4b23e1d522f49dbde461",
+      "title": "receipt: engineering/fin_mechanics/artifacts/manifest.json [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/artifacts/manifest.json]",
+      "uri": "urn:sha256:179f6f910d4e1c58a3241569171fc3bd924d2336982c4b23e1d522f49dbde461"
+     }
+    ],
+    "assumptions": [
+     "Euler-Bernoulli (no shear deformation), linear elastic, static, constant EI along the ray",
+     "single clamped-free cantilever ray; clamped base; free tip",
+     "load = mean aerodynamic lift-pressure proxy p = 0.5*rho*V^2*CL from DECLARED rho, V, CL; uniform along the ray and normal to it; NOT a measured fin pressure",
+     "line load q_line = p * tributary width (width declared, see load_bridge.inputs)",
+     "EI swept over an ASSUMED log-spaced range [1/1000000, 1] N m^2, 61 points; no biological calibration",
+     "small-deformation validity limits are DECLARED thresholds, not derived from material"
+    ],
+    "context": "A picture of the computed frames, linked to the simulation Evidence it consumed. It adds no new support for the Claim. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "179 of 360 frames are flagged by the producer as outside the small-deformation limit.",
+     "mp4 bytes can differ across ffmpeg builds; frames_data_sha256 hashes the computed numeric frames and is the reproducible quantity",
+     "mp4 and png are views for people; they are not an artifact of the measurement and not a validation of anything."
+    ],
+    "local_id": null,
+    "method": "Producer's renderer draws 360 frames from beam.solve_checked (Hermite FEM) per frame; closed form overlaid for comparison.",
+    "produced_by": {
+     "id": "eng-finmech-action-render",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "2ce84b9068184df208140fe18aaa339c38e6bded34b15717c8869f267f67f0b4"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.engineering_manifest",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter",
+     "frames_data_sha256": "bf71352706d690e9643653366aaf07e88dc9bbb7df88d0a7085f221101c473b5",
+     "frames_invalid": 179,
+     "frames_valid": 181,
+     "ordering_note": "The producer records no creation time for either output; both files arrive in one commit. Separation of the two Actions follows different code and different outputs, not a recorded sequence.",
+     "source_commit": "a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+     "system": "engineering/fin_mechanics render.py"
+    },
+    "provider_assessment": null,
+    "relation": "context_only",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T19:32:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Render manifest.",
+     "content_available": false,
+     "content_sha256": "179f6f910d4e1c58a3241569171fc3bd924d2336982c4b23e1d522f49dbde461",
+     "license": null,
+     "locator": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/artifacts/manifest.json",
+     "source_version": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer and same computed frames as the simulation Evidence",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "eng-finmech-claim-ei-crit",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+    },
+    "uncertainty": "Not applicable to a rendering; the numeric frames are the reproducible quantity (bf71352706d690e9...)."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:engineering-manifest:fin-mechanics",
+   "version": "0360bea50a108244e31b4360c07dd083766875ae50099de54eb46b8418701479",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T19:32:00+00:00",
+   "id": "eng-finmech-problem-ei-measurement",
+   "issuer": "importer",
+   "kind": "Problem",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [],
+    "approach": "measurement",
+    "completeness": "recorded",
+    "context_tags": [
+     "engineering-surrogate",
+     "declared-illustration"
+    ],
+    "cost_stop_bounds": null,
+    "data_access": "No measurement of any real ray exists in this repository; EI appears only as an assumed range (status ASSUMED_RANGE_NOT_MEASURED).",
+    "dependencies": [
+     {
+      "id": "eng-finmech-claim-ei-crit",
+      "kind": "Claim",
+      "namespace": "node-a",
+      "version": "4998ef85bd98ec64c0f4bc86e77337ea25df7ff5683ac6b62dc9095cf5f62f57"
+     }
+    ],
+    "downstream_uses": [
+     "If measured EI >= EI_crit_Nm2 the declared load stays inside the small-deformation limit for this geometry; if EI < EI_crit_Nm2 the linear model is invalid at the declared load and a large-deformation model (or a lower load) is required.",
+     "the ASSUMED EI range in this package into measured data (>= several rays, with spread)"
+    ],
+    "falsifiers": [],
+    "known_state": "The surrogate's critical stiffness for the declared illustration request is EI_crit = 1323/2048000 N m^2; the EI of any real ray is not known to this repository (assumed range only).",
+    "next_action": null,
+    "novelty_status": "Not searched by this adapter; the producer cites a different species and boundary condition as context only.",
+    "original": {
+     "adapter": "frontier_adapters.engineering_manifest",
+     "producer_field": "measurement_question"
+    },
+    "problem_kind": "project_gap",
+    "question": "What is the effective flexural rigidity EI (N m^2) of an excised ray of the target fin, as a function of distance from its base, under the clamping condition that matches its in-fin boundary condition, and is it above or below EI_crit_Nm2 of this request?",
+    "required_capabilities": [
+     "Clamp the ray base (state whether both hemitrichs or one is clamped; Alben et al. 2007 report ~12x stiffness difference between these), load the free end with a calibrated micro-force transducer (resolution <= 1 microN) or a calibrated cantilever probe, track tip displacement optically (resolution <= 1 micrometre), keep the specimen hydrated, record force-displacement for tip/L < 0.1 (inside the linear range), and repeat with the clamp moved along the ray to get EI(x). Cross-check with micro-CT second moment of area."
+    ],
+    "scales": [],
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Problem text is the producer's measurement_question field, copied.",
+     "content_available": false,
+     "content_sha256": "971aa0056f0879b9bf38907a533727d324cc26cfea31f74d83e1e08266cf1f36",
+     "license": null,
+     "locator": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/fin_mechanics/artifacts/result.json",
+     "source_version": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+     "uri": null
+    },
+    "title": "Is the real effective bending stiffness of the target fin ray above or below the declared critical stiffness?"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:engineering-manifest:fin-mechanics",
+   "version": "4a72ddfd7dc19e0c0e54a59825528d0ea226412bdc552c54e06eaa259f43335c",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T19:32:00+00:00",
+   "id": "eng-formal-claim-declared-constraints-conflict",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "CL = 1 (design_assumption)",
+     "g = 196133/20000 (physical_law)",
+     "rho = 49/40 (design_assumption)",
+     "constraints used: mass_lo, mass_hi, wl_lo, wl_hi, level_lift_proxy, q_wl_min, q_speed_max; minimal conflict core: level_lift_proxy, q_wl_min, q_speed_max"
+    ],
+    "context": "Derived by the producer's constraint solver and certified by a Lean kernel check. within the declared constraints only; not organism feasibility; a source envelope is not a universal feasibility region; the lift constraint is a level-flight proxy (L = W), not a glide analysis (L = W cos(gamma))",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "Scope stated by the producer: within the declared constraints only; not organism feasibility; a source envelope is not a universal feasibility region; the lift constraint is a level-flight proxy (L = W), not a glide analysis (L = W cos(gamma))",
+     "The z3 search that found the conflict is reported as: unsat on a subset of the declared constraints; z3 verdict re-checked by z3 only, no independent proof object. The formal evidence is the Lean kernel check of the certificate, not the z3 verdict.",
+     "Whether the plain-language statement is a faithful reading of the Lean theorem has not been reviewed.",
+     "rho and CL are design assumptions set by the caller (rho=49/40, CL=1); they come from no source in the repository.",
+     "No independent proof object exists for the z3 step; the Lean check covers only the stated certificate theorem under its stated hypotheses."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Claim is the receipt's conflict_instance theorem and conflict core.",
+     "content_available": false,
+     "content_sha256": "b384c5ace8569027b226e4c5d24de8a54686877cfaf8266b8c7f7295953a6b17",
+     "license": null,
+     "locator": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/formal/RECEIPT.json",
+     "source_version": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "There are no real m, g, S, V with S > 0, V >= 0, wing loading at least 150, V at most 10 and the level-flight lift proxy 2*m*g <= V^2*(49/40)*S*1 jointly satisfied. Lean theorem as produced by the receipt:\ntheorem conflict_instance {m g S V : \u211d} (hS : 0 < S) (hV0 : 0 \u2264 V)\n    (hwl : ((150 : \u211d) / 1) \u2264 FlyingFish.wingLoading m g S) (hV : V \u2264 ((10 : \u211d) / 1))\n    (hlift : 2 * m * g \u2264 V ^ 2 * ((49 : \u211d) / 40) * S * ((1 : \u211d) / 1)) : False :=\n  FlyingFish.conflict_of_certificate hS hV0 (by norm_num) (by norm_num) hwl hV hlift (by norm_num)",
+    "title": "Three declared flying-fish design constraints have no common solution (level-lift proxy, minimum wing loading, maximum speed)"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:engineering-manifest:formal-certificate",
+   "version": "31d14a2eaa6f123ff7b91564d4bf247679ff36ec8beadfa4e229a0bd20660032",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T19:32:00+00:00",
+   "id": "eng-formal-action-lean-check",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-run of the pinned Lean sources reproduces exit 0 with only standard axioms for the positive block.",
+     "Each of the four negative blocks (including the corrupted certificate) is rejected by the kernel on re-run."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619; theory_sha256 17535326ff9f8b1ffd6d59eae5f0989bb211bbf581b5b4a01d17e9a29a992a89; lean_checks.py b2fa538b8dc75d24e89b9ae210db79d690709ddd6c17b3251a3fc7c00e288106",
+     "environment": "Lean 4.35.0 with Mathlib rev 56a005855ea1; project path withheld; lake manifest 81340aac923d17d4...; OS/hardware NOT recorded",
+     "input": "certificate_text sha256 c91ece6845e3149d079098ccc6d7d5efa2a05d12af667804b2542ed20a9627ad; positive source 063496524920379d5413b27aef4270e45c407f238c6247a1d4948584e6807423; negative source e2d1941f60044ae21b82e808370ed06fc90d03fba7c0c6350cf34297a73e50f6",
+     "model": "none: Lean kernel check; the certificate was found by a z3-based solver, no language model recorded",
+     "parameters": "positive block, then four negative blocks (wl_k2, mass_exponent, stall_k2, corrupted_certificate)",
+     "scope": "formal check of one theorem under stated hypotheses; not organism feasibility",
+     "target": "31d14a2eaa6f123ff7b91564d4bf247679ff36ec8beadfa4e229a0bd20660032"
+    },
+    "cost_stop_bounds": "Reported wall time: positive 85.6 s, negative 26.5 s (producer's clock, single run). No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "Lean 4.35.0 toolchain",
+     "Mathlib at the recorded revision"
+    ],
+    "target": {
+     "id": "eng-formal-claim-declared-constraints-conflict",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "31d14a2eaa6f123ff7b91564d4bf247679ff36ec8beadfa4e229a0bd20660032"
+    },
+    "title": "Imported record of a producer-reported Lean kernel check (NOT executed by Frontier): conflict certificate plus negative controls"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:engineering-manifest:formal-certificate",
+   "version": "7285bddd93bca5878156f04609149f7b3187c8e2046c54237fd1ef9fc1eeeab9",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T19:32:00+00:00",
+   "id": "eng-formal-evidence-lean-check",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 5152,
+      "license": null,
+      "media_type": "application/json",
+      "role": "certificate",
+      "sha256": "b384c5ace8569027b226e4c5d24de8a54686877cfaf8266b8c7f7295953a6b17",
+      "title": "certificate: engineering/formal/RECEIPT.json [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/formal/RECEIPT.json]",
+      "uri": "urn:sha256:b384c5ace8569027b226e4c5d24de8a54686877cfaf8266b8c7f7295953a6b17"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 38524,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "de0acf47ffc7ffbebe5a44d775e007e87b7f4a996256b6c94fc0e188a0fcead1",
+      "title": "code: engineering/constraints.py [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/constraints.py]",
+      "uri": "urn:sha256:de0acf47ffc7ffbebe5a44d775e007e87b7f4a996256b6c94fc0e188a0fcead1"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 4827,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "code",
+      "sha256": "17535326ff9f8b1ffd6d59eae5f0989bb211bbf581b5b4a01d17e9a29a992a89",
+      "title": "code: engineering/formal/GeometricSimilarity.lean [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/formal/GeometricSimilarity.lean]",
+      "uri": "urn:sha256:17535326ff9f8b1ffd6d59eae5f0989bb211bbf581b5b4a01d17e9a29a992a89"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2003,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "code",
+      "sha256": "2ed863acbefcbfd6d721a1629852ad38a3b8eb847d4cfe52c028cab1ea7d4147",
+      "title": "code: engineering/formal/MutantRefutations.lean [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/formal/MutantRefutations.lean]",
+      "uri": "urn:sha256:2ed863acbefcbfd6d721a1629852ad38a3b8eb847d4cfe52c028cab1ea7d4147"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1329,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "code",
+      "sha256": "c3a485297b03826d3ddcf47495c4e6bf748eb68dea6032f8955e88d8e7c7cd9f",
+      "title": "code: engineering/formal/NegativeControls.lean [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/formal/NegativeControls.lean]",
+      "uri": "urn:sha256:c3a485297b03826d3ddcf47495c4e6bf748eb68dea6032f8955e88d8e7c7cd9f"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 6674,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "b2fa538b8dc75d24e89b9ae210db79d690709ddd6c17b3251a3fc7c00e288106",
+      "title": "code: engineering/formal/lean_checks.py [git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/formal/lean_checks.py]",
+      "uri": "urn:sha256:b2fa538b8dc75d24e89b9ae210db79d690709ddd6c17b3251a3fc7c00e288106"
+     }
+    ],
+    "assumptions": [
+     "The Lean hypotheses are the Claim's stated constraints with the stated rho and CL.",
+     "Mathlib and the Lean kernel are trusted as installed."
+    ],
+    "context": "Formal check of the Lean theorem quoted in the Claim. 'supports' is a declaration by the adapter that this check bears on the Claim's statement; it is not a review of statement fidelity.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "formal",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "Scope stated by the producer: within the declared constraints only; not organism feasibility; a source envelope is not a universal feasibility region; the lift constraint is a level-flight proxy (L = W), not a glide analysis (L = W cos(gamma))",
+     "The z3 search that found the conflict is reported as: unsat on a subset of the declared constraints; z3 verdict re-checked by z3 only, no independent proof object. The formal evidence is the Lean kernel check of the certificate, not the z3 verdict.",
+     "Whether the plain-language statement is a faithful reading of the Lean theorem has not been reviewed.",
+     "rho and CL are design assumptions set by the caller (rho=49/40, CL=1); they come from no source in the repository.",
+     "No independent proof object exists for the z3 step; the Lean check covers only the stated certificate theorem under its stated hypotheses."
+    ],
+    "local_id": null,
+    "method": "Lean kernel check, Lean 4.35.0 with Mathlib rev 56a005855ea1; project path withheld; positive block exit 0 in 85.6 s with axioms ['Classical.choice', 'Quot.sound', 'propext']; negative controls rejected: ['corrupted_certificate', 'mass_exponent', 'stall_k2', 'wl_k2']. The certificate came from a z3 conflict search (status unsat, solver z3-nlsat-tracked v1, z3 5.3.3).",
+    "produced_by": {
+     "id": "eng-formal-action-lean-check",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "7285bddd93bca5878156f04609149f7b3187c8e2046c54237fd1ef9fc1eeeab9"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.engineering_manifest",
+      "version": "0.1.0"
+     },
+     "checks_performed_by_adapter": [
+      "solver.unsat",
+      "solver.core_minimal",
+      "lean.ran",
+      "lean.positive.exit0",
+      "lean.positive.axioms",
+      "lean.negative.all_rejected",
+      "certificate.text_hash",
+      "file.GeometricSimilarity.lean",
+      "file.MutantRefutations.lean",
+      "file.NegativeControls.lean",
+      "file.lean_checks.py",
+      "file.../constraints.py",
+      "theory.hash"
+     ],
+     "execution": "reported by the producer; not executed or replayed by this adapter",
+     "lean_version": "Lean (version 4.35.0, x86_64-unknown-linux-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)",
+     "mathlib_rev": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+     "negative": {
+      "each_block_rejected": {
+       "corrupted_certificate": true,
+       "mass_exponent": true,
+       "stall_k2": true,
+       "wl_k2": true
+      },
+      "exit": 1,
+      "seconds": 26.5
+     },
+     "positive": {
+      "axioms_used": [
+       "Classical.choice",
+       "Quot.sound",
+       "propext"
+      ],
+      "exit": 0,
+      "seconds": 85.6
+     },
+     "solver": {
+      "conflict_core": [
+       "level_lift_proxy",
+       "q_wl_min",
+       "q_speed_max"
+      ],
+      "core_minimal": true,
+      "name": "z3-nlsat-tracked v1",
+      "status": "unsat",
+      "used_constraints": [
+       "mass_lo",
+       "mass_hi",
+       "wl_lo",
+       "wl_hi",
+       "level_lift_proxy",
+       "q_wl_min",
+       "q_speed_max"
+      ],
+      "verdict_checked_by": "z3 only (producer's own words); no independent proof object",
+      "z3_version": "5.3.3"
+     },
+     "source_commit": "a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+     "system": "engineering/formal/lean_checks.py",
+     "toolchain_file": "leanprover/lean4:v4.35.0"
+    },
+    "provider_assessment": null,
+    "relation": "supports",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T19:32:00+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Receipt of the formal check.",
+     "content_available": false,
+     "content_sha256": "b384c5ace8569027b226e4c5d24de8a54686877cfaf8266b8c7f7295953a6b17",
+     "license": null,
+     "locator": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619:engineering/formal/RECEIPT.json",
+     "source_version": "git:delphi-frontier@a48399f60f770c0e88cf3aaf1e7e239ca1055619",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer built the constraints, found the certificate and wrote the checks",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "eng-formal-claim-declared-constraints-conflict",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "31d14a2eaa6f123ff7b91564d4bf247679ff36ec8beadfa4e229a0bd20660032"
+    },
+    "uncertainty": "Not applicable to a kernel check beyond trust in the toolchain; statement fidelity is separate and unreviewed."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:engineering-manifest:formal-certificate",
+   "version": "7741ae31a6b26f926684f3749c72fa9ea177e7c873a92b3bad3bd2c798877a88",
+   "visibility": "public"
+  }
+ ],
+ "review_claims": [],
+ "schema_version": "frontier-bundle-0.1",
+ "trust": "Digest proves integrity only; reviews require receiving-node policy."
+}
