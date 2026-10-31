@@ -2,11 +2,13 @@
   "claim_id": "wolfram2002-ch11-25",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch11-25",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "With a single-step block-emulation scheme of the kind shown on NKS pp. 703-705 (fixed background blocks of width w between single input cells, t steps of the underlying rule, output read at a fixed offset), the underlying rules 22, 30 and 110 can realise, as the induced map from (x[i-1], x[i], x[i+1]) to the output under cell i, every one of the 256 elementary rules once w is large enough, whereas rules 90 and 184 realise only a small number of them at the same widths.",
   "pass_criterion": "Pre-registered. Scheme: the initial condition is periodic with period w+1: one input cell x[i] in {0,1} followed by a fixed background block B in {0,1}^w. The underlying rule f is run for t steps with w+1 <= t <= 2w+2 and the output for cell i is read at offset d in 0..w to the right of x[i]'s position. For each (w, B, t, d) the output is computed for all 32 assignments of (x[i-2], ..., x[i+2]) in a window padded on both sides with t+2 further background cells (input positions in the padding set to 0; they lie outside the light cone). If the output depends only on (x[i-1], x[i], x[i+1]) (the 4 assignments of the outer inputs agree for each of the 8 inner triples), the induced 3-input truth table is an elementary rule g that f emulates for one step at width w. E(f, W) = the set of g realised for some w <= W. Widths searched: W = 1..6. 'supports' if |E(f, 6)| = 256 for each f in {22, 30, 110} and |E(f, 6)| <= 32 for each f in {90, 184}.",
   "fail_criterion": "Pre-registered. 'refutes' if |E(90, 6)| >= 128 or |E(184, 6)| >= 128 (a 'simple' rule emulates at least half of all elementary rules), or if min over f in {22, 30, 110} of |E(f, 6)| is smaller than max over f in {90, 184} of |E(f, 6)| (the contrast is reversed). 'inconclusive' with reason 'other' if neither condition holds, e.g. because 22, 30 or 110 do not reach 256 within W = 6 under this scheme: Wolfram's figure uses a scheme whose exact readout and width conventions are not fully recoverable from the online text, so a shortfall under the reconstructed scheme does not refute the claim. In every case the counts for all 256 underlying rules at W = 6 are reported.",
-  "planned_datasets": ["nks-ch11-25-single-step-emulation-search"],
+  "planned_datasets": [
+    "nks-ch11-25-single-step-emulation-search"
+  ],
   "interpretation": "The claim concerns one-step emulation under block encodings, which Wolfram himself distinguishes from universality. The test reconstructs the p. 703-704 scheme from its caption (fixed initial conditions except at input positions; blocks of 3 cells between inputs for the rule 30 to Xor example; blocks 5 cells wide for all 256 rules) with the output position and step count as free parameters searched over a bounded range. 'A few' is given the threshold 32 of 256 (one eighth). Positive emulations are exact finite certificates; negative counts are relative to the scheme and the searched widths. All computation is in analysis.py; there is no external download.",
   "datasets": [
     {
@@ -20,10 +22,191 @@
       "role": "the search whose outcome is the number of elementary rules each underlying rule can emulate for one step"
     }
   ],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-wolfram-nks-e5f4", "date": "2026-10-31" }
+  "method": "analysis.py builds, for each underlying rule f, each background width w = 1..6 and each of the 2^w background blocks, a periodic initial condition with one input cell per period, runs f for t = w+1..2w+2 steps on all 32 assignments of five consecutive inputs (numpy, vectorised over assignments), reads the output at each offset d = 0..w below the central input, and records the induced 3-input truth table whenever the output is independent of the two outer inputs. The cumulative number of distinct elementary rules so obtained was computed for all 256 underlying rules (25 s). After seeing that the counts were still rising at w = 6, the same search was continued post hoc to w = 12 for rules 22, 30, 45, 90, 110 and 184 (a further 2 minutes).",
+  "measured": {
+    "value": {
+      "22": 117,
+      "30": 229,
+      "110": 55,
+      "90": 14,
+      "184": 14,
+      "41": 217,
+      "45": 251,
+      "54": 189
+    },
+    "unit": "number of the 256 elementary rules emulated for one step with background width <= 6 (pre-registered range)",
+    "n": {
+      "underlying_rules": 256,
+      "widths": 6
+    },
+    "uncertainty": "exhaustive within the reconstructed scheme and searched range; none",
+    "extra": {
+      "cumulative_by_width_1_to_6": {
+        "22": [
+          4,
+          9,
+          28,
+          57,
+          72,
+          117
+        ],
+        "30": [
+          8,
+          23,
+          71,
+          117,
+          151,
+          229
+        ],
+        "110": [
+          4,
+          7,
+          32,
+          33,
+          51,
+          55
+        ],
+        "90": [
+          2,
+          10,
+          10,
+          10,
+          14,
+          14
+        ],
+        "184": [
+          4,
+          9,
+          12,
+          14,
+          14,
+          14
+        ],
+        "45": [
+          8,
+          30,
+          62,
+          109,
+          201,
+          251
+        ]
+      },
+      "all_256_underlying_rules_at_width_6": {
+        "min": 1,
+        "median": 15.5,
+        "max": 251,
+        "n_reaching_256": 0,
+        "n_at_most_32": 174
+      },
+      "post_hoc_cumulative_by_width_1_to_12": {
+        "22": [
+          4,
+          9,
+          28,
+          57,
+          72,
+          117,
+          190,
+          249,
+          255,
+          256,
+          256,
+          256
+        ],
+        "30": [
+          8,
+          23,
+          71,
+          117,
+          151,
+          229,
+          256,
+          256,
+          256,
+          256,
+          256,
+          256
+        ],
+        "45": [
+          8,
+          30,
+          62,
+          109,
+          201,
+          251,
+          254,
+          256,
+          256,
+          256,
+          256,
+          256
+        ],
+        "90": [
+          2,
+          10,
+          10,
+          10,
+          14,
+          14,
+          14,
+          14,
+          16,
+          16,
+          16,
+          16
+        ],
+        "110": [
+          4,
+          7,
+          32,
+          33,
+          51,
+          55,
+          87,
+          92,
+          115,
+          136,
+          143,
+          167
+        ],
+        "184": [
+          4,
+          9,
+          12,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14,
+          14
+        ]
+      },
+      "post_hoc_width_at_which_256_reached": {
+        "30": 7,
+        "45": 8,
+        "22": 10,
+        "110": "not by 12 (167)",
+        "90": "never (16)",
+        "184": "never (14)"
+      }
+    }
+  },
+  "verdict": "inconclusive",
+  "confidence": 0.5,
+  "caveats": [
+    "Under the pre-registered rule the outcome is inconclusive: at width <= 6 none of rules 22, 30, 110 reaches all 256 targets under the reconstructed scheme (117, 229 and 55 respectively), while the refutation conditions are far from met (rules 90 and 184 emulate only 14 each, and every complex rule exceeds them). The pre-registered width limit of 6 was too small for this scheme.",
+    "Post hoc (not pre-registered, not decisive): continuing the identical search to width 12, rule 30 emulates all 256 elementary rules from width 7, rule 45 from width 8 and rule 22 from width 10, whereas rule 90 saturates at 16 and rule 184 at 14 by width 4-9 and never grows further. This matches the claim's contrast exactly for 22, 30, 90 and 184. Rule 110 reaches 167 of 256 by width 12 and is still rising; whether it reaches 256 at larger widths under this scheme was not determined (Wolfram's figure shows it doing so under his scheme).",
+    "The scheme is a reconstruction from the figure captions (single-cell inputs separated by fixed blocks, free readout offset and step count); Wolfram's exact conventions may differ, so the widths at which 256 is reached are not directly comparable with his figure, and negative counts are scheme-relative. Positive emulations are exact and independently checkable certificates.",
+    "One-step emulation is, as Wolfram himself notes, much weaker than universality; the claim's inference to 'arbitrarily sophisticated computations' is a heuristic and was not tested."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-wolfram-nks-e5f4",
+    "date": "2026-10-31"
+  },
+  "reason": "other"
 }
