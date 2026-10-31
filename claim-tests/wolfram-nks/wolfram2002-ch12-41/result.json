@@ -2,11 +2,13 @@
   "claim_id": "wolfram2002-ch12-41",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch12-41",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Among the simplest equational axiom systems for one binary operator (single equations with at most four operator occurrences), the large majority admit several non-isomorphic finite models (operator forms) on 2 and 3 elements, and only a small minority force a single form.",
   "pass_criterion": "Pre-registered. Family: all single-equation axiom systems lhs == rhs where lhs and rhs are terms built from one binary operator and variables, with a total of n = 1..4 operator occurrences in the equation, variables named canonically in order of first occurrence (a, b, c, ...) reading lhs then rhs, excluding equations with lhs identical to rhs, and identifying an equation with its side-swapped twin (so each unordered pair of sides is counted once). For each axiom system and each k in {2, 3}, enumerate all k^(k^2) operator tables (16 and 19,683), keep those satisfying the equation for every assignment of the variables, and count the models up to isomorphism (relabelling of the k elements by any permutation): m2 and m3. Definitions: 'many forms' = m3 >= 3; 'single form' = m2 <= 1 and m3 <= 1 and m2 + m3 >= 1; 'no non-trivial form' = m2 = m3 = 0 (only the one-element model). The claim PASSES if the fraction of axiom systems with 'many forms' is >= 0.80 and the fraction with 'single form' is <= 0.05. Reported, not decisive: the same fractions restricted to n = 4; the list of 'single form' systems; the systems whose k = 2 model set is exactly {Nand, Nor} (operators 7 and 1 in Wolfram's numbering) or {Xor, Xnor} (6 and 9); and, as a validation of the model-finding code against the note 'Properties of operators from axioms' (p. 1171), the k = 2 model sets of all lhs == a systems with up to 6 operators under this canonical labelling, listing how many allow only {6, 9} and only {1, 7} (the note reports 32,004 and 964 for its family of 274,499 systems; the family definition in the note is not fully specified, so this is a plausibility check, not a decisive comparison).",
   "fail_criterion": "Pre-registered. The claim FAILS if fewer than 50% of the axiom systems have 'many forms', or if more than 20% force a 'single form'. Between those bounds and the pass thresholds the verdict is 'mixed'. If the enumeration cannot be completed for k = 3 within the run-time budget the verdict is inconclusive (underpowered).",
-  "planned_datasets": ["single-equation-axiom-systems-n-le-4"],
+  "planned_datasets": [
+    "single-equation-axiom-systems-n-le-4"
+  ],
   "interpretation": "Wolfram's pictures (pp. 804-805) show, for a sequence of simple axiom systems, the operator forms (multiplication tables) allowed with 2, 3 and 4 elements, inequivalent under relabelling; his claim is that the vast majority of systems allow many forms and are 'not really about operators of any particular form', while a few (logic, i.e. Nand; junctional, equivalential and implicational calculi) force essentially a single form. This test reproduces that model enumeration for k = 2 and 3 only (k = 4 would require 4^16 tables per axiom, beyond the budget) over an explicit, exhaustively enumerated family of the simplest single-equation systems. 'Vast majority' is read as >= 80%, 'only a few' as <= 5%. Multi-axiom systems (e.g. group theory) are outside the enumerated family and are not needed for the majority statement.",
   "datasets": [
     {
@@ -20,10 +22,103 @@
       "role": "axiom family under test; finite models on 2 and 3 elements enumerated exhaustively"
     }
   ],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/wolfram-nks-claim-tests-106e", "date": "2026-10-31" }
+  "method": "analysis.py enumerates all binary-tree term shapes with up to 4 operator occurrences split between the two sides, labels variables canonically (restricted-growth strings over the leaves of lhs then rhs), drops lhs == rhs and side-swapped duplicates (4692 systems), and for k = 2 and 3 evaluates every one of the 16 and 19,683 operator tables on every variable assignment with numpy, keeping the models and counting isomorphism classes via the canonical (minimal) table number over all permutations of the k elements. Validation family (lhs == a, up to 6 operators, k = 2 only) and the supplementary runs S1 (Wolfram's lhs == a family over {a, b} with up to 3 operators, k = 2, 3 exact plus a capped 4-element search) and S2 (capped 4-element search for the 2792 main-family systems not already 'many forms' at k = 3; --k4 flag, about 25 minutes) are described in interpretation and caveats. Default run about 2 minutes; derived/axioms.csv and derived/supplementary.json are from the --k4 run.",
+  "measured": {
+    "value": 0.4049,
+    "unit": "fraction of axiom systems with >= 3 non-isomorphic 3-element models ('many forms')",
+    "n": 4692,
+    "uncertainty": "exhaustive enumeration, no sampling; 1900 of 4692 systems",
+    "extra": {
+      "single_form_fraction": 0.1451,
+      "single_form_count": 681,
+      "no_nontrivial_form_fraction": 0.325,
+      "no_nontrivial_form_count": 1525,
+      "many_forms_count": 1900,
+      "n4_only": {
+        "n": 4284,
+        "many_forms_fraction": 0.4076,
+        "single_form_fraction": 0.1433
+      },
+      "median_classes_k3": 2.0,
+      "k2_models_exactly_nand_nor": [
+        "((a∘b)∘(b∘(a∘a))) == b",
+        "((a∘b)∘(b∘(a∘c))) == b",
+        "((a∘b)∘(b∘(c∘a))) == b",
+        "(((a∘a)∘b)∘(b∘a)) == b",
+        "(((a∘b)∘c)∘(c∘a)) == c",
+        "(((a∘b)∘c)∘(c∘b)) == c"
+      ],
+      "validation_lhs_eq_a_k2": {
+        "count": 125106,
+        "only_6_9": 0,
+        "only_1_7": 0,
+        "k2_model_sets_size_le_2": {
+          "(12,)": 39894,
+          "(3, 12)": 35128,
+          "(10, 12)": 6061
+        }
+      },
+      "supplementary_S1_wolfram_family_summary": {
+        "n": 101,
+        "many_forms_any_k_le_4": 67,
+        "single_form_k_le_4": 4,
+        "no_nontrivial_form_k_le_4": 4,
+        "k4_incomplete": 91
+      },
+      "supplementary_S2_k4": {
+        "main_family_n": 4692,
+        "many_forms_k_le_3": 1900,
+        "additional_many_forms_at_k4": 306,
+        "many_forms_k_le_4_fraction": 0.4702,
+        "single_form_k_le_4": 272,
+        "single_form_k_le_4_fraction": 0.058,
+        "no_nontrivial_form_k_le_4": 448,
+        "k4_search_incomplete": 1703,
+        "excluding_degenerate": {
+          "n": 4244,
+          "many_forms_fraction": 0.5198,
+          "single_form_fraction": 0.0641
+        }
+      },
+      "k2_models_exactly_xor_xnor_count": 20,
+      "k2_models_exactly_xor_xnor_examples": [
+        "(a∘(b∘a)) == b",
+        "((a∘b)∘a) == b",
+        "(a∘(b∘(b∘(b∘a)))) == b",
+        "(a∘(b∘(a∘(a∘a)))) == b",
+        "(a∘(b∘(a∘(c∘c)))) == b",
+        "(a∘(b∘(c∘(a∘c)))) == b"
+      ],
+      "single_form_axioms_examples": [
+        "(a∘b) == a",
+        "(a∘b) == b",
+        "(a∘(b∘c)) == a",
+        "((a∘b)∘c) == c",
+        "(a∘a) == (b∘c)",
+        "(a∘b) == (b∘c)",
+        "(a∘b) == (c∘d)",
+        "(a∘(b∘(a∘c))) == a",
+        "(a∘(b∘(b∘c))) == a",
+        "(a∘(b∘(c∘b))) == a",
+        "(a∘(b∘(c∘c))) == a",
+        "(a∘(b∘(c∘d))) == a"
+      ],
+      "runtime_s_default": 69,
+      "runtime_s_with_k4": 1513.6
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.45,
+  "caveats": [
+    "Pre-registered decision: 40.5% of the 4692 simplest single-equation axiom systems have 'many forms' (>= 3 non-isomorphic 3-element models), below the pre-registered 50% failure bound, so the 'vast majority' reading fails in this family; the 'single form' fraction (14.5%) falls in the mixed band (5-20%). The verdict follows the pre-registration, but the confidence is low because the result is sensitive to definitional choices listed below.",
+    "32.5% of the systems (1525) have no 2- or 3-element model at all (e.g. a o b == c, a o (b o c) == b o (a o c) == ... forcing a one-element structure); whether such degenerate equations belong to the population Wolfram had in mind is unclear. Excluding them, and adding a capped 4-element search (supplementary S2: 306 further systems gain >= 3 forms at k = 4; 1703 searches hit the node budget, so this is a lower bound), the many-forms fraction is 52.0% and the single-form fraction 6.4%, i.e. the mixed band rather than failure.",
+    "In Wolfram's own illustrated family (lhs == a with lhs over {a, b}, up to 3 operators; supplementary S1, 101 systems), 67 (66%) allow >= 3 forms for some k <= 4, 4 force a single form and 4 have no non-trivial form, which is closer to his description but still short of 'vast majority' at the 80% reading. The pre-registered validation against the note on p. 1171 was uninformative: under this canonical labelling no lhs == a system with <= 6 operators has k = 2 models exactly {Xor, Xnor} or {Nand, Nor}, because the note's family evidently uses a different variable convention (its counts 32,004 and 964 could not be reproduced).",
+    "Only models with 2 and 3 elements (and a capped 4-element search) were examined; the pictures in the book go to 4 elements exactly. Isomorphism is relabelling of elements only (duality/anti-isomorphism not identified). Thresholds (80% / 50%, 5% / 20%) are readings of 'vast majority' and 'only a few'. Six systems have exactly {Nand, Nor} as 2-element models, e.g. ((a o b) o (b o (a o a))) == b, consistent with the book's statement that short axioms for Nand exist, and 40 have exactly {Xor, Xnor}."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/wolfram-nks-claim-tests-106e",
+    "date": "2026-10-31"
+  }
 }
