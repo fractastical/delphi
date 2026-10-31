@@ -62,4 +62,9 @@ New model runs: `python3 -m engineering.formalize.extract --case cantilever|oca2
 ## Limits and open problems
 Translation fidelity is never proven. The grammar has no vocabulary for biological mechanism, so unsupported biology is an explicit open translation problem. The Lean text is hand-authored and corresponds
 to the hand-authored fixture; the service's generated `lean_statement` (unit-rescaling invariance) is text only and was not compiled. z3 was not importable in the worker, so `unsat` rests on intervals and enumeration.
-The refusal gate is lexical. The endpoint is proposal-only: no persistence, no Lean job, no authentication.
+The refusal gate is lexical. The checker is proposal-only: no persistence or Lean job.
+The website exposes `POST /api/formalize/propose` through its existing session,
+Origin and CSRF checks, with a16KiB request limit and two concurrent slots.
+Public readers can create an anonymous calculation session; it grants no record
+write permission. Each solver child has an8second wall limit,10CPU-second limit
+and384MiB address-space limit. Model calls remain separate offline actions.

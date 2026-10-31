@@ -10,7 +10,10 @@ import sys
 def main() -> int:
     try:
         resource.setrlimit(resource.RLIMIT_CPU, (10, 10))
-        resource.setrlimit(resource.RLIMIT_AS, (3 * 1024**3, 3 * 1024**3))
+        # Two public solver slots share the web service's 1GiB cgroup.
+        # Bound each child below that total so an expression-expansion failure
+        # cannot consume the service's whole memory allowance.
+        resource.setrlimit(resource.RLIMIT_AS, (384 * 1024**2, 384 * 1024**2))
         resource.setrlimit(resource.RLIMIT_FSIZE, (0, 0))
     except (ValueError, OSError):
         pass

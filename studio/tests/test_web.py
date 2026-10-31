@@ -1076,6 +1076,23 @@ def test_beliefs_route_against_the_real_adapter_example_and_malformed_inputs(aut
     assert s == 400 and body["calibrated"] is False
 
 
+def test_formalize_route_checks_real_constraints_and_preserves_the_gate(authed):
+    from engineering.formalize.cases import cantilever_request, oca2_request
+
+    origin = f"http://127.0.0.1:{authed.port}"
+    headers = {"Origin": origin, "X-CSRF-Token": authed.csrf}
+    request = cantilever_request()
+    status, result, _ = authed.json("POST", "/api/formalize/propose", request, headers)
+    assert status == 200 and result["status"] == "checked"
+    assert result["calibrated"] is False and result["lean"] == "not_run"
+    assert result["checks"] and result["not_established"]
+    status, refused, _ = authed.json("POST", "/api/formalize/propose", oca2_request(), headers)
+    assert status == 200 and refused["status"] == "refused"
+    assert authed.req("POST", "/api/formalize/propose", request, headers, cookie=False)[0] == 401
+    assert authed.req("POST", "/api/formalize/propose", request, {"Origin": origin})[0] == 403
+    assert authed.req("POST", "/api/formalize/propose", {"padding": "x" * 16400}, headers)[0] == 413
+
+
 def test_beliefs_route_has_the_same_gate_and_a_32k_body_bound(authed, monkeypatch):
     import types
     monkeypatch.setitem(sys.modules, "frontier.beliefs_api", types.SimpleNamespace(solve_scenario=lambda d: {"ok": True}))
