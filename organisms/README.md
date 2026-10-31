@@ -155,3 +155,20 @@ backbone) get **one** record per slice listing all taxa they cover; taxon-specif
 
 Counts of mentions, distinct taxa, taxa resolved to each authority, datasets built, taxa with no
 usable dataset and why, non-animal taxa seen, and anything ambiguous.
+
+## Collecting results
+
+Each slice is produced by one cloud agent on its own `cursor/organisms-*` branch, touching only
+its slice directory, so the branches merge into `main` without conflicts:
+
+```sh
+git fetch origin 'refs/heads/cursor/*:refs/remotes/origin/cursor/*'
+for b in $(git branch -r | grep -E 'origin/cursor/.*organisms'); do git merge --no-edit "$b"; done
+node organisms/validate.mjs
+node organisms/merge.mjs        # -> organisms/merged/{taxa,datasets,mentions}.json, SUMMARY.md
+```
+
+`merge.mjs` unifies taxa across slices and projects by GBIF key (else Wikidata QID, else NCBI
+taxid), unions names, mentions and datasets, merges shared-database records by id, and lists
+identifier conflicts for a human to resolve. The merged files are the input for the
+`dcat:Dataset` nanopub builder and the dataset-reliability assessment pass.
