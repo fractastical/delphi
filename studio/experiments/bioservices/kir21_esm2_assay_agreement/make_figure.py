@@ -26,9 +26,27 @@ LIGHT = {"surface": "#2a78d6", "function": "#eb6834", "bg": "#fcfcfb",
 DARK = {"surface": "#3987e5", "function": "#d95926", "bg": "#1a1a19",
         "ink": "#f0efec", "ink2": "#c3c2b7", "grid": "#343431"}
 
-W, H = 940, 530
-PANEL_W, PANEL_H = 370, 300
-PAD_L, PAD_T, GAP = 68, 96, 56
+W, H = 940, 648
+PANEL_W, PANEL_H = 370, 290
+PAD_L, PAD_T, GAP = 68, 118, 56
+# Roughly how many characters of 11.5px system-ui fit across the plotting width.
+WRAP_COLS = 122
+
+
+def _wrap(text: str, cols: int = WRAP_COLS) -> list[str]:
+    """Greedy word wrap. The figure is standalone SVG, which has no text flow,
+    so every caption line is placed by hand and must be wrapped before placing."""
+    words, lines, cur = text.split(), [], ""
+    for w in words:
+        trial = f"{cur} {w}".strip()
+        if len(trial) > cols and cur:
+            lines.append(cur)
+            cur = w
+        else:
+            cur = trial
+    if cur:
+        lines.append(cur)
+    return lines
 
 
 def _nice_ticks(lo: float, hi: float, target: int = 5) -> list[float]:
@@ -54,8 +72,8 @@ def _panel(rows, xkey, ykey, x0, y0, title, role, xlim, ylim, annotation) -> str
     ylo, yhi = ylim
     sx = lambda v: x0 + (v - xlo) / (xhi - xlo) * PANEL_W
     sy = lambda v: y0 + PANEL_H - (v - ylo) / (yhi - ylo) * PANEL_H
-    parts = [f'<g class="panel">']
-    parts.append(f'<text x="{x0}" y="{y0 - 34}" class="panel-title">{_esc(title)}</text>')
+    parts = ['<g class="panel">']
+    parts.append(f'<text x="{x0}" y="{y0 - 14}" class="panel-title">{_esc(title)}</text>')
 
     for t in _nice_ticks(ylo, yhi):
         y = sy(t)
@@ -79,9 +97,12 @@ def _panel(rows, xkey, ykey, x0, y0, title, role, xlim, ylim, annotation) -> str
                      f'<title>{_esc(r["mutant"])}: ESM-2 {float(r[xkey]):.2f}, '
                      f'measured {float(r[ykey]):.2f}</title></circle>')
 
+    # A backing plate, so the statistics stay readable where points are dense.
+    plate_h = 12 + len(annotation) * 17
+    parts.append(f'<rect x="{x0 + 2}" y="{y0 + 4}" width="186" height="{plate_h}" rx="3" class="plate"/>')
     for i, line in enumerate(annotation):
         cls = "annot-strong" if i == 0 else "annot"
-        parts.append(f'<text x="{x0 + 10}" y="{y0 + 20 + i * 17}" class="{cls}">{_esc(line)}</text>')
+        parts.append(f'<text x="{x0 + 10}" y="{y0 + 21 + i * 17}" class="{cls}">{_esc(line)}</text>')
     parts.append("</g>")
     return "".join(parts)
 
@@ -126,9 +147,8 @@ def main() -> int:
                "Channel function", "function", xlim, ylim_for("function_dms_score"), annot("function")),
     ]
 
-    strip_y = PAD_T + PANEL_H + 58
+    strip_y = PAD_T + PANEL_H + 92
     covered = {int(r["position"]) for r in rows}
-    ref_len = an.get("coverage", {}).get("matched_position_range", [1, 428])[1]
     total_w = PANEL_W * 2 + GAP
     body.append(f'<text x="{PAD_L}" y="{strip_y - 10}" class="strip-label">'
                 f'Positions scored: {len(covered)} distinct of {cov["matched_distinct_positions"]} '
@@ -151,9 +171,13 @@ def main() -> int:
         f"Assay-to-assay ρ = {w.get('rho_between_assays', float('nan')):+.3f} — function is measured "
         f"downstream of surface expression, so these are not independent readouts.",
     ]
+    y = strip_y + 44
     for i, line in enumerate(caption):
-        body.append(f'<text x="{PAD_L}" y="{strip_y + 44 + i * 17}" '
-                    f'class="{"caption-strong" if i == 2 else "caption"}">{_esc(line)}</text>')
+        cls = "caption-strong" if i == 2 else "caption"
+        for part in _wrap(line):
+            body.append(f'<text x="{PAD_L}" y="{y}" class="{cls}">{_esc(part)}</text>')
+            y += 17
+        y += 3
 
     css = """
     .bg{fill:var(--bg)}
@@ -170,6 +194,7 @@ def main() -> int:
     .annot-strong{fill:var(--ink);font:600 12.5px system-ui,-apple-system,"Segoe UI",sans-serif}
     .axis-label{fill:var(--ink2);font:400 12px system-ui,-apple-system,"Segoe UI",sans-serif;text-anchor:middle}
     .strip-label{fill:var(--ink2);font:400 11.5px system-ui,-apple-system,"Segoe UI",sans-serif}
+    .plate{fill:var(--bg);fill-opacity:.82}
     .strip-bg{fill:var(--grid)} .strip-tick{fill:var(--ink2);opacity:.85}
     .caption{fill:var(--ink2);font:400 11.5px system-ui,-apple-system,"Segoe UI",sans-serif}
     .caption-strong{fill:var(--ink);font:600 11.5px system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -187,10 +212,11 @@ svg{{{light_vars}}}
 {css}
 </style>
 <rect width="{W}" height="{H}" class="bg"/>
-<text x="{PAD_L}" y="34" class="title">ESM-2 masked marginals against two Kir2.1 assays, on identical variants</text>
-<text x="{PAD_L}" y="54" class="subtitle">Zero-shot prediction (x) versus measured outcome (y). ProteinGym v1.3, KCNJ2_MOUSE, Coyote-Maestas 2022. A prediction remains a prediction.</text>
+<text x="{PAD_L}" y="36" class="title">ESM-2 masked marginals against two Kir2.1 assays, on identical variants</text>
+<text x="{PAD_L}" y="58" class="subtitle">Zero-shot prediction (x) versus measured outcome (y). ProteinGym v1.3, KCNJ2_MOUSE, Coyote-Maestas 2022.</text>
+<text x="{PAD_L}" y="76" class="subtitle">A computational replication on public data. A prediction remains a prediction.</text>
 {''.join(body)}
-<text x="{PAD_L + (PANEL_W * 2 + GAP) / 2}" y="{PAD_T + PANEL_H + 42}" class="axis-label">ESM-2 masked-marginal score  (log p(mut) − log p(wt), higher = more tolerated)</text>
+<text x="{PAD_L + (PANEL_W * 2 + GAP) / 2}" y="{PAD_T + PANEL_H + 48}" class="axis-label">ESM-2 masked-marginal score  (log p(mut) − log p(wt), higher = more tolerated)</text>
 </svg>
 """
     with open(args.out, "w") as fh:
