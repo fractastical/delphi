@@ -34,8 +34,18 @@ PDB residue, so those 19 variants could not be submitted honestly at all.
 offset. Checked residue by residue: the 25 modelled residues read `CLEALYVLMVLGFFGFFTLGIMLSY` at
 auth 41–65, and ProteinGym's `target_seq` positions 41–65 read `KLEALYVLMVLGFFGFFTLGIMLSY`. The
 **single** mismatch is the engineered K41C. The 9VEC SEQRES (129 aa) and ProteinGym's `target_seq`
-(129 aa) differ at exactly **two** positions: `G38S` (a known common KCNE1 polymorphism; position 38
-is unmodelled, so it does not touch the usable set) and `K41C`.
+(129 aa) differ at exactly **two** positions, and checking both against UniProt **P15382** (129 aa,
+fetched here) resolves which side each belongs to:
+
+- **position 41** — 9VEC has Cys, UniProt and ProteinGym have Lys. This is the engineered K41C.
+- **position 38** — **UniProt canonical is Ser38, and so is 9VEC. It is ProteinGym's `target_seq`
+  that carries Gly38**, the alternative allele of **dbSNP rs1805127** (UniProt natural-variant
+  record: original S, alternative G). So the assay was performed on the G38 allele and the
+  structure is the canonical S38 protein — *the two differ in allele, not in the structure's
+  construct*. Position 38 is unmodelled in 9VEC, so it does not touch the usable set.
+
+Stated exactly: **9VEC SEQRES differs from UniProt canonical at K41C only**; **ProteinGym's
+`target_seq` differs from UniProt canonical at S38G only.**
 
 Independent confirmation that the mapping is right, from the assay data itself — the two
 preregistered controls behave exactly as the source paper describes:
@@ -202,9 +212,10 @@ under a **new** preregistration with the **+0.434** comparator, it is one submit
 | Model scores | ProteinGym v1.3 `zero_shot_substitutions_scores.zip`, extracted by HTTP range (1,794,898 B fetched of 1,911,045,703 B); 95 models × 2,339 variants |
 | Reference table | `reference_files/DMS_substitutions.csv`, 208,734 B, sha256 `a8f498011532a74aa9fe556a50555a75e928c5837d19c06a87592ae04049b308`; 217 rows |
 | Structure survey | RCSB search API on P15382 → 5 entries; bogus accession → HTTP 204, 0 bytes |
+| UniProt | `rest.uniprot.org/uniprotkb/P15382.json`, 67,918 B. Canonical 129 aa. Differs from 9VEC SEQRES at K41C only, and from ProteinGym `target_seq` at S38G only; natural-variant record at 38 cites dbSNP rs1805127 |
 
 Caveats carried rather than smoothed: 9VEC's KCNQ1 carries an **I145C** mutation and is the 76–620
-construct (modelled 104–569, 353 of 466 residues); its KCNE1 carries **K41C** and the **G38S** allele.
+construct (modelled 104–569, 353 of 466 residues); its KCNE1 carries **K41C**; its position 38 is the UniProt-canonical **Ser**, whereas the assay's reference sequence is the **Gly38** allele (rs1805127) — assay and structure sit on different alleles at 38, which is unmodelled and so does not reach the usable set.
 Read-levels: the PDB files, both ProteinGym CSV sets and the MCP schema are `full-text` (fetched and
 parsed here). The ProteinGym *published* ρ values are `full-text` as to what ProteinGym reports and
 `source-only` as to whether each is right — though the four I recomputed agree to three decimals.
