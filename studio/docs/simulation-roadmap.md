@@ -187,7 +187,44 @@ probability is assigned.
 [full simulation receipt](../artifacts/molecular/cuda-v2/production/receipt.json),
 [backend parity](../artifacts/molecular/cuda-v2/cpu-cuda-parity.json),
 [regional-assurance-compatible vector](../artifacts/molecular/design-assurance.json).
-The first failed attempt remains distinct. A longer conditional continuation is
-being proposed because the 100 ps structural traces still exhibit slow drift;
+The first failed attempt remains distinct. The longer conditional continuation recorded below was
+proposed because the 100 ps structural traces still exhibited slow drift;
 that observation is not evidence for organism function or an invitation to infer
 material constants from RMSD.
+
+## Actual conditional extensions to 1000 ps
+
+Job `aijob-e00qxektzctnk69zwg` returned three 900 ps extensions from the exact
+recorded 100 ps parent states, using newly declared thermostat seeds 11731–11733.
+The original positions and velocities were preserved, with no minimization,
+velocity reset or further thermalization. State XML does not preserve the
+integrator RNG stream: these are conditional branches, not bitwise replays.
+All 33 returned job-file SHA256 values were independently checked; all three
+same-state derivative/sign, paired NVE and CPU/CUDA parity gates passed. Actual
+CUDA production took 136.74, 136.45 and 137.96 seconds on an H100. Each extension
+contains 101 actual heavy-atom frames. Its first frame exactly matches its parent's
+final saved float32 frame; there are three parent branches, not six independent
+biological samples.
+
+The frozen diagnostic compares the 600–800 and 800–1000 ps windows, requiring both
+mean original-reference Cα RMSD and geometric Cα radius-of-gyration changes to be
+below 0.02 nm. Outcomes were **false, false, true**, retained without threshold
+changes. RMSD changes were 0.0202865, 0.0293491 and 0.00047693 nm; radius changes were
+0.00409193, 0.0169493 and 0.0153386 nm. The sampled windows contain 22 and 23 frames,
+respectively (actual times 604–793 and 802–1000 ps). These are descriptive finite
+windows; even the true outcome does not establish equilibrium, folding stability,
+a material modulus or biological success. No success probability is assigned.
+
+Final Cα RMSD from each original parent's production start was 0.27088, 0.17068 and
+0.26715 nm; geometric Cα radii were 2.47439, 2.45820 and 2.41163 nm. These calculated
+values are not measured accuracy. Empirical force-field accuracy and transfer to
+native fish collagen, fibrils, tissue mechanics and fin bending stiffness remain
+unknown. A further run requires a scientific question and its own frozen protocol;
+the two negative window diagnostics do not justify arbitrary workload expansion.
+
+[Actual continuation movie](../artifacts/molecular/continuation-render/trajectory.mp4),
+[poster](../artifacts/molecular/continuation-render/poster.png),
+[parent-plus-extension traces](../artifacts/molecular/continuation-analysis/conditional-branches.png),
+[recomputed diagnostic and continuity](../artifacts/molecular/continuation-analysis/summary.json),
+[frozen protocol](../artifacts/molecular/continuation-protocol.json),
+[production receipt](../artifacts/molecular/cuda-v3/production/receipt.json).

@@ -313,3 +313,64 @@ def test_continuation_window_drift_diagnostic_keeps_negative_outcome():
         "does not establish equilibrium"
         in small_window_drift(metrics, protocol)["meaning"]
     )
+
+
+def test_actual_conditional_extensions_keep_parent_identity_and_negative_diagnostics():
+    from engineering.molecular.continuation import small_window_drift
+
+    folder = ROOT / "artifacts/molecular/cuda-v3"
+    receipt = json.loads((folder / "production/receipt.json").read_text())
+    protocol = json.loads(
+        (ROOT / "artifacts/molecular/continuation-protocol.json").read_text()
+    )
+    assert (
+        receipt["protocol_sha256"]
+        == hashlib.sha256(
+            (ROOT / "artifacts/molecular/continuation-protocol.json").read_bytes()
+        ).hexdigest()
+    )
+    assert len(receipt["runs"]) == 3
+    assert {r["parent_seed"] for r in receipt["runs"]} == {1731, 1732, 1733}
+    assert {r["seed"] for r in receipt["runs"]} == {11731, 11732, 11733}
+    outcomes = []
+    for run in receipt["runs"]:
+        assert run["backend"] == "CUDA" and run["production_ps"] == 900
+        assert run["equilibration_steps"] == 0 and run["frames"] == 101
+        seed = run["seed"]
+        metrics = json.loads((folder / f"production/metrics-{seed}.json").read_text())
+        data = np.load(folder / f"production/trajectory-{seed}.npz")
+        assert data["global_production_times_ps"][[0, -1]].tolist() == [100, 1000]
+        assert np.isfinite(data["positions_nm"]).all()
+        diagnostic = small_window_drift(metrics, protocol)
+        assert diagnostic == run["predeclared_diagnostic"]
+        outcomes.append(diagnostic["small_window_drift"])
+        control = json.loads(
+            (folder / f"controls-{run['parent_seed']}/controls.json").read_text()
+        )
+        assert (
+            control["passed"]
+            and control["CUDA_parity"]["passed"]
+            and control["nve"]["passed"]
+        )
+    assert outcomes == [False, False, True]
+    for name, digest in receipt["files"].items():
+        assert (
+            hashlib.sha256((folder / "production" / name).read_bytes()).hexdigest()
+            == digest
+        )
+    summary = json.loads(
+        (ROOT / "artifacts/molecular/continuation-analysis/summary.json").read_text()
+    )
+    assert summary["n_new_independent_biological_samples"] == 0
+    assert summary["biological_success_probability"] is None
+    assert summary["empirical_accuracy"] == "unknown"
+    assert summary["small_window_drift_diagnostic_count"] == 1
+    assert all(
+        r["frame0_vs_parent_final_saved_float32_max_abs_nm"] == 0
+        for r in summary["branches"]
+    )
+    render = ROOT / "artifacts/molecular/continuation-render"
+    render_receipt = json.loads((render / "render.json").read_text())
+    assert render_receipt["global_production_time_ps"] == [100, 1000]
+    for name, digest in render_receipt["outputs"].items():
+        assert hashlib.sha256((render / name).read_bytes()).hexdigest() == digest
