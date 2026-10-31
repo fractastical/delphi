@@ -72,7 +72,11 @@ def source_of(problem):
 
     `why_source` is the strong one: a pmcid, a locator and a verbatim quote, carried by 34 of
     250. `references` is weaker: a list of pmcids with a role and a curator's note, no locator
-    and no quote, carried by 74 more. 148 of 250 have neither, and that absence is recorded
+    and no quote, and it supplies the source for 68 more. (74 problems carry a `references`
+    list at all; six of those either already had `why_source` or carried no resolvable
+    identifier, so 68 is the number this function actually falls back to, and 34 + 68 = 102
+    matches the measured count of problems with any source.) 148 of 250 have neither, and
+    that absence is recorded
     here rather than papered over, because an evidence layer that cannot see its own unsourced
     fraction is worse than no evidence layer.
     """
