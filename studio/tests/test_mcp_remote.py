@@ -20,6 +20,9 @@ from frontier.models import ref
 ROOT = Path(__file__).resolve().parents[1]
 INIT = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2025-03-26", "capabilities": {}, "clientInfo": {"name": "t", "version": "0"}}}
 RHEA = "test-only-reviewer-only-token-0000000"
+READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_artifacts", "frontier_capabilities",
+              "frontier_discover", "frontier_graph", "frontier_catalogue", "frontier_project_inspect", "frontier_artifact_inspect",
+              "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief"}
 
 
 def free_port():
@@ -268,7 +271,7 @@ def test_read_only_server_has_no_write_tools_but_still_requires_a_bearer(readonl
     async def go():
         async with client(r, TOKENS["alice"]) as s:
             names = {t.name for t in (await s.list_tools()).tools}
-            assert names == {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_artifacts", "frontier_capabilities"}
+            assert names == READ_TOOLS
             caps = val(await s.call_tool("frontier_capabilities", {}))
             assert caps["mode"] == "read_only" and caps["principal"]["actor"] == "alice"
             gone = await s.call_tool("frontier_propose", {"draft": claim(store), "idempotency_key": "x"})
@@ -434,7 +437,7 @@ def test_public_read_without_write_opt_in_has_no_write_tools(store):
             async with streamable_http_client(r.url) as (read, write, _):
                 async with ClientSession(read, write) as s:
                     await s.initialize()
-                    assert {t.name for t in (await s.list_tools()).tools} == {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_artifacts", "frontier_capabilities"}
+                    assert {t.name for t in (await s.list_tools()).tools} == READ_TOOLS
                     assert val(await s.call_tool("frontier_capabilities", {}))["mode"] == "read_only"
         run(go())
     finally:
