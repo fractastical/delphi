@@ -1,0 +1,25 @@
+{
+  "claim_id": "darwin1859-ch10-02",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch10-02",
+  "project": "darwin-origin",
+  "status": "preregistered",
+  "hypothesis": "If different classes and genera change at different rates, then taxonomic turnover measured as the stratigraphic duration of extinct genera in the Paleobiology Database should differ substantially among major animal classes, and, within classes, among orders.",
+  "pass_criterion": "Using PBDB genus-rank taxa with first- and last-appearance ages for 14 higher taxa (Trilobita, Brachiopoda, Bivalvia, Gastropoda, Cephalopoda, Anthozoa, Echinoidea, Crinoidea, Ostracoda, Bryozoa, Mammalia, Reptilia, Actinopterygii, Chondrichthyes), restricted to extinct genera with >= 5 occurrences, genus duration = midpoint of first-appearance range minus midpoint of last-appearance range. Clause A (between classes): a Kruskal-Wallis test of genus duration across the higher taxa has p < 0.001 AND epsilon-squared effect size >= 0.02 AND the ratio of the largest to the smallest group median duration is >= 2. Clause B (between genera grouped by order, within classes): within each higher taxon having >= 3 orders with >= 20 qualifying genera each, a Kruskal-Wallis test of genus duration across orders has p < 0.001 and epsilon-squared >= 0.02; clause B passes if this holds in a majority of eligible higher taxa. Verdict 'supports' if A and B pass; 'mixed' if exactly one passes; 'refutes' if neither.",
+  "fail_criterion": "Clause A fails if genus durations are statistically indistinguishable across classes (p >= 0.001), or the effect is trivial (epsilon-squared < 0.02), or every class median lies within a factor of 2 of every other. Clause B fails if orders within a class differ significantly and non-trivially in half or fewer of the eligible classes. Both failing refutes the claim. A sensitivity re-run with >= 20 occurrences per genus is reported; if the sign of either clause flips under that filter the result is downgraded to 'mixed' regardless.",
+  "planned_datasets": [
+    "pbdb-taxa-genus-appearances-14-higher-taxa"
+  ],
+  "interpretation": "Darwin's 'rate of change' of species is read, following the Grok assessor, as taxonomic turnover: shorter genus durations mean faster replacement of forms. 'Classes' are mapped to PBDB classes or, where PBDB class structure is unstable (brachiopods, bryozoans), phyla. 'Species of different genera' is approximated by genera grouped into orders, because species-level ranges in PBDB are too noisy and species durations are strongly tied to the genus concept. Durations are taxonomic, not morphological; the morphological reading (rates of character change) is not tested. Differences in preservation potential and taxonomic splitting between classes can mimic rate differences, which is why the pass criterion requires a non-trivial effect size and a two-fold spread of medians rather than mere significance.",
+  "datasets": [],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-darwin-batch-0e75",
+    "date": "2026-10-31"
+  }
+}
