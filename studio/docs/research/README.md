@@ -17,7 +17,8 @@ root review.
 |---|---|
 | [frontier-multiscale-substrate.md](frontier-multiscale-substrate.md) | The note: the eleven-scale flying-fish coupling map with every unsolved coupling marked; the five substrate layers mapped to real sources and store primitives; constraint-solver + Lean P0 (bite vs decoration); BioModels + jaw-joint model-class transfer; the connector access/replay table; the bounded morphometrics search |
 | [darwin-flying-fish.md](darwin-flying-fish.md) | Darwin primary: Chapter VI "imaginary illustration," edition/page locators (1859 p.182 … 1872 p.140), cross-edition wording variants (variorum), the "fluttering fins" vs modern-gliding distinction, and the three things the narrative must not claim |
-| [source-cards/README.md](source-cards/README.md) | Human-readable source cards by scale; **the authoritative machine-readable set is [`../../data/research/flying-fish-source-cards.json`](../../data/research/flying-fish-source-cards.json)** |
+| [source-cards/README.md](source-cards/README.md) | Human-readable source cards by scale; **the authoritative machine-readable set is [`../../data/research/flying-fish-source-cards.json`](../../data/research/flying-fish-source-cards.json)**; Draft records for import in [`../../data/research/frontier-drafts.json`](../../data/research/frontier-drafts.json) |
+| [future-missions-comparative-finch.md](future-missions-comparative-finch.md) | **Scoping only** — a proposed future mission on Darwin's-finch beaks (distinct from zebra finch); genetic-association vs developmental-model vs mechanics; leads only, no sim; gated on root importing the fish Drafts first |
 
 **Core finding (corrected 2026-10-31 after root review):** flying fish is best-supported at the
 organism / organ / evolution scales (measured biomechanics, a downloadable time-tree → executable
