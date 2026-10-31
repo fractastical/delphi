@@ -1,0 +1,96 @@
+{
+ "schema": "frontier.render-receipt.v0",
+ "kind": "chart_video_from_logged_data",
+ "is_spatial_movie": false,
+ "disclosure": "Chart of logged cell count, mean CDK1 and mean g_l per cell. No cell shapes or fields are drawn. Generic Morpheus example, not calibrated, not fish growth. Earlier artifacts/multicell/{baseline,nofeedback,seed2}.mp4 are real spatial frames but PARTIAL (t<=0.46).",
+ "inputs": {
+  "baseline": {
+   "path": "/data/worktrees/delphi-frontier/infra-director/results/infra/morpheus-v2/results/infra17-morpheus-output-repair/parts/00-morpheus-three-arms-output-repair/baseline/logger.csv",
+   "sha256": "27fd11a76bcacd6de766f64595d1d69f4d4255b60ae53a55e78ad483f7fc2707",
+   "bytes": 5327739
+  },
+  "nofeedback": {
+   "path": "/data/worktrees/delphi-frontier/infra-director/results/infra/morpheus-v2/results/infra17-morpheus-output-repair/parts/00-morpheus-three-arms-output-repair/nofeedback/logger.csv",
+   "sha256": "fbfb964183f9fdc06c6c7b2093bbbefee5abb253270f8049e309cc8088ce4947",
+   "bytes": 1298371
+  },
+  "seed2": {
+   "path": "/data/worktrees/delphi-frontier/infra-director/results/infra/morpheus-v2/results/infra17-morpheus-output-repair/parts/00-morpheus-three-arms-output-repair/seed2/logger.csv",
+   "sha256": "2928a8157692e271395c863d55b3df1e229ee8ce133e7651729ffa03fdaf431e",
+   "bytes": 5426718
+  }
+ },
+ "source_code": {
+  "render_full.py": {
+   "repo_path": "engineering/multicell/render_full.py",
+   "sha256": "30d2458ef69fa6d093144e7815ee5ff9fd9fd8bf14983bb0b433acbae680af06"
+  },
+  "analyze.py": {
+   "repo_path": "engineering/multicell/analyze.py",
+   "sha256": "b9d7b1ddb0f4e444124633e3ce7bbbf64ce16bea7dd1556c5f9ba7dcdbf09632"
+  },
+  "make_receipt.py": {
+   "repo_path": "engineering/multicell/make_receipt.py",
+   "sha256": "0573945aaf4c03ec2f4ae9824fb04bebc8314b9c70fafff79dba5997a74c1f5c"
+  }
+ },
+ "command_as_run": "OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 systemd-run --user --scope -q -p CPUQuota=100% -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=600 python3 engineering/multicell/render_full.py --parts <parts> --out artifacts/multicell/full/full_horizon_chart.mp4 --workdir <scratch dir>",
+ "render_params": {
+  "frames": 100,
+  "ffmpeg_framerate": 12,
+  "t_end": 2.0,
+  "dpi": 100
+ },
+ "tool_versions": {
+  "matplotlib": "3.10.8",
+  "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers"
+ },
+ "runtime_s": {
+  "value": 38.2,
+  "status": "reported",
+  "note": "wall time from the shell `time` of the one original render; no log file was kept and it was not re-measured. Tool versions above are those at receipt time, not proven identical to the render's."
+ },
+ "output": {
+  "video": {
+   "repo_path": "artifacts/multicell/full/full_horizon_chart.mp4",
+   "sha256": "e182866f34943970c79f71b3b30e89106bd741819fc34e5082bc9706f2ff8361",
+   "bytes": 134928
+  },
+  "ffprobe": {
+   "programs": [],
+   "streams": [
+    {
+     "codec_name": "h264",
+     "width": 700,
+     "height": 700,
+     "pix_fmt": "yuv420p",
+     "r_frame_rate": "12/1",
+     "nb_read_frames": "100"
+    }
+   ],
+   "format": {
+    "duration": "8.333333"
+   }
+  },
+  "poster": {
+   "repo_path": "artifacts/multicell/full/full_horizon_chart_poster.png",
+   "sha256": "8351ad2bda142e421c8c098a9feda9341b0ee56ac8e9e8274a1c1f40b0737890",
+   "derived_from": "last frame of the video above (ffmpeg -sseof -0.2)"
+  }
+ },
+ "upstream": {
+  "source_commit": "29a26b00838736c4180f22fea075688f1d51e619",
+  "binary_sha256": "3d9a6e5a4cb86824b745500df1474596d39cce5deed24f767c0841df0f94d5ad",
+  "packet_sha256": "994eb8314f1d912e7dc16a9a9ca0e9d5591f86cf805bfa16e6e2070f2c34f4f7"
+ },
+ "index_contract": {
+  "link_as": "chart_video",
+  "required_label": "Chart from logged data, not a spatial movie",
+  "must_link": [
+   "receipt",
+   "poster",
+   "full_summary.json",
+   "source_code"
+  ]
+ }
+}
