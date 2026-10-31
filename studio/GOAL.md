@@ -44,7 +44,7 @@ about a proposed action.
 - [x] Recover codex-api, codex-01, codex-02 and claude-15 handoffs.
 - [x] Preserve the existing foundation and scope the product around Frontier.
 - [x] Assign separate worktrees to existing harnesses and record ownership.
-- [ ] Commit an executable design/constraint/evidence contract.
+- [x] Commit an executable design/constraint/evidence contract (SPEC-005).
 - [ ] Deliver the multiscale website with working exploration and source views.
 - [ ] Exercise a persistent node and an agent MCP contribution round trip.
 - [ ] Run solver controls and a scoped Lean check with a failing mutant.
@@ -54,6 +54,12 @@ about a proposed action.
 - [ ] Measure actual claim reuse and coordination; retain null results.
 - [ ] Verify and deploy the integrated demo with source and artifact receipts.
 - [ ] Leave a 24-hour resource queue, owners, stop rules and remaining blockers.
+
+OpenResearch must connect actual runs to evidence and artifact hashes. Printed
+fish are a physical view of engineering candidates: constraints and simulations
+inform their dimensions, while display-scale and printability changes remain
+separate. Darwin's flying-fish discussion supplies a historically sourced
+narrative, not evidence that a proposed evolutionary route is reachable.
 
 The first working slice is due in the next few hours. The original 24-hour
 research decision point remains November 1, 2026 at 07:25:26 PST (15:25:26 UTC).

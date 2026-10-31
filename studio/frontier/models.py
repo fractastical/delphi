@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from hashlib import sha256
 import json
 from typing import Annotated, Any, Literal
+from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -82,6 +83,7 @@ class Claim(Model):
     source: Source
     source_record_version: Short | None = None
     prior_review: dict[str, Any] = Field(default_factory=dict)
+    origin: Literal["source_statement", "derived", "hypothesis", "unknown"] = "unknown"
 
 
 ACTIONABILITY = ("acceptance_criteria", "falsifiers", "next_action", "cost_stop_bounds")
@@ -124,6 +126,35 @@ class Problem(Model):
         return self
 
 
+class ArtifactRef(Model):
+    """A declared artifact pointer. A digest in a record is not a byte verification.
+
+    The store never fetches these URIs. Public HTTPS or content-addressed URNs
+    avoid exporting a worker's local path or embedding access credentials.
+    Availability and licence are assertions by the submitting actor.
+    """
+
+    title: Short
+    uri: Short
+    sha256: Digest
+    byte_size: int = Field(ge=0, le=10**13, strict=True)
+    media_type: Annotated[str, Field(min_length=3, max_length=150, pattern=r"^[\w.+-]+/[\w.+-]+$")]
+    role: Literal["input", "output", "code", "environment", "protocol", "log", "certificate", "geometry"]
+    availability: Literal["referenced", "downloadable", "unavailable"]
+    license: Short | None = None
+
+    @model_validator(mode="after")
+    def artifact_uri(self):
+        parts = urlsplit(self.uri)
+        if self.uri.startswith("urn:sha256:"):
+            if self.uri != "urn:sha256:" + self.sha256 or self.availability == "downloadable":
+                raise ValueError("A content URN must match its digest and is not a download URL")
+        elif (parts.scheme != "https" or not parts.hostname or parts.username or parts.password
+              or parts.query or parts.fragment or any(ord(c) < 33 for c in self.uri)):
+            raise ValueError("Artifact pointers need credential-free HTTPS without query/fragment, or a SHA256 URN")
+        return self
+
+
 class Evidence(Model):
     target: Ref
     evidence_kind: Literal["observed", "predicted", "simulated", "formal", "source_assessment"]
@@ -139,11 +170,18 @@ class Evidence(Model):
     limitations: Strings = Field(min_length=1)
     local_id: Short | None = None
     provider_assessment: dict[str, Any] | None = None
+    relation: Literal["supports", "refutes", "qualifies", "reproduces", "context_only", "unspecified"] = "unspecified"
+    produced_by: Ref | None = None
+    artifacts: list[ArtifactRef] = Field(default_factory=list, max_length=30)
 
     @model_validator(mode="after")
     def target_kind(self):
         if self.target.kind not in {"Claim", "Problem"}:
             raise ValueError("Evidence must pin a Claim or Problem")
+        if self.produced_by is not None and self.produced_by.kind != "Action":
+            raise ValueError("Evidence produced_by must pin an Action")
+        if len({(a.sha256, a.role) for a in self.artifacts}) != len(self.artifacts):
+            raise ValueError("Duplicate artifact digest and role")
         return self
 
 
@@ -179,6 +217,7 @@ class Action(Model):
     required_capabilities: Strings
     cost_stop_bounds: Text
     cache_key: dict[str, str]
+    inputs: list[Ref] = Field(default_factory=list, max_length=30)
 
     @model_validator(mode="after")
     def complete_cache(self):
@@ -188,6 +227,10 @@ class Action(Model):
             raise ValueError("Cache dimensions must be bounded nonempty strings")
         if self.cache_key["target"] != self.target.version or self.cache_key["acceptance_policy"] != POLICY:
             raise ValueError("Cache target/policy must match action")
+        if any(r.kind not in {"Claim", "Evidence"} for r in self.inputs):
+            raise ValueError("Action inputs must pin Claim or Evidence records")
+        if len({r.version for r in self.inputs}) != len(self.inputs):
+            raise ValueError("Duplicate action input version")
         return self
 
 
@@ -295,6 +338,11 @@ def references(record: dict) -> list[tuple[str, dict]]:
         edges.append(("targets", p["target"]))
     for item in p.get("dependencies", []):
         edges.append(("depends_on", item))
+    if record["kind"] == "Action":
+        for item in p.get("inputs", []):
+            edges.append(("uses", item))
+    if record["kind"] == "Evidence" and p.get("produced_by") is not None:
+        edges.append(("produced_by", p["produced_by"]))
     for dimension in p.get("dimensions", {}).values():
         for item in dimension["evidence_links"]:
             edges.append(("review_evidence", item))
