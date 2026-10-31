@@ -4,6 +4,19 @@ One team, one day, a large agent fleet and good tools. **Every candidate headlin
 refuted, nulled, or found to have a predecessor.** This file is the record, because the ratio is
 the most interesting number we produced.
 
+**That sentence needs its scope stated, now that something passed.** It is about claims of
+*novelty* — our own candidate headlines. It is not a claim that nothing we did produced a result.
+On 2026-10-31 a preregistered test closed POSITIVE
+([`results/2026-10-31-oca2-exon21-molino-RESULT.md`](../results/2026-10-31-oca2-exon21-molino-RESULT.md)):
+oca2 exon 21 is absent from all 1,361,196,561 bp of the Molino cavefish assembly, reproducing
+Warren et al. 2021 against a different fish and a different data type.
+
+**That is a successful independent reproduction, which is a different category from a novel
+claim, and the distinction is the whole point of this file.** We reproduced someone else's
+finding by a route they did not use. We did not discover the deletion, and the row would be
+dishonest if it implied we had. The ledger's ratio stands: zero of our novelty claims survived,
+and one of our reproductions did.
+
 Each row names the witness. A list of mistakes without receipts is a confession; with receipts it
 is a measurement.
 
