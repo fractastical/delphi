@@ -630,7 +630,7 @@ def test_assurance_map_renders_vectors_regions_matrix_and_never_a_percentage(bro
     pg = page(browser)
     pg.goto(base + "#/studio/flying-fish")
     pg.wait_for_selector("#assurance")
-    assert "No design-assurance map is present" in pg.locator("#assurance").inner_text()
+    assert "No whole-organism success figure exists" in pg.locator("#assurance").inner_text()
     pg.evaluate("(src) => { const A = (new Function('return ' + src))()(); const host = document.getElementById('assurance'); host.innerHTML = DF.assurancePanel(A).toString(); DF.assuranceWire(host, A, null); }", _ASSURANCE_FIXTURE)
     txt = pg.locator("#assurance").inner_text()
     assert "not computed" in txt and "calibrated: false" in txt and "%" not in txt
@@ -646,3 +646,103 @@ def test_assurance_map_renders_vectors_regions_matrix_and_never_a_percentage(bro
     pg.click(".mcell[data-from=m2][data-to=m3]")
     assert "unknown" in pg.locator("#asmcell").inner_text()
     assert "expected information gain" in txt.lower() and "not computed" in txt.lower()
+
+
+def test_connect_tab_states_what_is_and_is_not_verified(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=connect")
+    pg.wait_for_selector("#cn-h")
+    txt = pg.locator("#main").inner_text().lower()
+    assert "is not tested" in txt and "official mcp sdk client" in txt and "never put a credential" in txt
+    assert pg.input_value("#sharelink").startswith("http")
+
+
+def test_gallery_has_every_verified_video_with_a_player(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    ids = [m["id"] for m in snap["simulation_manifests"] if m.get("video_state") == "present_verified"]
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    pg.wait_for_selector(".simcard")
+    assert pg.locator("video").count() == len(ids) and len(ids) >= 4
+    for i in ids:
+        assert pg.locator(f"#sim-{i} video").count() == 1, i
+
+
+def test_real_assurance_map_equation_registry_and_ensembles_render(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    A = snap.get("assurance")
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#assurance")
+    if not A or A.get("error"):
+        assert "No whole-organism success figure exists" in pg.locator("#assurance").inner_text()
+        return
+    pg.wait_for_selector("#assurance .part", timeout=15000)
+    txt = pg.locator("#assurance").inner_text()
+    assert "No whole-organism success figure exists" in txt and "not computed" in txt
+    assert pg.is_checked("input[value=empirical_validation]")
+    assert pg.locator("#assurance .eqcard .katex").count() >= 1, "equation registry is rendered with KaTeX"
+    assert pg.locator("#assurance .eqcard .tex-fallback").count() == 0
+    assert "predicate declared before the runs" in txt and "not a probability of biological success" in txt.replace("\n", " ")
+    pg.check("input[value=numerical_fidelity]")
+    styled = pg.evaluate("() => [...document.querySelectorAll('#assurance .part .shape')].some((s) => s.style.fill)")
+    assert styled, "parts are coloured from the map's own display legend"
+    assert "Colors are categorical evidence states" in pg.locator("#aslegend").inner_text()
+    n = len(A["transfer_matrix"]["axes"])
+    assert pg.locator("#assurance .mcell").count() == n * n - n
+
+
+def test_frontier_shows_the_3d_fish_above_the_open_questions(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector("#fishmini canvas, #fishmini svg")
+    fish_y = pg.locator("#fishmini").bounding_box()["y"]
+    board_y = pg.locator("#wb-h").bounding_box()["y"]
+    assert fish_y < board_y, (fish_y, board_y)
+
+
+def test_knowledge_infinite_scroll_appends_one_page_at_a_time_with_retry_and_end(browser, base):
+    import json as _j
+    from urllib.parse import urlparse, parse_qs
+    calls = []
+
+    def rec(i):
+        return {"record": {"namespace": "n", "kind": "Claim", "id": f"c{i:03d}", "version": "a" * 64, "payload": {"title": f"Claim {i}", "statement": f"S{i}"}}, "local_status": "proposed", "is_head": True}
+
+    def catalog(route):
+        q = parse_qs(urlparse(route.request.url).query); after = q.get("after", [""])[0]; calls.append(after)
+        if after == "c049" and calls.count("c049") == 1:
+            return route.fulfill(status=503, json={"error": "x", "message": "temporarily down"})
+        start = int(after[1:]) + 1 if after else 0
+        end = min(start + 50, 120)
+        route.fulfill(json={"mode": "live", "namespace": "n", "results": [rec(i) for i in range(start, end)], "next_cursor": None if end >= 120 else f"c{end - 1:03d}"})
+
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", catalog)
+    pg.goto(base + "#/knowledge")
+    pg.wait_for_selector("#cblist .claimcard")
+    pg.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+    pg.wait_for_selector("#cbmore [role=alert]")           # scrolling (or the sentinel) asked for page 2 and the node refused
+    assert pg.locator("#cblist .claimcard").count() == 50 and "Page 1" not in pg.locator("#main").inner_text()
+    pg.click("#cbmore [data-more]")                       # retry
+    pg.wait_for_function("document.querySelectorAll('#cblist .claimcard').length === 100")
+    pg.evaluate("window.scrollTo(0, document.body.scrollHeight)")   # scrolling alone loads the last page
+    pg.wait_for_function("document.querySelectorAll('#cblist .claimcard').length === 120")
+    assert "End of the list" in pg.locator("#cbmore").inner_text()
+    assert len(pg.locator("#cblist .claimcard").evaluate_all("els => [...new Set(els.map(e => e.textContent))]")) == 120
+
+
+def test_home_and_frontier_offer_all_six_printable_models_with_stl_download(browser, base):
+    names = ["A-precursor-short-fin", "B-two-wing-glider", "C-four-wing-glider", "N1-cypselurus-baseline", "N2-area-x1.3", "N3-area-x1.3-ar-x1.2"]
+    for route in ("#/home", "#/frontier"):
+        pg = page(browser)
+        pg.goto(base + route)
+        pg.wait_for_selector(".printmodels select")
+        assert pg.locator(".printmodels option").all_inner_texts() == names
+        pg.select_option(".printmodels select", "N2-area-x1.3")
+        dl = pg.locator(".printmodels a[download]")
+        assert dl.get_attribute("href").endswith("artifacts/print/stl/N2-area-x1.3.stl") and dl.get_attribute("download") == "N2-area-x1.3.stl"
+        info = pg.locator(".printmodels p").inner_text()
+        assert " mm" in info and "does not change" in info

@@ -45,11 +45,11 @@
   }
 
   /* Catalog: GET /api/catalog?query&kind&status&limit<=50&after -> {records, next_cursor, namespace, mode}. */
-  async function catalog({ query = "", kind = "", status = "", limit = 20, after = "" } = {}) {
+  async function catalog({ query = "", kind = "", status = "", limit = 20, after = "", signal = null } = {}) {
     limit = Math.max(1, Math.min(50, limit | 0 || 20));
     if (isLive()) {
       const q = new URLSearchParams(); if (query) q.set("query", query); if (kind) q.set("kind", kind); if (status) q.set("status", status); q.set("limit", String(limit)); if (after) q.set("after", after);
-      const r = await getJSON("api/catalog?" + q.toString());
+      const r = await getJSON("api/catalog?" + q.toString(), 3000, signal);
       return { records: (r.results || []).map(norm), next_cursor: r.next_cursor || null, namespace: r.namespace || null, mode: r.mode || "live", search_mode: r.search_mode || null, source: "runtime" };
     }
     const needle = query.trim().toLowerCase();
@@ -88,6 +88,12 @@
   async function media(sha) {
     if (!isLive() || state.mediaAbsent === true || !/^[0-9a-f]{64}$/.test(String(sha))) return null;
     try { return await getJSON("api/media?sha256=" + sha, 6000); } catch (e) { if (/HTTP 404/.test(e.message)) state.mediaAbsent = true; return null; }
+  }
+
+  /* GET /api/counts: cached corpus counts with their own notes and bases. Returned as received; rendering keeps every note next to its number. */
+  async function counts() {
+    if (!isLive()) return { unavailable: true, reason: "no live runtime" };
+    try { return { report: await getJSON("api/counts", 8000) }; } catch (e) { return { unavailable: true, reason: e.message }; }
   }
 
   async function events() {
@@ -180,5 +186,5 @@
     } catch (e) { if (e.name === "AbortError") throw e; if (/HTTP 404/.test(e.message)) { state.graphAbsent = true; return null; } throw e; }
   }
 
-  DF.api = { state, isLive, load, discovery, graph, catalog, record, artifacts, media, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
+  DF.api = { state, isLive, load, discovery, graph, catalog, record, artifacts, media, counts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
 })();
