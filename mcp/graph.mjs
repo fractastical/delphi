@@ -45,12 +45,12 @@ function claimStatus(claim) {
   return {
     verification: c.verification, theorem: c.theorem, math: c.math,
     leanTheorems: c.lean_theorems ?? undefined,
-    dataTest: t ? { verdict: t.verdict, confidence: t.confidence, preregistered: t.preregistered, result: t.path } : undefined,
+    dataTest: t ? { verdict: t.verdict, dataKind: t.data_kind, confidence: t.confidence, preregistered: t.preregistered, result: t.path } : undefined,
     registry: c.registry, graph: graphUrl({ claim: c.id }),
   };
 }
 
-const STATUS_NOTE = "status: verification = lean (machine-checked in Lean 4), literature (proved in the literature), partial, untested or refuted; dataTest = verdict of a pre-registered test against data; registry = production, test or null (unpublished). From docs/claims.json, built ";
+const STATUS_NOTE = "status: verification = lean (machine-checked in Lean 4), literature (proved in the literature), partial, untested or refuted; dataTest = verdict of a pre-registered test against data, with dataKind = biological (measured on organisms; the only kind that shows a claim holds in biology), physical, computational (simulation or mathematics) or none; registry = production, test or null (unpublished). From docs/claims.json, built ";
 
 export async function searchClaimsWithStatus(args) {
   const rows = await searchClaims(args);
@@ -85,6 +85,7 @@ const GROUPS = {
   decade: c => `${Math.floor(c.year / 10) * 10}s`,
   status: c => c.status,
   verification: c => c.verification,
+  evidenceKind: c => c.evidence_kind ?? "untested",
   kind: c => c.kind,
 };
 export const GROUP_KEYS = Object.keys(GROUPS);
@@ -101,6 +102,8 @@ export function graphStatus() {
     tested: count(cs, c => c.evidence),
     ...Object.fromEntries(EVIDENCE.map(e => [e, count(cs, c => c.evidence === e)])),
     neither: count(cs, c => c.verification === "untested" && !c.evidence),
+    onOrganisms: count(cs, c => c.evidence_kind === "biological"),
+    mathInOrganisms: count(cs, c => c.math && c.evidence_kind === "biological" && c.evidence === "supports"),
   });
   const thinkers = [...new Set([...claims].sort((a, b) => a.year - b.year).map(c => c.thinker))];
   const rows = thinkers.map(t => ({ thinker: t, ...tally(claims.filter(c => c.thinker === t)), graph: graphUrl({ thinker: t }) }));
@@ -113,19 +116,20 @@ export function graphStatus() {
     theoremsPage: graphUrl({}, "theorems"),
   };
   const cell = (n, params) => (n ? `[${n}](${graphUrl(params)})` : "·");
-  const line = (name, r, t) => `| ${t ? `[${name}](${graphUrl({ thinker: t })})` : `**${name}**`} | ${r.claims} | ${cell(r.theorems, { thinker: t, thm: 1 })} | ${cell(r.math, { thinker: t, math: "yes" })} | `
+  const plain = n => (n ? String(n) : "·");
+  const line = (name, r, t) => `| ${t ? `[${name}](${graphUrl({ thinker: t })})` : `**${name}**`} | ${r.claims} | ${cell(r.math, { thinker: t, math: "yes" })} | ${plain(r.mathInOrganisms)} | ${cell(r.theorems, { thinker: t, thm: 1 })} | `
     + LEVELS.map(l => cell(r[l], { thinker: t, level: l })).join(" | ") + ` | ${cell(r.mathUnverified, { thinker: t, math: "yes", level: "untested" })} | `
-    + cell(r.tested, { thinker: t, ev: "any" }) + " | " + EVIDENCE.map(e => cell(r[e], { thinker: t, ev: e })).join(" | ") + ` | ${cell(r.neither, { thinker: t, level: "untested", ev: "none" })} |`;
+    + cell(r.tested, { thinker: t, ev: "any" }) + ` | ${plain(r.onOrganisms)} | ` + EVIDENCE.map(e => cell(r[e], { thinker: t, ev: e })).join(" | ") + ` | ${cell(r.neither, { thinker: t, level: "untested", ev: "none" })} |`;
   const markdown = [
-    `**Claim graph, built ${built}:** ${total.claims} claims, **${total.theorems} theorems** (${total.lean} Lean-checked, ${total.literature} proved in the literature), ${total.math} math claims, ${total.mathUnverified} of them not proved. ${total.tested} claims tested against data (${EVIDENCE.map(e => `${total[e]} ${e}`).join(", ")}); ${total.neither} neither proved nor tested.`,
+    `**Claim graph, built ${built}:** ${total.claims} claims. **${total.mathInOrganisms} of ${total.math} math claims are supported by data measured on organisms.** ${total.tested} claims tested against data, ${total.onOrganisms} of them on organisms (${EVIDENCE.map(e => `${total[e]} ${e}`).join(", ")} across all data kinds). ${total.theorems} theorems (${total.lean} Lean-checked, ${total.literature} proved in the literature); ${total.mathUnverified} math claims not proved; ${total.neither} claims neither proved nor tested.`,
     "",
-    `| Thinker | Claims | ★ Theorems | ∑ Math | ${LEVELS.map(l => LEVEL_LABEL[l]).join(" | ")} | Math, not proved | Tested | ${EVIDENCE.map(e => `Data: ${e}`).join(" | ")} | Neither |`,
-    `|---|${"---:|".repeat(LEVELS.length + 4 + EVIDENCE.length + 2)}`,
+    `| Thinker | Claims | ∑ Math | ★ Math supported in organisms | Theorems | ${LEVELS.map(l => LEVEL_LABEL[l]).join(" | ")} | Math, not proved | Tested | Tested on organisms | ${EVIDENCE.map(e => `Data: ${e}`).join(" | ")} | Neither |`,
+    `|---|${"---:|".repeat(LEVELS.length + 6 + EVIDENCE.length + 2)}`,
     ...rows.map(r => line(r.thinker, r, r.thinker)),
     line("All", total, null),
     "",
     `Open: [full graph](${links.graph}) · [theorems only](${links.theorems}) · [math claims awaiting proof](${links.mathUnverified}) · [theorems page](${links.theoremsPage}). Every count above links to the graph filtered to it.`,
-    "A theorem is a math claim (formal notation, a Lean formalization, or a mathematical kind) that is machine-checked in Lean 4 or proved in the literature. Tested against data is a separate axis: the verdict of a pre-registered test in test-data/claim-tests/, which never makes a claim a theorem. Assessor truth scores count as neither.",
+    "A theorem is a math claim (formal notation, a Lean formalization, or a mathematical kind) that is machine-checked in Lean 4 or proved in the literature. Tested against data is a separate axis: the verdict of a pre-registered test in test-data/claim-tests/, which never makes a claim a theorem. Only tests whose data were measured on organisms (data_kind biological) show that a claim holds in biology; simulation and mathematical enumeration show it holds as mathematics. Assessor truth scores count as neither.",
   ].join("\n");
   return { markdown, built, total, thinkers: rows, links };
 }
@@ -137,7 +141,7 @@ export async function overviewWithGraph(source) {
     claimGraph: { built, total, links, more: "delphi_graph with no arguments returns this table per thinker; add filters to list claims" } };
 }
 
-const FILTERS = ["text", "thinker", "work", "status", "verification", "math", "theorem", "kind", "yearFrom", "yearTo", "minTruth", "maxTruth", "published", "groupBy"];
+const FILTERS = ["text", "thinker", "work", "status", "verification", "evidence", "evidenceKind", "math", "theorem", "kind", "yearFrom", "yearTo", "minTruth", "maxTruth", "published", "groupBy"];
 
 export function browseClaims(args = {}) {
   const view = args.view ?? (FILTERS.some(k => args[k] != null) || args.minTruthAssessors ? "claims" : "status");
@@ -146,7 +150,7 @@ export function browseClaims(args = {}) {
 }
 
 function listClaims(args) {
-  const { text, thinker, work, status, verification, math, theorem, kind, yearFrom, yearTo, minTruth, maxTruth, minTruthAssessors = 0,
+  const { text, thinker, work, status, verification, evidence, evidenceKind, math, theorem, kind, yearFrom, yearTo, minTruth, maxTruth, minTruthAssessors = 0,
     published, sort = "truth", groupBy, limit = 20 } = args;
   const { built, claims } = load();
   const hits = claims.filter(c =>
@@ -155,6 +159,8 @@ function listClaims(args) {
     && (!work || has(c.work, work))
     && (!status || c.status === status)
     && (!verification || c.verification === verification)
+    && (!evidence || (evidence === "any" ? !!c.evidence : evidence === "none" ? !c.evidence : c.evidence === evidence))
+    && (!evidenceKind || c.evidence_kind === evidenceKind)
     && (math == null || c.math === math)
     && (theorem == null || c.theorem === theorem)
     && (!kind || has(c.kind, kind))
@@ -169,7 +175,7 @@ function listClaims(args) {
   const names = [...new Set(hits.map(c => c.thinker))];
   const params = { thinker: thinker && names.length === 1 ? names[0] : null, level: verification ?? (status === "proved" ? null : status),
     math: math == null ? null : math ? "yes" : "no", thm: theorem ? 1 : null, p: minTruth };
-  const unmapped = ["text", "work", "kind", "yearFrom", "yearTo", "maxTruth", "published"].filter(k => args[k] != null);
+  const unmapped = ["text", "work", "kind", "yearFrom", "yearTo", "maxTruth", "published", "evidence", "evidenceKind"].filter(k => args[k] != null);
   const graph = graphUrl(params);
   const graphNote = unmapped.length ? `The graph link cannot apply ${unmapped.join(", ")}; it shows a superset of these results.` : undefined;
 
@@ -192,6 +198,8 @@ function listClaims(args) {
         verification: cs.reduce((m, c) => ({ ...m, [c.verification]: (m[c.verification] ?? 0) + 1 }), {}),
         math: cs.filter(c => c.math).length,
         theorems: cs.filter(c => c.theorem).length,
+        testedOnOrganisms: cs.filter(c => c.evidence_kind === "biological").length,
+        supportedInOrganisms: cs.filter(c => c.evidence_kind === "biological" && c.evidence === "supports").length,
       })).sort((a, b) => b.claims - a.claims),
     };
   }
@@ -203,6 +211,7 @@ function listClaims(args) {
       graph: graphUrl({ claim: c.id }),
       id: c.id, title: c.label, statement: c.statement, thinker: c.thinker, year: c.year, work: c.work, chapter: c.chapter,
       kind: c.kind, status: c.status, verification: c.verification, math: c.math, theorem: c.theorem, notation: c.notation ?? undefined, truth: c.truth, truthBy: c.truth_by, disagreement: c.disagreement,
+      evidence: c.evidence ?? undefined, evidenceKind: c.evidence_kind ?? undefined,
       testability: c.testability, nanopub: c.nanopub, registry: c.registry, draft: c.draft || undefined,
     })),
   };

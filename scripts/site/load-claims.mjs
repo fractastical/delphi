@@ -10,6 +10,9 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), "../..");
 export const MATH_KINDS = new Set(["mathematical-law", "mathematical", "model-theorem"]);
 export const VERIFICATION = ["refuted", "untested", "partial", "literature", "lean"];
 export const EVIDENCE = ["supports", "mixed", "refutes", "inconclusive"];
+// What a test's data measured (test-data/claim-tests/README.md). Only `biological` shows that a
+// claim holds in organisms; `computational` shows it holds in simulation or mathematics.
+export const DATA_KINDS = ["biological", "physical", "computational", "none"];
 const UNTESTED_NOTE = "Extracted from the text; not yet tested against data.";
 export const claimKey = c => createHash("sha256").update(`${c.label}\n${c.text}`.replace(/\s+/g, " ").trim()).digest("hex").slice(0, 16);
 
@@ -162,7 +165,7 @@ export function loadClaims() {
   // result.json. It never changes `verification` or `theorem` (a proof is not evidence that
   // organisms satisfy the assumptions, and a data test is not a proof). test-data/claim-tests/README.md
   // requires pre-registration, so a test counts as pre-registered unless it says otherwise.
-  const tests = {};
+  const tests = {}, unkinded = [];
   const TESTS = join(ROOT, "test-data/claim-tests");
   // A claim's folder may hold its result at the top or in one subfolder per test run; the top-level one wins.
   const isDir = p => statSync(p).isDirectory();
@@ -174,7 +177,8 @@ export function loadClaims() {
       if (!existsSync(f)) continue;
       const r = readJson(f);
       if (r.status !== "complete" || !EVIDENCE.includes(r.verdict) || tests[r.claim_id]) continue;
-      tests[r.claim_id] = { verdict: r.verdict, confidence: r.confidence ?? null, preregistered: r.preregistered !== false,
+      if (!DATA_KINDS.includes(r.data_kind)) { unkinded.push(join("test-data/claim-tests", p, id, rel, "result.json")); continue; }
+      tests[r.claim_id] = { verdict: r.verdict, confidence: r.confidence ?? null, preregistered: r.preregistered !== false, dataKind: r.data_kind,
         path: join("test-data/claim-tests", p, id, rel, "result.json"), hypothesis: r.hypothesis ?? "", datasets: (r.datasets || []).map(d => d.name),
         // The four test-contract fields (test-data/claim-tests/README.md); `explicit` is false when derived from the pre-registration fields.
         testContract: { expected_observation: r.test_contract?.expected_observation ?? r.pass_criterion ?? "",
@@ -184,6 +188,7 @@ export function loadClaims() {
         revisions: (r.revisions || []).map(v => ({ date: v.date, from: v.from, to: v.to, prompted_by: (v.prompted_by || []).map(x => x.agent) })) };
     }
   }
+  if (unkinded.length) throw new Error(`Complete claim tests without data_kind (${DATA_KINDS.join(" | ")}):\n  ${unkinded.join("\n  ")}`);
   for (const c of claims) {
     c.key = claimKey(c);
     c.verification = c.status === "proved" ? c.proof : c.status;
@@ -191,6 +196,7 @@ export function loadClaims() {
     c.theorem = c.math && c.status === "proved";
     c.dataTest = tests[c.id] ?? null;
     c.evidence = c.dataTest?.verdict ?? null;
+    c.evidenceKind = c.dataTest?.dataKind ?? null;
     if (c.dataTest && c.statusNote === UNTESTED_NOTE) c.statusNote = "Extracted from the text; not proved.";
   }
   return claims;

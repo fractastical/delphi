@@ -90,6 +90,10 @@ tool("delphi_graph",
     status: z.enum(["untested", "proved", "partial", "refuted"]).optional(),
     verification: z.enum(["lean", "literature", "partial", "untested", "refuted"]).optional()
       .describe("Status with proved split by how: lean = machine-checked in Lean 4, literature = proved in the literature"),
+    evidence: z.enum(["supports", "mixed", "refutes", "inconclusive", "any", "none"]).optional()
+      .describe("Data-test verdict; any = tested, none = not tested"),
+    evidenceKind: z.enum(["biological", "physical", "computational", "none"]).optional()
+      .describe("What the test's data measured: biological = organisms (shows the claim holds in biology), computational = simulation or mathematics. E.g. math: true, evidence: \"supports\", evidenceKind: \"biological\" lists math shown to hold in organisms"),
     math: z.boolean().optional().describe("true = only math claims (formal notation, a Lean formalization, or a mathematical kind)"),
     theorem: z.boolean().optional().describe("true = only theorems: math claims that are Lean-checked or proved in the literature"),
     kind: z.string().optional().describe("Substring of the claim kind, e.g. \"mechanism\", \"theorem\""),

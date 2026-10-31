@@ -103,6 +103,14 @@ const derived = {
   file: "docs/claims.json", built: committed.built, ...drift,
   stale: drift.added + drift.removed + drift.changed > 0, ...gitState(["docs/claims.json"]),
 };
+// The number the project exists to raise: math claims shown to hold in organisms.
+const math = [...fresh.values()].filter(c => c.math);
+const evidence = {
+  math: math.length,
+  supportedInOrganisms: math.filter(c => c.evidenceKind === "biological" && c.evidence === "supports").length,
+  testedOnOrganisms: math.filter(c => c.evidenceKind === "biological").length,
+  testedOtherwise: math.filter(c => c.evidence && c.evidenceKind !== "biological").length,
+};
 
 const gaps = rows.flatMap(r => {
   const g = [];
@@ -116,13 +124,14 @@ if (derived.stale) gaps.push(`docs/claims.json is stale: ${drift.added} claims a
 else if (derived.notOnMain) gaps.push("docs/claims.json is current but not on origin/main");
 
 if (json) {
-  console.log(JSON.stringify({ rows, derived, gaps }, null, 2));
+  console.log(JSON.stringify({ evidence, rows, derived, gaps }, null, 2));
 } else {
   const cols = ["project", "kind", "records", "built", "signed", "test", "production", "uncommitted", "notOnMain"];
   const head = ["Project", "Record", "Records", "Built", "Signed", "Test", "Production", "Uncommitted", "Not on main"];
   const cell = (r, c) => (typeof r[c] === "number" && c !== "records" && r[c] < r.records ? `${r[c]} !` : String(r[c] ?? ""));
   console.log(`| ${head.join(" | ")} |\n|${head.map((_, i) => (i < 2 ? "---|" : "---:|")).join("")}`);
   for (const r of rows) console.log(`| ${cols.map(c => (c === "uncommitted" || c === "notOnMain" ? String(r[c] || "·") : cell(r, c))).join(" | ")} |`);
+  console.log(`\nMath in biology: ${evidence.supportedInOrganisms} of ${evidence.math} math claims supported by data measured on organisms; ${evidence.testedOnOrganisms} tested on organisms, ${evidence.testedOtherwise} tested only on simulation, mathematics or physical data.`);
   console.log(`\n${derived.file}: built ${derived.built}, ${derived.stale ? "STALE" : "current"}${derived.notOnMain ? ", not on origin/main" : ""}`);
   console.log(gaps.length ? `\nGaps:\n${gaps.map(g => `- ${g}`).join("\n")}` : "\nNo gaps.");
 }

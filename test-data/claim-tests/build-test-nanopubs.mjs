@@ -124,6 +124,7 @@ sub:assertion {
     delphi:admissibleDatasets ${lit(tc.admissible_datasets)} ;
     delphi:inferenceMethod ${lit(tc.inference_method)} ;
     delphi:preregistered ${r.preregistered ? "true" : "false"} ;
+    delphi:dataKind ${lit(r.data_kind)} ;
     dct:description ${lit(r.method ?? "")} ;
     rdfs:comment ${lit(`Measured: ${summary}${r.measured?.n != null ? ` (n = ${r.measured.n}${r.measured.uncertainty ? `, ${r.measured.uncertainty}` : ""})` : ""}. Interpretation: ${r.interpretation ?? ""}`)} ;
 ${(r.caveats ?? []).map(c => `    delphi:evidenceAgainst ${lit(c)} ;`).join("\n")}
@@ -171,6 +172,7 @@ for (const project of readdirSync(HERE).filter(p => existsSync(join(HERE, p, "")
     if (!existsSync(f)) continue;
     const r = JSON.parse(readFileSync(f, "utf8"));
     if (r.status !== "complete") continue;
+    if (!["biological", "physical", "computational", "none"].includes(r.data_kind)) throw new Error(`${f}: data_kind must be biological, physical, computational or none`);
     writeFileSync(join(OUT, `${id}.trig`), trig(project, id, r));
     n++;
   }

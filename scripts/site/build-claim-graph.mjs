@@ -5,7 +5,7 @@
 //   node scripts/site/build-claim-graph.mjs
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { ROOT, VERIFICATION, EVIDENCE, loadClaims } from "./load-claims.mjs";
+import { ROOT, VERIFICATION, EVIDENCE, DATA_KINDS, loadClaims } from "./load-claims.mjs";
 
 const HERE = join(ROOT, "docs");
 const claims = loadClaims();
@@ -46,7 +46,7 @@ for (const [page, data] of [["claim-graph", DATA], ["claims-query", DATA], ["the
 const rows = claims.map(c => ({ id: c.id, key: c.key, label: c.label, statement: c.text, quote: c.quote || null, thinker: c.thinker, year: c.year,
   work: c.work, chapter: c.section || null, kind: c.kind, status: c.status, proof: c.proof ?? null, verification: c.verification,
   math: c.math, theorem: c.theorem, notation: c.notation || null, lean_theorems: c.lean?.theorems ?? null,
-  evidence: c.evidence, data_test: c.dataTest ? { verdict: c.dataTest.verdict, confidence: c.dataTest.confidence, preregistered: c.dataTest.preregistered, path: c.dataTest.path, test_contract: c.dataTest.testContract, revisions: c.dataTest.revisions } : null,
+  evidence: c.evidence, evidence_kind: c.evidenceKind, data_test: c.dataTest ? { verdict: c.dataTest.verdict, confidence: c.dataTest.confidence, preregistered: c.dataTest.preregistered, data_kind: c.dataTest.dataKind, path: c.dataTest.path, test_contract: c.dataTest.testContract, revisions: c.dataTest.revisions } : null,
   testability: c.resolvability ?? null, truth: c.truth,
   truth_by: c.truthBy.map(x => ({ assessor: x.who, p_true: x.p })), assessor_confidence: c.confidence ?? null,
   nanopub: c.uri || null, registry: c.registry || null, draft: !!c.draft }));
@@ -54,4 +54,5 @@ writeFileSync(join(HERE, "claims.json"), JSON.stringify({ built: DATA.built, cla
 console.log(`${claims.length} claims (${count(c => c.registry === "production")} in production, ${count(c => c.registry === "test")} test only, ${count(c => !c.registry)} unpublished, ${count(c => c.draft)} drafts); docs/claims.json written`);
 console.log(`verification: ${VERIFICATION.map(v => `${count(c => c.verification === v)} ${v}`).join(", ")}`);
 console.log(`tested against data: ${count(c => c.evidence)} (${EVIDENCE.map(v => `${count(c => c.evidence === v)} ${v}`).join(", ")}); ${count(c => c.verification === "untested" && !c.evidence)} neither proved nor tested`);
+console.log(`data kind of tests: ${DATA_KINDS.map(k => `${count(c => c.evidenceKind === k)} ${k}`).join(", ")}; math claims supported by biological data: ${count(c => c.math && c.evidenceKind === "biological" && c.evidence === "supports")} of ${count(c => c.math)}`);
 console.log(`${count(c => c.math)} math claims; ${count(c => c.theorem)} theorems (math and proved): ${count(c => c.theorem && c.proof === "lean")} machine-checked in Lean 4, ${count(c => c.theorem && c.proof === "literature")} proved in the literature`);
