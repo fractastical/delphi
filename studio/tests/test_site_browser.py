@@ -610,3 +610,39 @@ def test_simulation_widget_is_disabled_and_honest_without_a_node(browser, base):
     pg.wait_for_selector("#simwidget form", timeout=15000)
     assert pg.locator("#simwidget button[type=submit]").is_disabled()
     assert "Needs a live node" in pg.locator("#simwidget").inner_text()
+
+
+_ASSURANCE_FIXTURE = """() => {
+  const ev = [{path: 'artifacts/x.json', sha256: 'a'.repeat(64), selector: '$.rows[0]'}];
+  const vec = (e, n, x) => ({empirical_validation: {status: e, summary: 'no calibration data', scope: 'none', evidence: []}, numerical_fidelity: {status: n, summary: 'FEM matches closed form', scope: 'scoped controls only', evidence: ev}, cross_scale_transfer: {status: x, summary: 'bridge unsupported', scope: 'cell to organ', evidence: ev}});
+  return {schema: 'frontier.design-assurance/1', project_id: 'flying-fish', status: 'unsupported_essential_bridges', biological_success_probability: null, probability_calibrated: false, file_sha256: 'f'.repeat(64),
+    dimensions: ['formal_properties', 'numerical_fidelity', 'empirical_validation', 'parameter_coverage', 'cross_scale_transfer', 'ensemble_robustness'],
+    nodes: [{id: 'region:body', kind: 'region', label: 'Body', region_ids: ['body'], model_ids: ['m1'], vector: vec('unknown', 'scoped_pass', 'unsupported_bridge')},
+            {id: 'region:pectoral-left', kind: 'region', label: 'Pectoral, left', region_ids: ['pectoral-left'], model_ids: ['m2'], vector: vec('unknown', 'failed', 'unknown')},
+            {id: 'scale:organ', kind: 'scale', label: 'organ', studio_anchor: 'flying-fish:organ', vector: vec('unknown', 'scoped_pass', 'unknown')}],
+    transfer_matrix: {axes: ['m1', 'm2', 'm3'], entries: [{from: 'm1', to: 'm2', status: 'scenario', unit_check: 'dimensions match', assumptions: ['A1'], missing_calibrations: ['cell to organ'], evidence: ev, quantitative_error: null}]},
+    dependence_graph: {aggregation: 'no product or sum of confidence'}, project: {unsupported_essential_bridges: ['molecular to fin geometry'], counterexamples: [], next_actions: [{text: 'Find a calibration dataset', blocked_by: ['F002']}], expected_information_gain: null},
+    notices: ['regions are UI anchors'], evidence_index: [{path: 'artifacts/x.json', sha256: 'a'.repeat(64), byte_size: 10}]}; }"""
+
+
+def test_assurance_map_renders_vectors_regions_matrix_and_never_a_percentage(browser, base):
+    """Renderer test on a fixture built from the contract fields (the real map is not in this tree)."""
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#assurance")
+    assert "No design-assurance map is present" in pg.locator("#assurance").inner_text()
+    pg.evaluate("(src) => { const A = (new Function('return ' + src))()(); const host = document.getElementById('assurance'); host.innerHTML = DF.assurancePanel(A).toString(); DF.assuranceWire(host, A, null); }", _ASSURANCE_FIXTURE)
+    txt = pg.locator("#assurance").inner_text()
+    assert "not computed" in txt and "calibrated: false" in txt and "%" not in txt
+    assert pg.is_checked("input[value=empirical_validation]")
+    assert pg.locator("#assurance .part.t-unk").count() >= 1, "empirical validation defaults to unknown (neutral)"
+    pg.check("input[value=numerical_fidelity]")
+    assert pg.locator("#assurance .part[data-region=pectoral-left].t-bad").count() == 1 and pg.locator("#assurance .part[data-region=body].t-good, #assurance .part[data-region=body].t-mid").count() == 1
+    pg.click("#assurance .part[data-region=body]")
+    d = pg.locator("#asdetail").inner_text()
+    assert "scoped controls only" in d and "a" * 12 in d and "$.rows[0]" in d
+    pg.click(".mcell[data-from=m1][data-to=m2]")
+    assert "Quantitative error: not measured" in pg.locator("#asmcell").inner_text() and "Missing calibrations" in pg.locator("#asmcell").inner_text()
+    pg.click(".mcell[data-from=m2][data-to=m3]")
+    assert "unknown" in pg.locator("#asmcell").inner_text()
+    assert "expected information gain" in txt.lower() and "not computed" in txt.lower()

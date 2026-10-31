@@ -412,6 +412,20 @@ def project_drafts(ins: Inputs) -> dict:
     return out
 
 
+ASSURANCE = "artifacts/assurance/map.json"
+
+
+def assurance_map(ins: Inputs) -> dict | None:
+    """The regional design-assurance map (frontier.design-assurance/1), when present. Shown as written: no aggregation, no probability is computed here."""
+    if not (ROOT / ASSURANCE).exists():
+        return None
+    m = json.loads(ins.read(ASSURANCE))
+    if m.get("schema") != "frontier.design-assurance/1":
+        return {"error": f"unexpected schema {m.get('schema')!r}; not shown", "file_sha256": ins.seen[ASSURANCE]["sha256"]}
+    m["file_sha256"] = ins.seen[ASSURANCE]["sha256"]
+    return m
+
+
 def checklist(text: str) -> list[dict]:
     return [{"done": m.group(1) == "x", "text": m.group(2).strip()} for m in re.finditer(r"^- \[([ x])\] (.+)$", text, re.M)]
 
@@ -487,6 +501,7 @@ def build() -> dict[str, bytes]:
     belief_ex = belief_example(ins)
     genomics_slice = genomics(ins)
     project_recs = project_drafts(ins)
+    assurance = assurance_map(ins)
     extra: dict = {}
     prints = print_forms(ins, extra)
     controlled = controlled_results(ins, files)
@@ -520,6 +535,7 @@ def build() -> dict[str, bytes]:
         "print_forms": prints,
         "genomics": genomics_slice,
         "project_drafts": project_recs,
+        "assurance": assurance,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
     }
     catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}
