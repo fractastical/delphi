@@ -211,6 +211,7 @@ def run_request(request: dict):
     started = time.perf_counter()
     numerical = simulate(p, duration_s=duration, dt_s=dt, seed=seed, frame_count=count)
     env = environment()
+    source_hash = hashlib.sha256(Path(__file__).with_name("sources.json").read_bytes()).hexdigest()
     return {"schema": "frontier.mechanobio.result/1", "status": "simulated", "evidence_kind": "simulated",
             "title": "Force-feedback motor clutches on a relaxing ECM contact",
             "request_echo": echo, "parameter_provenance": parameter_provenance(p),
@@ -229,5 +230,6 @@ def run_request(request: dict):
                                "Does a validated cell-to-tissue constitutive bridge connect this to fin development?"],
             **numerical,
             "provenance": {"input_sha256": digest(echo), "code_files": code_hashes(),
+                           "source_receipt_sha256": source_hash,
                            "environment": env, "environment_sha256": digest(env),
                            "trajectory_sha256": digest(numerical), "elapsed_s": time.perf_counter() - started}}

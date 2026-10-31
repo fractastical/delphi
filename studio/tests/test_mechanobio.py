@@ -1,8 +1,12 @@
 import math
+import hashlib
+import json
+from pathlib import Path
 
 import pytest
 
 from engineering.mechanobio.model import Parameters, run_request, simulate
+from engineering.mechanobio.controls import run_controls
 
 
 def test_binding_and_velocity_nulls():
@@ -30,6 +34,13 @@ def test_force_law_mutant_changes_mechanics():
     assert base["summary"]["max_force_balance_residual_pN"] < 1e-9
 
 
+def test_control_report_runs_independent_viscoelastic_reference_and_step_screen():
+    controls = run_controls(replicates=4)
+    assert controls["independent_viscoelastic_integration"]["passed"]
+    assert controls["timestep_screen"]["statistics"]["0.005"]["n"] == 4
+    assert controls["passed"]
+
+
 def test_replay_and_unsupported_transfer_labels():
     one = run_request({"duration_s": 1, "frame_count": 11})
     two = run_request({"duration_s": 1, "frame_count": 11})
@@ -46,3 +57,17 @@ def test_replay_and_unsupported_transfer_labels():
 def test_resource_bounds_and_bad_inputs_are_refused(payload):
     with pytest.raises(ValueError):
         run_request(payload)
+
+
+def test_published_artifact_pointers_and_render_inputs_match_saved_bytes():
+    root = Path(__file__).resolve().parents[1] / "artifacts" / "mechanobio"
+    for name in ("simulation-manifest.json", "feedback-simulation-manifest.json", "render-manifest.json"):
+        manifest = json.loads((root / name).read_text())
+        pointers = manifest["artifacts"]
+        if "input_trajectory" in manifest:
+            pointers += [manifest["input_trajectory"], manifest["input_sweep"]]
+        for ref in pointers:
+            data = (root / ref["title"]).read_bytes()
+            assert len(data) == ref["byte_size"]
+            assert hashlib.sha256(data).hexdigest() == ref["sha256"]
+            assert ref["uri"] == "urn:sha256:" + ref["sha256"]

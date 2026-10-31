@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS principals (
 CREATE TABLE IF NOT EXISTS record_versions (
   version TEXT PRIMARY KEY CHECK (version ~ '^[0-9a-f]{64}$'),
   namespace TEXT NOT NULL, kind TEXT NOT NULL CHECK (kind IN
-  ('Problem','Claim','Evidence','Assessment','Action','Actor','ResourceOffer','Interest','Event')),
+  ('Problem','Claim','Evidence','Assessment','Action','Actor','ResourceOffer','Interest','Event','Project','Annotation')),
   record_id TEXT NOT NULL, issuer TEXT NOT NULL, source_uri TEXT NOT NULL,
   visibility TEXT NOT NULL CHECK (visibility IN ('public','private')),
   predecessor TEXT, created_at TIMESTAMPTZ NOT NULL, envelope JSONB NOT NULL,
@@ -74,12 +74,34 @@ CREATE TABLE IF NOT EXISTS imported_review_claims (
   digest TEXT PRIMARY KEY, exporting_node TEXT NOT NULL, receipt JSONB NOT NULL,
   received_at TIMESTAMPTZ NOT NULL
 );
+-- Additive migration, idempotent. A store initialised before Project/Annotation has a CHECK that rejects the new kinds and
+-- `CREATE TABLE IF NOT EXISTS` does not touch it. Replace only that constraint; no row is read for update or rewritten, and the
+-- old rows (which passed the narrower list) are unchanged byte for byte. NOT VALID then VALIDATE avoids a long exclusive scan.
+CREATE TABLE IF NOT EXISTS schema_migrations (
+  id TEXT PRIMARY KEY, description TEXT NOT NULL, applied_at TIMESTAMPTZ NOT NULL
+);
+DO $$
+DECLARE cname TEXT;
+BEGIN
+  SELECT c.conname INTO cname FROM pg_constraint c
+   WHERE c.conrelid = to_regclass('record_versions') AND c.contype = 'c'
+     AND pg_get_constraintdef(c.oid) LIKE '%''Problem''%' AND pg_get_constraintdef(c.oid) NOT LIKE '%''Annotation''%';
+  IF cname IS NOT NULL THEN
+    EXECUTE format('ALTER TABLE record_versions DROP CONSTRAINT %I', cname);
+    ALTER TABLE record_versions ADD CONSTRAINT record_versions_kind_check CHECK (kind IN
+      ('Problem','Claim','Evidence','Assessment','Action','Actor','ResourceOffer','Interest','Event','Project','Annotation')) NOT VALID;
+    ALTER TABLE record_versions VALIDATE CONSTRAINT record_versions_kind_check;
+  END IF;
+END; $$;
+INSERT INTO schema_migrations(id,description,applied_at)
+  VALUES ('projects-annotations-1','record kinds Project and Annotation added to the record_versions kind check',CURRENT_TIMESTAMP)
+  ON CONFLICT DO NOTHING;
 CREATE OR REPLACE FUNCTION frontier_immutable() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN RAISE EXCEPTION 'Frontier immutable table: append only'; END; $$;
 DO $$
 DECLARE name TEXT;
 BEGIN
-  FOREACH name IN ARRAY ARRAY['record_versions','typed_edges','events','reviews','write_receipts','idempotency','forks','imported_review_claims'] LOOP
+  FOREACH name IN ARRAY ARRAY['record_versions','typed_edges','events','reviews','write_receipts','idempotency','forks','imported_review_claims','schema_migrations'] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = name || '_immutable' AND tgrelid = to_regclass(name)) THEN
       EXECUTE format('CREATE TRIGGER %I BEFORE UPDATE OR DELETE ON %I FOR EACH ROW EXECUTE FUNCTION frontier_immutable()', name || '_immutable', name);
     END IF;

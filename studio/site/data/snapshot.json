@@ -1,7 +1,7 @@
 {
  "schema": "frontier-site-snapshot-0.1",
- "label": "snapshot of inputs ec84ae4cf062",
- "input_fingerprint": "ec84ae4cf0628bf066f15b49af0c6077c4f89009a3b704d7104992f1f988fe00",
+ "label": "snapshot of inputs 7ca6eb70b18c",
+ "input_fingerprint": "7ca6eb70b18c5f997fb49b0188a2ac8a52b8ab0a991b630c15a91765324b694c",
  "inputs": [
   {
    "path": "GOAL.md",
@@ -307,6 +307,11 @@
    "path": "frontier/beliefs.py",
    "sha256": "967b80d1b231b2591609d9790eb95975000db58079bf88dfc3aab75712b780a8",
    "bytes": 28357
+  },
+  {
+   "path": "projects/flying-fish.draft.json",
+   "sha256": "38248eede12e0bf5a54a1cc188311ba134a6ad1d8d7f0b86be70fcb3b45c8997",
+   "bytes": 15670
   },
   {
    "path": "results/2026-10-31-kcne1-binding-ddg-STOPPED.md",
@@ -5637,6 +5642,342 @@
   ]
  },
  "genomics": null,
- "project_drafts": {},
+ "project_drafts": {
+  "flying-fish": {
+   "path": "projects/flying-fish.draft.json",
+   "sha256": "38248eede12e0bf5a54a1cc188311ba134a6ad1d8d7f0b86be70fcb3b45c8997",
+   "title": "Engineer toward a flying fish",
+   "mission": "Engineer toward a flying fish: explore, with typed models and refusals, what a flying-fish-like glider would require. This is a design-studio project on a generic schema; it does not assert that any design is feasible.",
+   "limitations": [
+    "Every member ref is a snapshot-catalog ref (namespace 'snapshot'), not a live-store version: re-pin before submitting.",
+    "Membership is a declared pin and states where a record applies; it infers no causal link between members.",
+    "No calibration bridges any pair of scales; every coupling above the organ scale is refused or assumption-level.",
+    "The numeric requirements are Fish 1990 observed ranges proposed as a design envelope, not a feasibility certificate."
+   ],
+   "scale_coverage": [
+    {
+     "note": "One molecule-to-fin source (Daane 2021, association in zebrafish); no executable model, no parameter link to wing area.",
+     "scale": "molecular",
+     "status": "source_only"
+    },
+    {
+     "note": "No structure or affinity input for a fin-patterning protein; the one binding test was stopped at its coverage floor.",
+     "scale": "macromolecular",
+     "status": "unimplemented"
+    },
+    {
+     "note": "Nothing indexed.",
+     "scale": "subcellular",
+     "status": "unimplemented"
+    },
+    {
+     "note": "A two-cell Delta-Notch model is replayed in this project but it is non-dimensional and not tied to a fish; no cell-to-fin coupling exists.",
+     "scale": "cellular",
+     "status": "source_only"
+    },
+    {
+     "note": "A reaction-diffusion field sweep exists only for abstract kinetics; no fin-tissue model, no SI length or time scale.",
+     "scale": "tissue",
+     "status": "unimplemented"
+    },
+    {
+     "note": "An elastic fin-ray beam with an ASSUMED stiffness range runs; no calibrated fin stiffness exists.",
+     "scale": "organ",
+     "status": "implemented_model"
+    },
+    {
+     "note": "Nothing indexed.",
+     "scale": "neural",
+     "status": "unimplemented"
+    },
+    {
+     "note": "Exact-rational constraint solver, point-mass glide simulation and a fin load bridge run; all rest on declared assumptions.",
+     "scale": "organism",
+     "status": "implemented_model"
+    },
+    {
+     "note": "Fish 1990 allometry only (a measured scaling of wing loading with mass); no developmental model.",
+     "scale": "developmental",
+     "status": "source_only"
+    },
+    {
+     "note": "Nothing indexed.",
+     "scale": "collective",
+     "status": "unimplemented"
+    },
+    {
+     "note": "Darwin 1859, a phylogeny and a fossil source as context; no ecological model.",
+     "scale": "ecological",
+     "status": "source_only"
+    },
+    {
+     "note": "No source or model is indexed for this scale in the snapshot.",
+     "scale": "evolutionary",
+     "status": "unknown"
+    }
+   ],
+   "requirements": [
+    {
+     "id": "req-mass-min",
+     "kind": "constraint",
+     "quantity": {
+      "comparator": ">=",
+      "name": "body mass",
+      "unit": "kg",
+      "value": "0.003"
+     },
+     "source_member": 1,
+     "stage": "proposed",
+     "text": "Stay at or above the lightest specimen mass in the source envelope."
+    },
+    {
+     "id": "req-mass-max",
+     "kind": "constraint",
+     "quantity": {
+      "comparator": "<=",
+      "name": "body mass",
+      "unit": "kg",
+      "value": "0.53"
+     },
+     "source_member": 1,
+     "stage": "proposed",
+     "text": "Stay at or below the heaviest specimen mass in the source envelope."
+    },
+    {
+     "id": "req-wl-min",
+     "kind": "constraint",
+     "quantity": {
+      "comparator": ">=",
+      "name": "wing loading",
+      "unit": "N/m^2",
+      "value": "11.7"
+     },
+     "source_member": 1,
+     "stage": "proposed",
+     "text": "Stay at or above the lowest reported wing loading."
+    },
+    {
+     "id": "req-wl-max",
+     "kind": "constraint",
+     "quantity": {
+      "comparator": "<=",
+      "name": "wing loading",
+      "unit": "N/m^2",
+      "value": "208.9"
+     },
+     "source_member": 1,
+     "stage": "proposed",
+     "text": "Stay at or below the highest reported wing loading."
+    },
+    {
+     "id": "req-coupling-labels",
+     "kind": "validation",
+     "source_member": 8,
+     "stage": "declared",
+     "text": "Every coupling between models is reported as composable, assumption-level scenario, or refused; scenario results keep that label."
+    },
+    {
+     "id": "req-no-feasibility-claim",
+     "kind": "non_goal",
+     "stage": "declared",
+     "text": "Do not claim that an organism is feasible, that a source envelope is a universal feasibility region, or that a model coupling is a biological correspondence."
+    }
+   ],
+   "open_questions": [
+    {
+     "text": "What measured and modelled quantities could connect a molecular prediction to tissue transport in one specified fish system?",
+     "problem": "F002",
+     "blocks": [
+      5,
+      9
+     ]
+    },
+    {
+     "text": "How does a linear instability result relate to the nonlinear pattern a reaction-diffusion simulation produces for a fin-like domain?",
+     "problem": "F003",
+     "blocks": [
+      12
+     ]
+    },
+    {
+     "text": "Which measured lift and drag coefficients apply to a flying-fish-like body? The Park & Choi tables have not been read, so CL_max, CD0 and e are declared priors.",
+     "problem": null,
+     "blocks": [
+      2
+     ]
+    },
+    {
+     "text": "What is the effective flexural rigidity of an excised fin ray under the clamping that matches its in-fin boundary condition? The beam model sweeps an assumed range.",
+     "problem": null,
+     "blocks": []
+    },
+    {
+     "text": "Is there a sourced upper size limit for a gliding fish? Davenport 2003, the paper that argues one, is unread.",
+     "problem": null,
+     "blocks": [
+      4
+     ]
+    }
+   ],
+   "members": [
+    {
+     "subsystem": "mission specification",
+     "role": "mission",
+     "relationship": "context_for",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: the governing specification of the demo mission and its honesty rules; it makes no biological claim.",
+     "ref": {
+      "kind": "Evidence",
+      "id": "doc-SPEC-005",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "wing loading and aspect-ratio allometry",
+     "role": "evidence",
+     "relationship": "supports",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: preserved Exocoetidae specimens (n = 199, 0.003-0.53 kg); mass, wing-loading and pectoral-fin aspect-ratio ranges. A source envelope, not a flight-feasibility result and not a universal limit.",
+     "ref": {
+      "kind": "Evidence",
+      "id": "src-fish1990",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "lift and drag polar",
+     "role": "evidence",
+     "relationship": "informs",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: the intended source of lift/drag coefficients for a flying-fish model. The PDF has not been read in this repository, so no coefficient from it is applied anywhere.",
+     "ref": {
+      "kind": "Evidence",
+      "id": "src-parkchoi2010",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "stability and wing-loading morphometrics",
+     "role": "evidence",
+     "relationship": "constrains",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: known only through a publisher extract; its stability argument is not turned into a numeric limit here.",
+     "ref": {
+      "kind": "Evidence",
+      "id": "src-davenport1992",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "maximum size argument",
+     "role": "gap",
+     "relationship": "context_for",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: UNREAD (publisher challenge). No size limit is derived from it.",
+     "ref": {
+      "kind": "Evidence",
+      "id": "src-davenport2003",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "molecule-to-fin association",
+     "role": "context",
+     "relationship": "informs",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: an association in zebrafish with genome signatures across species; transfer to exocoetids is an unestablished hypothesis and no parameter maps it to wing area.",
+     "ref": {
+      "kind": "Evidence",
+      "id": "src-daane2021",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "historical framing",
+     "role": "context",
+     "relationship": "context_for",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: Chapter VI conceivability argument; context only, not evidence for a transition.",
+     "ref": {
+      "kind": "Evidence",
+      "id": "src-darwin1859",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "phylogeny of the family",
+     "role": "context",
+     "relationship": "context_for",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: phylogenetic context; no trait-scale parameter is drawn from it.",
+     "ref": {
+      "kind": "Evidence",
+      "id": "src-lovejoy2004",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "model coupling layer",
+     "role": "design",
+     "relationship": "implements",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: describes typed ports and the composable / scenario / refused rule for coupling models; it validates no coupling itself.",
+     "ref": {
+      "kind": "Evidence",
+      "id": "doc-model-coupling",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "macromolecular binding test",
+     "role": "measurement",
+     "relationship": "constrains",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: a preregistered test that STOPPED at its coverage floor (a structure covering about a fifth of the assay). Not a flying-fish result.",
+     "ref": {
+      "kind": "Evidence",
+      "id": "doc-2026-10-31-kcne1-binding-ddg-STOPPED",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "molecular-to-tissue evidence",
+     "role": "gap",
+     "relationship": "depends_on",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: the open question of what measured and modelled quantities could connect molecular predictions to tissue transport; unanswered.",
+     "ref": {
+      "kind": "Problem",
+      "id": "F002",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "linear versus nonlinear pattern",
+     "role": "subsystem",
+     "relationship": "informs",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: how linear instability analysis relates to the nonlinear pattern a simulation produces; open.",
+     "ref": {
+      "kind": "Problem",
+      "id": "F003",
+      "namespace": "snapshot"
+     }
+    },
+    {
+     "subsystem": "pattern wavelength at onset",
+     "role": "subsystem",
+     "relationship": "context_for",
+     "causal_bridge": "none_declared",
+     "applicability": "Declared: a generic Turing onset-wavelength statement from the Delphi register; no fin-tissue parameter maps to it.",
+     "ref": {
+      "kind": "Claim",
+      "id": "turing-wavelength",
+      "namespace": "snapshot"
+     }
+    }
+   ]
+  }
+ },
  "spec_acceptance_open": 11
 }
