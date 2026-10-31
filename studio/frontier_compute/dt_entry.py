@@ -8,6 +8,10 @@ try:
 except ImportError:
     subprocess.run([sys.executable, "-m", "pip", "install", "-q", "scipy"], capture_output=True)
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_V = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontier_compute", "vendor")
+if not os.path.exists(os.path.join(_V, "scopedesk")) and os.path.exists("inputs/vendor_solver.tar.xz"):      # compact bundle: solver sources ship as one xz tar (injected-files limit)
+    import tarfile
+    os.makedirs(_V, exist_ok=True); tarfile.open("inputs/vendor_solver.tar.xz").extractall(_V)
 from frontier_compute import cols, gpu_neumann as G
 cells, extra = cols.decode(sys.argv[1])
 if os.environ.get("PREFLIGHT"):
