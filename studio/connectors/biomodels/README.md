@@ -147,3 +147,23 @@ for the source assessment; `Evidence.artifacts` are typed `ArtifactRef`s, digest
 `work/corpus-adapters`, not modified) and writes `orx/orx_facts.json` and `orx/evidence_draft.json`. The run was a second
 execution of the same code from an orx snapshot; its four outputs and code hash equal the committed receipt's. It is a repeat by
 the same author, not independent replication, and orx did not record the environment, seeds or the network input.
+
+## Simulation video (`render.py`, `video/`)
+
+```
+cd "$(git rev-parse --show-toplevel)"; export PYTHONPATH="$PWD"
+python3 -m connectors.biomodels.render --receipt-dir connectors/biomodels/receipts/BIOMD0000001047 --out-dir "$(mktemp -d)"
+```
+
+Renders `delta_notch_replay.mp4` (1280x720, 24 fps, 16 s, about 0.3 MB, H.264), `delta_notch_replay_poster.png` and
+`delta_notch_replay_manifest.json` from the three replay CSVs only. Each CSV is checked against the receipt's sha256 first; a
+mismatch is refused. Top row: Delta and Notch of both cells against model time. Bottom row: each cell's (Notch, Delta) phase portrait.
+Columns: as published, unperturbed baseline, and the `b = 0` counterfactual (added here, not in the source).
+
+* Time mapping: frames 0-335 sweep model time 0 to 60 linearly by showing the nearest CSV row (no interpolation); 48 hold frames repeat the last row.
+  Most change happens before model time 30, so the second half of the video is the settled state.
+* Captions on every frame: simulation, not an observation; non-dimensional model time and concentrations; two abstract cells, not tissue, not a fin, no cell shape modelled or observed.
+* Manifest: input CSV and model hashes, replay and render code hashes, fps and time mapping, dimensions, ffmpeg/matplotlib/numpy versions, video and poster hashes, and a raw-frame hash.
+* Determinism, measured: two full renders gave byte-identical MP4 and poster files and equal raw-frame hashes on one machine and one ffmpeg build (6.1.1). The MP4 hash is not promised across ffmpeg builds; the raw-frame hash depends only on the drawing.
+* `encode_mp4`, `file_record`, `probe` and `ffmpeg_version` know nothing about this model and can be reused by another renderer.
+* Caveat: the video does not show what cells look like. It plots two numbers per cell. Do not describe it as cell differentiation or morphology.
