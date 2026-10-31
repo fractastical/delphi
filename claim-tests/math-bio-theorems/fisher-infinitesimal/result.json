@@ -1,0 +1,25 @@
+{
+  "claim_id": "fisher-infinitesimal",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/fisher-infinitesimal",
+  "project": "math-bio-theorems",
+  "status": "preregistered",
+  "hypothesis": "If adult height is governed by many Mendelian loci of small additive effect, then (a) a child's height given the parents' heights is approximately Gaussian with a residual variance (segregation plus environment) that does not depend on the parental mean, and (b) full siblings are correlated at least as strongly as parent and offspring, because dominance and shared environment add to the sibling covariance but not to the parent-offspring covariance.",
+  "pass_criterion": "Pre-registered. Data: Galton's 1886 family height records as distributed in the R HistData package (GaltonFamilies: 934 adult children in 205 families with father, mother and child heights in inches and child sex). Female child heights are multiplied by 1.08, as Galton did, to put both sexes on a common scale; mid-parent height is (father + 1.08*mother)/2. Residuals r are taken from the ordinary-least-squares regression of adjusted child height on mid-parent height. Criterion A (homoscedasticity): Levene's test (median-centred, Brown-Forsythe) of residual variance across the three mid-parent terciles gives p > 0.05 AND the ratio of the largest to the smallest tercile residual variance is < 1.5. Criterion B (normality): residual sample skewness |g1| < 0.5 and excess kurtosis |g2| < 1.0. Criterion C (sibling vs parent-offspring): the full-sibling intraclass correlation of adjusted height (one-way random-effects ANOVA estimator over families with >= 2 children) is >= r_po - 0.05, where r_po is the single-parent-offspring correlation implied by the child-on-mid-parent correlation r_mp as r_po = r_mp / sqrt(2) (which assumes uncorrelated parents). SUPPORTS if A, B and C all hold.",
+  "fail_criterion": "Pre-registered. REFUTES if A fails strongly (variance ratio > 2 or Levene p < 0.001) OR B fails strongly (|g1| > 1 or |g2| > 2) OR the sibling correlation is more than 0.15 below r_po. MIXED otherwise. INCONCLUSIVE (data-unavailable) if the file cannot be downloaded.",
+  "planned_datasets": [
+    "galton1886-families-histdata"
+  ],
+  "interpretation": "Fisher (1918) derived the covariances between relatives from Mendelian inheritance at many loci and showed they reproduce the biometric correlations; Galton's and Pearson's height data were among the biometric facts he reconciled, so this is an in-sample test of the model's distributional predictions on classic data, not an out-of-sample test. Environmental variance cannot be separated here, so criterion A tests the joint prediction that neither segregation variance nor environmental variance depends on the parental mean. Assortative mating (positive parent-parent correlation) inflates r_mp relative to sqrt(2)*r_po and so makes criterion C harder, not easier, to pass. Galton's 1.08 female adjustment is applied because the dataset is the raw one.",
+  "datasets": [],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack)",
+    "date": "2026-10-31"
+  }
+}

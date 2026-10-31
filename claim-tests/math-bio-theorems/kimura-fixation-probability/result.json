@@ -1,0 +1,25 @@
+{
+  "claim_id": "kimura-fixation-probability",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/kimura-fixation-probability",
+  "project": "math-bio-theorems",
+  "status": "preregistered",
+  "hypothesis": "If a neutral allele's probability of eventual fixation equals its initial frequency, then in Buri's (1956) 107 replicate Drosophila populations, each started with the bw75 allele at frequency 0.5 in 16 flies, the lines that have reached fixation or loss by the last recorded generation should be split evenly between fixation of bw75 and loss of bw75.",
+  "pass_criterion": "Pre-registered. Data: the 'fly' matrix in the CRAN package popgenr 0.2 (CC0; Laruson and Reed 2021), a 19 x 107 matrix of the number of bw75 allele copies (out of 32) in each replicate at each generation, transcribed from Buri (1956). At the last recorded generation, a line is 'fixed' if the count is 32 and 'lost' if the count is 0; m = fixed + lost, k = fixed. SUPPORTS if m >= 20 AND the two-sided exact binomial test of k against Binomial(m, 0.5) gives p > 0.05 AND |k/m - 0.5| < 0.15. Reported but not decisive: the mean bw75 frequency across all 107 lines at the last generation (predicted 0.5 under neutrality, since the expected frequency is constant under drift) and the number of fixed-or-lost lines.",
+  "fail_criterion": "Pre-registered. REFUTES if the exact binomial test gives p < 0.01 (fixation significantly favours one allele) OR |k/m - 0.5| >= 0.25. MIXED otherwise (0.01 <= p <= 0.05, or 0.15 <= |k/m - 0.5| < 0.25). INCONCLUSIVE (underpowered) if m < 20; INCONCLUSIVE (data-unavailable) if the package source cannot be downloaded.",
+  "planned_datasets": [
+    "buri1956-drosophila-bw75-popgenr-fly"
+  ],
+  "interpretation": "The claim's neutral limit u(p) = p is tested at p = 0.5 with 32 gene copies per line. The selection-dependent form u(p) = (1 - exp(-4*Ne*s*p)) / (1 - exp(-4*Ne*s)) is not tested, because the selection coefficient of bw75 is not measured independently of these data (Buri himself reported a small heterozygote advantage in the series). A balanced split among fixed lines is the prediction of neutrality; a strong imbalance would show selection acting, which the claim's selective form would then describe but which this test could not quantify. Lines not yet fixed at the last generation are censored and do not enter k or m.",
+  "datasets": [],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack)",
+    "date": "2026-10-31"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "claim_id": "maynardsmith-hitchhiking",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/maynardsmith-hitchhiking",
+  "project": "math-bio-theorems",
+  "status": "preregistered",
+  "hypothesis": "If a favourable mutation's sweep removes variation at linked neutral sites, and more so where recombination is weaker relative to selection, then across windows of a human chromosome nucleotide diversity should be positively correlated with the local recombination rate.",
+  "pass_criterion": "Pre-registered. Data: 1000 Genomes Project Phase 3 chromosome 22 genotype VCF (release 20130502, all 2504 samples) and the HapMap Phase II GRCh37 genetic map for chromosome 22. SNP filter: records with VT=SNP in INFO, biallelic (no MULTI_ALLELIC flag, single ALT), FILTER PASS. Windows: non-overlapping 200 kb windows starting at 16,000,000 bp (GRCh37) up to the last SNP. Diversity per window: pi = sum over SNPs of 2p(1-p) * 2n/(2n-1), with p the INFO AF value and 2n = 5008 chromosomes, divided by the window length (200,000 bp). Windows with fewer than 200 qualifying SNPs are excluded as unassessable (centromere-proximal or low-accessibility regions). Recombination rate per window: (map cM at window end minus map cM at window start) / 0.2 Mb, with cM linearly interpolated from the genetic map. SUPPORTS if Spearman rho(pi, recombination rate) across windows is >= 0.2 with two-sided p < 0.01.",
+  "fail_criterion": "Pre-registered. REFUTES if rho < 0 with p < 0.05 (diversity lower where recombination is higher) OR if |rho| < 0.1 with p > 0.05 and at least 100 windows (no detectable relationship). MIXED otherwise (0 <= rho < 0.2, or 0.01 <= p). INCONCLUSIVE (data-unavailable) if either file cannot be downloaded.",
+  "planned_datasets": [
+    "1000genomes-phase3-chr22-genotypes-20130502",
+    "hapmap-phaseII-genetic-map-grch37"
+  ],
+  "interpretation": "Maynard Smith and Haigh predicted that a sweep reduces heterozygosity at a linked neutral site by an amount that grows as recombination fraction over selection coefficient falls. The claim's assessment proposes the genome-wide version of the test used by Begun and Aquadro (1992): correlation between neutral diversity and local recombination rate. A positive correlation is also produced by background selection (Charlesworth et al. 1993), so a positive result supports the pattern the claim predicts but does not identify hitchhiking as the only cause; this is recorded as a caveat, not folded into the verdict. pi is computed from allele frequencies pooled across 26 populations; population structure inflates pooled pi roughly uniformly along the chromosome and does not create a correlation with recombination. All SNPs are used rather than only 'neutral' sites, which if anything weakens the expected correlation.",
+  "datasets": [],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack)",
+    "date": "2026-10-31"
+  }
+}

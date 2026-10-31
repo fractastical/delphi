@@ -1,0 +1,25 @@
+{
+  "claim_id": "kimura-heterozygosity",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/kimura-heterozygosity",
+  "project": "math-bio-theorems",
+  "status": "preregistered",
+  "hypothesis": "If neutral equilibrium heterozygosity H = theta/(1+theta) with theta = 4*Ne*mu holds and effective size scales with census size across species, then genome-wide nucleotide diversity (pi, the per-site heterozygosity) across metazoan species rises with census population size N: for pi << 1, H is approximately 4*Ne*mu, so log10(pi) should increase with log10(N) with a slope near 1 when mu and Ne/N are comparable across species, and the rank correlation between pi and N should be strongly positive.",
+  "pass_criterion": "Pre-registered. Data: Buffalo (2021) combined_data.tsv from github.com/vsbuffalo/paradox_variation (commit b8f91d5, 2021-09-27), metazoan species (kingdom == Animalia) with a non-missing diversity value (pairwise nucleotide diversity, column 'diversity') and a non-missing census-size estimate (column 'log10_popsize', the posterior mean of log10 census size from the author's range x density model; if the file carries another census-size point estimate instead, the column actually used is recorded in 'method'). One row per species. SUPPORTS if Spearman rho(log10 pi, log10 N) > 0.5 with p < 0.001 AND the ordinary-least-squares slope of log10 pi on log10 N has a point estimate >= 0.3 with a 95% confidence interval that includes some value >= 0.5 (diversity rises at least about a third as fast as census size on a log scale, i.e. within a factor of about 3 of the law's slope of 1).",
+  "fail_criterion": "Pre-registered. REFUTES if the 95% confidence interval of the slope lies entirely below 0.25 (diversity rises less than a quarter as fast as census size on a log scale, so the law with N as the proxy for Ne is quantitatively wrong by orders of magnitude across the range of N: the Lewontin's-paradox pattern) OR rho <= 0. MIXED otherwise. INCONCLUSIVE (underpowered) if fewer than 50 species qualify; INCONCLUSIVE (data-unavailable) if the file cannot be downloaded.",
+  "planned_datasets": [
+    "buffalo2021-paradox-variation-combined-data"
+  ],
+  "interpretation": "The claim is about effective population size Ne. Independent Ne estimates do not exist for most species, so census size N is used as the proxy, which is how Lewontin (1974) and Buffalo (2021) framed the paradox of variation. Mutation rates per site per generation vary by roughly an order of magnitude across metazoa and are not available per species here, so they are not included; a slope far below 1 therefore means that Ne is decoupled from N (by linked selection, demography or variation in mu), not that the within-model theorem is wrong. This is a test of the claim as the assessment proposed it ('regress genome-wide neutral diversity on estimates of Ne*mu across species'), with N standing in for Ne*mu.",
+  "datasets": [],
+  "method": null,
+  "measured": null,
+  "verdict": null,
+  "confidence": null,
+  "caveats": [],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack)",
+    "date": "2026-10-31"
+  }
+}
