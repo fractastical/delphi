@@ -452,6 +452,27 @@ def assurance_map(ins: Inputs) -> dict | None:
     return m
 
 
+RESOURCES = "results/resources/resource-inventory.json"
+
+
+def mcp_check(ins: Inputs) -> dict | None:
+    """The recorded public MCP check (official SDK). Shown with its own scope; no product-client claim is derived from it."""
+    f = "deploy/receipts/mcp-public-check.json"
+    if not (ROOT / f).exists():
+        return None
+    d = json.loads(ins.read(f)); cs = d.get("checks", [])
+    return {"checked_at": d.get("checked_at"), "endpoint": d.get("endpoint"), "transport": d.get("transport"), "total": len(cs), "passed": sum(1 for c in cs if c.get("passed")), "failed": [c.get("name") for c in cs if not c.get("passed")],
+            "scientific_records_written": d.get("scientific_records_written"), "scope": d.get("scope"), "file_sha256": ins.seen[f]["sha256"]}
+
+
+def resource_inventory(ins: Inputs) -> dict | None:
+    """The recorded resource inventory (observed at a stated time): requested capacity and outcomes, never utilisation or spend that was not measured."""
+    if not (ROOT / RESOURCES).exists():
+        return None
+    d = json.loads(ins.read(RESOURCES)); d["file_sha256"] = ins.seen[RESOURCES]["sha256"]
+    return d
+
+
 def checklist(text: str) -> list[dict]:
     return [{"done": m.group(1) == "x", "text": m.group(2).strip()} for m in re.finditer(r"^- \[([ x])\] (.+)$", text, re.M)]
 
@@ -528,6 +549,8 @@ def build() -> dict[str, bytes]:
     genomics_slice = genomics(ins)
     project_recs = project_drafts(ins)
     assurance = assurance_map(ins)
+    resources = resource_inventory(ins)
+    mcp_chk = mcp_check(ins)
     extra: dict = {}
     prints = print_forms(ins, extra)
     controlled = controlled_results(ins, files)
@@ -562,6 +585,8 @@ def build() -> dict[str, bytes]:
         "genomics": genomics_slice,
         "project_drafts": project_recs,
         "assurance": assurance,
+        "resource_inventory": resources,
+        "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
     }
     catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}

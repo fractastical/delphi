@@ -630,7 +630,7 @@ def test_assurance_map_renders_vectors_regions_matrix_and_never_a_percentage(bro
     pg = page(browser)
     pg.goto(base + "#/studio/flying-fish")
     pg.wait_for_selector("#assurance")
-    assert "No design-assurance map is present" in pg.locator("#assurance").inner_text()
+    assert "No whole-organism success figure exists" in pg.locator("#assurance").inner_text()
     pg.evaluate("(src) => { const A = (new Function('return ' + src))()(); const host = document.getElementById('assurance'); host.innerHTML = DF.assurancePanel(A).toString(); DF.assuranceWire(host, A, null); }", _ASSURANCE_FIXTURE)
     txt = pg.locator("#assurance").inner_text()
     assert "not computed" in txt and "calibrated: false" in txt and "%" not in txt
@@ -653,7 +653,7 @@ def test_connect_tab_states_what_is_and_is_not_verified(browser, base):
     pg.goto(base + "#/work?tab=connect")
     pg.wait_for_selector("#cn-h")
     txt = pg.locator("#main").inner_text().lower()
-    assert "not verified" in txt and "frontier_artifacts" in txt and "never put a credential" in txt
+    assert "is not tested" in txt and "official mcp sdk client" in txt and "never put a credential" in txt
     assert pg.input_value("#sharelink").startswith("http")
 
 
@@ -666,3 +666,27 @@ def test_gallery_has_every_verified_video_with_a_player(browser, base):
     assert pg.locator("video").count() == len(ids) and len(ids) >= 4
     for i in ids:
         assert pg.locator(f"#sim-{i} video").count() == 1, i
+
+
+def test_real_assurance_map_equation_registry_and_ensembles_render(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    A = snap.get("assurance")
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#assurance")
+    if not A or A.get("error"):
+        assert "No whole-organism success figure exists" in pg.locator("#assurance").inner_text()
+        return
+    pg.wait_for_selector("#assurance .part", timeout=15000)
+    txt = pg.locator("#assurance").inner_text()
+    assert "No whole-organism success figure exists" in txt and "not computed" in txt
+    assert pg.is_checked("input[value=empirical_validation]")
+    assert pg.locator("#assurance .eqcard .katex").count() >= 1, "equation registry is rendered with KaTeX"
+    assert pg.locator("#assurance .eqcard .tex-fallback").count() == 0
+    assert "predicate declared before the runs" in txt and "not a probability of biological success" in txt.replace("\n", " ")
+    pg.check("input[value=numerical_fidelity]")
+    styled = pg.evaluate("() => [...document.querySelectorAll('#assurance .part .shape')].some((s) => s.style.fill)")
+    assert styled, "parts are coloured from the map's own display legend"
+    assert "Colors are categorical evidence states" in pg.locator("#aslegend").inner_text()
+    n = len(A["transfer_matrix"]["axes"])
+    assert pg.locator("#assurance .mcell").count() == n * n - n
