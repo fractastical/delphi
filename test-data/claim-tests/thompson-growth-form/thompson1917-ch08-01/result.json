@@ -2,8 +2,8 @@
   "claim_id": "thompson1917-ch08-01",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch08-01",
   "project": "thompson-growth-form",
-  "status": "preregistered",
-  "preregistered_at": "2026-10-31T21:40:00Z",
+  "status": "complete",
+  "preregistered_at": "2026-10-31T21:32:19Z",
   "hypothesis": "In dividing plant cells, the new wall cuts across the mother cell's longest axis (its normal is near-parallel to that axis), and when two successive divisions are both recent, the second wall is near-perpendicular to the first.",
   "pass_criterion": "Pre-registered. Data: the same 8 Arabidopsis shoot-apex archives as thompson1917-ch08-02 (first 8 archive names, alphabetical, of Zenodo record 18711581). Sister pairs = the two cells separated by a wall in *_new_walls.tif; mother = their union; sisters >= 40 um^3, not touching the border. Part 1 (longest axis): theta = angle between the new wall's normal (smallest principal axis of the shared-interface voxel coordinates, in um) and the mother's longest principal axis (largest-variance axis of its voxel coordinates, in um); analysed for elongated mothers (sqrt(lambda1/lambda2) >= 1.2), all mothers reported too. Under random orientation the median theta is 60 deg. Part 1 passes if median theta <= 30 deg and >= 60% of elongated mothers have theta <= 30 deg. Part 2 (alternation): triples X, Y1, Y2 where Y1|Y2 is a new wall and Y1 and Y2 each also share a new wall with the same cell X (so Y divided after X|Y formed); phi = angle between the normals of wall Y1|Y2 and wall X|(Y1 u Y2), folded to [0, 90]. Part 2 passes if median phi >= 75 deg and >= 50% of triples have phi >= 70 deg. SUPPORTS if both parts pass.",
   "fail_criterion": "Pre-registered. Part 1 fails if median theta >= 50 deg; Part 2 fails if median phi <= 60 deg. REFUTES if both parts fail. MIXED for any other combination of pass/fail/neither. If Part 2 has fewer than 15 triples it is underpowered; the verdict is then Part 1's outcome (supports if it passes, refutes if it fails, mixed otherwise) with that limitation noted and confidence capped at 0.6. If Part 1 has fewer than 30 elongated mothers: inconclusive (underpowered). Secondary, reported but not used for the verdict: in eLife 79224 Figure 8 source data 2 (Laruelle et al. 2022, Arabidopsis embryo apical cells at 16C), the fraction of horizontally dividing cells whose longitudinal length exceeds their maximal radial length, and of longitudinally dividing cells whose longitudinal length is below it.",
@@ -31,6 +31,71 @@
     "min_part1": 30,
     "min_part2": 15
   },
+  "datasets": [
+    {
+      "id": "zenodo-18711581-yates-2026-arabidopsis-sam-segmentations",
+      "name": "Image processing data for manuscript: Control of plant organ growth through cell division orientation in inner tissues (Yates & Sablowski)",
+      "landing_url": "https://zenodo.org/records/18711581",
+      "doi": "10.5281/zenodo.18711581",
+      "version": "published 2026-02-20",
+      "license": "CC BY 4.0",
+      "files": [
+        {"download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_260_t0_40x.zip?download=1", "byte_size": 805340231, "md5_published": "7381ba1a5c503a553d4d51469f1c3943"},
+        {"download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_263_t0_40x.zip?download=1", "byte_size": 631275566, "md5_published": "d1b96007579f5359cc905d6537cb4553"},
+        {"download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_274_t0_40x.zip?download=1", "byte_size": 584391104, "md5_published": "a3d6b3acfa90d31b398d26ee94ff5282"},
+        {"download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_280_t0_40x.zip?download=1", "byte_size": 581548177, "md5_published": "ddb8a4e114614262840cf07b9d2a16f5"},
+        {"download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_289_t0_40x.zip?download=1", "byte_size": 614552191, "md5_published": "416654b69fbdb8a765af640707d02b78"},
+        {"download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_291_t0_40x.zip?download=1", "byte_size": 198570454, "md5_published": "8a99b73f4bd21c7a3e7305439124945b"},
+        {"download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_301_t0_40x.zip?download=1", "byte_size": 512847315, "md5_published": "f4b9760193f3bd385cd8d88eb098dc47"},
+        {"download_url": "https://zenodo.org/records/18711581/files/20230922_mPS-PI_Meristem_311_t0_40x.zip?download=1", "byte_size": 430061980, "md5_published": "001111b69f749dc9023a91bcb9320901"}
+      ],
+      "files_note": "The archives (4.4 GB together) were not downloaded whole. From each, five members (Metadata.txt, *_seg.tif, *_new_walls.tif, *_walls_data.csv, *_cell_data.csv; 304 MB in total) were read by HTTP range requests and checked against their ZIP CRC-32. Each member's SHA-256, byte size and retrieval time (2026-10-31T21:55Z-22:22Z, all after the pre-registration commit) are in derived/fetch_log.csv. The members were first fetched by thompson1917-ch08-02's analysis.py and reused here after a CRC check. Whole-archive SHA-256s were not computed; the MD5s are Zenodo's published checksums.",
+      "role": "watershed segmentations of 3D confocal stacks of Arabidopsis inflorescence shoot apices (voxel 0.1832 x 0.1832 x 0.334 um), the dataset's own flags for recently formed walls (New wall filter = 1, the labels in *_new_walls.tif) and their two flanking cells"
+    },
+    {
+      "id": "elife-79224-fig8-data2",
+      "name": "Laruelle et al. 2022, eLife 11:e79224, Figure 8 source data 2: longitudinal/radial length ratio measurements",
+      "landing_url": "https://elifesciences.org/articles/79224",
+      "doi": "10.7554/eLife.79224",
+      "license": "CC BY 4.0",
+      "files": [
+        {"download_url": "https://cdn.elifesciences.org/articles/79224/elife-79224-fig8-data2-v1.zip", "retrieved_at": "2026-10-31T22:32:25Z", "byte_size": 1511, "sha256": "03dad88c34112f193233eb9ed173736f3c7cda232e2b0468978468c41e4ce13d"}
+      ],
+      "role": "secondary, not used for the verdict: division type and longitudinal/maximal radial length ratio of 149 apical mother cells reconstructed at the 16-cell stage"
+    }
+  ],
+  "method": "analysis.py range-extracts the five members per archive and, for each wall flagged new whose two flanking cells are >= 40 um^3 and whose bounding boxes do not touch the image border, takes the mother as the union of the two cells. The wall normal is the smallest principal axis of the midpoints of the voxel faces shared by the two cells (um coordinates); the mother's longest axis and elongation sqrt(lambda1/lambda2) come from the covariance of its voxel coordinates. theta is the folded angle between them. Part 2 searches for cells X sharing a new wall with both cells of another new wall Y1|Y2. As a control that was not pre-registered, 1000 randomly sampled walls per apex that are not flagged new are analysed identically. Secondary: the eLife table is read and fractions are computed by division type. Per-wall rows are written to data/part1.csv (regenerated, not committed); derived/part1_theta_histogram.csv has theta counts by wall kind and elongation bin.",
+  "measured": {
+    "value": 35.85,
+    "unit": "median angle (deg) between the new wall's normal and the mother cell's longest principal axis, elongated mothers (axis ratio >= 1.2)",
+    "n": 22810,
+    "uncertainty": "IQR 20.3-58.4 deg; random-orientation median 59.8 deg; per-apex medians 27.2-52.9 deg across the 8 apices",
+    "extra": {
+      "part1_fraction_theta_le_30": 0.4128,
+      "part1_outcome": "neither (median <= 30 not met, fraction >= 0.6 not met, median < 50)",
+      "part1_all_mothers": {"n": 27249, "median_theta_deg": 37.68, "fraction_le_30": 0.3906},
+      "part1_median_theta_by_elongation": {"1.0-1.2": {"n": 4439, "median": 47.56}, "1.2-1.5": {"n": 9728, "median": 42.21}, "1.5-2.0": {"n": 8442, "median": 34.29}, ">=2.0": {"n": 4640, "median": 26.74}},
+      "part2_n_triples": 0,
+      "part2_outcome": "underpowered (0 triples < 15)",
+      "cells_in_more_than_one_new_wall": 0,
+      "confidence_cap": 0.6,
+      "control_not_preregistered_old_walls": {"n_elongated": 6606, "median_theta_deg": 26.54, "fraction_le_30": 0.5886},
+      "secondary_elife79224_fig8_data2": {"n_transversal": 9, "transversal_fraction_longitudinal_gt_radial": 0.0, "n_longitudinal": 140, "longitudinal_fraction_longitudinal_lt_radial": 0.9714, "median_ratio_transversal": 0.742, "median_ratio_longitudinal": 0.734}
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.5,
+  "caveats": [
+    "Part 1 is between the pre-registered pass and fail bands. New walls are better aligned with the mother's long axis than random planes (median 35.9 deg against 59.8 deg), but short of the 30 deg median and 60%-within-30-deg needed to pass (41%). Alignment increases with elongation: median 26.7 deg for mothers with axis ratio >= 2, and 42-48 deg for nearly isodiametric ones, as the rule predicts if 'longest axis' only matters when one is clearly longest.",
+    "Part 2 could not be tested. The dataset's new-wall detection pairs each cell with at most one sister (no cell lies on two new walls in any of the 8 apices), so no successive-division triples exist. Under the pre-registered rule the verdict is Part 1's outcome (mixed), with confidence capped at 0.6. The alternation half of the claim is untested.",
+    "A control that was not pre-registered weakens the support from Part 1. Walls not flagged as new, between arbitrary neighbouring cells, score better (median 26.5 deg, 59% within 30 deg) than new walls do. The union of any two adjacent cells is elongated across their shared wall, so this measure favours the rule by construction. New walls lining up less well than that geometric baseline suggests that the observed alignment is not evidence for a division rule beyond geometry.",
+    "Sister identification relies on the dataset's own new-wall filter, which flags 4,365 walls in the first apex (8,730 of 12,499 cells), more than a single recent round of division would give. It probably includes older walls, which this test cannot separate from recent ones.",
+    "The 'cell crosses image border' field in *_cell_data.csv is 0 for every cell, so border contact was judged from each cell's bounding box touching the image edge. Mothers whose sister volumes the segmentation already limits to >= 40 um^3 all pass the volume filter.",
+    "Secondary (eLife 79224, embryo apical cells at 16C, not part of the verdict): 136 of 140 longitudinal divisions are in cells whose radial length exceeds their longitudinal length, as the rule predicts. All 9 transverse divisions are also in such cells, against the rule. Nearly all these cells are radially longer (median ratio 0.73), so the table cannot show cells choosing their division by length.",
+    "Shoot-apex division orientation is also influenced by mechanical stress and growth direction, which this test does not separate from geometry.",
+    "preregistered_at is the time of the pre-registration commit (9e0ec83d); the committed pre-registration carried an estimated time (21:40Z) written before committing. Data were first fetched after that commit; criteria are unchanged."
+  ],
   "agent": {
     "kind": "local-agent",
     "model": "claude-opus-5.5",
