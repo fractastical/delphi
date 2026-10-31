@@ -16,10 +16,11 @@ first. Mixing levels in one table without marking them is the failure this colum
 
 | Claim | Level | Receipt | Status |
 |---|---|---|---|
+| Decisions linked to the exact claims and evidence behind them | C (one instance) | **Persisted today:** the RD-1D pilot's equation carries its claim and problem refs into the run, as snapshot pins. **An audit found most Action inputs absent and curation is pending**, so this is a direction with one worked example, not a property of the graph | **Partly earned — do not generalise** |
 | Whole-organism design maps knowledge gaps; each gap becomes a pinned Problem/Action | C | `frontier/models.py` `completeness` discriminator; `recorded` vs `actionable` with four required fields | **Earned** |
 | 250 morphoswarm register problems imported, **0 actionable** | C | `scripts/import_register.py` run output | **Earned** — and the zero is the point |
 | 17 sourced proposals, **13 actionable**, 17/17 resolvable URI | C | `scripts/import_sourced_problems.py` | **Earned** (corrected down from 15 after data-access verification) |
-| No machine-checked library of mathematical biology exists | — | — | **MISSING**: asserted, never systematically searched. Do not claim on stage |
+| ~~No machine-checked library of mathematical biology exists~~ | — | — | **CUT 2026-10-31.** Never systematically searched, so it could not be supported. Removed from the pitch rather than softened. Do not reintroduce without a scoped search |
 | Scope conditions are the natural unit because biological results are stated in limits and applied in regimes | C | the mispredication probe is one worked instance | **Partly earned** — one instance, not a survey |
 
 **Honest weak point.** "No such library exists" is the load-bearing significance claim and it has
@@ -163,6 +164,11 @@ Full document with read-levels: `docs/research/generative-roadmap.md`. Page copy
   still grows 0.265; blocked it is **3e-16**. At O₂ 20, **0.291 free vs 0.097 blocked**. It is a
   model-constraint diagnosis; blocking MAR04071 is not biology.
 - **GPU hours are `unknown until a receipt exists`, never `0`**, while a provider job is running.
+- **Never say "every decision is a record with its claim attached."** An audit found most Action
+  inputs absent; curation is pending. Say we are *linking* decisions to exact claims and evidence,
+  and show the one persisted example.
+- **Never say the pilot task "had no room to fail."** The scores show only that **this task did not
+  distinguish the arms**; an answer-explicit packet is the likely cause, not a proven one.
 
 **Forbidden:** "first diffusion model for synthetic biology", and any IP claim. The method class is
 published; what we propose is the evidence loop around it.
@@ -199,8 +205,11 @@ named dimensions.
 2. **Decentralized Agency (20%) is asserted more broadly than it was practised today.** Mitigation:
    claim the one instance that genuinely went through the commons, not the architecture.
 3. **Three Impact numbers sit at level R with no committed path** (the 357 perturbation checks, the
-   OpenFold2 confidence figures, the OpenMM trajectory). Mitigation: either land a receipt path
-   before the cut or drop them from the slides.
-4. **The significance claim "no machine-checked library of mathematical biology exists" has no
-   search receipt.** Mitigation: downgrade to "we have not found one" with the scope of what we
-   looked at, or cut it.
+   OpenFold2 confidence figures, the OpenMM trajectory). **Paths now exist** under
+   `artifacts/molecular/` and `deploy/receipts/science-integration-20261031.json` on main
+   `8790824`. **I read that integration receipt; I did not open the individual artifacts.** So say
+   "recorded at <path>", not "verified".
+4. ~~The "no machine-checked library of mathematical biology" claim.~~ **RESOLVED by cutting
+   it**, 2026-10-31. Never systematically searched, so it could not be supported. Significance
+   now rests on scope conditions being the natural unit and on the design surfacing which ones
+   are unpinned — both of which we can show.

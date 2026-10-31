@@ -8,12 +8,12 @@ Supersedes `archive/demo-narrative-2026-10-31-refusal-led.md`.
 
 ---
 
-# PART 1 — THE SPOKEN SCRIPT (451 words)
+# PART 1 — THE SPOKEN SCRIPT (452 words)
 
 ### Open · on the viewer
 
-Designing a whole organism end to end forces a decision at every scale — and shows you which ones
-the evidence can't yet support.
+Designing an organism end to end forces a decision at every scale — and shows which ones the
+evidence can't yet support.
 
 This is our flying fish, version three. The ray counts aren't artistic: fifteen pectoral, thirteen
 dorsal, ten anal, read out of an FAO species sheet that we reuse as a record, not a citation. The
@@ -30,8 +30,8 @@ don't claim it is. Raise potassium permeability in two cells and they drop about
 so do their neighbours. Block the gap junctions and those two drop four times further while the
 neighbours barely move. That's the coupling, shown by removing it.
 
-Down again, to metabolism. A genome-scale zebrafish model that ships with no medium, so we
-**assumed** one. Growth came out zero — the biomass pool needed a vitamin E catabolite we hadn't
+Down again, to metabolism. A genome-scale zebrafish model ships with no medium, so we **assumed**
+one. Growth came out zero — the biomass pool needed a vitamin E catabolite we hadn't
 supplied. We added it; it solved.
 
 Then we swept oxygen and growth barely moved. Not biology: under our assumed medium the model was
@@ -55,17 +55,18 @@ design is for.
 
 ### Close · the commons
 
-Every one of those decisions is a record in a shared graph, with the claim that licensed it
-attached — so the next project inherits the refusal, not just the result. All of it is public:
-repository, site, and nineteen tools where reads and calculations need no account.
+We are linking those decisions to the exact claims behind them. One is persisted today: the
+diffusion pilot's governing equation carries its claim and problem references into the run.
+**Most aren't curated yet** — that's the work, and it's why the graph is public: repository, site,
+and nineteen tools where reads and calculations need no account.
 
 One honest result. We preregistered a comparison of a single analyst against collaborating agents.
-**Every arm scored full marks**, so we measured **no advantage** — the task had no room to fail.
-A null about our benchmark, not evidence that agents coordinate better.
+**Every arm scored full marks**, so **this task did not distinguish them.** That's a null about
+our benchmark, not evidence that agents coordinate better.
 
 ---
 
-**Pacing.** 451 words: **3:13 at 140 wpm, 3:00 at 150**. If the slot is hard three minutes, either
+**Pacing.** 452 words: **3:14 at 140 wpm, 3:01 at 150**. If the slot is hard three minutes, either
 speak at 150 or **drop the oxygen paragraph** (−58 words → 2:47 at 140). Cut the whole metabolism
 beat for 2:20, and the scale beat too for 1:55. **Never cut the edge section** — it is the thesis.
 
@@ -194,8 +195,10 @@ Numbers, sources and exact limits. Reach for these in Q&A.
 - v3 completed: **27 requests valid**; every answer and every condition-by-repeat aggregate
   **16/16**; all three condition means identical. Conditions: one serial analyst, isolated
   specialists, specialists sharing pinned artifacts.
-- **A ceiling, not a tie.** The packet stated the source fit, the stiffness range and the
-  measurement method, so the task was answer-explicit.
+- **What this shows: the task did not distinguish the arms.** All three hit the rubric's maximum.
+  The packet stated the source fit, the stiffness range and the measurement method, so the task was
+  answer-explicit — that is the *likely* reason, and the scores alone do not prove the ceiling was
+  structural. **Do not say "no room to fail"**; say the task did not separate the conditions.
 - Communication treatment **did execute**: 9 pinned artifacts to the serial analyst, 9 peer
   artifacts to collaborators, none to the isolated arm.
 - **Do not pool v2 with v3.** v2: 27 HTTP 200, all truncated at `MAX_TOKENS`, scored zero, 49,626
@@ -228,11 +231,33 @@ Numbers, sources and exact limits. Reach for these in Q&A.
   fields by 1–2 ULP** while float32 STLs stayed identical. A declared geometry-only dispatch
   setting restored byte-identical output.
 
+## Receipt paths that landed late (main `8790824`)
+
+`deploy/receipts/science-integration-20261031.json`, recorded 2026-10-31T23:20:18Z against tested
+base `e8f53704`, carries **7 checks**. I read the receipt; I have **not** opened the individual
+artifacts under it, so treat the per-item science as recorded-by-that-check, not inspected by me:
+
+- Molecular returned data and controls — `pytest tests/test_molecular.py -q`, **16 passed**
+- Portable packet RD software and genomics — **41 passed**; genomics alone **37 passed**
+- Molecular manifest — **120 paths with matching byte counts and SHA256, root recomputed**
+- **Pilot independent reconstruction — 27 distinct calls, 27 JSON/text/hash matches, all 27 scored
+  16/16, 53,802 provider tokens, 18 prior-artifact references**
+- Ruff on changed source — passed after 15 style fixes, scientific artifacts unchanged
+- Incremental credential scan — 19 commits, 5.84 MB, **0 findings** (gitleaks 8.30.1)
+- **Retained failure, kept in the receipt:** the first molecular collection stopped for missing
+  OpenMM in the root venv; re-run on the isolated dependency path
+
+`artifacts/molecular/` holds the simulation receipts (CPU controls, CPU trajectory, CUDA v2 and v3
+parity, job receipts, production receipts, return verification). **The 357-perturbation-check, the
+OpenFold2 confidence figures and the OpenMM 101-state trajectory now have real paths under here,
+but I have not opened them.** Say "recorded at" and name the path; do not say "verified".
+
 ## If a judge interrupts
 
 - **Does it fly?** No. Print-ready meshes exist; nothing printed, nothing flown.
-- **Is the collective better?** Not established, and we ran the experiment. 16/16 everywhere — a
-  ceiling on an answer-explicit task.
+- **Is the collective better?** Not established, and we ran the experiment. 16/16 in every arm, so
+  the task did not distinguish them. Independently reconstructed: 27 distinct calls, 27 JSON/text/
+  hash matches, all 27 scored 16/16, 53,802 provider tokens.
 - **Novel architecture?** No. Prove2Me, ScienceClaw, Infinite, ASK; and Comlekoglu, Bastek and
   GenCFD for the diffusion roadmap.
 - **Yours vs reused?** Sources and software are published and credited; today's work is the

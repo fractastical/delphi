@@ -187,9 +187,10 @@ The architecture is not our novelty and we do not claim it. Prove2Me (arXiv 2608
 the harness-so-agents-build-on-each-other's-work thesis for formalization; ScienceClaw published
 the artifact DAG and dead-ends-as-artifacts; Infinite published the publication and coordination
 layer; ASK models versioned epistemic state. We claim the **workflow integration** and two
-domain-specific things: that no machine-checked library of mathematical biology exists, and that
-biological results are stated in limits and applied in regimes, which makes *scope conditions* the
-natural unit. If Prove2Me already measured the commons effect at matched budget, we cite them and
+domain-specific things: that biological results are stated in limits and applied in regimes, which
+makes *scope conditions* the natural unit, and that a whole-organism design is a way of finding
+which of those conditions nobody has pinned down. **We are not claiming that no machine-checked
+library of mathematical biology exists** — we never ran a search that could support it. If Prove2Me already measured the commons effect at matched budget, we cite them and
 report a replication. **We have not read their evaluation section carefully enough to say, and I
 am not going to guess at this podium.**
 
