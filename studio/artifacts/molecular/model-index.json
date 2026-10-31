@@ -2,7 +2,7 @@
   "schema": "frontier.simulation.model-index/1",
   "checkpoint_date": "2026-10-31",
   "scope": "Prioritized primary-source model inventory. Owner-dispatched and source-only entries are not completed simulations. No biological success probability is computed.",
-  "runtime_basis": "Planning estimates/caps except explicitly recorded CPU molecular run. GPU runtime is unknown until returned receipts.",
+  "runtime_basis": "Planning estimates/caps except explicitly returned CPU/CUDA molecular receipts. Owner-dispatched models are not verified here.",
   "models": [
     {
       "id": "collagen_mimetic_md",
@@ -23,25 +23,34 @@
         "chain_terminal_distance_nm"
       ],
       "missing_transfer": "No fibril assembly, crosslinks, tissue constitutive law, Young modulus or fin EI",
-      "compute": "ActualH100 CUDA mixed;3x100ps production after10ps preliminary thermalization;~18s/seed",
+      "compute": "Actual H100 CUDA mixed:3x100ps parents (~18s/seed) plus3x900ps conditional extensions (~137s/branch);3parent branches total,not6independent biological samples",
       "setup_cost": "done",
-      "next_job": "Assess900ps exact-state branch continuations for slow structural drift; not an equilibrium or modulus claim",
+      "next_job": "Two ofthree branches failed the frozen small-window-drift diagnostic; do not claim equilibrium. Further relaxation/sampling or force-field sensitivity needs a separately justified protocol; no automatic expansion.",
       "artifacts": {
-        "protocol": "artifacts/molecular/protocol.json",
-        "controls": "artifacts/molecular/cpu-controls/controls.json",
-        "trajectory": "artifacts/molecular/cuda-v2/production/trajectory-1731.npz",
-        "receipt": "artifacts/molecular/cuda-v2/production/receipt.json",
-        "video": "artifacts/molecular/cuda-render/trajectory.mp4",
-        "poster": "artifacts/molecular/cuda-render/poster.png",
-        "render_receipt": "artifacts/molecular/cuda-render/render.json",
+        "protocol": "artifacts/molecular/continuation-protocol.json",
+        "controls": "artifacts/molecular/cuda-v3/controls-1731/controls.json",
+        "trajectory": "artifacts/molecular/cuda-v3/production/trajectory-11731.npz",
+        "receipt": "artifacts/molecular/cuda-v3/production/receipt.json",
+        "video": "artifacts/molecular/continuation-render/trajectory.mp4",
+        "poster": "artifacts/molecular/continuation-render/poster.png",
+        "render_receipt": "artifacts/molecular/continuation-render/render.json",
         "interface": "artifacts/molecular/model-interface.json",
         "cross_scale_gate": "artifacts/molecular/cross-scale-gate.json",
         "failed_GPU_attempt": "artifacts/molecular/gpu-attempt-1/controls.json",
         "repaired_controls": "artifacts/molecular/gpu-attempt-1/repaired-controls/controls.json",
         "GPU_protocol_revision2": "artifacts/molecular/protocol-reference-oracle.json",
-        "seed_variation": "artifacts/molecular/cuda-analysis/ensemble.json",
-        "seed_plot": "artifacts/molecular/cuda-analysis/ensemble.png",
-        "assurance": "artifacts/molecular/design-assurance.json"
+        "seed_variation": "artifacts/molecular/continuation-analysis/summary.json",
+        "seed_plot": "artifacts/molecular/continuation-analysis/conditional-branches.png",
+        "assurance": "artifacts/molecular/design-assurance.json",
+        "continuation_protocol": "artifacts/molecular/continuation-protocol.json",
+        "continuation_receipt": "artifacts/molecular/cuda-v3/production/receipt.json",
+        "continuation_analysis": "artifacts/molecular/continuation-analysis/summary.json",
+        "continuation_plot": "artifacts/molecular/continuation-analysis/conditional-branches.png",
+        "parent_video": "artifacts/molecular/cuda-render/trajectory.mp4",
+        "parent_receipt": "artifacts/molecular/cuda-v2/production/receipt.json",
+        "parent_trajectory": "artifacts/molecular/cuda-v2/production/trajectory-1731.npz",
+        "parent_protocol": "artifacts/molecular/protocol.json",
+        "parent_seed_variation": "artifacts/molecular/cuda-analysis/ensemble.json"
       },
       "empirical_accuracy": "unknown",
       "biological_success_probability": null
@@ -58,7 +67,7 @@
       "owner": "claude06",
       "organism_link": "Published educational multiscale motif, not fish calibration",
       "source": "https://morpheus.gitlab.io/courses/multiscale-models/example/",
-      "source_locator": "Steps1–3:ODE→CPM→PDE→ODE",
+      "source_locator": "Steps1\u20133:ODE\u2192CPM\u2192PDE\u2192ODE",
       "inputs": "Source XML, cell-cycle ODE,CPM geometry,cytokine diffusion",
       "coupling_ports": [
         "CDK1",
@@ -69,7 +78,7 @@
       "missing_transfer": "Cell-specific model units and parameters do not define fish tissue",
       "compute": "CPU2threads/600s first slice",
       "setup_cost": "moderate",
-      "next_job": "Paired intact versus disabled cytokine→cell-cycle feedback; retain same seeds"
+      "next_job": "Paired intact versus disabled cytokine\u2192cell-cycle feedback; retain same seeds"
     },
     {
       "id": "betse_tissue_ions",
@@ -140,7 +149,7 @@
       "missing_transfer": "3D resolution/Re domain,fin material law,and fluid-structure feedback",
       "compute": "CPU controls then1GPU",
       "setup_cost": "moderate",
-      "next_job": "No-body/analytic/force-sign/grid/time controls before candidate mesh; pressure integration→beam"
+      "next_job": "No-body/analytic/force-sign/grid/time controls before candidate mesh; pressure integration\u2192beam"
     },
     {
       "id": "fin_beam_glide",
@@ -163,7 +172,7 @@
       "missing_transfer": "No calibrated native fish stiffness or3D aerodynamic coefficients",
       "compute": "CPU",
       "setup_cost": "ready reuse",
-      "next_job": "Actual pressure-field→conservative distributed-load bridge with multiple EI candidates"
+      "next_job": "Actual pressure-field\u2192conservative distributed-load bridge with multiple EI candidates"
     },
     {
       "id": "motor_clutch_sls",
@@ -175,9 +184,9 @@
       "engine": "Existing stochastic motor-clutch/SLS implementation",
       "status": "existing_artifacts_inspected_not_rerun",
       "owner": "mechanobio_sim",
-      "organism_link": "Cell–ECM feedback motif; not fish calibrated",
+      "organism_link": "Cell\u2013ECM feedback motif; not fish calibrated",
       "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5866566/",
-      "source_locator": "Gong2018 Model Description Eqs1–6",
+      "source_locator": "Gong2018 Model Description Eqs1\u20136",
       "inputs": "Clutch/motor kinetics,substrate stiffness and relaxation;source versus assumed parameters retained",
       "coupling_ports": [
         "traction_pN",
@@ -202,7 +211,7 @@
       "organism_link": "Zebrafish scale regeneration source; transfer to fins unknown",
       "source": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8516634/",
       "source_locator": "Numerical solutions,governing equations,Table1",
-      "inputs": "Erk/activator/inhibitor parameters,source region and µm/h grid",
+      "inputs": "Erk/activator/inhibitor parameters,source region and \u00b5m/h grid",
       "coupling_ports": [
         "active_Erk_fraction",
         "wave_speed_um_h",
@@ -374,7 +383,7 @@
       "missing_transfer": "Measured native tissue kinetics,permeability,elasticity and growth law",
       "compute": "CPU first",
       "setup_cost": "high",
-      "next_job": "Analytic homogeneous-swelling/reaction test before cell→growth scenario"
+      "next_job": "Analytic homogeneous-swelling/reaction test before cell\u2192growth scenario"
     },
     {
       "id": "fenics_pde",
@@ -439,7 +448,7 @@
         "lineages",
         "population_sizes"
       ],
-      "missing_transfer": "Genotype→geometry→realized fitness and ecological context",
+      "missing_transfer": "Genotype\u2192geometry\u2192realized fitness and ecological context",
       "compute": "CPU",
       "setup_cost": "low engine cost,high science cost",
       "next_job": "Neutral analytic control only after meaningful demography inputs; no inferred evolutionary reachability"
