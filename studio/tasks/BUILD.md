@@ -7,26 +7,26 @@ metered model was selected. Provider-billed incremental spend is not yet known.
 
 | Priority | Deliverable | Owner | Status / acceptance |
 | --- | --- | --- | --- |
-| P0 | Product goal, engineering contract, integrated site | codex-03 | Working; SPEC-005 and browser checks |
-| P0 | Constraint solver + meaningful Lean boundary | dx-guilds | Delivered; root requested certificate and parameter-correspondence repairs before integration |
-| P0 | Flying-fish sourced constraint checker | claude-15's flying-fish-research | Handoff delivered; source-envelope scope needs integration review |
-| P0 | Scoped glide simulation + uncertainty | delphi-rethink-nca | Assigned; frozen protocol then convergence and baseline |
-| P0 | MCP contribution tools | dx-collab | Integrated; root ran 8 interface tests on integrated code, exit 0 |
-| P0 | Typed attention and action adapter | dx-market-r1 | Managed authentication recovered; port in progress |
-| P0 | Persistent node + site data/export | dx-collab | Implementing separate PG16 instance and gated web runtime |
-| P0 | Multiscale website | claude-02 | Implementing portable data build and functional views |
-| P1 | Data/tool indexes and multiscale source cards | dx-fable-lead | Darwin primary texts, precursor hypotheses and source cards in progress |
-| P1 | Indexed search and explicit curation | dx-submit | Delivered; ranking and truncation review repairs requested |
-| P1 | OpenResearch and evidence/nanopub adapter | dx-corpus | Assigned; inspectable adapter and draft export |
-| P1 | Nebius/Google live inventory and bounded execution | dx-gpuops-r1 | Managed authentication recovered; bounded Neumann PDE replay authorized |
-| P1 | BioModels model replay | claude-11 | Retrieving public SBML and checking reproducible solver options |
-| P1 | Matched-assay biomodel evaluation | claude-12 | Public ProteinGym archive retrieved; frozen protocol before inference |
-| P1 | Printable candidate geometry | claude-05 | Three parametric forms; final dimensions must come from engineering results |
-| P1 | Explicit factor-graph beliefs | director / nca | Ownership consolidation requested; exact controls required |
+| P0 | Product goal, engineering contract, integrated site | codex-03 | First gated release live; deployed access/browser checks passed |
+| P0 | Constraint solver + meaningful Lean boundary | dx-guilds | Integrated; six real Lean positive and mutant checks passed; arithmetic scope only |
+| P0 | Flying-fish sourced constraint checker | claude-15's flying-fish-research | Integrated; sampled envelopes and transfer assumptions displayed |
+| P0 | Scoped glide simulation + uncertainty | delphi-rethink-nca | Corrected common-launch comparison and videos integrated; no robust winner across tested scenarios |
+| P0 | MCP contribution tools | dx-collab / dx-submit | Interface checks passed; persistent diagnostic round trip in progress |
+| P0 | Typed attention and action adapter | dx-market-r1 | Live HTTP view; unknown utilities retained; allocation advantage not demonstrated |
+| P0 | Persistent node + site data/export | dx-collab | Separate PG16 and gated runtime active; System measurements available |
+| P0 | Multiscale website | claude-02 | First version live; video, print downloads and live whiteboard integration in progress |
+| P1 | Data/tool indexes and multiscale source cards | dx-fable-lead | Primary-source cards integrated; new sourced drafts and design-primitive index in progress |
+| P1 | Indexed search and explicit curation | dx-submit | Live lexical index; 250 curated questions imported, still proposed |
+| P1 | OpenResearch and evidence/nanopub adapter | dx-corpus | Real replay chain imported; unsigned nanopub drafts available; BioModels render lineage pending |
+| P1 | Nebius/Google live inventory and bounded execution | dx-gpuops-r1 | CPU and H100 receipts integrated; held-out validation in progress, fixed inconclusive verdict |
+| P1 | BioModels model replay | claude-11 | Pinned SBML replay and controls passed; video integrated; no fish-tissue correspondence |
+| P1 | Matched-assay biomodel evaluation | claude-12 | 256-variant ESM-2 evaluation complete, hypothesis undetermined; expanded follow-up and Evo2 queued |
+| P1 | Printable candidate geometry | claude-05 | Three forms with stands integrated; 27 mesh/geometry checks passed; printer slicing unattempted |
+| P1 | Explicit factor-graph beliefs | director | Live exact-rational solver; declared priors and utilities, not calibrated |
 | P1 | Typed action-to-artifact provenance | codex-03 | Committed; 14 selected store/provenance checks passed |
 | P1 | Whiteboard directions and artifact index | codex-03 | Implemented; 14 selected artifact/register checks passed |
-| P1 | Reuse and allocation measurements | dx-market + codex-03 | Pending; matched tasks and receipt-derived counts |
-| P1 | Integrated QA, deployment and pitch handoff | codex-03 + existing director | Pending; exact source SHA and checks |
+| P1 | Reuse and allocation measurements | dx-market + codex-03 | One source run with two claim references documented; no reuse-benefit or scaling-law measurement |
+| P1 | Integrated QA, deployment and pitch handoff | codex-03 + existing director | First live release recorded; next media release and prior-art pitch in progress |
 
 ## Integration update — October 31, 12:25 PDT
 
@@ -57,7 +57,10 @@ the System endpoint separately measures database and service state.
   checks initially skipped for a missing dependency; their separate run is pending.
 - [ ] Finish publishing actual videos, artifact downloads and model-source cards
   (claude-02); show live questions alongside the authored mission diagram.
-- [ ] Complete exact-source Lean checks and mesh verification (codex-03).
+- [x] Complete exact-source Lean checks and mesh verification (codex-03): six
+  Lean tests ran and passed after restoring the toolchain PATH; all 27 geometry
+  checks passed after installing the recorded dependencies. Earlier skips remain
+  recorded as skips, not passes.
 - [ ] Import the BioModels replay/render lineage and newly sourced flying-fish
   claims/questions after validating their final mappings (dx-corpus, claude-11,
   dx-fable-lead). Rendering has its own Action, separate from numerical replay.
