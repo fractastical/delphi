@@ -99,6 +99,21 @@ Same gitleaks 8.30.1 binary and flags as section 7 (no config, redacted, archive
 
 Not covered, beyond section 5: the actual merge commit if it differs from the simulated tree, refs pushed after 15:53 PDT, and nested archives or encodings deeper than three levels. Root's own check for those is the last step before the flip.
 
+## 7b. Final scan at root tip `35db5773b8fe` (15:58-16:00 PDT, 22:58-23:00 UTC)
+
+Same binary and flags as section 7. Receipt directory `/data/artifacts/delphi-evolve-rethink/security/final3-20261031/`. A first run that morning pinned `7e3e228` because the root branch advanced during my fetch; it was discarded and redone at the tip below.
+
+| Item | Value |
+|---|---|
+| Frozen refs | 72 `refs/remotes/origin/*` entries (hashes in `scanref-manifest.txt`) |
+| Commits | **604** reachable = **143** merges + **461** non-merge, from one rev-list; gitleaks reported "461 commits scanned". Root branch ancestry 519. |
+| Tree | `git archive` of `origin/codex/frontier-demo-20261031` at `35db5773b8fe` (full `35db5773b8fe` prefix recorded in `tip.txt`), 2,162 files, includes `7e3e228` and `work/fish3d-v3` |
+| Findings | history **23**, tree **19**; all `Secret` fields `REDACTED`, all `Match` fields contain `REDACTED` |
+| Delta vs section 7a | History: the 23 fingerprints are identical (none new, none dropped). Tree: the same 19 rule/file/line entries (15 sampling keys, 3 `oneAPI` UUID lines, 1 test marker). Nothing new. |
+| Receipt hashes (sha256 prefix) | `history.redacted.json` `fcc98d7251854102`, `tree-tip.redacted.json` `3b8848b16957ec1e`, `scanref-manifest.txt` `d7e1b34f76dc13bc` |
+
+Not covered: refs or commits after 16:00 PDT, nested archives or encodings deeper than three levels, and the usual limits in section 5. Future additions need their own scan.
+
 ## 8. Before any visibility change
 
 Root's final rescan of the latest refs, and the nested-archive scan result, are required. This document changes no repository visibility.
