@@ -106,3 +106,17 @@ def test_preflight_fails_on_a_missing_file(tmp_path):
     r = subprocess.run([sys.executable, "-I", "engineering/cfd3d/gpu_entry.py"], cwd=job,
                        env=dict(os.environ, PREFLIGHT="1"), capture_output=True, text=True, timeout=60)
     assert r.returncode != 0
+
+
+def test_avx512_repair_is_geometry_only_and_evidenced():
+    pk = json.loads((ROOT / "engineering/cfd3d/packet.json").read_text())
+    env = pk["geometry"]["numpy_env"]
+    assert "X86_V4" in env["NPY_DISABLE_CPU_FEATURES"]
+    src = (ROOT / "engineering/cfd3d/gpu_entry.py").read_text()
+    assert src.count('PK["geometry"]["numpy_env"]') == 2          # the build call and its status record only
+    ev = ROOT / env["evidence"]
+    pin = (ART / "geometry/candidate.json").read_bytes()
+    assert (ev / "candidate.no_avx512.json").read_bytes() == pin          # disabled dispatch reproduces the pin
+    assert (ev / "candidate.default.json").read_bytes() != pin            # default AVX-512 dispatch does not
+    d = json.loads((ev / "diff-pin-vs-cloud-default.json").read_text())
+    assert d["n_differences"] == 3 and d["max_ulps"] <= 2 and not d["non_numeric"]
