@@ -27,7 +27,7 @@ def register_surfaces(server, store: Store, register, *, read_annotations, publi
     embedder = GeminiEmbedder()
     discovery = Discovery(store, embedder)
     artifacts = ArtifactIndex(store)
-    media = LocalMedia(Path(__file__).resolve().parents[1] / "site")
+    media = LocalMedia(Path(__file__).resolve().parents[1] / "site", scan_ttl=10)
 
     def frontier_discover(query: Annotated[str, Field(min_length=1, max_length=200)],
                           kind: str | None = None,

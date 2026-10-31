@@ -74,7 +74,7 @@ Logs: `METHOD PATH STATUS` only. Never the query string, a header, a cookie or a
 
 ## Credentials and the review boundary
 
-* Browser gate: `FRONTIER_ACCESS_TOKEN`, else `MORPHOSWARM_STUDIO_TOKEN`, both from the service's `EnvironmentFile`s (`-%h/.config/morphoswarm/studio.env`, `-%h/.config/delphi-frontier/web.env`). The adapter refuses to start without a token of at least 16 characters and never prints one. The studio file holds the studio's other settings too; for a smaller blast radius create `web.env` and delete the studio line from the unit.
+* Browser gate: `FRONTIER_ACCESS_TOKEN`, else `MORPHOSWARM_STUDIO_TOKEN`, both from the service's `EnvironmentFile`s (`-%h/.config/morphoswarm/studio.env`, `-%h/.config/delphi-frontier/web.env`). The adapter refuses to start without a token of at least 16 characters and never prints one. The studio file holds the studio's other settings too, so the checked-in public-read unit no longer loads it (public-read mode reads no access token); a gated rollback needs `web.env` with `FRONTIER_ACCESS_TOKEN` instead.
 * Operator credentials: `python -m frontier.admin provision --namespace N --actor A --operator O --roles contributor,coordinator --credential-file PATH`. The credential is generated, written once to `PATH` (mode 600, `O_EXCL`, inside a private directory that is not in a git work tree) and never printed or passed as an argument. Re-running is a no-op if the file already matches; it never overwrites.
 * Independent review stays independent: one principal cannot hold both reviewer and contributor/coordinator, and an operator id cannot span the two sides. Nothing here seeds records or accepts anything; seeded records stay `proposed` until a separate reviewer credential acts.
 
