@@ -461,6 +461,288 @@ LATER = {"betse": betse_chain}
 ALL_CHAINS = {**CHAINS, **LATER}
 
 
+# ------------------------------------------------------------------------------------------------------------------------ OpenFold2 Kcnj13
+OF = "artifacts/bio-services/kcnj13_openfold2"
+OFS = "artifacts/bio-services/kcnj13_source"
+
+
+def openfold_chain(repo: str, commit: str, *, namespace="node-a", issuer="importer", created_at=None) -> AssetChain:
+    """Hosted OpenFold2, exact unmodified Kcnj13 BAF03613.1 sequence. A provider operation with a real receipt, and a LOW-confidence prediction.
+
+    Not copied into any record: the provider's storage bucket, object keys and prefix (`customer_storage`, `provider_reported_*`), the request
+    payload, and source URLs (accessions are cited instead). Structure is not function: no conductance, gating or phenotype follows.
+    """
+    created_at = created_at or em._commit_utc(repo, commit)
+    c = AssetChain(repo, commit, namespace, issuer, created_at, "openfold2")
+    op = c.jblob(f"{OF}/operation_receipt.json")
+    c.check("op.status", op.get("final_status") == "SUCCEEDED" and op.get("model_id") == "openfold2" and op["states"][-1]["status"] == "SUCCEEDED", f"final {op.get('final_status')!r} model {op.get('model_id')!r}")
+    pdb = c.same_hash("rank1.pdb", f"{OF}/rank1.pdb", op["rank1_structure_sha256"])
+    met_b = c.same_hash("metrics", f"{OF}/metrics.json", op["metrics_sha256"])
+    res_b = c.same_hash("result", f"{OF}/result.json", op["result_sha256"])
+    met = json.loads(met_b)
+    src = c.jblob(f"{OFS}/source_manifest.json")
+    fa = c.blob(f"{OFS}/ncbi_baf03613_fasta.txt")
+    seq = "".join(ln.strip() for ln in fa.decode().splitlines() if not ln.startswith(">"))
+    c.check("sequence.hash", sha_bytes(seq.encode()) == op["sequence_sha256"] == src["selected_sequence"]["sequence_sha256"] == met["input_sequence_sha256"] and len(seq) == op["sequence_length_aa"] == 362,
+            f"{len(seq)} aa, recomputed sha256 {sha_bytes(seq.encode())[:16]}..., receipt {op['sequence_sha256'][:16]}...")
+    c.check("sequence.unmodified", src["inference_eligibility"]["only_unmodified_source_sequence"] is True and src["inference_eligibility"]["mutation_or_design"] is False, "source manifest: unmodified, no mutation or design")
+    c.check("coordinates", op["coordinate_check"]["sequence_exact_match"] is True and op["coordinate_check"]["ca_residue_count"] == 362, f"coordinate_check {op['coordinate_check']['ca_residue_count']} CA, exact {op['coordinate_check']['sequence_exact_match']}")
+    pm = met["provider_metrics"]
+    pl = pm["plddt"]
+    c.check("metrics.consistent", abs(pl["mean"] - op["confidence"]) < 1e-9 and abs(pm["ptm_score"] - op["ptm_score"]) < 1e-12, f"pLDDT mean {pl['mean']:.4f} vs receipt confidence {op['confidence']:.4f}")
+    opb = c.blob(f"{OF}/operation_receipt.json")
+    srcb = c.blob(f"{OFS}/source_manifest.json")
+    disc = src["discrepancy"]
+    c.check("discrepancy.recorded", disc["exact_match_to_selected"] is False and disc["length_aa"] == 358, f"RefSeq variant {disc['ncbi_refseq_accession']} {disc['length_aa']} aa differs from the selected 362 aa")
+    lim = [em.IMPORT_NOTE, "A PREDICTED structure, not an observed one: " + met["epistemic_status"] + ".", *met["limits"],
+           "Structure does not establish conductance, gating, a pigment pattern or any phenotype. Not used to set any BETSE parameter.", NOT_CALIBRATED]
+    asm = [f"Input: the exact unmodified source sequence {src['selected_sequence']['accession']} ({len(seq)} aa, sha256 {op['sequence_sha256'][:16]}...), matched to UniProt {src['crosscheck']['uniprot_accession']}; selected for the exact match, not labelled canonical.",
+           f"Tool {op['tool']} on {op['provider']}; model parameter set {met['model_parameter_set']}; relaxed {met['relaxed']}.",
+           f"Provider-reported runtime image {op['runtime_reported'].split('@')[-1][:19]}... with origin {op['reported_runtime_origin']}."]
+    claim = _claim(c, "run-openfold2-claim-kcnj13-low-confidence", "OpenFold2 single-sequence monomer of zebrafish Kcnj13 (BAF03613.1) has low model-internal confidence",
+                   (f"The hosted OpenFold2 monomer prediction for the 362-aa Kcnj13 sequence has mean pLDDT {pl['mean']:.1f} (min {pl['min']:.1f}, max {pl['max']:.1f}); {pl['fraction_below_50']*100:.1f}% of residues are below 50 and {pl['fraction_at_least_70']*100:.1f}% are at least 70; "
+                    f"pTM is {pm['ptm_score']:.3f}; mean predicted aligned error is {pm['predicted_aligned_error']['mean_A']:.1f} A (max {pm['predicted_aligned_error']['max_A']:.1f} A)."),
+                   "A model-internal confidence summary of a predicted structure with a dummy single-sequence MSA; these are not calibrated probabilities of correctness. " + "; ".join(met["limits"][:2]), asm, lim,
+                   f"{OF}/metrics.json", met_b, "Provider metrics: pLDDT and PAE summaries, pTM, coordinate check.")
+    act = _action(c, SRC, "run-openfold2-action-infer", claim,
+                  f"Provider-executed operation (hosted OpenFold2, {op['operation_id']}): submitted by the producer, completion reported by the provider receipt (states QUEUED, RUNNING, SUCCEEDED); the provider returned NO hardware or GPU allocation and is not counted as our H100 allocation",
+                  [ACCEPT_REPLAY.replace("a clean re-execution from the pinned code", "a re-run of the same sequence on the same provider operation, or any independent OpenFold2 run,"), "An independent reviewer treats the confidence metrics as model-internal and not as evidence of function."],
+                  ["hosted OpenFold2 via Nebius Scientific AI MCP"],
+                  dict(input=f"sequence sha256 {op['sequence_sha256']} (362 aa, unmodified)", code=f"git:{em.REPO_LABEL}@{commit}; result and metrics files hashed in operation_receipt.json", model=f"openfold2 {op['tool']} (single-sequence dummy MSA, monomer, unrelaxed)",
+                       environment=f"provider runtime image {op['runtime_reported'].split('@')[-1][:19]}...; hardware NOT RETURNED", parameters=f"model_parameter_set {met['model_parameter_set']}; relaxed {met['relaxed']}", scope="predicted monomer structure of one sequence"), [])
+    _evidence(c, SRC, "run-openfold2-evidence-predicted-structure", claim, kind="predicted", relation="unspecified", produced_by=act, source=em._source(c, f"{OF}/operation_receipt.json", opb, "Provider operation receipt."),
+              method=f"Provider-hosted OpenFold2 inference; operation {op['operation_id']} reached {op['final_status']}; pLDDT, PAE and pTM are the provider's own summaries; the C-alpha order was parsed from the returned PDB and matches the input sequence ({op['coordinate_check']['ca_residue_count']} residues). No structural alignment was done.",
+              context="Applicability: this one sequence, single-sequence mode. " + em.IMPORT_NOTE, assumptions=asm,
+              provenance=_prov(c, operation_id=op["operation_id"], states=[{"status": x["status"], "elapsed_s": x["elapsed_s"]} for x in op["states"]], provider_reported_inference_seconds=op["provider_reported_inference_seconds"],
+                               poll_elapsed_s=op["poll_elapsed_s"], submitted_utc=op["submitted_utc"], completed_utc=op["completed_utc"], tool=op["tool"], hashes_recomputed=["rank1.pdb", "metrics.json", "result.json", "sequence"]),
+              limitations=lim, uncertainty="No uncertainty beyond the model's own pLDDT and PAE, which are not calibrated.",
+              artifacts=[c.artifact("geometry", f"{OF}/rank1.pdb", pdb, "predicted structure, rank 1 (PDB text)"), c.artifact("output", f"{OF}/metrics.json", met_b, "pLDDT, PAE and pTM summaries"),
+                         c.artifact("log", f"{OF}/operation_receipt.json", opb, "provider operation receipt (bucket and keys not carried into this record)"), c.artifact("output", f"{OF}/result.json", res_b, "provider result envelope"),
+                         c.artifact("input", f"{OFS}/source_manifest.json", srcb, "source sequence packet with the RefSeq discrepancy"), c.artifact("input", f"{OFS}/ncbi_baf03613_fasta.txt", fa, "selected source sequence")])
+    sc = _claim(c, "run-openfold2-claim-kcnj13-sequence-discrepancy", "Kcnj13 source records disagree: the current RefSeq variant (358 aa) differs from the sequence that was predicted (BAF03613.1 = UniProt Q0KIZ7, 362 aa)",
+                f"The selected sequence BAF03613.1 ({len(seq)} aa) matches UniProt {src['crosscheck']['uniprot_accession']} exactly; RefSeq {disc['ncbi_refseq_accession']} ({disc['transcript_variant']}) is {disc['length_aa']} aa and differs at the N-terminus. {disc['description']}",
+                "A source disagreement kept as found: the two records are not claimed interchangeable and neither is claimed canonical. The prediction above used the 362-aa sequence only.", asm,
+                [em.IMPORT_NOTE, "Only the N-terminal difference is described by the source manifest; this record did not align the sequences."], f"{OFS}/source_manifest.json", srcb, "Source manifest: selected sequence, crosscheck and discrepancy.")
+    _evidence(c, SRC, "run-openfold2-evidence-source-discrepancy", sc, kind="source_assessment", relation="context_only", produced_by=None, source=em._source(c, f"{OFS}/source_manifest.json", srcb, "Source manifest."),
+              method="Comparison of the NCBI protein record, the UniProt entry and the current RefSeq variant as recorded in the source packet. No simulator ran.", context="A source assessment; no Action by design. " + em.IMPORT_NOTE, assumptions=asm,
+              provenance=_prov(c, selected_sha256=op["sequence_sha256"], refseq_sha256=disc["sequence_sha256"], refseq_accession=disc["ncbi_refseq_accession"], uniprot=src["crosscheck"]["uniprot_accession"]),
+              limitations=[em.IMPORT_NOTE, "Single reader; the sequences were not re-fetched or aligned by this adapter."], uncertainty="None quantified.",
+              artifacts=[c.artifact("input", f"{OFS}/source_manifest.json", srcb, "source sequence packet"), c.artifact("input", f"{OFS}/ncbi_baf03613_fasta.txt", fa, "selected source sequence")])
+    return c
+
+
+LATER["openfold2"] = openfold_chain
+ALL_CHAINS = {**CHAINS, **LATER}
+
+
+# ----------------------------------------------------------------------------------------------------------------------------- Morpheus
+MC = "artifacts/multicell"
+MI = "results/infra/morpheus"
+MI_RUN = f"{MI}/results/infra16-morpheus-full-horizon/parts/00-morpheus-three-arms/baseline"
+MC_ARMS = ("baseline", "nofeedback", "seed2")
+
+
+def morpheus_chain(repo: str, commit: str, *, namespace="node-a", issuer="importer", created_at=None) -> AssetChain:
+    """Morpheus v2.3.9 generic multiscale example: two different runs, kept apart.
+
+    (1) Three local arms stopped by a 600 s cap (SIGTERM, exit -15) at t=0.456 of a configured stop 0.6: NEVER COMPLETED. The record says so.
+    (2) A provider job whose state is FAILED (an output wrapper raised IndexError on blank logger lines) but whose BASELINE arm logged all of
+        t=0..2.0 with simulator exit 0 and was recovered. Only the baseline timecourse exists; nofeedback and seed2 report exit 0 in stdout but have
+        no recovered trajectories, so completion evidence for them is insufficient. These two runs use different XML (stop 0.6 vs 2.0): they are not
+        replicates. Generic example; not calibrated to any fish or tissue.
+    """
+    created_at = created_at or em._commit_utc(repo, commit)
+    c = AssetChain(repo, commit, namespace, issuer, created_at, "morpheus")
+    sm = c.jblob(f"{MC}/summary.json")
+    arms = sm["arms"]
+    c.check("local.arms", tuple(sorted(arms)) == tuple(sorted(MC_ARMS)), f"arms {sorted(arms)}")
+    c.check("local.not_completed", all(a["manifest"]["exit"] == -15 for a in arms.values()) and all(a["reached_t"] < a["manifest"]["stop"] for a in arms.values()),
+            "every local arm has exit -15 and reached_t below its configured stop (the run did NOT complete)")
+    mp4_hash = {ln.split()[1].rsplit("/", 1)[-1]: ln.split()[0] for ln in c.blob(f"{MC}/mp4.sha256").decode().splitlines() if ln.strip()}
+    mp4 = {a: c.same_hash(f"local.mp4.{a}", f"{MC}/{a}.mp4", mp4_hash[f"{a}.mp4"]) for a in MC_ARMS}
+    xml = {a: c.blob(f"{MC}/{a}/model.xml") for a in MC_ARMS}
+    logger = {a: c.blob(f"{MC}/{a}/logger.csv") for a in MC_ARMS}
+    smb = c.blob(f"{MC}/summary.json")
+    pins = {a["manifest"]["source_sha256"] for a in arms.values()}, {a["manifest"]["binary_sha256"] for a in arms.values()}
+    c.check("local.pins", all(len(x) == 1 for x in pins), "one upstream XML sha256 and one binary sha256 across arms (stated by the producer; the upstream bytes are not in this repo and are not re-verified)")
+    code = {n: c.blob(f"engineering/multicell/{n}") for n in ("run_morpheus.py", "analyze.py")}
+    b0, nf, s2 = arms["baseline"], arms["nofeedback"], arms["seed2"]
+    lim = [em.IMPORT_NOTE, "GENERIC Morpheus example (Ferrell-Tsai-Yang cell-cycle ODE + CPM + cytokine PDE); not calibrated to any fish, cell type or tissue; nothing here is fin growth. " + NOT_CALIBRATED,
+           "Upstream XML was edited by recorded exact-once replacements (including a hand-made version 1 to 2 fix); the model is not byte-for-byte the shipped one.",
+           "Units are the example's own; no dimensional mapping to seconds or micrometres.", "One seed per arm; the seed repeat is a noise check on the CPM, not an independent replicate; no time-step or lattice refinement was run."]
+    asm = ["Source: Morpheus v2.3.9 `Examples/Multiscale/MultiscaleModel.xml`; upstream XML sha256 %s and static binary sha256 %s are stated by the producer (BSD 3-clause)." % (b0["manifest"]["source_sha256"][:16] + "...", b0["manifest"]["binary_sha256"][:16] + "..."),
+           "Edits: " + ", ".join(b0["manifest"]["edits"]) + "; feedback-off additionally multiplies g_l by 0 inside the CDK1 equation only."]
+    claim = _claim(c, "run-morpheus-claim-local-capped-arms", "Morpheus generic multiscale example: three local arms were stopped by the time cap at t=0.456 and never completed",
+                   (f"All three local arms were stopped by the 600 s cap (SIGTERM, exit -15) before their configured stop of {b0['manifest']['stop']}; the common reached horizon is t={sm['common_horizon_t']}. At that horizon: baseline (feedback on, seed {b0['manifest']['seed']}) has {b0['cells_at_common_horizon']} cells "
+                    f"with division events at {b0['division_event_times_to_horizon']}; feedback-off has {nf['cells_at_common_horizon']} cells with division events at {nf['division_event_times_to_horizon']}; the seed repeat has {s2['cells_at_common_horizon']} cells with division events at {s2['division_event_times_to_horizon']}. "
+                    f"No arm reached its configured stop, and the upstream example's own stop is 2.0."),
+                   "A partial run reported as partial: within this short window and one seed each, the second division came earlier with the cytokine term in the CDK1 equation than without it. Whether feedback-off divides later or never was not run to the end.", asm,
+                   lim + ["NOT COMPLETED: every arm ended by SIGTERM at the cap."], f"{MC}/summary.json", smb, "Summary: per-arm horizon, division events and each arm's manifest.")
+    act = _action(c, SRC, "run-morpheus-action-local-arms", claim,
+                  "Imported record of a producer-reported run (executed locally by the producer; each arm ended with exit -15 at the 600 s cap; NOT COMPLETED; threads env was not applied to these arms)",
+                  [ACCEPT_REPLAY.replace("the digests the receipt lists", "the division-event times to the common horizon"), "A full-horizon run (stop 0.6 or 2.0) completes with exit 0 before any conclusion about feedback-off is drawn."], ["Morpheus v2.3.9 static binary; gnuplot for frames"],
+                  dict(input=f"upstream XML sha256 {b0['manifest']['source_sha256']}; per-arm model.xml {', '.join(a + ':' + sha_bytes(xml[a])[:10] for a in MC_ARMS)}", code=f"git:{em.REPO_LABEL}@{commit}; run_morpheus.py {sha_bytes(code['run_morpheus.py'])[:12]}",
+                       model="Morpheus v2.3.9 cell-cycle ODE + CPM + cytokine PDE (no language model)", environment=f"binary sha256 {b0['manifest']['binary_sha256'][:16]}...; 1 CPU quota, TasksMax 128, MemoryMax 4G, RuntimeMaxSec 600; OMP_NUM_THREADS not applied",
+                       parameters="; ".join(f"{a}: seed {arms[a]['manifest']['seed']}, feedback {arms[a]['manifest']['feedback']}, stop {arms[a]['manifest']['stop']}" for a in MC_ARMS), scope="generic multiscale example; partial window only"), [])
+    ev = _evidence(c, SRC, "run-morpheus-evidence-local-arms", claim, kind="simulated", relation="unspecified", produced_by=act, source=em._source(c, f"{MC}/summary.json", smb, "Summary."),
+                   method="Morpheus v2.3.9 headless runs of three arms; division events read from the logger; analysis by analyze.py. All three arms ended by SIGTERM at the cap.", context="Applicability: this window of this generic example. " + em.IMPORT_NOTE, assumptions=asm,
+                   provenance=_prov(c, arms={a: {"exit": arms[a]["manifest"]["exit"], "reached_t": arms[a]["reached_t"], "seed": arms[a]["manifest"]["seed"]} for a in MC_ARMS}, common_horizon_t=sm["common_horizon_t"], completed=False),
+                   limitations=lim + ["NOT COMPLETED: every arm ended by SIGTERM at the cap."], uncertainty="One seed per arm; no refinement; the window ends mid-run.",
+                   artifacts=[c.artifact("output", f"{MC}/{a}/logger.csv", logger[a], f"arm {a}: logged CDK1, APC, g_l, volume per cell (partial window)") for a in MC_ARMS]
+                   + [c.artifact("input", f"{MC}/{a}/model.xml", xml[a], f"arm {a}: edited Morpheus XML") for a in MC_ARMS] + [c.artifact("log", f"{MC}/summary.json", smb, "summary with per-arm manifests"),
+                      c.artifact("code", "engineering/multicell/run_morpheus.py", code["run_morpheus.py"]), c.artifact("code", "engineering/multicell/analyze.py", code["analyze.py"])])
+    ract = _action(c, SRC, "run-morpheus-action-local-render", claim, "Imported record of a producer-reported render (not re-run by Frontier): Morpheus Gnuplotter frames of the partial runs, concatenated at 4 fps; the last truncated frame is dropped",
+                   ["Re-rendering the logged frames reproduces the videos; mp4 bytes can differ across ffmpeg builds.", "Pictures are views of partial computed states, not evidence."], ["Morpheus Gnuplotter; gnuplot; ffmpeg"],
+                   dict(input=f"simulation evidence version {ev['version']}", code=f"git:{em.REPO_LABEL}@{commit}; mp4.sha256 pins three videos", model="none: rendering", environment="gnuplot 6.0.5 (conda-forge); a set-colorbox warning at each frame, frames render",
+                        parameters="22 frames per arm at 4 fps", scope="visualisation of partial runs"), [ev])
+    _evidence(c, SRC, "run-morpheus-evidence-local-render", claim, kind="simulated", relation="context_only", produced_by=ract, source=em._source(c, f"{MC}/mp4.sha256", c.blob(f"{MC}/mp4.sha256"), "Video hashes."),
+              method="Frames drawn by Morpheus' Gnuplotter from the partial runs and encoded with ffmpeg; hashes from mp4.sha256 were recomputed.", context=RENDER_NOTE + " The videos show partial runs. " + em.IMPORT_NOTE, assumptions=asm,
+              provenance=_prov(c, mp4_sha256={a: sha_bytes(mp4[a]) for a in MC_ARMS}, completed=False), limitations=[em.IMPORT_NOTE, RENDER_NOTE, "The videos show runs that never completed.", NOT_CALIBRATED],
+              artifacts=[c.artifact("output", f"{MC}/{a}.mp4", mp4[a], f"arm {a}: video of the partial run") for a in MC_ARMS] + [c.artifact("log", f"{MC}/mp4.sha256", c.blob(f"{MC}/mp4.sha256"), "video hashes")])
+    # (2) the provider full-horizon attempt
+    rec = c.jblob("results/infra/morpheus-failure-recovery.json")
+    mf = c.jblob(f"{MI}/manifest-infra16.json")
+    job = mf["owned"][0]
+    c.check("infra.failed", rec["provider_state"] == "FAILED" and job["status"] == "failed" and job["result"]["job_state"] == "FAILED" and job["result"]["parts"][0]["rc"] == 1, f"provider state {rec['provider_state']!r}, part rc {job['result']['parts'][0]['rc']}")
+    lg = c.same_hash("infra.logger", f"{MI_RUN}/logger.csv", rec["logger_sha256"])
+    rows = [ln.split("\t") for ln in lg.decode().split("\n")[1:] if ln.strip()]
+    ts = sorted({float(r[0]) for r in rows})
+    blank = sum(1 for ln in lg.decode().split("\n") if not ln.strip())
+    c.check("infra.rows", len(rows) == rec["data_rows"] and ts[-1] == rec["last_time"] == 2.0 and all(len(r) == 7 for r in rows), f"{len(rows)} non-blank rows (note says {rec['data_rows']}), last t {ts[-1]}, {len(ts)} time points, {blank} blank lines")
+    last = [r for r in rows if float(r[0]) == ts[-1]]
+    ex = c.blob(f"{MI_RUN}/exit.txt").decode().strip()
+    c.check("infra.exit", ex == "exit=0", f"baseline exit.txt {ex!r}")
+    stop = re.search(r'StopTime value="([^"]*)"', c.blob(f"{MI_RUN}/model.xml").decode())
+    c.check("infra.stop", stop is not None and float(stop.group(1)) == 2.0, f"model.xml StopTime {stop.group(1) if stop else None}")
+    recb, mfb, xmlb = c.blob("results/infra/morpheus-failure-recovery.json"), c.blob(f"{MI}/manifest-infra16.json"), c.blob(f"{MI_RUN}/model.xml")
+    cl2 = _claim(c, "run-morpheus-claim-provider-baseline-recovered", "Morpheus baseline reached t=2.0 in a provider job whose state is FAILED; only the baseline timecourse was recovered",
+                 (f"In provider job {job['id']} (state FAILED; an output wrapper raised IndexError on blank logger lines), the baseline arm (StopTime 2.0, seed 3445) logged {len(ts)} time points from t=0 to t={ts[-1]:g} ({len(rows)} non-blank rows, {len(last)} cells at t={ts[-1]:g}) and its stdout reports simulator exit 0. "
+                  f"The nofeedback and seed2 arms report exit 0 in stdout but no trajectories were recovered, so completion evidence for them is insufficient. This is a different run from the capped local arms (different XML, stop 2.0 against 0.6); the two are not replicates."),
+                 "A provider run reported as it ended: failed at the job level, recovered for one arm. " + rec["interpretation"], asm,
+                 lim + [f"Job state FAILED: {rec['failure']}.", f"Missing artifacts: {', '.join(rec['missing_artifacts'])}.", f"The logger has {blank} blank separator lines between time blocks; the {len(rows)} non-blank rows match the recovery note's data_rows.",
+                        "One seed, no refinement, one arm recovered: no feedback comparison can be drawn from this record."], "results/infra/morpheus-failure-recovery.json", recb, "Failure and recovery note: provider state, recovered arm, missing arms.")
+    act2 = _action(c, SRC, "run-morpheus-action-provider-job", cl2,
+                   f"Provider-executed CPU job {job['id']} (state FAILED, part rc 1 after {job['result']['parts'][0]['wall_s']} s); the baseline simulator's own stdout and exit.txt report exit 0 and the logger was recovered after the wrapper error",
+                   ["A rerun with the wrapper fixed (blank lines skipped, all arms preserved before parsing) completes all three arms and returns all three trajectories.", ACCEPT_REVIEW], ["Morpheus v2.3.9 static binary on a provider CPU job"],
+                   dict(input=f"model.xml sha256 {sha_bytes(xmlb)}; StopTime 2.0; seed 3445", code=f"git:{em.REPO_LABEL}@{commit}; recovery note and manifest-infra16.json", model="Morpheus v2.3.9 cell-cycle ODE + CPM + cytokine PDE (no language model)",
+                        environment="provider CPU job; image and interpreter NOT RECORDED in the files read", parameters="baseline arm; feedback on; seed 3445", scope="generic multiscale example; baseline arm only"), [])
+    _evidence(c, SRC, "run-morpheus-evidence-provider-baseline", cl2, kind="simulated", relation="unspecified", produced_by=act2, source=em._source(c, "results/infra/morpheus-failure-recovery.json", recb, "Recovery note."),
+              method=f"Provider CPU job ran Morpheus v2.3.9; the baseline logger ({len(rows)} rows) was recovered and its sha256 recomputed from the committed file. The job state is FAILED.", context="Applicability: this baseline arm only. " + em.IMPORT_NOTE, assumptions=asm,
+              provenance=_prov(c, job_id=job["id"], job_state=job["result"]["job_state"], part_rc=job["result"]["parts"][0]["rc"], part_wall_s=job["result"]["parts"][0]["wall_s"], baseline_exit_txt=ex, logger_sha256=rec["logger_sha256"], time_points=len(ts),
+                               non_blank_rows=len(rows), blank_lines=blank, cells_at_last_time=len(last), missing_arms=rec["missing_artifacts"]),
+              limitations=lim + [f"Job state FAILED: {rec['failure']}.", f"Missing artifacts: {', '.join(rec['missing_artifacts'])}."], uncertainty="One seed, one arm, no refinement.",
+              artifacts=[c.artifact("output", f"{MI_RUN}/logger.csv", lg, "baseline logger, t=0 to 2.0 (recovered)"), c.artifact("input", f"{MI_RUN}/model.xml", xmlb, "baseline Morpheus XML, StopTime 2.0"),
+                         c.artifact("log", f"{MI_RUN}/exit.txt", c.blob(f"{MI_RUN}/exit.txt"), "simulator exit report"), c.artifact("log", "results/infra/morpheus-failure-recovery.json", recb, "failure and recovery note"),
+                         c.artifact("log", f"{MI}/manifest-infra16.json", mfb, "provider batch manifest: job state FAILED, part rc 1")])
+    return c
+
+
+LATER["morpheus"] = morpheus_chain
+ALL_CHAINS = {**CHAINS, **LATER}
+
+
+# ------------------------------------------------------------------------------------------------------------------------------- MD
+MD = "artifacts/molecular"
+
+
+def md_chain(repo: str, commit: str, *, namespace="node-a", issuer="importer", created_at=None) -> AssetChain:
+    """Collagen-mimetic atomistic MD (OpenMM 8.4): a CPU run, a first GPU attempt that FAILED its numerical gate, and a CUDA retry on an H100.
+
+    Kept apart: the 0.2 ps CPU run, the failed attempt (no CUDA trajectory was produced), and the 3 x 100 ps CUDA production. A short peptide trajectory
+    does not estimate fin stiffness; the cross-scale gate refuses the transfer and this record does not make it.
+    """
+    created_at = created_at or em._commit_utc(repo, commit)
+    c = AssetChain(repo, commit, namespace, issuer, created_at, "md")
+    cpu_dir, cuda_dir = f"{MD}/cpu-trajectory-final", f"{MD}/cuda-v2"
+    cr = c.jblob(f"{cpu_dir}/receipt.json")
+    c.check("cpu.receipt", cr["schema"] == "frontier.molecular.run/1" and len(cr["runs"]) == 1 and cr["runs"][0]["backend"] == "CPU", f"runs {[(r['backend'], r['seed']) for r in cr['runs']]}")
+    cpu_blobs = {n: c.same_hash(f"cpu.{n}", f"{cpu_dir}/{n}", h) for n, h in cr["files"].items() if _has(c, f"{cpu_dir}/{n}")}
+    pr = c.jblob(f"{cuda_dir}/production/receipt.json")
+    c.check("cuda.receipt", pr["schema"] == "frontier.molecular.run/1" and {r["backend"] for r in pr["runs"]} == {"CUDA"} and sorted(r["seed"] for r in pr["runs"]) == [1731, 1732, 1733], f"runs {[(r['backend'], r['seed']) for r in pr['runs']]}")
+    prod = {n: c.same_hash(f"cuda.{n}", f"{cuda_dir}/production/{n}", h) for n, h in pr["files"].items() if _has(c, f"{cuda_dir}/production/{n}")}
+    jr = c.jblob(f"{cuda_dir}/job-receipt.json")
+    c.check("job.cuda_required", jr["CUDA_required"] is True and "H100" in jr["GPU"], f"CUDA_required {jr['CUDA_required']!r}, GPU {jr['GPU']!r}")
+    present = {n: c.same_hash(f"job.{n}", f"{cuda_dir}/{n}", h) for n, h in jr["files"].items() if _has(c, f"{cuda_dir}/{n}")}
+    not_here = sorted(n for n in jr["files"] if n not in present)
+    par = c.jblob(f"{cuda_dir}/cpu-cuda-parity.json")
+    c.check("parity", par["passed"] is True and par["energy_abs_difference_kJ_mol_per_atom"] <= par["frozen_limits"]["energy_per_atom_max"] and par["force_relative_L2_difference"] <= par["frozen_limits"]["force_relative_L2_max"],
+            f"energy diff {par['energy_abs_difference_kJ_mol_per_atom']:.3g}, force rel L2 {par['force_relative_L2_difference']:.3g}")
+    ret = c.jblob(f"{cuda_dir}/return-provenance.json")
+    g1 = c.jblob(f"{MD}/gpu-attempt-1/receipt.json")
+    c.check("attempt1.failed", g1["status"].startswith("failed") and g1["CUDA_trajectory_produced"] is False, f"status {g1['status']!r}, CUDA trajectory produced {g1['CUDA_trajectory_produced']!r}")
+    dg = c.jblob(f"{MD}/gpu-attempt-1/derivative-diagnosis.json")
+    gate = c.jblob(f"{MD}/cross-scale-gate.json")
+    c.check("gate.refused", gate["counts"]["refused"] == 1 and gate["counts"]["composable"] == 0, f"gate counts {gate['counts']}")
+    an = c.jblob(f"{MD}/cuda-analysis/ensemble.json")
+    rn = c.jblob(f"{MD}/cuda-render/render.json")
+    rn_out = {n: c.same_hash(f"render.{n}", f"{MD}/cuda-render/{n}", h) for n, h in rn["outputs"].items() if _has(c, f"{MD}/cuda-render/{n}")}
+    c.check("render.same_trajectory", rn["trajectory_sha256"] == an["runs"][0]["trajectory_sha256"] and rn["simulation_receipt_sha256"] == an["simulation_receipt_sha256"], "render and analysis name the same trajectory and receipt")
+    r0 = cr["runs"][0]
+    gate_text = "refused (composable 0, scenario 0, refused 1): no conversion of an atomistic peptide trajectory to tissue modulus or fin function"
+    lim = [em.IMPORT_NOTE, "Classical atomistic MD of a collagen-mimetic peptide in solvent; empirical accuracy UNKNOWN; cross-scale transfer UNKNOWN: " + cr["cross_scale_transfer"].replace("unknown: ", "") + ". " + NOT_CALIBRATED,
+           f"The cross-scale coupling gate for this model is {gate_text}.", "Short trajectories (0.2 ps CPU; 3 x 100 ps CUDA) do not sample collagen fibril or tissue mechanics."]
+    asm = [f"OpenMM {cr['openmm_version']}; protocol sha256 CPU {cr['protocol_sha256'][:16]}... and CUDA {pr['protocol_sha256'][:16]}... (different frozen protocols); prepared system sha256 {par['same_prepared_system_sha256'][:16]}... for the CUDA parity."]
+    cmd_cpu = _claim(c, "run-md-claim-cpu-short-trajectory", "Collagen-mimetic MD: a 0.2 ps CPU production run from one seed",
+                     f"The producer's CPU run (seed {r0['seed']}, {r0['equilibration_ps']} ps equilibration then {r0['production_ps']} ps production, {r0['frames']} frames, {r0['wall_seconds']:.1f} s wall on {r0['platform_properties']['Threads']} threads) ends at a C-alpha RMSD of {r0['final_CA_RMSD_nm']:.4f} nm from the production start.",
+                     "A short computed trajectory used as the CPU reference stage. " + cr["simulation_kind"] + ". " + cr["cross_scale_transfer"], asm, lim, f"{cpu_dir}/receipt.json", c.blob(f"{cpu_dir}/receipt.json"), "Run receipt: versions, protocol, seed, wall time, file hashes.")
+    a1 = _action(c, SRC, "run-md-action-cpu", cmd_cpu, f"Imported record of a producer-reported run (executed by the producer on CPU; receipt records OpenMM {cr['openmm_version']}, python, platform and wall time, not an exit code)",
+                 [ACCEPT_REPLAY, ACCEPT_REVIEW], ["python3 with OpenMM 8.4"], dict(input=f"preparation sha256 {cr['preparation_sha256']}; protocol sha256 {cr['protocol_sha256']}", code=f"git:{em.REPO_LABEL}@{commit}; producer code sha256 {cr['code_sha256'][:16]}",
+                 model="OpenMM 8.4 classical MD (no language model)", environment=f"python {cr['python'].split('|')[0].strip()}; numpy {cr['numpy_version']}; {cr['platform']}", parameters=f"seed {r0['seed']}; {r0['production_steps']} production steps; threads {r0['platform_properties']['Threads']}", scope="short atomistic trajectory"), [])
+    _evidence(c, SRC, "run-md-evidence-cpu", cmd_cpu, kind="simulated", relation="unspecified", produced_by=a1, source=em._source(c, f"{cpu_dir}/receipt.json", c.blob(f"{cpu_dir}/receipt.json"), "Run receipt."),
+              method="OpenMM 8.4 classical MD on CPU; file hashes in the receipt were recomputed.", context="Applicability: this prepared system and protocol. " + em.IMPORT_NOTE, assumptions=asm,
+              provenance=_prov(c, run=r0, code_sha256=cr["code_sha256"], files_recomputed=sorted(cpu_blobs)), limitations=lim, uncertainty="One seed; no ensemble; no convergence claim.",
+              artifacts=[c.artifact("output", f"{cpu_dir}/{n}", b, d) for n, b, d in ((n, cpu_blobs[n], "producer file") for n in sorted(cpu_blobs)) if n.endswith((".npz", ".xml", ".json"))][:6] + [c.artifact("log", f"{cpu_dir}/receipt.json", c.blob(f"{cpu_dir}/receipt.json"), "run receipt")])
+    scan = dg["observations"]["CPU"]["gradient_scan"]
+    cl_f = _claim(c, "run-md-claim-gpu-attempt-failed-gate", "Collagen-mimetic MD: the first GPU attempt failed its CPU force-derivative gate and produced no CUDA trajectory",
+                  (f"Job {g1['job_id']} ended '{g1['status']}': passed controls {g1['passed_controls']}; failed control: {g1['failed_control']}. CUDA trajectory produced: {g1['CUDA_trajectory_produced']}. The producer's diagnosis of one force component {dg['component']} found the finite-difference relative error depends on the step: "
+                   + "; ".join(f"h={x['h_nm']:g} nm: {x['relative_error']*100:.2f}%" for x in scan) + "."),
+                  "A failed run kept as a result. The diagnosis records the step dependence; this record does not say which step is right. " + dg["scope"], asm, lim + ["No CUDA trajectory exists from this attempt."], f"{MD}/gpu-attempt-1/receipt.json", c.blob(f"{MD}/gpu-attempt-1/receipt.json"), "Attempt receipt and failed control.")
+    a2 = _action(c, SRC, "run-md-action-gpu-attempt-1", cl_f, f"Provider-executed job {g1['job_id']} (failed before CUDA production); the control file was reconstructed from exact stdout JSON and its sha256 matches the returned manifest",
+                 ["A rerun with a derivative oracle that is stable across steps passes the CPU gate on the same system.", ACCEPT_REVIEW], ["OpenMM 8.4 on a provider job"],
+                 dict(input=f"system sha256 {dg['system_sha256']}; state sha256 {dg['state_sha256']}", code=f"git:{em.REPO_LABEL}@{commit}; diagnosis code sha256 {dg['code_sha256'][:16]}", model="OpenMM 8.4 force-derivative controls", environment="see the receipt; interpreter NOT RECORDED in the files read",
+                      parameters="frozen relative-error limit 0.005; step h=1e-5 nm", scope="numerical gate of one system"), [])
+    _evidence(c, SRC, "run-md-evidence-gpu-attempt-1", cl_f, kind="simulated", relation="unspecified", produced_by=a2, source=em._source(c, f"{MD}/gpu-attempt-1/derivative-diagnosis.json", c.blob(f"{MD}/gpu-attempt-1/derivative-diagnosis.json"), "Derivative diagnosis."),
+              method="Frozen controls on the CPU before production; the failed control and the step scan are recorded. Hashes of the receipt files were not all present locally.", context="Applicability: this system and these controls. " + em.IMPORT_NOTE, assumptions=asm,
+              provenance=_prov(c, job_id=g1["job_id"], status=g1["status"], passed_controls=g1["passed_controls"], failed_control=g1["failed_control"], cuda_trajectory_produced=False), limitations=lim + ["No CUDA trajectory exists from this attempt."], uncertainty="Numerical gate only.",
+              artifacts=[c.artifact("log", f"{MD}/gpu-attempt-1/receipt.json", c.blob(f"{MD}/gpu-attempt-1/receipt.json"), "attempt receipt"), c.artifact("certificate", f"{MD}/gpu-attempt-1/derivative-diagnosis.json", c.blob(f"{MD}/gpu-attempt-1/derivative-diagnosis.json"), "derivative step scan"),
+                         c.artifact("log", f"{MD}/gpu-attempt-1/controls.json", c.blob(f"{MD}/gpu-attempt-1/controls.json"), "controls")])
+    runs = pr["runs"]
+    cl_c = _claim(c, "run-md-claim-cuda-three-seed-production", "Collagen-mimetic MD: three H100 CUDA seeds of 100 ps after a CPU-CUDA parity check; no tissue stiffness follows",
+                  (f"On {jr['GPU'].split(',')[0]} (CUDA required), after a CPU-CUDA parity check on the same prepared system (energy difference {par['energy_abs_difference_kJ_mol_per_atom']:.2g} kJ/mol/atom against a limit of {par['frozen_limits']['energy_per_atom_max']}; force relative L2 {par['force_relative_L2_difference']:.2g} against {par['frozen_limits']['force_relative_L2_max']}), "
+                   f"seeds {', '.join(str(r['seed']) for r in runs)} each ran {runs[0]['production_ps']:g} ps after {runs[0]['equilibration_ps']:g} ps equilibration; final C-alpha RMSD from the production start is {', '.join(f'{r['final_CA_RMSD_nm']:.3f}' for r in runs)} nm and the sampled temperature over the last 20% is "
+                   f"{', '.join(f'{x['last_20_percent_sampled_temperature_mean_K']:.1f}' for x in an['runs'])} K."),
+                  "A computed ensemble of three seeds of a short trajectory. The cross-scale gate refuses any conversion to tissue modulus or fin function.", asm + [f"Job {ret['job_id']}; {ret['all_returned_job_file_hashes_verified']} returned file hashes were verified by the producer."], lim,
+                  f"{cuda_dir}/production/receipt.json", c.blob(f"{cuda_dir}/production/receipt.json"), "Production receipt: three CUDA runs.")
+    a3 = _action(c, SRC, "run-md-action-cuda-v2", cl_c, f"Provider-executed job {ret['job_id']} (CUDA required; {jr['GPU'].split(',')[0]}; {jr['wall_seconds']:.1f} s wall); the producer reports {ret['all_returned_job_file_hashes_verified']} returned file hashes verified; the prior failed job {ret['prior_failed_job_retained']} is retained",
+                 [ACCEPT_REPLAY, ACCEPT_REVIEW], ["OpenMM 8.4 with CUDA on an H100"], dict(input=f"prepared system sha256 {par['same_prepared_system_sha256']}; positions sha256 {par['same_prepared_positions_sha256'][:16]}", code=f"git:{em.REPO_LABEL}@{commit}; remote code sha256 {jr['remote_code_sha256'][:16]}; source commit {ret['source_code_commit'][:12]}",
+                 model="OpenMM 8.4 classical MD, CUDA mixed precision (no language model)", environment=f"python {pr['python'].split('(')[0].strip()}; {pr['platform']}; GPU {jr['GPU']}", parameters=f"seeds 1731-1733; {runs[0]['production_steps']} production steps; DeterministicForces {runs[0]['platform_properties']['DeterministicForces']}", scope="short atomistic ensemble"), [])
+    ev_c = _evidence(c, SRC, "run-md-evidence-cuda-v2", cl_c, kind="simulated", relation="unspecified", produced_by=a3, source=em._source(c, f"{cuda_dir}/production/receipt.json", c.blob(f"{cuda_dir}/production/receipt.json"), "Production receipt."),
+                     method="CPU-CUDA parity then three CUDA production runs; every locally present file hash in the job and production receipts was recomputed" + (f"; {len(not_here)} job-receipt files are inside the prepared-inputs archive and not separately checked here." if not_here else "."), context="Applicability: this prepared system. " + em.IMPORT_NOTE, assumptions=asm,
+                     provenance=_prov(c, job_id=ret["job_id"], parity=par, gpu=jr["GPU"], wall_seconds=jr["wall_seconds"], runs=[{k: r[k] for k in ("seed", "wall_seconds", "final_CA_RMSD_nm")} for r in runs], files_recomputed=len(present) + len(prod), files_stated_not_checked=not_here),
+                     limitations=lim, uncertainty="Three seeds; no convergence or block-averaging claim; RMSD is from the production start.",
+                     artifacts=[c.artifact("output", f"{cuda_dir}/production/trajectory-{x}.npz", prod[f"trajectory-{x}.npz"], f"seed {x}: saved trajectory") for x in (1731, 1732, 1733)] + [c.artifact("output", f"{cuda_dir}/production/metrics-{x}.json", prod[f"metrics-{x}.json"], f"seed {x}: metrics") for x in (1731, 1732, 1733)]
+                     + [c.artifact("certificate", f"{cuda_dir}/cpu-cuda-parity.json", c.blob(f"{cuda_dir}/cpu-cuda-parity.json"), "CPU-CUDA parity"), c.artifact("log", f"{cuda_dir}/job-receipt.json", c.blob(f"{cuda_dir}/job-receipt.json"), "job receipt"),
+                        c.artifact("log", f"{cuda_dir}/production/receipt.json", c.blob(f"{cuda_dir}/production/receipt.json"), "production receipt"), c.artifact("environment", f"{cuda_dir}/environment.txt", c.blob(f"{cuda_dir}/environment.txt"), "CUDA environment"),
+                        c.artifact("input", f"{cuda_dir}/prepared-inputs.tar.gz", c.blob(f"{cuda_dir}/prepared-inputs.tar.gz"), "exact prepared System and State")])
+    ra = _action(c, SRC, "run-md-action-cuda-render", cl_c, "Imported record of a producer-reported render (not re-run by Frontier): video and poster of seed 1731 from the actual saved states, rigidly aligned, no deformation invented",
+                 ["Re-rendering the trajectory reproduces the frames; mp4 bytes can differ across ffmpeg builds.", "Pictures are views of computed states, not evidence."], ["python3 with matplotlib; ffmpeg"],
+                 dict(input=f"simulation evidence version {ev_c['version']}; trajectory sha256 {rn['trajectory_sha256'][:16]}", code=f"git:{em.REPO_LABEL}@{commit}; render code sha256 {rn['render_code_sha256'][:16]}", model="none: rendering", environment="NOT RECORDED", parameters=f"{rn['frames']} frames at {rn['display_fps']} fps; transform: {rn['coordinate_transform'][:90]}", scope="visualisation of one seed"), [ev_c])
+    _evidence(c, SRC, "run-md-evidence-cuda-render", cl_c, kind="simulated", relation="context_only", produced_by=ra, source=em._source(c, f"{MD}/cuda-render/render.json", c.blob(f"{MD}/cuda-render/render.json"), "Render receipt."),
+              method="Producer renders the saved seed-1731 trajectory; output hashes were recomputed.", context=RENDER_NOTE + " " + em.IMPORT_NOTE, assumptions=asm, provenance=_prov(c, seed=rn["seed"], frames=rn["frames"], outputs_recomputed=sorted(rn_out)),
+              limitations=[em.IMPORT_NOTE, RENDER_NOTE, NOT_CALIBRATED], artifacts=[c.artifact("output", f"{MD}/cuda-render/{n}", b, d) for n, b, d in (("trajectory.mp4", rn_out.get("trajectory.mp4"), "video of seed 1731"), ("poster.png", rn_out.get("poster.png"), "poster")) if b is not None]
+              + [c.artifact("log", f"{MD}/cuda-render/render.json", c.blob(f"{MD}/cuda-render/render.json"), "render receipt")])
+    return c
+
+
+def _has(c: AssetChain, path: str) -> bool:
+    import subprocess as sp
+    return sp.run(["git", "-C", c.repo, "cat-file", "-e", f"{c.commit}:{path}"], capture_output=True).returncode == 0
+
+
+LATER["md"] = md_chain
+ALL_CHAINS = {**CHAINS, **LATER}
+
+
 # ---------------------------------------------------------------------------------------------------------------------------- bundles
 # Root is making the repository public after a credential/history audit: no curated output may carry a presigned URL or a secret-looking field.
 SECRETISH = re.compile(r"X-Amz|Signature=|Expires=|presign|[?&]token=|access[_-]?key|secret|passw(?:or)?d|api[_-]?key|bearer|authorization|AKIA[0-9A-Z]{8}|sk-[A-Za-z0-9]{16}|BEGIN [A-Z ]*PRIVATE|\.credentials|https?://[^\"\s]*\?", re.I)
