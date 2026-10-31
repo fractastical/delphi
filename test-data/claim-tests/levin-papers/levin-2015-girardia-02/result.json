@@ -2,7 +2,7 @@
   "claim_id": "levin-2015-girardia-02",
   "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2015-girardia-02",
   "project": "levin-papers",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "In the published Procrustes distances between head-shape groups, each octanol-induced G. dorotocephala head-shape group is closer to the wild-type head shape of the species it resembles than to the wild-type G. dorotocephala head shape.",
   "pass_criterion": "Pre-registered: for every induced group in the published table (e.g. D. japonica-like, S. mediterranea-like, P. felina-like), the Procrustes distance to the resembled species' wild type is smaller than its distance to wild-type G. dorotocephala; if the table also reports significance of between-group distances (permutation p-values), the induced-vs-G. dorotocephala distance is significant (p < 0.05) for every induced group.",
   "fail_criterion": "Pre-registered: at most one of the induced groups (or, with two groups, neither) is closer to its resembled species than to wild-type G. dorotocephala. If all are closer by distance but a reported significance test fails for some group, or exactly one of three groups violates the ordering, the verdict is 'mixed'. If no distance table can be retrieved, 'inconclusive' (data-unavailable).",
@@ -16,6 +16,56 @@
     "admissible_datasets": "Published Procrustes distances (or landmark data from which they can be computed) for octanol-induced G. dorotocephala head shapes and wild-type heads of the resembled species; the source paper's table is admissible but not independent.",
     "inference_method": "Read the pairwise distance matrix; for each induced group compare its distance to the resembled species with its distance to G. dorotocephala; count groups satisfying the inequality and check any reported permutation p-values; apply the thresholds."
   },
+  "datasets": [
+    {
+      "id": "emmonsbell2015-ijms-table1",
+      "name": "Emmons-Bell et al. 2015, Int J Mol Sci 16:27865-27896, Table 1: Procrustes distances between head-shape groups (Europe PMC full text XML, PMC4661923)",
+      "landing_url": "https://doi.org/10.3390/ijms161126065",
+      "doi": "10.3390/ijms161126065",
+      "version": "Europe PMC full text as retrieved",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4661923/fullTextXML",
+          "retrieved_at": "2026-10-31T21:40:11Z",
+          "byte_size": 300657,
+          "sha256": "91d802a4e95a842df2e9782229731abd239676729022aab0dc7df23354b6c3e4"
+        }
+      ],
+      "role": "lower-triangular matrix of mean Procrustes distances among wild-type G. dorotocephala (intact and regenerated in water), wild-type D. japonica, P. felina, S. mediterranea and the octanol-induced pseudo groups; group sizes from the Figure 2 legend"
+    }
+  ],
+  "method": "analysis.py downloads the paper's Europe PMC full-text XML, parses Table 1 into a symmetric distance matrix (keeping which cells are bold) and, for each pseudo group (D. japonica-, P. felina- and S. mediterranea-like), compares its distance to the resembled species' wild type with its distance to wild-type G. dorotocephala. As a secondary measure, not part of the verdict, it lists each pseudo group's nearest wild-type group among all five wild-type groups, including G. dorotocephala regenerated for 10 days in water.",
+  "measured": {
+    "value": 3,
+    "unit": "of 3 octanol-induced pseudo-species groups closer (Procrustes distance) to the resembled species' wild type than to wild-type G. dorotocephala",
+    "n": 3,
+    "uncertainty": "published distances to two decimals; no dispersion or per-pair test reported in the table",
+    "extra": {
+      "pseudo_DJ_to_WT_DJ_vs_WT_GD": [0.14, 0.19],
+      "pseudo_PF_to_WT_PF_vs_WT_GD": [0.09, 0.40],
+      "pseudo_SM_to_WT_SM_vs_WT_GD": [0.22, 0.25],
+      "pseudo_DJ_to_WT_GD_regenerated_in_water": 0.14,
+      "pseudo_SM_to_WT_DJ": 0.17,
+      "pseudo_SM_to_WT_GD_regenerated_in_water": 0.21,
+      "pseudo_GD_to_WT_GD": 0.10,
+      "nearest_wild_type": {"DJ": ["WT DJ", "WT GD after 10 days in Water"], "PF": ["WT PF"], "SM": ["WT DJ"]},
+      "groups_whose_nearest_wild_type_is_the_resembled_species": ["PF"],
+      "group_sizes_fig2_legend": {"WT GD": 10, "WT GD regenerated in water": 8, "WT DJ": 9, "WT PF": 6, "WT SM": 8, "pseudo GD": 7, "pseudo DJ": 13, "pseudo PF": 5, "pseudo SM": 6},
+      "bold_cells": "mark 'comparisons of particular interest' (table footnote), not significance",
+      "verdict_by_preregistered_rule": "supports"
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "supports",
+  "confidence": 0.5,
+  "caveats": [
+    "The literal inequality holds for all three groups (D. japonica-like 0.14 vs 0.19, P. felina-like 0.09 vs 0.40, S. mediterranea-like 0.22 vs 0.25), so the pre-registered rule gives 'supports'. The table reports no dispersion and no per-pair significance test, so the significance clause of the pass criterion could not be applied; the only reported tests are ANOVAs across all groups (centroid size F = 7.94, shape F = 7.40, both p < 0.0001).",
+    "Two of the three margins are small (0.05 and 0.03 Procrustes units) relative to the distance between intact and regenerated wild-type G. dorotocephala (0.10), and the groups have only 5-13 animals.",
+    "Outside the verdict, the full matrix weakens the 'species-specific' reading. Only the P. felina-like group is nearest its resembled species. The D. japonica-like group is as close to G. dorotocephala regenerated in water (0.14) as to D. japonica (0.14), and regenerated G. dorotocephala is arguably the right control for regenerates. The S. mediterranea-like group is nearer wild-type D. japonica (0.17) and the D. japonica-like group (0.09) than wild-type S. mediterranea (0.22).",
+    "Not independent: this audits the source paper's own table. Raw landmarks are not deposited, so the distances cannot be recomputed, and induced animals were assigned to groups by eye from the same head shape that is then measured, which biases each group toward its label.",
+    "The table footnote abbreviates P. felina as 'P. feline'; the analysis follows the table's group labels."
+  ],
   "agent": {
     "kind": "local-agent",
     "model": "claude-opus-5.5",
