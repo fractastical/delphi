@@ -610,10 +610,17 @@ portion of exon 24 is deleted in Pachón cavefish" — naming two, not three.
 
 ### 14.4 What the Tinaja arm now supports, and what it does not
 
-**Supports:** within these three assemblies, the oca2 exon-21 deletion is present in
-the albino cave population and absent from the brown cave population and from
-surface. It therefore tracks albinism rather than cave-dwelling. That is a stronger
-statement than the preregistered one.
+**Supports:** a three-individual sequence comparison. In these three assemblies (one fish
+per population) the oca2 exon-21 deletion is found in the Molino fish and not in the Tinaja
+or surface fish.
+
+> *Superseded wording, kept for the record and withdrawn on independent review, 2026-10-31:*
+> "It therefore tracks albinism rather than cave-dwelling. That is a stronger statement than
+> the preregistered one." *Why withdrawn:* n = 1 per population; haploid, unphased assemblies;
+> Pachón (also albino, with a different reported lesion) was not run; the laboratory line of the
+> sequenced fish is unknown; and the Warren et al. text quoted in section 1 reports smaller
+> exon-21 deletions in 5/9 wild Tinaja and 5/9 wild Pachón samples, so a single Tinaja fish
+> with an intact exon 21 does not show that the lesion is confined to the albino population.
 
 **Does not support:** anything with n > 1 per population. Three fish. The
 pigmentation phenotypes come from a review describing populations, not from these
@@ -622,3 +629,13 @@ but not pigment. And the Tinaja exon-22 SNP is uncharacterised. **This is a
 suggestive specificity observation, not a tested hypothesis** — it was not
 preregistered, and it must not be reported with the same confidence as the exon-21
 result, which was.
+
+---
+
+## 15. Independent-review notes (added 2026-10-31, after the result; the text above is unchanged except section 14.4)
+
+- **Scope of "absent from all 1,361,196,561 bp".** An independent flatten of the assembly found **72,000 N bases** of the 1,361,196,561 (0.005%); "absent from the assembled sequence" is the accurate form. The N-gap appendix covers chromosome 5 only.
+- **Which fish.** The sequenced Molino fish is a laboratory isolate (ESR-SI-002). Warren et al.'s sentence begins "Consistent with the laboratory strains"; whether this isolate belongs to a line already tested there is not known, so "a different fish" does not establish an independent population.
+- **Section 8** says ~4.4 kb and sections 7 and 11 say ~4.6 kb; the offset profile gives a -4,588 bp jump and a net -4,415 bp.
+- **Re-derivation.** The headline counts (37/37, 82/82, 0/82), the six Ma et al. oligo positions and the genome-wide absence were reproduced from the public accessions by an independent reader (reviewer report 2026-10-31); the six analysis scripts named in Appendix B are still not committed.
+- **Population behind the thresholds.** The preregistered "present = at least 0.50 of 24-mers" is not derived from any distribution of exact-k-mer retention (Tinaja exon 22 keeps 0.662 with one SNP); the result is unaffected because the observed values were 1.000 and 0.000.
