@@ -1,0 +1,37 @@
+{
+  "claim_id": "thompson1917-ch08-02",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch08-02",
+  "project": "thompson-growth-form",
+  "status": "preregistered",
+  "preregistered_at": "2026-10-31T21:40:00Z",
+  "hypothesis": "In recently divided plant cells, the new wall between two sister cells has close to the least area of any planar cut that divides the reconstructed mother cell in the same volume ratio, and much less area than a cut of random orientation.",
+  "pass_criterion": "Pre-registered. Data: the 8 alphabetically first meristem archives of Zenodo record 18711581 (Yates et al. 2026, Arabidopsis inflorescence shoot apices, 3D confocal, watershed-segmented). For each wall marked in *_new_walls.tif, the two cells it separates are sisters; the mother is their union (including the wall voxels between them). Both sisters must have volume >= 40 um^3 and must not touch the image border. Observed area A_obs = area of the voxel faces shared between the two sister regions in the mother mask (anisotropic voxel face areas from Metadata.txt). For 500 plane orientations spread uniformly over the hemisphere (Fibonacci lattice), the plane offset is set so the smaller side holds the observed smaller-sister volume fraction, and the cut area A(n) is measured with the same voxel-face rule. A_min = min over orientations; q = A_obs / A_min; percentile p = fraction of orientations with A(n) < A_obs. SUPPORTS if the median p over all divisions is <= 0.10 AND at least 50% of divisions have q <= 1.10.",
+  "fail_criterion": "Pre-registered. REFUTES if the median p is >= 0.35 (observed walls are no smaller than typical random-orientation cuts) OR fewer than 20% of divisions have q <= 1.10. Any other outcome is MIXED. Fewer than 30 analysable divisions: inconclusive (underpowered).",
+  "planned_datasets": [
+    "zenodo-18711581-yates-2026-arabidopsis-sam-segmentations"
+  ],
+  "interpretation": "Errera's rule as Thompson states it: the incipient partition has the least area that can divide the given space-content. The 'given space-content' is the observed volume split of the two sisters, so asymmetric divisions are included. Real walls may be curved; the minimum is taken over planes, so a curved minimal wall can have q < 1, which still counts as consistent. Sisters are identified from the dataset's own detection of recently formed walls (its pipeline flags thin, recent walls), not from lineage tracking; mis-identified pairs work against the claim. Sachs's subordinate rule (right-angle alternation) is tested separately under thompson1917-ch08-01. The test is on one model plant tissue (Arabidopsis shoot apex), within the claim's scope 'dividing cells, especially plant cells'.",
+  "test_contract": {
+    "expected_observation": "The new wall's area is near the minimum over planar cuts of the mother at the same volume ratio (q close to or below 1) and in the lowest tail of the area distribution over cut orientations.",
+    "disconfirming_observation": "New walls are no smaller than cuts of random orientation (percentile around 0.5) or are usually much larger than the least-area cut.",
+    "admissible_datasets": "3D segmentations of plant tissue in which recently divided sister cells can be identified (lineage tracking or detection of new walls), with known voxel size; independent of Thompson; public licence.",
+    "inference_method": "Reconstruct mother = union of sisters; compare observed interface area with the planar cut-area distribution over 500 orientations at the observed volume fraction; median percentile and fraction within 10% of the minimum against the pre-registered thresholds."
+  },
+  "preregistration": {
+    "archives": "first 8 archive file names of Zenodo record 18711581 in alphabetical order",
+    "n_orientations": 500,
+    "min_sister_volume_um3": 40,
+    "q_tolerance": 1.10,
+    "pass_median_percentile": 0.10,
+    "pass_fraction_within_tolerance": 0.5,
+    "fail_median_percentile": 0.35,
+    "fail_fraction_within_tolerance": 0.2,
+    "min_divisions": 30
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "cursor local subagent",
+    "date": "2026-10-31"
+  }
+}
