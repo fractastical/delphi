@@ -32,6 +32,9 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
     receipt_path = Path(metrics_path).parent / "receipt.json"
     receipt = json.loads(receipt_path.read_text())
     run = next(item for item in receipt["runs"] if item["seed"] == seed)
+    offset = run.get("parent_production_ps", 0)
+    plot_times = times + offset
+    rmsd_key = "CA_RMSD_from_original_production_start_nm" if offset else "CA_RMSD_nm"
     atoms = json.loads(Path(atoms_path).read_text())
     lookup = {int(index): i for i, index in enumerate(indices)}
     assert len(frames) == len(metrics) == len(times) and np.isfinite(frames).all()
@@ -103,22 +106,24 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
     ax.set_zlabel("nm")
     ax.legend(loc="upper left", frameon=False)
     ax.set_title("Actual atomistic states · 1K6F collagen mimetic", pad=20)
-    rms.plot(times, [m["CA_RMSD_nm"] for m in metrics], color="#286ca5")
+    rms.plot(plot_times, [m[rmsd_key] for m in metrics], color="#286ca5")
     rms.set_ylabel("Cα RMSD (nm)")
-    rms.set_xlabel("Production time (ps)")
-    rms.set_title("Aligned to production start")
+    rms.set_xlabel("Global production time (ps)" if offset else "Production time (ps)")
+    rms.set_title(
+        "Aligned to original parent start" if offset else "Aligned to production start"
+    )
     for i, color in enumerate(("#1b82b1", "#e17e28", "#748b35")):
         end.plot(
-            times,
+            plot_times,
             [m["chain_end_to_end_nm"][i] for m in metrics],
             color=color,
             label="ABC"[i],
         )
     end.set_ylabel("Terminal Cα distance (nm)")
-    end.set_xlabel("Production time (ps)")
+    end.set_xlabel("Global production time (ps)" if offset else "Production time (ps)")
     end.set_title("Three chain lengths · no modulus inferred")
-    cursor1 = rms.axvline(0, color="#999", ls="--")
-    cursor2 = end.axvline(0, color="#999", ls="--")
+    cursor1 = rms.axvline(plot_times[0], color="#999", ls="--")
+    cursor2 = end.axvline(plot_times[0], color="#999", ls="--")
     fig.suptitle(
         "Molecular dynamics: computed motion, not observed fish biology",
         fontsize=17,
@@ -147,10 +152,10 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
             lines.set_segments([frame[list(pair)] for pair in bonds])
             for line, ids in ca_chains:
                 line.set_data_3d(*frame[ids].T)
-            cursor1.set_xdata([times[k]] * 2)
-            cursor2.set_xdata([times[k]] * 2)
+            cursor1.set_xdata([plot_times[k]] * 2)
+            cursor2.set_xdata([plot_times[k]] * 2)
             subtitle.set_text(
-                f"Actual production time {times[k]:.3f} ps / {times[-1]:.3f} ps · frame {k + 1}/{len(frames)} · playback greatly slowed"
+                f"Actual {'global ' if offset else ''}production time {plot_times[k]:.3f} ps / {plot_times[-1]:.3f} ps · frame {k + 1}/{len(frames)} · playback greatly slowed"
             )
             if k == len(frames) - 1:
                 fig.savefig(out / "poster.png", dpi=100)
@@ -172,6 +177,10 @@ def render(trajectory, metrics_path, atoms_path, prepared_pdb, output, seed=1731
         "coordinate_storage_dtype": str(frames.dtype),
         "frames": len(frames),
         "simulation_duration_ps": float(times[-1]),
+        "global_production_time_ps": [float(plot_times[0]), float(plot_times[-1])],
+        "RMSD_reference": "original parent production start"
+        if offset
+        else "production start",
         "display_fps": 12,
         "coordinate_transform": "translation and proper rigid least-squares alignment to initial frame, then fixed principal-axis camera frame; no deformation invented",
         "outputs": {f.name: sha(f) for f in out.iterdir() if f.name != "render.json"},
