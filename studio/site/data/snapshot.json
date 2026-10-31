@@ -1,7 +1,7 @@
 {
  "schema": "frontier-site-snapshot-0.1",
- "label": "snapshot of inputs 7311c288d2aa",
- "input_fingerprint": "7311c288d2aa30b04833d500a6e254027d531e8c15486fcd126c1ab883635f1e",
+ "label": "snapshot of inputs 9d1f014d4e81",
+ "input_fingerprint": "9d1f014d4e81ed0d41d62553cf2ba69ebb4cbac4df32a41531a88df356158da0",
  "inputs": [
   {
    "path": "GOAL.md",
@@ -404,6 +404,31 @@
    "bytes": 125439
   },
   {
+   "path": "data/fish-lifecycle/assurance.json",
+   "sha256": "2d95cb0b54fb0b465744c1a56e50de73a40b9a1fadbc0bb26a5ec687bad07827",
+   "bytes": 6800
+  },
+  {
+   "path": "data/fish-lifecycle/equations.json",
+   "sha256": "f25c4f5d15eec38603291882f2868949783c39a2f0f55451a25fba7daffb8c70",
+   "bytes": 13352
+  },
+  {
+   "path": "data/fish-lifecycle/manifest.json",
+   "sha256": "3d589444d86cf4f2d3faa2bb5d1b81aec403deceac1d76575cda279ee145a36b",
+   "bytes": 4054
+  },
+  {
+   "path": "data/fish-lifecycle/nutrient_diffusion_check.json",
+   "sha256": "aedc5268c1c4ab597fb2ad5cc23225fb15f46935879dee9352566e0568eced93",
+   "bytes": 2724
+  },
+  {
+   "path": "data/fish-lifecycle/stages.json",
+   "sha256": "9adc804c659f0d110990f01f8e6af433fdca4507eb7558786338e8b255462b31",
+   "bytes": 12740
+  },
+  {
    "path": "data/genomics/artifacts/ncbi_gene_summaries.json",
    "sha256": "a9fafdf675bd29b9107104e489e6ae1063a68f68ff14f8deb35598551a41683d",
    "bytes": 48131
@@ -432,6 +457,11 @@
    "path": "deploy/receipts/mcp-public-check.json",
    "sha256": "ce095305fec2a0d0f5d45b7f22b9f4161e62e96f63cfb27205a06a084a4fe1e5",
    "bytes": 3704
+  },
+  {
+   "path": "docs/fish-lifecycle.md",
+   "sha256": "e0966643e70b3cb165f97019599b30fad80e62afc3610efd72b177c1bfee4425",
+   "bytes": 7653
   },
   {
    "path": "docs/mcp.md",
@@ -2624,6 +2654,14 @@
    "path": "docs/model-coupling.md",
    "sha256": "55f9253188271a6127ddf23feb846df1b54f982207a4f7b11dd421c02a1f075c",
    "href": "data/docs/model-coupling.md.txt"
+  },
+  {
+   "id": "fish-lifecycle",
+   "title": "Fish life cycle: source and equation layer",
+   "status_line": null,
+   "path": "docs/fish-lifecycle.md",
+   "sha256": "e0966643e70b3cb165f97019599b30fad80e62afc3610efd72b177c1bfee4425",
+   "href": "data/docs/fish-lifecycle.md.txt"
   },
   {
    "id": "README",
@@ -20536,6 +20574,497 @@
    }
   ],
   "prompts_note": "These are dimensions to inspect. They do not assert that the current Project has any particular flaw."
+ },
+ "lifecycle": {
+  "organism": "Danio rerio",
+  "status": "proposed; single operator; unreviewed",
+  "stage_order": [
+   "embryo",
+   "larva",
+   "juvenile",
+   "adult"
+  ],
+  "statuses": [
+   "borrowed_nonfish",
+   "measured_in_fish",
+   "modelled_and_fit_to_fish_data",
+   "observed_qualitative",
+   "unknown"
+  ],
+  "claims_not_made": [
+   "a living whole-fish bioprint is feasible",
+   "any of these zebrafish values holds for a flying fish",
+   "locomotion or maintenance cost models exist here"
+  ],
+  "gaps_first": [
+   "locomotion at every stage",
+   "juvenile and adult growth series",
+   "volumetric oxygen consumption of fish tissue",
+   "viability thresholds for fish cells in a bioink",
+   "scaffold stiffness, degradation and maturation kinetics",
+   "quantitative fin-growth and scale-growth laws",
+   "flying-fish stage boundaries and sizes"
+  ],
+  "temperature_c": 28.5,
+  "stage_note": "stage boundaries are Parichy 2009's laboratory conventions; any other species needs its own boundaries (unknown)",
+  "stages": [
+   {
+    "id": "embryo",
+    "name": "Embryo",
+    "time": {
+     "end_hpf": 72,
+     "start_hpf": 0,
+     "temperature_c": 28.5
+    },
+    "definition": "the attainment of the protruding mouth stage (~72 hpf at 28.5 °C)",
+    "axes": {
+     "size": "unknown",
+     "growth": "unknown",
+     "metabolism": "measured_in_fish",
+     "locomotion": "unknown",
+     "fins_and_scales": "modelled_and_fit_to_fish_data"
+    }
+   },
+   {
+    "id": "larva",
+    "name": "Larva",
+    "time": {
+     "end": "complete squamation and loss of the larval fin fold (about 4 weeks post-fertilization in the authors' laboratory)",
+     "start_hpf": 72,
+     "temperature_c": 28.5
+    },
+    "definition": "Larva: An individual that is no longer an embryo but has yet to become a juvenile",
+    "axes": {
+     "size": null,
+     "growth": "measured_in_fish",
+     "metabolism": "measured_in_fish",
+     "locomotion": "unknown",
+     "fins_and_scales": "observed_qualitative"
+    }
+   },
+   {
+    "id": "juvenile",
+    "name": "Juvenile",
+    "time": {
+     "duration": "the juvenile period lasts from ~4 weeks post-fertilization to 6–12 weeks post-fertilization depending on strain and rearing conditions"
+    },
+    "definition": "Here defined by the attainment of a complete pattern of scales (squamation) and complete loss of the larval fin fold.",
+    "axes": {
+     "size": null,
+     "growth": "unknown",
+     "metabolism": "unknown",
+     "locomotion": "unknown",
+     "fins_and_scales": "observed_qualitative"
+    }
+   },
+   {
+    "id": "adult",
+    "name": "Adult",
+    "time": null,
+    "definition": "Adult: Defined by the production of viable gametes and the appearance of secondary sexual characteristics in fish that are in breeding condition.",
+    "axes": {
+     "size": null,
+     "growth": "unknown",
+     "metabolism": "measured_in_fish",
+     "locomotion": "unknown",
+     "fins_and_scales": "observed_qualitative"
+    }
+   }
+  ],
+  "processes": {
+   "cell_viability_in_printing": {
+    "embryo": {
+     "status": "unknown",
+     "note": "not read (open-access bioprinting viability papers were found but not fetched)",
+     "sources": ""
+    },
+    "larva": {
+     "status": "unknown",
+     "note": "not read (open-access bioprinting viability papers were found but not fetched)",
+     "sources": ""
+    },
+    "juvenile": {
+     "status": "unknown",
+     "note": "not read (open-access bioprinting viability papers were found but not fetched)",
+     "sources": ""
+    },
+    "adult": {
+     "status": "unknown",
+     "note": "not read (open-access bioprinting viability papers were found but not fetched)",
+     "sources": ""
+    }
+   },
+   "fin_outgrowth_law": {
+    "embryo": {
+     "status": "modelled_and_fit_to_fish_data",
+     "note": "exponential BMP gradient, lambda about 28 um at 60 hpf, 48-78 hpf only",
+     "sources": "mateus2020"
+    },
+    "larva": {
+     "status": "unknown",
+     "note": "no quantitative fin growth law read",
+     "sources": ""
+    },
+    "juvenile": {
+     "status": "unknown",
+     "note": "no source read",
+     "sources": ""
+    },
+    "adult": {
+     "status": "observed_qualitative",
+     "note": "regeneration overgrowth under calcineurin inhibition; no equation",
+     "sources": "daane2018"
+    }
+   },
+   "growth_rate": {
+    "embryo": {
+     "status": "unknown",
+     "note": "no source read",
+     "sources": ""
+    },
+    "larva": {
+     "status": "measured_in_fish",
+     "note": "two temperature means; no growth law",
+     "sources": "parichy2009"
+    },
+    "juvenile": {
+     "status": "unknown",
+     "note": "no series extracted",
+     "sources": ""
+    },
+    "adult": {
+     "status": "unknown",
+     "note": "no source read",
+     "sources": ""
+    }
+   },
+   "locomotion": {
+    "embryo": {
+     "status": "unknown",
+     "note": "no source read",
+     "sources": ""
+    },
+    "larva": {
+     "status": "unknown",
+     "note": "no source read",
+     "sources": ""
+    },
+    "juvenile": {
+     "status": "unknown",
+     "note": "no source read",
+     "sources": ""
+    },
+    "adult": {
+     "status": "unknown",
+     "note": "no source read",
+     "sources": ""
+    }
+   },
+   "nutrient_diffusion_constraint": {
+    "embryo": {
+     "status": "borrowed_nonfish",
+     "note": "DLD1 spheroids, D assumed water-like; no fish tissue or bioink value",
+     "sources": "grimes2014"
+    },
+    "larva": {
+     "status": "borrowed_nonfish",
+     "note": "DLD1 spheroids, D assumed water-like; no fish tissue or bioink value",
+     "sources": "grimes2014"
+    },
+    "juvenile": {
+     "status": "borrowed_nonfish",
+     "note": "DLD1 spheroids, D assumed water-like; no fish tissue or bioink value",
+     "sources": "grimes2014"
+    },
+    "adult": {
+     "status": "borrowed_nonfish",
+     "note": "DLD1 spheroids, D assumed water-like; no fish tissue or bioink value",
+     "sources": "grimes2014"
+    }
+   },
+   "oxygen_consumption": {
+    "embryo": {
+     "status": "measured_in_fish",
+     "note": "linear increase 3-48 hpf; per-stage values not read",
+     "sources": "stackley2011"
+    },
+    "larva": {
+     "status": "measured_in_fish",
+     "note": "94.4 pmol/min/larva; 5 dpf 126 pmol/min/embryo (stage naming disagrees with Parichy)",
+     "sources": "konadu2023"
+    },
+    "juvenile": {
+     "status": "unknown",
+     "note": "no source read",
+     "sources": ""
+    },
+    "adult": {
+     "status": "measured_in_fish",
+     "note": "160 pmol/min/animal; unit or normalisation suspect",
+     "sources": "konadu2023"
+    }
+   },
+   "scaffold_mechanics_and_maturation": {
+    "embryo": {
+     "status": "borrowed_nonfish",
+     "note": "pore-size windows only; stiffness, degradation and maturation kinetics not extracted; ranges disagree",
+     "sources": "mukasheva2024"
+    },
+    "larva": {
+     "status": "borrowed_nonfish",
+     "note": "pore-size windows only; stiffness, degradation and maturation kinetics not extracted; ranges disagree",
+     "sources": "mukasheva2024"
+    },
+    "juvenile": {
+     "status": "borrowed_nonfish",
+     "note": "pore-size windows only; stiffness, degradation and maturation kinetics not extracted; ranges disagree",
+     "sources": "mukasheva2024"
+    },
+    "adult": {
+     "status": "borrowed_nonfish",
+     "note": "pore-size windows only; stiffness, degradation and maturation kinetics not extracted; ranges disagree",
+     "sources": "mukasheva2024"
+    }
+   },
+   "scale_formation": {
+    "embryo": {
+     "status": "unknown",
+     "note": "not applicable before squamation",
+     "sources": ""
+    },
+    "larva": {
+     "status": "observed_qualitative",
+     "note": "onset sizes (Table 4) and invariant row/column sequence; no equation",
+     "sources": "parichy2009; aman2018"
+    },
+    "juvenile": {
+     "status": "observed_qualitative",
+     "note": "Fgf needed for initiation and outgrowth",
+     "sources": "aman2018"
+    },
+    "adult": {
+     "status": "unknown",
+     "note": "no source read",
+     "sources": ""
+    }
+   },
+   "staging_by_size": {
+    "embryo": {
+     "status": "unknown",
+     "note": "Kimmel 1995 not open access; not read",
+     "sources": ""
+    },
+    "larva": {
+     "status": "measured_in_fish",
+     "note": "Table 4 milestones in SL, SSL and HAA",
+     "sources": "parichy2009"
+    },
+    "juvenile": {
+     "status": "measured_in_fish",
+     "note": "entry at 11.0 SSL",
+     "sources": "parichy2009"
+    },
+    "adult": {
+     "status": "measured_in_fish",
+     "note": "sexual maturity 17.5-18.3 mm SL",
+     "sources": "parichy2009"
+    }
+   },
+   "whole_organism_bioprint": {
+    "embryo": {
+     "status": "unknown",
+     "note": "not claimed feasible or infeasible; no source supports either",
+     "sources": ""
+    },
+    "larva": {
+     "status": "unknown",
+     "note": "not claimed feasible or infeasible; no source supports either",
+     "sources": ""
+    },
+    "juvenile": {
+     "status": "unknown",
+     "note": "not claimed feasible or infeasible; no source supports either",
+     "sources": ""
+    },
+    "adult": {
+     "status": "unknown",
+     "note": "not claimed feasible or infeasible; no source supports either",
+     "sources": ""
+    }
+   }
+  },
+  "equations": [
+   {
+    "id": "eq-exp-gradient",
+    "name": "Exponential morphogen gradient",
+    "form": "C(s) = C0 * exp(-s / lambda)",
+    "context": "zebrafish pectoral fin bud, BRE reporter, 48-78 hpf, anterior and posterior gradients",
+    "not_established_here": "the quantitative lambda(fin size) relation was not extracted; the equation is not validated beyond 48-78 hpf or beyond the pectoral fin",
+    "claimed_by_source": "the gradients scale in two dimensions with the fin's size; scaling by an expansion-repression mechanism with expander Smoc1"
+   },
+   {
+    "id": "eq-diffusion-consumption",
+    "name": "Steady-state diffusion with constant consumption (spherical)",
+    "form": "D * Laplacian(C) = a   (spherical Laplacian)",
+    "context": "DLD1 human colorectal tumour spheroids in culture; constant a; time-independent",
+    "not_established_here": "any value of D, C0 or a for fish tissue or a bioink",
+    "claimed_by_source": ""
+   },
+   {
+    "id": "eq-diffusion-limit",
+    "name": "Diffusion limit (sphere) and the slab analogue",
+    "form": "sphere: r_l = sqrt(6 D C0 / a);  slab, one-sided supply: L = sqrt(2 D C0 / a);  slab supplied from both faces: total thickness 2L",
+    "context": "derived here from the paper's stated boundary conditions, then verified by substitution; the sphere form is the paper's 'diffusion limit' defined as the radius at which the centre pressure just reaches zero",
+    "not_established_here": "this is a sizing aid for an assumed uniform consumption; it says nothing about vascularised tissue",
+    "claimed_by_source": ""
+   },
+   {
+    "id": "rel-size-over-age",
+    "name": "Size predicts developmental progress better than age",
+    "form": "logistic regression of trait presence on SL or HAA (all R^2 > 0.5); temperature and density add R^2 < 0.05 after size",
+    "context": "laboratory zebrafish, three temperatures (24, 28.5, 33 C) and three densities, N = 782",
+    "not_established_here": "",
+    "claimed_by_source": ""
+   },
+   {
+    "id": "reg-sl-haa",
+    "name": "SL from HAA",
+    "form": "SL = 3.56 * HAA + 4.40",
+    "context": "Parichy 2009 Table 3, R^2 = 0.98; valid for HAA > 0.5 mm",
+    "not_established_here": "",
+    "claimed_by_source": ""
+   },
+   {
+    "id": "param-growth-rate",
+    "name": "Post-embryonic growth rate in SL",
+    "form": "dSL/dt (measured mean, not a fitted law)",
+    "context": "larvae reared at 24 C and at 33 C; the 28.5 C value is not stated in this sentence",
+    "not_established_here": "no growth law (von Bertalanffy, Gompertz or other) was found in the text read; none is asserted",
+    "claimed_by_source": ""
+   },
+   {
+    "id": "param-o2-consumption",
+    "name": "Oxygen consumption per animal",
+    "form": "measured rates (no equation)",
+    "context": "zebrafish at 28.5 C, Oroboros chamber (Konadu) and Seahorse XF24 (Stackley)",
+    "not_established_here": "",
+    "claimed_by_source": ""
+   },
+   {
+    "id": "seq-squamation",
+    "name": "Scale formation sequence and staging",
+    "form": "invariant sequence of row and column addition (no equation)",
+    "context": "zebrafish juveniles, live imaging of individual fish; Fgf signalling necessary for scale initiation and outgrowth",
+    "not_established_here": "",
+    "claimed_by_source": ""
+   },
+   {
+    "id": "obs-fin-calcineurin",
+    "name": "Fin regeneration growth and calcineurin",
+    "form": "qualitative: dose-dependent coordinated overgrowth (no equation)",
+    "context": "adult fin regeneration; kcnk5b/alf mutants",
+    "not_established_here": "no allometric coefficient or growth law was found",
+    "claimed_by_source": ""
+   },
+   {
+    "id": "win-scaffold-pore",
+    "name": "Scaffold pore-size windows (design context, not a law)",
+    "form": "ranges by tissue; sources disagree",
+    "context": "review of tissue-engineering scaffolds (bone, skin, others); not fish tissue",
+    "not_established_here": "",
+    "claimed_by_source": ""
+   }
+  ],
+  "diffusion": {
+   "status": "SIZING AID UNDER BORROWED PARAMETERS. Not a feasibility statement and not a fish-tissue result.",
+   "derived": {
+    "c0_over_a_s": 4.524083333333333,
+    "c0_over_a_s_range": [
+     3.7100833333333334,
+     5.41875
+    ],
+    "slab_one_sided_limit_um": 134.5226127211828,
+    "slab_two_sided_range_um": [
+     243.64181359802208,
+     294.44863728670913
+    ],
+    "slab_two_sided_total_thickness_um": 269.0452254423656,
+    "sphere_check_um": 233.0
+   },
+   "inputs": {
+    "D_m2_per_s": {
+     "kind": "assumed close to water, not measured",
+     "source": "grimes2014",
+     "value": 2e-09
+    },
+    "r_l_m": {
+     "kind": "fitted to DLD1 spheroids",
+     "sd": 2.2e-05,
+     "source": "grimes2014",
+     "value": 0.000233
+    },
+    "typical_diffusion_limit_um": {
+     "source": "grimes2014 Introduction (citing others)",
+     "value": "100-200"
+    }
+   },
+   "assumptions": [
+    "uniform oxygen consumption, steady state, diffusion only, no perfusion",
+    "sphere form is the paper's diffusion limit; the slab forms are derived here for a flat solid supplied from one or two faces"
+   ],
+   "not_known": [
+    "volumetric oxygen consumption of any zebrafish tissue",
+    "C0 at a printed construct's surface",
+    "D in a bioink or scaffold",
+    "whether consumption stays constant as cells mature or proliferate",
+    "any viability threshold for fish cells"
+   ],
+   "reading": "a perfusion-free solid block as tall as the fish at these stages would exceed the borrowed two-sided limit by the stated ratio; real fish tissue is vascularised and its consumption differs, so this exposes the scale of the constraint and nothing more",
+   "rows": [
+    {
+     "haa_mm": 0.52,
+     "milestone": "MMA",
+     "ratio_haa_to_two_sided_slab_limit": 1.93
+    },
+    {
+     "haa_mm": 0.53,
+     "milestone": "AR",
+     "ratio_haa_to_two_sided_slab_limit": 1.97
+    },
+    {
+     "haa_mm": 0.58,
+     "milestone": "DR",
+     "ratio_haa_to_two_sided_slab_limit": 2.16
+    },
+    {
+     "haa_mm": 0.78,
+     "milestone": "PB",
+     "ratio_haa_to_two_sided_slab_limit": 2.9
+    },
+    {
+     "haa_mm": 1.16,
+     "milestone": "PR",
+     "ratio_haa_to_two_sided_slab_limit": 4.31
+    },
+    {
+     "haa_mm": 1.43,
+     "milestone": "SP",
+     "ratio_haa_to_two_sided_slab_limit": 5.32
+    },
+    {
+     "haa_mm": 1.67,
+     "milestone": "SA",
+     "ratio_haa_to_two_sided_slab_limit": 6.21
+    },
+    {
+     "haa_mm": 2.02,
+     "milestone": "J",
+     "ratio_haa_to_two_sided_slab_limit": 7.51
+    }
+   ]
+  },
+  "manifest": "data/fish-lifecycle/manifest.json",
+  "doc": "docs/fish-lifecycle.md"
  },
  "resource_inventory": {
   "$schema": "resource-inventory.schema.json",

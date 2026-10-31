@@ -814,3 +814,15 @@ def test_design_review_shows_live_challenges_with_replies_and_no_resolution(brow
     assert "1 challenge" in t and "none resolved" in t and "open: no resolution state exists" in t.lower() and "1 reply" in t and "2 withheld" in t
     assert "Stiffness measured" in t and "Falsifiable next test" in t and "member 3" in t.lower()
     assert seen and f"version={v}" in seen[0] and "kind=Project" in seen[0]
+
+
+def test_lifecycle_panel_shows_unknowns_and_the_borrowed_parameter_label(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=developmental")
+    pg.wait_for_selector(".lifecycle table")
+    t = pg.locator(".lifecycle").text_content()
+    assert "not a flying fish" in t and "Not claimed: a living whole-fish bioprint is feasible" in t
+    assert pg.locator(".lifecycle .tablewrap").first.locator("tbody tr").count() == 10 and pg.locator(".lifecycle td .pill.no, .lifecycle td .no").count() >= 1
+    assert "borrowed parameters, not a feasibility statement" in t and "SIZING AID UNDER BORROWED PARAMETERS" in t
+    href = pg.locator(".lifecycle a:has-text('life-cycle document')").get_attribute("href")
+    assert href

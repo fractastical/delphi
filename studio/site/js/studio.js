@@ -36,6 +36,29 @@
       <h3>Claims that mention it</h3>${(res.claims || []).length ? html`<ul>${res.claims.map((x) => html`<li><a href="${DF.href("/entity/Claim/" + x.ref.id, { v: x.ref.version })}">${x.title}</a></li>`)}</ul><p class="small"><a href="${DF.href("/knowledge", { tab: "browse", q: goal.split(/\s+/)[0] })}">Browse the claims</a></p>` : html`<p class="empty">No claim matches these words.</p>`}</section>`;
   }
 
+  /* Zebrafish life-cycle source layer: what each stage has (size, growth, metabolism, locomotion, fins) and where it is unknown. Danio rerio only. */
+  function lifecyclePanel(snap) {
+    const L = snap.lifecycle;
+    if (!L) return html`<section class="panel"><h3>Life cycle</h3><p class="empty">No life-cycle data is present in this snapshot.</p></section>`;
+    const tone = { measured_in_fish: "ok", modelled_and_fit_to_fish_data: "warn", observed_qualitative: "st-unk", borrowed_nonfish: "warn", unknown: "no" };
+    const pill = (v) => U.pill(String(v || "not stated").replace(/_/g, " "), tone[v] || "st-unk");
+    const names = Object.fromEntries(L.stages.map((x) => [x.id, x.name]));
+    const D = L.diffusion;
+    return html`<section class="panel lifecycle" aria-labelledby="lc-h"><h3 id="lc-h">Life cycle (${L.organism}, not a flying fish)</h3>
+      <p class="note warn small"><b>${L.status}.</b> ${L.claims_not_made.map((x) => "Not claimed: " + x + ".").join(" ")}</p>
+      <p class="small">${L.stage_note}. Reference temperature ${L.temperature_c} °C.</p>
+      <div class="tablewrap"><table><caption class="sr">Evidence status of each process at each stage</caption><thead><tr><th scope="col">Process</th>${L.stage_order.map((g) => html`<th scope="col">${names[g] || g}</th>`)}</tr></thead>
+        <tbody>${Object.entries(L.processes).map(([k, v]) => html`<tr><th scope="row">${k.replace(/_/g, " ")}</th>${L.stage_order.map((g) => html`<td>${v[g] ? html`${pill(v[g].status)}<br><span class="small faint">${v[g].note}${v[g].sources ? " [" + v[g].sources + "]" : ""}</span>` : ""}</td>`)}</tr>`)}</tbody></table></div>
+      <p class="small"><b>Gaps first:</b> ${L.gaps_first.join("; ")}.</p>
+      <details><summary><b>${L.stages.length} stages</b> <span class="faint small">definitions quoted from the source</span></summary><ul class="small">${L.stages.map((x) => html`<li><b>${x.name}</b>${x.time ? html` (from ${x.time.start_hpf !== undefined ? x.time.start_hpf + " hpf" : "start not stated"})` : ""}: ${x.definition ? "“" + x.definition + "”" : "no definition quoted"}<br>${Object.entries(x.axes).map(([a, v]) => html`${a.replace(/_/g, " ")}: ${pill(v)} `)}</li>`)}</ul></details>
+      <details><summary><b>${L.equations.length} named equations and parameters</b> <span class="faint small">forms as written; context and limits stated</span></summary><ul class="small">${L.equations.map((q) => html`<li><b>${q.name}</b>: <code>${q.form}</code><br>${q.context}${q.not_established_here ? html`<br><b>Not established here:</b> ${q.not_established_here}` : ""}</li>`)}</ul></details>
+      <details><summary><b>Oxygen diffusion sizing aid</b> <span class="faint small">borrowed parameters, not a feasibility statement</span></summary><p class="note warn small">${D.status}</p><p class="small">${D.reading}</p>
+        <p class="small">Derived one-sided slab limit ${Math.round(D.derived.slab_one_sided_limit_um)} µm; two faces ${Math.round(D.derived.slab_two_sided_range_um[0])} to ${Math.round(D.derived.slab_two_sided_range_um[1])} µm (total thickness ${Math.round(D.derived.slab_two_sided_total_thickness_um)} µm).</p>
+        <div class="tablewrap"><table><thead><tr><th>Milestone</th><th>HAA (mm)</th><th>HAA / two-sided slab limit</th></tr></thead><tbody>${D.rows.map((r) => html`<tr><td>${r.milestone}</td><td>${r.haa_mm}</td><td>${r.ratio_haa_to_two_sided_slab_limit}</td></tr>`)}</tbody></table></div>
+        <p class="small"><b>Not known:</b> ${D.not_known.join("; ")}.</p></details>
+      <p class="small faint">Manifest ${L.manifest} · ${U.src("doc:fish-lifecycle", "Read the life-cycle document")}</p></section>`;
+  }
+
   /* ---------------------------------------------------------------- home */
   DF.views.home = function (snap) {
     const p = fish(snap); const forms = snap.print_forms ? snap.print_forms.forms : []; const vids = (snap.simulation_manifests || []).filter((m) => m.video_state === "present_verified" && m.poster_href);
@@ -137,7 +160,7 @@
           <h3>Model</h3>${models}<h3>Media</h3>${media}<h3>Equations and claims</h3>${eqHtml}
           <h3>Parameters and unknowns</h3>${unknowns.length ? html`<ul>${unknowns.map((u) => html`<li>${u}</li>`)}</ul>` : html`<p class="faint small">No parameter list is attached at this scale.</p>`}
           ${srcs.length ? html`<h3>Sources</h3><ul>${srcs.map((s) => html`<li>${U.src("src:" + s.id, s.cite)} ${U.pill(s.read_level, "rl")}</li>`)}</ul>` : ""}
-          ${scale === "molecular" ? genomicsPanel(snap) : ""}<h3>Open questions at this scale</h3>${qs.length ? html`<ul>${qs.map((q) => html`<li><a href="${DF.href("/frontier/" + q.id)}"><b>${q.id}</b></a> ${q.title} ${U.pill(DF.annotate(q, snap).approach.replace(/_/g, " "), "ap-" + DF.annotate(q, snap).approach)}</li>`)}</ul>` : html`<p class="faint small">No curated question names this scale.</p>`}<p class="small"><a href="${DF.href("/frontier", { scale })}">Filter the Frontier to this scale</a></p>
+          ${scale === "molecular" ? genomicsPanel(snap) : ""}${scale === "developmental" ? lifecyclePanel(snap) : ""}<h3>Open questions at this scale</h3>${qs.length ? html`<ul>${qs.map((q) => html`<li><a href="${DF.href("/frontier/" + q.id)}"><b>${q.id}</b></a> ${q.title} ${U.pill(DF.annotate(q, snap).approach.replace(/_/g, " "), "ap-" + DF.annotate(q, snap).approach)}</li>`)}</ul>` : html`<p class="faint small">No curated question names this scale.</p>`}<p class="small"><a href="${DF.href("/frontier", { scale })}">Filter the Frontier to this scale</a></p>
           <h3>Couplings</h3>${here.length ? html`<ul>${here.map((c) => html`<li><code>${c.id}</code> ${U.pill(c.status, { composable: "ok", scenario: "warn", refused: "no" }[c.status] || "st-unk")} ${c.from} → ${c.to}</li>`)}</ul><p class="small"><a href="${DF.href("/simulations")}">Reasons and missing calibrations</a></p>` : mc.length ? html`<ul>${mc.map((c) => html`<li>${U.pill(c.status, c.status === "absent" ? "no" : "warn")} ${c.text}</li>`)}</ul>` : html`<p class="faint small">None recorded.</p>`}
         </section>
         <section class="panel" aria-labelledby="ann-h"><h2 id="ann-h">Comments and proposed edits for this subsystem</h2>
