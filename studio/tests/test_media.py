@@ -91,6 +91,52 @@ def test_text_preview_cached_path_cannot_be_replaced_by_symlink(tmp_path):
     assert result["text"] is None and "not published" not in str(result)
 
 
+@pytest.mark.parametrize("destination", ["relocated.json", "private-vault/inside.json"])
+def test_text_preview_rejects_cached_in_tree_symlink_even_for_same_bytes(tmp_path, destination):
+    path = put(tmp_path, "artifacts/public.json", b'{"published":true}')
+    digest = sha256(path.read_bytes()).hexdigest()
+    projection = media.LocalMedia(tmp_path, scan_ttl=60)
+    assert projection.lookup(digest)["matches"]
+    relocated = tmp_path / "artifacts" / destination
+    relocated.parent.mkdir(parents=True, exist_ok=True)
+    path.rename(relocated)
+    path.symlink_to(relocated)
+    preview = projection.text_preview(digest)
+    assert preview["status"] == "unavailable" and preview["text"] is None
+    fresh = media.LocalMedia(tmp_path).text_preview(digest)
+    if destination.startswith("private"):
+        assert fresh["text"] is None
+    else:
+        # The real relocated public path can qualify after a fresh scan; its
+        # rejected symlink alias must never acquire that path's permission.
+        assert fresh["status"] == "available" and fresh["href"] == "/artifacts/relocated.json"
+
+
+def test_text_preview_rechecks_cached_serving_guard_before_open(tmp_path, monkeypatch):
+    path = put(tmp_path, "artifacts/result.json", b"published")
+    allowed = [True]
+    def guard(root, href):
+        return resolve_static(root, href) if allowed[0] else None
+    projection = media.LocalMedia(tmp_path, validator=guard, scan_ttl=60)
+    digest = sha256(path.read_bytes()).hexdigest()
+    assert projection.lookup(digest)["matches"]
+    allowed[0] = False
+    monkeypatch.setattr(projection, "_open", lambda *args: pytest.fail("revoked path was opened"))
+    assert projection.text_preview(digest)["text"] is None
+
+
+def test_text_preview_rechecks_current_type_instead_of_cached_type(tmp_path, monkeypatch):
+    path = put(tmp_path, "artifacts/result.json", b"published")
+    current_type = ["application/json"]
+    projection = media.LocalMedia(tmp_path, mime_resolver=lambda *args: current_type[0], scan_ttl=60)
+    digest = sha256(path.read_bytes()).hexdigest()
+    assert projection.lookup(digest)["matches"]
+    current_type[0] = "image/png"
+    monkeypatch.setattr(projection, "_open", lambda *args: pytest.fail("unsupported type was opened"))
+    result = projection.text_preview(digest)
+    assert result["status"] == "unsupported_type" and result["text"] is None
+
+
 def test_real_changes_removal_and_same_mtime_drop_old_digest(tmp_path):
     target = put(tmp_path, "artifacts/frame.png", b"old")
     projection = media.LocalMedia(tmp_path)
