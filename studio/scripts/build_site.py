@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import copy
 import datetime
 import json
 import re
@@ -433,6 +434,50 @@ def fish3d_files(ins: Inputs, out: dict) -> dict | None:
     return {"base": f"artifacts/fish3d/{cid}/", "glb_sha256": r["glb_sha256"], "candidates": candidates, "shared": shared, **state}
 
 
+def formalize_examples(ins: Inputs) -> dict | None:
+    """Fixtures from engineering/formalize/cases.py and the recorded Gemini extraction runs, for the proposal checker page. Nothing is run here:
+    the site only offers these requests to the node's POST /api/formalize/propose."""
+    fdir = ROOT / "engineering/formalize"
+    if not (fdir / "cases.py").exists():
+        return None
+    import importlib, sys as _sys
+    _sys.path.insert(0, str(ROOT))
+    try:
+        cases = importlib.import_module("engineering.formalize.cases")
+    finally:
+        _sys.path.pop(0)
+    for rel in ("cases.py", "sources/MANIFEST.json", "sources/cantilever_passage.txt", "sources/oca2_passage.txt"):
+        if (fdir / rel).exists():
+            ins.read(f"engineering/formalize/{rel}")
+    passages = {"cantilever": ins.text("engineering/formalize/sources/cantilever_passage.txt"), "oca2": ins.text("engineering/formalize/sources/oca2_passage.txt"), "gc": ""}
+    ex = []
+    add = lambda eid, title, kind, req, case, note="", receipt=None: ex.append({"id": eid, "title": title, "kind": kind, "request": req, "passage": passages[case], "passage_sha256": digest_bytes(passages[case].encode()) if passages[case] else None, "note": note, "receipt": receipt})
+    add("cantilever", "Cantilever tip deflection (human-written proposal)", "human fixture", cases.cantilever_request(), "cantilever", "The expected result is a checked proposal with a witness; translation fidelity is still unresolved.")
+    for k, why in (("L2", "L cubed written as L squared: a dimension fault the checker should reject"), ("wrong_unit", "second moment of area declared in m squared: a unit fault"), ("drop_guard", "the small-deflection guard removed. The checker still reports checked: it tests consistency, and cannot see that the proposal no longer matches the source. That gap is what the unresolved-translation part is for."), ("flip_guard", "the guard inequality reversed. The checker still reports checked for the same reason: it cannot see a mismatch with the source.")):
+        add("cantilever-" + k, "Cantilever with a deliberate fault: " + k.replace("_", " "), "negative control", cases.corrupt_cantilever(k), "cantilever", why)
+    add("gc-feasible", "Oligonucleotide GC window (human-written, feasible)", "human fixture", cases.gc_design_request(), "gc", "A counting property only; says nothing about function.")
+    if hasattr(cases, "gc_infeasible_request"):
+        add("gc-infeasible", "Oligonucleotide GC window (human-written, infeasible)", "negative control", cases.gc_infeasible_request(), "gc", "The constraints cannot all hold; the checker should say unsat.")
+    base = {"cantilever": cases.cantilever_request(), "oca2": cases.oca2_request()}
+    for rd in sorted((fdir / "runs").glob("*")):
+        rr = f"engineering/formalize/runs/{rd.name}"
+        if not (rd / "receipt.json").exists():
+            continue
+        rc = json.loads(ins.read(f"{rr}/receipt.json")); raw = ins.text(f"{rr}/response.raw.txt") if (rd / "response.raw.txt").exists() else ""
+        case = rc.get("case")
+        try:
+            prop = json.loads(raw)
+        except Exception:
+            prop = None
+        receipt = {"model": rc.get("model_version_reported"), "provider": rc.get("provider"), "finish_reason": rc.get("finish_reason"), "outcome_status": (rc.get("outcome") or {}).get("status"), "parent_checker_status": rc.get("parent_checker_status"), "repair_of": rc.get("repair_of"),
+                   "wall_s": rc.get("wall_s"), "tokens": {k: (rc.get("usage_reported_by_provider") or {}).get(k) for k in ("promptTokenCount", "candidatesTokenCount", "thoughtsTokenCount")}, "response_sha256": rc.get("response_sha256"), "path": rr}
+        if prop is None or case not in base:
+            ex.append({"id": "run-" + rd.name, "title": f"Recorded Gemini extraction {rd.name}", "kind": "recorded model proposal (not usable)", "request": None, "passage": passages.get(case, ""), "passage_sha256": rc.get("passage_sha256"), "note": "The model output is not valid JSON (finish reason " + str(rc.get("finish_reason")) + "), so there is nothing to check.", "receipt": receipt}); continue
+        req = copy.deepcopy(base[case]); req["claim"]["id"] = f"{case}-recorded-{rd.name}"; req["proposal"] = prop
+        ex.append({"id": "run-" + rd.name, "title": f"Recorded Gemini proposal {rd.name}", "kind": "recorded model proposal", "request": req, "passage": passages[case], "passage_sha256": rc.get("passage_sha256"), "note": "A model's proposal recorded earlier, shown unedited; the checker decides, the model does not. Its recorded checker outcome is in the receipt.", "receipt": receipt})
+    return {"examples": ex, "schema": "frontier.formalize.request/1", "limits": {"max_bytes": 16384}}
+
+
 def lifecycle_block(ins: Inputs) -> dict | None:
     """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
     d = "data/fish-lifecycle"
@@ -488,15 +533,16 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
     d = "artifacts/multicell"
     if (ROOT / d / "summary.json").exists():
         sm = json.loads(ins.read(f"{d}/summary.json")); arms = sm["arms"]; shas = {l.split()[1].split("/")[-1]: l.split()[0] for l in ins.text(f"{d}/mp4.sha256").splitlines() if l.strip()}
+        fh = json.loads(ins.read(f"{d}/full/full_summary.json")) if (ROOT / d / "full/full_summary.json").exists() else None
         st, href = _vid(ins, out, "morpheus-multicell", d, "baseline.mp4", shas.get("baseline.mp4"))
         cards.append({"id": "morpheus-multicell", "title": "Morpheus multicellular growth: cell cycle, division, cytokine feedback (baseline arm)", "scales": ["tissue", "cellular"], "evidence_kind": "SimulationResult (generic example model)",
-            "model": {"name": "Morpheus v2.3.9 official multiscale example (cell-cycle ODE, cellular Potts division, cytokine PDE, feedback)", "context": f"Three arms ran headless and each hit the 600 s cap at model time {sm['common_horizon_t']} of a 2.0 horizon. Generic and not calibrated; not fish growth."},
+            "model": {"name": "Morpheus v2.3.9 official multiscale example (cell-cycle ODE, cellular Potts division, cytokine PDE, feedback)", "context": f"The first three arms ran headless and each hit the 600 s cap at model time {sm['common_horizon_t']} of a 2.0 horizon; a later full-horizon rerun reached t = 2.0 (see the limitations). Generic and not calibrated; not fish growth."},
             "time": {"units": "model time units (example model)", "note": "All arms are compared at the common horizon; none reached the planned end."},
             "video": {"file": "baseline.mp4", "sha256": shas.get("baseline.mp4"), "note": "22 frames"}, "video_state": st, "video_href": href, "poster_href": None,
             "numerical_checks": [{"name": f"arm {a}", "result": f"{v['cells_at_common_horizon']} cells at t={v['reached_t']}; divisions at {v['division_event_times_to_horizon']}; max cdk1 {v['max_cdk1']:.3f}"} for a, v in arms.items()],
-            "parameter_unknowns": ["Not calibrated to any organism.", "Run stopped at the 600 s cap; independent seeds, refinement and the full horizon were not run."],
-            "open_questions": ["Does the feedback-off arm keep fewer cells at the full horizon? Only the early window was observed."],
-            "limitations": ["Generic example, not fish growth.", "Seed repeat is one repeat, not an uncertainty estimate.", "Two further arm movies (feedback-off, seed repeat) exist in artifacts/multicell and are not shown here."], "couplings": [], "manifest": f"{d}/summary.json", "native": True})
+            "parameter_unknowns": ["Not calibrated to any organism.", "The early-window arms stopped at the 600 s cap. Only one seed repeat exists; there is no refinement study."],
+            "open_questions": ["Is the feedback effect on cell count robust across more seeds and a finer time step? One repeat and one step size exist."],
+            "limitations": ["Generic example, not fish growth.", "Seed repeat is one repeat, not an uncertainty estimate.", "Two further arm movies (feedback-off, seed repeat) exist in artifacts/multicell and are not shown here."] + ([f"Full horizon (t = 2.0, exit 0): baseline {fh['baseline']['final_cells']} cells, feedback-off {fh['nofeedback']['final_cells']}, seed repeat {fh['seed2']['final_cells']}; the movie above is the early window only." ] if fh else []), "couplings": [], "manifest": f"{d}/summary.json", "native": True})
     d = "artifacts/molecular"
     if (ROOT / d / "cuda-render/render.json").exists() and (ROOT / d / "cuda-analysis/ensemble.json").exists():
         rr = json.loads(ins.read(f"{d}/cuda-render/render.json")); en = json.loads(ins.read(f"{d}/cuda-analysis/ensemble.json")); o = rr["outputs"]; runs = en["runs"]; ds = en["descriptive_endpoint_CA_RMSD_nm"]
@@ -510,7 +556,35 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "parameter_unknowns": ["Empirical accuracy: " + str(en["empirical_accuracy"]) + ".", "Equilibrated ensemble: " + str(en["equilibrated_ensemble"]) + ".", "Tissue material modulus: not computed (null)."],
             "open_questions": ["Do longer runs from different starting structures change any observable? Warm-start parents for a next job are recorded in warmstart-v3.json."],
             "limitations": [en["scope"], "Biological success probability: null (not computed).", "Synthetic collagen-mimetic peptide, not a fish protein.", "The earlier 0.2 ps CPU setup run is a separate card and is not part of this ensemble."], "couplings": [], "manifest": f"{d}/cuda-render/render.json", "native": True})
-    ws = f"{d}/warmstart-v3.tar.xz"
+    d = "artifacts/molecular"
+    if (ROOT / d / "continuation-render/render.json").exists() and (ROOT / d / "continuation-analysis/summary.json").exists():
+        rr = json.loads(ins.read(f"{d}/continuation-render/render.json")); an = json.loads(ins.read(f"{d}/continuation-analysis/summary.json")); o = rr["outputs"]
+        st, href = _vid(ins, out, "molecular-md-continuation", f"{d}/continuation-render", "trajectory.mp4", o["trajectory.mp4"]); _, ph = _vid(ins, out, "molecular-md-continuation", f"{d}/continuation-render", "poster.png", o["poster.png"])
+        br = an["branches"]; drift = [b["predeclared_diagnostic"]["small_window_drift"] for b in br]
+        cards.append({"id": "molecular-md-continuation", "title": "Collagen-mimetic trimer: three 900 ps continuations from the 100 ps states (OpenMM, CUDA)", "scales": ["molecular"], "evidence_kind": rr["kind"] + "; conditional branches, not independent samples",
+            "model": {"name": "OpenMM classical MD continued from each parent's final saved state with a new thermostat seed", "context": f"{an['n_parent_branches']} branches reach global production time {br[0]['global_production_end_ps']:.0f} ps. The movie shows seed {rr['seed']} ({rr['frames']} saved states over {rr['simulation_duration_ps']:.0f} ps, global {rr['global_production_time_ps'][0]:.0f} to {rr['global_production_time_ps'][1]:.0f} ps). Each branch starts from one shared parent state, so the branches are conditional, not independent."},
+            "time": {"units": "picoseconds of simulated time", "note": f"{rr['frames']} frames at {rr['display_fps']} fps; rigid alignment for display only. RMSD reference: {rr['RMSD_reference']}."},
+            "video": {"file": "trajectory.mp4", "sha256": o["trajectory.mp4"], "note": ""}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": f"branch from seed {b['parent_seed']} (thermostat seed {b['new_thermostat_seed']})", "result": f"final CA RMSD from the original reference {b['final_original_reference_CA_RMSD_nm']:.3f} nm; CA radius of gyration {b['final_CA_geometric_Rg_nm']:.3f} nm; predeclared small-window drift: {'TRUE' if b['predeclared_diagnostic']['small_window_drift'] else 'false'} (RMSD window means differ by {b['predeclared_diagnostic']['RMSD_window_mean_change_nm']:.4f} nm)"} for b in br]
+                + [{"name": "predeclared drift diagnostic", "result": f"true for {an['small_window_drift_diagnostic_count']} of {an['diagnostic_denominator']} branches; false outcomes are kept"}, {"name": "new independent biological samples", "result": str(an["n_new_independent_biological_samples"])}],
+            "parameter_unknowns": ["Empirical accuracy: " + str(an["empirical_accuracy"]) + ".", "Biological success probability: null (not computed).", "Equilibrium and material modulus are not established."],
+            "open_questions": ["Do longer runs from different starting structures change any observable? These branches share one parent and one Hamiltonian."],
+            "limitations": [an["scope"], "A true diagnostic does not establish equilibrium; a false one is not hidden.", "Synthetic collagen-mimetic peptide, not a fish protein."], "couplings": [], "manifest": f"{d}/continuation-analysis/summary.json", "native": True})
+    d = "artifacts/metabolism"
+    if (ROOT / d / "manifest.json").exists() and (ROOT / d / "basic-nutrients-v3/metabolism_results.json").exists():
+        mf = json.loads(ins.read(f"{d}/manifest.json")); R = json.loads(ins.read(f"{d}/basic-nutrients-v3/metabolism_results.json")); png = next((f for f in mf["files"] if f["path"].endswith("o2_atp_biomass.png")), None)
+        _, ph = _vid(ins, out, "metabolism-gem", f"{d}/basic-nutrients-v3", "o2_atp_biomass.png", png["sha256"]) if png else (None, None)
+        sw = R["o2_sweep"]; C = R["controls"]; m = R["model"]
+        cards.append({"id": "metabolism-gem", "title": "Generic zebrafish metabolic model: a steady-state flux balance with an assumed medium", "scales": ["subcellular", "cellular"], "evidence_kind": "computed (flux balance analysis); figure is a plot of stored numbers",
+            "model": {"name": f"Zebrafish-GEM (Wang 2021 PNAS, {mf['model']['license']}), commit {mf['model']['commit'][:9]}, cobra {mf['software']['cobra']} with {mf['software']['solver']}", "context": f"A generic Danio rerio network of {m['reactions']:,} reactions, {m['metabolites']:,} metabolites and {m['genes']:,} genes (counts measured from the file). It defines no growth medium, so the medium is ASSUMED: " + R["assumed_medium"]["basis"] + ". A steady-state linear programme, not a time course; not specific to fin, tissue or life stage."},
+            "time": {"units": "none: steady state", "note": R["units"]},
+            "video": {"file": None, "sha256": None, "note": ""}, "video_state": "none", "poster_href": ph, "poster_is_figure": True,
+            "numerical_checks": [{"name": k.replace("_", " "), "result": (f"{v['status']}; objective {v['objective']:.4g}; max |S v| {v['max_abs_Sv']:.1e}" if isinstance(v, dict) and "objective" in v else json.dumps(v)[:160])} for k, v in C.items()]
+                + [{"name": "oxygen sweep", "result": f"biomass {sw[0]['biomass']:.3f} at zero oxygen uptake, {sw[-1]['biomass']:.3f} at uptake limit {sw[-1]['o2_uptake_limit']}: growth barely depends on the oxygen limit"}],
+            "parameter_unknowns": ["The medium is assumed, not published or measured.", "Flux units are not declared in the SBML; mmol/gDW/h is assumed.", "Uptake is uncapped except glucose."],
+            "open_questions": ["Which measured medium and uptake bounds would replace the assumed ones? The sweep does not show oxygen dependence because the model can make its own oxygen through a reaction next to uncapped vitamin uptake; the owner's diagnostic is in the branch, not in this tree."],
+            "limitations": ["Not a measurement of fish oxygen use or oxygen dependence.", "Growth values are model objective fluxes, not physiological growth.", "Not fin- or tissue-specific and says nothing about flying fish.", "The ATP-maintenance slope is not calibrated."], "couplings": [], "manifest": f"{d}/manifest.json", "native": True})
+    d = "artifacts/molecular"; ws = f"{d}/warmstart-v3.tar.xz"          # d was reassigned by the cards above; set it explicitly
     if (ROOT / ws).exists() and (ROOT / d / "warmstart-v3.json").exists():
         wm = json.loads(ins.read(f"{d}/warmstart-v3.json")); b = ins.read(ws)
         if digest_bytes(b) == wm["sha256"] and len(b) == wm["bytes"]:
@@ -553,6 +627,23 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
             "open_questions": ["What measured fin camber, ray structure and thickness would replace the assumed ones?"],
             "limitations": ["Not claimed: " + x for x in r["not_claimed"]] + [f"The mesh itself (fish.glb, sha256 {r['glb_sha256'][:12]}…) is in artifacts/fish3d and is not served by this site."],
             "couplings": [], "manifest": f"{d}/render.json", "native": True})
+    d = "artifacts/cfd3d/gpu-v1"
+    if (ROOT / d / "status.json").exists() and (ROOT / d / "receipt.json").exists():
+        stt = json.loads(ins.read(f"{d}/status.json")); rc = json.loads(ins.read(f"{d}/receipt.json")); gate = stt["reference_gate"]
+        for tag, cid in (("L128_Re1000", "cfd3d-gpu-L128-Re1000"), ("L192_Re1000", "cfd3d-gpu-L192-Re1000")):
+            rd = f"{d}/gpu_fish_{tag}/render"
+            if not (ROOT / rd / "render.json").exists():
+                continue
+            r = json.loads(ins.read(f"{rd}/render.json")); cs = json.loads(ins.read(f"{d}/gpu_fish_{tag}/case.json"))["case"]
+            st, href = _vid(ins, out, cid, rd, "flow.mp4", r["video"]["sha256"]); _, ph = _vid(ins, out, cid, rd, r["poster"], r["poster_sha256"])
+            cards.append({"id": cid, "title": f"3D flow past the fish3d candidate, Re = {cs['Re']}, {cs['L_cells']} cells along the body (WaterLily, H100)", "scales": ["organism"], "evidence_kind": "simulated (numerical demo; video is a render of solver slices)",
+                "model": {"name": "WaterLily 1.10.0 three-dimensional Navier-Stokes, fixed rigid body, candidate 4a3b912eb346", "context": r["what"] + ". " + " ".join(r["caption"].splitlines()[1:2])},
+                "time": {"units": "convective time units", "note": f"{r['frames']} frames at {r['fps']} fps; case runs to t = {cs['t_end']}, averaging over the last {cs['t_avg']}. Container wall {rc['container_wall_s']} s on {rc['device']} for the whole packet (all four cases), not for this case alone."},
+                "video": {"file": "flow.mp4", "sha256": r["video"]["sha256"], "note": ""}, "video_state": st, "video_href": href, "poster_href": ph,
+                "numerical_checks": [{"name": "C1 sphere reference (Re 100)", "result": f"FAILED: |Cd| {gate['evidence'].split('|Cd| ')[1].split(' vs')[0]} against correlation 1.092, band [0.95, 1.35]; no physical-validation claim"}, {"name": "platform gates", "result": "reproduce model behaviour only (" + gate["consequence"] + ")"}],
+                "parameter_unknowns": ["Fins are " + r["caption"].splitlines()[2 - 1].split("Fins are ")[1].split(": fin flow")[0] + ". Fin flow is not resolved.", "A flying fish glides at Reynolds numbers orders of magnitude above this."],
+                "open_questions": ["Can the C1 reference be brought into its band? Until then no case here supports a quantitative force claim."],
+                "limitations": r["caption"].splitlines()[2:] + ["Low-Re numerical demo: not swimming-, taxiing- or flight-validated."], "couplings": [], "manifest": f"{rd}/render.json", "native": True})
     d = "artifacts/behavior"
     if (ROOT / d / "manifest.json").exists() and (ROOT / d / "controls.json").exists():
         m = json.loads(ins.read(f"{d}/manifest.json")); ct = json.loads(ins.read(f"{d}/controls.json")); fl = m["files"]
@@ -866,6 +957,7 @@ def build() -> dict[str, bytes]:
     home_biology_block = home_biology(ins)
     timeline = build_timeline(ins)
     fish3d_viewer = fish3d_files(ins, extra)
+    formalize_ex = formalize_examples(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -897,6 +989,7 @@ def build() -> dict[str, bytes]:
         "home_biology": home_biology_block,
         "timeline": timeline,
         "fish3d_viewer": fish3d_viewer,
+        "formalize": formalize_ex,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
