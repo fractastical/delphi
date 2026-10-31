@@ -117,7 +117,7 @@ def main():
     species_cache = {}
     for name, spec in UNITS.items():
         params = {"classKey": AMPHIBIA_CLASS_KEY, "limit": 0, "facet": "speciesKey",
-                  "facetLimit": 500, **unit_params(spec)}
+                  "facetLimit": 500, **({"hasGeospatialIssue": "false"} if "box" in spec else {}), **unit_params(spec)}
         d = gbif(params, f"unit-facet:{name}")
         total = d["count"]
         facets = d["facets"][0]["counts"] if d.get("facets") else []
@@ -125,15 +125,20 @@ def main():
         for f in facets:
             key = int(f["name"])
             in_unit = int(f["count"])
-            if key not in species_cache:
-                g = gbif({"speciesKey": key, "limit": 1}, f"species-global:{key}")
+            # Box units only see georeferenced records, so their denominator must be
+            # georeferenced records too; country units see all records with a country code.
+            georef = "box" in spec
+            ck = (key, georef)
+            if ck not in species_cache:
+                extra = {"hasCoordinate": "true", "hasGeospatialIssue": "false"} if georef else {}
+                g = gbif({"speciesKey": key, "limit": 1, **extra}, f"species-global:{key}:{'georef' if georef else 'all'}")
                 sci = g["results"][0].get("species") or g["results"][0].get("scientificName") if g["results"] else str(key)
-                species_cache[key] = {"global": g["count"], "name": sci}
-            glob = species_cache[key]["global"]
+                species_cache[ck] = {"global": g["count"], "name": sci}
+            glob = species_cache[ck]["global"]
             frac = in_unit / glob if glob else 0.0
             species.append({
                 "speciesKey": key,
-                "species": species_cache[key]["name"],
+                "species": species_cache[ck]["name"],
                 "records_in_unit": in_unit,
                 "records_global": glob,
                 "fraction_in_unit": round(frac, 4),
