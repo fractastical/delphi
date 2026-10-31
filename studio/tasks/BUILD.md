@@ -1,6 +1,6 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 02:41PM PDT.
+Coordinator: codex-03. Updated October 31, 2026, 02:59PM PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-008 define acceptance. This board supersedes the earlier 1:48pm snapshot.
 Every status distinguishes implementation, integration, publication and biological validation.
@@ -40,14 +40,44 @@ Every status distinguishes implementation, integration, publication and biologic
 - [x] Deployed branch puts the fish above Frontier questions and adds the six-model printable selector to both Home and Frontier. STL downloads were individually fetched and digest checked on the live site; printer preparation remains unverified.
 - [x] MCP branch b97f88c adds nine bounded discovery/project/artifact/calculation tools; author reports 34 official SDK tests. Root integration/deployment pending. Existing public endpoint passed 12 root production checks at 2:07pm PDT.
 - [x] Deployed exact release c804b317b2afe3e6d180141de134e03606c2e910. Root 43 browser checks and scratch runtime checks passed; public web 8 checks and expanded MCP 33 checks passed (18 tools, actual bounded calculations). Native performance read: first 50 claims 322.7 ms, one 274089-byte request; previous 26 requests / 7.09 MB and~10.14 s. These are single captured samples, not latency guarantees.
-- [ ] Add exact-version project/subsystem design challenges, cited evidence, alternatives and falsifiable next tests. Native resource_scaling owns contract/API/MCP; root owns web integration; site owner owns readable project discussion. Debate does not establish biological plausibility.
+- [x] Implement exact-version project/subsystem challenges: contract/API/MCP plus web GET context are integrated at a77d35b; 88 focused tests passed. Four source-context challenges were submitted as proposed Annotations and anonymously read back through exact Project context. Receipt: imports/2026-10-31-design-challenges-receipt.json. These are authored critiques, not independent reviews or accepted conclusions.
+- [ ] Deploy the design-context API and readable project discussion together. Site owner is integrating the UI; deployed c804b31 still exposes the preceding 18-tool MCP surface.
 - [ ] Publish the prepared wind-tunnel, data-derived controls, scale-growth, lifecycle, behavior and assurance surfaces after checking lineage and numerical limits.
 - [ ] Finish corpus imports for new genomics, behavior, lifecycle, assurance and render evidence; audit all Project pins and remaining artifact gaps.
 - [ ] Complete independent Playwright review of every route and major interaction on the new public release.
 
 ## Current resource evidence
 
-Provider read at 2:37:31pm PDT: Evo2 arm B completed; our P9 wind-tunnel and dt/4 jobs were pulling images (zero of ours computing then). Infrastructure lead subsequently dispatched aijob-e00cqbmnzwmvms8ayr: 357 missing perturbations + 48 fixed repeats. Our startup/run pipeline now contains three jobs, not a claim of three busy GPUs. Next prepared packet: actual N1 mesh at angles of attack 0/4/12 degrees, 24/48 grids, conditional on CUDA parity; remains 2D low-Re and cannot establish flight aerodynamics. Prior telemetry retains its own time window.
+Infrastructure lead's provider read at 2:51:49pm PDT: dt/4 RUNNING; perturbation and angle-of-attack jobs IMAGE_PULLING; cylinder STARTING. Molecular dynamics was created at 2:55:36pm PDT. Five jobs are in the infrastructure pipeline; this is not five occupied GPUs. The separate hosted OpenFold2 operation reported QUEUED at 2:56:54pm PDT. Prior telemetry retains its own time window.
+
+| Job / operation | Purpose | Latest reported state |
+| --- | --- | --- |
+| aijob-e00h6cqxa1c7cwts6y | Frozen 81-case timestep check | RUNNING at 2:51:49pm PDT |
+| aijob-e00cqbmnzwmvms8ayr | 357 missing perturbations plus 48 fixed repeats | IMAGE_PULLING at 2:51:49pm PDT |
+| aijob-e00saz7cewggkp50d2 | Recover actual flow fields; N1 angles 0/4/12 degrees on two grids | IMAGE_PULLING at 2:51:49pm PDT |
+| aijob-e00vga5krqxr3xxc94 | Three-grid/timestep cylinder reference assay | STARTING at 2:51:49pm PDT |
+| aijob-e00a3q798jsc6fdbas | OpenMM explicit-solvent collagen, CUDA parity then three 100 ps trajectories | CREATED at 2:55:36pm PDT; not yet a completed trajectory |
+| op-5ba1d104dbbcd293 | Hosted OpenFold2, exact unmodified BAF03613.1/Q0KIZ7-matching Kcnj13 sequence | QUEUED at 2:56:54pm PDT; not counted as our H100 allocation |
+
+P9 wind-tunnel completed at 2:40:36pm PDT. Infrastructure lead recovered numeric controls: CPU/CUDA coefficient difference 1.49e-13; drag refinement differences 1.922% and 0.794%. Its 35-sample telemetry window had mean 71.54% and maximum 88% GPU utilization. The field archive exceeded an old 3 MB recovery cap and was discarded; the truncation remains a finding and the next packet reruns recovery with a larger bounded cap. These are low-Re 2D numerical results, not measured flight performance.
+
+## Executable multiscale queue
+
+Every run must retain exact inputs, model/code versions, units, parameter provenance, numerical controls, actual saved states, artifacts and limits. Cross-scale compatibility is not biological calibration. The existing coupling contract remains normative.
+
+| Scale / question | Owner | Active work and next gate |
+| --- | --- | --- |
+| Molecules: collagen structure and fluctuations | native mechanobio_sim + infra_director | Actual 10,491-atom CPU setup trajectory and force/NVE controls delivered at 5a4b6fa. GPU job above must pass same-job CPU/CUDA parity; actual-state video and source/model matrix follow. A short peptide trajectory does not estimate fin stiffness. |
+| Protein structure: sourced ion channel | native resource_scaling | One hosted OpenFold2 operation above; exact 362-aa source sequence, RefSeq discrepancy retained. Single-sequence monomer omits membrane/tetramer/ligands; structure does not establish conductance. |
+| Cell/tissue voltage: electrodiffusion | dx-market-r1 | BETSE baseline ran; K-permeability, gap-junction and half-step controls underway. Generic tissue, not calibrated fish tissue. |
+| Metabolism: oxygen and biomass feasibility | claude-11 | Zebrafish-GEM/COBRApy actual solves. Unrestricted uptake allowed energy-rich compounds and is retained as a failed physiological assumption; explicit assumed nutrient medium being checked. Steady-state flux is not organism growth. |
+| Growth: intracellular dynamics to tissue | claude-06 | Morpheus ODE to cell division to cytokine PDE feedback, source model plus disabled-feedback controls. Generic multiscale example; fish correspondence unknown. |
+| Geometry/flow: 3D Navier–Stokes | claude-04 | WaterLily/mesh-body feasibility and reference controls before exact fish geometry. Actual units, mesh resolution and Reynolds-number limits required. |
+| Flow to fin deformation | claude-07 | New coupling adapter: pressure to traction to ray load, conservation and analytic controls. Await a dimensioned compatible flow artifact; lattice units or 2D projections cannot silently become whole-fin pressure. |
+| Scale formation and fish geometry | claude-05 | Corrected scale-model labels integrated; model mismatch retained. Biological-scale mesh 994aac4 awaits integration; additive corrected print v2 task dispatched, old files preserved. |
+| UI and independent critique | claude-02 / dx-critic-r1 | Design discussion and simulation cards; all remaining public routes/major interactions assigned for audit against exact deployed SHA. |
+
+Next valuable couplings are the actual Morpheus closed loop and pressure-to-fin mechanics. Additional generic parameter sweeps do not substitute for either. FEBio multiphasic/growth and PhysiCell intracellular ODE models are sourced candidates for later work; no execution is claimed.
 
 - [x] Canonical Delphi import: all 1,190 Claims in the latest fetched catalogue are present, imported_unreviewed. Root independently queried that count. This does not establish scientific acceptance or future upstream completeness.
 - [x] Corpus recovery reports 1,543 imported_unreviewed records, zero forks, all 13 Project members pinned and 73 MorphoLib records imported; exact receipts c324e10/7ac62ae/b58006c. Two MorphoLib models have no remediation Problem, so the correct total is 73, not 75.
