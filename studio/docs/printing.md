@@ -24,7 +24,8 @@ From the repository root, on Python 3.13 (the version used here):
 ```
 uv venv --python 3.13 .venv && uv pip install -e '.[geometry,test]'     # or: pip install -e '.[geometry,test]'
 python -m engineering.geometry.build --solver-repo .     # writes artifacts/print/** ; exits 1 if any check fails
-pytest --noconftest tests/test_geometry.py               # 41 tests; skips if manifold3d is absent
+python -m engineering.geometry.build --edition v2        # writes artifacts/print-v2/** (corrected body profile)
+pytest --noconftest tests/test_geometry.py               # 65 tests over both editions; skips if manifold3d is absent
 ```
 
 Run both under the repo's caps (`systemd-run --user --scope -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0
@@ -102,6 +103,54 @@ authority, and they also carry the mesh and file hashes.
   b²/S is unresolved. The second treats the 16–20 m/s taxi speed as a flight-speed envelope, which it is not.
 - **Glide receipts.** A–C have no glide simulation. The build attaches a `frontier.glide.receipt/1` from
   `artifacts/print/glide/<id>.receipt.json` only if it names the candidate's sha256.
+
+## Edition v2: corrected body profile (`artifacts/print-v2/`)
+
+**The defect.** v1 evaluated the body half-width at single stations (fin roots, the dorsal and anal fins, the stand
+saddle) with `mesh.body_profile_v1`. That function normalises by the maximum of its input, so a single-point call
+returns nearly full width wherever it is evaluated. Long arrays (the loft stations, the volume integral) were nearly
+unaffected, so the body itself and its volume-derived width are the same in v1 and v2. It was found while building
+the 3-D fish (`docs/fish3d.md`).
+
+**v2 is additive.** It holds the same six forms under new ids (`<v1 id>-v2`) in new sets (`morphology-v2`,
+`nca-comparison-v2`), each recorded as superseding its v1 set. The only spec change is `body_profile: "pointwise"`
+(`forms.FORMS_V2`). Sources, solver, print rules, display scales (7:20 and 9:20) and shape parameters are unchanged.
+- **v1 stays as published.** Every v1 STL, stand, GLB, solver run, candidate, PNG, MP4 and GIF keeps its bytes.
+  `test_v1_binaries_unchanged_since_publication` pins all 60 of them to `518671a`. The v1 JSON and HTML records
+  changed only in the build code hash and the file hashes that follow from it. `artifacts/print/` was rebuilt and
+  diffed after substituting the hash.
+- **Its own files.** `artifacts/print-v2/` has its own `manifest.json` (with an `edition` block mapping each v2 id
+  to its v1 id), `downloads.json` (with `base: artifacts/print-v2/`), `viewer.html`, and turntables under
+  `media/`.
+
+| form | solver | prop L × span × H (mm) | volume (mm³) | change from v1 |
+|---|---|---|---|---|
+| A-precursor-short-fin-v2 | **unsat** (`wl_hi`, as v1) | 110.9 × 25.1 × 20.1 | 4622 | H 20.9 → 20.1, volume −92 |
+| B-two-wing-glider-v2 | feasible | 94.9 × 111.3 × 20.1 | 6007 | H 20.9 → 20.1, volume −39 |
+| C-four-wing-glider-v2 | feasible | 91.3 × 94.4 × 19.1 | 6072 | H 20.0 → 19.1, volume −36 |
+| N1-cypselurus-baseline-v2 | feasible | 92.5 × 93.6 × 19.6 | 6437 | H 20.6 → 19.6, volume −37 |
+| N2-area-x1.3-v2 | feasible | 92.5 × 106.9 × 20.1 | 6969 | H 20.6 → 20.1, volume −36 |
+| N3-area-x1.3-ar-x1.2-v2 | feasible | 92.5 × 117.0 × 20.7 | 6979 | H 20.8 → 20.7, volume −36 |
+
+**What moved.**
+- **Body width.** The width at the fin roots fell by 2–10%. On N1 the pectoral root went from 26.80 to 26.13 mm
+  and the pelvic root from 27.95 to 25.32 mm (biological).
+- **Wings and solver.** For the fish-fit forms (B, C, N1–N3), S and b are unchanged, so the solver queries are too.
+  The pectoral fins get slightly longer, because L = (b − body width) / 2, and the pelvic share of the remainder
+  shifts.
+- **Form A.** Its S and b are derived from the fin layout, so its solver point moved. It is still unsat on the
+  same three constraints.
+- **Height.** Prop height falls by up to 1 mm, because the dorsal and anal fins sit on the narrower body.
+
+`test_v2_is_v1_with_the_pointwise_profile_only` checks four things:
+- the specs differ only in id, set, labels and profile;
+- each recorded fin-root width equals the pointwise formula for v2 and the v1 formula for v1. The two differ by
+  2–10%, so the check can tell them apart;
+- every v2 mesh differs from its v1 mesh;
+- every v2 set names its v1 predecessor.
+
+**Not changed by v2.** The 3-D fish (`artifacts/fish3d/`) already used the pointwise profile. Its candidate is not
+the v2 print candidate: it is built at 1:1 from the biological point, without the solver's rational witness.
 
 ## Downloads for the site
 

@@ -73,8 +73,8 @@ the tail up to +98%.
 - **The fix.** `body_profile` is now pointwise. The old function is kept as `body_profile_v1` only so that the
   published print sets (morphology-v1, nca-comparison-v1) rebuild byte for byte. `test_geometry.py` passes, and
   every print STL, GLB, solver record and video is unchanged.
-- **This candidate uses the corrected profile.** Correcting the print sets would need new set ids (v2), and that
-  is root's decision.
+- **This candidate uses the corrected profile.** The corrected print sets are the additive v2 edition in
+  `artifacts/print-v2/` (`docs/printing.md`). The v1 files are unchanged.
 
 ## Not claimed
 - Aerodynamic validity of any kind, from the render or from a 2-D section.
