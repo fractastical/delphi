@@ -1,0 +1,108 @@
+"""Focused checks on cfd3d's committed packet, case artifacts and regime/grid summaries (no solver run)."""
+from __future__ import annotations
+
+import hashlib
+import importlib.util
+import json
+import os
+import subprocess
+import sys
+import tarfile
+from pathlib import Path
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+ART = ROOT / "artifacts/cfd3d"
+PACKET = ART / "packet"
+
+
+def _load(name: str):
+    spec = importlib.util.spec_from_file_location(name, ROOT / f"engineering/cfd3d/{name}.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def sha(p: Path) -> str:
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def test_regime_converts_re_to_speed_in_each_medium():
+    s = _load("summarize")
+    r = s.regime(200)
+    assert r["same_Re_in_each_medium"]["water_20C"]["U_m_s"] == pytest.approx(200 * 1.004e-6 / 0.230699)
+    assert r["same_Re_in_each_medium"]["air_20C"]["U_m_s"] == pytest.approx(200 * 1.516e-5 / 0.230699)
+    for v in r["intended"].values():          # intended regimes stay far above the simulated one
+        assert min(v["gap_factor"]) > 100 and v["status"].startswith("assumed")
+    assert "NOT" in r["label"].upper() and "flight" in r["label"]
+
+
+def test_cpu_pair_is_reported_not_grid_independent():
+    s = json.loads((ART / "summary-cpu.json").read_text())
+    (pair,) = s["grid_pairs"]
+    assert pair["rel_diff"] > 0.10 and pair["grid_rule_met"] is False
+    assert "no force claim" in pair["reading"]
+
+
+@pytest.mark.parametrize("case", ["fish_L24_Re200", "fish_L32_Re200"])
+def test_case_artifacts_match_their_header(case):
+    c = json.loads((ART / case / "case.json").read_text())
+    geo = json.loads((ART / "geometry/components.json").read_text())
+    assert c["candidate_sha256"] == geo["candidate_sha256"]
+    assert c["resolution"]["fins_resolved"] is False and c["resolution"]["fin_thickness_cells"] < 2
+    assert "body force" in c["coefficients"]["sign"] or "ON THE BODY" in c["coefficients"]["sign"].upper()
+    for k, v in c["components"].items():
+        assert v["stl_sha256"] == geo["components"][k]["stl_sha256"]
+        n = (ART / case / "surface" / f"{k}.f32").stat().st_size
+        assert n == v["rows"] * 10 * 4                        # 10 float32 columns per STL triangle
+        assert v["resolved"] == (k in ("body", "eye_L", "eye_R"))
+    r = json.loads((ART / case / "render/render.json").read_text())
+    assert r["video"]["sha256"] == sha(ART / case / "render/flow.mp4")
+    assert "FAILED" in r["caption"] and "not swimming" in r["caption"]
+
+
+def test_reference_gate_failure_is_carried_by_the_packet():
+    pk = json.loads((ROOT / "engineering/cfd3d/packet.json").read_text())
+    ctl = json.loads((ART / "controls/cpu_controls.json").read_text())
+    assert pk["reference_gate"]["C1_sphere_Re100"] == "FAIL" and ctl["C1"]["pass"] is False
+    assert pk["local_cpu_pins"]["sphere_D16_Cd"] == ctl["C1"]["D16"]["Cd_mean"]
+
+
+def test_packet_manifest_matches_archive_and_git():
+    m = json.loads((PACKET / "packet-manifest.json").read_text())
+    blob = (PACKET / m["archive"]).read_bytes()
+    assert hashlib.sha256(blob).hexdigest() == m["archive_sha256"] and m["inject_total_raw"] <= 45_000
+    with tarfile.open(PACKET / m["archive"]) as tf:
+        for row in m["files"]:
+            data = tf.extractfile(row["path"]).read()
+            assert hashlib.sha256(data).hexdigest() == row["sha256"]
+            src = row["path"].removeprefix("fish3d_src/")
+            assert subprocess.run(["git", "-C", str(ROOT), "rev-parse", f"{row['rev']}:{src}"],
+                                  capture_output=True, text=True).stdout.strip() == row["blob"]
+
+
+def _launch(tmp_path, digest, extra_env=None):
+    m = json.loads((PACKET / "packet-manifest.json").read_text())
+    env = dict(os.environ, PREFLIGHT="1", TMPDIR=str(tmp_path), **(extra_env or {}))
+    return subprocess.run([sys.executable, "-I", str(ROOT / m["launcher"]), str(PACKET / m["archive"]), digest],
+                          env=env, capture_output=True, text=True, timeout=60)
+
+
+def test_preflight_passes_and_wrong_hash_is_refused(tmp_path):
+    m = json.loads((PACKET / "packet-manifest.json").read_text())
+    ok = _launch(tmp_path, m["archive_sha256"])
+    assert ok.returncode == 0 and '"preflight": true' in ok.stdout
+    bad = _launch(tmp_path, "0" * 64)
+    assert bad.returncode == 9 and "refused" in bad.stdout
+
+
+def test_preflight_fails_on_a_missing_file(tmp_path):
+    m = json.loads((PACKET / "packet-manifest.json").read_text())
+    job = tmp_path / "job"
+    with tarfile.open(PACKET / m["archive"]) as tf:
+        tf.extractall(job, filter="data")
+    (job / "engineering/cfd3d/env_gpu/pins.tsv").unlink()
+    r = subprocess.run([sys.executable, "-I", "engineering/cfd3d/gpu_entry.py"], cwd=job,
+                       env=dict(os.environ, PREFLIGHT="1"), capture_output=True, text=True, timeout=60)
+    assert r.returncode != 0
