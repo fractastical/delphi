@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 import json
 import pytest
 
-from frontier_compute.resource_snapshot import summarize
+from frontier_compute.resource_snapshot import summarize, telemetry_summary
 
 
 def test_allocation_counts_include_bioservices_without_leaking_specs():
@@ -47,3 +47,23 @@ def test_controller_counts_bioservices_but_does_not_claim_ownership():
     controller = Batch({"items": []})
     assert controller.ours_active_gpus([worker]) == 1
     assert controller.owned_ids() == {}
+
+
+def test_telemetry_retains_zero_samples_and_original_window(tmp_path):
+    path = tmp_path / "samples.csv"
+    path.write_text("timestamp,utilization.gpu,memory.used,power.draw\n"
+                    "2026/10/31 21:00:00.000,0,10,50\n"
+                    "2026/10/31 21:00:01.000,100,20,400\n")
+    result = telemetry_summary("fixture", path)
+    assert result["samples"] == 2
+    assert result["gpu_utilization_pct_mean"] == 50
+    assert result["gpu_samples_ge90pct"] == 1
+    assert result["window_utc"] == ["2026-10-31T21:00:00Z", "2026-10-31T21:00:01Z"]
+
+
+def test_telemetry_refuses_unmeasured_values(tmp_path):
+    path = tmp_path / "samples.csv"
+    path.write_text("timestamp,utilization.gpu,memory.used,power.draw\n"
+                    "2026/10/31 21:00:00.000,NaN,10,50\n")
+    with pytest.raises(ValueError, match="invalid"):
+        telemetry_summary("fixture", path)
