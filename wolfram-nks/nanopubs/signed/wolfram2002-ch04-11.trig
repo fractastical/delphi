@@ -1,0 +1,75 @@
+@prefix this: <https://w3id.org/np/RAj9ZwTP8XoiP8m_v5rQo2e9NyBwAw-hVJYh8j3zJP_Ho>.
+@prefix sub: <https://w3id.org/np/RAj9ZwTP8XoiP8m_v5rQo2e9NyBwAw-hVJYh8j3zJP_Ho/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/wolfram2002-ch04-11> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Despite pi's simple definition, its digit sequence shows no significant regularity in all computed digits and appears for practical purposes completely random.";
+    dc:type "computational-observation";
+    <http://www.w3.org/2000/01/rdf-schema#label> "The digits of pi are random for practical purposes";
+    <https://w3id.org/delphi/ontology/context> "Stephen Wolfram, A New Kind of Science (Champaign, IL: Wolfram Media, 2002), Chapter 4, “Systems Based on Numbers”; section “Mathematical Constants” (from p. 136), p. 138. Scope: digit sequence of pi in any base"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor>;
+    prov:wasDerivedFrom sub:quote, <http://www.wikidata.org/entity/Q60413467>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci A New Kind of Science claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    dc:rights "Verbatim quotation from A New Kind of Science, © 2002 Stephen Wolfram, LLC, all rights reserved; quoted for scholarly purposes with citation, as the book's copyright notice permits.";
+    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://www.wolframscience.com/nks/piv--copyright/>;
+    prov:hadPrimarySource <https://www.wolframscience.com/nks/p138--mathematical-constants/>;
+    prov:wasQuotedFrom <http://www.wikidata.org/entity/Q60413467>;
+    <https://schema.org/pagination> "p. 138";
+    <https://schema.org/text> "Despite the simplicity of its definition, the digit sequence of π seems for practical purposes completely random.".
+<http://www.wikidata.org/entity/Q60413467> dc:creator <http://www.wikidata.org/entity/Q310798>;
+    dc:date "2002"^^xsd:gYear;
+    dc:identifier <urn:isbn:978-1-57955-008-0>;
+    dc:publisher "Wolfram Media";
+    dc:title "A New Kind of Science";
+    <https://schema.org/exampleOfWork> <http://www.wikidata.org/entity/Q2987018>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://www.wolframscience.com/nks/p138--mathematical-constants/>, sub:pageText;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://www.wolframscience.com/nks/p138--mathematical-constants/> <https://schema.org/pagination> "138";
+    <https://schema.org/isPartOf> <https://www.wolframscience.com/nks/>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/build/generate.mjs>, <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/extraction/INSTRUCTIONS.md>.
+sub:pageText a prov:Entity;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p138--mathematical-constants/>;
+    <http://spdx.org/rdf/terms#checksum> sub:pageTextChecksum;
+    <http://www.w3.org/2000/01/rdf-schema#comment> "Plain text of the cited page as extracted by the pipeline's fetch step (headings, paragraphs and figure captions, whitespace collapsed); the checksum is of this text, not of the HTML.".
+<https://www.wolframscience.com/nks/> <https://schema.org/about> <http://www.wikidata.org/entity/Q60413467>.
+sub:pageTextChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "d580e1af58e57dd761abbbd75770749a10a256fd91c69e1a8bf89725e2e5684a"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Wolfram 2002 claim: The digits of pi are random for practical purposes";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T03:46:54.964Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/wolfram2002-ch04-11>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/wolfram-nks-2002>.
+<https://w3id.org/delphi/resource/domain/wolfram-nks-2002> <http://www.w3.org/2000/01/rdf-schema#label> "wolfram-nks-2002".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "eTLBDNTw7B2bDsyaDp0Qo0h08yMkb+btEuGhNnNX3XaO5F3ncycg7LTFV2jf1nM2+2Bi+2XT0FVBJpXLhk5Om7TbO9VwwWwYoYkufC6hJwOaBRy7HkH3w+LWfea2xVj0qWCZNg+EE6oe51lPR9hyrAYAyaiG8VO37eAswAxBQ5lYs8QePkF6+bQkNGdxglbNiTGtMVwTj8pmz2b9+4t8yqi5V9aJW14JyhznPS1g5NZY2k5ruIrNDGCEaBg3JMF6LX0UyszqPhruRpS3b/7ENZsk94kq1Orx/AixpyU4S2Qq/LNaDT2T3+PAYCVm8hLdCBRmj1PJCeYWDjs/36gPVw=="
+}

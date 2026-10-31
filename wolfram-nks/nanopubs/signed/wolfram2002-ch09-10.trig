@@ -1,0 +1,75 @@
+@prefix this: <https://w3id.org/np/RArw1vo2vAj0f57ZAEe5nYdpTCGj9rjbmFLUfflYhb__Y>.
+@prefix sub: <https://w3id.org/np/RArw1vo2vAj0f57ZAEe5nYdpTCGj9rjbmFLUfflYhb__Y/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/wolfram2002-ch09-10> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Features such as seemingly continuous space and certain aspects of gravitation and quantum mechanics will emerge from many different underlying rules for the universe, whereas properties like the spectrum of particle masses, and perhaps the dimensionality of space, will be specific to particular rules.";
+    dc:type "physical-hypothesis";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Space, gravity and quantum features are generic across many candidate rules";
+    <https://w3id.org/delphi/ontology/context> "Stephen Wolfram, A New Kind of Science (Champaign, IL: Wolfram Media, 2002), Chapter 9, “Fundamental Physics”; section “Ultimate Models for the Universe” (from p. 465), p. 469. Scope: candidate fundamental rules for the universe"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor>;
+    prov:wasDerivedFrom sub:quote, <http://www.wikidata.org/entity/Q60413467>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci A New Kind of Science claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    dc:rights "Verbatim quotation from A New Kind of Science, © 2002 Stephen Wolfram, LLC, all rights reserved; quoted for scholarly purposes with citation, as the book's copyright notice permits.";
+    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://www.wolframscience.com/nks/piv--copyright/>;
+    prov:hadPrimarySource <https://www.wolframscience.com/nks/p469--ultimate-models-for-the-universe/>;
+    prov:wasQuotedFrom <http://www.wikidata.org/entity/Q60413467>;
+    <https://schema.org/pagination> "p. 469";
+    <https://schema.org/text> "so also I suspect that properties such as the existence of seemingly continuous space, as well as certain features of gravitation and quantum mechanics, will emerge with many different possible underlying rules for the universe.".
+<http://www.wikidata.org/entity/Q60413467> dc:creator <http://www.wikidata.org/entity/Q310798>;
+    dc:date "2002"^^xsd:gYear;
+    dc:identifier <urn:isbn:978-1-57955-008-0>;
+    dc:publisher "Wolfram Media";
+    dc:title "A New Kind of Science";
+    <https://schema.org/exampleOfWork> <http://www.wikidata.org/entity/Q2987018>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://www.wolframscience.com/nks/p469--ultimate-models-for-the-universe/>, sub:pageText;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://www.wolframscience.com/nks/p469--ultimate-models-for-the-universe/> <https://schema.org/pagination> "469";
+    <https://schema.org/isPartOf> <https://www.wolframscience.com/nks/>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/build/generate.mjs>, <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/extraction/INSTRUCTIONS.md>.
+sub:pageText a prov:Entity;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p469--ultimate-models-for-the-universe/>;
+    <http://spdx.org/rdf/terms#checksum> sub:pageTextChecksum;
+    <http://www.w3.org/2000/01/rdf-schema#comment> "Plain text of the cited page as extracted by the pipeline's fetch step (headings, paragraphs and figure captions, whitespace collapsed); the checksum is of this text, not of the HTML.".
+<https://www.wolframscience.com/nks/> <https://schema.org/about> <http://www.wikidata.org/entity/Q60413467>.
+sub:pageTextChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "734caf3d472559c87219d97085a81aae803282e93b3217c628a0c826b0f6d06c"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Wolfram 2002 claim: Space, gravity and quantum features are generic across many candidate rules";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T03:46:54.964Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/wolfram2002-ch09-10>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/wolfram-nks-2002>.
+<https://w3id.org/delphi/resource/domain/wolfram-nks-2002> <http://www.w3.org/2000/01/rdf-schema#label> "wolfram-nks-2002".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "nlWa2s9ABq/n2WDq6NENC58nNITkyV2Gb0XBeYHbo2uL1gv90xfvRAnG/5Wvai0oRlctnmryS9zPDXT25dAIVQ2zkvKw3qJPyZOdoxuQe2FP/LcKE9r2ELdXYaYP2IXK3LKBSL4DCWEq3MBy5HzM2tEBmhjqfMou+6l/DWj+29SKQVcJ06LoAsJIgZTLLcaGrVN3eRvWprdhGvP5b+ZRMZcFU2dJOtPOYfz6fl4Lhw78mLTTlL7OK7ITN3ov9RwirW6lyBb38ZM6dFkDcXoWwWgoLxnxgQvL7QgHHqgqxuQX9lfi2iQwZ7uozmN7cAsP0yULf83XnGSk99cLq83zGA=="
+}

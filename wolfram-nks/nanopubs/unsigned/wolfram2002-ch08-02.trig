@@ -1,0 +1,83 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch08-02> a delphi:Claim ;
+    rdfs:label "Snowflake shapes arise from growth inhibition captured by a hexagonal cellular automaton" ;
+    dct:description "The main features of snowflake shapes are reproduced by a hexagonal cellular automaton in which a cell becomes ice only if exactly one neighbor is ice, which represents the inhibition of nearby growth by released latent heat." ;
+    delphi:context "Stephen Wolfram, A New Kind of Science (Champaign, IL: Wolfram Media, 2002), Chapter 8, “Implications for Everyday Systems”; section “The Growth of Crystals” (from p. 369), p. 370. Scope: growth of snowflakes (ice crystals from water vapor)" ;
+    dct:type "model-of-nature" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <http://www.wikidata.org/entity/Q60413467> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "One can capture this basic effect by having a cellular automaton with rules in which cells become black if they have exactly one black neighbor, but stay white whenever they have more than one black neighbor." ;
+    prov:wasQuotedFrom <http://www.wikidata.org/entity/Q60413467> ;
+    prov:hadPrimarySource <https://www.wolframscience.com/nks/p370--the-growth-of-crystals/> ;
+    schema:pagination "p. 370" ;
+    dct:rights "Verbatim quotation from A New Kind of Science, © 2002 Stephen Wolfram, LLC, all rights reserved; quoted for scholarly purposes with citation, as the book's copyright notice permits." ;
+    rdfs:seeAlso <https://www.wolframscience.com/nks/piv--copyright/> .
+
+  <https://www.wolframscience.com/nks/p370--the-growth-of-crystals/> schema:isPartOf <https://www.wolframscience.com/nks/> ;
+    schema:pagination "370" .
+  sub:pageText a prov:Entity ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p370--the-growth-of-crystals/> ;
+    rdfs:comment "Plain text of the cited page as extracted by the pipeline's fetch step (headings, paragraphs and figure captions, whitespace collapsed); the checksum is of this text, not of the HTML." ;
+    spdx:checksum sub:pageTextChecksum .
+  sub:pageTextChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "cbefcd37eadf1e81de8313bf50861d30211f515026a1c380cbcaff9940a241a0" .
+
+  <http://www.wikidata.org/entity/Q60413467> dct:title "A New Kind of Science" ;
+    dct:creator <http://www.wikidata.org/entity/Q310798> ;
+    dct:publisher "Wolfram Media" ;
+    dct:date "2002"^^xsd:gYear ;
+    dct:identifier <urn:isbn:978-1-57955-008-0> ;
+    schema:exampleOfWork <http://www.wikidata.org/entity/Q2987018> .
+  <https://www.wolframscience.com/nks/> schema:about <http://www.wikidata.org/entity/Q60413467> .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://www.wolframscience.com/nks/p370--the-growth-of-crystals/> , sub:pageText ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/build/generate.mjs> , <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/extraction/INSTRUCTIONS.md> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci A New Kind of Science claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T03:46:54.964Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Wolfram 2002 claim: Snowflake shapes arise from growth inhibition captured by a hexagonal cellular automaton" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/wolfram2002-ch08-02> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+  <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> rdfs:label "wolfram-nks-2002" .
+}

@@ -1,0 +1,75 @@
+@prefix this: <https://w3id.org/np/RAVxiBBnus8BgeGYewQLYj5Fi6JEKRExYmNseCTJ9pPcY>.
+@prefix sub: <https://w3id.org/np/RAVxiBBnus8BgeGYewQLYj5Fi6JEKRExYmNseCTJ9pPcY/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/wolfram2002-ch10-18> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Minimal Boolean formulas (in disjunctive normal form or in Nand operations) for the outcome of rule 30 grow rapidly with the number of steps, unlike those for simple rules such as 90 and 254, indicating that no simple formula describes rule 30 evolution and that, in most cases, cellular automaton patterns have no simple mathematical formula.";
+    dc:type "computational-observation";
+    <http://www.w3.org/2000/01/rdf-schema#label> "No simple formula describes many steps of rule 30 evolution";
+    <https://w3id.org/delphi/ontology/context> "Stephen Wolfram, A New Kind of Science (Champaign, IL: Wolfram Media, 2002), Chapter 10, “Processes of Perception and Analysis”; section “Human Thinking” (from p. 620), p. 620. Scope: formula representations of cellular automaton evolution, especially rule 30"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor>;
+    prov:wasDerivedFrom sub:quote, <http://www.wikidata.org/entity/Q60413467>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci A New Kind of Science claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    dc:rights "Verbatim quotation from A New Kind of Science, © 2002 Stephen Wolfram, LLC, all rights reserved; quoted for scholarly purposes with citation, as the book's copyright notice permits.";
+    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://www.wolframscience.com/nks/piv--copyright/>;
+    prov:hadPrimarySource <https://www.wolframscience.com/nks/p620--human-thinking/>;
+    prov:wasQuotedFrom <http://www.wikidata.org/entity/Q60413467>;
+    <https://schema.org/pagination> "p. 620";
+    <https://schema.org/text> "So even if one allows rather general structure, the evidence is that in the end there is no way to set up any simple formula that will describe the outcome of evolution for a system like rule 30.".
+<http://www.wikidata.org/entity/Q60413467> dc:creator <http://www.wikidata.org/entity/Q310798>;
+    dc:date "2002"^^xsd:gYear;
+    dc:identifier <urn:isbn:978-1-57955-008-0>;
+    dc:publisher "Wolfram Media";
+    dc:title "A New Kind of Science";
+    <https://schema.org/exampleOfWork> <http://www.wikidata.org/entity/Q2987018>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://www.wolframscience.com/nks/p620--human-thinking/>, sub:pageText;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://www.wolframscience.com/nks/p620--human-thinking/> <https://schema.org/pagination> "620";
+    <https://schema.org/isPartOf> <https://www.wolframscience.com/nks/>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/build/generate.mjs>, <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/extraction/INSTRUCTIONS.md>.
+sub:pageText a prov:Entity;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p620--human-thinking/>;
+    <http://spdx.org/rdf/terms#checksum> sub:pageTextChecksum;
+    <http://www.w3.org/2000/01/rdf-schema#comment> "Plain text of the cited page as extracted by the pipeline's fetch step (headings, paragraphs and figure captions, whitespace collapsed); the checksum is of this text, not of the HTML.".
+<https://www.wolframscience.com/nks/> <https://schema.org/about> <http://www.wikidata.org/entity/Q60413467>.
+sub:pageTextChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "04ceff8a776bc42b9ea0b5797eb8407c907c9af1731e015137790523f32fcd70"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Wolfram 2002 claim: No simple formula describes many steps of rule 30 evolution";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T03:46:54.964Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/wolfram2002-ch10-18>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/wolfram-nks-2002>.
+<https://w3id.org/delphi/resource/domain/wolfram-nks-2002> <http://www.w3.org/2000/01/rdf-schema#label> "wolfram-nks-2002".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "LUQzMP9/2zPKtjO1mix16SzS7gB9pS484YSeZPNYjq+bD1XroL5BNTcnSsKzpfFhKlpzYeAUC2S/EGm3WRNT95e9cpkZglpMzAxrkqHIN6orDgeQb8FbRRbh7MWc64cs9o6wrQxNaWDZJqZo8ZN2MW71Qx+6+pDtIsD3ygsmRq1QTWq+ZsFEyTal5ziSwRunxOuYm38DKDET12VWQAlqOPKseHJK2GSIEsyT68lBQmd4+w2IiFk68+GeHTuBqQZVa3DA5prMIbuUi9JOukOYigkC4IRQmZHrQJmm9iFwzc+KW3NEw3XF9/x0bSZVoyKP+0lDJMtiZRR1oZu/JittRw=="
+}

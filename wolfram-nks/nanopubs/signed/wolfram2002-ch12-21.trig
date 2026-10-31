@@ -1,0 +1,75 @@
+@prefix this: <https://w3id.org/np/RA5Gg7SovHRlhJFHnwusnu9AIkmtR9ZHsB2WCwdt6Ctx8>.
+@prefix sub: <https://w3id.org/np/RA5Gg7SovHRlhJFHnwusnu9AIkmtR9ZHsB2WCwdt6Ctx8/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/wolfram2002-ch12-21> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "For almost any system whose behavior seems complex, almost any non-trivial question about its behavior after infinitely many steps (e.g. whether a pattern dies out, becomes repetitive, or ever produces a given arrangement) is undecidable, and such undecidability should be widespread in nature.";
+    dc:type "mathematical";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Infinite-time questions about complex systems are almost always undecidable";
+    <https://w3id.org/delphi/ontology/context> "Stephen Wolfram, A New Kind of Science (Champaign, IL: Wolfram Media, 2002), Chapter 12, “The Principle of Computational Equivalence”; section “Undecidability and Intractability” (from p. 753), p. 755. Scope: systems with complex behavior, including simple programs and natural systems"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor>;
+    prov:wasDerivedFrom sub:quote, <http://www.wikidata.org/entity/Q60413467>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci A New Kind of Science claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    dc:rights "Verbatim quotation from A New Kind of Science, © 2002 Stephen Wolfram, LLC, all rights reserved; quoted for scholarly purposes with citation, as the book's copyright notice permits.";
+    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://www.wolframscience.com/nks/piv--copyright/>;
+    prov:hadPrimarySource <https://www.wolframscience.com/nks/p755--undecidability-and-intractability/>;
+    prov:wasQuotedFrom <http://www.wikidata.org/entity/Q60413467>;
+    <https://schema.org/pagination> "p. 755";
+    <https://schema.org/text> "for almost any system whose behavior seems to us complex almost any non-trivial question about what the system does after an infinite number of steps will be undecidable.".
+<http://www.wikidata.org/entity/Q60413467> dc:creator <http://www.wikidata.org/entity/Q310798>;
+    dc:date "2002"^^xsd:gYear;
+    dc:identifier <urn:isbn:978-1-57955-008-0>;
+    dc:publisher "Wolfram Media";
+    dc:title "A New Kind of Science";
+    <https://schema.org/exampleOfWork> <http://www.wikidata.org/entity/Q2987018>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://www.wolframscience.com/nks/p755--undecidability-and-intractability/>, sub:pageText;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://www.wolframscience.com/nks/p755--undecidability-and-intractability/> <https://schema.org/pagination> "755";
+    <https://schema.org/isPartOf> <https://www.wolframscience.com/nks/>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/build/generate.mjs>, <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/extraction/INSTRUCTIONS.md>.
+sub:pageText a prov:Entity;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p755--undecidability-and-intractability/>;
+    <http://spdx.org/rdf/terms#checksum> sub:pageTextChecksum;
+    <http://www.w3.org/2000/01/rdf-schema#comment> "Plain text of the cited page as extracted by the pipeline's fetch step (headings, paragraphs and figure captions, whitespace collapsed); the checksum is of this text, not of the HTML.".
+<https://www.wolframscience.com/nks/> <https://schema.org/about> <http://www.wikidata.org/entity/Q60413467>.
+sub:pageTextChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "9e03608dc8187ed20db5203ce3f5c6e718dcdab7505fc6f1e0e9ec8553e46462"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Wolfram 2002 claim: Infinite-time questions about complex systems are almost always undecidable";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T03:46:54.964Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-21>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/wolfram-nks-2002>.
+<https://w3id.org/delphi/resource/domain/wolfram-nks-2002> <http://www.w3.org/2000/01/rdf-schema#label> "wolfram-nks-2002".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "GRELOkTZFtQ1dlNbrCM4z6/6fYrDV6S/V9si79pE1ti1LgjfHEQX21RFUEEjoqO0+favoVRr9GiB4+LohwHnSn/Pl9LcBo7WBV6l/hqO1qqaoO3v/Et1kg8uM9aBJkLvyAXudZ08sz0VtWk8iFRJ+oYL63bOeaeGAoaWOmHfHxF6ppYnl3muS2hdY5eS9vhv+f+w63IiQiOKHR1DUc22Lx6alYy0EawQB16bJpZe0a2YPfA5SpYRRDLKkNm2VFtZUTwKZHM0QkAPvbqhUBxZTh0zaZwAOw2K0rwTaV1ncF51Tlj1Ooqj/7l/qTjlCAX+VfKlmZaBJ+EsmevCIfyZpw=="
+}

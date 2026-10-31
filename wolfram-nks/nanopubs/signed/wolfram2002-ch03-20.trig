@@ -1,0 +1,75 @@
+@prefix this: <https://w3id.org/np/RAcqhjbmGOQHUO2PLcXVrjQ3Ma0zZYfBf_C20y2T2Uptk>.
+@prefix sub: <https://w3id.org/np/RAcqhjbmGOQHUO2PLcXVrjQ3Ma0zZYfBf_C20y2T2Uptk/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/wolfram2002-ch03-20> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "The four themes of repetition, nesting, randomness and localized structures are the dominant types of behavior across a vast range of systems, and these overall behavior types are almost independent of the details of the underlying rules.";
+    dc:type "general-principle";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Repetition, nesting, randomness and localized structures dominate everywhere";
+    <https://w3id.org/delphi/ontology/context> "Stephen Wolfram, A New Kind of Science (Champaign, IL: Wolfram Media, 2002), Chapter 3, “The World of Simple Programs”; section “Some Conclusions” (from p. 105), p. 106. Scope: simple programs and, by extension, a vast range of systems"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor>;
+    prov:wasDerivedFrom sub:quote, <http://www.wikidata.org/entity/Q60413467>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci A New Kind of Science claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    dc:rights "Verbatim quotation from A New Kind of Science, © 2002 Stephen Wolfram, LLC, all rights reserved; quoted for scholarly purposes with citation, as the book's copyright notice permits.";
+    <http://www.w3.org/2000/01/rdf-schema#seeAlso> <https://www.wolframscience.com/nks/piv--copyright/>;
+    prov:hadPrimarySource <https://www.wolframscience.com/nks/p106--some-conclusions/>;
+    prov:wasQuotedFrom <http://www.wikidata.org/entity/Q60413467>;
+    <https://schema.org/pagination> "p. 106";
+    <https://schema.org/text> "the basic themes of repetition, nesting, randomness and localized structures that we already saw in specific cellular automata in the previous chapter are actually very general, and in fact represent the dominant themes in the behavior of a vast range of different systems.".
+<http://www.wikidata.org/entity/Q60413467> dc:creator <http://www.wikidata.org/entity/Q310798>;
+    dc:date "2002"^^xsd:gYear;
+    dc:identifier <urn:isbn:978-1-57955-008-0>;
+    dc:publisher "Wolfram Media";
+    dc:title "A New Kind of Science";
+    <https://schema.org/exampleOfWork> <http://www.wikidata.org/entity/Q2987018>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://www.wolframscience.com/nks/p106--some-conclusions/>, sub:pageText;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://www.wolframscience.com/nks/p106--some-conclusions/> <https://schema.org/pagination> "106";
+    <https://schema.org/isPartOf> <https://www.wolframscience.com/nks/>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/build/generate.mjs>, <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/extraction/INSTRUCTIONS.md>.
+sub:pageText a prov:Entity;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p106--some-conclusions/>;
+    <http://spdx.org/rdf/terms#checksum> sub:pageTextChecksum;
+    <http://www.w3.org/2000/01/rdf-schema#comment> "Plain text of the cited page as extracted by the pipeline's fetch step (headings, paragraphs and figure captions, whitespace collapsed); the checksum is of this text, not of the HTML.".
+<https://www.wolframscience.com/nks/> <https://schema.org/about> <http://www.wikidata.org/entity/Q60413467>.
+sub:pageTextChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "731eed9462f1a165375db91a21fc4257410ebf32a732689ddbd7cc0d621c6abc"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Wolfram 2002 claim: Repetition, nesting, randomness and localized structures dominate everywhere";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:created "2026-10-31T03:46:54.964Z"^^xsd:dateTime;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/wolfram2002-ch03-20>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/wolfram-nks-2002>.
+<https://w3id.org/delphi/resource/domain/wolfram-nks-2002> <http://www.w3.org/2000/01/rdf-schema#label> "wolfram-nks-2002".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "ZoDh1XqDRAdDpwu+ns7syc0tl1g7yVzrGBKNyXk1vcTrWbmWuvXqGvsbahfpJ9WsFB0ugKC4yEaJWBWzdM9O7lSRly4xKQ6q59E833isiD46kmqMGmxouyIhWpZHf6euZuUz75A2nvumK373b+Mrq0Fu67+2Fe8/uuHQ2YfygiKixDMBp6UA3dvhUVKzSP/1ocwxWEP12SQ2TWdsbyqNwOn5XqjGGEn+F29HrOoetXijUwx6jrwufiiXEDacIhXoCeSmRebiTp41cz3+BRK8rs7MMbmNd7PJlv+sxMQLvApW9u4GkZu+ER5QSdi0j5gXTICzZyp3UqJR1CPfVd3T5g=="
+}

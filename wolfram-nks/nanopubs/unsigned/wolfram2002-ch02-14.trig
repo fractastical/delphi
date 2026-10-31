@@ -1,0 +1,83 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/wolfram2002-ch02-14> a delphi:Claim ;
+    rdfs:label "Unknown phenomena are found only by systematic, preconception-free experiments" ;
+    dct:description "Phenomena not already known to exist can be found only by very systematic and general experiments whose results are examined with as few preconceptions as possible." ;
+    delphi:context "Stephen Wolfram, A New Kind of Science (Champaign, IL: Wolfram Media, 2002), Chapter 2, “The Crucial Experiment”; section “Why These Discoveries Were Not Made Before” (from p. 42), p. 45. Scope: scientific methodology, especially computer experiments" ;
+    dct:type "conceptual" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <http://www.wikidata.org/entity/Q60413467> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "the only way to find phenomena that one does not already know exist is to do very systematic and general experiments, and then to look at the results with as few preconceptions as possible." ;
+    prov:wasQuotedFrom <http://www.wikidata.org/entity/Q60413467> ;
+    prov:hadPrimarySource <https://www.wolframscience.com/nks/p45--why-these-discoveries-were-not-made-before/> ;
+    schema:pagination "p. 45" ;
+    dct:rights "Verbatim quotation from A New Kind of Science, © 2002 Stephen Wolfram, LLC, all rights reserved; quoted for scholarly purposes with citation, as the book's copyright notice permits." ;
+    rdfs:seeAlso <https://www.wolframscience.com/nks/piv--copyright/> .
+
+  <https://www.wolframscience.com/nks/p45--why-these-discoveries-were-not-made-before/> schema:isPartOf <https://www.wolframscience.com/nks/> ;
+    schema:pagination "45" .
+  sub:pageText a prov:Entity ;
+    prov:wasDerivedFrom <https://www.wolframscience.com/nks/p45--why-these-discoveries-were-not-made-before/> ;
+    rdfs:comment "Plain text of the cited page as extracted by the pipeline's fetch step (headings, paragraphs and figure captions, whitespace collapsed); the checksum is of this text, not of the HTML." ;
+    spdx:checksum sub:pageTextChecksum .
+  sub:pageTextChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "5c3f9e5aebece34addeca6ef74f33039253e3577d8d1a034b74a362a038628c0" .
+
+  <http://www.wikidata.org/entity/Q60413467> dct:title "A New Kind of Science" ;
+    dct:creator <http://www.wikidata.org/entity/Q310798> ;
+    dct:publisher "Wolfram Media" ;
+    dct:date "2002"^^xsd:gYear ;
+    dct:identifier <urn:isbn:978-1-57955-008-0> ;
+    schema:exampleOfWork <http://www.wikidata.org/entity/Q2987018> .
+  <https://www.wolframscience.com/nks/> schema:about <http://www.wikidata.org/entity/Q60413467> .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://www.wolframscience.com/nks/p45--why-these-discoveries-were-not-made-before/> , sub:pageText ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/build/generate.mjs> , <https://github.com/fractastical/delphisci/blob/b3f424ba358bf56619a035783d78cb7683d6cebf/wolfram-nks/extraction/INSTRUCTIONS.md> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-wolfram-nks-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci A New Kind of Science claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T03:46:54.964Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Wolfram 2002 claim: Unknown phenomena are found only by systematic, preconception-free experiments" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/wolfram2002-ch02-14> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> .
+  <https://w3id.org/delphi/resource/domain/wolfram-nks-2002> rdfs:label "wolfram-nks-2002" .
+}
