@@ -33,3 +33,11 @@ declared design, not an independent confirmation of a hypothesis stated in advan
 ## What this can and cannot say
 It can show that the claim "<1% beyond 1.5 lambda_c" depends on the grid and the prior (a counterexample at non-half-integer lengths).
 It cannot say how often real Turing systems mispredict, nothing about nonlinear/subcritical outcomes, nothing about any organism.
+
+## Amendment 1 (after the run; 2026-10-31 12:06 PDT per `date`)
+The committed run exited 1 because declared control 2 (x = 0.1 must be > 90% mispredicted for every prior) failed on ONE prior:
+Dv/Du log-uniform [1,1000] gave 89.53%. The 90% line was my guess before seeing any output, not derived from anything; the control's purpose
+(the counter can report failure) is met by 89.5-98.5%, but I am not editing the declared threshold or the script to make the run pass. The output
+files stay as the run produced them (`probe_declared_prior.out`, `.json`, exit 1). Controls 1 and 3 passed (half-integers exactly 0; band criterion vs direct eigenvalues,
+3,000 comparisons, 0 disagreements). The results below are therefore reported with that failed control stated.
+Counts differ slightly from the earlier scratch run (e.g. 3.41 vs 3.66 at x = 1.75, R = 30) because the committed script draws all priors from one seeded stream in a different order; neither number is more correct.
