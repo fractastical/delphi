@@ -19,6 +19,33 @@ organisms/<project>/<slice>/REPORT.md
 `<project>` is `darwin-origin` or `thompson-growth-form`; `<slice>` is a chapter range such as
 `ch01-05`. Duplicates across slices are merged later by identifier (GBIF key / Wikidata QID).
 
+Run `node organisms/validate.mjs [<project>/<slice>]` before committing; it checks the field
+rules below, cross-references, the 1 MB limit and that no record carries an `assessment`.
+
+## Slices
+
+Line numbers refer to the Project Gutenberg text in `<project>/inputs/`. Claim ids for a slice
+are those whose chapter key (`darwin1859-ch03-…`, `thompson1917-ch11-…`) falls in the range.
+
+| project | slice | chapters | text lines |
+|---|---|---|---|
+| darwin-origin | `intro-ch02` | Introduction, I–II | 313–2063 |
+| darwin-origin | `ch03-04` | III–IV | 2064–4139 |
+| darwin-origin | `ch05-06` | V–VI | 4140–6369 |
+| darwin-origin | `ch07-08` | VII–VIII | 6370–8460 |
+| darwin-origin | `ch09-10` | IX–X | 8461–10411 |
+| darwin-origin | `ch11-12` | XI–XII | 10412–12300 |
+| darwin-origin | `ch13-14` | XIII–XIV | 12301–14617 |
+| thompson-growth-form | `ch01-02` | I–II | 980–2579 |
+| thompson-growth-form | `ch03` | III | 2580–5906 |
+| thompson-growth-form | `ch04-05` | IV–V | 5907–9881 |
+| thompson-growth-form | `ch06-07` | VI–VII | 9882–12091 |
+| thompson-growth-form | `ch08` | VIII | 12092–14081 |
+| thompson-growth-form | `ch09-10` | IX–X | 14082–16506 |
+| thompson-growth-form | `ch11` | XI | 16507–19560 |
+| thompson-growth-form | `ch12-14` | XII–XIV | 19561–21574 |
+| thompson-growth-form | `ch15-epilogue` | XV–XVII, Epilogue | 21575–28917 |
+
 ## Rules
 
 - **Animals only** (kingdom Animalia). Record plants, fungi and microbes you notice in
