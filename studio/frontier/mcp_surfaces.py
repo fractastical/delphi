@@ -60,6 +60,13 @@ def register_surfaces(server, store: Store, register, *, read_annotations, publi
                 "members": store.project_members(pinned),
                 "scope": "Exact Project version; member pins and local review state are explicit; membership is not applicability or acceptance."}
 
+    def frontier_design_context(target: Ref,
+                                limit: Annotated[int, Field(ge=1, le=50)] = 20,
+                                cursor: Annotated[str | None, Field(max_length=16)] = None) -> dict:
+        """Read bounded exact-version Project/member annotations with explicit pagination; challenges and replies never settle or resolve the design."""
+        from .design_review import project_design_context
+        return project_design_context(store, target.model_dump(), limit=limit, cursor=cursor)
+
     def frontier_artifact_inspect(sha256: Annotated[str, Field(pattern=r"^[0-9a-fA-F]{64}$")],
                                   limit: Annotated[int, Field(ge=1, le=20)] = 10) -> dict:
         """Inspect matching Evidence declarations and check for matching bytes in this release's guarded public artifacts tree."""
@@ -104,7 +111,7 @@ def register_surfaces(server, store: Store, register, *, read_annotations, publi
         result["accepted"] = False
         return result
 
-    for tool in (frontier_discover, frontier_graph, frontier_catalogue, frontier_project_inspect,
+    for tool in (frontier_discover, frontier_graph, frontier_catalogue, frontier_project_inspect, frontier_design_context,
                  frontier_artifact_inspect, frontier_simulate, frontier_engineer, frontier_formalize,
                  frontier_belief):
         register(tool, read_annotations, "read", None)

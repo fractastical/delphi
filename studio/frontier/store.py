@@ -209,6 +209,13 @@ class Store:
             return
         anchor = pl["anchor"]
         anchored = found[("annotates", anchor["record"]["version"])]
+        design_review = pl.get("design_review")
+        if design_review is not None:
+            if anchored["kind"] != "Project":
+                raise Conflict("A structured design review must anchor an exact Project version")
+            member_index = design_review.get("member_index")
+            if member_index is not None and member_index >= len(anchored["payload"]["members"]):
+                raise Conflict("Design-review member_index is outside the pinned Project member list")
         art = anchor.get("artifact")
         if art and not self._artifact_listed(found[("annotates_artifact", art["evidence"]["version"])], art["sha256"]):
             raise Conflict("Anchored artifact digest is not listed by that Evidence version")
@@ -218,6 +225,8 @@ class Store:
                 {k: anchor["record"][k] for k in ("namespace", "kind", "id")}
             if not same:
                 raise Conflict("A reply must anchor the same record as the annotation it answers")
+            if replied["payload"].get("design_review") is not None and replied["payload"]["anchor"]["record"] != anchor["record"]:
+                raise Conflict("A design-review reply must anchor the same exact Project version")
         edit = pl.get("proposed_edit")
         if edit and re.split(r"[.\[]", edit["target_path"])[0] not in anchored["payload"]:
             raise Conflict("Proposed edit path must start at a top-level payload field of the anchored record")
@@ -366,7 +375,7 @@ class Store:
             return {"edges": edges, "truncated": len(rows) > limit, "depth": 1,
                     "limit": "Typed one-hop relations, including disputed assessments; no implicit support inference."}
 
-    def _edge_heads(self, c, p, relation, kind, target, all_versions, limit):
+    def _edge_heads(self, c, p, relation, kind, target, all_versions, limit, offset=0):
         """Head records of `kind` that point at `target` through `relation` (typed edges only, no inference)."""
         return c.execute("""SELECT v.envelope,s.status FROM typed_edges e
             JOIN record_versions v ON v.version=e.source_version AND v.kind=%s
@@ -374,9 +383,9 @@ class Store:
             WHERE e.relation=%s AND ((NOT %s AND e.target_version=%s)
                OR (%s AND e.target_namespace=%s AND e.target_kind=%s AND e.target_id=%s))
               AND (v.visibility='public' OR %s::jsonb ? v.namespace)
-            ORDER BY v.created_at,v.version LIMIT %s""",
+            ORDER BY v.created_at,v.version LIMIT %s OFFSET %s""",
             (kind, relation, all_versions, target["version"], all_versions, target["namespace"], target["kind"], target["id"],
-             Jsonb(p["namespaces"] if p else []), limit)).fetchall()
+             Jsonb(p["namespaces"] if p else []), limit, offset)).fetchall()
 
     def _discussion_rows(self, rows):
         out, withheld = [], 0
@@ -402,17 +411,23 @@ class Store:
             self._raw(c, target, p)
             return {"ref": target}
 
-    def annotations_for(self, target: dict, token: str | None = None, limit: int = 50, all_versions: bool = False):
+    def annotations_for(self, target: dict, token: str | None = None, limit: int = 50, all_versions: bool = False, offset: int = 0):
         """Current annotation heads anchored at an exact version (or at any version of that record id). Read-only; replies are
         linked by `payload.reply_to`, threading is a display concern. An annotation is not acceptance and not an answer."""
-        if not 1 <= limit <= 100:
-            raise FrontierError("Limit must be 1..100")
+        if not 1 <= limit <= 100 or type(offset) is not int or not 0 <= offset <= 10000:
+            raise FrontierError("Limit must be 1..100 and offset must be 0..10000")
         t = Ref.model_validate(target).model_dump()
         with self.connection() as c:
             p = self._read_principal(c, token)
             self._raw(c, t, p)
-            out, withheld = self._discussion_rows(self._edge_heads(c, p, "annotates", "Annotation", t, all_versions, limit))
+            rows = self._edge_heads(c, p, "annotates", "Annotation", t, all_versions, limit + 1, offset)
+            page = rows[:limit]
+            out, withheld = self._discussion_rows(page)
+            truncated = len(rows) > limit
+            scanned = len(page)
             return {"target": t, "all_versions": all_versions, "annotations": out, "withheld_unlicensed": withheld,
+                    "truncated": truncated, "scanned": scanned,
+                    "next_offset": offset + scanned if truncated else None,
                     "limit": "Current heads only. Author is the authenticated issuer; no field records an answer by anyone else."}
 
     def projects_for(self, target: dict, token: str | None = None, limit: int = 50, all_versions: bool = False):

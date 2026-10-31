@@ -3,13 +3,11 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from socketserver import ThreadingMixIn
 from threading import BoundedSemaphore
-from urllib.parse import urlsplit
-
-from pydantic import ValidationError
 
 from .models import MAX_BUNDLE_BYTES, canonical
 from .search import SearchIndex
 from .artifacts import ArtifactIndex
+from .design_review import project_design_context, submit_design_review
 from .store import FrontierError, Store
 
 
@@ -33,6 +31,13 @@ class Application:
             raise FrontierError("Authentication and idempotency belong in headers")
         if path in read:
             return read[path](**data, token=token)
+        if path == "/v1/read/design-context":
+            return project_design_context(self.store, data.get("target"), token=token,
+                                          limit=data.get("limit", 20), cursor=data.get("cursor"))
+        if path == "/v1/design/reviews":
+            if set(data) != {"draft"}:
+                raise FrontierError("A design review request contains only the Annotation draft")
+            return submit_design_review(self.store, token, key, data["draft"])
         if path in write:
             return write[path](**data, token=token, key=key)
         raise FrontierError("Unknown endpoint")

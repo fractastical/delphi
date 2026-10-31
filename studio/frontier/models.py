@@ -540,12 +540,33 @@ class ProposedEdit(Model):
         return self
 
 
+class DesignReview(Model):
+    """A falsifiable, authored challenge tied to one exact Project annotation anchor."""
+    dimension: Literal["biology", "geometry", "aerodynamics", "genotype_bridge", "manufacturing", "materials",
+                      "physiology", "behavior", "ecology", "validation", "other"]
+    member_index: int | None = Field(default=None, ge=0, le=59, strict=True)
+    evidence_basis: Literal["observed", "source", "simulation", "formal", "assumption", "unknown"]
+    scope: Text
+    evidence_refs: list[Ref] = Field(default_factory=list, max_length=12)
+    alternative: Text
+    falsifiable_next_test: Text
+
+    @model_validator(mode="after")
+    def evidence_kinds(self):
+        if any(r.kind not in {"Claim", "Evidence"} for r in self.evidence_refs):
+            raise ValueError("Design-review evidence refs pin Claims or Evidence")
+        if len({r.version for r in self.evidence_refs}) != len(self.evidence_refs):
+            raise ValueError("Repeated design-review evidence ref")
+        return self
+
+
 class Annotation(Model):
     kind: Literal["comment", "question", "challenge", "proposed_edit"]
     body: Text
     anchor: Anchor
     reply_to: Ref | None = None
     proposed_edit: ProposedEdit | None = None
+    design_review: DesignReview | None = None
 
     @model_validator(mode="after")
     def coherent(self):
@@ -553,6 +574,8 @@ class Annotation(Model):
             raise ValueError("A proposed_edit annotation carries a proposed_edit, and only it does")
         if self.reply_to is not None and self.reply_to.kind != "Annotation":
             raise ValueError("reply_to pins an Annotation")
+        if self.design_review is not None and (self.kind != "challenge" or self.anchor.record.kind != "Project" or self.reply_to is not None):
+            raise ValueError("A structured design review is a challenge anchored to an exact Project version")
         return self
 
 
@@ -634,4 +657,6 @@ def references(record: dict) -> list[tuple[str, dict]]:
             edges.append(("annotates_artifact", p["anchor"]["artifact"]["evidence"]))
         if p.get("reply_to"):
             edges.append(("replies_to", p["reply_to"]))
+        for item in (p.get("design_review") or {}).get("evidence_refs", []):
+            edges.append(("design_review_evidence", item))
     return edges
