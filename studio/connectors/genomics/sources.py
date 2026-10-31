@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -40,6 +41,7 @@ class Receipt:
     sha256: str
     md5: str | None = None
     truncated: bool = False
+    redirect_host: str | None = None        # set when the final URL was a signed link and has been withheld
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -79,9 +81,22 @@ def _open(url: str, cap: int):
     return resp
 
 
+SIGNED = re.compile(r"(^|&)(x-amz-[^=&]*|signature|credential|awsaccesskeyid|token|sig|key-pair-id|policy)=", re.I)
+
+
+def public_url(url: str | None) -> str | None:
+    """The URL without a temporary credential: None if it carries a signed query (a signed link is not a public address)."""
+    if not url:
+        return url
+    p = urllib.parse.urlsplit(url)
+    return None if SIGNED.search(p.query) else url
+
+
 def _receipt(url: str, resp, h, n: int, md5=None, truncated: bool = False) -> Receipt:
-    return Receipt(url, resp.geturl(), datetime.now(timezone.utc).isoformat(timespec="seconds"), resp.status, resp.headers.get("Content-Type"),
-                   resp.headers.get("Last-Modified"), resp.headers.get("ETag"), n, h.hexdigest(), md5.hexdigest() if md5 else None, truncated)
+    final = public_url(resp.geturl())
+    withheld = urllib.parse.urlsplit(resp.geturl()).hostname if final is None else None
+    return Receipt(url, final, datetime.now(timezone.utc).isoformat(timespec="seconds"), resp.status, resp.headers.get("Content-Type"),
+                   resp.headers.get("Last-Modified"), resp.headers.get("ETag"), n, h.hexdigest(), md5.hexdigest() if md5 else None, truncated, withheld)
 
 
 def fetch(url: str, cap: int = 20_000_000) -> tuple[bytes, Receipt]:
