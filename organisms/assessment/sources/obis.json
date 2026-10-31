@@ -1,0 +1,54 @@
+{
+  "source_id": "obis",
+  "label": "OBIS, Ocean Biodiversity Information System, API v3 (occurrence counts and statistics)",
+  "homepage": "https://obis.org/",
+  "data_paper_or_docs": [
+    "https://api.obis.org/",
+    "https://manual.obis.org/",
+    "https://manual.obis.org/access.html",
+    "https://manual.obis.org/policy.html",
+    "https://manual.obis.org/citing.html",
+    "https://doi.org/10.3389/fmars.2019.00588",
+    "https://doi.org/10.5670/oceanog.2000.01",
+    "https://doi.org/10.5281/zenodo.20218567"
+  ],
+  "references": [
+    {
+      "citation": "Klein E, Appeltans W, Provoost P, Saeedi H, et al. (2019) OBIS Infrastructure, Lessons Learned, and Vision for the Future. Frontiers in Marine Science 6:588.",
+      "doi": "10.3389/fmars.2019.00588",
+      "verified": "doi.org resolves to the Frontiers article page with this title; Crossref metadata agrees (checked 2026-10-31)."
+    },
+    {
+      "citation": "Grassle JF (2000) The Ocean Biogeographic Information System (OBIS): an on-line, worldwide atlas for accessing, modeling and mapping marine biological data in a multidimensional geographic context. Oceanography 13(3):5-7.",
+      "doi": "10.5670/oceanog.2000.01",
+      "verified": "doi.org resolves to the Oceanography article page with this title; Crossref metadata agrees (checked 2026-10-31)."
+    },
+    {
+      "citation": "Lawrence E, Benson A, Biddle M, Bosch S, et al. (2026) iobis/manual: v1.0 OBIS Manual bookdown version. Zenodo.",
+      "doi": "10.5281/zenodo.20218567",
+      "verified": "DataCite record returns this title (checked 2026-10-31); this is the citation the manual gives for itself on https://manual.obis.org/."
+    },
+    {
+      "citation": "OBIS (YEAR) Ocean Biodiversity Information System. Intergovernmental Oceanographic Commission of UNESCO. https://obis.org",
+      "doi": null,
+      "verified": "Recommended general citation format on https://manual.obis.org/citing.html and in the data policy (checked 2026-10-31)."
+    }
+  ],
+  "governance": "Programme of the Intergovernmental Oceanographic Commission (IOC) of UNESCO under its International Oceanographic Data and Information Exchange (IODE) programme, run through a network of national and thematic OBIS nodes that publish Darwin Core datasets via IPT instances. The OBIS data policy (manual.obis.org/policy.html) follows the IOC data policy; its data-sharing guidelines were agreed at SG-OBIS-IV (2015), adopted at IODE-XXIII (2015) and revised by an inter-sessional working group set up at SG-OBIS-11 (2023). Datasets must carry one of three licences (CC0, CC BY, CC BY-NC) with CC0 preferred; derived OBIS information products are CC0. Taxonomy is matched to WoRMS (AphiaID).",
+  "versioning": "The API serves a live index: occurrence?taxonid=N&size=0 and statistics?taxonid=N return current totals, and nothing in the response identifies a release. OBIS also publishes dated full exports (obis.org/data/access/) and will mint a DOI for a specific download on request (manual.obis.org/citing.html), but neither applies to a count query. Individual source datasets have DOIs and versions on their IPT.",
+  "licensing": "Per source dataset: CC0 1.0, CC BY 4.0 or CC BY-NC 4.0 (OBIS data policy). An aggregate count is not itself a licensed object.",
+  "scores": {
+    "source-authority": 0.9,
+    "independence": 0.85,
+    "authenticity": 1.0
+  },
+  "known_issues": [
+    "Counts for a taxonid include all descendant taxa as matched to WoRMS; a count is attributed to the AphiaID queried, so an unaccepted or wrong AphiaID silently returns a different taxon's total (or 0).",
+    "Terrestrial and freshwater taxa return 0 or tiny counts (OBIS is marine); a zero is a true answer but the record then describes a taxon that is not present in the data.",
+    "A large share of OBIS datasets is also published to GBIF, so OBIS and GBIF occurrence counts for the same taxon are not independent evidence of each other.",
+    "The dataset-level DOI 10.25607/OBP-1690 quoted in one record of this batch resolves (via AquaDocs) to a Government of Greenland white paper on seal management, not to OBIS; OBIS has no single DOI for the whole database.",
+    "The occurrence endpoint's 'total' and the statistics endpoint's 'records' are computed from the same index; for the 7 AphiaIDs in this batch that were queried through both endpoints the two numbers were equal on 2026-10-31, but both drift as nodes publish or withdraw datasets.",
+    "The obis.org/taxon/N landing pages are a single-page application that returns HTTP 200 for any N; existence of a taxon has to be checked through api.obis.org/v3/taxon/N."
+  ],
+  "rationale": "OBIS is an intergovernmental (IOC-UNESCO/IODE) infrastructure with a published data policy, a versioned manual with its own DOI, a documented OpenAPI service, peer-reviewed descriptions (Grassle 2000; Klein et al. 2019) and WoRMS-anchored identifiers, which puts it at the governed-infrastructure anchor; it is scored 0.9 rather than 1.0 for source authority because the live count queries assessed here carry no release identifier and the database as a whole has no DOI. Independence is 0.85: the records are primary observations and specimens published by hundreds of independent providers with no relation to this project, but OBIS is an aggregator, and its manual (https://manual.obis.org/data_sharing.html, 'Publish OBIS data to GBIF') documents the routine dual publication of the same IPT datasets to OBIS and GBIF, so OBIS counts are not independent of GBIF counts for the same marine taxon. Authenticity is 1.0 at the source level: everything served is a real, provider-published occurrence record; the fabrication risk is in how individual records cite OBIS (e.g. the unrelated DOI noted above), which is scored per record."
+}
