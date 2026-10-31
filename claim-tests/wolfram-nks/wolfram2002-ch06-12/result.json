@@ -2,7 +2,7 @@
   "claim_id": "wolfram2002-ch06-12",
   "claim_iri": "https://w3id.org/delphi/resource/claim/wolfram2002-ch06-12",
   "project": "wolfram-nks",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "For every finite deterministic discrete system we enumerate, every orbit (from every possible state) becomes eventually periodic, and its eventual period is at most N, the total number of possible states of the system (and the transient plus period is also at most N).",
   "pass_criterion": "Pre-registered: across all enumerated systems and all initial states, 100% of orbits satisfy period <= N and transient + period <= N (zero violations), where N is the exact number of distinct global states of the system.",
   "fail_criterion": "Pre-registered: at least one orbit of at least one enumerated system has eventual period > N, or never repeats within N + 1 steps (impossible to observe without a period > N, so equivalently a measured period exceeding N).",
@@ -50,10 +50,73 @@
       "role": "finite deterministic systems with N = n states (Wolfram's 'systems based on numbers' of limited size)"
     }
   ],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
-  "agent": { "kind": "cloud-agent", "model": "claude-fable-5.1", "run": "cursor/claim-tests-wolfram-nks-0123", "date": "2026-10-31" }
+  "method": "analysis.py builds, for each enumerated system, the complete transition map on its N global states and computes for every state the transient length and the eventual period from the functional graph (in-degree peeling to find cycle nodes, cycle walking for periods, vectorised relaxation for transients). It then counts orbits with period > N or transient + period > N. Families: 256 ECA x ring sizes 1..12 (3072 systems, 2,096,640 orbits), 4096 two-state two-colour Turing machines x cyclic tapes 1..5 (20,480 systems, 2,113,536 orbits), and x -> m x mod n for n = 2..200 (20,099 maps, 2,686,699 orbits). Total 43,651 systems and 6,896,875 orbits; run time about 4 s.",
+  "measured": {
+    "value": 1.0,
+    "unit": "fraction of orbits with eventual period <= N and transient + period <= N",
+    "n": 6896875,
+    "uncertainty": "exact (exhaustive enumeration, no sampling)",
+    "extra": {
+      "systems_checked": 43651,
+      "violations": 0,
+      "max_period_over_N": 1.0,
+      "per_family": [
+        {
+          "family": "eca-cyclic-rings-n1-12",
+          "systems": 3072,
+          "orbits_checked": 2096640,
+          "violations": 0,
+          "max_period_over_N": 1.0,
+          "max_period_over_N_at": {
+            "system": "ECA rule 1, ring n=1",
+            "N": 2,
+            "max_period": 2
+          },
+          "max_transient_plus_period_over_N": 1.0,
+          "max_period_absolute": 979
+        },
+        {
+          "family": "tm-2state-2color-cyclic-tape-n1-5",
+          "systems": 20480,
+          "orbits_checked": 2113536,
+          "violations": 0,
+          "max_period_over_N": 1.0,
+          "max_period_over_N_at": {
+            "system": "TM machine 297, tape n=1",
+            "N": 4,
+            "max_period": 4
+          },
+          "max_transient_plus_period_over_N": 1.0,
+          "max_period_absolute": 315
+        },
+        {
+          "family": "modular-multiplication-maps-n2-200",
+          "systems": 20099,
+          "orbits_checked": 2686699,
+          "violations": 0,
+          "max_period_over_N": 0.994975,
+          "max_period_over_N_at": {
+            "system": "x -> 3 x mod 199",
+            "N": 199,
+            "max_period": 198
+          },
+          "max_transient_plus_period_over_N": 1.0,
+          "max_period_absolute": 198
+        }
+      ]
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.99,
+  "caveats": [
+    "The claim is a theorem (pigeonhole principle on a finite state set), so a finite enumeration can only fail to refute it; the enumeration here covers three concrete families exhaustively up to the stated sizes and finds the bound tight (period = N in degenerate 1-cell systems, period = N - 1 for x -> 3x mod 199).",
+    "Wolfram's bound is on the eventual period; the test also checks the slightly stronger transient + period <= N, which is what the pigeonhole argument actually gives, and it held in every orbit.",
+    "Systems whose next state depends on more than the current state (external input, randomness, unbounded memory) are outside the claim's scope and were not tested."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5.1",
+    "run": "cursor/claim-tests-wolfram-nks-0123",
+    "date": "2026-10-31"
+  }
 }
