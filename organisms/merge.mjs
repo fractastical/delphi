@@ -83,7 +83,7 @@ for (const { project, slice, dir } of slices()) {
     }
     for (const [k, v] of Object.entries(ids)) {
       if (v === null || v === undefined || v === "") continue;
-      if (m.identifiers[k] !== undefined && m.identifiers[k] !== v)
+      if (m.identifiers[k] !== undefined && String(m.identifiers[k]) !== String(v))
         conflicts.push(`${key}: identifiers.${k} ${m.identifiers[k]} vs ${v} (${project}/${slice}/${t.slug})`);
       else m.identifiers[k] = v;
     }
