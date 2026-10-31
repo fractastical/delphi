@@ -1,0 +1,22 @@
+# Delphi Frontier discovery index refresh: embeds only NEW or CHANGED public records/artifacts into the dedicated Frontier database (pgvector).
+# Bounded: at most 20 provider requests per run, zero when nothing changed; an advisory lock makes overlapping runs skip. USER unit.
+# Uses the CURRENT deployed app (the `app` symlink) and the service venv. The embedding key is read from the existing gemini.env by systemd
+# into this process's environment only; no value is in this file or in any log. Skipped (not failed) until a release containing the module is live.
+[Unit]
+Description=Delphi Frontier discovery index refresh (bounded, 20 requests)
+After=delphi-frontier-postgres.service
+Wants=delphi-frontier-postgres.service
+ConditionPathExists=/data/services/delphi-frontier/app/frontier/discovery.py
+
+[Service]
+Type=oneshot
+WorkingDirectory=/data/services/delphi-frontier/app
+Environment="FRONTIER_DSN=host=/data/services/delphi-frontier/run port=5471 dbname=frontier user=frontier_app"
+Environment=OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+EnvironmentFile=%h/.config/morphoswarm/gemini.env
+ExecStart=/data/services/delphi-frontier/venv/bin/python -m frontier.discovery refresh --namespace delphi-frontier --schema public --max-requests 20 --receipt %h/.local/state/delphi-frontier/discovery-refresh.jsonl
+MemoryMax=2G
+MemorySwapMax=0
+TasksMax=128
+TimeoutStartSec=300
+NoNewPrivileges=yes
