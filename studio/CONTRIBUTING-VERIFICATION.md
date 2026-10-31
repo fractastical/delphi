@@ -98,3 +98,14 @@ observation at the confidence the evidence supports — post-hoc, n=1 per popula
 from a review about populations rather than from the individuals sequenced.
 
 **Label every claim `retrieved` or `remembered` as you write it**, not when someone asks.
+
+**And the asymmetry, which is the sharper form of this rule.** The author's own account, after the
+fact: *"the Tinaja claim was load-bearing precisely because it improved the result, and I didn't
+notice that while writing it."* That is the tell. A detail which **upgrades** a finding is the one
+whose provenance needs checking before it goes in — not because such details are usually wrong,
+but because nothing downstream will question them. A claim that weakens your result gets
+scrutinised by you, immediately, for free. A claim that strengthens it does not, and the direction
+of the effect is the trigger for the check.
+
+So the operational rule is narrower than "source everything", which nobody does: **when you notice
+that a detail makes the result better, stop and ask where you got it.**
