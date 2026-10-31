@@ -1,0 +1,24 @@
+{
+  "source_id": "morphosource",
+  "label": "MorphoSource (Duke University) media and physical-object search API",
+  "homepage": "https://www.morphosource.org/",
+  "data_paper_or_docs": [
+    "https://doi.org/10.1017/scs.2017.13",
+    "https://www.morphosource.org/api",
+    "https://www.morphosource.org/terms"
+  ],
+  "governance": "Institutional 3-D data repository run by Duke University. Described in a peer-reviewed paper (Boyer, Gunnell, Kaufman & McGeary 2016, 'MorphoSource: archiving and sharing 3-D digital specimen data', The Paleontological Society Papers 22:157-181, DOI 10.1017/scs.2017.13; resolves, checked 2026-10-31). Media are contributed by institutions and researchers and carry per-item licences (CC0, CC BY, CC BY-NC or restricted) reported in the API's publication_status/licence facets; record metadata are openly queryable. The public API (/api/media, /api/physical-objects) returns JSON wrapped in a top-level 'response' object with 'media', 'facets' and 'pages'.",
+  "versioning": "Live repository without release numbers; counts (pages.total_count) grow as media are published and change as items are restricted or re-identified. The human-readable pages (/about, item pages) sit behind the Anubis proof-of-work anti-bot layer and the API rate-limits with HTTP 429, so a query is reproducible only with throttling.",
+  "scores": {
+    "source-authority": 0.85,
+    "independence": 0.9,
+    "authenticity": 0.95
+  },
+  "known_issues": [
+    "Rate limiting (HTTP 429) and the Anubis challenge on HTML pages; API re-queries succeed with ~2 s spacing and retries.",
+    "Taxonomy facet f[taxonomy_gbif][] matches GBIF-aligned taxonomy strings, while q= free-text matches any field, so 'q=Pan troglodytes' counts can jump when unrelated records mention the name (physical-objects count went 7 -> 24 between vendoring and re-check on 2026-10-31).",
+    "One vendored record cites DOI 10.1017/S1089332600002862 as the MorphoSource paper; that DOI resolves to a different article (Paleontological Society Papers 20:217-236, 2014). The correct DOI is 10.1017/scs.2017.13.",
+    "Counts, not data, are what the project vendors; the 3-D files themselves are not downloaded or checksummed."
+  ],
+  "rationale": "A university-run repository with a peer-reviewed description, documented API and per-item licensing scores high on authority but below governed international infrastructures because it has no release versioning and its totals are live. Media are primary digitisations of specimens contributed by independent institutions, so independence is high. Authenticity is high: the 159 API queries recorded by the vendor re-ran successfully and 157 recorded checksums were reproduced from the live API (70 raw response bodies byte-identical; 87 of 89 'reduced response' checksums reproduced using the vendor's documented reduction, the other two differing because the live count changed); the wrong DOI is a record-level error."
+}

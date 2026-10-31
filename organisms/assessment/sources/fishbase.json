@@ -1,0 +1,25 @@
+{
+  "source_id": "fishbase",
+  "label": "FishBase (www.fishbase.se web pages: species summaries, PopGrowth tables, manual), version (06/2026)",
+  "homepage": "https://www.fishbase.se/",
+  "data_paper_or_docs": [
+    "https://www.fishbase.se/search.php",
+    "https://www.fishbase.se/manual/english/FishBaseThe_LENGTH_WEIGHT_Table.htm",
+    "https://doi.org/10.1111/j.1095-8649.2012.03464.x"
+  ],
+  "governance": "Consortium-run global fish database (FishBase Consortium; editors Froese & Pauly). The footer of search.php (the page the homepage redirects to) states 'www.fishbase.org, version (06/2026)' and links the licence http://creativecommons.org/licenses/by-nc/4.0/ (checked 2026-10-31). There is no DOI for the database itself; the citation requested is 'Froese, R. and D. Pauly. Editors. FishBase. World Wide Web electronic publication.' The rfishbase paper (Boettiger et al. 2012, J. Fish Biol. 81:2030-2039) documents programmatic access, not the database.",
+  "versioning": "Rolling web releases named by month/year in the page footer (currently '(06/2026)'); pages are generated dynamically from the live MySQL backend, so HTML byte checksums are not stable between requests and the PopGrowth study tables grow as new references are entered. Snapshots of the backend tables are published separately (see source fishbase-hf-parquet).",
+  "scores": {
+    "source-authority": 0.8,
+    "independence": 0.7,
+    "authenticity": 0.9
+  },
+  "known_issues": [
+    "Licence is CC BY-NC 4.0 per the site footer; vendored records that say 'CC BY-NC 3.0' are wrong.",
+    "Dynamic HTML: of 15 FishBase page checksums re-downloaded 2026-10-31, only the four static PopGrowthList pages matched byte-for-byte; all species summary pages differed (session-dependent markup) even though their content (max length, title) was unchanged.",
+    "PopGrowth study counts drift: Pleuronectes platessa 14 -> 26 rows, Melanogrammus aeglefinus 43 -> 51, Salmo trutta 55 -> 57, Mustelus canis 8 -> 8 (vendored 2026-10-31 vs re-parsed later the same day); the vendored parser may also have counted differently.",
+    "Two manual URLs cited by vendored records return HTTP 404 (…/manual/English/FishbaseThe_FishBase_Book.htm and …/manual/English/FishBaseThe_Database.htm); https://www.fishbase.org answers 403 to scripts.",
+    "Version string is only exposed in the page footer; records say 'accessed 2026-10-31' or 'as served' rather than the footer version."
+  ],
+  "rationale": "FishBase is a long-running, editorially governed consortium database with a visible version label and licence, but without a data paper or DOI for the database and with unstable page bytes, so authority is 0.8 rather than higher. Its growth, length-weight and max-length values are compiled from the primary literature (independent of this project but not primary measurements), giving independence 0.7. The pages and values re-checked are real and current; the deductions in authenticity come from dead manual URLs and the unreproducible HTML checksums rather than any sign of fabrication."
+}
