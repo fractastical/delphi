@@ -53,6 +53,19 @@ def main() -> int:
             gid = re.search(r"ID=(ZDB-GENE-[^;]+)", c[8])
             if gid:
                 loc[gid.group(1)] = (c[0], int(c[3]), int(c[4]), c[6])
+    # --- ZFIN <-> Ensembl id cross-check: ensembl_1_to_1.txt versus the Ensembl ids ZFIN's own GFF3 lists as aliases (two files, one provider)
+    alias_ens = {}
+    for l in (ART / "zfin_genes_selected.gff3").read_text().splitlines():
+        c = l.split("\t")
+        if len(c) > 8 and c[2] == "gene":
+            gid = re.search(r"ID=(ZDB-GENE-[^;]+)", c[8])
+            if gid:
+                alias_ens[gid.group(1)] = sorted(set(re.findall(r"ENSDARG\d{11}", c[8])))
+    cross = {sym: {"zfin_id": zfin[sym], "ensembl_1_to_1": ens.get(sym), "ensembl_in_zfin_gff_alias": alias_ens.get(zfin[sym], []), "agree": bool(ens.get(sym)) and ens.get(sym) in alias_ens.get(zfin[sym], [])} for sym in GENES}
+    (OUT / "id_crosscheck.json").write_text(json.dumps({
+        "what": "ZFIN-to-Ensembl gene ids: ensembl_1_to_1.txt versus the ENSDARG aliases in ZFIN's own GFF3 gene rows",
+        "limits": "both files are ZFIN's, so this is a consistency check, not an independent source; Ensembl's own REST (its description carries a ZFIN accession) was unreachable from this host",
+        "agree": sum(v["agree"] for v in cross.values()), "of": len(cross), "genes": cross}, indent=1, sort_keys=True))
     # --- NCBI Gene (current NCBI assembly; may not be GRCz11)
     ng = json.loads((ART / "ncbi_gene_summaries.json").read_text())["result"]
     ncbi_loc = {}

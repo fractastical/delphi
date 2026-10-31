@@ -273,3 +273,13 @@ def test_every_receipt_final_url_is_public_or_null():
                 for v in n:
                     walk(v)
         walk(J(name))
+
+
+def test_zfin_ensembl_ids_agree_across_two_zfin_files_and_the_check_says_it_is_not_independent():
+    c = J("id_crosscheck.json")
+    assert c["agree"] == c["of"] == 22 and "not an independent source" in c["limits"]
+    rows = {r["symbol"]: r for r in csv.DictReader(open(D / "genes.csv"))}
+    for sym, v in c["genes"].items():
+        assert rows[sym]["ensembl_gene"] == v["ensembl_1_to_1"] and v["ensembl_1_to_1"] in v["ensembl_in_zfin_gff_alias"], sym
+    # negative control: a wrong id must not count as agreeing
+    assert "ENSDARG00000000000" not in c["genes"]["kcnh2a"]["ensembl_in_zfin_gff_alias"]

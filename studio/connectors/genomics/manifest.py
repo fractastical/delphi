@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "data" / "genomics"
 
 ROLES = {"index.json": ("index", "multi", "all"), "genes.csv": ("table", "Danio rerio", "source_assessment"), "sources.json": ("sources", "multi", "source_assessment"),
-         "records/records.json": ("records", "multi", "all"), "assembly_check.json": ("check", "Danio rerio", "source_assessment"), "lat4a_resolution.json": ("check", "Danio rerio", "source_assessment"),
+         "records/records.json": ("records", "multi", "all"), "assembly_check.json": ("check", "Danio rerio", "source_assessment"), "id_crosscheck.json": ("check", "Danio rerio", "source_assessment"), "lat4a_resolution.json": ("check", "Danio rerio", "source_assessment"),
          "flyingfish_genome_facts.json": ("table", "Hirundichthys speculiger", "sequence_annotation"), "daniocell_correlations.csv": ("table", "Danio rerio", "expression_correlation"),
          "daniocell_tissue_group_thumbnails.csv": ("table", "Danio rerio", "expression_correlation"), "zfin_expression_selected.csv": ("table", "Danio rerio", "expression_correlation"),
          "zfin_phenotype_selected.csv": ("table", "Danio rerio", "genotype_phenotype"), "receipts.json": ("receipts", "multi", "all"), "flyingfish_receipts.json": ("receipts", "Hirundichthys speculiger", "sequence_annotation"),
