@@ -1113,3 +1113,17 @@ def test_ranked_results_say_when_nothing_contains_the_query_and_print_no_raw_ind
     pg.goto(base + "#/search?q=fin&tab=catalog")
     pg.wait_for_function("document.querySelector('#main').textContent.includes('Fin allometry')")
     assert "No result contains your words" not in pg.locator("#main").text_content()
+
+
+def test_malformed_entity_route_makes_no_request_and_navigation_moves_focus_to_main(browser, base):
+    seen = []
+    pg = page(browser)
+    pg.on("request", lambda r: seen.append(r.url) if "/api/" in r.url else None)
+    pg.goto(base + "#/frontier"); pg.wait_for_selector(".board")
+    pg.evaluate("location.hash = '#/entity/Bogus/x'")
+    pg.wait_for_selector("h1:has-text('Not found')")
+    t = pg.locator("#main").text_content()
+    assert "not a record kind this site knows" in t and "HTTP 400" not in t
+    assert not [u for u in seen if "Bogus" in u]
+    pg.evaluate("location.hash = '#/knowledge'"); pg.wait_for_selector("#cbrowse")
+    assert pg.evaluate("document.activeElement && document.activeElement.id") == "main"
