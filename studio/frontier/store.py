@@ -138,6 +138,16 @@ class Store:
             raise Forbidden("Required role missing")
         return p
 
+    def principal(self, token: str) -> dict:
+        """Who a credential belongs to, WITHOUT the credential. Read-only; raises Unauthorized for a missing or unknown token.
+
+        Public replacement for callers that reached into `_auth` (the MCP server's startup check and manifest, the admin tool).
+        Changes no other store behaviour."""
+        with self.connection() as c:
+            p = self._auth(c, token)
+        return {"actor": p["actor"], "operator": p["operator"], "roles": list(p["roles"]), "namespaces": list(p["namespaces"]),
+                "daily_write_limit": p["daily_write_limit"]}
+
     def _read_principal(self, c, token):
         return self._auth(c, token) if token else None
 
