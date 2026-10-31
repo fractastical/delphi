@@ -1,16 +1,19 @@
 # CPU feasibility controls for cfd3d (gates in gates_cpu.json, frozen before the first run).
 # Usage: julia --project=engineering/cfd3d/env engineering/cfd3d/controls.jl OUT.json [C0|C1|C2|all]
 using WaterLily, StaticArrays, JSON, LinearAlgebra
+const GPU = get(ENV, "CFD3D_GPU", "0") == "1"
+GPU && @eval using CUDA
+memtype() = GPU ? CUDA.CuArray : Array
 
 const t_wall0 = time()
 
 "Empty box with a uniform stream: anything but U everywhere is a solver defect."
-function c0(; n=32, steps=200)
-    sim = Simulation((n, n, n), (1.0, 0.0, 0.0), n; ν=1e-3, T=Float64)
+function c0(; n=32, steps=200, mem=Array)
+    sim = Simulation((n, n, n), (1.0, 0.0, 0.0), n; ν=1e-3, T=Float64, mem)
     t = @elapsed for _ in 1:steps
         sim_step!(sim)
     end
-    u = sim.flow.u
+    u = Array(sim.flow.u)
     I = CartesianIndices((2:n+1, 2:n+1, 2:n+1))
     du = maximum(abs, @view(u[I, 1]) .- 1.0)
     dvw = max(maximum(abs, @view u[I, 2]), maximum(abs, @view u[I, 3]))
@@ -24,10 +27,10 @@ end
 δ(k, ::CartesianIndex{N}) where N = CartesianIndex(ntuple(j -> j == k ? 1 : 0, N))
 
 "Fixed sphere, Re = U D / nu; Cd from WaterLily's total (pressure + viscous) force."
-function sphere(D; Re=100, t_end=12.0, t_avg=8.0, U=1.0f0)
-    centre = SA[1.5f0D, 2f0D, 2f0D]
+function sphere(D; Re=100, t_end=12.0, t_avg=8.0, U=1.0f0, dom=(6, 4, 4), cx=1.5f0, exitBC=false, mem=Array)
+    centre = SA[cx * D, dom[2] * D / 2f0, dom[3] * D / 2f0]
     body = AutoBody((x, t) -> √sum(abs2, x .- centre) - D / 2)
-    sim = Simulation((6D, 4D, 4D), (U, 0, 0), D; ν=U * D / Re, body, T=Float32)
+    sim = Simulation(dom .* D, (U, 0, 0), D; ν=U * D / Re, body, T=Float32, exitBC, mem)
     area = π * D^2 / 4
     ts, cd, cl = Float64[], Float64[], Float64[]
     nsteps = 0
@@ -72,6 +75,22 @@ function main(out, which)
         m = sphere(16; Re=25)
         m["pass"] = !(lo <= m["Cd_mean"] <= hi)
         r["C2"] = m
+    end
+    if which == "D1"   # diagnostic only, not a gate: is the C1 bias from the 1D inlet gap / near side walls?
+        r["D1_sphere_D16_big_domain"] = sphere(16; dom=(10, 6, 6), cx=3f0, exitBC=true)
+        r["D1_note"] = "WaterLily force = +sum(p n ds) with outward n (Metrics.jl:148): drag on body = -F_x"
+    end
+    if which == "PLATFORM"   # container gate: same cases as the local CPU pins, on this host's CPU or CUDA
+        mem = memtype()
+        r["device"] = GPU ? string(CUDA.name(CUDA.device())) : "cpu"
+        r["C0"] = c0(; mem)
+        r["sphere_D8"] = sphere(8; mem)
+        GPU && (r["sphere_D16"] = sphere(16; mem))
+    end
+    if which == "GPU_DIAG"   # diagnostics, not gates: does the C1 bias shrink with resolution / domain size?
+        mem = memtype()
+        r["sphere_D32"] = sphere(32; mem)
+        r["sphere_D32_big_domain"] = sphere(32; dom=(10, 6, 6), cx=3f0, exitBC=true, mem)
     end
     r["wall_total_s"] = time() - t_wall0
     tmp = out * ".tmp"
