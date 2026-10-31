@@ -1,0 +1,72 @@
+{
+  "schema": "frontier.bioelectric.controls/1",
+  "passed": false,
+  "mutation": "one gap endpoint sign reversed",
+  "checks": [
+    {
+      "name": "sealed_equal_area_gap_charge_balance",
+      "sum_current_uA_cm2": 50.0,
+      "tolerance": 1e-12,
+      "passed": false
+    },
+    {
+      "name": "frozen_gate_capacitive_relaxation_closed_form",
+      "final_mV": -64.95370306143903,
+      "analytic_mV": -64.95370306162748,
+      "equilibrium_mV": -64.99376347518808,
+      "error_mV": 1.8845014437829377e-10,
+      "tolerance_mV": 1e-07,
+      "passed": true,
+      "formula": "V(t)=Eeff+(V0-Eeff)exp(-sum(g)*t/Cm), actual membrane-current implementation, gates held fixed"
+    },
+    {
+      "name": "voltage_clamp_gate_closed_form",
+      "error": 6.250555628639631e-14,
+      "tolerance": 1e-09,
+      "passed": true,
+      "formula": "q(t)=q_inf+(q0-q_inf)exp[-(alpha+beta)t], V=-20mV, t=1ms"
+    },
+    {
+      "name": "sealed_passive_cable_grid_convergence",
+      "rows": [
+        {
+          "n": 16,
+          "dx_cm": 0.0625,
+          "max_error_mV": 0.0002855811341244685
+        },
+        {
+          "n": 32,
+          "dx_cm": 0.03125,
+          "max_error_mV": 7.171489718160728e-05
+        },
+        {
+          "n": 64,
+          "dx_cm": 0.015625,
+          "max_error_mV": 1.794873102745065e-05
+        }
+      ],
+      "error_ratios": [
+        3.982173095797333,
+        3.9955413601065772
+      ],
+      "passed": true,
+      "scope": "same conservative gap operator, D=.01cm^2/ms, L=1cm, cos(pi*x/L), Neumann boundary, t=1ms; not a calibration of the fixed 12-cell network"
+    },
+    {
+      "name": "HH_time_step_convergence",
+      "dt_ms": [
+        0.025,
+        0.0125,
+        0.00625
+      ],
+      "successive_max_voltage_difference_mV": [
+        0.007010262118939181,
+        0.00038279014326292327
+      ],
+      "ratio": 18.31359099057081,
+      "fine_tolerance_mV": 0.05,
+      "passed": true,
+      "scope": "default pulse and network only; event-aligned RK4, all cells at common saved times"
+    }
+  ]
+}
