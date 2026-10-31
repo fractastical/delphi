@@ -20,16 +20,20 @@ def _shade(tri: np.ndarray, base=(0.32, 0.55, 0.78)) -> np.ndarray:
     return np.clip(np.outer(k, base), 0, 1)
 
 
+def add_mesh(ax, parts: list[tuple[np.ndarray, np.ndarray, tuple]]) -> None:
+    """Draw the exported triangles as flat-shaded polygons (shared by the stills and the turntables)."""
+    for V, T, color in parts:
+        tri = V[T]
+        ax.add_collection3d(Poly3DCollection(tri, facecolors=_shade(tri, color), edgecolors="none", linewidths=0))
+
+
 def render(parts: list[tuple[np.ndarray, np.ndarray, tuple]], path, title: str, dpi: int = 110) -> None:
     allv = np.concatenate([p[0] for p in parts])
     lo, hi = allv.min(axis=0), allv.max(axis=0)
     fig = plt.figure(figsize=(10.5, 3.6), dpi=dpi)
     for i, (name, elev, azim) in enumerate(VIEWS):
         ax = fig.add_subplot(1, 3, i + 1, projection="3d")
-        for V, T, color in parts:
-            tri = V[T]
-            pc = Poly3DCollection(tri, facecolors=_shade(tri, color), edgecolors="none", linewidths=0)
-            ax.add_collection3d(pc)
+        add_mesh(ax, parts)
         ax.set_xlim(lo[0], hi[0]); ax.set_ylim(lo[1], hi[1]); ax.set_zlim(lo[2], hi[2])
         ax.set_box_aspect(hi - lo)
         ax.view_init(elev=elev, azim=azim)

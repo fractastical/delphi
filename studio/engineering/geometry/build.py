@@ -38,6 +38,8 @@ CONVERGENCE_TOL = 0.01  # relative volume / extent change default -> fine
 def code_hash() -> str:
     h = hashlib.sha256()
     for p in sorted(HERE.glob("*.py")):
+        if p.name == "turntable.py":  # media only; it reads the build's outputs and has its own code hash
+            continue
         h.update(p.name.encode() + b"\0" + p.read_bytes())
     return h.hexdigest()
 
@@ -266,7 +268,7 @@ def main(argv=None) -> int:
                                                   (out / "img" / "species-graph.png").read_bytes(), F.LABEL, run, sets))
     wjson(out / "downloads.json", downloads(out, viewer_designs, sets, run))
     for p in sorted(out.rglob("*")):
-        if p.is_file() and p.name != "manifest.json":
+        if p.is_file() and p.name != "manifest.json" and p.relative_to(out).parts[0] != "media":
             manifest["files"][str(p.relative_to(out))] = sha(p)
     wjson(out / "manifest.json", manifest)
     bad = [k for k, v in manifest["forms"].items() if not form_passes(v, sets[v["set"]]["length_aim"])]
