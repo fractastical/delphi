@@ -1,0 +1,129 @@
+# Rubric-to-evidence matrix: what is earned, what is missing
+
+Rubric weights relayed from the root session's reading of the live ScienceClaw page; **not
+re-fetched by me.** Receipt paths are exact. Evidence levels:
+
+- **M** — measured by me in this session, receipt committed under `data/research/mcp-probe-2026-10-31/`
+- **C** — committed artifact in this repository that I opened and read
+- **R** — reported by a worker in a message; **not re-run or viewed by me**
+
+A row at **R** may be spoken on stage only with the words "reported by" attached, or re-verified
+first. Mixing levels in one table without marking them is the failure this column exists to stop.
+
+---
+
+## Problem Significance and Complexity — 20%
+
+| Claim | Level | Receipt | Status |
+|---|---|---|---|
+| Whole-organism design maps knowledge gaps; each gap becomes a pinned Problem/Action | C | `frontier/models.py` `completeness` discriminator; `recorded` vs `actionable` with four required fields | **Earned** |
+| 250 morphoswarm register problems imported, **0 actionable** | C | `scripts/import_register.py` run output | **Earned** — and the zero is the point |
+| 17 sourced proposals, **13 actionable**, 17/17 resolvable URI | C | `scripts/import_sourced_problems.py` | **Earned** (corrected down from 15 after data-access verification) |
+| No machine-checked library of mathematical biology exists | — | — | **MISSING**: asserted, never systematically searched. Do not claim on stage |
+| Scope conditions are the natural unit because biological results are stated in limits and applied in regimes | C | the mispredication probe is one worked instance | **Partly earned** — one instance, not a survey |
+
+**Honest weak point.** "No such library exists" is the load-bearing significance claim and it has
+no negative-search receipt with a stated scope. Either say "we have not found one" or drop it.
+
+---
+
+## Scientific / Technical Impact — 25%
+
+| Claim | Level | Receipt | Status |
+|---|---|---|---|
+| Textbook Turing criterion's finite-domain error is **windowed, not monotone**: exactly 0.0% at every half-integer multiple of λc; 6.22% at 1.25 λc; **0.58% still at 4.25 λc** (prior Dv/Du log-uniform [1,30]) | C | `bench/mispredication/probe_declared_prior.out` on `origin/codex/resource-utilization-20261031` | **Earned**, with the toy-ensemble limit stated |
+| Our own claim *"reliable (under 1%) above 1.5 critical wavelengths"* is **withdrawn** | C | `bench/mispredication/README.md` correction notice, 2026-10-31 | **Earned** — the strongest single artifact |
+| Probe committed **before** its output; scratch-run motivation disclosed | C | `bench/mispredication/PROBE_DECLARATION.md` | **Earned** |
+| Band criterion vs direct eigenvalues: **3,000 comparisons, 0 disagreements** | C | `probe_declared_prior.json` `band_equals_direct_eigenvalues` | **Earned** (cross-check control passed) |
+| Declared control **failed** (89.53% vs declared >90%), threshold not moved, run shipped at exit 1 | C | `probe_declared_prior.out` `PY_EXIT=1`; Amendment 1 in `PROBE_DECLARATION.md` | **Earned** |
+| oca2 exon 21 absent from all 1,361,196,561 bp of the Molino assembly; flanking exons present once each | C | `results/2026-10-31-oca2-exon21-molino-RESULT.md` | **Earned** (positive closure) |
+| KCNE1 test **stopped**, not failed: 20.27% coverage vs a 75% preregistered floor | C | `results/2026-10-31-kcne1-binding-ddg-STOPPED.md` | **Earned** (a stop is a result) |
+| Scale-Erk model reproduces 5 source bands, misses the rise and synchrony-growth impairment; **retained** | R | worker message | Speak as "reported" |
+| 357 initial-state perturbation checks at 1e-10, 48 repeats, 0 divergences, max repeat delta 1.32e-14 | R | codex03 message only; **I found no committed receipt** | **Do not put on a slide until a path exists** |
+| OpenFold2 zebrafish Kcnj13 362 aa: mean pLDDT 52.86, pTM 0.2728, PAE 22.91 Å | R | codex03 message only; no corroborating file found | Speak as "reported"; the low confidence is the honest reading |
+| OpenMM 10,491-atom CPU trajectory, 101 states + MP4 | R | codex03 message | Speak as "reported" |
+
+**Honest weak point.** The headline comparisons we ran and lost are real and should stay in: an
+earlier scale study returned **shared specialists 78/100 vs original 78/100** (null), and a
+baseline beat us 96/100 vs 78/100. Keeping these is what makes the Turing result credible.
+
+---
+
+## Decentralized Agency — 20%
+
+| Claim | Level | Receipt | Status |
+|---|---|---|---|
+| Agent B falsified agent A's **published** claim through the written commons; no coordinator adjudicated the verdict | C | correction notice + `PROBE_DECLARATION.md` authored by the critic | **Earned — one instance** |
+| Review status is **node-local and separate** from the record: a record carries `local_status`, acceptance needs an independent operator elsewhere | M | `read_search_anonymous.json` (`"local_status": "imported_unreviewed"`); `capabilities.json` (*"there is no review/accept tool"*) | **Earned** |
+| Each MCP request authenticates as **its own principal**; the server holds no shared token | M | `capabilities.json`: `"principal": null`, *"the server holds no shared token"* | **Earned** |
+| Agents coordinate through the claim graph rather than a dispatcher | — | — | **MISSING as a general claim.** Much of today's work *was* root-dispatched. The one instance above is real; the architecture-wide claim is not measured |
+
+**Honest weak point, stated plainly.** This is the criterion where the gap between what we
+designed and what we ran today is widest. The commons supports decentralized review and one real
+instance went through it; most coordination today was a root session handing out work. Say the
+instance, not the architecture.
+
+---
+
+## Collective Capability — 25%
+
+| Claim | Level | Receipt | Status |
+|---|---|---|---|
+| The collective caught an error a single agent had published and shipped | C | mispredication correction notice | **Earned, qualitative, n=1** |
+| Collective beats single agent at **matched budget** | — | preregistration in progress, native `resource_scaling` | **PENDING — no result.** Do not promise a win |
+| Prior scale study: shared specialists **78/100** vs original **78/100** | R | relayed in the rubric strategy document | **A measured null.** Keep it in the talk |
+| Model-family diversity beats sampling diversity at equal budget | — | — | **NOT RUN.** Proposed only |
+
+**This is the 25% we cannot currently evidence quantitatively, and the pitch must say so in its
+own voice before a judge says it for us.** The script does this at 2:30 and in Q2.
+
+A null result here is still worth presenting: "we ran the experiment the rubric cares most about
+and it said no" is a stronger scientific posture than an unmeasured claim, and it is consistent
+with the arithmetic — averaging correlated homogeneous agents adds nothing; the gain regime is
+verification asymmetry.
+
+---
+
+## Execution and Validation — 10%
+
+| Claim | Level | Receipt | Status |
+|---|---|---|---|
+| Public MCP live, **18 tools** (manifest: 15 `read`, 3 `write`), protocol 2025-06-18, server `Delphi Frontier MCP` 1.27.0 | M | `tools_list.json`, HTTP 200 at 2026-10-31T22:08:18Z | **Earned** |
+| **Anonymous reads work**: `frontier_search` returns records with no credential | M | `read_search_anonymous.json` | **Earned** |
+| **Anonymous calculations work**: `frontier_simulate` returns an HH trajectory in 1.10 s, `calibrated: false`, six model-file sha256s, request sha256, full environment | M | `calc_simulate_anonymous.json`, `computed_at` 2026-10-31T22:10:02Z | **Earned** |
+| **Writes are refused**: well-formed `frontier_propose` with no credential → `unauthorized: Authenticated operator token required` | M | `control_write_anonymous_refused.json` | **Earned — this is the must-fail control** |
+| Catalogue: **1,287** claim versions, **1,190** with upstream claim id, **1,214** origin unknown, 451 artifact declarations | M | `catalogue.json` | **Earned** |
+| Catalogue reports its own unknowns as `null` and `0`-means-unchecked | M | `catalogue.json`: `mapped_species: null`, `structured_conditions: null`, `hosted_and_byte_checked: 0` with *"0 is the absence of any check"* | **Earned** |
+| 11 Nebius jobs with ids, UTC windows, in-container rc, returned bytes, sha256 — including **3 failed and 1 cancelled, all kept** | C | `results/compute/RECEIPT.md` on `origin/codex/frontier-demo-20261031` | **Earned** |
+| Cost of those jobs | C | RECEIPT.md: *"unavailable ... this is not zero"* | Honest unknown, keep the wording |
+| 13-part fish model + six print-ready props, geometry hashes shared with renders | R | print worker message | Speak as "reported". **Never "printed forms"** |
+| 26 assurance tests passed, integrated | R | native worker | Speak as "reported" |
+| Public Studio with interactive HH + mechanobio | R | native worker; **not viewed by me** | Speak as "reported" |
+
+---
+
+## Collaboration Bonus — +10
+
+| Claim | Level | Status |
+|---|---|---|
+| Endpoint publicly reachable, anonymous reads and calculations, one-page recipe exists | M | **Ready** |
+| **Another team actually used it and got a result** | — | **UNEARNED.** No external contact has been made or authorized. Zero until we hold their receipt |
+
+The recipe is `docs/research/mcp-reuse-recipe.md`. It is written to be executable by a stranger
+with curl and nothing else. **It has not been given to anyone**, because outreach is not
+authorized.
+
+---
+
+## The four things most likely to sink us, in order
+
+1. **Collective Capability (25%) has no quantitative result.** Mitigation: say it first, show the
+   n=1 instance, commit to reporting the null.
+2. **Decentralized Agency (20%) is asserted more broadly than it was practised today.** Mitigation:
+   claim the one instance that genuinely went through the commons, not the architecture.
+3. **Three Impact numbers sit at level R with no committed path** (the 357 perturbation checks, the
+   OpenFold2 confidence figures, the OpenMM trajectory). Mitigation: either land a receipt path
+   before the cut or drop them from the slides.
+4. **The significance claim "no machine-checked library of mathematical biology exists" has no
+   search receipt.** Mitigation: downgrade to "we have not found one" with the scope of what we
+   looked at, or cut it.
