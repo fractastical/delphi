@@ -249,11 +249,11 @@ def n_rows_counts(per_taxon, what):
 
 
 # --------------------------------------------------------------------------- GBIF
-def build_gbif():
+def build_gbif(only=None):
     print("GBIF occurrence counts")
     for slug, t in taxa.items():
         key = t["identifiers"].get("gbif_usage_key")
-        if not key:
+        if not key or (only and slug not in only):
             continue
         url = f"https://api.gbif.org/v1/occurrence/search?taxonKey={key}&limit=0"
         data, dist = api_json(url)
@@ -477,11 +477,11 @@ def build_fishbase():
 
 
 # --------------------------------------------------------------------------- NCBI Datasets
-def build_ncbi():
+def build_ncbi(only=None):
     print("NCBI Datasets reference genomes")
     for slug, t in taxa.items():
         taxid = t["identifiers"].get("ncbi_taxid")
-        if not taxid or t["rank"] not in ("species", "subspecies", "genus"):
+        if not taxid or t["rank"] not in ("species", "subspecies", "genus") or (only and slug not in only):
             continue
         url = f"https://api.ncbi.nlm.nih.gov/datasets/v2/genome/taxon/{taxid}/dataset_report?filters.reference_only=true&page_size=1"
         try:
@@ -605,8 +605,13 @@ SECTIONS = {"gbif": build_gbif, "anage": build_anage, "pantheria": build_panther
             "avonet": build_avonet, "fishbase": build_fishbase, "ncbi": build_ncbi, "worms": build_worms, "pbdb": build_pbdb}
 
 if __name__ == "__main__":
+    # usage: build_datasets.py [section[:slug,slug] ...]; per-taxon sections (gbif, ncbi) accept a slug filter
     wanted = sys.argv[1:] or list(SECTIONS)
     for w in wanted:
-        SECTIONS[w]()
+        name, _, slugs = w.partition(":")
+        if slugs:
+            SECTIONS[name](only=set(slugs.split(",")))
+        else:
+            SECTIONS[name]()
     save_taxa()
     print("done")

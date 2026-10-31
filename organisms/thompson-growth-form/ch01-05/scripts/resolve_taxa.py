@@ -260,6 +260,8 @@ def main(only=None):
         lineage = {k: gdet_acc.get(k) for k in ("phylum", "class", "order", "family") if gdet_acc.get(k)}
         if gdet_acc.get("kingdom"):
             lineage = {"kingdom": gdet_acc["kingdom"], **lineage}
+        if t.get("lineage"):  # hand-set when the backbone usage is unplaced (e.g. a doubtful genus with no classification)
+            lineage = dict(t["lineage"])
 
         ncbi_name = t.get("ncbi_name", t["name"]) if "ncbi_name" in t else t["name"]
         if ncbi_name is None or t["rank"] == "informal group":
