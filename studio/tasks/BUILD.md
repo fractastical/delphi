@@ -1,6 +1,6 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 03:50PM PDT.
+Coordinator: codex-03. Updated October 31, 2026, 04:06PM PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-008 define acceptance. This board supersedes the earlier 1:48pm snapshot.
 Every status distinguishes implementation, integration, publication and biological validation.
@@ -73,7 +73,7 @@ System reporting must use dated actual hackathon receipts: available shared capa
 - [x] Infrastructure's 3:50:19pm PDT provider snapshot lists 80 shared jobs: 35 confirmed ours and 45 other/unattributed. Ours: 24 completed, 5 failed, 3 cancelled, 2 running and 1 pulling an image. Other/unattributed: 32 completed, 10 failed, 2 cancelled and 1 running. Ownership is determined from our recorded IDs/prefixes; the provider returned no owner fields. This is a job census, not measured GPU saturation.
 - [ ] Current useful GPU work: conditional molecular-dynamics continuation and repaired 3D flow job running; reaction-diffusion DDPM job pulling its image. Setup and numerical controls precede kernels. Collect actual results before claiming training, scientific success or utilization.
 - [ ] Critical independent browser findings still need closure: Frontier table width, mobile Knowledge overflow, mobile navigation access, and large raw System detail expansion. Recheck each fix on the published release.
-- [ ] Complete final secret review, land the integrated branch and make the repository public as authorized. Historical scans found no active account credential in their stated scope; later commits still require a final scan. No public visibility claim yet.
+- [x] Completed the final credential review and incremental scan, merged PR7, and made kganjam/delphi-frontier public at 4:06pm PDT. Anonymous metadata and current README reads passed; public read access does not grant write access. The review scope and retained classifications are in docs/security-review.md.
 
 Earlier snapshots below retain their original observation times and are superseded for current-state reporting by this checkpoint.
 
@@ -142,3 +142,13 @@ Workers report atomically under /data/artifacts/delphi-evolve-rethink/messages. 
 ## Remaining proof obligations
 
 No calibrated whole-fish probability, biological manufacturing feasibility, real flight result, independent biological review, measured claim-reuse benefit or collective-intelligence scaling law has been established. Actual zero/null/inconclusive results stay visible. The platform must make those gaps actionable while showing the checked computational work.
+
+## Public-source and geometry integration checkpoint
+
+- [x] Three sourced ray-fan fish candidates and additive corrected print forms integrated. Root ran81 focused geometry/print checks.
+- [x] Full-horizon tissue analysis, metabolic solves, pressure-transfer refusals, diffusion controls and resource receipts integrated; root ran117 focused checks.
+- [x] Viewer review identified and repaired small-mesh picking precedence, transformed-distance errors and missing destruction on candidate/navigation changes. Source materials and exact geometry hashes are preserved.
+- [x] Root ran19 targeted combined Home/About/mobile/table/error browser checks;50 unrelated cases were deselected. New geometry is not biological validation.
+- [ ] Publish the next exact site release with the selectable ray-fan candidates, critical browser fixes and public-repository label; recheck production and independent critique.
+- [ ] Integrate returned1ns molecular-dynamics branches with all three frozen-window outcomes, then collect the3D flow and diffusion jobs.
+- [ ] Publish the matched-budget synthesis comparison as a ceiling/null result; all arms16/16 does not establish collective advantage.
