@@ -46,6 +46,7 @@ const PREFIXES = `@prefix this: <http://purl.org/nanopub/temp/np1/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix dct: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix schema: <https://schema.org/> .
 @prefix spdx: <http://spdx.org/rdf/terms#> .
@@ -70,7 +71,8 @@ sub:Head {
 sub:assertion {
   ${claim} a delphi:Claim ;
     rdfs:label ${lit(c.label)} ;
-    dct:description ${lit(c.claim)} ;
+    dct:description ${lit(c.claim)} ;${c.notation ? `
+    skos:notation ${lit(c.notation)} ;` : ""}
     delphi:context ${lit(context)} ;
     dct:type ${lit(c.claim_kind)} .
 }

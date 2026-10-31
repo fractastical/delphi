@@ -79,14 +79,23 @@ for (const c of claims) {
 const dupQuotes = claims.filter((c, i) => claims.findIndex(d => d.quote === c.quote) !== i);
 for (const d of dupQuotes) errors.push(`${d.id}: same quote as another claim`);
 
+// LaTeX for claims that state a relation, keyed by claim id.
+const notation = JSON.parse(readFileSync(join(ROOT, "extraction/notation.json"), "utf8"));
+const byId = new Map(claims.map(c => [c.id, c]));
+for (const [id, n] of Object.entries(notation)) {
+  if (!byId.has(id)) errors.push(`notation.json: no claim ${id}`);
+  else if (typeof n !== "string" || !n.trim()) errors.push(`notation.json: empty notation for ${id}`);
+  else byId.get(id).notation = n;
+}
+
 if (errors.length) {
   console.error(errors.join("\n"));
   console.error(`\n${errors.length} error(s); claims.json not written`);
   process.exit(1);
 }
 
-const ordered = claims.map(({ id, chapter, section, label, claim, quote, lineStart, lineEnd, claim_kind, scope, measurable_quantities, candidate_data, resolvability_triage }) =>
-  ({ id, chapter, section, label, claim, quote, lineStart, lineEnd, claim_kind, scope, measurable_quantities, candidate_data, resolvability_triage }));
+const ordered = claims.map(({ id, chapter, section, label, claim, notation, quote, lineStart, lineEnd, claim_kind, scope, measurable_quantities, candidate_data, resolvability_triage }) =>
+  ({ id, chapter, section, label, claim, notation, quote, lineStart, lineEnd, claim_kind, scope, measurable_quantities, candidate_data, resolvability_triage }));
 writeFileSync(join(ROOT, "claims.json"), JSON.stringify({ source: { file: "inputs/pg55264.txt", sha256: SOURCE_SHA256 }, claims: ordered }, null, 2) + "\n");
 
 const tsv = [["id", "chapter", "section", "label", "claim_kind", "resolvability_triage", "measurable_quantities", "candidate_data"].join("\t"),
