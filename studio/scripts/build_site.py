@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import collections
+import copy
 import datetime
 import json
 import re
@@ -431,6 +432,50 @@ def fish3d_files(ins: Inputs, out: dict) -> dict | None:
     else:
         shared = None
     return {"base": f"artifacts/fish3d/{cid}/", "glb_sha256": r["glb_sha256"], "candidates": candidates, "shared": shared, **state}
+
+
+def formalize_examples(ins: Inputs) -> dict | None:
+    """Fixtures from engineering/formalize/cases.py and the recorded Gemini extraction runs, for the proposal checker page. Nothing is run here:
+    the site only offers these requests to the node's POST /api/formalize/propose."""
+    fdir = ROOT / "engineering/formalize"
+    if not (fdir / "cases.py").exists():
+        return None
+    import importlib, sys as _sys
+    _sys.path.insert(0, str(ROOT))
+    try:
+        cases = importlib.import_module("engineering.formalize.cases")
+    finally:
+        _sys.path.pop(0)
+    for rel in ("cases.py", "sources/MANIFEST.json", "sources/cantilever_passage.txt", "sources/oca2_passage.txt"):
+        if (fdir / rel).exists():
+            ins.read(f"engineering/formalize/{rel}")
+    passages = {"cantilever": ins.text("engineering/formalize/sources/cantilever_passage.txt"), "oca2": ins.text("engineering/formalize/sources/oca2_passage.txt"), "gc": ""}
+    ex = []
+    add = lambda eid, title, kind, req, case, note="", receipt=None: ex.append({"id": eid, "title": title, "kind": kind, "request": req, "passage": passages[case], "passage_sha256": digest_bytes(passages[case].encode()) if passages[case] else None, "note": note, "receipt": receipt})
+    add("cantilever", "Cantilever tip deflection (human-written proposal)", "human fixture", cases.cantilever_request(), "cantilever", "The expected result is a checked proposal with a witness; translation fidelity is still unresolved.")
+    for k, why in (("L2", "L cubed written as L squared: a dimension fault the checker should reject"), ("wrong_unit", "second moment of area declared in m squared: a unit fault"), ("drop_guard", "the small-deflection guard removed. The checker still reports checked: it tests consistency, and cannot see that the proposal no longer matches the source. That gap is what the unresolved-translation part is for."), ("flip_guard", "the guard inequality reversed. The checker still reports checked for the same reason: it cannot see a mismatch with the source.")):
+        add("cantilever-" + k, "Cantilever with a deliberate fault: " + k.replace("_", " "), "negative control", cases.corrupt_cantilever(k), "cantilever", why)
+    add("gc-feasible", "Oligonucleotide GC window (human-written, feasible)", "human fixture", cases.gc_design_request(), "gc", "A counting property only; says nothing about function.")
+    if hasattr(cases, "gc_infeasible_request"):
+        add("gc-infeasible", "Oligonucleotide GC window (human-written, infeasible)", "negative control", cases.gc_infeasible_request(), "gc", "The constraints cannot all hold; the checker should say unsat.")
+    base = {"cantilever": cases.cantilever_request(), "oca2": cases.oca2_request()}
+    for rd in sorted((fdir / "runs").glob("*")):
+        rr = f"engineering/formalize/runs/{rd.name}"
+        if not (rd / "receipt.json").exists():
+            continue
+        rc = json.loads(ins.read(f"{rr}/receipt.json")); raw = ins.text(f"{rr}/response.raw.txt") if (rd / "response.raw.txt").exists() else ""
+        case = rc.get("case")
+        try:
+            prop = json.loads(raw)
+        except Exception:
+            prop = None
+        receipt = {"model": rc.get("model_version_reported"), "provider": rc.get("provider"), "finish_reason": rc.get("finish_reason"), "outcome_status": (rc.get("outcome") or {}).get("status"), "parent_checker_status": rc.get("parent_checker_status"), "repair_of": rc.get("repair_of"),
+                   "wall_s": rc.get("wall_s"), "tokens": {k: (rc.get("usage_reported_by_provider") or {}).get(k) for k in ("promptTokenCount", "candidatesTokenCount", "thoughtsTokenCount")}, "response_sha256": rc.get("response_sha256"), "path": rr}
+        if prop is None or case not in base:
+            ex.append({"id": "run-" + rd.name, "title": f"Recorded Gemini extraction {rd.name}", "kind": "recorded model proposal (not usable)", "request": None, "passage": passages.get(case, ""), "passage_sha256": rc.get("passage_sha256"), "note": "The model output is not valid JSON (finish reason " + str(rc.get("finish_reason")) + "), so there is nothing to check.", "receipt": receipt}); continue
+        req = copy.deepcopy(base[case]); req["claim"]["id"] = f"{case}-recorded-{rd.name}"; req["proposal"] = prop
+        ex.append({"id": "run-" + rd.name, "title": f"Recorded Gemini proposal {rd.name}", "kind": "recorded model proposal", "request": req, "passage": passages[case], "passage_sha256": rc.get("passage_sha256"), "note": "A model's proposal recorded earlier, shown unedited; the checker decides, the model does not. Its recorded checker outcome is in the receipt.", "receipt": receipt})
+    return {"examples": ex, "schema": "frontier.formalize.request/1", "limits": {"max_bytes": 16384}}
 
 
 def lifecycle_block(ins: Inputs) -> dict | None:
@@ -866,6 +911,7 @@ def build() -> dict[str, bytes]:
     home_biology_block = home_biology(ins)
     timeline = build_timeline(ins)
     fish3d_viewer = fish3d_files(ins, extra)
+    formalize_ex = formalize_examples(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -897,6 +943,7 @@ def build() -> dict[str, bytes]:
         "home_biology": home_biology_block,
         "timeline": timeline,
         "fish3d_viewer": fish3d_viewer,
+        "formalize": formalize_ex,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),

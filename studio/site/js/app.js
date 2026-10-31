@@ -21,7 +21,7 @@
 
   const ABOUT = [["/about", "Overview"], ["/about/team", "Team"], ["/about/docs", "Documentation"], ["/about/inspirations", "Motivation & inspirations"], ["/generative", "Generative biology"]];
   const NAV = [["studio", "Studio"], ["frontier", "Frontier"], ["knowledge", "Knowledge"], ["evidence", "Evidence"], ["work", "System"]];
-  const STUDIO_GROUP = new Set(["studio", "engineering", "simulations", "belief"]);       // reached from a project; they highlight Studio
+  const STUDIO_GROUP = new Set(["studio", "engineering", "simulations", "belief", "formalize"]);       // reached from a project; they highlight Studio
   const inNav = (k, view) => view === k || (k === "studio" && STUDIO_GROUP.has(view)) || (k === "knowledge" && view === "entity") || (k === "work" && view === "system");
   let snap = null; let lastView = null; let opener = null;
 

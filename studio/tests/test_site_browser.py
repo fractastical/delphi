@@ -70,7 +70,7 @@ def test_build_is_current_and_portable():
 
 def test_every_view_renders_without_errors(browser, base):
     pg = page(browser)
-    for route in ["frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1, #main h2", timeout=5000)
         assert pg.locator("#main").inner_text().strip(), route
@@ -308,7 +308,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["home", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -1177,3 +1177,51 @@ def test_v3_candidates_declare_no_video_so_the_fallback_cannot_offer_a_missing_t
     snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
     for c in snap["fish3d_viewer"]["candidates"][1:]:
         assert c["variants"] and all("video" in v and v["video"] is None for v in c["variants"]), c["id"]
+
+
+def _formalize_handler(route):
+    """Serve the node's real checker: the request body goes through frontier.formalize.propose, exactly as POST /api/formalize/propose does."""
+    import sys
+    sys.path.insert(0, str(ROOT))
+    from frontier.formalize import http_status, propose
+    result = propose(json.loads(route.request.post_data))
+    route.fulfill(status=http_status(result), json=result)
+
+
+def test_formalize_page_shows_six_separate_parts_and_the_real_checker_verdicts(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/formalize")
+    pg.wait_for_selector("#fz-src")
+    for sec in ("fz-src", "fz-prop", "fz-sym"):
+        assert pg.locator("#" + sec).count() == 1
+    assert pg.locator("section[aria-labelledby=fz-res]").count() == 0 and pg.locator("#fzgo").is_disabled(), "no node: nothing checked, nothing shown"
+    pg = page(browser)                                   # a fresh page: the mocks must be in place before the first load decides live vs snapshot
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": []}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.route("**/api/formalize/propose", _formalize_handler)
+    pg.goto(base + "#/formalize?ex=cantilever"); pg.wait_for_selector("#fzgo:not([disabled])")
+    pg.click("#fzgo")
+    pg.wait_for_selector("section[aria-labelledby=fz-lean]", timeout=20000)
+    res = pg.locator("section[aria-labelledby=fz-res]").text_content()
+    assert "checked" in res and "C1" in res and "witness" in res.lower() and "E = " in res and "dimensions consistent" in res
+    unres = pg.locator("section[aria-labelledby=fz-unres]").text_content()
+    assert "U1" in unres and "translation" in unres.lower() and "witness" not in unres.lower()
+    lean = pg.locator("section[aria-labelledby=fz-lean]").text_content()
+    assert "not_run" in lean and "generated_not_compiled" in lean and "Nothing is compiled" in lean
+    pg.goto(base + "#/formalize?ex=cantilever-L2"); pg.wait_for_selector("#fzgo:not([disabled])")
+    pg.click("#fzgo"); pg.wait_for_selector("section[aria-labelledby=fz-res]", timeout=20000)
+    bad = pg.locator("section[aria-labelledby=fz-res]").text_content()
+    assert "checked" not in bad.split("Request")[0].split("calibrated")[0] and ("invalid" in bad or "dimension fault" in bad), bad[:300]
+    pg.goto(base + "#/formalize?ex=run-cantilever-gemini-1")
+    pg.wait_for_selector("#main h1")
+    assert "not valid JSON" in pg.locator("#main").text_content() and pg.locator("#fzgo").count() == 0
+
+
+def test_formalize_page_has_no_overflow_on_a_phone_and_is_reachable_from_the_studio_nav(browser, base):
+    pg = page(browser, 400, 800)
+    pg.goto(base + "#/formalize?ex=run-cantilever-gemini-3"); pg.wait_for_selector("#fz-sym")
+    assert pg.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+    pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
+    assert pg.locator(".subnav a:has-text('Proposal checker')").count() == 1

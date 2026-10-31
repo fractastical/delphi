@@ -145,6 +145,16 @@
   /* An API error may be a string or {code, message}; never print an object. */
   const errCode = (j) => { const e = j && j.error; const c = e && typeof e === "object" ? e.code : e; return c ? ", " + String(c) : ""; };
   const errMessage = (j) => { const m = (j && j.message) || (j && j.error && typeof j.error === "object" && j.error.message); return m ? ": " + (typeof m === "string" ? m : JSON.stringify(m)) + "." : "."; };
+  /* POST /api/formalize/propose {frontier.formalize.request/1} -> frontier.formalize.response/1. Checks constraints as written; stores nothing, runs no Lean. */
+  async function formalize(body) {
+    if (!isLive()) throw new Unavailable("formalization check", "No runtime is connected, so nothing was checked.");
+    const text = JSON.stringify(body); if (text.length > 16384) throw new Error("the request is larger than the 16384-byte limit");
+    const sess = await getJSON("api/session", 5000); if (!sess.csrf) throw new Error("the session did not provide a CSRF token");
+    const r = await fetch("api/formalize/propose", { method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json", "X-CSRF-Token": sess.csrf }, body: text, cache: "no-store" });
+    let j = null; try { j = await r.json(); } catch (e) { /* not JSON */ }
+    if (!r.ok && !(j && j.schema === "frontier.formalize.response/1")) throw new Error(`The checker refused the request (HTTP ${r.status}${errCode(j)})${errMessage(j)}`);
+    return j;
+  }
   async function simulate(body) {
     if (!isLive()) throw new Unavailable("simulation", "No runtime is connected, so nothing ran and no result is shown.");
     if (JSON.stringify(body).length > 8192) throw new Error("the request is larger than the 8192-byte limit");
@@ -196,5 +206,5 @@
     return getJSON("api/design/context?" + q.toString(), 5000, signal);
   }
 
-  DF.api = { state, designContext, isLive, load, discovery, graph, catalog, record, artifacts, media, counts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
+  DF.api = { state, designContext, formalize, isLive, load, discovery, graph, catalog, record, artifacts, media, counts, system, attention, events, solve, belief, simulate, propose, Unavailable, getJSON };
 })();
