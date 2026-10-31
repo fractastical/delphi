@@ -140,7 +140,7 @@ def test_engineering_checks_never_fake_a_pass(browser, base):
 
 def test_mobile_has_no_horizontal_page_overflow(browser, base):
     pg = page(browser, 400, 860)
-    for route in ["frontier", "knowledge?tab=graph", "engineering", "evidence", "work", "belief"]:
+    for route in ["frontier", "knowledge?tab=graph", "engineering", "simulations", "evidence", "work", "work?tab=receipts", "belief"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_timeout(1200)
         assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth"), route
