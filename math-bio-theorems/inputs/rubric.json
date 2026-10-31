@@ -1,0 +1,46 @@
+{
+  "id": "theorem-readiness",
+  "version": "0.1.0",
+  "iri": "https://w3id.org/delphi/resource/concept/theorem-readiness-0.1.0",
+  "label": "Theorem-readiness of a mathematical-biology claim, v0.1.0",
+  "description": "Scores how close a claim from mathematical biology is to a theorem that is also an empirically testable statement about living systems. A claim reaches 'theorem status' in the strong sense when (a) it is a precise mathematical proposition, (b) it is proved from stated assumptions, and (c) those assumptions are empirically checkable and hold, or fail, in identifiable biological systems. Each dimension is scored in [0,1] as a graded judgement (delphi:hasScore), never as a probability. The overall score is the weighted mean of the five dimensions.",
+  "dimensions": [
+    {
+      "id": "formal-precision",
+      "weight": 0.20,
+      "question": "Can the claim be written as an unambiguous mathematical proposition (definitions, quantifiers, hypotheses) without loss of what the author meant?",
+      "anchors": {"0.0": "metaphor or slogan with no agreed formal reading", "0.5": "several competing formalizations, or a formal core plus informal surplus", "1.0": "a single canonical formal statement exists and is accepted"}
+    },
+    {
+      "id": "proof-status",
+      "weight": 0.25,
+      "question": "Within its formal reading, is the claim proved, plausibly provable, open, or false? Machine-checked proofs (Lean, Coq, Isabelle, mathlib) count higher than paper proofs only if the checked statement is the claim itself, not a generic arithmetic lemma.",
+      "anchors": {"0.0": "no mathematical content to prove, or shown false as stated", "0.3": "open conjecture with weak partial results", "0.6": "proved for special cases or under strong idealizations", "0.85": "proved in full generality on paper and widely accepted", "1.0": "proved and machine-checked as stated"}
+    },
+    {
+      "id": "empirical-testability",
+      "weight": 0.25,
+      "question": "Does the claim make falsifiable predictions about measurable biological quantities, with a feasible experiment or dataset that could refute it?",
+      "anchors": {"0.0": "unfalsifiable or tautological in application", "0.5": "testable only qualitatively, or only with infeasible experiments", "1.0": "sharp quantitative predictions with standard, feasible tests"}
+    },
+    {
+      "id": "empirical-support",
+      "weight": 0.15,
+      "question": "Has the claim survived serious empirical tests in real biological systems?",
+      "anchors": {"0.0": "refuted or never tested", "0.5": "mixed or limited evidence", "1.0": "repeatedly confirmed across systems and labs"}
+    },
+    {
+      "id": "bridge-fidelity",
+      "weight": 0.15,
+      "question": "If the mathematical statement is a theorem, do its hypotheses actually hold in the biological systems it is meant to describe, so that the theorem says something true about biology rather than only about the model?",
+      "anchors": {"0.0": "assumptions are known not to hold anywhere relevant", "0.5": "assumptions hold approximately in some systems", "1.0": "assumptions are routinely verified to hold"}
+    }
+  ],
+  "verdicts": {
+    "theorem-and-validated": "proved, testable and empirically supported with faithful assumptions",
+    "theorem-ready": "precise and testable; a proof exists or is within reach; bridge needs work",
+    "model-theorem-only": "proved inside its model, but weak testability or bridge fidelity",
+    "testable-not-formal": "empirically sharp but not a mathematical proposition",
+    "conjectural-framework": "neither precise nor sharply testable yet"
+  }
+}

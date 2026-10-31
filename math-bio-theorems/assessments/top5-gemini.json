@@ -1,0 +1,132 @@
+{
+  "assessor": {
+    "agent": "assessor-gemini",
+    "model": "gemini-4-argon-medium"
+  },
+  "rubric": "theorem-readiness/0.1.0",
+  "top5": [
+    {
+      "rank": 1,
+      "thinker_id": "hardy-weinberg",
+      "flagship_claim": "Hardy-Weinberg Equilibrium Law",
+      "formal_statement": "In a large panmictic diploid population with discrete generations, equal allele frequencies between sexes, and no mutation, migration, or natural selection at an autosomal locus with alleles A_1, ..., A_k at frequencies p_1, ..., p_k (sum p_i = 1), single-generation random union of gametes establishes genotype frequencies P(A_i A_i) = p_i^2 and P(A_i A_j) = 2 p_i p_j (i != j), which remain invariant in all subsequent generations.",
+      "source_citation": "Hardy, G. H. (1908) Mendelian Proportions in a Mixed Population. Science 28(706): 49-50.",
+      "source_doi": "10.1126/science.28.706.49",
+      "scores": {
+        "formal-precision": 1.0,
+        "proof-status": 0.95,
+        "empirical-testability": 0.95,
+        "empirical-support": 0.95,
+        "bridge-fidelity": 0.9
+      },
+      "verdict": "theorem-and-validated",
+      "proposed_test": "Genotype a large random sample (n >= 10,000) from an outbred diploid population across autosomal biallelic loci and apply an exact conditional goodness-of-fit test (Haldane-Wigginton exact test) against P(AA, Aa, aa) = (p^2, 2pq, q^2) over consecutive generations.",
+      "evidence_against": "Real populations exhibit finite size (genetic drift), population substructure (Wahlund effect), assortative mating, and local selection or genotyping artifacts that produce measurable departures at specific loci.",
+      "rationale": "The Hardy-Weinberg law is the canonical example of an exact mathematical theorem in biology whose core physical hypothesis\u2014symmetric Mendelian segregation of gametes\u2014holds directly in diploid meiosis. Because single-generation per-locus selection and mutation rates are typically negligible at neutral autosomal sites, its quantitative predictions hold to high precision across millions of loci while providing an exact falsifiable baseline for detecting evolutionary forces.",
+      "overall": 0.9525
+    },
+    {
+      "rank": 2,
+      "thinker_id": "berg-purcell",
+      "flagship_claim": "Berg-Purcell Physical Limit on Cellular Chemoreception",
+      "formal_statement": "For a spherical cell or sensor of radius a immersed in a medium containing a chemoattractant at mean concentration c_0 with diffusivity D, any estimate of c_0 formed by integrating stochastic ligand-receptor occupancy over time T >= a^2/D has fractional variance bounded below by (delta c / c_0)^2 >= 3 / (5 pi D a c_0 T) (or ~ 1 / (D a c_0 T) up to an O(1) geometric prefactor).",
+      "source_citation": "Berg, H. C. & Purcell, E. M. (1977) Physics of chemoreception. Biophysical Journal 20(2): 193-219.",
+      "source_doi": "10.1016/S0006-3495(77)85544-6",
+      "scores": {
+        "formal-precision": 0.92,
+        "proof-status": 0.88,
+        "empirical-testability": 0.95,
+        "empirical-support": 0.9,
+        "bridge-fidelity": 0.9
+      },
+      "verdict": "theorem-and-validated",
+      "proposed_test": "Measure single-cell chemotactic drift velocity or intracellular kinase (CheA/FRET) noise floor in E. coli across controlled shallow concentration gradients while independently varying ligand diffusivity D (via viscosity), mean concentration c_0, and integration time T.",
+      "evidence_against": "Active cellular swimming, irreversible ligand consumption/endocytosis, and non-equilibrium receptor cooperativity can alter the O(1) prefactor (e.g., maximum-likelihood arrival timing reduces variance by ~2x relative to time-averaged occupancy).",
+      "rationale": "Berg and Purcell derived a rigorous physical bound on biological sensing from first-principles Brownian diffusion and stochastic correlation times. Its hypotheses (Fickian diffusion of dilute ligands and discrete molecular binding) hold faithfully in aqueous cellular environments, and its parameter-free quantitative predictions have been repeatedly verified in bacterial chemotaxis, eukaryotic gradient sensing, and embryonic morphogen readout.",
+      "overall": 0.9115
+    },
+    {
+      "rank": 3,
+      "thinker_id": "kingman",
+      "flagship_claim": "Kingman n-Coalescent Convergence Theorem",
+      "formal_statement": "In any haploid or diploid exchangeable neutral reproduction model of population size N with finite, non-zero offspring variance sigma^2 (such as the Wright-Fisher or Moran model), as N -> infinity with time rescaled in units of N / sigma^2 generations, the ancestral genealogy of a sample of n lineages converges in distribution to the continuous-time n-coalescent in which each of the k(k-1)/2 pairs of extant lineages merges independently at rate 1.",
+      "source_citation": "Kingman, J. F. C. (1982) The coalescent. Stochastic Processes and their Applications 13(3): 235-248.",
+      "source_doi": "10.1016/0304-4149(82)90011-4",
+      "scores": {
+        "formal-precision": 0.98,
+        "proof-status": 0.9,
+        "empirical-testability": 0.9,
+        "empirical-support": 0.85,
+        "bridge-fidelity": 0.8
+      },
+      "verdict": "theorem-and-validated",
+      "proposed_test": "Sequence whole genomes from a random sample of n individuals in a demographically stable population and test whether the unfolded site frequency spectrum at unlinked putatively neutral noncoding sites satisfies E[xi_i] = theta / i and Tajima D = 0.",
+      "evidence_against": "Widespread linked selection (background selection and selective sweeps), highly skewed offspring distributions in marine/viral species (multiple-merger coalescents), and non-equilibrium demographic history violate constant-N exchangeability in many natural populations.",
+      "rationale": "Kingman proved a universal probability limit theorem showing that diverse micro-evolutionary reproduction models collapse onto a single canonical genealogical process. Coupled with Poisson mutation, it delivers sharp, falsifiable predictions for DNA polymorphism spectra that anchor modern empirical population genomics.",
+      "overall": 0.8935
+    },
+    {
+      "rank": 4,
+      "thinker_id": "kimura",
+      "flagship_claim": "Neutral Molecular Substitution Rate Theorem (k = mu) and Diffusion Fixation Formula",
+      "formal_statement": "In a finite diploid population of effective size N_e where newly arising mutations at a locus have selection coefficient s and per-gamete mutation rate mu, the diffusion-limit fixation probability from initial frequency p is u(p) = (1 - exp(-4 N_e s p)) / (1 - exp(-4 N_e s)); in the neutral limit |4 N_e s| -> 0, u(1/(2N)) = 1/(2N), so the long-term rate of allele substitution per generation is k = 2 N mu * (1/(2N)) = mu, independent of population size N.",
+      "source_citation": "Kimura, M. (1968) Evolutionary Rate at the Molecular Level. Nature 217(5129): 624-626.",
+      "source_doi": "10.1038/217624a0",
+      "scores": {
+        "formal-precision": 0.95,
+        "proof-status": 0.88,
+        "empirical-testability": 0.92,
+        "empirical-support": 0.85,
+        "bridge-fidelity": 0.8
+      },
+      "verdict": "theorem-and-validated",
+      "proposed_test": "Compare de novo germline mutation rates mu measured directly via parent-offspring trio whole-genome sequencing with long-term evolutionary substitution rates k per generation at fourfold-degenerate and pseudogene sites across species with vastly different effective population sizes N_e.",
+      "evidence_against": "Weakly deleterious selection (nearly neutral regime where N_e s = O(1)), GC-biased gene conversion, and fluctuations in generation time cause systematic deviations from strict constancy and pure N-independence.",
+      "rationale": "Kimura turned population genetics into a quantitative molecular science via a remarkably crisp mathematical theorem: exact cancellation of population size N between mutation influx (2N*mu) and neutral fixation probability (1/2N). This yields a falsifiable, parameter-free identity between pedigree mutation rates and phylogenetic divergence at neutral sites.",
+      "overall": 0.8875
+    },
+    {
+      "rank": 5,
+      "thinker_id": "kermack-mckendrick",
+      "flagship_claim": "Epidemic Threshold and Final Size Theorem",
+      "formal_statement": "In a homogeneously mixing population governed by the SIR renewal dynamics with basic reproduction number R_0 = integral_0^infinity beta(tau) S_0 exp(-gamma tau) d_tau, an introduced small infectious fraction grows into an epidemic if and only if R_0 > 1 (equivalently S_0 > S_c = 1/R_0), and the asymptotic fraction escaping infection s_infinity in a closed population is the unique root in (0, 1) of s_infinity = s_0 exp(-R_0 (1 - s_infinity)).",
+      "source_citation": "Kermack, W. O. & McKendrick, A. G. (1927) A contribution to the mathematical theory of epidemics. Proceedings of the Royal Society of London. Series A 115(772): 700-721.",
+      "source_doi": "10.1098/rspa.1927.0118",
+      "scores": {
+        "formal-precision": 0.95,
+        "proof-status": 0.9,
+        "empirical-testability": 0.9,
+        "empirical-support": 0.85,
+        "bridge-fidelity": 0.75
+      },
+      "verdict": "theorem-and-validated",
+      "proposed_test": "Induce graded herd immunity via vaccination across replicate closed host populations (or monitor regional vaccination coverage v against R_0 estimated from serial intervals and initial growth) to test whether endemic transmission ceases sharply at v_c = 1 - 1/R_0.",
+      "evidence_against": "Real host contact networks are spatially, socially, and age-heterogeneous (superspreading), and waning immunity or pathogen antigenic evolution can shift the effective invasion threshold and final epidemic size away from the homogeneous SIR formula.",
+      "rationale": "Kermack and McKendrick proved a genuine nonlinear threshold theorem that explains why epidemics terminate before exhausting all susceptibles and establishes the exact mathematical basis for herd immunity. Even when homogeneous mixing is relaxed to heterogeneous contact networks, the spectral radius of the next-generation operator preserves their threshold theorem.",
+      "overall": 0.88
+    }
+  ],
+  "ranks_6_10": [
+    {
+      "thinker_id": "ewens",
+      "overall": 0.8735
+    },
+    {
+      "thinker_id": "hodgkin-huxley",
+      "overall": 0.872
+    },
+    {
+      "thinker_id": "haldane",
+      "overall": 0.8565
+    },
+    {
+      "thinker_id": "winfree",
+      "overall": 0.8525
+    },
+    {
+      "thinker_id": "alon",
+      "overall": 0.8375
+    }
+  ],
+  "notable_exclusions": "George Price (Price Equation) and Ronald Fisher (Fundamental Theorem of Natural Selection) were excluded from the top tier despite famous mathematical results: Price's equation is an exact algebraic identity over any data partition and thus empirically tautological (low empirical-testability) without extra dynamical assumptions, whereas Fisher's FTNS holds strictly only for the partial change in mean fitness due to additive genetic variance, failing as a statement about total fitness change under epistasis or frequency dependence (low bridge-fidelity). Grand systems theorists such as Karl Friston (Free Energy Principle), Robert Rosen ((M,R)-systems), Humberto Maturana & Francisco Varela (autopoiesis), and Ren\u00e9 Thom (catastrophe morphogenesis) scored poorly because their claims lack canonical formal hypotheses that map onto falsifiable biological observables."
+}
