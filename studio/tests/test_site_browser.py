@@ -690,3 +690,12 @@ def test_real_assurance_map_equation_registry_and_ensembles_render(browser, base
     assert "Colors are categorical evidence states" in pg.locator("#aslegend").inner_text()
     n = len(A["transfer_matrix"]["axes"])
     assert pg.locator("#assurance .mcell").count() == n * n - n
+
+
+def test_frontier_shows_the_3d_fish_above_the_open_questions(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector("#fishmini canvas, #fishmini svg")
+    fish_y = pg.locator("#fishmini").bounding_box()["y"]
+    board_y = pg.locator("#wb-h").bounding_box()["y"]
+    assert fish_y < board_y, (fish_y, board_y)

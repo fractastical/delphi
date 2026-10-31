@@ -196,6 +196,11 @@
         <div class="herotext"><p class="lede">An open-questions whiteboard where a design goal and the literature meet. <b>Top-down</b>: goal, then constraints, then what is unresolved. <b>Bottom-up</b>: theory and evidence fitted to known biology, then challenged and reconciled. The questions column is where they have to agree.</p>
           <p class="mission"><b>Mission</b> Engineer toward a flying fish.</p></div></section>
 
+      <section class="panel missionview" aria-labelledby="mv">
+        <div class="mv-head"><h2 id="mv">Mission view: eleven scales, one design</h2>
+          <p class="note small">Each scale is a way to look at the same design. Showing a scale does not mean an executable model exists there; ${m.scales.filter((s) => s.have.length).length} of 11 have at least one indexed source.</p></div>
+        <div class="mv-body"><div class="mv-fish"><div id="fishmini" class="fishmini"></div></div><ol class="scales" aria-label="The eleven MorphoSwarm scales; each opens Engineering at that scale">${scaleChips}</ol></div></section>
+
       <div id="livepanel"></div>
       <section class="panel board" aria-labelledby="wb-h">
         <h2 id="wb-h">Open-questions whiteboard</h2>
@@ -216,10 +221,7 @@
         ${mdl.vis.length ? html`<div class="tablewrap"><table class="qtable"><thead><tr><th>Id</th><th>Question</th><th>Approach</th><th>Scales</th><th>State</th><th>Owner</th><th>Blocked by</th><th>Sources</th></tr></thead><tbody>${mdl.vis.map(rowFor)}</tbody></table></div>` : U.empty("No question matches these filters.")}
       </section>
 
-      <section class="panel missionview" aria-labelledby="mv">
-        <div class="mv-head"><h2 id="mv">Mission view: eleven scales, one design</h2>
-          <p class="note small">Each scale is a way to look at the same design. Showing a scale does not mean an executable model exists there; ${m.scales.filter((s) => s.have.length).length} of 11 have at least one indexed source.</p></div>
-        <div class="mv-body"><div class="mv-fish"><div id="fishmini" class="fishmini"></div></div><ol class="scales" aria-label="The eleven MorphoSwarm scales; each opens Engineering at that scale">${scaleChips}</ol></div></section>`,
+`,
       async after(root) {
         DF.mountFishMini(root.querySelector("#fishmini"));
         DF.renderLiveQuestions(root.querySelector("#livepanel"), snap, route);
