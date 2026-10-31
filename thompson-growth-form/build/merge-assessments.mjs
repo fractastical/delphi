@@ -74,6 +74,14 @@ const status = new Map();
 for (let i = 0; i < urls.length; i += 12)
   await Promise.all(urls.slice(i, i + 12).map(async u => status.set(u, await resolves(u))));
 
+// Builder edits to assessor text, each with a reason; the raw batches are left as written.
+const edits = existsSync(join(A, "edits.json")) ? JSON.parse(readFileSync(join(A, "edits.json"), "utf8")) : [];
+for (const e of edits) {
+  const d = rows.find(r => r.assessor === e.assessor && r.claim_id === e.claim_id)?.candidate_datasets.find(d => d.url === e.url);
+  if (d?.[e.field] !== e.from) throw new Error(`edits.json: ${e.assessor} ${e.claim_id} ${e.url} ${e.field} no longer reads ${JSON.stringify(e.from)}`);
+  d[e.field] = e.to;
+}
+
 const dropped = [];
 for (const r of rows) {
   r.candidate_datasets = r.candidate_datasets.filter(d => {
