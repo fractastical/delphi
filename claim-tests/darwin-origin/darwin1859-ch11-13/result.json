@@ -2,7 +2,7 @@
   "claim_id": "darwin1859-ch11-13",
   "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch11-13",
   "project": "darwin-origin",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If the Glacial period lasted a very long time at each place and was at least in part simultaneous across the whole world, then (a) a globally mixed marine proxy of ice volume and deep-water temperature (benthic d18O) shows prolonged cold, ice-rich states lasting well over 10 thousand years and recurring through the Pleistocene, with the last glacial maximum in such a state, and (b) a southern-hemisphere high-latitude temperature record (Antarctic ice core) is cold at the same times as the global proxy is ice-rich, within age-model uncertainty.",
   "pass_criterion": "Pre-registered. Data: (1) LR04 benthic d18O stack of Lisiecki and Raymo (2005), the LR04stack.txt file served by the author (columns: age in ka, benthic d18O in per mil, error), and (2) EPICA Dome C deuterium-derived temperature anomaly on the EDC3 age scale (Jouzel et al. 2007), the NOAA paleoclimatology file edc3deuttemp2007.txt. Criterion A (long-lasting cold states): with d18O linearly interpolated to a 1-kyr grid over 0-2600 ka, d18O >= 4.0 per mil during at least 20% of the interval AND at least 5 separate contiguous intervals with d18O >= 4.0 per mil each lasting >= 10 kyr. Criterion B (last glacial maximum): mean d18O over 18-26 ka >= 4.5 per mil. Criterion C (simultaneity, north-dominated ice volume vs southern temperature): both series interpolated to a 1-kyr grid over 0-800 ka; the maximum Pearson correlation between EDC temperature anomaly and negative d18O across lags of -6 to +6 kyr (to allow for independent age models) is >= 0.6. SUPPORTS if A, B and C all hold.",
   "fail_criterion": "Pre-registered. REFUTES if d18O >= 4.0 per mil covers < 10% of 0-2600 ka, OR fewer than 2 contiguous >= 4.0 per mil intervals last >= 10 kyr, OR the 18-26 ka mean d18O is < 4.2 per mil, OR the maximum lagged correlation in criterion C is < 0.3 (southern temperature not in step with global ice volume). MIXED otherwise (values between the support and refute thresholds, or A and B holding while C is between 0.3 and 0.6). INCONCLUSIVE (data-unavailable) if either file cannot be downloaded.",
@@ -11,12 +11,71 @@
     "epica-dome-c-edc3-deuterium-temperature-jouzel-2007"
   ],
   "interpretation": "Darwin's Glacial period is mapped to the Pleistocene glacial stages. 'Lasted a very long time' is read as cold states of at least 10 kyr; 'simultaneous across the whole world' is read as the Antarctic (southern high-latitude) temperature record being in step with the benthic d18O stack, whose glacial signal is dominated by northern-hemisphere ice sheets; this is a two-hemisphere test of simultaneity at the resolution of orbital cycles, not of the sub-millennial bipolar seesaw. Darwin implied one long glacial episode; the data show many cycles, so the test asks whether long, globally cold intervals recur and co-occur. The 4.0 and 4.5 per mil thresholds and the 0.6 correlation threshold were fixed before any data were read. Criteria A and B follow the swarm thread's draft plan; criterion C was added to address the simultaneity clause the draft could not test.",
-  "datasets": [],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "datasets": [
+    {
+      "id": "lr04-benthic-d18o-stack-lisiecki-raymo-2005",
+      "name": "LR04: Pliocene-Pleistocene stack of 57 globally distributed benthic d18O records (Lisiecki and Raymo 2005), author's distribution file LR04stack.txt",
+      "landing_url": "https://lorraine-lisiecki.com/stack.html",
+      "doi": "10.1029/2004PA001071",
+      "version": "LR04 (2005) as served 2026-10-31",
+      "license": "not stated on the file; published data, cite the paper",
+      "files": [
+        {
+          "download_url": "https://lorraine-lisiecki.com/LR04stack.txt",
+          "retrieved_at": "2026-10-31T06:14:04Z",
+          "byte_size": 37431,
+          "sha256": "7d1a6ca7ffc033e45e20fb76a7f39c8d99df87baa1094260f9dbdc09f0bb8945"
+        }
+      ],
+      "role": "global ice-volume and deep-water temperature proxy, 0-5320 ka at 1-5 kyr steps"
+    },
+    {
+      "id": "epica-dome-c-edc3-deuterium-temperature-jouzel-2007",
+      "name": "EPICA Dome C ice core 800 kyr deuterium and temperature estimates on the EDC3 age scale (Jouzel et al. 2007), NOAA World Data Service for Paleoclimatology file edc3deuttemp2007.txt",
+      "landing_url": "https://www.ncei.noaa.gov/access/paleo-search/study/6080",
+      "doi": "10.1126/science.1141038",
+      "version": "NOAA file last updated 2007-11-26 (EDC3 age model)",
+      "license": "public domain (NOAA NCEI)",
+      "files": [
+        {
+          "download_url": "https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/epica_domec/edc3deuttemp2007.txt",
+          "retrieved_at": "2026-10-31T06:14:04Z",
+          "byte_size": 357470,
+          "sha256": "b801fc2e422d427524619be25b50ee86fd63b36eb440eb5044d9bec12a4d1747"
+        }
+      ],
+      "role": "Antarctic temperature anomaly, 0-802 ka"
+    }
+  ],
+  "method": "fetch.py downloads both text files. analysis.py interpolates LR04 d18O to a 1-kyr grid over 0-2600 ka, measures the fraction of time at or above 4.0 per mil and the contiguous intervals at or above 4.0 per mil lasting 10 kyr or more, the mean d18O over 18-26 ka, and, over 0-800 ka, the maximum Pearson correlation between the EDC temperature anomaly and negative d18O across lags of -6 to +6 kyr. The pre-registered rule is applied.",
+  "measured": {
+    "value": 0.37985390234525185,
+    "unit": "fraction of the last 2.6 Myr with benthic d18O >= 4.0 per mil (pre-registered threshold 0.20)",
+    "n": "2115 LR04 points, 5785 EDC points",
+    "uncertainty": "LR04 standard errors are 0.03-0.1 per mil per point, small relative to the 4.0 threshold",
+    "extra": {
+      "n_cold_intervals_ge_10kyr": 34,
+      "n_cold_intervals_total": 62,
+      "longest_cold_interval_kyr": 68,
+      "mean_d18O_18_26ka": 4.88,
+      "corr_antarctic_temp_vs_global_ice_lag0": 0.855605957948549,
+      "max_lagged_corr": 0.8758444437688593,
+      "best_lag_kyr": 2,
+      "criteria": {
+        "A": true,
+        "B": true,
+        "C": true
+      }
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.85,
+  "caveats": [
+    "Darwin pictured one long Glacial period; the record shows dozens of glacial cycles. The test asks only whether long (>= 10 kyr), globally registered cold states recur and whether the southern high latitudes are cold at the same times, which they are (correlation 0.88 at a 2 kyr lag).",
+    "Benthic d18O mixes ice volume (mostly northern hemisphere ice sheets) with deep-water temperature; the Antarctic record is a single site. Simultaneity is shown at orbital (10-100 kyr) resolution and does not speak to millennial-scale bipolar anti-phasing.",
+    "The 4.0 and 4.5 per mil thresholds are absolute values of a stack whose mean level drifts over 2.6 Myr; early Pleistocene glacials are shallower, which the 20% criterion absorbs.",
+    "Darwin's 'whole world' includes the tropics and the ocean, which these two records do not resolve."
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "claude-fable-5-1",

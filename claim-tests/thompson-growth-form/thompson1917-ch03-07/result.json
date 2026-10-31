@@ -2,7 +2,7 @@
   "claim_id": "thompson1917-ch03-07",
   "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch03-07",
   "project": "thompson-growth-form",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "If weight varies as the cube of a linear dimension during growth, then across childhood and adolescence the population mean body weight scales with the population mean stature with a log-log exponent near 3, so the weight-for-age curve is approximately the cube of the stature-for-age curve.",
   "pass_criterion": "Pre-registered. Data: US NHANES examination data, cycles 2013-2014, 2015-2016 and 2017-2018 (Body Measures BMX_H/I/J and Demographics DEMO_H/I/J XPT files), examined participants aged 2 to 19 years with measured standing height (BMXHT, cm) and weight (BMXWT, kg). For each sex, compute MEC-exam-weighted (WTMEC2YR) mean height and mean weight in 1-year age bins (18 bins), regress log(mean weight) on log(mean height) by ordinary least squares, and also fit the constrained model weight = k * height^3 with k estimated by least squares on the log scale. SUPPORTS if, for both sexes, the free exponent b lies in [2.5, 3.5] AND the cubic model reproduces the age-bin mean weights with R^2 >= 0.90 on the original scale.",
   "fail_criterion": "Pre-registered. REFUTES if, for either sex, b lies outside [2.5, 3.5] OR the cubic model's R^2 on the age-bin weight curve is < 0.90. MIXED is not possible under this rule except as follows: if the two sexes disagree (one passes, the other fails) the verdict is MIXED. INCONCLUSIVE (data-unavailable) if the files cannot be downloaded.",
@@ -10,12 +10,86 @@
     "nhanes-2013-2018-body-measures-demographics"
   ],
   "interpretation": "Thompson's 'linear dimension' is measured standing stature and 'weight' is measured body mass, taken as proportional to volume at near-constant density. 'Tend to vary as the cube' is read as an ontogenetic allometric exponent near 3 with a tolerance band of 2.5 to 3.5 because he wrote 'mainly (though not wholly)'. The claim is tested on age-binned population means, which is how he compared the human weight and stature curves, using a modern cross-sectional survey in place of his Quetelet-era tables; survey weights make the means representative of the US population. This follows the swarm thread's draft plan with the cycles fixed in advance.",
-  "datasets": [],
-  "method": null,
-  "measured": null,
-  "verdict": null,
-  "confidence": null,
-  "caveats": [],
+  "datasets": [
+    {
+      "id": "nhanes-2013-2018-body-measures-demographics",
+      "name": "US National Health and Nutrition Examination Survey (NHANES) 2013-2014, 2015-2016 and 2017-2018: Body Measures (BMX) and Demographics (DEMO) files",
+      "landing_url": "https://wwwn.cdc.gov/nchs/nhanes/",
+      "doi": null,
+      "version": "public release XPT files as served 2026-10-31",
+      "license": "public domain (US federal government data)",
+      "files": [
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/BMX_H.xpt",
+          "retrieved_at": "2026-10-31T06:14:09Z",
+          "byte_size": 2045520,
+          "sha256": "fd5e9fc6e6aab0a4aee6e699f51497bbc9b62101f7f43aee924c473e38fd9442"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/DEMO_H.xpt",
+          "retrieved_at": "2026-10-31T06:14:09Z",
+          "byte_size": 3833200,
+          "sha256": "f8f0cbb3085a323d4cde22349b164878fea1e64dbc404e65b5815c7816b547d7"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/BMX_I.xpt",
+          "retrieved_at": "2026-10-31T06:14:09Z",
+          "byte_size": 1989600,
+          "sha256": "d31da84e14212b4e58e8340598a5b8e2144fac83333563e966eb1b332e4141d6"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/DEMO_I.xpt",
+          "retrieved_at": "2026-10-31T06:14:09Z",
+          "byte_size": 3756480,
+          "sha256": "c9297c6c37ae8f78f29be9568fa2a03cf3b112616a39afee04030fc775a66a0d"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/BMX_J.xpt",
+          "retrieved_at": "2026-10-31T06:14:10Z",
+          "byte_size": 1466000,
+          "sha256": "8d675e42d8826ac98714b2c3dd4c5138a5e353fb4424f7eff5e6db4a01ce838a"
+        },
+        {
+          "download_url": "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt",
+          "retrieved_at": "2026-10-31T06:14:10Z",
+          "byte_size": 3412720,
+          "sha256": "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec"
+        }
+      ],
+      "role": "measured standing height and weight with age, sex and MEC exam weights"
+    }
+  ],
+  "method": "fetch.py downloads six XPT files (16.5 MB). analysis.py merges body measures with demographics per cycle, keeps examined participants aged 2-19 with both measurements, computes MEC-weighted mean height and weight per completed year of age and sex, regresses log mean weight on log mean height (free exponent with 95% CI), fits weight = k * height^3 by least squares on the log scale, and scores the cubic model's R^2 on the original scale.",
+  "measured": {
+    "value": 2.7420799020169984,
+    "unit": "log-log exponent of mean weight on mean height across ages 2-19, males (pre-registered band 2.5-3.5); females given in extra",
+    "n": "4905 males and 4810 females in 18 age bins each",
+    "uncertainty": "males 95% CI [2.59, 2.89]; females b = 2.86, CI [2.66, 3.06]",
+    "extra": {
+      "male_cubic_model_r2": 0.9905578803477098,
+      "female_cubic_model_r2": 0.97918410786246,
+      "female_free_exponent_b": 2.8606369468483357,
+      "male_height_range_cm": [
+        91.6548428956483,
+        175.2816641779385
+      ],
+      "female_height_range_cm": [
+        90.10482142878853,
+        162.94861252958128
+      ],
+      "cubic_k_kg_per_cm3": {
+        "male": 1.4492782056210137e-05,
+        "female": 1.5046459489477242e-05
+      }
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.85,
+  "caveats": [
+    "The free exponent is below 3 in both sexes (2.74 and 2.86) and the male CI excludes 3, so weight grows a little slower than the cube of stature across childhood; Thompson's 'mainly (though not wholly)' is borne out literally: the cube reproduces the weight curve with R^2 of 0.98-0.99 but is not exact.",
+    "Cross-sectional population means from 2013-2018 US children, who are heavier at given height than Thompson's early-20th-century tables; the exponent, not the constant k, is what the claim concerns.",
+    "Binned means over 18 ages leave 16 degrees of freedom; the CI reflects bin-to-bin scatter, not individual variation."
+  ],
   "agent": {
     "kind": "cloud-agent",
     "model": "claude-fable-5-1",
