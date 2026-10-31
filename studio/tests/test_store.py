@@ -210,6 +210,13 @@ def test_seed_snapshot_keeps_six_questions_and_resolved_correction(store):
     refs = seed(store, TOKENS["alice"], "alice")
     assert len(refs) == 28
     assert seed(store, TOKENS["alice"], "alice") == refs
+    for target in refs:
+        if target["kind"] == "Problem":
+            problem = store.get(target)["record"]["payload"]
+            assert problem["completeness"] == "recorded"
+            assert problem["falsifiers"] == []
+            with pytest.raises(Conflict, match="recorded, not actionable"):
+                store.submit(TOKENS["alice"], "seed-action-" + target["id"], action(store, target))
     problems = store.search(kind="Problem", limit=50)["results"]
     assert len(problems) == 7
     resolved = store.get(next(x["ref"] for x in problems if x["ref"]["id"] == "F007"))
