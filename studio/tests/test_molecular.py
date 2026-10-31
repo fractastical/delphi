@@ -255,3 +255,61 @@ def test_molecular_assurance_keeps_empirical_and_functional_robustness_unknown()
                 hashlib.sha256((ROOT / item["path"]).read_bytes()).hexdigest()
                 == item["sha256"]
             )
+
+
+def test_continuation_protocol_preserves_parent_states_and_declares_new_rng():
+    import tarfile
+
+    protocol = json.loads(
+        (ROOT / "artifacts/molecular/continuation-protocol.json").read_text()
+    )
+    archive = ROOT / "artifacts/molecular/warmstart-v3.tar.xz"
+    assert (
+        hashlib.sha256(archive.read_bytes()).hexdigest() == protocol["warmstart_sha256"]
+    )
+    assert protocol["additional_production_steps"] == 900000
+    assert protocol["minimize"] is False and protocol["reset_velocities"] is False
+    assert protocol["extra_thermalization_steps"] == 0
+    assert len(protocol["branches"]) == 3
+    with tarfile.open(archive) as tar:
+        manifest = json.load(tar.extractfile("warmstart-files.json"))
+        for name, digest in manifest["files"].items():
+            assert hashlib.sha256(tar.extractfile(name).read()).hexdigest() == digest
+        for branch in protocol["branches"]:
+            assert branch["new_thermostat_seed"] != branch["source_seed"]
+            assert (
+                hashlib.sha256(tar.extractfile(branch["state_path"]).read()).hexdigest()
+                == branch["state_sha256"]
+            )
+
+
+def test_continuation_window_drift_diagnostic_keeps_negative_outcome():
+    from engineering.molecular.continuation import small_window_drift
+
+    protocol = json.loads(
+        (ROOT / "artifacts/molecular/continuation-protocol.json").read_text()
+    )
+    # Synthetic software fixture for the reporting rule, never a measured series.
+    metrics = [
+        {
+            "global_production_time_ps": t,
+            "CA_RMSD_from_original_production_start_nm": 0.1,
+            "CA_geometric_Rg_nm": 2.3,
+        }
+        for t in (600, 650, 700, 750, 800, 850, 900, 950, 1000)
+    ]
+    assert small_window_drift(metrics, protocol)["small_window_drift"]
+    changed = [
+        {
+            **m,
+            "CA_RMSD_from_original_production_start_nm": 0.3
+            if m["global_production_time_ps"] >= 850
+            else 0.1,
+        }
+        for m in metrics
+    ]
+    assert not small_window_drift(changed, protocol)["small_window_drift"]
+    assert (
+        "does not establish equilibrium"
+        in small_window_drift(metrics, protocol)["meaning"]
+    )
