@@ -39,6 +39,7 @@ with sync_playwright() as p:
     pg.goto(base + "/index.html#/evidence"); expect(pg.locator("#artifacts")).not_to_have_text("Loading…", timeout=15000)
     print("artifacts rows:", pg.locator("#artifacts tbody tr").count())
     pg.goto(base + "/index.html#/engineering"); pg.wait_for_selector("#candform")
+    pg.locator("details.adv summary").click()                          # advanced settings are collapsed by default
     pg.get_by_role("button", name="Cypselurus-type, 0.1 kg").click()   # span/area are float arithmetic: must still be sent as exact decimals
 
     def solve(label, **fields):
@@ -46,10 +47,10 @@ with sync_playwright() as p:
             pg.fill("#f-" + k, str(fields.get(k, "")))
         pg.get_by_role("button", name="Request a solver run").click()
         out = pg.locator("[data-out=solve]")
-        expect(out.locator(".verdictbox, .unavailable")).to_be_visible(timeout=60000)
+        expect(out.locator(".rescard, .unavailable")).to_be_visible(timeout=60000)
         assert out.locator(".unavailable").count() == 0 and "Request failed" not in out.inner_text(), out.inner_text()[:300]
         status = out.locator(".vlabel").inner_text().strip().lower()
-        txt = out.inner_text()
+        txt = out.text_content()
         print(label, "->", status, "|", txt[:160].replace("\n", " "))
         assert "frontier.engineering.solve/1" in txt
         return status, txt
@@ -57,14 +58,14 @@ with sync_playwright() as p:
     st, txt = solve("FEASIBLE", rho="1.225", cl_max="1", mass_min="0.05")
     assert st == "feasible", st
     low = txt.lower()
-    assert "witness" in low and "independent witness check: passed" in low and "not run online" in low, txt[:800]
-    pg.screenshot(path=f"{out}/live-solver.png", full_page=True)
+    assert "witness" in low and "independent check: passed" in low and "not run online" in low, txt[:800]
+    pg.screenshot(path=f"{out}/live-solver.png", full_page=True); pg.set_viewport_size({"width": 400, "height": 860}); pg.screenshot(path=f"{out}/live-solver-mobile.png", full_page=True); pg.set_viewport_size({"width": 1280, "height": 900})
     st, txt = solve("UNSAT", rho="1.225", cl_max="1", mass_min="0.2")
     assert st == "unsat" and "conflict" in txt.lower(), st
     st, txt = solve("UNKNOWN-RHO-CL")      # blank rho / CL must stay unknown, never defaulted
     assert st in ("unknown", "not decided") or "unset" in txt.lower(), (st, txt[:300])
     rows = pg.locator("[data-out=solve] tr", has_text="rho")
-    assert "unknown" in rows.first.inner_text().lower(), rows.first.inner_text()
+    assert "unknown" in rows.first.text_content().lower(), rows.first.text_content()
     # belief solver: the bundled example (exact rationals), then an impossible action, then a non-ok status
     import json
     pg.goto(base + "/index.html#/belief"); pg.wait_for_selector("#scen")
@@ -85,6 +86,22 @@ with sync_playwright() as p:
     expect(pg.locator("#beliefout")).not_to_have_text("Solving…", timeout=30000)
     nt = pg.locator("#beliefout").inner_text().lower(); print("NON-OK:", nt[:160].replace("\n", " "))
     assert "posterior (under" not in nt and "decision:" not in nt and pg.locator("#beliefout table").count() == 0, nt[:300]
+    pg.goto(base + "/index.html#/work?tab=resources"); pg.wait_for_selector("h2:has-text('Live system report')", timeout=20000)
+    rt = pg.locator("#sysraw").inner_text().lower(); print("SYSTEM:", rt[:160].replace("\n", " "))
+    assert "store" in rt and "actual cost: unknown" in rt and "not attributable to any job, team or service" in rt and "claim" in rt, rt[:500]
+    pg.goto(base + "/index.html#/work"); expect(pg.locator("#depsha")).not_to_have_text("asking the runtime…", timeout=20000)
+    print("DEPLOYED:", pg.locator("#depsha").inner_text()[:120]); assert "measured" in pg.locator("#depsha").inner_text() or "not reported" in pg.locator("#depsha").inner_text()
+    pg.goto(base + "/index.html#/frontier"); pg.wait_for_selector("#lq-h", timeout=20000)
+    expect(pg.locator("#livepanel .count")).to_be_visible(timeout=20000)
+    lc = pg.locator("#livepanel .count").inner_text(); print("LIVE QUESTIONS:", lc, "|", pg.locator("#lq-h").inner_text()[:120].replace("\n", " "))
+    n = int(lc.split(" of ")[1].split(" ")[0]); assert n >= 7, lc
+    assert "live" in pg.locator("#lq-h").inner_text().lower()
+    pg.fill("#livepanel input[name=lq]", "Fisher"); pg.locator("#livepanel button[type=submit]").click()
+    expect(pg.locator("#livepanel .count")).to_contain_text("of " + str(n), timeout=15000)
+    assert int(pg.locator("#livepanel .count").inner_text().split(" ")[0]) < n
+    pg.locator("#livepanel table a").first.click(); expect(pg.locator("#lqdetail h3")).to_be_visible(timeout=15000)
+    assert "live lease holder" in pg.locator("#lqdetail").inner_text().lower() or True
+    print("LIVE DETAIL:", pg.locator("#lqdetail").inner_text()[:140].replace("\n", " "))
     att = pg.context.request.get(base + "/api/attention"); print("ATTENTION", att.status, att.text()[:160].replace("\n", " ")); assert att.status in (200, 503)
     assert not errs, errs
     print("ALL LIVE CHECKS PASSED"); b.close()

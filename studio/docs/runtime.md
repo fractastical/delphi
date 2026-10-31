@@ -100,3 +100,38 @@ The namespace (`delphi-frontier` in the unit) is fixed by the first `bootstrap`;
 * Static fallback while the endpoint is not deployed: `python -m frontier.system_status --manifest > site/data/system-manifest.json` (worker reports only; its `measured` field says "not measured"; mode of every section is `worker_report`). The site build is root's; this branch does not write into `site/`.
 * `build-info.json` at the checkout root is NOT created by this branch. Whoever cuts a release writes it (`release_sha` = the 40-hex commit, `checks[]` with `name`, `command`, `exit`, `passed`, `total`, `at`); without it the page says "absent" and invents nothing. Test counts must come from an execution receipt, never from counting `def test_` lines (BUILD.md finding).
 * The one shipped receipt pin is `results/compute/receipts.json` at sha256 `f534829f…2e8b` (read from `work/frontier-compute@beea7c3`). That file is not in this branch, so until it is merged the page says "not present in this checkout"; if the gpuops worker later changes it, the page says "changed since it was pinned" and shows nothing from it until the pin is updated.
+
+## Releases and rollback (`deploy/release.py`, standard library only)
+
+Layout under `/data/services/delphi-frontier`: `releases/<40-hex sha>/` (an immutable `git archive` of exactly that committed SHA plus `build-info.json` and `.release-complete`),
+`releases/history.jsonl` (append-only), `app` (symlink the unit runs from, swapped atomically) and `app.previous` (where `app` pointed before the last switch). It never touches the
+database, never deletes or edits a release, and starts nothing by itself. **`deploy` and `rollback` only print a plan unless `--apply` is given.**
+
+```bash
+R=/data/services/delphi-frontier/app/deploy/release.py        # or any checkout's deploy/release.py
+python3 $R status                                                       # read-only: app, previous, releases, last history lines
+python3 $R prepare --repo /path/to/checkout --sha <40-hex> --checks receipt.json     # archive + build-info; refuses failing or foreign checks
+python3 $R deploy   --sha <40-hex>                                      # plan only
+python3 $R deploy   --sha <40-hex> --apply [--health-timeout 30]        # swap, restart, health, automatic fall-back
+python3 $R rollback [--to <sha>] --apply                                # previous release (or a named prepared one), same safeguards
+python3 $R adopt    --sha <sha> [--apply]                               # one-time: let a hand-built release (e.g. the first live one) be rolled back TO
+python3 $R deploy   --sha <sha> --apply --nginx-install                 # ONLY with this flag does it touch nginx (sudo, fixed steps, reverted if `nginx -t` fails)
+```
+
+* **Checks receipt** (`--checks`): `{"schema": "frontier.release.checks/1", "sha": "<the same 40-hex>", "checks": [{"name", "command", "exit": <int>, "passed", "total", "at", "result"}]}`.
+  A receipt naming another SHA is refused; any non-zero `exit` refuses the release (exit code 4) unless `--allow-failed-checks`, which is recorded as `checks_all_passed: false`.
+  Write it from real execution results; test counts are never derived by counting source lines. `build-info.json` carries the SHA, the tree SHA, the sha256 of the exact `git archive` stream,
+  the checks and the receipt's sha256; `/api/system` shows it labelled as an author report.
+* **Deploy steps**: preflight (the release is complete, its `build-info.json` names the SHA, and `import frontier.web ...` succeeds under the service venv, else nothing changes) → write `app.previous`
+  → atomic `app` swap (`rename(2)` over the symlink; readers never see it missing) → `systemctl --user restart delphi-frontier-web.service` → health: unit `active` and `/api/health` `ok`
+  three times in a row and no self-restart (`NRestarts` unchanged) → on ANY failure restore `app` and `app.previous` exactly as they were, restart, and check health again.
+  A first deployment that fails removes only the symlink it just made.
+* **Exit codes**: 0 ok or plan; 2 usage; 3 refused (nothing changed); 4 checks failed; 10 failed and rolled back cleanly; **11 failed AND the roll back failed (needs a person)**; 12 nginx test failed and was reverted.
+* **Fixed commands only** (`check_argv`): `git -C` read/archive, `systemctl --user restart|is-active|show` of the one unit, one import smoke test with the service venv, and, with `--nginx-install` only, `sudo -n` `install`/`cp`/`mv`/`nginx -t`/`systemctl reload nginx` on the one vhost path. An unknown vhost is moved aside, never deleted.
+* Database schema changes are not part of a release switch. `python -m frontier.admin bootstrap` is idempotent (`CREATE ... IF NOT EXISTS`); a release that needs a schema change must stay compatible with the previous release's code so a roll back is safe.
+* `deploy/verify_live.py` (root's) is the live HTTP verification; `release.py` does not call it. Its own health check is `/api/health` only.
+
+`/api/system` after these changes: `release.sha` is `git rev-parse HEAD` when the tree is a git checkout, otherwise the name of the `releases/<sha>` directory the code runs from (an archive has no `.git`),
+with `release.dir_name_matches_release_marker` checking that name against `.release-complete`; `deployed_sha` repeats it as a top-level string. `build.*` is the author report (label shown) and
+`build.matches_checkout` compares it with that measured SHA (`build.compared_with` says which). `store.counts_scope` states that counts cover every public namespace in the database, with `versions_by_namespace`;
+`store.namespace` is only this node's own.

@@ -194,6 +194,116 @@ def simulation_manifests(ins: Inputs) -> list[dict]:
     return out
 
 
+PRINT_DIR = "artifacts/print"
+PRINT_OUT = "@artifacts/print"          # site-relative output root (the runtime serves .stl only under site/artifacts/)
+
+
+def print_forms(ins: Inputs, out: dict) -> dict | None:
+    """Printable form studies, when present: the manifest's own words and receipts, plus the real STL and image files."""
+    mf = ROOT / PRINT_DIR / "manifest.json"
+    if not mf.exists():
+        return None
+    man = json.loads(ins.read(f"{PRINT_DIR}/manifest.json"))
+    forms = []
+    def copy(rel):
+        b = ins.read(f"{PRINT_DIR}/{rel}"); out[f"{PRINT_OUT}/{rel}"] = b
+        return {"href": f"artifacts/print/{rel}", "sha256": digest_bytes(b), "bytes": len(b), "declared_sha256": man["files"].get(rel)}
+    for fid, f in man["forms"].items():
+        d = json.loads(ins.read(f"{PRINT_DIR}/{f['design']}"))
+        es = d.get("engineering_status") or {}
+        entry = {"id": fid, "title": d.get("title"), "role": d.get("role"), "status_note": d.get("status_note"), "bounds_mm": f.get("bounds_mm"), "volume_mm3": f.get("volume_mm3"),
+                 "valid": f.get("valid"), "converged": f.get("converged"), "stand_valid": f.get("stand_valid"), "solver": f.get("solver"), "glide": f.get("glide"),
+                 "meaning": es.get("meaning"), "may_not_say": es.get("may_not_say"), "solver_conflict": es.get("solver_conflict"), "not_checked": d.get("not_checked"),
+                 "validation": {k: (d.get("validation") or {}).get(k) for k in ("closed_two_manifold", "consistently_oriented", "degenerate_triangles", "euler_characteristic", "face_connected_components", "fits_box", "fits_box_mm", "edges_not_shared_by_exactly_two_faces")},
+                 "roundtrip": {k: (d.get("stl_roundtrip") or {}).get(k) for k in ("ok", "triangles", "signed_volume_mm3")}, "convergence": {k: (d.get("convergence") or {}).get(k) for k in ("converged", "default_vs_fine_rel_extent", "default_vs_fine_rel_volume")},
+                 "design_sha256": man["files"].get(f["design"]), "files": {}}
+        for key, rel in (("stl", f"stl/{fid}.stl"), ("stand_stl", f"stl/{fid}-stand.stl"), ("image", f"img/{fid}.png"), ("image_on_stand", f"img/{fid}-on-stand.png")):
+            if (ROOT / PRINT_DIR / rel).exists():
+                entry["files"][key] = copy(rel)
+        entry["files"]["design"] = {"sha256": entry["design_sha256"]}
+        forms.append(entry)
+    return {"label": man.get("label"), "display_scale": man.get("display_scale"), "display_scale_note": man.get("display_scale_note"), "run": {k: man["run"].get(k) for k in ("box_mm", "launch_speed_query_m_s", "libraries")} | {"solver_commit": (man["run"].get("solver") or {}).get("commit"), "solver_branch": (man["run"].get("solver") or {}).get("branch")}, "forms": forms}
+
+
+SIM_OUT = "@artifacts/simulations"
+CTRL_DIR = "engineering/simulation/results_controlled"
+
+
+def controlled_results(ins: Inputs, out: dict) -> dict | None:
+    """The corrected common-launch comparison, when present; it supersedes the exploratory Pareto set as the thing to read."""
+    if not (ROOT / CTRL_DIR / "summary.json").exists():
+        return None
+    s = json.loads(ins.read(f"{CTRL_DIR}/summary.json"))
+    w = json.loads(ins.read(f"{CTRL_DIR}/witness_check.json")) if (ROOT / CTRL_DIR / "witness_check.json").exists() else None
+    designs = s.get("designs", [])
+    files = []
+    for name in ("summary.json", "comparison.csv", "witness_check.json"):
+        if (ROOT / CTRL_DIR / name).exists():
+            b = ins.read(f"{CTRL_DIR}/{name}"); out[f"docs/controlled_{name}"] = b
+            files.append({"name": name, "path": f"{CTRL_DIR}/{name}", "sha256": digest_bytes(b), "bytes": len(b), "href": f"data/docs/controlled_{name}"})
+    return {"model_version": s.get("model_version"), "evidence_kind": s.get("evidence_kind"), "protocol": s.get("protocol"), "n_rows": s.get("n_rows"), "n_unconverged": s.get("n_unconverged"),
+            "baselines": s.get("baselines", []), "baselines_excluded": s.get("baselines_excluded_wl_outside_genus_range", []),
+            "n_baseline_infeasible_scenarios": len(s.get("baseline_infeasible_scenarios", [])), "n_designs": len(designs),
+            "n_robust_win": sum(1 for d in designs if d.get("robust_win")), "n_flips": sum(1 for d in designs if d.get("flips")),
+            "witness": ({"solver_status": w.get("solver_status"), "witness": w.get("witness"), "wing_loading": w.get("witness_wing_loading_N_m2"), "query": w.get("query"),
+                         "verified": (w.get("independent_verify_certificate") or {}).get("ok"), "not_established": (w.get("receipt") or {}).get("not_established")} if w else None), "files": files}
+
+
+def _vid(ins, out, vid, src_dir, fname, declared, bytes_declared=None):
+    """Copy a declared video/poster into the site and compare its bytes with the declared sha256."""
+    f = ROOT / src_dir / fname
+    if not f.is_file():
+        return "declared_but_missing", None
+    b = ins.read(f"{src_dir}/{fname}"); h = digest_bytes(b)
+    if declared and declared != h:
+        return "digest_mismatch", None
+    out[f"{SIM_OUT}/{vid}/{fname}"] = b
+    return "present_verified", f"artifacts/simulations/{vid}/{fname}"
+
+
+def native_video_cards(ins: Inputs, out: dict) -> list[dict]:
+    """Map each worker's own manifest to the gallery card shape. Nothing is invented: absent fields stay absent."""
+    cards = []
+    d = "connectors/biomodels/video"; mf = ROOT / d / "delta_notch_replay_manifest.json"
+    if mf.exists():
+        m = json.loads(ins.read(f"{d}/delta_notch_replay_manifest.json")); v = m["video"]
+        st, href = _vid(ins, out, "biomodels-delta-notch", d, v["file"], v.get("sha256"))
+        _, ph = _vid(ins, out, "biomodels-delta-notch", d, m["poster"]["file"], m["poster"].get("sha256"))
+        cards.append({"id": "biomodels-delta-notch", "title": "Two-cell Delta-Notch replay (BioModels BIOMD0000001047)", "scales": ["cellular"], "evidence_kind": m["evidence_kind"],
+            "model": {"name": "BIOMD0000001047, Collier et al. 1996, replayed from the published SBML", "context": m["claims"]["shows"] + ". " + m["claims"]["captions"]["footer"]},
+            "time": {"units": "non-dimensional model time, 0 to 60", "note": m["time_mapping"]["rule"] + ". " + m["time_mapping"]["note"]},
+            "video": {"file": v["file"], "sha256": v.get("sha256"), "note": f"{v['width']}x{v['height']}, {v['duration_s']} s, {v['codec']}"}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": "replay inputs", "result": f"three scenario CSVs hashed ({len(m['inputs']['csv'])}); model and replay-code hashes recorded"}],
+            "parameter_unknowns": ["Model time and concentrations are non-dimensional; no physical units."], "open_questions": ["It does not show: " + "; ".join(m["claims"]["does_not_show"]) + "."],
+            "couplings": [], "manifest": f"{d}/delta_notch_replay_manifest.json", "native": True})
+    d = "engineering/fin_mechanics/artifacts"; mf = ROOT / d / "manifest.json"
+    if mf.exists():
+        m = json.loads(ins.read(f"{d}/manifest.json")); o = m["outputs"]; v = m["video"]
+        st, href = _vid(ins, out, "fin-mechanics", d, "fin_mechanics.mp4", o["fin_mechanics.mp4"]["sha256"])
+        _, ph = _vid(ins, out, "fin-mechanics", d, "poster.png", o["poster.png"]["sha256"])
+        cards.append({"id": "fin-mechanics", "title": "Elastic fin-ray surrogate (Euler-Bernoulli cantilever)", "scales": ["organ"], "evidence_kind": m["evidence_kind"],
+            "model": {"name": m["schema"], "context": "Frames from " + v["frames_from"] + ". A scoped elastic surrogate, not a fin."},
+            "time": {"units": "not a physical time axis; see the manifest", "note": m["note"]},
+            "video": {"file": "fin_mechanics.mp4", "sha256": o["fin_mechanics.mp4"]["sha256"], "note": f"{v['duration_s']} s at {v['fps']} fps, {v['n_frames']} frames"}, "video_state": st, "video_href": href, "poster_href": ph,
+            "numerical_checks": [{"name": "frames flagged invalid by the beam checker", "result": f"{v['n_frames_invalid']} of {v['n_frames']}"}, {"name": "reproducible quantity", "result": "frames_data_sha256 " + v["frames_data_sha256"][:16] + "…"}],
+            "parameter_unknowns": ["Material and geometry come from the request file, not from a measured fin."], "open_questions": ["Which loads on a real fin ray would the load bridge need from the glide model, and with what uncertainty?"],
+            "couplings": [], "manifest": f"{d}/manifest.json", "native": True})
+    d = "engineering/simulation/video"
+    for mname, vid, title, scale in (("manifest.json", "glide-fixed-launch", "Glide trajectories at a fixed launch (point mass)", "organism"), ("manifest_rd.json", "rd-fields", "Reaction-diffusion field time series", "tissue")):
+        if not (ROOT / d / mname).exists():
+            continue
+        m = json.loads(ins.read(f"{d}/{mname}"))
+        st, href = _vid(ins, out, vid, d, m["video"], m.get("video_sha256")); _, ph = _vid(ins, out, vid, d, m["poster"], m.get("poster_sha256"))
+        tu = m.get("time_units", {})
+        extra = ([{"name": "release", "result": f"V0 {m['release']['V0_ms']} m/s, h0 {m['release']['h0_m']} m"}, {"name": "polar", "result": (m.get("polar_status") or "")}] if m.get("release") else [{"name": "reproduction of frozen rows", "result": ", ".join(f"cell {c['cell_id']}: {c['reproduces_frozen_row']}" for c in m.get("cells", []))}])
+        cards.append({"id": vid, "title": title, "scales": [scale], "evidence_kind": m["evidence_kind"], "model": {"name": m.get("kind"), "context": "; ".join(c.get("label", "") for c in m.get("cells", []))[:600] or "Constant-coefficient point-mass glide; the coefficients are design assumptions."},
+            "time": {"units": tu.get("axis", "not stated"), "note": tu.get("separate_from", "")}, "video": {"file": m["video"], "sha256": m.get("video_sha256"), "note": f"{m['resolution'][0]}x{m['resolution'][1]}, {m['duration_video_s']} s, {m['fps']} fps"},
+            "video_state": st, "video_href": href, "poster_href": ph, "numerical_checks": extra,
+            "parameter_unknowns": [f"{k}: sampled over {v[0]} to {v[1]}" for k, v in (m.get("mc") or {}).get("priors", {}).items()] or ["See the manifest."],
+            "open_questions": ["The glide clock and the reaction-diffusion clock are unrelated and not coupled." if "separate_from" in tu else "Coefficients are assumptions, not measurements."], "couplings": [], "manifest": f"{d}/{mname}", "native": True})
+    return cards
+
+
 def checklist(text: str) -> list[dict]:
     return [{"done": m.group(1) == "x", "text": m.group(2).strip()} for m in re.finditer(r"^- \[([ x])\] (.+)$", text, re.M)]
 
@@ -266,6 +376,12 @@ def build() -> dict[str, bytes]:
     attestation = attestation_check(ins, files, docs)
     manifests = simulation_manifests(ins)
     belief_ex = belief_example(ins)
+    extra: dict = {}
+    prints = print_forms(ins, extra)
+    controlled = controlled_results(ins, files)
+    if simulation is not None:
+        simulation["controlled"] = controlled
+    manifests = manifests + native_video_cards(ins, extra)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
@@ -287,29 +403,32 @@ def build() -> dict[str, bytes]:
         "simulation_manifests": manifests,
         "system": system,
         "belief_example": belief_ex,
+        "print_forms": prints,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
     }
     catalog = {"schema": "frontier-site-catalog-0.1", "mode": "snapshot", "namespace": NAMESPACE, "snapshot": snapshot["label"], "records": build_catalog(snapshot)}
     out = {"snapshot.json": (json.dumps(snapshot, indent=1, ensure_ascii=False) + "\n").encode(),
            "catalog.json": (json.dumps(catalog, indent=1, ensure_ascii=False) + "\n").encode()}
-    out.update(files)
+    out.update(files); out.update(extra)
     return out
 
 
 def write(out: dict[str, bytes]) -> None:
-    for sub in ("docs", "results"):
-        if (DATA / sub).exists():
-            shutil.rmtree(DATA / sub)
+    for d in (DATA / "docs", DATA / "results", SITE / "artifacts" / "print"):
+        if d.exists():
+            shutil.rmtree(d)
     for name, b in out.items():
-        dest = DATA / name
+        dest = SITE / name[1:] if name.startswith("@") else DATA / name
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(b)
 
 
 def check(out: dict[str, bytes]) -> list[str]:
-    stale = [n for n, b in out.items() if not (DATA / n).exists() or (DATA / n).read_bytes() != b]
+    at = lambda n: SITE / n[1:] if n.startswith("@") else DATA / n
+    stale = [n for n, b in out.items() if not at(n).exists() or at(n).read_bytes() != b]
     extra = [p.relative_to(DATA).as_posix() for sub in ("docs", "results") if (DATA / sub).exists() for p in (DATA / sub).glob("*")]
-    return stale + [f"unexpected {e}" for e in extra if e not in out]
+    pr = [("@artifacts/print/" + p.relative_to(SITE / "artifacts/print").as_posix()) for p in (SITE / "artifacts/print").rglob("*") if p.is_file()] if (SITE / "artifacts/print").exists() else []
+    return stale + [f"unexpected {e}" for e in extra if e not in out] + [f"unexpected {e}" for e in pr if e not in out]
 
 
 def main(argv=None) -> int:
