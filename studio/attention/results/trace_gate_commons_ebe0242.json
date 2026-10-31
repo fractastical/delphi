@@ -1,0 +1,51 @@
+{
+ "cross_check": "per-arm model calls N 66 = 24+21+21 (TABLE.json N_r0 24 calls_used; N_r1, N_r2 21 each as printed); 12 runs x 19 targets = 228 rows",
+ "gate": {
+  "blocked_reasons": [
+   "budgets differ by 10.0% > 5.0%",
+   "every arm attempted the identical set of problems: the arms do not differ in which problems receive effort, so this is not an allocation contrast",
+   "no problem is resolved differently by any arm (ceiling/floor): outcomes cannot discriminate policies"
+  ],
+  "facts": {
+   "arms": [
+    "N",
+    "P",
+    "Q",
+    "S"
+   ],
+   "budget_spread": 0.10000000000000009,
+   "cost_by_arm": {
+    "N": 66,
+    "P": 66,
+    "Q": 60,
+    "S": 64
+   },
+   "n_problems": 19,
+   "problems_attempted_by_arm": {
+    "N": 19,
+    "P": 19,
+    "Q": 19,
+    "S": 19
+   },
+   "problems_where_arms_differ_in_resolution_rate": 0,
+   "rows": 228,
+   "rows_without_source_hash": 0
+  },
+  "usable": false
+ },
+ "limits": [
+  "rows.overturned unknown (no post-hoc fidelity audit joined); Codex's lean_commons review reported a target-fidelity defect in the checker, not re-verified here",
+  "these are Lean statements, not Frontier problems"
+ ],
+ "reading": "BLOCKED. The runs were designed to compare LIBRARY VISIBILITY (shared/private/sequential/none) on a fixed, identically ordered target list, not to compare allocation policies. All arms attempted all 19 targets and all 19 were certified in every run, so outcomes cannot discriminate. Budgets also differ by 10% (Q 60 vs N 66 calls). No allocation result is produced and none is inferred.",
+ "reproduce": "python3 -m attention trace-gate --commons-runs <extracted>/artifacts/commons/runs",
+ "source": {
+  "branch": "work/rethink-director",
+  "extract": "git archive <sha> artifacts/commons/runs",
+  "path": "artifacts/commons/runs/{N,P,Q,S}_r{0,1,2}/{summary.json,attempts.jsonl,board.jsonl}",
+  "repo": "kganjam/delphi-evolve",
+  "sha": "ebe024241a5d5bc8fe50c26c745d9ae55058dbd3",
+  "verified": "sha is an ancestor of origin/work/rethink-director (b5e0927f at check time) and of origin/work/submit"
+ },
+ "what": "Can the real Lean-commons traces support a matched-budget ALLOCATION comparison? (trace_gate)"
+}
