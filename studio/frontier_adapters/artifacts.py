@@ -87,7 +87,11 @@ def manifest(run_ref: dict, artifacts: list[dict], *, proposed_site_path: str) -
 
 
 _MEDIA = {"json": "application/json", "jsonl": "application/x-ndjson", "md": "text/markdown", "py": "text/x-python",
-          "tar": "application/x-tar", "txt": "text/plain", "log": "text/plain"}
+          "tar": "application/x-tar", "txt": "text/plain", "log": "text/plain",
+          # media: typed so a reader or a media resolver can tell a video from a mesh; the type says nothing about whether the bytes are served
+          "mp4": "video/mp4", "webm": "video/webm", "mov": "video/quicktime", "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg",
+          "gif": "image/gif", "webp": "image/webp", "svg": "image/svg+xml", "glb": "model/gltf-binary", "gltf": "model/gltf+json", "stl": "model/stl",
+          "npz": "application/x-npz", "csv": "text/csv", "html": "text/html"}
 # our roles -> the store's closed ArtifactRef.role set
 _ROLE = {"input": "input", "output": "output", "report": "output", "protocol": "protocol", "receipt": "log", "log": "log",
          "code": "code", "code_snapshot": "code", "environment": "environment", "certificate": "certificate", "geometry": "geometry"}

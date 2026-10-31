@@ -79,6 +79,8 @@ class VisualAssets(unittest.TestCase):
             if r["kind"] == "Evidence" and r["payload"]["relation"] in ("unspecified", "reproduces"):
                 bad = [a["media_type"] for a in r["payload"]["artifacts"] if (a["media_type"] or "").split("/")[0] in ("video", "image", "model")]
                 self.assertEqual(bad, [], r["id"])
+        typed = {a["media_type"] for r in recs for a in (r["payload"].get("artifacts") or [])}
+        self.assertTrue({"video/mp4", "image/png", "model/stl", "model/gltf-binary"} <= typed, typed)       # control: the check above is not vacuous
 
     def test_pointers_are_urn_referenced_with_no_licence_and_no_url(self):
         for r in allrecs():
