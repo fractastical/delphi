@@ -489,6 +489,10 @@ def lineage_for(t, r):
         if src and src.get("lineage"):
             for k, v in src["lineage"].items():
                 lin.setdefault(k, v)
+    if t.get("group") not in NON_ANIMAL_GROUPS:
+        lin.setdefault("kingdom", "Animalia")
+    if t.get("phylum"):
+        lin.setdefault("phylum", t["phylum"])
     lin = {k: lin[k] for k in ("kingdom", "phylum", "class", "order", "family") if lin.get(k)}
     if r["ncbi"] and r["ncbi"].get("lineage"):
         lin["ncbi_lineage"] = r["ncbi"]["lineage"]

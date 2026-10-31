@@ -39,7 +39,7 @@ T("radiolaria", "Radiolaria", [r"\b[Rr]adiolari\w*"], rank="class", kingdom="Chr
 T("nassellaria", "Nassellaria", [r"\b[Nn]assellari\w*"], rank="order", kingdom="Chromista", ncbi_kw="Polycystinea", group="protist", notes=RHIZ)
 T("phaeodaria", "Phaeodaria", kingdom="Chromista", ncbi_kw="Rhizaria", ncbi_name="Phaeodarea", group="protist", notes=RHIZ + " Phaeodaria are now placed in Cercozoa.")
 T("acantharia", "Acantharia", [r"\bAcanthari\w*"], rank="class", kingdom="Protozoa", ncbi_kw="Rhizaria", ncbi_name="Acantharea", group="protist", notes=RHIZ + " Modern class Acantharea.")
-T("acanthometridae", "Acanthometridae", kingdom="Chromista", ncbi_kw="Rhizaria", group="protist", notes=RHIZ)
+T("acanthometridae", "Acanthometridae", rank="family", kingdom="Protozoa", ncbi_kw="Rhizaria", group="protist", notes=RHIZ)
 T("callimitra", "Callimitra", kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
 T("collosphaera", "Collosphaera", kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
 T("aulacantha", "Aulacantha", [r"\bAulacantha\b(?: scolymantha)?"], kingdom="Chromista", ncbi_kw="Rhizaria", marine=True, group="protist", notes=RHIZ)
@@ -66,9 +66,9 @@ T("acanthocystis", "Acanthocystis", kingdom="Protozoa", ncbi_kw="Centroplastheli
   notes="Thompson's heliozoan; modern placement Centroplasthelida (Haptista), not Animalia.")
 T("clathrulina", "Clathrulina", kingdom="Protozoa", ncbi_kw="Cercozoa|Clathrulina", group="protist",
   notes="Thompson's heliozoan with a chitin-like lattice shell; modern placement Desmothoracida (Cercozoa), not Animalia.")
-T("heliozoa", "Heliozoa", [r"\b[Hh]eliozoa\w*"], kingdom="Protozoa", ncbi_kw="Heliozoa", group="protist",
+T("heliozoa", "Heliozoa", [r"\b[Hh]eliozoa\w*"], rank="phylum", kingdom="Chromista", ncbi_kw="Heliozoa", group="protist",
   notes="Polyphyletic protist grouping Thompson treats as animals; not Animalia.")
-T("ciliophora", "Ciliophora", [r"\b[Cc]iliated? Infusoria\b", r"\b[Ii]nfusoria\b", r"\b[Cc]iliate(?:s|d)?\b(?= (?:or|and) flagellate)",
+T("ciliophora", "Ciliophora", rank="phylum", patterns=[r"\b[Cc]iliated? Infusoria\b", r"\b[Ii]nfusoria\b", r"\b[Cc]iliate(?:s|d)?\b(?= (?:or|and) flagellate)",
                                 r"\bciliate or flagellate cells\b"],
   kingdom="Chromista", ncbi_kw="Ciliophora", group="protist",
   notes="Thompson's 'Infusoria' / ciliates; modern phylum Ciliophora (Alveolata), not Animalia.")
@@ -108,18 +108,18 @@ T("rugosa", "Rugosa", [r"\bTetracoralla\b", r"\bRugosa\b"], rank="order", kingdo
 T("heterophyllia", "Heterophyllia", [r"\bHeterophylli\w*(?: angulata)?"], phylum="Cnidaria", fossil=True, group="cnidarian")
 T("zaphrentis", "Zaphrentis", phylum="Cnidaria", fossil=True, group="cnidarian")
 T("cyathophyllum", "Cyathophyllum", [r"\bCyathophyllum\b(?: hexagonum)?"], phylum="Cnidaria", fossil=True, group="cnidarian")
-T("cyathophyllidae", "Cyathophyllidae", phylum="Cnidaria", fossil=True, group="cnidarian")
+T("cyathophyllidae", "Cyathophyllidae", rank="family", phylum="Cnidaria", fossil=True, group="cnidarian")
 T("streptelasma", "Streptelasma", [r"\bStreptoplasma\b"], phylum="Cnidaria", fossil=True, group="cnidarian",
   notes="Thompson writes 'Streptoplasma' (a misspelling of the rugose coral Streptelasma Hall, 1847).")
 T("lithostrotion", "Lithostrotion", [r"\bLithostrotion\b(?: Martini)?"], phylum="Cnidaria", fossil=True, group="cnidarian")
 T("arachnophyllum", "Arachnophyllum", [r"\bArachnophyllum\b(?: pentagonum)?"], phylum="Cnidaria", fossil=True, group="cnidarian")
 T("heliolites", "Heliolites", phylum="Cnidaria", fossil=True, group="cnidarian")
 T("synhelia", "Synhelia", phylum="Cnidaria", fossil=True, group="cnidarian")
-T("oculinidae", "Oculinidae", phylum="Cnidaria", marine=True, group="cnidarian")
+T("oculinidae", "Oculinidae", rank="family", phylum="Cnidaria", marine=True, group="cnidarian")
 T("phillipsastrea", "Phillipsastrea", [r"\bPhillipsastraea\b"], phylum="Cnidaria", fossil=True, group="cnidarian", notes="Written 'Phillipsastraea'.")
 T("thamnasteria", "Thamnasteria", [r"\bThamnastraea\b"], phylum="Cnidaria", fossil=True, group="cnidarian", notes="Written 'Thamnastraea'.")
 T("comoseris", "Comoseris", phylum="Cnidaria", fossil=True, group="cnidarian")
-T("fungiidae", "Fungiidae", [r"\bFungida\b"], phylum="Cnidaria", marine=True, group="cnidarian", notes="Thompson's '(Fungida)' for Thamnastraea; resolved to the family Fungiidae.")
+T("fungiidae", "Fungiidae", [r"\bFungida\b"], rank="family", phylum="Cnidaria", marine=True, group="cnidarian", notes="Thompson's '(Fungida)' for Thamnastraea; resolved to the family Fungiidae.")
 T("monticulipora", "Monticulipora", [r"\bMonticulipor\w*"], phylum="Bryozoa", fossil=True, group="bryozoan",
   notes="Thompson lists 'Monticuliporae' among corals; Monticulipora is a Palaeozoic trepostome bryozoan.")
 T("ctenophora", "Ctenophora", [r"\b[Cc]tenophores?\b"], rank="phylum", kingdom="Animalia", group="ctenophore")
@@ -278,10 +278,10 @@ T("unio", "Unio", phylum="Mollusca", group="mollusc")
 # ---------------------------------------------------------------- Brachiopoda
 T("brachiopoda", "Brachiopoda", [r"\b[Bb]rachiopods?\b", r"\bBrachiopoda\b"], rank="phylum", kingdom="Animalia", group="brachiopod")
 T("spirifer", "Spirifer", phylum="Brachiopoda", fossil=True, group="brachiopod")
-T("spiriferidae", "Spiriferidae", phylum="Brachiopoda", fossil=True, group="brachiopod")
+T("spiriferidae", "Spiriferidae", rank="family", phylum="Brachiopoda", fossil=True, group="brachiopod")
 T("atrypa", "Atrypa", [r"\bAtrypas?\b"], phylum="Brachiopoda", fossil=True, group="brachiopod")
-T("atrypidae", "Atrypidae", phylum="Brachiopoda", fossil=True, group="brachiopod")
-T("athyridae", "Athyrididae", [r"\bAthyridae\b"], phylum="Brachiopoda", fossil=True, group="brachiopod", notes="Written 'Athyridae'; the family is Athyrididae.")
+T("atrypidae", "Atrypidae", rank="family", phylum="Brachiopoda", fossil=True, group="brachiopod")
+T("athyridae", "Athyrididae", [r"\bAthyridae\b"], rank="family", phylum="Brachiopoda", fossil=True, group="brachiopod", notes="Written 'Athyridae'; the family is Athyrididae.")
 T("orthis", "Orthis", phylum="Brachiopoda", fossil=True, group="brachiopod")
 T("lingula", "Lingula", phylum="Brachiopoda", marine=True, fossil=True, group="brachiopod")
 T("pentamerus", "Pentamerus", [r"\bPentameri\b"], phylum="Brachiopoda", fossil=True, group="brachiopod", notes="Written 'the Pentameri'.")
