@@ -23,3 +23,6 @@ Reported, not gating: P1 to P5 on the held-out draws; unresolved mass and reason
 
 ## Stop rule and scope
 One H100 job of at most 30 minutes; failed implementation attempts for this protocol: 0 of 2 (stop at two). No Evo 2 or other payload is mixed in. The CPU part does not use Nebius CPU quota (the 4 free vCPU belong to the native-infra worker's mechanobiology run). Cost unavailable (no price or usage receipt), not zero.
+
+## Packaging record P6-1 (written 2026-10-31 13:25:41 PDT by `date`, before the GPU job)
+The injected-files size guard (added after Protocol 5's create failure) rejected the first bundle (72.6 KB raw, then 52.2 KB), so no job was created and no attempt is counted. The job ships `inputs/atlas_cells_gpu.json` (sha256 `ca7cf8622d824c3b6269663f48688a66dd3bd0ddc163c04c570c90e4bfa7e590`), a compact projection of the frozen `atlas_cells.json` (same cells, keys id, model, params, Dv, L, NA, K, T, eps, seed; same refine and control ids; `derived_from_sha256` recorded inside), and only the vendored files the solver imports (no PREREG, run, ensemble or analyze). Bundle 41,229 B plus the 2,304-byte runner; local preflight (extract the exact bundle in an empty directory and run the entry with PREFLIGHT=1) passed. Frozen criteria unchanged.
