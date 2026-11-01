@@ -58,7 +58,8 @@ def test_http_real_authenticated_proposal_and_shared_read(store):
 ROOT = Path(__file__).resolve().parents[1]
 READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_capabilities", "frontier_artifacts",
               "frontier_discover", "frontier_graph", "frontier_catalogue", "frontier_project_inspect", "frontier_artifact_inspect",
-              "frontier_design_context", "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief"}
+              "frontier_design_context", "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief",
+              "frontier_plan_experiments"}
 WRITE_TOOLS = {"frontier_propose", "frontier_lease", "frontier_transition"}
 SECRET_NAMES = {"token", "dsn", "password", "credential", "authorization", "secret", "api_key", "apikey"}
 
@@ -138,6 +139,68 @@ def test_official_mcp_stdio_reads_same_persisted_record(store):
             assert "statement" in schema["properties"]
             assert json.loads((await session.read_resource("frontier://capabilities")).contents[0].text)["mode"] == "read_only"
     run(exercise())
+
+
+def test_mcp_experimental_design_is_bounded_ephemeral_and_read_only(store):
+    from copy import deepcopy
+    from engineering.experimental_design.cantilever_demo import build_cantilever_protocol
+
+    contract = build_cantilever_protocol()
+    event_count = len(store.events(limit=50)["events"])
+
+    async def exercise():
+        async with session_for(store) as session:
+            tools = {tool.name: tool for tool in (await session.list_tools()).tools}
+            names = set(tools)
+            assert names == READ_TOOLS
+            assert "frontier_plan_experiments" in names
+            assert tools["frontier_plan_experiments"].annotations.readOnlyHint is True
+            capabilities = val(await session.call_tool("frontier_capabilities", {}))
+            entry = next(tool for tool in capabilities["tools"] if tool["name"] == "frontier_plan_experiments")
+            assert entry["kind"] == "read" and entry["requires_role"] is None
+            assert capabilities["manifest_version"] == "frontier-mcp-capabilities-0.4"
+            assert capabilities["limits"]["experimental_design"]["parameters"] == 8
+            assert capabilities["limits"]["experimental_design"]["candidate_designs"] == 12
+            planned = val(await session.call_tool("frontier_plan_experiments", {"contract": contract}))
+            designs = {row["id"]: row for row in planned["designs"]}
+            assert planned["status"] == "prospective_assumption_based"
+            assert planned["selected_design_id"] == "mixed_load_deflection"
+            assert designs["deflection_only"]["identifiability"]["rank"] == 1
+            assert designs["mixed_load_deflection"]["identifiability"]["rank"] == 2
+            assert planned["measurement_rows"] == []
+            assert planned["mcp_policy"]["persisted"] is False
+            assert planned["action_artifact"]["state"] == "proposal_unlinked"
+
+            invalid = deepcopy(contract)
+            invalid["parameters"]["prior_covariance"] = [[-1.0, 0.0], [0.0, 1.0]]
+            assert (await session.call_tool("frontier_plan_experiments", {"contract": invalid})).isError
+
+            too_many = deepcopy(contract)
+            too_many["parameters"]["names"] = [f"p{i}" for i in range(9)]
+            assert (await session.call_tool("frontier_plan_experiments", {"contract": too_many})).isError
+
+            too_many_candidates = deepcopy(contract)
+            too_many_candidates["designs"] *= 7
+            assert (await session.call_tool("frontier_plan_experiments", {"contract": too_many_candidates})).isError
+
+            too_many_observations = deepcopy(contract)
+            too_many_observations["designs"][0]["observations"] *= 17
+            assert (await session.call_tool("frontier_plan_experiments", {"contract": too_many_observations})).isError
+
+            too_many_repeats = deepcopy(contract)
+            too_many_repeats["designs"][0]["observations"][0]["technical_repeat"] = 65
+            assert (await session.call_tool("frontier_plan_experiments", {"contract": too_many_repeats})).isError
+
+            oversized_text = deepcopy(contract)
+            oversized_text["title"] = "x" * 2049
+            assert (await session.call_tool("frontier_plan_experiments", {"contract": oversized_text})).isError
+
+            oversized_request = deepcopy(contract)
+            oversized_request["context"]["open_gaps"] = ["x" * 1800] * 40
+            assert (await session.call_tool("frontier_plan_experiments", {"contract": oversized_request})).isError
+
+    run(exercise())
+    assert len(store.events(limit=50)["events"]) == event_count
 
 
 def test_expanded_mcp_surfaces_use_exact_refs_and_bounded_local_calculators(store):
