@@ -70,7 +70,7 @@ def test_build_is_current_and_portable():
 
 def test_every_view_renders_without_errors(browser, base):
     pg = page(browser)
-    for route in ["experimentation", "demo", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["experimentation", "assemblies", "demo", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1, #main h2", timeout=5000)
         assert pg.locator("#main").inner_text().strip(), route
@@ -308,7 +308,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["home", "experimentation", "demo", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "experimentation", "assemblies", "demo", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -1841,7 +1841,7 @@ def test_no_page_prints_markup_or_object_placeholders(browser, base):
     import re as _re
     bad = _re.compile(r"<span|</?b>|<a href|class=\"|\[object \w+\]")
     pg = page(browser, 1280, 900)
-    for r in ("blueprints", "blueprints?design=bp-2-development-versus-regeneration-contrast", "blueprints?region=pectoral-fin-field", "regulatory", "reuse", "history", "experimentation", "experimentation?tab=cross", "ecology", "formalize", "engineering", "simulations", "studio/flying-fish"):
+    for r in ("assemblies", "blueprints", "blueprints?design=bp-2-development-versus-regeneration-contrast", "blueprints?region=pectoral-fin-field", "regulatory", "reuse", "history", "experimentation", "experimentation?tab=cross", "ecology", "formalize", "engineering", "simulations", "studio/flying-fish"):
         pg.goto(base + "#/" + r); pg.wait_for_selector("#main h1"); pg.wait_for_timeout(500)
         t = pg.locator("#main").text_content()
         m = bad.search(t)
@@ -1919,3 +1919,39 @@ def test_studio_scale_selector_works_from_the_keyboard_and_keeps_deep_links(brow
     assert pg.locator(".subsys[aria-current=true] b").text_content() == "Cellular"
     pg.goto(base + "#/studio/flying-fish?scale=molecular"); pg.wait_for_selector(".studiomain h2:has-text('Molecular scale')")
     assert pg.locator(".rail").count() == 1 and pg.locator("nav[aria-label='Subsystems by scale']").count() == 1
+
+
+def test_assemblies_page_keeps_six_axes_apart_and_the_v3b_failure_visible(browser, base):
+    import hashlib
+    bio = ROOT / "artifacts/biodesign-compiler"
+    R = json.loads((bio / "report.json").read_text())
+    want = {f["path"]: f["sha256"] for f in json.loads((bio / "manifest.json").read_text())["files"]}
+    for rel, sha in want.items():
+        assert hashlib.sha256((ROOT / "site" / rel).read_bytes()).hexdigest() == sha, rel
+    assert R["retained_failures"] == ["fish3d-v3b"] and len(R["compiled"]) == 3
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        pg.goto(base + "#/assemblies"); pg.wait_for_selector("#as-axes")
+        assert pg.locator(".asmatrix tbody tr").count() == 6
+        for c in R["compiled"]:
+            for k, a in c["axes"].items():
+                row = pg.locator(f"#axis-{k}").text_content()
+                assert a["status"] in row, (c["assembly"], k, a["status"])
+        t = pg.locator("#main").text_content()
+        assert "no single score" in t and "Retained failure" in t and "NOT CONVERGED" in t
+        # the retained failure sits on the model-domain axis of v3b and v3b's lift is flagged unusable
+        v3b = next(c for c in R["compiled"] if c["assembly"] == "fish3d-v3b")
+        assert v3b["axes"]["model_domain"]["status"] == "fail" and "NOT CONVERGED" in v3b["axes"]["model_domain"]["reading"]
+        cells = pg.locator("#axis-model_domain td").all_text_contents()
+        assert len(cells) == 3 and cells[1].startswith("fail") and "NOT CONVERGED" in cells[1], cells
+        rows = {r.locator("td").first.text_content().strip(): r.locator("td").nth(3).text_content() for r in pg.locator("section[aria-labelledby=as-cmp] tbody tr").all()}
+        assert rows["v3b glide pose"].strip() == "no" and rows["v3a ray-fan"].strip() == "yes", rows
+        assert pg.locator(".asbridges article").count() == 3 and all("expression->growth" in x for x in pg.locator(".asbridges article").all_text_contents())
+        assert pg.locator("section[aria-labelledby=as-pins] tbody tr:has-text('genetic blueprint') :text('shared by all variants')").count() >= 1
+        assert pg.locator(".asdiff").count() == len(R["layer_revision_diff"]) == 3
+        for banned in ("biologically valid", "whole genome was designed"):
+            assert banned not in t.replace("no variant is shown to be biologically valid", "").replace("No whole genome is designed here", ""), banned
+        assert pg.locator("a[href$='artifacts/biodesign-compiler/report.json']").count() >= 1 and pg.locator("a[href='#/experimentation?tab=cross']").count() == 1
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
