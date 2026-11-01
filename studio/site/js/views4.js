@@ -229,7 +229,7 @@
 
   /* Connect and share: what a person or agent can actually use, with what is and is not verified. Nothing is claimed beyond the repository's own documents. */
   function connect(snap, S, live) {
-    const origin = "https://frontier.morphoswarm.ai";
+    const origin = "https://studio.morphoswarm.ai";
     const endpoint = origin + "/mcp";
     const config = JSON.stringify({ mcpServers: { frontier: { type: "http", url: endpoint } } }, null, 2);
     const apis = [["GET /api/health", "service status"], ["GET /api/catalog, /api/record, /api/events", "records, with exact pins"], ["GET /api/discovery?q=", "search (the response says which engine ran)"], ["GET /api/graph", "neighbourhood of one exact record"], ["GET /api/artifacts, /api/media?sha256=", "declared artifacts; node-verified local copies"], ["GET /api/attention, /api/system, /api/counts", "open work, system report, corpus counts"], ["POST /api/engineering/solve, /api/beliefs/solve, /api/simulations/run", "bounded calculations; they store nothing"]];

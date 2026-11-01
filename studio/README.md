@@ -42,7 +42,7 @@ Unsupported cross-scale mappings remain open questions. See the
 Use **Streamable HTTP** with this MCP endpoint:
 
 ```text
-https://frontier.morphoswarm.ai/mcp
+https://studio.morphoswarm.ai/mcp
 ```
 
 Public reads need no credential. Start with `frontier_capabilities`; discover

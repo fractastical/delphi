@@ -161,7 +161,7 @@
     const p = fish(snap); const forms = snap.print_forms ? snap.print_forms.forms : []; const vids = (snap.simulation_manifests || []).filter((m) => m.video_state === "present_verified" && m.poster_href);
     const openQ = DF.questions(snap).filter((q) => q.state === "open").length; const withModel = Object.values(p.panels).filter((x) => x.models.length).length;
     return {
-      html: html`<section class="hero compact"><div><p class="eyebrow">MorphoSwarm Frontier</p><h1>Design together.<br>Know what's open.</h1></div>
+      html: html`<section class="hero compact"><div><p class="eyebrow">MorphoSwarm Studio</p><h1>Design together.<br>Know what's open.</h1></div>
         <div class="herotext"><p class="lede">Two ways in, one body of evidence. <b>Studio</b> is where a design goal is worked across scales, with the models, media and gaps in one place. <b>Frontier</b> is the shared list of open questions and who is working on them. Both read the same claims and evidence, kept in the Delphi foundation: what we know, what's next, who's working on it.</p><p class="small herowatch"><a href="${DF.href("/demo")}">Watch the demo</a></p></div></section>
       ${groundingSection(snap)}
       <p class="small aboutlink"><a href="${DF.href("/about")}">About this project</a> · <a href="${DF.href("/generative")}">Generative biology: from mechanistic simulation to equation-conditioned models</a></p>

@@ -34,35 +34,113 @@ bridge between biological scales; total provider spend unknown.
 
 ## 2.1 Tokens
 
-Read by streaming **18,198 session transcripts** across the build host and seven
-Orchestra-managed accounts, summing the `usage` block of every assistant message.
+**Two agent harnesses wrote transcripts on this host, and an earlier version of this page
+counted only one of them.** Claude Code writes to `~/.claude/projects` and to seven
+Orchestra-managed account directories; Codex/GPT writes to `~/.codex/sessions`. Both were
+streamed line by line and their usage blocks summed. The Codex side is **six times the
+size** of the Claude side and was absent from this page entirely.
 
-### Since 2026-10-30 (the event window — 687 transcript files)
+### Combined, all time
+
+| Harness | Transcript files | Tokens, all categories |
+|---|---:|---:|
+| Codex / GPT | 6,778 (6,545 carrying a usage block) | **922,177,496,289** — 922.2 billion |
+| Claude Code | 18,198 | **144,988,434,152** — 145.0 billion |
+| **Combined** | **24,976** | **1,067,165,930,441 — about 1.07 trillion** |
+
+"All categories" is fresh input + cache read + cache creation + output. It counts tokens
+**moved**, not work done — see the cache-read note below.
+
+### Claude Code — all time, build host plus seven Orchestra accounts
 
 | Measure | Tokens |
-|---|---|
-| **Cache read** | **49,642,734,476** (49.6 billion) |
-| **Output generated** | **178,002,683** (178 million) |
-| Cache creation | 465,394,749 |
-| Fresh input | 342,598 |
-| **Assistant messages** | **160,546** |
-
-### All time across these accounts
-
-| Measure | Tokens |
-|---|---|
+|---|---:|
 | Cache read | 141,749,753,482 (141.7 billion) |
-| Output generated | 618,985,553 (619 million) |
 | Cache creation | 2,573,117,395 |
+| Output generated | 618,985,553 (619 million) |
 | Fresh input | 46,577,722 |
-| Assistant messages | 601,938 |
+| **Assistant messages** | **601,938** |
 
-Agent loops re-send their context every turn and hit the prompt cache, so cache-read
-dominates: that is why it is reported separately rather than folded into one headline
-number. **Output tokens are the honest measure of generated work: 178 million in the event
-window.**
+### Codex / GPT — all time
 
-### Per account (all time)
+| Measure | Tokens |
+|---|---:|
+| Input | 920,340,481,928 (920.3 billion) |
+| — of which cached | 905,347,191,552 (905.3 billion) |
+| Output | 1,837,014,361 (1.84 billion) |
+| — of which reasoning | 555,050,084 (555 million) |
+| **Total** | **922,177,496,289** |
+
+Codex keeps one cumulative `total_token_usage` counter per session; the figure above sums
+the **last** counter in each of the 6,545 session files. Within a session nothing is
+double-added — the total is input + output exactly (920,340,481,928 + 1,837,014,361 =
+922,177,496,289), and reasoning is a subset of output. **Across** sessions it can be: a
+resumed or forked session opens a new file while carrying the same cumulative counter
+forward, and this method would count the shared prefix again. No deduplication was done
+for that, so the Codex total is an **upper bound**, not a settled figure.
+
+### Per day since 2026-10-26 — Claude Code
+
+Each assistant message is attributed to **its own timestamp**.
+
+| Day | Assistant messages | Output tokens | Cache read |
+|---|---:|---:|---:|
+| 2026-10-26 | 21,498 | 16,016,942 | 4,013,283,053 |
+| 2026-10-27 | 44,702 | 52,775,080 | 9,180,622,394 |
+| 2026-10-28 | 52,281 | 63,436,326 | 11,820,718,671 |
+| 2026-10-29 | 50,068 | 74,609,336 | 9,564,698,335 |
+| **2026-10-30** | **32,212** | **37,402,765** | **6,181,699,742** |
+| **2026-10-31** | **31,789** | **47,869,754** | **8,978,192,632** |
+| **2026-11-01** (to ~09:00 PST) | **13,453** | **17,439,842** | **3,999,963,608** |
+| **Seven-day total** | **246,003** | **309,550,045** | **53,739,178,435** |
+
+### Per day since 2026-10-26 — Codex / GPT
+
+**A different attribution rule, so the two tables are not merged.** Codex's counter is
+cumulative per session, so a session's whole lifetime total lands on the day of its
+**last** usage record, not on the days it ran.
+
+| Day | Total tokens | Output tokens | of which reasoning |
+|---|---:|---:|---:|
+| 2026-10-26 | 381,095,992 | 614,723 | 194,248 |
+| 2026-10-27 | 302,088,858 | 1,055,054 | 367,148 |
+| 2026-10-28 | 926,160,963 | 3,097,376 | 1,001,581 |
+| 2026-10-29 | 2,654,465,889 | 9,467,166 | 3,060,559 |
+| **2026-10-30** | **2,187,180,520** | **6,484,121** | **2,081,258** |
+| **2026-10-31** | **1,369,688,098** | **3,447,924** | **1,146,446** |
+| **2026-11-01** (to ~09:00 PST) | **1,674,640,948** | **5,721,893** | **2,690,741** |
+| **Seven-day total** | **9,495,321,268** | **29,888,257** | **10,541,981** |
+
+Those seven days carry **1.0%** of the all-time Codex total (9.50 billion of 922.18
+billion). Under this attribution rule that says most session files last recorded usage
+before 2026-10-26. It is **not** a claim that 99% of the tokens were spent before the
+window: we do not know how the 922 billion distributes over calendar time, and this method
+cannot tell us.
+
+### The event window, 2026-10-30 to 2026-11-01
+
+| Harness | Assistant messages | Output tokens | Cache read / cached input | All categories |
+|---|---:|---:|---:|---:|
+| Claude Code | 77,454 | 102,712,361 | 19,159,855,982 | 19,553,362,586 |
+| Codex / GPT | not recorded per message | 15,653,938 | 5,128,615,680 | 5,231,509,566 |
+
+**A correction to this page.** It previously reported **178,002,683** output tokens and
+**49,642,734,476** cache reads "since 2026-10-30". That figure selected transcript *files*
+by modification time and then summed **every** usage record inside them, including messages
+written days before the window — so pre-event work was carried into an event number.
+Re-summed by each message's own timestamp, the window is **102,712,361 output tokens**
+across **77,454** assistant messages. The superseded number is printed here rather than
+deleted, because it was published.
+
+### Why cache read is reported apart from output
+
+An agent loop re-sends its entire context on every turn and hits the prompt cache on nearly
+all of it, so cache-read scales with turn count and context length rather than with work
+produced. Folding it into one headline would make a long conversation look like a large
+result. **Output tokens are the closer measure of generated work: 102.7 million from Claude
+and 15.7 million from Codex in the event window.**
+
+### Per account, all time (Claude Code only)
 
 | Account | Messages | Output tokens | Cache read |
 |---|---:|---:|---:|
@@ -75,13 +153,25 @@ window.**
 | max_outlook3 | 4,675 | 4,846,820 | 575,346,435 |
 | ent_allen | 2,828 | 2,970,304 | 339,687,588 |
 
-**Not included:** Codex/GPT sessions (a separate 6,778 transcript files), Gemini calls
-beyond the two receipts below, and any provider-side usage outside these transcripts. The
-true total is therefore **higher** than the table, not lower.
+Codex sessions carry no account split in their transcripts, so there is no equivalent table
+for them.
+
+### What these token numbers are not
+
+- **Not spend.** No price is applied to any row, and the billing meter was never queried.
+  A token count is not a cost, and we do not know the cost.
+- **Not complete.** Gemini (`gemini-embedding-001`, `gemini-3.8-flash`, `gemini-4-argon`),
+  Evo 2, OpenFold2 and the Nebius-hosted scientific models write into neither transcript
+  set; only the two receipts in §2.5 cover them. The true total is **higher**, not lower.
+- **Not scoped to this project.** Both transcript sets are host-wide. They include work on
+  other projects — MorphoSwarm's attack campaign among them, see §2.3 — and no attempt was
+  made to split tokens by project.
+- **Not evidence of productivity.** A token was moved; whether it helped is not measured
+  here, and §8 is where the work is actually checked.
 
 ## 2.2 Models actually used
 
-Fourteen distinct models appear in the transcripts, by assistant-message count:
+### Claude Code transcripts — fourteen models, by assistant-message count
 
 | Model | Messages |
 |---|---:|
@@ -100,28 +190,74 @@ Fourteen distinct models appear in the transcripts, by assistant-message count:
 | Claude Fable 5 | 4 |
 | Claude Opus 4.7 | 2 |
 
-Plus, outside the Claude transcripts: **Gemini** (`gemini-embedding-001`,
-`gemini-3.8-flash`, `gemini-4-argon`), **Evo 2**, **OpenFold2**, and the hosted scientific
-models on the Nebius Scientific AI workbench. This is a genuinely multi-model system, not
-one vendor.
+Non-Anthropic models in bold. The unit here is the assistant message, which is **not** a
+unit of work: one Opus message and one Haiku message count the same.
 
-## 2.3 Agents and sessions
+### Codex / GPT transcripts — eight models, by session
+
+The unit is different, and deliberately so. Codex transcripts record the model in a
+turn-context record rather than beside the usage block, so these are **sessions**, counted
+by the **first** model each session names. A session that switches model mid-run is counted
+once, under the first, so this is a model **census** and not a share of tokens or of work.
+It also undercounts the model list: a 40-file spot check found `gpt-6-luna` named in later
+turns of sessions whose first model was something else, and it appears nowhere in the table
+below.
+
+| Model named first | Sessions |
+|---|---:|
+| `gpt-5.6-sol` | 5,801 |
+| `gpt-rosalind-5.5` | 703 |
+| `gpt-5.5` | 92 |
+| `gpt-6-astra` | 51 |
+| `codex-auto-review` | 34 |
+| `gpt-6.1-sol` | 10 |
+| `heisenberg` | 9 |
+| `gpt-5.4` | 6 |
+| **Total with a model field** | **6,706 of 6,778** |
+
+Scan method and its controls: the first 256 KB of every one of the 6,778 session files was
+read and the first `"model"` field taken. **72 files named no model in that window** and
+are reported as such rather than dropped silently; a negative control for a model name that
+cannot exist returned **0**, so the matcher is not matching itself or everything.
+
+### Outside both transcript sets
+
+**Gemini** (`gemini-embedding-001`, `gemini-3.8-flash`, `gemini-4-argon`), **Evo 2**,
+**OpenFold2**, and the hosted scientific models on the Nebius Scientific AI workbench.
+These write no transcript here, so only the receipts in §2.5 cover them and there is no
+message or session count for any of them.
+
+**Twenty-two distinct model identifiers** appear in the two tables above — 14 Claude Code,
+8 Codex — from at least four vendors: Anthropic (10), OpenAI, Zhipu/GLM (2) and MiniMax
+(2), plus Google's Gemini and the Nebius-hosted models outside them. `gpt-6-luna` is a
+twenty-third, seen mid-session and so missed by the first-model census. Two of the
+Codex identifiers, `codex-auto-review` and `heisenberg`, are names as the transcripts
+record them; whether they are models or routing aliases was not established. This is a
+genuinely multi-model system rather than one vendor. **Which model did which useful work is
+not measured**, and no model here is ranked against another.
+
+## 2.3 Agents, sessions, tool calls and repositories
+
+**Read at 2026-11-01, 09:54 PST**, from `tmux ls` and `ps` on the build host. The counts
+move during the day; an earlier reading on this page recorded 43 sessions and 12 harnesses.
 
 | | Count |
 |---|---:|
-| tmux agent sessions on the build host | **43** |
-| live agent processes | **47** |
-| purpose-built simulation harnesses (`ff-*`) | **12** |
-| transcript files scanned | **18,198** |
-| transcript files active in the event window | **687** |
+| tmux agent sessions on the build host | **47** |
+| live `claude` / `codex` processes | **48** |
+| — of the 47: general `claude-NN` sessions | 17 |
+| — of the 47: `ff-*` simulation harnesses | 14 |
+| — of the 47: `dx-*` named role sessions | 11 |
+| — of the 47: `codex` sessions | 4 |
+| — of the 47: other (`delphi`) | 1 |
+| Claude transcript files scanned | **18,198** |
+| Codex transcript files scanned | **6,778** |
 
-The 43 comprise 17 general `claude-NN` sessions, 4 `codex` sessions, 11 named role
-sessions (`dx-corpus`, `dx-critic-r1`, `dx-submit`, `dx-guilds`, `dx-market`, `dx-gpuops`,
-`dx-collab`, `dx-fable-lead`, a director and two retired), and the 12 harnesses. Not all
-are active; several are spend-capped or quota-exhausted, and this count does not claim
-they are working.
+Not all 47 are active. Several are spend-capped, quota-exhausted or
+authentication-blocked. **A session existing is an orchestration state, not measured work,
+and this count does not claim any of them is productive.**
 
-### The twelve harnesses
+### The harnesses
 
 Each owns one scale or question, runs in its own git worktree on its own branch, submits
 its own cloud jobs under its own name prefix, and writes its own status file.
@@ -141,8 +277,107 @@ its own cloud jobs under its own name prefix, and writes its own status file.
 | `ff-xenomorph` | cell aggregation into printable morphology |
 | `ff-sitecritic` | independent Playwright critique of every route |
 
+Two more `ff-*` sessions — `ff-agentuse` and `ff-fseries` — were running at the read time
+above and have worktrees (`claude-agentuse`, `claude-fseries`), but no scope statement was
+recorded for them, so none is invented here.
+
 They hand work to one another through **files**, not conversation, so a worker can pick up
 another's output without shared memory.
+
+### Tool calls — a floor, not a total
+
+Counted by substring match over the Claude transcript lines written since 2026-10-26
+(2,504 session files), for **four tools only**:
+
+| Tool | Calls |
+|---|---:|
+| `Bash` | 158,393 |
+| `Edit` | 13,419 |
+| `Read` | 10,980 |
+| `Write` | 8,458 |
+| **Total, these four** | **191,250** |
+
+Every other tool — web fetch, MCP calls, the agent-spawn tool, the browser suite,
+everything the harnesses invoke — is **outside this count**. 191,250 is therefore a floor
+on tool use, not a total. It also covers Claude sessions only; Codex tool calls are not
+counted at all.
+
+**Subagent spawns: not counted.** The extraction searched for the agent-spawn tool by name
+across all 2,504 files and returned **zero matches**. Subagents were used, so zero is an
+extraction failure, not a measurement. It is reported as not counted rather than filled in
+with a guess.
+
+### Repositories built during the event window
+
+The event window runs **2026-10-30 to 2026-11-01**. Two anchors fix its start, both read
+here: `delphi-evolve`'s first commit is `3090ca7`, authored **2026-10-30 23:58:05 PST**,
+and the `kganjam/delphi-frontier` repository was created at **2026-10-31T14:49:43Z**
+(GitHub API `repos/kganjam/delphi-frontier`, field `created_at`).
+
+| Repository | Commits | Branches | Tracked files |
+|---|---:|---:|---:|
+| `kganjam/delphi-frontier` | **1,700** | 166 | 6,687 |
+| `kganjam/delphi-evolve` ("Darwin's Bridge") | **461** | 66 refs | 829 |
+
+`delphi-evolve` was omitted from earlier versions of this page. Its 461 commits fall on
+exactly two days — **2 on 2026-10-30 and 459 on 2026-10-31** — so all of it is event work.
+Its GitHub repository was created 2026-10-31T06:58:06Z, after the first commits were
+authored locally.
+
+The `delphi-frontier` row is a re-read at 2026-11-01 10:00 PST and is larger than §2.4's
+reading of 1,595 commits / 158 branches / 6,684 files taken earlier the same day; the
+repository was still taking commits while this was written. Both readings are kept, with
+their times, rather than one overwriting the other.
+
+### Swarm infrastructure at scale — measured on a DIFFERENT project, NOT hackathon work
+
+**Read this subsection as evidence about the orchestration machinery, not about the
+hackathon.** The figures below come from `kganjam/morphoswarm` on **2026-10-28 and
+2026-10-29**, which is **before the event window** and is a **separate attack-campaign
+project**. None of it is hackathon work, none of it is folded into any total above, and
+nothing in §2.4, §2.5 or §9 counts it. It is here only because it is the one place where
+the agent swarm's throughput was driven hard enough to be worth measuring.
+
+Orchestra, the task orchestrator on this host, lists **1,551 tasks** for the `morphoswarm`
+project — 1,434 `done`, 52 `archived`, 28 `blocked`, 23 `open`, 8 `cancelled`, 6 `failed`
+(`orchestra list --project morphoswarm --all`, read 2026-11-01 09:52 PST). The repository's
+own backlog holds 1,078 `M<id>` rows and retains 556 distinct `orchestra/task/<id>`
+branches.
+
+In the two days 2026-10-28/29, across every ref in that repository:
+
+| Measure | Count |
+|---|---:|
+| Unique commits in the two-day window | **2,138** |
+| — carrying at least one model `Co-Authored-By` trailer | **1,792** |
+| Distinct `M<id>` backlog task ids named by those commits | **350** |
+| Distinct `orchestra/task/<id>` branches named by those commits | 226 |
+
+Model `Co-Authored-By` trailer lines on those commits — **2,848 lines over 1,792 commits**,
+because a commit may carry more than one:
+
+| Trailer | Lines |
+|---|---:|
+| Claude Opus 5 | 1,568 |
+| Claude Sonnet 5.5 | 551 |
+| Claude Opus 5.5 | 421 |
+| Claude Haiku 5.5 | 216 |
+| Claude Code (unversioned) | 87 |
+| OpenAI Codex | 5 |
+
+Command, re-runnable: `git -C ~/git/morphoswarm log --all --since=2026-10-28
+--until=2026-10-30 --format='%H%n%B%n==ENDC=='`, parsed for unique SHAs, `Co-Authored-By:`
+lines, `orchestra/task/<hex>` and `M<digits>`. `--since`/`--until` filter on committer
+date; counts by author date differ by roughly 1% and the repository is still moving, so a
+re-run will not match to the unit.
+
+**What this does and does not show.** It shows that the orchestration layer sustained
+~1,070 merged commits a day from ~175 distinct task rows a day across four model tiers,
+for two days, on one host — that is a real throughput measurement of the swarm
+infrastructure. It shows **nothing** about the hackathon, nothing about whether those
+commits were good, and nothing about multi-agent versus single-agent performance: there was
+no single-agent arm, and the work was handed out by a coordinating session sharing one git
+identity.
 
 ## 2.4 Commits
 

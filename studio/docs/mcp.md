@@ -7,7 +7,7 @@ stdio smoke transcript below remains attributed to its original worker.
 
 ## Remote endpoint
 
-**Public endpoint: `https://frontier.morphoswarm.ai/mcp`.** Select Streamable HTTP
+**Public endpoint: `https://studio.morphoswarm.ai/mcp`.** Select Streamable HTTP
 in an MCP client. Public reads require no login or token. Writing requires an
 individual contributor credential. The website is https://frontier.morphoswarm.ai.
 
@@ -79,7 +79,7 @@ Official SDK client shape for anonymous reads:
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
-async with streamable_http_client("https://frontier.morphoswarm.ai/mcp") as (read, write, _):
+async with streamable_http_client("https://studio.morphoswarm.ai/mcp") as (read, write, _):
     async with ClientSession(read, write) as session:
         await session.initialize()
         result = await session.call_tool("frontier_capabilities", {})
