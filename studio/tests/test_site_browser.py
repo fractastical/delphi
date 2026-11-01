@@ -1969,10 +1969,11 @@ def test_aeroelastic_and_nca_cards_follow_the_review_wording_and_pin_their_media
     for cid in ("aeroelastic-coupling", "nca-pattern", "nca-seed-placement"):
         pg.wait_for_selector(f"#sim-{cid} video")
     a = pg.locator("#sim-aeroelastic-coupling").text_content()
-    for must in ("Bending-only, torsion-rigid scaffold", "fixed-alpha, assumed-release descent proxy", "bookkeeping identities", "not validated improvements", "not a production mesh", "production 36-arm return is pending"):
+    for must in ("Bending-only, torsion-rigid scaffold", "fixed-alpha, assumed-release", "bookkeeping, not an independent transfer validation", "not a demonstrated useful flight improvement", "cannot resolve smaller paired effects", "Independent review B1", "Independent review B2", "36 arms"):
         assert must in a, must
-    rigid, one, two = (ae["control_slice"]["arms"][k]["CL"] for k in ("rigid", "one-way-frozen-load", "two-way-static-feedback"))
-    assert f"{rigid:.6f}" in a and f"{two - one:.1e}" in a and "improvement" in a and "validated" in a
+    assert "coarse 8x2" not in a and "not a production mesh" not in a, "the production arms replace the earlier coarse slice"
+    P = ae["production"]; r_cl, o_cl, t_cl = P["nominal_fine"]["CL"]
+    assert f"{r_cl:.6f}" in a and f"{o_cl:.6f}" in a and f"{t_cl:.6f}" in a and "3.84e-06" in a and "all declared arms returned" in a
     n = pg.locator("#sim-nca-seed-placement").text_content()
     assert "32 of 48 passed" in n and "original 0 of 12 to corrected seed 12 of 12" in n and "original 0 of 12 to corrected seed 8 of 12" in n and "original 0 of 12 to corrected seed 0 of 12" in n
     assert "not fresh held-out cases" in n and "reused from parent" in n and "tissue regeneration" in n and "Not generalisation" in n

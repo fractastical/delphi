@@ -1195,31 +1195,39 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
 
 
 def aeroelastic_cards(ins: Inputs, out: dict) -> list[dict]:
-    """Static aeroelastic coupling card from the native model card. Wording follows the independent review: a bending-only, torsion-rigid scaffold; a
-    fixed-alpha assumed-release descent proxy; ledger gates are bookkeeping, not validation; paired differences are not called improvements."""
+    """Static aeroelastic coupling card from the native model card and its production audit. Wording follows the independent review (B1, B2): a
+    bending-only, torsion-rigid scaffold; a fixed-alpha assumed-release descent proxy; ledger gates are bookkeeping; the absolute mesh gate does not
+    resolve small paired effects; small differences are not validated improvements. The 36-arm production arms are used, not the earlier coarse slice."""
     d = "artifacts/aeroelastic"
     if not (ROOT / d / "index.json").exists():
         return []
-    ix = json.loads(ins.read(f"{d}/index.json")); art = ix["artifacts"]; arms = ix["control_slice"]["arms"]
-    rigid, one, two = arms["rigid"], arms["one-way-frozen-load"], arms["two-way-static-feedback"]
-    st, href = _vid(ins, out, "aeroelastic-coupling", d, "render-control/coupled-states.mp4", art["video"]["sha256"])
-    _, ph = _vid(ins, out, "aeroelastic-coupling", d, "render-control/poster.png", art["poster"]["sha256"])
-    _, prov = _vid(ins, out, "aeroelastic-coupling", d, "render-control/provenance.json", art["render_provenance"]["sha256"])
-    rel = lambda a, b: (a - b) / b
-    return [{"id": "aeroelastic-coupling", "title": "Static aeroelastic coupling of the fins: a coarse 8x2 control slice (bending-only scaffold)", "scales": ["organ", "organism"], "evidence_kind": ix["evidence_kind"] + " (video: render of saved states)",
-        "model": {"name": "equivalent constant-EI bending scaffold + steady thin-surface VLM", "context": ix["question"] + " " + ix["status"] + ". The production 36-arm return is pending; this card is the coarse slice only."},
-        "time": {"units": "static iterations, not physical seconds", "note": "The video holds the last state explicitly; deflection is unscaled. The glide paths are a separate rigidized-shape point-mass proxy."},
+    ix = json.loads(ins.read(f"{d}/index.json")); art = ix["artifacts"]; P = ix.get("production")
+    if not P:
+        return []
+    sub = lambda k: art[k]["path"].split(d + "/", 1)[1]
+    st, href = _vid(ins, out, "aeroelastic-coupling", d, sub("video"), art["video"]["sha256"])
+    _, ph = _vid(ins, out, "aeroelastic-coupling", d, sub("poster"), art["poster"]["sha256"])
+    _, prov = _vid(ins, out, "aeroelastic-coupling", d, sub("render_provenance"), art["render_provenance"]["sha256"])
+    au = json.loads(ins.read(f"{d}/production-audit.json")); dg = json.loads(ins.read(f"{d}/production-diagnostics.json"))
+    gates = dg["native_lattice_gates"]; npass = sum(1 for g in gates if g.get("lattice_gate_passed"))
+    nom = next(e for e in dg["paired_effects"] if e["compliance"] == 0.2 and e["speed_m_s"] == 20.0 and e["comparison"] == "two_way_minus_one_way")["meshes"]["fine"]
+    rv = dg.get("review", {})
+    (r_cl, o_cl, t_cl), (r_rg, o_rg, t_rg) = P["nominal_fine"]["CL"], P["nominal_fine"]["descent_range_m"]
+    return [{"id": "aeroelastic-coupling", "title": f"Static aeroelastic coupling of the fins: {P['arms']} arms, bending-only torsion-rigid scaffold", "scales": ["organ", "organism"], "evidence_kind": ix["evidence_kind"] + " (video: render of saved states)",
+        "model": {"name": "equivalent constant-EI bending scaffold + steady thin-surface VLM", "context": ix["question"] + " " + ix["status"] + "."},
+        "time": {"units": "static iterations, not physical seconds", "note": "The video holds terminal states explicitly; deflection is unscaled. The descent paths are a separate rigidized-shape point-mass proxy."},
         "video": {"file": "coupled-states.mp4", "sha256": art["video"]["sha256"], "note": f"{art['video']['bytes']} bytes"}, "video_state": st, "video_href": href, "poster_href": ph, "provenance_href": prov,
         "numerical_checks": [
-            {"name": "rigid arm", "result": f"CL {rigid['CL']:.6f}; point-mass glide range {rigid['glide_range_m']:.3f} m (assumed release, fixed alpha)"},
-            {"name": "one-way frozen load minus rigid", "result": f"dCL/CL {100 * rel(one['CL'], rigid['CL']):.2f}%; glide range {one['glide_range_m'] - rigid['glide_range_m']:+.3f} m. One mesh, one compliance: a single coarse difference, not a supported effect"},
-            {"name": "two-way minus one-way", "result": f"dCL {two['CL'] - one['CL']:.1e} (fixed-point tolerance is 1e-6): treat as negligible feedback at this compliance, not as a two-way improvement"},
-            {"name": "local control slice", "result": "20 primitive checks pass; the force, moment and virtual-work ledger gates are bookkeeping identities and are not counted as independent evidence"}],
-        "parameter_unknowns": [ix["inputs"]["material"] + ".", "Mass 0.05 kg, drag coefficients, release height and fixed alpha in the glide proxy are assumed engineering values.", "The 3% absolute mesh gate cannot resolve effects this small; no refinement gate on the paired differences was declared."],
+            {"name": "production run", "result": f"{P['native_execution_status']}: {P['arms']} arms over {P['contexts']} compliance and speed contexts, two lattices; empirical accuracy {P['empirical_accuracy']}"},
+            {"name": "nominal (compliance 0.2, 20 m/s, fine lattice)", "result": f"CL rigid {r_cl:.6f}, one-way {o_cl:.6f}, two-way {t_cl:.6f}; assumed-release descent range {r_rg:.3f}, {o_rg:.3f}, {t_rg:.3f} m"},
+            {"name": "two-way minus one-way", "result": f"dCL {t_cl - o_cl:.2e}, range {1000 * (t_rg - o_rg):+.2f} mm; about {nom['abs_delta_CL_over_fixed_point_tolerance']:.1f} times the frozen fixed-point tolerance. A small effect, not a demonstrated useful flight improvement"},
+            {"name": "independent audit of the returned files", "result": f"{au['collection_files_checked']} files, {au['actual_static_frames_checked']} static frames and {au['actual_glide_states_checked']} descent states reproduced exactly; same-model integrity, not validation"},
+            {"name": "mesh gate", "result": f"the absolute 3% CL gate between the two lattices passed for {npass} of {len(gates)} comparisons; it cannot resolve smaller paired effects or establish a convergence rate"},
+            {"name": "ledger gates", "result": "the force, moment and virtual-work residuals hold by construction and only detect an overridden normal vector; they are bookkeeping, not an independent transfer validation"}],
+        "parameter_unknowns": [ix["inputs"]["material"] + ".", "Mass, drag coefficients, release height and fixed alpha in the descent proxy are assumed engineering values.", "Paired differences and their mesh ratios are descriptive posthoc diagnostics; no acceptance criterion was changed or added."],
         "open_questions": ix["open_questions"],
-        "equations": [], "sources": [{"label": "Static aeroelastic method (aircraft model, not a fish)", "locator": "Ting, Nguyen, Trinh 2014, NASA NTRS 20140008648, Eq 63-66, 74-75 and Section VIII"}, {"label": "Beam deflection reference", "locator": "MIT 1.050 beam deflection notes"}, {"label": "Protocol", "locator": f"{d}/protocol.json sha256 {art['protocol']['sha256'][:12]}…"}],
-        "limitations": ["Bending-only, torsion-rigid scaffold: no streamwise twist, no torsion or axial model, no hinge mapping.", "The glide is a fixed-alpha, assumed-release descent proxy on the rigidized final shape, not continuous fluid-structure interaction or a controlled flight.",
-                        "The 8x2 slice is not a production mesh. Small paired differences are not validated improvements.", "Computed engineering result; empirical validation: " + str(ix["empirical_validation"]) + ". No biological calibration of the equivalent stiffness exists."],
+        "equations": [], "sources": [{"label": "Static aeroelastic method (aircraft model, not a fish)", "locator": "Ting, Nguyen, Trinh 2014, NASA NTRS 20140008648, Eq 63-66, 74-75 and Section VIII"}, {"label": "Beam deflection reference", "locator": "MIT 1.050 beam deflection notes"}, {"label": "Independent review (claude-07), kept byte-exact, with the author's response", "locator": f"{d}/independent-review-claude07.md sha256 {rv.get('sha256', '')[:12]}…"}, {"label": "Protocol", "locator": f"{d}/protocol.json sha256 {art['protocol']['sha256'][:12]}…"}],
+        "limitations": ["Bending-only, torsion-rigid scaffold; the descent is a fixed-alpha, assumed-release proxy; neither is validated fin or glide performance.", "Independent review B1: the ledger identities cannot catch a wrong station, frame or scaling, so they are not independent transfer validation.", "Independent review B2: the 3% absolute mesh gate cannot establish paired effects smaller than itself; the deltas, mesh ratios and tolerance multiples shown are descriptive and added after the fact, with no new gate.", "Torsion, axial, hinge stiffness, trimmed flight, unsteady fluid and structure, viscosity and separation are not modelled.", "Computed engineering result; empirical validation: " + str(ix["empirical_validation"]) + ". No biological calibration of the equivalent stiffness exists."],
         "couplings": [], "manifest": f"{d}/index.json", "native": True}]
 
 

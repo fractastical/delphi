@@ -1,7 +1,7 @@
 {
  "schema": "frontier-site-snapshot-0.1",
- "label": "snapshot of inputs 250142a4b1df",
- "input_fingerprint": "250142a4b1df702353629ec7c9cf821f29f3b03a4973bdc03d1e2c20b046dc94",
+ "label": "snapshot of inputs 737bbfbf933d",
+ "input_fingerprint": "737bbfbf933d8eb52da5bd91534a0b5bbc5960015dc8c9473a14c825d043c643",
  "inputs": [
   {
    "path": "GOAL.md",
@@ -10,23 +10,33 @@
   },
   {
    "path": "artifacts/aeroelastic/index.json",
-   "sha256": "181c1ce0cf9359a2fd2a7361bed0eb39b85fcd9ada5896535f559c70ae9ec65b",
-   "bytes": 4248
+   "sha256": "88591d88b1601d862f6b7d957a2c1d6aa29237419648825e213ac65fc417f26e",
+   "bytes": 7243
   },
   {
-   "path": "artifacts/aeroelastic/render-control/coupled-states.mp4",
-   "sha256": "dbdc001c594b982375a6819f542842caa3aac59dfe601bdd00fa113dd9abc06a",
-   "bytes": 115674
+   "path": "artifacts/aeroelastic/production-audit.json",
+   "sha256": "dded1be1c43826d8c1d02d015edab10b5da82de57cee66a765fe51148543a2c2",
+   "bytes": 2150365
   },
   {
-   "path": "artifacts/aeroelastic/render-control/poster.png",
-   "sha256": "c8d0372a492d5fcb2128b5ea4e0a097e1b862dfc4d099faac85152c6854044df",
-   "bytes": 200177
+   "path": "artifacts/aeroelastic/production-diagnostics.json",
+   "sha256": "3942ccf86325cefc8689fe5cedecdf6b1b9a4786483cbaf2ff9407118f736f14",
+   "bytes": 101057
   },
   {
-   "path": "artifacts/aeroelastic/render-control/provenance.json",
-   "sha256": "03cc2e4e647cacd7bf6ac7d6c6d59a36fa5779ced1f85af682445f18f80b837c",
-   "bytes": 6015
+   "path": "artifacts/aeroelastic/render-production/coupled-states.mp4",
+   "sha256": "39cccc437663bccb120bdc72222dae71f5d31bc78c649ee4044242f336294d66",
+   "bytes": 112455
+  },
+  {
+   "path": "artifacts/aeroelastic/render-production/poster.png",
+   "sha256": "9892fa31d2e82f974c12215e619f9097c84db3d5ccc41803f6ca47573e7c6212",
+   "bytes": 197281
+  },
+  {
+   "path": "artifacts/aeroelastic/render-production/provenance.json",
+   "sha256": "f0ecc407ec04daed18839bdbf6b2e56bdda9bb015aabaf99a9ada9962b9ec044",
+   "bytes": 6086
   },
   {
    "path": "artifacts/assurance/map.json",
@@ -7627,7 +7637,7 @@
   },
   {
    "id": "aeroelastic-coupling",
-   "title": "Static aeroelastic coupling of the fins: a coarse 8x2 control slice (bending-only scaffold)",
+   "title": "Static aeroelastic coupling of the fins: 36 arms, bending-only torsion-rigid scaffold",
    "scales": [
     "organ",
     "organism"
@@ -7635,43 +7645,51 @@
    "evidence_kind": "computed (video: render of saved states)",
    "model": {
     "name": "equivalent constant-EI bending scaffold + steady thin-surface VLM",
-    "context": "Under declared equivalent-fin bending stiffness, how much does recomputing aerodynamics after elastic deformation change shape, forces and the explicitly rigidized-shape point-mass glide compared with rigid and frozen-load arms? actual checked coarse control slice;36-arm production pending. The production 36-arm return is pending; this card is the coarse slice only."
+    "context": "Under declared equivalent-fin bending stiffness, how much does recomputing aerodynamics after elastic deformation change shape, forces and the explicitly rigidized-shape point-mass glide compared with rigid and frozen-load arms? 36declaredarms computed and saved-state audited; scoped torsion-rigid scaffold only."
    },
    "time": {
     "units": "static iterations, not physical seconds",
-    "note": "The video holds the last state explicitly; deflection is unscaled. The glide paths are a separate rigidized-shape point-mass proxy."
+    "note": "The video holds terminal states explicitly; deflection is unscaled. The descent paths are a separate rigidized-shape point-mass proxy."
    },
    "video": {
     "file": "coupled-states.mp4",
-    "sha256": "dbdc001c594b982375a6819f542842caa3aac59dfe601bdd00fa113dd9abc06a",
-    "note": "115674 bytes"
+    "sha256": "39cccc437663bccb120bdc72222dae71f5d31bc78c649ee4044242f336294d66",
+    "note": "112455 bytes"
    },
    "video_state": "present_verified",
-   "video_href": "artifacts/simulations/aeroelastic-coupling/render-control/coupled-states.mp4",
-   "poster_href": "artifacts/simulations/aeroelastic-coupling/render-control/poster.png",
-   "provenance_href": "artifacts/simulations/aeroelastic-coupling/render-control/provenance.json",
+   "video_href": "artifacts/simulations/aeroelastic-coupling/render-production/coupled-states.mp4",
+   "poster_href": "artifacts/simulations/aeroelastic-coupling/render-production/poster.png",
+   "provenance_href": "artifacts/simulations/aeroelastic-coupling/render-production/provenance.json",
    "numerical_checks": [
     {
-     "name": "rigid arm",
-     "result": "CL 0.262328; point-mass glide range 30.317 m (assumed release, fixed alpha)"
+     "name": "production run",
+     "result": "all declared arms returned: 36 arms over 6 compliance and speed contexts, two lattices; empirical accuracy unknown"
     },
     {
-     "name": "one-way frozen load minus rigid",
-     "result": "dCL/CL -0.56%; glide range -0.149 m. One mesh, one compliance: a single coarse difference, not a supported effect"
+     "name": "nominal (compliance 0.2, 20 m/s, fine lattice)",
+     "result": "CL rigid 0.250360, one-way 0.249013, two-way 0.249016; assumed-release descent range 29.169, 29.046, 29.047 m"
     },
     {
      "name": "two-way minus one-way",
-     "result": "dCL 4.2e-06 (fixed-point tolerance is 1e-6): treat as negligible feedback at this compliance, not as a two-way improvement"
+     "result": "dCL 3.84e-06, range +0.35 mm; about 3.8 times the frozen fixed-point tolerance. A small effect, not a demonstrated useful flight improvement"
     },
     {
-     "name": "local control slice",
-     "result": "20 primitive checks pass; the force, moment and virtual-work ledger gates are bookkeeping identities and are not counted as independent evidence"
+     "name": "independent audit of the returned files",
+     "result": "161 files, 222 static frames and 72544 descent states reproduced exactly; same-model integrity, not validation"
+    },
+    {
+     "name": "mesh gate",
+     "result": "the absolute 3% CL gate between the two lattices passed for 18 of 18 comparisons; it cannot resolve smaller paired effects or establish a convergence rate"
+    },
+    {
+     "name": "ledger gates",
+     "result": "the force, moment and virtual-work residuals hold by construction and only detect an overridden normal vector; they are bookkeeping, not an independent transfer validation"
     }
    ],
    "parameter_unknowns": [
     "assumed equivalent constantEI scaffold, not measured tissue or ecologyhingeK.",
-    "Mass 0.05 kg, drag coefficients, release height and fixed alpha in the glide proxy are assumed engineering values.",
-    "The 3% absolute mesh gate cannot resolve effects this small; no refinement gate on the paired differences was declared."
+    "Mass, drag coefficients, release height and fixed alpha in the descent proxy are assumed engineering values.",
+    "Paired differences and their mesh ratios are descriptive posthoc diagnostics; no acceptance criterion was changed or added."
    ],
    "open_questions": [
     "ECM/cell state to measured equivalent EI",
@@ -7691,14 +7709,19 @@
      "locator": "MIT 1.050 beam deflection notes"
     },
     {
+     "label": "Independent review (claude-07), kept byte-exact, with the author's response",
+     "locator": "artifacts/aeroelastic/independent-review-claude07.md sha256 3d09e769d14b…"
+    },
+    {
      "label": "Protocol",
      "locator": "artifacts/aeroelastic/protocol.json sha256 2343dd6e80cc…"
     }
    ],
    "limitations": [
-    "Bending-only, torsion-rigid scaffold: no streamwise twist, no torsion or axial model, no hinge mapping.",
-    "The glide is a fixed-alpha, assumed-release descent proxy on the rigidized final shape, not continuous fluid-structure interaction or a controlled flight.",
-    "The 8x2 slice is not a production mesh. Small paired differences are not validated improvements.",
+    "Bending-only, torsion-rigid scaffold; the descent is a fixed-alpha, assumed-release proxy; neither is validated fin or glide performance.",
+    "Independent review B1: the ledger identities cannot catch a wrong station, frame or scaling, so they are not independent transfer validation.",
+    "Independent review B2: the 3% absolute mesh gate cannot establish paired effects smaller than itself; the deltas, mesh ratios and tolerance multiples shown are descriptive and added after the fact, with no new gate.",
+    "Torsion, axial, hinge stiffness, trimmed flight, unsteady fluid and structure, viscosity and separation are not modelled.",
     "Computed engineering result; empirical validation: unknown. No biological calibration of the equivalent stiffness exists."
    ],
    "couplings": [],
