@@ -144,13 +144,15 @@ def create_snapshot(config, output):
                         excluded.append({'path': logical, 'reason': 'Deferred until final publication manifest and commit'})
                         continue
                     if source is None:
-                        excluded.append({'path': logical, 'reason': reason})
+                        excluded.append({'path': logical, 'reason': reason,
+                                         'capture_error': reason.startswith('MissingFileError:')})
                         continue
                     copy = Path(scratch) / 'file'
                     try:
                         item = stable_copy(source, copy, min(config['max_file_bytes'], config['max_total_bytes'] - total))
                     except (OSError, ValueError) as error:
-                        excluded.append({'path': logical, 'reason': type(error).__name__ + ': ' + str(error)[:180]})
+                        excluded.append({'path': logical, 'reason': type(error).__name__ + ': ' + str(error)[:180],
+                                         'capture_error': True})
                         continue
                     total += item['bytes']
                     if total > config['max_total_bytes']:
@@ -163,7 +165,7 @@ def create_snapshot(config, output):
                         seen.add(item['sha256'])
                     rows.append({'path': logical, **item})
                 manifest.update(finished_utc=utc(), file_count=len(rows), unique_blob_count=len(seen),
-                                logical_bytes=total, capture_errors=[x for x in excluded if x['reason'].startswith(('OSError:', 'ValueError:', 'MissingFileError:'))])
+                                logical_bytes=total, capture_errors=[x for x in excluded if x.get('capture_error', False)])
                 if not rows:
                     raise ValueError('No files captured')
                 add_bytes(archive, 'manifest.json', json.dumps(manifest, indent=2).encode())

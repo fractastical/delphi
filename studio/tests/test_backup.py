@@ -65,3 +65,30 @@ def test_expected_tracked_deletion_is_distinct_from_missing_input(tmp_path):
     assert missing[2].startswith('MissingFileError:')
     deletion = list(configured_files({'roots': [], 'files': [{**base, 'expected_tracked_deletion': True}]}))[0]
     assert deletion[2] == 'Tracked deletion retained in binary patch and source bundle'
+
+
+def test_source_disappearing_during_capture_is_a_publication_blocker(tmp_path, monkeypatch):
+    from frontier_compute import backup
+    identity = tmp_path / 'identity'
+    subprocess.run(['age-keygen', '-o', str(identity)], capture_output=True, check=True)
+    recipient = tmp_path / 'recipient'
+    recipient.write_text(subprocess.run(['age-keygen', '-y', str(identity)], capture_output=True, text=True, check=True).stdout)
+    source = tmp_path / 'source'
+    source.mkdir()
+    (source / 'stable').write_text('Retained control')
+    (source / 'disappearing').write_text('Inventory saw this file')
+    original = backup.stable_copy
+
+    def race(path, destination, bound):
+        if path.name == 'disappearing':
+            path.unlink()
+        return original(path, destination, bound)
+
+    monkeypatch.setattr(backup, 'stable_copy', race)
+    result = backup.create_snapshot({'recipients': str(recipient),
+        'roots': [{'path': str(source), 'label': 'evidence'}],
+        'max_total_bytes': 10000, 'max_file_bytes': 1000}, tmp_path / 'snapshot')
+    assert result['file_count'] == 1 and result['capture_errors'] == 1
+    manifest = json.loads((tmp_path / 'snapshot/private-manifest.json').read_text())
+    failure = manifest['capture_errors'][0]
+    assert failure['capture_error'] is True and failure['reason'].startswith('FileNotFoundError:')
