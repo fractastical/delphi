@@ -1,0 +1,540 @@
+{
+  "round": "r1-2026-11-01",
+  "slice": "slice-03",
+  "model": "gemini-4-argon",
+  "provider": "Google",
+  "generated": "2026-11-01T01:28:00Z",
+  "problems": [
+    {
+      "problem": "kelvin-problem-in-epithelia",
+      "p_solved_30d": 0.14,
+      "p_solved_365d": 0.35,
+      "rationale": "Meeting the full acceptance criteria requires both a pre-registered biological test on 3D segmented epithelia and a rigorous mathematical result (such as a Lean-checked lower bound on equal-volume partition area or local optimality of Weaire-Phelan). The biological side is moderately tractable using Gómez-Gálvez et al. (2018) supplementary tables or existing segmented volumes, though 3D apico-basal segmentation errors could limit resolution. The main blocker is the mathematical requirement: proving an unconditional 3D isoperimetric or Kusner-style lower bound in Lean 4 or certifying spectral enclosures for singular Plateau borders is a major formalization hurdle, so 30-day full problem resolution is well below the completion rate of individual biological or conditional-proof approaches. Seeing a verified Mathlib path to 3D Brunn-Minkowski or numeric scutoid tables in the 2018 supplement would raise these probabilities.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "kelvin-problem-in-epithelia--claude-opus-5-5--1",
+          "p_complete": 0.04,
+          "p_settle": 0.85,
+          "note": "Rigorous continuous spectral enclosures (Lehmann-Goerisch) for the Jacobi operator on curved foam networks with singular Plateau borders are beyond standard agent automation in 30 days."
+        },
+        {
+          "approach": "kelvin-problem-in-epithelia--claude-opus-5-5--2",
+          "p_complete": 0.45,
+          "p_settle": 0.35,
+          "note": "Agents can easily formalize the shared-face accounting conditional on the 3D isoperimetric inequality, but proving the unconditional geometric measure theory bound or Kusner's bound in Lean 4 is much harder."
+        },
+        {
+          "approach": "kelvin-problem-in-epithelia--claude-opus-5-5--3",
+          "p_complete": 0.55,
+          "p_settle": 0.70,
+          "note": "Open 3D segmented epithelial datasets (Gómez-Gálvez 2018, PlantSeg) and Voronoi/foam simulation tools are accessible, though apico-basal neighbour-exchange noise may blur the verdict."
+        },
+        {
+          "approach": "kelvin-problem-in-epithelia--gpt-5-6-sol--1",
+          "p_complete": 0.18,
+          "p_settle": 0.80,
+          "note": "Curating and validating 30 distinct open epithelial volumes with >200 cells each at F1 > 0.95 is a heavy data-scouting and segmentation bottleneck within 30 days."
+        },
+        {
+          "approach": "kelvin-problem-in-epithelia--gpt-5-6-sol--2",
+          "p_complete": 0.08,
+          "p_settle": 0.60,
+          "note": "Certifying a finite-dimensional interval Hessian in Lean is slightly more approachable than the full continuous operator, but exact curved-face parametrization remains very difficult."
+        },
+        {
+          "approach": "kelvin-problem-in-epithelia--grok-4-7--1",
+          "p_complete": 0.75,
+          "p_settle": 0.65,
+          "note": "Checking and transcribing the Gómez-Gálvez 2018 supplementary tables against the paper's analytical curve is fast, though it only settles the biological half if numeric tables are present."
+        },
+        {
+          "approach": "kelvin-problem-in-epithelia--grok-4-7--2",
+          "p_complete": 0.70,
+          "p_settle": 0.02,
+          "note": "Running 400 random periodic foam annealings in Surface Evolver is straightforward to execute and log, but virtually guaranteed not to beat Weaire-Phelan or prove optimality."
+        },
+        {
+          "approach": "kelvin-problem-in-epithelia--grok-4-7--3",
+          "p_complete": 0.30,
+          "p_settle": 0.55,
+          "note": "Proving an interval inequality between Kelvin and Weaire-Phelan areas in Lean is doable, but proving a sorry-free lower bound strictly above the isolated-sphere bound is a tough formalization task."
+        }
+      ]
+    },
+    {
+      "problem": "mutant-morphant-discrepancy-prediction",
+      "p_solved_30d": 0.65,
+      "p_solved_365d": 0.85,
+      "rationale": "This problem is highly matched to the swarm's existing capabilities: ZFIN phenotype/allele downloads, Ensembl Compara paralog tables, and the public INDRA CoGEx MCP server are all directly accessible without external hardware. The main route to success is building a family-grouped classifier and testing the NMD + paralog identity rule, which will definitively settle predictability one way or the other (either achieving held-out AUROC significantly above baseline or hitting the falsifier at chance). The primary blocker is data hygiene in ZFIN—matching anatomical systems and developmental stages between morphants and CRISPR/mutant alleles and parsing allele PTC coordinates relative to exon junctions. Logging a clean ZFIN allele-to-exon-junction mapping with >=150 doubly assayed genes would push the 30-day probability above 0.85.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "mutant-morphant-discrepancy-prediction--claude-opus-5-5--1",
+          "p_complete": 0.75,
+          "p_settle": 0.80,
+          "note": "All required inputs (ZFIN flat files, Ensembl paralogs, INDRA CoGEx) are open and scriptable, and the family-grouped CV plus ranked list directly satisfies the acceptance criteria or falsifier."
+        },
+        {
+          "approach": "mutant-morphant-discrepancy-prediction--claude-opus-5-5--2",
+          "p_complete": 0.70,
+          "p_settle": 0.65,
+          "note": "Testing the two-feature PTC + paralog rule via Fisher's exact test is straightforward, though ZFIN may have too few promoter-less deletion alleles for the within-gene contrast."
+        },
+        {
+          "approach": "mutant-morphant-discrepancy-prediction--claude-opus-5-5--3",
+          "p_complete": 0.65,
+          "p_settle": 0.60,
+          "note": "Aligning ZFIN morpholino sequences against Ensembl transcripts and auditing toxicity terms is very feasible, though it addresses confounding rather than delivering the full ranked prediction list."
+        },
+        {
+          "approach": "mutant-morphant-discrepancy-prediction--gpt-5-6-sol--1",
+          "p_complete": 0.55,
+          "p_settle": 0.80,
+          "note": "Double-labeling matched stage/anatomy records with >=100 positives and >=100 negatives under family and temporal holdout is rigorous and decisive if enough clean pairs survive."
+        },
+        {
+          "approach": "mutant-morphant-discrepancy-prediction--gpt-5-6-sol--2",
+          "p_complete": 0.25,
+          "p_settle": 0.70,
+          "note": "Finding at least 50 zebrafish mutants with public RNA-seq paired to matched morphant and mutant phenotypes is a severe data-availability bottleneck."
+        },
+        {
+          "approach": "mutant-morphant-discrepancy-prediction--grok-4-7--1",
+          "p_complete": 0.75,
+          "p_settle": 0.65,
+          "note": "Joining Morpholinos.txt, CRISPR.txt, and phenoGeneCleanData_fish.txt with Ensembl transcript coordinates is highly tractable and gives a clean test of the Boolean NMD-paralog rule."
+        },
+        {
+          "approach": "mutant-morphant-discrepancy-prediction--grok-4-7--2",
+          "p_complete": 0.75,
+          "p_settle": 0.75,
+          "note": "Fitting an L2-regularized logistic regression with sequence and INDRA feature blocks on family-held-out ZFIN splits is fast, clean, and directly tests the predictability falsifier."
+        },
+        {
+          "approach": "mutant-morphant-discrepancy-prediction--grok-4-7--3",
+          "p_complete": 0.70,
+          "p_settle": 0.60,
+          "note": "Scoring untested morpholino genes is easy to run, though requiring strict decile monotonicity on a modest held-out sample could cause a technical failure signature."
+        }
+      ]
+    },
+    {
+      "problem": "trabecular-stress-alignment-wolffs-law",
+      "p_solved_30d": 0.30,
+      "p_solved_365d": 0.60,
+      "rationale": "The acceptance criteria require a pre-registered test on at least three open micro-CT datasets of loaded bone sites from at least two species, comparing mean-intercept-length fabric tensors to finite-element principal stresses against both randomized and growth-rule nulls. While the 2D Lean formalizations and remodelling simulations are highly tractable, the main route to solving the problem itself is the micro-CT + FE pipeline (`claude-opus-5-5--1` or `grok-4-7--1`). The main blocker is data curation and 3D meshing: many public trabecular micro-CT deposits (like Doube 2011) are excised cubes lacking whole-bone geometry or anatomical orientation needed to apply physiological boundary conditions. Confirming three intact, oriented micro-CT volumes across two species would substantially raise the 30-day forecast.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "trabecular-stress-alignment-wolffs-law--claude-opus-5-5--1",
+          "p_complete": 0.35,
+          "p_settle": 0.75,
+          "note": "Computing MIL fabric and homogenized 3D FE stresses on three intact bone sites across two species directly meets the acceptance criteria, but scouting oriented whole-bone scans is hard."
+        },
+        {
+          "approach": "trabecular-stress-alignment-wolffs-law--claude-opus-5-5--2",
+          "p_complete": 0.75,
+          "p_settle": 0.30,
+          "note": "Voxel FE remodelling versus developmental-field simulations in Python are very tractable for the swarm, but only calibrate the null rather than testing real bone scans."
+        },
+        {
+          "approach": "trabecular-stress-alignment-wolffs-law--claude-opus-5-5--3",
+          "p_complete": 0.80,
+          "p_settle": 0.20,
+          "note": "Extending ThompsonLaws/Mechanics.lean with 2D ODE stability and Lyapunov proofs for shear rotation rules is well within Lean 4 agent capabilities, though it only settles the theoretical mechanism."
+        },
+        {
+          "approach": "trabecular-stress-alignment-wolffs-law--claude-opus-5-5--4",
+          "p_complete": 0.50,
+          "p_settle": 0.55,
+          "note": "A meta-analysis of published in vivo load-reorientation experiments addresses the causal falsifier, though fewer than five studies may report extractable angular dispersions."
+        },
+        {
+          "approach": "trabecular-stress-alignment-wolffs-law--gpt-5-6-sol--1",
+          "p_complete": 0.30,
+          "p_settle": 0.80,
+          "note": "This directly targets the three-site, two-species micro-CT and FE requirement with strict blinding, facing the same bottleneck of finding intact open volumes with clear load geometry."
+        },
+        {
+          "approach": "trabecular-stress-alignment-wolffs-law--gpt-5-6-sol--2",
+          "p_complete": 0.20,
+          "p_settle": 0.65,
+          "note": "Fitting inverse mechanostat and reaction-diffusion models across at least 20 whole-bone specimens with known loading class is computationally and data-wise demanding."
+        },
+        {
+          "approach": "trabecular-stress-alignment-wolffs-law--grok-4-7--1",
+          "p_complete": 0.40,
+          "p_settle": 0.75,
+          "note": "By naming specific open deposits (Leeds lumbar, Palanca vertebrae, DaRUS femoral head, Doube stacks) and explicit exclusion gates, this has the best shot at completing the micro-CT test."
+        },
+        {
+          "approach": "trabecular-stress-alignment-wolffs-law--grok-4-7--2",
+          "p_complete": 0.80,
+          "p_settle": 0.25,
+          "note": "A 2D plane-stress Huiskes remodelling loop with load rotation in Python/FEniCS is easy to complete, but serves as a theoretical sufficiency check rather than the required micro-CT test."
+        },
+        {
+          "approach": "trabecular-stress-alignment-wolffs-law--grok-4-7--3",
+          "p_complete": 0.85,
+          "p_settle": 0.20,
+          "note": "Proving in Lean 4 that 2D shear traction vanishes iff normal to principal axes and maximizes the Frobenius product is a straightforward trigonometric extension of existing repo theorems."
+        }
+      ]
+    },
+    {
+      "problem": "biocomposite-toughness-from-hierarchy",
+      "p_solved_30d": 0.42,
+      "p_solved_365d": 0.70,
+      "rationale": "Solving this problem requires a pre-registered meta-analysis of at least 40 published material records across five biocomposite families with structural descriptors (mineral fraction, aspect ratio, interface compliance, hierarchical levels) tested via leave-one-family-out validation. The computational and Lean approaches (proving Voigt stiffness bounds and simulating self-similar tension-shear chains) are highly likely to complete within 30 days, settling the theoretical piece. The main blocker for full problem resolution is literature extraction completeness: many experimental fracture papers omit interface thickness or mix incompatible toughness metrics (K_Ic vs work of fracture), which may drop the complete-case table below 40 records unless constituent reference tables or protocol strata are carefully pre-registered. Verifying 40 complete rows from open reviews (Wegst 2015, Barthelat 2016) would raise the 30-day probability.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "biocomposite-toughness-from-hierarchy--claude-opus-5-5--1",
+          "p_complete": 0.55,
+          "p_settle": 0.75,
+          "note": "Allowing a fixed pre-registered reference table for constituent properties when missing in primary papers makes reaching the 40-record, 5-family bar realistic and directly decisive."
+        },
+        {
+          "approach": "biocomposite-toughness-from-hierarchy--claude-opus-5-5--2",
+          "p_complete": 0.75,
+          "p_settle": 0.35,
+          "note": "A 2D lattice-spring fracture simulation of 1-to-4 level staggered composites is tractable in Python and settles compounding in the ideal model, though not across the 40 literature records."
+        },
+        {
+          "approach": "biocomposite-toughness-from-hierarchy--claude-opus-5-5--3",
+          "p_complete": 0.85,
+          "p_settle": 0.25,
+          "note": "Proving by induction in Lean 4 that the Gao tension-shear recursive modulus is bounded by the Voigt bound is elementary algebra, cleanly settling the stiffness half of the question."
+        },
+        {
+          "approach": "biocomposite-toughness-from-hierarchy--gpt-5-6-sol--1",
+          "p_complete": 0.45,
+          "p_settle": 0.80,
+          "note": "Modeling protocol-specific measurement strata in a hierarchical Bayesian meta-analysis is methodologically strong, though assembling 40 complete rows with all descriptors remains challenging."
+        },
+        {
+          "approach": "biocomposite-toughness-from-hierarchy--gpt-5-6-sol--2",
+          "p_complete": 0.70,
+          "p_settle": 0.35,
+          "note": "A 2D cohesive-zone factorial parameter sweep over 1-to-3 nested levels is computationally tractable and isolates pure hierarchy interactions in theory."
+        },
+        {
+          "approach": "biocomposite-toughness-from-hierarchy--grok-4-7--1",
+          "p_complete": 0.45,
+          "p_settle": 0.65,
+          "note": "Because this approach strictly drops any row missing a field or mixing work-of-fracture with K_Ic without imputation, it risks failing the 40-record coverage gate on paywalled or incomplete tables."
+        },
+        {
+          "approach": "biocomposite-toughness-from-hierarchy--grok-4-7--2",
+          "p_complete": 0.85,
+          "p_settle": 0.30,
+          "note": "Coding and sweeping the algebraic recurrence of Zhang, Zhang and Gao (2011) in Python is trivial once equations are transcribed, settling monotonicity for that analytical model."
+        },
+        {
+          "approach": "biocomposite-toughness-from-hierarchy--grok-4-7--3",
+          "p_complete": 0.70,
+          "p_settle": 0.30,
+          "note": "Formalizing the algebraic recurrence in Lean 4 and exhibiting a rational parameter point where toughness decreases with level count is very doable if the recurrence is cleanly transcribed."
+        }
+      ]
+    },
+    {
+      "problem": "hollow-tube-mass-optimality",
+      "p_solved_30d": 0.35,
+      "p_solved_365d": 0.65,
+      "rationale": "The formal piece—proving in Lean 4 that an empty thin-walled tube has no interior stiffness-per-mass optimum while a core-filled tube (Currey & Alexander 1985) or buckling-constrained tube does—is highly tractable and almost certain to be completed within 30 days. However, the acceptance criteria require a pre-registered comparison of at least 100 structures across four types (long bones, plant stems, bamboo culms, feather rachises) each with its measured tissue modulus. The main blocker is obtaining matched tissue moduli and geometry across all four structure types from open tables (especially stems and feather rachises, where publisher paywalls or missing same-specimen moduli may shrink the sample below 100). Locating an open botanical stem morphometry-and-modulus compilation would substantially increase `p_solved_30d`.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "hollow-tube-mass-optimality--claude-opus-5-5--1",
+          "p_complete": 0.85,
+          "p_settle": 0.35,
+          "note": "Proving monotonicity for empty tubes and uniqueness of the core-mass-adjusted optimum K*(q) in Lean 4 is a clean calculus exercise that clarifies the theoretical baseline."
+        },
+        {
+          "approach": "hollow-tube-mass-optimality--claude-opus-5-5--2",
+          "p_complete": 0.45,
+          "p_settle": 0.75,
+          "note": "Allowing tissue-matched moduli from Currey & Alexander (1985) and related compilations gives a solid chance of reaching 100 structures across the four types and testing the bird pneumaticity contrast."
+        },
+        {
+          "approach": "hollow-tube-mass-optimality--claude-opus-5-5--3",
+          "p_complete": 0.35,
+          "p_settle": 0.50,
+          "note": "Segmenting 60 open-download limb-bone CT scans from MorphoSource tests allometry and mid-shaft profiles, but covers only bones rather than all four required structure types."
+        },
+        {
+          "approach": "hollow-tube-mass-optimality--gpt-5-6-sol--1",
+          "p_complete": 0.80,
+          "p_settle": 0.35,
+          "note": "Formalizing the annular Pareto envelope and active buckling/radius constraint boundary in Lean 4 is straightforward and establishes the mathematical framework."
+        },
+        {
+          "approach": "hollow-tube-mass-optimality--gpt-5-6-sol--2",
+          "p_complete": 0.40,
+          "p_settle": 0.75,
+          "note": "Propagating modulus uncertainties across 100 cross-sections from four structure types directly addresses the problem, contingent on finding enough open stem and rachis records."
+        },
+        {
+          "approach": "hollow-tube-mass-optimality--grok-4-7--1",
+          "p_complete": 0.85,
+          "p_settle": 0.30,
+          "note": "Proving strict decrease of gas-core area and the stationarity condition for μ(k, q) in Lean 4 is elementary and highly likely to compile without sorry."
+        },
+        {
+          "approach": "hollow-tube-mass-optimality--grok-4-7--2",
+          "p_complete": 0.45,
+          "p_settle": 0.50,
+          "note": "Requiring strictly same-paper moduli and noting missing stem tables and blocked feather supplements makes it likely this run logs a coverage failure rather than settling the 100-structure claim."
+        },
+        {
+          "approach": "hollow-tube-mass-optimality--grok-4-7--3",
+          "p_complete": 0.75,
+          "p_settle": 0.25,
+          "note": "Plotting the available modulus-matched structures on the theoretical mass and buckling curves is easy to execute, though it explicitly does not meet the four-type 100-structure acceptance bar."
+        }
+      ]
+    },
+    {
+      "problem": "limb-bone-scaling-vs-mechanical-similarity",
+      "p_solved_30d": 0.70,
+      "p_solved_365d": 0.88,
+      "rationale": "This problem is one of the most tractable in the slice because the core datasets—Campione and Evans (2012) (245 extant quadrupeds in the `MASSTIMATE` R package) and Amson and Bibi (152 mammal species with a deposited timetree)—are open, clean, and combined exceed the 300-taxon requirement once resolved through the repo's organisms layer and Upham mammal trees. Both the pooled PGLS exponent tests and the clade-by-clade heterogeneity falsifiers can be run and logged rapidly in R or Python, alongside the Lean 4 derivation of the similarity exponents. The only minor hurdle is assembling or matching a reptile phylogeny for the non-mammal subset of Campione and Evans and the scarcity of in vivo effective mechanical advantage (EMA) data for the secondary safety-factor question.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--1",
+          "p_complete": 0.80,
+          "p_settle": 0.85,
+          "note": "Combining Campione & Evans with an independent compilation (such as Amson & Bibi or Alexander 1979) easily clears 300 taxa and directly tests the three exponents with PGLS."
+        },
+        {
+          "approach": "limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--2",
+          "p_complete": 0.80,
+          "p_settle": 0.80,
+          "note": "Fitting phylogenetic ANCOVA models across clades and literature-coded posture classes on the same dataset directly tests the clade-heterogeneity falsifier."
+        },
+        {
+          "approach": "limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--3",
+          "p_complete": 0.85,
+          "p_settle": 0.40,
+          "note": "Formalizing the power-law exponent derivations and the posture identity a + e = 1 in Lean 4 using Real.rpow is very tractable and anchors the theoretical predictions."
+        },
+        {
+          "approach": "limb-bone-scaling-vs-mechanical-similarity--gpt-5-6-sol--1",
+          "p_complete": 0.75,
+          "p_settle": 0.85,
+          "note": "Running PGLS and multilevel models over a tree ensemble on Campione & Evans plus an independent compilation directly satisfies the acceptance criteria."
+        },
+        {
+          "approach": "limb-bone-scaling-vs-mechanical-similarity--gpt-5-6-sol--2",
+          "p_complete": 0.25,
+          "p_settle": 0.70,
+          "note": "Scouting 40 mammal species with matched force-plate ground-reaction forces, EMA, bone length, and CT section modulus is a tough data bottleneck."
+        },
+        {
+          "approach": "limb-bone-scaling-vs-mechanical-similarity--grok-4-7--1",
+          "p_complete": 0.85,
+          "p_settle": 0.80,
+          "note": "Using the already-packaged MASSTIMATE extants (245 species) and Amson & Bibi humerus table (152 species) provides an immediately executable path past the 300-taxon bar."
+        },
+        {
+          "approach": "limb-bone-scaling-vs-mechanical-similarity--grok-4-7--2",
+          "p_complete": 0.90,
+          "p_settle": 0.30,
+          "note": "Proving the algebraic relations between geometric, elastic, and stress similarity exponents in Lean 4 next to ThompsonLaws.Magnitude is simple and reliable."
+        },
+        {
+          "approach": "limb-bone-scaling-vs-mechanical-similarity--grok-4-7--3",
+          "p_complete": 0.85,
+          "p_settle": 0.50,
+          "note": "Running PGLS by lifestyle on Amson & Bibi's deposited timetree is very easy to complete, though lifestyle is only a proxy for biomechanical posture."
+        }
+      ]
+    },
+    {
+      "problem": "hygromorph-bilayer-scaling",
+      "p_solved_30d": 0.38,
+      "p_solved_365d": 0.65,
+      "rationale": "The acceptance criteria allow either at least 20 plant hygromorph specimens across five species OR printed/fabricated bilayers of at least three thicknesses and two swelling mismatches, with independently measured moduli, swelling strains, and diffusivity compared against the Lean-checked Timoshenko curvature and diffusive time formulas. Since the swarm has no printer or humidity chamber, the physical operator protocol (`grok-4-7--4`) will not complete in 30 days, leaving literature extraction (`claude-opus-5-5--1`, `gpt-5-6-sol--1`, `grok-4-7--1`) as the main route. The key blocker is circularity in published papers: many studies back-calculate swelling strain from curvature rather than measuring it independently on monolayers. If the published fabricated-bilayer series (Reyssat & Mahadevan 2009, Erb et al. 2013) or open pine-cone datasets (Quan et al. 2021) supply enough independent monolayer measurements, the problem can be settled quickly.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "hygromorph-bilayer-scaling--claude-opus-5-5--1",
+          "p_complete": 0.50,
+          "p_settle": 0.75,
+          "note": "Combining plant hygromorph papers with published fabricated-bilayer series (Reyssat & Mahadevan, Erb, Gladman) gives the best chance of meeting either the 20-specimen or fabricated-series bar."
+        },
+        {
+          "approach": "hygromorph-bilayer-scaling--claude-opus-5-5--2",
+          "p_complete": 0.75,
+          "p_settle": 0.30,
+          "note": "FEniCSx parameter sweeps of fibre angle, modulus gradients, and viscoelastic lag are straightforward to run and quantify theoretical deviations, though they do not replace the empirical test."
+        },
+        {
+          "approach": "hygromorph-bilayer-scaling--claude-opus-5-5--3",
+          "p_complete": 0.65,
+          "p_settle": 0.25,
+          "note": "Proving the graded-beam moment integral formula and its reduction to Timoshenko in Lean 4 is tractable with Mathlib interval integrals, though the Sturm-Liouville diffusion bracket is harder."
+        },
+        {
+          "approach": "hygromorph-bilayer-scaling--gpt-5-6-sol--1",
+          "p_complete": 0.40,
+          "p_settle": 0.80,
+          "note": "Restricting strictly to 20 biological specimens across five species with all inputs independently measured is rigorous, but likely to hit a literature-reporting bottleneck."
+        },
+        {
+          "approach": "hygromorph-bilayer-scaling--gpt-5-6-sol--2",
+          "p_complete": 0.70,
+          "p_settle": 0.30,
+          "note": "A synthetic model-identifiability sweep over bilayer extensions is computationally tractable in Python/FEniCS, settling when curvature-time curves can distinguish mechanisms."
+        },
+        {
+          "approach": "hygromorph-bilayer-scaling--grok-4-7--1",
+          "p_complete": 0.50,
+          "p_settle": 0.70,
+          "note": "Targeting specific papers (Quan 2021, Reyssat 2009, Dawson 1997, Elbaum 2007, Armon 2011) and using Reyssat's paper-polymer series for the fabricated arm is well-scoped, provided publisher blocks don't prevent figure/table extraction."
+        },
+        {
+          "approach": "hygromorph-bilayer-scaling--grok-4-7--2",
+          "p_complete": 0.80,
+          "p_settle": 0.30,
+          "note": "Solving a 1D/2D numerical beam with linear modulus gradient, viscoelastic branch, and fibre angle verified against the Lean symmetric theorem is highly tractable and answers the theoretical deviation question."
+        },
+        {
+          "approach": "hygromorph-bilayer-scaling--grok-4-7--3",
+          "p_complete": 0.60,
+          "p_settle": 0.25,
+          "note": "Deriving and proving an explicit relative-error perturbation bound f(ε) for bilayerCurvature in Lean 4 is a clean algebraic inequality proof, though tedious."
+        },
+        {
+          "approach": "hygromorph-bilayer-scaling--grok-4-7--4",
+          "p_complete": 0.02,
+          "p_settle": 0.90,
+          "note": "Because the decisive result requires actual physical measurements from a printer and humidity chamber that the swarm lacks, completion within 30 days depends on an unlikely external operator."
+        }
+      ]
+    },
+    {
+      "problem": "biomineral-form-physical-vs-biological-control",
+      "p_solved_30d": 0.41,
+      "p_solved_365d": 0.68,
+      "rationale": "The acceptance criteria require segmenting at least 30 radiolarian, acantharian, and related lattice shells from open image archives and comparing polygon-side distributions, vertex angles, and spacing against foam-packing and random Voronoi nulls. The repo already has the `cell-geometry` segmentation and junction-angle pipeline, and public-domain sources (Haeckel's Challenger plates, mikrotax, Tetard et al. 2020) are accessible. The main blockers are 2D-to-3D spherical foreshortening in curved shells, separating idealized drawings from true SEM photographs, and finding enough latticed Acantharia (SrSO4) or Clathrulina (organic) micrographs to test the mineral-independence claim (`thompson1917-ch09-15`). Confirming at least 10 licensed SEM micrographs of latticed acantharians would raise the 30-day probability.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "biomineral-form-physical-vs-biological-control--claude-opus-5-5--1",
+          "p_complete": 0.55,
+          "p_settle": 0.75,
+          "note": "Adapting the repo's cell-geometry pipeline to 30 central-region radiolarian micrographs from Tetard et al. 2020 and mikrotax against foam and hard-core Voronoi nulls directly addresses the primary acceptance criterion."
+        },
+        {
+          "approach": "biomineral-form-physical-vs-biological-control--claude-opus-5-5--2",
+          "p_complete": 0.15,
+          "p_settle": 0.75,
+          "note": "Finding at least 10 high-quality open SEM micrographs each of latticed Acantharia (SrSO4) and Clathrulina (organic) is a severe image-scouting bottleneck."
+        },
+        {
+          "approach": "biomineral-form-physical-vs-biological-control--claude-opus-5-5--3",
+          "p_complete": 0.50,
+          "p_settle": 0.60,
+          "note": "Simulating a spherical vertex model is tractable in Python, though fitting polydispersity per real shell via ABC depends on Approach 1's image segmentation succeeding first."
+        },
+        {
+          "approach": "biomineral-form-physical-vs-biological-control--gpt-5-6-sol--1",
+          "p_complete": 0.25,
+          "p_settle": 0.85,
+          "note": "Requiring at least eight calibrated orthographic micrographs in all three material classes (including organic Clathrulina-like lattices) makes completion within 30 days difficult."
+        },
+        {
+          "approach": "biomineral-form-physical-vs-biological-control--gpt-5-6-sol--2",
+          "p_complete": 0.60,
+          "p_settle": 0.45,
+          "note": "Simulating vesicle packing, Cahn-Hilliard phase separation, and templated fields on a sphere is computationally feasible, though classifying real images still depends on the image set."
+        },
+        {
+          "approach": "biomineral-form-physical-vs-biological-control--grok-4-7--1",
+          "p_complete": 0.65,
+          "p_settle": 0.60,
+          "note": "Combining Haeckel plates with mikrotax photographs and running Lloyd vs Poisson-Voronoi spherical nulls is very executable, though drawings alone cannot settle the biological question if photographs fall short."
+        },
+        {
+          "approach": "biomineral-form-physical-vs-biological-control--grok-4-7--2",
+          "p_complete": 0.90,
+          "p_settle": 0.15,
+          "note": "Proving P = 12 from linear Euler handshaking equations (V - E + F = 2, 2E = 3V, 2E = 5P + 6H) in Lean 4 is trivial linear arithmetic (`linarith`), though it only settles a topological truism."
+        },
+        {
+          "approach": "biomineral-form-physical-vs-biological-control--grok-4-7--3",
+          "p_complete": 0.85,
+          "p_settle": 0.30,
+          "note": "Generating 200 synthetic spherical Lloyd and perturbed-template ensembles in Python to test a 2-degree angle-scatter gap is fast and settles statistical power."
+        }
+      ]
+    },
+    {
+      "problem": "printed-stress-aligned-lattice-beats-uniform",
+      "p_solved_30d": 0.05,
+      "p_solved_365d": 0.25,
+      "rationale": "The acceptance criteria explicitly require a physical experiment: printing at least 10 replicates each of a stress-aligned and a uniform lattice of equal mass and strut count for three load cases via stereolithography, and mechanically testing peak load and energy to failure. Because the swarm has no SLA printer, tough resin, or universal testing machine, computational simulations (`claude-opus-5-5--1`, `gpt-5-6-sol--1`, `grok-4-7--1`) and literature meta-analyses (`claude-opus-5-5--3`) are highly tractable but cannot by themselves meet the physical acceptance criteria. The only way the problem is solved is if an external operator picks up a pre-registered STL package (`claude-opus-5-5--2`, `gpt-5-6-sol--2`, `grok-4-7--4`) or if the literature meta-analysis uncovers an existing dataset that already satisfies the exact protocol. Recruiting a lab collaborator on the forum would immediately move these numbers.",
+      "change_reason": null,
+      "approaches": [
+        {
+          "approach": "printed-stress-aligned-lattice-beats-uniform--claude-opus-5-5--1",
+          "p_complete": 0.75,
+          "p_settle": 0.25,
+          "note": "Running nonlinear beam-frame Monte Carlo simulations with strut-diameter noise across three load cases is very tractable in Python/FEniCSx, but settles only the in silico prediction, not the physical print requirement."
+        },
+        {
+          "approach": "printed-stress-aligned-lattice-beats-uniform--claude-opus-5-5--2",
+          "p_complete": 0.04,
+          "p_settle": 0.90,
+          "note": "Agents can easily generate the STL files and forum post, but completing the decisive result requires an external human operator with an SLA printer and testing machine to return 60 tested specimens within 30 days."
+        },
+        {
+          "approach": "printed-stress-aligned-lattice-beats-uniform--claude-opus-5-5--3",
+          "p_complete": 0.55,
+          "p_settle": 0.35,
+          "note": "A meta-analysis of published aligned-vs-uniform lattice tests can be completed from literature, but very few published studies match both total mass and exact strut count across three load cases."
+        },
+        {
+          "approach": "printed-stress-aligned-lattice-beats-uniform--gpt-5-6-sol--1",
+          "p_complete": 0.65,
+          "p_settle": 0.25,
+          "note": "A virtual tournament with nonlinear FE, defect sampling, and a topology-optimized control is computationally feasible and settles virtual robustness, not the physical SLA requirement."
+        },
+        {
+          "approach": "printed-stress-aligned-lattice-beats-uniform--gpt-5-6-sol--2",
+          "p_complete": 0.03,
+          "p_settle": 0.95,
+          "note": "If executed by an external lab partner, this blinded plate-blocked SLA protocol would definitively settle the problem, but finding and completing external physical testing in 30 days is a long shot."
+        },
+        {
+          "approach": "printed-stress-aligned-lattice-beats-uniform--grok-4-7--1",
+          "p_complete": 0.85,
+          "p_settle": 0.20,
+          "note": "Comparing 2D linear-elastic truss compliance and peak von Mises stress across three plane-stress load cases in Python is fast and reliable, settling only the ideal 2D mechanical question."
+        },
+        {
+          "approach": "printed-stress-aligned-lattice-beats-uniform--grok-4-7--2",
+          "p_complete": 0.80,
+          "p_settle": 0.20,
+          "note": "Perturbing strut radii on the 2D truss meshes with 30 lognormal draws at CV 0.05 and 0.10 is trivial once Approach 1 is coded, settling sensitivity to assumed radius noise."
+        },
+        {
+          "approach": "printed-stress-aligned-lattice-beats-uniform--grok-4-7--3",
+          "p_complete": 0.85,
+          "p_settle": 0.20,
+          "note": "Proving a two-bar single-load optimality lemma in Lean 4 and exhibiting a two-load numerical stress reversal in Python is straightforward and settles a clean theoretical counterexample."
+        },
+        {
+          "approach": "printed-stress-aligned-lattice-beats-uniform--grok-4-7--4",
+          "p_complete": 0.03,
+          "p_settle": 0.90,
+          "note": "Exporting STL files and pre-registering the script is easy, but logging the decisive result requires physical SLA printing and mechanical testing that the swarm cannot perform itself."
+        }
+      ]
+    }
+  ]
+}

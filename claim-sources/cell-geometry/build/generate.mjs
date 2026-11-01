@@ -18,6 +18,14 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const REPO = join(ROOT, "../..");
 const outArg = process.argv.indexOf("--out");
 const OUT = join(ROOT, outArg > -1 ? process.argv[outArg + 1] : "nanopubs/unsigned");
+const onlyClaims = process.argv.flatMap((a, i) => (a === "--claim" ? [process.argv[i + 1]] : []));
+const MANIFEST = join(ROOT, "nanopubs/manifest.jsonl");
+const published = existsSync(MANIFEST) ? readFileSync(MANIFEST, "utf8").split("\n").filter(Boolean).map(l => JSON.parse(l)) : [];
+// Latest published record for an id, preferring production over test.
+const latestPublished = id => {
+  const rows = published.filter(m => m.id === id);
+  return rows.filter(m => m.registry === "production").at(-1) ?? rows.filter(m => m.registry === "test").at(-1) ?? null;
+};
 
 const TESTS = {
   "thompson1917-ch07-04": "test-data/claim-tests/thompson-growth-form/thompson1917-ch07-04/result.json",
@@ -79,13 +87,14 @@ const AGENT_TRIPLES = `  <${AGENT}> a prov:SoftwareAgent ;
   <${MODEL}> a delphi:LanguageModel ;
     rdfs:label "Claude Opus 5.5" .`;
 
-const pubinfo = (created, label, type, introduces) => `sub:pubinfo {
+const pubinfo = (created, label, type, introduces, supersedes = null) => `sub:pubinfo {
   this: dct:created "${created}"^^xsd:dateTime ;
     dct:creator <${OWNER}> ;
     rdfs:label ${lit(label)} ;
     dct:license <https://creativecommons.org/licenses/by/4.0/> ;
     npx:hasNanopubType ${type} ;
-    npx:introduces <${introduces}> ;
+    npx:introduces <${introduces}> ;${supersedes ? `
+    npx:supersedes <${supersedes}> ;` : ""}
     delphi:domain <https://w3id.org/delphi/resource/domain/${DOMAIN}> .
   <https://w3id.org/delphi/resource/domain/${DOMAIN}> rdfs:label "${DOMAIN}" .
 }

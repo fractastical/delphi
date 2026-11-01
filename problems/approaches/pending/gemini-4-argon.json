@@ -1,0 +1,217 @@
+{
+  "model": "gemini-4-argon",
+  "provider": "Google",
+  "generated": "2026-11-01T05:35:00.000Z",
+  "approaches": [
+    {
+      "problem": "trabecular-stress-alignment-wolffs-law",
+      "n": 1,
+      "title": "Cross-species micro-CT fabric vs homogeneous-FE principal stress against two nulls",
+      "kind": "data-test",
+      "method": "Pre-register a morphometric and finite-element test on 30 intact trabecular bone scans spanning three anatomical sites (proximal femur, lumbar vertebral body, calcaneus) across at least three mammalian species from MorphoSource. For each specimen, extract two distinct 5-mm cubical volumes of interest (VOIs) from the trabecular core and compute the second-rank mean-intercept-length (MIL) fabric tensor M and its principal eigenvectors using a standardized 3D stereological grid (following Harrigan and Mann 1984 and BoneJ conventions). Independently, build a continuum linear-elastic finite-element (FE) mesh of the whole bone outer cortex and cancellous volume with homogeneous isotropic modulus (so the stress trajectory computation does not smuggle in the internal trabecular anisotropy), and solve for the principal stress tensor sigma under two canonical physiological boundary conditions (habitual stance and peak locomotor joint reaction).\n\nFor each VOI, compute the acute angular error theta_1 between the dominant fabric eigenvector e_M1 and the dominant compressive stress eigenvector e_sigma1. Evaluate theta_1 against two explicit nulls on the exact same voxel grid: (1) a spatial-permutation null that preserves the local bone volume fraction (BV/TV) field while applying random SO(3) rotations to the local fabric tensors, and (2) an anatomical growth-axis null that aligns the predicted fabric strictly with the developmental long-axis of the bone shaft or growth-plate normal, independent of off-axis joint loads.",
+      "steps": [
+        "Select and lock 30 open micro-CT volumes on MorphoSource with voxel size at or below 40 micrometers across proximal femur, vertebral body, and calcaneus in human, primate, and ungulate taxa.",
+        "Segment trabecular bone via Otsu thresholding and compute the 3D MIL fabric tensor and degree of anisotropy in two core VOIs per bone.",
+        "Generate tetrahedral FE meshes of the whole-bone geometry with uniform isotropic modulus and apply standardized stance and peak joint-reaction boundary conditions.",
+        "Compute the voxel-weighted median angular deviation theta_1 between the principal fabric axis and principal compressive stress axis across all 60 VOIs, plus paired differences against the SO(3)-rotated null and the growth-axis null."
+      ],
+      "decisive_result": "Across the 30 specimens, a median fabric-to-stress angular error theta_1 <= 12 degrees that is both significantly smaller than the SO(3) permutation null (one-sided paired Wilcoxon p < 0.001) and beats the developmental growth-axis null by at least 8 degrees in off-axis loaded regions (femoral neck and calcaneal tuberosity) settles static stress alignment affirmatively.",
+      "failure_signature": "Median angular error exceeding 20 degrees, indistinguishability from the growth-axis null (paired difference < 3 degrees or p > 0.05), or sensitivity where switching between habitual and peak physiological load cases shifts the principal stress axes by more than 25 degrees without matching sub-populations of trabeculae.",
+      "tools": ["morpholib", "data-test"],
+      "datasets": [
+        {
+          "name": "MorphoSource 3D trabecular bone micro-CT media",
+          "url": "https://www.morphosource.org/api/media?q=femur&per_page=1",
+          "note": "High-resolution micro-CT scans of vertebrate femora, vertebrae, and calcanei used to extract MIL fabric tensors and outer cortical surfaces for FE meshing"
+        }
+      ],
+      "references": [
+        {
+          "doi": "10.1038/35015116",
+          "note": "Huiskes et al. 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone"
+        },
+        {
+          "doi": "10.1007/bf00540446",
+          "note": "Harrigan and Mann 1984, Characterization of microstructural anisotropy in orthotropic materials using a second rank tensor"
+        },
+        {
+          "doi": "10.1016/j.bone.2010.08.023",
+          "note": "Doube et al. 2010, BoneJ: Free and extensible bone image analysis in ImageJ"
+        },
+        {
+          "doi": "10.1098/rspb.2011.0069",
+          "note": "Doube et al. 2011, Trabecular bone scales allometrically in mammals and birds"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": "Subject-specific in vivo joint-reaction force measurements paired to the exact museum specimens scanned on MorphoSource; boundary conditions must use literature-derived canonical load angles."
+    },
+    {
+      "problem": "trabecular-stress-alignment-wolffs-law",
+      "n": 2,
+      "title": "Lean 4 proof of coaxiality at Cowin remodelling equilibrium and zero-shear lines",
+      "kind": "formalization",
+      "method": "Extend the existing Lean 4 proof of principal-stress orthogonality (`ThompsonLaws.Mechanics.principalDirections_orthogonal` in `claim-sources/thompson-growth-form/lean/ThompsonLaws/Mechanics.lean`) to formalize the mathematical core of Wolff's and Thompson's causal mechanism (`thompson1917-ch16-06`). In Cowin's (1986) continuum formulation of Wolff's law, cancellous bone is an orthotropic elastic medium whose stiffness tensor C(M) is a symmetric function of the second-rank fabric tensor M, and local remodelling evolves M according to dM/dt = alpha * (sigma - sigma_0(M)) or strain-energy density gradients until shear stresses in the fabric principal frame vanish.\n\nState and prove in Lean 4 (with no `sorry` and only standard axioms) two linked theorems in 2D and 3D symmetric tensor algebra: (1) for any orthotropic constitutive law where shear coupling vanishes in the eigenframe of M, zero shear stress in the fabric frame is equivalent to exact coaxiality (commutativity, M * sigma = sigma * M) of the fabric tensor M and Cauchy stress tensor sigma; and (2) under a linear shear-dissipation remodelling ODE on the orientation angle phi between the eigenframes of M and sigma, any oblique strut orientation (phi != 0, pi/2) experiences a non-zero restoring torque proportional to (lambda_1 - lambda_2) sin(2*phi) that makes coaxial alignment with distinct principal stresses asymptotically stable.",
+      "steps": [
+        "Define symmetric 2x2 and 3x3 fabric and stress tensors in `ThompsonLaws/Mechanics.lean` over `Mathlib` matrix and inner-product-space structures.",
+        "Prove the coaxiality equivalence lemma: off-diagonal (shear) components of sigma in the eigenbasis of M vanish if and only if M and sigma commute (`M * sigma = sigma * M`).",
+        "Formalize the angular remodelling law for an oblique trabecula subject to principal stresses `lam != mu` and prove that shear stress along the strut vanishes solely at `phi = 0` and `phi = pi / 2`, with strict Lyapunov decay of `sin^2(2*phi)` along trajectories.",
+        "Run `npm run claims:exec -- --kind lean` to verify compilation and link the theorem report to `thompson1917-ch16-05` and `thompson1917-ch16-06`."
+      ],
+      "decisive_result": "A machine-checked Lean 4 module compiling with zero `sorry` and standard axioms that proves (a) vanishing shear in the fabric frame iff `[M, sigma] = 0`, and (b) strict Lyapunov stability of the aligned orientation under shear-driven remodelling.",
+      "failure_signature": "Discovery of degenerate orthotropic parameter regimes where zero shear in the fabric frame permits non-coaxial equilibrium under distinct principal stresses, refuting the universality of the algebraic implication.",
+      "tools": ["lean4"],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1115/1.3138584",
+          "note": "Cowin 1986, Wolff's Law of Trabecular Architecture at Remodeling Equilibrium"
+        },
+        {
+          "doi": "10.1038/35015116",
+          "note": "Huiskes et al. 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "trabecular-stress-alignment-wolffs-law",
+      "n": 3,
+      "title": "Longitudinal re-orientation reanalysis in altered-load animal experiments",
+      "kind": "data-test",
+      "method": "Test the causal re-orientation prediction (`thompson1917-ch16-07`) by conducting a pre-registered quantitative reanalysis of published load-alteration experiments (such as Pontzer et al. 2006 in guineafowl knee flexion and Barak et al. 2011 in sheep calcaneal/tarsal loading, alongside longitudinal in vivo micro-CT studies modeled by Christen et al. 2014). Extract the reported or deposited fabric principal angle shifts delta_theta_M, bone volume fraction changes, and finite-element principal compressive stress shifts delta_theta_sigma between control (habitual posture) and experimentally inclined/altered loading groups.\n\nFit a hierarchical Bayesian linear model regressing the observed shift in principal trabecular orientation delta_theta_M on the imposed shift in principal stress orientation delta_theta_sigma across experimental cohorts. Test two competing hypotheses: (H1) causal Wolffian tracking, where the slope beta of delta_theta_M on delta_theta_sigma is near unity (0.7 <= beta <= 1.3) and the intercept is near zero; versus (H0) a lazy-zone or purely developmental baseline where trabecular thickness changes without angular re-orientation (beta < 0.2).",
+      "steps": [
+        "Compile specimen-level or group-level summary statistics (sample size, initial fabric angle, final fabric angle, imposed load-angle shift, standard deviations) from published altered-stance trabecular adaptation studies (Pontzer et al. 2006, Barak et al. 2011, Christen et al. 2014).",
+        "Compute the standardized directional tracking ratio beta = delta_theta_M / delta_theta_sigma and its 95% credible interval across all experimental groups.",
+        "Evaluate whether bone resorption and apposition preferentially remove oblique struts by comparing the angular dispersion (circular variance) before and after load alteration."
+      ],
+      "decisive_result": "A cross-study directional tracking slope beta whose 95% credible interval lies entirely above 0.5 (with posterior probability > 0.95 that trabecular principal axes rotate toward the new principal stress trajectory within the experimental window) confirms causal load-driven alignment.",
+      "failure_signature": "A tracking slope beta whose 95% credible interval includes 0 or lies below 0.2, or evidence that apparent re-orientation is entirely explained by bulk density apposition along pre-existing developmental tracts.",
+      "tools": ["data-test"],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1242/jeb.01971",
+          "note": "Pontzer et al. 2006, Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation"
+        },
+        {
+          "doi": "10.1016/j.bone.2011.08.020",
+          "note": "Barak et al. 2011, A Wolff in sheep's clothing: Trabecular bone adaptation in response to changes in joint loading orientation"
+        },
+        {
+          "doi": "10.1038/ncomms5855",
+          "note": "Christen et al. 2014, Bone remodelling in humans is load-driven but not lazy"
+        }
+      ],
+      "difficulty": "hard",
+      "missing": "Raw longitudinal in vivo micro-CT voxel time-series of individual animals before and after surgical or postural load alteration are rarely deposited in open repositories; without raw scans, the analysis is restricted to published summary tables."
+    },
+    {
+      "problem": "biocomposite-toughness-from-hierarchy",
+      "n": 1,
+      "title": "Leave-one-family-out meta-regression of toughness enhancement across 50 records",
+      "kind": "data-test",
+      "method": "Pre-register and execute a structured literature meta-analysis across 50 published experimental material property records spanning five mineralised biocomposite families: mollusc nacre, cortical bone, osteonal dentin, cervine antler, and hexactinellid/crustacean skeletal composites. From primary compilations (Jackson et al. 1988, Ashby et al. 1995, Barthelat et al. 2007, Launey and Ritchie 2009, Wegst et al. 2015, Barthelat et al. 2016), extract the measured fracture toughness K_Jc (at instability / J-integral initiation and steady-state crack-growth resistance), mineral volume fraction phi_m, mineral constituent toughness K_m, organic constituent work of fracture, characteristic mineral platelet/fibril thickness h_1, aspect ratio rho, and integer hierarchical level count N_levels (defined strictly by the number of distinct structural length scales exhibiting crack-bridging or shear-lag load transfer).\n\nDefine the dimensionless toughness-enhancement ratio A_K = K_Jc / K_Voigt, where K_Voigt is the constituent-only rule-of-mixtures baseline predicted from phi_m and constituent moduli/energies. Fit nested hierarchical regression models predicting log(A_K) from: (M0) constituent volume fraction and testing mode (K_Ic vs J-integral R-curve) only; (M1) M0 plus platelet aspect ratio rho and interface compliance; and (M2) M1 plus hierarchical level count N_levels. Evaluate models by leave-one-family-out cross-validated log predictive density (ELPD) and test whether the partial regression coefficient beta_N on N_levels is strictly positive.",
+      "steps": [
+        "Extract and provenance-lock 50 biocomposite records across nacre, cortical bone, dentin, antler, and enamel/sponge silica from published tables, recording exact fracture test method (SENB, CT, notched bending, initiation vs R-curve peak).",
+        "Compute the constituent-only baseline K_Voigt and dimensionless enhancement ratio A_K for each record.",
+        "Fit models M0, M1, and M2 with testing-method fixed effects and perform leave-one-family-out cross-validation across the 5 biocomposite families.",
+        "Test monotonicity of log(A_K) in N_levels (N = 1, 2, 3, 4) holding phi_m and test method constant."
+      ],
+      "decisive_result": "Architecture models (M1/M2) outperforming the constituent-only baseline M0 by delta_ELPD > 10 on held-out material families, with a positive partial slope beta_N > 0.35 log-units per hierarchical level (95% CI excluding zero), demonstrates that hierarchy compounds fracture toughness beyond constituent mixing.",
+      "failure_signature": "Leave-one-family-out predictive error of M1/M2 within 1 standard error of the constituent-only model M0, or a non-monotonic / zero slope on N_levels once mineral volume fraction phi_m and fracture test method (K_Ic vs R-curve) are controlled.",
+      "tools": ["data-test"],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1002/adma.200803322",
+          "note": "Launey and Ritchie 2009, On the fracture toughness of advanced materials"
+        },
+        {
+          "doi": "10.1038/nmat4089",
+          "note": "Wegst et al. 2015, Bioinspired structural materials"
+        },
+        {
+          "doi": "10.1038/natrevmats.2016.7",
+          "note": "Barthelat et al. 2016, Structure and mechanics of interfaces in biological materials"
+        },
+        {
+          "doi": "10.1098/rspb.1988.0056",
+          "note": "Jackson, Vincent and Turner 1988, The mechanical design of nacre"
+        },
+        {
+          "doi": "10.1016/j.jmps.2006.07.007",
+          "note": "Barthelat et al. 2007, On the mechanics of mother-of-pearl: a key feature in the material hierarchical structure"
+        },
+        {
+          "doi": "10.1098/rspa.1995.0075",
+          "note": "Ashby, Gibson, Wegst and Olive 1995, The mechanical properties of natural materials. I. Material property charts"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": "Standardized raw R-curve force-displacement files across all five material families; literature values mix small-specimen linear-elastic K_Ic with nonlinear J-integral toughness and require explicit method covariates."
+    },
+    {
+      "problem": "biocomposite-toughness-from-hierarchy",
+      "n": 2,
+      "title": "Lean 4 formalization of recursive tension-shear chain toughness compounding",
+      "kind": "formalization",
+      "method": "Formalize in Lean 4 the recursive hierarchical fracture mechanics model of Gao (2006) and Gao et al. (2003) for staggered mineral-organic biocomposites. At hierarchical level n, staggered hard inclusions of aspect ratio rho_n and volume fraction phi_n embedded in a compliant matrix transfer tensile load via shear (the tension-shear chain of Jäger-Fratzl and Gao). The effective modulus E_n and fracture energy G_n at level n act as the matrix/homogenized properties at level n+1.\n\nState and machine-check in Lean 4: (1) the Griffith flaw-tolerance theorem at scale level 1, proving that below a critical mineral platelet thickness h* = alpha * Gamma_m * E_m / sigma_th^2 the stress required for platelet fracture exceeds the theoretical strength sigma_th, ensuring failure by interfacial shear pull-out rather than brittle mineral cleavage; and (2) the recursive toughness-compounding theorem across N self-similar levels, proving that under interfacial pull-out at levels 1..N, the effective fracture energy G_N / G_0 grows exponentially in N when the per-level shear-lag energy dissipation factor lambda_n > 1, whereas stiffness E_N / E_0 decays by the product of shear-lag reduction factors.",
+      "steps": [
+        "Create a new module `ThompsonLaws/Biocomposites.lean` in `claim-sources/thompson-growth-form/lean/` importing `Mathlib`.",
+        "Define the tension-shear chain effective stiffness `E_eff(E_m, G_p, phi, rho)` and pull-out fracture energy `G_pullout(tau_y, phi, rho, h)` and prove the flaw-tolerance crossover inequality `h <= h* -> sigma_f >= sigma_th`.",
+        "Define the N-level recursive composition operator mapping `(E_{n-1}, G_{n-1})` to `(E_n, G_n)` and prove by induction on `N` the closed-form compounding bound for toughness enhancement `G_N / G_0` and the stiffness-toughness trade-off identity.",
+        "Verify with `lake build` that all theorems compile with zero `sorry` and standard axioms."
+      ],
+      "decisive_result": "A Lean 4 module compiling with no `sorry` that proves the exact parameter conditions (`h_n <= h*_n` and `rho_n * tau_n / sigma_n` bounds) under which N-level hierarchy strictly compounds fracture energy while bounding the unavoidable stiffness penalty.",
+      "failure_signature": "Proof reveals that imposing the self-consistency constraint (that level n+1 inclusions cannot sustain shear stress exceeding the homogenized tensile strength of level n) forces the per-level enhancement factor to saturate or decay as N grows without bound.",
+      "tools": ["lean4"],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1073/pnas.0631609100",
+          "note": "Gao et al. 2003, Materials become insensitive to flaws at nanoscale: Lessons from nature"
+        },
+        {
+          "doi": "10.1007/s10704-006-7156-4",
+          "note": "Gao 2006, Application of Fracture Mechanics Concepts to Hierarchical Biomechanics of Bone and Bone-like Materials"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "biocomposite-toughness-from-hierarchy",
+      "n": 3,
+      "title": "Multiscale shear-lag and cohesive-zone numerical sweep at fixed mineral fraction",
+      "kind": "simulation",
+      "method": "Isolate the pure effect of hierarchical architecture from constituent properties by running a deterministic multiscale cohesive-zone and shear-lag numerical sweep in Python. Fix the mineral constituent properties (hydroxyapatite/aragonite modulus E_m = 100 GPa, strength sigma_m = 1 GPa, fracture energy Gamma_m = 1 J/m^2), organic interface properties (shear yield tau_i = 40 MPa, critical slip delta_c = 100 nm), and total mineral volume fraction phi_total = 0.85. Construct synthetic material architectures with N = 1, 2, 3, and 4 hierarchical levels by partitioning phi_total across levels (phi_1 * phi_2 * ... * phi_N = 0.85) and sweeping platelet aspect ratios rho_k in [5, 100].\n\nFor each parameter tuple, solve the coupled nonlinear cohesive-zone crack-bridging and platelet pull-out traction-separation law from the nanoscale up to the macroscale to compute the steady-state R-curve toughness K_Jc(N, rho) without free fitting parameters. Compare the simulated K_Jc(N) curves against the 50-record empirical compilation from Approach 1 to test whether the parameter-free mechanical model reproduces the empirical jump from single-level ceramic composites to nacre (N=2) and bone/antler (N=3..4).",
+      "steps": [
+        "Implement the bottom-up cohesive traction-separation homogenizer in Python, computing effective bridging traction law T(delta) at level k from the pull-out and fracture competition at level k-1.",
+        "Run a full factorial parameter sweep over N in {1, 2, 3, 4}, total mineral fraction phi in [0.5, 0.95], and aspect ratios rho_k in [5, 100] (10,000 parameter combinations).",
+        "Overlay the parameter-free theoretical Pareto frontier in (Stiffness E, Toughness K_Jc) space onto the empirical Ashby-Wegst data for nacre, dentin, bone, and antler."
+      ],
+      "decisive_result": "At fixed total mineral fraction phi = 0.85, increasing hierarchy from N=1 to N=3 in the simulation increases K_Jc by at least a factor of 5 while predicting the empirical nacre and cortical bone toughness values within a factor of 1.5 without fitting parameters.",
+      "failure_signature": "At fixed total mineral volume fraction phi = 0.85, partitioning mineral across N >= 2 levels reduces or leaves unchanged the peak toughness relative to an optimized N = 1 brick-and-mortar composite because matrix dilution at higher levels triggers premature tensile rupture.",
+      "tools": ["computation", "simulation"],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1007/s10704-006-7156-4",
+          "note": "Gao 2006, Application of Fracture Mechanics Concepts to Hierarchical Biomechanics of Bone and Bone-like Materials"
+        },
+        {
+          "doi": "10.1038/natrevmats.2016.7",
+          "note": "Barthelat et al. 2016, Structure and mechanics of interfaces in biological materials"
+        },
+        {
+          "doi": "10.1080/14786430410001680935",
+          "note": "Wegst and Ashby 2004, The mechanical efficiency of natural materials"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    }
+  ]
+}
