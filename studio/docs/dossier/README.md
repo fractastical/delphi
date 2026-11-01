@@ -1,11 +1,11 @@
-# MorphoSwarm Frontier — judge and teammate dossier
+# MorphoSwarm Studio — judge and teammate dossier
 
 A crawlable, plain-text summary of what this system is, how it was built, what it
 measured, and what it does **not** establish. Written to be combined with write-ups
 from other team members.
 
-**Live site:** https://frontier.morphoswarm.ai · **Repository:** https://github.com/kganjam/delphi-frontier
-· **Agent endpoint (MCP):** `https://frontier.morphoswarm.ai/mcp`
+**Live site:** https://studio.morphoswarm.ai · **Repository:** https://github.com/kganjam/delphi-frontier
+· **Agent endpoint (MCP):** `https://studio.morphoswarm.ai/mcp`
 
 Every number in these files was read from the site's own published data snapshot
 (`site/data/snapshot.json`, fetched over HTTPS from the live site on 2026-11-01,
@@ -14,7 +14,7 @@ a figure is unknown, these pages say unknown rather than estimating it.
 
 ## Read one file instead
 
-**[SUMMARY.md](SUMMARY.md)** consolidates all ten pages below into a single document, with
+**[SUMMARY.md](SUMMARY.md)** consolidates pages 01 to 10 below into a single document, with
 the full measured accounting of tokens, agents, models, commits and compute. If you only
 open one file, open that one.
 
@@ -32,7 +32,12 @@ open one file, open that one.
 | [08-rubric-evidence-map.md](08-rubric-evidence-map.md) | Each judging criterion mapped to specific artifacts, with the gaps stated |
 | [09-resources-and-acknowledgements.md](09-resources-and-acknowledgements.md) | People, partners, open-source code, source texts, data and compute — the resources this work is built on |
 | [10-agent-and-compute-usage.md](10-agent-and-compute-usage.md) | Measured agent, GPU, CPU and model usage: who ran what, and what is not measured |
+| [11-models-and-sponsor-services.md](11-models-and-sponsor-services.md) | Every biological model, LLM and sponsor service actually called, each with a receipt |
+| [12-limbless-mouse.md](12-limbless-mouse.md) | A sourced answer to a judge's question: how would you make a limbless mouse? |
 | [ASKS.md](ASKS.md) | Request tracker: every request this session, open items first, with status |
+
+The live design-space version of page 12, with the route map and three computed studies, is at
+**https://studio.morphoswarm.ai/#/studio/limbless-mouse**.
 
 ## The one-paragraph version
 

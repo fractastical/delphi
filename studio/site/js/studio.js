@@ -161,7 +161,7 @@
     const p = fish(snap); const forms = snap.print_forms ? snap.print_forms.forms : []; const vids = (snap.simulation_manifests || []).filter((m) => m.video_state === "present_verified" && m.poster_href);
     const openQ = DF.questions(snap).filter((q) => q.state === "open").length; const withModel = Object.values(p.panels).filter((x) => x.models.length).length;
     return {
-      html: html`<section class="hero compact"><div><p class="eyebrow">MorphoSwarm Frontier</p><h1>Design together.<br>Know what's open.</h1></div>
+      html: html`<section class="hero compact"><div><p class="eyebrow">MorphoSwarm Studio</p><h1>Design together.<br>Know what's open.</h1></div>
         <div class="herotext"><p class="lede">Two ways in, one body of evidence. <b>Studio</b> is where a design goal is worked across scales, with the models, media and gaps in one place. <b>Frontier</b> is the shared list of open questions and who is working on them. Both read the same claims and evidence, kept in the Delphi foundation: what we know, what's next, who's working on it.</p><p class="small herowatch"><a href="${DF.href("/demo")}">Watch the demo</a></p></div></section>
       ${groundingSection(snap)}
       <p class="small aboutlink"><a href="${DF.href("/about")}">About this project</a> · <a href="${DF.href("/generative")}">Generative biology: from mechanistic simulation to equation-conditioned models</a></p>
@@ -179,6 +179,7 @@
           <p class="facts-line"><b id="homeq">${openQ}</b> curated questions in the snapshot <span class="faint small">(live count appears when the node is reachable)</span></p>
           <p><a class="btn" href="${DF.href("/frontier")}">Open the Frontier</a> <a class="btn ghost" href="${DF.href("/knowledge")}">Claims and evidence</a></p></article></section>
       <section class="panel crosslinks"><h2>How they connect</h2><ul><li>Every open question names the scales it touches; from a question you can jump to that subsystem in the studio.</li><li>Every subsystem lists the open questions at its scale and links to them on the Frontier.</li><li>Claims, evidence and artifacts live once, in the Delphi foundation, and both paths link to the same entity pages.</li></ul>
+        ${DF.limbless && snap.limbless ? html`<p class="small"><b>Design space:</b> <a href="${DF.href("/studio/limbless-mouse")}">${snap.limbless.title}</a> — ${(snap.limbless.counts || {}).routes || 0} sourced routes to one stated outcome, across ${(snap.limbless.scales || []).length} scales, with the models that bear on them. Written in answer to a question put to us: could you make one?</p>` : ""}
         <p class="small faint">Projects other than Flying fish are added as Project records; none is invented here.</p></section>`,
       async after(root) {
         DF.mountFishMini(root.querySelector("#fishmini"), snap);
@@ -209,6 +210,7 @@
       html: html`<section class="pagehead"><h1>Studio</h1><p class="lede">Design projects, each broken into subsystems by scale. ${snap.projects.note}</p></section>
         <section class="panel goalpanel">${goalForm(goal)}</section><div id="goalout"></div>
         <section class="panel"><h2 class="sr">Projects</h2>${snap.projects.projects.filter((p) => !p.template).map((p) => html`<article class="card pform"><h3>${p.title} ${p.featured ? U.pill("featured", "gen") : ""} ${U.pill(p.status, "st-unk")}</h3><p><b>Goal.</b> ${p.goal}</p><p class="small">${p.summary}</p><p><a class="btn" href="${DF.href("/studio/" + p.id)}">Open studio</a></p></article>`)}
+        ${DF.limbless && snap.limbless ? html`<h2 class="small">Design spaces</h2><p class="small faint">A design space is not a design: it maps the routes to a stated outcome across scales, each with its own evidence level, and runs the models we can run. Nothing in one has been attempted here.</p>${DF.limbless.card(snap)}` : ""}
         ${reuseList(snap)}<p class="note small">${snap.projects.other_projects_note}</p><p class="small faint">Starting a new project needs a Project record and a credentialed submission route; this page does not create one.</p></section>`,
       async after(root) {
         DF.bindForm(root, "goal", (v) => DF.href("/studio", { goal: v.goal }));
@@ -286,6 +288,9 @@
 
   function projectStudio(snap, route, id) {
     const p = snap.projects.projects.find((x) => x.id === id);
+    /* Design spaces are not entries in projects.json: that file's digest is pinned by the reuse studies' publication receipt, so adding a
+     * row there would silently un-stamp two stored Projects. They carry their own content block instead and are routed by id here. */
+    if (id === "limbless-mouse" && DF.limbless && snap.limbless) return DF.limbless.page(snap, route);
     if (p && p.template === "reuse-study") return reuseStudy(snap, p);
     if (!p) return { html: html`<section class="pagehead"><h1>No such project</h1><p class="lede">There is no project “${id}” in this snapshot. <a href="${DF.href("/studio")}">See the projects</a>.</p></section>` };
     const m = snap.mission; const scale = route.params.scale && p.panels[route.params.scale] ? route.params.scale : "organism"; const pan = p.panels[scale]; const sc = m.scales.find((s) => s.key === scale);

@@ -1,0 +1,215 @@
+[
+  {
+    "id": "mol-zrs-ortholog-swap",
+    "scale": "molecular",
+    "title": "Replace the mouse ZRS with a snake ortholog (king cobra or Burmese python)",
+    "mechanism": "The ZRS is a limb-specific enhancer of Shh sitting ~1 Mb from the Shh promoter inside Lmbr1 intron 5, and it is the sole driver of Shh expression in the posterior limb bud mesenchyme. Snake ZRS orthologs have accumulated substitutions that destroy the transcription-factor binding sites the enhancer needs, so an otherwise wild-type mouse carrying a snake ZRS makes no limb-bud Shh. Every protein in the genome is left intact; only 1.3 kb of non-coding DNA changes.",
+    "intervention": "CRISPR/Cas9 homology-directed replacement of the functionally critical 1.3 kb ZRS core with the same-length orthologous sequence from king cobra (Ophiophagus hannah) or Burmese python (Python bivittatus). Kvon et al. did exactly this in FVB mice with a matched-littermate design.",
+    "predicted_phenotype": "Severe TRUNCATION of both fore- and hindlimbs, not amelia. The cobra knock-in gives complete loss of limb-bud Shh and a phenotype indistinguishable from deleting the enhancer outright; the proximal skeleton is present. The python knock-in is slightly milder: most elements distal to the stylopod:zeugopod junction are severely affected, but 2-3 rudimentary digits form in the forelimb and a slightly enlarged ossification resembling a rudimentary zeugopod appears, attributed to very weak residual Shh transcript detectable only after prolonged in-situ development.",
+    "evidence": [
+      {
+        "pmid": "27768887",
+        "cite": "Kvon EZ et al. 2016, Cell 167:633-642.e11, 'Progressive Loss of Function in a Limb Enhancer during Snake Evolution'",
+        "doi": "10.1016/j.cell.2016.09.028",
+        "finding": "Replacing the mouse ZRS with the cobra ortholog 'resulted in a complete loss of [Shh] expression and a truncated limb phenotype, affecting both the fore- and hindlimbs, that is indistinguishable from the phenotype caused by deletion of the mouse enhancer'. The python ortholog gave 'a similar but a slightly milder phenotype ... 2-3 rudimentary digits in the forelimb'. Human and coelacanth orthologs rescued fully developed limbs.",
+        "read_level": "full-text"
+      }
+    ],
+    "evidence_strength": "direct_mouse_phenotype",
+    "reversibility": "Not reversible in the animal: this is a germline sequence change fixed at the zygote. It IS reversible at the design stage - reintroducing 17 bp restores normal limbs (see mol-zrs-e1-ets-site), which makes the allele series itself a dose knob rather than a switch.",
+    "lethality_risk": "Low. ZRS-null mice are alive and of comparable body size at two weeks of age; Kvon et al. photographed them. Mouse ZRS reporter assays show no reproducible activity outside the limb and ZRS deletion studies report no phenotypes beyond limb defects, so there is no known non-limb organ requirement.",
+    "specificity": "Limb only, both pairs, posterior-distal. It removes the autopod and zeugopod and spares the stylopod and girdle. It does not touch lung, kidney, allantois, neural tube or craniofacial structures.",
+    "difficulty": "low-to-medium. The exact sgRNA, donor design, homology arms and genotyping primers are published; the line already exists in at least one lab. Cost is a standard CRISPR knock-in campaign plus a mouse colony.",
+    "what_we_would_run": "Score the published ortholog series with a genome language model (we have an Evo 2 7B pipeline that has produced one real paired result on zebrafish regulatory windows) and ask whether the model's ranking reproduces the measured ranking: human ~ coelacanth (normal) > python (weak residual) > cobra (none). Pre-register the prediction. Controls: dinucleotide shuffles and GC-matched random windows, as in the run we already did.\n\nSTUDY: The study `zrs-conservation` IS this route's assay: it is the ZRS ortholog panel, and the measured knock-in ranking (human ~ coelacanth normal > python weak residual > cobra none) is the answer key any score would be checked against.",
+    "open_questions": [
+      "Does a sequence model separate cobra from coelacanth, given that coelacanth shares LESS sequence identity with human ZRS (57%) than python does (59%) yet behaves like wild type? This is the single sharpest test in the dataset and it is an explicit identity-versus-function dissociation.",
+      "Boa ZRS retained ZPA reporter activity but was never taken to knock-in, so the 'ordered series' is four knock-in phenotypes plus reporter data, not a uniform assay."
+    ],
+    "study": "zrs-conservation"
+  },
+  {
+    "id": "mol-zrs-deletion",
+    "scale": "molecular",
+    "title": "Delete the ZRS outright",
+    "mechanism": "Removing the enhancer removes the only known driver of limb-bud Shh. Shh protein is still made everywhere else it is normally made (notochord, floor plate, gut), so the animal has no midline, neural-tube or axial defect. This is the cleanest available dissociation between 'Shh the gene' and 'Shh in the limb'.",
+    "intervention": "CRISPR/Cas9 deletion of the 1,324 bp ZRS (mm10 chr5:29,314,497-29,315,820), or the earlier targeted deletion of the conserved intronic module. Both alleles exist.",
+    "predicted_phenotype": "Truncation of both limbs with a surviving proximal skeleton. At E18.5 the forelimb humerus, radius and ulna appear fused and no recognisable autopod is present; the hindlimb zeugopod is severely reduced and the autopod is represented by a single rudimentary digit. Animals survive to at least two weeks with body size comparable to wild type.",
+    "evidence": [
+      {
+        "pmid": "27768887",
+        "cite": "Kvon EZ et al. 2016, Cell 167:633-642.e11",
+        "doi": "10.1016/j.cell.2016.09.028",
+        "finding": "Figure S3E-F: 'Gross phenotypes of two week old ZRS(+/+) (top) and ZRS(-/-) (bottom) mice. The body sizes are comparable, but ZRS(-/-) mice have truncated limbs.' Skeletal detail as described above.",
+        "read_level": "full-text"
+      },
+      {
+        "pmid": "15677727",
+        "cite": "Sagai T et al. 2005, Development 132:797-803, 'Elimination of a long-range cis-regulatory module causes complete loss of limb-specific Shh expression and truncation of the mouse limb'",
+        "doi": "10.1242/dev.01613",
+        "finding": "Targeted deletion of the conserved intronic sequence gives 'a complete loss of Shh expression in the limb bud and degeneration of skeletal elements distal to the stylopod/zygopod junction'.",
+        "read_level": "abstract"
+      }
+    ],
+    "evidence_strength": "direct_mouse_phenotype",
+    "reversibility": "None in the animal. Germline, constitutive.",
+    "lethality_risk": "Low; this is the only route in the whole design space with a published photograph of a limb-reduced mouse alive at two weeks and of normal body size.",
+    "specificity": "Limb only, both pairs. Spares girdle and stylopod.",
+    "difficulty": "low. Two independent alleles published, one of them CRISPR-made specifically to exclude neo-cassette and background effects.",
+    "what_we_would_run": "Nothing new computationally - this is the reference phenotype everything else is scored against, and it is the anchor for the honest claim that 'limbless mouse' in the ZRS literature means limb-REDUCED and viable, not amelia.\n\nSTUDY: `zrs-conservation` bears on this route as its anchor: the ZRS-null is the wild-type-to-null endpoint the ortholog series is read against, and it is the reference phenotype for the whole molecular scale.",
+    "open_questions": [
+      "Welfare: a viable animal with truncated limbs is the ethically harder case precisely because it lives. See the welfare section.",
+      "No published long-term (adult, >2 week) husbandry or behavioural data was found in our search."
+    ],
+    "study": "zrs-conservation"
+  },
+  {
+    "id": "mol-zrs-e1-ets-site",
+    "scale": "molecular",
+    "title": "Edit the single E1 ETS binding site - a 17 bp switch",
+    "mechanism": "A 17 bp deletion overlapping the E1 ETS1 recognition motif is the only sequence present in all examined limbed vertebrates and fish and absent from all examined snakes. Reintroducing those 17 bp into an otherwise-python ZRS restores full enhancer activity in the posterior limb-bud mesenchyme and rescues normal limb development in the mouse. Conversely the site is the smallest known handle on the whole system.",
+    "intervention": "CRISPR knock-in of a 1,341 bp synthetic 'resurrected python' allele (python ZRS plus the 17 bp lizard sequence) in place of the mouse ZRS; or the reciprocal, removing the 17 bp from an otherwise wild-type mouse ZRS.",
+    "predicted_phenotype": "Reintroduction direction: NORMAL limbs. Removal direction: Kvon et al. state that loss of the E1 motif in the mouse ZRS alone is NOT sufficient to alter limb-bud expression, and boa ZRS is active despite lacking both E0 and E1, so deleting E1 in mouse is predicted to give normal or near-normal limbs. Do not state that removing 17 bp from a mouse removes its limbs; the literature says the opposite.",
+    "evidence": [
+      {
+        "pmid": "27768887",
+        "cite": "Kvon EZ et al. 2016, Cell 167:633-642.e11",
+        "doi": "10.1016/j.cell.2016.09.028",
+        "finding": "'reintroduction of 17 bp of sequence alone was sufficient to reinstate full enhancer activity' and knock-in mice with the modified python allele 'had normal limbs'. Separately: 'the loss of E1 motif in mouse ZRS is not sufficient to alter limb bud expression' and boa ZRS is active despite lacking E0 and E1, so 'loss of these motifs alone cannot explain ZRS deactivation in snake lineage'.",
+        "read_level": "full-text"
+      }
+    ],
+    "evidence_strength": "direct_mouse_phenotype",
+    "reversibility": "This is the one asymmetric, directional result in the design space: the 17 bp is sufficient to RESTORE function on a degraded background but not sufficient to DESTROY function on a healthy one. Context-dependence of this kind is exactly what a per-nucleotide additive sequence model will get wrong.",
+    "lethality_risk": "None beyond the background allele.",
+    "specificity": "Limb only.",
+    "difficulty": "low. Published allele, published sequence.",
+    "what_we_would_run": "Ask a genome language model for the effect of the 17 bp indel in BOTH directions and on BOTH backgrounds (mouse ZRS minus 17 bp; python ZRS plus 17 bp). A model that reports a symmetric effect has failed a test with a known answer. This is a cheap, pre-registerable, falsifiable experiment, and the published asymmetry means we know the right answer before scoring.\n\nSTUDY: `zrs-conservation` bears on this route directly, and this is the sharpest test in it: the 17 bp E1 indel has a published ASYMMETRIC effect, so a model scored on that panel has a known-in-advance right answer to fail.",
+    "open_questions": [
+      "Kvon et al. explicitly say ETS-site loss alone cannot explain snake ZRS deactivation and point at homeodomain motifs with a similar snake-specific substitution increase. So E1 is necessary-in-context, not the mechanism."
+    ],
+    "study": "zrs-conservation"
+  },
+  {
+    "id": "mol-zrs-designed-hypomorph",
+    "scale": "molecular",
+    "title": "Design a graded ZRS hypomorphic allelic series from the in-vivo variant panel",
+    "mechanism": "Nearly a thousand human ZRS variants have been assayed in vivo in a high-throughput mouse reporter, and selected variants were confirmed in knock-in mice. That panel is a measured sequence-to-activity map over the exact element that sets limb-bud Shh. In principle one can pick combinations that place enhancer activity at a chosen point between wild type and null and so dial the degree of limb reduction.",
+    "intervention": "Select variant combinations from the published panel, knock them in, and read out skeletal phenotype at E18.5.",
+    "predicted_phenotype": "Unknown and the honest answer is that the published panel points the WRONG WAY for this purpose. Kvon et al. 2020 assayed an enhancer 'repeatedly linked to polydactyly' and the knock-in confirmations were of variants that CAUSE polydactyly - a gain of ectopic anterior activity, i.e. extra digits, not fewer. A graded loss-of-function series would have to be designed and tested; it does not exist in that dataset.",
+    "evidence": [
+      {
+        "pmid": "32169219",
+        "cite": "Kvon EZ et al. 2020, Cell 180:1262-1271.e15, 'Comprehensive In Vivo Interrogation Reveals Phenotypic Impact of Human Enhancer Variants'",
+        "doi": "10.1016/j.cell.2020.02.031",
+        "finding": "'71% of all rare non-coding variants previously proposed as causal lead to reporter gene expression in a pattern consistent with their pathogenic role. Variants observed to alter enhancer activity were further confirmed to cause polydactyly in knockin mice.' Combinatorial and single-nucleotide mutagenesis covered all positions of the enhancer.",
+        "read_level": "abstract"
+      },
+      {
+        "pmid": "17152067",
+        "cite": "Gurnett CA et al. 2007, Am J Med Genet A 143A:27-32, 'Two novel point mutations in the long-range SHH enhancer in three families with triphalangeal thumb and preaxial polydactyly'",
+        "doi": "10.1002/ajmg.a.31563",
+        "finding": "Point mutations within the ZRS (bp 621, bp 739 of a 774 bp conserved core in LMBR1 intron 5) segregate with triphalangeal thumb and preaxial polydactyly; both alter putative Cdx binding sites. A 5'-end mutation was associated with a milder phenotype and 82% penetrance.",
+        "read_level": "abstract"
+      }
+    ],
+    "evidence_strength": "cis_regulatory_inference",
+    "reversibility": "None in the animal.",
+    "lethality_risk": "Low, by analogy with the deletion.",
+    "specificity": "Limb only.",
+    "difficulty": "high, because the loss-of-function side of the map is not the side that was measured. Building it means a new in-vivo panel.",
+    "what_we_would_run": "Score the Kvon 2020 panel and report rank correlation against the published in-vivo calls - but label it for what it is: a benchmark on the POLYDACTYLY (gain) direction, used as a proxy for whether the model has any grip on this element at all. Reporting it as a limb-loss benchmark would be a category error.\n\nSTUDY: `zrs-conservation` bears on this route, but only on its gain-of-function half - the panel it would be scored against was assayed for polydactyly, not limb reduction, and that has to be stated wherever the number is reported.",
+    "open_questions": [
+      "Is a model that ranks gain-of-function ZRS variants well also good at loss-of-function ZRS variants? Nothing in the literature we read answers this, and assuming transfer is exactly the kind of assumption that has failed before."
+    ],
+    "study": "zrs-conservation"
+  },
+  {
+    "id": "mol-shh-zrs-ctcf-contact",
+    "scale": "molecular",
+    "title": "Break the CTCF-mediated contact between the ZRS and the SHH promoter",
+    "mechanism": "The ZRS acts across ~1 Mb, and that action depends on physical contact. Three CTCF sites inside a 12 kb interval of LMBR1 mediate the ZRS-to-SHH-promoter interaction. Homozygous deletion of that interval in humans causes acheiropodia, congenital limb truncation, and the interval does not itself function as an enhancer - the lesion is architectural, not transcriptional.",
+    "intervention": "Delete or mutate the CTCF sites that anchor the ZRS-promoter loop, leaving the enhancer sequence intact.",
+    "predicted_phenotype": "In humans: acheiropodia - congenital truncation of hands and feet. In mouse: NO APPARENT ABNORMALITY. This route is the design space's clearest documented failure of species transfer.",
+    "evidence": [
+      {
+        "pmid": "33863876",
+        "cite": "Ushiki A et al. 2021, Nat Commun 12:2282, 'Deletion of CTCF sites in the SHH locus alters enhancer-promoter interactions and leads to acheiropodia'",
+        "doi": "10.1038/s41467-021-22470-z",
+        "finding": "Fine-mapped the acheiropodia region to 12 kb; it does not function as an enhancer. Three CTCF sites mediate the ZRS-SHH promoter interaction, substituted by centromeric sites in disease. 'Mouse knockouts of the orthologous 12 kb sequence have no apparent abnormalities, showcasing the challenges in modelling CTCF alterations in animal models due to inherent motif differences between species.'",
+        "read_level": "abstract"
+      }
+    ],
+    "evidence_strength": "direct_other_species",
+    "reversibility": "None in the animal.",
+    "lethality_risk": "Not applicable in mouse (no phenotype). In humans acheiropodia is compatible with life.",
+    "specificity": "Would be limb-restricted if it worked, because the contact being broken is the limb enhancer's.",
+    "difficulty": "high, and currently unsolved: nobody has engineered a mouse allele that reproduces the human architectural lesion. It would require re-deriving the CTCF motif arrangement for the mouse locus rather than copying the human deletion.",
+    "what_we_would_run": "Encode this as an explicit REFUSAL in our cross-scale coupling layer: a human-to-mouse transfer of a CTCF-motif-dependent claim is not composable, and the layer should say so with the Ushiki result as the stated reason rather than emitting a score. This is a one-record change and it is the kind of thing the layer exists for. No study on this page bears on this route; naming one would stretch the link past what it supports.",
+    "open_questions": [
+      "Which mouse CTCF sites would have to be removed to phenocopy acheiropodia? Nobody has published an answer.",
+      "Would a sequence model trained on human data flag the mouse orthologous deletion as benign? If it does, that is the correct answer and worth demonstrating."
+    ],
+    "study": null
+  },
+  {
+    "id": "mol-tad-boundary",
+    "scale": "molecular",
+    "title": "Move a TAD boundary so the limb enhancer cluster drives the wrong gene",
+    "mechanism": "Limb enhancers are confined to a topologically associating domain by CTCF-associated boundaries. Deletions, inversions and duplications that disrupt those boundaries let a cluster of limb enhancers contact a promoter it should never reach, producing ectopic limb expression of the wrong gene. The rewiring occurs only when the variant disrupts a CTCF-associated boundary - the structural change, not the sequence content, is the lesion.",
+    "intervention": "CRISPR engineering of deletions, inversions or duplications at a TAD boundary, modelled on the human WNT6/IHH/EPHA4/PAX3 rearrangements, which were reproduced as mouse alleles.",
+    "predicted_phenotype": "Limb MALFORMATION of a type set by which gene is misexpressed (the published human conditions at this locus are brachydactyly, polydactyly and syndactyly) - not limb loss. This route is in the design space because it is the general architectural mechanism and because it is mouse-validated, not because it has been shown to remove a limb.",
+    "evidence": [
+      {
+        "pmid": "25959774",
+        "cite": "Lupianez DG et al. 2015, Cell 161:1012-1025, 'Disruptions of topological chromatin domains cause pathogenic rewiring of gene-enhancer interactions'",
+        "doi": "10.1016/j.cell.2015.04.004",
+        "finding": "Distinct human limb malformations are caused by deletions, inversions or duplications altering the TAD-spanning WNT6/IHH/EPHA4/PAX3 locus; CRISPR mice with corresponding rearrangements showed ectopic promoter-noncoding contacts and ectopic limb expression. 'This rewiring occurred only if the variant disrupted a CTCF-associated boundary domain.'",
+        "read_level": "abstract"
+      }
+    ],
+    "evidence_strength": "direct_mouse_phenotype",
+    "reversibility": "None in the animal.",
+    "lethality_risk": "Locus-dependent; the published alleles are viable.",
+    "specificity": "Depends entirely on which domain is broken. A boundary move is a blunt instrument: it changes everything in the domain, not one enhancer-promoter pair.",
+    "difficulty": "high. Large structural variants are harder to make and harder to genotype than a 1.3 kb replacement, and the outcome is not predictable from sequence alone.",
+    "what_we_would_run": "Nothing yet. A sequence model that scores 1 kb windows has no representation of a megabase-scale boundary, so this route is a good argument for why 'score the enhancer' is not the same as 'predict the phenotype', and it belongs on the page as that argument. No study on this page bears on this route; naming one would stretch the link past what it supports.",
+    "open_questions": [
+      "Can any current sequence model predict the direction of a boundary-disruption phenotype? We found no evidence that one can, and our search did not cover the chromatin-model literature."
+    ],
+    "study": null
+  },
+  {
+    "id": "mol-pitx1-hindlimb-enhancer",
+    "scale": "molecular",
+    "title": "Delete the Pitx1 hindlimb enhancer - nature's own cis-regulatory limb removal",
+    "mechanism": "In threespine stickleback, pelvic (hindlimb-homologue) loss has evolved repeatedly through deletion of a tissue-specific enhancer of Pitx1. Pitx1 null alleles are lethal in laboratory animals; the enhancer deletion is not, and it carries molecular signatures of positive selection. This is the proof of principle that evolution solves 'remove an appendage without killing the animal' by cis-regulation, not by knockout.",
+    "intervention": "Identify and delete the mouse orthologous hindlimb-specific Pitx1 enhancer. The stickleback element is characterised; the mouse equivalent would have to be mapped, which is work, not a copy.",
+    "predicted_phenotype": "In stickleback: pelvic reduction/loss, viable, naturally selected. In mouse: UNKNOWN and not to be asserted. The best-supported expectation is a hindlimb-restricted phenotype milder than the Pitx1 null (which gives hindlimb hypoplasia, not absence), but we found no published mouse Pitx1 limb-enhancer deletion.",
+    "evidence": [
+      {
+        "pmid": "20007865",
+        "cite": "Chan YF et al. 2010, Science 327:302-5, 'Adaptive evolution of pelvic reduction in sticklebacks by recurrent deletion of a Pitx1 enhancer'",
+        "doi": "10.1126/science.1182213",
+        "finding": "Pelvic loss in different natural stickleback populations occurred through regulatory mutations deleting a tissue-specific Pitx1 enhancer. 'Although Pitx1 null mutations are lethal in laboratory animals, Pitx1 regulatory mutations show molecular signatures of positive selection in pelvic-reduced populations.' Deletion is recurrent, possibly from structural features of the locus.",
+        "read_level": "abstract"
+      },
+      {
+        "pmid": "10101115",
+        "cite": "Lanctot C et al. 1999, Development 126:1805-10, 'Hindlimb patterning and mandible development require the Ptx1 gene'",
+        "doi": "10.1242/dev.126.9.1805",
+        "finding": "Mouse Pitx1 (Ptx1) null: hindlimb development severely impaired but not abolished - ilium and knee cartilage absent, long bones underdeveloped, Tbx4 expression decreased; also loss of proximal mandibular bones. Limb-bud molecular identity is retained.",
+        "read_level": "abstract"
+      }
+    ],
+    "evidence_strength": "direct_other_species",
+    "reversibility": "None in the animal.",
+    "specificity": "Hindlimb only, if the mouse element behaves like the stickleback one. Note the mouse Pitx1 null ALSO loses proximal mandibular bone, so the gene is not hindlimb-exclusive even if the enhancer is.",
+    "lethality_risk": "Low for an enhancer deletion by the stickleback precedent; high for the null in laboratory animals per Chan et al.",
+    "difficulty": "high, because the mouse enhancer has to be found first and the Ushiki result (above) is a standing warning that a cis-element's behaviour does not transfer between species.",
+    "what_we_would_run": "This is the single best test case for a sequence model doing something useful rather than reproducing a known answer: use the model to nominate candidate hindlimb-specific Pitx1 enhancers in mouse, then check the nominations against published limb-bud ATAC/ChIP data. That is a retrieval task with an external answer key, not a self-graded one. No study on this page bears on this route; naming one would stretch the link past what it supports.",
+    "open_questions": [
+      "Is there a single mouse Pitx1 hindlimb enhancer, or distributed redundancy? Enhancer redundancy is the standard reason a cis-deletion gives no phenotype, and we did not search the Pitx1 regulatory-landscape literature."
+    ],
+    "study": null
+  }
+]
