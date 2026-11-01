@@ -169,10 +169,29 @@
       "job_id": "aijob-e00rhs6hdan4n57kv8",
       "task": "Four-model inverse NCA comparison",
       "owner": "infra_director + mechanobio_sim",
-      "provider_state": "RUNNING",
+      "provider_state": "COMPLETED",
       "protocol": "artifacts/nca-pattern/packet/owner-manifest.json",
       "source_sha256": "27bba4e0f1a5dba9f869b05ff87ce20a0421921dea94d5137060e668eaa25262",
-      "scope": "4models x2000steps,52heldouts declared; no result yet, no biological/genetic implementation claim"
+      "scope": "4 models x2000steps and52 evaluation runs completed;0/48 design predicates,4/4 absorbing negatives. Original metadata parse failure retained; exact outer/part archives recovered without rerun.",
+      "completion_receipt": "results/resources/nca-completion.json"
+    },
+    {
+      "job_id": "aijob-e00jmvgx169vje8ywk",
+      "task": "Seed-placement NCA controlled comparison",
+      "owner": "infra_director",
+      "provider_state": "admitted; live provider receipt in resource snapshot",
+      "protocol": "artifacts/nca-seed-placement/packet/owner-manifest.json",
+      "controller_manifest": "results/infra/nca-seed/manifest-infra28.json",
+      "scope": "No biological validation. Controls and negative outcomes retained."
+    },
+    {
+      "job_id": "aijob-e00dydgq6ps3hkzjfv",
+      "task": "H100 cylinder controls and calibration only",
+      "owner": "infra_director",
+      "provider_state": "admitted; live provider receipt in resource snapshot",
+      "protocol": "artifacts/cfd-h100-calibration/protocol.json",
+      "controller_manifest": "results/infra/cfd-h100-calibration/manifest-infra29.json",
+      "scope": "No biological validation. Controls and negative outcomes retained."
     }
   ],
   "preparation": [
@@ -336,14 +355,14 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-11-01T01:44:56.284787+00:00",
+  "updated_at_utc": "2026-11-01T02:09:32.268968+00:00",
   "planning_horizon_utc": [
     "2026-10-31T23:28:04.655084+00:00",
     "2026-11-01T23:28:04.655084+00:00"
   ],
   "gcp": {
     "project": "scienceclaw26bos-3016",
-    "observed_at_utc": "2026-11-01T01:44:56.284787+00:00",
+    "observed_at_utc": "2026-11-01T02:09:32.268968+00:00",
     "global_cpu_limit": 32,
     "gpu_quota_granted": 1,
     "gpu_vm_created": true,
@@ -384,28 +403,15 @@
           }
         ],
         "id": "4266786588371661074",
-        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/machineTypes/g2-standard-4",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/machineTypes/g2-standard-8",
         "name": "frontier-gpu-20261031-01",
         "status": "TERMINATED",
         "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
-      },
-      {
-        "guestAccelerators": [
-          {
-            "acceleratorCount": 1,
-            "acceleratorType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a/acceleratorTypes/nvidia-l4"
-          }
-        ],
-        "id": "4290327145207244677",
-        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a/machineTypes/g2-standard-4",
-        "name": "frontier-gpu-20261031-02",
-        "status": "STOPPING",
-        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a"
       }
     ],
     "active_allocated_vcpus": 16,
     "instantaneous_cpu_utilization": null,
-    "state": "Only VM03 remains running scientific CPU cases. Ecology completed its two missing pairs and VM04 stopped. L4 retry and two alternate-zone admissions returned explicit capacity stockouts; no overnight R2 case started.",
+    "state": "Only VM03 runs the controlled cylinder CPU cases. Ecology original26 plus missing-only2 completed and VM04 stopped. Five later L4 capacity attempts failed, including provider-suggested zone; no R2 assay started. Further blind Google admissions stopped.",
     "plan": [
       {
         "vm": "frontier-cpu-20261031-03",
@@ -449,9 +455,10 @@
       "completion_is_export_not_science": true
     },
     "next_ecology": {
-      "state": "completed_missing_pairs",
+      "state": "complete_28_pairs_no_new_compute",
       "receipt": "results/resources/gcp/ecology-missing-completion.json",
-      "native_independent_check": "Reported by mechanobio_sim: four traces/364frames and18 endpoint/discrepancy metrics independently reproduced; final aggregation pending"
+      "native_audit_commit": "d3d64c6",
+      "native_audit_scope": "Reported independent verification of189files/4912frames/252metrics,28dt and140actuator gates."
     },
     "l4_admission": {
       "id": "4266786588371661074",
@@ -478,8 +485,10 @@
     "l4_capacity_failures": [
       "results/resources/gcp/l4-overnight-operation-result.json",
       "results/resources/gcp/l4-east4-operation-result.json",
-      "results/resources/gcp/l4-east4a-operation-result.json"
+      "results/resources/gcp/l4-east4a-operation-result.json",
+      "results/resources/gcp/l4-size8-operation-result.json",
+      "results/resources/gcp/l4-hint-operation-result.json"
     ]
   },
-  "next_ready_dispatch": "R2 source is frozen but three current capacity admissions failed; NCA actual training and CPU CFD continue. No further ecology work is needed."
+  "next_ready_dispatch": "Two H100 jobs admitted: seed-only NCA comparison and same-source CFD controls/timing only. No fullR2 until measuredruntime and coherentcheckpoint transport; no additional ecology/MD jobs."
 }
