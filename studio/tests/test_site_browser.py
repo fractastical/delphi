@@ -1886,3 +1886,36 @@ def test_ecology_uncertainty_section_states_scope_and_matches_the_aggregate(brow
         if w == 400:
             assert _overflow(pg) <= 0
         pg.close()
+
+
+def test_studio_scale_selector_is_near_the_top_and_the_selected_scale_leads_with_equations(browser, base):
+    for w, h in ((1440, 900), (390, 800)):
+        pg = page(browser, w, h)
+        pg.goto(base + "#/studio/flying-fish?scale=organ"); pg.wait_for_selector(".studiogrid")
+        rail, grid = pg.locator(".rail").bounding_box(), pg.locator(".studiogrid").bounding_box()
+        assert rail["y"] < (600 if w >= 900 else 750), (w, rail)
+        assert pg.locator(".projectwide").bounding_box()["y"] > grid["y"] + grid["height"] - 5       # project-wide panels moved below the workspace
+        for anchor in ("#assurance", "#annkind", "#simwidget"):
+            assert pg.locator(anchor).count() == 1, anchor
+        main = [t.strip() for t in pg.locator(".studiomain h3").all_text_contents()]
+        assert main.index("Equations and claims") < main.index("Parameters and unknowns") < main.index("Media") < main.index("Model"), main
+        if w >= 900:
+            top = pg.locator(".rail").bounding_box()["y"]
+            pg.mouse.wheel(0, 700); pg.wait_for_timeout(300)
+            assert abs(pg.locator(".rail").bounding_box()["y"] - 76) < 12 and top > 76, "rail stays in view on desktop"
+        else:
+            assert _overflow(pg) <= 0
+            for i in range(11):
+                assert pg.locator(".subsys").nth(i).bounding_box()["width"] <= w
+        pg.close()
+
+
+def test_studio_scale_selector_works_from_the_keyboard_and_keeps_deep_links(browser, base):
+    pg = page(browser, 1280, 900)
+    pg.goto(base + "#/studio/flying-fish?scale=organ"); pg.wait_for_selector(".subsys.on")
+    pg.locator(".subsys").nth(3).focus()                                   # Cellular
+    pg.keyboard.press("Enter"); pg.wait_for_selector(".studiomain h2:has-text('Cellular scale')")
+    assert "scale=cellular" in pg.evaluate("location.hash") and pg.locator(".subsys[aria-current=true]").count() == 1
+    assert pg.locator(".subsys[aria-current=true] b").text_content() == "Cellular"
+    pg.goto(base + "#/studio/flying-fish?scale=molecular"); pg.wait_for_selector(".studiomain h2:has-text('Molecular scale')")
+    assert pg.locator(".rail").count() == 1 and pg.locator("nav[aria-label='Subsystems by scale']").count() == 1
