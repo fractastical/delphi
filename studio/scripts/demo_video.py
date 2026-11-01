@@ -86,7 +86,7 @@ def load_story(path: Path) -> dict:
     if not isinstance(cuts, list) or not cuts:
         raise ValueError("storyboard needs at least one cut")
     for cut in cuts:
-        if not isinstance(cut, dict) or cut.get("id") not in {"frontier-60s", "frontier-90s", "frontier-120s", "frontier-science-60s", "frontier-science-120s"}:
+        if not isinstance(cut, dict) or cut.get("id") not in {"frontier-60s", "frontier-90s", "frontier-120s", "frontier-science-60s", "frontier-science-120s", "frontier-delphi-60s", "frontier-delphi-120s"}:
             raise ValueError("unsupported demo cut id")
         scenes = cut.get("scenes")
         if not isinstance(scenes, list) or not scenes:
@@ -136,7 +136,7 @@ def _base_ok(message: dict) -> bool:
     return isinstance(response, dict) and response.get("status_code") == 0
 
 
-async def synthesize_segment(text: str, api_key: str, output: Path, *, voice_id: str, speed: float) -> dict:
+async def synthesize_segment(text: str, api_key: str, output: Path, *, voice_id: str, speed: float, model: str = TTS_MODEL) -> dict:
     """Call one non-retried MiniMax TTS task and write its returned MP3 bytes."""
     headers = {"Authorization": f"Bearer {api_key}"}
     chunks: list[bytes] = []
@@ -153,7 +153,7 @@ async def synthesize_segment(text: str, api_key: str, output: Path, *, voice_id:
         trace_id = connected.get("trace_id")
         await socket.send(json.dumps({
             "event": "task_start",
-            "model": TTS_MODEL,
+            "model": model,
             "voice_setting": {"voice_id": voice_id, "speed": speed, "vol": 1.0, "pitch": 0,
                               "english_normalization": True},
             "audio_setting": {"sample_rate": 32000, "bitrate": 128000, "format": "mp3", "channel": 1},
@@ -192,26 +192,26 @@ async def synthesize_segment(text: str, api_key: str, output: Path, *, voice_id:
     safe_usage = {key: usage[key] for key in (
         "audio_length", "audio_sample_rate", "audio_size", "bitrate", "word_count", "usage_characters",
         "audio_format", "audio_channel") if usage and key in usage}
-    return {"provider": "MiniMax", "endpoint": TTS_URL, "model": TTS_MODEL, "voice_id": voice_id,
+    return {"provider": "MiniMax", "endpoint": TTS_URL, "model": model, "voice_id": voice_id,
             "voice_settings": {"speed": speed, "volume": 1.0, "pitch": 0, "english_normalization": True},
             "trace_id": trace_id, "text_sha256": sha256_bytes(text.encode("utf-8")),
             "audio_sha256": sha256_file(output), "audio_bytes": output.stat().st_size,
             "audio_path": str(output), "usage": safe_usage}
 
 
-def tts_cache_key(text: str, voice_id: str, speed: float) -> str:
-    identity = {"text_sha256": sha256_bytes(text.encode("utf-8")), "model": TTS_MODEL,
+def tts_cache_key(text: str, voice_id: str, speed: float, model: str = TTS_MODEL) -> str:
+    identity = {"text_sha256": sha256_bytes(text.encode("utf-8")), "model": model,
                 "voice_id": voice_id, "speed": speed, "sample_rate": 32000,
                 "bitrate": 128000, "format": "mp3", "channel": 1}
     return sha256_bytes(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode())
 
 
-async def synthesize_cut(cut: dict, api_key: str, audio_root: Path, *, voice_id: str, speed: float) -> dict:
+async def synthesize_cut(cut: dict, api_key: str, audio_root: Path, *, voice_id: str, speed: float, model: str = TTS_MODEL) -> dict:
     entries = []
     provider_requests = 0
     for scene in cut["scenes"]:
         text_sha = sha256_bytes(scene["narration"].encode("utf-8"))
-        cache_key = tts_cache_key(scene["narration"], voice_id, speed)
+        cache_key = tts_cache_key(scene["narration"], voice_id, speed, model)
         output = audio_root / cut["id"] / f"{scene['id']}-{cache_key[:12]}.mp3"
         receipt_path = output.with_suffix(".receipt.json")
         legacy_outputs = [
@@ -250,7 +250,7 @@ async def synthesize_cut(cut: dict, api_key: str, audio_root: Path, *, voice_id:
                 break
         if reused:
             continue
-        receipt = await synthesize_segment(scene["narration"], api_key, output, voice_id=voice_id, speed=speed)
+        receipt = await synthesize_segment(scene["narration"], api_key, output, voice_id=voice_id, speed=speed, model=model)
         receipt.update({"cut_id": cut["id"], "scene_id": scene["id"], "narration": scene["narration"],
                         "word_count": len(scene["narration"].split()), "scene_budget_s": scene["duration_s"],
                         "scene_budget_s_current": scene["duration_s"], "cache_key_sha256": cache_key,
@@ -262,12 +262,12 @@ async def synthesize_cut(cut: dict, api_key: str, audio_root: Path, *, voice_id:
         print(json.dumps({"cut": cut["id"], "scene": scene["id"], "trace_id": receipt["trace_id"],
                           "usage_characters": receipt.get("usage", {}).get("usage_characters"),
                           "audio_bytes": receipt["audio_bytes"]}))
-    return {"cut_id": cut["id"], "voice_model": TTS_MODEL, "voice_id": voice_id, "voice_speed": speed,
+    return {"cut_id": cut["id"], "voice_model": model, "voice_id": voice_id, "voice_speed": speed,
             "provider_requests": provider_requests, "segments": entries}
 
 
 def run_synthesis(story_path: Path, audio_root: Path, output_root: Path, *, voice_id: str = VOICE_ID,
-                  speed: float = 1.0, only_cut: str | None = None) -> dict:
+                  speed: float = 1.0, only_cut: str | None = None, model: str = TTS_MODEL) -> dict:
     story = load_story(story_path)
     if not 0.5 <= speed <= 2.0:
         raise ValueError("MiniMax speed must be between 0.5 and 2.0")
@@ -287,21 +287,21 @@ def run_synthesis(story_path: Path, audio_root: Path, output_root: Path, *, voic
             if not backup_path.exists():
                 backup_path.write_bytes(manifest_path.read_bytes())
     api_key = load_api_key()
-    results = asyncio.run(_synthesize_story(selected_cuts, api_key, audio_root, voice_id=voice_id, speed=speed))
+    results = asyncio.run(_synthesize_story(selected_cuts, api_key, audio_root, voice_id=voice_id, speed=speed, model=model))
     for cut in results:
         for segment in cut["segments"]:
             segment["audio_path"] = stable_path(audio_file(segment))
     manifest = {"schema": "frontier.demo-video.tts-manifest/1", "status": "complete",
                 "storyboard_sha256": storyboard_sha, "storyboard_path": stable_path(story_path),
-                "provider": "MiniMax", "model": TTS_MODEL, "voice_id": voice_id, "voice_speed": speed,
+                "provider": "MiniMax", "model": model, "voice_id": voice_id, "voice_speed": speed,
                 "provider_requests_this_run": sum(cut["provider_requests"] for cut in results), "cuts": results}
     atomic_json(manifest_path, manifest)
     return manifest
 
 
 async def _synthesize_story(cuts: list[dict], api_key: str, audio_root: Path, *, voice_id: str,
-                            speed: float) -> list[dict]:
-    return [await synthesize_cut(cut, api_key, audio_root, voice_id=voice_id, speed=speed) for cut in cuts]
+                            speed: float, model: str = TTS_MODEL) -> list[dict]:
+    return [await synthesize_cut(cut, api_key, audio_root, voice_id=voice_id, speed=speed, model=model) for cut in cuts]
 
 
 def prepare_audio_edit(story_path: Path, tts_path: Path, output_root: Path, *, tempo: float) -> dict:
@@ -467,7 +467,7 @@ def validate_media_map(story: dict, media_map_path: Path) -> tuple[dict, list[di
             shot_total = 0.0
             for shot in spec["shots"]:
                 layout = shot.get("layout")
-                expected = {"single": 1, "grid-2": 2, "grid-4": 4}.get(layout)
+                expected = {"single": 1, "portal": 1, "grid-2": 2, "grid-4": 4}.get(layout)
                 shot_sources = shot.get("sources")
                 if expected is None or not isinstance(shot_sources, list) or len(shot_sources) != expected:
                     raise ValueError(f"invalid layout/source count in {cut['id']}/{scene['id']}")
@@ -534,6 +534,21 @@ def _draw_overlay(scene_spec: dict, shot: dict, path: Path) -> dict:
     width, height = 1920, 1080
     overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(overlay)
+    if shot["layout"] == "portal":
+        title_font = ImageFont.truetype(str(_font_path(True)), 46)
+        kicker_font = ImageFont.truetype(str(_font_path(True)), 24)
+        badge_font = ImageFont.truetype(str(_font_path(True)), 22)
+        draw.rounded_rectangle((48, 14, 1872, 138), radius=24, fill=(5, 20, 35, 230), outline=(116, 230, 190, 170), width=2)
+        draw.text((76, 20), "DELPHI · BIOLOGICAL MATHEMATICS", font=kicker_font, fill=(115, 238, 194, 255))
+        title = textwrap.shorten(scene_spec["headline"].strip(), width=66, placeholder="…")
+        draw.text((76, 52), title, font=title_font, fill=(255, 255, 255, 255))
+        badge = shot.get("badge", scene_spec.get("badge", ""))
+        if badge:
+            draw.text((76, 104), textwrap.shorten(badge.strip(), width=135, placeholder="…"), font=badge_font, fill=(255, 238, 188, 255))
+        overlay.save(path)
+        return {"width": width, "height": height, "headline_font_px": 46, "kicker_font_px": 24,
+                "caption_font_px": 32, "safe_margin_px": 72, "layout": "portal-full-height",
+                "font_files": {"regular": str(_font_path()), "semibold": str(_font_path(True))}}
     title_font = ImageFont.truetype(str(_font_path(True)), 56)
     kicker_font = ImageFont.truetype(str(_font_path(True)), 24)
     badge_font = ImageFont.truetype(str(_font_path(True)), 27)
@@ -557,6 +572,7 @@ def _draw_overlay(scene_spec: dict, shot: dict, path: Path) -> dict:
     # labels only; no scientific image or trajectory pixels are invented.
     positions = {
         "single": [(72, 820)],
+        "portal": [],
         "grid-2": [(72, 820), (1020, 820)],
         "grid-4": [(72, 820), (1020, 820), (72, 872), (1020, 872)],
     }[shot["layout"]]
@@ -588,7 +604,11 @@ def render_shot(shot: dict, scene_spec: dict, output: Path, overlay_path: Path, 
         args.extend(_video_input_args(source))
     args.extend(["-loop", "1", "-framerate", "30", "-i", str(overlay_path)])
     filters = []
-    if shot["layout"] == "single":
+    if shot["layout"] == "portal":
+        source = sources[0]
+        filters.append(f"[0:v]scale=1920:760:force_original_aspect_ratio=decrease,pad=1920:760:(ow-iw)/2:(oh-ih)/2:color=0xf4f6ff,setsar=1,fps=30,tpad=stop_mode=clone:stop_duration={duration},trim=duration={duration},setpts=PTS-STARTPTS,pad=1920:1080:0:140:color=0xf4f6ff[vbase]")
+        base = "[vbase]"
+    elif shot["layout"] == "single":
         source = sources[0]
         if source["kind"] == "image":
             # Screenshots are cropped to the central content band: the renderer
@@ -896,8 +916,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--media-map", type=Path, default=DEFAULT_MEDIA_MAP)
     parser.add_argument("--tts-manifest", type=Path, default=None)
     parser.add_argument("--work-root", type=Path, default=DEFAULT_RENDER_WORK)
-    parser.add_argument("--cut", choices=("frontier-60s", "frontier-90s", "frontier-120s", "frontier-science-60s", "frontier-science-120s"), help="render one cut as a preview; omit for all cuts")
+    parser.add_argument("--cut", choices=("frontier-60s", "frontier-90s", "frontier-120s", "frontier-science-60s", "frontier-science-120s", "frontier-delphi-60s", "frontier-delphi-120s"), help="render one cut as a preview; omit for all cuts")
     parser.add_argument("--voice-id", default=VOICE_ID, help="MiniMax voice id; used only by synthesize")
+    parser.add_argument("--tts-model", choices=("speech-2.8-turbo", "speech-02-hd"), default=TTS_MODEL, help="MiniMax speech model; used only by synthesize")
     parser.add_argument("--speed", type=float, default=1.0, help="MiniMax voice speed in the provider's 0.5–2.0 range")
     parser.add_argument("--tempo", type=float, default=1.3, help="pitch-preserving editorial atempo multiplier for prepare-edit")
     parser.add_argument("--rendered-commit", default=None, help="renderer source commit for finalize; defaults to current HEAD")
@@ -905,7 +926,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "synthesize":
             result = run_synthesis(args.storyboard, args.audio_root, args.output,
-                                  voice_id=args.voice_id, speed=args.speed, only_cut=args.cut)
+                                  voice_id=args.voice_id, speed=args.speed, only_cut=args.cut, model=args.tts_model)
             summary = {"ok": True, "manifest": str(args.output / "tts-manifest.json"),
                        "provider_requests_this_run": result["provider_requests_this_run"],
                        "cuts": [{"id": cut["cut_id"], "segments": len(cut["segments"])} for cut in result["cuts"]]}
