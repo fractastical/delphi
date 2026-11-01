@@ -1497,7 +1497,9 @@ def test_recovery_inputs_are_published_exactly_and_the_failed_run_is_not_called_
     pg = page(browser)
     pg.goto(base + "#/work?tab=built"); pg.wait_for_selector("#bt-h")
     t = pg.locator("#main").text_content()
-    assert "primary run: failed" in t and "no evaluation and no generated examples exist" in t and "training and evaluation are not complete" in t
+    # Since 89726ac a separate evaluation of the retained checkpoint is published; the primary timeout must still read as a failure and nothing as validated biology.
+    assert "primary run: failed" in t and "The primary timeout remains a failure" in t and "strict secondary audit failed" in t and "not evaluated performance or validated biology" in t
+    assert "no evaluation or generated examples are present" not in t, "the retired no-evaluation sentence would contradict the published diffusion pilot"
     href = pg.locator("a[download][href$='primary-runtime-inputs.tar.xz']").get_attribute("href")
     assert href == "artifacts/rd-diffusion/primary-runtime-inputs.tar.xz"
     assert pg.request.get(base + href).status == 200
@@ -1585,7 +1587,8 @@ def test_fish_history_lists_only_stated_lineage_and_separates_siblings_revisions
 def test_stale_sentences_are_gone_and_cost_cites_the_dated_google_receipt(browser, base):
     snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
     cost = next(c for c in snap["timeline"]["counters"] if c["quantity"] == "Cost")
-    assert "terms-of-service" not in cost["note"] and "dated readiness receipt" in cost["note"] and "No VM usage and no spend are inferred" in cost["note"]
+    # The Cost counter now cites the dated Google Cloud allocation snapshot (reservations, not usage) and still infers no spend from credits.
+    assert "terms-of-service" not in cost["note"] and "Google Cloud allocation snapshot (20" in cost["note"] and "No dollar estimate or zero spend inferred from credits" in cost["note"] and "spend remains unknown" in cost["note"]
     pg = page(browser)
     pg.goto(base + "#/studio/flying-fish?scale=molecular"); pg.wait_for_selector("#pl-h")
     t = pg.locator("#main").text_content()
