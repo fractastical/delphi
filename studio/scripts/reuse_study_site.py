@@ -1,0 +1,78 @@
+"""Publisher adapter for reuse-study visuals: verify a manifest's input and output hashes, then offer only verified media.
+
+    build(ins, out, root, manifest_path=MANIFEST, expected_sha256=None) -> {"visuals": [card, ...], "manifest_href": str}
+
+`ins` is build_site's Inputs (read(rel) -> bytes, remembered with its sha256); `out` is its output mapping ("@<site path>" keys);
+`root` is the checkout. Nothing is scanned, run or fetched. A visual is offered only when EVERY source, renderer and media file
+named by the manifest exists inside the allowlist and matches its declared sha256 and size; one mismatch raises and nothing is
+added to `out`. The adapter never invents a result: it publishes what the manifest declares, and a study with no manifest entry
+shows nothing. It accepts a future formal (for example oxygen-diffusion) artifact the same way: add its source prefix below.
+"""
+from __future__ import annotations
+
+import json
+from hashlib import sha256
+from pathlib import Path, PurePosixPath
+
+MANIFEST = "artifacts/reuse-study-visuals/manifest.json"
+MEDIA_PREFIX = "artifacts/reuse-study-visuals/"
+SOURCE_PREFIXES = ("artifacts/voxel-actuation/", "artifacts/oxygen-diffusion/", "artifacts/epithelial-repair/")   # exact committed producer outputs only
+RENDERER_PREFIXES = ("engineering/reuse_visuals/",)
+MEDIA_SUFFIXES = (".mp4", ".gif", ".png", ".json")
+MAX_MEDIA_BYTES = 20_000_000
+REQUIRED = ("id", "study", "title", "evidence_kind", "labels", "caveats", "media", "sources", "renderer")
+
+
+def _safe(rel: str, prefixes: tuple[str, ...], root: Path) -> str:
+    p = PurePosixPath(rel)
+    if p.is_absolute() or ".." in p.parts or str(p) != rel or not rel.startswith(prefixes):
+        raise ValueError(f"path outside the allowlist: {rel}")
+    if not (root / rel).resolve().is_relative_to(root.resolve()):
+        raise ValueError(f"path escapes the checkout: {rel}")
+    return rel
+
+
+def _verify(ins, item: dict, prefixes: tuple[str, ...], root: Path) -> bytes:
+    rel = _safe(item["path"], prefixes, root)
+    blob = ins.read(rel)
+    if sha256(blob).hexdigest() != item["sha256"] or len(blob) != item["bytes"]:
+        raise ValueError(f"digest or size mismatch: {rel}")
+    return blob
+
+
+def build(ins, out: dict, root, manifest_path: str = MANIFEST, expected_sha256: str | None = None) -> dict:
+    root = Path(root)
+    raw = ins.read(_safe(manifest_path, (MEDIA_PREFIX,), root))
+    if expected_sha256 and sha256(raw).hexdigest() != expected_sha256:
+        raise ValueError("manifest digest changed")
+    m = json.loads(raw)
+    if m.get("schema") != "frontier.reuse-study-visuals/1" or not m.get("visuals"):
+        raise ValueError("not a reuse-study-visuals/1 manifest")
+    studies = {p["id"] for p in ins.json("site/content/projects.json")["projects"] if p.get("template") == "reuse-study"}
+    staged, cards, total = {"@" + manifest_path: raw}, [], 0
+    for v in m["visuals"]:
+        missing = [k for k in REQUIRED if k not in v]
+        if missing or v["study"] not in studies:
+            raise ValueError(f"visual {v.get('id')!r}: missing {missing} or unknown study {v.get('study')!r}")
+        if not v["labels"].get("model_only") and "formal" not in v["evidence_kind"].lower():
+            raise ValueError("a visual must declare itself model-only or a formal artifact")
+        for item in v["sources"]:
+            _verify(ins, item, SOURCE_PREFIXES, root)
+        for item in v["renderer"]:
+            _verify(ins, item, RENDERER_PREFIXES, root)
+        hrefs = {}
+        for kind, item in v["media"].items():
+            if not item["path"].endswith(MEDIA_SUFFIXES):
+                raise ValueError(f"media type not allowed: {item['path']}")
+            blob = _verify(ins, item, (MEDIA_PREFIX,), root)
+            total += len(blob)
+            staged["@" + item["path"]] = blob
+            hrefs[kind + "_href"] = item["path"]
+        cards.append({"id": v["id"], "study": v["study"], "title": v["title"], "evidence_kind": v["evidence_kind"], "labels": v["labels"], "caveats": v["caveats"],
+                      "records_kept": v.get("records_kept", []), "engine_benchmark": v.get("engine_benchmark"), "biological_carrier": v.get("biological_carrier"),
+                      "posthoc_denominators": v.get("posthoc_denominators"), "sim_time_s": v.get("sim_time_s"), "media": v["media"],
+                      "sources_verified": len(v["sources"]), "renderer_verified": len(v["renderer"]), **hrefs})
+    if total > MAX_MEDIA_BYTES:
+        raise ValueError("media exceed the byte bound")
+    out.update(staged)
+    return {"visuals": cards, "manifest_href": manifest_path, "manifest_sha256": sha256(raw).hexdigest()}
