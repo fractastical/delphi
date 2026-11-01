@@ -1,0 +1,136 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>04 · The stack</title><style>
+:root{--paper:#F2F5F8;--white:#fff;--grid:#D7DFE9;--rule:#C3CDDA;--ink:#142033;--muted:#4B5A70;
+--subtle:#7B8798;--blue:#2457D6;--pink:#B23A5A;--green:#2E7D5B;--amber:#B8860B;
+--blue-soft:rgba(36,87,214,.08);--shadow:0 18px 60px rgba(20,32,51,.055);
+--serif:Georgia,"Times New Roman",serif;--sans:Inter,"Aptos","Segoe UI",Arial,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#8b93a5}
+.slide{position:relative;width:1600px;height:900px;padding:0 72px;background:var(--paper);overflow:hidden;
+font-family:var(--sans);color:var(--ink);margin:auto}
+.top{display:flex;align-items:center;gap:16px;padding:26px 0 14px;border-bottom:1px solid var(--rule)}
+.mark{width:34px;height:34px}.word{font:500 29px/1 var(--serif);letter-spacing:-.015em}
+.div{width:1px;height:28px;background:var(--rule)}
+.tag{font:600 10.5px/1.3 var(--sans);letter-spacing:.14em;color:var(--subtle);text-transform:uppercase}
+.pg{margin-left:auto;font:500 13px/1 var(--sans);color:var(--subtle);letter-spacing:.06em}
+.eyebrow{display:flex;gap:11px;align-items:baseline;margin:14px 0 5px}
+.eyebrow b{font:600 12px/1 var(--sans);color:var(--subtle)}
+.eyebrow span{font:600 11.5px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--blue)}
+h1{font:500 42px/1.05 var(--serif);letter-spacing:-.025em;max-width:30ch}
+h1 em{font-style:normal;color:var(--blue)}
+.sub{font-size:15px;color:var(--muted);margin:8px 0 12px;max-width:112ch}
+.hero{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:12px}
+.h{background:var(--white);border:1px solid var(--grid);border-radius:10px;padding:11px 12px;box-shadow:var(--shadow)}
+.h b{display:block;font:500 31px/1 var(--serif);color:var(--blue);letter-spacing:-.02em}
+.h i{display:block;font-style:normal;font-size:11.9px;color:var(--muted);margin-top:6px;line-height:1.38}
+.cols{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;height:262px}
+.c{background:var(--white);border:1px solid var(--grid);border-radius:11px;padding:14px 16px;box-shadow:var(--shadow);min-width:0;display:flex;flex-direction:column}
+.c h2{font:600 16px/1.2 var(--sans);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.c h2 i{width:7px;height:7px;border-radius:50%;background:var(--blue);flex:0 0 7px;font-style:normal}
+.c .who{font:600 10.5px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--subtle);margin-bottom:9px}
+.c li{list-style:none;font-size:12.4px;line-height:1.42;color:var(--muted);padding:3.5px 0;border-top:1px solid #EDF1F6}
+.c li:first-of-type{border-top:0}
+.c li b{color:var(--ink);font-weight:600}
+.win{margin-top:auto;background:var(--blue-soft);border-radius:7px;padding:8px 10px;font-size:11.6px;line-height:1.42;color:var(--ink)}
+.win b{color:var(--blue)}
+.foot{position:absolute;left:72px;right:72px;bottom:14px;display:flex;justify-content:space-between;
+font-size:11.6px;color:var(--subtle);border-top:1px solid var(--rule);padding-top:8px}
+
+.band{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px;align-items:center;
+background:var(--white);border:1px solid var(--grid);border-radius:11px;padding:11px 18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.eyebrow2{display:block;font:600 10px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--blue);margin-bottom:5px}
+.bl b{display:block;font:500 22px/1.15 var(--serif);letter-spacing:-.015em;margin-bottom:5px}
+.bn{display:block;font-size:11.2px;color:var(--subtle);line-height:1.4}
+.bn code{font-size:10.6px}
+.bars{display:flex;flex-direction:column;gap:5px}
+.bar{display:grid;grid-template-columns:92px 1fr 62px;align-items:center;gap:10px}
+.bk{font-size:11.8px;color:var(--muted);text-align:right}
+.track{height:13px;background:#EDF1F6;border-radius:4px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--blue);border-radius:4px}
+.bv{font:600 11.8px/1 var(--sans);color:var(--ink)}
+</style></head><body><div class="slide">
+ <div class="top">
+  <svg class="mark" viewBox="0 0 44 44"><polygon points="22,5 40,37 4,37" fill="none" stroke="#2457D6" stroke-width="2.6" stroke-linejoin="round"/><polygon points="22,14 32,32 12,32" fill="none" stroke="#2457D6" stroke-width="1.7" stroke-linejoin="round" opacity=".5"/><circle cx="22" cy="25" r="3.2" fill="#2457D6"/></svg>
+  <span class="word">delphi</span><span class="div"></span><span class="tag">Lean for<br>biology</span><span class="pg">04&nbsp;&nbsp;/&nbsp;&nbsp;06</span>
+ </div>
+ <div class="eyebrow"><b>04</b><span>The stack we ran on</span></div>
+ <h1>A trillion tokens of reasoning,<br>turned into <em>checkable biology</em>.</h1>
+ <p class="sub">Sponsor infrastructure, foundation models and mechanistic simulators, driven end to end by an agent swarm — every run leaving a receipt.</p>
+
+ <div class="hero">
+  <div class="h"><b>1.07T</b><i>tokens across 14 models and 24,976 sessions</i></div>
+  <div class="h"><b>140</b><i>H100 GPU jobs on Nebius · 109 completed</i></div>
+  <div class="h"><b>31</b><i>recorded simulations across 9 biological scales</i></div>
+  <div class="h"><b>98.6%</b><i>peak mean GPU utilisation, sampled at 1&nbsp;Hz</i></div>
+  <div class="h"><b>2,444</b><i>documents embedded for semantic search</i></div>
+  <div class="h"><b>474K</b><i>lines of code written across two repositories</i></div>
+  <div class="h"><b>2,175</b><i>commits, both repositories created this week</i></div>
+ </div>
+
+
+ <div class="band">
+  <div class="bl"><span class="eyebrow2">Pre-registered, two experiments, 20 test plans</span>
+   <b>Every multi-agent arm beat the single agent.</b>
+   <span class="bn">Verified datasets out of 20 · claude-sonnet-5-5 via headless <code>claude -p</code> in every arm · <code>test-data/agent-comparison/four-arm.json</code></span></div>
+  <div class="bars">
+   <div class="bar"><span class="bk">single</span><span class="track"><i style="width:65%;background:#9AA7B8"></i></span><span class="bv">13 · 12</span></div>
+   <div class="bar"><span class="bk">isolated</span><span class="track"><i style="width:85%"></i></span><span class="bv">17 · 16</span></div>
+   <div class="bar"><span class="bk">centralized</span><span class="track"><i style="width:95%"></i></span><span class="bv">19 · 18</span></div>
+   <div class="bar"><span class="bk">decentralized</span><span class="track"><i style="width:90%"></i></span><span class="bv">18 · 17</span></div>
+  </div>
+ </div>
+ <div class="cols">
+  <div class="c"><h2><i></i>GPU, CPU and VMs</h2><div class="who">Nebius · Google Cloud</div>
+   <ul>
+    <li><b>Nebius H100 / L40S</b> — 140 jobs, 1 GPU each</li>
+    <li><b>Nebius Scientific AI</b> — 69 hosted tools</li>
+    <li><b>Google Cloud</b> — 5 CPU VMs, 32 vCPU quota</li>
+    <li><b>NVIDIA CUDA</b> — under every GPU run</li>
+    <li><b>Nebius CPU batch</b> — 4‑vCPU arms, pinned image</li>
+    <li><b>NVIDIA Brev</b> — L40S instance, Boltz‑2 served</li>
+    <li><b>6 jobs</b> still running at slide time</li>
+   </ul>
+   <div class="win">Telemetry at 1 Hz recorded <b>96.6%, 98.6%</b> and 51.6% mean utilisation — measured, not allocated.</div>
+  </div>
+
+  <div class="c"><h2><i></i>Foundation models</h2><div class="who">NVIDIA BioNeMo · Nebius · Google</div>
+   <ul>
+    <li><b>Evo 2</b> — genomic language model, 14 jobs</li>
+    <li><b>OpenFold2</b> — structure prediction</li>
+    <li><b>Boltz‑2</b> — served on Brev L40S for KCNJ13</li>
+    <li><b>ESM2</b> — protein likelihoods, variant assay</li>
+    <li><b>Gemini</b> — embedding‑001, 3.8‑flash, 3.1‑pro</li>
+    <li><b>Claude</b> Opus 5.5 / 5, Sonnet 5.5, Haiku 5.5</li>
+    <li><b>MiniMax</b> M2.7 · <b>GLM</b> 5 · <b>GPT‑5.6</b></li>
+   </ul>
+   <div class="win"><b>Evo 2 result:</b> real fin/scale regulatory windows beat their own shuffles, <b>p&nbsp;=&nbsp;3.9×10⁻⁶</b> — and it holds in the flying‑fish genome alone, which is not in its training corpus.</div>
+  </div>
+
+  <div class="c"><h2><i></i>Mechanistic simulators</h2><div class="who">Open source, every version pinned</div>
+   <ul>
+    <li><b>OpenMM 8.4</b> MD · <b>WaterLily 1.10</b> 3‑D CFD</li>
+    <li><b>Morpheus 2.3.9</b> · <b>PhysiCell 1.14.2</b> cells</li>
+    <li><b>BETSE 1.5.0</b> bioelectric · <b>Voxelyze</b> soft body</li>
+    <li><b>libRoadRunner</b> SBML · <b>Zebrafish‑GEM</b></li>
+    <li><b>Neural cellular automata</b> · reaction‑diffusion</li>
+    <li><b>Lattice‑Boltzmann</b> · vortex‑lattice aerodynamics</li>
+    <li><b>OpenResearch</b> — replay receipts, 2 exemplars</li>
+   </ul>
+   <div class="win"><b>OpenResearch</b> replayed the published Collier 1996 model: exit 0, <b>all replay checks passed</b>, every output hash matched. Plus <b>98 bio‑database calls</b> — UniProt, Ensembl, NCBI, BioModels, ZFIN, Europe PMC.</div>
+  </div>
+
+  <div class="c"><h2><i></i>Design to object</h2><div class="who">Formlabs · the agent swarm</div>
+   <ul>
+    <li><b>Print‑ready STLs</b> — watertight, manifold, one body</li>
+    <li><b>Wall checks</b> by ray‑cast sampling</li>
+    <li><b>12 agent harnesses</b>, own branch and job prefix</li>
+    <li><b>Lean 4 + Z3</b> — laws and conflict certificates</li>
+    <li><b>14 cell‑aggregate STLs</b> + 6 printable fish forms</li>
+    <li><b>Two parts printed</b> — design to physical object</li>
+    <li><b>Public MCP</b> — 21 tools, agents read the same record</li>
+   </ul>
+   <div class="win">Design to printed part in one pipeline: <b>two pieces printed</b>. Every artifact carries a sha256, its inputs and the command that made it — <b>failures too</b>.</div>
+  </div>
+ </div>
+
+ <div class="foot"><span>Counts read from provider CLIs, transcripts and receipt files. Brev instance df‑boltz2‑kcnj13 (L40S) read from the Brev CLI. Print count attested by the team.</span><span>delphi · Lean for biology</span></div>
+</div></body></html>
