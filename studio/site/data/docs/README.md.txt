@@ -35,6 +35,10 @@ papered over.
 | [SPEC-004](SPEC-004-bundles-and-federation.md) | Export/import bundles; `imported_unreviewed`; fork-on-conflict; review receipts as untrusted assertions; why a digest is integrity and not a signature, timestamp, or acceptance |
 | [SPEC-005](SPEC-005-agentic-engineering-demo.md) | Current multiscale engineering delivery contract and explicit applicability boundaries |
 | [SPEC-006](SPEC-006-action-epistemics-and-learning.md) | Typed action proposals, alternatives, outcomes and plans; allocation and learning requirements separate from acceptance |
+| [SPEC-007](SPEC-007-studio-frontier-and-discovery.md) | Human-readable Studio, discovery, annotation and artifact surfaces |
+| [SPEC-008](SPEC-008-holistic-design-assurance.md) | Regional assurance and explicit cross-scale interfaces |
+| [SPEC-009](SPEC-009-agent-workspace-mcp.md) | Agent-facing workspace and bounded tool capabilities |
+| [SPEC-010](SPEC-010-launchable-fish-glider.md) | User-requested printed fish glider, required slingshot launch, material and flight validation |
 
 **Verification run (this session), bounded:**
 `systemd-run --user --scope -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=600
