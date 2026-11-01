@@ -1,0 +1,94 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/hygromorph-bilayer-curvature--claim-test> a delphi:Assessment ;
+    rdfs:label "Claim test of hygromorph-bilayer-curvature: supports, confidence 0.4" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "supports" ;
+    delphi:hasConfidence "0.4"^^xsd:double ;
+    delphi:hypothesis "If a pine cone scale behaves as a Timoshenko bilayer, the change in curvature between the dry and wet state predicted from the measured active-layer thickness h1, passive-layer thickness h2, modulus ratio n = E1/E2 and swelling-strain mismatch delta_eps, kappa_pred = 6(1+m)^2 / (h [3(1+m)^2 + (1+mn)(m^2 + 1/(mn))]) * delta_eps with m = h1/h2 and h = h1 + h2, equals the measured curvature change (or, for a scale of free length L, the measured opening-angle change theta = L * kappa) of the same scales to within the measurement uncertainty." ;
+    delphi:passCriterion "Pre-registered (claim supported). For every specimen set (one per paper, or one combined set if no single paper gives all five quantities) compute r = log10(kappa_pred / kappa_meas), using opening angle theta = L * kappa where only angles are reported. The claim is supported if the predicted and measured changes have the same sign (the scale bends towards the passive, less-swelling layer when wetted, i.e. closes) and |r| <= 0.18 (prediction within a factor of 1.5 of the measurement) for the primary specimen set; where several specimen sets exist, the median |r| across sets must be <= 0.18 and no set may have |r| > 0.48." ;
+    delphi:failCriterion "Pre-registered (claim refuted). The predicted and measured curvature changes have opposite sign, or |r| > 0.48 (prediction off by more than a factor of 3) for the primary specimen set or for the median across sets. 0.18 < |r| <= 0.48 is 'mixed'. If no paper (or admissible combination of papers) gives h1, h2, E1/E2, delta_eps and a measured curvature or opening-angle change for pine cone scales, the verdict is 'inconclusive' with reason 'data-unavailable'; if only one quantity has to be assumed rather than measured and the result depends on that assumption over its plausible range, the verdict is 'inconclusive' with reason 'underpowered'." ;
+    delphi:expectedObservation "Published measurements on real Pinus cone scales (layer thicknesses h1 and h2, Young's moduli E1 and E2 of the sclerenchyma and sclereid layers, hygroscopic strain mismatch delta_eps between dry and wet, and the dry-to-wet change in scale curvature or opening angle) give a Timoshenko prediction kappa_pred that matches the measured curvature change within a factor of 1.5, with the scale bending towards the passive layer." ;
+    delphi:disconfirmingObservation "The Timoshenko prediction from the measured h1, h2, E1/E2 and delta_eps differs from the measured curvature change by more than a factor of 3, or predicts bending in the wrong direction; this would show that the scale is not adequately described as a well-bonded, uniform, linearly elastic two-layer strip (for instance because swelling is strongly non-uniform through the thickness, the layers slip, or the scale is too thick for Euler-Bernoulli kinematics)." ;
+    delphi:admissibleDatasets "Peer-reviewed, open-access publications reporting measurements on real pine cone (Pinus) scales, not on biomimetic bilayers or simulations; the values must be tabulated or quoted in the text, or digitisable from figures whose axes are labelled with numeric values; thicknesses in the same cross-section as the curvature measurement; moduli measured along the scale axis (tensile or nanoindentation) on the dry and/or wet tissue; swelling strain along the scale axis between the same two hydration states as the curvature change. Model fits reported by the papers themselves are not admissible as measurements but may be quoted for comparison. Combining geometry and curvature from one paper with moduli and strain from another is admissible only as a secondary, lower-confidence analysis and must be stated." ;
+    delphi:inferenceMethod "For each specimen set compute kappa_pred from the Timoshenko formula with the measured inputs; propagate the stated uncertainties (or the plausible range of any input that is only bounded) by evaluating the formula at the extremes; compute r = log10(kappa_pred / kappa_meas), where kappa_meas is the measured curvature change or theta_meas / L for reported opening angles. Verdict thresholds: |r| <= 0.18 supports, 0.18 < |r| <= 0.48 mixed, |r| > 0.48 or wrong sign refutes; a secondary sensitivity statistic is the ratio under the m = 1, n = 1 simplification kappa = 1.5 delta_eps / h, reported but not used for the verdict." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "fetch.py downloads the two accessible papers and the Quan supplement and records size and SHA-256 (derived/fetch_manifest.json); `--measure` reads the Quan Fig. 3b micro-CT against its 1 cm bar to get the scale length (38.6 mm) and the length of the thin proximal stalk that bends (22.4 mm). Every input number is in derived/measurements.csv with its paper, page, table or figure. analysis.py evaluates the claim's formula kappa = f(m,n) delta_eps / h for each specimen set and converts to the reported opening-angle change with theta = kappa L_a (Euler-Bernoulli). Quan set: h1 = 2.3 mm (sclereid, active), h2 = 1.5 mm (fibre, passive), n = 0.86/4.53 = 0.19, delta_eps = 0.20 - 0.06 = 0.14, giving f = 1.44, kappa_pred = 0.0531 /mm (radius 18.8 mm) and theta_pred = 68 deg over L_a = 22.4 mm, against the measured 79 deg of the Fig. S1 scale (kappa_meas = 0.0616 /mm). Reyssat set: m = 1, n = 5, delta_eps = 0.20 (immersed cells), L_a/h_a = 10 (so h cancels), giving f = 1.25 and theta_pred = 72 deg against the 132 deg plateau of Fig. 1d. Statistic r = log10(pred/meas); input ranges from the CSV are propagated by evaluating at the extremes; verdict by the pre-registered thresholds applied to the primary set and to the median |r| over the two sets." ;
+    rdfs:comment "Measured: -0.064 log10(predicted / measured bending), primary set (Quan et al. 2021, Pinus torreyana): predicted 68.1 deg vs measured 79 deg, ratio 0.86 (n = 2, primary set r range -0.33 to +0.25 over the plausible input ranges; second set (Reyssat & Mahadevan 2009, P. coulteri) r = -0.266 (ratio 0.54; range -1.21 to +0.23); median |r| over the two sets 0.165 against the 0.18 threshold). Interpretation: The claim is Timoshenko's bimetal result applied to the pine cone scale with the outer sclerenchyma (fibre) layer as the active layer (swells along the scale when wet) and the inner sclereid layer as the passive layer. 'Curvature change' is the difference between the wet and dry curvature of the scale measured along its length; where a paper reports opening angle rather than curvature, the angle change over a free length L is converted with theta = L * kappa (small-rotation Euler-Bernoulli), which is the same conversion Reyssat and Mahadevan use. delta_eps is the difference in longitudinal hygroscopic strain between the two layers between the dry and wet states; if only the active layer's strain is reported the passive layer is taken to swell by zero along the scale, as the claim states. Moduli may be reported for the dry or the wet tissue; the formula depends only on the ratio n, and both the dry and wet ratios are used as the plausible range if both are reported. No data had been inspected when this pre-registration was written; the three planned sources were named from the claim's see_also list and their abstracts only. Post hoc note on terms: the claim statement calls the active layer the 'outer sclerenchyma' layer; in Dawson et al., Reyssat & Mahadevan and Quan et al. the layer that swells is the sclereid layer (also sclerenchyma tissue, on the abaxial/outer face of the scale) and the fibre layer is the one that barely swells; the bilayer coefficient f(m,n) is symmetric under swapping the layers, so this changes no number, only the labels." ;
+    delphi:evidenceAgainst "The verdict follows the pre-registered rule but sits on its edge: the primary set is well inside the factor-1.5 band (ratio 0.86), the second set is outside it (ratio 0.54, 'mixed' on its own), and the median |r| = 0.165 is just under the 0.18 threshold. Pairing Reyssat & Mahadevan's humidity-range strain (0.113 for 0-100 % RH) with their text value of 100 deg instead of the immersed values gives r = -0.39 for that set and the combined verdict becomes 'mixed'. In both sets the formula underpredicts the bending; it never gets the sign wrong or misses by a factor of 3." ;
+    delphi:evidenceAgainst "No paper measures all five quantities on the same scales. The Quan set combines Torrey pine layer thicknesses and one scale's rotation with moduli and swelling strains that Quan et al. tabulate from Dawson et al. 1997 (Pinus radiata); the Reyssat set combines one P. coulteri scale's angle and single-cell strain with thickness and active-length ratios pooled over several species (Fig. 3, 'strongly scattered') and a modulus ratio from Dawson. Dawson et al. 1997 itself is paywalled and was not read; its numbers are used at second hand. This is the lower-confidence combined case anticipated in fail_criterion, hence confidence 0.4." ;
+    delphi:evidenceAgainst "The bending length L_a is the weakest input. For the Quan set it is the length of the thin proximal stalk (22.4 mm) measured on the micro-CT of a different scale (Fig. 3b) and cross-checked against the fraction of the free length over which curvature changes in Fig. S1d (about 0.67 of about 34 mm); a +-25 % range is carried. For the Reyssat set the paper's text (L_a/h ~ 10) and figure (L_a/h_a ~ 10) differ by the factor 1 + m = 2; the figure was used, and the text reading would give r = +0.035." ;
+    delphi:evidenceAgainst "n = 2 scales with a measured dry-to-wet angle (one per paper). Thicknesses are uniform-beam idealisations of a tapered scale (Quan's own micro-CT shows the sclereid porosity and the fibre layer varying along and across the stalk), and Quan et al. argue the scale is better described as a graded tri-layer whose isolated layers also bend on their own; the Timoshenko formula was still within 15 % of their measured rotation." ;
+    delphi:evidenceAgainst "Reproducibility of the fetch: PMC fronts PDF downloads with a proof-of-work cookie (solved in fetch.py) and, after repeated requests, a reCAPTCHA page; the Reyssat PDF was obtained once at 12:43 UTC and its SHA-256 is pinned in fetch.py, which keeps a cached copy that matches. ScienceDirect blocks scripted and in-IDE browser access to the CC BY article; the identical publisher PDF was taken from the Ritchie group's LBNL library and the supplement from Elsevier's CDN." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/hygromorph-bilayer-curvature--claim-test--dataset-1>, <https://w3id.org/delphi/resource/evidence/hygromorph-bilayer-curvature--claim-test--dataset-2>, <https://w3id.org/delphi/resource/evidence/hygromorph-bilayer-curvature--claim-test--dataset-3> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/854c19ca49a2ccd57a4ffa8bc26ab10846323fdf/test-data/claim-tests/plant-hygromorph-mechanics/hygromorph-bilayer-curvature/result.json> .
+  <https://w3id.org/delphi/resource/evidence/hygromorph-bilayer-curvature--claim-test--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Quan, Pirosa, Yang, Ritchie & Meyers 2021, 'Hydration-induced reversible deformation of the pine cone', Acta Biomaterialia 128:370-383 (article PDF and supplementary material)" ;
+    dct:description "primary specimen set: Pinus torreyana scale geometry (h1 = 2.3 mm sclereid, h2 = 1.5 mm fibre), bilayer moduli and strains as tabulated (from Dawson et al. 1997), measured 79 deg rotation of one scale, stalk length 22.4 mm" ;
+    delphi:hasChecksum "sha256:87f98b1f729d0f2e9dc4b5b8721b5f3528b5d0f0a4aae79f69ba27c87188e1ba" ;
+    prov:atLocation <https://www2.lbl.gov/ritchie/Library/PDF/2021_Quan_pine_cone.pdf> ;
+    delphi:hasChecksum "sha256:2598442e28e2cd5bfbba189f4edd6a349a75bb7b100c1d7c4493cd16c75f5090" ;
+    prov:atLocation <https://ars.els-cdn.com/content/image/1-s2.0-S1742706121002956-mmc1.docx> ;
+    prov:wasDerivedFrom <https://doi.org/10.1016/j.actbio.2021.04.049> ;
+    dct:license "CC BY 4.0 (openaccessUserLicense in the Elsevier article metadata API; stated on p. 370)" .
+  <https://w3id.org/delphi/resource/evidence/hygromorph-bilayer-curvature--claim-test--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Reyssat & Mahadevan 2009, 'Hygromorphs: from pine cones to biomimetic bilayers', J. R. Soc. Interface 6:951-957" ;
+    dct:description "second specimen set: Pinus coulteri scale angle (132 deg plateau, Fig. 1d) and cell strain (0.20 immersed; 0.0011 per % RH), with pooled geometric ratios m ~ 1 and L_a/h_a ~ 10 and n ~ 5" ;
+    delphi:hasChecksum "sha256:544b4b7d4ce54af02e7227c7949cdc6f1613c326c12172b65fdaf69c6b860930" ;
+    prov:atLocation <https://pmc.ncbi.nlm.nih.gov/articles/PMC2838359/pdf/rsif20090184.pdf> ;
+    prov:wasDerivedFrom <https://doi.org/10.1098/rsif.2009.0184> ;
+    dct:license "Royal Society copyright 2009; free full text in PMC (not an open licence)" .
+  <https://w3id.org/delphi/resource/evidence/hygromorph-bilayer-curvature--claim-test--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Dawson, Vincent & Rocca 1997, 'How pine cones open', Nature 390:668" ;
+    dct:description "not accessible; moduli and swelling strains used at second hand" ;
+    delphi:hasChecksum "sha256:119debd27000f963de15f360ed54e5b493983d2e2b1a089275dce5db0f6cb6be" ;
+    prov:atLocation <https://www.nature.com/articles/37745> ;
+    prov:wasDerivedFrom <https://doi.org/10.1038/37745> ;
+    dct:license "paywalled (Nature; isAccessibleForFree false, USD 39.95 on 2026-11-01)" .
+  <https://w3id.org/delphi/resource/claim/hygromorph-bilayer-curvature> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/hygromorph-bilayer-curvature--claim-test> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/854c19ca49a2ccd57a4ffa8bc26ab10846323fdf/test-data/claim-tests/plant-hygromorph-mechanics/hygromorph-bilayer-curvature/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/854c19ca49a2ccd57a4ffa8bc26ab10846323fdf/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-fable-5-1-thinking> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-fable-5-1-thinking; )" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1-thinking> a delphi:LanguageModel ;
+    dct:identifier "claude-fable-5-1-thinking" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T14:53:45.797Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of hygromorph-bilayer-curvature: supports, confidence 0.4" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/hygromorph-bilayer-curvature--claim-test> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/plant-hygromorph-mechanics> .
+}

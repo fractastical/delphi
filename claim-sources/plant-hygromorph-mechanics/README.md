@@ -20,9 +20,10 @@ in the claim graph, and it sits next to Thompson's mechanics claims (`thompson19
 | `claims/key-claims.json` | Five claims, same schema as `claim-sources/math-bio-claims/claims/key-claims.json`: `statement`, LaTeX `notation`, `context` ending in `Formal status: …`, `proposed_test`, paper DOI (checked against Crossref 2026-10-31). |
 | `../thompson-growth-form/lean/ThompsonLaws/Hygromorphs.lean` and `…/lean/reports/Hygromorphs.json` | Lean 4 formalizations. They live in the Thompson Lake project because Lean reports are keyed by claim id across projects (`scripts/site/load-claims.mjs`) and a second Mathlib checkout is 7 GB. |
 | `../../test-data/claim-tests/plant-hygromorph-mechanics/<claim-id>/` | Pre-registered tests against published measurements. |
+| `build-nanopubs.mts`, `nanopubs/unsigned/*.trig`, `nanopubs/manifest.json` | One unsigned claim nanopub per claim (domain `plant-hygromorph-mechanics`), built with `DELPHI_PIPELINE=… NANOPUB_ORCID=… npx tsx build-nanopubs.mts`. Evidence nanopubs for the completed tests are built separately by `test-data/claim-tests/build-test-nanopubs.mjs`. |
 
-No nanopubs have been built or published for this source yet; `claim-sources/math-bio-claims/build-nanopubs.mts`
-is the template when that happens (new domain `plant-hygromorph-mechanics`).
+Status: unsigned drafts only; nothing from this source is signed or published. Signing and
+publishing are deliberate human steps (see `BEST_PRACTICES.md`).
 
 ## Claims
 
