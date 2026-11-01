@@ -281,3 +281,41 @@ service drill remains tied to its exact older source and dump. Moving experiment
 and original CPU cylinder states not yet returned remain outside this cutoff. The first broad
 inventory attempt refused an unsafe selected path; its local failure was retained, and the
 successful explicit frozen-release capture did not weaken the path or stability gates.
+
+### Secondary-project release checkpoint (12:10am PDT, November 1)
+
+Snapshot `20261101T0710` preserves exact deployed revision
+`d87e5d15094be6fe89704f8225b17d4719d07b3b`, including the secondary project media and
+all source refs captured in an incremental bundle. It also labels later native VLM,
+epithelial, regulatory recovery and failed Voxcraft evidence separately from that release.
+The fresh read-only database snapshot finished at 12:04:11am PDT: 3,960 record versions,
+1,988 events and zero forks. Both raw and sanitized dumps reproduced the recorded
+18-table counts in an isolated local PG16 cluster; scientific envelopes were unchanged.
+
+The 799,342,626-byte age archive was uploaded privately to persistent S3, downloaded
+and hash-checked, then decrypted on sb03. All 7,601 files / 1,709,971,561 logical bytes
+matched at 12:10:54am PDT. Anonymous S3 access returned 403. The incremental source
+bundle was verified and fetched into separate recovery refs in the mirror restored from
+`20261101T0610`; the exact release commit resolves there. Use that base mirror before
+fetching this bundle. The prerequisite commit list is inside encrypted metadata.
+
+The public-safe joined receipt is `results/resources/backup-recovery-studies-20261101.json`.
+Preparation failures (missing wrapper PATH/import path, missing pip in the uv venv, and
+a missing resume variable) were retained; none overwrote an earlier snapshot. The
+successful archive has zero capture errors. This checkpoint does not claim a new full
+application drill: the earlier separate-host service drill remains separately dated.
+Fresh credentials are required. Live credentials, upload capabilities, later transcript
+appends and unreturned running CPU-CFD states are excluded. Public-genome re-fetch
+accessions/checksums remain in the external-input inventory. The subsequent UI-only
+`795f140` source/deploy change will use a small additive delta, without recapturing this data.
+
+The UI followup is now captured as `20261101T0720`: exact revision
+`795f1405e9ebea4554d3c7e4d62b924742aab2ad`. Only five deployed files differ from
+`d87e5d1`; 6,551 files are unchanged and none are removed. The 32,157,342-byte
+archive contains those files, incremental committed source refs and exact publication
+receipts (18 files total). Its S3 download hash and second-host decryption passed;
+the incremental bundle verifies/fetches into the `0610` + `0710` recovery mirror and
+the exact final commit resolves. Apply this static delta atop `0710`, retaining that
+3960-version database snapshot and fresh-credential recipe. This is a source/static
+recovery check, not a new application or scientific validation claim. Later simulation
+returns and publications remain separately scoped.
