@@ -80,11 +80,35 @@ def _manifest(bound: _Bound, rel: str, label: str) -> dict:
     return {f["path"]: f["sha256"] for f in files if isinstance(f, dict) and "path" in f} if isinstance(files, list) else {f"{rel.rsplit('/', 1)[0]}/{k}": v.get("sha256") for k, v in files.items() if isinstance(v, dict)}
 
 
-def _put(bound: _Bound, out: dict, rel: str, b: bytes, role: str, want: str) -> dict:
-    name = rel.split("/")[-1]
+def _put(bound: _Bound, out: dict, rel: str, b: bytes, role: str, want: str, name: str | None = None) -> dict:
+    name = name or rel.split("/")[-1]
     path = f"{PUBLIC}/{role}/{name}"
     out[f"@{path}"] = b
     return {"name": name, "role": role, "source": rel, "path": path, "sha256": want, "bytes": len(b)}
+
+
+# The three manifests that pin everything shown, published as the exact bytes read (each name says which repository manifest it is; two are called manifest.json at source).
+MANIFESTS = {
+    "genotype": (f"{BIO}/genotype-manifest.json", "genotype-manifest.json"),
+    "sequence_evidence": (f"{SEQ}/manifest.json", "sequence-evidence-manifest.json"),
+    "doe": (f"{DOE}/manifest.json", "crossscale-doe-manifest.json"),
+}
+
+
+def _manifests(bound: _Bound, out: dict, files: list) -> dict:
+    """Publish each manifest's actual bytes, bound to their own sha256, so the "what is pinned" links resolve to a real download. A manifest that is
+    missing or not a manifest object is not published and its entry is None (the adapter has already recorded why under `withheld`)."""
+    got = {}
+    for key, (rel, name) in MANIFESTS.items():
+        b = bound.raw(rel)
+        d = _json(b)
+        if b is None or not isinstance(d, dict) or not isinstance(d.get("files"), (list, dict)):
+            got[key] = None
+            continue
+        e = _put(bound, out, rel, b, "manifests", _sha(b), name)
+        files.append(e)
+        got[key] = {"href": e["path"], "sha256": e["sha256"], "source": rel, "name": name}
+    return got
 
 
 def _ledger(bound: _Bound, out: dict, files: list) -> dict | None:
@@ -281,6 +305,7 @@ def build(ins, out: dict, root: Path | None = None) -> dict | None:
     doe_man = _manifest(bound, f"{DOE}/manifest.json", "DOE manifest")
     contracts = _contracts(bound, out, files, doe_man)
     screen = _screen(bound, out, files, doe_man)
+    manifests = _manifests(bound, out, files)
     graph, val = comp["graph"], comp["validation"]
     ref = ((val or {}).get("instrument_contracts_ref") or {}).get("sha256")
     notes = []
@@ -309,5 +334,5 @@ def build(ins, out: dict, root: Path | None = None) -> dict | None:
         "instrument_contracts": contracts,
         "design_screen": screen,
         "files": files,
-        "manifests": {"genotype": f"{BIO}/genotype-manifest.json", "sequence_evidence": f"{SEQ}/manifest.json", "doe": f"{DOE}/manifest.json"},
+        "manifests": manifests,
     }

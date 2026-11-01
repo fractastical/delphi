@@ -68,7 +68,7 @@ def test_only_allowlisted_hashed_files_are_published(built):
     g, out = built
     assert set(out) == {"@" + f["path"] for f in g["files"]}
     for f in g["files"]:
-        assert GS._sha(out["@" + f["path"]]) == f["sha256"] and f["role"] in ("compiler", "ledger", "sequences", "doe")
+        assert GS._sha(out["@" + f["path"]]) == f["sha256"] and f["role"] in ("compiler", "ledger", "sequences", "doe", "manifests")
     assert sorted(f["name"] for f in g["files"] if f["role"] == "sequences") == ["fgf20a-genomic.fasta", "fgf20a-transcript.fasta", "kcnh2a-genomic.fasta", "kcnh2a-transcript.fasta"]
     assert not any("evo2" in k for k in out), "model-output JSON stays a pinned source and is not republished"
 
@@ -151,6 +151,10 @@ def test_the_panel_shows_counts_withholds_nothing_and_never_overflows(browser, b
         assert must in t, must
     assert "does not create DNA" in t and "contradicted by the source" in t and "Withheld" not in t
     assert pg.locator(".gif").count() == 5 and pg.locator("#genotype table").count() == 3
+    link = pg.locator("#genotype a", has_text="sequence-evidence manifest")
+    href = link.get_attribute("href")
+    assert href == built[0]["manifests"]["sequence_evidence"]["href"] and href in {f["path"] for f in built[0]["files"]}, "the link points at a published file, not a repository path"
+    assert "@" + href in built[1], "the builder writes exactly this file into the site (HTTP 200 is checked by tests/review_new_surfaces.py on a built site)"
     pg.locator("#gif-I1 summary").click()
     assert "validation slice" in pg.locator("#gif-I1").inner_text().lower()
     assert overflow(pg) <= 0 and pg.errors == []
@@ -178,3 +182,24 @@ def test_without_a_genotype_block_the_assemblies_page_is_unchanged(browser, base
     pg.goto(base + "#/assemblies")
     pg.wait_for_selector(".asmatrix")
     assert pg.locator("#genotype").count() == 0
+
+
+def test_the_three_pinning_manifests_are_published_as_their_actual_bytes_with_unambiguous_names(built):
+    g, out = built
+    ms = g["manifests"]
+    assert set(ms) == {"genotype", "sequence_evidence", "doe"} and all(ms.values())
+    assert sorted(m["name"] for m in ms.values()) == ["crossscale-doe-manifest.json", "genotype-manifest.json", "sequence-evidence-manifest.json"], "two sources are both called manifest.json"
+    for key, m in ms.items():
+        src = (ROOT / m["source"]).read_bytes()
+        assert out["@" + m["href"]] == src and GS._sha(src) == m["sha256"], key
+        assert m["href"] == f"{GS.PUBLIC}/manifests/{m['name']}" and any(f["path"] == m["href"] and f["role"] == "manifests" and f["source"] == m["source"] for f in g["files"])
+    assert sum(1 for f in g["files"] if f["role"] == "manifests") == 3
+
+
+def test_a_missing_manifest_is_not_published_and_its_link_is_withheld(tmp_path):
+    root = stage(tmp_path)
+    (root / GS.SEQ / "manifest.json").unlink()
+    out = {}
+    g = GS.build(Ins(root), out, root=root)
+    assert g["manifests"]["sequence_evidence"] is None and g["status"] == "partial" and any(w["path"].endswith("sequence-evidence/manifest.json") for w in g["withheld"])
+    assert not any("sequence-evidence-manifest" in k for k in out)
