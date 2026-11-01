@@ -319,3 +319,17 @@ the exact final commit resolves. Apply this static delta atop `0710`, retaining 
 3960-version database snapshot and fresh-credential recipe. This is a source/static
 recovery check, not a new application or scientific validation claim. Later simulation
 returns and publications remain separately scoped.
+
+## Later original CPU checkpoints
+
+The separate `20261101T073049-cpu-checkpoints` add-on preserves the first three
+returned CPU R1/R3/M1 restart states and their native control/status/collection
+receipts. It follows the hosted `795f140` cutoff; these are partial states, not
+completed case results or acceptance. No database or service capture was repeated.
+The encrypted archive is 603,855,760 bytes, SHA256
+`77395fbd2df94be377f8b81c60b9fca7a19287a031285f2c4b0dbc5857b361be`.
+A private S3 download matched, anonymous access returned 403, and actual sb03
+decryption restored and hash-checked all 14 files / 1,185,936,851 logical bytes at
+12:33:43am PDT on November 1. The joined receipt is
+`results/resources/backup-recovery-cpu-checkpoints-20261101.json`. Later integration
+steps and both newly running scientific jobs remain outside this small add-on.
