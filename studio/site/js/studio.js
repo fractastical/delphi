@@ -108,6 +108,7 @@
     if (!H) return html`<section class="panel"><h2>Start from real fish anatomy.</h2><p class="empty">No fish3d candidate or fish-control data is present in this snapshot.</p></section>`;
     const downloads = (snap.model_downloads || {}).groups || [];
     const v3a = downloads.flatMap((g) => g.files).find((f) => f.name === "fish3d-v3a-fan-prop-scales.stl");
+    const launchBundle = downloads.flatMap((g) => g.files).find((f) => f.format === "ZIP" && !f.withdrawn);
     const copied = new Set((snap.fish3d_viewer || {}).copied || []);
     const f = H.fitted[0]; const c = H.candidate; const sh = Object.entries(H.fish1990.pectoral_share_pct_mean_se).sort((x, y) => x[1][0] - y[1][0]); const lo = sh[0], hi = sh[sh.length - 1]; const cm = (snap.coupling_manifest || {}).counts; const SOFT = new Set(["aesthetic", "assumed", "numerical", "assumed transfer", "design_assumption"]);
     return html`<section class="panel grounding" aria-labelledby="gr-h"><h2 id="gr-h">Start from real fish anatomy.</h2>
@@ -117,8 +118,9 @@
         <div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint" id="fishnote">The 3D model is a candidate mesh. Colours and pigment bands are appearance choices, each marked sourced or assumed in the viewer. Not an organism and not an aerodynamic result. The schematic drawing and printable models are below.</p><p class="small"><a href="${DF.href("/history")}">How these candidates relate: the fish design history</a> (revisions, sibling variants and display props kept apart).</p>
         <div id="home-model-downloads" class="small">
           ${v3a ? html`<p><a href="${v3a.href}" download>Download v3a fish with scales · STL</a> <span class="faint">Display model, not the slingshot prototype.</span></p>` : ""}
+          ${launchBundle ? html`<p><a href="${launchBundle.href}" download>Download corrected slingshot test-print set · ZIP</a> <span class="faint">Six parts and assembly notes. Untested; current mass exceeds the assumed glide target.</span></p>` : ""}
           <details><summary><b>All model downloads</b> · print revisions, stands and 3D candidates</summary>
-            ${downloads.map((g) => html`<details><summary>${g.title} · ${g.files.length} files</summary><p class="faint">${g.scope} <a href="${g.manifest_href}">Manifest and checks</a></p><ul>${g.files.map((f) => html`<li><a href="${f.href}" download title="SHA-256 ${f.sha256}">${f.name}</a> <span class="faint">${(f.bytes / 1048576).toFixed(2)} MB</span></li>`)}</ul></details>`)}
+            ${downloads.map((g) => html`<details><summary>${g.title} · ${g.files.length} files</summary><p class="faint">${g.scope} <a href="${g.manifest_href}">Manifest and checks</a></p>${g.warning ? html`<p class="note warn">${g.warning}</p>` : ""}<ul>${g.files.map((f) => html`<li>${f.withdrawn ? html`<span>${f.name} — withdrawn. ${f.withdrawn}</span>` : html`<a href="${f.href}" download title="SHA-256 ${f.sha256}">${f.name}</a>`} <span class="faint">${(f.bytes / 1048576).toFixed(2)} MB</span></li>`)}</ul></details>`)}
             <details><summary>Candidate meshes · GLB</summary><p class="faint">Visualisation meshes; use the print revisions above for printing.</p><ul>${snap.fish3d_viewer.candidates.map((c) => html`<li>${c.label}: ${["fish.glb", ...(c.variants || []).map((v) => v.glb)].filter((f) => copied.has(c.id + "/" + f)).map((f) => html`<a href="${c.base + f}" download>${f}</a> `)}</li>`)}</ul></details>
           </details>
         </div>
