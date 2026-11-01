@@ -1416,7 +1416,7 @@ def test_design_review_shows_challenges_left_on_the_earlier_project_version(brow
     assert head["version"] in seen and hist["version"] in seen, seen
 
 
-def test_home_offers_the_v3_display_props_with_hash_exact_stl_downloads(browser, base):
+def test_home_offers_print_revisions_with_hash_exact_stl_downloads(browser, base):
     import hashlib
     snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
     assert snap["print_v3"]["refused"] == []
@@ -1437,13 +1437,32 @@ def test_home_offers_the_v3_display_props_with_hash_exact_stl_downloads(browser,
             assert len(data) == file["bytes"] and hashlib.sha256(data).hexdigest() == file["sha256"]
     assert pg.locator("#home-model-downloads").evaluate("e => !!(e.compareDocumentPosition(document.querySelector('#fishmini')) & Node.DOCUMENT_POSITION_FOLLOWING)")
     assert pg.locator("#home-model-downloads > p a").first.is_visible()
-    assert pg.locator(".printv3 option").all_inner_texts() == ["fish3d-v3a-fan-prop", "fish3d-v3b-glide-pose-prop"]
+    assert pg.locator(".printv3 option").all_inner_texts() == [f["title"] for f in snap["print_v3"]["forms"]]
+    assert {"fish3d-v3a-fan-prop", "fish3d-v3b-glide-pose-prop"} <= set(pg.locator(".printv3 option").evaluate_all("els => els.map(e => e.value)"))
     assert pg.locator(".printv3 .v3links a[download]").count() == 3
     pg.select_option(".printv3 select", "fish3d-v3b-glide-pose-prop")
     hrefs = pg.locator(".printv3 .v3links a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
     assert all("fish3d-v3b-glide-pose-prop" in h and h.endswith(".stl") for h in hrefs), hrefs
     assert "printer and resin unknown" in pg.locator(".printv3").text_content() and "not organisms" in pg.locator(".printv3 .v3info").text_content()
     assert pg.request.get(base + hrefs[0]).status == 200
+    latest = [f for f in snap["print_v3"]["forms"] if f["family"] == "print-v4"]
+    assert len(latest) >= 2
+    assert len({f["id"] for f in latest}) == len(latest)
+    for width in (1440, 390):
+        pg.set_viewport_size({"width": width, "height": 960})
+        cards = pg.locator(".latest-prints .print-study")
+        assert cards.count() == len(latest)
+        for i, form in enumerate(latest):
+            card = cards.nth(i)
+            card.scroll_into_view_if_needed()
+            pg.wait_for_function("i => { const e = document.querySelectorAll('.print-study img')[i]; return e.complete && e.naturalWidth > 0; }", arg=i)
+            assert form["short"] in card.inner_text()
+            assert "Calculated mass" in card.inner_text() and "Not weighed" in card.inner_text()
+            assert f'{form["mass_conditional_g"]["smooth"]:.2f} g' in card.inner_text()
+            assert card.locator("a[download]").count() == 2
+            assert all("print-v4/stl/" in h for h in card.locator("a[download]").evaluate_all("els => els.map(e => e.getAttribute('href'))"))
+        assert pg.evaluate("document.documentElement.scrollWidth <= window.innerWidth")
+    assert not pg.errors
 
 
 def test_generative_page_shows_recorded_denoising_and_retains_failed_audit(browser, base):
@@ -1897,7 +1916,7 @@ def test_demo_page_defaults_to_latest_published_cut_and_preserves_old_downloads(
         return
     pg = page(browser, 1280, 900)
     pg.goto(base + "#/demo"); pg.wait_for_selector("#demo-video")
-    expected = cuts.get("frontier-90s") or cuts["frontier-60s"]
+    expected = cuts.get("frontier-science-60s") or cuts.get("frontier-90s") or cuts["frontier-60s"]
     assert pg.locator("#demo-video source").get_attribute("src") == expected["href"]
     assert pg.locator(".demodl li").count() == len(cuts) and pg.locator(".demodl a[download]").count() >= len(cuts)
 
@@ -2193,7 +2212,7 @@ def test_tables_keep_badges_on_one_line_stack_on_phones_and_say_when_they_scroll
 
 def test_new_ninety_second_cut_is_featured_with_accurate_label_and_old_cuts(browser, base):
     snap = json.loads((ROOT / 'site/data/snapshot.json').read_text())
-    old = snap['demo_videos']['cuts']
+    old = [c for c in snap['demo_videos']['cuts'] if not c['id'].startswith('frontier-science-')]
     assert {c['id'] for c in old} >= {'frontier-60s', 'frontier-120s'}
     latest = dict(old[0], id='frontier-90s', title='New narrated tour', duration_s=90)
     snap['demo_videos']['cuts'] = [c for c in old if c['id'] != 'frontier-90s'] + [latest]
@@ -2209,6 +2228,34 @@ def test_new_ninety_second_cut_is_featured_with_accurate_label_and_old_cuts(brow
         pg.wait_for_selector('.democut[aria-current=page]:has-text("1 minute")')
         assert pg.locator('#demo-video source').get_attribute('src') == next(c['href'] for c in old if c['id'] == 'frontier-60s')
         assert _overflow(pg) <= 0 and not pg.errors
+        pg.close()
+
+
+def test_science_pair_is_featured_and_earlier_videos_remain_playable(browser, base):
+    snap = json.loads((ROOT / 'site/data/snapshot.json').read_text())
+    old = [c for c in snap['demo_videos']['cuts'] if not c['id'].startswith('frontier-science-')]
+    new = [dict(old[0], id=f'frontier-science-{seconds}s', title=title, duration_s=seconds)
+           for seconds, title in [(60, 'Lean for biology'), (120, 'Design across scales')]]
+    snap['demo_videos']['cuts'] = old + new
+    for width in (1440, 390):
+        pg = page(browser, width, 960)
+        pg.route('**/data/snapshot.json', lambda r: r.fulfill(json=snap))
+        pg.goto(base + '#/demo')
+        pg.wait_for_selector('#demo-video')
+        assert 'Lean for biology' in pg.locator('.demohead').inner_text()
+        assert pg.locator('.democut[aria-current=page]').get_attribute('href').endswith('frontier-science-60s')
+        assert pg.locator('nav[aria-label="Choose a cut"] .democut').count() == 2
+        assert pg.locator('.demodl li').count() == len(old) + 2
+        pg.locator('#demo-switch').click()
+        pg.wait_for_selector('.democut[aria-current=page][href$="frontier-science-120s"]')
+        assert pg.locator('#demo-switch').get_attribute('href').endswith('frontier-science-60s')
+        pg.locator('.demoarchive summary').click()
+        pg.locator('.demoarchive .democut[href$="frontier-60s"]').click()
+        pg.wait_for_selector('.demoarchive .democut[aria-current=page]')
+        assert pg.locator('#demo-video source').get_attribute('src') == next(c['href'] for c in old if c['id'] == 'frontier-60s')
+        assert pg.locator('.demoarchive').evaluate('e => e.open')
+        assert _overflow(pg) <= 0 and not pg.errors
+        pg.close()
 
 
 def test_single_ray_card_preserves_same_equation_scope_and_source_discrepancy(browser, base):

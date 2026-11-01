@@ -666,7 +666,10 @@ def print_v3_block(ins: Inputs, out: dict) -> dict | None:
                     continue
                 out["@" + href] = raw
                 files.append({"kind": item["kind"], "href": href, "bytes": item["bytes"], "sha256": item["sha256"], "units": item.get("units")})
-            forms.append({"id": form["id"], "title": form.get("title") or form["id"], "short": form.get("short"), "display_scale": form["display_scale"], "prop_size_mm": form.get("prop_size_mm"), "source_candidate": form.get("source_candidate"), "source_candidate_sha256": form.get("source_candidate_sha256"), "family": directory.name, "files": files})
+            forms.append({"id": form["id"], "title": form.get("title") or form["id"], "short": form.get("short"), "display_scale": form["display_scale"], "prop_size_mm": form.get("prop_size_mm"), "source_candidate": form.get("source_candidate"), "source_candidate_sha256": form.get("source_candidate_sha256"), "family": directory.name, "files": files,
+                          "why": form.get("why"), "wall_rule_mm": form.get("wall_rule_mm"),
+                          "mass_conditional_g": form.get("mass_conditional_g"),
+                          "mass_density_kg_m3": form.get("mass_density_kg_m3")})
     return {"forms": forms, "limitations": limitations, "printer_resin": printer_resin, "refused": refused} if forms else None
 
 
@@ -757,7 +760,8 @@ def demo_videos(ins: Inputs, out: dict) -> dict | None:
     result = {"cuts": [], "refused": [], "limits": []}
     present = False
     for directory, expected in (("artifacts/demo-video", {"frontier-60s": 60, "frontier-120s": 120}),
-                                ("artifacts/demo-video-90", {"frontier-90s": 90})):
+                                ("artifacts/demo-video-90", {"frontier-90s": 90}),
+                                ("artifacts/demo-video-science", {"frontier-science-60s": 60, "frontier-science-120s": 120})):
         manifest = _demo_manifest(ins, out, directory, expected)
         if manifest is None:
             continue

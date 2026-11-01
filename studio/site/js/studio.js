@@ -95,6 +95,18 @@
 
   /* Home: sourced anatomy beside the actual 3D candidate. Statuses are the fish3d candidate's own; nothing is called validated. */
   const STATUS_WORDS = { derived: "derived from a sourced fit", functional: "set from a sourced relation or the design target", figure_read: "read from a published figure", aesthetic: "aesthetic choice", assumed: "assumed", numerical: "numerical setting", design_assumption: "design assumption", "assumed transfer": "assumed transfer" };
+  function printableStudy(f) {
+    const preview = f.files.find((x) => x.kind === "png_prop");
+    const smooth = f.files.find((x) => x.kind === "stl_prop");
+    const mass = f.mass_conditional_g || {};
+    return html`<article class="print-study">
+      ${preview && smooth ? html`<a href="${DF.href("/print-laws", {file: smooth.href})}"><img src="${preview.href}" alt="${f.title} — rendered print geometry" loading="lazy"></a>` : ""}
+      <div><h4>${f.short || f.title}</h4><p>${f.why || f.title}</p>
+      ${f.prop_size_mm ? html`<p class="small"><b>${f.prop_size_mm.map((x) => Number(x).toFixed(1)).join(" × ")} mm</b> · ${f.display_scale}× display scale</p>` : ""}
+      ${Number.isFinite(mass.smooth) && Number.isFinite(f.mass_density_kg_m3) ? html`<p class="small faint">Calculated mass: ${mass.smooth.toFixed(2)} g smooth${Number.isFinite(mass.relief) ? ", " + mass.relief.toFixed(2) + " g with scales" : ""}, at ${(f.mass_density_kg_m3 / 1000).toFixed(2)} g/cm³. Not weighed.</p>` : ""}
+      ${Number.isFinite(f.wall_rule_mm) ? html`<p class="small faint">${f.wall_rule_mm.toFixed(1)} mm provisional wall rule; sampled checks and relief limits are in the file report.</p>` : ""}
+      <ul>${f.files.filter((x) => ["stl_prop", "stl_prop_scale_relief"].includes(x.kind)).map((x) => html`<li><a href="${x.href}" download>${x.kind === "stl_prop" ? "Smooth STL" : "Scale-relief STL"}</a> · <a href="${DF.href("/print-laws", {file: x.href})}">File checks and laws</a></li>`)}</ul></div></article>`;
+  }
   /* Candidate-dependent statement about what the selected 3D model is. Status words are the candidate's own; nothing is called validated. */
   function groundNote(c, H) {
     const sc = c.status_counts || {}; const parts = Object.entries(sc).map(([k, n]) => n + " " + (STATUS_WORDS[k] || k)).join(", ");
@@ -118,8 +130,8 @@
         <h3 class="sr">Interactive 3D candidate</h3>
         <div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint" id="fishnote">The 3D model is a candidate mesh. Colours and pigment bands are appearance choices, each marked sourced or assumed in the viewer. Not an organism and not an aerodynamic result. The schematic drawing and printable models are below.</p><p class="small"><a href="${DF.href("/history")}">How these candidates relate: the fish design history</a> (revisions, sibling variants and display props kept apart).</p>
         <div id="home-model-downloads" class="small">
-          ${snap.print_laws && snap.print_laws.data ? html`<p><a href="${DF.href("/print-laws")}"><b>Why the print fails its mass budget · laws, checks & lineage</b></a></p>` : ""}
-          ${newProps.length ? html`<div class="latest-prints"><h3>Latest printable fish studies</h3><p class="faint">Source-conditioned geometry with thicker membranes and rays for printing. Each file has its own checks; these are display studies.</p><ul>${newProps.map((f) => html`<li><b>${f.title}</b>${f.prop_size_mm ? " · " + f.prop_size_mm.map((x) => Number(x).toFixed(1)).join(" × ") + " mm" : ""}<br>${f.files.filter((x) => ["stl_prop", "stl_prop_scale_relief"].includes(x.kind)).map((x) => html`<a href="${x.href}" download>${x.kind === "stl_prop" ? "Smooth STL" : "Scale-relief STL"}</a> · <a href="${DF.href("/print-laws", {file: x.href})}">File checks and laws</a> `)}</li>`)}</ul></div>` : ""}
+          ${snap.print_laws && snap.print_laws.data ? html`<p><a href="${DF.href("/print-laws")}"><b>Print models: laws, checks, mass budgets & lineage</b></a></p>` : ""}
+          ${newProps.length ? html`<div class="latest-prints"><h3>Latest printable fish studies</h3><p class="faint">Source-conditioned geometry with thicker membranes and rays for printing. Each file has its own checks; these are display studies.</p><div class="print-study-grid">${newProps.map(printableStudy)}</div><p><a href="${DF.href("/history")}">Compare the design history</a> · Stands and previous revisions are under All model downloads.</p></div>` : ""}
           ${v3a ? html`<p><a href="${v3a.href}" download>Download v3a fish with scales · STL</a> <span class="faint">Display model, not the slingshot prototype.</span></p>` : ""}
           ${launchBundle ? html`<p><a href="${launchBundle.href}" download>Download corrected slingshot test-print set · ZIP</a> <span class="faint">Six parts and assembly notes. Fit/balance only: overweight, with a catch-wall concern unresolved. Not cleared for launch.</span></p>` : ""}
           <details><summary><b>All model downloads</b> · print revisions, stands and 3D candidates</summary>
