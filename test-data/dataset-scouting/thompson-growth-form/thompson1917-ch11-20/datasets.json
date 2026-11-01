@@ -1,0 +1,109 @@
+{
+  "claim_id": "thompson1917-ch11-20",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:18:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "3D volumes or meshes of chambered cephalopod shells resolving the septa and their lines of attachment (sutures)",
+    "septal surface geometry (mean curvature, area) and the boundary curve of attachment, per septum",
+    "cone geometry and attachment orientation (straight cone with perpendicular or oblique septum; sinuous suture)",
+    "taxon and preservation state of each shell"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource-cephalopod-shell-ct",
+      "name": "MorphoSource: Nautilus and ammonoid shell media (API)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Nautilus",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:12:53Z", "method": "GET /api/media for q=Nautilus (1), Ammonoidea (1), ammonite (1), Nautiloidea (0), Cephalopoda (0), Ammonitida (0), septa (2, both a dinosaur); /api/physical-objects?q=Nautilus (7), Ammonoidea (0)", "http_status": 200 },
+      "variables_present": [
+        "'Conch Of Nautilus Pompilius [CTImageSeries]' (open download; 1,551 images, x pixel spacing 0.090565 mm, North Star Imaging X5000, file_size_all 6,667,197,177 bytes, physical object pimuz:7825)",
+        "an open ammonoid mesh of Didymoceras stevensoni (micro-CT, titled 'Element Unspecified') and an open mesh 'Ammonite [Mesh] [StrLight]' of Gastrioceras fittsi (structured light)"
+      ],
+      "variables_missing": [
+        "only three cephalopod media items; no taxon sampling of straight cones, oblique attachments or sinuous sutures",
+        "whether the CT series resolves the septa and whether the structured-light mesh shows internal septa was not checked (the structured-light scan is an external surface method)",
+        "no precomputed septal curvature or surface meshes"
+      ],
+      "scope": "three media records matching cephalopod names; MorphoSource is a catalogue and its coverage of fossil cephalopods is small",
+      "evidence": "pages.total_count 1 for each of Nautilus, Ammonoidea, ammonite and 0 for Nautiloidea, Cephalopoda, Ammonitida; titles, visibility 'open' and taxonomy fields as returned",
+      "verdict": "partial",
+      "reuses_organism_dataset": "morphosource-nautilus-pompilius-validated-2026-10-31"
+    },
+    {
+      "id": "dryad-kosmoceras-2d-3d-shell-morphology",
+      "name": "Data from: Integrating 2D and 3D shell morphology to disentangle the palaeobiology of ammonoids: a virtual approach (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.133nq",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.133nq",
+      "doi": "10.5061/dryad.133nq",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:13:09Z", "method": "GET Dryad dataset metadata and version-21672 file list (storageSize 36,119,654 bytes; files include suture photographs SF_1 to SF_6 and 'Supplementary Data.xlsx' 123,870 bytes); files not downloaded", "http_status": 200 },
+      "variables_present": [
+        "nano-CT derived data on a single juvenile Kosmoceras (Jurassic, Callovian) including 2D shell morphology in 10-degree steps and 3D chamber volumes",
+        "suture ontogeny photographs and a spreadsheet of measurements"
+      ],
+      "variables_missing": [
+        "one specimen; no septal surface meshes or curvature in the listed files",
+        "not a straight cone, oblique or sinuous attachment comparison"
+      ],
+      "scope": "one ammonite specimen",
+      "evidence": "Dryad API abstract and file list as quoted; license https://spdx.org/licenses/CC0-1.0.html",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-ammonoid-septal-shape-compression",
+      "name": "Did shell-crushing predators drive the evolution of ammonoid septal shape? (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.pvmcvdnk6",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.pvmcvdnk6",
+      "doi": "10.5061/dryad.pvmcvdnk6",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:13:05Z", "method": "GET Dryad dataset metadata and version-100301 file list (three TIFF figures, 563,310 / 2,113,078 / 1,056,394 bytes)", "http_status": 200 },
+      "variables_present": [
+        "abstract describes compression experiments on 3D-printed computer-designed model septa"
+      ],
+      "variables_missing": [
+        "listed files are figures only; models are theoretical designs, not scanned natural septa"
+      ],
+      "scope": "theoretical septal margin morphologies",
+      "evidence": "file list of three .tif figures; abstract text",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "digital-atlas-of-ancient-life",
+      "name": "Digital Atlas of Ancient Life",
+      "landing_url": "https://www.digitalatlasofancientlife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:13:09Z", "method": "GET landing page (120,274 bytes of HTML, page title 'Digital Atlas of Anc...')", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["an educational web atlas of fossil images and descriptions; no downloadable suture outlines, sections or 3D data were identified from the landing page"],
+      "scope": "web portal",
+      "evidence": "HTML page; no data endpoint seen",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "MorphoSource API", "query": "media q=Nautilus / Ammonoidea / ammonite / Nautiloidea / Cephalopoda / septa", "url": "https://www.morphosource.org/api/media?q=Ammonoidea&per_page=3", "hits": 1, "note": "three cephalopod media in total" },
+    { "source": "Dryad", "query": "ammonoid septa; septal surface cephalopod; ammonite suture; Nautilus shell CT", "url": "https://datadryad.org/api/v2/search?q=ammonoid%20septa&per_page=6", "hits": 1, "note": "'septal surface cephalopod' 1 (10.5061/dryad.133nq), 'ammonite suture' 1 (same), 'Nautilus shell CT' 0" },
+    { "source": "DataCite", "query": "ammonoid septal morphology micro-CT", "url": "https://api.datacite.org/dois?query=ammonoid%20septal%20morphology%20micro-CT&page[size]=6", "hits": 0, "note": "'nautilus shell septum' gave 13, mostly Zenodo taxon treatments" },
+    { "source": "Zenodo", "query": "ammonoid septa micro-CT model", "url": "https://zenodo.org/api/records?q=ammonoid%20septa%20micro-CT%20model&size=6", "hits": 573365, "note": "unfiltered full-text noise; includes a paper on relative septal thickness (10.1186/s13358-022-00246-2) that is a PDF only" }
+  ],
+  "status": "partial",
+  "summary": "Open 3D cephalopod shell data are sparse: MorphoSource lists one Nautilus pompilius conch CT series (1,551 slices at 0.09 mm, 6.7 GB) and two ammonoid items, and Dryad has one Kosmoceras CT dataset with chamber volumes and suture photographs. No repository holding meshed septal surfaces with their attachment curves, or a sample spanning straight cones and sinuous sutures, was found.",
+  "next_step": "Open the MorphoSource Nautilus CT series metadata (voxel spacing, whether septa resolve) and ask CT groups for ammonoid septal models; otherwise compile septal surfaces from published CT studies.",
+  "obstacles_confirmed": [
+    "Downloadable CT is limited to Nautilus and a few ammonoid items.",
+    "Computer-designed septa on Dryad are theoretical, not measured.",
+    "The assumptions of uniform pressure and isotropic membrane are not recorded in any dataset."
+  ]
+}

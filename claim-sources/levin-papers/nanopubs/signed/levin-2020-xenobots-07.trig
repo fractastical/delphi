@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAvPji9HOfjPCP9ZQRSqySeSmnIkGY2Cur3xVbBr3w6KA>.
+@prefix sub: <https://w3id.org/np/RAvPji9HOfjPCP9ZQRSqySeSmnIkGY2Cur3xVbBr3w6KA/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2020-xenobots-07> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "The behavioural competence of individual cells and their propensity to cooperate in groups facilitate functional morphogenesis in novel circumstances, so that the designed organisms, despite lacking nervous systems, following novel developmental trajectories and mixing tissues, still possess self-organizing properties that support their designed behaviour.";
+    dc:type "mechanism";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Cell competence lets neural-less novel aggregates self-organize functionally";
+    <https://w3id.org/delphi/ontology/context> "Kriegman S, Blackiston D, Levin M, Bongard J, “A scalable pipeline for designing reconfigurable organisms”, Proceedings of the National Academy of Sciences of the United States of America (2020), doi:10.1073/pnas.1910837117; section “Discussion”. Scope: Xenopus cells in novel, designed multicellular configurations"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1073/pnas.1910837117>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2020-xenobots.txt#line=50,51>;
+    prov:wasQuotedFrom <https://doi.org/10.1073/pnas.1910837117>;
+    <https://schema.org/text> "The behavioral competence of individual cells, and the propensity of cells to cooperate in groups, facilitate functional morphogenesis in novel circumstances. The lifeforms presented here, despite lacking nervous systems, following novel developmental trajectories, and being composed of materials from different tissues, nevertheless possess these self-organizing properties.".
+<https://doi.org/10.1073/pnas.1910837117> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Kriegman S, Blackiston D, Levin M, Bongard J. A scalable pipeline for designing reconfigurable organisms. Proceedings of the National Academy of Sciences of the United States of America (2020). doi:10.1073/pnas.1910837117";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2020"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "A scalable pipeline for designing reconfigurable organisms";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC6994979>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2020-xenobots.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2020-xenobots.txt#line=50,51> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2020-xenobots.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2020-xenobots.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6994979/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1073/pnas.1910837117>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "b346b429d6de2a1f5dc08f3d4a590fac3621fcd4d8e70bd86ef7f354e92efdba"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2020 claim: Cell competence lets neural-less novel aggregates self-organize functionally";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2020-xenobots-07>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "R7ZxbCfRlZkkVuvJFYs+9ym4QDvpgNiD0zAG1nlldF2Xr+pllaPHoALBZTwB3b3EYbElUA+htGyryyWNpIfm0C4yONWjbBY5ezsWjJwWu3nVDYGuHuZNLWIkCDvp4qdWuu+ZzG8f0d3pbGQetNfHiS0RUSPiP92fcWZs67UNPYXop79ssaQgc1VOtqvMdKLaiBGJU/T+yGlFYaXe3NO+Vk1ZHbCzyU2zpxVy7qUKVOXksBleqigBBMxYYAsVmLax+SCuVdmfYAKRy2y9SZFSaANQXhVe5C1dTBcpgZ3bpzfN9fAHw0r63vH4gHcLealJTUfDDBH1UBxNIUyw+ax72g=="
+}

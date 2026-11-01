@@ -1,0 +1,86 @@
+{
+  "claim_id": "levin-2023-glue-03",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:29:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "levin-01" },
+  "variables_needed": [
+    "trial-level visual-conditioning outcomes for eyeless tadpoles with one tail eye versus controls",
+    "light-cue versus non-visual response controls",
+    "anatomical tracing of axons from the tail eye to the spinal cord"
+  ],
+  "datasets": [
+    {
+      "id": "blackiston-levin-2013-ectopic-eyes",
+      "name": "Ectopic eyes outside the head in Xenopus tadpoles provide sensory data for light-mediated learning (J Exp Biol 2013)",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22Ectopic%20eyes%20outside%20the%20head%20in%20Xenopus%20tadpoles%22&format=json&resultType=core",
+      "access_url": null,
+      "doi": "10.1242/jeb.074963",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:26:00Z", "method": "Europe PMC REST search by title", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["a paper, not a dataset; no deposited trial-level data found"],
+      "scope": "PMC3587383, 2013; Europe PMC flags hasSuppl N, hasData Y; contents not read.",
+      "evidence": "Europe PMC record only.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "biostudies",
+      "name": "BioStudies (portal)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=ectopic%20eye%20Xenopus%20tadpole&pageSize=5",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:26:30Z", "method": "GET BioStudies search API", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["no matching behaviour or tracing study among top hits"],
+      "scope": "66,758 hits for 'ectopic eye Xenopus tadpole', dominated by Europe PMC paper records (S-EPMC...); top 5 titles concern rabies-virus tracing, tail regeneration and antiviral protection, not tail-eye vision.",
+      "evidence": "Search JSON totalHits 66758 and the first 5 titles.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad (portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=ectopic%20eye%20Xenopus%20tadpole%20vision",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:26:15Z", "method": "GET Dryad search API", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["no deposit found"],
+      "scope": "Search returned total 0.",
+      "evidence": "Search JSON total 0.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "xenbase",
+      "name": "Xenbase",
+      "landing_url": "https://www.xenbase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:14:30Z", "method": "HEAD landing page with redirect", "http_status": 200, "note": "redirected to https://www.xenbase.org/xenbase/recaptcha.do?nextUrl=%2Fxenbase%2F, a reCAPTCHA wall; no content seen" },
+      "variables_present": [],
+      "variables_missing": ["could not be queried; the assessor already says it does not store learning trials"],
+      "scope": "Unreachable programmatically.",
+      "evidence": "Redirect target contains 'recaptcha'.",
+      "verdict": "unreachable"
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "ectopic eye Xenopus tadpole vision", "url": "https://datadryad.org/api/v2/search?q=ectopic%20eye%20Xenopus%20tadpole%20vision", "hits": 0, "note": "none" },
+    { "source": "BioStudies", "query": "ectopic eye Xenopus tadpole", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=ectopic%20eye%20Xenopus%20tadpole&pageSize=5", "hits": 66758, "note": "top hits unrelated" },
+    { "source": "Europe PMC", "query": "Ectopic eyes outside the head in Xenopus tadpoles", "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22Ectopic%20eyes%20outside%20the%20head%20in%20Xenopus%20tadpoles%22&format=json&resultType=core", "hits": 2, "note": "the 2013 J Exp Biol paper (PMC3587383) and a review" },
+    { "source": "Zenodo", "query": "\"ectopic eye\" Xenopus learning", "url": "https://zenodo.org/api/records?q=%22ectopic%20eye%22%20Xenopus%20learning&size=4", "hits": 289070, "note": "loose; none relevant among the top 4" }
+  ],
+  "status": "gap",
+  "summary": "No deposited trial-level behaviour data or axon-tracing images for tail-eye tadpoles were found in Dryad (0 hits), BioStudies (top hits unrelated), Zenodo or Xenbase (behind a reCAPTCHA). The only record is the 2013 J Exp Biol paper, which holds summary results.",
+  "next_step": "Contact the authors for trial-level counts, or tabulate the published group performance from the paper's figures and pre-register against that summary.",
+  "obstacles_confirmed": [
+    "Published performance is a summary; no trial-level choices were found in any repository.",
+    "Xenbase could not be queried programmatically."
+  ]
+}

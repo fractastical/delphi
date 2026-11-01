@@ -1,0 +1,130 @@
+{
+  "claim_id": "thompson1917-ch10-06",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:22:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "3D position tracks of swimming ciliates, flagellates or other small swimmers",
+    "body orientation or axial rotation rate of the same swimmers over time",
+    "path curvature and helix pitch/radius derived from the tracks",
+    "a condition with reduced or absent rotation (to see circular paths)"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-bilophotrichous-bacterial-3d-tracks",
+      "name": "Data from: High-speed motility originates from cooperatively pushing and pulling flagella bundles in bilophotrichous bacteria (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.r2nd550",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.r2nd550",
+      "doi": "10.5061/dryad.r2nd550",
+      "license": "CC0-1.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:15:14Z", "method": "GET Dryad dataset metadata (storageSize 456,235,498 bytes, published 2021-02-18) and version-105778 file list: one file, MC1_3Dtracks.zip (456,235,498 bytes); not downloaded (over 1 MB)", "http_status": 200 },
+      "variables_present": [
+        "3D tracks of magnetotactic cocci (the single file is named MC1_3Dtracks.zip) with two flagella bundles on one pole, swimming above 500 micrometres per second along a double helical path (abstract)"
+      ],
+      "variables_missing": [
+        "bacteria, not ciliates, flagellates, rotifers or swarm-spores",
+        "body-axis rotation as a recorded variable is not stated in the metadata; contents of the zip not inspected",
+        "no no-rotation control stated"
+      ],
+      "scope": "one bacterial type; zip contents unverified",
+      "evidence": "Dryad API: title, abstract text 'swim faster than 500 um/s along a double helical path', license CC0-1.0; files endpoint listed MC1_3Dtracks.zip",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bia-s-biad1298-chlamydomonas-swimming-assay",
+      "name": "S-BIAD1298: A high-throughput imaging assay for phenotyping unicellular swimming (BioImage Archive)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD1298",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD1298",
+      "doi": "10.6019/S-BIAD1298",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:14:49Z", "method": "GET BioStudies study JSON; search listing shows 1,042 files; released 2024-07-30", "http_status": 200 },
+      "variables_present": [
+        "brightfield microscopy time series with cell tracking of the unicellular alga Chlamydomonas (keywords: motility, high-throughput, cell tracking)"
+      ],
+      "variables_missing": [
+        "whether images are 2D or 3D, and whether body rotation or helical axis is recorded, is not stated in the metadata read"
+      ],
+      "scope": "Chlamydomonas; 1,042 files",
+      "evidence": "study JSON Title, Description ('track motility phenotypes from unicellular algae in high-throughput'), Keywords, License CC BY 4.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bia-s-biad2286-schistosome-miracidia-videos",
+      "name": "S-BIAD2286: Quantitative ethology of schistosome miracidia (sample swimming videos, BioImage Archive)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD2286",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD2286",
+      "doi": "10.6019/S-BIAD2286",
+      "license": "CC0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:14:50Z", "method": "GET BioStudies study JSON; search listing shows 9 files; released 2025-09-19", "http_status": 200 },
+      "variables_present": [
+        "videos of swimming schistosome miracidia (ciliated larvae) in a custom arena, described as usable to develop tracking pipelines"
+      ],
+      "variables_missing": [
+        "videos only, with no tracks supplied in the description; 2D arena versus 3D not stated; body rotation not stated"
+      ],
+      "scope": "one species' larvae; 9 files",
+      "evidence": "study JSON Description 'Videos are of schistosome miracidia swimming in a custom arena and can be used to develop and optimize tracking pipelines', License CC0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive search (BioStudies API)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=ciliate%20OR%20flagellate%20swimming%20tracking",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:14:44Z", "method": "GET BioImages search: 'helical swimming trajectory' 74 hits (top: S-BIAD1298; the rest are cryo-EM helical filaments); 'ciliate OR flagellate swimming tracking' 134 hits; 'Chlamydomonas OR Paramecium trajectories' 51 hits; 'holographic 3D tracking swimming microorganism' 643 hits", "http_status": 200 },
+      "variables_present": [
+        "motility and tracking studies exist (S-BIAD1298 Chlamydomonas; S-BIAD1470 Chlamydomonas motility mutants, 372 files; S-BIAD2286 miracidia)"
+      ],
+      "variables_missing": [
+        "no study identified with 3D tracks of ciliates plus body orientation; result lists are dominated by unrelated imaging studies"
+      ],
+      "scope": "archive-wide",
+      "evidence": "totalHits values above and the top accessions in each list",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "biostudies",
+      "name": "BioStudies (EMBL-EBI) full-text search",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=helical%20swimming%20trajectory",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:45Z", "method": "GET BioStudies search 'helical swimming trajectory': 26,658 hits; top five are Europe PMC-derived records (S-EPMC...) of papers on bacterial helical swimming, Spiroplasma and E. coli motility", "http_status": 200 },
+      "variables_present": [
+        "paper-level records; supplementary videos are not enumerated by this search"
+      ],
+      "variables_missing": ["the hits are papers, not trajectory datasets; no files with tracks verified"],
+      "scope": "literature index",
+      "evidence": "totalHits 26658; accessions S-EPMC5262464 (helical and rod-shaped bacteria swim in helical trajectories), S-EPMC3562768 (propulsion by a helical flagellum)",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "helical swimming trajectory 3D tracking; ciliate swimming tracks; flagellate helical path", "url": "https://datadryad.org/api/v2/search?q=ciliate%20swimming%20tracks&per_page=6", "hits": 0, "note": "all three queries returned 0" },
+    { "source": "DataCite", "query": "3D tracking swimming microorganism helical trajectory ciliate", "url": "https://api.datacite.org/dois?query=3D%20tracking%20swimming%20microorganism%20helical%20trajectory%20ciliate&page[size]=6", "hits": 0, "note": "'Paramecium swimming trajectory 3D' and 'Chlamydomonas helical swimming 3D tracking dataset' also 0" },
+    { "source": "Zenodo", "query": "3D swimming trajectories ciliate flagellate helix", "url": "https://zenodo.org/api/records?q=3D%20swimming%20trajectories%20ciliate%20flagellate%20helix&size=6", "hits": 115003, "note": "unfiltered noise (taxon treatments, a horse swimming video)" },
+    { "source": "BioImage Archive (BioStudies)", "query": "helical swimming trajectory", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=helical%20swimming%20trajectory&pageSize=5", "hits": 74, "note": "S-BIAD1298 top" },
+    { "source": "BioImage Archive (BioStudies)", "query": "ciliate OR flagellate swimming tracking", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=ciliate%20OR%20flagellate%20swimming%20tracking&pageSize=5", "hits": 134, "note": "S-BIAD1298, S-BIAD2286 among top" },
+    { "source": "BioStudies (all collections)", "query": "helical swimming trajectory", "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=helical%20swimming%20trajectory&pageSize=5", "hits": 26658, "note": "paper records" }
+  ],
+  "status": "partial",
+  "summary": "One open 3D swimming-track dataset exists (CC0 Dryad zip of magnetotactic-coccus tracks with double helical paths, 456 MB) and the BioImage Archive holds tracking videos of Chlamydomonas and schistosome miracidia, but none is confirmed to record body-axis rotation alongside path curvature for ciliates or flagellates, and no no-rotation control was found.",
+  "next_step": "Inspect the Dryad zip's file listing in a browser and read the S-BIAD1298 and S-BIAD2286 file lists to see whether they are 2D videos or tracks; if body rotation is not recorded, the test needs new imaging or a published rotation-rate table.",
+  "obstacles_confirmed": [
+    "Open 3D tracks found are for bacteria, not ciliates or flagellates.",
+    "Archive videos are of Chlamydomonas and miracidia; dimensionality and orientation data are not stated in the metadata.",
+    "No dataset with swimmers lacking rotation was found."
+  ]
+}

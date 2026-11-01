@@ -1,0 +1,91 @@
+{
+  "claim_id": "thompson1917-ch17-14",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:07:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "3D landmark or surface data for complete skulls of Hyracotherium/Eohippus and Equus (the transformation endpoints)",
+    "the same for Mesohippus and Protohippus, and for off-path equids or other perissodactyls (the comparison skulls)",
+    "specimen age and taxonomic identity for each skull"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource-fossil-equid-media",
+      "name": "MorphoSource: Mesohippus, Protohippus, Hyracotherium and Equus media (API)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Mesohippus",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T04:59:59Z", "method": "GET /api/media and /api/physical-objects with q=Mesohippus, Protohippus, Hyracotherium, Parahippus, Equus", "http_status": 200 },
+      "variables_present": [
+        "Mesohippus: 5 physical objects, 3 media (laser-scan meshes and a micro-CT image, titled Metapodial 3 Distal, Metacarpal 3, Metacarpal 3 [Image] [CT])",
+        "Protohippus: 1 object, 1 media (Metacarpal 3 [Mesh] [CT])",
+        "Hyracotherium: 1 object, 1 media (Metacarpal 3 [Image] [CT])",
+        "Equus: media facets show 108 meshes, 7 volumetric CT series, 55 open-download and 62 restricted-download items"
+      ],
+      "variables_missing": [
+        "no skull or cranial media for Mesohippus, Protohippus or Hyracotherium among the returned titles (all are metapodials)",
+        "all Mesohippus, Protohippus and Hyracotherium media returned have visibility restricted_download"
+      ],
+      "scope": "Whatever each museum has deposited; the fossil equid skulls Thompson names are not among the returned media titles",
+      "evidence": "media?q=Mesohippus pages.total_count=3 with visibility restricted_download; media?q=Protohippus total 1; media?q=Hyracotherium total 1; media?q=Equus returned an open item 'Mandible And Skull [CTImageSeries] [CT]' (file_size 36,114,033)",
+      "verdict": "partial",
+      "reuses_organism_dataset": "morphosource-media-2026-10-31"
+    },
+    {
+      "id": "pbdb-equidae-taxa-and-occurrences",
+      "name": "Paleobiology Database: Equidae genera and occurrence counts",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Mesohippus&show=attr",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T04:45:09Z", "method": "GET taxa/single.json for Mesohippus (txn:43010, 86 occurrences), Protohippus (txn:43020, 95), Hyracotherium (203), Equus (1679); taxa/list for Equidae gave 81 genus records, 51 accepted", "http_status": 200 },
+      "variables_present": [
+        "taxonomic identity and occurrence counts for the genera named in the claim"
+      ],
+      "variables_missing": [
+        "no skull geometry; PBDB does not hold cranial measurements"
+      ],
+      "scope": "51 non-synonymised equid genera, 5,833 occurrences",
+      "evidence": "taxa/single.json records with noc fields: Mesohippus 86, Protohippus 95, Hyracotherium 203, Equus 1679",
+      "verdict": "partial",
+      "reuses_organism_dataset": "pbdb-occurrences-equidae-2026-10-31"
+    },
+    {
+      "id": "dryad-equid-skull-shape-wisniewski-slater",
+      "name": "Data for: Phylogenetic analyses reveal that horses deviate from a pervasive pattern of skull shape evolution (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.crjdfn3g3",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.crjdfn3g3",
+      "doi": "10.5061/dryad.crjdfn3g3",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:00:24Z", "method": "GET Dryad dataset, versions and files metadata (zip 285,853,459 bytes, README.md 14,073 bytes); file download returned 401 without a token and was not fetched", "http_status": 200 },
+      "variables_present": [
+        "3D geometric morphometrics of the equid skull and linear measurements (abstract)",
+        "species-level Equidae phylogeny from meta-analysis (abstract)"
+      ],
+      "variables_missing": [
+        "specimen list not inspected: whether Hyracotherium, Mesohippus and Protohippus are included is unconfirmed"
+      ],
+      "scope": "Equidae; published 2026-03-26; article doi 10.1017/pab.2026.10096",
+      "evidence": "Dryad API: storageSize 285867532, license CC0-1.0, abstract describes 3D geometric morphometrics of the equid skull",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "MorphoSource API", "query": "media q=Mesohippus / Protohippus / Hyracotherium / Parahippus / Equus", "url": "https://www.morphosource.org/api/media?q=Mesohippus&per_page=3", "hits": 3, "note": "Mesohippus 3, Protohippus 1, Hyracotherium 1, Parahippus 0; all fossil items are metapodials, restricted download" },
+    { "source": "PBDB taxa API", "query": "single-taxon records Mesohippus, Protohippus, Hyracotherium, Equus", "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Protohippus&show=attr", "hits": 1, "note": "noc 95 for Protohippus" },
+    { "source": "DataCite", "query": "equid skull geometric morphometrics Hyracotherium", "url": "https://api.datacite.org/dois?query=equid%20skull%20geometric%20morphometrics%20Hyracotherium&page[size]=6", "hits": 1, "note": "Dryad 10.5061/dryad.crjdfn3g3" },
+    { "source": "Dryad", "query": "Equidae skull", "url": "https://datadryad.org/api/v2/search?q=Equidae%20skull&per_page=6", "hits": 1, "note": "same dataset" }
+  ],
+  "status": "partial",
+  "summary": "Open skull data exist for Equus and probably for other equids in a CC0 Dryad dataset, but the fossil comparison skulls named in the claim (Mesohippus, Protohippus) and the Hyracotherium endpoint appear in MorphoSource only as restricted-download metapodial scans, so a skull-shape test of the interpolated series cannot yet be assembled from open repositories.",
+  "next_step": "Open the Dryad zip to list specimens; if the early Tertiary genera are absent, request scans or landmark files from museum collections (e.g. the specimens behind the six Parahippus and five Mesohippus MorphoSource objects) or digitise landmarks from the literature.",
+  "obstacles_confirmed": [
+    "MorphoSource media for Mesohippus, Protohippus and Hyracotherium are metapodials with restricted download, not skulls.",
+    "Dryad file downloads require an authentication token (HTTP 401)."
+  ]
+}

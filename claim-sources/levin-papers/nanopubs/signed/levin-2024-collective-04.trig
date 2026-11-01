@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RA2G_oaB96EndAqtgDJgo9Sr5iw_kwblzh5-fbQduaYuE>.
+@prefix sub: <https://w3id.org/np/RA2G_oaB96EndAqtgDJgo9Sr5iw_kwblzh5-fbQduaYuE/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2024-collective-04> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "In an electric field, whole keratocytes migrate toward the cathode while fragments of keratocytes migrate toward the anode, so the collective (an intact cell) has the opposite taxis to its parts, illustrating that collective behaviour can be a hard-to-predict function of component tendencies.";
+    dc:type "empirical-generalization";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Keratocyte fragments migrate to the anode while whole keratocytes migrate to the cathode";
+    <https://w3id.org/delphi/ontology/context> "McMillen P, Levin M, “Collective intelligence: A unifying concept for integrating biology across scales and substrates”, Communications biology (2024), doi:10.1038/s42003-024-06037-4; section “Introduction › Cell migration: the group does not go where each of the parts wants to go”. Scope: Fish keratocytes and keratocyte fragments in applied electric fields"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1038/s42003-024-06037-4>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt#line=35,36>;
+    prov:wasQuotedFrom <https://doi.org/10.1038/s42003-024-06037-4>;
+    <https://schema.org/text> "In an electric field, keratocytes migrate to the cathode, but fragments of keratocytes migrate to the anode104.".
+<https://doi.org/10.1038/s42003-024-06037-4> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "McMillen P, Levin M. Collective intelligence: A unifying concept for integrating biology across scales and substrates. Communications biology (2024). doi:10.1038/s42003-024-06037-4";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2024"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Collective intelligence: A unifying concept for integrating biology across scales and substrates";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC10978875>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt#line=35,36> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2024-collective.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10978875/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1038/s42003-024-06037-4>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "8f0e83775f3f814dbf827776d94a018c5bcdf1389e44e6be1b0678692278f8fd"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2024 claim: Keratocyte fragments migrate to the anode while whole keratocytes migrate to the cathode";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2024-collective-04>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "t5lyABC6e5O0cnlnzJZsJn4s8161ZdFQAKCBocv5qaRf6DgxFoBdJKs5oRz3ZeLTaT3ymPQwBM2qsX+LJOngTwutHAf3F/52mvAbx2ZcFZGUF6CWuPDCUZ+QGnI50QN2cfUGOMcmE9ZJ4UVTBKwWqrkM7S0wNE8bxB1IMjqcprY3cQhIefmAa4qPvgYlCF3F2EPDUe0X8ivyt5HkXbt6tJVF5qq4Zmk6oA6yBR+k+kYMTu2necqIcdPUqMuJhjLlAdf0hHpNMwR0kfrc3aQ9GguNAv4I2o/G1eO2hXfMQzAuQ8XbGcDSfEdVZUPjl1zcnlcdgUwsV9/pu5EzlvhYRQ=="
+}

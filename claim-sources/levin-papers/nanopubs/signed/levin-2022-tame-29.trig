@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAgkjzcO1E40sn0IJ2BExNN6V2gFrBt2GEDaJ52u7GBvM>.
+@prefix sub: <https://w3id.org/np/RAgkjzcO1E40sn0IJ2BExNN6V2gFrBt2GEDaJ52u7GBvM/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2022-tame-29> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "In organisms with a multiscale competency architecture, whose modules actively correct toward a target morphology, mutations that would be detrimental in hardwired organisms (e.g. displacing the eye) become neutral, so the architecture shields some of mutations' negative effects from selection and smooths the fitness landscape.";
+    dc:type "prediction";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Multiscale competency shields mutations from selection and smooths fitness landscapes";
+    <https://w3id.org/delphi/ontology/context> "Levin M, “Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds”, Frontiers in systems neuroscience (2022), doi:10.3389/fnsys.2022.768201; section “Evolutionary Aspects › Multi-Scale Autonomy Potentiates the Speed of Evolution”. Scope: Evolving multicellular organisms; computational models of evolution with competent cells"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.3389/fnsys.2022.768201>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt#line=146,147>;
+    prov:wasQuotedFrom <https://doi.org/10.3389/fnsys.2022.768201>;
+    <https://schema.org/text> "Thus, MCA shields from selection some aspects of mutations’ negative effects (which inevitably are the bulk of random mutations’ consequences).".
+<https://doi.org/10.3389/fnsys.2022.768201> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Levin M. Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds. Frontiers in systems neuroscience (2022). doi:10.3389/fnsys.2022.768201";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2022"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC8988303>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt#line=146,147> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8988303/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.3389/fnsys.2022.768201>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "2f99ca3a21299e41167f7f1bbd6bc7c86dbc7a1a357f7835f8571033b7c63ff3"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2022 claim: Multiscale competency shields mutations from selection and smooths fitness landscapes";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2022-tame-29>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "nyTRwSIvpP34+ZOgIX9tEjv4zavEgyACHGAVt07p8P7XTYWYt7R8EM2SgkphAl1WXrvezyC/Tp00C5hjejEsTZrdjWAP72+XDJSqCAIkPQjYXkIOSim/6yRNrp11ggCS/O9ysWlkQmG3DzMhZ4Oc1g/KuKY7WYM+FjrNT19fuj4mtB/SUx48/kRj8dS7xx+4LpwB/hI7u7HAuaejdu7zKWXO6qrgXqITUIRBxFgzP94Y0oged2CnEPt9vBz0c0IwC0DTaS/gPnm9yAgd67fkRot+n3fs1aXDvuaJvZAw8SzuRxtM29+GT883Q4//AJe+qX1BwcWjBK7v0uHBZnHmGQ=="
+}

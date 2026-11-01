@@ -195,7 +195,18 @@ export function loadClaims() {
           disconfirming_observation: r.test_contract?.disconfirming_observation ?? r.fail_criterion ?? "",
           admissible_datasets: r.test_contract?.admissible_datasets ?? (r.planned_datasets?.length ? `Planned datasets: ${r.planned_datasets.join(", ")}` : ""),
           inference_method: r.test_contract?.inference_method ?? r.method ?? "", explicit: !!r.test_contract },
-        revisions: (r.revisions || []).map(v => ({ date: v.date, from: v.from, to: v.to, prompted_by: (v.prompted_by || []).map(x => x.agent) })) };
+        revisions: (r.revisions || []).map(v => ({ date: v.date, from: v.from, to: v.to, prompted_by: (v.prompted_by || []).map(x => x.agent) })),
+        // A9 faithfulness (test-data/claim-tests/FAITHFULNESS.md): does the analysis measure what the claim asserts?
+        // faithfulness.json is the first assessor, faithfulness.<assessor>.json a blind second opinion. `agreed` when
+        // every assessor gave the same verdict; `contested` otherwise. A not-representative verdict never changes
+        // `evidence` here; it is a published finding about the test.
+        faithfulness: (() => {
+          const files = ls(join(dir, rel), /^faithfulness(\.[a-z0-9-]+)?\.json$/).sort((a, b) => (a === "faithfulness.json" ? -1 : b === "faithfulness.json" ? 1 : a.localeCompare(b)));
+          if (!files.length) return null;
+          const by = files.map(f => { const a = readJson(join(dir, rel, f)); return { assessor: a.assessor?.model ?? f, verdict: a.verdict, confidence: a.confidence ?? null, file: join("test-data/claim-tests", p, id, rel, f) }; });
+          const verdicts = new Set(by.map(a => a.verdict));
+          return { verdict: by[0].verdict, assessors: by, status: verdicts.size === 1 ? "agreed" : "contested" };
+        })() };
     }
   }
   if (unkinded.length) throw new Error(`Complete claim tests without data_kind (${DATA_KINDS.join(" | ")}):\n  ${unkinded.join("\n  ")}`);

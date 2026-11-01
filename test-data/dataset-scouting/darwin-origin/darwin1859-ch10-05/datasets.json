@@ -1,0 +1,110 @@
+{
+  "claim_id": "darwin1859-ch10-05",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "darwin-01"
+  },
+  "variables_needed": [
+    "first and last appearance ages of genera and families",
+    "dated occurrences per genus/family from which internal range gaps can be found",
+    "sampling intensity per time interval (collections / occurrences)"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:56Z",
+        "method": "GET landing; GET data1.2 occs/list.json, taxa/list.json, taxa/single.json, colls/list.json with limit=1&rowcount; show=app,class,time,ent,ref",
+        "http_status": 200
+      },
+      "variables_present": [
+        "first/last appearance per genus and family (fea, fla, lea, lla fields)",
+        "dated occurrences with taxonomic classification",
+        "collection counts per interval and occurrence counts per taxon (noc)"
+      ],
+      "variables_missing": [
+        "an independent test of monophyly of the groups"
+      ],
+      "scope": "Animals worldwide: 91,043 genus records, 13,465 family records; e.g. Trilobita 56,590 occurrences",
+      "evidence": "taxa/list.json?base_name=Animalia&rank=genus returned records_found 91043 and rank=family 13465; with extant=no 72445 and extant=yes 17981. taxa/list.json show=app returns per-genus first/last appearance fields (fea, fla, lea, lla; e.g. Byronia fea 521, lea 504.5) and noc (occurrence count). taxa/single.json?name=Trilobita&show=app: noc 56586, fea 538.8, lea 254.14. colls/list.json?all_records records_found 278876 (fields include lat/lng, formation name sfm, eag/lag ages). occs/list.json?base_name=Mammalia&taxon_reso=species records_found 76087; base_name=Aves 15225; base_name=Insecta 53530. taxa/single.json?name=Animalia noc 1361152. The unrestricted occs/list.json?base_name=Animalia and all_records count queries timed out (25 s). occs/list.json?base_name=Trilobita&show=class,time,ent,ref returned per-occurrence phylum/class/order/family/genus, age bounds (eag, lag), reference text.",
+      "verdict": "holds",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:28:45Z",
+        "method": "GET https://morphobank.org/ and https://www.morphobank.org/ (urllib UA); GET /index.php/Projects/ProjectOverview; curl default UA on both hosts",
+        "http_status": 403,
+        "note": "All requests returned HTTP 403 'The request could not be satisfied' (CloudFront error page, 919 bytes); curl default UA also 403 on both hosts"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "anything retrievable by script"
+      ],
+      "scope": "could not be inspected",
+      "evidence": "HTTP 403 on https://morphobank.org/, https://www.morphobank.org/ and a project-overview path, with two different user agents. Content could not be inspected; no project list or matrix was seen.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "Lazarus taxa gaps stratigraphic ranges genus",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=Lazarus%20taxa%20gaps%20stratigraphic%20ranges%20genus",
+      "hits": 0,
+      "note": "nothing (429 on first attempt, 200 on retry)"
+    },
+    {
+      "source": "Dryad",
+      "query": "Sepkoski genus compendium stratigraphic ranges",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=Sepkoski%20genus%20compendium%20stratigraphic%20ranges",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "DataCite",
+      "query": "Sepkoski fossil marine animal genera compendium stratigraphic ranges",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=Sepkoski%20fossil%20marine%20animal%20genera%20compendium%20stratigraphic%20ranges",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Zenodo",
+      "query": "Lazarus taxa fossil record gaps ranges sampling",
+      "url": "https://zenodo.org/api/records?size=5&q=Lazarus%20taxa%20fossil%20record%20gaps%20ranges%20sampling",
+      "hits": 1783925,
+      "note": "full-text noise; surfaced 10.5061/dryad.6hdr7sqw4 (Pull of the Recent, elasmobranchs), not examined"
+    }
+  ],
+  "status": "data-ready",
+  "summary": "PBDB holds every variable the range-continuity test needs: per-genus and per-family first and last appearance fields, dated occurrences classified to genus and family, and collection and occurrence counts for sampling control. A separate monophyly check of the groups (the definitional-circularity obstacle) is not provided by PBDB and MorphoBank, the assessor-named source of cladistic matrices, returned HTTP 403.",
+  "next_step": "Pre-register gap detection on PBDB occurrence ages per genus/family with a sampling-adjusted absence criterion; take a pre-cladistic classification or a fixed taxonomy version to limit circularity.",
+  "obstacles_confirmed": [
+    "MorphoBank unreachable by script (403).",
+    "No deposited Sepkoski-style range compendium found; PBDB is the only source seen.",
+    "Taxonomic membership in PBDB is a database classification, not a test of monophyly."
+  ]
+}

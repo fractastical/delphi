@@ -1,0 +1,94 @@
+{
+  "claim_id": "thompson1917-ch16-17",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:32:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "morphological character matrices with scapular and vertebral characters scored separately from other skeletal characters",
+    "an independent reference phylogeny (molecular or otherwise) for the same taxa",
+    "ecological or locomotor mode per taxon, to identify lineages that changed habit",
+    "fossil cetacean (archaeocete) coverage, for the Zeuglodon-versus-whales example"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank-cetacea-matrices",
+      "name": "MorphoBank projects on Cetacea, including Basilosauridae (found via DataCite)",
+      "landing_url": "https://morphobank.org/",
+      "access_url": "https://api.datacite.org/dois?query=prefix:10.7934%20AND%20(Cetacea%20OR%20Basilosauridae%20OR%20Archaeoceti)",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:18:33Z", "method": "GET DataCite query on MorphoBank prefix 10.7934: 42 Cetacea/Basilosauridae/Archaeoceti hits (e.g. 10.7934/p6157 Saghacetus osiris and other archaeocetes, 10.7934/p6239 Miophyseter, 10.7934/p6149 kentriodontid dolphin); 2 hits for '(scapula OR vertebrae) AND phylogeny' (a pterosaur project); morphobank.org returned 403 to scripted requests earlier", "http_status": 200 },
+      "variables_present": [
+        "published cetacean and archaeocete phylogenetic matrix projects (titles and DOIs)"
+      ],
+      "variables_missing": [
+        "matrix contents were not inspected because the portal blocks scripted access, so whether scapular and vertebral characters are separately identifiable is unconfirmed",
+        "matrix-specific character partitions for scapula and vertebrae are not tabulated in the DataCite metadata"
+      ],
+      "scope": "42 cetacean-related MorphoBank DOIs (projects and their matrix versions)",
+      "evidence": "DataCite meta total 42; titles listed for the first six hits",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life-synthesis",
+      "name": "Open Tree of Life synthetic tree (API)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:18:43Z", "method": "POST tree_of_life/about (synth_id opentree16.1, 1,931 source studies, 2,064 source trees, root 'cellular organisms' with 2,385,875 tips) and POST tnrs/match_names for Basilosaurus (ott 4942612) and Cetacea (ott 698424, infraorder); web page tree.opentreeoflife.org returned 503 on an earlier request", "http_status": 200 },
+      "variables_present": [
+        "a synthetic phylogeny over a very large taxon set; names Basilosaurus and Cetacea resolve in the taxonomy"
+      ],
+      "variables_missing": [
+        "whether Basilosaurus (extinct) is placed in the synthetic tree, as opposed to the taxonomy, was not queried",
+        "extinct archaeocetes have no molecular data, so any tree for them is itself morphology-based",
+        "the tree is not a character matrix, so character-level homoplasy cannot be computed from it"
+      ],
+      "scope": "reference topology only",
+      "evidence": "about response fields and match_names results as listed",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource-scapula-vertebra-media",
+      "name": "MorphoSource: scapula and vertebra media (API)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=scapula",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:18:42Z", "method": "GET /api/media: q=scapula 1,454 media (870 open, 584 restricted); q=vertebra 4,548 media (2,025 open, 2,523 restricted)", "http_status": 200 },
+      "variables_present": [
+        "3D meshes and CT of scapulae and vertebrae across many taxa, openly downloadable for 870 scapula and 2,025 vertebra media"
+      ],
+      "variables_missing": [
+        "no ready character scoring or homoplasy measure",
+        "fossil cetacean coverage not queried",
+        "the counts are free-text hits and not restricted to mammals"
+      ],
+      "scope": "full-text hits on the media API",
+      "evidence": "pages.total_count and publication_status facet values as listed",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite (MorphoBank prefix 10.7934)", "query": "Cetacea OR Basilosauridae OR Archaeoceti", "url": "https://api.datacite.org/dois?query=prefix%3A10.7934%20AND%20%28Cetacea%20OR%20Basilosauridae%20OR%20Archaeoceti%29&page[size]=6", "hits": 42, "note": "many cetacean matrices" },
+    { "source": "Dryad", "query": "morphological matrix phylogeny scapula vertebrae mammals; Zeuglodon Basilosauridae; cetacean morphological character matrix", "url": "https://datadryad.org/api/v2/search?q=cetacean%20morphological%20character%20matrix&per_page=6", "hits": 0, "note": "all three queries 0; also 'postcranial cranial partitions phylogenetic signal', 'homoplasy skeletal characters partition' and 'forelimb scapula characters phylogeny convergence' returned 0" },
+    { "source": "DataCite", "query": "cranial postcranial morphological partitions phylogenetic congruence matrix", "url": "https://api.datacite.org/dois?query=cranial%20postcranial%20morphological%20partitions%20phylogenetic%20congruence%20matrix&page[size]=6", "hits": 0, "note": "a Zenodo hit from another query listed Dryad 10.5061/dryad.f1b56 (basal synapsids: cranial and postcranial morphological partitions; Benson 2012 pelycosaur data.zip, 51,499 bytes), not opened or judged" },
+    { "source": "MorphoSource API", "query": "media q=scapula; q=vertebra", "url": "https://www.morphosource.org/api/media?q=scapula&per_page=3", "hits": 1454, "note": "vertebra 4,548" },
+    { "source": "Open Tree of Life API", "query": "tree_of_life/about; tnrs/match_names Basilosaurus, Cetacea", "url": "https://api.opentreeoflife.org/v3/tree_of_life/about", "hits": null, "note": "synthesis opentree16.1" }
+  ],
+  "status": "partial",
+  "summary": "Cetacean morphological matrices exist on MorphoBank (42 DOIs including archaeocete projects) and a broad synthetic reference tree is available through the Open Tree API, but the matrices could not be opened (portal blocks scripted access) so separate scapular and vertebral character partitions are unconfirmed, and extinct archaeocetes have no molecular reference tree.",
+  "next_step": "Download two or three cetacean matrices from MorphoBank in a browser, check whether characters are labelled by skeletal region, and decide the reference tree (molecular for extant cetaceans; published total-evidence tree for archaeocetes).",
+  "obstacles_confirmed": [
+    "MorphoBank portal returned 403 to scripted requests, so matrices were not inspected.",
+    "No repository dataset tabulates homoplasy by skeletal region.",
+    "Zeuglodon-type fossils lack a molecular reference tree."
+  ]
+}

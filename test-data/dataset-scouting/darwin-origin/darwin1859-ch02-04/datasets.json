@@ -1,0 +1,123 @@
+{
+  "claim_id": "darwin1859-ch02-04",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T06:40:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-02" },
+  "variables_needed": [
+    "specimen-level DNA sequences, giving pairwise genetic distance within populations, among populations, and among named species",
+    "rank labels (individual variant, variety, subspecies, species) for the compared names",
+    "phenotypic or morphological distance for the same pairs",
+    "reproductive-isolation measures for population/species pairs spanning the continuum"
+  ],
+  "datasets": [
+    {
+      "id": "bold-portal-api",
+      "name": "Barcode of Life Data System (BOLD) portal API",
+      "landing_url": "https://portal.boldsystems.org/api/summary?query=tax:kingdom:Animalia&fields=specimens",
+      "access_url": "https://portal.boldsystems.org/api/summary",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "grok", "gpt"],
+      "checked": { "at": "2026-11-01T05:23:44Z", "method": "GET portal summary API with tax: queries (Drosophila melanogaster; Aves; kingdom Animalia; kingdom Plantae); HEAD www.boldsystems.org and boldsystems.org", "http_status": 200 },
+      "variables_present": [
+        "barcode specimens with BIN (bin_uri) assignments and marker_code per specimen",
+        "taxonomic queries at species, class and kingdom level"
+      ],
+      "variables_missing": ["infraspecific (variety/subspecies) labels were not checked in the summary", "morphological and reproductive-isolation data", "pairwise distances are not precomputed in the summary API (they must be calculated from downloaded sequences)"],
+      "scope": "Animalia: 20,581,037 specimens; Plantae: 462,020 specimens. Drosophila melanogaster: 943 specimens in 131 BINs (COI-5P 856, COI-3P 80, other markers fewer than 10 each)",
+      "evidence": "Summary responses: {\"counts\":{\"specimens\":20581037}}, {\"counts\":{\"specimens\":462020}}, and for D. melanogaster counts bin_uri 131 and specimens 943 with marker_code COI-5P 856.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "bold-barcodes-drosophila-melanogaster-2026-10-31"
+    },
+    {
+      "id": "coyne-orr-drosophila-pairs-dryad-g5g43",
+      "name": "Data from: On the Coyne and Orr-igin of species (Drosophila species-pair data)",
+      "landing_url": "https://zenodo.org/api/records/4985394",
+      "access_url": "https://zenodo.org/api/records/4985394/files/CoynOrriginDat_funk.csv/content",
+      "doi": "10.5061/dryad.g5g43",
+      "license": "CC0 (Dryad SPDX CC0-1.0)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:23:40Z", "method": "GET Zenodo mirror CSV and read header and first rows (see darwin1859-ch08-06 record)", "http_status": 200, "bytes": 26907 },
+      "variables_present": ["Nei's genetic distance (NeisD) per Drosophila species pair paired with pre- and post-zygotic isolation indices"],
+      "variables_missing": ["variety and subspecies pairs; plants; non-Drosophila animals", "morphological distance"],
+      "scope": "one genus; about 143 pairs",
+      "evidence": "CSV header includes sp1, sp2, sympatry, NeisD, prezygotic, postzygotic, percent_sympatry; first row athabasca_EA+athabasca_WN with NeisD 0.12.",
+      "verdict": "partial"
+    },
+    {
+      "id": "heliconius-speciation-continuum-dryad-5n10d",
+      "name": "Data from: Divergence with gene flow across a speciation continuum of Heliconius butterflies",
+      "landing_url": "https://datadryad.org/api/v2/search?q=speciation+continuum+genomic+divergence+population+pairs&per_page=5",
+      "access_url": null,
+      "doi": "10.5061/dryad.5n10d",
+      "license": "CC0 (Dryad SPDX CC0-1.0)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:23:50Z", "method": "Dryad search API and Zenodo search (record metadata and file list)", "http_status": 200, "bytes": 212892660 },
+      "variables_present": ["sequence alignments and tree files for Heliconius population and species pairs spanning a divergence continuum (files include beast_heliconius.zip 564,598 B, mrbayes_unlinked_heliconius.zip 276,677 B, mrbayes_D65peak_heliconius.zip 798,182 B)"],
+      "variables_missing": ["contents not opened", "one genus"],
+      "scope": "Heliconius butterflies; Dryad storage 212,892,660 B",
+      "evidence": "Dryad hit dryad.5n10d published 2015-09-17 with the file list above (from the Zenodo mirror listing).",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-genbank-sra",
+      "name": "NCBI GenBank / SRA (Entrez)",
+      "landing_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=Equus[Organism]&retmax=0&retmode=json",
+      "access_url": null,
+      "doi": null,
+      "license": "NCBI public domain; per-record submitter terms",
+      "suggested_by": ["gpt", "grok", "gemini"],
+      "checked": { "at": "2026-11-01T05:11:27Z", "method": "Entrez esearch count (db=sra, Equus[Organism]) as a probe of the service; no query made for variety or subspecies pairs", "http_status": 200 },
+      "variables_present": ["public sequence and read archives across taxa (SRA Equus: 57,487 records)"],
+      "variables_missing": ["no curated cross-rank distance table; the genome-divergence (grey zone) data named by an assessor were not located as an accession"],
+      "scope": "service probe only",
+      "evidence": "esearchresult.count 57487 for Equus[Organism] in SRA. A DataCite search for the Roux et al. grey-zone paper title returned 0 hits.",
+      "verdict": "partial"
+    },
+    {
+      "id": "catalogue-of-life-and-gbif-rank-labels",
+      "name": "Catalogue of Life (ChecklistBank 3LR) and GBIF backbone rank counts",
+      "landing_url": "https://api.checklistbank.org/dataset/3LR/nameusage/search?rank=subspecies&limit=0",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok", "gpt"],
+      "checked": { "at": "2026-11-01T05:21:01Z", "method": "GET ChecklistBank nameusage/search by rank; GET GBIF species/search by rank with the GBIF backbone dataset key", "http_status": 200 },
+      "variables_present": ["rank labels for infraspecific names: COL 3LR subspecies name usages 306,196, variety name usages 308,101; GBIF backbone accepted SPECIES 2,614,593, SUBSPECIES 193,922, VARIETY 68,948"],
+      "variables_missing": ["no distances; these labels only define which names are compared"],
+      "scope": "all kingdoms",
+      "evidence": "ChecklistBank total 306196 (rank=subspecies) and 308101 (rank=variety); GBIF counts 2614593, 193922, 68948.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif-infraspecific-occurrences",
+      "name": "GBIF occurrences (species and infraspecific)",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": null,
+      "doi": null,
+      "license": "per-record CC0 / CC BY / CC BY-NC (GBIF)",
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:19:16Z", "method": "occurrence/search API probed for other claims; no infraspecific query made here", "http_status": 200 },
+      "variables_present": ["occurrence records at species and infraspecific rank"],
+      "variables_missing": ["no genetic or phenotypic distances"],
+      "scope": "distribution records only",
+      "evidence": "occurrence search for Plantae returned count 652196829 (HTTP 200).",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "grey zone of speciation genomic divergence continuum", "url": "https://datadryad.org/api/v2/search?q=grey+zone+of+speciation+genomic+divergence+continuum&per_page=5", "hits": 0, "note": "none" },
+    { "source": "Dryad", "query": "speciation continuum genomic divergence population pairs", "url": "https://datadryad.org/api/v2/search?q=speciation+continuum+genomic+divergence+population+pairs&per_page=5", "hits": 8, "note": "relevant: Heliconius (dryad.5n10d), stickleback, Rhagoletis host race to species, whitefish; each single-clade" },
+    { "source": "Zenodo", "query": "grey zone of speciation genomic divergence continuum", "url": "https://zenodo.org/api/records?q=grey+zone+of+speciation+genomic+divergence+continuum&size=5", "hits": 5683458, "note": "surfaced Heliconius, stickleback, Timema and a lizard speciation-initiation dataset" },
+    { "source": "DataCite", "query": "Shedding light on the grey zone of speciation along a continuum of genomic divergence", "url": "https://api.datacite.org/dois?query=Shedding+light+on+the+grey+zone+of+speciation+along+a+continuum+of+genomic+divergence&page%5Bsize%5D=4", "hits": 0, "note": "the Roux et al. data were not located" },
+    { "source": "BOLD", "query": "tax:kingdom:Animalia and tax:kingdom:Plantae specimens", "url": "https://portal.boldsystems.org/api/summary?query=tax:kingdom:Animalia&fields=specimens", "hits": 20581037, "note": "specimens" }
+  ],
+  "status": "partial",
+  "summary": "Barcode sequences are open and large (BOLD: 20.6 million animal specimens, 462,020 plant specimens), so within- and between-species genetic distances can be computed, and a few single-genus speciation-continuum datasets exist (Drosophila pairs with Nei's D and isolation indices; Heliconius alignments; others). Missing: rank labels at the variety and subspecies end linked to specimens, morphological distance, and any cross-clade table covering the full continuum.",
+  "next_step": "Check BOLD and GenBank specimen records for subspecies labels, assemble the Drosophila, Heliconius and stickleback datasets as a first multi-clade set, and compute distances before applying rank labels (as the assessors' obstacles require).",
+  "obstacles_confirmed": [
+    "BOLD's summary API reports specimens and BINs, not precomputed pairwise distances.",
+    "No single dataset spans variety, subspecies and species pairs for several clades.",
+    "The Roux et al. grey-zone data were not found as a repository record in DataCite."
+  ]
+}

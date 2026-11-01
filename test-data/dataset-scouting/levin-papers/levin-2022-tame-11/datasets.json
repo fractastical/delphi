@@ -1,0 +1,72 @@
+{
+  "claim_id": "levin-2022-tame-11",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:23:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "levin-01" },
+  "variables_needed": [
+    "RNA-seq of barium-adapted versus wild-type D. japonica heads (transcript-level counts or FPKM)",
+    "total number of expressed transcripts to express changed genes as a fraction",
+    "head loss, regeneration and barium-insensitivity tallies",
+    "replicates"
+  ],
+  "datasets": [
+    {
+      "id": "geo-series-gse98084",
+      "name": "GEO GSE98084: Regenerative adaptation to electrochemical perturbation in planaria",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98084",
+      "access_url": "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98084/suppl/GSE98084_All_Data_BaCl2.xlsx",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:11:00Z", "method": "GET GEO accession page (text, brief) and eutils esummary; HEAD on supplementary xlsx", "http_status": 200, "bytes": 2562675 },
+      "variables_present": ["RNA-seq of D. japonica BaCl2 versus WT samples", "FPKM tables per replicate (supplementary xlsx)", "raw reads via SRA SRP104988"],
+      "variables_missing": ["head loss, regeneration and survival tallies"],
+      "scope": "Dugesia japonica, platform GPL16430, 4 samples listed (WT1, WT2, BaCl1, BaCl2), released 2017-08-31. Supplementary: GSE98084_All_Data_BaCl2.xlsx (2,562,675 bytes), GSE98084_FPKM_Replicate_1.xlsx (2,533,594 bytes), GSE98084_FPKM_Replicate_2.xlsx. Series design text mentions three biological replicates of 25 worms and 35 days in BaCl2, but only 4 samples are listed; check before use.",
+      "evidence": "GEO text record and esummary (extrelation SRA SRP104988, bioproject PRJNA383937). xlsx files over 1 MB, not downloaded.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-gene-expression-omnibus",
+      "name": "NCBI Gene Expression Omnibus (portal)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=planaria+barium&retmode=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:10:30Z", "method": "eutils esearch db=gds term='planaria barium'", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["portal; the barium series is GSE98084 (listed separately)"],
+      "scope": "Search for 'planaria barium' returned exactly 1 record (GSE98084).",
+      "evidence": "esearch count '1', idlist 200098084.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "pubmed-central",
+      "name": "PubMed Central (portal)",
+      "landing_url": "https://pmc.ncbi.nlm.nih.gov/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:30Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["portal for papers, not a dataset; supplementary phenotype tallies were not located"],
+      "scope": "Europe PMC lookup found the iScience paper (DOI 10.1016/j.isci.2019.11.014, PMID 31765995, 2019); I did not read its full text or supplement.",
+      "evidence": "Landing page returned 200; the paper record was found through Europe PMC search (1 hit).",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "GEO (eutils db=gds)", "query": "planaria barium", "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=planaria+barium&retmode=json", "hits": 1, "note": "only GSE98084" },
+    { "source": "Dryad", "query": "planaria barium", "url": "https://datadryad.org/api/v2/search?q=planaria%20barium", "hits": 0, "note": "nothing" },
+    { "source": "Zenodo", "query": "planarian barium regeneration", "url": "https://zenodo.org/api/records?q=planarian%20barium%20regeneration&size=3", "hits": 14750, "note": "loose match; none about barium among top 3" },
+    { "source": "Europe PMC", "query": "title of the iScience paper", "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22Regenerative%20adaptation%20to%20electrochemical%20perturbation%20in%20planaria%22&format=json&resultType=lite", "hits": 1, "note": "iScience 2019, PMID 31765995; DOI resolves with 200 via linkinghub.elsevier.com" }
+  ],
+  "status": "partial",
+  "summary": "The expression half of the claim has public data (GSE98084, 4 samples, FPKM supplements, SRA reads). The phenotype half (head loss, regeneration, barium insensitivity) is not deposited as data; it lives in the paper text and figures.",
+  "next_step": "Extract the phenotype tallies from the iScience paper, check the sample/replicate layout of GSE98084, and fix the 'relatively few' fraction before recounting.",
+  "obstacles_confirmed": [
+    "Only 4 samples listed in GEO.",
+    "Head loss and later barium insensitivity are not in the expression series."
+  ]
+}

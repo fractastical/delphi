@@ -1,0 +1,165 @@
+{
+  "claim_id": "darwin1859-ch09-05",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "darwin-01"
+  },
+  "variables_needed": [
+    "top and base ages of gap-bound rock packages per column",
+    "duration of each package and of the gap between successive packages",
+    "fossil collections tied to units (to restrict to fossiliferous formations)",
+    "a partition of record incompleteness among non-deposition/erosion, preservation and sampling"
+  ],
+  "datasets": [
+    {
+      "id": "macrostrat",
+      "name": "Macrostrat API v2 (columns, sections = gap-bound packages, units, fossils)",
+      "landing_url": "https://macrostrat.org/",
+      "access_url": "https://macrostrat.org/api/v2/sections?col_id=2&format=json",
+      "doi": null,
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:11:40Z",
+        "method": "GET landing; GET api/v2 (root), /meta, /stats?all, /columns?all&response=short, /columns?col_id=2&response=long, /sections?col_id=2, /fossils?interval_name=Cambrian, /defs/intervals?timescale_id=11",
+        "http_status": 200
+      },
+      "variables_present": [
+        "package and unit ages (t_age, b_age) per column from which gap lengths can be derived",
+        "package thickness",
+        "PBDB collection counts per package"
+      ],
+      "variables_missing": [
+        "a causal partition of incompleteness (erosion vs non-deposition vs preservation vs collecting)",
+        "coverage outside the regions listed in scope"
+      ],
+      "scope": "Strongest in North America (1076 columns, 8208 packages); other regions have 1 to 1710 columns each, with the deep-sea and eODP projects having no PBDB collections",
+      "evidence": "API root describes /sections as 'Summarize units by gap-bound packages'; /sections?col_id=2 returned packages with t_age, b_age, max_thick, min_thick, pbdb_collections (first: 322.3-351.5 Ma, then 353.34-357.02 Ma). /columns?col_id=2&response=long returned t_age 322.3, b_age 1550, t_units 22, t_sections 6. /stats?all per project (columns/packages/units/pbdb_collections): North America 1076/8208/27034/49266; eODP 1710/2029/92451/0; Deep Sea 133/389/7356/0; New Zealand 587/1096/2871/328; Caribbean 64/243/798/897; South America 61/469/1238/0; North American Ediacaran 218/648/1372/0; Australia 1/4/32/0; Africa 2/11/41/0; Indonesia 25/64/212/0; North American Cretaceous 1/2/13/0. /meta states 'All data are licensed under Creative Commons BY 4.0'. /fossils?interval_name=Cambrian returned PBDB collections matched to Macrostrat units. The units?col_id=1 call returned an empty data array.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:56Z",
+        "method": "GET landing; GET data1.2 occs/list.json, taxa/list.json, taxa/single.json, colls/list.json with limit=1&rowcount",
+        "http_status": 200
+      },
+      "variables_present": [
+        "fossil collections with formation names and age ranges",
+        "occurrence counts per collection and per taxon"
+      ],
+      "variables_missing": [
+        "rock-package boundaries and gap durations",
+        "erosion/non-deposition estimates"
+      ],
+      "scope": "Fossil collections worldwide, 278,876 collection records",
+      "evidence": "taxa/list.json?base_name=Animalia&rank=genus returned records_found 91043 and rank=family 13465; with extant=no 72445 and extant=yes 17981. taxa/list.json show=app returns per-genus first/last appearance fields (fea, fla, lea, lla; e.g. Byronia fea 521, lea 504.5) and noc (occurrence count). taxa/single.json?name=Trilobita&show=app: noc 56586, fea 538.8, lea 254.14. colls/list.json?all_records records_found 278876 (fields include lat/lng, formation name sfm, eag/lag ages). occs/list.json?base_name=Mammalia&taxon_reso=species records_found 76087; base_name=Aves 15225; base_name=Insecta 53530. taxa/single.json?name=Animalia noc 1361152. The unrestricted occs/list.json?base_name=Animalia and all_records count queries timed out (25 s).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-bedrock-map-fossil-occurrences-vhhmgqnxt",
+      "name": "Data from: Bedrock geological map predictions for Phanerozoic fossil occurrences (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.vhhmgqnxt",
+      "access_url": null,
+      "doi": "10.5061/dryad.vhhmgqnxt",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.vhhmgqnxt and its version files list",
+        "http_status": 200,
+        "bytes": 283230210
+      },
+      "variables_present": [
+        "fossil collections linked to geological map units (per abstract/file names)",
+        "genus list"
+      ],
+      "variables_missing": [
+        "gap durations between packages"
+      ],
+      "scope": "Phanerozoic fossil occurrences matched to bedrock map data",
+      "evidence": "Dryad API HTTP 200; publicationDate 2022-12-02; described as the supplementary repository of a Paleobiology paper on bedrock-map predictions for fossil occurrences. Files listed by the API: fossil_collections.csv (19810303 B), map_data.zip (250317738 B), README.md (2977 B), unique_genus.csv (13099192 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "sadler-sedimentation-rate-compilation",
+      "name": "Sadler-type compilations of sedimentation rates / stratigraphic completeness",
+      "landing_url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=Sadler%20sedimentation%20rates%20stratigraphic%20completeness%20database",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:15:30Z",
+        "method": "DataCite query for Sadler sedimentation rates stratigraphic completeness database",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "any deposited dataset"
+      ],
+      "scope": "mentioned in an assessor obstacle note, not a named dataset",
+      "evidence": "DataCite query returned total 0 for 'Sadler sedimentation rates stratigraphic completeness database'; Dryad query 'stratigraphic completeness hiatus sedimentation rate' returned 0 and 'unconformity hiatus duration sedimentary record' returned 0. No deposit found.",
+      "verdict": "not-found",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "DataCite",
+      "query": "Sadler sedimentation rates stratigraphic completeness database",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=Sadler%20sedimentation%20rates%20stratigraphic%20completeness%20database",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Dryad",
+      "query": "stratigraphic completeness hiatus sedimentation rate",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=stratigraphic%20completeness%20hiatus%20sedimentation%20rate",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Dryad",
+      "query": "unconformity hiatus duration sedimentary record",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=unconformity%20hiatus%20duration%20sedimentary%20record",
+      "hits": 0,
+      "note": "rate-limited (429) twice earlier in the run; this retry returned 200 with 0 hits"
+    },
+    {
+      "source": "Zenodo",
+      "query": "stratigraphic completeness hiatus fossil record sedimentation rates compilation",
+      "url": "https://zenodo.org/api/records?size=5&q=stratigraphic%20completeness%20hiatus%20fossil%20record%20sedimentation%20rates%20compilation",
+      "hits": 1703772,
+      "note": "full-text noise; one dataset-type hit 10.5061/dryad.w6m905qn9 (early cynodont record completeness) not examined"
+    }
+  ],
+  "status": "partial",
+  "summary": "Macrostrat holds the core variables (ages of gap-bound packages per column, so hiatus lengths and package durations can be derived) openly under CC BY 4.0, with the densest coverage in North America. What the claim also needs, a partition of incompleteness among erosion, non-deposition, preservation and sampling, is not a field in any dataset; PBDB supplies collections for the sampling side only.",
+  "next_step": "Pre-register a North American test on Macrostrat sections (distribution of derived gap durations vs package durations), with PBDB collections per package as the sampling covariate; treat the 'chief cause' wording as untestable without a model.",
+  "obstacles_confirmed": [
+    "Macrostrat coverage is far denser in North America than elsewhere (project table).",
+    "No dataset partitions incompleteness by cause.",
+    "Sadler-type completeness compilations were not found in DataCite or Dryad."
+  ]
+}

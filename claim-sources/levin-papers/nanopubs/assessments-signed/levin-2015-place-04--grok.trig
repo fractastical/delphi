@@ -1,0 +1,104 @@
+@prefix this: <https://w3id.org/np/RAoQn42aLN5IejF5jhwPH_O682R6KS9LsK0wfPqBxXc3c>.
+@prefix sub: <https://w3id.org/np/RAoQn42aLN5IejF5jhwPH_O682R6KS9LsK0wfPqBxXc3c/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci dataset-resolvability assessor (Grok 4.7)";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/grok-4.7-high-fast>.
+<https://w3id.org/delphi/resource/model/grok-4.7-high-fast> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Grok 4.7";
+    dc:identifier "grok-4.7-high-fast".
+<https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Grok 4.7 on levin-2015-place-04: partially-resolvable, resolvability 0.69";
+    dc:description "The statement is a mathematical claim about a fully specified active-inference model, and the public code exposes free energy and inferred place. Reruns and inspection of the energy can refute unconditional convergence or a non-unique minimum. They do not by themselves prove the guarantee for every target, and the energy is defined so that the encoded target is the low-energy state.";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0>;
+    <http://www.w3.org/2000/01/rdf-schema#comment> "Proposed test with existing data: From the published generative model and the public solver, record variational free energy against cell locations and identity beliefs over random initial states. A converged run whose free energy is minimal at a duplicated or mis-assigned place, or a run that fails to reach the target under the stated assumptions, would refute the uniqueness-and-guarantee claim for that model.";
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0";
+    <https://w3id.org/delphi/ontology/evidenceAgainst> "Finite reruns can produce a counterexample, while a universal guarantee needs an analytic argument the demo does not print out.", "The minimum sits at the target largely because the target is encoded as the model's parameters.";
+    <https://w3id.org/delphi/ontology/hasConfidence> "0.62"^^xsd:double;
+    <https://w3id.org/delphi/ontology/hasEvidence> <https://w3id.org/delphi/resource/evidence/levin-2015-place-04--grok--dataset-1>, <https://w3id.org/delphi/resource/evidence/levin-2015-place-04--grok--dataset-2>;
+    <https://w3id.org/delphi/ontology/hasScore> "0.695"^^xsd:double;
+    <https://w3id.org/delphi/ontology/hasVerdict> "partially-resolvable".
+<https://w3id.org/delphi/resource/evidence/levin-2015-place-04--grok--dataset-1> a <https://w3id.org/delphi/ontology/EvidenceItem>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Candidate dataset: SPM DEM_morphogenesis";
+    dc:description "public solver that returns ensemble free energy, locations, and identity expectations";
+    prov:wasDerivedFrom <https://github.com/spm/spm/blob/main/toolbox/DEM/DEM_morphogenesis.m>.
+<https://w3id.org/delphi/resource/evidence/levin-2015-place-04--grok--dataset-2> a <https://w3id.org/delphi/ontology/EvidenceItem>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Candidate dataset: Knowing one's place";
+    dc:description "equations and precision settings that define the free-energy minimum being asserted";
+    prov:wasDerivedFrom <https://doi.org/10.1098/rsif.2014.1383>.
+<https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok--analysis-feasibility> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Analysis feasibility of levin-2015-place-04 by Grok 4.7: 0.68";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-analysis-feasibility>;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0/analysis-feasibility";
+    <https://w3id.org/delphi/ontology/hasScore> "0.68"^^xsd:double;
+    dc:isPartOf <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok>.
+<https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok--data-adequacy> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Data adequacy of levin-2015-place-04 by Grok 4.7: 0.58";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-data-adequacy>;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0/data-adequacy";
+    <https://w3id.org/delphi/ontology/hasScore> "0.58"^^xsd:double;
+    dc:isPartOf <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok>.
+<https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok--data-existence> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Data existence of levin-2015-place-04 by Grok 4.7: 0.85";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-data-existence>;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0/data-existence";
+    <https://w3id.org/delphi/ontology/hasScore> "0.85"^^xsd:double;
+    dc:isPartOf <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok>.
+<https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok--discriminating-power> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Discriminating power of levin-2015-place-04 by Grok 4.7: 0.52";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-discriminating-power>;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0/discriminating-power";
+    <https://w3id.org/delphi/ontology/hasScore> "0.52"^^xsd:double;
+    dc:isPartOf <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok>.
+<https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok--operationalizability> a <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Operationalizability of levin-2015-place-04 by Grok 4.7: 0.8";
+    dc:subject <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0-operationalizability>;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    <https://w3id.org/delphi/ontology/assessmentType> "dataset-resolvability/0.2.0/operationalizability";
+    <https://w3id.org/delphi/ontology/hasScore> "0.8"^^xsd:double;
+    dc:isPartOf <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok>.
+<https://w3id.org/delphi/resource/claim/levin-2015-place-04> <https://w3id.org/delphi/ontology/hasAssessment> <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok>, <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok--analysis-feasibility>, <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok--data-adequacy>, <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok--data-existence>, <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok--discriminating-power>, <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok--operationalizability>
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>;
+    prov:wasDerivedFrom <https://w3id.org/delphi/resource/concept/dataset-resolvability-0.2.0>, <https://github.com/fractastical/delphisci/blob/4cd09f458c4f3e1a91641d9d74421baaa0da297f/books/levin-papers/assessment/raw/grok/batch-1.json>;
+    prov:wasGeneratedBy sub:assessment.
+sub:assessment a prov:Activity;
+    prov:qualifiedAssociation sub:assessmentPlan;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-resolvability-assessor-grok-4.7-high-fast>.
+sub:assessmentPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/4cd09f458c4f3e1a91641d9d74421baaa0da297f/books/levin-papers/assessment/INSTRUCTIONS.md>
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Grok 4.7 on levin-2015-place-04: partially-resolvable, resolvability 0.69";
+    dc:created "2026-10-31T19:03:50.141Z"^^xsd:dateTime;
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/LLMClaimAssessment>;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2015-place-04--grok>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "UHQ3PBe902Z5eHhua2WhFrqrd8l/mZ8dFgPcyi+u5xDufwWCyXU9aw/4l7uiFsdIjaCsZJObXJm5WyXAxio4HWDsQOfuehEG75iuWl3SO6YO/O9x7imqs6AxGnowAh7V8M0F9ucOe7wbYdUircpjG5OJU9YR6cDq+MaActp3ePHg6Wc6C94eUiIxXb2k8fXgJbqVqwJulAxZPQ/jrol56pDV3T97DFxbBK8lph6r8G/EtRJGWst2/269L5PQbVH5TTNay9f7nzKIzZV9mhPr/Q+N8MH8QoyXKrFl7clLYEZlN7dCxOqzjZBqJZU03EzeU0wrKorj+Vq3s3dkie4SjQ=="
+}

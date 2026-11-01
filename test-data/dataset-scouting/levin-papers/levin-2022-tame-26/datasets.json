@@ -1,0 +1,103 @@
+{
+  "claim_id": "levin-2022-tame-26",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T05:25:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "levin-01" },
+  "variables_needed": [
+    "presence/absence (or copy number) of voltage-gated and ligand-gated ion-channel families per species across unicellular eukaryotes and early-branching metazoa",
+    "classification of channels as context-sensitive (domain architecture or gating mode)",
+    "species tree with divergence dates or taxonomic placement",
+    "independent coding of body-plan complexity per clade"
+  ],
+  "datasets": [
+    {
+      "id": "interpro",
+      "name": "InterPro (EMBL-EBI)",
+      "landing_url": "https://www.ebi.ac.uk/interpro/",
+      "access_url": "https://www.ebi.ac.uk/interpro/api/entry/interpro/IPR005821",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:18:00Z", "method": "GET entry API for IPR005821 and IPR027359", "http_status": 200 },
+      "variables_present": ["domain definitions for channel families", "protein and taxon counts per domain"],
+      "variables_missing": ["per-species presence/absence matrix (the per-taxonomy API call timed out with no response)", "context-sensitivity classification", "body-plan coding"],
+      "scope": "IPR005821 'Ion transport domain': 207,698 proteins, 10,900 proteomes, 21,250 taxa, 3,470 domain architectures. IPR027359 'Voltage-dependent channel domain superfamily': 120,712 proteins, 12,011 proteomes, 22,127 taxa.",
+      "evidence": "Counters object in the entry metadata JSON. A taxonomy-distribution call (api/taxonomy/uniprot/entry/interpro/IPR005821) did not respond within 30 seconds.",
+      "verdict": "partial"
+    },
+    {
+      "id": "uniprot",
+      "name": "UniProt",
+      "landing_url": "https://www.uniprot.org/",
+      "access_url": "https://rest.uniprot.org/uniprotkb/search?query=xref:interpro-IPR005821&size=1&format=list",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:19:00Z", "method": "GET search API, read X-Total-Results header; release 2026_03", "http_status": 200 },
+      "variables_present": ["protein records carrying IPR005821 per clade (counts via taxonomy_id filter)"],
+      "variables_missing": ["context-sensitivity annotation as a field", "per-species matrix without paging the full set", "body-plan coding"],
+      "scope": "UniProt release 2026_03 (2 Sep 2026): proteins with IPR005821 total 207,571; Metazoa (33208) 165,003; Cnidaria (6073) 1,796; Ctenophora (10197) 276; Porifera (6040) 171; Choanoflagellida (28009) 47. Taxonomy filter includes descendants.",
+      "evidence": "X-Total-Results headers of size=1 queries.",
+      "verdict": "partial"
+    },
+    {
+      "id": "orthodb",
+      "name": "OrthoDB",
+      "landing_url": "https://www.orthodb.org/",
+      "access_url": "https://data.orthodb.org/current/search?query=voltage-gated%20potassium%20channel&level=33208&species=33208&take=3",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:19:30Z", "method": "GET search API at Metazoa level", "http_status": 200 },
+      "variables_present": ["ortholog groups with per-species presence (gene_count, present_in)"],
+      "variables_missing": ["context-sensitivity classification", "body-plan coding"],
+      "scope": "Query 'voltage-gated potassium channel' at Metazoa level returned count 7292 groups; top group 5971206at33208 'potassium voltage-gated channel' has gene_count 13619, present_in 1236. Unicellular-outgroup levels were not queried.",
+      "evidence": "JSON response with data and bigdata fields.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ensembl-metazoa",
+      "name": "Ensembl Metazoa",
+      "landing_url": "https://metazoa.ensembl.org/",
+      "access_url": "https://rest.ensembl.org/info/genomes/division/EnsemblMetazoa?content-type=application/json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:19:45Z", "method": "GET REST genomes-by-division; HEAD landing page returned 405", "http_status": 200 },
+      "variables_present": ["metazoan genomes and annotations (386 listed)"],
+      "variables_missing": ["unicellular outgroups are outside the Metazoa division", "channel-family matrix", "body-plan coding"],
+      "scope": "REST returned 386 genomes in division EnsemblMetazoa.",
+      "evidence": "JSON list of length 386; landing page HEAD gave 405 (method not allowed), REST ping returned 200.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "NCBI GenBank (portal)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:30Z", "method": "HEAD landing page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["general sequence archive, not a curated channel-family dataset"],
+      "scope": "Portal.",
+      "evidence": "Landing page returned 200.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "InterPro API", "query": "entry IPR005821 and IPR027359", "url": "https://www.ebi.ac.uk/interpro/api/entry/interpro/IPR005821", "hits": 2, "note": "two channel-domain entries inspected" },
+    { "source": "UniProt REST", "query": "xref:interpro-IPR005821 AND taxonomy_id in {33208, 28009, 6040, 10197, 6073}", "url": "https://rest.uniprot.org/uniprotkb/search?query=xref:interpro-IPR005821+AND+taxonomy_id:33208&size=1&format=list", "hits": 165003, "note": "Metazoa count; other clades in the dataset entry" },
+    { "source": "OrthoDB", "query": "voltage-gated potassium channel at Metazoa", "url": "https://data.orthodb.org/current/search?query=voltage-gated%20potassium%20channel&level=33208&species=33208&take=3", "hits": 7292, "note": "orthologous groups" },
+    { "source": "DataCite", "query": "ion channel evolution metazoa phylogeny", "url": "https://api.datacite.org/dois?query=ion%20channel%20evolution%20metazoa%20phylogeny&page%5Bsize%5D=5", "hits": 0, "note": "none" },
+    { "source": "Dryad", "query": "ion channel evolution metazoa", "url": "https://datadryad.org/api/v2/search?q=ion%20channel%20evolution%20metazoa", "hits": 0, "note": "none" }
+  ],
+  "status": "partial",
+  "summary": "Protein-level resources can supply channel-family presence by clade (InterPro, UniProt 2026_03, OrthoDB at Metazoa level, 386 Ensembl Metazoa genomes). No source I found classifies channels as context-sensitive or codes body-plan complexity, and no ready presence/absence matrix across unicellular outgroups and early metazoa was found.",
+  "next_step": "Define the channel families and context-sensitive criteria in advance, build the per-species matrix from OrthoDB or InterPro proteome counts including choanoflagellates, and take body-plan coding from a published source.",
+  "obstacles_confirmed": [
+    "Body-plan complexity and context sensitivity are not fields in any resource I queried.",
+    "InterPro per-taxon distribution calls are slow and timed out in my test."
+  ]
+}

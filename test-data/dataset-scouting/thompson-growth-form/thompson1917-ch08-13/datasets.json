@@ -1,0 +1,104 @@
+{
+  "claim_id": "thompson1917-ch08-13",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:30:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "stomatal positions (x, y coordinates) on the same leaf epidermis images, for spatial-arrangement statistics (row order versus scatter)",
+    "epidermal cell outlines or aspect ratio on the same images (oblong versus polygonal)",
+    "species with oblong cells (e.g. monocots such as hyacinth) and with polygonal cells (e.g. Sedum or Arabidopsis)"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-arabidopsis-stomata-position",
+      "name": "Data from: Does stomatal patterning in amphistomatous leaves minimize the CO2 diffusion path length within leaves? (Dryad; stomata_position.csv)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.44j0zpcn6",
+      "access_url": "https://zenodo.org/api/records/10808231/files/stomata_position.csv/content",
+      "doi": "10.5061/dryad.44j0zpcn6",
+      "license": "CC0-1.0",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:17:50Z", "method": "GET Dryad metadata and file list (stomata_position.csv 164,243 bytes, README.md 1,341 bytes); GET the Zenodo mirror of both files, read README, header and line count (4,883 lines)", "http_status": 200, "bytes": 164243 },
+      "variables_present": [
+        "x, y position (pixels) and guard-cell length of each stomate on each leaf surface of 66 Arabidopsis thaliana (Col-0) plants under low, medium and high light; columns light, surface, leaf_id, x, y, length; each pixel 0.824 micrometres"
+      ],
+      "variables_missing": [
+        "no epidermal cell outlines or aspect ratios",
+        "one species (Arabidopsis); no oblong-celled monocot",
+        "file position values include non-integer x and y (e.g. 0.25, 175.25) in the first rows, so coordinates may be aggregated; not examined further"
+      ],
+      "scope": "Arabidopsis thaliana only, 66 plants, about 4,880 rows",
+      "evidence": "README text: 'x and y coordinates (in pixels), angle, and length of each stomate on each leaf surface from 66 Arabidopsis thaliana (Col-0 ecotype) plants'; CSV header 'light,surface,leaf_id,x,y,length'; 4,883 lines",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-stomaquant-monocot-leaf-images",
+      "name": "StomaQuant: Deep learning-based quantification for stomatal trait assessment (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.3j9kd51zr",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.3j9kd51zr",
+      "doi": "10.5061/dryad.3j9kd51zr",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:18:00Z", "method": "GET Dryad dataset metadata (storageSize 1,210,125,096 bytes); no Zenodo mirror found; file list not read", "http_status": 200 },
+      "variables_present": [
+        "stomata-detection training images of 300 rice, 100 barley and 50 sugarcane leaves (monocots), plus detection of stomata in monocots and dicots, per the abstract"
+      ],
+      "variables_missing": [
+        "stomatal detection labels would give positions; epidermal cell shape is not annotated according to the abstract",
+        "dicots with polygonal cells are not stated to be in the training images",
+        "file contents were not inspected"
+      ],
+      "scope": "450 monocot leaves in the in-house training set (rice, barley, sugarcane); images captured against a dark background",
+      "evidence": "Dryad API abstract: 'in-house training dataset consisted of images of 300 rice, 100 barley and 50 sugarcane leaves'; license CC0-1.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (BioStudies search)",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=stomata%20epidermis",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:17:47Z", "method": "GET BioImages search 'stomata epidermis': 25 hits, top five are animal epidermis, onion skin (S-BIAD3555, 1 file) and unrelated cell-biology studies", "http_status": 200 },
+      "variables_present": [
+        "no plant stomata study among the top hits; S-BIAD3555 'Biological Visions: ethereal onion skin' is one file"
+      ],
+      "variables_missing": ["no leaf-epidermis stomata image study identified"],
+      "scope": "archive-wide search",
+      "evidence": "totalHits 25 and the five titles",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "try-plant-trait",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:17:00Z", "method": "HEAD https://www.try-db.org/ and GET the TryWeb/Data.php page", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["trait values on request under terms; no stomatal spatial arrangement or epidermal cell shape coordinates"],
+      "scope": "plant trait portal",
+      "evidence": "HTTP 200 on the landing pages; no spatial image or coordinate data advertised in what was read",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "stomata spatial pattern leaf epidermis", "url": "https://datadryad.org/api/v2/search?q=stomata%20spatial%20pattern%20leaf%20epidermis&per_page=6", "hits": 0, "note": "'stomatal density epidermal cell shape monocot' returned 1: StomaQuant" },
+    { "source": "DataCite", "query": "stomata microscopy images epidermal cell shape monocot dicot dataset", "url": "https://api.datacite.org/dois?query=stomata%20microscopy%20images%20epidermal%20cell%20shape%20monocot%20dicot%20dataset&page[size]=6", "hits": 0, "note": "'stomatal pattern images multiple species epidermis' also 0" },
+    { "source": "Zenodo", "query": "stomata epidermis images dataset multiple species monocot", "url": "https://zenodo.org/api/records?q=stomata%20epidermis%20images%20dataset%20multiple%20species%20monocot&size=6", "hits": 1653726, "note": "unfiltered noise: taxon-treatment figures and papers" },
+    { "source": "BioImage Archive (BioStudies)", "query": "stomata epidermis", "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=stomata%20epidermis&pageSize=5", "hits": 25, "note": "nothing relevant in top five" }
+  ],
+  "status": "partial",
+  "summary": "Stomatal coordinates are openly available for Arabidopsis (a polygonal-celled case, 66 plants, CC0), and a CC0 Dryad set holds stomata-annotated images of 450 monocot leaves (rice, barley, sugarcane), but no dataset combines stomatal positions with epidermal cell shape on the same leaves across oblong- and polygonal-celled species; the claim's named species (hyacinth, Sedum) were not found in any dataset checked.",
+  "next_step": "Open the StomaQuant files to see whether monocot images show epidermal cell walls as well as stomata; for polygonal-celled dicots add the Arabidopsis coordinates and request epidermal micrographs, then pre-register cell-aspect and row-order measures.",
+  "obstacles_confirmed": [
+    "The open coordinate table is Arabidopsis, a polygonal case, and contains no oblong-celled monocot.",
+    "No dataset records epidermal cell outlines together with stomatal coordinates."
+  ]
+}

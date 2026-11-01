@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RALlXxaZfBt5tSAbk_POeEYxXMq7eD3CYOHgI-QIEozPU>.
+@prefix sub: <https://w3id.org/np/RALlXxaZfBt5tSAbk_POeEYxXMq7eD3CYOHgI-QIEozPU/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2018-hcn2-04> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "The authors' BETSE model explains nicotine-induced brain defects in Xenopus as resulting from nicotine's disruption of the endogenous bioelectric prepattern (neural tube hyperpolarization) required for brain development.";
+    dc:type "mechanism";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Nicotine causes brain defects by disrupting the endogenous bioelectric prepattern";
+    <https://w3id.org/delphi/ontology/context> "Pai VP, Pietak A, Willocq V, Ye B, Shi NQ, Levin M, “HCN2 Rescues brain defects by enforcing endogenous voltage pre-patterns”, Nature communications (2018), doi:10.1038/s41467-018-03334-5; section “Results › Nicotine targets Vmem”. Scope: Xenopus laevis neurula and brain development under nicotine exposure"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.1038/s41467-018-03334-5>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt#line=37,38>;
+    prov:wasQuotedFrom <https://doi.org/10.1038/s41467-018-03334-5>;
+    <https://schema.org/text> "Our model explains why nicotine induces brain defects: it correctly predicts the disruptive effects of this teratogen on the endogenous bioelectric prepattern required for brain development.".
+<https://doi.org/10.1038/s41467-018-03334-5> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Pai VP, Pietak A, Willocq V, Ye B, Shi NQ, Levin M. HCN2 Rescues brain defects by enforcing endogenous voltage pre-patterns. Nature communications (2018). doi:10.1038/s41467-018-03334-5";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2018"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "HCN2 Rescues brain defects by enforcing endogenous voltage pre-patterns";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC5843655>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt#line=37,38> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2018-hcn2.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5843655/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.1038/s41467-018-03334-5>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "3272e52259dcf1f3cc5bbcae5bee7719e59288813021949dccebc0f6fbd31425"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2018 claim: Nicotine causes brain defects by disrupting the endogenous bioelectric prepattern";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-04>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "JkOnZ09kSY7SS8/cdymk5uwMdYGWlzJ+jHPNBhrWeISKO/2gKeIF9JHEFVLlntgE06tFAQo292Vkx2I4WckC5tKXc4bNFn9cPixzlPyz58gLtHEoI5O7dQtYApsNiamxpOLU/3BJvBKeBcrGQvcZNd0r8Wbsl52/xDg2urA4LLz9Z2tWYm5i6uKJqzuFZ64sbW+KeF2D804eM+8KRxW4e5RHfh3OAF/B9icbNrfft9KcZ+HwHu+T6PUhvMvBckDNgyIGIaF/tFo47MCS2AYggcZj7GTpCwVqHx7E5ZkQand2+O4LtdQXPhw9wAfDNXiGtoTHPC6VnXeKsyVEeQWQDQ=="
+}

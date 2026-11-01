@@ -1,0 +1,2172 @@
+{
+ "round": "r1-2026-11-01",
+ "slice": "slice-02",
+ "date": "2026-11-01",
+ "horizons": {
+  "complete_days": 30,
+  "short_days": 30,
+  "long_days": 365
+ },
+ "blind": true,
+ "previous_round": null,
+ "problems": [
+  {
+   "id": "species-area-exponent",
+   "title": "Why does the species-area exponent cluster where it does?",
+   "field": "biology",
+   "tier": "B",
+   "question": "Is the island species-area relationship a power law with a near-universal exponent z around 0.25, and if so what sets that value; or is the power law an approximation to a non-power form (as the maximum entropy theory of ecology predicts) whose apparent exponent depends on scale?",
+   "known_state": "Darwin recorded that islands hold fewer species than equal continental areas (ch12-04). Drakare, Lennon and Hillebrand (2006) meta-analysed 794 species-area curves and found z depends on sampling design, habitat and body size; Harte et al. (2009) derived a universal non-power curve from METE; Triantis, Guilhaumon and Whittaker (2012) compared 20 functional forms across 601 island datasets and found the power law best overall but with substantial variation in z. Whether a single mechanism sets z is unresolved.",
+   "acceptance_criteria": [
+    "A pre-registered test on GBIF occurrence counts for a defined set of island archipelagos (from the organisms layer), fitting the power law, METE and at least two alternatives with identical sampling corrections, stating in advance the decision rule for 'universal exponent' versus 'scale-dependent form'."
+   ],
+   "falsifiers": [
+    "METE predictions failing systematically at the island scale would refute the universal non-power form; z intervals that do not overlap across archipelagos refute universality."
+   ],
+   "required_capabilities": [
+    "gbif",
+    "macroecology",
+    "model-comparison",
+    "data-test"
+   ],
+   "data_access": "GBIF (open), island area from Triantis et al. 2012 supplementary data (open).",
+   "related_claims": [
+    {
+     "id": "darwin1859-ch12-04",
+     "label": "Oceanic islands have fewer species than equal continental areas",
+     "status": "proved",
+     "proof": "lean",
+     "theorem": true,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.9,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/darwin-origin/darwin1859-ch12-04/result.json"
+     }
+    },
+    {
+     "id": "darwin1859-ch12-05",
+     "label": "Oceanic islands have a very high proportion of endemic species",
+     "status": "proved",
+     "proof": "lean",
+     "theorem": true,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.85,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/darwin-origin/darwin1859-ch12-05/result.json"
+     }
+    },
+    {
+     "id": "darwin1859-ch11-02",
+     "label": "Barriers to migration correspond closely to differences between regional biotas",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.8,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/darwin-origin/darwin1859-ch11-02/result.json"
+     }
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "species-area-exponent--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Pre-registered GBIF island SAR test with coverage-standardized richness",
+     "kind": "data-test",
+     "method": "Archipelagos: Canary Islands, Galápagos, Hawaiian main islands, Azores, Balearic Islands, Cape Verde, chosen before looking at data because they have island areas in GIFT and dense GBIF sampling. Taxa: vascular plants, land birds and land snails, analysed separately. For each island × taxon, estimate richness from GBIF occurrences by coverage-based rarefaction to a common sample coverage of 0.95 (iNEXT), and also use GIFT checklists for plants as a sampling-independent check. Fit with the sars package, using identical richness estimates for every model: power (S = cA^z), logarithmic, Weibull-3 and the METE-predicted island curve (Harte et al. 2009 form, anchored at the largest island with its total abundance proxy). Pre-registered rules: 'universal power law' if the power model has the lowest AICc in ≥ 70% of archipelago × taxon sets and all z 95% CIs overlap a common interval of width ≤ 0.1; 'scale-dependent form' if METE or a curved model wins in ≥ 50% and local slope declines with area as METE predicts; otherwise 'neither'.",
+     "steps": [
+      "Write result.json with archipelagos, taxa, coverage target, models and decision rules.",
+      "Resolve island polygons and areas from GIFT; download GBIF occurrences per island polygon with a fetch script and checksums.",
+      "Compute coverage-standardized richness (and GIFT checklist richness for plants).",
+      "Fit all models with sars; compute AICc ranks and z intervals; apply the decision rule."
+     ],
+     "decisive_result": "For 18 archipelago × taxon sets (6 × 3), the share where the power law wins and whether z intervals overlap, giving a pre-registered verdict among 'universal power law', 'scale-dependent form' or 'neither'.",
+     "failure_signature": "GBIF coverage is too low on small islands for coverage standardization to reach 0.95 in most sets, and plant results disagree with GIFT checklists by more than the CI widths: inconclusive, data quality.",
+     "tools": [
+      "gbif",
+      "organisms-layer",
+      "macroecology",
+      "model-comparison",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "GBIF sampling bias across islands is severe for snails; METE needs abundance totals that occurrence data only approximate."
+    },
+    {
+     "id": "species-area-exponent--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Sampling-only null: do lognormal SADs and random placement reproduce z?",
+     "kind": "computation",
+     "method": "Before asking what mechanism sets z ≈ 0.25, establish what z distribution arises with no mechanism beyond the species-abundance distribution and random placement. Preston (1962) and later May argued that a canonical lognormal yields z ≈ 0.26 for isolates. Compute this exactly over the range of conditions in real datasets. For each of a grid of total individuals J (10^3–10^9), species pools S₀ and SAD shapes (lognormal with σ ∈ [1, 3], log-series with α ∈ [5, 500], and Preston's canonical constraint), place individuals on islands proportional to area (Coleman random placement, expected richness E[S(a)] = Σ_i 1 − (1 − a)^{n_i}). Fit z over island-area spans matching each dataset in the Triantis et al. compilation (area range, number of islands), producing the null distribution of z per dataset. Compare the observed z distribution with the null by quantile regression and a two-sample Anderson–Darling test.",
+     "steps": [
+      "Pre-register the SAD families, parameter grid and comparison statistics.",
+      "Compute expected richness curves analytically (Coleman formula) and stochastically for small J.",
+      "Match null conditions to each published dataset's area span and island count; generate null z.",
+      "Compare observed and null z distributions; report the variance in z the null explains."
+     ],
+     "decisive_result": "The fraction of the between-dataset variance in z explained by SAD shape and area span alone. If the sampling null reproduces the observed z distribution (Anderson–Darling p > 0.05 under a plausible SAD), z ≈ 0.25 needs no ecological mechanism; if observed z is systematically higher (for example on isolated archipelagos), the excess quantifies the mechanism's contribution.",
+     "failure_signature": "The null z depends so strongly on unobservable SAD parameters that a plausible SAD can be found to fit any observed z, so the null has no discriminating power.",
+     "tools": [
+      "large-scale-computation",
+      "macroecology"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "species-area-exponent--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Random-effects meta-analysis of z heterogeneity plus a METE scaling-collapse test",
+     "kind": "data-test",
+     "method": "Universality means the true between-dataset variance τ² of z is near zero after sampling error. Using the Triantis et al. 2012 and Drakare et al. 2006 compilations, estimate each dataset's z with its standard error (refitting from the raw S–A data where supplied, otherwise from reported fits) and fit a random-effects meta-regression: z_j = μ + x_j'β + u_j + e_j, with u_j ~ N(0, τ²), e_j ~ N(0, se_j²), and covariates for isolation, island type, taxon and body size. Pre-registered: universality refuted if τ's 95% CI excludes 0.03, a z standard deviation one eighth of the canonical 0.25. Independently, test METE's specific prediction (Harte et al. 2009) that the local slope z at a scale is a universal decreasing function of log(N/S) at that scale: for datasets with abundance N, compute local slopes and test the collapse onto the METE curve by its residual variance against a free-curve alternative.",
+     "steps": [
+      "Pre-register τ threshold, covariates and the METE collapse statistic.",
+      "Extract per-dataset z and SE; flag datasets with abundance data for the METE test.",
+      "Fit the random-effects meta-regression (REML) and report τ², I² and covariate effects.",
+      "Run the METE collapse test on datasets with abundances; report the residual variance ratio."
+     ],
+     "decisive_result": "τ with CI (universality supported if the CI upper bound is < 0.03, refuted if the lower bound is > 0.03), the share of heterogeneity explained by covariates, and whether local slopes collapse onto the METE curve, the decisive test between 'universal exponent' and 'universal non-power form'.",
+     "failure_signature": "Too few datasets report abundances for the METE test (fewer than 20), and z standard errors are unavailable for most compiled curves, making τ uninterpretable.",
+     "tools": [
+      "meta-analysis",
+      "macroecology",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Raw S–A data for many compiled curves are not public, so standard errors may have to be reconstructed from the reported number of islands and R²."
+    },
+    {
+     "id": "species-area-exponent--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Coverage-corrected island model tournament",
+     "kind": "data-test",
+     "method": "Select at least 30 oceanic archipelagos and construct standardized GBIF checklists with equal-coverage rarefaction. Fit power law, log-series, Lomolino and METE forms using the same observation model, area covariates and spatially blocked cross-validation. Estimate archipelago-specific z with partial pooling.",
+     "steps": [
+      "Freeze island polygons, taxonomic groups, dates and minimum 1000 occurrences per archipelago.",
+      "Estimate completeness from singleton and doubleton frequencies and rarefy to 80% coverage.",
+      "Fit all candidate forms with identical detection offsets.",
+      "Hold out whole islands and compare predictive log density and z heterogeneity."
+     ],
+     "decisive_result": "A universal power law requires ELPD at least 10 above every alternative and between-archipelago SD(z) below 0.03 around a mean within 0.03 of 0.25; nonoverlapping z intervals or superior non-power prediction refutes it.",
+     "failure_signature": "Coverage estimates below 0.5 for more than one third of archipelagos or severe geographic sampling clustering makes the test inconclusive.",
+     "tools": [
+      "gbif",
+      "macroecology",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Reliable island polygons and absence-aware inventories for poorly sampled archipelagos."
+    },
+    {
+     "id": "species-area-exponent--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Scale-transition test within nested surveys",
+     "kind": "data-test",
+     "method": "Use nested quadrat and island inventories to test whether apparent z changes predictably with sampled area. Pre-register local-slope estimators d log S/d log A for power-law and METE curves, and compare them on datasets with at least six nested area scales and 50 species.",
+     "steps": [
+      "Assemble at least 50 independent nested sampling series without pooling nonnested sites.",
+      "Estimate local slopes with a monotone spline whose smoothing is fixed by simulation.",
+      "Compare constant-slope and METE-predicted slope curves by leave-one-scale-out prediction.",
+      "Meta-analyze effects with biome and taxon moderators."
+     ],
+     "decisive_result": "Scale dependence is supported if at least 70% of series show directional local-slope change and the non-power model improves total ELPD by at least 20; otherwise a constant exponent remains adequate.",
+     "failure_signature": "Fewer than 30 series retain six scales after harmonization or richness estimates are dominated by unequal effort.",
+     "tools": [
+      "macroecology",
+      "data-test",
+      "large-scale-computation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "A harmonized public collection of genuinely nested surveys."
+    },
+    {
+     "id": "species-area-exponent--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Power law against METE on GIFT island floras",
+     "kind": "data-test",
+     "method": "Pre-register on GIFT island regions: complete vascular-plant checklists, native species, region area as returned by the GIFT API. Exclude incomplete lists. Fit three models with the same data and the same log-likelihood: the power law log S = log c + z log A by a negative-binomial GLM with log area as offset predictor; the logarithmic curve S = c + z log A under the same likelihood family; and the METE species-area curve implemented by meteR's meteSAR, following Harte et al. 2009, where expected richness is the sum over the MaxEnt species-abundance distribution of the probability a species is present. Universal exponent, pre-registered: the pooled z has a 95 percent interval of width less than 0.1, and every island group with at least 10 islands has a z interval overlapping that pooled interval. Groups are the island-group identifiers GIFT returns; if that field is absent, stop, do not invent clusters. METE wins only if its AIC beats the power law by more than 10 and its mean absolute residual is smaller.",
+     "steps": [
+      "Freeze the likelihood, the width criterion and the AIC gap before querying GIFT.",
+      "Download complete native vascular-plant island checklists and areas.",
+      "Fit the power law, the logarithmic curve and meteSAR.",
+      "Compute pooled and per-group z intervals.",
+      "Apply the universal-exponent rule and the METE rule separately."
+     ],
+     "decisive_result": "Either a pooled z interval narrower than 0.1 that every qualifying island group overlaps, or a rejection of that universality, plus an AIC comparison of METE against the power law with gap 10.",
+     "failure_signature": "Group identifiers are missing, or fewer than five groups have 10 islands. The test is then inconclusive. A METE win on residual and a loss on AIC, or the converse, is a split result and does not count as a win.",
+     "tools": [
+      "gbif",
+      "macroecology",
+      "model-comparison",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    },
+    {
+     "id": "species-area-exponent--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "A logseries null for the island exponent",
+     "kind": "computation",
+     "method": "Test the sampling explanation of z without fitting z on the same islands used to build the null. Fit Fisher's logseries to the single largest GIFT island, or to one pre-registered mainland GIFT region if the largest island is itself in the test set. Freeze those parameters. Place individuals independently onto the other islands with probability proportional to island area, thinning the same abundance vector. Estimate z by the same negative-binomial GLM as the data test, 1000 replicates. The empirical pooled z is a sampling consequence if it lies inside the central 95 percent of this null. The null uses the empirical area distribution and does not use the empirical species lists of the test islands.",
+     "steps": [
+      "Choose the calibration region and freeze it before estimating z on the remainder.",
+      "Fit the logseries on the calibration region only.",
+      "Thin individuals onto the other islands proportional to area, 1000 times.",
+      "Estimate z with the same GLM as the data test.",
+      "Locate the empirical z in the null distribution."
+     ],
+     "decisive_result": "The empirical pooled z either lies inside the central 95 percent of the logseries-placement null or it does not. Inside means the cluster of z is reproduced by this sampling model.",
+     "failure_signature": "The empirical z falls outside the null interval. A biological mechanism is then still required, and this approach has not explained the exponent. Using the test islands to fit the logseries is a failed pre-registration.",
+     "tools": [
+      "macroecology",
+      "model-comparison"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "species-area-exponent--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Prove the METE slope is not a constant power",
+     "kind": "formalization",
+     "method": "Formalize the Harte 2009 claim that the MaxEnt species-area curve is not a power law, so a local exponent near 0.25 is an accident of scale. Define expected richness S(A) as S0 times the sum over abundances of the MaxEnt species-abundance probabilities times the probability a species of that abundance is present in a nested cell of area A. Define the local exponent as the derivative of log S with respect to log A. Prove it is not constant on (0, A0) under the Harte constraints, and prove the published limiting statement that the local exponent tends to 0, not to 1/4, as mean abundance per species goes to infinity. This is a theorem about the model. It does not say islands obey the model.",
+     "steps": [
+      "Encode the MaxEnt abundance distribution and the spatial presence probability from Harte et al. 2009.",
+      "Define S(A) and the local exponent.",
+      "Prove the local exponent is non-constant for finite mean abundance.",
+      "Prove the infinite-abundance limit is 0.",
+      "Audit axioms."
+     ],
+     "decisive_result": "A no-sorry proof that the METE local exponent is not constant and tends to 0 as mean abundance per species tends to infinity.",
+     "failure_signature": "Under the stated constraints the local exponent is in fact constant. The formalization would then have found that METE does not say what the approach claims it says.",
+     "tools": [
+      "lean4",
+      "macroecology"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    }
+   ]
+  },
+  {
+   "id": "clade-trajectory-universality",
+   "title": "Are clade diversity trajectories universally hat-shaped?",
+   "field": "biology",
+   "tier": "B",
+   "question": "Do most fossil clades rise to a diversity peak and decline symmetrically, as Darwin and later Foote and Quental and Marshall proposed, or is the apparent hat shape a product of sampling and the way clades are defined?",
+   "known_state": "Darwin claimed groups rise gradually to a maximum then decline (ch10-06; repo verdict mixed). Foote (2007) found symmetric waxing and waning of marine invertebrate genera; Liow and Stenseth (2007) found similar shapes in mammals; Quental and Marshall (2013) linked decline to Red Queen dynamics. Critics attribute symmetry to the 'pull of the recent', paraphyletic clade definitions and sampling heterogeneity. No standardized, subsampling-corrected test across all orders and families exists.",
+   "acceptance_criteria": [
+    "A pre-registered test over all PBDB orders and families meeting stated occurrence thresholds, using shareholder-quorum subsampling and monophyly filters, with a stated statistic for hat-shapedness and a null from randomized origination-extinction sequences.",
+    "A verdict with effect size: fraction of clades significantly hat-shaped versus the null."
+   ],
+   "falsifiers": [
+    "If the fraction of hat-shaped clades is indistinguishable from the random-walk null after subsampling, the pattern is an artifact."
+   ],
+   "required_capabilities": [
+    "pbdb",
+    "paleobiology-statistics",
+    "subsampling",
+    "data-test"
+   ],
+   "data_access": "Paleobiology Database API (open), already wired into test-data/organisms.",
+   "related_claims": [
+    {
+     "id": "darwin1859-ch10-06",
+     "label": "Groups rise gradually in species number to a maximum, then gradually decline",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "mixed",
+     "data_test": {
+      "verdict": "mixed",
+      "confidence": 0.7,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/darwin-origin/darwin1859-ch10-06/result.json"
+     }
+    },
+    {
+     "id": "darwin1859-ch10-07",
+     "label": "Species and groups disappear gradually, place by place, not by global catastrophes",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "mixed",
+     "data_test": {
+      "verdict": "mixed",
+      "confidence": 0.6,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/darwin-origin/darwin1859-ch10-07/result.json"
+     }
+    },
+    {
+     "id": "darwin1859-ch10-02",
+     "label": "Species of different genera and classes change at different rates",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.7,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/darwin-origin/darwin1859-ch10-02/result.json"
+     }
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "clade-trajectory-universality--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Pre-registered PBDB test: hat-shapedness of subsampled trajectories versus an MBL null",
+     "kind": "data-test",
+     "method": "Download PBDB occurrences at genus resolution for all orders and families, assign occurrences to stages (ICS 2023), and estimate per-stage richness by shareholder quorum subsampling at quorum 0.7 (divDyn). Include clades with ≥ 6 stages of duration and ≥ 50 occurrences. Hat-shapedness statistics: (a) center of gravity CG ∈ [0, 1] of the subsampled diversity curve (Gould et al. 1987); (b) a unimodality score, the share of total variation explained by the best single-peaked isotonic fit; (c) a symmetry score |CG − 0.5|. Null: the Raup et al. (1973) MBL process, a homogeneous birth–death process with per-clade origination and extinction rates estimated from the clade's own boundary-crosser counts, conditioned on clade duration and terminal diversity, passed through the same sampling (per-stage sampling probabilities from three-timer analysis) and the same SQS procedure. Pre-registered verdict: hat-shape is a real pattern if the fraction of clades with unimodality above the null's 95th percentile exceeds 5% by at least 10 percentage points (binomial test p < 0.01).",
+     "steps": [
+      "Write result.json with inclusion thresholds, statistics, null and decision rule before downloading.",
+      "Fetch PBDB occurrences via the API with a scripted query; record checksums.",
+      "Compute SQS curves per clade; compute CG, unimodality and symmetry.",
+      "Simulate 1,000 null clades per real clade; compute empirical percentiles; apply the decision rule; report effect sizes separately for marine invertebrates and terrestrial vertebrates."
+     ],
+     "decisive_result": "The fraction of clades significantly hat-shaped against a sampling-matched birth–death null, with its binomial CI. Reaching that fraction is the effect size the problem asks for. Several hundred qualifying families are expected, enough to detect a 10-point excess.",
+     "failure_signature": "The null's percentiles are dominated by the conditioning on duration and terminal diversity (conditioned random walks are themselves hat-shaped), leaving no power to detect an excess; or SQS fails for many clades with low occurrence counts.",
+     "tools": [
+      "pbdb",
+      "organisms-layer",
+      "subsampling",
+      "paleobiology-statistics",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "clade-trajectory-universality--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Model-based rates: does net diversification decline through clade life?",
+     "kind": "data-test",
+     "method": "Hat-shapedness from diversity curves is indirect; the mechanistic claim (Quental and Marshall) is that origination falls and extinction rises with clade age. Estimate this directly with PyRate (Bayesian joint estimation of preservation, origination and extinction from occurrence data) for each family with ≥ 20 genera and ≥ 100 occurrences, using a time-variable preservation model. For each clade compute the posterior of the slope of net diversification rate r(t) = λ(t) − μ(t) against standardized clade age (birth–death shift model or a linear-trend model in clade age). Pre-registered: the claim holds if more than 50% of clades have posterior probability > 0.95 of a negative slope, and the median slope is negative with a 95% interval excluding 0; it fails if negative-slope clades are no more frequent than positive-slope ones.",
+     "steps": [
+      "Pre-register clade inclusion, PyRate settings (preservation model, MCMC length, convergence criteria ESS > 200) and the decision rule.",
+      "Prepare PyRate inputs from PBDB occurrences with age ranges.",
+      "Run PyRate per clade on a compute cluster; check convergence.",
+      "Summarize slope posteriors across clades; apply the decision rule; compare with approach 1's CG and unimodality."
+     ],
+     "decisive_result": "The distribution across clades of the posterior slope of net diversification versus clade age. A majority of significantly negative slopes would support Red-Queen decline as general; a symmetric distribution around zero would mean hat shapes, if present, are not driven by systematic rate decline.",
+     "failure_signature": "Rate trends are not identifiable from preservation trends for most clades (posterior slopes span zero widely), which is likely for small clades: inconclusive.",
+     "tools": [
+      "pbdb",
+      "bayesian-inference",
+      "large-scale-computation",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Compute for hundreds of PyRate runs (each hours to days); approach is feasible but may need to restrict to a few hundred clades."
+    },
+    {
+     "id": "clade-trajectory-universality--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Artifact audit: hat-shape from Linnaean grouping and the pull of the recent",
+     "kind": "simulation",
+     "method": "Critics attribute symmetric clade histories to how clades are defined. Measure that directly. Simulate phylogenies under homogeneous birth–death (no rate decline) for 10^4 replicates per parameter set spanning observed origination and extinction rates. Partition each tree into named 'taxa' with three rules: (a) monophyletic crown and stem clades; (b) a Linnaean-style rule that founds a new 'family' when morphological divergence (Brownian character) passes a threshold, leaving paraphyletic remainders, as taxonomists do; (c) rank-by-age cuts. Apply realistic fossil sampling (Poisson preservation with rates from PBDB three-timer estimates) and the pull of the recent (perfect sampling of extant taxa). Compute the same CG and unimodality statistics as approach 1. The artifact share is the excess hat-shapedness under (b) and under the pull of the recent relative to (a) with uniform sampling. Then test on real data: restrict approach 1 to clades whose monophyly is supported in Open Tree of Life and to wholly extinct clades, and compare effect sizes.",
+     "steps": [
+      "Implement birth–death simulation with character evolution and the three taxon-definition rules.",
+      "Add preservation and pull-of-the-recent sampling; compute hat statistics per pseudo-taxon.",
+      "Quantify artifact contributions per rule; publish code and seeds.",
+      "Rerun approach 1 on monophyletic-only and extinct-only subsets; compare with the simulated artifact sizes."
+     ],
+     "decisive_result": "The amount of hat-shapedness (excess unimodality over the MBL null) produced by paraphyletic definition and the pull of the recent in simulations with no real decline, compared with the excess in real data. If real excess ≤ simulated artifact excess, the pattern is an artifact; if real monophyletic and extinct-only clades retain the excess, it is not.",
+     "failure_signature": "The Linnaean rule cannot be calibrated: artifact size depends on an arbitrary divergence threshold over the plausible range, so the comparison has no fixed reference.",
+     "tools": [
+      "simulation",
+      "pbdb",
+      "phylogenetics"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "clade-trajectory-universality--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "PBDB subsampled hat-shape census",
+     "kind": "data-test",
+     "method": "Query all PBDB marine orders and families with at least 200 occurrences, 20 genera and 10 occupied time bins. Apply shareholder-quorum subsampling at quorum 0.6, align each clade to fractional lifetime, and quantify hat shape by peak interiority and signed monotonicity before and after the peak. Compare against occurrence-preserving time randomizations.",
+     "steps": [
+      "Freeze taxonomy, time scale, quorum and clade thresholds before downloading occurrences.",
+      "Run 1000 subsampling replicates per clade.",
+      "Generate 10000 null trajectories preserving duration, total occurrences and bin-level sampling intensity.",
+      "Control false discovery rate at 0.05 and report the supported fraction with bootstrap intervals."
+     ],
+     "decisive_result": "Universality requires more than 75% of eligible clades to be significantly hat-shaped and the lower 95% interval above the 95th null percentile; equivalence to the null refutes it.",
+     "failure_signature": "Results reverse across reasonable quorum values 0.4 to 0.7 or fewer than 50 clades meet inclusion, indicating sampling dependence.",
+     "tools": [
+      "pbdb",
+      "paleobiology-statistics",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "clade-trajectory-universality--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Birth-death observation-model discrimination",
+     "kind": "computation",
+     "method": "Fit each clade with a state-space birth-death model whose fossil observations have bin-specific sampling probability. Compare constant-rate, diversity-dependent, symmetric hat and asymmetric rise-decline processes by simulation-based calibration and leave-future-bins-out prediction. Include only clades passing posterior identifiability checks.",
+     "steps": [
+      "Simulate 10000 clades per model across PBDB-like sampling regimes to calibrate model recovery.",
+      "Specify priors and identifiability thresholds before fitting real clades.",
+      "Fit at least 50 eligible clades and evaluate posterior model probabilities.",
+      "Repeat with monophyletic clades only and quantify pull-of-the-recent sensitivity."
+     ],
+     "decisive_result": "A biological hat process is supported if calibrated posterior probability exceeds 0.9 in a majority of identifiable clades and outpredicts sampling-only models; failure to recover simulated hats first invalidates the test.",
+     "failure_signature": "Simulation-based calibration confuses hats with sampling heterogeneity in more than 20% of cases, so observed symmetry cannot identify the process.",
+     "tools": [
+      "pbdb",
+      "bayesian-computation",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Reliable monophyly annotations and computationally intensive state-space inference."
+    },
+    {
+     "id": "clade-trajectory-universality--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "SQS hat-shape test of marine orders and families",
+     "kind": "data-test",
+     "method": "Pre-register on the Paleobiology Database occurrence API. Taxa: marine invertebrate orders and families with at least 50 occurrences and at least 8 occupied international stages, accepted names only. Richness in each stage is shareholder-quorum subsampling at quorum 0.6 with 1000 trials, using Alroy's sqs. A clade is hat-shaped if the stage of peak subsampled richness lies in the middle third of its occupied duration and richness at both endpoint stages is below half the peak. The null for each clade is a constant-rate birth-death trajectory conditioned on the same duration and the same number of occurrences, passed through the same quorum filter, 200 replicates. The clade p-value is the fraction of null trajectories with symmetry at least as strong. The summary is the fraction of clades that are hat-shaped. Universality, pre-registered, requires that fraction above 0.5 and a bootstrap interval for the excess over the null mean that excludes 0. Repeat with the two most recent Cenozoic stages removed. If that sensitivity flips the call, the result is a pull-of-the-recent artifact.",
+     "steps": [
+      "Freeze quorum, trials, occurrence floor, hat definition and the 0.5 fraction before download.",
+      "Download PBDB occurrences for accepted marine invertebrate orders and families.",
+      "Compute SQS richness curves and the hat indicator.",
+      "Simulate the conditioned birth-death null through the same filter.",
+      "Bootstrap the excess over the null and repeat after dropping the last two Cenozoic stages."
+     ],
+     "decisive_result": "Fraction of qualifying clades hat-shaped, with a bootstrap interval for its excess over the null. Supports a general hat only if the fraction exceeds 0.5, the excess interval excludes 0, and the call survives dropping the last two Cenozoic stages.",
+     "failure_signature": "The excess interval contains 0, or the call flips when recent stages are dropped. The pattern is then indistinguishable from the null or is a sampling-edge artifact.",
+     "tools": [
+      "pbdb",
+      "paleobiology-statistics",
+      "subsampling",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "PBDB taxonomic status is not a monophyly proof. The test excludes unaccepted names and still cannot guarantee monophyletic clades."
+    },
+    {
+     "id": "clade-trajectory-universality--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "A sampling-intensity null that increases toward the present",
+     "kind": "computation",
+     "method": "The birth-death null above uses constant sampling. This null uses the empirical PBDB collection counts per international stage as a time-varying sampling probability, normalized once from the global marine-invertebrate collection curve and then frozen. Simulate origination and extinction at constant rates, sample occurrences with that curve, and apply the same SQS hat statistic. The empirical hat fraction is an artifact of sampling intensity if it lies inside the central 95 percent of this null. The collection curve is a property of the database, computed once, not fit to the clade shapes. This can exonerate a hat that the constant-sampling null flags, or the reverse, which is why it is a separate approach.",
+     "steps": [
+      "Compute the global marine collection count per stage and freeze it.",
+      "Simulate constant-rate origination and extinction sampled with that curve.",
+      "Pass simulations through SQS and the hat statistic.",
+      "Place the empirical hat fraction in the null predictive interval.",
+      "Do not refit the collection curve to clade shape."
+     ],
+     "decisive_result": "The empirical hat fraction lies inside or outside the central 95 percent of the sampling-intensity null. Inside means the hat fraction is accounted for by the collection curve.",
+     "failure_signature": "The empirical fraction lies outside that interval. Sampling intensity of this form then does not explain the pattern, and the approach has failed as an artifact explanation.",
+     "tools": [
+      "pbdb",
+      "paleobiology-statistics"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "clade-trajectory-universality--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Diversity-dependent extinction versus constant rates",
+     "kind": "computation",
+     "method": "If hats survive the sampling nulls, ask whether diversity-dependent extinction fits the declines better than constant rates. On each SQS curve that passed the occurrence floor, fit two birth-death models by Poisson likelihood of the stage-to-stage richness changes: constant origination and extinction, and constant origination with extinction linear in standing SQS richness. Compare by AIC. Diversity dependence is supported only if it beats the constant model by more than 10 in AIC for a fraction of clades whose bootstrap interval lies above 0.5. This can fail while the hat-shape test succeeds: symmetric-looking curves need not have diversity-dependent rates. It is the Red Queen piece of the question, not a second hat statistic.",
+     "steps": [
+      "Freeze the linear extinction model and the AIC gap.",
+      "Fit both likelihoods on each SQS curve.",
+      "Record the fraction of clades with AIC gap above 10.",
+      "Bootstrap that fraction.",
+      "Require the interval to lie above 0.5."
+     ],
+     "decisive_result": "Bootstrap interval, entirely above 0.5, for the fraction of clades in which diversity-dependent extinction beats constant rates by AIC of more than 10.",
+     "failure_signature": "The interval is not entirely above 0.5. Diversity-dependent extinction then does not explain the declines in this model class, whether or not the curves look hat-shaped.",
+     "tools": [
+      "pbdb",
+      "paleobiology-statistics",
+      "model-comparison"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    }
+   ]
+  },
+  {
+   "id": "empty-shell-morphospace",
+   "title": "Why is shell morphospace empty where it is?",
+   "field": "both",
+   "tier": "B",
+   "question": "In Raup's parameter space of coiled shells (whorl expansion W, distance from axis D, translation T), is the unoccupied region explained by developmental constraint, functional selection (strength, hydrodynamics, stability) or phylogenetic inertia, and can these be told apart quantitatively?",
+   "known_state": "Raup (1966) showed realized shells occupy a small, structured part of the theoretical space. Fifty years of theoretical morphology (reviewed by Gerber 2017) have proposed functional and constructional explanations, but no accepted test discriminates them, partly because digitized shell parameter data were sparse. Thompson's shell-form claims (ch11) assume the logarithmic-spiral generative model.",
+   "acceptance_criteria": [
+    "A pre-registered test on digitized museum shell datasets (parameters measured by the morpholib MorphoEval pipeline), fitting explicit occupancy models: a developmental-constraint model (parameter correlations imposed by the generating curve), a functional model (strength and stability thresholds) and a phylogenetic model, compared by predictive likelihood on held-out taxa.",
+    "An empty-region map with the winning model's predicted boundaries."
+   ],
+   "falsifiers": [
+    "If no model beats a phylogenetic random walk on held-out taxa, the question stays open with present data."
+   ],
+   "required_capabilities": [
+    "theoretical-morphology",
+    "morpholib",
+    "3d-shape-analysis",
+    "data-test"
+   ],
+   "data_access": "Digitized shell collections (MorphoSource, iDigBio, open), Raup parameters re-measured; taxon resolution via test-data/organisms.",
+   "related_claims": [
+    {
+     "id": "thompson1917-ch11-09",
+     "label": "All differences of form between shells are differences of degree in a few growth ratios",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "thompson1917-ch11-11",
+     "label": "Separation or overlap of whorls reflects the growth-rate ratio of outer to inner border",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "thompson1917-ch11-05",
+     "label": "The shell grows in size without changing its shape",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "refutes",
+     "data_test": {
+      "verdict": "refutes",
+      "confidence": 0.8,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/thompson-growth-form/thompson1917-ch11-05/result.json"
+     }
+    },
+    {
+     "id": "thompson1917-ch11-15",
+     "label": "Dissimilar turbinate shells share similar spiral angles and differ mainly in apical angle",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "supports",
+     "data_test": {
+      "verdict": "supports",
+      "confidence": 0.6,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/thompson-growth-form/thompson1917-ch11-15/result.json"
+     }
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "empty-shell-morphospace--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Measure Raup parameters from 3D scans and compare occupancy models on held-out taxa",
+     "kind": "data-test",
+     "method": "Build the dataset the field lacks. From MorphoSource CT and surface scans of gastropod, ammonoid (where 3D fossil scans exist) and bivalve shells, and iDigBio 2D images in standard apertural view for gastropods, extract the coiling axis and the generating-curve centroid trajectory, and fit Raup's W (whorl expansion per revolution), D (relative distance of generating curve from axis) and T (translation) by nonlinear least squares on the spiral. Fit generating-curve shape with elliptic Fourier coefficients. Use the morpholib MorphoEval pipeline for segmentation and quality scoring, and admit a specimen only if fit RMSE < 3% of shell height. Target: ≥ 500 species across ≥ 50 families, taxa resolved via the organisms layer and MolluscaBase. Occupancy models over (log W, D, T): (M_dev) a developmental-constraint density proportional to the volume of parameter space producing geometrically valid, non-self-intersecting shells, with correlations imposed by the generating curve; (M_fun) density decreasing with distance below functional thresholds, from approach 2; (M_phy) phylogenetic Brownian or OU model on the molluscan tree with no boundaries; and combinations. Score by predictive log-likelihood on held-out families (leave-one-family-out).",
+     "steps": [
+      "Pre-register specimen admission criteria, models and the held-out scoring rule.",
+      "Query MorphoSource and iDigBio for shell media; build the fetch list with licences and checksums.",
+      "Run segmentation and spiral fitting through morpholib; quality-filter.",
+      "Fit the occupancy models; compute held-out log-likelihood; produce the empty-region map under the winning model."
+     ],
+     "decisive_result": "A ranked comparison of developmental, functional and phylogenetic occupancy models by held-out predictive log-likelihood (a difference > 10 units counts as decisive), plus a map of the empty region with the winning model's predicted boundary.",
+     "failure_signature": "Fewer than about 200 species pass quality filters, or no model beats the phylogenetic random walk on held-out families, which is the problem's stated falsifier.",
+     "tools": [
+      "morpholib",
+      "3d-shape-analysis",
+      "organisms-layer",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Scan coverage of molluscs on MorphoSource is uneven; ammonoids are mostly 2D. Labelled training data for spiral-fitting quality control would need curation."
+    },
+    {
+     "id": "empty-shell-morphospace--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Compute functional landscapes over the whole Raup space by generative modelling and FE",
+     "kind": "simulation",
+     "method": "Make the functional hypothesis predictive before looking at occupancy. Generate shells on a dense grid over (log W ∈ [0, 6], D ∈ [0, 0.9], T ∈ [0, 6]) with a circular or elliptical generating curve. For each, compute: (a) internal volume per unit shell material (constructional economy); (b) for planispiral forms, hydrostatic stability, the distance between centres of buoyancy and mass with a stated tissue density; (c) crushing resistance by linear-elastic finite-element analysis of a compression load across the aperture, normalized by material volume; (d) a self-overlap indicator (whorls that would intersect). Define the functional hypothesis as the Pareto front of (a)–(c). Its predicted occupied region is the set of points within δ of the front, with δ fixed from a pilot of 20 species chosen at random and excluded from approach 1's test. The output is a predicted occupancy surface supplied to approach 1 as M_fun.",
+     "steps": [
+      "Implement the Raup generator with mesh output; validate against published Raup figures.",
+      "Compute volume and material metrics analytically or numerically on the grid.",
+      "Run FE compression on a coarser grid (about 10^4 shells) and interpolate.",
+      "Compute the Pareto front and the predicted occupancy surface; freeze it before approach 1's scoring."
+     ],
+     "decisive_result": "A pre-computed functional occupancy surface whose boundary is fixed before occupancy data are examined, evaluated in approach 1 against developmental and phylogenetic surfaces. If it predicts the empty regions (for example sparse occupancy at high D and low W), functional selection is supported quantitatively.",
+     "failure_signature": "The Pareto front is so broad that nearly the whole space is within δ, so it predicts no empty region, or results are dominated by the arbitrary choice of load case.",
+     "tools": [
+      "simulation",
+      "finite-element-analysis",
+      "theoretical-morphology"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "empty-shell-morphospace--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Lean-proved constructional boundaries of Raup space plus a growth-rule reachability map",
+     "kind": "mixed",
+     "method": "Separate what geometry forbids outright from what development or selection disfavours. Formalize in Lean the logarithmic-spiral shell: the generating curve's centroid at angle θ is at radius r(θ) = r₀ W^{θ/2π}, with the curve's inner edge at distance proportional to D·r. Prove: (a) successive whorls just touch when D = 1/W, Raup's boundary between overlapping and separated coils, generalized to elliptical generating curves; (b) a whorl penetrates the previous one exactly when D < 1/W under stated conditions, with the conditions on T for helicospiral forms; (c) for T = 0, an umbilicus exists iff D > 0. These carve out the constructionally impossible region (self-intersection), which must not count as an 'unexplained empty region'. Second, derive developmental reachability from local aperture growth rules (Moulton–Goriely style, with growth rate varying around the aperture): compute which (W, D, T) combinations are produced by growth-rate profiles in a bounded family, giving the developmental-constraint surface M_dev for approach 1.",
+     "steps": [
+      "Define the spiral shell in Lean with ℝ parameters; prove the touching and penetration conditions with explicit hypotheses.",
+      "Report the theorems against Thompson ch11 claims (logarithmic spiral generative model).",
+      "Implement an aperture-growth model; sample growth-rate profiles; record resulting (W, D, T).",
+      "Produce the reachability density as M_dev for approach 1."
+     ],
+     "decisive_result": "Lean theorems giving the exact self-intersection boundary of Raup space (D = 1/W and its elliptical and helicospiral generalizations), and a growth-rule reachability density. Together they separate 'impossible', 'developmentally unlikely' and 'possible but unoccupied' regions, the three-way distinction the problem needs.",
+     "failure_signature": "The growth-rule family is so flexible that every geometrically valid point is reachable, leaving M_dev uninformative; or the geometric theorems hold only under circular generating curves, too restrictive for real gastropods.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "simulation",
+      "theoretical-morphology"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "empty-shell-morphospace--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Held-out shell occupancy mechanism tournament",
+     "kind": "data-test",
+     "method": "Measure Raup W, D and T from at least 1000 openly digitized adult shells spanning 100 genera with MorphoEval. Fit three preregistered occupancy models: developmental covariance from mantle growth, finite-element failure and stability thresholds, and a phylogenetic diffusion model. Hold out entire families to distinguish interpolation from mechanism.",
+     "steps": [
+      "Blindly validate automated parameters against 100 manual measurements with ICC above 0.9.",
+      "Specify feasible regions for each mechanistic model before inspecting occupancy.",
+      "Fit models to 80% of families and predict voxel occupancy in held-out families.",
+      "Compare proper scoring rules and map false-positive empty regions."
+     ],
+     "decisive_result": "A mechanism wins if its held-out log score exceeds phylogenetic diffusion by at least 20 and predicts at least 80% of occupied voxels while falsely allowing under 20% of robustly empty voxels.",
+     "failure_signature": "Parameter ICC below 0.9 or no model improves family-held-out prediction over phylogenetic diffusion.",
+     "tools": [
+      "morpholib",
+      "morphometrics",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "A sufficiently large consistently oriented set of open 3D shell meshes."
+    },
+    {
+     "id": "empty-shell-morphospace--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Mechanics-derived forbidden-region simulation",
+     "kind": "simulation",
+     "method": "Generate shells across a dense W-D-T lattice and simulate growth, self-intersection, center-of-mass stability and pressure loading. Use interval geometry for self-intersection and validated finite-element convergence for failure. Compare the predicted infeasible boundary to observed morphospace without fitting boundary parameters to occupancy.",
+     "steps": [
+      "Evaluate at least one million W-D-T points with adaptive refinement near constraints.",
+      "Certify self-intersection and aperture occlusion geometrically.",
+      "Compute dimensionless stress and stability under preregistered material ranges.",
+      "Test whether observed taxa lie inside the feasible set and empty voxels outside it."
+     ],
+     "decisive_result": "Functional constraint explains emptiness if at least 90% of observed shells are feasible and at least 70% of well-sampled empty voxels are infeasible across the full material range.",
+     "failure_signature": "Large connected empty regions remain mechanically feasible, or more than 10% of observed shells are classified impossible.",
+     "tools": [
+      "mechanobiology-simulation",
+      "large-scale-computation",
+      "morphometrics"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Species-specific shell material properties and loading regimes."
+    },
+    {
+     "id": "empty-shell-morphospace--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Prove the planispiral non-intersection boundary",
+     "kind": "formalization",
+     "method": "Raup's parameters are whorl expansion W, relative distance D of the generating curve from the coiling axis, and translation T. For the planispiral case T = 0, define the shell as the Thompson logarithmic spiral of expansion W with a circular generating curve of Raup's D. Prove the necessary and sufficient algebraic inequality on W and D such that the generating circle at angle θ does not meet the circle at angle θ minus 2π. The theorem is that inequality, derived inside Lean from the definitions, not copied from a secondary source. State the open solid-of-revolution case T ≠ 0 as out of scope. This is the developmental-constraint boundary the occupancy test will use.",
+     "steps": [
+      "Define W, D and the planispiral logarithmic spiral.",
+      "Write the two successive generating circles.",
+      "Prove they are disjoint if and only if the derived inequality holds.",
+      "Leave T ≠ 0 unformalized and say so.",
+      "Audit axioms."
+     ],
+     "decisive_result": "A no-sorry equivalence between non-intersection of successive planispiral whorls and an explicit inequality in W and D.",
+     "failure_signature": "A numerically non-intersecting (W, D) pair that violates the inequality, or the converse. The statement is then false.",
+     "tools": [
+      "lean4",
+      "theoretical-morphology"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    },
+    {
+     "id": "empty-shell-morphospace--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Held-out occupancy models on museum meshes",
+     "kind": "data-test",
+     "method": "Measure W, D and T with the morpholib MorphoEval pipeline on open gastropod and cephalopod meshes from MorphoSource, supplemented by iDigBio specimen records for provenance. A taxon enters only if it resolves to a GBIF key or an Open Tree taxon. Pre-register a minimum of 30 species; below that the verdict is underpowered. Three predictive models, scored by log predictive density on families held out one at a time. Developmental constraint: the planispiral inequality from the Lean theorem, with a Gaussian likelihood inside the allowed region and a fixed penalty outside. Functional: from each mesh, the center of mass must project inside the aperture-down contact footprint, and a thickness proxy from the mesh, if the mesh has a wall, supplies a strength score; meshes without a wall use only the stability score. Phylogenetic: a phylogenetic Gaussian process on the Open Tree subtree. The developmental or functional model wins only if its expected log predictive density beats the phylogenetic model by an interval that excludes 0. If neither does, the question stays open, which is the stated falsifier.",
+     "steps": [
+      "Freeze the 30-species floor and the scoring rule before measuring meshes.",
+      "Measure W, D, T on MorphoSource shells with MorphoEval and keep provenance from iDigBio.",
+      "Fit the geometric, functional and phylogenetic models.",
+      "Score them by family-held-out log predictive density.",
+      "Declare a winner only if it beats the phylogenetic model with an interval excluding 0."
+     ],
+     "decisive_result": "A held-out log-predictive comparison. A non-phylogenetic model wins only if its advantage over the phylogenetic Gaussian process has an interval excluding 0, on at least 30 species.",
+     "failure_signature": "Neither geometric nor functional model beats the phylogenetic model, or fewer than 30 species have measurable meshes. The question then stays open on present public scans.",
+     "tools": [
+      "morpholib",
+      "3d-shape-analysis",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Most shells are not scanned. The test is built to return underpowered if the open meshes do not reach 30 species."
+    },
+    {
+     "id": "empty-shell-morphospace--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Grid the generating curve and compare empty cells",
+     "kind": "simulation",
+     "method": "Fill a rectangular grid in (W, D, T) at the resolution of Raup's published figures, generate the logarithmic-spiral solid, and mark cells whose successive whorls intersect. Overlay the empirical (W, D, T) points from the mesh measurements. Developmental constraint explains an empty region only where the empty cells are exactly the intersecting cells, up to a pre-registered boundary strip of one grid cell. Empirical points inside the intersecting region falsify the generating model. Empty cells that do not intersect remain unexplained by this geometric filter and are passed to the functional model rather than called a success. This approach never sees phylogeny, so it cannot be rescued by a phylogenetic random walk.",
+     "steps": [
+      "Choose the grid from Raup's figure limits and freeze it.",
+      "Mark intersecting cells by the same circle test used in the Lean theorem, extended numerically to T ≠ 0.",
+      "Overlay measured shells.",
+      "Count empirical points in intersecting cells and empty non-intersecting cells.",
+      "Accept developmental constraint only for regions where those two sets match within one grid cell."
+     ],
+     "decisive_result": "A cell-wise map. Developmental constraint accounts for a named empty region only if that region matches the intersecting cells within a one-cell strip and no measured shell falls in an intersecting cell.",
+     "failure_signature": "A measured shell lies in an intersecting cell, or a large empty region is non-intersecting. Geometry then does not explain that emptiness.",
+     "tools": [
+      "theoretical-morphology",
+      "simulation"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    }
+   ]
+  },
+  {
+   "id": "somite-number-control",
+   "title": "What sets vertebrate somite number?",
+   "field": "biology",
+   "tier": "B",
+   "question": "Across vertebrates, is total somite (and hence vertebral) number set by the ratio of the duration of axis elongation to the segmentation-clock period, as clock-and-wavefront predicts, and if so what evolutionary changes in clock period and elongation explain the range from about 30 to over 300?",
+   "known_state": "Cooke and Zeeman (1976) proposed clock-and-wavefront; Gomez et al. (2008) showed in zebrafish, chick, mouse and corn snake that snakes make many more somites by slowing axis elongation relative to the clock; Oates, Morelli and Soroldoni (2012) review the clock. Clock period and elongation rate are measured in only a handful of species, so the comparative prediction has not been tested broadly. Already a Frontier Problem.",
+   "acceptance_criteria": [
+    "A pre-registered comparative test: for every species with a measured clock period and elongation duration, compare predicted and observed vertebral counts (from museum and literature counts via the organisms layer); state in advance the tolerance for 'supports'.",
+    "A ranked list of species whose clock measurement would most reduce uncertainty about the mechanism."
+   ],
+   "falsifiers": [
+    "Measured clock period and elongation duration whose ratio mispredicts somite number by more than the stated tolerance in several species."
+   ],
+   "required_capabilities": [
+    "developmental-biology",
+    "comparative-data",
+    "data-test"
+   ],
+   "data_access": "Vertebral counts in literature and museum databases (open); clock periods from published time-lapse studies.",
+   "related_claims": [
+    {
+     "id": "thompson1917-ch17-04",
+     "label": "Related organisms differ by simple, symmetrical Cartesian transformations",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "somite-number-control--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Pre-registered test: clock period and PSM dynamics versus vertebral counts",
+     "kind": "data-test",
+     "method": "Avoid the tautology. 'One somite per clock cycle' makes N = (duration of somitogenesis)/(period) trivially true, so the test must predict N from quantities measured independently of the count: the clock period τ, the rate at which the presomitic mesoderm (PSM) is replenished by the tailbud, and the PSM length at onset, which together determine when the PSM is exhausted (Gomez et al. 2008). Compile from time-lapse literature every species with τ and PSM dynamics measured: zebrafish, medaka, chick, mouse, corn snake, and human and other mammals from in vitro PSM systems (Matsuda et al. 2020), at stated temperatures. Predict total somite number N̂ from the Gomez-type balance model with parameters measured, not fitted. Compare with observed somite or vertebral counts from literature and museum data via the organisms layer (FishBase for fish vertebrae; Head and Polly 2015 for squamates). Pre-registered tolerance: supports if |N̂ − N|/N ≤ 15% in every species with complete data; refutes if > 30% in two or more.",
+     "steps": [
+      "Write result.json with the prediction formula, tolerance and admissible measurement types.",
+      "Compile τ, PSM length and elongation rates per species with temperature; record sources.",
+      "Compute N̂ and compare with observed counts.",
+      "Compute, for unmeasured species, the expected reduction in posterior uncertainty about the mechanism from measuring τ (value-of-information ranking), using the variance of predicted N across plausible τ."
+     ],
+     "decisive_result": "Per-species predicted versus observed somite numbers within or outside the 15% tolerance for all species with independent measurements (n ≈ 5–8), plus a ranked list of species whose clock measurement would most reduce uncertainty: long-bodied fishes, caecilians, and snakes other than corn snake.",
+     "failure_signature": "Too few species have PSM dynamics measured independently of somite counts (n < 4), so the test is underpowered; or published measurements were taken at temperatures incompatible with the counts.",
+     "tools": [
+      "comparative-data",
+      "organisms-layer",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Clock and PSM measurements exist for only a handful of species; the decisive species need new time-lapse experiments the swarm cannot perform."
+    },
+    {
+     "id": "somite-number-control--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Fit a PSM balance model across species and predict held-out species",
+     "kind": "mixed",
+     "method": "Formalize the clock-and-wavefront count as a dynamical model and test it out of sample. Model: PSM length L(t) obeys dL/dt = v_g(t) − v_s(t), where v_g is tailbud addition and v_s = S(t)/τ(t) is segmentation (segment length S over period τ), with S set by the wavefront speed, S = v_w τ. Somitogenesis ends at t* when L(t*) = L_min. N = ∫₀^{t*} dt/τ(t). Prove in Lean the qualitative theorems: (a) with constant τ and v_g decaying exponentially at rate k, N is an explicit closed-form function of τ k and L₀/S₀; (b) N increases when τ decreases at fixed elongation and v_w (the snake mechanism), and the elasticity of N to τ is exactly −1 only when elongation is independent of the clock. Then fit the free parameters (k and L_min) on four well-measured species and predict N for a held-out fifth (leave-one-out), comparing elasticity predictions with snake–lizard contrasts.",
+     "steps": [
+      "Prove the closed form and elasticity theorems in Lean (ODE solution by explicit integration, monotonicity).",
+      "Extract L(t), S(t) and τ(t) from published time courses (zebrafish, chick, mouse, corn snake).",
+      "Fit k and L_min; predict the held-out species; report leave-one-out errors.",
+      "State which comparative contrast (for example snake versus lizard) would most sharply test the elasticity prediction."
+     ],
+     "decisive_result": "Leave-one-out prediction errors for N across the measured species (decisive if all within 15%), and a Lean-proved elasticity statement making precise how much of the snake's high count is due to τ versus elongation.",
+     "failure_signature": "Leave-one-out errors exceed 30% for any species, meaning species differ in mechanisms the model lacks (for example termination by Hox or Gdf11 timing rather than PSM depletion).",
+     "tools": [
+      "lean4",
+      "ode-simulation",
+      "comparative-data"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Digitized PSM time courses exist only as published figures; extraction is laborious and introduces measurement error."
+    },
+    {
+     "id": "somite-number-control--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Temperature test: do clock and elongation Q10s predict meristic plasticity?",
+     "kind": "data-test",
+     "method": "Use temperature as a natural perturbation the swarm can exploit from existing data. In ectotherms, temperature changes both clock period and elongation rate. Clock-and-wavefront predicts that total somite number varies with rearing temperature in proportion to the difference of their thermal sensitivities: d ln N / dT ≈ (E_τ − E_elong)/(kT²) in Arrhenius form. If both scale identically, N is temperature-invariant, as reported for zebrafish somitogenesis by Schröter et al. 2008. Compile (a) clock-period and elongation-rate temperature series for zebrafish and any other species with them, and (b) laboratory rearing-temperature experiments reporting vertebral counts in fishes (meristic plasticity literature), plus (c) the latitudinal vertebral-count gradient (Jordan's rule) from FishBase across species and populations. Pre-registered predictions: the measured E difference predicts the sign and magnitude of rearing-temperature effects within a factor of 2, and species whose measured E difference is near zero show no latitudinal gradient.",
+     "steps": [
+      "Pre-register the Arrhenius prediction and tolerance.",
+      "Extract temperature series for τ and elongation from published studies; estimate E values with CIs.",
+      "Compile rearing-temperature vertebral-count experiments; compute d ln N/dT per study.",
+      "Compare predicted and observed slopes; run a phylogenetically controlled test of Jordan's rule against predicted sensitivity where data allow."
+     ],
+     "decisive_result": "Agreement or disagreement, within a factor of 2, between d ln N/dT predicted from measured clock and elongation thermal sensitivities and the observed rearing-temperature effect on vertebral counts. A sign mismatch in two or more species refutes the clock-and-wavefront account of meristic plasticity.",
+     "failure_signature": "No species has both a clock-temperature series and a rearing-temperature vertebral-count experiment, so predictions and observations come from different species and the test is indirect.",
+     "tools": [
+      "comparative-data",
+      "data-test",
+      "organisms-layer"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Matched clock and meristic data for the same species are rare; new temperature-series time-lapse experiments would make the test decisive."
+    },
+    {
+     "id": "somite-number-control--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Cross-species clock-ratio prediction test",
+     "kind": "data-test",
+     "method": "Pre-register a comparative dataset of every vertebrate species with independently measured segmentation-clock period, somitogenesis duration and final somite count. Predict count as duration divided by period with no fitted slope, propagate measurement error, and use phylogenetic residual analysis. Require at least 15 species spanning fish, amphibians, reptiles, birds and mammals.",
+     "steps": [
+      "Define admissible live-imaging measurements and exclude inferred clock periods.",
+      "Blindly extract clock, duration and count in duplicate.",
+      "Compute posterior predictive intervals from measurement uncertainties only.",
+      "Test absolute percentage error and clade-structured bias."
+     ],
+     "decisive_result": "Clock-and-wavefront count control is supported if at least 80% of species fall within 15% of the parameter-free prediction and phylogenetic residual SD is below 0.1 log units.",
+     "failure_signature": "Three or more independently measured species miss by over 30% in the same direction, or fewer than 10 species have all three direct measurements.",
+     "tools": [
+      "data-test",
+      "phylogenetic-comparative-methods",
+      "organisms-layer"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Direct elongation-duration and clock-period measurements exist for too few species."
+    },
+    {
+     "id": "somite-number-control--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Clock-wavefront perturbation identifiability map",
+     "kind": "simulation",
+     "method": "Build a stochastic delayed-oscillator plus moving-wavefront model and perform global sensitivity analysis over clock period, axis elongation, coupling delay and arrest-front speed. Reproduce published perturbation time courses, then identify perturbations whose somite-count outcomes discriminate period control from elongation control.",
+     "steps": [
+      "Implement a spatial oscillator chain with explicit observation model.",
+      "Calibrate separately to each species using only time-course phase and axis length.",
+      "Run Sobol sensitivity and profile-likelihood identifiability analyses.",
+      "Rank feasible temperature, FGF and Notch perturbations by expected information gain."
+     ],
+     "decisive_result": "A perturbation is decisive if competing mechanisms predict nonoverlapping 95% intervals separated by at least three somites; publish the top five preregisterable experiments.",
+     "failure_signature": "All feasible perturbations have overlapping predictions because period and elongation parameters remain structurally nonidentifiable.",
+     "tools": [
+      "developmental-simulation",
+      "large-scale-computation",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": "Executing the discriminating perturbations requires laboratory access."
+    },
+    {
+     "id": "somite-number-control--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Clock period over elongation time versus vertebral counts",
+     "kind": "data-test",
+     "method": "Pre-register the clock-and-wavefront prediction N = T_elongation / T_clock. A species enters only when a published time-lapse study reports both the segmentation-clock period and the duration of axis elongation, and an independent count of vertebrae or somites exists. Gomez et al. 2008 is the seed list, not a cap: later papers enter under the same measurement rule. The tolerance is |log(N_predicted / N_observed)| < log(1.25), that is, within 25 percent. The claim is supported only if every qualifying species meets the tolerance. If fewer than 6 species qualify, the verdict is inconclusive, underpowered, and is not converted into support by relaxing the tolerance. Vertebral counts and clock measurements must come from different publications so the count is not the number the clock paper already compared.",
+     "steps": [
+      "Freeze the 25 percent tolerance and the 6-species floor.",
+      "Admit a species only with both clock measurements and an independent vertebral count.",
+      "Compute N_predicted = T_elongation / T_clock.",
+      "Apply the log-ratio tolerance to each species.",
+      "Support the claim only if every qualifying species passes and at least 6 qualify."
+     ],
+     "decisive_result": "Every qualifying species within 25 percent, with at least 6 species. Otherwise the comparative prediction is not supported at the pre-registered bar.",
+     "failure_signature": "Two or more qualifying species miss the 25 percent tolerance. A single miss with at least 6 species is a mixed result, not support. Fewer than 6 species is underpowered.",
+     "tools": [
+      "developmental-biology",
+      "comparative-data",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": "Clock period and elongation duration are published for only a handful of species. The test is expected to hit the underpowered floor, and that is an acceptable outcome."
+    },
+    {
+     "id": "somite-number-control--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Rank unmeasured species by expected variance reduction",
+     "kind": "computation",
+     "method": "The second acceptance criterion is a ranked list of species whose clock measurement would most reduce uncertainty. Use FishBase vertebral counts as the response and the Open Tree vertebrate subtree as the covariance. The model is N = α T / τ with log α a phylogenetic Gaussian process. Species that already have a clock measurement anchor the process. For every FishBase species without a clock measurement, compute the expected reduction in posterior variance of α from observing its clock period, using the current phylogenetic covariance. Rank by that reduction. Extremes that are phylogenetically redundant with zebrafish, chick, mouse or snake should rank low. The list is the result; it does not test the mechanism.",
+     "steps": [
+      "Assemble FishBase vertebral counts and the Open Tree distances.",
+      "Anchor the phylogenetic regression at species with published clock data.",
+      "Compute expected variance reduction for each unmeasured species.",
+      "Publish the ranked list with the variance reductions.",
+      "Note species that cannot be ranked because they are absent from the tree."
+     ],
+     "decisive_result": "A ranked list of unmeasured species with the expected reduction in variance of the clock-and-wavefront coefficient.",
+     "failure_signature": "The ranking is unchanged if phylogenetic covariance is replaced by a star phylogeny, in which case the list is only a ranking by vertebral-count extremity and does not use the tree. Report that degeneration rather than hiding it.",
+     "tools": [
+      "comparative-data"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": "FishBase does not cover tetrapods. Tetrapod counts enter only from literature sources named in the result, and species without a count are omitted."
+    },
+    {
+     "id": "somite-number-control--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Hold out mouse, chick and snake from a zebrafish-fit clock",
+     "kind": "simulation",
+     "method": "Fit a delayed-coupling phase-oscillator model of the segmentation clock to zebrafish only: coupling delay, intrinsic period, and elongation speed set so the simulated somite count matches the zebrafish count within the same 25 percent tolerance. Freeze those parameters. Predict chick, mouse and corn snake by changing only the two quantities Gomez et al. identify as the evolutionary variables, clock period and elongation speed, to the values published for those species. The model fails if any of those three predictions misses the 25 percent tolerance. No parameter may be touched after the zebrafish fit. This fails differently from the comparative ratio test: the ratio test can pass while this oscillator, with its frozen coupling, misses the other species.",
+     "steps": [
+      "Specify the delayed-coupling oscillator and fit it to zebrafish only.",
+      "Freeze coupling and intrinsic parameters.",
+      "Insert published clock period and elongation speed for chick, mouse and corn snake.",
+      "Simulate somite number.",
+      "Apply the 25 percent tolerance to each held-out species."
+     ],
+     "decisive_result": "Chick, mouse and corn snake somite counts each within 25 percent of the zebrafish-calibrated oscillator, with no refitting.",
+     "failure_signature": "Any one of the three held-out species misses the tolerance. The oscillator then does not carry the comparative prediction, even if the bare ratio N = T/τ does.",
+     "tools": [
+      "simulation",
+      "developmental-biology"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    }
+   ]
+  },
+  {
+   "id": "murrays-law-vascular-optimality",
+   "title": "Does real vasculature obey Murray's law?",
+   "field": "both",
+   "tier": "B",
+   "question": "At vascular branch points, does the cube of the parent radius equal the sum of the cubes of the daughter radii (Murray's minimum-work law), does the exponent shift toward 2 in high-shear or turbulent beds, and does plant xylem obey the same law?",
+   "known_state": "Murray (1926) derived the cubic law from minimizing pumping work plus blood-volume maintenance; Sherman (1981) found good agreement in arterial trees; McCulloh, Sperry and Adler (2003) found plant xylem conduits obey Murray's law where conduits are not load-bearing. Modern retinal and whole-organ imaging datasets allow exponent estimation at thousands of branch points, but no standardized cross-tissue, cross-kingdom test exists. Thompson's claim (ch15-13) is the minimum-effort statement.",
+   "acceptance_criteria": [
+    "A pre-registered test estimating the branching exponent across at least three open vascular datasets (retinal fundus segmentations, micro-CT of organ vasculature, xylem anatomy), with the hypotheses 'exponent 3', 'exponent 7/3 (turbulent)' and 'no single exponent' stated in advance."
+   ],
+   "falsifiers": [
+    "Exponent intervals excluding 3 across tissues would refute the general law; a shear-dependent shift would support the amended form."
+   ],
+   "required_capabilities": [
+    "image-segmentation",
+    "vascular-morphometry",
+    "data-test"
+   ],
+   "data_access": "Open retinal vessel datasets (DRIVE, HRF), open micro-CT vascular casts, xylem data from McCulloh et al. 2003.",
+   "related_claims": [
+    {
+     "id": "thompson1917-ch15-13",
+     "label": "Blood-vessels are arranged for minimum effort and minimum wall-surface",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "thompson1917-ch16-03",
+     "label": "Structures that must resist bending are built as hollow tubes",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "murrays-law-vascular-optimality--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Pre-registered multi-tissue branching-exponent estimation with errors-in-variables",
+     "kind": "data-test",
+     "method": "Datasets: retinal fundus segmentations (DRIVE, HRF, manual vessel annotations), whole mouse brain vasculature (VesSAP), pig coronary morphometry (Kassab et al. 1993 tables) and xylem conduit data (McCulloh et al. 2003). At each bifurcation estimate radii from the segmentation distance transform averaged over a segment length of 5–10 radii away from the junction, and solve r₀^x = r₁^x + r₂^x for x by root-finding. Estimate per-tissue exponent distributions with a hierarchical errors-in-variables model: observed radii are true radii plus heteroscedastic noise with variance calibrated from approach 3. Hypotheses, stated in advance: H3, x = 3 (Murray); H7/3, x = 7/3 (turbulent, large arteries); H_none, no single x across tissues (between-tissue SD of x > 0.3). Decision: a tissue supports H3 if the 95% interval of its mean x contains 3 and excludes 7/3; it supports H7/3 conversely; H_none holds if tissue intervals are disjoint. Also test shear dependence: x versus vessel diameter class within retina and brain.",
+     "steps": [
+      "Write result.json with datasets, estimator, noise calibration source and decision rules.",
+      "Download DRIVE and HRF; obtain VesSAP graphs; transcribe Kassab and McCulloh tables; record checksums.",
+      "Extract bifurcations and radii; fit the hierarchical model with noise priors from approach 3.",
+      "Report per-tissue x intervals, the diameter-class trend and the verdict."
+     ],
+     "decisive_result": "Per-tissue posterior intervals for the branching exponent across at least four tissue types, and a verdict among x = 3, x = 7/3, or no single exponent. Thousands of bifurcations per dataset give intervals of about ±0.1 once measurement error is modelled.",
+     "failure_signature": "Calibrated measurement noise in image-derived radii (2D retinal images especially) inflates x intervals beyond ±0.5, so 3 and 7/3 cannot be distinguished: inconclusive, measurement-limited.",
+     "tools": [
+      "image-segmentation",
+      "vascular-morphometry",
+      "bayesian-hierarchical-models",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "murrays-law-vascular-optimality--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Lean formalization of Murray's cubic law and its turbulent and load-bearing variants",
+     "kind": "formalization",
+     "method": "Formalize the optimization so that each empirical exponent has a precise theoretical antecedent. Cost per unit length of a vessel with flow Q and radius r: C(r) = 8μQ²/(πr⁴) + b π r², Poiseuille dissipation plus metabolic maintenance proportional to volume. Theorem 1: C has a unique minimizer on r > 0, with r³ = (16μ/(bπ²))^{1/2} · Q, so Q ∝ r³. Theorem 2: with flow conservation Q₀ = Q₁ + Q₂ at a bifurcation and each segment at its optimum, r₀³ = r₁³ + r₂³. Theorem 3 (turbulent): with dissipation ∝ Q^{7/4}r^{−19/4} (Blasius friction), optimal radius r ∝ Q^{3/7}, giving exponent 7/3 at bifurcations. Theorem 4 (xylem): if conduits also bear mechanical load with cost ∝ r² independent of flow, the optimum shifts away from the cubic law (explicit exponent), matching McCulloh et al.'s observation that load-bearing conduits deviate. Proofs use derivative sign analysis (Mathlib's deriv and monotonicity lemmas) and rpow algebra.",
+     "steps": [
+      "Define the cost functions with ℝ and positivity hypotheses.",
+      "Prove existence, uniqueness and the closed form of the minimizer (first-derivative test, strict convexity).",
+      "Derive bifurcation exponents for laminar and turbulent cases with flow conservation.",
+      "Report each theorem linked to thompson1917-ch15-13 with scope notes on what data must decide."
+     ],
+     "decisive_result": "A Lean module proving the cubic law, the 7/3 turbulent law and the load-bearing deviation from explicit cost functions, compiled with only standard axioms. This makes approach 1's hypotheses theorem-backed.",
+     "failure_signature": "None mathematically. The risk is rpow manipulations in Mathlib taking longer than expected; low risk.",
+     "tools": [
+      "lean4",
+      "mathlib"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "murrays-law-vascular-optimality--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Synthetic-tree calibration: can image-derived radii distinguish exponent 3 from 7/3?",
+     "kind": "simulation",
+     "method": "Exponent estimates from images are biased: estimating x from r₀^x = r₁^x + r₂^x is nonlinear, and radius noise near junctions inflates or deflates x. Before trusting approach 1, generate synthetic vascular trees with known exponent x_true ∈ {2, 7/3, 2.7, 3}, using constrained constructive optimization or a simple binary tree with stated asymmetry and length ratios. Render them through realistic image formation for each modality: a fundus model (2D projection, Gaussian blur, vessel central reflex, noise at matched SNR); light-sheet volumes for VesSAP (anisotropic PSF, voxel size); micro-CT. Run the same segmentation and radius pipeline as approach 1. Output: the bias and variance of estimated x as a function of x_true, vessel size in pixels and modality. These become the noise priors in approach 1's model, and determine the minimum vessel diameter (in pixels) at which 3 and 7/3 are distinguishable.",
+     "steps": [
+      "Implement the synthetic tree generator and modality-specific forward image models.",
+      "Run approach 1's segmentation pipeline on 10^3 synthetic trees per setting.",
+      "Fit bias and variance curves for x as functions of x_true and diameter in pixels.",
+      "Publish calibration tables; set approach 1's minimum-diameter inclusion threshold from them."
+     ],
+     "decisive_result": "Calibration curves giving, for each modality, the smallest vessel diameter at which estimated x separates 3 from 7/3 with 95% power. If no real dataset reaches that resolution, approach 1 is underpowered by design and the question needs better imaging.",
+     "failure_signature": "Forward models fail validation: synthetic images differ visibly from real ones in vessel-contrast statistics, so the calibration does not transfer.",
+     "tools": [
+      "simulation",
+      "image-segmentation",
+      "vascular-morphometry"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "murrays-law-vascular-optimality--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Errors-in-variables branching exponent test",
+     "kind": "data-test",
+     "method": "Analyze at least three independent vascular modalities: retinal images, segmented 3D organ vessels and plant xylem. At each bifurcation fit r_parent^p = r_1^p + r_2^p with hierarchical errors-in-variables likelihood, accounting for pixel resolution, taper and branch-order dependence. Hold out specimens, not branch points.",
+     "steps": [
+      "Pre-register segmentation quality and minimum 500 bifurcations per modality.",
+      "Estimate radius uncertainty from repeated segmentation and exclude unresolved vessels.",
+      "Fit shared p = 3, p = 7/3, p = 2 and varying-p models.",
+      "Compare specimen-held-out predictive density and residual shear dependence."
+     ],
+     "decisive_result": "General Murray scaling requires p's 95% interval within 0.2 of 3 in every modality and no varying-p model ELPD gain above 10; exclusion of 3 in two modalities refutes generality.",
+     "failure_signature": "Radius uncertainty exceeds 20% at most branches or exponent estimates shift by more than 0.3 under preregistered taper corrections.",
+     "tools": [
+      "morpholib",
+      "image-segmentation",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Open, quality-controlled 3D vascular trees with calibrated voxel dimensions."
+    },
+    {
+     "id": "murrays-law-vascular-optimality--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Formal derivation and robust optimality envelope",
+     "kind": "formalization",
+     "method": "Formalize Poiseuille pumping cost plus volume-maintenance cost for a bifurcating vessel in Lean. Prove strict convexity, derive the optimal radius-flow relation, and derive the cubic junction law under flow conservation. Then vary the drag exponent and maintenance cost to obtain a theorem mapping physical assumptions to branching exponent.",
+     "steps": [
+      "Define positive radii, flows and cost with explicit viscosity and length hypotheses.",
+      "Prove existence and uniqueness of the radius minimizer.",
+      "Derive the generalized exponent for resistance proportional to r^-k.",
+      "Construct counterexamples with load-bearing or nonlaminar cost terms."
+     ],
+     "decisive_result": "A no-sorry Lean theorem proving p = 3 exactly under named assumptions and a generalized theorem quantifying how p changes when each assumption changes.",
+     "failure_signature": "The optimization requires an unacknowledged flow-radius premise equivalent to the cubic law, making the standard derivation circular.",
+     "tools": [
+      "lean4",
+      "calculus",
+      "fluid-mechanics"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "murrays-law-vascular-optimality--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Derive the junction exponent from a stated cost",
+     "kind": "formalization",
+     "method": "Minimize, for one vessel, a Poiseuille pumping cost proportional to Q squared over r to the fourth plus a blood-volume cost proportional to r squared. Prove the optimum is r cubed proportional to Q. At a junction with Q_parent = Q_1 + Q_2 and the same constant of proportionality, prove r_parent cubed equals r_1 cubed plus r_2 cubed. Then replace the resistance exponent by a parameter b and the flow exponent by a parameter a, and prove the junction exponent is (b + 2) / a for a volume cost proportional to r squared. State which (a, b) would yield 7/3, and do not assert that turbulent flow has those exponents unless the algebra produces them from a stated friction law. The laminar cubic law and the general exponent are the theorems.",
+     "steps": [
+      "Define Poiseuille power and volume cost.",
+      "Prove the cubic optimum and the junction law.",
+      "Generalize to resistance exponent b and flow exponent a.",
+      "Solve for the (a, b) pair that would give junction exponent 7/3.",
+      "Audit axioms."
+     ],
+     "decisive_result": "A no-sorry cubic junction law under Poiseuille-plus-volume cost, and a general exponent (b + 2) / a with the unique (a, b) pair that equals 7/3.",
+     "failure_signature": "The cubic law does not follow from those costs, or more than one (a, b) pair on the stated family yields 7/3. The derivation would then not pin down the turbulent alternative.",
+     "tools": [
+      "lean4"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "murrays-law-vascular-optimality--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Estimate the branching exponent on retina and large vessels",
+     "kind": "data-test",
+     "method": "Pre-register three sources: the DRIVE gold-standard vessel segmentations (40 images), the HRF gold-standard segmentations (45 images: 15 healthy, 15 glaucoma, 15 diabetic retinopathy), and the cardiovascular models in the Vascular Model Repository. Extract branch points from the existing segmentations and from the repository centerlines. At each bifurcation estimate α by minimizing the squared difference between log(r_parent to the α) and log(r_1 to the α plus r_2 to the α). Pool α in a Gaussian model with a random intercept for image or model. Hypotheses, decided by AIC and by the 95 percent interval: a single α whose interval contains 3, a single α whose interval contains 7/3, or no single exponent. No single exponent wins if a model with α depending on source (retina versus large vessel) beats the single-α model by AIC of more than 10, or if the single-α interval has width greater than 1. A source with fewer than 100 branch points is dropped. The test proceeds only if at least two sources remain.",
+     "steps": [
+      "Freeze the estimator, the AIC gap and the 100-branch minimum.",
+      "Extract bifurcations from DRIVE, HRF and the Vascular Model Repository.",
+      "Estimate per-junction α and pool with a random intercept.",
+      "Compare α = 3, α = 7/3 and a source-dependent α by AIC and intervals.",
+      "Drop any source under 100 branch points and stop if fewer than two sources remain."
+     ],
+     "decisive_result": "A 95 percent interval for α and an AIC comparison. Murray's cubic law is supported only if the interval contains 3 and excludes 7/3, and the source-dependent model does not win.",
+     "failure_signature": "The interval excludes 3 in both retina and large vessels, which refutes a general cubic law, or the interval contains both 3 and 7/3 and the source model does not win, which leaves the exponent unresolved.",
+     "tools": [
+      "image-segmentation",
+      "vascular-morphometry",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "murrays-law-vascular-optimality--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Xylem conduits and a radius-dependent exponent",
+     "kind": "data-test",
+     "method": "Two pre-registered extensions that can support an amended law even if the pooled animal exponent excludes 3. First, transcribe conduit radii at branch points from the tables of McCulloh, Sperry and Adler 2003, with a checksum of the transcription. Do not digitize figures. If the tables are not numerically usable, drop the xylem arm and say so. Estimate α by the same one-dimensional fit. Plant xylem agrees with Murray only if its interval contains 3. Second, on the retinal junctions only, regress per-junction α on log parent radius, with a random intercept for image. A shear-dependent amendment is supported if the slope's 95 percent interval excludes 0. These two tests are not pooled with the animal single-exponent test.",
+     "steps": [
+      "Transcribe McCulloh tabled radii or drop xylem if the tables are not numeric.",
+      "Estimate xylem α and its interval.",
+      "Regress retinal per-junction α on log parent radius.",
+      "Support a radius-dependent exponent only if the slope interval excludes 0.",
+      "Report xylem and the slope as separate calls."
+     ],
+     "decisive_result": "A xylem interval that contains or excludes 3, and a retinal slope of α on log parent radius whose interval contains or excludes 0.",
+     "failure_signature": "Xylem excludes 3, which refutes a cross-kingdom cubic law, or the retinal slope interval contains 0, which fails the shear-dependent amendment. Unusable tables make xylem inconclusive rather than a refutation.",
+     "tools": [
+      "vascular-morphometry",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "A public xylem file of branch-point radii. If the 2003 tables cannot be transcribed without guessing, the xylem arm stops."
+    }
+   ]
+  },
+  {
+   "id": "morphogenesis-cognition-gene-overlap",
+   "title": "Do morphogenesis and learning share a gene set beyond pleiotropy?",
+   "field": "biology",
+   "tier": "C",
+   "question": "Do genes annotated to morphogenesis and genes annotated to learning and memory overlap more than expected from gene-set size, pleiotropy and shared housekeeping components, as Levin's TAME framework predicts?",
+   "known_state": "Levin (2022) predicts wide overlap because, on his account, morphogenesis uses the same problem-solving machinery as cognition. The repo's one test (levin-2022-tame-19) returned refutes at confidence 0.7 using GO term overlap, but did not control for pleiotropy, annotation bias or gene-set size. INDRA CoGEx allows a mechanistically grounded, permutation-controlled test.",
+   "acceptance_criteria": [
+    "A pre-registered test using INDRA CoGEx gene sets for morphogenesis and learning/memory (GO and HPO), a permutation null matched on gene-set size, pleiotropy degree and annotation count, and a stated effect-size threshold for 'wide overlap'.",
+    "The same test on ion-channel and gap-junction subsets, which Levin names specifically."
+   ],
+   "falsifiers": [
+    "Overlap within the matched null refutes the prediction; overlap well above it (especially in the bioelectric subset) supports it and would revise the current verdict."
+   ],
+   "required_capabilities": [
+    "indra-cogex",
+    "gene-set-statistics",
+    "data-test"
+   ],
+   "data_access": "INDRA CoGEx MCP (public), Gene Ontology, HPO.",
+   "related_claims": [
+    {
+     "id": "levin-2022-tame-19",
+     "label": "Genes for morphogenesis and for learning and memory should overlap widely",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": "refutes",
+     "data_test": {
+      "verdict": "refutes",
+      "confidence": 0.7,
+      "data_kind": "biological",
+      "preregistered": true,
+      "path": "test-data/claim-tests/levin-papers/levin-2022-tame-19/result.json"
+     }
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "morphogenesis-cognition-gene-overlap--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Matched permutation test of GO/HPO morphogenesis–learning overlap via INDRA CoGEx",
+     "kind": "data-test",
+     "method": "Gene sets: M = human genes annotated (experimental evidence codes only, to limit annotation-cascade bias) to GO 'anatomical structure morphogenesis' (GO:0009653) or descendants, or to HPO 'abnormality of body morphology'-type branches; L = genes annotated to GO 'learning or memory' (GO:0007611) or descendants, or to HPO memory and learning phenotypes. Retrieve via INDRA CoGEx (GO and HPO edges are in the graph). Statistic: observed |M ∩ L| over the expected value under a matched null. Null: 10^5 permutations drawing gene sets of the same sizes in which each gene is replaced by a random gene from the same stratum of (number of distinct GO biological-process annotations: pleiotropy, in deciles; publication count from CoGEx literature edges: annotation bias, in deciles; GTEx expression breadth τ: housekeeping, in tertiles). Pre-registered 'wide overlap': observed/expected ≥ 1.5 with permutation p < 0.001. Refuted: observed/expected ≤ 1.1 or p > 0.05. Repeat on the bioelectric subset (ion channels and gap junctions: HGNC groups for voltage-gated channels, K2P, connexins, innexins, pannexins).",
+     "steps": [
+      "Write result.json with GO and HPO identifiers, evidence-code filter, strata, threshold and the bioelectric subset definition.",
+      "Query INDRA CoGEx for annotations and publication counts; fetch GTEx breadth; record query hashes.",
+      "Run the stratified permutation test for all genes and for the bioelectric subset.",
+      "Compare with the repo's existing levin-2022-tame-19 verdict and record a revision if the verdict changes."
+     ],
+     "decisive_result": "Observed/expected overlap with permutation p under a null matched for pleiotropy, annotation depth and expression breadth, for all genes and for ion-channel and gap-junction genes, with pre-registered thresholds for 'wide overlap'.",
+     "failure_signature": "Strata are so collinear (highly studied genes are also highly pleiotropic and broadly expressed) that the matched null has too few genes per stratum to permute, making p-values unstable.",
+     "tools": [
+      "indra-cogex",
+      "gene-set-statistics",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "morphogenesis-cognition-gene-overlap--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Annotation-independent test using mouse knockout phenotyping (IMPC/MGI)",
+     "kind": "data-test",
+     "method": "GO and HPO overlap inherits curation bias. The International Mouse Phenotyping Consortium phenotypes knockouts systematically through a fixed pipeline, so which genes are tested for which phenotypes does not depend on prior interest. For all IMPC knockout lines that completed both morphological (skeletal, craniofacial, organ morphology) and behavioural or neurological procedures, build a 2 × 2 table: abnormal morphology yes/no versus abnormal learning-related or behavioural phenotype yes/no. Fit logistic regression of the behavioural call on the morphology call with covariates: number of other phenotype systems hit (pleiotropy), viability class and sex. Supplement with MGI curated knockouts restricted to studies reporting both kinds. Pre-registered: an adjusted odds ratio ≥ 2 (95% CI excluding 1.3) supports a shared gene set beyond pleiotropy; OR CI including 1 refutes it. Run the ion-channel and gap-junction subset separately.",
+     "steps": [
+      "Pre-register phenotype term sets (MP ontology IDs), covariates and thresholds.",
+      "Download IMPC statistical results; filter to lines with both procedure classes; record version and checksums.",
+      "Fit adjusted logistic models for all genes and the bioelectric subset.",
+      "Compare with approach 1 to see whether annotation-based and screen-based answers agree."
+     ],
+     "decisive_result": "An adjusted odds ratio, with CI, for co-occurrence of morphological and behavioural or learning phenotypes in systematically phenotyped knockouts. This is the strongest available test free of curation bias.",
+     "failure_signature": "IMPC behavioural procedures measure activity and anxiety rather than learning per se, so the 'learning' category cannot be operationalized; the test then reverts to a broader behavioural proxy, which must be stated as a reinterpretation.",
+     "tools": [
+      "gene-set-statistics",
+      "data-test",
+      "indra-cogex"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "morphogenesis-cognition-gene-overlap--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Mechanistic proximity: network separation of the two modules in INDRA's causal graph",
+     "kind": "data-test",
+     "method": "Overlap counts shared members. TAME's claim is better read as shared machinery: the modules may be mechanistically adjacent without sharing genes. Use the network separation s_AB = ⟨d_AB⟩ − (⟨d_AA⟩ + ⟨d_BB⟩)/2 of Menche et al. 2015, computed on INDRA CoGEx's causal statement graph between human genes (indra_rel edges with evidence_count ≥ 2, undirected for distance). A = core morphogenesis set and B = core learning/memory set (experimental GO annotations), with SynGO synaptic genes as a positive-control module expected to be near B. Null: degree-preserving randomization, sampling gene sets with matched degree distribution (binned), 10^4 draws. Pre-registered: s_AB < 0 with z < −3 against the degree-matched null supports shared machinery; s_AB ≥ 0 refutes it. Repeat after removing the top 1% highest-degree hubs to check that shared housekeeping hubs do not drive proximity.",
+     "steps": [
+      "Pre-register edge filters, gene sets, null and thresholds.",
+      "Export the INDRA causal subgraph via execute_cypher; record the query and statement-hash counts.",
+      "Compute s_AB and the null distribution; run the hub-removal sensitivity check.",
+      "For gene pairs driving proximity, cite INDRA statement hashes and PMIDs as mechanistic evidence."
+     ],
+     "decisive_result": "Network separation s_AB with z-score against a degree-matched null, with and without hubs. Negative separation surviving hub removal would support Levin's shared-machinery prediction in a form the overlap test cannot detect; non-negative separation would refute it.",
+     "failure_signature": "INDRA's causal graph is so dominated by literature-heavy genes that degree matching cannot remove study bias (separation tracks publication count), so the result reflects literature structure rather than biology.",
+     "tools": [
+      "indra-cogex",
+      "network-statistics",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "morphogenesis-cognition-gene-overlap--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Degree-matched ontology overlap test",
+     "kind": "data-test",
+     "method": "Freeze GO terms for morphogenesis and learning or memory, propagate annotations under a declared relation set, and restrict to experimentally supported human and mouse genes. Test overlap against 100000 permutations matched jointly on total annotation count, publication count, protein-interaction degree and gene length; repeat after removing generic signaling and housekeeping terms.",
+     "steps": [
+      "Timestamp ontology and evidence-code filters before retrieving genes.",
+      "Fit propensity scores for membership in each gene set from bias covariates.",
+      "Compute matched-null overlap z score, odds ratio and semantic-specificity-weighted overlap.",
+      "Repeat for ion-channel and gap-junction genes and across species."
+     ],
+     "decisive_result": "Wide overlap requires odds ratio at least 2, empirical P below 0.001 and replication in both human and mouse after generic-term removal; an odds ratio between 0.8 and 1.25 supports no enrichment.",
+     "failure_signature": "Balance diagnostics retain standardized covariate differences above 0.1 or enrichment disappears under leave-one-ontology-term-out analysis.",
+     "tools": [
+      "indra-cogex",
+      "gene-ontology",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "morphogenesis-cognition-gene-overlap--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Mechanistic-pathway convergence in INDRA",
+     "kind": "data-test",
+     "method": "Move beyond gene lists by constructing evidence-weighted INDRA subnetworks connecting curated morphogenesis phenotypes and learning phenotypes. Compare shared causal intermediates and signed paths to degree-preserving, evidence-count-matched network rewires; require statement-level provenance and hold out papers mentioning both domains.",
+     "steps": [
+      "Ground phenotype-associated genes and retain statements with primary evidence.",
+      "Remove cross-domain papers to prevent literature leakage.",
+      "Compute shared intermediates, signed-path enrichment and pathway conductance.",
+      "Run 10000 constrained rewires preserving node degree and statement evidence bins."
+     ],
+     "decisive_result": "Mechanistic convergence requires at least twofold excess shared intermediates with empirical P below 0.001 and replication after removing all ion-channel genes; null-level paths refute broad convergence.",
+     "failure_signature": "The result is driven by fewer than five hubs or by statements from cross-domain review papers.",
+     "tools": [
+      "indra-cogex",
+      "network-statistics",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "INDRA literature coverage and causal direction are uneven across developmental systems."
+    },
+    {
+     "id": "morphogenesis-cognition-gene-overlap--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Pleiotropy-matched overlap of morphogenesis and learning genes",
+     "kind": "data-test",
+     "method": "Pre-register human genes with GO:0009653 (anatomical structure morphogenesis) and GO:0007611 (learning or memory). Primary run excludes evidence code IEA; a second run includes it and is labeled. Background is human protein-coding genes. The statistic is the odds ratio of the intersection. The null is 10,000 permutations that preserve both set sizes and match genes on the number of GO annotations and on degree in the public INDRA statement graph. Wide overlap, the pre-registered threshold, is an odds ratio above 2 and a permutation p-value below 0.01. The same threshold is a primary endpoint, not a subgroup glance, for the subsets annotated with GO:0005216 (monoatomic ion channel activity; the synonym is ion channel activity) and with GO:0005921 (gap junction). Housekeeping is partly absorbed by the annotation-count match; it is not a separate covariate invented after the test.",
+     "steps": [
+      "Freeze the two GO sets, the IEA rule, the odds-ratio threshold and the permutation scheme.",
+      "Pull annotations from Gene Ontology and degrees from INDRA.",
+      "Compute the observed odds ratio.",
+      "Run 10,000 matched permutations.",
+      "Apply the same test to the ion-channel and gap-junction subsets as primary endpoints."
+     ],
+     "decisive_result": "Odds ratio above 2 and permutation p below 0.01 for the full sets and, separately, for the ion-channel subset and the gap-junction subset.",
+     "failure_signature": "The full-set odds ratio falls inside the matched null. That refutes wide overlap beyond pleiotropy and annotation volume. A hit that appears only in the IEA-included run is annotation noise and does not count.",
+     "tools": [
+      "indra-cogex",
+      "gene-set-statistics",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "morphogenesis-cognition-gene-overlap--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "INDRA statement density inside the intersection",
+     "kind": "data-test",
+     "method": "Set overlap can be shared annotation fashion. This test asks whether genes in the intersection are mechanistically tied. Count INDRA statements with evidence count at least 5 that connect a GO:0009653 gene to a GO:0007611 gene. Compare with 10,000 random bipartitions that preserve the two set sizes and the joint degree sequence. The pre-registered effect is a statement count above the 99th percentile of that null. Repeat for the ion-channel subset and the gap-junction subset. A gene-set hit with a null statement density means the shared genes are not preferentially wired to each other in INDRA, which is a different negative from a failed overlap test.",
+     "steps": [
+      "Build the morphogenesis and learning sets as in the overlap test.",
+      "Count INDRA statements of evidence count at least 5 across the cut.",
+      "Permute bipartitions preserving sizes and degrees, 10,000 times.",
+      "Apply the 99th-percentile threshold.",
+      "Repeat for ion channels and gap junctions."
+     ],
+     "decisive_result": "Cross-set INDRA statement count above the 99th percentile of the degree-preserving null, overall and in the two bioelectric subsets.",
+     "failure_signature": "The count lies within the null. Overlap of annotations, if it exists, is then not matched by INDRA evidence between the sets.",
+     "tools": [
+      "indra-cogex",
+      "gene-set-statistics",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "morphogenesis-cognition-gene-overlap--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Repeat the overlap using only pre-2015 annotations",
+     "kind": "data-test",
+     "method": "Annotation fashion after Levin's papers would inflate overlap. Repeat the matched odds-ratio test using only GO annotations whose assignment date is before 2015, if QuickGO exposes that date. Keep the same sets, the same exclusion of IEA, and the same thresholds. If dates are not in the download, the approach stops as inconclusive rather than using a proxy such as the paper's publication year. A signal present in the full ontology and absent before 2015 is evidence of later annotation, not of a standing shared gene set. A signal present before 2015 survives that objection.",
+     "steps": [
+      "Check whether annotation dates are present before computing the odds ratio.",
+      "Restrict to dates before 2015.",
+      "Reuse the matched permutation null.",
+      "Apply the odds-ratio and p-value thresholds.",
+      "If dates are absent, record inconclusive and stop."
+     ],
+     "decisive_result": "The pre-2015 odds ratio either clears the same threshold as the full test or it does not. Clearing it supports overlap that predates the recent annotation wave.",
+     "failure_signature": "The pre-2015 odds ratio falls inside the null while the full-ontology test does not. The apparent overlap is then carried by later annotations.",
+     "tools": [
+      "gene-set-statistics",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": "GO assignment dates may be absent from the query used. The approach then cannot run, and that is a stated stop."
+    }
+   ]
+  },
+  {
+   "id": "bioelectric-prepattern-predicts-anatomy",
+   "title": "Does the bioelectric prepattern predict anatomical outcome?",
+   "field": "biology",
+   "tier": "C",
+   "question": "Is there a quantitative, predictive mapping from a measured resting-potential (Vmem) pattern in a tissue to the anatomical structure it will form, such that perturbing the pattern predicts the anatomical change before it occurs?",
+   "known_state": "Levin and colleagues report that Vmem patterns prefigure and can instruct anatomy in planarian head regeneration, Xenopus face and eye induction, and tumour induction (Levin and Martyniuk 2018). BETSE (Pietak and Levin 2016) simulates Vmem dynamics; Durant et al. (2017) modelled planarian anterior-posterior polarity. No model takes an arbitrary measured Vmem map and outputs a falsifiable anatomical prediction with stated accuracy. Thirteen Levin tests in the repo are pre-registered and awaiting data.",
+   "acceptance_criteria": [
+    "A model (bounded bioelectric simulation plus a pattern-to-anatomy decoder) that, given published Vmem images of perturbed and control embryos or planarian fragments, predicts the anatomical phenotype class with pre-registered accuracy on held-out images.",
+    "Explicit statement of which published datasets are used for training and which for testing."
+   ],
+   "falsifiers": [
+    "Prediction accuracy at chance on held-out perturbations refutes the predictive form of the bioelectric-code hypothesis for those tissues."
+   ],
+   "required_capabilities": [
+    "bioelectric-simulation",
+    "image-analysis",
+    "frontier_simulate",
+    "data-test"
+   ],
+   "data_access": "Published Vmem imaging (DiBAC/CC2-DMPE) in open-access Levin lab papers; BETSE (open source).",
+   "related_claims": [
+    {
+     "id": "levin-2015-girardia-11",
+     "label": "Hexanol, which does not block gap junctions, does not alter head shape",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "levin-2018-hcn2-06",
+     "label": "HCN2 modelled as a voltage-controlled switch that amplifies small Vmem gradients",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "levin-2018-hcn2-16",
+     "label": "Native HCN2 activity is not required for normal brain patterning",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "levin-2019-boundary-14",
+     "label": "Animal senses use the same ion channel mechanisms found in bacteria",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Curated Vmem image corpus and a decoder validated by leave-one-study-out",
+     "kind": "data-test",
+     "method": "Build an image corpus from open-access Levin-lab and other papers showing voltage-reporter dye images (DiBAC4(3), CC2-DMPE:DiSBAC2(3)) of control and perturbed Xenopus embryos and planarian fragments, each linked to the reported anatomical outcome class: for Xenopus craniofacial or eye, normal, ectopic eye, malformed face; for planaria, one head, two heads, no head. Register images to a common template (embryo outline or fragment axis), extract a low-dimensional Vmem feature vector (template-aligned intensity on a coarse grid, normalized to within-image range because dye images are not absolutely calibrated). Train simple, pre-registered decoders (multinomial logistic regression on 20 PCA components; k-NN) and evaluate leave-one-study-out, so test images come from papers not used in training. Pre-registered success: balanced accuracy ≥ 0.70 against a chance level computed from class frequencies, permutation p < 0.01.",
+     "steps": [
+      "Pre-register inclusion criteria (open licence, dye named, outcome reported for the imaged individual or the imaged group), decoder, features and threshold.",
+      "Harvest figures with their licences; annotate outcome labels from the papers' text; record provenance.",
+      "Register images and extract features via the morpholib pipeline where applicable.",
+      "Run leave-one-study-out evaluation and the permutation test; report confusion matrices."
+     ],
+     "decisive_result": "Leave-one-study-out balanced accuracy of anatomy-class prediction from Vmem images, against chance, with a permutation p-value. Above 0.70 supports a predictive mapping; at chance refutes the predictive form for those tissues.",
+     "failure_signature": "Most published Vmem images show group-representative embryos without individual outcome labels, or too few studies (fewer than 5 per tissue) exist for leave-one-study-out: inconclusive, data-unavailable.",
+     "tools": [
+      "image-analysis",
+      "morpholib",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Raw image data with individual-level outcome labels are rarely published; the swarm cannot generate new imaging."
+    },
+    {
+     "id": "bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Pre-registered forward predictions of perturbation outcomes from bioelectric simulation",
+     "kind": "simulation",
+     "method": "Test the instructive (causal) form of the hypothesis on perturbations whose outcomes are published but held out from calibration. Calibrate a BETSE or frontier_simulate model of the planarian fragment (ion channels, pumps, gap junctions per Durant et al. 2017 and Pietak and Levin 2017) on control and two perturbation conditions only. Then, for each held-out perturbation in the literature (for example ivermectin-induced hyperpolarization, SCH-28080 H,K-ATPase inhibition, octanol gap-junction block at stated concentrations), predict the steady-state anterior–posterior Vmem pattern. Map it to anatomy with a rule fixed in advance: a depolarized region above threshold θ predicts a head, θ fixed from the calibration conditions. Lodge predictions as a timestamped commit before comparison. Score the fraction of held-out perturbations whose predicted outcome class matches the published one, against a baseline that always predicts the most common outcome.",
+     "steps": [
+      "Fix model structure and calibration conditions; pre-register the Vmem-to-anatomy rule and the held-out list.",
+      "Calibrate parameters on the calibration set; freeze.",
+      "Simulate each held-out perturbation; commit predictions before reading outcomes.",
+      "Compare with published outcomes; report accuracy against the baseline with a binomial test."
+     ],
+     "decisive_result": "The fraction of held-out pharmacological and genetic perturbations whose anatomical outcome class the frozen model predicts, against the most-common-class baseline. Accuracy significantly above baseline (binomial p < 0.01, at least 10 held-out conditions) supports the predictive bioelectric code; baseline accuracy refutes this model's version of it.",
+     "failure_signature": "Too few held-out perturbations with clear published outcomes and known molecular targets (fewer than 10), or model outcomes so sensitive to unmeasured parameters that predictions are not robust to plausible parameter ranges (report the fraction of the parameter posterior agreeing).",
+     "tools": [
+      "bioelectric-simulation",
+      "frontier_simulate",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "frontier_simulate offers bounded previews only; full BETSE calibration needs more compute and parameter data (channel densities) than published papers supply."
+    },
+    {
+     "id": "bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Dose–response meta-analysis: does Vmem shift size predict penetrance?",
+     "kind": "data-test",
+     "method": "A predictive code implies graded dependence: larger, more localized Vmem shifts should give higher penetrance of the predicted phenotype. Code every published bioelectric perturbation experiment in Xenopus and planaria reporting both (a) a quantitative Vmem change (reporter intensity ratio or electrode mV, with dispersion) and (b) phenotype penetrance (k of n animals). Fit a random-effects logistic meta-regression of penetrance on the standardized Vmem shift, with study as a random effect and tissue and perturbation class (channel misexpression, drug, gap-junction block) as covariates. Pre-registered: a positive slope with 95% CI excluding 0, and the shift explaining ≥ 30% of between-condition variance, support the graded predictive form; a slope CI including 0 refutes it. Check small-study effects with funnel plots and Egger's test, since positive results may be preferentially published.",
+     "steps": [
+      "Pre-register extraction rules, effect-size standardization and the model.",
+      "Systematically search open-access literature; double-extract data (two independent agents) and reconcile.",
+      "Fit the meta-regression; run publication-bias diagnostics.",
+      "Link each coded study to repo claims (levin-2018-hcn2, levin-2019-boundary) and record evidence."
+     ],
+     "decisive_result": "The meta-regression slope of phenotype penetrance on Vmem shift magnitude with CI, and the variance explained, adjusted for publication bias.",
+     "failure_signature": "Fewer than 15 conditions report both a quantitative Vmem change and penetrance, or Egger's test shows strong small-study bias making the slope uninterpretable.",
+     "tools": [
+      "meta-analysis",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "bioelectric-prepattern-predicts-anatomy--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Held-perturbation Vmem phenotype decoder",
+     "kind": "data-test",
+     "method": "Digitize raw or supplementary Vmem images with specimen-level anatomical outcomes from one system only. Register maps to a common coordinate frame, train a spatial decoder on controls and selected perturbation classes, and hold out entire intervention mechanisms so the test measures pattern-based transfer rather than batch recognition.",
+     "steps": [
+      "Require at least 200 specimens, five perturbations and 30 specimens per held-out class.",
+      "Freeze normalization, masks and phenotype labels before model training.",
+      "Compare Vmem decoder with morphology-at-imaging-time, batch and permuted-map baselines.",
+      "Use nested cross-validation grouped by experiment and intervention."
+     ],
+     "decisive_result": "Predictive mapping requires held-intervention macro-F1 at least 0.75 and at least 0.15 above every baseline, with bootstrap 95% lower bound above 0.6.",
+     "failure_signature": "Performance falls to chance when experiments or intervention mechanisms are held out, indicating batch-specific correlation rather than a transferable code.",
+     "tools": [
+      "image-analysis",
+      "data-test",
+      "bioelectric-simulation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Specimen-linked raw Vmem maps and later phenotype labels may not be publicly available at adequate sample size."
+    },
+    {
+     "id": "bioelectric-prepattern-predicts-anatomy--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Intervention-generalizing bioelectric simulator",
+     "kind": "simulation",
+     "method": "Construct a bounded tissue graph with measured channel classes, gap-junction coupling and cell-state transitions. Fit conductances only on control and one perturbation, then predict spatial Vmem and phenotype under unseen channel, gap-junction and pump interventions. Compare mechanistic predictions to a flexible image-only decoder.",
+     "steps": [
+      "Ground intervention targets and signed channel effects through INDRA CoGEx.",
+      "Specify prior parameter ranges and identifiability checks.",
+      "Calibrate with simulation-based inference on preregistered training interventions.",
+      "Predict held-out Vmem maps and anatomical classes without parameter refitting."
+     ],
+     "decisive_result": "Mechanistic support requires held-intervention Vmem spatial correlation above 0.7 and phenotype accuracy above 0.75 for at least three distinct intervention classes.",
+     "failure_signature": "No single posterior parameter region predicts both Vmem and anatomy, or image-only prediction strongly outperforms simulation on held interventions.",
+     "tools": [
+      "frontier-simulate",
+      "indra-cogex",
+      "bioelectric-simulation",
+      "data-test"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "Quantitative conductance, coupling and longitudinal imaging data for the same specimens."
+    },
+    {
+     "id": "bioelectric-prepattern-predicts-anatomy--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Leave-one-paper-out decoder of published Vmem figures",
+     "kind": "data-test",
+     "method": "Admissible images are the voltage-reporter figures (DiBAC or CC2-DMPE) in the open-access papers of Levin and Martyniuk 2018, Pietak and Levin 2016, and Durant et al. 2017, with the phenotype class taken from the caption: for planaria, two-headed, normal, or no-head; for the other tissues, the classes the caption itself names. Features, frozen first, are the anterior-posterior dipole of the reported potential, the number of domains above the caption's own threshold, and a left-right asymmetry index. The split is by paper: train on two, test on the third, all three rotations. Support requires accuracy at least 0.7 and a binomial test against the test paper's majority class at p below 0.05, in at least two rotations. Independent experiments, not panels of one experiment, are the sample. Fewer than 20 independent experiments across the three papers makes the test underpowered. Raw stacks are not required and are not invented.",
+     "steps": [
+      "Freeze features, classes and the 0.7 accuracy bar before measuring figures.",
+      "Encode each admissible figure's features from the published image and its caption.",
+      "Rotate training and test by paper.",
+      "Score accuracy against the majority-class baseline.",
+      "Stop as underpowered if fewer than 20 independent experiments exist."
+     ],
+     "decisive_result": "Accuracy at least 0.7 and above the majority class at p below 0.05 in at least two of three paper rotations, on at least 20 independent experiments.",
+     "failure_signature": "Accuracy consistent with the majority class in two or more rotations. The dipole-and-domain decoder then does not predict anatomy on these figures.",
+     "tools": [
+      "image-analysis",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Raw microscopy. Published figures are a biased subset of the experiments, and the test cannot repair that."
+    },
+    {
+     "id": "bioelectric-prepattern-predicts-anatomy--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Freeze BETSE parameters and predict a held-out perturbation",
+     "kind": "simulation",
+     "method": "Use the BETSE engine. Fix parameters at the published defaults in Pietak and Levin 2016 before looking at outcome counts. Choose one channel-block or gap-junction perturbation that Durant et al. 2017 report and that was not used to set those defaults. Map the simulated anterior-posterior Vmem difference onto the phenotype classes with a threshold frozen from the control simulation alone. Compare the predicted class with the published outcome. frontier_simulate may be called only as a bounded bioelectric preview to see whether a parameter dictionary is inside its allowlisted family. Its ephemeral result is not evidence and cannot meet this test. Success is the correct class on that held-out perturbation and on one additional perturbation from the same paper, both chosen before the run.",
+     "steps": [
+      "Pin the BETSE commit and the published default parameters.",
+      "Name the two held-out perturbations before simulating.",
+      "Derive the decision threshold from the control simulation only.",
+      "Simulate the two perturbations and emit phenotype classes.",
+      "Score them against the paper. Do not retune."
+     ],
+     "decisive_result": "Both pre-named held-out perturbations assigned the published phenotype class by the frozen threshold.",
+     "failure_signature": "Either perturbation is misclassified. Retuning parameters to obtain the class fails the approach.",
+     "tools": [
+      "bioelectric-simulation",
+      "frontier_simulate"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "frontier_simulate is a bounded preview and is not a substitute for BETSE. The swarm still needs a local BETSE run for the evidence."
+    },
+    {
+     "id": "bioelectric-prepattern-predicts-anatomy--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Prove which Vmem summaries cannot identify anatomy",
+     "kind": "formalization",
+     "method": "A decoder that sees only the anterior-posterior dipole and the number of supra-threshold domains assigns the same phenotype to any two fields that agree on those summaries. Prove that statement. Then apply it to the admissible figures: search for two experiments with different caption phenotypes whose dipole and domain count agree within a tolerance frozen first (relative dipole difference below 0.1, same domain count). A hit refutes every decoder that uses only those features. Absence of a hit does not confirm the bioelectric code; it only says these features are not yet contradicted by the figures. This approach can refute a feature set that the classifier approach would merely score as inaccurate.",
+     "steps": [
+      "Prove the identifiability lemma for dipole and domain count.",
+      "Freeze the 0.1 relative tolerance.",
+      "Measure the summaries on the admissible figures.",
+      "Search for a cross-phenotype collision under that tolerance.",
+      "Report a refuting pair or the absence of one."
+     ],
+     "decisive_result": "Either a pair of published experiments with different phenotypes and summaries inside the tolerance, which refutes dipole-and-domain decoders, or an exhaustive statement that no such pair exists in the admissible figures.",
+     "failure_signature": "The lemma is false for some pair of fields, which would be a mathematics error, or the figure measurements are too coarse to decide equality within 0.1, in which case the empirical half is inconclusive.",
+     "tools": [
+      "lean4",
+      "image-analysis"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": "Raw pixel values. Figure measurements may be too coarse for the 0.1 tolerance, and the approach then stops as inconclusive on the empirical half."
+    }
+   ]
+  },
+  {
+   "id": "grn-memory-generic-or-biological",
+   "title": "Is memory in gene regulatory network models generic or a biological signature?",
+   "field": "both",
+   "tier": "C",
+   "question": "Do the memory and habituation behaviours found in published ODE models of biological pathways occur at the same rate in random nonlinear ODE networks of matched size, sparsity and kinetics, or are they enriched in biological networks?",
+   "known_state": "Biswas, Manicka, Hoel and Levin (2021) found several kinds of memory (UCS-based, pairing, associative, consolidation) in 35 BioModels pathway models, and habituation in 27 of them (levin-2022-grn-learning claims, top of the repo's testability ranking). No matched random-network null has been run, so it is unknown whether the result says anything about biology rather than about nonlinear dynamics in general.",
+   "acceptance_criteria": [
+    "A pre-registered computational test re-running the Biswas protocol on the original 35 models and on at least 350 random networks matched on node count, edge density, kinetic form and parameter ranges; the enrichment statistic and its threshold stated in advance.",
+    "Code and seeds published so the result is reproducible."
+   ],
+   "falsifiers": [
+    "Memory rates in random networks equal to or above the biological ones refute the biological-signature reading."
+   ],
+   "required_capabilities": [
+    "ode-simulation",
+    "biomodels",
+    "random-network-nulls",
+    "data-test"
+   ],
+   "data_access": "BioModels (open), Biswas et al. 2021 code (open access paper).",
+   "related_claims": [
+    {
+     "id": "levin-2022-grn-learning-01",
+     "label": "Published ODE models of gene and protein pathways show several kinds of memory",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "levin-2022-grn-learning-08",
+     "label": "Pathway memories can form through dynamics alone, without structural change",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "levin-2022-grn-learning-11",
+     "label": "Most pathway-model memories persist over long periods and survive recall",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "levin-2022-grn-learning-14",
+     "label": "Habituation (pharmacoresistance) occurs in every testable pathway model",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "levin-2022-grn-learning-16",
+     "label": "Stimulating other nodes can break pharmacoresistance in many pathway models",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "grn-memory-generic-or-biological--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Re-run the Biswas protocol on 35 BioModels and ≥ 350 matched random ODE networks",
+     "kind": "computation",
+     "method": "Reimplement the Biswas et al. 2021 protocol: choose stimulus nodes (UCS, CS) and a response node, apply the stimulus schedules for each memory type (UCS-based, pairing, transfer, associative, consolidation) and score memory by the paper's criteria and thresholds. Validate by reproducing their per-model memory calls on the 35 BioModels models (agreement ≥ 90% required before proceeding). Null ensemble: for each biological model, generate 10 random networks matched on node count, edge count and density, in- and out-degree sequences (configuration model), kinetic forms (mass-action and Hill terms in the same proportions, with Hill coefficients drawn from the model's empirical distribution), parameter values drawn from the model's own log-parameter distribution, and stability (retain only networks with a stable steady state from the default initial condition, as biological models have). Simulate with libRoadRunner. Statistic: per memory type, the fraction of (network, stimulus/response triple) combinations showing memory, biological versus random. Pre-registered: 'biological signature' if the biological rate exceeds the random rate by ≥ 2× with a stratified permutation p < 0.01; 'generic' if the ratio is ≤ 1.2.",
+     "steps": [
+      "Reimplement the protocol; validate against the paper's reported calls; publish the discrepancy list.",
+      "Write result.json with matching criteria, statistic and thresholds before simulating random networks.",
+      "Generate ≥ 350 matched random networks; check matching statistics.",
+      "Run all protocols; compute rates and ratios with stratified permutation p-values; publish code and seeds."
+     ],
+     "decisive_result": "Per memory type, the ratio of memory rates in biological versus matched random networks with permutation p. A ratio ≥ 2 supports the biological-signature reading and ≤ 1.2 supports 'generic nonlinear dynamics', which is the problem's stated falsifier.",
+     "failure_signature": "Reproduction of the original calls falls below 90% agreement because protocol details are underspecified in the paper, so any comparison tests a different protocol.",
+     "tools": [
+      "ode-simulation",
+      "biomodels",
+      "random-network-nulls",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "grn-memory-generic-or-biological--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Attribution by surgery: rewire topology vs shuffle parameters in real models",
+     "kind": "computation",
+     "method": "Random networks differ from biological ones in many ways at once. A sharper design perturbs the biological models themselves along one axis at a time. For each of the 35 models: (a) topology surgery, degree-preserving edge swaps (100 swaps per edge) keeping every reaction's rate law and parameters; (b) parameter surgery, permuting parameter values among reactions of the same kinetic type, keeping topology; (c) kinetic surgery, replacing Hill terms with Michaelis–Menten terms (n = 1), keeping topology and parameters; (d) a combination. Generate 20 variants per model per surgery, discard variants without a stable steady state, and re-run the memory protocol. Memory that survives (a) but not (b) points to tuned parameters; memory surviving (b) but lost under (c) points to cooperativity (ultrasensitivity) as the generic cause. This decomposes any biological enrichment from approach 1 into causes.",
+     "steps": [
+      "Implement SBML-level surgery operators with libsbml; verify that variants remain valid and stable.",
+      "Pre-register the attribution logic (which surgery outcomes imply which cause).",
+      "Run the memory protocol on all variants.",
+      "Report per-memory-type retention rates under each surgery with CIs."
+     ],
+     "decisive_result": "Retention rates of each memory type under topology, parameter and kinetic surgery. For example, '80% of UCS memory survives topology rewiring but only 20% survives replacing Hill terms' would identify ultrasensitivity, not network wiring, as the cause.",
+     "failure_signature": "Most surgical variants lose steady-state stability, so the surviving variants are a biased subset and retention rates are uninterpretable.",
+     "tools": [
+      "ode-simulation",
+      "biomodels",
+      "random-network-nulls"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "grn-memory-generic-or-biological--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Theory: memory as multistability or slow manifolds, predicted by CRNT",
+     "kind": "mixed",
+     "method": "Explain which networks can show which memory, so the result is a theorem plus a prediction rather than only a rate comparison. Step 1 (proof): show that, for the protocol's definitions, persistent UCS-based memory over a test window T after stimulus removal requires either (i) multistability, with the stimulus switching basins, or (ii) a slow variable with relaxation time ≥ T. The argument: if the system is monostable with all eigenvalues at the steady state having real part ≤ −λ and the steady state is globally attracting with exponential rate λ, the response returns within ε after time log(C/ε)/λ, so memory beyond that is impossible. Formalize the linear-stability core in Lean. Step 2 (prediction): for mass-action models, Chemical Reaction Network Theory (deficiency zero and deficiency one theorems) certifies that some networks cannot be multistable for any rates. Classify all 35 models and the random ensemble by CRNT before simulation; predict that CRNT-certified monostable networks show long-window memory only if they have slow eigenvalues (computed). Compare with approach 1's observed memory calls.",
+     "steps": [
+      "State and prove the exponential-relaxation lemma for monostable systems in Lean (linear case; nonlinear case by citation of standard Lyapunov results with stated hypotheses).",
+      "Run CRNT analysis (deficiency computation) on mass-action-convertible models; compute slowest eigenvalues at steady state.",
+      "Pre-register predicted memory or no-memory per model from (multistability possible, slowest timescale).",
+      "Compare predictions with observed memory calls; report sensitivity and specificity."
+     ],
+     "decisive_result": "A proved necessary condition for persistent memory, and the accuracy with which the CRNT plus slowest-timescale classification predicts observed memory across biological and random networks. High accuracy (≥ 85%) shows memory is explained by generic dynamical features, whatever the biological enrichment.",
+     "failure_signature": "Many networks show memory the classification rules out, which would mean the protocol's memory criterion picks up transient effects within the test window, a finding about the protocol itself; or most models use non-mass-action kinetics outside CRNT's scope.",
+     "tools": [
+      "lean4",
+      "chemical-reaction-network-theory",
+      "ode-simulation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Many BioModels use non-mass-action rate laws; CRNT results cover only a subset."
+    },
+    {
+     "id": "grn-memory-generic-or-biological--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Matched random-network memory enrichment test",
+     "kind": "computation",
+     "method": "Reimplement the exact stimulation and memory criteria for all 35 biological ODE models, then generate 100 matched nulls per model preserving node count, signed degree sequence, kinetic-law family, parameter marginal distributions and stiffness. Blindly apply identical protocols and estimate enrichment with a model-paired conditional logistic regression.",
+     "steps": [
+      "Freeze executable model versions and numerical tolerances.",
+      "Validate protocol reproduction against all reported memory calls.",
+      "Generate at least 3500 convergent null networks with fixed seeds.",
+      "Classify memory, habituation and consolidation using preregistered effect thresholds."
+     ],
+     "decisive_result": "Biological enrichment requires paired odds ratio at least 2 with 99% interval excluding 1 for a memory class and replication across two null generators; odds ratio at or below 1 refutes enrichment.",
+     "failure_signature": "Fewer than 80% of published calls reproduce or null convergence filtering changes network dynamics enough to break covariate balance.",
+     "tools": [
+      "ode-simulation",
+      "large-scale-computation",
+      "data-test"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "grn-memory-generic-or-biological--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Dynamical motif attribution of memory",
+     "kind": "computation",
+     "method": "Identify whether memory enrichment is explained by specific feedback motifs rather than biological origin. Enumerate signed three- and four-node motifs, sample kinetic parameters by Latin hypercube, and estimate each motif's memory probability. Decompose each BioModels network's prediction with motif counts and targeted edge ablations.",
+     "steps": [
+      "Enumerate nonisomorphic signed motifs with self-loops handled explicitly.",
+      "Run at least 10000 parameter sets per motif under the fixed memory protocol.",
+      "Fit a sparse hierarchical predictor from motif content to memory behavior.",
+      "Ablate predicted motifs in biological models and matched nulls."
+     ],
+     "decisive_result": "A motif mechanism is established if its presence increases memory probability by at least 0.25 and deleting it abolishes memory in at least 80% of predicted biological models while matched control deletions do not.",
+     "failure_signature": "Memory depends on diffuse parameter combinations and no motif has stable effects across kinetic families.",
+     "tools": [
+      "ode-simulation",
+      "network-enumeration",
+      "large-scale-computation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Combinatorial parameter sweeps are expensive and motif effects may be context-dependent."
+    },
+    {
+     "id": "grn-memory-generic-or-biological--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Match 350 random ODE networks to the 35 BioModels",
+     "kind": "computation",
+     "method": "Re-run the Biswas, Manicka, Hoel and Levin 2021 memory probes on the original models they took from BioModels, and on at least 10 random networks per model, at least 350 in total. Match each random network on node count, reaction count, and kinetic family (mass-action or Hill, matching the source model). Draw parameter magnitudes from the empirical distribution of the absolute values in that source model. Randomize regulatory signs in this approach; the topology-preserving arm is the next one. Probes are the paper's UCS-based, pairing, associative and consolidation memories, plus habituation. The enrichment statistic is the paired difference in the number of memory kinds present. Success, pre-registered, is a permutation p-value below 0.01 against the random ensemble and at least 20 of the 35 biological models showing strictly more memory kinds than their matched random networks. Publish seeds and the model identifiers.",
+     "steps": [
+      "Pin the 35 BioModels identifiers from the paper before simulating.",
+      "Build at least 10 matched random networks for each, signs randomized.",
+      "Run the five probes with the paper's protocol.",
+      "Compute the paired permutation test.",
+      "Require p below 0.01 and at least 20 of 35 models strictly enriched."
+     ],
+     "decisive_result": "Permutation p below 0.01 and strict enrichment in at least 20 of 35 models. Otherwise memory in this protocol is not enriched relative to the matched random networks.",
+     "failure_signature": "The random networks meet or exceed the biological memory rate. That refutes the biological-signature reading for this match. A probe implementation that cannot reproduce the paper's count on the original 35 models invalidates the run before the null is interpreted.",
+     "tools": [
+      "ode-simulation",
+      "biomodels",
+      "random-network-nulls",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    },
+    {
+     "id": "grn-memory-generic-or-biological--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Factor topology against kinetics in the memory rate",
+     "kind": "computation",
+     "method": "Cross two factors the single matched null confounds. Arm A keeps the biological reaction graph and redraws parameters from the same magnitude distribution. Arm B rewires the graph to the same degree sequence and keeps the original parameters. Arm C does both and is the null from the first approach. Each arm has the same 10 networks per model. The biological-signature claim for topology survives only if arm A still shows the enrichment and arm B does not. The claim for kinetics survives only if arm B shows it and arm A does not. If arm A already loses the enrichment, topology is not the carrier. Pre-register that split before looking at which arm wins.",
+     "steps": [
+      "Build arms A, B and C with the shared size match.",
+      "Run the same five probes.",
+      "Test enrichment separately in each arm.",
+      "Assign the effect to topology, kinetics, both, or neither by the pre-registered pattern.",
+      "Do not reinterpret the pattern after seeing it."
+     ],
+     "decisive_result": "A four-way call: enrichment in A only (topology), B only (kinetics), both, or neither, using the same p-value and 20-of-35 rule in each arm.",
+     "failure_signature": "Arm C differs from the first approach's null on the same seeds, which means the factor arms are not comparable. Substantively, enrichment in neither arm refutes a biological signature of either factor.",
+     "tools": [
+      "ode-simulation",
+      "biomodels",
+      "random-network-nulls"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    },
+    {
+     "id": "grn-memory-generic-or-biological--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Prove habituation for one nonlinear motif and not for linear ODEs",
+     "kind": "formalization",
+     "method": "Define habituation as three inequalities on a forced ODE: repeated identical pulses produce strictly decreasing peak responses; after a rest interval longer than a stated multiple of the pulse spacing, the next peak returns to within 10 percent of the first; the decrement happens for every pulse amplitude in an open interval. Prove that a three-variable system with slow negative feedback satisfies this on an open set of parameters. Prove that no linear system of the same input-output shape can satisfy decrement for all amplitudes in an interval and recovery after rest, because superposition fixes the gain. This shows habituation is generic for that motif and absent for linear kinetics. It does not show that BioModels are enriched. A failure here leaves the enrichment test untouched.",
+     "steps": [
+      "Write the habituation inequalities as a Lean predicate.",
+      "Define the three-variable negative-feedback system.",
+      "Prove the predicate on an open parameter set.",
+      "Prove linear systems of the same shape fail the predicate.",
+      "Audit axioms."
+     ],
+     "decisive_result": "A no-sorry existence theorem for the nonlinear motif and a no-sorry impossibility theorem for linear kinetics, under the stated habituation predicate.",
+     "failure_signature": "The nonlinear motif fails recovery or fails decrement on every open set tried, or a linear system is found that meets the predicate. Either kills the generic-versus-linear claim.",
+     "tools": [
+      "lean4",
+      "ode-simulation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    }
+   ]
+  },
+  {
+   "id": "active-inference-morphogenesis-falsifiable",
+   "title": "A falsifiable form of active-inference morphogenesis",
+   "field": "both",
+   "tier": "C",
+   "question": "Can the claim that morphogenesis is variational free-energy minimization be stated as a quantitative prediction that a regeneration or development experiment could refute, and does existing data refute it?",
+   "known_state": "Friston, Levin, Sengupta and Pezzulo (2015) modelled morphogenesis as active inference by identical cells sharing a generative model; Kuchling et al. (2020) extended it to regeneration. Critics hold the framework is unfalsifiable because any outcome can be described as free-energy minimization under some generative model. No prediction has been derived that fixes the generative model in advance and could fail. The repo's levin-2015-place and levin-2019-boundary claims are untested for this reason.",
+   "acceptance_criteria": [
+    "A derivation, from a generative model fixed before looking at data, of a quantitative prediction (for example regeneration time or error rate scaling with a stated surprise measure under graded perturbations) together with the observation that would refute it.",
+    "A pre-registered test of that prediction on published planarian or Xenopus regeneration time courses."
+   ],
+   "falsifiers": [
+    "If every candidate prediction can be rescued by changing the generative model post hoc, the framework is not empirically testable in its current form; that is itself a result."
+   ],
+   "required_capabilities": [
+    "variational-inference",
+    "developmental-biology",
+    "philosophy-of-science",
+    "data-test"
+   ],
+   "data_access": "Published regeneration time courses (open-access Levin lab papers).",
+   "related_claims": [
+    {
+     "id": "levin-2015-place-03",
+     "label": "Morphogenesis requires each cell to model its place in the target form",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "levin-2015-place-04",
+     "label": "Free energy is minimized only when every cell occupies a unique inferred place",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "levin-2019-boundary-15",
+     "label": "Cells in development minimize surprise and variational free energy like nervous systems",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    },
+    {
+     "id": "levin-2015-girardia-20",
+     "label": "Regeneration as descent to a free-energy attractor; induced shapes as local minima",
+     "status": "untested",
+     "proof": null,
+     "theorem": false,
+     "evidence": null,
+     "data_test": null
+    }
+   ],
+   "runs_logged": [],
+   "changes_since_last_round": [],
+   "prior": null,
+   "approaches": [
+    {
+     "id": "active-inference-morphogenesis-falsifiable--claude-opus-5-5--1",
+     "proposer": "claude-opus-5-5",
+     "title": "Lean: a finite complete-class theorem showing exactly when free-energy accounts are empty",
+     "kind": "formalization",
+     "method": "Make the unfalsifiability charge precise, which is a result in itself. Setting: finite hidden-state space S, finite observations O, finite actions A, and a policy π: Oⁿ → A over a finite horizon. Theorem 1 (finite complete class): for every deterministic policy π there exist a generative model (prior over S, likelihood, and preference prior over outcomes) under which π minimizes expected free energy; the construction places preference mass on the outcomes π produces. So without constraints on the generative model, the claim 'morphogenesis minimizes free energy' excludes no behaviour. Theorem 2 (restoring content): if the likelihood and preference prior are fixed in advance (for example the target morphology and the cell-signalling likelihood from Friston et al. 2015's model), the set of free-energy-optimal policies is a proper subset, and there exist observable trajectories outside it, with an explicit separating example. This gives a formal criterion: an active-inference morphogenesis claim is testable iff it fixes the components named in Theorem 2.",
+     "steps": [
+      "Define finite POMDP-style generative models and expected free energy over Finset types in Lean.",
+      "Prove Theorem 1 by explicit construction of the preference prior.",
+      "Prove Theorem 2 with a small explicit fixed model (for example 3 states, 2 actions) and a trajectory not optimal under it.",
+      "Write a short note mapping critics' and proponents' statements to Theorems 1 and 2."
+     ],
+     "decisive_result": "Lean-checked Theorems 1 and 2. Together they state precisely that the framework is empty with a free generative model and testable with a fixed one, which turns the falsifiability debate into a checkable criterion that approaches 2 and 3 then meet.",
+     "failure_signature": "Expected free energy has several non-equivalent definitions in the literature, and the theorems hold for one but not others; the result then must be stated per definition, which weakens its reach.",
+     "tools": [
+      "lean4",
+      "mathlib",
+      "variational-inference",
+      "philosophy-of-science"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "active-inference-morphogenesis-falsifiable--claude-opus-5-5--2",
+     "proposer": "claude-opus-5-5",
+     "title": "Fix Friston et al.'s generative model and derive a graded-excision prediction",
+     "kind": "mixed",
+     "method": "Take the published generative model (Friston et al. 2015: cells with a shared model of target positions and signal expression) without modification and derive a quantitative prediction for an experiment that already exists. Simulate excision of fractions f ∈ {0.1, …, 0.9} of the ensemble and measure (a) time to reach the target configuration and (b) the probability of incorrect pattern (a residual error above threshold). The model predicts specific functional forms, for example recovery time increasing with f up to a critical fraction f_c beyond which the pattern fails. Freeze these predictions, functional forms and f_c with intervals over the model's stated parameter ranges, before collecting data. Then compare with published planarian regeneration data on fragment size versus regeneration success and time, and Xenopus or axolotl data where graded removals exist. Pre-registered: refuted if the observed success-versus-fragment-size curve is outside the predicted envelope at ≥ 2 fragment sizes.",
+     "steps": [
+      "Reimplement the Friston et al. 2015 simulation from the published equations; reproduce its figures.",
+      "Run graded excisions over the model's parameter ranges; freeze predicted curves with envelopes.",
+      "Compile published fragment-size and regeneration-outcome data with a pre-registered inclusion rule.",
+      "Compare; report verdict and which model parameters, if any, the data constrain."
+     ],
+     "decisive_result": "A pre-registered comparison of the fixed-model prediction (recovery time and failure probability versus fraction removed, with envelope) against published regeneration data. Observations outside the envelope refute this active-inference model of pattern regulation; observations inside it are a first non-trivial success.",
+     "failure_signature": "The envelope over plausible parameters is so wide that it contains every monotone curve, so the fixed model still makes no risky prediction. This would confirm Theorem 1's warning in practice even with the model fixed.",
+     "tools": [
+      "variational-inference",
+      "simulation",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Published regeneration datasets reporting outcomes over graded fragment sizes are sparse and old; the decisive experiment would need new lab work."
+    },
+    {
+     "id": "active-inference-morphogenesis-falsifiable--claude-opus-5-5--3",
+     "proposer": "claude-opus-5-5",
+     "title": "Craniofacial remodelling: error-proportional correction vs hardwired movement",
+     "kind": "data-test",
+     "method": "Xenopus 'Picasso' tadpoles, with organs experimentally displaced, remodel toward normal craniofacial geometry (Vandenberg et al. 2012; Pinet et al. 2019). A fixed-target active-inference model with Gaussian precision predicts that each organ's correction velocity is proportional to its displacement from the target, giving exponential relaxation and a rate independent of the direction of displacement. A hardwired-movement alternative (organs migrate a fixed program regardless of start) predicts velocity independent of displacement. Using organ positions reported or measurable in these papers' figures at multiple stages, estimate for each organ the regression of displacement change on initial displacement. Pre-registered: the active-inference model is supported if the slope is negative with exponential-fit R² ≥ 0.6, and refuted if velocity is independent of displacement (slope CI including 0) or if organs overshoot the target systematically, which a fixed-precision gradient flow cannot produce.",
+     "steps": [
+      "Pre-register both models' predictions and the statistics.",
+      "Extract organ positions over developmental stages from the published figures and supplementary data, with landmark definitions.",
+      "Fit the displacement-dependent and displacement-independent models; compare by AICc.",
+      "Check for overshoot; report verdicts per organ."
+     ],
+     "decisive_result": "Whether correction velocity scales with displacement (supporting fixed-target error correction) or not (supporting hardwired programs), per organ, with model-comparison weights. This is a risky prediction the fixed model can fail.",
+     "failure_signature": "Published figures give too few time points or individuals per stage (fewer than 3 stages or 10 tadpoles), making slopes unidentifiable; or any proportional-correction result is shared by non-inferential gradient models, so it supports a class of models rather than active inference specifically (this must be stated in the interpretation).",
+     "tools": [
+      "morphometrics",
+      "image-analysis",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Individual-level trajectory data are not published as tables; figure extraction is limited and new time-lapse imaging would be decisive."
+    },
+    {
+     "id": "active-inference-morphogenesis-falsifiable--gpt-5-6-sol--1",
+     "proposer": "gpt-5-6-sol",
+     "title": "Frozen generative model predicts regeneration times",
+     "kind": "data-test",
+     "method": "Choose one planarian regeneration series and fit a fixed generative model only to intact anatomy and unperturbed regeneration. Define sensory states, latent target morphology, likelihood variance and action dynamics before examining graded perturbations. Predict median regeneration time and failure probability as functions of initial variational surprise.",
+     "steps": [
+      "Publish the full generative model, priors and fitting data split before testing.",
+      "Compute surprise from initial fragment geometry and Vmem summaries.",
+      "Derive posterior predictive time and error curves for held-out perturbations.",
+      "Compare against size-only and flexible survival-model baselines."
+     ],
+     "decisive_result": "The fixed model passes if at least 80% of held-out median times lie within its 90% intervals and surprise improves leave-intervention-out ELPD by at least 10; failure of interval coverage below 50% refutes this instantiation.",
+     "failure_signature": "Predictions require changing likelihoods, priors or target morphology after observing each perturbation, demonstrating post hoc flexibility.",
+     "tools": [
+      "variational-inference",
+      "data-test",
+      "bioelectric-simulation"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Open specimen-level regeneration time courses with quantified initial perturbations."
+    },
+    {
+     "id": "active-inference-morphogenesis-falsifiable--gpt-5-6-sol--2",
+     "proposer": "gpt-5-6-sol",
+     "title": "Identifiability and universal-fit stress test",
+     "kind": "computation",
+     "method": "Test falsifiability directly. Generate synthetic morphogenetic trajectories from reaction-diffusion, mechanical relaxation and random state-space models, then fit the same bounded active-inference model class without changing its latent dimension or priors. Estimate how often it fits non-active-inference processes as well as genuine ones.",
+     "steps": [
+      "Predefine model class, parameter bounds and predictive scoring rule.",
+      "Generate 1000 datasets per mechanism over matched noise and sample sizes.",
+      "Fit blindly and perform simulation-based calibration.",
+      "Compute specificity, power and parameter identifiability for labeling active inference."
+     ],
+     "decisive_result": "The framework is discriminative only if power and specificity both exceed 0.8 on held-out trajectories; specificity below 0.6 shows the tested formulation can absorb unrelated dynamics.",
+     "failure_signature": "Equivalent predictive scores occur across all generators or posterior parameters are nonidentifiable, making empirical attribution unsupported.",
+     "tools": [
+      "variational-inference",
+      "large-scale-computation",
+      "simulation"
+     ],
+     "proposer_difficulty": "tractable",
+     "missing": null
+    },
+    {
+     "id": "active-inference-morphogenesis-falsifiable--grok-4-7--1",
+     "proposer": "grok-4-7",
+     "title": "Fix the generative model, then rank regeneration times",
+     "kind": "data-test",
+     "method": "Before opening a regeneration time course, fix the generative model to the shared target morphology used by Friston, Levin, Sengupta and Pezzulo 2015, with no free retargeting. Define the surprise of a cut as the variational free energy of that initial condition under the fixed target. The prediction is ordinal: among fragment classes of one species in one paper, the ordering of free energies must match the ordering of regeneration times, with Spearman rank correlation above 0.5. Planarian fragment series are the admissible data, and only series that report times for at least four fragment classes. Parameters of the target are taken from the 2015 paper, not from the time series. Fewer than four classes, or times that exist only as unlabeled cartoons, makes the test inconclusive.",
+     "steps": [
+      "Transcribe the 2015 target morphology and freeze it.",
+      "Define free energy of a cut under that target.",
+      "List fragment classes and published times from one admissible series.",
+      "Compute Spearman correlation between free-energy rank and time rank.",
+      "Refute the fixed model if the correlation is at most 0.5."
+     ],
+     "decisive_result": "Spearman correlation above 0.5 between pre-registered free-energy rank and regeneration-time rank, on at least four fragment classes.",
+     "failure_signature": "Correlation at most 0.5. Changing the target after seeing the times fails the approach and is the unfalsifiability pattern the problem names.",
+     "tools": [
+      "variational-inference",
+      "developmental-biology",
+      "data-test"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": "Quantitative regeneration times for four or more fragment classes in one paper. If the papers only show cartoons, the test is inconclusive."
+    },
+    {
+     "id": "active-inference-morphogenesis-falsifiable--grok-4-7--2",
+     "proposer": "grok-4-7",
+     "title": "Prove the free-target class is tautological",
+     "kind": "formalization",
+     "method": "Two theorems. First, if the generative model may be any smooth target morphology plus a positive precision, then for every observed morphology there exists a target equal to it that minimizes variational free energy. That class is unfalsifiable, and the theorem should say so. Second, with the target fixed as in the 2015 paper, the free-energy ordering of a finite set of cuts is not an identity: exhibit two cuts whose free-energy order is determined by the fixed target, so a reversed regeneration-time order would violate the prediction. The second theorem is the falsifiable form. If the fixed-target ordering can still be reversed by using a degree of freedom the paper leaves open, the second theorem fails and the approach concludes that the published model is not yet a test.",
+     "steps": [
+      "Define variational free energy for a morphology and a target.",
+      "Prove existence of a minimizing target for every observation.",
+      "Instantiate the 2015 target and rank a finite set of cuts.",
+      "Show the ranking is invariant under the degrees of freedom the paper leaves free, or name the freedom that flips it.",
+      "Audit axioms."
+     ],
+     "decisive_result": "A no-sorry tautology theorem for free targets, and either a no-sorry non-identity for the fixed 2015 target or a proof that a free parameter in that paper flips the ranking.",
+     "failure_signature": "The fixed-target ranking flips under a parameter the pre-registration treated as frozen. The model is then not testable in the form stated, which the problem accepts as a result only if it is proved rather than asserted.",
+     "tools": [
+      "lean4",
+      "variational-inference"
+     ],
+     "proposer_difficulty": "hard",
+     "missing": null
+    },
+    {
+     "id": "active-inference-morphogenesis-falsifiable--grok-4-7--3",
+     "proposer": "grok-4-7",
+     "title": "Lattice simulation with the target frozen before the cut",
+     "kind": "simulation",
+     "method": "Implement the cell-lattice update from Kuchling et al. 2020 only if the paper states a complete parameter set. If it gives a schematic without numbers, stop and mark the approach not operationalizable. When numbers exist, freeze them, apply one cut geometry that the paper reports but that is not the figure used to illustrate the update, and predict the polarity class. frontier_simulate's mechanobiology preview may be used to check that a lattice energy is inside its allowlisted family; it does not replace the lattice run and is not evidence. Success is the published polarity class. One cut, named first.",
+     "steps": [
+      "Extract numerical parameters from Kuchling et al. 2020 or stop.",
+      "Name the held-out cut before simulating.",
+      "Run the lattice update with the frozen target.",
+      "Compare predicted polarity with the paper.",
+      "Do not add a parameter to repair a miss."
+     ],
+     "decisive_result": "The pre-named cut's published polarity, from a parameter set taken entirely from the paper.",
+     "failure_signature": "The polarity is wrong, or the paper has no complete parameter set. The second case is a failed operationalization, not a refutation of active inference.",
+     "tools": [
+      "simulation",
+      "frontier_simulate",
+      "variational-inference"
+     ],
+     "proposer_difficulty": "long-shot",
+     "missing": "A fully numerical parameter set in the paper. If the model is schematic, this approach cannot start."
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,857 @@
+{
+  "model": "grok-4-7",
+  "provider": "xAI",
+  "generated": "2026-11-01T04:37:16Z",
+  "approaches": [
+    {
+      "problem": "trabecular-stress-alignment-wolffs-law",
+      "n": 1,
+      "title": "Mean-intercept fabric versus finite-element principal stress",
+      "kind": "data-test",
+      "method": "Pre-register a claim test of thompson1917-ch16-05 before any orientation or stress field is inspected. In each surviving volume, binarize bone with Otsu's threshold on the bone histogram and compute the mean-intercept-length fabric tensor on a grid of cubic regions of interest (BoneJ anisotropy, or an equivalent coded intercept count). The stress tensor comes from a linear-elastic finite-element solve on the same geometry with one isotropic tissue modulus, so the fabric never enters the stress calculation. The primary load cases, fixed in advance, are: femoral head, uniform pressure on a spherical cap of 40 degree half-angle directed from the articular surface through the head centre toward the neck, distal cut fixed; vertebral body, uniform compression of the endplates. The statistic is the angle between the undirected primary fabric axis and the principal-stress direction of largest absolute value, folded into 0 to 90 degrees. The random-fabric null keeps the measured eigenvalues and draws the primary axis uniformly; for that null the distribution is known, P(angle ≤ θ) = 1 − cos θ on [0, π/2], so the null median is 60 degrees, and the script checks the formula with a Monte Carlo of the same draws. The growth-rule null aligns fabric with the local density gradient, or with the scanner superior-inferior axis when that gradient is below a pre-registered magnitude. A volume is dropped if it is an excised cube whose anatomical orientation is not in the deposit, if trabecular thickness is under three voxels, or if the growth-rule axis cannot be defined. Pass requires, on at least three volumes from at least two species, a median angle ≤ 20 degrees that is also at least 15 degrees below both null medians, with a permutation p < 0.01. A pre-registered cap-angle sweep from 20 to 60 degrees tests the load-case falsifier: a change under 5 degrees that leaves the median inside the random-fabric null counts as insensitive to the load.",
+      "steps": [
+        "Write the pre-registration (thresholds, load cases, exclusion gates) and commit it before downloading volumes.",
+        "Download the Leeds lumbar set, the unaugmented Palanca vertebrae, the DaRUS femoral-head overview, and only those Doube stacks whose filenames and the 2011 protocol identify a whole head or condyle.",
+        "Apply the resolution and orientation gates; record every exclusion.",
+        "Compute mean-intercept-length fabric and the finite-element principal stresses on the surviving volumes.",
+        "Compare angles with the random-axis null and the growth-rule null, then run the cap-angle sweep."
+      ],
+      "decisive_result": "A table of fabric-to-stress angles for every surviving region, with the median ≤ 20 degrees and at least 15 degrees below both null medians at permutation p < 0.01, on at least three volumes from two species. The cap-angle sweep must move the median by at least 5 degrees or the load-case falsifier trips.",
+      "failure_signature": "Fewer than three volumes survive the gates; the median is not distinguishable from the random-fabric null (median 60 degrees); or the median moves by less than 5 degrees across the cap-angle sweep while remaining inside that null.",
+      "tools": [
+        "bonej",
+        "fenics",
+        "imagej",
+        "python",
+        "data-test"
+      ],
+      "datasets": [
+        {
+          "name": "Doube, Kłosowski, Hutchinson and Shefelbine micro-CT of femoral-head and condyle trabeculae",
+          "url": "https://doi.org/10.6084/m9.figshare.7257179",
+          "note": "16-bit stacks, voxel size at most 15 µm, 18 avian, 72 mammalian and one crocodilian species. Whole heads or condyles only; excised cubes without a recorded anatomical orientation are excluded. About 36 GB."
+        },
+        {
+          "name": "Ruf, Steeb, Gebert, Schneider and Helwig human femoral-head micro-XRCT",
+          "url": "https://doi.org/10.18419/DARUS-1177",
+          "note": "One explanted human femoral head. Use the 15 µm overview (about 22 GB). Body mass is recorded; joint-contact force is not, so the cap load is a stated model."
+        },
+        {
+          "name": "Day, Jones and Wilcox lumbar-vertebra micro-CT",
+          "url": "https://doi.org/10.5518/874",
+          "note": "Raw micro-CT of 14 human lumbar vertebrae, about 1 GB, plus example finite-element models. Second species-site after the femoral heads."
+        },
+        {
+          "name": "Palanca, Cristofolini, Dall'Ara and Tozzi vertebral micro-CT",
+          "url": "https://doi.org/10.6084/m9.figshare.4062351",
+          "note": "Natural and augmented vertebrae at 39 µm, about 8 GB. Use only unaugmented scans that pass the three-voxel trabecular-thickness gate."
+        }
+      ],
+      "references": [
+        {
+          "doi": "10.1098/rspb.2011.0069",
+          "note": "Doube, Kłosowski, Wiktorowicz-Conroy, Hutchinson and Shefelbine 2011, Trabecular bone scales allometrically in mammals and birds"
+        },
+        {
+          "doi": "10.1038/35015116",
+          "note": "Huiskes, Ruimerman, van Lenthe and Janssen 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone"
+        }
+      ],
+      "difficulty": "hard",
+      "missing": "Subject-specific joint loads are not in these deposits, and many Doube volumes are excised cubes. The test uses stated load cases and drops cubes whose orientation is unrecorded. No animal lab is available for a new reorientation experiment."
+    },
+    {
+      "problem": "trabecular-stress-alignment-wolffs-law",
+      "n": 2,
+      "title": "Stress-adaptive remodelling versus a load-independent rule",
+      "kind": "simulation",
+      "method": "This attacks the mechanism in thompson1917-ch16-06 and the reorientation prediction in thompson1917-ch16-07 as a sufficiency question, not as a substitute for the micro-CT test. On a 2D plane-stress mesh of a cantilever and of a femoral-head silhouette, iterate a Huiskes-type density update: the strain-energy density is recomputed by linear finite elements each step, and density grows where strain energy per unit density exceeds a reference value, with a lazy zone of ±10 percent inside which density does not change. The comparison rule uses the same update but drives it with a fixed anatomical gradient and never with stress. After a pre-registered iteration budget, compute the mean-intercept fabric of the density field and its angle to the principal stress of the final solid. Then rotate the load by 30 degrees and continue. A bounded Frontier mechanobiology preview may smoke-test one parameter set; it is not the result, because those previews are not accepted evidence.",
+      "steps": [
+        "Freeze the two update rules, the lazy-zone width, the mesh and the iteration budget before any production run.",
+        "Run the stress rule and the gradient rule from the same initial density.",
+        "Measure fabric-to-stress angle at convergence.",
+        "Rotate the load by 30 degrees and record the fabric rotation.",
+        "Repeat from three initial densities to separate the rule from the initial condition."
+      ],
+      "decisive_result": "Under the stress rule the median fabric-to-stress angle is ≤ 15 degrees, and after the 30 degree load rotation the fabric axis turns by ≥ 20 degrees. The gradient rule stays above 40 degrees from the principal stress. Both comparisons hold for all three initial densities.",
+      "failure_signature": "The stress rule does not beat the gradient rule by 15 degrees, the density collapses to empty or solid, or the iteration oscillates past the budget without a fabric axis stable to 5 degrees.",
+      "tools": [
+        "fenics",
+        "python",
+        "frontier_simulate"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1038/35015116",
+          "note": "Huiskes, Ruimerman, van Lenthe and Janssen 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "trabecular-stress-alignment-wolffs-law",
+      "n": 3,
+      "title": "Lean: shear vanishes only on principal planes",
+      "kind": "formalization",
+      "method": "Thompson's reason for alignment, in thompson1917-ch16-06, is that a plane along a principal direction carries no shear. The repo already proves that principal directions of a 2D symmetric stress are orthogonal (ThompsonLaws.Mechanics.principalDirections_orthogonal). Extend that file. For the stress [[a, b], [b, c]] and a unit normal, define the shear component of the traction and prove it is zero if and only if the normal is an eigenvector, when the two principal values are distinct. Then prove the alignment lemma used as the optimality piece: for a fixed stress with distinct eigenvalues, the Frobenius product with a fabric of fixed eigenvalues is maximised exactly when the eigenframes coincide. In 2D that product is a cos 2θ + b sin 2θ, and the maximum is at θ = 0. The development stays in 2D plane stress so it can close on the existing lemma. It does not say that bone does this.",
+      "steps": [
+        "Define traction and its shear part for a 2D symmetric stress.",
+        "Prove shear vanishes if and only if the normal is a principal direction.",
+        "Prove the 2D Frobenius product is maximised when the frames coincide.",
+        "Build the Thompson Lake project with no sorry and only standard axioms."
+      ],
+      "decisive_result": "A Lean module, compiled with no sorry, containing both the shear characterisation and the 2D alignment-maximum theorem.",
+      "failure_signature": "Either theorem still contains sorry, or the alignment statement is true only after assuming something the mechanics lemma does not give (a nonsymmetric stress, or a 3D spectral theorem the development does not have).",
+      "tools": [
+        "lean4"
+      ],
+      "datasets": [],
+      "references": [],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "biocomposite-toughness-from-hierarchy",
+      "n": 1,
+      "title": "Leave-one-family regression of toughness on architecture",
+      "kind": "data-test",
+      "method": "Build a provenanced table of published fracture records for mineralised composites, aimed at the problem's bar of at least 40 records and five families (nacre, bone, dentin, antler, and one of enamel, sea-urchin stereom or stomatopod cuticle). Each row records the family, the toughness quantity and the method name, mineral volume fraction, mineral Young's modulus, mineral strength, platelet or fibril aspect ratio, an interface-compliance proxy defined as organic-layer thickness divided by platelet thickness, and the number of hierarchical levels counted by a written rule (a level counts only if the paper names a distinct structural element at that scale). Work of fracture is not pooled with K_Ic. The constituent-only null, fixed first, is log10(K_Ic) = a + b φ + c log10(E_mineral) + d log10(σ_mineral) + error. The architecture model adds log10(aspect ratio), log10(interface compliance) and the level count N. Pass requires a likelihood-ratio test of those three terms at p < 0.01, and a leave-one-family-out check in which the architecture model cuts mean absolute error on log10(K_Ic) by at least 0.10 relative to the null in at least four of five held-out families. Compounding is a separate coefficient: N has a positive coefficient whose 95 percent interval excludes zero in the model that already contains φ. Rows missing a required field are dropped, not imputed.",
+      "steps": [
+        "Write the extraction rules, the level-counting rule and both model formulas before reading tables for the purpose of fitting.",
+        "Extract records from open papers and from supplements, keeping the page or table for each number.",
+        "Drop rows that mix toughness definitions or lack a required field.",
+        "Fit the null and the architecture model; run the likelihood-ratio test and leave-one-family-out.",
+        "Report the coefficient on N after controlling for mineral volume fraction."
+      ],
+      "decisive_result": "At least 40 K_Ic records, five families, a likelihood-ratio p < 0.01 for the architecture block, a leave-one-family-out error drop of at least 0.10 log10 units in at least four families, and a 95 percent interval for the level-count coefficient that lies entirely above zero. Anything short of the coverage bar is a failed test, not a fit on a smaller table.",
+      "failure_signature": "Fewer than 40 complete K_Ic records or fewer than five families remain after the method filter; the likelihood-ratio test is above 0.01; or the level-count interval includes zero or is negative, which refutes compounding even if the joint architecture test passes.",
+      "tools": [
+        "python",
+        "literature-extraction",
+        "data-test"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1038/nmat4089",
+          "note": "Wegst, Bai, Saiz, Tomsia and Ritchie 2015, Bioinspired structural materials"
+        },
+        {
+          "doi": "10.1016/j.jmps.2006.07.007",
+          "note": "Barthelat, Tang, Zavattieri, Li and Espinosa 2007, On the mechanics of mother-of-pearl"
+        },
+        {
+          "doi": "10.1098/rspb.2010.1093",
+          "note": "Zhang, Zhang and Gao 2011, On optimal hierarchy of load-bearing biological materials"
+        },
+        {
+          "doi": "10.1002/adma.200803322",
+          "note": "Launey and Ritchie 2009, On the fracture toughness of advanced materials"
+        },
+        {
+          "doi": "10.1098/rspa.1995.0075",
+          "note": "Ashby, Gibson, Wegst and Olive 1995, The mechanical properties of natural materials. I. Material property charts"
+        }
+      ],
+      "difficulty": "hard",
+      "missing": "There is no open database that already joins toughness with aspect ratio, interface compliance and level count. Several source papers are paywalled, and interface thickness is often unreported, so the table may miss the coverage bar."
+    },
+    {
+      "problem": "biocomposite-toughness-from-hierarchy",
+      "n": 2,
+      "title": "Self-similar hierarchy sweep of toughness against level count",
+      "kind": "computation",
+      "method": "Transcribe the quasi-self-similar tension-shear recurrence of Zhang, Zhang and Gao 2011 from the paper's equations, not from memory of their plotted optimum. Sweep mineral volume fraction from 0.05 to 0.95 and the matrix failure shear strain over the factor-of-two box around the values printed in that paper. At each point compute stiffness, strength and toughness at hierarchy levels N = 1 through 8 under the equal-strength closure, and again with a weakest-link flaw inserted at the largest level. The compounding claim is that toughness keeps rising with N. The pre-registered window is N = 2 through 7 and mineral fraction 0.30 to 0.95. Compounding survives this model only if toughness is increasing throughout that window for every parameter point in the box.",
+      "steps": [
+        "Code the recurrence so that it matches the paper's equations line by line, with a unit test against one printed numerical example if the paper gives one.",
+        "Sweep volume fraction and matrix failure strain.",
+        "Record toughness against N and the smallest N at which the first difference becomes negative.",
+        "Repeat with the weakest-link flaw at the top level.",
+        "Archive the curves and the parameter box."
+      ],
+      "decisive_result": "The curve of toughness against N, and the set of volume fractions for which the first difference changes from positive to negative inside N = 2 through 7. Compounding is supported only if no such sign change occurs anywhere in the pre-registered box.",
+      "failure_signature": "No stationary point of toughness exists for any volume fraction in [0.05, 0.95], or the sign pattern reverses when the equal-strength closure is replaced by the weakest-link flaw, so the monotone-or-not answer is an artefact of one closure.",
+      "tools": [
+        "python"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1098/rspb.2010.1093",
+          "note": "Zhang, Zhang and Gao 2011, On optimal hierarchy of load-bearing biological materials"
+        },
+        {
+          "doi": "10.1073/pnas.0631609100",
+          "note": "Gao, Ji, Jäger, Arzt and Fratzl 2003, Materials become insensitive to flaws at nanoscale: lessons from nature"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "biocomposite-toughness-from-hierarchy",
+      "n": 3,
+      "title": "Lean proof that the transcribed toughness recurrence is not monotone",
+      "kind": "formalization",
+      "method": "Take the same recurrence used in the sweep and define it in Lean as a function of level, volume fraction and the matrix parameters. Prove two algebraic facts, and nothing about continuum fracture. First, stiffness at level n is at most the Voigt bound set by the mineral fraction, so adding a level cannot raise stiffness above that bound. Second, there exists an open set of positive parameters on which toughness at level n+1 is strictly less than toughness at level n for some n ≤ 7. The second statement is the negation of unrestricted compounding. The proof obligation is the paper's recurrence as transcribed; if the transcription disagrees with the paper, the theorem is void rather than patched.",
+      "steps": [
+        "Define the recurrence in ThompsonLaws as a pure function of the paper's parameters.",
+        "Prove the Voigt upper bound on stiffness under that recurrence.",
+        "Exhibit a rational parameter point, checked in the proof, where toughness falls between two successive levels.",
+        "Compile with no sorry."
+      ],
+      "decisive_result": "A sorry-free Lean theorem that the transcribed recurrence is not monotone in the level count on a nonempty open set of positive parameters, together with the stiffness bound.",
+      "failure_signature": "The recurrence cannot be stated in Lean without extra scaling assumptions that make the decrease trivial, or the transcribed equations do not match Zhang, Zhang and Gao 2011, or sorry remains.",
+      "tools": [
+        "lean4"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1098/rspb.2010.1093",
+          "note": "Zhang, Zhang and Gao 2011, On optimal hierarchy of load-bearing biological materials"
+        }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "hollow-tube-mass-optimality",
+      "n": 1,
+      "title": "Lean: a gas-filled tube has no interior stiffness optimum",
+      "kind": "formalization",
+      "method": "For a circular tube, k = r_inner / r_outer in [0, 1). With the second moment of area held fixed, bone cross-sectional area is proportional to sqrt((1 − k^2) / (1 + k^2)). Prove in Lean that this factor is strictly decreasing in k, so with a weightless core the stiffness-per-mass minimum is the thin-wall limit and there is no interior optimum. That is the content of the gas-filled case of Currey and Alexander's mass argument, derived here rather than quoted as a number. Then define total mass per unit length with a core density ratio q = ρ_core / ρ_bone, μ(k) = (1 − k^2 + q k^2) times the radius factor required by the fixed second moment. Prove the critical-point equation obtained by differentiating μ, and prove that a critical point in (0, 1) exists only for q in an interval the proof identifies. Local buckling enters as a symbolic lower bound t/R ≥ C σ/E; the constrained optimum is the unconstrained critical point if it satisfies the inequality, and the boundary otherwise. The constant C stays a parameter. thompson1917-ch16-04 already has the uniform-stress thickness in Lean; this approach does not redo that theorem.",
+      "steps": [
+        "Define k, the fixed-second-moment area and μ(k, q) in ThompsonLaws.",
+        "Prove the gas-core area is strictly decreasing in k.",
+        "Derive and prove the stationarity condition for q > 0.",
+        "State the buckling constraint symbolically and the constrained argmin.",
+        "Compile with no sorry."
+      ],
+      "decisive_result": "Sorry-free theorems: gas-core area decreases strictly in k, and the core-density stationarity condition together with the interval of q on which an interior minimum exists.",
+      "failure_signature": "The gas-core monotonicity proof does not close, or differentiation of μ produces no interior critical point for any q, in which case the lemma is wrong and must not be restated to force a minimum.",
+      "tools": [
+        "lean4"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1111/j.1469-7998.1985.tb03551.x",
+          "note": "Currey and Alexander 1985, The thickness of the walls of tubular bones"
+        },
+        {
+          "doi": "10.1098/rspa.1995.0076",
+          "note": "Gibson, Ashby, Wegst and Olive 1995, The mechanical properties of natural materials. II. Microstructures for mechanical efficiency"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "hollow-tube-mass-optimality",
+      "n": 2,
+      "title": "Measured hollowness against the mass optimum and buckling",
+      "kind": "data-test",
+      "method": "Using the k-star and the buckling boundary from the Lean development, compare measured hollowness on every open record that supplies either an inner and outer radius or the two areas that define them. For a circular annulus, global compactness Cg = bone area / total area gives k = sqrt(1 − Cg). Amson and Bibi deposit humeral MeanArea, MeanC, cross-sectional shape and body mass for 152 mammal species (159 rows in the humerus file). MeanC is used as compactness only if their methods equate it with Cg; otherwise those rows are dropped from the k test and MeanArea is not a substitute. Alfieri, Nyakatura and Amson deposit cortical compactness and cortical area for humeri and femora of slow arboreal mammals, a lifestyle-biased long-bone set. The junco deposit has cortical thickness, total area and marrow area for femur and humerus of one species, which determine k directly. Bamboo is the one verified culm table with outer diameter and wall thickness on some internodes, plus the single Moso culm whose diameters and mean wall thickness are stated in Dixon and Gibson. Feather rachises are included only from the measurements printed in the 2017 Royal Society Open Science rachis paper, and only if that supplement can be fetched. A structure is at the stiffness optimum if |k − k-star(q)| ≤ 0.10, and at the buckling limit if it is within 0.10 of the buckling boundary and farther than 0.10 from k-star. The core ratio q is 0 for air-filled culms and pneumatic bones, and is the marrow-to-bone density ratio only when a fetched source states it. Tissue modulus must come from the same paper or the row is excluded from the buckling comparison. The problem's bar is at least 100 structures of at least four types; this approach reports that count and does not relax it.",
+      "steps": [
+        "Pre-register the 0.10 bands, the circular-annulus conversion and the rule for q before converting any table.",
+        "Confirm from Amson and Bibi's methods whether MeanC is global compactness; drop it if not.",
+        "Compute k for every row with a verified radius pair or area pair.",
+        "Attach a modulus only from the same paper, then classify each row.",
+        "Test whether the majority class is the stiffness optimum, the buckling boundary, or neither, by structure type."
+      ],
+      "decisive_result": "A classification of at least 100 structures from four types (long bones, stems, bamboo culms, feather rachises), each with a matched modulus, into at-optimum, at-buckling or neither, using the 0.10 bands. The optimality claim passes only if the majority of structures in most types are at-optimum rather than at-buckling.",
+      "failure_signature": "Fewer than four types have at least ten modulus-matched structures, so the acceptance bar is missed; or the measured k values fall mostly in neither class; or they cluster on the buckling boundary rather than on k-star.",
+      "tools": [
+        "python",
+        "data-test"
+      ],
+      "datasets": [
+        {
+          "name": "Amson and Bibi 2021 humeral structure table",
+          "url": "https://doi.org/10.6084/m9.figshare.12600440.v3",
+          "note": "RawDataHumerusR1.csv has 159 rows and 152 mammal species, with body mass, MeanArea and MeanC. MeanC enters the hollowness test only if the paper defines it as global compactness."
+        },
+        {
+          "name": "Alfieri, Nyakatura and Amson cortical compactness",
+          "url": "https://doi.org/10.6084/m9.figshare.12896249.v8",
+          "note": "TableS1_humeri.xlsx and TableS2_femora.xlsx give cortical compactness and cortical area for slow arboreal mammals. Lifestyle-biased; one structure type."
+        },
+        {
+          "name": "Junco hyemalis bone microstructure",
+          "url": "https://doi.org/10.6078/D1WT5H",
+          "note": "Cortical thickness, total cross-sectional area and marrow area for femur and humerus of one species, enough to compute k. Not a multi-species sample."
+        },
+        {
+          "name": "Elegant Experiments bamboo internode table",
+          "url": "http://www.elegantexperiments.net/datasets/bamboo-dataset-elegant-experiments.csv",
+          "note": "One culm labelled Phyllostachys, CC BY. Outer diameter and, for some internodes, wall thickness. A single bamboo example, not a species survey."
+        }
+      ],
+      "references": [
+        {
+          "doi": "10.1186/s12915-021-01016-1",
+          "note": "Amson and Bibi 2021, Differing effects of size and lifestyle on bone structure in mammals"
+        },
+        {
+          "doi": "10.1111/j.1469-7998.1985.tb03551.x",
+          "note": "Currey and Alexander 1985, The thickness of the walls of tubular bones"
+        },
+        {
+          "doi": "10.1098/rsif.2014.0321",
+          "note": "Dixon and Gibson 2014, The structure and mechanics of Moso bamboo material. One culm: outer diameter about 12.4 to 16.8 cm and a stated mean wall thickness."
+        },
+        {
+          "doi": "10.1098/rsos.160927",
+          "note": "Lees et al. 2017, Rachis morphology cannot accurately predict the mechanical performance of primary feathers in extant (and therefore fossil) feathered flyers"
+        }
+      ],
+      "difficulty": "hard",
+      "missing": "No public stem radius-and-wall compilation was verified. The feather paper's publisher page blocked a scripted fetch, so its table may be unreachable. Matched tissue moduli are missing for most long-bone rows, and the swarm has no calipers or scanner of its own."
+    },
+    {
+      "problem": "hollow-tube-mass-optimality",
+      "n": 3,
+      "title": "Plot every measured tube on the mass and buckling curves",
+      "kind": "computation",
+      "method": "Even if the four-type bar fails, the mass curve itself can be drawn for every structure that has both k and a same-paper modulus. Evaluate μ(k) from the Lean definition at fixed second moment, for q = 0 and for the marrow ratio if one has been fetched, and draw the buckling boundary t/R = C σ/E with C symbolic at three stated values (the value read from Gibson, Ashby, Wegst and Olive 1995 if the fetched text gives it, otherwise the three placeholders 0.1, 0.3 and 1 are not used; the script plots the boundary as a function of C and does not pick a favourite after seeing the data). Place each measured (k, E) on that plot. This computation does not declare the biological claim settled when n is small. It does say, for the structures in hand, whether they sit nearer the descending mass curve's thin-wall end or nearer a buckling boundary.",
+      "steps": [
+        "Import μ(k, q) from the same definition the Lean file uses.",
+        "Plot μ against k for q = 0 and for any fetched marrow ratio.",
+        "Overlay buckling boundaries for the C values the fetched shell formula supports.",
+        "Drop any structure without a same-paper modulus.",
+        "Report distances to k-star and to the boundary without refitting C."
+      ],
+      "decisive_result": "One plot of μ(k) and the buckling boundary with every modulus-matched structure marked, and the median |k − k-star| and median distance to the boundary. A type is called buckling-limited only if its median is within 0.10 of the boundary and more than 0.10 from k-star.",
+      "failure_signature": "Fewer than 20 structures have both k and a same-paper modulus, so the plot is an illustration and the approach fails its own sample gate; or the ranking of the two distances flips when C is varied across the values the shell formula allows.",
+      "tools": [
+        "python",
+        "lean4"
+      ],
+      "datasets": [
+        {
+          "name": "Amson and Bibi 2021 humeral structure table",
+          "url": "https://doi.org/10.6084/m9.figshare.12600440.v3",
+          "note": "Hollowness only, and only if MeanC is compactness. Modulus is not in this file, so these rows cannot enter the buckling overlay unless a matched modulus is fetched."
+        },
+        {
+          "name": "Elegant Experiments bamboo internode table",
+          "url": "http://www.elegantexperiments.net/datasets/bamboo-dataset-elegant-experiments.csv",
+          "note": "Geometry of one culm. Modulus must come from a fetched bamboo paper, not from this file."
+        }
+      ],
+      "references": [
+        {
+          "doi": "10.1098/rspa.1995.0076",
+          "note": "Gibson, Ashby, Wegst and Olive 1995, The mechanical properties of natural materials. II. Microstructures for mechanical efficiency"
+        },
+        {
+          "doi": "10.1098/rsif.2014.0321",
+          "note": "Dixon and Gibson 2014, The structure and mechanics of Moso bamboo material"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": "A specimen-matched modulus for the mammal humeri is not in the Amson table. The curve can still be drawn; most mammal points will lack a buckling coordinate."
+    },
+    {
+      "problem": "limb-bone-scaling-vs-mechanical-similarity",
+      "n": 1,
+      "title": "Phylogenetic slopes of limb-bone size on body mass",
+      "kind": "data-test",
+      "method": "Two open tables, analysed separately and then counted together. Campione and Evans, as redistributed in the MASSTIMATE package data frame extants, give body mass and humeral and femoral circumference for 245 extant tetrapods. Use only those extant rows. Dinosaur rows in the paper's supplement are excluded, because their masses are estimated from the limb bones. Amson and Bibi give body mass and humeral MeanArea for 152 mammal species, with a deposited timetree. The model is log(y) = α + β log(mass) + error, fitted by phylogenetic generalised least squares with Pagel's λ: covariance σ² (λ V + (1 − λ) I), λ by maximum likelihood. For circumference the three hypotheses are β = 1/3 (geometric), 3/8 (elastic) and 1/2 (stress). For cross-sectional area they are β = 2/3, 3/4 and 1. Campione circumferences also yield a circular-section area proxy C² / (4π), labelled as a proxy. A hypothesis is compatible if the 95 percent interval of β contains it, and it is the unique winner if it is the only compatible one. Clade fits use each order with at least 15 species. The exponent varies across clades if at least two such orders have intervals that exclude the pooled estimate. Mammal trees come from the Upham, Esselstyn and Jetz posterior; names are resolved through the organisms layer to GBIF. Reptiles in Campione are fitted by ordinary least squares unless a fetched tree file covers them, and that split is reported. The safety-factor claim is not measured here: constant stress under geometric posture is the area exponent 1, and no strain gauge data are in these tables. The problem asks for 300 taxa. The decisive count is the number of unique species across the two tables after name resolution. If that count is under 300, the fits are still reported and the coverage clause fails.",
+      "steps": [
+        "Pre-register the three exponents, the compatibility rule and the dinosaur exclusion before fitting.",
+        "Load MASSTIMATE extants and the Amson humerus table; resolve names to GBIF.",
+        "Build the mammal covariance from the Upham trees and the Amson timetree for that table.",
+        "Fit PGLS for humerus and femur, pooled and by order with n ≥ 15.",
+        "Report which hypotheses are compatible, and the unique-species count against 300."
+      ],
+      "decisive_result": "The PGLS slope and 95 percent interval for each bone and each table, the list of compatible hypotheses, the order-level slopes, and the unique-species count. A single similarity law is supported only if one hypothesis is the unique winner in both tables and no two large orders exclude the pooled estimate. The 300-taxon bar is met only if the deduplicated union reaches 300.",
+      "failure_signature": "Tree mismatch drops more than half the species; every interval is wider than 0.25 so no hypothesis is excluded; the two tables pick different unique winners; or the unique-species count stays under 300.",
+      "tools": [
+        "python",
+        "gbif",
+        "organisms-layer",
+        "data-test"
+      ],
+      "datasets": [
+        {
+          "name": "MASSTIMATE extants, Campione and Evans 2012 limb measurements",
+          "url": "https://cran.r-project.org/package=MASSTIMATE",
+          "note": "Data frame extants: 245 extant tetrapods, body mass in grams, humeral and femoral circumference in millimetres. The paper supplement is the same extant table plus dinosaur rows that this test excludes."
+        },
+        {
+          "name": "Campione and Evans 2012 paper",
+          "url": "https://doi.org/10.1186/1741-7007-10-60",
+          "note": "Source of the extant limb and body-mass table. Dinosaur masses in the supplement are estimated from limb dimensions and are not used as data."
+        },
+        {
+          "name": "Amson and Bibi 2021 humeral structure and timetree",
+          "url": "https://doi.org/10.6084/m9.figshare.12600440.v3",
+          "note": "152 mammal species with body mass and humeral MeanArea, plus AlteredTimetree.nex. Independent of the Campione circumference table."
+        },
+        {
+          "name": "Upham, Esselstyn and Jetz 2019 mammal trees",
+          "url": "https://doi.org/10.5061/dryad.tb03d03",
+          "note": "Posterior sample of node-dated mammal trees for the Campione mammal PGLS. Reptiles are not in this tree."
+        }
+      ],
+      "references": [
+        {
+          "doi": "10.1186/1741-7007-10-60",
+          "note": "Campione and Evans 2012, A universal scaling relationship between body mass and proximal limb bone dimensions in quadrupedal terrestrial tetrapods"
+        },
+        {
+          "doi": "10.1186/s12915-021-01016-1",
+          "note": "Amson and Bibi 2021, Differing effects of size and lifestyle on bone structure in mammals"
+        },
+        {
+          "doi": "10.1371/journal.pbio.3000494",
+          "note": "Upham, Esselstyn and Jetz 2019, Inferring the mammal tree"
+        },
+        {
+          "doi": "10.1126/science.179.4079.1201",
+          "note": "McMahon 1973, Size and shape in biology"
+        },
+        {
+          "doi": "10.1126/science.2740914",
+          "note": "Biewener 1989, Scaling body support in mammals: limb posture and muscle mechanics"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": "A reptile phylogeny file was not verified in the Campione supplement. In vivo bone strain and effective mechanical advantage are not in either table, so safety-factor flatness is not measured. The extant Campione table has 245 species, under the problem's 300 until the union is counted."
+    },
+    {
+      "problem": "limb-bone-scaling-vs-mechanical-similarity",
+      "n": 2,
+      "title": "Lean derivation of the three similarity exponents",
+      "kind": "formalization",
+      "method": "The data test needs its targets to be theorems. From the scaling assumptions, prove in Lean, next to the existing strength-to-weight lemmas in ThompsonLaws.Magnitude: geometric similarity (every length proportional to mass to the 1/3) implies cross-sectional area proportional to mass to the 2/3 and circumference to the 1/3; elastic similarity as McMahon stated it (diameter proportional to mass to the 3/8, length to the 1/4) implies area proportional to mass to the 3/4; stress similarity (force proportional to mass and stress equal to force over area held constant) implies area proportional to mass to the 1 and circumference to the 1/2. Prove the three area exponents are distinct. Also prove the posture lemma in elementary form: if effective mechanical advantage scales as mass to the γ, constant bone stress is compatible with area proportional to mass to the 1 − γ. No organism is asserted to follow any of these.",
+      "steps": [
+        "State the three assumption sets as Lean hypotheses.",
+        "Prove the area and circumference exponents.",
+        "Prove the exponents are pairwise distinct.",
+        "Prove the effective-mechanical-advantage correction 1 − γ.",
+        "Compile with no sorry and point the data test at these constants."
+      ],
+      "decisive_result": "Sorry-free theorems giving area exponents 2/3, 3/4 and 1, circumference exponents 1/3, 3/8 and 1/2, and the posture correction 1 − γ.",
+      "failure_signature": "One classical exponent does not follow from the assumptions as formalised. That hypothesis is then withdrawn from the data test rather than forced.",
+      "tools": [
+        "lean4"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1126/science.179.4079.1201",
+          "note": "McMahon 1973, Size and shape in biology"
+        },
+        {
+          "doi": "10.1126/science.2740914",
+          "note": "Biewener 1989, Scaling body support in mammals: limb posture and muscle mechanics"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "limb-bone-scaling-vs-mechanical-similarity",
+      "n": 3,
+      "title": "Does the area-mass exponent differ by lifestyle?",
+      "kind": "data-test",
+      "method": "The problem asks whether the exponent depends on posture. These tables do not contain effective mechanical advantage. Amson and Bibi do code lifestyle (aerial, terrestrial, aquatic, subterranean) and deposit a timetree. Fit log(MeanArea) = α_L + β_L log(mass) by PGLS inside each lifestyle with at least 20 species, using their tree. Posture dependence, in this proxy, is supported if at least one pair of lifestyles has slope estimates differing by more than 0.08 (the gap between 2/3 and 3/4) and non-overlapping 95 percent intervals. Lifestyle is not joint posture, and the write-up says so. This does not test safety-factor flatness.",
+      "steps": [
+        "Pre-register the 0.08 gap and the minimum of 20 species before fitting.",
+        "Split the humerus table by the deposited lifestyle codes.",
+        "Fit one PGLS slope per lifestyle on the deposited timetree.",
+        "Compare intervals pairwise.",
+        "State that the covariate is lifestyle, not effective mechanical advantage."
+      ],
+      "decisive_result": "Four lifestyle slopes with intervals. Dependence is accepted only if some pair differs by more than 0.08 with disjoint intervals. Otherwise the deposited lifestyle codes do not identify a different similarity law.",
+      "failure_signature": "Every lifestyle with at least 20 species has an interval that overlaps all three of 2/3, 3/4 and 1, or a lifestyle class falls under 20 species so the comparison cannot be made.",
+      "tools": [
+        "python",
+        "data-test"
+      ],
+      "datasets": [
+        {
+          "name": "Amson and Bibi 2021 humeral structure and timetree",
+          "url": "https://doi.org/10.6084/m9.figshare.12600440.v3",
+          "note": "Lifestyle codes and AlteredTimetree.nex are in the deposit. Body mass and MeanArea are the regression pair."
+        }
+      ],
+      "references": [
+        {
+          "doi": "10.1186/s12915-021-01016-1",
+          "note": "Amson and Bibi 2021, Differing effects of size and lifestyle on bone structure in mammals"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": "Effective mechanical advantage and in vivo strain are not in this file, so the safety-factor claim stays open."
+    },
+    {
+      "problem": "hygromorph-bilayer-scaling",
+      "n": 1,
+      "title": "Published curvature and response time against the bilayer laws",
+      "kind": "data-test",
+      "method": "The curvature formula and the diffusive time τ = h² / D are already theorems in ThompsonLaws.Hygromorphs (bilayerCurvature_ofEquilibrium, diffusiveTime_scale). The missing piece is the comparison with measurements. Extract, from tables when they exist and from figures only when they do not, every specimen that reports layer thicknesses, moduli and a swelling strain measured independently of the curvature, plus the measured curvature change. Response-time rows need thickness and a time constant after a humidity step. Sources to extract, in this order: Quan, Pirosa, Yang, Ritchie and Meyers 2021 (open access pine-cone scales), Reyssat and Mahadevan 2009 (pine scales and paper-polymer bilayers), Dawson, Vincent and Rocca 1997, Elbaum and colleagues 2007 on wheat awns, and Armon, Efrati, Kupferman and Sharon 2011 on chiral pods. Predicted curvature uses the Lean formula. Pass, pre-registered: median |κ_measured − κ_predicted| / |κ_predicted| ≤ 0.50, the sign of curvature correct in at least 90 percent of specimens, and the ordinary-least-squares slope of log(τ) on log(h) has a 95 percent interval that contains 2 and excludes 1 and 3. Swelling strains fitted from the curvature itself are forbidden. The problem's coverage bar is at least 20 specimens from five species, or fabricated bilayers at three thicknesses and two swelling mismatches. The Reyssat paper-polymer series is the fabricated arm and does not require the swarm to print.",
+      "steps": [
+        "Pre-register the 0.50 relative-error band, the sign rule and the slope exclusions before extracting numbers.",
+        "Pull independently measured inputs from the open papers; mark every figure-digitised point.",
+        "Reject rows whose swelling strain was fitted from curvature.",
+        "Compute Timoshenko curvature and the log-log time slope.",
+        "Score coverage against 20 specimens and five species, and against the fabricated-bilayer alternative."
+      ],
+      "decisive_result": "The per-specimen relative curvature error and the response-time slope with its interval, on a sample that meets one of the two coverage bars. The model passes only if the median relative error is ≤ 0.50, the sign is right in ≥ 90 percent of rows, and the time-slope interval contains 2 and excludes 1 and 3.",
+      "failure_signature": "The open record does not reach 20 specimens from five species or the fabricated thickness series; most papers only back-calculate swelling from curvature; the median relative error exceeds 0.50; or the time-slope interval misses 2 or includes 1 or 3.",
+      "tools": [
+        "python",
+        "lean4",
+        "data-test"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1016/j.actbio.2021.04.049",
+          "note": "Quan, Pirosa, Yang, Ritchie and Meyers 2021, Hydration-induced reversible deformation of the pine cone. Open access."
+        },
+        {
+          "doi": "10.1098/rsif.2009.0184",
+          "note": "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers"
+        },
+        {
+          "doi": "10.1038/37745",
+          "note": "Dawson, Vincent and Rocca 1997, How pine cones open"
+        },
+        {
+          "doi": "10.1126/science.1140097",
+          "note": "Elbaum, Zaltzman, Burgert and Fratzl 2007, The role of wheat awns in the seed dispersal unit"
+        },
+        {
+          "doi": "10.1126/science.1203874",
+          "note": "Armon, Efrati, Kupferman and Sharon 2011, Geometry and mechanics in the opening of chiral seed pods"
+        },
+        {
+          "doi": "10.1364/josa.11.000233",
+          "note": "Timoshenko 1925, Analysis of bi-metal thermostats"
+        }
+      ],
+      "difficulty": "hard",
+      "missing": "No humidity chamber and no printer, so no new specimens. Several of the papers expose only figures, and a scripted fetch of the Royal Society and Science landing pages returned 403, so some tables may be unreachable."
+    },
+    {
+      "problem": "hygromorph-bilayer-scaling",
+      "n": 2,
+      "title": "Size of curvature and time errors when the assumptions fail",
+      "kind": "computation",
+      "method": "Quantify the deviations the problem asks about, as a model bound rather than a plant measurement. Start from the two-layer Euler-Bernoulli equilibrium already proved in Lean and check that a numerical beam recovers κ = (3/2) Δε / h when thicknesses and moduli are equal, to within 1 percent. Then solve three extensions the theorems do not cover: a linear through-thickness modulus gradient, a standard-linear-solid viscoelastic branch in the active layer, and a fibre angle that adds the shear mismatch already defined for the antisymmetric-twist claim. On a grid of modulus ratio from 0.1 to 10, gradient strength, viscosity ratio and fibre angle from 0 to 45 degrees, record κ divided by the Timoshenko value and the apparent exponent d log τ / d log h.",
+      "steps": [
+        "Verify the numerical beam against bilayerCurvature_symmetric to 1 percent.",
+        "Add the modulus gradient, the viscoelastic branch and the fibre angle one at a time.",
+        "Sweep the pre-registered grid.",
+        "Tabulate relative curvature error and the apparent time exponent.",
+        "Mark cells where the absolute relative curvature error exceeds 0.50 or the time exponent leaves [1.5, 2.5]."
+      ],
+      "decisive_result": "The grid of κ / κ_Timoshenko and of the apparent time exponent. Deviations are large, by the pre-registered rule, where the absolute relative curvature error exceeds 0.50 or the time exponent leaves [1.5, 2.5]. The symmetric-case check must pass or the grid is void.",
+      "failure_signature": "The solver misses the Lean symmetric curvature by more than 1 percent, or the error changes sign when the mesh is refined by two, so the deviation table is a discretisation artefact.",
+      "tools": [
+        "fenics",
+        "python",
+        "lean4"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1098/rsif.2009.0184",
+          "note": "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers"
+        },
+        {
+          "doi": "10.1364/josa.11.000233",
+          "note": "Timoshenko 1925, Analysis of bi-metal thermostats"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "hygromorph-bilayer-scaling",
+      "n": 3,
+      "title": "Lean bound on curvature error under a modulus perturbation",
+      "kind": "formalization",
+      "method": "The equilibrium theorem already gives κ as a smooth function of the two moduli. Prove a perturbation bound: if both moduli are multiplied by factors within (1 − ε, 1 + ε) with ε < 1/2 and the thicknesses stay positive, the relative change in curvature is at most an explicit f(ε) derived from the formula, not a fitted constant. The bound covers modulus error only. Fibre angle, grading and viscosity are outside it, and the theorem says so. This is the piece of the deviation question that is an inequality rather than a sweep.",
+      "steps": [
+        "Treat bilayerCurvature as a function of the two moduli.",
+        "Differentiate it under the existing positivity hypotheses.",
+        "Prove a concrete relative-error inequality for ε < 1/2.",
+        "Compile with no sorry."
+      ],
+      "decisive_result": "A sorry-free theorem giving an explicit f such that the relative curvature change is ≤ f(ε) whenever both moduli move by at most the factor 1 + ε, ε < 1/2.",
+      "failure_signature": "The bound does not close without assuming the curvature formula rather than the equilibrium hypotheses, or sorry remains. Fibre angle and viscosity are not a failure; they are out of scope and must not be smuggled into the statement.",
+      "tools": [
+        "lean4"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1364/josa.11.000233",
+          "note": "Timoshenko 1925, Analysis of bi-metal thermostats"
+        }
+      ],
+      "difficulty": "hard",
+      "missing": null
+    },
+    {
+      "problem": "hygromorph-bilayer-scaling",
+      "n": 4,
+      "title": "Operator protocol for bilayers at three thicknesses",
+      "kind": "data-test",
+      "method": "The acceptance criterion allows printed bilayers of at least three thicknesses and two swelling mismatches instead of 20 plant specimens. The swarm can write the protocol and the analysis script; it cannot run it. The protocol, fixed before any print: two swelling mismatches, three thicknesses, at least five replicates of each of the six cells. Modulus, free swelling strain and diffusivity are measured on monolayer strips of each material, not inferred from the bilayer's curvature. Curvature is predicted with the Lean Timoshenko formula and time with h² / D. Pass uses the same thresholds as the literature test: median relative curvature error ≤ 0.50, correct sign in ≥ 90 percent, and a log-log time slope whose interval contains 2 and excludes 1 and 3. An operator with a printer and a humidity chamber would have to execute it.",
+      "steps": [
+        "Publish the protocol with the six-cell design and the pass thresholds.",
+        "Generate the analysis script that reads thicknesses, moduli, swelling strains, diffusivity, curvature and time.",
+        "Stop. Do not invent measurements.",
+        "If an operator later deposits a file, run the script unchanged."
+      ],
+      "decisive_result": "Measured curvature and response time on the six-cell design, scored with the pre-registered thresholds. The script alone is not the result.",
+      "failure_signature": "No operator runs the prints, which is the expected outcome, or the prints are run but the median relative error exceeds 0.50 or the time slope misses 2.",
+      "tools": [
+        "python",
+        "lean4"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1098/rsif.2009.0184",
+          "note": "Reyssat and Mahadevan 2009, Hygromorphs: from pine cones to biomimetic bilayers"
+        }
+      ],
+      "difficulty": "long-shot",
+      "missing": "A printer, a humidity chamber and an operator. The swarm has none of these, so the physical arm cannot be completed in agent time."
+    },
+    {
+      "problem": "biomineral-form-physical-vs-biological-control",
+      "n": 1,
+      "title": "Lattice angles against a foam and a Poisson-Voronoi null",
+      "kind": "data-test",
+      "method": "Segment at least 30 spherical lattice shells from Haeckel's Challenger plates (public domain) and from mikrotax pages that actually display a drawing or photograph. Plates 1 to 50 are Spumellaria (silica) and plates 129 to 140 are Acantharia (strontium sulphate); only lattice shells are measured, not spicular skeletons. Record the polygon side-count histogram and the interior angles at each vertex. Two nulls are generated by the swarm, not taken from a remembered table: a Poisson-Voronoi tessellation on the sphere with the same cell count, and a Lloyd (centroidal Voronoi) relaxation used as the foam proxy, whose vertices approach 120 degree meetings. The statistics are the circular standard deviation of vertex angles about 120 degrees, and the total-variation distance between side-count histograms. A shell supports the foam prediction if it is closer to the Lloyd null than to the Poisson-Voronoi null on both statistics. Pass is a pre-registered majority of at least 70 percent of the 30 shells. Drawings and photographs are scored separately; a foam match that appears only in drawings does not confirm the biological claim. Mineral independence, for thompson1917-ch09-15, is a permutation test of angle scatter between silica and strontium-sulphate lattice shells, and it is run only if at least ten lattice shells exist in each class. It fails if the permutation p is under 0.01 and the median angle scatter differs by more than 5 degrees. The same angle pipeline on nannotax coccoliths is the cellular-control contrast: they are not predicted to be foams, and the test only asks which null they are closer to. Mature shells do not show the vesicle grooves of thompson1917-ch09-14.",
+      "steps": [
+        "Pre-register the 70 percent majority, the 10-shell mineral gate and the drawing-versus-photograph split.",
+        "Download Haeckel plates and mikrotax images that display a lattice; skip pages without an image.",
+        "Segment sides and vertex angles for at least 30 shells.",
+        "Generate Poisson-Voronoi and Lloyd nulls matched in cell count.",
+        "Score foam versus Voronoi, then the mineral split, then the coccolith contrast."
+      ],
+      "decisive_result": "Side-count and angle-scatter distances for at least 30 shells, a foam majority only if at least 70 percent are closer to the Lloyd null on both statistics in the photograph subset as well as the drawings, and a mineral comparison only if both classes have at least ten lattice shells.",
+      "failure_signature": "Shells are no closer to the Lloyd foam than to Poisson-Voronoi; the foam match is confined to drawings; fewer than ten lattice shells exist for one mineral; or the mineral classes differ by more than 5 degrees at permutation p < 0.01, which refutes mineral independence.",
+      "tools": [
+        "python",
+        "image-segmentation",
+        "data-test"
+      ],
+      "datasets": [
+        {
+          "name": "Haeckel 1887 Challenger Radiolaria plates",
+          "url": "https://www.gutenberg.org/files/44527/44527-h/44527-h.htm",
+          "note": "Public-domain plates. Spumellaria plates 1 to 50 and Acantharia plates 129 to 140. Drawings, not photographs, so they are scored apart from modern images."
+        },
+        {
+          "name": "Internet Archive text of Haeckel's Radiolaria report",
+          "url": "https://archive.org/details/reportonradiolar01haecrich",
+          "note": "Plate volume and text for identifying which figures are lattice shells rather than spicules."
+        },
+        {
+          "name": "radiolaria@mikrotax",
+          "url": "https://www.mikrotax.org/radiolaria/index.php",
+          "note": "Developing Cenozoic radiolarian catalogue. Use only species pages that display a photograph or drawing."
+        },
+        {
+          "name": "Nannotax coccolith catalogue",
+          "url": "https://www.mikrotax.org/Nannotax3/",
+          "note": "Coccolith images as the cellular-control contrast. The foam test is not expected to pass here."
+        }
+      ],
+      "references": [
+        {
+          "doi": "10.1126/science.1102289",
+          "note": "Politi, Arad, Klein, Weiner and Addadi 2004, Sea urchin spine calcite forms via a transient amorphous calcium carbonate phase"
+        },
+        {
+          "doi": "10.1146/annurev-matsci-062910-095803",
+          "note": "Weiner and Addadi 2011, Crystallization pathways in biomineralization"
+        }
+      ],
+      "difficulty": "hard",
+      "missing": "Paired vesicle and mineral maps of growing shells are not in these archives, so the groove mechanism is untested. A modern image set of organic Clathrulina lattices was not verified. Mikrotax radiolaria is a developing catalogue and may lack thirty usable photographs."
+    },
+    {
+      "problem": "biomineral-form-physical-vs-biological-control",
+      "n": 2,
+      "title": "Twelve pentagons are a topological count",
+      "kind": "formalization",
+      "method": "A spherical lattice of hexagons and pentagons with three edges at every vertex has exactly twelve pentagons, by Euler's formula. Prove it in Lean from the handshaking hypotheses the statement names: V − E + F = 2, 2E = 3V, and 2E = 5P + 6H with F = P + H, hence P = 12. The count does not depend on a material parameter. That is the mineral-independence of this one integer, for thompson1917-ch09-15, and it does not say the angles are 120 degrees. Applicability is an empirical gate owned by the image test: if more than 20 percent of segmented vertices have degree other than 3, the hypothesis is not the biological case. The proof itself does not wait on that count.",
+      "steps": [
+        "State the handshaking hypotheses.",
+        "Prove P = 12.",
+        "Prove the count is unchanged if a material parameter is added to the context and never used.",
+        "Compile with no sorry."
+      ],
+      "decisive_result": "A sorry-free proof that any such lattice has exactly twelve pentagons, independent of material.",
+      "failure_signature": "The counting argument needs a graph library the development does not have and sorry remains, or the hypotheses cannot be stated without assuming the conclusion.",
+      "tools": [
+        "lean4"
+      ],
+      "datasets": [],
+      "references": [],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "biomineral-form-physical-vs-biological-control",
+      "n": 3,
+      "title": "Does the angle statistic separate foam from a template?",
+      "kind": "computation",
+      "method": "Before trusting the image test, check that its statistic has power. Generate two synthetic ensembles with the same cell count: Lloyd relaxations (foam proxy) and a cellular template that places pores on a perturbed regular lattice with a fixed defect set and does not minimise an energy. Compute the circular standard deviation of vertex angles about 120 degrees for each draw. The statistic is usable only if the two ensembles are separable. Pre-register separability as a gap of at least 2 degrees between the 95th percentile of the foam ensemble and the 5th percentile of the template ensemble, over at least 200 draws. The existing morpholib phase-separation audit of diatom pores is a related mechanism for thompson1917-ch09-14 but is not this radiolarian test and is not re-scored here.",
+      "steps": [
+        "Implement Lloyd relaxation on the sphere and the perturbed template.",
+        "Draw at least 200 realisations of each at matched cell counts.",
+        "Compute angle scatter about 120 degrees.",
+        "Apply the 2 degree percentile gap.",
+        "Hand the foam distribution to the image test as its null, only if the gap is met."
+      ],
+      "decisive_result": "The two angle-scatter distributions and the percentile gap. The image statistic is accepted for use only if the foam 95th percentile and the template 5th percentile differ by at least 2 degrees.",
+      "failure_signature": "The gap is under 2 degrees, so foam and template are not separable and the image test cannot decide physical versus cellular control.",
+      "tools": [
+        "python"
+      ],
+      "datasets": [],
+      "references": [],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "printed-stress-aligned-lattice-beats-uniform",
+      "n": 1,
+      "title": "Ideal-strut comparison of aligned and uniform lattices",
+      "kind": "computation",
+      "method": "The printed experiment needs a machine the swarm does not have. The mechanical piece can be settled for ideal struts. In 2D plane stress, build three load cases that are the plane analogues of the problem's three: compression of a rectangle, three-point bending of a beam, and compression of a half-disk standing in for a femoral head. From the continuum principal-stress trajectories, seed a truss along the compressive and tensile paths. Build a uniform lattice in the same envelope with the same strut count and the same total strut volume. Same modulus, linear elasticity. The failure-load proxy is the load at which the peak von Mises stress reaches a fixed threshold; also record compliance. Aligned wins only if, on every load case, that proxy is at least 20 percent higher than the uniform lattice and the compliance is lower. A 3D femoral head is not required for this approach. Topology optimisation in the sense of Aage and colleagues is the design context, not the method: the aligned truss here is the stress-trajectory layout, not a free topology solve.",
+      "steps": [
+        "Freeze envelopes, strut count, total volume and the 20 percent rule before meshing.",
+        "Solve the continuum problem and trace principal trajectories.",
+        "Build the aligned truss and the equal-mass uniform lattice.",
+        "Compute compliance and the failure-load proxy on all three load cases.",
+        "Declare a win only if all three cases agree."
+      ],
+      "decisive_result": "Failure-load proxy and compliance for both layouts on all three load cases. Alignment wins only if every case shows at least a 20 percent higher failure-load proxy and a lower compliance at equal mass and equal strut count.",
+      "failure_signature": "The gain is under 5 percent on any load case, the ranking reverses across load cases, or the two layouts do not share the envelope and the volume, which voids the comparison.",
+      "tools": [
+        "fenics",
+        "python"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1038/nature23911",
+          "note": "Aage, Andreassen, Lazarov and Sigmund 2017, Giga-voxel computational morphogenesis for structural design"
+        },
+        {
+          "doi": "10.1007/s00158-016-1420-7",
+          "note": "Sigmund, Aage and Andreassen 2016, On the (non-)optimality of Michell structures"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": "No stereolithography printer and no testing machine. This approach does not claim to be the printed experiment."
+    },
+    {
+      "problem": "printed-stress-aligned-lattice-beats-uniform",
+      "n": 2,
+      "title": "Does assumed strut-radius noise erase the gain?",
+      "kind": "computation",
+      "method": "On the meshes from the ideal comparison, multiply each strut radius by an independent lognormal draw. Two coefficients of variation, 0.05 and 0.10, and 30 draws each, are assumed stand-ins, not measurements from a printer. They are frozen before the sweep. If a fetched paper states a measured stereolithography radius coefficient for a tough resin, that value replaces 0.05 before any draw is looked at, and the replacement is recorded. The advantage survives at 0.05 only if the 5th percentile of the aligned failure-load proxy still exceeds the 95th percentile of the uniform lattice. The 0.10 runs are reported and are not required to pass.",
+      "steps": [
+        "Freeze the two coefficients and the percentile rule before perturbing radii.",
+        "Search once for a measured printer coefficient; adopt it only if the page is fetched, and only before the sweep.",
+        "Run 30 draws at each coefficient on all three load cases.",
+        "Compare the 5th percentile of the aligned layout with the 95th of the uniform layout.",
+        "Do not retune the coefficient after seeing the ranking."
+      ],
+      "decisive_result": "At coefficient 0.05, the aligned 5th percentile exceeds the uniform 95th percentile on every load case. The 0.10 ensemble is reported beside it.",
+      "failure_signature": "At coefficient 0.05 the two failure-load distributions overlap by the percentile rule on any load case, so the ideal gain does not survive this noise model.",
+      "tools": [
+        "fenics",
+        "python"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1038/nature23911",
+          "note": "Aage, Andreassen, Lazarov and Sigmund 2017, Giga-voxel computational morphogenesis for structural design"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": "A measured strut-radius coefficient for the resin and printer that would actually be used. The coefficients 0.05 and 0.10 are assumptions."
+    },
+    {
+      "problem": "printed-stress-aligned-lattice-beats-uniform",
+      "n": 3,
+      "title": "Two-bar single-load lemma and a two-load counterexample",
+      "kind": "mixed",
+      "method": "A full Michell continuum proof is not the target. Prove a two-bar lemma in Lean: under a single load and a stress constraint, the minimum-volume two-bar layout aligns the bars with the load. Then, in a small numerical example with two load cases, compare that single-load aligned layout with a uniform two-bar layout of equal volume. The point of Sigmund, Aage and Andreassen is that single-load optimality need not survive a second load. Sweep the load ratio on a pre-registered grid from 0.1 to 10. The counterexample succeeds if, at some ratio, the aligned layout's peak stress exceeds the uniform layout's.",
+      "steps": [
+        "Prove the two-bar single-load minimum in Lean with no sorry.",
+        "Code the two-load numerical comparison at equal volume.",
+        "Sweep the load ratio from 0.1 to 10.",
+        "Record the ratios at which the ranking reverses.",
+        "Keep the Lean lemma and the numerical reversal as separate claims."
+      ],
+      "decisive_result": "A sorry-free two-bar lemma, and at least one load ratio on the grid where the single-load aligned layout has higher peak stress than the equal-volume uniform layout.",
+      "failure_signature": "The ranking never reverses on the grid, so this approach has not exhibited the non-optimality, or the Lean lemma still has sorry.",
+      "tools": [
+        "lean4",
+        "python"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1007/s00158-016-1420-7",
+          "note": "Sigmund, Aage and Andreassen 2016, On the (non-)optimality of Michell structures"
+        }
+      ],
+      "difficulty": "tractable",
+      "missing": null
+    },
+    {
+      "problem": "printed-stress-aligned-lattice-beats-uniform",
+      "n": 4,
+      "title": "Printed replicates the swarm cannot test itself",
+      "kind": "data-test",
+      "method": "Write the pre-registered physical protocol that matches the problem's acceptance criterion, and generate the STL files from the ideal-strut layouts. At least ten replicates of each layout, three load cases, equal mass and equal strut count, same resin and the same stereolithography process. Outcomes are peak load and energy to failure. Alignment wins only if it exceeds the uniform lattice by more than the replicate-to-replicate standard deviation on both outcomes, on every load case. A ranking that flips across load cases refutes a general advantage. The swarm stops at the protocol and the files. An operator would have to print and test.",
+      "steps": [
+        "Freeze the replicate count, the outcomes and the variability rule.",
+        "Export STL files of both layouts for the three load cases.",
+        "Write the analysis script that compares peak load and energy against the replicate scatter.",
+        "Do not invent test results.",
+        "If an operator deposits a results file, run the script unchanged."
+      ],
+      "decisive_result": "Peak load and energy to failure for at least ten replicates of each layout on three load cases. Alignment is supported only if both outcomes exceed the uniform lattice by more than the print-to-print standard deviation on every load case.",
+      "failure_signature": "No prints are run, or the printed aligned lattice does not clear the replicate scatter, or the ranking reverses between load cases.",
+      "tools": [
+        "python",
+        "fenics"
+      ],
+      "datasets": [],
+      "references": [
+        {
+          "doi": "10.1038/nature23911",
+          "note": "Aage, Andreassen, Lazarov and Sigmund 2017, Giga-voxel computational morphogenesis for structural design"
+        },
+        {
+          "doi": "10.1038/nmat4089",
+          "note": "Wegst, Bai, Saiz, Tomsia and Ritchie 2015, Bioinspired structural materials"
+        }
+      ],
+      "difficulty": "long-shot",
+      "missing": "An SLA printer, a tough resin, a universal testing machine and a post-processing line. The problem states that an operator has to print and test; the swarm cannot."
+    }
+  ]
+}

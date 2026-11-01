@@ -1,0 +1,149 @@
+{
+  "claim_id": "thompson1917-ch11-22",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-02" },
+  "variables_needed": [
+    "coiling parameters (or 3D shell form) per shell for gastropods, cephalopods, foraminifera and tube worms on a common protocol",
+    "geological age of each specimen or taxon (occurrence-level)",
+    "environment of each occurrence (climate zone, depth, marine habitat)",
+    "taxonomic identity and phylogeny to separate recurrence from relatedness"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-going-round-the-twist-gastropod-coiling",
+      "name": "Data associated with: Going round the twist, an empirical analysis of shell coiling in helicospiral gastropods (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.p5hqbzknw",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.p5hqbzknw",
+      "doi": "10.5061/dryad.p5hqbzknw",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:13:50Z", "method": "GET Dryad dataset metadata (storageSize 532,024,549 bytes); Zenodo listing shows Collins_et_al_data.zip 521,094,347 bytes; files not downloaded", "http_status": 200 },
+      "variables_present": [
+        "176 fossil and modern gastropod shells (25 species) with an empirical morphospace of coiling (abstract)"
+      ],
+      "variables_missing": [
+        "gastropods only; no cephalopod, foraminifer or tube-worm shells",
+        "geological period and climate of each shell not confirmed from metadata"
+      ],
+      "scope": "176 shells, 25 gastropod species, fossil and modern",
+      "evidence": "Dryad API abstract text: 'Using a dataset of 176 fossil and modern gastropod shells...'; license CC0-1.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-gastropod-coiling-functional-constraints",
+      "name": "Data from: Functional constraints on coiling geometry and aperture inclination in gastropods (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.6mk023c0",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.6mk023c0",
+      "doi": "10.5061/dryad.6mk023c0",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:13:51Z", "method": "GET Dryad dataset metadata (storageSize 2,749,073 bytes)", "http_status": 200 },
+      "variables_present": [
+        "theoretical-morphology simulations and a functional morphospace of gastropod coiling (abstract)"
+      ],
+      "variables_missing": [
+        "simulated forms rather than a scan sample; gastropods only"
+      ],
+      "scope": "gastropod coiling morphospace",
+      "evidence": "Dryad API abstract; license CC0-1.0",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource-coiled-shell-media",
+      "name": "MorphoSource: gastropod and foraminifera media (API)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Foraminifera",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:13:56Z", "method": "GET /api/media: Foraminifera 75 media (74 open, 1 restricted; 38 meshes, 37 volumetric series; first three are Nummulites micro-CT meshes), Gastropoda 6 (4 open), Serpulidae 0, Spirorbis 0; Nautilus 1, Ammonoidea 1 from the cephalopod check", "http_status": 200 },
+      "variables_present": [
+        "open micro-CT meshes of foraminifera (75 media, a Nummulites series among them)"
+      ],
+      "variables_missing": [
+        "gastropod and cephalopod coverage is a handful of media; no tube worms (0 for Serpulidae and Spirorbis)",
+        "no common coiling parameters, geological age or environment fields on the media records"
+      ],
+      "scope": "full-text hits on the media API",
+      "evidence": "pages.total_count and publication_status facets per query as listed",
+      "verdict": "partial",
+      "reuses_organism_dataset": "morphosource-media-2026-10-31"
+    },
+    {
+      "id": "pbdb-spiral-shell-groups",
+      "name": "Paleobiology Database: occurrences of Gastropoda, Ammonoidea, Foraminifera, Nautiloidea and Serpulidae",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Gastropoda&show=attr",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:14:00Z", "method": "GET taxa/single.json for each group; noc values: Gastropoda 170,691; Ammonoidea 94,568; Foraminifera 196,776; Nautiloidea 2,467; Serpulidae 2,390 (Spirorbinae not found in the taxonomy table)", "http_status": 200 },
+      "variables_present": [
+        "occurrence counts by group; occurrences carry age, geography and environment fields in the PBDB occurrence service (not queried here)"
+      ],
+      "variables_missing": [
+        "no shell shape or coiling parameters",
+        "tube-worm coverage thin (2,390 Serpulidae occurrences; Spirorbinae not recognised)"
+      ],
+      "scope": "fossil occurrences through time worldwide",
+      "evidence": "noc fields in the single-taxon records",
+      "verdict": "partial",
+      "reuses_organism_dataset": "pbdb-occurrences-ammonoidea-2026-10-31"
+    },
+    {
+      "id": "obis-gastropoda-foraminifera",
+      "name": "OBIS: Gastropoda and Foraminifera occurrence counts",
+      "landing_url": "https://obis.org/",
+      "access_url": "https://api.obis.org/v3/occurrence?scientificname=Gastropoda&size=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T05:14:02Z", "method": "GET OBIS v3 occurrence with size=0: Gastropoda total 4,494,588; Foraminifera total 1,515,976", "http_status": 200 },
+      "variables_present": [
+        "living marine occurrences with locality (and often depth) for gastropods and foraminifera"
+      ],
+      "variables_missing": [
+        "no shell form data; modern marine only, so no geological periods"
+      ],
+      "scope": "living marine occurrences",
+      "evidence": "response total field",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "mikrotax",
+      "name": "Mikrotax (microfossil taxonomy websites)",
+      "landing_url": "https://www.mikrotax.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T05:14:20Z", "method": "GET landing page text: 'a set of websites documenting the taxonomy of microfossils', each with its own database, bibliography and image collection", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["taxonomic and image sites; no downloadable coiling measurements or shape table identified"],
+      "scope": "web portal",
+      "evidence": "landing page text as quoted",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "shell coiling morphospace gastropod", "url": "https://datadryad.org/api/v2/search?q=shell%20coiling%20morphospace%20gastropod&per_page=6", "hits": 2, "note": "also 'Raup coiling parameters' 1 and 'foraminifera test coiling morphology' 2 (Fohsella lineage 10.5061/dryad.h8fr1, K/Pg aberrant foraminifera 10.5061/dryad.n1q6527; not opened)" },
+    { "source": "DataCite", "query": "shell coiling parameters Raup gastropod ammonoid morphospace", "url": "https://api.datacite.org/dois?query=shell%20coiling%20parameters%20Raup%20gastropod%20ammonoid%20morphospace&page[size]=6", "hits": 0, "note": "'planispiral coiling foraminifera test morphometrics' also 0" },
+    { "source": "Zenodo", "query": "coiling morphospace Raup shell parameters dataset", "url": "https://zenodo.org/api/records?q=coiling%20morphospace%20Raup%20shell%20parameters%20dataset&size=6", "hits": 475662, "note": "unfiltered noise; surfaced PDF papers on ammonoid shell models only" },
+    { "source": "MorphoSource API", "query": "media q=Foraminifera / Gastropoda / Serpulidae / Spirorbis", "url": "https://www.morphosource.org/api/media?q=Foraminifera&per_page=3", "hits": 75, "note": "" },
+    { "source": "PBDB taxa API", "query": "single-taxon records for five spiral-shell groups", "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Foraminifera&show=attr", "hits": 1, "note": "see noc counts" },
+    { "source": "OBIS API", "query": "occurrence totals Gastropoda, Foraminifera", "url": "https://api.obis.org/v3/occurrence?scientificname=Gastropoda&size=0", "hits": 4494588, "note": "Foraminifera 1,515,976" }
+  ],
+  "status": "partial",
+  "summary": "Occurrence data by period and environment are large for all four groups except tube worms (PBDB: gastropods 170,691, ammonoids 94,568, foraminifera 196,776), and shell form data are open for gastropods (176 shells in a CC0 Dryad set) and foraminifera (75 MorphoSource media), but no dataset parameterises coiling across gastropods, cephalopods, foraminifera and tube worms on one protocol and none ties shell form to age and environment.",
+  "next_step": "Decide which coiling parameterisation will be used, then compile it per taxon from published shell parameters (gastropod Dryad set, ammonoid literature, foraminiferal tests) and join to PBDB occurrence age and environment by genus.",
+  "obstacles_confirmed": [
+    "No common measurement protocol across the four groups exists in a repository.",
+    "Tube-worm shells are absent from MorphoSource (Serpulidae and Spirorbis returned 0) and thin in PBDB.",
+    "Occurrence and shell-form data are in different databases and must be linked at genus level."
+  ]
+}

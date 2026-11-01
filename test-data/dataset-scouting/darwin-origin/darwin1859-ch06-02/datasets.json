@@ -1,0 +1,266 @@
+{
+  "claim_id": "darwin1859-ch06-02",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T05:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "darwin-01"
+  },
+  "variables_needed": [
+    "range extent of each member of a closely allied (sister or representative) species pair",
+    "width of the zone where both occur, from fine-scale georeferenced occurrences",
+    "relative abundance along a gradient toward each range limit",
+    "a list of sister or representative species pairs"
+  ],
+  "datasets": [
+    {
+      "id": "ebird",
+      "name": "eBird (Basic Dataset, status and trends products)",
+      "landing_url": "https://ebird.org/science/download-ebird-data-products",
+      "access_url": "https://ebird.org/data/download",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T03:28:45Z",
+        "method": "GET https://ebird.org/science/download-ebird-data-products; GET https://ebird.org/data/download; GET https://science.ebird.org/use-ebird-data/download-ebird-data-products; GET https://api.ebird.org/v2/ref/taxonomy/ebird?fmt=json&species=amerob",
+        "http_status": 200,
+        "note": "Download pages redirect to the Cornell CAS login (ebird.org/data/download ended at secure.birds.cornell.edu/cassso/login with HTTP 200; the other two returned HTTP 302 with a meta refresh to the login). The public taxonomy reference endpoint returned HTTP 200 without a key."
+      },
+      "variables_present": [
+        "checklist-level abundance and locality for birds (per eBird's own description; not accessible to me)"
+      ],
+      "variables_missing": [
+        "any file or count I could inspect without login"
+      ],
+      "scope": "Global birds; the Basic Dataset needs an account and access request",
+      "evidence": "All three download-page URLs ended at a login page. api.ebird.org taxonomy reference returned a record for American Robin (Turdus migratorius, speciesCode amerob) with no key; data endpoints were not tried. The same observations are partly mirrored in GBIF (see gbif-ebird-observation-dataset).",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF occurrence API",
+      "landing_url": "https://api.gbif.org/v1/occurrence/search?limit=0",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:21Z",
+        "method": "GET api.gbif.org/v1/occurrence/search?limit=0; same with taxonKey=212&hasCoordinate=true and facet=speciesKey; GET https://www.gbif.org/",
+        "http_status": 200,
+        "note": "https://www.gbif.org/ itself returned HTTP 403 (Cloudflare 'Just a moment...' challenge) to a scripted request; the API at api.gbif.org answered HTTP 200"
+      },
+      "variables_present": [
+        "georeferenced occurrences by species (point coordinates)",
+        "some records with individualCount"
+      ],
+      "variables_missing": [
+        "standardized abundance for most taxa",
+        "pre-listed sister species pairs",
+        "range polygons"
+      ],
+      "scope": "Global, all taxa; occurrence count with no filter 3887469368; taxonKey=212 (birds) with hasCoordinate=true 2244062493",
+      "evidence": "occurrence/search?limit=0 returned count 3887469368; taxonKey=212&hasCoordinate=true returned 2244062493; facet=speciesKey&facetLimit=1 returned the top species with 29150083 records. The queue lists three GBIF entries under different names; merged here.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "obis",
+      "name": "OBIS occurrence API",
+      "landing_url": "https://obis.org/",
+      "access_url": "https://api.obis.org/v3/occurrence",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:21Z",
+        "method": "GET https://obis.org/; GET api.obis.org/v3/occurrence?size=0; GET ...?size=1&fields=scientificName,decimalLatitude,decimalLongitude,minimumDepthInMeters,maximumDepthInMeters",
+        "http_status": 200
+      },
+      "variables_present": [
+        "marine occurrences with latitude, longitude and minimum/maximum depth in metres"
+      ],
+      "variables_missing": [
+        "abundance standardization",
+        "sister pair list"
+      ],
+      "scope": "Marine only; total 245030035 occurrence records",
+      "evidence": "occurrence?size=0 returned total 245030035; one record returned decimalLatitude -32, decimalLongitude 115.41667, min/max depth 20 m, scientificName Prymnesiales. The queue lists two OBIS entries; merged here.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree opentree16.1)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:12:01Z",
+        "method": "POST https://api.opentreeoflife.org/v3/tree_of_life/about; POST /v3/tree_of_life/mrca",
+        "http_status": 200
+      },
+      "variables_present": [
+        "tree topology from which sister species pairs can be extracted",
+        "taxonomy"
+      ],
+      "variables_missing": [
+        "occurrence/range data",
+        "abundance"
+      ],
+      "scope": "2385875 tips, synth_id opentree16.1",
+      "evidence": "tree_of_life/about returned num_tips 2385875 and num_source_trees 2064; tree_of_life/mrca for two OTT ids returned an MRCA node with 33 tips.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif-ebird-observation-dataset",
+      "name": "EOD - eBird Observation Dataset (published through GBIF)",
+      "landing_url": "https://api.gbif.org/v1/dataset/4fa7b334-ce0d-4e88-aaae-2e0c138d049e",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?datasetKey=4fa7b334-ce0d-4e88-aaae-2e0c138d049e",
+      "doi": "10.15468/aomfnb",
+      "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:13:07Z",
+        "method": "GET api.gbif.org/v1/dataset?q=eBird; GET /v1/dataset/<key>; GET /v1/occurrence/search?datasetKey=<key>&limit=0; same with taxonKey=212&hasCoordinate=true&limit=1",
+        "http_status": 200
+      },
+      "variables_present": [
+        "georeferenced presence records per bird species",
+        "individualCount per record",
+        "event date"
+      ],
+      "variables_missing": [
+        "standardized effort per checklist (not seen in the GBIF fields I inspected)",
+        "pre-computed range polygons or sister-species pairs"
+      ],
+      "scope": "Global birds; occurrence search with datasetKey returned count 1672931106",
+      "evidence": "GBIF dataset search q=eBird returned 22 datasets, the first titled 'EOD – eBird Observation Dataset', DOI 10.15468/aomfnb, key 4fa7b334-ce0d-4e88-aaae-2e0c138d049e. occurrence/search?datasetKey=<key>&limit=0 returned count 1672931106. One record fetched (Progne chalybea) showed decimalLatitude/decimalLongitude, individualCount 10, eventDate 2025-01-18, basisOfRecord HUMAN_OBSERVATION, license CC BY 4.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-dispersal-transition-to-sympatry-7qj70",
+      "name": "Data from: Dispersal and the transition to sympatry in vertebrates (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.7qj70",
+      "access_url": null,
+      "doi": "10.5061/dryad.7qj70",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.7qj70 and its version files list",
+        "http_status": 200,
+        "bytes": 199727
+      },
+      "variables_present": [
+        "data on the transition from allopatry/parapatry to sympatry in vertebrate (sister-species) groups (per abstract; columns not opened)"
+      ],
+      "variables_missing": [
+        "abundance toward range edges",
+        "zone widths at point-occurrence resolution"
+      ],
+      "scope": "Vertebrates; scope of species pairs not inspected",
+      "evidence": "Dryad API HTTP 200; publicationDate 2014-11-20; abstract concerns the extent of range overlap among previously isolated forms. Files listed by the API: Dataset S1.csv (79785 B), Dataset S2.xlsx (22644 B), Dataset S3.xlsx (97298 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-elevational-divergence-sister-birds-6qg3g",
+      "name": "Data from: Competitive interactions upon secondary contact drive elevational divergence in tropical birds (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.6qg3g",
+      "access_url": null,
+      "doi": "10.5061/dryad.6qg3g",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T05:14:35Z",
+        "method": "GET https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.6qg3g and its version files list",
+        "http_status": 200,
+        "bytes": 39327
+      },
+      "variables_present": [
+        "database of sister species of tropical montane birds from 41 families in three regions (per abstract), including elevational distributions"
+      ],
+      "variables_missing": [
+        "abundance profiles",
+        "other taxa and temperate regions"
+      ],
+      "scope": "Tropical montane birds, Neotropics and two other regions",
+      "evidence": "Dryad API HTTP 200; publicationDate 2015-05-26; abstract: 'a database of sister species of tropical montane birds from 41 families and three regions'. Files listed by the API: Appendix1_22May.xlsx (39327 B). License field https://spdx.org/licenses/CC0-1.0.html. Files not downloaded.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "DataCite",
+      "query": "hybrid zone width sister species avian contact zone range overlap",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=hybrid%20zone%20width%20sister%20species%20avian%20contact%20zone%20range%20overlap",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "DataCite",
+      "query": "parapatric replacement elevational transect bird abundance range limit",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=parapatric%20replacement%20elevational%20transect%20bird%20abundance%20range%20limit",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Dryad",
+      "query": "parapatric sister species contact zone range overlap",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=parapatric%20sister%20species%20contact%20zone%20range%20overlap",
+      "hits": 2,
+      "note": "10.5061/dryad.k6djh9w8p (hybridization genetic structure) and 10.5061/dryad.8cj221n (Zosterops reproductive isolation) not examined"
+    },
+    {
+      "source": "Dryad",
+      "query": "hybrid zone width cline range abundance",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=hybrid%20zone%20width%20cline%20range%20abundance",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Zenodo",
+      "query": "avian sister species range overlap sympatry contact zone dataset",
+      "url": "https://zenodo.org/api/records?size=5&q=avian%20sister%20species%20range%20overlap%20sympatry%20contact%20zone%20dataset",
+      "hits": 1650498,
+      "note": "full-text noise; relevant Dryad records: 10.5061/dryad.7qj70, 10.5061/dryad.6qg3g; also 10.5061/dryad.j407q (Townsend's / black-throated green warbler hybridization) not examined"
+    },
+    {
+      "source": "GBIF",
+      "query": "dataset?q=eBird",
+      "url": "https://api.gbif.org/v1/dataset?q=eBird&limit=3",
+      "hits": 22,
+      "note": "eBird Observation Dataset found, key 4fa7b334-ce0d-4e88-aaae-2e0c138d049e"
+    }
+  ],
+  "status": "partial",
+  "summary": "Point occurrences with some counts are open at very large scale (GBIF 3,887,469,368 records; eBird Observation Dataset via GBIF 1,672,931,106; OBIS 245,030,035 with depth), which would support range and overlap-width estimates, but standardized abundance toward range edges lives in the eBird Basic Dataset behind a login and was not inspectable. Small deposited sister-species range tables exist (Dryad 7qj70, 6qg3g) but none gives edge abundance profiles or a general list of representative pairs.",
+  "next_step": "Request the eBird Basic Dataset for a few avian pairs and use OTL or a sister-pair table (Dryad 10.5061/dryad.7qj70) to choose pairs; pre-register overlap width as a share of range width at a stated grid resolution and an edge-decline metric with effort covariates.",
+  "obstacles_confirmed": [
+    "eBird data downloads sit behind a login.",
+    "GBIF occurrence density reflects observer effort, not abundance.",
+    "Abundance toward range edges is available only for birds in the sources found."
+  ]
+}

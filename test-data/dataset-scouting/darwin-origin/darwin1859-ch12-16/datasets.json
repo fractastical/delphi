@@ -1,0 +1,106 @@
+{
+  "claim_id": "darwin1859-ch12-16",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T06:10:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-02" },
+  "variables_needed": [
+    "species-by-region presence for many region pairs (so shared species can be counted)",
+    "a way to identify allied or representative species pairs (sister species or congeners) across regions",
+    "a count of doubtful forms per region pair (species versus variety rank instability, synonymy)",
+    "region area and survey-effort covariates"
+  ],
+  "datasets": [
+    {
+      "id": "wcvp-distribution-and-names",
+      "name": "World Checklist of Vascular Plants (WCVP): wcvp_distribution.csv and wcvp_names.csv",
+      "landing_url": "http://sftp.kew.org/pub/data-repositories/WCVP/",
+      "access_url": "http://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T05:29:00Z", "method": "HEAD wcvp.zip; HTTP Range requests for the zip central directory and the first rows of the distribution and names CSV members", "http_status": 200, "bytes": 88179649 },
+      "variables_present": [
+        "species presence by TDWG level-3 area (area_code_l3, area) with introduced, extinct and location_doubtful flags (wcvp_distribution.csv)",
+        "genus and species per name, taxon_rank, taxon_status, infraspecific_rank and accepted-name links (wcvp_names.csv), usable for congener counts and variety/synonym counts"
+      ],
+      "variables_missing": ["phylogeny (sister relationships need an external tree)", "survey effort", "animals"],
+      "scope": "vascular plants worldwide; wcvp_distribution.csv is 141,657,561 B and wcvp_names.csv 300,826,661 B uncompressed (88,179,649 B zip)",
+      "evidence": "Central directory lists README_WCVP.xlsx, wcvp_distribution.csv, wcvp_names.csv. wcvp_distribution.csv header: plant_locality_id|plant_name_id|continent_code_l1|continent|region_code_l2|region|area_code_l3|area|introduced|extinct|location_doubtful. wcvp_names.csv header includes genus|species|taxon_rank|taxon_status|infraspecific_rank|accepted_plant_name_id|... Archive not downloaded.",
+      "verdict": "holds"
+    },
+    {
+      "id": "catalogue-of-life-checklistbank-3lr",
+      "name": "Catalogue of Life via ChecklistBank API (dataset 3LR)",
+      "landing_url": "https://api.checklistbank.org/dataset/3LR/nameusage/search?status=synonym&limit=0",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T05:20:28Z", "method": "GET nameusage/search with limit=0 and filters status=synonym, rank=species&status=accepted, rank=subspecies (each request took about 30 s)", "http_status": 200 },
+      "variables_present": ["accepted species, subspecies and synonym name usages across kingdoms (a basis for counting synonymy and infraspecific ranks)"],
+      "variables_missing": ["per-region species presence (distribution not queried)", "phylogeny"],
+      "scope": "dataset 3LR totals: accepted species 2,193,940; subspecies name usages 306,196; synonym name usages 2,606,330",
+      "evidence": "Responses {\"total\":2193940,...}, {\"total\":306196,...}, {\"total\":2606330,...} (HTTP 200).",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif-occurrences-by-country",
+      "name": "GBIF occurrence search API (country facet)",
+      "landing_url": "https://api.gbif.org/v1/occurrence/search?taxonKey=6&limit=0&facet=country&facetLimit=5",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": "per-record CC0 / CC BY / CC BY-NC (GBIF)",
+      "suggested_by": ["grok", "gemini", "gpt"],
+      "checked": { "at": "2026-11-01T05:19:16Z", "method": "GET occurrence/search with taxonKey=6 (Plantae), limit=0, facet=country", "http_status": 200 },
+      "variables_present": ["species-by-country occurrence records (queryable per species and country)", "occurrence counts by country usable as an effort proxy"],
+      "variables_missing": ["not a checklist: species lists per country must be built from occurrences; per-country effort is very uneven"],
+      "scope": "Plantae: 652,196,829 occurrence records; top countries FR 95,686,963, GB 91,517,476, US 57,007,830, SE 40,858,989, DE 36,470,412",
+      "evidence": "count 652196829 and country facet counts as listed.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life-synthetic-tree",
+      "name": "Open Tree of Life synthetic tree (API)",
+      "landing_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:17:10Z", "method": "POST tree_of_life/about (and, for the Equus claim, induced_subtree)", "http_status": 200 },
+      "variables_present": ["a global synthetic tree (2,385,875 tips) from which sister relationships can be extracted per taxon set"],
+      "variables_missing": ["no branch lengths in the induced-subtree output seen for another claim (Equus subtree was an unresolved polytomy with empty supporting_studies); resolution varies by clade"],
+      "scope": "all life; 1,931 source studies, 2,064 source trees",
+      "evidence": "tree_of_life/about returned num_tips 2385875, num_source_studies 1931, num_source_trees 2064, created 2025-12-20.",
+      "verdict": "partial"
+    },
+    {
+      "id": "oribatid-mites-species-by-region-subias",
+      "name": "Data for: Biogeography of oribatid mites (Acari) reflects their ancient origin and points to Southeast Asia as a centre of diversity",
+      "landing_url": "https://zenodo.org/api/records?q=global+species+checklist+by+biogeographic+region+shared+species+between+regions+dataset&size=5",
+      "access_url": null,
+      "doi": "10.5281/zenodo.12787361",
+      "license": "CC BY 4.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:19:00Z", "method": "Zenodo search API (record metadata and file list)", "http_status": 200, "bytes": 484750 },
+      "variables_present": ["a species-by-region table for oribatid mites (file Subias2022-11435-species.xlsx, 484,750 B; columns not read)"],
+      "variables_missing": ["phylogeny", "variety or synonym instability"],
+      "scope": "one animal group (Acari: Oribatida)",
+      "evidence": "Zenodo record published 2024-07-20 with one xlsx of 484,750 B; title as above.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "Zenodo", "query": "global species checklist by biogeographic region shared species between regions dataset", "url": "https://zenodo.org/api/records?q=global+species+checklist+by+biogeographic+region+shared+species+between+regions+dataset&size=5", "hits": 3667806, "note": "taxon-specific region tables only (oribatid mites, Dacini flies, Sunda-Sahul flora checklist); no all-taxa table" },
+    { "source": "DataCite", "query": "species distribution by region checklist shared species between regions", "url": "https://api.datacite.org/dois?query=species+distribution+by+region+checklist+shared+species+between+regions&page%5Bsize%5D=5", "hits": null, "note": "first hit irrelevant (a non-biological Zenodo item); hit count not read" },
+    { "source": "GBIF", "query": "Plantae occurrences by country", "url": "https://api.gbif.org/v1/occurrence/search?taxonKey=6&limit=0&facet=country&facetLimit=5", "hits": 652196829, "note": "count" },
+    { "source": "ChecklistBank", "query": "COL 3LR synonym / accepted species / subspecies totals", "url": "https://api.checklistbank.org/dataset/3LR/nameusage/search?rank=species&status=accepted&limit=0", "hits": 2193940, "note": "accepted species in 3LR" }
+  ],
+  "status": "partial",
+  "summary": "For vascular plants the WCVP bulk files hold species by TDWG region together with genus, rank and synonym status, so shared-species counts, congener counts and a doubtful-form proxy can be built from one open download; sister-species identification needs a tree (Open Tree resolution varies). No equivalent open species-by-region table was found for animals; GBIF occurrences and COL can be used but are not checklists and survey effort is very uneven.",
+  "next_step": "Use WCVP for region pairs among TDWG level-3 areas, take congeners as the allied-species proxy and phylogenetic sisters from Open Tree for a subset; pre-register the effort covariate (GBIF counts per area).",
+  "obstacles_confirmed": [
+    "Doubtful forms depend on taxonomic practice, which is the same effort that creates the pattern.",
+    "Open Tree resolution is uneven; the induced subtree for a small Equus set was an unresolved polytomy.",
+    "No all-animal species-by-region checklist found."
+  ]
+}

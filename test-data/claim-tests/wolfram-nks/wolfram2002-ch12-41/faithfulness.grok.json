@@ -1,0 +1,33 @@
+{
+  "claim_id": "wolfram2002-ch12-41",
+  "assessor": { "model": "Grok 4.7", "provider": "xAI", "role": "A9 faithfulness (second opinion)" },
+  "assessed_at": "2026-11-01T05:44:08Z",
+  "test_verdict_seen": "refutes",
+  "verdict": "faithful-with-narrower-scope",
+  "confidence": 0.63,
+  "variables": {
+    "claim_asserts": "Among simple equational axiom systems for one binary operator, the vast majority allow operators of many different forms, and only a few, such as those for logic, force essentially a single form.",
+    "test_measures": "For each of 4692 canonical single equations with 1–4 operator occurrences, classes_k2 and classes_k3: counts of operator tables on 2 and 3 elements up to relabelling. 'many forms' means classes_k3 ≥ 3; 'single form' means classes_k2 ≤ 1 and classes_k3 ≤ 1 with at least one model. The decisive fraction is many_forms / 4692 = 0.4049, failed because it is under 0.50.",
+    "match": "proxy"
+  },
+  "modality": {
+    "appropriate": true,
+    "note": "The objects are multiplication tables of a binary operator, counted up to permutation of the elements, which is what the pictures of operator forms are. Exhaustive enumeration of the 16 and 19,683 tables at k = 2 and k = 3 is the right modality for a census of forms. The k = 4 pictures are only a capped supplementary search."
+  },
+  "assumptions": {
+    "compatible": true,
+    "note": "Equational satisfaction on every assignment, and isomorphism as relabelling, match the claim. Duality is not collapsed, so Nand and Nor stay two forms; the test says so. That makes 'essentially a single form' stricter than the book's examples, but the fail rule that fired is the many-forms fraction (0.4049 < 0.50), not the single-form fraction (0.1451, inside the mixed band)."
+  },
+  "scope": {
+    "claim_scope": "Simple equational axiom systems for a single binary operator, as illustrated for forms on 2, 3, and 4 elements.",
+    "test_scope": "All single equations with 1–4 operator occurrences, canonical variable names, side-swaps identified (n = 4692), models at k = 2 and k = 3 only. Wolfram's lhs == a family (S1, 101 systems) and the capped k = 4 search (S2) are reported and do not decide the verdict.",
+    "narrower": true
+  },
+  "reasons": [
+    "The measured quantity is the claim's quantity: how many inequivalent operator forms an axiom allows. interpretation states the narrowing and the numeric reading ('vast majority' ≥ 0.80 to pass and < 0.50 to fail; 'many forms' = at least three non-isomorphic 3-element models). On that declared population the fraction is 1900/4692 = 0.4049, with median classes_k3 = 2.",
+    "The population is narrower than the pictures. The book shows forms through 4 elements; the decisive count stops at k = 3. Supplementary S2 adds 306 systems with at least three forms at k = 4 and lifts the fraction only to 0.4702, with 1703 searches hitting the node budget, so that is a lower bound and still not the verdict. S1, the lhs == a systems over {a, b} with up to 3 operators, is the family closest to the figure: 67/101 have many forms at some k ≤ 4. It is closer to the claim and it is not what the pre-registered rule scores.",
+    "1525 of 4692 systems (0.325) have classes_k2 = classes_k3 = 0, so they neither 'allow many forms' nor 'force a single form'. They sit in the denominator of 'vast majority'. The p. 1171 check did not recover the note's family: validation_lhs_eq_a_k2 has only_6_9 = 0 and only_1_7 = 0 against the note's 32,004 and 964. The 4692-equation census is therefore the tester's simplest-equation family, not the pictured list. It is still a family of simple equational systems for one operator, which is the stated scope, and interpretation says the k = 4 and multi-axiom omissions."
+  ],
+  "what_would_change_it": "Decide the verdict on the systems actually drawn on pp. 804–805, or on a family that reproduces the note's 32,004 and 964 counts, counting distinct forms through 4 elements and leaving equations with no finite model out of the majority. If those pictured systems were not multiplication tables up to relabelling, the measurement would be not-representative.",
+  "files_read": ["result.json", "analysis.py", "derived/supplementary.json"]
+}

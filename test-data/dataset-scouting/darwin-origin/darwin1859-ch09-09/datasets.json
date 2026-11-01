@@ -1,0 +1,82 @@
+{
+  "claim_id": "darwin1859-ch09-09",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T06:20:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-02" },
+  "variables_needed": [
+    "marine fossil occurrences with formation or member and stratigraphic position (to identify first appearance partway through a formation)",
+    "age bounds per occurrence or collection (to compare the local first occurrence with older records elsewhere)",
+    "georeferenced locality per occurrence (to identify other basins)",
+    "formation ages and stratigraphic context (to place local first appearance within the formation)"
+  ],
+  "datasets": [
+    {
+      "id": "pbdb-occurrences-api",
+      "name": "Paleobiology Database occurrences and taxa (data service 1.2)",
+      "landing_url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Mollusca&interval=Neogene&envtype=marine&show=strat,coords,class&limit=1&rowcount",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.json",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T05:21:42Z", "method": "GET occs/list.json (Mollusca, Neogene, envtype=marine, show=strat,coords,class, limit=1, rowcount); GET taxa/list.json (Bivalvia, rank=species, show=app, limit=1, rowcount)", "http_status": 200 },
+      "variables_present": [
+        "formation (sfm) and member (smb) per occurrence",
+        "early/late age bounds (eag, lag) and age interval (oei) per occurrence",
+        "longitude/latitude per occurrence",
+        "per-species first/last appearance ages (fea, fla, lea, lla), occurrence count (noc) and extant flag via taxa show=app"
+      ],
+      "variables_missing": ["stratigraphic height or bed order within a formation (only formation, member and age bounds)", "correlation or age uncertainty estimates"],
+      "scope": "Mollusca marine occurrences in the Neogene: records_found 88,567; Bivalvia species taxa: 19,194",
+      "evidence": "Sample occurrence record: Aturia coxi, Messinian, formation Otsuki, member Saruhashi dacitic tuff, lng 138.89, lat 35.75, eag 7.246, lag 5.333. Sample taxon record: Paradoxia timorensis with fea 192.9, fla 184.2, lea 192.9, lla 184.2, noc 1.",
+      "verdict": "partial"
+    },
+    {
+      "id": "macrostrat-fossils-and-units",
+      "name": "Macrostrat API (fossils endpoint, units, columns)",
+      "landing_url": "https://macrostrat.org/api/v2/fossils?interval_name=Miocene&response=short&limit=1",
+      "access_url": "https://macrostrat.org/api/v2/fossils",
+      "doi": null,
+      "license": "CC-BY 4.0 (reported in every API response)",
+      "suggested_by": ["gemini", "gpt"],
+      "checked": { "at": "2026-11-01T05:21:43Z", "method": "GET fossils?interval_name=Miocene&response=short&limit=1 (and earlier units/stats calls)", "http_status": 200 },
+      "variables_present": [
+        "PBDB collections linked to Macrostrat units and columns (cltn_id, unit_id, col_id, pbdb_occs)",
+        "unit ages (t_age, b_age), strat_name_concept_id for formation-level context",
+        "unit thickness and environment lists (see the darwin1859-ch09-06 record)"
+      ],
+      "variables_missing": ["bed-level position of a species within a formation", "North America is the main project with linked PBDB collections (project 1: 49,266 PBDB collections per stats?all)"],
+      "scope": "fossils endpoint returned collections such as 'Felton (Scotts Valley - Purisima Formation)' (8.342 to 2.58 Ma, 9 occurrences) and 'Woodring Loc. 177 - eastern area [upper Gatun Fm]' with unit and column ids",
+      "evidence": "Response license CC-BY 4.0, fields cltn_id, cltn_name, t_age, b_age, pbdb_occs, genus_no, taxon_no, unit_id, col_id, refs, strat_name_concept_id.",
+      "verdict": "partial"
+    },
+    {
+      "id": "probable-datum-method-pdm",
+      "name": "Data from: The Probable Datum Method (PDM): a technique for estimating the age of origination or extinction of taxa",
+      "landing_url": "https://zenodo.org/api/records?q=marine+fossil+first+occurrence+regional+immigration+diachronous+first+appearance+datum&size=4",
+      "access_url": null,
+      "doi": "10.5061/dryad.ck0mp",
+      "license": "CC0 (Zenodo licence id cc-zero)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T05:22:00Z", "method": "Zenodo search API (metadata and file list)", "http_status": 200, "bytes": 318437 },
+      "variables_present": ["method code (PDM code files.zip, 318,437 B) and supplementary text (690,887 B) for estimating origination or extinction ages of taxa"],
+      "variables_missing": ["not an occurrence dataset; the file contents were not opened"],
+      "scope": "a technique and code, published 2014-05-07",
+      "evidence": "Zenodo hit with files Schueth et al Supplementary Materials.pdf and PDM code files.zip.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "Zenodo", "query": "marine fossil first occurrence regional immigration diachronous first appearance datum", "url": "https://zenodo.org/api/records?q=marine+fossil+first+occurrence+regional+immigration+diachronous+first+appearance+datum&size=4", "hits": 824463, "note": "only PDM method/code is relevant; the rest irrelevant" },
+    { "source": "Dryad", "query": "fossil first appearance datum diachrony immigration marine", "url": "https://datadryad.org/api/v2/search?q=fossil+first+appearance+datum+diachrony+immigration+marine&per_page=4", "hits": 0, "note": "none" },
+    { "source": "DataCite", "query": "fossil first appearance immigration origination regional formation marine", "url": "https://api.datacite.org/dois?query=fossil+first+appearance+immigration+origination+regional+formation+marine&page%5Bsize%5D=4", "hits": 0, "note": "none" },
+    { "source": "PBDB", "query": "Mollusca Neogene marine occurrences", "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Mollusca&interval=Neogene&envtype=marine&rowcount&limit=0", "hits": 88567, "note": "records_found" },
+    { "source": "Macrostrat", "query": "fossils Miocene", "url": "https://macrostrat.org/api/v2/fossils?interval_name=Miocene&response=short&limit=1", "hits": null, "note": "linked collections returned" }
+  ],
+  "status": "partial",
+  "summary": "The Paleobiology Database holds the core data openly (georeferenced, dated marine occurrences with formation and member names, plus per-species first and last appearance ages) and Macrostrat links PBDB collections to formation units. What no source gives is the order of occurrences inside a single formation, so 'first appearance partway through a formation' can only be approximated from formation membership and age bounds.",
+  "next_step": "Pull Neogene marine bivalve and gastropod occurrences with formation and age bounds, define local first occurrence per formation, and compare with the oldest occurrence elsewhere; pre-register how age-bin overlap is treated.",
+  "obstacles_confirmed": [
+    "Bed-level stratigraphic position within a formation is not in PBDB (only formation, member and age bounds were seen in the returned fields).",
+    "A sampled Bivalvia species record (Paradoxia timorensis) has noc 1, an example of single-occurrence taxa; the share of such species was not measured."
+  ]
+}

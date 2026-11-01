@@ -1,0 +1,70 @@
+@prefix this: <https://w3id.org/np/RAOmWGCqYRmmnzJKaN-XcmkZz2vMXUMaWzCN_rZ8Gvnkk>.
+@prefix sub: <https://w3id.org/np/RAOmWGCqYRmmnzJKaN-XcmkZz2vMXUMaWzCN_rZ8Gvnkk/>.
+@prefix np: <http://www.nanopub.org/nschema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix npx: <http://purl.org/nanopub/x/>.
+@prefix dc: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+sub:Head {
+this: np:hasAssertion sub:assertion;
+    np:hasProvenance sub:provenance;
+    np:hasPublicationInfo sub:pubinfo;
+    a np:Nanopublication
+}
+sub:assertion {
+<https://w3id.org/delphi/resource/claim/levin-2022-tame-18> a <https://w3id.org/delphi/ontology/Claim>;
+    dc:description "Limbs show mirror-neuron-like and somatotopic responses to injury outside the nervous system: the type and site of damage to one limb can be read out within 30 seconds by imaging the opposite, uninjured limb.";
+    dc:type "empirical-generalization";
+    <http://www.w3.org/2000/01/rdf-schema#label> "Injury to one limb can be read out from the opposite limb within 30 seconds";
+    <https://w3id.org/delphi/ontology/context> "Levin M, “Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds”, Frontiers in systems neuroscience (2022), doi:10.3389/fnsys.2022.768201; section “Somatic Cognition: An Example of Unconventional Agency in Detail › Specific Parallels Between Morphogenesis and Basal Cognition”. Scope: Xenopus tadpole limbs (Busse et al., 2018)"
+}
+sub:provenance {
+sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>;
+    prov:wasDerivedFrom sub:quote, <https://doi.org/10.3389/fnsys.2022.768201>;
+    prov:wasGeneratedBy sub:extraction.
+<https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor> a prov:SoftwareAgent;
+    <http://www.w3.org/2000/01/rdf-schema#label> "delphisci Levin papers claim extractor";
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192>;
+    <https://w3id.org/delphi/ontology/usesModel> <https://w3id.org/delphi/resource/model/claude-opus-5.5>.
+sub:quote a prov:Entity;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt#line=100,101>;
+    prov:wasQuotedFrom <https://doi.org/10.3389/fnsys.2022.768201>;
+    <https://schema.org/text> "For example, mirror neurons and somatotopic representation are seen in limbs’ response to injury, where the type and site of damage to one limb can be read out within 30 s from imaging the opposite, un-injured limbs (Busse et al., 2018).".
+<https://doi.org/10.3389/fnsys.2022.768201> a <https://schema.org/ScholarlyArticle>;
+    dc:bibliographicCitation "Levin M. Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds. Frontiers in systems neuroscience (2022). doi:10.3389/fnsys.2022.768201";
+    dc:creator <http://www.wikidata.org/entity/Q39444955>;
+    dc:date "2022"^^xsd:gYear;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:title "Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds";
+    <https://schema.org/sameAs> <https://europepmc.org/article/PMC/PMC8988303>.
+sub:extraction a prov:Activity;
+    prov:qualifiedAssociation sub:extractionPlan;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt>;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-levin-papers-extractor>.
+<https://w3id.org/delphi/resource/model/claude-opus-5.5> a <https://w3id.org/delphi/ontology/LanguageModel>;
+    <http://www.w3.org/2000/01/rdf-schema#label> "Claude Opus 5.5".
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt#line=100,101> <https://schema.org/isPartOf> <https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt>.
+sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/build/generate.mjs>.
+<https://raw.githubusercontent.com/fractastical/delphisci/2404c437f822e1c98420130cd01e7972acf3ac57/books/levin-papers/inputs/2022-tame.txt> prov:wasDerivedFrom <https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8988303/fullTextXML>;
+    <http://spdx.org/rdf/terms#checksum> sub:sourceChecksum;
+    <https://schema.org/about> <https://doi.org/10.3389/fnsys.2022.768201>.
+sub:sourceChecksum <http://spdx.org/rdf/terms#algorithm> <http://spdx.org/rdf/terms#checksumAlgorithm_sha256>;
+    <http://spdx.org/rdf/terms#checksumValue> "2f99ca3a21299e41167f7f1bbd6bc7c86dbc7a1a357f7835f8571033b7c63ff3"
+}
+sub:pubinfo {
+this: <http://www.w3.org/2000/01/rdf-schema#label> "Levin 2022 claim: Injury to one limb can be read out from the opposite limb within 30 seconds";
+    dc:creator <https://orcid.org/0009-0007-4948-9192>;
+    dc:license <https://creativecommons.org/licenses/by/4.0/>;
+    dc:created "2026-10-31T17:52:51.947Z"^^xsd:dateTime;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Claim>;
+    npx:introduces <https://w3id.org/delphi/resource/claim/levin-2022-tame-18>;
+    <https://w3id.org/delphi/ontology/domain> <https://w3id.org/delphi/resource/domain/levin-papers>.
+<https://w3id.org/delphi/resource/domain/levin-papers> <http://www.w3.org/2000/01/rdf-schema#label> "levin-papers".
+sub:sig npx:hasAlgorithm "RSA";
+    npx:hasPublicKey "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyFHtPB6p0mCjDozxlOY9CmO3nBm7Te3jFbXyLmM+G1tGe47Da0jYIbhkl9Oo1ZjxmCa3LCwlEqK8gj6hEIcL4ahW30JXh9HycfKVk1bugkzMEV15tJdTzAU3sGMFnbNsn43xY2LFLy45tApkRm5byEiM7oRRrooIdwoQKnP4Wzq/bfAoJ9qvW+MGkelyOTd1jbSt+KfmT7xKmDfWzAHddUlWwMX2QJOLxDaffOteTop6ZRgPiNmPJKA/S62Gac9XtSYT3oDkZ6/nr5cxxNLpOyxTf5FPISiCe11xYO/unYjY+mwnOfA8yhJIyx1l0O9I0vpOpn+E5TvyHJV+oSTrvwIDAQAB";
+    npx:hasSignatureTarget this:;
+    npx:signedBy <https://orcid.org/0009-0007-4948-9192>;
+    npx:hasSignature "TLxPyKRSkNEUzQOAqHrHe4+2kqUdhjo3mmZwHHWG4n8AdA4JbMX3P11brNr2VjlYUeTLlfLSUOyXqD+mdg3L7q5kgXhjBm7gr0L+zteFlTAKmD1nZkavskCkcC74J9H3DRL0whYVPBlxfgUrUToyaNyfdoCnUuxGT6luyxkVMnxjQpoxLEX1qsy8F3nNIy582efYUgKWRHrkE84YP5ZSDUGfvwPDhKelVaO3fewtgVZJU3AiY9ve2zXUOngO0gN1Xwizu6iVbtonzCZE4FTgu16VcIDu9Nr2Xc9pXmHf5zooC/7STe9CG+io8sQz1SAGZrKanNTquDd5CvpB8zdS2A=="
+}
