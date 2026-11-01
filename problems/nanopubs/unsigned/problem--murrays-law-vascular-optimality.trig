@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Does real vasculature obey Murray's law?" ;
+    dct:description "At vascular branch points, does the cube of the parent radius equal the sum of the cubes of the daughter radii (Murray's minimum-work law), does the exponent shift toward 2 in high-shear or turbulent beds, and does plant xylem obey the same law?" ;
+
+    skos:historyNote "Known state: Murray (1926) derived the cubic law from minimizing pumping work plus blood-volume maintenance; Sherman (1981) found good agreement in arterial trees; McCulloh, Sperry and Adler (2003) found plant xylem conduits obey Murray's law where conduits are not load-bearing. Modern retinal and whole-organ imaging datasets allow exponent estimation at thousands of branch points, but no standardized cross-tissue, cross-kingdom test exists. Thompson's claim (ch15-13) is the minimum-effort statement." ;
+    dct:subject "both" ;
+    delphi:hypothesisType "open-problem/tier-B" ;
+    skos:scopeNote "Resolved when: A pre-registered test estimating the branching exponent across at least three open vascular datasets (retinal fundus segmentations, micro-CT of organ vasculature, xylem anatomy), with the hypotheses 'exponent 3', 'exponent 7/3 (turbulent)' and 'no single exponent' stated in advance." ;
+    skos:scopeNote "Refuted if: Exponent intervals excluding 3 across tissues would refute the general law; a shear-dependent shift would support the amended form." ;
+    skos:note "Data access: Open retinal vessel datasets (DRIVE, HRF), open micro-CT vascular casts, xylem data from McCulloh et al. 2003." ;
+    skos:note "Requires: image-segmentation" ;
+    skos:note "Requires: vascular-morphometry" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: tissue" ;
+    skos:note "Scale: organ" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch15-13> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.12.3.207> ;
+    rdfs:seeAlso <https://doi.org/10.1085/jgp.78.4.431> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature01444> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> .
+
+  <https://doi.org/10.1073/pnas.12.3.207> dct:title "The Physiological Principle of Minimum Work" ;
+    dct:bibliographicCitation "Murray 1926, The physiological principle of minimum work I" .
+  <https://doi.org/10.1085/jgp.78.4.431> dct:title "On connecting large vessels to small. The meaning of Murray's law." ;
+    dct:bibliographicCitation "Sherman 1981, On connecting large vessels to small: the meaning of Murray's law" .
+  <https://doi.org/10.1038/nature01444> dct:title "Water transport in plants obeys Murray's law" ;
+    dct:bibliographicCitation "McCulloh, Sperry and Adler 2003, Water transport in plants obeys Murray's law" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/docs/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.841Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Does real vasculature obey Murray's law?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

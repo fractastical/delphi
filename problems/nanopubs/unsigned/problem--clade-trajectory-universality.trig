@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/clade-trajectory-universality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are clade diversity trajectories universally hat-shaped?" ;
+    dct:description "Do most fossil clades rise to a diversity peak and decline symmetrically, as Darwin and later Foote and Quental and Marshall proposed, or is the apparent hat shape a product of sampling and the way clades are defined?" ;
+
+    skos:historyNote "Known state: Darwin claimed groups rise gradually to a maximum then decline (ch10-06; repo verdict mixed). Foote (2007) found symmetric waxing and waning of marine invertebrate genera; Liow and Stenseth (2007) found similar shapes in mammals; Quental and Marshall (2013) linked decline to Red Queen dynamics. Critics attribute symmetry to the 'pull of the recent', paraphyletic clade definitions and sampling heterogeneity. No standardized, subsampling-corrected test across all orders and families exists." ;
+    dct:subject "biology" ;
+    delphi:hypothesisType "open-problem/tier-B" ;
+    skos:scopeNote "Resolved when: A pre-registered test over all PBDB orders and families meeting stated occurrence thresholds, using shareholder-quorum subsampling and monophyly filters, with a stated statistic for hat-shapedness and a null from randomized origination-extinction sequences." ;
+    skos:scopeNote "Resolved when: A verdict with effect size: fraction of clades significantly hat-shaped versus the null." ;
+    skos:scopeNote "Refuted if: If the fraction of hat-shaped clades is indistinguishable from the random-walk null after subsampling, the pattern is an artifact." ;
+    skos:note "Data access: Paleobiology Database API (open), already wired into test-data/organisms." ;
+    skos:note "Requires: pbdb" ;
+    skos:note "Requires: paleobiology-statistics" ;
+    skos:note "Requires: subsampling" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: evolutionary" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-02> ;
+    rdfs:seeAlso <https://doi.org/10.1666/06084.1> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspb.2007.1006> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1239431> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> .
+
+  <https://doi.org/10.1666/06084.1> dct:title "Symmetric waxing and waning of marine invertebrate genera" ;
+    dct:bibliographicCitation "Foote 2007, Symmetric waxing and waning of marine invertebrate genera" .
+  <https://doi.org/10.1098/rspb.2007.1006> dct:title "The rise and fall of species: implications for macroevolutionary and macroecological studies" ;
+    dct:bibliographicCitation "Liow and Stenseth 2007, The rise and fall of species: implications for macroevolutionary and macroecological studies" .
+  <https://doi.org/10.1126/science.1239431> dct:title "How the Red Queen Drives Terrestrial Mammals to Extinction" ;
+    dct:bibliographicCitation "Quental and Marshall 2013, How the Red Queen drives terrestrial mammals to extinction" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/docs/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.841Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Are clade diversity trajectories universally hat-shaped?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/clade-trajectory-universality> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

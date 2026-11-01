@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does the bioelectric prepattern predict anatomical outcome?" ;
+    dct:description "Is there a quantitative, predictive mapping from a measured resting-potential (Vmem) pattern in a tissue to the anatomical structure it will form, such that perturbing the pattern predicts the anatomical change before it occurs?" ;
+
+    skos:historyNote "Known state: Levin and colleagues report that Vmem patterns prefigure and can instruct anatomy in planarian head regeneration, Xenopus face and eye induction, and tumour induction (Levin and Martyniuk 2018). BETSE (Pietak and Levin 2016) simulates Vmem dynamics; Durant et al. (2017) modelled planarian anterior-posterior polarity. No model takes an arbitrary measured Vmem map and outputs a falsifiable anatomical prediction with stated accuracy. Thirteen Levin tests in the repo are pre-registered and awaiting data." ;
+    dct:subject "biology" ;
+    delphi:hypothesisType "open-problem/tier-C" ;
+    skos:scopeNote "Resolved when: A model (bounded bioelectric simulation plus a pattern-to-anatomy decoder) that, given published Vmem images of perturbed and control embryos or planarian fragments, predicts the anatomical phenotype class with pre-registered accuracy on held-out images." ;
+    skos:scopeNote "Resolved when: Explicit statement of which published datasets are used for training and which for testing." ;
+    skos:scopeNote "Refuted if: Prediction accuracy at chance on held-out perturbations refutes the predictive form of the bioelectric-code hypothesis for those tissues." ;
+    skos:note "Data access: Published Vmem imaging (DiBAC/CC2-DMPE) in open-access Levin lab papers; BETSE (open source)." ;
+    skos:note "Requires: bioelectric-simulation" ;
+    skos:note "Requires: image-analysis" ;
+    skos:note "Requires: frontier_simulate" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: cellular" ;
+    skos:note "Scale: tissue" ;
+    skos:note "Scale: developmental" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-girardia-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-16> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2019-boundary-14> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.biosystems.2017.08.009> ;
+    rdfs:seeAlso <https://doi.org/10.3389/fbioe.2016.00055> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bpj.2017.04.011> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> .
+
+  <https://doi.org/10.1016/j.biosystems.2017.08.009> dct:title "The bioelectric code: An ancient computational medium for dynamic control of growth and form" ;
+    dct:bibliographicCitation "Levin and Martyniuk 2018, The bioelectric code" .
+  <https://doi.org/10.3389/fbioe.2016.00055> dct:title "Exploring Instructive Physiological Signaling with the Bioelectric Tissue Simulation Engine" ;
+    dct:bibliographicCitation "Pietak and Levin 2016, Exploring instructive physiological signaling with the bioelectric tissue simulation engine" .
+  <https://doi.org/10.1016/j.bpj.2017.04.011> dct:title "Long-Term, Stochastic Editing of Regenerative Anatomy via Targeting Endogenous Bioelectric Gradients" ;
+    dct:bibliographicCitation "Durant et al. 2017, Long-term, stochastic editing of regenerative anatomy via targeting endogenous bioelectric gradients" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/docs/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.841Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Does the bioelectric prepattern predict anatomical outcome?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

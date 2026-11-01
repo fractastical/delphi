@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/active-inference-morphogenesis-falsifiable--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Frozen generative model predicts regeneration times" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/active-inference-morphogenesis-falsifiable> ;
+    dct:description "Choose one planarian regeneration series and fit a fixed generative model only to intact anatomy and unperturbed regeneration. Define sensory states, latent target morphology, likelihood variance and action dynamics before examining graded perturbations. Predict median regeneration time and failure probability as functions of initial variational surprise." ;
+
+    delphi:proposedTest "The fixed model passes if at least 80% of held-out median times lie within its 90% intervals and surprise improves leave-intervention-out ELPD by at least 10; failure of interval coverage below 50% refutes this instantiation." ;
+    delphi:context "Fails if: Predictions require changing likelihoods, priors or target morphology after observing each perturbation, demonstrating post hoc flexibility." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Publish the full generative model, priors and fitting data split before testing. 2. Compute surprise from initial fragment geometry and Vmem summaries. 3. Derive posterior predictive time and error curves for held-out perturbations. 4. Compare against size-only and flexible survival-model baselines." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Open specimen-level regeneration time courses with quantified initial perturbations." ;
+    skos:note "Tool: variational-inference" ;
+    skos:note "Tool: data-test" ;
+    skos:note "Tool: bioelectric-simulation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-place-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-place-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2019-boundary-15> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-girardia-20> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/active-inference-morphogenesis-falsifiable> a delphi:Concept, schema:Question ;
+    rdfs:label "A falsifiable form of active-inference morphogenesis" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to active-inference-morphogenesis-falsifiable, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/e77f4bcffb077981b60f1e3aea24b72c7a36b2fc/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T03:30:21.847Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to active-inference-morphogenesis-falsifiable: Frozen generative model predicts regeneration times" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/active-inference-morphogenesis-falsifiable--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -53,7 +53,7 @@ tool("delphi_overview",
   ({ source }) => overviewWithGraph(source));
 
 tool("delphi_search_claims",
-  "Find claims by text (matched against title, statement and math) and/or domain. Returns each claim's IRI, title, statement, LaTeX math, nanopub and `status`: whether it is proved (Lean-checked or in the literature), its data-test verdict, and whether it is published. To filter by status, use delphi_graph.",
+  "Find claims by text (matched against title, statement and math) and/or domain. Returns each claim's IRI, title, statement, LaTeX math, nanopub and `status`: whether it is proved (Lean-checked or in the literature), its data-test verdict, and whether it is published. Claims with a completed data test also carry `testContract` (expected observation, disconfirming observation, admissible dataset constraints, inference method; `explicit` is false when derived from the pre-registration fields) and any `revisions` of the verdict with who prompted them. To filter by status, use delphi_graph.",
   {
     text: z.string().optional().describe("Case-insensitive substring, e.g. \"fixation\" or \"\\\\sqrt\""),
     domain: z.string().optional().describe("Substring of the domain IRI, e.g. \"math\", \"turing\", \"darwin\""),
@@ -115,7 +115,7 @@ tool("delphi_graph",
   rejectNetwork("delphi_graph", browseClaims));
 
 tool("delphi_claim_tests",
-  "Tests of claims against data (test-data/claim-tests/): how many claims are tested, with what verdicts, on what kind of data, and which to test next. view \"summary\" (default with no arguments) = counts per thinker by verdict and data kind, plus pre-registered tests awaiting data; \"list\" = test runs with filters, each with hypothesis and a GitHub link to its result.json; \"claim\" = every run for one claim id with the full result.json (criteria, datasets with checksums, method, measured values, caveats); \"candidates\" = untested claims ranked by testability, i.e. what to test next. A claim with several runs counts once in the summary. Only dataKind \"biological\" shows a claim holds in organisms.",
+  "Tests of claims against data (test-data/claim-tests/): how many claims are tested, with what verdicts, on what kind of data, and which to test next. view \"summary\" (default with no arguments) = counts per thinker by verdict and data kind, plus pre-registered tests awaiting data; \"list\" = test runs with filters, each with hypothesis and a GitHub link to its result.json; \"claim\" = every run for one claim id with the full result.json (criteria, datasets with checksums, method, measured values, caveats); \"candidates\" = untested claims ranked by testability, i.e. what to test next, each with its dataset-scouting status and located datasets when a scout has checked it. A claim with several runs counts once in the summary. Only dataKind \"biological\" shows a claim holds in organisms.",
   {
     view: z.enum(TEST_VIEWS).optional().describe("summary | list | claim | candidates. Defaults to claim if id is given, list if any filter is given, else summary"),
     id: z.string().optional().describe("Claim id for view \"claim\", e.g. \"darwin1859-ch12-11\""),
@@ -126,6 +126,8 @@ tool("delphi_claim_tests",
     status: z.enum(["complete", "preregistered", "abandoned", "any"]).optional().describe("For view \"list\"; default complete"),
     math: z.boolean().optional().describe("true = only math claims"),
     minTestability: z.number().min(0).max(1).optional().describe("For view \"candidates\""),
+    scouted: z.enum(["data-ready", "partial", "gap", "not-empirically-resolvable", "any", "none"]).optional().describe("For view \"candidates\": filter by dataset-scouting status (test-data/dataset-scouting/), i.e. whether public data for the claim has been located"),
+    sort: z.enum(["testability", "data"]).optional().describe("For view \"candidates\": \"data\" puts claims whose data has been located first"),
     text: z.string().optional().describe("Substring of claim id, title, statement or hypothesis"),
     limit: z.number().int().min(1).max(500).optional(),
     source: localOnly("test-data/claim-tests"),
