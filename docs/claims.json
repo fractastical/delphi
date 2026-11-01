@@ -1,5 +1,5 @@
 {
- "built": "2026-11-01 05:47",
+ "built": "2026-11-01 06:56",
  "claims": [
   {
    "id": "darwin1859-intro-01",
@@ -12271,7 +12271,18 @@
      "explicit": false
     },
     "revisions": [],
-    "faithfulness": null
+    "faithfulness": {
+     "verdict": "faithful-with-narrower-scope",
+     "assessors": [
+      {
+       "assessor": "gpt-5-2025-08-07",
+       "verdict": "faithful-with-narrower-scope",
+       "confidence": null,
+       "file": "test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07/faithfulness.json"
+      }
+     ],
+     "status": "agreed"
+    }
    },
    "morpholib": [],
    "thumbnail": null,
@@ -22873,7 +22884,18 @@
      "explicit": false
     },
     "revisions": [],
-    "faithfulness": null
+    "faithfulness": {
+     "verdict": "faithful-with-narrower-scope",
+     "assessors": [
+      {
+       "assessor": "gpt-5-2025-08-07",
+       "verdict": "faithful-with-narrower-scope",
+       "confidence": null,
+       "file": "test-data/claim-tests/thompson-growth-form/thompson1917-ch16-13/faithfulness.json"
+      }
+     ],
+     "status": "agreed"
+    }
    },
    "morpholib": [],
    "thumbnail": null,
@@ -68887,9 +68909,35 @@
    "theorem": true,
    "notation": "ESS allocation: N_m c_m = N_f c_f; with c_m = c_f the unbeatable primary sex ratio is 1:1",
    "lean_theorems": null,
-   "evidence": null,
-   "evidence_kind": null,
-   "data_test": null,
+   "evidence": "mixed",
+   "evidence_kind": "biological",
+   "data_test": {
+    "verdict": "mixed",
+    "confidence": 0.85,
+    "preregistered": true,
+    "data_kind": "biological",
+    "path": "test-data/claim-tests/math-bio-claims/fisher-sex-ratio/result.json",
+    "test_contract": {
+     "expected_observation": "Pre-registered. Data: United Nations World Population Prospects 2024, Demographic Indicators, medium variant CSV (WPP2024_Demographic_Indicators_Medium.csv.gz), variable SRB (sex ratio at birth, males per 100 female births), rows with LocTypeName == 'Country/Area', years 1950 to 1979 inclusive (before prenatal sex determination was widely available, so the ratio reflects biology rather than sex-selective abortion), country-years with total mid-year population >= 1 million. Criterion A (equality): the median SRB across qualifying country-years lies in [95, 105] (within 5% of equal numbers). Criterion B (uniform near-equality): at least 95% of qualifying country-years lie in [90, 110]. SUPPORTS if A and B both hold.",
+     "disconfirming_observation": "Pre-registered. REFUTES if the median SRB lies outside [90, 110] OR fewer than 80% of qualifying country-years lie in [90, 110]. MIXED otherwise (for example a consistent small excess of one sex between 5% and 10%, with B holding). INCONCLUSIVE (data-unavailable) if the file cannot be downloaded or has no SRB column.",
+     "admissible_datasets": "Planned datasets: un-wpp-2024-demographic-indicators-medium",
+     "inference_method": "fetch.py downloads the gzipped CSV (16.6 MB). analysis.py keeps rows of type Country/Area for 1950-1979 with mid-year population >= 1 million and a non-missing SRB, and computes the median, mean, SD, 5th and 95th percentiles of SRB over country-years, the fractions inside [95,105] and [90,110], and per-country means; the pre-registered rule is applied.",
+     "explicit": false
+    },
+    "revisions": [],
+    "faithfulness": {
+     "verdict": "representative-with-caveats",
+     "assessors": [
+      {
+       "assessor": "gpt-5-2025-08-07",
+       "verdict": "representative-with-caveats",
+       "confidence": null,
+       "file": "test-data/claim-tests/math-bio-claims/fisher-sex-ratio/faithfulness.json"
+      }
+     ],
+     "status": "agreed"
+    }
+   },
    "morpholib": [],
    "thumbnail": null,
    "testability": null,
@@ -68927,9 +68975,24 @@
    "theorem": true,
    "notation": "Cov(z_i, z_j) = 2\\Theta_{ij} V_A + \\Delta_{ij} V_D; in the limit of M \\to \\infty loci the offspring trait given parents is Gaussian with mean (z_1+z_2)/2 and segregation variance V_0(1-\\bar{F}), with error O(1/\\sqrt{M}) (Barton, Etheridge and Veber 2017)",
    "lean_theorems": null,
-   "evidence": null,
-   "evidence_kind": null,
-   "data_test": null,
+   "evidence": "supports",
+   "evidence_kind": "biological",
+   "data_test": {
+    "verdict": "supports",
+    "confidence": 0.75,
+    "preregistered": true,
+    "data_kind": "biological",
+    "path": "test-data/claim-tests/math-bio-claims/fisher-infinitesimal/result.json",
+    "test_contract": {
+     "expected_observation": "Pre-registered. Data: Galton's 1886 family height records as distributed in the R HistData package (GaltonFamilies: 934 adult children in 205 families with father, mother and child heights in inches and child sex). Female child heights are multiplied by 1.08, as Galton did, to put both sexes on a common scale; mid-parent height is (father + 1.08*mother)/2. Residuals r are taken from the ordinary-least-squares regression of adjusted child height on mid-parent height. Criterion A (homoscedasticity): Levene's test (median-centred, Brown-Forsythe) of residual variance across the three mid-parent terciles gives p > 0.05 AND the ratio of the largest to the smallest tercile residual variance is < 1.5. Criterion B (normality): residual sample skewness |g1| < 0.5 and excess kurtosis |g2| < 1.0. Criterion C (sibling vs parent-offspring): the full-sibling intraclass correlation of adjusted height (one-way random-effects ANOVA estimator over families with >= 2 children) is >= r_po - 0.05, where r_po is the single-parent-offspring correlation implied by the child-on-mid-parent correlation r_mp as r_po = r_mp / sqrt(2) (which assumes uncorrelated parents). SUPPORTS if A, B and C all hold.",
+     "disconfirming_observation": "Pre-registered. REFUTES if A fails strongly (variance ratio > 2 or Levene p < 0.001) OR B fails strongly (|g1| > 1 or |g2| > 2) OR the sibling correlation is more than 0.15 below r_po. MIXED otherwise. INCONCLUSIVE (data-unavailable) if the file cannot be downloaded.",
+     "admissible_datasets": "Planned datasets: galton1886-families-histdata",
+     "inference_method": "fetch.py downloads the CSV. analysis.py multiplies female child and mother heights by 1.08 (Galton's adjustment), forms mid-parent height, regresses adjusted child height on it, and tests the residuals: Brown-Forsythe Levene test and variance ratio across mid-parent terciles (A), sample skewness and excess kurtosis (B), and the one-way ANOVA intraclass correlation of siblings against the single-parent correlation implied by the mid-parent correlation (C). The pre-registered rule is applied.",
+     "explicit": false
+    },
+    "revisions": [],
+    "faithfulness": null
+   },
    "morpholib": [],
    "thumbnail": null,
    "testability": null,
@@ -69388,9 +69451,24 @@
    "theorem": true,
    "notation": "u(p) = \\frac{1-e^{-4N_e s p}}{1-e^{-4N_e s}}; neutral limit u(p) = p, so a new mutant fixes with probability 1/(2N)",
    "lean_theorems": null,
-   "evidence": null,
-   "evidence_kind": null,
-   "data_test": null,
+   "evidence": "supports",
+   "evidence_kind": "biological",
+   "data_test": {
+    "verdict": "supports",
+    "confidence": 0.8,
+    "preregistered": true,
+    "data_kind": "biological",
+    "path": "test-data/claim-tests/math-bio-claims/kimura-fixation-probability/result.json",
+    "test_contract": {
+     "expected_observation": "Pre-registered. Data: the 'fly' matrix in the CRAN package popgenr 0.2 (CC0; Laruson and Reed 2021), a 19 x 107 matrix of the number of bw75 allele copies (out of 32) in each replicate at each generation, transcribed from Buri (1956). At the last recorded generation, a line is 'fixed' if the count is 32 and 'lost' if the count is 0; m = fixed + lost, k = fixed. SUPPORTS if m >= 20 AND the two-sided exact binomial test of k against Binomial(m, 0.5) gives p > 0.05 AND |k/m - 0.5| < 0.15. Reported but not decisive: the mean bw75 frequency across all 107 lines at the last generation (predicted 0.5 under neutrality, since the expected frequency is constant under drift) and the number of fixed-or-lost lines.",
+     "disconfirming_observation": "Pre-registered. REFUTES if the exact binomial test gives p < 0.01 (fixation significantly favours one allele) OR |k/m - 0.5| >= 0.25. MIXED otherwise (0.01 <= p <= 0.05, or 0.15 <= |k/m - 0.5| < 0.25). INCONCLUSIVE (underpowered) if m < 20; INCONCLUSIVE (data-unavailable) if the package source cannot be downloaded.",
+     "admissible_datasets": "Planned datasets: buri1956-drosophila-bw75-popgenr-fly",
+     "inference_method": "fetch.py downloads the CRAN tarball, extracts data/fly.RData and converts it with Rscript to derived/buri1956_fly.csv (committed, 1.7 KB). The object turned out to be a 20 x 33 generation-by-allele-count table (each row sums to 107 populations), not a 19 x 107 per-replicate matrix as the pre-registration assumed; the pre-registered quantities (number of populations fixed for bw75, k = 32 copies, and lost, k = 0, at the last recorded generation) are read directly from it. analysis.py applies the exact two-sided binomial test of fixed against Binomial(fixed + lost, 0.5) and reports the mean bw75 frequency and heterozygosity by generation, from whose decay an effective size is estimated for context.",
+     "explicit": false
+    },
+    "revisions": [],
+    "faithfulness": null
+   },
    "morpholib": [],
    "thumbnail": null,
    "testability": null,
@@ -69508,9 +69586,35 @@
    "theorem": true,
    "notation": "H = \\frac{\\theta}{1+\\theta}, \\theta = 4N_e\\mu (infinite-alleles model)",
    "lean_theorems": null,
-   "evidence": null,
-   "evidence_kind": null,
-   "data_test": null,
+   "evidence": "refutes",
+   "evidence_kind": "biological",
+   "data_test": {
+    "verdict": "refutes",
+    "confidence": 0.9,
+    "preregistered": true,
+    "data_kind": "biological",
+    "path": "test-data/claim-tests/math-bio-claims/kimura-heterozygosity/result.json",
+    "test_contract": {
+     "expected_observation": "Pre-registered. Data: Buffalo (2021) combined_data.tsv from github.com/vsbuffalo/paradox_variation (commit b8f91d5, 2021-09-27), metazoan species (kingdom == Animalia) with a non-missing diversity value (pairwise nucleotide diversity, column 'diversity') and a non-missing census-size estimate (column 'log10_popsize', the posterior mean of log10 census size from the author's range x density model; if the file carries another census-size point estimate instead, the column actually used is recorded in 'method'). One row per species. SUPPORTS if Spearman rho(log10 pi, log10 N) > 0.5 with p < 0.001 AND the ordinary-least-squares slope of log10 pi on log10 N has a point estimate >= 0.3 with a 95% confidence interval that includes some value >= 0.5 (diversity rises at least about a third as fast as census size on a log scale, i.e. within a factor of about 3 of the law's slope of 1). AMENDMENT (2026-10-31, before any data were downloaded, at the request of the holdout thread): species of class Aves are excluded from the primary analysis and from all criteria above; bird rows are held out and only reported separately, unfitted, as a holdout check. The taxonomic class is taken from the file's own taxonomy columns.",
+     "disconfirming_observation": "Pre-registered. REFUTES if the 95% confidence interval of the slope lies entirely below 0.25 (diversity rises less than a quarter as fast as census size on a log scale, so the law with N as the proxy for Ne is quantitatively wrong by orders of magnitude across the range of N: the Lewontin's-paradox pattern) OR rho <= 0. MIXED otherwise. INCONCLUSIVE (underpowered) if fewer than 50 species qualify; INCONCLUSIVE (data-unavailable) if the file cannot be downloaded.",
+     "admissible_datasets": "Planned datasets: buffalo2021-paradox-variation-combined-data, holdout: class Aves rows excluded from fitting (see holdout/README.md)",
+     "inference_method": "fetch.py downloads combined_data.tsv at the pinned commit. analysis.py keeps Animalia rows with a diversity value > 0 and a log10_popsize value (one row per species), drops the 13 class-Aves species (held out, never fitted), and on the remaining species computes Spearman rho between log10 diversity and log10 census size and an ordinary-least-squares regression of log10 diversity on log10 census size with a t-based 95% confidence interval on the slope. The decision rule is the pre-registered one.",
+     "explicit": false
+    },
+    "revisions": [],
+    "faithfulness": {
+     "verdict": "representative-with-caveats",
+     "assessors": [
+      {
+       "assessor": "gpt-5-2025-08-07",
+       "verdict": "representative-with-caveats",
+       "confidence": null,
+       "file": "test-data/claim-tests/math-bio-claims/kimura-heterozygosity/faithfulness.json"
+      }
+     ],
+     "status": "agreed"
+    }
+   },
    "morpholib": [],
    "thumbnail": null,
    "testability": null,
@@ -69588,9 +69692,24 @@
    "theorem": true,
    "notation": "\\Delta \\bar{p} > 0 \\iff r b - c > 0, with r, b, c defined as regression coefficients (Queller form via the Price equation)",
    "lean_theorems": null,
-   "evidence": null,
-   "evidence_kind": null,
-   "data_test": null,
+   "evidence": "inconclusive",
+   "evidence_kind": "computational",
+   "data_test": {
+    "verdict": "inconclusive",
+    "confidence": 0.99,
+    "preregistered": true,
+    "data_kind": "computational",
+    "path": "test-data/claim-tests/math-bio-claims/hamilton-rule/overnight-hamiltons-moran/result.json",
+    "test_contract": {
+     "expected_observation": "The refit regression matches the sign of exact expected frequency change at every non-absorbing state with nonzero expected change, and the frozen predictor disagrees in sign at least once at an endpoint state.",
+     "disconfirming_observation": "The frozen additive predictor agrees in sign at every state, or the refit regression disagrees with any nonzero exact expected frequency change.",
+     "admissible_datasets": "",
+     "inference_method": "Enumerate all 64 labelled binary configurations of six haploids in three fixed pairs using fractions.Fraction. For each configuration, compute exact fitnesses and all Moran birth-death transitions, then uniformly average transitions conditional on cooperator count to emit the requested seven-row table. Fit exact ordinary least-squares coefficients to pooled individual records at each count, freeze the count-three coefficients for the additive predictor, and compare both predictor signs with the aggregated expected frequency change.",
+     "explicit": false
+    },
+    "revisions": [],
+    "faithfulness": null
+   },
    "morpholib": [],
    "thumbnail": null,
    "testability": null,
@@ -69668,9 +69787,24 @@
    "theorem": true,
    "notation": "unbeatable proportion of males x^* = \\frac{n-1}{2n} for n foundresses per patch (diploid case)",
    "lean_theorems": null,
-   "evidence": null,
-   "evidence_kind": null,
-   "data_test": null,
+   "evidence": "inconclusive",
+   "evidence_kind": "none",
+   "data_test": {
+    "verdict": "inconclusive",
+    "confidence": 1,
+    "preregistered": true,
+    "data_kind": "none",
+    "path": "test-data/claim-tests/math-bio-claims/hamilton-lmc/result.json",
+    "test_contract": {
+     "expected_observation": "Pre-registered. Data: Cook et al. (2015) 'DNA methylation and sex allocation in the parasitoid wasp Nasonia vitripennis', Dryad doi:10.5061/dryad.15nj0, file DryadData.xlsx; only control (untreated or vehicle-treated) females are used, with the number of co-foundresses and the numbers of sons and daughters per brood or host as given in the file. SUPPORTS if Spearman rho(number of foundresses, proportion of sons) > 0 with p < 0.05 across broods AND the mean absolute deviation between the observed mean proportion of sons at each foundress number n >= 2 and (n - 1) / (2n) is <= 0.10.",
+     "disconfirming_observation": "Pre-registered. REFUTES if rho <= 0 or p >= 0.05 (no increase of the son proportion with foundress number). MIXED if the increase is present but the deviation from (n - 1) / (2n) exceeds 0.10. INCONCLUSIVE (not-operationalizable) if the file does not record foundress number per brood. INCONCLUSIVE (data-unavailable) if Dryad keeps blocking automated download (as of 2026-10-31 it serves a JavaScript proof-of-work challenge to scripted requests, which this project does not circumvent) and no manually downloaded copy with a recorded checksum is supplied.",
+     "admissible_datasets": "Planned datasets: cook2015-nasonia-methylation-sex-allocation-dryad",
+     "inference_method": "fetch.py requested the file(s) by their Dryad file-stream URLs with a plain HTTP client and received HTTP 403 with a proof-of-work challenge page (the Dryad API download endpoint requires an account token). Per BEST_PRACTICES.md, sites that block automated requests are not circumvented, so no data were inspected and no analysis was run. fetch.py accepts a manually downloaded copy placed in data/ and records its checksum; the pre-registered analysis can then be run without changing the criteria.",
+     "explicit": false
+    },
+    "revisions": [],
+    "faithfulness": null
+   },
    "morpholib": [],
    "thumbnail": null,
    "testability": null,
@@ -69708,9 +69842,24 @@
    "theorem": false,
    "notation": "s(a) = \\frac{\\partial r}{\\partial \\ln p_a} = \\frac{1}{T}\\sum_{x=a+1}^{\\infty} e^{-rx} l_x m_x, non-increasing in a",
    "lean_theorems": null,
-   "evidence": null,
-   "evidence_kind": null,
-   "data_test": null,
+   "evidence": "mixed",
+   "evidence_kind": "biological",
+   "data_test": {
+    "verdict": "mixed",
+    "confidence": 0.6,
+    "preregistered": true,
+    "data_kind": "biological",
+    "path": "test-data/claim-tests/math-bio-claims/hamilton-senescence/result.json",
+    "test_contract": {
+     "expected_observation": "Pre-registered. Data: COMADRE Animal Matrix Database v4.26.4.0 (RData file served at compadre-db.org/Data/ComadreDownload; data user agreement and citation guidelines accepted). Matrix selection: MatrixCriteriaAge == 'Yes' (age-classified), MatrixSplit == 'Divided' (U and F submatrices available), MatrixComposite in {'Individual', 'Mean'}, MatrixTreatment == 'Unmanipulated', MatrixCaptivity == 'W' (wild), matrix dimension >= 5, no missing entries in U or F. For each qualifying matrix, survival of age class a is the column sum of U for class a; the last class is dropped from the trend if U has a non-zero diagonal entry there (an open-ended plus group whose survival mixes ages). Mature classes are those whose F column sum is > 0. For each species, qualifying matrices of the same dimension are averaged element-wise (so each species contributes once); species with fewer than 4 mature age classes after dropping the plus group are excluded. Rising adult mortality = Spearman rho between age-class index and mortality (1 - survival) over the mature classes is > 0. SUPPORTS if at least 80% of qualifying species show rising adult mortality AND the mean rho across species is > 0.3. AMENDMENT (2026-10-31, before any data were downloaded, at the request of the holdout thread): species of class Aves are excluded from the primary analysis and from all criteria above; bird species are held out and only reported separately, unfitted, as a holdout check. Class is taken from COMADRE's 'Class' metadata column.",
+     "disconfirming_observation": "Pre-registered. REFUTES if fewer than 50% of qualifying species show rising adult mortality. MIXED otherwise (50% to 80%, or >= 80% with mean rho <= 0.3). INCONCLUSIVE (underpowered) if fewer than 15 species qualify; INCONCLUSIVE (data-unavailable) if the file cannot be downloaded or read.",
+     "admissible_datasets": "Planned datasets: comadre-animal-matrix-database-4.26.4.0, holdout: class Aves rows excluded from fitting (see holdout/README.md)",
+     "inference_method": "fetch.py downloads the RData file and exports metadata and U, F, C submatrices to JSON with an R script (jsonlite). analysis.py keeps age-classified, divided, unmanipulated, wild, individual-or-mean matrices of dimension >= 5 with finite entries; averages a species' matrices of its most common dimension; takes survival per class as the U column sum, drops a terminal class with a self-loop (open plus group), defines mature classes by positive F column sums, and computes Spearman rho between class index and mortality over >= 4 mature classes (constant mortality counted as rho = 0). Bird species are excluded before the verdict. The pre-registered rule is applied.",
+     "explicit": false
+    },
+    "revisions": [],
+    "faithfulness": null
+   },
    "morpholib": [],
    "thumbnail": null,
    "testability": null,
@@ -69828,9 +69977,24 @@
    "theorem": true,
    "notation": "with cost linear in time at unit rate and resource value V, the ESS persistence time has density p(x) = \\frac{1}{V} e^{-x/V}",
    "lean_theorems": null,
-   "evidence": null,
-   "evidence_kind": null,
-   "data_test": null,
+   "evidence": "inconclusive",
+   "evidence_kind": "none",
+   "data_test": {
+    "verdict": "inconclusive",
+    "confidence": 1,
+    "preregistered": true,
+    "data_kind": "none",
+    "path": "test-data/claim-tests/math-bio-claims/maynardsmith-war-of-attrition/result.json",
+    "test_contract": {
+     "expected_observation": "Pre-registered. Data: 'Vibrating aggression: spider males perform an unusual assessment strategy during contest displays', Dryad doi:10.5061/dryad.bg79cnpjg, file fight.csv (male-male contests of the orb-web spider Trichonephila clavipes), restricted to contests recorded as not escalating to physical contact, using the contest duration column as given. SUPPORTS if n >= 20 AND a Kolmogorov-Smirnov test of exponentiality with the rate estimated from the data (p-value calibrated by 10,000 parametric bootstrap replicates, i.e. a Lilliefors-type test) gives p > 0.05 AND the coefficient of variation of the durations lies in [0.7, 1.3].",
+     "disconfirming_observation": "Pre-registered. REFUTES if the bootstrap-calibrated test gives p < 0.01 AND the coefficient of variation lies outside [0.5, 1.5]. MIXED otherwise. INCONCLUSIVE (underpowered) if n < 20. INCONCLUSIVE (data-unavailable) if Dryad keeps blocking automated download (as of 2026-10-31 it serves a JavaScript proof-of-work challenge to scripted requests, which this project does not circumvent) and no manually downloaded copy with a recorded checksum is supplied.",
+     "admissible_datasets": "Planned datasets: spider-contest-display-durations-dryad-bg79cnpjg",
+     "inference_method": "fetch.py requested the file(s) by their Dryad file-stream URLs with a plain HTTP client and received HTTP 403 with a proof-of-work challenge page (the Dryad API download endpoint requires an account token). Per BEST_PRACTICES.md, sites that block automated requests are not circumvented, so no data were inspected and no analysis was run. fetch.py accepts a manually downloaded copy placed in data/ and records its checksum; the pre-registered analysis can then be run without changing the criteria.",
+     "explicit": false
+    },
+    "revisions": [],
+    "faithfulness": null
+   },
    "morpholib": [],
    "thumbnail": null,
    "testability": null,
@@ -69908,9 +70072,35 @@
    "theorem": true,
    "notation": "the relative heterozygosity H_{after}/H_{before} at a neutral site at recombination fraction c is an increasing function of c/s that tends to 0 as c/s \\to 0; the affected region has a width of order s in recombination units, up to logarithmic factors in N",
    "lean_theorems": null,
-   "evidence": null,
-   "evidence_kind": null,
-   "data_test": null,
+   "evidence": "supports",
+   "evidence_kind": "biological",
+   "data_test": {
+    "verdict": "supports",
+    "confidence": 0.85,
+    "preregistered": true,
+    "data_kind": "biological",
+    "path": "test-data/claim-tests/math-bio-claims/maynardsmith-hitchhiking/result.json",
+    "test_contract": {
+     "expected_observation": "Pre-registered. Data: 1000 Genomes Project Phase 3 chromosome 22 genotype VCF (release 20130502, all 2504 samples) and the HapMap Phase II GRCh37 genetic map for chromosome 22. SNP filter: records with VT=SNP in INFO, biallelic (no MULTI_ALLELIC flag, single ALT), FILTER PASS. Windows: non-overlapping 200 kb windows starting at 16,000,000 bp (GRCh37) up to the last SNP. Diversity per window: pi = sum over SNPs of 2p(1-p) * 2n/(2n-1), with p the INFO AF value and 2n = 5008 chromosomes, divided by the window length (200,000 bp). Windows with fewer than 200 qualifying SNPs are excluded as unassessable (centromere-proximal or low-accessibility regions). Recombination rate per window: (map cM at window end minus map cM at window start) / 0.2 Mb, with cM linearly interpolated from the genetic map. SUPPORTS if Spearman rho(pi, recombination rate) across windows is >= 0.2 with two-sided p < 0.01.",
+     "disconfirming_observation": "Pre-registered. REFUTES if rho < 0 with p < 0.05 (diversity lower where recombination is higher) OR if |rho| < 0.1 with p > 0.05 and at least 100 windows (no detectable relationship). MIXED otherwise (0 <= rho < 0.2, or 0.01 <= p). INCONCLUSIVE (data-unavailable) if either file cannot be downloaded.",
+     "admissible_datasets": "Planned datasets: 1000genomes-phase3-chr22-genotypes-20130502, hapmap-phaseII-genetic-map-grch37",
+     "inference_method": "fetch.py downloads the chr22 VCF (205.6 MB) and the genetic-map archive. analysis.py streams the VCF, keeps PASS biallelic records with VT=SNP and without MULTI_ALLELIC, sums 2p(1-p)*2n/(2n-1) from the INFO AF value over non-overlapping 200 kb windows from 16.0 Mb, divides by window length to get pi, and takes the recombination rate per window from the linearly interpolated HapMap map; windows with fewer than 200 SNPs are excluded. Spearman and Pearson correlations between pi and rate across windows are computed and the pre-registered rule applied.",
+     "explicit": false
+    },
+    "revisions": [],
+    "faithfulness": {
+     "verdict": "representative-with-caveats",
+     "assessors": [
+      {
+       "assessor": "gpt-5-2025-08-07",
+       "verdict": "representative-with-caveats",
+       "confidence": null,
+       "file": "test-data/claim-tests/math-bio-claims/maynardsmith-hitchhiking/faithfulness.json"
+      }
+     ],
+     "status": "agreed"
+    }
+   },
    "morpholib": [],
    "thumbnail": null,
    "testability": null,
