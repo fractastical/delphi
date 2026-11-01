@@ -1,11 +1,40 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 6:11pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 6:37pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
-GOAL.md and SPEC-005 through SPEC-015 define acceptance. The latest dated checkpoint supersedes older status snapshots.
+GOAL.md and SPEC-005 through SPEC-016 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 6:11pm PDT
+## Current checkpoint — October 31, 2026, 6:37pm PDT
+
+- [x] Release `e246a51` is live: ecology saved-state viewer, prospective
+  Experimentation comparison, recorded DDPM visuals with failed strict audit,
+  and current dated resource receipts. Root ran 18 focused browser/resource
+  tests, 39 live public MCP checks and 8 public web checks. No scientific writes.
+- [x] Public MCP now executes the bounded prospective experiment planner:
+  the live check reproduced deflection-only rank 1 versus mixed readouts rank 2,
+  without observations, persistence, lab execution or cloud submission.
+- [x] Corrected R4 print ZIP remains downloadable from Home, with fit/balance
+  limits. No flight or catch-wall safety validation has been established.
+- [x] MiniMax narration synthesized from the revision-2 frozen storyboard:
+  109.152 seconds of speech for the 120-second cut and 54.648 for the 60-second
+  cut. Natural speed 1.0; unchanged segments reused by exact text hash.
+- [ ] Native resource_scaling: edit both videos from actual media and current
+  live captures; verify durations, captions, source hashes and decoded output.
+  Claude-06: capture actual interfaces. Claude-02: public demo gallery. Root:
+  independent review, guarded artifact publication and public playback checks.
+- [ ] Native mechanobio_sim/infra_director report 26 of 28 ecology scenario pairs
+  returned with numerical gates passing; two were never started at the deadline.
+  Missing-only continuation is separate. These returned analyses await integration.
+- [ ] Google L4 calibrated CPU/CUDA parity and restart controls passed, but the
+  three-hour run admission failed its measured timing budget; no R2 scientific
+  run started under that admission. A separately declared overnight run is being
+  prepared. Nebius NCA H100 was admitted but still pulling its image at the latest
+  provider observation; no training result is claimed.
+- [ ] Compiler/layer lineage, 23-genome interpretation, independent R4 catch-wall
+  review and inverse-pattern learning remain active. The broad goal is unfinished.
+
+## Previous checkpoint — October 31, 2026, 6:11pm PDT
 
 - [x] Site/MCP release `5e27158` is live. Root ran 22 focused browser/blueprint
   checks (85 deselected), then 8 deployed public-read checks and 37 MCP checks.
