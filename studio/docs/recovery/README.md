@@ -17,7 +17,7 @@ capabilities. Never publish a decrypted tree, the private manifest, or either da
   specifications in source, and a per-file hash/size/mode manifest.
 
 The capture is a declared time window, not an atomic filesystem snapshot. Each individual
-file must remain stable while copied. A changing file is reported as a capture error; publication
+file must remain stable while copied. Active JSONL transcripts are first staged at a declared complete-line cutoff, checked against a second unbuffered source read; later appends are explicitly outside that cutoff. Prefix rewrites, truncation and symlink replacement are refused. A changing staged file is reported as a capture error; publication
 refuses a snapshot with capture errors. The database has its own transactional snapshot.
 The receipt's `bundled-refs.txt` describes actual bundled refs; an earlier worktree inventory
 can describe an earlier capture moment.
@@ -217,3 +217,5 @@ The checker requires Docker, a new virtual environment and dependency download a
 no host database listener, exposes no public port, retains failed receipts and records cleanup.
 The storage download/archive rehash, independent database replay and separate-host application
 run are distinct evidence, joined in `results/resources/backup-recovery-service-20261101.json`.
+
+The first final follow-up capture (`20261101T0440`) was withheld from publication because one active Codex transcript changed during copying. Its failed receipt remains preserved. The immutable transcript-prefix staging above was added in response; the archive stable-file gate was not weakened.
