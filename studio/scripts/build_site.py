@@ -572,6 +572,49 @@ def fish_history(ins: Inputs) -> dict | None:
             "date_basis": "Author date of the first commit that added the node's manifest in this repository (a repository fact, not the date the design was made); null when git history is unavailable."}
 
 
+def regulatory_map(ins: Inputs) -> dict | None:
+    """Fish cell-regulatory applicability map (source-only): the seven cell programs, four datasets, four coupling ports (all unknown), proposed next actions and the source list.
+    Local response paths are dropped; nothing is added or inferred here."""
+    d = "artifacts/fish-regulatory-map"
+    if not (ROOT / d / "map.json").exists():
+        return None
+    M = json.loads(ins.read(f"{d}/map.json")); S = json.loads(ins.read(f"{d}/sources.json")); man = json.loads(ins.read(f"{d}/manifest.json"))
+    return {"status": M["status"], "organism": M["organism"], "target_organism_transfer": M["target_organism_transfer"], "rows": M["rows"], "datasets": M["datasets"], "coupling_ports": M["coupling_ports"], "next_actions": M["proposed_next_actions"],
+            "flags": {k: M[k] for k in ("blocked_generation_replayed", "new_model_inference_performed", "whole_organism_genome_design_available", "biological_success_probability")},
+            "sources": [{k: x.get(k) for k in ("id", "primary_url", "response_sha256", "response_bytes", "read_scope", "evidence_status")} for x in S["sources"]], "not_performed": S.get("not_performed", []),
+            "excluded": {"reason": S["excluded_response"]["reason"], "sha256": S["excluded_response"]["sha256"]} if S.get("excluded_response") else None,
+            "files": man["files"], "manifest": f"{d}/manifest.json"}
+
+
+def claim_reuse_block(ins: Inputs) -> dict | None:
+    """A worked example of exact Claim reuse and an independent dispute: two distinct Actions consumed the same exact Claim version before their solver ran; an independent
+    reviewer recorded both Evidence as disputed. Everything is copied from the producer audit, the review readback and the author response; no benefit is computed."""
+    d = "artifacts/claim-reuse"; rv = "docs/reviews/fin-reuse-review-run/readback"
+    if not ((ROOT / d / "audit.json").exists() and (ROOT / rv / "assessment-above.json").exists()):
+        return None
+    A = json.loads(ins.read(f"{d}/audit.json")); E = json.loads(ins.read(f"{d}/reuse-verification.json")); reviews = []
+    for n in ("below", "above"):
+        r = json.loads(ins.read(f"{rv}/assessment-{n}.json")); pl = r["record"]["payload"]
+        reviews.append({"case": n, "reviewer": r["record"]["issuer"], "policy": r["policy_version"], "decision": pl["decision"], "assessment_id": r["record"]["id"], "created_at": r["record"]["created_at"],
+                        "dimensions": {k: {"status": v.get("status"), "rationale": v.get("rationale", "")} for k, v in pl["dimensions"].items()}})
+    return {"claim_ref": A["claim_ref"], "distinct_actions": A["distinct_current_action_ids_with_recorded_input_use"], "causal_order_checked": A["causal_read_and_input_binding_before_each_solver"],
+            "cases": [{k: c.get(k) for k in ("case", "action_ref", "evidence_ref", "parsed_EIcrit_Nm2_exact", "solver_EI_Nm2_exact", "tip_over_L", "tip_over_L_limit", "max_slope_rad", "model_domain_valid", "numerical_checks_passed", "result_sha256", "action_state_at_readback", "evidence_status_at_submission", "wall_seconds")} for c in A["cases"]],
+            "edges": E["edges"], "edges_truncated": E["truncated"], "reviews": reviews,
+            "not_established": {"time_or_cost_saved": A["time_or_cost_saved"], "collective_benefit": A["collective_benefit"], "biological_success_probability": A["biological_success_probability"], "empirical_validation": A["empirical_validation"]},
+            "scope": A["scope"], "original_proposals": A["original_proposals"], "readme": ins.text(f"{d}/README.md"), "author_response": ins.text(f"{d}/author-response.md"),
+            "audit": f"{d}/audit.json", "audit_sha256": ins.seen[f"{d}/audit.json"]["sha256"], "review_readback": rv}
+
+
+def genetic_blueprints(ins: Inputs) -> dict | None:
+    """Genetic implementation blueprints (SPEC-012): source-backed PROPOSED designs in zebrafish, copied as written. No sequence, effector or coefficient is added; unknowns stay as the package states them."""
+    d = "artifacts/genetic-blueprints"
+    if not (ROOT / d / "blueprints.json").exists():
+        return None
+    B = json.loads(ins.read(f"{d}/blueprints.json")); S = json.loads(ins.read(f"{d}/sources.json")) if (ROOT / d / "sources.json").exists() else {}
+    return {"status": B["status"], "species_scope": B["species_scope"], "date": B["date"], "designs": B["designs"], "comparison": B["comparison"], "global_causal_gaps": B["global_causal_gaps"], "not_done": B["not_done"],
+            "inputs": B["inputs"], "citations": B["citation_table"], "source_status": S.get("status"), "files": {"blueprints.json": ins.seen[f"{d}/blueprints.json"]["sha256"], "sources.json": ins.seen.get(f"{d}/sources.json", {}).get("sha256")}}
+
+
 def lifecycle_block(ins: Inputs) -> dict | None:
     """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
     d = "data/fish-lifecycle"
@@ -1078,6 +1121,9 @@ def build() -> dict[str, bytes]:
     recovery_in = recovery_inputs(ins, extra)
     secondary_in = runtime_inputs(ins, extra, "secondary-runtime-inputs")
     fish_hist = fish_history(ins)
+    reg_map = regulatory_map(ins)
+    claim_reuse = claim_reuse_block(ins)
+    gen_bp = genetic_blueprints(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -1114,6 +1160,9 @@ def build() -> dict[str, bytes]:
         "recovery_inputs": recovery_in,
         "secondary_inputs": secondary_in,
         "fish_history": fish_hist,
+        "regulatory_map": reg_map,
+        "claim_reuse": claim_reuse,
+        "genetic_blueprints": gen_bp,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),

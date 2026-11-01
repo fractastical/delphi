@@ -70,7 +70,7 @@ def test_build_is_current_and_portable():
 
 def test_every_view_renders_without_errors(browser, base):
     pg = page(browser)
-    for route in ["history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1, #main h2", timeout=5000)
         assert pg.locator("#main").inner_text().strip(), route
@@ -308,7 +308,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["home", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -1462,3 +1462,74 @@ def test_stale_sentences_are_gone_and_cost_cites_the_dated_google_receipt(browse
     assert "not available from this page" not in t and "Waiting for the genomic" not in t and "Panels waiting for a contract" not in t and "Waiting for bounded proposals" not in t
     assert "Related panels and their status" in t and "proposal checker" in t and "Contribute panel" in t
     assert pg.locator("#pl-h").locator("xpath=..").locator("a[href='#/formalize']").count() == 1
+
+
+def test_regulatory_map_page_keeps_source_only_scope_unknown_bridges_and_no_execution(browser, base):
+    R = json.loads((ROOT / "site/data/snapshot.json").read_text())["regulatory_map"]
+    src = json.loads((ROOT / "artifacts/fish-regulatory-map/map.json").read_text())
+    assert [r["id"] for r in R["rows"]] == [r["id"] for r in src["rows"]] and len(R["rows"]) == 7 and len(R["datasets"]) == 4 and len(R["coupling_ports"]) == 4
+    assert all(c["value"] is None and c["status"] == "unknown" for c in R["coupling_ports"]) and all(a["status"].endswith("not-executed") for a in R["next_actions"])
+    assert "local_response_path" not in json.dumps(R), "local file paths must not be published"
+    pg = page(browser)
+    pg.goto(base + "#/regulatory"); pg.wait_for_selector(".regprog")
+    t = pg.locator("#main").text_content()
+    assert "source-only" in t and "flying-fish transfer unknown" in t and "not computed (null)" in t and "not available" in t
+    assert pg.locator(".regprog").count() == 7 and pg.evaluate("[...document.querySelectorAll('.regprog')].every(d => !d.open)")
+    assert "transfer validated: false" in t and "Demonstrated." in t and "Inferred, not demonstrated." in t and "Missing bridge." in t
+    assert t.count("unknown") >= 4 and "none (null)" in t and "none executed" in t
+    assert "A retrieved response is not independent experimental verification" in t
+    pg.goto(base + "#/regulatory?row=pectoral-fin-field"); pg.wait_for_selector(".regprog[open]")
+    assert pg.locator(".regprog[open]").get_attribute("id") == "rg-pectoral-fin-field"
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/regulatory"); pg2.wait_for_selector(".regprog")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+    pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
+    assert pg.locator(".subnav a:has-text('Regulatory applicability')").count() == 1
+
+
+def test_claim_reuse_page_shows_the_dispute_and_claims_no_benefit(browser, base):
+    C = json.loads((ROOT / "site/data/snapshot.json").read_text())["claim_reuse"]
+    audit = json.loads((ROOT / "artifacts/claim-reuse/audit.json").read_text())
+    assert C["distinct_actions"] == audit["distinct_current_action_ids_with_recorded_input_use"] == 2 and len(C["cases"]) == 2
+    for n in ("below", "above"):
+        a = json.loads((ROOT / f"docs/reviews/fin-reuse-review-run/readback/assessment-{n}.json").read_text())["record"]["payload"]
+        r = next(x for x in C["reviews"] if x["case"] == n)
+        assert r["decision"] == a["decision"] == "disputed" and r["dimensions"]["empirical_relevance"]["status"] == a["dimensions"]["empirical_relevance"]["status"] == "insufficient"
+    pg = page(browser)
+    pg.goto(base + "#/reuse"); pg.wait_for_selector("#ru-3")
+    t = pg.locator("#main").text_content()
+    assert "not a saving of time or cost" in t and "not a collective benefit" in t and "not biological evidence" in t
+    assert "disputed" in t and "insufficient" in t and "outside: a retained counterexample" in t and "inside" in t
+    assert "0.111111" in t and "0.090909" in t and "agreed with each finding and changed no record" in t
+    assert "typed uses link" in t or "typed <code>uses</code>" in pg.locator("#ru-1").inner_html()
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/reuse"); pg2.wait_for_selector("#ru-3")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+    pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
+    assert pg.locator(".subnav a:has-text('Claim reuse and dispute')").count() == 1
+
+
+def test_genetic_blueprints_show_construct_blocks_unknowns_equations_and_no_sequence(browser, base):
+    G = json.loads((ROOT / "site/data/snapshot.json").read_text())["genetic_blueprints"]
+    src = json.loads((ROOT / "artifacts/genetic-blueprints/blueprints.json").read_text())
+    assert [d["id"] for d in G["designs"]] == [d["id"] for d in src["designs"]] and len(G["designs"]) == 4
+    pg = page(browser)
+    pg.goto(base + "#/blueprints"); pg.wait_for_selector(".bpdesign")
+    t = pg.locator("#main").text_content()
+    assert pg.locator(".bpdesign").count() == 4 and pg.locator(".bpconstruct").count() == 4 and pg.locator(".bpconstruct .bpblock").count() == 16
+    assert pg.locator(".bpdesign").first.locator(".bpstep").count() == 8
+    assert "proposed, not executed" in t or "proposed design, NOT executed" in t
+    assert pg.locator("mark.unk").count() >= 20, "unknowns must be conspicuous"
+    assert "No DNA sequence, effector, coefficient or result is given" in t and "flying-fish transfer: unknown; not claimed" in t
+    assert pg.locator("section[aria-labelledby=bp-eq] .katex").count() >= 2 and pg.locator("section[aria-labelledby=bp-eq] tbody tr").count() == 4 and "not declared" in pg.locator("section[aria-labelledby=bp-eq]").text_content()
+    assert "A BAC" not in t or "autonomous" in t
+    import re
+    assert not re.search(r"\b[ACGT]{20,}\b", t), "no DNA sequence may appear"
+    assert len(src["comparison"]["rows"]) >= 6
+    assert pg.locator("section[aria-labelledby=bp-cmp] tbody tr").count() == len(src["comparison"]["rows"]) and "Not a ranking" in t
+    pg.click("a[data-cite]:visible >> nth=0")
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/blueprints"); pg2.wait_for_selector(".bpdesign")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+    pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
+    assert pg.locator(".subnav a:has-text('Genetic blueprints')").count() == 1
