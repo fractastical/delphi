@@ -12,10 +12,17 @@
 //   node mcp/cli.mjs organisms --has-axis genome --missing-axis traits --rank species
 //   node mcp/cli.mjs organisms --group-by class
 //   node mcp/cli.mjs organism columba-livia
+//   node mcp/cli.mjs laws --kind biological --status accepted     (Lean laws; same handlers as sim-engine/lean-cli.mjs)
+//   node mcp/cli.mjs law kimura-substitution-rate
+//   node mcp/cli.mjs lawset current
+//   node mcp/cli.mjs check design.json --lawset current
+//   node mcp/cli.mjs propose Law.lean --meta meta.json
+//   node mcp/cli.mjs verify
 
 import { browseClaims } from "./graph.mjs";
 import { getClaim, overview, rankClaims, searchClaims, sparql } from "./lib.mjs";
 import { browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
+import { COMMANDS as LEAN } from "../sim-engine/lean-cli.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const opts = {};
@@ -43,6 +50,9 @@ const commands = {
   }),
   organism: () => getOrganism({ id: positional[0] ?? opts.id, includeMentions: opts.includeMentions !== false }),
 };
+// Lean law subcommands: parsed again from raw argv by the shared CLI so numbers stay strings (lawset "1.2.0").
+const { parseArgs } = await import("../sim-engine/lean-cli.mjs");
+for (const [name, fn] of Object.entries(LEAN)) commands[name] = () => fn(parseArgs(rest));
 
 if (!commands[cmd]) {
   console.error(`Usage: node mcp/cli.mjs <${Object.keys(commands).join("|")}> [args] [--source local|network]`);
