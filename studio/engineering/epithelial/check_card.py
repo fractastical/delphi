@@ -24,7 +24,15 @@ def claims(A: dict, G: dict, S: dict) -> list[tuple[str, object, object]]:
         ("A3 contractility-off sweeps", 180.0, A["A3-contractility-off"]["closure_sweeps"]),
         ("A4 tension-off sweeps", 290.0, A["A4-tension-off-NEGATIVE"]["closure_sweeps"]),
         ("F1 no-drive floor", 0.220, round(A["F1-no-drive-NEGATIVE"]["closed_fraction"], 3)),
-        ("geometric floor nodes", 1875, 40000 - 61 * 625),
+        # filled and residual are pinned SEPARATELY. Pinning only 1875 could not tell which
+        # quantity it was, and an earlier card called it the filled amount when it is the
+        # residual. Found by independent review of edc1e10, not by this checker.
+        ("floor: residual gap nodes at target", 1875, 40000 - 61 * 625),
+        ("floor: filled nodes at target", 625, int(A["F1-no-drive-NEGATIVE"]["gap0"]) - (40000 - 61 * 625)),
+        ("floor: filled fraction at target", 0.250,
+         round((A["F1-no-drive-NEGATIVE"]["gap0"] - (40000 - 61 * 625)) / A["F1-no-drive-NEGATIVE"]["gap0"], 3)),
+        ("floor: filled nodes measured", 551,
+         round(A["F1-no-drive-NEGATIVE"]["gap0"] - A["F1-no-drive-NEGATIVE"]["gap_end"])),
         ("G9 measured bracket", [1, 2], g9["measured_bracket"]),
         ("G9 lambda*", 1.414, round(g9["measured_lambda_star"], 3)),
         ("G9 predicted interval", [0.6, 2.0], g9["predicted_interval"]),
@@ -46,6 +54,17 @@ def claims(A: dict, G: dict, S: dict) -> list[tuple[str, object, object]]:
                      ("G5", True), ("G7", True), ("G9", True), ("G10", False), ("G11", True),
                      ("G12", False)):
         rows.append((f"{gid} passed", exp, G[gid]["passed"]))
+    # The TALLY is pinned as its own claim. G6 is descriptive and G8 unevaluable; neither is a
+    # pass, and summing "not failed" as "passed" is how the handoff came to say 9 pass.
+    rows += [
+        ("tally: gates passing", 8, sum(1 for g in G.values() if g["passed"] is True)),
+        ("tally: gates failing", 3, sum(1 for g in G.values() if g["passed"] is False)),
+        ("tally: no verdict assigned (G6 descriptive, G8 unevaluable)", 2,
+         sum(1 for g in G.values() if g["passed"] is None)),
+        ("tally: G6 is not a pass", True, G["G6"]["passed"] is None),
+        ("tally: G8 is not a pass", True, G["G8"]["passed"] is None),
+        ("tally: total gates", 13, len(G)),
+    ]
     return rows
 
 

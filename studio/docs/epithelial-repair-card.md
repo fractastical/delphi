@@ -73,9 +73,16 @@ All four pass.
 cell–medium interface energy and no protrusion — the gap still shrinks by **22.0%**.
 
 That is arithmetic, not biology. After removing 4 cells, 61 survivors at a 625-node target
-claim 38 125 of 40 000 nodes, so 1 875 nodes of the hole are filled by cells relaxing into
-volume they were already short of. The geometric floor is 25.0%; measured 22.0% sits just
-below it because the surface constraint holds cells slightly under target.
+can claim at most 38 125 of 40 000 nodes, which leaves **1 875 nodes of residual gap**. So
+the most the hole can be filled by cells relaxing into volume they were already short of is
+2 500 − 1 875 = **625 nodes, i.e. 25.0%**. Measured is 551 nodes, 22.0%, just under that
+ceiling because the surface constraint holds cells slightly below target.
+
+*(Corrected 2026-10-31 after independent review of `edc1e10`. An earlier version of this
+paragraph called 1 875 the number of nodes **filled**. It is the residual, and the filled
+quantity is 625. The 25.0% and 22.0% figures were right; the label on 1 875 was not.
+`check_card.py` now pins filled and residual separately, since pinning only 1 875 could not
+tell the two apart.)*
 
 **Every closure figure at *k*=4 must be read against this 22% floor.** The first revision's
 negative control (G4) turned off only interface energy and was therefore mis-specified; it
@@ -131,11 +138,19 @@ can shed to outweigh the volume-constraint cost of the stretch that fills the ho
 Phi = lambda_V * A_gap^2 / (N_cells * J_cell_medium * P_gap),   P_gap = 2*sqrt(pi*A_gap)
 ```
 
-**Held-out test (G9, passes).** Φ is linear in λ_V and inverse in J, so doubling J must
-double the threshold. Revision 1 bracketed the *k*=4 threshold at λ_V ∈ (0.3, 1.0) with
-J=140, predicting (0.6, 2.0) at J=280. Measured at J=280: closes at 0.3, 0.6, 1; arrests at
-2, 4 — bracket (1, 2), threshold **1.414**, inside the predicted interval. **No J=280
-measurement entered the prediction.**
+**Held-out test (G9, passes) — one conditional bracket check, not a verified scaling law.**
+Φ is linear in λ_V and inverse in J, so doubling J must double the threshold. Revision 1
+bracketed the *k*=4 threshold at λ_V ∈ (0.3, 1.0) with J=140, predicting (0.6, 2.0) at
+J=280. Observed at J=280: closes at 0.3, 0.6, 1; arrests at 2, 4. The **observed bracketing
+interval is (1, 2)**, whose geometric-mean summary is **1.414** — inside the predicted
+interval. **No J=280 measurement entered the prediction.**
+
+What that is and is not: 1.414 is a **summary statistic of the bracket**, not a directly
+measured point threshold; the true threshold is somewhere in (1, 2) and the sweep spacing is
+all that is known about it. This is **one doubling at one gap size**. It was not repeated at
+*k*=7, and it does not establish exact linear proportionality in J — only that one
+out-of-sample bracket fell where the group said it would. The packet sweep in the infra
+handoff exists precisely because one doubling is one test.
 
 **Where it breaks (G12, fails).**
 
@@ -153,6 +168,12 @@ and **not** a statement about any tissue. One doubling is one test; nothing here
 the scaling over a wider range of J.
 
 ## 7. Numerical controls
+
+**Tally: 8 pass, 3 fail, 1 descriptive, 1 unevaluable** — 13 in all. **G6 is descriptive and
+is not a pass**: it was declared with no threshold, because three seeds of one model are not
+independent samples, and no bound is invented for it now. G8 is unevaluable, which is also
+not a pass. *(Corrected after independent review of `edc1e10`, where this was stated as
+9 pass by counting G6 among them.)*
 
 | gate | result | |
 |---|---|---|
