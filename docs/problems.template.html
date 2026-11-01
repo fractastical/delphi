@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open problems — delphisci</title>
+<meta name="description" content="The delphisci problem graph: genuinely hard open problems in biology and mathematics that an agent swarm could attack, each a nanopublication, with the approaches independently proposed by agents from different model providers, the claims each problem bears on, and the literature.">
+<link rel="icon" href="data:image/svg+xml,/*__SEAL_URI__*/">
+<style>
+:root{--bg:#0e1830;--navy:#14213d;--panel:#16243f;--panel2:#1b2b4d;--gold:#e5c07b;--gold2:#f2dba6;--goldline:rgba(229,192,123,.38);--goldfaint:rgba(229,192,123,.14);
+ --ink:#efe6cf;--mut:#a7b0c2;--line:rgba(229,192,123,.26);--serif:Georgia,'Times New Roman',serif;--sans:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sans);color:var(--ink);background:radial-gradient(1200px 600px at 50% -200px,#1d2f57 0%,var(--bg) 60%) fixed,var(--bg)}
+main{max-width:1180px;margin:0 auto;padding:18px 18px 40px}
+h1,h2,h3{font-family:var(--serif);color:var(--gold)}
+h1{font-size:26px;margin:0;letter-spacing:4px;text-transform:uppercase}
+h3{font-size:11px;margin:14px 0 4px;letter-spacing:2px;text-transform:uppercase}
+p{font-size:13.5px;line-height:1.55;margin:6px 0}.mut{color:var(--mut)}.small{font-size:12px}b{color:var(--gold2)}
+.masthead{display:flex;gap:16px;align-items:center;padding:0 0 12px}
+.masthead svg{width:58px;height:58px;flex:none;filter:drop-shadow(0 4px 12px rgba(0,0,0,.45))}
+.subtitle{font-family:var(--serif);font-style:italic;color:var(--gold2);font-size:15px;margin:4px 0 0}
+.nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+a{color:var(--gold2);text-decoration-color:rgba(229,192,123,.5)}a:hover{color:#fff}
+button,.btn{font:inherit;font-size:12.5px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);cursor:pointer;text-decoration:none;white-space:nowrap}
+button:hover,.btn:hover{border-color:var(--gold);color:var(--gold2)}button.on{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:700}
+input[type=search]{font:inherit;font-size:13px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;background:var(--navy);color:var(--ink);width:220px}
+input[type=search]:focus{outline:none;border-color:var(--gold)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);margin-bottom:10px}
+.lab{font-family:var(--serif);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-right:2px}
+.sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.group{display:inline-flex;gap:4px;flex-wrap:wrap}
+.overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0 16px}
+.stat{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:10px 14px}
+.stat .n{font-family:var(--serif);font-size:26px;color:var(--gold2)}.stat .l{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut)}
+.tier-head{display:flex;align-items:baseline;gap:12px;margin:26px 0 8px;border-bottom:1px solid var(--goldline);padding-bottom:6px}
+.tier-head h2{font-size:21px;margin:0;color:var(--gold)}.tier-head .sub{font-size:12px;color:var(--mut)}
+.prob{position:relative;border:1px solid var(--line);border-radius:12px;background:var(--panel);margin:12px 0;padding:16px 20px 12px;box-shadow:0 6px 20px rgba(0,0,0,.25);scroll-margin-top:16px}
+.prob:target{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold),0 10px 30px rgba(0,0,0,.4)}
+.prob .head{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.prob .num{font-family:var(--serif);color:var(--gold);font-size:12px;letter-spacing:2px;text-transform:uppercase;white-space:nowrap;margin-top:2px}
+.prob .title{font-family:var(--serif);font-size:18px;color:var(--gold2);margin:0;flex:1 1 320px;line-height:1.3}
+.prob .title a{color:inherit;text-decoration:none}.prob .title a:hover{text-decoration:underline}
+.badges{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-left:auto}
+.badge{display:inline-block;color:var(--navy);font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:10px;white-space:nowrap;background:var(--gold)}
+.badge.ghost{background:transparent;color:var(--mut);border:1px dashed var(--mut)}
+.badge.kind{background:transparent;color:var(--gold2);border:1px solid var(--goldline)}
+.badge.math{background:#7fb3ff}.badge.bio{background:#8fd18f}.badge.both{background:#d9a6ff}
+.badge.tractable{background:#8fd18f}.badge.hard{background:#e5c07b}.badge.long-shot{background:#ff9f9f}
+.question{font-family:var(--serif);font-style:italic;font-size:15.5px;line-height:1.55;color:var(--ink);margin:12px 0 6px;padding-left:14px;border-left:2px solid var(--gold)}
+.question::before{content:'Question. ';font-style:normal;font-weight:700;color:var(--gold)}
+.known{font-size:13px;line-height:1.55;color:var(--ink);margin:8px 0}
+.crit{margin:6px 0;padding:0 0 0 18px;font-size:13px;line-height:1.5}.crit li{margin:2px 0}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0}.chip{font-size:11.5px;padding:2px 9px;border:1px solid var(--line);border-radius:999px;color:var(--mut);text-decoration:none}
+.chip:hover{border-color:var(--gold);color:var(--gold2)}
+.refs{font-size:12px;color:var(--mut);margin:6px 0}.refs a{color:var(--gold2)}
+.approaches{margin-top:12px;border-top:1px dashed var(--line);padding-top:8px}
+.appr{border:1px solid rgba(229,192,123,.18);border-radius:10px;background:#0f1a33;margin:8px 0;padding:10px 14px}
+.appr .ahead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.appr .atitle{font-family:var(--serif);font-size:15px;color:var(--gold2);margin:0;flex:1 1 280px}
+.appr .model{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--mut)}
+.appr p{font-size:13px}
+.appr details{font-size:12.5px;margin-top:4px}.appr summary{cursor:pointer;color:var(--gold2)}
+.appr ol{margin:4px 0;padding-left:20px}.appr li{margin:2px 0}
+.np{font-size:11.5px;color:var(--mut)}.np a{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+.hidden{display:none}
+footer{margin-top:30px;font-size:12px;color:var(--mut);border-top:1px solid var(--line);padding-top:10px}
+</style></head>
+<body><main>
+<div class="masthead"><!--__SEAL__-->
+<div><h1>Open problems</h1><p class="subtitle">Genuinely hard questions in biology and mathematics that an agent swarm could attack, with the ways agents proposed to attack them</p></div>
+<div class="nav"><a class="btn" href="claim-graph.html">Claim graph</a><a class="btn" href="theorems.html">Theorems</a><a class="btn" href="problems.json">problems.json</a></div></div>
+
+<p>Each problem and each approach is a nanopublication. A problem (<code>delphir:problem/&lt;id&gt;</code>) states the question, what is known, what would resolve it and what would refute an answer, and links to the claims in the <a href="claim-graph.html">claim graph</a> it bears on. An approach (<code>delphir:approach/&lt;problem&gt;--&lt;model&gt;--&lt;n&gt;</code>) is a plan proposed by one agent, working blind from the problem statement, from one of four model providers. Approaches are proposals, not results: nothing here is solved. Difficulty is the proposer's own estimate of finishing within about a month of agent time. Source and build: <a href="https://github.com/fractastical/delphi/tree/main/problems">problems/</a>.</p>
+
+<div class="overview" id="overview"></div>
+
+<div class="toolbar">
+  <span class="lab">Tier</span><span class="group" id="tierBtns"></span><span class="sep"></span>
+  <span class="lab">Field</span><span class="group" id="fieldBtns"></span><span class="sep"></span>
+  <span class="lab">Proposer</span><span class="group" id="modelBtns"></span><span class="sep"></span>
+  <input type="search" id="q" placeholder="Search problems and approaches">
+</div>
+
+<div id="list"></div>
+<footer>Built <span id="built"></span>. Tiers: A, proof or exhaustive computation that agents could finish; B, an open empirical question a pre-registered data test can settle; C, hard and open, where these agents have an unusual angle. Nanopub links point at the registry where the file is published; unpublished drafts show none.</footer>
+</main>
+<script>
+const DATA = /*__DATA__*/null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const state = { tier: 'all', field: 'all', model: 'all', q: '' };
+const TIERS = DATA.tiers;
+const fieldClass = f => f === 'mathematics' ? 'math' : f === 'biology' ? 'bio' : 'both';
+const fieldLabel = f => f === 'mathematics' ? 'mathematics' : f === 'biology' ? 'biology' : 'biology and mathematics';
+$('built').textContent = DATA.built;
+
+function buttons(el, items, key, labels = {}) {
+  el.innerHTML = [['all', 'all'], ...items.map(i => [i, labels[i] ?? i])].map(([v, l]) => `<button data-v="${esc(v)}" class="${state[key] === v ? 'on' : ''}">${esc(l)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { state[key] = b.dataset.v; render(); });
+}
+const models = [...new Set(DATA.problems.flatMap(p => p.approaches.map(a => a.model)))].sort();
+const modelLabels = Object.fromEntries(DATA.problems.flatMap(p => p.approaches.map(a => [a.model, a.model_label || a.model])));
+
+function overview() {
+  const nA = DATA.problems.reduce((s, p) => s + p.approaches.length, 0);
+  const pub = DATA.problems.filter(p => p.nanopub).length + DATA.problems.reduce((s, p) => s + p.approaches.filter(a => a.nanopub).length, 0);
+  $('overview').innerHTML = [
+    [DATA.problems.length, 'problems'], [nA, 'approaches'], [models.length, 'proposer models'],
+    [DATA.problems.filter(p => p.tier === 'A').length + ' / ' + DATA.problems.filter(p => p.tier === 'B').length + ' / ' + DATA.problems.filter(p => p.tier === 'C').length, 'tier A / B / C'],
+    [pub, 'nanopubs published' + (DATA.registry ? ` (${DATA.registry})` : '')],
+  ].map(([n, l]) => `<div class="stat"><div class="n">${esc(n)}</div><div class="l">${esc(l)}</div></div>`).join('');
+}
+
+function npLink(np) {
+  if (!np) return `<span class="np">nanopub: unsigned draft</span>`;
+  return `<span class="np">nanopub: <a href="${esc(np.uri)}">${esc(np.uri.replace('https://w3id.org/np/', ''))}</a>${np.registry && np.registry.includes('test') ? ' <span class="badge ghost">test registry</span>' : ''}</span>`;
+}
+
+function approach(a) {
+  return `<div class="appr" id="${esc(a.id)}">
+    <div class="ahead"><h4 class="atitle">${esc(a.title)}</h4>
+      <span class="model">${esc(a.model_label || a.model)} · ${esc(a.provider)}</span>
+      <span class="badges"><span class="badge kind">${esc(a.kind)}</span><span class="badge ${esc(a.difficulty)}">${esc(a.difficulty)}</span></span></div>
+    <p>${esc(a.method)}</p>
+    <p><b>Decisive result.</b> ${esc(a.decisive_result)}</p>
+    <p class="mut"><b>Fails if.</b> ${esc(a.failure_signature)}</p>
+    <details><summary>Steps, tools, data and citations</summary>
+      <ol>${(a.steps || []).map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+      ${a.tools?.length ? `<div class="chips">${a.tools.map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>` : ''}
+      ${a.datasets?.length ? `<div class="refs">Data: ${a.datasets.map(d => d.url ? `<a href="${esc(d.url)}">${esc(d.name || d.url)}</a>` : esc(d.name)).join(' · ')}</div>` : ''}
+      ${a.references?.length ? `<div class="refs">Cites: ${a.references.map(r => r.url ? `<a href="${esc(r.url)}">${esc(r.title || r.note || r.url)}</a>` : esc(r.note)).join(' · ')}</div>` : ''}
+      ${a.missing ? `<p class="mut small"><b>Missing.</b> ${esc(a.missing)}</p>` : ''}
+    </details>
+    ${npLink(a.nanopub)}
+  </div>`;
+}
+
+function problem(p, i) {
+  const apps = p.approaches.filter(a => state.model === 'all' || a.model === state.model);
+  return `<article class="prob" id="${esc(p.id)}">
+    <div class="head"><span class="num">Problem ${i + 1}</span><h2 class="title"><a href="#${esc(p.id)}">${esc(p.title)}</a></h2>
+      <span class="badges"><span class="badge ${fieldClass(p.field)}">${esc(fieldLabel(p.field))}</span><span class="badge kind">tier ${esc(p.tier)}</span>${p.frontier_problem ? `<span class="badge ghost">also a Frontier problem</span>` : ''}</span></div>
+    <p class="question">${esc(p.question)}</p>
+    <p class="known"><b>Known state.</b> ${esc(p.known_state)}</p>
+    <h3>Resolved when</h3><ul class="crit">${p.acceptance_criteria.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
+    <h3>Refuted if</h3><ul class="crit">${p.falsifiers.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
+    ${p.related_claims.length ? `<h3>Claims it bears on</h3><div class="chips">${p.related_claims.map(c => `<a class="chip" href="claim-graph.html#${encodeURIComponent(c.id)}" title="${esc(c.label || '')}">${esc(c.id)}${c.evidence ? ` · ${esc(c.evidence)}` : c.status && c.status !== 'untested' ? ` · ${esc(c.status)}` : ''}</a>`).join('')}</div>` : ''}
+    <div class="refs">${p.references.map(r => `<a href="${esc(r.url)}">${esc(r.title || r.note)}</a>`).join(' · ')}</div>
+    <div class="chips">${p.required_capabilities.map(c => `<span class="chip">${esc(c)}</span>`).join('')}<span class="chip">${esc(p.data_access)}</span></div>
+    ${npLink(p.nanopub)}
+    <div class="approaches"><h3>${apps.length} approach${apps.length === 1 ? '' : 'es'}${state.model !== 'all' ? ` by ${esc(modelLabels[state.model])}` : ''}</h3>${apps.map(approach).join('') || '<p class="mut small">No approaches yet.</p>'}</div>
+  </article>`;
+}
+
+function render() {
+  buttons($('tierBtns'), ['A', 'B', 'C'], 'tier', { A: 'A · proof or computation', B: 'B · data test', C: 'C · unusual angle' });
+  buttons($('fieldBtns'), ['mathematics', 'biology', 'both'], 'field', { both: 'biology and mathematics' });
+  buttons($('modelBtns'), models, 'model', modelLabels);
+  const q = state.q.trim().toLowerCase();
+  const hit = p => !q || JSON.stringify(p).toLowerCase().includes(q);
+  const shown = DATA.problems.filter(p => (state.tier === 'all' || p.tier === state.tier) && (state.field === 'all' || p.field === state.field) && hit(p));
+  let html = '';
+  for (const t of ['A', 'B', 'C']) {
+    const ps = shown.filter(p => p.tier === t);
+    if (!ps.length) continue;
+    html += `<div class="tier-head"><h2>Tier ${t}</h2><span class="sub">${esc(TIERS[t])} · ${ps.length} problem${ps.length === 1 ? '' : 's'}</span></div>`;
+    html += ps.map(p => problem(p, DATA.problems.indexOf(p))).join('');
+  }
+  $('list').innerHTML = html || '<p class="mut">Nothing matches.</p>';
+}
+$('q').oninput = e => { state.q = e.target.value; render(); };
+overview(); render();
+if (location.hash) { const el = document.querySelector(location.hash); if (el) el.scrollIntoView(); }
+</script>
+</body></html>
