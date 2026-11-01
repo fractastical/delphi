@@ -1,0 +1,51 @@
+{
+  "claim_id": "hamilton-rule",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/hamilton-rule",
+  "project": "math-bio-claims",
+  "status": "complete",
+  "hypothesis": "In the specified exact N = 6 paired Moran model, a regression predictor refit at each non-absorbing state has the same sign as exact expected frequency change, while coefficients frozen from frequency 1/2 have the wrong sign in at least one endpoint state.",
+  "pass_criterion": "The refit regression matches the sign of exact expected frequency change at every non-absorbing state with nonzero expected change, and the frozen predictor disagrees in sign at least once at an endpoint state.",
+  "fail_criterion": "The frozen additive predictor agrees in sign at every state, or the refit regression disagrees with any nonzero exact expected frequency change.",
+  "planned_datasets": [],
+  "data_kind": "computational",
+  "interpretation": "The method cannot literally define the requested seven-state chain: with three fixed pairs, configurations having the same cooperator count can have different transition probabilities, and the absorbing no-mutation chain has no unique stationary conditional distribution on transient three-cooperator configurations. To make the requested count table computable without adding data or stochastic error, the analysis enumerated all 64 labelled configurations and uniformly averaged configurations conditional on each count; this is an explicit closure convention, not a true lumping of the fixed-pair chain. Under that convention the pre-registered criterion fails because the refit predictor disagrees at counts 2 and 3, but this does not refute the regression identity or the target claim because the averaging mixes distinct population states and their fitness normalizations.",
+  "datasets": [],
+  "method": "Enumerate all 64 labelled binary configurations of six haploids in three fixed pairs using fractions.Fraction. For each configuration, compute exact fitnesses and all Moran birth-death transitions, then uniformly average transitions conditional on cooperator count to emit the requested seven-row table. Fit exact ordinary least-squares coefficients to pooled individual records at each count, freeze the count-three coefficients for the additive predictor, and compare both predictor signs with the aggregated expected frequency change.",
+  "measured": {
+    "value": 0,
+    "unit": "preregistered-pass indicator",
+    "n": 5,
+    "uncertainty": "none; exact rational arithmetic",
+    "extra": {
+      "configurations_enumerated": 64,
+      "refit_matches_all_nonzero_states": false,
+      "refit_disagreement_states": [2, 3],
+      "frozen_disagreement_states": [1, 2, 3],
+      "frozen_endpoint_disagreement_states": [1],
+      "count_projection_is_lumpable": false,
+      "distinct_config_delta_counts_by_cooperator_count": {
+        "0": 1,
+        "1": 1,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 1,
+        "6": 1
+      }
+    }
+  },
+  "verdict": "inconclusive",
+  "reason": "not-operationalizable",
+  "confidence": 0.99,
+  "caveats": [
+    "Uniform conditional averaging was not specified by the approach and is not preserved by the fixed-pair Moran dynamics.",
+    "The phrase stationary-conditional fitnesses is undefined without mutation or another conditioning construction because the stated chain is absorbing.",
+    "The computation tests a finite closure convention, not whether organisms obey Hamilton's rule and not the full exact-scope problem."
+  ],
+  "agent": {
+    "kind": "cursor-agent",
+    "model": "gpt-5.6-sol",
+    "run": "hamiltons-rule-exact-scope--grok-4-7--2",
+    "date": "2026-11-01"
+  }
+}

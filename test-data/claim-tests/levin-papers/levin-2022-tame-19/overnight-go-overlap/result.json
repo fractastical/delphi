@@ -1,0 +1,30 @@
+{
+  "claim_id": "levin-2022-tame-19",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-tame-19",
+  "project": "levin-papers",
+  "approach": "morphogenesis-cognition-gene-overlap--grok-4-7--1",
+  "status": "preregistered",
+  "hypothesis": "Among human protein-coding genes, genes annotated (non-IEA) to GO:0009653 anatomical structure morphogenesis and genes annotated (non-IEA) to GO:0007611 learning or memory overlap with odds ratio > 2, and that overlap exceeds a permutation null that preserves both set sizes and matches genes on number of GO annotations and on degree in the INDRA CoGEx statement graph; the same holds within the ion-channel subset (GO:0005216) and within the gap-junction subset (GO:0005921).",
+  "pass_criterion": "Pre-registered. Primary run (IEA excluded). For each of three endpoints, (E1) all human protein-coding genes, (E2) the subset annotated to GO:0005216 monoatomic ion channel activity or descendants, (E3) the subset annotated to GO:0005921 gap junction or descendants, the endpoint passes if the observed odds ratio of the 2x2 table (morphogenesis membership x learning-or-memory membership, within that endpoint's universe) is > 2 AND the one-sided matched-permutation p-value, (1 + #{null OR >= observed OR}) / (1 + 10000), is < 0.01. Verdict 'supports' requires E1, E2 and E3 all to pass in the primary run.",
+  "fail_criterion": "Pre-registered. Verdict 'refutes' if E1 fails in the primary run (observed OR <= 2 or matched-permutation p >= 0.01), i.e. the full-set overlap is not wide beyond annotation volume and statement-graph degree. Verdict 'mixed' if E1 passes but E2 or E3 fails or is underpowered. A subset endpoint is underpowered (and counted as not passing) if its universe has fewer than 5 learning-or-memory genes or fewer than 5 morphogenesis genes. A pass that appears only in the IEA-included run does not count toward any verdict; that run is reported, labelled, as a secondary analysis.",
+  "planned_datasets": [
+    "go-basic-obo",
+    "goa-human-gaf",
+    "hgnc-protein-coding",
+    "indra-cogex-statement-degree"
+  ],
+  "planned_method": "Sets: GAF lines with a NOT qualifier and lines to obsolete terms are dropped; annotations are propagated over is_a and part_of in go-basic.obo; a gene is in a set if any (propagated) annotation reaches the set's root term. Gene identity: HGNC approved protein-coding genes (locus type 'gene with protein product') are the universe; GAF rows are mapped to HGNC IDs through the UniProt accessions listed by HGNC; unmapped rows are dropped and counted. Evidence rule: primary run uses every evidence code except IEA; secondary run uses all codes and is labelled 'IEA-included'. Subset universes (E2, E3) are defined with the same evidence rule as the run. Matching covariates: annotation count = number of distinct GO term IDs directly annotated to the gene in any aspect under the run's evidence rule; INDRA degree = number of distinct INDRA statements (indra_rel edges, any type, any evidence count, either direction) incident on the gene's HGNC node in INDRA CoGEx. Strata: E1 uses the cross of quintiles of annotation count and quintiles of INDRA degree (25 strata; quantile cuts on average ranks, duplicate edges dropped); E2 and E3 use tertiles x tertiles computed within the subset. Null: 10,000 permutations, each shuffling learning-or-memory labels among genes within each stratum (morphogenesis labels fixed), which preserves both set sizes and the per-stratum composition; random seed 20261101. Odds ratios use a 0.5 Haldane correction only when a cell is zero; 95% CI is Woolf (log) interval. Deviation rule fixed in advance: if INDRA degree cannot be obtained for the universe, strata are deciles of annotation count only (tertiles for E2/E3), and this is recorded as a deviation.",
+  "test_contract": {
+    "expected_observation": "Morphogenesis and learning-or-memory gene sets overlap with odds ratio > 2 and above a size-, annotation-count- and INDRA-degree-matched permutation null (p < 0.01), overall and within ion-channel and gap-junction genes.",
+    "disconfirming_observation": "The full-set odds ratio lies inside the matched null (p >= 0.01) or is <= 2.",
+    "admissible_datasets": "Current GO Consortium human annotations and ontology, HGNC protein-coding gene list, INDRA CoGEx statement graph; all public, none derived from Levin's papers.",
+    "inference_method": "Observed 2x2 odds ratio compared with 10,000 stratified label permutations matched on annotation count and INDRA degree; thresholds OR > 2 and one-sided permutation p < 0.01 per endpoint."
+  },
+  "agent": {
+    "kind": "local-agent",
+    "model": "claude-opus-5.5",
+    "run": "approach morphogenesis-cognition-gene-overlap--grok-4-7--1",
+    "date": "2026-11-01",
+    "preregistered_at": "2026-11-01T05:52:00Z"
+  }
+}

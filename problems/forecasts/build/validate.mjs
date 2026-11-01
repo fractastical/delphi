@@ -38,17 +38,14 @@ export function validateFile(round, file) {
       errors.push(`${p.problem}: moved more than 0.10 from the prior without change_reason`);
     const wantA = new Map(w.approaches.map(a => [a.id, a]));
     const seenA = new Set();
-    let best = 0;
     for (const a of p.approaches ?? []) {
       if (!wantA.has(a.approach)) { errors.push(`${p.problem}: unknown approach ${a.approach}`); continue; }
       if (seenA.has(a.approach)) errors.push(`${a.approach} appears twice`);
       seenA.add(a.approach);
       for (const k of ["p_complete", "p_settle"]) if (!prob(a[k])) errors.push(`${a.approach}.${k} must be a number in [0,1]`);
       if (typeof a.note !== "string" || a.note.trim().length < 10) errors.push(`${a.approach}: note missing`);
-      if (prob(a.p_complete) && prob(a.p_settle)) best = Math.max(best, a.p_complete * a.p_settle);
     }
     for (const id of wantA.keys()) if (!seenA.has(id)) errors.push(`${p.problem}: approach ${id} missing`);
-    if (prob(p.p_solved_30d) && p.p_solved_30d + 0.02 < best) warnings.push(`${p.problem}: p_solved_30d ${p.p_solved_30d} below best approach p_complete*p_settle ${best.toFixed(2)}`);
   }
   for (const id of want.keys()) if (!seen.has(id)) errors.push(`problem ${id} missing`);
   return { file, errors, warnings };

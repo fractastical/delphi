@@ -48,9 +48,10 @@ Per **problem**:
   in sequence and learn from failures.
 
 Constraints the validator checks: all values in [0, 1]; `p_solved_30d` ≤ `p_solved_365d`; every
-approach and problem in your slice present exactly once. Warnings (explain in the rationale if
-you keep them): a problem's `p_solved_30d` below the best single whole-problem approach's
-`p_complete × p_settle`; a `p_solved_365d` below `p_solved_30d` plus a plausible extra.
+approach and problem in your slice present exactly once. An approach's `p_complete × p_settle` is
+not a floor for its problem: most approaches settle only a piece (a lemma, one dataset, a bound),
+so a problem's probability can be well below its best approach's. Say in the rationale which piece
+an approach settles when that is the reason.
 
 ## Calibration
 
