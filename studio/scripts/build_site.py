@@ -822,6 +822,15 @@ def demo_videos(ins: Inputs, out: dict) -> dict | None:
     return result if present else None
 
 
+def genotype_surface(ins: Inputs, out: dict) -> dict | None:
+    module_path = "scripts/genotype_site.py"
+    ins.read(module_path)
+    spec = importlib.util.spec_from_file_location("frontier_genotype_site", ROOT / module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.build(ins, out, root=ROOT)
+
+
 def _demo_manifest(ins: Inputs, out: dict, directory: str, expected_cuts: dict) -> dict | None:
     """Publish complete edits only when every required media file matches its pin."""
     manifest_path = f"{directory}/manifest.json"
@@ -1789,6 +1798,7 @@ def build() -> dict[str, bytes]:
     mcp_chk = mcp_check(ins)
     extra: dict = {}
     proofs = lean_proofs(ins, extra)
+    genotype = genotype_surface(ins, extra)
     prints = print_forms(ins, extra)
     controlled = controlled_results(ins, files)
     if simulation is not None:
@@ -1839,6 +1849,7 @@ def build() -> dict[str, bytes]:
         "board": board,
         "lean_receipt": lean_receipt,
         "lean_gallery": proofs,
+        "genotype": genotype,
         "simulation": simulation,
         "attestation_check": attestation,
         "simulation_manifests": manifests,
@@ -1883,7 +1894,7 @@ def build() -> dict[str, bytes]:
 
 
 def generated_artifact_families() -> list[str]:
-    return ["results", "fish3d", "molecular", "rd-diffusion", "lean-gallery", "observed-allometry", *(path.name for path in print_families())]
+    return ["results", "fish3d", "molecular", "rd-diffusion", "lean-gallery", "genotype", "observed-allometry", *(path.name for path in print_families())]
 
 
 def write(out: dict[str, bytes]) -> None:
