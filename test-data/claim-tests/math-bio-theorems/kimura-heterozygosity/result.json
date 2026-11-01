@@ -1,0 +1,147 @@
+{
+  "claim_id": "kimura-heterozygosity",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/kimura-heterozygosity",
+  "project": "math-bio-theorems",
+  "status": "complete",
+  "hypothesis": "If neutral equilibrium heterozygosity H = theta/(1+theta) with theta = 4*Ne*mu holds and effective size scales with census size across species, then genome-wide nucleotide diversity (pi, the per-site heterozygosity) across metazoan species rises with census population size N: for pi << 1, H is approximately 4*Ne*mu, so log10(pi) should increase with log10(N) with a slope near 1 when mu and Ne/N are comparable across species, and the rank correlation between pi and N should be strongly positive.",
+  "pass_criterion": "Pre-registered. Data: Buffalo (2021) combined_data.tsv from github.com/vsbuffalo/paradox_variation (commit b8f91d5, 2021-09-27), metazoan species (kingdom == Animalia) with a non-missing diversity value (pairwise nucleotide diversity, column 'diversity') and a non-missing census-size estimate (column 'log10_popsize', the posterior mean of log10 census size from the author's range x density model; if the file carries another census-size point estimate instead, the column actually used is recorded in 'method'). One row per species. SUPPORTS if Spearman rho(log10 pi, log10 N) > 0.5 with p < 0.001 AND the ordinary-least-squares slope of log10 pi on log10 N has a point estimate >= 0.3 with a 95% confidence interval that includes some value >= 0.5 (diversity rises at least about a third as fast as census size on a log scale, i.e. within a factor of about 3 of the law's slope of 1). AMENDMENT (2026-10-31, before any data were downloaded, at the request of the holdout thread): species of class Aves are excluded from the primary analysis and from all criteria above; bird rows are held out and only reported separately, unfitted, as a holdout check. The taxonomic class is taken from the file's own taxonomy columns.",
+  "fail_criterion": "Pre-registered. REFUTES if the 95% confidence interval of the slope lies entirely below 0.25 (diversity rises less than a quarter as fast as census size on a log scale, so the law with N as the proxy for Ne is quantitatively wrong by orders of magnitude across the range of N: the Lewontin's-paradox pattern) OR rho <= 0. MIXED otherwise. INCONCLUSIVE (underpowered) if fewer than 50 species qualify; INCONCLUSIVE (data-unavailable) if the file cannot be downloaded.",
+  "planned_datasets": [
+    "buffalo2021-paradox-variation-combined-data",
+    "holdout: class Aves rows excluded from fitting (see holdout/README.md)"
+  ],
+  "interpretation": "The claim is about effective population size Ne. Independent Ne estimates do not exist for most species, so census size N is used as the proxy, which is how Lewontin (1974) and Buffalo (2021) framed the paradox of variation. Mutation rates per site per generation vary by roughly an order of magnitude across metazoa and are not available per species here, so they are not included; a slope far below 1 therefore means that Ne is decoupled from N (by linked selection, demography or variation in mu), not that the within-model theorem is wrong. This is a test of the claim as the assessment proposed it ('regress genome-wide neutral diversity on estimates of Ne*mu across species'), with N standing in for Ne*mu.",
+  "datasets": [
+    {
+      "id": "buffalo2021-paradox-variation-combined-data",
+      "name": "Buffalo (2021) 'Why do species get a thin slice of pi?' combined species table: pairwise nucleotide diversity (collated from Leffler et al. 2012, Romiguier et al. 2014, Corbett-Detig et al. 2015) and census population size estimates (range x density model) for 300 metazoan species",
+      "landing_url": "https://github.com/vsbuffalo/paradox_variation",
+      "doi": "10.7554/eLife.67509",
+      "version": "git commit b8f91d5c34675733db8cae8dcab625dcbb55c30a (2021-09-27)",
+      "license": "not stated in the repository; the article is CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://raw.githubusercontent.com/vsbuffalo/paradox_variation/b8f91d5c34675733db8cae8dcab625dcbb55c30a/data/combined_data.tsv",
+          "retrieved_at": "2026-10-31T05:57:45Z",
+          "byte_size": 171863,
+          "sha256": "df559451dad94b53ba8675e09811708107a57eeb6ffe8f72b944bcbbf3a1f2eb"
+        }
+      ],
+      "role": "per-species diversity (column 'diversity') and log10 census size (column 'log10_popsize', posterior mean)"
+    }
+  ],
+  "method": "fetch.py downloads combined_data.tsv at the pinned commit. analysis.py keeps Animalia rows with a diversity value > 0 and a log10_popsize value (one row per species), drops the 13 class-Aves species (held out, never fitted), and on the remaining species computes Spearman rho between log10 diversity and log10 census size and an ordinary-least-squares regression of log10 diversity on log10 census size with a t-based 95% confidence interval on the slope. The decision rule is the pre-registered one.",
+  "measured": {
+    "value": 0.10731485075894663,
+    "unit": "OLS slope of log10(pi) on log10(census N); the law with Ne proportional to N predicts about 1",
+    "n": "160 non-bird metazoan species (diversity sources: {'Leffler et al.': 90, 'Romiguier et al.': 58, 'Corbett-Detig et al.': 12})",
+    "uncertainty": "95% CI [0.078, 0.137]; SE 0.0150",
+    "extra": {
+      "spearman_rho": 0.492118832766905,
+      "spearman_p": 3.867337652899697e-11,
+      "pearson_r": 0.49493920875974984,
+      "log10_N_range": [
+        2.766308090324165,
+        15.17881504849919
+      ],
+      "log10_pi_range": [
+        -3.987162775294828,
+        -1.0785315066229717
+      ],
+      "n_bird_species_held_out": 13,
+      "classes_in_fit": {
+        "Insecta": 58,
+        "Mammalia": 40,
+        "Teleostei": 10,
+        "Bivalvia": 8,
+        "Echinoidea": 7,
+        "Branchiopoda": 6,
+        "Malacostraca": 5,
+        "Gastropoda": 5,
+        "Reptilia": 4,
+        "Ascidiacea": 3,
+        "Clitellata": 2,
+        "Anthozoa": 2,
+        "Anopla": 2,
+        "Demospongiae": 1,
+        "Chromadorea": 1,
+        "Euchelicerata": 1,
+        "Holostei": 1,
+        "Arachnida": 1,
+        "Ophiuroidea": 1,
+        "Polychaeta": 1,
+        "Cephalopoda": 1
+      },
+      "post_hoc_perturbation": {
+        "observed": {
+          "verdict": "refutes",
+          "ols_slope": 0.10731485075894663,
+          "ols_slope_ci95": [
+            0.07771085302172717,
+            0.1369188484961661
+          ],
+          "spearman_rho": 0.492118832766905,
+          "n_species": 160,
+          "residual_sd_log10_pi": 0.46392868283158084
+        },
+        "n_simulations_per_slope": 2000,
+        "simulated": {
+          "1.0": {
+            "true_slope": 1.0,
+            "verdict_fractions": {
+              "supports": 1.0
+            },
+            "mean_fitted_slope": 1.000251204461526
+          },
+          "0.75": {
+            "true_slope": 0.75,
+            "verdict_fractions": {
+              "supports": 1.0
+            },
+            "mean_fitted_slope": 0.7499673331755471
+          },
+          "0.5": {
+            "true_slope": 0.5,
+            "verdict_fractions": {
+              "mixed": 0.0245,
+              "supports": 0.9755
+            },
+            "mean_fitted_slope": 0.4998527027435866
+          },
+          "0.25": {
+            "true_slope": 0.25,
+            "verdict_fractions": {
+              "mixed": 0.976,
+              "refutes": 0.024
+            },
+            "mean_fitted_slope": 0.24987073006126395
+          },
+          "0.0": {
+            "true_slope": 0.0,
+            "verdict_fractions": {
+              "refutes": 1.0
+            },
+            "mean_fitted_slope": -0.00019334732212035233
+          }
+        },
+        "reading": "Under the law as operationalized (true slope 1 with the observed census sizes and scatter) the pre-registered rule returns 'supports' in the fraction shown for slope 1.0; the observed data (slope 0.107) return 'refutes'. The rule therefore discriminates the law from the observed pattern; the refutation is not a failure of test sensitivity."
+      }
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.9,
+  "caveats": [
+    "Census size stands in for effective size and per-site mutation rate is not included, so the refutation is of the law as operationalized (diversity should track census size), which is exactly Lewontin's paradox: diversity does rise with N (rho about 0.5, p < 1e-10) but roughly ten times too slowly on a log scale, across 12 orders of magnitude of N.",
+    "Census sizes are model-based estimates (species range times a body-size-predicted density) with large uncertainty; measurement error in N attenuates the slope, but not by the factor of ten needed to rescue the law (Buffalo 2021 reaches the same conclusion with error-in-variables models).",
+    "Diversity estimates mix synonymous, non-coding and genome-wide measures from three collations, and are averaged where several entries exist for a species.",
+    "Class Aves (13 species) was excluded before fitting at the holdout thread's request and can be scored later with 'analysis.py --exam'. The first run of the script, before the gate was added, printed the birds' mean residual once; it was not used to change anything.",
+    "This is a cross-species pattern; it does not test the within-model derivation H = theta/(1+theta), which is a theorem.",
+    "Post-hoc discriminating-power check (perturbation.py, added 2026-10-31 after the result; simulation, not observation): with the observed census sizes and residual scatter, the pre-registered rule returns 'supports' in 100% of 2000 simulated datasets when the true slope is 1.0 or 0.75 and in 97.6% at 0.5, 'mixed' in 97.6% at 0.25, and 'refutes' in 100% at slope 0; the observed slope of 0.107 returns 'refutes'. The refutation is therefore not a failure of test sensitivity."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack)",
+    "date": "2026-10-31"
+  }
+}

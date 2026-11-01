@@ -1,0 +1,82 @@
+{
+  "claim_id": "maynardsmith-hitchhiking",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/maynardsmith-hitchhiking",
+  "project": "math-bio-theorems",
+  "status": "complete",
+  "hypothesis": "If a favourable mutation's sweep removes variation at linked neutral sites, and more so where recombination is weaker relative to selection, then across windows of a human chromosome nucleotide diversity should be positively correlated with the local recombination rate.",
+  "pass_criterion": "Pre-registered. Data: 1000 Genomes Project Phase 3 chromosome 22 genotype VCF (release 20130502, all 2504 samples) and the HapMap Phase II GRCh37 genetic map for chromosome 22. SNP filter: records with VT=SNP in INFO, biallelic (no MULTI_ALLELIC flag, single ALT), FILTER PASS. Windows: non-overlapping 200 kb windows starting at 16,000,000 bp (GRCh37) up to the last SNP. Diversity per window: pi = sum over SNPs of 2p(1-p) * 2n/(2n-1), with p the INFO AF value and 2n = 5008 chromosomes, divided by the window length (200,000 bp). Windows with fewer than 200 qualifying SNPs are excluded as unassessable (centromere-proximal or low-accessibility regions). Recombination rate per window: (map cM at window end minus map cM at window start) / 0.2 Mb, with cM linearly interpolated from the genetic map. SUPPORTS if Spearman rho(pi, recombination rate) across windows is >= 0.2 with two-sided p < 0.01.",
+  "fail_criterion": "Pre-registered. REFUTES if rho < 0 with p < 0.05 (diversity lower where recombination is higher) OR if |rho| < 0.1 with p > 0.05 and at least 100 windows (no detectable relationship). MIXED otherwise (0 <= rho < 0.2, or 0.01 <= p). INCONCLUSIVE (data-unavailable) if either file cannot be downloaded.",
+  "planned_datasets": [
+    "1000genomes-phase3-chr22-genotypes-20130502",
+    "hapmap-phaseII-genetic-map-grch37"
+  ],
+  "interpretation": "Maynard Smith and Haigh predicted that a sweep reduces heterozygosity at a linked neutral site by an amount that grows as recombination fraction over selection coefficient falls. The claim's assessment proposes the genome-wide version of the test used by Begun and Aquadro (1992): correlation between neutral diversity and local recombination rate. A positive correlation is also produced by background selection (Charlesworth et al. 1993), so a positive result supports the pattern the claim predicts but does not identify hitchhiking as the only cause; this is recorded as a caveat, not folded into the verdict. pi is computed from allele frequencies pooled across 26 populations; population structure inflates pooled pi roughly uniformly along the chromosome and does not create a correlation with recombination. All SNPs are used rather than only 'neutral' sites, which if anything weakens the expected correlation.",
+  "datasets": [
+    {
+      "id": "1000genomes-phase3-chr22-genotypes-20130502",
+      "name": "1000 Genomes Project Phase 3 integrated variant call set, chromosome 22 (release 20130502, 2504 samples, GRCh37)",
+      "landing_url": "https://www.internationalgenome.org/category/phase-3/",
+      "doi": "10.1038/nature15393",
+      "version": "phase3 v5b, 20130502",
+      "license": "open (Fort Lauderdale principles; IGSR terms of use)",
+      "files": [
+        {
+          "download_url": "https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz",
+          "retrieved_at": "2026-10-31T05:56:03Z",
+          "byte_size": 205612353,
+          "sha256": "a90c16c4ff2b3196476d506ae13cb3047fae8670163c7c932c4b0239aef3daf5"
+        }
+      ],
+      "role": "allele frequencies (INFO AF) of biallelic PASS SNPs for per-window nucleotide diversity"
+    },
+    {
+      "id": "hapmap-phaseII-genetic-map-grch37",
+      "name": "HapMap Phase II LD-based recombination map lifted to GRCh37 (NCBI HapMap FTP, 2011-01 release)",
+      "landing_url": "https://ftp.ncbi.nlm.nih.gov/hapmap/recombination/2011-01_phaseII_B37/",
+      "doi": "10.1038/nature06258",
+      "version": "2011-01_phaseII_B37",
+      "license": "public domain (NCBI FTP)",
+      "files": [
+        {
+          "download_url": "https://ftp.ncbi.nlm.nih.gov/hapmap/recombination/2011-01_phaseII_B37/genetic_map_HapMapII_GRCh37.tar.gz",
+          "retrieved_at": "2026-10-31T05:59:05Z",
+          "byte_size": 37730100,
+          "sha256": "8287508135f43a4266bf34fae34988d69e5ebf356e450d7e1d8ce45a83e61468"
+        }
+      ],
+      "role": "cumulative genetic position (cM) to compute recombination rate per 200 kb window"
+    }
+  ],
+  "method": "fetch.py downloads the chr22 VCF (205.6 MB) and the genetic-map archive. analysis.py streams the VCF, keeps PASS biallelic records with VT=SNP and without MULTI_ALLELIC, sums 2p(1-p)*2n/(2n-1) from the INFO AF value over non-overlapping 200 kb windows from 16.0 Mb, divides by window length to get pi, and takes the recombination rate per window from the linearly interpolated HapMap map; windows with fewer than 200 SNPs are excluded. Spearman and Pearson correlations between pi and rate across windows are computed and the pre-registered rule applied.",
+  "measured": {
+    "value": 0.6162852097435987,
+    "unit": "Spearman rho between per-window nucleotide diversity and recombination rate (cM/Mb), chr22, 200 kb windows",
+    "n": "177 windows (of 177), 1051673 SNPs of 1103547 VCF records",
+    "uncertainty": "p = 6.8e-20; Pearson r = 0.556",
+    "extra": {
+      "median_pi": 0.0010088619215601004,
+      "median_rec_rate_cM_per_Mb": 1.6032284991092638,
+      "median_pi_by_rec_rate_quartile": {
+        "Q1 low": 0.0006548566799966859,
+        "Q2": 0.0009761150136901179,
+        "Q3": 0.0011035027173634379,
+        "Q4 high": 0.0013071151627201821
+      },
+      "map_file": "genetic_map_GRCh37_chr22.txt"
+    }
+  },
+  "verdict": "supports",
+  "confidence": 0.85,
+  "caveats": [
+    "A positive diversity-recombination correlation is also produced by background selection (purifying selection removing linked neutral variation), so the result supports the pattern hitchhiking predicts but does not isolate sweeps as the cause; separating the two needs site-frequency or sweep-scan evidence.",
+    "Diversity is computed from allele frequencies pooled over all 26 populations; population structure inflates pi uniformly and does not create the correlation, but the absolute pi values are not a single-population estimate.",
+    "All SNPs are used, not only neutral sites; gene density and GC content covary with recombination in humans and could contribute to the correlation through mutation-rate variation. Windows with < 200 SNPs (none on chr22 above 16 Mb) would have been excluded.",
+    "One chromosome (22, about 35 Mb of assessable sequence) was tested, as pre-registered, to keep the download small; the pattern is well known genome-wide (Hellmann et al. 2003)."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack)",
+    "date": "2026-10-31"
+  }
+}

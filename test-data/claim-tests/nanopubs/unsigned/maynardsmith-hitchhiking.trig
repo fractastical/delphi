@@ -1,0 +1,110 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix nt: <https://w3id.org/np/o/ntemplate/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/maynardsmith-hitchhiking> delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/claim-test-maynardsmith-hitchhiking> .
+  <https://w3id.org/delphi/resource/evidence/claim-test-maynardsmith-hitchhiking> a delphi:EvidenceItem ;
+    rdfs:label "Supported: nucleotide diversity rises with local recombination rate across 177 windows of 200 kb on human chromosome 22 (Spearman rho 0.62, p 6.8e-20)" ;
+    dct:description "Pre-registered test of the claim. Hypothesis as tested: If a favourable mutation's sweep removes variation at linked neutral sites, and more so where recombination is weaker relative to selection, then across windows of a human chromosome nucleotide diversity should be positively correlated with the local recombination rate." ;
+    delphi:statisticalTest "Spearman rank correlation between per-window nucleotide diversity (1000 Genomes phase 3, all 26 populations) and HapMap phase II recombination rate in cM/Mb, 200 kb windows" ;
+    delphi:pValue "6.8e-20"^^xsd:double ;
+    schema:additionalProperty sub:plain, sub:status, sub:doesNotEstablish, sub:measured, sub:n, sub:uncertainty, sub:preregRule, sub:evNpopulations ;
+    rdfs:comment "A positive diversity-recombination correlation is also produced by background selection (purifying selection removing linked neutral variation), so the result supports the pattern hitchhiking predicts but does not isolate sweeps as the cause; separating the two needs site-frequency or sweep-scan evidence." ;
+    rdfs:comment "Diversity is computed from allele frequencies pooled over all 26 populations; population structure inflates pi uniformly and does not create the correlation, but the absolute pi values are not a single-population estimate." ;
+    rdfs:comment "All SNPs are used, not only neutral sites; gene density and GC content covary with recombination in humans and could contribute to the correlation through mutation-rate variation. Windows with < 200 SNPs (none on chr22 above 16 Mb) would have been excluded." ;
+    rdfs:comment "One chromosome (22, about 35 Mb of assessable sequence) was tested, as pre-registered, to keep the download small; the pattern is well known genome-wide (Hellmann et al. 2003)." ;
+    prov:used <https://w3id.org/delphi/resource/dataset/1000genomes-phase3-chr22-genotypes-20130502>, <https://w3id.org/delphi/resource/dataset/hapmap-phaseII-genetic-map-grch37> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/maynardsmith-hitchhiking/result.json> .
+  sub:plain a schema:PropertyValue ; schema:propertyID "plain_language_statement" ; schema:value "Stretches of a chromosome where genes are shuffled less often should carry less genetic variation; on human chromosome 22 they do." ; schema:description "The tested claim and its outcome in one sentence for a general reader." .
+  sub:status a schema:PropertyValue ; schema:propertyID "status" ; schema:value "supported" ; schema:description "Outcome under the pre-registered decision rule. result.json verdict field: supports" .
+  sub:measured a schema:PropertyValue ; schema:propertyID "measured_value" ; schema:value "0.6162852097435987"^^xsd:double ; schema:unitText "Spearman rho between per-window nucleotide diversity and recombination rate (cM/Mb), chr22, 200 kb windows" ; schema:description "Observation: the primary pre-registered quantity, computed by analysis.py from the retrieved files; further computed quantities are in result.json measured.extra." .
+  sub:n a schema:PropertyValue ; schema:propertyID "sample" ; schema:value "177 windows (of 177), 1051673 SNPs of 1103547 VCF records" ; schema:description "Observation: what was analysed after the pre-registered filters." .
+  sub:uncertainty a schema:PropertyValue ; schema:propertyID "uncertainty" ; schema:value "p = 6.8e-20; Pearson r = 0.556" ; schema:description "Observation: uncertainty or secondary statistics as reported in result.json." .
+  sub:preregRule a schema:PropertyValue ; schema:propertyID "pre_registered_rule" ; schema:value "PASS: Pre-registered. Data: 1000 Genomes Project Phase 3 chromosome 22 genotype VCF (release 20130502, all 2504 samples) and the HapMap Phase II GRCh37 genetic map for chromosome 22. SNP filter: records with VT=SNP in INFO, biallelic (no MULTI_ALLELIC flag, single ALT), FILTER PASS. Windows: non-overlapping 200 kb windows starting at 16,000,000 bp (GRCh37) up to the last SNP. Diversity per window: pi = sum over SNPs of 2p(1-p) * 2n/(2n-1), with p the INFO AF value and 2n = 5008 chromosomes, divided by the window length (200,000 bp). Windows with fewer than 200 qualifying SNPs are excluded as unassessable (centromere-proximal or low-accessibility regions). Recombination rate per window: (map cM at window end minus map cM at window start) / 0.2 Mb, with cM linearly interpolated from the genetic map. SUPPORTS if Spearman rho(pi, recombination rate) across windows is >= 0.2 with two-sided p < 0.01. FAIL: Pre-registered. REFUTES if rho < 0 with p < 0.05 (diversity lower where recombination is higher) OR if |rho| < 0.1 with p > 0.05 and at least 100 windows (no detectable relationship). MIXED otherwise (0 <= rho < 0.2, or 0.01 <= p). INCONCLUSIVE (data-unavailable) if either file cannot be downloaded." ; schema:description "Assumption and decision rule fixed before the data were opened (see the pre-registration commit in the provenance graph); not an observation." .
+  sub:evNpopulations a schema:PropertyValue ; schema:propertyID "n_populations" ; schema:value 26 ; schema:description "Count of populations as stated in this record's text, taken from result.json." .
+  sub:doesNotEstablish a schema:PropertyValue ; schema:propertyID "does_not_establish" ; schema:value "Does not isolate selective sweeps as the cause: background selection, gene density and mutation-rate variation produce the same positive correlation. One chromosome, all SNPs rather than neutral sites only, and diversity pooled over populations." ; schema:description "Interpretation: the limits of what this evidence shows." .
+  sub:ds1Nfiles a schema:PropertyValue ; schema:propertyID "n_files" ; schema:value 1 ; schema:description "Files of this dataset that the test retrieved and checksummed (the distributions listed here)." .
+  sub:ds1Nbytes a schema:PropertyValue ; schema:propertyID "byte_size_total" ; schema:value 205612353 ; schema:description "Total byte size of the retrieved files." .
+  sub:ds1Nsamples a schema:PropertyValue ; schema:propertyID "n_samples" ; schema:value 2504 ; schema:description "Count of samples as stated in this record's text, taken from result.json." .
+  <https://w3id.org/delphi/resource/dataset/1000genomes-phase3-chr22-genotypes-20130502> a dcat:Dataset ;
+    rdfs:label "1000 Genomes Project Phase 3 integrated variant call set, chromosome 22 (release 20130502, 2504 samples, GRCh37)" ;
+    schema:additionalProperty sub:ds1Nfiles, sub:ds1Nbytes, sub:ds1Nsamples ;
+    dct:identifier "10.1038/nature15393" ;
+    owl:sameAs <https://doi.org/10.1038/nature15393> ;
+    dcat:landingPage <https://www.internationalgenome.org/category/phase-3/> ;
+    dcat:version "phase3 v5b, 20130502" ;
+    dct:rights "open (Fort Lauderdale principles; IGSR terms of use)" ;
+    dct:license "open (Fort Lauderdale principles; IGSR terms of use)" ;
+    rdfs:comment "Role in this test: allele frequencies (INFO AF) of biallelic PASS SNPs for per-window nucleotide diversity" ;
+    dcat:distribution sub:ds1f1 .
+  sub:ds1f1 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr22.phase3_shapeit2_mvncall_integrated_v5b.20130502.genotypes.vcf.gz> ;
+    dcat:byteSize "205612353"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T05:56:03Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f1sum .
+  sub:ds1f1sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "a90c16c4ff2b3196476d506ae13cb3047fae8670163c7c932c4b0239aef3daf5"^^xsd:hexBinary .
+  sub:ds2Nfiles a schema:PropertyValue ; schema:propertyID "n_files" ; schema:value 1 ; schema:description "Files of this dataset that the test retrieved and checksummed (the distributions listed here)." .
+  sub:ds2Nbytes a schema:PropertyValue ; schema:propertyID "byte_size_total" ; schema:value 37730100 ; schema:description "Total byte size of the retrieved files." .
+  <https://w3id.org/delphi/resource/dataset/hapmap-phaseII-genetic-map-grch37> a dcat:Dataset ;
+    rdfs:label "HapMap Phase II LD-based recombination map lifted to GRCh37 (NCBI HapMap FTP, 2011-01 release)" ;
+    schema:additionalProperty sub:ds2Nfiles, sub:ds2Nbytes ;
+    dct:identifier "10.1038/nature06258" ;
+    owl:sameAs <https://doi.org/10.1038/nature06258> ;
+    dcat:landingPage <https://ftp.ncbi.nlm.nih.gov/hapmap/recombination/2011-01_phaseII_B37/> ;
+    dcat:version "2011-01_phaseII_B37" ;
+    dct:rights "public domain (NCBI FTP)" ;
+    dct:license "public domain (NCBI FTP)" ;
+    rdfs:comment "Role in this test: cumulative genetic position (cM) to compute recombination rate per 200 kb window" ;
+    dcat:distribution sub:ds2f1 .
+  sub:ds2f1 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://ftp.ncbi.nlm.nih.gov/hapmap/recombination/2011-01_phaseII_B37/genetic_map_HapMapII_GRCh37.tar.gz> ;
+    dcat:byteSize "37730100"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T05:59:05Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds2f1sum .
+  sub:ds2f1sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "8287508135f43a4266bf34fae34988d69e5ebf356e450d7e1d8ce45a83e61468"^^xsd:hexBinary .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/maynardsmith-hitchhiking/result.json>, <https://github.com/fractastical/delphisci/commit/9b73128702b7eb3eaae988df99ee2de68e122ebd> ;
+    prov:wasGeneratedBy sub:test .
+  <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/maynardsmith-hitchhiking/result.json> dct:title "claim-tests/math-bio-theorems/maynardsmith-hitchhiking/result.json at commit c330f91 (2026-10-31T06:04:25Z)" ;
+    rdfs:comment "Result file with verdict, measured values, dataset checksums and caveats. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  <https://github.com/fractastical/delphisci/commit/9b73128702b7eb3eaae988df99ee2de68e122ebd> a prov:Entity ; dct:title "claim-tests: pre-register 8 tests of proved math-bio laws against public data" ; dct:date "2026-10-31T05:55:32Z"^^xsd:dateTime ; rdfs:comment "Pre-registration: pass and fail criteria with verdict null, committed 2026-10-31T05:55:32Z; the first data file for this test was retrieved at 2026-10-31T05:56:03Z, 31 s later. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  sub:test a prov:Activity ; prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:used <https://w3id.org/delphi/resource/dataset/1000genomes-phase3-chr22-genotypes-20130502>, <https://w3id.org/delphi/resource/dataset/hapmap-phaseII-genetic-map-grch37>, <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/maynardsmith-hitchhiking/analysis.py> ; prov:qualifiedAssociation sub:plan .
+  sub:plan a prov:Association ; prov:agent <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:hadPlan <https://github.com/fractastical/delphisci/blob/9b73128702b7eb3eaae988df99ee2de68e122ebd/claim-tests/math-bio-theorems/maynardsmith-hitchhiking/result.json> .
+  <https://github.com/fractastical/delphisci/blob/9b73128702b7eb3eaae988df99ee2de68e122ebd/claim-tests/math-bio-theorems/maynardsmith-hitchhiking/result.json> rdfs:comment "The pre-registered plan: result.json as first committed, before any download." .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> a prov:SoftwareAgent ; rdfs:label "delphisci claim-tests runner (claims thread)" ; rdfs:comment "Run: scienceclaw-c4 (claims thread, ScienceClaw hack); model claude-fable-5-1; 2026-10-31" ; delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5.1> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5.1> a delphi:LanguageModel ; rdfs:label "Claude Fable 5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T14:25:59Z"^^xsd:dateTime ;
+    dct:creator <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    rdfs:label "Evidence for maynardsmith-hitchhiking: supported" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:EvidenceItem ;
+    npx:introduces <https://w3id.org/delphi/resource/evidence/claim-test-maynardsmith-hitchhiking> ;
+    nt:wasCreatedFromProvenanceTemplate <https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA> ;
+    rdfs:comment "UNSIGNED DRAFT prepared 2026-10-31 by the claims thread of the DELPHI team: not signed, not published to any registry. Intended for the nanopub TEST registry first; production publication needs the ORCID key owner's explicit approval. No human owner is named in this draft: dct:creator is the software agent, and the ORCID of the key holder is added only when that person approves and signs. Built by claim-tests/nanopubs/build.py from result.json." ;
+    rdfs:comment "No assertion template is declared. The template that would otherwise apply, the published Project Delphi evidence item template https://w3id.org/np/RAk4kcX4zA_touv8CeKku9tTUnbR5xiTLSLwFbrKSl3BE (dct:created 2026-10-01), still carries the legacy https://w3id.org/probknow/ontology/ namespace (1 occurrence, checked 2026-10-31 on the live network), and its required statements cannot be instantiated with Delphi ontology 2.0 terms, so this hand-authored record was not created from it and does not claim to be. The provenance template https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA is declared because it carries no legacy IRI (0 occurrences, same check). No pubinfo template is declared. See claim-tests/nanopubs/DECISIONS.md (2026-10-31)." .
+}
