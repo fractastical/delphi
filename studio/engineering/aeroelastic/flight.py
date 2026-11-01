@@ -7,17 +7,21 @@ from engineering.simulation.schema import G
 from .model import protocol
 
 
-def trajectory(CL, area, AR, speed, dt, drag=True, lift=True):
+def trajectory(CL, area, AR, speed, dt, drag=True, lift=True, mass_scale=1.0, CD0_scale=1.0):
     p = protocol()
     f = p["glide"]
     rho = p["parameters"]["rho_kg_m3"]
+    if not np.isfinite([mass_scale, CD0_scale]).all() or mass_scale <= 0 or CD0_scale <= 0:
+        raise ValueError("Flight scenario scales must be finite and positive")
+    mass = f["mass_kg"] * mass_scale
+    CD0 = f["CD0"] * CD0_scale
     native = glide.integrate(
-        f["mass_kg"],
+        mass,
         area,
         AR,
         rho,
         CL,
-        f["CD0"],
+        CD0,
         f["oswald_e"],
         f["height_m"],
         speed,
@@ -31,8 +35,7 @@ def trajectory(CL, area, AR, speed, dt, drag=True, lift=True):
         if bool(active[0]):
             rows.append([old_time + dt, *state[:, 0].tolist()])
     values = np.asarray(rows)
-    cd = float(glide.drag_coeff(CL, f["CD0"], f["oswald_e"], AR)) if drag else 0.0
-    mass = f["mass_kg"]
+    cd = float(glide.drag_coeff(CL, CD0, f["oswald_e"], AR)) if drag else 0.0
     energy = 0.5 * mass * values[:, 3] ** 2 + mass * G * values[:, 2]
     power = -0.5 * rho * values[:, 3] ** 3 * area * cd
     work = np.trapezoid(power, values[:, 0])
