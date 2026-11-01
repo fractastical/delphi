@@ -143,3 +143,25 @@ The parent reviewer also independently read the actual sb03-restored sanitized d
 matched its23,236,752 bytes and SHA256 to the dump used in its18-table/application replay.
 That ties the off-host recovered bytes directly to the database check. The complete-file
 rehash was performed by the restore tool; the parent did not manually rehash every file.
+
+## Public inputs and remote work that are not archived bytes
+
+`results/resources/recovery-external-inputs.json` records the exact23 public genome
+accessions, original HTTPS URLs, MD5 checksums and measured compressed sizes (5,805,450,239
+bytes total). The original job deliberately deleted each temporary genome after analysis;
+its complete output/progress files are preserved. No raw genome corpus is claimed in the
+snapshot. To recover a selected assembly, fetch that exact URL to a new bounded destination,
+require its recorded byte count and MD5, and record a new SHA256 separately. Do not silently
+select a newer assembly. NCBI availability is an external dependency; backup did not re-fetch it.
+
+The existing Evo2 smoke receipt pins a13,766,621,200-byte upstream weight file, exact Hugging
+Face revision and SHA256. It is documented as an external model input, not archived model
+weights or authorization to replay a provider-stopped task. Hosted model internals are not
+recoverable from our request/output receipts. Container/package caches also remain external,
+with only actually recorded pins/digests claimed. The inventory preserves the original6.78MB
+CFD transport-cap loss explicitly; a later run is not the same missing archive.
+
+Ongoing Nebius/GCP scientific states that have not been returned remain remote-only. Their
+existing bounded collectors must finish and produce a later recovery snapshot before those
+states can be called backed up. Returned partials are included; the Google lab is never the
+sole final destination for retained results.
