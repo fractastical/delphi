@@ -84,10 +84,13 @@ def coef(gap_nodes: float, n_cells: int, j: float) -> float:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs", required=True)
-    ap.add_argument("--protocol", required=True)
+    ap.add_argument("--protocol", required=True, help="comma-separated; arms from all, gates scored for all")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
-    proto = json.loads(Path(a.protocol).read_text())
+    protos = [json.loads(Path(p).read_text()) for p in a.protocol.split(",")]
+    proto = dict(protos[-1])
+    proto["arms"] = [x for p in protos for x in p["arms"]]
+    proto["gates"] = [g for p in protos for g in p["gates"]]
     runs = Path(a.runs)
 
     arms, missing = {}, []
@@ -184,8 +187,76 @@ def main() -> None:
                   measured_bracket_k4=[brackets[4]["lo"], brackets[4]["hi"]], inside=inside)
     gates.append(dict(id="G8", passed=g8.get("inside"), detail=g8))
 
-    out = dict(schema="frontier.epithelial-results.v1",
-               protocol_sha256=__import__("hashlib").sha256(Path(a.protocol).read_bytes()).hexdigest(),
+    have = lambda n: n in res
+
+    if have("F1-no-drive-NEGATIVE"):
+        f1 = res["F1-no-drive-NEGATIVE"]
+        gates.append(dict(id="G10", passed=f1["gap_end"] >= 0.95 * f1["gap0"],
+                          detail=f"gap_end/gap0 = {f1['gap_end'] / f1['gap0']:.4f} (needs >= 0.95)"))
+
+    drows = sorted((res[n] for n in res if n.startswith("D-k4-J280-")), key=lambda r: r["arm"]["lambda_v"])
+    if drows:
+        cl = [r["arm"]["lambda_v"] for r in drows if r["state"] == "CLOSED"]
+        ar = [r["arm"]["lambda_v"] for r in drows if r["state"] == "ARRESTED"]
+        g9 = dict(closed=cl, arrested=ar, predicted_interval=[0.6, 2.0],
+                  basis="revision 1 bracketed k=4 at (0.3, 1.0) with J=140; Phi is inverse in J, so x2")
+        if cl and ar and max(cl) < min(ar):
+            lam = math.sqrt(max(cl) * min(ar))
+            g9.update(measured_bracket=[max(cl), min(ar)], measured_lambda_star=lam,
+                      inside=0.6 <= lam <= 2.0)
+        gates.append(dict(id="G9", passed=g9.get("inside"), detail=g9))
+
+    prot_series = []
+    for n, r in res.items():
+        if (n.startswith("F2-prot") or n == "B-k4-lamV1") and r["arm"]["lambda_v"] == 1 and r["arm"]["wound_r2"] == 400:
+            prot_series.append((r["arm"]["protrusion"], r["closed_fraction"], n))
+    prot_series.sort()
+    if len(prot_series) >= 3:
+        fr = [f for _, f, _ in prot_series]
+        gates.append(dict(id="G11", passed=all(x <= y + 1e-12 for x, y in zip(fr, fr[1:])),
+                          detail=[(p, round(f, 4), n) for p, f, n in prot_series]))
+
+    ladder = {}
+    for k in (1, 4, 7):
+        rows = sorted((res[n] for n in res
+                       if (n.startswith(f"B-k{k}-") or (k == 1 and n.startswith("E-k1-")))),
+                      key=lambda r: r["arm"]["lambda_v"])
+        cl = [r["arm"]["lambda_v"] for r in rows if r["state"] == "CLOSED"]
+        ar = [r["arm"]["lambda_v"] for r in rows if r["state"] == "ARRESTED"]
+        if cl and ar and max(cl) < min(ar):
+            lam = math.sqrt(max(cl) * min(ar))
+            c = coef(rows[0]["gap0"], rows[0]["n_cells"], rows[0]["arm"]["j_cell_medium"])
+            ladder[k] = dict(bracket=[max(cl), min(ar)], lambda_star=lam, coef=c, phi_star=lam * c,
+                             gap0=rows[0]["gap0"], gap0_um2=rows[0]["gap0"] * NODE_AREA_UM2,
+                             n_cells=rows[0]["n_cells"])
+    if ladder:
+        ph = [v["phi_star"] for v in ladder.values()]
+        gates.append(dict(id="G12", passed=(len(ladder) == 3), detail=dict(
+            ladder=ladder, phi_star_values=ph,
+            phi_star_spread_ratio=(max(ph) / min(ph)) if ph else None,
+            constant_phi_star_asserted=False,
+            note="a constant Phi* is not asserted. The spread ratio states how far from constant it is.")))
+
+    # Descriptive shape of the closing phase. Bai & Zeng 2023 report a roughly linear area
+    # decrease and cite Anon et al. for a linear experimental decrease and ref 74 for an
+    # exponential one. This fits both forms to the pre-closure samples of each CLOSED arm and
+    # reports R^2. It compares curve SHAPE between models; it validates nothing.
+    shapes = {}
+    for n, A in arms.items():
+        if res[n]["state"] != "CLOSED":
+            continue
+        pre = [(s_["t"], s_["gap"]) for s_ in A["series"] if s_["gap"] > 0]
+        if len(pre) < 6:
+            continue
+        t = np.array([x for x, _ in pre], float); g = np.array([y for _, y in pre], float)
+        r2 = lambda y, f: 1 - ((y - f) ** 2).sum() / max(((y - y.mean()) ** 2).sum(), 1e-12)
+        lin = np.polyval(np.polyfit(t, g, 1), t)
+        ex = np.exp(np.polyval(np.polyfit(t, np.log(g), 1), t))
+        shapes[n] = dict(n_samples=len(pre), r2_linear=float(r2(g, lin)), r2_exponential=float(r2(g, ex)),
+                         better=("exponential" if r2(g, ex) > r2(g, lin) else "linear"))
+
+    out = dict(schema="frontier.epithelial-results.v1", closing_curve_shape=shapes,
+               protocols={q: __import__("hashlib").sha256(Path(q).read_bytes()).hexdigest() for q in a.protocol.split(",")},
                arms_missing=missing, arms=res, gates=gates)
     Path(a.out).write_text(json.dumps(out, indent=1, default=float))
     print(f"arms scored {len(res)}, missing {len(missing)}")
