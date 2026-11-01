@@ -254,6 +254,7 @@ def plan_experiments(contract: dict) -> dict:
     or lab write occurs. The optional exact links are passed through; absent context
     refs remain an explicit blocker to a versioned Action submission.
     """
+    request_sha256 = sha256_json(contract)
     normalized = _validate_contract(json.loads(canonical_json(contract)))
     design_rows = []
     for design in normalized["designs"]:
@@ -275,7 +276,8 @@ def plan_experiments(contract: dict) -> dict:
         "state": "proposal_unsubmitted" if linked else "proposal_unlinked",
         "links": links,
         "link_blockers": [] if linked else ["Pin an exact Problem, Project, or Action Ref before submitting a versioned Action."],
-        "protocol_sha256": sha256_json(normalized),
+        "protocol_sha256": request_sha256,
+        "normalized_contract_sha256": sha256_json(normalized),
         "equation": normalized["equation"],
         "context": normalized["context"],
         "source_claims": normalized["source_claims"],
@@ -288,6 +290,7 @@ def plan_experiments(contract: dict) -> dict:
         "schema": ARTIFACT_SCHEMA,
         "status": "prospective_assumption_based",
         "protocol_sha256": artifact["protocol_sha256"],
+        "normalized_contract_sha256": artifact["normalized_contract_sha256"],
         "design_version": normalized["design_version"],
         "context": normalized["context"],
         "source_claims": normalized["source_claims"],

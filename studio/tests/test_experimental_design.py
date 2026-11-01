@@ -5,7 +5,7 @@ import pytest
 
 from frontier.models import ActionProposal
 from engineering.experimental_design.linear_gaussian import evaluate_design, posterior_covariance
-from engineering.experimental_design.planner import plan_experiments
+from engineering.experimental_design.planner import plan_experiments, sha256_json
 
 
 def action_proposal():
@@ -172,6 +172,8 @@ def test_protocol_has_stable_hash_and_unlinked_plan_is_not_claimed_submitted():
     first = plan_experiments(contract())
     second = plan_experiments(contract())
     assert first["protocol_sha256"] == second["protocol_sha256"]
+    assert first["protocol_sha256"] == sha256_json(contract())
+    assert first["normalized_contract_sha256"] != first["protocol_sha256"]
     assert first["action_artifact"]["link_blockers"]
     assert first["action_artifact"]["state"] == "proposal_unlinked"
 
