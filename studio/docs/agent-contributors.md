@@ -1,30 +1,35 @@
-# Hackathon contributor ledger: counting basis
+# Hackathon participation: evidence and counting units
 
-Data: `results/resources/agent-contributors.json` (built by `python3 scripts/agent_contributors.py`; observed 2026-11-01T03:01:44.096881Z, window start 2026-10-31T07:00:00Z), reviewed input `results/resources/agent-contributor-mapping.json`, tests `tests/test_agent_contributors.py`.
+The recorded Frontier participant floor is **23**, comprising **11 supported harnesses, 4 native child identities and 8 nested Claude child identities**. This is a historical participation count, not a count of simultaneously active workers or successful tasks.
 
-## Counts by unit (never summed)
+Transcript cutoff: **10:08:29PM PDT on October 31, 2026**, window starts midnight PDT October 31. Sources: [participation receipt](../results/resources/agent-participation.json), [harness ledger](../results/resources/agent-contributors.json), [scope and live API observation](../results/resources/agent-participation-scope.json), [reviewed artifact mapping](../results/resources/agent-contributor-mapping.json).
 
-| Unit | Count | Meaning |
-|---|---|---|
-| **Supported contributing harnesses (minimum)** | 11: claude-02, claude-04, claude-05, claude-06, claude-07, claude-10, claude-13, claude-14, claude-15, codex-03, dx-submit | authored handoff in the window, or a reviewed mapping whose named artifact resolves in the window |
-| Probable, not counted | 5 | `dx-*` session matches a bare role name; alias unproven |
-| Named by others only | 3 | referenced, no authorship evidence |
-| tmux session names, raw / after rename dedup | 34 / 33 | `dx-submit-retired-1` is a rename |
-| **Live harness processes now** | 31 | a claude/codex process under the pane. Not a measure of work |
-| Pane state (coarse class of the last lines) | {"auth_blocked": 13, "error_visible": 2, "idle": 6, "unknown": 11, "working": 1} | `idle` is an empty prompt; `auth_blocked` shows a login string; `error_visible` shows an API or hook error; `unknown` matched nothing |
-| Roles in handoff filenames | 81 | topic names, not harnesses |
-| Worker branches / own provider jobs | 93 / 42 | jobs, not agents |
-| Git identities / models in trailers | 4 / 4 | `SciDEX Bot` is one shared identity; a model is not an agent |
-| **Native contributors (supported minimum)** | 3: /root/infra_director, /root/mechanobio_sim, /root/resource_scaling | a separate identity class, attested by root from the live conversation and tool routing; each named commit is checked to resolve in the window and what it touched. Not tmux aliases, not root/codex-03, root not counted again |
-| Harness floor + native, if the classes are disjoint | 14 | a sum across two identity classes, valid only while no native identity aliases a harness (the builder refuses an identity that collides with a session, `root` or `codex-03`). A floor, not a census |
+| Unit | Recorded count | Meaning |
+|---|---:|---|
+| Supported contributing harness IDs | 11 | Authored handoff or reviewed mapping with an in-window artifact; includes root/codex-03 once |
+| Native historical child identities | 4 | Actual child session metadata and tool activity; includes retired bioelectric_sim |
+| Nested Claude child identities | 8 | Initial task explicitly names Frontier and has actual assistant/tool activity |
+| Recorded participant floor | 23 | Sum of those disjoint identity classes, not an estimate of every contributor |
+| Native API running root / children | 1 / 3 | Actual API observation at 10:07:30PM PDT; running state is not measured CPU/model utilization |
+| Native task turns started / completion events | 36 / 33 | Completed conversation turns, not independently accepted outputs |
+| Scoped Claude task transcripts | 8 | One distinct scoped child transcript each; no success claim |
+| Transcripts inspected / excluded | 166 / 154 | Earlier, unscoped, and root-only records excluded |
+| Host tmux names / after rename dedup | 34 / 33 | Inventory only; not scoped participant or activity count |
+| Live harness descendant processes | 31 | Process presence only; auth-blocked/idle processes remain possible |
+| Current Frontier provider job records | 46 | Snapshot from hackathon-usage.json; jobs are not agents |
 
-Contribution activity is **unknown** for every session: a live process, an idle prompt or an auth block is not work.
+## What changed
 
-## Evidence basis
-- **Sender side of the title:** the text before the first arrow or ` to ` (or before `:`) decides who wrote a handoff, so a recipient ID is never taken as the author. `fish-glider (claude-05) → ...` and `# claude-07: ...` count; `BioModels to codex-03:` does not.
-- **Role labels:** a title `role (claude-NN) →` labels that role as that harness; the label applies to other handoffs whose filename sender is exactly that role. A role labelled with two harnesses is a conflict and is not used (0 now).
-- **Reviewed mapping:** 6 root-attested entries; each is checked against its commit, branch or handoff (resolves, in window, title names the harness) and counted only if it verifies. One git identity signs nearly all commits, so commit authorship cannot separate agents: a verified artifact shows the work exists and the harness link rests on the reviewed entry.
-- **Not evidence:** tmux `session_activity` (one poller touched 18 sessions within 180 s), mentions, document names like `CODEX-21-...`.
-- **Native class check:** a verified commit shows the work exists in the window and what it changed (file counts and sample paths are in the JSON); it does not show which identity wrote it. That link is root's attestation. `/root/resource_scaling`'s demo 60/120 source and output were attested without a commit or path, so they are listed as unchecked and only `ec42409` supports it.
-- **Still a floor:** a worker with no ID in its titles and no mapping entry is missed. Unknowns: roles with no label, unattributed workers, reuse of pre-window sessions, the native-agent count.
-- **Privacy:** private handoffs and pane tails were read for IDs and state classes only; the output holds names, sha256, times and classes, no text.
+The earlier floor of 14 included 11 harnesses and only the three native children supported by artifact mapping. It omitted a retired native child and eight explicit Frontier nested research workers. The original artifact-backed minimum of three remains in the harness ledger, while transcript-backed historical native participation is four. **Never add the old native minimum to the new native count.** The native API's current tree omits retired agents, so it cannot reconstruct historical participation by itself.
+
+The eight nested tasks cover ASK source identification, bioelectric problem sourcing, Buehler prior art, cavefish analysis, flying-fish constraints, evidence API review, open-problem sourcing, and the preregistered KCNE1 job. Participation does not imply a positive scientific outcome. Fifteen other same-day child transcripts lack the required Frontier initial-task scope and are excluded, as are earlier project records. This deliberately remains a lower bound.
+
+## Reproduction and privacy
+
+Run `python -m frontier_compute.agent_participation --help` for the transcript receipt generator, then `python scripts/agent_contributors.py` for the harness ledger and joined summary. The reviewed scope file pins the Frontier root thread and separately timestamped direct `collaboration.list_agents` observation. Refresh that observation from the actual tool; elapsed time never updates it automatically.
+
+The scanner reads complete JSONL lines only within the initial file byte boundary, bounds line/file size, and publishes prefix hashes, identity IDs, timestamps, counts and model metadata. Incomplete trailing lines are withheld; malformed complete lines exclude the transcript. Parent metadata embedded in full-history forks cannot replace the child identity, and inherited events before child creation are not counted. Duplicate child identities require explicit resume reconciliation.
+
+No prompts, tool arguments, encrypted message content, account IDs, credentials or unrelated transcript names are published. Model IDs (claude-opus-5, gpt-6-astra, gpt-6-luna, gpt-6.1-sol) come from recorded model/context metadata, not a provider billing ledger. Provider calls, tokens, spend, global simultaneous activity and platform concurrency limits are not inferred here.
+
+The older harness evidence rules remain: sender-side handoff titles prevent recipients being counted as authors; reviewed mappings prove artifacts exist but rely on explicit identity attribution; shared Git author names, model names, branches and tmux activity timestamps do not identify agents. The five probable `dx-*` aliases remain uncounted. No platform settings were changed.

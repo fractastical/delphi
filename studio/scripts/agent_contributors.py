@@ -72,7 +72,7 @@ def classify_pane(text: str) -> str:
         return "working"
     if re.search(r"api error|hook error", low):
         return "error_visible"
-    if any(re.fullmatch(r"\s*[❯>]\s*", l) for l in text.splitlines()[-8:]):
+    if any(re.fullmatch(r"\s*[❯>]\s*", line) for line in text.splitlines()[-8:]):
         return "idle"
     return "unknown"
 
@@ -86,7 +86,7 @@ def scan_messages(files: dict[str, tuple[bytes, float]], window_start: float, se
             pre += 1
             continue
         text = data.decode("utf-8", "replace")
-        first = next((l for l in text.splitlines() if l.strip()), "")
+        first = next((line for line in text.splitlines() if line.strip()), "")
         parsed[name] = (data, mtime, text, title_sender(first))
         ts_ = parsed[name][3]
         if ts_ and ts_[1]:
@@ -176,7 +176,7 @@ def verify_mapping(entries: list[dict], repo: str, window_start: float, files: d
             elif k == "handoff":
                 f = files.get(ref)
                 ok = f is not None and f[1] >= window_start
-                head = next((l for l in f[0].decode("utf-8", "replace").splitlines() if l.strip()), "") if f else ""
+                head = next((line for line in f[0].decode("utf-8", "replace").splitlines() if line.strip()), "") if f else ""
                 ts_ = title_sender(head)
                 checks.append({**ev, "resolves": f is not None, "in_window": ok, "sha256": sha(f[0]) if f else None, "title_names_harness": bool(ts_ and ts_[0] == e["harness"])})
             else:
@@ -252,7 +252,7 @@ def build(messages: dict, tmux: dict, git: dict, branch_names: list[str], jobs: 
             "git_identities_in_window": len(git["git_identities"]),
             "models_in_trailers": len(git["models_in_trailers"]),
         },
-        "not_summed": "these are different units; no total 'agents' number is given or implied",
+        "not_summed": "roles, jobs, branches, models and process counts are different units; only the separately documented disjoint participation identities may be summed",
         "supported_harnesses": {k: supported[k] for k in sorted(supported)},
         "probable_aliases": {k: probable[k] for k in sorted(probable)},
         "named_by_others_only": dict(sorted(named_only.items())),
@@ -278,7 +278,7 @@ def build(messages: dict, tmux: dict, git: dict, branch_names: list[str], jobs: 
                         "the shared git identity 'SciDEX Bot' cannot distinguish agents"],
         "unknowns": ["which roles map to which harness except where a handoff title labels itself or the reviewed mapping verifies", "work by agents that wrote no handoff and no commit under a distinct identity",
                      "whether tmux sessions created before the window were reused for hackathon work (reported only if they authored in the window)",
-                     "the 'four native agents' reference count is not reconstructed here"],
+                     "historical native participation is reconstructed separately from scoped transcripts when the participation receipt is present"],
         "privacy": "private handoff files were read for ids only; only names, sha256 and times are published",
     }
 
@@ -287,11 +287,34 @@ def live_inputs(messages_dir: str, repo: str):
     mdir = Path(messages_dir)
     files = {f.name: (f.read_bytes(), f.stat().st_mtime) for f in sorted(mdir.iterdir()) if f.is_file()}
     raw = subprocess.run(["tmux", "list-panes", "-a", "-F", "#{session_name}\t#{pane_pid}\t#{session_activity}\t#{session_created}"], capture_output=True, text=True).stdout
-    panes = [{"session": a, "pid": int(b), "activity": float(c), "created": float(d)} for a, b, c, d in (l.split("\t") for l in raw.splitlines())]
+    panes = [{"session": a, "pid": int(b), "activity": float(c), "created": float(d)} for a, b, c, d in (line.split("\t") for line in raw.splitlines())]
     psr = subprocess.run(["ps", "-eo", "pid,ppid,comm"], capture_output=True, text=True).stdout.splitlines()[1:]
     ps_rows = [(int(x.split()[0]), int(x.split()[1]), x.split()[2]) for x in psr]
     texts = {p["session"]: subprocess.run(["tmux", "capture-pane", "-p", "-t", p["session"], "-S", "-25"], capture_output=True, text=True).stdout for p in panes}
     return files, panes, ps_rows, texts
+
+
+def attach_participation(out: dict, participation: dict, source_sha256: str):
+    """Add transcript-backed participants without re-adding artifact-backed natives."""
+    children = participation["participants"]
+    native = {r["identity"] for r in children if r["kind"] == "codex_native_child"}
+    nested = {r["identity"] for r in children if r["kind"] == "claude_nested_child"}
+    if not set(out["native_contributors"]["identities"]) <= native:
+        raise ValueError("participation receipt misses previously supported native identities")
+    if native & set(out["supported_harnesses"]) or nested & set(out["supported_harnesses"]):
+        raise ValueError("child identity overlaps a harness")
+    out["participation"] = {
+        "source": "results/resources/agent-participation.json",
+        "source_sha256": source_sha256,
+        "window": participation["window"],
+        "supported_harnesses": len(out["supported_harnesses"]),
+        "recorded_native_children": len(native),
+        "recorded_nested_claude_children": len(nested),
+        "recorded_participant_floor": len(out["supported_harnesses"]) + len(native) + len(nested),
+        "basis": "Disjoint harness, native child and nested Claude child identities; native artifact floor is already included, never added again. Root/codex-03 is counted once among harnesses. Participation is not successful task completion.",
+        "live_native_api": participation["live_native_api"],
+        "task_units": participation["counts"],
+    }
 
 
 def main():
@@ -312,6 +335,9 @@ def main():
     jobs = {"own_jobs": len(usage["own_jobs"]), "source": "results/resources/hackathon-usage.json", "source_sha256": sha((Path(a.repo) / "results/resources/hackathon-usage.json").read_bytes())}
     out = build(files, tm, g, branches(a.repo), jobs, ws, dt.datetime.now(dt.timezone.utc).timestamp(), mapping, native)
     out["worker_jobs_source"] = jobs
+    participation = Path(a.repo) / "results/resources/agent-participation.json"
+    if participation.exists():
+        attach_participation(out, json.loads(participation.read_bytes()), sha(participation.read_bytes()))
     Path(a.out).write_text(json.dumps(out, indent=1, sort_keys=True) + "\n")
     print(json.dumps(out["counts"], indent=1))
 
