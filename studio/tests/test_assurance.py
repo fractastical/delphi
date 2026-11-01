@@ -147,6 +147,12 @@ def test_equation_stack_links_actual_files_models_ports_and_explicit_gaps(result
     assert fin["dependency_chain"]["transfers"]
     assert all(gap["latex"] is None for gap in result["equation_gaps"])
     assert any(gap["id"] == "gene-to-fin-program" for gap in result["equation_gaps"])
+    gaps = {gap["id"]: gap for gap in result["equation_gaps"]}
+    assert "static two-way FEM/VLM scenario is implemented" in gaps["deformed-fin-to-polar"]["summary"]
+    assert "finite torsion" in gaps["deformed-fin-to-polar"]["summary"]
+    assert "neighbor-response scenarios are implemented" in gaps["neural-caudal-control"]["summary"]
+    assert all(gaps[key]["status"] == "missing_mechanism" and len(gaps[key]["evidence"]) == 4
+               for key in ("deformed-fin-to-polar", "neural-caudal-control"))
 
 
 def test_projection_deterministic_and_source_paths_do_not_escape(result, tmp_path):
