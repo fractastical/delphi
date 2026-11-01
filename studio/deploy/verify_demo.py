@@ -75,10 +75,25 @@ def verify(base: str, capture: Path | None = None) -> dict:
                   state["width"] == 1920 and state["height"] == 1080 and state["decodedFrames"] > 0
                   and abs(state["duration"] - cuts[name]["duration_s"]) <= 0.25)
             check(name + " no horizontal overflow", page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"))
+            page.locator("#demo-fs").click()
+            page.wait_for_function("document.fullscreenElement?.id === 'demo-stage'")
+            check(name + " fullscreen entered", page.evaluate("document.fullscreenElement.id === 'demo-stage'"))
+            page.evaluate("document.exitFullscreen()")
+            page.wait_for_function("document.fullscreenElement === null")
+            check(name + " both cuts have direct downloads", page.locator(".demodl a[download][href$='.mp4']").count() == 2)
             if capture:
                 capture.mkdir(parents=True, exist_ok=True)
                 page.screenshot(path=str(capture / (name + ".png")))
             playback.append({"id": name, **state})
+        page.set_viewport_size({"width": 390, "height": 844})
+        page.goto(base + "/#/demo", wait_until="domcontentloaded")
+        page.wait_for_selector("#demo-video")
+        check("mobile defaults to one-minute cut", page.locator("#demo-video source").get_attribute("src").endswith("frontier-60s.mp4"))
+        check("mobile has no horizontal overflow", page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"))
+        page.locator(".aboutmenu summary").click()
+        check("About exposes Demo videos", page.locator(".aboutmenu a[href$='#/demo']").inner_text() == "Demo videos")
+        if capture:
+            page.screenshot(path=str(capture / "demo-mobile.png"))
         check("no page errors", not errors)
         browser.close()
     return {"schema": "frontier.demo-video.live-check/1", "checked_at": datetime.now(timezone.utc).isoformat(),
