@@ -1,11 +1,27 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 8:23pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 8:50pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-016 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 8:23pm PDT
+## Current checkpoint — October 31, 2026, 8:50pm PDT
+
+- [x] Team crest and short team clip are public at release 5d88ed4. Five focused
+  browser/build checks passed; deployment passed eight public web and 39 public
+  MCP checks. Root checked 1440/390 layouts and all three served media hashes.
+  Receipt: deploy/receipts/team-media-live.json.
+- [ ] New 90-second candidate encoded and decoded at 90.000 seconds. Independent
+  review found three source/frame mismatches: an unrelated Blueprint passage
+  labelled as genomic retrieval, a stale receipts screen contradicting GPU use,
+  and an unavailable subsystem beneath the control demonstration. The video
+  owner is replacing these frames and retaining the superseded candidate. It
+  is not published. Earlier 60/120-second cuts remain available.
+- [ ] Infra created a transactional raw database dump and a sanitized restore
+  copy. Off-host key decryption and a private S3 fixture round trip were checked.
+  Full archive upload and independent root restore remain unfinished.
+
+## Previous checkpoint — October 31, 2026, 8:23pm PDT
 
 - [x] Publication follow-up: print/FAQ/usage release 9d5a3d0 passed 8 public
   web, 39 public MCP and 6 live route/viewport checks. Subsequent release 7d72793
