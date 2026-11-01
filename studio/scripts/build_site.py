@@ -503,17 +503,25 @@ def print_v3_block(ins: Inputs, out: dict) -> dict | None:
     return {"forms": forms, "limitations": D["limitations"], "printer_resin": D["printer_resin"], "refused": refused}
 
 
-def recovery_inputs(ins: Inputs, out: dict) -> dict | None:
-    """The fixed public copy of the failed primary DDPM run's checkpoint inputs: published only if the archive's size and sha256 equal the sidecar's, never described as an evaluation."""
-    d = "artifacts/rd-diffusion"; sc = f"{d}/primary-runtime-inputs.json"; ar = f"{d}/primary-runtime-inputs.tar.xz"
+def runtime_inputs(ins: Inputs, out: dict, stem: str) -> dict | None:
+    """Publish a fixed runtime archive only when its sidecar digest and size match."""
+    d = "artifacts/rd-diffusion"; sc = f"{d}/{stem}.json"; ar = f"{d}/{stem}.tar.xz"
     if not ((ROOT / sc).exists() and (ROOT / ar).exists()):
         return None
     m = json.loads(ins.read(sc)); b = ins.read(ar)
     ok = len(b) == m["bytes"] and digest_bytes(b) == m["archive_sha256"]
     if ok:
-        out["@artifacts/rd-diffusion/primary-runtime-inputs.tar.xz"] = b; out["@artifacts/rd-diffusion/primary-runtime-inputs.json"] = ins.read(sc)
-    return {"published": ok, "href": "artifacts/rd-diffusion/primary-runtime-inputs.tar.xz" if ok else None, "bytes": m["bytes"], "sha256": m["archive_sha256"], "status": m["status"], "training_steps": m["training_steps"], "checkpoint_sha256": m["checkpoint_sha256"],
-            "primary_full_run_status": m["primary_full_run_status"], "original_primary_job_id": m["original_primary_job_id"], "next_admission": m["next_admission"], "members": m["files"], "sidecar": sc}
+        out["@" + ar] = b; out["@" + sc] = ins.read(sc)
+    return {**m, "published": ok, "href": ar if ok else None, "sha256": m["archive_sha256"], "sidecar": sc}
+
+
+def recovery_inputs(ins: Inputs, out: dict) -> dict | None:
+    """Original failed primary inputs retain their status separately from recovery."""
+    m = runtime_inputs(ins, out, "primary-runtime-inputs")
+    if m is None:
+        return None
+    return {"published": m["published"], "href": m["href"], "bytes": m["bytes"], "sha256": m["archive_sha256"], "status": m["status"], "training_steps": m["training_steps"], "checkpoint_sha256": m["checkpoint_sha256"],
+            "primary_full_run_status": m["primary_full_run_status"], "original_primary_job_id": m["original_primary_job_id"], "next_admission": m["next_admission"], "members": m["files"], "sidecar": m["sidecar"]}
 
 
 def fish_history(ins: Inputs) -> dict | None:
@@ -1068,6 +1076,7 @@ def build() -> dict[str, bytes]:
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
     recovery_in = recovery_inputs(ins, extra)
+    secondary_in = runtime_inputs(ins, extra, "secondary-runtime-inputs")
     fish_hist = fish_history(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
@@ -1103,6 +1112,7 @@ def build() -> dict[str, bytes]:
         "formalize": formalize_ex,
         "print_v3": print_v3,
         "recovery_inputs": recovery_in,
+        "secondary_inputs": secondary_in,
         "fish_history": fish_hist,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,

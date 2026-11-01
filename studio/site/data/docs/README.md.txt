@@ -39,6 +39,8 @@ papered over.
 | [SPEC-008](SPEC-008-holistic-design-assurance.md) | Regional assurance and explicit cross-scale interfaces |
 | [SPEC-009](SPEC-009-agent-workspace-mcp.md) | Agent-facing workspace and bounded tool capabilities |
 | [SPEC-010](SPEC-010-launchable-fish-glider.md) | User-requested printed fish glider, required slingshot launch, material and flight validation |
+| [SPEC-011](SPEC-011-behavior-and-ecology.md) | Actual-state gliding control and collective escape simulations with matched controls |
+| [SPEC-012](SPEC-012-genetic-implementation-blueprints.md) | Regulatory programs, constructs, delivery and evidence-linked implementation across scales |
 
 **Verification run (this session), bounded:**
 `systemd-run --user --scope -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=600
