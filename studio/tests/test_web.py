@@ -1217,25 +1217,26 @@ def test_video_types_are_served_only_from_guarded_artifacts_with_range_support(a
     assert web.resolve_static(site, "/artifacts/big.mp4") is None
 
 
-def test_warmstart_archive_is_an_opaque_download_only_under_artifacts(authed, site, tmp_path):
+@pytest.mark.parametrize("suffix,content_type", [(".tar.xz", "application/x-xz"), (".zip", "application/zip")])
+def test_warmstart_archive_is_an_opaque_download_only_under_artifacts(authed, site, tmp_path, suffix, content_type):
     """Publishing a frozen simulator input must not open arbitrary archives or paths."""
     import lzma
 
     art = site / "artifacts"
     art.mkdir(exist_ok=True)
     payload = lzma.compress(b"frozen simulation inputs")
-    (art / "warmstart.tar.xz").write_bytes(payload)
-    status, headers, body = authed.req("GET", "/artifacts/warmstart.tar.xz")
+    (art / ("bundle" + suffix)).write_bytes(payload)
+    status, headers, body = authed.req("GET", "/artifacts/bundle" + suffix)
     assert status == 200 and body == payload
-    assert headers["content-type"] == "application/x-xz"
+    assert headers["content-type"] == content_type
     assert headers["content-disposition"].split(";", 1)[0] == "attachment"
     assert headers["x-content-type-options"] == "nosniff"
-    (site / "outside.tar.xz").write_bytes(payload)
-    (art / "credentials.tar.xz").write_bytes(payload)
-    outside = tmp_path / "outside-archive.xz"
+    (site / ("outside" + suffix)).write_bytes(payload)
+    (art / ("credentials" + suffix)).write_bytes(payload)
+    outside = tmp_path / ("outside-archive" + suffix)
     outside.write_bytes(payload)
-    (art / "linked.xz").symlink_to(outside)
-    for path in ("/outside.tar.xz", "/artifacts/credentials.tar.xz", "/artifacts/linked.xz"):
+    (art / ("linked" + suffix)).symlink_to(outside)
+    for path in ("/outside" + suffix, "/artifacts/credentials" + suffix, "/artifacts/linked" + suffix):
         assert authed.req("GET", path)[0] == 404
 
 
