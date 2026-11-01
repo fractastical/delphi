@@ -1,5 +1,9 @@
 {
  "biological_success_probability": null,
+ "directions": {
+  "forward": "sequence to function: a context-conditioned effect prediction. It needs a measured transfer for the stated genotype, species, cell state, stage and condition.",
+  "inverse": "function to sequence: propose a CANDIDATE SET, then reuse the forward checks on every member. An edge that is not a calibrated transfer for the context is never inverted, and a set is never one guaranteed genome."
+ },
  "interfaces": {
   "I1": {
    "bridges": [
@@ -10,6 +14,21 @@
     }
    ],
    "bridges_not_in_sources": [],
+   "directions": {
+    "forward": {
+     "from": "dna",
+     "label": "context-conditioned effect prediction",
+     "state": "unknown",
+     "to": "expression"
+    },
+    "inverse": {
+     "from": "expression",
+     "invertible": false,
+     "label": "candidate-set proposal, checked by the forward path",
+     "to": "dna",
+     "why": "the forward edge is not a calibrated transfer for any context"
+    }
+   },
    "from": "dna",
    "proposed_experiments": [
     {
@@ -25,7 +44,7 @@
     "allele",
     "construct_context"
    ],
-   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's species, tissue, cell state, life stage, condition, allele and construct context",
    "state": "unknown",
    "text": "DNA to expression in the stated cell state",
    "to": "expression"
@@ -67,6 +86,21 @@
     }
    ],
    "bridges_not_in_sources": [],
+   "directions": {
+    "forward": {
+     "from": "expression",
+     "label": "context-conditioned effect prediction",
+     "state": "unknown",
+     "to": "growth_material"
+    },
+    "inverse": {
+     "from": "growth_material",
+     "invertible": false,
+     "label": "candidate-set proposal, checked by the forward path",
+     "to": "expression",
+     "why": "the forward edge is not a calibrated transfer for any context"
+    }
+   },
    "from": "expression",
    "proposed_experiments": [
     {
@@ -88,7 +122,7 @@
     "allele",
     "construct_context"
    ],
-   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's species, tissue, cell state, life stage, condition, allele and construct context",
    "state": "unknown",
    "text": "expression to growth/material (conductance, proliferation, deposition)",
    "to": "growth_material"
@@ -123,6 +157,21 @@
     }
    ],
    "bridges_not_in_sources": [],
+   "directions": {
+    "forward": {
+     "from": "growth_material",
+     "label": "context-conditioned effect prediction",
+     "state": "unknown",
+     "to": "shape_mechanics"
+    },
+    "inverse": {
+     "from": "shape_mechanics",
+     "invertible": false,
+     "label": "candidate-set proposal, checked by the forward path",
+     "to": "growth_material",
+     "why": "the forward edge is not a calibrated transfer for any context"
+    }
+   },
    "from": "growth_material",
    "proposed_experiments": [
     {
@@ -144,7 +193,7 @@
     "allele",
     "construct_context"
    ],
-   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's species, tissue, cell state, life stage, condition, allele and construct context",
    "state": "unknown",
    "text": "growth/material to ray geometry and stiffness EI",
    "to": "shape_mechanics"
@@ -167,6 +216,21 @@
     }
    ],
    "bridges_not_in_sources": [],
+   "directions": {
+    "forward": {
+     "from": "shape_mechanics",
+     "label": "context-conditioned effect prediction",
+     "state": "unknown",
+     "to": "performance"
+    },
+    "inverse": {
+     "from": "performance",
+     "invertible": false,
+     "label": "candidate-set proposal, checked by the forward path",
+     "to": "shape_mechanics",
+     "why": "the forward edge is not a calibrated transfer for any context"
+    }
+   },
    "from": "shape_mechanics",
    "proposed_experiments": [
     {
@@ -197,7 +261,7 @@
     "allele",
     "construct_context"
    ],
-   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's species, tissue, cell state, life stage, condition, allele and construct context",
    "state": "unknown",
    "text": "fin shape and deformation to aerodynamic performance",
    "to": "performance"
@@ -220,6 +284,21 @@
     }
    ],
    "bridges_not_in_sources": [],
+   "directions": {
+    "forward": {
+     "from": "performance",
+     "label": "context-conditioned effect prediction",
+     "state": "unknown",
+     "to": "behavior"
+    },
+    "inverse": {
+     "from": "behavior",
+     "invertible": false,
+     "label": "candidate-set proposal, checked by the forward path",
+     "to": "performance",
+     "why": "the forward edge is not a calibrated transfer for any context"
+    }
+   },
    "from": "performance",
    "proposed_experiments": [
     {
@@ -241,12 +320,18 @@
     "allele",
     "construct_context"
    ],
-   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's species, tissue, cell state, life stage, condition, allele and construct context",
    "state": "unknown",
    "text": "simulated performance to organism behaviour and control",
    "to": "behavior"
   }
  },
+ "inverse_rules": [
+  "an interface that is not a calibrated transfer for the stated context is not inverted: the request is not proposable",
+  "every candidate carries provenance (proposer, method, sources) and a pinned sequence artifact, and passes the forward checks for the target before it is listed as passing",
+  "an ortholog or homolog is not interchangeable: function does not transfer across species or contexts without its own context-matched measurement",
+  "the output is a candidate set with its provenance and the unresolved bridges, never a single guaranteed genome, and the compiler adds no sequence of its own"
+ ],
  "must_not_say": [
   "a working genome or construct was designed",
   "homology or a marker shows a function transfers to this organism",

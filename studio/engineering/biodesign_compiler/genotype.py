@@ -53,6 +53,16 @@ STATES = ("unknown", "proposed", "measured_context", "calibrated_transfer")  # "
 CONTEXT_FIELDS = ("species", "tissue", "cell_state", "life_stage", "condition", "allele", "construct_context")  # the sequence-function ledger's vocabulary
 LEDGER_SCHEMA = "frontier.sequence-function-ledger/1"
 BRIDGE_STATE = {"context_supported": "measured_context", "proposed": "proposed", "unresolved": "unknown", "contradicted": "contradicted"}
+DIRECTIONS = {
+    "forward": "sequence to function: a context-conditioned effect prediction. It needs a measured transfer for the stated genotype, species, cell state, stage and condition.",
+    "inverse": "function to sequence: propose a CANDIDATE SET, then reuse the forward checks on every member. An edge that is not a calibrated transfer for the context is never inverted, and a set is never one guaranteed genome.",
+}
+INVERSE_RULES = [
+    "an interface that is not a calibrated transfer for the stated context is not inverted: the request is not proposable",
+    "every candidate carries provenance (proposer, method, sources) and a pinned sequence artifact, and passes the forward checks for the target before it is listed as passing",
+    "an ortholog or homolog is not interchangeable: function does not transfer across species or contexts without its own context-matched measurement",
+    "the output is a candidate set with its provenance and the unresolved bridges, never a single guaranteed genome, and the compiler adds no sequence of its own",
+]
 SOURCES = {"design_control": "artifacts/design-control/map.json", "compiler_report": "artifacts/biodesign-compiler/report.json", "blueprints": "artifacts/genetic-blueprints/blueprints.json"}
 MUST_NOT_SAY = ["a working genome or construct was designed", "homology or a marker shows a function transfers to this organism", "an unresolved interface is a violated constraint", "a calibration measured in one context holds in another"]
 
@@ -81,13 +91,19 @@ def baseline_graph(root: Path = ROOT) -> dict:
             "bridges": ev,
             "bridges_not_in_sources": missing,
             "required_context": list(CONTEXT_FIELDS),
-            "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+            "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's species, tissue, cell state, life stage, condition, allele and construct context",
             "proposed_experiments": [{"id": w, **wps[w]} for w in WORKPACKAGES.get(iid, []) if w in wps] or [{"note": "no experiment for this interface is recorded in the design-control map"}],
+            "directions": {
+                "forward": {"from": a, "to": b, "label": "context-conditioned effect prediction", "state": "unknown"},
+                "inverse": {"from": b, "to": a, "label": "candidate-set proposal, checked by the forward path", "invertible": False, "why": "the forward edge is not a calibrated transfer for any context"},
+            },
         }
     return {
         "schema": GRAPH_SCHEMA,
         "nodes": [{"id": n, "text": NODE_TEXT[n]} for n in NODES],
         "interfaces": ifs,
+        "directions": DIRECTIONS,
+        "inverse_rules": INVERSE_RULES,
         "states": list(STATES),
         "sources": pins,
         "scope": "an explicit dependency graph of what a genotype-to-fin design needs; every interface is unknown and nothing is calibrated",
@@ -375,6 +391,7 @@ def validation_slices(graph: dict, design: dict | None = None, report: dict | No
             "recorded_bridges": [b["bridge"] for b in g["bridges"]],
             "recorded_experiments": g["proposed_experiments"],
             "instrument_slots": [{"kind": k, "contract_ref": None, "owner": "experimental-design instrument contracts (claude14)", "required_fields": INSTRUMENT_FIELDS} for k in ("physical", "virtual")],
+            "directions": g["directions"],
             "invalidated_by_dna_change": iid in dna["invalidated_interfaces"],
             "invalidated_by_context_change": True,
             "ledger_readouts": ledger_readouts if iid in ("I1", "I2") else [],
@@ -394,6 +411,77 @@ def validation_slices(graph: dict, design: dict | None = None, report: dict | No
         "after_proposed_dna_change": {k: dna[k] for k in ("invalidated_nodes", "invalidated_interfaces", "retained_calibrations", "invalidated_calibrations")} | {"meaning": "every interface evidence entry was for the previous sequence and must be repeated; independent numerical checks of other layers are retained"},
         "scope": "requirements for validation, not protocols, not results; no calibrated genotype-to-phenotype transfer exists or is implied",
         "must_not_say": MUST_NOT_SAY,
+    }
+
+
+# ------------------------------------------------------------------------------------------------------------ inverse direction
+INVERSE_SCHEMA = "frontier.biodesign.inverse-request/1"
+INVERSE_REPORT_SCHEMA = "frontier.biodesign.inverse-report/1"
+
+
+def inverse_cutset(graph: dict, target_node: str) -> list[str]:
+    """The interfaces between the DNA and the target function: each must be a calibrated transfer for the context before any inversion."""
+    return cutset(graph, "dna", target_node)["interfaces"]
+
+
+def compile_inverse(root: Path, graph: dict, request: dict, forward: dict) -> dict:
+    """Function to sequence. `request` names a target layer and a set of PROPOSED candidates with provenance; `forward` is a forward design document
+    (context, interface evidence, ledger) against which every candidate is re-checked. The compiler does not add a sequence, does not invert an
+    uncalibrated edge, does not treat a homolog as interchangeable and never returns one guaranteed genome: it returns the interfaces that block
+    the request, or the candidates that passed the forward checks, each with its provenance."""
+    root = Path(root)
+    problems = []
+    if request.get("schema") != INVERSE_SCHEMA:
+        problems.append(f"schema must be {INVERSE_SCHEMA}")
+    target = request.get("target_node")
+    if target not in NODES:
+        problems.append(f"target_node must be one of {', '.join(NODES)}")
+        target = None
+    ctx = forward.get("context") or {}
+    base = compile_design(root, graph, {**forward, "claim": "proposal", "sequence_candidates": [], "build_plan_proposals": []})
+    state = base["interface_state"]
+    needed = inverse_cutset(graph, target) if target else []
+    blocked = [{"interface": i, "state": state.get(i, "unknown"), "why": "not a calibrated transfer for this context: the forward edge cannot be inverted", "needs": graph["interfaces"][i]["proposed_experiments"]} for i in needed if state.get(i) != "calibrated_transfer"]
+    cands = []
+    for c in request.get("candidates", []):
+        prov = c.get("provenance") or {}
+        miss = [k for k in ("proposer", "method") if not prov.get(k)] + ([] if prov.get("source_refs") else ["source_refs"])
+        issues = [f"provenance is missing: {', '.join(miss)}"] if miss else []
+        seq = check_sequence(root, c)
+        issues += seq["problems"]
+        obs = c.get("observed_context") or {}
+        if c.get("ortholog_of") or c.get("evidence_kind") == "homology" or (obs.get("species") and obs.get("species") != ctx.get("species")):
+            issues.append("ortholog or homolog: function is not interchangeable across species or contexts; it needs its own context-matched measurement")
+        checked = {}
+        if not issues and not blocked:
+            fwd = compile_design(root, graph, {**forward, "claim": "proposal", "sequence_candidates": [c]})
+            checked = {"interface_state": {i: fwd["interface_state"][i] for i in needed}, "reasons": fwd["reasons"]}
+            if fwd["reasons"] or any(fwd["interface_state"][i] != "calibrated_transfer" for i in needed):
+                issues.append("did not pass the forward checks for this target")
+        cands.append({"id": c.get("id"), "provenance": prov, "sequence": seq, "ortholog_of": c.get("ortholog_of"), "forward_check": checked, "issues": issues, "passes_forward_checks": not issues and not blocked})
+    passing = [c for c in cands if c["passes_forward_checks"]]
+    if problems:
+        verdict = "invalid_request"
+    elif blocked:
+        verdict = "not_proposable"
+    else:
+        verdict = "candidate_set" if passing else "no_candidate_passed"
+    return {
+        "schema": INVERSE_REPORT_SCHEMA,
+        "request_id": request.get("id"),
+        "target_node": target,
+        "context": ctx,
+        "verdict": verdict,
+        "problems": problems,
+        "interfaces_crossed": needed,
+        "blocked_interfaces": blocked,
+        "candidate_set": [{"id": c["id"], "provenance": c["provenance"], "sequence": c["sequence"]["source_ref"], "forward_check": c["forward_check"]} for c in passing],
+        "unscreened_or_failed_candidates": [{"id": c["id"], "provenance": c["provenance"], "issues": c["issues"] or ["not screened: an interface on the path is not calibrated"]} for c in cands if not c["passes_forward_checks"]],
+        "unresolved_bridges": [{"interface": i, "bridges": [b["bridge"] for b in graph["interfaces"][i]["bridges"]]} for i in needed if state.get(i) != "calibrated_transfer"],
+        "single_genome_guaranteed": False,
+        "rules": INVERSE_RULES,
+        "added_sequences": 0,
+        "scope": "a candidate set with provenance, each member re-checked by the forward path; no sequence was generated here and nothing follows biologically from membership",
     }
 
 
@@ -495,6 +583,8 @@ def build_files(root: Path = ROOT) -> dict[str, str]:
         "context": {"species": "Danio rerio", "tissue": "caudal fin", "cell_state": "regenerating blastema", "life_stage": "adult", "condition": "amputation", "allele": "wild type, strain unspecified", "construct_context": "none: no construct"},
     }
     rep = compile_design(root, g, baseline_design)
+    inverse_example = {"schema": INVERSE_SCHEMA, "id": "baseline-inverse-no-candidates", "target_node": "shape_mechanics", "candidates": []}
+    inv = compile_inverse(root, g, inverse_example, baseline_design)
     contract = {
         "schema": "frontier.biodesign.genotype-contract/1",
         "graph_file": "genotype-graph.json",
@@ -511,6 +601,8 @@ def build_files(root: Path = ROOT) -> dict[str, str]:
             "a build plan stays a proposal",
         ],
         "must_not_say": MUST_NOT_SAY,
+        "inverse_example": {"request": inverse_example, "verdict": inv["verdict"], "blocked": [b["interface"] for b in inv["blocked_interfaces"]], "single_genome_guaranteed": inv["single_genome_guaranteed"]},
+        "directions": DIRECTIONS,
         "baseline_example": {"design": baseline_design, "verdict": rep["verdict"], "unresolved": [u["interface"] for u in rep["assembly_unresolved_interfaces"]]},
     }
     vs = validation_slices(g, {"context": baseline_design["context"]}, {**rep, "compiled": json.loads((root / SOURCES["compiler_report"]).read_text())["compiled"]})

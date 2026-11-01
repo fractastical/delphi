@@ -265,3 +265,85 @@ def test_ledger_readouts_travel_with_the_expression_slices(tree):
     v = G.validation_slices(GRAPH, d, r)
     assert v["interfaces"]["I1"]["ledger_readouts"] == [{"entry": "e-len", "falsifiable_validation_readout": "reporter signal after deleting the element", "missing_causal_bridge": "growth and EI"}]
     assert v["interfaces"]["I1"]["state"] == "measured_context" and v["interfaces"]["I3"]["ledger_readouts"] == []
+
+
+# ---------------------------------------------------------------------------------------------- bidirectional: forward and inverse
+def seq_candidate(root, name, cid, **kw):
+    (root / "seq" / name).write_bytes(f">{cid}\nACGTACGT{cid}\n".encode())
+    c = {"id": cid, "source_ref": ref(root, f"seq/{name}"), "evidence_kind": "measured_expression", "observed_context": copy.deepcopy(CTX), "provenance": {"proposer": "designer-A", "method": "enhancer scan constrained by the ledger", "source_refs": ["ledger:e-len"]}}
+    c.update(kw)
+    return c
+
+
+def inv_req(cands, target="shape_mechanics"):
+    return {"schema": G.INVERSE_SCHEMA, "id": "r1", "target_node": target, "candidates": cands}
+
+
+def test_every_interface_carries_forward_and_inverse_directions_and_none_is_invertible_today():
+    assert "context-conditioned effect prediction" in G.DIRECTIONS["forward"] and "CANDIDATE SET" in G.DIRECTIONS["inverse"] and "never one guaranteed genome" in G.DIRECTIONS["inverse"]
+    for iid, v in GRAPH["interfaces"].items():
+        assert v["directions"]["forward"]["label"] == "context-conditioned effect prediction" and v["directions"]["forward"]["state"] == "unknown"
+        assert v["directions"]["inverse"]["invertible"] is False and "not a calibrated transfer" in v["directions"]["inverse"]["why"]
+        assert v["directions"]["inverse"]["from"] == v["to"] and v["directions"]["inverse"]["to"] == v["from"]
+    assert len(GRAPH["inverse_rules"]) == 4
+
+
+def test_inverse_request_on_the_repository_baseline_is_not_proposable_and_names_the_unresolved_bridges():
+    base = {"schema": G.DESIGN_SCHEMA, "id": "b", "context": CTX}
+    cand = {"id": "x", "provenance": {"proposer": "p", "method": "m", "source_refs": ["s"]}}
+    r = G.compile_inverse(ROOT, GRAPH, inv_req([cand]), base)
+    assert r["verdict"] == "not_proposable" and [b["interface"] for b in r["blocked_interfaces"]] == ["I1", "I2", "I3"] and r["candidate_set"] == []
+    assert r["single_genome_guaranteed"] is False and r["added_sequences"] == 0
+    assert any("fin-stiffness-calibration" in u["bridges"] for u in r["unresolved_bridges"] if u["interface"] == "I3")
+    assert r["unscreened_or_failed_candidates"][0]["id"] == "x" and "no pinned source artifact" in r["unscreened_or_failed_candidates"][0]["issues"]
+    pinned = {"id": "y", "provenance": cand["provenance"], "source_ref": ref(ROOT, "artifacts/design-control/map.json"), "evidence_kind": "measured_expression"}
+    r = G.compile_inverse(ROOT, GRAPH, inv_req([pinned]), base)
+    assert r["candidate_set"] == [] and "not screened: an interface on the path is not calibrated" in r["unscreened_or_failed_candidates"][0]["issues"]
+
+
+def test_a_candidate_set_is_proposed_only_when_every_interface_on_the_path_is_calibrated(tree):
+    fwd = design(tree, claim="proposal", ifs=("I1", "I2", "I3"))
+    cands = [seq_candidate(tree, "a.fa", "a"), seq_candidate(tree, "b.fa", "b")]
+    r = G.compile_inverse(tree, GRAPH, inv_req(cands), fwd)
+    assert r["verdict"] == "candidate_set" and [c["id"] for c in r["candidate_set"]] == ["a", "b"] and r["interfaces_crossed"] == ["I1", "I2", "I3"]
+    assert r["candidate_set"][0]["provenance"]["method"] == "enhancer scan constrained by the ledger" and r["candidate_set"][0]["forward_check"]["interface_state"] == {"I1": "calibrated_transfer", "I2": "calibrated_transfer", "I3": "calibrated_transfer"}
+    assert r["single_genome_guaranteed"] is False and r["added_sequences"] == 0 and r["unresolved_bridges"] == []
+    assert [c["sequence"]["path"] for c in r["candidate_set"]] == ["seq/a.fa", "seq/b.fa"], "the compiler returns the candidates it was given, never a sequence of its own"
+
+
+def test_the_path_to_the_target_decides_what_can_be_inverted(tree):
+    fwd = design(tree, claim="proposal", ifs=("I1", "I2"))  # I3 (growth to EI) is not calibrated
+    c = [seq_candidate(tree, "a.fa", "a")]
+    assert G.compile_inverse(tree, GRAPH, inv_req(c, "growth_material"), fwd)["verdict"] == "candidate_set"
+    r = G.compile_inverse(tree, GRAPH, inv_req(c, "shape_mechanics"), fwd)
+    assert r["verdict"] == "not_proposable" and [b["interface"] for b in r["blocked_interfaces"]] == ["I3"]
+
+
+def test_a_measured_context_is_not_enough_to_invert_an_edge(tree):
+    fwd = design(tree, claim="proposal", ifs=())
+    fwd["interface_evidence"] = [evidence(tree, "I1", status="measured_context")]
+    r = G.compile_inverse(tree, GRAPH, inv_req([seq_candidate(tree, "a.fa", "a")], "expression"), fwd)
+    assert r["verdict"] == "not_proposable" and r["blocked_interfaces"][0]["state"] == "measured_context"
+
+
+def test_candidates_need_provenance_a_matching_pinned_sequence_and_are_never_assumed_interchangeable(tree):
+    fwd = design(tree, claim="proposal", ifs=("I1", "I2", "I3"))
+    good = seq_candidate(tree, "a.fa", "good")
+    noprov = seq_candidate(tree, "b.fa", "noprov")
+    noprov["provenance"] = {"proposer": "x"}
+    stale = seq_candidate(tree, "c.fa", "stale")
+    (tree / "seq/c.fa").write_bytes(b"changed after pinning")
+    ortho = seq_candidate(tree, "d.fa", "ortholog", ortholog_of={"species": "Danio rerio", "gene": "lepb"}, evidence_kind="homology", observed_context={**CTX, "species": "Hirundichthys speculiger"})
+    r = G.compile_inverse(tree, GRAPH, inv_req([good, noprov, stale, ortho]), fwd)
+    assert r["verdict"] == "candidate_set" and [c["id"] for c in r["candidate_set"]] == ["good"]
+    why = {c["id"]: " ".join(c["issues"]) for c in r["unscreened_or_failed_candidates"]}
+    assert "provenance is missing: method, source_refs" in why["noprov"] and "stale sequence reference" in why["stale"] and "not interchangeable across species or contexts" in why["ortholog"]
+
+
+def test_no_passing_candidate_or_a_bad_request_never_produces_a_genome(tree):
+    fwd = design(tree, claim="proposal", ifs=("I1", "I2", "I3"))
+    only_bad = seq_candidate(tree, "a.fa", "a")
+    only_bad["provenance"] = {}
+    r = G.compile_inverse(tree, GRAPH, inv_req([only_bad]), fwd)
+    assert r["verdict"] == "no_candidate_passed" and r["candidate_set"] == [] and r["single_genome_guaranteed"] is False
+    assert G.compile_inverse(tree, GRAPH, {"schema": "x", "target_node": "nowhere", "candidates": []}, fwd)["verdict"] == "invalid_request"
