@@ -1,0 +1,307 @@
+{
+ "biological_success_probability": null,
+ "interfaces": {
+  "I1": {
+   "bridges": [
+    {
+     "bridge": "blueprint->cell_program",
+     "reason": "cell_program_binding validation_status is unknown in every design",
+     "source_status": "unresolved"
+    }
+   ],
+   "bridges_not_in_sources": [],
+   "from": "dna",
+   "proposed_experiments": [
+    {
+     "note": "no experiment for this interface is recorded in the design-control map"
+    }
+   ],
+   "required_context": [
+    "species",
+    "tissue",
+    "cell_state",
+    "life_stage",
+    "condition",
+    "allele",
+    "construct_context"
+   ],
+   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+   "state": "unknown",
+   "text": "DNA to expression in the stated cell state",
+   "to": "expression"
+  },
+  "I2": {
+   "bridges": [
+    {
+     "bridge": "regulatory-expression-to-channel-density-conductance",
+     "from": "expression",
+     "layer": "molecular-regulatory",
+     "source_status": "unknown",
+     "to": "channel density/conductance"
+    },
+    {
+     "bridge": "regulatory-voltage-or-transport-to-proliferation-rate",
+     "from": "voltage or transport",
+     "layer": "molecular-regulatory",
+     "source_status": "unknown",
+     "to": "proliferation rate"
+    },
+    {
+     "bridge": "regulatory-osteoblast/fibroblast-state-to-mineral-ECM-deposition",
+     "from": "osteoblast/fibroblast state",
+     "layer": "molecular-regulatory",
+     "source_status": "unknown",
+     "to": "mineral/ECM deposition"
+    },
+    {
+     "bridge": "voltage-to-gene-tissue-fin",
+     "from": "membrane voltage",
+     "layer": "cell-bioelectric",
+     "source_status": "unsupported",
+     "to": "tissue/fin geometry or stiffness"
+    },
+    {
+     "bridge": "expression->growth",
+     "reason": "no expression-to-growth model or mapping is registered; blueprint expression_kinetics are UNKNOWN",
+     "source_status": "unresolved"
+    }
+   ],
+   "bridges_not_in_sources": [],
+   "from": "expression",
+   "proposed_experiments": [
+    {
+     "closes": [
+      "expression-to-conductance (first step only)"
+     ],
+     "id": "wp-reg-sample-identity",
+     "kind": "computational-metadata",
+     "status": "proposed-not-executed",
+     "title": "Resolve GSE261907 barcode and replicate pairing from small metadata files"
+    }
+   ],
+   "required_context": [
+    "species",
+    "tissue",
+    "cell_state",
+    "life_stage",
+    "condition",
+    "allele",
+    "construct_context"
+   ],
+   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+   "state": "unknown",
+   "text": "expression to growth/material (conductance, proliferation, deposition)",
+   "to": "growth_material"
+  },
+  "I3": {
+   "bridges": [
+    {
+     "bridge": "regulatory-deposition-to-ray-geometry-and-EI",
+     "from": "deposition",
+     "layer": "molecular-regulatory",
+     "source_status": "unknown",
+     "to": "ray geometry and EI"
+    },
+    {
+     "bridge": "fin-length-to-ray-EI",
+     "from": "fin length proportion",
+     "layer": "organ-fin-proportions",
+     "source_status": "unknown",
+     "to": "ray EI(x) and load field"
+    },
+    {
+     "bridge": "fin-stiffness-calibration",
+     "from": "fin-stiffness-calibration",
+     "layer": "tissue-fin-ray",
+     "source_status": "unknown",
+     "to": "target-fin behaviour"
+    },
+    {
+     "bridge": "growth->EI",
+     "reason": "no growth-to-flexural-rigidity mapping; the nearest registered coupling is refused",
+     "source_status": "unresolved"
+    }
+   ],
+   "bridges_not_in_sources": [],
+   "from": "growth_material",
+   "proposed_experiments": [
+    {
+     "closes": [
+      "tissue-to-EI"
+     ],
+     "id": "wp-fin-EI-load",
+     "kind": "physical-measurement",
+     "status": "proposed-not-executed",
+     "title": "Measure EI(x) under target clamping and the load field"
+    }
+   ],
+   "required_context": [
+    "species",
+    "tissue",
+    "cell_state",
+    "life_stage",
+    "condition",
+    "allele",
+    "construct_context"
+   ],
+   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+   "state": "unknown",
+   "text": "growth/material to ray geometry and stiffness EI",
+   "to": "shape_mechanics"
+  },
+  "I4": {
+   "bridges": [
+    {
+     "bridge": "fin-deformation-aerodynamic-polar",
+     "from": "fin-deformation-aerodynamic-polar",
+     "layer": "tissue-fin-ray",
+     "source_status": "unsupported",
+     "to": "target-fin behaviour"
+    },
+    {
+     "bridge": "cell-tissue-fin",
+     "from": "cell-tissue-fin",
+     "layer": "tissue-fin-ray",
+     "source_status": "unsupported",
+     "to": "target-fin behaviour"
+    }
+   ],
+   "bridges_not_in_sources": [],
+   "from": "shape_mechanics",
+   "proposed_experiments": [
+    {
+     "closes": [
+      "fin-load-bridge"
+     ],
+     "id": "wp-load-shape",
+     "kind": "physical-measurement",
+     "status": "proposed-not-executed",
+     "title": "Measure spatial pressure/load shape"
+    },
+    {
+     "closes": [
+      "fin-deformation-aerodynamic-polar"
+     ],
+     "id": "wp-deformed-polar",
+     "kind": "computational-model",
+     "status": "blocked-on-inputs",
+     "title": "Deformed-fin aerodynamic polar"
+    }
+   ],
+   "required_context": [
+    "species",
+    "tissue",
+    "cell_state",
+    "life_stage",
+    "condition",
+    "allele",
+    "construct_context"
+   ],
+   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+   "state": "unknown",
+   "text": "fin shape and deformation to aerodynamic performance",
+   "to": "performance"
+  },
+  "I5": {
+   "bridges": [
+    {
+     "bridge": "glide-to-flight-prediction",
+     "from": "simulated glide/escape",
+     "layer": "body-glide-escape",
+     "source_status": "unsupported",
+     "to": "organism behaviour"
+    },
+    {
+     "bridge": "phase-to-fluid-force",
+     "from": "oscillator phase/frequency",
+     "layer": "behavior-control",
+     "source_status": "unsupported",
+     "to": "fluid force"
+    }
+   ],
+   "bridges_not_in_sources": [],
+   "from": "performance",
+   "proposed_experiments": [
+    {
+     "closes": [
+      "phase-to-fluid-force"
+     ],
+     "id": "wp-moving-wall",
+     "kind": "computational-model",
+     "status": "not-started",
+     "title": "Moving-wall fluid solver with calibration controls"
+    }
+   ],
+   "required_context": [
+    "species",
+    "tissue",
+    "cell_state",
+    "life_stage",
+    "condition",
+    "allele",
+    "construct_context"
+   ],
+   "required_measurement": "a measured transfer (quantity, unit, bounds) for exactly the design's genotype, species, cell state, stage and environment",
+   "state": "unknown",
+   "text": "simulated performance to organism behaviour and control",
+   "to": "behavior"
+  }
+ },
+ "must_not_say": [
+  "a working genome or construct was designed",
+  "homology or a marker shows a function transfers to this organism",
+  "an unresolved interface is a violated constraint",
+  "a calibration measured in one context holds in another"
+ ],
+ "nodes": [
+  {
+   "id": "dna",
+   "text": "candidate sequence and construct (pinned artifact, never generated here)"
+  },
+  {
+   "id": "expression",
+   "text": "expression and cell program in a stated cell state and stage"
+  },
+  {
+   "id": "growth_material",
+   "text": "growth and material: proliferation, matrix and mineral deposition"
+  },
+  {
+   "id": "shape_mechanics",
+   "text": "fin shape and mechanics: ray geometry, stiffness EI(x), load"
+  },
+  {
+   "id": "performance",
+   "text": "aerodynamic performance of the fin and body (forces, glide)"
+  },
+  {
+   "id": "behavior",
+   "text": "organism behaviour and control"
+  }
+ ],
+ "schema": "frontier.biodesign.genotype-graph/1",
+ "scope": "an explicit dependency graph of what a genotype-to-fin design needs; every interface is unknown and nothing is calibrated",
+ "sources": {
+  "blueprints": {
+   "bytes": 86089,
+   "path": "artifacts/genetic-blueprints/blueprints.json",
+   "sha256": "cd1f28689a132b617db2da9593be54c58a2b558ff803a642705d4b8b86f1b92b"
+  },
+  "compiler_report": {
+   "bytes": 23758,
+   "path": "artifacts/biodesign-compiler/report.json",
+   "sha256": "a75187b9aea9b9393dc32418ace287d511a391079d394ed687209e166dc9137c"
+  },
+  "design_control": {
+   "bytes": 39712,
+   "path": "artifacts/design-control/map.json",
+   "sha256": "30128be55adf6ed715a47289aba795975ccaf74b95b2f82c2b4f77749e2891a9"
+  }
+ },
+ "states": [
+  "unknown",
+  "proposed",
+  "measured_context",
+  "calibrated_transfer"
+ ]
+}
