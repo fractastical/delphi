@@ -63,6 +63,74 @@ def arms() -> list[dict]:
     return out
 
 
+def arms_r2() -> list[dict]:
+    """Revision 2. Added AFTER revision 1 ran, for two stated reasons, and frozen before it ran.
+
+    Reason 1: revision 1's G4 was mis-specified. It assumed cell-medium interface energy is
+    necessary for closure; with J=0 the gap closed anyway, because Act-model protrusion drives
+    it. The true no-drive control turns BOTH off. Revision 1's G4 stays failed and is not relabelled.
+    Reason 2: revision 1's G8 could not be evaluated because k=1 closed at every swept lambda_V,
+    so no threshold bracket existed there. Revision 2 extends that sweep, and replaces the
+    held-out test with one whose prediction is derived rather than fitted: the Phi group says
+    the threshold lambda_V is proportional to J, so doubling J must double it. No revision 2
+    measurement is used to fit anything.
+    """
+    out = [
+        arm("F1-no-drive-NEGATIVE", "F",
+            "true negative control: both closure drives off (no interface energy, no protrusion). MUST NOT close.",
+            j_cell_medium=0, protrusion=0),
+    ]
+    # D. held-out J scaling at the gap whose threshold revision 1 bracketed (k=4)
+    for lv in (0.3, 0.6, 1, 2, 4):
+        out.append(arm(f"D-k4-J280-lamV{lv}", "D",
+                       "threshold at double the interface energy; prediction derived, not fitted",
+                       lambda_v=lv, j_cell_medium=280))
+    # E. complete the gap ladder: k=1 never arrested below lambda_V=50
+    for lv in (200, 1000, 5000):
+        out.append(arm(f"E-k1-lamV{lv}", "E", "extend the k=1 sweep until it arrests",
+                       lambda_v=lv, wound_r2=GAPS[1]))
+    # F. protrusion dose-response on an ARRESTED gap (k=4 at lambda_V=1 arrested at 0.684)
+    for p in (0, 20, 40, 160):
+        out.append(arm(f"F2-prot{p}", "F", "protrusion dose-response on an arrested gap",
+                       lambda_v=1, protrusion=p))
+    return out
+
+
+def gates_r2() -> list[dict]:
+    return [
+        dict(id="G9", name="held-out: threshold scales with interface energy",
+             statement="Revision 1 bracketed the k=4 closure threshold at lambda_V in (0.3, 1.0) with J=140. "
+                       "Phi is linear in lambda_V and inverse in J, so at J=280 the threshold must sit in "
+                       "(0.6, 2.0). The measured J=280 bracket's geometric-mean threshold must fall in that "
+                       "interval.",
+             bound="measured lambda* at J=280 within [0.6, 2.0]",
+             why="the prediction comes from the algebraic form of Phi and revision 1's J=140 bracket. No J=280 "
+                 "result is used to derive it, so this is a genuine out-of-sample test of the group's "
+                 "J-dependence. It tests only that dependence; revision 1 already refuted a constant Phi* "
+                 "across gap size, and G9 does not re-open that."),
+        dict(id="G10", name="no-drive control does not close",
+             statement="F1-no-drive-NEGATIVE ends with gap >= 0.95 * its initial gap.",
+             bound=">= 0.95",
+             why="replaces revision 1's G4, which turned off only one of the two drives. If the gap closes with "
+                 "both off, closure is an artifact of the volume constraint or the initialisation, not of either "
+                 "modelled mechanism."),
+        dict(id="G11", name="protrusion dose-response is monotone",
+             statement="At k=4 and lambda_V=1, closed_fraction is non-decreasing in protrusion strength over "
+                       "{0, 20, 40, 80, 160}; the 80 point is revision 1's B-k4-lamV1.",
+             bound="non-decreasing",
+             why="Bai & Zeng 2023 report that promoting lamellipodial protrusion raises the closure rate, over "
+                 "an assumed 0.2-10 pN range in a finite-element model. This checks whether this CPM carries the "
+                 "same ordering. Agreement is between two models and is not experimental validation; a CPM "
+                 "protrusion strength is not a force in piconewtons."),
+        dict(id="G12", name="gap ladder is complete",
+             statement="A closure threshold bracket exists at k=1, 4 and 7, and the three fitted Phi* values "
+                       "are reported together with whether they agree.",
+             bound="reported; a constant Phi* is NOT asserted",
+             why="revision 1 found Phi* rising as the gap shrinks. This records the full ladder so the domain of "
+                 "any rule is stated from three points rather than two."),
+    ]
+
+
 def gates() -> list[dict]:
     return [
         dict(id="G1", name="area conservation",
@@ -121,10 +189,11 @@ def phi(lambda_v: float, gap_nodes: float, n_cells: int, j: float) -> float:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--emit", required=True)
+    ap.add_argument("--revision", type=int, default=1)
     a = ap.parse_args()
     doc = {
         "schema": "frontier.epithelial-protocol.v1",
-        "status": "FROZEN before any arm was run",
+        "status": "FROZEN before any arm of this revision was run",
         "engine": {"name": "Morpheus", "tag": "v2.3.9",
                    "binary_sha256": "3d9a6e5a4cb86824b745500df1474596d39cce5deed24f767c0841df0f94d5ad",
                    "base_example": "Examples/CPM/Protrusion_2D.xml",
@@ -141,8 +210,12 @@ def main() -> None:
                                "both are CPM energy in model units and neither is a force or a stress."},
         "caps": {"cpu_quota_pct": 200, "memory_max": "2G", "memory_swap_max": 0,
                  "tasks_max": 256, "runtime_max_s": 600, "threads": 1},
-        "arms": arms(),
-        "gates": gates(),
+        "revision": a.revision,
+        "arms": arms() if a.revision == 1 else arms_r2(),
+        "gates": gates() if a.revision == 1 else gates_r2(),
+        "supersedes": None if a.revision == 1 else
+            "artifacts/epithelial/protocol.json (revision 1). Revision 1's arms and gate outcomes stand as run; "
+            "no revision 1 bound is changed and no revision 1 failure is relabelled.",
         "not_claimed": [
             "This is not a reproduction of Bai & Zeng 2023. Their mechanics is 3D continuum finite element with "
             "cohesive-zone traction-separation laws; a Cellular Potts Model implements none of those equations. "
