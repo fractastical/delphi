@@ -500,9 +500,33 @@ def ecology_block(ins: Inputs, out: dict) -> dict | None:
     panels = put(f"{v3}/panels.json", pins.get(f"{v3}/panels.json"))
     for rel in (f"{ECO}/geometry-manifest.json", f"{ECO}/interface.json", f"{ECO}/index.json", f"{ECO}/RESULTS.md"):
         out["@" + rel] = ins.read(rel)
-    return {"index": index, "cases": cases, "receipts": receipts, "media": media, "mesh": mesh, "panels": panels, "status": iface["status"], "engine": iface["engine"],
+    unc = ecology_uncertainty(ins, put)
+    return {"index": index, "uncertainty": unc, "cases": cases, "receipts": receipts, "media": media, "mesh": mesh, "panels": panels, "status": iface["status"], "engine": iface["engine"],
             "limits": iface.get("limits"), "biological_success_probability": iface.get("biological_success_probability"), "empirical_validation": index.get("empirical_validation"),
             "history": index.get("history"), "geometry": {k: geo.get(k) for k in ("source", "source_component_units", "mesh_to_body", "cg_from_nose_m")}, **state}
+
+
+def ecology_uncertainty(ins: Inputs, put) -> dict | None:
+    """Assumed-parameter sensitivity of the neighbour cue (28 scenarios). Figures and files are published only when equal to the hash the native
+    uncertainty manifest declares; the table is copied from the aggregate summary. Shared-model scenarios, not biological confidence."""
+    mp = f"{ECO}/uncertainty-manifest.json"
+    if not (ROOT / mp).exists() or not (ROOT / ECO / "uncertainty-aggregate/summary.json").exists():
+        return None
+    man = json.loads(ins.read(mp)); want = {f["path"]: f["sha256"] for f in man["files"]}
+    agg = json.loads(ins.read(f"{ECO}/uncertainty-aggregate/summary.json"))
+    files = {}
+    for key, rel in (("aggregate_figure", "uncertainty-aggregate/paired-sensitivity.png"), ("aggregate_provenance", "uncertainty-aggregate/paired-sensitivity.provenance.json"),
+                     ("aggregate_summary", "uncertainty-aggregate/summary.json"), ("initial_figure", "uncertainty-initial/paired-sensitivity.png"),
+                     ("initial_provenance", "uncertainty-initial/paired-sensitivity.provenance.json"), ("initial_summary", "uncertainty-initial/summary.json")):
+        files[key] = put(f"{ECO}/{rel}", want.get(f"{ECO}/{rel}"))
+    proto = json.loads(ins.read(f"{ECO}/uncertainty-protocol.json")); out_manifest = put(mp, digest_bytes(ins.read(mp)))
+    res = agg["results"]
+    return {"status": agg["status"], "scenario_count": agg["scenario_count"], "computed_count": agg["computed_count"],
+            "numeric_gate_passed": sum(1 for r in res if r["numeric_gate_passed"]), "initial_native_status": agg["initial_native_status_unchanged"],
+            "continuation_native_status": agg["continuation_native_status"], "scope": agg["scope"], "question": proto["scientific_question"],
+            "settings": [{"id": x["id"], "overrides": x["overrides"]} for x in proto["settings"]], "seeds": proto["seeds"], "design": proto["design"],
+            "termination_reasons": dict(collections.Counter(r["main_summary"]["termination_reason"] for r in res)),
+            "paired": agg["paired_comparisons"], "files": files, "manifest": out_manifest, "source_and_transfer_limits": proto.get("source_and_transfer_limits")}
 
 
 def formalize_examples(ins: Inputs) -> dict | None:
