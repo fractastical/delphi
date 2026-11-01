@@ -1,0 +1,121 @@
+{
+  "schema": "frontier.aeroelastic.model-card/1",
+  "status": "actual checked coarse control slice;36-arm production pending",
+  "evidence_kind": "computed",
+  "empirical_validation": "unknown",
+  "biological_success_probability": null,
+  "question": "Under declared equivalent-fin bending stiffness, how much does recomputing aerodynamics after elastic deformation change shape, forces and the explicitly rigidized-shape point-mass glide compared with rigid and frozen-load arms?",
+  "inputs": {
+    "material": "assumed equivalent constantEI scaffold, not measured tissue or ecologyhingeK",
+    "geometry": "actual existing fish-derivedv3a candidate/panels; source hash pins inprotocol",
+    "fluid": "steady inviscid thin-surfaceVLM with fixed straight horseshoe wake legs; no CFD/body/separation or free/unsteady wake"
+  },
+  "ports": [
+    {
+      "id": "equivalent_fin_EI",
+      "unit": "N*m^2",
+      "dimension": {
+        "kg": 1,
+        "m": 3,
+        "s": -2
+      },
+      "status": "assumed engineering design inputs"
+    },
+    {
+      "id": "surface_displacement",
+      "unit": "m",
+      "time": "static iteration NOTphysicalseconds",
+      "status": "computed from reused FEMresponses"
+    },
+    {
+      "id": "net_aerodynamic_force",
+      "unit": "N",
+      "frame": "right-handed source +Xfreestream,+Zup",
+      "status": "recomputed on deformed geometry/normals"
+    },
+    {
+      "id": "glide_CL",
+      "unit": "1",
+      "mapping": "one-way rigidized finalshape; constantcoefficient during separate pointmassRK4, no continuousFSI"
+    },
+    {
+      "id": "glide_position",
+      "unit": "m",
+      "time": "actualRK4seconds",
+      "status": "computed with assumedmass/drag; interpolatedeventendpoint not a state"
+    }
+  ],
+  "control_slice": {
+    "mesh": [
+      8,
+      2
+    ],
+    "compliance": 0.2,
+    "speed_m_s": 20,
+    "arms": {
+      "rigid": {
+        "status": "computed rigid",
+        "CL": 0.26232829057169127,
+        "glide_range_m": 30.317069418465096,
+        "glide_dt_gate": true
+      },
+      "one-way-frozen-load": {
+        "status": "computed one-way",
+        "CL": 0.26085404557694614,
+        "glide_range_m": 30.168306312414654,
+        "glide_dt_gate": true
+      },
+      "two-way-static-feedback": {
+        "status": "converged static feedback",
+        "CL": 0.2608582178691835,
+        "glide_range_m": 30.168725456801816,
+        "glide_dt_gate": true
+      }
+    }
+  },
+  "artifacts": {
+    "protocol": {
+      "path": "artifacts/aeroelastic/protocol.json",
+      "sha256": "2343dd6e80cc9da394e9379e4daaa36082599344522d9774d240aab75386b24a",
+      "bytes": 9658
+    },
+    "controls": {
+      "path": "artifacts/aeroelastic/controls-local.json",
+      "sha256": "9231e55fca6d9c17a97cfd2ca7f6675b0463afae3e6328585d25e7ef7fede25f",
+      "bytes": 2227
+    },
+    "local_preflight": {
+      "path": "artifacts/aeroelastic/local-preflight-receipt.json",
+      "sha256": "f2f877231af46dc2a053fc71bd5d96b6778131462a5464babf5c5efc01f284ee",
+      "bytes": 3753
+    },
+    "packet": {
+      "path": "artifacts/aeroelastic/packet.json",
+      "sha256": "912b47f03a8016fd97842f507760b7db75554a4024155e6da8290324e903fa6f",
+      "bytes": 4773
+    },
+    "video": {
+      "path": "artifacts/aeroelastic/render-control/coupled-states.mp4",
+      "sha256": "dbdc001c594b982375a6819f542842caa3aac59dfe601bdd00fa113dd9abc06a",
+      "bytes": 115674
+    },
+    "poster": {
+      "path": "artifacts/aeroelastic/render-control/poster.png",
+      "sha256": "c8d0372a492d5fcb2128b5ea4e0a097e1b862dfc4d099faac85152c6854044df",
+      "bytes": 200177
+    },
+    "render_provenance": {
+      "path": "artifacts/aeroelastic/render-control/provenance.json",
+      "sha256": "03cc2e4e647cacd7bf6ac7d6c6d59a36fa5779ced1f85af682445f18f80b837c",
+      "bytes": 6015
+    }
+  },
+  "open_questions": [
+    "ECM/cell state to measured equivalent EI",
+    "fin anisotropy,torsion,branching,membrane mechanics",
+    "viscosity,separation,body interaction,unsteady wake",
+    "ongoing aeroelastic motion during flight",
+    "Vm to growth lacks sourced mapping; no invented bioelectric bridge"
+  ],
+  "next": "Run frozen independent paired16x4/24x6 assay on CPU; preserve all numerical/domain/partialfailures"
+}
