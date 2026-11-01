@@ -141,8 +141,19 @@ def sweep_claims(S: dict) -> list[tuple[str, object, object]]:
              not (v["exponent_feasible_bounds"][0] <= 1.0 <= v["exponent_feasible_bounds"][1])),
         ]
     need = H["highest_J_arms_proportionality_requires_to_close"]["4"]
-    rows.append(("sweep k=4 J=560: no arm proportionality needs is still closing", 0,
-                 sum(1 for v in need.values() if v["still_closing"])))
+    rows += [
+        ("sweep k=4 J=560 lamV12.8: arms still shrinking (per arm, not seed mean)", 1,
+         need["12.8"]["arms_still_shrinking"]),
+        ("sweep k=4 J=560 lamV12.8: s3 delta", 22.0, need["12.8"]["per_arm_delta"]["s3"]),
+        ("sweep k=4 J=560 lamV12.8: the seed mean masks it", True,
+         need["12.8"]["mean_masks_a_shrinking_arm"]),
+    ]
+    bj = H["arrested_still_shrinking_by_J"]
+    for k, J, exp in (("4", "35.0", (9, 15)), ("4", "560.0", (1, 12)), ("7", "560.0", (6, 16))):
+        rows.append((f"sweep k={k} J={J}: arms still shrinking / not closed", list(exp),
+                     [bj[k][J]["arms_still_shrinking"], bj[k][J]["arms_not_closed"]]))
+    rows.append(("sweep k=4: still-shrinking count is NOT monotone in J", False,
+                 bj["4"]["monotone_in_J"]))
     return rows
 
 

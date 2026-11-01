@@ -141,25 +141,38 @@ def main() -> None:
             fitted_exponent_lambda_star_vs_J=exponent,
             predicted_exponent=1.0)
 
-    # could the finite horizon be manufacturing the result? Proportionality requires the
-    # highest-J arms above the observed bracket to be censored rather than genuinely arrested.
+    # Late-window endpoint delta, gap(800) - gap(1000), positive = the gap was still shrinking.
+    # Reported PER ARM. An earlier version averaged the deltas across seeds at each lambda and
+    # assigned "still closing" from the group mean, which let a shrinking arm vanish inside a
+    # flat mean: at k=4, J=560, lambda_V=12.8 the three seeds are -3, -16, +22 and the mean is
+    # +1.0, so seed s3 shrank 22 nodes while the group read as flat. Seed means are kept, but
+    # only beside the per-arm values and explicitly labelled as such.
     censor = {}
     for k in sorted(per_gap):
         Jmax = per_gap[k]["j_range"][1]
-        need = {}
+        lv = collections.defaultdict(list)
         for (kk, J, lam, s), r in arms.items():
             if kk == k and J == Jmax and not r["closed"]:
-                need.setdefault(lam, []).append(r["delta_last_20pct"])
-        censor[k] = {str(lam): dict(mean_delta_last_20pct=sum(v) / len(v),
-                                    still_closing=(sum(v) / len(v)) > 1)
-                     for lam, v in sorted(need.items())}
+                lv[lam].append((s, r["delta_last_20pct"]))
+        censor[k] = {str(lam): dict(
+            arms_not_closed=len(v),
+            per_arm_delta={f"s{s}": d for s, d in sorted(v)},
+            arms_still_shrinking=sum(1 for _, d in v if d > 1),
+            seed_mean_delta=sum(d for _, d in v) / len(v),
+            seed_mean_reads_as_still_closing=(sum(d for _, d in v) / len(v)) > 1,
+            mean_masks_a_shrinking_arm=(any(d > 1 for _, d in v)
+                                        and (sum(d for _, d in v) / len(v)) <= 1))
+            for lam, v in sorted(lv.items())}
     by_J = {}
     for k in sorted(per_gap):
         by_J[k] = {}
         for J in sorted({key[1] for key in arms if key[0] == k}):
             ar = [r for (kk, JJ, lam, s), r in arms.items() if kk == k and JJ == J and not r["closed"]]
-            by_J[k][str(J)] = dict(arrested=len(ar),
-                                   still_closing=sum(1 for r in ar if r["delta_last_20pct"] > 1))
+            by_J[k][str(J)] = dict(arms_not_closed=len(ar),
+                                   arms_still_shrinking=sum(1 for r in ar if r["delta_last_20pct"] > 1),
+                                   unit="individual arms, NOT parameter levels and NOT seed means")
+        seq = [by_J[k][str(J)]["arms_still_shrinking"] for J in sorted({key[1] for key in arms if key[0] == k})]
+        by_J[k]["monotone_in_J"] = (seq == sorted(seq) or seq == sorted(seq, reverse=True))
 
     out = dict(
         schema="frontier.epithelial-sweep-audit.v1",
@@ -177,8 +190,13 @@ def main() -> None:
                         spatial_states_present=prov["tiff_files"] > 0,
                         movie_renderable=prov["tiff_files"] > 0),
         interval_audit=per_gap,
-        horizon_audit=dict(highest_J_arms_proportionality_requires_to_close=censor,
-                           arrested_still_closing_by_J=by_J),
+        horizon_audit=dict(
+            unit="per arm. Seed means appear only as an explicitly labelled companion field.",
+            scope="gap(800) - gap(1000) at sampled times <= 1000 model units. A post-hoc "
+                  "endpoint delta: not a trend test, not proof of permanent arrest, and not a "
+                  "bound on future closure in a stochastic CPM.",
+            highest_J_arms_proportionality_requires_to_close=censor,
+            arrested_still_shrinking_by_J=by_J),
         brackets={f"k{k}-s{s}-J{J:g}": v for (k, s, J), v in sorted(brackets.items())},
     )
     Path(a.out).write_text(json.dumps(out, indent=1, default=float))

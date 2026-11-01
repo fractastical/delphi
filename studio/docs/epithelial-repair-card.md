@@ -399,22 +399,45 @@ threshold exponents**, and the bracket-endpoint bounds above are the defensible 
 
 ### Finite-horizon sensitivity — a diagnostic, not a bound
 
-A longer horizon can only turn `ARRESTED` into `CLOSED`, which moves brackets upward. As a
-**descriptive sensitivity diagnostic**, the late-window behaviour is:
+A longer horizon can only turn `ARRESTED` into `CLOSED`, which moves brackets upward. The
+**late-window endpoint delta**, `gap(800) − gap(1000)`, is a post-hoc descriptive quantity:
+positive means the gap was still shrinking over that window. It is **not** a trend test, not
+proof of permanent arrest, and not a bound on future closure in a stochastic CPM.
 
-- At *k*=4, J=560, every arm above the observed bracket (λ_V = 1.6, 3.2, 6.4, 12.8) showed a
-  flat or slightly re-opening gap over its final 20%; same at *k*=7 from 1.6 upward.
-- Two *k*=7 arms at λ_V 0.4 and 0.8 were still closing at the horizon.
-- Arms still closing at the horizon are **more common at low J** — at *k*=4, 3 of 5 arrested
-  arms at J=35 versus 0 of 4 at J=560.
+**Reported per arm.** *(Corrected 2026-11-01 by independent review. An earlier version
+averaged the deltas across seeds at each λ_V and called a parameter level flat from the group
+mean. That is wrong, and it hid real cases: at *k*=4, J=560, λ_V=12.8 the three seeds are
+−3, −16 and **+22**, so the mean reads +1.0 while **seed s3 shrank 22 nodes**. The claim that
+**every** arm above the bracket was flat or re-opening was false and is withdrawn. Further
+counterexamples the review names and I confirmed: *k*=7, J=560, λ_V=6.4 s2 (+3) and λ_V=12.8
+s2 (+8).)*
 
-**A plateau or a re-opening over a finite window does not establish permanent arrest and does
-not bound future closure in a stochastic CPM.** A rare fluctuation can still close a gap that
-looked static. So these deltas indicate where the horizon bites; they are **not** a proof that
-the horizon is harmless, and **the long-horizon threshold is unknown**. An earlier version of
-this section said the horizon "cannot rescue" the rule and that correcting for censoring
-"would flatten λ*(J) further". Both overstated what a finite window can show, and both are
-withdrawn.
+At *k*=4, J=560, per arm rather than per seed-mean:
+
+| λ_V | per-arm Δ (s1, s2, s3) | arms still shrinking | seed mean |
+|---|---|---|---|
+| 1.6 | −11, −22, −14 | 0 of 3 | −15.7 |
+| 3.2 | −57, 0, −40 | 0 of 3 | −32.3 |
+| 6.4 | −23, −11, −1 | 0 of 3 | −11.7 |
+| 12.8 | −3, −16, **+22** | **1 of 3** | +1.0 ← **mean masks the shrinking arm** |
+
+**Individual arms still shrinking, by J** — arms, not parameter levels, not seed means:
+
+| *k* | J=35 | J=70 | J=140 | J=280 | J=560 |
+|---|---|---|---|---|---|
+| 4 | 9/15 | 8/15 | 2/14 | 8/12 | **1/12** |
+| 7 | 8/18 | 11/18 | 10/18 | 10/18 | 6/16 |
+
+**This is not monotone in J**, so there is no clean directional story: at *k*=4, J=280 shows
+8 of 12 while J=140 shows 2 of 14. An earlier version of this section said the horizon
+"cannot rescue" the rule, cited a "maximum correction they allow", and said correcting for
+censoring "would flatten λ*(J) further". All three claimed more than a finite window can
+show and **all three are withdrawn**. At *k*=7, J=560 the λ_V 0.4 and 0.8 cases are **two
+parameter levels holding four non-closed arms** (one at 0.4, three at 0.8), not "two arms" as
+I previously wrote.
+
+**The long-horizon threshold is unknown.** The fixed-horizon evidence below rests on the
+**intervals**, not on these late-window deltas.
 
 ### What this does to §6
 
@@ -436,6 +459,16 @@ rows**; the solver's own receipt hashes to the pinned `3d9a6e5a…f0f94d5ad`.
 **No movie from this return, and none is claimed.** The packet deletes TIFF frames by design
 and the return contains **0** of them, so there are no spatial states to render. Logs alone
 cannot justify a spatial movie. The §9 movies remain the local 36-arm runs only.
+
+![Measured closure-threshold brackets for every gap, J and seed, against the predicted proportionality and the frozen tolerance band](../artifacts/epithelial/figures/threshold-brackets-light.png)
+
+*Measured brackets, not point estimates. Left: the λ_V bracket for every (gap, J, seed) against
+λ\* ∝ J anchored on the lowest-J bracket, which is not fitted. Right: the same brackets as
+λ\*/J ratio intervals against a band 2× tall — the frozen tolerance — one per gap. A passing
+set must fit inside one band.
+[light SVG](../artifacts/epithelial/figures/threshold-brackets-light.svg) ·
+[dark PNG](../artifacts/epithelial/figures/threshold-brackets-dark.png) ·
+[dark SVG](../artifacts/epithelial/figures/threshold-brackets-dark.svg)*
 
 Audit: [`artifacts/epithelial/sweep-audit.json`](../artifacts/epithelial/sweep-audit.json),
 regenerable with `engineering/epithelial/audit_return.py`. Raw return:
