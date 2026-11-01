@@ -190,6 +190,20 @@ def test_discovery_and_graph_keep_private_mode_gate(web):
         assert web.req("GET", path, cookie=False)[0] == 401
 
 
+def test_reference_fasta_is_plain_text_only_in_guarded_artifacts(web, site):
+    data = b">reference-only\nACGTACGT\n"
+    (site / "artifacts").mkdir(exist_ok=True)
+    for ext in (".fasta", ".fa"):
+        (site / "artifacts" / ("reference" + ext)).write_bytes(data)
+        (site / ("reference" + ext)).write_bytes(data)
+        assert resolve_static(site, "/reference" + ext) is None
+    web.login()
+    for ext in (".fasta", ".fa"):
+        status, headers, body = web.req("GET", "/artifacts/reference" + ext)
+        assert status == 200 and body == data
+        assert headers["content-type"].startswith("text/plain")
+
+
 def test_source_documents_and_result_csv_serve_exact_bytes(web, site):
     docs = site / "data" / "docs"
     docs.mkdir(parents=True)

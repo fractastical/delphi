@@ -51,6 +51,7 @@ MIME = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", 
         ".csv": "text/csv; charset=utf-8", ".woff2": "font/woff2"}
 # Extra types, served ONLY from <site>/artifacts/ (the guarded artifact subtree), never from the rest of the site.
 ARTIFACT_MIME = {".stl": "model/stl", ".obj": "model/obj", ".glb": "model/gltf-binary", ".csv": "text/csv; charset=utf-8",
+                 ".fasta": "text/plain; charset=utf-8", ".fa": "text/plain; charset=utf-8",
                  ".lean": "text/plain; charset=utf-8", ".trig": "application/trig", ".vtt": "text/vtt; charset=utf-8",
                  ".mp4": "video/mp4", ".webm": "video/webm", ".xz": "application/x-xz", ".zip": "application/zip"}
 STREAMED = {".mp4", ".webm"}                                                  # served by seek+chunk with Range support, never read whole into memory
