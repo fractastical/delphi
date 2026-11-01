@@ -310,11 +310,12 @@ def build_timeline(ins: Inputs) -> dict | None:
     add = lambda t, kind, title, outcome, path, ok=None, scope="", digest=None: rows.append({"time": t, "kind": kind, "title": title, "outcome": outcome, "ok": ok, "path": path, "sha256": digest or sha(path), "scope": scope})
     dated_only = []
     for f in sorted((ROOT / "deploy/receipts").glob("*.json")):
-        path = f"deploy/receipts/{f.name}"; d = json.loads(ins.read(path)); ch = d.get("checks", [])
+        path = f"deploy/receipts/{f.name}"; d = json.loads(ins.read(path)); ch = d.get("checks", []); note = ch if isinstance(ch, str) else None   # a receipt may state its checks as prose
+        ch = [c for c in ch if isinstance(c, dict)] if isinstance(ch, list) else []
         npass = sum(1 for c in ch if c.get("passed")); target = d.get("base") or d.get("endpoint") or "public node"
         if "checked_at" not in d:                         # a receipt with no time of day is listed apart, never given a made-up time
             dated_only.append({"title": f.stem.replace("-", " ") + (" (release " + str(d["sha"])[:12] + ")" if d.get("sha") else ""), "outcome": "; ".join(f"{c.get('name', 'check')}: {c.get('result') or ('passed' if c.get('passed') is True else 'not passed')} (exit {c.get('exit', 'not recorded')})" for c in ch) or "no checks listed", "ok": all(c.get("exit", 1) == 0 for c in ch) if ch else None, "path": path, "sha256": sha(path), "date": "no time recorded"}); continue
-        add(d["checked_at"], "live check", f.stem.replace("-", " ") + " (" + target + ")", f"{npass} of {len(ch)} checks passed", path, npass == len(ch), d.get("scope", ""))
+        add(d["checked_at"], "live check", f.stem.replace("-", " ") + " (" + target + ")", (note if note and not ch else f"{npass} of {len(ch)} checks passed"), path, (None if note and not ch else npass == len(ch)), d.get("scope", ""))
     for k, u in (U or R)["model_usage"].items():
         if isinstance(u, dict) and u.get("window_utc"):
             out = ", ".join(f"{n.replace('_', ' ')} {u[n]}" for n in ("documents_embedded", "embedding_requests", "failed_requests", "calls", "input_tokens", "output_tokens_including_thinking") if n in u)
