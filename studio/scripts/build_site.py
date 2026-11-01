@@ -1531,6 +1531,20 @@ def assurance_map(ins: Inputs) -> dict | None:
     return m
 
 
+DESIGN_CONTROL = "artifacts/design-control/map.json"
+
+
+def design_control_map(ins: Inputs) -> dict | None:
+    """The design-control map (frontier.design-control/1), when present. Shown as written; the pinned-source check is engineering.design_control.build --check."""
+    if not (ROOT / DESIGN_CONTROL).exists():
+        return None
+    m = json.loads(ins.read(DESIGN_CONTROL))
+    if m.get("schema") != "frontier.design-control/1":
+        return {"error": f"unexpected schema {m.get('schema')!r}; not shown", "file_sha256": ins.seen[DESIGN_CONTROL]["sha256"]}
+    m["file_sha256"] = ins.seen[DESIGN_CONTROL]["sha256"]
+    return m
+
+
 RESOURCES = "results/resources/resource-inventory.json"
 
 
@@ -1628,6 +1642,7 @@ def build() -> dict[str, bytes]:
     genomics_slice = genomics(ins)
     project_recs = project_drafts(ins)
     assurance = assurance_map(ins)
+    design_control = design_control_map(ins)
     resources = resource_inventory(ins)
     mcp_chk = mcp_check(ins)
     extra: dict = {}
@@ -1690,6 +1705,7 @@ def build() -> dict[str, bytes]:
         "genomics": genomics_slice,
         "project_drafts": project_recs,
         "assurance": assurance,
+        "design_control": design_control,
         "design_review": design_review,
         "lifecycle": lifecycle,
         "home_biology": home_biology_block,
