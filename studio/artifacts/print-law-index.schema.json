@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "frontier.print-law-index/1",
+  "title": "Print law index: every downloadable print file, the laws and rules it is grounded in, and the checks run on its bytes",
+  "description": "Grounding a file in a law is not evidence that the shape satisfies that law. A relation says what a law did for a file: 'governing' means the law computed a reported number from these bytes; 'checked' means a stated check was executed on these bytes, with evidence; 'inspired_only' means it shaped the design and was not checked on these bytes; 'not_applicable' carries a reason. No law is listed as executed without an evidence record. Masses are calculated from mesh volume times a card density; nothing was weighed.",
+  "type": "object",
+  "required": ["schema", "generated_by", "grounding_note", "vocabulary", "laws", "files", "assemblies", "findings"],
+  "properties": {
+    "schema": {"const": "frontier.print-law-index/1"},
+    "generated_by": {
+      "type": "object",
+      "required": ["command", "code_paths", "code_sha256"],
+      "properties": {
+        "command": {"type": "string"},
+        "code_paths": {"type": "array", "items": {"type": "string"}},
+        "code_sha256": {"type": "string"}
+      }
+    },
+    "grounding_note": {"type": "string"},
+    "vocabulary": {
+      "type": "object",
+      "required": ["relation", "check_status"],
+      "properties": {
+        "relation": {"type": "object", "additionalProperties": {"type": "string"}},
+        "check_status": {"type": "object", "additionalProperties": {"type": "string"}}
+      }
+    },
+    "laws": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "kind", "latex", "source_urls", "code_paths", "scope", "evidence"],
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "kind": {"enum": ["physical_law", "hand_model", "manufacturing_rule", "design_assumption"]},
+          "latex": {"type": "string"},
+          "source_urls": {"type": "array", "items": {"type": "string"}},
+          "code_paths": {"type": "array", "items": {"type": "string"}},
+          "scope": {"type": "string"},
+          "evidence": {
+            "description": "Executions of this law on our artifacts. Empty means it was not executed on any file here.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["by", "what", "artifact_path", "artifact_sha256", "recomputed_in_this_index"],
+              "properties": {
+                "by": {"type": "string"},
+                "what": {"type": "string"},
+                "artifact_path": {"type": ["string", "null"]},
+                "artifact_sha256": {"type": ["string", "null"]},
+                "commit": {"type": ["string", "null"]},
+                "recomputed_in_this_index": {"type": "boolean"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256", "bytes", "family", "revision", "kind", "part_id", "law_ids", "law_relations",
+                     "checks", "mass_g", "mass_basis", "volume_mm3", "material", "source_artifacts", "withdrawn"],
+        "properties": {
+          "path": {"type": "string", "description": "repository path"},
+          "sha256": {"type": "string"},
+          "bytes": {"type": "integer"},
+          "family": {"enum": ["glider", "print-v1", "print-v2", "print-v3"]},
+          "revision": {"type": "string"},
+          "kind": {"enum": ["stl_part", "stl_prop", "stl_prop_relief", "stl_stand", "glb_view", "zip_bundle"]},
+          "part_id": {"type": ["string", "null"]},
+          "law_ids": {"type": "array", "items": {"type": "string"}},
+          "law_relations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["law_id", "relation", "detail"],
+              "properties": {
+                "law_id": {"type": "string"},
+                "relation": {"enum": ["governing", "checked", "inspired_only", "not_applicable"]},
+                "detail": {"type": "string"}
+              }
+            }
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "status", "detail"],
+              "properties": {
+                "id": {"type": "string"},
+                "status": {"enum": ["pass", "fail", "unresolved", "unknown", "not_applicable", "withdrawn"]},
+                "detail": {"type": "string"}
+              }
+            }
+          },
+          "mass_g": {"type": ["number", "null"], "description": "calculated: mesh volume x card density; null when the material is unknown"},
+          "mass_basis": {"type": "string"},
+          "conditional_mass_g_at_1220_kg_m3": {"type": ["number", "null"], "description": "props only: IF printed solid in a 1220 kg/m3 resin; the resin is not chosen"},
+          "volume_mm3": {"type": ["number", "null"]},
+          "cg_mm_print_pose": {"type": ["array", "null"], "items": {"type": "number"}},
+          "material": {
+            "type": "object",
+            "required": ["id", "density_kg_m3", "status"],
+            "properties": {
+              "id": {"type": ["string", "null"]},
+              "density_kg_m3": {"type": ["number", "null"]},
+              "status": {"type": "string"},
+              "card_path": {"type": ["string", "null"]},
+              "card_commit": {"type": ["string", "null"]},
+              "card_sha256": {"type": ["string", "null"]},
+              "source_url": {"type": ["string", "null"]}
+            }
+          },
+          "source_artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["path", "role"],
+              "properties": {"path": {"type": "string"}, "sha256": {"type": ["string", "null"]}, "role": {"type": "string"}}
+            }
+          },
+          "withdrawn": {"type": ["string", "null"]},
+          "introduced_in_commit": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "assemblies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "revision", "nominal_file_paths", "parts_mass_g", "dry", "ballasted", "budgets",
+                     "cg_window", "neutral_point", "launch_status", "flight_status", "law_relations", "checks"],
+        "properties": {
+          "id": {"type": "string"},
+          "revision": {"type": "string"},
+          "nominal_file_paths": {"type": "array", "items": {"type": "string"}},
+          "parts_mass_g": {"type": "object", "additionalProperties": {"type": "number"}},
+          "dry": {
+            "type": "object",
+            "required": ["mass_g", "cg_mm", "basis"],
+            "properties": {"mass_g": {"type": "number"}, "cg_mm": {"type": "array", "items": {"type": "number"}}, "basis": {"type": "string"}}
+          },
+          "ballasted": {
+            "type": "object",
+            "required": ["target_cg_x_mm", "ballast_g", "total_mass_g", "basis"],
+            "properties": {"target_cg_x_mm": {"type": "number"}, "ballast_g": {"type": "number"},
+                           "total_mass_g": {"type": "number"}, "basis": {"type": "string"}}
+          },
+          "budgets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "value_g", "basis", "compared_mass_g", "verdict"],
+              "properties": {"id": {"type": "string"}, "value_g": {"type": "number"}, "basis": {"type": "string"},
+                             "compared_mass_g": {"type": "number"}, "verdict": {"enum": ["pass", "fail"]}}
+            }
+          },
+          "cg_window": {"type": "object"},
+          "neutral_point": {"type": "object"},
+          "launch_status": {
+            "type": "object",
+            "required": ["status", "detail"],
+            "properties": {"status": {"enum": ["not_cleared", "cleared"]}, "detail": {"type": "string"}}
+          },
+          "flight_status": {"type": "string"},
+          "law_relations": {"type": "array"},
+          "checks": {"type": "array"}
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "status", "applies_to", "detail"],
+        "properties": {
+          "id": {"type": "string"},
+          "status": {"enum": ["unresolved", "recorded_defect", "frozen_prose_inconsistency", "superseded_guidance"]},
+          "applies_to": {"type": "array", "items": {"type": "string"}},
+          "detail": {"type": "string"},
+          "source": {"type": ["string", "null"]}
+        }
+      }
+    }
+  }
+}
