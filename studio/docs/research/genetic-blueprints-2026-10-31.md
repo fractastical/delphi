@@ -25,16 +25,22 @@ Response bytes are not in the repository; their sha256 values are pinned in `sou
 
 ## What the designs are
 
-Four proposed records: (1) a regeneration-enhancer reporter on a Tol2 plasmid; (2) the same architecture read in the developing pectoral fin field and the regenerating fin, to expose the gap; (3) an endogenous 2A-reporter knock-in at a locus to be chosen; (4) a reporter in a BAC clone integrated with Tol2. Every enhancer, locus, BAC clone, reporter and effector is left UNSPECIFIED because no source read supplies one. No Evo2 call was made or rerouted.
+Revision 2. Four proposed records: (1) a regeneration-enhancer reporter on a Tol2 plasmid; (2) the same architecture read in the developing pectoral fin field and the regenerating fin, to expose the gap; (3) an endogenous 2A-reporter knock-in at a locus to be chosen; (4) a reporter in a BAC clone integrated with Tol2. Every enhancer, locus, BAC clone, reporter and effector is left UNSPECIFIED because no source read supplies one. No Evo2 call was made or rerouted.
 
 ## Comparison (not a ranking)
 
-- **Tol2 plasmid.** Authors of the knock-in paper list multicopy integration, position effects and silencing as limits. Some minimal promoters leak and promoter-enhancer pairs differ (abstract only).
+- **Tol2 plasmid.** Authors of the knock-in paper list multicopy integration, position effects and silencing as limits. Some minimal promoters leak (fos and DSCP) and enhancer-promoter pairs differ (full text of PMC10211259, larval assays; supplementary tables unread).
 - **BAC transgenesis.** A BAC with an iTol2 cassette is a cargo carrier integrated by the transposon (about 15% germline transmission in the abstract). It is not an autonomous fish chromosome.
 - **Endogenous knock-in.** Short-homology (48 bp) integration worked at three brain loci, with germline transmission of 100%, 10% and 20%. No fin locus was tested.
 - **Transient delivery.** No source read covers it as a design. Stated as a gap.
 - **Landing-site integration (pIGLET).** phiC31 attP sites with reported 25-50% germline transmission (abstract only); fin behaviour unread.
 - **Truly autonomous artificial chromosome.** No source read describes one in fish. The single source read is a ~750 kb human artificial chromosome in human cells, delivered by yeast spheroplast fusion; it says nothing about fish.
+
+## The named candidate (revision 2)
+
+`bp-1` now instantiates one source-named natural element: **LEN**, the lepb-linked enhancer of the TREE paper, an isolated 1.3 kb sequence from the H3K27ac-rich region about 7 kb upstream of lepb, with fragments 1–850, 450–1000, 450–850 and 660–850 reported active from the lepb 2 kb promoter in fin regeneration. The construct is **LEN-P2:EGFP** (the name used in a PMC10211259 supplementary caption, where it is tested in adult F0 caudal fin; that figure was not read). Coordinates, assembly and sequence are **null**: they are in Methods or the supplement, which were not read. Every choice in `provenance_of_choices` is marked sourced or root proposal; no cell specificity is inferred for LEN (the blastemal observations are about reporter lines, and 'blastemal mesenchyme' is about the lepb:eGFP BAC reporter).
+
+Each design is bound to a named map cell program with validation status unknown, and three cell-program blueprints (fin mesenchyme/ray, epithelium, neural/muscle observation interface) group them. The map has no neural or muscle row, so that program binds to none and says so.
 
 ## Specificity, off-target coverage, kinetics
 
@@ -42,7 +48,7 @@ Each design now carries `cell_stage_specificity`, `off_target_coverage`, `expres
 
 ## Gaps stated first
 
-1. **Developmental fin versus regeneration.** Every enhancer item read is from regenerating adult fin. The TREE authors only suspect development-and-injury elements. Nothing shows the same element works in fin development, or sets fin shape.
+1. **Developmental fin versus regeneration (scoped to the fish-fin trait bridge).** PMC10211259 tests developmental and regeneration enhancers in larval tissues (103runx1EN is described as acting in both modes; gata2a-i4 is developmental, endothelial). No source read shows any enhancer driving expression in the developing paired fin, or tying any enhancer to fin shape or stiffness.
 2. Reporter expression is not control of a trait.
 3. The metadata audit leaves replicate independence of the multiome and epigenome series unconfirmed.
 4. Everything is *Danio rerio*; flying-fish transfer is unknown.
@@ -51,4 +57,5 @@ Each design now carries `cell_stage_specificity`, `off_target_coverage`, `expres
 ## Revisions
 
 2026-10-31: first version.
-2026-10-31 (later): added pIGLET, the 2016 BAC plasmid set and the human artificial chromosome source; read the full text of PMC10211259; added the specificity, off-target and kinetics fields.
+2026-10-31 (later): revision 1 additions: added pIGLET, the 2016 BAC plasmid set and the human artificial chromosome source; read the full text of PMC10211259; added the specificity, off-target and kinetics fields.
+2026-10-31 (revision 2): named the source LEN candidate with null coordinates; separated sourced from root-proposed choices; scoped the developmental-versus-regeneration negative; corrected read-level wording for PMC10211259 (full text read; the earlier text said abstract only); bound designs to map cell programs.

@@ -20,6 +20,8 @@ DOC = "docs/research/genetic-blueprints-2026-10-31.md"
 LEVELS = {"full-text", "abstract", "listing", "search-summary", "could-not-access"}
 REQUIRED = {"bp-1-regeneration-enhancer-reporter", "bp-2-development-versus-regeneration-contrast", "bp-3-endogenous-locus-knock-in", "bp-4-bac-carried-locus-reporter"}
 APPROACHES = {"tol2-plasmid", "bac-transgenesis", "endogenous-knock-in", "transient-delivery", "autonomous-artificial-chromosome", "landing-site-integration"}
+MAP_ROWS = {"basal-epithelium", "surface-epithelium", "fibroblast-mesenchyme", "osteoblast-and-joint", "hematopoietic", "pectoral-fin-field", "organism-reference"}
+STALE = ["promoter-compatibility abstract", "body of the paper not read", "every enhancer evidence item here is from regenerating adult fin", "Every enhancer item read is from regenerating adult fin"]
 SRC_FILE = {"tree2016": "pmc4844022.txt", "fin-multiome2025": "genomeres.txt", "fin-epigenome2020": "pmc7047409.txt", "promoter-compat2023": "pmc10211259.txt", "bac-tol2-2011": "nprot.txt", "knockin-cre2021": "sci.txt", "piglet2024": "piglet.txt", "bac-plasmids2016": "bac2016.txt", "hac2024": "hac.txt"}
 
 
@@ -86,8 +88,20 @@ def check(base=HERE, cache=None, repo_root=None):
         if len({json.dumps(i[k], sort_keys=True) for k in ("carrier", "delivery", "integration")}) < 3 and d["id"] != "bp-2-development-versus-regeneration-contrast":
             errs.append(f"{d['id']}: carrier, delivery and integration are not three distinct statements")
         cargo = json.dumps(i["cargo"])
-        if "UNSPECIFIED" not in cargo:
-            errs.append(f"{d['id']}: cargo names no UNSPECIFIED element; a sequence/effector must not be invented")
+        enh = i["cargo"].get("enhancer")
+        named = isinstance(enh, dict) and enh.get("coordinates") is None and enh.get("sequence") is None and enh.get("source") in srcs
+        if "UNSPECIFIED" not in cargo and not named:
+            errs.append(f"{d['id']}: cargo is neither UNSPECIFIED nor a source-named element with null coordinates and sequence")
+        if isinstance(enh, dict) and (enh.get("coordinates") is not None or enh.get("sequence") is not None):
+            errs.append(f"{d['id']}: enhancer coordinates or sequence are set although the supplement was not read")
+        for ch in i.get("provenance_of_choices", []):
+            if not str(ch.get("status", "")).startswith(("sourced", "root proposal")):
+                errs.append(f"{d['id']}: a choice is neither sourced nor a root proposal: {ch.get('choice')}")
+        if d.get("cell_program_binding", {}).get("validation_status") != "unknown":
+            errs.append(f"{d['id']}: cell_program_binding.validation_status must be unknown")
+        for r in d.get("cell_program_binding", {}).get("map_rows", []):
+            if r not in MAP_ROWS:
+                errs.append(f"{d['id']}: unknown map row {r}")
         if d.get("expression_kinetics", {}).get("status") != "UNKNOWN":
             errs.append(f"{d['id']}: expression_kinetics must be UNKNOWN unless a source supplies it")
         if "NOT" not in d.get("off_target_coverage", ""):
@@ -124,6 +138,19 @@ def check(base=HERE, cache=None, repo_root=None):
     hac = rows["autonomous-artificial-chromosome"]
     if "NO source read describes one in fish" not in hac["evidence"] or "HUMAN" not in hac["evidence"]:
         errs.append("autonomous chromosome row must say no fish source and that the human source says nothing about fish")
+    cp = bp.get("cell_program_blueprints", [])
+    if len(cp) < 3 or any(x["validation_status"] != "unknown" or not (x["map_rows"] or "NO neural or muscle row" in " ".join(x["missing_links"])) for x in cp):
+        errs.append("need 3 cell-program blueprints with validation_status unknown; one with no map row must say so")
+    if any(r not in MAP_ROWS for x in cp for r in x["map_rows"]):
+        errs.append("cell-program blueprint names an unknown map row")
+    text = json.dumps(bp)
+    if re.search(r"\b[ACGT]{12,}\b", text):
+        errs.append("a nucleotide-like string of 12+ bases appears; sequences must stay null")
+    docp = os.path.join(repo_root or os.path.dirname(os.path.dirname(base)), DOC)
+    scan = text + (open(docp).read() if os.path.exists(docp) else "")
+    for ph in STALE:
+        if ph in scan:
+            errs.append(f"stale or contradicted wording present: {ph!r}")
     for need in ("Evo2", "sequence design"):
         if need not in json.dumps(bp["not_done"]):
             errs.append(f"not_done does not mention {need}")

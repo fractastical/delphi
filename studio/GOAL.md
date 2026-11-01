@@ -86,6 +86,10 @@ about a proposed action.
 - [ ] Add source-backed genetic implementation blueprints: cell programs,
   enhancers/promoters, constructs, delivery/integration, expression specificity
   and explicit missing causal bridges to the organism design (SPEC-012).
+- [ ] Add contextual Experimentation views and a checked prospective experiment
+  planner; connect observed-data updates to reusable transfer models (SPEC-013).
+- [ ] Track alternative organism assemblies, per-level iteration and explicit
+  compilation failures or unresolved biological interfaces (SPEC-014).
 
 Current owners, evidence and blockers are tracked in `tasks/BUILD.md`. A checked
 implementation is distinct from deployment, and either is distinct from biological
