@@ -79,3 +79,24 @@ GRCz11 sequence identity, context-matched candidate function and all biological
 expression-to-material/flight transfer unknown or blocked. The LEN deletion
 result specifically preserves the distinction between induced expression and
 required fin regeneration.
+
+## Publication and molecular-queue checks
+
+The clean ledger delivery is `e187efb`, rooted directly on root `4662d6b`, with
+ledger SHA256
+`b4d34d42cab74ea70900ceb12ae5d7614f4977d3408cc35392208d6aab4715b4`.
+It replaces article full-text artifacts with URL/digest/locator/license-audit
+receipts. No redistribution grant was found in those exact HTML caches. The
+original cached bytes/history remain private and unchanged. The initial draft
+integration above used the historical ledger; final integration must use the
+clean one. Sequence/context content is unchanged.
+
+Infra asked whether the reference differences justified a new molecular
+inference. Executed `protein_reference_check.py` on the exact clean raw records:
+fgf20a genome and transcript CDS both translate to NP_001032180.1, 208 identical
+amino acids. kcnh2a's source-selected NP_001036187.2 is 1,253 amino acids; genome
+CDS translation differs from RefSeq at five positions, consistent with the source
+annotation. Exact inputs/differences are in `protein-reference-identity.json`.
+These are reference-strain differences, not demonstrated causal fin alleles.
+Neither comparison supplies an independent structural/conductance or fin-function
+endpoint; no new inference job is justified from these differences alone.
