@@ -248,6 +248,13 @@ class GCS:
         _mkdir_without_symlinks(destination.parent)
         if destination.is_symlink():
             raise ValueError("refusing linked artifact destination")
+        if destination.exists():
+            if not destination.is_file() or destination.stat().st_size != max_bytes:
+                raise ValueError("existing artifact size or type mismatch")
+            actual_sha = _sha256_path(destination)
+            if actual_sha != expected_sha256:
+                raise ValueError("existing artifact SHA-256 mismatch")
+            return actual_sha, max_bytes
         url = ("https://storage.googleapis.com/download/storage/v1/b/" + urllib.parse.quote(bucket, safe="")
                + "/o/" + urllib.parse.quote(object_name, safe="") + "?alt=media")
         req = urllib.request.Request(url, headers=self._auth_headers())
