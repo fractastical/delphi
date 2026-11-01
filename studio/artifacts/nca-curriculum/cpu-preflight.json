@@ -1,0 +1,66 @@
+{
+  "schema": "frontier.nca.curriculum.cpu-preflight/1",
+  "cpu_controls": {
+    "schema": "frontier.nca.cpu-controls/1",
+    "checks": {
+      "finite_nonzero_gradient": true,
+      "finite_difference": true,
+      "wrong_sign_gradient_rejected": true,
+      "optimizer_changed_weights": true,
+      "optimizer_loss_finite": true,
+      "empty_state_absorbing": true,
+      "zero_updater_seed_only": true,
+      "zero_updater_fails_target": true,
+      "bounded_local_dependency": true,
+      "parameter_count": true
+    },
+    "passed": true,
+    "analytic_gradient": -0.006952765719666157,
+    "finite_difference": -0.006952765720102948,
+    "relative_error": 6.282265874768476e-11,
+    "wrong_sign_relative_error": 1.9999999999371774,
+    "selected_parameter": "output.bias",
+    "selected_flat_index": 1,
+    "optimizer_parameter_change_max": 0.001999971234882412,
+    "far_perturbation_delta": 0.0,
+    "near_perturbation_delta": 0.0003586946986615658,
+    "untrained_metrics": {
+      "rgba_MSE": 0.10959256401277888,
+      "silhouette_IoU": 0.0015313935681470138,
+      "living_pixels": 1,
+      "ray_RGB_MSE": 0.7136127283437794,
+      "max_abs_state": 1.0,
+      "finite": true,
+      "design_match": false
+    },
+    "scope": "Finite/local rule and actual gradient checks only; no training or biological validation."
+  },
+  "new_policy_gradient_controls": [
+    {
+      "regime": "damage-pool",
+      "loss": 0.10959255695343018,
+      "max_abs_gradient": 0.0006663603126071393,
+      "parameter_change_max": 0.001999699743464589,
+      "prefix_cutoff": 28
+    },
+    {
+      "regime": "curriculum-pool",
+      "loss": 0.10961290448904037,
+      "max_abs_gradient": 0.00044424019870348275,
+      "parameter_change_max": 0.001999549800530076,
+      "prefix_cutoff": 28
+    }
+  ],
+  "read_guard_fixture": {
+    "released_after_checkpoint_barrier": true,
+    "blocked_early_attempts": 1,
+    "mask_reads_after_release": 1
+  },
+  "scope": "CPUprimitive/policy/guard fixture only; no2000steptraining, checkpoint orheldoutoutcomes locally",
+  "environment": {
+    "python": "3.13.12",
+    "torch": "2.11.0+cu130",
+    "numpy": "2.4.4",
+    "device": "CPU"
+  }
+}

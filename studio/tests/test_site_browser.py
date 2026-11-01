@@ -2051,6 +2051,32 @@ def test_aeroelastic_and_nca_cards_follow_the_review_wording_and_pin_their_media
     assert "original run: 0 of 48" in t and "corrected seed placement: 32 of 48" in t
     pg.goto(base + "#/studio/flying-fish?scale=organ")
     pg.wait_for_function("document.querySelector('#main').textContent.includes('Static aeroelastic coupling')")
+    curriculum = json.loads((ROOT / "artifacts/nca-curriculum/index.json").read_text())
+    for width in (1440, 390):
+        pg.set_viewport_size({"width": width, "height": 900})
+        pg.goto(base + "#/simulations")
+        card = pg.locator("#sim-nca-curriculum")
+        if card.locator(".sim-sources").get_attribute("open") is None:
+            card.locator(".sim-sources summary").click()
+        assert "Sources and provenance" in card.inner_text()
+        assert card.locator(".eqcard").count() == 0
+        sources = card.locator(".sim-sources li a")
+        assert sources.count() == 4
+        for link in sources.all():
+            assert link.is_visible()
+            key = link.inner_text().replace(" ", "_")
+            response = pg.request.get(base + link.get_attribute("href"))
+            assert response.status == 200
+            assert hashlib.sha256(response.body()).hexdigest() == curriculum["artifacts"][key]["sha256"]
+        for label, key in (("View result chart", "training_plot"), ("Inspect rendering provenance", "render_provenance")):
+            response = pg.request.get(base + card.get_by_role("link", name=label).get_attribute("href"))
+            assert response.status == 200
+            assert hashlib.sha256(response.body()).hexdigest() == curriculum["artifacts"][key]["sha256"]
+        response = pg.request.get(base + card.get_by_role("link", name="Inspect model manifest").get_attribute("href"))
+        assert response.status == 200 and response.json() == curriculum
+        assert "No aggregate benefit" in card.text_content()
+        assert _overflow(pg) <= 0
+    assert pg.errors == []
 
 
 def test_assemblies_axis_cells_are_short_with_checks_in_a_disclosure(browser, base):
