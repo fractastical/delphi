@@ -21,6 +21,7 @@ import shutil
 import sys
 from hashlib import sha256
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
@@ -343,23 +344,40 @@ def build_timeline(ins: Inputs) -> dict | None:
         {"quantity": "Cost", "value": "Unknown", "status": "unknown", "note": R["cost"]["interpretation"], "source": ri}]
     usage = None
     if U:
-        pdt = lambda iso: (datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")) - datetime.timedelta(hours=7)).strftime("%H:%M:%S PDT")
-        sc = U["own_job_state_counts"]; ag = U["agents"]; mu = U["model_usage"]; emb = mu["gemini_embedding_index"]; bio = mu["bioservices_gemini_calls"]; of = (U.get("hosted_biomodels") or [{}])[0]
+        def pdt(iso):
+            return datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d %H:%M:%S %Z")
+        def job_kind(job):
+            platform = job.get("platform", "")
+            return "gpu" if platform.startswith("gpu-") else "cpu" if platform.startswith("cpu-") else "unknown"
+        # Derive processor counts from the preserved individual records. Producers
+        # have published both flat and processor-nested state summaries.
+        sc = {kind: collections.Counter(j["state"] for j in U["own_jobs"] if job_kind(j) == kind) for kind in ("gpu", "cpu", "unknown")}
+        ag = U["agents"]; mu = U["model_usage"]; emb = mu["gemini_embedding_index"]; bio = mu["bioservices_gemini_calls"]; of = (U.get("hosted_biomodels") or [{}])[0]
+        attribution = U.get("team_attribution") or {}
+        owners = attribution.get("ownership_breakdown") or {"current_frontier": attribution.get("current_frontier_jobs", "unknown"), "historical_team": attribution.get("historical_team_jobs", "unknown"), "unattributed": attribution.get("unattributed_jobs", "unknown")}
+        attribution_note = f" Separate attribution snapshot ({attribution.get('observed_at_seattle', 'time not recorded')}): {owners['current_frontier']} current Frontier jobs, {owners['historical_team']} historical team jobs, {owners['unattributed']} unattributed (not asserted to be other teams)." if attribution else ""
         st = lambda d: ", ".join(f"{n} {k.lower()}" for k, n in d.items() if n)
         gp = "results/resources/gcp/readiness.json"
-        if (ROOT / gp).exists():                       # a dated receipt replaces the earlier terms-of-service note
+        runtime_path = "results/resources/gcp/runtime-status.json"
+        if (ROOT / runtime_path).is_file():
+            g = json.loads(ins.read(runtime_path))
+            gpu_count = sum(a.get("acceleratorCount", 0) for instance in g.get("instances", []) if instance.get("status") == "RUNNING" for a in instance.get("guestAccelerators", []))
+            gcp_note = f" Google Cloud allocation snapshot ({g['observed_at_utc']}): {g.get('active_allocated_vcpus', 'unknown')} allocated vCPUs and {gpu_count} attached GPU(s) on RUNNING instances. Reservations are not measured utilization; spend remains unknown."
+        elif (ROOT / gp).exists():                       # a dated receipt replaces the earlier terms-of-service note
             g = json.loads(ins.read(gp)); gcp_note = f" Google Cloud, from the dated readiness receipt ({g['observed_at_utc']}): {g['state']}; observed instances {g['observed_instances']}; GPU quota granted {g['gpu_quota_granted']}, requested {g['gpu_quota_requested']}. No VM usage and no spend are inferred from this."
         else:
             gcp_note = " Google Cloud: no dated readiness receipt is in this tree; an earlier terms-of-service block is superseded and is not repeated. No VM usage is inferred."
         counters = [
             {"quantity": "Agents", "value": f"{ag['native_running_snapshot']} native agents with orchestrator status running; {ag['known_contributors_in_audited_slice']} identified contributors in the audited {ag['contributor_window_seattle']} slice", "status": "partial", "note": ag["definition"] + " Total distinct agents and currently active agents: unknown. No collective speedup is measured.", "source": uf},
-            {"quantity": "GPU jobs (own H100)", "value": f"{sum(sc['gpu'].values())}: {st(sc['gpu'])}", "status": "actual", "note": f"Own job records from {pdt(U['provider_window_utc'][0])} to {pdt(U['provider_window_utc'][1])} on 2026-10-31. Provider COMPLETED is not a scientific pass. Shared H100 capacity is not our use." + ((" Team attribution kept apart: " + str(U["team_attribution"]["current_frontier_jobs"]) + " current Frontier jobs, " + str(U["team_attribution"]["historical_team_jobs"]) + " historical team jobs listed separately, " + str(U["team_attribution"]["unattributed_jobs"]) + " unattributed (not asserted to be other teams).") if U.get("team_attribution") else ""), "source": uf},
+            {"quantity": "GPU jobs (own H100)", "value": f"{sum(sc['gpu'].values())}: {st(sc['gpu'])}", "status": "actual", "note": f"Own job records from {pdt(U['provider_window_utc'][0])} to {pdt(U['provider_window_utc'][1])}. Provider COMPLETED is not a scientific pass. Shared H100 capacity is not our use." + attribution_note, "source": uf},
             {"quantity": "CPU jobs (own)", "value": f"{sum(sc['cpu'].values())}: {st(sc['cpu'])}", "status": "actual", "note": "CPU seconds are not recorded: unknown.", "source": uf},
             {"quantity": "GPU container work seconds", "value": (f"{U['measured_completed_container_work']['gpu']['seconds']} s across {U['measured_completed_container_work']['gpu']['jobs']} completed GPU jobs and {U['measured_completed_container_work']['cpu']['seconds']} s across {U['measured_completed_container_work']['cpu']['jobs']} completed CPU jobs, from controller receipts" if U.get("measured_completed_container_work") else f"{U['five_completed_h100_container_work_seconds']} s across five completed H100 jobs"), "status": "partial", "note": (U["measured_completed_container_work"]["scope"] + " " if U.get("measured_completed_container_work") else "") + U["time_definition"] + " GPU kernel seconds and billed GPU seconds: unknown.", "source": uf},
             {"quantity": "GPU utilisation", "value": f"{len(U['historical_gpu_telemetry'])} sampled windows, listed below; current utilisation unknown", "status": "partial", "note": "Windows include low and zero values; no project-wide average is inferred.", "source": uf},
             {"quantity": "Model calls and tokens", "value": f"Embedding index: {emb['embedding_requests']} requests, {emb['documents_embedded']} documents, {emb['failed_requests']} failed. Bioservices ledger: {bio['calls']} calls, {bio['input_tokens']} input and {bio['output_tokens_including_thinking']} output tokens (thinking included). Hosted OpenFold2: {of.get('count', 0)} operation, {of.get('final_status', '')}", "status": "partial", "note": "Named ledgers only; embedding and generation units are not merged. Total tokens: unknown. BioNeMo-specific execution: not established.", "source": uf},
             {"quantity": "Cost", "value": "Unknown (not $0)", "status": "unknown", "note": U["cost"]["interpretation"] + gcp_note, "source": uf}]
-        usage = {"observed_at_seattle": U["observed_at_seattle"], "jobs": [{"name": j["name"], "kind": "GPU" if "gpu" in j["platform"] else "CPU", "state": j["state"], "created": pdt(j["created_at"]), "capacity": j["requested_capacity"]} for j in sorted(U["own_jobs"], key=lambda j: j["created_at"])],
+        if sc["unknown"]:
+            counters.append({"quantity": "Jobs with unknown processor kind", "value": f"{sum(sc['unknown'].values())}: {st(sc['unknown'])}", "status": "unknown", "note": "Not assigned to CPU or GPU totals.", "source": uf})
+        usage = {"observed_at_seattle": U["observed_at_seattle"], "jobs": [{"name": j["name"], "kind": job_kind(j).upper(), "state": j["state"], "created": pdt(j["created_at"]), "capacity": j["requested_capacity"]} for j in sorted(U["own_jobs"], key=lambda j: j["created_at"])],
             "controller": [{"task": e["task"], "status": e["controller_status"], "wall_s": e["container_wall_s"], "rc": e["result_rc"], "path": e["source"], "sha256": e["sha256"]} for e in U["recent_controller_events"]],
             "roles": ag["roles"], "credit": U["external_tools_credit"], "limitations": U["limitations"], "sha256": sha(uf)}
     return {"observed_at": R["observed_at"], "usage": usage, "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
@@ -439,6 +457,78 @@ def fish3d_files(ins: Inputs, out: dict) -> dict | None:
     return {"base": f"artifacts/fish3d/{cid}/", "glb_sha256": r["glb_sha256"], "candidates": candidates, "shared": shared, **state}
 
 
+ECO = "artifacts/ecology"
+
+
+def ecology_block(ins: Inputs, out: dict) -> dict | None:
+    """Ecology saved-state scenarios for the trajectory viewer. Files are published only when their bytes equal the hash declared by the run receipt,
+    render receipt or v3a build record; refusals are listed. Nothing here is a measurement or a validated flying fish."""
+    ix = ROOT / ECO / "index.json"
+    if not ix.exists():
+        return None
+    index = json.loads(ins.read(f"{ECO}/index.json")); run = index["canonical_run"]
+    rec = json.loads(ins.read(f"{run}/receipt.json")); declared = {f["path"]: f["sha256"] for f in rec["files"]}
+    summary = json.loads(ins.read(f"{run}/summary.json")); iface = json.loads(ins.read(f"{ECO}/interface.json")); geo = json.loads(ins.read(f"{ECO}/geometry-manifest.json"))
+    state = {"copied": [], "refused": []}
+    def put(rel, want, root_rel=None):
+        f = ROOT / rel
+        b = ins.read(rel) if f.is_file() else None
+        if b is None or not want or digest_bytes(b) != want:
+            state["refused"].append(rel); return None
+        dest = (root_rel or rel)
+        out["@" + dest] = b; state["copied"].append(rel); return dest
+    cases = []
+    for c in iface["canonical_cases"]:
+        t = c["trajectory"]; ok = put(t, declared.get(t))
+        cases.append({"id": c["id"], "trajectory": ok, "trajectory_sha256": declared.get(t), "half_step_trajectory": None, "summary": summary.get(c["id"])})
+        half = t.replace(c["id"] + "/", c["id"] + "-dt-half/")
+        cases[-1]["half_step_declared"] = half in declared
+    receipts = {k: put(f"{run}/{k}.json", declared.get(f"{run}/{k}.json")) for k in ("controls", "summary")}
+    receipts["receipt"] = f"{run}/receipt.json"; out["@" + receipts["receipt"]] = ins.read(receipts["receipt"]); state["copied"].append(receipts["receipt"])
+    media = []
+    for m in index["media"]:
+        prov = json.loads(ins.read(m["video"].replace(".mp4", ".provenance.json")))
+        files = {}
+        for key in ("video", "poster"):
+            rel = m[key]; want = prov.get(key + "_sha256")
+            files[key] = put(rel, want)
+        out["@" + m["video"].replace(".mp4", ".provenance.json")] = ins.read(m["video"].replace(".mp4", ".provenance.json"))
+        media.append({"id": m["id"], "frames": prov.get("video_frames"), "frame_method": prov.get("frame_method"), "geometry": prov.get("geometry"), **files, "provenance": m["video"].replace(".mp4", ".provenance.json")})
+    v3 = "artifacts/fish3d/fish3d-v3a-fan"; bj = json.loads(ins.read(f"{v3}/build.json"))
+    pins = {p["path"]: p["sha256"] for p in geo["candidate_and_panel_pins"]}
+    mesh = put(f"{v3}/fish.glb", (bj.get("files") or bj.get("sha256") or bj).get("fish.glb") if isinstance(bj, dict) else None)
+    panels = put(f"{v3}/panels.json", pins.get(f"{v3}/panels.json"))
+    for rel in (f"{ECO}/geometry-manifest.json", f"{ECO}/interface.json", f"{ECO}/index.json", f"{ECO}/RESULTS.md"):
+        out["@" + rel] = ins.read(rel)
+    unc = ecology_uncertainty(ins, put)
+    return {"index": index, "uncertainty": unc, "cases": cases, "receipts": receipts, "media": media, "mesh": mesh, "panels": panels, "status": iface["status"], "engine": iface["engine"],
+            "limits": iface.get("limits"), "biological_success_probability": iface.get("biological_success_probability"), "empirical_validation": index.get("empirical_validation"),
+            "history": index.get("history"), "geometry": {k: geo.get(k) for k in ("source", "source_component_units", "mesh_to_body", "cg_from_nose_m")}, **state}
+
+
+def ecology_uncertainty(ins: Inputs, put) -> dict | None:
+    """Assumed-parameter sensitivity of the neighbour cue (28 scenarios). Figures and files are published only when equal to the hash the native
+    uncertainty manifest declares; the table is copied from the aggregate summary. Shared-model scenarios, not biological confidence."""
+    mp = f"{ECO}/uncertainty-manifest.json"
+    if not (ROOT / mp).exists() or not (ROOT / ECO / "uncertainty-aggregate/summary.json").exists():
+        return None
+    man = json.loads(ins.read(mp)); want = {f["path"]: f["sha256"] for f in man["files"]}
+    agg = json.loads(ins.read(f"{ECO}/uncertainty-aggregate/summary.json"))
+    files = {}
+    for key, rel in (("aggregate_figure", "uncertainty-aggregate/paired-sensitivity.png"), ("aggregate_provenance", "uncertainty-aggregate/paired-sensitivity.provenance.json"),
+                     ("aggregate_summary", "uncertainty-aggregate/summary.json"), ("initial_figure", "uncertainty-initial/paired-sensitivity.png"),
+                     ("initial_provenance", "uncertainty-initial/paired-sensitivity.provenance.json"), ("initial_summary", "uncertainty-initial/summary.json")):
+        files[key] = put(f"{ECO}/{rel}", want.get(f"{ECO}/{rel}"))
+    proto = json.loads(ins.read(f"{ECO}/uncertainty-protocol.json")); out_manifest = put(mp, digest_bytes(ins.read(mp)))
+    res = agg["results"]
+    return {"status": agg["status"], "scenario_count": agg["scenario_count"], "computed_count": agg["computed_count"],
+            "numeric_gate_passed": sum(1 for r in res if r["numeric_gate_passed"]), "initial_native_status": agg["initial_native_status_unchanged"],
+            "continuation_native_status": agg["continuation_native_status"], "scope": agg["scope"], "question": proto["scientific_question"],
+            "settings": [{"id": x["id"], "overrides": x["overrides"]} for x in proto["settings"]], "seeds": proto["seeds"], "design": proto["design"],
+            "termination_reasons": dict(collections.Counter(r["main_summary"]["termination_reason"] for r in res)),
+            "paired": agg["paired_comparisons"], "files": files, "manifest": out_manifest, "source_and_transfer_limits": proto.get("source_and_transfer_limits")}
+
+
 def formalize_examples(ins: Inputs) -> dict | None:
     """Fixtures from engineering/formalize/cases.py and the recorded Gemini extraction runs, for the proposal checker page. Nothing is run here:
     the site only offers these requests to the node's POST /api/formalize/propose."""
@@ -501,6 +591,144 @@ def print_v3_block(ins: Inputs, out: dict) -> dict | None:
             files.append({"kind": x["kind"], "href": f"artifacts/print-v3/{x['path']}", "bytes": x["bytes"], "sha256": x["sha256"], "units": x.get("units")})
         forms.append({"id": f["id"], "title": f.get("title") or f["id"], "short": f.get("short"), "display_scale": f["display_scale"], "prop_size_mm": f.get("prop_size_mm"), "source_candidate": f.get("source_candidate"), "source_candidate_sha256": f.get("source_candidate_sha256"), "files": files})
     return {"forms": forms, "limitations": D["limitations"], "printer_resin": D["printer_resin"], "refused": refused}
+
+
+def model_downloads(ins: Inputs, out: dict) -> dict:
+    """Publish print revisions from manifest-pinned bytes, including earlier editions."""
+    manifests = [ROOT / "artifacts" / name / "manifest.json" for name in ("print-v3", "print-v2", "print")]
+    manifests += sorted((ROOT / "artifacts/glider").glob("*/manifest.json"))
+    defects_path = "artifacts/glider/KNOWN_DEFECTS.json"
+    defects = json.loads(ins.read(defects_path)) if (ROOT / defects_path).is_file() else {}
+    handedness = defects.get("right_hand_print_files_are_left_parts", {})
+    groups, refused = [], []
+    for path in manifests:
+        if not path.is_file():
+            continue
+        directory = path.parent.relative_to(ROOT).as_posix()
+        raw_manifest = ins.read(path.relative_to(ROOT).as_posix())
+        manifest = json.loads(raw_manifest)
+        withdrawn_right = manifest.get("revision") in handedness.get("revisions", [])
+        files = []
+        for rel, declared in manifest.get("files", {}).items():
+            member = Path(rel)
+            if member.is_absolute() or ".." in member.parts:
+                refused.append(f"{directory}/{rel}")
+                continue
+            if member.suffix.lower() not in {".stl", ".glb", ".zip"}:
+                continue
+            source = path.parent / member
+            data = ins.read(f"{directory}/{rel}") if source.is_file() else None
+            if data is None or digest_bytes(data) != declared:
+                refused.append(f"{directory}/{rel}")
+                continue
+            href = f"{directory}/{rel}"
+            out["@" + href] = data
+            withdrawn = withdrawn_right and "_R" in member.name and member.suffix == ".stl"
+            files.append({"name": member.name, "href": href, "sha256": declared, "bytes": len(data), "format": member.suffix[1:].upper(),
+                          "withdrawn": "Duplicates the left fin; use the corrected revision." if withdrawn else None})
+        sidecar = path.parent / "download.json"
+        if sidecar.is_file():
+            bundle = json.loads(ins.read(sidecar.relative_to(ROOT).as_posix()))
+            member = Path(bundle["path"])
+            if member.is_relative_to(Path(directory)):
+                member = member.relative_to(Path(directory))
+            if member.is_absolute() or ".." in member.parts or member.suffix != ".zip":
+                refused.append(f"{directory}/{member}")
+            else:
+                source = path.parent / member
+                data = ins.read(f"{directory}/{member}") if source.is_file() else None
+                if (data is None or len(data) != bundle["bytes"] or digest_bytes(data) != bundle["sha256"]
+                        or bundle.get("manifest_sha256") != digest_bytes(raw_manifest)):
+                    refused.append(f"{directory}/{member}")
+                else:
+                    href = f"{directory}/{member}"
+                    out["@" + href] = data
+                    files.insert(0, {"name": "Complete six-part test-print bundle", "href": href, "sha256": bundle["sha256"],
+                                     "bytes": len(data), "format": "ZIP", "withdrawn": None})
+        href = f"{directory}/manifest.json"
+        out["@" + href] = raw_manifest
+        groups.append({"id": directory, "title": manifest.get("revision") or path.parent.name,
+                       "scope": "Untested launch prototype; inspect its failed constraints before printing." if "/glider/" in directory else "Display models; not flight-tested designs. STL units: mm.",
+                       "warning": "Archived revision: right-fin print files are withdrawn because they duplicate left fins. Use r4-daane-printfix." if withdrawn_right else None,
+                       "manifest_href": href, "files": files})
+    return {"groups": groups, "refused": refused}
+
+
+def demo_videos(ins: Inputs, out: dict) -> dict | None:
+    """Publish complete edits only when every required media file matches its pin."""
+    directory = "artifacts/demo-video"
+    manifest_path = f"{directory}/manifest.json"
+    if not (ROOT / manifest_path).is_file():
+        return None
+    manifest = ins.json(manifest_path)
+    result = {"cuts": [], "refused": [], "limits": manifest.get("limits", [])}
+    if manifest.get("status") != "complete":
+        return result
+    required = {"video": {".mp4"}, "poster": {".png", ".jpg"}, "captions": {".vtt"}, "transcript": {".txt"}}
+    for cut in manifest.get("cuts", []):
+        expected = {"frontier-60s": 60, "frontier-120s": 120}.get(cut.get("id"))
+        if expected is None or not isinstance(cut.get("duration_s"), (int, float)) or abs(cut["duration_s"] - expected) > 0.25:
+            result["refused"].append({"id": cut.get("id"), "reason": "unexpected cut or duration"})
+            continue
+        pending, hrefs = {}, {}
+        for role, extensions in required.items():
+            pin = cut.get("files", {}).get(role, {})
+            path = Path(pin.get("path", ""))
+            rel = f"{directory}/{path.as_posix()}"
+            limit = 64_000_000 if role == "video" else 16_000_000
+            if path.is_absolute() or ".." in path.parts or path.suffix not in extensions or not (ROOT / rel).is_file():
+                break
+            if not (ROOT / rel).resolve().is_relative_to((ROOT / directory).resolve()):
+                break
+            size = (ROOT / rel).stat().st_size
+            if not 0 < size <= limit or size != pin.get("bytes"):
+                break
+            data = ins.read(rel)
+            if digest_bytes(data) != pin.get("sha256") or (role == "captions" and not data.startswith(b"WEBVTT")):
+                break
+            pending["@" + rel], hrefs[role] = data, rel
+        else:
+            out.update(pending)
+            result["cuts"].append({"id": cut["id"], "title": cut["title"], "duration_s": cut["duration_s"],
+                                   "href": hrefs["video"], "poster_href": hrefs["poster"],
+                                   "subtitles_href": hrefs["captions"], "transcript_href": hrefs["transcript"],
+                                   "manifest_href": manifest_path})
+            continue
+        result["refused"].append({"id": cut.get("id"), "reason": "required media missing, outside scope, oversized, or changed"})
+    if result["cuts"]:
+        out["@" + manifest_path] = ins.read(manifest_path)
+    return result
+
+
+def diffusion_pilot(ins: Inputs, out: dict) -> dict | None:
+    """Recorded denoising frames and evaluation receipts, with failed checks preserved."""
+    directory = "artifacts/rd-diffusion/visuals"
+    manifest_path = f"{directory}/manifest.json"
+    if not (ROOT / manifest_path).is_file():
+        return None
+    manifest = json.loads(ins.read(manifest_path))
+    files, refused = [], []
+    for name, pin in manifest["files"].items():
+        rel = f"{directory}/{name}"
+        data = ins.read(rel) if (ROOT / rel).is_file() else None
+        if data is None or len(data) != pin["bytes"] or digest_bytes(data) != pin["sha256"]:
+            refused.append(name)
+            continue
+        out["@" + rel] = data
+        files.append({"name": name, "href": rel, **pin})
+    receipts = {}
+    sources = {
+        "recovery": "results/infra/diffusion-recovery/results/infra25-rd-ddpm-evaluation-recovery/recovery-result.json",
+        "secondary_audit": "results/infra/diffusion-secondary/collection-audit.json",
+    }
+    for kind, path in sources.items():
+        if (ROOT / path).is_file():
+            data = ins.read(path)
+            href = f"artifacts/rd-diffusion/{kind}.json"
+            out["@" + href] = data
+            receipts[kind] = {"href": href, "sha256": digest_bytes(data), "data": json.loads(data)}
+    out["@" + manifest_path] = ins.read(manifest_path)
+    return {"manifest": manifest, "manifest_href": manifest_path, "files": files, "refused": refused, "receipts": receipts}
 
 
 def runtime_inputs(ins: Inputs, out: dict, stem: str) -> dict | None:
@@ -568,7 +796,23 @@ def fish_history(ins: Inputs) -> dict | None:
     for f in P3["forms"]:
         mk(f["id"], "display prop (print, not a launch prototype)", f.get("title") or f["id"], need[3], {"display_scale": f["display_scale"], "set": f.get("set")})
         edges.append({"from": f["id"], "to": f["source_candidate"], "relation": "printed from", "label": "display prop made from this 3D candidate", "source": f"{need[3]}: forms[].source_candidate", "chronological": False})
-    return {"nodes": nodes, "edges": edges, "siblings": sib, "launch_prototype": {"exists": False, "note": "No launch-prototype artifact is in the tree: source owners are still preparing it. Nothing is shown in its place."},
+    # Launch glider print sets: lineage comes only from each manifest's parent_revision and source_candidate pins; chronology is never inferred from the names.
+    gd = ROOT / "artifacts/glider"; gl = []
+    defects = json.loads(ins.read("artifacts/glider/KNOWN_DEFECTS.json")) if (gd / "KNOWN_DEFECTS.json").exists() else {}
+    bad_revs = {r: k for k, v in defects.items() if isinstance(v, dict) for r in v.get("revisions", [])}
+    for mp in (sorted(gd.glob("*/manifest.json")) if gd.exists() else []):
+        mrel = mp.relative_to(ROOT).as_posix(); m = json.loads(ins.read(mrel)); rid = m["revision"]; sc = m.get("source_candidate", {})
+        ok_pin = sc.get("id") in V3["candidates"] and V3["candidates"][sc["id"]]["candidate_sha256"] == sc.get("sha256")
+        bad = defects.get(bad_revs.get(rid), {}) if rid in bad_revs else {}
+        mk("glider-" + rid, "launch glider print set (a launch prototype, untested)", m.get("title") or rid, mrel, {"revision": rid, "parent_revision": m.get("parent_revision"), "pin_matches_v3_index": ok_pin,
+           "known_defect": bad.get("what"), "fixed_in": bad.get("fixed_in"), "label": m.get("label", "")[:300], "source_candidate": sc.get("id")})
+        gl.append(rid)
+        if m.get("parent_revision"):
+            edges.append({"from": "glider-" + rid, "to": "glider-" + m["parent_revision"], "relation": "revision", "label": "named as parent_revision in the manifest (not inferred from the names)", "source": mrel + ": parent_revision", "chronological": True})
+        if sc.get("id") and ok_pin:
+            edges.append({"from": "glider-" + rid, "to": sc["id"], "relation": "built from", "label": "source_candidate, pinned by sha256 and matching the v3 index", "source": mrel + ": source_candidate", "chronological": False})
+    lp = {"exists": bool(gl), "revisions": gl, "note": ("Launch glider print sets exist as manifests (" + ", ".join(gl) + "). Every one is labelled a launch prototype, untested: not printed, weighed, glided or thrown here." if gl else "No launch-prototype artifact is in the tree: source owners are still preparing it. Nothing is shown in its place.")}
+    return {"nodes": nodes, "edges": edges, "siblings": sib, "launch_prototype": lp,
             "date_basis": "Author date of the first commit that added the node's manifest in this repository (a repository fact, not the date the design was made); null when git history is unavailable."}
 
 
@@ -612,7 +856,90 @@ def genetic_blueprints(ins: Inputs) -> dict | None:
         return None
     B = json.loads(ins.read(f"{d}/blueprints.json")); S = json.loads(ins.read(f"{d}/sources.json")) if (ROOT / d / "sources.json").exists() else {}
     return {"status": B["status"], "species_scope": B["species_scope"], "date": B["date"], "designs": B["designs"], "comparison": B["comparison"], "global_causal_gaps": B["global_causal_gaps"], "not_done": B["not_done"],
-            "inputs": B["inputs"], "citations": B["citation_table"], "source_status": S.get("status"), "files": {"blueprints.json": ins.seen[f"{d}/blueprints.json"]["sha256"], "sources.json": ins.seen.get(f"{d}/sources.json", {}).get("sha256")}}
+            "inputs": B["inputs"], "citations": B["citation_table"], "revision": B.get("revision"), "revision_log": B.get("revision_log", []), "parent": B.get("parent"), "cell_programs": B.get("cell_program_blueprints", []), "actors": B.get("regulatory_actors"), "claim_ledger": B.get("claim_use_ledger"), "source_status": S.get("status"), "source_index": {x["id"]: {k: x.get(k) for k in ("citation", "primary_url", "read_level")} for x in S.get("sources", []) if x.get("id")}, "files": {"blueprints.json": ins.seen[f"{d}/blueprints.json"]["sha256"], "sources.json": ins.seen.get(f"{d}/sources.json", {}).get("sha256")}}
+
+
+def openresearch_exemplars(ins: Inputs) -> dict | None:
+    """Two real local OpenResearch (orx) runs recorded as provenance exemplars. OpenResearch is a local recorder of which code was run, not a cloud dispatcher; fields are copied from the run records."""
+    a = "connectors/biomodels/orx/orx_facts.json"; b = "frontier_adapters/examples/orx_run_turing"
+    if not ((ROOT / a).exists() and (ROOT / b / "run.json").exists()):
+        return None
+    iso = lambda ms: datetime.datetime.fromtimestamp(ms / 1000, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    F = json.loads(ins.read(a)); R = json.loads(ins.read(f"{b}/run.json"))["run"]; H = json.loads(ins.read(f"{b}/health.json")); ec = ins.text(f"{b}/exit_code").strip()
+    log = ins.text(f"{b}/log"); first = log.splitlines()[0] if log else ""
+    ex = [{"title": F["experiment_title"], "command": F["command"], "backend": F["backend_kind"], "commit": F["commit_sha"], "started_utc": iso(F["created_ms"]), "duration_s": round((F["ended_ms"] - F["created_ms"]) / 1000, 2), "exit_code_file": F["exit_code_file"], "db_exit_code": F["db_exit_code"], "status": F["status"],
+           "source_tar_sha256": F["source_tar_sha256"], "outputs": [{"path": o["path"], "sha256": o["sha256"], "bytes": o["bytes"]} for o in F["outputs"]], "replay_checks": F["replay_comparison"], "orx_version": F["orx_version"], "note": F["orx_version_note"], "record": a},
+          {"title": "Neumann-mode Turing scan (exact rationals)", "command": R["command"], "backend": R["backend"]["kind"], "commit": R["commitSha"], "started_utc": iso(R["createdAt"]), "duration_s": round((R["endedAt"] - R["createdAt"]) / 1000, 2), "exit_code_file": int(ec) if ec.isdigit() else ec, "db_exit_code": None, "status": R["status"],
+           "source_tar_sha256": R["backend"]["sourceDigest"], "outputs": [{"path": "results.json", "sha256": first.split("sha256 ")[-1] if "sha256 " in first else None, "bytes": None}], "replay_checks": None, "orx_version": "orx " + H["version"], "note": "outputs are not registered by orx; the digest is the producer's own printed line", "record": b + "/run.json"}]
+    return {"exemplars": ex, "scope": "OpenResearch is a local recorder of which code was run. It is not a cloud dispatcher and none of these runs used a remote backend. A completed run is evidence that this code at this commit exited 0 and printed this, not that the science is right.", "report": "OpenResearch integration note (corpus session, single reader, not independently reviewed)"}
+
+
+def planner_plan(ins: Inputs, base: Path, d: str) -> dict | None:
+    """Structured projection of the planner's result.json: values copied, hashes checked against the planner's own manifest. Prospective calculation only."""
+    rp, mp = base / "result.json", base / "manifest.json"
+    if not rp.is_file():
+        return None
+    r = json.loads(ins.read(f"{d}/result.json")); declared = {}
+    if mp.is_file():
+        declared = (json.loads(ins.read(f"{d}/manifest.json")).get("files") or {}).get("result.json", {}).get("sha256")
+    got = ins.seen[f"{d}/result.json"]["sha256"]; aa = r.get("action_artifact") or {}; ap = aa.get("action_proposal") or {}
+    designs = []
+    for x in r.get("designs", []):
+        i = x.get("identifiability") or {}
+        designs.append({"id": x["id"], "intervention": x.get("intervention"), "cost": x.get("cost"), "cost_unit": x.get("cost_unit"), "cost_basis": x.get("cost_basis"),
+                        "rank": i.get("rank"), "parameter_count": i.get("parameter_count"), "full_rank": i.get("full_rank"), "nullspace_basis": i.get("nullspace_basis"),
+                        "singular_values": i.get("singular_values"), "target_prior_variance": x.get("target_prior_variance"),
+                        "target_posterior_variance": x.get("expected_target_posterior_variance"), "variance_reduction": x.get("expected_target_variance_reduction"),
+                        "reduction_per_cost": x.get("expected_target_variance_reduction_per_cost"), "posterior_covariance": x.get("expected_posterior_covariance"),
+                        "observations": x.get("observations"), "measurement_rows": len(x.get("measurement_rows") or [])})
+    designs.sort(key=lambda z: -(z["reduction_per_cost"] or 0))
+    for n, z in enumerate(designs, 1):
+        z["objective_order"] = n
+    return {"result_path": f"{d}/result.json", "result_sha256": got, "declared_sha256": declared or None, "hash_matches_manifest": bool(declared) and declared == got,
+            "schema": r.get("schema"), "status": r.get("status"), "design_version": r.get("design_version"), "protocol_sha256": r.get("protocol_sha256"),
+            "selected_design_id": r.get("selected_design_id"), "objective": r.get("selection_objective"), "target": r.get("target"), "equation": r.get("equation"),
+            "parameters": r.get("parameters"), "designs": designs, "measurement_rows": len(r.get("measurement_rows") or []), "controls": r.get("controls"),
+            "assumptions": ap.get("assumptions"), "limitations": ap.get("limitations"), "link_blockers": aa.get("link_blockers"), "state": aa.get("state"),
+            "links": aa.get("links"), "context": r.get("context"), "model_discrepancy": r.get("model_discrepancy"), "held_out_validation": r.get("held_out_validation"),
+            "replicate_unit": r.get("replicate_unit"), "batch_effects": r.get("batch_effects"), "stop_rules": r.get("stop_rules"), "observed_result": aa.get("observed_result")}
+
+
+def experimentation_block(ins: Inputs) -> dict | None:
+    """SPEC-013's bridge table (parsed from the spec, not retyped) and the planner's artifacts when they exist. Measurement categories are not experiments run; no observation is invented."""
+    sp = "specs/SPEC-013-adaptive-experimentation.md"
+    if not (ROOT / sp).exists():
+        return None
+    t = ins.text(sp); rows = []; grab = False
+    for line in t.splitlines():
+        if line.startswith("| Bridge |"):
+            grab = True; continue
+        if grab:
+            if not line.startswith("|"):
+                break
+            if set(line.replace("|", "").strip()) <= set("- "):
+                continue
+            c = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(c) >= 2:
+                rows.append({"bridge": c[0], "measure": c[1]})
+    states = re.search(r"Protocol hash, ([^\n]+?) states and lineage", t)
+    out = {"spec": sp, "bridges": rows, "states_text": states.group(1) if states else None, "planner": None}
+    for d in ("artifacts/experimental-design", "engineering/experimental_design/artifacts/experimental-design"):
+        base = ROOT / d
+        if base.is_dir():
+            files = sorted(f for f in base.rglob("*") if f.is_file() and f.suffix in (".json", ".md"))
+            listing = []
+            for f in files[:40]:
+                rel = f.relative_to(ROOT).as_posix(); b = ins.read(rel)
+                schema = None
+                if f.suffix == ".json":
+                    try:
+                        schema = json.loads(b).get("schema")
+                    except Exception:
+                        schema = None
+                listing.append({"path": rel, "sha256": digest_bytes(b), "bytes": len(b), "schema": schema})
+            out["planner"] = {"dir": d, "files": listing, "plan": planner_plan(ins, base, d)}
+            break
+    return out
 
 
 def lifecycle_block(ins: Inputs) -> dict | None:
@@ -1116,14 +1443,20 @@ def build() -> dict[str, bytes]:
     home_biology_block = home_biology(ins)
     timeline = build_timeline(ins)
     fish3d_viewer = fish3d_files(ins, extra)
+    ecology = ecology_block(ins, extra)
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
+    downloads = model_downloads(ins, extra)
+    demos = demo_videos(ins, extra)
+    diffusion = diffusion_pilot(ins, extra)
     recovery_in = recovery_inputs(ins, extra)
     secondary_in = runtime_inputs(ins, extra, "secondary-runtime-inputs")
     fish_hist = fish_history(ins)
     reg_map = regulatory_map(ins)
     claim_reuse = claim_reuse_block(ins)
     gen_bp = genetic_blueprints(ins)
+    orx_ex = openresearch_exemplars(ins)
+    experimentation = experimentation_block(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -1155,14 +1488,20 @@ def build() -> dict[str, bytes]:
         "home_biology": home_biology_block,
         "timeline": timeline,
         "fish3d_viewer": fish3d_viewer,
+        "ecology": ecology,
         "formalize": formalize_ex,
         "print_v3": print_v3,
+        "model_downloads": downloads,
+        "demo_videos": demos,
+        "diffusion_pilot": diffusion,
         "recovery_inputs": recovery_in,
         "secondary_inputs": secondary_in,
         "fish_history": fish_hist,
         "regulatory_map": reg_map,
         "claim_reuse": claim_reuse,
         "genetic_blueprints": gen_bp,
+        "openresearch": orx_ex,
+        "experimentation": experimentation,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),

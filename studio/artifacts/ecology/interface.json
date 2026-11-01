@@ -1,0 +1,128 @@
+{
+  "schema": "frontier.ecology.interface/1",
+  "status": "computed reduced-model scenarios; no calibrated biological implementation",
+  "engine": "MuJoCo3.17.0 CPU; external quasisteady forces; no CFD",
+  "canonical_cases": [
+    {
+      "id": "glide-passive",
+      "trajectory": "artifacts/ecology/run-refined/glide-passive/trajectory.json",
+      "states": "artifacts/ecology/run-refined/glide-passive/states.npz"
+    },
+    {
+      "id": "glide-feedback",
+      "trajectory": "artifacts/ecology/run-refined/glide-feedback/trajectory.json",
+      "states": "artifacts/ecology/run-refined/glide-feedback/states.npz"
+    },
+    {
+      "id": "escape-neighbors",
+      "trajectory": "artifacts/ecology/run-refined/escape-neighbors/trajectory.json",
+      "states": "artifacts/ecology/run-refined/escape-neighbors/states.npz"
+    },
+    {
+      "id": "escape-no-neighbors",
+      "trajectory": "artifacts/ecology/run-refined/escape-no-neighbors/trajectory.json",
+      "states": "artifacts/ecology/run-refined/escape-no-neighbors/states.npz"
+    }
+  ],
+  "geometry_manifest": "artifacts/ecology/geometry-manifest.json",
+  "geometry_manifest_sha256": "87f38373efd3fa41a0d9a89831ad19cd8e8af3c5072f0fc1e214df64c6e5df86",
+  "parameter_ports": [
+    {
+      "id": "mass_kg",
+      "unit": "kg",
+      "default": 0.05,
+      "range": [
+        0.04,
+        0.06
+      ],
+      "basis": "assumed engineering envelope, not measured biological prior"
+    },
+    {
+      "id": "cg_from_nose_over_standard_length",
+      "unit": "1",
+      "default": 0.4,
+      "range": [
+        0.35,
+        0.45
+      ],
+      "basis": "assumed engineering envelope, not measured biological prior"
+    },
+    {
+      "id": "initial_speed_m_s",
+      "unit": "m/s",
+      "default": 20,
+      "range": [
+        16,
+        22
+      ],
+      "basis": "assumed engineering envelope, not measured biological prior"
+    },
+    {
+      "id": "initial_fin_incidence_deg",
+      "unit": "degree",
+      "default": 4,
+      "range": [
+        2,
+        6
+      ],
+      "basis": "assumed engineering envelope, not measured biological prior"
+    },
+    {
+      "id": "fin_stiffness_Nm_rad",
+      "unit": "N*m/rad",
+      "default": 0.2,
+      "range": [
+        0.1,
+        0.3
+      ],
+      "basis": "assumed engineering envelope, not measured biological prior"
+    },
+    {
+      "id": "neighbor_radius_m",
+      "unit": "m",
+      "default": 0.47,
+      "range": [
+        0.25,
+        0.6
+      ],
+      "basis": "assumed engineering envelope, not measured biological prior"
+    }
+  ],
+  "fixed_school_size": 8,
+  "sensing_to_actuation": "actual local neighbor bank + assigned delay -> bounded bank target -> fin servo torque -> MuJoCo joint/body dynamics -> recomputed aerodynamic force",
+  "scale_interfaces": [
+    {
+      "from": "regulatory/cell programs",
+      "to": "neural sensing/delay",
+      "status": "unknown; no identified flying-fish mapping"
+    },
+    {
+      "from": "ECM/tissue",
+      "to": "hinge stiffness and membrane mechanics",
+      "status": "unknown; assumed single hinge is not fin-beam EI or molecular modulus"
+    },
+    {
+      "from": "actual v3a geometry + computed VLM polar",
+      "to": "force/moment inputs",
+      "status": "implemented reduced-model coupling, not empirical validation"
+    },
+    {
+      "from": "fin commands",
+      "to": "body trajectories",
+      "status": "implemented torque/power/rate-bounded rigid-body integration"
+    },
+    {
+      "from": "body trajectories",
+      "to": "social sensing",
+      "status": "implemented local threshold/delay hypothesis; species/airborne transfer unknown"
+    }
+  ],
+  "biological_success_probability": null,
+  "limits": [
+    "No underwater phase or takeoff propulsion",
+    "No collision/wake interactions",
+    "No genetic or neuronal implementation inferred",
+    "Mass/CG/inertia/drag/controller and sensory parameters are assumptions",
+    "Terminal domain exits remain visible"
+  ]
+}

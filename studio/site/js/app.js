@@ -19,9 +19,9 @@
     e.preventDefault(); const v = {}; new FormData(form).forEach((val, k) => { if (String(val).trim()) v[k] = String(val).trim(); }); DF.go(build(v));
   }));
 
-  const ABOUT = [["/about", "Overview"], ["/about/team", "Team"], ["/about/docs", "Documentation"], ["/about/inspirations", "Motivation & inspirations"], ["/generative", "Generative biology"]];
+  const ABOUT = [["/about", "Overview"], ["/about/team", "Team"], ["/about/docs", "Documentation"], ["/about/inspirations", "Motivation & inspirations"], ["/generative", "Generative biology"], ["/demo", "Demo videos"]];
   const NAV = [["studio", "Studio"], ["frontier", "Frontier"], ["knowledge", "Knowledge"], ["evidence", "Evidence"], ["work", "System"]];
-  const STUDIO_GROUP = new Set(["studio", "engineering", "simulations", "belief", "formalize", "history", "regulatory", "reuse", "blueprints"]);       // reached from a project; they highlight Studio
+  const STUDIO_GROUP = new Set(["studio", "engineering", "simulations", "belief", "formalize", "history", "regulatory", "reuse", "blueprints", "experimentation", "ecology"]);       // reached from a project; they highlight Studio
   const inNav = (k, view) => view === k || (k === "studio" && STUDIO_GROUP.has(view)) || (k === "knowledge" && view === "entity") || (k === "work" && view === "system");
   let snap = null; let lastView = null; let opener = null;
   document.addEventListener("click", (e) => { const am = document.querySelector(".aboutmenu details"); if (am && am.open && !am.contains(e.target)) am.open = false; }, true);   // one listener for the life of the page
@@ -30,11 +30,26 @@
     const s = DF.api.state; const live = s.mode === "live";
     return html`<div class="bar"><a class="brand" href="${DF.href("/home")}"><svg class="mark" viewBox="0 0 44 28" width="44" height="28" aria-hidden="true" focusable="false"><defs><linearGradient id="mk" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c8f24a"/><stop offset="1" stop-color="#2bb3a3"/></linearGradient></defs><path d="M3 15c5-8 14-9 21-5 4 2 6 4 8 5-2 1-4 3-8 5-7 4-16 3-21-5z" fill="url(#mk)"/><path d="M32 15l8-7v14z" fill="url(#mk)" opacity=".85"/><circle cx="9" cy="13.5" r="1.4" fill="#0e2433"/><path d="M14 8c3-4 6-6 12-7M17 7c4-1 8 0 12 3M12 20c2 3 5 5 10 6" fill="none" stroke="#c8f24a" stroke-width="1.3" stroke-linecap="round"/><g fill="#c8f24a"><circle cx="26" cy="1.2" r="1.5"/><circle cx="29.5" cy="10" r="1.5"/><circle cx="22" cy="26" r="1.5"/></g></svg>MorphoSwarm <b>Frontier</b><span class="brandsub">claims and evidence: Delphi</span></a>
       <nav aria-label="Views"><ul>${NAV.map(([k, t]) => html`<li><a href="${DF.href("/" + k)}" aria-current="${inNav(k, route.view) ? "page" : "false"}">${t}</a></li>`)}
-        <li class="aboutmenu"><details><summary class="${route.view === "about" || route.view === "generative" ? "on" : ""}">About</summary><ul aria-label="About">${ABOUT.map(([h, t]) => html`<li><a href="${DF.href(h)}">${t}</a></li>`)}</ul></details></li></ul></nav>
+        <li class="aboutmenu"><details><summary class="${route.view === "about" || route.view === "generative" || route.view === "demo" ? "on" : ""}">About</summary><ul aria-label="About">${ABOUT.map(([h, t]) => html`<li><a href="${DF.href(h)}">${t}</a></li>`)}</ul></details></li></ul></nav>
       <form class="gsearch" role="search" id="gs"><label class="sr" for="gq">Search the catalog</label><input id="gq" type="search" placeholder="Search records" value="${route.view === "search" ? route.params.q || "" : ""}"><button class="btn small" type="submit">Search</button></form>
       <span class="mode ${live ? "live" : "snap"}" title="${esc(s.reason)}">${live ? "Live runtime" : "Snapshot"}</span></div>
-      ${live && !s.publicAccess && s.authenticated === false ? html`<div class="banner" role="status"><b>Runtime reachable, not signed in.</b> Records need a session: <a href="/login">sign in</a>. Until then the catalog, artifacts and solver are unavailable, and the page shows the snapshot.</div>` : ""}
+      ${live && !s.publicAccess && s.authenticated === false ? html`<div class="banner" role="status" id="sessbanner"><b>Runtime reachable, not signed in.</b> Records need a session: <a href="/login">sign in</a>. Until then the catalog, artifacts and solver are unavailable, and the page shows the snapshot.</div>` : ""}
       ${live ? "" : html`<div class="banner" role="status"><b>Snapshot, not live.</b> No runtime answered (${s.reason}). Everything shown comes from <code>${snap ? snap.label : "the committed snapshot"}</code>. Local controls are calculations in this browser; nothing is submitted.</div>`}`;
+  }
+
+  /* If the node is up but would not mint a browser session (the backend limits new anonymous sessions per network), say that and offer Retry instead of the generic sign-in text. */
+  async function sessionProbe(hdr) {
+    const b = hdr.querySelector("#sessbanner"); if (!b || b.dataset.probed) return; b.dataset.probed = "1";
+    try {
+      const r = await fetch("api/session", { headers: { Accept: "application/json" }, cache: "no-store", credentials: "same-origin" });
+      if (r.status === 429) {
+        b.textContent = "";
+        const t = document.createElement("span"); t.innerHTML = "<b>The node is limiting new browser sessions from this network.</b> Public pages and the committed snapshot still work; anything that needs a session is unavailable for a moment. Nothing was changed. ";
+        const btn = document.createElement("button"); btn.type = "button"; btn.className = "btn small"; btn.textContent = "Retry";
+        btn.addEventListener("click", async () => { btn.disabled = true; btn.textContent = "Retrying…"; try { await DF.api.load(); } finally { render(); } });
+        b.append(t, btn);
+      }
+    } catch (e) { /* the generic banner stays */ }
   }
 
   async function render() {
@@ -64,7 +79,9 @@
         console.error(e); main.innerHTML = html`<section class="pagehead"><h1>This view could not be drawn</h1><p class="lede">${e.message}</p><p>The data may be malformed. <a href="${DF.href("/frontier")}">Return to Frontier</a>.</p></section>`.toString();
       }
     }
-    if (lastView !== route.view) { try { main.focus({ preventScroll: true }); } catch (e) { /* focus is best effort */ } }   // keyboard and screen-reader users land at the new view, not on the old link
+    if (lastView !== null && lastView !== route.view) { try { main.focus({ preventScroll: true }); } catch (e) { /* focus is best effort */ } }   // keyboard and screen-reader users land at the new view, not on the old link
+    DF.ready = true;                                 // lets boot.js know the app drew
+    sessionProbe(hdr);
     lastView = route.view; window.scrollTo(0, y);
     await drawer(route);
   }

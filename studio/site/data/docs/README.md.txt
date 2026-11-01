@@ -41,6 +41,9 @@ papered over.
 | [SPEC-010](SPEC-010-launchable-fish-glider.md) | User-requested printed fish glider, required slingshot launch, material and flight validation |
 | [SPEC-011](SPEC-011-behavior-and-ecology.md) | Actual-state gliding control and collective escape simulations with matched controls |
 | [SPEC-012](SPEC-012-genetic-implementation-blueprints.md) | Regulatory programs, constructs, delivery and evidence-linked implementation across scales |
+| [SPEC-013](SPEC-013-adaptive-experimentation.md) | Identifiable transfer models, adaptive experiment plans and observed-data feedback |
+| [SPEC-014](SPEC-014-biodesign-compiler-and-lineage.md) | Pinned organism assemblies, compatibility checks and iterations across levels |
+| [SPEC-015](SPEC-015-robust-inverse-design.md) | Candidate ensembles, perturbation tests and scoped inverse-design capabilities |
 
 **Verification run (this session), bounded:**
 `systemd-run --user --scope -p TasksMax=128 -p MemoryMax=4G -p MemorySwapMax=0 -p RuntimeMaxSec=600

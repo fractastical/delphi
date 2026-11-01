@@ -1,11 +1,119 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 5:34pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 7:28pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
-GOAL.md and SPEC-005 through SPEC-012 define acceptance. The latest dated checkpoint supersedes older status snapshots.
+GOAL.md and SPEC-005 through SPEC-016 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 5:34pm PDT
+## Current checkpoint — October 31, 2026, 7:28pm PDT
+
+- [x] Release `c3fd602` is live. About → Demo videos serves both exact-length
+  1080p MiniMax-narrated cuts, captions, transcripts and downloadable MP4s. The
+  responsive page defaults to one minute and links both cuts; fullscreen works.
+  Root ran 9 focused publication/navigation/layout tests and 30 public media and
+  browser checks, plus 8 public web and 39 public MCP checks. Full audio/video
+  decoding passed for both cuts. These checks do not validate biological designs.
+- [x] Independent sampled-frame review cleared the wrong-page and wrong-scene
+  findings after a second export. Source crops and small original figure text
+  remain presentation limits. The frozen script, source hashes, both output
+  revisions and MiniMax receipts are preserved. No new narration was synthesized
+  for the corrected shots.
+- [x] Studio's scale selector now starts near the top: sticky on desktop, compact
+  on phones. The selected scale leads with equations, parameters and simulations;
+  project-wide review and assurance panels follow. Deep links remain supported.
+- [x] Canonical morphoswarm.ai and www redirect to Frontier with path/query kept.
+  Root checked HTTP 308 and the destination's HTTP 200. studio.morphoswarm.ai
+  serves the protected old site (HTTP 401 without credentials), with no redirect.
+  Infra reports unchanged Orchestra configuration and IP restrictions.
+- [ ] Native infra reports the seed-placement NCA follow-up is training on H100;
+  evaluation remains pending. The original run's 0/48 design success is retained.
+  A second H100 job is preparing controlled CFD calibration. Google VM03 remains
+  the active 16-vCPU CFD worker; further L4 admissions encountered stockouts.
+- [ ] More simulations are being prepared with separate owners: native mechanics
+  couples assumed fin stiffness to deformed aerodynamic geometry; native resources
+  prepares controlled BETSE dose/junction comparisons; Claude-11 owns metabolic
+  oxygen/medium constraints and the 23-genome interpretation. No invented
+  voltage-to-growth or molecular-to-fin transfer is treated as established.
+- [ ] Compiler/layer lineage, independent R4 catch-wall review and the broader
+  scientific integration remain unfinished. More compute is not itself a result.
+
+Public playback evidence: `deploy/receipts/demo-videos-live.json`. The first
+browser verifier attempt used an in-page string evaluation blocked by the site's
+CSP; that attempt did not complete. The verifier was repaired to read state via
+the browser protocol, then all 30 checks ran successfully. Site CSP stayed intact.
+
+## Previous checkpoint — October 31, 2026, 6:37pm PDT
+
+- [x] Release `e246a51` is live: ecology saved-state viewer, prospective
+  Experimentation comparison, recorded DDPM visuals with failed strict audit,
+  and current dated resource receipts. Root ran 18 focused browser/resource
+  tests, 39 live public MCP checks and 8 public web checks. No scientific writes.
+- [x] Public MCP now executes the bounded prospective experiment planner:
+  the live check reproduced deflection-only rank 1 versus mixed readouts rank 2,
+  without observations, persistence, lab execution or cloud submission.
+- [x] Corrected R4 print ZIP remains downloadable from Home, with fit/balance
+  limits. No flight or catch-wall safety validation has been established.
+- [x] MiniMax narration synthesized from the revision-2 frozen storyboard:
+  109.152 seconds of speech for the 120-second cut and 54.648 for the 60-second
+  cut. Natural speed 1.0; unchanged segments reused by exact text hash.
+- [ ] Native resource_scaling: edit both videos from actual media and current
+  live captures; verify durations, captions, source hashes and decoded output.
+  Claude-06: capture actual interfaces. Claude-02: public demo gallery. Root:
+  independent review, guarded artifact publication and public playback checks.
+- [ ] Native mechanobio_sim/infra_director report 26 of 28 ecology scenario pairs
+  returned with numerical gates passing; two were never started at the deadline.
+  Missing-only continuation is separate. These returned analyses await integration.
+- [ ] Google L4 calibrated CPU/CUDA parity and restart controls passed, but the
+  three-hour run admission failed its measured timing budget; no R2 scientific
+  run started under that admission. A separately declared overnight run is being
+  prepared. Nebius NCA H100 was admitted but still pulling its image at the latest
+  provider observation; no training result is claimed.
+- [ ] Compiler/layer lineage, 23-genome interpretation, independent R4 catch-wall
+  review and inverse-pattern learning remain active. The broad goal is unfinished.
+
+## Previous checkpoint — October 31, 2026, 6:11pm PDT
+
+- [x] Site/MCP release `5e27158` is live. Root ran 22 focused browser/blueprint
+  checks (85 deselected), then 8 deployed public-read checks and 37 MCP checks.
+  Desktop/mobile downloads were inspected: 49 links, no viewport overflow;
+  the headless browser used the labelled static-render fallback for the fish.
+- [x] Home now has a direct v3a scale-relief STL link and an expandable catalog
+  of print editions, stands and candidate GLBs next to the main viewer.
+  Manifest digests are checked before publication. The public repository is
+  `kganjam/delphi-frontier`; all new implementation stays there.
+- [x] Genetic blueprints, 19 regulatory actors, 47 claim-use rows, source links,
+  regulatory map, claim-reuse example and local OpenResearch provenance are live.
+  Root checked cached source digests/excerpt presence, not biological truth.
+- [x] Prospective experimental-design planner integrated from `cc12164`; root
+  ran its 10 focused tests. Its frozen comparison has no observations: mixed
+  load/deflection is identifiable under declared assumptions; repeated deflection
+  alone is not. This is model-based planning, not an empirical posterior.
+- [ ] Claude-02: contextual Experimentation UI; native resource_scaling: bounded
+  read-only MCP planner. Claude-14: pinned biodesign compiler and layer lineage.
+- [ ] Print priority: selected the larger-fin r3-daane geometry for a fit/balance
+  prototype. Independent review found right-fin STL chirality wrong in r1;
+  root reproduced it in r3. Claude-05 is producing additive r4-daane-printfix;
+  claude-13 reviews it. Corrected r4 bundle `bd2fcf3` is now shared for fit/balance only; root checked its public ZIP, six STL pins and nominal chirality. R3 body geometry is compatible. Catch-wall concern remains unresolved; launch is not cleared.
+  No printed mass, flight, catch-load survival or biological buildability claimed.
+- [ ] Native ecology canonical simulations/media `335648d` and packet `08e5b77`
+  await root integration; claude-10 builds the actual-state viewer. Native
+  mechanobio_sim is preparing a separate inverse-pattern NCA training protocol.
+- [ ] Infrastructure tip `56a1ed5` plus telemetry `5d37bca` awaits integration.
+  Secondary H100 evaluation completed; strict metric audit FAIL is retained:
+  zero-amplitude relative metrics are undefined and float32 rounding fails the
+  frozen float64 tolerance. Generated fields are finite; no blanket pass.
+- [x] Infra reports actual Google allocations: 16 vCPU CFD, 4 vCPU ecology,
+  4 vCPU plus one L4 for GPU calibration. L4 setup/controls are ongoing; physical
+  stock failures in two other zones were retained. At the delayed 6:05pm PDT
+  metric, CFD used 59.60% of its allocation and ecology 96.87% of its allocation.
+  These are host measurements, not completed-case counts or biological results.
+- [x] The Google 23-genome run completed with 23 archive MD5 checks. Claude-11
+  interprets the locus results; source coverage gaps are not gene-loss claims.
+- [ ] Integrate and publish corrected print bundle, ecology viewer, experimental
+  planner/UI, genomic result interpretation and actual diffusion visuals; preserve
+  failed simulations, unresolved connections, and independent review findings.
+
+## Previous checkpoint — October 31, 5:34pm PDT
 
 - [x] Site and MCP release `d531330` deployed: 13 website and 37 MCP checks
   passed. Transient contributor credentials and exact-version discussion/history

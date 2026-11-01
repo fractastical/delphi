@@ -6,6 +6,8 @@ call only existing fixed, bounded local adapters and return ephemeral results.
 """
 from __future__ import annotations
 
+import json
+import math
 from pathlib import Path
 from typing import Annotated, Literal
 
@@ -17,6 +19,87 @@ from .graph import catalogue_report, view as graph_view
 from .media import LocalMedia
 from .models import Ref
 from .store import FrontierError, Store
+
+MAX_DESIGN_REQUEST_BYTES = 64 * 1024
+MAX_DESIGN_DEPTH = 8
+MAX_DESIGN_NODES = 8192
+MAX_DESIGN_STRING_CHARS = 2048
+MAX_DESIGN_PARAMETERS = 8
+MAX_DESIGN_READOUTS = 12
+MAX_DESIGN_CANDIDATES = 12
+MAX_DESIGN_OBSERVATIONS = 32
+
+
+def _check_design_request_limits(contract: dict) -> None:
+    """Bound JSON traversal and matrix dimensions before numerical work starts."""
+    try:
+        encoded = json.dumps(contract, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8")
+    except (TypeError, ValueError, RecursionError):
+        raise ValueError("request must be finite JSON data") from None
+    if len(encoded) > MAX_DESIGN_REQUEST_BYTES:
+        raise ValueError("experimental-design request exceeds 65,536 bytes")
+
+    nodes = 0
+
+    def visit(value, depth: int) -> None:
+        nonlocal nodes
+        nodes += 1
+        if nodes > MAX_DESIGN_NODES:
+            raise ValueError("experimental-design request has too many values")
+        if depth > MAX_DESIGN_DEPTH:
+            raise ValueError("experimental-design request is nested too deeply")
+        if isinstance(value, str):
+            if len(value) > MAX_DESIGN_STRING_CHARS:
+                raise ValueError("experimental-design string exceeds 2,048 characters")
+        elif isinstance(value, dict):
+            if len(value) > 64:
+                raise ValueError("experimental-design object has too many fields")
+            for key, item in value.items():
+                if not isinstance(key, str) or len(key) > 64:
+                    raise ValueError("experimental-design object key is invalid or too long")
+                visit(item, depth + 1)
+        elif isinstance(value, list):
+            if len(value) > 64:
+                raise ValueError("experimental-design list exceeds 64 entries")
+            for item in value:
+                visit(item, depth + 1)
+        elif isinstance(value, float) and not math.isfinite(value):
+            raise ValueError("experimental-design numbers must be finite")
+        elif value is not None and not isinstance(value, (bool, int, float)):
+            raise ValueError("experimental-design request must contain JSON values only")
+
+    visit(contract, 0)
+    if not isinstance(contract, dict):
+        raise ValueError("contract must be an object")
+    parameters = contract.get("parameters")
+    if isinstance(parameters, dict) and isinstance(parameters.get("names"), list) and len(parameters["names"]) > MAX_DESIGN_PARAMETERS:
+        raise ValueError("experimental-design supports at most 8 parameters")
+    readouts = contract.get("readouts")
+    if isinstance(readouts, list) and len(readouts) > MAX_DESIGN_READOUTS:
+        raise ValueError("experimental-design supports at most 12 readouts")
+    designs = contract.get("designs")
+    if isinstance(designs, list):
+        if len(designs) > MAX_DESIGN_CANDIDATES:
+            raise ValueError("experimental-design supports at most 12 candidate designs")
+        for design in designs:
+            if not isinstance(design, dict):
+                continue  # The core validator will report its bounded shape error.
+            observations = design.get("observations")
+            if isinstance(observations, list) and len(observations) > MAX_DESIGN_OBSERVATIONS:
+                raise ValueError("each candidate supports at most 32 observation rows")
+            batches = design.get("batch_count")
+            if isinstance(batches, int) and not isinstance(batches, bool) and batches > 16:
+                raise ValueError("each candidate supports at most 16 batches")
+            if isinstance(observations, list):
+                for observation in observations:
+                    if isinstance(observation, dict):
+                        repeats = observation.get("technical_repeat")
+                        if isinstance(repeats, int) and not isinstance(repeats, bool) and repeats > 64:
+                            raise ValueError("technical_repeat is bounded to 64")
+    for field, maximum in (("source_claims", 64), ("input_datasets", 64)):
+        values = contract.get(field)
+        if isinstance(values, list) and len(values) > maximum:
+            raise ValueError(f"{field} supports at most {maximum} entries")
 
 
 def register_surfaces(server, store: Store, register, *, read_annotations, public_host: str | None = None) -> None:
@@ -114,7 +197,22 @@ def register_surfaces(server, store: Store, register, *, read_annotations, publi
         result["accepted"] = False
         return result
 
+    def frontier_plan_experiments(contract: Annotated[dict, Field(description=(
+            "One complete frontier.experimental-design.request/1 contract. Bounded prospective covariance only; response values, commands and arbitrary code are not accepted."))]) -> dict:
+        """Compare bounded linear-Gaussian experiment designs prospectively; returns no measurements and makes no Action, Store, lab or cloud writes."""
+        _check_design_request_limits(contract)
+        from engineering.experimental_design import plan_experiments
+        result = plan_experiments(contract)
+        result["mcp_policy"] = {
+            "persisted": False,
+            "accepted": False,
+            "observed_result": None,
+            "measurement_rows": [],
+            "scope": "Prospective covariance under the submitted assumptions only. This tool does not execute an experiment or queue its ActionProposal.",
+        }
+        return result
+
     for tool in (frontier_discover, frontier_graph, frontier_catalogue, frontier_project_inspect, frontier_design_context,
                  frontier_artifact_inspect, frontier_simulate, frontier_engineer, frontier_formalize,
-                 frontier_belief):
+                 frontier_belief, frontier_plan_experiments):
         register(tool, read_annotations, "read", None)

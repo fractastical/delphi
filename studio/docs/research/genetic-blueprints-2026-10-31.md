@@ -25,7 +25,7 @@ Response bytes are not in the repository; their sha256 values are pinned in `sou
 
 ## What the designs are
 
-Revision 2. Four proposed records: (1) a regeneration-enhancer reporter on a Tol2 plasmid; (2) the same architecture read in the developing pectoral fin field and the regenerating fin, to expose the gap; (3) an endogenous 2A-reporter knock-in at a locus to be chosen; (4) a reporter in a BAC clone integrated with Tol2. Every enhancer, locus, BAC clone, reporter and effector is left UNSPECIFIED because no source read supplies one. No Evo2 call was made or rerouted.
+Revision 2. Four proposed records: (1) a regeneration-enhancer reporter on a Tol2 plasmid; (2) the same architecture read in the developing pectoral fin field and the regenerating fin, to expose the gap; (3) an endogenous 2A-reporter knock-in at a locus to be chosen; (4) a reporter in a BAC clone integrated with Tol2. Design 1 uses a source-named candidate (the LEN enhancer from the TREE paper, with the lepb 2 kb promoter and EGFP; see the named-candidate section), with coordinates and sequence null because Methods and the supplement were not read. Design 2's comparator enhancers are root proposals. The knock-in locus (design 3) and the BAC clone (design 4) are left UNSPECIFIED because no source read names one for a fin trait. Effectors are none. No Evo2 call was made or rerouted.
 
 ## Comparison (not a ranking)
 
@@ -54,8 +54,13 @@ Each design now carries `cell_stage_specificity`, `off_target_coverage`, `expres
 4. Everything is *Danio rerio*; flying-fish transfer is unknown.
 5. Most sources are abstract-only; the BAC protocols, pIGLET results and per-pair promoter tables are unread.
 
+## Regulatory actors and claim-use ledger (revision 3)
+
+`regulatory_actors` in blueprints.json separates role (TF, enhancer, promoter, marker; no signal was found in any source read) from evidence class (measured, inferred, causal perturbation, proposed). Only fosl1a and lef1 carry a TF role. fosl1a has a motif-enrichment inference and a mutant with delayed whole-fin regeneration (PMC7047409, full-text passages; locator "full text"); lef1 is a TF by the multiome paper's GRN degree-centrality ranking only, an inference. sp7, msx1b, prrx1b, cldni and fras1 are cluster markers or labelling handles. tbx5a and hand2 are absent from every source read and stay marker-only from the root map row. `claim_use_ledger` has one row per citation: statement, read depth, evidence class, designs using it, and the missing bridge. Source passages are quoted briefly with a locator; the ledger paraphrases scope rather than expanding quotes.
+
 ## Revisions
 
 2026-10-31: first version.
 2026-10-31 (later): revision 1 additions: added pIGLET, the 2016 BAC plasmid set and the human artificial chromosome source; read the full text of PMC10211259; added the specificity, off-target and kinetics fields.
 2026-10-31 (revision 2): named the source LEN candidate with null coordinates; separated sourced from root-proposed choices; scoped the developmental-versus-regeneration negative; corrected read-level wording for PMC10211259 (full text read; the earlier text said abstract only); bound designs to map cell programs.
+2026-10-31 (revision 3): fixed the design summary sentence that said every enhancer was unspecified (contradicted the named LEN candidate); added regulatory actors and the claim-use ledger; PMC7047409 raised to full-text with a scoped read_scope (passages searched, body not fully read).

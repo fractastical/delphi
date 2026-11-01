@@ -57,7 +57,7 @@ async def verify(url: str, expanded: bool = False) -> dict:
                     expected = {"frontier_discover", "frontier_graph", "frontier_catalogue",
                                 "frontier_project_inspect", "frontier_artifact_inspect",
                                 "frontier_simulate", "frontier_engineer", "frontier_formalize",
-                                "frontier_belief", "frontier_design_context"}
+                                "frontier_belief", "frontier_design_context", "frontier_plan_experiments"}
                     check("expanded workspace tools discoverable", expected <= set(names))
                     discovery = value(await session.call_tool("frontier_discover", {"query": "fish"}))
                     check("discovery returns explicit mode without provider calls",
@@ -94,6 +94,18 @@ async def verify(url: str, expanded: bool = False) -> dict:
                     from frontier.beliefs import EXAMPLE_SCENARIO
                     belief = value(await session.call_tool("frontier_belief", {"scenario": EXAMPLE_SCENARIO}))
                     check("belief remains conditional and uncalibrated", belief["calibrated"] is False and belief["persisted"] is False)
+                    from engineering.experimental_design.cantilever_demo import build_cantilever_protocol
+                    plan = value(await session.call_tool("frontier_plan_experiments", {"contract": build_cantilever_protocol()}))
+                    designs = {row["id"]: row for row in plan["designs"]}
+                    check("experiment planner computes prospective rank comparison without observations or writes",
+                          plan["status"] == "prospective_assumption_based"
+                          and plan["selected_design_id"] == "mixed_load_deflection"
+                          and designs["deflection_only"]["identifiability"]["rank"] == 1
+                          and designs["mixed_load_deflection"]["identifiability"]["rank"] == 2
+                          and plan["measurement_rows"] == [] and plan["mcp_policy"]["persisted"] is False)
+                    responses["experiment_plan"] = {"protocol_sha256": plan["protocol_sha256"],
+                                                      "selected_design_id": plan["selected_design_id"],
+                                                      "sha256": hashlib.sha256(json.dumps(plan, sort_keys=True).encode()).hexdigest()}
                     model = Path(__file__).resolve().parents[1] / "site/artifacts/print/stl/A-precursor-short-fin.stl"
                     digest = hashlib.sha256(model.read_bytes()).hexdigest()
                     artifact = value(await session.call_tool("frontier_artifact_inspect", {"sha256": digest}))

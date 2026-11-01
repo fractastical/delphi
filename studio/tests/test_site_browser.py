@@ -70,7 +70,7 @@ def test_build_is_current_and_portable():
 
 def test_every_view_renders_without_errors(browser, base):
     pg = page(browser)
-    for route in ["blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["experimentation", "demo", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1, #main h2", timeout=5000)
         assert pg.locator("#main").inner_text().strip(), route
@@ -308,7 +308,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["home", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "experimentation", "demo", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -896,7 +896,12 @@ def test_system_built_tab_links_evidence_keeps_failures_and_labels_the_repo_publ
     assert "ResourceExhausted" in t and "UREQ_TOS_NOT_ACCEPTED" in t and "INCONCLUSIVE" in t and "POSITIVE" in t
     assert "actual spend" in t.lower() or "Unknown" in t
     assert pg.locator("tbody tr").count() >= 13
-    assert pg.locator(".tablewrap td:has-text('preregistered')").count() == 0   # date-only verdicts are not placed on the dated timeline
+    timeline = json.loads((ROOT / "site/data/snapshot.json").read_text())["timeline"]
+    # A dated telemetry filename may contain "preregistered". Check the actual
+    # invariant: date-only verdicts are not promoted onto the timed record.
+    assert all("T" in row["time"] for row in timeline["rows"])
+    dated = pg.locator("table").filter(has=pg.locator("caption", has_text="Dated build and run records"))
+    assert dated.locator("tbody tr").count() == len(timeline["rows"])
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
 
 
@@ -940,7 +945,7 @@ def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, b
     pg.wait_for_selector(".aboutmenu summary")
     pg.focus(".aboutmenu summary"); pg.keyboard.press("Enter")
     hrefs = pg.locator(".aboutmenu details[open] a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
-    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative"]
+    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative", "#/demo"]
     assert pg.locator("nav[aria-label=Views] > ul > li > a:has-text('Generative')").count() == 0   # not a top-level item
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
     pg2 = page(browser, 400, 800)
@@ -956,7 +961,10 @@ def test_system_built_tab_reports_counters_only_with_unknowns_and_no_scorecard(b
     for q in ("Agents", "Model calls and tokens", "GPU jobs (own H100)", "GPU container work seconds", "CPU jobs (own)", "GPU utilisation", "Cost"):
         assert q in t, q
     assert "CPU seconds are not recorded: unknown" in t and "Total distinct agents and currently active agents: unknown" in t
-    assert "3184.1 s across 9 completed GPU jobs" in t and "historical team jobs listed separately" in t and "GPU kernel seconds and billed GPU seconds: unknown" in t and "not a count of agents" in t and "Provider COMPLETED means the container ended" in t and "Reuse by anyone outside this team is not recorded" in t
+    timeline = json.loads((ROOT / "site/data/snapshot.json").read_text())["timeline"]
+    for counter in timeline["counters"]:
+        assert counter["value"] in t
+    assert "historical team jobs" in t and "GPU kernel seconds and billed GPU seconds: unknown" in t and "not a count of agents" in t and "Provider COMPLETED means the container ended" in t and "Reuse by anyone outside this team is not recorded" in t
     assert "%" not in pg.locator(".tablewrap").first.text_content()
     assert "scorecard" not in t.lower() and "rubric" not in t.lower()
 
@@ -1353,6 +1361,17 @@ def test_home_offers_the_v3_display_props_with_hash_exact_stl_downloads(browser,
             assert len(b) == x["bytes"] and hashlib.sha256(b).hexdigest() == x["sha256"], x["href"]
     pg = page(browser)
     pg.goto(base + "#/home"); pg.wait_for_selector(".printv3 select")
+    catalog = snap["model_downloads"]
+    assert not catalog["refused"]
+    links = pg.locator("#home-model-downloads a[download]").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert {"artifacts/print", "artifacts/print-v2", "artifacts/print-v3"} <= {g["id"] for g in catalog["groups"]}
+    for group in catalog["groups"]:
+        for file in group["files"]:
+            assert (file["href"] in links) != bool(file.get("withdrawn"))
+            data = (ROOT / "site" / file["href"]).read_bytes()
+            assert len(data) == file["bytes"] and hashlib.sha256(data).hexdigest() == file["sha256"]
+    assert pg.locator("#home-model-downloads").evaluate("e => !!(e.compareDocumentPosition(document.querySelector('#fishmini')) & Node.DOCUMENT_POSITION_FOLLOWING)")
+    assert pg.locator("#home-model-downloads > p a").first.is_visible()
     assert pg.locator(".printv3 option").all_inner_texts() == ["fish3d-v3a-fan-prop", "fish3d-v3b-glide-pose-prop"]
     assert pg.locator(".printv3 .v3links a[download]").count() == 3
     pg.select_option(".printv3 select", "fish3d-v3b-glide-pose-prop")
@@ -1360,6 +1379,23 @@ def test_home_offers_the_v3_display_props_with_hash_exact_stl_downloads(browser,
     assert all("fish3d-v3b-glide-pose-prop" in h and h.endswith(".stl") for h in hrefs), hrefs
     assert "printer and resin unknown" in pg.locator(".printv3").text_content() and "not organisms" in pg.locator(".printv3 .v3info").text_content()
     assert pg.request.get(base + hrefs[0]).status == 200
+
+
+def test_generative_page_shows_recorded_denoising_and_retains_failed_audit(browser, base):
+    import hashlib
+    pilot = json.loads((ROOT / "site/data/snapshot.json").read_text())["diffusion_pilot"]
+    assert not pilot["refused"]
+    for file in pilot["files"]:
+        data = (ROOT / "site" / file["href"]).read_bytes()
+        assert len(data) == file["bytes"] and hashlib.sha256(data).hexdigest() == file["sha256"]
+    pg = page(browser)
+    pg.goto(base + "#/generative")
+    pg.wait_for_selector("#diffusion-recorded img")
+    text = pg.locator("#diffusion-recorded").text_content()
+    assert "Strict secondary audit: failed" in text and "Denoising steps are not physical time" in text
+    assert "No inference speedup demonstrated" in text
+    assert "157 finite DDPM metrics" in text and "zero solver-amplitude denominator" in text
+    assert pg.locator("#diffusion-recorded img").count() == 3
 
 
 def test_morpheus_full_horizon_chart_is_labelled_a_chart_not_a_spatial_movie(browser, base):
@@ -1424,7 +1460,7 @@ def test_fish_history_lists_only_stated_lineage_and_separates_siblings_revisions
     H = snap["fish_history"]
     # every edge is backed by the manifest field it names: re-read the manifests, do not trust the snapshot
     p2 = json.loads((ROOT / "artifacts/print-v2/manifest.json").read_text())["edition"]["supersedes"]
-    rev = {(e["from"], e["to"]) for e in H["edges"] if e["relation"] == "revision"}
+    rev = {(e["from"], e["to"]) for e in H["edges"] if e["relation"] == "revision" and not e["from"].startswith("glider-")}
     assert rev == set(p2.items()) and len(rev) == 6
     v3 = json.loads((ROOT / "artifacts/fish3d/v3-index.json").read_text())
     for vid in v3["candidates"]:
@@ -1433,13 +1469,23 @@ def test_fish_history_lists_only_stated_lineage_and_separates_siblings_revisions
     props = json.loads((ROOT / "artifacts/print-v3/downloads.json").read_text())["forms"]
     for f in props:
         assert any(e["from"] == f["id"] and e["to"] == f["source_candidate"] and e["relation"] == "printed from" for e in H["edges"])
-    assert H["launch_prototype"]["exists"] is False
+    assert H["launch_prototype"]["exists"] is True and len(H["launch_prototype"]["revisions"]) == 5
+    gl = {m["id"]: json.loads((ROOT / f"artifacts/glider/{m['id']}/manifest.json").read_text()) for m in []}
+    import pathlib
+    man = {d.name: json.loads((d / "manifest.json").read_text()) for d in (ROOT / "artifacts/glider").iterdir() if (d / "manifest.json").exists()}
+    for rid, m in man.items():
+        edge = [e for e in H["edges"] if e["from"] == "glider-" + rid and e["relation"] == "revision"]
+        assert (not m["parent_revision"] and not edge) or (len(edge) == 1 and edge[0]["to"] == "glider-" + m["parent_revision"]), rid
+    known = json.loads((ROOT / "artifacts/glider/KNOWN_DEFECTS.json").read_text())
+    bad = set(known["right_hand_print_files_are_left_parts"]["revisions"])
+    flagged = {n["revision"] for n in H["nodes"] if n.get("known_defect")}
+    assert flagged == bad and "r4-daane-printfix" not in flagged
     pg = page(browser)
     pg.goto(base + "#/history"); pg.wait_for_selector("#fhgraph svg")
     t = pg.locator("#main").text_content()
-    assert "Chronological revision" in t and "Sibling variants" in t and "Derivation" in t and "not a launch prototype" in t and "No launch-prototype artifact is in the tree" in t
+    assert "Chronological revision" in t and "Sibling variants" in t and "Derivation" in t and "not a launch prototype" in t and "Launch glider print sets exist as manifests" in t and "untested" in t
     assert "not the date the design was made" in t or "not a design date" in t or "a repository fact" in t
-    assert pg.locator("#fhgraph .g-node").count() == len(H["nodes"]) == 18
+    assert pg.locator("#fhgraph .g-node").count() == len(H["nodes"]) == 23
     pg.goto(base + "#/history?sel=fish3d-v3a-fan-prop"); pg.wait_for_selector("#fhdetail h3")
     d = pg.locator("#fhdetail").text_content()
     assert "fish3d-v3a-fan-prop" in d and "printed from" in d and "fish3d-v3a-fan" in d and "artifacts/print-v3/downloads.json" in d
@@ -1521,8 +1567,14 @@ def test_genetic_blueprints_show_construct_blocks_unknowns_equations_and_no_sequ
     assert "proposed, not executed" in t or "proposed design, NOT executed" in t
     assert pg.locator("mark.unk").count() >= 20, "unknowns must be conspicuous"
     assert "No DNA sequence, effector, coefficient or result is given" in t and "flying-fish transfer: unknown; not claimed" in t
-    assert pg.locator("section[aria-labelledby=bp-eq] .katex").count() >= 2 and pg.locator("section[aria-labelledby=bp-eq] tbody tr").count() == 4 and "not declared" in pg.locator("section[aria-labelledby=bp-eq]").text_content()
-    assert "A BAC" not in t or "autonomous" in t
+    assert pg.locator("section[aria-labelledby=bp-eq] .katex").count() >= 2 and pg.locator("section[aria-labelledby=bp-eq] tbody tr").count() == 4
+    eq = pg.locator("section[aria-labelledby=bp-eq]").text_content()
+    for u in ("transcripts per cell per second", "per second (s⁻¹)", "protein molecules per transcript per second", "transcript count per cell", "protein molecules per cell", "time in seconds"):
+        assert u in eq, u
+    assert "does not supply a value" in eq and pg.locator("section[aria-labelledby=bp-eq] mark.unk").count() >= 8, "units declared, values still unknown"
+    assert "do not change" not in t and "They can change copy number, integration locus and therefore expression" in t
+    links = pg.locator("section[aria-labelledby=bp-src] td[data-label=Source] a").evaluate_all("els => els.map(e => e.href)")
+    assert links and all(h.startswith("https://") for h in links) and len(links) == len(src["citation_table"]) > 0, links
     import re
     assert not re.search(r"\b[ACGT]{20,}\b", t), "no DNA sequence may appear"
     assert len(src["comparison"]["rows"]) >= 6
@@ -1533,3 +1585,337 @@ def test_genetic_blueprints_show_construct_blocks_unknowns_equations_and_no_sequ
     assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
     pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
     assert pg.locator(".subnav a:has-text('Genetic blueprints')").count() == 1
+
+
+def test_openresearch_exemplars_are_local_recorder_provenance_not_a_cloud_dispatcher(browser, base):
+    O = json.loads((ROOT / "site/data/snapshot.json").read_text())["openresearch"]
+    facts = json.loads((ROOT / "connectors/biomodels/orx/orx_facts.json").read_text())
+    assert len(O["exemplars"]) == 2 and O["exemplars"][0]["commit"] == facts["commit_sha"]
+    assert [x["sha256"] for x in O["exemplars"][0]["outputs"]] == [x["sha256"] for x in facts["outputs"]]
+    assert all(e["backend"] == "local_job" for e in O["exemplars"])
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=built"); pg.wait_for_selector("#bt-h")
+    t = pg.locator("#main").text_content()
+    assert "Recorded OpenResearch runs (local exemplars)" in t and "not a cloud dispatcher" in t and "none of these runs used a remote backend" in t
+    assert "database exit code null" in t and "Collier 1996 replay v4" in t and "Neumann-mode Turing scan" in t
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/work?tab=built"); pg2.wait_for_selector("#bt-h")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+
+
+_FOCUS_JS = """() => { const e = document.activeElement; if (!e || e === document.body) return null; const cs = getComputedStyle(e); const r = e.getBoundingClientRect();
+  return {tag: e.tagName, ring: (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0) || cs.boxShadow !== 'none', vis: cs.visibility !== 'hidden' && r.width > 0}; }"""
+
+
+def test_every_keyboard_stop_has_a_visible_focus_style_on_a_phone(browser, base):
+    """The video element itself must show our ring when it first takes focus. Further Tab presses move through the browser's own media controls
+    (activeElement stays the same <video>), which the browser styles; those are not counted as page stops."""
+    for route in ("#/home", "#/frontier", "#/simulations", "#/studio/flying-fish"):
+        pg = page(browser, 400, 860); pg.goto(base + route); pg.wait_for_timeout(1200)
+        bad = []; last = None
+        for _ in range(45):
+            pg.keyboard.press("Tab")
+            ident = pg.evaluate("(() => { const e = document.activeElement; if (!e || e === document.body) return null; if (!e.__stop) e.__stop = Math.random(); return e.__stop; })()")
+            r = pg.evaluate(_FOCUS_JS)
+            if ident is not None and ident == last:
+                continue                                   # same element still active: focus is inside its native controls
+            last = ident
+            if r and r["vis"] and not r["ring"]:
+                bad.append(r["tag"])
+        assert bad == [], (route, bad)
+        pg.close()
+
+
+def test_bare_graph_route_makes_no_unnamed_link_and_the_skip_link_keeps_the_route(browser, base):
+    pg = page(browser)
+    pg.goto(base + "#/graph"); pg.wait_for_selector("h1:has-text('Neighbourhood graph')")
+    hrefs = pg.locator("#main a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert all(h and h != "#/entity//" and "entity//" not in h for h in hrefs) and "No record is selected" in pg.locator("#main").text_content()
+    pg = page(browser)                                  # a fresh page: Tab starts from the top of the document
+    pg.goto(base + "#/frontier"); pg.wait_for_selector(".board")
+    pg.keyboard.press("Tab")
+    assert pg.evaluate("document.activeElement.className") == "skip" and pg.locator(".skip").is_visible()
+    pg.keyboard.press("Enter")
+    assert pg.evaluate("document.activeElement.id") == "main" and pg.evaluate("location.hash") == "#/frontier", "the skip link must move focus without changing the route"
+
+
+def test_a_failed_script_shows_a_retry_message_not_a_blank_page(browser, base):
+    pg = page(browser)
+    pg.route("**/js/util.js", lambda r: r.fulfill(status=429, body="Too Many Requests"))
+    pg.goto(base + "#/frontier")
+    pg.wait_for_selector(".bootfail", timeout=15000)
+    t = pg.locator(".bootfail").text_content()
+    assert "could not finish loading" in t and "util.js" in t and pg.locator(".bootfail button:has-text('Try again')").count() == 1
+
+
+def test_session_limit_shows_a_retry_state_and_public_reads_stay_available(browser, base):
+    calls = {"n": 0}
+
+    def session(route):
+        calls["n"] += 1
+        route.fulfill(status=429, json={"error": "rate_limited", "message": "slow down"}) if calls["n"] < 3 else route.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"})
+    pg = page(browser)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", session)
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": "n", "next_cursor": None, "results": []}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.goto(base + "#/home")
+    pg.wait_for_selector("#sessbanner button:has-text('Retry')", timeout=15000)
+    t = pg.locator("#sessbanner").text_content()
+    assert "limiting new browser sessions" in t and "snapshot still work" in t and "sign in" not in t.lower()
+    assert pg.locator("h1").count() >= 1, "pages still draw while the session is limited"
+    pg.click("#sessbanner button")
+    pg.wait_for_function("!document.querySelector('#sessbanner')", timeout=15000)
+
+
+def test_blueprints_show_actors_claim_ledger_cell_programs_and_filters_that_are_not_validation(browser, base):
+    src = json.loads((ROOT / "artifacts/genetic-blueprints/blueprints.json").read_text())
+    G = json.loads((ROOT / "site/data/snapshot.json").read_text())["genetic_blueprints"]
+    assert len(G["actors"]["actors"]) == len(src["regulatory_actors"]["actors"]) > 0 and len(G["claim_ledger"]["rows"]) == len(src["claim_use_ledger"]["rows"]) > 0 and len(G["cell_programs"]) == len(src["cell_program_blueprints"]) > 0
+    pg = page(browser)
+    pg.goto(base + "#/blueprints"); pg.wait_for_selector("section[aria-labelledby=bp-act]")
+    t = pg.locator("#main").text_content()
+    assert pg.locator("section[aria-labelledby=bp-act] tbody tr").count() == len(G["actors"]["actors"])
+    assert pg.locator("section[aria-labelledby=bp-led] tbody tr").count() == len(G["claim_ledger"]["rows"])
+    assert pg.locator("section[aria-labelledby=bp-cpb] article").count() == len(G["cell_programs"])
+    assert "NONE identified" in t and "A marker or an inferred network role is not a validated driver" in t and "UNDECLARED" in t
+    roles = set(pg.locator("section[aria-labelledby=bp-act] td[data-label=Role]").all_inner_texts())
+    assert {"TF", "marker"} <= {r.strip() for r in roles}
+    d1 = "bp-1-regeneration-enhancer-reporter"
+    pg.goto(base + f"#/blueprints?design={d1}"); pg.wait_for_selector(".bpdesign")
+    t = pg.locator("#main").text_content()
+    assert pg.locator(".bpdesign").count() == 1 and "Filtered view" in t and "not validated expression" in t and "nothing here shows measured expression of any construct" in t
+    n_led = pg.locator("section[aria-labelledby=bp-led] tbody tr").count()
+    assert 0 < n_led < len(G["claim_ledger"]["rows"])
+    pg.goto(base + "#/blueprints?region=pectoral"); pg.wait_for_selector(".bptools")
+    t = pg.locator("#main").text_content()
+    assert "Filtered view" in t and ("No design in this package binds that region" in t or pg.locator(".bpdesign").count() >= 1)
+    pg.goto(base + "#/blueprints?cls=measured"); pg.wait_for_selector(".bptools")
+    assert set(pg.locator("section[aria-labelledby=bp-act] td[data-label='Evidence class']").all_inner_texts()) <= {"measured"}
+    pg.goto(base + "#/home"); pg.wait_for_selector("#regctx")
+    hrefs = pg.locator("#regctx a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert any(h.startswith("#/blueprints?region=") for h in hrefs) and "#/regulatory" in hrefs
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/blueprints"); pg2.wait_for_selector(".bptools")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+
+
+def test_experimentation_page_keeps_context_states_absence_and_invents_no_observation(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    X = snap["experimentation"]
+    spec = (ROOT / "specs/SPEC-013-adaptive-experimentation.md").read_text()
+    assert len(X["bridges"]) == 7 and all(b["bridge"] in spec for b in X["bridges"])
+    pg = page(browser)
+    pg.goto(base + "#/experimentation?scale=organ&region=pectoral-fin-field&intervention=loading"); pg.wait_for_selector("#ex-cur")
+    t = pg.locator("#main").text_content()
+    assert "Plans, not results" in t and "no wet-lab observation has been made" in t and "scale Organ" in t and "pectoral-fin-field" in t and "loading" in t
+    if X["planner"] is None:
+        assert "No candidate intervention, readout, control or replicate unit is recorded" in t and "nothing is invented" in t
+    assert "Wet-lab protocols frozen" in t and "Computational protocols frozen" in t and "0: no observation exists" in t and "Results ingested" in t and "proposal → ready → running → failed → completed → review" in t
+    pg.click("a:has-text('Across scales')"); pg.wait_for_selector("#ex-br")
+    assert pg.locator("section[aria-labelledby=ex-br] tbody tr").count() == 7 and "unknown bridge" in pg.locator("#main").text_content()
+    assert "scale=organ" in pg.evaluate("location.hash") and "region=pectoral-fin-field" in pg.evaluate("location.hash") and "tab=cross" in pg.evaluate("location.hash")
+    pg.select_option("form[data-form=ex] select[name=scale]", "cellular"); pg.click("form[data-form=ex] button[type=submit]")
+    pg.wait_for_function("location.hash.includes('scale=cellular')")
+    assert "region=pectoral-fin-field" in pg.evaluate("location.hash"), "changing the scale keeps the region"
+    pg.goto(base + "#/studio/flying-fish?scale=tissue"); pg.wait_for_selector(".subnav")
+    assert pg.locator(".subnav a[href*='experimentation'][href*='scale=tissue']").count() == 1
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/experimentation?tab=cross"); pg2.wait_for_selector("#ex-br")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+
+
+def test_experimentation_renders_the_planner_result_prospective_only(browser, base):
+    r = json.loads((ROOT / "artifacts/experimental-design/result.json").read_text())
+    by = {d["id"]: d for d in r["designs"]}
+    assert r["measurement_rows"] == [] and r["selected_design_id"] == "mixed_load_deflection"
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        pg.goto(base + "#/experimentation?scale=organ"); pg.wait_for_selector("#ex-plan")
+        t = pg.locator("#ex-plan").text_content()
+        for did, d in by.items():
+            row = pg.locator(f"#plan-{did}").text_content()
+            assert str(float(f"{d['expected_target_posterior_variance']:.6g}")) in row and str(d["identifiability"]["rank"]) + " of 2" in row, did
+        assert "prospective only" in t and "assumption based" in t and "0 measurement rows" in t
+        assert "selected under these assumptions" in pg.locator("#plan-mixed_load_deflection").text_content()
+        assert "selected under" not in pg.locator("#plan-deflection_only").text_content() and "nullspace" in pg.locator("#plan-deflection_only").text_content()
+        assert "probability of biological success" in t or "probability of biological success" in pg.locator("#main").text_content()
+        assert "matches the planner manifest" in t
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
+
+
+def test_ecology_page_plays_published_saved_states_and_keeps_limits(browser, base):
+    run = ROOT / "artifacts/ecology/run-refined"
+    summ = json.loads((run / "summary.json").read_text())
+    rec = {f["path"]: f["sha256"] for f in json.loads((run / "receipt.json").read_text())["files"]}
+    for w in (1280, 400):
+        pg = page(browser, w, 900); errs = []
+        pg.on("pageerror", lambda e: errs.append(str(e)))
+        pg.on("response", lambda r: errs.append(f"{r.status} {r.url}") if r.status >= 400 and "/api/" not in r.url else None)
+        pg.goto(base + "#/ecology"); pg.wait_for_selector("#eco-host .ev-cases button", timeout=20000)
+        assert pg.locator("#eco-host .ev-cases button").count() == 4
+        pg.locator("#eco-host canvas").first.wait_for(timeout=20000)
+        t = pg.locator("#main").text_content()
+        assert "computed reduced model" in t and "empirical validation: unknown" in t and "not stated" not in t.split("What each run ended on")[1].split("Rendered movies")[0]
+        for cid, s in summ.items():
+            row = pg.locator(f"#eco-{cid}").text_content()
+            assert s["main"]["termination_reason"] in row and str(float(f"{s['main']['last_time_s']:.4g}")) in row, cid
+        assert pg.locator("section[aria-labelledby=eco-m] video").count() == 2
+        assert not errs, errs
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
+    for a in ("glide-passive", "escape-neighbors"):
+        b = (ROOT / f"site/artifacts/ecology/run-refined/{a}/trajectory.json").read_bytes()
+        import hashlib
+        assert hashlib.sha256(b).hexdigest() == rec[f"artifacts/ecology/run-refined/{a}/trajectory.json"]
+
+
+def test_demo_page_empty_state_is_honest_and_entry_points_exist(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    pg = page(browser, 1280, 900)
+    pg.goto(base + "#/demo"); pg.wait_for_selector("#main h1")
+    t = pg.locator("#main").text_content()
+    if not (snap.get("demo_videos") or {}).get("cuts"):
+        assert "No demo video is published in this snapshot yet" in t and pg.locator("video").count() == 0
+    pg.goto(base + "#/home"); pg.wait_for_selector(".herowatch a")
+    assert pg.locator(".herowatch a").get_attribute("href").endswith("#/demo")
+    pg.locator(".aboutmenu summary").click()
+    assert pg.locator(".aboutmenu a[href$='#/demo']").count() == 1
+    assert not pg.errors, pg.errors
+
+
+def test_demo_page_shows_published_cuts_with_controls_downloads_and_provenance(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    mp4 = "artifacts/simulations/windtunnel-2d/windtunnel.mp4"; poster = "artifacts/simulations/windtunnel-2d/poster.png"
+    snap["demo_videos"] = {"cuts": [
+        {"id": "frontier-120s", "title": "Long tour & more", "duration_s": 120.0, "href": mp4, "poster_href": poster, "subtitles_href": "data/catalog.json", "transcript_href": "data/snapshot.json", "manifest_href": "data/snapshot.json"},
+        {"id": "frontier-60s", "title": "Short tour", "duration_s": 60.0, "href": mp4, "poster_href": poster, "subtitles_href": None, "manifest_href": "data/snapshot.json"}],
+        "limits": ["The video describes the site; it adds no evidence."]}
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        pg.route("**/data/snapshot.json", lambda r: r.fulfill(json=snap))
+        pg.goto(base + "#/demo"); pg.wait_for_selector("#demo-video")
+        # no cut parameter: the compact 60 s cut plays, and the CTA offers the long one
+        assert pg.locator(".democut[aria-current=page]").text_content().startswith("1 minute") and pg.locator("#demo-switch").text_content() == "Watch the full 2-minute tour"
+        assert "cut=frontier-120s" in pg.locator("#demo-switch").get_attribute("href")
+        assert pg.locator("#demo-video").get_attribute("controls") is not None and pg.locator("#demo-video").get_attribute("poster") == poster
+        assert [pg.locator(".demostory li b").nth(i).text_content() for i in range(4)] == ["Goal", "Multiscale evidence", "Next experiment", "Reusable agent work"]
+        # concept headline; the film comes before the story cards and starts inside the first screen on desktop
+        assert "A design studio for" in pg.locator("h1").text_content() and "Start with a flying fish" in pg.locator(".demohead .lede").text_content()
+        vt, st = pg.locator("#demo-video").bounding_box()["y"], pg.locator(".demostory").bounding_box()["y"]
+        assert vt < st and (w < 900 or vt < 600), (vt, st)
+        assert pg.locator(".democta a:has-text('Open the studio')").count() == 1
+        # both cuts are linked, and both have downloads
+        assert pg.locator(".democut").count() == 2 and pg.locator(".demodl li a[download][href$='windtunnel.mp4']").count() == 2
+        assert "burned into the video" in pg.locator("figcaption").text_content() and "No separate caption track" in pg.locator("figcaption").text_content() and pg.locator("track").count() == 0
+        assert "Long tour & more" in pg.locator(".demotabs").text_content() and "&amp;" not in pg.locator(".demotabs").text_content()
+        assert pg.locator("#demo-fs").is_visible() and "Fullscreen" in pg.locator("#demo-fs").get_attribute("aria-label")
+        pg.click(".democut:has-text('2 minutes')"); pg.wait_for_selector(".democut[aria-current=page]:has-text('2 minutes')")
+        assert pg.locator("track[kind=captions]").count() == 1 and "cut=frontier-120s" in pg.evaluate("location.hash")
+        assert pg.locator("#demo-switch").text_content() == "Watch the 1-minute version"
+        assert pg.locator("a:has-text('Transcript (TXT)')").count() == 1 and pg.locator("a:has-text('Captions (VTT)')").count() == 1
+        pg.locator(".demolimits summary").click(); assert "adds no evidence" in pg.locator(".demolimits").text_content()
+        box = pg.locator("#demo-video").bounding_box()
+        assert box["width"] <= w and (w < 900 or box["width"] >= 640)
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
+
+
+def test_demo_page_with_the_published_snapshot_defaults_to_the_one_minute_cut(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    cuts = {c["id"]: c for c in (snap.get("demo_videos") or {}).get("cuts", [])}
+    if "frontier-60s" not in cuts:
+        return
+    pg = page(browser, 1280, 900)
+    pg.goto(base + "#/demo"); pg.wait_for_selector("#demo-video")
+    assert pg.locator("#demo-video source").get_attribute("src") == cuts["frontier-60s"]["href"]
+    assert pg.locator(".demodl li").count() == len(cuts) and pg.locator(".demodl a[download]").count() >= len(cuts)
+
+
+
+def test_no_page_prints_markup_or_object_placeholders(browser, base):
+    import re as _re
+    bad = _re.compile(r"<span|</?b>|<a href|class=\"|\[object \w+\]")
+    pg = page(browser, 1280, 900)
+    for r in ("blueprints", "blueprints?design=bp-2-development-versus-regeneration-contrast", "blueprints?region=pectoral-fin-field", "regulatory", "reuse", "history", "experimentation", "experimentation?tab=cross", "ecology", "formalize", "engineering", "simulations", "studio/flying-fish"):
+        pg.goto(base + "#/" + r); pg.wait_for_selector("#main h1"); pg.wait_for_timeout(500)
+        t = pg.locator("#main").text_content()
+        m = bad.search(t)
+        assert not m, (r, t[max(0, m.start() - 80):m.start() + 80])
+
+
+def test_engineering_cell_tab_opens_cellular_and_names_its_group(browser, base):
+    pg = page(browser, 1280, 900)
+    pg.goto(base + "#/engineering?scale=organism"); pg.wait_for_selector(".tabs7")
+    pg.click(".tabs7 a:text-is('Cell')")
+    pg.wait_for_selector(".scalecard h3")
+    assert pg.locator(".scalecard h3").text_content() == "Cellular scale" and "scale=cellular" in pg.evaluate("location.hash")
+    t = pg.locator("#main").text_content()
+    assert "The Cell tab holds 2 scales: Subcellular and Cellular" in t
+    pg.goto(base + "#/engineering?scale=subcellular"); pg.wait_for_selector(".scalecard h3")
+    assert pg.locator(".scalecard h3").text_content() == "Subcellular scale"
+    assert pg.locator(".tabs7 a[aria-current=page]").text_content() == "Cell"
+
+
+def test_ecology_uncertainty_section_states_scope_and_matches_the_aggregate(browser, base):
+    import hashlib
+    eco = ROOT / "artifacts/ecology"
+    agg = json.loads((eco / "uncertainty-aggregate/summary.json").read_text())
+    want = {f["path"]: f["sha256"] for f in json.loads((eco / "uncertainty-manifest.json").read_text())["files"]}
+    for rel in ("uncertainty-aggregate/paired-sensitivity.png", "uncertainty-aggregate/summary.json", "uncertainty-initial/paired-sensitivity.png"):
+        b = (ROOT / "site/artifacts/ecology" / rel).read_bytes()
+        assert hashlib.sha256(b).hexdigest() == want[f"artifacts/ecology/{rel}"], rel
+    assert agg["scenario_count"] == agg["computed_count"] == 28 and len(agg["paired_comparisons"]) == 14
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        pg.goto(base + "#/ecology"); pg.wait_for_selector("#eco-u img")
+        t = pg.locator("#eco-u").text_content()
+        for must in ("assumed engineering scenarios", "not biological confidence", "edge of the reused VLM domain", "Interactions between settings are not estimated", "28 scenarios, 28 computed, 28 passing"):
+            assert must in t, must
+        assert pg.locator("#eco-u tbody tr").count() == 14
+        first = agg["paired_comparisons"][0]
+        row = pg.locator("#eco-u tbody tr").first.text_content()
+        assert str(float(f"{first['positive_work_difference_J']:.4g}")) in row and str(first["seed"]) in row
+        pg.locator("#eco-u img").evaluate("i => i.decode()")
+        assert pg.locator("#eco-u img").evaluate("i => i.naturalWidth") > 100
+        assert pg.locator("#eco-u a[href$='paired-sensitivity.provenance.json']").count() >= 1
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
+
+
+def test_studio_scale_selector_is_near_the_top_and_the_selected_scale_leads_with_equations(browser, base):
+    for w, h in ((1440, 900), (390, 800)):
+        pg = page(browser, w, h)
+        pg.goto(base + "#/studio/flying-fish?scale=organ"); pg.wait_for_selector(".studiogrid")
+        rail, grid = pg.locator(".rail").bounding_box(), pg.locator(".studiogrid").bounding_box()
+        assert rail["y"] < (600 if w >= 900 else 750), (w, rail)
+        assert pg.locator(".projectwide").bounding_box()["y"] > grid["y"] + grid["height"] - 5       # project-wide panels moved below the workspace
+        for anchor in ("#assurance", "#annkind", "#simwidget"):
+            assert pg.locator(anchor).count() == 1, anchor
+        main = [t.strip() for t in pg.locator(".studiomain h3").all_text_contents()]
+        assert main.index("Equations and claims") < main.index("Parameters and unknowns") < main.index("Media") < main.index("Model"), main
+        if w >= 900:
+            top = pg.locator(".rail").bounding_box()["y"]
+            pg.mouse.wheel(0, 700); pg.wait_for_timeout(300)
+            assert abs(pg.locator(".rail").bounding_box()["y"] - 76) < 12 and top > 76, "rail stays in view on desktop"
+        else:
+            assert _overflow(pg) <= 0
+            for i in range(11):
+                assert pg.locator(".subsys").nth(i).bounding_box()["width"] <= w
+        pg.close()
+
+
+def test_studio_scale_selector_works_from_the_keyboard_and_keeps_deep_links(browser, base):
+    pg = page(browser, 1280, 900)
+    pg.goto(base + "#/studio/flying-fish?scale=organ"); pg.wait_for_selector(".subsys.on")
+    pg.locator(".subsys").nth(3).focus()                                   # Cellular
+    pg.keyboard.press("Enter"); pg.wait_for_selector(".studiomain h2:has-text('Cellular scale')")
+    assert "scale=cellular" in pg.evaluate("location.hash") and pg.locator(".subsys[aria-current=true]").count() == 1
+    assert pg.locator(".subsys[aria-current=true] b").text_content() == "Cellular"
+    pg.goto(base + "#/studio/flying-fish?scale=molecular"); pg.wait_for_selector(".studiomain h2:has-text('Molecular scale')")
+    assert pg.locator(".rail").count() == 1 and pg.locator("nav[aria-label='Subsystems by scale']").count() == 1

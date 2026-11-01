@@ -132,7 +132,8 @@ action submitted through this MCP server and that a different operator can accep
 
 ## Expanded read and calculation tools
 
-The server registers these 16 read-only tools in both stdio and remote modes.
+This implementation registers 17 read-only tools in both stdio and
+remote modes, including `frontier_plan_experiments`.
 Check `frontier_capabilities` on the actual server before relying on a tool,
 because subsequent deployment changes may differ from this dated record.
 
@@ -154,6 +155,7 @@ because subsequent deployment changes may differ from this dated record.
 | `frontier_engineer` | Existing finite aircraft-constraint calculation | Ephemeral exact-constraint result. The optional Z3 solver must be installed; otherwise the adapter returns a bounded `solver_unavailable` error. No biological validation is implied. |
 | `frontier_formalize` | Existing finite expression/formalization proposal | Ephemeral proposal; not a persisted or accepted formal Evidence record. |
 | `frontier_belief` | Existing finite scenario calculation | Conditional on declared inputs and explicitly uncalibrated; ephemeral and not accepted. |
+| `frontier_plan_experiments` | Prospective linear-Gaussian design comparison | Returns assumption-based covariance and rank diagnostics, no measurements or writes. Check the connected server's capabilities for availability. |
 
 Example calls through the official MCP SDK:
 
@@ -172,6 +174,41 @@ await session.call_tool("frontier_simulate", {
     "parameters": {"duration_ms": 30, "frame_count": 31},
 })
 ```
+
+### Prospective experiment planning
+
+The `frontier_plan_experiments` tool is implemented here and should
+be relied on only when `frontier_capabilities` lists it on the connected server.
+It accepts one complete `frontier.experimental-design.request/1` contract under
+the argument `contract`. The existing local planner validates exact source and
+context pins, dimensionless parameters, finite positive-semidefinite prior
+covariance, positive noise covariance, and candidate design shapes. The MCP
+wrapper applies additional resource bounds before matrix work:
+
+| Limit | Maximum |
+|---|---:|
+| Serialized request | 65,536 bytes |
+| Parameters / readouts / candidate designs | 8 / 12 / 12 |
+| Observation rows per candidate / batches | 32 / 16 |
+| Technical repeats / source Claims / input datasets | 64 / 64 / 64 |
+| String length / nesting depth | 2,048 characters / 8 |
+
+Example using the frozen mathematical cantilever protocol:
+
+```python
+await session.call_tool("frontier_plan_experiments", {
+    "contract": frozen_protocol,
+})
+```
+
+The result is `prospective_assumption_based`. It includes each candidate's
+prospective covariance, rank/nullspace diagnostics, and target-variance
+reduction per the declared cost unit. It has no measurement rows. Priors, noise,
+and costs remain submitted assumptions; the output is not an observed posterior
+or a probability of biological success. The embedded ActionProposal is
+unsubmitted and unlinked until exact Problem/Project refs are supplied. The tool
+does not create records, queue Actions, launch compute, call model providers, or
+execute experiments.
 
 Calculations return ephemeral outputs. To make a durable, reviewable
 contribution, an authenticated contributor can submit a typed `Evidence` or
