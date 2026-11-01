@@ -224,7 +224,11 @@ def lattice_controls(payload):
     checks["zero_load_geometry_exact"] = all(
         np.array_equal(lattices[n][k], zeros[n][k])
         for n in fins
-        for k in ["A", "B", "C", "N"]
+        for k in ["A", "B", "C"]
+    )
+    # deform renormalises normals, so a zero load moves them only at roundoff
+    checks["zero_load_normals_roundoff"] = all(
+        float(np.max(abs(lattices[n]["N"] - zeros[n]["N"]))) <= 1e-12 for n in fins
     )
     checks["zero_load_CL"] = (
         abs(zero_CL - rigid_CL) <= g["zero_load_CL_absolute_difference_max"]
