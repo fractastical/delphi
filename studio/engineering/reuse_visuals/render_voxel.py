@@ -135,6 +135,7 @@ class Scene:
             ax.plot(tc, xc, color=col, ls=ls, lw=1.2, label=lab + " [longitudinal pattern]")
         ax.axvline(0.25, color="#999", lw=0.8, ls=":")
         ax.text(0.26, ax.get_ylim()[1] * 0.9, "settle | actuate", fontsize=6.5, color="#666")
+        self.live = ax.text(0.02, 0.04, "", transform=ax.transAxes, fontsize=7, weight="bold")
         self.cur = ax.axvline(0, color="k", lw=1)
         ax.set_xlabel("simulation time (s)", fontsize=8)
         ax.set_ylabel("COM x change since actuation start (mm)", fontsize=8)
@@ -145,14 +146,14 @@ class Scene:
         self.ax_n.axis("off")
         self.ax_n.legend(*ax.get_legend_handles_labels(), loc="upper left", fontsize=6.6, frameon=False, borderaxespad=0)
         S = self.summ
-        lines = ["Net displacement over 5 cycles (BL = 40 mm centre span)", f"travelling {S['arm_A_candidates']['travelling']['body_lengths']:.4f} BL = {math.hypot(S['arm_A_candidates']['travelling']['net_dx_m'], S['arm_A_candidates']['travelling']['net_dy_m']) * 1e3:.3f} mm   longitudinal {S['arm_A_candidates']['longitudinal']['body_lengths']:.4f} BL",
+        lines = ["Net displacement over 5 cycles (BL = 40 mm centre span)", f"travelling {S['arm_A_candidates']['travelling']['body_lengths']:.4f} BL = {math.hypot(S['arm_A_candidates']['travelling']['net_dx_m'], S['arm_A_candidates']['travelling']['net_dy_m']) * 1e3:.3f} mm (full-run metric,\n  JSON endpoints 0.2500 to 1.4999 s; not a sampled frame)   longitudinal {S['arm_A_candidates']['longitudinal']['body_lengths']:.4f} BL",
                  f"B passive {S['controls']['B_passive_cte0']['body_lengths']:.6f}   C zero-amp {S['controls']['C_zero_amplitude']['body_lengths']:.6f}   (bound 0.01: met)",
                  f"D frictionless {S['controls']['D_frictionless']['body_lengths']:.1f}  (x,y constant: met)",
                  f"E zero gravity {S['controls']['E_zero_gravity']['body_lengths']:.4f}  bound 0.01: MISSED (recorded, not retuned)",
                  "Spatial refinement G (longitudinal): did not converge, 0.1532 -> 0.0188.", "Post-hoc: odd/even voxel-count parity supported; not a proof.",
                  "Post-hoc travelling, coarse 14.577 mm (0.3644 of 40 mm span) vs fine 16.848 mm", "(0.3744 of 45 mm span): the 2.74% compares different denominators;",
                  "raw SI differs 15.57%. One pattern, two grids: NOT convergence.",
-                 "Controls above use the longitudinal pattern; none was run on travelling.", "Damping is a numerical absolute-frame term, not fluid drag or swimming."]
+                 "Sampled states span 0.2554 to 1.4950 s, so the last frame is not the metric endpoint.", "Controls above use the longitudinal pattern; none was run on travelling.", "Damping is a numerical absolute-frame term, not fluid drag or swimming."]
         self.ax_n.text(0, 0.50, "\n".join(lines), fontsize=7.0, va="top", family="DejaVu Sans")
         eng = self.proto["engine"]
         f.text(0.02, 0.018, f"Engine {eng['name']} {eng['commit'][:10]} ({eng['licence_of_record'].split(' ')[0]}). E 1e5 Pa, rho 1e3, nu 0.35, mu 1.0/0.8 sourced from voxcraft demo base.vxa; "
@@ -175,6 +176,8 @@ class Scene:
         self.clock.set_text(f"sim t = {t:6.3f} s")
         self.note.set_text(f"{phase} | state {k + 1} of {len(self.arr)} | playback {self.arr[-1, 0, 0] / (len(self.arr) / FPS):.3f}x real time (slow motion)")
         self.cur.set_xdata([t, t])
+        ts, xs, _ = self.series["travelling"]
+        self.live.set_text(f"state t = {t:.4f} s: COM x {xs[k]:+.3f} mm (zero at sampled t = {ts[ts >= 0.25][0]:.4f} s)")
 
 
 def render(out: Path):
@@ -190,6 +193,8 @@ def render(out: Path):
         pr.stdin.write(np.asarray(s.fig.canvas.buffer_rgba()).tobytes())
         if k == n // 2:
             s.fig.savefig(out / MEDIA["poster"], dpi=100)
+    s.note.set_text(f"HOLD of the last recorded state, t = {s.arr[-1, 0, 0]:.6f} s; no later time is simulated here")
+    s.fig.canvas.draw()
     for _ in range(FPS * 2):                      # hold the last recorded state for 2 s
         pr.stdin.write(np.asarray(s.fig.canvas.buffer_rgba()).tobytes())
     pr.stdin.close()
