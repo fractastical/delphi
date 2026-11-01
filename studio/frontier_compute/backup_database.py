@@ -37,6 +37,7 @@ def capture(destination, *, socket='/data/services/delphi-frontier/run', port=54
         tables = [r[0] for r in connection.execute("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename")]
         counts = {name: connection.execute(sql.SQL('SELECT count(*) FROM public.{}').format(sql.Identifier(name))).fetchone()[0] for name in tables}
         private = connection.execute("SELECT visibility,count(*) FROM record_versions GROUP BY visibility").fetchall()
+        extensions = dict(connection.execute('SELECT extname,extversion FROM pg_extension ORDER BY extname').fetchall())
         execute('source_pg_dump', [pg / 'pg_dump', '-h', socket, '-p', port, '-U', 'frontier_app', '-Fc', '--snapshot', snapshot, '-f', raw, 'frontier'])
         connection.execute('ROLLBACK')
     cluster, unix = destination / 'scratch-cluster', destination / 'scratch-socket'
@@ -69,6 +70,7 @@ def capture(destination, *, socket='/data/services/delphi-frontier/run', port=54
         receipt = {'schema': 'frontier.logical-backup/1', 'captured_utc': datetime.now(timezone.utc).isoformat(),
                    'source_socket': socket, 'source_port': port, 'source_access': 'Repeatable-read read-only exported snapshot',
                    'table_counts': counts, 'private_record_counts': dict(private), 'raw_restore_counts_identical': True,
+                   'postgres_extensions': extensions,
                    'sanitized_table_counts': sanitized_counts, 'leases_invalidated': leases,
                    'sanitization': 'Scratch only: principals and idempotency response cache removed; lease fields cleared and leased/running actions marked expired. Scientific record versions/envelopes unchanged.',
                    'record_envelope_before_after_digest_identical': True,

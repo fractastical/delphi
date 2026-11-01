@@ -165,3 +165,11 @@ Ongoing Nebius/GCP scientific states that have not been returned remain remote-o
 existing bounded collectors must finish and produce a later recovery snapshot before those
 states can be called backed up. Returned partials are included; the Google lab is never the
 sole final destination for retained results.
+
+The first real separate-host service drill exposed a missing dependency: a vanilla PG16
+container cannot restore the `vector` extension. That failed attempt is retained. Production
+reports `plpgsql1.0` and `vector0.6.0`; the corrected drill selects the official
+[`pgvector/pgvector`](https://github.com/pgvector/pgvector) image tag `0.6.0-pg16`, records its
+actual immutable digest and PG minor version, and requires the restored extension versions to
+match. Future database receipts also record installed extensions. Do not omit pgvector when
+rebuilding the database; successful extraction alone would not have discovered this gap.

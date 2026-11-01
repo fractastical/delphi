@@ -19,6 +19,8 @@ import time
 import urllib.error
 import urllib.request
 
+PG_IMAGE = 'pgvector/pgvector:0.6.0-pg16'
+
 
 def sha(path):
     with Path(path).open('rb') as stream:
@@ -102,12 +104,12 @@ def check(restored, root, source_sha, dump_sha, video_sha):
         receipt['python_version'] = run('python_version', [python, '--version']).strip()
         for lib in (venv / 'lib').glob('python*/site-packages'):
             site.addsitedir(str(lib))
-        run('postgres_image_pull', ['docker', 'pull', 'postgres:16-bookworm'], timeout=300)
+        run('postgres_image_pull', ['docker', 'pull', PG_IMAGE], timeout=300)
         receipt['postgres_image_digest'] = run('postgres_image_identity', [
-            'docker', 'image', 'inspect', 'postgres:16-bookworm', '--format', '{{index .RepoDigests 0}}']).strip()
+            'docker', 'image', 'inspect', PG_IMAGE, '--format', '{{index .RepoDigests 0}}']).strip()
         for name in ('pgdata', 'sock'):
             (root / name).mkdir(mode=0o700)
-        run('postgres_start', ['docker', 'run', '--detach', '--rm', '--name', container,
+        run('postgres_start', ['docker', 'run', '--detach', '--name', container,
             '--label', 'frontier.recovery.check=' + suffix, '--network', 'none',
             '--user', f'{os.getuid()}:{os.getgid()}', '--cpus', '1', '--memory', '1g',
             '--memory-swap', '1g', '--pids-limit', '128', '--cap-drop', 'ALL',
@@ -115,13 +117,15 @@ def check(restored, root, source_sha, dump_sha, video_sha):
             '--mount', f'type=bind,src={root / "pgdata"},dst=/var/lib/postgresql/data',
             '--mount', f'type=bind,src={root / "sock"},dst=/var/run/postgresql',
             '--env', 'POSTGRES_USER=frontier_recovery', '--env', 'POSTGRES_DB=frontier',
-            '--env', 'POSTGRES_HOST_AUTH_METHOD=trust', 'postgres:16-bookworm',
+            '--env', 'POSTGRES_HOST_AUTH_METHOD=trust', PG_IMAGE,
             '-c', 'listen_addresses=', '-c', 'unix_socket_permissions=0700', '-c', 'shared_buffers=128MB'])
         container_started = True
         run('independent_expiry', ['systemd-run', '--user', '--unit', expire_unit, '--on-active=15m',
                                   '/usr/bin/docker', 'stop', '--time', '5', container])
         for _ in range(60):
-            ready = subprocess.run(['docker', 'exec', container, 'pg_isready', '-U', 'frontier_recovery'],
+            # The entrypoint briefly starts a temporary initialization server. Require final PID1.
+            ready = subprocess.run(['docker', 'exec', container, 'sh', '-c',
+                                   'test "$(head -n 1 /var/lib/postgresql/data/postmaster.pid 2>/dev/null)" = 1 && pg_isready -U frontier_recovery -d frontier'],
                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
             if ready.returncode == 0:
                 break
@@ -142,6 +146,10 @@ def check(restored, root, source_sha, dump_sha, video_sha):
             if counts != expected or conn.execute('SELECT count(*) FROM action_state WHERE lease_id IS NOT NULL').fetchone()[0]:
                 raise ValueError('Restored database counts or sanitized leases differ')
             namespace = conn.execute('SELECT namespace FROM node_config').fetchone()[0]
+            extensions = dict(conn.execute('SELECT extname,extversion FROM pg_extension ORDER BY extname').fetchall())
+            if extensions != {'plpgsql': '1.0', 'vector': '0.6.0'}:
+                raise ValueError('Required restored database extension versions differ')
+            receipt['postgres_extensions'] = extensions
         receipt['checks']['all18_counts_and_sanitized_leases'] = True
         receipt['table_counts_before_disposable_write'] = counts
         token = secrets.token_urlsafe(48)
@@ -248,7 +256,12 @@ def check(restored, root, source_sha, dump_sha, video_sha):
             if label.returncode == 0 and label.stdout.strip() == suffix:
                 stop = subprocess.run(['docker', 'stop', '--time', '5', container], capture_output=True, timeout=30)
                 receipt['cleanup']['owned_container_stop_exit'] = stop.returncode
+                with (root / 'postgres-container.log').open('wb') as stream:
+                    logs = subprocess.run(['docker', 'logs', container], stdout=stream, stderr=stream, timeout=15)
+                receipt['cleanup']['postgres_logs_exit'] = logs.returncode
                 if stop.returncode == 0:
+                    removed = subprocess.run(['docker', 'rm', container], capture_output=True, timeout=15)
+                    receipt['cleanup']['owned_container_remove_exit'] = removed.returncode
                     subprocess.run(['systemctl', '--user', 'stop', expire_unit + '.timer'], capture_output=True, timeout=15)
         receipt['finished_utc'] = datetime.now(timezone.utc).isoformat()
         save()
