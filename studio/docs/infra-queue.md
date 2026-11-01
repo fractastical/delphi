@@ -67,14 +67,14 @@ preserved and no new sequence-generation request is being routed elsewhere.
 - [x] Collect 26 of 28 paired ecology scenarios, including all trace files; preserve two unstarted deadline rows.
 - [x] Dispatch and collect the missing-only two-scenario ecology continuation. Combined coverage is28pairs/56simulations; the original partial is unchanged.
 - [x] Collect the original four-model NCA comparison: all52evaluations returned,0/48design checks passed. Preserve exact original archive and metadata-clipping failure.
-- [x] Admit a separate seed-placement comparison with unchanged source/criteria and reused evaluations; all52evaluations returned; native summary32/48design checks, independent audit pending.
+- [x] Admit a separate seed-placement comparison with unchanged source/criteria and reused evaluations; all52evaluations returned; 32/48design checks; native independent audit c34c372 retains left-half0/12.
 - [x] Admit Google L4 controls: pinned environment plus CPU and CUDA restart checks passed.
 - [x] Collect L4 same-state parity and calibration. Numerical controls passed; runtime NO-GO stopped R2 before any assay. Five later capacity attempts failed.
 - [x] Admit H100 controls/calibration only; actual Julia setup started, no R2cases selected.
 - [x] Collect H100 controls/timing: original numerical gates and5907s conservative runtime projection passed. Native rc10/providerFAILED preserve intentionally absent cases.
-- [ ] Complete production capability transport before the fullR2 assay.
-- [x] Admit and collect all36 aeroelastic CPU arms;161file hashes checked, independent numerical interpretation pending.
-- [ ] Admit the independent BETSE CPU packet after its frozen preflight. Metabolic worker is provider-stopped; no packet or alternate-provider replay.
+- [x] Freeze scoped production checkpoint transport after actual tiny upload, hash and cancellation checks; full-size scientific checkpoint transfer remains unmeasured.
+- [x] Admit and collect all36 aeroelastic CPU arms;161file hashes checked, native independent exact numerical reproduction a54f478 reported.
+- [x] Admit and collect all eight BETSE trajectories; preserve native render-stage failure. Local report/video recovery uses the existing arrays. Metabolic worker remains provider-stopped.
 - [ ] Collect the three already-running CPU cylinder cases and exact checkpoints.
 
 The angle batch requires a passing parity check in the same allocation. Its
@@ -111,12 +111,12 @@ cancelled. It runs inside capped systemd units on this host.
 The next 24-hour plan is the `preparation` array in
 [`results/infra/queue.json`](../results/infra/queue.json), with owners, prepared
 source/protocol commits, time estimates, admission requirements and stop gates.
-The original NCA comparison completed4models/52runs, with0/48 design predicates passing. The separately frozen seed-placement comparison is now admitted. The exact-W1 evaluation has returned with a
+The original NCA comparison completed4models/52runs, with0/48 design predicates passing. The separately frozen seed-placement comparison completed32/48design checks with the reused evaluation labels preserved. The exact-W1 evaluation has returned with a
 retained strict metric-audit failure. The missing-only ecology continuation completed its two pairs; combined coverage is28pairs, and the original26-pair partial run remains immutable. The local
 resolved-fin CFD protocol awaits its CPU controls and measured runtime; no extra
 GPU is reserved for an unprepared packet. Pressure-to-mechanics work reuses the
 returned 3D arrays with Reynolds-consistent units and explicit unresolved
-physical-reference/fin-resolution limits. No further molecular job is requested.
+physical-reference/fin-resolution limits. A new molecular protocol is only prospective; no additional packet is ready or admitted.
 
 At the 2026-10-31 16:26:01 PDT accounting refresh, current Frontier jobs and exact-record
 historical team jobs remain separate. The shared project's unmatched jobs are
@@ -129,3 +129,5 @@ At7:08pm PDT on October31, the two admitted H100 jobs were starting/provisioning
 At7:40pm PDT both H100 jobs were terminal: zero active Frontier GPU allocations. Seed-comparison telemetry measured87.91% GPU utilization over742samples from7:21:49–7:34:12pm PDT, including export. Tiny create-only resumable upload and restarted-controller cancellation passed actual GCS checks. Provider session TTL remains one week; the explicit cancellation deadline is an operator control, not a short provider expiry. Production adapter remains required.
 
 At7:55pm PDT the fullR2 job aijob-e00gjhtd6nk55b266v was IMAGE_PULLING after admission7:52:53. BETSE VM04 was installing dependencies; actual20vCPU allocated across it and the existing16vCPU CFD worker. Latest7:52pm CPU samples were58.48% of16 and21.99% of4; these sampled windows include setup and are not current kernel measurements. The next NCA curriculum evaluation is independently committed atf5db91a before its source packet/admission.
+
+At8:19:13pm PDT, three H100 jobs are admitted: NCA curriculum and the repaired R2 are IMAGE_PULLING, and the separately declared CUDA R1/M1/R3 comparison is PROVISIONING. None has current kernel telemetry yet. The original R2 admission was cancelled before science because its wrapper silently clipped a long budget; that defect and cancellation remain recorded. The control-arm first submission failed locally on total injection size, creating no cloud job; a tested operator/worker module split fixed that transport limit without changing its science. Google VM03 is the sole active16vCPU worker; its8:14pm sample was59.46%, approximately9.51busy CPUs. The8:17pm collected status retains all three original CPU cases running beyond their first checkpoint segments. BETSE VM04 has terminated after exporting all eight trajectories.
