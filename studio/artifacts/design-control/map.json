@@ -1,0 +1,1246 @@
+{
+ "aggregate_score": null,
+ "biological_success_probability": null,
+ "concept": {
+  "line": "Evidence-led science. Goal-driven engineering.",
+  "text": "Bottom-up: Delphi literature claims and equations. Top-down: design requirements. The gaps appear where they do not meet."
+ },
+ "confidence_percent": null,
+ "execution_note": "Work packages are independent exactly when their inputs lists are disjoint; wp-deformed-polar depends on two others. Nothing here is executed or decentralized: all rows are proposals.",
+ "layers": [
+  {
+   "bridges": [
+    {
+     "from": "expression",
+     "id": "regulatory-expression-to-channel-density-conductance",
+     "ref": {
+      "ptr": "/coupling_ports/0",
+      "src": "regulatory"
+     },
+     "status": "unknown",
+     "to": "channel density/conductance",
+     "value": null
+    },
+    {
+     "from": "voltage or transport",
+     "id": "regulatory-voltage-or-transport-to-proliferation-rate",
+     "ref": {
+      "ptr": "/coupling_ports/1",
+      "src": "regulatory"
+     },
+     "status": "unknown",
+     "to": "proliferation rate",
+     "value": null
+    },
+    {
+     "from": "osteoblast/fibroblast state",
+     "id": "regulatory-osteoblast/fibroblast-state-to-mineral-ECM-deposition",
+     "ref": {
+      "ptr": "/coupling_ports/2",
+      "src": "regulatory"
+     },
+     "status": "unknown",
+     "to": "mineral/ECM deposition",
+     "value": null
+    },
+    {
+     "from": "deposition",
+     "id": "regulatory-deposition-to-ray-geometry-and-EI",
+     "ref": {
+      "ptr": "/coupling_ports/3",
+      "src": "regulatory"
+     },
+     "status": "unknown",
+     "to": "ray geometry and EI",
+     "value": null
+    }
+   ],
+   "controls_note": "No controllable parameter is identified at this scale: the sources report observed expression/accessibility, not an intervention-response relation.",
+   "id": "molecular-regulatory",
+   "label": "Gene regulation to fin program",
+   "parameters": [],
+   "region_ids": [],
+   "results": [
+    {
+     "count": 7,
+     "id": "reg-rows",
+     "ref": {
+      "ptr": "/rows",
+      "src": "regulatory"
+     },
+     "text": "Cell-state rows with explicit species/tissue/assay/accession and a stated missing bridge"
+    },
+    {
+     "id": "reg-sample-identity",
+     "independent_count": null,
+     "ref": {
+      "ptr": "/targets/target=GSE261907/sample_count",
+      "src": "reg-metadata",
+      "value": 20
+     },
+     "text": "Confirmed independent biological sample count in the GEO metadata audit stays null; do not count 20 libraries as 20 replicates"
+    }
+   ],
+   "scale": "molecular/regulatory",
+   "what_exists": "Measured zebrafish fin multiome and methylation datasets mapped for applicability; no flying-fish measurement and no regulatory model run."
+  },
+  {
+   "bridges": [
+    {
+     "from": "membrane voltage",
+     "id": "voltage-to-gene-tissue-fin",
+     "ref": {
+      "ptr": "/open_questions",
+      "src": "bioelectric"
+     },
+     "status": "unsupported",
+     "to": "tissue/fin geometry or stiffness",
+     "value": null
+    }
+   ],
+   "id": "cell-bioelectric",
+   "label": "Membrane voltage and gap-junction coupling (Hodgkin-Huxley chain, 12 cells)",
+   "parameters": [
+    {
+     "bound": {
+      "basis": "scenario value (x0.35 arm of a perturbation set); published squid g_Na is the baseline, not a fin measurement",
+      "scale_arm": {
+       "ptr": "/request/sodium_scale",
+       "src": "bioelectric",
+       "value": 0.35
+      },
+      "status": "assumed"
+     },
+     "controllable": true,
+     "id": "sodium_scale",
+     "identifiability": "not assessed: no voltage data from target tissue exists in these sources",
+     "label": "Sodium conductance scale",
+     "sensitivity": {
+      "kind": "simulated scenario contrast",
+      "ref": {
+       "ptr": "/metrics",
+       "src": "bioelectric",
+       "value": {
+        "cells_crossing_0mV": 0,
+        "final_mV_by_cell": [
+         -65.59742969519826,
+         -65.59642006869002,
+         -65.59674856349909,
+         -65.59692533407365,
+         -65.59686722923632,
+         -65.59674346862934,
+         -65.59664036273497,
+         -65.59657447842359,
+         -65.59653766103823,
+         -65.59651879125273,
+         -65.59650988420624,
+         -65.59650641014217
+        ],
+        "first_crossing_0mV_ms_by_cell": [
+         null,
+         null,
+         null,
+         null,
+         null,
+         null,
+         null,
+         null,
+         null,
+         null,
+         null,
+         null
+        ],
+        "peak_mV_by_cell": [
+         -58.175839205090256,
+         -64.08416894392396,
+         -65.0,
+         -65.0,
+         -65.0,
+         -65.0,
+         -65.0,
+         -65.0,
+         -65.0,
+         -65.0,
+         -65.0,
+         -65.0
+        ]
+       }
+      },
+      "result": "x0.35 arm: no cell crosses 0 mV in the 30 ms window (assurance handoff, bioelectric branch)"
+     },
+     "unit": "1",
+     "value": {
+      "ptr": "/request/sodium_scale",
+      "src": "bioelectric",
+      "value": 0.35
+     }
+    },
+    {
+     "bound": {
+      "basis": "network and coupling assumed; model source gives membrane parameters only",
+      "status": "assumed"
+     },
+     "controllable": true,
+     "id": "gap_mS_cm2",
+     "identifiability": "not assessed",
+     "label": "Gap-junction conductance",
+     "sensitivity": {
+      "kind": "simulated scenario contrast",
+      "ref": {
+       "ptr": "/limitations",
+       "src": "bioelectric",
+       "value": [
+        "SIMULATED: published squid-axon membrane kinetics; not measured fin voltages.",
+        "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+        "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+        "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+        "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+        "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established."
+       ]
+      },
+      "result": "disconnected arm: only the stimulated cell fires (bioelectric handoff)"
+     },
+     "unit": "mS/cm2",
+     "value": {
+      "ptr": "/request/gap_mS_cm2",
+      "src": "bioelectric",
+      "value": 0.5
+     }
+    }
+   ],
+   "region_ids": [],
+   "results": [
+    {
+     "id": "bio-limits",
+     "ref": {
+      "ptr": "/limitations",
+      "src": "bioelectric",
+      "value": [
+       "SIMULATED: published squid-axon membrane kinetics; not measured fin voltages.",
+       "Equal-area 12-cell sealed chain and ohmic gap conductance are assumed design scenarios.",
+       "All cells start at -65 mV with gates at their voltage-dependent steady states; perturbed conductances need not initially be at equilibrium.",
+       "Fixed extracellular potential and reversal potentials represent infinite buffered ion reservoirs; no ion mass balance, pumps or depletion is modeled.",
+       "Current is injected into cell 0 during 5 <= t < 6 ms; positive current is inward and depolarizing.",
+       "No cross-scale map to gene expression, tissue pattern, fin anatomy, stiffness or flight has been established."
+      ]
+     },
+     "text": "Scope limits stated by the producing model"
+    }
+   ],
+   "scale": "cellular",
+   "what_exists": "A published-squid-parameter simulator with closed-form and convergence controls; no fin-cell calibration and no voltage-to-tissue map."
+  },
+  {
+   "bridges": [
+    {
+     "from": "cell-tissue-fin",
+     "id": "cell-tissue-fin",
+     "need": "Target-species cell/tissue measurements and a causal developmental-to-fin map",
+     "ref": {
+      "ptr": "/project/unsupported_essential_bridges/id=cell-tissue-fin",
+      "src": "assurance"
+     },
+     "status": "unsupported",
+     "to": "target-fin behaviour",
+     "value": null
+    },
+    {
+     "from": "fin-deformation-aerodynamic-polar",
+     "id": "fin-deformation-aerodynamic-polar",
+     "need": "Calibrated geometry/deformation-to-lift/drag and held-out trajectories",
+     "ref": {
+      "ptr": "/project/unsupported_essential_bridges/id=fin-deformation-aerodynamic-polar",
+      "src": "assurance"
+     },
+     "status": "unsupported",
+     "to": "target-fin behaviour",
+     "value": null
+    },
+    {
+     "from": "fin-stiffness-calibration",
+     "id": "fin-stiffness-calibration",
+     "need": "Target-fin effective stiffness and boundary-condition data",
+     "ref": {
+      "ptr": "/project/unsupported_essential_bridges/id=fin-stiffness-calibration",
+      "src": "assurance"
+     },
+     "status": "unknown",
+     "to": "target-fin behaviour",
+     "value": null
+    }
+   ],
+   "id": "tissue-fin-ray",
+   "label": "Fin ray mechanics (single Euler-Bernoulli beam, two load shapes)",
+   "parameters": [
+    {
+     "alternative": {
+      "ptr": "/candidates/id=shorter-ray/ray_length_m",
+      "src": "fin-protocol",
+      "value": 0.12
+     },
+     "bound": {
+      "basis": "two declared design candidates; multiplier range is an assumed latent, not measured geometry",
+      "multiplier": {
+       "ptr": "/latents/geometry/maps/length_multiplier",
+       "src": "fin-protocol",
+       "value": "0.85+0.30*u"
+      },
+      "status": "assumed"
+     },
+     "controllable": true,
+     "id": "ray_length_m",
+     "identifiability": "geometry is a design choice here; no matched per-ray measurement exists",
+     "label": "Ray length",
+     "sensitivity": {
+      "elasticity": {
+       "ptr": "/paired_sensitivity/length_multiplier/elasticity",
+       "src": "fin-controls",
+       "value": 3.0000000088442986
+      },
+      "expected_from_dimensions": {
+       "ptr": "/paired_sensitivity/length_multiplier/expected_from_dimensions",
+       "src": "fin-controls",
+       "value": 3
+      },
+      "kind": "local paired elasticity, other inputs held fixed (not causal, not variance importance)"
+     },
+     "unit": "m",
+     "value": {
+      "ptr": "/candidates/id=baseline/ray_length_m",
+      "src": "fin-protocol",
+      "value": 0.15
+     }
+    },
+    {
+     "alternative": {
+      "ptr": "/candidates/id=stiffer-ray/EI_multiplier",
+      "src": "fin-protocol",
+      "value": 2.0
+     },
+     "bound": {
+      "basis": "design draw 0.0003*10^u N m2 is assumed; the bluegill composite-modulus envelope is a separate source context and is never transferred to candidate EI",
+      "design_draw": {
+       "ptr": "/latents/design_material/maps/EI_Nm2",
+       "src": "fin-protocol",
+       "value": "0.0003*10**u"
+      },
+      "source_context": {
+       "ptr": "/context_only/source_values",
+       "src": "fin-protocol",
+       "value": {
+        "E_range_Pa": [
+         100000000,
+         1000000000
+        ],
+        "I_average_m4": 1e-14,
+        "typical_ray_length_m": 0.04
+       }
+      },
+      "source_status": {
+       "ptr": "/context_only/source_status",
+       "src": "fin-protocol",
+       "value": "Approximate composite-modulus range and average area moment, not a per-ray dataset"
+      },
+      "status": "assumed"
+     },
+     "controllable": true,
+     "id": "EI_multiplier",
+     "identifiability": "stiffness and load scale are not separable from deflection reads alone: the planner's deflection-only design has rank 1 against 2 for deflection plus an independent load read (abstract linear-Gaussian cantilever, assumed prior, not this fin)",
+     "identifiability_ref": {
+      "deflection_only_rank": {
+       "ptr": "/designs/id=deflection_only/identifiability/rank",
+       "src": "planner",
+       "value": 1
+      },
+      "mixed_rank": {
+       "ptr": "/designs/id=mixed_load_deflection/identifiability/rank",
+       "src": "planner",
+       "value": 2
+      },
+      "status": {
+       "ptr": "/status",
+       "src": "planner",
+       "value": "prospective_assumption_based"
+      }
+     },
+     "label": "Flexural rigidity multiplier (EI)",
+     "sensitivity": {
+      "elasticity": {
+       "ptr": "/paired_sensitivity/EI_Nm2/elasticity",
+       "src": "fin-controls",
+       "value": -1.0000000031812406
+      },
+      "expected_from_dimensions": {
+       "ptr": "/paired_sensitivity/EI_Nm2/expected_from_dimensions",
+       "src": "fin-controls",
+       "value": -1
+      },
+      "kind": "local paired elasticity, other inputs held fixed"
+     },
+     "unit": "1",
+     "value": {
+      "ptr": "/candidates/id=baseline/EI_multiplier",
+      "src": "fin-protocol",
+      "value": 1.0
+     }
+    },
+    {
+     "bound": {
+      "basis": "weather latent is a declared stress scenario with perfect negative density/speed rank correlation, not fitted weather data",
+      "status": "assumed"
+     },
+     "controllable": false,
+     "id": "speed_m_s",
+     "identifiability": "uncontrolled context",
+     "label": "Air speed (scenario)",
+     "sensitivity": {
+      "elasticity": {
+       "ptr": "/paired_sensitivity/speed_m_s/elasticity",
+       "src": "fin-controls",
+       "value": 1.9999999999999845
+      },
+      "expected_from_dimensions": {
+       "ptr": "/paired_sensitivity/speed_m_s/expected_from_dimensions",
+       "src": "fin-controls",
+       "value": 2
+      },
+      "kind": "local paired elasticity; V^1-load mutant gives 1 and is detected"
+     },
+     "unit": "m/s",
+     "value": {
+      "ptr": "/latents/weather/maps/speed_m_s",
+      "src": "fin-protocol",
+      "value": "6-2*u"
+     }
+    }
+   ],
+   "region_ids": [
+    "pectoral-left",
+    "pectoral-right"
+   ],
+   "results": [
+    {
+     "denominator": {
+      "ptr": "/candidates/0/denominator",
+      "src": "fin-summary",
+      "value": 64
+     },
+     "fraction": {
+      "ptr": "/candidates/0/fraction",
+      "src": "fin-summary",
+      "value": 0.3125
+     },
+     "id": "ensemble-baseline",
+     "interval": {
+      "ptr": "/candidates/0/conditional_wilson95_interval",
+      "src": "fin-summary",
+      "value": [
+       0.21231066539482046,
+       0.4339233570274815
+      ]
+     },
+     "interval_kind": "conditional Wilson 95%, sampling variation under the assumed scenario law only",
+     "meaning": "fraction of assumed-scenario draws inside the linear envelope; not a probability of biological success; draws are shared across candidates",
+     "numerator": {
+      "ptr": "/candidates/0/numerator",
+      "src": "fin-summary",
+      "value": 20
+     },
+     "text": "both-load predicate passes, baseline"
+    },
+    {
+     "denominator": {
+      "ptr": "/candidates/1/denominator",
+      "src": "fin-summary",
+      "value": 64
+     },
+     "fraction": {
+      "ptr": "/candidates/1/fraction",
+      "src": "fin-summary",
+      "value": 0.515625
+     },
+     "id": "ensemble-shorter-ray",
+     "interval": {
+      "ptr": "/candidates/1/conditional_wilson95_interval",
+      "src": "fin-summary",
+      "value": [
+       0.39581601478580125,
+       0.6336644833456737
+      ]
+     },
+     "interval_kind": "conditional Wilson 95%, sampling variation under the assumed scenario law only",
+     "meaning": "fraction of assumed-scenario draws inside the linear envelope; not a probability of biological success; draws are shared across candidates",
+     "numerator": {
+      "ptr": "/candidates/1/numerator",
+      "src": "fin-summary",
+      "value": 33
+     },
+     "text": "both-load predicate passes, shorter-ray"
+    },
+    {
+     "denominator": {
+      "ptr": "/candidates/2/denominator",
+      "src": "fin-summary",
+      "value": 64
+     },
+     "fraction": {
+      "ptr": "/candidates/2/fraction",
+      "src": "fin-summary",
+      "value": 0.53125
+     },
+     "id": "ensemble-stiffer-ray",
+     "interval": {
+      "ptr": "/candidates/2/conditional_wilson95_interval",
+      "src": "fin-summary",
+      "value": [
+       0.41072087051471007,
+       0.6482401257482395
+      ]
+     },
+     "interval_kind": "conditional Wilson 95%, sampling variation under the assumed scenario law only",
+     "meaning": "fraction of assumed-scenario draws inside the linear envelope; not a probability of biological success; draws are shared across candidates",
+     "numerator": {
+      "ptr": "/candidates/2/numerator",
+      "src": "fin-summary",
+      "value": 34
+     },
+     "text": "both-load predicate passes, stiffer-ray"
+    }
+   ],
+   "scale": "tissue/organ",
+   "what_exists": "A frozen-protocol paired ensemble over three predeclared candidates with analytic, grid, speed-law-mutant and local-sensitivity controls."
+  },
+  {
+   "bridges": [
+    {
+     "from": "fin length proportion",
+     "id": "fin-length-to-ray-EI",
+     "need": "S1A has fin length against SL only; ray geometry, EI and load are not in it",
+     "ref": {
+      "ptr": "/next_measurements",
+      "src": "fin-summary"
+     },
+     "status": "unknown",
+     "to": "ray EI(x) and load field",
+     "value": null
+    }
+   ],
+   "id": "organ-fin-proportions",
+   "label": "Measured fin proportions (flying fish and relatives)",
+   "parameters": [
+    {
+     "bound": {
+      "basis": "log10-log10 OLS on specimens; bootstrap 95% CI on the exponent, in-sample fit over the stated SL range only",
+      "ci95": {
+       "ptr": "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit/bootstrap/b_ci95",
+       "src": "knobs",
+       "value": [
+        1.0212328260428893,
+        1.0989457119108639
+       ]
+      },
+      "n": {
+       "ptr": "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit/n",
+       "src": "knobs",
+       "value": 49
+      },
+      "r2": {
+       "ptr": "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit/r2",
+       "src": "knobs",
+       "value": 0.9834088833924874
+      },
+      "status": "measured"
+     },
+     "controllable": false,
+     "id": "pectoral_vs_SL_flying_fish",
+     "identifiability": "fin length is identified against SL in sample; leave-one-out RMSE is reported",
+     "identifiability_ref": {
+      "loocv_rmse_log10": {
+       "ptr": "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit/loocv_rmse_log10",
+       "src": "knobs",
+       "value": 0.05004236649809819
+      },
+      "quality": {
+       "ptr": "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit_quality",
+       "src": "knobs",
+       "value": "usable"
+      }
+     },
+     "label": "Pectoral fin length against standard length (flying fish)",
+     "sensitivity": {
+      "kind": "measured allometry exponent, not a design sensitivity"
+     },
+     "unit": "cm vs cm",
+     "value": {
+      "ptr": "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit/b",
+      "src": "knobs",
+      "value": 1.0579235570986707
+     }
+    },
+    {
+     "bound": {
+      "basis": "same method; fit judged unusable",
+      "n": {
+       "ptr": "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/n",
+       "src": "knobs",
+       "value": 15
+      },
+      "r2": {
+       "ptr": "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/r2",
+       "src": "knobs",
+       "value": 0.01937077986435287
+      },
+      "status": "measured"
+     },
+     "controllable": false,
+     "id": "pelvic_vs_SL_flying_halfbeak",
+     "identifiability": "not identifiable from these data",
+     "identifiability_ref": {
+      "quality": {
+       "ptr": "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit_quality",
+       "src": "knobs",
+       "value": "weak: do not use as a control relation"
+      }
+     },
+     "label": "Pelvic fin length against standard length (flying halfbeak)",
+     "sensitivity": {
+      "kind": "none: no relation recovered"
+     },
+     "unit": "cm vs cm",
+     "value": {
+      "ptr": "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/b",
+      "src": "knobs",
+      "value": 0.10828642938485845
+     }
+    }
+   ],
+   "region_ids": [
+    "pectoral-left",
+    "pectoral-right",
+    "pelvic-left",
+    "pelvic-right"
+   ],
+   "results": [
+    {
+     "count": 51,
+     "id": "knob-count",
+     "kinds": [
+      "observed_and_fitted_here",
+      "published_fit_only",
+      "published_summary_only"
+     ],
+     "text": "Control-knob records by kind; per-specimen raw data exist only for the observed_and_fitted_here kind"
+    }
+   ],
+   "scale": "organ",
+   "what_exists": "The only measured per-specimen data in this map: Daane 2021 Data S1A fin length against standard length, fitted here, plus published Fish 1990 fits without raw data."
+  },
+  {
+   "bridges": [
+    {
+     "from": "simulated glide/escape",
+     "id": "glide-to-flight-prediction",
+     "need": "no calibrated or measured trajectory comparison",
+     "ref": {
+      "ptr": "/project/unsupported_essential_bridges/id=fin-deformation-aerodynamic-polar",
+      "src": "assurance"
+     },
+     "status": "unsupported",
+     "to": "organism behaviour",
+     "value": null
+    }
+   ],
+   "id": "body-glide-escape",
+   "label": "Rigid-body glide and eight-fish escape (MuJoCo + quasi-steady VLM, not CFD)",
+   "parameters": [
+    {
+     "bound": {
+      "basis": "engineering assumption; not resin mass or a measured specimen",
+      "status": "assumed"
+     },
+     "controllable": true,
+     "id": "mass_kg",
+     "identifiability": "no interaction estimate was made",
+     "label": "Body mass",
+     "sensitivity": {
+      "kind": "paired arms (the baseline 0.05 kg is the unlisted default)",
+      "result": "responses at 0.6 s are the same as baseline in both mass arms; two seeds, no interaction estimate"
+     },
+     "unit": "kg",
+     "value": {
+      "ptr": "derived:eco_delay_table",
+      "src": "ecology",
+      "value": [
+       0.04,
+       0.06
+      ]
+     }
+    },
+    {
+     "bound": {
+      "basis": "assumed delay envelope; no measured neural parameter",
+      "status": "assumed"
+     },
+     "controllable": true,
+     "id": "reaction_delay_s_range",
+     "identifiability": "two seeds per arm; no variance partition and no interaction estimate",
+     "label": "Escape reaction-delay range",
+     "sensitivity": {
+      "kind": "saved paired outcomes at the fixed 0.6 s endpoint (response flags, neighbors vs no-neighbor ablation); no variance partition",
+      "table": [
+       {
+        "fish": 16,
+        "mode": "ablation",
+        "overrides": {},
+        "responses_at_0_6s": 2,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "baseline"
+       },
+       {
+        "fish": 16,
+        "mode": "neighbors",
+        "overrides": {},
+        "responses_at_0_6s": 15,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "baseline"
+       },
+       {
+        "fish": 16,
+        "mode": "ablation",
+        "overrides": {
+         "reaction_delay_s_range": [
+          0.02,
+          0.06
+         ]
+        },
+        "responses_at_0_6s": 2,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "delay-fast"
+       },
+       {
+        "fish": 16,
+        "mode": "neighbors",
+        "overrides": {
+         "reaction_delay_s_range": [
+          0.02,
+          0.06
+         ]
+        },
+        "responses_at_0_6s": 16,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "delay-fast"
+       },
+       {
+        "fish": 16,
+        "mode": "ablation",
+        "overrides": {
+         "reaction_delay_s_range": [
+          0.08,
+          0.16
+         ]
+        },
+        "responses_at_0_6s": 2,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "delay-slow"
+       },
+       {
+        "fish": 16,
+        "mode": "neighbors",
+        "overrides": {
+         "reaction_delay_s_range": [
+          0.08,
+          0.16
+         ]
+        },
+        "responses_at_0_6s": 9,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "delay-slow"
+       },
+       {
+        "fish": 16,
+        "mode": "ablation",
+        "overrides": {
+         "fin_stiffness_Nm_rad": 0.1
+        },
+        "responses_at_0_6s": 2,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "hinge-soft"
+       },
+       {
+        "fish": 16,
+        "mode": "neighbors",
+        "overrides": {
+         "fin_stiffness_Nm_rad": 0.1
+        },
+        "responses_at_0_6s": 15,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "hinge-soft"
+       },
+       {
+        "fish": 16,
+        "mode": "ablation",
+        "overrides": {
+         "fin_stiffness_Nm_rad": 0.3
+        },
+        "responses_at_0_6s": 2,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "hinge-stiff"
+       },
+       {
+        "fish": 16,
+        "mode": "neighbors",
+        "overrides": {
+         "fin_stiffness_Nm_rad": 0.3
+        },
+        "responses_at_0_6s": 15,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "hinge-stiff"
+       },
+       {
+        "fish": 16,
+        "mode": "ablation",
+        "overrides": {
+         "mass_kg": 0.06
+        },
+        "responses_at_0_6s": 2,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "mass-high"
+       },
+       {
+        "fish": 16,
+        "mode": "neighbors",
+        "overrides": {
+         "mass_kg": 0.06
+        },
+        "responses_at_0_6s": 15,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "mass-high"
+       },
+       {
+        "fish": 16,
+        "mode": "ablation",
+        "overrides": {
+         "mass_kg": 0.04
+        },
+        "responses_at_0_6s": 2,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "mass-low"
+       },
+       {
+        "fish": 16,
+        "mode": "neighbors",
+        "overrides": {
+         "mass_kg": 0.04
+        },
+        "responses_at_0_6s": 15,
+        "seeds": [
+         20261031,
+         20261101
+        ],
+        "setting": "mass-low"
+       }
+      ]
+     },
+     "unit": "s",
+     "value": {
+      "ptr": "derived:eco_delay_table",
+      "src": "ecology",
+      "value": [
+       [
+        0.02,
+        0.06
+       ],
+       [
+        0.08,
+        0.16
+       ]
+      ]
+     }
+    },
+    {
+     "bound": {
+      "basis": "engineering hinge assumption",
+      "status": "assumed"
+     },
+     "controllable": true,
+     "id": "fin_stiffness_Nm_rad",
+     "identifiability": "not assessed",
+     "label": "Hinge stiffness",
+     "sensitivity": {
+      "kind": "saved paired arms",
+      "result": "responses at 0.6 s equal baseline in both hinge arms; two seeds"
+     },
+     "unit": "N m/rad",
+     "value": {
+      "ptr": "derived:eco_delay_table",
+      "src": "ecology",
+      "value": [
+       0.1,
+       0.3
+      ]
+     }
+    }
+   ],
+   "region_ids": [
+    "body",
+    "pectoral-left",
+    "pectoral-right",
+    "pelvic-left",
+    "pelvic-right"
+   ],
+   "results": [
+    {
+     "computed": {
+      "ptr": "/computed_count",
+      "src": "ecology",
+      "value": 28
+     },
+     "id": "eco-scope",
+     "scenarios": {
+      "ptr": "/scenario_count",
+      "src": "ecology",
+      "value": 28
+     },
+     "scope": {
+      "ptr": "/scope",
+      "src": "ecology",
+      "value": "Exact disjoint union of original26 and separately executed2 missing arms; source partial receipts remain immutable. Shared-model axial scenarios, not biological success probabilities."
+     },
+     "status": {
+      "ptr": "/status",
+      "src": "ecology",
+      "value": "all declared arms computed"
+     },
+     "text": "Aggregate scope"
+    }
+   ],
+   "scale": "organism/collective",
+   "what_exists": "28 scenarios and 56 simulations with timestep and actuator gates passed; the assumed-delay arms are the only parameter contrast with saved outcomes."
+  },
+  {
+   "bridges": [
+    {
+     "from": "oscillator phase/frequency",
+     "id": "phase-to-fluid-force",
+     "need": "Moving-wall fluid solver, anatomical mapping, actuation/load calibration and oscillating-body control. Do not infer forces/thrust from these ports.",
+     "ref": {
+      "ptr": "/proposed_coupling",
+      "src": "behavior"
+     },
+     "status": "unsupported",
+     "to": "fluid force",
+     "value": null
+    }
+   ],
+   "id": "behavior-control",
+   "label": "Phase-oscillator controller with PD actuator",
+   "parameters": [
+    {
+     "bound": {
+      "basis": "assumed scenario; literature range discussed but not fitted",
+      "basis_text": {
+       "ptr": "/parameter_registry/name=frequency_Hz/basis",
+       "src": "behavior",
+       "value": "assumed scenario; Roussel2021 discussion20\u201365Hz, not fitted"
+      },
+      "status": "assumed"
+     },
+     "controllable": true,
+     "id": "frequency_Hz",
+     "identifiability": "not assessed",
+     "label": "Oscillator frequency",
+     "sensitivity": {
+      "kind": "scenario contrast (35 Hz baseline vs 25 Hz), controller metrics only"
+     },
+     "unit": "Hz",
+     "value": {
+      "ptr": "/parameter_registry/name=frequency_Hz/value",
+      "src": "behavior",
+      "value": 35
+     }
+    }
+   ],
+   "region_ids": [
+    "body",
+    "caudal"
+   ],
+   "results": [
+    {
+     "id": "behavior-transfer",
+     "ref": {
+      "ptr": "/proposed_coupling/status",
+      "src": "behavior",
+      "value": "unsupported_dynamic_transfer"
+     },
+     "text": "Proposed angle-to-fluid coupling is explicitly unsupported"
+    }
+   ],
+   "scale": "neural/behavior",
+   "what_exists": "An engineering controller with passing numerical controls; no neurons, no genotype-to-behavior map, no hydrodynamic transfer."
+  }
+ ],
+ "next_experiment": {
+  "assurance_priority_class": {
+   "ptr": "/project/next_actions/id=resolve-cell-tissue-fin/priority_class",
+   "src": "assurance",
+   "value": "unsupported_essential_bridge"
+  },
+  "expected_information_gain": {
+   "ptr": "/project/next_actions/id=resolve-cell-tissue-fin/expected_information_gain",
+   "src": "assurance",
+   "value": null
+  },
+  "id": "wp-fin-EI-load",
+  "not_claimed": "No expected-information-gain or utility number ranks the packages: the assurance map leaves both null because cost and outcome models are absent.",
+  "why_this_one": [
+   "It is the only item that both removes an explicit essential blocker (tissue-to-EI) and has a stated measurement in the owning handoff.",
+   "The ensemble fractions differ across candidates only under assumed envelopes; the fin assay's own next step is EI(x), and mesh refinement alone does not address the larger uncertainties.",
+   "Planner structure result: deflection-only reads leave stiffness and load scale confounded (rank 1), so the measurement must include an independent load read."
+  ]
+ },
+ "non_claims": [
+  "No new simulation, measurement or inference was run to make this map.",
+  "Fractions are conditional simulation-envelope fractions, not probabilities of biology.",
+  "Local elasticities hold other inputs fixed and are not causal biological effects."
+ ],
+ "schema": "frontier.design-control/1",
+ "separation": "Humans set the target goals. Solver or model validity (checked equations, convergence, controls) is a different thing from empirical biological realism, which is unknown for every layer here.",
+ "sources": [
+  {
+   "branch": "work/design-assurance",
+   "bytes": 464203,
+   "commit": "0722fc7992a72ea4b425cd2636a30eceff3d714d",
+   "id": "assurance",
+   "path": "artifacts/assurance/map.json",
+   "sha256": "737ed4004156bc32510241bcd352c5c7e352f8cb1c81ceb3959700f5862f8fd7"
+  },
+  {
+   "branch": "work/fin-assurance-experiment",
+   "bytes": 1999,
+   "commit": "1adc724bcdbd7f19e954b25a18d94c67426e87ca",
+   "id": "fin-summary",
+   "path": "artifacts/assurance-experiments/summary.json",
+   "sha256": "a8f37a3a8d9ab1b9a2ba5cae439d4b6e50d4a6729c253fba44dd8388a4e8dd17"
+  },
+  {
+   "branch": "work/fin-assurance-experiment",
+   "bytes": 3984,
+   "commit": "1adc724bcdbd7f19e954b25a18d94c67426e87ca",
+   "id": "fin-controls",
+   "path": "artifacts/assurance-experiments/controls.json",
+   "sha256": "53c1ea0dc73366e427b44f3180ae1dd6ccbdbf845275c7f8faa724a76f345ff8"
+  },
+  {
+   "branch": "work/fin-assurance-experiment",
+   "bytes": 4377,
+   "commit": "1adc724bcdbd7f19e954b25a18d94c67426e87ca",
+   "id": "fin-protocol",
+   "path": "engineering/assurance_experiments/protocol.json",
+   "sha256": "cc1eeabd06cb3401ba3d72a912df0d9e898b80369356339fd25afe519411c064"
+  },
+  {
+   "branch": "work/ecology",
+   "bytes": 156549,
+   "commit": "d3d64c68131ecf5795d820e543c3c0309d9d901a",
+   "id": "ecology",
+   "path": "artifacts/ecology/uncertainty-aggregate/summary.json",
+   "sha256": "d9a98bc06fa202861490f6826d91de37bbb549ad2b4ce0fa3ccf4834dfc8aee9"
+  },
+  {
+   "branch": "work/fish-control-data",
+   "bytes": 77198,
+   "commit": "73d3a83df599d84b2e225d12a95d68bf262fc670",
+   "id": "knobs",
+   "path": "data/fish-controls/knobs.json",
+   "sha256": "90c6ae6f8171ac1ee192408d19830cca7648c27807e4b488f45c1769a702273a"
+  },
+  {
+   "branch": "work/fish-regulatory-map",
+   "bytes": 16979,
+   "commit": "bff38281e28cf65961626a342612ba2c993861d2",
+   "id": "regulatory",
+   "path": "artifacts/fish-regulatory-map/map.json",
+   "sha256": "f7782821dd36f2726faecf7d89b5eb7e2a145ff61ec9e0b71503225030525d0e"
+  },
+  {
+   "branch": "work/regulatory-metadata",
+   "bytes": 266541,
+   "commit": "1b77f81",
+   "id": "reg-metadata",
+   "path": "artifacts/regulatory-metadata/run/coverage-reviewed.json",
+   "sha256": "05b7a9734fd93755d8dbade9565f40a9e712cff52478eb9bb44e63999d619ad3"
+  },
+  {
+   "branch": "work/fish-behavior-control",
+   "bytes": 5101,
+   "commit": "30db26bdd8fb5f153bfaa2fc19eafca4789c5f10",
+   "id": "behavior",
+   "path": "artifacts/behavior/interface.json",
+   "sha256": "7f2cbcd66a274876750eef16f107a00062a08abac841080c0cea1dd9af5a8fc5"
+  },
+  {
+   "branch": "work/bioelectric",
+   "bytes": 505623,
+   "commit": "d0143976fc1621b350dce9e2a33ade3253657ccb",
+   "id": "bioelectric",
+   "path": "artifacts/bioelectric/sodium_reduced.json",
+   "sha256": "5d85345cc0b65e5f3c21eebb5a64ca1f07469c4a6e8db7c34391684240adcc93"
+  },
+  {
+   "branch": "work/experimental-design",
+   "bytes": 13971,
+   "commit": "cc12164addd85c124a7e596b1059c005cf5650e9",
+   "id": "planner",
+   "path": "artifacts/experimental-design/result.json",
+   "sha256": "3e65ad8a398af252300b2be0416b7b50c8fda80dcc0e7b73ad04bd4c6d4ca30e"
+  }
+ ],
+ "workpackages": [
+  {
+   "closes": [
+    "tissue-to-EI"
+   ],
+   "gates": [
+    "frozen protocol before data",
+    "matched ray geometry + clamp + actuation tuple",
+    "independent load-scale read (planner: deflection-only is rank 1)"
+   ],
+   "id": "wp-fin-EI-load",
+   "inputs": [],
+   "kind": "physical-measurement",
+   "status": "proposed-not-executed",
+   "title": "Measure EI(x) under target clamping and the load field",
+   "why": {
+    "ptr": "/next_measurements/0",
+    "src": "fin-summary",
+    "value": "Measure EI(x) under the target clamping/actuation condition."
+   }
+  },
+  {
+   "closes": [
+    "fin-load-bridge"
+   ],
+   "gates": [
+    "frozen protocol before data"
+   ],
+   "id": "wp-load-shape",
+   "inputs": [],
+   "kind": "physical-measurement",
+   "status": "proposed-not-executed",
+   "title": "Measure spatial pressure/load shape",
+   "why": {
+    "ptr": "/next_measurements/1",
+    "src": "fin-summary",
+    "value": "Measure spatial pressure/load shape; uniform-versus-tip discrepancy is not a calibrated error bound."
+   }
+  },
+  {
+   "bound": {
+    "ptr": "/proposed_next_actions/id=fin-regulatory-coverage-audit/bound",
+    "src": "regulatory",
+    "value": "one CPU core,4GiB,60min; metadata only initially"
+   },
+   "closes": [
+    "expression-to-conductance (first step only)"
+   ],
+   "id": "wp-reg-sample-identity",
+   "inputs": [],
+   "kind": "computational-metadata",
+   "status": "proposed-not-executed",
+   "stop_rule": "unresolved sample identity, assembly mismatch or download exceeding admitted size",
+   "title": "Resolve GSE261907 barcode and replicate pairing from small metadata files",
+   "why": {
+    "ptr": "/proposed_next_actions/id=fin-regulatory-coverage-audit/question",
+    "src": "regulatory",
+    "value": "Which fin cell states and biological replicates have usable paired measured data?"
+   }
+  },
+  {
+   "closes": [
+    "phase-to-fluid-force"
+   ],
+   "id": "wp-moving-wall",
+   "inputs": [],
+   "kind": "computational-model",
+   "status": "not-started",
+   "title": "Moving-wall fluid solver with calibration controls",
+   "why": {
+    "ptr": "/proposed_coupling/need",
+    "src": "behavior",
+    "value": "Moving-wall fluid solver, anatomical mapping, actuation/load calibration and oscillating-body control. Do not infer forces/thrust from these ports."
+   }
+  },
+  {
+   "closes": [
+    "candidate choice (shorter vs stiffer)"
+   ],
+   "id": "wp-cost-mass-area",
+   "inputs": [],
+   "kind": "physical-measurement",
+   "status": "proposed-not-executed",
+   "title": "Mass and lifting-area cost of shorter or stiffer rays",
+   "why": {
+    "ptr": "/next_measurements/2",
+    "src": "fin-summary",
+    "value": "Measure mass/lifting-area costs before choosing stiffer or shorter candidates."
+   }
+  },
+  {
+   "closes": [
+    "fin-deformation-aerodynamic-polar"
+   ],
+   "id": "wp-deformed-polar",
+   "inputs": [
+    "wp-fin-EI-load",
+    "wp-load-shape"
+   ],
+   "kind": "computational-model",
+   "status": "blocked-on-inputs",
+   "title": "Deformed-fin aerodynamic polar",
+   "why": {
+    "ptr": "/project/unsupported_essential_bridges/id=fin-deformation-aerodynamic-polar/need",
+    "src": "assurance",
+    "value": "Calibrated geometry/deformation-to-lift/drag and held-out trajectories"
+   }
+  }
+ ]
+}
