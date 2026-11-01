@@ -120,6 +120,13 @@ Six typed documentary records are prepared (2 Claims, 1 Problem, 1 Action, 2 Evi
     files = ["observed-update.png", "RESULTS.md", "graph-summary.md", "source-observations.csv", "protocol.json", "import-contract.json",
              "run/summary.json", "run/update.json", "run/full-fits.json", "run/validation.json", "run/receipt.json",
              "context-transfer.json", "prepared-bundle-final/bundle.frontier-bundle-0.1.json", "prepared-bundle-final/manifest.json"]
+    corrected_bundle = ART / "prepared-bundle-component-purge-v2/bundle.frontier-bundle-0.1.json"
+    if corrected_bundle.is_file():
+        files += ["CORRECTION.md", "component-purge-correction.json", "component-purge-comparison.json",
+                  "run-component-purge-v2-complete/receipt.json", "run-component-purge-v2-complete/summary.json",
+                  "run-component-purge-v2-complete/validation.json", "run-component-purge-v2-complete/update.json",
+                  "prepared-bundle-component-purge-v2/bundle.frontier-bundle-0.1.json",
+                  "prepared-bundle-component-purge-v2/manifest.json"]
     dump(ART / "publication.json", {"schema": "frontier.observed-allometry.publication/1",
          "status": "PREPARED, not publicly served by this producer; root must copy bytes and verify HTTPS status/hash",
          "files": [{**ref(ART / name), "href": "artifacts/observed-allometry/" + name} for name in files]})
@@ -128,7 +135,9 @@ Six typed documentary records are prepared (2 Claims, 1 Problem, 1 Action, 2 Evi
          "heldout_RMSE_log10": errors, "biological_success_probability": None, "report": ref(ART / "RESULTS.md"),
          "poster": ref(ART / "observed-update.png"), "receipt": ref(native / "receipt.json"), "empirical_scope": summary["empirical_scope"],
          "prepared_bundle": ref(bundle) if bundle.is_file() else None,
-         "bundle_status": "Prepared typed documentary bundle only; no DB import/submission/lifecycle/review",
+         "bundle_status": "Historical original bundle retained; corrected bundle supersedes for proposed import when present. No DB import/submission/lifecycle/review",
+         "corrected_bundle": ref(corrected_bundle) if corrected_bundle.is_file() else None,
+         "correction_comparison": ref(ART / "component-purge-comparison.json") if corrected_bundle.is_file() else None,
          "publication": ref(ART / "publication.json"), "graph_narrative": ref(ART / "graph-summary.md")})
     dump(ART / "artifact-manifest.json", {"schema": "frontier.observed-allometry.artifacts/1", "files": [
         ref(path) for path in sorted(ART.rglob("*")) if path.is_file() and path.name != "artifact-manifest.json"

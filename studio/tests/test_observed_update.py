@@ -133,3 +133,29 @@ def test_actual_corrected_outputs_preserve_all_numeric_values_and_no_original_le
     assert not leaks and len(comparisons) == 5
     assert all(x["all_scientific_fields_exactly_equal"] for x in comparisons)
     assert any(not x["bytes_equal"] for x in comparisons)
+
+
+def test_observed_update_purges_transitive_heldout_dependence_fixture():
+    rows = copy.deepcopy(observed())
+    held = next(r for r in rows if r["species"] == "Hirundichthys rondeleti")
+    bridge = next(r for r in rows if r["species"] == "Cheilopogon furcatus")
+    tail = next(r for r in rows if r["species"] == "Exocoetus volitans")
+    held["catalog_tokens"], bridge["catalog_tokens"], tail["catalog_tokens"] = ["fixture-A"], ["fixture-A", "fixture-B"], ["fixture-B"]
+    result = update_demo(rows, json.loads((ART / "protocol.json").read_text()))
+    assert bridge["id"] not in result["after"]["training_ids"]
+    assert tail["id"] not in result["after"]["training_ids"]
+
+
+def test_corrected_bundle_pins_separate_producer_result_and_adapter():
+    from hashlib import sha256
+    from frontier_adapters.import_cli import load_frozen_bundle
+
+    directory = ART / "prepared-bundle-component-purge-v2"
+    bundle = load_frozen_bundle(directory / "bundle.frontier-bundle-0.1.json")
+    manifest = json.loads((directory / "manifest.json").read_text())
+    assert len(bundle["records"]) == 6 and all(x["ok"] for x in manifest["checks"])
+    assert manifest["adapter_code_sha256"] == sha256((ROOT / "engineering/observed_update/bundle.py").read_bytes()).hexdigest()
+    predicted = next(r for r in bundle["records"] if r["kind"] == "Evidence" and r["payload"]["evidence_kind"] == "predicted")
+    pins = predicted["payload"]["provenance"]
+    assert pins["producer_code_commit"] != pins["result_snapshot_commit"]
+    assert manifest["run_subdir"] == "run-component-purge-v2-complete"
