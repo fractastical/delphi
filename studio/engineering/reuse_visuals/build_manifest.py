@@ -44,6 +44,8 @@ def epithelial() -> dict:
     gates = res["gates"]
     status = lambda g: "pass" if g["passed"] is True else "fail" if g["passed"] is False else "not_pass_fail"   # noqa: E731
     by = {g["id"]: status(g) for g in gates}
+    review = {**by, "G1b": "incomplete"}                       # independent strict reading of the frozen every-frame rule; the file itself still says pass
+    by_review = {k: sum(v == k for v in review.values()) for k in ("pass", "fail")}
     arms = res["arms"]
     run = lambda a: json.loads((ROOT / f"{EP}/arms/{a}/run.json").read_text())      # noqa: E731
     g9 = next(g for g in gates if g["id"] == "G9")["detail"]
@@ -58,14 +60,17 @@ def epithelial() -> dict:
                    "not_modelled": ["purse-string closure", "proliferation", "signalling", "substrate stiffness", "ECM", "monolayer thickness"],
                    "not_a_reproduction": "Bai and Zeng 2023 (CC BY 4.0) is used for geometric construction and one length scale only; their mechanics is a 3D continuum finite-element model"},
         "summary": {
-            "readout_check": {"G1b": f"logger and TIFF agree at the {len(range(0, 1001, 50))} times they share, of {arms['A1-baseline']['tiff_frames']} TIFF frames per arm (logger every 10, TIFF every 25: shared at 0, 50, ..., 1000); the other TIFF frames are not compared. Same engine state, so a readout-consistency check, not independent biology. G1 is an identity from the gap definition, not independent area conservation."},
+            "readout_check": {"G1b": f"REPORTED pass, independently assessed incomplete: the frozen rule is every frame, yet logger and TIFF agree only at the {len(range(0, 1001, 50))} times they share, of {arms['A1-baseline']['tiff_frames']} TIFF frames per arm (logger every 10, TIFF every 25: shared at 0, 50, ..., 1000); the other TIFF frames are not compared. Same engine state, so a readout-consistency check, not independent biology. G1 is an identity from the gap definition, not independent area conservation."},
             "pair": {"same": "wound, seed and every parameter except motility",
                      "closes": {"arm": "A1-baseline", "state": arms["A1-baseline"]["state"], "closed_fraction": arms["A1-baseline"]["closed_fraction"], "closure_sweeps": arms["A1-baseline"]["closure_sweeps"], "wall_s": run("A1-baseline")["wall_s"]},
                      "arrests": {"arm": "A2-motility-off", "state": arms["A2-motility-off"]["state"], "closed_fraction": arms["A2-motility-off"]["closed_fraction"], "wall_s": run("A2-motility-off")["wall_s"]}},
             "passive_floor": {"arm": "F1-no-drive-NEGATIVE", "closed_fraction": arms["F1-no-drive-NEGATIVE"]["closed_fraction"], "state": arms["F1-no-drive-NEGATIVE"]["state"],
                               "reading": "Observed in this one context (both drives off, same wound): the gap still shrinks by this fraction as surviving cells relax into volume they were short of (geometric and volume relaxation, with perimeter and Metropolis dynamics). It is a context-specific control, not a universal amount to subtract: show it beside a matched baseline, and no isolated mechanism contribution was measured. The card's separate 25% geometric-floor arithmetic is under review (625 nodes filled versus 1875 residual); no 25% figure is shown here."},
-            "gates": {"ids": by, "pass": sum(v == "pass" for v in by.values()), "fail": sum(v == "fail" for v in by.values()), "descriptive": ["G6"], "unevaluable": ["G8"], "total": len(gates),
-                      "note": "Counted from results-r2.json: 8 pass, 3 fail, 1 descriptive (G6, 3 seeds of one model, no bound assigned) and 1 unevaluable (G8). The handoff phrase nine of thirteen counted G6 as a pass; it is not."},
+            "gates": {"reported": {"ids": by, "pass": sum(v == "pass" for v in by.values()), "fail": sum(v == "fail" for v in by.values()), "descriptive": ["G6"], "unevaluable": ["G8"], "total": len(gates),
+                                 "note": "As recorded in results-r2.json and the owner's card: 8 pass, 3 fail, 1 descriptive (G6), 1 unevaluable (G8). Kept unchanged as the historical reported statuses."},
+                      "independent_review": {"pass": by_review["pass"], "fail": by_review["fail"], "descriptive": ["G6"], "incomplete_or_unevaluable": ["G1b", "G8"],
+                                             "note": "Strict reading by the native reviewer: 7 pass, 3 fail, G6 descriptive, G1b and G8 incomplete. The frozen G1b rule is every frame; the logger (every 10) and TIFF (every 25) share only 21 of 41 TIFF frames per arm and the analyzer skips the other 20. The acceptance is not rewritten to shared times and G1b is not called a pass. No threshold was changed and no physics rerun.",
+                                             "no_all_frames_claim": True}},
             "j_scaling": {"status": "tested model hypothesis, not a law", "predicted_interval": g9["predicted_interval"], "observed_bracket": g9["measured_bracket"], "bracket_geometric_mean": g9["measured_lambda_star"],
                           "scope": "one doubling of interface energy at k=4, one conditional out-of-sample bracket check; 1.414 is the geometric mean of the observed bracket (1, 2), not an observed point threshold; nothing is established at k=7 or for exact proportionality"},
             "gap_size_scaling": "not supported in this model: gate G12 failed (the k=1 wound never arrests; the gap ladder is incomplete) and G8 was not evaluable; the k=4 and k=7 bracket midpoints differing does not by itself refute a constant Phi because their bracket intervals overlap. Counter-evidence kept, criteria not rescued.",
@@ -74,7 +79,7 @@ def epithelial() -> dict:
                     "Not validated against any measurement. Where it agrees with a published finding, that is two models agreeing.",
                     "No purse-string closure is modelled; the contractility arm is a perimeter constraint, not an actomyosin cable.",
                     "Movie time axes are model units, never minutes or hours."],
-        "records_kept": [f"{g['id']} {by[g['id']]}" + (f": {g['detail']}" if g["id"] in ("G4", "G10") and isinstance(g["detail"], str) else "") for g in gates if by[g["id"]] != "pass"]
+        "records_kept": [f"{g['id']} {by[g['id']]}" + (" (reported pass; independently assessed incomplete)" if g["id"] == "G1b" else "") + (f": {g['detail']}" if g["id"] in ("G4", "G10") and isinstance(g["detail"], str) else "") for g in gates if by[g["id"]] != "pass" or g["id"] == "G1b"]
                         + ["the doubling prediction passed one held-out test and is not a physical law"],
         "media": {k: ent(f"{EP}/media/{v}") for k, v in MEDIA.items()} | {"errata": ent(ERRATA)},
         "sources": [ent(p, download=True) for p in SOURCES], "renderer": [ent(p) for p in RENDERER],

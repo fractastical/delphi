@@ -80,11 +80,13 @@ def test_epithelial_entry_reports_the_files_own_gates_and_keeps_every_failure():
     v = _epithelial()
     g = v["summary"]["gates"]
     res = json.loads((ROOT / "artifacts/epithelial/results-r2.json").read_text())["gates"]
-    assert g["total"] == len(res) == 13
-    assert g["pass"] == sum(x["passed"] is True for x in res) and g["fail"] == sum(x["passed"] is False for x in res) == 3
-    assert g["pass"] == 8 and g["descriptive"] == ["G6"] and g["unevaluable"] == ["G8"]      # G6 is descriptive, not a pass
+    r, rv = g["reported"], g["independent_review"]
+    assert r["total"] == len(res) == 13 and r["pass"] == sum(x["passed"] is True for x in res) == 8 and r["fail"] == sum(x["passed"] is False for x in res) == 3
+    assert r["descriptive"] == ["G6"] and r["unevaluable"] == ["G8"]                  # the file's own historical statuses, unchanged
+    assert rv["pass"] == 7 and rv["fail"] == 3 and rv["incomplete_or_unevaluable"] == ["G1b", "G8"] and rv["no_all_frames_claim"] is True
+    assert "G1b" in json.dumps(v["records_kept"]) and "independently assessed incomplete" in json.dumps(v["records_kept"])
     text = json.dumps(v)
-    for needle in ("G4 fail", "G10 fail", "G12 fail", "G8 not_pass_fail", "not an observed point threshold", "not a physical law", "not supported in this model", "tested model hypothesis", "615.4", "21", "context-specific control"):
+    for needle in ("G4 fail", "G10 fail", "G12 fail", "G8 not_pass_fail", "not an observed point threshold", "REPORTED pass, independently assessed incomplete", "not a physical law", "not supported in this model", "tested model hypothesis", "615.4", "21", "context-specific control"):
         assert needle in text
     pair = v["summary"]["pair"]
     assert pair["closes"]["state"] == "CLOSED" and pair["arrests"]["state"] == "ARRESTED"
