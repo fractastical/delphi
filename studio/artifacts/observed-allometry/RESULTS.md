@@ -6,6 +6,8 @@ The real update adds 19 Exocoetus volitans observations to 12 Cheilopogon furcat
 
 On the same 18 held-out Hirundichthys rondeleti rows, RMSE **worsens 0.0471 → 0.0661 log10 units**. More observed data did not guarantee better transfer. No model selection, threshold or uncertainty estimate was changed after this result.
 
+The training context also broadens from one species to two: the common query is a descriptive pooled-group prediction, not a calibrated prediction for every flying fish. `context-transfer.json` explicitly marks held-out species absent from each saved training context. That is a postprocessing applicability flag, not a newly introduced pass/fail criterion.
+
 | Blocking | Group | Outcome | Scored / declared | Missing | Blocked | RMSE log10 | Extrapolated | Inside working band / available |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | species | flying fish | pectoral_cm | 49/49 | 0 | 0 | 0.0599 | 2 | 45/49 |
@@ -28,6 +30,8 @@ On the same 18 held-out Hirundichthys rondeleti rows, RMSE **worsens 0.0471 → 
 Errors include extrapolated cases; missing outcomes are unscored, never zero-filled. Species and catalog validation reuse the same records and must not be pooled as independent evidence. Each species is completely excluded from its training fold; shared catalog-token components are also excluded. Comma-separated catalog labels are conservative dependence links, not verified independent animal IDs. Only three flying-fish species (18/19/12 rows) are available. Source specimen/measurement context, not biological success, defines applicability.
 
 Training-only residual noise uses SSE/(n−2); parameter covariance uses delete-one catalog-component jackknife only when identifiable. The Gaussian ±1.96 prediction bands are **working conditional bands, not calibrated 95% confidence or future coverage claims**. Their observed internal inclusion counts are shown without treating cells/specimens as independent species replicates. Unidentifiable bands stay null; rank/insufficient-sample blocks and every band miss remain in run/validation.json.
+
+Residual variance combines measurement error, model misspecification and specimen/taxon heterogeneity; these components are not separately identified by this fit.
 
 All 18 missing pelvic values remain missing. The corrupt first source pelvic/SL ratio remains unchanged beside the source lengths and derived ratio; no silent replacement occurs. Existing data/fish-controls files, connector download/extraction code and the prospective experimental_design API are unchanged. No SL→mass conversion or Fish1990 raw data is invented.
 

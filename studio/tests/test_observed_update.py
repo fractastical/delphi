@@ -40,6 +40,17 @@ def test_species_and_catalog_groups_never_share_a_catalog_token():
                 assert not {r["species"] for r in split["train"]} & {r["species"] for r in split["test"]}
 
 
+def test_deliberately_shared_cross_species_catalog_is_purged():
+    # Dependence-label mutation fixture only; no scientific observation is changed.
+    rows = copy.deepcopy([r for r in observed() if r["group"] == "flying fish"])
+    held = next(r for r in rows if r["species"] == "Hirundichthys rondeleti")
+    training = next(r for r in rows if r["species"] == "Cheilopogon furcatus")
+    training["catalog_tokens"].append(held["catalog_tokens"][0])
+    split = next(x for x in blocked_folds(rows, "species") if x["heldout_block"] == held["species"])
+    assert training["id"] in split["purged_ids"]
+    assert training["id"] not in {r["id"] for r in split["train"]}
+
+
 def test_heldout_response_mutation_does_not_change_fit_noise_or_band():
     rows = [r for r in observed() if r["group"] == "flying fish"]
     changed = copy.deepcopy(rows)
@@ -86,3 +97,22 @@ def test_modified_observation_source_is_refused():
     contract = json.loads((ART / "import-contract.json").read_text())
     with pytest.raises(ValueError, match="digest"):
         import_observations((ROOT / contract["path"]).read_bytes() + b"\n", contract)
+
+
+def test_prepared_bundle_is_valid_but_not_database_integration():
+    from frontier_adapters.import_cli import load_frozen_bundle
+
+    bundle = load_frozen_bundle(ART / "prepared-bundle-final/bundle.frontier-bundle-0.1.json")
+    assert len(bundle["records"]) == 6 and bundle["review_claims"] == []
+    evidence = [r for r in bundle["records"] if r["kind"] == "Evidence"]
+    assert {r["payload"]["evidence_kind"] for r in evidence} == {"observed", "predicted"}
+    assert all(a["availability"] == "referenced" for r in evidence for a in r["payload"]["artifacts"])
+    action = next(r for r in bundle["records"] if r["kind"] == "Action")
+    assert "not consumed before" in action["payload"]["cache_key"]["scope"]
+    manifest = json.loads((ART / "prepared-bundle-final/manifest.json").read_text())
+    assert len(manifest["source_commit"]) == 40
+    derived = next(r for r in evidence if r["payload"]["evidence_kind"] == "predicted")
+    assert "adapter_source_commit" not in derived["payload"]["provenance"]
+    assert derived["payload"]["provenance"]["adapter_code_sha256"] == manifest["adapter_code_sha256"]
+    assert all(x["ok"] for x in manifest["checks"])
+    assert "no DB" in manifest["status"]
