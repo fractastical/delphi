@@ -1,0 +1,60 @@
+{
+  "claim_id": "hamilton-lmc",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/hamilton-lmc",
+  "project": "math-bio-theorems",
+  "status": "complete",
+  "hypothesis": "If mothers adjust the sex ratio of their offspring to the degree of local mate competition, then in the parasitoid wasp Nasonia vitripennis the proportion of sons should rise with the number of foundresses laying on a host, and for n >= 2 foundresses should lie near Hamilton's unbeatable value (n - 1) / (2n).",
+  "pass_criterion": "Pre-registered. Data: Cook et al. (2015) 'DNA methylation and sex allocation in the parasitoid wasp Nasonia vitripennis', Dryad doi:10.5061/dryad.15nj0, file DryadData.xlsx; only control (untreated or vehicle-treated) females are used, with the number of co-foundresses and the numbers of sons and daughters per brood or host as given in the file. SUPPORTS if Spearman rho(number of foundresses, proportion of sons) > 0 with p < 0.05 across broods AND the mean absolute deviation between the observed mean proportion of sons at each foundress number n >= 2 and (n - 1) / (2n) is <= 0.10.",
+  "fail_criterion": "Pre-registered. REFUTES if rho <= 0 or p >= 0.05 (no increase of the son proportion with foundress number). MIXED if the increase is present but the deviation from (n - 1) / (2n) exceeds 0.10. INCONCLUSIVE (not-operationalizable) if the file does not record foundress number per brood. INCONCLUSIVE (data-unavailable) if Dryad keeps blocking automated download (as of 2026-10-31 it serves a JavaScript proof-of-work challenge to scripted requests, which this project does not circumvent) and no manually downloaded copy with a recorded checksum is supplied.",
+  "planned_datasets": [
+    "cook2015-nasonia-methylation-sex-allocation-dryad"
+  ],
+  "interpretation": "Nasonia is haplodiploid; the claim states the diploid formula, which is used as stated. The haplodiploid correction (Hamilton 1979) raises the predicted son proportion slightly, which is noted but not applied. Single-foundress broods are excluded from the deviation criterion because the formula gives zero sons at n = 1 while a mother must produce at least one son to fertilise her daughters; they are included in the correlation.",
+  "datasets": [
+    {
+      "id": "cook2015-nasonia-methylation-sex-allocation-dryad",
+      "name": "Cook et al. (2015) 'DNA methylation and sex allocation in the parasitoid wasp Nasonia vitripennis', Dryad data (DryadData.xlsx, 33.5 KB)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.15nj0",
+      "doi": "10.5061/dryad.15nj0",
+      "version": "Dryad version as of 2026-10-31",
+      "license": "CC0 (Dryad)",
+      "files": [
+        {
+          "download_url": "https://datadryad.org/stash/downloads/file_stream/54407",
+          "attempted_at": "2026-10-31T05:57:57Z",
+          "http_status": 403,
+          "obtained": false
+        }
+      ],
+      "role": "not obtained: Dryad answered the scripted download with HTTP 403 and an Anubis JavaScript proof-of-work challenge page"
+    }
+  ],
+  "method": "fetch.py requested the file(s) by their Dryad file-stream URLs with a plain HTTP client and received HTTP 403 with a proof-of-work challenge page (the Dryad API download endpoint requires an account token). Per BEST_PRACTICES.md, sites that block automated requests are not circumvented, so no data were inspected and no analysis was run. fetch.py accepts a manually downloaded copy placed in data/ and records its checksum; the pre-registered analysis can then be run without changing the criteria.",
+  "measured": {
+    "value": null,
+    "unit": "not measured",
+    "n": 0,
+    "uncertainty": null,
+    "extra": {
+      "dryad_files_listed_by_api": [
+        "dryad_file"
+      ],
+      "http_status": [
+        403
+      ]
+    }
+  },
+  "verdict": "inconclusive",
+  "confidence": 1.0,
+  "caveats": [
+    "The dataset exists and is public (CC0) but could not be fetched by script; a person with a browser can download it in seconds, after which this test is runnable as pre-registered.",
+    "Dryad's metadata API (which does not require a token) confirmed the file names and sizes; nothing about the data values was seen."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack)",
+    "date": "2026-10-31"
+  },
+  "reason": "data-unavailable"
+}

@@ -1,0 +1,238 @@
+#!/usr/bin/env node
+// Freezes the held-out exam for DELPHI: which organisms no builder may use, and what the
+// exam over them looks like. Everything is derived from repo files; nothing is typed by hand.
+//
+//   node holdout/make-split.mjs                   # write holdout/{split,exam}.json, holdout-taxa.csv, CHECKSUMS.json
+//   node holdout/make-split.mjs --verify          # recompute and compare with CHECKSUMS.json (exit 1 on any change)
+//   node holdout/make-split.mjs --clade Mammalia  # size an alternative clade (writes to holdout/alt/<clade>/)
+//
+// Inputs (read only): organisms/merged/taxa.json, organisms/merged/datasets.json,
+//                     dashboard/genomes.cache.json, docs/claims.json
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const args = process.argv.slice(2);
+const flag = n => args.includes(n);
+const opt = (n, d) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : d; };
+
+// ------------------------------------------------------------------------------------------
+// THE RULE. Change the clade here (or with --clade) and nothing else.
+// ------------------------------------------------------------------------------------------
+const CLADES = {
+  Aves: {
+    label: 'birds', singular: 'bird',
+    // Taxa in the inventory that sit above class rank and contain the held-out clade. They are
+    // neither held out nor available for building, because their data mixes both sides.
+    containers: ['Animalia', 'Metazoa', 'Eumetazoa', 'Bilateria', 'Deuterostomia', 'Chordata', 'Vertebrata', 'Craniata',
+      'Gnathostomata', 'Osteichthyes', 'Sarcopterygii', 'Tetrapoda', 'Amniota', 'Sauropsida', 'Diapsida', 'Archosauria',
+      'Dinosauria', 'Theropoda'],
+    // Trait tables whose rows for held-out species are the exam's answer key.
+    traitSources: { avonet: /^avonet/, amniote: /^amniote-life-history/, anage: /^anage-build/, eltontraits: /^eltontraits/ }
+  },
+  Mammalia: {
+    label: 'mammals', singular: 'mammal',
+    containers: ['Animalia', 'Metazoa', 'Eumetazoa', 'Bilateria', 'Deuterostomia', 'Chordata', 'Vertebrata', 'Craniata',
+      'Gnathostomata', 'Osteichthyes', 'Sarcopterygii', 'Tetrapoda', 'Amniota', 'Synapsida', 'Therapsida'],
+    traitSources: { pantheria: /^pantheria/, amniote: /^amniote-life-history/, anage: /^anage-build/, eltontraits: /^eltontraits/ }
+  }
+};
+const DEFAULT_CLADE = 'Aves';
+const PROVISIONAL = false; // confirmed by Amit on 2026-10-31 (see DECISION); it was provisional from the 05:52 UTC freeze until then
+// The clade decision and its cost, recorded in split.json, exam.json and CHECKSUMS.json because the reasoning is the
+// part a reader will not be able to reconstruct later. The numbers are read from holdout/power-analysis.json and
+// holdout/exam-results/not-applicable.json at build time so that the record and the files cannot drift apart.
+const DECISION = (() => {
+  const rd = p => fs.existsSync(path.join(root, p)) ? JSON.parse(fs.readFileSync(path.join(root, p), 'utf8')) : null;
+  const power = rd('holdout/power-analysis.json'), na = rd('holdout/exam-results/not-applicable.json');
+  const tests = power ? power.tests.map(t => ({ test: t.test, clade: t.clade, held_out_n: t.held_out_n, builder_min_n: t.builder_min_n, verdict: t.held_out_verdict })) : [];
+  const mammalOnly = na ? na.tests.filter(t => /mammals only/i.test(t.why_not_applicable)).map(t => t.claim_id) : [];
+  const examined = [...new Set(tests.map(t => t.test))];
+  return {
+    clade: 'Aves', status: 'confirmed',
+    decided_by: 'Amit Shenoy, project lead, in his own words to the hub: "Sure do AVes"',
+    relayed_by: 'hub session scienceclaw-03 to the holdout thread (scienceclaw-93)',
+    decided_on: '2026-10-31',
+    provisional_from: '2026-10-31T05:52:44.982Z',
+    alternative_considered: 'Mammalia',
+    reasoning: [
+      'Aves was chosen knowing it is underpowered for the tests built so far: the held-out bird counts fall below the builders’ own pre-registered minimum sample sizes, so both examined tests read inconclusive.',
+      'Mammalia would have made 1 of 2 examined tests decisive, but the examined tests had already fitted on mammal rows, and one further completed test uses mammals only and would have been built entirely on held-out data; a switch now would have made those tests post hoc.',
+      'The choice was therefore a clean blind that cannot yet decide over a decisive-looking test on a contaminated design, and the clean blind was taken.',
+      'The finding this records is about the data, not the thread: the public trait and demographic tables cannot support a blind clade exam at the builders’ own minimum n for these laws. That is more useful to the next team than a decisive number from a compromised design.'
+    ],
+    cost: { examined_tests: examined, held_out_counts: tests, decisive_exams_by_clade: power ? power.decisive_exams_by_clade : null, tests_post_hoc_if_mammalia: [...examined, ...mammalOnly], mammal_only_tests: mammalOnly }
+  };
+})();
+
+const cladeName = opt('--clade', DEFAULT_CLADE);
+const clade = CLADES[cladeName];
+if (!clade) { console.error(`unknown clade ${cladeName}; known: ${Object.keys(CLADES).join(', ')}`); process.exit(2); }
+const outDir = cladeName === DEFAULT_CLADE ? path.join(root, 'holdout') : path.join(root, 'holdout', 'alt', cladeName);
+
+const INPUTS = ['organisms/merged/taxa.json', 'organisms/merged/datasets.json', 'dashboard/genomes.cache.json', 'docs/claims.json'];
+const sha256 = buf => crypto.createHash('sha256').update(buf).digest('hex');
+const readRaw = p => fs.readFileSync(path.join(root, p));
+const rd = p => JSON.parse(readRaw(p).toString('utf8'));
+
+const taxa = rd(INPUTS[0]);
+const datasets = rd(INPUTS[1]);
+const genomes = rd(INPUTS[2]);
+const claims = rd(INPUTS[3]).claims;
+
+// NCBI's "reference genome" flag also covers scaffold-level and contig-level assemblies, so the
+// exam counts an organism as genome-ready only when its best assembly is chromosome-level or complete.
+const GENOME_READY = new Set(['Chromosome', 'Complete Genome']);
+
+function assign(t) {
+  const cls = t.lineage?.class || null;
+  if (cls === cladeName) return ['holdout', `lineage.class is ${cladeName}`];
+  if (clade.containers.includes(t.accepted_name)) return ['excluded', `ranks above ${cladeName} and contains it, so its data mixes held-out and training organisms`];
+  if (cls) return ['train', `lineage.class is ${cls}`];
+  return ['train', `no class in lineage (rank ${t.rank}, phylum ${t.lineage?.phylum || 'unknown'}); does not contain ${cladeName}`];
+}
+
+const rows = taxa.map(t => {
+  const [assignment, reason] = assign(t);
+  const ncbi = t.identifiers?.ncbi_taxid ?? null;
+  const g = ncbi != null ? genomes[ncbi] : null;
+  const level = g?.best?.level ?? null;
+  const traits = {};
+  for (const [k, re] of Object.entries(clade.traitSources)) traits[k] = t.datasets.some(id => re.test(id));
+  return {
+    key: t.key, slug: t.slug, name: t.accepted_name, rank: t.rank,
+    phylum: t.lineage?.phylum || null, class: t.lineage?.class || null, order: t.lineage?.order || null, family: t.lineage?.family || null,
+    ids: { gbif: t.identifiers?.gbif_usage_key ?? null, ncbi, wikidata: t.identifiers?.wikidata_qid ?? null },
+    assignment, reason,
+    projects: t.projects, mentions: t.mention_count, claims: t.mentioned_in.length,
+    genome: g ? { assemblies: g.total, ncbi_reference_flag: g.reference, best_accession: g.best?.acc ?? null, best_level: level, ready: GENOME_READY.has(level), retrieved: g.retrieved } : null,
+    traits, datasets: t.datasets
+  };
+});
+
+const by = (arr, f) => arr.reduce((m, x) => { const k = f(x); (m[k] ||= []).push(x); return m; }, {});
+const groups = by(rows, r => r.assignment);
+const holdout = groups.holdout || [];
+const isSpecies = r => r.rank === 'species' || r.rank === 'subspecies';
+const species = holdout.filter(isSpecies);
+
+// Claims whose mentioned organisms fall on one side or the other.
+const taxaByClaim = {};
+for (const t of taxa) for (const c of t.mentioned_in) (taxaByClaim[c] ||= []).push(t.key);
+const assignOf = Object.fromEntries(rows.map(r => [r.key, r.assignment]));
+const claimSides = claims.map(c => {
+  const ks = taxaByClaim[c.id] || [];
+  const sides = new Set(ks.map(k => assignOf[k]));
+  const side = ks.length === 0 ? 'no-organism' : sides.has('holdout') ? (sides.has('train') ? 'mixed' : 'holdout') : sides.has('train') ? 'train' : 'excluded-only';
+  return { id: c.id, side, holdout_taxa: ks.filter(k => assignOf[k] === 'holdout'), n_taxa: ks.length, kind: c.kind, status: c.status, label: c.label };
+});
+const claimCounts = Object.fromEntries(Object.entries(by(claimSides, c => c.side)).map(([k, v]) => [k, v.length]));
+
+const anyTrait = r => Object.values(r.traits).some(Boolean);
+const summary = {
+  taxa: rows.length,
+  holdout: holdout.length, train: (groups.train || []).length, excluded: (groups.excluded || []).length,
+  holdout_species: species.length,
+  holdout_species_with_assembly: species.filter(r => r.genome && r.genome.assemblies > 0).length,
+  holdout_species_genome_ready: species.filter(r => r.genome?.ready).length,
+  holdout_species_reference_flag_but_not_ready: species.filter(r => r.genome && r.genome.ncbi_reference_flag > 0 && !r.genome.ready).length,
+  holdout_species_no_assembly: species.filter(r => !r.genome || r.genome.assemblies === 0).length,
+  holdout_species_with_trait_table: species.filter(anyTrait).length,
+  holdout_species_exam_ready: species.filter(r => r.genome?.ready && anyTrait(r)).length,
+  holdout_mentions: holdout.reduce((a, r) => a + r.mentions, 0),
+  holdout_higher_taxa: holdout.length - species.length,
+  claims: claimCounts,
+  trait_sources: Object.fromEntries(Object.keys(clade.traitSources).map(k => [k, species.filter(r => r.traits[k]).length]))
+};
+
+const split = {
+  clade: cladeName, label: clade.label, provisional: PROVISIONAL,
+  decision: cladeName === DEFAULT_CLADE ? DECISION : { clade: cladeName, status: 'alternative sizing only, not chosen' },
+  rule: [
+    `An organism is held out when the inventory's lineage puts it in class ${cladeName} (any rank: species, genus, family, order, or the class itself).`,
+    `The rule is the class, not the list: a ${clade.singular} species that is not in the inventory is held out too.`,
+    `A taxon above class rank that contains ${cladeName} (${clade.containers.join(', ')}) is excluded from both sides, because its data mixes them.`,
+    'Everything else is available for building (train).',
+    "Genome-ready means the best NCBI assembly is chromosome-level or a complete genome. NCBI's reference flag alone is not enough, because it also marks scaffold-level and contig-level assemblies."
+  ],
+  inputs: INPUTS,
+  summary,
+  taxa: rows.map(({ datasets, ...r }) => ({ ...r, n_datasets: datasets.length }))
+};
+
+const exam = {
+  clade: cladeName, label: clade.label, provisional: PROVISIONAL,
+  decision: cladeName === DEFAULT_CLADE ? DECISION : { clade: cladeName, status: 'alternative sizing only, not chosen' },
+  what_is_tested: 'Each candidate law that a builder supports on training organisms is re-scored, by an assessor who did not build it, on the held-out species below, using the same pre-registered pass and fail criteria. A law counts as generalizing only if it passes here.',
+  rules_for_builders: [
+    `Do not fit, tune, select or sanity-check anything on data for a ${clade.singular}: no ${cladeName} rows from trait tables, genomes, occurrence counts, fossils, or claim texts that only ${cladeName} organisms support.`,
+    "A claim test's planned_datasets may name a shared table (AnAge, EltonTraits, the Amniote database) only with the held-out class filtered out, and the filter must be in the committed analysis script.",
+    'The exam is run once, after building stops, on the frozen roster below. The roster’s SHA-256 is in CHECKSUMS.json; node holdout/make-split.mjs --verify checks it.',
+    'Reading this file is allowed. It names organisms, identifiers and which tables cover them; it contains no trait values.'
+  ],
+  roster: species.map(r => ({ key: r.key, name: r.name, rank: r.rank, order: r.order, family: r.family, ids: r.ids, genome: r.genome && { best_accession: r.genome.best_accession, best_level: r.genome.best_level, ready: r.genome.ready }, traits: r.traits, mentions: r.mentions, claims: r.claims })),
+  higher_taxa_also_held_out: holdout.filter(r => !isSpecies(r)).map(r => ({ key: r.key, name: r.name, rank: r.rank })),
+  claims_mentioning_holdout: claimSides.filter(c => c.side === 'holdout' || c.side === 'mixed').map(c => ({ id: c.id, side: c.side, label: c.label, kind: c.kind, holdout_taxa: c.holdout_taxa })),
+  summary
+};
+
+const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+const traitKeys = Object.keys(clade.traitSources);
+const csv = [['key', 'name', 'rank', 'order', 'family', 'gbif', 'ncbi_taxid', 'wikidata', 'assignment', 'mentions', 'claims', 'assemblies', 'best_assembly', 'best_level', 'genome_ready', ...traitKeys].join(',')]
+  .concat(holdout.map(r => [r.key, r.name, r.rank, r.order, r.family, r.ids.gbif, r.ids.ncbi, r.ids.wikidata, r.assignment, r.mentions, r.claims,
+    r.genome?.assemblies ?? '', r.genome?.best_accession ?? '', r.genome?.best_level ?? '', r.genome ? r.genome.ready : '', ...traitKeys.map(k => r.traits[k])].map(q).join(',')))
+  .join('\n') + '\n';
+
+const outputs = {
+  'split.json': JSON.stringify(split, null, 1) + '\n',
+  'exam.json': JSON.stringify(exam, null, 1) + '\n',
+  'holdout-taxa.csv': csv
+};
+const manifest = {
+  clade: cladeName, provisional: PROVISIONAL,
+  decision: cladeName === DEFAULT_CLADE ? { status: DECISION.status, decided_by: DECISION.decided_by, decided_on: DECISION.decided_on } : null,
+  inputs: Object.fromEntries(INPUTS.map(p => [p, { sha256: sha256(readRaw(p)), bytes: readRaw(p).length }])),
+  outputs: Object.fromEntries(Object.entries(outputs).map(([k, v]) => [k, { sha256: sha256(v), bytes: Buffer.byteLength(v) }])),
+  // The roster alone, so a re-freeze that only changes flags or the decision text can show the held-out set did not move.
+  roster_sha256: sha256(JSON.stringify({ roster: exam.roster.map(r => r.key), higher: exam.higher_taxa_also_held_out.map(r => r.key), assignments: split.taxa.map(t => [t.key, t.assignment]) })),
+  generator: 'holdout/make-split.mjs'
+};
+
+if (flag('--verify')) {
+  const mp = path.join(outDir, 'CHECKSUMS.json');
+  if (!fs.existsSync(mp)) { console.error('no CHECKSUMS.json to verify against'); process.exit(1); }
+  const frozen = JSON.parse(fs.readFileSync(mp, 'utf8'));
+  let bad = 0;
+  for (const [p, v] of Object.entries(frozen.inputs)) if (manifest.inputs[p]?.sha256 !== v.sha256) { console.log(`CHANGED input  ${p}`); bad++; }
+  for (const [p, v] of Object.entries(frozen.outputs)) {
+    const onDisk = fs.existsSync(path.join(outDir, p)) ? sha256(fs.readFileSync(path.join(outDir, p))) : null;
+    if (onDisk !== v.sha256) { console.log(`CHANGED output file ${p}`); bad++; }
+    if (manifest.outputs[p]?.sha256 !== v.sha256) { console.log(`RECOMPUTED differs ${p}`); bad++; }
+  }
+  console.log(bad ? `FROZEN SPLIT BROKEN: ${bad} difference(s) since ${frozen.frozen_at}` : `frozen split intact (frozen ${frozen.frozen_at}, clade ${frozen.clade}${frozen.provisional ? ', provisional' : frozen.decision ? `, ${frozen.decision.status} ${frozen.decision.decided_on}` : ''}${frozen.first_frozen_at && frozen.first_frozen_at !== frozen.frozen_at ? `; roster first frozen ${frozen.first_frozen_at}` : ''})`);
+  process.exit(bad ? 1 : 0);
+}
+
+fs.mkdirSync(outDir, { recursive: true });
+const mp = path.join(outDir, 'CHECKSUMS.json');
+const prev = fs.existsSync(mp) ? JSON.parse(fs.readFileSync(mp, 'utf8')) : null;
+// Roster hash of the freeze being replaced, computed from the files on disk before they are overwritten (older
+// manifests predate roster_sha256).
+const prevRosterSha = prev && fs.existsSync(path.join(outDir, 'exam.json')) && fs.existsSync(path.join(outDir, 'split.json')) ? (() => {
+  const oe = JSON.parse(fs.readFileSync(path.join(outDir, 'exam.json'), 'utf8')), os_ = JSON.parse(fs.readFileSync(path.join(outDir, 'split.json'), 'utf8'));
+  return sha256(JSON.stringify({ roster: oe.roster.map(r => r.key), higher: oe.higher_taxa_also_held_out.map(r => r.key), assignments: os_.taxa.map(t => [t.key, t.assignment]) }));
+})() : null;
+for (const [k, v] of Object.entries(outputs)) fs.writeFileSync(path.join(outDir, k), v);
+const unchanged = prev && JSON.stringify(prev.outputs) === JSON.stringify(manifest.outputs) && JSON.stringify(prev.inputs) === JSON.stringify(manifest.inputs);
+manifest.frozen_at = unchanged ? prev.frozen_at : new Date().toISOString();
+manifest.first_frozen_at = prev?.first_frozen_at || prev?.frozen_at || manifest.frozen_at;
+if (prev && !unchanged) {
+  // Chain of freezes: what this one replaces, and whether the held-out set itself moved. Exam results written before
+  // this freeze cite the previous exam.json SHA-256; roster_unchanged says whether they still apply.
+  manifest.previous_freeze = { frozen_at: prev.frozen_at, provisional: prev.provisional, outputs: prev.outputs, roster_sha256: prevRosterSha, roster_unchanged: prevRosterSha === manifest.roster_sha256, superseded_because: PROVISIONAL ? 'inputs or outputs changed' : 'clade confirmed; provisional flag cleared and the decision recorded', history: prev.previous_freeze ? [prev.previous_freeze, ...(prev.previous_freeze.history || [])].map(({ history, ...h }) => h) : [] };
+} else if (prev?.previous_freeze) manifest.previous_freeze = prev.previous_freeze;
+fs.writeFileSync(mp, JSON.stringify(manifest, null, 1) + '\n');
+if (manifest.previous_freeze && !unchanged) console.log(`re-frozen: replaces the ${manifest.previous_freeze.frozen_at} freeze; roster ${manifest.previous_freeze.roster_unchanged ? 'UNCHANGED' : 'CHANGED'}`);
+console.log(`${cladeName}: ${summary.holdout} held out (${summary.holdout_species} species, ${summary.holdout_species_genome_ready} genome-ready, ${summary.holdout_species_exam_ready} genome+traits), ${summary.train} train, ${summary.excluded} excluded; claims: ${JSON.stringify(claimCounts)}; frozen_at ${manifest.frozen_at}${unchanged ? ' (unchanged)' : ''}`);

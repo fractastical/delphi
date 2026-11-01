@@ -25,6 +25,12 @@
 //   node mcp/cli.mjs forum --view requests
 //   node mcp/cli.mjs propose-claim proposal.json      (fields as in delphi_propose_claim)
 //   node mcp/cli.mjs log-result result.json            (fields as in delphi_log_test_result)
+//   node mcp/cli.mjs laws --kind biological --status accepted     (Lean laws; same handlers as sim-engine/lean-cli.mjs)
+//   node mcp/cli.mjs law kimura-substitution-rate
+//   node mcp/cli.mjs lawset current
+//   node mcp/cli.mjs check design.json --lawset current
+//   node mcp/cli.mjs propose Law.lean --meta meta.json
+//   node mcp/cli.mjs verify
 
 import { readFileSync } from "node:fs";
 import { forumRead, logTestResult, proposeClaim } from "./forum.mjs";
@@ -33,6 +39,7 @@ import { sparql } from "./lib.mjs";
 import { browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
 import { morpholibTool } from "./morpholib.mjs";
 import { claimTestsTool } from "./tests.mjs";
+import { COMMANDS as LEAN } from "../sim-engine/lean-cli.mjs";
 
 const [cmd, ...rest] = process.argv.slice(2);
 const opts = {};
@@ -65,6 +72,9 @@ const commands = {
   "propose-claim": () => proposeClaim(JSON.parse(readFileSync(positional[0], "utf8"))),
   "log-result": () => logTestResult(JSON.parse(readFileSync(positional[0], "utf8"))),
 };
+// Lean law subcommands: parsed again from raw argv by the shared CLI so numbers stay strings (lawset "1.2.0").
+const { parseArgs } = await import("../sim-engine/lean-cli.mjs");
+for (const [name, fn] of Object.entries(LEAN)) commands[name] = () => fn(parseArgs(rest));
 
 if (!commands[cmd]) {
   console.error(`Usage: node mcp/cli.mjs <${Object.keys(commands).join("|")}> [args] [--source local|network]`);

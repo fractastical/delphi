@@ -1,0 +1,73 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/math-law/flight-climb-glide-law> a delphi:Concept, skos:Concept ;
+    rdfs:label "Climb from excess power and the range of a steady glide (Lean 4, kernel-checked)" ;
+    dct:description "Under a power balance with non-negative losses the climb rate is at most (P_avail − P_req)/W, and a steady unpowered glide from height h with lift equal to weight covers at most h (L/D)max, or h (L/D)max/(1 − δ) when drag is reduced by a fraction δ near the surface." ;
+    dct:source "Proved in this project (lean/Delphi/Flight.lean) for the flying-fish audit and the physics thread's coupled simulator (hub items 3 and 4, 2026-10-31); hypotheses named, no paper states it in this form." ;
+    skos:notation "c ≤ (P_avail − P_req)/W ; x ≤ h (L/D)max/(1−δ)" ;
+    skos:definition """/-- **Steady-glide range.** With no thrust, lift equal to weight, `L/D ≤ (L/D)_max` and the potential energy `W h` spent on drag work `D x` plus non-negative losses, the horizontal distance is at most `h (L/D)_max`. -/
+theorem glide_range_le {W h D x LDmax loss Lift : ℝ} (_hW : 0 < W) (hD : 0 < D) (hh : 0 ≤ h)
+    (hlift : Lift = W) (hLD : Lift / D ≤ LDmax) (henergy : W * h = D * x + loss) (hloss : 0 ≤ loss) :
+    x ≤ h * LDmax"""^^delphi:lean4 ;
+    schema:programmingLanguage "Lean 4" ;
+    delphi:leanDeclaration "Delphi.climbRate" ;
+    delphi:leanTheorem "Delphi.glide_range_le", "Delphi.glide_range_le_groundEffect", "Delphi.climbRate_le", "Delphi.climb_nonneg_iff" ;
+    delphi:leanVerified "true"^^xsd:boolean ;
+    skos:scopeNote "Energy and power balances with non-negative losses are the named hypotheses; taxiing thrust, multiple touch-and-go, wind and updrafts are outside the glide model, which is why field glide distances can exceed the bound." ;
+
+    rdfs:comment "Status: kernel-checked (Lean 4 accepted the module with zero sorry and standard axioms only). Not expert-validated. Does not establish: anything about organisms. The theorem is exact inside the stated model and silent outside it. The assumptions it rests on, written in the module header and never proved, are: A single steady glide with no thrust and lift equal to weight; taxiing, repeated touch-and-go, wind and updrafts are outside the model; Losses non-negative; the ground-effect fraction δ and (L/D)max are inputs. Kernel-checked is not expert-validated: no human expert has validated these statements. Whether the Lean statement faithfully renders the source is a separate assessment record, and so far only one assessor provider has run." ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/4ebb56add61de66744fe8b957ecd7c0bcecc8083/lean/Delphi/Flight.lean>, <https://delphi-mission-control.ashenoy000.workers.dev/t/lean/lean.json>, <https://delphi-mission-control.ashenoy000.workers.dev/t/lean/> .
+  <https://w3id.org/delphi/resource/claim/flight-climb-glide-law> dct:conformsTo <https://w3id.org/delphi/resource/math-law/flight-climb-glide-law> ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/lean-kernel-check-flight-climb-glide-law> .
+  <https://w3id.org/delphi/resource/evidence/lean-kernel-check-flight-climb-glide-law> a delphi:EvidenceItem ;
+    rdfs:label "Lean 4 kernel accepted Delphi.glide_range_le with zero sorry and standard axioms; it also rejected 2 deliberately broken variant(s) of this statement or its model" ;
+    dct:description "Build receipt. Lean (version 4.35.0, x86_64-w64-windows-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release); toolchain leanprover/lean4:v4.35.0; Mathlib v4.35.0 (56a005855ea17e0b0958f73ec801ae140b0a1679). lake build exit 0 in 5.3 s with 0 errors; 0 sorry in lean/Delphi/Flight.lean (206 lines). #print axioms for Delphi.glide_range_le, Delphi.glide_range_le_groundEffect, Delphi.climbRate_le, Delphi.climb_nonneg_iff: Classical.choice, Quot.sound, propext only (Lean's standard axioms; no sorryAx). Mutation evidence (lean/mutate.mjs, 2026-10-31T22:57:06.367Z): 2 deliberate change(s) to this statement or its model were each rejected by the compiler: [climb-bound-reversed] Mutant: the climb bound reversed (the excess power over weight claimed to be at most the climb rate); false with positive losses, so the proof must fail. Rejected with 1 error(s): Flight.lean:101:6: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern [glide-range-halved] Mutant: the glide range claimed to be at most half of h (L/D)max; the energy balance allows the full bound, so the proof must fail. Rejected with 2 error(s): Flight.lean:117:25: error: unsolved goals Controls: 17 of 17 unmodified modules accepted by the same command." ;
+    dct:subject <https://w3id.org/delphi/resource/math-law/flight-climb-glide-law> ;
+    rdfs:comment "This evidence item establishes that the stated theorem follows from the stated model. Does not establish: anything about organisms. The theorem is exact inside the stated model and silent outside it. The assumptions it rests on, written in the module header and never proved, are: A single steady glide with no thrust and lift equal to weight; taxiing, repeated touch-and-go, wind and updrafts are outside the model; Losses non-negative; the ground-effect fraction δ and (L/D)max are inputs. Kernel-checked is not expert-validated: no human expert has validated these statements. Whether the Lean statement faithfully renders the source is a separate assessment record, and so far only one assessor provider has run." ;
+    prov:wasDerivedFrom <https://delphi-mission-control.ashenoy000.workers.dev/t/lean/lean.json>, <https://github.com/fractastical/delphisci/blob/4ebb56add61de66744fe8b957ecd7c0bcecc8083/lean/mutations.json>, <https://github.com/fractastical/delphisci/blob/4ebb56add61de66744fe8b957ecd7c0bcecc8083/lean/Delphi/Audit.lean> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-lean-thread-builder> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/4ebb56add61de66744fe8b957ecd7c0bcecc8083/lean/Delphi/Flight.lean> , <https://delphi-mission-control.ashenoy000.workers.dev/t/lean/lean.json> , <https://github.com/fractastical/delphisci/blob/4ebb56add61de66744fe8b957ecd7c0bcecc8083/lean/mutations.json> .
+  <https://w3id.org/delphi/resource/agent/delphisci-lean-thread-builder> a prov:SoftwareAgent ;
+    rdfs:label "delphisci lean thread (Claude Fable 5.1 writing the Lean modules and this builder; the Lean kernel, not the model, checked the proofs)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T23:20:56.657Z"^^xsd:dateTime ;
+    dct:creator <https://w3id.org/delphi/resource/agent/delphisci-lean-thread-builder> ;
+    rdfs:comment "Owner ORCID not yet set: the key owner passes --owner <orcid> to lean/nanopubs/build.mjs at signing time; until then no human is named in this record." ;
+    rdfs:label "Climb from excess power and the range of a steady glide (Lean 4, kernel-checked)" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType <https://w3id.org/delphi/ontology/Concept> ;
+    rdfs:comment "Every source URL in this record was fetched when it was built and resolved, and each file's content at the pinned commit 4ebb56add61de66744fe8b957ecd7c0bcecc8083 is the content this record was built from (checked 2026-10-31T23:21:08.768Z; lean/Delphi/Flight.lean at git blob 0858b0bd17, lean/mutations.json at git blob 78e805a51c, lean/Delphi/Audit.lean at git blob 55c2e850aa). A reader can check that claim with git cat-file. The pinned commit is reachable by SHA from https://github.com/fractastical/delphisci (GitHub serves any commit in a fork network by SHA), but it is NOT an ancestor of that repository's main branch as fetched 2026-10-31T18:02:23.846Z: the work is on a branch and unmerged, so \"the citation resolves\" is not \"the change is merged\"." ;
+    rdfs:comment "Hand-authored in Delphi ontology v2.0 terms (https://w3id.org/delphi/ontology/) by the builder, not created from a template. The template that would otherwise apply as Provenance template is <https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA>. Its published copy carries no legacy probknow IRI (checked 2026-10-31); it was consulted but not instantiated, so no template is declared. A template-conformance checker will therefore report no template declared." ;
+    rdfs:comment "Hand-authored in Delphi ontology v2.0 terms (https://w3id.org/delphi/ontology/) by the builder, not created from a template. The template that would otherwise apply as Pubinfo template is <https://w3id.org/np/RAtKj9bCnB4gUe0E9k-WhffQFSEWd9Ve2hrVllYoLuOB0>. Its published copy still uses legacy w3id.org/probknow IRIs (2 occurrences when checked on 2026-10-31), and its required statements cannot be instantiated from v2.0 terms, so it was not used and no template is declared. A template-conformance checker will therefore report no template declared." ;
+    npx:introduces <https://w3id.org/delphi/resource/math-law/flight-climb-glide-law> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/math-population-genetics-and-evolutionary-theory> .
+  <https://w3id.org/delphi/resource/domain/math-population-genetics-and-evolutionary-theory> rdfs:label "math-population-genetics-and-evolutionary-theory" .
+}

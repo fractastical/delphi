@@ -1,0 +1,462 @@
+#!/usr/bin/env node
+// Builds UNSIGNED Project Delphi nanopub drafts for the Lean thread. One record per nanopub:
+//   law-<claim_id>.trig          the machine-checked law: a delphi:Concept (formal-verification convention
+//                                v1.3) carrying the Lean statement, the kernel-checked identifiers, and a
+//                                delphi:EvidenceItem (build receipt + rejected mutants) linked from the claim
+//   scope-<claim_id>.trig        the proof scope: what the kernel checked vs what the module header assumes
+//   rubric-lean-faithfulness-0.1.0.trig   the faithfulness rubric as a delphi:Concept with its dimensions
+//   assessment-<claim_id>--<provider>.trig  one blind faithfulness assessment, verdict kept literal
+// Every number and identifier comes from dashboard/public/t/lean/lean.json (written by lean/report.mjs from
+// the compiler's output), lean/mutations.json (lean/mutate.mjs) and lean/assessment/results/*.json.
+// Nothing here signs or publishes. An unsigned draft is not a publication.
+//   node lean/nanopubs/build.mjs [--commit <hash>] [--owner <orcid-iri>]
+// Without --commit, repository links point at the branch and the manifest says commitPinned=false; rerun
+// with the hash once lean/ is committed, before anything is signed.
+// Without --owner, no human is named anywhere: the assertion and dct:creator are attributed to the bot agent
+// that built the record, and prov:actedOnBehalfOf is omitted. The key owner sets --owner at signing time,
+// which is the one place the human identity enters. Consistency with earlier records is not consent.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
+import { compareVersions } from '../provenance.mjs';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(here, '../..');
+const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
+const commit = arg('commit', null);
+const owner = arg('owner', null);
+if (owner && !/^https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/.test(owner)) throw new Error('--owner must be an https://orcid.org/… IRI');
+const ref = commit || 'main';
+const REPO = 'https://github.com/fractastical/delphisci';
+const SITE = 'https://delphi-mission-control.ashenoy000.workers.dev/t/lean';
+const blob = p => `${REPO}/blob/${ref}/${p}`;
+
+const R = JSON.parse(fs.readFileSync(path.join(root, 'dashboard/public/t/lean/lean.json'), 'utf8'));
+const M = JSON.parse(fs.readFileSync(path.join(here, '../mutations.json'), 'utf8'));
+const DOMAIN = 'https://w3id.org/delphi/resource/domain/math-population-genetics-and-evolutionary-theory';
+if (!R.build.ok || !R.audit.ok || R.sorryTotal !== 0) throw new Error('lean.json does not report a clean build; refusing to draft leanVerified records');
+if (!M.summary.allAsExpected) throw new Error('mutations.json has a mutant that was not rejected or a control that failed; refusing');
+
+const resDir = path.join(here, '../assessment/results');
+const assessments = fs.existsSync(resDir) ? fs.readdirSync(resDir).filter(f => f.endsWith('.json')).map(f => JSON.parse(fs.readFileSync(path.join(resDir, f), 'utf8'))) : [];
+const providersPerClaim = id => [...new Set(assessments.filter(a => a.claim_id === id).map(a => a.assessor.provider))];
+const claimsWithTwoProviders = R.formalized.filter(f => providersPerClaim(f.claim_id).length >= 2).length;
+
+const DELPHI = 'https://w3id.org/delphi/ontology/', DELPHIR = 'https://w3id.org/delphi/resource/';
+const lit = s => JSON.stringify(String(s));
+const longlit = s => '"""' + String(s).replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"') + '"""';
+const now = new Date().toISOString();
+const PREFIXES = `@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <${DELPHI}> .
+`;
+const TEMPLATES = { // published template nanopubs (project-delphi-ontology/nanopubs/published.json)
+  provenance: 'https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA',
+  pubinfoDomain: 'https://w3id.org/np/RAtKj9bCnB4gUe0E9k-WhffQFSEWd9Ve2hrVllYoLuOB0',
+  evidence: 'https://w3id.org/np/RAk4kcX4zA_touv8CeKku9tTUnbR5xiTLSLwFbrKSl3BE',
+  rubric: 'https://w3id.org/np/RAbjeus1yO4SqlPLnpIWNLS6nvW0DGF3879tVduuE0y00',
+  rubricAssessment: 'https://w3id.org/np/RAOAK6Fe6J6JvD4kUCZg53sRpwRkRq7rzFuDtGT7n6Drw'
+};
+// Team rule (final, 2026-10-31): new records use Delphi ontology v2.0 IRIs only, never legacy probknow IRIs.
+// These records were hand-authored by this builder, not instantiated from a template, so they declare NO
+// nt:wasCreatedFrom*Template triple (that would be a false provenance assertion). Instead each record names,
+// in an rdfs:comment, the template that would otherwise apply, how many legacy probknow IRIs its PUBLISHED
+// copy carries, and the check date, so a reader can verify. Counts are grep -c 'w3id.org/probknow' on each
+// published template's TriG (https://w3id.org/np/<id>.trig), fetched 2026-10-31. The published
+// rubric-assessment template is legacy although the repository's src/18 file is already migrated to delphi:,
+// i.e. the migration happened in the source and was never republished to the network.
+const TEMPLATE_CHECK_DATE = '2026-10-31';
+const TEMPLATE_PROBKNOW_COUNTS = { [TEMPLATES.provenance]: 0, [TEMPLATES.pubinfoDomain]: 2, [TEMPLATES.rubricAssessment]: 19, [TEMPLATES.rubric]: 10 };
+const templateNotes = templates => templates.map(([role, u]) => {
+  const n = TEMPLATE_PROBKNOW_COUNTS[u];
+  const legacy = n > 0 ? `Its published copy still uses legacy w3id.org/probknow IRIs (${n} occurrences when checked on ${TEMPLATE_CHECK_DATE}), and its required statements cannot be instantiated from v2.0 terms, so it was not used and no template is declared.` : `Its published copy carries no legacy probknow IRI (checked ${TEMPLATE_CHECK_DATE}); it was consulted but not instantiated, so no template is declared.`;
+  return `    rdfs:comment ${lit(`Hand-authored in Delphi ontology v2.0 terms (https://w3id.org/delphi/ontology/) by the builder, not created from a template. The template that would otherwise apply as ${role.replace('wasCreatedFrom', '').replace('Template', '') || 'assertion'} template is <${u}>. ${legacy} A template-conformance checker will therefore report no template declared.`)} ;\n`;
+}).join('');
+const BUILDER_AGENT = `${DELPHIR}agent/delphisci-lean-thread-builder`;
+const onBehalf = owner ? `    prov:actedOnBehalfOf <${owner}> ;\n` : '';
+const BUILDER_MODEL = `${DELPHIR}model/claude-fable-5-1`;
+const builderProv = (derived) => `sub:provenance {
+  sub:assertion prov:wasAttributedTo <${BUILDER_AGENT}> ;
+    prov:wasDerivedFrom ${derived.map(d => `<${d}>`).join(' , ')} .
+  <${BUILDER_AGENT}> a prov:SoftwareAgent ;
+    rdfs:label "delphisci lean thread (Claude Fable 5.1 writing the Lean modules and this builder; the Lean kernel, not the model, checked the proofs)" ;
+${onBehalf}    delphi:usesModel <${BUILDER_MODEL}> .
+  <${BUILDER_MODEL}> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}`;
+const pubinfo = (label, type, introduces, templates = [], citedPaths = []) => `sub:pubinfo {
+  this: dct:created "${now}"^^xsd:dateTime ;
+    dct:creator <${BUILDER_AGENT}> ;
+${owner ? '' : '    rdfs:comment "Owner ORCID not yet set: the key owner passes --owner <orcid> to lean/nanopubs/build.mjs at signing time; until then no human is named in this record." ;\n'}    rdfs:label ${lit(label)} ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType <${type}> ;
+    rdfs:comment ${lit(urlNoteFor(citedPaths))} ;
+${templateNotes(templates)}${introduces ? `    npx:introduces <${introduces}> ;\n` : ''}    delphi:domain <${DOMAIN}> .
+  <${DOMAIN}> rdfs:label "math-population-genetics-and-evolutionary-theory" .
+}`;
+const head = `sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}`;
+const trig = (assertion, provenance, pub) => `${PREFIXES}\n${head}\n\n${assertion}\n\n${provenance}\n\n${pub}\n`;
+
+const outDir = path.join(here, 'unsigned');
+fs.rmSync(outDir, { recursive: true, force: true }); fs.mkdirSync(outDir, { recursive: true });
+const manifest = [];
+const write = (name, text, extra) => { fs.writeFileSync(path.join(outDir, name), text); manifest.push({ file: `lean/nanopubs/unsigned/${name}`, status: 'unsigned draft', registry: null, trustyUri: null, ...extra }); };
+
+// Which audited theorems belong to each module, and the main definition the law rests on.
+const leanDecl = { "genotype-genetic-code": "Delphi.Genotype.minSubst", "genotype-pleiotropy-closure": "Delphi.Genotype.closureB", "genotype-developmental-ordering": "Delphi.Genotype.devOrderedB", "genotype-substitution-time": "Delphi.Genotype.expectedWaitingTime", "haldane-cost-of-selection": "Delphi.Genotype.HaldaneCost", "physiology-q10": "Delphi.Physiology.q10Scale", "physiology-laplace": "Delphi.Physiology.sphereWallStress", "altitude-coupling": "Delphi.Altitude.Atmosphere", 'kimura-substitution-rate': 'Delphi.substitutionRate', 'kimura-fixation-probability': 'Delphi.NeutralChain', 'fisher-ftns': 'Delphi.meanFitness', 'maynardsmith-twofold-cost': 'Delphi.asexualNext', 'favored-fixation-lower-bound': 'Delphi.FavoredChain', 'blueprint-well-formedness': 'Delphi.Blueprint.Graph', 'thompson1917-ch03-07': 'Delphi.CubeLaw', 'scaling-area-law': 'Delphi.AreaLaw', 'scaling-strength-law': 'Delphi.breakLoad', 'thompson1917-ch02-06': 'Delphi.vmin', 'thompson1917-ch02-07': 'Delphi.MusclePowerLaw', 'thompson1917-ch02-10': 'Delphi.froudeSpeed', 'scaling-bending-law': 'Delphi.bendingStress', 'flight-allometry-law': 'Delphi.PowerLaw', 'flight-climb-glide-law': 'Delphi.climbRate', 'aerobic-power-bound': 'Delphi.aerobicPower' };
+const theoremsFor = { "genotype-genetic-code": ["Delphi.Genotype.minSubst_le","Delphi.Genotype.claimed_substitutions_rules_out","Delphi.Genotype.phe_leu_one","Delphi.Genotype.trp_stop_one","Delphi.Genotype.met_trp_two"], "genotype-pleiotropy-closure": ["Delphi.Genotype.closure_of_check","Delphi.Genotype.closure_violated"], "genotype-developmental-ordering": ["Delphi.Genotype.devOrdered_of_check","Delphi.Genotype.devOrdered_acyclic"], "genotype-substitution-time": ["Delphi.Genotype.expectedWaitingTime_bounds","Delphi.Genotype.expectedWaitingTime_neutral","Delphi.Genotype.too_little_time_rules_out"], "haldane-cost-of-selection": ["Delphi.Genotype.haldane_time_lower","Delphi.Genotype.haldane_rules_out"], "physiology-q10": ["Delphi.Physiology.q10_ratio","Delphi.Physiology.q10_log"], "physiology-laplace": ["Delphi.Physiology.sphereWallStress_mono","Delphi.Physiology.laplace_pressure_limit","Delphi.Physiology.hoop_pressure_limit"], "altitude-coupling": ["Delphi.Altitude.vmin_mono","Delphi.Altitude.demand_mono","Delphi.Altitude.supply_anti","Delphi.Altitude.feasible_downward_closed","Delphi.Altitude.ceiling","Delphi.Altitude.infeasible_at_ground_infeasible_everywhere"], 'kimura-substitution-rate': ['Delphi.neutral_substitution_rate', 'Delphi.neutral_substitution_rate_diploid', 'Delphi.neutral_substitution_rate_tendsto', 'Delphi.wrightFisher_fixation_one'], 'kimura-fixation-probability': ['Delphi.NeutralChain.fixedBy_tendsto', 'Delphi.NeutralChain.fixedBy_sub_le'], 'fisher-ftns': ['Delphi.fisher_fundamental_theorem', "Delphi.fisher_fundamental_theorem'", 'Delphi.mean_fitness_nondecreasing'], 'maynardsmith-twofold-cost': ['Delphi.twofold_cost_of_sex', 'Delphi.twofold_cost_of_sex_n'], 'favored-fixation-lower-bound': ['Delphi.FavoredChain.fixationProbability_ge', 'Delphi.FavoredChain.fixationProbability_le_one', 'Delphi.wrightFisherSelection_fixation_one_ge', 'Delphi.neutral_expectedSubstitutions', 'Delphi.favored_expectedSubstitutions_ge', 'Delphi.expectedSubstitutions_le', 'Delphi.wrightFisherSelection_substitutions_bounds'], 'blueprint-well-formedness': ['Delphi.Blueprint.wellFormed_of_check', 'Delphi.Blueprint.Graph.acyclic_of_levelsDown', 'Delphi.Blueprint.Graph.transGen_trans', 'Delphi.Blueprint.Graph.transGen_level_lt', 'Delphi.Blueprint.Graph.rooted_of'], 'thompson1917-ch03-07': ['Delphi.cubeLaw_loglog_exponent', 'Delphi.cubeLaw_ratio', 'Delphi.not_cubeLaw_of_exponent_ne_three'], 'scaling-area-law': ['Delphi.areaLaw_ratio', 'Delphi.areaLaw_log', 'Delphi.wingLoading_ratio', 'Delphi.wingLoading_log'], 'scaling-strength-law': ['Delphi.breakLoad_ratio', 'Delphi.safetyFactor_eq', 'Delphi.safetyFactor_scaled', 'Delphi.stress_ratio', 'Delphi.cannot_carry'], 'thompson1917-ch02-06': ['Delphi.powerRequired_log', 'Delphi.vmin_le', 'Delphi.vmin_ratio', 'Delphi.vmin_log', 'Delphi.powerRequired_ratio', 'Delphi.powerAvailable_ratio', 'Delphi.powerRatio_eq'], 'thompson1917-ch02-07': ['Delphi.exists_size_limit'], 'thompson1917-ch02-10': ['Delphi.vmin_ratio', 'Delphi.froude_ratio'], 'scaling-bending-law': ['Delphi.bendingStress_ratio_body', 'Delphi.bendingStress_log_body', 'Delphi.bendingSafety_eq', 'Delphi.bending_cannot_carry', 'Delphi.bendingStress_ratio_sheet', 'Delphi.bendingStress_log_sheet'], 'flight-allometry-law': ['Delphi.vmin_powerLaw_log', 'Delphi.powerLaw_ratio', 'Delphi.powerLaw_log', 'Delphi.powerLaw_div', 'Delphi.cubeLaw_powerLaw'], 'flight-climb-glide-law': ['Delphi.glide_range_le', 'Delphi.glide_range_le_groundEffect', 'Delphi.climbRate_le', 'Delphi.climb_nonneg_iff'], 'aerobic-power-bound': ['Delphi.sustained_flight_requires', 'Delphi.aerobic_le_Ca', 'Delphi.aerobic_le_metabolic', 'Delphi.sustained_le', 'Delphi.climb_le_aerobic', 'Delphi.powerLaw_crossover'] };
+const auditOf = name => R.audit.theorems.find(t => t.theorem === name);
+const plain = { "genotype-genetic-code": "In the standard genetic code, turning one amino acid into another needs at least a fixed number of nucleotide substitutions, computed over the 64-codon table; a claim of fewer is impossible. Phenylalanine to leucine takes one, tryptophan to a stop codon one, methionine to tryptophan two.", "genotype-pleiotropy-closure": "A decidable check that every node a gene is linked to in a genotype map is among the nodes an edit to that gene is shown to change; its truth implies the inclusion, and one missing node makes it false. It bounds what a picture of an edit may leave out, and says nothing about how much any node changes.", "genotype-developmental-ordering": "Taking the developmental stage as the level of a graph whose edges are develops_from, a decidable check passes exactly when every edge goes strictly down in stage; then every derivative is staged after its precursor and the relation is acyclic.", "genotype-substitution-time": "With M gene copies, mutation rate mu per copy per generation and fixation probability u between 1/M and 1, the expected time for N independent sequential substitutions lies between N/(M mu) and N/mu, and equals N/mu in the neutral case; a time below N/(M mu) is impossible even if every mutant fixed.", "haldane-cost-of-selection": "Taking Haldane 1957's cost accounting as a hypothesis (N substitutions by selection in T generations cost at most e T / c), T is at least c N / e. The hypothesis is not proved here and has been contested since it was published; only the arithmetic consequence is machine-checked.", "physiology-q10": "For a rate scaled by a Q10 factor, the ratio between two temperatures is Q10 raised to their difference over ten, and the logarithm of that ratio is linear in temperature.", "physiology-laplace": "The wall stress of a thin-walled sphere under pressure is P r / (2 t) and of a cylinder P r / t; stress grows with radius at fixed pressure and thickness, so a wall of strength sigma_max limits the pressure to 2 sigma_max t / r (sphere) or sigma_max t / r (cylinder).", "altitude-coupling": "In an atmosphere where air density and oxygen partial pressure both fall with height, the minimum speed of lift-supported flight and the power to fly at it rise with height while the aerobic supply falls, so flight possible at a height is possible at every lower height, infeasibility propagates upward, and a design that cannot fly at the ground cannot fly at any height. The direction is proved; the size of the effect is data and it is gentle.",
+  'kimura-substitution-rate': 'In a neutral Wright-Fisher population of M gene copies, the rate at which new mutations become fixed equals the mutation rate per copy per generation, whatever M is.',
+  'kimura-fixation-probability': 'In a neutral absorbing chain on 0..M copies, including the exact Wright-Fisher chain, a mutant present in i copies is eventually fixed with probability i/M.',
+  'fisher-ftns': 'For one haploid or clonal locus with fixed fitnesses, one round of selection raises mean fitness by exactly the variance in fitness divided by the mean fitness.',
+  'maynardsmith-twofold-cost': 'With equal fecundity, a 1:1 sex ratio and males contributing nothing, the odds of asexual to sexual females double every generation and are 2^n times the initial odds after n generations.',
+  'blueprint-well-formedness': 'A finite graph of ontology terms with a body root, levels and part_of edges is well-formed when every edge goes strictly down in level, every edge joins two nodes, every non-root node has a whole, and the pinned taxon statements exclude nothing: then part_of is acyclic, its closure is transitive, every node reaches the root, and a Boolean checker whose truth implies all of this can be evaluated by the kernel on each emitted blueprint.',
+  'thompson1917-ch03-07': 'If weight is k times the cube of a linear dimension (isometric growth at constant density), the log-log exponent of weight on that dimension is exactly 3 and the weight ratio is the cube of the size ratio; a measured exponent other than 3 refutes the exact cube law on that interval.',
+  'scaling-area-law': 'In an isometric family an area scales as the square of the linear dimension and the weight per unit area (wing loading, stress) scales linearly with it.',
+  'scaling-strength-law': 'A member of cross-section A and breaking stress σ fails under axial load σ A; with isometric sections and the same material the breaking load scales as the square of the linear dimension, the safety factor falls as 1/L, and above σ k3/(k1 n) the member cannot carry n body weights. The missing half of Galileo\'s square-cube argument.',
+  'flight-allometry-law': 'For power laws with real exponents the ratio between sizes is (L2/L1)^b, a quotient of power laws has exponent b1 − b2 (wing loading bW − bS), the cube law is the case b = 3, and under power laws for weight and area with constant air density and maximal lift coefficient the minimum flight speed has exponent (bW − bS)/2.',
+  'flight-climb-glide-law': 'Under a power balance with non-negative losses the climb rate is at most (P_avail − P_req)/W, and a steady unpowered glide from height h with lift equal to weight covers at most h (L/D)max, or h (L/D)max/(1 − δ) when drag is reduced by a fraction δ near the surface.',
+  'aerobic-power-bound': 'Aerobic mechanical power is at most η E Q (Ca − Cv) ≤ η E Q Ca; sustained flight needing P_req requires η E Q Ca ≥ P_req; climb under aerobic supply is at most (η E Q Ca − P_req)/W; and if supply scales with size with a smaller exponent than demand, there is a size above which supply falls short.',
+  'scaling-bending-law': 'For a slender linear-elastic beam with similar sections and lever arm proportional to size, bending stress scales as L when the load scales as the body (and a size limit σ_max k_Z/(k_F k_ℓ n) follows) and is independent of size when the load scales as an area (no limit follows).',
+  'thompson1917-ch02-06': 'Lift-supported flight with a bounded lift coefficient needs airspeed at least sqrt(2W/(ρ S C_L,max)); under isometry with constant ρ, C_L,max and L/D that minimum speed scales as L^(1/2) and the power required at it as L^(7/2), while power available scales as L^3 only under Thompson\'s muscle premise, carried as a named hypothesis.',
+  'thompson1917-ch02-07': 'Under the same hypotheses there exists a size above which the power required for flight exceeds the power available; the size exists, its value is not supplied.',
+  'thompson1917-ch02-10': 'Minimum flight speed under isometry and speed at equal Froude number both scale as the square root of the linear dimension.',
+  'favored-fixation-lower-bound': 'In an absorbing chain on 0..M gene copies whose expected copy number never decreases (neutral, or selection for the mutant), including Wright-Fisher sampling with relative fitness 1+s for any s >= 0, a lineage of i copies is eventually fixed with probability at least i/M; so the expected number of substitutions over T generations is at least mu T and at most M mu T.'
+};
+// What the kernel checked, NEVER the source's claim. The old label appended "(Lean 4, kernel-checked)" to
+// the claim as the paper states it, so a record about Thompson's model read as a checked fact about ostriches
+// and moa. For a claim with a paper the label now states the theorem; the paper's claim is kept beside it in
+// skos:note, marked as not what was checked.
+const firstSentence = x => { const m = String(x || '').match(/^([\s\S]*?[.])(\s|$)/); return (m ? m[1] : String(x || '')).trim(); };
+// Where delphi:leanDeclaration names a NAMED HYPOTHESIS rather than a definition, the scope text says so in
+// one clause, so a reader cannot take the premise for the law.
+const HYPOTHESIS_DECLS = {
+  'Delphi.MusclePowerLaw': "Thompson's muscle premise (power available proportional to muscle mass at a constant mass-specific power), which is contested and is never asserted here",
+  'Delphi.Genotype.HaldaneCost': "Haldane 1957's cost-of-selection accounting, contested since it was published",
+  'Delphi.Altitude.Atmosphere': 'a monotone atmosphere: that air density and oxygen partial pressure both fall with height'
+};
+const declClause = f => HYPOTHESIS_DECLS[leanDecl[f.claim_id]]
+  ? ` The declaration in delphi:leanDeclaration (${leanDecl[f.claim_id]}) is a NAMED HYPOTHESIS this theorem takes as an argument, not a definition the law rests on: it is ${HYPOTHESIS_DECLS[leanDecl[f.claim_id]]}, so the premise must not be read as the law.`
+  : '';
+const provedLabel = f => f.paper
+  ? `Kernel-checked Lean 4 statement about a model: ${firstSentence(plain[f.claim_id])}`
+  : `${f.label} (Lean 4, kernel-checked)`;
+const sourceClaimNote = f => f.paper
+  ? `The claim as the source states it, which is NOT what the kernel checked: "${f.label}" (${f.paper.title}, ${f.paper.year}). What was checked is the statement in dct:description, which is about a model.`
+  : null;
+// The assumptions of THIS claim, from its own proof scope, instead of one shared list copied everywhere.
+const notEstablished = f => 'Does not establish: anything about organisms. The theorem is exact inside the stated model and silent outside it. The assumptions it rests on, written in the module header and never proved, are: '
+  + f.proofScope.assumed.map(a => String(a).replace(/\s+$/, '').replace(/[.]$/, '')).join('; ')
+  + '. Kernel-checked is not expert-validated: no human expert has validated these statements. Whether the Lean statement faithfully renders the source is a separate assessment record, and so far only one assessor provider has run.';
+
+// Each source URL pins a commit, so two things have to hold: the file must EXIST at that commit, and the URL
+// must fetch. Both are checked, per path, and each record reports its own result.
+//   - existence is checked locally with git, which is exact;
+//   - reachability with a ranged GET, never HEAD: github.com answers 404 to HEAD on some blob URLs, which is
+//     what made an earlier version of this builder report every citation as unreachable when it was not.
+// GitHub serves any commit in a fork network by SHA, so a commit pushed to a fork resolves from this
+// repository too even when it is on none of its branches.
+const checkUrls = !process.argv.includes('--no-url-check');
+const pathExistsAtRef = p => spawnSync('git', ['cat-file', '-e', `${ref}:${p}`], { cwd: root }).status === 0;
+const urlStatus = new Map();
+async function probe(u) {
+  if (urlStatus.has(u)) return urlStatus.get(u);
+  let st = null;
+  try {
+    const c = new AbortController(); const t = setTimeout(() => c.abort(), 10000);
+    const r = await fetch(u, { method: 'GET', headers: { Range: 'bytes=0-0' }, signal: c.signal, redirect: 'follow' });
+    clearTimeout(t); st = r.status;
+  } catch (e) { st = 'unreachable: ' + e.message; }
+  urlStatus.set(u, st);
+  return st;
+}
+const pathState = new Map();
+const gitOut = (args) => { const r = spawnSync('git', args, { cwd: root, encoding: 'utf8' }); return r.status === 0 ? String(r.stdout).trim() : null; };
+async function statePath(rel) {
+  if (pathState.has(rel)) return pathState.get(rel);
+  const exists = pathExistsAtRef(rel);
+  const url = blob(rel);
+  const status = checkUrls ? await probe(url) : null;
+  // Does the pinned revision hold the bytes this build read? A URL that resolves but shows a different
+  // version is still a false citation, and it is the likelier failure once a file is regenerated.
+  const pinnedBlob = exists ? gitOut(['rev-parse', `${ref}:${rel}`]) : null;
+  const buildBlob = fs.existsSync(path.join(root, rel)) ? gitOut(['hash-object', rel]) : null;
+  const contentMatchesBuild = exists && pinnedBlob && buildBlob ? pinnedBlob === buildBlob : null;
+  // A difference in bytes is not automatically a difference a reader would notice: some cited artefacts are
+  // regenerated every run and carry a build timestamp. Tell the two apart.
+  let driftKind = null, driftFields = [];
+  if (contentMatchesBuild === false) {
+    const pinnedText = gitOut(['show', `${ref}:${rel}`]);
+    let nowText = null; try { nowText = fs.readFileSync(path.join(root, rel), 'utf8'); } catch (e) {}
+    const cmp = pinnedText !== null && nowText !== null ? compareVersions(pinnedText, nowText) : null;
+    driftKind = cmp ? (cmp.identical ? 'none' : cmp.onlyTimestamps ? 'timestamp-only' : 'substantive') : 'unknown';
+    driftFields = cmp ? cmp.fields : [];
+  }
+  const st = { path: rel, url, existsAtCommit: exists, httpStatus: status, contentMatchesBuild, driftKind, driftFields, pinnedBlob, buildBlob,
+    ok: exists && (contentMatchesBuild !== false || driftKind === 'timestamp-only' || driftKind === 'none') && (!checkUrls || status === 200 || status === 206) };
+  pathState.set(rel, st);
+  return st;
+}
+// Pre-check every path any record can cite: the modules, and the fixed files the other record kinds use.
+const CITED = [...new Set([
+  ...R.formalized.map(f => f.module),
+  'lean/mutations.json', 'lean/Delphi/Audit.lean', 'lean/bound/parameters.json', 'lean/bound/result.json',
+  'lean/bound/compute.mjs', 'lean/Delphi/Favored.lean', 'lean/assessment/prompt.md',
+  ...assessments.flatMap(a => [`lean/assessment/prompts/${a.claim_id}.md`, `lean/assessment/results/${a.claim_id}.${a.assessor.provider}.json`]),
+  ...((R.blueprintCertificates || []).filter(c => c.verified && c.current).flatMap(c => [c.leanModule, c.theory, `lean/blueprint/certificates/${c.name}.json`, `lean/blueprint/data/${c.name}.taxon.json`, c.blueprint.file]))
+].filter(Boolean))];
+for (const rel of CITED) await statePath(rel);
+const siteStatus = checkUrls ? await probe(`${SITE}/lean.json`) : null;
+const checkedAt = new Date().toISOString();
+const originMainFetched = (() => { try { return fs.statSync(path.join(root, '.git/refs/remotes/origin/main')).mtime.toISOString(); } catch (e) { return null; } })();
+const onDefaultBranch = spawnSync('git', ['merge-base', '--is-ancestor', ref, 'origin/main'], { cwd: root }).status === 0;
+const branchNote = commit
+  ? ` The pinned commit is reachable by SHA from ${REPO} (GitHub serves any commit in a fork network by SHA), but it is ${onDefaultBranch ? 'an ancestor of' : 'NOT an ancestor of'} that repository's main branch as fetched ${originMainFetched || 'at an unknown time'}: ${onDefaultBranch ? 'the work is merged' : 'the work is on a branch and unmerged, so "the citation resolves" is not "the change is merged"'}.`
+  : '';
+const urlReport = { checked: checkUrls, at: checkUrls ? checkedAt : null, method: 'git cat-file for existence at the commit, ranged GET for reachability', commit: commit || null, ref, repository: REPO,
+  siteStatus, onDefaultBranch, originMainFetched, paths: [...pathState.values()], missingAtCommit: [...pathState.values()].filter(x => !x.existsAtCommit).map(x => x.path),
+  contentDrift: [...pathState.values()].filter(x => x.contentMatchesBuild === false && x.driftKind !== 'timestamp-only').map(x => x.path),
+  timestampOnlyDrift: [...pathState.values()].filter(x => x.driftKind === 'timestamp-only').map(x => ({ path: x.path, fields: x.driftFields })),
+  note: 'A commit pushed to any repository in this fork network resolves from this one by SHA, so reachability and presence-on-a-branch are different questions; only reachability matters for a citation.' };
+// The sentence each record carries, about ITS OWN citations.
+const urlNoteFor = (paths) => {
+  if (!checkUrls) return 'Source URLs were not checked in this build (--no-url-check), so whether they resolve is unknown.' + branchNote;
+  if (!paths.filter(Boolean).length) return 'The source URLs in this record were not individually checked in this build, so nothing here claims they resolve.' + branchNote;
+  const sts = paths.filter(Boolean).map(x => pathState.get(x)).filter(Boolean);
+  const absent = sts.filter(x => !x.existsAtCommit).map(x => x.path);
+  const unreachable = sts.filter(x => x.existsAtCommit && x.httpStatus !== 200 && x.httpStatus !== 206).map(x => `${x.path} (HTTP ${x.httpStatus})`);
+  const drifted = sts.filter(x => x.contentMatchesBuild === false && x.driftKind !== 'timestamp-only' && x.driftKind !== 'none').map(x => x.path);
+  const stamped = sts.filter(x => x.driftKind === 'timestamp-only');
+  const parts = [];
+  if (absent.length) parts.push(`${absent.join(' and ')} did NOT exist at the pinned commit ${ref} (added later), so ${absent.length > 1 ? 'those URLs do' : 'that URL does'} not resolve; pinning a commit that contains ${absent.length > 1 ? 'them' : 'it'} would fix the citation`);
+  if (unreachable.length) parts.push(`${unreachable.join(' and ')} exists at that commit but did not fetch when checked`);
+  if (drifted.length) parts.push(`${drifted.join(' and ')} resolves, but the version at the pinned commit is NOT the one this record was built from (the file was regenerated after that commit), so the URL shows different content than the numbers quoted here`);
+  const stampClause = stamped.length ? ` ${stamped.map(x => `${x.path} differs from the pinned version only in ${x.driftFields.length ? 'its ' + x.driftFields.join(' and ') + ' field' : 'a build timestamp'}, which is rewritten on every run; its substantive content is the content this record was built from`).join('; ')}.` : '';
+  if (!parts.length) {
+    const blobShort = sts.filter(x => x.buildBlob).map(x => `${x.path} at git blob ${String(x.buildBlob).slice(0, 10)}`).join(', ');
+    return `Every source URL in this record was fetched when it was built and resolved, and each file's content at the pinned commit ${ref} is the content this record was built from (checked ${checkedAt}${blobShort ? `; ${blobShort}` : ''}). A reader can check that claim with git cat-file.` + stampClause + branchNote;
+  }
+  return `Checked ${checkedAt}: ${parts.join('; ')}. The record's other URLs resolved, including the dashboard snapshot.` + stampClause + branchNote;
+};
+
+for (const f of R.formalized) {
+  const id = f.claim_id, law = `${DELPHIR}math-law/${id}`, claim = `${DELPHIR}claim/${id}`, ev = `${DELPHIR}evidence/lean-kernel-check-${id}`;
+  const mod = R.modules.find(m => m.file === f.module);
+  const thms = theoremsFor[id].map(n => ({ name: n, audit: auditOf(n), decl: R.theorems.find(t => t.name === n.split('.').pop()) || R.lemmas.find(t => t.name === n.split('.').pop()) }));
+  const missing = thms.filter(t => !t.audit); if (missing.length) throw new Error(`${id}: not in the #print axioms audit: ${missing.map(t => t.name).join(', ')}`);
+  const main = thms[0];
+  const leanSrc = (main.decl?.doc ? `/-- ${main.decl.doc} -/\n` : '') + (main.decl?.statement || '');
+  const muts = M.results.filter(r => r.kind === 'mutation' && r.claim_id === id);
+  const axioms = [...new Set(thms.flatMap(t => t.audit.axioms))].sort();
+  const receipt = `Build receipt. ${R.versions.lean}; toolchain ${R.versions.toolchain}; Mathlib ${R.versions.mathlib.inputRev} (${R.versions.mathlib.rev}). lake build exit ${R.build.exit} in ${R.build.seconds} s with ${R.build.errors} errors; ${mod.sorries} sorry in ${f.module} (${mod.lines} lines). #print axioms for ${thms.map(t => t.name).join(', ')}: ${axioms.join(', ')} only (Lean's standard axioms; no sorryAx). Mutation evidence (lean/mutate.mjs, ${M.summary.run}): ${muts.length ? `${muts.length} deliberate change(s) to this statement or its model were each rejected by the compiler: ${muts.map(m => `[${m.id}] ${m.description} Rejected with ${m.errors} error(s): ${m.firstError}`).join(' ')}` : `NONE. The suite's ${M.summary.mutations} mutants target other theorems, so for this statement mutation evidence is ABSENT, which is not the same as negative: nobody has tried to break this statement and failed.`} Controls: ${M.summary.controlsPassed} of ${M.summary.controls} unmodified modules accepted by the same command.`;
+  const assertion = `sub:assertion {
+  <${law}> a delphi:Concept, skos:Concept ;
+    rdfs:label ${lit(provedLabel(f))} ;
+    dct:description ${lit(plain[id])} ;
+${f.paper ? `    dct:source ${lit(`${f.paper.title} (${f.paper.year})`)} ;\n` : `    dct:source ${lit(f.claim_id === 'blueprint-well-formedness' ? 'Proved in this project (lean/Delphi/Blueprint.lean) for the organism thread\'s text-to-blueprint tool; structural well-formedness, no paper states it.' : f.claim_id.startsWith('flight-') || f.claim_id === 'aerobic-power-bound' ? 'Proved in this project (lean/Delphi/Flight.lean) for the flying-fish audit and the physics thread\'s coupled simulator (hub items 3 and 4, 2026-10-31); hypotheses named, no paper states it in this form.' : f.claim_id.startsWith('scaling-') ? 'Proved in this project (lean/Delphi/Scaling.lean) from the physics thread\'s formal statements (physics/FORMAL-STATEMENTS.md, 2026-10-31; Galileo 1638 and Thompson 1917 ch. II for the idea); hypotheses named, no paper states it in this form.' : 'Proved in this project (lean/Delphi/Favored.lean) as an extension of the neutral case of Kimura (1962) to non-opposing selection; no paper states it in this form.')} ;\n`}${f.paper?.doi ? `    prov:wasDerivedFrom <https://doi.org/${f.paper.doi}> ;\n` : ''}    skos:notation ${lit(f.notation)} ;
+    skos:definition ${longlit(leanSrc)}^^delphi:lean4 ;
+    schema:programmingLanguage "Lean 4" ;
+    delphi:leanDeclaration ${lit(leanDecl[id])} ;
+    delphi:leanTheorem ${thms.map(t => lit(t.name)).join(', ')} ;
+    delphi:leanVerified "true"^^xsd:boolean ;
+    skos:scopeNote ${lit((f.note || 'As stated in the module header.') + declClause(f))} ;
+${sourceClaimNote(f) ? `    skos:note ${lit(sourceClaimNote(f))} ;\n` : ''}
+    rdfs:comment ${lit('Status: kernel-checked (Lean 4 accepted the module with zero sorry and standard axioms only). Not expert-validated. ' + notEstablished(f))} ;
+    rdfs:seeAlso <${blob(f.module)}>, <${SITE}/lean.json>, <${SITE}/> .
+  <${claim}> dct:conformsTo <${law}> ;
+    delphi:hasEvidence <${ev}> .
+  <${ev}> a delphi:EvidenceItem ;
+    rdfs:label ${lit(`Lean 4 kernel accepted ${main.name} with zero sorry and standard axioms; ${muts.length ? `it also rejected ${muts.length} deliberately broken variant(s) of this statement or its model` : 'NO mutant in the suite targets this statement, so it has no mutation evidence'}`)} ;
+    dct:description ${lit(receipt)} ;
+    dct:subject <${law}> ;
+    rdfs:comment ${lit('This evidence item establishes that the stated theorem follows from the stated model. ' + notEstablished(f))} ;
+    prov:wasDerivedFrom <${SITE}/lean.json>, <${blob('lean/mutations.json')}>, <${blob('lean/Delphi/Audit.lean')}> .
+}`;
+  write(`law-${id}.trig`, trig(assertion, builderProv([blob(f.module), `${SITE}/lean.json`, blob('lean/mutations.json')]), pubinfo(provedLabel(f), `${DELPHI}Concept`, law, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], [f.module, 'lean/mutations.json', 'lean/Delphi/Audit.lean'])),
+    { kind: 'law', claim, law, evidence: ev, theorems: thms.map(t => t.name), axioms, mutantsRejected: muts.length });
+
+  // Proof scope: kernel-checked vs assumed, as separate statements on the law.
+  const ps = f.proofScope;
+  const scope = `sub:assertion {
+  <${law}> dct:description ${lit(`Proof scope of the kernel-checked statement recorded as ${id}: ${ps.kernelChecked.length} statement(s) the Lean kernel checked and ${ps.assumed.length} assumption(s) stated in the module header and not proved.${f.paper ? ` The source's claim ("${f.label}", ${f.paper.title} ${f.paper.year}) is what the statement was written FROM, not what was checked.` : ''}`)} ;
+${ps.kernelChecked.map(x => `    skos:scopeNote ${lit('Kernel-checked: ' + x)} ;`).join('\n')}
+${ps.assumed.map(x => `    skos:scopeNote ${lit('Assumed, not proved: ' + x)} ;`).join('\n')}
+    rdfs:comment ${lit('The kernel-checked statements are theorems of the model; the assumptions are the model. ' + notEstablished(f))} ;
+    rdfs:seeAlso <${blob(f.module)}> .
+}`;
+  write(`scope-${id}.trig`, trig(scope, builderProv([blob(f.module), `${SITE}/lean.json`]), pubinfo(`Proof scope of the kernel-checked statement ${id}`, `${DELPHI}Concept`, null, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], [f.module])),
+    { kind: 'proof-scope', law, kernelChecked: ps.kernelChecked.length, assumed: ps.assumed.length });
+}
+
+// The flying-fish substitution budget: a delphi:Hypothesis (a proposition the graph represents without
+// asserting; no source states it) derived from the audited theorems and the sourced parameters in
+// lean/bound/parameters.json. Every number is read from lean.json's `bound` block (lean/bound/compute.mjs).
+const B = R.bound;
+if (B && B.verified) {
+  const P = JSON.parse(fs.readFileSync(path.join(here, '../bound/parameters.json'), 'utf8'));
+  const links = fs.existsSync(path.join(here, '../bound/links.json')) ? JSON.parse(fs.readFileSync(path.join(here, '../bound/links.json'), 'utf8')) : {};
+  const HYP = `${DELPHIR}hypothesis/exocoetidae-substitution-budget`, BEV = `${DELPHIR}evidence/exocoetidae-substitution-budget-computation`;
+  const lawF = `${DELPHIR}math-law/favored-fixation-lower-bound`, lawK = `${DELPHIR}math-law/kimura-substitution-rate`, lawP = `${DELPHIR}math-law/kimura-fixation-probability`;
+  const DATASET = `${DELPHIR}dataset/pbdb-occurrence-counts-2026-10-31`;
+  const e2 = x => Number(x).toExponential(2), f3 = x => Number(x).toFixed(3);
+  const dois = [...P.mutationRatePerSitePerGeneration.sources.map(s => s.doi), P.genomeSites.source.doi, ...P.populationSize.pointEstimates.map(p => p.doi), ...P.generationTimeYears.sources.filter(s => s.doi).map(s => s.doi)].filter(Boolean).map(d => `<https://doi.org/${d}>`);
+  const urls = [P.durationMa.source.url, ...P.generationTimeYears.sources.filter(s => s.url).map(s => s.url)].map(u => `<${u}>`);
+  const numbers = `Generations available: ${e2(B.generations.low)} to ${e2(B.generations.high)} (duration ${B.inputs.durationMa.low} to ${B.inputs.durationMa.high} Ma over a generation time of ${B.inputs.generationTimeYears.high} to ${B.inputs.generationTimeYears.low} years). Neutral budget, mu T per site (Delphi.neutral_expectedSubstitutions, independent of N): ${f3(B.neutralPerSite.low)} to ${f3(B.neutralPerSite.high)} substitutions per site, ${e2(B.neutralPerGenome.low)} to ${e2(B.neutralPerGenome.high)} genome-wide (G = ${e2(B.inputs.genomeSites.value)}); with a 2-year generation time the low end becomes ${f3(B.neutralPerSite.sensitivity2y)} per site${B.neutralPerSite.sensitivityAltFossil != null ? `, and with the next-oldest fossil record in place of the Ypresian one (${B.inputs.durationMa.alternativeFirstAppearance.low} Ma, ${B.inputs.durationMa.alternativeFirstAppearance.what}) it becomes ${f3(B.neutralPerSite.sensitivityAltFossil)} per site` : ''}. The first appearance rests on ${(B.inputs.durationMa.records || []).length} PBDB occurrence records from one publication: ${(B.inputs.durationMa.records || []).map(r => `${r.occurrence} ${r.taxon}, ${r.interval} ${r.early_ma}-${r.late_ma} Ma, ${r.reference}`).join('; ')}. Floor on adaptive substitutions (Delphi.favored_expectedSubstitutions_ge): mu_f T per site, with mu_f (the rate of mutations selection does not oppose) undefined; it equals the neutral budget at mu_f = mu and is independent of N. Ceiling (Delphi.expectedSubstitutions_le): 2 N mu T per site, ${B.ceiling.perSiteByN.map(r => `N = ${e2(r.N)}: ${e2(r.low)} to ${e2(r.high)}`).join('; ')}; vacuous. Required substitutions for a wing: undefined. Verdict: ${B.comparison.verdict}.`;
+  const plainB = `Over the ${B.inputs.durationMa.low} to ${B.inputs.durationMa.high} million years since the oldest Exocoetidae fossil, the machine-checked fixation theorems give the lineage a neutral substitution budget of ${f3(B.neutralPerSite.low)} to ${f3(B.neutralPerSite.high)} substitutions per site (${e2(B.neutralPerGenome.low)} to ${e2(B.neutralPerGenome.high)} genome-wide), independent of population size; adaptive substitutions have a floor of mu_f T per site that depends on an undefined favored-mutation rate, and a ceiling of 2 N mu T per site that is vacuous. Whether this was enough to modify a gliding fish into a winged animal (Darwin 1859, ch. VI) is inconclusive: the number of substitutions a wing requires is not a defined quantity, so there is nothing to compare the budget with.`;
+  const assertion = `sub:assertion {
+  <${HYP}> a delphi:Hypothesis, skos:Concept ;
+    rdfs:label "Substitution budget of the flying-fish lineage (Exocoetidae) over its fossil duration, from the machine-checked fixation theorems: inconclusive for the gliding-to-flight question" ;
+    dct:description ${lit(plainB)} ;
+    delphi:context ${lit(`Darwin, On the Origin of Species (1859), chapter VI: flying-fish "might have been modified into perfectly winged animals" (Project Gutenberg text 1228, lines 5639-5642; organisms/darwin-origin/ch05-06/mentions.json). Taxon: Exocoetidae, NCBI Taxonomy ${P.taxon.ncbi_taxid}, GBIF ${P.taxon.gbif_usage_key}, Wikidata ${P.taxon.wikidata_qid}, PBDB ${P.taxon.pbdb_taxon}. Parameters and sources: ${P.durationMa.source.label} ${P.generationTimeYears.sources.map(s => s.label).join(' ')} ${P.mutationRatePerSitePerGeneration.sources.map(s => s.label).join(' ')} ${P.genomeSites.source.label} ${P.populationSize.pointEstimates.map(p => `${p.species}: ${p.value}, ${p.what}; ${p.source}`).join(' ')} Caveats: ${P.durationMa.caveat} ${P.generationTimeYears.caveat} ${P.mutationRatePerSitePerGeneration.caveat} ${P.genomeSites.caveat} ${P.populationSize.caveat}`)} ;
+    delphi:hasEvidence <${BEV}> ;
+    prov:used <${lawF}>, <${lawK}>, <${lawP}>, <${DATASET}> ;
+    prov:wasDerivedFrom ${[...dois, ...urls].join(', ')} ;
+${B.kernelChecked.map(x => `    skos:scopeNote ${lit('Kernel-checked: ' + x)} ;`).join('\n')}
+${B.assumed.map(x => `    skos:scopeNote ${lit('Assumed, not proved: ' + x)} ;`).join('\n')}
+    rdfs:comment ${lit(`Verdict: ${B.comparison.verdict}. ${B.comparison.reason} Does not establish: that a wing was or was not reachable; which genes or substitutions a wing needs; that any of the named parameters hold for Exocoetidae (none of mu, generation time or N is measured for the family, and the fossil age is a minimum); anything beyond the Wright-Fisher model with independent mutant fates. The arithmetic multiplying the proved rate by generations and sites is a definition applied with a script (lean/bound/compute.mjs), kernel-checked only in the form of the theorems named above. Kernel-checked is not expert-validated. The dataset IRI <${DATASET}> follows the Delphi dataset convention for the repository record organisms/darwin-origin/ch05-06/datasets/pbdb-occurrence-counts-2026-10-31.json; its dataset nanopub is unpublished at build time.${links.blueprintClaim ? '' : ' The organism thread\'s blueprint record for the flying fish is not linked because it did not exist when this draft was built; rebuild with lean/bound/links.json once it does.'}`)} ;
+${links.blueprintClaim ? `    skos:related <${links.blueprintClaim}> ;\n    rdfs:comment ${lit(`Related record: <${links.blueprintClaim}> is the organism thread's ontology-derived anatomical blueprint for the living family${links.blueprintNote ? ' (' + links.blueprintNote + ')' : ''}. The two records are independent statements about the same taxon; this is a citation, not a support or derivation relation in either direction. Neither record is evidence about the transition Darwin imagined.`)} ;\n` : ''}${links.darwinReference ? `    dct:references ${lit(links.darwinReference)} ;\n` : ''}    rdfs:seeAlso <${blob('lean/bound/parameters.json')}>, <${blob('lean/bound/compute.mjs')}>, <${blob('lean/Delphi/Favored.lean')}>, <${blob('organisms/darwin-origin/ch05-06/taxa/exocoetidae.json')}>, <${SITE}/lean.json>, <${SITE}/#flyingfish> .
+  <${BEV}> a delphi:EvidenceItem ;
+    rdfs:label "Computation of the Exocoetidae substitution budget from the audited theorems and the sourced parameters" ;
+    dct:description ${lit(`Theorems (all accepted by Lean ${R.versions.toolchain} with standard axioms only; see lean.json audit): ${Object.values(B.theorems).map(t => `${t.name} [${t.formula}]`).join('; ')}. ${numbers} Computed ${B.computed} by lean/bound/compute.mjs from lean/bound/parameters.json.`)} ;
+    dct:subject <${HYP}> ;
+    rdfs:comment "This evidence item establishes only that the numbers follow from the named theorems' formulas and the named parameter values. It is not evidence that the parameters are right for Exocoetidae, and not evidence about wings." ;
+    prov:wasDerivedFrom <${SITE}/lean.json>, <${blob('lean/bound/parameters.json')}>, <${blob('lean/bound/result.json')}> .
+}`;
+  write('bound-exocoetidae-substitution-budget.trig', trig(assertion, builderProv([blob('lean/bound/parameters.json'), blob('lean/bound/compute.mjs'), blob('lean/Delphi/Favored.lean'), `${SITE}/lean.json`]), pubinfo('Substitution budget of the flying-fish lineage from the machine-checked fixation theorems: inconclusive', `${DELPHI}Hypothesis`, HYP, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], ['lean/bound/parameters.json', 'lean/bound/result.json', 'lean/bound/compute.mjs', 'lean/Delphi/Favored.lean'])),
+    { kind: 'bound', hypothesis: HYP, evidence: BEV, verdict: B.comparison.verdict, blueprintLinked: !!links.blueprintClaim, publishable: 'after signing by the key owner, test registry first; rebuild with lean/bound/links.json once the organism thread\'s blueprint record exists' });
+}
+
+// Blueprint certificates: one record per certified blueprint. A delphi:Hypothesis ("the emitted structure is
+// well-formed under its own rules") with the kernel-checked certificate as its evidence item. It cites the organism
+// thread's blueprint claim as a related record only; it asserts nothing about that claim's truth.
+for (const c of (R.blueprintCertificates || []).filter(c => c.verified && c.current)) {
+  const HYP = `${DELPHIR}hypothesis/blueprint-well-formed-${c.name}`, CEV = `${DELPHIR}evidence/blueprint-certificate-${c.name}`;
+  const lawB = `${DELPHIR}math-law/blueprint-well-formedness`;
+  const related = `${DELPHIR}claim/organism-blueprint-${c.name}`;
+  const g = c.graph, t = c.taxonData;
+  const plain = `The blueprint the organism thread's tool emitted for "${c.blueprint.description}" (${c.blueprint.taxon.label}, ${c.blueprint.taxon.term}; file ${c.blueprint.file}, sha256 ${c.blueprint.sha256}) is well-formed under its own rules: its ${g.distinctEdges} part_of placements over ${g.distinctTerms} distinct terms all go strictly down in level, form no cycle, and lead every term to the body root; ${t.rows.neverIn} never_in_taxon statements reachable from kept terms name no taxon that contains ${c.blueprint.taxon.label} (containing taxa pinned from Ubergraph: ${t.rows.ancestors}), and ${t.rows.inTaxon} in_taxon plus ${t.rows.stated} stated_in_taxon statements all name containing taxa. Distinct terms per level: ${Object.entries(g.countsByLevelDistinct).map(([k, v]) => `${k} ${v}`).join(', ')} (placements: ${Object.entries(g.countsByLevelPlacements).map(([k, v]) => `${k} ${v}`).join(', ')}). The Lean kernel evaluated the checker (${c.theorems.check}) and accepted ${c.theorems.wellFormed}, ${c.theorems.counts} and ${c.theorems.size} with standard axioms only.`;
+  const assertion = `sub:assertion {
+  <${HYP}> a delphi:Hypothesis, skos:Concept ;
+    rdfs:label ${lit(`The emitted blueprint for "${c.blueprint.description}" is structurally well-formed (kernel-checked certificate)`)} ;
+    dct:description ${lit(plain)} ;
+    delphi:context ${lit(`Certificate generated ${c.generated} by ${c.tool} from the blueprint file and lean/blueprint/data/${c.name}.taxon.json (sha256 ${t.sha256}; ${t.queries} SPARQL queries to ${t.endpoint}, retrieved ${t.retrieved.first} to ${t.retrieved.last}). Generic theory: lean/Delphi/Blueprint.lean. Lean ${R.versions.toolchain}; certificate compiled in ${c.compile.seconds} s.`)} ;
+    delphi:hasEvidence <${CEV}> ;
+    prov:used <${lawB}> ;
+${c.kernelChecked.map(x => `    skos:scopeNote ${lit('Kernel-checked: ' + x)} ;`).join('\n')}
+${c.assumed.map(x => `    skos:scopeNote ${lit('Assumed, not proved: ' + x)} ;`).join('\n')}
+    rdfs:comment ${lit(`Does not establish: that ${c.blueprint.taxon.label} or any organism has these structures; that the anatomy is correct or complete; that Uberon, the Cell Ontology or Ubergraph are right; that any part was measured; or anything about a transition between forms. It establishes only that the emitted structure is internally coherent under its own stated rules, with the data pinned by hash. Kernel-checked is not expert-validated.`)} ;
+    skos:related <${related}> ;
+    rdfs:comment ${lit(`Related record: <${related}> is the organism thread's own record of this blueprint. This record is a citation of it, not a statement about its truth, and no support or derivation relation is asserted in either direction. The organism thread may attach this certificate as evidence from its side if it chooses; this record does not do so.`)} ;
+    rdfs:seeAlso <${blob(c.leanModule)}>, <${blob(c.theory)}>, <${blob(`lean/blueprint/certificates/${c.name}.json`)}>, <${blob(c.blueprint.file)}>, <${SITE}/lean.json>, <${SITE}/#blueprint> .
+  <${CEV}> a delphi:EvidenceItem ;
+    rdfs:label ${lit(`Lean 4 kernel accepted the well-formedness certificate of the "${c.blueprint.description}" blueprint`)} ;
+    dct:description ${lit(`${c.theorems.wellFormed} := wellFormed_of_check _ _ ${c.theorems.check}, where ${c.theorems.check} is proved by decide +kernel on the literal graph (${g.distinctTerms} nodes, ${g.distinctEdges} edges) and taxon data (${t.rows.ancestors} ancestors, ${t.rows.neverIn} never_in_taxon rows, ${t.rows.inTaxon} in_taxon rows, ${t.rows.stated} stated_in_taxon rows). #print axioms: ${[...new Set(Object.values(c.audit).flatMap(a => a ? a.axioms : ['(not audited)']))].join(', ')}. Blueprint file sha256 ${c.blueprint.sha256} (built ${c.blueprint.built}); taxon data sha256 ${t.sha256}. Mutation evidence (lean/mutate.mjs): ${M.results.filter(r => r.kind === 'mutation' && r.claim_id === 'blueprint-well-formedness').map(m => `[${m.id}] ${m.description} ${m.outcome}.`).join(' ')}`)} ;
+    dct:subject <${HYP}> ;
+    rdfs:comment "This evidence item establishes that the checker accepts the pinned data and that the generic theorems apply. It is not evidence about any organism." ;
+    prov:wasDerivedFrom <${SITE}/lean.json>, <${blob(`lean/blueprint/certificates/${c.name}.json`)}>, <${blob(`lean/blueprint/data/${c.name}.taxon.json`)}> .
+}`;
+  write(`certificate-blueprint-${c.name}.trig`, trig(assertion, builderProv([blob(c.leanModule), blob(c.theory), blob(`lean/blueprint/certificates/${c.name}.json`), `${SITE}/lean.json`]), pubinfo(`Well-formedness certificate for the "${c.blueprint.description}" blueprint`, `${DELPHI}Hypothesis`, HYP, [['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], [c.leanModule, c.theory, `lean/blueprint/certificates/${c.name}.json`, `lean/blueprint/data/${c.name}.taxon.json`])),
+    { kind: 'certificate', hypothesis: HYP, evidence: CEV, blueprint: c.blueprint.file, blueprintSha256: c.blueprint.sha256, related, publishable: 'after signing by the key owner, test registry first; regenerate when the blueprint is rebuilt' });
+}
+
+// Rubric lean-faithfulness/0.1.0 as a concept with four dimensions (text from lean/assessment/prompt.md).
+const RUBRIC = `${DELPHIR}concept/lean-faithfulness-0.1.0`;
+const dims = [
+  ['same_quantities', 'Same quantities', 'Do the Lean quantities (the definitions shown) correspond to the quantities named in the law? 1 = each named quantity has a matching definition with the same meaning; 0 = the theorem is about different quantities.'],
+  ['assumptions_match', 'Assumptions match', "Are the hypotheses of the Lean theorem the law's stated assumptions, no more and no less? Score down for hidden extra assumptions that make the theorem easier, or for missing assumptions that the law needs."],
+  ['scope_stated', 'Scope stated', 'If the Lean theorem covers a special case (e.g. neutral only, haploid only), is that narrowing explicit in the docstring, and is it the case the law actually needs?'],
+  ['not_trivial', 'Not trivial', "Is the theorem's content the law, rather than generic arithmetic dressed in the law's names? A theorem whose hypotheses already contain the conclusion, or whose conclusion follows by rearranging a definition, scores 0."]
+];
+const dimIri = k => `${RUBRIC}-${k.replace(/_/g, '-')}`;
+const rubricAssertion = `sub:assertion {
+  <${RUBRIC}> a delphi:Concept, skos:Concept ;
+    rdfs:label "Faithfulness of a Lean 4 statement to a stated law of biology, v0.1.0 (lean-faithfulness/0.1.0)" ;
+    dct:description "Scores whether a Lean 4 theorem STATEMENT (hypotheses and conclusion, never the proof) faithfully formalises a law as its source states it. The assessor sees only the claim text, the theorem's docstring and statement, and the definitions it uses; not the proof, not the module header, not the builder's notes. Each dimension is a graded judgement in {0, 0.25, 0.5, 0.75, 1} (delphi:hasScore), never a probability; there is no weighted overall score. Verdicts: faithful = the statement is the law; faithful-with-narrower-scope = a correct but narrower instance of the law, with the narrowing stated; unfaithful = different quantities, hidden assumptions, or trivial content. The project requires assessments from two providers other than the builder's before a verdict travels with a published claim." ;
+    rdfs:seeAlso <${blob('lean/assessment/prompt.md')}> ;
+    skos:narrower ${dims.map(([k]) => `<${dimIri(k)}>`).join(', ')} .
+${dims.map(([k, l, d]) => `  <${dimIri(k)}> a delphi:Concept, skos:Concept ;
+    rdfs:label ${lit(`${l} (lean-faithfulness 0.1.0)`)} ;
+    dct:description ${lit(d)} ;
+    skos:broader <${RUBRIC}> .`).join('\n')}
+}`;
+write('rubric-lean-faithfulness-0.1.0.trig', trig(rubricAssertion, builderProv([blob('lean/assessment/prompt.md')]), pubinfo('Rubric lean-faithfulness/0.1.0', `${DELPHI}Concept`, RUBRIC, [['wasCreatedFromTemplate', TEMPLATES.rubric], ['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], ['lean/assessment/prompt.md'])), { kind: 'rubric', rubric: RUBRIC });
+
+// One assessment record per claim per assessor, verdict literal.
+for (const a of assessments) {
+  const id = a.claim_id, claim = `${DELPHIR}claim/${id}`, law = `${DELPHIR}math-law/${id}`;
+  const modelId = a.assessor.model, provider = a.assessor.provider;
+  const A = `${DELPHIR}assessment/lean-faithfulness--${id}--${provider}`;
+  const AGENT = `${DELPHIR}agent/delphisci-lean-faithfulness-assessor-${modelId}`, MODEL = `${DELPHIR}model/${modelId}`;
+  const nProv = providersPerClaim(id).length;
+  const caution = `Single-provider so far: this is 1 of the 2 assessor providers the project requires (claimsWithTwoProviders: ${claimsWithTwoProviders} of ${R.formalized.length} at build time). It is one model's blind opinion about a translation, not a consensus and not evidence about organisms. Verdict recorded exactly as the assessor returned it.`;
+  const assertion = `sub:assertion {
+  <${claim}> delphi:hasAssessment <${A}> .
+  <${A}> a delphi:LLMClaimAssessment ;
+    rdfs:label ${lit(`${modelId} on the Lean statement of ${id}: ${a.verdict}`)} ;
+    delphi:evaluatesHypothesis <${claim}> ;
+    dct:subject <${RUBRIC}> ;
+    delphi:assessmentType "lean-faithfulness/0.1.0" ;
+    delphi:hasVerdict ${lit(a.verdict)} ;
+    dct:date "${a.assessor.date.slice(0, 10)}"^^xsd:date ;
+    dct:description ${lit(a.rationale)} ;
+    rdfs:comment ${lit(caution)} ;
+    prov:used <${law}> ;
+    prov:wasAttributedTo <${AGENT}> .
+${Object.entries(a.scores).map(([k, v]) => `  <${A}--${k.replace(/_/g, '-')}> a delphi:LLMClaimAssessment ;
+    rdfs:label ${lit(`${dims.find(d => d[0] === k)?.[1] || k} of the Lean statement of ${id} by ${modelId}: ${v}`)} ;
+    dct:subject <${dimIri(k)}> ;
+    delphi:assessmentType "lean-faithfulness/0.1.0/${k}" ;
+    delphi:hasScore "${Number(v)}"^^xsd:double ;
+    dct:isPartOf <${A}> ;
+    prov:wasAttributedTo <${AGENT}> .
+  <${claim}> delphi:hasAssessment <${A}--${k.replace(/_/g, '-')}> .`).join('\n')}
+  <${AGENT}> a prov:SoftwareAgent ;
+    rdfs:label ${lit(`delphisci lean-faithfulness assessor (${modelId}, blind: claim text + Lean statement + definitions, no proof), run via ${a.assessor.via}`)} ;
+${onBehalf}    delphi:usesModel <${MODEL}> .
+  <${MODEL}> a delphi:LanguageModel ;
+    rdfs:label ${lit(modelId)} ;
+    dct:identifier ${lit(modelId)} .
+}`;
+  const provenance = `sub:provenance {
+  sub:assertion prov:wasAttributedTo <${AGENT}> ;
+    prov:wasDerivedFrom <${blob(`lean/assessment/prompts/${id}.md`)}> , <${blob(`lean/assessment/results/${id}.${provider}.json`)}> , <${RUBRIC}> ;
+    prov:wasGeneratedBy sub:assessment .
+  sub:assessment a prov:Activity ;
+    prov:startedAtTime "${a.assessor.date}"^^xsd:dateTime ;
+    prov:wasAssociatedWith <${AGENT}> ;
+    prov:qualifiedAssociation sub:assessmentPlan .
+  sub:assessmentPlan prov:hadPlan <${blob('lean/assessment/prompt.md')}> .
+}`;
+  write(`assessment-${id}--${provider}.trig`, trig(assertion, provenance, pubinfo(`${modelId} on the Lean statement of ${id}: ${a.verdict}`, `${DELPHI}LLMClaimAssessment`, A, [['wasCreatedFromTemplate', TEMPLATES.rubricAssessment], ['wasCreatedFromProvenanceTemplate', TEMPLATES.provenance], ['wasCreatedFromPubinfoTemplate', TEMPLATES.pubinfoDomain]], [`lean/assessment/prompts/${id}.md`, `lean/assessment/results/${id}.${provider}.json`, 'lean/assessment/prompt.md'])),
+    { kind: 'assessment', claim, assessment: A, provider, model: modelId, verdict: a.verdict, scores: a.scores, providersForClaim: nProv, publishable: nProv >= 2 ? 'yes: two providers' : 'hold: one provider only' });
+}
+
+fs.writeFileSync(path.join(here, 'manifest.json'), JSON.stringify({
+  built: now, commit, commitPinned: !!commit, repository: REPO, urlCheck: urlReport,
+  owner: owner, ownerSet: !!owner, ownerNote: owner ? null : 'No human named. The key owner sets --owner <orcid IRI> at signing time; that single value populates prov:actedOnBehalfOf on both agents.',
+  creator: BUILDER_AGENT, signerIdentity: 'to be decided by the key owner: a bot identity with its own key pair and introduction nanopub is the intended shape (nanopub skill); never a human ORCID as signer without that person\'s approval',
+  note: commit ? null : 'Links point at the branch; rerun with --commit <hash> once lean/ is committed and before signing.',
+  templateConformance: { rule: 'delphi v2.0 IRIs only; records are hand-authored, so no nt:wasCreatedFrom*Template triple is declared; the template that would otherwise apply is named in an rdfs:comment with its published probknow IRI count and the check date', checkedOn: TEMPLATE_CHECK_DATE, publishedTemplateProbknowIriCounts: TEMPLATE_PROBKNOW_COUNTS, observation: 'The published rubric-assessment template RAOAK6Fe… carries 19 legacy probknow IRIs while project-delphi-ontology/nanopubs/src/18-template-probknow-rubric-assessment.trig at commit 6ba5f9a is already migrated to delphi: (0 probknow IRIs): the migration happened in the source and was never republished to the network.' },
+  publishing: { status: 'unsigned drafts; nothing signed or published', policy: 'np check + lint, then TEST registry only; production needs the ORCID key owner\'s explicit approval each time', claimsWithTwoProviders, claimsFormalized: R.formalized.length, assessmentRecordsPublishable: claimsWithTwoProviders > 0 ? 'some' : 'none: hold until a second provider has run' },
+  leanBuild: { built: R.built, lean: R.versions.lean, mathlib: R.versions.mathlib, buildOk: R.build.ok, sorry: R.sorryTotal, nonStandardAxioms: R.audit.nonStandard.length },
+  mutations: M.summary,
+  nanopubs: manifest
+}, null, 1));
+console.log(`${manifest.length} unsigned drafts in lean/nanopubs/unsigned (${manifest.filter(m => m.kind === 'law').length} law, ${manifest.filter(m => m.kind === 'proof-scope').length} proof-scope, ${manifest.filter(m => m.kind === 'bound').length} bound, ${manifest.filter(m => m.kind === 'certificate').length} certificate, 1 rubric, ${manifest.filter(m => m.kind === 'assessment').length} assessment); commitPinned=${!!commit}; claimsWithTwoProviders=${claimsWithTwoProviders}`);

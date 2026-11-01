@@ -1,0 +1,118 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix nt: <https://w3id.org/np/o/ntemplate/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch03-07> delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/claim-test-thompson1917-ch03-07> .
+  <https://w3id.org/delphi/resource/evidence/claim-test-thompson1917-ch03-07> a delphi:EvidenceItem ;
+    rdfs:label "Supported: the log-log exponent of mean weight on mean height across ages 2 to 19 is 2.74 for males (95% CI 2.59 to 2.89) and 2.86 for females, inside the pre-registered 2.5 to 3.5 band; a pure cubic model explains 98 to 99% of the variance in mean weight" ;
+    dct:description "Pre-registered test of the claim. Hypothesis as tested: If weight varies as the cube of a linear dimension during growth, then across childhood and adolescence the population mean body weight scales with the population mean stature with a log-log exponent near 3, so the weight-for-age curve is approximately the cube of the stature-for-age curve." ;
+    delphi:statisticalTest "Ordinary least squares of log mean weight on log mean height over 18 one-year age bins per sex (NHANES 2013 to 2018, survey-weighted means) with a t-based 95% confidence interval; R-squared of the cubic model on the original scale" ;
+    schema:additionalProperty sub:plain, sub:status, sub:doesNotEstablish, sub:measured, sub:n, sub:uncertainty, sub:preregRule ;
+    rdfs:comment "The free exponent is below 3 in both sexes (2.74 and 2.86) and the male CI excludes 3, so weight grows a little slower than the cube of stature across childhood; Thompson's 'mainly (though not wholly)' is borne out literally: the cube reproduces the weight curve with R^2 of 0.98-0.99 but is not exact." ;
+    rdfs:comment "Cross-sectional population means from 2013-2018 US children, who are heavier at given height than Thompson's early-20th-century tables; the exponent, not the constant k, is what the claim concerns." ;
+    rdfs:comment "Binned means over 18 ages leave 16 degrees of freedom; the CI reflects bin-to-bin scatter, not individual variation." ;
+    rdfs:comment "Post-hoc discriminating-power check (perturbation.py, added 2026-10-31 after the result; simulation, not observation): with the observed mean heights and bin scatter, the pre-registered rule passes in 100% (males) and 99.95% (females) of 2000 simulations under the cube law, in 0% under an exponent of 2 or 4, and in about 47 to 49% at the band edges 2.5 and 3.5; so the rule rejects surface-law and fourth-power alternatives and is indifferent only at its own pre-registered boundaries." ;
+    rdfs:comment "Cross-check (cross_check.py, added 2026-10-31 after the result; verdict unchanged): the collaborator swarm's test of this claim (origin/main, run cursor/claim-tests-thompson-efb7, NHANES 2007-2018, ages 0 to 19.99 with recumbent length under 24 months) reports a pooled individual-level exponent of 2.408 (95% CI 2.399 to 2.416, n = 23540) and 'mixed'. On this test's own sample the individual-level exponent is 2.755 (CI 2.736 to 2.775, n = 9715; males 2.716, females 2.812), within 0.03 of the age-bin values, so the unit of analysis (bins versus individuals) is not the cause. The cause is the age range: the collaborator's own 2-20 year window gives 2.736 (CI 2.723 to 2.750, n = 19714), reproducing this test, while their 0-2 year window gives 2.098 and pulls the pooled exponent below the 2.5 edge of the band both tests pre-registered. The 'supports' verdict is therefore conditional on the scope fixed at pre-registration (ages 2 to 19, standing stature); including infancy in Thompson's 'during growth' makes it 'mixed'. Whether infancy is inside the claim is a reading of the claim, not a measurement." ;
+    prov:used <https://w3id.org/delphi/resource/dataset/nhanes-2013-2018-body-measures-demographics> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c364a3d8391d6a805eff6225a420e7443bec95ef/claim-tests/thompson-growth-form/thompson1917-ch03-07--delphi-claims/result.json> .
+  sub:plain a schema:PropertyValue ; schema:propertyID "plain_language_statement" ; schema:value "As children grow, their weight rises roughly with the cube of their height; a US survey of 2 to 19 year olds gives an exponent of 2.7 to 2.9." ; schema:description "The tested claim and its outcome in one sentence for a general reader." .
+  sub:status a schema:PropertyValue ; schema:propertyID "status" ; schema:value "supported" ; schema:description "Outcome under the pre-registered decision rule. result.json verdict field: supports" .
+  sub:measured a schema:PropertyValue ; schema:propertyID "measured_value" ; schema:value "2.7420799020169984"^^xsd:double ; schema:unitText "log-log exponent of mean weight on mean height across ages 2-19, males (pre-registered band 2.5-3.5); females given in extra" ; schema:description "Observation: the primary pre-registered quantity, computed by analysis.py from the retrieved files; further computed quantities are in result.json measured.extra." .
+  sub:n a schema:PropertyValue ; schema:propertyID "sample" ; schema:value "4905 males and 4810 females in 18 age bins each" ; schema:description "Observation: what was analysed after the pre-registered filters." .
+  sub:uncertainty a schema:PropertyValue ; schema:propertyID "uncertainty" ; schema:value "males 95% CI [2.59, 2.89]; females b = 2.86, CI [2.66, 3.06]" ; schema:description "Observation: uncertainty or secondary statistics as reported in result.json." .
+  sub:preregRule a schema:PropertyValue ; schema:propertyID "pre_registered_rule" ; schema:value "PASS: Pre-registered. Data: US NHANES examination data, cycles 2013-2014, 2015-2016 and 2017-2018 (Body Measures BMX_H/I/J and Demographics DEMO_H/I/J XPT files), examined participants aged 2 to 19 years with measured standing height (BMXHT, cm) and weight (BMXWT, kg). For each sex, compute MEC-exam-weighted (WTMEC2YR) mean height and mean weight in 1-year age bins (18 bins), regress log(mean weight) on log(mean height) by ordinary least squares, and also fit the constrained model weight = k * height^3 with k estimated by least squares on the log scale. SUPPORTS if, for both sexes, the free exponent b lies in [2.5, 3.5] AND the cubic model reproduces the age-bin mean weights with R^2 >= 0.90 on the original scale. FAIL: Pre-registered. REFUTES if, for either sex, b lies outside [2.5, 3.5] OR the cubic model's R^2 on the age-bin weight curve is < 0.90. MIXED is not possible under this rule except as follows: if the two sexes disagree (one passes, the other fails) the verdict is MIXED. INCONCLUSIVE (data-unavailable) if the files cannot be downloaded." ; schema:description "Assumption and decision rule fixed before the data were opened (see the pre-registration commit in the provenance graph); not an observation." .
+  sub:doesNotEstablish a schema:PropertyValue ; schema:propertyID "does_not_establish" ; schema:value "The exponent is below 3 in both sexes and the male interval excludes 3, so the cube is an approximation, as Thompson's 'mainly (though not wholly)' allows; cross-sectional population means, not individual growth; 16 degrees of freedom per sex." ; schema:description "Interpretation: the limits of what this evidence shows." .
+  sub:ds1Nfiles a schema:PropertyValue ; schema:propertyID "n_files" ; schema:value 6 ; schema:description "Files of this dataset that the test retrieved and checksummed (the distributions listed here)." .
+  sub:ds1Nbytes a schema:PropertyValue ; schema:propertyID "byte_size_total" ; schema:value 16503520 ; schema:description "Total byte size of the retrieved files." .
+  <https://w3id.org/delphi/resource/dataset/nhanes-2013-2018-body-measures-demographics> a dcat:Dataset ;
+    rdfs:label "US National Health and Nutrition Examination Survey (NHANES) 2013-2014, 2015-2016 and 2017-2018: Body Measures (BMX) and Demographics (DEMO) files" ;
+    schema:additionalProperty sub:ds1Nfiles, sub:ds1Nbytes ;
+    dct:identifier "https://wwwn.cdc.gov/nchs/nhanes/" ;
+    dcat:landingPage <https://wwwn.cdc.gov/nchs/nhanes/> ;
+    dcat:version "public release XPT files as served 2026-10-31" ;
+    dct:rights "public domain (US federal government data)" ;
+    dct:license "public domain (US federal government data)" ;
+    rdfs:comment "Role in this test: measured standing height and weight with age, sex and MEC exam weights" ;
+    dcat:distribution sub:ds1f1, sub:ds1f2, sub:ds1f3, sub:ds1f4, sub:ds1f5, sub:ds1f6 .
+  sub:ds1f1 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/BMX_H.xpt> ;
+    dcat:byteSize "2045520"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:09Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f1sum .
+  sub:ds1f1sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "fd5e9fc6e6aab0a4aee6e699f51497bbc9b62101f7f43aee924c473e38fd9442"^^xsd:hexBinary .
+  sub:ds1f2 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/DEMO_H.xpt> ;
+    dcat:byteSize "3833200"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:09Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f2sum .
+  sub:ds1f2sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "f8f0cbb3085a323d4cde22349b164878fea1e64dbc404e65b5815c7816b547d7"^^xsd:hexBinary .
+  sub:ds1f3 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/BMX_I.xpt> ;
+    dcat:byteSize "1989600"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:09Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f3sum .
+  sub:ds1f3sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "d31da84e14212b4e58e8340598a5b8e2144fac83333563e966eb1b332e4141d6"^^xsd:hexBinary .
+  sub:ds1f4 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2015/DataFiles/DEMO_I.xpt> ;
+    dcat:byteSize "3756480"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:09Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f4sum .
+  sub:ds1f4sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "c9297c6c37ae8f78f29be9568fa2a03cf3b112616a39afee04030fc775a66a0d"^^xsd:hexBinary .
+  sub:ds1f5 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/BMX_J.xpt> ;
+    dcat:byteSize "1466000"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:10Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f5sum .
+  sub:ds1f5sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "8d675e42d8826ac98714b2c3dd4c5138a5e353fb4424f7eff5e6db4a01ce838a"^^xsd:hexBinary .
+  sub:ds1f6 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt> ;
+    dcat:byteSize "3412720"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T06:14:10Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f6sum .
+  sub:ds1f6sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "c0b46e0345ea19404928656277c8b0d10b0cca348a9b2fe4fc3c67e8b7ee73ec"^^xsd:hexBinary .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c364a3d8391d6a805eff6225a420e7443bec95ef/claim-tests/thompson-growth-form/thompson1917-ch03-07--delphi-claims/result.json>, <https://github.com/fractastical/delphisci/commit/2a9d8d16d205177000098cb60c36c203c32a3f80> ;
+    prov:wasGeneratedBy sub:test .
+  <https://github.com/fractastical/delphisci/blob/c364a3d8391d6a805eff6225a420e7443bec95ef/claim-tests/thompson-growth-form/thompson1917-ch03-07--delphi-claims/result.json> dct:title "claim-tests/thompson-growth-form/thompson1917-ch03-07--delphi-claims/result.json at commit c364a3d (2026-10-31T14:22:26Z)" ;
+    rdfs:comment "Result file with verdict, measured values, dataset checksums and caveats. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  <https://github.com/fractastical/delphisci/commit/2a9d8d16d205177000098cb60c36c203c32a3f80> a prov:Entity ; dct:title "claim-tests: pre-register 4 Darwin/Thompson tests (ICS ages, LR04+EDC, NHANES, CCDB)" ; dct:date "2026-10-31T06:13:26Z"^^xsd:dateTime ; rdfs:comment "Pre-registration: pass and fail criteria with verdict null, committed 2026-10-31T06:13:26Z; the first data file for this test was retrieved at 2026-10-31T06:14:09Z, 43 s later. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  sub:test a prov:Activity ; prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:used <https://w3id.org/delphi/resource/dataset/nhanes-2013-2018-body-measures-demographics>, <https://github.com/fractastical/delphisci/blob/c364a3d8391d6a805eff6225a420e7443bec95ef/claim-tests/thompson-growth-form/thompson1917-ch03-07--delphi-claims/analysis.py> ; prov:qualifiedAssociation sub:plan .
+  sub:plan a prov:Association ; prov:agent <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:hadPlan <https://github.com/fractastical/delphisci/blob/2a9d8d16d205177000098cb60c36c203c32a3f80/claim-tests/thompson-growth-form/thompson1917-ch03-07--delphi-claims/result.json> .
+  <https://github.com/fractastical/delphisci/blob/2a9d8d16d205177000098cb60c36c203c32a3f80/claim-tests/thompson-growth-form/thompson1917-ch03-07--delphi-claims/result.json> rdfs:comment "The pre-registered plan: result.json as first committed, before any download." .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> a prov:SoftwareAgent ; rdfs:label "delphisci claim-tests runner (claims thread)" ; rdfs:comment "Run: scienceclaw-c4 (claims thread, ScienceClaw hack); drafts by the swarm thread (claude-sonnet-5-5) were used as starting points where noted; model claude-fable-5-1; 2026-10-31" ; delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5.1> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5.1> a delphi:LanguageModel ; rdfs:label "Claude Fable 5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T14:25:59Z"^^xsd:dateTime ;
+    dct:creator <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    rdfs:label "Evidence for thompson1917-ch03-07: supported" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:EvidenceItem ;
+    npx:introduces <https://w3id.org/delphi/resource/evidence/claim-test-thompson1917-ch03-07> ;
+    nt:wasCreatedFromProvenanceTemplate <https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA> ;
+    rdfs:comment "UNSIGNED DRAFT prepared 2026-10-31 by the claims thread of the DELPHI team: not signed, not published to any registry. Intended for the nanopub TEST registry first; production publication needs the ORCID key owner's explicit approval. No human owner is named in this draft: dct:creator is the software agent, and the ORCID of the key holder is added only when that person approves and signs. Built by claim-tests/nanopubs/build.py from result.json." ;
+    rdfs:comment "No assertion template is declared. The template that would otherwise apply, the published Project Delphi evidence item template https://w3id.org/np/RAk4kcX4zA_touv8CeKku9tTUnbR5xiTLSLwFbrKSl3BE (dct:created 2026-10-01), still carries the legacy https://w3id.org/probknow/ontology/ namespace (1 occurrence, checked 2026-10-31 on the live network), and its required statements cannot be instantiated with Delphi ontology 2.0 terms, so this hand-authored record was not created from it and does not claim to be. The provenance template https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA is declared because it carries no legacy IRI (0 occurrences, same check). No pubinfo template is declared. See claim-tests/nanopubs/DECISIONS.md (2026-10-31)." .
+}

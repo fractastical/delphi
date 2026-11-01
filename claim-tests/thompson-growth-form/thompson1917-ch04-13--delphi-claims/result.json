@@ -1,0 +1,148 @@
+{
+  "claim_id": "thompson1917-ch04-13",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch04-13",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "If chromosome numbers of germ-nuclei mostly lie between six and sixteen, with few below six and fewer still above sixteen, then across plant species the haploid (gametic) number n has most of its mass in 6 <= n <= 16, a small lower tail (n < 6) and a still smaller upper tail (n > 16).",
+  "pass_criterion": "Pre-registered. Data: the Chromosome Counts Database (CCDB, Rice et al. 2015), 'statistics' API output (one row per resolved species name with the median gametophytic/sporophytic counts) retrieved per major group (Angiosperms, Gymnosperms, Pteridophytes, Bryophytes) in CSV. One n per species: the median resolved gametophytic count; where only a sporophytic (2n) count is given, n = 2n/2; species with no usable count excluded. SUPPORTS if all three hold: (a) at least 70% of species have 6 <= n <= 16; (b) fewer than 15% have n < 6; (c) the share with n > 16 is smaller than the share with n < 6.",
+  "fail_criterion": "Pre-registered. REFUTES if any holds: fewer than 50% of species have 6 <= n <= 16; the share with n > 16 is >= the share with n < 6; or the share with n > 16 is >= 15%. MIXED otherwise. INCONCLUSIVE (data-unavailable) if the API cannot be read; INCONCLUSIVE (underpowered) if fewer than 1000 species have a usable n.",
+  "planned_datasets": [
+    "ccdb-chromosome-counts-database-statistics-api"
+  ],
+  "interpretation": "'Germ-nuclei' chromosome number is the reduced (haploid, gametic) number n. Thompson wrote before polyploidy was understood; using the median count per species keeps polyploid cytotypes within a species from counting as extra species. The database covers land plants only, so this decides the plant half of the claim ('plants and animals'); the animal half is not tested. 'Few' and 'fewer still' are read as the two tails of the distribution with the lower tail larger than the upper. Follows the swarm thread's draft plan with the data access route specified. READINGS CHECK (added after the result, at the hub's request; the pre-registered rule and thresholds are unchanged). Operationalization: Thompson's 'germ-nuclei' number is the haploid number n; 'organisms' are species; 'few' and 'fewer still' are the two tails of the species distribution, compared with each other and with the 6-16 core. Stated scope: 'plants and animals'; only the plant half is tested (CCDB is plant-only), so the verdict is for plants. Alternative readings computed post hoc: (i) lowest count per species rather than the median, which strips polyploid cytotypes within a species: 30.3% above 16 vs 2.2% below 6, still refuted; (ii) one value per genus (median of species medians), which damps polyploid species radiations: 32.0% of 8414 genera above 16 vs 1.1% below 6, still refuted; (iii) angiosperms only: 33.0% above 16, still refuted. (iv) Animals, untested here: the claim would not be rescued by them, since most vertebrates have n above 16 (humans 23, most birds about 40), but no animal dataset was analysed and this is background knowledge, not evidence from this test. The verdict is 'refutes' under every reading computed.",
+  "datasets": [
+    {
+      "id": "ccdb-chromosome-counts-database-statistics-api",
+      "name": "Chromosome Counts Database (CCDB, Rice et al. 2015), 'statistics' API output per major plant group (one row per resolved species name with minimum, median and maximum count)",
+      "landing_url": "http://ccdb.tau.ac.il/",
+      "doi": "10.1111/nph.13191",
+      "version": "live database as served 2026-10-31",
+      "license": "not stated on the site; community database, cite the paper",
+      "files": [
+        {
+          "download_url": "http://ccdb.tau.ac.il/services/statistics/?majorGroup=Angiosperms&format=csv",
+          "retrieved_at": "2026-10-31T06:14:11Z",
+          "byte_size": 2467253,
+          "sha256": "c97736983a98cca240ddce9af3db1ecc5d020534a0dd84f2637f09105e1fdfc2"
+        },
+        {
+          "download_url": "http://ccdb.tau.ac.il/services/statistics/?majorGroup=Gymnosperms&format=csv",
+          "retrieved_at": "2026-10-31T06:14:19Z",
+          "byte_size": 18444,
+          "sha256": "4711c9757315b9f8f791586a67211176ee677bba50a885bf21cd2a033630317d"
+        },
+        {
+          "download_url": "http://ccdb.tau.ac.il/services/statistics/?majorGroup=Pteridophytes&format=csv",
+          "retrieved_at": "2026-10-31T06:14:21Z",
+          "byte_size": 101653,
+          "sha256": "a6a6c7cce021a960711a00c52069687d55b9e82527eedbd2dc971b32cd2cb141"
+        },
+        {
+          "download_url": "http://ccdb.tau.ac.il/services/statistics/?majorGroup=Bryophytes&format=csv",
+          "retrieved_at": "2026-10-31T06:14:22Z",
+          "byte_size": 90895,
+          "sha256": "20d9ea1b469199d13c5e94dab13c4c09549bc7a796126f66c7a7f47c1b3c6028"
+        }
+      ],
+      "role": "median gametophytic (n) count per species"
+    }
+  ],
+  "method": "fetch.py downloads four CSV files (2.7 MB). analysis.py takes the median count per resolved species name, confirms on six reference species (Arabidopsis n=5, maize 10, wheat 21, rice 12, Scots pine 12, silver fir 12) that the column is at the haploid level, drops duplicates and non-numeric rows, and computes the shares of species with n < 6, 6 <= n <= 16 and n > 16, overall and by major group. The pre-registered rule is applied.",
+  "measured": {
+    "value": 0.3426545433750786,
+    "unit": "share of plant species with haploid number n > 16 (claim: 'fewer still' than the share with n < 6, which is given in extra)",
+    "n": "69948 species with a count",
+    "uncertainty": "binomial standard error below 0.002 at this sample size",
+    "extra": {
+      "fraction_6_to_16": 0.6407045233602104,
+      "fraction_below_6": 0.016640933264710927,
+      "median_n": 13.0,
+      "mode_n": 9,
+      "quantiles_5_25_50_75_95": [
+        7.0,
+        9.0,
+        13.0,
+        19.0,
+        39.0
+      ],
+      "by_group": [
+        {
+          "group": "Angiosperms",
+          "count": 64650,
+          "median": 12.0,
+          "frac_6_16": 0.6523588553750966,
+          "frac_below_6": 0.017385924207269914,
+          "frac_above_16": 0.3302552204176334
+        },
+        {
+          "group": "Bryophytes",
+          "count": 2342,
+          "median": 10.0,
+          "frac_6_16": 0.872331340734415,
+          "frac_below_6": 0.017079419299743808,
+          "frac_above_16": 0.11058923996584116
+        },
+        {
+          "group": "Gymnosperms",
+          "count": 538,
+          "median": 12.0,
+          "frac_6_16": 0.9479553903345725,
+          "frac_below_6": 0.0,
+          "frac_above_16": 0.05204460966542751
+        },
+        {
+          "group": "Pteridophytes",
+          "count": 2418,
+          "median": 41.0,
+          "frac_6_16": 0.036393713813068655,
+          "frac_below_6": 0.0,
+          "frac_above_16": 0.9636062861869313
+        }
+      ],
+      "reference_species_check": {
+        "Arabidopsis thaliana": 5.0,
+        "Zea mays": 10.0,
+        "Triticum aestivum": 21.0,
+        "Oryza sativa": 12.0,
+        "Pinus sylvestris": 12.0,
+        "Abies alba": 12.0
+      },
+      "post_hoc_sensitivity": {
+        "min_count_per_species": {
+          "n": 69948,
+          "fraction_6_to_16": 0.6746297249385258,
+          "fraction_below_6": 0.022416652370332246,
+          "fraction_above_16": 0.302953622691142,
+          "would_refute_under_rule": true
+        },
+        "genus_level_median": {
+          "n_genera": 8414,
+          "fraction_6_to_16": 0.6684097932018065,
+          "fraction_below_6": 0.011171856429759925,
+          "fraction_above_16": 0.3204183503684336,
+          "would_refute_under_rule": true
+        },
+        "angiosperms_only_species": {
+          "fraction_above_16": 0.3302552204176334,
+          "fraction_below_6": 0.017385924207269914,
+          "would_refute_under_rule": true
+        }
+      }
+    }
+  },
+  "verdict": "refutes",
+  "confidence": 0.9,
+  "caveats": [
+    "Thompson's central range is roughly right (64% of species have 6 <= n <= 16, mode n = 9), but the upper tail is 20 times larger than the lower tail (34% above 16 versus 1.7% below 6), the opposite of 'fewer still have more than sixteen': polyploidy, unknown in 1917, puts a third of angiosperms and 96% of ferns above 16.",
+    "Plants only; the animal half of the claim is untested here (animal karyotype compilations were not pursued in this batch).",
+    "The CCDB is a compilation of published counts with uneven taxonomic coverage; the median per species name hides within-species cytotype variation, which is the intended treatment of polyploid races.",
+    "Species with only a sporophytic count: the CCDB statistics service reports counts at the gametophytic level (confirmed on reference species), so no halving was applied.",
+    "Readings check: the refutation holds whether species are scored by their median or lowest count, whether genera rather than species are counted, and within angiosperms alone; it is a refutation for plants, the only half of Thompson's 'plants and animals' scope that was tested."
+  ],
+  "agent": {
+    "kind": "cloud-agent",
+    "model": "claude-fable-5-1",
+    "run": "scienceclaw-c4 (claims thread, ScienceClaw hack); drafts by the swarm thread (claude-sonnet-5-5) were used as starting points where noted",
+    "date": "2026-10-31"
+  }
+}

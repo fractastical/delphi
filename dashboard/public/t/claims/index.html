@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../../shared/shell.css">
+<script src="../../shared/shell.js"></script>
+<title>Claim tests</title>
+<meta name="description" content="DELPHI claims thread: candidate laws of biology tested against public data, each pre-registered before the data were downloaded.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230e7c86'/%3E%3Cpath d='M9 16l5 5 9-10' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#f6f7f4;--panel:#fff;--ink:#14201f;--mute:#5a6b69;--line:#d9dfdb;--accent:#0e7c86;--accent-ink:#fff;--ok:#2f7d4f;--bad:#b3392f;--warn:#a8650b;--viol:#6b4fb3;--soft:#eef2ef;--shadow:0 1px 2px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.05)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1514;--panel:#142120;--ink:#e7efec;--mute:#93a6a2;--line:#27403d;--accent:#38b6c1;--accent-ink:#06201f;--ok:#58c07f;--bad:#ef7a6e;--warn:#e0a24a;--viol:#a58ae6;--soft:#192b29;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3)}}
+:root[data-theme="dark"]{--bg:#0d1514;--panel:#142120;--ink:#e7efec;--mute:#93a6a2;--line:#27403d;--accent:#38b6c1;--accent-ink:#06201f;--ok:#58c07f;--bad:#ef7a6e;--warn:#e0a24a;--viol:#a58ae6;--soft:#192b29;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+h1,h2,h3{line-height:1.2;margin:0 0 .5em}
+h1{font-size:clamp(1.6rem,4vw,2.4rem)} h2{font-size:1.5rem} h3{font-size:1.1rem}
+p{margin:.4em 0 .8em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;gap:12px;align-items:center;overflow-x:auto;padding-top:8px;padding-bottom:8px;white-space:nowrap}
+.brand{font-weight:700;margin-right:8px}
+nav a{display:inline-block;padding:4px 10px;border-radius:99px;text-decoration:none;color:var(--mute);font-size:.9rem}
+nav a:hover{background:var(--soft);color:var(--ink)}
+#themeBtn{margin-left:auto}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;border-radius:8px}
+button:hover{border-color:var(--accent)}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+section{padding:36px 0;border-bottom:1px solid var(--line)}
+.lede{color:var(--mute);max-width:70ch;font-size:1.05rem}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.card h3{margin-top:0}
+.kpi{font-size:2rem;font-weight:700;line-height:1}
+.kpi small{display:block;font-size:.8rem;font-weight:400;color:var(--mute);margin-top:6px}
+.chip{display:inline-block;padding:1px 9px;border-radius:99px;font-size:.78rem;border:1px solid var(--line);background:var(--soft);color:var(--mute)}
+.chip.ok{color:var(--ok);border-color:var(--ok)} .chip.bad{color:var(--bad);border-color:var(--bad)} .chip.warn{color:var(--warn);border-color:var(--warn)} .chip.viol{color:var(--viol);border-color:var(--viol)}
+.pill-row{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+details{border:1px solid var(--line);border-radius:10px;background:var(--panel);margin:8px 0;padding:0}
+details>summary{cursor:pointer;padding:10px 14px;font-weight:600;list-style:none}
+details>summary::before{content:"\25B8";display:inline-block;margin-right:8px;transition:transform .15s;color:var(--accent)}
+details[open]>summary::before{transform:rotate(90deg)}
+details>.in{padding:2px 16px 14px}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600}
+.scroll{overflow-x:auto}
+code{font-size:.85em;background:var(--soft);padding:1px 5px;border-radius:5px}
+/* The ledger: one test, one verdict, the rule and the number side by side. */
+.test{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin:14px 0;overflow:hidden}
+.test>.head{padding:16px 18px 10px;border-left:6px solid var(--line)}
+.test.v-supports>.head{border-left-color:var(--ok)} .test.v-refutes>.head{border-left-color:var(--bad)} .test.v-mixed>.head{border-left-color:var(--warn)} .test.v-inconclusive>.head{border-left-color:var(--mute)}
+.test .who{color:var(--mute);font-size:.92rem}
+.ledger{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;padding:4px 18px 14px;font-size:.95rem}
+.ledger dt{color:var(--mute);margin:0}
+.ledger dd{margin:0}
+.ledger .num{font-weight:700;font-size:1.15rem}
+.ledger .num small{font-weight:400;color:var(--mute);font-size:.85rem}
+.expect{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line);font-size:.92rem}
+.expect>div{padding:10px 18px}
+.expect>div+div{border-left:1px solid var(--line)}
+.expect b{display:block;font-size:1.05rem}
+.test details{margin:0;border:0;border-top:1px solid var(--line);border-radius:0}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 4px}
+.filters button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.muted{color:var(--mute)}
+.sha{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.78rem;color:var(--mute)}
+.agree{display:inline-block;min-width:1.6em;text-align:center;border-radius:6px;padding:0 4px;font-weight:600}
+@media (max-width:640px){.ledger{grid-template-columns:1fr}.expect{grid-template-columns:1fr}.expect>div+div{border-left:0;border-top:1px solid var(--line)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+</style>
+<style id="dsh-fit">@media (max-width:720px){body{overflow-wrap:break-word}main table,section table,.card table,.in table,.scroll table{display:block;overflow-x:auto;max-width:100%}code,pre,.mono{overflow-wrap:anywhere}}</style>
+</head>
+<body>
+<!-- delphi-shell:start  generated by dashboard/build-shell.mjs - do not edit by hand -->
+<a class="dsh-skip" href="#dsh-content">Skip the navigation</a>
+<header class="dsh">
+  <div class="dsh-bar"><a class="dsh-brand" href="../../index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0e7c86"/><path d="M5 16c5-7 14-9 22-4-3 2-6 3-8 4 2 1 5 2 8 4-8 5-17 3-22-4z" fill="#fff"/></svg>DELPHI<span class="sub">laws of biology</span></a>
+    <nav class="dsh-nav" aria-label="Primary"><span class="dsh-grp"><span class="dsh-lab">Results</span><a class="dsh-link" href="../../results/">Results</a><a class="dsh-link" href="../../deck/">Pitch deck</a><a class="dsh-link" href="../../print/">Printable kit</a><a class="dsh-link" href="../../studio-api/">For agents</a><a class="dsh-link" href="../../evolve/">Enzymes</a></span><span class="dsh-grp"><span class="dsh-lab">Evidence</span><a class="dsh-link" href="../../proofs/">Claim book</a><a class="dsh-link" href="../../graph/">Graph</a><a class="dsh-link" href="../../figures/">Figures</a></span><span class="dsh-grp" data-cur><span class="dsh-lab">Threads</span><a class="dsh-link" href="../../t/lean/">Lean proofs</a><a class="dsh-link" href="../../t/claims/" aria-current="page">Claim tests</a><a class="dsh-link" href="../../t/genotype/">Genotype</a><a class="dsh-link" href="../../t/physics/">Physics</a><a class="dsh-link" href="../../t/physics/sim/">Simulator</a><a class="dsh-link" href="../../t/organism/">Organism</a><a class="dsh-link" href="../../t/holdout/">Holdout</a><a class="dsh-link" href="../../t/swarm/">Swarm</a><a class="dsh-link" href="../../t/validation/">Validation</a></span><span class="dsh-grp"><span class="dsh-lab">About</span><a class="dsh-link" href="../../start/">Start here</a><a class="dsh-link" href="../../index.html">Mission control</a></span></nav>
+    <button class="dsh-theme" id="themeBtn" data-dsh-theme type="button" title="Toggle light or dark">Theme</button></div>
+  <nav class="dsh-modes" aria-label="The 3D organism viewer"><span class="dsh-lab">The organism</span><a class="dsh-link" href="../../blueprint3d/">Anatomy</a><a class="dsh-link" href="../../blueprint3d/?mode=physiology">Circulation &amp; gills</a><a class="dsh-link" href="../../blueprint3d/?mode=tissue">Tissue signals</a><a class="dsh-link" href="../../blueprint3d/?mode=cell">Cell interactions</a><a class="dsh-link" href="../../blueprint3d/?mode=physics">Flight simulator</a><a class="dsh-link" href="../../blueprint3d/?mode=design">Design studio</a><a class="dsh-link" href="../../blueprint3d/?mode=growth">Growth</a><a class="dsh-link" href="../../blueprint3d/?mode=compare">Compare species</a><a class="dsh-link" href="../../blueprint3d/?mode=sequences">Gene sequences</a><a class="dsh-link" href="../../blueprint3d/?view=radial">Radial map</a></nav>
+</header>
+<span id="dsh-content"></span>
+<!-- delphi-shell:end -->
+<header class="top"><div class="wrap">
+  <a class="brand" href="../../index.html" style="text-decoration:none;color:inherit">&larr; DELPHI Mission Control</a>
+  <nav><a href="#summary">Summary</a><a href="#tests">Each test</a><a href="#data">Data used</a><a href="#how">How a test works</a></nav>
+  <button id="themeBtn" type="button" aria-label="Switch colour theme">Theme</button>
+</div></header>
+
+<section id="summary"><div class="wrap">
+  <h1>Claim tests: laws of biology against public data</h1>
+  <p class="lede">Each test takes one claim from the DELPHI claim graph, writes down in advance what result would support it and what would refute it, and only then downloads real public data and runs the analysis. The rule is committed before the data are seen, so a refutation counts as much as a confirmation.</p>
+  <p id="headline" class="lede">Loading tests.json&hellip;</p>
+  <div class="grid g4" id="kpis"></div>
+  <div class="card" style="margin-top:14px" id="agreeCard"></div>
+</div></section>
+
+<section id="tests"><div class="wrap">
+  <h2>Each test</h2>
+  <p class="lede">Verdicts follow the pre-registered rule mechanically. "Mixed" means the measurement fell between the support and refute thresholds; "inconclusive" means the data could not be obtained or the test lacked power.</p>
+  <div class="filters" id="filters"></div>
+  <div id="list"></div>
+</div></section>
+
+<section id="data"><div class="wrap">
+  <h2>Data used</h2>
+  <p class="lede">Every file is recorded with its download address, retrieval time, size and SHA-256 so that anyone can fetch the same bytes. Files over 1 MB are not kept in the repository; the fetch scripts re-download them.</p>
+  <div class="scroll"><table id="dataTable"><thead><tr><th>Dataset</th><th>Used by</th><th>Files</th><th>Size</th><th>Licence</th></tr></thead><tbody></tbody></table></div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2>How a test works</h2>
+  <p>Each test lives in its own folder under <code>claim-tests/</code> with four parts: <code>result.json</code> (the pre-registration, later filled with the measurement and verdict), <code>fetch.py</code> (downloads the data and records checksums), <code>analysis.py</code> (computes every number in the result) and <code>derived/</code> (small tables the analysis wrote). The pre-registration is committed to git before <code>fetch.py</code> is first run, so the commit history shows the rule preceded the data.</p>
+  <p>Two cross-species tests exclude all birds before fitting, because the holdout thread keeps class Aves as an exam set that no thread may tune against. Bird rows can be scored once, later, with an <code>--exam</code> flag the builder does not run.</p>
+  <p>Rules in full: <a href="https://github.com/fractastical/delphisci/blob/main/claim-tests/README.md">claim-tests/README.md</a>. Nothing here is a nanopublication yet; tests become evidence nanopubs later through the normal test-then-production path.</p>
+  <p class="muted" id="built"></p>
+</div></section>
+
+<script>
+(function(){
+  const root=document.documentElement, btn=document.getElementById('themeBtn');
+  let t=null; try{t=localStorage.getItem('delphi-theme')}catch(e){}
+  if(t) root.dataset.theme=t;
+  btn.onclick=()=>{const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches; root.dataset.theme=dark?'light':'dark'; try{localStorage.setItem('delphi-theme',root.dataset.theme)}catch(e){}};
+})();
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const word={supports:'Supported',refutes:'Refuted',mixed:'Mixed',inconclusive:'Inconclusive'};
+const cls={supports:'ok',refutes:'bad',mixed:'warn',inconclusive:''};
+const mb=b=>b>=1e6?(b/1e6).toFixed(1)+' MB':b>=1e3?(b/1e3).toFixed(0)+' kB':b+' B';
+const fmt=v=>typeof v==='number'?(Math.abs(v)>=100?v.toFixed(1):Math.abs(v)>=1?v.toFixed(2):v.toPrecision(3)):esc(v);
+let D=null, filter='all';
+// Keep the fetch and the render in separate catches: a render bug must not be
+// reported as a failed download, which sent us hunting the wrong file once.
+fetch('tests.json').then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+  .catch(e=>{document.getElementById('headline').textContent='tests.json could not be loaded: '+e.message;throw e})
+  .then(d=>{D=d;try{render()}catch(e){document.getElementById('headline').textContent='tests.json loaded, but rendering failed: '+e.message;throw e}})
+  .catch(()=>{});
+
+function render(){
+  const T=D.tests, by=D.stats.byVerdict;
+  const n=v=>by[v]||0;
+  const newOnes=T.filter(t=>t.project==='math-bio-theorems');
+  document.getElementById('headline').textContent=`${D.stats.total} claim tests so far: ${n('supports')} supported, ${n('refutes')} refuted, ${n('mixed')} mixed, ${n('inconclusive')} inconclusive. ${newOnes.length} of them test proved mathematical laws of population genetics and evolution and were added at the ScienceClaw hack.`;
+  document.getElementById('kpis').innerHTML=[
+    ['supports',n('supports'),'supported'],['refutes',n('refutes'),'refuted'],['mixed',n('mixed'),'mixed'],['inconclusive',n('inconclusive'),'inconclusive']
+  ].map(([v,c,l])=>`<div class="card"><div class="kpi" style="color:var(--${cls[v]||'mute'})">${c}<small>${l} of ${D.stats.total} tests</small></div></div>`).join('')+
+  `<div class="card"><div class="kpi">${mb(D.stats.bytes)}<small>of public data fetched, ${D.stats.files} files with SHA-256</small></div></div>`;
+  // Did the AI assessors' expected probability of truth line up with what the data said?
+  const dec=T.filter(t=>(t.verdict==='supports'||t.verdict==='refutes')&&typeof t.truth==='number');
+  const right=dec.filter(t=>(t.truth>=0.5)===(t.verdict==='supports'));
+  const wrong=dec.filter(t=>!right.includes(t));
+  document.getElementById('agreeCard').innerHTML=`<h3>Did the assessors' expectations survive contact with data?</h3>
+    <p>Before any test, two or more language models gave each claim a probability of being true. Of the ${dec.length} tests with a clear verdict, the data agreed with the assessors' side of 0.5 in <span class="agree" style="background:var(--soft)">${right.length}</span> and disagreed in <span class="agree" style="background:var(--soft)">${wrong.length}</span>.${wrong.length?` Disagreements: ${wrong.map(t=>`<b>${esc(t.label)}</b> (assessors expected P(true) = ${t.truth.toFixed(2)}, data ${word[t.verdict].toLowerCase()} it)`).join('; ')}.`:''} A refuted "proved" law is not a failed theorem: it means the theorem's assumptions do not hold in the real population the way the simple reading expects.</p>`;
+  const fl=document.getElementById('filters');
+  fl.innerHTML=['all','supports','refutes','mixed','inconclusive'].map(v=>`<button type="button" data-v="${v}" class="${filter===v?'on':''}">${v==='all'?'All':word[v]} (${v==='all'?T.length:n(v)})</button>`).join('');
+  fl.querySelectorAll('button').forEach(b=>b.onclick=()=>{filter=b.dataset.v;render()});
+  const order={supports:0,refutes:1,mixed:2,inconclusive:3};
+  const shown=T.filter(t=>filter==='all'||t.verdict===filter).sort((a,b)=>(a.project==='math-bio-theorems'?0:1)-(b.project==='math-bio-theorems'?0:1)||order[a.verdict]-order[b.verdict]||a.label.localeCompare(b.label));
+  document.getElementById('list').innerHTML=shown.map(card).join('')||'<p class="muted">No tests with this verdict.</p>';
+  // Data table
+  const rows=[];
+  for(const t of T) for(const d of t.datasets) rows.push({d,t});
+  document.querySelector('#dataTable tbody').innerHTML=rows.map(({d,t})=>`<tr><td>${d.url?`<a href="${esc(d.url)}">${esc(d.name)}</a>`:esc(d.name)}${d.doi?` <span class="muted">doi:${esc(d.doi)}</span>`:''}${d.version?`<div class="muted">${esc(d.version)}</div>`:''}</td><td>${esc(t.label)}</td><td>${d.files.filter(f=>f.obtained).length}${d.files.some(f=>!f.obtained)?` <span class="chip warn">${d.files.filter(f=>!f.obtained).length} not obtained</span>`:''}</td><td>${mb(d.bytes)}</td><td>${esc(d.license||'')}</td></tr>`).join('');
+  document.getElementById('built').textContent=`tests.json built ${D.built} from ${D.stats.total} result.json files; claim graph built ${D.graphBuilt}.`;
+}
+
+function card(t){
+  const v=t.verdict||'inconclusive';
+  const m=t.measured||{};
+  const assess=(t.truthBy||[]).map(a=>`${esc(a.assessor)} ${Number(a.p_true).toFixed(2)}`).join(', ');
+  const measuredLine=m.value==null?`<span class="muted">not measured${t.reason?` (${esc(t.reason.replace('-',' '))})`:''}</span>`:`<span class="num">${fmt(m.value)} <small>${esc(m.unit)}</small></span>`;
+  return `<article class="test v-${v}" id="${esc(t.claim_id)}">
+    <div class="head">
+      <h3>${esc(t.label)}</h3>
+      <div class="who">${esc(t.thinker||'')}${t.year?`, ${t.year}`:''} &middot; ${esc(t.project)} &middot; <a href="https://github.com/fractastical/delphisci/tree/main/${esc(t.dir)}">${esc(t.dir)}</a></div>
+      <div class="pill-row"><span class="chip ${cls[v]}">${word[v]}${t.reason?': '+esc(t.reason.replace('-',' ')):''}</span>${typeof t.confidence==='number'?`<span class="chip">builder's confidence in verdict ${t.confidence.toFixed(2)}</span>`:''}${t.graph_status?`<span class="chip">graph status: ${esc(t.graph_status)}</span>`:''}</div>
+    </div>
+    <dl class="ledger">
+      <dt>What was tested</dt><dd>${esc(t.hypothesis)}</dd>
+      <dt>Measured</dt><dd>${measuredLine}${m.n?`<div class="muted">n = ${esc(m.n)}</div>`:''}${m.uncertainty?`<div class="muted">${esc(m.uncertainty)}</div>`:''}</dd>
+      <dt>Verdict</dt><dd><b style="color:var(--${cls[v]||'mute'})">${word[v]}</b> by the pre-registered rule</dd>
+    </dl>
+    <div class="expect">
+      <div><span class="muted">Assessors expected, before the test</span><b>${typeof t.truth==='number'?`P(true) = ${t.truth.toFixed(2)}`:'no score'}</b><span class="muted">${assess}</span></div>
+      <div><span class="muted">Data obtained</span><b>${t.n_files_obtained} file${t.n_files_obtained===1?'':'s'}, ${mb(t.bytes_obtained)}</b><span class="muted">${t.datasets.map(d=>esc(d.name.split(':')[0].split(' (')[0])).join('; ')}</span></div>
+    </div>
+    <details><summary>Pre-registered rule</summary><div class="in"><p><b>Supports if:</b> ${esc(t.pass)}</p><p><b>Refutes if:</b> ${esc(t.fail)}</p><p><b>How the author's words were mapped to numbers:</b> ${esc(t.interpretation)}</p></div></details>
+    ${t.method?`<details><summary>What was actually done</summary><div class="in"><p>${esc(t.method)}</p>${m.extra?`<div class="scroll"><table>${Object.entries(m.extra).map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(typeof v==='object'?JSON.stringify(v):(typeof v==='number'?fmt(v):v))}</td></tr>`).join('')}</table></div>`:''}</div></details>`:''}
+    ${t.caveats&&t.caveats.length?`<details><summary>Caveats (${t.caveats.length})</summary><div class="in"><ul>${t.caveats.map(c=>`<li>${esc(c)}</li>`).join('')}</ul></div></details>`:''}
+    <details><summary>Files (${t.n_files_obtained} with checksum)</summary><div class="in">${t.datasets.map(d=>`<p><b>${esc(d.name)}</b>${d.license?` <span class="chip">${esc(d.license)}</span>`:''}</p><ul>${d.files.map(f=>`<li>${f.url?`<a href="${esc(f.url)}">${esc(String(f.url).replace(/^https?:\/\//,'').slice(0,90))}</a>`:`<span class="muted">${esc(f.name||'file')} &middot; no URL recorded</span>`}${f.bytes!=null?` &middot; ${mb(f.bytes)}`:''}${f.retrieved_at?` &middot; ${esc(f.retrieved_at)}`:''}${f.sha256?`<div class="sha">sha256 ${esc(f.sha256)}</div>`:'<div class="chip warn">not obtained</div>'}</li>`).join('')}</ul>`).join('')}</div></details>
+  </article>`;
+}
+</script>
+</body>
+</html>
