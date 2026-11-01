@@ -1,0 +1,59 @@
+{
+  "schema": "frontier.metadata-audit.protocol/1",
+  "question": "Do public GEO metadata identify compatible fish fin cell contexts, biological replicates, references and processed-file manifests for the proposed non-generative regulatory analysis?",
+  "targets": [
+    "GSE261907",
+    "GSE126703",
+    "GSE223922"
+  ],
+  "allowed_requests": {
+    "origin": "https://www.ncbi.nlm.nih.gov",
+    "path": "/geo/query/acc.cgi",
+    "query": {
+      "acc": "GSE or GSM identifier explicitly enumerated by target/child series",
+      "targ": "self",
+      "form": "text",
+      "view": "full"
+    },
+    "child_series_depth": 1,
+    "supplementary_url_policy": "record link strings only; never fetch linked files",
+    "redirect_policy": "same-origin only; public Jina metadata fallback permitted after challenge, separately logged"
+  },
+  "bounds": {
+    "cpu_cores": 1,
+    "memory_bytes": 2147483648,
+    "tasks": 128,
+    "wall_seconds": 2700,
+    "request_timeout_seconds": 30,
+    "max_responses": 512,
+    "max_response_bytes": 262144,
+    "max_total_response_bytes": 16777216,
+    "concurrent_requests": 1
+  },
+  "predeclared_extraction": [
+    "exact Series and Sample accession identities",
+    "series sample membership and child-series relation",
+    "raw metadata fields and response SHA256/bytes/retrieval URL/time",
+    "sample organism, tissue/source, characteristics, age/stage/time, explicit replicate labels and assay",
+    "processing text containing genome/annotation versions",
+    "supplementary-file and relation links as unfetched manifests",
+    "provided cell-label metadata and missing cell-level annotations"
+  ],
+  "identity_policy": "Validate SOFT header and geo_accession against requested identifier. Stop expansion on unresolved/mismatched identities and preserve failed receipt. Never infer biological independence from separate GSMs, RNA/ATAC libraries, lane or barcode. Missing metadata stays missing; no guessed donor/stage/cell labels.",
+  "comparison_policy": "Coverage audit only: no statistical test, biological success threshold, sequencing matrix download, sequence generation or model inference. Cell-level labels and checksums of linked files remain unverified.",
+  "outputs": [
+    "raw metadata responses",
+    "request receipts and code/environment/protocol pins",
+    "machine-readable samples/series coverage and missingness/questions",
+    "concise human report"
+  ],
+  "failure_policy": "No retries beyond one separately logged public metadata fallback; failures remain visible and downstream analysis blocked for unresolved identities.",
+  "checklist": [
+    "commit protocol before retrieval",
+    "implement bounded metadata-only collector/parser",
+    "focused fixture tests",
+    "collect within caps",
+    "audit response hashes/counts and derive gaps",
+    "commit and hand off"
+  ]
+}
