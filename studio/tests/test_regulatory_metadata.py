@@ -27,3 +27,14 @@ def test_library_titles_do_not_create_biological_replicates_or_cell_labels():
     assert not row["cell_level_labels_checked"]
     assert row["processed_file_links"][0]["sha256"] is None
     assert not row["processed_file_links"][0]["fetched"]
+
+
+def test_second_pass_exposes_literal_passages_without_relabelling_or_pairing():
+    from engineering.regulatory_metadata.review import literal_candidates
+
+    result = literal_candidates({"Sample_characteristics_ch1": ["passages: 0 dpa"], "Sample_title": ["ATAC_sp7ne0dpa_rep1"], "Sample_data_processing": ["Genome_build: GRCz10; Ensembl release 85"]})
+    assert result["time"][0] == {"selector": "Sample_characteristics_ch1", "literal": "passages: 0 dpa"}
+    assert result["assembly"][0]["literal"] == "GRCz10"
+    assert result["annotation"][0]["literal"] == "Ensembl release 85"
+
+    assert result["replicate"][0]["literal"] == "ATAC_sp7ne0dpa_rep1"
