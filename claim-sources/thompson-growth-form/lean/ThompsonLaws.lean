@@ -3,3 +3,4 @@ import ThompsonLaws.Cells
 import ThompsonLaws.Spirals
 import ThompsonLaws.HornsLeavesEggs
 import ThompsonLaws.Mechanics
+import ThompsonLaws.Hygromorphs

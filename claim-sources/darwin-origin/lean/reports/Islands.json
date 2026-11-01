@@ -1,0 +1,73 @@
+[
+  {
+    "claim_id": "darwin1859-ch03-11",
+    "status": "formalized",
+    "label": "Struggle is most severe between members of the same species",
+    "notation": "\\alpha(u,v) = \\frac{\\sum_i u_i v_i}{\\sqrt{\\sum_i u_i^2}\\sqrt{\\sum_i v_i^2}};\\quad \\alpha(u,u) = 1,\\ \\alpha(u,v) \\le \\alpha(u,u)",
+    "lean_declaration": "DarwinLaws.Islands.nicheOverlap",
+    "lean_theorems": [
+      "DarwinLaws.Islands.nicheOverlap_self",
+      "DarwinLaws.Islands.nicheOverlap_le_self"
+    ],
+    "assumptions": "Competition intensity between two forms is their MacArthur–Levins competition coefficient, the cosine similarity of their resource-utilisation vectors over a finite set of resource classes; both vectors are nonzero; members of one species share a single utilisation vector.",
+    "scope_note": "Model-dependent (MacArthur–Levins niche overlap). Proves by Cauchy–Schwarz that no other form's overlap with a given form exceeds its self-overlap, which is 1. This is close to a tautology of the chosen measure: any normalised inner-product similarity is maximised on the diagonal, so the theorem says nothing about real competition unless one already accepts that utilisation similarity is what makes the struggle severe. It does not prove the 'almost always' in Darwin's wording, does not treat intraspecific variation in resource use (which would make α(u,u) a within-species average less than 1), and does not model non-resource competition (mates, predators, disease). The ≤ is not strict: a different form with a proportional utilisation vector competes just as hard."
+  },
+  {
+    "claim_id": "darwin1859-ch03-12",
+    "status": "not-formalized",
+    "label": "Congeners compete more severely than species of different genera",
+    "notation": "\\alpha(u,v) \\text{ higher for congeners (empirical)}",
+    "reason": "Within the niche-overlap model of darwin1859-ch03-11, the claim becomes 'congeners have more similar utilisation vectors than non-congeners', which is an empirical premise about how resource use is distributed on the phylogeny, not a consequence of anything proved. Adding it as a hypothesis would make the theorem restate its assumption."
+  },
+  {
+    "claim_id": "darwin1859-ch04-20",
+    "status": "formalized",
+    "label": "Divergence of character maximises the life an area supports",
+    "notation": "L(U) = \\sum_{i \\in U} K_i,\\ K_i > 0;\\quad U \\subsetneq I \\Rightarrow L(U) < L(I);\\quad A \\subseteq B \\Rightarrow L(A) \\le L(B)",
+    "lean_declaration": "DarwinLaws.Islands.supportedLife",
+    "lean_theorems": [
+      "DarwinLaws.Islands.supportedLife_mono",
+      "DarwinLaws.Islands.supportedLife_lt_of_unused",
+      "DarwinLaws.Islands.supportedLife_increases_with_new_niche"
+    ],
+    "assumptions": "The area's resources ('places in the economy of nature') form a finite set, each resource i alone supporting K_i > 0 units of life; the life supported by an assemblage is the sum of K_i over the resources its species' niches cover (additive partition, no interaction between resources, no cost of specialisation).",
+    "scope_note": "Model-dependent (additive resource partition). Proves that an assemblage leaving some resource unused supports strictly less life than one covering every resource, and that adding a species whose niche includes an unused resource strictly increases the total. 'Diversification of structure' is identified with covering more resource classes; the theorem does not show that diversified assemblages cover more resources than uniform ones, nor that selection produces divergence (the mechanism half of Darwin's principle of divergence). Darwin's supporting evidence (Lamb and grass-plot experiments, naturalised floras) is empirical."
+  },
+  {
+    "claim_id": "darwin1859-ch04-21",
+    "status": "not-formalized",
+    "label": "The closest-competing neighbours tend to belong to different genera and orders",
+    "notation": "\\text{(no formal core)}",
+    "reason": "An empirical pattern about the taxonomic composition of small plots. The additive-partition model of darwin1859-ch04-20 explains why covering more resources supports more life, but says nothing about taxonomy; turning 'different genera use different resources' into a hypothesis would make the conclusion a restatement."
+  },
+  {
+    "claim_id": "darwin1859-ch12-04",
+    "status": "formalized",
+    "label": "Oceanic islands have fewer species than equal continental areas",
+    "notation": "I(P - S) = E S \\iff S^* = \\frac{P I}{I + E};\\quad E > 0 \\Rightarrow S^* < P;\\ \\partial S^*/\\partial I > 0,\\ \\partial S^*/\\partial E < 0;\\quad d_1 < d_2 \\Rightarrow S^*(I(d_2)) < S^*(I(d_1))",
+    "lean_declaration": "DarwinLaws.Islands.mwEquilibrium",
+    "lean_theorems": [
+      "DarwinLaws.Islands.mwEquilibrium_iff",
+      "DarwinLaws.Islands.mwEquilibrium_lt_pool",
+      "DarwinLaws.Islands.mwEquilibrium_strictMono_I",
+      "DarwinLaws.Islands.mwEquilibrium_strictAnti_E",
+      "DarwinLaws.Islands.remoter_island_poorer"
+    ],
+    "assumptions": "MacArthur–Wilson (1963) equilibrium theory: a source pool of P > 0 species; absent species immigrate at a per-species rate I ≥ 0 that is a strictly decreasing function of distance from the source; resident species go extinct at a per-species rate E > 0 set by area; richness S is the balance point I(P − S) = E S. 'Equal continental area' is read as equal E with the continent at the near (high-immigration) limit.",
+    "scope_note": "Model-dependent (MacArthur–Wilson). Proves that the equilibrium richness is unique, lies strictly below the pool whenever extinction is positive, rises with immigration and falls with extinction, and that at equal area a remoter island is strictly poorer. It does not prove that islands sit at equilibrium, that immigration falls with distance (assumed), that extinction depends on area only, or anything about in-situ speciation, which the model omits. Darwin's clause that the deficit is 'not explained by physical conditions' is not represented; the theorem shows isolation suffices, not that conditions are irrelevant. The empirical support is the data test, not this proof."
+  },
+  {
+    "claim_id": "darwin1859-ch12-05",
+    "status": "formalized",
+    "label": "Oceanic islands have a very high proportion of endemic species",
+    "notation": "\\sigma(1 - \\pi) = m \\pi \\iff \\pi^* = \\frac{\\sigma}{\\sigma + m};\\quad m_1 < m_2 \\Rightarrow \\pi^*(m_2) < \\pi^*(m_1);\\quad d_1 < d_2 \\Rightarrow \\pi^*(m(d_1)) < \\pi^*(m(d_2))",
+    "lean_declaration": "DarwinLaws.Islands.endemicFraction",
+    "lean_theorems": [
+      "DarwinLaws.Islands.endemicFraction_iff",
+      "DarwinLaws.Islands.endemicFraction_strictAnti_m",
+      "DarwinLaws.Islands.remoter_island_more_endemic"
+    ],
+    "assumptions": "Each resident lineage is a two-state Markov chain: a non-endemic resident diverges into an endemic species at rate σ > 0, and an endemic is replaced or genetically swamped by renewed immigration from the source at rate m ≥ 0, with m a strictly decreasing function of distance. The endemic fraction is the stationary probability of the endemic state.",
+    "scope_note": "Model-dependent (two-state divergence/replacement chain, built for this claim rather than taken from the literature). Proves that the stationary endemic fraction is σ/(σ + m), falls strictly as replacement rises, and so is higher on remoter islands. It does not prove 'very high' or 'extremely large relative to area' (no quantitative threshold), does not treat extinction of endemics without replacement, time since colonisation, or the 'often' in Darwin's wording; the stationary distribution may not be reached. The relation of m to immigration is assumed, not derived from darwin1859-ch12-04's I."
+  }
+]

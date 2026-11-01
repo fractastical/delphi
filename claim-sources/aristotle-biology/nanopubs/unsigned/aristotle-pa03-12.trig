@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/aristotle-pa03-12> a delphi:Claim ;
+    rdfs:label "The heart is the first part formed and at once contains blood" ;
+    dct:description "In animals with blood the heart is the first of all the parts to be formed in the embryo, and it contains blood as soon as it is formed." ;
+    delphi:context "Aristotle, On the Parts of Animals (De Partibus Animalium), Book III, Part 4; translated by William Ogle, The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912). Scope: embryos of animals with blood (e.g. the chick in the egg)" ;
+    dct:type "empirical-generalization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/parts_animals.html> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "For the heart is the first of all the parts to be formed; and no sooner is it formed than it contains blood." ;
+    prov:wasQuotedFrom <http://classics.mit.edu/Aristotle/parts_animals.html> ;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt#line=230,231> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt#line=230,231> schema:isPartOf <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt> .
+
+  <http://classics.mit.edu/Aristotle/parts_animals.html> a schema:Book ;
+    dct:title "On the Parts of Animals, translated by William Ogle" ;
+    dct:creator <http://www.wikidata.org/entity/Q868> ;
+    schema:translator "William Ogle" ;
+    dct:bibliographicCitation "Aristotle. On the Parts of Animals (De Partibus Animalium). Translated by William Ogle. The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912)." ;
+    dct:date "1912"^^xsd:gYear ;
+    schema:translationOfWork <http://www.wikidata.org/entity/Q1180725> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt> schema:about <http://classics.mit.edu/Aristotle/parts_animals.html> ;
+    prov:wasDerivedFrom <http://classics.mit.edu/Aristotle/parts_animals.mb.txt> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "b8e00550b055dc101ac363fe2ef8b33f0ee4a302d947b24269dac4df85024bcc" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/pa.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci Aristotle biology claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T21:56:36.734Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Aristotle, Parts of Animals III: The heart is the first part formed and at once contains blood" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/aristotle-pa03-12> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/aristotle-biology> .
+  <https://w3id.org/delphi/resource/domain/aristotle-biology> rdfs:label "aristotle-biology" .
+}

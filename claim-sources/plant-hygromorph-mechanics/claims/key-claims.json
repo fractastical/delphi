@@ -1,0 +1,68 @@
+{
+  "description": "Key quantitative claims of plant hygromorph mechanics: how pine cone scales, wheat awns, chiral seed pods and the Venus flytrap turn a humidity or turgor change into bending, twisting or snapping, and the compositional framing Marom et al. (2026) give to such hierarchies. Chosen because each is a short mathematical statement with a recorded formal status and published measurements on organisms to test it against. Every DOI was checked against Crossref on 2026-10-31 (title and year match). Years are Crossref's issued years. Same schema as claim-sources/math-bio-claims/claims/key-claims.json; the Lean modules live in the Thompson Lake project (claim-sources/thompson-growth-form/lean/ThompsonLaws/Hygromorphs.lean) because Lean reports are keyed by claim id across projects and a second Mathlib checkout is 7 GB.",
+  "domains": {
+    "default": "plant-hygromorph-mechanics"
+  },
+  "claims": [
+    {
+      "id": "hygromorph-bilayer-curvature",
+      "thinker": "Etienne Reyssat & L. Mahadevan",
+      "label": "Bilayer curvature from differential swelling (Timoshenko)",
+      "statement": "A thin two-layer strip whose layers swell by different amounts bends with a uniform curvature proportional to the swelling-strain mismatch, with a geometric coefficient fixed by the thickness ratio and modulus ratio of the layers; the pine cone scale is such a bilayer, its outer (active) sclerenchyma layer swelling along the scale and its inner (passive) layer not.",
+      "notation": "\\kappa = \\frac{6(1+m)^2}{h\\,[3(1+m)^2 + (1+mn)(m^2 + 1/(mn))]}\\,\\Delta\\varepsilon, \\quad m = h_1/h_2,\\ n = E_1/E_2,\\ h = h_1+h_2; \\text{ for } m = 1, n = 1: \\kappa = \\tfrac{3}{2}\\,\\Delta\\varepsilon / h",
+      "context": "Assumptions: linear elasticity, Euler–Bernoulli kinematics (plane sections, slender strip, w/L << 1), perfect bonding at the interface, uniform eigenstrain in each layer, small strains. Formal status: proved; this is Timoshenko's 1925 bimetal-thermostat result with thermal strain replaced by hygroscopic strain, which Reyssat and Mahadevan (2009) apply to pine cone scales and biomimetic paper–polymer bilayers. Whether a real scale's layers satisfy the assumptions (uniform, well-bonded, linearly elastic, slender) is empirical.",
+      "kind": "model-theorem",
+      "proposed_test": "Measure, on pine cone scales, the thickness of the active and passive layers, their Young's moduli, and the swelling strain of the active layer between dry and wet states; compute the predicted curvature change and compare it with the measured curvature change of the same scales (Reyssat & Mahadevan 2009, Fig. 2; Quan et al. 2021 give layer thicknesses, moduli and deformation for Pinus scales). Pass if predicted and measured curvature agree within the measurement uncertainty, or at least within a factor of two with the right ordering across specimens.",
+      "paper": {"title": "Hygromorphs: from pine cones to biomimetic bilayers", "doi": "10.1098/rsif.2009.0184", "year": 2009},
+      "see_also": ["10.1364/JOSA.11.000233", "10.1038/37745", "10.1016/j.actbio.2021.04.049"]
+    },
+    {
+      "id": "hygromorph-response-time",
+      "thinker": "Etienne Reyssat & L. Mahadevan",
+      "label": "Hygromorph response time scales as thickness squared",
+      "statement": "The time a hygromorphic bilayer takes to respond to a change in ambient humidity is set by diffusion of water through its thickness, so it grows as the square of the thickness divided by the diffusion coefficient.",
+      "notation": "\\tau \\sim h^2 / D",
+      "context": "Assumptions: water transport through the layer is Fickian diffusion with constant diffusivity D; the mechanical response is quasi-static (elastic relaxation much faster than diffusion); a single dominant thickness h. Formal status: proved as the diffusive time scale of the one-dimensional diffusion equation (the slowest mode decays as exp(-pi^2 D t / h^2) for a layer of thickness h with fixed boundary concentration). Reyssat and Mahadevan (2009) measured tau against h for paper–polymer bilayers and pine cone scales and found the quadratic scaling. Non-Fickian sorption, swelling-dependent D and internal cavities change the exponent.",
+      "kind": "model-theorem",
+      "proposed_test": "Record the opening-angle time series of pine cone scales (or bilayers) of several thicknesses after a humidity step, fit an exponential time constant to each, and regress log(tau) on log(h); pass if the slope is 2 within its confidence interval.",
+      "paper": {"title": "Hygromorphs: from pine cones to biomimetic bilayers", "doi": "10.1098/rsif.2009.0184", "year": 2009},
+      "see_also": ["10.1038/37745"]
+    },
+    {
+      "id": "hygromorph-antisymmetric-twist",
+      "thinker": "Shahaf Armon, Efi Efrati, Raz Kupferman & Eran Sharon",
+      "label": "Antisymmetric fibre angles turn differential swelling into twist",
+      "statement": "When the two layers of a swelling bilayer have their stiff fibres at equal and opposite angles to the strip axis, the in-plane shear strains of the layers are equal and opposite, so the through-thickness mismatch is a pure shear mismatch that drives helical twisting rather than bending; this is how chiral seed pods and wheat awns open.",
+      "notation": "\\varepsilon_{12}^{(j)} = \\tfrac{1}{2}(\\varepsilon_L - \\varepsilon_T)\\sin 2\\phi_j; \\text{ with } \\phi_1 = +\\phi,\\ \\phi_2 = -\\phi: \\ \\Delta\\varepsilon_{12} = (\\varepsilon_L - \\varepsilon_T)\\sin 2\\phi, \\ \\Delta\\varepsilon_{11} = 0",
+      "context": "Assumptions: each layer swells transversely isotropically about its fibre direction with principal strains eps_L (along fibres) and eps_T (across); the strain tensor transforms as a rank-2 tensor under rotation by the fibre angle; the two layers have the same material and |angle|. Formal status: proved; the strain transformation is elementary tensor algebra and the resulting shear mismatch drives twist in the thin-plate limit (Armon et al. 2011, who also show the transition from helicoid to cylindrical helix as width grows; Marom et al. 2026, eq. 28). Which shape the strip adopts at finite width depends on nonlinear plate theory and is only partly closed-form.",
+      "kind": "model-theorem",
+      "proposed_test": "In Bauhinia pods or wheat awns, measure the fibre angle of each layer and the swelling strains eps_L and eps_T of the tissue; predict the twist per unit length from the shear mismatch and the plate stiffness and compare with the pitch of the opened pod or awn.",
+      "paper": {"title": "Geometry and Mechanics in the Opening of Chiral Seed Pods", "doi": "10.1126/science.1203874", "year": 2011},
+      "see_also": ["10.1126/science.1140097", "10.1016/j.jmps.2026.106780"]
+    },
+    {
+      "id": "flytrap-snap-geometry",
+      "thinker": "Yoël Forterre, Jan M. Skotheim, Jacques Dumais & L. Mahadevan",
+      "label": "Venus flytrap snaps when a geometric parameter exceeds a threshold",
+      "statement": "A doubly curved leaf with a slowly changing natural curvature snaps between two stable shapes only if the dimensionless parameter combining its size, thickness and curvature is large enough; below the threshold it deforms smoothly, and the snap time is set by the leaf's elastic and poroelastic time scales rather than by cellular motor speed.",
+      "notation": "\\alpha = L^4 \\kappa^2 / h^2 \\gtrsim \\alpha_c \\approx 0.8 \\text{ for bistability (snap-buckling); } \\tau_{snap} \\sim \\tau_{poroelastic} = \\mu L^2 / (k E) \\text{ when } \\alpha \\gg \\alpha_c",
+      "context": "Assumptions: thin elastic shell of size L, thickness h and mean curvature kappa; curvature change driven by turgor; the leaf is modelled as a shallow shell with one natural curvature slowly varied. Formal status: partial. The existence of a bistability threshold in alpha is established by shallow-shell analysis and numerics (Forterre et al. 2005 report alpha_c about 0.8 and measured alpha from 0.3 to 1.9 across leaves), but the threshold value is not a closed-form theorem and the snap dynamics rest on scaling arguments confirmed by experiment.",
+      "kind": "model-theorem",
+      "proposed_test": "Measure L, h and the open-state mean curvature of many Dionaea leaves, compute alpha, and test that leaves with alpha below about 0.8 close smoothly while those above snap, as high-speed video classifies them; also check that closure time scales with L^2 for the snapping leaves.",
+      "paper": {"title": "How the Venus flytrap snaps", "doi": "10.1038/nature03185", "year": 2005},
+      "see_also": []
+    },
+    {
+      "id": "stimulus-response-systems-category",
+      "thinker": "Lee Marom",
+      "label": "Stimulus–response systems with simulation-preserving maps form a category",
+      "statement": "Stimulus–response dynamical systems (a state space, a stimulus space and an evolution law) together with pairs of smooth maps on states and stimuli that commute with time evolution form a category: identities satisfy the simulation condition and the condition is closed under composition, so a chain of locally valid scale transitions in a material hierarchy is globally valid.",
+      "notation": "\\text{Obj: } (X, E, f),\\ \\dot x = f(x,e);\\ \\text{Mor: } (\\alpha, \\alpha_E) \\text{ with } d\\alpha_x\\big(f(x,e)\\big) = g\\big(\\alpha(x), \\alpha_E(e)\\big);\\ (\\beta,\\beta_F)\\circ(\\alpha,\\alpha_E) = (\\beta\\circ\\alpha, \\beta_F\\circ\\alpha_E) \\text{ again satisfies the condition}",
+      "context": "Assumptions: finite-dimensional smooth state and stimulus manifolds, smooth evolution laws and maps. Formal status: proved (Marom, Tibbits, Zardini & Buehler 2026, Appendix A.2; the closure under composition is the chain rule applied to the simulation condition). This is a statement about the formal language, not about any material: the paper itself says that composition is verified by construction while the fidelity of each local model is empirical. The pinecone hierarchy fibre → lamina → tissue → element → organ is the worked instance, and the bilayer-curvature claim above is its element-scale law.",
+      "kind": "model-theorem",
+      "proposed_test": "Not a claim about organisms; the empirical content lives in the local models it composes (hygromorph-bilayer-curvature, hygromorph-antisymmetric-twist). The paper's own validation is on printed bilayers (predicted vs measured opening angle within one standard deviation for four actuator classes), which is physical, not biological, data.",
+      "paper": {"title": "A category-theoretic framework from biological mechanics to engineered stimulus-response systems", "doi": "10.1016/j.jmps.2026.106780", "year": 2026},
+      "see_also": ["10.1098/rsif.2009.0184", "10.1126/sciadv.abi8919"]
+    }
+  ]
+}

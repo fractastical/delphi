@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+@prefix delphir: <https://w3id.org/delphi/resource/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/aristotle-ga03-14> a delphi:Claim ;
+    rdfs:label "All fish have separate sexes except the erythrinus and the channa" ;
+    dct:description "In all fishes some individuals have milt organs and others a uterus, except two kinds, the erythrinus and the channa, which have no separate males." ;
+    delphi:context "Aristotle, On the Generation of Animals (De Generatione Animalium), Book III; translated by Arthur Platt, The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912). Scope: fishes; erythrinus and channa are probably sea perches (Serranus)" ;
+    dct:type "empirical-generalization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasDerivedFrom <https://en.wikisource.org/wiki/On_the_Generation_of_Animals> , sub:quote ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> ;
+    prov:wasGeneratedBy sub:extraction .
+
+  sub:quote a prov:Entity ;
+    schema:text "But, as it is, some of them have organs for milt and others have a uterus, and this distinction obtains in all except two, the erythrinus and the channa, some of them having the milt organs, others a uterus." ;
+    prov:wasQuotedFrom <https://en.wikisource.org/wiki/On_the_Generation_of_Animals> ;
+    prov:hadPrimarySource <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt#line=303,304> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt#line=303,304> schema:isPartOf <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt> .
+
+  <https://en.wikisource.org/wiki/On_the_Generation_of_Animals> a schema:Book ;
+    dct:title "On the Generation of Animals, translated by Arthur Platt" ;
+    dct:creator <http://www.wikidata.org/entity/Q868> ;
+    schema:translator "Arthur Platt" ;
+    dct:bibliographicCitation "Aristotle. On the Generation of Animals (De Generatione Animalium). Translated by Arthur Platt. The Works of Aristotle Translated into English, ed. J. A. Smith and W. D. Ross, Oxford: Clarendon Press, vol. V (1912)." ;
+    dct:date "1912"^^xsd:gYear ;
+    schema:translationOfWork <http://www.wikidata.org/entity/Q1180637> .
+
+  <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt> schema:about <https://en.wikisource.org/wiki/On_the_Generation_of_Animals> ;
+    prov:wasDerivedFrom <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_I&oldid=3450790&action=raw> , <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_II&oldid=3450789&action=raw> , <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_III&oldid=3450788&action=raw> , <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_IV&oldid=3450787&action=raw> , <https://en.wikisource.org/w/index.php?title=On_the_Generation_of_Animals/Book_V&oldid=3450786&action=raw> ;
+    spdx:checksum sub:sourceChecksum .
+  sub:sourceChecksum spdx:algorithm spdx:checksumAlgorithm_sha256 ;
+    spdx:checksumValue "23349787bbc025417e5a55b00000cc260f158f4579a9dd1213740da2bc670338" .
+
+  sub:extraction a prov:Activity ;
+    prov:used <https://raw.githubusercontent.com/fractastical/delphisci/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/inputs/ga.txt> ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> ;
+    prov:qualifiedAssociation sub:extractionPlan .
+  sub:extractionPlan prov:hadPlan <https://github.com/fractastical/delphisci/blob/db966bc45986743c3cde6d87ef6b567099bb3b7b/claim-sources/aristotle-biology/build/generate.mjs> .
+
+  <https://w3id.org/delphi/resource/agent/delphisci-aristotle-biology-extractor> a prov:SoftwareAgent ;
+    rdfs:label "delphisci Aristotle biology claim extractor" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5.5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5.5> a delphi:LanguageModel ;
+    rdfs:label "Claude Opus 5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T21:56:36.734Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Aristotle, Generation of Animals III: All fish have separate sexes except the erythrinus and the channa" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Claim ;
+    npx:introduces <https://w3id.org/delphi/resource/claim/aristotle-ga03-14> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/aristotle-biology> .
+  <https://w3id.org/delphi/resource/domain/aristotle-biology> rdfs:label "aristotle-biology" .
+}
