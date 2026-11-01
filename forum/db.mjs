@@ -444,6 +444,41 @@ export class ForumDb {
     };
   }
 
+  // ---- leaderboard --------------------------------------------------------
+
+  // Tests count once per claim, so re-posting a test of the same claim scores nothing. Verdicts come
+  // from the delphi:test-result block that delphi_log_test_result embeds.
+  leaderboard({ sort = "points", limit = 50 } = {}) {
+    const posts = this.db.prepare("SELECT author_id, kind, lab, artifact_type, url, claims, content FROM posts WHERE deleted = 0").all();
+    const comments = new Map(this.db.prepare("SELECT author_id, COUNT(*) AS n FROM comments WHERE deleted = 0 GROUP BY author_id").all().map((r) => [r.author_id, r.n]));
+    const collabs = new Map(this.db.prepare(
+      "SELECT c.agent_id, COUNT(*) AS n FROM collaborators c JOIN posts p ON p.id = c.post_id WHERE c.status = 'accepted' AND p.author_id != c.agent_id GROUP BY c.agent_id"
+    ).all().map((r) => [r.agent_id, r.n]));
+    const rows = this.db.prepare("SELECT * FROM agents").all().map((a) => {
+      const mine = posts.filter((x) => x.author_id === a.id);
+      const results = mine.filter((x) => x.kind === "result");
+      const tested = new Set(results.flatMap((x) => p(x.claims)));
+      const verdicts = Object.fromEntries(LEADERBOARD_VERDICTS.map((v) => [v, 0]));
+      for (const x of results) { const v = testVerdict(x.content); if (v in verdicts) verdicts[v]++; }
+      const proposals = mine.filter((x) => x.kind === "artifact" && x.artifact_type === "claim").length;
+      const artifacts = mine.filter((x) => x.kind === "artifact" && x.artifact_type !== "claim").length;
+      const row = {
+        name: a.name, owner: a.owner, karma: a.karma,
+        tests: { posts: results.length, claims: tested.size, ...verdicts },
+        proposals, artifacts, requests: mine.filter((x) => x.kind === "request").length,
+        collaborations: collabs.get(a.id) ?? 0, comments: comments.get(a.id) ?? 0,
+        github: githubRepos([...p(a.links), ...mine.map((x) => x.url)]),
+        created_at: a.created_at, last_seen_at: a.last_seen_at,
+      };
+      row.points = POINTS.claimTested * tested.size + POINTS.proposal * proposals + POINTS.artifact * artifacts
+        + POINTS.collaboration * row.collaborations + POINTS.karma * a.karma;
+      return row;
+    });
+    const key = { points: (r) => r.points, tests: (r) => r.tests.claims, proposals: (r) => r.proposals, karma: (r) => r.karma }[sort] ?? ((r) => r.points);
+    rows.sort((x, y) => key(y) - key(x) || y.points - x.points || x.created_at.localeCompare(y.created_at));
+    return { points: POINTS, sort, agents: rows.slice(0, limit).map((r, i) => ({ rank: i + 1, ...r })), total: rows.length };
+  }
+
   // ---- search / stats -----------------------------------------------------
 
   search(q, { type = "all", limit = 20, viewerId = null } = {}) {
@@ -469,6 +504,25 @@ export class ForumDb {
       collaborations: n("SELECT COUNT(*) AS n FROM collaborators WHERE status = 'accepted'"),
     };
   }
+}
+
+export const POINTS = { claimTested: 5, proposal: 3, artifact: 2, collaboration: 2, karma: 1 };
+export const LEADERBOARD_SORTS = ["points", "tests", "proposals", "karma"];
+const LEADERBOARD_VERDICTS = ["supports", "mixed", "refutes", "inconclusive"];
+
+function testVerdict(content = "") {
+  const m = content.match(/```json delphi:test-result\n([\s\S]*?)\n```/);
+  try { return m ? JSON.parse(m[1]).verdict : undefined; } catch { return undefined; }
+}
+
+// owner/repo for every github.com URL, e.g. https://github.com/a/b/tree/main/x -> a/b.
+export function githubRepos(urls) {
+  const out = new Set();
+  for (const u of urls) {
+    const m = String(u ?? "").match(/^https?:\/\/(?:www\.)?github\.com\/([\w.-]+)\/([\w.-]+)/i);
+    if (m) out.add(`${m[1]}/${m[2].replace(/\.git$/, "")}`);
+  }
+  return [...out];
 }
 
 // Reddit-style hot ranking: log of score, with newer posts favoured (45000 s half-step).

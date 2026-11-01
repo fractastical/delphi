@@ -11,6 +11,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { CLAIMS_JSON } from "./graph.mjs";
+import { testContributors } from "./tests.mjs";
 
 const CRED_FILE = join(homedir(), ".config", "science-claw", "credentials.json");
 const HOSTED = Boolean(process.env.DELPHI_HTTP_PORT);
@@ -82,7 +83,39 @@ const brief = p => ({
   ...(structuredPayloads(p.content).length ? { structured: structuredPayloads(p.content) } : {}),
 });
 
-export async function forumRead({ view, claim, q, postId, lab, kind, status, sort, limit }) {
+export const LEADERBOARD_SORTS = ["points", "tests", "proposals", "karma"];
+const POINT_LABELS = { claimTested: "claim tested", proposal: "claim proposed", artifact: "artifact", collaboration: "accepted collaboration", karma: "karma" };
+
+// Forum activity, joined with the tests that reached the repo (test-data/claim-tests). Only the
+// second shows the work was accepted; forum counts are whatever agents posted.
+async function leaderboard({ rankBy = "points", limit = 25 }) {
+  const repo = testContributors();
+  const merged = new Map(repo.filter(c => c.forum).map(c => [c.forum.toLowerCase(), c]));
+  let board, error;
+  try { board = await call("GET", `/leaderboard${qs({ sort: rankBy, limit: Math.min(limit, 200) })}`); }
+  catch (e) { error = e.message; }
+  const agents = (board?.agents ?? []).map(a => {
+    const m = merged.get(a.name.toLowerCase());
+    return { ...a, merged: m ? { claims: m.claims, runs: m.runs, supports: m.supports, refutes: m.refutes, onOrganisms: m.onOrganisms } : undefined };
+  });
+  const fmtVerdicts = r => VERDICTS.filter(v => r[v]).map(v => `${r[v]} ${v}`).join(", ") || "·";
+  const markdown = [
+    `**Forum leaderboard** (${FORUM_URL}/#/leaderboard), by ${rankBy}.` + (board ? ` Points: ${Object.entries(board.points).map(([k, v]) => `${v} per ${POINT_LABELS[k] ?? k}`).join(", ")}; a claim tested counts once.` : ` Unavailable: ${error}`),
+    "",
+    "| # | Agent | Points | Claims tested | Verdicts | Merged into repo | Proposed | Artifacts | Karma | GitHub |",
+    "|---:|---|---:|---:|---|---:|---:|---:|---:|---|",
+    ...agents.map(a => `| ${a.rank} | ${a.name} | ${a.points} | ${a.tests.claims} | ${fmtVerdicts(a.tests)} | ${a.merged?.claims ?? 0} | ${a.proposals} | ${a.artifacts} | ${a.karma} | ${a.github.join(", ") || "·"} |`),
+    "",
+    "**Tests merged into the repo** (test-data/claim-tests, completed runs), by who ran them:",
+    "",
+    "| Contributor | Claims tested | Runs | Sessions | Verdicts | On organisms |",
+    "|---|---:|---:|---:|---|---:|",
+    ...repo.map(c => `| ${c.forum ? `${c.forum} (forum)` : c.model} | ${c.claims} | ${c.runs} | ${c.sessions} | ${fmtVerdicts(c)} | ${c.onOrganisms} |`),
+  ].join("\n");
+  return { markdown, forum: FORUM_URL, rankBy, points: board?.points, agents, repoContributors: repo, ...(error ? { forumError: error } : {}) };
+}
+
+export async function forumRead({ view, claim, q, postId, lab, kind, status, sort, rankBy, limit }) {
   if (view === "post" || postId) {
     if (!postId) throw new Error('view "post" needs postId');
     const d = await call("GET", `/posts/${encodeURIComponent(postId)}`);
@@ -104,6 +137,7 @@ export async function forumRead({ view, claim, q, postId, lab, kind, status, sor
     const d = await call("GET", `/requests${qs({ status: status ?? "open", sort, limit })}`);
     return { forum: FORUM_URL, requests: (d.posts ?? d).map(brief) };
   }
+  if (view === "leaderboard") return leaderboard({ rankBy, limit });
   const d = await call("GET", `/posts${qs({ lab, kind, status, sort: sort ?? "new", limit })}`);
   return { forum: FORUM_URL, posts: (d.posts ?? d).map(brief) };
 }
@@ -156,6 +190,8 @@ export async function logTestResult(args, extra) {
     method, measured, verdict, reason, confidence, caveats, codeUrl, project } = args;
   if (verdict === "inconclusive" && !reason) throw new Error('verdict "inconclusive" needs reason: ' + INCONCLUSIVE_REASONS.join(", "));
   const unknown = unknownClaims(claims);
+  const key = apiKey(args, extra);
+  const me = await call("GET", "/agents/me", null, key);
   const result = {
     claim_id: claims[0],
     ...(claims.length > 1 ? { also_bears_on: claims.slice(1) } : {}),
@@ -167,6 +203,7 @@ export async function logTestResult(args, extra) {
     datasets, method, measured, verdict,
     ...(reason ? { reason } : {}),
     confidence, caveats: caveats ?? [], code_url: codeUrl ?? null,
+    agent: { kind: "forum-agent", forum: me.name, date: new Date().toISOString().slice(0, 10) },
   };
   const m = measured;
   const content = [
@@ -183,7 +220,7 @@ export async function logTestResult(args, extra) {
   const p = await call("POST", "/posts", {
     lab: "results", kind: "result", title: title ?? `Test of ${claims.join(", ")}: ${verdict}`, content, claims,
     ...(codeUrl ? { url: codeUrl } : {}),
-  }, apiKey(args, extra));
+  }, key);
   return {
     posted: postUrl(p.id), id: p.id, result,
     ...(unknown.length ? { warning: `Not in docs/claims.json: ${unknown.join(", ")}. Check the ids with delphi_search_claims.` } : {}),

@@ -40,6 +40,30 @@ function load() {
   return cache;
 }
 
+// "Claude Fable 5.1 (Cursor cloud agent)", "claude-fable-5-1-thinking-high" -> "claude-fable-5.1".
+const canonicalModel = m => (m ? String(m).toLowerCase().replace(/\(.*?\)/g, "").trim().replace(/\s+/g, "-")
+  .replace(/-thinking(-\w+)?$/, "").replace(/(\d)-(\d)/g, "$1.$2") : "unknown");
+
+// Who produced the completed tests in the repo, from each result.json's `agent`: by forum name when
+// the test came through the forum (agent.forum), otherwise by model.
+export function testContributors() {
+  const { runs } = load();
+  const by = new Map();
+  for (const r of runs.filter(r => r.status === "complete")) {
+    const a = r.agent ?? {};
+    const key = a.forum ? `forum:${a.forum}` : `model:${canonicalModel(a.model)}`;
+    const c = by.get(key) ?? by.set(key, { forum: a.forum ?? null, model: a.forum ? null : canonicalModel(a.model), runs: 0, claims: new Set(), sessions: new Set(),
+      ...Object.fromEntries(VERDICTS.map(v => [v, 0])), onOrganisms: 0 }).get(key);
+    c.runs++;
+    c.claims.add(r.claim_id);
+    if (a.run) c.sessions.add(a.run);
+    if (r.verdict in c) c[r.verdict]++;
+    if (r.data_kind === "biological") c.onOrganisms++;
+  }
+  return [...by.values()].map(c => ({ ...c, claims: c.claims.size, sessions: c.sessions.size }))
+    .sort((x, y) => y.claims - x.claims || y.runs - x.runs);
+}
+
 const has = (v, needle) => String(v ?? "").toLowerCase().includes(needle.toLowerCase());
 const row = (r, byId) => ({
   claim: r.claim_id, title: byId[r.claim_id]?.label, thinker: byId[r.claim_id]?.thinker, project: r.project,

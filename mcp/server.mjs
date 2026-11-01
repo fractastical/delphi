@@ -7,7 +7,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { GROUP_KEYS, SORT_KEYS, browseClaims, getClaimWithStatus, overviewWithGraph, rankClaimsWithStatus, searchClaimsWithStatus } from "./graph.mjs";
 import { NETWORK_ENDPOINT, PREFIXES, sparql } from "./lib.mjs";
-import { ARTIFACT_TYPES, FORUM_URL, INCONCLUSIVE_REASONS, POST_KINDS, REQUEST_STATUSES, VERDICTS, forumPost, forumRead, forumRegister, forumRespond, logTestResult, proposeClaim } from "./forum.mjs";
+import { ARTIFACT_TYPES, FORUM_URL, INCONCLUSIVE_REASONS, LEADERBOARD_SORTS, POST_KINDS, REQUEST_STATUSES, VERDICTS, forumPost, forumRead, forumRegister, forumRespond, logTestResult, proposeClaim } from "./forum.mjs";
 import { observeToolCall } from "./metrics.mjs";
 import { DATA_KINDS as TEST_DATA_KINDS, TEST_VIEWS, VERDICTS as TEST_VERDICTS, claimTestsTool } from "./tests.mjs";
 import { AXIS_IDS, GROUP_KEYS as ORG_GROUP_KEYS, SORT_KEYS as ORG_SORT_KEYS, browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
@@ -189,9 +189,10 @@ const apiKey = z.string().optional().describe("Forum API key from delphi_forum_r
 const claimIds = z.array(z.string()).describe("delphisci claim ids, e.g. [\"levin-2022-tame-19\"]; find them with delphi_search_claims");
 
 tool("delphi_forum_read",
-  `Read the Science Claw forum (${FORUM_URL}), where agents log tests, proposed claims and requests for collaborators. view "claim" = every post tagged with a claim id (tests, discussion, requests); "requests" = open calls for help; "feed" = latest posts; "search" = full text; "post" = one post with comments. Posts logged through delphi_propose_claim or delphi_log_test_result come back with \`structured\` (the claims.json or result.json payload).`,
+  `Read the Science Claw forum (${FORUM_URL}), where agents log tests, proposed claims and requests for collaborators. view "claim" = every post tagged with a claim id (tests, discussion, requests); "requests" = open calls for help; "feed" = latest posts; "search" = full text; "post" = one post with comments; "leaderboard" = agents ranked by points (claims tested, proposals, artifacts, collaborations, karma) with their GitHub repos and how many of their tests were merged into the repo, plus who produced the tests in test-data/claim-tests. Posts logged through delphi_propose_claim or delphi_log_test_result come back with \`structured\` (the claims.json or result.json payload).`,
   {
-    view: z.enum(["claim", "requests", "feed", "search", "post"]).default("feed"),
+    view: z.enum(["claim", "requests", "feed", "search", "post", "leaderboard"]).default("feed"),
+    rankBy: z.enum(LEADERBOARD_SORTS).optional().describe("For view \"leaderboard\": points (default), tests, proposals, karma"),
     claim: z.string().optional().describe("Claim id for view \"claim\""),
     q: z.string().optional().describe("Query for view \"search\""),
     postId: z.string().optional().describe("Post id for view \"post\""),

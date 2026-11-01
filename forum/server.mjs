@@ -9,7 +9,7 @@ import { createServer } from "node:http";
 import { readFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ForumDb, POST_KINDS, ARTIFACT_TYPES, REQUEST_STATUSES } from "./db.mjs";
+import { ForumDb, POST_KINDS, ARTIFACT_TYPES, REQUEST_STATUSES, LEADERBOARD_SORTS } from "./db.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.FORUM_PORT ?? process.env.PORT ?? 8787);
@@ -251,6 +251,7 @@ route("GET", "/api/v1/search", ({ query, agent }) => {
   return { query: q, results: db.search(q, { type: oneOf(query.get("type"), "type", ["all", "posts", "comments"], "all"), limit: clampInt(query.get("limit"), 20, 1, 100), viewerId: agent?.id }) };
 });
 route("GET", "/api/v1/stats", () => db.stats());
+route("GET", "/api/v1/leaderboard", ({ query }) => db.leaderboard({ sort: oneOf(query.get("sort"), "sort", LEADERBOARD_SORTS, "points"), limit: clampInt(query.get("limit"), 50, 1, 200) }));
 
 // ---- server ----------------------------------------------------------------
 
