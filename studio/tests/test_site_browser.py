@@ -1808,3 +1808,27 @@ def test_demo_page_shows_published_cuts_with_controls_downloads_and_provenance(b
         if w == 400:
             assert _overflow(pg) <= 0
         pg.close()
+
+
+def test_no_page_prints_markup_or_object_placeholders(browser, base):
+    import re as _re
+    bad = _re.compile(r"<span|</?b>|<a href|class=\"|\[object \w+\]")
+    pg = page(browser, 1280, 900)
+    for r in ("blueprints", "blueprints?design=bp-2-development-versus-regeneration-contrast", "blueprints?region=pectoral-fin-field", "regulatory", "reuse", "history", "experimentation", "experimentation?tab=cross", "ecology", "formalize", "engineering", "simulations", "studio/flying-fish"):
+        pg.goto(base + "#/" + r); pg.wait_for_selector("#main h1"); pg.wait_for_timeout(500)
+        t = pg.locator("#main").text_content()
+        m = bad.search(t)
+        assert not m, (r, t[max(0, m.start() - 80):m.start() + 80])
+
+
+def test_engineering_cell_tab_opens_cellular_and_names_its_group(browser, base):
+    pg = page(browser, 1280, 900)
+    pg.goto(base + "#/engineering?scale=organism"); pg.wait_for_selector(".tabs7")
+    pg.click(".tabs7 a:text-is('Cell')")
+    pg.wait_for_selector(".scalecard h3")
+    assert pg.locator(".scalecard h3").text_content() == "Cellular scale" and "scale=cellular" in pg.evaluate("location.hash")
+    t = pg.locator("#main").text_content()
+    assert "The Cell tab holds 2 scales: Subcellular and Cellular" in t
+    pg.goto(base + "#/engineering?scale=subcellular"); pg.wait_for_selector(".scalecard h3")
+    assert pg.locator(".scalecard h3").text_content() == "Subcellular scale"
+    assert pg.locator(".tabs7 a[aria-current=page]").text_content() == "Cell"

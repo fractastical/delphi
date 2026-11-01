@@ -147,12 +147,14 @@
     const m = snap.mission; const scaleKey = route.params.scale || "organism"; const scale = m.scales.find((s) => s.key === scaleKey) || m.scales.find((s) => s.key === "organism");
     const tabOf = scale.tab;
     const tabScales = (t) => m.scales.filter((s) => s.tab === t);
+    // seven tabs group the eleven scales: a tab opens the scale it is named for (Cell -> Cellular, not Subcellular), else the first it holds
+    const tabHome = (t) => tabScales(t).find((s) => s.label.toLowerCase().startsWith(t.toLowerCase())) || tabScales(t)[0];
     const num = (name, label, unit, ph, hint) => html`<div class="field"><label for="f-${name}">${label}${unit ? html` <span class="unit">${unit}</span>` : ""}</label>
         <input id="f-${name}" name="${name}" type="number" step="any" inputmode="decimal" placeholder="unknown" aria-describedby="h-${name}"><small id="h-${name}">${hint}</small><small class="err" id="e-${name}" role="alert"></small></div>`;
     const tri = (name, label) => html`<div class="field"><label for="f-${name}">${label}</label><select id="f-${name}" name="${name}"><option value="">unknown</option><option value="yes">yes</option><option value="no">no</option></select></div>`;
     const shareDef = html`<div class="field"><label for="f-pect_share">Pectoral share of wing area <span class="unit">fraction</span></label><input id="f-pect_share" name="pect_share" type="number" step="0.01" min="0.76" max="0.92" value="0.8" aria-describedby="h-pect_share"><small id="h-pect_share">Visual split only, used when four-winged. Fish 1990: pectorals supply 76–92% of wing area.</small></div>`;
 
-    const scaleTabs = html`<nav class="subnav tabs7" aria-label="Scale groups"><ul>${m.tabs.map((t) => html`<li><a href="${DF.href("/engineering", { scale: tabScales(t)[0].key })}" aria-current="${t === tabOf ? "page" : "false"}">${t}</a></li>`)}</ul></nav>`;
+    const scaleTabs = html`<nav class="subnav tabs7" aria-label="Scale groups"><ul>${m.tabs.map((t) => html`<li><a href="${DF.href("/engineering", { scale: tabHome(t).key })}" aria-current="${t === tabOf ? "page" : "false"}">${t}</a></li>`)}</ul></nav>`;
     const chips = html`<ol class="scales compact">${m.scales.map((s, i) => html`<li><a class="scale ${s.have.length ? "has" : "none"} ${s.key === scale.key ? "on" : ""}" href="${DF.href("/engineering", { scale: s.key })}" aria-current="${s.key === scale.key ? "true" : "false"}"><span class="n">${i + 1}</span><b>${s.label}</b></a></li>`)}</ol>`;
     const haveSrc = scale.have.map((id) => snap.mission.sources.find((s) => s.id === id)).filter(Boolean);
     const outC = m.couplings.filter((c) => c.from === scale.key); const inC = m.couplings.filter((c) => c.to === scale.key);
@@ -170,7 +172,7 @@
         <section class="panel" id="wb-g" aria-labelledby="wb-gh"><h2 id="wb-gh">Goal</h2><p>${m.whiteboard.goal.text}</p><p class="small"><a href="${DF.href("/frontier/G1")}">See it on the whiteboard</a></p></section>
         <section class="panel" aria-labelledby="sc-h"><h2 id="sc-h">Scales</h2>
           <p class="note small">All eleven MorphoSwarm scales are shown. A scale without an executable coupling to its neighbours is an <b>open question</b>, not a gap to ignore.</p>
-          ${scaleTabs}${chips}
+          ${scaleTabs}${tabScales(tabOf).length > 1 ? html`<p class="small faint">The ${tabOf} tab holds ${tabScales(tabOf).length} scales: ${tabScales(tabOf).map((x) => x.label).join(" and ")}. The eleven scales below are the full list.</p>` : ""}${chips}
           <article class="scalecard"><h3>${scale.label} scale</h3>
             <h4>What is indexed</h4>${haveSrc.length ? html`<ul>${haveSrc.map((s) => html`<li>${U.src("src:" + s.id, s.cite.split("). ")[0] + ")")} ${U.pill(s.read_level, "rl")}</li>`)}</ul>` : html`<p class="faint">No source indexed at this scale in this snapshot.</p>`}
             <h4>Open question</h4><p>${scale.open}</p>
