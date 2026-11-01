@@ -127,7 +127,9 @@ def main() -> None:
         "cards": [
             {"path": lean_out.relative_to(ROOT).as_posix(), "sha256": sha256(lean_out),
              "source_path": lean_path.relative_to(ROOT).as_posix(), "source_sha256": sha256(lean_path),
-             "source_kind": "Lean check receipt", "claim_scope": receipt.get("does_not_prove")},
+             "source_kind": "Lean check receipt",
+             "claim_scope": "Conditional algebraic Euler-Bernoulli cantilever theorem with a corrupt-law mutant check; algebraic statement only.",
+             "not_established": receipt.get("does_not_prove")},
             {"path": benchmark_out.relative_to(ROOT).as_posix(), "sha256": sha256(benchmark_out),
              "source_path": "artifacts/demo-video-90/sources/provenance/capability-agency-post-run.json",
              "source_sha256": sha256(ROOT / "artifacts/demo-video-90/sources/provenance/capability-agency-post-run.json"),
