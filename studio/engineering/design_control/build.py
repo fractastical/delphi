@@ -177,6 +177,7 @@ def build():
              "sensitivity": {"kind": "local paired elasticity, other inputs held fixed",
                              "elasticity": ref("fin-controls", "/paired_sensitivity/EI_Nm2/elasticity"),
                              "expected_from_dimensions": ref("fin-controls", "/paired_sensitivity/EI_Nm2/expected_from_dimensions")},
+             "identifiability_kind": "structural (Jacobian rank), prospective, abstract model",
              "identifiability": "stiffness and load scale are not separable from deflection reads alone: the planner's deflection-only design has rank 1 against 2 for deflection plus an independent load read (abstract linear-Gaussian cantilever, assumed prior, not this fin)",
              "identifiability_ref": {"deflection_only_rank": ref("planner", "/designs/id=deflection_only/identifiability/rank"),
                                      "mixed_rank": ref("planner", "/designs/id=mixed_load_deflection/identifiability/rank"),
@@ -195,7 +196,9 @@ def build():
              "fraction": ref("fin-summary", f"/candidates/{i}/fraction"),
              "interval_kind": "conditional Wilson 95%, sampling variation under the assumed scenario law only",
              "interval": ref("fin-summary", f"/candidates/{i}/conditional_wilson95_interval"),
-             "meaning": "fraction of assumed-scenario draws inside the linear envelope; not a probability of biological success; draws are shared across candidates"}
+             "tag": "source-only",
+             "meaning": "fraction of assumed-scenario draws inside the linear envelope; not a probability of biological success; draws are shared across candidates",
+             "ranking": "unranked: shorter-ray and stiffer-ray intervals overlap almost entirely and the paired difference is not computed here"}
             for i, c in enumerate(doc("fin-summary")["candidates"])],
         "bridges": [{"id": b["id"], "from": b["id"], "to": "target-fin behaviour", "status": b["status"], "value": None,
                      "need": b["need"], "ref": {"src": "assurance", "ptr": f"/project/unsupported_essential_bridges/id={b['id']}"}}
@@ -215,16 +218,20 @@ def build():
                             n=ref(knobs, "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit/n"),
                             r2=ref(knobs, "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit/r2")),
              "sensitivity": {"kind": "measured allometry exponent, not a design sensitivity"},
-             "identifiability": "fin length is identified against SL in sample; leave-one-out RMSE is reported",
+             "identifiability_kind": "practical/statistical, not structural",
+             "identifiability": "slope is estimated with a narrow interval in sample (n=49) over the stated SL range; an allometric association between organisms, not a causal control or an intervention response",
              "identifiability_ref": {"loocv_rmse_log10": ref(knobs, "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit/loocv_rmse_log10"),
                                      "quality": ref(knobs, "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit_quality")}},
             {"id": "pelvic_vs_SL_flying_halfbeak", "label": "Pelvic fin length against standard length (flying halfbeak)", "unit": "cm vs cm", "controllable": False,
              "value": ref(knobs, "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/b"),
              "bound": bound("measured", "same method; fit judged unusable",
                             r2=ref(knobs, "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/r2"),
+                            slope_b=ref(knobs, "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/b"),
+                            b_ci95_bootstrap=ref(knobs, "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/bootstrap/b_ci95"),
                             n=ref(knobs, "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/n")),
-             "sensitivity": {"kind": "none: no relation recovered"},
-             "identifiability": "not identifiable from these data",
+             "sensitivity": {"kind": "none: no slope distinguishable from zero"},
+             "identifiability_kind": "practical/statistical, not structural",
+             "identifiability": "Practical non-detection: at n=15 the slope is imprecise and its bootstrap interval spans zero (and excludes isometry, b=1). The log-log slope is structurally identifiable over this SL range; this is a statement about these data only, scoped to flying halfbeak pelvic, not to other groups or to pelvic fins generally",
              "identifiability_ref": {"quality": ref(knobs, "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit_quality")}},
         ],
         "results": [{"id": "knob-count", "text": "Control-knob records by kind; per-specimen raw data exist only for the observed_and_fitted_here kind",
@@ -248,6 +255,7 @@ def build():
             {"id": "reaction_delay_s_range", "label": "Escape reaction-delay range", "unit": "s", "controllable": True,
              "value": eco_vals("reaction_delay_s_range"),
              "bound": bound("assumed", "assumed delay envelope; no measured neural parameter"),
+             "tag": "computed-here (counts re-derived from saved results)",
              "sensitivity": {"kind": "saved paired outcomes at the fixed 0.6 s endpoint (response flags, neighbors vs no-neighbor ablation); no variance partition", "table": eco_delay_table()},
              "identifiability": "two seeds per arm; no variance partition and no interaction estimate"},
             {"id": "fin_stiffness_Nm_rad", "label": "Hinge stiffness", "unit": "N m/rad", "controllable": True,
@@ -318,6 +326,9 @@ def build():
         "assurance_priority_class": ref("assurance", "/project/next_actions/id=resolve-cell-tissue-fin/priority_class"),
         "expected_information_gain": ref("assurance", "/project/next_actions/id=resolve-cell-tissue-fin/expected_information_gain"),
     }
+    for layer in lay:
+        for q in layer["parameters"]:
+            q.setdefault("tag", {"measured": "source-only (owner's fit of specimen data)", "assumed": "assumed"}.get(q["bound"]["status"], q["bound"]["status"]))
     return {
         "schema": SCHEMA,
         "concept": {"line": "Evidence-led science. Goal-driven engineering.",
@@ -326,6 +337,8 @@ def build():
         "biological_success_probability": None, "confidence_percent": None, "aggregate_score": None,
         "sources": srcs, "layers": lay, "workpackages": wps, "next_experiment": nxt,
         "execution_note": "Work packages are independent exactly when their inputs lists are disjoint; wp-deformed-polar depends on two others. Nothing here is executed or decentralized: all rows are proposals.",
+        "provenance_notes": ["Data S1A pelvic/SL column holds a corrupt value (2.4e-16, specimen 1); the owner recomputed it from lengths and kept both.",
+                         "Neighbouring groups fit differently (flying-fish pelvic, halfbeak pelvic) and are outside this map; do not generalise the flying-halfbeak pelvic non-detection."],
         "non_claims": ["No new simulation, measurement or inference was run to make this map.",
                        "Fractions are conditional simulation-envelope fractions, not probabilities of biology.",
                        "Local elasticities hold other inputs fixed and are not causal biological effects."],

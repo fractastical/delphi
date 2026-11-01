@@ -168,6 +168,7 @@
       },
       "result": "x0.35 arm: no cell crosses 0 mV in the 30 ms window (assurance handoff, bioelectric branch)"
      },
+     "tag": "assumed",
      "unit": "1",
      "value": {
       "ptr": "/request/sodium_scale",
@@ -200,6 +201,7 @@
       },
       "result": "disconnected arm: only the stimulated cell fires (bioelectric handoff)"
      },
+     "tag": "assumed",
      "unit": "mS/cm2",
      "value": {
       "ptr": "/request/gap_mS_cm2",
@@ -304,6 +306,7 @@
       },
       "kind": "local paired elasticity, other inputs held fixed (not causal, not variance importance)"
      },
+     "tag": "assumed",
      "unit": "m",
      "value": {
       "ptr": "/candidates/id=baseline/ray_length_m",
@@ -346,6 +349,7 @@
      "controllable": true,
      "id": "EI_multiplier",
      "identifiability": "stiffness and load scale are not separable from deflection reads alone: the planner's deflection-only design has rank 1 against 2 for deflection plus an independent load read (abstract linear-Gaussian cantilever, assumed prior, not this fin)",
+     "identifiability_kind": "structural (Jacobian rank), prospective, abstract model",
      "identifiability_ref": {
       "deflection_only_rank": {
        "ptr": "/designs/id=deflection_only/identifiability/rank",
@@ -377,6 +381,7 @@
       },
       "kind": "local paired elasticity, other inputs held fixed"
      },
+     "tag": "assumed",
      "unit": "1",
      "value": {
       "ptr": "/candidates/id=baseline/EI_multiplier",
@@ -406,6 +411,7 @@
       },
       "kind": "local paired elasticity; V^1-load mutant gives 1 and is detected"
      },
+     "tag": "assumed",
      "unit": "m/s",
      "value": {
       "ptr": "/latents/weather/maps/speed_m_s",
@@ -446,6 +452,8 @@
       "src": "fin-summary",
       "value": 20
      },
+     "ranking": "unranked: shorter-ray and stiffer-ray intervals overlap almost entirely and the paired difference is not computed here",
+     "tag": "source-only",
      "text": "both-load predicate passes, baseline"
     },
     {
@@ -475,6 +483,8 @@
       "src": "fin-summary",
       "value": 33
      },
+     "ranking": "unranked: shorter-ray and stiffer-ray intervals overlap almost entirely and the paired difference is not computed here",
+     "tag": "source-only",
      "text": "both-load predicate passes, shorter-ray"
     },
     {
@@ -504,6 +514,8 @@
       "src": "fin-summary",
       "value": 34
      },
+     "ranking": "unranked: shorter-ray and stiffer-ray intervals overlap almost entirely and the paired difference is not computed here",
+     "tag": "source-only",
      "text": "both-load predicate passes, stiffer-ray"
     }
    ],
@@ -553,7 +565,8 @@
      },
      "controllable": false,
      "id": "pectoral_vs_SL_flying_fish",
-     "identifiability": "fin length is identified against SL in sample; leave-one-out RMSE is reported",
+     "identifiability": "slope is estimated with a narrow interval in sample (n=49) over the stated SL range; an allometric association between organisms, not a causal control or an intervention response",
+     "identifiability_kind": "practical/statistical, not structural",
      "identifiability_ref": {
       "loocv_rmse_log10": {
        "ptr": "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit/loocv_rmse_log10",
@@ -570,6 +583,7 @@
      "sensitivity": {
       "kind": "measured allometry exponent, not a design sensitivity"
      },
+     "tag": "source-only (owner's fit of specimen data)",
      "unit": "cm vs cm",
      "value": {
       "ptr": "/knobs/id=s1a-pectoral-length-vs-sl-flying-fish/fit/b",
@@ -579,6 +593,14 @@
     },
     {
      "bound": {
+      "b_ci95_bootstrap": {
+       "ptr": "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/bootstrap/b_ci95",
+       "src": "knobs",
+       "value": [
+        -0.6406016672097292,
+        0.5113313247508183
+       ]
+      },
       "basis": "same method; fit judged unusable",
       "n": {
        "ptr": "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/n",
@@ -590,11 +612,17 @@
        "src": "knobs",
        "value": 0.01937077986435287
       },
+      "slope_b": {
+       "ptr": "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/b",
+       "src": "knobs",
+       "value": 0.10828642938485845
+      },
       "status": "measured"
      },
      "controllable": false,
      "id": "pelvic_vs_SL_flying_halfbeak",
-     "identifiability": "not identifiable from these data",
+     "identifiability": "Practical non-detection: at n=15 the slope is imprecise and its bootstrap interval spans zero (and excludes isometry, b=1). The log-log slope is structurally identifiable over this SL range; this is a statement about these data only, scoped to flying halfbeak pelvic, not to other groups or to pelvic fins generally",
+     "identifiability_kind": "practical/statistical, not structural",
      "identifiability_ref": {
       "quality": {
        "ptr": "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit_quality",
@@ -604,8 +632,9 @@
      },
      "label": "Pelvic fin length against standard length (flying halfbeak)",
      "sensitivity": {
-      "kind": "none: no relation recovered"
+      "kind": "none: no slope distinguishable from zero"
      },
+     "tag": "source-only (owner's fit of specimen data)",
      "unit": "cm vs cm",
      "value": {
       "ptr": "/knobs/id=s1a-pelvic-length-vs-sl-flying-halfbeak/fit/b",
@@ -666,6 +695,7 @@
       "kind": "paired arms (the baseline 0.05 kg is the unlisted default)",
       "result": "responses at 0.6 s are the same as baseline in both mass arms; two seeds, no interaction estimate"
      },
+     "tag": "assumed",
      "unit": "kg",
      "value": {
       "ptr": "derived:eco_delay_table",
@@ -880,6 +910,7 @@
        }
       ]
      },
+     "tag": "computed-here (counts re-derived from saved results)",
      "unit": "s",
      "value": {
       "ptr": "derived:eco_delay_table",
@@ -909,6 +940,7 @@
       "kind": "saved paired arms",
       "result": "responses at 0.6 s equal baseline in both hinge arms; two seeds"
      },
+     "tag": "assumed",
      "unit": "N m/rad",
      "value": {
       "ptr": "derived:eco_delay_table",
@@ -991,6 +1023,7 @@
      "sensitivity": {
       "kind": "scenario contrast (35 Hz baseline vs 25 Hz), controller metrics only"
      },
+     "tag": "assumed",
      "unit": "Hz",
      "value": {
       "ptr": "/parameter_registry/name=frequency_Hz/value",
@@ -1041,6 +1074,10 @@
   "No new simulation, measurement or inference was run to make this map.",
   "Fractions are conditional simulation-envelope fractions, not probabilities of biology.",
   "Local elasticities hold other inputs fixed and are not causal biological effects."
+ ],
+ "provenance_notes": [
+  "Data S1A pelvic/SL column holds a corrupt value (2.4e-16, specimen 1); the owner recomputed it from lengths and kept both.",
+  "Neighbouring groups fit differently (flying-fish pelvic, halfbeak pelvic) and are outside this map; do not generalise the flying-halfbeak pelvic non-detection."
  ],
  "schema": "frontier.design-control/1",
  "separation": "Humans set the target goals. Solver or model validity (checked equations, convergence, controls) is a different thing from empirical biological realism, which is unknown for every layer here.",

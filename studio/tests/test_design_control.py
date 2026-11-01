@@ -131,3 +131,26 @@ def test_view_refuses_bad_schema_and_missing_map(amap, tmp_path):
     assert errs == [] and n_layers == 0 and "Unexpected schema" in txt
     txt, n_layers, _, errs = _render(tmp_path, None)
     assert errs == [] and n_layers == 0 and "No design-control map is present" in txt
+
+
+def test_pelvic_wording_is_practical_with_interval_and_scoped(amap):
+    p = next(q for lay in amap["layers"] for q in lay["parameters"] if q["id"] == "pelvic_vs_SL_flying_halfbeak")
+    lo, hi = p["bound"]["b_ci95_bootstrap"]["value"]
+    assert lo < 0 < hi and p["bound"]["n"]["value"] == 15
+    assert "practical" in p["identifiability_kind"] and "structurally identifiable" in p["identifiability"]
+    assert "not identifiable" not in p["identifiability"].lower().replace("not structural", "")
+    assert "causal control" in next(q for lay in amap["layers"] for q in lay["parameters"] if q["id"] == "pectoral_vs_SL_flying_fish")["identifiability"]
+    pl = next(q for lay in amap["layers"] for q in lay["parameters"] if q["id"] == "EI_multiplier")
+    assert "structural" in pl["identifiability_kind"]
+
+
+def test_fractions_unranked_and_every_param_tagged(amap):
+    fr = [r for lay in amap["layers"] for r in lay["results"] if "fraction" in r]
+    assert all("unranked" in r["ranking"] and "paired difference is not computed" in r["ranking"] and r["tag"] == "source-only" for r in fr)
+    assert all(q.get("tag") for lay in amap["layers"] for q in lay["parameters"])
+
+
+def test_view_shows_tags_interval_and_unranked(amap, tmp_path):
+    txt, _, _, errs = _render(tmp_path, amap)
+    assert errs == [] and "source-only" in txt and "computed-here" in txt and "practical/statistical" in txt
+    assert "paired difference is not computed" in txt and "b ci95 bootstrap" in txt and "2 seeds" in txt
