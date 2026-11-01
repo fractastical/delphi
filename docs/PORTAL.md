@@ -10,13 +10,14 @@ The Delphi website. Two parts live side by side here:
   copy them over; don't restyle them here.
 
 GitHub Pages publishes this `docs/` directory, with `CNAME` set to `delphibio.org`. The
-homepage is `index.html`. `platform.html` is the Lean for Biology page, also served at
-`/platform/` from `platform/index.html` (same file, with `<base href="/">` so its `data/`
-requests still load from `/data/`). The mission-control dashboard stays on its Cloudflare worker.
+homepage `index.html` is `Delphi_Product_Platform.html` from
+[kavitakoolkarni-bio/morpholib-delphi-branch](https://github.com/kavitakoolkarni-bio/morpholib-delphi-branch)
+`delphi-new/` at `d8449d0` (2026-11-01). On Pages, its `/v1/product` calls fall back to `data/`.
+`platform.html` remains the earlier Lean for Biology page, also at `/platform/`. The
+mission-control dashboard stays on its Cloudflare worker.
 - **The claims atlas**, built from this repo by `` scripts: `claim-graph.html`,
-  `theorems.html`, `claims-query.html`, `problems.html`, `team.html`, `overview-deck.html` (the
-  project-overview slide deck), plus `claims.json`, `problems.json`, `export/`, `thumbs/`, `team/`.
-  Don't edit these by hand; rebuild them.
+  `theorems.html`, `claims-query.html`, `problems.html`, `team.html`, plus `claims.json`,
+  `problems.json`, `export/`, `thumbs/`, `team/`. Don't edit these by hand; rebuild them.
 
 ## Shared look
 
@@ -39,7 +40,6 @@ cd engine
 node scripts/site/build-claim-graph.mjs     # claim-graph, claims-query, theorems, claims.json, export
 node problems/build/build-site.mjs          # problems.html, problems.json
 python3 scripts/site/build-team-page.py     # team.html
-node scripts/site/build-overview-deck.mjs   # overview-deck.html (run after build-claim-graph; reads claims.json)
 ```
 
 ## Refresh the portal
