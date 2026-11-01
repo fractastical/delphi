@@ -154,3 +154,33 @@ def test_committed_mapping_entries_are_all_verified_in_the_ledger():
     assert o["reviewed_mapping"] and all(m["verified"] for m in o["reviewed_mapping"])
     assert set(m["harness"] for m in o["reviewed_mapping"]) <= set(o["supported_harnesses"])
     assert not (set(o["role_to_harness_self_labelled"]) & set(o["role_label_conflicts"]))
+
+
+def test_native_identity_class_is_separate_verified_and_never_an_alias(tmp_path):
+    import subprocess
+    r = tmp_path
+    subprocess.run(["git", "-C", str(r), "init", "-q"], check=True)
+    (r / "f.txt").write_text("x")
+    subprocess.run(["git", "-C", str(r), "add", "f.txt"], check=True)
+    subprocess.run(["git", "-C", str(r), "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", "x"], check=True)
+    now = ac.dt.datetime.now().timestamp()
+    nat = ac.verify_mapping([{"identity": "/root/a", "role": "r", "evidence": [{"kind": "commit", "ref": "HEAD"}]},
+                             {"identity": "/root/b", "role": "r", "evidence": [{"kind": "commit", "ref": "deadbeef"}]}], str(r), now - 60, {})
+    assert [n["verified"] for n in nat] == [True, False] and nat[0]["checks"][0]["sample_paths"] == ["f.txt"]
+    tm = {"sessions": {"claude-05": {"live_harness_process": True, "pane_state": "idle"}}, "raw_session_names": 1, "activity_poller_suspected": False, "max_sessions_active_within_180s": 0}
+    g = {"git_identities": {}, "models_in_trailers": {}, "commits_in_window": 0}
+    out = ac.build({"claude05-to-x.md": msg("# a")}, tm, g, [], {"own_jobs": 0}, W, W + 7200, None, nat)
+    assert out["counts"]["native_contributors_supported_minimum"] == 1 and out["counts"]["distinct_contributing_harness_ids_supported_minimum"] == 1
+    assert out["native_contributors"]["combined_with_harness_floor_if_classes_are_disjoint"] == 2 and out["native_agents"]["count"] == 1
+    clash = [{"identity": "codex-03", "role": "r", "verified": True, "checks": []}]
+    with pytest.raises(AssertionError):
+        ac.build({}, tm, g, [], {"own_jobs": 0}, W, W + 7200, None, clash)
+
+
+def test_committed_native_class_is_three_verified_and_disjoint_from_harnesses():
+    o = json.loads((ROOT / "results/resources/agent-contributors.json").read_text())
+    n = o["native_contributors"]
+    assert n["supported_minimum"] == len(n["identities"]) == 3 and all(e["verified"] and e["identity"].startswith("/root/") for e in n["entries"])
+    assert not set(n["identities"]) & (set(o["supported_harnesses"]) | set(o["tmux"]))
+    assert n["combined_with_harness_floor_if_classes_are_disjoint"] == len(o["supported_harnesses"]) + 3
+    assert any(c["files_changed"] > 0 for e in n["entries"] for c in e["checks"])

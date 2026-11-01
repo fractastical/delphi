@@ -15,7 +15,8 @@ Data: `results/resources/agent-contributors.json` (built by `python3 scripts/age
 | Roles in handoff filenames | 81 | topic names, not harnesses |
 | Worker branches / own provider jobs | 93 / 42 | jobs, not agents |
 | Git identities / models in trailers | 4 / 4 | `SciDEX Bot` is one shared identity; a model is not an agent |
-| Native agents | not measured | separate unit; matched to a session only via the reviewed mapping |
+| **Native contributors (supported minimum)** | 3: /root/infra_director, /root/mechanobio_sim, /root/resource_scaling | a separate identity class, attested by root from the live conversation and tool routing; each named commit is checked to resolve in the window and what it touched. Not tmux aliases, not root/codex-03, root not counted again |
+| Harness floor + native, if the classes are disjoint | 14 | a sum across two identity classes, valid only while no native identity aliases a harness (the builder refuses an identity that collides with a session, `root` or `codex-03`). A floor, not a census |
 
 Contribution activity is **unknown** for every session: a live process, an idle prompt or an auth block is not work.
 
@@ -24,5 +25,6 @@ Contribution activity is **unknown** for every session: a live process, an idle 
 - **Role labels:** a title `role (claude-NN) →` labels that role as that harness; the label applies to other handoffs whose filename sender is exactly that role. A role labelled with two harnesses is a conflict and is not used (0 now).
 - **Reviewed mapping:** 6 root-attested entries; each is checked against its commit, branch or handoff (resolves, in window, title names the harness) and counted only if it verifies. One git identity signs nearly all commits, so commit authorship cannot separate agents: a verified artifact shows the work exists and the harness link rests on the reviewed entry.
 - **Not evidence:** tmux `session_activity` (one poller touched 18 sessions within 180 s), mentions, document names like `CODEX-21-...`.
+- **Native class check:** a verified commit shows the work exists in the window and what it changed (file counts and sample paths are in the JSON); it does not show which identity wrote it. That link is root's attestation. `/root/resource_scaling`'s demo 60/120 source and output were attested without a commit or path, so they are listed as unchecked and only `ec42409` supports it.
 - **Still a floor:** a worker with no ID in its titles and no mapping entry is missed. Unknowns: roles with no label, unattributed workers, reuse of pre-window sessions, the native-agent count.
 - **Privacy:** private handoffs and pane tails were read for IDs and state classes only; the output holds names, sha256, times and classes, no text.

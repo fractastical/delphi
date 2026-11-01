@@ -170,7 +170,9 @@ def verify_mapping(entries: list[dict], repo: str, window_start: float, files: d
                 r = subprocess.run(["git", "-C", repo, "log", "-1", "--format=%H%x1f%ct", ref], capture_output=True, text=True)
                 ok = r.returncode == 0 and "\x1f" in r.stdout
                 sha_, ct = r.stdout.strip().split("\x1f") if ok else (None, "0")
-                checks.append({**ev, "resolves": ok, "object": sha_, "in_window": ok and float(ct) >= window_start, "commit_time_utc": iso(float(ct)) if ok else None})
+                names = subprocess.run(["git", "-C", repo, "diff-tree", "--root", "--no-commit-id", "--name-only", "-r", "-m", "--first-parent", ref], capture_output=True, text=True).stdout.split() if ok and k == "commit" else []
+                checks.append({**ev, "resolves": ok, "object": sha_, "in_window": ok and float(ct) >= window_start, "commit_time_utc": iso(float(ct)) if ok else None,
+                               **({"files_changed": len(names), "sample_paths": names[:3]} if k == "commit" else {})})
             elif k == "handoff":
                 f = files.get(ref)
                 ok = f is not None and f[1] >= window_start
@@ -178,7 +180,7 @@ def verify_mapping(entries: list[dict], repo: str, window_start: float, files: d
                 ts_ = title_sender(head)
                 checks.append({**ev, "resolves": f is not None, "in_window": ok, "sha256": sha(f[0]) if f else None, "title_names_harness": bool(ts_ and ts_[0] == e["harness"])})
         verified = all(c["resolves"] and c["in_window"] and c.get("title_names_harness", True) for c in checks)
-        out.append({"harness": e["harness"], "role": e["role"], "verified": verified, "checks": checks})
+        out.append({("harness" if "harness" in e else "identity"): e.get("harness") or e["identity"], "role": e["role"], "verified": verified, "checks": checks})
     return out
 
 
@@ -212,7 +214,7 @@ def branches(repo: str) -> list[str]:
     return sorted({b.split("/", 1)[1] for b in out if "/" in b and not b.endswith("HEAD")})
 
 
-def build(messages: dict, tmux: dict, git: dict, branch_names: list[str], jobs: dict, window_start: float, observed: float, mapping: list[dict] | None = None) -> dict:
+def build(messages: dict, tmux: dict, git: dict, branch_names: list[str], jobs: dict, window_start: float, observed: float, mapping: list[dict] | None = None, native: list[dict] | None = None) -> dict:
     sessions = set(tmux["sessions"])
     sc = scan_messages(messages, window_start, sessions)
     rl = tier_for_roles(sc["roles"], sessions)
@@ -226,12 +228,16 @@ def build(messages: dict, tmux: dict, git: dict, branch_names: list[str], jobs: 
     probable = {h: v for h, v in rl["probable"].items() if h not in supported}
     named_only = {h: len(ev) for h, ev in sc["referenced"].items() if h not in supported and h not in probable}
     authored_not_session = sorted(set(sc["authored"]) - sessions)
+    nat = [n for n in (native or []) if n["verified"]]
+    clash = [n["identity"] for n in (native or []) if n["identity"].lstrip("/").replace("/", "-") in sessions or n["identity"] in ("root", "/root", "codex-03")]
+    assert not clash, f"native identity collides with a harness or root: {clash}"
     work = [b for b in branch_names if b.startswith(("work/", "codex/"))]
     return {
         "schema": SCHEMA,
         "window": {"start_utc": iso(window_start), "observed_utc": iso(observed), "basis": "handoff mtimes, commit times and provider job times inside the window; earlier evidence is skipped, not counted"},
         "counts": {
             "distinct_contributing_harness_ids_supported_minimum": len(supported),
+            "native_contributors_supported_minimum": len(nat),
             "harness_ids_probable_not_counted": len(probable),
             "harness_ids_named_by_others_only": len(named_only),
             "tmux_session_names_raw": tmux["raw_session_names"],
@@ -250,8 +256,12 @@ def build(messages: dict, tmux: dict, git: dict, branch_names: list[str], jobs: 
         "named_by_others_only": dict(sorted(named_only.items())),
         "authored_ids_without_a_session": authored_not_session,
         "unresolved_mentions": {k: len(v) for k, v in sorted(sc["unresolved_mentions"].items())},
+        "native_contributors": {"class": "native collaboration agent; a separate identity class from tmux harnesses; root not counted again",
+                                "supported_minimum": len(nat), "identities": [n["identity"] for n in nat], "entries": native or [],
+                                "combined_with_harness_floor_if_classes_are_disjoint": len(supported) + len(nat),
+                                "combined_note": "a sum across two identity classes, valid only while no native identity is an alias of a harness; neither is an estimate of everyone who contributed"},
         "contribution_activity": "unknown for every session: a live process, an idle prompt or an auth block is not work",
-        "native_agents": {"count": None, "status": "not measured here; a separate unit from tmux sessions, matched to a session only through the reviewed mapping"},
+        "native_agents": {"count": len(nat), "status": "supported minimum from root's attestation with verified commits; not a census"},
         "role_to_harness_self_labelled": sc["role_map"],
         "role_label_conflicts": sc["role_label_conflicts"],
         "reviewed_mapping": mapping or [],
@@ -294,10 +304,11 @@ def main():
     tm = scan_tmux(panes, ps_rows, texts)
     mp = json.load(open(Path(a.repo) / "results/resources/agent-contributor-mapping.json"))
     mapping = verify_mapping(mp["entries"], a.repo, ws, files)
+    native = verify_mapping(mp.get("native_contributors", []), a.repo, ws, files)
     g = scan_git(git_log(a.repo), ws)
     usage = json.load(open(Path(a.repo) / "results/resources/hackathon-usage.json"))
     jobs = {"own_jobs": len(usage["own_jobs"]), "source": "results/resources/hackathon-usage.json", "source_sha256": sha((Path(a.repo) / "results/resources/hackathon-usage.json").read_bytes())}
-    out = build(files, tm, g, branches(a.repo), jobs, ws, dt.datetime.now(dt.timezone.utc).timestamp(), mapping)
+    out = build(files, tm, g, branches(a.repo), jobs, ws, dt.datetime.now(dt.timezone.utc).timestamp(), mapping, native)
     out["worker_jobs_source"] = jobs
     Path(a.out).write_text(json.dumps(out, indent=1, sort_keys=True) + "\n")
     print(json.dumps(out["counts"], indent=1))
