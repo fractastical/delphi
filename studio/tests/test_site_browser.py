@@ -1795,7 +1795,7 @@ def test_experimentation_page_keeps_context_states_absence_and_invents_no_observ
     assert "Plans, not results" in t and "no wet-lab observation has been made" in t and "scale Organ" in t and "pectoral-fin-field" in t and "loading" in t
     if X["planner"] is None:
         assert "No candidate intervention, readout, control or replicate unit is recorded" in t and "nothing is invented" in t
-    assert "Wet-lab protocols frozen" in t and "Computational protocols frozen" in t and "0: no observation exists" in t and "Results ingested" in t and "proposal → ready → running → failed → completed → review" in t
+    assert "Wet-lab protocols frozen" in t and "Computational protocols frozen" in t and "0: no observation from this proposed experiment exists" in t and "Results ingested" in t and "proposal → ready → running → failed → completed → review" in t
     pg.click("a:has-text('Across scales')"); pg.wait_for_selector("#ex-br")
     assert pg.locator("section[aria-labelledby=ex-br] tbody tr").count() == 7 and "unknown bridge" in pg.locator("#main").text_content()
     assert "scale=organ" in pg.evaluate("location.hash") and "region=pectoral-fin-field" in pg.evaluate("location.hash") and "tab=cross" in pg.evaluate("location.hash")
@@ -2271,3 +2271,29 @@ def test_single_ray_card_preserves_same_equation_scope_and_source_discrepancy(br
     image = card.locator('img').first
     assert pg.request.get(base + image.get_attribute('src')).ok
     assert not pg.errors
+
+
+def test_observed_update_card_keeps_worsening_separate_from_observations(browser, base):
+    import hashlib
+    expected = json.loads((ROOT / "artifacts/observed-allometry/publication.json").read_text())
+    csv = next(x for x in expected["files"] if x["path"].endswith("source-observations.csv"))
+    for width in (1440, 390):
+        pg = page(browser, width, 900)
+        pg.goto(base + "#/simulations?q=Observed-data")
+        card = pg.locator("#sim-observed-allometry-update")
+        card.wait_for()
+        text = card.text_content()
+        assert "109 preserved-specimen rows" in text and "WORSENED: 0.047089 → 0.066057" in text
+        assert "5.55846 → 5.45984" in text and "imported_unreviewed" in text
+        assert "no independent biological validation" in text
+        assert card.locator("video").count() == 0
+        pg.wait_for_function("document.querySelector('#sim-observed-allometry-update img').naturalWidth > 0")
+        response = pg.request.get(base + card.get_by_role("link", name="Source observations CSV").get_attribute("href"))
+        assert response.status == 200 and hashlib.sha256(response.body()).hexdigest() == csv["sha256"]
+        assert _overflow(pg) <= 0 and pg.errors == []
+        pg.goto(base + "#/studio/flying-fish?scale=organ")
+        pg.wait_for_function("document.querySelector('#main').textContent.includes('Observed-data update')")
+        assert pg.get_by_role("link", name="Lean proof gallery").count() == 1
+        assert pg.locator("img[alt*='Observed-data update']").count() == 1
+        assert _overflow(pg) <= 0 and pg.errors == []
+        pg.close()

@@ -1088,6 +1088,35 @@ def lifecycle_block(ins: Inputs) -> dict | None:
         "manifest": f"{d}/manifest.json", "doc": "docs/fish-lifecycle.md"}
 
 
+def observed_update_cards(ins: Inputs, out: dict) -> list[dict]:
+    """Expose the pinned observed-data update through the common evidence gallery."""
+    module_path = "engineering/observed_update/site.py"
+    ins.read(module_path)
+    spec = importlib.util.spec_from_file_location("frontier_observed_update", ROOT / module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    card = module.build(ins, out)
+    f = card["facts"]
+    card.update({
+        "time": {"units": "cross-sectional specimen measurements; no trajectory", "note": "No new wet-lab measurements."},
+        "numerical_checks": [
+            {"name": "Held-out-species log10 RMSE", "result": f"WORSENED: {f['heldout_RMSE_log10']['heldout_before']:.6f} → {f['heldout_RMSE_log10']['heldout_after']:.6f}"},
+            {"name": "Prediction at standard length 8.35 cm", "result": f"{f['prediction_before_cm']:.5f} → {f['prediction_after_cm']:.5f} cm after adding 19 specimen rows"},
+            {"name": "Exact-version cache", "result": "Stale result rejected and recomputed"},
+            {"name": "Import read-back", "result": "6 typed records read back; imported_unreviewed, Action proposed"}],
+        "parameter_unknowns": ["Transfer to zebrafish, growth dynamics and causal genetic effects are uncalibrated.", "Only three flying-fish species; working uncertainty bands are not calibrated population confidence."],
+        "open_questions": ["Which additional species or growth-stage observations would improve held-out transfer?"],
+        "couplings": [], "manifest_href": card["manifest"],
+        "sources": card["sources"] + [
+            {"label": "Measurements and fitted predictions", "href": card["report"], "locator": "Source observations remain separate from model predictions."},
+            {"label": "Corrected record bundle", "href": card["current_bundle_href"], "locator": "Exact Claim, Evidence, Problem and proposed Action versions."},
+            {"label": "Live import receipt", "href": card["import_receipt_href"], "locator": card["record_status"]},
+            {"label": "Grouping correction and preserved history", "href": card["correction_report"], "locator": "Original and corrected scientific outputs match on this dataset."}],
+        "files": [{"name": "Source observations CSV", **next(x for x in card["downloads"] if x["path"].endswith("/source-observations.csv"))}],
+    })
+    return [card]
+
+
 def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
     """Wind-tunnel, behavior controller and scale-growth manifests as gallery cards, with equations, sources and limitations.
     Every number is copied from the worker's own receipt; verdicts and misses are carried, never softened."""
@@ -1708,7 +1737,7 @@ def build() -> dict[str, bytes]:
     controlled = controlled_results(ins, files)
     if simulation is not None:
         simulation["controlled"] = controlled
-    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra) + aeroelastic_cards(ins, extra) + nca_cards(ins, extra)
+    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra) + aeroelastic_cards(ins, extra) + nca_cards(ins, extra) + observed_update_cards(ins, extra)
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     design_review = ins.json("site/content/design-review.json")
@@ -1798,7 +1827,7 @@ def build() -> dict[str, bytes]:
 
 
 def generated_artifact_families() -> list[str]:
-    return ["results", "fish3d", "molecular", "rd-diffusion", "lean-gallery", *(path.name for path in print_families())]
+    return ["results", "fish3d", "molecular", "rd-diffusion", "lean-gallery", "observed-allometry", *(path.name for path in print_families())]
 
 
 def write(out: dict[str, bytes]) -> None:
