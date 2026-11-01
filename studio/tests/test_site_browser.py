@@ -1955,3 +1955,92 @@ def test_assemblies_page_keeps_six_axes_apart_and_the_v3b_failure_visible(browse
         if w == 400:
             assert _overflow(pg) <= 0
         pg.close()
+
+
+def test_aeroelastic_and_nca_cards_follow_the_review_wording_and_pin_their_media(browser, base):
+    import hashlib
+    ae = json.loads((ROOT / "artifacts/aeroelastic/index.json").read_text())
+    nca = json.loads((ROOT / "artifacts/nca-seed-placement/index.json").read_text())
+    orig = json.loads((ROOT / "artifacts/nca-pattern/index.json").read_text())
+    for rel, sha in ((ae["artifacts"]["video"]["path"], ae["artifacts"]["video"]["sha256"]), (nca["artifacts"]["video"]["path"], nca["artifacts"]["video"]["sha256"]), (orig["artifacts"]["video"]["path"], orig["artifacts"]["video"]["sha256"])):
+        assert hashlib.sha256((ROOT / rel).read_bytes()).hexdigest() == sha, rel
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    for cid in ("aeroelastic-coupling", "nca-pattern", "nca-seed-placement"):
+        pg.wait_for_selector(f"#sim-{cid} video")
+    a = pg.locator("#sim-aeroelastic-coupling").text_content()
+    for must in ("Bending-only, torsion-rigid scaffold", "fixed-alpha, assumed-release", "bookkeeping, not an independent transfer validation", "not a demonstrated useful flight improvement", "cannot resolve smaller paired effects", "Independent review B1", "Independent review B2", "36 arms"):
+        assert must in a, must
+    assert "coarse 8x2" not in a and "not a production mesh" not in a, "the production arms replace the earlier coarse slice"
+    P = ae["production"]; r_cl, o_cl, t_cl = P["nominal_fine"]["CL"]
+    assert f"{r_cl:.6f}" in a and f"{o_cl:.6f}" in a and f"{t_cl:.6f}" in a and "3.84e-06" in a and "all declared arms returned" in a
+    n = pg.locator("#sim-nca-seed-placement").text_content()
+    assert "32 of 48 passed" in n and "original 0 of 12 to corrected seed 12 of 12" in n and "original 0 of 12 to corrected seed 8 of 12" in n and "original 0 of 12 to corrected seed 0 of 12" in n
+    assert "not fresh held-out cases" in n and "reused from parent" in n and "tissue regeneration" in n and "Not generalisation" in n
+    o = pg.locator("#sim-nca-pattern").text_content()
+    assert "0 of 48 passed" in o and "unchanged" in o
+    pg.goto(base + "#/studio/flying-fish?scale=tissue")
+    pg.wait_for_function("document.querySelector('#main').textContent.includes('corrected seed placement')")
+    t = pg.locator("#main").text_content()
+    assert "original run: 0 of 48" in t and "corrected seed placement: 32 of 48" in t
+    pg.goto(base + "#/studio/flying-fish?scale=organ")
+    pg.wait_for_function("document.querySelector('#main').textContent.includes('Static aeroelastic coupling')")
+
+
+def test_assemblies_axis_cells_are_short_with_checks_in_a_disclosure(browser, base):
+    R = json.loads((ROOT / "artifacts/biodesign-compiler/report.json").read_text())
+    uc = R["compiled"][0]["axes"]["units_context"]
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        pg.goto(base + "#/assemblies"); pg.wait_for_selector("#axis-units_context")
+        row = pg.locator("#axis-units_context")
+        shown = row.inner_text()                                   # closed disclosures are not part of inner_text
+        assert "4 composable" in shown and "5 SCENARIO" in shown and "4 refused" in shown and "not these variants" in shown
+        assert "failed checks" not in shown and "mapping" not in shown, "full fields stay collapsed"
+        if w >= 900:
+            assert row.bounding_box()["height"] < 330, row.bounding_box()
+        assert pg.locator(".asinspect[open]").count() == 0
+        # failure stays visible without opening anything
+        assert "NOT CONVERGED" in pg.locator("#axis-model_domain").inner_text() and "fail" in pg.locator("#axis-model_domain").inner_text()
+        pg.locator("#axis-units_context .asinspect summary").first.click()
+        opened = row.inner_text()
+        assert uc["refused"][0]["coupling"] in opened and "scope" in opened and "mapping" in opened
+        assert pg.locator("#axis-units_context dl.astree").count() >= 1
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
+
+
+def _load_faq(pg, base):
+    pg.goto(base + "#/home"); pg.wait_for_selector("#main h1")
+    if "js/faq.js" not in (ROOT / "site/index.html").read_text():          # the shell registers it; until then the test registers the view itself
+        pg.add_script_tag(path=str(ROOT / "site/js/faq.js"))
+    pg.evaluate("location.hash = '#/faq'"); pg.wait_for_selector(".faqitem")
+
+
+def test_faq_answers_are_grounded_hedged_and_linked_to_real_documents(browser, base):
+    import re as _re
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    site_docs = {d["id"]: d["href"] for d in snap["documents"]}
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        _load_faq(pg, base)
+        assert pg.locator(".faqitem").count() == 10 and pg.locator(".faqindex li").count() == 10
+        t = pg.locator("#main").inner_text()
+        for must in ("not an established fact", "never \"accepted\"", "no accept tool", "no shared token", "not complete genomics", "gap in source coverage is not a claim that a gene is lost",
+                     "tie", "not evidence that agents coordinate better", "not verified here", "No organism was built", "we do not claim a decentralised architecture was exercised", "no running federated network"):
+            assert must.lower() in t.lower().replace("’", "'"), must
+        assert not _re.search(r"\b\d+\s+(autonomous\s+)?agents\b", t), "no agent count is stated"
+        for a in pg.locator(".faqlinks a[target=_blank]").all():
+            href = a.get_attribute("href")
+            assert href.startswith("https://github.com/kganjam/delphi-frontier/blob/main/") and (ROOT / href.split("/blob/main/")[1]).is_file(), href
+        for a in pg.locator(".faqlinks a:not([target])").all():
+            href = a.get_attribute("href")
+            if href.startswith("data/docs/"):
+                assert href in site_docs.values(), href
+        assert all(pg.locator(f"#faq-{q} .faqlinks a").count() >= 2 for q in ("claims", "mcp", "scales", "hosting", "nanopub", "genomes", "lean", "collective", "compute", "organism"))
+        pg.click(".faqindex a[data-q=lean]")
+        assert pg.evaluate("document.activeElement.id") == "faq-lean-h" and "q=lean" in pg.evaluate("location.hash")
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
