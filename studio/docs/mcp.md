@@ -309,7 +309,7 @@ conflict, wrong `lease_id` refused, acceptance unreachable, same-operator review
 credentials absent from schemas/outputs/stderr and invalid input not echoed; `mcp-smoke` round trip. Guard-removal mutations (token alone enables writes, token in manifest, errors echo exception text, a review tool
 registered, principal check removed) each fail a test.
 
-## Coupling and open points for the Frontier owner
+## Coupling and open points for the Studio owner
 
 * The earlier stdio implementation called private `Store._auth`. Both transports now use the existing public `Store.principal(token)`; store behavior is unchanged.
 * Quota: every write counts against the principal's `daily_write_limit`; a retry with the same key does not consume more.

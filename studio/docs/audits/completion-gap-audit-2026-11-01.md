@@ -78,6 +78,6 @@ public data source after its evidence matches; no job is marked successful by th
 - Under a bounded systemd scope, the focused command
   `env PYTHONPATH=. bash scripts/test_postgres.sh tests/test_system_status.py -k shipped_compute_pin`
   passed: **1 passed, 24 deselected**. The fixture-backed module run had **24 passed, 1 failed** before the title assertion was
-  corrected: it expected `Delphi Frontier`, while current `GOAL.md` is titled
-  `MorphoSwarm Frontier`. After aligning that stale assertion with the current document title,
+  corrected: it expected `Delphi Studio`, while current `GOAL.md` is titled
+  `MorphoSwarm Studio`. After aligning that stale assertion with the current document title,
   the complete focused module passed: **25 passed**. No acceptance criterion was relaxed.

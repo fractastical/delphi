@@ -1,4 +1,4 @@
-# SPEC-007 — MorphoSwarm Frontier: studio, knowledge and open work
+# SPEC-007 — MorphoSwarm Studio: studio, knowledge and open work
 
 Status: implementation contract, October 31, 2026. This extends SPEC-005 and
 SPEC-006 following the owner's design, search, visualization and project-model
@@ -6,7 +6,7 @@ instructions. A requirement below is not a claim that it already works.
 
 ## Product and navigation
 
-MorphoSwarm Frontier combines an organism-design studio with a shared scientific
+MorphoSwarm Studio combines an organism-design studio with a shared scientific
 frontier. Flying Fish is the featured project, not the platform's schema or scope.
 Delphi supplies the versioned claim, evidence and contribution foundation. The
 repository remains `delphi-frontier`; existing record identifiers do not change.

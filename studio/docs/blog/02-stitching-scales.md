@@ -33,7 +33,7 @@ The current manifest holds 13 proposed couplings: 4 composable, 5 scenario, 4 re
 
 One refused coupling is the one a reader is most tempted to draw: a Delta-Notch asymmetry from the two-cell model feeding fin flexural rigidity. The layer refuses it for stated reasons. No mapping exists. The scale changes from cell to organ. The context changes from the species named in the SBML file to the flying-fish design envelope. The Delta-Notch model (a published two-cell lateral-inhibition model) is non-dimensional as stored, so it cannot be identity-mapped to an SI quantity.
 
-An assumption is never allowed to stand in for a jump across biological scale or species. That needs a calibration, a structural record of measured or fitted-to-measured data with a closed domain and an uncertainty. **No calibration is registered today**, so every cross-scale bridge is either refused or labelled assumption-level, and the missing bridge becomes an open question on the Frontier page instead of a hidden constant.
+An assumption is never allowed to stand in for a jump across biological scale or species. That needs a calibration, a structural record of measured or fitted-to-measured data with a closed domain and an uncertainty. **No calibration is registered today**, so every cross-scale bridge is either refused or labelled assumption-level, and the missing bridge becomes an open question on the Studio page instead of a hidden constant.
 
 The scenario verdicts are equally explicit. Passing the constraint solver's witness speed to the glide model as its release speed is allowed only as a scenario, because the glide model's own default is 1.5 times the stall speed and the identity mapping is an assumption. The manifest prints that assumption next to the result.
 

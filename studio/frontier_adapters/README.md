@@ -1,6 +1,6 @@
 # frontier_adapters
 
-Claim, Action and Evidence adapters plus an unsigned nanopub-draft exporter for the Frontier store. Single-reader (corpus
+Claim, Action and Evidence adapters plus an unsigned nanopub-draft exporter for the Studio store. Single-reader (corpus
 session, Claude Sonnet 5.5), **not Codex-reviewed**. Nothing here submits, accepts, signs or publishes. Provenance: `PROVENANCE.md`.
 
 | module | does |

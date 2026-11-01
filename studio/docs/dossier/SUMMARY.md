@@ -1,4 +1,4 @@
-# MorphoSwarm Frontier — complete summary
+# MorphoSwarm Studio — complete summary
 
 **One file.** Everything from the ten dossier pages, consolidated: what the system is, how
 it was built, what it measured, what it used, and what it does **not** establish.

@@ -124,7 +124,7 @@ verdict (UNDETERMINED) is retained as a separate recorded result.
 - F4. Both intervals, plus the four sensitivity items of §5.
 - F5. Wall clock ≤ 60 minutes, or a reported stop.
 
-## 8. Status of these results in Delphi Frontier
+## 8. Status of these results in Delphi Studio
 
 **Protocol acceptance is not independent review.** A1–A5 in the 256 result, and
 F1–F5 here, are this harness checking its own run against criteria it fixed in

@@ -1,4 +1,4 @@
-# Delphi Frontier site
+# Delphi Studio site
 
 Static workspace in `site/` (vanilla JS, no bundler, no npm step). Vendored libraries, each with its licence file: KaTeX 0.16.47 (MIT, equations) and three.js 0.170.0 (MIT, used only by the actual-GLB viewer `site/js/model-viewer.js`; see `site/vendor/three/VENDOR.json`). The only build step is the data snapshot.
 
