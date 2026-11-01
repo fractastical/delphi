@@ -115,6 +115,22 @@ def audit(root, out, inputs=ART):
     target = np.load(inputs / "target.npz")
     goal = np.moveaxis(target["rgba"], -1, 0).astype(np.float64)
     ray = target["ray_mask"]
+    expected_identities = {
+        (f"{regime}-s{seed}", kind, update_seed)
+        for seed in cfg["training"]["model_seeds"]
+        for regime in cfg["training"]["regimes"]
+        for update_seed in cfg["evaluation"]["update_seeds"]
+        for kind in [
+            "persistence",
+            *cfg["evaluation"]["damage"]["masks"],
+            *(
+                ["all-erased-negative"]
+                if update_seed
+                == cfg["evaluation"]["negative_all_erased"]["update_seed"]
+                else []
+            ),
+        ]
+    }
     identities = set()
     counts = {
         "design_executed": 0,
@@ -126,6 +142,8 @@ def audit(root, out, inputs=ART):
     zero_visible_design_finals = 0
     for item in summary["evaluations"]:
         identity = (item["model_id"], item["kind"], item["update_seed"])
+        if identity not in expected_identities:
+            raise ValueError("Evaluation identity not in frozen protocol")
         if identity in identities:
             raise ValueError("Duplicate evaluation identity")
         identities.add(identity)
@@ -196,6 +214,10 @@ def audit(root, out, inputs=ART):
         counts=counts,
         zero_visible_final_design_count=zero_visible_design_finals,
         evaluation_identities=len(identities),
+        expected_evaluation_identities=len(expected_identities),
+        missing_evaluation_identities=[
+            list(x) for x in sorted(expected_identities - identities)
+        ],
         checkpoint_count=len(checkpoints),
         paired_training_checks=load(root / "paired-training-checks.json"),
         exact_visible_metric_reproduction=all(x["exact"] for x in result["checks"]),

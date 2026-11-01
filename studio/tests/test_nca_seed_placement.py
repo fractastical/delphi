@@ -42,3 +42,20 @@ def test_original_run_cannot_be_relabelled_as_changed_seed_experiment(tmp_path):
 
     with pytest.raises(ValueError, match="Frozen protocol changed"):
         audit(experiment.ART / "run-original", tmp_path, experiment.VARIANT)
+
+
+def test_training_comparison_detects_changed_budget_and_initialization():
+    import copy
+    from engineering.nca_pattern.compare import pair_check
+
+    old = json.loads((experiment.ART / "run-original/summary.json").read_text())[
+        "models"
+    ]
+    same = pair_check(old, copy.deepcopy(old))
+    assert all(v["exact_match"] for x in same for v in x["fields"].values())
+    changed = copy.deepcopy(old)
+    changed[0]["CA_updates_total"] += 1
+    changed[1]["initial_model_tensor_sha256"] = "changed"
+    check = pair_check(old, changed)
+    assert not check[0]["fields"]["CA_updates_total"]["exact_match"]
+    assert not check[1]["fields"]["initial_model_tensor_sha256"]["exact_match"]
