@@ -29,7 +29,8 @@ def test_builds_and_offers_only_verified_media():
     r = A.build(Ins(), out, ROOT)
     v = r["visuals"][0]
     assert v["study"] == "tissue-microcarrier" and v["labels"]["model_only"] is True
-    assert set(out) == {"@" + A.MANIFEST} | {"@" + x["path"] for x in v["media"].values()}
+    offered = {"@" + A.MANIFEST} | {"@" + x["path"] for c in r["visuals"] for x in c["media"].values()} | {"@" + d["href"] for c in r["visuals"] for d in c["downloads"]}
+    assert set(out) == offered
     assert v["sources_verified"] >= 17 and v["renderer_verified"] == 1
     assert sum(len(b) for b in out.values()) < A.MAX_MEDIA_BYTES
 
@@ -69,3 +70,48 @@ def test_committed_manifest_keeps_failures_and_the_denominator_qualification():
     assert v["labels"]["envelope_mm"] == [50, 30, 30] and v["labels"]["assumed_mass_g"] == 45
     assert v["biological_carrier"]["status"].startswith("proposed") and v["engine_benchmark"]["gpu_required"] is False
     assert "orientations" in v["labels"]["csv_contents"]
+
+
+def _epithelial():
+    return next(v for v in json.loads((ROOT / A.MANIFEST).read_text())["visuals"] if v["study"] == "epithelial-repair")
+
+
+def test_epithelial_entry_reports_the_files_own_gates_and_keeps_every_failure():
+    v = _epithelial()
+    g = v["summary"]["gates"]
+    res = json.loads((ROOT / "artifacts/epithelial/results-r2.json").read_text())["gates"]
+    assert g["total"] == len(res) == 13
+    assert g["pass"] == sum(x["passed"] is True for x in res) and g["fail"] == sum(x["passed"] is False for x in res) == 3
+    assert g["pass"] == 8 and g["descriptive"] == ["G6"] and g["unevaluable"] == ["G8"]      # G6 is descriptive, not a pass
+    text = json.dumps(v)
+    for needle in ("G4 fail", "G10 fail", "G12 fail", "G8 not_pass_fail", "not an observed point threshold", "not a physical law", "refuted in this model", "tested model hypothesis"):
+        assert needle in text
+    pair = v["summary"]["pair"]
+    assert pair["closes"]["state"] == "CLOSED" and pair["arrests"]["state"] == "ARRESTED"
+    assert round(v["summary"]["passive_floor"]["closed_fraction"], 3) == 0.22
+    assert "not minutes" in v["labels"]["time"] and v["labels"]["model_only"] is True
+    assert {m["path"].rsplit("/", 1)[0] for m in v["media"].values()} == {"artifacts/epithelial/media"}
+
+
+def test_card_contract_keys_and_strict_text_downloads():
+    cards = A.build(Ins(), {}, ROOT)["visuals"]
+    for c in cards:
+        assert {"id", "study", "title", "evidence_kind", "caveats", "records_kept", "video_href", "poster_href", "figure_href", "summary", "downloads"} <= set(c)
+        assert all(d["href"].endswith(A.DOWNLOAD_SUFFIXES) for d in c["downloads"])
+    ep = next(c for c in cards if c["study"] == "epithelial-repair")
+    assert ep["video_href"].endswith("A1-baseline.mp4") and ep["video_arrest_href"].endswith("A2-motility-off.mp4") and ep["figure_href"] is None
+
+
+def test_download_flag_on_non_text_and_wrong_source_prefix_are_refused():
+    m = json.loads((ROOT / A.MANIFEST).read_text())
+    p = "artifacts/reuse-study-visuals/bad.json"
+    mm = json.loads(json.dumps(m))
+    csv_src = next(s for s in mm["visuals"][0]["sources"] if s["path"].endswith("travelling-voxels.csv"))
+    csv_src["download"] = True
+    with pytest.raises(ValueError, match="download not allowed"):
+        A.build(Ins({p: json.dumps(mm).encode()}), {}, ROOT, manifest_path=p)
+    mm = json.loads(json.dumps(m))
+    mm["visuals"][1]["sources"][0]["path"] = "artifacts/epithelial-repair/results.json"        # the old, wrong prefix
+    with pytest.raises(ValueError, match="allowlist"):
+        A.build(Ins({p: json.dumps(mm).encode()}), {}, ROOT, manifest_path=p)
+    assert "artifacts/oxygen-diffusion-rule/" in A.SOURCE_PREFIXES

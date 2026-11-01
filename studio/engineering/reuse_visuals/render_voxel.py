@@ -19,7 +19,6 @@ import json
 import math
 import os
 import subprocess
-import sys
 from pathlib import Path
 
 for k in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS"):
@@ -253,17 +252,15 @@ def manifest(out: Path) -> dict:
         "caveats": ["Controls B-E were run on the longitudinal pattern; no control was run on the travelling pattern shown in the animation.", "Positions are recorded voxel centres; squares are drawn at nominal size, not deformed outlines.",
                     "Unvalidated against any organism; no simulator-derived relation is a biological law."],
         "sim_time_s": 1.495026, "states": n, "fps": FPS,
-        "media": {k: ent(rel(v)) for k, v in MEDIA.items()}, "sources": [ent(p) for p in SOURCES], "renderer": [ent(p) for p in RENDERER],
+        "media": {k: ent(rel(v)) for k, v in MEDIA.items()}, "sources": [dict(ent(p), download=p.endswith((".json", ".txt", ".md")) and not p.endswith("-com.json")) for p in SOURCES], "renderer": [ent(p) for p in RENDERER],
         "source_commit": "origin/work/xenobot-simulators e6f1033 (files copied unchanged)"}]}
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--manifest", action="store_true")
+    ap.add_argument("--manifest", action="store_true", help="rebuild the combined manifest only; media must already exist")
     a = ap.parse_args()
-    out = ROOT / OUT
     if not a.manifest:
-        render(out)
-    m = manifest(out)
-    (ROOT / "artifacts/reuse-study-visuals/manifest.json").write_text(json.dumps(m, indent=1, sort_keys=True) + "\n")
-    print("ok", sys.argv)
+        render(ROOT / OUT)
+    from engineering.reuse_visuals.build_manifest import write
+    print("ok", write())

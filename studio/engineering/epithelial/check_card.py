@@ -1,0 +1,66 @@
+"""Check that every number quoted in the science card still matches the results file.
+
+Pins expected VALUES rather than scanning the prose for digits: a scan over a document that
+discusses its own numbers cannot tell a quoted figure from a described one. Each row below is
+a claim the card makes; the script reads the same quantity out of results-r2.json and compares.
+Run it after any re-run, and after any edit to the card's numbers.
+
+It caught one real slip on first use: the card said R^2 0.956 where the fit gives 0.955.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+
+
+def claims(A: dict, G: dict, S: dict) -> list[tuple[str, object, object]]:
+    L = G["G12"]["detail"]["ladder"]
+    g9 = G["G9"]["detail"]
+    rows = [
+        ("A1 closed", 1.0, A["A1-baseline"]["closed_fraction"]),
+        ("A1 sweeps", 240.0, A["A1-baseline"]["closure_sweeps"]),
+        ("A2 motility-off closed", 0.450, round(A["A2-motility-off"]["closed_fraction"], 3)),
+        ("A3 contractility-off sweeps", 180.0, A["A3-contractility-off"]["closure_sweeps"]),
+        ("A4 tension-off sweeps", 290.0, A["A4-tension-off-NEGATIVE"]["closure_sweeps"]),
+        ("F1 no-drive floor", 0.220, round(A["F1-no-drive-NEGATIVE"]["closed_fraction"], 3)),
+        ("geometric floor nodes", 1875, 40000 - 61 * 625),
+        ("G9 measured bracket", [1, 2], g9["measured_bracket"]),
+        ("G9 lambda*", 1.414, round(g9["measured_lambda_star"], 3)),
+        ("G9 predicted interval", [0.6, 2.0], g9["predicted_interval"]),
+        ("Phi* k=4", 2.26, round(L["4"]["phi_star"], 2)),
+        ("Phi* k=7", 5.51, round(L["7"]["phi_star"], 2)),
+        ("Phi* spread ratio", 2.43, round(G["G12"]["detail"]["phi_star_spread_ratio"], 2)),
+        ("k=1 has no bracket", False, "1" in L),
+        ("k=1 still closes at lambda_V 5000", 1.0, A["E-k1-lamV5000"]["closed_fraction"]),
+        ("A1 R2 linear", 0.955, round(S["A1-baseline"]["r2_linear"], 3)),
+        ("A1 R2 exponential", 0.689, round(S["A1-baseline"]["r2_exponential"], 3)),
+        ("A4 R2 linear", 0.806, round(S["A4-tension-off-NEGATIVE"]["r2_linear"], 3)),
+        ("A4 R2 exponential", 0.938, round(S["A4-tension-off-NEGATIVE"]["r2_exponential"], 3)),
+        ("arm count", 36, len(A)),
+    ]
+    for p, v in ((0, 0.316), (20, 0.409), (40, 0.548), (80, 0.684), (160, 1.000)):
+        nm = "B-k4-lamV1" if p == 80 else f"F2-prot{p}"
+        rows.append((f"protrusion {p} closed", v, round(A[nm]["closed_fraction"], 3)))
+    for gid, exp in (("G1", True), ("G1b", True), ("G2", True), ("G3", True), ("G4", False),
+                     ("G5", True), ("G7", True), ("G9", True), ("G10", False), ("G11", True),
+                     ("G12", False)):
+        rows.append((f"{gid} passed", exp, G[gid]["passed"]))
+    return rows
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--results", required=True)
+    a = ap.parse_args()
+    d = json.loads(Path(a.results).read_text())
+    rows = claims(d["arms"], {g["id"]: g for g in d["gates"]}, d["closing_curve_shape"])
+    bad = [(n, c, g) for n, c, g in rows if c != g]
+    for n, c, g in bad:
+        print(f"  MISMATCH {n}: card says {c}, results say {g}")
+    print(f"{len(rows) - len(bad)}/{len(rows)} card claims match the results")
+    raise SystemExit(1 if bad else 0)
+
+
+if __name__ == "__main__":
+    main()

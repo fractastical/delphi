@@ -16,8 +16,11 @@ from pathlib import Path, PurePosixPath
 
 MANIFEST = "artifacts/reuse-study-visuals/manifest.json"
 MEDIA_PREFIX = "artifacts/reuse-study-visuals/"
-SOURCE_PREFIXES = ("artifacts/voxel-actuation/", "artifacts/oxygen-diffusion/", "artifacts/epithelial-repair/")   # exact committed producer outputs only
-RENDERER_PREFIXES = ("engineering/reuse_visuals/",)
+MEDIA_PREFIXES = (MEDIA_PREFIX, "artifacts/epithelial/media/")
+SOURCE_PREFIXES = ("artifacts/voxel-actuation/", "artifacts/oxygen-diffusion-rule/", "artifacts/epithelial/", "docs/epithelial-repair-card.md")   # exact committed producer outputs only
+RENDERER_PREFIXES = ("engineering/reuse_visuals/", "engineering/epithelial/")
+DOWNLOAD_SUFFIXES = (".json", ".md", ".txt")                    # strict text: no csv, tarball or binary is offered as a source download
+MAX_DOWNLOAD_BYTES = 2_000_000
 MEDIA_SUFFIXES = (".mp4", ".gif", ".png", ".json")
 MAX_MEDIA_BYTES = 20_000_000
 REQUIRED = ("id", "study", "title", "evidence_kind", "labels", "caveats", "media", "sources", "renderer")
@@ -56,22 +59,30 @@ def build(ins, out: dict, root, manifest_path: str = MANIFEST, expected_sha256: 
             raise ValueError(f"visual {v.get('id')!r}: missing {missing} or unknown study {v.get('study')!r}")
         if not v["labels"].get("model_only") and "formal" not in v["evidence_kind"].lower():
             raise ValueError("a visual must declare itself model-only or a formal artifact")
+        downloads = []
         for item in v["sources"]:
-            _verify(ins, item, SOURCE_PREFIXES, root)
+            blob = _verify(ins, item, SOURCE_PREFIXES, root)
+            if item.get("download"):
+                if not item["path"].endswith(DOWNLOAD_SUFFIXES) or len(blob) > MAX_DOWNLOAD_BYTES:
+                    raise ValueError(f"download not allowed: {item['path']}")
+                staged["@" + item["path"]] = blob
+                total += len(blob)
+                downloads.append({"label": PurePosixPath(item["path"]).name, "href": item["path"], "sha256": item["sha256"], "bytes": item["bytes"]})
         for item in v["renderer"]:
             _verify(ins, item, RENDERER_PREFIXES, root)
         hrefs = {}
         for kind, item in v["media"].items():
             if not item["path"].endswith(MEDIA_SUFFIXES):
                 raise ValueError(f"media type not allowed: {item['path']}")
-            blob = _verify(ins, item, (MEDIA_PREFIX,), root)
+            blob = _verify(ins, item, MEDIA_PREFIXES, root)
             total += len(blob)
             staged["@" + item["path"]] = blob
             hrefs[kind + "_href"] = item["path"]
-        cards.append({"id": v["id"], "study": v["study"], "title": v["title"], "evidence_kind": v["evidence_kind"], "labels": v["labels"], "caveats": v["caveats"],
+        cards.append({"video_href": None, "poster_href": None, "figure_href": None, "summary": v.get("summary"), "downloads": downloads, "source_hrefs": [d["href"] for d in downloads],
+                      "id": v["id"], "study": v["study"], "title": v["title"], "evidence_kind": v["evidence_kind"], "labels": v["labels"], "caveats": v["caveats"],
                       "records_kept": v.get("records_kept", []), "engine_benchmark": v.get("engine_benchmark"), "biological_carrier": v.get("biological_carrier"),
                       "posthoc_denominators": v.get("posthoc_denominators"), "sim_time_s": v.get("sim_time_s"), "media": v["media"],
-                      "sources_verified": len(v["sources"]), "renderer_verified": len(v["renderer"]), **hrefs})
+                      "sources_verified": len(v["sources"]), "renderer_verified": len(v["renderer"])} | hrefs)
     if total > MAX_MEDIA_BYTES:
         raise ValueError("media exceed the byte bound")
     out.update(staged)
