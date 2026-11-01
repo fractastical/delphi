@@ -360,7 +360,15 @@ declared parameters, and no organism, tissue or cell measurement enters it. The 
 voxels, an outer envelope of 50 x 30 x 30 mm, a 40 mm centre-to-centre span and a nominal
 45 g at the assumed 1000 kg/m^3. It is not tissue-scale, not a Xenopus or microcarrier
 model, and not material-calibrated. The known
-threat to its validity is that the rectifying ground reaction is part Coulomb friction
+If anything from this track is rendered,
+`artifacts/voxel-actuation/trajectory/travelling-voxels.csv` stores voxel **centres and the
+imposed temperature only** — no orientations, no deformed voxel meshes, no forces. A renderer
+may draw centre points, a link graph or nominal glyphs and must label them as such; it must not
+invent cellular textures, traction arrows or deformed tissue boundaries, and `temp_C` is an
+imposed numerical actuation signal rather than a measured cellular state. Use SI axes, and if
+body lengths are shown, say which denominator.
+
+The known threat to its validity is that the rectifying ground reaction is part Coulomb friction
 and part global damping to an absolute frame — Voxelyze's global damping is a numerical
 term and not a fluid model, so no swimming interpretation is available — and the split
 between those two mechanisms has not been measured.
