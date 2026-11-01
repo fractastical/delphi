@@ -25,7 +25,7 @@ NAMESPACE, ISSUER = "delphi-frontier", "codex-03"
 REPO_URL = "https://github.com/kganjam/delphi-frontier/blob/"
 OXY, OXY_DIR = "3b9d215", "artifacts/oxygen-diffusion-rule/"
 VOX_SUMMARY, VOX_AUDIT = "a896380", "130b3f4"
-EPI = "46eb7ff"
+EPI, EPI_REVIEW = "66f2b95", "6298621"
 LIVE_PROJECTS = "projects/reuse-studies/live-projects.json"
 
 
@@ -94,17 +94,17 @@ def oxygen_records(root, created_at):
     for name, g in GEOMETRIES.items():
         claim = _rec("Claim", f"claim:oxygen-{name}-center-bound", {
             "title": f"Conditional steady diffusion bound, {name}",
-            "statement": (f"Under steady diffusion with spatially constant non-negative consumption a, constant isotropic D > 0 and boundary content C0 >= 0, "
+            "statement": (f"Under steady diffusion with spatially constant positive consumption a > 0, constant isotropic D > 0 and boundary content C0 >= 0, "
                           f"in a {g['setting']}: {g['formula']}. Ccenter < 0 marks the constant-consumption model's domain limit, not a physical negative concentration."),
             "context": "Ideal-geometry algebraic rule with unknown parameters. It carries no biological context: D, a and C0 are context-specific unknowns.",
-            "assumptions": ["steady state", "diffusion only; no perfusion or advection", "constant consumption and diffusion coefficient", "ideal geometry with the stated boundary conditions"],
-            "limitations": ["Not established: " + "; ".join(OXYGEN_NOT_ESTABLISHED), g["attribution"]],
+            "assumptions": ["steady state", "diffusion only; no perfusion or advection", "constant positive consumption a > 0 (the Lean equivalence premise 0 < a) and constant diffusion coefficient", "ideal geometry with the stated boundary conditions"],
+            "limitations": ["Not established: " + "; ".join(OXYGEN_NOT_ESTABLISHED), "The formally supported claim is restricted to a > 0; a zero-consumption extension is not claimed and is not covered by the Lean statements", g["attribution"]],
             "source": pin.source(rule_path, f"/geometries/{name}", "Repository rule contract at the pinned commit; parameters unknown"),
             "source_record_version": manifest_sha.get(rule_path), "origin": g["origin"],
             "prior_review": {"status": "none; formal check and numerical check are Evidence, not review"}}, created_at)
         lean = _evidence(claim, "formal", "supports", pin.source(receipt_path, f"/positive and /corrupted_coefficients ({g['theorem']})", "Lean receipt at the pinned commit"),
                          "Lean 4 compiled the theorem and its two corrupted-coefficient twins; the twins failed with 4 diagnostics, as expected.",
-                         "Algebraic implication only, after the source-to-equation interpretation.",
+                         "Algebraic implication only, for a > 0, after the source-to-equation interpretation.",
                          ["Lean checks the implication under the stated premises", "translation from source to equation is a separate, unchecked step"],
                          {"lean_version": receipt["lean_version"], "mathlib_revision": receipt["mathlib"]["revision"], "corrupted_failure_diagnostics": receipt["corrupted_coefficients"]["actual_failure_diagnostics"],
                           "theorem": g["theorem"], "execution_performed": False,
@@ -200,13 +200,15 @@ def problem_records(root, created_at, claim_ref, voxel_evidence_ref):
         "approach": "measurement", "scales": ["cellular", "tissue"], "context_tags": ["voxel-actuation", "unresolved-bridge"]}, created_at)
     epi = _rec("Problem", "problem:epithelial-gap-closure-to-physical-time", {
         "title": "Observed gap closure to calibrated physical time and mechanism",
-        "known_state": "The Cellular Potts mechanism testbed runs in model units: the card states none of its parameters is a force, a stress or a time in minutes, and nothing is calibrated to a cell line or measured tissue. An arithmetic floor accounts for 22.0% of apparent gap shrinkage with both drives off. The independent review of the card was not final when this record was prepared.",
+        "known_state": ("The Cellular Potts mechanism testbed runs in model units: the card states none of its parameters is a force, a stress or a time in minutes, and nothing is calibrated to a cell line or measured tissue. "
+                        "In one both-drives-off control at k=4 the gap shrank by 551 of 2500 nodes (22.04%); that is a condition-specific run, consistent with passive volume relaxation but with no mechanism contribution isolated, and it is not a universal subtraction. "
+                        "Final strict tally at 66f2b95 with independent review 6298621: 7 pass, 3 fail, G6 descriptive, G1b incomplete, G8 unevaluable; physical-time calibration remains open."),
         "question": "What measurement of gap closure in one named cell line would calibrate the model's time unit and distinguish the contributing mechanisms?",
         "problem_kind": "project_gap", "novelty_status": "not assessed", "data_access": "No cell-line closure measurement is available here.",
         "completeness": "recorded", "required_capabilities": ["time-resolved gap closure measurement in a named cell line", "a stated mapping from model time units to physical time"],
         "downstream_uses": ["project-epithelial-repair closure-to-time bridge"], "dependencies": [f002],
-        "source": epi_pin.source("docs/epithelial-repair-card.md", "section 2 and section 4 (model units; the floor)", "Card at the pinned commit; independent review pending"),
-        "approach": "measurement", "scales": ["cellular", "tissue"], "context_tags": ["epithelial-repair", "unresolved-bridge", "review-pending"]}, created_at)
+        "source": epi_pin.source("docs/epithelial-repair-card.md", "section 2 (scale mapping), section 4 (passive control) and the strict tally", "Final corrected card at the pinned commit; independent review at 6298621 (docs/audits/epithelial-repair-review-2026-10-31.md)"),
+        "approach": "measurement", "scales": ["cellular", "tissue"], "context_tags": ["epithelial-repair", "unresolved-bridge", "independently-reviewed"]}, created_at)
     return tissue, epi
 
 
@@ -268,8 +270,14 @@ def validate(root, records, bindings):
             text = p["statement"] + " ".join(p["limitations"])
             if "missed" not in text or "without spatial convergence" not in text or "45 g" not in text:
                 probs.append(f"{r['id']}: E miss, nonconvergence and toy scale must be stated")
-        if r["kind"] == "Claim" and r["id"].startswith("claim:oxygen") and "unknown" not in (p["context"] + " ".join(p["limitations"])):
-            probs.append(f"{r['id']}: unknown parameters not stated")
+        if r["kind"] == "Claim" and r["id"].startswith("claim:oxygen"):
+            if "unknown" not in (p["context"] + " ".join(p["limitations"])):
+                probs.append(f"{r['id']}: unknown parameters not stated")
+            if "a > 0" not in p["statement"] or "non-negative consumption" in p["statement"] or "a >= 0" in p["statement"]:
+                probs.append(f"{r['id']}: formally supported claim must be restricted to a > 0")
+        if r["id"] == "problem:epithelial-gap-closure-to-physical-time":
+            if p["source"]["source_version"] != EPI or "22.04%" not in p["known_state"] or "not a universal subtraction" not in p["known_state"] or "arithmetic floor" in p["known_state"]:
+                probs.append(f"{r['id']}: stale epithelial source or floor attribution")
         if r["kind"] == "Evidence" and p["target"]["kind"] == "Claim" and (p["target"]["kind"], p["target"]["id"], p["target"]["version"]) not in by_ref:
             probs.append(f"{r['id']}: target not in bundle")
         if r["kind"] == "Evidence" and r["id"].startswith("evidence:voxelyze") and p["evidence_kind"] != "simulated":

@@ -52,6 +52,40 @@ def test_claim_and_evidence_stay_separate_with_unknown_parameters():
     assert "No slab expression is attributed" in json.dumps(by_id("claim:oxygen-slab-center-bound")["payload"])
 
 
+def test_oxygen_claims_are_restricted_to_positive_consumption():
+    for g in ("sphere", "slab"):
+        p = by_id(f"claim:oxygen-{g}-center-bound")["payload"]
+        assert "a > 0" in p["statement"] and "non-negative consumption" not in p["statement"] and "a >= 0" not in p["statement"]
+        assert "zero-consumption extension is not claimed" in " ".join(p["limitations"])
+        assert "for a > 0" in by_id(f"evidence:oxygen-{g}-lean")["payload"]["context"]
+
+
+def test_epithelial_problem_cites_final_source_and_context_specific_22_percent():
+    p = by_id("problem:epithelial-gap-closure-to-physical-time")["payload"]
+    assert p["source"]["source_version"] == "66f2b95" and "6298621" in p["source"]["access"]
+    ks = p["known_state"]
+    assert "22.04%" in ks and "not a universal subtraction" in ks and "no mechanism contribution isolated" in ks
+    assert "7 pass, 3 fail, G6 descriptive, G1b incomplete, G8 unevaluable" in ks
+    assert "arithmetic floor" not in ks and "review was not final" not in ks and p["completeness"] == "recorded"
+    assert "46eb7ff" not in json.dumps(RECORDS)
+
+
+def test_superseded_outputs_preserved():
+    old = json.loads((OUT / "superseded-adec3fe/records.json").read_text())
+    assert any("a >= 0" not in json.dumps(r) and "non-negative consumption" in json.dumps(r) for r in old if r["id"].startswith("claim:oxygen"))
+    assert any("46eb7ff" in json.dumps(r) for r in old)
+
+
+def test_validator_rejects_stale_epithelial_and_a_ge_0():
+    recs = copy.deepcopy(RECORDS)
+    next(r for r in recs if r["id"] == "problem:epithelial-gap-closure-to-physical-time")["payload"]["known_state"] += " arithmetic floor"
+    assert any("stale epithelial" in q for q in sr.validate(ROOT, recs, BINDINGS))
+    recs = copy.deepcopy(RECORDS)
+    c = next(r for r in recs if r["id"] == "claim:oxygen-sphere-center-bound")["payload"]
+    c["statement"] = c["statement"].replace("positive consumption a > 0", "non-negative consumption a")
+    assert any("restricted to a > 0" in q for q in sr.validate(ROOT, recs, BINDINGS))
+
+
 def test_voxel_evidence_is_simulated_toy_scale_with_miss_and_nonconvergence():
     ev = by_id("evidence:voxelyze-summary")["payload"]
     assert ev["evidence_kind"] == "simulated" and ev["relation"] == "qualifies"

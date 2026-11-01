@@ -1,0 +1,1 @@
+Superseded by the next commit; kept unchanged (also in git at adec3fe). Two corrections: oxygen Claims said consumption a >= 0 although the Lean equivalences require a > 0; the epithelial Problem cited obsolete card 46eb7ff and called 22% an arithmetic floor with the review pending.
