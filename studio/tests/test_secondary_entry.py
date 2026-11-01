@@ -1,5 +1,6 @@
 import hashlib
 from io import BytesIO
+from pathlib import Path
 
 import pytest
 
@@ -50,3 +51,13 @@ def test_other_hosts_and_unbounded_inputs_are_never_fetched(monkeypatch, tmp_pat
         runner.fetch_inputs({"url": "https://elsewhere.invalid/weights.tar.xz"}, tmp_path / "archive")
     with pytest.raises(ValueError, match="budget"):
         runner.fetch_inputs({"url": runner.PUBLIC_PREFIX + "input.tar.xz", "bytes": 12_000_001}, tmp_path / "archive")
+
+
+def test_recovery_never_requires_an_invented_primary_evaluation():
+    args = runner.evaluator_argv("primary_recovery", Path("inputs"), Path("new-output"))
+    assert "--train-log" in args and "--primary" not in args
+    assert "launch_recovery.py" in args
+    assert "--allow-policy-mismatch" not in args and "--expect-sha" not in args
+    assert "--smoke" not in args
+    with pytest.raises(ValueError, match="Unknown"):
+        runner.evaluator_argv("train", Path("inputs"), Path("new-output"))

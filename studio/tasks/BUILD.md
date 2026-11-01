@@ -197,14 +197,14 @@ this does not widen cancellation permissions.
   Browser sessions still grant no persistent write authority.
 - [x] Committed a conditional 24-hour queue with owners, admission and stop gates
   in results/infra/queue.json. Actual spend remains unavailable.
-- [ ] Publish the integrated artifacts, bounded text preview and identity endpoint
+- [x] Publish the integrated artifacts, bounded text preview and identity endpoint
   together with the gallery/mobile fixes in one exact release.
 - [ ] Connect persisted exact-version project discussion to the Studio contribution
   interface, using an explicit contributor credential held only in memory.
 - [x] Imported 37 new curated records with zero forks and exact readback; submitted
   Project version 1177c609 with 22 members, retaining all 13 original members and
   four challenges on the previous version. Records remain unreviewed/proposed.
-- [ ] Recompute the site snapshot and expose prior-version Project discussion.
+- [x] Recompute the site snapshot and expose prior-version Project discussion.
 - [ ] Demonstrate two actual computations consuming one exact existing Claim and
   a separate review of their evidence. The current public-head reuse count is zero.
 - [ ] Collect the live primary diffusion job; run the preregistered secondary
@@ -215,3 +215,86 @@ The fresh provider receipt at 4:33pm PDT records 52 team jobs (41 completed,
 running; no team job was queued or pulling. These are job states, not device
 utilization. Current hosted release is still c1ad527 until the release receipt
 records otherwise.
+
+## Published integration and resource handoff — October 31, 4:54pm PDT
+
+- [x] Published release `52cda98` and restarted the MCP on that immutable release.
+  Actual public verification passed 13 website checks and 37 MCP checks. Two
+  additional HTTP checks exercised contributor identity: anonymous access refused,
+  authenticated identity correct with no-store and no credential in the response.
+- [x] Published both v3 printable display props and stands, prior-version Project
+  challenges, formalization and gallery updates, and the full-horizon Morpheus
+  chart with its actual declared video/poster hashes. Root recomputed eight
+  Morpheus input/code/output hashes; this was not a new simulation or rendering.
+- [x] Retrieved the public diffusion recovery archive: HTTP 200, 5,007,988 bytes,
+  SHA256 `4c43b04106469764c1d24450a29c1e200914e3b7952c417bb62508fd52862a5d`.
+  The original 1,800-second primary job FAILED after returning a 30,000-step
+  checkpoint. No held-out evaluation or generated examples were returned.
+- [ ] Run one separately frozen evaluation-only recovery from the exact returned
+  weights; preserve the original failure and original scientific criteria.
+  Public transport is ready; infrastructure owns the remaining execution gates.
+- [ ] Complete and independently review the two exact-Claim fin computations.
+  Original proposals were made ready but superseded before leasing or calculation
+  to strengthen their cache identity. Revised heads `0ed92cdd` and `67532172` are
+  ready; both consume the existing exact Claim `4998ef85`. Numerical results and
+  review remain subsequent evidence, not implied by authorization.
+- [ ] Complete Studio contribution UI integration. The transient bearer adapter
+  and isolated-Store browser tests exist. Pagination and cross-namespace member
+  anchoring fixes are in progress; no browser session gains write authority.
+- [ ] Recheck the released routes with the separate browser critic. The site
+  owner's broad run observed one viewer reset pixel mismatch among 102 checks;
+  an isolated rerun passed. The viewer owner is investigating this timing issue.
+- [ ] Use newly available GCP CPU capacity for ready scientific jobs. The user
+  reports Compute API and billing enabled on `scienceclaw26bos-3016`, global
+  CPU quota 32, GPU quota 0. Infrastructure confirmed the active lab account and
+  is checking existing allocations before creating workers. Requesting a GPU
+  quota increase does not imply that one has been granted.
+- [ ] Export every GCP result before the account's user-reported deletion on
+  Sunday night, November 1. Each job needs explicit input/output hashes, bounded
+  resources, a collection path and cleanup ownership.
+
+The fresh 4:49pm PDT provider listing contained 52 attributable team jobs:
+41 completed, 8 failed, 3 cancelled, none running or queued. The 30 unattributed
+jobs included one running job. These are dated job states, not current device
+utilization. Infrastructure is the sole cloud dispatcher; no other team's jobs
+are touched. Exact release and live-check receipts are under `deploy/receipts/`.
+
+## Added user requirement — launchable printed fish
+
+- [x] Define SPEC-010 with required slingshot launch, a distinct manufactured
+  glider, actual mass/center-of-mass inputs, release dynamics and physical-test
+  acceptance. Existing display props remain distinct.
+- [ ] Build the lightweight fish-derived assembly (claude-05) and integrate
+  stability, launch-load and trajectory sweeps (claude-07, aero controls04).
+- [x] Record sourced Form Studio material cards and exact manufacturing
+  conditions; geometry/dynamics binding remains in progress and printer/resin availability remains an optional user
+  clarification while provisional scenarios proceed.
+- [ ] Publish linked launchable-model files, simulation artifacts and assembly/
+  physical-test instructions. No flight demonstration has occurred.
+
+## Integration checkpoint — October 31, 5:11pm PDT
+
+- [x] Integrated two actual exact-Claim computations and the separate reviewer
+  findings. Root checked 56 artifact hashes/sizes, eight frozen code hashes and
+  both saved read→input-binding→solver→Evidence sequences; six focused tests
+  passed. Receipt: `deploy/receipts/claim-reuse-root-check.json`. This is input
+  reuse, not evidence of collective advantage or biological validity. Reviewer
+  reported both Evidence records disputed despite correct scoped mathematics;
+  empirical relevance and independent non-computational replication are absent.
+- [x] Add strong-fin and revision-history acceptance to SPEC-010. Printed fins,
+  1:1 scale and Alpha Grey are coordinator defaults, not confirmed user choices.
+- [ ] Geometry05: first reinforced lightweight print assembly; dynamics07:
+  quantify launch loads, trim and mass feasibility. Preliminary analytic wing
+  loading indicates 15–20 g may require more than the provisional 4–8 m/s launch
+  speeds. Retain this constraint rather than promising flight from appearance.
+- [ ] Site02: contribute through transient bearer credentials and show design
+  lineage. Root is reviewing the integration; deployed release remains 52cda98.
+- [ ] Separate browser critic06 replaces the previous critic's revoked-login
+  blocker. Review each route and major interaction against the exact release.
+- [ ] Research worker: map primary Evo2 cell-specific regulatory results and
+  zebrafish fin cell/epigenetic datasets to explicit missing biological bridges.
+  This literature/data work does not resume provider-stopped sequence work.
+- [ ] Infrastructure reports GCP one-GPU quota approved; no VM allocation implied.
+  CPU packet admission and durable collection remain in progress. Nebius recovery
+  job `aijob-e00fb6jhvdt12fgsje` was image-pulling at the last report; no new
+  evaluation result is claimed. Export GCP artifacts before account deletion.

@@ -1,4 +1,4 @@
-"""Run a frozen secondary evaluator on hash-bound public primary artifacts.
+"""Run frozen recovery/secondary evaluators on hash-bound public artifacts.
 
 This launcher never trains. Missing primary artifacts, failed CUDA controls,
 changed transport bytes and an unapproved URL all stop before evaluation.
@@ -17,6 +17,16 @@ from frontier_compute.portable_entry import unpack
 
 PUBLIC_PREFIX = "https://frontier.morphoswarm.ai/artifacts/rd-diffusion/"
 MAX_INPUT_BYTES = 12_000_000
+
+
+def evaluator_argv(mode, inputs, output):
+    if mode == "primary_recovery":
+        return [sys.executable, "launch_recovery.py", "--ckpt", str(inputs / "checkpoint.pt"),
+                "--train-log", str(inputs / "train_loss.jsonl"), "--out", str(output)]
+    if mode == "secondary":
+        return [sys.executable, "launch_secondary.py", "secondary", "--ckpt", str(inputs / "checkpoint.pt"),
+                "--primary", str(inputs / "evaluation.json"), "--out", str(output)]
+    raise ValueError("Unknown evaluation mode")
 
 
 def fetch_inputs(spec, archive):
@@ -38,6 +48,9 @@ def fetch_inputs(spec, archive):
 def main():
     config_path = Path(sys.argv[1])
     config = json.loads(config_path.read_text())
+    mode = config.get("mode", "secondary")
+    if mode not in ("secondary", "primary_recovery"):
+        raise ValueError("Unknown evaluation mode")
     out = Path(os.environ["COPS_OUT"]).resolve()
     out.mkdir(parents=True, exist_ok=True)
     work = Path("secondary-runtime").resolve()
@@ -46,7 +59,8 @@ def main():
     source = work / "rd_diffusion"
     env = {**os.environ, "OMP_NUM_THREADS": "2", "MKL_NUM_THREADS": "2", "OPENBLAS_NUM_THREADS": "2"}
     if os.environ.get("PREFLIGHT"):
-        subprocess.run(["bash", "job_secondary.sh"], cwd=source, env={**env, "PREFLIGHT": "1"},
+        script = "job_recovery.sh" if mode == "primary_recovery" else "job_secondary.sh"
+        subprocess.run(["bash", script], cwd=source, env={**env, "PREFLIGHT": "1"},
                        check=True, timeout=60)
         return
     if not isinstance(config.get("inputs"), dict):
@@ -59,26 +73,30 @@ def main():
     archive = work / "primary-inputs.tar.xz"
     fetch_inputs(config["inputs"], archive)
     unpack(archive, config["inputs"], inputs)
-    primary = inputs / "evaluation.json"
     checkpoint = inputs / "checkpoint.pt"
-    report = json.loads(primary.read_text())
-    if hashlib.sha256(checkpoint.read_bytes()).hexdigest() != report["train"]["checkpoint_sha256"]:
-        raise ValueError("Primary evaluation and actual checkpoint bytes disagree")
+    expected = config["inputs"]["checkpoint_sha256"]
+    if hashlib.sha256(checkpoint.read_bytes()).hexdigest() != expected:
+        raise ValueError("Actual checkpoint bytes differ from the frozen input receipt")
+    if mode == "secondary":
+        report = json.loads((inputs / "evaluation.json").read_text())
+        if expected != report["train"]["checkpoint_sha256"]:
+            raise ValueError("Primary evaluation and actual checkpoint bytes disagree")
     (out / "runtime-input-receipt.json").write_text(json.dumps({
         "config_sha256": hashlib.sha256(config_path.read_bytes()).hexdigest(),
         "source": config["source"], "inputs": config["inputs"],
-        "scope": "Secondary evaluation only; no training or biological validation",
+        "mode": mode, "scope": "Evaluation only; no training or biological validation. Original primary failure remains.",
     }, indent=2) + "\n")
     # Run the same two frozen launcher commands directly. The transport already
     # archives output; an intermediate shell/archive would duplicate bytes and
     # leave a long-lived child behind if only that shell timed out.
-    subprocess.run([sys.executable, "launch_secondary.py", "control", "--out", str(out)],
+    control_dir = out / "control"
+    control_dir.mkdir()
+    subprocess.run([sys.executable, "launch_secondary.py", "control", "--out", str(control_dir)],
                    cwd=source, env=env, check=True, timeout=180)
-    control = json.loads((out / "control.json").read_text())
+    control = json.loads((control_dir / "control.json").read_text())
     if control.get("ok") is not True or control.get("env", {}).get("cuda_available") is not True:
         raise ValueError("Secondary same-allocation CUDA control failed")
-    subprocess.run([sys.executable, "launch_secondary.py", "secondary", "--ckpt", str(checkpoint),
-                    "--primary", str(primary), "--out", str(out)],
+    subprocess.run(evaluator_argv(mode, inputs, out / mode),
                    cwd=source, env=env, check=True, timeout=1800)
 
 
