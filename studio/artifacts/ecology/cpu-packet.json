@@ -10,7 +10,7 @@
   "python_requirement": ">=3.12; local3.13.12, proposed VM3.12.3 must pass same-job controls",
   "install": "python -m pip install -r artifacts/ecology/requirements.txt",
   "preflight": "MUJOCO_GL=disable OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m engineering.ecology.remote --preflight",
-  "run": "MUJOCO_GL=disable OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m engineering.ecology.remote --out output --workers4",
+  "run": "MUJOCO_GL=disable OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 python -m engineering.ecology.remote --out output --workers 4",
   "resources": {
     "device": "CPU; no GPU requested",
     "vCPU": 4,
@@ -85,5 +85,31 @@
       "sha256": "a25f66028ae052ca5bb2565fc0da2971c78b88f255271972dc1cd5b1d418cd2d",
       "bytes": 159
     }
-  ]
+  ],
+  "environment_variables": {
+    "MUJOCO_GL": "disable",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "run_argv": [
+    "python",
+    "-m",
+    "engineering.ecology.remote",
+    "--out",
+    "output",
+    "--workers",
+    "4"
+  ],
+  "preflight_argv": [
+    "python",
+    "-m",
+    "engineering.ecology.remote",
+    "--preflight"
+  ],
+  "unpacked_local_preflight": {
+    "path": "artifacts/ecology/packet-unpacked-preflight.json",
+    "sha256": "3d03f3b63c164f3287e7986069ff5b452519f9123211e14ccc00dedb4a20a553",
+    "result": "passed from a fresh extracted packet with exact copied inputs; no full batch rerun"
+  }
 }
