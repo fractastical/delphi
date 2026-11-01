@@ -58,6 +58,10 @@ about a proposed action.
 
 ## Delivery checklist
 
+- [ ] Add two bounded reuse studies, tissue microcarrier and epithelial repair,
+  preserving Flying Fish as the flagship. Give each exact source/model context,
+  shared-frontier questions, a bounded computation and a validation plan; measure
+  reuse separately from biological transfer (SPEC-007 and SPEC-017).
 - [ ] Research Xenobot/ICDO and additional multiscale simulators, publish a
   primary-source capability/compatibility catalog, and execute bounded useful
   comparisons with controls, trajectories and explicit biological-transfer gaps.

@@ -7,6 +7,11 @@ Every status distinguishes implementation, integration, publication and biologic
 
 ## Current checkpoint — October 31, 2026, 10:21pm PDT
 
+- [ ] Added two secondary reuse studies without changing the Flying Fish hero:
+  tissue microcarrier (claude15 source/simulation packet) and epithelial repair
+  (claude09 source/mechanics packet). Claude06 owns typed project drafts and
+  project-specific pages. Root owns import/integration/publication; infrastructure
+  remains the sole cloud dispatcher. No new biological result is asserted.
 - [ ] Added Xenobot/ICDO simulator discovery and runnable-packet work, assigned
   to existing claude15. Extend the existing simulation roadmap, prioritize
   Voxcraft/Voxelyze actuation-to-mechanics controls, and send exact bounded

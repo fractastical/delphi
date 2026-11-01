@@ -44,6 +44,41 @@ Agent identity, operator identity and independent review remain separate.
 Aggregate plans are still non-executable; constituent Actions retain their own
 permissions, bounds, leases and acceptance rules.
 
+## Bounded project expansion
+
+Flying Fish remains the sole featured organism-design demonstration. Add two
+secondary reuse studies, each with one falsifiable objective and only the scales
+needed to address it:
+
+| Project | Design question | Proposed reuse and missing bridge |
+| --- | --- | --- |
+| Tissue microcarrier | How do a contractile pattern and body geometry change deformation and motion? | Xenobot-inspired soft-body mechanics, constraint checking and virtual instruments; cell actuation and material calibration remain source/context-specific |
+| Epithelial repair | Which cell-mechanical or signaling interventions improve repair of a defined gap under stated conditions? | Existing multicell, bioelectric and pattern-repair tools; a simulated repair pattern does not establish barrier function or a therapeutic outcome |
+
+Each project records its starting organism/cell context, immutable source and
+model identities, controllable inputs, measurable endpoint, unknown couplings,
+positive/negative controls and the next experiment. Record reuse of an existing
+tool separately from reuse of an exact Claim and from a supported biological
+transfer. A shared parameter name or homologous gene does not establish either.
+
+Use the existing Project/Problem/Action/Artifact/Evidence model and SPEC-017
+validation contracts. Project-specific pages must not inherit fish geometry,
+genetic evidence or assurance by default. Proposed projects and unsubmitted
+drafts remain labelled until actual store receipts exist. Existing fish routes,
+downloads and media must remain intact.
+
+Composition of biological modules is a research hypothesis: expose interface
+compatibility, species/cell/stage differences, delivery/implementation unknowns
+and the tests that would establish function. No viable chimera or complete new
+organism is inferred from composing computational parts. A neural/control module
+can later be added as a similarly bounded reuse study after an existing project
+has produced an inspectable result; do not expand the demonstration indefinitely.
+
+Acceptance for each added project: one typed project, one linked frontier of
+open questions, exact reused-object references, a bounded execution or explicit
+blocker, and an inspectable validation plan. A claim of cross-project benefit
+requires an actual reused computation/evidence trail, not two cards in a gallery.
+
 ## Readable knowledge and artifact pages
 
 Claims, questions, models, artifacts and evidence open in readable views with a
