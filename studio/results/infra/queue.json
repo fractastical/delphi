@@ -150,10 +150,11 @@
       "task": "Exact-checkpoint evaluation-only recovery",
       "job_id": "aijob-e00fb6jhvdt12fgsje",
       "owner": "infra_director",
-      "provider_state": "STARTING",
+      "provider_state": "COMPLETED",
       "protocol": "artifacts/rd-diffusion/recovery-protocol.json",
       "source_commit": "7729292",
-      "scope": "Exact failed-primary weights; no retraining; original full-primary FAIL retained; original evaluator/controls and new1800s evaluation bound"
+      "scope": "Exact checkpoint recovery, strict completeness passed; original primary timeout FAIL retained; no retraining or speedup claim.",
+      "result": "results/infra/diffusion-recovery/results/infra25-rd-ddpm-evaluation-recovery/recovery-result.json"
     }
   ],
   "preparation": [
@@ -269,40 +270,107 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-11-01T00:07:33.979840Z",
+  "updated_at_utc": "2026-11-01T00:35:28.731826+00:00",
   "planning_horizon_utc": [
     "2026-10-31T23:28:04.655084+00:00",
     "2026-11-01T23:28:04.655084+00:00"
   ],
   "gcp": {
     "project": "scienceclaw26bos-3016",
+    "observed_at_utc": "2026-11-01T00:35:28.731826+00:00",
     "global_cpu_limit": 32,
-    "observed_instances": 0,
-    "gpu_quota_granted": 0,
-    "gpu_quota_requested": 1,
-    "state": "isolated network, dedicated bucket-only identity and private artifact bucket ready; awaiting frozen scientific CPU packets and exporter",
+    "gpu_quota_granted": 1,
+    "gpu_vm_created": false,
+    "instances": [
+      {
+        "id": "4732435591005420012",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-16",
+        "name": "frontier-cpu-20261031-01",
+        "status": "TERMINATED"
+      },
+      {
+        "id": "731385783382653564",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-8",
+        "name": "frontier-cpu-20261031-02",
+        "status": "RUNNING"
+      },
+      {
+        "id": "8843861969326519893",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-16",
+        "name": "frontier-cpu-20261031-03",
+        "status": "RUNNING"
+      }
+    ],
+    "active_allocated_vcpus": 24,
+    "instantaneous_cpu_utilization": null,
+    "state": "CFD VM03 started pinned Julia package instantiate/precompile at00:34:06Z. Genomics VM02 repaired packet start requested; original failures exported. Allocation is not CPU utilization.",
     "plan": [
       {
-        "vm": "frontier-cpu-20261031-01",
+        "vm": "frontier-cpu-20261031-03",
         "vcpu": 16,
-        "work": "CFD controlled cylinder/domain/mutant",
-        "ready": false
+        "work": "R1/R3/M1 cylinder control cases",
+        "ready": true,
+        "source_sha256": "95ac40c9f229ff1332b4a7c8ed01ae8fe2316676abf739606e7c02a017a7e625"
       },
       {
         "vm": "frontier-cpu-20261031-02",
         "vcpu": 8,
-        "work": "23public-genome residue survey",
+        "work": "23 public-genome observational residue survey; one JSON boundary repair",
+        "ready": true,
+        "source_sha256": "95cbd6cbdf2ba97081d3ef2d13679ec7a608d8cac58bfaef469270b4600c375e"
+      },
+      {
+        "vcpu": 4,
+        "work": "Future GPU VM overhead if validated useful packet ready",
         "ready": false
       },
       {
-        "vcpu": 8,
-        "work": "reserved glider design sweeps",
+        "vcpu": 4,
+        "work": "Reserved ecology/glider CPU packets when frozen",
         "ready": false
       }
     ],
     "network": "frontier-workers-20261031",
     "ingress": "explicit priority0 deny-all",
-    "credentials": "short-lived metadata identity; no embedded key",
-    "expiry": "user states account deletes Sunday night2026-11-01; export promptly, exact UTC cutoff unknown"
+    "credentials": "Dedicated bucket-only metadata identity; no embedded keys",
+    "expiry": "User states account deletes Sunday night2026-11-01; exact cutoff unknown.23h/4h VM caps and periodic exports.",
+    "cost": null,
+    "failure_receipts": [
+      "results/resources/gcp/cfd-bootstrap-failure.json",
+      "/data/artifacts/delphi-evolve-rethink/messages/gcp-artifact-collection-to-codex03.md"
+    ]
+  },
+  "next_ready_dispatch": {
+    "diffusion_secondary": {
+      "state": "WAIT_PUBLIC_GET",
+      "source_commit": "396bd0bb8e0b5952e48916762f24afbf69b7ea20",
+      "input_archive_sha256": "7ac6d86ba5a9dcddc0c9241f103f848920b0d42350f24dc28e7b52d3d890aab5",
+      "gpus": 1,
+      "hard_provider_minutes": 45,
+      "scientific_compute_estimate_minutes": 6,
+      "estimate_basis": "Returned primary evaluation stages total ~6min on same H100/image; secondary full ensembles may vary.",
+      "stop_gates": [
+        "exact public SHA",
+        "same-allocation CUDA controls",
+        "full frozen condition counts/finite values",
+        "original metric reproduction reported unchanged"
+      ]
+    },
+    "cylinder_R2": {
+      "state": "OWNER_PREPARING_CUDA_PACKET",
+      "owner": "claude-04",
+      "gpus": 1,
+      "stop_gates": [
+        "CPU/CUDA parity",
+        "measured calibration fits bounded runtime",
+        "frozen physical bands unchanged",
+        "partial checkpoints export"
+      ]
+    },
+    "ecology_glider": {
+      "state": "WAIT_FROZEN_CONTROLS_AND_INPUTS",
+      "reserved_cpu": 4,
+      "no_duplicate_dispatch": true
+    }
   }
 }
