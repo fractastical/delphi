@@ -38,6 +38,8 @@ def validate(spec):
         raise ValueError("Task command must be an argv list")
     if not re.fullmatch(r"[a-f0-9]{64}", spec["source_sha256"]):
         raise ValueError("Source hash required")
+    if not re.fullmatch(r"out(?:-[a-z0-9]+)*", spec.get("output_directory", "out")):
+        raise ValueError("Invalid output directory")
     # Only declared, nonsensitive task parameters are permitted in metadata.
     for key in spec.get("env", {}):
         if re.search(r"token|secret|password|credential|api.?key", key, re.I):
@@ -161,7 +163,7 @@ def run(spec):
     import tarfile
 
     validate(spec)
-    source, output = ROOT / "src", ROOT / "out"
+    source, output = ROOT / "src", ROOT / spec.get("output_directory", "out")
     source.mkdir(exist_ok=True)
     output.mkdir(exist_ok=True)
     packet = ROOT / "packet.tar"

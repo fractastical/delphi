@@ -32,6 +32,12 @@ def test_metadata_refuses_credentials_and_unbounded_task():
     request["runtime_s"] = 999999
     with pytest.raises(ValueError, match="runtime"):
         gcp_worker.validate(request)
+    request = spec()
+    request["output_directory"] = "../other-run"
+    with pytest.raises(ValueError, match="output directory"):
+        gcp_worker.validate(request)
+    request["output_directory"] = "out-json-repair"
+    gcp_worker.validate(request)
 
 
 def test_packet_changed_after_freeze_never_becomes_bootable_metadata(tmp_path):
