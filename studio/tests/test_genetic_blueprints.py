@@ -82,3 +82,31 @@ def test_unvalidated_cell_program_binding_cannot_be_marked_validated(tmp_path):
         b["cell_program_blueprints"][0]["validation_status"] = "validated"
     errs = mutated(tmp_path, f)
     assert any("validation_status must be unknown" in e for e in errs) and any("3 cell-program blueprints" in e for e in errs)
+
+
+def _act(b, i):
+    return next(a for a in b["regulatory_actors"]["actors"] if a["id"] == i)
+
+
+def test_marker_promoted_to_tf_is_refused(tmp_path):
+    assert any("sp7 must have role marker" in e for e in mutated(tmp_path, lambda b: _act(b, "sp7").update(role="TF")))
+
+
+def test_tbx5a_given_a_citation_or_tf_role_is_refused(tmp_path):
+    assert any("tbx5a" in e for e in mutated(tmp_path, lambda b: _act(b, "tbx5a").update(role="TF", citations=["gr5"])))
+
+
+def test_lef1_inference_cannot_be_relabelled_causal(tmp_path):
+    assert any("lef1" in e for e in mutated(tmp_path, lambda b: _act(b, "lef1").update(evidence_class="causal-perturbation")))
+
+
+def test_tf_without_citation_and_ledger_gap_are_refused(tmp_path):
+    assert any("TF role needs" in e for e in mutated(tmp_path, lambda b: _act(b, "fosl1a").update(citations=[])))
+
+    def f(b):
+        b["claim_use_ledger"]["rows"].pop()
+    assert any("one row per citation" in e for e in mutated(tmp_path / "x", f))
+
+
+def test_stale_unspecified_sentence_is_refused():
+    assert "left UNSPECIFIED because no source read supplies one" in gb.STALE

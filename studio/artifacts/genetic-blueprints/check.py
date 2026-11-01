@@ -21,7 +21,7 @@ LEVELS = {"full-text", "abstract", "listing", "search-summary", "could-not-acces
 REQUIRED = {"bp-1-regeneration-enhancer-reporter", "bp-2-development-versus-regeneration-contrast", "bp-3-endogenous-locus-knock-in", "bp-4-bac-carried-locus-reporter"}
 APPROACHES = {"tol2-plasmid", "bac-transgenesis", "endogenous-knock-in", "transient-delivery", "autonomous-artificial-chromosome", "landing-site-integration"}
 MAP_ROWS = {"basal-epithelium", "surface-epithelium", "fibroblast-mesenchyme", "osteoblast-and-joint", "hematopoietic", "pectoral-fin-field", "organism-reference"}
-STALE = ["promoter-compatibility abstract", "body of the paper not read", "every enhancer evidence item here is from regenerating adult fin", "Every enhancer item read is from regenerating adult fin"]
+STALE = ["promoter-compatibility abstract", "body of the paper not read", "every enhancer evidence item here is from regenerating adult fin", "left UNSPECIFIED because no source read supplies one", "Every enhancer item read is from regenerating adult fin"]
 SRC_FILE = {"tree2016": "pmc4844022.txt", "fin-multiome2025": "genomeres.txt", "fin-epigenome2020": "pmc7047409.txt", "promoter-compat2023": "pmc10211259.txt", "bac-tol2-2011": "nprot.txt", "knockin-cre2021": "sci.txt", "piglet2024": "piglet.txt", "bac-plasmids2016": "bac2016.txt", "hac2024": "hac.txt"}
 
 
@@ -151,6 +151,31 @@ def check(base=HERE, cache=None, repo_root=None):
     for ph in STALE:
         if ph in scan:
             errs.append(f"stale or contradicted wording present: {ph!r}")
+    ra = bp.get("regulatory_actors", {})
+    acts = {a["id"]: a for a in ra.get("actors", [])}
+    ledger = bp.get("claim_use_ledger", {}).get("rows", [])
+    if {r["citation"] for r in ledger} != set(cites):
+        errs.append("claim_use_ledger must have exactly one row per citation")
+    for a in acts.values():
+        if a["role"] not in ra.get("roles", []):
+            errs.append(f"actor {a['id']}: bad role")
+        for k in a["citations"]:
+            if k not in cites:
+                errs.append(f"actor {a['id']}: unknown citation {k}")
+        if a["role"] == "TF" and not a["citations"]:
+            errs.append(f"actor {a['id']}: TF role needs a supporting citation")
+        if a["role"] == "TF" and a["evidence_class"] == "proposed":
+            errs.append(f"actor {a['id']}: TF role cannot be only proposed")
+    for need_id, role in (("fosl1a", "TF"), ("lef1", "TF"), ("sp7", "marker"), ("tbx5a", "marker"), ("hand2", "marker")):
+        if acts.get(need_id, {}).get("role") != role:
+            errs.append(f"actor {need_id} must have role {role}")
+    for tid in ("tbx5a", "hand2"):
+        if acts.get(tid, {}).get("citations"):
+            errs.append(f"{tid} stays marker-only with no citation unless a read source supports more")
+    if acts.get("lef1", {}).get("evidence_class") != "inferred" or "causal" in acts.get("lef1", {}).get("evidence_class", ""):
+        errs.append("lef1 is a GRN inference, not a causal perturbation")
+    if "causal" not in acts.get("fosl1a", {}).get("evidence_class", "") or "inferred" not in acts.get("fosl1a", {}).get("evidence_class", ""):
+        errs.append("fosl1a must keep inferred and causal-perturbation distinct in its evidence class")
     for need in ("Evo2", "sequence design"):
         if need not in json.dumps(bp["not_done"]):
             errs.append(f"not_done does not mention {need}")
