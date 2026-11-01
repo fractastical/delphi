@@ -70,7 +70,7 @@ def test_build_is_current_and_portable():
 
 def test_every_view_renders_without_errors(browser, base):
     pg = page(browser)
-    for route in ["formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1, #main h2", timeout=5000)
         assert pg.locator("#main").inner_text().strip(), route
@@ -308,7 +308,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["home", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -956,7 +956,7 @@ def test_system_built_tab_reports_counters_only_with_unknowns_and_no_scorecard(b
     for q in ("Agents", "Model calls and tokens", "GPU jobs (own H100)", "GPU container work seconds", "CPU jobs (own)", "GPU utilisation", "Cost"):
         assert q in t, q
     assert "CPU seconds are not recorded: unknown" in t and "Total distinct agents and currently active agents: unknown" in t
-    assert "1037.4 s" in t and "GPU kernel seconds and billed GPU seconds: unknown" in t and "not a count of agents" in t and "Provider COMPLETED means the container ended" in t and "Reuse by anyone outside this team is not recorded" in t
+    assert "3184.1 s across 9 completed GPU jobs" in t and "historical team jobs listed separately" in t and "GPU kernel seconds and billed GPU seconds: unknown" in t and "not a count of agents" in t and "Provider COMPLETED means the container ended" in t and "Reuse by anyone outside this team is not recorded" in t
     assert "%" not in pg.locator(".tablewrap").first.text_content()
     assert "scorecard" not in t.lower() and "rubric" not in t.lower()
 
@@ -1381,3 +1381,72 @@ def test_recovery_inputs_are_published_exactly_and_the_failed_run_is_not_called_
     href = pg.locator("a[download][href$='primary-runtime-inputs.tar.xz']").get_attribute("href")
     assert href == "artifacts/rd-diffusion/primary-runtime-inputs.tar.xz"
     assert pg.request.get(base + href).status == 200
+
+
+def test_contributor_credential_lives_in_memory_only_and_the_composer_mounts(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    cp = snap["design_review"]["current_project"]["ref"]
+    pg = page(browser)
+    sent = []
+    pg.on("request", lambda r: sent.append((r.url, r.headers.get("authorization"), r.headers.get("cookie"))) if "/v1/" in r.url else None)
+    pg.route("**/api/health", lambda r: r.fulfill(json={"mode": "live", "status": "ok"}))
+    pg.route("**/api/session", lambda r: r.fulfill(json={"authenticated": False, "public_access": True, "csrf": "x"}))
+    pg.route("**/api/attention", lambda r: r.fulfill(status=503, json={"error": "attention_unavailable", "message": "no"}))
+    pg.route("**/api/catalog*", lambda r: r.fulfill(json={"mode": "live", "namespace": cp["namespace"], "next_cursor": None, "results": [{"record": {**cp, "payload": {"title": "Mission", "members": []}}, "local_status": "proposed", "is_head": True}]}))
+    pg.route("**/api/design/context*", lambda r: r.fulfill(json={"schema": "frontier.project.design-context/1", "project": {}, "members": [], "annotations": [], "withheld_unlicensed": 0, "pagination": {"limit": 50, "returned": 0, "next_cursor": None, "truncated": False}, "interpretation": "x"}))
+    pg.route("**/api/record*", lambda r: r.fulfill(json={"mode": "live", "record": {**cp, "payload": {"title": "Mission", "members": []}}, "local_status": "proposed", "is_head": True}))
+    pg.route("**/v1/read/identity", lambda r: r.fulfill(json={"principal": {"actor": "e2e-actor", "roles": ["contributor"]}}) if r.request.headers.get("authorization") == "Bearer secret-token-1234567890" else r.fulfill(status=401, json={"error": "unauthorized", "message": "no"}))
+    pg.goto(base + "#/studio/flying-fish")
+    pg.wait_for_selector("#ctform")
+    assert pg.get_attribute("#ctinput", "type") == "password" and pg.get_attribute("#ctinput", "autocomplete") == "off"
+    pg.wait_for_selector(".annotation-composer", timeout=15000)
+    pg.fill("#ctinput", "wrong-token-0000000000"); pg.click("#ctconnect")
+    pg.wait_for_function("document.querySelector('#ctstatus').textContent.includes('Not connected')")
+    assert pg.input_value("#ctinput") == ""
+    pg.fill("#ctinput", "secret-token-1234567890"); pg.click("#ctconnect")
+    pg.wait_for_function("document.querySelector('#ctstatus').textContent.includes('Connected as')")
+    assert pg.input_value("#ctinput") == "" and "e2e-actor" in pg.locator("#ctstatus").text_content()
+    storage = pg.evaluate("JSON.stringify([Object.entries(localStorage), Object.entries(sessionStorage), document.cookie, location.href])")
+    assert "secret-token-1234567890" not in storage, "the credential must live in memory only"
+    assert any(a == "Bearer secret-token-1234567890" and c is None for _, a, c in sent), sent
+    pg.click("#ctdisconnect")
+    pg.wait_for_function("document.querySelector('#ctstatus').textContent.includes('Disconnected')")
+    assert pg.evaluate("DF.api.hasContributor()") is False
+    pg.fill("#ctinput", "secret-token-1234567890"); pg.click("#ctconnect")
+    pg.wait_for_function("DF.api.hasContributor() === true")
+    pg.evaluate("location.hash = '#/knowledge'")
+    pg.wait_for_selector("#cbrowse")
+    assert pg.evaluate("DF.api.hasContributor()") is False, "leaving the page forgets the credential"
+
+
+def test_fish_history_lists_only_stated_lineage_and_separates_siblings_revisions_and_props(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    H = snap["fish_history"]
+    # every edge is backed by the manifest field it names: re-read the manifests, do not trust the snapshot
+    p2 = json.loads((ROOT / "artifacts/print-v2/manifest.json").read_text())["edition"]["supersedes"]
+    rev = {(e["from"], e["to"]) for e in H["edges"] if e["relation"] == "revision"}
+    assert rev == set(p2.items()) and len(rev) == 6
+    v3 = json.loads((ROOT / "artifacts/fish3d/v3-index.json").read_text())
+    for vid in v3["candidates"]:
+        cj = json.loads((ROOT / f"artifacts/fish3d/{vid}/candidate.json").read_text())
+        assert {"from": vid, "to": cj["baseline_candidate"]}.items() <= next(e for e in H["edges"] if e["from"] == vid and e["relation"] == "variant of").items()
+    props = json.loads((ROOT / "artifacts/print-v3/downloads.json").read_text())["forms"]
+    for f in props:
+        assert any(e["from"] == f["id"] and e["to"] == f["source_candidate"] and e["relation"] == "printed from" for e in H["edges"])
+    assert H["launch_prototype"]["exists"] is False
+    pg = page(browser)
+    pg.goto(base + "#/history"); pg.wait_for_selector("#fhgraph svg")
+    t = pg.locator("#main").text_content()
+    assert "Chronological revision" in t and "Sibling variants" in t and "Derivation" in t and "not a launch prototype" in t and "No launch-prototype artifact is in the tree" in t
+    assert "not the date the design was made" in t or "not a design date" in t or "a repository fact" in t
+    assert pg.locator("#fhgraph .g-node").count() == len(H["nodes"]) == 18
+    pg.goto(base + "#/history?sel=fish3d-v3a-fan-prop"); pg.wait_for_selector("#fhdetail h3")
+    d = pg.locator("#fhdetail").text_content()
+    assert "fish3d-v3a-fan-prop" in d and "printed from" in d and "fish3d-v3a-fan" in d and "artifacts/print-v3/downloads.json" in d
+    g = _graph_issues(pg, "#fhgraph")
+    assert g.get("outside") == [] and g.get("overlaps") == [], g
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/history"); pg2.wait_for_selector("#fhgraph svg")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+    pg.goto(base + "#/home"); pg.wait_for_selector("#fishnote")
+    assert pg.locator("a:has-text('fish design history')").count() >= 1

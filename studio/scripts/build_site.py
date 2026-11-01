@@ -348,9 +348,9 @@ def build_timeline(ins: Inputs) -> dict | None:
         st = lambda d: ", ".join(f"{n} {k.lower()}" for k, n in d.items() if n)
         counters = [
             {"quantity": "Agents", "value": f"{ag['native_running_snapshot']} native agents with orchestrator status running; {ag['known_contributors_in_audited_slice']} identified contributors in the audited {ag['contributor_window_seattle']} slice", "status": "partial", "note": ag["definition"] + " Total distinct agents and currently active agents: unknown. No collective speedup is measured.", "source": uf},
-            {"quantity": "GPU jobs (own H100)", "value": f"{sum(sc['gpu'].values())}: {st(sc['gpu'])}", "status": "actual", "note": f"Own job records from {pdt(U['provider_window_utc'][0])} to {pdt(U['provider_window_utc'][1])} on 2026-10-31. Provider COMPLETED is not a scientific pass. Shared H100 capacity is not our use.", "source": uf},
+            {"quantity": "GPU jobs (own H100)", "value": f"{sum(sc['gpu'].values())}: {st(sc['gpu'])}", "status": "actual", "note": f"Own job records from {pdt(U['provider_window_utc'][0])} to {pdt(U['provider_window_utc'][1])} on 2026-10-31. Provider COMPLETED is not a scientific pass. Shared H100 capacity is not our use." + ((" Team attribution kept apart: " + str(U["team_attribution"]["current_frontier_jobs"]) + " current Frontier jobs, " + str(U["team_attribution"]["historical_team_jobs"]) + " historical team jobs listed separately, " + str(U["team_attribution"]["unattributed_jobs"]) + " unattributed (not asserted to be other teams).") if U.get("team_attribution") else ""), "source": uf},
             {"quantity": "CPU jobs (own)", "value": f"{sum(sc['cpu'].values())}: {st(sc['cpu'])}", "status": "actual", "note": "CPU seconds are not recorded: unknown.", "source": uf},
-            {"quantity": "GPU container work seconds", "value": f"{U['five_completed_h100_container_work_seconds']} s across five completed H100 jobs", "status": "partial", "note": U["time_definition"] + " GPU kernel seconds and billed GPU seconds: unknown.", "source": uf},
+            {"quantity": "GPU container work seconds", "value": (f"{U['measured_completed_container_work']['gpu']['seconds']} s across {U['measured_completed_container_work']['gpu']['jobs']} completed GPU jobs and {U['measured_completed_container_work']['cpu']['seconds']} s across {U['measured_completed_container_work']['cpu']['jobs']} completed CPU jobs, from controller receipts" if U.get("measured_completed_container_work") else f"{U['five_completed_h100_container_work_seconds']} s across five completed H100 jobs"), "status": "partial", "note": (U["measured_completed_container_work"]["scope"] + " " if U.get("measured_completed_container_work") else "") + U["time_definition"] + " GPU kernel seconds and billed GPU seconds: unknown.", "source": uf},
             {"quantity": "GPU utilisation", "value": f"{len(U['historical_gpu_telemetry'])} sampled windows, listed below; current utilisation unknown", "status": "partial", "note": "Windows include low and zero values; no project-wide average is inferred.", "source": uf},
             {"quantity": "Model calls and tokens", "value": f"Embedding index: {emb['embedding_requests']} requests, {emb['documents_embedded']} documents, {emb['failed_requests']} failed. Bioservices ledger: {bio['calls']} calls, {bio['input_tokens']} input and {bio['output_tokens_including_thinking']} output tokens (thinking included). Hosted OpenFold2: {of.get('count', 0)} operation, {of.get('final_status', '')}", "status": "partial", "note": "Named ledgers only; embedding and generation units are not merged. Total tokens: unknown. BioNeMo-specific execution: not established.", "source": uf},
             {"quantity": "Cost", "value": "Unknown (not $0)", "status": "unknown", "note": U["cost"]["interpretation"] + " Google Compute: blocked by an unaccepted terms-of-service step; no VM created.", "source": uf}]
@@ -509,6 +509,54 @@ def recovery_inputs(ins: Inputs, out: dict) -> dict | None:
         out["@artifacts/rd-diffusion/primary-runtime-inputs.tar.xz"] = b; out["@artifacts/rd-diffusion/primary-runtime-inputs.json"] = ins.read(sc)
     return {"published": ok, "href": "artifacts/rd-diffusion/primary-runtime-inputs.tar.xz" if ok else None, "bytes": m["bytes"], "sha256": m["archive_sha256"], "status": m["status"], "training_steps": m["training_steps"], "checkpoint_sha256": m["checkpoint_sha256"],
             "primary_full_run_status": m["primary_full_run_status"], "original_primary_job_id": m["original_primary_job_id"], "next_admission": m["next_admission"], "members": m["files"], "sidecar": sc}
+
+
+def fish_history(ins: Inputs) -> dict | None:
+    """Design lineage read from the manifests that state it: print v1 sets (siblings), print v2 `supersedes` (chronological revisions), the 3D baseline's
+    from_print_form, v3 candidates' baseline_candidate/variant (siblings differing only in knobs) and each display prop's source_candidate. Nothing is inferred.
+    Dates are the author date of the first commit that added each manifest in this repository: a repository fact, not a design date."""
+    import subprocess
+    def first_commit(path):
+        try:
+            r = subprocess.run(["git", "-C", str(ROOT), "log", "--diff-filter=A", "--format=%aI", "--", path], capture_output=True, text=True, timeout=20)
+            lines = [x for x in r.stdout.split() if x]
+            return lines[-1] if lines else None                    # the oldest add of that path
+        except Exception:
+            return None
+    need = ["artifacts/print/manifest.json", "artifacts/print-v2/manifest.json", "artifacts/fish3d/v3-index.json", "artifacts/print-v3/downloads.json"]
+    if not all((ROOT / n).exists() for n in need):
+        return None
+    P1 = json.loads(ins.read(need[0])); P2 = json.loads(ins.read(need[1])); V3 = json.loads(ins.read(need[2])); P3 = json.loads(ins.read(need[3]))
+    nodes, edges, sib = [], [], []
+    mk = lambda i, kind, title, man, extra=None: nodes.append({"id": i, "kind": kind, "title": title, "manifest": man, "manifest_sha256": ins.seen[man]["sha256"] if man in ins.seen else None, "first_commit_date": first_commit(man), **(extra or {})})
+    sets1 = P1.get("sets", {}); sets2 = P2.get("sets", {})
+    for sname, S in sets1.items():
+        for fid in S["forms"]:
+            mk(fid, "print form v1 (display scale)", fid, "artifacts/print/manifest.json", {"set": sname, "display_scale": S.get("display_scale")})
+        sib.append({"group": sname, "members": S["forms"], "basis": "listed together in one set of artifacts/print/manifest.json; they differ in the parameters that manifest names", "manifest": "artifacts/print/manifest.json"})
+    for sname, S in sets2.items():
+        for fid in S["forms"]:
+            mk(fid, "print form v2 (display scale)", fid, "artifacts/print-v2/manifest.json", {"set": sname, "display_scale": S.get("display_scale")})
+        sib.append({"group": sname, "members": S["forms"], "basis": "listed together in one set of artifacts/print-v2/manifest.json", "manifest": "artifacts/print-v2/manifest.json"})
+    for new, old in (P2.get("edition") or {}).get("supersedes", {}).items():
+        edges.append({"from": new, "to": old, "relation": "revision", "label": "v2 supersedes v1 (the v1 files stay as published)", "source": "artifacts/print-v2/manifest.json: edition.supersedes", "chronological": True})
+    base = V3["baseline"]; bc = json.loads(ins.read(f"artifacts/fish3d/{base}/candidate.json"))
+    mk(base, "3D candidate (1:1)", "N1 baseline, flat fin plates", f"artifacts/fish3d/{base}/candidate.json", {"set": None})
+    if bc.get("from_print_form"):
+        edges.append({"from": base, "to": bc["from_print_form"], "relation": "built from", "label": "sized from the v1 print form's parameters", "source": f"artifacts/fish3d/{base}/candidate.json: from_print_form", "chronological": False})
+    group = []
+    for vid, meta in V3["candidates"].items():
+        cj = f"artifacts/fish3d/{vid}/candidate.json"
+        if not (ROOT / cj).exists():
+            continue
+        c = json.loads(ins.read(cj)); mk(vid, "3D candidate (1:1)", c.get("title") or vid, cj, {"candidate_sha256": meta["candidate_sha256"], "knobs": meta["knobs"]}); group.append(vid)
+        edges.append({"from": vid, "to": c.get("baseline_candidate", base), "relation": "variant of", "label": "v3 rebuild of the baseline; siblings differ only in knobs", "source": f"{cj}: baseline_candidate", "chronological": False})
+    sib.append({"group": "v3 variants", "members": group, "basis": V3["shared"], "manifest": need[2]})
+    for f in P3["forms"]:
+        mk(f["id"], "display prop (print, not a launch prototype)", f.get("title") or f["id"], need[3], {"display_scale": f["display_scale"], "set": f.get("set")})
+        edges.append({"from": f["id"], "to": f["source_candidate"], "relation": "printed from", "label": "display prop made from this 3D candidate", "source": f"{need[3]}: forms[].source_candidate", "chronological": False})
+    return {"nodes": nodes, "edges": edges, "siblings": sib, "launch_prototype": {"exists": False, "note": "No launch-prototype artifact is in the tree: source owners are still preparing it. Nothing is shown in its place."},
+            "date_basis": "Author date of the first commit that added the node's manifest in this repository (a repository fact, not the date the design was made); null when git history is unavailable."}
 
 
 def lifecycle_block(ins: Inputs) -> dict | None:
@@ -1015,6 +1063,7 @@ def build() -> dict[str, bytes]:
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
     recovery_in = recovery_inputs(ins, extra)
+    fish_hist = fish_history(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -1049,6 +1098,7 @@ def build() -> dict[str, bytes]:
         "formalize": formalize_ex,
         "print_v3": print_v3,
         "recovery_inputs": recovery_in,
+        "fish_history": fish_hist,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
