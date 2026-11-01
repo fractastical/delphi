@@ -50,25 +50,28 @@ def claims(A: dict, G: dict, S: dict) -> list[tuple[str, object, object]]:
     for p, v in ((0, 0.316), (20, 0.409), (40, 0.548), (80, 0.684), (160, 1.000)):
         nm = "B-k4-lamV1" if p == 80 else f"F2-prot{p}"
         rows.append((f"protrusion {p} closed", v, round(A[nm]["closed_fraction"], 3)))
-    for gid, exp in (("G1", True), ("G1b", True), ("G2", True), ("G3", True), ("G4", False),
+    for gid, exp in (("G1", True), ("G1b", None), ("G2", True), ("G3", True), ("G4", False),
                      ("G5", True), ("G7", True), ("G9", True), ("G10", False), ("G11", True),
                      ("G12", False)):
         rows.append((f"{gid} passed", exp, G[gid]["passed"]))
     # The TALLY is pinned as its own claim. G6 is descriptive and G8 unevaluable; neither is a
     # pass, and summing "not failed" as "passed" is how the handoff came to say 9 pass.
     rows += [
-        ("tally: gates passing", 8, sum(1 for g in G.values() if g["passed"] is True)),
+        ("tally: gates passing", 7, sum(1 for g in G.values() if g["passed"] is True)),
         ("tally: gates failing", 3, sum(1 for g in G.values() if g["passed"] is False)),
-        ("tally: no verdict assigned (G6 descriptive, G8 unevaluable)", 2,
+        ("tally: no verdict (G1b incomplete, G6 descriptive, G8 unevaluable)", 3,
          sum(1 for g in G.values() if g["passed"] is None)),
+        ("tally: G1b is not a pass", True, G["G1b"]["passed"] is None),
         ("tally: G6 is not a pass", True, G["G6"]["passed"] is None),
         ("tally: G8 is not a pass", True, G["G8"]["passed"] is None),
+        ("G1b verdict", "INCOMPLETE", G["G1b"].get("verdict")),
+        ("G1b reported history preserved", True, G["G1b"]["reported_history"]["reported_passed"] is True),
         ("tally: total gates", 13, len(G)),
     ]
     # G1b's DENOMINATOR is pinned, not just its zero. "0 disagreements" without the number of
     # frames actually compared is what let the card claim "every written frame" while the gate
     # silently skipped 720 of 1476. A zero and an empty comparison look identical otherwise.
-    cov = G["G1b"]["coverage"]
+    cov = G["G1b"]["evaluable"]
     rows += [
         ("G1b frames written", 1476, cov["frames_written"]),
         ("G1b frames comparable", 756, cov["frames_comparable"]),

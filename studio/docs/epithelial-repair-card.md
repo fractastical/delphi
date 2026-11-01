@@ -73,17 +73,26 @@ is the sensitivity probe for it.
 
 Two gates check the instrument before any result is read:
 
-- **G1b** compares that against an **independent channel** — counting medium pixels in the
-  lattice images Morpheus' `TiffPlotter` writes. The two share no code. They disagree on
-  **zero of 756 comparable frames**, which is **51.2% of the 1 476 frames written**.
+- **G1b is INCOMPLETE, not a pass.** It compares the gap against an **independent channel** —
+  counting medium pixels in the lattice images Morpheus' `TiffPlotter` writes, which shares no
+  code with the logger. The frozen rule is *"every arm and **every** TIFF frame"*. Only
+  **756 of 1 476 frames (51.2%)** are evaluable at all: the logger samples every 10 model time
+  units and the TIFF every 25, so only their common multiples line up, and 20 of each arm's 41
+  frames have no logger sample to compare against. **Zero of the 756 disagree** — consistent
+  everywhere it can be checked, which is useful evidence — but 720 frames cannot be checked
+  with the data that exists, so the frozen rule is unmet rather than satisfied.
 
-  *(Coverage corrected 2026-10-31 after independent review of `edc1e10`, which read the raw
-  runs. The card previously said "every written frame". It is not: the logger samples every
-  10 model time units and the TIFF every 25, so only their common multiples — every 50 — can
-  be compared pointwise, and **720 frames were silently skipped by the gate's own `if t in
-  logged` filter**. The agreement is real and is now stated over its actual domain. The
-  uncompared frames are not evidence of agreement and are not counted as such; `results-r2.json`
-  carries the denominator, and the gate now fails if it compares nothing.)*
+  | | |
+  |---|---|
+  | **Reported** at `9429a21` and `edc1e10` | G1b **passed**, "0 frames disagree" |
+  | **Independently assessed** (2026-10-31) | G1b **INCOMPLETE** — frozen rule unevaluable on 48.8% of frames |
+
+  Both are kept. The reported status is the historical record and is not rewritten; the
+  assessment supersedes it going forward. *Two errors of mine produced this: the card first
+  claimed agreement over "every written frame" when the gate silently skipped 720, and then —
+  worse — I narrowed the criterion to the shared times and kept the PASS. **That is relaxing
+  an acceptance to make it pass**, which the protocol forbids outright. The frozen rule text
+  is unchanged; only the verdict is corrected, and no threshold was moved to accept anything.*
 - **G3** confirms every initial gap is exactly 625·*k*. **G5** confirms an unwounded sheet
   reads exactly 0 at every logged time — a gap measure that cannot report zero cannot report
   closure. **G2** confirms no cell is created or destroyed after wounding.
@@ -223,16 +232,27 @@ the scaling over a wider range of J.
 
 ## 7. Numerical controls
 
-**Tally: 8 pass, 3 fail, 1 descriptive, 1 unevaluable** — 13 in all. **G6 is descriptive and
-is not a pass**: it was declared with no threshold, because three seeds of one model are not
-independent samples, and no bound is invented for it now. G8 is unevaluable, which is also
-not a pass. *(Corrected after independent review of `edc1e10`, where this was stated as
-9 pass by counting G6 among them.)*
+**Strict tally: 7 pass, 3 fail, 1 descriptive (G6), 2 incomplete or unevaluable (G1b, G8)** —
+13 in all. Only the 7 are passes. **G6 is descriptive**: declared with no threshold, because
+three seeds of one model are not independent samples, and no bound is invented for it now.
+**G8 is unevaluable** and **G1b is incomplete** — neither is a pass, and neither is a fail.
+
+| status | gates | count |
+|---|---|---|
+| pass | G1, G2, G3, G5, G7, G9, G11 | **7** |
+| fail | G4, G10, G12 | **3** |
+| descriptive, no verdict declared | G6 | 1 |
+| incomplete / unevaluable | G1b, G8 | 2 |
+
+*(Two corrections after independent review. At `edc1e10` this was stated as 9 pass by
+counting descriptive G6 among the passes; the intermediate correction said 8, which still
+counted G1b as a pass on a criterion I had narrowed to make it fit. The reported statuses at
+`9429a21` and `edc1e10` are preserved in `results-r2.json` beside the assessment.)*
 
 | gate | result | |
 |---|---|---|
 | G1 area conservation | **pass** | gap is an exact integer complement at every sample |
-| G1b independent TIFF channel | **pass** | 0 disagreeing frames, 36 arms |
+| G1b independent TIFF channel | **INCOMPLETE** | frozen rule is *every* frame; 756/1476 (51.2%) evaluable, 0 of those disagree. Reported as a pass at `9429a21`/`edc1e10`; that status is retained as history, not as a verdict |
 | G2 cell count constant | **pass** | |
 | G3 initial gap = 625·k | **pass** | |
 | G4 one-drive negative control | **FAIL** | mis-specified; see §4. Retained, not relabelled |
