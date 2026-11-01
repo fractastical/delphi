@@ -200,6 +200,32 @@ function evidenceTrig(claimId, created) {
   ].join("\n\n");
   const pValue = typeof r.measured.uncertainty === "string" && /^p = /.test(r.measured.uncertainty)
     ? Number(r.measured.uncertainty.slice(4)) : null;
+  // Revisions of the verdict or confidence recorded in result.json, in order, each a prov:Activity
+  // on the evidence item (same shape as test-data/claim-tests/build-test-nanopubs.mjs).
+  const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const revisions = (r.revisions ?? []).map((v, i) => {
+    const act = `https://w3id.org/delphi/resource/activity/cell-geometry-${claimId}--revision-${i + 1}`;
+    const people = (v.prompted_by ?? []).map(p => ({
+      who: `https://w3id.org/delphi/resource/agent/moltbook-${slug(p.agent)}`,
+      trig: `  <https://w3id.org/delphi/resource/agent/moltbook-${slug(p.agent)}> a prov:Agent ;
+    rdfs:label ${lit(p.agent)} ;
+    rdfs:comment ${lit(p.contribution)} ;
+    rdfs:seeAlso <${p.comment}> .`,
+    }));
+    return {
+      act,
+      trig: `  <${act}> a prov:Activity ;
+    rdfs:label ${lit(`Revision ${i + 1} of the ${claimId} cell-geometry test (${v.date})`)} ;
+    dct:description ${lit(v.reason)} ;
+    prov:startedAtTime "${v.date}"^^xsd:date ;${v.null_result ? (/\s/.test(v.null_result) ? `
+    rdfs:comment ${lit(`Evidence used: ${v.null_result}`)} ;` : `
+    prov:used <${BLOB(v.null_result)}> ;`) : ""}
+    delphi:evidenceAgainst ${lit(`Before: ${v.from.verdict}, ${v.from.summary} (confidence ${v.from.confidence}). After: ${v.to.verdict}, ${v.to.summary} (confidence ${v.to.confidence}).`)}${people.length ? ` ;
+    prov:wasInformedBy ${people.map(p => `<${p.who}>`).join(", ")}` : ""} .
+${people.map(p => p.trig).join("\n")}`,
+    };
+  });
+  const prior = latestPublished(`evidence-cell-geometry-${claimId}`);
   const imageActivities = used.map((id, i) => {
     const c = cellpose[id];
     return `  sub:segmentation${i} a prov:Activity ;
@@ -224,9 +250,11 @@ sub:assertion {
     delphi:statisticalTest ${lit(`Spearman rank correlation across ${r.measured.n} tissues, two-sided`)} ;` : ""}
     rdfs:comment ${lit(r.caveats.join("\n"))} ;
     rdfs:seeAlso <${BLOB(TESTS[claimId])}> ;
-${used.map(id => `    prov:used <${datasetIri(id)}>`).join(" ;\n")} ;
+${used.map(id => `    prov:used <${datasetIri(id)}>`).join(" ;\n")} ;${revisions.length ? `
+${revisions.map(v => `    prov:qualifiedRevision <${v.act}>`).join(" ;\n")} ;` : ""}
 ${props.map((_, i) => `    schema:additionalProperty sub:value${i}`).join(" ;\n")} .
-${props.map((p, i) => property(`sub:value${i}`, p)).join("\n")}
+${props.map((p, i) => property(`sub:value${i}`, p)).join("\n")}${revisions.length ? `
+${revisions.map(v => v.trig).join("\n")}` : ""}
 }
 
 sub:provenance {
@@ -248,7 +276,7 @@ ${imageActivities.join("\n")}
 ${AGENT_TRIPLES}
 }
 
-${pubinfo(created, `Evidence item: exploratory cell-geometry test of Thompson 1917 claim ${claimId}`, "delphi:EvidenceItem", ev)}`;
+${pubinfo(created, `Evidence item: exploratory cell-geometry test of Thompson 1917 claim ${claimId}${revisions.length ? ` (revision ${revisions.length})` : ""}`, "delphi:EvidenceItem", ev, prior?.trustyUri ?? null)}`;
 }
 
 for (const id of used) {
@@ -257,9 +285,16 @@ for (const id of used) {
 }
 if (new Set(used.map(id => cellpose[id].model_sha256)).size !== 1) throw new Error("images were segmented with different models");
 
-rmSync(OUT, { recursive: true, force: true });
-mkdirSync(OUT, { recursive: true });
 const created = new Date().toISOString();
-for (const id of used) writeFileSync(join(OUT, `dataset-wikimedia-commons-${id}.trig`), datasetTrig(id, created));
-for (const claimId of Object.keys(TESTS)) writeFileSync(join(OUT, `evidence-cell-geometry-${claimId}.trig`), evidenceTrig(claimId, created));
-console.log(`wrote ${used.length + Object.keys(TESTS).length} nanopubs to ${OUT} (generator commit ${commit}${dirty ? ", working tree DIRTY: drafts only, do not sign" : ""})`);
+if (onlyClaims.length) {
+  for (const c of onlyClaims) if (!TESTS[c]) throw new Error(`--claim ${c}: not one of ${Object.keys(TESTS).join(", ")}`);
+  mkdirSync(OUT, { recursive: true });
+  for (const claimId of onlyClaims) writeFileSync(join(OUT, `evidence-cell-geometry-${claimId}.trig`), evidenceTrig(claimId, created));
+  console.log(`rewrote ${onlyClaims.length} evidence nanopub(s) in ${OUT}: ${onlyClaims.map(c => `${c}${latestPublished(`evidence-cell-geometry-${c}`) ? " (supersedes " + latestPublished(`evidence-cell-geometry-${c}`).trustyUri.slice(-12) + ")" : ""}`).join(", ")} (generator commit ${commit}${dirty ? ", working tree DIRTY: drafts only, do not sign" : ""})`);
+} else {
+  rmSync(OUT, { recursive: true, force: true });
+  mkdirSync(OUT, { recursive: true });
+  for (const id of used) writeFileSync(join(OUT, `dataset-wikimedia-commons-${id}.trig`), datasetTrig(id, created));
+  for (const claimId of Object.keys(TESTS)) writeFileSync(join(OUT, `evidence-cell-geometry-${claimId}.trig`), evidenceTrig(claimId, created));
+  console.log(`wrote ${used.length + Object.keys(TESTS).length} nanopubs to ${OUT} (generator commit ${commit}${dirty ? ", working tree DIRTY: drafts only, do not sign" : ""})`);
+}
