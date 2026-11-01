@@ -14,7 +14,7 @@ Public addresses: [delphibio.org](https://delphibio.org) (site), [`mcp.delphibio
 
 **Five minutes:**
 
-1. **Read** the [project report](https://delphibio.org/blog/science-claw-2026.html) (all figures built from the repo by `scripts/site/build-blog.mjs`) or the six-slide [overview deck](https://delphibio.org/deck/).
+1. **Read** the [project report](https://delphibio.org/blog/science-claw-2026.html) (all figures built from the repo by `scripts/site/build-blog.mjs`) or the six-slide [overview deck](https://delphibio.org/deck/) ([PDF](https://delphibio.org/deck/overview-deck.pdf)).
 2. **Look**: the [claim graph](https://delphibio.org/claim-graph.html), the [theorems](https://delphibio.org/theorems.html), the [team page](https://delphibio.org/team.html), the live [mission-control dashboard](https://delphi-mission-control.ashenoy000.workers.dev/start/) and the [Claim Book](https://delphi-mission-control.ashenoy000.workers.dev/proofs/) (source, Lean proof, data verdict and faithfulness verdict for each claim).
 3. **Query it yourself.** Add `{ "mcpServers": { "delphisci": { "url": "https://mcp.delphibio.org/mcp" } } }` to any MCP client (no install, no key) and call `delphi_overview`, then `delphi_claim_tests`. From a clone, `npm install && node mcp/cli.mjs overview` gives the same result.
 4. **Check a result**: every tested claim and its verdict is in [`test-data/claim-tests/SUMMARY.md`](test-data/claim-tests/SUMMARY.md). Each verdict links to a `result.json` with its pre-registered pass and fail criteria. `npm run claims:exec` re-runs the Lean proofs and data tests and reports each one as reproduced, drifted, failed or skipped.
@@ -220,7 +220,7 @@ thread's status live.
 | [Claim Book](https://delphi-mission-control.ashenoy000.workers.dev/proofs/) | Each formalised claim end to end: source, data verdict, the Lean source, the prover's own explanation beside each step, the mutations that had to fail, and the faithfulness verdict. |
 | [Figures](https://delphi-mission-control.ashenoy000.workers.dev/figures/) | Every figure with its data source and SHA-256, including the flight phylogeny and gene families. |
 | [Deck](https://delphi-mission-control.ashenoy000.workers.dev/deck/) | The running pitch; unevidenced slides are greyed out. A PowerPoint is built from the same data. |
-| [Project overview deck](https://delphibio.org/deck/) | Six slides: why Lean for biology, what Delphi uncovered, the flying-fish design across eight scales of evidence, the measured swarm and its collaborators, applications and thanks. Counts are built from `docs/claims.json`, the organism inventory and the Lean registry by `node scripts/site/build-overview-deck.mjs`. |
+| [Project overview deck](https://delphibio.org/deck/) | Six slides (also as a [PDF](https://delphibio.org/deck/overview-deck.pdf)): why Lean for biology, what Delphi uncovered, the measured swarm and its collaborators, the flying-fish design across eight scales of evidence, applications and thanks. Counts are built from `docs/claims.json`, the organism inventory and the Lean registry by `node scripts/site/build-overview-deck.mjs`. |
 | [Lean](https://delphi-mission-control.ashenoy000.workers.dev/t/lean/) | The 53 laws in the Lean registry, zero `sorry`, statement-level mutation testing, the constraint checker and the open-problems elimination ledger. |
 
 **Where things live**
