@@ -39,7 +39,7 @@ small returned diagnostic bundle uses the existing verified log transport.
 A separate resumable-session path passed real checks at7:45–7:48pm PDT. The
 operator initiated exact create-only objects with existing credentials, then the
 worker-style uploader sent no OAuth credentials. Its45-byte probe passed GCS
-Content-MD5 metadata and independent operator SHA256 download checks. An earlier
+server-reported MD5 and independent operator SHA256 download checks. An earlier
 probe rejected overwrite withHTTP412. The reusable persisted cancellation timer
 ran after the initiating process exited, cancelled the pending session with499,
 and a later upload to that session returned499. Completed probe objects remain
