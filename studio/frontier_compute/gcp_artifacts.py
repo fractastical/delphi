@@ -239,6 +239,51 @@ class GCS:
         _, _, body = _bounded_response_bytes(self.opener, req, max_bytes)
         return body
 
+    def download_to_path(self, bucket: str, object_name: str, destination: Path,
+                         max_bytes: int, expected_sha256: str):
+        """Stream a bounded object to disk, hash it, and atomically publish on success."""
+        if not isinstance(max_bytes, int) or max_bytes < 0:
+            raise ValueError("max_bytes must be a nonnegative integer")
+        destination = Path(destination)
+        _mkdir_without_symlinks(destination.parent)
+        if destination.is_symlink():
+            raise ValueError("refusing linked artifact destination")
+        url = ("https://storage.googleapis.com/download/storage/v1/b/" + urllib.parse.quote(bucket, safe="")
+               + "/o/" + urllib.parse.quote(object_name, safe="") + "?alt=media")
+        req = urllib.request.Request(url, headers=self._auth_headers())
+        try:
+            response = self.opener(req, timeout=300)
+        except urllib.error.HTTPError as error:
+            body = error.read(2048)
+            raise RuntimeError(f"GCS request failed with HTTP {error.code}: {body[:500].decode('utf-8', 'replace')}") from None
+        temp_fd, temp_name = tempfile.mkstemp(prefix=".gcs-download-", dir=destination.parent)
+        digest = hashlib.sha256()
+        total = 0
+        try:
+            with response, os.fdopen(temp_fd, "wb") as target:
+                while True:
+                    chunk = response.read(min(1024 * 1024, max_bytes + 1 - total))
+                    if not chunk:
+                        break
+                    total += len(chunk)
+                    if total > max_bytes:
+                        raise ValueError("remote object exceeds configured collection limit")
+                    digest.update(chunk)
+                    target.write(chunk)
+                target.flush()
+                os.fsync(target.fileno())
+            actual_sha = digest.hexdigest()
+            if actual_sha != expected_sha256:
+                raise ValueError("artifact SHA-256 mismatch")
+            if destination.exists():
+                if destination.is_symlink() or _sha256_path(destination) != actual_sha:
+                    raise ValueError(f"refusing to overwrite different or linked artifact: {destination}")
+                return actual_sha, total
+            os.replace(temp_name, destination)
+            return actual_sha, total
+        finally:
+            Path(temp_name).unlink(missing_ok=True)
+
 
 def upload_run(gcs: GCS, bucket: str, prefix: str, output_dir: Path, record: dict,
                max_total_bytes: int = 512 * 1024 * 1024, complete: bool = True) -> dict:
@@ -324,6 +369,34 @@ def _write_verified(destination: Path, data: bytes, digest: str):
         Path(tempname).unlink(missing_ok=True)
 
 
+def _sha256_path(path: Path):
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        while chunk := stream.read(1024 * 1024):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _mkdir_without_symlinks(directory: Path):
+    directory = Path(directory)
+    missing = []
+    current = directory
+    while not current.exists():
+        if current.is_symlink():
+            raise ValueError("destination path traverses a symlink")
+        missing.append(current)
+        current = current.parent
+    if current.is_symlink():
+        raise ValueError("destination path traverses a symlink")
+    for path in reversed(missing):
+        path.mkdir()
+    current = directory
+    while current != current.parent:
+        if current.is_symlink():
+            raise ValueError("destination path traverses a symlink")
+        current = current.parent
+
+
 def collect(gcs: GCS, bucket: str, prefix: str, destination: Path,
             max_total_bytes: int = 2 * 1024 * 1024 * 1024, require_complete: bool = False) -> dict:
     prefix = prefix.strip("/")
@@ -353,7 +426,7 @@ def collect(gcs: GCS, bucket: str, prefix: str, destination: Path,
     job = validate_record(manifest["job"])
     snapshot_id = PurePosixPath(manifest_name).name.removesuffix(".json")
     task_dir = destination / safe_component(job["task_id"], "task_id") / safe_component(job["job_id"], "job_id") / safe_component(snapshot_id, "snapshot_id")
-    task_dir.mkdir(parents=True, exist_ok=True)
+    _mkdir_without_symlinks(task_dir)
     expected_total = sum(int(a["bytes"]) for a in manifest["artifacts"])
     if expected_total > max_total_bytes:
         raise ValueError("manifest artifact total exceeds collection limit")
@@ -374,14 +447,18 @@ def collect(gcs: GCS, bucket: str, prefix: str, destination: Path,
         expected_size = artifact.get("bytes")
         if not isinstance(expected_size, int) or expected_size < 0 or expected_size > max_total_bytes:
             raise ValueError("invalid artifact size in manifest")
-        data = gcs.download(bucket, obj_name, max_bytes=expected_size)
-        if len(data) != expected_size:
-            raise ValueError(f"artifact size mismatch: {rel}")
-        _verify_remote_metadata(remote, data)
         target = task_dir / Path(*PurePosixPath(rel).parts)
-        _write_verified(target, data, artifact["sha256"])
+        digest, actual_size = gcs.download_to_path(bucket, obj_name, target, max_bytes=expected_size,
+                                                   expected_sha256=artifact["sha256"])
+        if actual_size != expected_size:
+            raise ValueError(f"artifact size mismatch: {rel}")
+        remote_metadata = remote.get("metadata") or {}
+        if remote_metadata.get("sha256") and remote_metadata["sha256"] != digest:
+            raise ValueError(f"GCS metadata SHA mismatch for {obj_name}")
+        if remote_metadata.get("bytes") is not None and int(remote_metadata["bytes"]) != actual_size:
+            raise ValueError(f"GCS metadata size mismatch for {obj_name}")
         rows.append({"path": rel, "local_path": str(target), "object_name": obj_name,
-                     "sha256": artifact["sha256"], "bytes": len(data)})
+                     "sha256": digest, "bytes": actual_size})
 
     receipt = {"schema": SCHEMA, "collected_utc": utc_now(), "bucket": bucket, "requested_prefix": prefix,
                "prefix": manifest["prefix"],

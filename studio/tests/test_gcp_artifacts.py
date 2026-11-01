@@ -1,3 +1,4 @@
+import hashlib
 import json
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -28,10 +29,14 @@ class Response:
         self.headers = headers or {}
         self.status = status
         self.read_sizes = []
+        self.position = 0
 
     def read(self, size=-1):
         self.read_sizes.append(size)
-        return self.body if size < 0 else self.body[:size]
+        end = len(self.body) if size < 0 else min(len(self.body), self.position + size)
+        data = self.body[self.position:end]
+        self.position = end
+        return data
 
     def __enter__(self):
         return self
@@ -189,3 +194,26 @@ def test_download_reads_at_most_cap_plus_one_bytes():
     with pytest.raises(ValueError, match="collection limit"):
         client.download("bucket", "prefix/object", max_bytes=3)
     assert response.read_sizes == [4]
+
+
+def test_large_artifact_download_streams_in_bounded_chunks(tmp_path):
+    payload = b"abc123\n" * 400_000
+    response = Response(body=payload)
+    client = GCS(lambda: "test-token", lambda req, timeout=60: response)
+    destination = tmp_path / "nested/output.bin"
+    digest, size = client.download_to_path("bucket", "prefix/object", destination, len(payload),
+                                           hashlib.sha256(payload).hexdigest())
+    assert size == len(payload)
+    assert digest == hashlib.sha256(payload).hexdigest()
+    assert destination.read_bytes() == payload
+    assert all(0 < n <= 1024 * 1024 for n in response.read_sizes)
+
+
+def test_streaming_download_removes_oversized_partial_file(tmp_path):
+    response = Response(body=b"oversized")
+    client = GCS(lambda: "test-token", lambda req, timeout=60: response)
+    destination = tmp_path / "nested/output.bin"
+    with pytest.raises(ValueError, match="collection limit"):
+        client.download_to_path("bucket", "prefix/object", destination, 3, "0" * 64)
+    assert not destination.exists()
+    assert list(destination.parent.glob(".gcs-download-*")) == []

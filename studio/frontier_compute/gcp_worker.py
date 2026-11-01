@@ -10,6 +10,7 @@ import argparse
 import base64
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -37,6 +38,8 @@ def validate(spec):
         raise ValueError("Task command must be an argv list")
     if not re.fullmatch(r"[a-f0-9]{64}", spec["source_sha256"]):
         raise ValueError("Source hash required")
+    if not re.fullmatch(r"out(?:-[a-z0-9]+)*", spec.get("output_directory", "out")):
+        raise ValueError("Invalid output directory")
     # Only declared, nonsensitive task parameters are permitted in metadata.
     for key in spec.get("env", {}):
         if re.search(r"token|secret|password|credential|api.?key", key, re.I):
@@ -80,9 +83,46 @@ def now():
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 
+def extract_source(archive, source, output):
+    members = archive.getmembers()
+    for member in members:
+        if not (member.isfile() or member.isdir()) or Path(member.name).is_absolute() or ".." in Path(member.name).parts:
+            raise ValueError("Unsafe packet member")
+        target = source / member.name
+        for part in [target, *target.parents]:
+            if part == source.parent:
+                break
+            if part.is_symlink():
+                raise ValueError("Packet target traverses a symlink")
+    try:
+        archive.extractall(source, filter="data")
+    except TypeError as error:
+        if "filter" not in str(error) or "unexpected keyword" not in str(error):
+            raise
+        # Debian's older Python3.11 can lack the extraction-filter backport.
+        # All members were checked before extraction; copy regular bytes only,
+        # never applying archive modes, ownership, links or special-file types.
+        receipt = {"utc": now(), "python": sys.version, "observed_exception": repr(error),
+                   "repair": "Validated regular-file copying; traversal/link/special-file refusals retained"}
+        (output / "tar-extraction-compatibility.json").write_text(json.dumps(receipt, indent=2))
+        print("FRONTIER_TAR_COMPATIBILITY " + json.dumps(receipt), flush=True)
+        for member in members:
+            target = source / member.name
+            if member.isdir():
+                target.mkdir(parents=True, exist_ok=True)
+            else:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                with archive.extractfile(member) as incoming, target.open("wb") as outgoing:
+                    shutil.copyfileobj(incoming, outgoing)
+
+
 def export_snapshot(spec, output, rc, started):
     """Copy an immutable tree before hashing; skip a concurrently changing file."""
     stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime())
+    (output / "host-sample.json").write_text(json.dumps({"observed_utc": now(),
+        "logical_cpus": os.cpu_count(), "load_1_5_15": os.getloadavg(),
+        "cpu_pressure": Path("/proc/pressure/cpu").read_text(),
+        "scope": "Instant worker host sample; allocation is not utilization."}, indent=2))
     with tempfile.TemporaryDirectory(prefix="export-", dir=ROOT) as temp:
         snapshot = Path(temp) / "out"
         snapshot.mkdir()
@@ -104,7 +144,8 @@ def export_snapshot(spec, output, rc, started):
             "skipped_mutable_files": skipped, "complete_collection_possible": rc is not None and not skipped}, indent=2))
         record = {"job_id": spec["vm"], "task_id": spec["task_id"], "source_commit": spec["source_commit"],
                   "source_sha256": spec["source_sha256"], "input_sha256": spec.get("input_sha256", {}),
-                  "parameters": spec.get("parameters", {}), "command": spec["argv"], "exit_code": rc}
+                  "parameters": spec.get("parameters", {}), "command": spec["argv"], "exit_code": rc,
+                  "started_utc": started, "finished_utc": now() if rc is not None else None}
         record_path = Path(temp) / "record.json"
         record_path.write_text(json.dumps(record))
         command = [sys.executable, str(ROOT / "gcp_artifacts.py"), "upload", "--bucket", spec["bucket"],
@@ -122,26 +163,27 @@ def run(spec):
     import tarfile
 
     validate(spec)
-    source, output = ROOT / "src", ROOT / "out"
+    source, output = ROOT / "src", ROOT / spec.get("output_directory", "out")
     source.mkdir(exist_ok=True)
     output.mkdir(exist_ok=True)
     packet = ROOT / "packet.tar"
     if hashlib.sha256(packet.read_bytes()).hexdigest() != spec["source_sha256"]:
         raise ValueError("VM packet hash mismatch")
     with tarfile.open(packet) as archive:
-        for member in archive.getmembers():
-            if not (member.isfile() or member.isdir()) or Path(member.name).is_absolute() or ".." in Path(member.name).parts:
-                raise ValueError("Unsafe packet member")
-        archive.extractall(source, filter="data")
+        extract_source(archive, source, output)
     started = now()
     (output / "dispatch.json").write_text(json.dumps({"spec": spec, "started_utc": started}, indent=2))
     try:
         with (output / "console.log").open("w") as log:
             process = subprocess.Popen(systemd_argv(spec, source, output), stdout=log, stderr=subprocess.STDOUT)
-            next_export = time.monotonic() + spec["export_interval_s"]
+            # Confirm the attached-identity transport promptly during setup.
+            next_export = time.monotonic() + 30
             while process.poll() is None:
                 if time.monotonic() >= next_export:
-                    export_snapshot(spec, output, None, started)
+                    try:
+                        export_snapshot(spec, output, None, started)
+                    except (OSError, ValueError, subprocess.SubprocessError) as error:
+                        print(json.dumps({"event": "partial_export_failed", "error": str(error)[:500]}), flush=True)
                     next_export = time.monotonic() + spec["export_interval_s"]
                 time.sleep(5)
         rc = process.returncode
