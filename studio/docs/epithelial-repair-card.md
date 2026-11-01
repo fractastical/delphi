@@ -32,10 +32,25 @@ No full-text copy of any paywalled article is mirrored in this repository.
 
 ## 2. Scale mapping — declared, not fitted
 
-64 seeds on a 200×200 lattice give a mean cell area of **625 nodes by construction**. That
-is equated to the area of a 26 µm disc, the average cell diameter Bai & Zeng take from
-experimental measurement. Hence **1 node = 0.84949 µm²**, node length 0.92168 µm, and the
-lattice is 184.3 × 184.3 µm — smaller than their 400 × 400 µm sheet.
+The model requests 64 seeds on a 200×200 lattice, giving a **VolumeConstraint target of 625
+nodes per cell**. That target is equated to the area of a 26 µm disc, the average cell
+diameter Bai & Zeng take from experimental measurement. Hence **1 node = 0.84949 µm²**, node
+length 0.92168 µm, and the lattice is 184.3 × 184.3 µm — smaller than their 400 × 400 µm sheet.
+
+**625 is the target, not the realised mean.** `InitDistribute` actually places **65** cells,
+so the realised mean cell area on an unwounded sheet is 40 000/65 = **615.38 nodes**, and the
+cells sit about 1.5% below target. Anchoring the same 26 µm disc on the realised mean instead
+would give 1 node = 0.86275 µm² and gaps of 539 / 2 157 / 3 775 µm² for *k* = 1 / 4 / 7 —
+still inside Bai & Zeng's studied 400–4 900 µm² range, like the figures in the table below.
+**Every µm² figure in this card therefore carries about ±1.6% from this choice of anchor**,
+which is far smaller than the uncalibrated-model caveats in §8 and is recorded rather than
+hidden. The published artifacts use the target-anchored mapping throughout.
+
+*(Corrected 2026-10-31 after independent review read the raw runs. This section previously
+said "mean cell area of 625 nodes by construction", conflating the target with the mean, and
+gave the nominal 64 rather than the 65 cells actually placed. The logger and the TIFF agree
+on 65 living IDs in the unwounded arm, so the two channels were never in conflict — the
+error was in the card's description, not in the measurement.)*
 
 Wounds are made by removing *k* central cells, exactly as Bai & Zeng describe. Every removed
 cell is exactly 625 nodes, so initial gap areas are exact:
@@ -58,9 +73,26 @@ is the sensitivity probe for it.
 
 Two gates check the instrument before any result is read:
 
-- **G1b** compares that against an **independent channel** — counting medium pixels in the
-  lattice images Morpheus' `TiffPlotter` writes. The two share no code. Across all 36 arms
-  and every written frame they disagree on **zero** frames.
+- **G1b is INCOMPLETE, not a pass.** It compares the gap against an **independent channel** —
+  counting medium pixels in the lattice images Morpheus' `TiffPlotter` writes, which shares no
+  code with the logger. The frozen rule is *"every arm and **every** TIFF frame"*. Only
+  **756 of 1 476 frames (51.2%)** are evaluable at all: the logger samples every 10 model time
+  units and the TIFF every 25, so only their common multiples line up, and 20 of each arm's 41
+  frames have no logger sample to compare against. **Zero of the 756 disagree** — consistent
+  everywhere it can be checked, which is useful evidence — but 720 frames cannot be checked
+  with the data that exists, so the frozen rule is unmet rather than satisfied.
+
+  | | |
+  |---|---|
+  | **Reported** at `9429a21` and `edc1e10` | G1b **passed**, "0 frames disagree" |
+  | **Independently assessed** (2026-10-31) | G1b **INCOMPLETE** — frozen rule unevaluable on 48.8% of frames |
+
+  Both are kept. The reported status is the historical record and is not rewritten; the
+  assessment supersedes it going forward. *Two errors of mine produced this: the card first
+  claimed agreement over "every written frame" when the gate silently skipped 720, and then —
+  worse — I narrowed the criterion to the shared times and kept the PASS. **That is relaxing
+  an acceptance to make it pass**, which the protocol forbids outright. The frozen rule text
+  is unchanged; only the verdict is corrected, and no threshold was moved to accept anything.*
 - **G3** confirms every initial gap is exactly 625·*k*. **G5** confirms an unwounded sheet
   reads exactly 0 at every logged time — a gap measure that cannot report zero cannot report
   closure. **G2** confirms no cell is created or destroyed after wounding.
@@ -77,6 +109,33 @@ can claim at most 38 125 of 40 000 nodes, which leaves **1 875 nodes of residual
 the most the hole can be filled by cells relaxing into volume they were already short of is
 2 500 − 1 875 = **625 nodes, i.e. 25.0%**. Measured is 551 nodes, 22.0%, just under that
 ceiling because the surface constraint holds cells slightly below target.
+
+**The ceiling is 625 nodes at every gap size, and 22% is NOT a constant to subtract.**
+`InitDistribute` places **65** cells, so the population targets 65 × 625 = 40 625 nodes on a
+40 000-node lattice — over-subscribed by exactly one cell's worth. Whatever is removed, the
+survivors can collectively absorb exactly **625 extra nodes**. As a fraction of the wound
+that is wildly different:
+
+| *k* | survivors | gap (nodes) | residual at target | passive ceiling | **as % of this gap** |
+|---|---|---|---|---|---|
+| 1 | 64 | 625 | **0** | 625 | **100%** |
+| 4 | 61 | 2 500 | 1 875 | 625 | 25.0% |
+| 7 | 58 | 4 375 | 3 750 | 625 | 14.3% |
+
+**This confounds the *k*=1 arm outright: a one-cell wound can close completely by passive
+volume relaxation, with no mechanism at all.** That is the explanation for §6's finding that
+*k*=1 never arrests at any λ_V — it was never a mechanism test. It is also why the *k*=1
+rung is excluded from the rule's domain, and the exclusion is now mechanistic rather than
+merely empirical.
+
+The passive arm was measured **only at *k*=4**. The 22.0% is that arm's number; the 100% and
+14.3% entries above are the *arithmetic ceilings*, not measurements, and no passive arm was
+run at *k*=1 or *k*=7. So "subtract 22 points" is wrong everywhere except *k*=4, and even
+there it is a **hypothesis about the cause** of the first quarter of closure — consistent
+with the measurement, not proven to be its mechanism.
+
+*(Added 2026-10-31 after independent review read the raw runs. The card previously implied
+one universal floor.)*
 
 *(Corrected 2026-10-31 after independent review of `edc1e10`. An earlier version of this
 paragraph called 1 875 the number of nodes **filled**. It is the residual, and the filled
@@ -155,7 +214,11 @@ handoff exists precisely because one doubling is one test.
 **Where it breaks (G12, fails).**
 
 - *k*=1 **never arrests**, at any λ_V tried up to 5 000, where Φ ≈ 2 460 — while *k*=4
-  already arrests by Φ ≈ 4.13. The group does not govern a single-cell wound at all.
+  already arrests by Φ ≈ 4.13. The group does not govern a single-cell wound at all, and
+  **§4 now gives the reason: at *k*=1 the passive ceiling is 100% of the wound**, so a
+  one-cell gap can close with no mechanism acting. That arm cannot discriminate between
+  closure mechanisms in either direction, and the Φ failure at *k*=1 is a confound rather
+  than a refutation of the group there.
 - *k*=4 and *k*=7 share the bracket (0.3, 1.0), while Φ predicts their thresholds should
   differ by 2.4×. Φ* is 2.26 and 5.51 — a spread ratio of 2.43, not a constant.
 
@@ -169,16 +232,27 @@ the scaling over a wider range of J.
 
 ## 7. Numerical controls
 
-**Tally: 8 pass, 3 fail, 1 descriptive, 1 unevaluable** — 13 in all. **G6 is descriptive and
-is not a pass**: it was declared with no threshold, because three seeds of one model are not
-independent samples, and no bound is invented for it now. G8 is unevaluable, which is also
-not a pass. *(Corrected after independent review of `edc1e10`, where this was stated as
-9 pass by counting G6 among them.)*
+**Strict tally: 7 pass, 3 fail, 1 descriptive (G6), 2 incomplete or unevaluable (G1b, G8)** —
+13 in all. Only the 7 are passes. **G6 is descriptive**: declared with no threshold, because
+three seeds of one model are not independent samples, and no bound is invented for it now.
+**G8 is unevaluable** and **G1b is incomplete** — neither is a pass, and neither is a fail.
+
+| status | gates | count |
+|---|---|---|
+| pass | G1, G2, G3, G5, G7, G9, G11 | **7** |
+| fail | G4, G10, G12 | **3** |
+| descriptive, no verdict declared | G6 | 1 |
+| incomplete / unevaluable | G1b, G8 | 2 |
+
+*(Two corrections after independent review. At `edc1e10` this was stated as 9 pass by
+counting descriptive G6 among the passes; the intermediate correction said 8, which still
+counted G1b as a pass on a criterion I had narrowed to make it fit. The reported statuses at
+`9429a21` and `edc1e10` are preserved in `results-r2.json` beside the assessment.)*
 
 | gate | result | |
 |---|---|---|
 | G1 area conservation | **pass** | gap is an exact integer complement at every sample |
-| G1b independent TIFF channel | **pass** | 0 disagreeing frames, 36 arms |
+| G1b independent TIFF channel | **INCOMPLETE** | frozen rule is *every* frame; 756/1476 (51.2%) evaluable, 0 of those disagree. Reported as a pass at `9429a21`/`edc1e10`; that status is retained as history, not as a verdict |
 | G2 cell count constant | **pass** | |
 | G3 initial gap = 625·k | **pass** | |
 | G4 one-drive negative control | **FAIL** | mis-specified; see §4. Retained, not relabelled |

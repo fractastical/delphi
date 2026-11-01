@@ -115,15 +115,49 @@ def main() -> None:
            if abs(s["gap"] + (TOTAL_NODES - s["gap"]) - TOTAL_NODES) > 1e-9 or s["gap"] < -1e-9 or s["gap"] % 1 != 0]
     gates.append(dict(id="G1", passed=not bad, detail=f"{len(bad)} non-integer or negative gap samples"))
 
-    # G1b independent TIFF channel
-    mism = []
+    # G1b independent TIFF channel.
+    # The logger samples at log_step and the TIFF at frame_step; only frames whose model time
+    # is also a logged time can be compared pointwise. Reporting "0 disagreements" without the
+    # denominator overstates the check, which is what happened at edc1e10: 756 of 1476 frames
+    # are comparable and the other 720 were silently skipped. The coverage is now part of the
+    # gate, and a gate that compares nothing cannot pass.
+    mism, comparable, frames_total = [], 0, 0
     for n, A in arms.items():
         lg = {s["t"]: s["gap"] for s in A["series"]}
         for t, med, _ in tiff_gap(runs / n, A["arm"]["frame_step"]):
-            if t in lg and abs(lg[t] - med) > 0:
+            frames_total += 1
+            if t not in lg:
+                continue
+            comparable += 1
+            if abs(lg[t] - med) > 0:
                 mism.append((n, t, lg[t], med))
-    gates.append(dict(id="G1b", passed=not mism, detail=f"{len(mism)} frames disagree between logger and TIFF",
-                      examples=mism[:5]))
+    cov = comparable / frames_total if frames_total else 0.0
+    # The FROZEN rule is "every arm and every TIFF frame". 20 of each arm's 41 frames have no
+    # logger sample at the same model time, so the rule cannot be evaluated on them with the
+    # data that exists. Narrowing the criterion to the shared times and reporting PASS would be
+    # relaxing an acceptance to make it pass, which the protocol forbids. The verdict is
+    # therefore INCOMPLETE (passed=None), NOT a pass, and the partial agreement is reported
+    # beside it as the useful evidence it is. The status originally reported at 9429a21 is
+    # preserved here rather than overwritten.
+    gates.append(dict(
+        id="G1b", passed=None, verdict="INCOMPLETE",
+        detail=(f"frozen rule requires EVERY written frame; only {comparable} of {frames_total} "
+                f"({cov:.1%}) are evaluable. 0 disagreements on those; the remaining "
+                f"{frames_total - comparable} cannot be checked against the logger at all."),
+        frozen_rule_scope="every arm and every TIFF frame",
+        evaluable=dict(frames_written=frames_total, frames_comparable=comparable,
+                       frames_not_comparable=frames_total - comparable, fraction=cov,
+                       disagreements=len(mism), examples=mism[:5],
+                       why="logger time-step 10 and TIFF time-step 25 share only their common "
+                           "multiples. The uncompared frames are not evidence of agreement."),
+        partial_result="consistent on every frame that can be compared; useful, but not the "
+                       "frozen rule and not a pass",
+        reported_history=dict(
+            at="9429a21 (revision 1 results) and edc1e10 (handoffs)", reported_passed=True,
+            reported_detail="0 frames disagree between logger and TIFF",
+            retained_because="the reported status is the historical record and is preserved "
+                             "rather than rewritten; this entry is the independent assessment, "
+                             "which supersedes it going forward without erasing it")))
 
     # G2 cell count constant
     g2 = [n for n, A in arms.items() if len({s["n"] for s in A["series"]}) != 1]

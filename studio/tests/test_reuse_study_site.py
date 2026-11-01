@@ -80,13 +80,15 @@ def test_epithelial_entry_reports_the_files_own_gates_and_keeps_every_failure():
     v = _epithelial()
     g = v["summary"]["gates"]
     res = json.loads((ROOT / "artifacts/epithelial/results-r2.json").read_text())["gates"]
-    r, rv = g["reported"], g["independent_review"]
-    assert r["total"] == len(res) == 13 and r["pass"] == sum(x["passed"] is True for x in res) == 8 and r["fail"] == sum(x["passed"] is False for x in res) == 3
-    assert r["descriptive"] == ["G6"] and r["unevaluable"] == ["G8"]                  # the file's own historical statuses, unchanged
-    assert rv["pass"] == 7 and rv["fail"] == 3 and rv["incomplete_or_unevaluable"] == ["G1b", "G8"] and rv["no_all_frames_claim"] is True
-    assert "G1b" in json.dumps(v["records_kept"]) and "independently assessed incomplete" in json.dumps(v["records_kept"])
+    st = g["strict"]
+    assert st["total"] == len(res) == 13 and st["pass"] == sum(x["passed"] is True for x in res) == 7 and st["fail"] == sum(x["passed"] is False for x in res) == 3
+    assert st["descriptive"] == ["G6"] and st["incomplete_or_unevaluable"] == ["G1b", "G8"] and st["no_all_frames_claim"] is True
+    assert st["ids"]["G1b"] == "incomplete" and "9429a21" in g["reported_history"]["original"] and g["reported_history"]["G1b"]["reported_passed"] is True
+    g1b = next(x for x in res if x["id"] == "G1b")
+    assert g1b["passed"] is None and g1b["evaluable"]["frames_comparable"] == 756 and g1b["evaluable"]["frames_written"] == 1476
+    assert "756 of 1476" in v["summary"]["readout_check"]["G1b"] and "G1b incomplete" in json.dumps(v["records_kept"])
     text = json.dumps(v)
-    for needle in ("G4 fail", "G10 fail", "G12 fail", "G8 not_pass_fail", "not an observed point threshold", "REPORTED pass, independently assessed incomplete", "not a physical law", "not supported in this model", "tested model hypothesis", "615.4", "21", "context-specific control"):
+    for needle in ("G4 fail", "G10 fail", "G12 fail", "G8 unevaluable", "not an observed point threshold", "INCOMPLETE, not a pass", "not a physical law", "not supported in this model", "tested model hypothesis", "615.4", "21", "context-specific control"):
         assert needle in text
     pair = v["summary"]["pair"]
     assert pair["closes"]["state"] == "CLOSED" and pair["arrests"]["state"] == "ARRESTED"
@@ -123,7 +125,7 @@ def test_card_errata_is_offered_beside_the_uncorrected_card():
     ep = next(c for c in A.build(Ins(), {}, ROOT)["visuals"] if c["study"] == "epithelial-repair")
     text = (ROOT / ep["errata_href"]).read_text()
     assert ep["errata_href"].endswith("epithelial-card-errata.md")
-    assert "8 pass" in text and "625 nodes are filled" in text and "geometric mean" in text
+    assert "7 pass" in text and "625 nodes are filled" in text and "geometric mean" in text and "756 of 1476" in text
 
 
 def test_card_download_is_remapped_and_never_offered_without_errata():
