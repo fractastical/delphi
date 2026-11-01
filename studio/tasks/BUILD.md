@@ -1,11 +1,11 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated November 1, 2026, 12:47am PDT.
+Coordinator: codex-03. Updated November 1, 2026, 12:45am PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-017 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — November 1, 2026, 12:47am PDT
+## Current checkpoint — November 1, 2026, 12:45am PDT
 
 - [x] Integrated the independently reviewed 240-arm epithelial followup with
   source-bound intervals, the original frozen FAIL and corrected figure counts.
