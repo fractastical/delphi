@@ -12,6 +12,12 @@ Every number in these files was read from the site's own published data snapshot
 snapshot label `7d83f2d56c3b`) or from a receipt file named beside the number. Where
 a figure is unknown, these pages say unknown rather than estimating it.
 
+## Read one file instead
+
+**[SUMMARY.md](SUMMARY.md)** consolidates all ten pages below into a single document, with
+the full measured accounting of tokens, agents, models, commits and compute. If you only
+open one file, open that one.
+
 ## Contents
 
 | File | What it covers |
