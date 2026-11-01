@@ -1,0 +1,129 @@
+{
+  "schema": "frontier.fin-ray.protocol/1",
+  "question": "Within the published constant-parameter two-hemitrich ray model, how does prescribed base sliding change normalized ray curvature and shape under a fixed uniform load, and what is the unloaded generalized base-shift stiffness?",
+  "scope": "Static planar single segmented bluegill-ray model, not flying-fish calibration, aggregate fin EI, tissue-growth or muscle/neuronal actuator validation",
+  "source": {
+    "doi": "10.1098/rsif.2006.0181",
+    "title": "The mechanics of active fin-shape control in ray-finned fishes",
+    "url": "https://bpb-us-e1.wpmucdn.com/sites.harvard.edu/dist/6/58/files/2022/03/AlbenMaddenLauder2007.pdf",
+    "sha256": "03f39a22d3fd47b6c4552240b524f954090dc133d2418a6825fcea4762b51237",
+    "bytes": 409170,
+    "read_method": "Direct public author PDF; text extraction and original Fig8 page image inspected. PMC later reCAPTCHA, Jina unsuccessful.",
+    "selectors": [
+      "Eq3.9 sliding/curvature",
+      "Eq3.11-13 internal energy and variation",
+      "Eq3.14 centerline equilibrium",
+      "Sec3.2 fused tip/base shift BCs",
+      "Eq3.17-18 shape reconstruction",
+      "Sec3.3 nondimensionalization",
+      "Sec5.3 Eq5.2 uniform loading and Fig8b"
+    ]
+  },
+  "equations": {
+    "equilibrium": "-2 B phi_ss + G phi - p d (1-s)=0",
+    "BC": "phi(0)=phi0; phi(1)=0; theta(0)=0; x(0)=y(0)=0",
+    "curvature": "kappa=-phi_s/d",
+    "shape": "theta=(phi0-phi)/d; x_s=cos(theta); y_s=sin(theta)",
+    "closed_form": "a=sqrt(G/(2B)); c=pd/G; phi=(phi0-c)sinh(a(1-s))/sinh(a)+c(1-s)",
+    "unloaded_energy": "U=int_0^1[B phi_s^2/d^2+G phi^2/(2d^2)]ds",
+    "derived_unloaded_base_stiffness": "d2U/dphi0^2=2 B a coth(a)/d^2; derived here from energy for p=0,fusedtip; not measured stiffness"
+  },
+  "units": {
+    "all_numeric_inputs": "dimensionless, paper Sec3.3",
+    "s": "s_dim/L",
+    "d": "d_dim/L",
+    "phi": "phi_dim/L",
+    "kappa": "kappa_dim*L",
+    "B": "B_dim/B0, B_dim inN m^2",
+    "G": "G_dim*L^2/B0, G_dim inN =3Dshear modulus(Pa)*intraray cross-sectional area(m^2); not Pa",
+    "p": "p_dim*L^3/B0, p_dim force per ray arclength N/m, not pressurePa; derived dimensional balance",
+    "U": "U_dim*L/B0",
+    "base_shift_stiffness": "K_dim*L^3/B0, generalized axial sliding stiffness N/m, not bending EI",
+    "L_m": null,
+    "B0_N_m2": null,
+    "intraray_area_m2": null
+  },
+  "cases": {
+    "B": [
+      1.0
+    ],
+    "d": [
+      0.01
+    ],
+    "G": [
+      20.0,
+      200.0,
+      2000.0
+    ],
+    "phi0": [
+      0.0,
+      0.005,
+      0.01,
+      0.015
+    ],
+    "p": [
+      0.0,
+      200.0
+    ],
+    "count": 24,
+    "source_parameters": "B1,d.01,G200,phi0.01,p200 printed Sec5.3/Fig8b; all other values declared illustrative design perturbations, not sampled measurements"
+  },
+  "methods": {
+    "solver": "scipy.integrate.solve_bvp explicit second-order equilibrium,101initial mesh,tol1e-10,maxnodes10000",
+    "analysis_grid_points": 1001,
+    "shape_integral": "scipy.integrate.cumulative_simpson",
+    "reference": "published Eq5.2 analytic phi and derivative; not an independent biological solver"
+  },
+  "controls": {
+    "closed_form_max_phi_absolute_error": 1e-08,
+    "closed_form_max_curvature_absolute_error": 1e-06,
+    "BC_absolute_error": 1e-10,
+    "G0_p0": "phi=phi0(1-s), kappa=phi0/d",
+    "printed_cancellation": "source parameters give pd/G=phi0 exactly; curvature=1, circle tip x=sin(1),y=1-cos(1)",
+    "circle_tip_absolute_error": 1e-09,
+    "analytic_wrong_curvature_sign_must_fail": true,
+    "analytic_wrong_load_sign_must_fail": true,
+    "numerical_refinement": "recompute at tol1e-8 and1e-10, report both errors; no observed order claim"
+  },
+  "source_disagreement": {
+    "printed_Eq5_2_and_parameters": "predict constant positive curvature at the stated parameters",
+    "printed_Fig8b_and_text": "show/describe S-shaped reversal for same listed parameters; caption also cites Eq5.1 for uniform load",
+    "rule": "Preserve discrepancy; no parameter/sign tuning, digitized fit or claim of Fig8 reproduction"
+  },
+  "coupling_ports": {
+    "input": [
+      "base_slide_over_L",
+      "B_over_B0",
+      "G_L2_over_B0",
+      "gap_over_L",
+      "load_L3_over_B0"
+    ],
+    "output": [
+      "curvature_times_L(s)",
+      "centerline_over_L(s)",
+      "unloaded_sliding_stiffness_L3_over_B0"
+    ],
+    "unknown": [
+      "species ray material/spacing/taper",
+      "SI length and B0 calibration",
+      "muscle/servo force and work/basal anatomy",
+      "interray membrane and whole-fin shell/torsion",
+      "geometry/ray identity to flying-fish v3a",
+      "unsteady load orientation and fluid interaction"
+    ]
+  },
+  "resources": {
+    "local_cpu_threads": 1,
+    "memory_max_GiB": 2,
+    "tasks_max": 128,
+    "runtime_max_s": 300,
+    "cloud_jobs": 0
+  },
+  "base_commit": "1fe547164564eea53b308fba84b2fdb84ef750a8",
+  "status": "Frozen before any per-ray numerical outputs",
+  "pre_run_domain_clarification": {
+    "curvature_gap_product": "Report max(abs(kappa*d)) for every case. Paper thin-layer derivation assumes d/L<<1 and curvature of order1/L; high-G boundary localization can violate that asymptotic ordering even when d/L=.01. No source-proven sharp numerical validity cutoff is available. Values>=.1 receive a descriptive caution (engineering reference only), never a biological or asymptotic-validity PASS. Preserve all declared24outputs with applicability flags.",
+    "stiffness_scope": "Generalized unloaded sliding stiffness only, p=0; no loaded muscle force, active-control power or whole-fin bending EI inferred.",
+    "signs": "positive p uses exactly the printed M_ext=p(1-s)^2/2 convention; no sign repair to matchFig8."
+  }
+}
