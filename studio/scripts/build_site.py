@@ -629,7 +629,23 @@ def fish_history(ins: Inputs) -> dict | None:
     for f in P3["forms"]:
         mk(f["id"], "display prop (print, not a launch prototype)", f.get("title") or f["id"], need[3], {"display_scale": f["display_scale"], "set": f.get("set")})
         edges.append({"from": f["id"], "to": f["source_candidate"], "relation": "printed from", "label": "display prop made from this 3D candidate", "source": f"{need[3]}: forms[].source_candidate", "chronological": False})
-    return {"nodes": nodes, "edges": edges, "siblings": sib, "launch_prototype": {"exists": False, "note": "No launch-prototype artifact is in the tree: source owners are still preparing it. Nothing is shown in its place."},
+    # Launch glider print sets: lineage comes only from each manifest's parent_revision and source_candidate pins; chronology is never inferred from the names.
+    gd = ROOT / "artifacts/glider"; gl = []
+    defects = json.loads(ins.read("artifacts/glider/KNOWN_DEFECTS.json")) if (gd / "KNOWN_DEFECTS.json").exists() else {}
+    bad_revs = {r: k for k, v in defects.items() if isinstance(v, dict) for r in v.get("revisions", [])}
+    for mp in (sorted(gd.glob("*/manifest.json")) if gd.exists() else []):
+        mrel = mp.relative_to(ROOT).as_posix(); m = json.loads(ins.read(mrel)); rid = m["revision"]; sc = m.get("source_candidate", {})
+        ok_pin = sc.get("id") in V3["candidates"] and V3["candidates"][sc["id"]]["candidate_sha256"] == sc.get("sha256")
+        bad = defects.get(bad_revs.get(rid), {}) if rid in bad_revs else {}
+        mk("glider-" + rid, "launch glider print set (a launch prototype, untested)", m.get("title") or rid, mrel, {"revision": rid, "parent_revision": m.get("parent_revision"), "pin_matches_v3_index": ok_pin,
+           "known_defect": bad.get("what"), "fixed_in": bad.get("fixed_in"), "label": m.get("label", "")[:300], "source_candidate": sc.get("id")})
+        gl.append(rid)
+        if m.get("parent_revision"):
+            edges.append({"from": "glider-" + rid, "to": "glider-" + m["parent_revision"], "relation": "revision", "label": "named as parent_revision in the manifest (not inferred from the names)", "source": mrel + ": parent_revision", "chronological": True})
+        if sc.get("id") and ok_pin:
+            edges.append({"from": "glider-" + rid, "to": sc["id"], "relation": "built from", "label": "source_candidate, pinned by sha256 and matching the v3 index", "source": mrel + ": source_candidate", "chronological": False})
+    lp = {"exists": bool(gl), "revisions": gl, "note": ("Launch glider print sets exist as manifests (" + ", ".join(gl) + "). Every one is labelled a launch prototype, untested: not printed, weighed, glided or thrown here." if gl else "No launch-prototype artifact is in the tree: source owners are still preparing it. Nothing is shown in its place.")}
+    return {"nodes": nodes, "edges": edges, "siblings": sib, "launch_prototype": lp,
             "date_basis": "Author date of the first commit that added the node's manifest in this repository (a repository fact, not the date the design was made); null when git history is unavailable."}
 
 
