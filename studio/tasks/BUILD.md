@@ -1,11 +1,53 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 5:34pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 6:11pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
-GOAL.md and SPEC-005 through SPEC-012 define acceptance. The latest dated checkpoint supersedes older status snapshots.
+GOAL.md and SPEC-005 through SPEC-015 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 5:34pm PDT
+## Current checkpoint — October 31, 2026, 6:11pm PDT
+
+- [x] Site/MCP release `5e27158` is live. Root ran 22 focused browser/blueprint
+  checks (85 deselected), then 8 deployed public-read checks and 37 MCP checks.
+  Desktop/mobile downloads were inspected: 49 links, no viewport overflow;
+  the headless browser used the labelled static-render fallback for the fish.
+- [x] Home now has a direct v3a scale-relief STL link and an expandable catalog
+  of print editions, stands and candidate GLBs next to the main viewer.
+  Manifest digests are checked before publication. The public repository is
+  `kganjam/delphi-frontier`; all new implementation stays there.
+- [x] Genetic blueprints, 19 regulatory actors, 47 claim-use rows, source links,
+  regulatory map, claim-reuse example and local OpenResearch provenance are live.
+  Root checked cached source digests/excerpt presence, not biological truth.
+- [x] Prospective experimental-design planner integrated from `cc12164`; root
+  ran its 10 focused tests. Its frozen comparison has no observations: mixed
+  load/deflection is identifiable under declared assumptions; repeated deflection
+  alone is not. This is model-based planning, not an empirical posterior.
+- [ ] Claude-02: contextual Experimentation UI; native resource_scaling: bounded
+  read-only MCP planner. Claude-14: pinned biodesign compiler and layer lineage.
+- [ ] Print priority: selected the larger-fin r3-daane geometry for a fit/balance
+  prototype. Independent review found right-fin STL chirality wrong in r1;
+  root reproduced it in r3. Claude-05 is producing additive r4-daane-printfix;
+  claude-13 reviews it. Corrected r4 bundle `bd2fcf3` is now shared for fit/balance only; root checked its public ZIP, six STL pins and nominal chirality. R3 body geometry is compatible. Catch-wall concern remains unresolved; launch is not cleared.
+  No printed mass, flight, catch-load survival or biological buildability claimed.
+- [ ] Native ecology canonical simulations/media `335648d` and packet `08e5b77`
+  await root integration; claude-10 builds the actual-state viewer. Native
+  mechanobio_sim is preparing a separate inverse-pattern NCA training protocol.
+- [ ] Infrastructure tip `56a1ed5` plus telemetry `5d37bca` awaits integration.
+  Secondary H100 evaluation completed; strict metric audit FAIL is retained:
+  zero-amplitude relative metrics are undefined and float32 rounding fails the
+  frozen float64 tolerance. Generated fields are finite; no blanket pass.
+- [x] Infra reports actual Google allocations: 16 vCPU CFD, 4 vCPU ecology,
+  4 vCPU plus one L4 for GPU calibration. L4 setup/controls are ongoing; physical
+  stock failures in two other zones were retained. At the delayed 6:05pm PDT
+  metric, CFD used 59.60% of its allocation and ecology 96.87% of its allocation.
+  These are host measurements, not completed-case counts or biological results.
+- [x] The Google 23-genome run completed with 23 archive MD5 checks. Claude-11
+  interprets the locus results; source coverage gaps are not gene-loss claims.
+- [ ] Integrate and publish corrected print bundle, ecology viewer, experimental
+  planner/UI, genomic result interpretation and actual diffusion visuals; preserve
+  failed simulations, unresolved connections, and independent review findings.
+
+## Previous checkpoint — October 31, 5:34pm PDT
 
 - [x] Site and MCP release `d531330` deployed: 13 website and 37 MCP checks
   passed. Transient contributor credentials and exact-version discussion/history

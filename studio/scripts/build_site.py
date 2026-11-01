@@ -507,6 +507,9 @@ def model_downloads(ins: Inputs, out: dict) -> dict:
     """Publish print revisions from manifest-pinned bytes, including earlier editions."""
     manifests = [ROOT / "artifacts" / name / "manifest.json" for name in ("print-v3", "print-v2", "print")]
     manifests += sorted((ROOT / "artifacts/glider").glob("*/manifest.json"))
+    defects_path = "artifacts/glider/KNOWN_DEFECTS.json"
+    defects = json.loads(ins.read(defects_path)) if (ROOT / defects_path).is_file() else {}
+    handedness = defects.get("right_hand_print_files_are_left_parts", {})
     groups, refused = [], []
     for path in manifests:
         if not path.is_file():
@@ -514,6 +517,7 @@ def model_downloads(ins: Inputs, out: dict) -> dict:
         directory = path.parent.relative_to(ROOT).as_posix()
         raw_manifest = ins.read(path.relative_to(ROOT).as_posix())
         manifest = json.loads(raw_manifest)
+        withdrawn_right = manifest.get("revision") in handedness.get("revisions", [])
         files = []
         for rel, declared in manifest.get("files", {}).items():
             member = Path(rel)
@@ -529,11 +533,33 @@ def model_downloads(ins: Inputs, out: dict) -> dict:
                 continue
             href = f"{directory}/{rel}"
             out["@" + href] = data
-            files.append({"name": member.name, "href": href, "sha256": declared, "bytes": len(data), "format": member.suffix[1:].upper()})
+            withdrawn = withdrawn_right and "_R" in member.name and member.suffix == ".stl"
+            files.append({"name": member.name, "href": href, "sha256": declared, "bytes": len(data), "format": member.suffix[1:].upper(),
+                          "withdrawn": "Duplicates the left fin; use the corrected revision." if withdrawn else None})
+        sidecar = path.parent / "download.json"
+        if sidecar.is_file():
+            bundle = json.loads(ins.read(sidecar.relative_to(ROOT).as_posix()))
+            member = Path(bundle["path"])
+            if member.is_relative_to(Path(directory)):
+                member = member.relative_to(Path(directory))
+            if member.is_absolute() or ".." in member.parts or member.suffix != ".zip":
+                refused.append(f"{directory}/{member}")
+            else:
+                source = path.parent / member
+                data = ins.read(f"{directory}/{member}") if source.is_file() else None
+                if (data is None or len(data) != bundle["bytes"] or digest_bytes(data) != bundle["sha256"]
+                        or bundle.get("manifest_sha256") != digest_bytes(raw_manifest)):
+                    refused.append(f"{directory}/{member}")
+                else:
+                    href = f"{directory}/{member}"
+                    out["@" + href] = data
+                    files.insert(0, {"name": "Complete six-part test-print bundle", "href": href, "sha256": bundle["sha256"],
+                                     "bytes": len(data), "format": "ZIP", "withdrawn": None})
         href = f"{directory}/manifest.json"
         out["@" + href] = raw_manifest
         groups.append({"id": directory, "title": manifest.get("revision") or path.parent.name,
                        "scope": "Untested launch prototype; inspect its failed constraints before printing." if "/glider/" in directory else "Display models; not flight-tested designs. STL units: mm.",
+                       "warning": "Archived revision: right-fin print files are withdrawn because they duplicate left fins. Use r4-daane-printfix." if withdrawn_right else None,
                        "manifest_href": href, "files": files})
     return {"groups": groups, "refused": refused}
 
