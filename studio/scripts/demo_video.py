@@ -604,7 +604,8 @@ def render_shot(shot: dict, scene_spec: dict, output: Path, overlay_path: Path, 
     else:
         title_lines = textwrap.wrap(scene_spec["headline"], width=64)
         media_top = (202 if len(title_lines) > 1 else 142) + 72
-        tile_width, tile_height = (960, 820 - media_top) if shot["layout"] == "grid-2" else (960, (820 - media_top) // 2)
+        tile_width, tile_height = ((960, 820 - media_top) if shot["layout"] == "grid-2"
+                                   else (960, ((820 - media_top) // 2 // 2) * 2))
         labels = []
         for index in range(len(sources)):
             filters.append(f"[{index}:v]scale={tile_width}:{tile_height}:force_original_aspect_ratio=decrease,pad={tile_width}:{tile_height}:(ow-iw)/2:(oh-ih)/2:color=0x07121f,setsar=1,fps=30,tpad=stop_mode=clone:stop_duration={duration},trim=duration={duration},setpts=PTS-STARTPTS[v{index}]")
@@ -778,7 +779,7 @@ def render_storyboard(story_path: Path, media_map_path: Path, tts_path: Path,
                                        if source_storyboard_path else None),
                 "editing": story.get("editing"),
                 "renderer_commit": renderer_commit,
-                "media_map": {"path": str(media_map_path.relative_to(ROOT)), "sha256": sha256_file(media_map_path)},
+                "media_map": {"path": stable_path(media_map_path), "sha256": sha256_file(media_map_path)},
                 "tts_manifest": {"path": tts_path.resolve().relative_to(ROOT).as_posix() if tts_path.resolve().is_relative_to(ROOT) else str(tts_path.resolve()), "sha256": sha256_file(tts_path),
                                  "provider": tts_manifest["provider"], "model": tts_manifest["model"],
                                  "voice_id": tts_manifest["voice_id"],
@@ -797,9 +798,98 @@ def render_storyboard(story_path: Path, media_map_path: Path, tts_path: Path,
     return manifest
 
 
+def finalize_existing(story_path: Path, media_map_path: Path, tts_path: Path,
+                      output_root: Path, only_cut: str | None = None,
+                      rendered_commit: str | None = None) -> dict:
+    """Write a release manifest for already-rendered, independently checked files."""
+    story = load_story(story_path)
+    media_map, source_rows = validate_media_map(story, media_map_path)
+    tts_manifest = json.loads(tts_path.read_text(encoding="utf-8"))
+    source_story_sha = story.get("audio_source_storyboard_sha256", sha256_file(story_path))
+    if tts_manifest.get("storyboard_sha256") != source_story_sha:
+        raise ValueError("TTS manifest does not match the exact frozen storyboard")
+    cuts_tts = {cut["cut_id"]: cut for cut in tts_manifest["cuts"]}
+    selected = [cut for cut in story["cuts"] if only_cut is None or cut["id"] == only_cut]
+    if not selected or (only_cut and len(selected) != 1):
+        raise ValueError("requested cut is absent or ambiguous")
+    rendered = []
+    for cut in selected:
+        tts_cut = cuts_tts[cut["id"]]
+        rows = {row["scene_id"]: row for row in tts_cut["segments"]}
+        audio_timing = []
+        for scene in cut["scenes"]:
+            row = rows[scene["id"]]
+            spoken = probe_duration(audio_file(row))
+            if spoken > float(scene["duration_s"]) + 0.05:
+                raise ValueError(f"processed voice overruns {scene['id']}")
+            audio_timing.append({"scene_id": scene["id"], "voice_duration_s": round(spoken, 3),
+                                 "scene_budget_s": scene["duration_s"]})
+        duration = probe_duration(output_root / f"{cut['id']}.mp4")
+        if abs(duration - float(cut["duration_s"])) > 0.1:
+            raise ValueError("existing MP4 does not match edited cut duration")
+        paths = {"video": output_root / f"{cut['id']}.mp4",
+                 "poster": output_root / f"{cut['id']}-poster.jpg",
+                 "captions": output_root / f"{cut['id']}.vtt",
+                 "transcript": output_root / f"{cut['id']}.txt",
+                 "subtitles_srt": output_root / f"{cut['id']}.srt"}
+        if any(not path.is_file() or path.stat().st_size == 0 for path in paths.values()):
+            raise ValueError("render package has a missing or empty required file")
+        files = {name: {"path": path.name, "sha256": sha256_file(path), "bytes": path.stat().st_size}
+                 for name, path in paths.items()}
+        rendered.append({"id": cut["id"], "title": cut.get("title") or "Ninety-second tour",
+                         "duration_s": round(duration, 3), "files": files,
+                         "narration_duration_s": round(sum(row["voice_duration_s"] for row in audio_timing), 3),
+                         "audio_track_duration_s": round(duration, 3), "audio_timing": audio_timing,
+                         "subtitle_cues": sum(1 for line in paths["subtitles_srt"].read_text(encoding="utf-8").splitlines()
+                                               if " --> " in line),
+                         "video_size_limit_bytes": MAX_VIDEO_BYTES})
+    capture_path = Path(media_map["capture_manifest_path"])
+    if not capture_path.is_file() or sha256_file(capture_path) != media_map["capture_manifest_sha256"]:
+        raise ValueError("captured-screen manifest hash mismatch")
+    finalizer_commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
+                                      text=True, timeout=10, check=True).stdout.strip()
+    renderer_commit = rendered_commit or finalizer_commit
+    renderer_source = subprocess.run(["git", "show", f"{renderer_commit}:scripts/demo_video.py"],
+                                     cwd=ROOT, capture_output=True, timeout=10, check=True).stdout
+    stable_sources = []
+    for row in source_rows:
+        ref = _source_reference(row["path"], renderer_commit)
+        stable_sources.append({**row, "path": ref["path"], "source_commit": ref["commit"], "source_url": ref["url"]})
+    manifest = {"schema": "frontier.demo-video.release/1", "status": "complete",
+                "storyboard": {"path": stable_path(story_path), "sha256": sha256_file(story_path),
+                               "commit": media_map["storyboard_commit"]},
+                "source_storyboard": ({"path": story.get("audio_source_storyboard_path"),
+                                       "sha256": source_story_sha}
+                                      if story.get("audio_source_storyboard_path") else None),
+                "editing": story.get("editing"), "renderer_commit": renderer_commit,
+                "renderer_sha256": hashlib.sha256(renderer_source).hexdigest(),
+                "finalizer_commit": finalizer_commit,
+                "finalizer_sha256": sha256_file(Path(__file__).resolve()),
+                "media_map": {"path": stable_path(media_map_path), "sha256": sha256_file(media_map_path)},
+                "tts_manifest": {"path": stable_path(tts_path), "sha256": sha256_file(tts_path),
+                                 "provider": tts_manifest["provider"], "model": tts_manifest["model"],
+                                 "voice_id": tts_manifest["voice_id"], "voice_speed": tts_manifest.get("voice_speed"),
+                                 "provider_requests_this_run": tts_manifest["provider_requests_this_run"],
+                                 "audio_postprocessing": tts_manifest.get("audio_postprocessing")},
+                "source_capture_manifest": {"path": stable_path(capture_path),
+                                            "sha256": sha256_file(capture_path),
+                                            "release_sha": media_map["site_release_sha"]},
+                "source_files": stable_sources, "cuts": rendered,
+                "superseded_candidate": ({"path": stable_path(output_root / "superseded/v1/candidate.json"),
+                                           "sha256": sha256_file(output_root / "superseded/v1/candidate.json"),
+                                           "video_sha256": json.loads((output_root / "superseded/v1/candidate.json").read_text(encoding="utf-8"))["files"][0]["sha256"]}
+                                          if (output_root / "superseded/v1/candidate.json").is_file() else None),
+                "limits": ["Computational prototype; not a biologically realized flying fish.",
+                           "Simulation playback retains source timing; short clips hold on their final saved state for display only.",
+                           "No total spend claim; provider execution, runtime allocation and scientific success are separately sourced."],
+                "disclaimer": "Narrated computational prototype. Each claim is bounded by the exact source/model/context labels on screen; no biological realization or validation is implied."}
+    atomic_json(output_root / "manifest.json", manifest)
+    return manifest
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("synthesize", "prepare-edit", "render"), help="Synthesis uses MiniMax; editing and rendering use saved local media.")
+    parser.add_argument("command", choices=("synthesize", "prepare-edit", "render", "finalize"), help="Synthesis uses MiniMax; editing and rendering use saved local media.")
     parser.add_argument("--storyboard", type=Path, default=DEFAULT_STORY)
     parser.add_argument("--audio-root", type=Path, default=DEFAULT_AUDIO)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
@@ -810,6 +900,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--voice-id", default=VOICE_ID, help="MiniMax voice id; used only by synthesize")
     parser.add_argument("--speed", type=float, default=1.0, help="MiniMax voice speed in the provider's 0.5–2.0 range")
     parser.add_argument("--tempo", type=float, default=1.3, help="pitch-preserving editorial atempo multiplier for prepare-edit")
+    parser.add_argument("--rendered-commit", default=None, help="renderer source commit for finalize; defaults to current HEAD")
     args = parser.parse_args(argv)
     try:
         if args.command == "synthesize":
@@ -822,9 +913,16 @@ def main(argv: list[str] | None = None) -> int:
             result = prepare_audio_edit(args.storyboard, args.tts_manifest or args.output / "tts-manifest.json",
                                         args.output, tempo=args.tempo)
             summary = {"ok": True, **result}
-        else:
+        elif args.command == "render":
             tts_path = args.tts_manifest or args.output / "tts-manifest.json"
             result = render_storyboard(args.storyboard, args.media_map, tts_path, args.output, args.work_root, args.cut)
+            summary = {"ok": True, "manifest": str(args.output / "manifest.json"),
+                       "cuts": [{"id": cut["id"], "duration_s": cut["duration_s"],
+                                 "bytes": cut["files"]["video"]["bytes"]} for cut in result["cuts"]]}
+        else:
+            tts_path = args.tts_manifest or args.output / "tts-manifest.json"
+            result = finalize_existing(args.storyboard, args.media_map, tts_path, args.output, args.cut,
+                                       rendered_commit=args.rendered_commit)
             summary = {"ok": True, "manifest": str(args.output / "manifest.json"),
                        "cuts": [{"id": cut["id"], "duration_s": cut["duration_s"],
                                  "bytes": cut["files"]["video"]["bytes"]} for cut in result["cuts"]]}
