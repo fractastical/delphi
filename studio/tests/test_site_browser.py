@@ -1521,8 +1521,14 @@ def test_genetic_blueprints_show_construct_blocks_unknowns_equations_and_no_sequ
     assert "proposed, not executed" in t or "proposed design, NOT executed" in t
     assert pg.locator("mark.unk").count() >= 20, "unknowns must be conspicuous"
     assert "No DNA sequence, effector, coefficient or result is given" in t and "flying-fish transfer: unknown; not claimed" in t
-    assert pg.locator("section[aria-labelledby=bp-eq] .katex").count() >= 2 and pg.locator("section[aria-labelledby=bp-eq] tbody tr").count() == 4 and "not declared" in pg.locator("section[aria-labelledby=bp-eq]").text_content()
-    assert "A BAC" not in t or "autonomous" in t
+    assert pg.locator("section[aria-labelledby=bp-eq] .katex").count() >= 2 and pg.locator("section[aria-labelledby=bp-eq] tbody tr").count() == 4
+    eq = pg.locator("section[aria-labelledby=bp-eq]").text_content()
+    for u in ("transcripts per cell per second", "per second (s⁻¹)", "protein molecules per transcript per second", "transcript count per cell", "protein molecules per cell", "time in seconds"):
+        assert u in eq, u
+    assert "does not supply a value" in eq and pg.locator("section[aria-labelledby=bp-eq] mark.unk").count() >= 8, "units declared, values still unknown"
+    assert "do not change" not in t and "They can change copy number, integration locus and therefore expression" in t
+    links = pg.locator("section[aria-labelledby=bp-src] td[data-label=Source] a").evaluate_all("els => els.map(e => e.href)")
+    assert links and all(h.startswith("https://") for h in links) and len(links) == len(src["citation_table"]) > 0, links
     import re
     assert not re.search(r"\b[ACGT]{20,}\b", t), "no DNA sequence may appear"
     assert len(src["comparison"]["rows"]) >= 6
@@ -1533,3 +1539,19 @@ def test_genetic_blueprints_show_construct_blocks_unknowns_equations_and_no_sequ
     assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
     pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
     assert pg.locator(".subnav a:has-text('Genetic blueprints')").count() == 1
+
+
+def test_openresearch_exemplars_are_local_recorder_provenance_not_a_cloud_dispatcher(browser, base):
+    O = json.loads((ROOT / "site/data/snapshot.json").read_text())["openresearch"]
+    facts = json.loads((ROOT / "connectors/biomodels/orx/orx_facts.json").read_text())
+    assert len(O["exemplars"]) == 2 and O["exemplars"][0]["commit"] == facts["commit_sha"]
+    assert [x["sha256"] for x in O["exemplars"][0]["outputs"]] == [x["sha256"] for x in facts["outputs"]]
+    assert all(e["backend"] == "local_job" for e in O["exemplars"])
+    pg = page(browser)
+    pg.goto(base + "#/work?tab=built"); pg.wait_for_selector("#bt-h")
+    t = pg.locator("#main").text_content()
+    assert "Recorded OpenResearch runs (local exemplars)" in t and "not a cloud dispatcher" in t and "none of these runs used a remote backend" in t
+    assert "database exit code null" in t and "Collier 1996 replay v4" in t and "Neumann-mode Turing scan" in t
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/work?tab=built"); pg2.wait_for_selector("#bt-h")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0

@@ -612,7 +612,22 @@ def genetic_blueprints(ins: Inputs) -> dict | None:
         return None
     B = json.loads(ins.read(f"{d}/blueprints.json")); S = json.loads(ins.read(f"{d}/sources.json")) if (ROOT / d / "sources.json").exists() else {}
     return {"status": B["status"], "species_scope": B["species_scope"], "date": B["date"], "designs": B["designs"], "comparison": B["comparison"], "global_causal_gaps": B["global_causal_gaps"], "not_done": B["not_done"],
-            "inputs": B["inputs"], "citations": B["citation_table"], "source_status": S.get("status"), "files": {"blueprints.json": ins.seen[f"{d}/blueprints.json"]["sha256"], "sources.json": ins.seen.get(f"{d}/sources.json", {}).get("sha256")}}
+            "inputs": B["inputs"], "citations": B["citation_table"], "source_status": S.get("status"), "source_index": {x["id"]: {k: x.get(k) for k in ("citation", "primary_url", "read_level")} for x in S.get("sources", []) if x.get("id")}, "files": {"blueprints.json": ins.seen[f"{d}/blueprints.json"]["sha256"], "sources.json": ins.seen.get(f"{d}/sources.json", {}).get("sha256")}}
+
+
+def openresearch_exemplars(ins: Inputs) -> dict | None:
+    """Two real local OpenResearch (orx) runs recorded as provenance exemplars. OpenResearch is a local recorder of which code was run, not a cloud dispatcher; fields are copied from the run records."""
+    a = "connectors/biomodels/orx/orx_facts.json"; b = "frontier_adapters/examples/orx_run_turing"
+    if not ((ROOT / a).exists() and (ROOT / b / "run.json").exists()):
+        return None
+    iso = lambda ms: datetime.datetime.fromtimestamp(ms / 1000, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    F = json.loads(ins.read(a)); R = json.loads(ins.read(f"{b}/run.json"))["run"]; H = json.loads(ins.read(f"{b}/health.json")); ec = ins.text(f"{b}/exit_code").strip()
+    log = ins.text(f"{b}/log"); first = log.splitlines()[0] if log else ""
+    ex = [{"title": F["experiment_title"], "command": F["command"], "backend": F["backend_kind"], "commit": F["commit_sha"], "started_utc": iso(F["created_ms"]), "duration_s": round((F["ended_ms"] - F["created_ms"]) / 1000, 2), "exit_code_file": F["exit_code_file"], "db_exit_code": F["db_exit_code"], "status": F["status"],
+           "source_tar_sha256": F["source_tar_sha256"], "outputs": [{"path": o["path"], "sha256": o["sha256"], "bytes": o["bytes"]} for o in F["outputs"]], "replay_checks": F["replay_comparison"], "orx_version": F["orx_version"], "note": F["orx_version_note"], "record": a},
+          {"title": "Neumann-mode Turing scan (exact rationals)", "command": R["command"], "backend": R["backend"]["kind"], "commit": R["commitSha"], "started_utc": iso(R["createdAt"]), "duration_s": round((R["endedAt"] - R["createdAt"]) / 1000, 2), "exit_code_file": int(ec) if ec.isdigit() else ec, "db_exit_code": None, "status": R["status"],
+           "source_tar_sha256": R["backend"]["sourceDigest"], "outputs": [{"path": "results.json", "sha256": first.split("sha256 ")[-1] if "sha256 " in first else None, "bytes": None}], "replay_checks": None, "orx_version": "orx " + H["version"], "note": "outputs are not registered by orx; the digest is the producer's own printed line", "record": b + "/run.json"}]
+    return {"exemplars": ex, "scope": "OpenResearch is a local recorder of which code was run. It is not a cloud dispatcher and none of these runs used a remote backend. A completed run is evidence that this code at this commit exited 0 and printed this, not that the science is right.", "report": "OpenResearch integration note (corpus session, single reader, not independently reviewed)"}
 
 
 def lifecycle_block(ins: Inputs) -> dict | None:
@@ -1124,6 +1139,7 @@ def build() -> dict[str, bytes]:
     reg_map = regulatory_map(ins)
     claim_reuse = claim_reuse_block(ins)
     gen_bp = genetic_blueprints(ins)
+    orx_ex = openresearch_exemplars(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -1163,6 +1179,7 @@ def build() -> dict[str, bytes]:
         "regulatory_map": reg_map,
         "claim_reuse": claim_reuse,
         "genetic_blueprints": gen_bp,
+        "openresearch": orx_ex,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
