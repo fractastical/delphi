@@ -148,3 +148,19 @@ def test_runtime_receipts_deduplicate_own_jobs_and_reject_conflicting_durations(
     (tmp_path / "manifest-b.json").write_text(json.dumps(doc))
     with pytest.raises(ValueError, match="Conflicting"):
         terminal_runtime_summary(tmp_path, own)
+
+
+def test_gcp_quota_and_stopped_accelerators_are_not_active_usage():
+    from frontier_compute.resource_snapshot import gcp_allocation
+
+    result = gcp_allocation([
+        {'name': 'frontier-cpu-03', 'status': 'RUNNING', 'machineType': 'e2-standard-16', 'metadata': {'secret': 'do-not-emit'}},
+        {'name': 'frontier-gpu-01', 'status': 'TERMINATED', 'machineType': 'g2-standard-8', 'guestAccelerators': [{'acceleratorCount': 1}]},
+        {'name': 'unrelated', 'status': 'RUNNING', 'machineType': 'e2-standard-32'}],
+        [{'metric': 'GPUS_ALL_REGIONS', 'limit': 1, 'usage': 0}])
+    assert result['active_allocated_vcpus'] == 16 and result['active_allocated_gpus'] == 0
+    assert result['quotas'][0]['limit'] == 1
+    assert result['instantaneous_cpu_utilization'] is None
+    assert 'secret' not in json.dumps(result) and 'unrelated' not in json.dumps(result)
+    with pytest.raises(ValueError, match='Unknown owned machine'):
+        gcp_allocation([{'name': 'frontier-cpu-01', 'status': 'RUNNING', 'machineType': 'unknown'}], [])
