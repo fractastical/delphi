@@ -18,9 +18,7 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import subprocess
-import sys
 import tempfile
-import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -112,6 +110,20 @@ def _response_bytes(opener, request, timeout=60) -> tuple[int, dict, bytes]:
         raise RuntimeError(f"GCS request failed with HTTP {error.code}: {body[:500].decode('utf-8', 'replace')}") from None
     with response:
         body = response.read()
+        return getattr(response, "status", 200), dict(response.headers.items()), body
+
+
+def _bounded_response_bytes(opener, request, max_bytes: int, timeout=300):
+    """Read no more than max_bytes+1 from the remote body before rejecting it."""
+    try:
+        response = opener(request, timeout=timeout)
+    except urllib.error.HTTPError as error:
+        body = error.read(2048)
+        raise RuntimeError(f"GCS request failed with HTTP {error.code}: {body[:500].decode('utf-8', 'replace')}") from None
+    with response:
+        body = response.read(max_bytes + 1)
+        if len(body) > max_bytes:
+            raise ValueError("remote object exceeds configured collection limit")
         return getattr(response, "status", 200), dict(response.headers.items()), body
 
 
@@ -221,10 +233,10 @@ class GCS:
     def download(self, bucket: str, object_name: str, max_bytes: int) -> bytes:
         url = ("https://storage.googleapis.com/download/storage/v1/b/" + urllib.parse.quote(bucket, safe="")
                + "/o/" + urllib.parse.quote(object_name, safe="") + "?alt=media")
+        if not isinstance(max_bytes, int) or max_bytes < 0:
+            raise ValueError("max_bytes must be a nonnegative integer")
         req = urllib.request.Request(url, headers=self._auth_headers())
-        _, _, body = _response_bytes(self.opener, req)
-        if len(body) > max_bytes:
-            raise ValueError("remote object exceeds configured collection limit")
+        _, _, body = _bounded_response_bytes(self.opener, req, max_bytes)
         return body
 
 
@@ -341,6 +353,7 @@ def collect(gcs: GCS, bucket: str, prefix: str, destination: Path,
     job = validate_record(manifest["job"])
     snapshot_id = PurePosixPath(manifest_name).name.removesuffix(".json")
     task_dir = destination / safe_component(job["task_id"], "task_id") / safe_component(job["job_id"], "job_id") / safe_component(snapshot_id, "snapshot_id")
+    task_dir.mkdir(parents=True, exist_ok=True)
     expected_total = sum(int(a["bytes"]) for a in manifest["artifacts"])
     if expected_total > max_total_bytes:
         raise ValueError("manifest artifact total exceeds collection limit")
