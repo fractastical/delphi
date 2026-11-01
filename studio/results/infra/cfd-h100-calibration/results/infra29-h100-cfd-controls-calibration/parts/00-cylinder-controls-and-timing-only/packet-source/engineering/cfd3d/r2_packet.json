@@ -1,0 +1,132 @@
+{
+ "schema": "cfd3d-cyl2d-packet-0.2",
+ "device": "cuda",
+ "purpose": "R2 of the frozen 2-D cylinder control (cyl2d_contract.json 9d53cd1 + ddc7095; band cyl2d_band.json 5a02b46): n_D 64, H 60, Re 100, t_end 600, on one GPU (target: GCP g2-standard-4, one NVIDIA L4, 4 vCPU, 16 GiB host). Same equations, domain, boundary conditions, forces, averaging and band as R1/R3/M1 in the CPU packet 95ac40c9. Combined with those runs, R2 decides R2_fidelity and grid_pair.",
+ "science": "model diagnostics; never 'passed'. eval.json here evaluates R2 alone (R2_fidelity and periodicity); control_passes needs R1, R3 and M1 from the CPU packet as well, combined by cyl2d_eval.py afterwards. The 3-D C1 sphere reference gate FAILED and stays failed. No fin, fish, swimming or flight claim.",
+ "reference_gate": {
+  "C1_sphere_3d": "FAILED (|Cd| 0.875 at D16 CPU, 0.918/0.881 at D32 GPU, vs band [0.95, 1.35]); blocks physical-validation wording",
+  "cyl2d": "frozen contract + band; evaluator fails closed (a92d80e)"
+ },
+ "platform_note": "R2 runs on CUDA (Float32, env_gpu pins) while R1/R3/M1 run on CPU (env Manifest). Same WaterLily 1.10.0 and Julia 1.12.7; the same-state control below measures the CPU/CUDA difference on one shared flow state before R2 starts.",
+ "files": [
+  "cyl2d_entry.py",
+  "r2_packet.json",
+  "packet.json",
+  "cyl2d.jl",
+  "cyl2d_contract.json",
+  "cyl2d_band.json",
+  "cyl2d_eval.py",
+  "env_gpu/Project.toml",
+  "env_gpu/pins.tsv"
+ ],
+ "stages": [
+  "telemetry",
+  "julia",
+  "env",
+  "restart_check",
+  "platform",
+  "calibration",
+  "cases",
+  "eval",
+  "output"
+ ],
+ "env": {
+  "project": "engineering/cfd3d/env_gpu/Project.toml",
+  "pins": "engineering/cfd3d/env_gpu/pins.tsv",
+  "pin_count": 103,
+  "canonical_sha256": "d1a8e00741a5d1733be9e007b49bb2844fff2bdd232ccb993c1838319ed926bc",
+  "timeout_s": 2400,
+  "note": "the same pins and digest as the H100 fish packet 5af94b3f, which instantiated and passed its CUDA gate on 2026-10-31"
+ },
+ "outer_budget_s": 10800,
+ "emit_margin_s": 600,
+ "segment_s": 3600,
+ "min_segment_s": 300,
+ "ckpt_every_s": 900,
+ "ckpt_margin_s": 600,
+ "export_every_s": 10800,
+ "export_bytes_max": 0,
+ "export_reserve_bytes": 900000000,
+ "export_note": "off by default (export_bytes_max 0) for a 16 MB-return host; on GCS the dispatcher sets CFD3D_EXPORT_BYTES_MAX=2800000000: coherent R2 snapshots (~0.8 GB) every 3 h and at a stop-at-budget, listed in OUT/checkpoints/manifest.json, with 0.9 GB held for the stop snapshot; CFD3D_RESUME_FROM continues on another job",
+ "max_out_bytes": 12000000,
+ "restart_check": {
+  "run_id": "T_restart",
+  "threads": 2,
+  "mem_gb": 6,
+  "timeout_s": 1200,
+  "split_after_steps": 120,
+  "min_steps_after_split": 50,
+  "min_cp_samples_after_split": 5
+ },
+ "same_state": {
+  "run_id": "T_same",
+  "t_state": 100.0,
+  "steps": 20,
+  "shift": 10,
+  "cpu_threads": 4,
+  "timeout_s": 1800,
+  "tolerance": {
+   "Cd": 0.005,
+   "Cd_p": 0.005,
+   "Cl": 0.005,
+   "t": 0.001,
+   "u_abs": 0.01
+  },
+  "tolerance_units": "Cd, Cd_p, Cl: max |difference| over the compared steps divided by the CPU mean |Cd|; t: max relative difference; u_abs: max |u_cpu - u_cuda| over the whole field after the continuation, U = 1",
+  "tolerance_basis": "frozen before any CUDA run of this code; 0.005 is the GPU tolerance the earlier CUDA platform gate used (packet.json local_cpu_pins rel_tol_gpu) and passed with",
+  "mutant": "the same comparison with the CUDA series shifted by 10 steps must NOT be within tolerance (shows the comparison can fail on a developed shedding flow)"
+ },
+ "calibration": {
+  "run_id": "R2",
+  "steps": 300,
+  "timeout_s": 1500,
+  "steps_projected": [
+   204000,
+   340000
+  ],
+  "run_overhead": 1.3,
+  "host_rss_max_gb": 10,
+  "gpu_mem_frac_max": 0.8,
+  "rule": "GO only if: TIMING rc 0 on the device; steps_projected[1] (340k, the developed-wake dt) x measured s/step x run_overhead 1.3 <= time left before the outer budget minus emit and checkpoint margins; nvidia-smi device-memory peak <= 0.8 x card total; host RSS peak <= 10 GB. Otherwise rc 11: stop with the controls, calibration.json and nvidia-smi kept; no R2 started. fits_time_lower_only reports when only the 204k-step projection would fit (a decision for root/infra, not taken here)",
+  "note": "force-free TIMING; run_overhead 1.3 (forces every step, host copy of p every 10th step after t = 100) is an ASSUMPTION; R2's own wall_s and steps are the measurement"
+ },
+ "cases": [
+  {
+   "run_id": "R2",
+   "gpu": true,
+   "threads": 2,
+   "mem_gb": 11,
+   "budget_s": 172800
+  }
+ ],
+ "expected": {
+  "R2": {
+   "cells": 14760964,
+   "steps": "204k-340k",
+   "l4_wall": "NOT ASSUMED; measured by calibration. For orientation only: the L4's memory bandwidth (~0.3 TB/s) is ~1/11 of an H100's, and this solver is bandwidth-bound, so hours to tens of hours are plausible; the rule decides",
+   "device_memory_gb": "~2-3 of 24",
+   "host_rss_gb": "~3-5",
+   "output": "runs/R2.json.gz: t, Cd, Cd_p, Cl every step as shortest Float32 decimals (~14 MB raw at 340k steps, ~5-6 MB gzip)"
+  }
+ },
+ "outputs": [
+  "status.json",
+  "nvidia-smi.txt",
+  "resolved-Manifest.toml",
+  "restart_check.json",
+  "platform.json",
+  "calibration.json",
+  "runs/R2.json.gz (only if R2 finishes)",
+  "eval.json (only if R2 finishes)",
+  "checkpoints/R2-<n>.ckpt + checkpoints/manifest.json (only with CFD3D_EXPORT_BYTES_MAX)"
+ ],
+ "outer_budget_note": "default only; the dispatcher sets CFD3D_OUTER_BUDGET_S = VM hard stop - export margin. The calibration rule compares R2's projected wall time with what is left of it",
+ "host_requirements": {
+  "vcpu": 4,
+  "host_ram_gib_max": 12,
+  "caps": "every Julia process tree <= 11 GB host RSS (systemd scope MemoryMax + MemorySwapMax=0 where available, and the RSS watchdog); the steps run one at a time",
+  "gpu": "one CUDA device, driver supporting CUDA 12 (the pinned CUDA.jl 6.4.2 fetches its own runtime artifact)",
+  "disk_gb": 15,
+  "python": ">=3.11 (3.12 on the pinned image)"
+ }
+}
