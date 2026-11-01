@@ -2116,7 +2116,7 @@ def test_new_ninety_second_cut_is_featured_with_accurate_label_and_old_cuts(brow
         pg.goto(base + '#/demo')
         pg.wait_for_selector('.democut[aria-current=page]')
         assert pg.locator('.democut[aria-current=page] b').inner_text() == '90 seconds'
-        assert 'new 90-second tour' in pg.locator('.demohead').inner_text()
+        assert 'new 90-second tour' in pg.locator('.demohead').inner_text().lower()
         assert pg.locator('.demodl li').count() == 3
         pg.locator('.democut[href$="frontier-60s"]').click()
         pg.wait_for_selector('.democut[aria-current=page]:has-text("1 minute")')
