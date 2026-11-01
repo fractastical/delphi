@@ -70,7 +70,7 @@ def test_build_is_current_and_portable():
 
 def test_every_view_renders_without_errors(browser, base):
     pg = page(browser)
-    for route in ["experimentation", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["experimentation", "demo", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1, #main h2", timeout=5000)
         assert pg.locator("#main").inner_text().strip(), route
@@ -308,7 +308,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["home", "experimentation", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "experimentation", "demo", "blueprints", "reuse", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -945,7 +945,7 @@ def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, b
     pg.wait_for_selector(".aboutmenu summary")
     pg.focus(".aboutmenu summary"); pg.keyboard.press("Enter")
     hrefs = pg.locator(".aboutmenu details[open] a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
-    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative"]
+    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative", "#/demo"]
     assert pg.locator("nav[aria-label=Views] > ul > li > a:has-text('Generative')").count() == 0   # not a top-level item
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
     pg2 = page(browser, 400, 800)
@@ -1771,3 +1771,40 @@ def test_ecology_page_plays_published_saved_states_and_keeps_limits(browser, bas
         b = (ROOT / f"site/artifacts/ecology/run-refined/{a}/trajectory.json").read_bytes()
         import hashlib
         assert hashlib.sha256(b).hexdigest() == rec[f"artifacts/ecology/run-refined/{a}/trajectory.json"]
+
+
+def test_demo_page_empty_state_is_honest_and_entry_points_exist(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    pg = page(browser, 1280, 900)
+    pg.goto(base + "#/demo"); pg.wait_for_selector("#main h1")
+    t = pg.locator("#main").text_content()
+    if not (snap.get("demo_videos") or {}).get("cuts"):
+        assert "No demo video is published in this snapshot yet" in t and pg.locator("video").count() == 0
+    pg.goto(base + "#/home"); pg.wait_for_selector(".herowatch a")
+    assert pg.locator(".herowatch a").get_attribute("href").endswith("#/demo")
+    pg.locator(".aboutmenu summary").click()
+    assert pg.locator(".aboutmenu a[href$='#/demo']").count() == 1
+    assert not pg.errors, pg.errors
+
+
+def test_demo_page_shows_published_cuts_with_controls_downloads_and_provenance(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    mp4 = "artifacts/simulations/windtunnel-2d/windtunnel.mp4"; poster = "artifacts/simulations/windtunnel-2d/poster.png"
+    snap["demo_videos"] = {"cuts": [
+        {"id": "frontier-60s", "title": "60-second tour", "duration_s": 60.0, "href": mp4, "poster_href": poster, "subtitles_href": None, "manifest_href": "data/snapshot.json"},
+        {"id": "frontier-120s", "title": "2-minute tour", "duration_s": 120.0, "href": mp4, "poster_href": poster, "subtitles_href": "data/catalog.json", "manifest_href": "data/snapshot.json"}],
+        "limits": ["The video describes the site; it adds no evidence."]}
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        pg.route("**/data/snapshot.json", lambda r: r.fulfill(json=snap))
+        pg.goto(base + "#/demo"); pg.wait_for_selector("#demo-video")
+        assert pg.locator(".demotabs a").count() == 2 and pg.locator(".demotabs a[aria-current=page]").text_content().startswith("60-second")
+        assert pg.locator("#demo-video").get_attribute("controls") is not None and pg.locator("#demo-video").get_attribute("poster") == poster
+        assert pg.locator("a[download][href$='windtunnel.mp4']").count() == 1 and pg.locator("a:has-text('Provenance (JSON)')").count() == 1
+        assert "No caption file is published" in pg.locator("figcaption").text_content() and pg.locator("track").count() == 0
+        assert "adds no evidence" in pg.locator("#main").text_content()
+        pg.click(".demotabs a:has-text('2-minute')"); pg.wait_for_selector(".demotabs a[aria-current=page]:has-text('2-minute')")
+        assert pg.locator("track[kind=captions]").count() == 1 and "cut=frontier-120s" in pg.evaluate("location.hash")
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
