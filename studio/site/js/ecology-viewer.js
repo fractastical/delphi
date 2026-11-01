@@ -114,7 +114,7 @@ export function mountEcologyViewer(host, opts = {}) {
   let hinge = {};      // component id -> hinge point in BODY metres: Rz(pi) * (origin_m - [cg,0,0])
 
   host.textContent = "";
-  host.classList.add("ev");
+  host.classList.add("ecology-viewer");
   const head = el("ul", "ev-badges");
   [["ACTUAL SAVED STATES from the run file", "actual"], ["quasi-steady VLM forces + assumed drag, not CFD", "warn"],
    ["engineering candidate, not a validated flying fish", "warn"]].forEach(([t, c]) => head.append(el("li", "ev-badge " + c, t)));
@@ -577,6 +577,6 @@ export function mountEcologyViewer(host, opts = {}) {
       const v = new T.Vector3().fromBufferAttribute(m.geometry.attributes.position, vi).applyMatrix4(m.matrixWorld);
       return [v.x, -v.z, v.y];                                  // three axes -> sim axes
     },
-    destroy() { disposed = true; cancelAnimationFrame(raf); io && io.disconnect(); ro && ro.disconnect(); if (scene) disposeScene(); if (renderer) { renderer.dispose(); renderer.domElement.remove(); } host.textContent = ""; host.classList.remove("ev"); },
+    destroy() { disposed = true; cancelAnimationFrame(raf); io && io.disconnect(); ro && ro.disconnect(); if (scene) disposeScene(); if (renderer) { renderer.dispose(); renderer.domElement.remove(); } host.textContent = ""; host.classList.remove("ecology-viewer"); },
   };
 }
