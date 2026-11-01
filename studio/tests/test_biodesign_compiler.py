@@ -131,9 +131,15 @@ def test_changed_dependency_file_content_invalidates_dependent_stages(tmp_path):
 
 
 def _tree(tmp_path):
+    """Bounded fixture: only the pinned files of the three assemblies, STAGE_FILES and model_interfaces."""
     import shutil
-    for p in ("artifacts", "engineering"):
-        shutil.copytree(ROOT / p, tmp_path / p, ignore=shutil.ignore_patterns("*.stl", "*.glb", "*.png", "*.mp4", "*.npz"))
+    want = {p["path"] for a in bc.run(ROOT)["assemblies"] for p in a["components"].values()}
+    want |= {f for fs in bc.STAGE_FILES.values() for f in fs}
+    want |= {str(f.relative_to(ROOT)) for f in (ROOT / "engineering/model_interfaces").glob("*.json")}
+    for rel in want:
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(ROOT / rel, tmp_path / rel)
+    assert sum(f.stat().st_size for f in tmp_path.rglob("*") if f.is_file()) < 5_000_000
     return tmp_path
 
 
@@ -186,3 +192,57 @@ def test_overridden_registry_or_couplings_do_not_reuse_default_cache():
     assert "units_context" in bc.compile_assembly(ROOT, a, couplings=few, cache=cache)["reused_from_cache"]
     reg = cp.default_registry()
     assert bc.registry_fingerprint(reg, few) != bc.registry_fingerprint(reg, cp.default_couplings())
+
+
+def test_non_string_status_and_non_numeric_refinement_are_blocked_not_a_crash(tmp_path):
+    t = _tree(tmp_path)
+    a = bc.run(t)["assemblies"][0]
+    f = t / a["components"]["aero"]["path"]
+    o = json.loads(f.read_bytes())
+    o["status"] = 7
+    f.write_text(json.dumps(o))
+    a2 = copy.deepcopy(a)
+    a2["components"]["aero"]["sha256"] = bc.sha(f.read_bytes())
+    ax = bc.compile_assembly(t, a2)["axes"]
+    assert ax["model_domain"]["status"] == ax["numerical"]["status"] == "blocked"
+    assert "status is int, expected str" in ax["model_domain"]["reason"]
+    o["status"] = "ok"
+    o["refinement"]["CL_rel_change"] = "0.2"
+    f.write_text(json.dumps(o))
+    a2["components"]["aero"]["sha256"] = bc.sha(f.read_bytes())
+    ax = bc.compile_assembly(t, a2)["axes"]
+    assert ax["numerical"]["status"] == "blocked" and "expected number" in ax["numerical"]["reason"]
+    assert ax["model_domain"]["status"] == "unassessed"  # positive control: a valid string status still runs
+
+
+def test_missing_required_pin_or_bad_pin_shape_is_a_typed_failure_with_six_axes():
+    a = _r()["assemblies"][0]
+    for mut, msg in ((lambda x: x["components"].pop("behavior"), "missing required pin behavior"),
+                     (lambda x: x["components"]["aero"].update(sha256="abc"), "64-character sha256"),
+                     (lambda x: x.update(components=[]), "no components object")):
+        b = copy.deepcopy(a)
+        mut(b)
+        out = bc.compile_assembly(ROOT, b, cache={})
+        assert set(out["axes"]) == set(bc.AXES) and out["axes"]["structural_refs"]["status"] == "fail"
+        assert any(msg in f["reason"] for f in out["axes"]["structural_refs"]["failures"])
+        assert all(out["axes"][s]["status"] == "blocked" for s in bc.AXES if s != "structural_refs")
+    assert bc.compile_assembly(ROOT, a)["axes"]["structural_refs"]["status"] == "pass"
+
+
+def test_malformed_designs_are_blocked(tmp_path):
+    t = _tree(tmp_path)
+    a = bc.run(t)["assemblies"][0]
+    f = t / a["components"]["genetic_blueprint"]["path"]
+    for bad in ([1], [{"expression_kinetics": {"status": "UNKNOWN"}}], "x", []):
+        o = json.loads(f.read_bytes())
+        o["designs"] = bad
+        f.write_text(json.dumps(o))
+        a2 = copy.deepcopy(a)
+        a2["components"]["genetic_blueprint"]["sha256"] = bc.sha(f.read_bytes())
+        assert bc.compile_assembly(t, a2)["axes"]["implementation"]["status"] == "blocked", bad
+
+
+def test_empty_couplings_list_is_not_replaced_by_defaults():
+    a = _r()["assemblies"][0]
+    out = bc.compile_assembly(ROOT, a, couplings=[])
+    assert out["axes"]["units_context"]["counts"] == {}

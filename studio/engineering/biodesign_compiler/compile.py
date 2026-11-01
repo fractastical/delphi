@@ -92,14 +92,35 @@ def _load(root, p, layer="?"):
         raise Blocked(layer, f"not valid JSON: {p['path']} ({e})")
 
 
-def _need(o, layer, *keys):
-    """Index into a loaded pinned document; a missing key is a malformed input, not a crash."""
+def _need(o, layer, *keys, typ=None):
+    """Index into a loaded pinned document and check the leaf's type; a missing key or wrong type is a malformed
+    input (Blocked), not a crash. Only these shape errors are caught: other exceptions are programming errors."""
     try:
         for k in keys:
             o = o[k]
-        return o
     except (KeyError, IndexError, TypeError):
         raise Blocked(layer, f"malformed: no {'/'.join(map(str, keys))}")
+    if typ is not None and (not isinstance(o, typ) or (isinstance(o, bool) and typ is not bool)):
+        want = "number" if typ == (int, float) else typ.__name__
+        raise Blocked(layer, f"malformed: {'/'.join(map(str, keys))} is {type(o).__name__}, expected {want}")
+    return o
+
+
+NUM = (int, float)
+
+
+def assembly_problems(a) -> list[str]:
+    """Shape of the trusted assembly manifest: every pin present with a string path and a 64-hex sha256."""
+    if not isinstance(a, dict) or not isinstance(a.get("components"), dict):
+        return ["assembly has no components object"]
+    out = []
+    for k in PINS:
+        p = a["components"].get(k)
+        if not isinstance(p, dict):
+            out.append(f"missing required pin {k}")
+        elif not isinstance(p.get("path"), str) or not isinstance(p.get("sha256"), str) or len(p["sha256"]) != 64:
+            out.append(f"pin {k} needs a string path and a 64-character sha256")
+    return out
 
 
 def _file_sha(root, rel):
@@ -143,16 +164,17 @@ def stage_units_context(root: Path, reg: cp.Registry, couplings: list[cp.Couplin
 
 def stage_domain(root: Path, a: dict) -> dict:
     v = _load(root, a["components"]["aero"], "aero")
-    st = _need(v, "aero", "status")
+    st = _need(v, "aero", "status", typ=str)
     return {"status": "fail" if st.startswith("NOT CONVERGED") else "unassessed", "reading": st,
             "model": "horseshoe VLM, zero-thickness isolated paired fins, no body; rays/membrane/thickness not resolved"}
 
 
 def stage_numerical(root: Path, a: dict) -> dict:
     v = _load(root, a["components"]["aero"], "aero")
-    r = _need(v, "aero", "refinement")
-    st = _need(v, "aero", "status")
-    res = {"CL_rel_change_48x16_to_72x24": _need(r, "aero", "CL_rel_change"), "pectoral_dCp_rms_change": _need(r, "aero", "pectoral_L", "quad_dCp_rms_change_over_rms"),
+    r = _need(v, "aero", "refinement", typ=dict)
+    st = _need(v, "aero", "status", typ=str)
+    res = {"CL_rel_change_48x16_to_72x24": _need(r, "aero", "CL_rel_change", typ=NUM),
+           "pectoral_dCp_rms_change": _need(r, "aero", "pectoral_L", "quad_dCp_rms_change_over_rms", typ=NUM),
            "frozen_threshold": None}
     if st.startswith("NOT CONVERGED"):
         res["status"] = "fail (retained)"
@@ -172,13 +194,19 @@ def stage_empirical(root: Path, a: dict) -> dict:
         raise Blocked("coupling_manifest", "malformed engineering/COUPLING_MANIFEST.json")
     beh = _load(root, a["components"]["behavior"], "behavior")
     return {"status": "unresolved", "calibrations_registered": cals,
-            "reading": "no calibration is registered; behavior manifest: " + str(_need(beh, "behavior", "biological_accuracy"))}
+            "reading": "no calibration is registered; behavior manifest: " + _need(beh, "behavior", "biological_accuracy", typ=str)}
 
 
 def stage_implementation(root: Path, a: dict) -> dict:
     b = _load(root, a["components"]["genetic_blueprint"], "genetic_blueprint")
-    kin = {d["id"]: _need(d, "genetic_blueprint", "expression_kinetics", "status") for d in _need(b, "genetic_blueprint", "designs")}
-    bind = {d["id"]: _need(d, "genetic_blueprint", "cell_program_binding", "validation_status") for d in b["designs"]}
+    designs = _need(b, "genetic_blueprint", "designs", typ=list)
+    if not designs:
+        raise Blocked("genetic_blueprint", "malformed: designs is empty")
+    kin, bind = {}, {}
+    for n, d in enumerate(designs):
+        did = _need(d, "genetic_blueprint", "id", typ=str) if isinstance(d, dict) else _need({}, "genetic_blueprint", f"designs[{n}]/id")
+        kin[did] = _need(d, "genetic_blueprint", "expression_kinetics", "status", typ=str)
+        bind[did] = _need(d, "genetic_blueprint", "cell_program_binding", "validation_status", typ=str)
     return {"status": "unresolved", "expression_kinetics": kin, "cell_program_binding_validation": bind,
             "reading": "proposals only; LEN coordinates and sequence null; no genome implied"}
 
@@ -214,8 +242,15 @@ def stage_key(root: Path, a: dict, stage: str, reg_fp: str | None = None) -> str
 
 
 def compile_assembly(root: Path, a: dict, reg=None, couplings=None, cache=None) -> dict:
-    reg = reg or cp.default_registry()
-    couplings = couplings or cp.default_couplings()
+    reg = cp.default_registry() if reg is None else reg
+    couplings = cp.default_couplings() if couplings is None else couplings
+    bad_shape = assembly_problems(a)
+    if bad_shape:
+        ax = {s: {"status": "blocked", "reason": "malformed assembly manifest", "blocked_by": ["assembly"]} for s in AXES}
+        ax["structural_refs"] = {"status": "fail", "pinned_ok": [], "failures": [{"layer": "assembly", "reason": r} for r in bad_shape]}
+        return {"assembly": a.get("id") if isinstance(a, dict) else None, "assembly_sha256": a.get("assembly_sha256") if isinstance(a, dict) else None,
+                "axes": ax, "reused_from_cache": [], "unresolved_bridges": unresolved_bridges(reg, root),
+                "no_single_badge": "axes are reported separately; an unresolved bridge is not a violated constraint and neither is hidden by a render"}
     fns = {
         "structural_refs": lambda: stage_structural(root, a),
         "units_context": lambda: stage_units_context(root, reg, couplings),
@@ -281,9 +316,11 @@ def compare(root: Path, asms: list[dict]) -> dict:
     for a in asms:
         try:
             v = _load(root, a["components"]["aero"], "aero")
-            cl, rc, st = v["cases"]["4"]["CL_paired_fins_on_S_lattice"], v["refinement"]["CL_rel_change"], v["status"]
-        except (Blocked, KeyError) as e:
-            rows.append({"assembly": a["id"], "blocked": str(e), "usable_for_comparison": False})
+            cl = _need(v, "aero", "cases", "4", "CL_paired_fins_on_S_lattice", typ=NUM)
+            rc = _need(v, "aero", "refinement", "CL_rel_change", typ=NUM)
+            st = _need(v, "aero", "status", typ=str)
+        except Blocked as e:
+            rows.append({"assembly": a["id"], "blocked": e.reason, "usable_for_comparison": False})
             continue
         rows.append({"assembly": a["id"], "CL_paired_fins_alpha4_S_lattice": cl,
                      "refinement_CL_rel_change": rc, "aero_status": st[:60],
