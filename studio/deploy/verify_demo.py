@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
+import time
 from urllib.request import Request, urlopen
 
 
@@ -60,14 +61,23 @@ def verify(base: str, capture: Path | None = None) -> dict:
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
         page = browser.new_page(viewport={"width": 1440, "height": 1000})
+        def wait_js(expression, timeout=30):
+            # Read through the browser protocol; wait_for_function's in-page
+            # string evaluation can be rejected by the site's strict CSP.
+            deadline = time.monotonic() + timeout
+            while time.monotonic() < deadline:
+                if page.evaluate("() => (" + expression + ")"):
+                    return
+                page.wait_for_timeout(100)
+            raise TimeoutError("Browser state did not become true: " + expression)
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         for name in ("frontier-60s", "frontier-120s"):
             page.goto(base + "/#/demo?cut=" + name, wait_until="domcontentloaded")
             page.wait_for_selector("#demo-video")
-            page.wait_for_function("document.querySelector('#demo-video').readyState >= 2", timeout=30000)
+            wait_js("document.querySelector('#demo-video').readyState >= 2")
             page.evaluate("async () => {const v=document.querySelector('#demo-video');v.muted=true;await v.play();}")
-            page.wait_for_function("document.querySelector('#demo-video').currentTime > 0.5", timeout=15000)
+            wait_js("document.querySelector('#demo-video').currentTime > 0.5", timeout=15)
             state = page.evaluate("""() => {const v=document.querySelector('#demo-video');v.pause();return {
                 duration:v.duration,width:v.videoWidth,height:v.videoHeight,time:v.currentTime,
                 decodedFrames:v.getVideoPlaybackQuality().totalVideoFrames,source:v.currentSrc};}""")
@@ -76,10 +86,10 @@ def verify(base: str, capture: Path | None = None) -> dict:
                   and abs(state["duration"] - cuts[name]["duration_s"]) <= 0.25)
             check(name + " no horizontal overflow", page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"))
             page.locator("#demo-fs").click()
-            page.wait_for_function("document.fullscreenElement?.id === 'demo-stage'")
+            wait_js("document.fullscreenElement?.id === 'demo-stage'")
             check(name + " fullscreen entered", page.evaluate("document.fullscreenElement.id === 'demo-stage'"))
             page.evaluate("document.exitFullscreen()")
-            page.wait_for_function("document.fullscreenElement === null")
+            wait_js("document.fullscreenElement === null")
             check(name + " both cuts have direct downloads", page.locator(".demodl a[download][href$='.mp4']").count() == 2)
             if capture:
                 capture.mkdir(parents=True, exist_ok=True)

@@ -1,11 +1,48 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 6:37pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 7:28pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-016 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 6:37pm PDT
+## Current checkpoint — October 31, 2026, 7:28pm PDT
+
+- [x] Release `c3fd602` is live. About → Demo videos serves both exact-length
+  1080p MiniMax-narrated cuts, captions, transcripts and downloadable MP4s. The
+  responsive page defaults to one minute and links both cuts; fullscreen works.
+  Root ran 9 focused publication/navigation/layout tests and 30 public media and
+  browser checks, plus 8 public web and 39 public MCP checks. Full audio/video
+  decoding passed for both cuts. These checks do not validate biological designs.
+- [x] Independent sampled-frame review cleared the wrong-page and wrong-scene
+  findings after a second export. Source crops and small original figure text
+  remain presentation limits. The frozen script, source hashes, both output
+  revisions and MiniMax receipts are preserved. No new narration was synthesized
+  for the corrected shots.
+- [x] Studio's scale selector now starts near the top: sticky on desktop, compact
+  on phones. The selected scale leads with equations, parameters and simulations;
+  project-wide review and assurance panels follow. Deep links remain supported.
+- [x] Canonical morphoswarm.ai and www redirect to Frontier with path/query kept.
+  Root checked HTTP 308 and the destination's HTTP 200. studio.morphoswarm.ai
+  serves the protected old site (HTTP 401 without credentials), with no redirect.
+  Infra reports unchanged Orchestra configuration and IP restrictions.
+- [ ] Native infra reports the seed-placement NCA follow-up is training on H100;
+  evaluation remains pending. The original run's 0/48 design success is retained.
+  A second H100 job is preparing controlled CFD calibration. Google VM03 remains
+  the active 16-vCPU CFD worker; further L4 admissions encountered stockouts.
+- [ ] More simulations are being prepared with separate owners: native mechanics
+  couples assumed fin stiffness to deformed aerodynamic geometry; native resources
+  prepares controlled BETSE dose/junction comparisons; Claude-11 owns metabolic
+  oxygen/medium constraints and the 23-genome interpretation. No invented
+  voltage-to-growth or molecular-to-fin transfer is treated as established.
+- [ ] Compiler/layer lineage, independent R4 catch-wall review and the broader
+  scientific integration remain unfinished. More compute is not itself a result.
+
+Public playback evidence: `deploy/receipts/demo-videos-live.json`. The first
+browser verifier attempt used an in-page string evaluation blocked by the site's
+CSP; that attempt did not complete. The verifier was repaired to read state via
+the browser protocol, then all 30 checks ran successfully. Site CSP stayed intact.
+
+## Previous checkpoint — October 31, 2026, 6:37pm PDT
 
 - [x] Release `e246a51` is live: ecology saved-state viewer, prospective
   Experimentation comparison, recorded DDPM visuals with failed strict audit,

@@ -58,7 +58,7 @@ about a proposed action.
 
 ## Delivery checklist
 
-- [ ] Deliver 60-second and 120-second narrated demo videos with MiniMax voice,
+- [x] Deliver 60-second and 120-second narrated demo videos with MiniMax voice,
   real interface captures and recorded simulation footage; preserve source and
   validation limits, and map the story to the judging rubric (SPEC-016).
 - [x] Recover codex-api, codex-01, codex-02 and claude-15 handoffs.
