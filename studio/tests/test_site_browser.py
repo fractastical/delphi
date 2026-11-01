@@ -1792,19 +1792,19 @@ def test_demo_page_shows_published_cuts_with_controls_downloads_and_provenance(b
     mp4 = "artifacts/simulations/windtunnel-2d/windtunnel.mp4"; poster = "artifacts/simulations/windtunnel-2d/poster.png"
     snap["demo_videos"] = {"cuts": [
         {"id": "frontier-60s", "title": "60-second tour", "duration_s": 60.0, "href": mp4, "poster_href": poster, "subtitles_href": None, "manifest_href": "data/snapshot.json"},
-        {"id": "frontier-120s", "title": "2-minute tour", "duration_s": 120.0, "href": mp4, "poster_href": poster, "subtitles_href": "data/catalog.json", "manifest_href": "data/snapshot.json"}],
+        {"id": "frontier-120s", "title": "2-minute tour & more", "duration_s": 120.0, "href": mp4, "poster_href": poster, "subtitles_href": "data/catalog.json", "transcript_href": "data/snapshot.json", "title_note": "x", "manifest_href": "data/snapshot.json"}],
         "limits": ["The video describes the site; it adds no evidence."]}
     for w in (1280, 400):
         pg = page(browser, w, 900)
         pg.route("**/data/snapshot.json", lambda r: r.fulfill(json=snap))
         pg.goto(base + "#/demo"); pg.wait_for_selector("#demo-video")
-        assert pg.locator(".demotabs a").count() == 2 and pg.locator(".demotabs a[aria-current=page]").text_content().startswith("60-second")
+        assert "2-minute tour & more" in pg.locator(".demotabs").text_content() and "&amp;" not in pg.locator(".demotabs").text_content() and pg.locator(".demotabs a").count() == 2 and pg.locator(".demotabs a[aria-current=page]").text_content().startswith("60-second")
         assert pg.locator("#demo-video").get_attribute("controls") is not None and pg.locator("#demo-video").get_attribute("poster") == poster
         assert pg.locator("a[download][href$='windtunnel.mp4']").count() == 1 and pg.locator("a:has-text('Provenance (JSON)')").count() == 1
-        assert "No caption file is published" in pg.locator("figcaption").text_content() and pg.locator("track").count() == 0
+        assert "burned into the video" in pg.locator("figcaption").text_content() and "No separate caption track" in pg.locator("figcaption").text_content() and pg.locator("track").count() == 0
         assert "adds no evidence" in pg.locator("#main").text_content()
         pg.click(".demotabs a:has-text('2-minute')"); pg.wait_for_selector(".demotabs a[aria-current=page]:has-text('2-minute')")
-        assert pg.locator("track[kind=captions]").count() == 1 and "cut=frontier-120s" in pg.evaluate("location.hash")
+        assert pg.locator("a:has-text('Transcript (TXT)')").count() == 1 and pg.locator("a:has-text('Captions (VTT)')").count() == 1 and "optional English caption track" in pg.locator("figcaption").text_content() and pg.locator("track[kind=captions]").count() == 1 and "cut=frontier-120s" in pg.evaluate("location.hash")
         if w == 400:
             assert _overflow(pg) <= 0
         pg.close()
