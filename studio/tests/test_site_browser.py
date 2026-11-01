@@ -2330,3 +2330,25 @@ def test_delphi_and_science_pairs_remain_distinct_and_selectable(browser, base):
         assert pg.get_by_role('link', name='Explore Delphi', exact=True).get_attribute('href') == 'https://kavitakoolkarni-bio.github.io/delphi-portal/#about'
         assert _overflow(pg) <= 0 and not pg.errors
         pg.close()
+
+
+def test_project_navigation_resets_scroll_but_same_page_queries_preserve_it(browser, base):
+    for width in (1440, 390):
+        pg = page(browser, width, 844)
+        pg.goto(base + '#/studio')
+        pg.wait_for_selector('a[href="#/studio/tissue-microcarrier"]')
+        pg.locator('a[href="#/studio/tissue-microcarrier"]').click()
+        pg.wait_for_selector('#rs-gap')
+        pg.wait_for_function('window.scrollY === 0')
+        assert pg.locator('#main h1').bounding_box()['y'] >= 0
+        pg.evaluate('window.scrollTo(0, 400)')
+        pg.evaluate("location.hash = '#/studio/tissue-microcarrier?detail=1'")
+        pg.wait_for_function("DF.route.params.detail === '1'")
+        assert abs(pg.evaluate('window.scrollY') - 400) <= 1
+        pg.evaluate("location.hash = '#/studio/epithelial-repair'")
+        pg.wait_for_function("DF.route.path === '/studio/epithelial-repair' && window.scrollY === 0")
+        assert pg.locator('#main h1').bounding_box()['y'] >= 0
+        assert pg.evaluate("document.activeElement.id") == 'main'
+        assert 'observed fish' not in pg.locator('#foot').inner_text()
+        assert _overflow(pg) <= 0 and not pg.errors
+        pg.close()

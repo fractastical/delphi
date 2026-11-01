@@ -23,7 +23,7 @@
   const NAV = [["studio", "Studio"], ["frontier", "Frontier"], ["knowledge", "Knowledge"], ["evidence", "Evidence"], ["work", "System"]];
   const STUDIO_GROUP = new Set(["studio", "engineering", "simulations", "belief", "formalize", "history", "regulatory", "reuse", "blueprints", "experimentation", "ecology", "assemblies", "print-laws", "design-control", "proofs"]);       // reached from a project; they highlight Studio
   const inNav = (k, view) => view === k || (k === "studio" && STUDIO_GROUP.has(view)) || (k === "knowledge" && view === "entity") || (k === "work" && view === "system");
-  let snap = null; let lastView = null; let opener = null;
+  let snap = null; let lastPath = null; let opener = null;
   document.addEventListener("click", (e) => { const am = document.querySelector(".aboutmenu details"); if (am && am.open && !am.contains(e.target)) am.open = false; }, true);   // one listener for the life of the page
 
   function header(route) {
@@ -68,7 +68,7 @@
     }
     document.getElementById("gs").addEventListener("submit", (e) => { e.preventDefault(); const q = document.getElementById("gq").value.trim(); DF.go(DF.href("/search", { q, tab: "catalog" })); });
     const fn = DF.views[route.view];
-    const y = lastView === route.view ? window.scrollY : 0;
+    const y = lastPath === route.path ? window.scrollY : 0;
     document.title = (route.view[0].toUpperCase() + route.view.slice(1)) + " · MorphoSwarm Frontier";
     if (!fn) { main.innerHTML = html`<section class="pagehead"><h1>Not found</h1><p class="lede">${route.view === "about" || route.view === "generative" ? "This page is delivered by a module that is not part of this build yet." : "There is no view called “" + route.view + "”."} Choose one from the navigation above.</p></section>`.toString(); }
     else {
@@ -79,10 +79,10 @@
         console.error(e); main.innerHTML = html`<section class="pagehead"><h1>This view could not be drawn</h1><p class="lede">${e.message}</p><p>The data may be malformed. <a href="${DF.href("/frontier")}">Return to Frontier</a>.</p></section>`.toString();
       }
     }
-    if (lastView !== null && lastView !== route.view) { try { main.focus({ preventScroll: true }); } catch (e) { /* focus is best effort */ } }   // keyboard and screen-reader users land at the new view, not on the old link
+    if (lastPath !== null && lastPath !== route.path) { try { main.focus({ preventScroll: true }); } catch (e) { /* focus is best effort */ } }   // keyboard and screen-reader users land at the new page, including a different project
     DF.ready = true;                                 // lets boot.js know the app drew
     sessionProbe(hdr);
-    lastView = route.view; window.scrollTo(0, y);
+    lastPath = route.path; window.scrollTo(0, y);
     await drawer(route);
   }
 
@@ -154,7 +154,7 @@
     const foot = document.getElementById("foot");
     foot.innerHTML = html`<p><b>${snap.label}</b> · ${snap.inputs.length} input files hashed · <a href="data/snapshot.json">snapshot.json</a> · <a href="data/catalog.json">catalog.json</a> · KaTeX 0.16.47 (MIT, <a href="vendor/katex/LICENSE">licence</a>)</p>
       <details><summary>Input files and sha256</summary><div class="tablewrap"><table><tbody>${snap.inputs.map((i) => html`<tr><td><code>${i.path}</code></td><td><code>${i.sha256}</code></td><td>${i.bytes} bytes</td></tr>`)}</tbody></table></div></details>
-      <p class="small faint">Geometry is a design visualisation, not an observed fish and not CFD. Calculations are browser arithmetic on published fits. Upstream review labels are assertions, never local acceptance. Live: records, search, questions, System and the solver read the running node when it answers. From the snapshot: the curated mission board, recorded results and media, labelled with the snapshot above. No votes, scores or progress figures are shown.</p>`.toString();
+      <p class="small faint">Design geometry, simulations and observations are distinct evidence types. Each result states its model, source and validation limits. Upstream review labels are assertions, never local acceptance. Live: records, search, questions, System and the solver read the running node when it answers. From the snapshot: the curated mission board, recorded results and media, labelled with the snapshot above.</p>`.toString();
     document.addEventListener("click", (e) => { const a = e.target.closest("a[data-src]"); if (a) opener = a; });
     document.getElementById("dclose").addEventListener("click", closeDrawer);
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !document.getElementById("drawer").hidden) closeDrawer(); });
