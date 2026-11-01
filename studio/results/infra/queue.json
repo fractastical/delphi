@@ -160,9 +160,10 @@
       "task": "Preregistered exact-W1/amplitude-stratified secondary evaluation",
       "job_id": "aijob-e00dw01t3zcsg4az55",
       "owner": "infra_director",
-      "provider_state": "PROVISIONING",
-      "scope": "Same frozen weights/no training; primary metrics and failed-original history retained",
-      "manifest": "results/infra/diffusion-secondary/manifest-infra26.json"
+      "provider_state": "COMPLETED",
+      "scope": "Structural coverage passes; strict exact-W1 metric audit FAILED, all raw metrics retained. No retraining.",
+      "manifest": "results/infra/diffusion-secondary/manifest-infra26.json",
+      "result": "results/infra/diffusion-secondary/collection-audit.json"
     }
   ],
   "preparation": [
@@ -278,64 +279,84 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-11-01T00:40:10.714978Z",
+  "updated_at_utc": "2026-11-01T01:06:34.075010+00:00",
   "planning_horizon_utc": [
     "2026-10-31T23:28:04.655084+00:00",
     "2026-11-01T23:28:04.655084+00:00"
   ],
   "gcp": {
     "project": "scienceclaw26bos-3016",
-    "observed_at_utc": "2026-11-01T00:35:28.731826+00:00",
+    "observed_at_utc": "2026-11-01T01:05:59.509116+00:00",
     "global_cpu_limit": 32,
     "gpu_quota_granted": 1,
-    "gpu_vm_created": false,
+    "gpu_vm_created": true,
     "instances": [
       {
         "id": "4732435591005420012",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-16",
         "name": "frontier-cpu-20261031-01",
-        "status": "TERMINATED"
+        "status": "TERMINATED",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
       },
       {
         "id": "731385783382653564",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-8",
         "name": "frontier-cpu-20261031-02",
-        "status": "RUNNING"
+        "status": "TERMINATED",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
       },
       {
         "id": "8843861969326519893",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-16",
         "name": "frontier-cpu-20261031-03",
-        "status": "RUNNING"
+        "status": "RUNNING",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
+      },
+      {
+        "id": "946761909192569249",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-4",
+        "name": "frontier-cpu-20261031-04",
+        "status": "RUNNING",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
+      },
+      {
+        "guestAccelerators": [
+          {
+            "acceleratorCount": 1,
+            "acceleratorType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/acceleratorTypes/nvidia-l4"
+          }
+        ],
+        "id": "4266786588371661074",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/machineTypes/g2-standard-4",
+        "name": "frontier-gpu-20261031-01",
+        "status": "RUNNING",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
       }
     ],
     "active_allocated_vcpus": 24,
     "instantaneous_cpu_utilization": null,
-    "state": "CFD VM03 started pinned Julia package instantiate/precompile at00:34:06Z. Genomics VM02 repaired packet start requested; original failures exported. Allocation is not CPU utilization.",
+    "state": "VM03 runs R1/R3/M1 cylinder controls; VM04 ecology dependency setup and same-job controls; GPU01 L4 startup driver recognized and frozen calibration pipeline started. VM01/02 stopped; genomics23/23 exported. Allocation is not measured utilization.",
     "plan": [
       {
         "vm": "frontier-cpu-20261031-03",
-        "vcpu": 16,
-        "work": "R1/R3/M1 cylinder control cases",
-        "ready": true,
-        "source_sha256": "95ac40c9f229ff1332b4a7c8ed01ae8fe2316676abf739606e7c02a017a7e625"
+        "vcpus": 16,
+        "task": "controlled-cfd-argv-repair",
+        "source_sha256": "3507d462f7a4f6b6a1cd8f6cb67e6c1dc9bbf6d450fb2a3e476af38811f0418a",
+        "task_runtime_s": 79200
       },
       {
-        "vm": "frontier-cpu-20261031-02",
-        "vcpu": 8,
-        "work": "23 public-genome observational residue survey; one JSON boundary repair",
-        "ready": true,
-        "source_sha256": "95cbd6cbdf2ba97081d3ef2d13679ec7a608d8cac58bfaef469270b4600c375e"
+        "vm": "frontier-cpu-20261031-04",
+        "vcpus": 4,
+        "task": "ecology-axial-uncertainty",
+        "source_sha256": "755a23a592f3f07b87512d476a7560105bc203d3b2f5af8e85029a1db702c796",
+        "task_runtime_s": 1200
       },
       {
-        "vcpu": 4,
-        "work": "Future GPU VM overhead if validated useful packet ready",
-        "ready": false
-      },
-      {
-        "vcpu": 4,
-        "work": "Reserved ecology/glider CPU packets when frozen",
-        "ready": false
+        "vm": "frontier-gpu-20261031-01",
+        "vcpus": 4,
+        "task": "cylinder-r2-l4-calibration",
+        "source_sha256": "751a23c334b15cb3913441ef41b617b9d45502434527530d9805d6691dec0153",
+        "task_runtime_s": 10800
       }
     ],
     "network": "frontier-workers-20261031",
@@ -346,41 +367,31 @@
     "failure_receipts": [
       "results/resources/gcp/cfd-bootstrap-failure.json",
       "/data/artifacts/delphi-evolve-rethink/messages/gcp-artifact-collection-to-codex03.md"
-    ]
-  },
-  "next_ready_dispatch": {
-    "diffusion_secondary": {
-      "state": "PROVISIONING",
-      "source_commit": "396bd0bb8e0b5952e48916762f24afbf69b7ea20",
-      "input_archive_sha256": "7ac6d86ba5a9dcddc0c9241f103f848920b0d42350f24dc28e7b52d3d890aab5",
-      "gpus": 1,
-      "hard_provider_minutes": 45,
-      "scientific_compute_estimate_minutes": 6,
-      "estimate_basis": "Returned primary evaluation stages total ~6min on same H100/image; secondary full ensembles may vary.",
-      "stop_gates": [
-        "exact public SHA",
-        "same-allocation CUDA controls",
-        "full frozen condition counts/finite values",
-        "original metric reproduction reported unchanged"
+    ],
+    "status_update_utc": "2026-11-01T01:05:59.509116+00:00",
+    "genomics_completed": "results/resources/gcp/genomics-completion.json",
+    "automatic_collection": {
+      "service": "frontier-cfd-collector",
+      "prefix": "jobs/frontier-cpu-20261031-03/controlled-cfd-argv-repair/",
+      "runtime_s": 86400,
+      "interval_s": 300,
+      "state_path": "/data/artifacts/delphi-evolve-rethink/gcp/cfd-argv-watch.json",
+      "completion_is_export_not_science": true
+    },
+    "next_ecology": {
+      "state": "admitted, initial export succeeded; same-job controls pending",
+      "receipt": "results/resources/gcp/ecology-admission.json"
+    },
+    "l4_admission": {
+      "id": "4266786588371661074",
+      "zone": "us-central1-c",
+      "actual_cuda_science_pass": null,
+      "stockout_failures": [
+        "us-central1-a",
+        "us-central1-b"
       ],
-      "job_id": "aijob-e00dw01t3zcsg4az55",
-      "admitted_utc": "2026-11-01T00:39:30Z"
-    },
-    "cylinder_R2": {
-      "state": "OWNER_PREPARING_CUDA_PACKET",
-      "owner": "claude-04",
-      "gpus": 1,
-      "stop_gates": [
-        "CPU/CUDA parity",
-        "measured calibration fits bounded runtime",
-        "frozen physical bands unchanged",
-        "partial checkpoints export"
-      ]
-    },
-    "ecology_glider": {
-      "state": "WAIT_FROZEN_CONTROLS_AND_INPUTS",
-      "reserved_cpu": 4,
-      "no_duplicate_dispatch": true
+      "receipt": "results/resources/gcp/cfd-r2-l4-verified.json"
     }
-  }
+  },
+  "next_ready_dispatch": "Current L4 controls/calibration and ecology uncertainty admitted; native mechanobio is preparing distinct NCA training packet, no other frozen GPU packet ready."
 }

@@ -1,10 +1,10 @@
 {
   "schema": "frontier.hackathon-usage/1",
-  "observed_at_utc": "2026-11-01T00:44:14.039715Z",
-  "observed_at_seattle": "2026-10-31 17:35:28 PDT",
+  "observed_at_utc": "2026-11-01T00:59:08.046630Z",
+  "observed_at_seattle": "2026-10-31 17:59:08 PDT",
   "provider_window_utc": [
-    "2026-11-01T00:44:12.369039+00:00",
-    "2026-11-01T00:44:14.039715+00:00"
+    "2026-11-01T00:59:06.659642+00:00",
+    "2026-11-01T00:59:08.046630+00:00"
   ],
   "scope": "Actual Delphi Frontier hackathon job records created October31,2026; own prefixes only. Shared16H100 capacity is not usage.",
   "own_jobs": [
@@ -12,7 +12,7 @@
       "id": "aijob-e00dw01t3zcsg4az55",
       "name": "delphi-evolve-ops-infra26-rd-ddpm-preregistered-secondary-a1",
       "created_at": "2026-11-01T00:39:23.250505Z",
-      "state": "IMAGE_PULLING",
+      "state": "COMPLETED",
       "platform": "gpu-h100-sxm",
       "preset": "1gpu-16vcpu-200gb",
       "requested_capacity": {
@@ -511,18 +511,17 @@
     }
   ],
   "own_job_state_counts": {
-    "IMAGE_PULLING": 1,
-    "COMPLETED": 28,
+    "COMPLETED": 29,
     "FAILED": 7,
     "CANCELLED": 3
   },
   "active_allocations": {
-    "instances": 1,
+    "instances": 0,
     "running_instances": 0,
-    "pulling_instances": 1,
-    "gpus": 1,
-    "vcpus": 16,
-    "memory_gb": 200,
+    "pulling_instances": 0,
+    "gpus": 0,
+    "vcpus": 0,
+    "memory_gb": 0,
     "jobs_with_unknown_capacity": 0,
     "interpretation": "Requested capacity of nonterminal jobs, including startup. RUNNING is not measured GPU utilization. Kernel utilization is unknown until sampled telemetry is collected."
   },
@@ -705,6 +704,24 @@
       "gpu_samples_ge90pct": 313,
       "gpu_memory_used_mib_max": 42891.0,
       "power_w_mean": 563.9724678663239,
+      "interpretation": "Historical sampled allocation window, including setup and artifact emission; not current utilization or a project-wide average."
+    },
+    {
+      "task_label": "infra-secondary-exact-w1",
+      "source": "results/infra/diffusion-secondary/results/infra26-rd-ddpm-preregistered-secondary/out/telemetry_device.csv",
+      "sha256": "f625d7c50a01635c64377bfb71b55d7ac9f84861f2208ed8da456cbc95671cf2",
+      "window_utc": [
+        "2026-11-01T00:54:17.451000Z",
+        "2026-11-01T00:58:20.580000Z"
+      ],
+      "samples": 244,
+      "sample_period_ms": 1000.0,
+      "sample_period_definition": "Median observed interval, not an assumed polling rate",
+      "gpu_utilization_pct_mean": 80.02459016393442,
+      "gpu_utilization_pct_max": 100.0,
+      "gpu_samples_ge90pct": 178,
+      "gpu_memory_used_mib_max": 42891.0,
+      "power_w_mean": 521.4753278688524,
       "interpretation": "Historical sampled allocation window, including setup and artifact emission; not current utilization or a project-wide average."
     }
   ],
@@ -1245,66 +1262,119 @@
   },
   "latest_rd_numerics_status": "All5configs/960rows returned; independent full metric reproduction FAILED at66near-uniform power ratios. Original outcomes preserved; no convergence PASS. See artifacts/rd-numerics/artifact-manifest.json.",
   "latest_diffusion_status": {
-    "original_primary": "FAILED_TIMEOUT retained",
-    "evaluation_recovery": "COMPLETED exact weights/no training",
-    "audit_complete": true,
-    "receipt": "results/infra/diffusion-recovery/results/infra25-rd-ddpm-evaluation-recovery/recovery-result.json",
-    "secondary": "Admitted aijob-e00dw01t3zcsg4az55; IMAGE_PULLING at2026-11-01T00:44:14Z; no output yet.",
-    "speedup_claim": false
+    "observed_utc": "2026-11-01T01:04:59.733145+00:00",
+    "job_id": "aijob-e00dw01t3zcsg4az55",
+    "job_state": "COMPLETED",
+    "strict_audit_pass": false,
+    "structural_checks_pass": true,
+    "metric_failures": [
+      "12 nonfinite metric markers retained",
+      "157 finite DDPM metrics exceed frozen independent-recalculation tolerance",
+      "2 DDPM relative metrics have zero solver-amplitude denominator"
+    ],
+    "strata": {
+      "patterned": 140,
+      "near_uniform": 20
+    },
+    "float32_scalar_rounding_diagnosis": {
+      "finite_rows": 158,
+      "exact_float32_scalar_division_matches": 158,
+      "method": "Cast independently computed float64 W1 numerator to float32, divide by native float32 denominator, compare exactly. This reproduces source NumPy scalar promotion; it does not replace the frozen float64 recalculation criterion.",
+      "numpy_local": "2.4.4",
+      "numpy_remote": "2.1.0",
+      "max_relative_discrepancy_before_rounding": 9.919425107640942e-08,
+      "acceptance_unchanged": true
+    },
+    "frozen_approximate_metric_reproduction": {
+      "max_abs_diff_amp_w1_rel_or_mode_tv": 0.0,
+      "n_compared": 160,
+      "note": "generation is stochastic on GPU; a nonzero difference is reported, not corrected"
+    },
+    "raw_exact_relative_metric_medians": {
+      "ddpm": 0.025879913941025734,
+      "ddpm_shuffled_condition": 0.4463278204202652,
+      "nearest10_pooled": 0.8099779188632965,
+      "nearest1_pooled": {
+        "status": "nonfinite",
+        "token": "nan"
+      },
+      "nearest5_pooled": 0.09065183624625206
+    },
+    "note": "Undefined relative metrics and strict tolerance failures retained. Never claim exact-W1 audit pass; primary timeout remains separately preserved. No retraining or biological validation."
   },
   "gcp": {
     "project": "scienceclaw26bos-3016",
-    "observed_at_utc": "2026-11-01T00:50:17.033180+00:00",
+    "observed_at_utc": "2026-11-01T01:05:59.509116+00:00",
     "global_cpu_limit": 32,
     "gpu_quota_granted": 1,
-    "gpu_vm_created": false,
+    "gpu_vm_created": true,
     "instances": [
       {
         "id": "4732435591005420012",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-16",
         "name": "frontier-cpu-20261031-01",
-        "status": "TERMINATED"
+        "status": "TERMINATED",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
       },
       {
         "id": "731385783382653564",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-8",
         "name": "frontier-cpu-20261031-02",
-        "status": "TERMINATED"
+        "status": "TERMINATED",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
       },
       {
         "id": "8843861969326519893",
         "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-16",
         "name": "frontier-cpu-20261031-03",
-        "status": "RUNNING"
+        "status": "RUNNING",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
+      },
+      {
+        "id": "946761909192569249",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a/machineTypes/e2-standard-4",
+        "name": "frontier-cpu-20261031-04",
+        "status": "RUNNING",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-a"
+      },
+      {
+        "guestAccelerators": [
+          {
+            "acceleratorCount": 1,
+            "acceleratorType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/acceleratorTypes/nvidia-l4"
+          }
+        ],
+        "id": "4266786588371661074",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/machineTypes/g2-standard-4",
+        "name": "frontier-gpu-20261031-01",
+        "status": "RUNNING",
+        "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
       }
     ],
-    "active_allocated_vcpus": 16,
+    "active_allocated_vcpus": 24,
     "instantaneous_cpu_utilization": null,
-    "state": "Genomics23/23 completed and exported; VM02 stopped. VM03 exact argv-only repair restarted5:44:48PDT; Julia gate passed, cached environment complete, original restart controls rerunning. Same equations/acceptance; prior failures preserved.",
+    "state": "VM03 runs R1/R3/M1 cylinder controls; VM04 ecology dependency setup and same-job controls; GPU01 L4 startup driver recognized and frozen calibration pipeline started. VM01/02 stopped; genomics23/23 exported. Allocation is not measured utilization.",
     "plan": [
       {
         "vm": "frontier-cpu-20261031-03",
-        "vcpu": 16,
-        "work": "R1/R3/M1 cylinder control cases",
-        "ready": true,
-        "source_sha256": "95ac40c9f229ff1332b4a7c8ed01ae8fe2316676abf739606e7c02a017a7e625"
+        "vcpus": 16,
+        "task": "controlled-cfd-argv-repair",
+        "source_sha256": "3507d462f7a4f6b6a1cd8f6cb67e6c1dc9bbf6d450fb2a3e476af38811f0418a",
+        "task_runtime_s": 79200
       },
       {
-        "vm": "frontier-cpu-20261031-02",
-        "vcpu": 8,
-        "work": "Completed public-genome survey; stopped",
-        "ready": false,
-        "source_sha256": "95cbd6cbdf2ba97081d3ef2d13679ec7a608d8cac58bfaef469270b4600c375e"
+        "vm": "frontier-cpu-20261031-04",
+        "vcpus": 4,
+        "task": "ecology-axial-uncertainty",
+        "source_sha256": "755a23a592f3f07b87512d476a7560105bc203d3b2f5af8e85029a1db702c796",
+        "task_runtime_s": 1200
       },
       {
-        "vcpu": 4,
-        "work": "Future GPU VM overhead if validated useful packet ready",
-        "ready": false
-      },
-      {
-        "vcpu": 4,
-        "work": "Reserved ecology/glider CPU packets when frozen",
-        "ready": false
+        "vm": "frontier-gpu-20261031-01",
+        "vcpus": 4,
+        "task": "cylinder-r2-l4-calibration",
+        "source_sha256": "751a23c334b15cb3913441ef41b617b9d45502434527530d9805d6691dec0153",
+        "task_runtime_s": 10800
       }
     ],
     "network": "frontier-workers-20261031",
@@ -1316,7 +1386,7 @@
       "results/resources/gcp/cfd-bootstrap-failure.json",
       "/data/artifacts/delphi-evolve-rethink/messages/gcp-artifact-collection-to-codex03.md"
     ],
-    "status_update_utc": "2026-11-01T00:50:04.796444+00:00",
+    "status_update_utc": "2026-11-01T01:05:59.509116+00:00",
     "genomics_completed": "results/resources/gcp/genomics-completion.json",
     "automatic_collection": {
       "service": "frontier-cfd-collector",
@@ -1327,10 +1397,18 @@
       "completion_is_export_not_science": true
     },
     "next_ecology": {
-      "state": "ownerfreezing56controlledsimulations",
-      "vcpus": 4,
-      "image": "ubuntu-2404-noble-amd64-v20261024",
-      "requires_python": ">=3.12 for exact NumPy2.5.4; no silent pin substitution"
+      "state": "admitted, initial export succeeded; same-job controls pending",
+      "receipt": "results/resources/gcp/ecology-admission.json"
+    },
+    "l4_admission": {
+      "id": "4266786588371661074",
+      "zone": "us-central1-c",
+      "actual_cuda_science_pass": null,
+      "stockout_failures": [
+        "us-central1-a",
+        "us-central1-b"
+      ],
+      "receipt": "results/resources/gcp/cfd-r2-l4-verified.json"
     }
   },
   "measured_terminal_container_work": {
