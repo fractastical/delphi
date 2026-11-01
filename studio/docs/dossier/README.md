@@ -24,6 +24,7 @@ a figure is unknown, these pages say unknown rather than estimating it.
 | [06-simulations-across-scales.md](06-simulations-across-scales.md) | 31 recorded runs across 9 scales, and the coupling layer that refuses bridges |
 | [07-evidence-and-validation.md](07-evidence-and-validation.md) | What was actually checked, what failed, and the review-correction ledger |
 | [08-rubric-evidence-map.md](08-rubric-evidence-map.md) | Each judging criterion mapped to specific artifacts, with the gaps stated |
+| [09-resources-and-acknowledgements.md](09-resources-and-acknowledgements.md) | People, partners, open-source code, source texts, data and compute — the resources this work is built on |
 
 ## The one-paragraph version
 
