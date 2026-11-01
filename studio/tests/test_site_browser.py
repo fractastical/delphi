@@ -70,7 +70,7 @@ def test_build_is_current_and_portable():
 
 def test_every_view_renders_without_errors(browser, base):
     pg = page(browser)
-    for route in ["regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["reuse", "regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1, #main h2", timeout=5000)
         assert pg.locator("#main").inner_text().strip(), route
@@ -308,7 +308,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["home", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "reuse", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -1485,3 +1485,25 @@ def test_regulatory_map_page_keeps_source_only_scope_unknown_bridges_and_no_exec
     assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
     pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
     assert pg.locator(".subnav a:has-text('Regulatory applicability')").count() == 1
+
+
+def test_claim_reuse_page_shows_the_dispute_and_claims_no_benefit(browser, base):
+    C = json.loads((ROOT / "site/data/snapshot.json").read_text())["claim_reuse"]
+    audit = json.loads((ROOT / "artifacts/claim-reuse/audit.json").read_text())
+    assert C["distinct_actions"] == audit["distinct_current_action_ids_with_recorded_input_use"] == 2 and len(C["cases"]) == 2
+    for n in ("below", "above"):
+        a = json.loads((ROOT / f"docs/reviews/fin-reuse-review-run/readback/assessment-{n}.json").read_text())["record"]["payload"]
+        r = next(x for x in C["reviews"] if x["case"] == n)
+        assert r["decision"] == a["decision"] == "disputed" and r["dimensions"]["empirical_relevance"]["status"] == a["dimensions"]["empirical_relevance"]["status"] == "insufficient"
+    pg = page(browser)
+    pg.goto(base + "#/reuse"); pg.wait_for_selector("#ru-3")
+    t = pg.locator("#main").text_content()
+    assert "not a saving of time or cost" in t and "not a collective benefit" in t and "not biological evidence" in t
+    assert "disputed" in t and "insufficient" in t and "outside: a retained counterexample" in t and "inside" in t
+    assert "0.111111" in t and "0.090909" in t and "agreed with each finding and changed no record" in t
+    assert "typed uses link" in t or "typed <code>uses</code>" in pg.locator("#ru-1").inner_html()
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/reuse"); pg2.wait_for_selector("#ru-3")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+    pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
+    assert pg.locator(".subnav a:has-text('Claim reuse and dispute')").count() == 1

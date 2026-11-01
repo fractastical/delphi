@@ -578,6 +578,25 @@ def regulatory_map(ins: Inputs) -> dict | None:
             "files": man["files"], "manifest": f"{d}/manifest.json"}
 
 
+def claim_reuse_block(ins: Inputs) -> dict | None:
+    """A worked example of exact Claim reuse and an independent dispute: two distinct Actions consumed the same exact Claim version before their solver ran; an independent
+    reviewer recorded both Evidence as disputed. Everything is copied from the producer audit, the review readback and the author response; no benefit is computed."""
+    d = "artifacts/claim-reuse"; rv = "docs/reviews/fin-reuse-review-run/readback"
+    if not ((ROOT / d / "audit.json").exists() and (ROOT / rv / "assessment-above.json").exists()):
+        return None
+    A = json.loads(ins.read(f"{d}/audit.json")); E = json.loads(ins.read(f"{d}/reuse-verification.json")); reviews = []
+    for n in ("below", "above"):
+        r = json.loads(ins.read(f"{rv}/assessment-{n}.json")); pl = r["record"]["payload"]
+        reviews.append({"case": n, "reviewer": r["record"]["issuer"], "policy": r["policy_version"], "decision": pl["decision"], "assessment_id": r["record"]["id"], "created_at": r["record"]["created_at"],
+                        "dimensions": {k: {"status": v.get("status"), "rationale": v.get("rationale", "")} for k, v in pl["dimensions"].items()}})
+    return {"claim_ref": A["claim_ref"], "distinct_actions": A["distinct_current_action_ids_with_recorded_input_use"], "causal_order_checked": A["causal_read_and_input_binding_before_each_solver"],
+            "cases": [{k: c.get(k) for k in ("case", "action_ref", "evidence_ref", "parsed_EIcrit_Nm2_exact", "solver_EI_Nm2_exact", "tip_over_L", "tip_over_L_limit", "max_slope_rad", "model_domain_valid", "numerical_checks_passed", "result_sha256", "action_state_at_readback", "evidence_status_at_submission", "wall_seconds")} for c in A["cases"]],
+            "edges": E["edges"], "edges_truncated": E["truncated"], "reviews": reviews,
+            "not_established": {"time_or_cost_saved": A["time_or_cost_saved"], "collective_benefit": A["collective_benefit"], "biological_success_probability": A["biological_success_probability"], "empirical_validation": A["empirical_validation"]},
+            "scope": A["scope"], "original_proposals": A["original_proposals"], "readme": ins.text(f"{d}/README.md"), "author_response": ins.text(f"{d}/author-response.md"),
+            "audit": f"{d}/audit.json", "audit_sha256": ins.seen[f"{d}/audit.json"]["sha256"], "review_readback": rv}
+
+
 def lifecycle_block(ins: Inputs) -> dict | None:
     """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
     d = "data/fish-lifecycle"
@@ -1084,6 +1103,7 @@ def build() -> dict[str, bytes]:
     recovery_in = recovery_inputs(ins, extra)
     fish_hist = fish_history(ins)
     reg_map = regulatory_map(ins)
+    claim_reuse = claim_reuse_block(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -1120,6 +1140,7 @@ def build() -> dict[str, bytes]:
         "recovery_inputs": recovery_in,
         "fish_history": fish_hist,
         "regulatory_map": reg_map,
+        "claim_reuse": claim_reuse,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
