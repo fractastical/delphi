@@ -2376,6 +2376,8 @@ def test_reuse_studies_pair_real_recordings_with_controls_and_conditional_proofs
         assert pg.locator("#main .tex-fallback").count() == 0
         text = pg.locator("#main").inner_text()
         assert "unknown" in text and "does not establish tissue viability" in text
+        assert "No wound simulation exists in this node yet" not in text
+        assert "linking it to living tissue" in text or "calibrating them" in text.lower()
         assert "Wing loading" not in text and "[object Object]" not in text
         assert pg.locator('a[href="#/proofs?f=steady-oxygen-bound"]').count() == 1
         if study == "tissue-microcarrier":

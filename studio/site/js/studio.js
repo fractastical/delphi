@@ -225,7 +225,7 @@
     const rs = reuseStudies(snap);
     if (!rs.length) return "";
     return html`<h2 class="small">Reuse studies</h2><p class="small faint">Secondary, bounded proposals that reuse tools and records from the main project. None is a designed organism or a clinical claim, and none changes the featured project.</p>
-      ${rs.map((p) => html`<article class="card pform"><h3>${p.title} ${U.pill(p.group, "grp")} ${storeChip(p)}</h3><p><b>Question.</b> ${p.goal}</p><p class="small">${p.summary}</p><p><a class="btn ghost" href="${DF.href("/studio/" + p.id)}">Open reuse study</a></p></article>`)}`;
+      ${rs.map((p) => html`<article class="card pform"><h3>${p.title} ${U.pill(p.group, "grp")} ${storeChip(p)}</h3><p><b>Question.</b> ${p.goal}</p><p class="small">${DF.reuseStudies ? DF.reuseStudies.brief(snap, p) : p.summary}</p><p><a class="btn ghost" href="${DF.href("/studio/" + p.id)}">Open reuse study</a></p></article>`)}`;
   }
   const entityLink = (r) => html`<a href="${DF.href("/entity/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace || "snapshot" })}">${r.id}</a> <span class="faint small">@${r.version.slice(0, 12)}…</span>`;
   function reuseStudy(snap, p) {
@@ -236,11 +236,11 @@
     const inst = (x) => html`<li><b>${x.name}</b> ${U.pill(x.status, "warn")}${x.owner ? html` <span class="small faint">owner ${x.owner}</span>` : ""}<br><span class="small">${x.plan}</span>${x.needs ? html`<br><span class="small faint">Needs: ${x.needs}</span>` : ""}</li>`;
     return {
       html: html`<section class="pagehead"><p class="eyebrow"><a href="${DF.href("/studio")}">Studio</a> / ${p.group}</p><h1>${p.title}</h1><p class="lede">${p.goal}</p>
-        <p>${storeChip(p)} ${U.pill(p.status, "st-unk")}</p></section>
+        <p>${storeChip(p)}</p></section>
         <section class="panel" aria-labelledby="rs-st"><h2 id="rs-st">Design brief</h2>
-          <p>${p.summary}</p><p class="small"><b>Base context.</b> ${p.context.base}</p>
+          <p>${DF.reuseStudies ? DF.reuseStudies.brief(snap, p) : p.summary}</p><p class="small"><b>Base context.</b> ${p.context.base}</p>
           <details><summary>Scope and Project provenance</summary>${p.live_ref ? html`<p class="small">Project ${entityLink(p.live_ref)} was imported as an unreviewed proposal. This page combines the authored proposal with separately identified computational studies; storage does not establish biological validity.</p>` : html`<p class="note warn small"><b>An authored proposal, not a stored Project.</b> No Project record has been imported and no import receipt exists. ${PD ? html`The draft file <code>${PD.path}</code> (sha256 ${U.sha(PD.sha256)}) validates against the Project schema and has not been submitted. ` : ""}The design remains proposed.</p>`}
-          <ul class="small">${p.context.not_this.map((x) => html`<li>${x}</li>`)}</ul></details></section>
+          ${studies.length ? html`<p class="small"><b>Original proposal, retained as history:</b> ${p.summary}</p>` : ""}<ul class="small">${p.context.not_this.map((x) => html`<li>${x}</li>`)}</ul></details></section>
         ${DF.reuseStudies ? DF.reuseStudies.render(snap, p.id) : ""}
         ${DF.reuseStudies ? DF.reuseStudies.oxygen(snap, p.id) : ""}
         <section class="panel" aria-labelledby="rs-sc"><h2 id="rs-sc">Scales involved</h2><ol class="small">${p.scales.map((s) => html`<li><b>${sc(s.scale)}.</b> ${s.role}</li>`)}</ol></section>

@@ -4,6 +4,12 @@
 (function () {
   const DF = window.DF, { html } = DF, U = DF.ui;
   const cards = (snap, id) => ((snap.reuse_studies || {}).visuals || []).filter((v) => v.study === id);
+  function brief(snap, p) {
+    if (!cards(snap, p.id).length) return p.summary;
+    if (p.id === "epithelial-repair") return "Use a cultured epithelial sheet as a bounded test of multiscale design. Recorded Cellular Potts runs compare motility and mechanics; calibrating them against tissue measurements remains an open problem.";
+    if (p.id === "tissue-microcarrier") return "Explore how contraction, geometry and transport could shape a small tissue carrier. The numerical benchmark tests prescribed actuation in a generic soft body; linking it to living tissue remains an open problem.";
+    return p.summary;
+  }
   const num = (n) => Number.isFinite(n) ? n.toFixed(3) : "unknown";
   const pct = (n) => Number.isFinite(n) ? (100 * n).toFixed(2) + "%" : "unknown";
 
@@ -55,13 +61,13 @@
     const files = Object.entries(v.media || {});
     return html`<article class="reuse-result" id="study-result-${v.id}"><h3>${v.title}</h3>
       <p class="small">${U.pill("recorded simulation", "grp")} ${v.evidence_kind}</p>
-      ${summary(v.summary)}
       <div class="reuse-media${v.video_arrest_href ? " reuse-pair" : ""}">
       ${v.video_href ? html`<figure>${v.video_arrest_href ? html`<figcaption>Baseline: protrusion enabled</figcaption>` : ""}<video class="reuse-video" controls playsinline preload="metadata" poster="${v.poster_href || ""}" aria-label="${v.title}"><source src="${v.video_href}" type="video/mp4">Your browser cannot play this video. <a href="${v.video_href}">Download the recording</a>.</video></figure>` : ""}
       ${v.video_arrest_href ? html`<figure><figcaption>Control: protrusion disabled</figcaption><video class="reuse-video" controls playsinline preload="metadata" poster="${v.poster_arrest_href || ""}" aria-label="Protrusion-disabled control for ${v.title}"><source src="${v.video_arrest_href}" type="video/mp4"><a href="${v.video_arrest_href}">Download the control recording</a>.</video></figure>` : ""}</div>
       <p class="small faint">${v.labels.kind || ""} ${v.labels.time || ""}</p>
       ${v.labels.envelope_mm ? html`<p class="small">Toy envelope ${v.labels.envelope_mm.join(" × ")} mm; assumed mass ${v.labels.assumed_mass_g} g. These dimensions describe the numerical benchmark.</p>` : ""}
       ${v.biological_carrier ? html`<p class="note small"><b>Biological design: ${v.biological_carrier.status}.</b> ${v.biological_carrier.note}</p>` : ""}
+      ${summary(v.summary)}
       <ul class="small">${(v.caveats || []).map((s) => html`<li>${s}</li>`)}</ul>
       ${v.records_kept && v.records_kept.length ? html`<div class="note warn"><h4>Checks and unresolved results</h4><ul class="small">${v.records_kept.map((s) => html`<li>${s}</li>`)}</ul></div>` : ""}
       ${v.errata_href ? html`<p class="note small"><b>Review corrections:</b> <a href="${v.errata_href}">Read the reporting and validation qualifications</a> alongside the original results.</p>` : ""}
@@ -85,5 +91,5 @@
         <ul class="small">${m.record_links.groups[id].map((r) => html`<li><a href="${DF.href("/entity/" + r.ref.kind + "/" + r.ref.id, {v: r.ref.version, ns: r.ref.namespace})}">${r.title}</a> ${U.pill(r.ref.kind, "grp")}</li>`)}</ul>
         <p class="small"><a href="${m.record_links.receipt_href}">Exact public readback receipt</a></p>` : ""}</section>`;
   }
-  DF.reuseStudies = { cards, render, oxygen };
+  DF.reuseStudies = { cards, render, oxygen, brief };
 })();
