@@ -21,7 +21,7 @@ def strict(data):
     return json.loads(data, parse_constant=reject)
 
 
-def audit(collection, out):
+def audit(collection, out, continuation=False):
     protocol = strict((ART / "return-audit-protocol.json").read_bytes())
     rtol = protocol["roundoff_tolerance_before_recomputation"]["relative"]
     atol = protocol["roundoff_tolerance_before_recomputation"]["absolute"]
@@ -36,12 +36,26 @@ def audit(collection, out):
     summary = strict((science / "summary.json").read_bytes())
     cfg = strict((ART / "uncertainty-protocol.json").read_bytes())
     fixed = strict((ART / "protocol-refinement.json").read_bytes())
+    context = summary
+    continuation_cfg = None
+    if continuation:
+        from .continuation import selected_tasks
+
+        continuation_cfg = selected_tasks()
+        context = strict((ART / "uncertainty-initial/summary.json").read_bytes())
+        if (
+            summary["original_summary_sha256"]
+            != continuation_cfg["original_summary_sha256"]
+            or summary["continuation_protocol_sha256"]
+            != sha256((ART / "continuation-protocol.json").read_bytes()).hexdigest()
+        ):
+            raise ValueError("Continuation parent/protocol pin mismatch")
     if (
         sha256((ART / "uncertainty-protocol.json").read_bytes()).hexdigest()
-        != summary["protocol_sha256"]
+        != context["protocol_sha256"]
     ):
         raise ValueError("protocol pin mismatch")
-    for path, digest in summary["source_hashes"].items():
+    for path, digest in context["source_hashes"].items():
         if sha256((ROOT / path).read_bytes()).hexdigest() != digest:
             raise ValueError("frozen core source changed")
     expected = {
@@ -56,6 +70,8 @@ def audit(collection, out):
         for seed in cfg["seeds"]
         for neighbors in cfg["neighbor_modes"]
     }
+    if continuation:
+        expected = {x["id"]: x for x in continuation_cfg["tasks"]}
     ids = [x["id"] for x in summary["results"]]
     if len(ids) != len(set(ids)) or set(ids) != set(expected):
         raise ValueError("scenario identity/count mismatch")
@@ -292,7 +308,9 @@ def audit(collection, out):
         "source_partial_status": summary["status"],
         "collection_files_checked": len(receipt["artifacts"]),
         "collection_bytes_checked": sum(x["bytes"] for x in receipt["artifacts"]),
-        "declared_scenarios": 28,
+        "declared_scenarios": len(expected),
+        "missing_only_continuation": continuation,
+        "analysis_code_sha256": sha256(Path(__file__).read_bytes()).hexdigest(),
         "computed_scenarios": len(details),
         "actual_main_half_simulations": 2 * len(details),
         "actual_saved_frames_checked": total_frames,
@@ -318,8 +336,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--collection", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--continuation", action="store_true")
     args = parser.parse_args()
-    result = audit(args.collection, args.out)
+    result = audit(args.collection, args.out, args.continuation)
     print(
         {
             k: v

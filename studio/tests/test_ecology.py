@@ -91,3 +91,31 @@ def test_missing_only_continuation_rejects_recipe_change_and_repeated_case():
     changed["tasks"][0]["id"] = done[0]
     with pytest.raises(ValueError, match="repeat/change"):
         validate_missing_tasks(changed, summary, original)
+
+
+def test_aggregate_preserves_disjoint_science_and_rejects_replacement():
+    import copy
+    import json
+    import pytest
+    from engineering.ecology.model import ART
+    from engineering.ecology.aggregate import combine
+
+    initial = json.loads((ART / "uncertainty-initial/summary.json").read_text())
+    continuation = json.loads(
+        (ART / "uncertainty-continuation/raw-science/summary.json").read_text()
+    )
+    protocol = json.loads((ART / "uncertainty-protocol.json").read_text())
+    result = combine(initial, continuation, protocol)
+    assert result["computed_count"] == result["scenario_count"] == 28
+    assert initial["computed_count"] == 26
+    assert all(x["eligible"] for x in result["paired_comparisons"])
+    changed = copy.deepcopy(continuation)
+    changed["results"][0] = next(
+        x for x in initial["results"] if x["status"] == "computed"
+    )
+    with pytest.raises(ValueError, match="duplicate, replace or invent"):
+        combine(initial, changed, protocol)
+    changed = copy.deepcopy(continuation)
+    changed["results"][0]["task"]["overrides"]["fin_stiffness_Nm_rad"] = 0.4
+    with pytest.raises(ValueError, match="recipe"):
+        combine(initial, changed, protocol)

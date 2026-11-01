@@ -141,3 +141,23 @@ The native batch wall time is979.988s. Dollar cost and aggregate CPU utilization
 are unknown. Raw scientific outputs and exact-byte manifests are retained under
 `uncertainty-initial/raw-science/`; the original outer collection manifest is
 retained separately.
+
+## Separate missing-only continuation and aggregate
+
+The separately frozen continuation computed exactly the two originally unstarted
+hinge-stiff seed20261101 arms (168.909s native science wall time). All22 returned
+files/1,246,888bytes and four trajectory/context hashes were checked;364 saved
+frames and18 endpoint/discrepancy metrics reproduced exactly. Sampled saved-pose
+force/torque/energy checks again matched under the unchanged tolerance.
+
+Their0.6s response counts are8 with neighbors and1 without. The respective
+main/half-step maximum position discrepancies are1.677mm and1.881mm, and
+orientation discrepancies0.000705rad and0.000671rad. All actuator bounds pass.
+The aggregate therefore covers all28 originally declared scenarios/56 actual
+main/half-step simulations, while both native receipts retain their original
+statuses. `uncertainty-aggregate/summary.json` pins both parents and audits and
+refuses repeated, replaced or changed arms. The complete paired heatmap is in
+that directory. All28 dt-halving and140 actuator bounds pass; all0.6s endpoints
+exist, with later angle-domain stops retained. This remains a shared-model
+engineering sensitivity experiment, not empirical ecology or flying-fish neural
+validation. No extra cloud run was requested.

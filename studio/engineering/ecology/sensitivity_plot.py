@@ -61,7 +61,7 @@ def render(source, out):
     )
     fig.text(
         0.5,
-        0.005,
+        0.018,
         "Seven-point axial design: no interaction estimate | assumed parameter envelopes and shared source/seeds | model-domain stops retained | no biological probability",
         ha="center",
         color="#a4b4c8",
