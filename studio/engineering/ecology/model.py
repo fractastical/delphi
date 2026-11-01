@@ -312,6 +312,9 @@ def simulate(case, params, dt=None, seed=None):
     commands = np.full((len(ids), 4), -np.deg2rad(params["initial_fin_incidence_deg"]))
     work = np.zeros(len(ids))
     signedwork = work.copy()
+    fluid_work = 0.0
+    damping_loss = 0.0
+    initial_energy = float(sum(energies(model, data, ids, params)))
     frames = []
     reason = "duration reached"
     peaks = {
@@ -458,6 +461,7 @@ def simulate(case, params, dt=None, seed=None):
                     {
                         "id": f"fish-{i:02d}",
                         "position_m": positions[i].tolist(),
+                        "center_of_mass_world_m": data.subtree_com[x["body"]].tolist(),
                         "orientation_wxyz": data.qpos[x["q"] + 3 : x["q"] + 7].tolist(),
                         "linear_velocity_m_s": data.qvel[x["v"] : x["v"] + 3].tolist(),
                         "angular_velocity_body_rad_s": data.qvel[
@@ -468,6 +472,7 @@ def simulate(case, params, dt=None, seed=None):
                         },
                         "fin_command_rad": commands[i].tolist(),
                         "fin_actuator_torque_Nm": applied[i].tolist(),
+                        "fin_angular_velocity_rad_s": previous_velocity[i].tolist(),
                         "fin_effective_alpha_rad": alpha[i].tolist(),
                         "force_model_valid": bool(
                             np.max(abs(alpha[i]))
@@ -483,7 +488,24 @@ def simulate(case, params, dt=None, seed=None):
                         if np.max(abs(alpha[i]))
                         <= np.deg2rad(params["alpha_domain_deg"][1])
                         else None,
-                        "torque_world_Nm": torque[i].tolist()
+                        "fluid_torque_about_body_origin_world_Nm": torque[i].tolist()
+                        if np.max(abs(alpha[i]))
+                        <= np.deg2rad(params["alpha_domain_deg"][1])
+                        else None,
+                        "torque_world_Nm": (
+                            torque[i]
+                            + sum(
+                                (
+                                    np.cross(
+                                        data.xipos[bid] - positions[i],
+                                        np.array([0, 0, -model.body_mass[bid] * 9.81]),
+                                    )
+                                    for bid in [x["body"]]
+                                    + [j["body"] for j in x["joints"]]
+                                ),
+                                np.zeros(3),
+                            )
+                        ).tolist()
                         if np.max(abs(alpha[i]))
                         <= np.deg2rad(params["alpha_domain_deg"][1])
                         else None,
@@ -510,6 +532,10 @@ def simulate(case, params, dt=None, seed=None):
         interval = applied * (previous_velocity + after) / 2 * dt
         signedwork += interval.sum(axis=1)
         work += np.maximum(interval, 0).sum(axis=1)
+        fluid_work += drag_power * dt
+        damping_loss += (
+            params["fin_damping_Nm_s_rad"] * float(np.sum(previous_velocity**2)) * dt
+        )
     quat_error = max(
         abs(np.linalg.norm(x["orientation_wxyz"]) - 1)
         for f in frames
@@ -531,7 +557,8 @@ def simulate(case, params, dt=None, seed=None):
                 (GEOM / "candidate.json").read_bytes()
             ).hexdigest(),
             "panels_sha256": sha256((GEOM / "panels.json").read_bytes()).hexdigest(),
-            "mesh_mm_to_body_m": "Rz(pi)*(mesh_mm*0.001-[cg_from_nose_m,0,0])",
+            "mesh_source_units": "m; biological component STLs, not print STLs",
+            "mesh_m_to_body_m": "Rz(pi)*(component_STL_m-[cg_from_nose_m,0,0])",
             "cg_from_nose_m": geo["cg_from_nose_m"],
         },
         "assumptions": "Reduced quasisteady VLM-derived forces; no CFD, underwater propulsion, neural calibration, body/fin collision or wake coupling; assumed mass/CG/inertia/drag/control",
@@ -543,6 +570,19 @@ def simulate(case, params, dt=None, seed=None):
             "max_quaternion_norm_error": quat_error,
             "peaks": peaks,
             "final_positive_work_J": work.tolist(),
+            "fluid_work_J_total": fluid_work,
+            "joint_damping_loss_J_total": damping_loss,
+            "initial_mechanical_energy_J_total": initial_energy,
+            "final_mechanical_energy_J_total": float(
+                sum(energies(model, data, ids, params))
+            ),
+            "mechanical_energy_balance_residual_J": float(
+                sum(energies(model, data, ids, params))
+            )
+            - initial_energy
+            - float(signedwork.sum())
+            - fluid_work
+            + damping_loss,
             "triggered_count": int(triggered.sum()),
             "delays_s": delays.tolist(),
         },

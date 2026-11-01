@@ -85,8 +85,8 @@
         "sha256": "e35bf98da1c91987ef042b245a721e0814dc82cd5dcfaf659985a1b6a8131467"
       }
     ],
-    "source_status": "Sourced/assumed procedural biological geometry, not specimen scan; original component STL units mm, panels m; no print/resin mesh or mass",
-    "mesh_to_body": "Rz(pi)*(mesh_mm*0.001-[cg_from_nose_m,0,0])",
+    "source_status": "Biological component STL vertices are in metres (verified from actual body bounds); components.json bbox_mm is a different metadata representation. No print/resin mesh or mass.",
+    "mesh_to_body": "Rz(pi)*(component_STL_m-[cg_from_nose_m,0,0])",
     "world_axes": "+X initial flight,+Y left,+Z up; right-handed",
     "quaternion": "wxyz; body-to-world; actual normalized MuJoCo states"
   },
@@ -236,6 +236,7 @@
   "numerical_revision": {
     "parent_protocol_sha256": "0839a7892a72e1a61f1cf96d9c6fd955806e821d3cfc2eca79ff11747ace53a5",
     "reason": "Original0.0005/0.00025 servo case failed unchanged dt-discrepancy bounds; attempt smaller steps without changing physics/parameters or acceptance limits. Original failed convergence and domain exits retained.",
-    "original_result_path": "artifacts/ecology/run-v2/summary.json"
+    "original_result_path": "artifacts/ecology/run-v2/summary.json",
+    "geometry_metadata_correction": "Original protocol/draft viewer assumed component-STL unitsmm. Actual vertices are m. Physics used panelm and bbox_mm converted correctly; only draft render/metadata affected. Preserve original protocol and original V2 trajectories; apply this corrected transform to new output."
   }
 }

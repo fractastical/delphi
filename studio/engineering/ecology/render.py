@@ -32,7 +32,8 @@ def parts(cg):
     arrays = []
     body = trimesh.load(GEOM / "components/body.stl", process=True)
     # Rendering-only vertex clustering; original source and physics are unchanged.
-    vertices = np.asarray(body.vertices) * 0.001
+    # Biological component STLs are already in metres. Print STLs are separate.
+    vertices = np.asarray(body.vertices)
     cells = np.round(vertices / 0.0008).astype(int)
     _, inverse = np.unique(cells, axis=0, return_inverse=True)
     counts = np.bincount(inverse)
