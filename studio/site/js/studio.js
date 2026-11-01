@@ -218,10 +218,9 @@
   };
 
   /* ---------------------------------------------------------------- reuse studies: a bounded, data-driven template (site/content/projects.json, template "reuse-study").
-   * Each one is an authored proposal. It is shown as stored only when its entry names a live_project_id, which is set after a Project import receipt exists. */
-  const reuseStudies = (snap) => snap.projects.projects.filter((p) => p.template === "reuse-study");
-  const stored = (p) => !!p.live_project_id;
-  const storeChip = (p) => (stored(p) ? U.pill("stored Project " + p.live_project_id, "ok") : U.pill("authored proposal, not a stored Project", "warn"));
+   * Each study stays a proposal; a source-bound publication receipt can additionally identify its stored, unreviewed Project. */
+  const reuseStudies = (snap) => snap.projects.projects.filter((p) => p.template === "reuse-study").map((p) => ({ ...p, live_ref: ((snap.project_drafts || {})[p.draft_key] || {}).live_ref }));
+  const storeChip = (p) => (p.live_ref ? U.pill("stored Project · unreviewed proposal", "warn") : U.pill("authored proposal, not a stored Project", "warn"));
   function reuseList(snap) {
     const rs = reuseStudies(snap);
     if (!rs.length) return "";
@@ -231,12 +230,13 @@
   const entityLink = (r) => html`<a href="${DF.href("/entity/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace || "snapshot" })}">${r.id}</a> <span class="faint small">@${r.version.slice(0, 12)}…</span>`;
   function reuseStudy(snap, p) {
     const PD = (snap.project_drafts || {})[p.draft_key]; const sc = (k) => (snap.mission.scales.find((s) => s.key === k) || { label: k }).label;
+    p = { ...p, live_ref: PD && PD.live_ref };
     const tool = (t) => { const m = vidOf(snap, t.id); return html`<article class="card"><h4>${m ? m.title : t.id}</h4><p class="small">${U.pill("tool, not proof of transfer", "st-unk")} ${m ? U.pill(m.evidence_kind.split(" (")[0], "grp") : U.pill("not in this snapshot", "no")}</p><p class="small"><b>Use here.</b> ${t.use}</p><p class="small"><b>Limit.</b> ${t.limit}</p>${m ? html`<p class="small"><a href="${DF.href("/simulations", { q: m.title })}">Inspect its results, checks and sources</a></p>` : ""}</article>`; };
     const inst = (x) => html`<li><b>${x.name}</b> ${U.pill(x.status, "warn")}${x.owner ? html` <span class="small faint">owner ${x.owner}</span>` : ""}<br><span class="small">${x.plan}</span>${x.needs ? html`<br><span class="small faint">Needs: ${x.needs}</span>` : ""}</li>`;
     return {
       html: html`<section class="pagehead"><p class="eyebrow"><a href="${DF.href("/studio")}">Studio</a> / ${p.group}</p><h1>${p.title}</h1><p class="lede">${p.goal}</p>
         <p>${storeChip(p)} ${U.pill(p.status, "st-unk")}</p></section>
-        <section class="panel" aria-labelledby="rs-st"><h2 id="rs-st">What this page is</h2>${stored(p) ? html`<p class="small">A Project record <code>${p.live_project_id}</code> was imported into the node. This page is still the site's authored projection of it.</p>` : html`<p class="note warn small"><b>An authored proposal, not a stored Project.</b> No Project record has been imported and no import receipt exists. ${PD ? html`The draft file <code>${PD.path}</code> (sha256 ${U.sha(PD.sha256)}) validates against the Project schema and has not been submitted. ` : ""}Nothing below is accepted, reviewed or run.</p>`}
+        <section class="panel" aria-labelledby="rs-st"><h2 id="rs-st">What this page is</h2>${p.live_ref ? html`<p class="small">Project ${entityLink(p.live_ref)} was imported as an unreviewed proposal. This page is the site's authored projection; storage does not establish biological validity.</p>` : html`<p class="note warn small"><b>An authored proposal, not a stored Project.</b> No Project record has been imported and no import receipt exists. ${PD ? html`The draft file <code>${PD.path}</code> (sha256 ${U.sha(PD.sha256)}) validates against the Project schema and has not been submitted. ` : ""}Nothing below is accepted, reviewed or run.</p>`}
           <p class="small">${p.summary}</p><p class="small"><b>Base context.</b> ${p.context.base}</p>
           <p class="small"><b>This is not:</b></p><ul class="small">${p.context.not_this.map((x) => html`<li>${x}</li>`)}</ul></section>
         <section class="panel" aria-labelledby="rs-sc"><h2 id="rs-sc">Scales involved</h2><ol class="small">${p.scales.map((s) => html`<li><b>${sc(s.scale)}.</b> ${s.role}</li>`)}</ol></section>
@@ -258,7 +258,7 @@
 
   /* The Project record draft (guilds' schema): requirements and open questions as declared; a draft is not a store record and nothing here is accepted. */
   function projectDraftPanel(PD) {
-    return html`<section class="panel" aria-labelledby="pd-h"><h2 id="pd-h">Project record draft</h2><p class="note small"><b>Validated but not submitted.</b> This is the project as a Project record would carry it (file <code>${PD.path}</code>, sha256 ${U.sha(PD.sha256)}). A Project is proposed until an independent operator reviews it; the page does not submit it.</p>
+    return html`<section class="panel" aria-labelledby="pd-h"><h2 id="pd-h">Project record ${PD.live_ref ? "and authored snapshot" : "draft"}</h2><p class="note small">${PD.live_ref ? html`<b>Stored, unreviewed proposal.</b> ${entityLink(PD.live_ref)}. The live record pins the node's exact member versions. The original snapshot draft is retained below` : html`<b>Validated but not submitted.</b> This is the project as a Project record would carry it`} (file <code>${PD.path}</code>, sha256 ${U.sha(PD.sha256)}). Independent scientific acceptance is not established; the page does not submit records.</p>
       <p class="small">${PD.members.length} pinned members; none declares a calibrated causal bridge${PD.members.some((m) => m.causal_bridge && m.causal_bridge !== "none_declared") ? "" : " (all say none declared)"}. ${PD.limitations.join(" ")}</p>
       <details><summary><b>${PD.requirements.length} requirements</b> <span class="faint small">all stage ${[...new Set(PD.requirements.map((r) => r.stage))].join(", ")}</span></summary><ul>${PD.requirements.map((r) => html`<li><b>${r.kind}</b> ${r.text}${r.quantity ? html` <code>${r.quantity.name} ${r.quantity.comparator} ${r.quantity.value} ${r.quantity.unit}</code>` : ""}</li>`)}</ul></details>
       <details><summary><b>${PD.open_questions.length} open questions</b></summary><ul>${PD.open_questions.map((q) => html`<li>${q.text} ${q.problem ? html`<a href="${DF.href("/frontier/" + q.problem)}">${q.problem}</a>` : ""}</li>`)}</ul></details></section>`;

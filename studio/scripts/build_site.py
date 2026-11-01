@@ -1641,6 +1641,21 @@ def project_drafts(ins: Inputs) -> dict:
             "scale_coverage": p.get("scale_coverage", []), "requirements": p.get("requirements", []),
             "open_questions": [{"text": q.get("text"), "problem": (q.get("problem") or {}).get("id"), "blocks": q.get("blocks", [])} for q in p.get("open_questions", [])],
             "members": [{"subsystem": m.get("subsystem"), "role": m.get("role"), "relationship": m.get("relationship"), "causal_bridge": m.get("causal_bridge"), "applicability": m.get("applicability"), "ref": {k: (m.get("ref") or {}).get(k) for k in ("kind", "id", "namespace")}} for m in p.get("members", [])]}
+    receipt = "projects/reuse-studies/live-projects.json"
+    if (ROOT / receipt).is_file():
+        from frontier.models import Record
+        publication = ins.json(receipt)
+        current_source = digest_bytes(ins.read("site/content/projects.json"))
+        if publication.get("source_projects_sha256") == current_source:
+            for item in publication.get("projects", []):
+                record = Record.model_validate(item["record"]).model_dump()
+                key = item["project"]
+                expected = {k: record[k] for k in ("namespace", "kind", "id", "version")}
+                if (key in out and record["kind"] == "Project" and record["id"] == "project-" + key
+                        and item["target"] == expected and item["local_status"] == "imported_unreviewed"
+                        and record["payload"]["source"]["content_sha256"] == current_source):
+                    out[key]["live_ref"] = expected
+                    out[key]["live_status"] = item["local_status"]
     return out
 
 

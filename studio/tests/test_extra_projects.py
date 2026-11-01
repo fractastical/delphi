@@ -87,3 +87,28 @@ def test_tools_named_by_the_studies_are_recorded_simulation_manifests():
     have = {m["id"] for m in snap["simulation_manifests"]}
     named = {t["id"] for p in EXTRA.values() for t in p["tools"]}
     assert named and named <= have
+
+
+def test_stored_project_label_requires_bound_record_and_current_authored_source(tmp_path, monkeypatch):
+    import shutil
+    import build_site as site_builder
+
+    files = ['site/content/projects.json', 'projects/reuse-studies/live-projects.json',
+             'projects/tissue-microcarrier.draft.json', 'projects/epithelial-repair.draft.json']
+    for name in files:
+        dest = tmp_path / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / name, dest)
+    monkeypatch.setattr(site_builder, 'ROOT', tmp_path)
+    result = site_builder.project_drafts(site_builder.Inputs())
+    assert all(result[pid]['live_ref']['id'] == 'project-' + pid for pid in IDS)
+    receipt_path = tmp_path / files[1]
+    receipt = json.loads(receipt_path.read_text())
+    receipt['projects'][0]['target']['version'] = '0' * 64
+    receipt_path.write_text(json.dumps(receipt))
+    result = site_builder.project_drafts(site_builder.Inputs())
+    assert 'live_ref' not in result[receipt['projects'][0]['project']]
+    source = tmp_path / files[0]
+    source.write_bytes(source.read_bytes() + b'\n')
+    result = site_builder.project_drafts(site_builder.Inputs())
+    assert all('live_ref' not in row for row in result.values())
