@@ -237,6 +237,12 @@
    "evidence_kind": "SimulationResult: model-only Cellular Potts lattice frames (Morpheus TiffPlotter) with logged cell-centre tracks; not a chart, not validated",
    "id": "epithelial-closes-vs-arrests",
    "labels": {
+    "cell_counts": {
+     "nominal_target_nodes_per_cell": 625,
+     "note": "625 is the nominal target volume and scale anchor, not an observed mean: the unwounded run starts with 65 cells (logger and first TIFF), a mean of 40000/65 = 615.4 nodes",
+     "unwounded_A5_initial": 65,
+     "wounded_A1_F1_after_4_removed": 61
+    },
     "kind": "2D Cellular Potts testbed run on the pinned Morpheus engine, CPU",
     "length_scale": "26 um mean cell diameter sets a length scale only; no output was compared with data from any cell line or species",
     "model_only": true,
@@ -253,10 +259,10 @@
    },
    "media": {
     "errata": {
-     "bytes": 1756,
+     "bytes": 2880,
      "download": false,
      "path": "artifacts/reuse-study-visuals/epithelial-card-errata.md",
-     "sha256": "6237b997e951fdd25585abdf27b424f758bcc0ea8498556581faf7bcd874f83e"
+     "sha256": "aa8c7bc6a92bac8035175477004d6d67ae45a66342209948e4670db3c2845fbf"
     },
     "poster": {
      "bytes": 185499,
@@ -382,7 +388,7 @@
    ],
    "study": "epithelial-repair",
    "summary": {
-    "gap_size_scaling": "refuted in this model: gate G12 failed (the k=1 wound never arrests; k=4 and k=7 share a bracket although the rule predicts different thresholds)",
+    "gap_size_scaling": "not supported in this model: gate G12 failed (the k=1 wound never arrests; the gap ladder is incomplete) and G8 was not evaluable; the k=4 and k=7 bracket midpoints differing does not by itself refute a constant Phi because their bracket intervals overlap. Counter-evidence kept, criteria not rescued.",
     "gates": {
      "descriptive": [
       "G6"
@@ -410,6 +416,7 @@
       "G8"
      ]
     },
+    "horizon": "CLOSED and ARRESTED are operational labels at a finite 1000 model-unit horizon; permanence of arrest is not shown.",
     "j_scaling": {
      "bracket_geometric_mean": 1.4142135623730951,
      "observed_bracket": [
@@ -442,8 +449,11 @@
     "passive_floor": {
      "arm": "F1-no-drive-NEGATIVE",
      "closed_fraction": 0.22040000000000004,
-     "reading": "With both drives off the gap still shrinks by this fraction because surviving cells relax into volume they were short of: geometric and volume relaxation, not repair. Read any closure fraction against it. The card's separate 25% geometric-floor arithmetic is under review (625 nodes filled versus 1875 residual); no 25% figure is shown here.",
+     "reading": "Observed in this one context (both drives off, same wound): the gap still shrinks by this fraction as surviving cells relax into volume they were short of (geometric and volume relaxation, with perimeter and Metropolis dynamics). It is a context-specific control, not a universal amount to subtract: show it beside a matched baseline, and no isolated mechanism contribution was measured. The card's separate 25% geometric-floor arithmetic is under review (625 nodes filled versus 1875 residual); no 25% figure is shown here.",
      "state": "ARRESTED"
+    },
+    "readout_check": {
+     "G1b": "logger and TIFF agree at the 21 times they share, of 41 TIFF frames per arm (logger every 10, TIFF every 25: shared at 0, 50, ..., 1000); the other TIFF frames are not compared. Same engine state, so a readout-consistency check, not independent biology. G1 is an identity from the gap definition, not independent area conservation."
     }
    },
    "title": "Epithelial gap in a Cellular Potts model: the same wound closes, or is left open when motility is off"

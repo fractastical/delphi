@@ -84,7 +84,7 @@ def test_epithelial_entry_reports_the_files_own_gates_and_keeps_every_failure():
     assert g["pass"] == sum(x["passed"] is True for x in res) and g["fail"] == sum(x["passed"] is False for x in res) == 3
     assert g["pass"] == 8 and g["descriptive"] == ["G6"] and g["unevaluable"] == ["G8"]      # G6 is descriptive, not a pass
     text = json.dumps(v)
-    for needle in ("G4 fail", "G10 fail", "G12 fail", "G8 not_pass_fail", "not an observed point threshold", "not a physical law", "refuted in this model", "tested model hypothesis"):
+    for needle in ("G4 fail", "G10 fail", "G12 fail", "G8 not_pass_fail", "not an observed point threshold", "not a physical law", "not supported in this model", "tested model hypothesis", "615.4", "21", "context-specific control"):
         assert needle in text
     pair = v["summary"]["pair"]
     assert pair["closes"]["state"] == "CLOSED" and pair["arrests"]["state"] == "ARRESTED"
