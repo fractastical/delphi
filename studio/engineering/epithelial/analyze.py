@@ -65,6 +65,22 @@ def tiff_gap(d: Path, frame_step: float) -> list[tuple[float, int, int]]:
     return out
 
 
+def horizon_trend(series: list[dict]) -> dict:
+    """Was an arm still closing when its declared horizon ended?
+
+    ARRESTED means "did not close within the declared simulated horizon", NOT demonstrated
+    permanent arrest. Source-only reviewer's point, and it is measurable: this reports the gap
+    change over the last 20% of each run so the distinction is visible rather than asserted.
+    """
+    g = [s_["gap"] for s_ in series]
+    i = int(len(series) * 0.8)
+    d = g[-1] - g[i]
+    rel = d / max(g[i], 1)
+    return dict(gap_at_80pct=g[i], gap_at_end=g[-1], delta_last_20pct=d, relative=rel,
+                trend=("still closing" if rel < -0.01 else
+                       "plateaued" if abs(rel) <= 0.01 else "gap re-opening (CPM fluctuation)"))
+
+
 def closure(series: list[dict], mcs: float) -> dict:
     g0, gend = series[0]["gap"], series[-1]["gap"]
     hit = next((s["t"] for s in series if s["gap"] <= 0), None)
@@ -102,7 +118,7 @@ def main() -> None:
     for name, A in arms.items():
         c = closure(A["series"], A["arm"]["mcs"])
         tif = tiff_gap(runs / name, A["arm"]["frame_step"])
-        res[name] = dict(arm=A["arm"], **c,
+        res[name] = dict(arm=A["arm"], **c, horizon=horizon_trend(A["series"]),
                          n_cells=A["series"][0]["n"], t_end=A["series"][-1]["t"],
                          e_volume_end=A["series"][-1]["e_volume"], e_surface_end=A["series"][-1]["e_surface"],
                          e_volume_start=A["series"][0]["e_volume"], e_surface_start=A["series"][0]["e_surface"],
@@ -238,6 +254,16 @@ def main() -> None:
             lam = math.sqrt(max(cl) * min(ar))
             g9.update(measured_bracket=[max(cl), min(ar)], measured_lambda_star=lam,
                       inside=0.6 <= lam <= 2.0)
+        arrested_side = min(ar) if ar else None
+        if arrested_side is not None:
+            nm = next((n for n in res if n.startswith("D-k4-J280-")
+                       and res[n]["arm"]["lambda_v"] == arrested_side), None)
+            g9["horizon_caveat"] = dict(
+                arrested_side_arm=nm, trend=res[nm]["horizon"] if nm else None,
+                note="the bracket's arrested side is 'did not close within the declared horizon', "
+                     "not permanent arrest. If that arm would close given longer, the bracket "
+                     "and its geometric-mean summary both move. The horizon is a declared "
+                     "parameter of this result, not a property of the model.")
         gates.append(dict(id="G9", passed=g9.get("inside"), detail=g9))
 
     prot_series = []
@@ -264,13 +290,31 @@ def main() -> None:
                              gap0=rows[0]["gap0"], gap0_um2=rows[0]["gap0"] * NODE_AREA_UM2,
                              n_cells=rows[0]["n_cells"])
     if ladder:
-        ph = [v["phi_star"] for v in ladder.values()]
+        # Phi* is only known to lie inside (lambda bracket) x coef. Comparing the geometric-mean
+        # SUMMARIES of two intervals and calling the ratio a refutation is a statistical error:
+        # the summaries can differ while the intervals overlap, which is exactly the case here.
+        # Found by independent review; the overlap is computed rather than asserted.
+        for v in ladder.values():
+            v["phi_interval"] = [v["bracket"][0] * v["coef"], v["bracket"][1] * v["coef"]]
+        ks = sorted(ladder)
+        lo = max(ladder[k]["phi_interval"][0] for k in ks)
+        hi = min(ladder[k]["phi_interval"][1] for k in ks)
+        ph = [ladder[k]["phi_star"] for k in ks]
         gates.append(dict(id="G12", passed=(len(ladder) == 3), detail=dict(
-            ladder=ladder, phi_star_values=ph,
-            phi_star_spread_ratio=(max(ph) / min(ph)) if ph else None,
+            ladder=ladder, rungs=len(ladder), rungs_required=3,
+            phi_star_point_summaries=ph,
+            phi_star_summary_ratio=(max(ph) / min(ph)) if ph else None,
+            phi_interval_overlap=([lo, hi] if lo <= hi else None),
+            constant_phi_star_consistent_with_these_rungs=(lo <= hi),
             constant_phi_star_asserted=False,
-            note="a constant Phi* is not asserted. The spread ratio states how far from constant it is.")))
-
+            constant_phi_star_refuted=False,
+            note=("the rungs present have OVERLAPPING Phi intervals, so they are consistent with a "
+                  "constant Phi* and do NOT refute one. The point summaries differ by the ratio "
+                  "above, but a ratio of two interval summaries is not a measurement. G12 fails "
+                  "because the ladder is INCOMPLETE: k=1 produced no bracket at any swept "
+                  "lambda_V, and k=1 is independently confounded (its passive ceiling is 100% of "
+                  "that wound), so it cannot discriminate in either direction. Gap-size scaling is "
+                  "therefore UNTESTED at this resolution, not refuted."))))
     # Descriptive shape of the closing phase. Bai & Zeng 2023 report a roughly linear area
     # decrease and cite Anon et al. for a linear experimental decrease and ref 74 for an
     # exponential one. This fits both forms to the pre-closure samples of each CLOSED arm and

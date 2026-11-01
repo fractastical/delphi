@@ -71,6 +71,14 @@ is the sensitivity probe for it.
 
 `gap_nodes(t) = 40000 − Σ cell.volume(t)`, from the per-cell log.
 
+**"ARRESTED" means did not close within the declared simulated horizon** — `StopTime 1000`,
+i.e. 1 000 Monte-Carlo sweeps at `MCSDuration 1`. **It is not a demonstration of permanent
+arrest**, and that distinction is measurable rather than semantic here: of the 13 arrested
+arms, **5 were still closing when their horizon ended**, 4 had plateaued, and 4 showed the
+gap fluctuating slightly open — CPM is stochastic and a plateau is noisy, not static. Every
+arm's last-20% trend is in `results-r2.json` under `horizon`. *(Wording and analysis added
+2026-10-31 at the source-only reviewer's request; no run was repeated.)*
+
 Two gates check the instrument before any result is read:
 
 - **G1b is INCOMPLETE, not a pass.** It compares the gap against an **independent channel** —
@@ -96,6 +104,14 @@ Two gates check the instrument before any result is read:
 - **G3** confirms every initial gap is exactly 625·*k*. **G5** confirms an unwounded sheet
   reads exactly 0 at every logged time — a gap measure that cannot report zero cannot report
   closure. **G2** confirms no cell is created or destroyed after wounding.
+- **G1 is weaker than its name suggests.** "Area conservation" is **an identity given the
+  definition** `gap ≡ 40000 − Σ cell.volume`, so the sum cannot fail to total 40 000. What it
+  genuinely catches is a non-integer or negative gap, i.e. a corrupt or mis-parsed log. It is
+  **not** an independent proof that area is conserved. *(Framing corrected at the final
+  independent review's request.)*
+- **Neither G1 nor G1b is independent of the engine.** Both read the same simulation state
+  through two code paths. They check that the *readout* is consistent, not that the physics or
+  the biology is right.
 
 All four pass.
 
@@ -206,12 +222,23 @@ interval. **No J=280 measurement entered the prediction.**
 
 What that is and is not: 1.414 is a **summary statistic of the bracket**, not a directly
 measured point threshold; the true threshold is somewhere in (1, 2) and the sweep spacing is
-all that is known about it. This is **one doubling at one gap size**. It was not repeated at
+all that is known about it.
+
+**And the bracket is horizon-dependent.** Its arrested side, `D-k4-J280-lamV2`, was **still
+closing when the run ended** — down 152 nodes over the last 20%, from 1 360 to 1 208. If that
+arm would close given a longer horizon, the bracket moves up from (1, 2) to at least (2, 4)
+and the 1.414 summary goes with it. At that rate it would need roughly 2.6× the current
+horizon, so this is an open question rather than a near miss. **The horizon is a declared
+parameter of this result, not a property of the model**, and G9 should be read as "inside the
+predicted interval *at StopTime 1000*". This is **one doubling at one gap size**. It was not repeated at
 *k*=7, and it does not establish exact linear proportionality in J — only that one
 out-of-sample bracket fell where the group said it would. The packet sweep in the infra
 handoff exists precisely because one doubling is one test.
 
-**Where it breaks (G12, fails).**
+**Where it is incomplete (G12, fails) — and what that is *not*.**
+
+G12 fails because the **ladder is incomplete**, not because the group is refuted. Gap-size
+scaling is **UNTESTED at this resolution**, and the card no longer claims otherwise.
 
 - *k*=1 **never arrests**, at any λ_V tried up to 5 000, where Φ ≈ 2 460 — while *k*=4
   already arrests by Φ ≈ 4.13. The group does not govern a single-cell wound at all, and
@@ -219,8 +246,16 @@ handoff exists precisely because one doubling is one test.
   one-cell gap can close with no mechanism acting. That arm cannot discriminate between
   closure mechanisms in either direction, and the Φ failure at *k*=1 is a confound rather
   than a refutation of the group there.
-- *k*=4 and *k*=7 share the bracket (0.3, 1.0), while Φ predicts their thresholds should
-  differ by 2.4×. Φ* is 2.26 and 5.51 — a spread ratio of 2.43, not a constant.
+- *k*=4 and *k*=7 share the λ_V bracket (0.3, 1.0). Their **Φ intervals overlap**:
+  [1.239, 4.129] and [3.016, 10.053], common on **[3.016, 4.129]**. A constant Φ* in that
+  range fits **both**, so these two rungs are **consistent with** a constant Φ* and do **not**
+  refute one.
+
+  *(Corrected 2026-10-31, final independent review. This card previously said their Φ* values
+  of 2.26 and 5.51 "spread by 2.43×, not a constant". Those are **geometric-mean summaries of
+  intervals**, not measurements, and a ratio of two interval summaries is not evidence that
+  the intervals disagree. **I overstated a refutation.** The sweep spacing is too coarse to
+  separate these two rungs.)*
 
 **Stated domain.** The rule is usable as *"at a fixed gap geometry in this CPM, the
 closure threshold in λ_V scales linearly with the cell–medium contact energy J"*, verified
@@ -263,7 +298,7 @@ counted G1b as a pass on a criterion I had narrowed to make it fit. The reported
 | G9 held-out J scaling | **pass** | §6 |
 | G10 no-drive negative control | **FAIL** | the 22% floor; see §4 |
 | G11 protrusion monotonicity | **pass** | §5 |
-| G12 complete gap ladder | **FAIL** | *k*=1 never arrests; see §6 |
+| G12 complete gap ladder | **FAIL (incomplete, not refuted)** | 2 of 3 rungs; *k*=1 never arrests and is confounded. The two rungs present have **overlapping** Φ intervals, so they are consistent with a constant Φ*. Gap-size scaling is untested here; see §6 |
 
 **Sweep invariance (unplanned, stronger than G7's declared bound).** Halving `MCSDuration`
 halves the model time to closure — 240 → 120 — while closure measured in **Monte-Carlo
@@ -311,3 +346,131 @@ missing job, not a defaulted assumption.
 
 All 36 arms ran on CPU under `CPUQuota=200% MemoryMax=2G MemorySwapMax=0 TasksMax=256
 RuntimeMaxSec=600`, one thread each; the slowest arm took 31.3 s.
+
+---
+
+## 10. The 240-arm sweep: the J-dependence fails, for closure by StopTime 1000
+
+*Added 2026-11-01, prose revised the same day after a bounded source review. This evidence
+**postdates the `d87e5d1` release cutoff**. Infra ran the admitted `e2f74f2` packet on an
+owned 8-vCPU VM; 346.0 s wall, 2 627.2 CPU-seconds. I ran no cloud job and re-ran no arm.*
+
+**Native frozen verdict: FAIL** (`j-scaling-report.json`, criterion sha256 `5df249c4…`, which
+matches the analyzer shipped in the packet byte-for-byte). Completeness 240/240. **That
+verdict is preserved exactly as returned; everything below is a separately labelled
+re-reading of the same raw loggers.**
+
+**Every statement in this section is scoped to closure by `StopTime 1000` in these frozen
+simulations.** `CLOSED` and `ARRESTED` are defined by that horizon, so the brackets are too.
+
+### The statistic that tests the frozen tolerance
+
+The native statistic is a spread of geometric-mean *summaries* — the statistic that produced
+the refutation I withdrew in §6. The right test is the **minimum feasible cross-cell spread**:
+pick one ratio from inside each cell's interval so as to make them as close together as
+possible. The cell with the largest lower bound forces `r ≥ LO`, the cell with the smallest
+upper bound forces `r ≤ HI`, so no choice does better than `LO/HI`.
+
+| | *k*=4 | *k*=7 | frozen tolerance |
+|---|---|---|---|
+| **minimum feasible spread** | **4.0** | **8.0** | **2.0** |
+| native summary-ratio spread | 8 | 16 | 2.0 |
+
+**Even the most favourable choice inside every bracket cannot bring the spread below 4 (or 8),
+against a frozen tolerance of 2.** That tests the tolerance directly rather than merely
+rejecting exact equality, and it is why this FAIL is interval-supported where my §6 claim was
+not — there the intervals overlapped and the minimum feasible spread was 1.
+
+### How far the threshold actually moves
+
+| | *k*=4 | *k*=7 |
+|---|---|---|
+| λ* interval at J=35 | [0.4, 0.8] | [0.2, 0.4] |
+| λ* interval at J=560 | [0.8, 1.6] | [0.2, 0.8] |
+| **feasible λ\* factor over ×16 in J** | **[1.0, 4.0]** | **[0.5, 4.0]** |
+| needed for proportionality | 16 | 16 |
+| **feasible exponent bounds** | **[0.0, 0.5]** | **[−0.25, 0.5]** |
+| predicted exponent | 1.0 | 1.0 |
+
+**The predicted exponent of 1.0 lies outside the feasible bounds at both gap sizes**, and even
+the most favourable reading gives at most 0.5. *(A regression over the geometric bracket
+summaries returns 0.300 and 0.133. Those are **regressions of summaries, not measured
+threshold exponents**, and the bracket-endpoint bounds above are the defensible statement.)*
+
+### Finite-horizon sensitivity — a diagnostic, not a bound
+
+A longer horizon can only turn `ARRESTED` into `CLOSED`, which moves brackets upward. The
+**late-window endpoint delta**, `gap(800) − gap(1000)`, is a post-hoc descriptive quantity:
+positive means the gap was still shrinking over that window. It is **not** a trend test, not
+proof of permanent arrest, and not a bound on future closure in a stochastic CPM.
+
+**Reported per arm.** *(Corrected 2026-11-01 by independent review. An earlier version
+averaged the deltas across seeds at each λ_V and called a parameter level flat from the group
+mean. That is wrong, and it hid real cases: at *k*=4, J=560, λ_V=12.8 the three seeds are
+−3, −16 and **+22**, so the mean reads +1.0 while **seed s3 shrank 22 nodes**. The claim that
+**every** arm above the bracket was flat or re-opening was false and is withdrawn. Further
+counterexamples the review names and I confirmed: *k*=7, J=560, λ_V=6.4 s2 (+3) and λ_V=12.8
+s2 (+8).)*
+
+At *k*=4, J=560, per arm rather than per seed-mean:
+
+| λ_V | per-arm Δ (s1, s2, s3) | arms still shrinking | seed mean |
+|---|---|---|---|
+| 1.6 | −11, −22, −14 | 0 of 3 | −15.7 |
+| 3.2 | −57, 0, −40 | 0 of 3 | −32.3 |
+| 6.4 | −23, −11, −1 | 0 of 3 | −11.7 |
+| 12.8 | −3, −16, **+22** | **1 of 3** | +1.0 ← **mean masks the shrinking arm** |
+
+**Individual arms still shrinking, by J** — arms, not parameter levels, not seed means:
+
+| *k* | J=35 | J=70 | J=140 | J=280 | J=560 |
+|---|---|---|---|---|---|
+| 4 | 9/15 | 8/15 | 2/14 | 8/12 | **1/12** |
+| 7 | 8/18 | 11/18 | 10/18 | 10/18 | 6/16 |
+
+**This is not monotone in J**, so there is no clean directional story: at *k*=4, J=280 shows
+8 of 12 while J=140 shows 2 of 14. An earlier version of this section said the horizon
+"cannot rescue" the rule, cited a "maximum correction they allow", and said correcting for
+censoring "would flatten λ*(J) further". All three claimed more than a finite window can
+show and **all three are withdrawn**. At *k*=7, J=560 the λ_V 0.4 and 0.8 cases are **two
+parameter levels holding four non-closed arms** (one at 0.4, three at 0.8), not "two arms" as
+I previously wrote.
+
+**The long-horizon threshold is unknown.** The fixed-horizon evidence below rests on the
+**intervals**, not on these late-window deltas.
+
+### What this does to §6
+
+**G9's local pass is not contradicted.** Between J=140 and J=280 the bracket really does
+roughly double here too. It was simply **not diagnostic**: one doubling inside a wide
+predicted interval cannot separate λ* ∝ J from λ* ∝ J^0.3.
+
+So the rule's **J-dependence — the one part that survived locally — fails for closure by
+`StopTime 1000`**, while its gap-size dependence remains untested (§6). Together, **the Φ
+group is not a usable control surface at this horizon**, and the honest residue of §6 is the
+measured thresholds themselves, not the law proposed to organise them. What a longer horizon
+would do is an open question, not a settled one.
+
+### Provenance, independently re-derived
+
+240/240 arm directories exit 0; **0 non-finite or unparseable values in 1 442 280 logger
+rows**; the solver's own receipt hashes to the pinned `3d9a6e5a…f0f94d5ad`.
+
+**No movie from this return, and none is claimed.** The packet deletes TIFF frames by design
+and the return contains **0** of them, so there are no spatial states to render. Logs alone
+cannot justify a spatial movie. The §9 movies remain the local 36-arm runs only.
+
+![Measured closure-threshold brackets for every gap, J and seed, against the predicted proportionality and the frozen tolerance band](../artifacts/epithelial/figures/threshold-brackets-light.png)
+
+*Measured brackets, not point estimates. Left: the λ_V bracket for every (gap, J, seed) against
+λ\* ∝ J anchored on the lowest-J bracket, which is not fitted. Right: the same brackets as
+λ\*/J ratio intervals against a band 2× tall — the frozen tolerance — one per gap. A passing
+set must fit inside one band.
+[light SVG](../artifacts/epithelial/figures/threshold-brackets-light.svg) ·
+[dark PNG](../artifacts/epithelial/figures/threshold-brackets-dark.png) ·
+[dark SVG](../artifacts/epithelial/figures/threshold-brackets-dark.svg)*
+
+Audit: [`artifacts/epithelial/sweep-audit.json`](../artifacts/epithelial/sweep-audit.json),
+regenerable with `engineering/epithelial/audit_return.py`. Raw return:
+`/data/artifacts/delphi-evolve-rethink/gcp/epithelial-j-scaling-v1/frontier-cpu-20261031-02/final-ae15a56498cc4a0e80ad1b00a7e7fc0c`
+(971 files, 97 404 808 bytes, manifest sha256 `39f32c4d…6e116f7`).

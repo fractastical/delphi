@@ -2382,12 +2382,24 @@ def test_reuse_studies_pair_real_recordings_with_controls_and_conditional_proofs
         assert pg.locator('a[href="#/proofs?f=steady-oxygen-bound"]').count() == 1
         if study == "tissue-microcarrier":
             assert "45 g" in text and "50 × 30 × 30 mm" in text
+            assert pg.locator("#rs-followup").count() == 0
             pg.locator(".reuse-diagnostic").evaluate("e => e.open = true")
             assert "15.574%" in pg.locator(".reuse-diagnostic").inner_text()
         else:
             assert "G1b" in text and "incomplete" in text
             assert pg.locator(".reuse-pair video").count() == 2
             assert pg.locator('.reuse-result a[href$="epithelial-card-errata.md"]').count() >= 1
+            pg.locator("#rs-followup > summary").click()
+            followup = pg.locator("#rs-followup").inner_text()
+            assert "240 model runs" in followup and "FAIL" in followup
+            assert "do not use this proportional rule" in followup
+            assert "Longer-horizon closure" in followup and "remain unknown" in followup
+            assert pg.locator("#rs-followup tbody tr").count() == 2
+            pg.wait_for_function("document.querySelector('#rs-followup img').naturalWidth > 0")
+            f = snapshot["reuse_studies"]["sweep_followup"]
+            for file in f["downloads"] + [{"href": f["figure_href"], "sha256": f["figure_sha256"]}]:
+                response = pg.request.get(base + file["href"])
+                assert response.ok and hashlib.sha256(response.body()).hexdigest() == file["sha256"]
         for video in pg.locator(".reuse-video").all():
             video.evaluate("v => { v.muted = true; return v.play(); }")
             pg.wait_for_function("v => v.currentTime > 0.1 && !v.error", arg=video.element_handle())

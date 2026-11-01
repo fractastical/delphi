@@ -80,12 +80,32 @@
       </article>`;
   }
 
+  function followup(snap, id) {
+    const f = (snap.reuse_studies || {}).sweep_followup;
+    if (!f || f.study !== id) return "";
+    return html`<details class="reuse-followup note" id="rs-followup"><summary><b>Later experiment: ${f.complete_arms} runs challenge the proposed scaling rule</b></summary>
+      <h3>A local pass did not generalise across the tested range</h3>
+      <p>The earlier single-doubling comparison remains a local pass. A subsequent, wider sweep completed ${f.complete_arms} model runs and returned <b>${f.verdict}</b> against its frozen scaling criterion. Its result concerns closure observed at logged times through ${f.horizon} model-time units.</p>
+      <p>The hypothesis was that the operational threshold λ*<sub>V</sub>/J stays within a factor of two. Independent review checked the full threshold intervals: even the closest compatible choices exceed that tolerance.</p>
+      <div class="tablewrap"><table><caption>Recorded interval evidence; these are model results</caption><thead><tr><th>Gap setting k</th><th>Minimum feasible spread</th><th>Frozen tolerance</th><th>Original summary spread</th></tr></thead><tbody>
+        ${f.rows.map((r) => html`<tr><th>${r.gap}</th><td>${r.minimum_spread}×</td><td>${r.tolerance}×</td><td>${r.native_summary_spread}×</td></tr>`)}</tbody></table></div>
+      <figure><a href="${f.figure_href}"><img class="reuse-figure" src="${f.figure_href}" loading="lazy" alt="Recorded threshold intervals across the tested adhesion settings, compared with proportional scaling"></a>
+        <figcaption class="small">Intervals from the returned simulation logs. The interval calculation is an additional review; it does not replace the frozen criterion.</figcaption></figure>
+      <p class="note small"><b>Design consequence:</b> do not use this proportional rule as a control knob over the tested range. Longer-horizon closure, untested parameter values, numerical refinement and transfer to living tissue remain unknown.</p>
+      <p class="small">The videos below are the earlier 36-run study. This followup returned cell-centre and volume logs, but no lattice frames defining cell shapes or the wound boundary; no new tissue-shape movie is claimed.</p>
+      <details><summary>Evidence, independent review and history</summary><p class="small">Source ${U.sha(f.source_commit)}. The independent review names ${U.sha(f.reviewed_source_commit)}; the published interval values were compared with that review. Later reporting corrections retain the original numerical result.</p>
+        <ul class="small">${f.downloads.map((d) => html`<li><a href="${d.href}">${d.label}</a> · ${U.sha(d.sha256)}</li>`)}</ul>
+        <p class="small"><a href="${f.manifest_href}">Exact publication inputs and hashes</a> · ${U.sha(f.manifest_sha256)}</p></details>
+    </details>`;
+  }
+
   function render(snap, id) {
     const vs = cards(snap, id);
     if (!vs.length) return "";
     const m = snap.reuse_studies;
     return html`<section class="panel reuse-results" aria-labelledby="rs-results"><h2 id="rs-results">Recorded computational studies</h2>
       <p>These experiments test mechanisms and numerical assumptions relevant to the proposal. Their outcomes and failed controls remain visible; transfer to living tissue is a separate question.</p>
+      ${followup(snap, id)}
       ${vs.map(visual)}<p class="small"><a href="${m.manifest_href}">Recording manifest and source hashes</a> · ${U.sha(m.manifest_sha256)}</p>
       ${m.record_links && m.record_links.groups[id] ? html`<h3>Explore the shared frontier</h3><p class="small">Related versioned claims, evidence and open problems. These records remain unreviewed; the recorded mathematics and numerical checks retain their stated scope.</p>
         <ul class="small">${m.record_links.groups[id].map((r) => html`<li><a href="${DF.href("/entity/" + r.ref.kind + "/" + r.ref.id, {v: r.ref.version, ns: r.ref.namespace})}">${r.title}</a> ${U.pill(r.ref.kind, "grp")}</li>`)}</ul>

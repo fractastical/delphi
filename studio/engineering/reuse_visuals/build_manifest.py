@@ -72,11 +72,11 @@ def epithelial() -> dict:
             "passive_floor": {"arm": "F1-no-drive-NEGATIVE", "closed_fraction": arms["F1-no-drive-NEGATIVE"]["closed_fraction"], "state": arms["F1-no-drive-NEGATIVE"]["state"],
                               "reading": "Observed in this one context (both drives off, same wound): the gap still shrinks by this fraction, consistent with surviving cells relaxing toward target volume under perimeter and Metropolis dynamics. It is a context-specific control, not a universal amount to subtract: show it beside a matched baseline, and no isolated mechanism contribution was measured. The corrected separate volume-accounting estimate is 625 nodes filled versus 1875 residual; it is not an independently measured mechanism contribution."},
             "gates": {"strict": {"ids": by, "pass": sum(v == "pass" for v in by.values()), "fail": sum(v == "fail" for v in by.values()), "descriptive": ["G6"], "incomplete_or_unevaluable": ["G1b", "G8"], "total": len(gates), "no_all_frames_claim": True,
-                                 "note": "Counted from results-r2.json at 66f2b95: 7 pass, 3 fail, G6 descriptive, G1b incomplete, G8 unevaluable. The frozen G1b rule is not narrowed to shared times to call a pass; no threshold changed; no physics rerun."},
+                                 "note": "Counted from the exact results-r2.json published in this manifest (historical reporting at 66f2b95 retained): 7 pass, 3 fail, G6 descriptive, G1b incomplete, G8 unevaluable. The frozen G1b rule is not narrowed to shared times to call a pass; no threshold changed; no physics rerun."},
                       "reported_history": {"original": "8 pass, 3 fail, 2 null (G6, G8), with G1b reported as a pass at " + g1b["reported_history"]["at"], "G1b": g1b["reported_history"], "note": "Kept as the historical record and superseded going forward without being erased."}},
             "j_scaling": {"status": "tested model hypothesis, not a law", "predicted_interval": g9["predicted_interval"], "observed_bracket": g9["measured_bracket"], "bracket_geometric_mean": g9["measured_lambda_star"],
                           "scope": "one doubling of interface energy at k=4, one conditional out-of-sample bracket check; 1.414 is the geometric mean of the observed bracket (1, 2), not an observed point threshold; nothing is established at k=7 or for exact proportionality"},
-            "gap_size_scaling": "not supported in this model: gate G12 failed (the k=1 wound never arrests; the gap ladder is incomplete) and G8 was not evaluable; the k=4 and k=7 bracket midpoints differing does not by itself refute a constant Phi because their bracket intervals overlap. Counter-evidence kept, criteria not rescued.",
+            "gap_size_scaling": "Untested at this resolution: gate G12 failed because the gap ladder is incomplete (k=1 has no nonclosed bracket at the finite horizon), and G8 is not evaluable. The k=4 and k=7 Phi intervals overlap, so differing geometric-mean summaries do not refute a common threshold. The earlier midpoint-based refutation is withdrawn; the incomplete ladder remains a failed check.",
             "horizon": "CLOSED and ARRESTED are operational labels at a finite 1000 model-unit horizon; permanence of arrest is not shown."},
         "caveats": ["Not a treatment, therapy or clinical result; a mechanism testbed.", "Not a viable engineered organism, and not a step toward one.",
                     "Not validated against any measurement. Where it agrees with a published finding, that is two models agreeing.",
@@ -86,7 +86,35 @@ def epithelial() -> dict:
                         + ["the doubling prediction passed one held-out test and is not a physical law"],
         "media": {k: ent(f"{EP}/media/{v}") for k, v in MEDIA.items()} | {"errata": ent(ERRATA)},
         "sources": [ent(p, download=True) for p in SOURCES], "renderer": [ent(p) for p in RENDERER],
-        "source_commit": "origin/work/epithelial-repair 66f2b95 (results, card, analyzer and checker; remaining files as edc1e10), copied unchanged"}
+        "source_commit": "Historical 36-run outputs with subsequent reporting corrections; exact source files and hashes are listed in this manifest. No movie or native run was replaced."}
+
+
+def sweep_manifest() -> dict:
+    """Bind the additive 240-run followup to producer and independent-review files."""
+    bundle = json.loads((ROOT / EP / "publication-bundle.json").read_text())
+    for group in bundle["files"].values():
+        for rel, pin in group.items():
+            actual = ent(rel)
+            if any(actual[k] != pin[k] for k in ("sha256", "bytes")):
+                raise ValueError(f"producer bundle changed: {rel}")
+    sources = []
+    for role, rel, label in [
+        ("audit", f"{EP}/sweep-audit.json", "Returned-data audit and threshold intervals"),
+        ("review", "artifacts/audits/epithelial-sweep/review.json", "Independent recomputation and source hashes"),
+        ("review_report", "docs/audits/epithelial-sweep-review-2026-11-01.md", "Independent review, findings and limits"),
+        ("criterion_source", "engineering/epithelial/packet_files/analyze_sweep.py", "Frozen criterion source"),
+        ("producer", f"{EP}/publication-bundle.json", "Native result and frozen source bundle"),
+        ("card", CARD, "Study report with correction history"),
+        ("qualifications", ERRATA, "Reading notes and historical qualifications"),
+        ("plot_renderer", "engineering/epithelial/plot_brackets.py", "Figure renderer"),
+        ("audit_renderer", "engineering/epithelial/audit_return.py", "Returned-data analysis"),
+    ]:
+        item = ent(rel, download=True) | {"role": role, "label": label}
+        if rel.startswith("docs/audits/"):
+            item["site_path"] = "artifacts/reuse-study-visuals/sources/" + Path(rel).name
+        sources.append(item)
+    return {"schema": "frontier.epithelial-sweep-publication/1", "source_commit": bundle["frozen_at_commit"],
+            "sources": sources, "figure": ent(f"{EP}/figures/threshold-brackets-light.png")}
 
 
 def write() -> str:
@@ -94,6 +122,7 @@ def write() -> str:
     m["visuals"].append(epithelial())
     out = ROOT / "artifacts/reuse-study-visuals/manifest.json"
     out.write_text(json.dumps(m, indent=1, sort_keys=True) + "\n")
+    (out.parent / "sweep-manifest.json").write_text(json.dumps(sweep_manifest(), indent=1, sort_keys=True) + "\n")
     return str(out)
 
 

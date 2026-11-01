@@ -24,6 +24,8 @@ MAX_DOWNLOAD_BYTES = 2_000_000
 SITE_SOURCE_PREFIX = MEDIA_PREFIX + "sources/"                    # where a download whose producer path the static handler would not serve is remapped
 MEDIA_SUFFIXES = (".mp4", ".gif", ".png", ".json", ".md")
 MAX_MEDIA_BYTES = 20_000_000
+SWEEP_MANIFEST = MEDIA_PREFIX + "sweep-manifest.json"
+SWEEP_PREFIXES = SOURCE_PREFIXES + RENDERER_PREFIXES + (MEDIA_PREFIX, "artifacts/audits/epithelial-sweep/", "docs/audits/epithelial-sweep-review-2026-11-01.md")
 REQUIRED = ("id", "study", "title", "evidence_kind", "labels", "caveats", "media", "sources", "renderer")
 
 
@@ -154,3 +156,72 @@ def record_links(ins, out: dict) -> dict:
     out["@" + href] = readback_raw
     return {"groups": groups, "count": len(records), "observed_at": receipt["observed_at"], "receipt_href": href,
             "scope": "Related records, not an applied Project membership update; status at the recorded readback."}
+
+
+def sweep_followup(ins, out: dict, root, manifest_path=SWEEP_MANIFEST) -> dict:
+    """Publish the fixed-horizon followup separately from the earlier movie runs.
+
+    A review is evidence for its named source, not blanket acceptance of a later
+    card. Reconcile the specific interval result against that review and retain
+    both source identities. This adapter never runs a simulation or a proof.
+    """
+    root = Path(root)
+    raw = ins.read(_safe(manifest_path, (MEDIA_PREFIX,), root))
+    manifest = json.loads(raw)
+    if manifest.get("schema") != "frontier.epithelial-sweep-publication/1":
+        raise ValueError("unknown sweep publication schema")
+    if not 5 <= len(manifest["sources"]) <= 20:
+        raise ValueError("sweep sources exceed the finite publication contract")
+    staged, blobs, downloads = {"@" + manifest_path: raw}, {}, []
+    for item in manifest["sources"]:
+        blob = _verify(ins, item, SWEEP_PREFIXES, root)
+        role = item["role"]
+        if role in blobs:
+            raise ValueError("duplicate sweep source role")
+        blobs[role] = blob
+        if item.get("download"):
+            if not item["path"].endswith(DOWNLOAD_SUFFIXES) or len(blob) > MAX_DOWNLOAD_BYTES:
+                raise ValueError("sweep source download is not bounded text")
+            href = item.get("site_path", item["path"])
+            if href != item["path"]:
+                _safe(href, (SITE_SOURCE_PREFIX,), root)
+            staged["@" + href] = blob
+            downloads.append({"href": href, "label": item["label"], "sha256": item["sha256"], "bytes": len(blob)})
+    audit, review = (json.loads(blobs[role]) for role in ("audit", "review"))
+    if audit.get("schema") != "frontier.epithelial-sweep-audit.v1" or review.get("schema") != "frontier.epithelial-sweep-independent-review/1":
+        raise ValueError("unexpected sweep audit/review schema")
+    native, provenance = audit["native"], audit["provenance"]
+    if sha256(blobs["criterion_source"]).hexdigest() != native["criterion_sha256"]:
+        raise ValueError("sweep criterion is not the frozen source")
+    complete = native["completeness"]
+    if not (complete["complete"] and complete["complete_arms"] == complete["declared"] == provenance["exit_zero"] == provenance["arm_dirs"] == 240
+            and provenance["rows"] == review["raw_rows"] and provenance["nonfinite"] == 0
+            and review["all_240_models_match_frozen_packet"] and review["all_30_brackets_match_native"]
+            and review["all_240_exit_zero"] and review["all_240_have_101_finite_times_0_to_1000"]
+            and native["criterion_sha256"] == review["criterion_sha256"] and native["verdict"] == review["native_verdict"]):
+        raise ValueError("sweep result is not the complete independently reviewed experiment")
+    rows = []
+    for gap, values in sorted(audit["interval_audit"].items()):
+        independent = review["independent_interval_review"][gap]
+        if not (values["min_feasible_spread"] == independent["minimum_feasible_spread"]
+                and values["cells"] == independent["cells"] and independent["attaining_witness_checked"]
+                and values["frozen_tolerance"] == native["tolerance_ratio"] == 2):
+            raise ValueError("sweep interval result differs from its independent review")
+        rows.append({"gap": gap, "minimum_spread": values["min_feasible_spread"],
+                     "native_summary_spread": native["per_gap"][gap]["spread"], "tolerance": native["tolerance_ratio"]})
+    if len(rows) != 2 or sum(v["cells"] for v in audit["interval_audit"].values()) != 30:
+        raise ValueError("sweep bracket coverage changed")
+    figure = manifest["figure"]
+    if not figure["path"].endswith(".png"):
+        raise ValueError("sweep figure must be a PNG")
+    figure_bytes = _verify(ins, figure, ("artifacts/epithelial/", MEDIA_PREFIX), root)
+    if not figure_bytes.startswith(b"\x89PNG\r\n\x1a\n") or len(figure_bytes) > MAX_DOWNLOAD_BYTES:
+        raise ValueError("sweep figure exceeds publication bound")
+    staged["@" + figure["path"]] = figure_bytes
+    if sum(map(len, staged.values())) > MAX_MEDIA_BYTES:
+        raise ValueError("sweep downloads exceed publication bound")
+    out.update(staged)
+    return {"study": "epithelial-repair", "complete_arms": complete["complete_arms"], "verdict": native["verdict"],
+            "rows": rows, "horizon": 1000, "figure_href": figure["path"], "figure_sha256": figure["sha256"],
+            "source_commit": manifest["source_commit"], "reviewed_source_commit": review["source_commit"],
+            "downloads": downloads, "manifest_href": manifest_path, "manifest_sha256": sha256(raw).hexdigest()}

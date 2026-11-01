@@ -119,7 +119,7 @@ def test_epithelial_entry_reports_the_files_own_gates_and_keeps_every_failure():
     assert g1b["passed"] is None and g1b["evaluable"]["frames_comparable"] == 756 and g1b["evaluable"]["frames_written"] == 1476
     assert "756 of 1476" in v["summary"]["readout_check"]["G1b"] and "G1b incomplete" in json.dumps(v["records_kept"])
     text = json.dumps(v)
-    for needle in ("G4 fail", "G10 fail", "G12 fail", "G8 unevaluable", "not an observed point threshold", "INCOMPLETE, not a pass", "not a physical law", "not supported in this model", "tested model hypothesis", "615.4", "21", "context-specific control"):
+    for needle in ("G4 fail", "G10 fail", "G12 fail", "G8 unevaluable", "not an observed point threshold", "INCOMPLETE, not a pass", "not a physical law", "Untested at this resolution", "tested model hypothesis", "615.4", "21", "context-specific control"):
         assert needle in text
     pair = v["summary"]["pair"]
     assert pair["closes"]["state"] == "CLOSED" and pair["arrests"]["state"] == "ARRESTED"
@@ -175,3 +175,47 @@ def test_card_download_is_remapped_and_never_offered_without_errata():
     next(x for x in mm["visuals"][1]["sources"] if x["path"].endswith("epithelial-repair-card.md"))["site_path"] = "docs/elsewhere.md"
     with pytest.raises(ValueError, match="site path"):
         A.build(Ins({p: json.dumps(mm).encode()}), {}, ROOT, manifest_path=p)
+
+
+def test_sweep_followup_keeps_reviewed_intervals_separate_from_local_movies():
+    out = {}
+    result = A.sweep_followup(Ins(), out, ROOT)
+    assert result["study"] == "epithelial-repair"
+    assert result["complete_arms"] == 240 and result["horizon"] == 1000
+    assert result["verdict"] == "FAIL"
+    assert [(r["gap"], r["minimum_spread"], r["tolerance"]) for r in result["rows"]] == [("4", 4, 2), ("7", 8, 2)]
+    assert not any(path.endswith((".mp4", ".gif")) for path in out)
+    assert len(result["downloads"]) >= 4
+    for file in result["downloads"]:
+        assert sha256(out["@" + file["href"]]).hexdigest() == file["sha256"]
+
+
+@pytest.mark.parametrize("role", ["audit", "review", "criterion_source", "figure"])
+def test_sweep_changed_bytes_publish_nothing(role):
+    manifest = json.loads((ROOT / A.SWEEP_MANIFEST).read_text())
+    item = manifest["figure"] if role == "figure" else next(f for f in manifest["sources"] if f["role"] == role)
+    out = {}
+    with pytest.raises(ValueError, match="mismatch"):
+        A.sweep_followup(Ins({item["path"]: (ROOT / item["path"]).read_bytes() + b"x"}), out, ROOT)
+    assert out == {}
+
+
+@pytest.mark.parametrize("change", ["spread", "count", "empty", "criterion"])
+def test_repinning_an_altered_result_does_not_bypass_its_review(change):
+    manifest = json.loads((ROOT / A.SWEEP_MANIFEST).read_text())
+    item = next(f for f in manifest["sources"] if f["role"] == "audit")
+    audit = json.loads((ROOT / item["path"]).read_text())
+    if change == "spread":
+        audit["interval_audit"]["4"]["min_feasible_spread"] = 1
+    elif change == "count":
+        audit["native"]["completeness"]["complete_arms"] = 239
+    elif change == "empty":
+        audit["interval_audit"] = {}
+    else:
+        audit["native"]["criterion_sha256"] = "0" * 64
+    blob = json.dumps(audit).encode()
+    item.update(sha256=sha256(blob).hexdigest(), bytes=len(blob))
+    out = {}
+    with pytest.raises(ValueError):
+        A.sweep_followup(Ins({item["path"]: blob, A.SWEEP_MANIFEST: json.dumps(manifest).encode()}), out, ROOT)
+    assert out == {}

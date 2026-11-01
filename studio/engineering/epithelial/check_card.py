@@ -36,9 +36,16 @@ def claims(A: dict, G: dict, S: dict) -> list[tuple[str, object, object]]:
         ("G9 measured bracket", [1, 2], g9["measured_bracket"]),
         ("G9 lambda*", 1.414, round(g9["measured_lambda_star"], 3)),
         ("G9 predicted interval", [0.6, 2.0], g9["predicted_interval"]),
-        ("Phi* k=4", 2.26, round(L["4"]["phi_star"], 2)),
-        ("Phi* k=7", 5.51, round(L["7"]["phi_star"], 2)),
-        ("Phi* spread ratio", 2.43, round(G["G12"]["detail"]["phi_star_spread_ratio"], 2)),
+        ("Phi interval k=4", [1.239, 4.129], [round(x, 3) for x in L["4"]["phi_interval"]]),
+        ("Phi interval k=7", [3.016, 10.053], [round(x, 3) for x in L["7"]["phi_interval"]]),
+        ("Phi* summary ratio (a summary ratio, NOT a refutation)", 2.43,
+         round(G["G12"]["detail"]["phi_star_summary_ratio"], 2)),
+        ("Phi intervals OVERLAP", [3.016, 4.129],
+         [round(x, 3) for x in G["G12"]["detail"]["phi_interval_overlap"]]),
+        ("constant Phi* is consistent with the rungs present", True,
+         G["G12"]["detail"]["constant_phi_star_consistent_with_these_rungs"]),
+        ("constant Phi* is NOT claimed refuted", False, G["G12"]["detail"]["constant_phi_star_refuted"]),
+        ("G12 rungs present", 2, G["G12"]["detail"]["rungs"]),
         ("k=1 has no bracket", False, "1" in L),
         ("k=1 still closes at lambda_V 5000", 1.0, A["E-k1-lamV5000"]["closed_fraction"]),
         ("A1 R2 linear", 0.955, round(S["A1-baseline"]["r2_linear"], 3)),
@@ -89,11 +96,64 @@ def claims(A: dict, G: dict, S: dict) -> list[tuple[str, object, object]]:
         rows.append((f"k={k} passive ceiling % of its gap", pct,
                      round(100 * (g0 - (40000 - survivors * 625)) / g0, 1)))
     rows += [
+        ("ARRESTED arms still closing at the horizon", 5,
+         sum(1 for r in A.values() if r["state"] == "ARRESTED" and r["horizon"]["trend"] == "still closing")),
+        ("ARRESTED arms in total", 13, sum(1 for r in A.values() if r["state"] == "ARRESTED")),
+        ("G9 arrested-side arm", "D-k4-J280-lamV2", G["G9"]["detail"]["horizon_caveat"]["arrested_side_arm"]),
+        ("G9 arrested side was still closing", "still closing",
+         G["G9"]["detail"]["horizon_caveat"]["trend"]["trend"]),
+        ("G9 arrested side delta over last 20%", -152,
+         round(G["G9"]["detail"]["horizon_caveat"]["trend"]["delta_last_20pct"])),
         ("unwounded sheet cells placed (not the nominal 64)", 65,
          A["A5-unwounded-POSITIVE"]["n_cells"]),
         ("realised mean cell area, nodes (target is 625)", 615.38,
          round(40000 / A["A5-unwounded-POSITIVE"]["n_cells"], 2)),
     ]
+    return rows
+
+
+def sweep_claims(S: dict) -> list[tuple[str, object, object]]:
+    """Section 10 numbers, pinned against the sweep audit rather than the results file."""
+    I, H, P = S["interval_audit"], S["horizon_audit"], S["provenance"]
+    rows = [
+        ("sweep: native verdict", "FAIL", S["native"]["verdict"]),
+        ("sweep: native completeness", 240, S["native"]["completeness"]["complete_arms"]),
+        ("sweep: arms exit 0", 240, P["exit_zero"]),
+        ("sweep: non-finite values", 0, P["nonfinite"]),
+        ("sweep: logger rows", 1442280, P["rows"]),
+        ("sweep: TIFF frames returned (no movie possible)", 0, P["tiff_files"]),
+        ("sweep: binary matches pin", True, P["binary_matches_pin"]),
+    ]
+    for k, exp_exp in (("4", 0.300), ("7", 0.133)):
+        v = I[k]
+        rows += [
+            (f"sweep k={k}: intervals disjoint", False, v["intervals_consistent_with_a_constant_ratio"]),
+            (f"sweep k={k}: J factor", 16.0, round(v["j_factor"], 1)),
+            (f"sweep k={k}: lambda* factor", 2.00, round(v["lambda_star_factor"], 2)),
+            (f"sweep k={k}: summary-regression exponent (NOT a measured exponent)", exp_exp,
+             round(v["fitted_exponent_lambda_star_vs_J"], 3)),
+            (f"sweep k={k}: min feasible spread", {"4": 4.0, "7": 8.0}[k], v["min_feasible_spread"]),
+            (f"sweep k={k}: min feasible spread exceeds frozen tolerance 2",
+             True, v["min_feasible_spread_exceeds_tolerance"]),
+            (f"sweep k={k}: feasible exponent bounds", {"4": [0.0, 0.5], "7": [-0.25, 0.5]}[k],
+             [round(x, 3) for x in v["exponent_feasible_bounds"]]),
+            (f"sweep k={k}: predicted exponent 1.0 outside feasible bounds", True,
+             not (v["exponent_feasible_bounds"][0] <= 1.0 <= v["exponent_feasible_bounds"][1])),
+        ]
+    need = H["highest_J_arms_proportionality_requires_to_close"]["4"]
+    rows += [
+        ("sweep k=4 J=560 lamV12.8: arms still shrinking (per arm, not seed mean)", 1,
+         need["12.8"]["arms_still_shrinking"]),
+        ("sweep k=4 J=560 lamV12.8: s3 delta", 22.0, need["12.8"]["per_arm_delta"]["s3"]),
+        ("sweep k=4 J=560 lamV12.8: the seed mean masks it", True,
+         need["12.8"]["mean_masks_a_shrinking_arm"]),
+    ]
+    bj = H["arrested_still_shrinking_by_J"]
+    for k, J, exp in (("4", "35.0", (9, 15)), ("4", "560.0", (1, 12)), ("7", "560.0", (6, 16))):
+        rows.append((f"sweep k={k} J={J}: arms still shrinking / not closed", list(exp),
+                     [bj[k][J]["arms_still_shrinking"], bj[k][J]["arms_not_closed"]]))
+    rows.append(("sweep k=4: still-shrinking count is NOT monotone in J", False,
+                 bj["4"]["monotone_in_J"]))
     return rows
 
 
@@ -103,6 +163,9 @@ def main() -> None:
     a = ap.parse_args()
     d = json.loads(Path(a.results).read_text())
     rows = claims(d["arms"], {g["id"]: g for g in d["gates"]}, d["closing_curve_shape"])
+    sweep = Path(a.results).parent / "sweep-audit.json"
+    if sweep.exists():
+        rows += sweep_claims(json.loads(sweep.read_text()))
     bad = [(n, c, g) for n, c, g in rows if c != g]
     for n, c, g in bad:
         print(f"  MISMATCH {n}: card says {c}, results say {g}")

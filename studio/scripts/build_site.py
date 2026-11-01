@@ -849,6 +849,8 @@ def reuse_study_surface(ins: Inputs, out: dict) -> dict:
     result = module.build(ins, out, root=ROOT)
     result["gallery_cards"] = module.gallery_cards(result)
     result["record_links"] = module.record_links(ins, out)
+    if (ROOT / module.SWEEP_MANIFEST).is_file():
+        result["sweep_followup"] = module.sweep_followup(ins, out, ROOT)
     return result
 
 
