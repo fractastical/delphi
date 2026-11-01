@@ -1,0 +1,89 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix nt: <https://w3id.org/np/o/ntemplate/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/fisher-infinitesimal> delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/claim-test-fisher-infinitesimal> .
+  <https://w3id.org/delphi/resource/evidence/claim-test-fisher-infinitesimal> a delphi:EvidenceItem ;
+    rdfs:label "Supported: residual variance of child height is constant across mid-parent terciles (ratio 1.08, Levene p 0.96), residuals are near-Gaussian (skew -0.12, excess kurtosis 0.46), and the sibling correlation 0.39 is at least the parent-offspring correlation 0.35" ;
+    dct:description "Pre-registered test of the claim. Hypothesis as tested: If adult height is governed by many Mendelian loci of small additive effect, then (a) a child's height given the parents' heights is approximately Gaussian with a residual variance (segregation plus environment) that does not depend on the parental mean, and (b) full siblings are correlated at least as strongly as parent and offspring, because dominance and shared environment add to the sibling covariance but not to the parent-offspring covariance." ;
+    delphi:statisticalTest "Levene test for equality of residual variance across mid-parent terciles of 934 children in 205 Galton families; sibling intraclass correlation versus implied parent-offspring correlation" ;
+    delphi:pValue "0.956"^^xsd:double ;
+    schema:additionalProperty sub:plain, sub:status, sub:doesNotEstablish, sub:measured, sub:n, sub:uncertainty, sub:preregRule ;
+    rdfs:comment "In-sample classic data: Fisher (1918) built the model to explain exactly these biometric regularities, so the test shows the model's distributional predictions hold on Galton's families, not that they hold out of sample." ;
+    rdfs:comment "The sibling correlation (0.39) exceeds the implied parent-offspring correlation (0.35) as predicted, but shared family environment, not only dominance, can produce that excess; the two are not separable here." ;
+    rdfs:comment "Heteroscedasticity could be masked by the modest sample (about 311 children per tercile) and by Galton's rounding of heights; the variance ratio of 1.08 is nonetheless close to 1." ;
+    rdfs:comment "Galton's 1.08 female adjustment and the assumption of uncorrelated parents (observed father-mother r = 0.10) are approximations." ;
+    prov:used <https://w3id.org/delphi/resource/dataset/galton1886-families-histdata> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/fisher-infinitesimal/result.json> .
+  sub:plain a schema:PropertyValue ; schema:propertyID "plain_language_statement" ; schema:value "If height comes from many genes of tiny effect, children's heights should scatter around their parents' average by the same amount whatever the parents' height, and siblings should resemble each other at least as much as parent and child; Galton's families fit this." ; schema:description "The tested claim and its outcome in one sentence for a general reader." .
+  sub:status a schema:PropertyValue ; schema:propertyID "status" ; schema:value "supported" ; schema:description "Outcome under the pre-registered decision rule. result.json verdict field: supports" .
+  sub:measured a schema:PropertyValue ; schema:propertyID "measured_value" ; schema:value "1.07764604189515"^^xsd:double ; schema:unitText "ratio of largest to smallest residual variance across mid-parent terciles (model predicts 1)" ; schema:description "Observation: the primary pre-registered quantity, computed by analysis.py from the retrieved files; further computed quantities are in result.json measured.extra." .
+  sub:n a schema:PropertyValue ; schema:propertyID "sample" ; schema:value "934 children in 205 families (172 families with 2+ children)" ; schema:description "Observation: what was analysed after the pre-registered filters." .
+  sub:uncertainty a schema:PropertyValue ; schema:propertyID "uncertainty" ; schema:value "Levene p = 0.956" ; schema:description "Observation: uncertainty or secondary statistics as reported in result.json." .
+  sub:preregRule a schema:PropertyValue ; schema:propertyID "pre_registered_rule" ; schema:value "PASS: Pre-registered. Data: Galton's 1886 family height records as distributed in the R HistData package (GaltonFamilies: 934 adult children in 205 families with father, mother and child heights in inches and child sex). Female child heights are multiplied by 1.08, as Galton did, to put both sexes on a common scale; mid-parent height is (father + 1.08*mother)/2. Residuals r are taken from the ordinary-least-squares regression of adjusted child height on mid-parent height. Criterion A (homoscedasticity): Levene's test (median-centred, Brown-Forsythe) of residual variance across the three mid-parent terciles gives p > 0.05 AND the ratio of the largest to the smallest tercile residual variance is < 1.5. Criterion B (normality): residual sample skewness |g1| < 0.5 and excess kurtosis |g2| < 1.0. Criterion C (sibling vs parent-offspring): the full-sibling intraclass correlation of adjusted height (one-way random-effects ANOVA estimator over families with >= 2 children) is >= r_po - 0.05, where r_po is the single-parent-offspring correlation implied by the child-on-mid-parent correlation r_mp as r_po = r_mp / sqrt(2) (which assumes uncorrelated parents). SUPPORTS if A, B and C all hold. FAIL: Pre-registered. REFUTES if A fails strongly (variance ratio > 2 or Levene p < 0.001) OR B fails strongly (|g1| > 1 or |g2| > 2) OR the sibling correlation is more than 0.15 below r_po. MIXED otherwise. INCONCLUSIVE (data-unavailable) if the file cannot be downloaded." ; schema:description "Assumption and decision rule fixed before the data were opened (see the pre-registration commit in the provenance graph); not an observation." .
+  sub:doesNotEstablish a schema:PropertyValue ; schema:propertyID "does_not_establish" ; schema:value "An in-sample test on the classic data Fisher built the model to explain, not an out-of-sample test; shared family environment cannot be separated from dominance in the sibling excess; heights are Galton's rounded values." ; schema:description "Interpretation: the limits of what this evidence shows." .
+  sub:ds1Nfiles a schema:PropertyValue ; schema:propertyID "n_files" ; schema:value 1 ; schema:description "Files of this dataset that the test retrieved and checksummed (the distributions listed here)." .
+  sub:ds1Nbytes a schema:PropertyValue ; schema:propertyID "byte_size_total" ; schema:value 34722 ; schema:description "Total byte size of the retrieved files." .
+  sub:ds1Nfamilies a schema:PropertyValue ; schema:propertyID "n_families" ; schema:value 205 ; schema:description "Count of families as stated in this record's text, taken from result.json." .
+  <https://w3id.org/delphi/resource/dataset/galton1886-families-histdata> a dcat:Dataset ;
+    rdfs:label "Galton's 1886 family height records (934 adult children of 205 families), as distributed in the R package HistData (GaltonFamilies), via the Rdatasets CSV mirror" ;
+    schema:additionalProperty sub:ds1Nfiles, sub:ds1Nbytes, sub:ds1Nfamilies ;
+    dct:identifier "https://vincentarelbundock.github.io/Rdatasets/doc/HistData/GaltonFamilies.html" ;
+    dcat:landingPage <https://vincentarelbundock.github.io/Rdatasets/doc/HistData/GaltonFamilies.html> ;
+    dcat:version "Rdatasets master, retrieved 2026-10-31" ;
+    dct:rights "GPL (HistData package); the 1886 data are public domain" ;
+    dct:license "GPL (HistData package); the 1886 data are public domain" ;
+    rdfs:comment "Role in this test: father, mother and adult child heights (inches) with child sex and family id" ;
+    dcat:distribution sub:ds1f1 .
+  sub:ds1f1 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://raw.githubusercontent.com/vincentarelbundock/Rdatasets/master/csv/HistData/GaltonFamilies.csv> ;
+    dcat:byteSize "34722"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T05:57:48Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f1sum .
+  sub:ds1f1sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "b1fc91e4d4b9604661967dcc62ff1055eaa3020c4d5c42d1f9d588f74b9b3317"^^xsd:hexBinary .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/fisher-infinitesimal/result.json>, <https://github.com/fractastical/delphisci/commit/9b73128702b7eb3eaae988df99ee2de68e122ebd> ;
+    prov:wasGeneratedBy sub:test .
+  <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/fisher-infinitesimal/result.json> dct:title "claim-tests/math-bio-theorems/fisher-infinitesimal/result.json at commit c330f91 (2026-10-31T06:04:25Z)" ;
+    rdfs:comment "Result file with verdict, measured values, dataset checksums and caveats. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  <https://github.com/fractastical/delphisci/commit/9b73128702b7eb3eaae988df99ee2de68e122ebd> a prov:Entity ; dct:title "claim-tests: pre-register 8 tests of proved math-bio laws against public data" ; dct:date "2026-10-31T05:55:32Z"^^xsd:dateTime ; rdfs:comment "Pre-registration: pass and fail criteria with verdict null, committed 2026-10-31T05:55:32Z; the first data file for this test was retrieved at 2026-10-31T05:57:48Z, 136 s later. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  sub:test a prov:Activity ; prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:used <https://w3id.org/delphi/resource/dataset/galton1886-families-histdata>, <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/fisher-infinitesimal/analysis.py> ; prov:qualifiedAssociation sub:plan .
+  sub:plan a prov:Association ; prov:agent <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:hadPlan <https://github.com/fractastical/delphisci/blob/9b73128702b7eb3eaae988df99ee2de68e122ebd/claim-tests/math-bio-theorems/fisher-infinitesimal/result.json> .
+  <https://github.com/fractastical/delphisci/blob/9b73128702b7eb3eaae988df99ee2de68e122ebd/claim-tests/math-bio-theorems/fisher-infinitesimal/result.json> rdfs:comment "The pre-registered plan: result.json as first committed, before any download." .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> a prov:SoftwareAgent ; rdfs:label "delphisci claim-tests runner (claims thread)" ; rdfs:comment "Run: scienceclaw-c4 (claims thread, ScienceClaw hack); model claude-fable-5-1; 2026-10-31" ; delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5.1> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5.1> a delphi:LanguageModel ; rdfs:label "Claude Fable 5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T14:25:59Z"^^xsd:dateTime ;
+    dct:creator <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    rdfs:label "Evidence for fisher-infinitesimal: supported" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:EvidenceItem ;
+    npx:introduces <https://w3id.org/delphi/resource/evidence/claim-test-fisher-infinitesimal> ;
+    nt:wasCreatedFromProvenanceTemplate <https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA> ;
+    rdfs:comment "UNSIGNED DRAFT prepared 2026-10-31 by the claims thread of the DELPHI team: not signed, not published to any registry. Intended for the nanopub TEST registry first; production publication needs the ORCID key owner's explicit approval. No human owner is named in this draft: dct:creator is the software agent, and the ORCID of the key holder is added only when that person approves and signs. Built by claim-tests/nanopubs/build.py from result.json." ;
+    rdfs:comment "No assertion template is declared. The template that would otherwise apply, the published Project Delphi evidence item template https://w3id.org/np/RAk4kcX4zA_touv8CeKku9tTUnbR5xiTLSLwFbrKSl3BE (dct:created 2026-10-01), still carries the legacy https://w3id.org/probknow/ontology/ namespace (1 occurrence, checked 2026-10-31 on the live network), and its required statements cannot be instantiated with Delphi ontology 2.0 terms, so this hand-authored record was not created from it and does not claim to be. The provenance template https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA is declared because it carries no legacy IRI (0 occurrences, same check). No pubinfo template is declared. See claim-tests/nanopubs/DECISIONS.md (2026-10-31)." .
+}

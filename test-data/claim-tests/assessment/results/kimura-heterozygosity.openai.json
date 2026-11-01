@@ -1,0 +1,31 @@
+{
+ "claim_id": "kimura-heterozygosity",
+ "test_dir": "claim-tests/math-bio-theorems/kimura-heterozygosity",
+ "rubric": "analysis-faithfulness/0.1.0",
+ "role": "A9",
+ "assessor": {
+  "provider": "openai",
+  "via": "openai",
+  "model": "gpt-5-2025-08-07",
+  "date": "2026-10-31T15:05:46.587Z",
+  "blind": true,
+  "withheld": [
+   "measured",
+   "verdict",
+   "confidence",
+   "caveats",
+   "interpretation"
+  ],
+  "seconds": 21.1
+ },
+ "scores": {
+  "right_variables": 0.5,
+  "modality_appropriate": 0.75,
+  "assumptions_compatible": 0.5,
+  "rule_discriminates": 0.75,
+  "scope_stated": 1
+ },
+ "verdict": "representative-with-caveats",
+ "reasons": "The outcome variable (log10 nucleotide diversity, pi) matches the claim’s heterozygosity, but the predictor is census size (log10_popsize) rather than effective size Ne; the test relies on the added assumption that Ne scales with N and that mutation rates and Ne/N are comparable across species, neither of which is measured here. The modality is broadly appropriate: a cross-species, genome-wide diversity compilation paired with species-level census size estimates can, in principle, test the predicted positive scaling pattern. However, the analysis assumes independence and uses OLS with t-based CIs despite strong phylogenetic relatedness and substantial measurement error in census size estimates, which can bias slopes and p-values and is not modeled (no phylogenetic or errors-in-variables treatment). The pre-registered decision rule would distinguish a strong, near-linear rise of pi with N from a flat or negative relation, but it conflates a failure of Ne~N with a failure of the neutral-heterozygosity law itself. The narrowing (metazoans, excluding Aves as a holdout) is explicit and consistently applied in code and criteria.",
+ "what_would_change_it": "Measuring or inferring species-specific Ne (and ideally mutation rate μ) and testing log10 pi against log10 Ne (or θ) directly, with phylogenetic and measurement-error models, would remove the key proxy and independence caveats. Alternatively, demonstrate robustness using phylogenetic comparative methods (e.g., PGLS) and an errors-in-variables regression for census size."
+}

@@ -1,0 +1,93 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix nt: <https://w3id.org/np/o/ntemplate/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix schema: <https://schema.org/> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/claim/kimura-fixation-probability> delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/claim-test-kimura-fixation-probability> .
+  <https://w3id.org/delphi/resource/evidence/claim-test-kimura-fixation-probability> a delphi:EvidenceItem ;
+    rdfs:label "Supported: of the 58 Buri (1956) lines resolved by generation 19, 28 fixed bw75 and 30 lost it (0.48 against the neutral prediction 0.5, exact binomial p 0.90)" ;
+    dct:description "Pre-registered test of the claim. Hypothesis as tested: If a neutral allele's probability of eventual fixation equals its initial frequency, then in Buri's (1956) 107 replicate Drosophila populations, each started with the bw75 allele at frequency 0.5 in 16 flies, the lines that have reached fixation or loss by the last recorded generation should be split evenly between fixation of bw75 and loss of bw75." ;
+    delphi:statisticalTest "Exact two-sided binomial test of fixed versus lost lines against 0.5 among the 58 of 107 lines that had fixed or lost bw75 by the last recorded generation" ;
+    delphi:pValue "0.9"^^xsd:double ;
+    schema:additionalProperty sub:plain, sub:status, sub:doesNotEstablish, sub:measured, sub:n, sub:uncertainty, sub:preregRule ;
+    rdfs:comment "Only the neutral limit u(p) = p at p = 0.5 is tested; the selection-dependent formula is untested because s for bw75 is not independently known. The mean bw75 frequency drifted from 0.500 to 0.472 over 19 generations, a slight deficit that Buri attributed to weak selection; it is within what drift alone produces in 107 lines and does not change the fixed/lost balance." ;
+    rdfs:comment "The popgenr object is a transcription of Buri's published table; transcription accuracy was not checked against the 1956 paper (not open access)." ;
+    rdfs:comment "Censoring: 49 of 107 lines were still segregating at the last generation; the test uses only lines that had resolved. Effective size from heterozygosity decay is about 8 (census 16), consistent with Buri's own estimate, so most fixations occurred before 4Ne generations had elapsed." ;
+    prov:used <https://w3id.org/delphi/resource/dataset/buri1956-drosophila-bw75-popgenr-fly> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/kimura-fixation-probability/result.json> .
+  sub:plain a schema:PropertyValue ; schema:propertyID "plain_language_statement" ; schema:value "A gene variant with no advantage should end up taking over a population about as often as its starting share; in Buri's fly experiment, lines that started at 50% fixed it about half the time." ; schema:description "The tested claim and its outcome in one sentence for a general reader." .
+  sub:status a schema:PropertyValue ; schema:propertyID "status" ; schema:value "supported" ; schema:description "Outcome under the pre-registered decision rule. result.json verdict field: supports" .
+  sub:measured a schema:PropertyValue ; schema:propertyID "measured_value" ; schema:value "0.4827586206896552"^^xsd:double ; schema:unitText "fraction of fixed-or-lost populations fixed for bw75 at the last recorded generation (neutral prediction 0.5)" ; schema:description "Observation: the primary pre-registered quantity, computed by analysis.py from the retrieved files; further computed quantities are in result.json measured.extra." .
+  sub:n a schema:PropertyValue ; schema:propertyID "sample" ; schema:value "58 fixed-or-lost populations of 107 (28 fixed, 30 lost) after 19 generations" ; schema:description "Observation: what was analysed after the pre-registered filters." .
+  sub:uncertainty a schema:PropertyValue ; schema:propertyID "uncertainty" ; schema:value "exact binomial two-sided p = 0.90" ; schema:description "Observation: uncertainty or secondary statistics as reported in result.json." .
+  sub:preregRule a schema:PropertyValue ; schema:propertyID "pre_registered_rule" ; schema:value "PASS: Pre-registered. Data: the 'fly' matrix in the CRAN package popgenr 0.2 (CC0; Laruson and Reed 2021), a 19 x 107 matrix of the number of bw75 allele copies (out of 32) in each replicate at each generation, transcribed from Buri (1956). At the last recorded generation, a line is 'fixed' if the count is 32 and 'lost' if the count is 0; m = fixed + lost, k = fixed. SUPPORTS if m >= 20 AND the two-sided exact binomial test of k against Binomial(m, 0.5) gives p > 0.05 AND |k/m - 0.5| < 0.15. Reported but not decisive: the mean bw75 frequency across all 107 lines at the last generation (predicted 0.5 under neutrality, since the expected frequency is constant under drift) and the number of fixed-or-lost lines. FAIL: Pre-registered. REFUTES if the exact binomial test gives p < 0.01 (fixation significantly favours one allele) OR |k/m - 0.5| >= 0.25. MIXED otherwise (0.01 <= p <= 0.05, or 0.15 <= |k/m - 0.5| < 0.25). INCONCLUSIVE (underpowered) if m < 20; INCONCLUSIVE (data-unavailable) if the package source cannot be downloaded." ; schema:description "Assumption and decision rule fixed before the data were opened (see the pre-registration commit in the provenance graph); not an observation." .
+  sub:doesNotEstablish a schema:PropertyValue ; schema:propertyID "does_not_establish" ; schema:value "Only the neutral limit u(p) = p at p = 0.5 is tested; the selection-dependent formula is untested because the selection coefficient of bw75 is not independently known; 49 lines were still segregating and are censored; the data are a transcription of Buri's table." ; schema:description "Interpretation: the limits of what this evidence shows." .
+  sub:ds1Nfiles a schema:PropertyValue ; schema:propertyID "n_files" ; schema:value 2 ; schema:description "Files of this dataset that the test retrieved and checksummed (the distributions listed here)." .
+  sub:ds1Nbytes a schema:PropertyValue ; schema:propertyID "byte_size_total" ; schema:value 35919 ; schema:description "Total byte size of the retrieved files." .
+  <https://w3id.org/delphi/resource/dataset/buri1956-drosophila-bw75-popgenr-fly> a dcat:Dataset ;
+    rdfs:label "Buri (1956) 'Gene frequency in small populations of mutant Drosophila': allele-count distribution of bw75 in 107 replicate populations of 16 flies over 19 generations, as transcribed in the CRAN package popgenr 0.2 (object 'fly')" ;
+    schema:additionalProperty sub:ds1Nfiles, sub:ds1Nbytes ;
+    dct:identifier "10.2307/2406998" ;
+    owl:sameAs <https://doi.org/10.2307/2406998> ;
+    dcat:landingPage <https://cran.r-project.org/package=popgenr> ;
+    dcat:version "popgenr 0.2 (CRAN, 2021-02-25)" ;
+    dct:rights "CC0" ;
+    dct:license "CC0" ;
+    rdfs:comment "Role in this test: generation x allele-count table (rows = generations, columns = number of bw75 copies 0..32, cells = number of populations)" ;
+    dcat:distribution sub:ds1f1, sub:ds1f2 .
+  sub:ds1f1 a dcat:Distribution, prov:Entity ;
+    dcat:downloadURL <https://cran.r-project.org/src/contrib/popgenr_0.2.tar.gz> ;
+    dcat:byteSize "35230"^^xsd:nonNegativeInteger ;
+    prov:generatedAtTime "2026-10-31T05:57:50Z"^^xsd:dateTime ;
+    spdx:checksum sub:ds1f1sum .
+  sub:ds1f1sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "50aa99f0ba37e5a35fcc0fe06a4ce27642708b7613cb05e36fca03357f848d98"^^xsd:hexBinary .
+  sub:ds1f2 a dcat:Distribution, prov:Entity ;
+    dct:isPartOf sub:ds1f1 ; rdfs:comment "Member of the retrieved archive: popgenr/data/fly.RData" ;
+    dcat:byteSize "689"^^xsd:nonNegativeInteger ;
+    spdx:checksum sub:ds1f2sum .
+  sub:ds1f2sum a spdx:Checksum ; spdx:algorithm spdx:checksumAlgorithm_sha256 ; spdx:checksumValue "229423c3953a1d90a2d3a27b04dd83e7d2c1b7bdf68c0786dd8751b7bdcd148d"^^xsd:hexBinary .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/kimura-fixation-probability/result.json>, <https://github.com/fractastical/delphisci/commit/9b73128702b7eb3eaae988df99ee2de68e122ebd> ;
+    prov:wasGeneratedBy sub:test .
+  <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/kimura-fixation-probability/result.json> dct:title "claim-tests/math-bio-theorems/kimura-fixation-probability/result.json at commit c330f91 (2026-10-31T06:04:25Z)" ;
+    rdfs:comment "Result file with verdict, measured values, dataset checksums and caveats. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  <https://github.com/fractastical/delphisci/commit/9b73128702b7eb3eaae988df99ee2de68e122ebd> a prov:Entity ; dct:title "claim-tests: pre-register 8 tests of proved math-bio laws against public data" ; dct:date "2026-10-31T05:55:32Z"^^xsd:dateTime ; rdfs:comment "Pre-registration: pass and fail criteria with verdict null, committed 2026-10-31T05:55:32Z; the first data file for this test was retrieved at 2026-10-31T05:57:50Z, 138 s later. This commit is local to the hackathon tree and not yet on GitHub; the URL resolves after the push." .
+  sub:test a prov:Activity ; prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:used <https://w3id.org/delphi/resource/dataset/buri1956-drosophila-bw75-popgenr-fly>, <https://github.com/fractastical/delphisci/blob/c330f91dd8e6ad84365d92ac34dbee89d0a19cbe/claim-tests/math-bio-theorems/kimura-fixation-probability/analysis.py> ; prov:qualifiedAssociation sub:plan .
+  sub:plan a prov:Association ; prov:agent <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ; prov:hadPlan <https://github.com/fractastical/delphisci/blob/9b73128702b7eb3eaae988df99ee2de68e122ebd/claim-tests/math-bio-theorems/kimura-fixation-probability/result.json> .
+  <https://github.com/fractastical/delphisci/blob/9b73128702b7eb3eaae988df99ee2de68e122ebd/claim-tests/math-bio-theorems/kimura-fixation-probability/result.json> rdfs:comment "The pre-registered plan: result.json as first committed, before any download." .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> a prov:SoftwareAgent ; rdfs:label "delphisci claim-tests runner (claims thread)" ; rdfs:comment "Run: scienceclaw-c4 (claims thread, ScienceClaw hack); model claude-fable-5-1; 2026-10-31" ; delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5.1> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5.1> a delphi:LanguageModel ; rdfs:label "Claude Fable 5.1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-10-31T14:25:59Z"^^xsd:dateTime ;
+    dct:creator <https://w3id.org/delphi/resource/agent/delphisci-claim-tests-runner> ;
+    rdfs:label "Evidence for kimura-fixation-probability: supported" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:EvidenceItem ;
+    npx:introduces <https://w3id.org/delphi/resource/evidence/claim-test-kimura-fixation-probability> ;
+    nt:wasCreatedFromProvenanceTemplate <https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA> ;
+    rdfs:comment "UNSIGNED DRAFT prepared 2026-10-31 by the claims thread of the DELPHI team: not signed, not published to any registry. Intended for the nanopub TEST registry first; production publication needs the ORCID key owner's explicit approval. No human owner is named in this draft: dct:creator is the software agent, and the ORCID of the key holder is added only when that person approves and signs. Built by claim-tests/nanopubs/build.py from result.json." ;
+    rdfs:comment "No assertion template is declared. The template that would otherwise apply, the published Project Delphi evidence item template https://w3id.org/np/RAk4kcX4zA_touv8CeKku9tTUnbR5xiTLSLwFbrKSl3BE (dct:created 2026-10-01), still carries the legacy https://w3id.org/probknow/ontology/ namespace (1 occurrence, checked 2026-10-31 on the live network), and its required statements cannot be instantiated with Delphi ontology 2.0 terms, so this hand-authored record was not created from it and does not claim to be. The provenance template https://w3id.org/np/RAaYeFYF-Cz2bM5S1wPQsnvs5X6BBxsphL03UkbVZ1lcA is declared because it carries no legacy IRI (0 occurrences, same check). No pubinfo template is declared. See claim-tests/nanopubs/DECISIONS.md (2026-10-31)." .
+}

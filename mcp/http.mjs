@@ -10,6 +10,7 @@ import { browseClaims, setDocsBase } from "./graph.mjs";
 import { handleFederation } from "./federation.mjs";
 import { REPO, localFileCount } from "./lib.mjs";
 import { observeRateLimited, observeRequest, observeSession, observeVisitor, renderMetrics } from "./metrics.mjs";
+import { ensureFresh, sourceInfo } from "../lib/lean-source.mjs";
 
 const RATE_LIMIT = Number(process.env.DELPHI_RATE_LIMIT ?? 120); // requests per IP per minute
 const MAX_BODY = 1 << 20;
@@ -78,8 +79,12 @@ delphi_forum_register once, then send the key as the X-Claw-Api-Key header or th
 
 Claim graph page: https://${host}/docs/claim-graph.html   (theorems: /docs/theorems.html)
 
-Data: ${files} TriG files; claim graph built ${built}. Limit: ${RATE_LIMIT} requests/minute per IP.
+Data: ${files} TriG files; claim graph built ${built}. Lean laws: ${(i => `${i.source}, lawset ${i.lawset_version}`)(safeSourceInfo())} (tool lean_source_status). Limit: ${RATE_LIMIT} requests/minute per IP.
 `;
+
+// The Lean law source (local, or the remote the loader self-updates from) and its current lawset, for /healthz.
+function safeSourceInfo() { try { return sourceInfo(); } catch (e) { return { error: e.message }; } }
+let serverVersion = null;
 
 // The built pages that tool results link to. They inline their data, so each is one file.
 const DOC_PAGES = { "claim-graph.html": "text/html", "theorems.html": "text/html", "claims-query.html": "text/html", "claims.json": "application/json", "css/delphi.css": "text/css" };
@@ -95,7 +100,10 @@ function loadDocs() {
   return docs;
 }
 
-export function serveHttp(createServer, port) {
+export function serveHttp(createServer, port, version = null) {
+  serverVersion = version;
+  // Fetch the remote law source once at startup so the first lean_* call does not wait on it.
+  ensureFresh().then(i => console.log(`lean laws: ${i.source} lawset ${i.lawset_version}${i.url ? ` (${i.url})` : ""}${i.remote_error ? `; remote error: ${i.remote_error}` : ""}`)).catch(() => {});
   const files = localFileCount();
   const { built } = browseClaims({ limit: 1 });
   const docs = loadDocs();
@@ -106,7 +114,7 @@ export function serveHttp(createServer, port) {
     const ip = req.headers["fly-client-ip"] ?? req.headers["x-forwarded-for"]?.split(",")[0].trim() ?? req.socket.remoteAddress;
 
     if (req.method === "OPTIONS") { res.writeHead(204, CORS); return res.end(); }
-    if (path === "/healthz") return send(res, 200, { ok: true, files, built });
+    if (path === "/healthz") return send(res, 200, { ok: true, version: serverVersion, files, built, lean: safeSourceInfo() });
     if (path === "/" && req.method === "GET") return send(res, 200, landing(req.headers.host, files, built), "text/plain; charset=utf-8");
     if (path === "/docs" || path === "/docs/") { res.writeHead(302, { ...CORS, Location: "/docs/claim-graph.html" }); return res.end(); }
     if (docs.has(path) && (req.method === "GET" || req.method === "HEAD")) {
