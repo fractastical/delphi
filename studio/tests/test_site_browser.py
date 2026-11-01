@@ -1449,3 +1449,15 @@ def test_fish_history_lists_only_stated_lineage_and_separates_siblings_revisions
     assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
     pg.goto(base + "#/home"); pg.wait_for_selector("#fishnote")
     assert pg.locator("a:has-text('fish design history')").count() >= 1
+
+
+def test_stale_sentences_are_gone_and_cost_cites_the_dated_google_receipt(browser, base):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    cost = next(c for c in snap["timeline"]["counters"] if c["quantity"] == "Cost")
+    assert "terms-of-service" not in cost["note"] and "dated readiness receipt" in cost["note"] and "No VM usage and no spend are inferred" in cost["note"]
+    pg = page(browser)
+    pg.goto(base + "#/studio/flying-fish?scale=molecular"); pg.wait_for_selector("#pl-h")
+    t = pg.locator("#main").text_content()
+    assert "not available from this page" not in t and "Waiting for the genomic" not in t and "Panels waiting for a contract" not in t and "Waiting for bounded proposals" not in t
+    assert "Related panels and their status" in t and "proposal checker" in t and "Contribute panel" in t
+    assert pg.locator("#pl-h").locator("xpath=..").locator("a[href='#/formalize']").count() == 1
