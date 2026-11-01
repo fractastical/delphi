@@ -25,6 +25,7 @@ a figure is unknown, these pages say unknown rather than estimating it.
 | [07-evidence-and-validation.md](07-evidence-and-validation.md) | What was actually checked, what failed, and the review-correction ledger |
 | [08-rubric-evidence-map.md](08-rubric-evidence-map.md) | Each judging criterion mapped to specific artifacts, with the gaps stated |
 | [09-resources-and-acknowledgements.md](09-resources-and-acknowledgements.md) | People, partners, open-source code, source texts, data and compute — the resources this work is built on |
+| [10-agent-and-compute-usage.md](10-agent-and-compute-usage.md) | Measured agent, GPU, CPU and model usage: who ran what, and what is not measured |
 
 ## The one-paragraph version
 
