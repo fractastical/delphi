@@ -1,13 +1,24 @@
-"""Steady-state oxygen diffusion with constant consumption: the diffusion limit for a sphere and a slab.
+"""Steady-state oxygen diffusion with constant consumption: sphere and slab profiles.
 
-Grimes et al. 2014 (J R Soc Interface 11:20131124) state the model in words and typeset equations that are images in the open-access XML:
-  (1) steady-state diffusion with consumption:  D * Laplacian(C) = a            (their eq. 2.2, spherical Laplacian; text not read, form from their stated setup)
-  (2) boundary conditions as stated:  C = C_o at r = r_o;  C = 0 and dC/dr = 0 at r = r_n
-  (3) the 'diffusion limit' r_l: the radius at which the centre pressure just reaches zero (their eq. 2.6; closed form not read from the typeset equation)
-The closed forms below were DERIVED here from (1) and (2) with constant a, and verified by substitution in the tests. They are not a transcription of the paper.
+Grimes et al. 2014 (J R Soc Interface 11:20131124; doi:10.1098/rsif.2013.1124,
+PMC3899881) state the steady spherical diffusion equation and diffusion-limit
+radius in displayed equations 2.2 and 2.6. We retrieved and read the equation
+images because their MathML/XML contains image placeholders. Equation 2.6 is
+written in partial pressure as r_l = sqrt(6 D p_o/(a Omega)); substituting the
+paper's C_o = p_o/Omega yields sqrt(6 D C_o/a). Thus the spherical limit
+coefficient 6 is explicitly in the paper, while this code's profile is the
+closed form for constant a under the stated boundary conditions.
 
-Units (SI): D m^2/s; C0 the boundary oxygen amount per unit volume, a the consumption per unit volume, in the same amount unit, so C0/a is a time (s).
-Only the ratio C0/a enters. Grimes's own a is in m^3(O2 gas) kg^-1 s^-1 and C0 in m^3 kg^-1; the ratio is the same.
+The slab profile and coefficient 2 are a one-dimensional analogue derived
+here from D C'' = a with a no-flux center and supplied outer face; they are not
+an equation attributed to Grimes. The paper's C is oxygen volume per unit
+tissue mass, and a is oxygen consumption per unit tissue mass per time, so the
+ratio C_o/a has time units. Grimes' DLD1 human colorectal tumour data and
+parameters are source context only; they are not portable to another tissue.
+
+Primary source: https://doi.org/10.1098/rsif.2013.1124
+
+Units (SI): D m^2/s; C0 is the boundary oxygen-gas volume per tissue mass (m^3/kg), and a is oxygen-gas-volume consumption per tissue mass per second (m^3 kg^-1 s^-1). The ratio C0/a is seconds. If inputs are instead expressed per tissue volume, convert C0 and a consistently; that conversion is not performed here.
 """
 
 from __future__ import annotations
