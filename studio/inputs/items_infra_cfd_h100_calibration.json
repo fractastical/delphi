@@ -1,0 +1,35 @@
+{
+  "run_tag": "infra29",
+  "items": [
+    {
+      "id": "h100-cfd-controls-calibration",
+      "script": "frontier_compute/vendor/compute_ops/warm_worker.py",
+      "kind": "gpu",
+      "image": "nvcr.io/nvidia/pytorch@sha256:11e9976339d08669ede155cdbc601b1df5f57772fcee772b23527efc54e05602",
+      "args": [
+        "inputs/warm_queue_infra_cfd_h100_calibration.json"
+      ],
+      "files": [
+        "frontier_compute/__init__.py",
+        "frontier_compute/portable_entry.py",
+        "artifacts/gcp/cfd-r2-l4/payload.tar.xz",
+        "artifacts/cfd-h100-calibration/portable.json",
+        "artifacts/cfd-h100-calibration/protocol.json",
+        "inputs/warm_queue_infra_cfd_h100_calibration.json"
+      ],
+      "env": {
+        "OMP_NUM_THREADS": "2",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "CFD3D_WORK": "/work/cfd-h100-calibration",
+        "CFD3D_OUTER_BUDGET_S": "10800",
+        "CFD3D_EXPORT_BYTES_MAX": "0",
+        "CFD3D_PACKET_SHA256": "751a23c334b15cb3913441ef41b617b9d45502434527530d9805d6691dec0153"
+      },
+      "timeout": "75m",
+      "inner_timeout_s": 3100,
+      "max_result_bytes": 1000000,
+      "priority": 1
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "image": "nvcr.io/nvidia/pytorch:25.12-py3; infrastructure supplies exact digest/actual runtime receipt",
+  "environment": {
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2",
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8"
+  },
+  "dependency_policy": "Use existing Torch/NumPy in known NVIDIA image and record actual versions; no installs or model/API calls. LocalCPU2.11.0+cu130; same-jobCPU/CUDA gates mandatory on actual image2.10alpha/CUDA13.1 before training.",
+  "resources": {
+    "gpus": 1,
+    "cpu_threads": 2,
+    "scientific_hard_s": 2400,
+    "training_soft_deadline_s": 1800,
+    "total_soft_deadline_s": 2100,
+    "raw_output_cap_bytes": 50331648,
+    "compressed_transport_cap_bytes": 50331648,
+    "transport_budget_note": "Separate image-pull/export allowance; no increase to scientific training/evaluation budgets"
+  },
+  "same_job_gates": "CPU finite-difference/negative/locality/optimizer and CUDA forward<=1e-5,gradientL2<=1e-4,TF32off; fail beforetraining if gatefails",
+  "outputs": [
+    "output-seed-placement/cpu-controls.json",
+    "output-seed-placement/cuda-controls.json",
+    "output-seed-placement/training/<model>/{latest,final,partial}.pt asapplicable",
+    "output-seed-placement/checkpoint-before-holdout.json",
+    "output-seed-placement/evaluation/progress.json",
+    "output-seed-placement/evaluation/<model>/*.json and *.npz",
+    "output-seed-placement/summary.json",
+    "output-seed-placement/job-receipt.json",
+    "output-seed-placement/failure.json ifany"
+  ],
+  "partial_policy": "All failures/incomplete models kept; only complete2000-step models evaluated; no checkpoint resume claim because trainingpoolnotserialized. No retry/replacement to force targetmatch.",
+  "scientific_scope": "Inverse computational pattern control, not biochemical/genetic implementation, observed tissue regeneration or organism validation",
+  "schema": "frontier.nca.seed-placement-packet/1",
+  "archive_path": "artifacts/nca-seed-placement/nca-seed-placement-h100.tar.gz",
+  "archive_sha256": "5621ca67d91e1d36f56a7e922ab06fdde7942addedd206ec18543d034fcc1445",
+  "archive_bytes": 19170,
+  "entry_argv": [
+    "python",
+    "-m",
+    "engineering.nca_pattern.job",
+    "--out",
+    "output-seed-placement"
+  ],
+  "files": [
+    {
+      "path": "artifacts/nca-pattern/cpu-controls.json",
+      "sha256": "02ade3ad9fb181bbd6f1922a12c655550a8909a9fbd47b95f1700f3a425c233d",
+      "bytes": 1554
+    },
+    {
+      "path": "artifacts/nca-pattern/heldout-masks.npz",
+      "sha256": "6546e8dcab6ef733d11298a9177f5a014c3a57410b714a0584481e68fcd4d4fc",
+      "bytes": 1035
+    },
+    {
+      "path": "artifacts/nca-pattern/one-factor-protocol.json",
+      "sha256": "e247bdab351e9ba97204abfc3ed686aece5d14dd4063f90c9f60010e4058a149",
+      "bytes": 3741
+    },
+    {
+      "path": "artifacts/nca-pattern/protocol.json",
+      "sha256": "4976736fa66756f4fdf41d7b0b132db8ff3d8ddabe4602e62751f6a36aa57b11",
+      "bytes": 9223
+    },
+    {
+      "path": "artifacts/nca-pattern/target-manifest.json",
+      "sha256": "905af3c268ae9d3bf3c96fd6496aaa1ea106b185cc3fa7ab700553c46d8a6a29",
+      "bytes": 1815
+    },
+    {
+      "path": "artifacts/nca-pattern/target.npz",
+      "sha256": "fd1f4774882743f1c09fb2fa2513cbca70b3128f1c58431082298adba0298488",
+      "bytes": 1519
+    },
+    {
+      "path": "engineering/nca_pattern/__init__.py",
+      "sha256": "52e5f75caf97295cf1f14b0b61f414420724ef37f58aa5c53b0320c735e33de6",
+      "bytes": 87
+    },
+    {
+      "path": "engineering/nca_pattern/evaluate.py",
+      "sha256": "5856ec109acd7cea19ca2ed5b468bf6065f30f31d7516b0edd1b9e79d3983d86",
+      "bytes": 8335
+    },
+    {
+      "path": "engineering/nca_pattern/job.py",
+      "sha256": "da2f43130a901ff8ceb8a5bca9910aaec5b5546449b2569493966c6187349d2e",
+      "bytes": 9353
+    },
+    {
+      "path": "engineering/nca_pattern/model.py",
+      "sha256": "8a278ebd201603c87cefae4e8b64137e770c1ebe731aa07b87e02646064c5b98",
+      "bytes": 9042
+    },
+    {
+      "path": "engineering/nca_pattern/target.py",
+      "sha256": "afa93a7891de5ccf58bcb6c80bc11d96d810ed61cb7c2e1437fdd64121471b0c",
+      "bytes": 4400
+    },
+    {
+      "path": "engineering/nca_pattern/train.py",
+      "sha256": "14cb74c5712955e9f0549cba161e8722a15aa45c41f5ae76e740dd647b832bae",
+      "bytes": 6680
+    }
+  ],
+  "staging_note": "Variant input files map into an isolated original-layout tree; original repository artifacts/source are not overwritten",
+  "one_factor_protocol_sha256": "e247bdab351e9ba97204abfc3ed686aece5d14dd4063f90c9f60010e4058a149"
+}

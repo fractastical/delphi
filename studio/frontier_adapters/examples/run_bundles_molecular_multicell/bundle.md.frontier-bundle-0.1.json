@@ -1,0 +1,881 @@
+{
+ "bundle_sha256": "d254ec23b24b1d155f5ef4b066e5a3bd1cbb3b6a1f901ace175d0d50867d4b0d",
+ "exporting_node": "node-a",
+ "policy_version": "frontier-independent-review-0.1",
+ "records": [
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-claim-cpu-short-trajectory",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "OpenMM 8.4; protocol sha256 CPU e888b7ef0d50407c... and CUDA 945cd8f81926a234... (different frozen protocols); prepared system sha256 ecaf1614bc26806a... for the CUDA parity."
+    ],
+    "context": "A short computed trajectory used as the CPU reference stage. computed atomistic classical molecular dynamics. unknown: no conversion to tissue modulus or fin function",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "Classical atomistic MD of a collagen-mimetic peptide in solvent; empirical accuracy UNKNOWN; cross-scale transfer UNKNOWN: no conversion to tissue modulus or fin function. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "The cross-scale coupling gate for this model is refused (composable 0, scenario 0, refused 1): no conversion of an atomistic peptide trajectory to tissue modulus or fin function.",
+     "Short trajectories (0.2 ps CPU; 3 x 100 ps CUDA) do not sample collagen fibril or tissue mechanics."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Run receipt: versions, protocol, seed, wall time, file hashes.",
+     "content_available": false,
+     "content_sha256": "2d4d9e060d29a80d8d810246c9209600f52b157d8c4c4b77475f61d73e5dd89d",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cpu-trajectory-final/receipt.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "The producer's CPU run (seed 1731, 0.1 ps equilibration then 0.2 ps production, 101 frames, 90.7 s wall on 2 threads) ends at a C-alpha RMSD of 0.0385 nm from the production start.",
+    "title": "Collagen-mimetic MD: a 0.2 ps CPU production run from one seed"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "1e940256b8a22cfe5a154e1dcf665932c3c50bcce128080015de8bac09c88eec",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-action-cpu",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code reproduces the digests the receipt lists.",
+     "An independent reviewer checks the model against its cited sources before any number is used."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f; producer code sha256 b7feb160ed410abf",
+     "environment": "python 3.13.12; numpy 2.5.4; Linux-6.17.0-1012-aws-x86_64-with-glibc2.39",
+     "input": "preparation sha256 cc1ad18699e708b16cc9aece0e7a81942a9c2b6b262210cea4d7fd1e647e4eee; protocol sha256 e888b7ef0d50407cc91f48f18e62f90e06a7f7dc3855d8c351b06f1a16e8828b",
+     "model": "OpenMM 8.4 classical MD (no language model)",
+     "parameters": "seed 1731; 200 production steps; threads 2",
+     "scope": "short atomistic trajectory",
+     "target": "1e940256b8a22cfe5a154e1dcf665932c3c50bcce128080015de8bac09c88eec"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "python3 with OpenMM 8.4"
+    ],
+    "target": {
+     "id": "run-md-claim-cpu-short-trajectory",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "1e940256b8a22cfe5a154e1dcf665932c3c50bcce128080015de8bac09c88eec"
+    },
+    "title": "Imported record of a producer-reported run (executed by the producer on CPU; receipt records OpenMM 8.4, python, platform and wall time, not an exit code)"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "8bf4c1ad8220329d19934e1abd965983f7e23e59517de0934747de611ce8bc27",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-evidence-cpu",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 1729248,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "output",
+      "sha256": "62e7aa822dbde908f7cc46978940ab0437cf629693a5a25c7dcc63bb3f83af25",
+      "title": "output: artifacts/molecular/cpu-trajectory-final/final-state-1731.xml [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cpu-trajectory-final/final-state-1731.xml]",
+      "uri": "urn:sha256:62e7aa822dbde908f7cc46978940ab0437cf629693a5a25c7dcc63bb3f83af25"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 33280,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "e3e9d51ec68503164c031f89e0b94eee7eabdbc97ce994156a24d51014e81080",
+      "title": "output: artifacts/molecular/cpu-trajectory-final/metrics-1731.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cpu-trajectory-final/metrics-1731.json]",
+      "uri": "urn:sha256:e3e9d51ec68503164c031f89e0b94eee7eabdbc97ce994156a24d51014e81080"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 579902,
+      "license": null,
+      "media_type": "application/x-npz",
+      "role": "output",
+      "sha256": "d18f89edcc2070e366f2e98a0d42425868d3e0f7e5f01240e95bef257cdf2409",
+      "title": "output: artifacts/molecular/cpu-trajectory-final/trajectory-1731.npz [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cpu-trajectory-final/trajectory-1731.npz]",
+      "uri": "urn:sha256:d18f89edcc2070e366f2e98a0d42425868d3e0f7e5f01240e95bef257cdf2409"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1515,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "2d4d9e060d29a80d8d810246c9209600f52b157d8c4c4b77475f61d73e5dd89d",
+      "title": "log: artifacts/molecular/cpu-trajectory-final/receipt.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cpu-trajectory-final/receipt.json]",
+      "uri": "urn:sha256:2d4d9e060d29a80d8d810246c9209600f52b157d8c4c4b77475f61d73e5dd89d"
+     }
+    ],
+    "assumptions": [
+     "OpenMM 8.4; protocol sha256 CPU e888b7ef0d50407c... and CUDA 945cd8f81926a234... (different frozen protocols); prepared system sha256 ecaf1614bc26806a... for the CUDA parity."
+    ],
+    "context": "Applicability: this prepared system and protocol. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "Classical atomistic MD of a collagen-mimetic peptide in solvent; empirical accuracy UNKNOWN; cross-scale transfer UNKNOWN: no conversion to tissue modulus or fin function. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "The cross-scale coupling gate for this model is refused (composable 0, scenario 0, refused 1): no conversion of an atomistic peptide trajectory to tissue modulus or fin function.",
+     "Short trajectories (0.2 ps CPU; 3 x 100 ps CUDA) do not sample collagen fibril or tissue mechanics."
+    ],
+    "local_id": null,
+    "method": "OpenMM 8.4 classical MD on CPU; file hashes in the receipt were recomputed.",
+    "produced_by": {
+     "id": "run-md-action-cpu",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "8bf4c1ad8220329d19934e1abd965983f7e23e59517de0934747de611ce8bc27"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "code_sha256": "b7feb160ed410abf0b181ee677730f46bf5d1257e88e3c9b0ae4bd2c51d025d3",
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "files_recomputed": [
+      "final-state-1731.xml",
+      "metrics-1731.json",
+      "producer-run.py",
+      "trajectory-1731.npz"
+     ],
+     "run": {
+      "backend": "CPU",
+      "equilibration_ps": 0.1,
+      "equilibration_steps": 100,
+      "final_CA_RMSD_nm": 0.03852119768175029,
+      "frames": 101,
+      "platform_properties": {
+       "DeterministicForces": "false",
+       "Threads": "2"
+      },
+      "production_ps": 0.2,
+      "production_steps": 200,
+      "seed": 1731,
+      "wall_seconds": 90.66691061109304
+     },
+     "source_commit": "17edd4480f4616de0e930cec02e8453fb237e40f"
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T22:52:24+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Run receipt.",
+     "content_available": false,
+     "content_sha256": "2d4d9e060d29a80d8d810246c9209600f52b157d8c4c4b77475f61d73e5dd89d",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cpu-trajectory-final/receipt.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "run-md-claim-cpu-short-trajectory",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "1e940256b8a22cfe5a154e1dcf665932c3c50bcce128080015de8bac09c88eec"
+    },
+    "uncertainty": "One seed; no ensemble; no convergence claim."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "15cb66164ae190ab4810659e5a3daeb30d197ee63cd09b411bc97f9e5fe2b440",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-claim-gpu-attempt-failed-gate",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "OpenMM 8.4; protocol sha256 CPU e888b7ef0d50407c... and CUDA 945cd8f81926a234... (different frozen protocols); prepared system sha256 ecaf1614bc26806a... for the CUDA parity."
+    ],
+    "context": "A failed run kept as a result. The diagnosis records the step dependence; this record does not say which step is right. Measurement precision diagnosis; original failed gate remains failed. No acceptance bounds changed.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "Classical atomistic MD of a collagen-mimetic peptide in solvent; empirical accuracy UNKNOWN; cross-scale transfer UNKNOWN: no conversion to tissue modulus or fin function. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "The cross-scale coupling gate for this model is refused (composable 0, scenario 0, refused 1): no conversion of an atomistic peptide trajectory to tissue modulus or fin function.",
+     "Short trajectories (0.2 ps CPU; 3 x 100 ps CUDA) do not sample collagen fibril or tissue mechanics.",
+     "No CUDA trajectory exists from this attempt."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Attempt receipt and failed control.",
+     "content_available": false,
+     "content_sha256": "2dc24a441e600c36aab0fb191137620e69f44c128a49ff37ff67a23f8c756ba2",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/gpu-attempt-1/receipt.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "Job aijob-e00a3q798jsc6fdbas ended 'failed_CPU_numerical_gate_before_CUDA_production': passed controls ['minimization decrease', 'NVE1fs drift', 'NVE0.5fs drift', 'wrong-sign rejection']; failed control: CPU central-difference force relative error0.00623243 exceeds frozen0.005; h=1e-5nm. CUDA trajectory produced: False. The producer's diagnosis of one force component [345, 2] found the finite-difference relative error depends on the step: h=1e-06 nm: 4.89%; h=1e-05 nm: 0.67%; h=0.0001 nm: 0.04%; h=0.001 nm: 0.05%.",
+    "title": "Collagen-mimetic MD: the first GPU attempt failed its CPU force-derivative gate and produced no CUDA trajectory"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "33a7aa05e2243870af2c85597693a34ee5f198e974bf9d5296e873f9878d66ce",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-action-gpu-attempt-1",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A rerun with a derivative oracle that is stable across steps passes the CPU gate on the same system.",
+     "An independent reviewer checks the model against its cited sources before any number is used."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f; diagnosis code sha256 19f13a0f3c4b7f33",
+     "environment": "see the receipt; interpreter NOT RECORDED in the files read",
+     "input": "system sha256 5063bc0157e2c15e3081ec9df25cf8ee8d91cba84403f5e4ccbb102faa86b7ac; state sha256 fb6ac7d070f975b6547324cbbb4027937968041e1b89e6c4f380ce9d7c470e73",
+     "model": "OpenMM 8.4 force-derivative controls",
+     "parameters": "frozen relative-error limit 0.005; step h=1e-5 nm",
+     "scope": "numerical gate of one system",
+     "target": "33a7aa05e2243870af2c85597693a34ee5f198e974bf9d5296e873f9878d66ce"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "OpenMM 8.4 on a provider job"
+    ],
+    "target": {
+     "id": "run-md-claim-gpu-attempt-failed-gate",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "33a7aa05e2243870af2c85597693a34ee5f198e974bf9d5296e873f9878d66ce"
+    },
+    "title": "Provider-executed job aijob-e00a3q798jsc6fdbas (failed before CUDA production); the control file was reconstructed from exact stdout JSON and its sha256 matches the returned manifest"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "16085a82c6bc1bf9cb85ee78f9ebaaf7de9b850621b976ad1c2a79d212d8adc2",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-evidence-gpu-attempt-1",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 733,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "2dc24a441e600c36aab0fb191137620e69f44c128a49ff37ff67a23f8c756ba2",
+      "title": "log: artifacts/molecular/gpu-attempt-1/receipt.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/gpu-attempt-1/receipt.json]",
+      "uri": "urn:sha256:2dc24a441e600c36aab0fb191137620e69f44c128a49ff37ff67a23f8c756ba2"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 3379,
+      "license": null,
+      "media_type": "application/json",
+      "role": "certificate",
+      "sha256": "c935e17e5ce7ae4ddefed3944fc783e87a856d4b66023daeb6bfdee1865c4be4",
+      "title": "certificate: artifacts/molecular/gpu-attempt-1/derivative-diagnosis.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/gpu-attempt-1/derivative-diagnosis.json]",
+      "uri": "urn:sha256:c935e17e5ce7ae4ddefed3944fc783e87a856d4b66023daeb6bfdee1865c4be4"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1219,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "a0a0ea23b61990f9cf6c2db729f26870033ebdc42b685c360b43aee2988e451a",
+      "title": "log: artifacts/molecular/gpu-attempt-1/controls.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/gpu-attempt-1/controls.json]",
+      "uri": "urn:sha256:a0a0ea23b61990f9cf6c2db729f26870033ebdc42b685c360b43aee2988e451a"
+     }
+    ],
+    "assumptions": [
+     "OpenMM 8.4; protocol sha256 CPU e888b7ef0d50407c... and CUDA 945cd8f81926a234... (different frozen protocols); prepared system sha256 ecaf1614bc26806a... for the CUDA parity."
+    ],
+    "context": "Applicability: this system and these controls. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "Classical atomistic MD of a collagen-mimetic peptide in solvent; empirical accuracy UNKNOWN; cross-scale transfer UNKNOWN: no conversion to tissue modulus or fin function. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "The cross-scale coupling gate for this model is refused (composable 0, scenario 0, refused 1): no conversion of an atomistic peptide trajectory to tissue modulus or fin function.",
+     "Short trajectories (0.2 ps CPU; 3 x 100 ps CUDA) do not sample collagen fibril or tissue mechanics.",
+     "No CUDA trajectory exists from this attempt."
+    ],
+    "local_id": null,
+    "method": "Frozen controls on the CPU before production; the failed control and the step scan are recorded. Hashes of the receipt files were not all present locally.",
+    "produced_by": {
+     "id": "run-md-action-gpu-attempt-1",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "16085a82c6bc1bf9cb85ee78f9ebaaf7de9b850621b976ad1c2a79d212d8adc2"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "cuda_trajectory_produced": false,
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "failed_control": "CPU central-difference force relative error0.00623243 exceeds frozen0.005; h=1e-5nm",
+     "job_id": "aijob-e00a3q798jsc6fdbas",
+     "passed_controls": [
+      "minimization decrease",
+      "NVE1fs drift",
+      "NVE0.5fs drift",
+      "wrong-sign rejection"
+     ],
+     "source_commit": "17edd4480f4616de0e930cec02e8453fb237e40f",
+     "status": "failed_CPU_numerical_gate_before_CUDA_production"
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T22:52:24+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Derivative diagnosis.",
+     "content_available": false,
+     "content_sha256": "c935e17e5ce7ae4ddefed3944fc783e87a856d4b66023daeb6bfdee1865c4be4",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/gpu-attempt-1/derivative-diagnosis.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "run-md-claim-gpu-attempt-failed-gate",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "33a7aa05e2243870af2c85597693a34ee5f198e974bf9d5296e873f9878d66ce"
+    },
+    "uncertainty": "Numerical gate only."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "f173f8376fb72a7e2dc0360236d1d11a0a9bcd112bed0e61c917a09a2d855699",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-claim-cuda-three-seed-production",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "OpenMM 8.4; protocol sha256 CPU e888b7ef0d50407c... and CUDA 945cd8f81926a234... (different frozen protocols); prepared system sha256 ecaf1614bc26806a... for the CUDA parity.",
+     "Job aijob-e00h8rra7x8ams6jyn; 20 returned file hashes were verified by the producer."
+    ],
+    "context": "A computed ensemble of three seeds of a short trajectory. The cross-scale gate refuses any conversion to tissue modulus or fin function.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "Classical atomistic MD of a collagen-mimetic peptide in solvent; empirical accuracy UNKNOWN; cross-scale transfer UNKNOWN: no conversion to tissue modulus or fin function. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "The cross-scale coupling gate for this model is refused (composable 0, scenario 0, refused 1): no conversion of an atomistic peptide trajectory to tissue modulus or fin function.",
+     "Short trajectories (0.2 ps CPU; 3 x 100 ps CUDA) do not sample collagen fibril or tissue mechanics."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Production receipt: three CUDA runs.",
+     "content_available": false,
+     "content_sha256": "3665cd12f3fa2c3654d838ffa07645a94dd3d0a2a1138d558c22eb0451695bcb",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/production/receipt.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "On NVIDIA H100 80GB HBM3 (CUDA required), after a CPU-CUDA parity check on the same prepared system (energy difference 1.4e-05 kJ/mol/atom against a limit of 0.01; force relative L2 2e-05 against 0.002), seeds 1731, 1732, 1733 each ran 100 ps after 10 ps equilibration; final C-alpha RMSD from the production start is 0.146, 0.147, 0.165 nm and the sampled temperature over the last 20% is 300.0, 300.1, 301.4 K.",
+    "title": "Collagen-mimetic MD: three H100 CUDA seeds of 100 ps after a CPU-CUDA parity check; no tissue stiffness follows"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "fd363dd54fad1aa120755b41312193bda37a7e8308fdb3b7cd364b4f6f99416c",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-action-cuda-v2",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code reproduces the digests the receipt lists.",
+     "An independent reviewer checks the model against its cited sources before any number is used."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f; remote code sha256 6b96d958358a923d; source commit 31e6c238fbd7",
+     "environment": "python 3.12.16; Linux-6.11.0-1016-nvidia-x86_64-with-glibc2.36; GPU NVIDIA H100 80GB HBM3, 580.173.02",
+     "input": "prepared system sha256 ecaf1614bc26806a9bd2c601f06be47e9d6fb46a4cfe5e69e778b23ebc6bd412; positions sha256 978fffabd049d479",
+     "model": "OpenMM 8.4 classical MD, CUDA mixed precision (no language model)",
+     "parameters": "seeds 1731-1733; 100000 production steps; DeterministicForces true",
+     "scope": "short atomistic ensemble",
+     "target": "fd363dd54fad1aa120755b41312193bda37a7e8308fdb3b7cd364b4f6f99416c"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "OpenMM 8.4 with CUDA on an H100"
+    ],
+    "target": {
+     "id": "run-md-claim-cuda-three-seed-production",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "fd363dd54fad1aa120755b41312193bda37a7e8308fdb3b7cd364b4f6f99416c"
+    },
+    "title": "Provider-executed job aijob-e00h8rra7x8ams6jyn (CUDA required; NVIDIA H100 80GB HBM3; 80.2 s wall); the producer reports 20 returned file hashes verified; the prior failed job aijob-e00a3q798jsc6fdbas is retained"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "b3dab537aa75a22b7a903f7d82a3cbd9640eecef4282a47eeec438c1eae09429",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-evidence-cuda-v2",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 580203,
+      "license": null,
+      "media_type": "application/x-npz",
+      "role": "output",
+      "sha256": "e0fe577e9816653c4d5ff83e200e658bed76a671e288697a50efabc9a62e720a",
+      "title": "output: artifacts/molecular/cuda-v2/production/trajectory-1731.npz [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/production/trajectory-1731.npz]",
+      "uri": "urn:sha256:e0fe577e9816653c4d5ff83e200e658bed76a671e288697a50efabc9a62e720a"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 580073,
+      "license": null,
+      "media_type": "application/x-npz",
+      "role": "output",
+      "sha256": "c289eda8e0e4f51ff28adde6ba3ab091d28466d0cd73fa5ae3c72dd65fbae65c",
+      "title": "output: artifacts/molecular/cuda-v2/production/trajectory-1732.npz [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/production/trajectory-1732.npz]",
+      "uri": "urn:sha256:c289eda8e0e4f51ff28adde6ba3ab091d28466d0cd73fa5ae3c72dd65fbae65c"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 580206,
+      "license": null,
+      "media_type": "application/x-npz",
+      "role": "output",
+      "sha256": "a20f7f4e6afe4c88ef737b1012189a16460f54e5b1f439f50c74e7978366e314",
+      "title": "output: artifacts/molecular/cuda-v2/production/trajectory-1733.npz [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/production/trajectory-1733.npz]",
+      "uri": "urn:sha256:a20f7f4e6afe4c88ef737b1012189a16460f54e5b1f439f50c74e7978366e314"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 32924,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "9ab1a3e7dd9c6b1feb316d626bb4f544f29ada2f6e12034b9a9747114518664a",
+      "title": "output: artifacts/molecular/cuda-v2/production/metrics-1731.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/production/metrics-1731.json]",
+      "uri": "urn:sha256:9ab1a3e7dd9c6b1feb316d626bb4f544f29ada2f6e12034b9a9747114518664a"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 32909,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "fe0c2b68eb90540834d96c51d0d3d30b5376501eacb8a0b0963dac5bb24cbbe4",
+      "title": "output: artifacts/molecular/cuda-v2/production/metrics-1732.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/production/metrics-1732.json]",
+      "uri": "urn:sha256:fe0c2b68eb90540834d96c51d0d3d30b5376501eacb8a0b0963dac5bb24cbbe4"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 32941,
+      "license": null,
+      "media_type": "application/json",
+      "role": "output",
+      "sha256": "f7e9015483613112cc9c525515c12906969d3af84f9d4eaaa55dda70a764044e",
+      "title": "output: artifacts/molecular/cuda-v2/production/metrics-1733.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/production/metrics-1733.json]",
+      "uri": "urn:sha256:f7e9015483613112cc9c525515c12906969d3af84f9d4eaaa55dda70a764044e"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 445,
+      "license": null,
+      "media_type": "application/json",
+      "role": "certificate",
+      "sha256": "61d2907d1177f5bf379eb6864e1455f5a797ca027abea59fd8bacdd7c921e98d",
+      "title": "certificate: artifacts/molecular/cuda-v2/cpu-cuda-parity.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/cpu-cuda-parity.json]",
+      "uri": "urn:sha256:61d2907d1177f5bf379eb6864e1455f5a797ca027abea59fd8bacdd7c921e98d"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2335,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "a3ec452805299a83b1545629a12bde0d4fbd7e4bad0b2aa19902499ddd9d0f93",
+      "title": "log: artifacts/molecular/cuda-v2/job-receipt.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/job-receipt.json]",
+      "uri": "urn:sha256:a3ec452805299a83b1545629a12bde0d4fbd7e4bad0b2aa19902499ddd9d0f93"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 3605,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "3665cd12f3fa2c3654d838ffa07645a94dd3d0a2a1138d558c22eb0451695bcb",
+      "title": "log: artifacts/molecular/cuda-v2/production/receipt.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/production/receipt.json]",
+      "uri": "urn:sha256:3665cd12f3fa2c3654d838ffa07645a94dd3d0a2a1138d558c22eb0451695bcb"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 255,
+      "license": null,
+      "media_type": "text/plain",
+      "role": "environment",
+      "sha256": "4c4492dcc4a229cf1076837ae5c6f27846c059e1955e569a5b2bcc27042db2a0",
+      "title": "environment: artifacts/molecular/cuda-v2/environment.txt [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/environment.txt]",
+      "uri": "urn:sha256:4c4492dcc4a229cf1076837ae5c6f27846c059e1955e569a5b2bcc27042db2a0"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 463770,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "input",
+      "sha256": "e04baa840bcf5afc074b0527a84954f4cb85a031e5f79102649a04b751cf23f6",
+      "title": "input: artifacts/molecular/cuda-v2/prepared-inputs.tar.gz [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/prepared-inputs.tar.gz]",
+      "uri": "urn:sha256:e04baa840bcf5afc074b0527a84954f4cb85a031e5f79102649a04b751cf23f6"
+     }
+    ],
+    "assumptions": [
+     "OpenMM 8.4; protocol sha256 CPU e888b7ef0d50407c... and CUDA 945cd8f81926a234... (different frozen protocols); prepared system sha256 ecaf1614bc26806a... for the CUDA parity."
+    ],
+    "context": "Applicability: this prepared system. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "Classical atomistic MD of a collagen-mimetic peptide in solvent; empirical accuracy UNKNOWN; cross-scale transfer UNKNOWN: no conversion to tissue modulus or fin function. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "The cross-scale coupling gate for this model is refused (composable 0, scenario 0, refused 1): no conversion of an atomistic peptide trajectory to tissue modulus or fin function.",
+     "Short trajectories (0.2 ps CPU; 3 x 100 ps CUDA) do not sample collagen fibril or tissue mechanics."
+    ],
+    "local_id": null,
+    "method": "CPU-CUDA parity then three CUDA production runs; every locally present file hash in the job and production receipts was recomputed; 3 job-receipt files are inside the prepared-inputs archive and not separately checked here.",
+    "produced_by": {
+     "id": "run-md-action-cuda-v2",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "b3dab537aa75a22b7a903f7d82a3cbd9640eecef4282a47eeec438c1eae09429"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "files_recomputed": 26,
+     "files_stated_not_checked": [
+      "cpu-controls/minimized-state.xml",
+      "prepared/positions.xml",
+      "prepared/system.xml"
+     ],
+     "gpu": "NVIDIA H100 80GB HBM3, 580.173.02",
+     "job_id": "aijob-e00h8rra7x8ams6jyn",
+     "parity": {
+      "energy_abs_difference_kJ_mol_per_atom": 1.3939111050398422e-05,
+      "force_relative_L2_difference": 2.0150467878482663e-05,
+      "frozen_limits": {
+       "energy_per_atom_max": 0.01,
+       "force_relative_L2_max": 0.002
+      },
+      "passed": true,
+      "same_prepared_positions_sha256": "978fffabd049d47943c3057ade39972f09dbca8f431d3cc70cfb017ecaaa3ab8",
+      "same_prepared_system_sha256": "ecaf1614bc26806a9bd2c601f06be47e9d6fb46a4cfe5e69e778b23ebc6bd412"
+     },
+     "runs": [
+      {
+       "final_CA_RMSD_nm": 0.14647926238597417,
+       "seed": 1731,
+       "wall_seconds": 18.238215963000016
+      },
+      {
+       "final_CA_RMSD_nm": 0.14659172133313092,
+       "seed": 1732,
+       "wall_seconds": 17.944053932999992
+      },
+      {
+       "final_CA_RMSD_nm": 0.1654631107801003,
+       "seed": 1733,
+       "wall_seconds": 17.762254869999992
+      }
+     ],
+     "source_commit": "17edd4480f4616de0e930cec02e8453fb237e40f",
+     "wall_seconds": 80.238939341
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T22:52:24+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Production receipt.",
+     "content_available": false,
+     "content_sha256": "3665cd12f3fa2c3654d838ffa07645a94dd3d0a2a1138d558c22eb0451695bcb",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-v2/production/receipt.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "run-md-claim-cuda-three-seed-production",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "fd363dd54fad1aa120755b41312193bda37a7e8308fdb3b7cd364b4f6f99416c"
+    },
+    "uncertainty": "Three seeds; no convergence or block-averaging claim; RMSD is from the production start."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "e20850c97bc959dac3479cd016fa1ec852e083fdc5e658219607707bdb32619a",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-action-cuda-render",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "Re-rendering the trajectory reproduces the frames; mp4 bytes can differ across ffmpeg builds.",
+     "Pictures are views of computed states, not evidence."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f; render code sha256 e8c89c6fa0496ba5",
+     "environment": "NOT RECORDED",
+     "input": "simulation evidence version e20850c97bc959dac3479cd016fa1ec852e083fdc5e658219607707bdb32619a; trajectory sha256 e0fe577e9816653c",
+     "model": "none: rendering",
+     "parameters": "101 frames at 12 fps; transform: translation and proper rigid least-squares alignment to initial frame, then fixed principa",
+     "scope": "visualisation of one seed",
+     "target": "fd363dd54fad1aa120755b41312193bda37a7e8308fdb3b7cd364b4f6f99416c"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "run-md-evidence-cuda-v2",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "e20850c97bc959dac3479cd016fa1ec852e083fdc5e658219607707bdb32619a"
+     }
+    ],
+    "required_capabilities": [
+     "python3 with matplotlib; ffmpeg"
+    ],
+    "target": {
+     "id": "run-md-claim-cuda-three-seed-production",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "fd363dd54fad1aa120755b41312193bda37a7e8308fdb3b7cd364b4f6f99416c"
+    },
+    "title": "Imported record of a producer-reported render (not re-run by Frontier): video and poster of seed 1731 from the actual saved states, rigidly aligned, no deformation invented"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "38d4cde0545bea5354f72ba7d5e626fa8e5f8514e4301d664bcce0d1911ab3fc",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-md-evidence-cuda-render",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 652288,
+      "license": null,
+      "media_type": "video/mp4",
+      "role": "output",
+      "sha256": "f03ea1a2915d26e2904edef7d2fe72a3ac5ba894c1b04042372efc7718a7dd3d",
+      "title": "output: artifacts/molecular/cuda-render/trajectory.mp4 [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-render/trajectory.mp4]",
+      "uri": "urn:sha256:f03ea1a2915d26e2904edef7d2fe72a3ac5ba894c1b04042372efc7718a7dd3d"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 219438,
+      "license": null,
+      "media_type": "image/png",
+      "role": "output",
+      "sha256": "8884fe1cd94218238a5c28e1167faceb686b91680b825401ad421ec9c51dc2cd",
+      "title": "output: artifacts/molecular/cuda-render/poster.png [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-render/poster.png]",
+      "uri": "urn:sha256:8884fe1cd94218238a5c28e1167faceb686b91680b825401ad421ec9c51dc2cd"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 1292,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "0e9430a0dc3a670530d3d1e2fc3c1ab3636fdfc579b4c559102d1cb03cf0e842",
+      "title": "log: artifacts/molecular/cuda-render/render.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-render/render.json]",
+      "uri": "urn:sha256:0e9430a0dc3a670530d3d1e2fc3c1ab3636fdfc579b4c559102d1cb03cf0e842"
+     }
+    ],
+    "assumptions": [
+     "OpenMM 8.4; protocol sha256 CPU e888b7ef0d50407c... and CUDA 945cd8f81926a234... (different frozen protocols); prepared system sha256 ecaf1614bc26806a... for the CUDA parity."
+    ],
+    "context": "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right.",
+     "Not calibrated to any fish. Nothing here is a whole-fish result."
+    ],
+    "local_id": null,
+    "method": "Producer renders the saved seed-1731 trajectory; output hashes were recomputed.",
+    "produced_by": {
+     "id": "run-md-action-cuda-render",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "38d4cde0545bea5354f72ba7d5e626fa8e5f8514e4301d664bcce0d1911ab3fc"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "frames": 101,
+     "outputs_recomputed": [
+      "poster.png",
+      "producer-render.py",
+      "trajectory.mp4"
+     ],
+     "seed": 1731,
+     "source_commit": "17edd4480f4616de0e930cec02e8453fb237e40f"
+    },
+    "provider_assessment": null,
+    "relation": "context_only",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T22:52:24+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Render receipt.",
+     "content_available": false,
+     "content_sha256": "0e9430a0dc3a670530d3d1e2fc3c1ab3636fdfc579b4c559102d1cb03cf0e842",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/molecular/cuda-render/render.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "run-md-claim-cuda-three-seed-production",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "fd363dd54fad1aa120755b41312193bda37a7e8308fdb3b7cd364b4f6f99416c"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "64ac093adbaf9bcbedb7ad427620d9fbba202f46e7fb0c1d98bce9d0b6654679",
+   "visibility": "public"
+  }
+ ],
+ "review_claims": [],
+ "schema_version": "frontier-bundle-0.1",
+ "trust": "Digest proves integrity only; reviews require receiving-node policy."
+}

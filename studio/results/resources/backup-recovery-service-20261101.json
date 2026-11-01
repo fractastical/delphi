@@ -1,0 +1,397 @@
+{
+  "schema": "frontier.offhost-service-recovery/1",
+  "creation": {
+    "schema": "frontier.encrypted-backup-receipt/1",
+    "created_utc": "2026-11-01T04:12:25.897404+00:00",
+    "archive": "snapshot.tar.gz.age",
+    "archive_sha256": "4c8cfb98f3529fddb9cb2905c3942a1611cb456ac18283c731118821933d7501",
+    "archive_bytes": 1586623355,
+    "file_count": 15564,
+    "unique_blob_count": 6689,
+    "logical_bytes": 3305659592,
+    "excluded_count": 97,
+    "capture_errors": 0,
+    "recipients_sha256": "022301313ab0ccf86a0376c2e9d95fddb3b12a49163a901cc278136e90453e57",
+    "client_encryption": "age",
+    "restorable_verified": false
+  },
+  "storage": {
+    "schema": "frontier.private-backup-storage/1",
+    "verified_utc": "2026-11-01T04:13:56.272942+00:00",
+    "uri": "s3://morphoswarm-backups-024848463001/backups/delphi-frontier/snapshots/20261101T0410/snapshot.tar.gz.age",
+    "archive_sha256": "4c8cfb98f3529fddb9cb2905c3942a1611cb456ac18283c731118821933d7501",
+    "archive_bytes": 1586623355,
+    "download_sha256_matched": true,
+    "anonymous_http_status": 403,
+    "public_access_block": {
+      "BlockPublicAcls": true,
+      "IgnorePublicAcls": true,
+      "BlockPublicPolicy": true,
+      "RestrictPublicBuckets": true
+    },
+    "server_encryption": "AES256",
+    "create_only": true,
+    "put_etag": "\"6024af9bf7b7ce761caced708d942087\"",
+    "download_etag": "\"6024af9bf7b7ce761caced708d942087\"",
+    "runtime_credential_files_uploaded": false,
+    "historical_private_material_client_encrypted": true,
+    "full_restore_verified": false
+  },
+  "offhost_archive_restore": {
+    "schema": "frontier.backup-restore-check/1",
+    "verified_utc": "2026-11-01T04:19:30.097528+00:00",
+    "archive_sha256": "4c8cfb98f3529fddb9cb2905c3942a1611cb456ac18283c731118821933d7501",
+    "files_restored": 15564,
+    "logical_bytes": 3305659592,
+    "capture_errors": [],
+    "source_finished_utc": "2026-11-01T04:12:25.827995+00:00"
+  },
+  "offhost_host": "sandbox-03",
+  "successful_service_drill": {
+    "schema": "frontier.separate-host-service-recovery/1",
+    "started_utc": "2026-11-01T04:36:20.922083+00:00",
+    "source_sha": "8a1f0914ec86d7905f5d19a4d20ee70a8f5fd587",
+    "recovered_dump_sha256": "1cbe54fed0b5cfc55d473e017638f5616c823e7c2e998f3ee269e486359a3d62",
+    "archive_sha256": "4c8cfb98f3529fddb9cb2905c3942a1611cb456ac18283c731118821933d7501",
+    "checker_source_sha256": "1fa60606001cc4216aa9d1216d5246e5b87ec3412526a4cdeb851378c1c72cc3",
+    "operations": [
+      {
+        "stage": "source_clone",
+        "argv": [
+          "git",
+          "clone",
+          "--no-checkout",
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/snapshot-20261101T0410/restored/metadata/frontier-all-refs.bundle",
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/source"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "source_checkout",
+        "argv": [
+          "git",
+          "checkout",
+          "--detach",
+          "8a1f0914ec86d7905f5d19a4d20ee70a8f5fd587"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "source_identity",
+        "argv": [
+          "git",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "venv_create",
+        "argv": [
+          "/usr/bin/python3",
+          "-m",
+          "venv",
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/venv"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "dependencies_install",
+        "argv": [
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/venv/bin/python",
+          "-m",
+          "pip",
+          "--disable-pip-version-check",
+          "install",
+          "--no-input",
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/source"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "dependency_versions",
+        "argv": [
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/venv/bin/python",
+          "-m",
+          "pip",
+          "freeze"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "python_version",
+        "argv": [
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/venv/bin/python",
+          "--version"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "postgres_image_pull",
+        "argv": [
+          "docker",
+          "pull",
+          "pgvector/pgvector:0.6.0-pg16"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "postgres_image_identity",
+        "argv": [
+          "docker",
+          "image",
+          "inspect",
+          "pgvector/pgvector:0.6.0-pg16",
+          "--format",
+          "{{index .RepoDigests 0}}"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "postgres_start",
+        "argv": [
+          "docker",
+          "run",
+          "--detach",
+          "--name",
+          "frontier-recovery-a6c3fdaf2c",
+          "--label",
+          "frontier.recovery.check=a6c3fdaf2c",
+          "--network",
+          "none",
+          "--user",
+          "1000:1000",
+          "--cpus",
+          "1",
+          "--memory",
+          "1g",
+          "--memory-swap",
+          "1g",
+          "--pids-limit",
+          "128",
+          "--cap-drop",
+          "ALL",
+          "--security-opt",
+          "no-new-privileges",
+          "--read-only",
+          "--tmpfs",
+          "/tmp:rw,nosuid,nodev,size=64m",
+          "--mount",
+          "type=bind,src=/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/pgdata,dst=/var/lib/postgresql/data",
+          "--mount",
+          "type=bind,src=/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/sock,dst=/var/run/postgresql",
+          "--env",
+          "POSTGRES_USER=frontier_recovery",
+          "--env",
+          "POSTGRES_DB=frontier",
+          "--env",
+          "POSTGRES_HOST_AUTH_METHOD=trust",
+          "pgvector/pgvector:0.6.0-pg16",
+          "-c",
+          "listen_addresses=",
+          "-c",
+          "unix_socket_permissions=0700",
+          "-c",
+          "shared_buffers=128MB"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "independent_expiry",
+        "argv": [
+          "systemd-run",
+          "--user",
+          "--unit",
+          "frontier-recovery-expire-a6c3fdaf2c",
+          "--on-active=15m",
+          "/usr/bin/docker",
+          "stop",
+          "--time",
+          "5",
+          "frontier-recovery-a6c3fdaf2c"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "postgres_version",
+        "argv": [
+          "docker",
+          "exec",
+          "frontier-recovery-a6c3fdaf2c",
+          "postgres",
+          "--version"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "pg_restore",
+        "argv": [
+          "docker",
+          "exec",
+          "-i",
+          "frontier-recovery-a6c3fdaf2c",
+          "pg_restore",
+          "--no-owner",
+          "--no-acl",
+          "--exit-on-error",
+          "-U",
+          "frontier_recovery",
+          "-d",
+          "frontier"
+        ],
+        "exit_code": 0
+      },
+      {
+        "stage": "application_probe",
+        "argv": [
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/venv/bin/python",
+          "-I",
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/snapshot-20261101T0410/frontier_compute/backup_service_probe.py",
+          "--root",
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4",
+          "--restored",
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/snapshot-20261101T0410/restored",
+          "--source",
+          "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/source",
+          "--source-sha",
+          "8a1f0914ec86d7905f5d19a4d20ee70a8f5fd587"
+        ],
+        "exit_code": 0
+      }
+    ],
+    "checks": {
+      "source_and_final_video_hashes": true,
+      "all18_counts_and_sanitized_leases": true,
+      "loopback_web_health_and_catalog": true,
+      "private_fixture_hidden_from_public_only_mcp_read": true,
+      "official_mcp_authenticated_write_public_read_and_idempotency": true,
+      "invalid_bearer_refused401": true,
+      "fresh_credential_not_logged": true
+    },
+    "cleanup": {
+      "owned_app_children_stopped": true,
+      "owned_container_stop_exit": 0,
+      "postgres_logs_exit": 0,
+      "owned_container_remove_exit": 0
+    },
+    "success": true,
+    "scope": "Disposable separate-host recovery only. No public-domain cutover or unrelated service changes.",
+    "python_version": "Python 3.14.4",
+    "postgres_image_digest": "pgvector/pgvector@sha256:b740286128ce8e232fe0de3c8db2267d91aedc598dfbeaefb7ffb0b79ceef1b3",
+    "postgres_version": "postgres (PostgreSQL) 16.1 (Debian 16.1-1.pgdg120+1)",
+    "probe_source_sha256": "8425257251133a9f403e7fcd19120a6eb959bdfec269b35bb961751d91fe118f",
+    "application_probe": {
+      "schema": "frontier.isolated-application-probe/1",
+      "success": true,
+      "checks": {
+        "all18_counts_and_sanitized_leases": true,
+        "loopback_web_health_and_catalog": true,
+        "private_fixture_hidden_from_public_only_mcp_read": true,
+        "official_mcp_authenticated_write_public_read_and_idempotency": true,
+        "invalid_bearer_refused401": true,
+        "fresh_credential_not_logged": true
+      },
+      "runtime": {
+        "python": "3.14.4",
+        "venv": "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/venv",
+        "isolated_mode": 1,
+        "module_paths": {
+          "frontier.store": "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/venv/lib/python3.14/site-packages/frontier/store.py",
+          "psycopg": "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/venv/lib/python3.14/site-packages/psycopg/__init__.py",
+          "mcp": "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/venv/lib/python3.14/site-packages/mcp/__init__.py",
+          "typing_extensions": "/home/ubuntu/.local/lib/delphi-frontier-recovery/svc-0410-v4/venv/lib/python3.14/site-packages/typing_extensions.py"
+        },
+        "package_versions": {
+          "psycopg": "3.3.4",
+          "pydantic": "2.13.4",
+          "mcp": "1.27.0",
+          "typing_extensions": "4.16.0",
+          "anyio": "4.15.1"
+        }
+      },
+      "postgres_extensions": {
+        "plpgsql": "1.0",
+        "vector": "0.6.0"
+      },
+      "table_counts_before_disposable_write": {
+        "action_state": 69,
+        "discovery_documents": 4538,
+        "discovery_failures": 312,
+        "discovery_query_cache": 16,
+        "discovery_runs": 43,
+        "events": 1964,
+        "forks": 0,
+        "heads": 3906,
+        "idempotency": 0,
+        "imported_review_claims": 0,
+        "local_states": 3912,
+        "node_config": 1,
+        "principals": 0,
+        "record_versions": 3912,
+        "reviews": 2,
+        "schema_migrations": 1,
+        "typed_edges": 2477,
+        "write_receipts": 376
+      },
+      "loopback_ports": {
+        "web": 60139,
+        "mcp": 52067
+      },
+      "owned_app_children_stopped": true,
+      "finished_utc": "2026-11-01T04:36:57.614903+00:00"
+    },
+    "finished_utc": "2026-11-01T04:36:58.365688+00:00"
+  },
+  "service_receipt_sha256": "4b6f19451944c3cc50c6eaf1fa51bdff9d6143e79923f7527e94a61226670645",
+  "dependency_freeze_sha256": "7e4f320f3c95b5ef925415716d704128b6bce92023f40c26a415c3f0200b79ce",
+  "original_failed_attempts_preserved": [
+    {
+      "attempt": 1,
+      "receipt_sha256": "a13f2580dcf1ee37c108475c6e4ac661b623d604e56ac5fa5bfa456a24767d43",
+      "failure_stage": "pg_restore",
+      "failure_type": "RuntimeError",
+      "reason": "Vanilla PG16 lacked vector extension; pg_restore failed.",
+      "cleanup": {
+        "owned_app_children_stopped": true,
+        "owned_container_stop_exit": 0
+      },
+      "source_sha": "8a1f0914ec86d7905f5d19a4d20ee70a8f5fd587"
+    },
+    {
+      "attempt": 2,
+      "receipt_sha256": "49e5da9786d9a39b29d3994ac369415370114c22fc1f81eb380c8febaeeed7c4",
+      "failure_stage": "pg_restore",
+      "failure_type": "ImportError",
+      "reason": "Verifier host typing_extensions shadowed fresh venv; application client import failed.",
+      "cleanup": {
+        "owned_app_children_stopped": true,
+        "owned_container_stop_exit": 0,
+        "postgres_logs_exit": 0,
+        "owned_container_remove_exit": 0
+      },
+      "source_sha": "8a1f0914ec86d7905f5d19a4d20ee70a8f5fd587"
+    },
+    {
+      "attempt": 3,
+      "receipt_sha256": "6a4cfcb899811e9e1dde628dc749923ed132c3746a0ad571abd6b675a4115c7d",
+      "failure_stage": "application_probe",
+      "failure_type": "RuntimeError",
+      "reason": "Probe incorrectly expected public-only MCP get to return its private fixture; actual policy withheld it.",
+      "cleanup": {
+        "owned_app_children_stopped": true,
+        "owned_container_stop_exit": 0,
+        "postgres_logs_exit": 0,
+        "owned_container_remove_exit": 0
+      },
+      "source_sha": "8a1f0914ec86d7905f5d19a4d20ee70a8f5fd587"
+    }
+  ],
+  "independent_local_database_replay_receipt_sha256": "8915429fa4be676605020cf1e181c04b083e5fd2612ddd13687dfeb9e0d9990f",
+  "privacy": "Archive is client-side age encrypted and private in persistent AWS. Raw dumps/logs/transcripts are not public; explicit runtime credentials/capability files excluded. Old credentials are not restored.",
+  "scope": "Actual recovered-source application run is source8a1f091 only. Subsequent source refs/media/compute receipts need additive backup and are not claimed retested by this drill.",
+  "remaining": [
+    "Final additive snapshot with newer root refs, canonical BETSE and CFD return plus all actual drill logs.",
+    "Pending remote R2 and Google CPU state not yet returned; final checkpoints of completed CUDA arms were not exported.",
+    "Print-v4 not yet reviewed/ready at snapshot preparation; later additive capture required."
+  ]
+}

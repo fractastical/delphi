@@ -1,0 +1,296 @@
+{
+  "schema": "frontier.proofs.probe/1",
+  "checked_at": "2026-11-01T05:01:53.486833+00:00",
+  "transport": "read-only stdio",
+  "endpoint": null,
+  "server": {
+    "name": "Delphi Frontier MCP",
+    "title": null,
+    "version": "1.27.0",
+    "websiteUrl": null,
+    "icons": null
+  },
+  "tool_count": 18,
+  "tool_schema": {
+    "properties": {
+      "family": {
+        "anyOf": [
+          {
+            "enum": [
+              "geometric-similarity",
+              "unit-algebra",
+              "cantilever-guard"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Family"
+      },
+      "include_source": {
+        "default": false,
+        "title": "Include Source",
+        "type": "boolean"
+      }
+    },
+    "title": "frontier_proofsArguments",
+    "type": "object"
+  },
+  "principal": null,
+  "authorization_supplied": false,
+  "summary": {
+    "schema": "frontier.proofs/1",
+    "scope": "Recorded mathematical compile/control results only; not a new Lean run, scientific review, empirical finding, or proof of biological validity.",
+    "compile_executed": false,
+    "biological_validation": false,
+    "source_character_limit_per_family": 6000,
+    "families": [
+      {
+        "id": "geometric-similarity",
+        "title": "Geometric similarity: wing loading and speed scaling",
+        "summary": "Under similarity with length ratio k (area k squared, mass k cubed, same air density, lift coefficient and gravity), wing loading scales as k and the level-flight proxy speed as the square root of k. A solver-emitted conflict certificate is also checked.",
+        "assumptions": [
+          "Every symbol is a positive real number.",
+          "Air density, lift coefficient and gravity are unchanged between the two sizes.",
+          "Mass ratio k^3 and area ratio k^2 are assumptions of the model (hypotheses of the theorem), not derived.",
+          "The lift condition is a level-flight proxy (L = W), not a glide analysis."
+        ],
+        "equations": [
+          {
+            "label": "Wing loading",
+            "tex": "WL=\\frac{m\\,g}{S}"
+          },
+          {
+            "label": "Level-flight proxy speed",
+            "tex": "V=\\sqrt{\\frac{2\\,m\\,g}{\\rho\\,S\\,C}}"
+          },
+          {
+            "label": "Wing loading under similarity (area k^2, mass k^3)",
+            "tex": "WL(k^{3}m,\\,k^{2}S)=k\\,WL(m,S)"
+          },
+          {
+            "label": "Speed under similarity",
+            "tex": "V(k^{3}m,\\,k^{2}S)=\\sqrt{k}\\,V(m,S)"
+          },
+          {
+            "label": "Wing-loading ceiling at speed V",
+            "tex": "2\\,m\\,g\\le V^{2}\\rho S C\\ \\Rightarrow\\ 2\\,WL\\le \\rho V^{2}C"
+          }
+        ],
+        "status": "recorded_compile_source_matched",
+        "recorded_compile": true,
+        "versions": {
+          "lean_version": "Lean (version 4.35.0, x86_64-unknown-linux-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)",
+          "mathlib_rev": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+          "toolchain": "leanprover/lean4:v4.35.0"
+        },
+        "files": [
+          {
+            "name": "GeometricSimilarity.lean",
+            "role": "theory",
+            "sha256": "17535326ff9f8b1ffd6d59eae5f0989bb211bbf581b5b4a01d17e9a29a992a89",
+            "bytes": 4827,
+            "href": "artifacts/lean-gallery/geometric-similarity/GeometricSimilarity.lean"
+          },
+          {
+            "name": "MutantRefutations.lean",
+            "role": "controls compiled with it",
+            "sha256": "2ed863acbefcbfd6d721a1629852ad38a3b8eb847d4cfe52c028cab1ea7d4147",
+            "bytes": 2003,
+            "href": "artifacts/lean-gallery/geometric-similarity/MutantRefutations.lean"
+          },
+          {
+            "name": "NegativeControls.lean",
+            "role": "negative fixtures",
+            "sha256": "c3a485297b03826d3ddcf47495c4e6bf748eb68dea6032f8955e88d8e7c7cd9f",
+            "bytes": 1329,
+            "href": "artifacts/lean-gallery/geometric-similarity/NegativeControls.lean"
+          },
+          {
+            "name": "RECEIPT.json",
+            "role": "receipt",
+            "sha256": "b384c5ace8569027b226e4c5d24de8a54686877cfaf8266b8c7f7295953a6b17",
+            "bytes": 5152,
+            "href": "artifacts/lean-gallery/geometric-similarity/RECEIPT.json"
+          }
+        ],
+        "source_href": "artifacts/lean-gallery/geometric-similarity/GeometricSimilarity.lean",
+        "receipt_href": "artifacts/lean-gallery/geometric-similarity/RECEIPT.json",
+        "theorem_names": [
+          "wingLoading_scale",
+          "stallSpeed_sq_scale",
+          "stallSpeed_scale",
+          "wingLoading_mass_exponent",
+          "scaling_laws",
+          "wingLoading_ceiling",
+          "conflict_of_certificate"
+        ],
+        "positive_exit": 0,
+        "negative_exit": 1,
+        "only_standard_axioms": true,
+        "negative_control_ids": [
+          "wl_k2",
+          "mass_exponent",
+          "stall_k2",
+          "corrupted_certificate"
+        ]
+      },
+      {
+        "id": "unit-algebra",
+        "title": "Unit algebra: conversion, interval mapping and dimensions",
+        "summary": "The arithmetic the coupling checker relies on when it validates a unit conversion: converting twice equals converting by the product, a positive factor keeps order and sign, a nonzero factor is undone by its inverse, and dimension exponents add.",
+        "assumptions": [
+          "Values are exact rationals (conversion) and integer exponents (dimensions).",
+          "A positive factor is required for the interval rule; the control shows it is necessary.",
+          "Units themselves (what a kilogram is) are conventions checked in Python, not here."
+        ],
+        "equations": [
+          {
+            "label": "Conversion composes",
+            "tex": "(x f)\\,g=x\\,(f g)"
+          },
+          {
+            "label": "Interval mapped by a positive factor",
+            "tex": "lo\\le x\\le hi,\\ f>0\\ \\Rightarrow\\ lo\\,f\\le x f\\le hi\\,f"
+          },
+          {
+            "label": "Dimension exponents add",
+            "tex": "\\dim(dst)=\\dim(src)+\\dim(f)"
+          }
+        ],
+        "status": "recorded_compile_source_matched",
+        "recorded_compile": true,
+        "versions": {
+          "lean_version": "Lean (version 4.35.0, x86_64-unknown-linux-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)",
+          "mathlib_rev": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+          "toolchain": "leanprover/lean4:v4.35.0"
+        },
+        "files": [
+          {
+            "name": "UnitAlgebra.lean",
+            "role": "theory",
+            "sha256": "34f8fe40113db159bcc05421bcde329fd25b91841a7b6ffa9af8c8e94a2cae70",
+            "bytes": 1746,
+            "href": "artifacts/lean-gallery/unit-algebra/UnitAlgebra.lean"
+          },
+          {
+            "name": "UnitAlgebraControls.lean",
+            "role": "controls compiled with it",
+            "sha256": "0ee6c2e892ca97031ee9fdf36b4c5e72770a55042673d5513ad6789c554ce913",
+            "bytes": 789,
+            "href": "artifacts/lean-gallery/unit-algebra/UnitAlgebraControls.lean"
+          },
+          {
+            "name": "UnitAlgebraNegative.lean",
+            "role": "negative fixtures",
+            "sha256": "2c52d9c600b62be53c141ff5c6c044f92a4a67b0ca03fc2fc28b962f0cb84f63",
+            "bytes": 815,
+            "href": "artifacts/lean-gallery/unit-algebra/UnitAlgebraNegative.lean"
+          },
+          {
+            "name": "UNIT_ALGEBRA_RECEIPT.json",
+            "role": "receipt",
+            "sha256": "f7d02122cf5fa6e6aad588161997820e5e633ecfbf9badda65be0c32c45751d6",
+            "bytes": 2151,
+            "href": "artifacts/lean-gallery/unit-algebra/UNIT_ALGEBRA_RECEIPT.json"
+          }
+        ],
+        "source_href": "artifacts/lean-gallery/unit-algebra/UnitAlgebra.lean",
+        "receipt_href": "artifacts/lean-gallery/unit-algebra/UNIT_ALGEBRA_RECEIPT.json",
+        "theorem_names": [
+          "convert_comp",
+          "convert_pos",
+          "convert_inv",
+          "interval_map",
+          "dim_compose"
+        ],
+        "positive_exit": 0,
+        "negative_exit": 1,
+        "only_standard_axioms": true,
+        "negative_control_ids": [
+          "comp_adds",
+          "interval_no_positivity",
+          "inverse_without_nonzero",
+          "dim_sub"
+        ]
+      },
+      {
+        "id": "cantilever-guard",
+        "title": "Cantilever guard: a small-deflection bound with satisfiable hypotheses",
+        "summary": "For every positive P, L, E and I, if the end-load law 3EId = PL^3 holds and the bending stiffness satisfies 10 P L^2 <= 3 E I, then the deflection satisfies d <= L/10. The hypotheses are shown to be satisfiable, and the stiffness hypothesis is shown to be necessary.",
+        "assumptions": [
+          "P, L, E and I are positive reals.",
+          "The Euler-Bernoulli end-load law is a stated hypothesis, not shown to model a fin ray.",
+          "No real stiffness is shown to satisfy the stiffness hypothesis."
+        ],
+        "equations": [
+          {
+            "label": "End-load law (stated)",
+            "tex": "3\\,E\\,I\\,d=P\\,L^{3}"
+          },
+          {
+            "label": "Stiffness hypothesis",
+            "tex": "10\\,P\\,L^{2}\\le 3\\,E\\,I"
+          },
+          {
+            "label": "Guard conclusion",
+            "tex": "d\\le \\frac{L}{10}"
+          }
+        ],
+        "status": "recorded_compile_source_matched",
+        "recorded_compile": true,
+        "versions": {
+          "lean_version": "Lean (version 4.35.0, x86_64-unknown-linux-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)",
+          "mathlib_rev": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+          "toolchain": "leanprover/lean4:v4.35.0"
+        },
+        "files": [
+          {
+            "name": "CantileverGuard.lean",
+            "role": "theory",
+            "sha256": "32a9a0735cbcb83529bd0c36fb7cf7e9ef0766eef6e0554fc8b6f38a8e60b451",
+            "bytes": 1963,
+            "href": "artifacts/lean-gallery/cantilever-guard/CantileverGuard.lean"
+          },
+          {
+            "name": "CantileverGuard_negative_corrupt_law.lean",
+            "role": "negative fixtures",
+            "sha256": "790553687214f2d97083adb5c98b5a1ad18e58895964665161207ae05d571a98",
+            "bytes": 1044,
+            "href": "artifacts/lean-gallery/cantilever-guard/CantileverGuard_negative_corrupt_law.lean"
+          },
+          {
+            "name": "RECEIPT.json",
+            "role": "receipt",
+            "sha256": "2f5ebcb086f2dbe70a84a9f8863365736b1a59724744eb3a7101737a808c4be4",
+            "bytes": 2730,
+            "href": "artifacts/lean-gallery/cantilever-guard/RECEIPT.json"
+          }
+        ],
+        "source_href": "artifacts/lean-gallery/cantilever-guard/CantileverGuard.lean",
+        "receipt_href": "artifacts/lean-gallery/cantilever-guard/RECEIPT.json",
+        "theorem_names": [
+          "cantilever_guard",
+          "cantilever_guard_hypotheses_satisfiable",
+          "cantilever_guard_needs_stiffness"
+        ],
+        "positive_exit": 0,
+        "negative_exit": 1,
+        "only_standard_axioms": true,
+        "negative_control_ids": [
+          "corrupt_law"
+        ]
+      }
+    ],
+    "withheld": [],
+    "requested_family": null,
+    "include_source": false
+  },
+  "optional_source_characters": 1918,
+  "optional_source_SHA_matches": true,
+  "writes": 0,
+  "compile_executed": false
+}

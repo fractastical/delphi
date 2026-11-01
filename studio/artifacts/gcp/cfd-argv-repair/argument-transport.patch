@@ -1,0 +1,11 @@
+--- engineering/cfd3d/cpu_entry.py
++++ engineering/cfd3d/cpu_entry.py
+@@ -294,7 +294,7 @@
+     rows = {}
+     for th in sc["threads"]:
+         rc, peak = cyl(d / f"t{th}.json", sc["run_id"], th, sc["mem_gb"], sc["timeout_s"], d / f"t{th}.log",
+-                       "TIMING", sc["steps"])
++                       "TIMING", str(sc["steps"]))
+         r = json.loads((d / f"t{th}.json").read_text()) if rc == 0 else {}
+         rows[th] = {"rc": rc, "peak_rss_gb": round(peak, 2), "ns_per_cell_step": r.get("ns_per_cell_step"),
+                     "dt_grid_last": r.get("dt_grid_last")}

@@ -1,0 +1,981 @@
+{
+  "schema": "frontier.study-records.public-readback/1",
+  "observed_at": "2026-11-01T06:53:46.716873+00:00",
+  "records_sha256": "16a84b9efb11029edc112589729240095fa1701956ca3ab594a63eb1a3a90e7a",
+  "records": [
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Claim",
+        "id": "claim:oxygen-sphere-center-bound",
+        "version": "3a7577de4622283dc69d4747b4b9f3f3b40cce345f546f91270b55b7cf3142b6"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "claim:oxygen-sphere-center-bound",
+        "issuer": "codex-03",
+        "kind": "Claim",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "assumptions": [
+            "steady state",
+            "diffusion only; no perfusion or advection",
+            "constant positive consumption a > 0 (the Lean equivalence premise 0 < a) and constant diffusion coefficient",
+            "ideal geometry with the stated boundary conditions"
+          ],
+          "context": "Ideal-geometry algebraic rule with unknown parameters. It carries no biological context: D, a and C0 are context-specific unknowns.",
+          "limitations": [
+            "Not established: D, a and C0 for any tissue, cell type or material: all unknown; cell viability, survival or any oxygen threshold; actual oxygen supply to a microcarrier or repair patch; transfer from tumour spheroids or any other context",
+            "The formally supported claim is restricted to a > 0; a zero-consumption extension is not claimed and is not covered by the Lean statements",
+            "Sphere relation follows Grimes et al. 2014 Eq. 2.2 and Eq. 2.6 (read from the published equation images); the centre profile is the repository's application of that equation."
+          ],
+          "origin": "derived",
+          "prior_review": {
+            "status": "none; formal check and numerical check are Evidence, not review"
+          },
+          "source": {
+            "access": "Repository rule contract at the pinned commit; parameters unknown",
+            "content_available": false,
+            "content_sha256": "ca5fb2992e9e8a54ef17a9637cc4dcce9c77b2c8b100e4f9fd6f0e627066e3a3",
+            "license": null,
+            "locator": "/geometries/sphere",
+            "source_version": "3b9d215",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/3b9d215/artifacts/oxygen-diffusion-rule/rule-contract.json"
+          },
+          "source_record_version": "ca5fb2992e9e8a54ef17a9637cc4dcce9c77b2c8b100e4f9fd6f0e627066e3a3",
+          "statement": "Under steady diffusion with spatially constant positive consumption a > 0, constant isotropic D > 0 and boundary content C0 >= 0, in a spherical domain, outer boundary C(R) = C0, symmetry at the centre: C_center = C0 - a R^2 / (6 D); non-negative iff a R^2 <= 6 D C0. Ccenter < 0 marks the constant-consumption model's domain limit, not a physical negative concentration.",
+          "title": "Conditional steady diffusion bound, sphere"
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:claim:oxygen-sphere-center-bound",
+        "version": "3a7577de4622283dc69d4747b4b9f3f3b40cce345f546f91270b55b7cf3142b6",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Evidence",
+        "id": "evidence:oxygen-sphere-lean",
+        "version": "b5ab755a8f6b0b4bd69f6923750fdd9be396392964b1d31cf308d4ebab601e23"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "evidence:oxygen-sphere-lean",
+        "issuer": "codex-03",
+        "kind": "Evidence",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "artifacts": [
+            {
+              "availability": "referenced",
+              "byte_size": 3716,
+              "license": null,
+              "media_type": "text/plain",
+              "role": "code",
+              "sha256": "288eb515fc231a9471274728f18f1f127108a1355d0295a327900a237d73b85d",
+              "title": "OxygenDiffusionBound.lean",
+              "uri": "urn:sha256:288eb515fc231a9471274728f18f1f127108a1355d0295a327900a237d73b85d"
+            },
+            {
+              "availability": "referenced",
+              "byte_size": 2871,
+              "license": null,
+              "media_type": "text/plain",
+              "role": "code",
+              "sha256": "b52bd39250b9aa5909f5011e20247dedcf0be49244d04e1ff850835c0cc181e9",
+              "title": "negative control (corrupted law)",
+              "uri": "urn:sha256:b52bd39250b9aa5909f5011e20247dedcf0be49244d04e1ff850835c0cc181e9"
+            },
+            {
+              "availability": "referenced",
+              "byte_size": 4615,
+              "license": null,
+              "media_type": "application/json",
+              "role": "certificate",
+              "sha256": "2275021b43ba35a0fa5bba874e0cc5b355365b58347ef40b221991e292215f71",
+              "title": "lean-receipt.json",
+              "uri": "urn:sha256:2275021b43ba35a0fa5bba874e0cc5b355365b58347ef40b221991e292215f71"
+            }
+          ],
+          "assumptions": [
+            "Lean checks the implication under the stated premises",
+            "translation from source to equation is a separate, unchecked step"
+          ],
+          "context": "Algebraic implication only, for a > 0, after the source-to-equation interpretation.",
+          "created_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "evidence_kind": "formal",
+          "limitations": [
+            "Lean checks the algebraic implication after the source-to-equation interpretation; it does not independently verify that translation.",
+            "The theorem assumes steady diffusion, constant consumption, the stated ideal geometry and the boundary/no-flux conditions.",
+            "No empirical tissue parameters, cell-viability threshold, repair outcome, or organism-level conclusion is established.",
+            "Compilation is not tissue validation and says nothing about any parameter value"
+          ],
+          "method": "Lean 4 compiled the theorem and its two corrupted-coefficient twins; the twins failed with 4 diagnostics, as expected.",
+          "produced_by": null,
+          "provenance": {
+            "corrupted_failure_diagnostics": 4,
+            "execution_performed": false,
+            "lean_version": "Lean (version 4.35.0, x86_64-unknown-linux-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)",
+            "mathlib_revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+            "producer_exception": "Receipt copied from the owner's pinned run; this adapter reran nothing",
+            "theorem": "sphere_center_oxygen_bound"
+          },
+          "relation": "supports",
+          "retrieved_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "source": {
+            "access": "Lean receipt at the pinned commit",
+            "content_available": false,
+            "content_sha256": "2275021b43ba35a0fa5bba874e0cc5b355365b58347ef40b221991e292215f71",
+            "license": null,
+            "locator": "/positive and /corrupted_coefficients (sphere_center_oxygen_bound)",
+            "source_version": "3b9d215",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/3b9d215/artifacts/oxygen-diffusion-rule/lean-receipt.json"
+          },
+          "source_dependence": {
+            "group": "lean-receipt:2275021b43ba35a0fa5bba874e0cc5b355365b58347ef40b221991e292215f71",
+            "note": "records sharing this group read one receipt; they are not independent checks"
+          },
+          "target": {
+            "id": "claim:oxygen-sphere-center-bound",
+            "kind": "Claim",
+            "namespace": "delphi-frontier",
+            "version": "3a7577de4622283dc69d4747b4b9f3f3b40cce345f546f91270b55b7cf3142b6"
+          },
+          "uncertainty": "Exact over the stated reals; no statistical uncertainty. The premises are idealisations."
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:evidence:oxygen-sphere-lean",
+        "version": "b5ab755a8f6b0b4bd69f6923750fdd9be396392964b1d31cf308d4ebab601e23",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Evidence",
+        "id": "evidence:oxygen-sphere-numerical",
+        "version": "2e123a1105ca35e704fbd630c8da8cd879ae741c63b052d7b1a9bdd456a1c4b2"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "evidence:oxygen-sphere-numerical",
+        "issuer": "codex-03",
+        "kind": "Evidence",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "artifacts": [
+            {
+              "availability": "referenced",
+              "byte_size": 5611,
+              "license": null,
+              "media_type": "application/json",
+              "role": "output",
+              "sha256": "bf1e977785eea50264a7b2265956bf4a33c8db1f58c8c9150c52aaf36cd772aa",
+              "title": "numerical-checks.json",
+              "uri": "urn:sha256:bf1e977785eea50264a7b2265956bf4a33c8db1f58c8c9150c52aaf36cd772aa"
+            }
+          ],
+          "assumptions": [
+            "Fixture values are arbitrary test numbers, not biological parameters"
+          ],
+          "context": "Computational implementation check of a closed form on a fixture; not a simulation of tissue.",
+          "created_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "evidence_kind": "simulated",
+          "limitations": [
+            "Agreement of an implementation with its own equation is not empirical validation",
+            "Both geometries share one receipt"
+          ],
+          "method": "22 deterministic checks of the repository's profile helpers against the stated centre equation and limit.",
+          "produced_by": null,
+          "provenance": {
+            "check_count": 22,
+            "execution_performed": false,
+            "producer_exception": "Receipt copied from the owner's pinned run; this adapter reran nothing",
+            "statuses": [
+              "pass"
+            ]
+          },
+          "relation": "supports",
+          "retrieved_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "source": {
+            "access": "Numerical-check receipt at the pinned commit",
+            "content_available": false,
+            "content_sha256": "bf1e977785eea50264a7b2265956bf4a33c8db1f58c8c9150c52aaf36cd772aa",
+            "license": null,
+            "locator": "/checks (sphere_center_oxygen_bound twins)",
+            "source_version": "3b9d215",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/3b9d215/artifacts/oxygen-diffusion-rule/numerical-checks.json"
+          },
+          "source_dependence": {
+            "group": "numerical-checks:bf1e977785eea50264a7b2265956bf4a33c8db1f58c8c9150c52aaf36cd772aa",
+            "note": "records sharing this group read one receipt; they are not independent checks"
+          },
+          "target": {
+            "id": "claim:oxygen-sphere-center-bound",
+            "kind": "Claim",
+            "namespace": "delphi-frontier",
+            "version": "3a7577de4622283dc69d4747b4b9f3f3b40cce345f546f91270b55b7cf3142b6"
+          },
+          "uncertainty": "Tolerance 1e-12 on rational fixtures; says nothing about D, a or C0."
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:evidence:oxygen-sphere-numerical",
+        "version": "2e123a1105ca35e704fbd630c8da8cd879ae741c63b052d7b1a9bdd456a1c4b2",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Claim",
+        "id": "claim:oxygen-slab-center-bound",
+        "version": "71198c7343d995c31fa796c8434ff79cb1e793f5fa9eeb7dd15019d0961385d8"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "claim:oxygen-slab-center-bound",
+        "issuer": "codex-03",
+        "kind": "Claim",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "assumptions": [
+            "steady state",
+            "diffusion only; no perfusion or advection",
+            "constant positive consumption a > 0 (the Lean equivalence premise 0 < a) and constant diffusion coefficient",
+            "ideal geometry with the stated boundary conditions"
+          ],
+          "context": "Ideal-geometry algebraic rule with unknown parameters. It carries no biological context: D, a and C0 are context-specific unknowns.",
+          "limitations": [
+            "Not established: D, a and C0 for any tissue, cell type or material: all unknown; cell viability, survival or any oxygen threshold; actual oxygen supply to a microcarrier or repair patch; transfer from tumour spheroids or any other context",
+            "The formally supported claim is restricted to a > 0; a zero-consumption extension is not claimed and is not covered by the Lean statements",
+            "No slab expression is attributed to Grimes et al.; the coefficient 2 is derived here from D C'' = a with a no-flux centre."
+          ],
+          "origin": "derived",
+          "prior_review": {
+            "status": "none; formal check and numerical check are Evidence, not review"
+          },
+          "source": {
+            "access": "Repository rule contract at the pinned commit; parameters unknown",
+            "content_available": false,
+            "content_sha256": "ca5fb2992e9e8a54ef17a9637cc4dcce9c77b2c8b100e4f9fd6f0e627066e3a3",
+            "license": null,
+            "locator": "/geometries/slab",
+            "source_version": "3b9d215",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/3b9d215/artifacts/oxygen-diffusion-rule/rule-contract.json"
+          },
+          "source_record_version": "ca5fb2992e9e8a54ef17a9637cc4dcce9c77b2c8b100e4f9fd6f0e627066e3a3",
+          "statement": "Under steady diffusion with spatially constant positive consumption a > 0, constant isotropic D > 0 and boundary content C0 >= 0, in a one half of a symmetric slab: no-flux centre at x=0 and supplied face C(L) = C0 (total thickness 2L): C_center = C0 - a L^2 / (2 D); non-negative iff a L^2 <= 2 D C0. Ccenter < 0 marks the constant-consumption model's domain limit, not a physical negative concentration.",
+          "title": "Conditional steady diffusion bound, slab"
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:claim:oxygen-slab-center-bound",
+        "version": "71198c7343d995c31fa796c8434ff79cb1e793f5fa9eeb7dd15019d0961385d8",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Evidence",
+        "id": "evidence:oxygen-slab-lean",
+        "version": "62817d64c730aa63779626e3aaf213e7a5e2344ada1067eea2a126ca1b286b29"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "evidence:oxygen-slab-lean",
+        "issuer": "codex-03",
+        "kind": "Evidence",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "artifacts": [
+            {
+              "availability": "referenced",
+              "byte_size": 3716,
+              "license": null,
+              "media_type": "text/plain",
+              "role": "code",
+              "sha256": "288eb515fc231a9471274728f18f1f127108a1355d0295a327900a237d73b85d",
+              "title": "OxygenDiffusionBound.lean",
+              "uri": "urn:sha256:288eb515fc231a9471274728f18f1f127108a1355d0295a327900a237d73b85d"
+            },
+            {
+              "availability": "referenced",
+              "byte_size": 2871,
+              "license": null,
+              "media_type": "text/plain",
+              "role": "code",
+              "sha256": "b52bd39250b9aa5909f5011e20247dedcf0be49244d04e1ff850835c0cc181e9",
+              "title": "negative control (corrupted law)",
+              "uri": "urn:sha256:b52bd39250b9aa5909f5011e20247dedcf0be49244d04e1ff850835c0cc181e9"
+            },
+            {
+              "availability": "referenced",
+              "byte_size": 4615,
+              "license": null,
+              "media_type": "application/json",
+              "role": "certificate",
+              "sha256": "2275021b43ba35a0fa5bba874e0cc5b355365b58347ef40b221991e292215f71",
+              "title": "lean-receipt.json",
+              "uri": "urn:sha256:2275021b43ba35a0fa5bba874e0cc5b355365b58347ef40b221991e292215f71"
+            }
+          ],
+          "assumptions": [
+            "Lean checks the implication under the stated premises",
+            "translation from source to equation is a separate, unchecked step"
+          ],
+          "context": "Algebraic implication only, for a > 0, after the source-to-equation interpretation.",
+          "created_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "evidence_kind": "formal",
+          "limitations": [
+            "Lean checks the algebraic implication after the source-to-equation interpretation; it does not independently verify that translation.",
+            "The theorem assumes steady diffusion, constant consumption, the stated ideal geometry and the boundary/no-flux conditions.",
+            "No empirical tissue parameters, cell-viability threshold, repair outcome, or organism-level conclusion is established.",
+            "Compilation is not tissue validation and says nothing about any parameter value"
+          ],
+          "method": "Lean 4 compiled the theorem and its two corrupted-coefficient twins; the twins failed with 4 diagnostics, as expected.",
+          "produced_by": null,
+          "provenance": {
+            "corrupted_failure_diagnostics": 4,
+            "execution_performed": false,
+            "lean_version": "Lean (version 4.35.0, x86_64-unknown-linux-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)",
+            "mathlib_revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+            "producer_exception": "Receipt copied from the owner's pinned run; this adapter reran nothing",
+            "theorem": "slab_center_oxygen_bound"
+          },
+          "relation": "supports",
+          "retrieved_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "source": {
+            "access": "Lean receipt at the pinned commit",
+            "content_available": false,
+            "content_sha256": "2275021b43ba35a0fa5bba874e0cc5b355365b58347ef40b221991e292215f71",
+            "license": null,
+            "locator": "/positive and /corrupted_coefficients (slab_center_oxygen_bound)",
+            "source_version": "3b9d215",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/3b9d215/artifacts/oxygen-diffusion-rule/lean-receipt.json"
+          },
+          "source_dependence": {
+            "group": "lean-receipt:2275021b43ba35a0fa5bba874e0cc5b355365b58347ef40b221991e292215f71",
+            "note": "records sharing this group read one receipt; they are not independent checks"
+          },
+          "target": {
+            "id": "claim:oxygen-slab-center-bound",
+            "kind": "Claim",
+            "namespace": "delphi-frontier",
+            "version": "71198c7343d995c31fa796c8434ff79cb1e793f5fa9eeb7dd15019d0961385d8"
+          },
+          "uncertainty": "Exact over the stated reals; no statistical uncertainty. The premises are idealisations."
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:evidence:oxygen-slab-lean",
+        "version": "62817d64c730aa63779626e3aaf213e7a5e2344ada1067eea2a126ca1b286b29",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Evidence",
+        "id": "evidence:oxygen-slab-numerical",
+        "version": "6ed34605fd14e27d00f20628b9bd1013e6ca5f1daae2ba12b723bc2d98b1b928"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "evidence:oxygen-slab-numerical",
+        "issuer": "codex-03",
+        "kind": "Evidence",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "artifacts": [
+            {
+              "availability": "referenced",
+              "byte_size": 5611,
+              "license": null,
+              "media_type": "application/json",
+              "role": "output",
+              "sha256": "bf1e977785eea50264a7b2265956bf4a33c8db1f58c8c9150c52aaf36cd772aa",
+              "title": "numerical-checks.json",
+              "uri": "urn:sha256:bf1e977785eea50264a7b2265956bf4a33c8db1f58c8c9150c52aaf36cd772aa"
+            }
+          ],
+          "assumptions": [
+            "Fixture values are arbitrary test numbers, not biological parameters"
+          ],
+          "context": "Computational implementation check of a closed form on a fixture; not a simulation of tissue.",
+          "created_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "evidence_kind": "simulated",
+          "limitations": [
+            "Agreement of an implementation with its own equation is not empirical validation",
+            "Both geometries share one receipt"
+          ],
+          "method": "22 deterministic checks of the repository's profile helpers against the stated centre equation and limit.",
+          "produced_by": null,
+          "provenance": {
+            "check_count": 22,
+            "execution_performed": false,
+            "producer_exception": "Receipt copied from the owner's pinned run; this adapter reran nothing",
+            "statuses": [
+              "pass"
+            ]
+          },
+          "relation": "supports",
+          "retrieved_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "source": {
+            "access": "Numerical-check receipt at the pinned commit",
+            "content_available": false,
+            "content_sha256": "bf1e977785eea50264a7b2265956bf4a33c8db1f58c8c9150c52aaf36cd772aa",
+            "license": null,
+            "locator": "/checks (slab_center_oxygen_bound twins)",
+            "source_version": "3b9d215",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/3b9d215/artifacts/oxygen-diffusion-rule/numerical-checks.json"
+          },
+          "source_dependence": {
+            "group": "numerical-checks:bf1e977785eea50264a7b2265956bf4a33c8db1f58c8c9150c52aaf36cd772aa",
+            "note": "records sharing this group read one receipt; they are not independent checks"
+          },
+          "target": {
+            "id": "claim:oxygen-slab-center-bound",
+            "kind": "Claim",
+            "namespace": "delphi-frontier",
+            "version": "71198c7343d995c31fa796c8434ff79cb1e793f5fa9eeb7dd15019d0961385d8"
+          },
+          "uncertainty": "Tolerance 1e-12 on rational fixtures; says nothing about D, a or C0."
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:evidence:oxygen-slab-numerical",
+        "version": "6ed34605fd14e27d00f20628b9bd1013e6ca5f1daae2ba12b723bc2d98b1b928",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Evidence",
+        "id": "evidence:oxygen-source-assessment",
+        "version": "2b354036a7176e8698592cfffaa06b2ff207229f83b47046ef15f3c9539bfa71"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "evidence:oxygen-source-assessment",
+        "issuer": "codex-03",
+        "kind": "Evidence",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "artifacts": [
+            {
+              "availability": "referenced",
+              "byte_size": 3516,
+              "license": null,
+              "media_type": "application/json",
+              "role": "input",
+              "sha256": "07404c0c0a2df304f84c99b7879b2765e20857f878b5ca5c34c67561e7410cd6",
+              "title": "source-provenance.json",
+              "uri": "urn:sha256:07404c0c0a2df304f84c99b7879b2765e20857f878b5ca5c34c67561e7410cd6"
+            }
+          ],
+          "assumptions": [
+            "Equation images were read as published figures",
+            "No slab expression is attributed to the source"
+          ],
+          "context": "Grimes et al. 2014 (PMC3899881) supplies the spherical Laplacian and diffusion-limit expression; it is a spheroid study.",
+          "created_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "evidence_kind": "source_assessment",
+          "limitations": [
+            "No full article text is carried or mirrored; only URL, digests and locators",
+            "The source's spheroid consumption and diffusion values are context, not parameters here"
+          ],
+          "method": "Records which equations of the primary source were read, with image and full-text digests, and the license as stated.",
+          "produced_by": null,
+          "provenance": {
+            "citation": "Grimes DR, Kelly C, Bloch K, Partridge M. A method for estimating the oxygen consumption rate in multicellular tumour spheroids. Journal of the Royal Society Interface. 2014;11(92):20131124.",
+            "doi": "10.1098/rsif.2013.1124",
+            "execution_performed": false,
+            "producer_exception": "Documentary source assessment; no executed Action is invented",
+            "source_receipt": "artifacts/oxygen-diffusion-rule/source-provenance.json"
+          },
+          "relation": "context_only",
+          "retrieved_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "source": {
+            "access": "Provenance receipt at the pinned commit; no article bytes are carried",
+            "content_available": false,
+            "content_sha256": "07404c0c0a2df304f84c99b7879b2765e20857f878b5ca5c34c67561e7410cd6",
+            "license": null,
+            "locator": "/primary_source and /equations_read_from_published_equation_images",
+            "source_version": "3b9d215",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/3b9d215/artifacts/oxygen-diffusion-rule/source-provenance.json"
+          },
+          "source_dependence": {
+            "group": "grimes2014-pmc3899881",
+            "note": "records sharing this group read one receipt; they are not independent checks"
+          },
+          "target": {
+            "id": "claim:oxygen-sphere-center-bound",
+            "kind": "Claim",
+            "namespace": "delphi-frontier",
+            "version": "3a7577de4622283dc69d4747b4b9f3f3b40cce345f546f91270b55b7cf3142b6"
+          },
+          "uncertainty": "Spheroid parameters in the source are not transferred."
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:evidence:oxygen-source-assessment",
+        "version": "2b354036a7176e8698592cfffaa06b2ff207229f83b47046ef15f3c9539bfa71",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Claim",
+        "id": "claim:voxelyze-toy-numerical-mechanics",
+        "version": "2649634959fed5cc0dcdd83b16c527202a4efd9195a5cf7c31530fa4fec54cd4"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "claim:voxelyze-toy-numerical-mechanics",
+        "issuer": "codex-03",
+        "kind": "Claim",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "assumptions": [
+            "generic example material values",
+            "prescribed thermal-expansion drive stands in for an actuation parameter"
+          ],
+          "context": "Numerical mechanics of a toy model. The actuation is prescribed thermal expansion, not measured cellular contractility; the scale is a 45 g centimetre-scale benchmark, not a Xenopus-scale construct, tissue or microcarrier.",
+          "limitations": [
+            "Control E failed its frozen bound: 0.017479 center-span units against 0.01",
+            "Spatial discrepancy is unresolved: coarse 0.15318 BL against fine 0.01878 BL in arm G",
+            "No tissue calibration, living microcarrier or biological transfer is established",
+            "No force or energy history was saved, so no efficiency or mechanism fraction exists"
+          ],
+          "origin": "derived",
+          "prior_review": {
+            "independent_review": "docs/audits/voxelyze-review-2026-10-31.md at 130b3f4 reports no numerical-data blocker and required scale qualifications"
+          },
+          "source": {
+            "access": "Repository summary at the pinned commit",
+            "content_available": false,
+            "content_sha256": "3126d1157c270d94613a7b3a1a2d497e5007797d68909ac3e59a1d306f5b7318",
+            "license": null,
+            "locator": "/controls/E_zero_gravity and /arm_G_spatial",
+            "source_version": "a896380",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/a896380/artifacts/voxel-actuation/summary.json"
+          },
+          "statement": "In the saved CPU runs of Voxelyze 4287e365 on a 45 g generic soft-voxel ground-contact benchmark with prescribed thermal-expansion actuation, displacement depends on the prescribed pattern. The frozen zero-gravity control E missed its bound, and displacement differs between coarse and fine voxel grids without spatial convergence.",
+          "title": "Generic Voxelyze soft-voxel numerics at toy scale"
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:claim:voxelyze-toy-numerical-mechanics",
+        "version": "2649634959fed5cc0dcdd83b16c527202a4efd9195a5cf7c31530fa4fec54cd4",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Evidence",
+        "id": "evidence:voxelyze-summary",
+        "version": "7ccc6808f459945c526e26f77cc022e1e9fb66a99c8884e40fad55f981a36ce8"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "evidence:voxelyze-summary",
+        "issuer": "codex-03",
+        "kind": "Evidence",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "artifacts": [
+            {
+              "availability": "referenced",
+              "byte_size": 18579,
+              "license": null,
+              "media_type": "application/json",
+              "role": "output",
+              "sha256": "3126d1157c270d94613a7b3a1a2d497e5007797d68909ac3e59a1d306f5b7318",
+              "title": "summary.json",
+              "uri": "urn:sha256:3126d1157c270d94613a7b3a1a2d497e5007797d68909ac3e59a1d306f5b7318"
+            },
+            {
+              "availability": "referenced",
+              "byte_size": 59717,
+              "license": null,
+              "media_type": "application/json",
+              "role": "output",
+              "sha256": "0003422d03227fc97331db8a38d459ca7e0658ea4b072ece3fbf720c1f26ce3e",
+              "title": "corrected audit output",
+              "uri": "urn:sha256:0003422d03227fc97331db8a38d459ca7e0658ea4b072ece3fbf720c1f26ce3e"
+            }
+          ],
+          "assumptions": [
+            "generic example material values",
+            "prescribed thermal expansion, not measured contractility"
+          ],
+          "context": "Generic 45 g toy ground-contact benchmark; not a tissue or microcarrier.",
+          "created_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "evidence_kind": "simulated",
+          "limitations": [
+            "E missed its frozen bound and is retained as a miss",
+            "Spatial nonconvergence is retained, not resolved",
+            "Normalised comparisons use changing denominators; the raw SI difference is 15.5739% relative to coarse for the post-hoc travelling pattern, which is not a convergence test"
+          ],
+          "method": "Voxelyze 0.9 CPU runs frozen at 7b9bd5d, deterministic with no RNG, so there are no stochastic replicates.",
+          "produced_by": null,
+          "provenance": {
+            "arm_A_observed": "best travelling at 0.364432 BL, worst uniform at 0.000022 BL; ratio 16565, which is 4.22 orders of magnitude (independent audit computed 4.23 from the same artifacts; the small difference is rounding of the smallest value). CORRECTION 2026-11-01: an earlier version of this field said 'spans ~5 orders of magnitude', which overstated it.",
+            "arm_G": {
+              "G-coarse": {
+                "body_lengths": 0.15318,
+                "nx": 5,
+                "voxel_m": 0.01
+              },
+              "G-fine": {
+                "body_lengths": 0.01878,
+                "nx": 10,
+                "voxel_m": 0.005
+              }
+            },
+            "control_E": {
+              "PREREGISTRATION_MISS": true,
+              "body_lengths": 0.017479,
+              "bound": 0.01,
+              "diagnosis": "the predeclared argument was wrong, not the threshold. It claimed removing gravity removes the normal force; it does not. With the floor still enabled, actuation itself drives voxels into the floor and generates transient normal force, so Coulomb friction still acts. Arm D, which removes the tangential coefficient, is the control that actually isolates friction, and it gives exactly zero. The threshold was not changed and this arm is recorded as missed.",
+              "magnitude": "0.0175 BL, which is 4.8% of the travelling arm and 11.4% of the longitudinal arm",
+              "met": false
+            },
+            "determinism": "no RNG in Voxelyze 0.9 or in this driver; repeat runs are identical and there are no stochastic replicates",
+            "engine_commit": "4287e365e11416dd108f2f361e9ec4c5a011a16c",
+            "execution_performed": false,
+            "producer_exception": "Outputs copied from the owner's pinned run; this adapter reran nothing",
+            "protocol_frozen_commit": "7b9bd5d"
+          },
+          "relation": "qualifies",
+          "retrieved_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "source": {
+            "access": "Repository summary at the pinned commit",
+            "content_available": false,
+            "content_sha256": "3126d1157c270d94613a7b3a1a2d497e5007797d68909ac3e59a1d306f5b7318",
+            "license": null,
+            "locator": "/controls/E_zero_gravity, /arm_G_spatial, /arm_A_verdict",
+            "source_version": "a896380",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/a896380/artifacts/voxel-actuation/summary.json"
+          },
+          "source_dependence": {
+            "group": "voxel-summary:3126d1157c270d94613a7b3a1a2d497e5007797d68909ac3e59a1d306f5b7318",
+            "note": "records sharing this group read one receipt; they are not independent checks"
+          },
+          "target": {
+            "id": "claim:voxelyze-toy-numerical-mechanics",
+            "kind": "Claim",
+            "namespace": "delphi-frontier",
+            "version": "2649634959fed5cc0dcdd83b16c527202a4efd9195a5cf7c31530fa4fec54cd4"
+          },
+          "uncertainty": "Deterministic code with no replicates; spatial discrepancy between grids is unresolved and no uncertainty interval exists."
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:evidence:voxelyze-summary",
+        "version": "7ccc6808f459945c526e26f77cc022e1e9fb66a99c8884e40fad55f981a36ce8",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Evidence",
+        "id": "evidence:voxelyze-replay",
+        "version": "6b70d2347c08f2e73edd204fb6f37dc8e330f948eda500f3bd236df39f690bf9"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "evidence:voxelyze-replay",
+        "issuer": "codex-03",
+        "kind": "Evidence",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "artifacts": [
+            {
+              "availability": "referenced",
+              "byte_size": 8060,
+              "license": null,
+              "media_type": "application/json",
+              "role": "log",
+              "sha256": "382687feffcc7e915e2e5b1dff64f8d5a000c7b904ea5e8d0dc645531920f36a",
+              "title": "replay-receipt.json",
+              "uri": "urn:sha256:382687feffcc7e915e2e5b1dff64f8d5a000c7b904ea5e8d0dc645531920f36a"
+            },
+            {
+              "availability": "referenced",
+              "byte_size": 6777,
+              "license": null,
+              "media_type": "text/markdown",
+              "role": "output",
+              "sha256": "c8d426662f24ef12022f29aced61b2f870cc83da1275448d9e894c3854bc9548",
+              "title": "voxelyze-review-2026-10-31.md",
+              "uri": "urn:sha256:c8d426662f24ef12022f29aced61b2f870cc83da1275448d9e894c3854bc9548"
+            }
+          ],
+          "assumptions": [
+            "same engine and same inputs"
+          ],
+          "context": "Replay of the same numerical benchmark; the same model, so a shared-model check rather than independent biological replication.",
+          "created_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "evidence_kind": "simulated",
+          "limitations": [
+            "Replay does not address spatial convergence",
+            "E remains a failed control after replay"
+          ],
+          "method": "Independent reviewer rebuilt upstream Voxelyze and reran seven declared records; all matched the originals exactly.",
+          "produced_by": null,
+          "provenance": {
+            "E_still_fails_frozen_bound": true,
+            "execution_performed": false,
+            "producer_exception": "Receipt copied from the reviewer's pinned run; this adapter reran nothing",
+            "records_reran": [
+              "P1",
+              "P2",
+              "M1",
+              "M2",
+              "M3",
+              "D",
+              "E"
+            ],
+            "replay_receipt": "artifacts/audits/xenobot/replay-receipt.json",
+            "review_doc": "docs/audits/voxelyze-review-2026-10-31.md"
+          },
+          "relation": "reproduces",
+          "retrieved_time": {
+            "basis": "witnessed",
+            "value": "2026-11-01T06:48:40.156948+00:00"
+          },
+          "source": {
+            "access": "Independent replay receipt at the pinned commit",
+            "content_available": false,
+            "content_sha256": "382687feffcc7e915e2e5b1dff64f8d5a000c7b904ea5e8d0dc645531920f36a",
+            "license": null,
+            "locator": "/runs",
+            "source_version": "130b3f4",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/130b3f4/artifacts/audits/xenobot/replay-receipt.json"
+          },
+          "source_dependence": {
+            "group": "voxel-replay:382687feffcc7e915e2e5b1dff64f8d5a000c7b904ea5e8d0dc645531920f36a",
+            "note": "records sharing this group read one receipt; they are not independent checks"
+          },
+          "target": {
+            "id": "claim:voxelyze-toy-numerical-mechanics",
+            "kind": "Claim",
+            "namespace": "delphi-frontier",
+            "version": "2649634959fed5cc0dcdd83b16c527202a4efd9195a5cf7c31530fa4fec54cd4"
+          },
+          "uncertainty": "Replay is exact; it cannot show that the model is right."
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:evidence:voxelyze-replay",
+        "version": "6b70d2347c08f2e73edd204fb6f37dc8e330f948eda500f3bd236df39f690bf9",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Problem",
+        "id": "problem:tissue-contractility-to-actuation",
+        "version": "981b4f7122a9048add668e362d957aa797ecdf238850f17abb02f04385c5851e"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "problem:tissue-contractility-to-actuation",
+        "issuer": "codex-03",
+        "kind": "Problem",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "approach": "measurement",
+          "completeness": "recorded",
+          "context_tags": [
+            "voxel-actuation",
+            "unresolved-bridge"
+          ],
+          "data_access": "No construct measurement is available here.",
+          "dependencies": [
+            {
+              "id": "claim:voxelyze-toy-numerical-mechanics",
+              "kind": "Claim",
+              "namespace": "delphi-frontier",
+              "version": "2649634959fed5cc0dcdd83b16c527202a4efd9195a5cf7c31530fa4fec54cd4"
+            },
+            {
+              "id": "evidence:voxelyze-summary",
+              "kind": "Evidence",
+              "namespace": "delphi-frontier",
+              "version": "7ccc6808f459945c526e26f77cc022e1e9fb66a99c8884e40fad55f981a36ce8"
+            }
+          ],
+          "downstream_uses": [
+            "project-tissue-microcarrier actuation-to-motion bridge"
+          ],
+          "known_state": "The voxel model prescribes thermal expansion on a 45 g toy; the review states that this is not measured cellular contractility. No construct measurement exists in this repository and no calibration links the model's actuation parameter to any cell or tissue.",
+          "novelty_status": "not assessed",
+          "problem_kind": "project_gap",
+          "question": "What measured contractility of one named cell construct would bound the prescribed actuation parameter of a generic voxel model, and with what stated context?",
+          "required_capabilities": [
+            "measurement of construct contractility or strain against force",
+            "documented mapping to the model's actuation parameter"
+          ],
+          "scales": [
+            "cellular",
+            "tissue"
+          ],
+          "source": {
+            "access": "Independent review at the pinned commit",
+            "content_available": false,
+            "content_sha256": "c8d426662f24ef12022f29aced61b2f870cc83da1275448d9e894c3854bc9548",
+            "license": null,
+            "locator": "paragraph beginning 'Material values come from a generic example'",
+            "source_version": "130b3f4",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/130b3f4/docs/audits/voxelyze-review-2026-10-31.md"
+          },
+          "title": "Measured cell contractility to prescribed voxel actuation"
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:problem:tissue-contractility-to-actuation",
+        "version": "981b4f7122a9048add668e362d957aa797ecdf238850f17abb02f04385c5851e",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    },
+    {
+      "ref": {
+        "namespace": "delphi-frontier",
+        "kind": "Problem",
+        "id": "problem:epithelial-gap-closure-to-physical-time",
+        "version": "e5857882a57db059c91792e6dabd86531ff0588c0ee4e50f9c42039de4f9ac9b"
+      },
+      "record": {
+        "created_at": "2026-11-01T06:48:40.156948+00:00",
+        "id": "problem:epithelial-gap-closure-to-physical-time",
+        "issuer": "codex-03",
+        "kind": "Problem",
+        "namespace": "delphi-frontier",
+        "payload": {
+          "approach": "measurement",
+          "completeness": "recorded",
+          "context_tags": [
+            "epithelial-repair",
+            "unresolved-bridge",
+            "independently-reviewed"
+          ],
+          "data_access": "No cell-line closure measurement is available here.",
+          "dependencies": [
+            {
+              "id": "F002",
+              "kind": "Problem",
+              "namespace": "delphi-frontier",
+              "version": "6afb0fddfe777c5ddd705f1b9d31f79090f6df8e331a8b7d7e8a9abe59deb394"
+            }
+          ],
+          "downstream_uses": [
+            "project-epithelial-repair closure-to-time bridge"
+          ],
+          "known_state": "The Cellular Potts mechanism testbed runs in model units: the card states none of its parameters is a force, a stress or a time in minutes, and nothing is calibrated to a cell line or measured tissue. In one both-drives-off control at k=4 the gap shrank by 551 of 2500 nodes (22.04%); that is a condition-specific run, consistent with passive volume relaxation but with no mechanism contribution isolated, and it is not a universal subtraction. Final strict tally at 66f2b95 with independent review 6298621: 7 pass, 3 fail, G6 descriptive, G1b incomplete, G8 unevaluable; physical-time calibration remains open.",
+          "novelty_status": "not assessed",
+          "problem_kind": "project_gap",
+          "question": "What measurement of gap closure in one named cell line would calibrate the model's time unit and distinguish the contributing mechanisms?",
+          "required_capabilities": [
+            "time-resolved gap closure measurement in a named cell line",
+            "a stated mapping from model time units to physical time"
+          ],
+          "scales": [
+            "cellular",
+            "tissue"
+          ],
+          "source": {
+            "access": "Final corrected card at the pinned commit; independent review at 6298621 (docs/audits/epithelial-repair-review-2026-10-31.md)",
+            "content_available": false,
+            "content_sha256": "f4db9515a58d780a65da6bad8db5d318b173167940acb83a01e325f8caa66534",
+            "license": null,
+            "locator": "section 2 (scale mapping), section 4 (passive control) and the strict tally",
+            "source_version": "66f2b95",
+            "uri": "https://github.com/kganjam/delphi-frontier/blob/66f2b95/docs/epithelial-repair-card.md"
+          },
+          "title": "Observed gap closure to calibrated physical time and mechanism"
+        },
+        "predecessor": null,
+        "schema_version": "frontier-record-0.1",
+        "source_uri": "urn:frontier:study-record:problem:epithelial-gap-closure-to-physical-time",
+        "version": "e5857882a57db059c91792e6dabd86531ff0588c0ee4e50f9c42039de4f9ac9b",
+        "visibility": "public"
+      },
+      "status": "imported_unreviewed",
+      "is_head": true
+    }
+  ],
+  "writes": 0
+}

@@ -1,0 +1,46 @@
+# Review of the print-requirements module (3bd7f24): findings
+
+Reviewer: an independent AI agent process (not a lab or human). Reviewed `engineering/launch_glider/print_requirements.py`, `artifacts/launch-glider/print-requirements.json`
+(reads of the code and my own arithmetic; no new solver), the v3a `panels.json` and `components.json`, the 12 component STL files, and the material card. Criteria were preregistered
+in `launchable-fish-review-criteria.md` (dc49118). Scripts and outputs: `launchable-fish-review-run/`. Not reviewed: `tests/test_launch_glider.py` (not run), any print, any measurement, the cached Formlabs HTML.
+
+## 1. Declared allowance versus validated coverage (root's question)
+`SCENARIO["strength_safety_factor"]` is 3.0 with the status string "declared; covers notches, layer lines, thin-feature cure, handling". The module docstring says the opposite
+and is correct: notches, layer anisotropy, cure variation, fatigue, impact and hand loads are **not modelled**, "the strength safety factor SF is declared for that reason, not derived". The data field
+over-claims: nothing in the repo shows a factor of 3 covers any of those. Recommended wording: "declared allowance of 3 on bulk-coupon UTS; whether it covers notches, layer lines, thin-feature cure or handling is unknown and unvalidated".
+Related facts to carry with it: the allowable is UTS/SF = 14.33 MPa from a tensile coupon (no yield, flexural strength, orientation or thin-feature datum exists), the bending checks use a tensile-based allowable, and `limits` in the JSON already lists the omissions.
+The `hook` size is built on the same unvalidated factor (it multiplies the force by SF and divides UTS, which is internally consistent, my recomputation gives the same 3.5437 mm).
+
+## 2. Source coordinates and handedness
+* Frame stated in `components.json`: x snout to tail, y left, z dorsal, snout at x = 0, STL and GLB in metres; `glb (x, y, z) = fish (x, z, -y)`. Verified in the data: tail fin at x 154–191 mm, pelvic fins aft of pectorals (86 versus 40 mm), dorsal z positive, anal z negative; the 12 STL volumes match `components.json` to 2.6e-7, so the units are metres and the mesh values are consistent.
+* **As labelled this triple is left-handed.** With forward F, left L, up U, (F, L, U) is right-handed; x = -F makes (x, y, z) left-handed. The GLB map has determinant +1, so it preserves that and a right-handed viewer shows the fish with its labelled-right side toward the camera in a head-left view. For a bilaterally symmetric shape nothing visible changes; the L/R labels and any signed quantity can.
+* **The delivered module is not affected:** it uses dot products and 1-D x only (no cross products, no signed torque). `e_w = +x` is aft and the leading edge is the smallest w, which agrees with the data; the NP/CG are scalar x with +x aft, so SM = (x_np - x_cg)/MAC is correct as coded.
+* **Blocking precondition for the dynamics (07) and the launch-torque calculation:** release torque, pitch rate, roll/yaw and inertia-product signs must either use an explicitly right-handed frame (flip one axis and state it) or define every sign convention for this left-handed one. I cannot tell from a symmetric mesh whether the axes or the "left" labels are the wrong half; one of them is.
+* The left and right fin planes have opposite handedness (e_u x e_w points -z for the left fin, +z for the right); fine for magnitudes, wrong if a signed deflection is mirrored by copying.
+
+## 3. Stiffness, strength, inertia
+* **Arithmetic reproduces.** From the planform arrays in the JSON I recomputed the worst-case loads (a_peak 1000 m/s^2, a_n 173.6, p 73.5 Pa) and, for all 8 fin/thickness rows at the chosen spar height, root moment, shear, root and maximum stress: relative difference 0.0. This is the same formula applied by me, so it checks the arithmetic and wiring, not the model.
+* **The tip deflection that decides the spar height is not converged.** The file uses 64 elements. For pectoral, membrane 0.5 mm, spar 1.2 mm: tip/L = 0.09847 (valid) at 64, 0.10062 at 256, 0.10007 at 1024 (limit 0.10: invalid). So the converged value sits on the limit and the reported minimum spar for that row depends on the mesh; the 0.4 mm row moves 0.0782 to 0.0795. Cause: EI steps at the 12 mm root doubler, which does not fall on an element boundary, and EI/q are sampled at element midpoints (first-order across the step). My unit-load integral agrees with the refined value to 0.4%, not with 64 elements (1.9% off). Required: report the tip at a refined mesh and the margin to the limit, and size on that.
+* **Deflection, not stress, is binding.** Maximum stress is 12.8 MPa against an allowable of 14.3 for the 0.5 mm row (12% margin); the chosen spar is the first grid value meeting a declared 10% small-deformation bound, which is a model-validity limit, so every row sits on that limit by construction.
+* **Pelvic "minimum spar" is the grid floor.** All four pelvic rows return 0.4 mm, the first grid point, so the number is not a derived minimum; a 0.4 mm spar under a 0.4–0.8 mm membrane is essentially no spar.
+* **The modelled structure is not the ancestor's.** The requirement is a membrane plus one leading-edge spar ridge; the v3a fins are ray-supported fans. State that the printed ray layout must be analysed separately, or that this is a bound on a different structure.
+* **Load stacking.** The worst case applies the dynamic pressure at 10 m/s (8 m/s x 1.25) together with the peak launch acceleration (51 g mean, 102 g peak at 0.1 m). For an elastic launcher peak force occurs at the start of the stroke (low speed) and the pressure peak at release (low acceleration), so the stack is conservative and sizes mass upward. Fine as a bound; label it as one, and run the two phases separately for the trade-off the spec asks for.
+* **Inertia.** The module computes only the fin's own section mass as an inertial load. There is no mesh-derived mass, centre of mass or inertia tensor in this commit (that is 05's mesh).
+
+## 4. Mass, lift budget and balance implied by the mesh (my arithmetic)
+* Solid body from the delivered STL: 59.5 g at 1220 kg/m^3 (volume matches to 5.7e-9). The 8–20 g bracket (itself not derived from a mesh) therefore requires a hollow body: a shell on the outer area 0.00963 m^2 is 5.9 g at 0.5 mm, 9.4 g at 0.8 mm, 14.1 g at 1.2 mm, before fins, eyes, ballast and adhesive.
+* The v3a pectoral fin is 0.141 mm thick on average (306 mm^3 over 2165 mm^2), below the 0.4–0.8 mm the sizing assumes; at 0.5 mm the four paired fins weigh about 3.2 g against 1.1 g as modelled.
+* **The file's own mass budget does not support the mass bracket at low speed.** With S = 0.00529 m^2: maximum trim mass at CL 0.6 / 1.2 is 3.2 / 6.3 g at 4 m/s, 7.1 / 14.3 g at 6 m/s, 12.7 / 25.4 g at 8 m/s. The CL needed to carry 8 g / 20 g is 1.51 / 3.78 (4 m/s), 0.67 / 1.68 (6), 0.38 / 0.95 (8); the assumed `cn_max` is 1.2. So at 4 m/s no mass in the bracket is in level trim at CL <= 1.2, which matches criteria issue 1: the 4 m/s scenario is close to ballistic.
+* **CG window implies a large ballast.** The window (CG at 49.2–56.3 mm from the snout, from NP 54.5–59.0 mm) is far forward of the shell's area centroid (73.9 mm). A rough estimate (thin body shell, fins 3.2 g, ballast at x = 5 mm) puts the ballast at about 28% of total mass (3.4 g of 12 g, 5.9 g of 20 g). Treat that as an order of magnitude, not a model; the ballast must be inside the mass bracket and the 05 mesh should state it.
+
+## 5. Neutral-point bracket
+* Helmbold is coded for **zero sweep**; the planform has half-chord sweep of about 10.7 degrees (pectoral) and 23.5 degrees (pelvic). With the swept form CL_alpha drops 1.4% (5.125 to 5.053) and 7.6% (5.761 to 5.323). Not applied or bracketed; the pelvic effect moves the NP.
+* AR uses semispan + body half-width (102.7 mm for the pectoral), but the fin root starts at y = 10.4 mm, inside the body half-width of 13.6 mm, so the exposed span is about 3 mm shorter (about 3%).
+* Munk couple: checked. The body is a closed mesh of 158.8 mm by about 25 mm equivalent diameter, fineness 6.4, for which a prolate spheroid gives k2 - k1 = 0.883, inside the 0.80–0.95 bracket. The body is not a spheroid, which the file says.
+* The CL values 0.4–0.6 in the budget and `cn_max` 1.2 are assumptions without a cited source; label them.
+
+## 6. What this supports and does not
+Supports: the formulas are implemented as stated, units are consistent (m, mm converted correctly), and the loads, stresses and hook size are arithmetically reproducible. Does not support: any statement that the glider survives launch, that the spar sizes are converged minima, that the mass bracket is achievable, or that the NP is better than an uncalibrated hand bracket. Replication, empirical relevance and flight stay insufficient. Nothing here is marked not applicable to pass.
+
+## Needed from authors (smallest set)
+1. Reword the safety-factor status string. 2. Refine or align the beam mesh and re-report spar heights with margin to the limit. 3. State handedness and sign conventions before 07's torque/trim code. 4. Report the pelvic spar as grid-limited. 5. Show the hollow-body mass, fin mass at printable thickness, and ballast inside the mass bracket. 6. Say that the budget at 4 m/s cannot trim any bracket mass at CL <= 1.2.

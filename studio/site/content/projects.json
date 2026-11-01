@@ -1,0 +1,498 @@
+{
+ "schema": "frontier-site-projects-0.1",
+ "note": "Authored. A project is a named design goal with its subsystems by scale, the models and media that exist for each, and the gaps. The Project record schema exists, and each project here has a validated draft file. This file is the site's own projection: a project is a stored Project only when its entry names a live_project_id, and none does yet. Until then each is an authored proposal.",
+ "projects": [
+  {
+   "id": "flying-fish",
+      "live_project_id": "project-flying-fish-mission",
+   "title": "Flying fish",
+   "featured": true,
+   "status": "exploratory, featured",
+   "goal": "Engineer toward a vertebrate glider reachable from a beloniform ancestor, and make every missing bridge between scales visible.",
+   "summary": "Eleven scales from molecule to ecology. Recorded models exist at four of them, a bounded constraint solver and illustrative print forms at the organism and organ scales; most scales hold only a stated gap.",
+   "panels": {
+    "molecular": {
+     "sources": [
+      "daane2021"
+     ],
+     "models": [],
+     "videos": [],
+     "claims": [],
+     "equations": [],
+     "gap": "No molecular model output exists. Daane 2021 shows a zebrafish interaction that phenocopies flying-fish fin proportion; transfer to a halfbeak is unestablished."
+    },
+    "macromolecular": {
+     "sources": [],
+     "models": [],
+     "videos": [],
+     "claims": [],
+     "equations": [],
+     "gap": "No structure or affinity model is attached. The stopped KCNE1 protocol shows what an uncovered structure does to a test."
+    },
+    "subcellular": {
+     "sources": [],
+     "models": [],
+     "videos": [],
+     "claims": [],
+     "equations": [],
+     "gap": "Nothing indexed."
+    },
+    "cellular": {
+     "sources": [
+      "daane2021"
+     ],
+     "models": [
+      "collier1996_two_cell"
+     ],
+     "videos": [
+      "biomodels-delta-notch"
+     ],
+     "claims": [],
+     "equations": [],
+     "gap": "The SBML replay is a two-cell abstraction; it says nothing about fin cells."
+    },
+    "tissue": {
+     "sources": [],
+     "models": [
+      "rdfield_nonlinear_sweep"
+     ],
+     "videos": [
+      "rd-fields"
+     ],
+     "claims": [
+      "turing-ddi",
+      "turing-wavelength"
+     ],
+     "equations": [],
+     "gap": "Reaction-diffusion fields are generic pattern models, not a fin tissue model."
+    },
+    "organ": {
+     "sources": [
+      "fish1990",
+      "parkchoi2010"
+     ],
+     "models": [
+      "finbeam_euler_bernoulli"
+     ],
+     "videos": [
+      "fin-mechanics"
+     ],
+     "claims": [],
+     "equations": [
+      "eq-ar"
+     ],
+     "forms": true,
+     "gap": "A scoped elastic surrogate; how real fin rays load and bend is not modelled."
+    },
+    "neural": {
+     "sources": [],
+     "models": [],
+     "videos": [],
+     "claims": [],
+     "equations": [],
+     "gap": "No control model or source is indexed."
+    },
+    "organism": {
+     "sources": [
+      "fish1990",
+      "parkchoi2010",
+      "davenport1992"
+     ],
+     "models": [
+      "flying_fish_constraints",
+      "glide_pointmass"
+     ],
+     "videos": [
+      "glide-fixed-launch"
+     ],
+     "claims": [],
+     "equations": [
+      "eq-wl",
+      "eq-allometry",
+      "eq-speed",
+      "eq-sink",
+      "eq-anchor"
+     ],
+     "forms": true,
+     "solver": true,
+     "gap": "The glide model uses assumed coefficients; the corrected common-launch comparison found no robust winner across the tested scenarios."
+    },
+    "developmental": {
+     "sources": [
+      "fish1990"
+     ],
+     "models": [],
+     "videos": [],
+     "claims": [],
+     "equations": [],
+     "gap": "No developmental model links adult proportions to a programme."
+    },
+    "collective": {
+     "sources": [],
+     "models": [],
+     "videos": [],
+     "claims": [],
+     "equations": [],
+     "gap": "Nothing indexed."
+    },
+    "ecological": {
+     "sources": [
+      "darwin1859",
+      "lovejoy2004",
+      "xu2013",
+      "fishbase"
+     ],
+     "models": [],
+     "videos": [],
+     "claims": [],
+     "equations": [],
+     "gap": "Reachability from a halfbeak ancestor is unestablished; no evolutionary model is attached."
+    }
+   }
+  },
+  {
+   "id": "tissue-microcarrier",
+   "template": "reuse-study",
+   "group": "Reuse studies",
+   "live_project_id": null,
+   "title": "Contractile tissue microcarrier",
+   "status": "proposed, authored draft",
+   "featured": false,
+   "goal": "Ask one question about a Xenopus-inspired contractile tissue construct: how does a chosen actuation pattern turn into deformation, and how much of that deformation becomes net motion?",
+   "summary": "A bounded proposal. A generic soft-body mechanics runner and existing cell-scale tools are named as instruments. No simulation of this construct exists in this node yet, and no frog or fish parameter is used.",
+   "draft_key": "tissue-microcarrier",
+   "context": {
+    "base": "The source context is cell constructs made from Xenopus laevis (frog) cells. This project takes the abstract question only: actuation pattern, deformation, motion. It takes no frog parameter.",
+    "not_this": [
+     "A designed living organism or a release claim",
+     "A clinical or medical claim",
+     "A fish tissue, or part of the flying-fish design",
+     "Frog-validated mechanics"
+    ]
+   },
+   "scales": [
+    {
+     "scale": "cellular",
+     "role": "Where force comes from: contractile or ciliated cells (the sources report ciliary locomotion; contraction is this project's modelling choice)"
+    },
+    {
+     "scale": "tissue",
+     "role": "A construct of many cells as a deformable body under an actuation pattern"
+    },
+    {
+     "scale": "organ",
+     "role": "Construct-level shape change and net displacement (an organ-scale body, not an organism)"
+    }
+   ],
+   "tools": [
+    {
+     "id": "morpheus-multicell",
+     "use": "Cellular Potts engine already run here. It shows how a cell-level rule is exposed to a tissue-level readout.",
+     "limit": "A generic growth and cytokine example. It has no contraction and no elastic modulus."
+    },
+    {
+     "id": "mechanobio-clutch",
+     "use": "A cellular adhesion clutch render. Shows how cell-scale force is represented here.",
+     "limit": "A render of one simulation. No transfer to a construct is attempted."
+    },
+    {
+     "id": "betse-tissue",
+     "use": "Bioelectric patch with gap-junction controls, as one possible upstream of contraction.",
+     "limit": "Not calibrated to any cell. The voltage-to-contraction link is not established."
+    }
+   ],
+   "proposed_instruments": {
+    "virtual": [
+     {
+      "name": "Soft-voxel actuation comparison",
+      "owner": "claude15 (simulator and source owner)",
+      "status": "proposed; no runner or result is in this node yet",
+      "plan": "A finite set of actuation patterns over a small voxel body, with a passive arm, a mirrored arm and dt and mesh refinement. Generic mechanics only."
+     }
+    ],
+    "physical": [
+     {
+      "name": "Construct motion and strain tracking",
+      "status": "proposed",
+      "plan": "Time-lapse tracking of centroid displacement and contraction strain, with an inhibited or passive control arm.",
+      "needs": "Stiffness measured on the same construct type (for example by micropipette aspiration or AFM) before any modulus is used."
+     }
+    ]
+   },
+   "chain": [
+    {
+     "role": "original exact record",
+     "kind": "Evidence",
+     "id": "doc-model-coupling",
+     "version": "ddfed7fd539cb173432895e104886fcba89fc9f893177683cb053d2abf9335bf",
+     "namespace": "snapshot",
+     "label": "Model coupling: typed ports, explicit contracts, refusal instead of inference",
+     "note": "The one exact record this project intends to reuse. It defines composable, scenario and refused couplings."
+    },
+    {
+     "role": "intended use here",
+     "label": "Label the actuation to deformation to motion port: scenario until a calibration exists",
+     "ref": null
+    },
+    {
+     "role": "same record, other project",
+     "label": "The flying-fish project pins the same record",
+     "ref": {
+      "kind": "Evidence",
+      "id": "doc-model-coupling",
+      "version": "ddfed7fd539cb173432895e104886fcba89fc9f893177683cb053d2abf9335bf"
+     }
+    }
+   ],
+   "sources": [
+    {
+     "id": "kriegman2020",
+     "cite": "Kriegman S, Blackiston D, Levin M, Bongard J (2020). A scalable pipeline for designing reconfigurable organisms. Proc Natl Acad Sci USA 117(4):1853-1859.",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/31932426/",
+     "pmid": "31932426",
+     "doi": "10.1073/pnas.1910837117",
+     "read_level": "abstract",
+     "license": null,
+     "note": "Abstract read from PubMed. Full text not read here."
+    },
+    {
+     "id": "blackiston2021",
+     "cite": "Blackiston D, Lederer E, Kriegman S, Garnier S, Bongard J, Levin M (2021). A cellular platform for the development of synthetic living machines. Sci Robot 6(52):eabf1571.",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/34043553/",
+     "pmid": "34043553",
+     "doi": "10.1126/scirobotics.abf1571",
+     "read_level": "abstract",
+     "license": null,
+     "note": "Abstract read from PubMed. Full text not read here."
+    }
+   ],
+   "claims": [
+    {
+     "text": "AI methods design candidate lifeforms in silico for a desired function, and designs judged transferable are then built with a cell-based construction toolkit.",
+     "source": "kriegman2020",
+     "quote": "transferable designs are then created using a cell-based construction toolkit",
+     "status": "source-reported"
+    },
+    {
+     "text": "Xenopus laevis cell constructs move by cilia on their surface and heal after damage. Their locomotion is ciliary, so a contraction-driven model is a different mechanism from the one this abstract reports.",
+     "source": "blackiston2021",
+     "quote": "coordinated locomotion via cilia present on their surface",
+     "status": "source-reported"
+    }
+   ],
+   "missing_couplings": [
+    "Cell actuation (contraction or cilia) to tissue stress: no sourced parameter and no model.",
+    "Tissue stress to construct deformation: needs an elastic modulus of the construct. None is measured here.",
+    "Deformation to net motion in a fluid or on a surface: not modelled.",
+    "Simulated design to built construct: the source reports a pipeline, not a transfer rule for any runner in this node."
+   ],
+   "endpoints": [
+    {
+     "id": "passive-control",
+     "text": "With actuation off, from zero initial velocity and a settled force-balanced shape, with no external flow or forcing, a defined reference frame and after a stated transient window, net displacement is zero to numerical tolerance.",
+     "falsifier": "A nonzero passive displacement under those stated conditions triggers diagnosis of the setup or the runner. If a condition was not met, the control is restated, not read as a defect. No other endpoint is read until it is resolved."
+    },
+    {
+     "id": "pattern-dependence",
+     "text": "Two predeclared patterns with equal total actuation give net displacements that differ by more than a dt or mesh refinement changes either one.",
+     "falsifier": "If the difference is smaller than the refinement change, no pattern-to-motion statement is made."
+    },
+    {
+     "id": "mirror-symmetry",
+     "text": "A mirrored pattern on a symmetric body gives the mirrored displacement.",
+     "falsifier": "A failure marks an anisotropy artifact in the body or the solver."
+    }
+   ],
+   "open_questions": [
+    "Which actuation to deformation relation, if any, is shared by a soft-voxel model, a cell construct and a fin ray, and what would calibrate it?",
+    "What one measurement on a real construct (strain amplitude against force) would bound the model's actuation parameter?",
+    "Can the composable, scenario and refused labels of the coupling record apply to an actuation-to-motion port?"
+   ],
+   "runner": null
+  },
+  {
+   "id": "epithelial-repair",
+   "template": "reuse-study",
+   "group": "Reuse studies",
+   "live_project_id": null,
+   "title": "Epithelial repair patch",
+   "status": "proposed, authored draft",
+   "featured": false,
+   "goal": "Ask one question about a cultured epithelial sheet: how do cell-level motility and mechanics set the closure of a gap, and what barrier geometry results?",
+   "summary": "A bounded proposal. Two published mechanics models define what is known. The Morpheus engine run here is named as a possible instrument. No wound simulation exists in this node yet.",
+   "draft_key": "epithelial-repair",
+   "context": {
+    "base": "Cultured epithelial monolayers. Lee and Wolgemuth model MDCK (dog kidney) wounds. Bai and Zeng model a generic three-dimensional epithelial monolayer on a substrate. No fish cell line or species parameter is used.",
+    "not_this": [
+     "A clinical treatment or wound-care claim",
+     "A viable engineered organism",
+     "Observed wound healing in any fish tissue",
+     "Evidence for fin regeneration"
+    ]
+   },
+   "scales": [
+    {
+     "scale": "subcellular",
+     "role": "Protrusion and contractility that drive cell motion (not modelled here)"
+    },
+    {
+     "scale": "cellular",
+     "role": "Cell mechanics, cell-cell junctions and cell-substrate adhesion"
+    },
+    {
+     "scale": "tissue",
+     "role": "Collective sheet motion, stress and closure"
+    },
+    {
+     "scale": "organ",
+     "role": "Patch-level barrier geometry: the shape and size of the remaining gap"
+    }
+   ],
+   "tools": [
+    {
+     "id": "morpheus-multicell",
+     "use": "The Cellular Potts engine already run here, with receipts. A wound-gap setup would reuse the engine, not the example model.",
+     "limit": "The example model is a growth and cytokine feedback model, not a wound model."
+    },
+    {
+     "id": "nca-curriculum",
+     "use": "An algorithmic repair surrogate on a design raster.",
+     "limit": "Computed on a raster. It is not observed or simulated wound healing."
+    },
+    {
+     "id": "betse-tissue",
+     "use": "A bioelectric patch with gap-junction controls, as one possible signaling channel.",
+     "limit": "Not calibrated to any epithelium."
+    },
+    {
+     "id": "scale-erk-wave",
+     "use": "Erk trigger waves on one regenerating zebrafish scale, as a signaling-wave example.",
+     "limit": "A signaling example from a different tissue. No coupling to motility is established."
+    }
+   ],
+   "proposed_instruments": {
+    "virtual": [
+     {
+      "name": "Gap closure comparison on the Morpheus engine",
+      "owner": "claude09 (mechanics and source owner)",
+      "status": "proposed; no setup or result is in this node yet",
+      "plan": "A gap geometry sweep with a motility ablation, a positive baseline, seeds and dt checks. Outputs: closure area, cell trajectories, mechanical cost, failure cases."
+     }
+    ],
+    "physical": [
+     {
+      "name": "Gap closure assay with live imaging",
+      "status": "proposed",
+      "plan": "Image closure area over time in a monolayer, with a protrusion-inhibited arm, chosen and sourced before any run.",
+      "needs": "Edge stress by traction force microscopy, if the mechanical cost is to be compared."
+     }
+    ]
+   },
+   "chain": [
+    {
+     "role": "original exact record",
+     "kind": "Evidence",
+     "id": "doc-model-coupling",
+     "version": "ddfed7fd539cb173432895e104886fcba89fc9f893177683cb053d2abf9335bf",
+     "namespace": "snapshot",
+     "label": "Model coupling: typed ports, explicit contracts, refusal instead of inference",
+     "note": "The one exact record this project intends to reuse. It defines composable, scenario and refused couplings."
+    },
+    {
+     "role": "intended use here",
+     "label": "Label the signaling to motility to closure ports: scenario until a calibration exists",
+     "ref": null
+    },
+    {
+     "role": "same record, other project",
+     "label": "The flying-fish project pins the same record",
+     "ref": {
+      "kind": "Evidence",
+      "id": "doc-model-coupling",
+      "version": "ddfed7fd539cb173432895e104886fcba89fc9f893177683cb053d2abf9335bf"
+     }
+    }
+   ],
+   "sources": [
+    {
+     "id": "lee2011",
+     "cite": "Lee P, Wolgemuth CW (2011). Crawling cells can close wounds without purse strings or signaling. PLoS Comput Biol 7(3):e1002007.",
+     "url": "https://pubmed.ncbi.nlm.nih.gov/21423710/",
+     "pmid": "21423710",
+     "doi": "10.1371/journal.pcbi.1002007",
+     "read_level": "abstract",
+     "license": null,
+     "note": "Abstract read from PubMed. Full text not read here."
+    },
+    {
+     "id": "bai2023",
+     "cite": "Bai J, Zeng X (2023). Computational modeling and simulation of epithelial wound closure. Sci Rep 13:6265.",
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10110613/",
+     "pmid": "37069231",
+     "doi": "10.1038/s41598-023-33111-4",
+     "read_level": "abstract",
+     "license": null,
+     "note": "Abstract read from PubMed. The PMC page was blocked by a bot check, so full text was not read here. Licence unknown: an independent review found no Creative Commons notice in a retrieved copy of the text, so none is claimed."
+    }
+   ],
+   "claims": [
+    {
+     "text": "In MDCK monolayers, wounds still close when a row of cells at the wound edge is deactivated. The authors' model captures closure dynamics and suggests wound healing is predominantly mechanical, modified but not produced by signaling.",
+     "source": "lee2011",
+     "quote": "modified, but not produced, by cell-cell signaling",
+     "status": "source-reported (model-based conclusion)"
+    },
+    {
+     "text": "In a three-dimensional continuum finite-element model, closure efficiency is related to the initial gap size and to the intensity of lamellipodial protrusion. Wound-edge cells carry higher stress, and normal stress dominates shear stress.",
+     "source": "bai2023",
+     "quote": "closure efficiency is related to the initial gap size and the intensity of lamellipodial protrusion",
+     "status": "source-reported (model result)"
+    }
+   ],
+   "missing_couplings": [
+    "Signaling to motility or contractility: Lee and Wolgemuth conclude signaling modifies, but does not produce, closure (their model-based conclusion only). The Bai and Zeng abstract does not discuss signaling, so that coupling is an explicit gap there. Neither gives a transferable coupling.",
+    "Cell mechanics parameters for the chosen patch: none sourced here.",
+    "Continuum finite-element and Cellular Potts parameters are not interchangeable: no mapping exists.",
+    "Closure to barrier function (permeability): not modelled.",
+    "One cell line (MDCK) in one source and a generic monolayer in the other: no species transfer."
+   ],
+   "endpoints": [
+    {
+     "id": "motility-ablation",
+     "text": "In a declared stress-free, force-balanced model with no other active drive, setting protrusion intensity to zero leaves closed area constant to numerical tolerance.",
+     "falsifier": "Closure anyway triggers diagnosis, not a presumed defect: passive relaxation, initial stress, cell-cell or cell-substrate forces or another active mechanism can legitimately close a gap. No mechanism is read from the run until the cause is found."
+    },
+    {
+     "id": "gap-and-protrusion-dependence",
+     "text": "Closure efficiency changes with initial gap size and with protrusion intensity, as Bai and Zeng report. The abstract gives no direction, so none is assumed.",
+     "falsifier": "A run that shows no dependence on either does not reproduce the reported dependence."
+    },
+    {
+     "id": "refinement-conservation",
+     "text": "Paired runs from the same initial state give closed area within tolerance when dt (and grid, where there is one) is refined. Cell count is also preserved only under a declared no-birth, no-death assumption. Seed-to-seed variability is reported as an ensemble spread, not tested for equality.",
+     "falsifier": "A paired change larger than the tolerance voids the comparison for that setup. Variation across independent seeds is not by itself a defect."
+    }
+   ],
+   "open_questions": [
+    "What evidence would connect a lower-scale prediction to tissue-scale closure in one named cell line? (The same shape of gap as the registered question F002.)",
+    "Is closure efficiency against gap size comparable between a Cellular Potts and a continuum model once both are calibrated to one measurement?",
+    "What barrier-geometry readout (remaining gap shape) is worth measuring beyond closed area?"
+   ],
+   "related_problem": {
+    "kind": "Problem",
+    "id": "F002",
+    "version": "a438fc11cb28510520e581e641d07110298b34005f349badd66d9cbfe19525b3",
+    "namespace": "snapshot"
+   },
+   "runner": null
+  }
+ ],
+ "other_projects_note": "MorphoSwarm already holds other design projects (a pumpkin fruit, a newt and a toad) in its own checkout. They are not imported into this node, so none is shown here. The Studio shows two kinds of entry: a stored Project, which has an imported Project record, and an authored proposal, which has only a draft and is labelled as such. A project becomes stored when a Project record is imported and its entry names it.",
+ "model_scale": {
+  "collier1996_two_cell": "cellular",
+  "rdfield_nonlinear_sweep": "tissue",
+  "finbeam_euler_bernoulli": "organ",
+  "flying_fish_constraints": "organism",
+  "glide_pointmass": "organism"
+ }
+}

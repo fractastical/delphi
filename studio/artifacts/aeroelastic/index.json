@@ -1,0 +1,201 @@
+{
+  "schema": "frontier.aeroelastic.model-card/1",
+  "status": "36declaredarms computed and saved-state audited; scoped torsion-rigid scaffold only",
+  "evidence_kind": "computed",
+  "empirical_validation": "unknown",
+  "biological_success_probability": null,
+  "question": "Under declared equivalent-fin bending stiffness, how much does recomputing aerodynamics after elastic deformation change shape, forces and the explicitly rigidized-shape point-mass glide compared with rigid and frozen-load arms?",
+  "inputs": {
+    "material": "assumed equivalent constantEI scaffold, not measured tissue or ecologyhingeK",
+    "geometry": "actual existing fish-derivedv3a candidate/panels; source hash pins inprotocol",
+    "fluid": "steady inviscid thin-surfaceVLM with fixed straight horseshoe wake legs; no CFD/body/separation or free/unsteady wake"
+  },
+  "ports": [
+    {
+      "id": "equivalent_fin_EI",
+      "unit": "N*m^2",
+      "dimension": {
+        "kg": 1,
+        "m": 3,
+        "s": -2
+      },
+      "status": "assumed engineering design inputs"
+    },
+    {
+      "id": "surface_displacement",
+      "unit": "m",
+      "time": "static iteration NOTphysicalseconds",
+      "status": "computed from reused FEMresponses"
+    },
+    {
+      "id": "net_aerodynamic_force",
+      "unit": "N",
+      "frame": "right-handed source +Xfreestream,+Zup",
+      "status": "recomputed on deformed geometry/normals"
+    },
+    {
+      "id": "glide_CL",
+      "unit": "1",
+      "mapping": "one-way rigidized finalshape; constantcoefficient during separate pointmassRK4, no continuousFSI"
+    },
+    {
+      "id": "glide_position",
+      "unit": "m",
+      "time": "actualRK4seconds",
+      "status": "computed with assumedmass/drag; interpolatedeventendpoint not a state"
+    }
+  ],
+  "control_slice": {
+    "mesh": [
+      8,
+      2
+    ],
+    "compliance": 0.2,
+    "speed_m_s": 20,
+    "arms": {
+      "rigid": {
+        "status": "computed rigid",
+        "CL": 0.26232829057169127,
+        "glide_range_m": 30.317069418465096,
+        "glide_dt_gate": true
+      },
+      "one-way-frozen-load": {
+        "status": "computed one-way",
+        "CL": 0.26085404557694614,
+        "glide_range_m": 30.168306312414654,
+        "glide_dt_gate": true
+      },
+      "two-way-static-feedback": {
+        "status": "converged static feedback",
+        "CL": 0.2608582178691835,
+        "glide_range_m": 30.168725456801816,
+        "glide_dt_gate": true
+      }
+    }
+  },
+  "artifacts": {
+    "protocol": {
+      "path": "artifacts/aeroelastic/protocol.json",
+      "sha256": "2343dd6e80cc9da394e9379e4daaa36082599344522d9774d240aab75386b24a",
+      "bytes": 9658
+    },
+    "controls": {
+      "path": "artifacts/aeroelastic/controls-local.json",
+      "sha256": "9231e55fca6d9c17a97cfd2ca7f6675b0463afae3e6328585d25e7ef7fede25f",
+      "bytes": 2227
+    },
+    "local_preflight": {
+      "path": "artifacts/aeroelastic/local-preflight-receipt.json",
+      "sha256": "f2f877231af46dc2a053fc71bd5d96b6778131462a5464babf5c5efc01f284ee",
+      "bytes": 3753
+    },
+    "packet": {
+      "path": "artifacts/aeroelastic/packet.json",
+      "sha256": "912b47f03a8016fd97842f507760b7db75554a4024155e6da8290324e903fa6f",
+      "bytes": 4773
+    },
+    "video": {
+      "path": "artifacts/aeroelastic/render-production/coupled-states.mp4",
+      "sha256": "39cccc437663bccb120bdc72222dae71f5d31bc78c649ee4044242f336294d66",
+      "bytes": 112455
+    },
+    "poster": {
+      "path": "artifacts/aeroelastic/render-production/poster.png",
+      "sha256": "9892fa31d2e82f974c12215e619f9097c84db3d5ccc41803f6ca47573e7c6212",
+      "bytes": 197281
+    },
+    "render_provenance": {
+      "path": "artifacts/aeroelastic/render-production/provenance.json",
+      "sha256": "f0ecc407ec04daed18839bdbf6b2e56bdda9bb015aabaf99a9ada9962b9ec044",
+      "bytes": 6086
+    },
+    "production_summary": {
+      "path": "artifacts/aeroelastic/production/summary.json",
+      "sha256": "e0e5e385f149294071588973eb3a24e2b8b7d0ff4c9527e993356f58e5782843",
+      "bytes": 1753096
+    },
+    "production_receipt": {
+      "path": "artifacts/aeroelastic/production/receipt.json",
+      "sha256": "c9b79e7980dd740b584b59e8726a9fd58de29a4975ccfb3234c0accc42f06cd8",
+      "bytes": 29273
+    },
+    "production_audit": {
+      "path": "artifacts/aeroelastic/production-audit.json",
+      "sha256": "dded1be1c43826d8c1d02d015edab10b5da82de57cee66a765fe51148543a2c2",
+      "bytes": 2150365
+    },
+    "posthoc_diagnostics": {
+      "path": "artifacts/aeroelastic/production-diagnostics.json",
+      "sha256": "3942ccf86325cefc8689fe5cedecdf6b1b9a4786483cbaf2ff9407118f736f14",
+      "bytes": 101057
+    },
+    "independent_review": {
+      "path": "artifacts/aeroelastic/independent-review-claude07.md",
+      "sha256": "3d09e769d14b50773070998dc64abf7227e9c0d1aad9033d091a85faae1d14af",
+      "bytes": 9003
+    },
+    "author_response": {
+      "path": "artifacts/aeroelastic/author-response-to-review.md",
+      "sha256": "00c60d9fdb4c587c7b1faca08abe536ace711934c6bf27f4daefe9eb3558f278",
+      "bytes": 1253
+    },
+    "report": {
+      "path": "artifacts/aeroelastic/RESULTS.md",
+      "sha256": "b3a6a3b892d8275ee246ac406f975a1947ed19a493507b5ffbe794fae68f91b3",
+      "bytes": 5484
+    }
+  },
+  "open_questions": [
+    "ECM/cell state to measured equivalent EI",
+    "fin anisotropy,torsion,branching,membrane mechanics",
+    "viscosity,separation,body interaction,unsteady wake",
+    "ongoing aeroelastic motion during flight",
+    "Vm to growth lacks sourced mapping; no invented bioelectric bridge"
+  ],
+  "next": "Run frozen independent paired16x4/24x6 assay on CPU; preserve all numerical/domain/partialfailures",
+  "model_scope": "bending-only,torsion-rigid; fixed-alpha assumed-release descent, NOTvalidated fin/glideperformance",
+  "control_interpretation": {
+    "recorded_booleans": 20,
+    "ledger_gates": "bookkeeping identities conserved byconstruction; detect only overriddennormalvector, NOTindependent transfervalidation",
+    "lift_orthogonality": "weak algebraic identity check",
+    "independent_review": "claude-07; rawreview andauthorresponse retained",
+    "lattice_absolute_CL_gate": "18/18within3%; doesNOTresolve smaller pairedeffects or establishrate",
+    "saved_state_reproduction": "exact222staticframes,72544glidestates,36finalforceposes; same-modelintegrity"
+  },
+  "production": {
+    "arms": 36,
+    "contexts": 6,
+    "meshes": [
+      [
+        16,
+        4
+      ],
+      [
+        24,
+        6
+      ]
+    ],
+    "native_execution_status": "all declared arms returned",
+    "native_wall_seconds": 41.243141124,
+    "empirical_accuracy": "unknown",
+    "nominal_fine": {
+      "CL": [
+        0.2503603159205497,
+        0.2490125790091936,
+        0.2490164192082075
+      ],
+      "descent_range_m": [
+        29.169498936108145,
+        29.04643058678584,
+        29.046779750475256
+      ],
+      "arms": [
+        "rigid",
+        "one-way",
+        "two-way"
+      ],
+      "feedback_increment_scope": "negligible nominal increment; only3.8\u00d7frozeniterationtol; no performanceclaim"
+    },
+    "posthoc_diagnostics": "all signedpaireddeltas/mesh ratios/tolerance multiples andconstrainttorsionshare preserved; no newgate"
+  }
+}

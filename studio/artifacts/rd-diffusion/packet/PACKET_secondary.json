@@ -1,0 +1,29 @@
+{
+ "schema": "frontier.rd-ddpm.secondary-packet/1",
+ "status": "PREPARED, frozen, NOT READY, NOT DISPATCHED",
+ "branch": "work/rd-diffusion",
+ "archive": {
+  "file": "rd_secondary_packet.tar.gz",
+  "sha256": "6b97c5a897d303cfd1a5d46a2c4ea2c76a3bc124456bad6d95d1dc6c04d114b9",
+  "bytes": 15325
+ },
+ "members_sha256": {
+  "rd_ddpm.py": "25455430ef138b49e6bac151a144e338269a81ce5c2f576387f8805bbb1a400a",
+  "config.json": "bc77ebc55010b9c8ac910c2b31868ec0dbf2d1e3785a06ec3ef1aa028ea2b210",
+  "exact_w1.py": "74860ca4495ae62fcfe0f08dd9a422b7c2a4bcb93fab82ddb083587fae7c18d5",
+  "secondary_eval.py": "06d73b3646dcaefbda00f06adb756285e2fd966703728dc4094fab788d31643b",
+  "launch_secondary.py": "2509d703941dd8849755084e0ab9f4f70edf1f3a735b30dcdac8f4198867ff96",
+  "job_secondary.sh": "ac9ec6a702150a3a20039762ea3a5b11490f1bec37a8c66335229108a85f16bc"
+ },
+ "numerical_policy": "explicit FP32 identical to the primary (infra backend-policy.json sha256 3a59246be1278278da2a1b5c3a12989d24bc557c2791f0185066d99153061932), set by launch_secondary.py before torch import and verified by secondary_eval.py",
+ "inputs_supplied_by_infra": [
+  "checkpoint.pt (sha256 must equal train.checkpoint_sha256 in the primary evaluation.json)",
+  "primary evaluation.json"
+ ],
+ "preflight": "tar -xzf rd_secondary_packet.tar.gz && PREFLIGHT=1 bash rd_diffusion/job_secondary.sh",
+ "full": "CKPT=<checkpoint.pt> PRIMARY=<evaluation.json> OUT=out2 bash rd_diffusion/job_secondary.sh",
+ "output": "out2/part_secondary.tgz (control.json, secondary_evaluation.json, generated_ensemble_full.npz, examples.npz)",
+ "training": "none",
+ "runtime": "unmeasured",
+ "note": "supersedes the 7ac16be7 secondary archive e7af7884\u2026; merges root formatting 5391f6e"
+}

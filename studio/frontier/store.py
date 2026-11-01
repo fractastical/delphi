@@ -1,0 +1,638 @@
+"""Transactional domain service. All interfaces call this same authorization boundary.
+
+Writes serialize on one node row in this first slice. This favors inspectable
+correctness over throughput; no scalability result is implied.
+"""
+from contextlib import contextmanager
+from hashlib import sha256
+from pathlib import Path
+import re
+from uuid import uuid4
+
+import psycopg
+from psycopg import sql
+from psycopg.rows import dict_row
+from psycopg.types.json import Jsonb
+
+from .models import (Assessment, Draft, Record, Ref, KINDS, POLICY, MAX_BUNDLE_BYTES,
+                     MAX_BUNDLE_RECORDS, canonical, digest, make_record, now, ref, references)
+
+
+class FrontierError(ValueError):
+    code = "invalid_request"
+    http_status = 400
+
+
+class Unauthorized(FrontierError):
+    code = "unauthorized"
+    http_status = 401
+
+
+class Forbidden(FrontierError):
+    code = "forbidden"
+    http_status = 403
+
+
+class Conflict(FrontierError):
+    code = "conflict"
+    http_status = 409
+
+
+class Missing(FrontierError):
+    code = "not_found"
+    http_status = 404
+
+
+def _stated_redistribution_license(value):
+    """A declaration gate, not a legal judgement or licence authentication."""
+    return isinstance(value, str) and value.strip().casefold() not in {
+        "", "unknown", "unspecified", "none", "null", "n/a", "na", "no license", "no licence",
+        "all rights reserved", "not for redistribution", "redistribution prohibited"}
+
+
+def _unlicensed_available_content(records):
+    """Record ids asserting held content bytes with no stated licence.
+
+    A commons whose whole point is export and import must not be the thing that launders
+    redistribution rights. An independent review of the Paperclip Evidence API measured zero
+    occurrences of licence, copyright, terms-of-use or redistribution across its entire OpenAPI,
+    while its `include_context` option returns article passages and would set
+    `content_available=true` -- so an adapter written without this check would export passages of
+    unknown licence inside a bundle that claims integrity.
+
+    A digest is integrity, not permission. Exporting the digest of content you may not
+    redistribute is fine; asserting you HOLD that content and shipping it onward is not. So the
+    refusal covers structured held-content and downloadable-artifact declarations, including
+    nested provenance. Unknown, blank and explicit no-redistribution declarations do not pass.
+    References without available bytes need no licence. Arbitrary prose is not classified;
+    passing this check does not establish ownership or authenticate a permission statement.
+
+    Enforced at EVERY boundary, because the first version of this check guarded only
+    `export_bundle` and an independent reviewer found the hole within the hour: `/v1/read/get`
+    returns the full record envelope, so a record `submit` had accepted was refused on export
+    and served on read. The export gate passed its test the whole time. A control that guards
+    one exit of four is not a control, it is a thing that looks like one -- so the rule now
+    refuses at the door (`submit`, `import_bundle`) and again on the way out (`get`,
+    `export_bundle`). Refusing at the door is what actually closes it: a record that is never
+    stored cannot leak through an exit nobody has thought of yet.
+    """
+    offenders = []
+    for record in records:
+        pending = [record.get("payload") or {}]
+        while pending:
+            value = pending.pop()
+            if isinstance(value, list):
+                pending.extend(value)
+            elif isinstance(value, dict):
+                available = value.get("content_available") is True or (
+                    value.get("availability") == "downloadable" and "sha256" in value and "uri" in value)
+                if available and not _stated_redistribution_license(value.get("license")):
+                    offenders.append(f'{record["kind"]}/{record["id"]}')
+                    break
+                pending.extend(value.values())
+    return offenders
+
+
+def _refuse_unlicensed(offenders, verb):
+    """Refuse, naming a bounded sample AND the total, so the message is not read as a full list."""
+    if not offenders:
+        return
+    shown = ", ".join(offenders[:5])
+    more = f" (showing 5 of {len(offenders)})" if len(offenders) > 5 else ""
+    raise Forbidden(
+        f"Refusing to {verb} content asserted available under an unstated licence: {shown}{more}. "
+        "Declare the source/artifact redistribution licence, or share a reference without asserting available bytes.")
+
+
+class Store:
+    def __init__(self, dsn: str, namespace: str, schema: str = "public"):
+        if not re.fullmatch(r"[a-z][a-z0-9_]{0,62}", schema):
+            raise ValueError("Invalid SQL schema name")
+        Ref(namespace=namespace, kind="Problem", id="validation", version="0" * 64)
+        self.dsn, self.namespace, self.schema = dsn, namespace, schema
+
+    @contextmanager
+    def connection(self):
+        with psycopg.connect(self.dsn, row_factory=dict_row, connect_timeout=5) as c:
+            c.execute(sql.SQL("SET search_path TO {}, pg_catalog").format(sql.Identifier(self.schema)))
+            c.execute("SET statement_timeout = '5s'")
+            c.execute("SET lock_timeout = '5s'")
+            yield c
+
+    def initialize(self):
+        """Operator-only migration, never exposed by HTTP or MCP."""
+        with self.connection() as c:
+            # Operator migration on a possibly large store: the connection's 5 s statement cap is for request handling.
+            c.execute("SET statement_timeout = '300s'")
+            c.execute("SET lock_timeout = '30s'")
+            c.execute(sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(sql.Identifier(self.schema)))
+            c.execute(Path(__file__).with_name("schema.sql").read_text())
+            c.execute("INSERT INTO node_config VALUES (1,%s,1) ON CONFLICT DO NOTHING", (self.namespace,))
+            if c.execute("SELECT namespace FROM node_config").fetchone()["namespace"] != self.namespace:
+                raise Conflict("Store already belongs to another namespace")
+
+    def provision(self, token: str, actor: str, operator: str, roles: list[str],
+                  namespaces: list[str] | None = None, daily_write_limit: int = 100):
+        """Explicit local operator configuration, not self-service or imported authority.
+
+        Tokens are supplied in memory; only their hashes are persisted.
+        """
+        if not 24 <= len(token) <= 512 or not set(roles) <= {"contributor", "reviewer", "coordinator"}:
+            raise ValueError("Invalid provisioning configuration")
+        for identity in (actor, operator):
+            Ref(namespace=self.namespace, kind="Actor", id=identity, version="0" * 64)
+        with self.connection() as c:
+            c.execute("INSERT INTO principals VALUES (%s,%s,%s,%s,%s,%s)",
+                      (sha256(token.encode()).hexdigest(), actor, operator, Jsonb(roles),
+                       Jsonb(namespaces or [self.namespace]), daily_write_limit))
+
+    def _auth(self, c, token, role=None):
+        if not token or not isinstance(token, str) or len(token) > 512:
+            raise Unauthorized("Authenticated operator token required")
+        p = c.execute("SELECT actor,operator,roles,namespaces,daily_write_limit FROM principals WHERE token_hash=%s",
+                      (sha256(token.encode()).hexdigest(),)).fetchone()
+        if p is None:
+            raise Unauthorized("Unknown operator token")
+        if role and role not in p["roles"]:
+            raise Forbidden("Required role missing")
+        return p
+
+    def principal(self, token: str) -> dict:
+        """Who a credential belongs to, WITHOUT the credential. Read-only; raises Unauthorized for a missing or unknown token.
+
+        Public replacement for callers that reached into `_auth` (the MCP server's startup check and manifest, the admin tool).
+        Changes no other store behaviour."""
+        with self.connection() as c:
+            p = self._auth(c, token)
+        return {"actor": p["actor"], "operator": p["operator"], "roles": list(p["roles"]), "namespaces": list(p["namespaces"]),
+                "daily_write_limit": p["daily_write_limit"]}
+
+    def _read_principal(self, c, token):
+        return self._auth(c, token) if token else None
+
+    def _can_read(self, r, principal):
+        return r["visibility"] == "public" or (principal and r["namespace"] in principal["namespaces"])
+
+    def _raw(self, c, target, principal=None, current=False):
+        t = Ref.model_validate(target).model_dump()
+        row = c.execute("SELECT envelope FROM record_versions WHERE namespace=%s AND kind=%s AND record_id=%s AND version=%s",
+                        (t["namespace"], t["kind"], t["id"], t["version"])).fetchone()
+        if row is None or not self._can_read(row["envelope"], principal):
+            raise Missing("Exact record version unavailable")
+        if current:
+            head = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
+                             (t["namespace"], t["kind"], t["id"])).fetchone()
+            if head is None or head["version"] != t["version"]:
+                raise Conflict("Stale or forked target version")
+        return row["envelope"]
+
+    @staticmethod
+    def _artifact_listed(evidence, sha256):
+        return any(a.get("sha256") == sha256 for a in (evidence["payload"].get("artifacts") or []))
+
+    def _validate_discussion_refs(self, c, record, principal):
+        """Project and Annotation pins. Exact versions must exist and be readable by the author, but need NOT be heads: a
+        discussion may concern a superseded version and a Project pin says exactly which version it means. A PUBLIC record may
+        reference only PUBLIC records, so a public Project/Annotation cannot disclose a private record's coordinates."""
+        found = {}
+        for relation, target in references(record):
+            referenced = self._raw(c, target, principal, current=False)
+            if record["visibility"] == "public" and referenced["visibility"] != "public":
+                raise Conflict(f"A public {record['kind']} may reference only public records")
+            found[(relation, target["version"])] = referenced
+        pl = record["payload"]
+        if record["kind"] == "Project":
+            for m in pl["members"]:
+                art = m.get("artifact")
+                if art and not self._artifact_listed(found[("project_member_artifact", art["evidence"]["version"])], art["sha256"]):
+                    raise Conflict("Pinned artifact digest is not listed by that Evidence version")
+            return
+        anchor = pl["anchor"]
+        anchored = found[("annotates", anchor["record"]["version"])]
+        design_review = pl.get("design_review")
+        if design_review is not None:
+            if anchored["kind"] != "Project":
+                raise Conflict("A structured design review must anchor an exact Project version")
+            member_index = design_review.get("member_index")
+            if member_index is not None and member_index >= len(anchored["payload"]["members"]):
+                raise Conflict("Design-review member_index is outside the pinned Project member list")
+        art = anchor.get("artifact")
+        if art and not self._artifact_listed(found[("annotates_artifact", art["evidence"]["version"])], art["sha256"]):
+            raise Conflict("Anchored artifact digest is not listed by that Evidence version")
+        if pl.get("reply_to"):
+            replied = found[("replies_to", pl["reply_to"]["version"])]
+            same = {k: replied["payload"]["anchor"]["record"][k] for k in ("namespace", "kind", "id")} == \
+                {k: anchor["record"][k] for k in ("namespace", "kind", "id")}
+            if not same:
+                raise Conflict("A reply must anchor the same record as the annotation it answers")
+            if replied["payload"].get("design_review") is not None and replied["payload"]["anchor"]["record"] != anchor["record"]:
+                raise Conflict("A design-review reply must anchor the same exact Project version")
+        edit = pl.get("proposed_edit")
+        if edit and re.split(r"[.\[]", edit["target_path"])[0] not in anchored["payload"]:
+            raise Conflict("Proposed edit path must start at a top-level payload field of the anchored record")
+
+    def _validate_refs(self, c, record, principal, current=True):
+        if record["kind"] in ("Project", "Annotation"):
+            return self._validate_discussion_refs(c, record, principal)
+        for relation, target in references(record):
+            referenced = self._raw(c, target, principal, current=current)
+            if record["kind"] == "Evidence" and relation == "produced_by":
+                if referenced["payload"]["target"] != record["payload"]["target"]:
+                    raise Conflict("Producing action and evidence must pin the same target")
+            # An action needs acceptance criteria, falsifiers, a next action and a stop bound.
+            # A `recorded` problem has none of them, so there is nothing to execute or to stop.
+            if record["kind"] == "Action" and relation == "targets" and referenced["kind"] == "Problem":
+                if referenced["payload"].get("completeness") == "recorded":
+                    raise Conflict("Target problem is recorded, not actionable; supply the four actionability fields first")
+
+    def _write(self, token, key, request, role, operation):
+        if not isinstance(key, str) or not re.fullmatch(r"[A-Za-z0-9_.:-]{1,128}", key):
+            raise FrontierError("Bounded idempotency key required")
+        fingerprint = digest(request)
+        with self.connection() as c:
+            # Lock first; checks, state change, event and response commit together.
+            c.execute("SELECT singleton FROM node_config WHERE singleton=1 FOR UPDATE")
+            p = self._auth(c, token, role)
+            if self.namespace not in p["namespaces"]:
+                raise Forbidden("Operator cannot write this namespace")
+            prior = c.execute("SELECT request_hash,response FROM idempotency WHERE actor=%s AND key=%s", (p["actor"], key)).fetchone()
+            if prior:
+                if prior["request_hash"] != fingerprint:
+                    raise Conflict("Idempotency key already used for a different request")
+                return prior["response"]
+            n = c.execute("SELECT count(*) AS n FROM write_receipts WHERE operator=%s AND witnessed_at > CURRENT_TIMESTAMP - INTERVAL '1 day'", (p["operator"],)).fetchone()["n"]
+            if n >= p["daily_write_limit"]:
+                raise Forbidden("Operator daily write quota exhausted")
+            result = operation(c, p)
+            c.execute("INSERT INTO write_receipts(actor,operator,witnessed_at) VALUES (%s,%s,CURRENT_TIMESTAMP)", (p["actor"], p["operator"]))
+            c.execute("INSERT INTO idempotency VALUES (%s,%s,%s,%s,CURRENT_TIMESTAMP)", (p["actor"], key, fingerprint, Jsonb(result)))
+            return result
+
+    def _insert(self, c, record, p, status="proposed", set_head=True):
+        c.execute("INSERT INTO record_versions VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)",
+                  (record["version"], record["namespace"], record["kind"], record["id"], record["issuer"], record["source_uri"],
+                   record["visibility"], record["predecessor"], record["created_at"], Jsonb(record),
+                   (record["id"] + " " + canonical(record["payload"])).lower()))
+        c.execute("INSERT INTO local_states VALUES (%s,%s,%s,%s,%s,CURRENT_TIMESTAMP)",
+                  (record["version"], status, POLICY, p["actor"], p["operator"]))
+        if set_head:
+            c.execute("INSERT INTO heads VALUES (%s,%s,%s,%s) ON CONFLICT(namespace,kind,record_id) DO UPDATE SET version=EXCLUDED.version",
+                      (record["namespace"], record["kind"], record["id"], record["version"]))
+        for relation, target in references(record):
+            c.execute("INSERT INTO typed_edges VALUES (%s,%s,%s,%s,%s,%s) ON CONFLICT DO NOTHING",
+                      (record["version"], relation, target["namespace"], target["kind"], target["id"], target["version"]))
+        if record["kind"] == "Action":
+            c.execute("INSERT INTO action_state(version,state,updated_at) VALUES (%s,'proposed',CURRENT_TIMESTAMP)", (record["version"],))
+
+    def _event(self, c, event_type, record, p, details=None):
+        event = make_record(Draft(namespace=self.namespace, kind="Event", id=str(uuid4()), issuer=p["actor"],
+                                 source_uri="urn:frontier:local-transaction", visibility=record["visibility"], payload={
+                                     "event_type": event_type, "target": ref(record), "actor": p["actor"], "operator": p["operator"],
+                                     "witnessed_at": now(), "details": details or {}}))
+        self._insert(c, event, p)
+        c.execute("INSERT INTO events(event_version,event_type,target_version,actor,operator,witnessed_at) VALUES (%s,%s,%s,%s,%s,%s)",
+                  (event["version"], event_type, record["version"], p["actor"], p["operator"], event["payload"]["witnessed_at"]))
+
+    def submit(self, token: str, key: str, draft: dict):
+        d = Draft.model_validate(draft)
+        if d.kind == "Event":
+            raise Forbidden("Events are emitted only by transactions")
+
+        def operation(c, p):
+            if d.namespace != self.namespace or d.issuer != p["actor"]:
+                raise Forbidden("Issuer and namespace must match authenticated actor and node")
+            head = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
+                             (d.namespace, d.kind, d.id)).fetchone()
+            expected = head["version"] if head else None
+            if d.predecessor != expected:
+                raise Conflict("Stale predecessor; supply exact current version")
+            if d.kind == "Action" and head:
+                state = c.execute("SELECT state FROM action_state WHERE version=%s", (expected,)).fetchone()["state"]
+                if state not in {"proposed", "ready", "cancelled", "failed", "expired"}:
+                    raise Conflict("Cannot revise an action with active or completed execution")
+            record = make_record(d)
+            _refuse_unlicensed(_unlicensed_available_content([record]), "store")
+            self._validate_refs(c, record, p)
+            self._insert(c, record, p)
+            self._event(c, "record_proposed", record, p)
+            return {"record": record, "local_status": "proposed", "artifact_bytes_verified": False}
+        return self._write(token, key, {"op": "submit", "draft": draft}, "contributor", operation)
+
+    def get(self, target: dict, token: str | None = None):
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            record = self._raw(c, target, p)
+            state = c.execute("SELECT status,policy_version FROM local_states WHERE version=%s", (record["version"],)).fetchone()
+            action = c.execute("SELECT state,lease_until FROM action_state WHERE version=%s", (record["version"],)).fetchone()
+            head = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
+                             (record["namespace"], record["kind"], record["id"])).fetchone()
+            _refuse_unlicensed(_unlicensed_available_content([record]), "serve")
+            return {"record": record, "local_review": state, "is_head": bool(head and head["version"] == record["version"]),
+                    "action": {"state": action["state"], "lease_until": action["lease_until"].isoformat() if action["lease_until"] else None} if action else None}
+
+    def search(self, query="", kind=None, status=None, limit=20, after="", token=None):
+        if len(query) > 200 or not 1 <= limit <= 50 or len(after) > 64 or (after and not re.fullmatch(r"[0-9a-f]{64}", after)):
+            raise FrontierError("Invalid bounded search parameters")
+        if kind and kind not in KINDS:
+            raise FrontierError("Unknown kind")
+        if status and status not in {"proposed", "imported_unreviewed", "accepted", "disputed", "rejected"}:
+            raise FrontierError("Unknown review status")
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            args = [after, Jsonb(p["namespaces"] if p else []), query.lower(), query.lower(), kind, kind, status, status, limit + 1]
+            rows = c.execute("""SELECT v.envelope,s.status FROM record_versions v JOIN local_states s USING(version)
+                JOIN heads h ON h.version=v.version
+                WHERE v.version>%s AND (v.visibility='public' OR %s::jsonb ? v.namespace)
+                AND (%s='' OR position(%s in v.search_text)>0)
+                AND (%s::text IS NULL OR v.kind=%s) AND (%s::text IS NULL OR s.status=%s)
+                ORDER BY v.version LIMIT %s""", args).fetchall()
+            results = [{"ref": ref(r["envelope"]), "issuer": r["envelope"]["issuer"], "source_uri": r["envelope"]["source_uri"],
+                        "title": r["envelope"]["payload"].get("title", r["envelope"]["id"]), "local_status": r["status"],
+                        "why_matched": "all within filters" if not query else "literal text match: " + query} for r in rows[:limit]]
+            return {"results": results, "next_cursor": results[-1]["ref"]["version"] if len(rows) > limit else None,
+                    "search_kind": "bounded literal lexical retrieval; relevance is not truth"}
+
+    def neighborhood(self, target, limit=20, token=None):
+        if not 1 <= limit <= 50:
+            raise FrontierError("Limit must be 1..50")
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            record = self._raw(c, target, p)
+            rows = c.execute("""SELECT e.*,v.envelope FROM typed_edges e
+                JOIN record_versions v ON v.version=e.source_version
+                WHERE (source_version=%s OR target_version=%s)
+                  AND (v.visibility='public' OR %s::jsonb ? v.namespace)
+                ORDER BY source_version,target_version LIMIT %s""",
+                (record["version"], record["version"], Jsonb(p["namespaces"] if p else []), limit + 1)).fetchall()
+            edges = []
+            for row in rows[:limit]:
+                dest = {"namespace": row["target_namespace"], "kind": row["target_kind"], "id": row["target_id"], "version": row["target_version"]}
+                try:
+                    self._raw(c, dest, p)
+                except Missing:
+                    continue
+                edges.append({"source": ref(row["envelope"]), "relation": row["relation"], "target": dest})
+            return {"edges": edges, "truncated": len(rows) > limit, "depth": 1,
+                    "limit": "Typed one-hop relations, including disputed assessments; no implicit support inference."}
+
+    def _edge_heads(self, c, p, relation, kind, target, all_versions, limit, offset=0):
+        """Head records of `kind` that point at `target` through `relation` (typed edges only, no inference)."""
+        return c.execute("""SELECT v.envelope,s.status FROM typed_edges e
+            JOIN record_versions v ON v.version=e.source_version AND v.kind=%s
+            JOIN heads h ON h.version=v.version JOIN local_states s ON s.version=v.version
+            WHERE e.relation=%s AND ((NOT %s AND e.target_version=%s)
+               OR (%s AND e.target_namespace=%s AND e.target_kind=%s AND e.target_id=%s))
+              AND (v.visibility='public' OR %s::jsonb ? v.namespace)
+            ORDER BY v.created_at,v.version LIMIT %s OFFSET %s""",
+            (kind, relation, all_versions, target["version"], all_versions, target["namespace"], target["kind"], target["id"],
+             Jsonb(p["namespaces"] if p else []), limit, offset)).fetchall()
+
+    def _discussion_rows(self, rows):
+        out, withheld = [], 0
+        for r in rows:
+            if _unlicensed_available_content([r["envelope"]]):
+                withheld += 1
+                continue
+            out.append({"record": r["envelope"], "ref": ref(r["envelope"]), "issuer": r["envelope"]["issuer"],
+                        "local_status": r["status"]})
+        return out, withheld
+
+    def head_ref(self, kind: str, record_id: str, token: str | None = None, namespace: str | None = None):
+        """Exact ref of the CURRENT head of one record id in a namespace (default: this node), visibility-checked. Read-only.
+        Used to re-pin a project draft written against another namespace; it substitutes nothing silently."""
+        r = Ref(namespace=namespace or self.namespace, kind=kind, id=record_id, version="0" * 64)
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            row = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
+                            (r.namespace, r.kind, r.id)).fetchone()
+            if row is None:
+                raise Missing("No such record head")
+            target = {"namespace": r.namespace, "kind": r.kind, "id": r.id, "version": row["version"]}
+            self._raw(c, target, p)
+            return {"ref": target}
+
+    def annotations_for(self, target: dict, token: str | None = None, limit: int = 50, all_versions: bool = False, offset: int = 0):
+        """Current annotation heads anchored at an exact version (or at any version of that record id). Read-only; replies are
+        linked by `payload.reply_to`, threading is a display concern. An annotation is not acceptance and not an answer."""
+        if not 1 <= limit <= 100 or type(offset) is not int or not 0 <= offset <= 10000:
+            raise FrontierError("Limit must be 1..100 and offset must be 0..10000")
+        t = Ref.model_validate(target).model_dump()
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            self._raw(c, t, p)
+            rows = self._edge_heads(c, p, "annotates", "Annotation", t, all_versions, limit + 1, offset)
+            page = rows[:limit]
+            out, withheld = self._discussion_rows(page)
+            truncated = len(rows) > limit
+            scanned = len(page)
+            return {"target": t, "all_versions": all_versions, "annotations": out, "withheld_unlicensed": withheld,
+                    "truncated": truncated, "scanned": scanned,
+                    "next_offset": offset + scanned if truncated else None,
+                    "limit": "Current heads only. Author is the authenticated issuer; no field records an answer by anyone else."}
+
+    def projects_for(self, target: dict, token: str | None = None, limit: int = 50, all_versions: bool = False):
+        """Current Project heads that pin the exact version (or any version of the record id) as a member."""
+        if not 1 <= limit <= 100:
+            raise FrontierError("Limit must be 1..100")
+        t = Ref.model_validate(target).model_dump()
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            self._raw(c, t, p)
+            out, withheld = self._discussion_rows(self._edge_heads(c, p, "project_member", "Project", t, all_versions, limit))
+            return {"target": t, "all_versions": all_versions, "projects": out, "withheld_unlicensed": withheld,
+                    "limit": "Membership is a declared pin; it does not establish that the record applies or is accepted."}
+
+    def project_members(self, project: dict, token: str | None = None):
+        """Each pinned member with its availability, whether the pin is the current head, and its LOCAL review status."""
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            record = self._raw(c, project, p)
+            if record["kind"] != "Project":
+                raise FrontierError("Not a Project")
+            rows = []
+            for i, m in enumerate(record["payload"]["members"]):
+                pin = m["ref"]
+                try:
+                    self._raw(c, pin, p)
+                except Missing:
+                    rows.append({"index": i, "pin": pin, "available": False, "is_current": None, "current_version": None,
+                                 "local_status": None})
+                    continue
+                head = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
+                                 (pin["namespace"], pin["kind"], pin["id"])).fetchone()
+                st = c.execute("SELECT status FROM local_states WHERE version=%s", (pin["version"],)).fetchone()
+                rows.append({"index": i, "pin": pin, "available": True, "current_version": head["version"] if head else None,
+                             "is_current": bool(head and head["version"] == pin["version"]),
+                             "local_status": st["status"] if st else None})
+            return {"project": ref(record), "members": rows,
+                    "limit": "Pins are exact versions; a newer head is reported, never substituted."}
+
+    def review(self, token, key, assessment: dict):
+        a = Assessment.model_validate(assessment)
+        if a.decision == "unreviewed":
+            raise FrontierError("A review requires an explicit decision")
+
+        def operation(c, p):
+            target = self._raw(c, a.target.model_dump(), p, current=True)
+            state = c.execute("SELECT submitter_operator FROM local_states WHERE version=%s", (target["version"],)).fetchone()
+            if target["issuer"] == p["actor"] or state["submitter_operator"] == p["operator"]:
+                raise Forbidden("Independent operator review required")
+            if any(d.reviewer != p["actor"] for d in a.dimensions.values()):
+                raise Forbidden("Dimension reviewer must match authenticated reviewer")
+            if a.decision == "accepted":
+                if any(d.status not in {"passed", "not_applicable"} for d in a.dimensions.values()):
+                    raise Conflict("Unreviewed, failed or insufficient dimensions cannot be accepted")
+                if any(a.dimensions[k].status != "passed" for k in ("target_fidelity", "applicability")):
+                    raise Conflict("Acceptance requires target fidelity and applicability to pass")
+            self._validate_refs(c, target, p)
+            draft = Draft(namespace=self.namespace, kind="Assessment", id=str(uuid4()), issuer=p["actor"],
+                          source_uri="urn:frontier:local-review", visibility=target["visibility"], payload=a.model_dump())
+            review = make_record(draft)
+            self._validate_refs(c, review, p)
+            if target["kind"] == "Action":
+                action = c.execute("SELECT state,lease_operator FROM action_state WHERE version=%s", (target["version"],)).fetchone()
+                if action["state"] != "submitted" or action["lease_operator"] == p["operator"]:
+                    raise Conflict("Only submitted work reviewed by a separate operator can be adjudicated")
+                self._event(c, "action_reviewed", target, p, {"assessment": ref(review)})
+                action_status = {"accepted": "accepted", "disputed": "disputed", "rejected": "failed"}[a.decision]
+                c.execute("UPDATE action_state SET state=%s,updated_at=CURRENT_TIMESTAMP WHERE version=%s", (action_status, target["version"]))
+                self._event(c, "action_" + action_status, target, p)
+            self._insert(c, review, p)
+            c.execute("INSERT INTO reviews VALUES (%s,%s,%s,%s,%s,%s,CURRENT_TIMESTAMP)",
+                      (review["version"], target["version"], p["actor"], p["operator"], a.decision, POLICY))
+            c.execute("UPDATE local_states SET status=%s,updated_at=CURRENT_TIMESTAMP WHERE version=%s", (a.decision, target["version"]))
+            self._event(c, "review_recorded", target, p, {"assessment": ref(review)})
+            self._event(c, "acceptance_changed", target, p, {"status": a.decision, "policy_version": POLICY})
+            return {"assessment": review, "local_status": a.decision, "policy_version": POLICY}
+        return self._write(token, key, {"op": "review", "assessment": assessment}, "reviewer", operation)
+
+    def transition(self, token, key, target, state, lease_id=None):
+        if state not in {"ready", "running", "submitted", "blocked", "cancelled", "failed"}:
+            raise FrontierError("Unsupported transition; reviews control acceptance")
+
+        def operation(c, p):
+            record = self._raw(c, target, p, current=True)
+            if record["kind"] != "Action" or record["namespace"] != self.namespace:
+                raise Conflict("Only locally owned Action versions can execute")
+            current = c.execute("SELECT * FROM action_state WHERE version=%s", (record["version"],)).fetchone()
+            if state == "ready":
+                if (record["payload"].get("proposal") or {}).get("intent") == "plan":
+                    raise Conflict("A plan describes work; authorize and lease its individual steps")
+                if "coordinator" not in p["roles"] or current["state"] not in {"proposed", "blocked", "expired"}:
+                    raise Forbidden("Coordinator readiness gate required")
+                self._validate_refs(c, record, p)
+            elif state in {"blocked", "cancelled", "failed"} and "coordinator" in p["roles"]:
+                if current["state"] in {"accepted", "disputed", "failed", "cancelled"}:
+                    raise Conflict("Terminal action cannot transition")
+            else:
+                if current["lease_actor"] != p["actor"] or lease_id != current["lease_id"]:
+                    raise Forbidden("Lease owner and exact lease ID required")
+                live = c.execute("SELECT %s::timestamptz > CURRENT_TIMESTAMP AS live", (current["lease_until"],)).fetchone()["live"]
+                if not live:
+                    raise Conflict("Lease expired")
+                allowed = {"leased": {"running", "blocked", "failed", "cancelled"}, "running": {"submitted", "blocked", "failed", "cancelled"}}
+                if state not in allowed.get(current["state"], set()):
+                    raise Conflict("Invalid action lifecycle transition")
+            c.execute("UPDATE action_state SET state=%s,updated_at=CURRENT_TIMESTAMP WHERE version=%s", (state, record["version"]))
+            self._event(c, "action_" + state, record, p)
+            return {"target": target, "state": state}
+        return self._write(token, key, {"op": "transition", "target": target, "state": state, "lease_id": lease_id}, "contributor", operation)
+
+    def lease(self, token, key, target, seconds=60):
+        if not isinstance(seconds, int) or isinstance(seconds, bool) or not 1 <= seconds <= 600:
+            raise FrontierError("Lease duration must be 1..600 seconds")
+
+        def operation(c, p):
+            record = self._raw(c, target, p, current=True)
+            if record["kind"] != "Action" or record["namespace"] != self.namespace:
+                raise Conflict("Only local Action versions can be leased")
+            if (record["payload"].get("proposal") or {}).get("intent") == "plan":
+                raise Conflict("A plan describes work; authorize and lease its individual steps")
+            self._validate_refs(c, record, p)
+            prior = c.execute("SELECT state,lease_until FROM action_state WHERE version=%s", (record["version"],)).fetchone()
+            lease_id = str(uuid4())
+            won = c.execute("""UPDATE action_state SET state='leased',lease_id=%s,lease_actor=%s,lease_operator=%s,
+                lease_until=CURRENT_TIMESTAMP + %s * INTERVAL '1 second',updated_at=CURRENT_TIMESTAMP
+                WHERE version=%s AND (state IN ('ready','expired') OR (state IN ('leased','running') AND lease_until<=CURRENT_TIMESTAMP))
+                RETURNING lease_until""", (lease_id, p["actor"], p["operator"], seconds, record["version"])).fetchone()
+            if not won:
+                raise Conflict("Action unavailable or lease already held")
+            if prior["state"] in {"leased", "running"}:
+                self._event(c, "action_expired", record, p, {"expired_at": prior["lease_until"].isoformat()})
+            self._event(c, "action_leased", record, p, {"lease_id": lease_id, "lease_until": won["lease_until"].isoformat()})
+            return {"target": target, "state": "leased", "lease_id": lease_id, "lease_until": won["lease_until"].isoformat()}
+        return self._write(token, key, {"op": "lease", "target": target, "seconds": seconds}, "contributor", operation)
+
+    def export_bundle(self, targets, token=None):
+        if not 1 <= len(targets) <= MAX_BUNDLE_RECORDS:
+            raise FrontierError("Export requires 1..100 explicit versions; dependencies are not silently expanded")
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            records = [self._raw(c, target, p) for target in targets]
+            versions = [r["version"] for r in records]
+            rows = c.execute("SELECT assessment_version,target_version,reviewer,operator,decision,policy_version,witnessed_at FROM reviews WHERE target_version=ANY(%s) ORDER BY assessment_version LIMIT 101", (versions,)).fetchall()
+            claims = [{**r, "witnessed_at": r["witnessed_at"].isoformat()} for r in rows]
+            if len(claims) > 100:
+                raise FrontierError("Too many review receipts for one bundle")
+            # Preserve complete dimensional reviews, bounded with the selected records.
+            for review in rows:
+                if review["assessment_version"] not in versions:
+                    assessment = c.execute("SELECT envelope FROM record_versions WHERE version=%s", (review["assessment_version"],)).fetchone()["envelope"]
+                    if self._can_read(assessment, p):
+                        records.append(assessment)
+                        versions.append(assessment["version"])
+            if len(records) > MAX_BUNDLE_RECORDS:
+                raise FrontierError("Selected records plus dimensional reviews exceed 100-record bundle limit")
+            _refuse_unlicensed(_unlicensed_available_content(records), "export")
+            body = {"schema_version": "frontier-bundle-0.1", "exporting_node": self.namespace,
+                    "records": records, "review_claims": claims, "policy_version": POLICY,
+                    "trust": "Digest proves integrity only; reviews require receiving-node policy."}
+            bundle = {**body, "bundle_sha256": digest(body)}
+            if len(canonical(bundle).encode()) > MAX_BUNDLE_BYTES:
+                raise FrontierError("Bundle exceeds byte limit")
+            return bundle
+
+    def import_bundle(self, token, key, bundle):
+        if len(canonical(bundle).encode()) > MAX_BUNDLE_BYTES:
+            raise FrontierError("Bundle exceeds byte limit")
+        if set(bundle) != {"schema_version", "exporting_node", "records", "review_claims", "policy_version", "trust", "bundle_sha256"}:
+            raise FrontierError("Unknown bundle fields")
+        if bundle["schema_version"] != "frontier-bundle-0.1" or digest({k:v for k,v in bundle.items() if k != "bundle_sha256"}) != bundle["bundle_sha256"]:
+            raise FrontierError("Bundle digest or version mismatch")
+        if not 1 <= len(bundle["records"]) <= MAX_BUNDLE_RECORDS or len(bundle["review_claims"]) > 100:
+            raise FrontierError("Bundle record/review limit exceeded")
+        records = [Record.model_validate(r).model_dump() for r in bundle["records"]]
+        # A peer's assertion that it holds content does not give US the right to hold it.
+        _refuse_unlicensed(_unlicensed_available_content(records), "import")
+
+        def operation(c, p):
+            inserted, forks = [], []
+            for record in records:
+                if c.execute("SELECT 1 FROM record_versions WHERE version=%s", (record["version"],)).fetchone():
+                    continue
+                head = c.execute("SELECT version FROM heads WHERE namespace=%s AND kind=%s AND record_id=%s",
+                                 (record["namespace"], record["kind"], record["id"])).fetchone()
+                self._insert(c, record, p, status="imported_unreviewed", set_head=head is None)
+                self._event(c, "record_imported", record, p, {"bundle_sha256": bundle["bundle_sha256"], "issuer_authenticated": False})
+                inserted.append(ref(record))
+                if head:
+                    fork = {"local_version": head["version"], "imported_version": record["version"]}
+                    c.execute("INSERT INTO forks VALUES (%s,%s,%s,%s,%s)", (record["namespace"], record["kind"], record["id"], head["version"], record["version"]))
+                    self._event(c, "fork_detected", record, p, fork)
+                    forks.append(fork)
+            for claim in bundle["review_claims"]:
+                # Stored as an untrusted source assertion, never in local reviews/auth.
+                c.execute("INSERT INTO imported_review_claims VALUES (%s,%s,%s,CURRENT_TIMESTAMP) ON CONFLICT DO NOTHING",
+                          (digest({"node": bundle["exporting_node"], "claim": claim}), bundle["exporting_node"], Jsonb(claim)))
+            return {"inserted": inserted, "forks": forks, "imported_reviews_are_local_authority": False}
+        return self._write(token, key, {"op": "import", "bundle_sha256": bundle["bundle_sha256"]}, "coordinator", operation)
+
+    def events(self, after=0, limit=20, token=None):
+        if not isinstance(after, int) or after < 0 or not 1 <= limit <= 50:
+            raise FrontierError("Invalid event cursor/limit")
+        with self.connection() as c:
+            p = self._read_principal(c, token)
+            rows = c.execute("""SELECT e.sequence,v.envelope FROM events e JOIN record_versions v ON v.version=e.event_version
+                WHERE e.sequence>%s AND (v.visibility='public' OR %s::jsonb ? v.namespace)
+                ORDER BY e.sequence LIMIT %s""", (after, Jsonb(p["namespaces"] if p else []), limit + 1)).fetchall()
+            return {"events": rows[:limit], "next_cursor": rows[limit-1]["sequence"] if len(rows) > limit else None}

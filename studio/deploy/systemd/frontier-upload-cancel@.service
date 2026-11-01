@@ -1,0 +1,13 @@
+[Unit]
+Description=Cancel expired Frontier object-scoped upload capabilities (%i)
+
+[Service]
+Type=oneshot
+WorkingDirectory=/data/worktrees/delphi-frontier/infra-director
+ExecStart=/home/ubuntu/miniconda3/bin/python -m frontier_compute.resumable_upload cancel-due /data/artifacts/delphi-evolve-rethink/gcp/upload-capabilities/%i.json
+TimeoutStartSec=90
+CPUQuota=20%
+MemoryMax=256M
+MemorySwapMax=0
+TasksMax=32
+NoNewPrivileges=true

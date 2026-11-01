@@ -1,0 +1,41 @@
+{
+  "schema": "frontier.cfd.hardware-calibration/1",
+  "frozen_utc": "2026-11-01T02:07:56.932157+00:00",
+  "source_archive": "artifacts/gcp/cfd-r2-l4/payload.tar.xz",
+  "source_sha256": "751a23c334b15cb3913441ef41b617b9d45502434527530d9805d6691dec0153",
+  "source_commit": "a40312ced2a4f629f000234366162bd3f966140b",
+  "source_members_verified": 9,
+  "declared_stages": [
+    "telemetry",
+    "julia",
+    "env",
+    "restart_check",
+    "platform",
+    "calibration",
+    "output"
+  ],
+  "excluded_stages": [
+    "cases",
+    "eval"
+  ],
+  "one_gpu": "NVIDIA H100",
+  "scientific_orchestrator_timeout_s": 2700,
+  "container_timeout": "75m",
+  "transport_part_cap_bytes": 12000000,
+  "original_l4_receipt": "results/resources/gcp/l4-calibration-completion.json",
+  "original_l4_ms_per_step": 86.213,
+  "original_l4_no_go_retained": true,
+  "unchanged_gate_parameters": true,
+  "comparison_outer_budget_s": 10800,
+  "scope": "Same-source numerical controls and hardware runtime/memory calibration only. No full R2 case, fish aerodynamics, or physical validation. Different hardware/runtime is the declared comparison.",
+  "expected_native_outcome": {
+    "10": "All selected controls/calibration complete but case collection deliberately empty; partial full-pipeline status preserved.",
+    "11": "Original calibration NO-GO rule; timing retained.",
+    "other_nonzero": "Failed control/exception/timeout retained."
+  },
+  "no_full_assay_until": [
+    "actual runtime and same-state controls reviewed",
+    "bounded coherent ~0.8GB checkpoint export established"
+  ],
+  "timeout_note": "Source has per-process-group RSS/wall watchdog; provider container timeout bounds entire allocation. Parent timeout may leave a source-capped child until its watchdog/provider teardown."
+}

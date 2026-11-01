@@ -1,0 +1,160 @@
+{
+ "claim": {
+  "id": "cantilever",
+  "source": {
+   "locator": "sources/cantilever_passage.txt",
+   "ref": "https://en.wikipedia.org/wiki/Euler%E2%80%93Bernoulli_beam_theory ; https://pmc.ncbi.nlm.nih.gov/articles/PMC2359861/",
+   "text_sha256": "d186bf0a66a2f9716ce0e25b8f26417ad2e086743d1f426c0d34b0e6a92b3344"
+  },
+  "text": "Tip deflection of a clamped-free beam under a point load P at the free end is w_C = P L^3 / (3 E I); the fin-ray uses E ~ 1e8-1e9 N m^-2 and I ~ 1e-6 cm^4 (Alben et al. 2007)."
+ },
+ "options": {
+  "controls": true,
+  "lean_statement": true
+ },
+ "proposal": {
+  "assumptions": [
+   {
+    "id": "A1",
+    "kind": "modelling",
+    "text": "Converted I from cm^4 to m^4: 10^-6 cm^4 = 10^-6 * (10^-2 m)^4 = 10^-14 m^4."
+   },
+   {
+    "id": "A2",
+    "kind": "modelling",
+    "text": "The passage equates B to EI."
+   }
+  ],
+  "constraints": [
+   {
+    "dimension_check": true,
+    "expr": {
+     "lhs": "w_C",
+     "op": "==",
+     "rhs": {
+      "args": [
+       {
+        "args": [
+         "P",
+         {
+          "base": "L",
+          "exp": 3,
+          "op": "pow"
+         }
+        ],
+        "op": "*"
+       },
+       "3"
+      ],
+      "op": "/"
+     }
+    },
+    "id": "C1",
+    "kind": "equality",
+    "source_ref": "w_C = PL^3 / (3EI)"
+   },
+   {
+    "dimension_check": true,
+    "expr": {
+     "lhs": "B",
+     "op": "==",
+     "rhs": {
+      "args": [
+       "E",
+       "I"
+      ],
+      "op": "*"
+     }
+    },
+    "id": "C2",
+    "kind": "equality",
+    "source_ref": "B = EI"
+   }
+  ],
+  "source_mapping": [
+   {
+    "element": "C1",
+    "locator": "Wikipedia Euler-Bernoulli beam theory",
+    "quote": "w_C = \\tfrac{PL^3}{3EI}"
+   },
+   {
+    "element": "C2",
+    "locator": "Alben et al. 2007 Section 3",
+    "quote": "B = EI"
+   }
+  ],
+  "symbols": [
+   {
+    "domain": {
+     "hi": "1",
+     "hi_open": true,
+     "lo": "0",
+     "lo_open": false
+    },
+    "name": "w_C",
+    "source_ref": "tip deflection",
+    "status": "unknown",
+    "unit": "m"
+   },
+   {
+    "domain": {
+     "hi": "100",
+     "lo": "0",
+     "lo_open": true
+    },
+    "name": "P",
+    "source_ref": "range chosen by the proposer",
+    "status": "declared",
+    "unit": "N"
+   },
+   {
+    "domain": {
+     "hi": "10",
+     "lo": "0",
+     "lo_open": true
+    },
+    "name": "L",
+    "source_ref": "range chosen by the proposer",
+    "status": "declared",
+    "unit": "m"
+   },
+   {
+    "domain": {
+     "hi": "1e9",
+     "lo": "1e8"
+    },
+    "name": "E",
+    "source_ref": "Alben et al. 2007",
+    "status": "given",
+    "unit": "N m^-2"
+   },
+   {
+    "domain": {
+     "hi": "1e-14",
+     "lo": "1e-14"
+    },
+    "name": "I",
+    "source_ref": "Alben et al. 2007",
+    "status": "given",
+    "unit": "m^4"
+   },
+   {
+    "domain": {
+     "hi": "1e-5",
+     "lo": "1e-6"
+    },
+    "name": "B",
+    "source_ref": "Alben et al. 2007",
+    "status": "given",
+    "unit": "J m"
+   }
+  ],
+  "unresolved": [
+   {
+    "id": "U1",
+    "question": "The passage provides a range for B (10^-6 to 10^-5 J m) and E (10^8 to 10^9 N m^-2) but a single value for I (10^-6 cm^4). The product of the lower bounds of E and I (10^8 * 10^-14 = 10^-6) matches the lower bound of B, but the upper bound of B (10^-5) is not reached unless I or E varies further."
+   }
+  ]
+ },
+ "schema": "frontier.formalize.request/1"
+}

@@ -1,0 +1,66 @@
+{
+  "schema": "frontier.aeroelastic.fidelity-local-preflight/1",
+  "scope": "local preflight: original controls, main-lattice controls, one reproduced arm group; not the ladder",
+  "packet_sha256": "dacec9a5963c0a1e3c6520e465eb0444cf4f32c80b72d059310442c352a8a457",
+  "packet_source_commit": "34d400f208fbb7b36a912123f5814a82fa60c23f",
+  "run_from": "fresh extraction of the packet; no repository files on the path",
+  "command": "python -m engineering.aeroelastic.fidelity preflight --out <fresh dir>",
+  "exit_code": 0,
+  "environment": {
+    "python": "3.12.3",
+    "numpy": "2.5.4",
+    "scipy": "1.17.1",
+    "device": "CPU"
+  },
+  "resources": {
+    "systemd_scope": "TasksMax=128 MemoryMax=4G MemorySwapMax=0 RuntimeMaxSec=600 CPUQuota=100%",
+    "threads": 1,
+    "workers": 1
+  },
+  "wall_seconds": 11.757591310888529,
+  "output_bytes": 1158182,
+  "original_controls_passed": true,
+  "main_lattice_controls": {
+    "passed": true,
+    "count": 40,
+    "upstream_force_ratio": {
+      "pectoral_L": 0.01221898127982457,
+      "pectoral_R": 0.012218981279824348,
+      "pelvic_L": 0.017101886731132554,
+      "pelvic_R": 0.017101886731132998
+    },
+    "CL_per_rad": 3.5932939257778256
+  },
+  "reproduction_of_a54f478": [
+    {
+      "id": "chi0.8-u20-main-rigid",
+      "reference_sha256": "da76a669ae37cde951eddab2169ae3e56f0459a86c7d1ad11eb3f55f91276893",
+      "present": true,
+      "status_and_counts_equal": true,
+      "exact": true,
+      "within_roundoff": true,
+      "compared_values": 7
+    },
+    {
+      "id": "chi0.8-u20-main-one-way-frozen-load",
+      "reference_sha256": "75453d1831e411d29ebf7ce545a14c4715cec98ec141c2898dab295ec70a4f29",
+      "present": true,
+      "status_and_counts_equal": true,
+      "exact": false,
+      "within_roundoff": true,
+      "compared_values": 8
+    },
+    {
+      "id": "chi0.8-u20-main-two-way-static-feedback",
+      "reference_sha256": "d6191e5f7d28c3bb91685a7401b46fb9e4584e2f61438440d39f7b5a4f454791",
+      "present": true,
+      "status_and_counts_equal": true,
+      "exact": false,
+      "within_roundoff": true,
+      "compared_values": 24
+    }
+  ],
+  "earlier_attempt": "the first preflight of packet 9bcecc67 (commit 7fed229) exited 1 on zero_load_geometry_exact (normals compared bitwise); fixed in 34d400f before any ladder result",
+  "receipt_sha256": "036016f4b32f1a50a94f6f8689758cd2eaf76f4a541bd4bda70eede88e177720",
+  "no_ladder_result": "no 32x8, 36x9 or 64x16 arm was run locally"
+}

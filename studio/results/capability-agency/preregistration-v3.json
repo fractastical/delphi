@@ -1,0 +1,162 @@
+{
+  "schema": "frontier.capability-agency.preregistration/1",
+  "status": "FROZEN_BEFORE_MODEL_CALLS",
+  "registered_utc": "2026-10-31T23:00:46Z",
+  "experiment_id": "capability-agency-pilot-20261031-v3",
+  "supersedes": {
+    "experiment_id": "capability-agency-pilot-20261031-v2",
+    "preregistration_sha256": "efa1fce37e1e69bb69dd681d755f858042d5ad0c2de59c6b275fb8737c48c954",
+    "reason": "V2 completed 27 calls but all responses were truncated by default thinking under maxOutputTokens=400. V3 uses output budget 1200 and an exact-model-supported low thinking level, validated by a neutral JSON schema smoke test. V2 failures remain separately accounted and are not pooled."
+  },
+  "scope": "A small exploratory comparison of evidence synthesis and action selection across one serial analyst, three isolated specialists, and the same three specialists exchanging pinned notes.",
+  "claim_limit": "This pilot cannot establish a scaling law or general agent superiority. Task A's source states the core facts; the pilot measures evidence synthesis and verification, not discovery. All actor roles are fresh stateless calls to the same pinned model; role prompts do not establish cognitive independence or distinct-worker effects.",
+  "public_input_packet": "results/capability-agency/public_input_packet.json",
+  "model_access_probe": "results/capability-agency/gemini_model_probe.json",
+  "runner": "results/capability-agency/run_pilot.py --preregistration preregistration-v3.json",
+  "deterministic_scorer": "results/capability-agency/score_pilot.py --preregistration preregistration-v3.json",
+  "prompt_specification": "results/capability-agency/prompt_template-v3.md",
+  "privacy": {
+    "model_inputs": "The public input packet only. It contains open-access paper facts and deterministic arithmetic/unit outputs.",
+    "excluded": [
+      "private repository code",
+      "private prompts",
+      "credentials",
+      "unpublished model outputs",
+      "user or agent private context"
+    ],
+    "provider_data_class": "public",
+    "credential_handling": "Read only GEMINI_API_KEY from the existing mode-0600 Gemini env file; send it only in x-goog-api-key header; never put it in a URL, argv, prompt, log, or artifact."
+  },
+  "model_selection": {
+    "model": "models/gemini-3.8-flash",
+    "provider_route": "Google Generative Language API v1beta models/gemini-3.8-flash:generateContent; exact model ID pinned",
+    "catalog_observed_utc": "2026-10-31T22:46:09Z",
+    "live_catalog_context_tokens": 1048576,
+    "live_catalog_output_tokens": 65536,
+    "catalog_source": "https://generativelanguage.googleapis.com/v1beta/models",
+    "selection_reason": "The authenticated Google model list returned models/gemini-3.8-flash with generateContent support, 1,048,576 input tokens, and 65,536 output tokens. Exact-model behavior was tested with neutral schema calls: thinkingLevel=minimal is rejected; thinkingLevel=low is accepted. V3 therefore uses low thinking and maxOutputTokens=1200, retaining the same model and science tasks. USD pricing/actual charge are unknown because no billing meter is available. V2 failure receipts remain separate.",
+    "maximum_cost_usd": null,
+    "cost_basis": "Actual USD spend unavailable; do not report zero. Bounded request usage: 27 calls maximum, each with a 9,600-token input limit and 400-token output limit, for at most 270,000 configured input+output tokens. Provider usageMetadata is retained per call.",
+    "thinking_parameter_source": "https://ai.google.dev/api/generate-content and https://ai.google.dev/gemini-api/docs/generate-content/gemini-3",
+    "v2_failed_requests_retained": 27
+  },
+  "conditions": {
+    "single_serial_analyst": {
+      "calls_per_replicate": 3,
+      "actor_identity": "same stateless analyst role across three sequential calls",
+      "communication": "The analyst may see its own prior pinned JSON response in calls 2 and 3."
+    },
+    "isolated_specialists": {
+      "calls_per_replicate": 3,
+      "roles": [
+        "equation-and-numerical analysis",
+        "source-and-measurement provenance",
+        "mechanical coupling and next action"
+      ],
+      "actor_identity": "three fresh stateless role prompts to the same pinned model; no persistent session or distinct-model claim",
+      "communication": "Each specialist receives the full public input packet and the same tools, but no other specialist's response."
+    },
+    "collaborating_specialists": {
+      "calls_per_replicate": 3,
+      "roles": [
+        "equation-and-numerical analysis",
+        "source-and-measurement provenance",
+        "mechanical coupling and next action"
+      ],
+      "actor_identity": "three fresh stateless role prompts to the same pinned model; no persistent session or distinct-model claim",
+      "communication": "Specialist 2 receives specialist 1's SHA-pinned JSON; specialist 3 receives the exact SHA-pinned JSON from specialists 1 and 2. The actor chooses the next action in each response. This sequential exchange is the communication treatment."
+    }
+  },
+  "matched_budget_and_access": {
+    "repeats_per_condition": 3,
+    "tasks_per_response": 2,
+    "model_calls_per_condition": 9,
+    "total_model_calls": 27,
+    "model_and_parameters": {
+      "model": "models/gemini-3.8-flash",
+      "temperature": 0,
+      "max_tokens_per_call": 1200,
+      "seed_per_repeat": [
+        41031,
+        41032,
+        41033
+      ],
+      "thinking_level": "low"
+    },
+    "per_call_input_ceiling_tokens": 9600,
+    "per_call_output_ceiling_tokens": 1200,
+    "same_inputs_and_tools": "Every actor receives the identical full public packet and identical calculator/unit-algebra results. No source information is withheld from any condition. Peer/self artifacts are the only information difference in the communication treatment; their tokens count toward the same input ceiling. The runner rejects any rendered user prompt above 9,000 UTF-8 bytes before sending and requests maxOutputTokens=1200 with thinkingLevel=low; provider input/output token usage is retained, and any reported usage above its per-call ceiling is a protocol deviation.",
+    "condition_label": "Condition IDs are stored with results but omitted from model prompts. Isolated and collaborating specialist roles and turn numbers are identical; the only prompt difference is whether prior response artifacts are included.",
+    "tooling": "Two precomputed, deterministic tools in the packet: calculator-v1 and unit-algebra-v1. No web or other model calls are allowed during the pilot.",
+    "execution": "Serial calls; no retries, repair calls, or extra adjudication calls. A failed or malformed response consumes its scheduled slot and scores zero. The runner enforces a 9,000-byte rendered-prompt ceiling, requests at most 1,200 output tokens at thinkingLevel=low, reserves 10,800 tokens per call and 291,600 total. USD spend is unknown because no billing meter is available.",
+    "maximum_configured_total_tokens": 291600
+  },
+  "aggregation": {
+    "same_rule_for_all_conditions": true,
+    "numeric_fields": "median of valid replies; missing if no valid reply",
+    "boolean_and_categorical_fields": "strict majority; ties or fewer than two valid replies yield null",
+    "primary_comparison": "mean deterministic rubric score of the field-wise aggregate per replicate, then mean across three replicates",
+    "secondary": [
+      "mean per-reply deterministic score",
+      "turn 1-to-3 correction trajectory",
+      "number of prior response hashes actually passed to later calls",
+      "actual input/output/total tokens; USD charge unknown"
+    ],
+    "language_model_judging": false
+  },
+  "scoring": {
+    "maximum_per_task": 8,
+    "maximum_per_response": 16,
+    "task_a_checks": [
+      "published_fit_form exactly linear",
+      "exponential_log_form_directly_measured false",
+      "linear_factor_24h within 0.001 of 1.144",
+      "exponential_factor_24h within 0.001 of 1.154964",
+      "relative_difference_percent within 0.1 of 0.9588",
+      "uncertainty_bands_overlap true",
+      "synchrony_effect exactly impairs_growth",
+      "decision_code exactly keep_exponential_form_as_assumption_and_test_sensitivity"
+    ],
+    "task_b_checks": [
+      "pressure_width_product_unit exactly N/m",
+      "dimensions_are_compatible true",
+      "source_measured_bending_stiffness true",
+      "pressure_to_ray_load_calibration_in_source false",
+      "measured_EI_min_N_m2 within 1e-10 of 1.5e-9",
+      "measured_EI_max_N_m2 within 1e-10 of 4e-9",
+      "measurement_method exactly mechanical_force_deflection",
+      "decision_code exactly retain_as_assumption_until_hydrodynamic_load_is_measured_or_validated"
+    ],
+    "scoring_method": "Deterministic parser and exact-value/tolerance checks only. No text grading, model judge, or self-reported confidence."
+  },
+  "call_order_by_repeat": {
+    "repeat_1": [
+      "single_serial_analyst",
+      "isolated_specialists",
+      "collaborating_specialists"
+    ],
+    "repeat_2": [
+      "isolated_specialists",
+      "collaborating_specialists",
+      "single_serial_analyst"
+    ],
+    "repeat_3": [
+      "collaborating_specialists",
+      "single_serial_analyst",
+      "isolated_specialists"
+    ]
+  },
+  "outcome_reporting": [
+    "report every scheduled response, including errors and malformed JSON",
+    "report per-request token usage; USD spend is unknown",
+    "preserve null results and ties",
+    "do not claim statistical significance from three repeats",
+    "do not infer biological discovery or general scaling from this pilot"
+  ],
+  "neutral_smoke_tests": [
+    "results/capability-agency/neutral_schema_smoke.json",
+    "results/capability-agency/neutral_schema_smoke_attempt1.json",
+    "results/capability-agency/neutral_schema_smoke_attempt2.json"
+  ],
+  "separation": "V2 is a protocol-failure null run. V3 responses and scores must be analyzed separately; do not pool v2 and v3 scientific outcomes."
+}

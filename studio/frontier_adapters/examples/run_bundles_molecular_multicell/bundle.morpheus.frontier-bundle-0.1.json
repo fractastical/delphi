@@ -1,0 +1,675 @@
+{
+ "bundle_sha256": "d2327dc402488ee21d35739d0153e282943797b6b930e848f3dd7f8c4ca5ffb2",
+ "exporting_node": "node-a",
+ "policy_version": "frontier-independent-review-0.1",
+ "records": [
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-morpheus-claim-local-capped-arms",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "Source: Morpheus v2.3.9 `Examples/Multiscale/MultiscaleModel.xml`; upstream XML sha256 69030acf4467768a... and static binary sha256 3d9a6e5a4cb86824... are stated by the producer (BSD 3-clause).",
+     "Edits: version-2, surface-mode, log-states, frame-step, stop-time, seed; feedback-off additionally multiplies g_l by 0 inside the CDK1 equation only."
+    ],
+    "context": "A partial run reported as partial: within this short window and one seed each, the second division came earlier with the cytokine term in the CDK1 equation than without it. Whether feedback-off divides later or never was not run to the end.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "GENERIC Morpheus example (Ferrell-Tsai-Yang cell-cycle ODE + CPM + cytokine PDE); not calibrated to any fish, cell type or tissue; nothing here is fin growth. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "Upstream XML was edited by recorded exact-once replacements (including a hand-made version 1 to 2 fix); the model is not byte-for-byte the shipped one.",
+     "Units are the example's own; no dimensional mapping to seconds or micrometres.",
+     "One seed per arm; the seed repeat is a noise check on the CPM, not an independent replicate; no time-step or lattice refinement was run.",
+     "NOT COMPLETED: every arm ended by SIGTERM at the cap."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Summary: per-arm horizon, division events and each arm's manifest.",
+     "content_available": false,
+     "content_sha256": "6efa333106c5c82f218a08220b56226a9b973a3ed90a9dd66eb5fdedcdb33038",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/summary.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "All three local arms were stopped by the 600 s cap (SIGTERM, exit -15) before their configured stop of 0.6; the common reached horizon is t=0.456. At that horizon: baseline (feedback on, seed 3445) has 4 cells with division events at [0.166, 0.374]; feedback-off has 2 cells with division events at [0.166]; the seed repeat has 4 cells with division events at [0.166, 0.374]. No arm reached its configured stop, and the upstream example's own stop is 2.0.",
+    "title": "Morpheus generic multiscale example: three local arms were stopped by the time cap at t=0.456 and never completed"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "240b2a5187385ee78bbe45b01657c1366c9a1d438e9ef07961f60f05fd086b2f",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-morpheus-action-local-arms",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A clean re-execution from the pinned code reproduces the division-event times to the common horizon.",
+     "A full-horizon run (stop 0.6 or 2.0) completes with exit 0 before any conclusion about feedback-off is drawn."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f; run_morpheus.py 5252a2d365cd",
+     "environment": "binary sha256 3d9a6e5a4cb86824...; 1 CPU quota, TasksMax 128, MemoryMax 4G, RuntimeMaxSec 600; OMP_NUM_THREADS not applied",
+     "input": "upstream XML sha256 69030acf4467768a5388eb369a4dde3b4cbaba19502a7ce2ca069c745dd9c6fe; per-arm model.xml baseline:f2a309b9bd, nofeedback:381514e051, seed2:ad817057e3",
+     "model": "Morpheus v2.3.9 cell-cycle ODE + CPM + cytokine PDE (no language model)",
+     "parameters": "baseline: seed 3445, feedback True, stop 0.6; nofeedback: seed 3445, feedback False, stop 0.6; seed2: seed 7, feedback True, stop 0.6",
+     "scope": "generic multiscale example; partial window only",
+     "target": "240b2a5187385ee78bbe45b01657c1366c9a1d438e9ef07961f60f05fd086b2f"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "Morpheus v2.3.9 static binary; gnuplot for frames"
+    ],
+    "target": {
+     "id": "run-morpheus-claim-local-capped-arms",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "240b2a5187385ee78bbe45b01657c1366c9a1d438e9ef07961f60f05fd086b2f"
+    },
+    "title": "Imported record of a producer-reported run (executed locally by the producer; each arm ended with exit -15 at the 600 s cap; NOT COMPLETED; threads env was not applied to these arms)"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "9378cd7a4d70a78071d384d0294d62217ff29c517f258aa0a2bb568599ce7240",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-morpheus-evidence-local-arms",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 25196,
+      "license": null,
+      "media_type": "text/csv",
+      "role": "output",
+      "sha256": "1c28b944af1d01f67e3053a21fdbc8040ef13f660d96805f3b853cac52820253",
+      "title": "output: artifacts/multicell/baseline/logger.csv [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/baseline/logger.csv]",
+      "uri": "urn:sha256:1c28b944af1d01f67e3053a21fdbc8040ef13f660d96805f3b853cac52820253"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 20897,
+      "license": null,
+      "media_type": "text/csv",
+      "role": "output",
+      "sha256": "0fd27f222a2ee2b18bcf8051799226e39754d232087dcbbdc1783c008cd9b771",
+      "title": "output: artifacts/multicell/nofeedback/logger.csv [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/nofeedback/logger.csv]",
+      "uri": "urn:sha256:0fd27f222a2ee2b18bcf8051799226e39754d232087dcbbdc1783c008cd9b771"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 25620,
+      "license": null,
+      "media_type": "text/csv",
+      "role": "output",
+      "sha256": "eb2ce9af6058a2f0c07058779d149ee5348a407d57aec2fac2a5392eced86b80",
+      "title": "output: artifacts/multicell/seed2/logger.csv [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/seed2/logger.csv]",
+      "uri": "urn:sha256:eb2ce9af6058a2f0c07058779d149ee5348a407d57aec2fac2a5392eced86b80"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 7624,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "input",
+      "sha256": "f2a309b9bde1a6fcec658551a6d1eadd3d6fc749c1ac49ae240aa70f8121325e",
+      "title": "input: artifacts/multicell/baseline/model.xml [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/baseline/model.xml]",
+      "uri": "urn:sha256:f2a309b9bde1a6fcec658551a6d1eadd3d6fc749c1ac49ae240aa70f8121325e"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 7626,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "input",
+      "sha256": "381514e05178a07b2029cf1513bcab08132ff0f4740405a311b282a9f0575e00",
+      "title": "input: artifacts/multicell/nofeedback/model.xml [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/nofeedback/model.xml]",
+      "uri": "urn:sha256:381514e05178a07b2029cf1513bcab08132ff0f4740405a311b282a9f0575e00"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 7621,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "input",
+      "sha256": "ad817057e33980b650806e0463e5f05f0ca0b8cac4299f426fa729373d220197",
+      "title": "input: artifacts/multicell/seed2/model.xml [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/seed2/model.xml]",
+      "uri": "urn:sha256:ad817057e33980b650806e0463e5f05f0ca0b8cac4299f426fa729373d220197"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2593,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "6efa333106c5c82f218a08220b56226a9b973a3ed90a9dd66eb5fdedcdb33038",
+      "title": "log: artifacts/multicell/summary.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/summary.json]",
+      "uri": "urn:sha256:6efa333106c5c82f218a08220b56226a9b973a3ed90a9dd66eb5fdedcdb33038"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 3871,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "5252a2d365cda3fca40f25c54ecd8e4cc82bc42e06aa5411c0c4bc27db985776",
+      "title": "code: engineering/multicell/run_morpheus.py [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:engineering/multicell/run_morpheus.py]",
+      "uri": "urn:sha256:5252a2d365cda3fca40f25c54ecd8e4cc82bc42e06aa5411c0c4bc27db985776"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 3100,
+      "license": null,
+      "media_type": "text/x-python",
+      "role": "code",
+      "sha256": "b9d7b1ddb0f4e444124633e3ce7bbbf64ce16bea7dd1556c5f9ba7dcdbf09632",
+      "title": "code: engineering/multicell/analyze.py [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:engineering/multicell/analyze.py]",
+      "uri": "urn:sha256:b9d7b1ddb0f4e444124633e3ce7bbbf64ce16bea7dd1556c5f9ba7dcdbf09632"
+     }
+    ],
+    "assumptions": [
+     "Source: Morpheus v2.3.9 `Examples/Multiscale/MultiscaleModel.xml`; upstream XML sha256 69030acf4467768a... and static binary sha256 3d9a6e5a4cb86824... are stated by the producer (BSD 3-clause).",
+     "Edits: version-2, surface-mode, log-states, frame-step, stop-time, seed; feedback-off additionally multiplies g_l by 0 inside the CDK1 equation only."
+    ],
+    "context": "Applicability: this window of this generic example. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "GENERIC Morpheus example (Ferrell-Tsai-Yang cell-cycle ODE + CPM + cytokine PDE); not calibrated to any fish, cell type or tissue; nothing here is fin growth. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "Upstream XML was edited by recorded exact-once replacements (including a hand-made version 1 to 2 fix); the model is not byte-for-byte the shipped one.",
+     "Units are the example's own; no dimensional mapping to seconds or micrometres.",
+     "One seed per arm; the seed repeat is a noise check on the CPM, not an independent replicate; no time-step or lattice refinement was run.",
+     "NOT COMPLETED: every arm ended by SIGTERM at the cap."
+    ],
+    "local_id": null,
+    "method": "Morpheus v2.3.9 headless runs of three arms; division events read from the logger; analysis by analyze.py. All three arms ended by SIGTERM at the cap.",
+    "produced_by": {
+     "id": "run-morpheus-action-local-arms",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "9378cd7a4d70a78071d384d0294d62217ff29c517f258aa0a2bb568599ce7240"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "arms": {
+      "baseline": {
+       "exit": -15,
+       "reached_t": 0.456,
+       "seed": 3445
+      },
+      "nofeedback": {
+       "exit": -15,
+       "reached_t": 0.456,
+       "seed": 3445
+      },
+      "seed2": {
+       "exit": -15,
+       "reached_t": 0.46,
+       "seed": 7
+      }
+     },
+     "common_horizon_t": 0.456,
+     "completed": false,
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "source_commit": "17edd4480f4616de0e930cec02e8453fb237e40f"
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T22:52:24+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Summary.",
+     "content_available": false,
+     "content_sha256": "6efa333106c5c82f218a08220b56226a9b973a3ed90a9dd66eb5fdedcdb33038",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/summary.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "run-morpheus-claim-local-capped-arms",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "240b2a5187385ee78bbe45b01657c1366c9a1d438e9ef07961f60f05fd086b2f"
+    },
+    "uncertainty": "One seed per arm; no refinement; the window ends mid-run."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "75898af084728d6c519ecb79061596e8dea881fb0b8b6ae18962ce625b3b6260",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-morpheus-action-local-render",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "Re-rendering the logged frames reproduces the videos; mp4 bytes can differ across ffmpeg builds.",
+     "Pictures are views of partial computed states, not evidence."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f; mp4.sha256 pins three videos",
+     "environment": "gnuplot 6.0.5 (conda-forge); a set-colorbox warning at each frame, frames render",
+     "input": "simulation evidence version 75898af084728d6c519ecb79061596e8dea881fb0b8b6ae18962ce625b3b6260",
+     "model": "none: rendering",
+     "parameters": "22 frames per arm at 4 fps",
+     "scope": "visualisation of partial runs",
+     "target": "240b2a5187385ee78bbe45b01657c1366c9a1d438e9ef07961f60f05fd086b2f"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [
+     {
+      "id": "run-morpheus-evidence-local-arms",
+      "kind": "Evidence",
+      "namespace": "node-a",
+      "version": "75898af084728d6c519ecb79061596e8dea881fb0b8b6ae18962ce625b3b6260"
+     }
+    ],
+    "required_capabilities": [
+     "Morpheus Gnuplotter; gnuplot; ffmpeg"
+    ],
+    "target": {
+     "id": "run-morpheus-claim-local-capped-arms",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "240b2a5187385ee78bbe45b01657c1366c9a1d438e9ef07961f60f05fd086b2f"
+    },
+    "title": "Imported record of a producer-reported render (not re-run by Frontier): Morpheus Gnuplotter frames of the partial runs, concatenated at 4 fps; the last truncated frame is dropped"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "5ac5423d0677e6272cd42b23142ced9d6d060583f6a257ca406ce9cd6eff184f",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-morpheus-evidence-local-render",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 114262,
+      "license": null,
+      "media_type": "video/mp4",
+      "role": "output",
+      "sha256": "ceaaeabc4adf678830231946353897921e0a4432fa5ccb67b45be5fd442e0efd",
+      "title": "output: artifacts/multicell/baseline.mp4 [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/baseline.mp4]",
+      "uri": "urn:sha256:ceaaeabc4adf678830231946353897921e0a4432fa5ccb67b45be5fd442e0efd"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 101505,
+      "license": null,
+      "media_type": "video/mp4",
+      "role": "output",
+      "sha256": "7e82325584b69f6be3db6a0655af9786c9028a04afcc7cb5341486f9c3533648",
+      "title": "output: artifacts/multicell/nofeedback.mp4 [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/nofeedback.mp4]",
+      "uri": "urn:sha256:7e82325584b69f6be3db6a0655af9786c9028a04afcc7cb5341486f9c3533648"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 112410,
+      "license": null,
+      "media_type": "video/mp4",
+      "role": "output",
+      "sha256": "bfcdf4b59d08b91ceeb4cf5543a6805e6574596dcfe8c67edd8a4bf6e3f8e922",
+      "title": "output: artifacts/multicell/seed2.mp4 [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/seed2.mp4]",
+      "uri": "urn:sha256:bfcdf4b59d08b91ceeb4cf5543a6805e6574596dcfe8c67edd8a4bf6e3f8e922"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 296,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "log",
+      "sha256": "f7b91e85a3f4d1190176d202d618fe83155ddd1a0d59677d25f1bf44d3fe1dbe",
+      "title": "log: artifacts/multicell/mp4.sha256 [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/mp4.sha256]",
+      "uri": "urn:sha256:f7b91e85a3f4d1190176d202d618fe83155ddd1a0d59677d25f1bf44d3fe1dbe"
+     }
+    ],
+    "assumptions": [
+     "Source: Morpheus v2.3.9 `Examples/Multiscale/MultiscaleModel.xml`; upstream XML sha256 69030acf4467768a... and static binary sha256 3d9a6e5a4cb86824... are stated by the producer (BSD 3-clause).",
+     "Edits: version-2, surface-mode, log-states, frame-step, stop-time, seed; feedback-off additionally multiplies g_l by 0 inside the CDK1 equation only."
+    ],
+    "context": "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right. The videos show partial runs. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "A picture, video or mesh of what was computed. It adds no support for the Claim and is not an independent check of it; rendering it successfully says nothing about whether the model is right.",
+     "The videos show runs that never completed.",
+     "Not calibrated to any fish. Nothing here is a whole-fish result."
+    ],
+    "local_id": null,
+    "method": "Frames drawn by Morpheus' Gnuplotter from the partial runs and encoded with ffmpeg; hashes from mp4.sha256 were recomputed.",
+    "produced_by": {
+     "id": "run-morpheus-action-local-render",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "5ac5423d0677e6272cd42b23142ced9d6d060583f6a257ca406ce9cd6eff184f"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "completed": false,
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "mp4_sha256": {
+      "baseline": "ceaaeabc4adf678830231946353897921e0a4432fa5ccb67b45be5fd442e0efd",
+      "nofeedback": "7e82325584b69f6be3db6a0655af9786c9028a04afcc7cb5341486f9c3533648",
+      "seed2": "bfcdf4b59d08b91ceeb4cf5543a6805e6574596dcfe8c67edd8a4bf6e3f8e922"
+     },
+     "source_commit": "17edd4480f4616de0e930cec02e8453fb237e40f"
+    },
+    "provider_assessment": null,
+    "relation": "context_only",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T22:52:24+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Video hashes.",
+     "content_available": false,
+     "content_sha256": "f7b91e85a3f4d1190176d202d618fe83155ddd1a0d59677d25f1bf44d3fe1dbe",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:artifacts/multicell/mp4.sha256",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "run-morpheus-claim-local-capped-arms",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "240b2a5187385ee78bbe45b01657c1366c9a1d438e9ef07961f60f05fd086b2f"
+    },
+    "uncertainty": "Not quantified by the producer beyond what its record states."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "249dbee8bce50b23f97b53e1f4e85ec14036a502f6c3bfbb429ad690e122f8ca",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-morpheus-claim-provider-baseline-recovered",
+   "issuer": "importer",
+   "kind": "Claim",
+   "namespace": "node-a",
+   "payload": {
+    "assumptions": [
+     "Source: Morpheus v2.3.9 `Examples/Multiscale/MultiscaleModel.xml`; upstream XML sha256 69030acf4467768a... and static binary sha256 3d9a6e5a4cb86824... are stated by the producer (BSD 3-clause).",
+     "Edits: version-2, surface-mode, log-states, frame-step, stop-time, seed; feedback-off additionally multiplies g_l by 0 inside the CDK1 equation only."
+    ],
+    "context": "A provider run reported as it ended: failed at the job level, recovered for one arm. Only baseline timecourse recovered. Other arms have exit0 stdout but no recovered trajectories, so completion evidence is insufficient.",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "GENERIC Morpheus example (Ferrell-Tsai-Yang cell-cycle ODE + CPM + cytokine PDE); not calibrated to any fish, cell type or tissue; nothing here is fin growth. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "Upstream XML was edited by recorded exact-once replacements (including a hand-made version 1 to 2 fix); the model is not byte-for-byte the shipped one.",
+     "Units are the example's own; no dimensional mapping to seconds or micrometres.",
+     "One seed per arm; the seed repeat is a noise check on the CPM, not an independent replicate; no time-step or lattice refinement was run.",
+     "Job state FAILED: Output wrapper IndexError on trailing blank logger line; simulator stdout reports allthree armsexit0.",
+     "Missing artifacts: nofeedback, seed2.",
+     "The logger has 919 blank separator lines between time blocks; the 96802 non-blank rows match the recovery note's data_rows.",
+     "One seed, no refinement, one arm recovered: no feedback comparison can be drawn from this record."
+    ],
+    "origin": "derived",
+    "prior_review": {
+     "status": "none: not reviewed by anyone"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Failure and recovery note: provider state, recovered arm, missing arms.",
+     "content_available": false,
+     "content_sha256": "0975c4436da779e9215e682967f7a83fd6d9ad06b6974be5206c8b07f8797ccc",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:results/infra/morpheus-failure-recovery.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_record_version": null,
+    "statement": "In provider job aijob-e00bqeswtkd7dexff4 (state FAILED; an output wrapper raised IndexError on blank logger lines), the baseline arm (StopTime 2.0, seed 3445) logged 1001 time points from t=0 to t=2 (96802 non-blank rows, 256 cells at t=2) and its stdout reports simulator exit 0. The nofeedback and seed2 arms report exit 0 in stdout but no trajectories were recovered, so completion evidence for them is insufficient. This is a different run from the capped local arms (different XML, stop 2.0 against 0.6); the two are not replicates.",
+    "title": "Morpheus baseline reached t=2.0 in a provider job whose state is FAILED; only the baseline timecourse was recovered"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "65c3a5c1fb74e189582f36f3ebf2cc22b3214b3a287ac0c7b15d3699d4cf254c",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-morpheus-action-provider-job",
+   "issuer": "importer",
+   "kind": "Action",
+   "namespace": "node-a",
+   "payload": {
+    "acceptance_criteria": [
+     "A rerun with the wrapper fixed (blank lines skipped, all arms preserved before parsing) completes all three arms and returns all three trajectories.",
+     "An independent reviewer checks the model against its cited sources before any number is used."
+    ],
+    "cache_key": {
+     "acceptance_policy": "frontier-independent-review-0.1",
+     "code": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f; recovery note and manifest-infra16.json",
+     "environment": "provider CPU job; image and interpreter NOT RECORDED in the files read",
+     "input": "model.xml sha256 fd341d68bce73a71ace94637dbdd0eedaff0ccc977cc8d69bb8a847cde1b1e19; StopTime 2.0; seed 3445",
+     "model": "Morpheus v2.3.9 cell-cycle ODE + CPM + cytokine PDE (no language model)",
+     "parameters": "baseline arm; feedback on; seed 3445",
+     "scope": "generic multiscale example; baseline arm only",
+     "target": "65c3a5c1fb74e189582f36f3ebf2cc22b3214b3a287ac0c7b15d3699d4cf254c"
+    },
+    "cost_stop_bounds": "Wall time and resources of the producer's run are NOT recorded. No budget or stop bound was declared.",
+    "inputs": [],
+    "required_capabilities": [
+     "Morpheus v2.3.9 static binary on a provider CPU job"
+    ],
+    "target": {
+     "id": "run-morpheus-claim-provider-baseline-recovered",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "65c3a5c1fb74e189582f36f3ebf2cc22b3214b3a287ac0c7b15d3699d4cf254c"
+    },
+    "title": "Provider-executed CPU job aijob-e00bqeswtkd7dexff4 (state FAILED, part rc 1 after 52.4 s); the baseline simulator's own stdout and exit.txt report exit 0 and the logger was recovered after the wrapper error"
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "42bf0d485e9efef60d1c54b4fe841dbf3bfe4aae6eaf4c99ebd9ef35c2a4d189",
+   "visibility": "public"
+  },
+  {
+   "created_at": "2026-10-31T22:52:24+00:00",
+   "id": "run-morpheus-evidence-provider-baseline",
+   "issuer": "importer",
+   "kind": "Evidence",
+   "namespace": "node-a",
+   "payload": {
+    "artifacts": [
+     {
+      "availability": "referenced",
+      "byte_size": 5327739,
+      "license": null,
+      "media_type": "text/csv",
+      "role": "output",
+      "sha256": "27fd11a76bcacd6de766f64595d1d69f4d4255b60ae53a55e78ad483f7fc2707",
+      "title": "output: results/infra/morpheus/results/infra16-morpheus-full-horizon/parts/00-morpheus-three-arms/baseline/logger.csv [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:results/infra/morpheus/results/infra16-morpheus-full-horizon/parts/00-morpheus-three-arms/baseline/logger.csv]",
+      "uri": "urn:sha256:27fd11a76bcacd6de766f64595d1d69f4d4255b60ae53a55e78ad483f7fc2707"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 7624,
+      "license": null,
+      "media_type": "application/octet-stream",
+      "role": "input",
+      "sha256": "fd341d68bce73a71ace94637dbdd0eedaff0ccc977cc8d69bb8a847cde1b1e19",
+      "title": "input: results/infra/morpheus/results/infra16-morpheus-full-horizon/parts/00-morpheus-three-arms/baseline/model.xml [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:results/infra/morpheus/results/infra16-morpheus-full-horizon/parts/00-morpheus-three-arms/baseline/model.xml]",
+      "uri": "urn:sha256:fd341d68bce73a71ace94637dbdd0eedaff0ccc977cc8d69bb8a847cde1b1e19"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 7,
+      "license": null,
+      "media_type": "text/plain",
+      "role": "log",
+      "sha256": "19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061",
+      "title": "log: results/infra/morpheus/results/infra16-morpheus-full-horizon/parts/00-morpheus-three-arms/baseline/exit.txt [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:results/infra/morpheus/results/infra16-morpheus-full-horizon/parts/00-morpheus-three-arms/baseline/exit.txt]",
+      "uri": "urn:sha256:19eaf43821a7660ec323a87c8457bf74823beb296c39f5e01aa8a683aa50f061"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 766,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "0975c4436da779e9215e682967f7a83fd6d9ad06b6974be5206c8b07f8797ccc",
+      "title": "log: results/infra/morpheus-failure-recovery.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:results/infra/morpheus-failure-recovery.json]",
+      "uri": "urn:sha256:0975c4436da779e9215e682967f7a83fd6d9ad06b6974be5206c8b07f8797ccc"
+     },
+     {
+      "availability": "referenced",
+      "byte_size": 2068,
+      "license": null,
+      "media_type": "application/json",
+      "role": "log",
+      "sha256": "1a3f36f28892d08695eb62b9c79cf542d4a9b8ce7cdbb6963cbec484faa1bc73",
+      "title": "log: results/infra/morpheus/manifest-infra16.json [git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:results/infra/morpheus/manifest-infra16.json]",
+      "uri": "urn:sha256:1a3f36f28892d08695eb62b9c79cf542d4a9b8ce7cdbb6963cbec484faa1bc73"
+     }
+    ],
+    "assumptions": [
+     "Source: Morpheus v2.3.9 `Examples/Multiscale/MultiscaleModel.xml`; upstream XML sha256 69030acf4467768a... and static binary sha256 3d9a6e5a4cb86824... are stated by the producer (BSD 3-clause).",
+     "Edits: version-2, surface-mode, log-states, frame-step, stop-time, seed; feedback-off additionally multiplies g_l by 0 inside the CDK1 equation only."
+    ],
+    "context": "Applicability: this baseline arm only. Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+    "created_time": {
+     "basis": "unknown",
+     "value": null
+    },
+    "evidence_kind": "simulated",
+    "limitations": [
+     "Imported record of what the producer's receipt reports. Frontier did not execute this and no one has re-run it; the producer's own code produced both the claim and the result, so it is not independent evidence.",
+     "GENERIC Morpheus example (Ferrell-Tsai-Yang cell-cycle ODE + CPM + cytokine PDE); not calibrated to any fish, cell type or tissue; nothing here is fin growth. Not calibrated to any fish. Nothing here is a whole-fish result.",
+     "Upstream XML was edited by recorded exact-once replacements (including a hand-made version 1 to 2 fix); the model is not byte-for-byte the shipped one.",
+     "Units are the example's own; no dimensional mapping to seconds or micrometres.",
+     "One seed per arm; the seed repeat is a noise check on the CPM, not an independent replicate; no time-step or lattice refinement was run.",
+     "Job state FAILED: Output wrapper IndexError on trailing blank logger line; simulator stdout reports allthree armsexit0.",
+     "Missing artifacts: nofeedback, seed2."
+    ],
+    "local_id": null,
+    "method": "Provider CPU job ran Morpheus v2.3.9; the baseline logger (96802 rows) was recovered and its sha256 recomputed from the committed file. The job state is FAILED.",
+    "produced_by": {
+     "id": "run-morpheus-action-provider-job",
+     "kind": "Action",
+     "namespace": "node-a",
+     "version": "42bf0d485e9efef60d1c54b4fe841dbf3bfe4aae6eaf4c99ebd9ef35c2a4d189"
+    },
+    "provenance": {
+     "adapter": {
+      "id": "frontier_adapters.visual_assets",
+      "version": "0.1.0"
+     },
+     "baseline_exit_txt": "exit=0",
+     "blank_lines": 919,
+     "cells_at_last_time": 256,
+     "execution": "reported by the producer; not executed or replayed by this adapter unless a replay Evidence says so",
+     "job_id": "aijob-e00bqeswtkd7dexff4",
+     "job_state": "FAILED",
+     "logger_sha256": "27fd11a76bcacd6de766f64595d1d69f4d4255b60ae53a55e78ad483f7fc2707",
+     "missing_arms": [
+      "nofeedback",
+      "seed2"
+     ],
+     "non_blank_rows": 96802,
+     "part_rc": 1,
+     "part_wall_s": 52.4,
+     "source_commit": "17edd4480f4616de0e930cec02e8453fb237e40f",
+     "time_points": 1001
+    },
+    "provider_assessment": null,
+    "relation": "unspecified",
+    "retrieved_time": {
+     "basis": "declared",
+     "value": "2026-10-31T22:52:24+00:00"
+    },
+    "source": {
+     "access": "Public repository file at an immutable commit (git locator in the title/locator). Only digests are carried; bytes are not embedded and no licence for the content is stated by this record. Recovery note.",
+     "content_available": false,
+     "content_sha256": "0975c4436da779e9215e682967f7a83fd6d9ad06b6974be5206c8b07f8797ccc",
+     "license": null,
+     "locator": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f:results/infra/morpheus-failure-recovery.json",
+     "source_version": "git:delphi-frontier@17edd4480f4616de0e930cec02e8453fb237e40f",
+     "uri": null
+    },
+    "source_dependence": {
+     "declared": true,
+     "group": "same producer made the claim, the numbers and the picture",
+     "independent_of_claim": false
+    },
+    "target": {
+     "id": "run-morpheus-claim-provider-baseline-recovered",
+     "kind": "Claim",
+     "namespace": "node-a",
+     "version": "65c3a5c1fb74e189582f36f3ebf2cc22b3214b3a287ac0c7b15d3699d4cf254c"
+    },
+    "uncertainty": "One seed, one arm, no refinement."
+   },
+   "predecessor": null,
+   "schema_version": "frontier-record-0.1",
+   "source_uri": "urn:frontier:adapter:run-bundles",
+   "version": "0048878f9d17a66a44b1b671aaee18fb5d87526ea27fc669d9ecbe5e1a6e191e",
+   "visibility": "public"
+  }
+ ],
+ "review_claims": [],
+ "schema_version": "frontier-bundle-0.1",
+ "trust": "Digest proves integrity only; reviews require receiving-node policy."
+}

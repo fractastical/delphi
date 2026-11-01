@@ -1,0 +1,45 @@
+{
+ "schema": "frontier.rd-ddpm.packet/1",
+ "code_and_prereg_commit": "9c56a927d31c8d8a3b824e7ace86249e4a03a664",
+ "branch": "work/rd-diffusion",
+ "repo": "kganjam/delphi-frontier",
+ "archive": {
+  "file": "rd_ddpm_packet.tar.gz",
+  "sha256": "76eb4a7b273f71db51d6f8d35481dfe94a36b49414372c919d3387e67d75821c",
+  "bytes": 11526,
+  "base64_bytes": 15368,
+  "raw_member_bytes": 32236,
+  "deterministic": "tar --sort=name --mtime=@0 --owner=0 --group=0 | gzip -n -9"
+ },
+ "members_sha256": {
+  "rd_ddpm.py": "25455430ef138b49e6bac151a144e338269a81ce5c2f576387f8805bbb1a400a",
+  "config.json": "bc77ebc55010b9c8ac910c2b31868ec0dbf2d1e3785a06ec3ef1aa028ea2b210",
+  "job.sh": "9ca5a4b087dcadec95aeacc4c19f1ad0cf217a9c0cc8148d372036b7e7938372"
+ },
+ "prereg_sha256": "3f6f2c4d9187ced1e9a0d0979a73bd1532bb02c863634e924a9c89da70b5ab8f",
+ "requirements": "Python >=3.12, torch (CUDA build; tested API only: nn, optim, cuda, float64 matmul) and numpy; nothing else; no network, no credentials, no repo checkout; image nvcr.io/nvidia/pytorch:25.12-py3 (torch 2.10dev) is sufficient, python:3.12-slim + torch wheel is the alternative",
+ "preflight_command": "tar -xzf rd_ddpm_packet.tar.gz && PREFLIGHT=1 bash rd_diffusion/job.sh   (hash and import check only; never trains; expect {\"preflight\": \"ok\" ...})",
+ "full_command": "tar -xzf rd_ddpm_packet.tar.gz && OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OUT=out bash rd_diffusion/job.sh",
+ "gates": "job.sh runs: preflight -> control (refuses to continue without CUDA; checks DCT, steady state, CPU determinism, CPU-vs-CUDA solver and network, schedule) -> run",
+ "resources": "one H100 80GB, one GPU, CPU threads <=2 for the numpy parts, expected memory a few GB (peak sampling batch 16384 x 2 x 64 fields); no multi-GPU",
+ "runtime_budget": {
+  "useful_minutes_requested": "<=30 for dataset+training+evaluation (frozen 30,000 steps)",
+  "expected": "roughly 15-25 min; this is an ESTIMATE scaled from CPU smoke timings, NOT measured on a GPU",
+  "hard_stop_requested_minutes": 45,
+  "image_pull_reported_separately": true,
+  "note": "if the logged step rate predicts more than 30 min of training, stopping is acceptable and counts as a failed run, not a partial result"
+ },
+ "outputs": {
+  "part1_setup.tgz": "control.json (environment, CUDA/Torch/hardware, control checks)",
+  "part2_model_eval.tgz": "checkpoint.pt (~5.4 MB EMA weights + train-only normalisation), evaluation.json (all metrics, receipts, hashes, timings, GPU telemetry), examples.npz (direct solver vs generated fields, reverse trajectory), train_loss.jsonl",
+  "cap": "each part well under 16 MB compressed (expected under 8 MB)",
+  "missing_or_truncated": "failure"
+ },
+ "local_controls_actually_run": {
+  "cpu_control": "artifacts/rd-diffusion/cpu_control/control_cpu.json (all checks ok, torch 2.11 CPU, 2 threads)",
+  "cpu_smoke_end_to_end": "artifacts/rd-diffusion/cpu_control/smoke_evaluation_NOT_A_RESULT.json (150 steps, 30 dev settings only; untrained; numbers meaningless)",
+  "cuda_control": "NOT run locally (no GPU on this host); it is the first gate inside the job",
+  "tests": "tests/test_rd_diffusion.py 13 passed (solver equals numpy rd_frames to 1e-9)"
+ },
+ "no_duplicate_submission": "this worker submits nothing; infra_director owns dispatch"
+}

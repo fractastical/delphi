@@ -1,0 +1,28 @@
+{
+  "schema":"frontier.behavior.protocol/1",
+  "frozen_before_outputs":true,
+  "model":"Eight-segment amplitude-controlled phase CPG plus bounded PD/feedforward joint-angle actuator proxy",
+  "source_scope":"Zebrafish locomotor pattern context; Ijspeert2007 salamander/robot oscillator equations. Independent reduced engineering scenario, not either source's full circuit reproduction.",
+  "scenarios":{
+    "baseline":{"frequency_Hz":35,"feedback":true,"coupling_s":80},
+    "changed_frequency":{"frequency_Hz":25,"feedback":true,"coupling_s":80},
+    "feedback_removed":{"frequency_Hz":35,"feedback":false,"coupling_s":80},
+    "coupling_removed":{"frequency_Hz":35,"feedback":true,"coupling_s":0},
+    "feedback_sign_mutant":{"frequency_Hz":35,"feedback":true,"coupling_s":80,"feedback_sign":-1}
+  },
+  "perturbations":{"phase_kick":{"time_s":0.8,"segment":4,"delta_rad":1},"torque_pulse":{"start_s":1.1,"stop_s":1.3,"torque_Nm":0.00002,"segments":"all"}},
+  "acceptance":{
+    "baseline_finite":true,
+    "baseline_tracking_relative_rms_after_0_5s_max":0.08,
+    "phase_error_rms_final_0_3s_max_rad":0.03,
+    "uncoupled_phase_error_over_baseline_min_ratio":5,
+    "no_feedback_tracking_over_baseline_min_ratio":2,
+    "changed_frequency_endpoint_Hz_tolerance":0.000001,
+    "step_halving_max_angle_difference_rad":0.0001,
+    "amplitude_closed_form_max_error":0.000001,
+    "feedback_sign_mutant_must_fail_baseline_tracking_predicate":true
+  },
+  "numerics":{"method":"RK4, event-aligned phase kick/torque pulse", "default_dt_s":0.0002,"refined_dt_s":0.0001,"duration_s":2,"saved_frame_interval_s":0.002},
+  "not_a_success_predicate":"No swimming speed, thrust, energy efficiency, biological CPG fidelity, fish behavior, CFD or genotype effect is scored",
+  "coupling":"Only an actuation proposal. Existing wind tunnel is static; dynamic phase/frequency inputs cannot yet produce aerodynamic forces. Angle interface bound±0.262rad is a declared static-solver envelope, not biological validation."
+}

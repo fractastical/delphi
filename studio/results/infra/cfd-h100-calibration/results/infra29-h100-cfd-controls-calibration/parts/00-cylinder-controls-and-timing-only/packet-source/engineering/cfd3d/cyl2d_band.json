@@ -1,0 +1,26 @@
+{
+  "schema": "cfd3d-cyl2d-band-0.1",
+  "frozen_note": "Chosen after cyl2d_contract.json was frozen (9d53cd1, formula corrected ddc7095) and before any cylinder run, including timing runs. Never widened after a result; a FAIL is kept.",
+  "source": "Qu et al. 2013 Table 2 (Re 100), re-read with pdftotext from the primary PDF sha256 1a67139ea4d70d4149a66506c663e185ed927c48bd4a4396cdb13270fc30c73b",
+  "references": {
+    "H60": {"row": "D4 (H 60, 386x210, dt 0.02)", "Cd": 1.326, "Cd_p": 0.988, "St": 0.1660, "applies_to": ["R1", "R2", "M1_mutant"]},
+    "H120": {"row": "D2 (H 120, 386x322, dt 0.02)", "Cd": 1.315, "Cd_p": 0.979, "St": 0.1650, "applies_to": ["R3_domain"]}
+  },
+  "half_width_derivation": {
+    "rule": "sum of Qu's own documented sensitivities, each as max |change| / reference: grid (D5-D8 vs D2) + time step (D9-D11 vs D2) + domain (D4 vs D1, H 60 vs H 200); rounded up to 0.1 %",
+    "domain_term_role": "stands in for the unquantified difference between our free-slip lateral faces and Qu's free-stream lateral condition. That is our inference: Qu did not test lateral condition type",
+    "Cd": {"grid": 0.0023, "dt": 0.0046, "domain": 0.0122, "half_width": 0.020},
+    "Cd_p": {"grid": 0.0020, "dt": 0.0061, "domain": 0.0123, "half_width": 0.021},
+    "St": {"grid": 0.0030, "dt": 0.0012, "domain": 0.0079, "half_width": 0.013}
+  },
+  "not_covered_by_the_source": "WaterLily's own discretisation error (uniform Cartesian h = D/32, D/64 with BDIM, vs Qu's body-fitted 0.0054 D wall cell). The band is what the reference supports, not what this solver is expected to reach. A FAIL is a plausible, informative outcome (the 3-D sphere C1 read ~16-20 % low).",
+  "pass_rule": {
+    "R2_fidelity": "R2 Cd, Cd_p and St each within half_width of the H60 reference, with a periodic state (contract)",
+    "grid_pair": "|Cd(R2) - Cd(R1)| / Cd(R2) <= 0.03 (ENGINEERING assumption, not from the source); reported for St and Cd_p too",
+    "mutant": "M1 (Re 25) must NOT satisfy the R2 fidelity rule; a missing periodic state counts as not satisfying it",
+    "domain_diagnostic": "R3 compared with the H120 reference and with R1; reported, not required to pass",
+    "surface_internal": "|Cd_p_surface / Cd_p - 1| <= 0.10 on R2 (ENGINEERING tolerance for internal consistency, not a validation)",
+    "control_passes_only_if": ["R2_fidelity", "grid_pair", "mutant", "periodic state in R1, R2 and R3"],
+    "consequence_of_fail": "physical-fidelity wording for any 2-D fin section stays blocked; the sections may still run as labelled model diagnostics (claude-07 protocol)"
+  }
+}

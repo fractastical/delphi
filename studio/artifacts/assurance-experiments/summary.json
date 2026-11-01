@@ -1,0 +1,66 @@
+{
+  "schema": "frontier.fin-assurance.summary/1",
+  "protocol": {
+    "path": "engineering/assurance_experiments/protocol.json",
+    "sha256": "cc1eeabd06cb3401ba3d72a912df0d9e898b80369356339fd25afe519411c064",
+    "protocol_commit": "0514821317037e047d16bc2194daa6ff3b8dd42a"
+  },
+  "candidates": [
+    {
+      "candidate": {
+        "id": "baseline",
+        "ray_length_m": 0.15,
+        "EI_multiplier": 1.0,
+        "tradeoff": "Reference declared geometry; not an observed specimen"
+      },
+      "numerator": 20,
+      "denominator": 64,
+      "fraction": 0.3125,
+      "conditional_wilson95_interval": [
+        0.21231066539482046,
+        0.4339233570274815
+      ],
+      "uniform_only_numerator": 42
+    },
+    {
+      "candidate": {
+        "id": "shorter-ray",
+        "ray_length_m": 0.12,
+        "EI_multiplier": 1.0,
+        "tradeoff": "Shortening may lose lifting area; flight consequence unmodeled"
+      },
+      "numerator": 33,
+      "denominator": 64,
+      "fraction": 0.515625,
+      "conditional_wilson95_interval": [
+        0.39581601478580125,
+        0.6336644833456737
+      ],
+      "uniform_only_numerator": 63
+    },
+    {
+      "candidate": {
+        "id": "stiffer-ray",
+        "ray_length_m": 0.15,
+        "EI_multiplier": 2.0,
+        "tradeoff": "Stiffness change has unknown mass, material and developmental cost"
+      },
+      "numerator": 34,
+      "denominator": 64,
+      "fraction": 0.53125,
+      "conditional_wilson95_interval": [
+        0.41072087051471007,
+        0.6482401257482395
+      ],
+      "uniform_only_numerator": 63
+    }
+  ],
+  "all_candidates_retained": true,
+  "empirical_accuracy": "unknown",
+  "biological_success_probability": null,
+  "next_measurements": [
+    "Measure EI(x) under the target clamping/actuation condition.",
+    "Measure spatial pressure/load shape; uniform-versus-tip discrepancy is not a calibrated error bound.",
+    "Measure mass/lifting-area costs before choosing stiffer or shorter candidates."
+  ]
+}

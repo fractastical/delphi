@@ -1,0 +1,102 @@
+{
+  "schema": "frontier.design-assurance/1",
+  "region_ids": [],
+  "scale_anchor": "flying-fish:molecular",
+  "vector": {
+    "formal_properties": {
+      "status": "not_attempted",
+      "summary": "No formal theorem about the molecular trajectory or biological transfer",
+      "evidence": [],
+      "scope": "formal proof"
+    },
+    "numerical_fidelity": {
+      "status": "checked_in_scope",
+      "summary": "Reference derivative/sign control, paired1fs/0.5fs50fsNVE and same-state CPU/CUDA force+energy parity passed before each ofthree900ps conditional extensions",
+      "evidence": [
+        {
+          "path": "artifacts/molecular/cuda-v2/cpu-controls/controls.json",
+          "sha256": "1408f8cdca33823c661beef2bad4357046334dad22c3ffbbb729912f3023d69a",
+          "selector": "$"
+        },
+        {
+          "path": "artifacts/molecular/cuda-v2/cpu-cuda-parity.json",
+          "sha256": "61d2907d1177f5bf379eb6864e1455f5a797ca027abea59fd8bacdd7c921e98d",
+          "selector": "$"
+        },
+        {
+          "path": "artifacts/molecular/cuda-v3/controls-1731/controls.json",
+          "sha256": "f4e74eeebc19d83b2b5ee25fe5c59cfd77f7fc5699b45a3891ac8fbc3fe6fbd0",
+          "selector": "$"
+        },
+        {
+          "path": "artifacts/molecular/cuda-v3/controls-1732/controls.json",
+          "sha256": "9c3a4212699e5f44301222ff6853c349fa9858ed08bb5029299f0ba7307a983e",
+          "selector": "$"
+        },
+        {
+          "path": "artifacts/molecular/cuda-v3/controls-1733/controls.json",
+          "sha256": "2a2c7c667e1fa715037af511116c971779b96bfe396720f78442df5403773c55",
+          "selector": "$"
+        }
+      ],
+      "scope": "Local same-state force-gradient/backend and short NVE checks; not global1000ps trajectory accuracy, equilibrium or empirical validity"
+    },
+    "empirical_validation": {
+      "status": "unknown",
+      "summary": "No held-out molecular dynamics or mechanical assay; crystal coordinates are starting input, not independent validation",
+      "evidence": [],
+      "scope": "Synthetic motif only, not fish tissue calibration"
+    },
+    "parameter_coverage": {
+      "status": "declared_ensemble",
+      "summary": "Three shared-structure/Hamiltonian velocity/thermostat parents, each continued with one fresh declared RNG stream to1000ps; these remain three branches,not six biological samples",
+      "evidence": [
+        {
+          "path": "artifacts/molecular/cuda-analysis/ensemble.json",
+          "sha256": "a87297f8ecbb5fbfebbafc82ee0ab679912f5274c2ddf9edf128b72b8ae31e08",
+          "selector": "$"
+        },
+        {
+          "path": "artifacts/molecular/continuation-analysis/summary.json",
+          "sha256": "dccb9f38cde850ed1f0b733ad2f8512703f1c4c65c2c0f8ea3138e1df19f1364",
+          "selector": "$.branches"
+        }
+      ],
+      "scope": "Descriptive seed spread; no native fish population or force-field coverage"
+    },
+    "cross_scale_transfer": {
+      "status": "unknown",
+      "summary": "Molecular chain distance cannot set fin EI without fibril/tissue constitutive calibration",
+      "evidence": [
+        {
+          "path": "artifacts/molecular/cross-scale-gate.json",
+          "sha256": "46220d68123b044d6bf5f06cfba755d035733ac218f107644f8440da8348d6b9",
+          "selector": "$.couplings[0].verdict"
+        }
+      ],
+      "scope": "Synthetic motif only, not fish tissue calibration"
+    },
+    "ensemble_robustness": {
+      "status": "unknown",
+      "summary": "No functional biological predicate tested. Frozen finite-window structural-drift diagnostic was false,false,true; it is descriptive and does not establish equilibrium or biological robustness.",
+      "evidence": [
+        {
+          "path": "artifacts/molecular/cuda-analysis/ensemble.json",
+          "sha256": "a87297f8ecbb5fbfebbafc82ee0ab679912f5274c2ddf9edf128b72b8ae31e08",
+          "selector": "$"
+        }
+      ],
+      "scope": "Synthetic motif only, not fish tissue calibration"
+    }
+  },
+  "dimensions": [
+    "formal_properties",
+    "numerical_fidelity",
+    "empirical_validation",
+    "parameter_coverage",
+    "cross_scale_transfer",
+    "ensemble_robustness"
+  ],
+  "biological_success_probability": null,
+  "region_membership": "No anatomically calibrated region mapping for this synthetic motif"
+}

@@ -1,0 +1,226 @@
+{
+ "drafts": [
+  {
+   "namespace": "frontier-fable",
+   "kind": "Problem",
+   "id": "problem:ff-aerodynamic-calibration",
+   "issuer": "fable-lead",
+   "source_uri": "https://health-sciences.wcupa.edu/sciences-mathematics/biology/fFish/documents/1990JZWing%20design.pdf",
+   "visibility": "public",
+   "predecessor": null,
+   "payload": {
+    "title": "Calibrate the exocoetid aerodynamic envelope-checker against the measured Fish 1990 / Park & Choi values",
+    "known_state": "The checker (codex-03 + guilds 6612af6; NOT to be rebuilt) encodes C1 wing loading, C2 launch-speed, C5 pectoral-fin AR as arithmetic over declared numbers. Fish 1990 published per-genus r.m.a. fits and measured ranges; Park & Choi measured pectoral AR 9.0-10.7. Saro-Cortes et al. 2022 (robotic model) and Park & Choi 2010 (physical model) show longitudinal stability is configuration-dependent and trades against lift, so C4's static CG-sign pass/fail is narrower than its wording (the Oxyporhamphus refutation survives).",
+    "question": "Does the checker reproduce the published measured wing-loading and pectoral-fin aspect-ratio of the six exocoetid genera (and Park & Choi's Cypselurus) within a declared numerical tolerance, with a paired mutant that must fail?",
+    "problem_kind": "computational_open_question",
+    "novelty_status": "Methods calibration; not a novelty claim.",
+    "data_access": "Fish 1990 r.m.a. coefficients (full-text, in hand); Park & Choi AR (full-text via fetch tool). No new data acquisition needed.",
+    "completeness": "actionable",
+    "acceptance_criteria": [
+     "Checker-computed wing loading for each of the 6 genera at their published mean mass matches Fish 1990 Table II within 5%.",
+     "The checker's pectoral-fin AR band contains Park & Choi's measured 9.0-10.7.",
+     "A mutant that perturbs one published coefficient fails the calibration (must-fail control)."
+    ],
+    "falsifiers": [
+     "Any genus wing loading deviates more than 5% from Fish 1990 Table II.",
+     "The must-fail mutant passes the calibration."
+    ],
+    "next_action": "Run the checker on the six genera's published (mass, wing area) and on Park & Choi's Cypselurus; compare to Table II/III; record a receipt with tolerances; ship the paired mutant. No acceptance is claimed - this is a proposed protocol for root review.",
+    "required_capabilities": [
+     "python-stdlib",
+     "the exocoetid checker (codex-03 + guilds; do not rebuild)"
+    ],
+    "cost_stop_bounds": "CPU only, <=2 threads, <=5 min wall under systemd-run; stop if any source value cannot be located in the full text in hand; no GPU; no paid inference.",
+    "downstream_uses": [
+     "Lets a reader trust the checker's PASS / CANNOT-EVALUATE outputs",
+     "Supports aerodynamic design questions"
+    ],
+    "dependencies": [
+     {
+      "namespace": "delphi-frontier",
+      "kind": "Claim",
+      "id": "claim:fish1990-individual-pectoral-fin-aspect-ratio",
+      "version": "457b94e4877bbd185e3f9b81e0b4331518032ec1611ccdd33fe90c5e6630edff"
+     },
+     {
+      "namespace": "delphi-frontier",
+      "kind": "Claim",
+      "id": "claim:fish1990-wing-loading-measured-sample",
+      "version": "6380a383f371888595772261a95ce28fd0f406deabda677371601851e93b7fc4"
+     },
+     {
+      "namespace": "delphi-frontier",
+      "kind": "Claim",
+      "id": "claim:parkchoi2010-physical-model-lift-stability",
+      "version": "d5bdb0bb502ed84a3ace66811880d986db1ad0cec98abfed7b0fb97b692073ed"
+     }
+    ],
+    "source": {
+     "uri": "https://health-sciences.wcupa.edu/sciences-mathematics/biology/fFish/documents/1990JZWing%20design.pdf",
+     "locator": "Fish 1990 J Zool 221:391-403; p.394 (WL & AR definitions), p.395 (pectoral AR range), Table II/III",
+     "source_version": null,
+     "content_sha256": "1efed334ed4aa48ec8e23801ff0b420d1d5c21430100a6d86d0b3e569421f8ea",
+     "content_available": false,
+     "access": "author-hosted PDF, full-text, read 2026-10-31 (pdftotext)",
+     "license": null
+    },
+    "original": {},
+    "approach": "measurement",
+    "scales": [
+     "organism",
+     "organ"
+    ],
+    "context_tags": [
+     "biomechanics",
+     "calibration",
+     "wing-loading",
+     "aspect-ratio"
+    ]
+   }
+  },
+  {
+   "namespace": "frontier-fable",
+   "kind": "Problem",
+   "id": "problem:ff-fin-mechanism-transfer",
+   "issuer": "fable-lead",
+   "source_uri": "https://repository.library.noaa.gov/view/noaa/62581/noaa_62581_DS1.pdf",
+   "visibility": "public",
+   "predecessor": null,
+   "payload": {
+    "title": "Determine whether the zebrafish lat4a/kcnh2a fin-proportion mechanism is present and active in an exocoetid",
+    "known_state": "Daane 2021 demonstrates the mechanism functionally in zebrafish [[claim:daane2021-zebrafish-finproportion-phenocopy]] and by genomic association across 35 beloniform species [[claim:daane2021-flyingfish-phylogenomic-association]]. No functional test exists in any exocoetid; no transfer is asserted.",
+    "question": "Is the lat4a/kcnh2a (bioelectric + amino-acid-transport) fin-proportion mechanism present and functionally active in an exocoetid paired fin, rather than being a zebrafish-only demonstration plus a genomic association?",
+    "problem_kind": "sourced_field_open_problem",
+    "novelty_status": "Open; Daane 2021 explicitly leaves the in-exocoetid functional test undone.",
+    "data_access": "No exocoetid fin transcriptomics/functional dataset located (bounded search 2026-10-31). One scaffold genome GCA_018398805.1; SRA 53 records.",
+    "completeness": "actionable",
+    "acceptance_criteria": [
+     "An exocoetid paired-fin dataset shows lat4a/kcnh2a expression consistent with the zebrafish mechanism, OR a functional perturbation in an appropriate model alters exocoetid-relevant fin proportion as predicted."
+    ],
+    "falsifiers": [
+     "Only phylogenomic association is obtainable and no in-exocoetid expression or functional evidence exists; the transfer then remains explicitly unestablished."
+    ],
+    "next_action": "Search public exocoetid RNA-seq / SRA (53 records) for paired-fin lat4a/kcnh2a expression; if none, record searched-not-found and stop. No wet-lab, no flight inference, no bio-transfer asserted. Proposed only; no acceptance claimed.",
+    "required_capabilities": [
+     "NCBI SRA / E-utilities access",
+     "sequence analysis (stdlib + grep)"
+    ],
+    "cost_stop_bounds": "CPU only; bounded SRA metadata search <=30 min; stop at first clear negative; no GPU; no paid inference.",
+    "downstream_uses": [
+     "Labels the molecule->fin bridge as established or unestablished",
+     "Informs precursor-inspired print labelling (no flight claim)"
+    ],
+    "dependencies": [
+     {
+      "namespace": "delphi-frontier",
+      "kind": "Claim",
+      "id": "claim:daane2021-zebrafish-finproportion-phenocopy",
+      "version": "21c704effab36a2e54305857e17f3b0501b9cb7832db913f33ac8fd4c90db73f"
+     },
+     {
+      "namespace": "delphi-frontier",
+      "kind": "Claim",
+      "id": "claim:daane2021-flyingfish-phylogenomic-association",
+      "version": "e3c3fb80778d300530c18c3c492cb4370672c7aa5a412b947579ff80e4d012db"
+     }
+    ],
+    "source": {
+     "uri": "https://repository.library.noaa.gov/view/noaa/62581/noaa_62581_DS1.pdf",
+     "locator": "Daane et al. 2021 Curr Biol 31(24):5052-5061; NOAA repository full text (47 pp); Abstract; Fig 1B/1C (allometry); Fig 4 legend + panels B/C; Data S1A (exact per-species/per-genotype values); PMC9172250 / DOI 10.1016/j.cub.2021.08.054",
+     "source_version": null,
+     "content_sha256": "78cf3c283c0adc0dfe7ae85638e47ee494ef062c271df3392fd072834a352ee3",
+     "content_available": false,
+     "access": "NOAA repository full-text PDF (pdftotext, 47 pp) + Europe PMC abstract, read 2026-10-31",
+     "license": null
+    },
+    "original": {},
+    "approach": "theory_fit",
+    "scales": [
+     "molecular",
+     "cellular",
+     "organ"
+    ],
+    "context_tags": [
+     "molecule-to-form",
+     "association-vs-function",
+     "no-flight",
+     "cross-organism-transfer"
+    ]
+   }
+  },
+  {
+   "namespace": "frontier-fable",
+   "kind": "Problem",
+   "id": "problem:ff-parameter-correspondence",
+   "issuer": "fable-lead",
+   "source_uri": "https://repository.library.noaa.gov/view/noaa/62581/noaa_62581_DS1.pdf",
+   "visibility": "public",
+   "predecessor": null,
+   "payload": {
+    "title": "Test whether fin proportion predicted by the genetic model corresponds to the observed exocoetid pectoral allometry",
+    "known_state": "Daane 2021 measured fin length vs standard length across the clade (Fig 1B) and a zebrafish phenocopy (Fig 4); Fish 1990 measured exocoetid pectoral share (76-92%) and pectoral-fin AR [[claim:fish1990-individual-pectoral-fin-aspect-ratio]].",
+    "question": "Does the fin proportion predicted by the zebrafish genetic model (lat4a x kcnh2a) correspond, within a declared error, to the observed exocoetid pectoral allometry (Fish 1990; Daane Fig 1B)? A discrepancy is itself a new open question about the missing bridge.",
+    "problem_kind": "computational_open_question",
+    "novelty_status": "Open; a predicted-vs-observed correspondence cross-check is not published.",
+    "data_access": "Observed: Fish 1990 (full-text, in hand). Model: Daane 2021 now full-text (NOAA repository PDF); the exact Figure 4 B/C normalized fin-length values are in the figure panels / Data S1A supplement, not in the body text (reduced blocker, not resolved).",
+    "completeness": "actionable",
+    "acceptance_criteria": [
+     "The genetic-model fin proportion (Daane Fig 4) and the observed exocoetid pectoral allometry (Fish 1990 / Daane Fig 1B) agree within a declared tolerance."
+    ],
+    "falsifiers": [
+     "The two disagree beyond the declared tolerance, in which case record a discrepancy and open a missing-bridge question; do NOT infer transfer in either direction."
+    ],
+    "next_action": "Obtain the Fig 4 B/C plotted values from Data S1A (or digitize the panels); place beside Fish 1990's pectoral allometry; compute the correspondence with a stated tolerance. If Data S1A is not retrievable, record the residual blocker and stop. Proposed only; no acceptance claimed.",
+    "required_capabilities": [
+     "access to Daane 2021 source data (currently blocked)",
+     "arithmetic/stats (stdlib)"
+    ],
+    "cost_stop_bounds": "CPU only; stop if Daane source data remain unreachable; no extrapolation beyond measured ranges; no bio-transfer inference.",
+    "downstream_uses": [
+     "Quantifies the molecule->form correspondence or records the gap explicitly"
+    ],
+    "dependencies": [
+     {
+      "namespace": "delphi-frontier",
+      "kind": "Claim",
+      "id": "claim:daane2021-zebrafish-finproportion-phenocopy",
+      "version": "21c704effab36a2e54305857e17f3b0501b9cb7832db913f33ac8fd4c90db73f"
+     },
+     {
+      "namespace": "delphi-frontier",
+      "kind": "Claim",
+      "id": "claim:fish1990-individual-pectoral-fin-aspect-ratio",
+      "version": "457b94e4877bbd185e3f9b81e0b4331518032ec1611ccdd33fe90c5e6630edff"
+     },
+     {
+      "namespace": "delphi-frontier",
+      "kind": "Claim",
+      "id": "claim:fish1990-wing-loading-measured-sample",
+      "version": "6380a383f371888595772261a95ce28fd0f406deabda677371601851e93b7fc4"
+     }
+    ],
+    "source": {
+     "uri": "https://repository.library.noaa.gov/view/noaa/62581/noaa_62581_DS1.pdf",
+     "locator": "Daane et al. 2021 Curr Biol 31(24):5052-5061; NOAA repository full text (47 pp); Abstract; Fig 1B/1C (allometry); Fig 4 legend + panels B/C; Data S1A (exact per-species/per-genotype values); PMC9172250 / DOI 10.1016/j.cub.2021.08.054",
+     "source_version": null,
+     "content_sha256": "78cf3c283c0adc0dfe7ae85638e47ee494ef062c271df3392fd072834a352ee3",
+     "content_available": false,
+     "access": "NOAA repository full-text PDF (pdftotext, 47 pp) + Europe PMC abstract, read 2026-10-31",
+     "license": null
+    },
+    "original": {},
+    "approach": "design_goal",
+    "scales": [
+     "molecular",
+     "organ",
+     "organism"
+    ],
+    "context_tags": [
+     "molecule-to-form",
+     "predicted-vs-observed",
+     "fin-proportion"
+    ]
+   }
+  }
+ ]
+}
