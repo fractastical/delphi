@@ -77,6 +77,9 @@ Each assessor was asked for the single change with the largest expected gain in 
 | `delphisci-db966bc4--gemini` | [RAw3mZDVeu…](https://w3id.org/np/RAw3mZDVeui1UMHiD61i3M1srnFEI6nfZr83E9SjeuMNQ) | not promoted |
 | `delphisci-db966bc4--gpt` | [RAH0kHd0vV…](https://w3id.org/np/RAH0kHd0vVCOOK_T5p0KXoD_JSkZuZs8o_8gFUxNwFJQU) | not promoted |
 | `delphisci-db966bc4--grok` | [RAYleIpUNb…](https://w3id.org/np/RAYleIpUNbvSeTMajvmXue4pCai1o7td9DBXSYrruBACI) | not promoted |
+| `delphisci-08fd5b3c--gemini` | [RA8g4uNRg6…](https://w3id.org/np/RA8g4uNRg6LZkcz_twsLL_jMIBb6e3a5A-Kj_4SBRY_3g) | not promoted |
+| `delphisci-08fd5b3c--gpt` | [RAoww45EJj…](https://w3id.org/np/RAoww45EJjWPXm8Mg1HWj_MfUGb8Gza3ntNjTPBnC0NJ8) | not promoted |
+| `delphisci-08fd5b3c--grok` | [RApMCgF6cY…](https://w3id.org/np/RApMCgF6cYxqd6lPDH-IUemfBcKFoRFl29XDkorL40vs0) | not promoted |
 
 Published by `build/publish.mjs`; full record in [nanopubs/manifest.jsonl](nanopubs/manifest.jsonl).
 
