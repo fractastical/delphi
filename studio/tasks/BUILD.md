@@ -27,7 +27,7 @@ Every status distinguishes implementation, integration, publication and biologic
 - [ ] Print priority: selected the larger-fin r3-daane geometry for a fit/balance
   prototype. Independent review found right-fin STL chirality wrong in r1;
   root reproduced it in r3. Claude-05 is producing additive r4-daane-printfix;
-  claude-13 reviews it. R3 body alone was shared; fin prints are held.
+  claude-13 reviews it. Corrected r4 bundle `bd2fcf3` is now shared for fit/balance only; root checked its public ZIP, six STL pins and nominal chirality. R3 body geometry is compatible. Catch-wall concern remains unresolved; launch is not cleared.
   No printed mass, flight, catch-load survival or biological buildability claimed.
 - [ ] Native ecology canonical simulations/media `335648d` and packet `08e5b77`
   await root integration; claude-10 builds the actual-state viewer. Native
