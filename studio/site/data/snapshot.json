@@ -32095,7 +32095,223 @@
      "bytes": 13971,
      "schema": "frontier.experimental-design.plan/1"
     }
-   ]
+   ],
+   "plan": {
+    "result_path": "artifacts/experimental-design/result.json",
+    "result_sha256": "3e65ad8a398af252300b2be0416b7b50c8fda80dcc0e7b73ad04bd4c6d4ca30e",
+    "declared_sha256": "3e65ad8a398af252300b2be0416b7b50c8fda80dcc0e7b73ad04bd4c6d4ca30e",
+    "hash_matches_manifest": true,
+    "schema": "frontier.experimental-design.plan/1",
+    "status": "prospective_assumption_based",
+    "design_version": "cantilever-identifiability-v1",
+    "protocol_sha256": "ab1c868031599ae75c686b0ede93c2c3e900eda4e83dc856b6cf2b43f0b943c4",
+    "selected_design_id": "mixed_load_deflection",
+    "objective": {
+     "basis": "analytic linear-Gaussian prospective covariance; no observed response values",
+     "cost_unit": "assumed_readout_cost_unit",
+     "name": "expected_target_variance_reduction_per_cost",
+     "target": "log_EI_ratio",
+     "target_unit": "1"
+    },
+    "target": {
+     "name": "log_EI_ratio",
+     "unit": "1",
+     "vector": [
+      1.0,
+      0.0
+     ]
+    },
+    "equation": {
+     "applicability": "Euler-Bernoulli static small-deflection cantilever point-load model; mathematical demonstration only.",
+     "expression": "delta = F * L^3 / (3 * EI)",
+     "model_version": "engineering.fin_mechanics.beam/point-load/1",
+     "source_sha256": "4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d",
+     "source_uri": "https://github.com/kganjam/delphi-frontier/blob/72df07cb22ec6458625fd01092ceccda8ea96271/engineering/fin_mechanics/beam.py",
+     "units": {
+      "EI": "N m^2",
+      "F": "N",
+      "L": "m",
+      "delta": "m",
+      "normalized_log_readout": "1",
+      "parameters": "dimensionless log-ratios"
+     }
+    },
+    "parameters": {
+     "hypotheses": [
+      "Assumed Gaussian prior: SD(log_EI_ratio)=0.6, SD(log_load_scale)=0.5, correlation=0.6; covariance entry 0.18 is the declared product 0.6*0.5*0.6."
+     ],
+     "likelihood": "Linear Gaussian normalized log-readouts; each assumed noise variance is 0.01 (SD 0.1), not calibrated.",
+     "names": [
+      "log_EI_ratio",
+      "log_load_scale"
+     ],
+     "prior_covariance": [
+      [
+       0.36,
+       0.18
+      ],
+      [
+       0.18,
+       0.25
+      ]
+     ],
+     "prior_mean": [
+      0.0,
+      0.0
+     ],
+     "units": [
+      "1",
+      "1"
+     ]
+    },
+    "designs": [
+     {
+      "id": "mixed_load_deflection",
+      "intervention": "Acquire an independent load-scale read plus one normalized deflection read.",
+      "cost": 2.0,
+      "cost_unit": "assumed_readout_cost_unit",
+      "cost_basis": "two reads at one assumed unit each; not a dollar cost",
+      "rank": 2,
+      "parameter_count": 2,
+      "full_rank": true,
+      "nullspace_basis": [],
+      "singular_values": [
+       16.18033988749895,
+       6.180339887498948
+      ],
+      "target_prior_variance": 0.36,
+      "target_posterior_variance": 0.018947368421052657,
+      "variance_reduction": 0.34105263157894733,
+      "reduction_per_cost": 0.17052631578947366,
+      "posterior_covariance": [
+       [
+        0.018947368421052657,
+        0.009473684210526329
+       ],
+       [
+        0.009473684210526329,
+        0.00958532695374803
+       ]
+      ],
+      "observations": [
+       {
+        "batch": "one_assumed_batch",
+        "biological_replicate": "not_applicable_mathematical_example",
+        "condition": "load_scale_sensor",
+        "readout_id": "direct_log_load_scale",
+        "technical_repeat": 1
+       },
+       {
+        "batch": "one_assumed_batch",
+        "biological_replicate": "not_applicable_mathematical_example",
+        "condition": "nominal_force_ratio=1",
+        "readout_id": "normalized_log_deflection",
+        "technical_repeat": 1
+       }
+      ],
+      "measurement_rows": 0,
+      "objective_order": 1
+     },
+     {
+      "id": "deflection_only",
+      "intervention": "Set nominal force ratios 1 and 2; normalize out their known offsets.",
+      "cost": 2.0,
+      "cost_unit": "assumed_readout_cost_unit",
+      "cost_basis": "two reads at one assumed unit each; not a dollar cost",
+      "rank": 1,
+      "parameter_count": 2,
+      "full_rank": false,
+      "nullspace_basis": [
+       [
+        0.7071067811865475,
+        0.7071067811865475
+       ]
+      ],
+      "singular_values": [
+       20.000000000000004,
+       0.0
+      ],
+      "target_prior_variance": 0.36,
+      "target_posterior_variance": 0.23294117647058823,
+      "variance_reduction": 0.12705882352941175,
+      "reduction_per_cost": 0.06352941176470588,
+      "posterior_covariance": [
+       [
+        0.23294117647058823,
+        0.22941176470588234
+       ],
+       [
+        0.22941176470588234,
+        0.2307843137254902
+       ]
+      ],
+      "observations": [
+       {
+        "batch": "one_assumed_batch",
+        "biological_replicate": "not_applicable_mathematical_example",
+        "condition": "nominal_force_ratio=1",
+        "readout_id": "normalized_log_deflection",
+        "technical_repeat": 1
+       },
+       {
+        "batch": "one_assumed_batch",
+        "biological_replicate": "not_applicable_mathematical_example",
+        "condition": "nominal_force_ratio=2",
+        "readout_id": "normalized_log_deflection",
+        "technical_repeat": 1
+       }
+      ],
+      "measurement_rows": 0,
+      "objective_order": 2
+     }
+    ],
+    "measurement_rows": 0,
+    "controls": [
+     "Two nominal-force deflections have identical normalized sensitivity [-1,+1].",
+     "Independent load-scale sensitivity is [0,+1].",
+     "No synthetic response or measurement table is included."
+    ],
+    "assumptions": [
+     "Dimensionless log-ratio prior and readout-noise values are assumed, not fitted.",
+     "This abstract cantilever calculation has no species calibration."
+    ],
+    "limitations": [
+     "No measurements, biological parameters, empirical posterior, or physical success probability are generated.",
+     "The local proposal is not linked/submitted until exact Problem/Project refs are supplied."
+    ],
+    "link_blockers": [
+     "Pin an exact Problem, Project, or Action Ref before submitting a versioned Action."
+    ],
+    "state": "proposal_unlinked",
+    "links": {
+     "action_ref": null,
+     "problem_ref": null,
+     "project_ref": null
+    },
+    "context": {
+     "cell_state": "not_applicable",
+     "developmental_time": "not_applicable",
+     "eligibility": "abstract model only; no specimen or organism eligibility",
+     "environment": "not_applicable; static mathematical beam",
+     "genotype": "not_applicable",
+     "measurement_method": "prospective dimensionless readout model",
+     "open_gaps": [
+      "No biological calibration, species bridge, or source Claim pin is supplied."
+     ],
+     "species": "not_applicable_mathematical_cantilever"
+    },
+    "model_discrepancy": "Unknown and unestimated; no simulator-to-beam or beam-to-biology discrepancy model is fitted.",
+    "held_out_validation": [
+     "No observations or validation split exist; empirical fit/validation is blocked."
+    ],
+    "replicate_unit": "No biological replicate unit; two modeled readouts are not biological replicates.",
+    "batch_effects": "The diagonal noise covariance assumes independent readout errors; shared-batch error is not modeled or measured.",
+    "stop_rules": [
+     "Stop if covariance is nonfinite, asymmetric, or not positive semidefinite.",
+     "Do not submit or execute a physical plan without exact context refs and executing-lab constraints."
+    ],
+    "observed_result": null
+   }
   }
  },
  "resource_inventory": {

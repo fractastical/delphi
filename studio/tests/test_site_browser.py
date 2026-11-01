@@ -1698,3 +1698,24 @@ def test_experimentation_page_keeps_context_states_absence_and_invents_no_observ
     pg2 = page(browser, 400, 800)
     pg2.goto(base + "#/experimentation?tab=cross"); pg2.wait_for_selector("#ex-br")
     assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+
+
+def test_experimentation_renders_the_planner_result_prospective_only(browser, base):
+    r = json.loads((ROOT / "artifacts/experimental-design/result.json").read_text())
+    by = {d["id"]: d for d in r["designs"]}
+    assert r["measurement_rows"] == [] and r["selected_design_id"] == "mixed_load_deflection"
+    for w in (1280, 400):
+        pg = page(browser, w, 900)
+        pg.goto(base + "#/experimentation?scale=organ"); pg.wait_for_selector("#ex-plan")
+        t = pg.locator("#ex-plan").text_content()
+        for did, d in by.items():
+            row = pg.locator(f"#plan-{did}").text_content()
+            assert str(float(f"{d['expected_target_posterior_variance']:.6g}")) in row and str(d["identifiability"]["rank"]) + " of 2" in row, did
+        assert "prospective only" in t and "assumption based" in t and "0 measurement rows" in t
+        assert "selected under these assumptions" in pg.locator("#plan-mixed_load_deflection").text_content()
+        assert "selected under" not in pg.locator("#plan-deflection_only").text_content() and "nullspace" in pg.locator("#plan-deflection_only").text_content()
+        assert "probability of biological success" in t or "probability of biological success" in pg.locator("#main").text_content()
+        assert "matches the planner manifest" in t
+        if w == 400:
+            assert _overflow(pg) <= 0
+        pg.close()
