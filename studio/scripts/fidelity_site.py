@@ -142,12 +142,18 @@ def build(ins, out: dict, root: Path | None = None) -> list[dict]:
             "numerical_checks": [
                 {"name": "native ladder", "result": f"{native_n} of {arms.group(2)} arms valid over {len(ctxs)} contexts ({', '.join(ctxs)}), five lattices; scientific exit {nat.get('exit_code')}"},
                 {"name": "effect statuses", "result": f"{m.group(1)} sign_resolved, {m.group(2)} resolved: the sign is the same on every lattice but no magnitude is resolved. The audit's recomputation of the contributing statuses agrees ({len(statuses)} of {len(statuses)} sign_resolved)"},
-                {"name": "engineering decisions", "result": f"bending and feedback are undetermined in all {len(ctxs)} contexts, so no context is promoted. This is the frozen outcome, not a failure; the remedy is a finer or separated ladder, never a looser rule"},
+                {
+                    "name": "engineering decisions",
+                    "result": f"bending and feedback are undetermined in all {len(ctxs)} contexts, so no context is promoted. This is the frozen outcome, not a failure. The frozen protocol, written before the return, proposed a finer or span/chord-separated ladder as the remedy (a historical proposal, never a looser rule). The posthoc rigid solves since then do not support running a finer ladder in the same lattice scheme blindly, so the next action is diagnosing the scheme",
+                },
                 {"name": "frozen audit", "result": f"passed with 0 findings; {audit.get('comparisons', {}).get('count')} comparisons, all within roundoff ({audit.get('comparisons', {}).get('exact')} exact); protocol {au['protocol_sha256'][:12]}…. Same-model integrity and reproduction, not validation"},
                 {"name": "posthoc diagnostic (not frozen)", "result": f"{n_rigid if n_rigid is not None else 'a set of'} rigid unit solves after the return: rigid CL is non-monotone under span refinement and the mechanism is not identified. Descriptive only; it changes no status or decision"},
             ],
             "parameter_unknowns": ["EI is assumed, not measured.", "Mass, drag and the fixed angle of attack in the glide proxy are assumed engineering values."],
-            "open_questions": ["Does a finer or span/chord-separated ladder resolve any effect magnitude? The posthoc solves suggest the same lattice scheme may not."],
+            "open_questions": [
+                "What in the lattice scheme makes rigid CL non-monotone under span refinement? The mechanism is not identified and the scheme is under diagnosis.",
+                "Until it is, a finer ladder in the same scheme is not expected to give monotone triples; that is an inference from the posthoc rigid solves, not a tested prediction for coupled arms.",
+            ],
             "equations": [],
             "sources": [
                 {"label": "Returned report (RESULTS.md)", "locator": f"{PUBLIC}/RESULTS.md sha256 {declared[f'{D}/RESULTS.md'][:12]}…"},

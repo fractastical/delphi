@@ -124,3 +124,62 @@ def test_returned_claims_that_disagree_with_the_audit_are_refused(tmp_path):
 
 def test_no_handoff_means_no_card(tmp_path):
     assert F.build(Ins(tmp_path), {}, root=tmp_path) == []
+
+
+def test_the_frozen_remedy_stays_historical_and_posthoc_evidence_changes_the_next_action(built):
+    c, _ = built
+    chk = {k["name"]: k["result"] for k in c["numerical_checks"]}
+    d = chk["engineering decisions"]
+    assert "frozen protocol, written before the return, proposed a finer or span/chord-separated ladder" in d and "historical proposal" in d
+    assert "do not support running a finer ladder in the same lattice scheme blindly" in d and d.endswith("diagnosing the scheme")
+    assert "the remedy is a finer" not in d, "no present-tense recommendation of a finer ladder"
+    q = " ".join(c["open_questions"])
+    assert "under diagnosis" in q and "inference from the posthoc rigid solves, not a tested prediction for coupled arms" in q and "Does a finer" not in q
+
+
+# ------------------------------------------------------------------------------------------------ browser (the card injected into the real gallery, until root generates it)
+sync_api = pytest.importorskip("playwright.sync_api")
+
+
+def _open(browser, base, card, width):
+    snap = json.loads((ROOT / "site/data/snapshot.json").read_text())
+    snap["simulation_manifests"] = [x for x in snap.get("simulation_manifests", []) if x["id"] != card["id"]] + [card]
+    pg = browser.new_page(viewport={"width": width, "height": 900})
+    pg.errors = []
+    pg.on("pageerror", lambda e: pg.errors.append(str(e)))
+    pg.route("**/data/snapshot.json", lambda r: r.fulfill(json=snap))
+    pg.goto(base + "#/simulations?q=fidelity")
+    pg.wait_for_selector(".simgrid")
+    return pg
+
+
+@pytest.fixture(scope="module")
+def base():
+    import functools
+    import http.server
+    import threading
+
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(ROOT / "site"))
+    handler.log_message = lambda *a, **k: None
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    yield f"http://127.0.0.1:{srv.server_port}/"
+    srv.shutdown()
+
+
+@pytest.fixture(scope="module")
+def browser():
+    with sync_api.sync_playwright() as p:
+        b = p.chromium.launch()
+        yield b
+        b.close()
+
+
+@pytest.mark.parametrize("width", [1440, 390])
+def test_card_renders_in_the_gallery_with_the_corrected_wording_and_no_overflow(browser, base, built, width):
+    pg = _open(browser, base, built[0], width)
+    t = pg.locator(".simgrid").text_content()  # the checks sit inside the card's disclosure, so read text content rather than visible text
+    for must in ("45 native arms", "27 sign_resolved, 0 resolved", "historical proposal", "diagnosing the scheme", "posthoc"):
+        assert must in t, must
+    assert "the remedy is a finer" not in t and pg.errors == []
+    assert pg.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
