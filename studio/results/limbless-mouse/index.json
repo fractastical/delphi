@@ -1,0 +1,89 @@
+{
+  "schema": "limbless-mouse-index-0.1",
+  "note": "The index the site build reads. A study listed here and missing from the tree is reported on the page as declared-and-absent rather than dropped, so the page cannot quietly shrink. Captions are authored here so no figure can appear without one.",
+  "routes": {
+    "title": "Routes to a limbless or limb-reduced mouse",
+    "data": "results/limbless-mouse/routes.json",
+    "note": "Published perturbations and bounded proposals, grouped by the scale they act at. Every row carries its own evidence level and read levels on its sources. None has been attempted here."
+  },
+  "studies": [
+    {
+      "id": "zrs-conservation",
+      "title": "The ZRS across species: what changes when a limb enhancer is swapped",
+      "scale": "molecular",
+      "kind": "sequence analysis",
+      "question": "Kvon et al. swapped the mouse ZRS for orthologs from other species: human and coelacanth gave normal limbs, python and king cobra truncated them. The python ZRS is about as similar to mouse as the coelacanth's is, so whatever separates them is not overall sequence similarity. What can you see in the alignment?",
+      "summary": "Real ZRS orthologs fetched from NCBI, aligned here, with per-column conservation and ETS1 motif positions. The contrast of interest is between the orthologs that gave normal limbs in the published knock-in and the ones that truncated them. This is a correlational reading of a handful of sequences; it is not a predictor of enhancer activity and is not used as one anywhere on this page. The causal evidence is Kvon et al.'s mouse genetics, not this alignment.",
+      "code": "results/limbless-mouse/code/final_analysis.py (with fetch_orthologs.py, locate_zrs.py, core_trim.py, make_figure.py and zrs_lib.py beside it)",
+      "data": "results/limbless-mouse/zrs-analysis.json",
+      "figures": [
+        {
+          "file": "zrs-conservation.png",
+          "alt": "Per-column conservation of eleven aligned ZRS orthologs above a panel of per-species difference tracks, with ETS1 motif positions boxed, the limbed and finned species separated from the snakes, and a full-height band marking the 17 base-pair block that every snake has lost",
+          "caption": "Sequence analysis. Per-column conservation across the aligned orthologs, with ETS1 motif positions marked and the species split by what the published knock-in produced. The band marks a 17 bp block, counted against lizard, that is absent from four of the five snakes; in the fifth, tiger rattlesnake, the alignment places unrelated sequence there rather than a gap, so the deletion is not assessable there. An ETS1 motif inside the block scores in all six limbed or finned species and in none of the five snakes. A twelfth species, corn snake, had no detectable ZRS at all and is not in the figure. The block's position came out of the alignment before any comparison to the paper; the ETS1 call is a position-weight-matrix match, not measured binding."
+        }
+      ],
+      "summary_table_title": "Every species searched, with its percent identity to mouse over the trimmed core and its ETS1 motif content"
+    },
+    {
+      "id": "shh-grem1-fgf-loop",
+      "title": "The SHH–GREM1–FGF loop: where a weakened enhancer stops being a weaker limb and starts being no limb",
+      "scale": "tissue",
+      "kind": "simulation (ODE)",
+      "question": "The limb bud is held open by a feedback loop. If a ZRS allele lowers ZPA Shh output, is the result proportionally smaller, or is there a threshold below which the loop never engages at all?",
+      "summary": "An ODE model of the SHH–GREM1–BMP–FGF feedback loop, built from the published topology with every rate constant marked sourced or assumed. The wild-type control must initiate, sustain and self-terminate before any sweep is read. Three knobs are then swept — ZPA Shh output, AER-inducing FGF10 input, and GREM1 production — because three different routes on this page act on three different parts of the same loop.",
+      "code": "results/limbless-mouse/code/shh_loop.py",
+      "data": "results/limbless-mouse/shh-loop.json",
+      "figures": [
+        {
+          "file": "shh-loop-control.png",
+          "alt": "Simulated time courses of SHH, GREM1, BMP and FGF under wild-type parameters, showing the loop engaging and then self-terminating",
+          "caption": "Simulation, control arm. Wild-type parameters: the loop engages, is sustained for a bounded window, and self-terminates."
+        },
+        {
+          "file": "shh-loop-threshold.png",
+          "alt": "Simulated outgrowth duration against the fraction of wild-type ZPA Shh output, showing a sharp threshold",
+          "caption": "Simulation. Outgrowth duration against the fraction of wild-type ZPA Shh output. The threshold is a property of this model, not a measurement in an embryo."
+        },
+        {
+          "file": "shh-loop-phasemap.png",
+          "alt": "Simulated two-dimensional phase map over Shh output and FGF10 input, coloured by phenotype class",
+          "caption": "Simulation. Two knobs at once: the same phenotype class is reachable from different directions, which is the point of a design space."
+        }
+      ]
+    },
+    {
+      "id": "digit-turing",
+      "title": "Skeletal elements as a Turing pattern: how small a limb bud can be and still make a digit",
+      "scale": "pattern",
+      "kind": "simulation (reaction–diffusion)",
+      "question": "If a truncated bud is a smaller field, how small does the field have to get before it patterns no complete skeletal element at all?",
+      "summary": "A two-dimensional BMP–SOX9–WNT reaction–diffusion model on a limb-bud-shaped domain, with its own linear-stability analysis as an internal control. Element counts come from a pre-declared objective criterion, not from looking at the pictures, and the spread across random seeds is reported because Turing patterns are seed-dependent.",
+      "code": "results/limbless-mouse/code/digit_turing.py",
+      "data": "results/limbless-mouse/digit-turing.json",
+      "figures": [
+        {
+          "file": "digit-turing-normal.png",
+          "alt": "Simulated digit-like pattern in a limb-bud-shaped domain",
+          "caption": "Simulation. The pattern the model makes in a full-size paddle."
+        },
+        {
+          "file": "digit-turing-series.png",
+          "alt": "A strip of simulated patterns across the parameter sweep, from several elements down to none, each labelled with its element count",
+          "caption": "Simulation. The same model across the sweep, from several elements down to none."
+        },
+        {
+          "file": "digit-turing-domain.png",
+          "alt": "Simulated element count against domain size, with the critical domain size marked",
+          "caption": "Simulation. Element count against domain size, in units of the pattern's own wavelength."
+        },
+        {
+          "file": "digit-turing.mp4",
+          "kind": "video",
+          "alt": "Animation of the simulated BMP-SOX9-WNT pattern emerging in a limb-bud-shaped domain",
+          "caption": "Simulation. The pattern forming in the full-size paddle, from the seeded noise it starts in. No sound."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "schema": "limbless-mouse-page-0.1",
+  "id": "limbless-mouse",
+  "title": "Limbless mouse",
+  "group": "Design space",
+  "status": "design space, mapped and partly simulated",
+  "goal": "A judge asked whether we could make a limbless mouse. Rather than answer with one gene, map the whole design space: every route we can source, at every scale, with what each one would actually produce.",
+  "summary": "There is no single answer. Published mouse genetics already contains alleles that remove limbs entirely, alleles that truncate them, and alleles that take one limb pair and leave the other. They sit at different scales and they are not interchangeable. This page lays the routes out side by side, runs the models we can run on three of them, and says plainly where the chain between scales is uncalibrated.",
+  "answer": {
+    "headline": "Yes, several ways — and they do not give you the same animal.",
+    "paragraphs": [
+      "The honest answer to “could you make a limbless mouse?” is that the mouse literature already contains more than one way, and the first question back is which phenotype is wanted. Complete absence of all four limbs (amelia) is the Fgf10-null phenotype, and in humans the WNT3 Q83X tetra-amelia phenotype: the apical ectodermal ridge never forms, so there is no limb at all. Truncation is a different outcome reached by a different lesion: the limb bud starts, the SHH–GREM1–FGF loop fails to sustain it, and a stunted proximal element is left behind.",
+      "The sharpest precedent for getting there by editing regulation rather than by deleting a gene is Kvon et al. 2016. Replacing the mouse ZRS — the limb enhancer of Shh, about a megabase away inside an intron of Lmbr1 — with the king cobra ortholog abolished limb-bud Shh expression and truncated both limb pairs, while the human and coelacanth orthologs in the same assay gave normal limbs. And the 17 base pairs are not an association: Kvon et al. put that stretch, carrying an ETS site, back into the python ZRS, knocked that engineered allele into mice, and got normal limbs. Four ortholog knock-ins and one resurrected allele is the whole causal dataset, which is small — but it is a causal one. That is the resolution at which this is a design problem rather than a knockout.",
+      "If the goal is a viable adult animal rather than an embryonic phenotype, the realistic route is one limb pair, not four: a conditional Tbx5 allele for the forelimb, Tbx4 or Pitx1 for the hindlimb, switched after the body plan is laid down. Tetra-amelia alleles are generally severe and often lethal for reasons that have nothing to do with limbs.",
+      "And if the point is the mechanism rather than the mouse, the first thing a reviewer will ask for in 2026 is a limb-bud explant or organoid, not an animal. That route is on this page too."
+    ],
+    "precision_note": "Truncation is not amelia, and a page that blurs them is answering a question nobody asked. Every route below states which of the two — or which of micromelia, digit loss, or one-pair loss — it predicts."
+  },
+  "scales": [
+    {
+      "key": "molecular",
+      "label": "Molecular · sequence",
+      "blurb": "Edit the regulatory sequence rather than the gene: enhancer swaps, single transcription-factor binding sites, enhancer deletion, topology."
+    },
+    {
+      "key": "gene",
+      "label": "Gene · coding",
+      "blurb": "Null and hypomorphic alleles of the ligands, receptors and transcription factors that induce and maintain the limb field."
+    },
+    {
+      "key": "cell",
+      "label": "Cellular · signalling",
+      "blurb": "Remove or fail to maintain the signalling centres themselves — the apical ectodermal ridge and the zone of polarising activity — or exhaust the progenitor pool."
+    },
+    {
+      "key": "tissue",
+      "label": "Tissue · feedback",
+      "blurb": "Break the self-sustaining SHH–GREM1–FGF loop that keeps the bud growing, instead of removing any one of its parts."
+    },
+    {
+      "key": "pattern",
+      "label": "Pattern · skeleton",
+      "blurb": "Change the patterning system that lays down skeletal elements: the wavelength of the Turing-like network, or the size of the field it runs on."
+    },
+    {
+      "key": "timing",
+      "label": "Developmental · timing",
+      "blurb": "Keep the allele and choose when it fires. Conditional, inducible and degron systems move the lesion off fertilisation and away from lethality."
+    },
+    {
+      "key": "organism",
+      "label": "Organism · comparative",
+      "blurb": "Nature's own limbless vertebrates — snakes, limb-reduced skinks, cetaceans — reached it repeatedly and not by the same mechanism each time."
+    },
+    {
+      "key": "invitro",
+      "label": "In vitro · non-animal",
+      "blurb": "Limb-bud explants, micromass and organoids: the route that answers the mechanistic question without an animal, and the one a modern review asks for first."
+    }
+  ],
+  "chain": {
+    "title": "The chain across scales, and where it is not calibrated",
+    "intro": "The three models on this page are not independent demonstrations. They are meant to be read as one chain, and the chain has two junctions we refuse to call calibrated.",
+    "links": [
+      {
+        "from": "A ZRS allele",
+        "to": "ZPA Shh output",
+        "status": "scenario",
+        "note": "The sequence analysis measures divergence and motif content. It does not predict enhancer activity. Mapping an allele onto a fraction of wild-type Shh output is a scenario parameter, not a calibrated transfer."
+      },
+      {
+        "from": "ZPA Shh output",
+        "to": "Outgrowth duration",
+        "status": "model",
+        "note": "This junction is inside the SHH–GREM1–FGF model, so it is at least explicit: the model says how a reduction in Shh production shortens the window in which FGF stays above threshold."
+      },
+      {
+        "from": "Outgrowth duration",
+        "to": "Limb-bud domain size",
+        "status": "scenario",
+        "note": "A shorter outgrowth window means a smaller paddle, but the model has no geometry. Converting one to the other needs a growth law we have not fitted."
+      },
+      {
+        "from": "Domain size",
+        "to": "Skeletal element count",
+        "status": "model",
+        "note": "This junction is inside the Turing model, which gives a critical domain size in units of its own pattern wavelength."
+      }
+    ],
+    "verdict": "Two of the four junctions are within a single model and are explicit. Two cross between models and have no calibration behind them, so the end-to-end statement — “this allele gives that many digits” — is refused. The chain is a map of what would have to be measured, not a prediction."
+  },
+  "not_claimed": [
+    "No mouse was made, no embryo was used, and no wet-lab experiment was run for this page.",
+    "The three computational studies are simulations and a sequence analysis. None is an observation, and none is calibrated to a measured mouse limb bud.",
+    "No route on this page is a protocol. Each names published evidence and what would have to be done; none has been attempted here.",
+    "The sequence analysis is correlational over a handful of orthologs. It is not a predictor of enhancer activity and must not be used as one.",
+    "A threshold in a model is not a threshold in an embryo."
+  ],
+  "closing": {
+    "title": "Why this is on a design platform and not in a review article",
+    "text": "The useful thing here is not the list — a specialist could write the list. It is that every row carries its evidence level, every junction between scales carries a refusal or a label, and the three models can be re-run from the repository. The question “can you make a limbless mouse?” has a dozen answers whose differences only show up when you are forced to say which phenotype, at which scale, with what evidence, and at what cost. That is what this workspace is for."
+  }
+}

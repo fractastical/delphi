@@ -1,0 +1,1504 @@
+{
+  "what_this_is": "A SIMULATION of skeletal-element patterning by a Bmp-Sox9-Wnt Turing network in a limb-bud-shaped domain. No value in this file is an observation, a measurement, or a reproduction of published data. The element counts, wavelengths and critical domain size are properties of this model at these parameters and nothing else.",
+  "generated": "2026-11-01T12:33:11-0800",
+  "model": {
+    "name": "BSW (Bmp-Sox9-Wnt) Turing network with a proximodistal Fgf gradient",
+    "variables": [
+      {
+        "symbol": "S",
+        "species": "Sox9",
+        "diffuses": false,
+        "note": "D_S = 0; Sox9 is cell-autonomous (sourced: onimaru2016 states the system has one non-diffusive molecule, Sox9)."
+      },
+      {
+        "symbol": "B",
+        "species": "Bmp",
+        "diffuses": true,
+        "note": "long-range species, D_B = 160"
+      },
+      {
+        "symbol": "W",
+        "species": "Wnt",
+        "diffuses": true,
+        "note": "short-range species, D_W = 25"
+      },
+      {
+        "symbol": "F",
+        "species": "Fgf",
+        "diffuses": "prescribed, not solved",
+        "note": "static normalised gradient from the distal margin (the AER)"
+      }
+    ],
+    "equations_latex": {
+      "Sox9": "\\frac{\\partial S}{\\partial t} = \\beta\\left(k_2 B - k_3 W - S^3\\right)",
+      "Bmp": "\\frac{\\partial B}{\\partial t} = \\beta\\left(\\alpha_B - (1-k_F F)\\,k_4 S - k_5 B + D_B \\nabla^2 B\\right)",
+      "Wnt": "\\frac{\\partial W}{\\partial t} = \\beta\\left(\\alpha_W - k_7 k_F F\\,S - k_9 W + D_W \\nabla^2 W\\right)",
+      "Fgf": "F(\\hat{x}) = F_{\\max}\\,e^{-g\\,\\hat{x}},\\qquad \\hat{x} = \\frac{\\text{distance proximal from the distal margin}}{L_{PD}}",
+      "steady_state": "S^{*}=0,\\quad B^{*}=\\alpha_B/k_5,\\quad W^{*}=\\alpha_W/k_9",
+      "jacobian": "M(q)=\\beta\\begin{pmatrix}-3S^{*2} & k_2 & -k_3\\\\ -a_4 & -k_5-D_Bq^2 & 0\\\\ -a_7 & 0 & -k_9-D_Wq^2\\end{pmatrix},\\;a_4=(1-k_FF)k_4,\\; a_7=k_7k_FF"
+    },
+    "topology": [
+      {
+        "source_node": "Bmp",
+        "target": "Sox9",
+        "sign": "+",
+        "term": "+k2*B",
+        "evidence": "onimaru2016 eq (16), full-text"
+      },
+      {
+        "source_node": "Wnt",
+        "target": "Sox9",
+        "sign": "-",
+        "term": "-k3*W",
+        "evidence": "onimaru2016 eq (16), full-text"
+      },
+      {
+        "source_node": "Sox9",
+        "target": "Sox9",
+        "sign": "-",
+        "term": "-S^3",
+        "evidence": "onimaru2016 eq (16), full-text; cubic self-damping, the only nonlinearity"
+      },
+      {
+        "source_node": "Sox9",
+        "target": "Bmp",
+        "sign": "-",
+        "term": "-(1-kF*F)*k4*S",
+        "evidence": "onimaru2016 eq (17), full-text"
+      },
+      {
+        "source_node": "Sox9",
+        "target": "Wnt",
+        "sign": "-",
+        "term": "-k7*kF*F*S",
+        "evidence": "onimaru2016 eq (18), full-text"
+      },
+      {
+        "source_node": "Fgf",
+        "target": "Sox9-|Bmp edge",
+        "sign": "-",
+        "term": "(1-kF*F) scales k4",
+        "evidence": "onimaru2016 Results, 'repressing k4 and boosting k7', full-text"
+      },
+      {
+        "source_node": "Fgf",
+        "target": "Sox9-|Wnt edge",
+        "sign": "+",
+        "term": "kF*F scales k7",
+        "evidence": "onimaru2016 Results, 'repressing k4 and boosting k7', full-text"
+      }
+    ],
+    "parameters": [
+      {
+        "name": "beta",
+        "value": 8.0,
+        "units": "1/time (model)",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, 'Parameter values were beta=8, ...' for Figs 4-5",
+        "note": "Global coefficient controlling the speed of pattern appearance."
+      },
+      {
+        "name": "k2",
+        "value": 1.0,
+        "units": "dimensionless",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, Figs 4-5 parameter list",
+        "note": "Bmp -> Sox9 activation strength. Onimaru et al. perturb exactly this parameter to represent Bmp inhibition."
+      },
+      {
+        "name": "k3",
+        "value": 3.0,
+        "units": "dimensionless",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, Figs 4-5 parameter list",
+        "note": "Wnt -| Sox9 inhibition strength (the minus sign is explicit in eq 16)."
+      },
+      {
+        "name": "k4",
+        "value": 6.0,
+        "units": "dimensionless",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, Figs 4-5 parameter list",
+        "note": "Sox9 -| Bmp inhibition strength; repressed by Fgf."
+      },
+      {
+        "name": "k7",
+        "value": 2.4,
+        "units": "dimensionless",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, Figs 4-5 parameter list",
+        "note": "Sox9 -| Wnt inhibition strength; boosted by Fgf."
+      },
+      {
+        "name": "k5",
+        "value": 0.1,
+        "units": "1/time (model)",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, Figs 4-5 parameter list",
+        "note": "Bmp linear decay."
+      },
+      {
+        "name": "k9",
+        "value": 0.1,
+        "units": "1/time (model)",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, Figs 4-5 parameter list",
+        "note": "Wnt linear decay."
+      },
+      {
+        "name": "kF",
+        "value": 0.667,
+        "units": "dimensionless",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, Figs 4-5 parameter list",
+        "note": "Strength with which the normalised Fgf field F in [0,1] modulates k4 and k7."
+      },
+      {
+        "name": "D_B",
+        "value": 160.0,
+        "units": "length^2/time (model)",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, Figs 4-5 parameter list",
+        "note": "Bmp diffusion. Bmp is the LONG-range species (D_B > D_W)."
+      },
+      {
+        "name": "D_W",
+        "value": 25.0,
+        "units": "length^2/time (model)",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, Figs 4-5 parameter list",
+        "note": "Wnt diffusion. Wnt is the SHORT-range species."
+      },
+      {
+        "name": "alpha_B",
+        "value": 0.1,
+        "units": "conc/time (model)",
+        "status": "sourced",
+        "source": "onimaru2016 Methods, Figs 4-5 parameter list",
+        "note": "Constant Bmp production."
+      },
+      {
+        "name": "alpha_W",
+        "value": 0.03333333333333333,
+        "units": "conc/time (model)",
+        "status": "assumed",
+        "source": "CHANGED from the published value alpha_W = 1.2 (onimaru2016 Methods).",
+        "note": "alpha_W = k2*alpha_B*k9/(k3*k5) = 0.03333, chosen so the homogeneous steady state sits exactly at S*=0, where the cubic self-damping -3S*^2 vanishes and the paper's own LINEAR Turing conditions apply. With the published alpha_W = 1.2 my own linear stability analysis finds NO Turing instability anywhere on this static domain: see linear_stability.published_set_check in the JSON. This is the single substantive departure from the published parameter set and it is the reason the whole set must be read as 'published form, operating point retuned'."
+      },
+      {
+        "name": "F_max",
+        "value": 0.62,
+        "units": "dimensionless",
+        "status": "assumed",
+        "source": "no published value for this geometry",
+        "note": "Distal maximum of the normalised Fgf field. Chosen just BELOW the upper edge of the Turing window in F (F_hopf, computed by the LSA below), so that no part of the bud sits in the uniform (q=0) instability regime. Calibration choice."
+      },
+      {
+        "name": "F_decay",
+        "value": 4.0,
+        "units": "dimensionless",
+        "status": "assumed",
+        "source": "onimaru2016 gives exp(-3*x) on a UNIT SQUARE (Supplementary Fig. 7); the fin/limb simulations instead solve a reaction-diffusion Fgf field whose absolute spatial scale is set by their mesh, which I do not have.",
+        "note": "F(x_hat) = F_max * exp(-F_decay * x_hat), x_hat = normalised distance proximal from the distal margin. F_decay=4 (vs the published square-domain 3) makes the Turing-permissive band about one wavelength deep, which is what yields a single proximodistal row of elements rather than two rows."
+      },
+      {
+        "name": "L_PD",
+        "value": 300.0,
+        "units": "length (model)",
+        "status": "assumed",
+        "source": "no measured value used",
+        "note": "Proximodistal length of the paddle."
+      },
+      {
+        "name": "W_AP_half",
+        "value": 220.0,
+        "units": "length (model)",
+        "status": "assumed",
+        "source": "no measured value used",
+        "note": "Half-width of the paddle at its distal margin. L_PD and W_AP_half were chosen so that the WILD-TYPE-LIKE run yields about five elements. The five-element outcome is therefore IMPOSED by the domain, not predicted. What the model predicts is how the element count MOVES when the wavelength or the domain is changed."
+      },
+      {
+        "name": "dx",
+        "value": 4.0,
+        "units": "length (model)",
+        "status": "assumed",
+        "source": "numerical choice",
+        "note": "Grid spacing; checked by the grid-refinement arm."
+      },
+      {
+        "name": "dt",
+        "value": 0.01,
+        "units": "time (model)",
+        "status": "assumed",
+        "source": "numerical choice (onimaru2016 use dt=0.002 with an explicit Heun solver; this script uses a semi-implicit solver, so a larger step is admissible)",
+        "note": "Checked by the dt-refinement arm. dt=0.02 was measured to be numerically UNSTABLE here; dt=0.01, 0.005 and 0.002 agree to 5 significant figures."
+      },
+      {
+        "name": "T_end",
+        "value": 60.0,
+        "units": "time (model)",
+        "status": "assumed",
+        "source": "numerical choice",
+        "note": "The pattern coarsens after onset and the coarsening ARRESTS by t~40 (measured in a 1-D control out to t=320). T_end=60 is past arrest."
+      },
+      {
+        "name": "noise_amplitude",
+        "value": 0.01,
+        "units": "conc (model)",
+        "status": "assumed",
+        "source": "onimaru2016 use 1% Gaussian MULTIPLICATIVE noise at each step; multiplicative noise vanishes identically at this model's steady state S*=0, so it cannot be used here.",
+        "note": "Seeded additive Gaussian perturbation of S at t=0, s.d. 1% of the Bmp steady state. A control arm adds dt-scaled per-step additive noise instead."
+      }
+    ],
+    "parameter_provenance_summary": {
+      "sourced": [
+        "beta",
+        "k2",
+        "k3",
+        "k4",
+        "k7",
+        "k5",
+        "k9",
+        "kF",
+        "D_B",
+        "D_W",
+        "alpha_B"
+      ],
+      "assumed": [
+        "alpha_W",
+        "F_max",
+        "F_decay",
+        "L_PD",
+        "W_AP_half",
+        "dx",
+        "dt",
+        "T_end",
+        "noise_amplitude"
+      ],
+      "statement": "The EQUATION FORM and 11 of 19 parameters are sourced at full-text level from onimaru2016, which states that it implements the raspopovic2014 mouse BSW model. One sourced parameter (alpha_W) was CHANGED, for the reason recorded in its entry and measured in linear_stability.published_set_check. The geometry, the Fgf gradient shape, and all numerical parameters are assumed. The mouse parameter set of raspopovic2014 could not be obtained: that paper is subscription-only and was read at abstract level."
+    }
+  },
+  "linear_stability": {
+    "method": "Eigenvalues of the 3x3 Jacobian M(q) of the full nonlinear system, linearised about the homogeneous steady state, with the diffusion terms -D_B q^2 and -D_W q^2 on the diagonal and D_S = 0, evaluated on a grid of 6001 wavenumbers q in [0, 1.2]. Turing instability is declared when max Re sigma(0) < 0 AND max_q Re sigma(q) > 0 at q > 0. The homogeneous steady states are the real roots of the cubic in S obtained by eliminating B and W.",
+    "steady_state_used": {
+      "S": 0.0,
+      "B": 1.0,
+      "W": 0.3333333333333333
+    },
+    "turing_window_in_F": {
+      "F_low": 0.175,
+      "F_high": 0.6791666666666667,
+      "note": "below F_low the uniform state is stable (no pattern); above F_high it is unstable at q=0 (uniform runaway, not a Turing pattern). F_max was set to 0.62, just below F_high."
+    },
+    "predicted_wavelength": 42.80073394006878,
+    "predicted_wavelength_units": "model length units",
+    "predicted_at_F": 0.62,
+    "max_growth_rate": 8.179718139221478,
+    "published_set_check": {
+      "question": "Is the published parameter set, with alpha_W = 1.2, Turing-unstable on this static domain?",
+      "answer": "No.",
+      "scope": "51 values of F in [0,1]; every real homogeneous steady state at each (1 to 3 roots); 6001 wavenumbers in [0,1.2].",
+      "max_growth_rate_found": 3.578125573738048,
+      "at_F": 1.0,
+      "at_q": 0.054000955,
+      "growth_at_q0_there": 3.1247669057324177,
+      "any_turing_instability": false,
+      "diagnosis": "With alpha_W = 1.2 the homogeneous steady state lies far from S = 0 (S* between about -5.8 and -0.58 on the branch that is continuous in F), so the cubic self-damping term -3S*^2 is large and suppresses the instability. The one state with a positive growth rate is unstable already at q = 0, which is a uniform instability, not a Turing instability.",
+      "what_this_does_and_does_not_mean": "This is NOT a claim that the published model is wrong. onimaru2016 run it on a GROWING catshark fin mesh with per-step noise and a reaction-diffusion Fgf field whose absolute spatial scale is set by a mesh I do not have, and their published Turing-space analysis uses the LINEAR model (k1 = 0, so f_S = 0) with k3 = 1, not the cubic model with k3 = 3. My test is a static homogeneous domain and is not like-for-like. What it does mean is that I could not reproduce a Turing instability from the published numbers as I read them, so the operating point here is mine and is labelled assumed."
+    }
+  },
+  "measured_wavelength": {
+    "two_d_AP_element_spacing": 81.05195896813565,
+    "one_d_uniform_control_linear_regime": 45.45454545454546,
+    "one_d_uniform_control_saturated": 125.0,
+    "units": "model length units",
+    "comparison_to_linear_prediction": {
+      "lambda_linear_LSA": 42.80073394006878,
+      "ratio_saturated_over_linear": 2.9205106663598284,
+      "ratio_2D_measured_over_linear": 1.8937048855663945,
+      "verdict": "THEY DISAGREE, by a factor of about two, and the disagreement is reported rather than tuned away. The linear analysis predicts the FASTEST-GROWING mode at onset; the simulated pattern then coarsens and the coarsening arrests at a longer, nonlinearly selected wavelength. The agreement that does hold is in the LINEAR regime: a 1-D uniform-domain run probed at t = 2, while the amplitude is still small, has a dominant wavelength close to the LSA value. Coarsening was measured to arrest by t ~ 40 and the wavelength was then unchanged out to t = 320."
+    }
+  },
+  "sweeps": {
+    "diffusion_scale": [
+      {
+        "value": 0.25,
+        "element_count_mean": 9.0,
+        "element_count_sd": 1.632993161855452,
+        "element_counts": [
+          7,
+          9,
+          11
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 21.40043985938015,
+        "lsa_turing": true,
+        "amplitude_mean": 5.53086241938153,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 49.86655847240379
+      },
+      {
+        "value": 0.4,
+        "element_count_mean": 7.666666666666667,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          8,
+          7,
+          8
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 27.08260112305178,
+        "lsa_turing": true,
+        "amplitude_mean": 5.507027925306521,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 58.129774986917845
+      },
+      {
+        "value": 0.6,
+        "element_count_mean": 6.333333333333333,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          6,
+          7,
+          6
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 33.13901584455825,
+        "lsa_turing": true,
+        "amplitude_mean": 5.368825527186869,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 69.3095167259641
+      },
+      {
+        "value": 0.8,
+        "element_count_mean": 6.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          6,
+          6,
+          6
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 38.31190384899957,
+        "lsa_turing": true,
+        "amplitude_mean": 5.303338098627915,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 75.59493270680386
+      },
+      {
+        "value": 1.0,
+        "element_count_mean": 6.0,
+        "element_count_sd": 0.816496580927726,
+        "element_counts": [
+          5,
+          7,
+          6
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "normal digit number",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 5.294780919932467,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 77.5427979519642
+      },
+      {
+        "value": 1.5,
+        "element_count_mean": 3.3333333333333335,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          3,
+          3,
+          4
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "reduced",
+          "reduced",
+          "reduced"
+        ],
+        "lambda_pred": 52.3594848636934,
+        "lsa_turing": true,
+        "amplitude_mean": 5.145027319257577,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 137.7201140289167
+      },
+      {
+        "value": 2.0,
+        "element_count_mean": 3.3333333333333335,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          3,
+          4,
+          3
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "reduced",
+          "reduced",
+          "reduced"
+        ],
+        "lambda_pred": 60.64797196089966,
+        "lsa_turing": true,
+        "amplitude_mean": 5.0145480206664725,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 136.74730828142597
+      }
+    ],
+    "fgf_strength_kF": [
+      {
+        "value": 0.3,
+        "element_count_mean": 9.666666666666666,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          9,
+          10,
+          10
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 33.35009125824127,
+        "lsa_turing": true,
+        "amplitude_mean": 1.268334492369818,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 44.65434681993821
+      },
+      {
+        "value": 0.45,
+        "element_count_mean": 6.666666666666667,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          7,
+          7,
+          6
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 37.399721091782425,
+        "lsa_turing": true,
+        "amplitude_mean": 3.063655447688388,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 66.09889300135201
+      },
+      {
+        "value": 0.6,
+        "element_count_mean": 6.0,
+        "element_count_sd": 0.816496580927726,
+        "element_counts": [
+          5,
+          7,
+          6
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "normal digit number",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 41.01272539433507,
+        "lsa_turing": true,
+        "amplitude_mean": 4.616572389097497,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 77.83177684535104
+      },
+      {
+        "value": 0.667,
+        "element_count_mean": 6.0,
+        "element_count_sd": 0.816496580927726,
+        "element_counts": [
+          5,
+          7,
+          6
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "normal digit number",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 5.294780919932467,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 77.5427979519642
+      },
+      {
+        "value": 0.8,
+        "element_count_mean": 3.6666666666666665,
+        "element_count_sd": 1.699673171197595,
+        "element_counts": [
+          2,
+          3,
+          6
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "reduced",
+          "reduced",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 44.75175065088149,
+        "lsa_turing": true,
+        "amplitude_mean": 6.455285790726935,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 146.08915162220606
+      },
+      {
+        "value": 0.95,
+        "element_count_mean": 4.0,
+        "element_count_sd": 0.816496580927726,
+        "element_counts": [
+          3,
+          4,
+          5
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "reduced",
+          "reduced",
+          "normal digit number"
+        ],
+        "lambda_pred": 44.624615898569736,
+        "lsa_turing": true,
+        "amplitude_mean": 7.773866045058543,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 112.16897914668705
+      }
+    ],
+    "domain_scale": [
+      {
+        "value": 0.12,
+        "element_count_mean": 0.6666666666666666,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          1,
+          1,
+          0
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "none"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 2.1540801454062133,
+        "ap_extent": 48.0,
+        "pd_extent": 32.0,
+        "ap_spacing": null,
+        "ap_extent_in_wavelengths": 0.5922127066524139,
+        "pd_extent_in_wavelengths": 0.3948084711016092
+      },
+      {
+        "value": 0.16,
+        "element_count_mean": 1.3333333333333333,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          1,
+          1,
+          2
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "reduced"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 3.0778214478928376,
+        "ap_extent": 68.0,
+        "pd_extent": 48.0,
+        "ap_spacing": 48.54117647058824,
+        "ap_extent_in_wavelengths": 0.8389680010909196,
+        "pd_extent_in_wavelengths": 0.5922127066524139
+      },
+      {
+        "value": 0.2,
+        "element_count_mean": 1.6666666666666667,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          2,
+          2,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "reduced",
+          "reduced",
+          "single element"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 3.2997974355999595,
+        "ap_extent": 84.0,
+        "pd_extent": 60.0,
+        "ap_spacing": 54.82954545454545,
+        "ap_extent_in_wavelengths": 1.0363722366417243,
+        "pd_extent_in_wavelengths": 0.7402658833155172
+      },
+      {
+        "value": 0.25,
+        "element_count_mean": 1.3333333333333333,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          1,
+          2,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "reduced",
+          "single element"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 3.8563799419178717,
+        "ap_extent": 108.0,
+        "pd_extent": 72.0,
+        "ap_spacing": 64.63201094391245,
+        "ap_extent_in_wavelengths": 1.332478589967931,
+        "pd_extent_in_wavelengths": 0.8883190599786207
+      },
+      {
+        "value": 0.3,
+        "element_count_mean": 1.6666666666666667,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          1,
+          2,
+          2
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "single element",
+          "reduced",
+          "reduced"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 4.1644274375911285,
+        "ap_extent": 128.0,
+        "pd_extent": 88.0,
+        "ap_spacing": 79.02809224318659,
+        "ap_extent_in_wavelengths": 1.5792338844064369,
+        "pd_extent_in_wavelengths": 1.0857232955294254
+      },
+      {
+        "value": 0.4,
+        "element_count_mean": 2.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          2,
+          2,
+          2
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "reduced",
+          "reduced",
+          "reduced"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 4.312254370289282,
+        "ap_extent": 164.0,
+        "pd_extent": 120.0,
+        "ap_spacing": 98.60294262292324,
+        "ap_extent_in_wavelengths": 2.023393414395747,
+        "pd_extent_in_wavelengths": 1.4805317666310345
+      },
+      {
+        "value": 0.5,
+        "element_count_mean": 2.6666666666666665,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          2,
+          3,
+          3
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "reduced",
+          "reduced",
+          "reduced"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 4.916371740630288,
+        "ap_extent": 208.0,
+        "pd_extent": 148.0,
+        "ap_spacing": 87.95494215680121,
+        "ap_extent_in_wavelengths": 2.56625506216046,
+        "pd_extent_in_wavelengths": 1.8259891788449427
+      },
+      {
+        "value": 0.65,
+        "element_count_mean": 3.3333333333333335,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          4,
+          3,
+          3
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "reduced",
+          "reduced",
+          "reduced"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 5.055474197822002,
+        "ap_extent": 276.0,
+        "pd_extent": 192.0,
+        "ap_spacing": 93.72417357613112,
+        "ap_extent_in_wavelengths": 3.4052230632513796,
+        "pd_extent_in_wavelengths": 2.3688508266096555
+      },
+      {
+        "value": 0.8,
+        "element_count_mean": 4.333333333333333,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          5,
+          4,
+          4
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "normal digit number",
+          "reduced",
+          "reduced"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 5.09270194798929,
+        "ap_extent": 332.0,
+        "pd_extent": 236.0,
+        "ap_spacing": 76.18650557968179,
+        "ap_extent_in_wavelengths": 4.096137887679196,
+        "pd_extent_in_wavelengths": 2.911712474374368
+      },
+      {
+        "value": 1.0,
+        "element_count_mean": 6.0,
+        "element_count_sd": 0.816496580927726,
+        "element_counts": [
+          5,
+          7,
+          6
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "normal digit number",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 5.294780919932467,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 77.5427979519642,
+        "ap_extent_in_wavelengths": 5.181861183208621,
+        "pd_extent_in_wavelengths": 3.6519783576898854
+      },
+      {
+        "value": 1.25,
+        "element_count_mean": 7.333333333333333,
+        "element_count_sd": 0.4714045207910317,
+        "element_counts": [
+          7,
+          7,
+          8
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 5.516858434706022,
+        "ap_extent": 524.0,
+        "pd_extent": 368.0,
+        "ap_spacing": 75.45145969153722,
+        "ap_extent_in_wavelengths": 6.464988714288851,
+        "pd_extent_in_wavelengths": 4.540297417668506
+      }
+    ],
+    "bmp_to_sox9_k2": [
+      {
+        "value": 0.3,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 54.35238919322853,
+        "lsa_turing": true,
+        "amplitude_mean": 5.53788935490578,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 0.5,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 49.55158510682417,
+        "lsa_turing": true,
+        "amplitude_mean": 5.126002430462809,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 0.7,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 47.02951731747902,
+        "lsa_turing": true,
+        "amplitude_mean": 4.726466253840052,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 0.85,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 45.79551565319161,
+        "lsa_turing": true,
+        "amplitude_mean": 4.442976343589692,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 1.0,
+        "element_count_mean": 6.0,
+        "element_count_sd": 0.816496580927726,
+        "element_counts": [
+          5,
+          7,
+          6
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "normal digit number",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 5.294780919932467,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 77.5427979519642
+      },
+      {
+        "value": 1.5,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 36.615116130682175,
+        "lsa_turing": true,
+        "amplitude_mean": 3.34492330361037,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 2.0,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 32.99977701348315,
+        "lsa_turing": true,
+        "amplitude_mean": 2.6050254773625796,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 3.0,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 28.353619988845164,
+        "lsa_turing": true,
+        "amplitude_mean": 1.4989268802547215,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 4.0,
+        "element_count_mean": 3.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          3,
+          3,
+          3
+        ],
+        "n_seeds": 3,
+        "cls": "reduced",
+        "classes": [
+          "reduced",
+          "reduced",
+          "reduced"
+        ],
+        "lambda_pred": 24.89368323877861,
+        "lsa_turing": true,
+        "amplitude_mean": 0.5946961429503843,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 176.0
+      },
+      {
+        "value": 5.0,
+        "element_count_mean": 0.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          0,
+          0,
+          0
+        ],
+        "n_seeds": 3,
+        "cls": "none",
+        "classes": [
+          "none",
+          "none",
+          "none"
+        ],
+        "lambda_pred": 18.589266135769464,
+        "lsa_turing": true,
+        "amplitude_mean": 0.04188413617340617,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 6.0,
+        "element_count_mean": 0.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          0,
+          0,
+          0
+        ],
+        "n_seeds": 3,
+        "cls": "none",
+        "classes": [
+          "none",
+          "none",
+          "none"
+        ],
+        "lambda_pred": 5.235987755982989,
+        "lsa_turing": false,
+        "amplitude_mean": 0.02374540535006642,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      }
+    ],
+    "wnt_production_alphaW_scale": [
+      {
+        "value": 0.4,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 4.164951420352883,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 0.6,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 4.170609330040709,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 0.8,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 4.178145062674232,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 1.0,
+        "element_count_mean": 6.0,
+        "element_count_sd": 0.816496580927726,
+        "element_counts": [
+          5,
+          7,
+          6
+        ],
+        "n_seeds": 3,
+        "cls": "increased (polydactyl-like)",
+        "classes": [
+          "normal digit number",
+          "increased (polydactyl-like)",
+          "increased (polydactyl-like)"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 5.294780919932467,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": 77.5427979519642
+      },
+      {
+        "value": 1.3,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 4.171263042034991,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      },
+      {
+        "value": 1.6,
+        "element_count_mean": 1.0,
+        "element_count_sd": 0.0,
+        "element_counts": [
+          1,
+          1,
+          1
+        ],
+        "n_seeds": 3,
+        "cls": "single element",
+        "classes": [
+          "single element",
+          "single element",
+          "single element"
+        ],
+        "lambda_pred": 42.80073394006878,
+        "lsa_turing": true,
+        "amplitude_mean": 4.164782851219262,
+        "ap_extent": 420.0,
+        "pd_extent": 296.0,
+        "ap_spacing": null
+      }
+    ]
+  },
+  "sweep_descriptions": {
+    "diffusion_scale": "D_B and D_W scaled together by this factor. lambda scales as sqrt(factor). This is the WAVELENGTH KNOB. Direction check: shorter wavelength should give MORE, thinner elements, which is the direction sheth2012 reports for progressive loss of distal Hox dose (read at abstract level; no number taken from it).",
+    "fgf_strength_kF": "Strength of the Fgf modulation of k4 and k7. Moves the system through the Turing window and changes where the permissive band sits.",
+    "domain_scale": "Linear scale factor on the whole paddle, Fgf gradient scaling with it. This is the bridge to a truncated limb bud.",
+    "bmp_to_sox9_k2": "Strength of Bmp activation of Sox9. onimaru2016 perturb exactly this parameter to represent Bmp inhibition and report that the distal-most Sox9 spots fail to form. It is two-sided here: too small and the uniform state loses stability at q = 0, too large and the long-range inhibition stabilises every wavenumber, so the Turing instability is lost on BOTH sides.",
+    "wnt_production_alphaW_scale": "Multiplier on alpha_W. onimaru2016 perturb Wnt production and report partial fusion of Sox9 into continuous domains, matched in vivo by a porcupine inhibitor."
+  },
+  "critical_domain_size": {
+    "value": null,
+    "units": "wavelengths",
+    "uncertainty": null,
+    "axis": "anteroposterior width of the paddle at its widest point",
+    "pd_extent_at_the_same_point_in_wavelengths": null,
+    "definition": "Midpoint between the largest domain scale whose modal phenotype class is 'none' and the smallest whose class is not, expressed in units of the measured wavelength lambda_meas. The uncertainty is half that interval and is set by the spacing of the domain_scale grid, not by a fit.",
+    "reading": "Below roughly one wavelength of anteroposterior width the paddle cannot hold a complete element and the field is unpatterned. Because the Fgf gradient scales with the bud, the proximodistal permissive band shrinks at the same time, so both axes run out together; the AP figure is the one quoted."
+  },
+  "refinement_arm": {
+    "grid": {
+      "wt": {
+        "condition": "wt",
+        "baseline_counts": [
+          5,
+          7
+        ],
+        "refined_counts": [
+          4,
+          4
+        ],
+        "max_abs_difference": 3
+      },
+      "k2=0.85": {
+        "condition": "k2=0.85",
+        "baseline_counts": [
+          1,
+          1
+        ],
+        "refined_counts": [
+          1,
+          1
+        ],
+        "max_abs_difference": 0
+      },
+      "domain_scale=0.3": {
+        "condition": "domain_scale=0.3",
+        "baseline_counts": [
+          1,
+          2
+        ],
+        "refined_counts": [
+          1,
+          1
+        ],
+        "max_abs_difference": 1
+      }
+    },
+    "dt": {
+      "wt": {
+        "condition": "wt",
+        "baseline_counts": [
+          5,
+          7
+        ],
+        "refined_counts": [
+          5,
+          7
+        ],
+        "max_abs_difference": 0
+      },
+      "k2=0.85": {
+        "condition": "k2=0.85",
+        "baseline_counts": [
+          1,
+          1
+        ],
+        "refined_counts": [
+          1,
+          1
+        ],
+        "max_abs_difference": 0
+      },
+      "domain_scale=0.3": {
+        "condition": "domain_scale=0.3",
+        "baseline_counts": [
+          1,
+          2
+        ],
+        "refined_counts": [
+          1,
+          2
+        ],
+        "max_abs_difference": 0
+      }
+    },
+    "grid_change": "dx 4.0 -> 2.667 (x1.5 finer in each direction)",
+    "dt_change": "dt 0.01 -> 0.0025 (x4 smaller)"
+  },
+  "controls": {
+    "no_reaction": {
+      "what": "Sox9->Bmp and Sox9->Wnt couplings and the Bmp/Wnt->Sox9 terms all set to zero; diffusion, production and decay left in place.",
+      "must_show": "a flat field",
+      "amplitude": 0.038559299397223745,
+      "element_count": 0,
+      "class": "none",
+      "pass": true
+    },
+    "no_initial_perturbation": {
+      "what": "full model, but the t=0 perturbation of S is omitted.",
+      "must_show": "the homogeneous steady state, no pattern",
+      "amplitude": 5.219961791154859,
+      "element_count": 5,
+      "class": "normal digit number",
+      "pass": false
+    },
+    "per_step_noise": {
+      "what": "dt-scaled additive Gaussian noise on S at every step instead of a single t=0 perturbation (the published scheme is 1% multiplicative noise per step, which vanishes identically at S*=0).",
+      "must_show": "the same element counts as the default noise model",
+      "counts": [
+        5,
+        5,
+        5
+      ],
+      "mean": 5.0,
+      "sd": 0.0,
+      "wt_counts_same_seeds": [
+        5,
+        7,
+        6
+      ]
+    },
+    "positive_control_for_the_counter": {
+      "what": "the counter must return 5 on the wild-type-like field and 0 on the no-reaction field; both arms are above.",
+      "pass": true
+    }
+  },
+  "classification_rule": "Applied to the Sox9 field S at t = T_end, on the masked domain. (1) AMPLITUDE GATE: if p99(S) - p1(S) < 0.05 model concentration units, or p99(S) <= 0, the field is called unpatterned, element_count = 0, class = 'none'. (2) THRESHOLD: Sox9-high = {S > 0.25 * p99(S)}. The homogeneous steady state is S* = 0 by construction, so this threshold is referenced to the known unpatterned baseline and the unpatterned background can never be counted as an element. (3) MINIMUM SIZE: connected components (4-connectivity) of the Sox9-high set with area >= 0.10 * lambda_pred^2, where lambda_pred is the linear-stability wavelength computed analytically for THAT condition, are counted as elements. (4) CLASS from the count n: n=0 -> 'none'; n=1 -> 'single element'; 2<=n<=4 -> 'reduced'; n=5 -> 'normal digit number'; n>=6 -> 'increased (polydactyl-like)'.",
+  "seeds": {
+    "wild_type": [
+      11,
+      23,
+      37,
+      51,
+      67,
+      83
+    ],
+    "sweeps": [
+      11,
+      23,
+      37
+    ],
+    "note": "Turing patterns are seed-dependent. Every sweep point is run from 3 fixed seeds and the spread is reported as element_count_sd; the individual counts are kept in element_counts."
+  },
+  "numerics": {
+    "scheme": "IMEX. Diffusion and linear decay of B and W implicit (one sparse LU factorisation per condition, reused every step); the cubic in S treated semi-implicitly as -S_new * S_old^2, which keeps S bounded; all couplings explicit. Zero-flux boundary on the masked domain.",
+    "deviation_from_published_numerics": "onimaru2016 use an explicit Heun solver with dt = 0.002 on a triangular finite-volume mesh and a growing domain. This is a fixed cartesian grid, a static domain, and a semi-implicit solver.",
+    "dt_0.02_was_unstable": "Measured: at dt = 0.02 the solution diverged to ~1e8; at dt = 0.01, 0.005 and 0.002 the final field agreed to 5 significant figures. dt = 0.01 is the default."
+  },
+  "limitations": [
+    "NO GROWTH. The real limb bud grows while it patterns, and raspopovic2014's and onimaru2016's simulations both run on growing meshes. On a static domain the elements form as condensations in a distal band rather than elongating into proximodistally running digit rays. This study measures element NUMBER, not element SHAPE, and the shapes here should not be read as digit morphology.",
+    "The five-element wild-type-like outcome is IMPOSED by the chosen paddle width, not predicted. Only the changes in element count across the sweeps are model predictions.",
+    "The mouse parameter set of raspopovic2014 was not obtainable. The numbers used come from onimaru2016's CATSHARK FIN simulation of the same network, and one of them (alpha_W) had to be changed to obtain a Turing instability at all.",
+    "All lengths are model length units. The model as published carries no physical length scale that I can verify, so no result here is in micrometres and no statement is made about the real size of any limb bud.",
+    "The linear-stability wavelength and the simulated wavelength differ by a factor of about two (see measured_wavelength). The simulated value is the one used for the critical domain size.",
+    "The classification into phenotype classes is a threshold rule on a simulated scalar field. It is objective and pre-declared, but 'normal digit number' here means 'five counted components in this simulation', not a mouse phenotype.",
+    "Only one noise model, one domain shape, and one gradient shape were explored. Turing element counts are sensitive to all three."
+  ],
+  "what_this_does_not_establish": [
+    "It does not establish that any real limbless or limb-reduced animal, or any real mutant, lacks limbs because of a change in a Turing wavelength or a sub-critical patterning system. No animal was measured here.",
+    "It does not establish that the BSW network is the correct mechanism of mouse digit patterning. That is raspopovic2014's claim, read here at abstract level only.",
+    "It does not reproduce any published figure. No comparison to published data was made, so no agreement with data is claimed.",
+    "A simulated phenotype class is not a phenotype."
+  ],
+  "sources": [
+    {
+      "key": "raspopovic2014",
+      "citation": "Raspopovic J, Marcon L, Russo L, Sharpe J (2014) Digit patterning is controlled by a Bmp-Sox9-Wnt Turing network modulated by morphogen gradients. Science 345(6196):566-570.",
+      "pmid": "25082703",
+      "doi": "10.1126/science.1252960",
+      "read_level": "abstract",
+      "how_checked": "PMID and DOI resolved through the PubMed MCP tool; metadata record retrieved 2026-11-01. Europe PMC reports isOpenAccess=N, inEPMC=N, no PMC id: the full text and supplement are behind a subscription and were NOT read. Only the abstract was read.",
+      "used_for": "The claim that a Bmp-Sox9-Wnt Turing network drives mouse digit specification and is modulated by morphogen gradients. This is the model this script implements; the equations themselves were taken at full-text level from onimaru2016, which states that it implements this model."
+    },
+    {
+      "key": "sheth2012",
+      "citation": "Sheth R, Marcon L, Bastida MF, Junco M, Quintana L, Dahn R, Kmita M, Sharpe J, Ros MA (2012) Hox genes regulate digit patterning by controlling the wavelength of a Turing-type mechanism. Science 338(6113):1476-1480.",
+      "pmid": "23239739",
+      "doi": "10.1126/science.1226804",
+      "pmcid": "PMC4486416",
+      "read_level": "abstract",
+      "how_checked": "PMID and DOI resolved through the PubMed MCP tool. PMC4486416 is a PMC Canada author manuscript: the PubMed full-text tool returned an EMPTY body, the Europe PMC fullTextXML endpoint returned HTTP 500, the rendered PDF returned HTTP 403, and NCBI efetch db=pmc returned front matter with no <body>. Only the abstract was read.",
+      "used_for": "The DIRECTION of the wavelength sweep only: progressive loss of distal Hox dose gives progressively more, thinner, densely packed digits, i.e. a shorter Turing wavelength. No quantitative value is taken from this paper."
+    },
+    {
+      "key": "onimaru2016",
+      "citation": "Onimaru K, Marcon L, Musy M, Tanaka M, Sharpe J (2016) The fin-to-limb transition as the re-organization of a Turing pattern. Nat Commun 7:11582.",
+      "pmid": "27211489",
+      "doi": "10.1038/ncomms11582",
+      "pmcid": "PMC4879262",
+      "read_level": "full-text",
+      "how_checked": "Full text XML retrieved from the Europe PMC REST endpoint (/PMC4879262/fullTextXML, HTTP 200, 120161 bytes) on 2026-11-01, and the Methods section read. Equations (16)-(19) are published as images; the image files ncomms11582-m22..m25.jpg were downloaded from the PMC CDN and read directly. Parameter values were read verbatim from the Methods paragraph 'Mathematical analysis and numerical simulation'.",
+      "used_for": "The equation form and every sourced numeric parameter below. This paper states in its own text that it uses 'the BSW model' of Raspopovic et al. 2014 (its reference 12) and that the Fgf gradient modulates the same parameters as in the mouse model, 'repressing k4 and boosting k7'. It also supplies the numerical recipe (Heun, dt=0.002, zero-flux, homogeneous steady-state initial condition, 1% Gaussian multiplicative noise per step) and the simple square-domain Fgf substitute exp(-3x) on 0<=x<=1.",
+      "caveat": "Onimaru et al. apply this parameter set to a GROWING catshark pectoral fin mesh, where Sox9 forms spots. It is the same network as the mouse model but not the mouse parameter set, which was not obtainable (see raspopovic2014)."
+    }
+  ],
+  "runtime_seconds": 587.0,
+  "movie": "digit-turing.mp4"
+}

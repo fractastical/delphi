@@ -1,0 +1,97 @@
+[
+  {
+    "id": "tissue-shh-grem1-fgf-loop",
+    "scale": "tissue",
+    "title": "Trigger the self-terminating loop early",
+    "mechanism": "Limb outgrowth is driven by a positive feedback loop between Shh, Gremlin1 and AER-FGFs. The loop is not stopped by an external clock: rising FGF activity itself represses Grem1, so the circuit is self-promoting AND self-terminating. Independently, the descendants of former Shh-expressing cells cannot express Gremlin and physically interpose between the Shh source and the Gremlin domain, breaking the loop geometrically. Either mechanism, triggered early, should stop outgrowth early.",
+    "intervention": "Raise FGF activity in the early bud to engage the Fgf/Grem1 inhibitory loop before the limb has grown (a conditional Fgf4 gain-of-function allele exists and is known to raise FGF signalling in the bud); or force premature expansion of the former-ZPA lineage.",
+    "predicted_phenotype": "PROPOSED for the deliberate-early-termination direction. The components are measured: compound mutants defective in the positive loop show that FGF signalling represses Grem1 in a manner dependent on high FGF activity, in both mouse and chick. Note that the one published high-FGF4 gain-of-function gave postaxial POLYDACTYLY and syndactyly, not truncation - so 'more FGF' is not simply 'earlier stop', and we would not assert the predicted direction.",
+    "evidence": [
+      {
+        "pmid": "18594511",
+        "cite": "Verheyden JM & Sun X 2008, Nature 454:638-41, 'An Fgf/Gremlin inhibitory feedback loop triggers termination of limb bud outgrowth'",
+        "doi": "10.1038/nature07085",
+        "finding": "'genetic evidence that FGF signalling can repress Grem1 expression, revealing a novel Fgf/Grem1 inhibitory loop ... dependent on high FGF activity ... the positive Fgf/Shh loop drives outgrowth and an increase in FGF signalling, which triggers the Fgf/Grem1 inhibitory loop ... a self-promoting and self-terminating circuit'.",
+        "read_level": "abstract"
+      },
+      {
+        "pmid": "15256670",
+        "cite": "Scherz PJ et al. 2004, Science 305:396-9",
+        "doi": "10.1126/science.1096966",
+        "finding": "Proliferation of former-ZPA descendants 'forms a barrier separating the Shh signal from Gremlin-expressing cells, which breaks down the Shh-Fgf4 loop and thereby affects limb size'.",
+        "read_level": "abstract"
+      },
+      {
+        "pmid": "16308330",
+        "cite": "Lu P, Minowada G & Martin GR 2006, Development 133:33-42",
+        "doi": "10.1242/dev.02172",
+        "finding": "A conditional Fgf4 gain-of-function allele activated in a wild-type limb bud 'causes formation of a supernumerary posterior digit (postaxial polydactyly), as well as cutaneous syndactyly between all the digits'.",
+        "read_level": "abstract"
+      }
+    ],
+    "evidence_strength": "proposed",
+    "reversibility": "In principle fully reversible, because the target is a dynamic circuit state rather than a genomic lesion - but no published experiment turns the loop off and back on.",
+    "lethality_risk": "Low if limb-restricted.",
+    "specificity": "Both limbs; the loop is limb-bud-specific in its Shh/Grem1 arm.",
+    "difficulty": "high. The circuit is the thing everyone understands least well in quantitative terms, which is why 'trigger it early' is a sentence and not a protocol.",
+    "what_we_would_run": "This is the one route our existing reaction-diffusion and pattern simulators represent natively: an activator-inhibitor system with delayed negative feedback. We can run it and show how termination time moves with the inhibitory-loop gain. We CANNOT calibrate it - we have no registered calibration anywhere in our system - so the output is a simulated trajectory labelled 'simulated, not observed', and the bridge from it to a skeletal element count is exactly the kind our coupling layer refuses.\n\nSTUDY: `shh-grem1-fgf-loop` IS this route: the ODE is the model of exactly this circuit, and the route is the biology it claims to represent.",
+    "open_questions": [
+      "Mouse and chick terminate the loop in a different SEQUENCE, which is what led Verheyden & Sun to the inhibitory loop in the first place. A single model fitted to one species is not transferable to the other without saying so."
+    ],
+    "study": "shh-grem1-fgf-loop"
+  },
+  {
+    "id": "tissue-bmp-sox9-wnt-turing",
+    "scale": "pattern",
+    "title": "Detune the digit-patterning Turing network",
+    "mechanism": "Digits emerge from undifferentiated mesenchyme through a self-organising periodic mechanism. Combined experiment and modelling implicate a Turing network implemented by BMP, SOX9 and WNT, modulated by morphogen gradients; a two-dimensional simulation of this network reproduces wild-type and perturbed Sox9 expression patterns. Changing the network's parameters changes the periodic pattern, and in principle a sufficiently detuned network produces no periodic skeletal pattern at all.",
+    "intervention": "Pharmacological or genetic modulation of BMP and WNT in the autopod field, guided by the published model.",
+    "predicted_phenotype": "Changes in DIGIT PATTERN - number, spacing, thickness. NOT limb loss. This route is in the design space because it is the mechanism that decides what the autopod looks like, and because it is the only route here with a published, runnable, quantitative model attached. Claiming it produces a limbless mouse would be unsupported.",
+    "evidence": [
+      {
+        "pmid": "25082703",
+        "cite": "Raspopovic J, Marcon L, Russo L & Sharpe J 2014, Science 345:566-70, 'Digit patterning is controlled by a Bmp-Sox9-Wnt Turing network modulated by morphogen gradients'",
+        "doi": "10.1126/science.1252960",
+        "finding": "'By combining experiments and modeling, we reveal evidence that a Turing network implemented by Bmp, Sox9, and Wnt drives digit specification. We develop a realistic two-dimensional simulation of digit patterning and show that this network, when modulated by morphogen gradients, recapitulates the expression patterns of Sox9 in the wild type and in perturbation experiments.'",
+        "read_level": "abstract"
+      }
+    ],
+    "evidence_strength": "model_only",
+    "reversibility": "Pharmacological modulation is acutely reversible in explant; genetic modulation is not.",
+    "lethality_risk": "BMP and WNT are systemic; any whole-animal manipulation is dangerous and any explant manipulation is not an animal.",
+    "specificity": "Autopod pattern only.",
+    "difficulty": "medium in explant, high in vivo.",
+    "what_we_would_run": "We have 12 tissue-scale and 4 developmental-scale reaction-diffusion runs recorded, each with a manifest, numerical checks, input hashes and a verified figure, each labelled simulated-not-observed. Re-instantiating that machinery on the published BMP-SOX9-WNT network is the single most direct reuse of what we already have. It would produce a simulated digit pattern, not a prediction about a mouse.\n\nSTUDY: `digit-turing`, the BMP-SOX9-WNT reaction-diffusion model, IS this route: the published network and the model on this page are the same object.",
+    "open_questions": [
+      "A Turing model explains how digits are SPACED. Nothing in it explains why a limb bud exists. Conflating the two is the most likely way a cross-scale system gets this subject wrong, and the page should say so."
+    ],
+    "study": "digit-turing"
+  },
+  {
+    "id": "tissue-hox-turing-wavelength",
+    "scale": "pattern",
+    "title": "Use Hox dose to set the wavelength of the digit pattern",
+    "mechanism": "Progressive removal of Hoxa13 and Hoxd11-Hoxd13 from a Gli3-null background produces progressively more severe polydactyly with thinner, more densely packed digits. Read through a Turing framework, distal Hox dose modulates the period, or wavelength, of the digit/non-digit pattern. The resemblance of the extreme phenotype to fish fin endoskeleton suggests the pentadactyl state is a modified ancestral version of the same mechanism.",
+    "intervention": "Graded removal of distal Hox genes, on a Gli3-null background, as published.",
+    "predicted_phenotype": "MORE digits, thinner and more densely packed, as distal Hox dose falls - the opposite of limb reduction. Included because it is the only published, dose-resolved control knob on a limb pattern-forming mechanism, and because it defines what the pattern-level knob actually does.",
+    "evidence": [
+      {
+        "pmid": "23239739",
+        "cite": "Sheth R et al. 2012, Science 338:1476-80, 'Hox genes regulate digit patterning by controlling the wavelength of a Turing-type mechanism'",
+        "doi": "10.1126/science.1226804",
+        "finding": "'the progressive reduction in Hoxa13 and Hoxd11-Hoxd13 genes ... from the Gli3-null background results in progressively more severe polydactyly, displaying thinner and densely packed digits. Combined with computer modeling, our results argue for a Turing-type mechanism underlying digit patterning, in which the dose of distal Hox genes modulates the digit period or wavelength.'",
+        "read_level": "abstract"
+      }
+    ],
+    "evidence_strength": "direct_mouse_phenotype",
+    "reversibility": "None; germline allelic series.",
+    "lethality_risk": "Not retrieved; the compound mutants are described as analysed, not as viable adults, and we will not assert either.",
+    "specificity": "Autopod.",
+    "difficulty": "high - this is a large multi-allele breeding programme.",
+    "what_we_would_run": "Sheth et al. give an ordered dose mapped to an ordered wavelength, which is a second, independent instance of the same claim shape as the ZRS series and the Shh timing series. Three independent ordered-dose datasets in one subject is unusual, and it is the honest reason to call limb development a good benchmark domain - not because we can predict it, but because it is unusually well ordered.\n\nSTUDY: `digit-turing` bears on this route: distal Hox dose is the published wavelength parameter of that model, and Sheth et al.'s allelic series is the only measured dose-to-wavelength data the model could be checked against.",
+    "open_questions": [
+      "Does wavelength modulation ever reach a regime with ZERO digits, or does the pattern simply get finer until the field runs out? The published direction goes the other way and we have no evidence for the zero limit."
+    ],
+    "study": "digit-turing"
+  }
+]
