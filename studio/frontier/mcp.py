@@ -30,7 +30,7 @@ from .search import SEARCH_KIND, SearchIndex
 from .artifacts import ArtifactIndex
 from .store import FrontierError, Store, Unauthorized
 
-MANIFEST_VERSION = "frontier-mcp-capabilities-0.3"
+MANIFEST_VERSION = "frontier-mcp-capabilities-0.4"
 READ = ToolAnnotations(readOnlyHint=True, destructiveHint=False, idempotentHint=True, openWorldHint=False)
 # Append-only store: nothing is destroyed; a retry with the same idempotency key and request returns the stored response.
 WRITE = ToolAnnotations(readOnlyHint=False, destructiveHint=False, idempotentHint=True, openWorldHint=False)
@@ -194,7 +194,10 @@ def make_mcp(store: Store, *, allow_write: bool = False, token: str | None = Non
                 "schema_resources": "frontier://schema/{kind} returns that kind's payload JSON schema",
                 "payload_extensions": ["Claim.origin", "Problem.approach/scales/context_tags", "Action.inputs", "Action.proposal", "Action.proposal.plan_steps",
                                        "Evidence.relation/produced_by/artifacts"],
-                "limits": {"max_record_bytes": MAX_RECORD_BYTES, "max_bundle_records": MAX_BUNDLE_RECORDS, "search_page_max": 50, "lease_seconds": [1, 600]},
+                "limits": {"max_record_bytes": MAX_RECORD_BYTES, "max_bundle_records": MAX_BUNDLE_RECORDS, "search_page_max": 50, "lease_seconds": [1, 600],
+                           "experimental_design": {"request_bytes": 65536, "parameters": 8, "readouts": 12, "candidate_designs": 12,
+                                                   "observations_per_design": 32, "batches_per_design": 16, "technical_repeat": 64,
+                                                   "source_claims": 64, "input_datasets": 64, "string_chars": 2048, "nesting_depth": 8}},
                 "search": {"engine": SEARCH_KIND, "filters": ["kind|kinds", "status", "source (URI prefix)", "scope", "context", "include_history"], "exact_pins": ["version", "record id", "source URI"], "pagination": "opaque next_cursor, pass back as cursor (or legacy after)"},
                 "transition_states_via_mcp": ["ready (coordinator only)", "running", "submitted", "blocked", "cancelled", "failed"],
                 "lease_id_note": "A lease_id is a bearer capability for that lease: keep it inside the leasing agent's session. It is not logged by this server.",
