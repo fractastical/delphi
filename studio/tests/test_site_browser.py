@@ -70,7 +70,7 @@ def test_build_is_current_and_portable():
 
 def test_every_view_renders_without_errors(browser, base):
     pg = page(browser)
-    for route in ["history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["regulatory", "history", "formalize?ex=cantilever", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "evidence", "work", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1, #main h2", timeout=5000)
         assert pg.locator("#main").inner_text().strip(), route
@@ -308,7 +308,7 @@ _AUDIT = """() => { const bad = []; const name = (e) => (e.getAttribute('aria-la
 
 def test_accessibility_basics_on_every_view(browser, base):
     pg = page(browser)
-    for route in ["home", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
+    for route in ["home", "regulatory", "history", "formalize?ex=cantilever", "studio", "studio/flying-fish", "studio/flying-fish?scale=organism", "entity/Claim/turing-ddi", "graph/Claim/turing-ddi", "frontier", "knowledge", "knowledge?tab=graph", "knowledge?tab=mission", "knowledge?tab=catalog", "engineering", "simulations", "evidence", "work", "work?tab=specs", "work?tab=work", "work?tab=resources", "work?tab=receipts", "work?tab=runtime", "belief", "search?q=fisher&tab=catalog"]:
         pg.goto(base + "#/" + route)
         pg.wait_for_selector("#main h1")
         pg.wait_for_timeout(500)
@@ -1462,3 +1462,26 @@ def test_stale_sentences_are_gone_and_cost_cites_the_dated_google_receipt(browse
     assert "not available from this page" not in t and "Waiting for the genomic" not in t and "Panels waiting for a contract" not in t and "Waiting for bounded proposals" not in t
     assert "Related panels and their status" in t and "proposal checker" in t and "Contribute panel" in t
     assert pg.locator("#pl-h").locator("xpath=..").locator("a[href='#/formalize']").count() == 1
+
+
+def test_regulatory_map_page_keeps_source_only_scope_unknown_bridges_and_no_execution(browser, base):
+    R = json.loads((ROOT / "site/data/snapshot.json").read_text())["regulatory_map"]
+    src = json.loads((ROOT / "artifacts/fish-regulatory-map/map.json").read_text())
+    assert [r["id"] for r in R["rows"]] == [r["id"] for r in src["rows"]] and len(R["rows"]) == 7 and len(R["datasets"]) == 4 and len(R["coupling_ports"]) == 4
+    assert all(c["value"] is None and c["status"] == "unknown" for c in R["coupling_ports"]) and all(a["status"].endswith("not-executed") for a in R["next_actions"])
+    assert "local_response_path" not in json.dumps(R), "local file paths must not be published"
+    pg = page(browser)
+    pg.goto(base + "#/regulatory"); pg.wait_for_selector(".regprog")
+    t = pg.locator("#main").text_content()
+    assert "source-only" in t and "flying-fish transfer unknown" in t and "not computed (null)" in t and "not available" in t
+    assert pg.locator(".regprog").count() == 7 and pg.evaluate("[...document.querySelectorAll('.regprog')].every(d => !d.open)")
+    assert "transfer validated: false" in t and "Demonstrated." in t and "Inferred, not demonstrated." in t and "Missing bridge." in t
+    assert t.count("unknown") >= 4 and "none (null)" in t and "none executed" in t
+    assert "A retrieved response is not independent experimental verification" in t
+    pg.goto(base + "#/regulatory?row=pectoral-fin-field"); pg.wait_for_selector(".regprog[open]")
+    assert pg.locator(".regprog[open]").get_attribute("id") == "rg-pectoral-fin-field"
+    pg2 = page(browser, 400, 800)
+    pg2.goto(base + "#/regulatory"); pg2.wait_for_selector(".regprog")
+    assert pg2.evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth") <= 0
+    pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector(".subnav")
+    assert pg.locator(".subnav a:has-text('Regulatory applicability')").count() == 1

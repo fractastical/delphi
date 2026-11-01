@@ -564,6 +564,20 @@ def fish_history(ins: Inputs) -> dict | None:
             "date_basis": "Author date of the first commit that added the node's manifest in this repository (a repository fact, not the date the design was made); null when git history is unavailable."}
 
 
+def regulatory_map(ins: Inputs) -> dict | None:
+    """Fish cell-regulatory applicability map (source-only): the seven cell programs, four datasets, four coupling ports (all unknown), proposed next actions and the source list.
+    Local response paths are dropped; nothing is added or inferred here."""
+    d = "artifacts/fish-regulatory-map"
+    if not (ROOT / d / "map.json").exists():
+        return None
+    M = json.loads(ins.read(f"{d}/map.json")); S = json.loads(ins.read(f"{d}/sources.json")); man = json.loads(ins.read(f"{d}/manifest.json"))
+    return {"status": M["status"], "organism": M["organism"], "target_organism_transfer": M["target_organism_transfer"], "rows": M["rows"], "datasets": M["datasets"], "coupling_ports": M["coupling_ports"], "next_actions": M["proposed_next_actions"],
+            "flags": {k: M[k] for k in ("blocked_generation_replayed", "new_model_inference_performed", "whole_organism_genome_design_available", "biological_success_probability")},
+            "sources": [{k: x.get(k) for k in ("id", "primary_url", "response_sha256", "response_bytes", "read_scope", "evidence_status")} for x in S["sources"]], "not_performed": S.get("not_performed", []),
+            "excluded": {"reason": S["excluded_response"]["reason"], "sha256": S["excluded_response"]["sha256"]} if S.get("excluded_response") else None,
+            "files": man["files"], "manifest": f"{d}/manifest.json"}
+
+
 def lifecycle_block(ins: Inputs) -> dict | None:
     """Zebrafish life-cycle source layer (data/fish-lifecycle) projected for the Studio developmental panel. Statuses and quotes are copied, not summarised."""
     d = "data/fish-lifecycle"
@@ -1069,6 +1083,7 @@ def build() -> dict[str, bytes]:
     print_v3 = print_v3_block(ins, extra)
     recovery_in = recovery_inputs(ins, extra)
     fish_hist = fish_history(ins)
+    reg_map = regulatory_map(ins)
     fingerprint = digest_bytes(canonical(sorted((i["path"], i["sha256"]) for i in ins.seen.values())).encode())
     snapshot = {
         "schema": SCHEMA,
@@ -1104,6 +1119,7 @@ def build() -> dict[str, bytes]:
         "print_v3": print_v3,
         "recovery_inputs": recovery_in,
         "fish_history": fish_hist,
+        "regulatory_map": reg_map,
         "resource_inventory": resources,
         "mcp_check": mcp_chk,
         "spec_acceptance_open": len(re.findall(r"^- \[ \]", spec_text, re.M)),
