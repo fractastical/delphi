@@ -58,6 +58,10 @@ about a proposed action.
 
 ## Delivery checklist
 
+- [ ] Implement the self-validation loop in SPEC-017: falsifiable candidate
+  contracts, validator controls, cross-scale validation slices, virtual instruments
+  and evidence-directed next actions; preserve the separation between internal
+  consistency and biological validity.
 - [x] Deliver 60-second and 120-second narrated demo videos with MiniMax voice,
   real interface captures and recorded simulation footage; preserve source and
   validation limits, and map the story to the judging rubric (SPEC-016).
@@ -71,6 +75,10 @@ about a proposed action.
   evidence-backed collaboration examples without claiming a pilot advantage.
 - [ ] Refresh System participant counts from scoped harness and child transcripts,
   distinguishing historical contributors, active workers and capacity.
+- [ ] Build a source-grounded DNA-to-design ledger, compiler dependency graph,
+  candidate-screening/experimental-design workflow and virtual-instrument
+  contracts, preserving uncalibrated inter-layer connections and requiring
+  functional testing before calling generated DNA a working implementation.
 - [x] Recover codex-api, codex-01, codex-02 and claude-15 handoffs.
 - [x] Preserve the existing foundation and scope the product around Frontier.
 - [x] Assign separate worktrees to existing harnesses and record ownership.

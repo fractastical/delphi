@@ -1,11 +1,63 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 9:22pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 10:21pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
-GOAL.md and SPEC-005 through SPEC-016 define acceptance. The latest dated checkpoint supersedes older status snapshots.
+GOAL.md and SPEC-005 through SPEC-017 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 9:22pm PDT
+## Current checkpoint — October 31, 2026, 10:21pm PDT
+
+- [x] Added SPEC-017 self-validation: frozen candidate contracts, separate
+  assurance dimensions, meaningful negative controls, forward/inverse consistency
+  boundaries, validation slices/cuts, virtual instruments and adaptive next
+  actions. Linked compiler and experimentation specs. This records requirements;
+  implementation acceptance remains open and assigned to the existing owners.
+- [x] Integrated actual Lean source/receipt viewer and a read-only MCP proof
+  catalog for three fixed families. Sources/dependencies/published bytes are
+  checked; stale or missing proof records are withheld. Compiler execution is
+  recorded, not rerun by the read tool. Root ran focused proof/browser checks;
+  public deployment is pending this checkpoint.
+- [x] Corrected observed-data update imported six exact unreviewed records and
+  verified anonymous MCP/HTTP readback. 109 source specimen rows, 82 blocked
+  folds; adding data worsened held-out log10 RMSE from 0.047089 to 0.066057.
+  A transitive catalog-group bug was fixed; original outputs retained and
+  corrected scientific values match on this dataset. Gallery/source files and
+  organ-scale view integrated; root11 focused checks passed.
+- [x] Audited historical participant floor is 23: 11 supported harnesses,
+  4 native children and 8 scoped nested Claude children. 12 recorded subagents.
+  Separate native API snapshot at 10:07:30pm PDT had 1 root + 3 running children;
+  global active-worker total unknown. Four System/browser checks passed.
+- [x] Two new print-v4 display forms integrated with exact STL hashes, mass
+  assumptions, previews, laws and lineage. Four publication/browser checks
+  passed. Independent dense-wall review had an OOM-killed attempt; smaller
+  chunks under the same cap are running. No new print or flight validation.
+- [x] Private stable backup restored 17,486 files / 3.707 GB off host. New 3,924-version
+  DB add-on includes all 6 observed records, 18 table counts checked. Separate
+  website/MCP recovery drill passed on the earlier source/dump. New print/video
+  files require an additive capture after freezing; raw missing inputs remain
+  explicitly inventoried.
+- [ ] Four NEW normal-voice films in production: Lean/science 60s + 120s and
+  Delphi-portal 60s + 120s. Planned MiniMax English_Graceful_Lady, speech-02-hd at 1.0,
+  no atempo acceleration. Earlier films and superseded faster edits preserved.
+  Lean is the foundation; compiler outputs are intended DNA/build/validation
+  plans; virtual instruments and efficient testing appear in the validation
+  flow. Native resource_scaling owns media; root owns one canonical publication.
+- [ ] New overnight swarm: native mechanobio_sim owns exact zebrafish sequence,
+  regulatory-context and functional-evidence ledger; claude02 extends compiler
+  dependency/invalidation graph; claude14 owns finite candidate screening,
+  prospective experimental design and virtual-instrument contracts. Unknown
+  sequence-to-expression-to-growth bridges remain explicit. Native infra owns
+  provider queue and source/model execution, respecting prior provider stops.
+- [ ] Infra's 10:17:17pm PDT observation: 92 shared Nebius jobs, 61 team-attributed
+  (46 current + 15 historical), 31 unattributed, zero active/pulling/queued GPU
+  jobs. GCP 32 CPU quota / 16 used and 1 GPU quota / 0 used; L4 VM terminated after capacity
+  failures. CPU VM03 remains running. Actual resource saturation is not claimed.
+  Coupled owner 07 is preparing an additional-resolution packet with controls.
+- [ ] Complete independent print review, finish normal-speed videos, publish
+  source-matched canonical release, verify public media and MCP, and take the
+  final immutable add-on backup. All broad GOAL acceptance remains tracked.
+
+## Previous checkpoint — October 31, 2026, 9:22pm PDT
 
 - [x] Published `d589efb`: design-control map with six layers, NCA
   curriculum repair/persistence tradeoff, and recovered eight-condition BETSE

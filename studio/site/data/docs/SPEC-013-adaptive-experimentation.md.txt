@@ -4,6 +4,11 @@ Status: user-directed platform extension, October 31, 2026. The first planner is
 prospective numerical design under stated assumptions; no wet-lab observations
 or empirically learned biological law are asserted.
 
+SPEC-017 adds the self-validation contract: explicit virtual instruments,
+frozen tests and controls, validation slices across interfaces, and evidence-led
+selection of the next experiment. A prospective plan remains distinct from an
+executed measurement and a measured improvement in prediction.
+
 ## Purpose and design loop
 
 An uncertain bridge is an engineering object: identify its input/output variables,

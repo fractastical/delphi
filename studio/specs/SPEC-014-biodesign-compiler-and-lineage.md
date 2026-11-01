@@ -3,6 +3,11 @@
 Status: user-directed target, October 31, 2026. Existing design history is an
 initial artifact lineage view, not an implemented whole-organism compiler.
 
+SPEC-017 specifies self-validation for these assemblies: exact validation
+contracts, separate assurance dimensions, meaningful negative controls and
+dependency invalidation. Forward/inverse round trips test model consistency;
+they do not establish biological function or make a missing coupling executable.
+
 ## Organism variants as pinned assemblies
 
 Each organism variant is a versioned assembly manifest referencing exact subsystem
