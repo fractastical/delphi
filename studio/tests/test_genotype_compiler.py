@@ -660,16 +660,16 @@ def test_proposal_eligibility_is_separate_from_function_assurance(tree):
 def test_instrument_slots_carry_real_pinned_contract_refs_and_explicit_gaps():
     v = G.validation_slices(GRAPH, {"context": CTX}, None, ROOT)
     ids = {i: [(x["contract_ref"] or {}).get("instrument_id") for x in s["instrument_slots"]] for i, s in v["interfaces"].items()}
-    assert "P1-reporter-expression" in ids["I1"] and {"P2-growth-to-EI", "R1-ray-bending"} <= set(ids["I3"]) and {"R2-inflow-tip", "R3-load"} <= set(ids["I4"])
+    assert "P1-reporter-expression" in ids["I1"] and "P2-growth-to-EI" in ids["I2"] and {"R1-ray-bending", "R4-length"} <= set(ids["I3"]) and {"R2-inflow-tip", "R3-load", "V1-saved-deflection-section"} <= set(ids["I4"])
     c = next(x for x in v["interfaces"]["I1"]["instrument_slots"] if x["contract_ref"])["contract_ref"]
-    assert c["path"] == G.INSTRUMENT_FILE and c["status"] == "proposed_uncalibrated" and c["sha256"] == json.loads((ROOT / G.INSTRUMENT_MANIFEST).read_text())["files"]["protocol.json"]["sha256"]
-    assert any("gap" in x for x in v["interfaces"]["I2"]["instrument_slots"]), "a boundary without a contract says so"
+    assert c["path"] == G.INSTRUMENT_FILE and c["status"] == "proposed_uncalibrated" and c["pointer"].startswith("/contracts/") and c["sha256"] == json.loads((ROOT / G.INSTRUMENT_MANIFEST).read_text())["files"]["instrument-contracts.json"]["sha256"]
+    assert any("gap" in x for x in v["interfaces"]["I5"]["instrument_slots"]), "a boundary without a contract says so"
     virt = {x["contract_ref"]["instrument_id"] for x in v["layers"]["shape_mechanics"]["instrument_slots"] if x["kind"] == "virtual" and x["contract_ref"]}
     assert virt == {"V1-saved-deflection-section", "V2-saved-tip-and-slope"} and v["instrument_contracts_ref"]["path"] == G.INSTRUMENT_FILE
 
 
 def test_stale_or_missing_instrument_contracts_become_gaps_not_hidden_nulls(tmp_path):
-    for rel in (G.INSTRUMENT_FILE, G.INSTRUMENT_MANIFEST):
+    for rel in (G.INSTRUMENT_FILE, G.INSTRUMENT_MANIFEST, G.PROTOCOL_FILE):
         (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
         (tmp_path / rel).write_bytes((ROOT / rel).read_bytes())
     assert G.instrument_contracts(tmp_path)["contracts"]
@@ -679,3 +679,48 @@ def test_stale_or_missing_instrument_contracts_become_gaps_not_hidden_nulls(tmp_
     v = G.validation_slices(GRAPH, {"context": CTX}, None, tmp_path)
     assert all(x["contract_ref"] is None and "changed" in x["gap"] for s in v["interfaces"].values() for x in s["instrument_slots"])
     assert "no contract exists" in G.instrument_slots({"contracts": {}, "why": None}, ["P1"])[0]["gap"]
+
+
+def test_contracts_must_match_the_current_protocol_and_schema(tmp_path):
+    def stage():
+        for rel in (G.INSTRUMENT_FILE, G.INSTRUMENT_MANIFEST, G.PROTOCOL_FILE):
+            (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+            (tmp_path / rel).write_bytes((ROOT / rel).read_bytes())
+
+    def rewrite(mutate):
+        stage()
+        doc = json.loads((tmp_path / G.INSTRUMENT_FILE).read_text())
+        mutate(doc)
+        raw = json.dumps(doc).encode()
+        (tmp_path / G.INSTRUMENT_FILE).write_bytes(raw)
+        man = json.loads((tmp_path / G.INSTRUMENT_MANIFEST).read_text())
+        man["files"]["instrument-contracts.json"]["sha256"] = sha(raw)  # a manifest that matches the bytes: only the content checks can refuse
+        (tmp_path / G.INSTRUMENT_MANIFEST).write_text(json.dumps(man))
+        return G.instrument_contracts(tmp_path)
+
+    assert "different protocol" in rewrite(lambda d: d.update(protocol_sha256="0" * 64))["why"]
+    assert "unsupported contract schema" in rewrite(lambda d: d.update(schema="other/1"))["why"]
+    assert "typed compiler slot" in rewrite(lambda d: d["contracts"][0].pop("proposed_compiler_slot"))["why"]
+    assert rewrite(lambda d: None)["contracts"]
+    stage()
+    (tmp_path / G.PROTOCOL_FILE).write_text((tmp_path / G.PROTOCOL_FILE).read_text() + " ")
+    assert "changed" in G.instrument_contracts(tmp_path)["why"], "a protocol edited after the manifest was written"
+
+
+def test_typed_boundaries_reject_string_flags_duplicate_ids_and_arbitrary_input_strings(tree):
+    def plan_status(**kw):
+        d = design(tree)
+        plan, res = vplan(tree, **kw)
+        d["validation_plans"], d["validation_results"] = [plan], [res]
+        return compile_(tree, d)["validation"]["plans"][0]
+
+    assert plan_status()["all_required_pass"] is True
+    for flags in ({"endpoint": "false"}, {"endpoint": 1}, {"executable": "yes"}):
+        p = plan_status(check_extra=flags)
+        assert p["all_required_pass"] is False and p["checks"][0]["status"] != "pass" and "must be booleans" in (p["checks"][0]["reason"] or ""), flags
+    dup = plan_status(checks=[{"id": "c1", "interface": "I3", "endpoint": True, "executable": True}, {"id": "c1", "interface": "I3", "endpoint": False, "executable": True}])
+    assert dup["all_required_pass"] is False and "unique" in (dup["checks"][0]["reason"] or "")
+    assert plan_status(checks=[{"id": " ", "interface": "I3", "endpoint": True, "executable": True}])["all_required_pass"] is False
+    d = design(tree)
+    d["interface_evidence"][2]["inputs"] = {"upstream": "not-a-digest"}
+    assert any("not an arbitrary string" in x for x in compile_(tree, d)["reasons"])

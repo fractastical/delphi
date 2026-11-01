@@ -286,6 +286,26 @@ def check_sequence(root: Path, c: dict) -> dict:
     }
 
 
+def _is_digest(v) -> bool:
+    return isinstance(v, str) and len(v) == 64 and all(c in "0123456789abcdef" for c in v)
+
+
+def _check_flags(plan: dict) -> str | None:
+    """Required checks are typed: a non-empty list of objects with unique non-empty string ids and boolean endpoint/executable flags (a string
+    like "false" must never coerce to true)."""
+    rc = plan.get("required_checks")
+    if not (isinstance(rc, list) and rc):
+        return "required_checks must be a non-empty list"
+    ids = []
+    for c in rc:
+        if not (isinstance(c, dict) and isinstance(c.get("id"), str) and c["id"].strip()):
+            return "every required check needs a non-empty string id"
+        if not (isinstance(c.get("endpoint"), bool) and isinstance(c.get("executable"), bool)):
+            return f"required check {c['id']!r}: endpoint and executable must be booleans, not {type(c.get('endpoint')).__name__}/{type(c.get('executable')).__name__}"
+        ids.append(c["id"])
+    return "required check ids must be unique" if len(set(ids)) != len(ids) else None
+
+
 def _check_inputs(root: Path, iid: str, ev: dict, inputs: dict, cand_digests: set | None) -> list[str]:
     """Exact input dependency. DNA to expression: the evidence must name the nucleotide digest of a candidate in THIS design, so different DNA cannot
     inherit a measurement through identical allele or construct labels. Downstream interfaces: declared upstream input pins and a transfer version,
@@ -305,8 +325,8 @@ def _check_inputs(root: Path, iid: str, ev: dict, inputs: dict, cand_digests: se
             _, err = _pinned(root, v)
             if err:
                 out.append(f"measured bound not verifiable: input {name!r}: " + err)
-        elif not (isinstance(v, str) and v):
-            out.append(f"measured bound not verifiable: input {name!r} must be a digest string or a pinned artifact")
+        elif not _is_digest(v):
+            out.append(f"measured bound not verifiable: input {name!r} must be a 64-hex sha256 digest or a pinned artifact, not an arbitrary string")
     return out
 
 
@@ -405,7 +425,11 @@ def _bound_plan(root: Path, plan: dict) -> str | None:
         return "unverified plan: the pinned file is not JSON"
     if not isinstance(doc, dict) or doc.get("schema") != PLAN_SCHEMA:
         return f"unverified plan: the pinned file is not a {PLAN_SCHEMA} artifact, so its metadata is the caller's word only"
-    sig = lambda p: (p.get("id"), p.get("version"), p.get("candidate_id"), p.get("candidate_sequence_sha256"), sorted((c.get("id"), bool(c.get("endpoint")), bool(c.get("executable"))) for c in p.get("required_checks", [])))  # noqa: E731
+    for who, p in (("plan", plan), ("pinned plan artifact", doc)):
+        bad = _check_flags(p)
+        if bad:
+            return f"unverified plan: the {who} is malformed: {bad}"
+    sig = lambda p: (p.get("id"), p.get("version"), p.get("candidate_id"), p.get("candidate_sequence_sha256"), sorted((c.get("id"), c.get("endpoint"), c.get("executable")) for c in p.get("required_checks", [])))  # noqa: E731
     if sig(doc) != sig(plan):
         return "unverified plan: the plan's id, version, candidate or required checks differ from the pinned plan artifact"
     return None
@@ -633,36 +657,69 @@ def propagate(graph: dict, design: dict, change: dict, root: Path | None = None)
 
 # ------------------------------------------------------------------------------------------------- validation slices and cutsets
 VALIDATION_SCHEMA = "frontier.biodesign.validation-slices/1"
-INSTRUMENT_FILE = "artifacts/crossscale-doe/protocol.json"  # the experimental-design owner's instrument contracts (claude-14); read, never written
+INSTRUMENT_FILE = "artifacts/crossscale-doe/instrument-contracts.json"  # the experimental-design owner's typed instrument contracts (claude-14); read, never written
 INSTRUMENT_MANIFEST = "artifacts/crossscale-doe/manifest.json"
-# which of those contracts belong to which boundary or layer; a boundary with none keeps an explicit gap rather than an invented contract
-INSTRUMENT_MAP = {"I1": ["P1-reporter-expression"], "I2": [], "I3": ["P2-growth-to-EI", "R1-ray-bending"], "I4": ["R2-inflow-tip", "R3-load"], "I5": []}
+PROTOCOL_FILE = "artifacts/crossscale-doe/protocol.json"
+INSTRUMENT_SCHEMA = "frontier.crossscale-doe.instrument-contracts/1"
+# Which node a contract serves is a layer question, not a boundary question; a boundary's contracts come from each contract's own proposed_compiler_slot.
 NODE_INSTRUMENTS = {"shape_mechanics": ["V1-saved-deflection-section", "V2-saved-tip-and-slope", "R1-ray-bending", "R4-length"]}
 
 
 def instrument_contracts(root: Path) -> dict:
-    """Real instrument contracts, pinned: the file must match the sha256 its own manifest declares. Missing or stale means no contracts (explicit gaps)."""
+    """Typed instrument contracts, pinned: the manifest declares the contract file's sha256 and the protocol's; the contract file must match the first,
+    carry the expected schema, and name the protocol sha256 the manifest declares. Anything else means no contracts (explicit gaps), never a guess."""
     root = Path(root)
+    none = lambda why: {"contracts": {}, "why": why, "ref": None}  # noqa: E731
     f, err = _safe_file(root, INSTRUMENT_FILE)
     m, merr = _safe_file(root, INSTRUMENT_MANIFEST)
     if err or merr:
-        return {"contracts": {}, "why": err or merr, "ref": None}
+        return none(err or merr)
     b = f.read_bytes()
     try:
-        declared = json.loads(m.read_bytes())["files"]["protocol.json"]["sha256"]
+        files = json.loads(m.read_bytes())["files"]
+        declared, proto = files["instrument-contracts.json"]["sha256"], files["protocol.json"]["sha256"]
         doc = json.loads(b)
+        rows = doc["contracts"]
     except (ValueError, KeyError, TypeError):
-        return {"contracts": {}, "why": "the instrument manifest or protocol is not readable", "ref": None}
+        return none("the instrument manifest or contract file is not readable")
     if bc.sha(b) != declared:
-        return {"contracts": {}, "why": f"{INSTRUMENT_FILE} changed: its manifest declares {declared[:12]}, found {bc.sha(b)[:12]}", "ref": None}
-    ref = {"path": INSTRUMENT_FILE, "sha256": declared}
-    return {"contracts": {i["id"]: {**ref, "instrument_id": i["id"], "status": i.get("status"), "observable": i.get("observable"), "unit": i.get("unit"), "kind": "virtual" if str(i.get("kind", "")).startswith("virtual") else "physical"} for i in doc.get("instruments", [])}, "why": None, "ref": ref}
+        return none(f"{INSTRUMENT_FILE} changed: its manifest declares {declared[:12]}, found {bc.sha(b)[:12]}")
+    if doc.get("schema") != INSTRUMENT_SCHEMA:
+        return none(f"unsupported contract schema {doc.get('schema')!r}; expected {INSTRUMENT_SCHEMA}")
+    pf, perr = _safe_file(root, PROTOCOL_FILE)
+    if perr:
+        return none(perr)
+    pb = pf.read_bytes()
+    if bc.sha(pb) != proto:
+        return none(f"{PROTOCOL_FILE} changed: its manifest declares {proto[:12]}, found {bc.sha(pb)[:12]}")
+    try:  # the contract file names the protocol by the digest of its canonical JSON (the owner's sha256_json), not of the file's bytes
+        canon = bc.sha(json.dumps(json.loads(pb), sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False).encode("utf-8"))
+    except ValueError:
+        return none("the protocol is not readable JSON")
+    if doc.get("protocol_sha256") != canon:
+        return none("the contract file names a different protocol than the current one (a fresh protocol needs fresh contracts)")
+    if not isinstance(rows, list):
+        return none("contracts is not a list")
+    out = {}
+    for idx, i in enumerate(rows):
+        slot = i.get("proposed_compiler_slot") if isinstance(i, dict) else None
+        full = i.get("instrument id and version") if isinstance(i, dict) else None
+        if not (isinstance(full, str) and "@" in full and isinstance(slot, dict) and slot.get("interface") in INTERFACES and slot.get("kind") in ("physical", "virtual")):
+            return none(f"contract {idx} lacks an id@version or a typed compiler slot (interface I1-I5, kind physical|virtual)")
+        iid, ver = full.split("@", 1)
+        status = ("computed" if i.get("evidence_type") == "computed" else "proposed") + "_uncalibrated"
+        out[iid] = {"path": INSTRUMENT_FILE, "sha256": declared, "pointer": f"/contracts/{idx}", "instrument_id": iid, "instrument_version": ver, "status": status, "observable": i.get("observation schema with units"), "unit": None, "kind": slot["kind"], "interface": slot["interface"], "blocked_on": i.get("blocked_on")}
+    return {"contracts": out, "why": None, "ref": {"path": INSTRUMENT_FILE, "sha256": declared}}
+
+
+def interface_instruments(contracts: dict, iid: str) -> list[str]:
+    return [k for k, v in contracts["contracts"].items() if v["interface"] == iid]
 
 
 def instrument_slots(contracts: dict, ids: list[str]) -> list[dict]:
     """Contract refs for the given ids, always with a physical and a virtual slot: a missing contract is an explicit gap, not a hidden null."""
     got = [contracts["contracts"][i] for i in ids if i in contracts["contracts"]]
-    slots = [{"kind": c["kind"], "contract_ref": {k: c[k] for k in ("path", "sha256", "instrument_id", "status", "observable", "unit")}} for c in got]
+    slots = [{"kind": c["kind"], "contract_ref": {k: c[k] for k in ("path", "sha256", "pointer", "instrument_id", "instrument_version", "status", "observable", "unit")}} for c in got]
     for kind in ("physical", "virtual"):
         if not any(x["kind"] == kind for x in slots):
             slots.append({"kind": kind, "contract_ref": None, "gap": contracts["why"] or "no contract exists for this boundary and kind"})
@@ -757,7 +814,7 @@ def validation_slices(graph: dict, design: dict | None = None, report: dict | No
             "what_remains_unknown": spec["unknown"],
             "recorded_bridges": [b["bridge"] for b in g["bridges"]],
             "recorded_experiments": g["proposed_experiments"],
-            "instrument_slots": instrument_slots(contracts, INSTRUMENT_MAP[iid]),
+            "instrument_slots": instrument_slots(contracts, interface_instruments(contracts, iid)),
             "directions": g["directions"],
             "invalidated_by_dna_change": iid in dna["invalidated_interfaces"],
             "invalidated_by_context_change": True,
