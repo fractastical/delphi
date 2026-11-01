@@ -34,6 +34,9 @@ def validate(spec):
         raise ValueError("Invalid task runtime bound")
     if not 300 <= spec["export_interval_s"] <= 3600:
         raise ValueError("Invalid export interval")
+    tasks = spec.get("tasks_max", 256)
+    if type(tasks) is not int or not 1 <= tasks <= 256:
+        raise ValueError("Invalid process-tree task bound")
     if not isinstance(spec["argv"], list) or not spec["argv"] or not all(isinstance(x, str) for x in spec["argv"]):
         raise ValueError("Task command must be an argv list")
     if not re.fullmatch(r"[a-f0-9]{64}", spec["source_sha256"]):
@@ -52,7 +55,7 @@ def systemd_argv(spec, source, output):
     args = ["systemd-run", "--wait", "--pipe", "--collect", "--unit=frontier-science",
             "-p", f"WorkingDirectory={source}", "-p", f"CPUQuota={spec['vcpus'] * 100}%",
             "-p", f"MemoryMax={spec['memory_gb']}G", "-p", "MemorySwapMax=0",
-            "-p", "TasksMax=256", "-p", f"RuntimeMaxSec={spec['runtime_s']}",
+            "-p", f"TasksMax={spec.get('tasks_max', 256)}", "-p", f"RuntimeMaxSec={spec['runtime_s']}",
             "-p", "KillMode=control-group", "-p", "TimeoutStopSec=45",
             "--setenv", f"COPS_OUT={output}", "--setenv", "PYTHONUNBUFFERED=1"]
     for key, value in spec.get("env", {}).items():
@@ -159,18 +162,24 @@ def export_snapshot(spec, output, rc, started):
         return result.returncode
 
 
-def run(spec):
+def prepare_source(spec, output):
+    """Extract each admission into a fresh directory, preserving prior sources."""
     import tarfile
 
-    validate(spec)
-    source, output = ROOT / "src", ROOT / spec.get("output_directory", "out")
-    source.mkdir(exist_ok=True)
-    output.mkdir(exist_ok=True)
     packet = ROOT / "packet.tar"
     if hashlib.sha256(packet.read_bytes()).hexdigest() != spec["source_sha256"]:
         raise ValueError("VM packet hash mismatch")
+    source = Path(tempfile.mkdtemp(prefix=f"source-{spec['task_id']}-", dir=ROOT))
     with tarfile.open(packet) as archive:
         extract_source(archive, source, output)
+    return source
+
+
+def run(spec):
+    validate(spec)
+    output = ROOT / spec.get("output_directory", "out")
+    output.mkdir(exist_ok=True)
+    source = prepare_source(spec, output)
     started = now()
     (output / "dispatch.json").write_text(json.dumps({"spec": spec, "started_utc": started}, indent=2))
     try:

@@ -1,0 +1,36 @@
+# Bounded checkpoint transport
+
+The proposed GCS transport sends a private, short-lived V4 PUT capability for
+each exact object. It gives the scientific worker no OAuth token or private key.
+The object creator service account has no direct project roles and only
+`roles/storage.objectCreator` on the private artifact bucket. The effective
+inherited policy could not be established: Policy Troubleshooter returned
+`UNKNOWN_INFO`, which is retained in the receipt.
+
+At 7:17pm PDT on October31, a ten-minute operator-only signing grant was refused
+with `iam.serviceAccounts.setIamPolicy` denied. Signing itself was refused with
+`iam.serviceAccounts.signBlob` denied. **No IAM change, capability issuance or
+test upload occurred.** This transport is not an admission gate that has passed.
+
+The implemented uploader streams a regular file, bounds its size, checks URL
+origin/object identity and expiry, requires signed create-only generation-zero
+and content-type headers, and sends Content-MD5 for server-side integrity. Its
+public receipt contains size, SHA256, generation and expiry, never the URL. A
+network ambiguity requires operator download/hash verification; it is not
+silently retried. Nine focused software tests and Ruff passed. A tiny real
+create-only upload, rejected overwrite, and independent download/hash check are
+still required before scientific checkpoint admission.
+
+If a narrow authorized signer becomes available, start with a ten-minute probe
+grant on this service account only. Check actual effective create/get/list/
+delete/update/setIamPolicy permissions, revoke on excess rights, and sign only
+the declared object names. Production links must expire before the lab deadline;
+no service-account key is needed. Remove the operator-only signing binding after
+the last required capability, record the resulting policy, and export artifacts
+off the expiring lab project. Current cleanup state: there is no successful grant
+or upload to revoke/delete. The failed attempts and before-policy evidence live
+under `results/resources/gcp/signed-upload-*.json`.
+
+The full CFD R2 assay also requires its measured H100 runtime and unchanged
+numerical gates. The H100 controls/calibration job does not run R2 cases. Its
+small returned diagnostic bundle uses the existing verified log transport.

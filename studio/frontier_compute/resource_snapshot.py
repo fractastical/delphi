@@ -42,6 +42,8 @@ def refresh_usage(usage, snapshot, shared):
         "provider_window_utc": snapshot["live_state_request_window_utc"],
         "own_jobs": snapshot["own_jobs"],
         "own_job_state_counts": own_state_counts(snapshot["own_jobs"]),
+        "active_allocations": snapshot["active_allocations"],
+        "instantaneous_gpu_utilization_pct": snapshot["current_gpu_utilization_pct"],
         "own_job_state_counts_scope": "Current Frontier prefix jobs only; resource kind comes from the provider preset, with absent capacity kept unknown.",
         "team_attribution": {
             **shared,
@@ -50,6 +52,8 @@ def refresh_usage(usage, snapshot, shared):
             "unattributed_jobs": snapshot["unattributed_job_count"],
         },
     })
+    if "measured_terminal_container_work" in snapshot:
+        result["measured_terminal_container_work"] = snapshot["measured_terminal_container_work"]
     return result
 
 
@@ -235,8 +239,9 @@ def refresh(path: Path, cli: str) -> dict:
         runtime = terminal_runtime_summary(runtime_directory, snapshot["own_jobs"])
         runtime_path = path.parent / "terminal-runtime-receipts.json"
         runtime_path.write_text(json.dumps(runtime, indent=2) + "\n")
-        inventory["compute"]["nebius"]["measured_terminal_container_work"] = {
+        snapshot["measured_terminal_container_work"] = {
             **runtime["totals"], "scope": runtime["scope"], "receipt": str(runtime_path)}
+        inventory["compute"]["nebius"]["measured_terminal_container_work"] = snapshot["measured_terminal_container_work"]
     local = observed.astimezone(ZoneInfo("America/Los_Angeles"))
     offset = local.strftime("%z")
     inventory["observed_at"] = {

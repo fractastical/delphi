@@ -1,0 +1,215 @@
+{
+  "schema": "frontier.aeroelastic.protocol/1",
+  "question": "Under declared equivalent-fin bending stiffness, how much does recomputing aerodynamics after elastic deformation change shape, forces and the explicitly rigidized-shape point-mass glide compared with rigid and frozen-load arms?",
+  "evidence_kind": "computed; no fish material/neural/genetic calibration",
+  "base_commit": "a0665fbd0007e742eae1e065505531bde0eaf68c",
+  "inputs": [
+    {
+      "path": "artifacts/fish3d/fish3d-v3a-fan/candidate.json",
+      "sha256": "e8c2b666874a0658bf5be95a6603b68463e68dd67ac2c0a0be8728abb7e5763e",
+      "bytes": 17197
+    },
+    {
+      "path": "artifacts/fish3d/fish3d-v3a-fan/panels.json",
+      "sha256": "1f64a9759de289118e22e6a9edc5d76c63e6daef5c4a5b84e294e80021a1d33d",
+      "bytes": 143735
+    },
+    {
+      "path": "artifacts/fish3d/fish3d-v3a-fan/components.json",
+      "sha256": "5ec2c13d65de88d875c1f8c5bc8f5bd202cf058efed900ebf9ffcf02a09574b7",
+      "bytes": 23894
+    },
+    {
+      "path": "artifacts/fish3d/fish3d-v3a-fan/rays.json",
+      "sha256": "e644ff48d23e3ab6d616b1bdcbbaea532ed16b36f28970dda5eb75dfa8cb26e8",
+      "bytes": 126933
+    },
+    {
+      "path": "artifacts/cfd3d/vlm/fish3d-v3a-fan/vlm.json",
+      "sha256": "4b11b6221547005ee57a35e394a3a642680cdecd18c740b624b8b929a82db7f7",
+      "bytes": 121762
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://ntrs.nasa.gov/api/citations/20140008648/downloads/20140008648.pdf",
+      "sha256": "64b7952474bc1dd777997c0dd3e4db9b8a9e7c25cf99c5c6a673b08e85f325f0",
+      "bytes": 512847,
+      "cache_path": "/data/artifacts/delphi-evolve-rethink/aeroelastic-sources/nasa-static-aeroelastic.pdf",
+      "read_method": "web PDF extracted text; direct publicGET byte pin",
+      "selector": "Ting,Nguyen,Trinh2014: HermiteEq63-66,p10; staticFEMEq74-75,p11; geometrySectionVII; loopSectionVIII,p15; aircraft model, not fish",
+      "scope": "Model-method reference, not fish empirical validation"
+    },
+    {
+      "url": "https://ocw.mit.edu/courses/1-050-solid-mechanics-fall-2004/f9a4d5764b9b0f51ffaacbdf69f7aed8_emech10_04.pdf",
+      "sha256": "d4e8298e3e4bdb2134da25c3f412d14c20b489b7b1c44ebe9d8fd1b16f43e053",
+      "bytes": 276566,
+      "cache_path": "/data/artifacts/delphi-evolve-rethink/aeroelastic-sources/mit-beam-deflection.pdf",
+      "read_method": "web PDF extracted text; direct publicGET byte pin",
+      "selector": "MIT1.0502004 Deflections due to Bending,Section10.1 andp268cantilever table; small-displacement assumptionspp263-264",
+      "scope": "Model-method reference, not fish empirical validation"
+    }
+  ],
+  "geometry": {
+    "fins": [
+      "pectoral_L",
+      "pectoral_R",
+      "pelvic_L",
+      "pelvic_R"
+    ],
+    "coordinates": "source v3a right-handed SI coordinates; +x is VLM freestream direction, +z upward; no body aerodynamic model",
+    "structural_model": "one constant-EI clamped-free equivalent spanwise scaffold per fin; chord/axial directions constrained, no finite torsional compliance; NOT anatomy-resolved fin rays or ecology hinge stiffness",
+    "beam_kernel": "superpose existing Hermite FEM tip-load responses at each actual span load station; unloaded portion extends linearly; no duplicate beam solver",
+    "deflection_map": "Xdeformed=Xsource+w(s)*n_up; normals transformed by inverse-transpose of I+w_prime*n_up tensor e_u, then normalized; source camber normals retained as VLM approximation",
+    "load_map": "VLM bound-segment forces applied at segment midpoint; projectnormalforces, group common span stations; preserve normal resultant,firstmoment andvirtualwork. Full tangentialforce/torsional/moment constraint reactions retained separately, not silently discarded.",
+    "S_reference": "sum of undeformed source fin area_flat_m2, fixed across arms/meshes; CL normalization never changes to disguise force differences",
+    "beam_kernel_scope": "FE1/2/4 comparisons establish exactness/roundoff of constantEI point-load kernels, NOT a convergence rate; fluid lattice and fixed-point/glide refinements are separate"
+  },
+  "parameters": {
+    "rho_kg_m3": 1.204,
+    "rho_basis": "assumed air condition, same as upstream VLM air20C default; not specimen measurement",
+    "alpha_deg": 4.0,
+    "airspeeds_m_s": [
+      16.0,
+      20.0
+    ],
+    "reference_speed_m_s": 20.0,
+    "compliance_design_values": [
+      0.05,
+      0.2,
+      0.8
+    ],
+    "EI_formula": "EI_fin=abs(upstream rigid normalforce at20m/s)*span_length^2/compliance; engineering design definition, NOT fitted or measured material",
+    "EI_inputs": {
+      "pectoral_L": {
+        "length_m": 0.08914496831705351,
+        "reference_normal_force_N": 0.13485539247670475,
+        "EI_Nm2_by_compliance": {
+          "0.05": 0.0214334451011565,
+          "0.2": 0.005358361275289125,
+          "0.8": 0.0013395903188222812
+        }
+      },
+      "pectoral_R": {
+        "length_m": 0.08914496831705351,
+        "reference_normal_force_N": 0.1348553924767048,
+        "EI_Nm2_by_compliance": {
+          "0.05": 0.021433445101156506,
+          "0.2": 0.005358361275289126,
+          "0.8": 0.0013395903188222816
+        }
+      },
+      "pelvic_L": {
+        "length_m": 0.06085634132626962,
+        "reference_normal_force_N": 0.023360039428085476,
+        "EI_Nm2_by_compliance": {
+          "0.05": 0.0017302754478719785,
+          "0.2": 0.00043256886196799463,
+          "0.8": 0.00010814221549199866
+        }
+      },
+      "pelvic_R": {
+        "length_m": 0.06085634132626962,
+        "reference_normal_force_N": 0.02336003942808548,
+        "EI_Nm2_by_compliance": {
+          "0.05": 0.0017302754478719787,
+          "0.2": 0.0004325688619679947,
+          "0.8": 0.00010814221549199867
+        }
+      }
+    },
+    "arms": [
+      "rigid",
+      "one-way-frozen-load",
+      "two-way-static-feedback"
+    ],
+    "meshes": {
+      "main": {
+        "span": 16,
+        "chord": 4
+      },
+      "fine": {
+        "span": 24,
+        "chord": 6
+      }
+    },
+    "underrelaxation": 0.5,
+    "maximum_iterations": 40,
+    "no_biological_priors": true
+  },
+  "gates": {
+    "freeze_before_new_coupled_outputs": true,
+    "transfer_force_relative_max": 1e-11,
+    "transfer_moment_relative_max": 1e-11,
+    "virtual_work_relative_max": 1e-11,
+    "normal_unit_error_max": 1e-10,
+    "minimum_cell_area_m2": 1e-12,
+    "coordinate_roundoff_tolerance_m": 1e-08,
+    "small_deflection_tip_over_span_max": 0.1,
+    "small_slope_max_rad": 0.2,
+    "source_aoa_limit_deg": 8,
+    "fixed_point_shape_change_over_span_max": 1e-06,
+    "fixed_point_CL_absolute_change_max": 1e-06,
+    "lattice_CL_relative_change_max": 0.03,
+    "lattice_tip_difference_over_span_max": 0.005,
+    "beam_kernel_FE1_2_4_relative_max": 1e-08,
+    "analytic_tip_relative_max": 1e-10,
+    "stiff_limit_EI_multiplier": 1000000.0,
+    "stiff_limit_CL_absolute_difference_max": 1e-06,
+    "stiff_limit_tip_over_span_max": 1e-06,
+    "upstream_VLM_controls": "all frozen engineering/cfd3d/gates_vlm.json controls must pass; no threshold edits",
+    "negative_controls": [
+      "omit an actual load and detect conservation failure",
+      "degenerate geometry rejected",
+      "negative EI rejected",
+      "zero-load and stiff limit",
+      "deliberately excessive compliance20 retained as model-domain exit"
+    ],
+    "zero_load_CL_absolute_difference_max": 1e-12,
+    "ballistic_range_relative_error_max": 1e-06,
+    "gravity_energy_relative_variation_max": 1e-07,
+    "drag_energy_max_step_increase_J": 1e-09,
+    "lift_power_relative_error_max": 1e-12
+  },
+  "glide": {
+    "engine": "existing engineering.simulation.glide.integrate; actualRK4states",
+    "scope": "Final static shape is rigidized and its CL atalpha4 held fixed during a separate flight proxy. Shape does NOT continuously relax as speed changes. No continuousFSI, no biological motor/energy calibration. Assumeddrag; no prescribed air thrust.",
+    "mass_kg": 0.05,
+    "mass_basis": "assumed biological design mass, NOTresin model mass or measured specimen",
+    "height_m": 4.0,
+    "CD0": 0.05,
+    "oswald_e": 0.8,
+    "dt_s": 0.002,
+    "half_dt_s": 0.001,
+    "range_relative_discrepancy_max": 0.0001,
+    "series_time_adapter": "upstream series stores post-step state under k*dt; label retained active states at(k+1)*dt; initialstate explicitly recorded. Do not count interpolated water-event endpoints as integrated states. Ignore inactive/frozen series entries; terminalhold labeled.",
+    "energy_scope": "E=.5mV^2+mgh, expected drag power=-DV; lift orthogonalvelocity by existing equations; no energy renormalization"
+  },
+  "counts": {
+    "contexts": 6,
+    "arms_per_context": 3,
+    "meshes_per_arm": 2,
+    "total_declared_arms": 36,
+    "shared_rigid_cases": "same rigid input repeated only for paired comparison; not independent evidence",
+    "no_interaction_or_biological_probability": true
+  },
+  "resources": {
+    "CPU_vCPU": 4,
+    "workers": 2,
+    "threads_per_worker": 2,
+    "hard_seconds": 1200,
+    "soft_no_new_work_seconds": 1000,
+    "tree_memory_GiB": 12,
+    "tasks": 128,
+    "output_cap_bytes": 50000000,
+    "GPU": 0
+  },
+  "failures": "All invalid, unconverged,nonfinite and missing arms preserved; no new cases or threshold changes to force a pass. Actualstatic iterations are NOT physicaltime; glide time distinct.",
+  "cross_scale_open_questions": [
+    "ECM/cell state to measured equivalent EI",
+    "fin anisotropy,torsion,branching,membrane mechanics",
+    "viscosity,separation,body interaction,unsteady wake",
+    "ongoing aeroelastic motion during flight",
+    "Vm to growth lacks sourced mapping; no invented bioelectric bridge"
+  ]
+}

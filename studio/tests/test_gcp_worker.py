@@ -23,6 +23,15 @@ def test_whole_task_has_memory_process_cpu_and_runtime_caps():
     assert args[-3:] == ["--", "python3", "entry.py"]
 
 
+def test_packet_can_tighten_but_not_remove_process_tree_bound():
+    request = {**spec(), "tasks_max": 128}
+    assert "TasksMax=128" in gcp_worker.systemd_argv(request, Path("/src"), Path("/out"))
+    for invalid in (0, 257, True, "128"):
+        request["tasks_max"] = invalid
+        with pytest.raises(ValueError, match="task bound"):
+            gcp_worker.validate(request)
+
+
 def test_metadata_refuses_credentials_and_unbounded_task():
     request = spec()
     request["env"] = {"GCP_TOKEN": "must-not-embed"}
@@ -112,3 +121,23 @@ def test_gpu_worker_keeps_same_whole_tree_bounds_and_owned_name_scope():
     request["vm"] = "other-gpu-20261031-01"
     with pytest.raises(ValueError, match="owned VM"):
         gcp_worker.validate(request)
+
+
+def test_reused_vm_cannot_import_stale_previous_packet_files(monkeypatch, tmp_path):
+    monkeypatch.setattr(gcp_worker, "ROOT", tmp_path)
+    old = tmp_path / "src"
+    old.mkdir()
+    (old / "unlisted.py").write_text("raise RuntimeError('stale source')")
+    packet = tmp_path / "packet.tar"
+    with tarfile.open(packet, "w") as archive:
+        member = tarfile.TarInfo("entry.py")
+        member.size = 7
+        archive.addfile(member, io.BytesIO(b"pass\n#\n"))
+    request = {**spec(), "source_sha256": hashlib.sha256(packet.read_bytes()).hexdigest()}
+    first = gcp_worker.prepare_source(request, tmp_path)
+    (first / "runtime-leftover.py").write_text("leftover")
+    second = gcp_worker.prepare_source(request, tmp_path)
+    assert second != first and second != old
+    assert sorted(path.name for path in second.iterdir()) == ["entry.py"]
+    assert (old / "unlisted.py").exists()
+    assert (first / "runtime-leftover.py").read_text() == "leftover"

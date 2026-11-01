@@ -49,7 +49,7 @@ preserved and no new sequence-generation request is being routed elsewhere.
   0.001191914 exceeded0.001; no training or holdouts ran.
 - [x] Admit a preregistered precision-only diagnosis and conditional retry.
   The source/config/tolerance remain fixed; explicitFP32 controls must pass.
-- [ ] Recover trained checkpoint and full hold-out comparisons if controls pass.
+- [x] Recover the trained checkpoint after the primary timeout, then recover full held-out comparisons in a separate evaluation-only job; the primary failure remains.
 - [x] Admit a separate training-only RD discretization audit, five axial
   grid/timestep settings, hard900s; no network/holdout changes.
 - [x] Queue a CPU-only diagnostic for the 3D candidate hash mismatch; preserve
@@ -62,7 +62,14 @@ preserved and no new sequence-generation request is being routed elsewhere.
 - [x] Collect repaired CFD: four 3D cases, twelve pressure arrays and two actual-field movies; the frozen physical sphere reference still FAILS.
 - [x] Collect all five training-only RD audit configurations and 960 paired rows. The independent full derived-metric reproduction FAILED; all 66 discrepancies concern nearly uniform-field spectral-power ratios. Original values remain.
 - [x] Unify the primary diffusion collection/publication audit before outputs arrive; 23 focused tests pass, including nonfinite rejection.
-- [ ] Recover the running primary diffusion weights and held-out outputs, then admit only the separately preregistered secondary evaluation packet if its gates pass.
+- [x] Collect the separate secondary evaluation and full generated arrays. Structural completeness passes, but strict metric reproduction fails; undefined ratios and every failed scalar remain visible.
+- [x] Return all 23 pinned public-genome survey records from the Google CPU worker; preserve the species deviation and ten unscored records.
+- [x] Collect 26 of 28 paired ecology scenarios, including all trace files; preserve two unstarted deadline rows.
+- [ ] Dispatch the missing-only two-scenario ecology continuation after its packet freezes.
+- [x] Admit the bundled four-model NCA comparison; training and 52 held-out results remain pending.
+- [x] Admit Google L4 controls: pinned environment plus CPU and CUDA restart checks passed.
+- [ ] Collect same-state parity and L4 calibration; run R2 only if the original time/memory gates pass.
+- [ ] Collect the three already-running CPU cylinder cases and exact checkpoints.
 
 The angle batch requires a passing parity check in the same allocation. Its
 subsequent workloads reject a missing or failed gate. The original 3 MB return
@@ -98,8 +105,8 @@ cancelled. It runs inside capped systemd units on this host.
 The next 24-hour plan is the `preparation` array in
 [`results/infra/queue.json`](../results/infra/queue.json), with owners, prepared
 source/protocol commits, time estimates, admission requirements and stop gates.
-The running diffusion job comes first. Its separate exact-W1/full-ensemble
-evaluation awaits a valid returned checkpoint and a frozen packet. The local
+The original NCA comparison completed4models/52runs, with0/48 design predicates passing. The separately frozen seed-placement comparison is now admitted. The exact-W1 evaluation has returned with a
+retained strict metric-audit failure. The missing-only ecology continuation completed its two pairs; combined coverage is28pairs, and the original26-pair partial run remains immutable. The local
 resolved-fin CFD protocol awaits its CPU controls and measured runtime; no extra
 GPU is reserved for an unprepared packet. Pressure-to-mechanics work reuses the
 returned 3D arrays with Reynolds-consistent units and explicit unresolved
@@ -109,3 +116,6 @@ At the 2026-10-31 16:26:01 PDT accounting refresh, current Frontier jobs and exa
 historical team jobs remain separate. The shared project's unmatched jobs are
 **unattributed**, not asserted to be other teams. None of the broader historical
 attribution grants cancellation permission.
+
+
+At7:08pm PDT on October31, the two admitted H100 jobs were starting/provisioning, not yet measured busy. They test seed placement and same-source CFD hardware timing. Full R2 remains blocked on measured runtime and coherent checkpoint transport; the original L4 NO-GO is preserved. Google VM03 remains the only running scientific CPU worker (16vCPU); five later L4 capacity attempts returned stockouts. Original NCA telemetry measured90.85% mean GPU utilization over724samples from6:39:46–6:51:49pm PDT, alongside0/48 design checks. Exact archives/transport recovery are retained in results/infra/nca/recovered.

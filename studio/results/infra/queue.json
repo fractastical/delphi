@@ -1,6 +1,6 @@
 {
   "schema": "frontier.compute-queue/1",
-  "observed_at_utc": "2026-11-01T00:07:33.979840Z",
+  "observed_at_utc": "2026-11-01T01:31:20.467248Z",
   "owner": "infra_director",
   "tasks": [
     {
@@ -169,25 +169,91 @@
       "job_id": "aijob-e00rhs6hdan4n57kv8",
       "task": "Four-model inverse NCA comparison",
       "owner": "infra_director + mechanobio_sim",
-      "provider_state": "STARTING",
+      "provider_state": "COMPLETED",
       "protocol": "artifacts/nca-pattern/packet/owner-manifest.json",
       "source_sha256": "27bba4e0f1a5dba9f869b05ff87ce20a0421921dea94d5137060e668eaa25262",
-      "scope": "4models x2000steps,52heldouts declared; no result yet, no biological/genetic implementation claim"
+      "scope": "4 models x2000steps and52 evaluation runs completed;0/48 design predicates,4/4 absorbing negatives. Original metadata parse failure retained; exact outer/part archives recovered without rerun.",
+      "completion_receipt": "results/resources/nca-completion.json"
+    },
+    {
+      "job_id": "aijob-e00jmvgx169vje8ywk",
+      "task": "Seed-placement NCA controlled comparison",
+      "owner": "infra_director",
+      "provider_state": "admitted; live provider receipt in resource snapshot",
+      "protocol": "artifacts/nca-seed-placement/packet/owner-manifest.json",
+      "controller_manifest": "results/infra/nca-seed/manifest-infra28.json",
+      "scope": "No biological validation. Controls and negative outcomes retained."
+    },
+    {
+      "job_id": "aijob-e00dydgq6ps3hkzjfv",
+      "task": "H100 cylinder controls and calibration only",
+      "owner": "infra_director",
+      "provider_state": "admitted; live provider receipt in resource snapshot",
+      "protocol": "artifacts/cfd-h100-calibration/protocol.json",
+      "controller_manifest": "results/infra/cfd-h100-calibration/manifest-infra29.json",
+      "scope": "No biological validation. Controls and negative outcomes retained."
     }
   ],
   "preparation": [
     {
+      "task": "Collect four-model NCA comparison",
+      "owner": "infra_director transport / mechanobio_sim science",
+      "priority": 1,
+      "state": "running_training_first_arm_zero_fields",
+      "job_id": "aijob-e00rhs6hdan4n57kv8",
+      "packet": "inputs/items_infra_nca.json",
+      "budget": "One H100; 2400s science, 48MiB complete return cap",
+      "next_acceptance": "Same-job CPU/CUDA gates; four exact final checkpoints and 52 declared heldouts, source/target/mask hashes and finite state checks; preserve missing models and deadline outcomes",
+      "stop_gate": "No extra seed jobs, no changed targets or thresholds, no training after heldout inspection",
+      "progress": "results/resources/nca-live-progress.json"
+    },
+    {
+      "task": "Complete two unstarted ecology scenario pairs",
+      "owner": "mechanobio_sim freezes / infra_director dispatches",
+      "priority": 1,
+      "state": "complete_original_partial_preserved",
+      "prior_result": "results/resources/gcp/ecology-completion.json",
+      "budget": "Reuse stopped 4-vCPU VM04 with existing exact dependencies; fresh task prefix and output directory",
+      "next_acceptance": "Frozen two original scenario IDs, same original code/seed/settings and dt/actuator gates; rerun only missing two pairs, 4 simulations",
+      "stop_gate": "Original 26 pairs and partial receipt immutable; no threshold relaxation or invented endpoints",
+      "packet": "inputs/gcp-ecology-missing.json",
+      "result": "results/resources/gcp/ecology-missing-completion.json"
+    },
+    {
+      "task": "L4 same-state parity and runtime calibration then conditional R2",
+      "owner": "claude-04 science / infra_director dispatch and collection",
+      "priority": 1,
+      "state": "initial_no_go_then_restart_stockout",
+      "packet": "inputs/gcp-cfd-r2-l4.json",
+      "budget": "One L4, 4 vCPU, 10800s science; 14400s VM stop",
+      "next_acceptance": "Numerical controls passed; initial 3-hour budget no-go preserved. Separate12-hour envelope frozen, alternate eligible-region capacity admission pending.",
+      "stop_gate": "No-go retains controls and exits11; no runtime criterion relaxation; C1 physical sphere failure remains",
+      "result": "results/resources/gcp/l4-calibration-completion.json"
+    },
+    {
+      "task": "Collect existing CPU cylinder R1/R3/M1",
+      "owner": "claude-04 science / infra_director collection",
+      "priority": 1,
+      "state": "running",
+      "packet": "inputs/gcp-cfd-argv-repair.json",
+      "budget": "Existing 16-vCPU worker; 79200s task, 23h VM stop, periodic checkpoint export",
+      "next_acceptance": "Preserve coherent restart checkpoints, exact case identity, frozen fidelity and negative control evaluation; combine with R2 only after its return",
+      "stop_gate": "Incomplete cases stay incomplete; no full fish aero validation from cylinder controls"
+    },
+    {
       "task": "Exact-weight evaluation recovery",
       "owner": "dx-market-r1 source / infra_director admission",
       "priority": 1,
-      "state": "source_packet_preparation_public_runtime_release_pending",
+      "state": "completed_original_failure_retained",
       "authorization": "Root explicitly authorized after verified partialcheckpoint; original primaryFAIL permanent",
       "runtime_inputs": "artifacts/rd-diffusion/primary-runtime-inputs.json",
       "runtime_archive_sha256": "4c43b04106469764c1d24450a29c1e200914e3b7952c417bb62508fd52862a5d",
       "checkpoint_sha256": "1a0a185cdacd49e8a65aa77ece1cd8f51033533c996025b3f4da907cd2b2ae76",
       "budget": "oneH100;1800s evaluation-only; no optimizer/training",
       "next_acceptance": "Freeze new recovery protocol/source; original evaluate/marginals/timings unchanged; exactcheckpoint/config/source/splits/seeds, sameFP32+CUDAcontrols; original160conditions/allmethods/marginals/completeness criteria. Label regeneratedtrainingbaseline data asregenerated, require exactnormalizationmatch; stage receipts. PublicGET size/SHA/member gate beforeadmission.",
-      "stop_gate": "No change to originalfailure, originalscientificcriteria, weights oroptimizer; missing/nonfiniteoutputs andtimeouts remain failures."
+      "stop_gate": "No change to originalfailure, originalscientificcriteria, weights oroptimizer; missing/nonfiniteoutputs andtimeouts remain failures.",
+      "result": "results/infra/diffusion-recovery/results/infra25-rd-ddpm-evaluation-recovery/recovery-result.json",
+      "earliest_next_action": "No further recovery dispatch; original primary timeout remains"
     },
     {
       "task": "Collect primary trained RD model",
@@ -196,7 +262,7 @@
       "state": "collected_partial_primary_failed",
       "job_id": "aijob-e00qazx6sby3vav47b",
       "packet": "inputs/items_infra_diffusion_v2.json",
-      "earliest_next_action": "On return, or original hard1800s deadline around16:39:38PDT; estimate excludes provider transport",
+      "earliest_next_action": "Complete: exact checkpoint retained; separate recovery has returned",
       "next_acceptance": "Completedtrainingcheckpoint checked; originalfullrunFAIL remains, noheldoutperformanceclaim",
       "stop_gate": "Any missing file, timeout, failed/control/nonfinite/completeness check remains failed/partial; no threshold change or retraining on holdouts"
     },
@@ -204,13 +270,14 @@
       "task": "Secondary exact empirical W1 and full ensemble retention",
       "owner": "dx-market-r1 prepares / infra_director dispatches",
       "priority": 2,
-      "state": "source_frozen_waiting_valid_evaluation_recovery",
+      "state": "completed_strict_metric_audit_failed",
       "source": "engineering/rd_diffusion/AMENDMENT_1.md; engineering/rd_diffusion/secondary_eval.py; exact_w1.py",
       "prepared_source_commit": "396bd0bb",
-      "earliest_next_action": "After exact-weight evaluation-recovery passes original completeness criteria; no blindretry",
+      "earliest_next_action": "Publish unchanged raw values and strict failure; no rerun requested",
       "budget": "oneH100,initial30min hardbound, no additionaltraining",
       "next_acceptance": "Exact checkpoint SHA/public transport gate; source hashes frozen before secondary outputs; explicit FP32 flags matching actualprimary; fixedseeds; exactW1softwarefixture; fullgenerated+referenceensembles retained; unchanged primarymetrics compared and differences reported",
-      "stop_gate": "Invalidprimary checkpoint, missingprimaryidentity, failedcontrol, changedweights, nonfinite/truncatedoutput, or sharedforeignqueueddemand => do notadmit/stopasprotocolspecifies"
+      "stop_gate": "Invalidprimary checkpoint, missingprimaryidentity, failedcontrol, changedweights, nonfinite/truncatedoutput, or sharedforeignqueueddemand => do notadmit/stopasprotocolspecifies",
+      "result": "results/infra/diffusion-secondary/collection-audit.json"
     },
     {
       "task": "Curate controlled3D pressure/video artifacts",
@@ -288,14 +355,14 @@
     "no_biological_validity_from_numerical_success": true,
     "credentials": "neverincludedinsnapshot"
   },
-  "updated_at_utc": "2026-11-01T01:27:40.060899+00:00",
+  "updated_at_utc": "2026-11-01T02:09:32.268968+00:00",
   "planning_horizon_utc": [
     "2026-10-31T23:28:04.655084+00:00",
     "2026-11-01T23:28:04.655084+00:00"
   ],
   "gcp": {
     "project": "scienceclaw26bos-3016",
-    "observed_at_utc": "2026-11-01T01:27:40.060899+00:00",
+    "observed_at_utc": "2026-11-01T02:09:32.268968+00:00",
     "global_cpu_limit": 32,
     "gpu_quota_granted": 1,
     "gpu_vm_created": true,
@@ -336,15 +403,15 @@
           }
         ],
         "id": "4266786588371661074",
-        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/machineTypes/g2-standard-4",
+        "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/machineTypes/g2-standard-8",
         "name": "frontier-gpu-20261031-01",
-        "status": "RUNNING",
+        "status": "TERMINATED",
         "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
       }
     ],
-    "active_allocated_vcpus": 20,
+    "active_allocated_vcpus": 16,
     "instantaneous_cpu_utilization": null,
-    "state": "VM03 runs R1/R3/M1 cylinder controls; L4 pinned environment and actual CUDA.functional passed, restart/platform controls pending. Ecology exported26computed scenario pairs plus2not-started statuses; VM04 stopped. Genomics23/23 exported; VM01/02 stopped.",
+    "state": "Only VM03 runs the controlled cylinder CPU cases. Ecology original26 plus missing-only2 completed and VM04 stopped. Five later L4 capacity attempts failed, including provider-suggested zone; no R2 assay started. Further blind Google admissions stopped.",
     "plan": [
       {
         "vm": "frontier-cpu-20261031-03",
@@ -371,13 +438,13 @@
     "network": "frontier-workers-20261031",
     "ingress": "explicit priority0 deny-all",
     "credentials": "Dedicated bucket-only metadata identity; no embedded keys",
-    "expiry": "User states account deletes Sunday night2026-11-01; exact cutoff unknown.23h/4h VM caps and periodic exports.",
+    "expiry": "Exact lab cutoff unknown after project metadata read; user reports Sunday night Nov1. New R2 provider STOP fixed2026-11-01T16:00:00Z, 08:00 PST, with periodic exports.",
     "cost": null,
     "failure_receipts": [
       "results/resources/gcp/cfd-bootstrap-failure.json",
       "/data/artifacts/delphi-evolve-rethink/messages/gcp-artifact-collection-to-codex03.md"
     ],
-    "status_update_utc": "2026-11-01T01:27:40.060899+00:00",
+    "status_update_utc": "2026-11-01T01:38:47.734237+00:00",
     "genomics_completed": "results/resources/gcp/genomics-completion.json",
     "automatic_collection": {
       "service": "frontier-cfd-collector",
@@ -388,8 +455,10 @@
       "completion_is_export_not_science": true
     },
     "next_ecology": {
-      "state": "Original26pairs complete,2not-started arms; missing-only packet being prepared with original gates",
-      "receipt": "results/resources/gcp/ecology-completion.json"
+      "state": "complete_28_pairs_no_new_compute",
+      "receipt": "results/resources/gcp/ecology-missing-completion.json",
+      "native_audit_commit": "d3d64c6",
+      "native_audit_scope": "Reported independent verification of189files/4912frames/252metrics,28dt and140actuator gates."
     },
     "l4_admission": {
       "id": "4266786588371661074",
@@ -406,9 +475,20 @@
       "seconds_after_start": 735.4,
       "actual_device": "NVIDIA L4",
       "canonical_pins_sha256": "d1a8e00741a5d1733be9e007b49bb2844fff2bdd232ccb993c1838319ed926bc",
-      "scientific_platform_gate": null,
-      "receipt": "/data/artifacts/delphi-evolve-rethink/gcp/cylinder-r2-l4-calibration/frontier-gpu-20261031-01/progress-030bec0ad63e4e9ebba7c20433e6fb7e/status.json"
-    }
+      "scientific_platform_gate": true,
+      "receipt": "/data/artifacts/delphi-evolve-rethink/gcp/cylinder-r2-l4-calibration/frontier-gpu-20261031-01/progress-030bec0ad63e4e9ebba7c20433e6fb7e/status.json",
+      "scope": "Previous completed controls allocation only; no R2 case started"
+    },
+    "active_allocated_gpus": 0,
+    "l4_calibration_result": "results/resources/gcp/l4-calibration-completion.json",
+    "l4_restart_result": "results/resources/gcp/l4-overnight-operation-result.json",
+    "l4_capacity_failures": [
+      "results/resources/gcp/l4-overnight-operation-result.json",
+      "results/resources/gcp/l4-east4-operation-result.json",
+      "results/resources/gcp/l4-east4a-operation-result.json",
+      "results/resources/gcp/l4-size8-operation-result.json",
+      "results/resources/gcp/l4-hint-operation-result.json"
+    ]
   },
-  "next_ready_dispatch": "NCA admitted; native owner preparing2missing ecology pairs without rerunning26completed pairs; CFD and L4 controlled runs active."
+  "next_ready_dispatch": "Two H100 jobs admitted: seed-only NCA comparison and same-source CFD controls/timing only. No fullR2 until measuredruntime and coherentcheckpoint transport; no additional ecology/MD jobs."
 }

@@ -1,11 +1,34 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 7:28pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 7:42pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-016 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 7:28pm PDT
+## Current checkpoint — October 31, 2026, 7:42pm PDT
+
+- [x] Both public demo MP4 links returned HTTP 200 with the expected byte sizes;
+  the deployed app includes the Demo videos menu entry. The preceding user-facing
+  turn was a status check, not a new delivery; integration work resumes here.
+- [x] Integrated the coarse aeroelastic control slice and its actual-state movie.
+  Root ran four focused tests and scoped Ruff, and recomputed all 23 manifest
+  hashes and byte sizes. The source uses existing beam, VLM and glide solvers;
+  static iterations are distinct from flight time. No biological calibration.
+- [ ] Google aeroelastic worker exited zero; final export and independent
+  numerical audit remain pending. A process exit is not scientific acceptance.
+- [ ] Assembly compiler review found cache keys that omit actual pinned bytes,
+  and two stages that read default paths instead of exact assembly pins. Claude-14
+  is correcting these before integration; missing inputs must return typed blocks.
+- [ ] Claude-02 owns the coupling card and three-assembly comparison/history UI.
+  Shared genetic proposals must stay distinct from the varying geometries;
+  v3b's failed lattice comparison must remain visible. No aggregate success badge.
+- [ ] Native mechanics/infra collect the NCA and aeroelastic results; native
+  resources prepares the bounded BETSE comparison. The broader goal remains active.
+
+Local integration receipt: `deploy/receipts/aeroelastic-integration.json`.
+Public release remains `c3fd602` until the next tested feature batch is deployed.
+
+## Previous checkpoint — October 31, 2026, 7:28pm PDT
 
 - [x] Release `c3fd602` is live. About → Demo videos serves both exact-length
   1080p MiniMax-narrated cuts, captions, transcripts and downloadable MP4s. The
