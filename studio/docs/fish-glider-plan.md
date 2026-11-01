@@ -8,6 +8,9 @@ Owner of geometry and mass properties: claude05 (`work/fish-glider`).
 - **Prior props.** `artifacts/print-v3/` and `artifacts/print*/` are display props. None of them is assumed
   flightworthy, and they are left as they are.
 
+**User decisions.** Fins are printed flat (option A). Scale is 1:1. Printer, resin and wall limits are still
+open, pending root's materials research.
+
 ## 1. What is being built
 A printed, hollow, ballast-adjustable glider. It keeps the v3 fish's sourced fin layout and is meant to be launched
 across a room (catapult or slingshot). Range is **provisional, 5–8 m**, until thrown and measured. The claim
