@@ -78,6 +78,9 @@ launched. Dollar cost is unknown (`null`), not estimated as zero.
 request URL/time/status and every raw response SHA256/size. Raw responses are
 under `run/raw/`. The reviewed coverage pins the original receipt and extraction
 hashes separately. `artifact-manifest.json` covers the durable output files.
-Four focused fixture tests passed in0.17s; Ruff and whitespace checks passed.
+Four focused fixture tests passed in0.17s; Ruff and authored-code whitespace checks
+passed. Raw responses retain upstream CRLF and trailing whitespace for exact
+checksum preservation; local attributes disable text conversion/style checks
+only for those source bytes.
 Metadata retrieval and integrity checks do not independently validate the
 authors' biological observations.
