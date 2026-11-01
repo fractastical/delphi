@@ -72,3 +72,34 @@ and Brev execution remains unestablished. A contributor count must come from the
 audited ledger with its counting unit, not live process counts or model names.
 Keep the printed prop out of this cut for the live presentation. The same media
 and public-playback acceptance requirements apply to this additional video.
+
+## Science and formalization revision (user request, October 31)
+
+Produce a new 60-second foundation cut and a new 120-second demonstration under
+an additive artifact directory. Preserve every earlier video, script and receipt.
+Feature the new pair on the demo page after actual public playback checks; keep
+earlier cuts accessible as an archive.
+
+- The short cut leads with Lean for biology: sourced conditional claims,
+  equations, explicit assumptions, executable checks, and a shared community
+  interface. Show actual Lean source and its recorded compiler/control results.
+- The longer cut connects that foundation to the multiscale design studio and
+  its validation framework. Follow a named biological question through source
+  evidence, proposed genetic context, tissue/fin mechanics, organism constraints,
+  numerical tests, failures and the next required experiment.
+- Distinguish compiled conditional theorems from generated Lean text, source
+  translation fidelity, simulation accuracy, and empirical biological validity.
+  The MCP proposal checker does not itself compile Lean or certify a living fish.
+- Describe the fish as a design investigation grounded in real biology. Published
+  fin-size phenotypes do not establish flight, and no genotype/phenotype similarity
+  percentage is permitted without a defined metric and an actual measurement.
+- Any Evo2 statement must name what the saved run produced and what was tested.
+  Candidate sequence continuation is not demonstrated promoter/enhancer function
+  or cell-type specificity. Gene-to-growth-to-flight connections remain hypotheses
+  wherever the project has no calibrated transfer model.
+- Emphasize the approach, reusable evidence and independent critique. Resource
+  names are brief attribution to recorded use, not an inflated utilization claim.
+  A large universal library of verified biology and general collective advantage
+  are visions, not completed results.
+- Validate every scientific spoken claim before synthesis. Inspect the final
+  media, captions, sources and public playback under the existing acceptance.

@@ -755,6 +755,15 @@ def print_laws(ins: Inputs, out: dict, downloads: dict) -> dict | None:
     return {"data": index, "href": path, "sha256": digest_bytes(raw), "refused": []}
 
 
+def lean_proofs(ins: Inputs, out: dict) -> dict:
+    module_path = "scripts/lean_gallery.py"
+    ins.read(module_path)
+    spec = importlib.util.spec_from_file_location("frontier_lean_gallery", ROOT / module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.build(ins, out, root=ROOT)
+
+
 def demo_videos(ins: Inputs, out: dict) -> dict | None:
     """Preserve earlier cuts while admitting an additive, completely pinned edit."""
     result = {"cuts": [], "refused": [], "limits": []}
@@ -1694,6 +1703,7 @@ def build() -> dict[str, bytes]:
     resources = resource_inventory(ins)
     mcp_chk = mcp_check(ins)
     extra: dict = {}
+    proofs = lean_proofs(ins, extra)
     prints = print_forms(ins, extra)
     controlled = controlled_results(ins, files)
     if simulation is not None:
@@ -1743,6 +1753,7 @@ def build() -> dict[str, bytes]:
         "capabilities": tools,
         "board": board,
         "lean_receipt": lean_receipt,
+        "lean_gallery": proofs,
         "simulation": simulation,
         "attestation_check": attestation,
         "simulation_manifests": manifests,
@@ -1787,7 +1798,7 @@ def build() -> dict[str, bytes]:
 
 
 def generated_artifact_families() -> list[str]:
-    return ["results", "fish3d", "molecular", "rd-diffusion", *(path.name for path in print_families())]
+    return ["results", "fish3d", "molecular", "rd-diffusion", "lean-gallery", *(path.name for path in print_families())]
 
 
 def write(out: dict[str, bytes]) -> None:

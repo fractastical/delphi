@@ -106,3 +106,25 @@ def test_a_changed_checker_dependency_is_stale(tree):
     g, _ = run(tree)
     f = next(f for f in g["families"] if f["id"] == "geometric-similarity")
     assert f["status"] == "stale" and any("constraints.py changed" in r for r in f["reasons"])
+
+
+@pytest.mark.parametrize("mutation", ["empty_controls", "missing_control", "nonstandard_axiom", "contradictory_exit"])
+def test_receipt_summary_cannot_hide_incomplete_or_contradictory_checks(tree, mutation):
+    name = "engineering/formalize/lean/RECEIPT.json" if mutation == "contradictory_exit" else "engineering/formal/RECEIPT.json"
+    path = tree / name
+    data = json.loads(path.read_text())
+    record = data.get("lean_checks", data)
+    if mutation == "empty_controls":
+        record["negative"]["each_block_rejected"] = {}
+    elif mutation == "missing_control":
+        record["negative"]["each_block_rejected"].pop("wl_k2")
+    elif mutation == "nonstandard_axiom":
+        record["positive"]["axioms_used"].append("sorryAx")
+    else:
+        record["negative_corrupt_law"]["exit"] = 0
+    path.write_text(json.dumps(data))
+    gallery, out = run(tree)
+    family = "cantilever-guard" if mutation == "contradictory_exit" else "geometric-similarity"
+    result = next(f for f in gallery["families"] if f["id"] == family)
+    assert result["status"] == "receipt_failed" and not result["receipt"]["all_ok"]
+    assert not any(f"/{family}/" in key for key in out)

@@ -163,6 +163,18 @@ def _family(spec: dict, ins, out: dict, root: Path) -> dict:
         if not assembled_ok:
             reasons += [f"the compiled {k} source is not what the current files assemble to" for k, v in got.items() if assembled.get(k) != v]
     fam["assembled_sources_match"] = assembled_ok
+    # A summary boolean cannot substitute for the actual nonempty control/axiom record.
+    axioms = set(run["positive"].get("axioms") or [])
+    flags["positive"] = flags["positive"] and bool(axioms) and axioms <= STANDARD_AXIOMS
+    if spec.get("negative") and spec["negative"] in files:
+        expected = {b["id"] for b in neg_blocks(files[spec["negative"]].decode())}
+        reported = run["negative"]["each_block_rejected"]
+        flags["negative"] = (flags["negative"] and bool(expected) and set(reported) == expected
+                             and all(value is True for value in reported.values()))
+    elif spec.get("negative_file"):
+        flags["negative"] = (flags["negative"] and run["negative"]["exit"] == 1
+                             and bool(run["negative"].get("first_error")))
+    fam["receipt"]["all_ok"] = bool(fam["receipt"]["all_ok"] and all(flags.values()))
     # 3. the run itself must have been green
     if not flags["positive"]:
         reasons.append("the receipt records a failed or non-standard-axiom positive run")

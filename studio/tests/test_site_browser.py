@@ -987,7 +987,7 @@ def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, b
     pg.wait_for_selector(".aboutmenu summary")
     pg.focus(".aboutmenu summary"); pg.keyboard.press("Enter")
     hrefs = pg.locator(".aboutmenu details[open] a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
-    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative", "#/demo", "#/faq", "#/work?tab=connect"]
+    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative", "#/demo", "#/faq", "#/proofs", "#/work?tab=connect"]
     assert pg.locator("nav[aria-label=Views] > ul > li > a:has-text('Generative')").count() == 0   # not a top-level item
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
     pg2 = page(browser, 400, 800)
