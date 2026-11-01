@@ -1530,8 +1530,9 @@ def test_genetic_blueprints_show_construct_blocks_unknowns_equations_and_no_sequ
     links = pg.locator("section[aria-labelledby=bp-src] td[data-label=Source] a").evaluate_all("els => els.map(e => e.href)")
     assert links and all(h.startswith("https://") for h in links) and len(links) == len(src["citation_table"]) > 0, links
     import re
-    assert not re.search(r"\\b[ACGT]{20,}\\b", t), "no DNA sequence may appear"
-    assert pg.locator("section[aria-labelledby=bp-cmp] tbody tr").count() == len(src["comparison"]["rows"]) > 0 and "Not a ranking" in t
+    assert not re.search(r"\b[ACGT]{20,}\b", t), "no DNA sequence may appear"
+    assert len(src["comparison"]["rows"]) >= 6
+    assert pg.locator("section[aria-labelledby=bp-cmp] tbody tr").count() == len(src["comparison"]["rows"]) and "Not a ranking" in t
     pg.click("a[data-cite]:visible >> nth=0")
     pg2 = page(browser, 400, 800)
     pg2.goto(base + "#/blueprints"); pg2.wait_for_selector(".bpdesign")
