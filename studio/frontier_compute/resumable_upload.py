@@ -20,9 +20,20 @@ import stat
 import tempfile
 from urllib.parse import parse_qs, quote, urlsplit
 
-from frontier_compute.gcp_artifacts import CHUNK_BYTES, GCS, safe_relpath
 
+CHUNK_BYTES = 8 * 1024 * 1024
 MAX_BYTES = 3_200_000_000
+
+
+def safe_relpath(value):
+    """Capability object names use a deliberately narrower ASCII-only contract."""
+    if not isinstance(value, str) or not re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9._/-]{0,511}", value
+    ):
+        raise ValueError("Invalid capability object name")
+    if any(part in ("", ".", "..") for part in value.split("/")):
+        raise ValueError("Invalid capability object path")
+    return value
 
 
 def instant(value):
@@ -295,6 +306,8 @@ def main():
     # Persist every issued URI before issuing the next. Partial initiation remains cancellable.
     state = {"schema": "frontier.resumable-session-ledger/1", "sessions": []}
     private_save(args.state, state)
+    from frontier_compute.gcp_artifacts import GCS
+
     for index in range(args.slots):
         cap = issue(
             GCS.local(),
