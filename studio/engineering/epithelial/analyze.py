@@ -290,13 +290,31 @@ def main() -> None:
                              gap0=rows[0]["gap0"], gap0_um2=rows[0]["gap0"] * NODE_AREA_UM2,
                              n_cells=rows[0]["n_cells"])
     if ladder:
-        ph = [v["phi_star"] for v in ladder.values()]
+        # Phi* is only known to lie inside (lambda bracket) x coef. Comparing the geometric-mean
+        # SUMMARIES of two intervals and calling the ratio a refutation is a statistical error:
+        # the summaries can differ while the intervals overlap, which is exactly the case here.
+        # Found by independent review; the overlap is computed rather than asserted.
+        for v in ladder.values():
+            v["phi_interval"] = [v["bracket"][0] * v["coef"], v["bracket"][1] * v["coef"]]
+        ks = sorted(ladder)
+        lo = max(ladder[k]["phi_interval"][0] for k in ks)
+        hi = min(ladder[k]["phi_interval"][1] for k in ks)
+        ph = [ladder[k]["phi_star"] for k in ks]
         gates.append(dict(id="G12", passed=(len(ladder) == 3), detail=dict(
-            ladder=ladder, phi_star_values=ph,
-            phi_star_spread_ratio=(max(ph) / min(ph)) if ph else None,
+            ladder=ladder, rungs=len(ladder), rungs_required=3,
+            phi_star_point_summaries=ph,
+            phi_star_summary_ratio=(max(ph) / min(ph)) if ph else None,
+            phi_interval_overlap=([lo, hi] if lo <= hi else None),
+            constant_phi_star_consistent_with_these_rungs=(lo <= hi),
             constant_phi_star_asserted=False,
-            note="a constant Phi* is not asserted. The spread ratio states how far from constant it is.")))
-
+            constant_phi_star_refuted=False,
+            note=("the rungs present have OVERLAPPING Phi intervals, so they are consistent with a "
+                  "constant Phi* and do NOT refute one. The point summaries differ by the ratio "
+                  "above, but a ratio of two interval summaries is not a measurement. G12 fails "
+                  "because the ladder is INCOMPLETE: k=1 produced no bracket at any swept "
+                  "lambda_V, and k=1 is independently confounded (its passive ceiling is 100% of "
+                  "that wound), so it cannot discriminate in either direction. Gap-size scaling is "
+                  "therefore UNTESTED at this resolution, not refuted."))))
     # Descriptive shape of the closing phase. Bai & Zeng 2023 report a roughly linear area
     # decrease and cite Anon et al. for a linear experimental decrease and ref 74 for an
     # exponential one. This fits both forms to the pre-closure samples of each CLOSED arm and

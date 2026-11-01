@@ -104,6 +104,14 @@ Two gates check the instrument before any result is read:
 - **G3** confirms every initial gap is exactly 625·*k*. **G5** confirms an unwounded sheet
   reads exactly 0 at every logged time — a gap measure that cannot report zero cannot report
   closure. **G2** confirms no cell is created or destroyed after wounding.
+- **G1 is weaker than its name suggests.** "Area conservation" is **an identity given the
+  definition** `gap ≡ 40000 − Σ cell.volume`, so the sum cannot fail to total 40 000. What it
+  genuinely catches is a non-integer or negative gap, i.e. a corrupt or mis-parsed log. It is
+  **not** an independent proof that area is conserved. *(Framing corrected at the final
+  independent review's request.)*
+- **Neither G1 nor G1b is independent of the engine.** Both read the same simulation state
+  through two code paths. They check that the *readout* is consistent, not that the physics or
+  the biology is right.
 
 All four pass.
 
@@ -227,7 +235,10 @@ predicted interval *at StopTime 1000*". This is **one doubling at one gap size**
 out-of-sample bracket fell where the group said it would. The packet sweep in the infra
 handoff exists precisely because one doubling is one test.
 
-**Where it breaks (G12, fails).**
+**Where it is incomplete (G12, fails) — and what that is *not*.**
+
+G12 fails because the **ladder is incomplete**, not because the group is refuted. Gap-size
+scaling is **UNTESTED at this resolution**, and the card no longer claims otherwise.
 
 - *k*=1 **never arrests**, at any λ_V tried up to 5 000, where Φ ≈ 2 460 — while *k*=4
   already arrests by Φ ≈ 4.13. The group does not govern a single-cell wound at all, and
@@ -235,8 +246,16 @@ handoff exists precisely because one doubling is one test.
   one-cell gap can close with no mechanism acting. That arm cannot discriminate between
   closure mechanisms in either direction, and the Φ failure at *k*=1 is a confound rather
   than a refutation of the group there.
-- *k*=4 and *k*=7 share the bracket (0.3, 1.0), while Φ predicts their thresholds should
-  differ by 2.4×. Φ* is 2.26 and 5.51 — a spread ratio of 2.43, not a constant.
+- *k*=4 and *k*=7 share the λ_V bracket (0.3, 1.0). Their **Φ intervals overlap**:
+  [1.239, 4.129] and [3.016, 10.053], common on **[3.016, 4.129]**. A constant Φ* in that
+  range fits **both**, so these two rungs are **consistent with** a constant Φ* and do **not**
+  refute one.
+
+  *(Corrected 2026-10-31, final independent review. This card previously said their Φ* values
+  of 2.26 and 5.51 "spread by 2.43×, not a constant". Those are **geometric-mean summaries of
+  intervals**, not measurements, and a ratio of two interval summaries is not evidence that
+  the intervals disagree. **I overstated a refutation.** The sweep spacing is too coarse to
+  separate these two rungs.)*
 
 **Stated domain.** The rule is usable as *"at a fixed gap geometry in this CPM, the
 closure threshold in λ_V scales linearly with the cell–medium contact energy J"*, verified
@@ -279,7 +298,7 @@ counted G1b as a pass on a criterion I had narrowed to make it fit. The reported
 | G9 held-out J scaling | **pass** | §6 |
 | G10 no-drive negative control | **FAIL** | the 22% floor; see §4 |
 | G11 protrusion monotonicity | **pass** | §5 |
-| G12 complete gap ladder | **FAIL** | *k*=1 never arrests; see §6 |
+| G12 complete gap ladder | **FAIL (incomplete, not refuted)** | 2 of 3 rungs; *k*=1 never arrests and is confounded. The two rungs present have **overlapping** Φ intervals, so they are consistent with a constant Φ*. Gap-size scaling is untested here; see §6 |
 
 **Sweep invariance (unplanned, stronger than G7's declared bound).** Halving `MCSDuration`
 halves the model time to closure — 240 → 120 — while closure measured in **Monte-Carlo
