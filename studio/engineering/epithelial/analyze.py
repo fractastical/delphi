@@ -115,15 +115,32 @@ def main() -> None:
            if abs(s["gap"] + (TOTAL_NODES - s["gap"]) - TOTAL_NODES) > 1e-9 or s["gap"] < -1e-9 or s["gap"] % 1 != 0]
     gates.append(dict(id="G1", passed=not bad, detail=f"{len(bad)} non-integer or negative gap samples"))
 
-    # G1b independent TIFF channel
-    mism = []
+    # G1b independent TIFF channel.
+    # The logger samples at log_step and the TIFF at frame_step; only frames whose model time
+    # is also a logged time can be compared pointwise. Reporting "0 disagreements" without the
+    # denominator overstates the check, which is what happened at edc1e10: 756 of 1476 frames
+    # are comparable and the other 720 were silently skipped. The coverage is now part of the
+    # gate, and a gate that compares nothing cannot pass.
+    mism, comparable, frames_total = [], 0, 0
     for n, A in arms.items():
         lg = {s["t"]: s["gap"] for s in A["series"]}
         for t, med, _ in tiff_gap(runs / n, A["arm"]["frame_step"]):
-            if t in lg and abs(lg[t] - med) > 0:
+            frames_total += 1
+            if t not in lg:
+                continue
+            comparable += 1
+            if abs(lg[t] - med) > 0:
                 mism.append((n, t, lg[t], med))
-    gates.append(dict(id="G1b", passed=not mism, detail=f"{len(mism)} frames disagree between logger and TIFF",
-                      examples=mism[:5]))
+    cov = comparable / frames_total if frames_total else 0.0
+    gates.append(dict(id="G1b", passed=(not mism and comparable > 0), detail=(
+        f"{len(mism)} disagreements over {comparable} comparable frames "
+        f"({cov:.1%} of {frames_total} written frames)"), examples=mism[:5],
+        coverage=dict(frames_written=frames_total, frames_comparable=comparable,
+                      frames_not_comparable=frames_total - comparable, fraction=cov,
+                      why="logger time-step and TIFF time-step differ, so only their common "
+                          "multiples can be compared pointwise. The uncompared frames are not "
+                          "evidence of agreement and are not counted as such."),
+        scope="pointwise agreement on comparable frames only; NOT every written frame"))
 
     # G2 cell count constant
     g2 = [n for n, A in arms.items() if len({s["n"] for s in A["series"]}) != 1]

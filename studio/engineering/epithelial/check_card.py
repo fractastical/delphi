@@ -65,6 +65,32 @@ def claims(A: dict, G: dict, S: dict) -> list[tuple[str, object, object]]:
         ("tally: G8 is not a pass", True, G["G8"]["passed"] is None),
         ("tally: total gates", 13, len(G)),
     ]
+    # G1b's DENOMINATOR is pinned, not just its zero. "0 disagreements" without the number of
+    # frames actually compared is what let the card claim "every written frame" while the gate
+    # silently skipped 720 of 1476. A zero and an empty comparison look identical otherwise.
+    cov = G["G1b"]["coverage"]
+    rows += [
+        ("G1b frames written", 1476, cov["frames_written"]),
+        ("G1b frames comparable", 756, cov["frames_comparable"]),
+        ("G1b frames NOT comparable", 720, cov["frames_not_comparable"]),
+        ("G1b coverage is partial, not total", True, cov["frames_comparable"] < cov["frames_written"]),
+    ]
+    # the passive ceiling is 625 nodes at EVERY gap, which is a different fraction each time.
+    # Pinning only k=4's 25% would let "subtract 22 points everywhere" survive this checker.
+    for k, arm_name, survivors, pct in ((1, "B-k1-lamV0.1", 64, 100.0),
+                                        (4, "A1-baseline", 61, 25.0),
+                                        (7, "B-k7-lamV0.1", 58, 14.3)):
+        g0 = A[arm_name]["gap0"]
+        rows.append((f"k={k} survivors", survivors, A[arm_name]["n_cells"]))
+        rows.append((f"k={k} passive ceiling nodes", 625, round(g0 - (40000 - survivors * 625))))
+        rows.append((f"k={k} passive ceiling % of its gap", pct,
+                     round(100 * (g0 - (40000 - survivors * 625)) / g0, 1)))
+    rows += [
+        ("unwounded sheet cells placed (not the nominal 64)", 65,
+         A["A5-unwounded-POSITIVE"]["n_cells"]),
+        ("realised mean cell area, nodes (target is 625)", 615.38,
+         round(40000 / A["A5-unwounded-POSITIVE"]["n_cells"], 2)),
+    ]
     return rows
 
 

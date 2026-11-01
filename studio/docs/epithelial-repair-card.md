@@ -32,10 +32,25 @@ No full-text copy of any paywalled article is mirrored in this repository.
 
 ## 2. Scale mapping — declared, not fitted
 
-64 seeds on a 200×200 lattice give a mean cell area of **625 nodes by construction**. That
-is equated to the area of a 26 µm disc, the average cell diameter Bai & Zeng take from
-experimental measurement. Hence **1 node = 0.84949 µm²**, node length 0.92168 µm, and the
-lattice is 184.3 × 184.3 µm — smaller than their 400 × 400 µm sheet.
+The model requests 64 seeds on a 200×200 lattice, giving a **VolumeConstraint target of 625
+nodes per cell**. That target is equated to the area of a 26 µm disc, the average cell
+diameter Bai & Zeng take from experimental measurement. Hence **1 node = 0.84949 µm²**, node
+length 0.92168 µm, and the lattice is 184.3 × 184.3 µm — smaller than their 400 × 400 µm sheet.
+
+**625 is the target, not the realised mean.** `InitDistribute` actually places **65** cells,
+so the realised mean cell area on an unwounded sheet is 40 000/65 = **615.38 nodes**, and the
+cells sit about 1.5% below target. Anchoring the same 26 µm disc on the realised mean instead
+would give 1 node = 0.86275 µm² and gaps of 539 / 2 157 / 3 775 µm² for *k* = 1 / 4 / 7 —
+still inside Bai & Zeng's studied 400–4 900 µm² range, like the figures in the table below.
+**Every µm² figure in this card therefore carries about ±1.6% from this choice of anchor**,
+which is far smaller than the uncalibrated-model caveats in §8 and is recorded rather than
+hidden. The published artifacts use the target-anchored mapping throughout.
+
+*(Corrected 2026-10-31 after independent review read the raw runs. This section previously
+said "mean cell area of 625 nodes by construction", conflating the target with the mean, and
+gave the nominal 64 rather than the 65 cells actually placed. The logger and the TIFF agree
+on 65 living IDs in the unwounded arm, so the two channels were never in conflict — the
+error was in the card's description, not in the measurement.)*
 
 Wounds are made by removing *k* central cells, exactly as Bai & Zeng describe. Every removed
 cell is exactly 625 nodes, so initial gap areas are exact:
@@ -59,8 +74,16 @@ is the sensitivity probe for it.
 Two gates check the instrument before any result is read:
 
 - **G1b** compares that against an **independent channel** — counting medium pixels in the
-  lattice images Morpheus' `TiffPlotter` writes. The two share no code. Across all 36 arms
-  and every written frame they disagree on **zero** frames.
+  lattice images Morpheus' `TiffPlotter` writes. The two share no code. They disagree on
+  **zero of 756 comparable frames**, which is **51.2% of the 1 476 frames written**.
+
+  *(Coverage corrected 2026-10-31 after independent review of `edc1e10`, which read the raw
+  runs. The card previously said "every written frame". It is not: the logger samples every
+  10 model time units and the TIFF every 25, so only their common multiples — every 50 — can
+  be compared pointwise, and **720 frames were silently skipped by the gate's own `if t in
+  logged` filter**. The agreement is real and is now stated over its actual domain. The
+  uncompared frames are not evidence of agreement and are not counted as such; `results-r2.json`
+  carries the denominator, and the gate now fails if it compares nothing.)*
 - **G3** confirms every initial gap is exactly 625·*k*. **G5** confirms an unwounded sheet
   reads exactly 0 at every logged time — a gap measure that cannot report zero cannot report
   closure. **G2** confirms no cell is created or destroyed after wounding.
@@ -77,6 +100,33 @@ can claim at most 38 125 of 40 000 nodes, which leaves **1 875 nodes of residual
 the most the hole can be filled by cells relaxing into volume they were already short of is
 2 500 − 1 875 = **625 nodes, i.e. 25.0%**. Measured is 551 nodes, 22.0%, just under that
 ceiling because the surface constraint holds cells slightly below target.
+
+**The ceiling is 625 nodes at every gap size, and 22% is NOT a constant to subtract.**
+`InitDistribute` places **65** cells, so the population targets 65 × 625 = 40 625 nodes on a
+40 000-node lattice — over-subscribed by exactly one cell's worth. Whatever is removed, the
+survivors can collectively absorb exactly **625 extra nodes**. As a fraction of the wound
+that is wildly different:
+
+| *k* | survivors | gap (nodes) | residual at target | passive ceiling | **as % of this gap** |
+|---|---|---|---|---|---|
+| 1 | 64 | 625 | **0** | 625 | **100%** |
+| 4 | 61 | 2 500 | 1 875 | 625 | 25.0% |
+| 7 | 58 | 4 375 | 3 750 | 625 | 14.3% |
+
+**This confounds the *k*=1 arm outright: a one-cell wound can close completely by passive
+volume relaxation, with no mechanism at all.** That is the explanation for §6's finding that
+*k*=1 never arrests at any λ_V — it was never a mechanism test. It is also why the *k*=1
+rung is excluded from the rule's domain, and the exclusion is now mechanistic rather than
+merely empirical.
+
+The passive arm was measured **only at *k*=4**. The 22.0% is that arm's number; the 100% and
+14.3% entries above are the *arithmetic ceilings*, not measurements, and no passive arm was
+run at *k*=1 or *k*=7. So "subtract 22 points" is wrong everywhere except *k*=4, and even
+there it is a **hypothesis about the cause** of the first quarter of closure — consistent
+with the measurement, not proven to be its mechanism.
+
+*(Added 2026-10-31 after independent review read the raw runs. The card previously implied
+one universal floor.)*
 
 *(Corrected 2026-10-31 after independent review of `edc1e10`. An earlier version of this
 paragraph called 1 875 the number of nodes **filled**. It is the residual, and the filled
@@ -155,7 +205,11 @@ handoff exists precisely because one doubling is one test.
 **Where it breaks (G12, fails).**
 
 - *k*=1 **never arrests**, at any λ_V tried up to 5 000, where Φ ≈ 2 460 — while *k*=4
-  already arrests by Φ ≈ 4.13. The group does not govern a single-cell wound at all.
+  already arrests by Φ ≈ 4.13. The group does not govern a single-cell wound at all, and
+  **§4 now gives the reason: at *k*=1 the passive ceiling is 100% of the wound**, so a
+  one-cell gap can close with no mechanism acting. That arm cannot discriminate between
+  closure mechanisms in either direction, and the Φ failure at *k*=1 is a confound rather
+  than a refutation of the group there.
 - *k*=4 and *k*=7 share the bracket (0.3, 1.0), while Φ predicts their thresholds should
   differ by 2.4×. Φ* is 2.26 and 5.51 — a spread ratio of 2.43, not a constant.
 
