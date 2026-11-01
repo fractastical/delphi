@@ -130,10 +130,22 @@ def probe(root, restored, source, source_sha):
                         second = value(await client.call_tool('frontier_propose', args))
                         if first['record']['version'] != second['record']['version']:
                             raise ValueError('Idempotent retry changed version')
-                        got = value(await client.call_tool('frontier_get', {'target': ref(first['record'])}))
-                        if got['record']['id'] != actor or got['record']['issuer'] != actor:
+                        hidden = await client.call_tool('frontier_get', {'target': ref(first['record'])})
+                        if not hidden.isError or 'not_found:' not in hidden.content[0].text:
+                            raise ValueError('Public-only MCP read did not hide private fixture')
+                        receipt['checks']['private_fixture_hidden_from_public_only_mcp_read'] = True
+                        # This visibility is confined to the disposable socket-only database.
+                        # The documented MCP read surface deliberately does not read private records.
+                        public_draft = dict(draft, id=actor + '-public', visibility='public')
+                        public_args = {'draft': public_draft, 'idempotency_key': actor + '-public'}
+                        public_first = value(await client.call_tool('frontier_propose', public_args))
+                        public_second = value(await client.call_tool('frontier_propose', public_args))
+                        if public_first['record']['version'] != public_second['record']['version']:
+                            raise ValueError('Public fixture idempotent retry changed version')
+                        got = value(await client.call_tool('frontier_get', {'target': ref(public_first['record'])}))
+                        if got['record']['id'] != actor + '-public' or got['record']['issuer'] != actor:
                             raise ValueError('Authenticated round-trip differs')
-            receipt['checks']['official_mcp_authenticated_private_write_read_and_idempotency'] = True
+            receipt['checks']['official_mcp_authenticated_write_public_read_and_idempotency'] = True
         asyncio.run(asyncio.wait_for(exercise(), timeout=90))
         request = urllib.request.Request(f'http://127.0.0.1:{ports["mcp"]}/mcp', data=b'{}',
             headers={'Authorization': 'Bearer invalid-disposable-credential-0000', 'Content-Type': 'application/json'})
