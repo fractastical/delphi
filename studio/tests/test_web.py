@@ -1240,6 +1240,24 @@ def test_warmstart_archive_is_an_opaque_download_only_under_artifacts(authed, si
         assert authed.req("GET", path)[0] == 404
 
 
+def test_video_captions_serve_as_webvtt_only_inside_artifacts(authed, site, tmp_path):
+    art = site / "artifacts"
+    art.mkdir(exist_ok=True)
+    payload = b"WEBVTT\n\n00:00.000 --> 00:01.000\nA simulated result.\n"
+    (art / "captions.vtt").write_bytes(payload)
+    status, headers, body = authed.req("GET", "/artifacts/captions.vtt")
+    assert status == 200 and body == payload
+    assert headers["content-type"] == "text/vtt; charset=utf-8"
+    assert headers["x-content-type-options"] == "nosniff"
+    assert "attachment" not in headers.get("content-disposition", "")
+    (site / "outside.vtt").write_bytes(payload)
+    (art / "token-captions.vtt").write_bytes(payload)
+    (tmp_path / "external.vtt").write_bytes(payload)
+    (art / "link.vtt").symlink_to(tmp_path / "external.vtt")
+    for path in ("/outside.vtt", "/artifacts/token-captions.vtt", "/artifacts/link.vtt"):
+        assert authed.req("GET", path)[0] == 404
+
+
 def test_anonymous_session_minting_is_limited_per_client_and_a_cookie_holder_is_not_counted(store, site):
     """The session table is capped and evicts the oldest, so unlimited anonymous minting would sign everyone else out of the calculators."""
     w = Web(store, site, public_read=True, anon_sessions_per_window=3)
