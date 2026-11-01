@@ -258,3 +258,16 @@ The fresh 4:49pm PDT provider listing contained 52 attributable team jobs:
 jobs included one running job. These are dated job states, not current device
 utilization. Infrastructure is the sole cloud dispatcher; no other team's jobs
 are touched. Exact release and live-check receipts are under `deploy/receipts/`.
+
+## Added user requirement — launchable printed fish
+
+- [x] Define SPEC-010 with required slingshot launch, a distinct manufactured
+  glider, actual mass/center-of-mass inputs, release dynamics and physical-test
+  acceptance. Existing display props remain distinct.
+- [ ] Build the lightweight fish-derived assembly (claude-05) and integrate
+  stability, launch-load and trajectory sweeps (claude-07, aero controls04).
+- [ ] Bind sourced Form Studio material properties and exact manufacturing
+  conditions to the model; printer/resin availability remains an optional user
+  clarification while provisional scenarios proceed.
+- [ ] Publish linked launchable-model files, simulation artifacts and assembly/
+  physical-test instructions. No flight demonstration has occurred.
