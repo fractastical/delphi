@@ -65,10 +65,16 @@ preserved and no new sequence-generation request is being routed elsewhere.
 - [x] Collect the separate secondary evaluation and full generated arrays. Structural completeness passes, but strict metric reproduction fails; undefined ratios and every failed scalar remain visible.
 - [x] Return all 23 pinned public-genome survey records from the Google CPU worker; preserve the species deviation and ten unscored records.
 - [x] Collect 26 of 28 paired ecology scenarios, including all trace files; preserve two unstarted deadline rows.
-- [ ] Dispatch the missing-only two-scenario ecology continuation after its packet freezes.
-- [x] Admit the bundled four-model NCA comparison; training and 52 held-out results remain pending.
+- [x] Dispatch and collect the missing-only two-scenario ecology continuation. Combined coverage is28pairs/56simulations; the original partial is unchanged.
+- [x] Collect the original four-model NCA comparison: all52evaluations returned,0/48design checks passed. Preserve exact original archive and metadata-clipping failure.
+- [x] Admit a separate seed-placement comparison with unchanged source/criteria and reused evaluations; all52evaluations returned; native summary32/48design checks, independent audit pending.
 - [x] Admit Google L4 controls: pinned environment plus CPU and CUDA restart checks passed.
-- [ ] Collect same-state parity and L4 calibration; run R2 only if the original time/memory gates pass.
+- [x] Collect L4 same-state parity and calibration. Numerical controls passed; runtime NO-GO stopped R2 before any assay. Five later capacity attempts failed.
+- [x] Admit H100 controls/calibration only; actual Julia setup started, no R2cases selected.
+- [x] Collect H100 controls/timing: original numerical gates and5907s conservative runtime projection passed. Native rc10/providerFAILED preserve intentionally absent cases.
+- [ ] Complete production capability transport before the fullR2 assay.
+- [x] Admit and collect all36 aeroelastic CPU arms;161file hashes checked, independent numerical interpretation pending.
+- [ ] Admit the frozen metabolic and BETSE CPU packets after independent preflights.
 - [ ] Collect the three already-running CPU cylinder cases and exact checkpoints.
 
 The angle batch requires a passing parity check in the same allocation. Its
@@ -119,3 +125,5 @@ attribution grants cancellation permission.
 
 
 At7:08pm PDT on October31, the two admitted H100 jobs were starting/provisioning, not yet measured busy. They test seed placement and same-source CFD hardware timing. Full R2 remains blocked on measured runtime and coherent checkpoint transport; the original L4 NO-GO is preserved. Google VM03 remains the only running scientific CPU worker (16vCPU); five later L4 capacity attempts returned stockouts. Original NCA telemetry measured90.85% mean GPU utilization over724samples from6:39:46–6:51:49pm PDT, alongside0/48 design checks. Exact archives/transport recovery are retained in results/infra/nca/recovered.
+
+At7:40pm PDT both H100 jobs were terminal: zero active Frontier GPU allocations. Seed-comparison telemetry measured87.91% GPU utilization over742samples from7:21:49–7:34:12pm PDT, including export. Tiny create-only resumable upload and restarted-controller cancellation passed actual GCS checks. Provider session TTL remains one week; the explicit cancellation deadline is an operator control, not a short provider expiry. Production adapter remains required.
