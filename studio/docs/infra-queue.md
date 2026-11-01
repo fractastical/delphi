@@ -74,7 +74,7 @@ preserved and no new sequence-generation request is being routed elsewhere.
 - [x] Collect H100 controls/timing: original numerical gates and5907s conservative runtime projection passed. Native rc10/providerFAILED preserve intentionally absent cases.
 - [ ] Complete production capability transport before the fullR2 assay.
 - [x] Admit and collect all36 aeroelastic CPU arms;161file hashes checked, independent numerical interpretation pending.
-- [ ] Admit the frozen metabolic and BETSE CPU packets after independent preflights.
+- [ ] Admit the independent BETSE CPU packet after its frozen preflight. Metabolic worker is provider-stopped; no packet or alternate-provider replay.
 - [ ] Collect the three already-running CPU cylinder cases and exact checkpoints.
 
 The angle batch requires a passing parity check in the same allocation. Its
@@ -127,3 +127,5 @@ attribution grants cancellation permission.
 At7:08pm PDT on October31, the two admitted H100 jobs were starting/provisioning, not yet measured busy. They test seed placement and same-source CFD hardware timing. Full R2 remains blocked on measured runtime and coherent checkpoint transport; the original L4 NO-GO is preserved. Google VM03 remains the only running scientific CPU worker (16vCPU); five later L4 capacity attempts returned stockouts. Original NCA telemetry measured90.85% mean GPU utilization over724samples from6:39:46–6:51:49pm PDT, alongside0/48 design checks. Exact archives/transport recovery are retained in results/infra/nca/recovered.
 
 At7:40pm PDT both H100 jobs were terminal: zero active Frontier GPU allocations. Seed-comparison telemetry measured87.91% GPU utilization over742samples from7:21:49–7:34:12pm PDT, including export. Tiny create-only resumable upload and restarted-controller cancellation passed actual GCS checks. Provider session TTL remains one week; the explicit cancellation deadline is an operator control, not a short provider expiry. Production adapter remains required.
+
+At7:55pm PDT the fullR2 job aijob-e00gjhtd6nk55b266v was IMAGE_PULLING after admission7:52:53. BETSE VM04 was installing dependencies; actual20vCPU allocated across it and the existing16vCPU CFD worker. Latest7:52pm CPU samples were58.48% of16 and21.99% of4; these sampled windows include setup and are not current kernel measurements. The next NCA curriculum evaluation is independently committed atf5db91a before its source packet/admission.
