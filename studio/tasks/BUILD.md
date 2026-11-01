@@ -1,11 +1,41 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 7:58pm PDT.
+Coordinator: codex-03. Updated October 31, 2026, 8:23pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
 GOAL.md and SPEC-005 through SPEC-016 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
 
-## Current checkpoint — October 31, 2026, 7:58pm PDT
+## Current checkpoint — October 31, 2026, 8:23pm PDT
+
+- [x] Exact-file law and check index covers 123 STLs, 19 GLBs and one ZIP.
+  Root independently recomputed r4 dry mass 20.334592 g, ballasted 26.071823 g,
+  both failing the 13.545088 g own-area scenario. The new viewer separates
+  part from nominal assembly, keeps withdrawn files and display-only scope,
+  and links equations, sources, pinned receipts and failed checks. Fourteen
+  focused index/publication tests and browser checks passed; publication pending.
+- [x] System now distinguishes 11 contributing harness identities from 3 native
+  collaborators and 31 live processes at the 8:09pm PDT observation. Live is
+  not working. Twenty-four contributor tests and four browser/build checks pass.
+  Fifteen scoped model-use records cite 84 file hashes checked at an exact
+  source tree. BioNeMo/NIM usage and total spend remain unestablished.
+- [x] Integrated the production aeroelastic comparison and NCA cards, readable
+  assembly checks, About FAQ and their focused checks. Scientific limits and
+  failed outcomes are retained; not yet published at this checkpoint.
+- [ ] Three H100 jobs admitted: NCA curriculum, full CFD R2 and R1/M1/R3 controls.
+  At 8:19pm PDT, two were IMAGE_PULLING and one PROVISIONING; kernel use was
+  not yet measured. Google had 16 vCPU allocated and 9.51 busy vCPUs in the
+  8:14pm sample. Provider listing: 46 current Frontier jobs, 15 exact historical
+  team jobs, 30 unattributed. Shared jobs are not cancelled or claimed as ours.
+- [ ] The 90-second script and real goal-entry capture are frozen. Eight MiniMax
+  narration calls completed with English_Graceful_Lady at 1.15x; timing and
+  rendering underway. Old 60/120-second videos remain intact and live.
+- [ ] Design-control map is authored at ac65800; independent review and real-site
+  integration pending. Per-ray constitutive computation is authored at c24fc44;
+  source discrepancy and missing SI/species/whole-fin bridges stay explicit.
+- [ ] Goal remains active. More simulations are not biological validation, and
+  the controlled swarm comparison still does not establish collective advantage.
+
+## Previous checkpoint — October 31, 2026, 7:58pm PDT
 
 - [x] Shared table formatting is live at `fb52a75`: labelled cards for the build
   report on small screens, readable wrapping elsewhere, and an ecology CSS
