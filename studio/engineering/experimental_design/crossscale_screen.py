@@ -134,6 +134,16 @@ def build_protocol() -> dict:
             "controls": ["V-C1: a unit-mislabelled instrument (reads w in m but is compared as w/L) must fail acceptance", "V-C2: a section off the saved grid is refused rather than interpolated silently"],
             "status": "simulation_derived: agreement of two numerical solutions, not empirical validation",
         },
+        "bidirectional": {
+            "forward": "sequence/regulatory -> expression -> growth -> EI -> deflection margin. Only the last arrow has a computed model here; every earlier arrow is a proposed, uncalibrated interface.",
+            "inverse": "target observable -> candidate set. Executed only for the mechanical layer: the screen ranks a finite (length, EI multiplier) grid against the target 'both load shapes inside the linear envelope'. Inversion to sequence is NOT attempted: no calibrated map exists, so no full-genome or regulatory-element inversion is claimed.",
+            "forward_hypothesis_discrimination": {
+                "hypotheses": ["H-uniform: distributed load q", "H-tip: same total force at the tip"],
+                "statistic": "ln[w(x=L)/w(x=0.5L)] read from saved FEM profiles (parameter-free: EI and q cancel)",
+                "assumed_noise": "independent ln-reading SD 0.2 per section (ASSUMED, the R1 scale)",
+                "outputs": "separation d' = |difference of mean statistic| / SD, and replicates for d' >= 2 (needs independent specimens; repeats on one specimen share discrepancy)",
+            },
+        },
         "stop_criteria": [
             "Stop if any control fails (the run refuses to select).",
             "A physical measurement plan needs executing-lab constraints, replicates per fish, and exact context refs; none are supplied here.",
@@ -411,10 +421,31 @@ def virtual_validation(protocol, doc):
             "control_off_grid_refused": True, "status": spec["status"], "response_rows_created": 0}
 
 
+def hypothesis_discrimination(doc, sd=0.2):
+    stats = {"uniform": [], "tip_same_total_force": []}
+    for cand in doc["candidates"]:
+        for run in cand["runs"]:
+            for shape, case in run["cases"].items():
+                g = np.array(case["profile"]["x_over_L"])
+                w = np.array(case["profile"]["w_over_L"])
+                stats[shape].append(np.log(w[-1] / w[int(np.argmin(abs(g - 0.5)))]))
+    mu = {k: float(np.mean(v)) for k, v in stats.items()}
+    spread = {k: float(np.std(v)) for k, v in stats.items()}
+    delta = abs(mu["uniform"] - mu["tip_same_total_force"])
+    d1 = delta / (sd * np.sqrt(2))  # ratio of two readings, independent errors
+    return {"statistic": "ln[w(L)/w(0.5L)] from saved profiles", "cases_per_hypothesis": len(stats["uniform"]),
+            "mean_by_hypothesis": mu, "std_across_saved_cases": spread, "assumed_reading_sd": sd,
+            "d_prime_single_specimen": d1, "independent_specimens_for_d_prime_2": int(np.ceil((2.0 / d1) ** 2)),
+            "note": "parameter-free separation from saved simulated fields; the noise is assumed, and the load shapes are two modelled hypotheses, not observed loads",
+            "response_rows_created": 0}
+
+
 def interface_map():
     def row(level, test, status, readout, blocked):
         return {"level": level, "proposed_test": test, "status": status, "readout": readout, "blocked_on": blocked}
     return {"schema": "frontier.crossscale-doe.interface-map/1",
+            "directions": {"forward_seq_to_function": "all arrows before the mechanical layer are proposals needing calibration",
+                           "inverse_function_to_seq": "executed only as target observable -> mechanical candidate set; sequence inversion is unsupported and not attempted"},
             "note": "Only the material/fin row has numerical output here. Every other row is a proposal that needs calibration; none is an executed protocol, wetlab order or engineered-organism claim.",
             "rows": [
                 row("sequence/regulatory", "Enhancer/promoter perturbation reporter assay in the same cell state as the fin-ray osteoblast program", "proposal_needs_calibration",
@@ -448,6 +479,7 @@ def run(protocol_path: Path = PROTOCOL, out: Path = OUT):
     if not meas["zero_sensitivity_control"]["ok"]:
         raise RuntimeError("zero-sensitivity control failed")
     virt = virtual_validation(protocol, draws_doc)
+    hyp = hypothesis_discrimination(draws_doc)
     funnel = {"candidates": len(rows)}
     for sid in ("S1-functional-length", "S2-material-cap", "S3-robustness", "S4-pareto"):
         funnel[sid + "_rejects_first_listed"] = sum(1 for r in rows if r["rejections"] and r["rejections"][0] == sid)
@@ -456,7 +488,7 @@ def run(protocol_path: Path = PROTOCOL, out: Path = OUT):
     result = {"schema": "frontier.crossscale-doe.result/1", "evidence_kind": "simulated_and_prospective",
               "protocol_sha256": sha256_json(protocol), "controls": ctrl, "funnel": funnel,
               "finalist_id": finalist, "finalist_rule_note": protocol["finalist_rule"],
-              "measurement": meas, "virtual_validation": virt, "empirical_validation": "none", "biological_success_probability": None,
+              "measurement": meas, "virtual_validation": virt, "hypothesis_discrimination": hyp, "empirical_validation": "none", "biological_success_probability": None,
               "measurement_rows": []}
     out.mkdir(parents=True, exist_ok=True)
     (out / "candidates.json").write_text(_canon({"schema": "frontier.crossscale-doe.candidates/1", "evidence_kind": "simulated", "rows": rows}))

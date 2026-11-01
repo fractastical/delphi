@@ -1,4 +1,17 @@
 {
+  "bidirectional": {
+    "forward": "sequence/regulatory -> expression -> growth -> EI -> deflection margin. Only the last arrow has a computed model here; every earlier arrow is a proposed, uncalibrated interface.",
+    "forward_hypothesis_discrimination": {
+      "assumed_noise": "independent ln-reading SD 0.2 per section (ASSUMED, the R1 scale)",
+      "hypotheses": [
+        "H-uniform: distributed load q",
+        "H-tip: same total force at the tip"
+      ],
+      "outputs": "separation d' = |difference of mean statistic| / SD, and replicates for d' >= 2 (needs independent specimens; repeats on one specimen share discrepancy)",
+      "statistic": "ln[w(x=L)/w(x=0.5L)] read from saved FEM profiles (parameter-free: EI and q cancel)"
+    },
+    "inverse": "target observable -> candidate set. Executed only for the mechanical layer: the screen ranks a finite (length, EI multiplier) grid against the target 'both load shapes inside the linear envelope'. Inversion to sequence is NOT attempted: no calibrated map exists, so no full-genome or regulatory-element inversion is claimed."
+  },
   "candidates": {
     "EI_multiplier": [
       1.0,
