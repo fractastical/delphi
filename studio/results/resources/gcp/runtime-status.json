@@ -1,6 +1,6 @@
 {
   "project": "scienceclaw26bos-3016",
-  "observed_at_utc": "2026-11-01T01:27:40.060899+00:00",
+  "observed_at_utc": "2026-11-01T01:44:56.284787+00:00",
   "global_cpu_limit": 32,
   "gpu_quota_granted": 1,
   "gpu_vm_created": true,
@@ -43,13 +43,26 @@
       "id": "4266786588371661074",
       "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c/machineTypes/g2-standard-4",
       "name": "frontier-gpu-20261031-01",
-      "status": "RUNNING",
+      "status": "TERMINATED",
       "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-central1-c"
+    },
+    {
+      "guestAccelerators": [
+        {
+          "acceleratorCount": 1,
+          "acceleratorType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a/acceleratorTypes/nvidia-l4"
+        }
+      ],
+      "id": "4290327145207244677",
+      "machineType": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a/machineTypes/g2-standard-4",
+      "name": "frontier-gpu-20261031-02",
+      "status": "STOPPING",
+      "zone": "https://www.googleapis.com/compute/v1/projects/scienceclaw26bos-3016/zones/us-east4-a"
     }
   ],
-  "active_allocated_vcpus": 20,
+  "active_allocated_vcpus": 16,
   "instantaneous_cpu_utilization": null,
-  "state": "VM03 runs R1/R3/M1 cylinder controls; L4 pinned environment and actual CUDA.functional passed, restart/platform controls pending. Ecology exported26computed scenario pairs plus2not-started statuses; VM04 stopped. Genomics23/23 exported; VM01/02 stopped.",
+  "state": "Only VM03 remains running scientific CPU cases. Ecology completed its two missing pairs and VM04 stopped. L4 retry and two alternate-zone admissions returned explicit capacity stockouts; no overnight R2 case started.",
   "plan": [
     {
       "vm": "frontier-cpu-20261031-03",
@@ -76,13 +89,13 @@
   "network": "frontier-workers-20261031",
   "ingress": "explicit priority0 deny-all",
   "credentials": "Dedicated bucket-only metadata identity; no embedded keys",
-  "expiry": "User states account deletes Sunday night2026-11-01; exact cutoff unknown.23h/4h VM caps and periodic exports.",
+  "expiry": "Exact lab cutoff unknown after project metadata read; user reports Sunday night Nov1. New R2 provider STOP fixed2026-11-01T16:00:00Z, 08:00 PST, with periodic exports.",
   "cost": null,
   "failure_receipts": [
     "results/resources/gcp/cfd-bootstrap-failure.json",
     "/data/artifacts/delphi-evolve-rethink/messages/gcp-artifact-collection-to-codex03.md"
   ],
-  "status_update_utc": "2026-11-01T01:27:40.060899+00:00",
+  "status_update_utc": "2026-11-01T01:38:47.734237+00:00",
   "genomics_completed": "results/resources/gcp/genomics-completion.json",
   "automatic_collection": {
     "service": "frontier-cfd-collector",
@@ -93,8 +106,9 @@
     "completion_is_export_not_science": true
   },
   "next_ecology": {
-    "state": "Original26pairs complete,2not-started arms; missing-only packet being prepared with original gates",
-    "receipt": "results/resources/gcp/ecology-completion.json"
+    "state": "completed_missing_pairs",
+    "receipt": "results/resources/gcp/ecology-missing-completion.json",
+    "native_independent_check": "Reported by mechanobio_sim: four traces/364frames and18 endpoint/discrepancy metrics independently reproduced; final aggregation pending"
   },
   "l4_admission": {
     "id": "4266786588371661074",
@@ -111,7 +125,16 @@
     "seconds_after_start": 735.4,
     "actual_device": "NVIDIA L4",
     "canonical_pins_sha256": "d1a8e00741a5d1733be9e007b49bb2844fff2bdd232ccb993c1838319ed926bc",
-    "scientific_platform_gate": null,
-    "receipt": "/data/artifacts/delphi-evolve-rethink/gcp/cylinder-r2-l4-calibration/frontier-gpu-20261031-01/progress-030bec0ad63e4e9ebba7c20433e6fb7e/status.json"
-  }
+    "scientific_platform_gate": true,
+    "receipt": "/data/artifacts/delphi-evolve-rethink/gcp/cylinder-r2-l4-calibration/frontier-gpu-20261031-01/progress-030bec0ad63e4e9ebba7c20433e6fb7e/status.json",
+    "scope": "Previous completed controls allocation only; no R2 case started"
+  },
+  "active_allocated_gpus": 0,
+  "l4_calibration_result": "results/resources/gcp/l4-calibration-completion.json",
+  "l4_restart_result": "results/resources/gcp/l4-overnight-operation-result.json",
+  "l4_capacity_failures": [
+    "results/resources/gcp/l4-overnight-operation-result.json",
+    "results/resources/gcp/l4-east4-operation-result.json",
+    "results/resources/gcp/l4-east4a-operation-result.json"
+  ]
 }

@@ -1,0 +1,54 @@
+{
+  "vm": "frontier-cpu-20261031-04",
+  "task_id": "aeroelastic-static-coupling",
+  "vcpus": 4,
+  "memory_gb": 12,
+  "runtime_s": 1200,
+  "export_interval_s": 300,
+  "source_sha256": "02fd1451696ca17de9c96a200574678b3e51309b13732f0fd57c195205cf4d65",
+  "source_commit": "1696c58e6b465f1b26a6a6661dd29f7b5a13bf25",
+  "input_sha256": {
+    "artifacts/aeroelastic/controls-local.json": "9231e55fca6d9c17a97cfd2ca7f6675b0463afae3e6328585d25e7ef7fede25f",
+    "artifacts/aeroelastic/protocol.json": "2343dd6e80cc9da394e9379e4daaa36082599344522d9774d240aab75386b24a",
+    "artifacts/cfd3d/vlm/fish3d-v3a-fan/vlm.json": "4b11b6221547005ee57a35e394a3a642680cdecd18c740b624b8b929a82db7f7",
+    "artifacts/fish3d/fish3d-v3a-fan/candidate.json": "e8c2b666874a0658bf5be95a6603b68463e68dd67ac2c0a0be8728abb7e5763e",
+    "artifacts/fish3d/fish3d-v3a-fan/components.json": "5ec2c13d65de88d875c1f8c5bc8f5bd202cf058efed900ebf9ffcf02a09574b7",
+    "artifacts/fish3d/fish3d-v3a-fan/panels.json": "1f64a9759de289118e22e6a9edc5d76c63e6daef5c4a5b84e294e80021a1d33d",
+    "artifacts/fish3d/fish3d-v3a-fan/rays.json": "e644ff48d23e3ab6d616b1bdcbbaea532ed16b36f28970dda5eb75dfa8cb26e8",
+    "engineering/aeroelastic/__init__.py": "bb3fe4dded3f2adb8ff185d997892939bfae494212fbd7fe553abbadcd19077c",
+    "engineering/aeroelastic/controls.py": "a715ab263302fc45dfbbcc85f654897d961394d199e273d998137b0e4bbf1c75",
+    "engineering/aeroelastic/flight.py": "269964fe7b6240fcb5a23c7c1a4c92d6191d908061f9bf9f3078de0839d50880",
+    "engineering/aeroelastic/model.py": "7eb236b82e66a782d9b40b51e2bed9ccd663cbfce0dd29f2e4ed91dfea03a001",
+    "engineering/aeroelastic/requirements.txt": "64f661a009ca94167f3df24906806375f890d3accda95697bd541d71ef88f782",
+    "engineering/aeroelastic/run.py": "9dbb06629178529c93208d617a9ecbaae9e3e994cd5ea8016cc63c451c0d4aa4",
+    "engineering/cfd3d/gates_vlm.json": "f9ede945cfd28f284c2ec08e8dd87b1a38d5684af1912fe3f4ced80cedbc4d58",
+    "engineering/cfd3d/vlm.py": "f9dd43a97243234880fef5c4d99e77ee34458980c6246a284762763a12acb6d3",
+    "engineering/fin_mechanics/__init__.py": "8ff9253d5eb8e401cf2f2fbc573ad9580189531f9ee72d735d91e5194e800541",
+    "engineering/fin_mechanics/beam.py": "4dfceb004a2eddef9cad27f09b744710de2a8b9b7f9f9e232b756e3cb4683b5d",
+    "engineering/simulation/__init__.py": "d7ff2108d1c58d5da04f5972a4f64e49f3a7d8758c6a197c36743420f3574ec7",
+    "engineering/simulation/glide.py": "1f6a04baaf5a7cda589f80907ba00ac93f5b20fd458211a2340f3ec44de79fa7",
+    "engineering/simulation/schema.py": "94b4f003be514ac5055ed184b0e2695a68bf0de8689e387238e9583c8e62b944"
+  },
+  "bucket": "delphi-frontier-cpu-artifacts-20261031",
+  "parameters": {
+    "declared_arms": 36,
+    "workers": 2,
+    "threads_per_worker": 2,
+    "frozen_scope": "Static equivalent-scaffold aeroelastic comparison, paired ablation/refinement and explicitly rigidized-shape glide; not tissue calibration or continuousFSI",
+    "same_job_controls_required": true,
+    "biological_success_probability": null
+  },
+  "argv": [
+    "bash",
+    "-c",
+    "set -euo pipefail; /work/ecology-venv/bin/python -m pip install --disable-pip-version-check -r engineering/aeroelastic/requirements.txt > \"$COPS_OUT/dependency-install.log\" 2>&1; /work/ecology-venv/bin/python -m pip freeze > \"$COPS_OUT/installed-pins.txt\"; exec /work/ecology-venv/bin/python -m engineering.aeroelastic.run --out \"$COPS_OUT/science\""
+  ],
+  "env": {
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "2",
+    "MKL_NUM_THREADS": "2"
+  },
+  "max_export_bytes": 60000000,
+  "output_directory": "out-aeroelastic",
+  "tasks_max": 128
+}
