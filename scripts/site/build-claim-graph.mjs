@@ -150,7 +150,7 @@ if (readme.includes(START) && readme.includes(END)) {
     "| | count |",
     "|---|---:|",
     `| claims | ${claims.length} |`,
-    `| live as nanopubs (production; the Darwin, Thompson, Wolfram and math-bio claims, published before the hackathon) | ${count(c => c.registry === "production")} |`,
+    `| live as nanopubs (production; the Darwin, Thompson, Wolfram and math-bio claims, signed and published on the hackathon's first night, Oct 30–31) | ${count(c => c.registry === "production")} |`,
     `| theorems (math claims with a proof) | ${count(c => c.theorem)} (${count(c => c.theorem && c.proof === "lean")} Lean-checked, ${count(c => c.theorem && c.proof === "literature")} literature) |`,
     `| claims tested against data | ${tested.length} (${EVIDENCE.map(v => `${n(tested, c => c.evidence === v)} ${v}`).join(", ")}) |`,
     `| of those, tested on organisms | ${n(tested, c => c.evidenceKind === "biological")} |`,
