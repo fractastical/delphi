@@ -289,8 +289,8 @@
    "endpoints": [
     {
      "id": "passive-control",
-     "text": "With actuation off, net displacement is zero to numerical tolerance.",
-     "falsifier": "A nonzero passive displacement means the runner has a defect. No other endpoint is then read."
+     "text": "With actuation off, from zero initial velocity and a settled force-balanced shape, with no external flow or forcing, a defined reference frame and after a stated transient window, net displacement is zero to numerical tolerance.",
+     "falsifier": "A nonzero passive displacement under those stated conditions triggers diagnosis of the setup or the runner. If a condition was not met, the control is restated, not read as a defect. No other endpoint is read until it is resolved."
     },
     {
      "id": "pattern-dependence",
@@ -431,8 +431,8 @@
      "pmid": "37069231",
      "doi": "10.1038/s41598-023-33111-4",
      "read_level": "abstract",
-     "license": "CC-BY 4.0 as stated in the task brief; not retrieved here",
-     "note": "Abstract read from PubMed. The PMC page was blocked by a bot check, so full text and licence were not read here."
+     "license": null,
+     "note": "Abstract read from PubMed. The PMC page was blocked by a bot check, so full text was not read here. Licence unknown: an independent review found no Creative Commons notice in a retrieved copy of the text, so none is claimed."
     }
    ],
    "claims": [
@@ -450,7 +450,7 @@
     }
    ],
    "missing_couplings": [
-    "Signaling to motility or contractility: both abstracts treat it as modifying, not producing, closure. Neither gives a transferable coupling.",
+    "Signaling to motility or contractility: Lee and Wolgemuth conclude signaling modifies, but does not produce, closure (their model-based conclusion only). The Bai and Zeng abstract does not discuss signaling, so that coupling is an explicit gap there. Neither gives a transferable coupling.",
     "Cell mechanics parameters for the chosen patch: none sourced here.",
     "Continuum finite-element and Cellular Potts parameters are not interchangeable: no mapping exists.",
     "Closure to barrier function (permeability): not modelled.",
@@ -459,8 +459,8 @@
    "endpoints": [
     {
      "id": "motility-ablation",
-     "text": "With protrusion intensity set to zero, closed area stays constant to numerical tolerance.",
-     "falsifier": "If the sheet still closes, closure comes from a modelling artifact and no mechanism is read from the run."
+     "text": "In a declared stress-free, force-balanced model with no other active drive, setting protrusion intensity to zero leaves closed area constant to numerical tolerance.",
+     "falsifier": "Closure anyway triggers diagnosis, not a presumed defect: passive relaxation, initial stress, cell-cell or cell-substrate forces or another active mechanism can legitimately close a gap. No mechanism is read from the run until the cause is found."
     },
     {
      "id": "gap-and-protrusion-dependence",
@@ -469,8 +469,8 @@
     },
     {
      "id": "refinement-conservation",
-     "text": "Closed area and cell count are unchanged within tolerance when dt is halved and across seeds.",
-     "falsifier": "A change larger than the tolerance voids the comparison for that setup."
+     "text": "Paired runs from the same initial state give closed area within tolerance when dt (and grid, where there is one) is refined. Cell count is also preserved only under a declared no-birth, no-death assumption. Seed-to-seed variability is reported as an ensemble spread, not tested for equality.",
+     "falsifier": "A paired change larger than the tolerance voids the comparison for that setup. Variation across independent seeds is not by itself a defect."
     }
    ],
    "open_questions": [
