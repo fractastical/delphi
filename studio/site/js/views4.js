@@ -26,8 +26,8 @@
     const evidenceLink = (e, rev) => html`<li><a href="${repository(e.path, rev)}" target="_blank" rel="noopener noreferrer">${e.path}</a> ${e.sha256 ? U.sha(e.sha256) : ""}</li>`;
     return html`${a ? html`<details class="contributor-audit"><summary>Who contributed? Inspect the dated identity audit</summary>
       <p class="small">Observed ${new Date(a.window.observed_utc).toLocaleString("en-US", {timeZone: "America/Los_Angeles", timeZoneName: "short"})}. ${a.not_summed}. ${a.contribution_activity}.</p>
-      <div class="two"><article><h4>Contributing harnesses · supported minimum</h4><ul>${Object.entries(a.supported_harnesses).map(([id, v]) => html`<li><code>${id}</code> — ${v.mapping ? v.mapping.role : v.basis}</li>`)}</ul></article>
-      <article><h4>Native collaborators · separate identities</h4><ul>${a.native_contributors.entries.map((v) => html`<li><code>${v.identity}</code> — ${v.role}</li>`)}</ul></article></div>
+      <div class="two"><article><h3>Contributing harnesses · supported minimum</h3><ul>${Object.entries(a.supported_harnesses).map(([id, v]) => html`<li><code>${id}</code> — ${v.mapping ? v.mapping.role : v.basis}</li>`)}</ul></article>
+      <article><h3>Native collaborators · separate identities</h3><ul>${a.native_contributors.entries.map((v) => html`<li><code>${v.identity}</code> — ${v.role}</li>`)}</ul></article></div>
       <p class="small">Identity links include coordinator attestations. Artifact checks establish that the work exists, not independent proof of authorship. Historical contribution does not mean a worker is currently active.</p>
       <p class="small"><a href="${repository(A.path)}" target="_blank" rel="noopener noreferrer">Full audit, mappings and deduplication rules</a> ${U.sha(A.sha256)}</p></details>` : ""}
       ${m ? html`<details class="model-usage-audit"><summary>Models and simulators actually exercised · ${m.entries.length} scoped records</summary>

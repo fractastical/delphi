@@ -262,7 +262,7 @@ def test_system_view_keeps_author_report_and_measured_apart(browser, base):
     txt = pg.locator("#main").inner_text().lower()
     assert "author report" in txt and "measured" in txt and "not reported: a snapshot cannot know it" in txt
     pg.get_by_role("link", name="Resources").click()
-    pg.wait_for_selector("h2:has-text('actual versus unknown')")
+    pg.wait_for_selector("h2:has-text('Recorded resource inventory')")
     assert pg.locator("#main").inner_text().lower().count("unknown") >= 3
     pg.get_by_role("link", name="Receipts").click()
     pg.wait_for_selector("h2:has-text('What has been measured')")
@@ -987,7 +987,7 @@ def test_about_menu_lists_every_destination_and_works_without_a_mouse(browser, b
     pg.wait_for_selector(".aboutmenu summary")
     pg.focus(".aboutmenu summary"); pg.keyboard.press("Enter")
     hrefs = pg.locator(".aboutmenu details[open] a").evaluate_all("els => els.map(e => e.getAttribute('href'))")
-    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative", "#/demo"]
+    assert hrefs == ["#/about", "#/about/team", "#/about/docs", "#/about/inspirations", "#/generative", "#/demo", "#/faq", "#/work?tab=connect"]
     assert pg.locator("nav[aria-label=Views] > ul > li > a:has-text('Generative')").count() == 0   # not a top-level item
     assert not pg.evaluate("document.documentElement.scrollWidth > document.documentElement.clientWidth")
     pg2 = page(browser, 400, 800)
@@ -2137,6 +2137,32 @@ def test_system_audit_separates_contributors_activity_and_model_receipts(browser
         assert audit['models']['data']['source_tree_commit'] in source
         assert pg.evaluate('document.documentElement.scrollWidth <= innerWidth + 1')
         assert not pg.errors
+
+
+def test_tables_keep_badges_on_one_line_stack_on_phones_and_say_when_they_scroll(browser, base):
+    import pathlib
+    js = (pathlib.Path(__file__).parent / "_tblmeasure.js").read_text()
+    routes = ["frontier", "studio/flying-fish", "engineering", "evidence", "evidence?tab=artifacts", "work?tab=work", "work?tab=resources", "blueprints", "simulations", "experimentation", "formalize", "ecology", "reuse", "regulatory", "history", "assemblies"]
+    for w in (1440, 768, 390):
+        pg = page(browser, w, 900)
+        for r in routes:
+            pg.goto(base + "#/" + r); pg.wait_for_selector("#main h1"); pg.wait_for_timeout(500)
+            for t in pg.evaluate(js):
+                if not t["stacked"]:
+                    assert t["pillWraps"] == 0, (r, w, t)                    # a badge in a scrolling or normal table never spans two lines
+                if t["scrolls"]:
+                    assert t["cue"], (r, w, t)                               # edge shadows are drawn
+            wraps = pg.locator("#main .tablewrap").evaluate_all("els => els.filter(e => e.scrollWidth > e.clientWidth + 1).map(e => !!(e.previousElementSibling && e.previousElementSibling.classList.contains('tablehint')))")
+            assert all(wraps), (r, w, wraps)                                  # every table that scrolls sideways says so above it
+        if w == 390:
+            pg.goto(base + "#/evidence"); pg.wait_for_selector("#main .stackable")
+            assert pg.evaluate("getComputedStyle(document.querySelector('#main .stackable td')).display") == "block" and pg.locator("#main .stackable td[data-label]").count() > 0
+        if w == 1440:
+            pg.goto(base + "#/studio/flying-fish"); pg.wait_for_selector("table.matrix")
+            assert pg.evaluate("getComputedStyle(document.querySelector('table.matrix tbody tr > :first-child')).position") == "sticky" and pg.locator("table.matrix").evaluate("t => t.closest('.tablewrap').previousElementSibling.classList.contains('tablehint')")
+            pg.goto(base + "#/frontier"); pg.wait_for_selector("#main table")
+            assert pg.evaluate("[...document.querySelectorAll('#main .tablewrap')].every(w => w.scrollWidth <= w.clientWidth + 1)"), "no Frontier table hides a column on desktop"
+        pg.close()
 
 
 def test_new_ninety_second_cut_is_featured_with_accurate_label_and_old_cuts(browser, base):
