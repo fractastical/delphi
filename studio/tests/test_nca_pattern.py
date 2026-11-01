@@ -42,3 +42,19 @@ def test_checkpoint_model_state_is_safe_weights_only_loadable(tmp_path):
     saved = torch.load(path, weights_only=True, map_location="cpu")
     assert saved["step"] == 0 and not saved["pool_state_saved"]
     assert sum(x.numel() for k, x in saved["model"].items() if k != "kernels") == 8336
+
+
+def test_return_analysis_uses_raw_values_and_rejects_unmapped_artifacts(tmp_path):
+    import pytest
+    from engineering.nca_pattern.analyze import artifact_path, visible_metrics
+
+    goal = np.zeros((4, 2, 2), dtype=np.float64)
+    state = np.full_like(goal, 2.0)
+    values = visible_metrics(state, goal, np.ones((2, 2), dtype=bool))
+    assert values["rgba_MSE"] == 4.0  # display clipping would incorrectly give1
+    assert values["silhouette_IoU"] == 0.0
+    assert values["living_pixels"] == 4
+    with pytest.raises(ValueError):
+        artifact_path(tmp_path, "/etc/passwd")
+    with pytest.raises(ValueError):
+        artifact_path(tmp_path, "evaluation/../../outside")
