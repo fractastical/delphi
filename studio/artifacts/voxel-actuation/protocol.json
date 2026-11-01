@@ -1,0 +1,77 @@
+{
+  "schema": "frontier.preregistered-protocol/1",
+  "id": "voxel-actuation-r1",
+  "title": "Xenobot-inspired soft-voxel actuation comparison (generic mechanics)",
+  "frozen_before_outputs": true,
+  "scope_statement": "Generic soft-body voxel mechanics. Nothing here is calibrated to Xenopus laevis tissue, frog cells, cilia, or any measured organism. 'Xenobot-inspired' names the design pattern (voxel body + volumetric actuation + ground friction) taken from the computationally designed organism literature. It is NOT a reproduction of Kriegman et al. 2020 and it is NOT fish or frog validation. No simulator-derived relation here is a biological law.",
+  "engine": {
+    "name": "Voxelyze",
+    "repo": "https://github.com/jonhiller/Voxelyze",
+    "commit": "4287e365e11416dd108f2f361e9ec4c5a011a16c",
+    "lib_version_string": "voxelyze.0.9.92",
+    "licence_of_record": "LGPL-3.0-or-later, declared in every src/*.cpp and include/*.h header",
+    "licence_caveat": "no LICENSE file exists at this commit, so the GitHub API reports license: null; the per-file headers are the licence",
+    "redistribution": "we commit our driver source and a build recipe; we do not redistribute a linked binary"
+  },
+  "governing_relations_read_from_upstream_source": {
+    "zero_stress_voxel_size": "baseSize = size * (1 + temp * alphaCTE)   [include/VX_Voxel.h:88]",
+    "voxel_temperature": "temp is set only by setTemperature and never decays [src/VX_Voxel.cpp:108-110]",
+    "link_stiffness": "_a1=E*L (EA/L), _a2=E*L^3/(12(1+nu)) (GJ/L), _b1=E*L (12EI/L^3), _b2=E*L^2/2 (6EI/L^2), _b3=E*L^3/6 (2EI/L) [src/VX_MaterialLink.cpp:126-131]; each link is therefore an Euler-Bernoulli element of length L=s with I=s^4/12",
+    "integration": "explicit Euler; doTimeStep returns false when any link axialStrain exceeds 100 [src/Voxelyze.cpp:251-269]"
+  },
+  "imposed_actuation_not_upstream": "T_i(t) = A * sin(2*pi*f*t + phi_i), phi_i set per voxel by the named pattern. Voxelyze 0.9 has no per-voxel phase field; voxcraft-sim exposes the same idea as MaterialTempPhase. We impose it from the driver each step.",
+  "parameter_provenance": {
+    "sourced_from_pinned_artifact": {
+      "source": "voxcraft/voxcraft-sim demos/basic/base.vxa @ dd8668f99ff74fb2fc2ee60deb91287a3b519d8f",
+      "voxel_m": 0.01, "E_Pa": 1e5, "rho_kg_m3": 1e3, "poisson": 0.35, "mu_static": 1.0, "mu_kinetic": 0.8
+    },
+    "assumed_not_measured": {
+      "cte_per_C": 0.01, "temp_amplitude_C": 10.0, "freq_Hz": 4.0,
+      "zeta_internal": 1.0, "zeta_global": 0.1, "zeta_collision": 0.8,
+      "note": "amplitude x cte = 0.10 peak linear strain. These are declared engineering choices with no measured biological referent."
+    }
+  },
+  "cross_scale_interface": {
+    "name": "actuation-pattern-to-motion/1",
+    "inputs": {"phase_pattern": "phi(x,y,z) in radians", "cte_per_C": "1/degC", "temp_amplitude_C": "degC", "freq_Hz": "Hz", "E_Pa": "Pa", "mu_static": "-", "mu_kinetic": "-"},
+    "outputs": {"net_disp_m": "m", "disp_per_cycle_m": "m/cycle", "disp_in_body_lengths": "-", "path_len_m": "m", "com_trajectory": "t,x,y,z in m"},
+    "transfer_status": "mathematically defined and numerically checked; EMPIRICALLY UNVALIDATED. No measured organism displacement is compared here."
+  },
+  "body": {"nx": 5, "ny": 3, "nz": 3, "voxels": 45, "body_len_m": 0.04, "note": "body_len is centre-to-centre along x, (nx-1)*voxel"},
+  "determinism": "Voxelyze 0.9 uses no random number generator and this driver introduces none. Repeat runs of identical arguments are bitwise identical, so there are NO stochastic replicates and no seed spread may be reported as uncertainty. Variation can only come from parameters.",
+  "arms": [
+    {"id": "A", "name": "candidate comparison", "runs": ["uniform", "longitudinal", "lateral", "dorsoventral", "travelling", "checker"], "question": "do distinct spatial actuation phase patterns produce distinguishable net displacement at matched material, amplitude, frequency and duration?"},
+    {"id": "B", "name": "passive control", "change": "cte=0", "pattern": "longitudinal"},
+    {"id": "C", "name": "zero-amplitude control", "change": "amp=0", "pattern": "longitudinal"},
+    {"id": "D", "name": "frictionless control", "change": "muS=0, muK=0", "pattern": "longitudinal"},
+    {"id": "E", "name": "zero-gravity control", "change": "gravity=0 (floor still enabled)", "pattern": "longitudinal"},
+    {"id": "F", "name": "timestep refinement", "change": "dtScale in {0.5, 0.25, 0.125}", "pattern": "longitudinal"},
+    {"id": "G", "name": "spatial refinement", "change": "nx,ny,nz doubled and voxel halved, same body dimensions and same phase split", "pattern": "longitudinal"}
+  ],
+  "predeclared_expectations": {
+    "A": "at least one pattern reaches |disp| >= 0.05 body lengths over 5 cycles, and the six patterns are not all equal. If every pattern gives the same displacement the comparison did not distinguish them and that is the result.",
+    "B": "|disp| <= 0.01 body lengths. With cte=0 the imposed temperature cannot change any zero-stress size, so there is no actuation at all.",
+    "C": "|disp| <= 0.01 body lengths, for the same reason by the other factor of the product.",
+    "D": "|disp| <= 0.01 body lengths. ARGUED, not assumed: with gravity vertical, floor reaction vertical and mu=0, the only remaining external horizontal force is global damping, which is linear and isotropic, so M*dV_com/dt = -c*M*V_com and a body starting at rest cannot translate its centre of mass horizontally. If this arm moves, the measurement is not measuring friction-mediated locomotion and arm A must not be reported.",
+    "E": "|disp| <= 0.01 body lengths, by the same argument with the normal force removed instead of the friction coefficient.",
+    "F": "net displacement at dtScale 0.25 and 0.125 agree with 0.5 within 20 percent. Explicit Euler with contact and Coulomb friction is not guaranteed to converge quickly and a larger spread is a real finding, not a failure to be tuned away.",
+    "G": "NO convergence is predicted. The actuation pattern is defined on the lattice, so halving the voxel changes the body's internal discretisation and its contact resolution together. This arm is reported as an open convergence question."
+  },
+  "analytic_controls": [
+    {"id": "P1", "mode": "expansion", "gate": "|L_measured / ((n-1)*s*(1+cte*T)) - 1| <= 0.02 AND settle_drift <= 1e-3", "tests": "the actuation law itself, dynamically rather than by reading baseSize back"},
+    {"id": "P2", "mode": "cantilever", "n": 4, "gate": "|delta_measured / (F*L^3/(3*E*I)) - 1| <= 0.02 AND settle_drift <= 1e-3", "tests": "the link elasticity against the closed form the upstream stiffness terms claim to implement. Reuses the end-loaded cantilever slice named in SPEC-013 and SPEC-017."},
+    {"id": "M1", "mode": "expansion", "mutate": "sign", "must_fail": true, "reason": "expects contraction where the law gives expansion"},
+    {"id": "M2", "mode": "expansion", "mutate": "none_law", "must_fail": true, "reason": "expects no thermal strain at all"},
+    {"id": "M3", "mode": "cantilever", "mutate": "stiffness", "must_fail": true, "reason": "back-solves with 10x the Young's modulus actually used"}
+  ],
+  "must_fail_discipline": "a mutant counts as correctly rejected only if its gate fails WHILE the run is settled and not diverged. A crash, an unsettled beam or a missing dependency is not a passing negative control.",
+  "settling_finding_recorded_in_advance": "During development the n=12 cantilever at simT=3 s read ratio 0.057 and looked like a 17x model mismatch. It was incomplete settling: the same comparison at n=2,3,4 gives ratio 1.0000 with settle drift <= 4e-13. The settling bound is in the gate because of this, and the n sweep is retained as evidence.",
+  "resource_caps": {"cpu": "<=2", "memory": "2G with MemorySwapMax=0", "tasks": 128, "runtime_s_per_run": 600, "no_apt_or_system_modification": true, "gpu": "none; this workload is CPU-only by construction"},
+  "what_this_cannot_establish": [
+    "that any displacement here would be observed in a real biological construct",
+    "that the chosen CTE, amplitude or frequency correspond to any measured cellular contractility",
+    "that a pattern ranking in this simulator transfers to another simulator or to matter",
+    "a material modulus, a force, or a gait for any organism"
+  ],
+  "calibrating_measurement_proposed": "see docs/simulation-roadmap.md, section 'One measurement that would calibrate the missing biology'"
+}
