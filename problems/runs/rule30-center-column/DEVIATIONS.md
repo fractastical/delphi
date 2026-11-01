@@ -46,3 +46,19 @@ Further deviations found while running, if any, are appended below.
    is `/tmp/rule30-work/column.bin` (about 6.5 MB) and is not in the repository. The registered tests on
    `L_reached` have not been run. This prefix is not a verdict.
 
+8. **The main run was killed at 78% of its rows and the registered prefix rule was applied.** The
+   generator was running normally (log line at 3425 s: t = 55,655,424, 79.5% of rows, 91.6% of the work) when the
+   process disappeared between 11:39:06 and 11:39:39 local (about 3,430 s after launch). It printed no
+   completion line and left no error. I do not know why; the helper that was waiting on it exited with
+   code 143 (SIGTERM) at about the same time, so an outside kill of my processes is the likely cause, not a
+   crash of the code. No checkpoint of the row state exists, so the run could not be resumed, and
+   re-running would have cost another hour. PREREG.md registers what to do when the run does not finish: test
+   the longest flushed exact prefix. That prefix is **L_reached = 54,423,553 bits (t = 0..54,423,552)**, written at the
+   flush at t = 54,423,552 (log line at 3,365 s) and copied to `column_54423553.bin` (SHA-256
+   `b2dcfe7ea12fe75a228df733063cb8e7a76547c39e58c662de048c65875af255`, 6,802,945 bytes). Every bit up to the
+   flushed row is exact: the light-cone computation fixes c[t] at the moment row t is computed and a later
+   crash cannot alter it. I checked that its first 2,000,001 bits equal the verified N = 2x10^6 run and the first
+   100,001 bits equal OEIS A051023. N_target was 7x10^7 (L = 70,000,001); the reached length is 77.7% of that
+   and 5.4% of the Wolfram Data Repository billion bits. The registered minimum (10^7) is met, so the verdict rule
+   applies unchanged. The "150 minutes" stop rule was not the cause. `rule30.c` as shipped computes to N and
+   flushes the prefix; `run.sh` reads `L_reached` for such a case.
