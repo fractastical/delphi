@@ -503,6 +503,41 @@ def print_v3_block(ins: Inputs, out: dict) -> dict | None:
     return {"forms": forms, "limitations": D["limitations"], "printer_resin": D["printer_resin"], "refused": refused}
 
 
+def model_downloads(ins: Inputs, out: dict) -> dict:
+    """Publish print revisions from manifest-pinned bytes, including earlier editions."""
+    manifests = [ROOT / "artifacts" / name / "manifest.json" for name in ("print-v3", "print-v2", "print")]
+    manifests += sorted((ROOT / "artifacts/glider").glob("*/manifest.json"))
+    groups, refused = [], []
+    for path in manifests:
+        if not path.is_file():
+            continue
+        directory = path.parent.relative_to(ROOT).as_posix()
+        raw_manifest = ins.read(path.relative_to(ROOT).as_posix())
+        manifest = json.loads(raw_manifest)
+        files = []
+        for rel, declared in manifest.get("files", {}).items():
+            member = Path(rel)
+            if member.is_absolute() or ".." in member.parts:
+                refused.append(f"{directory}/{rel}")
+                continue
+            if member.suffix.lower() not in {".stl", ".glb", ".zip"}:
+                continue
+            source = path.parent / member
+            data = ins.read(f"{directory}/{rel}") if source.is_file() else None
+            if data is None or digest_bytes(data) != declared:
+                refused.append(f"{directory}/{rel}")
+                continue
+            href = f"{directory}/{rel}"
+            out["@" + href] = data
+            files.append({"name": member.name, "href": href, "sha256": declared, "bytes": len(data), "format": member.suffix[1:].upper()})
+        href = f"{directory}/manifest.json"
+        out["@" + href] = raw_manifest
+        groups.append({"id": directory, "title": manifest.get("revision") or path.parent.name,
+                       "scope": "Untested launch prototype; inspect its failed constraints before printing." if "/glider/" in directory else "Display models; not flight-tested designs. STL units: mm.",
+                       "manifest_href": href, "files": files})
+    return {"groups": groups, "refused": refused}
+
+
 def runtime_inputs(ins: Inputs, out: dict, stem: str) -> dict | None:
     """Publish a fixed runtime archive only when its sidecar digest and size match."""
     d = "artifacts/rd-diffusion"; sc = f"{d}/{stem}.json"; ar = f"{d}/{stem}.tar.xz"
@@ -1171,6 +1206,7 @@ def build() -> dict[str, bytes]:
     fish3d_viewer = fish3d_files(ins, extra)
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
+    downloads = model_downloads(ins, extra)
     recovery_in = recovery_inputs(ins, extra)
     secondary_in = runtime_inputs(ins, extra, "secondary-runtime-inputs")
     fish_hist = fish_history(ins)
@@ -1212,6 +1248,7 @@ def build() -> dict[str, bytes]:
         "fish3d_viewer": fish3d_viewer,
         "formalize": formalize_ex,
         "print_v3": print_v3,
+        "model_downloads": downloads,
         "recovery_inputs": recovery_in,
         "secondary_inputs": secondary_in,
         "fish_history": fish_hist,

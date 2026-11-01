@@ -106,12 +106,22 @@
   function groundingSection(snap) {
     const H = snap.home_biology;
     if (!H) return html`<section class="panel"><h2>Start from real fish anatomy.</h2><p class="empty">No fish3d candidate or fish-control data is present in this snapshot.</p></section>`;
+    const downloads = (snap.model_downloads || {}).groups || [];
+    const v3a = downloads.flatMap((g) => g.files).find((f) => f.name === "fish3d-v3a-fan-prop-scales.stl");
+    const copied = new Set((snap.fish3d_viewer || {}).copied || []);
     const f = H.fitted[0]; const c = H.candidate; const sh = Object.entries(H.fish1990.pectoral_share_pct_mean_se).sort((x, y) => x[1][0] - y[1][0]); const lo = sh[0], hi = sh[sh.length - 1]; const cm = (snap.coupling_manifest || {}).counts; const SOFT = new Set(["aesthetic", "assumed", "numerical", "assumed transfer", "design_assumption"]);
     return html`<section class="panel grounding" aria-labelledby="gr-h"><h2 id="gr-h">Start from real fish anatomy.</h2>
       <p class="note warn small" id="grnote"></p>
       ${snap.fish3d_viewer ? html`<div class="fishchoose"><label for="fishcand"><b>Candidate</b></label> <select id="fishcand">${snap.fish3d_viewer.candidates.map((c, i) => html`<option value="${c.id}" ${i === (snap.fish3d_viewer.candidates.length > 1 ? 1 : 0) ? raw("selected") : ""}>${c.label}</option>`)}</select> <span class="small faint" id="fishknobs"></span></div>
         <h3 class="sr">Interactive 3D candidate</h3>
         <div id="fish-viewer" class="fishviewer" aria-label="Interactive 3D model of the candidate"></div><p class="small faint" id="fishnote">The 3D model is a candidate mesh. Colours and pigment bands are appearance choices, each marked sourced or assumed in the viewer. Not an organism and not an aerodynamic result. The schematic drawing and printable models are below.</p><p class="small"><a href="${DF.href("/history")}">How these candidates relate: the fish design history</a> (revisions, sibling variants and display props kept apart).</p>
+        <div id="home-model-downloads" class="small">
+          ${v3a ? html`<p><a href="${v3a.href}" download>Download v3a fish with scales · STL</a> <span class="faint">Display model, not the slingshot prototype.</span></p>` : ""}
+          <details><summary><b>All model downloads</b> · print revisions, stands and 3D candidates</summary>
+            ${downloads.map((g) => html`<details><summary>${g.title} · ${g.files.length} files</summary><p class="faint">${g.scope} <a href="${g.manifest_href}">Manifest and checks</a></p><ul>${g.files.map((f) => html`<li><a href="${f.href}" download title="SHA-256 ${f.sha256}">${f.name}</a> <span class="faint">${(f.bytes / 1048576).toFixed(2)} MB</span></li>`)}</ul></details>`)}
+            <details><summary>Candidate meshes · GLB</summary><p class="faint">Visualisation meshes; use the print revisions above for printing.</p><ul>${snap.fish3d_viewer.candidates.map((c) => html`<li>${c.label}: ${["fish.glb", ...(c.variants || []).map((v) => v.glb)].filter((f) => copied.has(c.id + "/" + f)).map((f) => html`<a href="${c.base + f}" download>${f}</a> `)}</li>`)}</ul></details>
+          </details>
+        </div>
         ${snap.regulatory_map ? html`<p class="small" id="regctx"><b>Regulatory context for a region</b> (what sources and proposals mention it; not measured expression in this model): ${snap.regulatory_map.rows.map((r, i) => html`${i ? " · " : ""}<a href="${DF.href("/blueprints", { region: r.id })}">${r.id.replace(/-/g, " ")}</a>`)} · <a href="${DF.href("/regulatory")}">the regulatory applicability map</a></p>` : ""}` : ""}
       <div class="groundgrid"><div><h3>N1 baseline reference <span class="faint small">(a separate schematic and the printable models, not the candidate selected above)</span></h3><div id="fishmini" class="fishmini"></div></div>
         <div><h3>What the body and fins are sized from <span class="faint small">(N1 baseline reference)</span></h3>

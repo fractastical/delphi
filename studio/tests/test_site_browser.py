@@ -1353,6 +1353,17 @@ def test_home_offers_the_v3_display_props_with_hash_exact_stl_downloads(browser,
             assert len(b) == x["bytes"] and hashlib.sha256(b).hexdigest() == x["sha256"], x["href"]
     pg = page(browser)
     pg.goto(base + "#/home"); pg.wait_for_selector(".printv3 select")
+    catalog = snap["model_downloads"]
+    assert not catalog["refused"]
+    links = pg.locator("#home-model-downloads a[download]").evaluate_all("els => els.map(e => e.getAttribute('href'))")
+    assert {"artifacts/print", "artifacts/print-v2", "artifacts/print-v3"} <= {g["id"] for g in catalog["groups"]}
+    for group in catalog["groups"]:
+        for file in group["files"]:
+            assert file["href"] in links
+            data = (ROOT / "site" / file["href"]).read_bytes()
+            assert len(data) == file["bytes"] and hashlib.sha256(data).hexdigest() == file["sha256"]
+    assert pg.locator("#home-model-downloads").evaluate("e => !!(e.compareDocumentPosition(document.querySelector('#fishmini')) & Node.DOCUMENT_POSITION_FOLLOWING)")
+    assert pg.locator("#home-model-downloads > p a").is_visible()
     assert pg.locator(".printv3 option").all_inner_texts() == ["fish3d-v3a-fan-prop", "fish3d-v3b-glide-pose-prop"]
     assert pg.locator(".printv3 .v3links a[download]").count() == 3
     pg.select_option(".printv3 select", "fish3d-v3b-glide-pose-prop")
