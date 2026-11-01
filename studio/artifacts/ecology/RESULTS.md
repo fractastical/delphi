@@ -109,3 +109,35 @@ The separately frozen uncertainty protocol proposes seven axial settings,
 two seeds and paired neighbor ablations, with a fixed0.6s endpoint, no interaction
 estimate and no biological probability. Cloud dispatch/results are separate
 evidence; a proposed packet is not a completed batch.
+
+## Returned axial uncertainty batch (initial partial)
+
+The actual Ubuntu24.04/Python3.12.3/MuJoCo3.17.0 CPU batch completed26 of28
+declared scenarios (52 main/half-step simulations). The final two hinge-stiff
+seed20261101 neighbor/ablation arms were never started at the original soft
+deadline. They remain missing in the initial heatmap; a separately frozen
+missing-only continuation does not replace this partial receipt.
+
+All167 returned file hashes (15,535,827bytes), all52 trajectory/context hashes,
+4,548 saved frames, and234 endpoint/discrepancy metrics were checked. The metrics
+reproduced exactly. Reevaluating force, torque and mechanical energy at528
+selected saved poses gave zero difference using the same model; this is a
+saved-state integrity check, not an independent physical solver or experiment.
+All26 original dt-halving bounds and130 actuator bounds passed. Every computed
+scenario supplies the declared0.6s endpoint, then later stops at the reused
+VLM angle-domain boundary near0.85s.
+
+At0.6s the encoded neighbor cue produces7/8 response flags for the two baseline
+seeds versus1/1 without neighbors. Fast assigned reaction delays produce8/8;
+slow delays4/5. The paired figure also shows the actual actuator-work and lateral
+displacement costs, without collapsing them into a fitness score. These are
+conditional software responses under assumed engineering parameter envelopes,
+not measured nervous-system parameters or survival probabilities. Two seeds
+share geometry, model and source assumptions; the seven axial settings do not
+estimate interactions. Center separation is sampled over the whole episode,
+not continuous mesh clearance.
+
+The native batch wall time is979.988s. Dollar cost and aggregate CPU utilization
+are unknown. Raw scientific outputs and exact-byte manifests are retained under
+`uncertainty-initial/raw-science/`; the original outer collection manifest is
+retained separately.
