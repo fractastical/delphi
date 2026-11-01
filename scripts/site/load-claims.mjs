@@ -13,6 +13,14 @@ export const EVIDENCE = ["supports", "mixed", "refutes", "inconclusive"];
 // What a test's data measured (test-data/claim-tests/README.md). Only `biological` shows that a
 // claim holds in organisms; `computational` shows it holds in simulation or mathematics.
 export const DATA_KINDS = ["biological", "physical", "computational", "none"];
+// How a math claim maps onto formal statements (`formalization.tags` on a claim in its source file).
+// `one`: a single formalization everyone agrees on. `several`: non-equivalent readings, listed in
+// `formalization.readings`, so a proof of one says nothing about the others. `identity`: provable
+// from the model's own bookkeeping, so true and carrying no information about organisms.
+// `contingent`: a dataset can touch it. `not-mathematical`: no formalization. A claim may carry
+// several tags (the Price equation is an identity whose selection/transmission split is contingent).
+// A proof never changes the tags; the tags say which statement a proof is a proof of.
+export const FORMALIZATION = ["one", "several", "identity", "contingent", "not-mathematical"];
 const UNTESTED_NOTE = "Extracted from the text; not yet tested against data.";
 export const claimKey = c => createHash("sha256").update(`${c.label}\n${c.text}`.replace(/\s+/g, " ").trim()).digest("hex").slice(0, 16);
 
@@ -99,7 +107,7 @@ export function loadClaims() {
         status: l ? "proved" : "untested", proof: l ? "lean" : null,
         statusNote: l ? `Mathematical core machine-checked in Lean 4 (${l.module}: ${l.theorems.join(", ")}). ${l.scopeNote}`.trim()
           : leanDeclined[c.id] ? `Lean formalization attempted and declined: ${leanDeclined[c.id]}` : UNTESTED_NOTE,
-        lean: l,
+        lean: l, formalization: c.formalization ?? null,
         draft, assess: a, resolvability: mean(a.map(x => x.overall).filter(v => v != null)), confidence: mean(a.map(x => x.confidence).filter(v => v != null)),
         uri, registry,
         ...perClaim(c),
@@ -161,6 +169,7 @@ export function loadClaims() {
       id: c.id, label: c.label, text: c.statement, notation: c.notation, context: c.context, test: c.proposed_test, kind: c.kind,
       thinker: c.thinker, year: c.paper.year, work: c.paper.title, section: `${c.paper.title} (${c.paper.year})`,
       doi: c.paper.doi, seeAlso: c.see_also ?? [], status, proof: l ? "lean" : status === "proved" ? "literature" : null, lean: l,
+      formalization: c.formalization ?? null,
       statusNote: fsText ? `Formal status recorded in ${dir}/claims/key-claims.json: ${fsText}` : "",
       draft: false, assess: [], resolvability: null, confidence: null,
       uri: m?.trustyUri ?? null, registry: m?.productionRegistry ? "production" : m?.trustyUri ? "test" : null,
@@ -228,7 +237,10 @@ export function loadClaims() {
         verdict: a.verdict, score: a.score, thompsonVerdict: a.thompson?.verdict ?? null, nanopub: a.nanopub, registry: a.registry, report: a.report });
     }
   }
+  const badTags = claims.filter(c => c.formalization && !(Array.isArray(c.formalization.tags) && c.formalization.tags.length && c.formalization.tags.every(t => FORMALIZATION.includes(t))));
+  if (badTags.length) throw new Error(`formalization.tags must be non-empty and from ${FORMALIZATION.join(" | ")}: ${badTags.map(c => c.id).join(", ")}`);
   for (const c of claims) {
+    c.formalization ??= null;
     c.morpholib = morpho[c.id] ?? [];
     c.key = claimKey(c);
     c.verification = c.status === "proved" ? c.proof : c.status;

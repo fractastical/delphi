@@ -108,6 +108,8 @@ tool("delphi_graph",
       .describe("Only claims linked to a MorphoEval audit in github.com/fractastical/morpholib: tests = it measured the claim's assertion on specimens, models = it simulates the claim's mechanism"),
     math: z.boolean().optional().describe("true = only math claims (formal notation, a Lean formalization, or a mathematical kind)"),
     theorem: z.boolean().optional().describe("true = only theorems: math claims that are Lean-checked or proved in the literature"),
+    formalization: z.enum(["one", "several", "identity", "contingent", "not-mathematical", "any", "none"]).optional()
+      .describe("How a math claim maps onto formal statements: one = a single agreed formalization; several = non-equivalent readings (listed in formalization.readings), so a proof of one says nothing about the others; identity = provable from the model's own bookkeeping, true and uninformative about organisms; contingent = a dataset can touch it; not-mathematical; any = classified; none = not yet classified. A claim can carry several tags (the Price equation is identity + contingent)"),
     kind: z.string().optional().describe("Substring of the claim kind, e.g. \"mechanism\", \"theorem\""),
     yearFrom: z.number().int().optional(),
     yearTo: z.number().int().optional(),

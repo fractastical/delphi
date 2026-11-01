@@ -129,6 +129,16 @@ the `theorem` set and nothing else; `delphi_graph` with `status: "proved"` retur
 A proof shows a statement follows from its assumptions, not that organisms satisfy them; that is
 what the assessments and `test-data/claim-tests/` are for.
 
+A proof is a proof of one formal statement, and a claim can map onto more than one. The
+`formalization` field (in the claim's source file; `formalization.tags` in `docs/claims.json`,
+filter `formalization` in `delphi_graph`) records which: `one` (a single agreed formalization),
+`several` (non-equivalent readings listed in `readings`, each with its own status: Fisher's
+fundamental theorem is proved in the partial-change reading and false in the total-change one),
+`identity` (follows from the model's own bookkeeping, so true and uninformative about organisms:
+the Price equation, Thompson's hexagonal-on-average claim via Euler's formula), `contingent` (a
+dataset can touch it) and `not-mathematical`. Tags combine. Every math-bio key claim carries one;
+tag a claim before formalizing it, so a Lean module is written against a known reading.
+
 ## Layout
 
 Everything runs from the repo root; paths below start there. Root files are `README.md`, `AGENTS.md`,

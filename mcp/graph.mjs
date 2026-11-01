@@ -47,13 +47,14 @@ function claimStatus(claim) {
   return {
     verification: c.verification, theorem: c.theorem, math: c.math,
     leanTheorems: c.lean_theorems ?? undefined,
+    formalization: c.formalization ?? undefined,
     dataTest: t ? { verdict: t.verdict, dataKind: t.data_kind, confidence: t.confidence, preregistered: t.preregistered, result: t.path } : undefined,
     morpholib: c.morpholib?.length ? c.morpholib : undefined,
     registry: c.registry, graph: graphUrl({ claim: c.id }),
   };
 }
 
-const STATUS_NOTE = "status: verification = lean (machine-checked in Lean 4), literature (proved in the literature), partial, untested or refuted; dataTest = verdict of a pre-registered test against data, with dataKind = biological (measured on organisms; the only kind that shows a claim holds in biology), physical, computational (simulation or mathematics) or none; morpholib = MorphoEval audits in github.com/fractastical/morpholib that test the claim on specimens (relation tests) or simulate its mechanism (models), whose verdict grades the simulation, not the claim (thompsonVerdict is the verdict on Thompson's claim); registry = production, test or null (unpublished). From docs/claims.json, built ";
+const STATUS_NOTE = "status: verification = lean (machine-checked in Lean 4), literature (proved in the literature), partial, untested or refuted; formalization = how a math claim maps onto formal statements, tags from one (a single agreed formalization), several (non-equivalent readings, listed; a proof of one says nothing about the others), identity (provable from the model's own bookkeeping, so true and uninformative about organisms), contingent (a dataset can touch it), not-mathematical, with readings and a note, or absent when the claim has not been classified; dataTest = verdict of a pre-registered test against data, with dataKind = biological (measured on organisms; the only kind that shows a claim holds in biology), physical, computational (simulation or mathematics) or none; morpholib = MorphoEval audits in github.com/fractastical/morpholib that test the claim on specimens (relation tests) or simulate its mechanism (models), whose verdict grades the simulation, not the claim (thompsonVerdict is the verdict on Thompson's claim); registry = production, test or null (unpublished). From docs/claims.json, built ";
 
 export async function searchClaimsWithStatus(args) {
   const rows = await searchClaims(args);
@@ -151,7 +152,7 @@ export async function overviewWithGraph(source) {
     claimGraph: { built, total, links, more: "delphi_graph with no arguments returns this table per thinker; add filters to list claims" } };
 }
 
-const FILTERS = ["text", "thinker", "work", "status", "verification", "evidence", "evidenceKind", "morpholib", "math", "theorem", "kind", "yearFrom", "yearTo", "minTruth", "maxTruth", "published", "groupBy"];
+const FILTERS = ["text", "thinker", "work", "status", "verification", "evidence", "evidenceKind", "morpholib", "math", "theorem", "formalization", "kind", "yearFrom", "yearTo", "minTruth", "maxTruth", "published", "groupBy"];
 
 export function browseClaims(args = {}) {
   const view = args.view ?? (FILTERS.some(k => args[k] != null) || args.minTruthAssessors ? "claims" : "status");
@@ -160,12 +161,14 @@ export function browseClaims(args = {}) {
 }
 
 function listClaims(args) {
-  const { text, thinker, work, status, verification, evidence, evidenceKind, morpholib, math, theorem, kind, yearFrom, yearTo, minTruth, maxTruth, minTruthAssessors = 0,
+  const { text, thinker, work, status, verification, evidence, evidenceKind, morpholib, math, theorem, formalization, kind, yearFrom, yearTo, minTruth, maxTruth, minTruthAssessors = 0,
     published, sort = "truth", groupBy, limit = 20 } = args;
   const { built, claims } = load();
   const audits = c => c.morpholib ?? [];
+  const tags = c => c.formalization?.tags ?? [];
   const hits = claims.filter(c =>
     (!text || has(`${c.label} ${c.statement} ${c.quote ?? ""}`, text))
+    && (!formalization || (formalization === "any" ? tags(c).length > 0 : formalization === "none" ? tags(c).length === 0 : tags(c).includes(formalization)))
     && (!morpholib || (morpholib === "any" ? audits(c).length > 0 : audits(c).some(m => m.relation === morpholib)))
     && (!thinker || has(c.thinker, thinker))
     && (!work || has(c.work, work))
@@ -187,7 +190,7 @@ function listClaims(args) {
   const names = [...new Set(hits.map(c => c.thinker))];
   const params = { thinker: thinker && names.length === 1 ? names[0] : null, level: verification ?? (status === "proved" ? null : status),
     math: math == null ? null : math ? "yes" : "no", thm: theorem ? 1 : null, p: minTruth };
-  const unmapped = ["text", "work", "kind", "yearFrom", "yearTo", "maxTruth", "published", "evidence", "evidenceKind", "morpholib"].filter(k => args[k] != null);
+  const unmapped = ["text", "work", "kind", "yearFrom", "yearTo", "maxTruth", "published", "evidence", "evidenceKind", "morpholib", "formalization"].filter(k => args[k] != null);
   const graph = graphUrl(params);
   const graphNote = unmapped.length ? `The graph link cannot apply ${unmapped.join(", ")}; it shows a superset of these results.` : undefined;
 
@@ -210,6 +213,7 @@ function listClaims(args) {
         verification: cs.reduce((m, c) => ({ ...m, [c.verification]: (m[c.verification] ?? 0) + 1 }), {}),
         math: cs.filter(c => c.math).length,
         theorems: cs.filter(c => c.theorem).length,
+        formalization: cs.reduce((m, c) => { for (const t of tags(c)) m[t] = (m[t] ?? 0) + 1; return m; }, {}),
         testedOnOrganisms: cs.filter(c => c.evidence_kind === "biological").length,
         supportedInOrganisms: cs.filter(c => c.evidence_kind === "biological" && c.evidence === "supports").length,
         morpholibTested: cs.filter(c => audits(c).some(m => m.relation === "tests")).length,
@@ -223,7 +227,7 @@ function listClaims(args) {
     claims: [...hits].sort(SORTS[sort]).slice(0, Math.min(Number(limit) || 20, 500)).map(c => ({
       graph: graphUrl({ claim: c.id }),
       id: c.id, title: c.label, statement: c.statement, thinker: c.thinker, year: c.year, work: c.work, chapter: c.chapter,
-      kind: c.kind, status: c.status, verification: c.verification, math: c.math, theorem: c.theorem, notation: c.notation ?? undefined, truth: c.truth, truthBy: c.truth_by, disagreement: c.disagreement,
+      kind: c.kind, status: c.status, verification: c.verification, math: c.math, theorem: c.theorem, notation: c.notation ?? undefined, formalization: c.formalization ?? undefined, truth: c.truth, truthBy: c.truth_by, disagreement: c.disagreement,
       evidence: c.evidence ?? undefined, evidenceKind: c.evidence_kind ?? undefined,
       morpholib: audits(c).length ? audits(c).map(m => ({ id: m.id, relation: m.relation, verdict: m.verdict, thompsonVerdict: m.thompson_verdict ?? undefined, registry: m.registry })) : undefined,
       testability: c.testability, nanopub: c.nanopub, registry: c.registry, draft: c.draft || undefined,
