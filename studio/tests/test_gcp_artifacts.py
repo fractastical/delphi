@@ -230,6 +230,9 @@ def test_verified_local_artifact_avoids_repeat_remote_download(tmp_path):
     client = GCS(lambda: "test-token", no_network)
     digest = hashlib.sha256(payload).hexdigest()
     assert client.download_to_path("bucket", "object", destination, len(payload), digest) == (digest, len(payload))
+    assert client.download_to_path("bucket", "object", destination, len(payload) + 5, digest) == (digest, len(payload))
+    with pytest.raises(ValueError, match="size"):
+        client.download_to_path("bucket", "object", destination, len(payload) - 1, digest)
     destination.write_bytes(b"X" * len(payload))
     with pytest.raises(ValueError, match="SHA-256 mismatch"):
         client.download_to_path("bucket", "object", destination, len(payload), digest)
