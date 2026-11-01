@@ -14,7 +14,7 @@ Tests: [`../../test-data/claim-tests/plant-hygromorph-mechanics/`](../../test-da
 
 | id | Law | Formal status | Lean | Data test |
 |---|---|---|---|---|
-| `hygromorph-bilayer-curvature` | \(\kappa = C(h,m,n)\,\Delta\varepsilon\) | proved (Timoshenko 1925) | 6 theorems, incl. derivation from equilibrium | pre-registered on pine cone scales (Reyssat & Mahadevan 2009; Quan et al. 2021) |
+| `hygromorph-bilayer-curvature` | \(\kappa = C(h,m,n)\,\Delta\varepsilon\) | proved (Timoshenko 1925) | 6 theorems, incl. derivation from equilibrium | `supports` (biological, confidence 0.4): prediction within 15% of measured bending for *P. torreyana* (Quan et al. 2021), ~2× under for *P. coulteri* (Reyssat & Mahadevan 2009); n = 2 scales, inputs combined across papers |
 | `hygromorph-response-time` | \(\tau \sim h^2/D\) | proved (diffusion time scale) | 8 theorems, incl. heat-equation mode | none yet |
 | `hygromorph-antisymmetric-twist` | \(\Delta\varepsilon_{12} = (\varepsilon_L-\varepsilon_T)\sin 2\phi,\ \Delta\varepsilon_{11}=0\) | proved (tensor algebra) | 5 theorems, incl. Mohr's circle | none yet |
 | `flytrap-snap-geometry` | bistable iff \(\alpha = L^4\kappa^2/h^2 \gtrsim 0.8\) | partial (threshold numerical) | dimensional part only; not counted | none yet |
@@ -45,8 +45,12 @@ the interface; `bilayerCurvature_linear`, `_zero`, `_symmetric`, `_sign`, `timos
 
 **What is left to data.** Whether a real scale's layers are uniform, well bonded, linearly elastic
 and slender enough, and whether the measured curvature change matches the prediction from measured
-\(h_1, h_2, E_1, E_2, \Delta\varepsilon\). Test pre-registered against Reyssat & Mahadevan (2009) and
-Quan et al. (2021, *Acta Biomater.* 128:370, CC BY).
+\(h_1, h_2, E_1, E_2, \Delta\varepsilon\). Pre-registered test (commit `310ca761`) against Reyssat &
+Mahadevan (2009) and Quan et al. (2021, *Acta Biomater.* 128:370, CC BY): verdict `supports` by the
+pre-registered rule (median \(|\log_{10}(\text{pred}/\text{meas})| = 0.165 \le 0.18\)), but on its
+edge and at confidence 0.4: predicted 68° vs measured 79° for *P. torreyana*, predicted 72° vs
+measured 132° for *P. coulteri*; the model underpredicts in both, sign correct in both; only two
+scales, and no paper gives all five inputs for the same specimen. See the test's `result.json`.
 
 **Sources.** [10.1098/rsif.2009.0184](https://doi.org/10.1098/rsif.2009.0184);
 [10.1364/JOSA.11.000233](https://doi.org/10.1364/JOSA.11.000233);
