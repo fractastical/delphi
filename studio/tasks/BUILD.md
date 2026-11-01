@@ -1,9 +1,54 @@
 # Frontier execution board
 
-Coordinator: codex-03. Updated October 31, 2026, 04:15PM PDT.
+Coordinator: codex-03. Updated October 31, 2026, 5:34pm PDT.
 Canonical repository: kganjam/delphi-frontier; root task branch: codex/frontier-demo-20261031.
-GOAL.md and SPEC-005 through SPEC-008 define acceptance. This board supersedes the earlier 1:48pm snapshot.
+GOAL.md and SPEC-005 through SPEC-012 define acceptance. The latest dated checkpoint supersedes older status snapshots.
 Every status distinguishes implementation, integration, publication and biological validation.
+
+## Current checkpoint — October 31, 5:34pm PDT
+
+- [x] Site and MCP release `d531330` deployed: 13 website and 37 MCP checks
+  passed. Transient contributor credentials and exact-version discussion/history
+  are live. Root browser checks passed; separate route critique continues.
+- [x] Fixed public static-asset throttling in the Frontier nginx configuration
+  (`d3c8890`): API routes retain request limits; static JS no longer shares that
+  limit. Config validation passed; only the Frontier vhost changed, with Orchestra
+  hashes unchanged. Independent fresh-browser confirmation remains pending.
+- [x] Exact-Claim reuse and independent review readback integrated. Both resulting
+  Evidence records are disputed; scoped numerical reproduction does not establish
+  biological relevance or independent experimental replication.
+- [x] OpenResearch actually ran a Turing calculation and BioModels replay. The
+  local-run adapter records provenance/hashes; this is not cloud orchestration.
+  Root recomputed all four current BioModels output hashes on this checkpoint.
+- [x] Regulatory literature/cell-program map integrated. Native metadata audit
+  has 128 retrieved records; root integration is pending. Sequencing matrices
+  were not fetched; assembly and biological-replicate mismatches stay explicit.
+- [x] Define two controlled behavior/ecology comparisons in SPEC-011 and genetic
+  implementation blueprints in SPEC-012, including enhancer/promoter compatibility,
+  delivery, integration and autonomous-chromosome feasibility as separate questions.
+- [ ] Native mechanobio_sim: real MuJoCo gliding and local collective escape,
+  controls before sweeps. Claude-10: viewer of actual saved trajectories.
+- [ ] Claude-14: source-backed genetic blueprint package. Claude-02: readable
+  Studio implementation view and regulatory map, linked to source/evidence/gaps.
+- [ ] Claude-05: first reinforced printable glider revision; claude-07 dynamics;
+  claude-13 independent review. Requirements calculations integrated and 14 root
+  tests passed. No new assembled print, launch or measured glide is claimed yet.
+- [x] Infrastructure reports exact-weight DDPM evaluation recovery COMPLETED;
+  strict audit complete, no nonfinite results. It did not retrain the model.
+  Reported generation timing is slower than its same-GPU solver comparison.
+  Root review/integration of the returned artifacts remains pending.
+- [ ] Infrastructure: exact-W1 secondary evaluation, repaired GCP genomics retry,
+  and replacement CFD VM using Python 3.12 for the nested archive extraction.
+  Both initial CPU VMs stopped at software gates; no completed CFD case or full
+  genome survey resulted. Failed outputs were exported and independently hashed.
+- [x] Infrastructure's 5:32:37pm PDT provider read: 83 Nebius jobs, 53 ours
+  (42 completed, 8 failed, 3 cancelled), 30 unattributed. Zero active/queued ours
+  at that instant; one unattributed job running. Recovery telemetry separately
+  reports 85.64% mean GPU utilization during its measured window, not now.
+
+The owner table below retains earlier assignments as history; the current work
+is governed by the checkpoint above. No unmeasured spend, activity or biological
+success probability is inferred from resource reservations or completed software.
 
 | Priority | Deliverable | Owner | Status / next acceptance |
 | --- | --- | --- | --- |

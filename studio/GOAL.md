@@ -81,6 +81,11 @@ about a proposed action.
   compare multiple candidates and direct the next evidence-producing action.
 - [ ] Model a sourced developmental/lifecycle slice, scale formation and fin
   mechanics; record living-bioprint requirements and unresolved feasibility.
+- [ ] Deliver actual-state passive/feedback gliding and local collective-escape
+  comparisons with numerical controls and a trajectory viewer (SPEC-011).
+- [ ] Add source-backed genetic implementation blueprints: cell programs,
+  enhancers/promoters, constructs, delivery/integration, expression specificity
+  and explicit missing causal bridges to the organism design (SPEC-012).
 
 Current owners, evidence and blockers are tracked in `tasks/BUILD.md`. A checked
 implementation is distinct from deployment, and either is distinct from biological
