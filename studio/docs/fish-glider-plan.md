@@ -1,4 +1,9 @@
-# Launchable glider fish: plan (DRAFT, nothing frozen, no geometry code yet)
+# Launchable glider fish: plan (DRAFT, nothing frozen)
+
+*Superseded in part: the first parts exist. Revision r1 (strong and light variants) is built by
+`engineering/glider/` into `artifacts/glider/`, under the provisional defaults below and claude-07's print
+requirements R1–R4. Root's deadline instruction was to build before agreement. See `docs/fish-glider.md`. The
+sections below are the plan as written before r1.*
 
 Owner of geometry and mass properties: claude05 (`work/fish-glider`).
 - **Aerodynamics** is agreed with the aero/mechanics owner, claude-07, and with cfd3d (claude-04), which owns the
