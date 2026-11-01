@@ -121,7 +121,7 @@ def build():
         "results": [
             {"id": "reg-rows", "text": "Cell-state rows with explicit species/tissue/assay/accession and a stated missing bridge",
              "count": len(doc("regulatory")["rows"]), "ref": {"src": "regulatory", "ptr": "/rows"}},
-            {"id": "reg-sample-identity", "text": "Confirmed independent biological sample count in the GEO metadata audit stays null; do not count 20 libraries as 20 replicates",
+            {"id": "reg-sample-identity", "text": "GSE261907 libraries listed in the GEO metadata audit (a library count, not a replicate count; the confirmed independent biological sample count stays null)",
              "ref": ref("reg-metadata", "/targets/target=GSE261907/sample_count"), "independent_count": None},
         ],
         "bridges": [{"id": "regulatory-" + p["from"].replace(" ", "-") + "-to-" + p["to"].replace(" ", "-").replace("/", "-"),
@@ -336,7 +336,7 @@ def build():
         "separation": "Humans set the target goals. Solver or model validity (checked equations, convergence, controls) is a different thing from empirical biological realism, which is unknown for every layer here.",
         "biological_success_probability": None, "confidence_percent": None, "aggregate_score": None,
         "sources": srcs, "layers": lay, "workpackages": wps, "next_experiment": nxt,
-        "execution_note": "Work packages are independent exactly when their inputs lists are disjoint; wp-deformed-polar depends on two others. Nothing here is executed or decentralized: all rows are proposals.",
+        "execution_note": "Packages with no unresolved predecessor can run concurrently under the declared dependencies. Disjoint input lists do not prove the packages are independent, and resource conflicts (people, equipment, compute) are not modelled. Nothing here is executed or decentralized: all rows are proposals.",
         "provenance_notes": ["Data S1A pelvic/SL column holds a corrupt value (2.4e-16, specimen 1); the owner recomputed it from lengths and kept both.",
                          "Neighbouring groups fit differently (flying-fish pelvic, halfbeak pelvic) and are outside this map; do not generalise the flying-halfbeak pelvic non-detection."],
         "non_claims": ["No new simulation, measurement or inference was run to make this map.",

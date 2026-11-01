@@ -78,7 +78,10 @@ def test_measured_bounds_are_only_the_fitted_specimen_data(amap):
     assert {k for k, s in kinds.items() if s == "measured"} == {"pectoral_vs_SL_flying_fish", "pelvic_vs_SL_flying_halfbeak"}
 
 
-def test_independence_is_declared_from_inputs_only(amap):
+def test_dependencies_are_declared_and_independence_is_not_claimed(amap):
+    t = amap["execution_note"]
+    assert "do not prove" in t and "resource conflicts" in t and "not modelled" in t and "Independent" not in t
+
     w = {x["id"]: x for x in amap["workpackages"]}
     assert w["wp-deformed-polar"]["inputs"] == ["wp-fin-EI-load", "wp-load-shape"]
     assert all(not x["inputs"] for k, x in w.items() if k != "wp-deformed-polar")
@@ -121,7 +124,7 @@ def test_view_renders_artifact_without_invented_values(amap, tmp_path):
         assert word not in txt
     assert "20/64" in txt and "0.3125" in txt and "not a probability" in txt
     assert "Evidence-led science. Goal-driven engineering." in txt
-    assert "Independent: no declared input" in txt and "Depends on:" in txt
+    assert "No unresolved predecessor declared" in txt and "Depends on:" in txt
     assert "Biological success probability: unknown" in txt
 
 
@@ -154,3 +157,71 @@ def test_view_shows_tags_interval_and_unranked(amap, tmp_path):
     txt, _, _, errs = _render(tmp_path, amap)
     assert errs == [] and "source-only" in txt and "computed-here" in txt and "practical/statistical" in txt
     assert "paired difference is not computed" in txt and "b ci95 bootstrap" in txt and "2 seeds" in txt
+
+
+def _site(pw_ctx, fn):
+    import functools
+    import http.server
+    import threading
+
+    h = functools.partial(http.server.SimpleHTTPRequestHandler, directory=os.path.join(ROOT, "site"))
+    h.log_message = lambda *a, **k: None
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), h)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    try:
+        b = pw_ctx.chromium.launch()
+        return fn(b, f"http://127.0.0.1:{srv.server_port}/")
+    finally:
+        srv.shutdown()
+
+
+def test_real_site_route_desktop_and_mobile(amap):
+    shots = os.environ.get("DC_SHOTS")
+
+    def run(b, base):
+        out = {}
+        for name, (w, h) in {"desktop": (1280, 900), "mobile": (390, 844)}.items():
+            pg = b.new_page(viewport={"width": w, "height": h})
+            errs = []
+            pg.on("pageerror", lambda e: errs.append(str(e)))
+            # the app's own optional /api/health probe 404s on a static server on every route; any other 4xx/5xx is a failure
+            pg.on("response", lambda r: errs.append(f"{r.status} {r.url}") if r.status >= 400 and not r.url.endswith("/api/health") else None)
+            pg.goto(base + "#/design-control")
+            pg.wait_for_selector(".dc .dc-card")
+            out[name] = dict(
+                errs=errs, layers=pg.locator(".dc-layer").count(), cards=pg.locator(".dc-card").count(),
+                overflow=pg.evaluate("document.documentElement.scrollWidth - innerWidth"),
+                text=pg.locator("#main").inner_text(),
+                back=pg.locator(".pagehead .eyebrow a").get_attribute("href"),
+                links=pg.eval_on_selector_all(".dc-sources a", "a => a.map(x => x.href)"),
+                small_cards=pg.evaluate("[...document.querySelectorAll('.dc-card')].every(c => c.getBoundingClientRect().right <= innerWidth + 1)"))
+            if shots:
+                pg.screenshot(path=os.path.join(shots, f"design-control-{name}.png"), full_page=True)
+            pg.close()
+        b.close()
+        return out
+
+    with _browser() as pw:
+        res = _site(pw, run)
+    for name, r in res.items():
+        assert r["errs"] == [], (name, r["errs"])
+        assert r["layers"] == 6 and r["cards"] == sum(len(lay["parameters"]) for lay in amap["layers"])
+        assert r["overflow"] <= 1 and r["small_cards"], name
+        assert r["back"].endswith("#/home")
+        for bad in ("NaN", "undefined", "[object"):
+            assert bad not in r["text"]
+        assert "source-only" in r["text"] and "computed-here" in r["text"] and "unranked" in r["text"]
+        assert "do not prove" in r["text"] and "practical/statistical" in r["text"]
+        assert sorted(r["links"]) == sorted(f"https://github.com/kganjam/delphi-frontier/blob/{s['commit']}/{s['path']}" for s in amap["sources"])
+
+
+def test_snapshot_carries_the_same_map(amap):
+    snap = json.load(open(os.path.join(ROOT, "site/data/snapshot.json")))
+    got = {k: v for k, v in snap["design_control"].items() if k != "file_sha256"}
+    assert got == amap
+
+
+def test_library_count_is_not_presented_as_independent_count(amap):
+    r = next(x for lay in amap["layers"] for x in lay["results"] if x["id"] == "reg-sample-identity")
+    assert r["independent_count"] is None and r["ref"]["value"] == 20
+    assert "library count, not a replicate count" in r["text"] and "stays null" in r["text"]
