@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../../shared/shell.css">
+<script src="../../shared/shell.js"></script>
+<title>Flying fish physics</title>
+<meta name="description" content="DELPHI physics thread: what flying fish measurably do in the air, and whether they sit inside D'Arcy Thompson's flight envelope. Every number read from a file.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230e7c86'/%3E%3Cpath d='M6 20 Q16 6 26 20' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#f6f7f4;--panel:#fff;--ink:#14201f;--mute:#5a6b69;--line:#d9dfdb;--accent:#0e7c86;--accent-ink:#fff;--ok:#2f7d4f;--bad:#b3392f;--warn:#a8650b;--soft:#eef2ef;--code:#f0f3f1;--shadow:0 1px 2px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.05)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1514;--panel:#142120;--ink:#e7efec;--mute:#93a6a2;--line:#27403d;--accent:#38b6c1;--accent-ink:#06201f;--ok:#58c07f;--bad:#ef7a6e;--warn:#e0a24a;--soft:#192b29;--code:#0f1a19;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3)}}
+:root[data-theme="dark"]{--bg:#0d1514;--panel:#142120;--ink:#e7efec;--mute:#93a6a2;--line:#27403d;--accent:#38b6c1;--accent-ink:#06201f;--ok:#58c07f;--bad:#ef7a6e;--warn:#e0a24a;--soft:#192b29;--code:#0f1a19;--shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+a{color:var(--accent)}
+h1,h2,h3{line-height:1.2;margin:0 0 .5em}
+h1{font-size:clamp(1.5rem,4vw,2.2rem)} h2{font-size:1.4rem} h3{font-size:1.05rem}
+p{margin:.4em 0 .8em}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;gap:12px;align-items:center;overflow-x:auto;padding-top:8px;padding-bottom:8px;white-space:nowrap}
+.brand{font-weight:700;margin-right:8px}
+nav a{display:inline-block;padding:4px 10px;border-radius:99px;text-decoration:none;color:var(--mute);font-size:.9rem}
+nav a:hover{background:var(--soft);color:var(--ink)}
+#themeBtn{margin-left:auto}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:6px 12px;border-radius:8px}
+button:hover{border-color:var(--accent)}
+section{padding:30px 0;border-bottom:1px solid var(--line)}
+.lede{color:var(--mute);max-width:72ch;font-size:1.05rem}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:var(--shadow)}
+.card h3{margin-top:0}
+.kpi{font-size:2rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.kpi small{display:block;font-size:.8rem;font-weight:400;color:var(--mute);margin-top:6px}
+.chip{display:inline-block;padding:1px 9px;border-radius:99px;font-size:.78rem;border:1px solid var(--line);background:var(--soft);color:var(--mute)}
+.chip.ok{color:var(--ok);border-color:var(--ok)} .chip.bad{color:var(--bad);border-color:var(--bad)} .chip.warn{color:var(--warn);border-color:var(--warn)}
+details{border:1px solid var(--line);border-radius:10px;background:var(--panel);margin:8px 0}
+details>summary{cursor:pointer;padding:10px 14px;font-weight:600;list-style:none}
+details>summary::before{content:"\25B8";display:inline-block;margin-right:8px;transition:transform .15s;color:var(--accent)}
+details[open]>summary::before{transform:rotate(90deg)}
+details>.in{padding:2px 16px 14px}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600}
+.scroll{overflow-x:auto}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;margin:6px 0;white-space:pre-wrap}
+.mute{color:var(--mute)} .small{font-size:.85rem}
+.quote{border-left:3px solid var(--accent);padding:2px 12px;color:var(--mute);margin:8px 0}
+.verdict{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.back{text-decoration:none;color:var(--mute);font-size:.9rem}
+.fig{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--ink)}
+.fig svg{width:100%;height:auto;display:block}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps>li{counter-increment:s;position:relative;padding:10px 14px 10px 54px;border:1px solid var(--line);background:var(--panel);border-radius:10px;margin:8px 0}
+.steps>li::before{content:counter(s);position:absolute;left:12px;top:10px;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700}
+footer{padding:26px 0;color:var(--mute);font-size:.88rem}
+</style>
+
+
+<style id="dsh-fit">@media (max-width:720px){body{overflow-wrap:break-word}main table,section table,.card table,.in table,.scroll table{display:block;overflow-x:auto;max-width:100%}code,pre,.mono{overflow-wrap:anywhere}}</style>
+</head>
+<body>
+<!-- delphi-shell:start  generated by dashboard/build-shell.mjs - do not edit by hand -->
+<a class="dsh-skip" href="#dsh-content">Skip the navigation</a>
+<header class="dsh">
+  <div class="dsh-bar"><a class="dsh-brand" href="../../index.html"><svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#0e7c86"/><path d="M5 16c5-7 14-9 22-4-3 2-6 3-8 4 2 1 5 2 8 4-8 5-17 3-22-4z" fill="#fff"/></svg>DELPHI<span class="sub">laws of biology</span></a>
+    <nav class="dsh-nav" aria-label="Primary"><span class="dsh-grp"><span class="dsh-lab">Results</span><a class="dsh-link" href="../../results/">Results</a><a class="dsh-link" href="../../deck/">Pitch deck</a><a class="dsh-link" href="../../print/">Printable kit</a><a class="dsh-link" href="../../studio-api/">For agents</a><a class="dsh-link" href="../../swarm-board/">Swarm board</a><a class="dsh-link" href="../../evolve/">Enzymes</a></span><span class="dsh-grp"><span class="dsh-lab">Evidence</span><a class="dsh-link" href="../../proofs/">Claim book</a><a class="dsh-link" href="../../leanbio/">LeanBio repo</a><a class="dsh-link" href="../../graph/">Graph</a><a class="dsh-link" href="../../figures/">Figures</a></span><span class="dsh-grp" data-cur><span class="dsh-lab">Threads</span><a class="dsh-link" href="../../t/lean/">Lean proofs</a><a class="dsh-link" href="../../t/claims/">Claim tests</a><a class="dsh-link" href="../../t/genotype/">Genotype</a><a class="dsh-link" href="../../t/physics/" aria-current="page">Physics</a><a class="dsh-link" href="../../t/physics/sim/">Simulator</a><a class="dsh-link" href="../../t/organism/">Organism</a><a class="dsh-link" href="../../t/holdout/">Holdout</a><a class="dsh-link" href="../../t/swarm/">Swarm</a><a class="dsh-link" href="../../t/validation/">Validation</a></span><span class="dsh-grp"><span class="dsh-lab">About</span><a class="dsh-link" href="../../start/">Start here</a><a class="dsh-link" href="../../record/">Development record</a><a class="dsh-link" href="../../index.html">Mission control</a></span></nav>
+    <button class="dsh-theme" id="themeBtn" data-dsh-theme type="button" title="Toggle light or dark">Theme</button></div>
+  <nav class="dsh-modes" aria-label="The 3D organism viewer"><span class="dsh-lab">The organism</span><a class="dsh-link" href="../../blueprint3d/">Anatomy</a><a class="dsh-link" href="../../blueprint3d/?mode=physiology">Circulation &amp; gills</a><a class="dsh-link" href="../../blueprint3d/?mode=tissue">Tissue signals</a><a class="dsh-link" href="../../blueprint3d/?mode=cell">Cell interactions</a><a class="dsh-link" href="../../blueprint3d/?mode=physics">Flight simulator</a><a class="dsh-link" href="../../blueprint3d/?mode=design">Design studio</a><a class="dsh-link" href="../../blueprint3d/?mode=growth">Growth</a><a class="dsh-link" href="../../blueprint3d/?mode=compare">Compare species</a><a class="dsh-link" href="../../blueprint3d/?mode=sequences">Gene sequences</a><a class="dsh-link" href="../../blueprint3d/?view=radial">Radial map</a></nav>
+</header>
+<span id="dsh-content"></span>
+<!-- delphi-shell:end -->
+<header class="top"><div class="wrap">
+  <a class="back" href="../../index.html">&larr; Mission Control</a>
+  <span class="brand">Physics thread</span>
+  <nav><a href="#result">Result</a><a href="#envelope">Envelope</a><a href="#sim">Simulator</a><a href="#flier">Flier (hypothetical)</a><a href="#tff">TFF map</a><a href="#bridge">Bridge</a><a href="#data">Glide data</a><a href="#compare">Comparison</a><a href="#formal">For Lean</a><a href="#method">Method</a><a href="#honest">Limits</a><a href="#sources">Sources</a></nav>
+  <button id="themeBtn" title="Toggle light or dark">Theme</button>
+</div></header>
+
+<main class="wrap">
+
+<section id="result" style="padding-top:34px">
+<h1>Is a flying fish inside Thompson's flight envelope?</h1>
+<p class="lede">In 1917 D'Arcy Thompson argued that a flier of fixed proportions must move at least at a speed that grows with the square root of its size, and that the work of flight grows faster than the muscle to do it. This page checks a real flying fish against that argument using only numbers we could trace to a fetched source, and reports what the published record does and does not contain. Everything here is read from <code>results.json</code>, <code>status.json</code> and the two CSV files beside this page; nothing is typed by hand.</p>
+<div class="verdict" id="verdict"></div>
+<div class="grid g4" id="kpis" style="margin-top:12px"></div>
+<p class="small mute" id="builtLine" style="margin-top:10px"></p>
+</section>
+
+<section id="envelope"><h2>The envelope</h2>
+<p class="lede">The lift a wing makes is &frac12;&thinsp;&rho;&thinsp;v&sup2;&thinsp;S&thinsp;C<sub>L</sub>. To stay up it must equal the weight W, so the slowest possible lift-supported speed is v<sub>min</sub> = &radic;(2&thinsp;(W/S) / (&rho;&thinsp;C<sub>L,max</sub>)). That is Thompson's "must": speed grows as the square root of wing loading W/S, and under isometry as the square root of length. The dashed line below has that slope, drawn through the flying fish.</p>
+<div class="fig" id="vminwrap"><div id="figVmin"></div>
+<p class="small mute">The blue line is the slowest speed at which the measured fins of a 0.06 kg darkedged-wing flying fish can carry its weight; the shaded band runs to three times that. Each bar is a speed from the glide table, coloured by how the source got it. Hover any bar or the band for the source, the locator and the retrieval time. Standalone copy for the deck: <a href="vmin-band.svg">vmin-band.svg</a>.</p></div>
+<div class="grid g2" style="margin-top:14px">
+  <div class="card"><h3>Reading B: the fish on its own envelope</h3><div id="readingB"></div></div>
+  <div class="card"><h3>Reading A: does speed scale as (W/S)<sup>&frac12;</sup>?</h3><div id="readingA"></div></div>
+</div>
+<div class="fig" style="margin-top:14px" id="figwrap"><div id="fig"></div>
+<p class="small mute">Airspeed against wing loading, both on log scales. Gliders in blue, powered fliers in orange, fitted separately because they are two physical regimes; the vertical bar on the flying fish is the 10 to 20 m/s field range. Birds are absent on purpose: class Aves is the frozen holdout exam and no bird value may enter any test. Hover a point for its provenance.</p></div>
+<div class="grid g2" style="margin-top:14px">
+  <div class="card"><h3>Reading C: could its muscles power level flight?</h3><div id="readingC"></div></div>
+  <div class="card"><h3>Reading D: the exponents themselves</h3><div id="readingD"></div></div>
+</div>
+</section>
+
+<section id="sim"><h2>The simulator: swim, taxi, take-off, glide, in equations</h2>
+<p class="lede">A 2D side-view model of the Park and Choi specimen, integrated with RK4 from the parameters on this page, runs in the browser at <a href="sim/index.html"><b>sim/</b></a>: live altitude, speed against the minimum lift-supported speed, and energy, with every parameter's source and kind shown and sliders on the assumed ones. Its validation was pre-registered before the first run (<a href="data/sim/PREREG.md">PREREG.md</a>, hash in <a href="data/sim/PREREG.sha256">PREREG.sha256</a>); the run log with every change made after seeing a result is <a href="data/sim/RUNS.md">RUNS.md</a>. Tests 1 to 3 became exploratory after run 1 and are labelled post-hoc. Test 4 (the real fish cannot power-fly) has run with the physiology chain: it passes at the fish's own muscle and <b>fails</b> at the pre-registered upper bound (a bat's flight-muscle fraction), where the model lets the fish fly 26 s bouts on anaerobic stores; and with the chain capping the launch the fish cannot even lift off, which exposes the tuned launch thrust as unphysical. Both outcomes are reported in RUNS.md. The pure-glide bound from the Lean thread, one glide at most h&middot;(L/D)<sub>max</sub> &asymp; 35 m, is a visible row: long field flights need repeated taxis.</p>
+<p class="lede">The simulator takes a <b>design</b>, so the same animal can be flown here and looked at in the 3D viewer. It accepts the parametric schema's own parameters (<code>standard_length_m</code>, <code>body_mass_kg</code>, <code>pectoral_area_over_SL2</code>, <code>pectoral_span_over_SL</code>, <code>flight_muscle_fraction</code>) by URL query and by <code>postMessage</code> from a parent frame, and posts its results and their provenance back; the contract is <a href="sim/EMBED.md">EMBED.md</a>. Presets for the organisms we hold, each labelled with what it rests on: <a href="sim/index.html?preset=flying-fish">the real flying fish</a> (measured), <a href="sim/index.html?preset=tff">the HYPOTHETICAL TFF</a> (a spec, which surfaces the four mismatches found while building it as a mesh, including a flight muscle only 29.5 % of which fits inside the animal), <a href="sim/index.html?preset=winged-zebrafish">the HYPOTHETICAL winged zebrafish</a> (its fin value is a chosen delta, not the paper's number, whose measurements are figure-only) and <a href="sim/index.html?preset=zebrafish">the zebrafish itself</a> (schematic fins; it never leaves the water). <b>Parameters supplied at run time make the run exploratory</b>, and the page says so in red: a pre-registered test applies to the pre-registered parameters, not to whatever is typed in.</p>
+</section>
+
+<section id="flier"><h2>A truly flying fish: what it would take <span class="chip bad">HYPOTHETICAL</span></h2>
+<p class="lede">A design study, not an organism. Starting from the real specimen, only morphology and physiology parameters are changed; the equations and the measured fin polar are the real fish's. Powered-flight values come from bats, insects and pterosaurs only; class Aves is the frozen holdout, and where a value exists only for birds the study says "unavailable (holdout)". Prior art and every number: <a href="data/flier/PRIOR-ART-FLIER.md">PRIOR-ART-FLIER.md</a>; the spec with its sources and arithmetic: <a href="data/flier/spec.json">spec.json</a>; the candidate for the Lean checker: <a href="data/flier/lean-candidate.json">lean-candidate.json</a>. Run it: <a href="sim/index.html?fish=1">the simulator with the flier selected</a>.</p>
+<div class="grid g2">
+  <div class="card"><h3>What changes, real fish to flier</h3><table>
+   <tr><th>parameter</th><th>real (measured)</th><th>flier (hypothetical)</th><th>why</th></tr>
+   <tr><td>wing loading</td><td>46.4 N/m²</td><td>12 N/m²</td><td>inside the bat range 6.5 to 14.25; below pterosaur hatchlings 15.8 to 17.9</td></tr>
+   <tr><td>lifting area</td><td>0.0127 m²</td><td>0.0491 m² (3.9×)</td><td>follows from the wing loading at 60 g</td></tr>
+   <tr><td>span at aspect ratio 9</td><td>0.26 m</td><td>0.66 m (2.5×)</td><td>the fish's own aspect ratio, kept</td></tr>
+   <tr><td>flight-muscle fraction</td><td>not reported (small)</td><td>0.16</td><td>smallest that covers a 1 m/s climb at the bat-derived maximum specific power of 202 W/kg muscle; bats average 0.091, minimum 0.078</td></tr>
+   <tr><td>mass, C<sub>L,max</sub>, (L/D)<sub>max</sub></td><td>0.06 kg, 0.78, 4.37</td><td>same</td><td>same body and fin section; conservative</td></tr>
+   <tr><td>O<sub>2</sub> delivery for sustained climb</td><td>unknown</td><td>about 930 ml O<sub>2</sub> per min per kg</td><td>18.6 W metabolic at 10 % conversion (bat-measured 7 to 10 %); 310 W/kg body, above bats (70 to 183) and below hovering bumblebees (559)</td></tr>
+  </table></div>
+  <div class="card"><h3>What the budget says</h3>
+   <ul class="small">
+    <li><b>Level flight</b> at the best speed (6 m/s) costs 1.28 W mechanical including 0.48 W of flapping inertia; a 1 m/s climb costs 1.86 W.</li>
+    <li>A 60 g fish with the <b>bat mean</b> muscle fraction (9.1 %) has 1.1 W at the bat-derived maximum specific power: <b>not enough for level flight</b>, let alone a climb.</li>
+    <li>At 16 % flight muscle it has 1.94 W: level flight with margin and a 1 m/s climb. In the simulator this fish lifts off at 11.6 m/s and climbs to 42 m in 40 s at about 6 m/s, with the real fish's equations. <b>With the physiology chain on, the climb reaches 179 m at 66 s and ends when the burst store empties, with the blood oxygen store still at 35 %: it is a burst of about a minute on anaerobic stores, not sustained flight.</b> In air, gills do not ventilate, so the 930 ml O<sub>2</sub> per minute per kg must come from an air-breathing respiratory surface; that is a design requirement the genome would have to meet, and the climb result is expected to change once the physiology chain is wired. The real fish, in the same simulator, cannot (it gets no flapping thrust; whether its muscles <em>could</em> is test 4, pending the physiology chain).</li>
+    <li>Environment: water 25 °C, air 1.225 kg/m³, calm air and average nutrition, rest and clearance, held fixed by the project baseline (conditions/baseline.json) and shown as locked in the simulator's panel.</li>
+    <li>The flapping power is a figure derived from two sourced bat numbers (0.140 W of mechanical power from 0.69 g of flight muscle); it is the parameter the physiology chain and the Lean O<sub>2</sub>-to-power bound will replace or confirm.</li>
+    <li>Minimum lift-supported speed of the flier: 5.0 m/s (constraint C9); the candidate file asks the Lean checker to confirm 7 m/s cruise is consistent and a 4 m/s claim is eliminated.</li>
+   </ul>
+   <p class="small mute">Not established: that such a fish could develop (development is not simulated), that fins of four times the area keep the measured polar, that any gill can deliver the oxygen, and anything about birds. The genome question is Genotype's: the parameter diff above is what they translate.</p>
+  </div>
+</div>
+</section>
+
+<section id="tff"><h2>TFF v2: a co-design map for altitude <span class="chip bad">HYPOTHETICAL</span></h2>
+<p class="lede">The Lean thread's certificates make the oxygen side binding: sustained aerobic flight is eliminated for the real fish and the first flier (aerobic ceiling 0.0357 W against about 1 W), and gills do not work in air. So the truly-flying fish is no longer a point but a map: for each altitude, the pairs of wing loading and aerobic capacity (&eta;&middot;E&middot;Q&middot;C<sub>a</sub>) that allow sustained level flight, using the real fin polar, the standard atmosphere for air density and oxygen partial pressure (NASA GRC fit, fetched), and the trout haemoglobin curve from the physiology chain. Birds are the frozen holdout, so "similar to birds" is not benchmarked against any bird: the target altitude, 1000 m, comes from a bat reference (Brazilian free-tailed bats forage at over 1 km above ground), and the map is drawn to 5000 m to show the shrinkage. Files: <a href="data/flier/tff/tff.json">tff.json</a>, <a href="data/flier/tff/lean-candidates-tff.json">lean-candidates-tff.json</a>, <a href="data/flier/tff/COEVOLUTION.md">COEVOLUTION.md</a>. Run it: <a href="sim/index.html?fish=2">the simulator with the TFF</a> (altitude readout) and <a href="sim/index.html?fish=3">the winged zebrafish</a>.</p>
+<div class="fig" id="tffwrap"><div id="figTff"></div>
+<p class="small mute">Above each curve, sustained level flight is possible at that altitude. The region shrinks with altitude on both axes: thinner air raises the minimum speed and the power for every wing loading, and lower oxygen pressure lowers the arterial content for every cardiac output. Along a curve, bigger wings (lower wing loading) buy lower oxygen capacity as a square root. The real fish sits below every curve by more than thirty times; the TFF point reaches 1000 m only with an oxygen supply no sourced fish has. Hover any curve or point for its numbers.</p></div>
+<div class="grid g2" style="margin-top:14px">
+  <div class="card"><h3>The TFF v2 spec, and what no animal has</h3><div id="tffSpec" class="small"></div></div>
+  <div class="card"><h3>Ceiling as a function of parameters</h3><div id="tffCeil" class="small"></div><p class="small mute">Highest altitude at which &eta;&middot;E&middot;Q&middot;C<sub>a</sub>(h) &ge; W&middot;v<sub>min</sub>(h)/(L/D) + inertial power, with arterial PO<sub>2</sub> taken equal to inspired PO<sub>2</sub> (an assumed upper bound). "none" means not even at sea level.</p></div>
+</div>
+<div class="card" style="margin-top:14px"><h3>Co-evolution of wings and oxygen processing: what the literature search found</h3><p class="small" id="coevo">The project lead's hypothesis is that wing size co-evolves with oxygen processing because oxygen thins with altitude. The map above says a model-level version of that: at a given altitude, flight needs either lower wing loading or higher oxygen delivery. A logged literature search for comparative evidence in bats and insects (no birds) found <b>no source either supporting or opposing</b> the co-variation; two insect elevational-gradient papers would be the first to read, and the high-altitude mammal haemoglobin literature exists by title but was not read. The claim stays a hypothesis. Details and verdict: <a href="data/flier/tff/COEVOLUTION.md">COEVOLUTION.md</a>.</p></div>
+<div class="card" style="margin-top:14px"><h3>The 2&times;2: a winged zebrafish</h3><p class="small" id="zebra">One panel of the developmental comparison. An adult zebrafish of 3.0 cm standard length weighs 0.51 g by the FishBase length-weight row for the species (an unverified estimate, like most flying-fish rows). Given flying-fish fin proportions by isometric scaling of the measured fins, its wing loading is 18 N/m² and its minimum lift-supported speed 6.1 m/s, which is 205 body lengths per second. The simulator result for whether it can reach that speed on its scaled physiology is in the status line below once run.</p><p class="small mute" id="zebraRun"></p></div>
+</section>
+
+<section id="bridge"><h2>The bridge: fin proportion from real specimens, under the envelope</h2>
+<p class="lede">The Genotype thread extracted Daane et al. 2021's measurements of 109 preserved beloniform specimens (Harvard MCZ): standard length and pectoral fin length, from needlefish through halfbeaks and gliding halfbeaks to flying fish. The same paper names the genes (lat4a with kcnh2a) that reproduce the flying-fish fin proportion in zebrafish. Here the five wind-tunnel specimens whose wing loading set v<sub>min</sub> are placed on that series. Their fin length is not reported, only the tip-to-tip span and the dihedral angle, so each is an <b>upper bound</b>: fin length &le; half span / cos(dihedral), because body width is at least zero. No length is converted to an area: there is no sourced shape factor, so none is assumed.</p>
+<div class="fig" id="bridgewrap"><div id="figBridge"></div>
+<p class="small mute" id="bridgeCaption"></p></div>
+<div class="grid g2" style="margin-top:14px">
+  <div class="card"><h3>Recount against the Genotype thread</h3><div id="recount" class="small"></div></div>
+  <div class="card"><h3>What this does and does not establish</h3><div id="bridgeNote" class="small"></div></div>
+</div>
+</section>
+
+<section id="data"><h2>What a flying fish does in the air: the table (issue #50)</h2>
+<p class="lede">One row per value per source. <b>measured</b> means the authors measured it; <b>secondary</b> means a fetched paper quotes an older one we could not get; <b>theory</b> means a model's number, kept only to say so. Blank cells are blank: nothing is filled in.</p>
+<div class="grid g4" id="coverage"></div>
+<div class="card" style="margin-top:12px"><h3>What is missing, stated plainly</h3><ul id="missing" class="small"></ul></div>
+<details style="margin-top:12px" open><summary>The glide table</summary><div class="in scroll" id="glideTable"></div></details>
+<details><summary>Fin size and proportion: the allometry that is in the abstracts</summary><div class="in scroll" id="allom"></div></details>
+</section>
+
+<section id="compare"><h2>Comparison lineages</h2>
+<p class="lede">The cladogram on the main page compares flying fish with flies, bats, flying squirrels and colugos. Each non-bird lineage that has a fetched source with a speed is here; those with a wing loading as well enter the fit.</p>
+<div class="scroll" id="compTable"></div>
+</section>
+
+<section id="formal"><h2>What goes to the Lean thread</h2>
+<p class="lede">The exponents are consequences of definitions, not measurements, so they belong in the proof checker. Each statement, with symbols, units, the assumptions that are not mathematics, and a mutant that must fail to compile, is in <a href="data/FORMAL-STATEMENTS.md">FORMAL-STATEMENTS.md</a>. <b>R2 to R8 are now proved</b> by the Lean thread in <code>lean/Delphi/Scaling.lean</code> as theorems over named hypotheses; this thread checked the Lean build report (standard axioms, zero sorry, built 19:00 UTC) but did not re-run the proofs. With R7 in place the ledger's 13 square-cube candidates moved from "cannot rule" to "consistent", none eliminated, because they restate the law. The one strength row still open is petiole bending, so R9 was written next.</p>
+<ol class="steps">
+<li><b>R1 cube law</b> W &prop; L&sup3; <span class="chip ok">proved earlier</span> (thompson1917-ch03-07).</li>
+<li><b>R2 area law</b> S &prop; L&sup2;, A<sub>cs</sub> &prop; L&sup2; <span class="chip ok">proved</span></li>
+<li><b>R3</b> wing loading W/S &prop; L <span class="chip ok">proved</span></li>
+<li><b>R4 minimum speed</b> v &ge; &radic;(2W/(&rho;SC<sub>L,max</sub>)) exactly, no isometry; v<sub>min</sub> &prop; L<sup>&frac12;</sup> under R1 and R2 <span class="chip ok">proved</span> (ch02-06 first half, ch02-10).</li>
+<li><b>R5 power required</b> P<sub>req</sub> &prop; L<sup>7/2</sup> at v<sub>min</sub> with constant L/D <span class="chip ok">proved</span> (ch02-06 second half).</li>
+<li><b>R6 power available</b> P<sub>avail</sub> &prop; L&sup3; <em>as a named hypothesis only, never asserted</em>; a size limit exists but its value needs f, p, L/D, &rho;, C<sub>L,max</sub>, so no animal is placed above it <span class="chip ok">proved as conditional</span> (ch02-07).</li>
+<li><b>R7 strength</b> F<sub>break</sub> &prop; L&sup2;, safety factor = &sigma;k<sub>3</sub>/(k<sub>1</sub>L), a size L<sub>max</sub> above which a member cannot carry n body weights; axial only <span class="chip ok">proved</span></li>
+<li><b>R8 Froude</b> v &prop; &radic;(gL) <span class="chip ok">proved</span> (ch02-10).</li>
+<li><b>R9 bending</b> &sigma;<sub>b</sub> = M<sub>b</sub>/Z with Z &prop; d&sup3;: for a body-like load (&prop; L&sup3;) stress &prop; L and a limit exists; for a constant-thickness sheet (load &prop; L&sup2;) stress is size-independent and no limit follows. Written for the petiole-bending candidate WP-077/C1 <span class="chip warn">proposed, not yet formalised</span></li>
+</ol>
+</section>
+
+<section id="method"><h2>How this was done</h2>
+<ol class="steps">
+<li><b>Prior art first.</b> A logged search for flying-fish aerodynamics and glide performance before any model: OpenAlex via the OpenResearch CLI (rate-limited after one call), then Europe PMC, Crossref and Semantic Scholar. Every call is in <a href="data/SEARCHES.md">SEARCHES.md</a>; findings in <a href="data/PRIOR-ART.md">PRIOR-ART.md</a>. No run identifier is issued by the tool, so none is recorded. No email, name or account id went into any request.</li>
+<li><b>Pre-register, then read.</b> The test's pass and fail rules were written to <a href="data/result.json">result.json</a> at 18:21 UTC before any wing loading, lifting area or lift coefficient had been read; the file lists the few values seen in abstracts before that moment. One amendment at 18:26 UTC, requested by the hub before any fit ran, separates gliders from powered fliers and names the flying fish in the set.</li>
+<li><b>Fetch, verify, record.</b> Candidate DOIs recalled from memory were resolved in Crossref and kept only when the title matched; one guess returned 404 and is cited nowhere. Paywalled texts are cited as abstract-only. Open copies came from PubMed Central, Zenodo, Inter-Research and the Wayback Machine.</li>
+<li><b>Compute from files.</b> <code>analysis.py</code> reads the two CSVs and writes every number to <code>results.json</code>; this page reads that file. Air density 1.225 kg/m&sup3; and g = 9.81 m/s&sup2; are the only constants.</li>
+<li><b>Keep the kinds apart.</b> Measured, secondary, theory and simulation are separate labels on every row. A CFD result is a simulation and enters no verdict.</li>
+</ol>
+</section>
+
+<section id="honest"><h2>What this does not establish</h2>
+<ul>
+<li>That Thompson's scaling law holds: both fits are underpowered by the pre-registered rules. The pooled slope of 0.54 across eight points is descriptive only; it mixes gliders and powered fliers.</li>
+<li>That the flying fish's glide speeds were measured on the fish whose wing loading was measured. The speeds are family-level field figures quoted second-hand from works published between 1941 and 1994; the morphometrics are 40 to 60 g stuffed specimens of one species.</li>
+<li>Anything about muscle power: no source gives the muscle mass fraction or specific power of a flying fish.</li>
+<li>Anything about birds. Class Aves is held out; the exam on birds is for an assessor who built none of this.</li>
+<li>Any novelty. Fish 1990 and Park and Choi 2010 already compared flying-fish wings with birds and bats; what we did not find is a pre-registered test of the (W/S)<sup>&frac12;</sup> law on gliders, and Google Scholar was not searched.</li>
+<li>That the compiled bat and hoverfly values are right: the compilation's own mass and area columns disagree with its wing-loading column for insects by a factor of 5 to 8, and its primary sources were not fetched.</li>
+</ul>
+</section>
+
+<section id="sources"><h2>Sources</h2>
+<p class="lede">Each row says what was actually read. DOIs were verified by fetching Crossref metadata.</p>
+<div class="scroll" id="sourcesTable"></div>
+</section>
+
+</main>
+<footer class="wrap">Physics thread of DELPHI at the ScienceClaw hack. Nothing on this page is signed or published as a nanopublication; drafts, when written, are unsigned and say so. <a href="../../index.html">Back to Mission Control</a>.</footer>
+
+<script>
+(function(){
+  const root=document.documentElement, btn=document.getElementById('themeBtn');
+  try{const s=localStorage.getItem('theme'); if(s) root.setAttribute('data-theme',s);}catch(e){}
+  btn.onclick=()=>{const cur=root.getAttribute('data-theme')|| (matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'); const nx=cur==='dark'?'light':'dark'; root.setAttribute('data-theme',nx); try{localStorage.setItem('theme',nx);}catch(e){}};
+})();
+const fmt=(x,d=2)=> (x==null||x==='')?'':(typeof x==='number'? (Math.abs(x)>=100? x.toFixed(0): x.toFixed(d)) : x);
+function parseCSV(t){const lines=t.replace(/\r/g,'').split('\n').filter(l=>l.trim()); const h=lines[0].split(','); return lines.slice(1).map(l=>{const o={}; l.split(',').forEach((v,i)=>o[h[i]]=v); return o;});}
+function table(el,rows,cols){ if(!rows.length){el.textContent='no rows';return;} const t=document.createElement('table'); t.innerHTML='<thead><tr>'+cols.map(c=>`<th>${c.label}</th>`).join('')+'</tr></thead>'; const tb=document.createElement('tbody'); rows.forEach(r=>{const tr=document.createElement('tr'); tr.innerHTML=cols.map(c=>`<td>${c.f? c.f(r): (r[c.key]??'')}</td>`).join(''); tb.appendChild(tr);}); t.appendChild(tb); el.innerHTML=''; el.appendChild(t); }
+const chip=(v)=>{const cls=v==='inside'||v==='supports'?'ok':(v==='outside'||v==='refutes'?'bad':'warn'); return `<span class="chip ${cls}">${v}</span>`;};
+Promise.all([
+  fetch('status.json').then(r=>r.json()), fetch('results.json').then(r=>r.json()),
+  fetch('data/glide-data.csv').then(r=>r.text()), fetch('data/comparison-data.csv').then(r=>r.text()),
+  fetch('data/sources.json').then(r=>r.json()), fetch('data/allometry.json').then(r=>r.json()), fetch('envelope.svg').then(r=>r.text()), fetch('vmin-band.svg').then(r=>r.text()), fetch('bridge.svg').then(r=>r.text()), fetch('bridge.json').then(r=>r.json()), fetch('tff-map.svg').then(r=>r.text()), fetch('data/flier/tff/tff.json').then(r=>r.json())
+]).then(([st,res,gcsv,ccsv,src,allo,svg,svg2,svg3,br,svg4,tf])=>{
+  document.getElementById('figTff').innerHTML=svg4;
+  const T=tf.tff; document.getElementById('tffSpec').innerHTML=`<table><tr><th>parameter</th><th>TFF v2</th><th>measured range (sourced)</th><th>verdict</th></tr>${tf.parameters_vs_measured_ranges.map(r=>`<tr><td>${r.parameter}</td><td>${typeof r.tff==='number'?(r.tff>=10?r.tff.toFixed(0):r.tff.toFixed(2)):r.tff} ${r.unit}</td><td class="mute">${r.measured_range_sourced}</td><td>${r.verdict}</td></tr>`).join('')}</table><p>Mass ${T.mass_kg.value} kg (kept); lifting area ${(0.5886/T.wing_loading_N_m2.value).toFixed(4)} m²; aerobic capacity ${T.aerobic_capacity_W.value.toFixed(2)} W; O<sub>2</sub> to be taken up in air ${T.air_breathing_surface.required_O2_uptake_ml_min_kg.toFixed(0)} ml/min/kg (surface area not computable: ${T.air_breathing_surface.note.split(';')[1]||''}); target ${T.target_altitude_m.value} m (${T.target_altitude_m.justification}); ceiling ${T.ceiling_m.value.toFixed(0)} m.</p>`;
+  const ct=tf.ceiling_table; document.getElementById('tffCeil').innerHTML='<table><tr><th>W/S N/m²</th><th>cardiac output ml/s (ml/min/kg)</th><th>ceiling m</th></tr>'+ct.map(r=>`<tr><td>${r.Q}</td><td>${r.Qc_ml_s} (${(r.Qc_ml_s*60/0.06).toFixed(0)})</td><td>${r.ceiling_m==null?'none':r.ceiling_m.toFixed(0)}</td></tr>`).join('')+'</table>';
+  document.getElementById('figVmin').innerHTML=svg2;
+  document.getElementById('figBridge').innerHTML=svg3;
+  const ffs=br.groups['flying fish'];
+  document.getElementById('bridgeCaption').innerHTML=`Pectoral fin length over standard length against standard length, ${br.source.rows_read} specimens, four groups. Flying fish: n ${ffs.n}, median ${ffs.median.toFixed(3)}, range ${ffs.min.toFixed(3)} to ${ffs.max.toFixed(3)}; under 5 cm ${br.flying_fish_by_size.under_5cm.median.toFixed(3)} (n ${br.flying_fish_by_size.under_5cm.n}), 5 cm and over ${br.flying_fish_by_size.at_or_over_5cm.median.toFixed(3)} (n ${br.flying_fish_by_size.at_or_over_5cm.n}). Hollow diamonds: Park and Choi specimens as upper bounds (${br.park_choi_specimens_upper_bound.map(p=>p.model+' &le; '+p.pectoral_over_SL_upper_bound.toFixed(3)).join(', ')}). Hover any point for its specimen and catalogue number.`;
+  document.getElementById('recount').innerHTML='<table><tr><th>group</th><th>Genotype n / median</th><th>our n / median</th><th>agree</th></tr>'+Object.entries(br.recount_vs_genotype_thread).map(([g,v])=>`<tr><td>${g}</td><td>${v.genotype_n} / ${v.genotype_median}</td><td>${v.our_n} / ${v.our_median}</td><td>${v.agree?'<span class="chip ok">yes</span>':'<span class="chip bad">no</span>'}</td></tr>`).join('')+'</table><p class="mute">Recounted from the per-specimen CSV, not copied from the summary file.</p>';
+  document.getElementById('bridgeNote').innerHTML=`<p>${br.what_this_establishes}</p><p class="mute">${br.note_on_species} Model M's dihedral angle is not legible in the paper's table, so the largest stated angle (22°) is used for it, which is the loosest bound.</p>`;
+  const g=parseCSV(gcsv), c=parseCSV(ccsv);
+  document.getElementById('verdict').innerHTML=`Overall: ${chip(res.overall.verdict)} &nbsp; reading B ${chip(res.verdicts.B)} &nbsp; reading A gliders ${chip(res.verdicts.A_gliders)} &nbsp; reading A powered ${chip(res.verdicts.A_powered)} &nbsp; reading C ${chip(res.verdicts.C)}`;
+  const B=res.interpretation_B, A=res.interpretation_A, C=res.interpretation_C;
+  const kp=[['v<sub>min</sub> of the fish',fmt(B.v_min_m_s)+' m/s','from its own W/S and C<sub>L,max</sub>'],['quoted glide speed',B.airspeed_range_m_s.join(' to ')+' m/s','field, second-hand'],['wing loading',fmt(B.W_N/B.reference_area_m2,1)+' N/m²','0.06 kg specimen L3'],['glide-table rows',g.length,res.coverage.n_species_or_groups+' species or groups'],['first-hand species',res.coverage.species_with_first_hand_measurements.length,'with measured values'],['fetched sources',src.sources.filter(s=>s.access.startsWith('full text')).length,'in full; '+src.sources.length+' cited'],['taxa in the fit',A.gliders.n+' + '+A.powered.n,'gliders + powered'],['logged calls',st.metrics.find(m=>m.label.startsWith('logged')).value,'searches and fetches']];
+  document.getElementById('kpis').innerHTML=kp.map(k=>`<div class="card"><div class="kpi">${k[1]}<small>${k[0]}<br><span class="mute">${k[2]}</span></small></div></div>`).join('');
+  document.getElementById('builtLine').textContent=`Numbers computed ${res.computed_at} by analysis.py; status ${st.updated}.`;
+  document.getElementById('readingB').innerHTML=`<p>${chip(B.verdict)} &nbsp; W = ${fmt(B.W_N,3)} N, reference area ${fmt(B.reference_area_m2,5)} m², C<sub>L,max</sub> ${B.C_Lmax}, so v<sub>min</sub> = <b>${fmt(B.v_min_m_s)} m/s</b>; inside means the quoted speeds ${B.airspeed_range_m_s.join(' to ')} m/s overlap [v<sub>min</sub>, 3v<sub>min</sub>] = [${fmt(B.v_min_m_s)}, ${fmt(B.three_v_min_m_s)}].</p><p class="small mute">${B.caveat}</p><p class="small">Second fish (descriptive only): ${B.second_specimen.specimen}: wing loading ${fmt(B.second_specimen.wing_loading_N_m2,1)} N/m², v<sub>min</sub> ${fmt(B.second_specimen.v_min_with_Park_Choi_CLmax_m_s)} m/s with the borrowed C<sub>L,max</sub>, quoted airspeed ${B.second_specimen.airspeed_quoted_for_this_species_m_s.join(' to ')} m/s.</p>`;
+  const fitTxt=(f,name)=>`<p><b>${name}</b> ${chip(f.verdict)} n = ${f.n}${f.slope!=null?`, slope ${fmt(f.slope)} (95% CI ${fmt(f.slope_ci95[0])} to ${fmt(f.slope_ci95[1])})`:''}, W/S spans ${fmt(f.decades_of_WS)} decades. <span class="mute">${f.why||''}</span></p>`;
+  document.getElementById('readingA').innerHTML=fitTxt(A.gliders,'Gliders')+fitTxt(A.powered,'Powered fliers')+`<p class="small mute">Thompson predicts slope ½. Pre-registered rule: a verdict needs n &ge; 5 taxa spanning at least one decade of W/S with a CI narrower than 1.0. Pooled across both regimes, descriptive only: slope ${fmt(A.pooled_descriptive_only.slope)} &plusmn; ${fmt(A.pooled_descriptive_only.slope_se)} (n = ${A.pooled_descriptive_only.n}, r² ${fmt(A.pooled_descriptive_only.r2)}). It decides nothing.</p>`;
+  document.getElementById('readingC').innerHTML=`<p>${chip(C.verdict)} P<sub>req</sub> = W&thinsp;v<sub>min</sub>/(L/D)<sub>max</sub> = <b>${fmt(C.P_req_W_at_v_min)} W</b> (${fmt(C.P_req_per_kg_body_W_kg,1)} W per kg of body).</p><p class="small mute">${C.why}</p><p class="small">${C.what_would_decide_it}</p>`;
+  document.getElementById('readingD').innerHTML=`<p><span class="chip ok">provable</span> ${res.interpretation_D.status}.</p><ul class="small">${res.interpretation_D.statements.map(s=>`<li>${s}</li>`).join('')}</ul>`;
+  document.getElementById('fig').innerHTML=svg;
+  const cov=res.coverage.per_column; const nice={glide_distance_m:'glide distance',glide_duration_s:'glide duration',airspeed_m_s:'airspeed',launch_speed_m_s:'launch speed',height_m:'height',body_mass_kg:'body mass',body_length_m:'body length',pectoral_fin_span_m:'pectoral span',pectoral_fin_area_m2:'pectoral area',pelvic_fin_area_m2:'pelvic area',CL_max:'C<sub>L,max</sub>',LD_max:'(L/D)<sub>max</sub>'};
+  document.getElementById('coverage').innerHTML=Object.keys(cov).map(k=>{const v=cov[k]; const kinds=Object.entries(v.by_value_kind).map(([a,b])=>`${b} ${a.split(' ')[0]}`).join(', '); return `<div class="card"><div class="kpi">${v.rows_with_value}<small>${nice[k]} rows<br><span class="mute">${v.species.length} species/groups${kinds?'; '+kinds:''}</span></small></div></div>`;}).join('');
+  document.getElementById('missing').innerHTML=res.coverage.what_is_missing.map(s=>`<li>${s}</li>`).join('');
+  table(document.getElementById('glideTable'),g,[{label:'species',key:'species'},{label:'kind',key:'row_kind'},{label:'glide m',key:'glide_distance_m'},{label:'airspeed m/s',key:'airspeed_m_s'},{label:'launch m/s',key:'launch_speed_m_s'},{label:'height m',key:'height_m'},{label:'mass kg',key:'body_mass_kg'},{label:'length m',key:'body_length_m'},{label:'span m',key:'pectoral_fin_span_m'},{label:'pectoral m²',key:'pectoral_fin_area_m2'},{label:'pelvic m²',key:'pelvic_fin_area_m2'},{label:'C<sub>L,max</sub>',key:'CL_max'},{label:'L/D',key:'LD_max'},{label:'method',key:'method'},{label:'n',key:'sample_size'},{label:'value kind',key:'value_kind'},{label:'source',f:r=>`${r.source_id}<br><span class="mute small">${r.source_locator}</span>`},{label:'notes',f:r=>`<span class="small">${r.notes}</span>`}]);
+  table(document.getElementById('allom'),allo.entries,[{label:'species',key:'species'},{label:'quantity',key:'quantity'},{label:'exponent or value',f:r=>r.exponent??r.value},{label:'source',f:r=>`${r.source_id} (${r.locator})`},{label:'note',key:'note'}]);
+  table(document.getElementById('compTable'),c,[{label:'lineage',key:'lineage'},{label:'species',f:r=>`<i>${r.species}</i><br><span class="mute small">${r.common_name}</span>`},{label:'mode',key:'mode'},{label:'mass kg',key:'body_mass_kg'},{label:'W/S N/m²',key:'wing_loading_N_m2'},{label:'speed m/s',key:'airspeed_m_s'},{label:'speed kind',key:'speed_kind'},{label:'value kind',key:'value_kind'},{label:'source',key:'source_id'},{label:'notes',f:r=>`<span class="small">${r.notes}</span>`}]);
+  table(document.getElementById('sourcesTable'),src.sources,[{label:'id',key:'id'},{label:'citation',key:'citation'},{label:'identifier',f:r=>r.doi?`<a href="https://doi.org/${r.doi}">${r.doi}</a>`:(r.url||'')},{label:'what was read',key:'access'},{label:'retrieved',key:'retrieved_at'},{label:'method',key:'method'}]);
+  const n=document.getElementById('kpis');
+}).catch(e=>{document.getElementById('verdict').innerHTML='<span class="chip bad">could not load data files</span> '+e;});
+</script>
+</body>
+</html>
