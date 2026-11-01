@@ -28,15 +28,17 @@ export function checkEmpirical(s, derived) {
   { const b = num(s.mass_exponent) ? s.mass_exponent : (derived && num(derived.impliedMassExponent) ? derived.impliedMassExponent : null);
     const src = num(s.mass_exponent) ? 'committed mass_exponent' : 'the exponent implied against the reference specimen';
     if (b === null) rows.push(empiricalRow('E2', 'cannot-evaluate', {}, ['mass_exponent (or a length different from the reference specimen)'], 'the band is [2.90, 3.02] over the six fitted field rows of five species'));
-    else rows.push(empiricalRow('E2', b >= 2.9 && b <= 3.02 ? 'holds' : 'violated', { exponent: b, from: src, band: [2.9, 3.02] }, [],
+    else rows.push(empiricalRow('E2', geTol(b, 2.9) && leTol(b, 3.02) ? 'holds' : 'violated', { exponent: b, from: src, band: [2.9, 3.02] }, [],
       'within the band every fitted flying-fish study spans; outside it, no fit in the project\'s table supports the design',
       { needed: { exponent_between: [2.9, 3.02] }, available: { exponent: b } })); }
 
-  // E3: the ceiling of every teleost in the measured ranges.
-  { const ceiling = 0.0458;
-    if (Preq === null) rows.push(empiricalRow('E3', 'cannot-evaluate', {}, ['airspeed_m_s and LD_max (or powerRequired_W)'], 'the ceiling is ' + ceiling + ' W at 0.06 kg; a different mass needs the cardiac output per kg, which this row does not scale'));
-    else rows.push(empiricalRow('E3', Preq <= ceiling ? 'holds' : 'violated', { powerRequired_W: Preq, ceiling_W: ceiling, shortfall_factor: Preq > 0 ? Preq / ceiling : null }, [],
-      'stronger than the oxygen row C14, which rules only on the physiology a design commits: this one rules on every teleost the measured ranges allow',
+  // E3 (v2.0.0, law set 1.6.0): the ceiling inside the widened ranges (eta <= 0.23, Q*Ca <= 0.0187 ml O2/s at
+  // 0.06 kg, from measured zebrafish MO2max, Palstra 2010). v1.0.0 (law sets 1.0.0-1.5.0) used 0.0458 W; the
+  // law-set judgement re-applies that ceiling when an older law set is chosen (ceiling_v1_W below).
+  { const ceiling = 0.0833, ceilingV1 = 0.0458;
+    if (Preq === null) rows.push(empiricalRow('E3', 'cannot-evaluate', {}, ['airspeed_m_s and LD_max (or powerRequired_W)'], 'the ceiling is ' + ceiling + ' W at 0.06 kg; a different mass needs the O2 delivery per kg, which this row does not scale'));
+    else rows.push(empiricalRow('E3', leTol(Preq, ceiling) ? 'holds' : 'violated', { powerRequired_W: Preq, ceiling_W: ceiling, shortfall_factor: Preq > 0 ? Preq / ceiling : null, ceiling_v1_W: ceilingV1 }, [],
+      'stronger than the oxygen row C14, which rules only on the physiology a design commits: this one rules on the widened ranges its sources support (E3 v2; v1 claimed every teleost and was withdrawn after measured zebrafish exceeded it)',
       { needed: { power_W: Preq }, available: { power_W: ceiling } })); }
 
   // E4: the O2 store carried into the air.
@@ -49,7 +51,7 @@ export function checkEmpirical(s, derived) {
     if (Preq === null) miss.push('airspeed_m_s and LD_max (or powerRequired_W)');
     if (miss.length) rows.push(empiricalRow('E4', 'cannot-evaluate', { o2_store_ml: S, flight_duration_s: t }, miss, 'no blood volume or venous O2 reserve is measured for a flying fish in this project, so a store must be committed'));
     else { const bound = E * S / t;
-      rows.push(empiricalRow('E4', Preq <= bound ? 'holds' : 'violated', { powerRequired_W: Preq, store_ml: S, oxycaloric_J_per_ml: E, duration_s: t, meanPowerFromStore_W: bound }, [],
+      rows.push(empiricalRow('E4', leTol(Preq, bound) ? 'holds' : 'violated', { powerRequired_W: Preq, store_ml: S, oxycaloric_J_per_ml: E, duration_s: t, meanPowerFromStore_W: bound }, [],
         'the aerobic part only: burst power on white-muscle stores is outside this bound, and that is what a flying fish is understood to use',
         { needed: { power_W: Preq }, available: { power_W: bound } })); } }
 

@@ -27,7 +27,7 @@ const t0 = Date.now();
 console.error(`indexing ${ROOT} ...`);
 const idx = buildIndex(ROOT);
 const claimsJson = JSON.parse(readFileSync(join(ROOT, "docs/claims.json"), "utf8"));
-let coverage = null; try { coverage = JSON.parse(readFileSync(join(ROOT, "organisms/merged/coverage.json"), "utf8")); } catch {}
+let coverage = null; try { coverage = JSON.parse(readFileSync(join(ROOT, "test-data/organisms/merged/coverage.json"), "utf8")); } catch {}
 console.error(`index: ${idx.files} files, ${idx.claims.size} claims (${Date.now() - t0} ms)`);
 
 await pace();
@@ -290,7 +290,7 @@ const repoChecks = {
   "repo:graph": (j, a) => checkGraph(j, a),
   "repo:org": (j, a) => checkOrg(j, a),
   "repo:org-overview": j => {
-    if (!coverage) return "no organisms/merged/coverage.json in local checkout";
+    if (!coverage) return "no test-data/organisms/merged/coverage.json in local checkout";
     const issues = [];
     if (j.generated !== coverage.generated) issues.push(`generated ${j.generated} vs file ${coverage.generated}`);
     for (const ax of j.axes ?? []) { const n = coverage.taxa.filter(r => r.axes[ax.id] > 0).length; if (n !== ax.taxaCovered) issues.push(`${ax.id}: taxaCovered ${ax.taxaCovered} vs file ${n}`); }

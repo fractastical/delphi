@@ -11,7 +11,7 @@
 // Sources (all public, no credentials):
 //   Ubergraph  https://ubergraph.apps.renci.org/sparql  (Uberon + CL + GO + NCBITaxon with
 //              precomputed part_of / subClassOf closures and taxon constraints)
-//   organisms/merged/taxa.json  the team's species inventory (common names -> NCBI taxid)
+//   test-data/organisms/merged/taxa.json  the team's species inventory (common names -> NCBI taxid)
 //   holdout/exam.json           the frozen held-out clade; descriptions that resolve inside it are refused
 // Every SPARQL response is cached under organism-design/cache/<sha256 of query>.json so a
 // clean checkout reproduces the same blueprint offline (--offline fails instead of fetching).
@@ -41,7 +41,7 @@ const cacheDir = path.join(here, 'cache');
 fs.mkdirSync(cacheDir, { recursive: true });
 const sha = s => crypto.createHash('sha256').update(s).digest('hex');
 const lexicon = JSON.parse(fs.readFileSync(path.join(here, 'lexicon.json'), 'utf8'));
-const inventory = JSON.parse(fs.readFileSync(path.join(root, 'organisms/merged/taxa.json'), 'utf8'));
+const inventory = JSON.parse(fs.readFileSync(path.join(root, 'test-data/organisms/merged/taxa.json'), 'utf8'));
 const examPath = path.join(root, 'holdout/exam.json');
 const exam = fs.existsSync(examPath) ? JSON.parse(fs.readFileSync(examPath, 'utf8')) : null;
 
@@ -103,7 +103,7 @@ for (const t of inventory) {
 }
 for (const g of grams) {
   const t = invIndex.get(g);
-  if (t) { cover(g); if (!found.taxon.some(x => x.taxid === t.identifiers.ncbi_taxid)) found.taxon.push({ matched: g, taxid: t.identifiers.ncbi_taxid, name: t.accepted_name, rank: t.rank, source: { file: 'organisms/merged/taxa.json', key: t.key, gbif: t.identifiers.gbif_usage_key || null, wikidata: t.identifiers.wikidata_qid || null } }); }
+  if (t) { cover(g); if (!found.taxon.some(x => x.taxid === t.identifiers.ncbi_taxid)) found.taxon.push({ matched: g, taxid: t.identifiers.ncbi_taxid, name: t.accepted_name, rank: t.rank, source: { file: 'test-data/organisms/merged/taxa.json', key: t.key, gbif: t.identifiers.gbif_usage_key || null, wikidata: t.identifiers.wikidata_qid || null } }); }
   // The entry recorded is the key that actually matched, which is not always the gram: the fallback
   // strips a trailing plural s.
   const key = lexicon.taxon_words[g] ? g : lexicon.taxon_words[g.replace(/s$/, '')] ? g.replace(/s$/, '') : null;

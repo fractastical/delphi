@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// For every taxon in organisms/merged/taxa.json that has an NCBI taxid, ask the NCBI Datasets API how many
+// For every taxon in test-data/organisms/merged/taxa.json that has an NCBI taxid, ask the NCBI Datasets API how many
 // genome assemblies exist under that taxon, and how many are RefSeq reference genomes.
 // Result is cached in dashboard/genomes.cache.json with the retrieval time, so the dashboard states what was
 // measured and when. Resumable: taxids already in the cache are skipped.
@@ -9,7 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const taxa = JSON.parse(fs.readFileSync(path.join(root, 'organisms/merged/taxa.json'), 'utf8'));
+const taxa = JSON.parse(fs.readFileSync(path.join(root, 'test-data/organisms/merged/taxa.json'), 'utf8'));
 const cachePath = path.join(root, 'dashboard/genomes.cache.json');
 const cache = fs.existsSync(cachePath) ? JSON.parse(fs.readFileSync(cachePath, 'utf8')) : {};
 const ids = [...new Set(taxa.map(t => t.identifiers?.ncbi_taxid).filter(Boolean))].filter(i => !cache[i]);

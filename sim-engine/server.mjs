@@ -21,8 +21,13 @@ import * as morphogen from './tools/morphogen-diffusion.mjs';
 import * as protein from './tools/protein-structure.mjs';
 import { physiologySchema, physiologyChain, growthSchema, growthTrajectory } from './tools/wrappers.mjs';
 import { LEAN_TOOLS } from './tools/lean-tools.mjs';
+import { LEANBIO_TOOLS } from '../pipeline/leanbio/tools.mjs';
 import { STUDIO_TOOLS } from './tools/studio.mjs';
+import { OMICS_TOOLS } from './tools/omics-tools.mjs';
+import { VALIDATE_TOOLS } from './tools/validate-tools.mjs';
 import { SPEC_TOOLS } from './tools/spec-tools.mjs';
+import { GENERATIVE_TOOLS } from './tools/generative-tools.mjs';
+import { SWARM_TOOLS } from './swarm/board.mjs';
 
 export const TOOLS = [
   { name: 'morphogen_diffusion', ...morphogen.schema, handler: args => morphogen.run(args) },
@@ -32,10 +37,22 @@ export const TOOLS = [
   // Lean laws: lean_laws_list, lean_law_get, lean_lawset_get, lean_check, lean_propose, lean_verify.
   // One loader (lib/lean-source.mjs); the same handlers serve mcp/server.mjs, http.mjs and lean-cli.mjs.
   ...LEAN_TOOLS,
+  // LeanBio: queue, grounding, claim records (pipeline/leanbio/tools.mjs).
+  ...LEANBIO_TOOLS,
   // Design Studio: organism documents, STATE, scenarios, optimisation, co-design sessions (tools/studio.mjs).
   ...STUDIO_TOOLS,
+  // Multi-omics: omics_gene, omics_part, omics_search over omics/index (tools/omics-tools.mjs).
+  ...OMICS_TOOLS,
+  // Design score (scorer v1.0.0, weights frozen in validate/score-weights.json; tools/validate-tools.mjs). Only
+  // design_score is registered; the other validate tools wait for VALIDATE-REGISTER.md.
+  ...VALIDATE_TOOLS.filter(t => t.name === 'design_score'),
   // Functional criteria: parse_design_text, design_from_spec (tools/spec-tools.mjs, lib/spec.mjs, lib/parse-text.mjs).
   ...SPEC_TOOLS,
+  // Swarm task board on codesign sessions: swarm_post_task, swarm_claim, swarm_submit, swarm_status, swarm_try_edits
+  // (swarm/board.mjs). Results land in the session as proposals or comments; humans still decide with session_decide.
+  ...SWARM_TOOLS,
+  // Generative backends: generate_candidates, generative_backends_status (sim-engine/generative, README there).
+  ...GENERATIVE_TOOLS,
 ];
 
 // flight_sim is deliberately absent. It would wrap the physics simulation's equations, which are not

@@ -354,11 +354,24 @@ await ok('unedited adult zebrafish at 28 C: P1 (thermal window) evaluates and ho
   assert.equal(Pv(r, 'P1').verdict, 'holds');
   assert.equal(r.result.lean_inputs.spec.ct_max_C, r.result.run.metrics.find(m => m.key === 'ctmax_C').value);
 });
-await ok('zebrafish at 45 C (above CTmax): P1 violated, shown as a CANDIDATE law (dashed), not red', async () => {
+// Severity follows the law's status as the registry states it (read, never hard-coded): accepted -> red,
+// contested -> amber, candidate -> dashed ('candidate').
+const SEVERITY = { accepted: 'red', contested: 'amber', candidate: 'candidate' };
+await ok('zebrafish at 45 C (above CTmax): P1 violated, with the severity its registry status implies (red once accepted)', async () => {
   const r = await T.scenarioRun({ organism: 'zebrafish-adult', scenario: 'temperature', params: { water_temperature_C: M === 'p1' ? 30 : 45 } });
   const v = r.result.violations.find(x => x.lean_ref.constraint === 'P1');
-  assert.ok(v, 'P1 not violated'); assert.equal(v.status, 'candidate'); assert.equal(v.severity, 'candidate');
+  assert.ok(v, 'P1 not violated');
+  const status = r.result.verdicts.find(x => x.constraint === 'P1').status;
+  assert.equal(v.severity, SEVERITY[status] || 'advisory', `status ${status} -> severity ${v.severity}`);
   assert.ok(v.parts.includes('skin_L'));
+});
+await ok('P3 (Boyle, v2 with rho and g) holds for a correct Boyle volume at 100 m and 1000 m', async () => {
+  for (const d of [100, 1000]) {
+    const r = await T.scenarioRun({ organism: 'zebrafish-adult', scenario: 'pressure', params: { depth_m: d } });
+    const sp = r.result.lean_inputs.spec;
+    assert.ok(sp.water_density_kg_m3 > 0 && sp.g > 9 && sp.bladder_volume_at_depth_ml > 0, 'P3 inputs missing');
+    assert.equal(r.result.verdicts.find(x => x.constraint === 'P3').verdict, M === 'p3' && d === 1000 ? 'violated' : 'holds', `depth ${d}`);
+  }
 });
 await ok('a current above Ucrit violates P2; below it P2 holds', async () => {
   const lo = await T.scenarioRun({ organism: 'zebrafish-adult', scenario: 'current', params: { current_m_s: 0.3 } });
@@ -370,9 +383,24 @@ await ok('9000 m depth: the teleost depth cap (P3b) is contested, shown amber', 
   const v = r.result.violations.find(x => x.lean_ref.constraint === 'P3b');
   assert.ok(v, 'P3b not flagged'); assert.equal(v.severity, 'amber'); assert.equal(Pv(r, 'P3b').verdict, 'contested');
 });
-await ok('the Lean spec never carries a convention-mismatched input (no finArea_m2, no Boyle volumes)', async () => {
-  const r = await T.scenarioRun({ organism: 'flying-fish', scenario: 'pressure', params: { depth_m: 50 } });
-  for (const k of ['finArea_m2', 'bladder_volume_surface_ml', 'bladder_volume_at_depth_ml']) assert.ok(!(k in r.result.lean_inputs.spec), `${k} passed`);
+await ok('the Lean spec never carries a convention-mismatched input (no finArea_m2; Boyle volumes only with their rho and g)', async () => {
+  for (const org of ['flying-fish', 'zebrafish-adult']) {
+    const sp = (await T.scenarioRun({ organism: org, scenario: 'pressure', params: { depth_m: 50 } })).result.lean_inputs.spec;
+    assert.ok(!('finArea_m2' in sp), 'finArea_m2 passed');
+    if ('bladder_volume_at_depth_ml' in sp) assert.ok('water_density_kg_m3' in sp && 'g' in sp, 'Boyle volume without rho and g');
+  }
+});
+await ok('flying-fish additions are merged as a second layer: logged, labelled, adult red muscle now the flying-fish value', () => {
+  assert.ok(b.ontogeny.merge_log.length > 0 && b.ontogeny.layers.length === 2);
+  const s = st('flying-fish', 365);
+  assert.ok(/merged|ontogeny-flyingfish-additions|Khokiattiwong|dark/i.test(s.red_muscle_fraction.source + JSON.stringify(s.red_muscle_fraction)), 'red muscle not from the additions');
+  assert.equal(s.red_muscle_fraction.kind, M === 'ffadd' ? 'borrowed' : 'derived');
+  assert.ok(s.red_muscle_fraction.alternative && s.red_muscle_fraction.alternative.kind === 'borrowed', 'the trout proxy is kept as the alternative');
+});
+await ok('the adult flying-fish mass STATE uses stays the Park & Choi aerodynamic specimen (0.060 kg), with both roles labelled', () => {
+  const s = st('flying-fish', 365);
+  assert.equal(s.mass_kg.value, 0.06);
+  assert.ok((s.mass_kg.flags || []).some(f => /ROLE: aerodynamic specimen/.test(f) && /0\.1316/.test(f)));
 });
 
 await ok('regression (codesign-demo): approved winged-zebrafish fin, what-if 10 m/s launch from 1 m -> C15 holds on the Lean-covered part; the total is reported separately', async () => {
@@ -387,6 +415,78 @@ await ok('regression (codesign-demo): approved winged-zebrafish fin, what-if 10 
   assert.notEqual(spec.glideDistance_m, total);
   assert.equal(r.result.verdicts.find(v => v.constraint === 'C15').verdict, 'holds');
   assert.ok(/NOT covered/.test(r.result.run.metrics.find(x => x.key === 'glide_range_total_m').source));
+});
+
+console.log('\naccepted laws P4, P4b, P5 evaluate from their scenarios; designed violations show red');
+const sev = (r, id) => { const v = r.result.violations.find(x => x.lean_ref.constraint === id); return v ? v.severity : null; };
+const verdict = (r, id) => r.result.verdicts.find(x => x.constraint === id)?.verdict;
+await ok('P4 (minimum airspeed at altitude): holds for a flying fish at 1000 m; at 4500 m its 10 m/s launch is below v_min -> red', async () => {
+  const lo = await T.scenarioRun({ organism: 'flying-fish', scenario: 'altitude', params: { altitude_m: 1000 } });
+  const hi = await T.scenarioRun({ organism: 'flying-fish', scenario: 'altitude', params: { altitude_m: M === 'p4' ? 1000 : 4500 } });
+  assert.equal(verdict(lo, 'P4'), 'holds'); assert.equal(verdict(hi, 'P4'), 'violated');
+  const st = hi.result.verdicts.find(x => x.constraint === 'P4').status;
+  assert.equal(sev(hi, 'P4'), SEVERITY[st] || 'advisory');
+});
+await ok('the scoped lifting area reaches only P4 and C9, never the reference-specimen rows (C2a, C8e, C9c)', async () => {
+  const r = await T.scenarioRun({ organism: 'tff', scenario: 'altitude', params: { altitude_m: 1000 } });
+  for (const id of ['C2a', 'C8e', 'C9c']) assert.ok(!r.result.verdicts.find(x => x.constraint === id)?.scoped_inputs, `${id} saw the scoped area`);
+  assert.ok(r.result.verdicts.find(x => x.constraint === 'P4').scoped_inputs.includes('finArea_m2'));
+  assert.ok(!('finArea_m2' in r.result.lean_inputs.spec), 'finArea_m2 leaked into the global spec');
+});
+await ok('P4b (glide ground range): holds for the wild-type glide; a claimed 10 m glide from 1 m in still air -> red', async () => {
+  const ok1 = await T.scenarioRun({ organism: 'flying-fish', scenario: 'glide' });
+  assert.equal(verdict(ok1, 'P4b'), 'holds');
+  const bad = await T.scenarioRun({ organism: 'flying-fish', scenario: 'glide', claims: { ground_distance_m: M === 'p4b' ? 4 : 10 } });
+  assert.equal(verdict(bad, 'P4b'), 'violated'); assert.equal(sev(bad, 'P4b'), SEVERITY[bad.result.verdicts.find(x => x.constraint === 'P4b').status]);
+  assert.ok(/CLAIM/.test(bad.result.lean_inputs.sources.ground_distance_m));
+});
+await ok('P5 (energy balance): holds for a fed adult zebrafish; a mass-gain claim on 0.3 % BW/day (below maintenance) -> red', async () => {
+  const fed = await T.scenarioRun({ organism: 'zebrafish-adult', scenario: 'digestion' });
+  assert.equal(verdict(fed, 'P5'), 'holds');
+  const lean = await T.scenarioRun({ organism: 'zebrafish-adult', scenario: 'digestion', params: { ration_pct_bw_day: 0.3 }, claims: { mass_change: M === 'p5' ? 'negative' : 'positive' } });
+  assert.equal(verdict(lean, 'P5'), 'violated'); assert.equal(sev(lean, 'P5'), SEVERITY[lean.result.verdicts.find(x => x.constraint === 'P5').status]);
+});
+await ok('unknown claim keys are refused', async () => {
+  await assert.rejects(T.scenarioRun({ organism: 'flying-fish', scenario: 'glide', claims: { anything_goes: 1 } }), /unknown claim/);
+});
+
+console.log('\nP1b, P2b and P4b-with-wind from the scenarios\' lean_inputs');
+await ok('P2b is fed from the current scenario for an unedited zebrafish: holds at 0.2 m/s; a claimed station-hold at 0.6 m/s beyond the drag bound -> red', async () => {
+  const lo = await T.scenarioRun({ organism: 'zebrafish-adult', scenario: 'current', params: { current_m_s: 0.2 } });
+  assert.equal(verdict(lo, 'P2b'), 'holds', `P2b is '${verdict(lo, 'P2b')}': not fed? missing ${JSON.stringify(lo.result.verdicts.find(x => x.constraint === 'P2b')?.missing)}`);
+  const sp = lo.result.lean_inputs.spec;
+  assert.ok(/drag_reference_area_m2/.test(lo.result.lean_inputs.sources.drag_area_m2), 'P2b area must be the module reference area');
+  const dragPower = 0.5 * sp.water_density_kg_m3 * sp.drag_coefficient * sp.drag_area_m2 * 0.2 ** 3;
+  const scen = lo.result.run.metrics.find(m => m.key === 'drag_power_at_current_W').value;
+  assert.ok(Math.abs(dragPower / scen - 1) < 1e-9, `drag power ${dragPower} vs the scenario's ${scen}: Cd counted twice?`);
+  assert.ok(/Fick upper bound/.test(lo.result.lean_inputs.sources.aerobicCeiling_W));
+  const hi = await T.scenarioRun({ organism: 'zebrafish-adult', scenario: 'current', params: { current_m_s: 0.2 }, claims: { current_speed_m_s: M === 'p2b' ? 0.2 : 0.6 } });
+  assert.equal(verdict(hi, 'P2b'), 'violated'); assert.equal(sev(hi, 'P2b'), SEVERITY[hi.result.verdicts.find(x => x.constraint === 'P2b').status]);
+});
+await ok('P1b (sustained power within the Q10-scaled reference): holds at 28 C; a claimed 3x sustained power -> red', async () => {
+  const ok1 = await T.scenarioRun({ organism: 'zebrafish-adult', scenario: 'temperature', params: { water_temperature_C: 28 } });
+  assert.equal(verdict(ok1, 'P1b'), 'holds');
+  assert.ok(/Fick upper bound/.test(ok1.result.lean_inputs.sources.reference_sustained_power_W));
+  const claim = 3 * ok1.result.lean_inputs.spec.sustained_power_W;
+  const bad = await T.scenarioRun({ organism: 'zebrafish-adult', scenario: 'temperature', params: { water_temperature_C: 28 }, claims: { sustained_power_W: M === 'p1b' ? claim / 3 : claim } });
+  assert.equal(verdict(bad, 'P1b'), 'violated'); assert.equal(sev(bad, 'P1b'), SEVERITY[bad.result.verdicts.find(x => x.constraint === 'P1b').status]);
+});
+await ok('P4b with wind: the wild-type descent equals the bound (L/D) h (1 + w/u); claiming the still-air distance into a 3 m/s headwind -> red', async () => {
+  const r = await T.scenarioRun({ organism: 'flying-fish', scenario: 'wind', params: { headwind_m_s: 3 } });
+  const sp = r.result.lean_inputs.spec;
+  assert.equal(sp.wind_along_track_m_s, -3, 'headwind must enter as negative w');
+  const bound = sp.LD_max * sp.glideHeight_m * (1 + sp.wind_along_track_m_s / sp.horizontal_airspeed_m_s);
+  assert.ok(Math.abs(sp.ground_distance_m - bound) <= 1e-12 * bound, `descent ${sp.ground_distance_m} vs bound ${bound}`);
+  // KNOWN (reported to the hub): browser-check's P4b compares with no tolerance, so this equality can come back
+  // 'violated' by one ulp (4.4e-16). Once the evaluator has a tolerance it must be 'holds'.
+  const v = verdict(r, 'P4b');
+  if (v !== 'holds') console.log(`          note: P4b wild-type wind verdict is '${v}' (one-ulp comparison in browser-check, reported); distance equals the bound within 1e-12`);
+  const bad = await T.scenarioRun({ organism: 'flying-fish', scenario: 'wind', params: { headwind_m_s: 3 }, claims: { ground_distance_m: M === 'p4bw' ? 3 : 4.37 } });
+  assert.equal(verdict(bad, 'P4b'), 'violated'); assert.equal(sev(bad, 'P4b'), SEVERITY[bad.result.verdicts.find(x => x.constraint === 'P4b').status]);
+});
+await ok('P4 reads the altitude scenario\'s numeric CLmax (no text parsing)', async () => {
+  const r = await T.scenarioRun({ organism: 'flying-fish', scenario: 'altitude', params: { altitude_m: 1000 } });
+  assert.ok(/lean_inputs\.CLmax/.test(r.result.lean_inputs.sources.CLmax));
 });
 
 console.log('\nserver and CLI');

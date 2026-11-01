@@ -27,12 +27,31 @@ export const LIFT_OVER_PECTORAL = 0.012688 / 0.006377;
 // Fick aerobic bound; constants as in physics/flier/tff/design.py and the physiology chain.
 export const FICK = {
   eta: { value: 0.15, kind: 'borrowed', source: 'gamperl2021 via physiology/muscle.js: ventricular muscle efficiency ~15% in Atlantic salmon (no fetched value for fish skeletal muscle)' },
-  E_J_per_ml: { value: 13.54 / 0.7, kind: 'measured-secondhand', source: 'oxycalorific 13.54 J/mg O2 (gerry2014, quoting its ref. 89; measured-secondhand) / 0.7 mg O2 per ml (STPD; a standard unit conversion) = 19.34 J/ml; physiology/muscle.js' },
-  Qmax_ml_min_kg: { value: 58.48, kind: 'borrowed', source: 'durnford2026 Table 1 (schoolmaster snapper, Ucrit group, 28 degC) maximum cardiac output 58.48 ml/min/kg (physiology/cardiac.js), x body mass. Lean C14 and physics/flier/tff/design.py use 0.0656 ml/s for 0.06 kg (65.6 ml/min/kg) instead' },
+  E_J_per_ml: { value: 13.54 / 0.7, kind: 'measured-secondhand', source: 'oxycalorific 13.54 J/mg O2 (gerry2014, quoting its ref. 89; measured-secondhand) / 0.7 ml O2 per mg (1.429 mg/ml, STPD; a standard unit conversion) = 19.34 J/ml; physiology/muscle.js' },
+  Qmax_ml_min_kg: { value: 58.48, kind: 'borrowed', source: 'FALLBACK for species with no measured MO2max (it underestimates small cyprinids about 3x: physics/FICK-CEILING-CHECK.md). durnford2026 Table 1 (schoolmaster snapper, Ucrit group, 28 degC) maximum cardiac output 58.48 ml/min/kg (physiology/cardiac.js), x body mass. Lean C14 and physics/flier/tff/design.py use 0.0656 ml/s for 0.06 kg (65.6 ml/min/kg) instead' },
   hb_cap_ml_ml: { value: 0.206, kind: 'calibrated', source: 'physiology/index.js warmHbCapacity: set so the snapper maximal O2 extraction (durnford2026) fits the trout Hill curve. Calibrated, not measured' },
   P50_kPa: { value: 24.8 / 7.50062, kind: 'borrowed', source: 'rummer2015 Table 1: rainbow trout P50 24.8 mmHg (borrowed) / 7.50062 mmHg per kPa (standard unit conversion)' },
   n_H: { value: 1.34, kind: 'borrowed', source: 'rummer2015 Results text: rainbow trout Hill n 1.34 (Table 1 shows 1.3 +/- 0.1)' },
 };
+// Measured maximal O2 uptake (MO2max), used in place of the Fick product Q Ca where a species has one.
+// Ceiling = eta x 13.54 J/mg x MO2max x mass. physics/FICK-CEILING-CHECK.md: the snapper-Q Fick bound (950 mg O2/kg/h for
+// the zebrafish fixture) lies below the measured zebrafish MO2 at Ucrit (2630) and even its SMR (1401).
+export const OXY_J_PER_MG = { value: 13.54, kind: 'measured-secondhand', source: 'gerry2014 (Fig. 1 legend): oxycaloric value 13.54 J/mg O2, citing their ref. 89; physiology/muscle.js' };
+export const MO2MAX = {
+  zebrafish: { re: /danio rerio|zebrafish/i, value_mg_kg_h: 2630, T_C: 28, mass_kg: 0.00043, kind: 'measured', source: 'Palstra AP, Tudorache C, Rovira M, et al. (2010) Establishing zebrafish as a novel exercise model. PLoS One 5:e14483, doi:10.1371/journal.pone.0014483, PMC3013094, Results "Swimming economy": maximal O2 consumption at Ucrit 82.18 +/- 6.50 umol g-1 h-1 (= 2630 mg O2 kg-1 h-1); wild-type adults 3.05 cm BL, 0.43 g, 28 degC, n = 10 (Methods)' },
+};
+export const MO2_SCALING = { mass_exponent: -0.15, Q10: 2, kind: 'assumed', source: 'mass-specific MO2max exponent -0.15 and Q10 2 (assumed; physics/FICK-CEILING-CHECK.md section 3 brackets -0.1 to -0.2 and 2 to 2.5)' };
+/** Aerobic mechanical ceiling from a measured MO2max, scaled to this mass and temperature; null if the species has none. */
+export function measuredAerobicCeiling(species, mass_kg, T_C) {
+  const r = Object.values(MO2MAX).find(x => x.re.test(String(species || '')));
+  if (!r || !(mass_kg > 0)) return null;
+  const T = T_C ?? r.T_C;
+  const factor = (mass_kg / r.mass_kg) ** MO2_SCALING.mass_exponent * MO2_SCALING.Q10 ** ((T - r.T_C) / 10);
+  const mo2 = r.value_mg_kg_h * factor;
+  const P = mo2_ => FICK.eta.value * OXY_J_PER_MG.value * mo2_ * mass_kg / 3600;
+  return { P_W: P(mo2), P_W_unscaled: P(r.value_mg_kg_h), MO2max_mg_kg_h: mo2, MO2max_measured_mg_kg_h: r.value_mg_kg_h, factor, T_C: T, kind: 'derived', measured_kind: r.kind,
+    source: `eta ${FICK.eta.value} (borrowed) x ${OXY_J_PER_MG.value} J/mg x MO2max ${mo2.toFixed(0)} mg O2/kg/h x mass: MO2max measured ${r.value_mg_kg_h} mg/kg/h at ${r.T_C} degC, ${r.mass_kg * 1000} g (${r.source}), scaled x ${factor.toFixed(3)} to ${(mass_kg * 1000).toPrecision(4)} g and ${T} degC (${MO2_SCALING.source}); unscaled ceiling ${P(r.value_mg_kg_h).toExponential(3)} W` };
+}
 export const hillSat = (P, P50, n) => (P > 0 ? P ** n / (P ** n + P50 ** n) : 0);
 
 // Breakpoints 0.33 / 0.86 / 0.97: physics/ground-effect.json (park-choi-2010, Results 'Ground effect', model L3 over water).
@@ -96,9 +115,11 @@ export const nullMetrics = (defs, why) => defs.map(d => metric(d.key, d.label, n
 
 /** Lifting (aerodynamic reference) area: state lifting_area_m2 if present (field listed in `needs`), else
  *  pectoral_area_both x 1.98965 (assumed transfer). */
+// STATE lifting_area_m2, when present, is pectoral + pelvic + caudal membrane area measured on the mesh (core lib/state.mjs),
+// NOT Park & Choi's pectoral + pelvic + body-planform reference area: a convention difference this module does not correct.
 export function liftingArea(state) {
   const direct = (state && (state.lifting_area_m2 || (state.parts && state.parts.lifting_area_m2))) || null;
-  if (direct && direct.value != null) return { value: direct.value, kind: direct.kind || 'derived', source: direct.source || 'state lifting_area_m2' };
+  if (direct && direct.value != null) return { value: direct.value, kind: direct.kind || 'derived', source: `${direct.source || 'state lifting_area_m2'} (pectoral + pelvic + caudal on the mesh; Park & Choi's reference area uses body planform instead of caudal)` };
   const pa = val(state, 'pectoral_area_both_m2');
   if (pa == null) return { value: null, kind: 'assumed', source: 'none', reason: 'no pectoral_area_both_m2 and no lifting_area_m2 in the state' };
   return { value: pa * LIFT_OVER_PECTORAL, kind: 'assumed', source: `pectoral_area_both_m2 (${state.pectoral_area_both_m2.kind}) x ${LIFT_OVER_PECTORAL.toFixed(5)}, the Park & Choi L3 total/pectoral area ratio (NOTES-FOR-HUB.md item 3): an assumed transfer` };
@@ -126,6 +147,20 @@ export function polarOf(state) {
 // physics/prior-art/raw/pdf-takahashi-2013.txt). Below adult size the 30 BL/s upper end is used. Zebrafish: the
 // maximum swimming speed Umax = 1.15 Ucrit from current.mjs (calibrated). No other species has a value.
 const FF_RE = /exocoet|flying fish|cypselurus|hirundichthys|cheilopogon/i;
+// Taxi phase (adult flying fish). Sources, all fetched (physics/prior-art/raw):
+//  - leap: "approached and leaped from the water surface at approximately 10 m s-1" (makiguchi-2013 Discussion,
+//    citing Davenport 1994);
+//  - taxi end: taxiing "can probably accelerate the flying fish to a speed up to 15 - 20 m s-1 (Davenport 1994)"
+//    (Deng, Wang, Zhang, Mao 2019 bioRxiv 10.1101/765560, Introduction); flying fish "glide for up to 50 m ... at an
+//    air speed of 15 to 20 m s-1" (makiguchi-2013 Introduction citing Edgerton & Breder 1941 and Davenport 1990);
+//    "they use this taxiing to gain additional speed for successive gliding flights" (park-choi-2010 Introduction).
+//  - taxi length: average 9 m for cypselurid flying fish (deng-2019 Bioinspir Biomim Introduction, second-hand).
+// Not modelled mechanistically: the taxi power (Deng 2019 preprint CFD: 36 W at 10 m/s, 350 W to reach 16.5 m/s, a
+// model result) is burst/anaerobic and is NOT checked against this animal's muscle.
+export const LEAP_M_S = 10;
+export const TAXI_END_M_S = 15;
+export const TAXI_MAX_M_S = 20;
+const TAXI_SRC = 'adult flying fish: leap at ~10 m/s (makiguchi-2013 citing Davenport 1994), then taxi to take-off; take-off airspeed = 15 m/s, the LOWER end of the 15-20 m/s taxi-end / glide airspeed range (Davenport 1994 as quoted by Deng et al. 2019 bioRxiv https://doi.org/10.1101/765560; Edgerton & Breder 1941 as quoted by makiguchi-2013 https://doi.org/10.3354/ab00494). Family-level, second-hand; the taxi power is not checked';
 const ZF_RE = /danio rerio|zebrafish/i;
 export function organismLaunchSpeed(state) {
   const sp = String(val(state, 'species') || '');
@@ -137,9 +172,11 @@ export function organismLaunchSpeed(state) {
     // reference flying fish that is 'adult' from ~250 days after hatching (SL >= ~0.187 m). Adults take the measured
     // ~10 m/s leap speed; earlier stages scale 30 BL/s x SL (no leap speed is measured for them).
     const adult = /adult/i.test(String(val(state, 'stage') || ''));
-    const v = adult ? 10 : Math.min(10, 30 * SL);
-    const big = SL >= 0.33; // 10 m/s = 20-30 BL/s implies fish of 0.33-0.5 m
-    return { value: v, kind: adult && big ? 'measured-secondhand' : 'borrowed', source: adult ? `flying-fish leap speed ~10 m/s (makiguchi-2013 citing Davenport 1994, stroboscopic film; https://doi.org/10.3354/ab00494)${big ? '' : `; borrowed for this ${(SL * 1000).toFixed(0)} mm adult: the quoted 20-30 BL/s implies 0.33-0.5 m fish`}` : `30 BL/s x SL ${(SL * 1000).toFixed(0)} mm, capped at 10 m/s (upper end of the adult 20-30 BL/s leap speed, makiguchi-2013 citing Davenport 1994), borrowed for a non-adult stage` };
+    // Adults: leap at ~10 m/s, then TAXI (caudal lower lobe beating in the water, body airborne) up to the take-off
+    // airspeed. Taxi end speed = TAXI_END_M_S (15 m/s, the LOWER end of the measured 15-20 m/s range), never above 20.
+    if (adult) return { value: TAXI_END_M_S, kind: 'measured-secondhand', taxi: { leap_m_s: LEAP_M_S, end_m_s: TAXI_END_M_S, max_m_s: TAXI_MAX_M_S }, source: TAXI_SRC };
+    const v = Math.min(LEAP_M_S, 30 * SL);
+    return { value: v, kind: 'borrowed', source: `30 BL/s x SL ${(SL * 1000).toFixed(0)} mm, capped at the 10 m/s adult leap speed (makiguchi-2013 citing Davenport 1994: ~10 m/s, 20-30 BL/s), borrowed for a non-adult stage; no taxiing speed is measured for juveniles, so none is added` };
   }
   if (ZF_RE.test(sp)) {
     const age = val(state, 'ageDays');
@@ -188,7 +225,7 @@ const METRICS = [
 ];
 
 export const needs = [
-  { field: 'lifting_area_m2', why: "aerodynamic reference area (pectoral + pelvic + body planform, Park & Choi convention). Absent, the pectoral area x 1.98965 (one specimen's ratio) is used and labelled assumed." },
+  { field: 'lifting_area_m2', why: "aerodynamic lifting area. The core STATE supplies pectoral + pelvic + caudal membrane area measured on the design mesh (not the body outline); Park & Choi's own reference area is pectoral + pelvic + body planform, so the two conventions differ by the caudal-vs-body term. Absent, the pectoral area x 1.98965 (one specimen's ratio) is used and labelled assumed." },
   { field: 'cardiac_output_max_ml_s', why: 'Q for the Fick bound. Absent, snapper Q_max 58.48 ml/min/kg x mass is borrowed.' },
   { field: 'launch_speed_m_s', why: 'a sourced leap/burst speed for any species other than flying fish and zebrafish (and for blends). Absent, the glide is not evaluated (null), never defaulted.' },
 ];
@@ -240,6 +277,11 @@ export default {
     const Preq = (W * gp.vmin) / PARK_CHOI.LD_max;
     const Qs = val(state, 'cardiac_output_max_ml_s');
     const fk = fickPower({ mass_kg: m, pO2_kPa: po2.value, P50_kPa: P50, Q_ml_s: Qs });
+    // A species with a measured MO2max (zebrafish) uses it (measured in water: a generous bound for air, where gills do not ventilate);
+    // others keep the Fick product with the snapper-Q fallback, labelled.
+    const mc = measuredAerobicCeiling(val(state, 'species'), m, val(state, 'temperature_C'));
+    const Pav = mc ? mc.P_W : fk.P_W;
+    if (mc) prov.push({ quantity: 'aerobic ceiling from measured MO2max (W)', value: mc.P_W, kind: mc.kind, source: mc.source });
     prov.push({ quantity: 'cardiac output (ml/s)', value: fk.Q_ml_s, kind: Qs != null ? state.cardiac_output_max_ml_s.kind || 'assumed' : FICK.Qmax_ml_min_kg.kind, source: Qs != null ? state.cardiac_output_max_ml_s.source || 'state' : FICK.Qmax_ml_min_kg.source });
     prov.push({ quantity: 'arterial PO2 = inspired air PO2 (kPa, upper bound)', value: po2.value, kind: po2.kind, source: po2.source });
     const notes = [];
@@ -249,14 +291,21 @@ export default {
     if (m < 0.02 || m > 0.4) { inRange = false; notes.push(`Mass ${m} kg is outside 0.02-0.4 kg (polar specimens 0.04-0.06 kg; field fliers to ~0.4 kg): polar extrapolated.`); }
     if (Re != null && (Re < 5e3 || Re > 1e5)) { inRange = false; notes.push(`Mean-chord Reynolds number ~${Re.toExponential(1)} is outside 5e3-1e5 around the polar's Re ~1e4 (Park & Choi: 'gliding flying fish (Re ~10^4)'; air kinematic viscosity 1.46e-5 m2/s).`); }
     if (S.kind === 'assumed') notes.push("Lifting area is the pectoral area times one specimen's total/pectoral ratio (assumed transfer).");
-    if (FF_RE.test(String(val(state, 'species') || ''))) notes.push('Taxiing (tail sculling with the body airborne), by which real flying fish reach 15-20 m/s airspeed before long glides, is not modelled: the launch speed is the ~10 m/s leap speed.');
+    if (FF_RE.test(String(val(state, 'species') || ''))) notes.push(ls.taxi ? `Adult flying fish: launch airspeed is the taxi end speed (${ls.taxi.end_m_s} m/s, lower end of the measured 15-20 m/s), reached by taxiing after a ~${ls.taxi.leap_m_s} m/s leap; the taxi distance (~9 m, second-hand) is not added to the glide range and the taxi power is not checked.` : 'No taxiing is credited to this stage.');
     notes.push('glide_range_total_m exceeds the Lean bound whenever the kinetic phase is non-zero; only glide_range_lean_bound_m is covered by glide_range_le.');
     notes.push('Fick bound: arterial PO2 taken equal to air PO2 and gills taken to work in air; gills do not ventilate in air (physiology chain), so for a gill-breather this is a generous upper bound.');
     notes.push('TFF: NOTES-FOR-HUB.md item 2 says only 29.5% of the flight muscle the simulator charges fits in the body. This module uses no muscle power (the Fick bound is the cap), so the issue does not enter here; any muscle-based claim for the TFF must take it into account.');
-    const margin = fk.P_W / Preq;
+    const margin = Pav / Preq;
+    // Cross-taxon correction of the snapper-Q Fick fallback (physics/FICK-CEILING-CHECK.md section 5): O2 supply x1.3 to x2.5
+    // (zebrafish MO2max, Palstra 2010, allometric to unscaled) and eta 0.15 to 0.23 (Gladman & Askew 2024): factor 1.3 (low),
+    // 1.4 x 0.19/0.15 = 1.77 (central), 2.5 x 0.23/0.15 = 3.83 (extreme). Applied only where no measured MO2max is used.
+    const CORR = { low: 1.3, central: 1.4 * 0.19 / 0.15, high: 2.5 * 0.23 / 0.15 };
+    const short = margin > 0 && margin < 1 ? 1 / margin : null;
+    const corrected = short != null && !mc ? { high: short / CORR.low, central: short / CORR.central, low: short / CORR.high } : null;
+    if (corrected) notes.push(`Aerobic shortfall for level powered flight: ${short.toFixed(1)}x on the snapper-Q Fick fallback; with cross-taxon corrected O2 supply and efficiency (physics/FICK-CEILING-CHECK.md section 5) about ${corrected.low.toFixed(0)}-${corrected.high.toFixed(0)}x, central ${corrected.central.toFixed(0)}x. Either way an order of magnitude short.`);
     const limiting = !known ? `glide not evaluated: ${ls.reason}`
       : !canGlide ? `cannot glide: the reachable launch speed ${v0.toFixed(2)} m/s is below v_min ${gp.vmin.toFixed(2)} m/s, so lift cannot carry the weight`
-      : margin < 1 ? 'glide only: the aerobic O2 supply cannot pay for level powered flight (Fick bound)' : null;
+      : margin < 1 ? `glide only: the aerobic O2 supply cannot pay for level powered flight (${mc ? 'ceiling from measured MO2max' : 'Fick bound'}; ${corrected ? `about ${corrected.low.toFixed(0)}-${corrected.high.toFixed(0)}x short with corrected O2 supply and efficiency, central ${corrected.central.toFixed(0)}x; ${short.toFixed(0)}x on the snapper-Q fallback` : `${short.toFixed(1)}x short`})` : null;
     const why = known ? null : ls.reason;
     const metrics = [
       metric('glide_range_lean_bound_m', METRICS[0].label, known ? parts.lean : null, 'm', 'higher', 'derived', canGlide ? LEAN_SRC : 'cannot glide: 0', why),
@@ -270,8 +319,8 @@ export default {
       metric('glide_time_s', METRICS[8].label, known ? (canGlide ? gp.time_s : 0) : null, 's', 'higher', 'derived', '(L/D)_eff (v0 - v_min)/g + h (L/D)/v_LD; v_LD uses C_L(0 deg) 0.53 (approximate)', why),
       metric('glide_ratio', METRICS[9].label, PARK_CHOI.LD_max, '1', 'higher', polar.kind, polar.source),
       metric('power_required_W', METRICS[10].label, Preq, 'W', 'lower', 'derived', 'physics/results.json interpretation C formula'),
-      metric('aerobic_power_available_W', METRICS[11].label, fk.P_W, 'W', 'higher', 'derived', `eta E Q Ca, Ca ${fk.Ca_ml_ml.toFixed(4)} ml/ml at PO2 ${po2.value.toFixed(1)} kPa (Hill P50 ${P50.toFixed(2)} kPa, n 1.34), Q ${fk.Q_ml_s.toFixed(4)} ml/s`),
-      metric('powered_flight_margin', METRICS[12].label, margin, '1', 'higher', 'derived', '>= 1 would mean the O2 budget does not forbid level flight (necessary, not sufficient)'),
+      metric('aerobic_power_available_W', METRICS[11].label, Pav, 'W', 'higher', 'derived', mc ? mc.source : `eta E Q Ca, Ca ${fk.Ca_ml_ml.toFixed(4)} ml/ml at PO2 ${po2.value.toFixed(1)} kPa (Hill P50 ${P50.toFixed(2)} kPa, n 1.34), Q ${fk.Q_ml_s.toFixed(4)} ml/s (${Qs != null ? 'STATE' : 'snapper-Q FALLBACK: no measured MO2max for this species; it underestimates small cyprinids about 3x'})`),
+      metric('powered_flight_margin', METRICS[12].label, margin, '1', 'higher', 'derived', '>= 1 would mean the O2 budget does not forbid level flight (necessary, not sufficient)' + (corrected ? `; corrected O2 supply and efficiency raise it about x${CORR.low}-x${CORR.high.toFixed(2)} (central x${CORR.central.toFixed(2)}): shortfall ${corrected.low.toFixed(0)}-${corrected.high.toFixed(0)}x, central ${corrected.central.toFixed(0)}x` : '')),
     ];
     return {
       metrics, survives: null, feasible: canGlide, feasibility_note: limiting, limiting: null, provenance: prov,
@@ -282,7 +331,7 @@ export default {
   modelCard: {
     equations: [
       'W = m g; v_min = sqrt(2 W / (rho S C_Lmax))',
-      "launch speed v0 = the organism's own: flying fish adult 10 m/s, other stages min(10 m/s, 30 BL/s x SL); zebrafish Umax = 1.15 Ucrit; otherwise not evaluated",
+      "launch speed v0 = the organism's own: adult flying fish = taxi end speed 15 m/s (leap ~10 m/s then taxi; lower end of the measured 15-20 m/s); other flying-fish stages min(10 m/s, 30 BL/s x SL), no taxi; zebrafish Umax = 1.15 Ucrit; otherwise not evaluated",
       'cannot glide if v0 < v_min: every range = 0, feasible = false',
       'Lean-covered part: d_lean = h (L/D)max   (glide_range_le: d <= h (L/D)/(1 - delta))',
       'kinetic phase (outside the theorem): x_A = (L/D)_eff (v0^2 - v_min^2)/(2g), (L/D)_eff = (L/D)max / f_ground(h/(b/2))',
@@ -292,7 +341,8 @@ export default {
     sources: [
       { cite: PARK_CHOI.cite, doi_or_url: PARK_CHOI.doi },
       { cite: 'Makiguchi Y et al. (2013). Take-off performance of flying fish Cypselurus heterurus doederleini measured with miniature acceleration data loggers. Aquat Biol 18:105-111 (leap speed ~10 m/s, 20-30 BL/s, citing Davenport 1994; glide up to 50 m at 15-20 m/s citing Edgerton & Breder 1941)', doi_or_url: 'https://doi.org/10.3354/ab00494' },
-      { cite: 'Deng J et al. (2019). Numerical prediction of aerodynamic performance for a flying fish during gliding flight. Bioinspir Biomim 14:046009 (maximum flight height 8 m, second-hand)', doi_or_url: 'https://doi.org/10.1088/1748-3190/ab23e6' },
+      { cite: 'Deng J et al. (2019). Numerical prediction of aerodynamic performance for a flying fish during gliding flight. Bioinspir Biomim 14:046009 (maximum flight height 8 m; average taxiing length 9 m, second-hand)', doi_or_url: 'https://doi.org/10.1088/1748-3190/ab23e6' },
+      { cite: 'Deng J, Wang S, Zhang L, Mao X (2019). Why does a flying fish taxi on sea surface before take-off? A hydrodynamic interpretation. bioRxiv 765560 (taxiing accelerates to 15-20 m/s, citing Davenport 1994)', doi_or_url: 'https://doi.org/10.1101/765560' },
       { cite: 'Durnford FPH, Porter ES, Gamperl AK (2026). Increased heart rate and blood oxygen extraction ... schoolmaster snapper. J Exp Biol', doi_or_url: 'https://doi.org/10.1242/jeb.252059' },
       { cite: 'Rummer JL, Brauner CJ (2015). Root effect haemoglobins in fish ... PLoS One 10:e0139477', doi_or_url: 'https://doi.org/10.1371/journal.pone.0139477' },
       { cite: 'Gerry SP, Ellerby DJ (2014). Resolving shifting patterns of muscle energy use in swimming fish. PLoS One 9:e106030', doi_or_url: 'https://doi.org/10.1371/journal.pone.0106030' },
@@ -300,7 +350,7 @@ export default {
     validity: 'Flying-fish-sized gliders (0.02-0.4 kg), mean-chord Re 5e3-1e5, launch heights 0-10 m. The polar is from stuffed specimens at one wind speed (12 m/s; Park & Choi: Re ~1e4); a zebrafish-sized or larval animal is far outside it (inRange false), and cannot reach its v_min anyway.',
     validatedAgainst: [
       { organism: 'Cypselurus hiraii (Park & Choi model L3)', observation: 'code regression against physics/results.json at rho 1.225', predicted: 'v_min 9.854 m/s, P_req 1.327 W', measured: 'physics/results.json: 9.854 m/s, 1.327 W (same equations: a code check, not a test against nature)', source: 'physics/results.json interpretation_B and interpretation_C' },
-      { organism: 'Exocoetidae (several genera)', observation: 'glides up to 50 m at 15-20 m/s airspeed after taxiing (stroboscopic film, Edgerton & Breder 1941, quoted second-hand)', predicted: "at the organism's own 10 m/s leap speed: Lean part h x 4.37 (35 m from the 8 m maximum height) + kinetic phase under 1 m. 50 m is NOT reached without the taxiing acceleration, which is not modelled. (An earlier version reached 50 m only by setting the launch speed to 15-20 m/s, taken from the same observation: circular, withdrawn.)", measured: 'up to 50 m', source: 'makiguchi-2013 Introduction (https://doi.org/10.3354/ab00494). NOT REPRODUCED at the organism\'s own speed; the gap is the unmodelled taxiing phase' },
+      { organism: 'Exocoetidae (several genera)', observation: 'glides up to 50 m at 15-20 m/s airspeed after taxiing (stroboscopic film, Edgerton & Breder 1941, quoted second-hand)', predicted: 'with the taxi end speed 15 m/s (L3 polar): ~33 m from 1 m (Lean part 4.37 m + kinetic phase ~29 m), ~64 m from the 8 m maximum height', measured: 'up to 50 m', source: 'makiguchi-2013 Introduction (https://doi.org/10.3354/ab00494). Inside the range, but PARTLY CIRCULAR: the 15 m/s take-off speed comes from the same body of observations (15-20 m/s) as the 50 m glide. Not independent evidence.' },
       { organism: 'Cheilopogon (Cypselurus) heterurus doederleini', observation: 'leap speed about 10 m/s (Davenport 1994, stroboscopic, quoted by Makiguchi)', predicted: 'v_min 9.85 m/s (L3): a fish leaving the water at 10 m/s is barely lift-supported, consistent with the taxiing seen before long glides', measured: '~10 m/s', source: 'makiguchi-2013. Consistent; not a pass/fail test' },
     ],
   },

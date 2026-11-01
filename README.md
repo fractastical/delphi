@@ -168,8 +168,9 @@ claims, lean, holdout, swarm, organism, and new threads for genotype–phenotype
 MCP testing, and visualisation ([`dashboard/NEW-THREADS.md`](dashboard/NEW-THREADS.md)).
 
 **What is not established.** No wet-lab work. No claim promoted to a theorem of biology: a Lean proof
-checks the mathematics given its stated assumptions. Flying-fish molecular data comes from proxy species
-(medaka, zebrafish) because almost none exists for Exocoetidae itself. The nanopub records are drafts.
+checks the mathematics given its stated assumptions. Flying-fish functional data (expression, phenotype) comes from proxy species
+(medaka, zebrafish); the flying-fish genome itself is sequenced and annotated (Xu et al. 2021: 23,611 genes, 99.5% with a
+functional annotation), but no flying-fish transcriptome or perturbation data exists. The nanopub records are drafts.
 
 ## Design studio
 

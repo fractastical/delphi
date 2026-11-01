@@ -10,10 +10,12 @@ and its history, never removes its file.
 | path | what |
 |---|---|
 | `lean/registry/laws-registry.schema.json` | JSON Schema (draft 2020-12) for one law file |
-| `lean/registry/laws/<law_id>.json` | one file per law (schema above) |
+| `lean/registry/laws/<law_id>.json` | one file per law, at its CURRENT version (schema above) |
+| `lean/registry/law-versions/<law_id>@<version>.json` | every superseded version of a law, kept so older law sets stay reproducible (`loadLawVersion(id, version)` in registry-lib.mjs) |
 | `lean/registry/lawsets/lawset-<semver>.json` | a law-set release: `{version, created, previous, laws:[{law_id, version, content_hash, status, kind}]}` |
 | `lean/registry/lawsets/current.json` | `{version, file}`: the current law set |
-| `lean/registry/CHANGELOG.md` | one section per law-set release |
+| `lean/registry/CHANGELOG.md` | one section per law-set release (keep the `## <version> (<date>)` heading and `### <Section>` + `- ` bullets: `/api/lean/changes.json`, `changes.xml` and `lean_changes` are parsed from it) |
+| `lean/registry/SELF-UPDATE.md` | how servers follow new lawsets at runtime (remote source, TTL, content-hash integrity), the publish workflow, and a recorded demo |
 | `lean/registry/proposals/<law_id>/` | a proposal: `law.lean`, `meta.json`, and `result.json` written by propose.mjs |
 | `lean/registry/discovered/` | machine-proposed drafts written by discover.mjs (`index.json` + one folder per draft, same shape as a proposal) |
 | `lean/registry/build-registry.mjs` | bootstrap: builds `laws/` and lawset 1.0.0 from lean/laws.json, lean/constraints.json, lean/empirical.json and the Lean modules |
@@ -65,6 +67,16 @@ Hashed fields: `law_id, version, kind, class, lean_ref.module, lean_ref.theorem,
 lean_ref.statement_sha256, statement_en, hypotheses, scope, shared_scope, non_vacuity_witness`. Status,
 approval, history and evidence are NOT hashed: a law changes status without changing what it says. Any edit
 to a hashed field must bump `version`; test.mjs fails if a hash does not match.
+
+## Versions of one law
+
+A change to what a law says (its Lean statement, hypotheses, scope or shared-scope atoms) is a new VERSION of the same
+`law_id`: semver per law, major for a changed statement. The old version's file is copied to
+`law-versions/<law_id>@<old>.json` (with `superseded_by: <law_id>@<new>`), the new file carries
+`supersedes: <law_id>@<old>`, its Lean statement is a NEW declaration (the old one stays compiled), and a new law
+set pins the new version. Example: `perturb-pressure` 1.0.0 (`Delphi.Perturb.closed_bladder_rules_out`, pressure
+`p0 + k d` with the Studio fixing k = 0.1 atm/m) was superseded in law set 1.4.0 by 2.0.0
+(`Delphi.Hydro.closed_bladder_rules_out` in lean/Delphi/Hydrostatics.lean, pressure `p0 + rho g d`).
 
 ## Status lifecycle
 

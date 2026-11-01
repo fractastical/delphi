@@ -56,10 +56,12 @@ const GROUPS = [
     { key: 'deck',     href: 'deck/',           text: 'Pitch deck' },
     { key: 'print',    href: 'print/',          text: 'Printable kit' },
     { key: 'agents',   href: 'studio-api/',     text: 'For agents' },
+    { key: 'swarmb',   href: 'swarm-board/',    text: 'Swarm board' },
     { key: 'evolve',   href: 'evolve/',         text: 'Enzymes' }
   ]},
   { key: 'evidence', label: 'Evidence', items: [
     { key: 'proofs',   href: 'proofs/',         text: 'Claim book' },
+    { key: 'leanbio',  href: 'leanbio/',        text: 'LeanBio repo' },
     { key: 'graph',    href: 'graph/',          text: 'Graph' },
     { key: 'figures',  href: 'figures/',        text: 'Figures' }
   ]},
@@ -76,6 +78,7 @@ const GROUPS = [
   ]},
   { key: 'about', label: 'About', items: [
     { key: 'start',    href: 'start/',          text: 'Start here' },
+    { key: 'record',   href: 'record/',         text: 'Development record' },
     { key: 'home',     href: 'index.html',      text: 'Mission control' }
   ]}
 ];

@@ -87,12 +87,12 @@ fs.writeFileSync(path.join(root, 'dashboard/public/data.json'), JSON.stringify(o
 console.log(`data.json: ${claims.length} claims, ${tests.length} claim tests, ${issues.length} issues, swarm ${swarm ? swarm.mode : 'none'}`);
 
 // ---------------------------------------------------------------------------------------------
-// Species inventory: organisms/merged (built by the collaborators' agents from Darwin and Thompson)
+// Species inventory: test-data/organisms/merged (built by the collaborators' agents from Darwin and Thompson)
 // plus NCBI genome-assembly counts fetched by dashboard/fetch-genomes.mjs (cached, timestamped).
 // ---------------------------------------------------------------------------------------------
 {
-  const taxa = rd('organisms/merged/taxa.json');
-  const mentions = rd('organisms/merged/mentions.json');
+  const taxa = rd('test-data/organisms/merged/taxa.json');
+  const mentions = rd('test-data/organisms/merged/mentions.json');
   const gpath = path.join(root, 'dashboard/genomes.cache.json');
   const genomes = fs.existsSync(gpath) ? JSON.parse(fs.readFileSync(gpath, 'utf8')) : {};
   const claimIds = new Set(claims.map(c => c.id));

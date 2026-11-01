@@ -22,6 +22,9 @@
 //   (d) reachable via the CLI (sim-engine/lean-cli.mjs `law <id>`, and mcp/cli.mjs `laws`)
 //   (e) returned by the hosted server's tools (mcp/server.mjs over stdio: lean_laws_list), and by the sim-engine HTTP
 //       bridge's tool discovery
+//   (f) self-update: every lean_* envelope carries source, lawset_version and fetched_at; lean_changes covers every
+//       lawset; .github/workflows/leanbio-publish.yml republishes the mirror and deploy-mcp.yml's path filters
+//       cover the law sources (lean/registry/SELF-UPDATE.md)
 // and when the static mirror or sim-engine/contract.json is stale relative to the sources (content comparison), or a
 // registered theorem's statement no longer matches its pinned lean_ref.statement_sha256 (drift).
 
@@ -47,6 +50,9 @@ const RULES_OUT_EXEMPT = {
   "Delphi.Constraints.supply_rules_out'": 'variant of supply_rules_out (constraint C3b); same law favored-fixation-lower-bound',
 };
 
+// This check is about the local tree: never let a configured remote law source (LEANBIO_REMOTE) stand in for it.
+process.env.LEANBIO_REMOTE = 'off';
+
 const failures = [];
 const notes = [];
 const fail = (check, item, msg, fix) => failures.push({ check, item, msg, fix });
@@ -70,7 +76,16 @@ for (const c of reg.constraints) {
   if (!cidx[c.id]) fail('a:registry', c.id, `constraint ${c.id} (lean/constraints.json, lemma ${c.lemma}) is backed by no registry law`, `list "${c.id}" in the constraints of its law (lean/registry/laws/<law_id>.json)`);
   for (const n of [c.lemma, c.law]) if (n && !src.findDecl(n, c.module)) fail('a:lean', `${c.id}:${n}`, `constraint ${c.id} names ${n}, which is not declared in any Lean module`, 'fix the name in lean/constraints.json or restore the declaration');
 }
-for (const ls of reg.lawsets) for (const x of ls.laws) if (!ids.has(x.law_id)) fail('a:registry', x.law_id, `lawset ${ls.version} names "${x.law_id}", which has no law file`, 'restore the law file (laws are retired, never deleted)');
+for (const ls of reg.lawsets) for (const x of ls.laws) {
+  if (!ids.has(x.law_id)) fail('a:registry', x.law_id, `lawset ${ls.version} names "${x.law_id}", which has no law file`, 'restore the law file (laws are retired, never deleted)');
+  else if (x.version && !src.lawVersion(x.law_id, x.version)) fail('a:registry', `${x.law_id}@${x.version}`, `lawset ${ls.version} pins ${x.law_id}@${x.version}, which is neither the current law file nor an archived snapshot`, `archive it as lean/registry/law-versions/${x.law_id}@${x.version}.json`);
+}
+// Archived versions (law-versions/<id>@<v>.json) keep older lawsets reproducible: their theorems must still exist,
+// and they count as backing for the lemmas they name (a superseded lemma is not dead code).
+const archived = Object.values(reg.versions || {});
+for (const v of archived) {
+  if (v.lean_ref?.theorem && !src.findDecl(v.lean_ref.theorem, v.lean_ref.module)) fail('a:lean', `${v.law_id}@${v.version}`, `archived ${v.law_id}@${v.version} names ${v.lean_ref.theorem}, no longer in the Lean sources; older lawsets pinning it cannot reproduce`, 'restore the theorem (keep superseded lemmas compiled)');
+}
 for (const l of reg.laws) {
   const ref = l.lean_ref;
   if (ref?.theorem && !src.findDecl(ref.theorem, ref.module)) fail('a:lean', l.law_id, `law ${l.law_id} names theorem ${ref.theorem}, not found in the Lean sources`, 'fix lean_ref.theorem or restore the theorem');
@@ -78,13 +93,13 @@ for (const l of reg.laws) {
 }
 // Pinned statements: a registered theorem whose statement changed without a new law version is drift.
 for (const d of src.verify().drift) fail('drift', d.law_id, `law ${d.law_id}: ${d.status} (${d.decl || d.module})`, d.status === 'drift' ? 'the Lean statement changed: bump the law version and re-pin lean_ref.statement_sha256 (lean/registry), or revert the Lean edit' : 'fix lean_ref in the law file');
-const covered = new Set(reg.laws.map(l => l.lean_ref?.module).filter(Boolean));
+const covered = new Set([...reg.laws, ...archived].map(l => l.lean_ref?.module).filter(Boolean));
 const allModules = src.leanModules({ includeCertificates: false });
 for (const m of allModules) {
   if (INFRASTRUCTURE[m]) continue;
   if (!covered.has(m)) fail('a:lean', m, `Lean module ${m} backs no registry law`, `register its law(s) (${REGFIX.split(',')[0]}), or, if it truly holds no law, add it to INFRASTRUCTURE in lean/registry/check-exposed.mjs with a reason`);
 }
-const constraintLemmas = new Set(reg.constraints.map(c => c.lemma));
+const constraintLemmas = new Set([...reg.constraints.map(c => c.lemma), ...archived.map(v => v.lean_ref?.theorem).filter(Boolean)]);
 const tags = [];
 for (const m of src.leanModules({ includeCertificates: true })) {
   const text = fs.readFileSync(R(m), 'utf8');
@@ -108,6 +123,28 @@ for (const id of ids) {
   catch (e) { fail('b:handler', id, `lean_law_get(${id}) failed: ${e.message}`, 'see lib/lean-source.mjs getLaw'); }
 }
 try { await T.lean_lawset_get.handler({ version: 'current' }); } catch (e) { fail('b:handler', 'lean_lawset_get', e.message, 'lean/registry/lawsets/current.json'); }
+// Self-update: every lean_* envelope says where its laws came from (source, lawset_version, fetched_at), and the
+// status and changes tools answer.
+for (const t of tools.LEAN_TOOLS.filter(t => !t.local && t.name !== 'lean_check')) {
+  try {
+    const args = t.name === 'lean_law_get' ? { id: [...ids][0] } : {};
+    const r = await t.handler(args);
+    for (const k of ['source', 'lawset_version', 'fetched_at']) if (r[k] == null) throw new Error(`envelope has no ${k}`);
+    if (r.lawset_version !== reg.current) throw new Error(`envelope lawset_version ${r.lawset_version} is not the current lawset ${reg.current}`);
+  } catch (e) { fail('b:source', t.name, `${t.name}: ${e.message}`, 'wrap the handler with withSource() in sim-engine/tools/lean-tools.mjs'); }
+}
+try {
+  const c = (await T.lean_changes.handler({})).result;
+  const vs = new Set(c.entries.map(e => e.version));
+  for (const ls of reg.lawsets) if (!vs.has(ls.version)) fail('b:changes', ls.version, `lean_changes has no entry for lawset ${ls.version}`, 'add a "## <version> (<date>)" section to lean/registry/CHANGELOG.md (release.mjs writes one)');
+} catch (e) { fail('b:changes', 'lean_changes', e.message, 'lib/lean-source.mjs getChanges'); }
+// CI self-update: the mirror republishes and the hosted server redeploys when laws change.
+const wf = rel => (has(rel) ? fs.readFileSync(R(rel), 'utf8') : null);
+const pub = wf('.github/workflows/leanbio-publish.yml');
+if (!pub) fail('ci:publish', 'leanbio-publish.yml', '.github/workflows/leanbio-publish.yml is missing: the /api/lean/ mirror would not republish when laws change', 'restore the workflow (lean/registry/SELF-UPDATE.md)');
+else for (const need of ['lean/**', 'build-lean-api.mjs', 'check-exposed.mjs', 'wrangler', 'CLOUDFLARE_API_TOKEN']) if (!pub.includes(need)) fail('ci:publish', need, `leanbio-publish.yml does not mention ${need}`, 'see lean/registry/SELF-UPDATE.md');
+const dep = wf('.github/workflows/deploy-mcp.yml');
+if (dep) for (const need of ['lean/registry/**', 'lib/lean-source.mjs', 'sim-engine/tools/lean-tools.mjs']) if (!dep.includes(`"${need}"`)) fail('ci:deploy-mcp', need, `deploy-mcp.yml path filters do not cover ${need}`, 'add it under on.push.paths');
 try { await T.lean_check.handler({ design: {} }); } catch (e) { fail('b:handler', 'lean_check', e.message, 'lean/eliminate/browser-check.mjs'); }
 
 // ── (c) static mirror ────────────────────────────────────────────────────────
@@ -120,6 +157,7 @@ else {
     if (!inIdx.has(id)) fail('c:mirror', id, `${id} missing from /api/lean/index.json`, 'node dashboard/build-lean-api.mjs');
     if (!has(`dashboard/public/api/lean/laws/${id.replace(/[^A-Za-z0-9._-]/g, '_')}.json`)) fail('c:mirror', id, `/api/lean/laws/${id}.json missing`, 'node dashboard/build-lean-api.mjs');
   }
+  for (const v of archived) if (!has(`dashboard/public/api/lean/laws/${v.law_id}@${v.version}.json`)) fail('c:mirror', `${v.law_id}@${v.version}`, `/api/lean/laws/${v.law_id}@${v.version}.json missing`, 'node dashboard/build-lean-api.mjs');
   const d = mirror.diff();
   if (d.length) fail('stale:mirror', `${d.length} files`, `static mirror is stale relative to the sources: ${d.slice(0, 6).map(x => `${x.file} (${x.why})`).join(', ')}${d.length > 6 ? ', ...' : ''}`, 'node dashboard/build-lean-api.mjs');
 }
@@ -167,7 +205,7 @@ if (!FAST && has('mcp/server.mjs')) {
   try {
     const { Client } = await import(pathToFileURL(R('node_modules/@modelcontextprotocol/sdk/dist/esm/client/index.js')).href);
     const { StdioClientTransport } = await import(pathToFileURL(R('node_modules/@modelcontextprotocol/sdk/dist/esm/client/stdio.js')).href);
-    const env = { ...process.env }; delete env.DELPHI_HTTP_PORT;
+    const env = { ...process.env, LEANBIO_REMOTE: 'off' }; delete env.DELPHI_HTTP_PORT;
     const transport = new StdioClientTransport({ command: process.execPath, args: [R('mcp/server.mjs')], cwd: ROOT, env, stderr: 'pipe' });
     const client = new Client({ name: 'check-exposed', version: '1' });
     await client.connect(transport);
@@ -183,7 +221,7 @@ if (!FAST && has('mcp/server.mjs')) {
 if (has('package.json')) {
   const files = readJson('package.json').files || [];
   const di = has('.dockerignore') ? fs.readFileSync(R('.dockerignore'), 'utf8') : '';
-  for (const need of ['lib/lean-source.mjs', 'lib/lean-scope.mjs', 'sim-engine/tools/lean-tools.mjs', 'sim-engine/lib/envelope.mjs', 'lean/registry', 'lean/laws.json', 'lean/constraints.json', 'lean/eliminate/browser-check.mjs', 'lean/Delphi']) {
+  for (const need of ['lib/lean-source.mjs', 'lib/lean-scope.mjs', 'sim-engine/tools/lean-tools.mjs', 'sim-engine/lib/envelope.mjs', 'lean/registry/laws/', 'lean/registry/lawsets/', 'lean/registry/law-versions/', 'lean/registry/registry-lib.mjs', 'lean/laws.json', 'lean/constraints.json', 'lean/eliminate/browser-check.mjs', 'lean/Delphi']) {
     if (!files.some(f => f === need || f.startsWith(need))) fail('e:package', need, `package.json "files" does not ship ${need}`, 'add it to "files" in package.json');
     if (di && !di.split(/\r?\n/).some(l => l.startsWith('!' + need))) fail('e:package', need, `.dockerignore does not let ${need} into the image`, `add !${need}... to .dockerignore`);
   }

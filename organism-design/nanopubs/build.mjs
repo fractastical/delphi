@@ -207,12 +207,12 @@ const queryKey = text => crypto.createHash('sha256').update('sparql:' + text).di
 // equivalence, derivation or support relation is asserted between the two.
 const MOTIVATION = {
   'a-flying-fish': {
-    source: 'darwin-origin/inputs/pg1228.txt#line=5639,5642',
+    source: 'claim-sources/darwin-origin/inputs/pg1228.txt#line=5639,5642',
     work: 'Charles Darwin, On the Origin of Species by Means of Natural Selection, chapter VI; Project Gutenberg eBook 1228',
     quote:
       'it is conceivable that flying-fish, which now glide far through the air, slightly rising and turning by the aid of their fluttering fins, might have been modified into perfectly winged animals.',
     note:
-      'Motivation by analogy only. Darwin names a hypothetical transition from gliding fish to winged animal; this blueprint lists the anatomy that Uberon and the Cell Ontology record for the living family, at one point in time. It is not evidence for or against the transition, it does not assert that these structures are the ones that would change, and nothing here is equivalent to or derived from the sentence. The mention is already recorded in organisms/merged/taxa.json under key gbif:2968.',
+      'Motivation by analogy only. Darwin names a hypothetical transition from gliding fish to winged animal; this blueprint lists the anatomy that Uberon and the Cell Ontology record for the living family, at one point in time. It is not evidence for or against the transition, it does not assert that these structures are the ones that would change, and nothing here is equivalent to or derived from the sentence. The mention is already recorded in test-data/organisms/merged/taxa.json under key gbif:2968.',
     taxon_identifiers: ['https://www.gbif.org/species/2968', 'http://www.wikidata.org/entity/Q183686'],
   },
 };

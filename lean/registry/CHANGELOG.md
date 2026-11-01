@@ -4,6 +4,48 @@ Newest first. Each release is an immutable file `lawsets/lawset-<version>.json` 
 content hash, status and kind. `lawsets/current.json` names the current one. Laws are never deleted: a retired
 or contested law keeps its file, so a verdict computed against an older law set can be reproduced exactly.
 
+## 1.6.0 (2026-11-01)
+
+E3 1.0.0 -> 2.0.0: the Fick aerobic envelope widened after a measured zebrafish broke it (Palstra et al. 2010, PMC3013094: MO2max at Ucrit 2630 mg O2 kg^-1 h^-1, about 2x the per-kg delivery v1 allowed). v2 bounds eta <= 0.23 (Gladman and Askew 2024) and O2 delivery Q*Ca <= 0.0187 ml O2/s at 0.06 kg (1600 mg O2 kg^-1 h^-1), ceiling 0.0458 -> 0.0833 W, wording rescoped from every teleost to its sources; v1 stays compiled and pinned by law sets 1.0.0-1.5.0, and v2 is proved a weakening of v1 (TeleostAerobic.toV2). Flying-fish powered-flight shortfall: 16x on the new envelope, about 10 to 29x (central about 20x) across corrected inputs, 38x with the original snapper proxies; still ruled out by an order of magnitude. perturb-current 1.1.0 adds a P2b scope assumption (aerobic only below about 0.8 Ucrit; taxon-appropriate ceiling); fick-principle 1.1.0 adds a scope note (taxon-appropriate MO2max or Q). The three new versions carry approval role carried-forward-pending-review: no person has reviewed them yet. Report: physics/FICK-CEILING-CHECK.md.
+
+### Added
+- added `maynardsmith-hitchhiking` 1.0.0 (biological, candidate)
+
+### Changed
+- `E3` 1.0.0 -> 2.0.0
+- `fick-principle` 1.0.0 -> 1.1.0
+- `perturb-current` 1.0.0 -> 1.1.0
+
+## Checker note (2026-11-01, no law set change)
+
+Floating-point tolerance in lean/eliminate/browser-check.mjs (generator and fragments), not a law change: no law
+version, hash or status changed, and law set 1.5.0 stands. A correct unpowered glide in a 3 m/s headwind was red
+on P4b because the distance and the bound, the same formula in a different operation order, differed by one ulp
+(3.1678027110201326 vs 3.167802711020132). Every comparison of a design value against a COMPUTED bound now uses
+a relative tolerance of 1e-9 of the larger magnitude (`leTol`, `geTol`, exported `REL_TOL`; sign-safe for
+negative bounds such as a climb bound). That covers C9, C15, C16, C14, C8c, the scaling bands (C7b, C2a, C8e,
+C9c), P1b, P2b, P3, P4, P4b, P5, E2, E3, E4, G4 and G5. Comparisons of raw inputs with fixed constants (P1
+window, P2 U_crit, P3b depth cap, E5) and integer comparisons (G1, G3, E7) stay exact. A design 0.1 percent over
+a bound is still red.
+
+## 1.5.0 (2026-11-01)
+
+Five perturbation laws promoted from candidate to accepted by human approval (approved_by_role human:project-lead, 2026-11-01: approved by the project lead in the hub session after review of sources and mutation results): perturb-thermal (P1, P1b), perturb-current (P2, P2b), perturb-isa-vmin (P4), perturb-wind-glide (P4b), perturb-energy-balance (P5). Their violations are now red. Not approved and unchanged: perturb-pressure 2.0.0 (candidate) and perturb-depth-cap (contested).
+
+### Status
+- `perturb-current` candidate -> accepted
+- `perturb-energy-balance` candidate -> accepted
+- `perturb-isa-vmin` candidate -> accepted
+- `perturb-thermal` candidate -> accepted
+- `perturb-wind-glide` candidate -> accepted
+
+## 1.4.0 (2026-11-01)
+
+perturb-pressure 1.0.0 -> 2.0.0: Boyle's law for a closed swim bladder now takes pressure from the water column, P(d) = p0 + rho g d, with p0, rho and g as named hypotheses (Delphi.Hydro.WaterColumn, lean/Delphi/Hydrostatics.lean). Version 1.0.0 fixed the gradient at 1 atm per 10 m; in sea water (1025 kg/m^3) the real gradient is 10053 Pa/m, below 10132.5, so v1 called a correct Boyle volume violated by 0.5 to 1 percent. The v1 case is the instance oneAtmPer10m. v1 is superseded, not deleted: law-versions/perturb-pressure@1.0.0.json, and its Lean statement stays compiled. Constraint P3 now uses Delphi.Hydro.closed_bladder_rules_out; 4 new statement mutants are rejected (61/61 overall, 19/19 controls).
+
+### Changed
+- `perturb-pressure` 1.0.0 -> 2.0.0
+
 ## 1.3.0 (2026-11-01)
 
 perturb-depth-cap stays contested, now with the contradiction compiled in Lean (lean/registry/lean/P3bContested.lean: OsmolyteDepthCap applied to a teleost at 8336 m proves False, standard axioms only; the same statement at 8100 m is rejected) and the observation's PMID 41822858 and primary DOI 10.1016/j.dsr.2023.104132 recorded. The law and the observation are both kept. No law version or hash changed.

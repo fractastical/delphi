@@ -6,7 +6,7 @@
 //   node holdout/make-split.mjs --verify          # recompute and compare with CHECKSUMS.json (exit 1 on any change)
 //   node holdout/make-split.mjs --clade Mammalia  # size an alternative clade (writes to holdout/alt/<clade>/)
 //
-// Inputs (read only): organisms/merged/taxa.json, organisms/merged/datasets.json,
+// Inputs (read only): test-data/organisms/merged/taxa.json, test-data/organisms/merged/datasets.json,
 //                     dashboard/genomes.cache.json, docs/claims.json
 import fs from 'node:fs';
 import path from 'node:path';
@@ -72,7 +72,7 @@ const clade = CLADES[cladeName];
 if (!clade) { console.error(`unknown clade ${cladeName}; known: ${Object.keys(CLADES).join(', ')}`); process.exit(2); }
 const outDir = cladeName === DEFAULT_CLADE ? path.join(root, 'holdout') : path.join(root, 'holdout', 'alt', cladeName);
 
-const INPUTS = ['organisms/merged/taxa.json', 'organisms/merged/datasets.json', 'dashboard/genomes.cache.json', 'docs/claims.json'];
+const INPUTS = ['test-data/organisms/merged/taxa.json', 'test-data/organisms/merged/datasets.json', 'dashboard/genomes.cache.json', 'docs/claims.json'];
 const sha256 = buf => crypto.createHash('sha256').update(buf).digest('hex');
 const readRaw = p => fs.readFileSync(path.join(root, p));
 const rd = p => JSON.parse(readRaw(p).toString('utf8'));

@@ -13,9 +13,12 @@ import { DATA_KINDS as TEST_DATA_KINDS, TEST_VIEWS, VERDICTS as TEST_VERDICTS, c
 import { AXIS_IDS, GROUP_KEYS as ORG_GROUP_KEYS, SORT_KEYS as ORG_SORT_KEYS, browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
 import { MORPHOLIB_VIEWS, REGISTRIES, RELATIONS, morpholibTool } from "./morpholib.mjs";
 import { LEAN_TOOLS } from "../sim-engine/tools/lean-tools.mjs";
+import { LEANBIO_TOOLS } from "../pipeline/leanbio/tools.mjs";
+import { OMICS_TOOLS } from "../sim-engine/tools/omics-tools.mjs";
+import { VALIDATE_TOOLS } from "../sim-engine/tools/validate-tools.mjs";
 
 const TOOLS = [];
-export const VERSION = "0.4.0";
+export const VERSION = "0.6.1";
 // Hosted (HTTP) mode never offers tools that run a Lean build or write files.
 const HOSTED = !!process.env.DELPHI_HTTP_PORT;
 
@@ -328,7 +331,10 @@ leanTool("lean_laws_list", {
   lawset: z.string().optional().describe("Only laws in this lawset version, or \"current\""),
   text: z.string().optional().describe("Substring of law_id, label or statement"),
 });
-leanTool("lean_law_get", { id: z.string().describe("law_id from lean_laws_list, e.g. \"kimura-substitution-rate\"") });
+leanTool("lean_law_get", {
+  id: z.string().describe("law_id from lean_laws_list, e.g. \"kimura-substitution-rate\""),
+  version: z.string().optional().describe("A specific (e.g. archived) law version; omit for the current one"),
+});
 leanTool("lean_lawset_get", { version: z.string().default("current").describe("Semver, or \"current\"") });
 leanTool("lean_check", {
   design: z.record(z.string(), z.any()).optional().describe("SI-unit design: SL_m, mass_kg, finArea_m2, CLmax, airspeed_m_s, genotype_edits, ..."),
@@ -336,15 +342,87 @@ leanTool("lean_check", {
   lawset: z.string().default("current"),
 });
 leanTool("lean_verify", {});
+// Self-update: where the laws come from (local files, or a remote mirror/github ref re-checked every TTL), and
+// what changed between lawsets. See lean/registry/SELF-UPDATE.md.
+leanTool("lean_source_status", {
+  refresh: z.boolean().optional().describe("Check the remote now instead of waiting for the TTL (at most once per 30 s)"),
+});
+leanTool("lean_changes", {
+  since_version: z.string().optional().describe("Lawset version you last saw, e.g. \"1.3.0\" (exclusive), or \"current\"; omit for all releases"),
+});
 if (!HOSTED) leanTool("lean_propose", {
   file: z.string().optional().describe("Path to a .lean file"),
   source: z.string().optional().describe("Lean source text, if no file"),
   meta: z.record(z.string(), z.any()).default({}).describe("law_id, kind, statement_en, hypotheses, sources (see lean/registry/README.md)"),
 });
 
+// LeanBio: the formalization queue, grounding, and per-claim records (pipeline/leanbio/). Read-only; leanbio_ground
+// calls Gilda / MyGene.info / OLS4 on a cache miss unless offline is set. In hosted mode it is forced offline so the
+// public server makes no outbound calls on behalf of anonymous clients and never writes the cache.
+const lb = Object.fromEntries(LEANBIO_TOOLS.map(t => [t.name, t]));
+tool("leanbio_queue", lb.leanbio_queue.description, {
+  limit: z.number().int().min(1).max(500).default(20),
+  min_belief: z.number().min(0).max(1).optional().describe("Only items at or above this belief"),
+  relation: z.string().optional().describe("Relation type, e.g. ScalingLaw, Bound, Equality, Dynamics, Inhibition"),
+  origin: z.enum(["claim", "draft"]).optional(),
+}, args => lb.leanbio_queue.handler(args));
+tool("leanbio_ground", lb.leanbio_ground.description, {
+  text: z.string().optional().describe("Free text to annotate"),
+  entity: z.string().optional().describe("One entity name or identifier, instead of text"),
+  kind: z.enum(["any", "gene", "taxon"]).default("any"),
+  context: z.string().optional().describe("Context for an entity, e.g. \"zebrafish\""),
+  offline: z.boolean().default(false).describe("Answer from the cache only"),
+}, args => lb.leanbio_ground.handler({ ...args, offline: HOSTED ? true : args.offline }));
+tool("leanbio_claim", lb.leanbio_claim.description, {
+  id: z.string().describe("Claim id (docs/claims.json), e.g. \"maynardsmith-hitchhiking\", or \"draft:<repo path>\""),
+  draft: z.boolean().default(true).describe("Include the unsigned nanopub draft (TriG)"),
+}, args => lb.leanbio_claim.handler(args));
+
+// Multi-omics cards (sim-engine/tools/omics-tools.mjs over omics/index/, shipped in the image and the npm package).
+// Proxy-species data, kind borrowed; absence means not recorded.
+const om = Object.fromEntries(OMICS_TOOLS.map(t => [t.name, t]));
+const omicsLayer = z.enum(["genomic", "transcriptomic", "proteomic", "pathway", "ptm"]);
+tool("omics_gene", om.omics_gene.description, {
+  symbol: z.string().optional().describe("ZFIN symbol (e.g. kcnk5b), ZDB-GENE id, or human orthologue symbol (e.g. KCNK5)"),
+  id: z.string().optional().describe("Alias of symbol"),
+  layers: z.array(omicsLayer).optional().describe("Only these layers (default all)"),
+  features: z.array(z.string()).optional().describe("Only these features, e.g. allele_phenotype, expressed_in"),
+}, args => om.omics_gene.handler(args));
+tool("omics_part", om.omics_part.description, {
+  part_id: z.string().describe("UBERON:xxxxxxx or CL:xxxxxxx (underscore form accepted)"),
+  layer: omicsLayer.optional(),
+  limit: z.number().optional().describe("Max genes returned (default 100)"),
+}, args => om.omics_part.handler(args));
+tool("omics_search", om.omics_search.description, {
+  term: z.string().describe("e.g. \"pectoral fin\", \"GO:0030326\", \"Wnt signaling\""),
+  feature: z.string().optional(),
+  layer: omicsLayer.optional(),
+  limit: z.number().optional().describe("Max matching terms (default 25)"),
+}, args => om.omics_search.handler(args));
+
+// The design score (scorer v1.0.0, weights frozen: sim-engine/validate/score-weights.json and
+// SCORER-PREREGISTRATION.md). In hosted mode network and BLAST are forced off: the public server answers from its
+// shipped data and cache, makes no outbound calls for anonymous clients, and never runs minutes-long BLAST jobs.
+const dsc = VALIDATE_TOOLS.find(t => t.name === "design_score");
+tool("design_score", dsc.description, {
+  organism: z.union([z.string(), z.record(z.string(), z.any())]).optional().describe("A repository organism/design id (zebrafish-adult, flying-fish, winged-zebrafish, tff, ...) or an inline organism document"),
+  specimen: z.record(z.string(), z.any()).optional().describe("Instead of an organism: a raw specimen record {SL_m, mass_kg, depth_SL, ...}"),
+  ageDays: z.number().optional(),
+  conditions: z.record(z.string(), z.any()).optional(),
+  exclude: z.array(z.string()).optional().describe("Reference ids or groups to leave out of the nearest-neighbour search"),
+  reference_set_excluding: z.array(z.string()).optional().describe("Leave-out scoring (e.g. organism:zebrafish); use it whenever the design IS a real organism"),
+  containment: z.array(z.record(z.string(), z.any())).optional().describe("partedit.js containment results [{part, refused}]"),
+  network: z.boolean().optional().describe("Allow cached network calls (forced off on the hosted server)"),
+  blast: z.boolean().optional().describe("Run NCBI BLAST for genes without an alignment (forced off on the hosted server)"),
+  lawset: z.string().optional(),
+  taxon: z.string().optional(),
+  label: z.string().optional(),
+  spec: z.record(z.string(), z.any()).optional().describe("Optional DesignSpec for the S component"),
+}, args => dsc.handler(HOSTED ? { ...args, network: false, blast: false } : args));
+
 if (process.env.DELPHI_HTTP_PORT) {
   const { serveHttp } = await import("./http.mjs");
-  serveHttp(createServer, Number(process.env.DELPHI_HTTP_PORT));
+  serveHttp(createServer, Number(process.env.DELPHI_HTTP_PORT), VERSION);
 } else {
   await createServer().connect(new StdioServerTransport());
 }

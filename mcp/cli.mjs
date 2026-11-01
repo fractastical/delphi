@@ -31,6 +31,8 @@
 //   node mcp/cli.mjs check design.json --lawset current
 //   node mcp/cli.mjs propose Law.lean --meta meta.json
 //   node mcp/cli.mjs verify
+//   node mcp/cli.mjs source [--refresh]                         (Lean law source: local, or remote mirror/github)
+//   node mcp/cli.mjs changes 1.3.0                              (lawset releases after 1.3.0)
 
 import { readFileSync } from "node:fs";
 import { forumRead, logTestResult, proposeClaim } from "./forum.mjs";
@@ -75,6 +77,12 @@ const commands = {
 // Lean law subcommands: parsed again from raw argv by the shared CLI so numbers stay strings (lawset "1.2.0").
 const { parseArgs } = await import("../sim-engine/lean-cli.mjs");
 for (const [name, fn] of Object.entries(LEAN)) commands[name] = () => fn(parseArgs(rest));
+// LeanBio subcommands (pipeline/leanbio/tools.mjs), for parity with the leanbio_* MCP tools.
+const { LEANBIO_TOOLS } = await import("../pipeline/leanbio/tools.mjs");
+const lb = Object.fromEntries(LEANBIO_TOOLS.map(t => [t.name, t]));
+commands["leanbio-queue"] = () => lb.leanbio_queue.handler({ limit: Number(positional[0] || 20) });
+commands["leanbio-ground"] = () => lb.leanbio_ground.handler({ text: positional.join(" ") });
+commands["leanbio-claim"] = () => lb.leanbio_claim.handler({ id: positional[0] });
 
 if (!commands[cmd]) {
   console.error(`Usage: node mcp/cli.mjs <${Object.keys(commands).join("|")}> [args] [--source local|network]`);

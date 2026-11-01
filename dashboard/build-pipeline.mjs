@@ -13,7 +13,7 @@ const R = p => { try { return fs.readFileSync(path.join(root, p), 'utf8'); } cat
 const J = p => { const t = R(p); try { return t ? JSON.parse(t) : null; } catch { return null; } };
 
 // ---- step 1: a claim, with where in the source it came from ----
-const keyClaims = J('math-bio-theorems/claims/key-claims.json');
+const keyClaims = J('claim-sources/math-bio-claims/claims/key-claims.json');
 const claimList = Array.isArray(keyClaims) ? keyClaims : (keyClaims?.claims || []);
 const kimura = claimList.find(c => (c.id || '').includes('kimura-substitution-rate')) || claimList[0] || null;
 
@@ -54,7 +54,7 @@ const steps = [
       id: kimura.id, statement: kimura.statement || kimura.claim || kimura.label,
       source: kimura.source || kimura.citation || null, math: kimura.math || kimura.latex || null
     } : null,
-    provenance: ['math-bio-theorems/claims/key-claims.json'],
+    provenance: ['claim-sources/math-bio-claims/claims/key-claims.json'],
     count: claimList.length ? `${claimList.length} key claims here, 880 across the whole graph` : null
   },
   {
@@ -66,7 +66,7 @@ const steps = [
       assessments: disagreed.assessments,
       note: 'Two assessors, two different verdicts on the same claim. The scores are elicited model opinions, not probabilities, and are never averaged.'
     } : null,
-    provenance: ['darwin-origin/assessment/', 'dashboard/public/evolve/data.json']
+    provenance: ['claim-sources/darwin-origin/assessment/', 'dashboard/public/evolve/data.json']
   },
   {
     n: 3, name: 'Resolve it against real data',

@@ -15,10 +15,10 @@ const root = path.resolve(here, '..');
 const git = a => execSync(`git -C "${root}" ${a}`, { maxBuffer: 1 << 28 }).toString();
 const show = (ref, p) => { try { return JSON.parse(git(`show ${ref}:${p}`)); } catch { return null; } };
 const list = ref => git(`ls-tree -r --name-only ${ref}`).split(/\r?\n/)
-  .filter(l => /^claim-tests\/.+\/result\.json$/.test(l));
+  .filter(l => /^test-data\/claim-tests\/.+\/result\.json$/.test(l));
 
 const ours = list('HEAD'), theirs = list('origin/main');
-const id = p => p.replace(/^claim-tests\//, '').replace(/\/result\.json$/, '');
+const id = p => p.replace(/^test-data\/claim-tests\//, '').replace(/\/result\.json$/, '');
 const ourIds = new Set(ours.map(id)), theirIds = new Set(theirs.map(id));
 const both = [...ourIds].filter(x => theirIds.has(x)).sort();
 

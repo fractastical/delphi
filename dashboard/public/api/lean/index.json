@@ -2,14 +2,17 @@
  "api": "delphisci lean laws, static mirror",
  "version": 1,
  "origin": "registry",
- "current_lawset": "1.3.0",
+ "current_lawset": "1.6.0",
  "lawsets": [
   "1.0.0",
   "1.1.0",
   "1.2.0",
-  "1.3.0"
+  "1.3.0",
+  "1.4.0",
+  "1.5.0",
+  "1.6.0"
  ],
- "count": 52,
+ "count": 53,
  "laws": [
   {
    "law_id": "E1",
@@ -67,17 +70,16 @@
   },
   {
    "law_id": "E3",
-   "version": "1.0.0",
+   "version": "2.0.0",
    "kind": "biological",
    "status": "accepted",
-   "label": "Efficiency, cardiac output and arterial O2 lie in the measured teleost ranges",
+   "label": "Efficiency and O2 delivery lie in the ranges the cited sources support (widened after measured zebrafish)",
    "level": "empirical observation",
-   "theorem": "Delphi.Empirical.aerobicCeiling_le",
+   "theorem": "Delphi.Empirical.aerobicCeilingV2_le",
    "module": "lean/Delphi/Empirical.lean",
-   "statement": "eta <= 0.15, oxycaloric <= 19.35 J/ml, cardiac output <= 0.075 ml/s and arterial O2 <= 0.21 ml/ml imply an aerobic ceiling of at most 0.0458 W.",
+   "statement": "eta <= 0.23, oxycaloric <= 19.35 J/ml and O2 delivery Q*Ca <= 0.0187 ml O2/s (1600 mg O2 kg^-1 h^-1 at 0.06 kg) imply an aerobic ceiling of at most 0.0833 W.",
    "sources": [
-    "physiology/muscle.js (efficiency, oxycaloric), physiology/cardiac.js (cardiac output range), physiology/haemoglobin.js (blood O2 capacity), as cited in lean/eliminate/physiology-candidates.json",
-    "physiology/muscle.js (efficiency, oxycaloric), physiology/cardiac.js (cardiac output range), physiology/haemoglobin.js (blood O2 capacity), as cited in lean/eliminate/physiology-candidates.json"
+    "Palstra AP et al. (2010) PLoS One 5:e14483, doi:10.1371/journal.pone.0014483, PMC3013094, Results \"Swimming economy\" (MO2max at Ucrit 82.18 umol g^-1 h^-1 = 2630 mg O2 kg^-1 h^-1; 0.43 g, 28 C); Gladman NW, Askew GN (2024) J Exp Biol 227, PMC11583979 (contractile efficiency 0.37 x oxidative recovery 0.61 = 0.23); physiology/muscle.js (oxycaloric 13.54 J/mg at 0.7 ml O2 per mg). Analysis: physics/FICK-CEILING-CHECK.md section 5."
    ],
    "scope": {
     "taxa": [
@@ -89,7 +91,7 @@
       "min": 0.06,
       "max": 0.06,
       "unit": "kg",
-      "note": "the cardiac-output ceiling (75 ml/min/kg) was converted to ml/s for a 0.06 kg fish; at any other mass the absolute bound 0.075 ml/s is not the measured one"
+      "note": "the O2-delivery bound (1600 mg O2 kg^-1 h^-1) was converted to ml O2/s for a 0.06 kg fish; at any other mass the absolute bound 0.0187 ml/s is not the one the sources give"
      }
     }
    },
@@ -482,7 +484,7 @@
   },
   {
    "law_id": "fick-principle",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "kind": "biological",
    "status": "accepted",
    "label": "Fick principle: aerobic supply is at most eta E Q (Ca - Cv)",
@@ -835,6 +837,29 @@
    "href": "laws/kimura-substitution-rate.json"
   },
   {
+   "law_id": "maynardsmith-hitchhiking",
+   "version": "1.0.0",
+   "kind": "biological",
+   "status": "candidate",
+   "label": "Genetic hitchhiking: a sweep's reduction of linked variation grows as c/s falls",
+   "level": null,
+   "theorem": "Delphi.LeanBio.Hitchhiking.hitchhiking_relHet",
+   "module": "lean/registry/proposals/maynardsmith-hitchhiking/law.lean",
+   "statement": "Under the deterministic-sweep approximation relHet = 1 - K^(-a c/s) with K > 1 and a > 0 (a named hypothesis), a selective sweep leaves no variation at a neutral site with c/s = 0, the variation left rises strictly with c/s (so the reduction is larger the tighter the linkage relative to selection), and for c/s > 0 the sweep removes some but not all variation.",
+   "sources": [
+    "doi:10.1017/S0016672300014634"
+   ],
+   "scope": {
+    "taxa": [
+     "any"
+    ],
+    "life_stages": [],
+    "ranges": {}
+   },
+   "constraints": [],
+   "href": "laws/maynardsmith-hitchhiking.json"
+  },
+  {
    "law_id": "maynardsmith-twofold-cost",
    "version": "1.0.0",
    "kind": "biological",
@@ -885,9 +910,9 @@
   },
   {
    "law_id": "perturb-current",
-   "version": "1.0.0",
+   "version": "1.1.0",
    "kind": "biological",
-   "status": "candidate",
+   "status": "accepted",
    "label": "No holding station in a current above U_crit or the aerobic drag bound",
    "level": null,
    "theorem": "Delphi.Perturb.no_station_above_ucrit",
@@ -940,7 +965,7 @@
    "law_id": "perturb-energy-balance",
    "version": "1.0.0",
    "kind": "biological",
-   "status": "candidate",
+   "status": "accepted",
    "label": "Intake below (R + Act) / (a (1 - s)) means mass loss",
    "level": null,
    "theorem": "Delphi.Perturb.energy_rules_out",
@@ -967,7 +992,7 @@
    "law_id": "perturb-isa-vmin",
    "version": "1.0.0",
    "kind": "physical",
-   "status": "candidate",
+   "status": "accepted",
    "label": "Minimum flight speed rises with altitude (ISA troposphere)",
    "level": null,
    "theorem": "Delphi.Perturb.vmin_isa_mono",
@@ -990,17 +1015,18 @@
   },
   {
    "law_id": "perturb-pressure",
-   "version": "1.0.0",
+   "version": "2.0.0",
    "kind": "physical",
    "status": "candidate",
-   "label": "Boyle's law: a closed swim bladder shrinks with depth",
+   "label": "Boyle's law: a closed swim bladder shrinks with depth (pressure p0 + rho g d)",
    "level": null,
-   "theorem": "Delphi.Perturb.closed_bladder_rules_out",
-   "module": "lean/Delphi/Perturb.lean",
-   "statement": "Boyle's law for a closed swim bladder at fixed temperature with hydrostatic pressure p0 + k d: the volume at depth d is V0 p0 / P(d), so a closed bladder claiming more volume at depth is ruled out (quasi-static only).",
+   "theorem": "Delphi.Hydro.closed_bladder_rules_out",
+   "module": "lean/Delphi/Hydrostatics.lean",
+   "statement": "With absolute pressure p0 + rho g d (surface pressure p0, water density rho and gravity g as named hypotheses) and P(d) V(d) constant (closed bladder, fixed temperature, quasi-static), the bladder volume at depth d is V(0) p0 / (p0 + rho g d); a closed bladder claiming more volume at depth is ruled out. The v1 '1 atm per 10 m' law is the instance rho g = 10132.5 Pa/m (oneAtmPer10m).",
    "sources": [
-    "Yancey PH 2020, Cellular responses in marine animals to hydrostatic pressure. (PMID 32096337, doi:10.1002/jez.2354); lean/perturb-sources.json#yancey2020",
-    "Kerr JR, White PR, Leighton TG, Silva LGM, Kemp PS 2023, Boyle's Law ignores dynamic processes in governing barotrauma in fish. (PMID 37926724, doi:10.1038/s41598-023-46125-9); lean/perturb-sources.json#kerr2023"
+    "lean/perturb-sources.json#yancey2020",
+    "lean/perturb-sources.json#kerr2023",
+    "sim-engine/scenarios/pressure.mjs"
    ],
    "scope": {
     "taxa": [
@@ -1018,7 +1044,7 @@
    "law_id": "perturb-thermal",
    "version": "1.0.0",
    "kind": "biological",
-   "status": "candidate",
+   "status": "accepted",
    "label": "No sustained power outside the thermal window; Q10 bound inside",
    "level": null,
    "theorem": "Delphi.Perturb.thermal_rules_out",
@@ -1047,7 +1073,7 @@
    "law_id": "perturb-wind-glide",
    "version": "1.0.0",
    "kind": "physical",
-   "status": "candidate",
+   "status": "accepted",
    "label": "Glide ground range in wind is at most h (L/D)max (1 + w/u)",
    "level": null,
    "theorem": "Delphi.Perturb.wind_glide_rules_out",
@@ -1396,35 +1422,43 @@
  ],
  "endpoints": {
   "law": "laws/<law_id>.json",
+  "law_version": "laws/<law_id>@<version>.json",
   "lawset": "lawsets/<version>.json",
-  "current": "current.json"
+  "current": "current.json",
+  "changes": "changes.json",
+  "changes_atom": "changes.xml"
  },
  "scope": "Static mirror generated by dashboard/build-lean-api.mjs from lib/lean-source.mjs, the same loader the MCP tools (lean_laws_list, lean_law_get, lean_lawset_get) use. A law's status is a registry decision, not a truth value; \"proved\" means a Lean kernel proof about a model, never that the model describes an organism. Laws absent here are unchecked, not satisfied. Evaluation (lean_check) is not mirrored: the browser runs blueprint3d/browser-check.mjs locally via lean-client.js.",
  "source_fingerprint": {
-  "hash": "sha256:5615473634a28b6748ab173070ddf9f47eea4a319404ea0d03dcfc3578d26e0d",
+  "hash": "sha256:1f45a60c98fa39cd11d5f3cfcc84071ba6eb4cc58c1373b920b958ae0ae1810d",
   "files": {
    "lean/Delphi/Altitude.lean": "sha256:a4d50803eef0c96bcfa1de9542311ab5eb45444b0d33de9e56b63d5334cd4278",
-   "lean/Delphi/Audit.lean": "sha256:bf30fc701ce739b332b02a4249f8b8b5164c590ee2922b285b84c00f10faead6",
+   "lean/Delphi/Audit.lean": "sha256:78c8d21447cee5340781ecc9f089c3d94f49efcc1fcf2eea1e676402f6b1eebc",
    "lean/Delphi/Blueprint.lean": "sha256:3e82911e7224dfb5a467d63b9f5f9d4653572fbc1715bab1393d3736761cbcb8",
    "lean/Delphi/Constraints.lean": "sha256:565d8fee05485f3d90c839e0f30a83658198f31cfcbd6f178eb0ae866db42fb2",
-   "lean/Delphi/Empirical.lean": "sha256:394522f3b39ba7b045dd8d63523b8249c4677309a231a4cccc6372bb3c7de172",
+   "lean/Delphi/Empirical.lean": "sha256:a95d0edd5aff429e00e4d0587cddee5de064bb9155287dbad24dcbac8b4ac10f",
    "lean/Delphi/Favored.lean": "sha256:d1d197bf0b4d872ba6e42fad6ee0453fa644f4cf10ae450834cf2dabcc26995d",
    "lean/Delphi/Fisher.lean": "sha256:174d7316740586bb86ef88df945a5e998ecd6c98e17f4ebcf2ad892c74b153f2",
    "lean/Delphi/Flight.lean": "sha256:eb2a122973bd84883c52e70dc38a871db0f7a25a8f897eeac5ac776577afda5d",
    "lean/Delphi/Genotype.lean": "sha256:089324f43f22587dc948e83dc6ec5bdcac2d06ecc2bcad34037641b4aa610af8",
+   "lean/Delphi/Hydrostatics.lean": "sha256:636c805fdec1fb1037b6f56a6ab70b076e5aeb7f1985edb1f170b87a09ddce69",
    "lean/Delphi/Kimura.lean": "sha256:f7f13973fbf77675980935ab89d26d5c383537a2beb8bd55cf9c3c9642b06022",
    "lean/Delphi/MaynardSmith.lean": "sha256:7853a63b8a5e7d70246c5b5f8eb48e8310f67a83feff28b229b9b17a77155ff3",
    "lean/Delphi/Perturb.lean": "sha256:aae8246f04f53e006936c8c45be2c856e35302b3e4a3b0eab42068adda595b42",
    "lean/Delphi/Physiology.lean": "sha256:77f9a325714ccfd36648b9c858b89dc7b815f052f14a8d1f8d4bb927e5238379",
    "lean/Delphi/Scaling.lean": "sha256:06a4a8983291cf2740913f5e31c8c95f19b0372287e0a886b3d1ca26b42ee340",
    "lean/Delphi/Thompson.lean": "sha256:e8a404588d3d7172f18c0f396653d942f0264e4c1a997d3d04beccbb946f7f02",
-   "lean/constraints.json": "sha256:952102e1ba56966884196ad0433c81dc86c08fa58187505e26604dc164dfcba4",
-   "lean/eliminate/browser-check.mjs": "sha256:c369dcb727a31e73d2dbd450aa8e474b75fb54883f7e5af17d739a99da6c6127",
-   "lean/empirical.json": "sha256:2eb09f1c77aea4c5a79cef643dba783c20b75812f498208b63872b9bb5344148",
-   "lean/laws.json": "sha256:fc88475dc07085925e12f2ca95d3c7341bb5d4f977ace03cffeff5f471ba540f",
+   "lean/constraints.json": "sha256:085b53d124fc478d9ffb20568fc1b0bdd70d38d94a24e5d278eb4f580899b2ce",
+   "lean/eliminate/browser-check.mjs": "sha256:673a9d290802e6526f84765e023c98596a69461166b5899f796fbb9d73f3245b",
+   "lean/empirical.json": "sha256:f566a7d81a95ea8475a3587e5483700b108e8d1573386bcc5fa0071f23734ebb",
+   "lean/laws.json": "sha256:591e989a9f266becf08ecc349aac57f867c85116347837fe78bb80ef8e7c6bcb",
+   "lean/registry/law-versions/E3@1.0.0.json": "sha256:087082468bb1ceb6662eeab8dc4177f3b3569624d0d3b0c5c6195920f347379f",
+   "lean/registry/law-versions/fick-principle@1.0.0.json": "sha256:33c183807e6e9f434a1331bd12a9710235d83178913d92d83c20f0924e92d783",
+   "lean/registry/law-versions/perturb-current@1.0.0.json": "sha256:9f9b20bd25ca5498210ebbd63969cb786b938e3b2e893f5338e083eb144beee3",
+   "lean/registry/law-versions/perturb-pressure@1.0.0.json": "sha256:c2578e2e50754f3b913aa6f15f9911c5f52e9513d8a67adaa10c9b053d0daafc",
    "lean/registry/laws/E1.json": "sha256:02955b834627707cbad384f34b1e30345859ecb8876b82804f43cb8475abaae6",
    "lean/registry/laws/E2.json": "sha256:688392efcea59e60305e8becc515751b8f0f10f706b2a324eeca25716de30064",
-   "lean/registry/laws/E3.json": "sha256:4c4c13f848991ab90d5ec41f7e27b57a818f16fb430097616459773992b31ea7",
+   "lean/registry/laws/E3.json": "sha256:5bbd8ddccbac67866af044a7c89269b107a0c29cc96cb71561e819d6edebeb2c",
    "lean/registry/laws/E4.json": "sha256:d392f3c17fccdb545a7c882965c0092f4bf4c0da84403ad6ae27bac7ec454ba2",
    "lean/registry/laws/E5.json": "sha256:07f9a6c45bae754bfbcd45be3689926afb28647e5f532a34e24faf338021a8b6",
    "lean/registry/laws/E6.json": "sha256:6880bbc752b1426b67d518e4b070c9f46906d36f8855e420db87203b1c9e50cd",
@@ -1440,7 +1474,7 @@
    "lean/registry/laws/disc-pectoral-length-allometry.json": "sha256:2a06df708b96231ebc5ae9677bd972ca310b754cb102f80bb7db9468edf6dd05",
    "lean/registry/laws/elastic-similarity.json": "sha256:2d6d886d92392c10353c407b7fdbe030eb98697f071da908b5c15113d51b3fff",
    "lean/registry/laws/favored-fixation-lower-bound.json": "sha256:6a01b7421bc626a2518610fa2ac8b42d52933101953f925f9924ca92ffb57b45",
-   "lean/registry/laws/fick-principle.json": "sha256:cca0d4cbe936832f4dc143b1bf0deb530e46d8890498aebc14a20117278bc9b8",
+   "lean/registry/laws/fick-principle.json": "sha256:c1a6856301cceb9c50a2c329d05aab306ce0e00b04fc1870431b2036cc5a7cab",
    "lean/registry/laws/fin-length-ratio.json": "sha256:57f874b23c1e048a722828549635e0441129a569612df12f9ab445b40a37941e",
    "lean/registry/laws/fisher-ftns.json": "sha256:3006fa8e5c91c070f572be1cc2e5a66c073cac7d08c744b44266431d3d65e84a",
    "lean/registry/laws/flight-allometry-law.json": "sha256:f688056ad88c94f9292bb04bef021763eea05f153d6fdb20b438f203946a0315",
@@ -1454,15 +1488,16 @@
    "lean/registry/laws/haldane-cost-of-selection.json": "sha256:f3d244a4dfff2b753a5ea48c58d0fafaf8f97439a2cafe54dbfa91113f45d777",
    "lean/registry/laws/kimura-fixation-probability.json": "sha256:9db63d3a56b4e85625b0bf8798ba7b9452f01240d989849075b06cb02125ebf8",
    "lean/registry/laws/kimura-substitution-rate.json": "sha256:5ec78b7002b5d8bc9af788af73dfb2c62cc4bafecafbc16a84b9376bae46af14",
+   "lean/registry/laws/maynardsmith-hitchhiking.json": "sha256:93032348d4c0ec8eeadee1cc7e780137f969050856f0363a5c6203d6f68c5b34",
    "lean/registry/laws/maynardsmith-twofold-cost.json": "sha256:7b0bff035b949df9f78b8bd43de9f9fa61d437d594b7c398e0173f8e54e9f002",
    "lean/registry/laws/muscle-power-premise.json": "sha256:3506f6ddf186039d612e6f3c98b8fc2d598abb70c1f3e0814c55ca9b042a4f69",
-   "lean/registry/laws/perturb-current.json": "sha256:c4c451b532ccc43f4aedee6466dc44809c341a9ae7947b61e9445699c649d770",
+   "lean/registry/laws/perturb-current.json": "sha256:9b75e6b6c11a5fd299ae49cb7aec4576d6e5ae5c843c069ee6cf97920655f7ce",
    "lean/registry/laws/perturb-depth-cap.json": "sha256:16573b5c32c029669f8ecc348045c81f9172d1f2e0d5ff244c2fd0a5c64b2082",
-   "lean/registry/laws/perturb-energy-balance.json": "sha256:d6d402e2f99d700cd6308e885b71b244b3570fe4598f4d9395b99ea9c82f58cf",
-   "lean/registry/laws/perturb-isa-vmin.json": "sha256:b1919ede784b97faff69461f05bad260b07ba07311779303135445a85a1f8a9a",
-   "lean/registry/laws/perturb-pressure.json": "sha256:6378e99e53f757b0325bd4e247ef0a23115c375e889df61669027ded82e10c73",
-   "lean/registry/laws/perturb-thermal.json": "sha256:6fad6e68182a8cdfe2c6e47deeba7df62f4a0d19eda5c98a1892faa5d1da781c",
-   "lean/registry/laws/perturb-wind-glide.json": "sha256:ddfe7e2ad363a2b6f9082d1a9d68284abb0e21873c5766ba5144880c030d9ad9",
+   "lean/registry/laws/perturb-energy-balance.json": "sha256:d35c329633d70ee75dfee4dcef3fcd0f7dc1d4310b851a1e90be112fb96a4617",
+   "lean/registry/laws/perturb-isa-vmin.json": "sha256:a7eb791c5c0b0695e1f55565aa70191d4e941df11ea0321e35ad83957e14010f",
+   "lean/registry/laws/perturb-pressure.json": "sha256:4fb94418159f0d073fb27317a44d42a2db15569417e735e9497530acc955fedc",
+   "lean/registry/laws/perturb-thermal.json": "sha256:0011c0a562f1acd4d2e11acb23fb14a9ce94bbbcec65400be7fcf220fb73dfc7",
+   "lean/registry/laws/perturb-wind-glide.json": "sha256:17d7895ac8c990bc0dbf26d3dd5e2e99de918f45ca82e5114a646e1b371a9bf9",
    "lean/registry/laws/physiology-laplace.json": "sha256:b2d5526dc46fb31e3f69e12e06137e133a0860a4b6550561aaf9aaaad9b657a7",
    "lean/registry/laws/physiology-q10.json": "sha256:0735acde2ff09d7cebe142bfa54341652cd3c2383bba576839cda9c7228cf6ea",
    "lean/registry/laws/scaling-area-law.json": "sha256:b60035f25a1348573b0af46e7ab64699e5290e30f6a89d9800a14a04146a8db2",
@@ -1474,13 +1509,16 @@
    "lean/registry/laws/thompson1917-ch02-10.json": "sha256:6bdadedad2c0cfba43a696dc24d20ba0786f226247856d124d9091ddc0006327",
    "lean/registry/laws/thompson1917-ch03-07.json": "sha256:35cbf4a3be0fd72893c84bc21a039e8c9315fc9bd74add027e2e863e56d51d4c",
    "lean/registry/laws/walking-pendulum-speed.json": "sha256:c72e5162fe67dd3d4be7b65e5fb35cc47ac3b5f9a8c95bb094d58db0cc1a40d2",
-   "lean/registry/lawsets/current.json": "sha256:2a2c4f6f2ca89e47c163c27638a9d5fe46b35adc09bb23647d6f461b98909b53",
+   "lean/registry/lawsets/current.json": "sha256:c036833739b9436aa116ca15bdfd27f276fe6b941fc46e42544ddddfa48b5453",
    "lean/registry/lawsets/lawset-1.0.0.json": "sha256:4b16ed1db92a680a35fb9ca5fbb3f4c067cab4eaff12de0c874283683dcee166",
    "lean/registry/lawsets/lawset-1.1.0.json": "sha256:a418e2c4d2c8d60e6c8cf47d0b44be66ed309cf75aeada720bbc5a6136517eb3",
    "lean/registry/lawsets/lawset-1.2.0.json": "sha256:ee891927214d94ab7e50870e18d8056935aa11371f553bc472426d1064b43983",
    "lean/registry/lawsets/lawset-1.3.0.json": "sha256:0b43c243dea52628111fef2ee190b0df20688d9f7f586658f618298084728eee",
+   "lean/registry/lawsets/lawset-1.4.0.json": "sha256:cd6cd106df94ce8c5df0b3f554344ef0a5dbd9ab264a690c2243ca04a00c3358",
+   "lean/registry/lawsets/lawset-1.5.0.json": "sha256:6bcaf1915ccbe0eebf4fad4ba408e2c824cb7b24987a2e8c6f90a7b459bc1d5a",
+   "lean/registry/lawsets/lawset-1.6.0.json": "sha256:382a96432dd2ccf3755becf72e07e5a74e2b36981e0e600507c64b01004bc409",
    "lib/lean-scope.mjs": "sha256:d075654841b8793c3c7533f323b81bc0178823cd9ced472980f5f718ad724e0d",
-   "lib/lean-source.mjs": "sha256:97c01781d24cfc33737ea2a8d69022c0ee2f65e35a38eafa386c4e19efa4fd14"
+   "lib/lean-source.mjs": "sha256:c571974f8427162964c28c058ef1e775515f78f5e4aee6f72e492dfce61cf5b8"
   }
  }
 }

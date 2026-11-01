@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(here, '../..');
 const report = JSON.parse(fs.readFileSync(path.join(root, 'dashboard/public/t/lean/lean.json'), 'utf8'));
-const key = JSON.parse(fs.readFileSync(path.join(root, 'math-bio-theorems/claims/key-claims.json'), 'utf8')).claims;
+const key = JSON.parse(fs.readFileSync(path.join(root, 'claim-sources/math-bio-claims/claims/key-claims.json'), 'utf8')).claims;
 
 // Pull a declaration's docstring + full text (to the first blank line) from a module.
 function decl(text, name) {
