@@ -26,11 +26,13 @@ class Inputs:
 @pytest.fixture
 def tree(tmp_path):
     for name in ["engineering/formal", "engineering/formalize/lean", "site/artifacts/lean-gallery",
-                 "artifacts/oxygen-diffusion-rule"]:
+                 "artifacts/oxygen-diffusion-rule", "artifacts/epithelial/interval-certificate"]:
         shutil.copytree(ROOT / name, tmp_path / name)
     shutil.copy2(ROOT / "engineering/constraints.py", tmp_path / "engineering/constraints.py")
     (tmp_path / "projects/reuse-studies").mkdir(parents=True)
     shutil.copy2(ROOT / "projects/reuse-studies/live-projects.json", tmp_path / "projects/reuse-studies/live-projects.json")
+    (tmp_path / "artifacts/audits/epithelial-sweep").mkdir(parents=True)
+    shutil.copy2(ROOT / "artifacts/audits/epithelial-sweep/review.json", tmp_path / "artifacts/audits/epithelial-sweep/review.json")
     out = {}
     lean_gallery.build(Inputs(tmp_path), out, root=tmp_path)
     for key, value in out.items():
@@ -75,13 +77,13 @@ def test_summary_and_optional_source_match_actual_published_receipts_without_exe
 ])
 def test_changed_original_dependency_or_published_bytes_withholds_family_without_cache(tree, path, family):
     catalog = ProofCatalog(tree)
-    assert len(catalog.read()["families"]) == 4
+    assert len(catalog.read()["families"]) == 5
     target = tree / path
     target.write_bytes(target.read_bytes() + b"\n-- mutation")
     result = catalog.read(include_source=True)
     assert family in {f["id"] for f in result["withheld"]}
     assert family not in {f["id"] for f in result["families"]}
-    assert len(result["families"]) == 3
+    assert len(result["families"]) == 4
 
 
 def test_receipt_mutation_cannot_introduce_an_arbitrary_file_read(tree, monkeypatch):
@@ -139,8 +141,90 @@ def test_symlink_even_to_identical_bytes_is_withheld(tree, tmp_path, path, famil
 def test_missing_family_and_invalid_request_are_bounded(tree):
     (tree / "engineering/formalize/lean/RECEIPT.json").unlink()
     result = ProofCatalog(tree).read()
-    assert len(result["families"]) == 3 and result["withheld"][0]["id"] == "cantilever-guard"
+    assert len(result["families"]) == 4 and result["withheld"][0]["id"] == "cantilever-guard"
     with pytest.raises(ValueError):
         ProofCatalog(tree).read("../../secret")
     with pytest.raises(ValueError):
         ProofCatalog(tree).read(include_source="true")
+
+
+def test_interval_catalog_publishes_bounded_full_source_and_roles(tree):
+    result = ProofCatalog(tree).read("scaled-threshold-intervals", True, "frontier.morphoswarm.ai")
+    assert result["withheld"] == [] and len(result["families"]) == 1
+    family = result["families"][0]
+    assert [len(names) for names in family["check_roles"].values()] == [2, 2, 2, 4]
+    assert len(family["theorem_names"]) == 10 and len(family["negative_control_ids"]) == 4
+    assert not family["source"]["truncated"] and len(family["source"]["text"]) == 4272
+    assert {item["name"] for item in family["files"]} >= {"source-witnesses.json", "validate.py", "lean-receipt.json", "reviewed-sweep-audit.json"}
+    assert "/data/" not in json.dumps(result) and "/tmp/" not in json.dumps(result)
+
+
+@pytest.mark.parametrize("path", [
+    "artifacts/epithelial/interval-certificate/source-witnesses.json",
+    "artifacts/epithelial/interval-certificate/validate.py",
+    "artifacts/epithelial/interval-certificate/reviewed-sweep-audit.json",
+    "site/artifacts/lean-gallery/scaled-threshold-intervals/source-witnesses.json",
+    "site/artifacts/lean-gallery/scaled-threshold-intervals/lean-receipt.json",
+])
+def test_interval_catalog_changed_source_or_published_dependency_is_withheld(tree, path):
+    catalog = ProofCatalog(tree)
+    assert catalog.read("scaled-threshold-intervals")["withheld"] == []
+    target = tree / path
+    target.write_bytes(target.read_bytes() + b"changed")
+    result = catalog.read("scaled-threshold-intervals", True)
+    assert result["families"] == [] and len(result["withheld"]) == 1
+
+
+def test_interval_changed_receipt_cannot_expand_allowlist(tree, monkeypatch):
+    target = tree / "artifacts/epithelial/interval-certificate/lean-receipt.json"
+    receipt = json.loads(target.read_text())
+    receipt["source_pins"].append({"path": "../../secret", "sha256": "0" * 64})
+    target.write_text(json.dumps(receipt))
+    catalog = ProofCatalog(tree)
+    read = catalog.source.read
+    seen = []
+    def observe(path):
+        seen.append(path)
+        return read(path)
+    monkeypatch.setattr(catalog.source, "read", observe)
+    assert catalog.read("scaled-threshold-intervals")["families"] == []
+    assert seen == ["artifacts/epithelial/interval-certificate/lean-receipt.json"]
+
+
+@pytest.mark.parametrize('remote', [False, True])
+def test_fifth_family_official_sdk_schema_and_anonymous_read(tree, monkeypatch, remote):
+    import asyncio
+    from types import SimpleNamespace
+    from mcp.shared.memory import create_connected_server_and_client_session
+    from frontier import proofs
+    from frontier.mcp import make_mcp
+
+    monkeypatch.setattr(proofs, 'ProofCatalog', lambda: ProofCatalog(tree))
+    monkeypatch.setattr(subprocess, 'run', lambda *args, **kwargs: pytest.fail('No process allowed in a proof read'))
+    # No store method is exercised: this fixed public tool reads only published artifacts.
+    server = make_mcp(SimpleNamespace(namespace='proof-fixture'), remote=remote, public_read=remote)
+
+    async def exercise():
+        async with create_connected_server_and_client_session(server) as client:
+            tools = {tool.name: tool for tool in (await client.list_tools()).tools}
+            schema = tools['frontier_proofs'].inputSchema['properties']['family']
+            values = next(x['enum'] for x in schema['anyOf'] if 'enum' in x)
+            assert set(values) == set(FAMILY_IDS)
+            assert tools['frontier_proofs'].annotations.readOnlyHint
+            assert tools['frontier_get'].annotations.readOnlyHint
+            result = await client.call_tool('frontier_proofs', {'family': 'scaled-threshold-intervals', 'include_source': True})
+            assert not result.isError
+            data = json.loads(result.content[0].text)
+            assert len(data['families']) == 1 and data['withheld'] == []
+            assert not data['compile_executed'] and not data['biological_validation']
+            assert len(data['families'][0]['check_results']) == 10
+            assert not data['families'][0]['source']['truncated']
+            assert '/data/' not in json.dumps(data) and '/tmp/' not in json.dumps(data)
+            target = tree / 'artifacts/epithelial/interval-certificate/source-witnesses.json'
+            target.write_bytes(target.read_bytes() + b'changed')
+            after = await client.call_tool('frontier_proofs', {'family': 'scaled-threshold-intervals'})
+            assert not after.isError
+            refused = json.loads(after.content[0].text)
+            assert refused['families'] == [] and len(refused['withheld']) == 1
+            assert (await client.call_tool('frontier_proofs', {'family': '../../secret'})).isError
+    asyncio.run(exercise())

@@ -9,7 +9,7 @@ import stat
 
 from scripts import lean_gallery
 
-FAMILY_IDS = ("geometric-similarity", "unit-algebra", "cantilever-guard", "steady-oxygen-bound")
+FAMILY_IDS = ("geometric-similarity", "unit-algebra", "cantilever-guard", "steady-oxygen-bound", "scaled-threshold-intervals")
 MAX_FILE_BYTES = 512_000
 MAX_SOURCE_CHARS = 6_000
 RECEIPTS = {
@@ -17,6 +17,7 @@ RECEIPTS = {
     "unit-algebra": "f7d02122cf5fa6e6aad588161997820e5e633ecfbf9badda65be0c32c45751d6",
     "cantilever-guard": "2f5ebcb086f2dbe70a84a9f8863365736b1a59724744eb3a7101737a808c4be4",
     "steady-oxygen-bound": "2275021b43ba35a0fa5bba874e0cc5b355365b58347ef40b221991e292215f71",
+    "scaled-threshold-intervals": "233b57e33c0fd95b0f9202bd7f5cc9602262cceeb60c02693776eba3eda0e69c",
 }
 SCOPE = "Recorded mathematical compile/control results only; not a new Lean run, scientific review, empirical finding, or proof of biological validity."
 
@@ -118,7 +119,7 @@ class ProofCatalog:
                     files.append(entry)
                 theory = next(x for x in files if x["role"] == "theory")
                 result = {k: checked[k] for k in ("id", "title", "summary", "assumptions", "equations")}
-                for key in ("proves", "does_not_prove", "statement_origin"):
+                for key in ("proves", "does_not_prove", "statement_origin", "check_roles", "source_binding"):
                     if key in checked:
                         result[key] = checked[key]
                 result.update(status="recorded_compile_source_matched", recorded_compile=True,
