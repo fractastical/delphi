@@ -27,9 +27,11 @@ class Response:
         self.body = body
         self.headers = headers or {}
         self.status = status
+        self.read_sizes = []
 
-    def read(self):
-        return self.body
+    def read(self, size=-1):
+        self.read_sizes.append(size)
+        return self.body if size < 0 else self.body[:size]
 
     def __enter__(self):
         return self
@@ -109,6 +111,21 @@ def test_partial_snapshot_is_collectable_and_not_reported_complete(tmp_path):
     assert receipt["job"]["exit_code"] is None
 
 
+def test_empty_progress_snapshot_writes_receipt(tmp_path):
+    output = tmp_path / "output"
+    output.mkdir()
+    fake = FakeGCS()
+    client = GCS(lambda: "test-token", fake)
+    record = run_record(exit_code=None)
+    record["finished_utc"] = None
+    upload_run(client, "bucket", "jobs/job/empty", output, record, complete=False)
+
+    receipt = collect(client, "bucket", "jobs/job/empty", tmp_path / "durable")
+    assert receipt["complete"] is False
+    assert receipt["artifacts"] == []
+    assert Path(receipt["receipt_path"]).is_file()
+
+
 def test_parent_prefix_collects_latest_immutable_snapshot(tmp_path):
     fake = FakeGCS()
     client = GCS(lambda: "test-token", fake)
@@ -164,3 +181,11 @@ def test_export_refuses_symlinked_output(tmp_path):
     (output / "linked.txt").symlink_to(outside)
     with pytest.raises(ValueError, match="symlinks"):
         upload_run(GCS(lambda: "token", FakeGCS()), "bucket", "jobs/job/task", output, run_record())
+
+
+def test_download_reads_at_most_cap_plus_one_bytes():
+    response = Response(body=b"oversized")
+    client = GCS(lambda: "test-token", lambda req, timeout=60: response)
+    with pytest.raises(ValueError, match="collection limit"):
+        client.download("bucket", "prefix/object", max_bytes=3)
+    assert response.read_sizes == [4]
