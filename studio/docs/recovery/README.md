@@ -219,3 +219,30 @@ The storage download/archive rehash, independent database replay and separate-ho
 run are distinct evidence, joined in `results/resources/backup-recovery-service-20261101.json`.
 
 The first final follow-up capture (`20261101T0440`) was withheld from publication because one active Codex transcript changed during copying. Its failed receipt remains preserved. The immutable transcript-prefix staging above was added in response; the archive stable-file gate was not weakened.
+
+
+## Stable add-on and newer database
+
+The private `20261101T0455` snapshot recovered **17,486 files / 3,707,042,825 logical bytes**
+on sb03 at **9:56:00pm PDT**. Its encrypted archive is1,806,700,211 bytes, SHA256
+`d95096e63db197efa597c04ad8befee4f59d304a6b5ff1fe3ee78efa74d1e7e3`.
+It includes the corrected film, canonical BETSE media, NCA/design-control/CFD returns, source
+refs and all four service-drill attempts. Active transcripts have declared complete-line
+cutoffs. The recovered bundle was cloned on sb03 and every required commit checked.
+
+A separate new read-only database transaction at **9:52:17pm PDT** contains **3,924 record
+versions / 3,918 current heads / 1,970 events**. Its raw dump reproduced all18 source counts
+in scratch; sanitization preserved scientific envelopes. All six exact newly imported observed
+record references were also found in the sanitized dump's data stream. The private encrypted
+`20261101T0500` add-on is47,038,250 bytes, SHA256
+`f16301f7bbc2b7d960d70db6cb6e8ea62b02d07c445a051647c1f0071a1440b4`;
+actual S3 download and sb03 decrypt/file checks passed. Use this newer sanitized dump with the
+base source/artifact recovery. It does not overwrite or relabel the earlier dump.
+
+`results/resources/backup-recovery-stable-addons-20261101.json` joins creation, private-storage,
+off-host restore, exact source/video/dump identities and the new import-presence receipts.
+The full website/MCP drill remains explicitly tied to its older tested source and dump.
+The withheld0440 and0450 captures remain recorded; neither was uploaded. The latter caught
+16 print-v4 paths being replaced during active repair. Print-v4 and new science videos are
+explicitly deferred until their final publication, as are later cloud states not yet returned.
+This is a declared recovery cutoff, not a claim to capture future writes.
