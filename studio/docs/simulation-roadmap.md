@@ -228,3 +228,289 @@ the two negative window diagnostics do not justify arbitrary workload expansion.
 [recomputed diagnostic and continuity](../artifacts/molecular/continuation-analysis/summary.json),
 [frozen protocol](../artifacts/molecular/continuation-protocol.json),
 [production receipt](../artifacts/molecular/cuda-v3/production/receipt.json).
+
+## Soft-voxel mechanics: a runnable workload, and a catalog of what else exists
+
+This section adds a second executable track beside the molecular one. It is not a
+fish or a frog result. It is generic soft-body voxel mechanics, chosen because it
+runs today on CPU in seconds and because its actuation law is simple enough to check
+against a closed form rather than against an opinion.
+
+### The engine that runs
+
+[Voxelyze](https://github.com/jonhiller/Voxelyze) at pin
+`4287e365e11416dd108f2f361e9ec4c5a011a16c`, library version string
+`voxelyze.0.9.92`, builds with the unmodified upstream `make` in **11.45 s** on
+g++ 13.3.0 under Ubuntu 24.04 and exits 0. The full recipe in
+[`scripts/voxel_actuation/build.sh`](../scripts/voxel_actuation/build.sh), starting
+from an empty directory, takes **17.85 s** and exits 0. It needs no CUDA, no Boost
+and no CMake, and the longest simulation run in this work was **8.6 s**. Every
+invocation ran under `MemoryMax=2G`, `MemorySwapMax=0` and `nice -n 19`; nothing was
+installed system-wide and no package manager was invoked.
+
+One upstream defect is worth recording because it looks like our bug: the shipped
+makefile's default `FLAGS` contain `-DPARDISO_5=1`, which leaves undefined references
+to `pardisoinit` and `pardiso` in the archive, so any program linking it fails unless
+a commercial Pardiso 5 library is present. Overriding `FLAGS` to drop the define fixes
+it; `doLinearSolve()` is unused here.
+
+Its licence needs stating carefully. The GitHub API reports `license: null` because
+**there is no LICENSE file at that commit**. Every `src/*.cpp` and `include/*.h`
+header declares **LGPL-3.0-or-later**, and those headers are the licence of record.
+"The API says null" is not "unlicensed". We commit our driver source and a build
+recipe and redistribute no linked binary.
+
+### What was measured, and what failed
+
+The protocol was frozen at `7b9bd5d` before any output existed, with predeclared
+expectations for every arm. Results and receipts are in
+[`artifacts/voxel-actuation/`](../artifacts/voxel-actuation/); the summary with the
+preregistration outcomes is
+[`summary.json`](../artifacts/voxel-actuation/summary.json).
+
+Six actuation phase patterns, matched in material, amplitude, frequency and duration,
+rank travelling **0.3644** body lengths in five cycles, longitudinal **0.1532**,
+lateral **0.1412**, dorsoventral **0.0031**, checker and uniform at **2e-5**. None
+diverged. That is a ratio of **16,565**, or **4.2 orders of magnitude** — an earlier version of
+this paragraph said "about five orders", which overstated it.
+
+The controls are what make that table worth reading. Setting the coefficient of
+thermal expansion to zero and setting the temperature amplitude to zero give
+numerically identical, essentially zero displacement, as they must, since both zero
+the same product. Removing friction gives **exactly 0.0** horizontal displacement:
+centre-of-mass x and y are constant to nine decimals across all 241 samples while z
+ranges 0.009967 to 0.011017 m, so the body is demonstrably active and its horizontal
+centre of mass does not move. That is the conservation prediction, not a dead run.
+
+Two analytic positive controls reproduce their closed forms at ratio **1.0000** — free
+thermal expansion against the zero-stress size law, and an end-loaded cantilever
+against `F L^3 / (3 E I)`, which is the same mechanical slice SPEC-013 and SPEC-017
+already name. Three must-fail mutants are rejected at ratios 1.2222, 1.1000 and
+10.0000, each **while settled and not diverged**, which is the condition that stops a
+crash from counting as a negative control.
+
+Two things failed, and both are kept.
+
+**One predeclared expectation was wrong.** The zero-gravity arm was predicted to give
+at most 0.01 body lengths and gave 0.0175. The argument behind the prediction was
+wrong, not the threshold: it assumed that removing gravity removes the normal force.
+With the floor still enabled, actuation itself drives voxels into the floor and
+generates transient normal force, so friction still acts. The frictionless arm is the
+control that actually isolates friction. The threshold was not changed.
+
+**Spatial refinement did not converge.** 0.1532 body lengths on a 5x3x3 body of 10 mm
+voxels against 0.0188 on a 10x6x6 body of 5 mm voxels, an 8.2x drop. The protocol
+predicted no convergence and said so in advance.
+
+Two post-hoc diagnostics, labelled as such in the artifact, explain it. Global damping
+as the cause is **refuted**, in the weaker form the data actually support: displacement is
+higher at the largest damping ratio than at zero on both lattices (coarse 0.0237 to 0.1532,
+fine 0.0047 to 0.0188), so raising it does not suppress the motion the way a purely parasitic
+drag would, and matching total drag by halving it on the fine lattice widens the gap to 15x
+rather than closing it. Two cautions, both from independent audit and both confirmed here:
+the fine series is **not monotone** — 0.00466, 0.00425, 0.01039, 0.01878 at damping ratios 0,
+0.025, 0.05 and 0.1, so only the endpoints are ordered — and global damping **is** a
+dissipative `-C*v` term. What these runs bear on is rectification of the actuation cycle, not
+the sign of that term, and the mechanism is not identified.
+
+Actuator-layout parity is **supported**: at fixed 10 mm resolution and fixed damping,
+`nx` = 4, 5, 6, 7 give 0.0200, 0.1532, 0.0086 and 0.0796 body lengths, so an odd
+voxel count moves 7.6x to 17.8x further than its adjacent even neighbours (nx5/nx4 = 7.65, nx5/nx6 = 17.81, nx7/nx6 = 9.25; non-adjacent pairs are not part of the claim). The longitudinal
+pattern splits at `x < nx/2`, so the refinement arm confounded lattice resolution with
+actuator-layout asymmetry. That is an artefact of our encoding, not of the engine.
+
+**That series is a diagnostic, not an isolated cause.** Varying `nx` at a fixed voxel size
+changes the voxel count, the body length and the mass together: 36 voxels at 36 g for nx=4
+through 63 voxels at 63 g for nx=7. Parity is identified as a large effect; length and mass
+are not held constant and their separate contributions are unmeasured.
+
+With the confound removed — the travelling-wave pattern sets phase as a gradient and
+so carries its own asymmetry at any `nx` — the two bodies move **14.577281 mm** and
+**16.847525 mm**, a **15.57% difference relative to the coarse run**.
+
+**An earlier version of this paragraph said 2.74%, and that figure is withdrawn.** It
+divided the two runs by two *different* denominators. The stored normalisation is
+`body_len = (nx-1) * voxel`, the centre-to-centre span, which is 40 mm for the coarse
+body and **45 mm** for the fine one, because halving the voxel while doubling the count
+adds half a lattice spacing. Dividing by two different lengths manufactured an agreement
+that is not in the data. The outer envelope `nx * voxel` is 50 x 30 x 30 mm for *both*
+bodies and the nominal mass is 45 g for both, so the envelope is the invariant length
+here; at that common 50 mm denominator the two give 0.291546 and 0.336950, which is the
+same **15.57%**. The frozen centre-span metric is preserved in the artifact beside the SI
+values and both denominators. Raised by independent review of `e6f1033`; all eight of its
+figures were recomputed here from the stored artifacts and all eight match.
+
+So the travelling pattern is far less resolution-sensitive than the longitudinal split's
+8.2x, and that is all. **15.6% is not agreement, and one pattern on two grids cannot
+establish convergence under any denominator.** The parity diagnosis does not cure the
+remaining discretisation and normalisation issues. The timestep series does converge,
+0.9% of the coarsest value across a 4x range of `dt`, and that statement is about `dt` on
+that one arm.
+
+### The cross-scale interface this adds
+
+`actuation-pattern-to-motion/1`. Inputs are a per-voxel actuation phase field in
+radians, a coefficient of thermal expansion per degree C, a temperature amplitude, a
+drive frequency, a Young's modulus in Pa and friction coefficients. Outputs are net
+centre-of-mass displacement in m, displacement per cycle, displacement in body
+lengths, path length and the full trajectory. The transfer is **mathematically defined
+and numerically checked, and empirically unvalidated**: no measured organism
+displacement is compared anywhere in it.
+
+The relation it supports, stated with its conditions, is that **net displacement per
+cycle is produced by spatial asymmetry of the actuation phase field, not by actuation
+amplitude alone**, with a mirror-symmetric field yielding roughly an order of magnitude
+less than an asymmetric one at matched everything else. Its conditions are the
+specific lattice, the linear elastic parameters, Coulomb friction on a rigid floor,
+global damping to a stationary absolute frame, explicit Euler at half the recommended
+timestep, five cycles at 4 Hz and 10% peak linear strain. Its validation data is the
+six-pattern arm, the four-point parity series, the two-resolution refinement of the
+travelling pattern, four behavioural controls, a timestep series and five analytic
+gates.
+
+**It is not a biological law.** It is a property of one numerical soft-body model under
+declared parameters, and no organism, tissue or cell measurement enters it. The object itself is a
+**numerical soft-voxel ground-contact mechanics benchmark, not tissue**: 45 nominal 10 mm
+voxels, an outer envelope of 50 x 30 x 30 mm, a 40 mm centre-to-centre span and a nominal
+45 g at the assumed 1000 kg/m^3. It is not tissue-scale, not a Xenopus or microcarrier
+model, and not material-calibrated.
+
+If anything from this track is rendered,
+`artifacts/voxel-actuation/trajectory/travelling-voxels.csv` stores voxel **centres and the
+imposed temperature only** — no orientations, no deformed voxel meshes, no forces. A renderer
+may draw centre points, a link graph or nominal glyphs and must label them as such; it must not
+invent cellular textures, traction arrows or deformed tissue boundaries, and `temp_C` is an
+imposed numerical actuation signal rather than a measured cellular state. Use SI axes, and if
+body lengths are shown, say which denominator. One sampling limitation goes with it: the
+headline displacement is taken from the centre of mass at the simulator's exact step
+boundaries, while the CSV is written every `record_every` steps, so a value re-derived from
+the CSV can differ slightly from the stored metric. Use the stored metric for the number and
+the CSV for the shape.
+
+The known threat to its validity is that the rectifying ground reaction is part Coulomb friction
+and part global damping to an absolute frame — Voxelyze's global damping is a numerical
+term and not a fluid model, so no swimming interpretation is available — and the split
+between those two mechanisms has not been measured.
+
+### One measurement that would calibrate the missing biology
+
+Three parameters in that interface are declared assumptions with no measured referent:
+the coefficient of thermal expansion standing in for active contraction, the drive
+amplitude and the drive frequency. A fourth, Young's modulus, is inherited from a
+simulator demo file rather than from tissue.
+
+The single measurement that would replace them is **the free contractile strain
+amplitude and its frequency, together with an independent quasi-static elastic
+modulus, all taken on the same specimen of the candidate contractile tissue**.
+Peak-to-peak linear strain under negligible load sets the product of expansion
+coefficient and amplitude directly; the beat frequency sets the drive frequency; and a
+calibrated modulus on that same specimen sets `E`. Same-specimen matters more than
+precision here, because the three are currently drawn from three unrelated places, and
+a context-matched triple is what makes them a parameterisation rather than three
+coincidences.
+
+It would not fix everything, and the gap it leaves should be named now: it says
+nothing about friction or adhesion against a real substrate, and nothing about whether
+the rectifying reaction in a real construct is frictional or viscous. Those need their
+own measurement, and until then the ranking above is a ranking inside a simulator.
+
+This paragraph describes quantities and what they would license. It is not a
+laboratory protocol and nothing here has been executed in a laboratory.
+
+### The engine catalog
+
+[`artifacts/simulator-catalog/catalog.json`](../artifacts/simulator-catalog/catalog.json)
+holds twelve engines with per-entry read levels: one built and run here, three already
+in use on this project, seven source-only and one blocked. Each entry carries its pin
+or version, its licence with the evidence for that licence, scale and state variables,
+supported couplings, compute requirements, applicability limits, parameter gaps,
+public examples and available controls. The ranking in it is a ranking of **practical
+readiness for this project**, not of scientific quality.
+
+Its most load-bearing property is a vocabulary of read levels, because most of its
+equation fields honestly read `not-read-here`. Nine of the twelve entries need a
+reading pass before their governing equations may be cited, and the catalog says which
+file or DOI to open for each. A verified Crossref record establishes a title, authors,
+venue and DOI; it does not license a claim about an equation.
+
+Three licence findings in it are worth surfacing here because each is a trap.
+
+**The website and the repositories disagree.** `https://cdorgs.github.io/code` states
+verbatim that *"The source code and build instructions are distributed under an
+Attribution-NonCommercial Creative Commons license"*, linking CC BY-NC 4.0. Every
+repository it links — `voxcraft/voxcraft-sim`, `voxcraft/voxcraft-viz` and
+`skriegman/reconfigurable_organisms` — carries a **CC0-1.0** LICENSE file, confirmed
+from the file bytes. Rely on the LICENSE file in the repository you actually clone and
+record that the website says otherwise. Neither statement should be quoted alone.
+Separately, `reconfigurable_organisms` declares CC0 at its root while vendoring
+Voxelyze, whose per-file headers declare LGPL-3.0-or-later; a repository-level CC0 does
+not obviously reach vendored third-party code.
+
+**`license: null` from the GitHub API means two opposite things.** For Voxelyze it
+hides LGPL-3.0-or-later in the source headers. For PhysiCell 1.14.2 it hides
+BSD-3-Clause in `licenses/PhysiCell.txt`, alongside separate licence files for BioFVM,
+MaBoSS and pugixml that a reuser must check as well. In both cases the API is reporting
+the absence of a root LICENSE file, not the absence of a licence.
+
+**The SOFA inverse plugin carries a patent grant scoped to itself.**
+[SoftRobots.Inverse](https://github.com/SofaDefrost/SoftRobots.Inverse) is AGPL-3.0
+with an added clause file recording an Inria patent, *"Method for controlling of a
+deformable robot, associated module and computer program"*, French priority
+2013-02-08, publication numbers FR3002047, WO2014122134A1, US2015360367A1,
+EP2954429A1 and JP2016513021A. Its own words: AGPLv3 Clause 11 grants a royalty-free
+licence to the patent *"when you use 'SoftRobots.Inverse' software or any derivative
+software work (i.e., developed from the source of that software)"*, and *"Any other
+exploitation of the patent, in particular by using a software solution to implement
+the method other than 'SoftRobots.Inverse' ... is not covered by this license."* Inria
+names `stip-lille@inria.fr` for a separate licence. The practical reading for us is
+narrow and specific: reimplementing that inverse method in our own code would not be
+covered by this grant, and AGPL-3.0 network use carries a source-provision obligation.
+This is a statement of what the licence files say, not legal advice, and it is not a
+claim about anyone's commercial position. None of it applies to the SOFA core, which is
+LGPL-2.1, or to the forward SoftRobots plugin, which is LGPL-3.0.
+
+### GPU: what is blocked, and what nobody has run
+
+[voxcraft-sim](https://github.com/voxcraft/voxcraft-sim) at pin
+`dd8668f99ff74fb2fc2ee60deb91287a3b519d8f` is the engine the computationally designed
+organism results actually used, and it is the only GPU path in the voxel line. It is
+**blocked here**: this host has no GPU and no CUDA toolkit — `nvidia-smi` is absent and
+`/usr/local/cuda*` does not exist, checked against a positive control that
+`/usr/local` does — and its `CMakeLists.txt` autodetects the target architecture by
+probing a GPU at configure time, so even a configure is not meaningful here. Its README
+asks for CUDA 10.1 while its Dockerfile pins `cuda:10.2-devel-ubuntu18.04`, which is a
+further reason the version question has to be settled by a run.
+
+**No claim is made here about whether it works on a modern GPU.** A two-arm probe with
+definite acceptance is specified in
+[`docs/handoff/xenobot-packet-to-infra.md`](handoff/xenobot-packet-to-infra.md): one
+arm builds at the pin under a current CUDA toolkit with the architecture forced rather
+than autodetected, and one builds in the pinned 10.2 image with an explicit PTX
+`gencode` so the driver has something to JIT forward. Infra owns the dispatch; this
+branch does not launch cloud jobs.
+
+### Differentiation, stated against the actual prior art
+
+The forward-generation roadmap in [`research/generative-roadmap.md`](research/generative-roadmap.md)
+must not be pitched as novel, and the engine catalog is where that stays honest. A
+diffusion-model surrogate trained on forward output from a mechanistic agent-based
+biological model is **published**: Comlekoglu and colleagues, *Generative diffusion
+model surrogates for mechanistic agent-based biological models*, arXiv 2505.09630, DOI
+`10.1088/2632-2153/ae11f8`, on a cellular Potts model — the same model class as the
+Morpheus instance already running on this project, with a reference implementation at
+`tc2fh/CPM_DDPM_Surrogate`. Read at abstract level and recorded in
+[`data/research/prior-art.json`](../data/research/prior-art.json). **We do not claim
+that nobody has trained a diffusion model on forward biological simulator data.**
+Building that is replication, and replication is a fine thing to say we are doing.
+
+What this section adds that is not in that prior art is narrower and more boring: a
+frozen protocol that precedes its outputs, an engine whose actuation law is checked
+against a closed form at ratio 1.0000 with mutants that fail for the right reason, a
+preregistered expectation that was recorded as missed rather than adjusted, a
+refinement failure diagnosed down to a confound in our own encoding, and per-claim read
+levels so that nine unread papers are visible as unread. Those are provenance and
+validation properties, not a modelling advance, and they should be described that way.
+
+Likewise, inverse control of a deformable mechanism is a solved and patented capability
+in SoftRobots.Inverse. Inverse *design* of a body from a goal is a different problem,
+and nothing in this section addresses it.
