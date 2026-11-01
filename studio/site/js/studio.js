@@ -105,6 +105,7 @@
       ${f.prop_size_mm ? html`<p class="small"><b>${f.prop_size_mm.map((x) => Number(x).toFixed(1)).join(" × ")} mm</b> · ${f.display_scale}× display scale</p>` : ""}
       ${Number.isFinite(mass.smooth) && Number.isFinite(f.mass_density_kg_m3) ? html`<p class="small faint">Calculated mass: ${mass.smooth.toFixed(2)} g smooth${Number.isFinite(mass.relief) ? ", " + mass.relief.toFixed(2) + " g with scales" : ""}, at ${(f.mass_density_kg_m3 / 1000).toFixed(2)} g/cm³. Not weighed.</p>` : ""}
       ${Number.isFinite(f.wall_rule_mm) ? html`<p class="small faint">${f.wall_rule_mm.toFixed(1)} mm provisional wall rule; sampled checks and relief limits are in the file report.</p>` : ""}
+      ${f.files.some((x) => x.kind === "stl_prop_scale_relief") ? html`<p class="small">Choose the smooth STL for the more conservative print. Fine scale relief is ungated texture and may not resolve or survive printing. <a href="https://github.com/kganjam/delphi-frontier/blob/279fea9dff22529a449d88835fd4b475703a70d7/docs/reviews/launchable-fish-review-print-v4.md">Independent file review</a>.</p>` : ""}
       <ul>${f.files.filter((x) => ["stl_prop", "stl_prop_scale_relief"].includes(x.kind)).map((x) => html`<li><a href="${x.href}" download>${x.kind === "stl_prop" ? "Smooth STL" : "Scale-relief STL"}</a> · <a href="${DF.href("/print-laws", {file: x.href})}">File checks and laws</a></li>`)}</ul></div></article>`;
   }
   /* Candidate-dependent statement about what the selected 3D model is. Status words are the candidate's own; nothing is called validated. */
