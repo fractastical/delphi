@@ -161,3 +161,90 @@ def test_launcher_sets_the_policy_before_torch_and_refuses_if_torch_is_already_l
             [sys.executable, "-c", probe], capture_output=True, text=True
         ).stdout
     )
+
+
+def test_recovery_normalization_gate_is_exact_and_difference_is_diagnostic_only():
+    from engineering.rd_diffusion import recovery_eval as RE
+
+    m, s = (
+        np.array([[[1.0], [2.0]]], np.float32),
+        np.array([[[3.0], [4.0]]], np.float32),
+    )
+    ok = RE.normalization_gate(m.copy(), s.copy(), m, s)
+    assert ok["ok"] and ok["exactly_equal"] and ok["max_abs_difference_mean"] == 0.0
+    off = RE.normalization_gate(
+        m + np.float32(1e-7), s, m, s
+    )  # a difference far below the old 1e-6 draft tolerance
+    assert (
+        not off["ok"]
+        and not off["exactly_equal"]
+        and off["max_relative_difference_DIAGNOSTIC_ONLY"] < 1e-6
+    )
+    assert not RE.normalization_gate(m, s[:, :1], m, s)[
+        "ok"
+    ]  # shape mismatch fails, no exception
+
+
+def test_recovery_requires_the_exact_301_step_log_and_production_has_no_overrides(
+    tmp_path,
+):
+    from engineering.rd_diffusion import recovery_eval as RE
+
+    good = tmp_path / "g.jsonl"
+    good.write_text("\n".join(json.dumps({"step": k}) for k in RE.PRODUCTION_STEPS))
+    assert (
+        RE.check_log_steps(good) == RE.PRODUCTION_STEPS
+        and len(RE.PRODUCTION_STEPS) == 301
+    )
+    for name, steps in (
+        ("short", RE.PRODUCTION_STEPS[:-1]),
+        ("dup", RE.PRODUCTION_STEPS + [30000]),
+        ("gap", [s for s in RE.PRODUCTION_STEPS if s != 15000]),
+        ("order", RE.PRODUCTION_STEPS[::-1]),
+    ):
+        p = tmp_path / f"{name}.jsonl"
+        p.write_text("\n".join(json.dumps({"step": k}) for k in steps))
+        with pytest.raises(SystemExit):
+            RE.check_log_steps(p)
+    base = [
+        sys.executable,
+        str(ROOT / "engineering/rd_diffusion/recovery_eval.py"),
+        "--ckpt",
+        "x",
+        "--train-log",
+        "y",
+        "--out",
+        str(tmp_path / "o"),
+    ]
+    for flag in (["--expect-sha", "0" * 64], ["--allow-policy-mismatch"]):
+        r = subprocess.run(base + flag, capture_output=True, text=True)
+        assert r.returncode != 0 and "smoke-only" in (r.stderr + r.stdout)
+    assert (
+        RE.CHECKPOINT_SHA256
+        == "1a0a185cdacd49e8a65aa77ece1cd8f51033533c996025b3f4da907cd2b2ae76"
+        and RE.TRAIN_LOG_SHA256
+        == "2ecdd2ceb6eec513a634ec7edcaf5e37cc15cba3d3717c90c5ad7ab41dc05862"
+    )
+    assert RE.POLICY == {
+        "NVIDIA_TF32_OVERRIDE": "0",
+        "TORCH_ALLOW_TF32_CUBLAS_OVERRIDE": "0",
+        "torch.backends.cuda.matmul.allow_tf32": False,
+        "torch.backends.cudnn.allow_tf32": False,
+        "torch.set_float32_matmul_precision": "highest",
+    }
+
+
+def test_recovery_stage_logger_writes_begin_end_and_fail_durably(tmp_path):
+    from engineering.rd_diffusion import recovery_eval as RE
+
+    st = RE.Stages(str(tmp_path))
+    assert st.run("a", lambda: 5) == 5
+    with pytest.raises(ZeroDivisionError):
+        st.run("b", lambda: 1 / 0)
+    ev = [
+        (r["stage"], r["event"])
+        for r in map(
+            json.loads, (tmp_path / "stage_log.jsonl").read_text().splitlines()
+        )
+    ]
+    assert ev == [("a", "BEGIN"), ("a", "END"), ("b", "BEGIN"), ("b", "FAIL")]
