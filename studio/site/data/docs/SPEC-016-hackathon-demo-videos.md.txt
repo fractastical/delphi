@@ -56,3 +56,19 @@ Changes to spoken scientific claims require source checking before synthesis.
 4. Rehash all inputs and outputs; publish both downloadable videos and posters
    through Frontier's guarded artifact surface, with source/provenance links.
 5. Verify public HTTP and playback/download behavior on the actual deployment.
+
+## Additive 90-second revision (user request, October 31)
+
+The original 60- and 120-second cuts have been delivered and remain available.
+Add a separate 90-second cut from `artifacts/demo-video-90/storyboard.json`, with
+faster, clearly intelligible narration and the SciDEX Graceful Lady voice as a
+candidate. Record the selected voice and measured speech timing. Preserve all
+previous videos, scripts and receipts; never overwrite them to make this cut.
+
+Lead with typing a design goal in the actual routing input, explain Delphi claims
+and the commons, show human intervention, MCP collaboration, validation and
+actual multiscale outputs. Cite sponsors/models by demonstrated usage; BioNeMo
+and Brev execution remains unestablished. A contributor count must come from the
+audited ledger with its counting unit, not live process counts or model names.
+Keep the printed prop out of this cut for the live presentation. The same media
+and public-playback acceptance requirements apply to this additional video.
