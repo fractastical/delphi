@@ -1955,3 +1955,32 @@ def test_assemblies_page_keeps_six_axes_apart_and_the_v3b_failure_visible(browse
         if w == 400:
             assert _overflow(pg) <= 0
         pg.close()
+
+
+def test_aeroelastic_and_nca_cards_follow_the_review_wording_and_pin_their_media(browser, base):
+    import hashlib
+    ae = json.loads((ROOT / "artifacts/aeroelastic/index.json").read_text())
+    nca = json.loads((ROOT / "artifacts/nca-seed-placement/index.json").read_text())
+    orig = json.loads((ROOT / "artifacts/nca-pattern/index.json").read_text())
+    for rel, sha in ((ae["artifacts"]["video"]["path"], ae["artifacts"]["video"]["sha256"]), (nca["artifacts"]["video"]["path"], nca["artifacts"]["video"]["sha256"]), (orig["artifacts"]["video"]["path"], orig["artifacts"]["video"]["sha256"])):
+        assert hashlib.sha256((ROOT / rel).read_bytes()).hexdigest() == sha, rel
+    pg = page(browser)
+    pg.goto(base + "#/simulations")
+    for cid in ("aeroelastic-coupling", "nca-pattern", "nca-seed-placement"):
+        pg.wait_for_selector(f"#sim-{cid} video")
+    a = pg.locator("#sim-aeroelastic-coupling").text_content()
+    for must in ("Bending-only, torsion-rigid scaffold", "fixed-alpha, assumed-release descent proxy", "bookkeeping identities", "not validated improvements", "not a production mesh", "production 36-arm return is pending"):
+        assert must in a, must
+    rigid, one, two = (ae["control_slice"]["arms"][k]["CL"] for k in ("rigid", "one-way-frozen-load", "two-way-static-feedback"))
+    assert f"{rigid:.6f}" in a and f"{two - one:.1e}" in a and "improvement" in a and "validated" in a
+    n = pg.locator("#sim-nca-seed-placement").text_content()
+    assert "32 of 48 passed" in n and "original 0 of 12 to corrected seed 12 of 12" in n and "original 0 of 12 to corrected seed 8 of 12" in n and "original 0 of 12 to corrected seed 0 of 12" in n
+    assert "not fresh held-out cases" in n and "reused from parent" in n and "tissue regeneration" in n and "Not generalisation" in n
+    o = pg.locator("#sim-nca-pattern").text_content()
+    assert "0 of 48 passed" in o and "unchanged" in o
+    pg.goto(base + "#/studio/flying-fish?scale=tissue")
+    pg.wait_for_function("document.querySelector('#main').textContent.includes('corrected seed placement')")
+    t = pg.locator("#main").text_content()
+    assert "original run: 0 of 48" in t and "corrected seed placement: 32 of 48" in t
+    pg.goto(base + "#/studio/flying-fish?scale=organ")
+    pg.wait_for_function("document.querySelector('#main').textContent.includes('Static aeroelastic coupling')")

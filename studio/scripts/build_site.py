@@ -1193,6 +1193,68 @@ def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
     return cards
 
 
+def aeroelastic_cards(ins: Inputs, out: dict) -> list[dict]:
+    """Static aeroelastic coupling card from the native model card. Wording follows the independent review: a bending-only, torsion-rigid scaffold; a
+    fixed-alpha assumed-release descent proxy; ledger gates are bookkeeping, not validation; paired differences are not called improvements."""
+    d = "artifacts/aeroelastic"
+    if not (ROOT / d / "index.json").exists():
+        return []
+    ix = json.loads(ins.read(f"{d}/index.json")); art = ix["artifacts"]; arms = ix["control_slice"]["arms"]
+    rigid, one, two = arms["rigid"], arms["one-way-frozen-load"], arms["two-way-static-feedback"]
+    st, href = _vid(ins, out, "aeroelastic-coupling", d, "render-control/coupled-states.mp4", art["video"]["sha256"])
+    _, ph = _vid(ins, out, "aeroelastic-coupling", d, "render-control/poster.png", art["poster"]["sha256"])
+    _, prov = _vid(ins, out, "aeroelastic-coupling", d, "render-control/provenance.json", art["render_provenance"]["sha256"])
+    rel = lambda a, b: (a - b) / b
+    return [{"id": "aeroelastic-coupling", "title": "Static aeroelastic coupling of the fins: a coarse 8x2 control slice (bending-only scaffold)", "scales": ["organ", "organism"], "evidence_kind": ix["evidence_kind"] + " (video: render of saved states)",
+        "model": {"name": "equivalent constant-EI bending scaffold + steady thin-surface VLM", "context": ix["question"] + " " + ix["status"] + ". The production 36-arm return is pending; this card is the coarse slice only."},
+        "time": {"units": "static iterations, not physical seconds", "note": "The video holds the last state explicitly; deflection is unscaled. The glide paths are a separate rigidized-shape point-mass proxy."},
+        "video": {"file": "coupled-states.mp4", "sha256": art["video"]["sha256"], "note": f"{art['video']['bytes']} bytes"}, "video_state": st, "video_href": href, "poster_href": ph, "provenance_href": prov,
+        "numerical_checks": [
+            {"name": "rigid arm", "result": f"CL {rigid['CL']:.6f}; point-mass glide range {rigid['glide_range_m']:.3f} m (assumed release, fixed alpha)"},
+            {"name": "one-way frozen load minus rigid", "result": f"dCL/CL {100 * rel(one['CL'], rigid['CL']):.2f}%; glide range {one['glide_range_m'] - rigid['glide_range_m']:+.3f} m. One mesh, one compliance: a single coarse difference, not a supported effect"},
+            {"name": "two-way minus one-way", "result": f"dCL {two['CL'] - one['CL']:.1e} (fixed-point tolerance is 1e-6): treat as negligible feedback at this compliance, not as a two-way improvement"},
+            {"name": "local control slice", "result": "20 primitive checks pass; the force, moment and virtual-work ledger gates are bookkeeping identities and are not counted as independent evidence"}],
+        "parameter_unknowns": [ix["inputs"]["material"] + ".", "Mass 0.05 kg, drag coefficients, release height and fixed alpha in the glide proxy are assumed engineering values.", "The 3% absolute mesh gate cannot resolve effects this small; no refinement gate on the paired differences was declared."],
+        "open_questions": ix["open_questions"],
+        "equations": [], "sources": [{"label": "Static aeroelastic method (aircraft model, not a fish)", "locator": "Ting, Nguyen, Trinh 2014, NASA NTRS 20140008648, Eq 63-66, 74-75 and Section VIII"}, {"label": "Beam deflection reference", "locator": "MIT 1.050 beam deflection notes"}, {"label": "Protocol", "locator": f"{d}/protocol.json sha256 {art['protocol']['sha256'][:12]}…"}],
+        "limitations": ["Bending-only, torsion-rigid scaffold: no streamwise twist, no torsion or axial model, no hinge mapping.", "The glide is a fixed-alpha, assumed-release descent proxy on the rigidized final shape, not continuous fluid-structure interaction or a controlled flight.",
+                        "The 8x2 slice is not a production mesh. Small paired differences are not validated improvements.", "Computed engineering result; empirical validation: " + str(ix["empirical_validation"]) + ". No biological calibration of the equivalent stiffness exists."],
+        "couplings": [], "manifest": f"{d}/index.json", "native": True}]
+
+
+def nca_cards(ins: Inputs, out: dict) -> list[dict]:
+    """Neural cellular automaton fin-pattern cards: the original run and the one-factor seed-placement intervention, side by side. Both fit one 64x64 design
+    raster on reused evaluation cases; neither is tissue regeneration, a sequence implementation or a generalisation."""
+    cards = []
+    kinds = {}
+    sp = ROOT / "artifacts/nca-seed-placement/index.json"
+    if sp.exists():
+        kinds = {b["kind"]: b for b in json.loads(ins.read("artifacts/nca-seed-placement/index.json")).get("by_kind", [])}
+    for cid, d in (("nca-pattern", "artifacts/nca-pattern"), ("nca-seed-placement", "artifacts/nca-seed-placement")):
+        if not (ROOT / d / "index.json").exists() or not (ROOT / d / "returned-analysis").is_dir():
+            continue
+        ix = json.loads(ins.read(f"{d}/index.json")); art = ix["artifacts"]; rel = lambda k: art[k]["path"].split(d + "/", 1)[1]
+        st, href = _vid(ins, out, cid, d, rel("video"), art["video"]["sha256"]); _, ph = _vid(ins, out, cid, d, rel("poster"), art["poster"]["sha256"])
+        _, plot = _vid(ins, out, cid, d, rel("training_plot"), art["training_plot"]["sha256"]); _, prov = _vid(ins, out, cid, d, rel("render_provenance"), art["render_provenance"]["sha256"])
+        c = ix["counts"]; seed = cid == "nca-seed-placement"; nfr = len(json.loads(ins.read(art["render_provenance"]["path"]))["frames"])
+        checks = [{"name": "declared design predicates", "result": f"{c['design_passed']} of {c['design_executed']} passed; negative controls {c['negative_passed']} of {c['negative_executed']}"}]
+        if seed:
+            checks += [{"name": b["kind"].replace("-", " "), "result": f"original {b['parent']['passed']} of {b['parent']['executed']} to corrected seed {b['variant']['passed']} of {b['variant']['executed']}"} for b in kinds.values()]
+            checks += [{"name": "regime " + r["regime"], "result": f"{r['passed']} of {r['tested']}"} for r in ix["regime_counts"]]
+        cards.append({"id": cid, "title": ("Neural cellular automaton fin pattern, corrected seed placement: 32 of 48 predicates, left-half recovery 0 of 12" if seed else "Neural cellular automaton fin pattern, original run: 0 of 48 predicates"),
+            "scales": ["tissue", "developmental"], "evidence_kind": "computed (trained model on a 64x64 design raster; video renders saved states, not tissue)",
+            "model": {"name": "neural cellular automaton, 8336 shared local-rule weights", "context": ("One factor changed from the original run: the seed cell " + str(ix["parent_seed_xy"]) + " -> " + str(ix["seed_xy"]) + ". Target, source, training budgets and evaluation cases are unchanged. " + ix["evaluation_status"] + "." if seed else "The original run, kept unchanged: " + ix["inverse_objective_status"] + ". Four models, two initialisations, a fin/ray design raster; not observed tissue.")},
+            "time": {"units": f"cellular-automaton update steps; {nfr} frames shown", "note": "Frames are saved model states drawn as a raster, not a microscope image."},
+            "video": {"file": rel("video"), "sha256": art["video"]["sha256"], "note": f"{art['video']['bytes']} bytes"}, "video_state": st, "video_href": href, "poster_href": ph, "plot_href": plot, "provenance_href": prov,
+            "numerical_checks": checks,
+            "parameter_unknowns": ["The 12 hidden channels are computational state, not measured biochemical signals.", ("Evaluation cases are reused from the original run: not fresh held-out cases and not a new target." if seed else "Seeds and pools are declared inputs; repeated probes are not independent biological replicates.")],
+            "open_questions": ["Large left-half damage failed all 12 cases even with the corrected seed." if seed else "Would a different seed placement change the outcome? One factor was tested separately (see the corrected-seed card).", "No DNA, cell program, neural control or tissue regeneration is implemented or implied."],
+            "equations": [], "sources": [{"label": "Protocol", "locator": art["protocol"]["path"] + " sha256 " + art["protocol"]["sha256"][:12] + "…"}, {"label": "Audit", "locator": art["audit"]["path"] + " sha256 " + art["audit"]["sha256"][:12] + "…"}],
+            "limitations": list(ix.get("limits", [])) + ["Computed result; empirical validation: " + str(ix["empirical_validation"]) + ". Not generalisation and not a biological regeneration result."],
+            "couplings": [], "manifest": f"{d}/index.json", "native": True})
+    return cards
+
+
 def native_video_cards(ins: Inputs, out: dict) -> list[dict]:
     """Map each worker's own manifest to the gallery card shape. Nothing is invented: absent fields stay absent."""
     cards = []
@@ -1464,7 +1526,7 @@ def build() -> dict[str, bytes]:
     controlled = controlled_results(ins, files)
     if simulation is not None:
         simulation["controlled"] = controlled
-    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra)
+    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra) + aeroelastic_cards(ins, extra) + nca_cards(ins, extra)
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     design_review = ins.json("site/content/design-review.json")
