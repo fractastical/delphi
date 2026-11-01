@@ -46,11 +46,11 @@ def test_citation_read_level_drift_is_refused(tmp_path):
 def test_an_invented_sequence_known_kinetics_or_fish_transfer_is_refused(tmp_path):
     def f(b):
         d = b["designs"][0]
-        d["implementation"]["cargo"] = {"enhancer": "ACGTACGT", "reporter": "GFP"}
+        d["implementation"]["cargo"] = {"enhancer": {"name": "LEN", "source": "tree2016", "coordinates": "chr1:1-2", "sequence": "ACGTACGTACGTACGT"}, "reporter": "GFP"}
         d["expression_kinetics"]["status"] = "measured"
         d["flying_fish_transfer"] = "validated"
     errs = mutated(tmp_path, f)
-    assert any("UNSPECIFIED" in e for e in errs) and any("expression_kinetics" in e for e in errs) and any("flying_fish_transfer" in e for e in errs)
+    assert any("coordinates or sequence are set" in e for e in errs) and any("nucleotide-like" in e for e in errs) and any("expression_kinetics" in e for e in errs) and any("flying_fish_transfer" in e for e in errs)
 
 
 def test_merged_carrier_delivery_integration_and_hidden_off_target_gap_are_refused(tmp_path):
@@ -67,3 +67,18 @@ def test_human_chromosome_source_must_not_be_presented_as_fish_evidence(tmp_path
         r = next(x for x in b["comparison"]["rows"] if x["id"] == "autonomous-artificial-chromosome")
         r["evidence"] = "Human artificial chromosomes work and could be used in fish"
     assert any("no fish source" in e for e in mutated(tmp_path, f))
+
+
+def test_a_named_source_element_with_null_coordinates_is_accepted_and_a_stale_claim_is_refused(tmp_path):
+    b = json.load(open(os.path.join(PKG, "blueprints.json")))
+    enh = b["designs"][0]["implementation"]["cargo"]["enhancer"]
+    assert enh["name"].startswith("LEN") and enh["coordinates"] is None and enh["sequence"] is None
+    assert any("stale or contradicted" in e for e in mutated(tmp_path, lambda x: x["global_causal_gaps"].append("every enhancer evidence item here is from regenerating adult fin")))
+
+
+def test_unvalidated_cell_program_binding_cannot_be_marked_validated(tmp_path):
+    def f(b):
+        b["designs"][0]["cell_program_binding"]["validation_status"] = "validated"
+        b["cell_program_blueprints"][0]["validation_status"] = "validated"
+    errs = mutated(tmp_path, f)
+    assert any("validation_status must be unknown" in e for e in errs) and any("3 cell-program blueprints" in e for e in errs)
