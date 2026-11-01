@@ -170,3 +170,22 @@ At11:05pm PDT on October31, the45-arm aeroelastic packet was complete and VM04 h
 - [x] Refresh Google allocation: VM03 and VM04 RUNNING, 20 of 32 vCPUs allocated, zero active GPUs. At 12:23am, provider CPU fractions were 59.35% of 16 and 19.96% of 4, including startup/control work. These dated measurements are not instantaneous utilization. Actual provider spend remains unknown.
 - [ ] Collect and independently verify both new scientific returns; preserve failed controls and partial coverage.
 - [ ] Add later checkpoint/results bytes to an encrypted private recovery snapshot after the next stable cutoff. The d87e5d1 full add-on and 795f140 source/deploy delta are already off-host decrypted and hash-checked.
+
+At 12:27:43am PDT the inverse-pattern workload actually started. Its first two
+60-sample GPU windows averaged 29.75% and 31.03% (peaks 33% and 32%), with at most
+689 MiB device memory. These include setup and do not establish a scientific result.
+The original 900-second science limit is unchanged. Owner09 is now preparing a
+separate minimal observation-horizon study, requiring exact original 1000-time
+prefix reproduction and new preregistered censoring/bracketing rules before any
+cloud admission; the old 240-arm fixed-horizon FAIL remains unchanged.
+
+### 12:39am PDT completed batches
+
+- [x] Recover inverse RD: actual scientific command 357.4 seconds, rc0, no timeout or truncation; all 30 returned file hashes, 11 source pins and phase hashes match. Six targets and twelve method/target budgets each contain 64 evaluations. Independent scientific audit/rendering is now owner14's task. Whole-allocation telemetry: 363 samples from 12:27:44–12:33:46am, mean32.27%, peak37%; not current utilization. The receipt distinguishes matmul TF32 false from cuDNN TF32 true; solver paths use float64.
+- [x] Recover corrected collocation: 233 files/45,469,659 bytes independently rehashed, 45 revised arms plus six baseline arms. Native controls pass; two revised arms leave the linear-beam model domain. Independent effect/convergence interpretation and actual-state rendering are owner07's task.
+- [x] Finish encrypted private recovery of the three CPU checkpoints, including actual S3 download and all14-file decryption/rehash on sb03. Recovery tip e97bdb0 contains the joined receipt; this add-on does not include these two newly finished batches.
+- [ ] Freeze and review the new minimal epithelial horizon packet before any CPU dispatch. Existing 240-arm FAIL remains intact.
+
+Fresh provider reads at12:39am show zero active Nebius GPUs and only the original
+16-vCPU Google cylinder worker still running. No additional frozen GPU packet is
+ready. Completed-job counts, allocation and dated telemetry remain separate.
