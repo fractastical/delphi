@@ -1,0 +1,108 @@
+{
+  "claim_id": "levin-2014-tumor-04",
+  "variables_needed": [
+    "number of KRASG12D-injected Xenopus embryos with tumor-like structures per medium (normal vs high chloride)",
+    "membrane-voltage readout under high chloride",
+    "comparison arm with Kv1.5 channel manipulation"
+  ],
+  "datasets": [
+    {
+      "id": "long-range-vmem-tumorigenesis-paper-pmc4102810",
+      "name": "Open-access article PMC4102810: Transmembrane voltage potential of somatic cells controls oncogene-mediated tumorigenesis at long-range",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.18632/oncotarget.1935&format=json&resultType=core",
+      "access_url": null,
+      "doi": "10.18632/oncotarget.1935",
+      "license": "cc by",
+      "suggested_by": [
+        "grok",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "Europe PMC core record for DOI (doi.org returned HTTP 403); supplementaryFiles endpoint opened as a partial stream",
+        "http_status": 200
+      },
+      "variables_present": [
+        "incidence figures reported in the article (not downloaded)"
+      ],
+      "variables_missing": [
+        "animal-level counts and voltage recordings in a deposited file",
+        "supplement contents not confirmed: the partial supplementaryFiles stream listed two image files (g001.gif, g003.jpg) before it was cut"
+      ],
+      "scope": "single article; isOpenAccess Y, hasSuppl Y, hasData Y, license cc by",
+      "evidence": "Europe PMC core record fields as listed.",
+      "verdict": "partial"
+    },
+    {
+      "id": "datacite-10-13016-m2uine-sbqj",
+      "name": "Resting potential, oncogene-induced tumorigenesis, and metastasis: the bioelectric basis of cancer in vivo (DataCite record)",
+      "landing_url": "https://api.datacite.org/dois/10.13016/m2uine-sbqj",
+      "access_url": null,
+      "doi": "10.13016/m2uine-sbqj",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GET DataCite DOI record",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "any measurements"
+      ],
+      "scope": "resourceTypeGeneral 'Text' (rights text: Accepted Manuscript of an article in Physical Biology, 2012)",
+      "evidence": "DataCite attributes: types.resourceTypeGeneral Text, publisher IOP Publishing, year 2012.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "KRAS Xenopus tumor membrane potential",
+      "url": "https://datadryad.org/api/v2/search?q=KRAS+Xenopus+tumor+membrane+potential&per_page=3",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"membrane potential\" AND Xenopus AND tumor",
+      "url": "https://zenodo.org/api/records?q=%22membrane+potential%22+AND+Xenopus+AND+tumor&size=3",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "DataCite",
+      "query": "\"transmembrane voltage\" tumorigenesis",
+      "url": "https://api.datacite.org/dois?query=%22transmembrane+voltage%22+tumorigenesis&page%5Bsize%5D=3",
+      "hits": 1,
+      "note": "a Text record, not data"
+    },
+    {
+      "source": "NCBI GEO",
+      "query": "Xenopus AND KRAS AND GSE",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=Xenopus+AND+KRAS+AND+GSE%5BEntry+Type%5D&retmode=json&retmax=5",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "BioStudies",
+      "query": "Xenopus tumor voltage (unquoted)",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Xenopus+tumor+voltage&pageSize=3",
+      "hits": 239395,
+      "note": "unquoted terms; top hits unrelated oocyte physiology papers"
+    }
+  ],
+  "status": "gap",
+  "summary": "No deposited animal-level data for the high-chloride or Kv1.5 KRAS experiments were found in Dryad, Zenodo, GEO or DataCite; the incidence figures exist only in the open-access article (PMC4102810) and any supplement, so a test would have to re-extract them from the paper or repeat the experiment.",
+  "next_step": "Read the article's tables and supplement and record per-condition counts; or pre-register a new Xenopus KRAS assay in normal vs high-chloride medium with a voltage readout.",
+  "obstacles_confirmed": [
+    "Animal-level voltages and incidence records are not deposited in any repository searched."
+  ],
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "levin-03"
+  }
+}

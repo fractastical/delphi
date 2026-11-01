@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claim Graph — delphisci</title>
+<meta name="description" content="Every claim extracted in delphisci, grouped by thinker or by date, coloured by proof status (Lean-checked, proved in the literature, refuted) and by the verdict of tests against data, with the math claims and theorems marked, testability and truth scores on the edges and links to the live nanopubs.">
+<link rel="icon" href="data:image/svg+xml,/*__SEAL_URI__*/">
+<link rel="stylesheet" href="css/delphi.css">
+<style>
+main{max-width:1640px}
+input{width:240px}
+.thr{display:inline-flex;align-items:center;gap:6px}.thr b{font-size:12px;min-width:30px;font-variant-numeric:tabular-nums}
+.dot{display:inline-block;width:10px;height:10px;margin-right:6px;vertical-align:-1px;border-radius:3px}
+.overview{padding:0 0 12px}
+.overview summary{cursor:pointer;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);padding:2px 0}
+.overview summary span{font-weight:400;font-size:13px;letter-spacing:0;text-transform:none;color:var(--ink-3);margin-left:10px}
+.ovwrap{overflow-x:auto;background:var(--paper-2);border:1px solid var(--grid);border-radius:10px;margin-top:10px;padding:4px 10px}
+table.ov{border-collapse:collapse;width:100%;margin:6px 0 4px;font-size:13px;font-variant-numeric:tabular-nums}
+table.ov th{font-weight:600;color:var(--ink-3);text-align:right;padding:6px;border-bottom:1px solid var(--rule);white-space:normal;vertical-align:bottom;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+table.ov td{text-align:right;padding:3px 6px;border-bottom:1px solid var(--grid);white-space:nowrap}
+table.ov th:first-child,table.ov td:first-child,table.ov td.bar2,table.ov th.bar2{text-align:left}
+table.ov td:first-child button{font-weight:600}
+table.ov tr.total td{border-top:1px solid var(--rule);border-bottom:none;font-weight:600}
+table.ov button{border-color:transparent;background:transparent;padding:2px 7px;font-size:13px;min-height:0;font-weight:500}
+table.ov button:hover{background:var(--accent-soft);border-color:transparent}
+table.ov button.on{background:var(--accent);color:var(--on-accent)}
+table.ov button.sub{font-size:11px;color:var(--ink-3);padding:1px 5px}table.ov button.sub.on{color:var(--on-accent)}
+table.ov .zero{color:var(--rule);padding:2px 7px}
+table.ov tr.grp th{border-bottom:none;text-align:center;font-weight:600;color:var(--ink-2);padding-bottom:0}
+table.ov .gl{border-left:1px solid var(--grid)}
+.stack{display:flex;width:140px;height:12px;background:var(--paper);border-radius:3px;overflow:hidden}
+.ovnote{font-size:13px;color:var(--ink-3);margin:8px 0 0}.ovnote button{font-size:12px;padding:1px 8px;min-height:0}
+.legend{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--ink-3);padding:10px 0}
+.tri{display:inline-block;width:12px;height:12px;clip-path:polygon(0 0,100% 0,0 100%);margin-right:5px;vertical-align:middle}
+.pT{background:var(--accent)}.pP{background:var(--specimen)}
+#graphwrap{overflow:hidden;background:var(--paper-2);border:1px solid var(--grid);border-radius:10px;position:relative}
+#graph{cursor:grab;touch-action:none;display:block;width:100%;height:auto;background-image:radial-gradient(var(--grid) 1px,transparent 1.2px);background-size:22px 22px}#graph:active{cursor:grabbing}
+.zoomctl{position:absolute;top:12px;right:12px;z-index:20;display:flex;gap:4px;align-items:center;background:var(--paper-2);border:1px solid var(--rule);border-radius:8px;padding:3px}
+.zoomctl button{font-size:15px;font-weight:600;line-height:1;padding:3px 10px;border-color:transparent;background:transparent}.zoomctl button:hover{background:var(--grid)}.zoomctl .zlab{font-size:11.5px;padding:3px 8px}
+#zoompct{font-size:12px;font-weight:600;min-width:44px;text-align:center}
+#drawer{position:fixed;top:14px;right:14px;width:620px;max-width:calc(100vw - 28px);max-height:calc(100vh - 28px);overflow-y:auto;z-index:60;background:var(--paper-2);border:1px solid var(--rule);border-radius:12px;padding:20px 22px;display:none;box-shadow:0 18px 50px color-mix(in srgb,var(--ink) 20%,transparent)}
+.clickable{cursor:pointer;border:none;border-bottom:1px solid var(--grid);border-radius:0;padding:8px 2px;margin:0;background:transparent;color:var(--ink);text-align:left;width:100%;display:flex;gap:8px;align-items:center;font-size:13px;font-weight:400;justify-content:flex-start;white-space:normal}
+.clickable:hover{background:var(--paper)}.clickable .r{margin-left:auto;white-space:nowrap}
+.assess{border-top:1px solid var(--grid);padding:9px 0;margin:0}.assess p{font-size:13px;margin:5px 0}
+.num{display:flex;align-items:center;gap:8px;font-size:13px;margin:5px 0}.num .l{width:150px;color:var(--ink-3)}
+.bar{display:inline-block;width:150px;height:10px;background:var(--paper);border-radius:3px;overflow:hidden}.bar>i{display:block;height:10px}
+.np{display:block;margin:12px 0;padding:10px 12px;border:1px solid var(--grid);border-radius:8px;font-size:13px;text-decoration:none}
+a.np{border-color:var(--accent)}a.np:hover{background:var(--accent-soft)}
+@media(max-width:760px){input{width:150px}#drawer{top:0;right:0;width:100%;max-width:100%;height:100dvh;max-height:100dvh;border:none;border-radius:0}}
+</style></head><body>
+<!--__SITE_HEAD__-->
+<main>
+<header class="page-head"><div><div class="eyebrow accent">Claims atlas</div><h1>Where every claim stands</h1>
+<p class="subtitle" id="subtitle"></p></div>
+<div class="nav"><span class="small" id="asof"></span><a class="btn" href="claims.json" title="Every claim with its scores as plain JSON">claims.json</a></div></header>
+
+<details class="overview" open><summary>Verification status<span id="ovsum"></span></summary>
+<div class="ovwrap"><table class="ov" id="ovtable"></table></div>
+<p class="ovnote" id="ovnote"></p></details>
+
+<div class="toolbar">
+ <span class="lab">Proof</span><span class="chips" id="f-level"></span>
+ <span class="sep"></span>
+ <span class="lab">Data test</span><span class="chips" id="f-ev"></span>
+ <span class="sep"></span>
+ <span class="lab">Math</span><span class="chips" id="f-math"></span>
+ <span class="sep"></span>
+ <button id="f-thm" onclick="setFilter({ thm: !S.thm })" title="Math claims that are machine-checked in Lean 4 or proved in the literature">★ Theorems only</button>
+ <span class="chips" id="f-thinker"></span>
+</div>
+<div class="toolbar">
+ <span class="lab">Group by</span><button id="m-thinker" class="on" onclick="setMode('thinker')">Thinker</button><button id="m-date" onclick="setMode('date')">Date</button>
+ <span class="sep"></span>
+ <button onclick="expandAll()">Expand all chapters</button><button onclick="collapseAll()">Collapse all</button>
+ <span class="sep"></span>
+ <input id="search" type="search" placeholder="Search claims…" aria-label="Search claims">
+ <span class="small mut" id="searchinfo"></span>
+ <span class="sep"></span>
+ <span class="lab">Show only</span>
+ <label class="thr" title="Minimum truth probability (P)"><span class="pill pP">P ≥</span><input id="minP" type="range" min="0" max="1" step="0.05" value="0"><b id="minPv">any</b></label>
+ <label class="thr" id="minTlab" title="Minimum testability score (T)"><span class="pill pT">T ≥</span><input id="minT" type="range" min="0" max="1" step="0.05" value="0"><b id="minTv">any</b></label>
+ <button id="clearthr" onclick="clearFilters()" style="display:none">Clear filters</button>
+ <span class="small mut" id="shown"></span>
+</div>
+<div class="legend" id="legend"></div>
+
+<div id="graphwrap"><svg id="graph" aria-label="Claim graph (zoomable)"></svg>
+<div class="zoomctl"><button onclick="zoomStep(0.8)" title="Zoom out">−</button><span id="zoompct">100%</span><button onclick="zoomStep(1.25)" title="Zoom in">+</button>
+<button class="zlab" onclick="fitView()" title="Fit (F)">Fit</button><button class="zlab" onclick="resetView()" title="Reset (0)">Reset</button></div></div>
+<p class="mut small" style="margin:6px 2px 0">Click any card to open it. Click a chapter to show its claims as cards. Pinch or ⌘-scroll zooms, drag pans, <b>F</b> fits, <b>Esc</b> closes the inspector.</p>
+<div id="drawer"></div>
+</main>
+<!--__SITE_FOOT__-->
+<script>
+const DATA = /*__DATA__*/null;
+const CLAIMS = DATA.claims, byId = Object.fromEntries(CLAIMS.map(c => [c.id, c]));
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+/* ---- verification level (load-claims.mjs), strongest first; red to green ---- */
+const LEVEL = { lean: { v: 1, label: 'Machine-checked in Lean 4', short: 'Lean-checked', col: '#e0a100' },
+  literature: { v: 0.9, label: 'Proved in the literature', short: 'Proved in literature', col: '#efc65a' },
+  partial: { v: 0.72, label: 'Partly proved', short: 'Partly proved', col: '#f6e2a8' },
+  untested: { v: 0.45, label: 'Not proved (and not refuted by proof)', short: 'Not proved', col: '#cbd7ec' },
+  refuted: { v: 0, label: 'Refuted as stated', short: 'Refuted', col: '#bf3b7f' } };
+const LEVELS = Object.keys(LEVEL);
+/* ---- evidence: verdict of a test against data in test-data/claim-tests/ (load-claims.mjs), a separate axis from proof ---- */
+const EV = { supports: { v: 0.85, label: 'Tested against data: supports', short: 'Supports', col: '#2f8f6b' },
+  mixed: { v: 0.6, label: 'Tested against data: mixed', short: 'Mixed', col: '#a9d9c4' },
+  inconclusive: { v: 0.45, label: 'Tested against data: inconclusive', short: 'Inconclusive', col: '#dfe6f3' },
+  refutes: { v: 0.1, label: 'Tested against data: refutes', short: 'Refutes', col: '#e7a0c4' } };
+const EVS = Object.keys(EV);
+// Colour of a claim: its proof status if it has one, else its data verdict, else untested.
+const STAND = { lean: LEVEL.lean, literature: LEVEL.literature, partial: LEVEL.partial, supports: EV.supports, mixed: EV.mixed,
+  inconclusive: EV.inconclusive, untested: { ...LEVEL.untested, label: 'Untested: not proved and not tested against data', short: 'Untested' }, refutes: EV.refutes, refuted: LEVEL.refuted };
+const STANDS = Object.keys(STAND);
+const standing = c => c.verification !== 'untested' ? c.verification : c.evidence ?? 'untested';
+const STOPS = [[0,[191,59,127]],[0.45,[203,215,236]],[1,[224,161,0]]];
+const ramp = v => { let i = 0; while (i < STOPS.length - 2 && v > STOPS[i+1][0]) i++;
+  const [a, ca] = STOPS[i], [b, cb] = STOPS[i+1], t = Math.max(0, Math.min(1, (v - a) / (b - a)));
+  return `rgb(${ca.map((x, k) => Math.round(x + (cb[k] - x) * t)).join(',')})`; };
+const scol = s => STAND[s].col;
+const meanStatus = cs => cs.reduce((s, c) => s + STAND[standing(c)].v, 0) / cs.length;
+const corner = cs => cs.every(c => standing(c) === standing(cs[0])) ? scol(standing(cs[0])) : ramp(meanStatus(cs));
+const mark = c => c.theorem ? '★' : c.math ? '∑' : '';
+const fmt = v => v == null ? '–' : v.toFixed(2);
+const short = t => /Maynard Smith$/.test(t) ? 'Maynard Smith' : t.split(' ').slice(-1)[0];
+const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+
+const live = CLAIMS.filter(c => c.registry === 'production').length;
+const truthN = CLAIMS.filter(c => c.truth != null).length;
+$('subtitle').textContent = `${CLAIMS.length} claims from ${new Set(CLAIMS.map(c => c.thinker)).size} thinkers, by how far each has been checked: proved (in Lean or the literature), tested against data, or neither. ${live} are live as nanopubs.`;
+$('asof').textContent = `As of ${new Date(DATA.built.replace(' ', 'T') + 'Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+$('legend').innerHTML = `<span><b>Corner triangle</b> = proof status, else data-test verdict:</span>` +
+  STANDS.map(s => `<span><i class="tri" style="background:${scol(s)}"></i>${STAND[s].short}${EV[s] ? ' (data)' : ''}</span>`).join('') +
+  `<span>· <b style="color:#e0a100">★</b> theorem · <b style="color:var(--ink-3)">∑</b> math, not yet proved · picture on a card = final frame of the MorphoEval simulation that tests (dark frame) or models (light frame) the claim · dashed card = draft, not published</span>` +
+  `<span>· <b>On each edge</b>: <span class="pill pT">T</span>testability, how far today's open data could settle it · <span class="pill pP">P</span>truth, blind GPT and Grok assessors' mean probability that it is true${truthN ? '' : ' (not scored yet)'} · 0–1</span>`;
+
+/* ---- tree model: root → group (thinker or decade) → chapter (books) → claim ---- */
+const S = { mode: 'thinker', sel: null, q: '', minP: 0, minT: 0, level: null, ev: null, math: null, thm: false, thinker: null };
+const OPEN = new Set();
+let TREE = null;
+// Unscored claims fail any non-zero threshold. `ev` is a verdict, 'any' (tested) or 'none' (not tested).
+const evPasses = c => !S.ev || (S.ev === 'any' ? !!c.evidence : S.ev === 'none' ? !c.evidence : c.evidence === S.ev);
+const passes = c => (!S.minP || (c.truth ?? -1) >= S.minP) && (!S.minT || (c.resolvability ?? -1) >= S.minT)
+  && (!S.level || c.verification === S.level) && evPasses(c) && (!S.math || (S.math === 'yes') === c.math) && (!S.thm || c.theorem) && (!S.thinker || c.thinker === S.thinker);
+const filtering = () => S.minP > 0 || S.minT > 0 || !!S.level || !!S.ev || !!S.math || S.thm || !!S.thinker;
+function buildTree(mode) {
+  const gkey = c => mode === 'thinker' ? c.thinker : `${Math.floor(c.year / 10) * 10}s`;
+  const groups = new Map(), CS = CLAIMS.filter(passes), liveN = CS.filter(c => c.registry === 'production').length;
+  for (const c of CS) { const k = gkey(c); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(c); }
+  const gl = [...groups.entries()].map(([k, cs]) => ({ k, cs: cs.slice().sort((a, b) => a.year - b.year), year: Math.min(...cs.map(c => c.year)) }))
+    .sort((a, b) => a.year - b.year);
+  const root = { id: 'root', kind: 'root', label: 'All claims', claims: CS, children: [],
+    sub: `${filtering() ? `${CS.length} of ${CLAIMS.length}` : CLAIMS.length} claims · ★ ${CS.filter(c => c.theorem).length} · ${liveN} live` };
+  for (const g of gl) {
+    const thinkers = [...new Set(g.cs.map(c => c.thinker))], years = [...new Set(g.cs.map(c => c.year))];
+    const gn = { id: `g:${g.k}`, kind: 'group', label: g.k, claims: g.cs, children: [],
+      sub: `${mode === 'thinker' ? (years.length > 1 ? `${years[0]}–${years.at(-1)}` : years[0]) : thinkers.map(short).join(', ')} · ${plural(g.cs.length, 'claim')}` };
+    root.children.push(gn);
+    // Books get one card per chapter; papers' claims hang directly under the group.
+    const chapters = new Map();
+    for (const c of g.cs) {
+      if (!c.section || c.section.startsWith(c.work)) { gn.children.push(claimNode(c, mode)); continue; }
+      const ck = `${c.thinker}|${c.section}`;
+      if (!chapters.has(ck)) { const ch = { id: `c:${g.k}:${ck}`, kind: 'chapter', label: c.section, claims: [], children: [], thinker: c.thinker, year: c.year }; chapters.set(ck, ch); gn.children.push(ch); }
+      chapters.get(ck).claims.push(c);
+    }
+    for (const ch of chapters.values()) {
+      ch.sub = `${mode === 'date' ? `${short(ch.thinker)} ${ch.year} · ` : ''}${plural(ch.claims.length, 'claim')}`;
+      ch.children = ch.claims.map(c => claimNode(c, mode));
+    }
+  }
+  return root;
+}
+const claimNode = (c, mode) => ({ id: `n:${c.id}`, kind: 'claim', label: c.label, claim: c, claims: [c], children: [],
+  sub: mode === 'date' ? `${short(c.thinker)} ${c.year}` : c.kind });
+
+/* ---- simulation snapshot: final frame of the MorphoEval model that tests or models the claim ---- */
+// Built by scripts/site/morpholib-thumbs.py into docs/thumbs/; `thumb` is attached in build-claim-graph.mjs.
+const nh = n => n.kind === 'claim' && n.claim.thumb ? H + THUMB_H : H;
+
+/* ---- layout: columns of stacked cards ---- */
+const W = 158, H = 76, COLW = W + 44, GAP = 38, TOP = 30;
+const THUMB_H = 66, THUMB_BOX = 58, THUMB_W = W - 12; // card growth, image height, image width
+let NODES = [], EDGES = [], WIDTH = 0, HEIGHT = 0;
+function layout() {
+  NODES = []; EDGES = [];
+  const root = TREE, cols = root.children.length;
+  WIDTH = Math.max(1200, cols * COLW + 40);
+  const place = (n, x, y) => { n.x = x; n.y = y; n.h = nh(n); NODES.push(n); };
+  place(root, WIDTH / 2 - W / 2, TOP);
+  let maxY = 0;
+  const left = (WIDTH - cols * COLW) / 2;
+  root.children.forEach((g, i) => {
+    const x = left + i * COLW + (COLW - W) / 2;
+    place(g, x, TOP + H + 70);
+    EDGES.push({ from: root, to: g, kind: 'tree' });
+    let y = g.y + H + GAP, prev = g;
+    for (const ch of g.children) {
+      place(ch, x, y); EDGES.push({ from: prev, to: ch, kind: ch.kind === 'claim' ? 'claim' : 'spine' });
+      y += ch.h + GAP; prev = ch;
+      if (ch.kind === 'chapter' && OPEN.has(ch.id)) {
+        let p = ch;
+        for (const cn of ch.children) { place(cn, x + 12, y); EDGES.push({ from: p, to: cn, kind: 'claim' }); y += cn.h + GAP; p = cn; }
+        y += 10;
+      }
+    }
+    maxY = Math.max(maxY, y);
+  });
+  HEIGHT = maxY + 20;
+}
+
+/* ---- drawing ---- */
+const NS = 'http://www.w3.org/2000/svg';
+function wrap(text, max) { const words = String(text).split(' '), out = []; let cur = '';
+  words.forEach(w => { if ((cur + ' ' + w).trim().length > max) { if (cur) out.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); }); if (cur) out.push(cur); return out; }
+const matches = c => !S.q || `${c.label} ${c.text} ${c.thinker} ${c.work} ${c.section} ${c.year}`.toLowerCase().includes(S.q);
+function draw() {
+  layout();
+  const svg = $('graph');
+  svg.setAttribute('width', WIDTH); svg.setAttribute('height', HEIGHT); svg.setAttribute('viewBox', `0 0 ${WIDTH} ${HEIGHT}`);
+  svg.innerHTML = '';
+  const mk = (tag, attrs, parent) => { const el = document.createElementNS(NS, tag); for (const k in attrs) { if (k === 'fill' || k === 'stroke') el.style[k] = attrs[k]; else el.setAttribute(k, attrs[k]); } (parent || vp).appendChild(el); return el; };
+  const vp = document.createElementNS(NS, 'g'); vp.id = 'viewport'; vp.setAttribute('transform', viewTransform()); svg.appendChild(vp);
+  const hit = n => n.claims.some(matches);
+  for (const e of EDGES) {
+    const a = e.from, b = e.to, x1 = a.x + W / 2, y1 = a.y + a.h, x2 = b.x + W / 2, y2 = b.y, mid = (y1 + y2) / 2;
+    const d = Math.abs(x1 - x2) < 4 ? `M${x1},${y1} L${x2},${y2}` : `M${x1},${y1} C${x1},${mid} ${x2},${mid} ${x2},${y2}`;
+    const faded = S.q && !hit(b);
+    mk('path', { d, fill: 'none', stroke: e.kind === 'claim' ? 'var(--ink-3)' : 'var(--rule)', 'stroke-width': e.kind === 'claim' ? 1.4 : 1.2, opacity: faded ? .2 : 1 });
+    if (e.kind === 'claim') {
+      const c = b.claim, py = y2 - GAP / 2, g = mk('g', { opacity: faded ? .2 : 1 });
+      const pill = (x, lab, v, fill) => { mk('rect', { x, y: py - 7.5, width: 46, height: 15, rx: 3, fill: v == null ? 'var(--grid)' : fill }, g);
+        const t = mk('text', { x: x + 23, y: py + 3.5, 'text-anchor': 'middle', 'font-size': 9.5, 'font-weight': 700, fill: v == null ? 'var(--ink-3)' : 'var(--on-accent)' }, g); t.textContent = `${lab} ${fmt(v)}`; };
+      pill(x2 - 49, 'T', c.resolvability, 'var(--accent)'); pill(x2 + 3, 'P', c.truth, 'var(--specimen)');
+    }
+  }
+  for (const n of NODES) {
+    const g = mk('g', {}); g.style.cursor = 'pointer';
+    g.addEventListener('click', () => { if (suppressClick) return; select(n); });
+    const root = n.kind === 'root', sel = S.sel === n.id, draft = n.claim?.draft, open = OPEN.has(n.id);
+    const faded = S.q && !hit(n);
+    g.setAttribute('opacity', faded ? .25 : 1);
+    const h = n.h;
+    mk('rect', { x: n.x, y: n.y, width: W, height: h, rx: 6, fill: root ? 'var(--ink)' : 'var(--paper-2)',
+      stroke: sel ? 'var(--accent)' : root ? 'var(--ink)' : S.q && hit(n) ? 'var(--accent)' : n.kind === 'group' ? 'var(--ink)' : n.kind === 'chapter' ? 'var(--ink-3)' : 'var(--rule)', 'stroke-width': sel ? 2.6 : n.kind === 'group' ? 1.6 : 1, 'stroke-dasharray': draft ? '5 3' : '' }, g);
+    if (!root && n.claims.length) mk('path', { d: `M${n.x + 1},${n.y + 1} h18 L${n.x + 1},${n.y + 19} z`, fill: corner(n.claims) }, g);
+    const lines = wrap(n.label, root ? 12 : 23).slice(0, 2);
+    if (wrap(n.label, 23).length > 2) lines[1] = lines[1].replace(/.{0,2}$/, '…');
+    lines.forEach((l, k) => { const t = mk('text', { x: n.x + W / 2, y: n.y + 20 + k * 12.5, 'text-anchor': 'middle', 'font-size': root ? 12 : 11, 'font-weight': 700,
+      fill: root ? 'var(--paper)' : 'var(--ink)', 'font-family': "Inter,-apple-system,'Segoe UI',sans-serif", 'letter-spacing': root ? 1.5 : 0 }, g); t.textContent = root ? l.toUpperCase() : l; });
+    const sub = mk('text', { x: n.x + W / 2, y: n.y + 20 + lines.length * 12.5 + 3, 'text-anchor': 'middle', 'font-size': 9, fill: root ? 'var(--rule)' : 'var(--ink-3)' }, g);
+    sub.textContent = n.sub;
+    if (n.kind !== 'claim' && !root) {
+      // Bottom strip: share of the card's claims at each standing.
+      let x = n.x + 1; const total = n.claims.length;
+      for (const s of STANDS) { const k = n.claims.filter(c => standing(c) === s).length; if (!k) continue;
+        const w = (W - 2) * k / total; mk('rect', { x, y: n.y + H - 7, width: w, height: 6, fill: scol(s) }, g); x += w; }
+      const nm = n.claims.filter(c => c.math).length, nt = n.claims.filter(c => c.theorem).length;
+      if (nm) { const t = mk('text', { x: n.x + 8, y: n.y + H - 12, 'font-size': 9.5, 'font-weight': 700, fill: 'var(--ink)' }, g); t.textContent = `★ ${nt}  ∑ ${nm}`; }
+    }
+    if (n.kind === 'claim' && n.claim.thumb) {
+      // Snapshot of the simulation: a small image box above the bottom row, cover-cropped.
+      const th = n.claim.thumb, by = n.y + h - 17 - THUMB_BOX, bx = n.x + 6;
+      const img = mk('image', { x: bx, y: by, width: THUMB_W, height: THUMB_BOX, href: th.src, preserveAspectRatio: 'xMidYMid slice' }, g);
+      img.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', th.src);
+      mk('rect', { x: bx, y: by, width: THUMB_W, height: THUMB_BOX, fill: 'none', stroke: th.relation === 'tests' ? 'var(--ink)' : 'var(--rule)', 'stroke-width': .8 }, g);
+      const lab = mk('text', { x: bx + THUMB_W - 3, y: by + THUMB_BOX - 3, 'text-anchor': 'end', 'font-size': 7.5, 'font-weight': 700, fill: '#fff', stroke: '#000', 'stroke-width': 2, 'paint-order': 'stroke', 'letter-spacing': .3 }, g);
+      lab.textContent = th.relation === 'tests' ? 'SIMULATION · TESTS' : 'SIMULATION · MODELS';
+    }
+    if (n.kind === 'claim' && mark(n.claim)) { const t = mk('text', { x: n.x + 8, y: n.y + h - 7, 'font-size': 9, 'font-weight': 700, fill: n.claim.theorem ? '#e0a100' : 'var(--ink-3)' }, g);
+      t.textContent = n.claim.theorem ? '★ theorem' : '∑ math'; }
+    if (n.kind === 'chapter') { const t = mk('text', { x: n.x + W - 8, y: n.y + H - 12, 'text-anchor': 'end', 'font-size': 9.5, 'font-weight': 700, fill: 'var(--ink)' }, g); t.textContent = open ? '▲ hide' : `▼ ${n.claims.length}`; }
+    if (n.kind === 'claim' && n.claim.registry === 'production') { const t = mk('text', { x: n.x + W - 7, y: n.y + h - 7, 'text-anchor': 'end', 'font-size': 9, fill: 'var(--ok)' }, g); t.textContent = '● live'; }
+    const tl = document.createElementNS(NS, 'title'); tl.textContent = n.kind === 'claim' ? `${n.label} — ${LEVEL[n.claim.verification].label}${n.claim.evidence ? ` · ${EV[n.claim.evidence].label}` : ''}${n.claim.theorem ? ' · theorem' : n.claim.math ? ' · math' : ''}${n.claim.thumb ? `\nSnapshot: MorphoEval ${n.claim.thumb.morpholib} (${n.claim.thumb.relation} this claim), frame ${n.claim.thumb.frame}/${n.claim.thumb.frames} of ${n.claim.thumb.media}` : ''}`
+      : `${n.label} — ${n.sub} · ${n.claims.filter(c => c.theorem).length} theorems, ${n.claims.filter(c => c.math).length} math claims`; g.appendChild(tl);
+  }
+  applyView();
+}
+
+/* ---- zoom & pan (same model as the problem graph) ---- */
+const VIEW = { k: 1, tx: 0, ty: 0 }; let suppressClick = false;
+const viewTransform = () => `translate(${VIEW.tx},${VIEW.ty}) scale(${VIEW.k})`;
+function applyView() { const vp = $('viewport'); if (vp) vp.setAttribute('transform', viewTransform()); $('zoompct').textContent = Math.round(VIEW.k * 100) + '%'; }
+const SW = () => WIDTH, SH = () => HEIGHT;
+function svgPoint(e) { const r = $('graph').getBoundingClientRect(); return { x: (e.clientX - r.left) * SW() / r.width, y: (e.clientY - r.top) * SH() / r.height }; }
+function zoomAt(px, py, f) { const k2 = Math.max(0.2, Math.min(5, VIEW.k * f)), r = k2 / VIEW.k; VIEW.tx = px - (px - VIEW.tx) * r; VIEW.ty = py - (py - VIEW.ty) * r; VIEW.k = k2; applyView(); }
+function zoomStep(f) { zoomAt(SW() / 2, Math.min(SH(), 900) / 2, f); }
+function resetView() { VIEW.k = 1; VIEW.tx = 0; VIEW.ty = 0; applyView(); }
+function fitView() { VIEW.k = 1; VIEW.tx = 0; VIEW.ty = 0; applyView(); $('graphwrap').scrollIntoView({ behavior: 'smooth' }); }
+(function initZoom() {
+  const svg = $('graph');
+  // Plain wheel scrolls the page; pinch (ctrlKey) or ⌘-wheel zooms.
+  svg.addEventListener('wheel', e => { if (!e.ctrlKey && !e.metaKey) return; e.preventDefault(); const p = svgPoint(e); zoomAt(p.x, p.y, Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+  let drag = null;
+  svg.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, moved: 0 }; });
+  svg.addEventListener('pointermove', e => { if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.moved += Math.abs(dx) + Math.abs(dy);
+    if (drag.moved > 4 && !suppressClick) { suppressClick = true; svg.setPointerCapture(e.pointerId); }
+    if (!suppressClick) return; const r = svg.getBoundingClientRect(); VIEW.tx += dx * SW() / r.width; VIEW.ty += dy * SH() / r.height; drag.x = e.clientX; drag.y = e.clientY; applyView(); });
+  const end = () => { drag = null; setTimeout(() => suppressClick = false, 50); };
+  svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end);
+  document.addEventListener('keydown', e => { if (e.target.matches('input')) return;
+    if (e.key === 'Escape') closeDrawer(); else if (e.key === '+' || e.key === '=') zoomStep(1.25); else if (e.key === '-') zoomStep(0.8); else if (e.key === '0' || e.key.toLowerCase() === 'f') fitView(); });
+})();
+
+/* ---- interaction ---- */
+function setMode(m) { S.mode = m; $('m-thinker').classList.toggle('on', m === 'thinker'); $('m-date').classList.toggle('on', m === 'date');
+  OPEN.clear(); TREE = buildTree(m); S.sel = null; closeDrawer(); draw(); }
+function expandAll() { walk(TREE, n => n.kind === 'chapter' && OPEN.add(n.id)); draw(); }
+function collapseAll() { OPEN.clear(); draw(); }
+function walk(n, f) { f(n); n.children.forEach(c => walk(c, f)); }
+function findNode(id) { let hit = null; walk(TREE, n => { if (n.id === id) hit = n; }); return hit; }
+function parentOf(id) { let hit = null; walk(TREE, n => { if (n.children.some(c => c.id === id)) hit = n; }); return hit; }
+function select(n) {
+  if (n.kind === 'chapter') OPEN.has(n.id) && S.sel === n.id ? OPEN.delete(n.id) : OPEN.add(n.id);
+  S.sel = n.id; draw(); openDrawer(n);
+}
+function selectClaim(id) {
+  const n = findNode(`n:${id}`); if (!n) return;
+  const p = parentOf(n.id); if (p?.kind === 'chapter') OPEN.add(p.id);
+  S.sel = n.id; draw(); openDrawer(n);
+  const r = $('graph').getBoundingClientRect(), scale = r.width / WIDTH;
+  window.scrollTo({ top: window.scrollY + r.top + (n.y * VIEW.k + VIEW.ty) * scale - innerHeight / 2, behavior: 'smooth' });
+}
+$('search').addEventListener('input', e => {
+  S.q = e.target.value.trim().toLowerCase();
+  const n = S.q ? CLAIMS.filter(c => passes(c) && matches(c)).length : 0;
+  $('searchinfo').textContent = S.q ? `${plural(n, 'match')}${n ? ' · Enter opens the first' : ''}` : '';
+  draw();
+});
+$('search').addEventListener('keydown', e => { if (e.key === 'Enter') { const c = CLAIMS.find(c => passes(c) && matches(c)); if (c) selectClaim(c.id); } });
+
+const T_ONLY = (() => { const all = new Set(CLAIMS.map(c => c.thinker)), has = [...new Set(CLAIMS.filter(c => c.resolvability != null).map(c => c.thinker))];
+  return has.length && has.length < all.size ? `${has.map(short).join(' and ')}'s claims` : ''; })();
+$('minTlab').title += T_ONLY ? `. Only ${T_ONLY} have T scores so far.` : '';
+function setThresholds(p, t) { setFilter({ minP: +p, minT: +t }); }
+function clearFilters() { setFilter({ minP: 0, minT: 0, level: null, ev: null, math: null, thm: false, thinker: null }); }
+// Small filtered sets open every chapter so the matching claims are visible without clicking.
+const AUTO_OPEN = 150;
+function setFilter(patch) {
+  Object.assign(S, patch);
+  $('minP').value = S.minP; $('minT').value = S.minT;
+  $('minPv').textContent = S.minP ? S.minP.toFixed(2) : 'any'; $('minTv').textContent = S.minT ? S.minT.toFixed(2) : 'any';
+  $('clearthr').style.display = filtering() ? '' : 'none';
+  TREE = buildTree(S.mode);
+  if (S.sel && !findNode(S.sel)) { S.sel = null; $('drawer').style.display = 'none'; }
+  const n = TREE.claims.length;
+  if (filtering() && n <= AUTO_OPEN) walk(TREE, x => x.kind === 'chapter' && OPEN.add(x.id));
+  $('shown').textContent = filtering() ? `${n} of ${CLAIMS.length} claims shown${S.minT && T_ONLY ? ` · only ${T_ONLY} have T scores so far` : ''}` : '';
+  const q = new URLSearchParams(location.search);
+  for (const [k, v] of [['p', S.minP], ['t', S.minT], ['level', S.level], ['ev', S.ev], ['math', S.math], ['thm', S.thm ? 1 : 0], ['thinker', S.thinker]]) v ? q.set(k, v) : q.delete(k);
+  history.replaceState(null, '', `${location.pathname}${q.size ? `?${q}` : ''}${location.hash}`);
+  syncFilters(); draw();
+}
+$('minP').addEventListener('input', e => setThresholds(e.target.value, S.minT));
+$('minT').addEventListener('input', e => setThresholds(S.minP, e.target.value));
+
+/* ---- verification overview and filter chips ---- */
+const THINKERS = [...new Set(CLAIMS.slice().sort((a, b) => a.year - b.year).map(c => c.thinker))];
+const nOf = f => CLAIMS.filter(f).length;
+const js = v => esc(JSON.stringify(v));
+const isOn = p => Object.entries({ ...NO_FILTER, ...p }).every(([k, v]) => S[k] === v);
+// One clickable count; clicking an active cell clears it.
+const NO_FILTER = { level: null, ev: null, math: null, thm: false, thinker: null };
+function cell(n, patch, cls = '', label = n) {
+  if (!n) return `<span class="zero">·</span>`;
+  const on = Object.values(patch).some(v => v) && isOn(patch);
+  return `<button class="${cls}${on ? ' on' : ''}" onclick='setFilter(${js(on ? NO_FILTER : { ...NO_FILTER, ...patch })})'>${label}</button>`;
+}
+const PROOF_COLS = ['lean', 'literature', 'partial', 'refuted'];
+const untested = c => c.verification === 'untested' && !c.evidence;
+function renderOverview() {
+  const sub = (k, patch) => { const km = k.filter(c => c.math).length; return km && km < k.length ? cell(km, { ...patch, math: 'yes' }, 'sub', `∑${km}`) : ''; };
+  const row = (label, t, cs) => {
+    const stack = STANDS.map(s => { const k = cs.filter(c => standing(c) === s).length; return k ? `<i style="width:${100 * k / cs.length}%;background:${scol(s)}" title="${k} ${STAND[s].short.toLowerCase()}"></i>` : ''; }).join('');
+    const un = cs.filter(untested);
+    return `<tr class="${t ? '' : 'total'}"><td>${cell(cs.length, { thinker: t }, '', `${esc(label)} <span class="mut">${cs.length}</span>`)}</td>
+      <td class="bar2"><span class="stack">${stack}</span></td>
+      <td>${cell(cs.filter(c => c.theorem).length, { thinker: t, thm: true })}</td>
+      <td>${cell(cs.filter(c => c.math).length, { thinker: t, math: 'yes' })}</td>
+      ${PROOF_COLS.map(s => { const k = cs.filter(c => c.verification === s); return `<td>${sub(k, { thinker: t, level: s })}${cell(k.length, { thinker: t, level: s })}</td>`; }).join('')}
+      <td class="gl">${cell(cs.filter(c => c.evidence).length, { thinker: t, ev: 'any' })}</td>
+      ${EVS.map(s => `<td>${cell(cs.filter(c => c.evidence === s).length, { thinker: t, ev: s })}</td>`).join('')}
+      <td class="gl">${sub(un, { thinker: t, level: 'untested', ev: 'none' })}${cell(un.length, { thinker: t, level: 'untested', ev: 'none' })}</td></tr>`;
+  };
+  const th = (title, col, short, cls = '') => `<th class="${cls}" title="${esc(title)}"><i class="dot" style="background:${col}"></i>${short}</th>`;
+  $('ovtable').innerHTML = `<tr class="grp"><th colspan="4"></th><th colspan="${PROOF_COLS.length}">Proof (math claims)</th><th class="gl" colspan="${EVS.length + 1}">Tested against data</th><th class="gl"></th></tr>` +
+    `<tr><th>Thinker · claims</th><th class="bar2">Standing</th><th title="Math claims that are Lean-checked or proved in the literature">★ Theorems</th><th title="Has a formal statement or is a mathematical kind of claim">∑ Math</th>
+    ${PROOF_COLS.map(s => th(LEVEL[s].label, LEVEL[s].col, LEVEL[s].short)).join('')}
+    <th class="gl" title="Claims with a completed test in test-data/claim-tests/">Tested</th>
+    ${EVS.map(s => th(EV[s].label, EV[s].col, EV[s].short)).join('')}
+    ${th(STAND.untested.label, STAND.untested.col, 'Untested', 'gl')}</tr>` +
+    THINKERS.map(t => row(t, t, CLAIMS.filter(c => c.thinker === t))).join('') + row('All thinkers', null, CLAIMS);
+  const queue = nOf(c => c.math && c.verification === 'untested');
+  const exploratory = nOf(c => c.dataTest && !c.dataTest.preregistered), both = nOf(c => c.evidence && c.verification !== 'untested');
+  $('ovsum').textContent = `${nOf(c => c.theorem)} theorems · ${nOf(c => c.evidence)} tested against data (${nOf(c => c.evidence === 'supports')} supported, ${nOf(c => c.evidence === 'refutes')} refuted) · ${nOf(untested)} untested of ${CLAIMS.length}`;
+  $('ovnote').innerHTML = `Two separate checks. <b>Proof</b> applies to math claims: a <b>theorem</b> is a math claim (formal notation, a Lean formalization, or a mathematical kind of claim) machine-checked in Lean 4 or proved in the literature; see <a href="theorems.html">Theorems</a>. ` +
+    `<b>Tested against data</b> applies to any claim: the verdict of a test in <code>claim-tests/</code> against open datasets, with pass and fail criteria written before the data were examined${exploratory ? ` (${exploratory} marked exploratory are the exception)` : ''}. A verdict is evidence, not settlement. ` +
+    `A proof shows a statement follows from its assumptions, not that organisms satisfy them, so ${both ? `${plural(both, 'claim')} with both appear in both groups, and ` : ''}a data verdict never makes a claim a theorem. ` +
+    `Assessor truth scores (P) are opinions and count as neither. <b>∑</b> counts math claims: ` +
+    `${cell(queue, { level: 'untested', math: 'yes' }, 'sub', `${queue} math claims are unproved`)} and are the candidates for formalization. Click any count to filter the graph.`;
+}
+function syncFilters() {
+  const chip = (label, patch, on, title = '') => `<button class="${on ? 'on' : ''}" title="${esc(title)}" onclick='setFilter(${js(patch)})'>${label}</button>`;
+  $('f-level').innerHTML = chip('All', { level: null }, !S.level) + LEVELS.map(s => chip(`<i class="dot" style="background:${scol(s)}"></i>${LEVEL[s].short} ${nOf(c => c.verification === s)}`, { level: S.level === s ? null : s }, S.level === s, LEVEL[s].label)).join('');
+  $('f-ev').innerHTML = chip('Any', { ev: null }, !S.ev) + chip(`Tested ${nOf(c => c.evidence)}`, { ev: S.ev === 'any' ? null : 'any' }, S.ev === 'any') +
+    EVS.map(s => chip(`<i class="dot" style="background:${EV[s].col}"></i>${EV[s].short} ${nOf(c => c.evidence === s)}`, { ev: S.ev === s ? null : s }, S.ev === s, EV[s].label)).join('') +
+    chip(`Not tested ${nOf(c => !c.evidence)}`, { ev: S.ev === 'none' ? null : 'none' }, S.ev === 'none');
+  $('f-math').innerHTML = chip('Any', { math: null }, !S.math) + chip(`∑ Has math ${nOf(c => c.math)}`, { math: S.math === 'yes' ? null : 'yes' }, S.math === 'yes') + chip(`No math ${nOf(c => !c.math)}`, { math: S.math === 'no' ? null : 'no' }, S.math === 'no');
+  $('f-thm').classList.toggle('on', S.thm); $('f-thm').textContent = `★ Theorems only (${nOf(c => c.theorem)})`;
+  $('f-thinker').innerHTML = S.thinker ? chip(`${esc(short(S.thinker))} ✕`, { thinker: null }, true, 'Clear the thinker filter') : '';
+  renderOverview();
+}
+
+/* ---- inspector ---- */
+const lum = c => { const m = /^#([0-9a-f]{6})$/i.exec(c); if (!m) return 0; const n = parseInt(m[1], 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; };
+const badge = (t, c) => `<span class="badge" style="background:${c};border-color:transparent;color:${lum(c) > .6 ? '#172945' : '#fff'}">${esc(t)}</span>`;
+const num = (lab, v, col) => `<div class="num"><span class="l">${lab}</span><span class="bar"><i style="width:${v == null ? 0 : Math.round(v * 100)}%;background:${col}"></i></span><b>${fmt(v)}</b></div>`;
+function npBlock(c) {
+  if (c.registry === 'production') return `<a class="np" href="${esc(c.uri)}" target="_blank" rel="noopener"><b>Open the live nanopub ↗</b><br><span class="small mut">${esc(c.uri)}</span></a>`;
+  if (c.registry === 'test') return `<a class="np" href="${esc(c.uri)}" target="_blank" rel="noopener"><b>Test-registry nanopub ↗</b> (not yet in production)</a>`;
+  return `<div class="np"><b>Not published yet.</b> ${c.draft ? 'Draft extraction: its quote has not been verified against the source text yet.' : ''}</div>`;
+}
+function claimHtml(c) {
+  const a = c.assess || [], t = c.truthBy || [];
+  return `${c.verification !== 'untested' || !c.evidence ? badge(c.verification === 'untested' ? STAND.untested.label : LEVEL[c.verification].label, scol(c.verification)) : ''}
+  ${c.evidence ? badge(EV[c.evidence].label, EV[c.evidence].col) : ''}
+  ${c.theorem ? `<a class="badge" style="background:#e0a100;color:#172945;border-color:transparent;text-decoration:none" href="theorems.html#${encodeURIComponent(c.id)}">★ Theorem ↗</a>` : c.math ? '<span class="badge ghost">∑ math, not yet proved</span>' : ''}
+  ${c.draft ? '<span class="badge ghost">draft</span>' : ''}
+  <h2>${esc(c.label)}</h2>
+  <p class="small mut" style="margin:0">${esc(c.thinker)} · <i>${esc(c.work)}</i> (${c.year})${c.section && !c.section.startsWith(c.work) ? ` · ${esc(c.section)}` : ''}${c.locator ? ` · ${esc(c.locator)}` : ''}</p>
+  ${npBlock(c)}
+  ${c.thumb ? `<a href="${esc(c.thumb.source)}" target="_blank" rel="noopener" title="Open the full animation in morpholib ↗" style="display:block;margin:10px 0"><img src="${esc(c.thumb.src)}" alt="Final frame of the ${esc(c.thumb.morpholib)} simulation" style="display:block;width:100%;border:1px solid var(--grid);border-radius:8px"></a>
+  <p class="small mut" style="margin:-4px 0 8px">Simulation snapshot: final frame (${c.thumb.frame} of ${c.thumb.frames}) of MorphoEval model <code>${esc(c.thumb.morpholib)}</code>, which ${c.thumb.relation === 'tests' ? 'tests' : 'models'} this claim. <a href="${esc(c.thumb.source)}" target="_blank" rel="noopener">Full animation ↗</a></p>` : ''}
+  <p>${esc(c.text)}</p>
+  ${c.quote ? `<blockquote>“${esc(c.quote)}”</blockquote>` : ''}
+  ${c.notation ? `<h3>Formal statement</h3><p><code>${esc(c.notation)}</code></p>` : ''}
+  ${c.statusNote || c.lean ? `<h3>Verification</h3><p>${esc(c.statusNote)}</p>` : ''}
+  ${c.lean ? `<p class="small"><code>${esc(c.lean.module)}</code><br>${c.lean.theorems.map(t => `<code>${esc(t)}</code>`).join(' ')}</p>` : ''}
+  ${c.dataTest ? `<h3>Tested against data</h3><p><b>${esc(EV[c.evidence].short)}</b> · tester confidence ${fmt(c.dataTest.confidence)} · ${c.dataTest.preregistered ? 'pre-registered' : 'exploratory, not pre-registered'}</p>
+    <p class="small">${esc(c.dataTest.hypothesis)}</p>
+    ${c.dataTest.datasets.length ? `<p class="small">Datasets: ${c.dataTest.datasets.map(esc).join(' · ')}</p>` : ''}
+    <p class="small"><a href="https://github.com/fractastical/delphi/blob/main/${esc(c.dataTest.path)}" target="_blank" rel="noopener"><code>${esc(c.dataTest.path)}</code> ↗</a></p>` : ''}
+  <h3>Edge scores</h3>
+  ${num('<span class="pill pT">T</span> Testability', c.resolvability, 'var(--accent)')}
+  ${num('<span class="pill pP">P</span> Truth', c.truth, 'var(--specimen)')}
+  <p class="small mut">Testability: how far today's open datasets could confirm or refute the claim (rubric score, mean of ${a.length || 'no'} blind assessors). Truth: the assessors' probability that the claim, as stated, is true${t.length ? ` (mean of ${t.length})` : '; not scored yet'}.</p>
+  ${t.length > 1 && Math.max(...t.map(x => x.p)) - Math.min(...t.map(x => x.p)) > 0.3 ? `<p class="small" style="color:var(--specimen)">The assessors disagree on this claim's truth by more than 0.3; treat the mean with care.</p>` : ''}
+  ${t.map(x => `<div class="assess"><b>${esc(x.who)}</b> · truth ${fmt(x.p)}<p>${esc(x.rationale)}</p></div>`).join('')}
+  ${a.map(x => `<div class="assess"><b>${esc(x.who)}</b> · ${esc(x.verdict)} · testability ${fmt(x.overall)} · confidence ${fmt(x.confidence)}
+    ${x.operationalization ? `<p>${esc(x.operationalization)}</p>` : ''}
+    ${x.datasets.length ? `<p class="small">Datasets: ${x.datasets.map(d => `<a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>`).join(' · ')}</p>` : ''}</div>`).join('')}
+  ${c.test ? `<h3>Proposed test</h3><p>${esc(c.test)}</p>` : ''}
+  ${c.doi ? `<p class="small">Source: <a href="https://doi.org/${esc(c.doi)}" target="_blank" rel="noopener">doi:${esc(c.doi)}</a></p>` : ''}
+  ${c.scope ? `<h3>Scope</h3><p>${esc(c.scope)}</p>` : ''}`;
+}
+function listHtml(n) {
+  const cs = filtering() ? n.claims.slice().sort((a, b) => (S.minT && !S.minP ? (b.resolvability ?? -1) - (a.resolvability ?? -1) : (b.truth ?? -1) - (a.truth ?? -1))) : n.claims;
+  const by = s => cs.filter(c => standing(c) === s).length;
+  return `<h2>${esc(n.kind === 'root' ? 'All claims' : n.label)}</h2><p class="small mut" style="margin:0">${esc(n.sub)} · ${cs.filter(c => c.registry === 'production').length} live</p>
+  <p class="small" style="margin:6px 0">★ ${cs.filter(c => c.theorem).length} theorems · ∑ ${cs.filter(c => c.math).length} math claims · ${STANDS.filter(by).map(s => `<i class="dot" style="background:${scol(s)}"></i>${by(s)} ${STAND[s].short.toLowerCase()}${EV[s] ? ' (data)' : ''}`).join(' · ')}</p>
+  <h3>${plural(cs.length, 'claim')}</h3>` + cs.map(c => `<button class="clickable" onclick="selectClaim('${esc(c.id)}')"><i class="tri" style="background:${scol(standing(c))};flex:none"></i>${mark(c) ? `<b style="color:${c.theorem ? '#e0a100' : 'var(--ink-3)'}">${mark(c)}</b>` : ''}${esc(c.label)}<span class="r"><span class="pill pT">${fmt(c.resolvability)}</span><span class="pill pP">${fmt(c.truth)}</span></span></button>`).join('');
+}
+function openDrawer(n) {
+  $('drawer').innerHTML = `<div style="display:flex;justify-content:flex-end"><button onclick="closeDrawer()">✕ Close</button></div>` + (n.kind === 'claim' ? claimHtml(n.claim) : listHtml(n));
+  $('drawer').style.display = 'block'; $('drawer').scrollTop = 0;
+}
+function closeDrawer() { $('drawer').style.display = 'none'; if (S.sel) { S.sel = null; draw(); } }
+
+{ const q = new URLSearchParams(location.search);
+  setFilter({ minP: +(q.get('p') || 0), minT: +(q.get('t') || 0), level: LEVEL[q.get('level')] ? q.get('level') : null,
+    ev: EV[q.get('ev')] || ['any', 'none'].includes(q.get('ev')) ? q.get('ev') : null,
+    math: ['yes', 'no'].includes(q.get('math')) ? q.get('math') : null, thm: q.get('thm') === '1', thinker: THINKERS.includes(q.get('thinker')) ? q.get('thinker') : null });
+  if (q.get('claim')) selectClaim(q.get('claim')); }
+</script></body></html>

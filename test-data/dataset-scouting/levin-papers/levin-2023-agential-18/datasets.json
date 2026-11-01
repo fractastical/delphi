@@ -1,0 +1,188 @@
+{
+  "claim_id": "levin-2023-agential-18",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T10:25:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "levin-04"
+  },
+  "variables_needed": [
+    "catalogue of heritable planarian strains with abnormal morphology and their origin (genetic vs bioelectric or physiological)",
+    "catalogue of fly morphological mutant strains (contrast class)",
+    "catalogue of mouse morphological mutant strains (contrast class)",
+    "record of planarian transgenesis attempts and outcomes"
+  ],
+  "datasets": [
+    {
+      "id": "pubmed-literature-index",
+      "name": "PubMed",
+      "landing_url": "https://pubmed.ncbi.nlm.nih.gov/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing; eutils esearch db=pubmed with counts",
+        "http_status": 200,
+        "bytes": 42324
+      },
+      "variables_present": [
+        "bibliographic index for a census of planarian transgenesis and strain papers"
+      ],
+      "variables_missing": [
+        "a structured table of planarian strains",
+        "strain origin classification"
+      ],
+      "scope": "literature index, not a strain registry",
+      "evidence": "Landing HTTP 200 (42,324 bytes). Counts (retmax=0): (planaria OR planarian OR Schmidtea OR Dugesia OR Girardia) AND (transgenesis OR transgenic OR \"germline transmission\") = 31; planaria AND (transgenic OR transgenesis) AND Schmidtea = 7; Schmidtea mediterranea[Title/Abstract] AND (transgenic OR transgenesis) = 8; the two-headed/double-headed AND line/strain AND regeneration query returned 0.",
+      "verdict": "partial"
+    },
+    {
+      "id": "flybase-portal",
+      "name": "FlyBase",
+      "landing_url": "https://flybase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing page",
+        "http_status": 200,
+        "bytes": 217422
+      },
+      "variables_present": [
+        "contrast class: Drosophila stocks and alleles with morphological phenotypes"
+      ],
+      "variables_missing": [
+        "planarian data",
+        "a ready count of morphological mutants"
+      ],
+      "scope": "Drosophila only",
+      "evidence": "HTTP 200, 217,422 bytes (landing page only; no query was run, so no stock count is recorded).",
+      "verdict": "partial"
+    },
+    {
+      "id": "mgi-portal",
+      "name": "Mouse Genome Informatics",
+      "landing_url": "https://www.informatics.jax.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing page",
+        "http_status": 200,
+        "bytes": 58275
+      },
+      "variables_present": [
+        "contrast class: mouse alleles with morphological phenotypes"
+      ],
+      "variables_missing": [
+        "planarian data",
+        "a ready count of morphological mutants"
+      ],
+      "scope": "mouse only",
+      "evidence": "HTTP 200, 58,275 bytes (landing page only; no query was run, so no allele count is recorded).",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-sra-planarian",
+      "name": "NCBI Sequence Read Archive",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/sra",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing; eutils esearch db=sra \"Schmidtea mediterranea\"[Organism] retmax=0",
+        "http_status": 200,
+        "bytes": 33915
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "catalogue of heritable planarian strains with abnormal morphology and their origin (genetic vs bioelectric or physiological)",
+        "catalogue of fly morphological mutant strains (contrast class)",
+        "catalogue of mouse morphological mutant strains (contrast class)",
+        "record of planarian transgenesis attempts and outcomes"
+      ],
+      "scope": "sequencing runs",
+      "evidence": "Landing HTTP 200 (33,915 bytes). The esearch returned 6,382 SRA records for Schmidtea mediterranea; sequencing runs do not record strain morphology or heritability.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PubMed",
+      "query": "planaria AND (transgenic OR transgenesis) AND Schmidtea",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&retmax=0&term=planaria%20AND%20%28transgenic%20OR%20transgenesis%29%20AND%20Schmidtea",
+      "hits": 7
+    },
+    {
+      "source": "PubMed",
+      "query": "(planaria OR planarian OR Schmidtea OR Dugesia OR Girardia) AND (transgenesis OR transgenic OR \"germline transmission\")",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&retmax=0&term=%28planaria%20OR%20planarian%20OR%20Schmidtea%20OR%20Dugesia%20OR%20Girardia%29%20AND%20%28transgenesis%20OR%20transgenic%20OR%20%22germline%20transmission%22%29",
+      "hits": 31
+    },
+    {
+      "source": "PubMed",
+      "query": "(planarian OR Schmidtea OR Girardia OR Dugesia) AND (two-headed OR \"double-headed\") AND (line OR strain) AND regeneration",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&retmax=0&term=%28planarian%20OR%20Schmidtea%20OR%20Girardia%20OR%20Dugesia%29%20AND%20%28two-headed%20OR%20%22double-headed%22%29%20AND%20%28line%20OR%20strain%29%20AND%20regeneration",
+      "hits": 0,
+      "note": "phrase query too narrow, not evidence of absence"
+    },
+    {
+      "source": "Europe PMC",
+      "query": "\"planarian\" AND \"transgenesis\" AND \"stable\" AND OPEN_ACCESS:y",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?format=json&pageSize=5&query=%22planarian%22%20AND%20%22transgenesis%22%20AND%20%22stable%22%20AND%20OPEN_ACCESS%3Ay",
+      "hits": 37,
+      "note": "top hit PMC13563047 (Development, 2026) on innate-immunity components limiting transgene expression in adult planarians"
+    },
+    {
+      "source": "Alliance of Genome Resources",
+      "query": "allele search API (several queries incl. Drosophila, Mus musculus, planarian)",
+      "url": "https://www.alliancegenome.org/api/search?category=allele&limit=1",
+      "hits": 0,
+      "note": "API returned {\"total\":0} even with no species filter, so the endpoint was unusable as called"
+    },
+    {
+      "source": "NCBI SRA",
+      "query": "Schmidtea mediterranea[Organism]",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&retmode=json&retmax=0&term=Schmidtea%20mediterranea%5BOrganism%5D",
+      "hits": 6382
+    },
+    {
+      "source": "Zenodo",
+      "query": "planarian transgenic",
+      "url": "https://zenodo.org/api/records?size=5&q=planarian%20transgenic",
+      "hits": 2884,
+      "note": "top 5 are taxonomy figures and behaviour code, no strain registry"
+    },
+    {
+      "source": "Dryad",
+      "query": "planarian head two-headed",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=planarian%20head%20two-headed",
+      "hits": 0
+    }
+  ],
+  "status": "partial",
+  "summary": "No registry of planarian strains exists in the places searched; the planarian side is reachable only through a literature census (PubMed: 31 records matching planarian plus transgenesis terms). FlyBase and MGI are the natural contrast catalogues but only their landing pages were checked, and the Alliance search API returned zero for every query tried.",
+  "next_step": "Run a documented PubMed/Europe PMC census of planarian heritable-line papers, classify each by origin, and pull morphology-phenotype allele counts for fly and mouse from FlyBase and MGI (their own query tools) before pre-registering.",
+  "obstacles_confirmed": [
+    "Absence of reports is not proof of absence.",
+    "No single database covers planarian strains."
+  ]
+}

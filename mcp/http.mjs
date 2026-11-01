@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { browseClaims, setDocsBase } from "./graph.mjs";
+import { handleFederation } from "./federation.mjs";
 import { REPO, localFileCount } from "./lib.mjs";
 import { observeRateLimited, observeRequest, observeSession, observeVisitor, renderMetrics } from "./metrics.mjs";
 
@@ -81,7 +82,7 @@ Data: ${files} TriG files; claim graph built ${built}. Limit: ${RATE_LIMIT} requ
 `;
 
 // The built pages that tool results link to. They inline their data, so each is one file.
-const DOC_PAGES = { "claim-graph.html": "text/html", "theorems.html": "text/html", "claims-query.html": "text/html", "claims.json": "application/json" };
+const DOC_PAGES = { "claim-graph.html": "text/html", "theorems.html": "text/html", "claims-query.html": "text/html", "claims.json": "application/json", "css/delphi.css": "text/css" };
 
 function loadDocs() {
   const docs = new Map();
@@ -114,6 +115,10 @@ export function serveHttp(createServer, port) {
       const body = gzip ? page.gzip : page.body;
       res.writeHead(200, { ...CORS, "Content-Type": page.type, "Content-Length": body.length, "Cache-Control": "public, max-age=300", Vary: "Accept-Encoding", ...(gzip ? { "Content-Encoding": "gzip" } : {}) });
       return res.end(req.method === "HEAD" ? undefined : body);
+    }
+    if (path.startsWith("/federation/")) {
+      if (limited(ip)) { res.setHeader("Retry-After", "60"); return send(res, 429, { error: `Rate limit: ${RATE_LIMIT} requests per minute per IP.` }); }
+      if (await handleFederation(req, res, path, { send, readJson })) return;
     }
     if (path !== "/mcp") return send(res, 404, { error: "Not found. The MCP endpoint is /mcp." });
     if (req.method !== "POST") return rpcError(res, 405, "Method not allowed: this server is stateless, use POST /mcp.");

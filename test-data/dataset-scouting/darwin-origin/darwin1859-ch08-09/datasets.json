@@ -1,0 +1,202 @@
+{
+  "claim_id": "darwin1859-ch08-09",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-08"
+  },
+  "variables_needed": [
+    "interspecific first crosses with outcome classified (no fertilization, early embryo/seed death, later death, adult sterility)",
+    "stage of failure per cross",
+    "taxon coverage including birds and plants as in Darwin",
+    "denominator of all failed first crosses"
+  ],
+  "datasets": [
+    {
+      "id": "drosophila-speciation-dataset",
+      "name": "Drosophila speciation dataset (Coyne and Orr-igin; Dryad g5g43)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.g5g43",
+      "access_url": "https://datadryad.org/dataset/doi:10.5061/dryad.g5g43",
+      "doi": "10.5061/dryad.g5g43",
+      "license": "CC0-1.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Dryad dataset page; GET Dryad API dataset + files",
+        "http_status": 200,
+        "bytes": 58489
+      },
+      "variables_present": [
+        "Drosophila species pairs with hybrid male inviability/sterility dichotomised (per abstract)"
+      ],
+      "variables_missing": [
+        "embryonic versus later stage of death",
+        "fertilization failure counts",
+        "birds and plants"
+      ],
+      "scope": "Drosophila only; inviability not staged",
+      "evidence": "Landing returned 200 (38,741 bytes). API: published 2014-01-09, CC0-1.0, storageSize 58,489; files CoynOrriginDat_funk.csv (26,907 bytes), CoynOrriginDat_roman.csv (26,882 bytes), FitzpatrickControl.R, minFTexample.R. Abstract says intrinsic postzygotic isolation is dichotomised as to whether hybrid males show complete inviability/sterility. File download returned 401; columns not read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "mimulus-hybrid-seed-inviability-64dh3",
+      "name": "Disruption of endosperm development is a major cause of hybrid seed inviability between Mimulus guttatus and M. nudatus",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.64dh3",
+      "access_url": "https://datadryad.org/dataset/doi:10.5061/dryad.64dh3",
+      "doi": "10.5061/dryad.64dh3",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Dryad API /api/v2/datasets/doi:10.5061/dryad.64dh3 and /versions/*/files",
+        "http_status": 200,
+        "bytes": 64663
+      },
+      "variables_present": [
+        "seed set and proportions and seed morphology for reciprocal hybrid crosses of one plant species pair",
+        "endosperm/embryo development stage data (confocal)"
+      ],
+      "variables_missing": [
+        "birds",
+        "many species pairs",
+        "fertilization-failure class"
+      ],
+      "scope": "One species pair (Mimulus), plants",
+      "evidence": "Dryad API GET /api/v2/datasets/doi:10.5061/dryad.64dh3 returned 200: title 'Disruption of endosperm development is a major cause of hybrid seed inviability between Mimulus guttatus and Mimulus nudatus', published 2016-12-07, license CC0-1.0, storageSize 64663 bytes; file list: CCvsPENConfocalData.csv 1,164; ImmatureSeedSize 52,407; SeedMorphSizeData.csv 8,255; SeedSetandProportions.csv 2,837. Abstract: some hybrid seeds show early endosperm disruption and are inviable; others fail later. File download via the Dryad API returned 401 (Unauthorized), so file contents were not read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "f1-viability-animal-crosses-pone-0001294",
+      "name": "Variation in F1 viability among different animal crosses (PLoS ONE 2008 Table 1)",
+      "landing_url": "https://figshare.com/articles/dataset/Variation_in_F1_viability_among_different_animal_crosses_/611570",
+      "access_url": "https://ndownloader.figshare.com/files/941139",
+      "doi": "10.1371/journal.pone.0001294.t001",
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Figshare API /v2/articles/611570",
+        "http_status": 200,
+        "bytes": 5632
+      },
+      "variables_present": [
+        "F1 viability values for animal crosses (Table_1.xls)"
+      ],
+      "variables_missing": [
+        "stage of death (the table notes inviability examples are partial)",
+        "plants",
+        "full coverage"
+      ],
+      "scope": "Illustrative animal examples, 'not an exhaustive review' per description",
+      "evidence": "Figshare API returned 200: license CC BY 4.0, published 2013-02-21, file Table_1.xls (5,632 bytes). Description: data obtained from studies on postzygotic isolation, 'examples of partial inviability and not an exhaustive review'. Related to https://doi.org/10.1371/journal.pone.0001294.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-gene-expression-omnibus",
+      "name": "NCBI Gene Expression Omnibus",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET landing; Entrez esearch db=gds",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "stage-of-failure classification of crosses",
+        "fertilization versus death counts"
+      ],
+      "scope": "Expression series; not cross-outcome tables",
+      "evidence": "Landing returned 200 (21,426 bytes). Entrez esearch db=gds returned count 38 for 'hybrid embryo interspecific' and 2 for 'interspecific hybrid inviability'. Expression profiles do not record the fraction of failed crosses by stage.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "dryad-repository-portal",
+      "name": "Dryad (repository portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET landing; DataCite/Zenodo searches",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a multi-taxon stage-of-failure table"
+      ],
+      "scope": "Portal, not a dataset",
+      "evidence": "Dryad landing page https://datadryad.org/ returned 200 (15,621 bytes); it is a repository, not a dataset. Specific datasets found are listed above; avian cross datasets were not found.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad API",
+      "query": "dryad.g5g43 and dryad.64dh3 dataset records",
+      "url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.g5g43",
+      "hits": 2
+    },
+    {
+      "source": "Zenodo",
+      "query": "interspecific cross embryo abortion seed hybrid failure stage",
+      "url": "https://zenodo.org/api/records?q=interspecific+cross+embryo+abortion+seed+hybrid+failure+stage&size=5",
+      "hits": 332663,
+      "note": "found Mimulus (dryad.64dh3); also sunflower barrier data dryad.r4j63pg0 and Vigna F1 hybrids zenodo.15459260, not inspected"
+    },
+    {
+      "source": "DataCite",
+      "query": "hybrid inviability embryonic lethality interspecific crosses",
+      "url": "https://api.datacite.org/dois?query=hybrid+inviability+embryonic+lethality+interspecific+crosses&page%5Bsize%5D=5",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "interspecific hybridization seed abortion endosperm failure",
+      "url": "https://api.datacite.org/dois?query=interspecific+hybridization+seed+abortion+endosperm+failure&page%5Bsize%5D=5",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "Mimulus hybrid seed inviability embryo",
+      "url": "https://api.datacite.org/dois?query=Mimulus+hybrid+seed+inviability+embryo&page%5Bsize%5D=5",
+      "hits": 5,
+      "note": "also dryad.w9ghx3fs4 and dryad.xsj3tx9tr (Mimulus postzygotic isolation); not inspected"
+    },
+    {
+      "source": "Figshare",
+      "query": "hybrid inviability embryo cross",
+      "url": "https://api.figshare.com/v2/articles/search",
+      "hits": 1,
+      "note": "found PLoS ONE F1 viability table"
+    },
+    {
+      "source": "NCBI Entrez GDS",
+      "query": "hybrid embryo interspecific",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=hybrid+embryo+interspecific&retmode=json&retmax=0",
+      "hits": 38
+    }
+  ],
+  "status": "partial",
+  "summary": "Open CC0 or CC BY data exist for single systems: Mimulus seed development in reciprocal hybrids, Drosophila pair-level hybrid inviability/sterility flags, and an illustrative table of F1 viability in animal crosses. None records the stage of failure across a representative set of first crosses, and no bird cross dataset was found.",
+  "next_step": "Compile a cross-by-cross table from the literature Darwin cites and later hybrid-seed studies, coding failure stage, then choose the denominator before pre-registering.",
+  "obstacles_confirmed": [
+    "No public stage-of-failure table spanning birds and plants was found.",
+    "Drosophila dataset dichotomises male inviability/sterility without embryo stage.",
+    "Dryad file downloads returned 401, so columns were not read."
+  ]
+}

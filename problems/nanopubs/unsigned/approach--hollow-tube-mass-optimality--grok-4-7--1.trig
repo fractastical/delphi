@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean: a gas-filled tube has no interior stiffness optimum" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> ;
+    dct:description "For a circular tube, k = r_inner / r_outer in [0, 1). With the second moment of area held fixed, bone cross-sectional area is proportional to sqrt((1 − k^2) / (1 + k^2)). Prove in Lean that this factor is strictly decreasing in k, so with a weightless core the stiffness-per-mass minimum is the thin-wall limit and there is no interior optimum. That is the content of the gas-filled case of Currey and Alexander's mass argument, derived here rather than quoted as a number. Then define total mass per unit length with a core density ratio q = ρ_core / ρ_bone, μ(k) = (1 − k^2 + q k^2) times the radius factor required by the fixed second moment. Prove the critical-point equation obtained by differentiating μ, and prove that a critical point in (0, 1) exists only for q in an interval the proof identifies. Local buckling enters as a symbolic lower bound t/R ≥ C σ/E; the constrained optimum is the unconstrained critical point if it satisfies the inequality, and the boundary otherwise. The constant C stays a parameter. thompson1917-ch16-04 already has the uniform-stress thickness in Lean; this approach does not redo that theorem." ;
+
+    delphi:proposedTest "Sorry-free theorems: gas-core area decreases strictly in k, and the core-density stationarity condition together with the interval of q on which an interior minimum exists." ;
+    delphi:context "Fails if: The gas-core monotonicity proof does not close, or differentiation of μ produces no interior critical point for any q, in which case the lemma is wrong and must not be restated to force a minimum." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define k, the fixed-second-moment area and μ(k, q) in ThompsonLaws. 2. Prove the gas-core area is strictly decreasing in k. 3. Derive and prove the stationarity condition for q > 0. 4. State the buckling constraint symbolically and the constrained argmin. 5. Compile with no sorry." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+
+    rdfs:seeAlso <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0076> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are biological hollow structures at the stiffness-per-mass optimum?" .
+
+
+  <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> dct:title "The thickness of the walls of tubular bones" ;
+    dct:bibliographicCitation "Currey and Alexander 1985, The thickness of the walls of tubular bones" .
+  <https://doi.org/10.1098/rspa.1995.0076> dct:title "The mechanical properties of natural materials. II. Microstructures for mechanical efficiency" ;
+    dct:bibliographicCitation "Gibson, Ashby, Wegst and Olive 1995, The mechanical properties of natural materials. II. Microstructures for mechanical efficiency" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hollow-tube-mass-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.347Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hollow-tube-mass-optimality: Lean: a gas-filled tube has no interior stiffness optimum" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

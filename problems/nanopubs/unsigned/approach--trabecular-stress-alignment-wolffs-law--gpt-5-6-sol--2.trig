@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gpt-5-6-sol--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Out-of-sample load inference from trabecular architecture" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    dct:description "Turn the potentially circular agreement test into a prediction task. For each scanned bone, define a finite library of anatomically plausible load directions before inspecting trabecular fabric. Fit a mechanostat-remodelling model and a load-independent reaction-diffusion growth model on training specimens, then ask each model to rank the held-out specimen's true load direction from architecture alone. Use the same density field and material law in both models, and score top-one identification plus angular error; this tests whether stress leaves information in architecture that a developmental null does not." ;
+
+    delphi:proposedTest "Stress causation gains support if the remodelling model identifies the held-out load within 15 degrees in at least 80% of at least 20 specimens and exceeds the developmental null by at least 25 percentage points with a permutation p-value below 0.05." ;
+    delphi:context "Fails if: Equivalent predictive accuracy of the two models, strong dependence on a tuned boundary condition, or failure on synthetic recovery falsifies the proposed discriminator." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Generate preregistered candidate load libraries and synthetic recovery tests. 2. Calibrate remodelling and developmental-null parameters only on training specimens. 3. Blind the held-out load label and rank candidate directions by posterior predictive discrepancy. 4. Repeat leave-one-specimen-out and report sensitivity to material anisotropy and boundary conditions." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: A public set of at least 20 specimens with known loading class is not yet established; static architecture cannot directly test reorientation after altered loading." ;
+    skos:note "Tool: finite-element-analysis" ;
+    skos:note "Tool: bayesian-model-comparison" ;
+    skos:note "Tool: mechanobiology-simulation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/35015116> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" .
+
+
+  <https://doi.org/10.1038/35015116> dct:title "Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" ;
+    dct:bibliographicCitation "Huiskes et al. 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to trabecular-stress-alignment-wolffs-law, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.330Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to trabecular-stress-alignment-wolffs-law: Out-of-sample load inference from trabecular architecture" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gpt-5-6-sol--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

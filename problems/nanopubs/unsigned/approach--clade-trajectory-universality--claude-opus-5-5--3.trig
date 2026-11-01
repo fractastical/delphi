@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/clade-trajectory-universality--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Artifact audit: hat-shape from Linnaean grouping and the pull of the recent" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/clade-trajectory-universality> ;
+    dct:description "Critics attribute symmetric clade histories to how clades are defined. Measure that directly. Simulate phylogenies under homogeneous birth–death (no rate decline) for 10^4 replicates per parameter set spanning observed origination and extinction rates. Partition each tree into named 'taxa' with three rules: (a) monophyletic crown and stem clades; (b) a Linnaean-style rule that founds a new 'family' when morphological divergence (Brownian character) passes a threshold, leaving paraphyletic remainders, as taxonomists do; (c) rank-by-age cuts. Apply realistic fossil sampling (Poisson preservation with rates from PBDB three-timer estimates) and the pull of the recent (perfect sampling of extant taxa). Compute the same CG and unimodality statistics as approach 1. The artifact share is the excess hat-shapedness under (b) and under the pull of the recent relative to (a) with uniform sampling. Then test on real data: restrict approach 1 to clades whose monophyly is supported in Open Tree of Life and to wholly extinct clades, and compare effect sizes." ;
+
+    delphi:proposedTest "The amount of hat-shapedness (excess unimodality over the MBL null) produced by paraphyletic definition and the pull of the recent in simulations with no real decline, compared with the excess in real data. If real excess ≤ simulated artifact excess, the pattern is an artifact; if real monophyletic and extinct-only clades retain the excess, it is not." ;
+    delphi:context "Fails if: The Linnaean rule cannot be calibrated: artifact size depends on an arbitrary divergence threshold over the plausible range, so the comparison has no fixed reference." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Implement birth–death simulation with character evolution and the three taxon-definition rules. 2. Add preservation and pull-of-the-recent sampling; compute hat statistics per pseudo-taxon. 3. Quantify artifact contributions per rule; publish code and seeds. 4. Rerun approach 1 on monophyletic-only and extinct-only subsets; compare with the simulated artifact sizes." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: simulation" ;
+    skos:note "Tool: pbdb" ;
+    skos:note "Tool: phylogenetics" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-02> ;
+    rdfs:seeAlso <https://opentreeoflife.github.io/> ;
+    rdfs:seeAlso <https://paleobiodb.org/data1.2/> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1083246> ;
+    rdfs:seeAlso <https://doi.org/10.1086/627905> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/clade-trajectory-universality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are clade diversity trajectories universally hat-shaped?" .
+
+  <https://opentreeoflife.github.io/> dct:title "Open Tree of Life" ;
+    dct:description "Monophyly support for real clades" .
+  <https://paleobiodb.org/data1.2/> dct:title "Paleobiology Database API" ;
+    dct:description "Preservation-rate estimation" .
+  <https://doi.org/10.1126/science.1083246> dct:title "The Impact of the Pull of the Recent on the History of Marine Diversity" ;
+    dct:bibliographicCitation "Jablonski et al. 2003, The impact of the pull of the recent on the history of marine diversity" .
+  <https://doi.org/10.1086/627905> dct:title "Stochastic Models of Phylogeny and the Evolution of Diversity" ;
+    dct:bibliographicCitation "Raup et al. 1973, MBL model" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to clade-trajectory-universality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.301Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to clade-trajectory-universality: Artifact audit: hat-shape from Linnaean grouping and the pull of the recent" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/clade-trajectory-universality--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

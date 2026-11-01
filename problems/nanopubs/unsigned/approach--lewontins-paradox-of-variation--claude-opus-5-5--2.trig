@@ -1,0 +1,88 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Decompose π into N_e and μ using pedigree mutation rates" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> ;
+    dct:description "Part of the paradox may sit in μ, not N_e: the drift-barrier hypothesis predicts that per-generation mutation rate falls as N_e rises, which flattens π = 4N_eμ against N_c. Pedigree-based germline mutation rates now exist for dozens of vertebrates (Bergeron et al. 2023). For every species with both a pedigree μ and a published π (Romiguier et al. 2014, Leffler et al. 2012, genome-scale estimates in NCBI-linked studies), compute N̂_e = π/(4μ) and fit log N̂_e on log N_c (PGLS). Pre-registered predictions: if the paradox is entirely in N_e, then log μ is uncorrelated with log N_c and the slope of log N̂_e equals the slope of log π; if drift-barrier compression matters, log μ declines with log N_c and the N̂_e slope is steeper than the π slope by the μ slope. The quantity of interest is the fraction of the gap between neutral slope 1 and the observed π slope that μ accounts for." ;
+
+    delphi:proposedTest "The estimated slope of log μ on log N_c and the implied share of the π–N_c gap explained by mutation-rate variation, with 95% CI. If the share's interval excludes 0, μ is a quantified part of the answer; if it is centred near 0 with a tight interval, the paradox is entirely in N_e." ;
+    delphi:context "Fails if: Fewer than about 30 species with both pedigree μ and comparable π, giving intervals spanning 0 to 100%: inconclusive, underpowered." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the decomposition and predicted signs; list admissible μ estimates (trio-based, with stated callable-genome correction). 2. Assemble the matched set (species with both μ and π); resolve taxa via the organisms layer. 3. Fit PGLS for log π, log μ and log N̂_e on log N_c; propagate μ uncertainty by parametric bootstrap. 4. Report the share of the paradox attributable to μ with its 95% interval." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: phylogenetic-comparative-methods" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-heterozygosity> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-neutral-theory> ;
+    skos:related <https://w3id.org/delphi/resource/claim/kimura-substitution-rate> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41586-023-05752-y> ;
+    rdfs:seeAlso <https://github.com/vsbuffalo/paradox_variation> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41586-023-05752-y> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nrg.2016.104> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature13685> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nrg.2016.58> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/lewontins-paradox-of-variation> a delphi:Concept, schema:Question ;
+    rdfs:label "Lewontin's paradox of variation" .
+
+  <https://doi.org/10.1038/s41586-023-05752-y> dct:title "Bergeron et al. 2023 germline mutation rates (supplementary tables)" ;
+    dct:description "Pedigree-based per-generation mutation rates across vertebrates" .
+  <https://github.com/vsbuffalo/paradox_variation> dct:title "Buffalo 2021 compilation" ;
+    dct:description "π estimates and census proxies to match against" .
+  <https://doi.org/10.1038/s41586-023-05752-y> dct:title "Evolution of the germline mutation rate across vertebrates" ;
+    dct:bibliographicCitation "Bergeron et al. 2023, Evolution of the germline mutation rate across vertebrates" .
+  <https://doi.org/10.1038/nrg.2016.104> dct:title "Genetic drift, selection and the evolution of the mutation rate" ;
+    dct:bibliographicCitation "Lynch et al. 2016, Genetic drift, selection and the evolution of the mutation rate" .
+  <https://doi.org/10.1038/nature13685> dct:title "Comparative population genomics in animals uncovers the determinants of genetic diversity" ;
+    dct:bibliographicCitation "Romiguier et al. 2014, Comparative population genomics in animals uncovers the determinants of genetic diversity" .
+  <https://doi.org/10.1038/nrg.2016.58> dct:title "Determinants of genetic diversity" ;
+    dct:bibliographicCitation "Ellegren and Galtier 2016, Determinants of genetic diversity" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to lewontins-paradox-of-variation, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.299Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to lewontins-paradox-of-variation: Decompose π into N_e and μ using pedigree mutation rates" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/lewontins-paradox-of-variation--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

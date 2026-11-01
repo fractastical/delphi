@@ -1,0 +1,89 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/turing-capable-network-topologies--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Sign-pattern theorem via additive D-stability and sign stability" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/turing-capable-network-topologies> ;
+    dct:description "Reformulate. With linearization J at a stable steady state and diagonal diffusion D ≥ 0, a Turing instability is J stable with J − k²D unstable for some k > 0. Absorbing k² into D, the pattern P is Turing-capable (all species may diffuse) iff some realization J of P is stable but not additively D-stable, that is, J − D is unstable for some nonnegative diagonal D (Cross 1978). Lemma A: sign-stable patterns, characterized combinatorially by Quirk–Ruppert and Jeffries–Klee–van den Driessche (nonpositive diagonal, no positive 2-cycles, no cycles of length ≥ 3, nonzero determinant, a colour test), stay sign-stable when negative diagonal is added, hence are Turing-incapable. Conjecture B for n = 3: P is Turing-capable iff P is potentially stable and not sign-stable. Prove B by case analysis over which Jeffries condition fails (a 3-cycle, a positive self-loop, a mutualistic 2-cycle, or the colour test). For each case give an explicit parametric family (J(ε), D) that is stable, satisfying the 3×3 Routh–Hurwitz conditions a₁ > 0, a₃ > 0, a₁a₂ > a₃, with det(J − D) of the wrong sign or Routh–Hurwitz violated for J − D. For m < n diffusing species, D is supported on the diffusing set S, and the analogous criterion involves principal submatrices of J off S (Satnoianu et al. 2000)." ;
+
+    delphi:proposedTest "A Lean-checked theorem: for n = 3 and each diffusing set S, the Turing-capable sign patterns are exactly those satisfying an explicit combinatorial condition (conjecturally 'potentially stable and not S-restricted sign-stable'), with zero disagreements against the exhaustive enumeration." ;
+    delphi:context "Fails if: The enumeration finds a potentially stable, non-sign-stable pattern that is Turing-incapable (every stable realization is additively D-stable without being sign-stable), so Conjecture B is false and the characterization needs a finer invariant." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Prove in Lean: for 3×3 real matrices, define stability by the Routh–Hurwitz inequalities on the characteristic polynomial coefficients, and prove that the Turing condition is equivalent to 'not additively D-stable'. 2. Prove Lemma A (sign-stable implies Turing-incapable) from the Jeffries conditions. 3. For each failure mode of sign stability, construct witness families and prove the inequalities with nlinarith or polyrith. 4. Extend to restricted diffusion sets S ⊂ {1,2,3} and state the theorem for each m. 5. Check the theorem against approach 2's enumeration (any disagreement is a counterexample to B)." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Mathlib lacks a ready Routh–Hurwitz theorem connecting coefficient inequalities to root location; for n = 3 it must be proved, or stability defined by the coefficient conditions with that equivalence proved separately." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: sign-pattern-matrices" ;
+    skos:note "Tool: linear-algebra" ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-ddi> ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-wavelength> ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-morphogen-hypothesis> ;
+
+    rdfs:seeAlso <https://doi.org/10.1098/rstb.1952.0012> ;
+    rdfs:seeAlso <https://doi.org/10.1016/0024-3795(78)90021-6> ;
+    rdfs:seeAlso <https://doi.org/10.4153/CJM-1977-035-3> ;
+    rdfs:seeAlso <https://doi.org/10.2307/2295838> ;
+    rdfs:seeAlso <https://doi.org/10.1007/s002850000056> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/turing-capable-network-topologies> a delphi:Concept, schema:Question ;
+    rdfs:label "Classify the network topologies that admit diffusion-driven instability" .
+
+
+  <https://doi.org/10.1098/rstb.1952.0012> dct:title "The chemical basis of morphogenesis" ;
+    dct:bibliographicCitation "Turing 1952, The chemical basis of morphogenesis" .
+  <https://doi.org/10.1016/0024-3795(78)90021-6> dct:title "Three types of matrix stability" ;
+    dct:bibliographicCitation "Cross 1978, Three types of matrix stability (D-stability, additive D-stability)" .
+  <https://doi.org/10.4153/CJM-1977-035-3> dct:title "When is a Matrix Sign Stable?" ;
+    dct:bibliographicCitation "Jeffries, Klee and van den Driessche 1977, When is a matrix sign stable?" .
+  <https://doi.org/10.2307/2295838> dct:title "Qualitative Economics and the Stability of Equilibrium" ;
+    dct:bibliographicCitation "Quirk and Ruppert 1965, Qualitative economics and the stability of equilibrium" .
+  <https://doi.org/10.1007/s002850000056> dct:title "Turing instabilities in general systems" ;
+    dct:bibliographicCitation "Satnoianu, Menzinger and Maini 2000, Turing instabilities in general systems" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to turing-capable-network-topologies, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.297Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to turing-capable-network-topologies: Sign-pattern theorem via additive D-stability and sign stability" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/turing-capable-network-topologies--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

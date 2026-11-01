@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean-proved constructional boundaries of Raup space plus a growth-rule reachability map" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> ;
+    dct:description "Separate what geometry forbids outright from what development or selection disfavours. Formalize in Lean the logarithmic-spiral shell: the generating curve's centroid at angle θ is at radius r(θ) = r₀ W^{θ/2π}, with the curve's inner edge at distance proportional to D·r. Prove: (a) successive whorls just touch when D = 1/W, Raup's boundary between overlapping and separated coils, generalized to elliptical generating curves; (b) a whorl penetrates the previous one exactly when D < 1/W under stated conditions, with the conditions on T for helicospiral forms; (c) for T = 0, an umbilicus exists iff D > 0. These carve out the constructionally impossible region (self-intersection), which must not count as an 'unexplained empty region'. Second, derive developmental reachability from local aperture growth rules (Moulton–Goriely style, with growth rate varying around the aperture): compute which (W, D, T) combinations are produced by growth-rate profiles in a bounded family, giving the developmental-constraint surface M_dev for approach 1." ;
+
+    delphi:proposedTest "Lean theorems giving the exact self-intersection boundary of Raup space (D = 1/W and its elliptical and helicospiral generalizations), and a growth-rule reachability density. Together they separate 'impossible', 'developmentally unlikely' and 'possible but unoccupied' regions, the three-way distinction the problem needs." ;
+    delphi:context "Fails if: The growth-rule family is so flexible that every geometrically valid point is reachable, leaving M_dev uninformative; or the geometric theorems hold only under circular generating curves, too restrictive for real gastropods." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. Define the spiral shell in Lean with ℝ parameters; prove the touching and penetration conditions with explicit hypotheses. 2. Report the theorems against Thompson ch11 claims (logarithmic spiral generative model). 3. Implement an aperture-growth model; sample growth-rate profiles; record resulting (W, D, T). 4. Produce the reachability density as M_dev for approach 1." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: simulation" ;
+    skos:note "Tool: theoretical-morphology" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-15> ;
+
+    rdfs:seeAlso <https://www.jstor.org/stable/1301405> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.jtbi.2012.07.009> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> a delphi:Concept, schema:Question ;
+    rdfs:label "Why is shell morphospace empty where it is?" .
+
+
+  <https://www.jstor.org/stable/1301405> dct:bibliographicCitation "Raup 1966, the W = 1/D boundary" .
+  <https://doi.org/10.1016/j.jtbi.2012.07.009> dct:title "Mechanical growth and morphogenesis of seashells" ;
+    dct:bibliographicCitation "Moulton, Goriely and Chirat 2012, growth-based shell morphogenesis" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to empty-shell-morphospace, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.302Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to empty-shell-morphospace: Lean-proved constructional boundaries of Raup space plus a growth-rule reachability map" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

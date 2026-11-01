@@ -1,0 +1,214 @@
+{
+  "claim_id": "darwin1859-ch02-07",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T09:28:48Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-03"
+  },
+  "variables_needed": [
+    "geographic range size per plant species",
+    "local abundance or occupancy per species",
+    "number of recognised infraspecific taxa (varieties/subspecies) per species",
+    "sampling or collecting effort per species (specimen counts)"
+  ],
+  "datasets": [
+    {
+      "id": "gbif-backbone-and-occurrences",
+      "name": "GBIF backbone taxonomy and occurrence records (API)",
+      "landing_url": "https://api.gbif.org/v1/",
+      "access_url": "https://api.gbif.org/v1/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET api.gbif.org/v1/species/search with datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c, highertaxonKey=6 (Plantae), rank VARIETY/SUBSPECIES/SPECIES, status ACCEPTED, limit=0; GET occurrence/search?taxonKey=6",
+        "http_status": 200,
+        "note": "https://www.gbif.org/ web portal returned 403 to curl; the API returned 200."
+      },
+      "variables_present": [
+        "accepted plant species and infraspecific taxa counts",
+        "georeferenced occurrence counts per taxon (range and effort proxies)"
+      ],
+      "variables_missing": [
+        "abundance",
+        "curated range maps",
+        "taxonomic-effort control beyond occurrence counts"
+      ],
+      "scope": "Plantae in backbone: 446,842 accepted species, 33,665 subspecies, 40,082 varieties; 652,196,829 plant occurrence records (571,650,719 with coordinates)",
+      "evidence": "Counts as returned: SPECIES 446842, SUBSPECIES 33665, VARIETY 40082; occurrence/search?taxonKey=6 -> 652196829 (hasCoordinate=true -> 571650719); facet basisOfRecord: HUMAN_OBSERVATION 487,367,689, PRESERVED_SPECIMEN 134,142,961.",
+      "verdict": "partial"
+    },
+    {
+      "id": "bien",
+      "name": "Botanical Information and Ecology Network (BIEN 4.2)",
+      "landing_url": "https://bien.nceas.ucsb.edu/bien/biendata/",
+      "access_url": "https://bien.nceas.ucsb.edu/bien/biendata/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://bien.nceas.ucsb.edu/bien/ (200) and /bien/biendata/ page text",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plant occurrences",
+        "vegetation plot counts",
+        "range maps (98,829 species in the Americas; 289,743 OpenRange maps global)"
+      ],
+      "variables_missing": [
+        "infraspecific taxon counts (not stated on the page)",
+        "plot abundance coverage outside the Americas"
+      ],
+      "scope": "Page states BIEN 4.2: 284,466,171 occurrence records, 363,258 vegetation plots, 25,932,454 trait measurements",
+      "evidence": "Data page text: 'The BIEN 4.2 release includes over 284 million primary botanical occurrence records' and the counts above; access through the BIEN R package.",
+      "verdict": "partial"
+    },
+    {
+      "id": "wcvp",
+      "name": "World Checklist of Vascular Plants (Kew WCVP download)",
+      "landing_url": "https://sftp.kew.org/pub/data-repositories/WCVP/",
+      "access_url": "https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET http://sftp.kew.org/pub/data-repositories/WCVP/ (directory listing); HEAD https://sftp.kew.org/pub/data-repositories/WCVP/wcvp.zip",
+        "http_status": 200,
+        "bytes": 88179649
+      },
+      "variables_present": [
+        "global checklist of accepted names with infraspecific taxa (per the assessors; columns not opened because the file is over 1 MB)"
+      ],
+      "variables_missing": [
+        "range size",
+        "abundance"
+      ],
+      "scope": "wcvp.zip last modified Thu, 04 Jun 2026; also wcvp_dwca.zip (84M)",
+      "evidence": "HEAD of wcvp.zip returned Content-Length 88,179,649; directory listing shows wcvp.zip and wcvp_dwca.zip, both about 84M. The POWO site https://powo.science.kew.org/ returned 403.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gift",
+      "name": "Global Inventory of Floras and Traits (GIFT)",
+      "landing_url": "https://gift.uni-goettingen.de/home",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://gift.uni-goettingen.de/home; GET https://gift.uni-goettingen.de/api/index.php?query=species&taxon_name=Poa%20annua",
+        "http_status": 200
+      },
+      "variables_present": [
+        "regional floras and species lists (per assessor)"
+      ],
+      "variables_missing": [
+        "infraspecific counts and abundance (not seen)"
+      ],
+      "scope": "Counts not read",
+      "evidence": "Home page 5,520 bytes HTTP 200; the API URL I tried returned HTTP 200 with 'No query selected' (the parameters I guessed were wrong).",
+      "verdict": "partial"
+    },
+    {
+      "id": "map-of-life",
+      "name": "Map of Life",
+      "landing_url": "https://mol.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://mol.org/",
+        "http_status": 200
+      },
+      "variables_present": [
+        "range and occupancy surfaces (per assessor; not verified)"
+      ],
+      "variables_missing": [
+        "data download endpoint",
+        "abundance"
+      ],
+      "scope": "Not inspected beyond landing page",
+      "evidence": "Landing page returned HTTP 200 (426,658 bytes); no data endpoint was queried.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "GBIF API",
+      "query": "Plantae accepted species/subspecies/varieties in backbone",
+      "url": "https://api.gbif.org/v1/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&rank=VARIETY&highertaxonKey=6&status=ACCEPTED&limit=0",
+      "hits": 40082,
+      "note": "subspecies 33665; species 446842"
+    },
+    {
+      "source": "GBIF API",
+      "query": "Plantae occurrence counts and basisOfRecord facet",
+      "url": "https://api.gbif.org/v1/occurrence/search?taxonKey=6&limit=0&facet=basisOfRecord&facetLimit=5",
+      "hits": 652196829,
+      "note": null
+    },
+    {
+      "source": "BIEN",
+      "query": "data page counts",
+      "url": "https://bien.nceas.ucsb.edu/bien/biendata/",
+      "hits": null,
+      "note": "284,466,171 occurrences; 98,829 range maps"
+    },
+    {
+      "source": "Kew WCVP",
+      "query": "directory listing and HEAD of wcvp.zip",
+      "url": "http://sftp.kew.org/pub/data-repositories/WCVP/",
+      "hits": 2,
+      "note": "wcvp.zip and wcvp_dwca.zip"
+    },
+    {
+      "source": "DataCite",
+      "query": "number of subspecies geographic range size species",
+      "url": "https://api.datacite.org/dois?query=number%20of%20subspecies%20geographic%20range%20size%20species",
+      "hits": 376,
+      "note": "top hits are insect/termite taxon treatments, unrelated"
+    },
+    {
+      "source": "Dryad",
+      "query": "range size and subspecies number",
+      "url": "https://datadryad.org/api/v2/search?q=range%20size%20and%20subspecies%20number",
+      "hits": 6,
+      "note": "island bird radiation (doi:10.5061/dryad.1m7n014) looks closest; not opened"
+    },
+    {
+      "source": "Zenodo",
+      "query": "infraspecific variation range size abundance plants dataset",
+      "url": "https://zenodo.org/api/records?q=infraspecific%20variation%20range%20size%20abundance%20plants%20dataset",
+      "hits": 838490,
+      "note": "loose; Dryad elevational range sizes of Andean woody plants (10.5061/dryad.31zcrjdt0) noted, not opened"
+    }
+  ],
+  "status": "partial",
+  "summary": "Range and effort proxies (GBIF occurrences, BIEN occurrences and range maps) and counts of infraspecific taxa (GBIF backbone 33,665 subspecies and 40,082 varieties of plants; WCVP checklist) are all openly available, but no single record set joins range size, local abundance and variety counts per species. Abundance exists only in plot data (BIEN, americas) and the three measures would have to be joined by species name.",
+  "next_step": "Join WCVP infraspecific counts to GBIF/BIEN range and occurrence counts by accepted name for a regional flora with plot abundance, with specimen counts as effort covariate; pre-register before running.",
+  "obstacles_confirmed": [
+    "Occurrence counts confound range, abundance and collecting effort.",
+    "Variety counts depend on taxonomic splitting practice."
+  ]
+}

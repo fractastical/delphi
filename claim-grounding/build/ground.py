@@ -444,12 +444,13 @@ def plan_iri():
 
     :return: the plan IRI and whether it is pinned to a clean commit
     """
-    relative = Path(__file__).resolve().relative_to(REPO).as_posix()
+    relative = Path(__file__).resolve().relative_to(REPO).as_posix()  # relative to 
+    pinned_path = f"{relative}"  # path in the GitHub repo
     commit = subprocess.run(["git", "-C", str(REPO), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
     dirty = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain", "--", relative],
                            capture_output=True, text=True).stdout.strip()
     pinned = bool(commit) and not dirty
-    return f"https://github.com/fractastical/delphi/blob/{commit if pinned else 'UNCOMMITTED'}/{relative}", pinned
+    return f"https://github.com/fractastical/delphi/blob/{commit if pinned else 'UNCOMMITTED'}/{pinned_path}", pinned
 
 
 def literal(text):

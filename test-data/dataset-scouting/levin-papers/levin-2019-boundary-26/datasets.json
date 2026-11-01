@@ -1,0 +1,99 @@
+{
+  "claim_id": "levin-2019-boundary-26",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T09:46:54Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "levin-02"
+  },
+  "variables_needed": [
+    "executable ion-channel and gap-junction network model with fixed parameters",
+    "transient stimulus protocol and stable Vmem patterns",
+    "in vivo time series of a switch and the later attractor (for the tissue reading)"
+  ],
+  "datasets": [
+    {
+      "id": "betse",
+      "name": "BETSE - Bioelectric Tissue Simulation Engine (Pietak & Levin)",
+      "landing_url": "https://github.com/betsee/betse",
+      "access_url": "https://api.github.com/repos/betsee/betse",
+      "doi": null,
+      "license": "BSD-2-Clause",
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET GitHub API repo record, root contents, betse/data/yaml listing; GET PyPI JSON",
+        "http_status": 200
+      },
+      "variables_present": [
+        "open-source simulator of multicellular bioelectric networks with ion channels and gap junctions",
+        "default simulation config sim_config.yaml and INITS/SIMS/RESULTS config directories"
+      ],
+      "variables_missing": [
+        "a published BETSE configuration verified to show multiple attractors and transient switching (not checked)"
+      ],
+      "scope": "software, not a dataset; PyPI release 1.5.0; repo pushed 2025-04-16; 105 stars at fetch",
+      "evidence": "GitHub API: full_name betsee/betse, description 'BETSE - Bioelectric Tissue Simulation Engine', license spdx BSD-2-Clause; contents list betse, betse_test, doc, pyproject.toml; betse/data/yaml has INITS, RESULTS, SIMS, extra_configs, geo, sim_config.yaml.",
+      "verdict": "partial"
+    },
+    {
+      "id": "biomodels",
+      "name": "BioModels",
+      "landing_url": "https://www.biomodels.org/",
+      "access_url": "https://www.ebi.ac.uk/biomodels/search?query=gap+junction&offset=0&numResults=10&format=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET search API for 'gap junction', 'connexin', 'bistability membrane potential'",
+        "http_status": 200
+      },
+      "variables_present": [
+        "SBML models with membrane-potential and coupling dynamics (a few)"
+      ],
+      "variables_missing": [
+        "a verified multistable model of voltage-gated channels coupled by voltage-gated gap junctions (not found)"
+      ],
+      "scope": "'gap junction' 2 matches (Maleckar2008_AtrialMyocyte, Verma2016 hepatocyte Ca2+); 'connexin' 1; 'bistability membrane potential' 2 (Bertram2004 beta-cell models A and B); contents of the models not inspected",
+      "evidence": "Search responses listed MODEL9810152478, BIOMD0000000834, BIOMD0000000373, MODEL1006230071 (format SBML).",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "BioModels",
+      "query": "gap junction",
+      "url": "https://www.ebi.ac.uk/biomodels/search?query=gap+junction&offset=0&numResults=10&format=json",
+      "hits": 2,
+      "note": "MODEL9810152478 Maleckar2008_AtrialMyocyte; BIOMD0000000834 Verma2016 hepatocyte Ca2+ propagation"
+    },
+    {
+      "source": "BioModels",
+      "query": "connexin",
+      "url": "https://www.ebi.ac.uk/biomodels/search?query=connexin&offset=0&numResults=10&format=json",
+      "hits": 1,
+      "note": "Maleckar2008_AtrialMyocyte"
+    },
+    {
+      "source": "BioModels",
+      "query": "bistability membrane potential",
+      "url": "https://www.ebi.ac.uk/biomodels/search?query=bistability+membrane+potential&offset=0&numResults=10&format=json",
+      "hits": 2,
+      "note": "BIOMD0000000373 and MODEL1006230071, Bertram2004 pancreatic beta-cell models A and B"
+    }
+  ],
+  "status": "partial",
+  "summary": "BETSE (BSD-2-Clause, PyPI 1.5.0) is an open implementation of channel and gap-junction dynamics, so the in silico reading is testable, but I did not verify a configuration showing multistability, and BioModels searches found only a few bistable or coupled membrane models. No public in vivo time series of a bioelectric switch exists in what I searched.",
+  "next_step": "Run a BETSE or BioModels (Bertram2004) bistability scan under fixed parameters; for the tissue reading, a data test needs lab-held voltage-dye time series (none public).",
+  "obstacles_confirmed": [
+    "No public time series records an in vivo bioelectric switch and the subsequent attractor.",
+    "A multistable model does not show that tissues occupy those attractors."
+  ]
+}

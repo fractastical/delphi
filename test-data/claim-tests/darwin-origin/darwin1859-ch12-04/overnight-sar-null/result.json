@@ -1,0 +1,186 @@
+{
+  "claim_id": "darwin1859-ch12-04",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/darwin1859-ch12-04",
+  "project": "darwin-origin",
+  "status": "complete",
+  "approach": "species-area-exponent--claude-opus-5-5--2",
+  "hypothesis": "If no mechanism beyond the species-abundance distribution and random placement sets the island species-area exponent, the distribution of dataset-level power-law exponents z in the Triantis, Guilhaumon and Whittaker 2012 island compilation is indistinguishable from the Coleman null E[S(a)] = sum_i 1-(1-a)^{n_i}.",
+  "pass_criterion": "A two-sample Anderson-Darling test of the observed per-dataset z values against the Coleman-null z values gives p > 0.05 under at least one pre-registered SAD family (lognormal with sigma in [1, 3], log-series with alpha in [5, 500], or Preston's canonical constraint). That result means z needs no ecological mechanism beyond abundance structure and random placement.",
+  "fail_criterion": "Observed z is systematically higher than the null when the Anderson-Darling p is at most 0.05 and the observed median z exceeds the null median z. That excess (observed median minus null median) is the contribution of a further mechanism. A systematic shortfall is a mismatch of the sampling-only account and is not called an excess.",
+  "planned_datasets": [
+    "triantis-guilhaumon-whittaker-2012-island-sar"
+  ],
+  "test_contract": {
+    "expected_observation": "Per-dataset power-law exponents from the Triantis et al. 2012 island compilation fall inside the Coleman random-placement null (Anderson-Darling p > 0.05) for a pre-registered species-abundance family.",
+    "disconfirming_observation": "The observed exponents are systematically higher than that null (Anderson-Darling p <= 0.05 and a higher observed median), an excess over sampling. If the compilation's observed z values cannot be obtained from a public file, the comparison is not run and the verdict is inconclusive with reason data-unavailable; observed z values are never invented.",
+    "admissible_datasets": "A public file from the Triantis, Guilhaumon and Whittaker 2012 Journal of Biogeography paper (DOI 10.1111/j.1365-2699.2011.02652.x) or its journal supplement, Dryad, Zenodo or Figshare deposit, that reports island species-area datasets with a fitted exponent z, or the island areas and richness values from which z can be refit. The file must be fetched from a URL that resolves; area span and island count may be used to place the null, but the comparison requires the observed z values themselves.",
+    "inference_method": "Null z is the ordinary-least-squares slope of log(E[S(a)]) on log(a), with E[S(a)] = sum_i 1-(1-a)^{n_i} (Coleman 1981). The SAD grid, fixed before any download, is: J in {1e3, 1e5, 1e7, 1e9}; lognormal sigma in {1, 2, 3} with S0 in {20, 100, 500}, abundances set by lognormal quantiles scaled to sum to J and then largest-remainder rounded to integers of at least 1; log-series alpha in {5, 50, 500} with the closed form E[S(a)] = alpha * ln(1 + a*J/alpha); Preston canonical with S0 in {20, 100, 500}, sigma chosen so the log2 individuals-curve mode coincides with the octave of the most abundant species and the least abundant species is one individual. Cells with S0 > J are infeasible. If a public per-dataset area list exists, each dataset is matched to that list; otherwise the null is reported on a fallback geometry that was also fixed in advance: n_islands in {5, 10, 20, 40}, log10(Amax/Amin) in {1, 2, 3, 4}, islands geometrically spaced, and two pool conventions (a_i = A_i/sum(A), or a_i = A_i/(10*Amax)). Islands with E[S] < 0.5 are dropped; a cell with fewer than 4 remaining islands is infeasible. For J = 1e3 only, one stochastic abundance draw with seed 20261101 is compared with the analytical z and is not used in the Anderson-Darling test. The decision rule is the two-sample Anderson-Darling test (scipy anderson_ksamp) of observed z against null z within each SAD family. Quantile regression is descriptive and is not the decision rule."
+  },
+  "data_kind": "computational",
+  "interpretation": "Darwin's sentence says oceanic islands hold far fewer species than continental areas of equal size, and that physical conditions do not explain the difference. The open problem asks what sets the species-area exponent z. This run maps that question onto Coleman's random-placement curve, E[S(a)] = sum_i 1-(1-a)^{n_i}, which already predicts fewer species in a smaller sample. The numbers below are that null, not a measurement of islands. Preston's canonical constraint is implemented as a lognormal whose least abundant species has one individual and whose individuals-curve mode sits on the richest species; it is not rescaled onto the J grid, because that rescaling would move the veil line. The classic claim that a canonical lognormal yields z around 0.25 is a different sampling construction from the ordinary-least-squares slope of this Coleman curve on the pre-registered windows.",
+  "datasets": [],
+  "method": "No public file supplied the Triantis et al. 2012 per-dataset exponents or island areas, so the null was evaluated on the fallback geometries named in the pre-registered contract: 5, 10, 20 and 40 geometrically spaced islands, area spans of 1, 2, 3 and 4 orders of magnitude, and two pool conventions (island areas partition the pool, or the pool is ten times the largest island). Lognormal communities use sigma in {1, 2, 3} and S0 in {20, 100, 500}, with normal quantiles scaled to J in {1e3, 1e5, 1e7, 1e9} and largest-remainder rounded to integers of at least 1. Log-series communities use alpha in {5, 50, 500} and the closed form alpha*ln(1+a*J/alpha), checked against a truncated Coleman sum. Preston communities use S0 in {20, 100, 500} with sigma equal to the upper normal quantile, which enforces the canonical mode condition. z is the ordinary-least-squares slope of log expected richness on log relative area, dropping islands with expected richness below 0.5 and requiring at least four islands. For J=1000 only, one stochastic abundance draw from Generator seed 20261101 was compared with the analytical z and was not treated as an observation. The Anderson-Darling comparison was not run.",
+  "measured": {
+    "value": 0.13432457143522103,
+    "unit": "Coleman-null power-law exponent z on the pre-registered grid",
+    "n": 1618,
+    "uncertainty": "5th\u201395th percentile 0.0000 to 0.9255",
+    "extra": {
+      "closed_form_max_abs_error": 5.115907697472721e-13,
+      "n_cells": 1632,
+      "n_feasible": 1618,
+      "n_infeasible": 14,
+      "null_z": {
+        "n": 1618,
+        "min": 0.0,
+        "p05": 0.0,
+        "p25": 0.014986540504390697,
+        "median": 0.13432457143522103,
+        "p75": 0.4696005149634326,
+        "p95": 0.9254933829339254,
+        "max": 0.9862409711291172,
+        "mean": 0.27462286031282573,
+        "sd": 0.30430750167148457
+      },
+      "by_family": {
+        "lognormal": {
+          "n": 1142,
+          "min": 0.0,
+          "p05": 0.0,
+          "p25": 0.0014150327249855743,
+          "median": 0.1052347065269742,
+          "p75": 0.4676774834535349,
+          "p95": 0.9243147748584919,
+          "max": 0.9842102284499152,
+          "mean": 0.25783018450559736,
+          "sd": 0.3102491303122621
+        },
+        "logseries": {
+          "n": 381,
+          "min": 0.05823356517234321,
+          "p05": 0.06998715969732879,
+          "p25": 0.10255814305517348,
+          "median": 0.19555457929719183,
+          "p75": 0.5986282716967501,
+          "p95": 0.9657462396607089,
+          "max": 0.9862409711291172,
+          "mean": 0.34923412896024064,
+          "sd": 0.3012259664835963
+        },
+        "preston_canonical": {
+          "n": 95,
+          "min": 0.006223118584135788,
+          "p05": 0.01705542589354625,
+          "p25": 0.05605654064703726,
+          "median": 0.12285962777919295,
+          "p75": 0.27800695447362866,
+          "p95": 0.47636048793816116,
+          "max": 0.5121075500900135,
+          "mean": 0.17725804365166511,
+          "sd": 0.14907672910057612
+        }
+      },
+      "by_J_lognormal_and_logseries": {
+        "1000": {
+          "n": 371,
+          "min": 0.1373091258269334,
+          "p05": 0.41588955296142227,
+          "p25": 0.5769302283219913,
+          "median": 0.751861676650667,
+          "p75": 0.9162107994870994,
+          "p95": 0.9812173427533752,
+          "max": 0.9862409711291172,
+          "mean": 0.7293582076152163,
+          "sd": 0.1971515325307463
+        },
+        "100000": {
+          "n": 384,
+          "min": 0.0,
+          "p05": 0.019858917379967943,
+          "p25": 0.15588233356344602,
+          "median": 0.28561916084047323,
+          "p75": 0.4277429540244818,
+          "p95": 0.6473528961974842,
+          "max": 0.8302313332223099,
+          "mean": 0.3035317735082659,
+          "sd": 0.189586806516181
+        },
+        "10000000": {
+          "n": 384,
+          "min": 0.0,
+          "p05": 0.0,
+          "p25": 0.0037266353348268675,
+          "median": 0.05479173875027285,
+          "p75": 0.12849878712208634,
+          "p95": 0.23037111369761795,
+          "max": 0.3923813543383921,
+          "mean": 0.07891735906790896,
+          "sd": 0.08203319620610856
+        },
+        "1000000000": {
+          "n": 384,
+          "min": 0.0,
+          "p05": 0.0,
+          "p25": 0.0,
+          "median": 0.0010030302517427363,
+          "p75": 0.063070789241695,
+          "p95": 0.10229907845274287,
+          "max": 0.14773576538381325,
+          "mean": 0.026166437251946593,
+          "sd": 0.038733367761172685
+        }
+      },
+      "share_z_positive": 0.8838071693448702,
+      "share_z_between_0_20_and_0_30": 0.06983930778739184,
+      "within_null_eta_squared": {
+        "family": 0.022329464931903825,
+        "log10_span": 0.017473134258326584,
+        "n_islands": 0.0037096774268716246,
+        "convention": 0.004202685384696426,
+        "J_on_lognormal_and_logseries": 0.7866321489536037
+      },
+      "stochastic_j_1000": {
+        "seed": 20261101,
+        "n_comparisons": 371,
+        "mean_abs_dz": 0.027359806035269118,
+        "max_abs_dz": 0.34022775697239477,
+        "logseries_adjustment_steps": {
+          "5": 178,
+          "50": 298,
+          "500": 48
+        }
+      },
+      "preston_sigma": {
+        "20": 1.959963984540054,
+        "100": 2.5758293035489004,
+        "500": 3.090232306167813
+      },
+      "preston_realized_J": {
+        "20": 4523,
+        "100": 1411693,
+        "500": 539369619
+      },
+      "observed_z_used": false,
+      "anderson_darling": {
+        "status": "not_run",
+        "reason": "data-unavailable"
+      }
+    }
+  },
+  "verdict": "inconclusive",
+  "reason": "data-unavailable",
+  "confidence": 0.8,
+  "caveats": [
+    "The comparison with observed exponents was not run. No Dryad, Zenodo, Figshare or DataCite record of the Triantis, Guilhaumon and Whittaker 2012 compilation (DOI 10.1111/j.1365-2699.2011.02652.x) was found, Unpaywall and OpenAlex mark the paper closed, and Europe PMC records no supplement. Wiley returned HTTP 403, so a subscription appendix was not inspected. Observed z values were not invented.",
+    "The CRAN package sars cites the paper and is the only OpenAlex dataset that does so. Its data files are seven small examples (aegean, aegean2, cole_sim, countryside, galap, habitat, niering), not the 601-dataset compilation, and they were not used as observations.",
+    "Without per-dataset area lists, null exponents use the pre-registered fallback windows. Those windows are not the archipelagos in the compilation, so the null spread is not an estimate of between-dataset variance.",
+    "A power-law slope is a local summary of a Coleman curve that is not itself a power law. On the lognormal and log-series cells, total abundance J accounts for 79% of the variation in null z: the median is 0.752 at J=10^3 and 0.001 at J=10^9. Species-abundance family, area span, island count and pool convention each have a small main-effect share. The null can therefore sit almost anywhere in (0, 1) when J is free. That is a property of these curves, not a comparison with islands.",
+    "The stochastic check is one draw at J=1000. It is a numerical comparison with the analytical curve, not a second null distribution and not biological data."
+  ],
+  "agent": {
+    "kind": "cursor-agent",
+    "model": "grok-4.7",
+    "run": "species-area-exponent--claude-opus-5-5--2",
+    "date": "2026-11-01"
+  }
+}

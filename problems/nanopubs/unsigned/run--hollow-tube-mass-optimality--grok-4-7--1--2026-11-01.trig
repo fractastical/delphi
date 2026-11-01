@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/run/hollow-tube-mass-optimality--grok-4-7--1--2026-11-01> a prov:Activity ;
+    rdfs:label "Run of approach hollow-tube-mass-optimality--grok-4-7--1 (2026-11-01): completed, settled its target" ;
+    dct:description "Lean 4 (ThompsonLaws.HollowTube), no sorry, standard axioms only. At fixed second moment I the wall area is sqrt(4 pi I) sqrt((1-k^2)/(1+k^2)), strictly decreasing in k = r_in/R, so with a gas core no interior optimum exists; with a core of relative density q the mass factor mu(k) = (1 - k^2 + q k^2)/sqrt(1 - k^4) has its unique global minimum at k^2 = 1 - q for 0 < q < 1, and the solid rod is optimal for q >= 1; under a buckling bound t/R >= lambda the optimum is min(sqrt(1-q), 1-lambda). The approach's failure signature did not occur. Whether bones, culms and rachises sit at k* is the pre-registered morphometry test, not run." ;
+
+    dct:subject <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> ;
+    prov:qualifiedAssociation <https://w3id.org/delphi/resource/run/hollow-tube-mass-optimality--grok-4-7--1--2026-11-01#plan> ;
+    prov:startedAtTime "2026-11-01"^^xsd:date ;
+    prov:endedAtTime "2026-11-01"^^xsd:date ;
+    schema:actionStatus schema:CompletedActionStatus ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/run/hollow-tube-mass-optimality--grok-4-7--1--2026-11-01#settled>, <https://w3id.org/delphi/resource/run/hollow-tube-mass-optimality--grok-4-7--1--2026-11-01#solves_problem> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/run-reports/hollow-tube-mass-optimality--grok-4-7--1.md> ;
+    prov:generated <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/claim-sources/thompson-growth-form/lean/reports/HollowTube.json> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/runs.json> .
+  <https://w3id.org/delphi/resource/run/hollow-tube-mass-optimality--grok-4-7--1--2026-11-01#plan> a prov:Association ;
+    prov:hadPlan <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--grok-4-7--1> .
+  <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--grok-4-7--1> a prov:Plan ;
+    rdfs:label "Lean: a gas-filled tube has no interior stiffness optimum" .
+  <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are biological hollow structures at the stiffness-per-mass optimum?" .
+  <https://w3id.org/delphi/resource/run/hollow-tube-mass-optimality--grok-4-7--1--2026-11-01#settled> a schema:PropertyValue ;
+    schema:propertyID "settled" ;
+    schema:value true ;
+    schema:description "Whether the run settled the piece of the problem its approach names (forecasts/INSTRUCTIONS.md)" .
+  <https://w3id.org/delphi/resource/run/hollow-tube-mass-optimality--grok-4-7--1--2026-11-01#solves_problem> a schema:PropertyValue ;
+    schema:propertyID "solves_problem" ;
+    schema:value false ;
+    schema:description "Whether the logged artifacts meet the problem's acceptance criteria or hit one of its falsifiers definitively" .
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-runner> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/runs.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/run-reports/hollow-tube-mass-optimality--grok-4-7--1.md> ;
+    prov:wasGeneratedBy sub:logging .
+  sub:logging a prov:Activity ;
+    rdfs:label "Logging what the swarm ran against hollow-tube-mass-optimality--grok-4-7--1 in problems/forecasts/runs.json, following problems/forecasts/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-runner> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-runner> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach runner (model not recorded in the run report)" ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.352Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Run of approach hollow-tube-mass-optimality--grok-4-7--1 (2026-11-01): completed, settled its target" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Activity ;
+    npx:introduces <https://w3id.org/delphi/resource/run/hollow-tube-mass-optimality--grok-4-7--1--2026-11-01> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,90 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--gemini-4-argon--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Ridge-traced lattice geometry across 45 images in silica, celestite, and chitin" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> ;
+    dct:description "Execute a pre-registered geometric comparison across 45 images of spherical and near-spherical single-cell lattice skeletons spanning the three chemical compositions named in `thompson1917-ch09-14` and `thompson1917-ch09-15`: amorphous silica (polycystine Radiolaria such as *Aulonia*, *Cenosphaera*, *Actinomma* from Mikrotax and Haeckel's 1887 Challenger plates), crystalline strontium sulphate / celestite (Acantharia peripheral lattices), and organic/tectin matrices (heliozoan *Clathrulina elegans*). Because the repo's `claim-sources/cell-geometry/segmenter_bias.py` audit demonstrated that Cellpose CPSAM v2 rounds corners and biases random Voronoi tilings toward 120 degrees, extract lattice graphs directly via intensity-ridge skeletonization and medial-axis vertex detection on the mineral bars, bypassing Cellpose.\n\nOn each extracted spherical graph (corrected for orthographic foreshortening within 45 degrees of the shell center), measure the interior polygon side-number distribution p_n (after subtracting topological pentagon defects forced by Euler's theorem sum(6 - n) = 12 on S^2), the triple-junction vertex angle standard deviation sigma_theta around 120 degrees, the Aboav-Weaire parameter alpha, and Lewis's law slope. Compare each specimen against: (1) a physical Plateau foam-packing simulation on S^2 (Surface Evolver / Lloyd-relaxed centroidal Voronoi), and (2) a random Poisson-Voronoi tessellation on S^2." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--gemini-4-argon--1#n_images> ;
+    delphi:proposedTest "Across the 45 images, ridge-traced vertex angle SD is <= 14 degrees (well below the 26.6 degree Poisson-Voronoi baseline, p < 0.001) and cross-mineral differences in mean hexagon fraction p_6 and vertex angle SD between silica, strontium sulphate, and organic shells are smaller than 10% (Kruskal-Wallis p > 0.20), confirming physical foam geometry and mineral independence." ;
+    delphi:context "Fails if: Ridge-traced vertex angle SD in real radiolarian and acantharian shells exceeds 22 degrees (indistinguishable from unrelaxed Poisson-Voronoi), or crystalline SrSO4 lattices show crystallographic facet angles (e.g. 90 degrees or 104 degrees) absent in amorphous silica shells." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Curate and checksum 45 images (at least 25 silica Radiolaria, 10 celestite Acantharia, and 10 organic *Clathrulina* or tintinnid loricae) from Mikrotax, Wikimedia Commons, and BHL Challenger plates. 2. Build and calibrate a ridge-tracing skeletonizer in `claim-sources/cell-geometry/` on synthetic rendered lattices (hexagonal, Voronoi, and brick-wall) to verify < 2 degrees angle bias. 3. Extract polygon side distributions, vertex angle SDs, and pore area CVs from the central cap (r <= 0.7 R_shell) of all 45 images. 4. Test whether (a) real lattices lie closer to the Plateau foam manifold than to Poisson-Voronoi (one-sided Mann-Whitney p < 0.001), and (b) chemical composition (SiO2 vs SrSO4 vs organic) has zero effect on vertex angle SD and p_6 after controlling for pore count (ANOVA / Kruskal-Wallis equivalence test)." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: Live time-lapse developmental imaging of vesicle packing paired with nascent silica or celestite deposition in Acantharia and Radiolaria is virtually nonexistent in public archives, so the test resolves mature geometric equivalence across minerals rather than direct observation of vesicles." ;
+    skos:note "Tool: image-segmentation" ;
+    skos:note "Tool: geometry-statistics" ;
+    skos:note "Tool: cell-geometry" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-15> ;
+    rdfs:seeAlso <https://www.mikrotax.org/> ;
+    rdfs:seeAlso <https://commons.wikimedia.org/> ;
+    rdfs:seeAlso <https://doi.org/10.5962/bhl.title.31840> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1102289> ;
+    rdfs:seeAlso <https://doi.org/10.1146/annurev-matsci-062910-095803> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> a delphi:Concept, schema:Question ;
+    rdfs:label "How much of biomineral form is physical, and how much is cell-controlled?" .
+  <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--gemini-4-argon--1#n_images> a schema:PropertyValue ;
+    schema:propertyID "n_images" ;
+    schema:value 45 ;
+    schema:description "images named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://www.mikrotax.org/> dct:title "Mikrotax radiolarian taxonomic and SEM image database" ;
+    dct:description "Curated SEM micrographs of polycystine radiolarian lattice shells across Cenozoic and Mesozoic genera" .
+  <https://commons.wikimedia.org/> dct:title "Wikimedia Commons open micrographs and Challenger plates" ;
+    dct:description "Public-domain Haeckel Challenger plates and open-license micrographs of Radiolaria, Acantharia, and Clathrulina" .
+  <https://doi.org/10.5962/bhl.title.31840> dct:title "Report on the Radiolaria collected by H.M.S. Challenger during the years 1873-76" ;
+    dct:bibliographicCitation "Haeckel 1887, Report on the Radiolaria collected by H.M.S. Challenger during the years 1873-76" .
+  <https://doi.org/10.1126/science.1102289> dct:title "Sea Urchin Spine Calcite Forms via a Transient Amorphous Calcium Carbonate Phase" ;
+    dct:bibliographicCitation "Politi et al. 2004, Sea urchin spine calcite forms via a transient amorphous calcium carbonate phase" .
+  <https://doi.org/10.1146/annurev-matsci-062910-095803> dct:title "Crystallization Pathways in Biomineralization" ;
+    dct:bibliographicCitation "Weiner and Addadi 2011, Crystallization pathways in biomineralization" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biomineral-form-physical-vs-biological-control, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.315Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biomineral-form-physical-vs-biological-control: Ridge-traced lattice geometry across 45 images in silica, celestite, and chitin" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--gemini-4-argon--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

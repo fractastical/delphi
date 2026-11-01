@@ -17,7 +17,7 @@ export const config = {
   channelId: process.env.DISCORD_CHANNEL_ID || "",
 
   // Git repo whose activity the agent reports on. Defaults to this repo.
-  repoDir: process.env.AGENT_REPO_DIR || resolve(__dirname, "../.."),
+  repoDir: process.env.AGENT_REPO_DIR || resolve(__dirname, "../../.."),
 
   // Persona / display name used when the agent refers to itself in messages.
   agentName: process.env.AGENT_NAME || "delphisci-bot",

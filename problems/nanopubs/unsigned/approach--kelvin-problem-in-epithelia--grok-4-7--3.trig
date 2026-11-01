@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/kelvin-problem-in-epithelia--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean-check a lower bound and the Kelvin–Weaire gap" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/kelvin-problem-in-epithelia> ;
+    dct:description "Two checked statements, neither of which is global optimality. First, formalize a lower bound on surface area for a periodic partition into equal-volume cells that is strictly stronger than the single-cell isoperimetric inequality obtained by ignoring shared faces, and prove it in Lean with interval arithmetic where a radical is involved. Second, formalize the areas of the Kelvin truncated octahedron and the Weaire–Phelan cell in the same normalization and prove the Weaire–Phelan area is smaller, to a stated interval. The acceptance criteria allow a Lean-checked lower bound that does not identify the minimizer. Do not describe the comparison of two candidates as a lower bound on all partitions." ;
+
+    delphi:proposedTest "A no-sorry lower bound strictly above the isolated-sphere area, and a no-sorry inequality that the Weaire–Phelan cell has smaller area than Kelvin's cell." ;
+    delphi:context "Fails if: The bound does not exceed the isolated-sphere area, or the interval arithmetic cannot separate the two foam areas. The approach has then not produced the promised checked comparison." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Prove a shared-face lower bound above the isolated-sphere area. 2. Compute Kelvin's cell area as an interval. 3. Compute the Weaire–Phelan area as an interval. 4. Prove the Weaire–Phelan interval lies strictly below Kelvin's. 5. State that global optimality remains open, and audit axioms." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: A proof of optimality for any three-dimensional partition. This approach does not claim one." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: surface-evolver" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-08> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1080/09500839408241577> ;
+    rdfs:seeAlso <https://doi.org/10.1007/s004540010071> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/kelvin-problem-in-epithelia> a delphi:Concept, schema:Question ;
+    rdfs:label "Kelvin's problem in epithelia" .
+
+
+  <https://doi.org/10.1080/09500839408241577> dct:title "A counter-example to Kelvin's conjecture on minimal surfaces" ;
+    dct:bibliographicCitation "Weaire and Phelan 1994, the comparison being machine-checked" .
+  <https://doi.org/10.1007/s004540010071> dct:title "The Honeycomb Conjecture" ;
+    dct:bibliographicCitation "Hales 2001, the two-dimensional theorem used as a model of what a finished proof looks like" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to kelvin-problem-in-epithelia, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.345Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to kelvin-problem-in-epithelia: Lean-check a lower bound and the Kelvin–Weaire gap" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/kelvin-problem-in-epithelia--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

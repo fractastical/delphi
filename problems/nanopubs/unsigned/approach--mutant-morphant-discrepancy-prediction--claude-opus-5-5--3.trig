@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/mutant-morphant-discrepancy-prediction--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Confound audit: do morpholino properties, not gene properties, predict it?" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> ;
+    dct:description "A rival explanation of mutant–morphant discrepancy is morpholino artefact: off-target binding and p53-mediated toxicity give phenotypes the true loss of function would not. If so, discrepancy should be predicted by properties of the morpholino, not the gene. For each morpholino in ZFIN with a target and phenotype, compute: (a) the number of off-target sites in the zebrafish transcriptome with ≤ 2 mismatches (translation-start and splice-site windows, by alignment against Ensembl transcripts); (b) whether reported phenotypes include the nonspecific toxicity signature (necrosis, pericardial oedema, small head and eyes) in the same annotations; (c) morpholino type (translation-blocking or splice-blocking) and whether rescue or p53 co-knockdown is annotated. Fit a logistic model of discrepancy on morpholino features alone, gene features alone (approach 1's), and both, with nested grouped cross-validation. Pre-registered: the artefact explanation dominates if morpholino features alone reach AUROC within 0.03 of the combined model and gene features add < 0.03." ;
+
+    delphi:proposedTest "The relative predictive contribution of morpholino properties versus gene properties to mutant–morphant discrepancy. Dominance of morpholino features attributes most discrepancies to artefact; dominance of gene features supports compensation, the Frontier problem's attribution question." ;
+    delphi:context "Fails if: Morpholino and gene features are confounded (genes with paralogs are also targeted by morpholinos with more off-target sites), so the incremental AUROCs cannot be separated; report the overlap instead of a verdict." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the toxicity signature terms, off-target search parameters and comparison thresholds. 2. Extract morpholino sequences and targets from ZFIN; run the off-target alignment. 3. Fit morpholino-only, gene-only and combined models with the same splits as approach 1. 4. Report AUROCs and the incremental contribution of each feature group." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: zfin" ;
+    skos:note "Tool: sequence-analysis" ;
+    skos:note "Tool: machine-learning" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch05-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://zfin.org/downloads> ;
+    rdfs:seeAlso <https://rest.ensembl.org/> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.devcel.2014.11.018> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature14580> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> a delphi:Concept, schema:Question ;
+    rdfs:label "Predict which genes show mutant-morphant discrepancies" .
+
+  <https://zfin.org/downloads> dct:title "ZFIN data downloads" ;
+    dct:description "Morpholino sequences, targets and phenotypes" .
+  <https://rest.ensembl.org/> dct:title "Ensembl REST API" ;
+    dct:description "Transcript sequences for off-target search" .
+  <https://doi.org/10.1016/j.devcel.2014.11.018> dct:title "Reverse Genetic Screening Reveals Poor Correlation between Morpholino-Induced and Mutant Phenotypes in Zebrafish" ;
+    dct:bibliographicCitation "Kok et al. 2015" .
+  <https://doi.org/10.1038/nature14580> dct:title "Genetic compensation induced by deleterious mutations but not gene knockdowns" ;
+    dct:bibliographicCitation "Rossi et al. 2015" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to mutant-morphant-discrepancy-prediction, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.306Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to mutant-morphant-discrepancy-prediction: Confound audit: do morpholino properties, not gene properties, predict it?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/mutant-morphant-discrepancy-prediction--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

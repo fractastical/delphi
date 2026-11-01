@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule30-center-column--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Certify a period lower bound past the published checks" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule30-center-column> ;
+    dct:description "Prove the elementary step in Lean: the Rule 30 cell is left XOR (center OR right). Then certify a long center-column prefix by blocked replay. An external bit-packed simulator emits a row hash every K steps; Lean replays each block from the certified start row and checks the hash and the center bit. The theorem is that if the center column is periodic with period p, then p exceeds N, where N is the length of the certified prefix with no period. N must be strictly larger than the longest prefix the Rule 30 prize page reports as already computed on the day the run starts. Read that horizon from the prize page first and write it into the pre-registration. A certified prefix that does not beat the published horizon is not a result under the acceptance criteria." ;
+
+    delphi:proposedTest "A no-sorry theorem that any period of the center column exceeds the published computational horizon recorded at the start of the run." ;
+    delphi:context "Fails if: A repeat is found, which refutes non-periodicity if it is a true period, or the certified N does not exceed the published horizon, in which case the approach has not met its own bar." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. Record the computational horizon stated on the prize page before running. 2. Prove the Rule 30 step function in Lean. 3. Emit block hashes from a bit-packed simulator for a prefix longer than that horizon. 4. Check every block in Lean. 5. Prove that absence of a repeat in the certified prefix rules out every period at most N." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Lean kernel time. If the published horizon is far beyond what blocked replay can certify in a month, this approach cannot finish as stated." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: large-scale-simulation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch02-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch06-14> ;
+    rdfs:seeAlso <https://www.rule30prize.org/> ;
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/rule30-center-column> a delphi:Concept, schema:Question ;
+    rdfs:label "The Rule 30 center column" .
+
+  <https://www.rule30prize.org/> dct:title "Wolfram Rule 30 Prizes" ;
+    dct:description "Source of the three problem statements and of the computational horizon the certified prefix must beat." .
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule30-center-column, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.336Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule30-center-column: Certify a period lower bound past the published checks" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule30-center-column--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

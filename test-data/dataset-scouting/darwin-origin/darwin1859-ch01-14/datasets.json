@@ -1,0 +1,104 @@
+{
+  "claim_id": "darwin1859-ch01-14",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "darwin-07" },
+  "variables_needed": [
+    "list of long-cultivated crops with duration of cultivation (domestication date)",
+    "whether a wild progenitor has been identified (and when) per crop",
+    "morphological or genomic distance between crop and nearest wild relative",
+    "status of candidate wild parent populations (extinct / unsampled / extant)"
+  ],
+  "datasets": [
+    {
+      "id": "global-crop-wild-relatives-distributions-gbif",
+      "name": "A global database for the distributions of crop wild relatives (GBIF dataset, Crop Trust / CIAT)",
+      "landing_url": "https://api.gbif.org/v1/dataset/07044577-bd82-4089-9f3a-f4a9d2170b2e",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?datasetKey=07044577-bd82-4089-9f3a-f4a9d2170b2e&limit=0",
+      "doi": "10.15468/jyrthk",
+      "license": "CC BY 4.0 (per GBIF API)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T08:12:00Z", "method": "GET GBIF registry dataset record and occurrence/search limit=0 count for the dataset key (found via GBIF dataset search q='crop wild relatives', 32 hits)", "http_status": 200 },
+      "variables_present": ["occurrence records of crop wild relatives (germplasm accessions and herbarium samples) with coordinates"],
+      "variables_missing": ["which species is the identified progenitor of which crop", "domestication date", "genomic or morphological distance"],
+      "scope": "Occurrence search returned count 3,403,810; abstract says the dataset originally held 5,647,442 records from more than 100 providers (34% germplasm, 66% herbarium).",
+      "evidence": "GBIF API responses; abstract text quoted from the registry. Describes distribution of wild relatives, not progenitor identification.",
+      "verdict": "partial"
+    },
+    {
+      "id": "genesys-pgr",
+      "name": "Genesys Global Portal on Plant Genetic Resources",
+      "landing_url": "https://www.genesys-pgr.org/",
+      "access_url": "https://api.genesys-pgr.org/api/v1/acn/query",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T08:10:00Z", "method": "GET landing (200, 377833 bytes); GET api.genesys-pgr.org/api/v1/acn/query", "http_status": 401, "note": "landing page 200; the API endpoint tried returned 401 (needs authentication)" },
+      "variables_present": [],
+      "variables_missing": ["progenitor identification", "domestication dates", "divergence measures"],
+      "scope": "Genebank accession passport data; the data API was not accessible without credentials and no record count was obtained.",
+      "evidence": "Landing page loads; the unauthenticated API call returned 401. Contents were not inspected.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "usda-ars-grin-taxonomy",
+      "name": "USDA-ARS GRIN-Global taxonomy (npgsweb.ars-grin.gov)",
+      "landing_url": "https://npgsweb.ars-grin.gov/",
+      "access_url": "https://npgsweb.ars-grin.gov/gringlobal/taxon/taxonomysearch",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok", "gemini"],
+      "checked": { "at": "2026-11-01T08:13:00Z", "method": "HEAD/GET landing and taxonomy search page", "http_status": 200, "bytes": 167709 },
+      "variables_present": ["taxonomy search interface for plant names, with crop wild relative classification (per assessors' claim; not verified by this scout)"],
+      "variables_missing": ["bulk download not verified", "domestication dates", "distance measures"],
+      "scope": "Landing page returned 420 bytes; taxonomy search page returned 167,709 bytes of HTML. Not opened beyond status.",
+      "evidence": "HTTP 200 responses only; no machine-readable download located.",
+      "verdict": "partial"
+    },
+    {
+      "id": "world-flora-online-backbone",
+      "name": "World Flora Online taxonomic backbone",
+      "landing_url": "https://www.worldfloraonline.org/",
+      "access_url": "https://files.worldfloraonline.org/files/WFO_Backbone/_WFOCompleteBackbone/WFO_Backbone.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T08:14:00Z", "method": "HEAD backbone zip (Content-Length) and GET landing", "http_status": 200, "bytes": 121131289 },
+      "variables_present": ["accepted names and synonymy for plant taxa"],
+      "variables_missing": ["progenitor relationships", "cultivation history"],
+      "scope": "Name backbone only; zip is 121 MB (not downloaded).",
+      "evidence": "HEAD returned 200 and Content-Length 121131289.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "ncbi-genbank-sra-crops",
+      "name": "NCBI GenBank / Sequence Read Archive (crop and wild-relative sequences)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": "https://www.ncbi.nlm.nih.gov/sra",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "gemini"],
+      "checked": { "at": "2026-11-01T07:36:00Z", "method": "GET GenBank and SRA landing pages (no crop-specific query run)", "http_status": 200 },
+      "variables_present": ["raw sequence data for crops and wild relatives (general archive; no taxon-specific counts fetched here)"],
+      "variables_missing": ["curated progenitor labels", "morphological data"],
+      "scope": "Archive-wide; a published genome-resequencing set for castor bean was seen only as a DataCite title (figshare collection 10.6084/m9.figshare.c.5394684).",
+      "evidence": "HTTP 200 for both landing pages.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "crop wild progenitor domestication genome resequencing", "url": "https://api.datacite.org/dois?query=crop%20wild%20progenitor%20domestication%20genome%20resequencing&page%5Bsize%5D=5", "hits": 4, "note": "castor bean origin/domestication genomics (figshare collection), Solanum insanum records on Zenodo" },
+    { "source": "Dryad", "query": "crop wild progenitor domestication phylogeny", "url": "https://datadryad.org/api/v2/search?q=crop%20wild%20progenitor%20domestication%20phylogeny", "hits": 0, "note": "none" },
+    { "source": "DataCite", "query": "\"crop wild relatives\" inventory gene pool", "url": "https://api.datacite.org/dois?query=%22crop%20wild%20relatives%22%20inventory%20gene%20pool&page%5Bsize%5D=5", "hits": 2, "note": "Setting conservation priorities for crop wild relatives in the Fertile Crescent (not opened)" },
+    { "source": "GBIF", "query": "dataset search crop wild relatives", "url": "https://api.gbif.org/v1/dataset/search?q=crop%20wild%20relatives&limit=3", "hits": 32, "note": "includes the global CWR distribution dataset and national CWR occurrence datasets (Ghana, Bangladesh)" },
+    { "source": "GBIF", "query": "occurrence count for global CWR dataset", "url": "https://api.gbif.org/v1/occurrence/search?datasetKey=07044577-bd82-4089-9f3a-f4a9d2170b2e&limit=0", "hits": 3403810, "note": "occurrence count" }
+  ],
+  "status": "partial",
+  "summary": "Occurrence data for crop wild relatives (3.4 M GBIF records) and taxonomic backbones are open, but no dataset located lists the identified wild progenitor of each long-cultivated crop with cultivation age, so the progenitor-identification variable has to be compiled from the literature.",
+  "next_step": "Compile a crop-by-crop table of cultivation age, progenitor status (identified, contested, none) and a divergence measure from published domestication genomics, using GBIF/GRIN only for sampling status.",
+  "obstacles_confirmed": [
+    "Genesys data API returned 401 without credentials.",
+    "No fetched resource encodes morphological recognisability of parents in 1859 versus genomic identification today.",
+    "Extinction/unsampled-parent status is not a field in any resource fetched."
+  ]
+}

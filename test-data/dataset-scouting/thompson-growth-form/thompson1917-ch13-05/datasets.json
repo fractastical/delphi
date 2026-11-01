@@ -1,0 +1,140 @@
+{
+  "claim_id": "thompson1917-ch13-05",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "3D horn centreline or scan of each argali form (Ovis ammon ammon, O. a. polii, O. a. hodgsoni or equivalents)",
+    "taxon label and geographic form per specimen",
+    "enough specimens per form (n per taxon) to compare spiral angle and helical pitch",
+    "specimen photographs in two views as a coarser alternative"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Ovis+ammon",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET media API with q=Ovis+ammon (1), q=Ovis (1), q=Ovis+poli (0)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "1 public media record for Ovis ammon: 'Cranium [Mesh]'"
+      ],
+      "variables_missing": [
+        "no hodgsoni or polii media found by name query",
+        "sample size far below a per-form comparison",
+        "horn sheaths not confirmed"
+      ],
+      "scope": "3D specimen repository",
+      "evidence": "pages.total_count 1 for q=Ovis+ammon and for q=Ovis, 0 for q=Ovis+poli; the one media title is 'Cranium [Mesh] [StrLight]'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "idigbio",
+      "name": "iDigBio",
+      "landing_url": "https://www.idigbio.org/",
+      "access_url": "https://search.idigbio.org/v2/search/records?rq=%7B%22genus%22:%22ovis%22,%22specificepithet%22:%22ammon%22%7D&limit=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET search.idigbio.org/v2/search/records for genus ovis, specificepithet ammon (443 records; 40 with hasImage true)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "443 specimen records for Ovis ammon, 40 with images"
+      ],
+      "variables_missing": [
+        "photographs not shown to be standardised views",
+        "no subspecies breakdown checked",
+        "no 3D data"
+      ],
+      "scope": "US collections",
+      "evidence": "itemCount 443 for {genus: ovis, specificepithet: ammon}; itemCount 40 when hasImage true is added.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif",
+      "name": "Global Biodiversity Information Facility (GBIF)",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?scientificName=Ovis%20ammon&basisOfRecord=PRESERVED_SPECIMEN&mediaType=StillImage&limit=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET GBIF occurrence search (limit=0) for Ovis ammon, species match for 'Ovis ammon polii' and 'Ovis poli'",
+        "http_status": 200
+      },
+      "variables_present": [
+        "894 preserved-specimen occurrences of Ovis ammon, 117 of them with still-image media",
+        "Ovis ammon polii is an accepted subspecies (usageKey 4262542); 'Ovis poli' matches the synonym Ovis polii Blyth, 1840 (usageKey 9175366, fuzzy match)"
+      ],
+      "variables_missing": [
+        "images are not standardised for horn geometry",
+        "no 3D data",
+        "no horn measurements as fields"
+      ],
+      "scope": "Global museum and observation records",
+      "evidence": "count 894 (PRESERVED_SPECIMEN) and 117 (PRESERVED_SPECIMEN with StillImage) for scientificName=Ovis ammon.",
+      "verdict": "partial",
+      "reuses_organism_dataset": "gbif-occurrences-ovis-ammon-2026-10-31"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "MorphoSource",
+      "query": "Ovis ammon",
+      "url": "https://www.morphosource.org/api/media?q=Ovis+ammon",
+      "hits": 1
+    },
+    {
+      "source": "MorphoSource",
+      "query": "Ovis poli",
+      "url": "https://www.morphosource.org/api/media?q=Ovis+poli",
+      "hits": 0
+    },
+    {
+      "source": "GBIF",
+      "query": "Ovis ammon preserved specimens with images",
+      "url": "https://api.gbif.org/v1/occurrence/search?scientificName=Ovis%20ammon&basisOfRecord=PRESERVED_SPECIMEN&mediaType=StillImage&limit=0",
+      "hits": 117
+    },
+    {
+      "source": "iDigBio",
+      "query": "Ovis ammon records / with images",
+      "url": "https://search.idigbio.org/v2/search/records?rq=%7B%22genus%22:%22ovis%22,%22specificepithet%22:%22ammon%22,%22hasImage%22:true%7D&limit=1",
+      "hits": 40,
+      "note": "443 records without the image filter"
+    }
+  ],
+  "status": "partial",
+  "summary": "Specimen records exist (GBIF: 894 preserved Ovis ammon, 117 with still images; iDigBio: 443, 40 with images) but 3D horn data are almost absent: MorphoSource returns one Ovis ammon cranium mesh and none for O. poli. A two-view photographic estimate is the only route at scale, and the three named forms would need synonymy curation (GBIF treats 'Ovis poli' as a synonym of Ovis polii).",
+  "next_step": "Pull the image URLs for the 117 GBIF records and the 40 iDigBio records, resolve each to ammon/polii/hodgsoni, and check how many show horns in a usable orientation; separately request 3D scans from museums if the photographic route is rejected.",
+  "obstacles_confirmed": [
+    "Public 3D sample sizes for rare wild sheep may be small.",
+    "Taxonomic synonymy and specimen age require curation."
+  ]
+}

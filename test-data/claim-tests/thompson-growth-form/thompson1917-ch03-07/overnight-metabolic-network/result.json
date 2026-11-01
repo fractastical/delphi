@@ -1,0 +1,58 @@
+{
+  "claim_id": "thompson1917-ch03-07",
+  "claim_iri": "https://w3id.org/delphi/resource/claim/thompson1917-ch03-07",
+  "project": "thompson-growth-form",
+  "status": "complete",
+  "hypothesis": "The primary network, with branching ratio 2, generations 2 to 24, area-preserving radii, and fixed terminal units, takes service volume to be the sum of the terminal service volumes and has a local exponent of total terminal flow against that volume within 0.01 of 3/4 at some generation at most 24; the alternative network, whose volume is the total tube volume under the space-filling length ratio, has its exponent reported from the same code.",
+  "pass_criterion": "The primary network's local exponent lies within 0.01 of 3/4 at some generation at most 24, and the alternative network's exponent is reported from the same code.",
+  "fail_criterion": "The primary exponent stays more than 0.01 away from 3/4 through generation 24. The finite network then does not realize the 3/4 claim for this volume, and one of the volume definition and that claim is wrong.",
+  "planned_datasets": [],
+  "test_contract": {
+    "expected_observation": "Some local exponent of total terminal flow against the primary service-volume sum, taken between successive generations from 2 through 24, lies within 0.01 of 3/4.",
+    "disconfirming_observation": "Every such primary local exponent stays more than 0.01 away from 3/4. That answers the finite-network claim in the negative and does not choose which of the volume definition and the 3/4 statement to withdraw.",
+    "admissible_datasets": "None. The test is computational. Organism measurements, capillary tables, and fitted allometries are not admissible.",
+    "inference_method": "The primary local exponent is the ratio of logarithms of total terminal flow and of the service-volume sum between successive generations. The pass threshold is absolute deviation at most 0.01 from 3/4 on at least one pair with both generations in 2..24. Tube-volume local exponents are computed in the same run and reported; they do not enter the pass rule."
+  },
+  "interpretation": "Terminal flow is one unit per terminal, so metabolic rate equals the number of terminals, 2^G. Each terminal service volume is one fixed unit (a sphere whose diameter is the fixed terminal length, up to a factor that cancels in every ratio); the primary service volume is their sum, 2^G. Area-preserving radii mean the two daughters have cross-sections adding to the parent. The space-filling length ratio 2^(-1/3) is taken from the companion formalization's hypotheses and is used only to set tube lengths. The method's phrase for the primary volume and its phrase for the critique's service-volume assumption name the same invariant-terminal sum in Kozłowski and Konarzewski (2004). The quantity the 3/4 derivation sets proportional to mass is total tube volume, so that volume is the reported alternative and is not substituted into the pass rule. ThompsonLaws.Magnitude states the cube law (weightOfLength, this claim) and the surface-to-mass law; it does not contain an infinite-generation branching theorem. No animal is represented.",
+  "data_kind": "computational",
+  "datasets": [],
+  "method": "For each generation G from 2 to 24 the script builds one binary network: 2^G terminals, area-preserving radii, and vessel lengths in geometric ratio 2^(-1/3). Primary service volume and total terminal flow are both exactly 2^G, so each of the 22 successive local exponents is log(2)/log(2) = 1 and the ordinary-least-squares slope on those generations is 1. Tube volume is the sum of the cylindrical vessel volumes in units of pi r_c^2 l_c, computed at 80 decimal places and checked against the closed geometric series. The pass rule uses only the primary exponents; the tube-volume exponents are reported beside them.",
+  "measured": {
+    "value": 1,
+    "unit": "dimensionless local exponent",
+    "n": 22,
+    "uncertainty": "0; exact on every primary pair",
+    "extra": {
+      "preregistered_criterion_met": false,
+      "primary_local_exponent": "1/1",
+      "primary_abs_deviation_from_3_4": "1/4",
+      "primary_ols_slope": "1/1",
+      "alternative_volume": "total tube volume",
+      "alternative_ols_slope": "0.7326159368973280655263572694713793059325",
+      "alternative_first_generation_within_0_01": 13,
+      "alternative_exponent_at_12": "0.7390764819559103435649502675179242256604",
+      "alternative_deviation_at_12": "0.0109235180440896564350497324820757743396",
+      "alternative_exponent_at_13": "0.7414079559216214625713636114738606455137",
+      "alternative_deviation_at_13": "0.0085920440783785374286363885261393544863",
+      "alternative_exponent_at_24": "0.7493443085223868748013293495417477581589",
+      "alternative_deviation_at_24": "0.0006556914776131251986706504582522418411",
+      "full_series": "derived/summary.json"
+    }
+  },
+  "verdict": "inconclusive",
+  "reason": "other",
+  "confidence": 0.99,
+  "caveats": [
+    "The pre-registered network criterion fails: the service-volume sum has local exponent exactly 1, deviation 1/4 from 3/4, on every pair from generation 2 to 24.",
+    "Area preservation and the length ratio do not enter that primary exponent. They enter only the tube volume.",
+    "Tube-volume local exponents, which are not the pass rule, come within 0.01 of 3/4 at generation 13 and equal 0.7493443085223868748 at generation 24. The straight-line slope on generations 2 to 24 is 0.73261593689732806553.",
+    "This checks the algebra of the two volume definitions. It says nothing about real animals, and it neither supports nor refutes the cube law for growing organisms.",
+    "ThompsonLaws.Magnitude has no infinite-generation branching theorem to compare these numbers with."
+  ],
+  "agent": {
+    "kind": "cursor-agent",
+    "model": "grok-4.7",
+    "run": "metabolic-scaling-exponent--grok-4-7--3",
+    "date": "2026-11-01"
+  }
+}

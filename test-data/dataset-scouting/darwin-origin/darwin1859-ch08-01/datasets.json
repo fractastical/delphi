@@ -1,0 +1,209 @@
+{
+  "claim_id": "darwin1859-ch08-01",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:10:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-05"
+  },
+  "variables_needed": [
+    "failure of crossing between pure parental species (prezygotic, fertilization or F1 production) per species pair",
+    "F1 hybrid gonad or gamete function (sterility) per species pair",
+    "a record of which stage failed, across more than one taxonomic group"
+  ],
+  "datasets": [
+    {
+      "id": "drosophila-speciation-dryad-g5g43",
+      "name": "Data from: On the Coyne and Orr-igin of species (Drosophila pairwise isolation data)",
+      "landing_url": "https://doi.org/10.5061/dryad.g5g43",
+      "access_url": "https://datadryad.org/api/v2/versions/13212/files",
+      "doi": "10.5061/dryad.g5g43",
+      "license": "CC0-1.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:04:08Z",
+        "method": "GET doi.org redirect (200, 05:10:43Z); Dryad datasets API; Dryad versions/13212/files listing; file download attempts returned 401 (API) and 403 (file_stream)",
+        "http_status": 200,
+        "bytes": 58489
+      },
+      "variables_present": [
+        "pairwise Drosophila species-pair data with premating isolation and intrinsic postzygotic isolation (hybrid male inviability/sterility), per the abstract and file descriptions"
+      ],
+      "variables_missing": [
+        "column names not verified (file bodies could not be downloaded)",
+        "inviability and sterility are dichotomised together in the abstract, not as separate stages",
+        "taxa other than Drosophila"
+      ],
+      "scope": "Drosophila species pairs only",
+      "evidence": "Files: CoynOrriginDat_funk.csv 26907 B, CoynOrriginDat_roman.csv 26882 B, FitzpatrickControl.R, minFTexample.R; abstract mentions \"intrinsic postzygotic isolation, dichotomized as to whether hybrid males show complete inviability/sterility\". Storage size 58489 bytes.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad Digital Repository (portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:44Z",
+        "method": "GET landing; GET search API (see search_log)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset"
+      ],
+      "scope": null,
+      "evidence": "Landing page 200; search API answered (counts in search_log).",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "mouse-phenome-database",
+      "name": "Mouse Phenome Database",
+      "landing_url": "https://phenome.jax.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:45Z",
+        "method": "GET landing (200, 208,380 bytes); guessed API path /api/pheno/measures?q=sperm returned 404",
+        "http_status": 200,
+        "bytes": 208380,
+        "note": "contents unverified; no API route found within budget"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "interspecific F1 measurements not confirmed"
+      ],
+      "scope": null,
+      "evidence": "Landing page loads; the API path I tried returned HTTP 404 (2026-11-01T08:04:00Z); no measure listing was obtained.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ncbi-geo",
+      "name": "NCBI Gene Expression Omnibus",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=hybrid+sterility+testis&retmode=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:46Z",
+        "method": "GET landing (returned a reCAPTCHA challenge page); GET E-utilities gds esearch (200, 08:04:00Z)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "gene-expression series about hybrid sterility and testis (esearch count 27)"
+      ],
+      "variables_missing": [
+        "crossing outcome records",
+        "first-cross failure data"
+      ],
+      "scope": null,
+      "evidence": "gds esearch term \"hybrid sterility testis\" count \"27\"; landing page body was a Google reCAPTCHA challenge.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-8kprr4xm2-mimulus-tilingii",
+      "name": "Evolution of multiple postzygotic barriers between species of the Mimulus tilingii complex",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.8kprr4xm2",
+      "access_url": null,
+      "doi": "10.5061/dryad.8kprr4xm2",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:08:49Z",
+        "method": "GET Dryad datasets API (found via Zenodo search)",
+        "http_status": 200,
+        "bytes": 99483
+      },
+      "variables_present": [
+        "postzygotic barriers between plant species as separate stages (per title)"
+      ],
+      "variables_missing": [
+        "one species complex only; data columns not inspected"
+      ],
+      "scope": "Mimulus tilingii complex (angiosperm)",
+      "evidence": "API title \"Evolution of multiple postzygotic barriers between species of the Mimulus tilingii complex\", storage 99483 bytes, license CC0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-d34t730j-damselfly",
+      "name": "Data from: Strong asymmetry in the relative strengths of prezygotic and postzygotic barriers between two damselfly sister species",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.d34t730j",
+      "access_url": null,
+      "doi": "10.5061/dryad.d34t730j",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:08:50Z",
+        "method": "GET Dryad datasets API (found via Zenodo search)",
+        "http_status": 200,
+        "bytes": 94208
+      },
+      "variables_present": [
+        "pre- and postzygotic barrier strengths for one pair of damselfly sister species"
+      ],
+      "variables_missing": [
+        "one species pair only"
+      ],
+      "scope": "Two damselfly species",
+      "evidence": "API title as given; abstract: \"we quantify the absolute and cumulative contribution o...\" ; storage 94208 bytes; CC0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "hybrid sterility F1 interspecific cross postzygotic isolation",
+      "url": "https://datadryad.org/api/v2/search?q=hybrid+sterility+F1+interspecific+cross+postzygotic+isolation&per_page=8",
+      "hits": 1,
+      "note": "Boechera (dryad.73n5tb2vq): not opened"
+    },
+    {
+      "source": "Dryad",
+      "query": "pollen fertility F1 hybrids interspecific crosses",
+      "url": "https://datadryad.org/api/v2/search?q=pollen+fertility+F1+hybrids+interspecific+crosses&per_page=8",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "interspecific hybrid fertility crosses species pairs postzygotic isolation dataset",
+      "url": "https://zenodo.org/api/records?q=interspecific+hybrid+fertility+crosses+species+pairs+postzygotic+isolation+dataset&size=8",
+      "hits": 1572978,
+      "note": "hits include Mimulus tilingii, damselfly, Drosophila postmating-prezygotic (dryad.6v774), Arabidopsis; the total is not specific"
+    },
+    {
+      "source": "NCBI GEO (gds)",
+      "query": "hybrid sterility testis",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=hybrid+sterility+testis&retmode=json",
+      "hits": 27
+    }
+  ],
+  "status": "partial",
+  "summary": "The best open data are Drosophila pairwise isolation tables (Coyne & Orr compilation re-analysis on Dryad) and a few single-pair or single-complex plant and insect deposits; no multi-taxon table that scores the stage of failure for first crosses versus F1 sterility was found.",
+  "next_step": "Open CoynOrriginDat_funk.csv in a browser session to confirm the isolation columns, and decide whether Drosophila-only scope is acceptable; otherwise compile stage-of-failure scores from Mimulus/Arabidopsis deposits.",
+  "obstacles_confirmed": [
+    "Crossing records are dispersed and taxonomically biased.",
+    "The Dryad file bodies could not be fetched by script (401/403), so column definitions were not verified."
+  ]
+}

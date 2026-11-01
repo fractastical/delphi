@@ -1,0 +1,86 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/turing-capable-network-topologies--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Exact exhaustive enumeration for n = 3 and n = 4 with certificates" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/turing-capable-network-topologies> ;
+    dct:description "Decide Turing-capability for every sign pattern exactly, not by sampling. For n = 3 there are 3^9 = 19,683 patterns, about 3,400 up to relabelling. For each pattern and diffusing set S, the question ∃J consistent with P, ∃D ≥ 0 supported on S, ∃k: J stable and J − k²D unstable is a sentence in the existential theory of the reals, decidable by cylindrical algebraic decomposition or nlsat. Pipeline: (1) random-search for a numerical witness (log-uniform entries, D spanning six orders of magnitude); (2) if found, rationalize and verify exactly (rational arithmetic, Routh–Hurwitz), and emit the witness as a Lean `norm_num` lemma; (3) otherwise run Redlog CAD or z3 nlsat on the exact sentence and keep the 'unsat' result, or prove incapability from sign stability (approach 1, Lemma A). For n = 4, 3^16 ≈ 4.3 × 10^7 patterns, about 1.8 × 10^6 up to relabelling. Numerical witnesses should settle most capable patterns; the unresolved remainder goes to nlsat with a time cap, and capped cases are reported as open. Compare with the Marcon et al. 2016 and Scholes et al. 2019 atlases pattern by pattern." ;
+
+    delphi:proposedTest "A complete n = 3 table (every pattern × S labelled capable with an exact rational witness, or incapable with a CAD/nlsat certificate or sign-stability proof), and an n = 4 table with the fraction left undecided stated. Any capable pattern that a published atlas lists as non-Turing, or the reverse, is reported." ;
+    delphi:context "Fails if: CAD or nlsat times out on a substantial set of n = 3 patterns, so incapability cannot be certified and the table is incomplete even at n = 3." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Canonicalize patterns under node relabelling (respecting S) and generate the work list. 2. Run witness search with exact rational verification; export capable witnesses as Lean lemmas. 3. Run CAD or nlsat on unresolved patterns; record certificates or timeouts. 4. Cross-check with the published atlases; publish the classification table with SHA-256 and reproduction scripts." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: enumeration" ;
+    skos:note "Tool: computer-algebra" ;
+    skos:note "Tool: smt-solver" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-ddi> ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-wavelength> ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-morphogen-hypothesis> ;
+
+    rdfs:seeAlso <https://doi.org/10.7554/eLife.14022> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.cels.2019.07.007> ;
+    rdfs:seeAlso <https://doi.org/10.1103/PhysRevX.8.021071> ;
+    rdfs:seeAlso <https://www.redlog.eu/> ;
+    rdfs:seeAlso <https://github.com/z3prover/z3> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/turing-capable-network-topologies> a delphi:Concept, schema:Question ;
+    rdfs:label "Classify the network topologies that admit diffusion-driven instability" .
+
+
+  <https://doi.org/10.7554/eLife.14022> dct:title "High-throughput mathematical analysis identifies Turing networks for patterning with equally diffusing signals" ;
+    dct:bibliographicCitation "Marcon et al. 2016, atlas of 2- and 3-node Turing networks" .
+  <https://doi.org/10.1016/j.cels.2019.07.007> dct:title "A Comprehensive Network Atlas Reveals That Turing Patterns Are Common but Not Robust" ;
+    dct:bibliographicCitation "Scholes et al. 2019, comprehensive network atlas" .
+  <https://doi.org/10.1103/PhysRevX.8.021071> dct:title "Key Features of Turing Systems are Determined Purely by Network Topology" ;
+    dct:bibliographicCitation "Diego, Marcon, Müller and Sharpe 2018, Key features of Turing systems are determined purely by network topology" .
+  <https://www.redlog.eu/> dct:bibliographicCitation "Redlog, real quantifier elimination" .
+  <https://github.com/z3prover/z3> dct:bibliographicCitation "Z3 with the nlsat procedure for nonlinear real arithmetic" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to turing-capable-network-topologies, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.297Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to turing-capable-network-topologies: Exact exhaustive enumeration for n = 3 and n = 4 with certificates" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/turing-capable-network-topologies--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

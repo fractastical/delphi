@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/morphogenesis-cognition-gene-overlap--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Annotation-independent test using mouse knockout phenotyping (IMPC/MGI)" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> ;
+    dct:description "GO and HPO overlap inherits curation bias. The International Mouse Phenotyping Consortium phenotypes knockouts systematically through a fixed pipeline, so which genes are tested for which phenotypes does not depend on prior interest. For all IMPC knockout lines that completed both morphological (skeletal, craniofacial, organ morphology) and behavioural or neurological procedures, build a 2 × 2 table: abnormal morphology yes/no versus abnormal learning-related or behavioural phenotype yes/no. Fit logistic regression of the behavioural call on the morphology call with covariates: number of other phenotype systems hit (pleiotropy), viability class and sex. Supplement with MGI curated knockouts restricted to studies reporting both kinds. Pre-registered: an adjusted odds ratio ≥ 2 (95% CI excluding 1.3) supports a shared gene set beyond pleiotropy; OR CI including 1 refutes it. Run the ion-channel and gap-junction subset separately." ;
+
+    delphi:proposedTest "An adjusted odds ratio, with CI, for co-occurrence of morphological and behavioural or learning phenotypes in systematically phenotyped knockouts. This is the strongest available test free of curation bias." ;
+    delphi:context "Fails if: IMPC behavioural procedures measure activity and anxiety rather than learning per se, so the 'learning' category cannot be operationalized; the test then reverts to a broader behavioural proxy, which must be stated as a reinterpretation." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register phenotype term sets (MP ontology IDs), covariates and thresholds. 2. Download IMPC statistical results; filter to lines with both procedure classes; record version and checksums. 3. Fit adjusted logistic models for all genes and the bioelectric subset. 4. Compare with approach 1 to see whether annotation-based and screen-based answers agree." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: gene-set-statistics" ;
+    skos:note "Tool: data-test" ;
+    skos:note "Tool: indra-cogex" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://www.mousephenotype.org/> ;
+    rdfs:seeAlso <https://www.informatics.jax.org/> ;
+    rdfs:seeAlso <https://doi.org/10.3389/fnsys.2022.768201> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.2006643> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/morphogenesis-cognition-gene-overlap> a delphi:Concept, schema:Question ;
+    rdfs:label "Do morphogenesis and learning share a gene set beyond pleiotropy?" .
+
+  <https://www.mousephenotype.org/> dct:title "International Mouse Phenotyping Consortium" ;
+    dct:description "Systematic knockout phenotype calls" .
+  <https://www.informatics.jax.org/> dct:title "Mouse Genome Informatics" ;
+    dct:description "Curated knockout phenotypes (MP ontology)" .
+  <https://doi.org/10.3389/fnsys.2022.768201> dct:title "Technological Approach to Mind Everywhere: An Experimentally-Grounded Framework for Understanding Diverse Bodies and Minds" ;
+    dct:bibliographicCitation "Levin 2022, TAME" .
+  <https://doi.org/10.1371/journal.pbio.2006643> dct:title "Large-scale investigation of the reasons why potentially important genes are ignored" ;
+    dct:bibliographicCitation "Stoeger, Gerlach, Morimoto and Nunes Amaral 2018, Large-scale investigation of the reasons why potentially important genes are ignored (study-bias context)" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to morphogenesis-cognition-gene-overlap, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.303Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to morphogenesis-cognition-gene-overlap: Annotation-independent test using mouse knockout phenotyping (IMPC/MGI)" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/morphogenesis-cognition-gene-overlap--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

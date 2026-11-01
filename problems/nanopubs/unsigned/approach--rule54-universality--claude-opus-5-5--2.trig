@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule54-universality--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Impossibility route: a potential function on glider dynamics forcing ballistic decay" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule54-universality> ;
+    dct:description "Try to prove that Rule 54 cannot be universal in a precise sense, for example that on every finite perturbation of the ether the long-run behaviour is decidable. Strategy: (a) prove a decomposition theorem that every configuration differing from the ether on a finite set evolves, after a transient bounded in terms of the perturbation's width, into a superposition of catalogued gliders separated by ether, using a de Bruijn-diagram argument that any non-ether, non-glider region shrinks; (b) compute the full collision algebra and look for a potential Φ (a weighted glider count, or a count weighted by velocity class) that never increases in any collision and strictly decreases in some. If Φ exists and the number of gliders produced by a collision is bounded, every finite perturbation reaches, in finitely many collisions, a state of non-interacting outgoing gliders. Then 'eventual configuration' is computable, which rules out universality for the standard definition with finite seeds. The integrable reversible RCA54 of Bobenko et al., a different automaton whose name and local rule are related, has solitons that only phase-shift on collision; checking whether ECA 54's ether-restricted dynamics inherit such a conservation law is a concrete sub-question." ;
+
+    delphi:proposedTest "A proof, ideally Lean-checked, that for every finite perturbation of the ether the multiset of eventual outgoing gliders is computable. This rules out universality from finite seeds on ether, and the result states exactly which universality notions remain open (for example, infinite periodic program streams)." ;
+    delphi:context "Fails if: The ILP is infeasible, meaning some collision cycle increases every candidate potential (glider multiplication), or an exhaustive search finds a finite perturbation that produces unboundedly many gliders (a 'gun' or breeder). Both suggest universality is plausible and point back to approach 1." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Compute the collision algebra (outcome multiset for each glider pair, phase and gap) from the approach-1 catalogue. 2. Solve an integer linear program for weights making Φ non-increasing over all catalogued collisions; record strict decreases. 3. Attempt the decomposition theorem: prove by exhaustive de Bruijn analysis that non-glider defects shrink, giving a bound on transient length. 4. If both hold, formalize: decomposition plus potential implies decidability of the eventual glider content; state precisely what this excludes (universality with finite seeds on ether)." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: Infinite periodic program streams (as in Cook's Rule 110 proof) escape a finite-seed impossibility argument, so even success settles only one universality notion." ;
+    skos:note "Tool: proof" ;
+    skos:note "Tool: integer-linear-programming" ;
+    skos:note "Tool: cellular-automaton-simulation" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-21> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-19> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-20> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.chaos.2005.05.013> ;
+    rdfs:seeAlso <https://doi.org/10.1007/BF02097234> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/rule54-universality> a delphi:Concept, schema:Question ;
+    rdfs:label "Is Rule 54 computationally universal?" .
+
+
+  <https://doi.org/10.1016/j.chaos.2005.05.013> dct:title "Phenomenology of glider collisions in cellular automaton Rule 54 and associated logical gates" ;
+    dct:bibliographicCitation "Martínez, Adamatzky and McIntosh 2006, Rule 54 glider collisions" .
+  <https://doi.org/10.1007/BF02097234> dct:title "On two integrable cellular automata" ;
+    dct:bibliographicCitation "Bobenko, Bordemann, Gunn and Pinkall 1993, On two integrable cellular automata (the reversible RCA54, a related but distinct system)" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule54-universality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.296Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule54-universality: Impossibility route: a potential function on glider dynamics forcing ballistic decay" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule54-universality--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

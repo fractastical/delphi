@@ -1,0 +1,96 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered PGLS of circumference on mass with three fixed exponents" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    dct:description "Translate the hypotheses to circumference C (the measure Campione and Evans use): geometric similarity predicts C proportional to M^(1/3), elastic similarity M^(3/8), stress similarity with constant posture M^(1/2) (area proportional to M). Combine the Campione and Evans 2012 supplementary data with an independent compilation (e.g. Alexander et al. 1979 and further published tables found by a pre-registered search) to reach at least 300 quadrupedal taxa, resolve names through the organisms layer and match to a time-calibrated phylogeny (Upham et al. 2019 for mammals; a published composite tree for reptiles and amniotes stated in advance). Fit PGLS with Pagel's lambda estimated by ML (phylolm), separately for humerus, femur and combined circumference, and report both OLS-type and standardized major axis slopes, because the choice changes the exponent and is a known source of disagreement. A hypothesis is accepted if its exponent lies inside the 95% CI and the CI half-width is at most 0.02; the three values differ by 0.042 and 0.125, so the tolerance must be tighter than half the smallest gap." ;
+
+    delphi:proposedTest "Global phylogenetic exponent of C on M with 95% CI of half-width at most 0.02, stating which of 1/3, 3/8, 1/2 it includes, replicated on the independent compilation." ;
+    delphi:context "Fails if: CI too wide to separate 1/3 from 3/8 (fewer usable taxa than expected), or the exponent differing between the two compilations by more than the CI, indicating measurement or mass-estimation inconsistency." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Download Campione and Evans 2012 additional files; record the exact file and checksum. 2. Pre-register hypotheses, regression type, tree source, lambda handling, tolerance 0.02 and the clade partition. 3. Assemble the independent compilation and run a pre-specified duplicate check against Campione and Evans taxa. 4. Fit PGLS globally and per bone; bootstrap over 100 posterior trees to propagate tree uncertainty. 5. Report which hypotheses lie in each CI; also refit on the independent compilation alone as a replication." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: An independent compilation large enough to replicate at 300 taxa may need several sources; reptile phylogeny choice adds uncertainty." ;
+    skos:note "Tool: r-phylolm" ;
+    skos:note "Tool: r-smatr" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:note "Tool: gbif" ;
+    skos:note "Tool: vertlife" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://bmcbiol.biomedcentral.com/articles/10.1186/1741-7007-10-60> ;
+    rdfs:seeAlso <https://vertlife.org> ;
+    rdfs:seeAlso <https://doi.org/10.1890/08-1494.1> ;
+    rdfs:seeAlso <https://cran.r-project.org/package=MASSTIMATE> ;
+    rdfs:seeAlso <https://doi.org/10.1186/1741-7007-10-60> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1469-7998.1979.tb03964.x> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.179.4079.1201> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pbio.3000494> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" .
+
+  <https://bmcbiol.biomedcentral.com/articles/10.1186/1741-7007-10-60> dct:title "Campione and Evans 2012 additional files" ;
+    dct:description "Humeral and femoral circumferences and body masses of extant quadrupeds." .
+  <https://vertlife.org> dct:title "VertLife mammal phylogenies" ;
+    dct:description "Posterior tree sets of Upham et al. 2019." .
+  <https://doi.org/10.1890/08-1494.1> dct:title "PanTHERIA" ;
+    dct:description "Independent adult body masses for mammals where the bone source gives none." .
+  <https://cran.r-project.org/package=MASSTIMATE> dct:title "MASSTIMATE R package" ;
+    dct:description "Campione and Evans' implementation, used to reproduce their published fit before extending it." .
+  <https://doi.org/10.1186/1741-7007-10-60> dct:title "A universal scaling relationship between body mass and proximal limb bone dimensions in quadrupedal terrestrial tetrapods" ;
+    dct:bibliographicCitation "Campione and Evans 2012, A universal scaling relationship between body mass and proximal limb bone dimensions" .
+  <https://doi.org/10.1111/j.1469-7998.1979.tb03964.x> dct:title "Allometry of the limb bones of mammals from shrews (Sorex) to elephant (Loxodonta)" ;
+    dct:bibliographicCitation "Alexander et al. 1979, Allometry of the limb bones of mammals from shrews (Sorex) to elephant (Loxodonta)" .
+  <https://doi.org/10.1126/science.179.4079.1201> dct:title "Size and Shape in Biology" ;
+    dct:bibliographicCitation "McMahon 1973, Size and shape in biology" .
+  <https://doi.org/10.1371/journal.pbio.3000494> dct:title "Inferring the mammal tree: Species-level sets of phylogenies for questions in ecology, evolution, and conservation" ;
+    dct:bibliographicCitation "Upham, Esselstyn and Jetz 2019, Inferring the mammal tree" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to limb-bone-scaling-vs-mechanical-similarity, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.309Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to limb-bone-scaling-vs-mechanical-similarity: Pre-registered PGLS of circumference on mass with three fixed exponents" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

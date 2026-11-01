@@ -1,0 +1,250 @@
+{
+  "claim_id": "darwin1859-ch03-06",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:10:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-05"
+  },
+  "variables_needed": [
+    "species richness per site or elevation band (plots or occurrence sets) along latitude and elevation",
+    "plant stature or the share of stunted or dwarfed individuals per site",
+    "climate (temperature, season length) per site",
+    "site latitude and elevation"
+  ],
+  "datasets": [
+    {
+      "id": "splotopen",
+      "name": "sPlotOpen: environmentally balanced open-access global dataset of vegetation plots",
+      "landing_url": "https://doi.org/10.25829/idiv.3474-40-3292",
+      "access_url": "https://idata.idiv.de/ddm/Data/ShowData/3474?version=55",
+      "doi": "10.25829/idiv.3474-40-3292",
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:52Z",
+        "method": "GET doi.org (redirects to idata.idiv.de, 200; page notes this is not the latest version); GET Crossref works/10.1111/geb.13346 abstract (200, 08:07:17Z) for contents",
+        "http_status": 200,
+        "note": "dataset page is a DDM viewer; files not downloaded"
+      },
+      "variables_present": [
+        "vegetation plots n=95,104 with species cover/abundance (species richness derivable)",
+        "plot elevation, location, date, biome",
+        "community-weighted means and variances of 18 plant functional traits from TRY"
+      ],
+      "variables_missing": [
+        "individual-level stunting",
+        "which of the 18 traits is plant height was not confirmed",
+        "climate variables not listed in the abstract"
+      ],
+      "scope": "Global; 42,677 vascular plant taxa; plot sizes 0.01-40,000 m2; 1888-2015",
+      "evidence": "Crossref abstract (Sabatini et al. 2021, Global Ecology and Biogeography): \"Vegetation plots (n = 95,104) ... plot-level data also include community-weighted means and variances of 18 plant functional traits from the TRY Plant Trait Database\"; \"Three main matrices (.csv), relationally linked\".",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "try-plant-trait",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:43Z",
+        "method": "GET landing (meta-refresh) and TryWeb/Home.php (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plant trait records (version 7: 22,860,407 records, 306,701 taxa)"
+      ],
+      "variables_missing": [
+        "site-level species richness",
+        "stunting as a measured condition"
+      ],
+      "scope": null,
+      "evidence": "TryWeb/Home.php text: \"Database version 7 online (2026-09-04) 22,860,407 trait records 306,701 plant taxa\".",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "worldclim",
+      "name": "WorldClim 2.1 bioclimatic variables",
+      "landing_url": "https://www.worldclim.org/",
+      "access_url": "https://geodata.ucdavis.edu/climate/worldclim/2_1/base/wc2.1_10m_bio.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:47Z",
+        "method": "GET landing (200); HEAD wc2.1_10m_bio.zip (200 at 08:05:29Z, not downloaded)",
+        "http_status": 200,
+        "bytes": 49869449
+      },
+      "variables_present": [
+        "global temperature and precipitation bioclimatic rasters at 10 arc-minute (file 49,869,449 bytes)"
+      ],
+      "variables_missing": [
+        "biological variables"
+      ],
+      "scope": null,
+      "evidence": "HEAD returned 200 with Content-Length 49869449.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bien",
+      "name": "Botanical Information and Ecology Network (BIEN)",
+      "landing_url": "https://bien.nceas.ucsb.edu/bien/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:48Z",
+        "method": "GET landing (200), page title read",
+        "http_status": 200,
+        "note": "landing page only"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "contents not verified"
+      ],
+      "scope": null,
+      "evidence": "Page title \"Botanical Information and Ecology Network\"; no API query run.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad Digital Repository (portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:44Z",
+        "method": "GET landing; Dryad search API (two relevant queries, 0 hits each)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset"
+      ],
+      "scope": null,
+      "evidence": "Searches for the Hargreaves-type transplant datasets returned total 0.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF (occurrence API)",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?limit=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:04:58Z",
+        "method": "GET occurrence/search limit=0 (API 200); web landing 403 (Cloudflare) at 05:10:46Z",
+        "http_status": 200,
+        "note": "web landing 403; API fine"
+      },
+      "variables_present": [
+        "occurrence records with coordinates (3,887,469,368 total)"
+      ],
+      "variables_missing": [
+        "plant size or stunting",
+        "standardised sampling for richness"
+      ],
+      "scope": null,
+      "evidence": "occurrence/search count 3887469368.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-xsj3tx99k-krummholz",
+      "name": "Winter damage is more important than summer temperature for maintaining the krummholz growth form above alpine treeline",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.xsj3tx99k",
+      "access_url": null,
+      "doi": "10.5061/dryad.xsj3tx99k",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:08:51Z",
+        "method": "GET Dryad datasets API (found via Zenodo search)",
+        "http_status": 200,
+        "bytes": 168818221
+      },
+      "variables_present": [
+        "krummholz growth-form data above treelines (per title and abstract start)"
+      ],
+      "variables_missing": [
+        "species richness along the same gradient not confirmed"
+      ],
+      "scope": null,
+      "evidence": "API title as given; abstract begins \"Understanding the processes that control alpine treelines, the elevational limits of tree growth forms...\"; storage 168818221 B.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Crossref",
+      "query": "sPlotOpen paper abstract",
+      "url": "https://api.crossref.org/works/10.1111/geb.13346",
+      "hits": 1,
+      "note": "n=95,104 plots; 18 TRY traits as community-weighted means"
+    },
+    {
+      "source": "DataCite",
+      "query": "sPlotOpen vegetation plot database",
+      "url": "https://api.datacite.org/dois?query=sPlotOpen+vegetation+plot+database&page%5Bsize%5D=8&resource-type-id=dataset",
+      "hits": 7,
+      "note": "VegVault (10.48700 DOIs) and a Dryad angiosperm latitudinal dataset; not opened"
+    },
+    {
+      "source": "Dryad",
+      "query": "transplant experiment range limits abiotic biotic poleward upper elevational",
+      "url": "https://datadryad.org/api/v2/search?q=transplant+experiment+range+limits+abiotic+biotic+poleward+upper+elevational&per_page=8",
+      "hits": 0
+    },
+    {
+      "source": "Dryad",
+      "query": "plant height elevation gradient latitude species richness",
+      "url": "https://datadryad.org/api/v2/search?q=plant+height+elevation+gradient+latitude+species+richness&per_page=8",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "stunted growth form alpine treeline krummholz cushion plant elevation species richness dataset",
+      "url": "https://zenodo.org/api/records?q=stunted+growth+form+alpine+treeline+krummholz+cushion+plant+elevation+species+richness+dataset&size=8",
+      "hits": 1846127,
+      "note": "treeline and krummholz deposits (dryad.xsj3tx99k, dryad.8422, dryad.j0v43)"
+    }
+  ],
+  "status": "partial",
+  "summary": "sPlotOpen supplies plot-level species composition, elevation and trait community means worldwide, and WorldClim supplies climate; nothing found measures stunted individuals directly, only community-weighted trait means or single-site krummholz studies.",
+  "next_step": "Pull sPlotOpen DT/CWM tables, join WorldClim by plot coordinates, and decide on a stunting proxy (community-weighted height) before pre-registering.",
+  "obstacles_confirmed": [
+    "Stunted stature is partly adaptive and genetic.",
+    "Stunting is not a recorded variable in the large plot databases; only community-weighted traits."
+  ]
+}

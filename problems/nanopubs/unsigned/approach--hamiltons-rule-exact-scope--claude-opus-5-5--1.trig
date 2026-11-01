@@ -1,0 +1,88 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hamiltons-rule-exact-scope--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean: Price equation and the regression Hamilton's rule as an exact finite identity" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hamiltons-rule-exact-scope> ;
+    dct:description "Formalize the finite-population statements both sides of the 2010–2011 dispute rely on. Population: a Finset of individuals with breeding value g_i, social partners' breeding value g'_i and fitness w_i (real, mean w̄ > 0). Theorem 1 (Price, no transmission bias): w̄ Δḡ = Cov(w, g). Theorem 2 (least-squares decomposition): with c := −β_{wg·g'} and b := β_{wg'·g} the partial regression coefficients from the 2×2 normal equations (assuming the regressors' covariance matrix is nonsingular), Cov(w, g) = Var(g)(r b − c) with r := Cov(g', g)/Var(g). Corollary (regression HR): if Var(g) > 0, then Δḡ > 0 ⇔ r b > c. Theorem 3 (content condition): if fitness is exactly additive, w_i = α − c₀ g_i + b₀ g'_i, then the regression b, c equal b₀, c₀ in every population state, so the rule predicts change from parameters fixed in advance. Theorem 4: if fitness has an interaction term d g_i g'_i, the regression b and c depend on the population state, so b and c measured in one generation do not predict the next. These separate reading (ii), an identity, from reading (i), a theorem with content." ;
+
+    delphi:proposedTest "A Lean module with Theorems 1–4 compiled with only standard axioms, and a mapping table assigning each disputed claim to a formal statement. This settles which claims are identities and which have content under which hypotheses." ;
+    delphi:context "Fails if: None expected for Theorems 1–3, which are classical. The approach fails as a resolution if the mapping shows the disputants mean incompatible definitions of 'Hamilton's rule' that no single formal statement captures; the mapping would then document the equivocation instead." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define finite-population mean, covariance and partial regression coefficients over Finset sums in Lean. 2. Prove Theorems 1 and 2 and the corollary with field_simp, ring and positivity. 3. Prove Theorem 3 (parameter recovery under additivity) and Theorem 4 (state dependence under synergy), giving explicit rational states for the latter. 4. Write the mapping document: each disputed sentence from Nowak et al. 2010, Gardner et al. 2011 and Birch and Okasha 2015 assigned to Theorems 1–4 or to approach 2's counterexamples." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: population-genetics" ;
+    skos:note "Tool: price-equation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-rule> ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-haplodiploidy> ;
+    skos:related <https://w3id.org/delphi/resource/claim/hamilton-lmc> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/227520a0> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1558-5646.1992.tb02045.x> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature09205> ;
+    rdfs:seeAlso <https://doi.org/10.1111/j.1420-9101.2011.02236.x> ;
+    rdfs:seeAlso <https://doi.org/10.1093/biosci/biu196> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/hamiltons-rule-exact-scope> a delphi:Concept, schema:Question ;
+    rdfs:label "The exact scope of Hamilton's rule" .
+
+
+  <https://doi.org/10.1038/227520a0> dct:title "Selection and Covariance" ;
+    dct:bibliographicCitation "Price 1970, Selection and covariance" .
+  <https://doi.org/10.1111/j.1558-5646.1992.tb02045.x> dct:title "A GENERAL MODEL FOR KIN SELECTION" ;
+    dct:bibliographicCitation "Queller 1992, A general model for kin selection (regression form)" .
+  <https://doi.org/10.1038/nature09205> dct:title "The evolution of eusociality" ;
+    dct:bibliographicCitation "Nowak, Tarnita and Wilson 2010" .
+  <https://doi.org/10.1111/j.1420-9101.2011.02236.x> dct:title "The genetical theory of kin selection" ;
+    dct:bibliographicCitation "Gardner, West and Wild 2011" .
+  <https://doi.org/10.1093/biosci/biu196> dct:title "Kin Selection and Its Critics" ;
+    dct:bibliographicCitation "Birch and Okasha 2015 (online 2014), Kin selection and its critics" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hamiltons-rule-exact-scope, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.298Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hamiltons-rule-exact-scope: Lean: Price equation and the regression Hamilton's rule as an exact finite identity" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hamiltons-rule-exact-scope--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

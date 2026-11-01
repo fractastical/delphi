@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule110-universality-machine-checked--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Verified certificate checker: reduce the proof to a finite spacetime tile set" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule110-universality-machine-checked> ;
+    dct:description "Instead of proving Cook's construction lemma by lemma, prove once in Lean that a small checker is sound, and let external search produce the certificate. The spacetime diagram of Cook's construction for an arbitrary CTS is assembled from finitely many rectangular spacetime tiles (ether blocks, glider segments, collision blocks), and the program side is periodic while the data side varies only through which tiles are chosen. Define in Lean a certificate as a finite tile set with edge labels (boundary words) plus a context-free or regular grammar describing admissible tile arrangements for any CTS. The checker verifies (a) each tile is a valid Rule 110 spacetime patch, by kernel computation, (b) adjacent tiles agree on shared boundary words, (c) the grammar generates, for each CTS step, an arrangement whose decoded output equals the CTS successor. Soundness theorem: if the checker accepts, the universality statement holds. This fails differently from approach 1: the human-proof burden shrinks to the soundness lemma and the grammar semantics, while the computational burden moves to certificate generation outside Lean." ;
+
+    delphi:proposedTest "Lean accepts the certificate, and the soundness theorem plus the checker run yields the universality theorem with only standard axioms. A secondary artifact is the tile count, a compact measure of the construction's complexity." ;
+    delphi:context "Fails if: The tile decomposition does not close: arrangements depend on unbounded gap values in a way no regular or context-free grammar captures, or the tile set needed exceeds what kernel reduction can check in reasonable time." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. Specify tiles, boundary words and the arrangement grammar in Lean; prove the soundness theorem using the light-cone splicing lemma. 2. Write an external generator that runs the construction on many CTS, cuts the spacetime diagram into tiles, deduplicates them and infers the arrangement grammar. 3. Run the checker inside Lean by kernel reduction on the certificate; iterate on tile size if kernel cost is prohibitive. 4. Prove the grammar-to-CTS correspondence by induction on CTS steps." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: No existing tile-level description of Cook's construction; the grammar-inference step is research." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:note "Tool: certificate-checking" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch01-07> ;
+
+    rdfs:seeAlso <https://doi.org/10.25088/ComplexSystems.15.1.1> ;
+    rdfs:seeAlso <https://github.com/ccz181078/Coq-BB5> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/rule110-universality-machine-checked> a delphi:Concept, schema:Question ;
+    rdfs:label "Machine-check the universality of Rule 110" .
+
+
+  <https://doi.org/10.25088/ComplexSystems.15.1.1> dct:title "Universality in Elementary Cellular Automata" ;
+    dct:bibliographicCitation "Cook 2004, the construction to be tiled" .
+  <https://github.com/ccz181078/Coq-BB5> dct:bibliographicCitation "Coq proof of BB(5), a precedent for verified deciders checking large externally generated case analyses in a proof assistant" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule110-universality-machine-checked, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.295Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule110-universality-machine-checked: Verified certificate checker: reduce the proof to a finite spacetime tile set" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule110-universality-machine-checked--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

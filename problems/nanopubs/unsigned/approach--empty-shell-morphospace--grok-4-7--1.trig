@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Prove the planispiral non-intersection boundary" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> ;
+    dct:description "Raup's parameters are whorl expansion W, relative distance D of the generating curve from the coiling axis, and translation T. For the planispiral case T = 0, define the shell as the Thompson logarithmic spiral of expansion W with a circular generating curve of Raup's D. Prove the necessary and sufficient algebraic inequality on W and D such that the generating circle at angle θ does not meet the circle at angle θ minus 2π. The theorem is that inequality, derived inside Lean from the definitions, not copied from a secondary source. State the open solid-of-revolution case T ≠ 0 as out of scope. This is the developmental-constraint boundary the occupancy test will use." ;
+
+    delphi:proposedTest "A no-sorry equivalence between non-intersection of successive planispiral whorls and an explicit inequality in W and D." ;
+    delphi:context "Fails if: A numerically non-intersecting (W, D) pair that violates the inequality, or the converse. The statement is then false." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define W, D and the planispiral logarithmic spiral. 2. Write the two successive generating circles. 3. Prove they are disjoint if and only if the derived inequality holds. 4. Leave T ≠ 0 unformalized and say so. 5. Audit axioms." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: theoretical-morphology" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-15> ;
+
+    rdfs:seeAlso <https://doi.org/10.1111/brv.12276> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> a delphi:Concept, schema:Question ;
+    rdfs:label "Why is shell morphospace empty where it is?" .
+
+
+  <https://doi.org/10.1111/brv.12276> dct:title "The geometry of morphospaces: lessons from the classic\n                    <scp>R</scp>\n                    aup shell coiling model" ;
+    dct:bibliographicCitation "Gerber 2017, The geometry of morphospaces, used for the parameter definitions and the occupancy question" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to empty-shell-morphospace, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.341Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to empty-shell-morphospace: Prove the planispiral non-intersection boundary" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,86 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Calibrate the growth-rule null and re-orientation by remodelling simulation" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    dct:description "The problem asks whether alignment is stronger than a load-independent growth rule would produce, but the size of that null is unknown. Simulate trabecular architecture on 2D and coarse 3D voxel domains (a femoral-head section and a rectangular block) under three rule families: (1) a Huiskes-type remodelling rule driven by strain energy density sensed by osteocytes with spatial influence decay; (2) load-independent rules (reaction-diffusion Turing-type patterning of bone deposition, and growth along a fixed developmental field such as radial distance from an ossification centre); (3) mixed rules with a tunable load weight w from 0 to 1. For each run compute the same fabric-to-principal-stress angle statistic as approach 1. Then rotate the applied load by 13 and 20 degrees, matching the magnitudes used in the guineafowl and sheep experiments (Pontzer et al. 2006; Barak et al. 2011), continue the simulation, and record the fabric re-orientation angle and its time constant." ;
+
+    delphi:proposedTest "A table showing that the alignment statistic separates load-driven (w = 1) from load-independent (w = 0) rules by more than the seed-to-seed spread, with the minimum load weight that produces a median angle below 20 degrees, and predicted re-orientation magnitudes for the two experimental rotations." ;
+    delphi:context "Fails if: If load-independent rules on the same geometry produce median angles within the seed spread of the load-driven rule, the alignment statistic cannot discriminate causes and approach 1 must be redesigned around re-orientation; if results change by more than 10 degrees with voxel resolution or VOI size, the simulation is not converged." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Implement the remodelling loop in Python with a voxel FE solver (FEniCSx or a sparse linear-elastic voxel solver), verify against the published qualitative outcomes of Huiskes et al. 2000 (aligned struts under uniaxial load, re-alignment after load rotation). 2. Implement the load-independent rules and the mixed-rule family; fix seeds and record all parameters. 3. For each rule and 20 seeds, compute the distribution of fabric-to-stress angles and the stress-anisotropy dependence. 4. Apply load rotation and record re-orientation angle versus simulated time. 5. Publish a lookup table: expected median angle and anisotropy slope for w in {0, 0.25, 0.5, 0.75, 1}, to be used as the pre-registered growth-rule null in approach 1." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: No wet data needed; this calibrates nulls and does not by itself settle whether real bone is aligned." ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: fenicsx" ;
+    skos:note "Tool: frontier_simulate" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/35015116> ;
+    rdfs:seeAlso <https://doi.org/10.1016/0021-9290(87)90058-3> ;
+    rdfs:seeAlso <https://doi.org/10.1242/jeb.01971> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bone.2011.08.020> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" .
+
+
+  <https://doi.org/10.1038/35015116> dct:title "Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" ;
+    dct:bibliographicCitation "Huiskes et al. 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" .
+  <https://doi.org/10.1016/0021-9290(87)90058-3> dct:title "Trabecular bone density and loading history: Regulation of connective tissue biology by mechanical energy" ;
+    dct:bibliographicCitation "Carter, Fyhrie and Whalen 1987, Trabecular bone density and loading history: regulation of connective tissue biology by mechanical energy" .
+  <https://doi.org/10.1242/jeb.01971> dct:title "Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation" ;
+    dct:bibliographicCitation "Pontzer et al. 2006, Trabecular bone in the bird knee responds with high sensitivity to changes in load orientation" .
+  <https://doi.org/10.1016/j.bone.2011.08.020> dct:title "A Wolff in sheep's clothing: Trabecular bone adaptation in response to changes in joint loading orientation" ;
+    dct:bibliographicCitation "Barak et al. 2011, A Wolff in sheep's clothing" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to trabecular-stress-alignment-wolffs-law, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.307Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to trabecular-stress-alignment-wolffs-law: Calibrate the growth-rule null and re-orientation by remodelling simulation" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

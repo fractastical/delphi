@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/active-inference-morphogenesis-falsifiable--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lattice simulation with the target frozen before the cut" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/active-inference-morphogenesis-falsifiable> ;
+    dct:description "Implement the cell-lattice update from Kuchling et al. 2020 only if the paper states a complete parameter set. If it gives a schematic without numbers, stop and mark the approach not operationalizable. When numbers exist, freeze them, apply one cut geometry that the paper reports but that is not the figure used to illustrate the update, and predict the polarity class. frontier_simulate's mechanobiology preview may be used to check that a lattice energy is inside its allowlisted family; it does not replace the lattice run and is not evidence. Success is the published polarity class. One cut, named first." ;
+
+    delphi:proposedTest "The pre-named cut's published polarity, from a parameter set taken entirely from the paper." ;
+    delphi:context "Fails if: The polarity is wrong, or the paper has no complete parameter set. The second case is a failed operationalization, not a refutation of active inference." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Extract numerical parameters from Kuchling et al. 2020 or stop. 2. Name the held-out cut before simulating. 3. Run the lattice update with the frozen target. 4. Compare predicted polarity with the paper. 5. Do not add a parameter to repair a miss." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: A fully numerical parameter set in the paper. If the model is schematic, this approach cannot start." ;
+    skos:note "Tool: simulation" ;
+    skos:note "Tool: frontier_simulate" ;
+    skos:note "Tool: variational-inference" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-place-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-place-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2019-boundary-15> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-girardia-20> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.plrev.2019.06.001> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/active-inference-morphogenesis-falsifiable> a delphi:Concept, schema:Question ;
+    rdfs:label "A falsifiable form of active-inference morphogenesis" .
+
+
+  <https://doi.org/10.1016/j.plrev.2019.06.001> dct:title "Morphogenesis as Bayesian inference: A variational approach to pattern formation and control in complex biological systems" ;
+    dct:bibliographicCitation "Kuchling et al. 2020, the update rule and the only allowed source of parameters" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to active-inference-morphogenesis-falsifiable, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.344Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to active-inference-morphogenesis-falsifiable: Lattice simulation with the target frozen before the cut" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/active-inference-morphogenesis-falsifiable--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

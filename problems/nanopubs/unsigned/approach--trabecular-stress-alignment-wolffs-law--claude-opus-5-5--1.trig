@@ -1,0 +1,101 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered fabric-versus-principal-stress angle on open femoral micro-CT" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    dct:description "On open micro-CT of loaded cancellous bone, compute the local fabric tensor (mean intercept length, via BoneJ anisotropy) in a grid of cubic volumes of interest (edge about 5 mm in human femoral heads, scaled to trabecular spacing in other species) and the local principal stress tensor from a homogenized finite-element model of the same bone under a stated physiological load case (hip contact force direction and magnitude from Bergmann et al. 2001 / OrthoLoad for human femur). The statistic is, per volume, the angle between the primary fabric eigenvector and the principal stress direction of largest absolute magnitude, folded to 0-90 degrees. Two nulls are fixed in advance: (a) randomized fabric with the same density field, for which an isotropic random axis has median angle 60 degrees (P(angle <= theta) = 1 - cos theta); (b) a load-independent growth-rule null in which fabric follows a geometric field of the bone alone (local direction of the shaft or neck axis, and the gradient of distance to the cortical shell). Load-case sensitivity is tested by sweeping the load direction over a cone of 60 degrees around the physiological direction and recording the direction that minimizes median angular error; alignment is credited to load only if the best direction lies inside the physiological range and the error rises away from it." ;
+
+    delphi:proposedTest "Median fabric-to-stress angle at or below 20 degrees in at least three sites from two species, significantly below both the randomized-fabric null (median 60 degrees) and the geometric growth-rule null, with the best-fitting load direction inside the physiological cone and error decreasing with stress anisotropy." ;
+    delphi:context "Fails if: Median angle not distinguishable from the growth-rule null, or the error minimum in the load sweep lying outside the physiological cone or being flat (load-case insensitive); or fewer than three usable loaded sites with licences after scouting, in which case the approach stalls rather than refutes." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Scout and register datasets: human proximal femora (Twente/VPHOP femur database, FEMHALS if a data-use agreement can be signed, the CC BY Figshare femur section), plus at least one non-human loaded site on MorphoSource (primate or ungulate femoral head, calcaneus or vertebra) with licence recorded. 2. Pre-register in test-data/claim-tests/thompson-growth-form/thompson1917-ch16-05/: VOI size, fabric method, FE material law (density-dependent isotropic modulus, so fabric does not enter the stress computation), load case, angular tolerance (median error <= 20 degrees), and the pass rule (median error below both nulls at p < 0.01 by permutation, in at least three sites from two species). 3. Segment with a fixed global threshold (Otsu per scan, recorded), compute MIL fabric per VOI with BoneJ, discard VOIs with degree of anisotropy below 1.1 where the primary axis is undefined. 4. Build voxel or tetrahedral homogenized FE meshes (FEniCSx), apply the load case, extract principal stresses per VOI. 5. Compute angular error distributions, the two nulls (1,000 permutations for the randomized null), and the load-direction sweep; report all three sites separately and pooled. 6. Stratify by local stress anisotropy (sigma1 - sigma3)/(|sigma1| + |sigma3|): the stress-alignment hypothesis predicts error falls as anisotropy rises; the growth-rule null predicts no such dependence." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Licensed non-human micro-CT of loaded sites with known habitual loads; FEMHALS raw scans need an operator-signed data-use agreement; homogenized FE of whole bones is computationally heavy but feasible." ;
+    skos:note "Tool: bonej" ;
+    skos:note "Tool: fenicsx" ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: morphosource" ;
+    skos:note "Tool: pre-registered-claim-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+    rdfs:seeAlso <https://doi.org/10.4121/uuid:4ae59365-92f0-480b-a899-ade34bc84a00> ;
+    rdfs:seeAlso <https://doi.org/10.5281/zenodo.21494457> ;
+    rdfs:seeAlso <https://doi.org/10.6084/m9.figshare.14097263> ;
+    rdfs:seeAlso <https://orthoload.com> ;
+    rdfs:seeAlso <https://www.morphosource.org> ;
+    rdfs:seeAlso <https://doi.org/10.1016/S0021-9290(01)00040-9> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bone.2010.08.023> ;
+    rdfs:seeAlso <https://doi.org/10.1038/35015116> ;
+    rdfs:seeAlso <https://doi.org/10.1371/journal.pone.0078781> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" .
+
+  <https://doi.org/10.4121/uuid:4ae59365-92f0-480b-a899-ade34bc84a00> dct:title "Database of femur samples (VPHOP, University of Twente)" ;
+    dct:description "33 human cadaver proximal femora with reconstructed micro-CT, FE input files and per-element microstructural parameters; open for research with citation. Check whether fabric eigenvectors are among the per-element parameters." .
+  <https://doi.org/10.5281/zenodo.21494457> dct:title "FEMHALS: multiscale imaging and mechanical testing of human proximal femora" ;
+    dct:description "Micro-CT of proximal femur and femoral neck for 94 femora with mechanical tests; raw scans reported to require access approval and a data-use agreement, which the operator would have to sign." .
+  <https://doi.org/10.6084/m9.figshare.14097263> dct:title "Human femur section (female, 77 years) CT stack" ;
+    dct:description "CC BY 4.0 micro-CT stack at 10 micrometre voxels; small, useful for calibrating the pipeline, not as a full loaded site." .
+  <https://orthoload.com> dct:title "OrthoLoad" ;
+    dct:description "Instrumented-implant hip contact forces for the human load case." .
+  <https://www.morphosource.org> dct:title "MorphoSource" ;
+    dct:description "Non-human micro-CT of loaded trabecular sites; availability and licence to be scouted per specimen." .
+  <https://doi.org/10.1016/S0021-9290(01)00040-9> dct:title "Hip contact forces and gait patterns from routine activities" ;
+    dct:bibliographicCitation "Bergmann et al. 2001, Hip contact forces and gait patterns from routine activities" .
+  <https://doi.org/10.1016/j.bone.2010.08.023> dct:title "BoneJ: Free and extensible bone image analysis in ImageJ" ;
+    dct:bibliographicCitation "Doube et al. 2010, BoneJ: free and extensible bone image analysis in ImageJ" .
+  <https://doi.org/10.1038/35015116> dct:title "Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" ;
+    dct:bibliographicCitation "Huiskes et al. 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" .
+  <https://doi.org/10.1371/journal.pone.0078781> dct:title "Trabecular Bone Structure Correlates with Hand Posture and Use in Hominoids" ;
+    dct:bibliographicCitation "Tsegai et al. 2013, Trabecular bone structure correlates with hand posture and use in hominoids" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to trabecular-stress-alignment-wolffs-law, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.307Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to trabecular-stress-alignment-wolffs-law: Pre-registered fabric-versus-principal-stress angle on open femoral micro-CT" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

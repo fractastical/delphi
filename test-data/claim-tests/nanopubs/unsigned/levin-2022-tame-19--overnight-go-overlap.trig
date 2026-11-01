@@ -1,0 +1,103 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/levin-2022-tame-19--claim-test--overnight-go-overlap> a delphi:Assessment ;
+    rdfs:label "Claim test of levin-2022-tame-19 (overnight-go-overlap): mixed, confidence 0.6" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "mixed" ;
+    delphi:hasConfidence "0.6"^^xsd:double ;
+    delphi:hypothesis "Among human protein-coding genes, genes annotated (non-IEA) to GO:0009653 anatomical structure morphogenesis and genes annotated (non-IEA) to GO:0007611 learning or memory overlap with odds ratio > 2, and that overlap exceeds a permutation null that preserves both set sizes and matches genes on number of GO annotations and on degree in the INDRA CoGEx statement graph; the same holds within the ion-channel subset (GO:0005216) and within the gap-junction subset (GO:0005921)." ;
+    delphi:passCriterion "Pre-registered. Primary run (IEA excluded). For each of three endpoints, (E1) all human protein-coding genes, (E2) the subset annotated to GO:0005216 monoatomic ion channel activity or descendants, (E3) the subset annotated to GO:0005921 gap junction or descendants, the endpoint passes if the observed odds ratio of the 2x2 table (morphogenesis membership x learning-or-memory membership, within that endpoint's universe) is > 2 AND the one-sided matched-permutation p-value, (1 + #{null OR >= observed OR}) / (1 + 10000), is < 0.01. Verdict 'supports' requires E1, E2 and E3 all to pass in the primary run." ;
+    delphi:failCriterion "Pre-registered. Verdict 'refutes' if E1 fails in the primary run (observed OR <= 2 or matched-permutation p >= 0.01), i.e. the full-set overlap is not wide beyond annotation volume and statement-graph degree. Verdict 'mixed' if E1 passes but E2 or E3 fails or is underpowered. A subset endpoint is underpowered (and counted as not passing) if its universe has fewer than 5 learning-or-memory genes or fewer than 5 morphogenesis genes. A pass that appears only in the IEA-included run does not count toward any verdict; that run is reported, labelled, as a secondary analysis." ;
+    delphi:expectedObservation "Morphogenesis and learning-or-memory gene sets overlap with odds ratio > 2 and above a size-, annotation-count- and INDRA-degree-matched permutation null (p < 0.01), overall and within ion-channel and gap-junction genes." ;
+    delphi:disconfirmingObservation "The full-set odds ratio lies inside the matched null (p >= 0.01) or is <= 2." ;
+    delphi:admissibleDatasets "Current GO Consortium human annotations and ontology, HGNC protein-coding gene list, INDRA CoGEx statement graph; all public, none derived from Levin's papers." ;
+    delphi:inferenceMethod "Observed 2x2 odds ratio compared with 10,000 stratified label permutations matched on annotation count and INDRA degree; thresholds OR > 2 and one-sided permutation p < 0.01 per endpoint." ;
+    delphi:preregistered false ;
+    delphi:dataKind "biological" ;
+    dct:description "fetch.py downloads go-basic.obo, the GOA human GAF and the HGNC protein-coding list, and queries INDRA CoGEx (execute_cypher over the public MCP endpoint, batches of 250 HGNC ids) for each gene's count of distinct indra_rel statement hashes. analysis.py drops NOT-qualified and obsolete-term lines, maps UniProt accessions to 19,276 HGNC protein-coding genes, propagates annotations over is_a/part_of, and builds the 2x2 table of GO:0009653 x GO:0007611 membership overall (E1) and within the GO:0005216 (E2) and GO:0005921 (E3) subsets. The null shuffles learning-or-memory labels within strata of annotation count x INDRA degree (5x5 quantile strata for E1, 3x3 within subsets), 10,000 permutations, seed 20261101; p = (1 + #null OR >= observed) / 10,001. The primary run excludes IEA; a labelled secondary run includes it." ;
+    rdfs:comment "Measured: 5.9585 odds ratio, GO:0009653 x GO:0007611 human protein-coding genes, IEA excluded (n = 19276, 95% CI 4.0202-8.8316; matched-permutation p = 0.0002). Interpretation: TAME (Levin 2022) predicts that genes involved in morphogenesis overlap widely with memory and learning genes. 'Morphogenesis' is GO:0009653 anatomical structure morphogenesis and 'learning and memory' is GO:0007611 learning or memory, each with is_a/part_of descendants, in human protein-coding genes. 'Beyond pleiotropy' is operationalised as beyond a permutation null matched on number of GO annotations (annotation volume) and number of INDRA CoGEx statements (how studied and how connected a gene is). The ion-channel and gap-junction subsets are the bioelectric machinery Levin names. Primary evidence rule is every GO evidence code except IEA (so ISS, IBA, TAS and similar curated inferences are included, unlike the earlier mouse experimental-only test in the parent directory)." ;
+    delphi:evidenceAgainst "Pre-registered rule gives 'mixed': the full-set endpoint passes (OR 5.96, 95% CI 4.02-8.83, 37 genes vs 8.6 expected; matched-null median OR 2.62, p = 0.0002), the ion-channel endpoint fails (2 of 7 learning-or-memory ion-channel genes are morphogenesis genes; OR 8.02 but p = 0.23, CI 1.46-44.1), and the gap-junction endpoint is underpowered (26 genes, 0 annotated to learning or memory). The bioelectric subsets Levin names therefore give no support, mostly for lack of data." ;
+    delphi:evidenceAgainst "The OR > 2 threshold is weak on its own: the matched null's median OR is already 2.62, so the informative quantity is the excess over the null (2.27x) and the permutation p." ;
+    delphi:evidenceAgainst "The IEA-included run gives the same picture (E1 OR 5.65, p = 0.0002; E2 OR 10.42, p = 0.10; E3 underpowered), so the full-set hit is not an IEA artefact." ;
+    delphi:evidenceAgainst "This conflicts in direction with the earlier mouse test in the parent directory (experimental codes only, annotation-depth decile Mantel-Haenszel OR 0.94, refutes). Species, evidence codes and the matching scheme differ; 5x5 quantile strata control annotation volume more coarsely than within-decile stratification, so residual study bias may remain." ;
+    delphi:evidenceAgainst "GO annotation bias: genes are annotated to learning or memory mostly after behavioural knockout studies, which favour genes already studied in development. Matching on annotation count and INDRA degree absorbs this only approximately; INDRA degree is itself literature-derived." ;
+    delphi:evidenceAgainst "Only 117 human genes carry non-IEA learning-or-memory annotations, so the learning set is small and subset endpoints have little power." ;
+    delphi:evidenceAgainst "60,356 GAF lines did not map to an approved HGNC protein-coding gene through HGNC's UniProt list and were dropped; 10 HGNC ids are absent from CoGEx and were given degree 0." ;
+    delphi:evidenceAgainst "GO, GOA, HGNC and CoGEx are 'current' and unversioned in their URLs; re-running later will fetch newer releases and numbers will drift. The SHA-256s identify the files used; the INDRA table is regenerated by query." ;
+    delphi:evidenceAgainst "Approach executed by a Claude Opus 5.5 agent on a plan proposed by grok-4-7. During the run the repo was restructured (test-data moved under ); the pre-registered result.json was written before any data were fetched (prereg 2026-11-01T05:50Z, first download 10:15Z)." ;
+    delphi:hasEvidence <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--overnight-go-overlap--dataset-1>, <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--overnight-go-overlap--dataset-2>, <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--overnight-go-overlap--dataset-3>, <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--overnight-go-overlap--dataset-4> ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/levin-papers/levin-2022-tame-19/overnight-go-overlap/result.json> .
+  <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--overnight-go-overlap--dataset-1> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: Gene Ontology, basic edition (go-basic.obo)" ;
+    dct:description "term hierarchy (is_a, part_of) for propagation and set definition" ;
+    delphi:hasChecksum "sha256:b08d45b268b8c24ccb2513dbbbc7d4df9f6521c099b413f79eb31e06e0fa3bcc" ;
+    prov:atLocation <https://purl.obolibrary.org/obo/go/go-basic.obo> ;
+    prov:wasDerivedFrom <https://geneontology.org/docs/download-ontology/> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--overnight-go-overlap--dataset-2> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: GOA human GO annotations (GAF 2.2), via the GO Consortium" ;
+    dct:description "gene-to-GO annotations with evidence codes (set membership, annotation counts, subsets)" ;
+    delphi:hasChecksum "sha256:db472faff1785878521693af62646546cea6af4a386609dd01c72c0554a46a30" ;
+    prov:atLocation <https://current.geneontology.org/annotations/goa_human.gaf.gz> ;
+    prov:wasDerivedFrom <https://current.geneontology.org/products/pages/downloads.html> ;
+    dct:license "CC BY 4.0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--overnight-go-overlap--dataset-3> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: HGNC approved genes, locus type 'gene with protein product'" ;
+    dct:description "universe of human protein-coding genes and UniProt-to-HGNC mapping" ;
+    delphi:hasChecksum "sha256:6a274291fd9029a2ca41b8b00cd114b039629db3a6d68a52eedd3e6b422a3304" ;
+    prov:atLocation <https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/locus_types/gene_with_protein_product.txt> ;
+    prov:wasDerivedFrom <https://www.genenames.org/download/statistics-and-files/> ;
+    dct:license "CC0" .
+  <https://w3id.org/delphi/resource/evidence/levin-2022-tame-19--claim-test--overnight-go-overlap--dataset-4> a delphi:EvidenceItem ;
+    rdfs:label "Dataset: INDRA CoGEx knowledge graph, per-gene count of distinct INDRA statements" ;
+    dct:description "statement-graph degree, a matching covariate of the permutation null" ;
+    delphi:hasChecksum "sha256:bf594d1a330454034d7f3edb4ece8b4dd046a5cf0fcec234ffc43357f6dd490a" ;
+    prov:atLocation <https://discovery.indra.bio/mcp> ;
+    prov:wasDerivedFrom <https://discovery.indra.bio/> ;
+    dct:license "INDRA CoGEx public service terms (BSD-2 code; content per upstream sources)" .
+  <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/levin-2022-tame-19--claim-test--overnight-go-overlap> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/levin-papers/levin-2022-tame-19/overnight-go-overlap/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (claude-opus-5.5; approach morphogenesis-cognition-gene-overlap--grok-4-7--1)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    dct:identifier "claude-opus-5.5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.958Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of levin-2022-tame-19 (overnight-go-overlap): mixed, confidence 0.6" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/levin-2022-tame-19--claim-test--overnight-go-overlap> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/levin-papers> .
+}

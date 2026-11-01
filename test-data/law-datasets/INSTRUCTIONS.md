@@ -56,7 +56,7 @@ Log every search in `search_log`, including empty ones.
 - **Scope as stated.** A dataset on one species is `partial` for a claim about all vertebrates.
 - No dummy data: no templated records, no placeholder IDs, no synthetic numbers.
 - Don't download anything over 1 MB. A HEAD request, an API count or the first KB is enough.
-- Don't touch claim files, assessments, nanopubs, `docs/`, `claim-tests/` or other slices.
+- Don't touch claim files, assessments, nanopubs, `site/`, `claim-tests/` or other slices.
 - For fossils, give `geologic_age` (`interval`, `ma_min`, `ma_max`) from the source or PBDB when the source is about specimens or occurrences.
 
 ## Record format

@@ -1,0 +1,145 @@
+{
+  "claim_id": "levin-2022-tame-33",
+  "variables_needed": [
+    "head-shape (landmark or outline) coordinates of regenerated heads after transient gap-junction blockade (e.g. octanol)",
+    "reference head shapes of other planarian species",
+    "repeated measurements of the same animals weeks later (remodelling trajectory)",
+    "frequency of categorical head outcomes per treatment"
+  ],
+  "datasets": [
+    {
+      "id": "planform",
+      "name": "Planform / PlanformDB (planarian regeneration experiment database)",
+      "landing_url": "https://lobolab.umbc.edu/planform/",
+      "access_url": "https://lobolab.umbc.edu/planform/downloads/planformDB_2.5.0.edb",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GET landing_url; GET access_url (744,448 bytes), opened as SQLite and queried locally",
+        "http_status": 200,
+        "bytes": 744448
+      },
+      "variables_present": [
+        "categorical resultant morphologies with frequencies per experiment (e.g. 'Wild type' 0.95, 'Double head, two pharynxes' 0.05)",
+        "octanol/heptanol experiments: 38 octanol and 6 heptanol ExperimentDrug rows, all Dugesia japonica, from two publications (2010 'Long-range neural and gap junction protein-mediated cues control polarity during planarian regeneration'; 2005 'Characterization of innexin gene expression and functional roles of gap-junctional communication in planarian regeneration')",
+        "RegenPeriod per result set"
+      ],
+      "variables_missing": [
+        "landmark or outline coordinates",
+        "experiments from the paper PMC4661923 (Girardia dorotocephala)",
+        "post-regeneration remodelling time course"
+      ],
+      "scope": "SQLite DB, version 2.5.0 dated 8 Feb 2018: 1,716 experiments, 119 publications, 17 species, 372 morphology names, 2,000 result sets",
+      "evidence": "Last-Modified Thu, 08 Feb 2018; file is 'SQLite 3.x database'; tables Experiment, ExperimentDrug, ResultSet, ResultantMorphology, Publication. No publication title in the DB matched the PMC4661923 paper title.",
+      "verdict": "partial"
+    },
+    {
+      "id": "paper-pmc4661923",
+      "name": "Open-access paper PMC4661923: Gap Junctional Blockade Stochastically Induces Different Species-Specific Head Anatomies in Genetically Wild-Type Girardia dorotocephala Fragments",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22Gap+Junctional+Blockade+Stochastically%22&format=json&resultType=lite",
+      "access_url": null,
+      "doi": "10.3390/ijms161126065",
+      "license": "cc by",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "Europe PMC REST search and core record for PMC4661923 (isOpenAccess Y, hasSuppl Y, license cc by)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "the paper's own figures and tables of head outcomes (described in the paper, not downloaded)"
+      ],
+      "variables_missing": [
+        "a deposited machine-readable morphometric table was not found; supplementary contents were not inspected"
+      ],
+      "scope": "one Girardia dorotocephala study; hasSuppl flag only",
+      "evidence": "Europe PMC core record: PMCID PMC4661923, DOI 10.3390/ijms161126065, license 'cc by', hasSuppl 'Y'. Suppl contents not opened.",
+      "verdict": "partial"
+    },
+    {
+      "id": "pubmed-central",
+      "name": "PubMed Central (portal)",
+      "landing_url": "https://pmc.ncbi.nlm.nih.gov/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GET landing_url",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a dataset; it is an article archive"
+      ],
+      "scope": "article archive; the relevant paper is recorded separately as paper-pmc4661923",
+      "evidence": "Landing page HTTP 200.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Europe PMC",
+      "query": "\"Gap junctional blockade stochastically\"",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22Gap+junctional+blockade+stochastically%22&format=json&resultType=lite",
+      "hits": 1,
+      "note": "PMC4661923, CC BY"
+    },
+    {
+      "source": "Dryad",
+      "query": "planarian octanol head",
+      "url": "https://datadryad.org/api/v2/search?q=planarian+octanol+head&per_page=3",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Dryad",
+      "query": "Girardia gap junction regeneration",
+      "url": "https://datadryad.org/api/v2/search?q=Girardia+gap+junction+regeneration&per_page=3",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Dryad",
+      "query": "planarian regeneration bioelectric",
+      "url": "https://datadryad.org/api/v2/search?q=planarian+regeneration+bioelectric&per_page=3",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Zenodo",
+      "query": "planarian octanol (unquoted)",
+      "url": "https://zenodo.org/api/records?q=planarian+octanol&size=3",
+      "hits": 819,
+      "note": "unquoted terms; top hits unrelated (predation, behavioural screening code); nothing on head morphometry"
+    },
+    {
+      "source": "BioStudies",
+      "query": "Girardia",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Girardia&pageSize=3",
+      "hits": 22,
+      "note": "mitogenome, transcriptome records; no head-shape data among the first three"
+    }
+  ],
+  "status": "partial",
+  "summary": "PlanformDB (SQLite, 744 KB) holds categorical head outcomes after octanol/heptanol in Dugesia japonica from two papers, but no landmark coordinates, no Girardia dorotocephala data from the PMC4661923 study, and no remodelling time course; the PMC4661923 paper is open access with a supplement flag, but no deposited morphometric table was found.",
+  "next_step": "Open the PMC4661923 supplement to see whether outcome counts or images are tabulated; otherwise compile head-shape landmarks from the figures.",
+  "obstacles_confirmed": [
+    "No public longitudinal morphometric file for the PMC4661923 experiment was found in Dryad, Zenodo or BioStudies.",
+    "Planform stores categorical outcomes, not the remodelling trajectory."
+  ],
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "levin-03"
+  }
+}

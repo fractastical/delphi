@@ -4,7 +4,10 @@
 // or skipped. Files a data test writes are restored afterwards unless --update is given.
 //
 // Usage: node scripts/exec/run.mjs [--kind lean|data] [--project P] [--claim ID ...] [--offline]
-//                          [--update] [--jobs N] [--timeout S] [--rtol X] [--list]
+//                          [--update] [--jobs N] [--timeout S] [--rtol X] [--list] [--base RUN.json]
+//
+// --base: re-run only the selected entries and carry every other result over from a previous run file
+//         (each carried result gets `carried_from`), so a partial re-run still yields a complete latest.json.
 
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -21,7 +24,7 @@ const STD_AXIOMS = new Set(["propext", "Classical.choice", "Quot.sound"]);
 const WALL_CLOCK = /(^|[._])(seconds|secs|elapsed|runtime|duration|wall_?time|timing)s?($|[._[])/i;
 // Sizes of fetched files change with upstream re-exports and HTTP metadata; they are provenance, not measurement.
 const FETCH_METADATA = /(^|[._\]])(byte_size|bytes|size_bytes|content_length|n_bytes)$/i;
-const PY_DEPS = ["numpy", "scipy", "pandas", "requests", "biopython", "pillow", "openpyxl", "pdfplumber"];
+const PY_DEPS = ["numpy", "scipy", "pandas", "requests", "biopython", "pillow", "openpyxl", "pdfplumber", "gemmi", "tifffile"];
 
 const args = process.argv.slice(2);
 const opt = { claims: [], jobs: 1, rtol: 1e-6, atol: 1e-9 };
@@ -36,6 +39,7 @@ for (let i = 0; i < args.length; i++) {
   else if (a === "--jobs") opt.jobs = Number(args[++i]);
   else if (a === "--timeout") opt.timeout = Number(args[++i]);
   else if (a === "--rtol") opt.rtol = Number(args[++i]);
+  else if (a === "--base") opt.base = args[++i];
   else throw new Error(`unknown argument ${a}`);
 }
 
@@ -68,21 +72,31 @@ const hasUv = spawnSync("uv", ["--version"]).status === 0;
 function exec(cmd, cwd, timeoutS) {
   return new Promise((resolve) => {
     const started = Date.now();
-    const child = spawn(cmd[0], cmd.slice(1), { cwd, env: { ...process.env, PYTHONUNBUFFERED: "1", MPLBACKEND: "Agg" } });
+    // detached: the child leads its own process group, so a timeout kills `uv run` *and* the python it spawned.
+    const child = spawn(cmd[0], cmd.slice(1), { cwd, detached: true, env: { ...process.env, PYTHONUNBUFFERED: "1", MPLBACKEND: "Agg" } });
     let out = "";
     let err = "";
     child.stdout.on("data", (d) => (out += d));
     child.stderr.on("data", (d) => (err += d));
     let timedOut = false;
-    const timer = setTimeout(() => {
-      timedOut = true;
-      child.kill("SIGKILL");
-    }, timeoutS * 1000);
-    child.on("error", (e) => (err += String(e)));
-    child.on("close", (code) => {
+    let done = false;
+    const finish = (code) => {
+      if (done) return;
+      done = true;
       clearTimeout(timer);
       resolve({ code: timedOut ? null : code, timedOut, out, err, seconds: (Date.now() - started) / 1000 });
-    });
+    };
+    const timer = setTimeout(() => {
+      timedOut = true;
+      try {
+        process.kill(-child.pid, "SIGKILL");
+      } catch {
+        child.kill("SIGKILL");
+      }
+      setTimeout(() => finish(null), 2000); // don't wait on pipes an orphaned grandchild may still hold
+    }, timeoutS * 1000);
+    child.on("error", (e) => (err += String(e)));
+    child.on("close", finish);
   });
 }
 
@@ -338,13 +352,23 @@ await Promise.all(
   }),
 );
 
-const ordered = selected.map((e) => ({ id: e.id, claim_id: e.claim_id, kind: e.kind, ...results.get(e.id) }));
+let ordered = selected.map((e) => ({ id: e.id, claim_id: e.claim_id, kind: e.kind, ...results.get(e.id) }));
+let base = null;
+if (opt.base) {
+  base = JSON.parse(readFileSync(opt.base, "utf8"));
+  const fresh = new Set(ordered.map((r) => r.id));
+  const carried = base.results.filter((r) => !fresh.has(r.id)).map((r) => ({ ...r, carried_from: r.carried_from ?? base.ran_at }));
+  const order = new Map(manifest.entries.map((e, i) => [e.id, i]));
+  ordered = [...ordered, ...carried].sort((a, b) => (order.get(a.id) ?? 1e9) - (order.get(b.id) ?? 1e9));
+  console.log(`\ncarried ${carried.length} results over from ${opt.base} (run of ${base.ran_at})`);
+}
 const tally = Object.groupBy(ordered, (r) => r.status);
 const summary = Object.fromEntries(Object.entries(tally).map(([k, v]) => [k, v.length]));
 const run = {
   ran_at: new Date().toISOString(),
   manifest_built: manifest.built,
   options: { ...opt, claims: opt.claims.length ? opt.claims : undefined },
+  ...(base ? { base: { file: opt.base, ran_at: base.ran_at, options: base.options } } : {}),
   summary,
   results: ordered,
 };

@@ -28,7 +28,7 @@ theorem pentagons_eq_twelve (counts : LatticeCounts)
 /-- Adding a material parameter does not change the topological count: no property of the
 material is used. This establishes independence only for the integer `12`, conditional on
 the same trivalent pentagon-hexagon lattice hypotheses for each material. -/
-theorem pentagons_eq_twelve_independent_of_material (Material : Type) (material : Material)
+theorem pentagons_eq_twelve_independent_of_material (Material : Type) (_material : Material)
     (counts : LatticeCounts) (h : IsPentagonHexagonSphere counts) :
     counts.pentagons = 12 := by
   exact pentagons_eq_twelve counts h

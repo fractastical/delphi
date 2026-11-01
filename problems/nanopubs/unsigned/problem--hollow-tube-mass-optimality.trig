@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are biological hollow structures at the stiffness-per-mass optimum?" ;
+    dct:description "For bone shafts, plant stems, bamboo, feathers and quills, is the radius-to-wall-thickness ratio at the value that maximizes bending stiffness per unit mass, or does a competing constraint (local buckling, impact, vascular space, growth) set it? How large is the systematic deviation, and does it depend on the organism's size?" ;
+
+    skos:historyNote "Known state: Thompson (1917, ch. 16) argues that where stiffness against bending in all directions is required organisms use hollow cylinders with little material in the core, and that the walls of long bones are thickest where bending is greatest. Thin-walled-tube theory gives the stiffness-per-mass optimum and the local-buckling limit, and Ashby, Gibson, Wegst and Olive 1995 compare natural and engineering shapes. We know of no pre-registered cross-taxon comparison of measured thickness ratios with the optimum and buckling limits that uses the measured material properties of each structure, so the extent of optimality is unmeasured." ;
+    dct:subject "both" ;
+    delphi:hypothesisType "open-problem/tier-B" ;
+    skos:scopeNote "Resolved when: A pre-registered comparison of measured radius and wall thickness for at least 100 structures from at least four structure types (long bones, stems, bamboo culms, feather rachises), each with its measured tissue modulus, against the stiffness-per-mass optimum and the buckling limit, with the tolerance for 'at optimum' stated in advance." ;
+    skos:scopeNote "Refuted if: If the measured ratios cluster at the buckling limit rather than at the stiffness-per-mass optimum for most structures, the optimality claim is refuted and a buckling-limited design is supported." ;
+    skos:scopeNote "Refuted if: If the ratios show no relation to either, the claim is refuted for the tested set." ;
+    skos:note "Data access: Published cross-section morphometry of long bones, culms and rachises, and open CT of limb bones on MorphoSource; tissue modulus values have to be taken from the same or a closely matched source, which limits the usable sample." ;
+    skos:note "Requires: morphometry" ;
+    skos:note "Requires: mechanics-modelling" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: tissue" ;
+    skos:note "Scale: organ" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0076> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0075> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.1098/rspa.1995.0076> dct:title "The mechanical properties of natural materials. II. Microstructures for mechanical efficiency" ;
+    dct:bibliographicCitation "Gibson, Ashby, Wegst and Olive 1995, The mechanical properties of natural materials. II. Microstructures for mechanical efficiency" .
+  <https://doi.org/10.1098/rspa.1995.0075> dct:title "The mechanical properties of natural materials. I. Material property charts" ;
+    dct:bibliographicCitation "Ashby, Gibson, Wegst and Olive 1995, The mechanical properties of natural materials. I. Material property charts" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.292Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Are biological hollow structures at the stiffness-per-mass optimum?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

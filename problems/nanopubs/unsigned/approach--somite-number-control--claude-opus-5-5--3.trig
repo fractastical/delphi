@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/somite-number-control--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Temperature test: do clock and elongation Q10s predict meristic plasticity?" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/somite-number-control> ;
+    dct:description "Use temperature as a natural perturbation the swarm can exploit from existing data. In ectotherms, temperature changes both clock period and elongation rate. Clock-and-wavefront predicts that total somite number varies with rearing temperature in proportion to the difference of their thermal sensitivities: d ln N / dT ≈ (E_τ − E_elong)/(kT²) in Arrhenius form. If both scale identically, N is temperature-invariant, as reported for zebrafish somitogenesis by Schröter et al. 2008. Compile (a) clock-period and elongation-rate temperature series for zebrafish and any other species with them, and (b) laboratory rearing-temperature experiments reporting vertebral counts in fishes (meristic plasticity literature), plus (c) the latitudinal vertebral-count gradient (Jordan's rule) from FishBase across species and populations. Pre-registered predictions: the measured E difference predicts the sign and magnitude of rearing-temperature effects within a factor of 2, and species whose measured E difference is near zero show no latitudinal gradient." ;
+
+    delphi:proposedTest "Agreement or disagreement, within a factor of 2, between d ln N/dT predicted from measured clock and elongation thermal sensitivities and the observed rearing-temperature effect on vertebral counts. A sign mismatch in two or more species refutes the clock-and-wavefront account of meristic plasticity." ;
+    delphi:context "Fails if: No species has both a clock-temperature series and a rearing-temperature vertebral-count experiment, so predictions and observations come from different species and the test is indirect." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the Arrhenius prediction and tolerance. 2. Extract temperature series for τ and elongation from published studies; estimate E values with CIs. 3. Compile rearing-temperature vertebral-count experiments; compute d ln N/dT per study. 4. Compare predicted and observed slopes; run a phylogenetically controlled test of Jordan's rule against predicted sensitivity where data allow." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Matched clock and meristic data for the same species are rare; new temperature-series time-lapse experiments would make the test decisive." ;
+    skos:note "Tool: comparative-data" ;
+    skos:note "Tool: data-test" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch17-04> ;
+    rdfs:seeAlso <https://www.fishbase.se/> ;
+    rdfs:seeAlso <https://doi.org/10.1002/dvdy.21458> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature07020> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/somite-number-control> a delphi:Concept, schema:Question ;
+    rdfs:label "What sets vertebrate somite number?" .
+
+  <https://www.fishbase.se/> dct:title "FishBase" ;
+    dct:description "Vertebral counts and distribution latitudes" .
+  <https://doi.org/10.1002/dvdy.21458> dct:title "Dynamics of zebrafish somitogenesis" ;
+    dct:bibliographicCitation "Schröter et al. 2008, Dynamics of zebrafish somitogenesis (temperature dependence)" .
+  <https://doi.org/10.1038/nature07020> dct:title "Control of segment number in vertebrate embryos" ;
+    dct:bibliographicCitation "Gomez et al. 2008" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to somite-number-control, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.302Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to somite-number-control: Temperature test: do clock and elongation Q10s predict meristic plasticity?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/somite-number-control--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

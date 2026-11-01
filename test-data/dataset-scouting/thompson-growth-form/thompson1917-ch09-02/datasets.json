@@ -1,0 +1,192 @@
+{
+  "claim_id": "thompson1917-ch09-02",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-04"
+  },
+  "variables_needed": [
+    "larval stage / survival under lime-free (Ca-depleted) versus normal seawater",
+    "presence or absence of skeletal rods (mineralisation, e.g. birefringence) per larva",
+    "larval arm length per larva",
+    "echinoid species"
+  ],
+  "datasets": [
+    {
+      "id": "biostudies",
+      "name": "BioStudies / BioImage Archive",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=sea%20urchin%20larvae%20skeleton%20spicule%20calcium",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD biostudies landing (200); GET BioImages search 'sea urchin larvae skeleton spicule calcium' (150 hits) and 'echinoid larva skeletogenesis' (18 hits)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "no lime-free (calcium-depleted) rearing study among returned hits",
+        "hits are mostly unrelated zebrafish and sperm-flagella studies"
+      ],
+      "scope": "Archive-wide portal",
+      "evidence": "totalHits 150 and 18; titles listed in the two responses",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bia-s-biad510-ske-t-sea-urchin",
+      "name": "S-BIAD510: ske-T, a T-box gene expressed in the skeletogenic mesenchyme lineage of the sea urchin embryo - raw image data",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD510",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD510",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET BioStudies study JSON api/v1/studies/S-BIAD510",
+        "http_status": 200
+      },
+      "variables_present": [
+        "sea-urchin embryo images, released 2022-07-29, 21 files (from search listing)"
+      ],
+      "variables_missing": [
+        "gene-expression imaging; no calcium manipulation, no skeletal-rod or arm-length scoring"
+      ],
+      "scope": "Sea urchin embryo gene expression",
+      "evidence": "study JSON description: expression of ske-T restricted to the skeletogenic mesenchyme lineage",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "pangaea-907717-heliocidaris-oa-larvae",
+      "name": "Seawater carbonate chemistry and mortality, abnormality, morphology, respiration of Heliocidaris crassispina larvae (PANGAEA 907717)",
+      "landing_url": "https://doi.org/10.1594/PANGAEA.907717",
+      "access_url": null,
+      "doi": "10.1594/PANGAEA.907717",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD doi.org/10.1594/PANGAEA.907717 (200, doi.pangaea.de, 271,447 bytes); title and nDataPoints from PANGAEA Elasticsearch hit",
+        "http_status": 200
+      },
+      "variables_present": [
+        "per-larva-batch mortality, abnormality and morphology measurements named in the title, 82,177 data points",
+        "a carbonate-chemistry (acidification) manipulation of larval calcification"
+      ],
+      "variables_missing": [
+        "manipulation is lowered carbonate saturation, not lime-free seawater",
+        "which morphology columns (arm length, rods) are present was not opened"
+      ],
+      "scope": "One urchin species, laboratory ocean-acidification experiment",
+      "evidence": "ES hit: title as above, nDataPoints 82177, URI https://doi.org/10.1594/PANGAEA.907717",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "pangaea-942320-evechinus-oa-larvae",
+      "name": "Seawater carbonate chemistry and development and growth in early-stage larvae of the New Zealand sea urchin Evechinus chloroticus (PANGAEA 942320)",
+      "landing_url": "https://doi.org/10.1594/PANGAEA.942320",
+      "access_url": null,
+      "doi": "10.1594/PANGAEA.942320",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD doi.org/10.1594/PANGAEA.942320 (200, doi.pangaea.de, 249,016 bytes); title and nDataPoints from PANGAEA Elasticsearch hit",
+        "http_status": 200
+      },
+      "variables_present": [
+        "early-larval development and growth measures under a carbonate-chemistry manipulation, 35,354 data points"
+      ],
+      "variables_missing": [
+        "acidification, not lime-free water; column list not opened"
+      ],
+      "scope": "One urchin species",
+      "evidence": "ES hit: nDataPoints 35354",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-gxd2547x4-calcification-sea-urchin-larvae",
+      "name": "Data from: Calcification in sea urchin larvae is associated with low metabolic costs (Dryad)",
+      "landing_url": "https://doi.org/10.5061/dryad.gxd2547x4",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.gxd2547x4",
+      "doi": "10.5061/dryad.gxd2547x4",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD doi.org/10.5061/dryad.gxd2547x4 (200); GET Dryad API datasets/doi (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "larval calcification and metabolic-cost data, publication 2025-01-27, storage 35,948 bytes, CC0"
+      ],
+      "variables_missing": [
+        "no lime-free treatment confirmed from the abstract seen; skeleton presence/absence and arm length not confirmed"
+      ],
+      "scope": "Sea urchin larvae (species not read)",
+      "evidence": "Dryad API: title, license CC0-1.0, storageSize 35948, publicationDate 2025-01-27",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "BioImage Archive (BioStudies API)",
+      "query": "sea urchin larvae skeleton spicule calcium",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=sea%20urchin%20larvae%20skeleton%20spicule%20calcium&pageSize=8",
+      "hits": 150,
+      "note": "S-BIAD510 only relevant-looking hit"
+    },
+    {
+      "source": "BioImage Archive (BioStudies API)",
+      "query": "echinoid larva skeletogenesis",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=echinoid%20larva%20skeletogenesis&pageSize=8",
+      "hits": 18,
+      "note": "nothing on echinoids"
+    },
+    {
+      "source": "Zenodo",
+      "query": "sea urchin larvae calcium-free seawater skeleton spicules, type=dataset",
+      "url": "https://zenodo.org/api/records?q=sea%20urchin%20larvae%20calcium-free%20seawater%20skeleton%20spicules&type=dataset&size=8",
+      "hits": 24208,
+      "note": "loose; larval-plasticity sets 5026455 and 4991327 (arm elongation with bacteria/food, files of 0.6-1.1 GB) are not calcium manipulations"
+    },
+    {
+      "source": "Dryad",
+      "query": "sea urchin larvae skeleton calcification",
+      "url": "https://datadryad.org/api/v2/search?q=sea%20urchin%20larvae%20skeleton%20calcification",
+      "hits": 3,
+      "note": "gxd2547x4, ngf1vhhrw, ns1rn8pwr: calcification physiology, not lime-free rearing"
+    },
+    {
+      "source": "DataCite",
+      "query": "sea urchin larvae skeleton spicule calcium free (resource type dataset)",
+      "url": "https://api.datacite.org/dois?query=sea%20urchin%20larvae%20skeleton%20spicule%20calcium%20free&resource-type-id=dataset",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "PANGAEA Elasticsearch",
+      "query": "\"sea urchin\" larvae arm length skeleton",
+      "url": "https://ws.pangaea.de/es/pangaea/panmd/_search?q=%22sea%20urchin%22%20larvae%20arm%20length%20skeleton&size=6",
+      "hits": 367204,
+      "note": "loose OR matching; top hits are ocean-acidification larval experiments 825017, 942320, 907717, 968971, 822160"
+    }
+  ],
+  "status": "partial",
+  "summary": "No open table of echinoid larvae reared in calcium-free versus normal seawater was found. The nearest repository data are ocean-acidification larval experiments in PANGAEA (e.g. 907717 with 82,177 data points on mortality, abnormality and morphology; 942320 with 35,354 on development and growth) and a Dryad larval-calcification set; these alter carbonate saturation, not the presence of lime, and I did not open their column lists.",
+  "next_step": "Open PANGAEA 907717/942320 to see whether arm length and skeletal-rod scores are columns; if the lime-free premise itself is to be tested, digitise the published lime-free rearings (Herbst-era and later papers) into a small table.",
+  "obstacles_confirmed": [
+    "A dedicated open replication dataset of calcium-free rearing does not exist in the repositories searched.",
+    "Acidification experiments manipulate carbonate, not calcium or 'lime', so they are only a proxy for skeleton suppression."
+  ]
+}

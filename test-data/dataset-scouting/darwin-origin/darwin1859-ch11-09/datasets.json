@@ -1,0 +1,117 @@
+{
+  "claim_id": "darwin1859-ch11-09",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:13:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-10" },
+  "variables_needed": [
+    "per-species proportion of seeds still afloat after fixed times in water (ideally seawater, ideally after drying)",
+    "post-immersion germination or viability per species (seawater exposure)",
+    "species list of a defined regional flora, to turn species counts into a fraction of the flora",
+    "surface current speed or drift transit time for a 900-mile route"
+  ],
+  "datasets": [
+    {
+      "id": "leda-traitbase-buoyancy-2016",
+      "name": "LEDA Traitbase: Buoyancy (buoyancy_2016.txt)",
+      "landing_url": "https://uol.de/en/landeco/research/leda/data-files",
+      "access_url": "https://uol.de/f/5/inst/biologie/ag/landeco/download/LEDA/Data_files/buoyancy_2016.txt",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T11:58:00Z", "method": "GET data-files page (lists buoyancy_2016.txt, 44362 KB, marked NEW); HEAD access_url; Range GET of first 1500 bytes", "http_status": 200, "bytes": 45426686 },
+      "variables_present": [
+        "percentage of diaspores floating ('single value [%]') per species/SBS entry at a fixed time step, with sample size, method name, diaspore type, dispersal type and vector, and reference"
+      ],
+      "variables_missing": [
+        "germination after immersion (not among the SQL-header columns)",
+        "water type (sea versus fresh) is not a column in the header; it may be in the 'general method' or reference fields, not checked",
+        "coverage is NW European species, not a whole flora and not oceanic-island floras"
+      ],
+      "scope": "Northwest European vascular plants (per LEDA's own description); row count not checked (file is about 45 MB, not downloaded)",
+      "evidence": "HEAD returned HTTP/2 200, content-type text/plain, content-length 45426686. The first 1500 bytes are the SQL query header; selected columns include 'single value [%]', 'sample size', 'fixed time step', 'valid', 'reference', 'dispersal type', 'dispersal vector'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "try-plant-trait-database",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/TryWeb/Home.php",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T12:01:00Z", "method": "GET https://www.try-db.org/ (meta-refresh page, 96 bytes) then GET TryWeb/Home.php; GET TryWeb/dp.php (data explorer); regex for 'buoyan' and 'dispersal syndrome' in dp.php returned no match", "http_status": 200, "bytes": 30280 },
+      "variables_present": [],
+      "variables_missing": [
+        "buoyancy or seawater-germination traits not confirmed: the data-explorer page text contains no mention of buoyancy",
+        "no open download link was seen on the pages fetched"
+      ],
+      "scope": "Plant traits generally; whether any seed-buoyancy trait exists was not confirmed",
+      "evidence": "Home page loads (30,280 bytes); the 6,337-byte data-explorer page returned no match for 'buoyan'.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-correa-fleshy-fruits-wetland-forests",
+      "name": "Data from: Water and fish select for fleshy fruits in tropical wetland forests (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.nn983",
+      "access_url": null,
+      "doi": "10.5061/dryad.nn983",
+      "license": null,
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T12:05:00Z", "method": "Dryad search API 'seed buoyancy' (1 hit) then GET dataset record", "http_status": 200, "bytes": 4779 },
+      "variables_present": ["seed or fruit buoyancy of tropical wetland-forest species (inferred from the search match on 'seed buoyancy' and the title; file contents not inspected)"],
+      "variables_missing": ["seawater exposure", "germination after drying", "not a regional flora"],
+      "scope": "Tropical wetland forests; freshwater, storage size 103,383 bytes",
+      "evidence": "Dryad API record lists identifier doi:10.5061/dryad.nn983 and storageSize 103383.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=seed%20buoyancy%20seawater%20germination",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T12:01:00Z", "method": "GET landing page; Dryad search API with three seed-flotation queries (0, 0 and 1 hits)", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["no seawater flotation plus germination dataset found by search"],
+      "scope": "Repository, not a dataset",
+      "evidence": "Search q='seed buoyancy seawater germination' total 0; q='seed dispersal sea water floating germination' total 0; q='seed buoyancy' total 1.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "noaa-ncei-portal",
+      "name": "NOAA National Centers for Environmental Information (portal; drifter and current products)",
+      "landing_url": "https://www.ncei.noaa.gov/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:08:00Z", "method": "GET landing page; GET AOML drifter page; GET NCEI metadata landing page for a drifter product (503); GET AOML ERDDAP for a guessed dataset id (404, server alive)", "http_status": 200, "note": "Homepage 200; www.aoml.noaa.gov/phod/gdp/ returned 403 and the NCEI drifter metadata page returned 503 on this run, so no specific drifter dataset was confirmed" },
+      "variables_present": [],
+      "variables_missing": ["a confirmed, fetched current-velocity or drifter-transit table"],
+      "scope": "Global ocean surface currents; specific product not verified",
+      "evidence": "Landing page returned 34,873 bytes; the drifter-specific URLs tried did not return data.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "seed buoyancy", "url": "https://datadryad.org/api/v2/search?q=seed%20buoyancy&per_page=5", "hits": 1, "note": "Correa et al., doi:10.5061/dryad.nn983, tropical wetland fruits" },
+    { "source": "Dryad", "query": "seed buoyancy seawater germination", "url": "https://datadryad.org/api/v2/search?q=seed%20buoyancy%20seawater%20germination", "hits": 0, "note": null },
+    { "source": "Dryad", "query": "seed dispersal sea water floating germination", "url": "https://datadryad.org/api/v2/search?q=seed%20dispersal%20sea%20water%20floating%20germination&per_page=5", "hits": 0, "note": null },
+    { "source": "Zenodo", "query": "\"seed buoyancy\" OR \"seed flotation\" seawater", "url": "https://zenodo.org/api/records?q=%22seed%20buoyancy%22%20OR%20%22seed%20flotation%22%20seawater&size=5", "hits": 4184, "note": "broad OR query; top hits are single-species (Echinocystis lobata seed buoyancy, doi 10.3897/neobiota.104.162267; wild cucumber seeds, doi 10.5281/zenodo.17313254), the rest off-topic; not opened" },
+    { "source": "DataCite", "query": "seed buoyancy seawater dispersal germination", "url": "https://api.datacite.org/dois?query=seed%20buoyancy%20seawater%20dispersal%20germination&page%5Bsize%5D=5", "hits": 0, "note": null }
+  ],
+  "status": "partial",
+  "summary": "LEDA's buoyancy file gives percent of diaspores floating over fixed times for NW European species (45 MB), which covers the flotation half of the variable; no open dataset found that pairs seawater flotation with post-immersion germination, and none covers a whole flora, or the 900-mile drift time via a verified current-speed table.",
+  "next_step": "Open buoyancy_2016.txt to count species and check the water-type field; separately digitize Darwin's own seed trials and later seawater germination papers; pick a current speed from a drifter climatology to fix transit time.",
+  "obstacles_confirmed": [
+    "No open dataset found that applies one seawater flotation and germination protocol to a whole flora.",
+    "LEDA covers flotation but its header shows no germination-after-immersion column."
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "claim_id": "levin-2023-agential-08",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T09:46:54Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "levin-02"
+  },
+  "variables_needed": [
+    "visual-learning trial outcomes per tadpole for tail-eye, eyeless and normal-eyed groups",
+    "innervation target of the ectopic eye (spinal cord vs peripheral tissue) per animal",
+    "controls for extraocular light sensitivity (no-eye, eye-removed)"
+  ],
+  "datasets": [
+    {
+      "id": "pubmed-central-ectopic-eye-papers",
+      "name": "PMC3587383 (Blackiston & Levin 2013, J Exp Biol) and PMC5665622 (Blackiston et al. 2017, npj Regen Med)",
+      "landing_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3587383/",
+      "access_url": null,
+      "doi": "10.1242/jeb.074963",
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET both article pages; listed /articles/instance/<pmcid>/bin/ links; searched for data-availability text",
+        "http_status": 200,
+        "bytes": 209229
+      },
+      "variables_present": [
+        "summary visual-learning performance reported in figures and text of the papers"
+      ],
+      "variables_missing": [
+        "trial-level choice records",
+        "per-animal innervation classification (spinal cord vs peripheral)"
+      ],
+      "scope": "Xenopus laevis tadpoles with ectopic eyes; PMC3587383 page lists no supplementary /bin/ files and no data-availability section was found; PMC5665622 (serotonergic stimulation, posterior eye grafts) lists one supplementary file, 41536_2017_12_MOESM1_ESM.jpg",
+      "evidence": "Europe PMC search returned both papers as open access (PMC3587383 isOpenAccess N in the lite record, page itself served HTTP 200). Neither page links a data table.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "biostudies",
+      "name": "BioStudies (EBI)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET landing page; API keyword searches logged in search_log",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "trial-level tadpole learning data"
+      ],
+      "scope": "general repository; no Levin-lab primary deposit found for this experiment",
+      "evidence": "Landing page HTTP 200. Keyword searches in search_log returned only Europe PMC article mirrors (S-EPMC...), which carry the papers' supplements, not primary data.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad (general repository)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET landing page; API searches logged in search_log",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "animal-level behavioural training and anatomical records"
+      ],
+      "scope": "general repository; searches for this experiment returned no matching deposit",
+      "evidence": "Landing page HTTP 200; the Dryad search API returned 0 datasets for the claim-specific queries recorded in search_log.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "xenbase",
+      "name": "Xenbase",
+      "landing_url": "https://www.xenbase.org/xenbase/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET landing page (first attempt HTTP 429 Too Many Requests, retry 200)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "trial-level learning scores",
+        "ectopic-eye innervation records"
+      ],
+      "scope": "Xenopus model-organism database (genes, anatomy, literature); no query for ectopic-eye behavioural assays was run",
+      "evidence": "Landing page reached; I did not find or query any behavioural-assay table. The assessor's own note says trial-level scores are not deposited there.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "Xenopus eye",
+      "url": "https://datadryad.org/api/v2/search?q=Xenopus%20eye",
+      "hits": 4,
+      "note": "glaucoma/optineurin, opsins, salamander table, Celf1 lens; none about ectopic or tail eyes or learning"
+    },
+    {
+      "source": "Dryad",
+      "query": "Xenopus learning tadpole",
+      "url": "https://datadryad.org/api/v2/search?q=Xenopus%20learning%20tadpole",
+      "hits": 1,
+      "note": "dry-mass imaging of larvae; unrelated"
+    },
+    {
+      "source": "DataCite",
+      "query": "Xenopus ectopic eye tail",
+      "url": "https://api.datacite.org/dois?query=Xenopus%20ectopic%20eye%20tail&page%5Bsize%5D=5",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"ectopic eye\" Xenopus",
+      "url": "https://zenodo.org/api/records?q=%22ectopic%20eye%22%20Xenopus&size=3",
+      "hits": null,
+      "note": "top hits are 'Trained models for Xenopus segmentation and tracking workflow' and a chytrid prevalence table; unrelated"
+    },
+    {
+      "source": "BioStudies",
+      "query": "Xenopus ectopic eye",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=Xenopus%20ectopic%20eye&pageSize=3",
+      "hits": 66667,
+      "note": "OR-matched; top hits are Xenopus eye-development papers, none on tail eyes or learning"
+    },
+    {
+      "source": "Europe PMC",
+      "query": "\"ectopic eyes\" Xenopus tail learning Blackiston",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22ectopic%20eyes%22%20Xenopus%20tail%20learning%20Blackiston&format=json&pageSize=5&resultType=lite",
+      "hits": 5,
+      "note": "primary papers PMC3587383 (Blackiston & Levin 2013) and PMC5665622 (Blackiston et al. 2017) plus reviews"
+    }
+  ],
+  "status": "gap",
+  "summary": "No deposited trial-level or innervation data for tail-eye tadpoles turned up in Dryad, DataCite, Zenodo or BioStudies. The primary papers (Blackiston & Levin 2013; Blackiston et al. 2017) are open on PMC but link no data tables (one JPG supplement in the 2017 paper).",
+  "next_step": "Ask the Levin lab (Blackiston) for the training-trial tables behind the 2013 and 2017 figures; failing that, extract group-level success rates from the figures as a paper-supplement table.",
+  "obstacles_confirmed": [
+    "Animal-level trial data and innervation classifications are not public.",
+    "The behavioural trials are published as summary performance, not as a public trial table."
+  ]
+}

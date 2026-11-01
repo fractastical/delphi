@@ -1,0 +1,165 @@
+/* Delphi shared stylesheet.
+ *
+ * The design tokens, type, header and footer are the Delphi portal's (index.html), so the
+ * claim graph, theorems, query, problem graph and team pages read as part of one site.
+ * The portal itself carries its CSS inline and is imported unchanged; keep the tokens below in
+ * step with the :root blocks in index.html (see docs/PORTAL.md).
+ *
+ * Pages link this file and add only what is specific to them. They are built from
+ * scripts/site/templates/*.template.html; do not hand-edit the built .html.
+ */
+
+/* ---- tokens (portal) ---------------------------------------------------------------------- */
+:root,:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#0c1422;--paper-2:#142035;--grid:#2a3953;--rule:#3a4c6a;
+  --ink:#eef3ff;--ink-2:#b5c2dc;--ink-3:#92a4c3;
+  --model:#8cacff;--model-soft:#202f51;--specimen:#f09ac6;--pink-soft:#40283e;
+  --ok:#9bcfbe;--warn:#e9bc78;
+  --accent:#8cacff;--accent-soft:#202f51;--on-accent:#10203d;
+  --canvas-bg:#111d31;--hero-bg:#142039;--shadow:0 12px 50px #0002;
+  --code-bg:#0b1220;--code-ink:#cfe0ff;--code-line:#223049;
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --paper:#f7f9ff;--paper-2:#ffffff;--grid:#dfe6f3;--rule:#cbd7ec;
+  --ink:#172945;--ink-2:#536582;--ink-3:#60708d;
+  --model:#315ee7;--model-soft:#eaf0ff;--specimen:#bf3b7f;--pink-soft:#fdebf4;
+  --ok:#28694f;--warn:#956513;
+  --accent:#315ee7;--accent-soft:#eaf0ff;--on-accent:#ffffff;
+  --canvas-bg:#f5f8ff;--hero-bg:#f6f8ff;--shadow:0 10px 38px #345a9d09;
+}
+:root{
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --maxw:1240px;
+  /* Older pages named their colours differently. These aliases map those names onto the portal
+     tokens, so a rule written against --gold or --blue follows the theme. */
+  --bg:var(--paper);--panel:var(--paper-2);--panel2:var(--paper);--navy:var(--paper-2);
+  --gold:var(--accent);--gold2:var(--ink);--goldline:var(--rule);--goldfaint:var(--accent-soft);
+  --mut:var(--ink-3);--ink2:var(--ink-2);--grey:var(--rule);--line:var(--grid);--faint:var(--paper);
+  --blue:var(--accent);--green:var(--ok);--red:var(--specimen);--amber:var(--warn);
+}
+
+/* ---- base --------------------------------------------------------------------------------- */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+img,svg,canvas{max-width:100%}
+h1,h2,h3,h4{font-family:var(--sans);font-weight:500;color:var(--ink);margin:0;letter-spacing:-.02em}
+h1{font-size:clamp(26px,3vw,34px);line-height:1.12;letter-spacing:-.03em}
+h2{font-size:20px;line-height:1.25;letter-spacing:-.02em}
+h3{font-size:10.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+p{font-size:13.5px;line-height:1.6;margin:0 0 8px}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
+a:hover{color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+b,strong{color:var(--ink);font-weight:600}
+code,.mono{font-family:var(--mono);font-size:11.5px;color:var(--accent);background:var(--accent-soft);padding:1px 5px;border-radius:4px;word-break:break-word}
+blockquote{margin:10px 0;padding:4px 14px;border-left:2px solid var(--accent);color:var(--ink-2);font-family:var(--serif);font-style:italic;font-size:14px}
+.mut,.small{color:var(--ink-3)}.small{font-size:12px;line-height:1.5}
+.num,.tnum{font-variant-numeric:tabular-nums}
+.serif{font-family:var(--serif)}
+.hidden{display:none}
+::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:var(--rule);border-radius:6px}::-webkit-scrollbar-track{background:transparent}
+main{max-width:var(--maxw);margin:0 auto;padding:26px 28px 24px}
+
+/* ---- site header (portal) ----------------------------------------------------------------- */
+.site-nav{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--grid)}
+.site-nav-in{max-width:var(--maxw);margin:0 auto;padding:0 28px;height:66px;display:flex;align-items:center;gap:26px}
+.logo{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;padding:0}
+.logo .brand-symbol{width:24px;height:30px;color:var(--accent);flex:none}
+.logo b{font:500 21px/1.1 var(--sans);letter-spacing:-1px;color:var(--ink)}
+.site-links{display:flex;gap:4px;margin-left:8px}
+.site-links a{font-size:12.5px;font-weight:500;color:var(--ink-2);text-decoration:none;padding:8px 11px;border-radius:7px}
+.site-links a:hover{background:var(--paper-2);color:var(--ink)}
+.site-links a[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
+.site-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.site-actions .lbl-s{display:none}
+.icon-button{display:inline-grid;place-items:center;flex:none;border:1px solid var(--grid);border-radius:7px;background:var(--paper-2);color:var(--ink-2);height:34px;width:34px;padding:0;cursor:pointer}
+.icon-button:hover{background:var(--accent-soft);border-color:var(--rule);color:var(--ink)}
+.icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.site-menu{display:none}
+
+/* The claims atlas: our pages, one step below the portal navigation. */
+.subnav{border-bottom:1px solid var(--grid);background:var(--paper-2)}
+.subnav-in{max-width:var(--maxw);margin:0 auto;padding:0 28px;height:44px;display:flex;align-items:center;gap:6px;overflow-x:auto;white-space:nowrap}
+.subnav .eyebrow{margin-right:8px}
+.subnav a{font-size:12.5px;font-weight:500;color:var(--ink-2);text-decoration:none;padding:6px 11px;border-radius:7px}
+.subnav a:hover{background:var(--paper);color:var(--ink)}
+.subnav a[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
+
+/* ---- page heading ------------------------------------------------------------------------- */
+.eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:10px;font-weight:600;color:var(--ink-3)}
+.eyebrow.accent{color:var(--accent)}
+.page-head,.masthead{display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;padding:6px 0 18px}
+.page-head>div:first-child,.masthead>div:first-child{flex:1 1 360px;min-width:0}
+.page-head h1,.masthead h1{margin:6px 0 0}
+.subtitle{font-family:var(--sans);font-style:normal;color:var(--ink-2);font-size:14px;line-height:1.55;margin:8px 0 0;max-width:78ch}
+.nav{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+
+/* ---- controls ----------------------------------------------------------------------------- */
+button,.btn,.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-size:12px;font-weight:550;min-height:30px;padding:5px 12px;border:1px solid var(--rule);border-radius:7px;background:var(--paper-2);color:var(--ink);cursor:pointer;text-decoration:none;white-space:nowrap;transition:background .16s,border-color .16s}
+button:hover,.btn:hover,.button:hover{border-color:var(--ink-3);background:var(--grid);color:var(--ink)}
+button.on,.btn.on,.button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.on:hover,.button.primary:hover{filter:brightness(1.06);background:var(--accent);color:var(--on-accent)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.site-actions .button{min-height:34px;font-size:12px}
+input,select,textarea{font:inherit;font-size:13px;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:7px;padding:6px 12px}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+input[type=range]{padding:0;border:0;background:none;accent-color:var(--accent);vertical-align:middle;box-shadow:none}
+input::placeholder{color:var(--ink-3)}
+.lab{font-family:var(--sans);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-right:2px}
+.sep{width:1px;height:22px;background:var(--grid);margin:0 4px}
+.group{display:inline-flex;gap:4px;flex-wrap:wrap}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 14px;border:1px solid var(--grid);border-radius:10px;background:var(--paper-2);margin-bottom:10px}
+.chips{display:inline-flex;gap:4px;flex-wrap:wrap}
+
+/* ---- surfaces ----------------------------------------------------------------------------- */
+.panel{background:var(--paper-2);border:1px solid var(--grid);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.card{background:var(--paper-2);border:1px solid var(--grid);border-radius:10px;box-shadow:var(--shadow)}
+.stat{border:1px solid var(--grid);border-radius:10px;background:var(--paper-2);padding:12px 16px}
+.stat .n{font:500 26px/1.15 var(--sans);letter-spacing:-.03em;color:var(--ink)}
+.stat .l{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.dark-code{background:var(--code-bg);color:var(--code-ink);border:1px solid var(--code-line);border-radius:10px}
+
+/* status colours: the portal's soft pills */
+.badge{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;letter-spacing:.01em;color:var(--accent);background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent)}
+.badge.ghost{background:transparent;color:var(--ink-3);border:1px dashed var(--ink-3)}
+.badge.kind{background:transparent;color:var(--ink-2);border:1px solid var(--rule)}
+.pill{display:inline-block;font-size:10.5px;font-weight:600;padding:1px 7px;border-radius:5px;font-variant-numeric:tabular-nums;color:var(--on-accent);background:var(--accent)}
+.live{color:var(--ok)}.test{color:var(--warn)}.bad{color:var(--specimen)}.ok{color:var(--ok)}.warn{color:var(--warn)}
+
+/* ---- tables ------------------------------------------------------------------------------- */
+table{border-collapse:collapse}
+table.res{width:100%;font-size:13px}
+table.res th{position:sticky;top:0;background:var(--paper-2);text-align:left;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);padding:10px 8px;border-bottom:1px solid var(--rule);cursor:pointer;user-select:none;white-space:nowrap}
+table.res th.num,table.res td.num{text-align:right}
+table.res td{padding:8px;border-bottom:1px solid var(--grid);vertical-align:top}
+table.res tr.c{cursor:pointer}table.res tr.c:hover td{background:var(--paper)}
+table.res tr.open td{background:var(--accent-soft)}
+
+/* ---- footer (portal) ---------------------------------------------------------------------- */
+.site-footer{margin-top:56px;border-top:1px solid var(--grid);background:var(--paper-2)}
+.foot-in{max-width:var(--maxw);margin:0 auto;padding:36px 28px 22px;display:grid;grid-template-columns:1.4fr repeat(3,minmax(0,1fr));gap:28px}
+.foot-in h4{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin-bottom:12px}
+.foot-in a{display:block;font-size:12.5px;color:var(--ink-2);text-decoration:none;margin:0 0 9px}
+.foot-in a:hover{color:var(--accent)}
+.foot-brand p{font-size:12px;color:var(--ink-3);line-height:1.7;max-width:34ch;margin-top:12px}
+.foot-legal{max-width:var(--maxw);margin:0 auto;padding:16px 28px 28px;border-top:1px solid var(--grid);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:10.5px;color:var(--ink-3)}
+
+/* ---- small screens ------------------------------------------------------------------------ */
+@media(max-width:1100px){.foot-in{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:900px){
+  .site-links{display:none}.site-menu{display:inline-grid}
+  .site-links.open{display:flex;flex-direction:column;position:absolute;top:66px;left:0;right:0;background:var(--paper-2);border-bottom:1px solid var(--grid);padding:12px 20px 16px;margin:0}
+}
+@media(max-width:600px){
+  main{padding:18px 14px 20px}
+  .site-nav-in,.subnav-in{padding:0 14px}
+  .site-actions .lbl-l{display:none}.site-actions .lbl-s{display:inline}
+  .site-actions .button.sign{display:none}
+  .foot-in{grid-template-columns:1fr 1fr;padding:28px 14px 18px}.foot-legal{padding:14px 14px 24px}
+}

@@ -157,6 +157,44 @@ def shifted(m: np.ndarray, diffusion: np.ndarray, k: float) -> np.ndarray:
     return out
 
 
+def shifted_hurwitz3(m: np.ndarray, diffusion: np.ndarray,
+                     wave_numbers: np.ndarray) -> np.ndarray:
+    """Cubic Routh-Hurwitz on J-k^2D using coefficient polynomials."""
+    x = wave_numbers[None, None, :] ** 2
+    j00, j11, j22 = m[..., 0, 0], m[..., 1, 1], m[..., 2, 2]
+    d0, d1, d2 = diffusion[..., 0], diffusion[..., 1], diffusion[..., 2]
+    a1_0 = -(j00 + j11 + j22)
+    a2_0 = (
+        j00 * j11 - m[..., 0, 1] * m[..., 1, 0]
+        + j00 * j22 - m[..., 0, 2] * m[..., 2, 0]
+        + j11 * j22 - m[..., 1, 2] * m[..., 2, 1]
+    )
+    a3_0 = -np.linalg.det(m)
+    a1 = a1_0[..., None] + x * (d0 + d1 + d2)[..., None]
+    a2 = (
+        a2_0[..., None]
+        - x * (
+            d0 * (j11 + j22) + d1 * (j00 + j22) + d2 * (j00 + j11)
+        )[..., None]
+        + x * x * (d0 * d1 + d0 * d2 + d1 * d2)[..., None]
+    )
+    diagonal_cofactor = (
+        d0 * (j11 * j22 - m[..., 1, 2] * m[..., 2, 1])
+        + d1 * (j00 * j22 - m[..., 0, 2] * m[..., 2, 0])
+        + d2 * (j00 * j11 - m[..., 0, 1] * m[..., 1, 0])
+    )
+    quadratic = d0 * d1 * j22 + d0 * d2 * j11 + d1 * d2 * j00
+    a3 = (
+        a3_0[..., None] + x * diagonal_cofactor[..., None]
+        - x * x * quadratic[..., None]
+        + x * x * x * (d0 * d1 * d2)[..., None]
+    )
+    return (
+        (a1 > TOL) & (a2 > TOL) & (a3 > TOL)
+        & (a1 * a2 - a3 > TOL)
+    )
+
+
 def detect_n3_chunk(signs: np.ndarray, rng: np.random.Generator) -> tuple[np.ndarray, np.ndarray]:
     b = signs.shape[0]
     rates = log_uniform(rng, (b, N3_DRAWS, 3, 3), RATE_LOW, RATE_HIGH)
@@ -169,14 +207,9 @@ def detect_n3_chunk(signs: np.ndarray, rng: np.random.Generator) -> tuple[np.nda
         diffusion = log_uniform(
             rng, (b, N3_DRAWS, 3), DIFFUSION_LOW, DIFFUSION_HIGH
         ) * support
-        active = stable.copy()
-        for k in K_VALUES:
-            if not np.any(active):
-                break
-            unstable = ~hurwitz3(shifted(jacobians, diffusion, float(k)))
-            found = active & unstable
-            by_support[:, support_code - 1] |= np.any(found, axis=1)
-            active &= ~found
+        unstable = ~shifted_hurwitz3(jacobians, diffusion, K_VALUES)
+        found = stable & np.any(unstable, axis=2)
+        by_support[:, support_code - 1] = np.any(found, axis=1)
     return np.any(by_support, axis=1), by_support
 
 
@@ -235,13 +268,21 @@ def run_n4(rng: np.random.Generator) -> dict:
     ) * support_mask[:, None, :]
     stable = hurwitz4(jacobians)
     capable = np.zeros(N4_PATTERNS, dtype=bool)
-    active = stable.copy()
+    pattern_index, draw_index = np.nonzero(stable)
+    candidates = jacobians[pattern_index, draw_index]
+    candidate_diffusion = diffusion[pattern_index, draw_index]
+    active = np.ones(len(candidates), dtype=bool)
     for k in K_VALUES:
         if not np.any(active):
             break
-        unstable = ~hurwitz4(shifted(jacobians, diffusion, float(k)))
-        found = active & unstable
-        capable |= np.any(found, axis=1)
+        active_indices = np.flatnonzero(active)
+        unstable = ~hurwitz4(shifted(
+            candidates[active_indices], candidate_diffusion[active_indices], float(k)
+        ))
+        found_indices = active_indices[unstable]
+        capable[pattern_index[found_indices]] = True
+        found = np.zeros_like(active)
+        found[found_indices] = True
         active &= ~found
 
     successes = int(np.sum(capable))

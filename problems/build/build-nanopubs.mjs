@@ -2,12 +2,15 @@
 //
 //   problems/nanopubs/unsigned/problem--<id>.trig                 one per problem in problems.json
 //   problems/nanopubs/unsigned/approach--<problem>--<model>--<n>.trig  one per approach in approaches/*.json
+//   problems/nanopubs/unsigned/run--<approach>--<date>.trig            one per entry in forecasts/runs.json
 //
 // A problem is delphir:problem/<id>, typed delphi:Concept (the ontology's reusable entity that
 // claims and plans refer to) and schema:Question. It links to the repo claims it bears on with
 // skos:related and to the literature with rdfs:seeAlso. An approach is delphir:approach/<...>,
 // typed prov:Plan and delphi:TestableHypothesis (the hypothesis that this plan would settle the
 // problem, with delphi:proposedTest the decisive result), and names its problem with dct:subject.
+// A run is delphir:run/<...>, a prov:Activity whose prov:hadPlan is the approach, with the outcome
+// as schema:actionStatus and the artifact (and the claim-test assessment, if any) as prov:generated.
 // Links listed in dropped-links.json (resolve-links.mjs) are left out. Signing and publishing are
 // separate steps (publish.mjs; BEST_PRACTICES.md sections 2-4).
 //
@@ -119,7 +122,7 @@ function refTriples(refs, where) {
 // The upstream linter requires every "<number> <species|genera|...>" in a label, description or
 // comment to have a structured count (schema:additionalProperty) on the subject. Approaches state
 // planned sample sizes in prose, so mirror each one as a structured count. Two different numbers
-// for the same unit in one nanopub cannot be mirrored unambiguously and stop the build.
+// for the same unit (two datasets of 40 and 45 images) become two counts with the same propertyID.
 const COUNT_IN_TEXT = /(~|≈|\bc\.\s*|\babout\s+|\bapprox(?:\.|imately)?\s+|\bon the order of\s+)?\b(\d{1,3}(?:,\d{3})+|\d+)\s+(species|specimens|genera|families|taxa|individuals|samples|images|sites|populations)\b/gi;
 function structuredCounts(subject, texts, where) {
   const counts = new Map();
@@ -127,14 +130,14 @@ function structuredCounts(subject, texts, where) {
     const [, approx, num, unit] = m;
     if (approx) throw new Error(`${where}: approximate count "${m[0].trim()}" cannot be a structured value; state the number exactly or drop it`);
     const id = `n_${unit.toLowerCase()}`, value = Number(num.replace(/,/g, ""));
-    if (counts.has(id) && counts.get(id) !== value) throw new Error(`${where}: two different counts of ${unit} (${counts.get(id)} and ${value}); make the text unambiguous`);
-    counts.set(id, value);
+    if (!counts.has(id)) counts.set(id, new Set());
+    counts.get(id).add(value);
   }
   const inlineParts = [], afterParts = [];
-  for (const [id, value] of counts) {
-    const node = `${subject}#${id}`;
+  for (const [id, values] of counts) for (const value of values) {
+    const node = `${subject}#${values.size > 1 ? `${id}-${value}` : id}`;
     inlineParts.push(`    schema:additionalProperty ${iri(node)} ;`);
-    afterParts.push(`  ${iri(node)} a schema:PropertyValue ;\n    schema:propertyID ${lit(id)} ;\n    schema:value ${value} ;\n    schema:description ${lit(`${id.slice(2)} the approach proposes to use, as stated in its description (a planned sample size, not a measurement)`)} .`);
+    afterParts.push(`  ${iri(node)} a schema:PropertyValue ;\n    schema:propertyID ${lit(id)} ;\n    schema:value ${value} ;\n    schema:description ${lit(`${id.slice(2)} named in the text (a sample size as stated there, not a measurement made here)`)} .`);
   }
   return { inline: inlineParts.join("\n"), after: afterParts.join("\n") };
 }
@@ -234,12 +237,103 @@ ${agentBlock(agent)}
 ${pubinfo(`Approach to ${ap.problem}: ${ap.title}`, "prov:Plan", A)}`;
 }
 
+// A run is what the swarm actually did against an approach (forecasts/runs.json, append only):
+// delphir:run/<approach>--<date>[-<k>], a prov:Activity whose plan was the approach, on the
+// problem, generating the logged artifact. The outcome is schema:actionStatus (completed,
+// partial, abandoned, in-progress); `settled` and `solves_problem` are structured
+// schema:PropertyValue booleans so they can be queried without parsing prose. When the run
+// produced a claim test, prov:generated names that test's assessment IRI as
+// test-data/claim-tests/build-test-nanopubs.mjs mints it (<claim>--claim-test[--<run>]).
+const STATUS = { completed: "schema:CompletedActionStatus", partial: "schema:ActiveActionStatus", "in-progress": "schema:ActiveActionStatus", abandoned: "schema:FailedActionStatus" };
+const runsPath = join(HERE, "forecasts", "runs.json");
+const runs = existsSync(runsPath) ? JSON.parse(readFileSync(runsPath, "utf8")).runs ?? [] : [];
+const approachMeta = new Map();
+for (const f of readdirSync(join(HERE, "approaches")).filter(f => f.endsWith(".json"))) {
+  const a = JSON.parse(readFileSync(join(HERE, "approaches", f), "utf8"));
+  for (const ap of a.approaches ?? []) approachMeta.set(`${ap.problem}--${a.model}--${ap.n}`, { ...ap, model: a.model, model_label: a.model_label, provider: a.provider });
+}
+function runId(r, k) {
+  const base = `${r.approach ?? `${r.problem}--unplanned`}--${r.date}`;
+  return k ? `${base}-${k}` : base;
+}
+function testAssessmentIri(testPath) {
+  const m = /^test-data\/claim-tests\/[^/]+\/([^/]+)\/(?:([^/]+)\/)?result\.json$/.exec(testPath ?? "");
+  if (!m) return null;
+  return `${R}assessment/${m[1]}--claim-test${m[2] ? `--${m[2]}` : ""}`;
+}
+function runTrig(r, id) {
+  const RUN = `${R}run/${id}`;
+  const ap = r.approach ? approachMeta.get(r.approach) : null;
+  if (r.approach && !ap) throw new Error(`runs.json: unknown approach ${r.approach}`);
+  const problemId = r.problem ?? ap?.problem;
+  const problem = problems.problems.find(p => p.id === problemId);
+  if (!problem) throw new Error(`runs.json: run ${id} names unknown problem ${problemId}`);
+  if (!STATUS[r.outcome]) throw new Error(`runs.json: run ${id} has outcome ${r.outcome}; expected ${Object.keys(STATUS).join(", ")}`);
+  if (!r.artifact) throw new Error(`runs.json: run ${id} has no artifact`);
+  const P = `${R}problem/${problemId}`;
+  const A = r.approach ? `${R}approach/${r.approach}` : null;
+  const claims = (r.claims ?? []).filter(c => { if (knownClaims.has(c)) return true; unresolvedLog.push({ url: c, where: `run ${id}`, reason: "no such claim in the repo" }); return false; });
+  const assessment = r.test ? testAssessmentIri(r.test) : null;
+  if (r.test && !assessment) throw new Error(`runs.json: run ${id} has a test path that is not test-data/claim-tests/<project>/<claim>[/<run>]/result.json`);
+  const generated = [iri(blob(r.artifact)), assessment && iri(assessment)].filter(Boolean);
+  const modelSlug = r.agent ? slug(r.agent) : null;
+  const agent = modelSlug
+    ? { agent: `${R}agent/delphisci-approach-runner-${modelSlug}`, model: `${R}model/${modelSlug}`, modelId: r.agent, modelLabel: r.agent, label: `delphisci approach runner (${r.agent}), executing a proposed approach and logging the result` }
+    : { agent: `${R}agent/delphisci-approach-runner`, label: "delphisci approach runner (model not recorded in the run report)" };
+  const flag = (key, value, description) => value == null ? "" : `  ${iri(`${RUN}#${key}`)} a schema:PropertyValue ;\n    schema:propertyID ${lit(key)} ;\n    schema:value ${value ? "true" : "false"} ;\n    schema:description ${lit(description)} .`;
+  const label = `Run of ${r.approach ? `approach ${r.approach}` : `an unplanned test on ${problemId}`} (${r.date}): ${r.outcome}${r.settled === true ? ", settled its target" : r.settled === false ? ", did not settle its target" : ""}`;
+  const counts = structuredCounts(RUN, [label, r.note], `run ${id}`);
+  return `${PREFIXES}${head}
+sub:assertion {
+  ${iri(RUN)} a prov:Activity ;
+    rdfs:label ${lit(label)} ;
+    dct:description ${lit(r.note ?? "")} ;
+${counts.inline}
+    dct:subject ${iri(P)} ;
+${A ? `    prov:qualifiedAssociation ${iri(`${RUN}#plan`)} ;\n` : ""}    prov:startedAtTime "${r.date}"^^xsd:date ;
+${r.outcome === "completed" || r.outcome === "abandoned" ? `    prov:endedAtTime "${r.date}"^^xsd:date ;\n` : ""}    schema:actionStatus ${STATUS[r.outcome]} ;
+    schema:additionalProperty ${iri(`${RUN}#settled`)}, ${iri(`${RUN}#solves_problem`)} ;
+${claims.map(c => `    skos:related ${iri(`${R}claim/${c}`)} ;`).join("\n")}
+${r.report ? `    rdfs:seeAlso ${iri(blob(r.report))} ;\n` : ""}    prov:generated ${generated.join(", ")} ;
+    rdfs:isDefinedBy ${iri(blob("problems/forecasts/runs.json"))} .
+${A ? `  ${iri(`${RUN}#plan`)} a prov:Association ;\n    prov:hadPlan ${iri(A)} .\n  ${iri(A)} a prov:Plan ;\n    rdfs:label ${lit(ap.title)} .\n` : ""}  ${iri(P)} a delphi:Concept, schema:Question ;
+    rdfs:label ${lit(problem.title)} .
+${flag("settled", r.settled ?? false, r.settled == null ? "Whether the run settled the piece of the problem its approach names: unknown, the run did not complete" : "Whether the run settled the piece of the problem its approach names (forecasts/INSTRUCTIONS.md)")}
+${flag("solves_problem", !!r.solves_problem, "Whether the logged artifacts meet the problem's acceptance criteria or hit one of its falsifiers definitively")}
+${assessment ? `  ${iri(assessment)} a delphi:Assessment ;\n    rdfs:label ${lit(`Claim test produced by this run (${r.test})`)} .` : ""}
+${counts.after}
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo ${iri(agent.agent)} ;
+    prov:wasDerivedFrom ${iri(blob("problems/forecasts/runs.json"))}${r.report ? `, ${iri(blob(r.report))}` : ""} ;
+    prov:wasGeneratedBy sub:logging .
+  sub:logging a prov:Activity ;
+    rdfs:label ${lit(`Logging what the swarm ran against ${r.approach ?? problemId} in problems/forecasts/runs.json, following problems/forecasts/INSTRUCTIONS.md`)} ;
+    prov:wasAssociatedWith ${iri(agent.agent)} ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan ${iri(blob("problems/forecasts/INSTRUCTIONS.md"))} .
+${agent.model ? agentBlock(agent) : `  ${iri(agent.agent)} a prov:SoftwareAgent ;\n    rdfs:label ${lit(agent.label)} ;\n    prov:actedOnBehalfOf ${iri(OWNER)} .`}
+}
+${pubinfo(label, "prov:Activity", RUN)}`;
+}
+
 mkdirSync(OUT, { recursive: true });
 const manifestPath = join(HERE, "nanopubs", "manifest.json");
 const previous = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, "utf8")) : { nanopubs: [] };
-const published = new Map(previous.nanopubs.filter(m => m.trustyUri).map(m => [m.file, m]));
+// Publication state comes from nanopubs/manifest.jsonl, which scripts/release/publish.mjs appends to
+// (one line per file and registry). A file that reached a registry is never regenerated here.
+const jsonl = join(HERE, "nanopubs", "manifest.jsonl");
+const publications = existsSync(jsonl) ? readFileSync(jsonl, "utf8").split("\n").filter(Boolean).map(l => JSON.parse(l)) : [];
+const published = new Map();
+for (const m of previous.nanopubs) if (m.trustyUri) published.set(m.file, m);
+for (const m of publications) {
+  const file = `nanopubs/${m.file}`;
+  const prev = published.get(file) ?? previous.nanopubs.find(x => x.file === file) ?? { file };
+  published.set(file, { ...prev, trustyUri: m.trustyUri, registry: m.registry === "production" ? "production" : (prev.registry === "production" ? "production" : m.registry), publishedAt: m.publishedAt, generatorCommit: m.generatorCommit ?? prev.generatorCommit });
+}
 const manifest = [];
-let nP = 0, nA = 0, kept = 0;
+let nP = 0, nA = 0, nR = 0, kept = 0;
 
 for (const p of problems.problems) {
   const file = `nanopubs/unsigned/problem--${p.id}.trig`;
@@ -263,9 +357,22 @@ for (const f of readdirSync(apDir).filter(f => f.endsWith(".json")).sort()) {
     nA++;
   }
 }
-const status = manifest.every(m => m.trustyUri) ? "published to the test registry; not promoted to production"
+const seenRun = new Map();
+for (const r of runs) {
+  const base = runId(r);
+  const k = seenRun.get(base) ?? 0;
+  seenRun.set(base, k + 1);
+  const id = runId(r, k);
+  const file = `nanopubs/unsigned/run--${id}.trig`;
+  if (published.has(file)) { manifest.push(published.get(file)); kept++; continue; }
+  writeFileSync(join(HERE, file), runTrig(r, id));
+  manifest.push({ file, kind: "run", subject: `${R}run/${id}`, problem: r.problem ?? approachMeta.get(r.approach)?.problem, approach: r.approach, date: r.date, outcome: r.outcome, settled: r.settled ?? null, solvesProblem: !!r.solves_problem, artifact: r.artifact, generatorCommit: commit, registry: null, trustyUri: null });
+  nR++;
+}
+const status = manifest.every(m => m.registry === "production") ? "published to production"
+  : manifest.every(m => m.trustyUri) ? "published to the test registry; not promoted to production"
   : manifest.some(m => m.trustyUri) ? "partly published to the test registry; not promoted to production"
   : "unsigned draft; not published";
 writeFileSync(manifestPath, JSON.stringify({ status, nanopubs: manifest }, null, 2) + "\n");
 writeFileSync(join(HERE, "nanopubs", "omitted-links.json"), JSON.stringify({ generated: new Date().toISOString(), note: "Links and claim ids named in the sources but left out of the nanopubs, with the reason.", omitted: unresolvedLog }, null, 2) + "\n");
-console.log(`wrote ${nP} problem and ${nA} approach nanopubs to ${OUT} (commit ${commit.slice(0, 8)}); kept ${kept} already published; omitted ${unresolvedLog.length} links (nanopubs/omitted-links.json)`);
+console.log(`wrote ${nP} problem, ${nA} approach and ${nR} run nanopubs to ${OUT} (commit ${commit.slice(0, 8)}); kept ${kept} already published; omitted ${unresolvedLog.length} links (nanopubs/omitted-links.json)`);

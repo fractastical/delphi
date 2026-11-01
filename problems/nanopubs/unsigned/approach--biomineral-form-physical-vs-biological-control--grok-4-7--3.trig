@@ -1,0 +1,72 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Does the angle statistic separate foam from a template?" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> ;
+    dct:description "Before trusting the image test, check that its statistic has power. Generate two synthetic ensembles with the same cell count: Lloyd relaxations (foam proxy) and a cellular template that places pores on a perturbed regular lattice with a fixed defect set and does not minimise an energy. Compute the circular standard deviation of vertex angles about 120 degrees for each draw. The statistic is usable only if the two ensembles are separable. Pre-register separability as a gap of at least 2 degrees between the 95th percentile of the foam ensemble and the 5th percentile of the template ensemble, over at least 200 draws. The existing morpholib phase-separation audit of diatom pores is a related mechanism for thompson1917-ch09-14 but is not this radiolarian test and is not re-scored here." ;
+
+    delphi:proposedTest "The two angle-scatter distributions and the percentile gap. The image statistic is accepted for use only if the foam 95th percentile and the template 5th percentile differ by at least 2 degrees." ;
+    delphi:context "Fails if: The gap is under 2 degrees, so foam and template are not separable and the image test cannot decide physical versus cellular control." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Implement Lloyd relaxation on the sphere and the perturbed template. 2. Draw at least 200 realisations of each at matched cell counts. 3. Compute angle scatter about 120 degrees. 4. Apply the 2 degree percentile gap. 5. Hand the foam distribution to the image test as its null, only if the gap is met." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: python" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-15> ;
+
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/biomineral-form-physical-vs-biological-control> a delphi:Concept, schema:Question ;
+    rdfs:label "How much of biomineral form is physical, and how much is cell-controlled?" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biomineral-form-physical-vs-biological-control, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.349Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biomineral-form-physical-vs-biological-control: Does the angle statistic separate foam from a template?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biomineral-form-physical-vs-biological-control--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

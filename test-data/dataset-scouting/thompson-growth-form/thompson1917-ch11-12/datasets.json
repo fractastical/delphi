@@ -1,0 +1,185 @@
+{
+  "claim_id": "thompson1917-ch11-12",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-04"
+  },
+  "variables_needed": [
+    "spiral angle or whorl expansion rate per cephalopod shell (straight, loosely coiled, tightly coiled)",
+    "independently inferred phylogeny or ancestral states not using coiling as a character",
+    "stratigraphic age or order of the shells",
+    "shell size"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-034jq765-westermann-morphospace",
+      "name": "Data from: Westermann Morphospace displays ammonoid shell shape and hypothetical paleoecology (Dryad)",
+      "landing_url": "https://doi.org/10.5061/dryad.034jq765",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.034jq765",
+      "doi": "10.5061/dryad.034jq765",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD doi.org/10.5061/dryad.034jq765 (200); GET Dryad API datasets/doi (200) and versions/91972/files (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "measured ammonoid shell shape for fossils (abstract: describes shell shape 'without assumption of theoretical coiling laws')",
+        "files 'Westermann Morphospace Appendix ABD.xls' (144,384 bytes) and 'Westermann Morphospace Appendix C.pdf' (96,013 bytes); CC0; published 2011-12-07"
+      ],
+      "variables_missing": [
+        "column list not opened, so whorl expansion/spiral angle not confirmed",
+        "no phylogeny or ages in the files named"
+      ],
+      "scope": "Ammonoid fossils in one compilation",
+      "evidence": "Dryad API: license CC0-1.0, storageSize 240397, file list as given",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "paleobiology",
+      "name": "Paleobiology Database: Ammonoidea",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Ammonoidea&show=attr,size",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET data1.2 taxa/single.json?name=Ammonoidea&show=attr,size (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "taxon record txn:14505 with noc=94,568, siz=18,634, exs=14 as returned; occurrences with taxonomy and stratigraphic ages"
+      ],
+      "variables_missing": [
+        "no coiling or whorl measurements",
+        "taxonomy may itself use coiling"
+      ],
+      "scope": "Ammonoid occurrences",
+      "evidence": "JSON fields noc 94568, siz 18634, exs 14",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (API v3)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "POST tnrs/match_names (Nautilus pompilius, Ammonoidea, Sepia officinalis, Spirula spirula) (200); POST taxonomy/taxon_info ott 5424465 (200); POST tree_of_life/induced_subtree for 3 coleoid/nautiloid species (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "Ammonoidea ott5424465 present with flags extinct, incertae_sedis and a children list in the taxonomy (e.g. Actinoceras listed)",
+        "induced subtree returned a Newick for Nautilus pompilius, Sepia officinalis, Spirula spirula"
+      ],
+      "variables_missing": [
+        "no ammonoid topology: the taxon is an extinct, incertae sedis taxonomy entry",
+        "only extant cephalopod tips can be placed on the synthetic tree"
+      ],
+      "scope": "Extant cephalopods only for trees",
+      "evidence": "TNRS flags and induced_subtree keys newick/supporting_studies",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource media API (cephalopod queries)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?locale=en&q=Ammonoidea",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET /api/media?locale=en&q=Ammonoidea (total_count 1), q=Cephalopoda (0), q=Nautilus (1)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "one Ammonoidea media item: 'Element Unspecified [Mesh]', micro-CT, Smithsonian SIBIR; one Nautilus item"
+      ],
+      "variables_missing": [
+        "far too few shells for a comparative test"
+      ],
+      "scope": "Three query terms",
+      "evidence": "pages.total_count values 1, 0, 1",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "PBDB",
+      "query": "taxa/single Ammonoidea",
+      "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Ammonoidea&show=attr,size",
+      "hits": 1,
+      "note": "noc 94568"
+    },
+    {
+      "source": "Open Tree of Life",
+      "query": "tnrs/match_names, taxon_info, induced_subtree",
+      "url": "https://api.opentreeoflife.org/v3/tnrs/match_names",
+      "hits": 4,
+      "note": "Ammonoidea ott5424465 extinct incertae_sedis"
+    },
+    {
+      "source": "Dryad",
+      "query": "ammonoid shell coiling morphology",
+      "url": "https://datadryad.org/api/v2/search?q=ammonoid%20shell%20coiling%20morphology",
+      "hits": 2,
+      "note": "034jq765 Westermann Morphospace; k9b14 intraspecific variability through ontogeny in early ammonoids (title only)"
+    },
+    {
+      "source": "Dryad",
+      "query": "ammonite whorl expansion",
+      "url": "https://datadryad.org/api/v2/search?q=ammonite%20whorl%20expansion",
+      "hits": 1,
+      "note": "d7wm37qfx Gunnarites morphology, Maastrichtian, James Ross Island region (title only)"
+    },
+    {
+      "source": "Zenodo",
+      "query": "ammonoid shell shape coiling whorl expansion rate dataset, type=dataset",
+      "url": "https://zenodo.org/api/records?q=ammonoid%20shell%20shape%20coiling%20whorl%20expansion%20rate%20dataset&type=dataset&size=6",
+      "hits": 214703,
+      "note": "loose; relevant titles: 15157802/04/06 tables from 'Exploring the limits of morphospace' (Viséan ammonoids), 4988147 early ammonoid embryonic development, 4437733 gastropod shell coiling"
+    },
+    {
+      "source": "DataCite",
+      "query": "ammonoid shell morphology coiling (resource type dataset)",
+      "url": "https://api.datacite.org/dois?query=ammonoid%20shell%20morphology%20coiling&resource-type-id=dataset",
+      "hits": 1,
+      "note": "only the Westermann Morphospace record"
+    },
+    {
+      "source": "MorphoSource",
+      "query": "q=Ammonoidea / Cephalopoda / Nautilus",
+      "url": "https://www.morphosource.org/api/media?locale=en&q=Ammonoidea",
+      "hits": 2,
+      "note": "counts 1, 0, 1"
+    }
+  ],
+  "status": "partial",
+  "summary": "Shell-shape measurements for fossil ammonoids are open (Dryad Westermann Morphospace, CC0, an XLS appendix of 144,384 bytes; further Zenodo tables on Viséan ammonoids seen in search), and occurrences with ages are open (PBDB Ammonoidea: 94,568 occurrences). No independent ammonoid phylogeny is available through Open Tree of Life (Ammonoidea is an extinct, incertae sedis taxonomy entry), and MorphoSource holds only one ammonoid mesh. I did not open the Dryad XLS, so whether spiral angle or whorl expansion is a column is unconfirmed.",
+  "next_step": "Open the Westermann appendix and the Viséan-ammonoid Zenodo tables to list columns; for the phylogeny side, take published cladograms built without coiling characters, or use extant Nautilus/Spirula/Sepia placements on the Open Tree for a restricted-scope test.",
+  "obstacles_confirmed": [
+    "Independent fossil phylogenies remain uncertain; ammonoid cladograms have often used coiling.",
+    "Shell meshes for measuring the angle are rare in MorphoSource."
+  ]
+}

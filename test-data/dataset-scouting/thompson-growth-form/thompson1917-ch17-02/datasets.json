@@ -1,0 +1,128 @@
+{
+  "claim_id": "thompson1917-ch17-02",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "landmark or 3D shape data for several species within a clade, with size",
+    "discrete character matrix for the same species (presence/absence, meristic counts)",
+    "clade membership for within-genus or within-class partitioning"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "HEAD landing page",
+        "http_status": 403,
+        "note": "HTTP 403 to non-browser client."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "blocked to a scripted client; project and matrix counts not obtained"
+      ],
+      "scope": "Phenomic character matrices and images",
+      "evidence": "HEAD returned 403 (text/html, 919 bytes); a project-list JSON URL I tried also returned 403. The www.morphobank.org host was not tested.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Foraminifera",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET media API for example queries (Diplodocus 47 media, Foraminifera 75, Ovis 1)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "3D scans from which landmarks can be taken for some groups"
+      ],
+      "variables_missing": [
+        "no ready landmark datasets",
+        "no discrete character data",
+        "coverage uneven by clade"
+      ],
+      "scope": "3D specimen repository",
+      "evidence": "pages.total_count: 47 (Diplodocus), 75 (Foraminifera), 1 (Ovis); each is a media file.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-geometric-morphometric-sets",
+      "name": "Dryad: geometric-morphometric datasets with size and species contrasts",
+      "landing_url": "https://datadryad.org/api/v2/search?q=geometric%20morphometrics%20landmark%20species%20shape%20allometry",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.tf083ng",
+      "doi": "10.5061/dryad.tf083ng",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET Dryad search (4 hits), DataCite query (5 hits), dataset record tf083ng",
+        "http_status": 200
+      },
+      "variables_present": [
+        "10.5061/dryad.tf083ng: beak geometric morphometrics in large-billed and carrion crows with allometry and integration analysed (117,178 bytes, CC0)",
+        "10.5061/dryad.j3tx95xnp: ontogenetic and evolutionary allometries in parrotfishes (listed by DataCite)",
+        "10.5061/dryad.hp34m: ecomorphological convergence in a lizard radiation (82,118 bytes)"
+      ],
+      "variables_missing": [
+        "single clades, mostly one structure",
+        "no matched discrete-character data",
+        "file contents not opened"
+      ],
+      "scope": "Individual studies",
+      "evidence": "Dataset API for tf083ng: title and abstract about allometry versus beak-shape evolution, CC0-1.0; others from search listings.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "geometric morphometrics landmark species shape allometry",
+      "url": "https://datadryad.org/api/v2/search?q=geometric%20morphometrics%20landmark%20species%20shape%20allometry&per_page=5",
+      "hits": 4
+    },
+    {
+      "source": "DataCite",
+      "query": "geometric morphometrics landmarks interspecific shape variation clade",
+      "url": "https://api.datacite.org/dois?query=geometric%20morphometrics%20landmarks%20interspecific%20shape%20variation%20clade&page[size]=5",
+      "hits": 5,
+      "note": "parrotfish allometry, Dryad plus four Zenodo copies"
+    },
+    {
+      "source": "MorphoSource",
+      "query": "Foraminifera",
+      "url": "https://www.morphosource.org/api/media?q=Foraminifera",
+      "hits": 75
+    }
+  ],
+  "status": "partial",
+  "summary": "Landmark data with size information for single clades are on Dryad (crow beak shape, parrotfish allometry, lizard ecomorphs), and MorphoSource has scans for some groups, but the claim needs landmark and discrete-character data for the same species, which would come from MorphoBank. MorphoBank returned HTTP 403 to my client, so I could not check its matrices.",
+  "next_step": "Open MorphoBank in a browser to see which projects carry both continuous and discrete characters for one clade, or choose a clade where a Dryad landmark set and a published character matrix cover the same species, then define the partition rule before testing.",
+  "obstacles_confirmed": [
+    "'Essential' and 'main cause' lack thresholds.",
+    "Well-sampled clades are a minority of classes and genera."
+  ]
+}

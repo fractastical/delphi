@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/bioelectric-prepattern-predicts-anatomy--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Freeze BETSE parameters and predict a held-out perturbation" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> ;
+    dct:description "Use the BETSE engine. Fix parameters at the published defaults in Pietak and Levin 2016 before looking at outcome counts. Choose one channel-block or gap-junction perturbation that Durant et al. 2017 report and that was not used to set those defaults. Map the simulated anterior-posterior Vmem difference onto the phenotype classes with a threshold frozen from the control simulation alone. Compare the predicted class with the published outcome. frontier_simulate may be called only as a bounded bioelectric preview to see whether a parameter dictionary is inside its allowlisted family. Its ephemeral result is not evidence and cannot meet this test. Success is the correct class on that held-out perturbation and on one additional perturbation from the same paper, both chosen before the run." ;
+
+    delphi:proposedTest "Both pre-named held-out perturbations assigned the published phenotype class by the frozen threshold." ;
+    delphi:context "Fails if: Either perturbation is misclassified. Retuning parameters to obtain the class fails the approach." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Pin the BETSE commit and the published default parameters. 2. Name the two held-out perturbations before simulating. 3. Derive the decision threshold from the control simulation only. 4. Simulate the two perturbations and emit phenotype classes. 5. Score them against the paper. Do not retune." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: frontier_simulate is a bounded preview and is not a substitute for BETSE. The swarm still needs a local BETSE run for the evidence." ;
+    skos:note "Tool: bioelectric-simulation" ;
+    skos:note "Tool: frontier_simulate" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-girardia-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-16> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2019-boundary-14> ;
+    rdfs:seeAlso <https://gitlab.com/betse/betse> ;
+    rdfs:seeAlso <https://doi.org/10.3389/fbioe.2016.00055> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bpj.2017.04.011> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does the bioelectric prepattern predict anatomical outcome?" .
+
+  <https://gitlab.com/betse/betse> dct:title "BETSE source" ;
+    dct:description "Bioelectric Tissue Simulation Engine used for the frozen-parameter runs." .
+  <https://doi.org/10.3389/fbioe.2016.00055> dct:title "Exploring Instructive Physiological Signaling with the Bioelectric Tissue Simulation Engine" ;
+    dct:bibliographicCitation "Pietak and Levin 2016, source of the default parameters" .
+  <https://doi.org/10.1016/j.bpj.2017.04.011> dct:title "Long-Term, Stochastic Editing of Regenerative Anatomy via Targeting Endogenous Bioelectric Gradients" ;
+    dct:bibliographicCitation "Durant et al. 2017, the held-out planarian perturbations" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to bioelectric-prepattern-predicts-anatomy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.343Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to bioelectric-prepattern-predicts-anatomy: Freeze BETSE parameters and predict a held-out perturbation" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/bioelectric-prepattern-predicts-anatomy--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

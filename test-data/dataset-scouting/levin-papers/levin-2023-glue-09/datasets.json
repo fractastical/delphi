@@ -1,0 +1,157 @@
+{
+  "claim_id": "levin-2023-glue-09",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T09:46:54Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "levin-02"
+  },
+  "variables_needed": [
+    "head number per fragment across multiple untreated rounds of cutting after transient bioelectric or gap-junction treatment",
+    "reset cohort (second manipulation back to one head) and sham controls",
+    "bioelectric state records"
+  ],
+  "datasets": [
+    {
+      "id": "planformdb-2-5-0",
+      "name": "PlanformDB 2.5.0 (Lobo, Malone & Levin 2013; curated planarian regeneration experiments)",
+      "landing_url": "https://lobolab.umbc.edu/planform/download/",
+      "access_url": "https://lobolab.umbc.edu/planform/downloads/planformDB_2.5.0.edb",
+      "doi": "10.1093/bioinformatics/btt088",
+      "license": "custom 'as-is' permissive terms on the download page (use and redistribute for any purpose, with restrictions listed there); not an SPDX licence",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET access_url (744,448 bytes, under 1 MB); opened as SQLite 3 and counted rows; GET landing page",
+        "http_status": 200,
+        "bytes": 744448
+      },
+      "variables_present": [
+        "encoded head-number outcomes per experiment and manipulation",
+        "manipulation actions stored as chained Crop/Remove actions, so serial cutting can in principle be represented"
+      ],
+      "variables_missing": [
+        "verified record of an untreated second or third round of cutting after a transient drug in a drug-induced double-head lineage (not checked)",
+        "genotype or sequence of treated lines",
+        "per-worm lineage"
+      ],
+      "scope": "1,716 curated experiments from 119 papers up to 2018; frequencies per result set, not animals",
+      "evidence": "File is a SQLite database. Row counts: Experiment 1,716; Publication 119 (years 2005-2018); Species 17 (Dugesia japonica, Schmidtea mediterranea, Girardia tigrina, Dugesia dorotocephala ...); Drug 37 (incl. Octanol, Heptanol, Hexanol); RNAi 412; ResultSet 2,000; ResultantMorphology 3,114 (each = a named morphology with a frequency per result set). 282 experiments have a resultant morphology whose name starts 'Double head'; 126 have 'Headless'; 45 experiments are linked through ExperimentDrug to octanol, heptanol or hexanol; 126 experiments use Dugesia dorotocephala. Publication titles include Nogi & Levin 2005 (innexins, gap-junctional communication) and Beane 2011 (H,K-ATPase voltage and head regeneration); no 2015 Emmons-Bell or 2019 Durant title appears in the 2014-2018 Publication list. Manipulations are stored as chained actions (Crop/Remove actions each reference a FromAction).",
+      "verdict": "partial"
+    },
+    {
+      "id": "biostudies",
+      "name": "BioStudies (EBI)",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET landing page; API keyword searches logged in search_log",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "lineage-level regeneration data"
+      ],
+      "scope": "general repository; no Levin-lab primary deposit found for this experiment",
+      "evidence": "Landing page HTTP 200. Keyword searches in search_log returned only Europe PMC article mirrors (S-EPMC...), which carry the papers' supplements, not primary data.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad (general repository)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET landing page; API searches logged in search_log",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "lineage-level phenotype records"
+      ],
+      "scope": "general repository; searches for this experiment returned no matching deposit",
+      "evidence": "Landing page HTTP 200; the Dryad search API returned 0 datasets for the claim-specific queries recorded in search_log.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "planarian",
+      "url": "https://datadryad.org/api/v2/search?q=planarian",
+      "hits": 11,
+      "note": "11 datasets; none about bioelectric manipulation or head number; two relevant to genome/aging (dryad.v15dv425h, dryad.c5f0ps6)"
+    },
+    {
+      "source": "Dryad",
+      "query": "planarian regeneration head",
+      "url": "https://datadryad.org/api/v2/search?q=planarian%20regeneration%20head",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Dryad",
+      "query": "Dugesia head regeneration",
+      "url": "https://datadryad.org/api/v2/search?q=Dugesia%20head%20regeneration",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "DataCite",
+      "query": "planarian two-headed regeneration",
+      "url": "https://api.datacite.org/dois?query=planarian%20two-headed%20regeneration&page%5Bsize%5D=5",
+      "hits": 4,
+      "note": "four Zenodo records, titles 'FRC 820.002: The FRC Coherence Pump Reproduces Planarian Morphogenesis' and 'Coupling response geometry in planarian polarity editing'; theory/modelling preprints, not experimental head-count data (not opened)"
+    },
+    {
+      "source": "Zenodo",
+      "query": "planarian regeneration two-headed",
+      "url": "https://zenodo.org/api/records?q=planarian%20regeneration%20two-headed&size=5",
+      "hits": null,
+      "note": "API reported 288097 total (query evidently OR-matched on single words, so the figure is meaningless); top hits are a serotonin school project, reviews and transcriptome records, none on head number"
+    },
+    {
+      "source": "Figshare (POST /v2/articles/search)",
+      "query": "planarian head regeneration bioelectric",
+      "url": "https://api.figshare.com/v2/articles/search",
+      "hits": 0,
+      "note": "POST body {search_for, page_size:5}; HTTP 200, empty list"
+    },
+    {
+      "source": "BioStudies",
+      "query": "planarian bioelectric",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?query=planarian%20bioelectric&pageSize=3",
+      "hits": 736,
+      "note": "OR-matched Europe PMC article mirrors; top hits are articles (Beane 2011-type and Durant 2019 titles), not deposited image sets"
+    },
+    {
+      "source": "Europe PMC",
+      "query": "title searches for Emmons-Bell 2015, Durant 2019, Levin 2016 (Physiological inputs regulate species-specific anatomy)",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=%22Gap%20junctional%20blockade%20stochastically%20induces%22&format=json&pageSize=2&resultType=lite",
+      "hits": 1,
+      "note": "found PMC4661923 (OA), PMC6401388 (not OA), PMC4988443 (OA); three searches, one URL logged"
+    }
+  ],
+  "status": "gap",
+  "summary": "No repository holds round-by-round head counts for two-headed planarian lineages: Dryad, Zenodo, Figshare, DataCite and BioStudies searches found nothing, and PlanformDB stores outcome frequencies per experiment, with serial untreated cutting unverified.",
+  "next_step": "Check PlanformDB for multi-cut manipulations after drug (not done), and request lineage tables from the Levin lab.",
+  "obstacles_confirmed": [
+    "Round-by-round head counts are in the papers, not in a deposited lineage table.",
+    "Genome sequence of the altered lines is not deposited; wild-type genome is inferred from induction and reset experiments."
+  ]
+}

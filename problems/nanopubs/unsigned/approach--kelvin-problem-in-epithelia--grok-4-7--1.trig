@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/kelvin-problem-in-epithelia--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Scutoid frequency against curvature in the 2018 data" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/kelvin-problem-in-epithelia> ;
+    dct:description "Use the supplementary tables of Gómez-Gálvez et al. 2018, not a re-segmentation, unless the tables lack per-tissue scutoid frequencies. If they lack frequencies, stop as data-unavailable rather than tracing figures. The prediction is the paper's own energy-minimizing scutoid fraction as a function of the measured curvature and cell aspect ratio. Pre-register success as either every curvature bin within 10 percentage points of the predicted fraction, or a Spearman correlation above 0.8 between predicted and observed fractions across bins. Bins are the paper's bins. A new segmentation pipeline is a different project and is not a rescue if the tables are insufficient." ;
+
+    delphi:proposedTest "Either all bins within 10 percentage points of the predicted scutoid fraction, or Spearman correlation above 0.8." ;
+    delphi:context "Fails if: Both conditions fail. The energy-minimizing scutoid prediction then does not fit the paper's own binned data. Missing numeric tables are inconclusive, not a refutation." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Read the supplement and stop if frequencies and curvatures are not numeric. 2. Transcribe bin-wise scutoid fractions and curvatures with a checksum. 3. Compute the paper's predicted fraction at each bin. 4. Apply the 10-point tolerance and the Spearman threshold. 5. Support the energy account only if one of the two pre-registered conditions holds." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: If the supplement contains images rather than frequencies, the swarm lacks the numeric table and should not invent one by tracing." ;
+    skos:note "Tool: 3d-segmentation" ;
+    skos:note "Tool: cell-geometry" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch07-08> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch09-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/s41467-018-05376-1> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/kelvin-problem-in-epithelia> a delphi:Concept, schema:Question ;
+    rdfs:label "Kelvin's problem in epithelia" .
+
+
+  <https://doi.org/10.1038/s41467-018-05376-1> dct:title "Scutoids are a geometrical solution to three-dimensional packing of epithelia" ;
+    dct:bibliographicCitation "Gómez-Gálvez et al. 2018, Scutoids are a geometrical solution to three-dimensional packing of epithelia" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to kelvin-problem-in-epithelia, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.345Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to kelvin-problem-in-epithelia: Scutoid frequency against curvature in the 2018 data" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/kelvin-problem-in-epithelia--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

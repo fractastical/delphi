@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule30-center-column--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean: left-permutivity, Jen's two-column theorem and conditional extensions" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule30-center-column> ;
+    dct:description "Formalize the only rigorous progress on Prize problem 1 and push it as far as it goes. Rule 30 is x_i^{t+1} = x_{i−1}^t XOR (x_i^t OR x_{i+1}^t). It is left-permutive: x_{i−1}^t = x_i^{t+1} XOR (x_i^t OR x_{i+1}^t), so two adjacent columns determine everything to their left. Jen (1990, announced 1986) proved that no two columns of the single-seed pattern can both be eventually periodic. Prove in Lean: (a) the reconstruction lemma; (b) if columns i and i+1 are eventually periodic with period p, every column to the left is eventually periodic with period p; (c) Jen's theorem, from the fact that the left boundary of the light cone moves left one cell per step, contradicting periodicity of the reconstructed region. Then attempt new conditional theorems with explicit hypotheses, for example: if the center column is eventually periodic with period p from time t₀, then column +1 is not eventually periodic and its subword complexity grows at least linearly; or, the periodic-diagonal region on the left (Wolfram's observation) cannot reach the center column before time f(p)." ;
+
+    delphi:proposedTest "A Lean module proving Jen's theorem (no two columns both eventually periodic) with only standard axioms, plus at least one new conditional theorem about the center column whose hypothesis is stated explicitly. A proof of non-periodicity itself would settle Prize problem 1." ;
+    delphi:context "Fails if: All conditional extensions reduce back to assuming information about a second column; the left-permutivity method then provably cannot reach a single column without new input." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define Rule 30 and the single-seed evolution on ℤ × ℕ; prove the light-cone and left-permutivity lemmas. 2. Prove the reconstruction and periodicity-propagation lemmas; derive Jen's two-column theorem. 3. Formulate and attempt the conditional single-column statements; record which hypotheses each needs. 4. Report as in the Thompson Lean reports, with axioms checked." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Jen's theorem is tractable; a genuinely new single-column result needs a mathematical idea no one has yet found." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:note "Tool: symbolic-dynamics" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch02-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch06-14> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/0167-2789(90)90169-p> ;
+    rdfs:seeAlso <https://writings.stephenwolfram.com/2019/10/announcing-the-rule-30-prizes/> ;
+    rdfs:seeAlso <https://www.rule30prize.org/> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/rule30-center-column> a delphi:Concept, schema:Question ;
+    rdfs:label "The Rule 30 center column" .
+
+
+  <https://doi.org/10.1016/0167-2789(90)90169-p> dct:title "Aperiodicity in one-dimensional cellular automata" ;
+    dct:bibliographicCitation "Jen 1990, Aperiodicity in one-dimensional cellular automata, Physica D 45:3" .
+  <https://writings.stephenwolfram.com/2019/10/announcing-the-rule-30-prizes/> dct:bibliographicCitation "Wolfram 2019, prize announcement; summarizes Jen's result and the left-permutivity reconstruction" .
+  <https://www.rule30prize.org/> dct:bibliographicCitation "Rule 30 Prize problems" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule30-center-column, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.297Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule30-center-column: Lean: left-permutivity, Jen's two-column theorem and conditional extensions" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule30-center-column--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

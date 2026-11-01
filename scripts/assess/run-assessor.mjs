@@ -69,18 +69,19 @@ outside the JSON.
 ${JSON.stringify(rubric, null, 2)}`;
 
 async function assess(claim) {
-  const body = {
-    model,
-    temperature: 0.2,
-    max_tokens: maxTokens,
-    messages: [
-      { role: "system", content: system },
-      { role: "user", content: `Assess this claim:\n\n${JSON.stringify(claim, null, 2)}` },
-    ],
-    response_format: { type: "json_schema", json_schema: { name: "assessment", strict: true, schema } },
-    chat_template_kwargs: { enable_thinking: false },
-  };
+  let note = "";
   for (let attempt = 1; attempt <= 3; attempt++) {
+    const body = {
+      model,
+      temperature: attempt === 1 ? 0.2 : 0.5,
+      max_tokens: maxTokens,
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: `Assess this claim:\n\n${JSON.stringify(claim, null, 2)}${note}` },
+      ],
+      response_format: { type: "json_schema", json_schema: { name: "assessment", strict: true, schema } },
+      chat_template_kwargs: { enable_thinking: false },
+    };
     try {
       const r = await fetch(`${baseUrl}/chat/completions`, {
         method: "POST",
@@ -91,12 +92,15 @@ async function assess(claim) {
       if (!r.ok) throw new Error(`HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`);
       const j = await r.json();
       const out = JSON.parse(j.choices[0].message.content);
+      for (const k of ["operationalization", "rationale"])
+        if (!out[k]?.trim()) throw new Error(`empty ${k} (required even for not-empirically-resolvable: say what observation, if any, would bear on the claim)`);
       out.claim_id = claim.id;
       for (const d of DIMS) out.scores[d] = Math.round(out.scores[d] * 100) / 100;
       out.confidence = Math.round(out.confidence * 100) / 100;
       return { out, usage: j.usage };
     } catch (e) {
       if (attempt === 3) throw e;
+      if (e.message.startsWith("empty ")) note = `\n\nYour previous answer was rejected: ${e.message}. Every string field must be non-empty prose.`;
       console.error(`  ${claim.id}: ${e.message} (retry ${attempt})`);
     }
   }

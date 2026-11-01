@@ -1,0 +1,94 @@
+{
+  "claim_id": "thompson1917-ch14-04",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T08:17:30Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "images (or 3D scans) of conifer cones in which cone scales are visible and countable from the side or base",
+    "species identity of each cone (Picea abies and Larix decidua at least)",
+    "parastichy counts per cone, as the two conspicuous opposing families (e.g. 5 and 3, 8 and 5)",
+    "many cones per species, with cone size or position if available"
+  ],
+  "datasets": [
+    {
+      "id": "gbif-picea-larix-images",
+      "name": "GBIF occurrence records of Picea abies and Larix decidua with still images",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search?scientificName=Picea%20abies&mediaType=StillImage",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T08:16:12Z", "method": "GET occurrence/search with mediaType=StillImage and limit=0 for Picea abies and for Larix decidua", "http_status": 200 },
+      "variables_present": ["48,584 image-bearing occurrences of Picea abies and 12,803 of Larix decidua (count fields)"],
+      "variables_missing": ["whether each image shows a cone, and at what angle and resolution, is unknown (images are of trees, needles, bark and sheets as well); no counts of parastichies"],
+      "scope": "Global occurrence images; mostly observation photographs",
+      "evidence": "API counts 48584 and 12803",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "idigbio-picea-abies-images",
+      "name": "iDigBio specimen records of Picea abies with images",
+      "landing_url": "https://www.idigbio.org/",
+      "access_url": "https://search.idigbio.org/v2/search/records?rq=%7B%22scientificname%22:%22picea%20abies%22,%22hasImage%22:true%7D",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T08:16:20Z", "method": "GET search/records with scientificname=picea abies and hasImage=true, limit=1", "http_status": 200 },
+      "variables_present": ["1,102 specimen records of Picea abies with images (itemCount)"],
+      "variables_missing": ["herbarium sheets rarely carry intact cones viewable for parastichy counting; not checked per image"],
+      "scope": "Museum and herbarium records",
+      "evidence": "API itemCount 1102",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource media search (keyword)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=cone&per_page=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T08:16:23Z", "method": "GET /api/media?q=<term>&per_page=1 reading pages.total_count for Picea, Larix, cone, Pinaceae", "http_status": 200 },
+      "variables_present": ["109 media for the keyword 'cone' and 10 for 'Pinaceae' (counts)"],
+      "variables_missing": ["0 media for 'Picea' and 0 for 'Larix'; 'cone' hits include non-botanical cones (e.g. cone snails, bone cones), not examined"],
+      "scope": "MorphoSource keyword hits",
+      "evidence": "pages.total_count: Picea 0, Larix 0, cone 109, Pinaceae 10",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "smithsonian-open-access",
+      "name": "Smithsonian Open Access",
+      "landing_url": "https://www.si.edu/openaccess",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T07:22:03Z", "method": "HEAD landing page (same check as for the antler claim)", "http_status": 403, "note": "request blocked for this client; not retried" },
+      "variables_present": [],
+      "variables_missing": ["not inspected"],
+      "scope": null,
+      "evidence": "HTTP 403",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "GBIF", "query": "Picea abies StillImage", "url": "https://api.gbif.org/v1/occurrence/search?scientificName=Picea%20abies&mediaType=StillImage&limit=0", "hits": 48584, "note": "images of any plant part" },
+    { "source": "GBIF", "query": "Larix decidua StillImage", "url": "https://api.gbif.org/v1/occurrence/search?scientificName=Larix%20decidua&mediaType=StillImage&limit=0", "hits": 12803, "note": "images of any plant part" },
+    { "source": "iDigBio", "query": "picea abies hasImage", "url": "https://search.idigbio.org/v2/search/records?rq=%7B%22scientificname%22:%22picea%20abies%22,%22hasImage%22:true%7D&limit=1", "hits": 1102, "note": "herbarium sheets" },
+    { "source": "MorphoSource", "query": "media q=Picea / Larix / cone / Pinaceae", "url": "https://www.morphosource.org/api/media?q=cone&per_page=1", "hits": 109, "note": "Picea 0, Larix 0, Pinaceae 10" },
+    { "source": "Dryad", "query": "cone parastichy", "url": "https://datadryad.org/api/v2/search?q=cone%20parastichy", "hits": 0, "note": "no hits" },
+    { "source": "Zenodo", "query": "\"parastichy\" cone conifer", "url": "https://zenodo.org/api/records?q=%22parastichy%22%20cone%20conifer&size=6", "hits": 13648, "note": "count inflated; top hits (conifer pollen/seed cone function, fossil cone, Pinus pinea pest guide) are not parastichy tables" },
+    { "source": "DataCite", "query": "pine cone scale spiral Fibonacci counts", "url": "https://api.datacite.org/dois?query=pine%20cone%20scale%20spiral%20Fibonacci%20counts&page%5Bsize%5D=5&disable-facets=true", "hits": 0, "note": "no hits" }
+  ],
+  "status": "gap",
+  "summary": "No dataset of conifer-cone parastichy counts was found: Dryad and DataCite searches returned zero hits and the Zenodo hits are unrelated papers. Image sources exist (GBIF 48,584 Picea abies and 12,803 Larix decidua image records; iDigBio 1,102 Picea abies records) but they were not checked for cones and carry no counts, and MorphoSource has no media under Picea or Larix. Smithsonian Open Access returned HTTP 403.",
+  "next_step": "Compile a table by hand: sample a few hundred GBIF/iNaturalist cone photographs per species (filtering by a 'cone' keyword in the media description), pre-register the counting protocol, and have two independent counters score the two opposing parastichy families; or collect published counts from the literature.",
+  "obstacles_confirmed": [
+    "Published cone counts are summarised in papers rather than released as one open raw table; no repository record was found.",
+    "Image sources are not curated for cones, and herbarium sheets are poor for cone arrangement."
+  ]
+}

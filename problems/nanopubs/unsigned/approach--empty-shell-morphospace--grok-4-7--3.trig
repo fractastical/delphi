@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Grid the generating curve and compare empty cells" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> ;
+    dct:description "Fill a rectangular grid in (W, D, T) at the resolution of Raup's published figures, generate the logarithmic-spiral solid, and mark cells whose successive whorls intersect. Overlay the empirical (W, D, T) points from the mesh measurements. Developmental constraint explains an empty region only where the empty cells are exactly the intersecting cells, up to a pre-registered boundary strip of one grid cell. Empirical points inside the intersecting region falsify the generating model. Empty cells that do not intersect remain unexplained by this geometric filter and are passed to the functional model rather than called a success. This approach never sees phylogeny, so it cannot be rescued by a phylogenetic random walk." ;
+
+    delphi:proposedTest "A cell-wise map. Developmental constraint accounts for a named empty region only if that region matches the intersecting cells within a one-cell strip and no measured shell falls in an intersecting cell." ;
+    delphi:context "Fails if: A measured shell lies in an intersecting cell, or a large empty region is non-intersecting. Geometry then does not explain that emptiness." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Choose the grid from Raup's figure limits and freeze it. 2. Mark intersecting cells by the same circle test used in the Lean theorem, extended numerically to T ≠ 0. 3. Overlay measured shells. 4. Count empirical points in intersecting cells and empty non-intersecting cells. 5. Accept developmental constraint only for regions where those two sets match within one grid cell." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: theoretical-morphology" ;
+    skos:note "Tool: simulation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-15> ;
+    rdfs:seeAlso <https://www.morphosource.org/> ;
+    rdfs:seeAlso <https://doi.org/10.1111/brv.12276> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> a delphi:Concept, schema:Question ;
+    rdfs:label "Why is shell morphospace empty where it is?" .
+
+  <https://www.morphosource.org/> dct:title "MorphoSource" ;
+    dct:description "Empirical shells overlaid on the grid." .
+  <https://doi.org/10.1111/brv.12276> dct:title "The geometry of morphospaces: lessons from the classic\n                    <scp>R</scp>\n                    aup shell coiling model" ;
+    dct:bibliographicCitation "Gerber 2017, review of proposed explanations for the empty region" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to empty-shell-morphospace, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.341Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to empty-shell-morphospace: Grid the generating curve and compare empty cells" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

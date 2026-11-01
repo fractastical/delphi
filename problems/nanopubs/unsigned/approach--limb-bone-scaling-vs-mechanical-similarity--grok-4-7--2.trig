@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean derivation of the three similarity exponents" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    dct:description "The data test needs its targets to be theorems. From the scaling assumptions, prove in Lean, next to the existing strength-to-weight lemmas in ThompsonLaws.Magnitude: geometric similarity (every length proportional to mass to the 1/3) implies cross-sectional area proportional to mass to the 2/3 and circumference to the 1/3; elastic similarity as McMahon stated it (diameter proportional to mass to the 3/8, length to the 1/4) implies area proportional to mass to the 3/4; stress similarity (force proportional to mass and stress equal to force over area held constant) implies area proportional to mass to the 1 and circumference to the 1/2. Prove the three area exponents are distinct. Also prove the posture lemma in elementary form: if effective mechanical advantage scales as mass to the γ, constant bone stress is compatible with area proportional to mass to the 1 − γ. No organism is asserted to follow any of these." ;
+
+    delphi:proposedTest "Sorry-free theorems giving area exponents 2/3, 3/4 and 1, circumference exponents 1/3, 3/8 and 1/2, and the posture correction 1 − γ." ;
+    delphi:context "Fails if: One classical exponent does not follow from the assumptions as formalised. That hypothesis is then withdrawn from the data test rather than forced." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. State the three assumption sets as Lean hypotheses. 2. Prove the area and circumference exponents. 3. Prove the exponents are pairwise distinct. 4. Prove the effective-mechanical-advantage correction 1 − γ. 5. Compile with no sorry and point the data test at these constants." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+
+    rdfs:seeAlso <https://doi.org/10.1126/science.179.4079.1201> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.2740914> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" .
+
+
+  <https://doi.org/10.1126/science.179.4079.1201> dct:title "Size and Shape in Biology" ;
+    dct:bibliographicCitation "McMahon 1973, Size and shape in biology" .
+  <https://doi.org/10.1126/science.2740914> dct:title "Scaling Body Support in Mammals: Limb Posture and Muscle Mechanics" ;
+    dct:bibliographicCitation "Biewener 1989, Scaling body support in mammals: limb posture and muscle mechanics" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to limb-bone-scaling-vs-mechanical-similarity, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.348Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to limb-bone-scaling-vs-mechanical-similarity: Lean derivation of the three similarity exponents" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

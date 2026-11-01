@@ -48,7 +48,7 @@ def meanFitness (b c d r p δ : ℝ) : ℝ :=
   p * fitC b c d r p δ + (1 - p) * fitD b r p δ
 
 /-- Change in cooperator frequency over one generation, `p w_C / w̄ - p`. -/
-def deltaP (b c d r p δ : ℝ) : ℝ :=
+noncomputable def deltaP (b c d r p δ : ℝ) : ℝ :=
   p * fitC b c d r p δ / meanFitness b c d r p δ - p
 
 /-- The synergy-corrected inclusive-fitness quantity `r b - c + d (r + (1 - r) p)`. -/
@@ -175,25 +175,3 @@ theorem frequency_flip :
     partnerCoopGivenD]
 
 end ThompsonLaws.HamiltonScope
-
-#print axioms ThompsonLaws.HamiltonScope.payoffC_sub_payoffD
-
-#print axioms ThompsonLaws.HamiltonScope.deltaP_eq
-
-#print axioms ThompsonLaws.HamiltonScope.meanFitness_pos
-
-#print axioms ThompsonLaws.HamiltonScope.generalizedHamilton
-
-#print axioms ThompsonLaws.HamiltonScope.generalizedHamilton_neg
-
-#print axioms ThompsonLaws.HamiltonScope.simpleHamilton_additive
-
-#print axioms ThompsonLaws.HamiltonScope.counterexample_ruleHolds_selectedAgainst
-
-#print axioms ThompsonLaws.HamiltonScope.counterexample_ruleFails_selectedFor
-
-#print axioms ThompsonLaws.HamiltonScope.simpleHamilton_not_sufficient
-
-#print axioms ThompsonLaws.HamiltonScope.simpleHamilton_not_necessary
-
-#print axioms ThompsonLaws.HamiltonScope.frequency_flip

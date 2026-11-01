@@ -1,0 +1,243 @@
+{
+  "claim_id": "darwin1859-ch12-06",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:47:10Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "darwin-06"
+  },
+  "variables_needed": [
+    "species lists per island with endemic/non-endemic status, split by group (seabirds, land birds, marine molluscs, land snails, plants)",
+    "an immigration-ability measure per group or species that is independent of endemism (e.g. dispersal syndrome, hand-wing index, marine habit)",
+    "island attributes (age/isolation/area) to control residence time"
+  ],
+  "datasets": [
+    {
+      "id": "gift-plants",
+      "name": "GIFT: Global Inventory of Floras and Traits",
+      "landing_url": "https://gift.uni-goettingen.de/",
+      "access_url": "https://gift.uni-goettingen.de/api/extended/index.php?query=traits_meta",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:47:10Z",
+        "method": "GET gift.uni-goettingen.de; GET gift.uni-goettingen.de/api/extended/index.php?query=traits_meta; query=checklists",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plant regional/island floras (per landing)",
+        "plant trait list incl. Dispersal_syndrome_1 (9,602 records) and Dispersal_syndrome_2 (6,518)"
+      ],
+      "variables_missing": [
+        "animal groups (birds, molluscs)",
+        "endemism per island not verified: query=checklists without parameters returned an empty list"
+      ],
+      "scope": "Vascular plants only; 109 traits listed in traits_meta",
+      "evidence": "API 200: traits_meta returns 109 rows; Dispersal_syndrome_1 count 9,602 (categorical). Plants only, so it cannot give the cross-taxon comparison (seabirds, shells).",
+      "verdict": "partial"
+    },
+    {
+      "id": "avonet-v7",
+      "name": "AVONET (figshare v7; Tobias et al. 2022)",
+      "landing_url": "https://doi.org/10.6084/m9.figshare.16586228",
+      "access_url": "https://ndownloader.figshare.com/files/34480856",
+      "doi": "10.6084/m9.figshare.16586228",
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:47:10Z",
+        "method": "GET api.figshare.com/v2/articles/16586228",
+        "http_status": 200
+      },
+      "variables_present": [
+        "bird species-level morphological, ecological and geographical data (title)",
+        "candidate independent dispersal proxy for birds (morphology/migration traits; columns not inspected here)"
+      ],
+      "variables_missing": [
+        "island-specific endemic status",
+        "non-bird groups"
+      ],
+      "scope": "~11,000 bird species (per the vendored organisms record: 11,009 rows)",
+      "evidence": "Figshare API 200: files AVONET Supplementary dataset 1.xlsx (21,524,673 bytes), Supplementary dataset 2.xlsx, ELEData.zip; CC BY 4.0. Direct file HEAD returned 302 then 403 (signed redirect).",
+      "verdict": "partial",
+      "reuses_organism_dataset": "avonet-v7"
+    },
+    {
+      "id": "gbif-island-occurrences",
+      "name": "GBIF occurrences (island/country filter, establishmentMeans)",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:47:10Z",
+        "method": "GET api.gbif.org/v1/occurrence/search?country=EC&establishmentMeans=NATIVE&taxonKey=212&limit=0",
+        "http_status": 200,
+        "note": "web landing www.gbif.org returned 403 to curl earlier; API returned 200"
+      },
+      "variables_present": [
+        "occurrence records by country/island with an establishmentMeans field"
+      ],
+      "variables_missing": [
+        "an 'endemic' flag",
+        "complete island checklists",
+        "dispersal measures"
+      ],
+      "scope": "Global; records, not checklists",
+      "evidence": "API 200: filter accepted but the country=EC + NATIVE + Aves query returned count 0, so establishmentMeans is sparsely filled; endemism would have to be derived from range lists elsewhere.",
+      "verdict": "partial"
+    },
+    {
+      "id": "worms-marine-molluscs",
+      "name": "World Register of Marine Species (REST API)",
+      "landing_url": "https://www.marinespecies.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:47:10Z",
+        "method": "GET marinespecies.org/rest/AphiaRecordsByName/Conus%20ebraeus; GET /rest/AphiaDistributionsByAphiaID/215436",
+        "http_status": 200
+      },
+      "variables_present": [
+        "accepted marine species names and distribution localities (e.g. Chagos, Aldabra)"
+      ],
+      "variables_missing": [
+        "endemic status (establishmentMeans null in sampled record)",
+        "systematic island checklists"
+      ],
+      "scope": "Marine species; per-species distribution records",
+      "evidence": "API 200 for both calls; the sampled distribution rows have establishmentMeans: null.",
+      "verdict": "partial"
+    },
+    {
+      "id": "obis-marine-checklists",
+      "name": "OBIS checklist API",
+      "landing_url": "https://api.obis.org/v3/checklist?scientificname=Mollusca&size=1",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:47:10Z",
+        "method": "GET api.obis.org/v3/checklist?areaid=&scientificname=Mollusca&size=1",
+        "http_status": 200
+      },
+      "variables_present": [
+        "marine mollusc species checklist by area (38,960 taxa for Mollusca)"
+      ],
+      "variables_missing": [
+        "endemism flags",
+        "terrestrial groups"
+      ],
+      "scope": "Marine, occurrence-based",
+      "evidence": "API 200: total 38,960 for scientificname=Mollusca, with is_marine/is_terrestrial flags in each row.",
+      "verdict": "partial"
+    },
+    {
+      "id": "iucn-red-list",
+      "name": "IUCN Red List",
+      "landing_url": "https://www.iucnredlist.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:47:10Z",
+        "method": "GET www.iucnredlist.org (200); GET api.iucnredlist.org/api/v4/taxa/scientific_name (403 without token)",
+        "http_status": 403,
+        "note": "API 403 without token"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "open bulk download without registration"
+      ],
+      "scope": "Global assessments",
+      "evidence": "Landing 200 but the v4 API returned 403 without a token; data download needs an account.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "movebank",
+      "name": "Movebank",
+      "landing_url": "https://www.movebank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:47:10Z",
+        "method": "GET www.movebank.org (redirect to /cms/movebank-main)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "island endemism",
+        "group-level dispersal measures"
+      ],
+      "scope": "Individual animal tracking studies",
+      "evidence": "Landing 200 only; tracking studies are per study with their own permissions and do not contain island endemic status.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "DataCite",
+      "query": "island endemism dispersal ability archipelago checklist endemic species birds molluscs",
+      "url": "https://api.datacite.org/dois?query=island+endemism+dispersal+ability+archipelago+checklist+endemic+species+birds+molluscs",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Dryad",
+      "query": "island endemism dispersal ability birds land snails archipelago",
+      "url": "https://datadryad.org/api/v2/search?q=island+endemism+dispersal+ability+birds+land+snails+archipelago&per_page=3",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "Dryad",
+      "query": "endemic species proportion islands dispersal traits taxonomic groups",
+      "url": "https://datadryad.org/api/v2/search?q=endemic+species+proportion+islands+dispersal+traits+taxonomic+groups&per_page=3",
+      "hits": 0,
+      "note": "nothing"
+    },
+    {
+      "source": "OBIS",
+      "query": "Mollusca checklist",
+      "url": "https://api.obis.org/v3/checklist?areaid=&scientificname=Mollusca&size=1",
+      "hits": 38960,
+      "note": "checklist with habitat flags"
+    },
+    {
+      "source": "GIFT API",
+      "query": "traits_meta",
+      "url": "https://gift.uni-goettingen.de/api/extended/index.php?query=traits_meta",
+      "hits": 109,
+      "note": "dispersal syndrome traits for plants"
+    }
+  ],
+  "status": "partial",
+  "summary": "Datasets cover only parts: no single open dataset gives island-by-island endemism for several taxonomic groups together with an independent dispersal measure. GIFT has plant dispersal syndromes and floras, AVONET has bird traits, WoRMS/OBIS have marine checklists, but endemic flags per island for birds, shells and insects were not found; three keyword searches returned zero hits.",
+  "next_step": "Compile island checklists with endemic status for 2-3 archipelagos (e.g. birds, land snails, marine molluscs, plants) from regional checklists; join GIFT dispersal syndromes and AVONET traits.",
+  "obstacles_confirmed": [
+    "Independent dispersal traits available for birds and plants only",
+    "Residence time/island age needed as covariate",
+    "Arrival 'in a body' is rarely recorded"
+  ]
+}

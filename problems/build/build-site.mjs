@@ -1,16 +1,18 @@
 // Build the problem graph for the site: docs/problems.json (problems, their approaches, the claims
 // each bears on with their current status, and nanopub URIs from the manifest) and docs/problems.html
-// from docs/problems.template.html, following scripts/site/build-claim-graph.mjs conventions.
+// from scripts/site/templates/problems.template.html, following scripts/site/build-claim-graph.mjs conventions.
 //
 //   node problems/build/build-site.mjs
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { linkOf } from "./links.mjs";
+import { withChrome } from "../../scripts/site/chrome.mjs";
 
 const HERE = join(dirname(fileURLToPath(import.meta.url)), "..");
 const ROOT = join(HERE, "..");
 const DOCS = join(ROOT, "docs");
+const TEMPLATES = join(ROOT, "scripts/site/templates");
 
 const problems = JSON.parse(readFileSync(join(HERE, "problems.json"), "utf8"));
 const manifest = existsSync(join(HERE, "nanopubs/manifest.json")) ? JSON.parse(readFileSync(join(HERE, "nanopubs/manifest.json"), "utf8")) : { nanopubs: [] };
@@ -68,7 +70,7 @@ writeFileSync(join(DOCS, "problems.json"), JSON.stringify(data, null, 1) + "\n")
 
 const seal = readFileSync(join(ROOT, "assets/logo.svg"), "utf8").trim();
 const inline = svg => svg.replace(/<svg[^>]*>/, t => t.replace(/\s(width|height)="\d+"/g, "")).replace("<svg ", '<svg role="img" aria-label="DELPHI seal" ');
-const html = readFileSync(join(DOCS, "problems.template.html"), "utf8")
+const html = withChrome(readFileSync(join(TEMPLATES, "problems.template.html"), "utf8"), "problems")
   .replace("<!--__SEAL__-->", inline(seal))
   .replace("/*__SEAL_URI__*/", encodeURIComponent(seal))
   .replace("/*__DATA__*/null", JSON.stringify(data).replace(/</g, "\\u003c"));

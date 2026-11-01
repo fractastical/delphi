@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--claude-opus-5-5--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean proof that shear-driven rotation makes principal directions the stable fabric" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    dct:description "Formalize the mechanism in claim thompson1917-ch16-06. For a plane stress state with principal stresses sigma1 > sigma2 and principal angle theta_p, the shear traction on a strut at angle theta is tau(theta) = ((sigma1 - sigma2)/2) sin(2(theta - theta_p)). Compare two rotation rules, k > 0. Rule A (signed shear): d theta/dt = -k tau(theta). Rule B (descent on shear energy): d theta/dt = -k d(tau^2)/d theta, which is proportional to -sin(4(theta - theta_p)). Prove: (i) under both rules the principal directions theta_p + m pi/2 are equilibria; (ii) under rule A the linearization -k(sigma1 - sigma2) cos(2(theta - theta_p)) is negative at theta_p and positive at theta_p + pi/2, so only one principal family is stable and Thompson's two orthogonal families (ch16-05) cannot both arise from it; (iii) under rule B both principal directions are asymptotically stable, the diagonals theta_p + pi/4 are the only other (unstable) equilibria, and V = tau^2 is a Lyapunov function non-increasing along trajectories; (iv) if sigma1 = sigma2 every angle is an equilibrium, so alignment is undefined under equal principal stresses. Part (ii)-(iii) says which reading of 'displaced by shear' is consistent with crossing tension and compression families; part (iv) yields the data prediction used in approach 1 that alignment strength should rise with stress anisotropy." ;
+
+    delphi:proposedTest "A compiled Lean module with no sorry proving the four statements, recorded as formalized for thompson1917-ch16-06 in the lean reports, including the result that only the shear-energy rule makes both orthogonal families stable." ;
+    delphi:context "Fails if: Needing a sorry for the stability or Lyapunov step, or a statement weakened to the point that it only restates tau = 0 on principal axes (already implied by the existing ch16-05 theorem)." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Extend ThompsonLaws/Mechanics.lean with the shear traction formula derived from the existing stressAction (rotation of the symmetric tensor), proving tau is zero exactly on principal directions. 2. Prove the equilibrium characterization and the sign of the derivative at each equilibrium for rules A and B using Real.sin and Real.cos lemmas in Mathlib. 3. Prove V = tau^2 is non-increasing along any differentiable solution of rule B (HasDerivAt plus chain rule). 4. Prove the degenerate case sigma1 = sigma2. 5. Write the report entry under lean/reports with no sorry and standard axioms only, and link it to thompson1917-ch16-06." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: A proof shows the rule implies alignment, not that bone follows the rule; it does not address causality in organisms." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mathlib" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/0021-9290(87)90058-3> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" .
+
+
+  <https://doi.org/10.1016/0021-9290(87)90058-3> dct:title "Trabecular bone density and loading history: Regulation of connective tissue biology by mechanical energy" ;
+    dct:bibliographicCitation "Carter, Fyhrie and Whalen 1987, mechanical-energy regulation of trabecular density" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to trabecular-stress-alignment-wolffs-law, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.307Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to trabecular-stress-alignment-wolffs-law: Lean proof that shear-driven rotation makes principal directions the stable fabric" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--claude-opus-5-5--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Derive the junction exponent from a stated cost" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> ;
+    dct:description "Minimize, for one vessel, a Poiseuille pumping cost proportional to Q squared over r to the fourth plus a blood-volume cost proportional to r squared. Prove the optimum is r cubed proportional to Q. At a junction with Q_parent = Q_1 + Q_2 and the same constant of proportionality, prove r_parent cubed equals r_1 cubed plus r_2 cubed. Then replace the resistance exponent by a parameter b and the flow exponent by a parameter a, and prove the junction exponent is (b + 2) / a for a volume cost proportional to r squared. State which (a, b) would yield 7/3, and do not assert that turbulent flow has those exponents unless the algebra produces them from a stated friction law. The laminar cubic law and the general exponent are the theorems." ;
+
+    delphi:proposedTest "A no-sorry cubic junction law under Poiseuille-plus-volume cost, and a general exponent (b + 2) / a with the unique (a, b) pair that equals 7/3." ;
+    delphi:context "Fails if: The cubic law does not follow from those costs, or more than one (a, b) pair on the stated family yields 7/3. The derivation would then not pin down the turbulent alternative." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define Poiseuille power and volume cost. 2. Prove the cubic optimum and the junction law. 3. Generalize to resistance exponent b and flow exponent a. 4. Solve for the (a, b) pair that would give junction exponent 7/3. 5. Audit axioms." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch15-13> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.12.3.207> ;
+    rdfs:seeAlso <https://doi.org/10.1085/jgp.78.4.431> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Does real vasculature obey Murray's law?" .
+
+
+  <https://doi.org/10.1073/pnas.12.3.207> dct:title "The Physiological Principle of Minimum Work" ;
+    dct:bibliographicCitation "Murray 1926, The physiological principle of minimum work I" .
+  <https://doi.org/10.1085/jgp.78.4.431> dct:title "On connecting large vessels to small. The meaning of Murray's law." ;
+    dct:bibliographicCitation "Sherman 1981, On connecting large vessels to small" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to murrays-law-vascular-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.342Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to murrays-law-vascular-optimality: Derive the junction exponent from a stated cost" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

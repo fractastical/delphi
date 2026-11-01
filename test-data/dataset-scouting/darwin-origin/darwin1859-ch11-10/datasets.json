@@ -1,0 +1,268 @@
+{
+  "claim_id": "darwin1859-ch11-10",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-08"
+  },
+  "variables_needed": [
+    "native vascular plant checklists for islands and continental regions",
+    "over-water distance between each island or region and the nearest continent / other regions",
+    "pairwise floristic similarity (shared native species) between regions",
+    "dated phylogeny-based dispersal events or colonisation rates across ocean gaps"
+  ],
+  "datasets": [
+    {
+      "id": "global-inventory-of-floras-and-traits",
+      "name": "Global Inventory of Floras and Traits (GIFT)",
+      "landing_url": "https://gift.uni-goettingen.de/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET GIFT API query=lists, query=species, query=traits_meta; GET landing",
+        "http_status": 200
+      },
+      "variables_present": [
+        "native/naturalized-flagged plant checklists per geographic entity",
+        "entity class label (Island vs other)",
+        "species names"
+      ],
+      "variables_missing": [
+        "over-water distances between entities (not seen in endpoints queried)",
+        "pairwise similarity matrix (must be computed from species-by-list data)"
+      ],
+      "scope": "Worldwide regional and island floras; list-level API open without login",
+      "evidence": "GIFT API https://gift.uni-goettingen.de/api/extended/index.php?query=lists returned 200 (JSON array; first 400 KB read) of list records with fields ref_ID, type (Flora/Checklist), native_indicated, natural_indicated, entity_ID, geo_entity, entity_class (first record: 'Ashmore Reef', entity_class 'Island'); query=species returned 200 with work_species names; query=traits_meta returned 200 (Woodiness_1 count 249,169). Landing page returned 200 (5,520 bytes). Pairwise distance fields were not seen in the endpoints I queried.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif",
+      "name": "GBIF occurrence records",
+      "landing_url": "https://www.gbif.org/",
+      "access_url": "https://api.gbif.org/v1/occurrence/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET GBIF API occurrence/search?taxonKey=6&limit=0; GET landing",
+        "http_status": 200,
+        "note": "Landing page returned 403 to curl; status 200 is for the API call."
+      },
+      "variables_present": [
+        "georeferenced plant occurrence records with country/island locality"
+      ],
+      "variables_missing": [
+        "native vs introduced status per record",
+        "dispersal events or colonisation rates",
+        "island-level checklists as such"
+      ],
+      "scope": "Global occurrence records; no checklist or distance structure",
+      "evidence": "API https://api.gbif.org/v1/occurrence/search?taxonKey=6&limit=0 returned 200 with count 652,196,829 (Plantae). The www.gbif.org landing page returned 403 to curl; the API is open.",
+      "verdict": "partial"
+    },
+    {
+      "id": "movebank",
+      "name": "Movebank animal tracking",
+      "landing_url": "https://www.movebank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET landing; GET public json endpoint for one study",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "any plant floristic or colonisation variable"
+      ],
+      "scope": "Animal movement tracks; not floristic data",
+      "evidence": "Landing https://www.movebank.org/ redirected to /cms/movebank-main and returned 200 (49,907 bytes). A request to the public json service for one study returned 500. It holds animal tracks, which describe possible vectors, not floras or dispersal outcomes.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "plants-of-the-world-online",
+      "name": "Plants of the World Online (Kew POWO)",
+      "landing_url": "https://powo.science.kew.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET landing; GET /api/2/search?q=Echium",
+        "http_status": 403,
+        "note": "403 challenge page"
+      },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Global native distributions (per assessor); not verified",
+      "evidence": "Both the landing page and https://powo.science.kew.org/api/2/search?q=Echium returned 403 with a 'Just a moment...' challenge page to curl/urllib, so contents could not be checked.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "bach-2022-249-global-islands",
+      "name": "Species richness and phylogenetic structure of 249 global islands (Bach et al.)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.h44j0zpp5",
+      "access_url": "https://datadryad.org/dataset/doi:10.5061/dryad.h44j0zpp5",
+      "doi": "10.5061/dryad.h44j0zpp5",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Dryad API dataset + files",
+        "http_status": 200,
+        "bytes": 139290
+      },
+      "variables_present": [
+        "island-level native-flora summaries for 249 islands drawn from GIFT (per abstract)",
+        "island naturalized-alien richness"
+      ],
+      "variables_missing": [
+        "pairwise species sharing between islands and continents",
+        "over-water distance fields not confirmed"
+      ],
+      "scope": "249 islands worldwide; island-level summaries, not region-pair similarity",
+      "evidence": "Dryad API returned 200: title 'Species richness and phylogenetic structure of 249 global islands', published 2022-07-11, CC0-1.0, storageSize 139,290 bytes; files species_richness_and_phylogenetic_structure_of_249_global_islands.csv (130,960 bytes) and a README (8,330 bytes). The abstract says the 249 islands were assembled from GIFT and GloNAF. File download via API returned 401, so columns were not read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dispersal-danish-islands-r2280gbg0",
+      "name": "Plant dispersal characteristics shape the relationship of diversity with area and isolation (Danish islands)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.r2280gbg0",
+      "access_url": "https://datadryad.org/dataset/doi:10.5061/dryad.r2280gbg0",
+      "doi": "10.5061/dryad.r2280gbg0",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Dryad API dataset + files",
+        "http_status": 200,
+        "bytes": 301340
+      },
+      "variables_present": [
+        "island plant species richness with area, isolation and dispersal-syndrome information (per abstract)"
+      ],
+      "variables_missing": [
+        "distances of hundreds of miles",
+        "distant-continent comparison"
+      ],
+      "scope": "Danish islands only (regional scale)",
+      "evidence": "Dryad API returned 200: published 2022-08-19, CC0-1.0, storageSize 301,340 bytes; files Dispersal_Danish_Islands_data.xlsx (292,870 bytes) and README.txt (8,470 bytes). Same study also on Zenodo as 10.5281/zenodo.6993597 (DataCite result). Contents not read (API download 401).",
+      "verdict": "partial"
+    },
+    {
+      "id": "glonaf-v2-02-zenodo",
+      "name": "Global Naturalized Alien Flora (GloNAF) v2.02",
+      "landing_url": "https://zenodo.org/records/17105725",
+      "access_url": "https://zenodo.org/records/17105725/files/glonaf_region.csv",
+      "doi": "10.5281/zenodo.17105725",
+      "license": "CC-BY-4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Zenodo API /api/records/17105725; HEAD glonaf_region.csv",
+        "http_status": 200,
+        "bytes": 80120
+      },
+      "variables_present": [
+        "alien naturalized plant lists for 1,343 regions incl. 427 islands (human-mediated spread)"
+      ],
+      "variables_missing": [
+        "native-flora similarity",
+        "natural dispersal events"
+      ],
+      "scope": "Naturalized aliens only; useful to flag human introductions that contaminate modern ranges",
+      "evidence": "Zenodo API returned 200: CC-BY-4.0, 16,429 taxa, 1,343 regions (427 islands), 336 sources; files include glonaf_region.csv (80,120 bytes; HEAD returned 200 with content-length 80120) and glonaf_TxR.csv (31,795,097 bytes, not downloaded). Landing https://glonaf.org/ returned 200.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "GIFT API",
+      "query": "lists / species / traits_meta",
+      "url": "https://gift.uni-goettingen.de/api/extended/index.php?query=lists",
+      "hits": null,
+      "note": "open JSON endpoints; count not taken because response exceeds 1 MB"
+    },
+    {
+      "source": "Zenodo",
+      "query": "island flora checklist isolation distance",
+      "url": "https://zenodo.org/api/records?q=island%20flora%20checklist%20isolation%20distance&size=3",
+      "hits": 230856,
+      "note": "noisy; surfaced Aleutian Islands plant diversity (dryad.r12cq4r) only"
+    },
+    {
+      "source": "DataCite",
+      "query": "island floras distance to mainland",
+      "url": "https://api.datacite.org/dois?query=island+floras+distance+to+mainland&page%5Bsize%5D=3",
+      "hits": 6,
+      "note": "relevant: Bach 2022 (249 islands), Danish islands dispersal"
+    },
+    {
+      "source": "Dryad",
+      "query": "island floristic similarity distance",
+      "url": "https://datadryad.org/api/v2/search?q=island%20floristic%20similarity%20distance&per_page=3",
+      "hits": 0
+    },
+    {
+      "source": "Dryad",
+      "query": "island plant",
+      "url": "https://datadryad.org/api/v2/search?q=island+plant&per_page=5",
+      "hits": 612,
+      "note": "broad; top hits were single-system studies"
+    },
+    {
+      "source": "DataCite",
+      "query": "oceanic dispersal seed flotation sea water",
+      "url": "https://api.datacite.org/dois?query=oceanic+dispersal+seed+flotation+sea+water&page%5Bsize%5D=3",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "long-distance dispersal plant phylogeny oceanic islands",
+      "url": "https://zenodo.org/api/records?q=long-distance+dispersal+plant+phylogeny+oceanic+islands&size=5",
+      "hits": 483627,
+      "note": "single-clade datasets, e.g. Pacific plant genus metapopulation (dryad.p2gs002), Galapagos habitat filtering (dryad.43b1t); not inspected"
+    },
+    {
+      "source": "GBIF dataset search",
+      "query": "island flora checklist",
+      "url": "https://api.gbif.org/v1/dataset/search?q=island%20flora%20checklist&limit=1",
+      "hits": 127,
+      "note": "many small island checklists published as GBIF datasets"
+    },
+    {
+      "source": "Zenodo",
+      "query": "GloNAF naturalized alien flora database",
+      "url": "https://zenodo.org/api/records?q=GloNAF+naturalized+alien+flora+database&size=5",
+      "hits": 211759,
+      "note": "found 10.5281/zenodo.17105725"
+    }
+  ],
+  "status": "partial",
+  "summary": "Native regional and island floras with an island label are open through the GIFT API, and GloNAF (Zenodo) lists human-introduced aliases for 1,343 regions. No fetched resource holds over-water distances, pairwise floristic similarity and dispersal events together; island-level summaries (Bach 2022) and regional studies (Danish islands) cover parts at limited scope.",
+  "next_step": "Pull species-by-list data from GIFT for island and continental entities, compute great-circle or over-water distances from entity coordinates, and use GloNAF to flag human-introduced species before pre-registering the distance-decay test.",
+  "obstacles_confirmed": [
+    "No single table of pairwise native-species sharing versus ocean distance was found.",
+    "POWO is behind a bot challenge (403) for scripted access.",
+    "Human-introduced species are recorded separately in GloNAF; mechanisms (currents, birds, driftwood) are not variables in any flora table."
+  ]
+}

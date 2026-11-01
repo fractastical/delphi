@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/smallest-universal-turing-machine-2-3--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Construction route: replace Smith's non-periodic tape with a periodic refuel gadget" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> ;
+    dct:description "Smith's proof is a chain: the (2,3) machine emulates system 0, which emulates a sequence of intermediate systems ending in a cyclic tag system, and the infinite non-periodic tape supplies the structures the chain consumes. Implement each layer as an executable specification and instrument the emulation to find exactly which layer consumes non-periodic structure, and what that structure is (for example, blocks whose lengths grow with the number of emulated steps). Then search for a replacement: a finite gadget on a periodic background that regenerates the consumed structure on demand. Neary and Woods' weakly universal small machines show this kind of periodic-background refuelling can work. The search runs over short periodic background words and finite gadgets (SAT or bounded model checking on the layer's step relation), with the requirement that the composed system still emulates the CTS." ;
+
+    delphi:proposedTest "An explicit eventually periodic initial tape for which the (2,3) machine emulates a universal CTS, verified by simulation for at least 10^6 emulated steps and then proved in Lean. Even without success, the instrumented chain is a precise statement of what the non-periodic tape contributes, which the current literature lacks." ;
+    delphi:context "Fails if: The consumed structure grows superlinearly in a way no finite gadget on a periodic background can produce (for example, its growth law implies the background must encode an unbounded counter), or the search exhausts all gadgets up to the size bound." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. Implement Smith's systems 0 through 5 and the CTS layer as executable specs, with cross-checking simulation from a common CTS input. 2. Instrument the emulation to log the background symbols consumed per emulated CTS step and fit their growth law. 3. Formulate a SAT or bounded-model-checking search for a periodic background plus finite gadget that produces the consumed structure; run for background periods up to 40. 4. If a candidate is found, verify by long simulation and then formalize the composed emulation in Lean." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: Possibly a genuinely new idea; the search space for gadgets may be far too large." ;
+    skos:note "Tool: turing-machine-enumeration" ;
+    skos:note "Tool: sat-solver" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-28> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-23> ;
+
+    rdfs:seeAlso <https://doi.org/10.25088/ComplexSystems.29.1.1> ;
+    rdfs:seeAlso <https://doi.org/10.1007/978-3-642-03409-1_24> ;
+    rdfs:seeAlso <https://www.wolframscience.com/prizes/tm23/> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/smallest-universal-turing-machine-2-3> a delphi:Concept, schema:Question ;
+    rdfs:label "Settle whether the (2,3) Turing machine is universal under a conventional definition" .
+
+
+  <https://doi.org/10.25088/ComplexSystems.29.1.1> dct:title "Universality of Wolfram’s 2, 3 Turing Machine" ;
+    dct:bibliographicCitation "Smith 2020, the emulation chain to instrument" .
+  <https://doi.org/10.1007/978-3-642-03409-1_24> dct:title "Small Weakly Universal Turing Machines" ;
+    dct:bibliographicCitation "Neary and Woods 2009, Small weakly universal Turing machines (periodic-background constructions)" .
+  <https://www.wolframscience.com/prizes/tm23/> dct:bibliographicCitation "Wolfram 2,3 Turing Machine Research Prize page with the proof materials" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to smallest-universal-turing-machine-2-3, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.296Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to smallest-universal-turing-machine-2-3: Construction route: replace Smith's non-periodic tape with a periodic refuel gadget" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/smallest-universal-turing-machine-2-3--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

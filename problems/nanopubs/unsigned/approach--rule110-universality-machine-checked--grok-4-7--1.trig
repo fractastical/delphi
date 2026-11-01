@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule110-universality-machine-checked--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Kernel-check Cook's ether, gliders and collision table" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule110-universality-machine-checked> ;
+    dct:description "In the repo's Lean 4.35.0 and Mathlib 4.35.0, encode Rule 110 as the Boolean function on (Bool × Bool × Bool) given by Wolfram's 8-bit table number 110. Do not use the formula left XOR (center OR right); that formula is Rule 30. Transcribe the periodic background word and every glider word from Cook 2004, without rewriting them. Prove the background is invariant under the spacetime shift Cook states. For each published collision, evolve the finite word with a pure Lean function and prove equality to Cook's product word by kernel reduction (rfl or decide on a Bool), never native_decide, sorry, or an extra axiom. Split any evolution the kernel cannot reduce in one pass into blocks of a few hundred steps with an intermediate word that is itself a lemma. The glider catalog, the background and the collision table are separate lemmas, as the acceptance criteria require." ;
+
+    delphi:proposedTest "A Lean module, with no sorry, whose lemmas are exactly Cook's background, glider catalog and collision table, each proved by reduction of the cellular-automaton step." ;
+    delphi:context "Fails if: Any transcribed collision evolves to a word different from Cook's table, or a collision is too long for blocked kernel reduction and no alternative proof is found. A mismatched collision is also evidence against the published table." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define rule110 : Bool × Bool × Bool → Bool from the 8-bit table and prove it matches Wolfram number 110. 2. Transcribe Cook's periodic background and prove the invariance he claims. 3. Transcribe each glider as a finite word on that background. 4. Discharge each collision lemma by blocked kernel reduction of the pure step function. 5. Record #print axioms output and reject the module if any axiom other than propext, Classical.choice or Quot.sound appears." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Nothing external. The obstacle is proof size: Cook's table is a long finite case analysis, and Lean's kernel may force very small blocks." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: cellular-automaton-simulation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch01-07> ;
+
+    rdfs:seeAlso <https://doi.org/10.25088/ComplexSystems.15.1.1> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/rule110-universality-machine-checked> a delphi:Concept, schema:Question ;
+    rdfs:label "Machine-check the universality of Rule 110" .
+
+
+  <https://doi.org/10.25088/ComplexSystems.15.1.1> dct:title "Universality in Elementary Cellular Automata" ;
+    dct:bibliographicCitation "Cook 2004, Universality in elementary cellular automata" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule110-universality-machine-checked, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.334Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule110-universality-machine-checked: Kernel-check Cook's ether, gliders and collision table" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule110-universality-machine-checked--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

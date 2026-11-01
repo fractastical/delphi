@@ -1,0 +1,71 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-07--claim-test--overnight-metabolic-network> a delphi:Assessment ;
+    rdfs:label "Claim test of thompson1917-ch03-07 (overnight-metabolic-network): inconclusive, confidence 0.99" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0.99"^^xsd:double ;
+    delphi:hypothesis "The primary network, with branching ratio 2, generations 2 to 24, area-preserving radii, and fixed terminal units, takes service volume to be the sum of the terminal service volumes and has a local exponent of total terminal flow against that volume within 0.01 of 3/4 at some generation at most 24; the alternative network, whose volume is the total tube volume under the space-filling length ratio, has its exponent reported from the same code." ;
+    delphi:passCriterion "The primary network's local exponent lies within 0.01 of 3/4 at some generation at most 24, and the alternative network's exponent is reported from the same code." ;
+    delphi:failCriterion "The primary exponent stays more than 0.01 away from 3/4 through generation 24. The finite network then does not realize the 3/4 claim for this volume, and one of the volume definition and that claim is wrong." ;
+    delphi:expectedObservation "Some local exponent of total terminal flow against the primary service-volume sum, taken between successive generations from 2 through 24, lies within 0.01 of 3/4." ;
+    delphi:disconfirmingObservation "Every such primary local exponent stays more than 0.01 away from 3/4. That answers the finite-network claim in the negative and does not choose which of the volume definition and the 3/4 statement to withdraw." ;
+    delphi:admissibleDatasets "None. The test is computational. Organism measurements, capillary tables, and fitted allometries are not admissible." ;
+    delphi:inferenceMethod "The primary local exponent is the ratio of logarithms of total terminal flow and of the service-volume sum between successive generations. The pass threshold is absolute deviation at most 0.01 from 3/4 on at least one pair with both generations in 2..24. Tube-volume local exponents are computed in the same run and reported; they do not enter the pass rule." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "For each generation G from 2 to 24 the script builds one binary network: 2^G terminals, area-preserving radii, and vessel lengths in geometric ratio 2^(-1/3). Primary service volume and total terminal flow are both exactly 2^G, so each of the 22 successive local exponents is log(2)/log(2) = 1 and the ordinary-least-squares slope on those generations is 1. Tube volume is the sum of the cylindrical vessel volumes in units of pi r_c^2 l_c, computed at 80 decimal places and checked against the closed geometric series. The pass rule uses only the primary exponents; the tube-volume exponents are reported beside them." ;
+    rdfs:comment "Measured: 1 dimensionless local exponent (n = 22, 0; exact on every primary pair). Interpretation: Terminal flow is one unit per terminal, so metabolic rate equals the number of terminals, 2^G. Each terminal service volume is one fixed unit (a sphere whose diameter is the fixed terminal length, up to a factor that cancels in every ratio); the primary service volume is their sum, 2^G. Area-preserving radii mean the two daughters have cross-sections adding to the parent. The space-filling length ratio 2^(-1/3) is taken from the companion formalization's hypotheses and is used only to set tube lengths. The method's phrase for the primary volume and its phrase for the critique's service-volume assumption name the same invariant-terminal sum in Kozłowski and Konarzewski (2004). The quantity the 3/4 derivation sets proportional to mass is total tube volume, so that volume is the reported alternative and is not substituted into the pass rule. ThompsonLaws.Magnitude states the cube law (weightOfLength, this claim) and the surface-to-mass law; it does not contain an infinite-generation branching theorem. No animal is represented." ;
+    delphi:evidenceAgainst "The pre-registered network criterion fails: the service-volume sum has local exponent exactly 1, deviation 1/4 from 3/4, on every pair from generation 2 to 24." ;
+    delphi:evidenceAgainst "Area preservation and the length ratio do not enter that primary exponent. They enter only the tube volume." ;
+    delphi:evidenceAgainst "Tube-volume local exponents, which are not the pass rule, come within 0.01 of 3/4 at generation 13 and equal 0.7493443085223868748 at generation 24. The straight-line slope on generations 2 to 24 is 0.73261593689732806553." ;
+    delphi:evidenceAgainst "This checks the algebra of the two volume definitions. It says nothing about real animals, and it neither supports nor refutes the cube law for growing organisms." ;
+    delphi:evidenceAgainst "ThompsonLaws.Magnitude has no infinite-generation branching theorem to compare these numbers with." ;
+    delphi:hasEvidence () ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-grok-4-7> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07/overnight-metabolic-network/result.json> .
+  <https://w3id.org/delphi/resource/claim/thompson1917-ch03-07> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-07--claim-test--overnight-metabolic-network> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch03-07/overnight-metabolic-network/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (grok-4.7; metabolic-scaling-exponent--grok-4-7--3)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    dct:identifier "grok-4.7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.970Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of thompson1917-ch03-07 (overnight-metabolic-network): inconclusive, confidence 0.99" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/thompson1917-ch03-07--claim-test--overnight-metabolic-network> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/thompson-growth-form-1917> .
+}

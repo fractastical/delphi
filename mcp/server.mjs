@@ -12,6 +12,7 @@ import { observeToolCall } from "./metrics.mjs";
 import { DATA_KINDS as TEST_DATA_KINDS, TEST_VIEWS, VERDICTS as TEST_VERDICTS, claimTestsTool } from "./tests.mjs";
 import { AXIS_IDS, GROUP_KEYS as ORG_GROUP_KEYS, SORT_KEYS as ORG_SORT_KEYS, browseOrganisms, getOrganism, organismsOverview } from "./organisms.mjs";
 import { MORPHOLIB_VIEWS, REGISTRIES, RELATIONS, morpholibTool } from "./morpholib.mjs";
+import { replicationsTool } from "./federation.mjs";
 
 const TOOLS = [];
 
@@ -149,6 +150,16 @@ tool("delphi_morpholib",
     limit: z.number().int().min(1).max(500).optional(),
   },
   morpholibTool);
+
+tool("delphi_replications",
+  "Independent re-runs of a claim's Lean proof or data test, as signed attestations (ed25519, content-addressed, verified here), and what they add up to. Without `claim`: how many claims with an executable test are replicated, contested, single-witness or unattested, and which have witnesses. With `claim`: each of its tests with every witness (signer, operator, outcome, time, repo commit). Status counts only attestations of the test's current hash, one vote per signer, quorum over distinct operators: replicated = quorum or more operators reproduced it and none diverged; contested = some reproduced and some drifted or failed; single-witness = fewer than quorum; stale-only = witnesses exist but the test has since changed. Signers are keys, not verified people, and operators are self-declared: pass `trusted` to count only keys you choose. includePeers also asks this node's configured peers (mcp/peers.json, DELPHI_PEERS) and verifies what they return. To add a witness, re-run with `node scripts/exec/run.mjs --claim ID`, then `node scripts/federation/cli.mjs attest`.",
+  {
+    claim: z.string().optional().describe("Claim id, e.g. \"darwin1859-ch01-09\""),
+    quorum: z.number().int().min(1).max(20).default(2).describe("Distinct operators that must reproduce a test for status \"replicated\""),
+    trusted: z.array(z.string().regex(/^ed25519:[0-9a-f]{64}$/)).max(200).optional().describe("Only count attestations signed by these public keys (\"ed25519:<hex>\")"),
+    includePeers: z.boolean().default(false).describe("Also query this node's configured federation peers"),
+  },
+  replicationsTool);
 
 const axis = z.enum(AXIS_IDS);
 tool("delphi_organisms",

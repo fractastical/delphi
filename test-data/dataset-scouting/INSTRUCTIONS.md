@@ -58,7 +58,7 @@ if one covers your variables, cite its `id` in `reuses_organism_dataset`.
   scales as length^3" is not.
 - **Scope as stated.** Judge datasets against the claim's own scope. A dataset on one species is
   `partial` for a claim about all vertebrates.
-- Don't touch claim files, assessments, nanopubs, `docs/`, or anything under `test-data/claim-tests/`.
+- Don't touch claim files, assessments, nanopubs, `site/`, or anything under `test-data/claim-tests/`.
 - Don't download anything over 1 MB; a HEAD request or an API count is enough.
 - Don't score or rank; `verdict` values are about the dataset's fit, never a probability.
 

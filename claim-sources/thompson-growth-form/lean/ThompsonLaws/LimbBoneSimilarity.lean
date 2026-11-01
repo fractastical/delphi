@@ -20,8 +20,14 @@ theorem area_scales_from_diameter (diameter : ℝ → ℝ) (p k : ℝ) (hk : 0 <
     ScalesWithMass (areaFromDiameter diameter) (2 * p) := by
   refine ⟨Real.pi / 4 * k ^ 2, by positivity, ?_⟩
   intro mass hmass
+  have hpow : (mass ^ p) ^ 2 = mass ^ (2 * p) := by
+    calc
+      (mass ^ p) ^ 2 = (mass ^ p) ^ (2 : ℝ) :=
+        (Real.rpow_natCast (mass ^ p) 2).symm
+      _ = mass ^ (p * 2) := by rw [Real.rpow_mul hmass.le]
+      _ = mass ^ (2 * p) := by ring_nf
   unfold areaFromDiameter
-  rw [hdiameter mass hmass, mul_pow, ← Real.rpow_natCast, ← Real.rpow_mul hmass.le]
+  rw [hdiameter mass hmass, mul_pow, hpow]
   ring
 
 /-- A circumference has the same mass exponent as its diameter. -/
@@ -42,8 +48,8 @@ theorem geometric_similarity_exponents (diameter : ℝ → ℝ) (k : ℝ) (hk : 
     ScalesWithMass (areaFromDiameter diameter) ((2 : ℝ) / 3) ∧
       ScalesWithMass (circumferenceFromDiameter diameter) ((1 : ℝ) / 3) := by
   constructor
-  · convert area_scales_from_diameter diameter ((1 : ℝ) / 3) k hk hdiameter using 1 <;>
-      norm_num
+  · simpa only [show (2 : ℝ) * ((1 : ℝ) / 3) = (2 : ℝ) / 3 by norm_num] using
+      area_scales_from_diameter diameter ((1 : ℝ) / 3) k hk hdiameter
   · exact circumference_scales_from_diameter diameter ((1 : ℝ) / 3) k hk hdiameter
 
 /-- Under McMahon's elastic-similarity assumption `diameter ∝ mass^(3/8)`, area and
@@ -54,8 +60,8 @@ theorem elastic_similarity_exponents (diameter : ℝ → ℝ) (k : ℝ) (hk : 0 
     ScalesWithMass (areaFromDiameter diameter) ((3 : ℝ) / 4) ∧
       ScalesWithMass (circumferenceFromDiameter diameter) ((3 : ℝ) / 8) := by
   constructor
-  · convert area_scales_from_diameter diameter ((3 : ℝ) / 8) k hk hdiameter using 1 <;>
-      norm_num
+  · simpa only [show (2 : ℝ) * ((3 : ℝ) / 8) = (3 : ℝ) / 4 by norm_num] using
+      area_scales_from_diameter diameter ((3 : ℝ) / 8) k hk hdiameter
   · exact circumference_scales_from_diameter diameter ((3 : ℝ) / 8) k hk hdiameter
 
 /-- Under stress similarity, constant stress and force proportional to mass require area
@@ -66,14 +72,13 @@ theorem stress_similarity_exponents (diameter : ℝ → ℝ) (k : ℝ) (hk : 0 <
     ScalesWithMass (areaFromDiameter diameter) 1 ∧
       ScalesWithMass (circumferenceFromDiameter diameter) ((1 : ℝ) / 2) := by
   constructor
-  · convert area_scales_from_diameter diameter ((1 : ℝ) / 2) k hk hdiameter using 1 <;>
-      norm_num
+  · simpa only [show (2 : ℝ) * ((1 : ℝ) / 2) = 1 by norm_num] using
+      area_scales_from_diameter diameter ((1 : ℝ) / 2) k hk hdiameter
   · exact circumference_scales_from_diameter diameter ((1 : ℝ) / 2) k hk hdiameter
 
 /-- The geometric, elastic and stress-similarity area exponents are pairwise distinct. -/
 theorem area_exponents_distinct :
-    Pairwise (fun x y : ℝ => x ≠ y) [((2 : ℝ) / 3), ((3 : ℝ) / 4), 1] := by
-  simp
+    List.Pairwise (fun x y : ℝ => x ≠ y) [((2 : ℝ) / 3), ((3 : ℝ) / 4), 1] := by
   norm_num
 
 /-- Effective mechanical advantage proportional to `mass^γ`. -/
@@ -92,9 +97,8 @@ theorem posture_area_exponent (w e stress mass γ : ℝ) (hmass : 0 < mass)
     postureRequiredArea w e stress mass γ =
       (w / (e * stress)) * mass ^ (1 - γ) := by
   unfold postureRequiredArea mechanicalAdvantage
-  rw [Real.rpow_sub hmass.le, Real.rpow_one]
+  rw [Real.rpow_sub hmass, Real.rpow_one]
   have hp : mass ^ γ ≠ 0 := (Real.rpow_pos_of_pos hmass γ).ne'
   field_simp
-  ring
 
 end ThompsonLaws.LimbBoneSimilarity

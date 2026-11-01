@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/clade-trajectory-universality--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "A sampling-intensity null that increases toward the present" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/clade-trajectory-universality> ;
+    dct:description "The birth-death null above uses constant sampling. This null uses the empirical PBDB collection counts per international stage as a time-varying sampling probability, normalized once from the global marine-invertebrate collection curve and then frozen. Simulate origination and extinction at constant rates, sample occurrences with that curve, and apply the same SQS hat statistic. The empirical hat fraction is an artifact of sampling intensity if it lies inside the central 95 percent of this null. The collection curve is a property of the database, computed once, not fit to the clade shapes. This can exonerate a hat that the constant-sampling null flags, or the reverse, which is why it is a separate approach." ;
+
+    delphi:proposedTest "The empirical hat fraction lies inside or outside the central 95 percent of the sampling-intensity null. Inside means the hat fraction is accounted for by the collection curve." ;
+    delphi:context "Fails if: The empirical fraction lies outside that interval. Sampling intensity of this form then does not explain the pattern, and the approach has failed as an artifact explanation." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Compute the global marine collection count per stage and freeze it. 2. Simulate constant-rate origination and extinction sampled with that curve. 3. Pass simulations through SQS and the hat statistic. 4. Place the empirical hat fraction in the null predictive interval. 5. Do not refit the collection curve to clade shape." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: pbdb" ;
+    skos:note "Tool: paleobiology-statistics" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-02> ;
+    rdfs:seeAlso <https://paleobiodb.org/data1.2/> ;
+    rdfs:seeAlso <https://doi.org/10.1666/06084.1> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/clade-trajectory-universality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are clade diversity trajectories universally hat-shaped?" .
+
+  <https://paleobiodb.org/data1.2/> dct:title "Paleobiology Database data service 1.2" ;
+    dct:description "Global collection counts per stage, and the empirical hat fraction from the paired test." .
+  <https://doi.org/10.1666/06084.1> dct:title "Symmetric waxing and waning of marine invertebrate genera" ;
+    dct:bibliographicCitation "Foote 2007, the symmetry claim the sampling null tries to reproduce" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to clade-trajectory-universality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.340Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to clade-trajectory-universality: A sampling-intensity null that increases toward the present" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/clade-trajectory-universality--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

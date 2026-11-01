@@ -1,0 +1,79 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--gemini-4-argon--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean 4 proof of the shear-free advantage of principal-stress-aligned 2D frames" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> ;
+    dct:description "Formalize in Lean 4 the mathematical core of Thompson's claim (`thompson1917-ch16-05` and `thompson1917-ch16-06`) and Michell's (1904) frame optimality theorem on top of `ThompsonLaws/Mechanics.lean` (which already defines `stressAction`, `principalDirections_orthogonal`, and `threeStrutStiffness_isotropic` for `thompson1917-ch16-14`). Consider a planar 2D unit cell subjected to a macroscopic symmetric stress tensor sigma with principal stresses (sigma_1, sigma_2) and principal angle phi, realized either by: (A) an orthogonal 2-strut frame aligned with phi (carrying purely axial forces with zero bending moment), or (B) a uniform orthogonal or 120-degree 3-strut lattice (`threeStrutStiffness`) oriented at a fixed grid angle theta_0 != phi whose struts have finite bending-to-axial stiffness ratio eta = (t/L)^2 << 1.\n\nProve in Lean 4 that for any non-hydrostatic load state (sigma_1 != sigma_2) and generic orientation mismatch sin(2(phi - theta_0)) != 0: (1) the aligned frame stores strain energy purely in axial stretching U_aligned prop (|sigma_1| + |sigma_2|)^2 / E_s rho_rel, whereas (2) an unaligned orthogonal frame experiences shear in the strut frame, multiplying compliance by O(1 / eta) = O(1 / rho_rel^2), and even an isotropic stretching-dominated 3-strut frame (`threeStrutStiffness`) requires strictly greater structural mass than the principal-stress-aligned orthogonal frame whenever sigma_1 and sigma_2 have the same sign (Michell's lemma) or when peak nodal stress is bounded." ;
+
+    delphi:proposedTest "A zero-`sorry` Lean 4 theorem (`stressAlignedFrame_beats_uniform`) proving the exact compliance and peak-stress ratio between principal-stress-aligned and uniform 2D frames as a function of relative density rho_rel, misalignment angle, and stress biaxiality." ;
+    delphi:context "Fails if: For a triangulated stretching-dominated uniform lattice (`threeStrutStiffness`), the proved compliance gain of principal-stress alignment under multi-axial or slightly uncertain load directions is less than the typical 10-15% SLA print-to-print stiffness variance whenever relative density rho_rel >= 0.25." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Define the axial and Euler-Bernoulli bending strain-energy quadratic forms for a 2D strut network of relative density rho_rel and slenderness ratio eta = rho_rel^2 in `ThompsonLaws/Mechanics.lean`. 2. Prove that aligning orthogonal struts with the eigenvectors of `stressAction` (using `principalDirections_orthogonal`) zeroes out the transverse shear force and bending energy on every strut. 3. Prove the compliance-ratio inequality between the principal-stress-aligned 2-strut cell and a rotated 2-strut cell at angle theta_0 != phi, showing an O(eta^-1) stiffness gain. 4. Prove the exact mass-efficiency ratio between the principal-stress-aligned 2-strut cell and the isotropic 120-degree 3-strut cell (`threeStrutStiffness_isotropic`) as a function of the principal stress biaxiality ratio sigma_2 / sigma_1." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mechanics-modelling" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+
+    rdfs:seeAlso <https://doi.org/10.1007/s00158-016-1420-7> ;
+    rdfs:seeAlso <https://doi.org/10.1016/0045-7825(88)90086-2> ;
+    rdfs:seeAlso <https://doi.org/10.1016/S1359-6454(00)00379-7> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> a delphi:Concept, schema:Question ;
+    rdfs:label "Does a stress-aligned lattice beat a uniform lattice at equal mass, when printed?" .
+
+
+  <https://doi.org/10.1007/s00158-016-1420-7> dct:title "On the (non-)optimality of Michell structures" ;
+    dct:bibliographicCitation "Sigmund, Aage and Andreassen 2016, On the (non-)optimality of Michell structures" .
+  <https://doi.org/10.1016/0045-7825(88)90086-2> dct:title "Generating optimal topologies in structural design using a homogenization method" ;
+    dct:bibliographicCitation "Bendsøe and Kikuchi 1988, Generating optimal topologies in structural design using a homogenization method" .
+  <https://doi.org/10.1016/S1359-6454(00)00379-7> dct:title "Foam topology: bending versus stretching dominated architectures" ;
+    dct:bibliographicCitation "Deshpande, Ashby and Fleck 2001, Foam topology: bending versus stretching dominated architectures" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to printed-stress-aligned-lattice-beats-uniform, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.317Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to printed-stress-aligned-lattice-beats-uniform: Lean 4 proof of the shear-free advantage of principal-stress-aligned 2D frames" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--gemini-4-argon--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

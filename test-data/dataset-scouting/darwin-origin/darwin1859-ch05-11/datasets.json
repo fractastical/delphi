@@ -1,0 +1,266 @@
+{
+  "claim_id": "darwin1859-ch05-11",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:10:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-05"
+  },
+  "variables_needed": [
+    "count of a serially repeated part (vertebrae, fin rays, stamens) per individual or per species with within-species variance",
+    "mean count per species to separate many-fold from few-fold parts",
+    "matched counts for low-count homologous parts in the same species",
+    "sample size per species"
+  ],
+  "datasets": [
+    {
+      "id": "fishbase",
+      "name": "FishBase (species summary pages)",
+      "landing_url": "https://www.fishbase.se/",
+      "access_url": "https://www.fishbase.se/summary/Gadus-morhua.html",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:06:40Z",
+        "method": "GET landing (meta-refresh to search.php, 200); GET species summary page for Gadus morhua (200, 69,285 bytes)",
+        "http_status": 200,
+        "bytes": 69285
+      },
+      "variables_present": [
+        "per-species meristic ranges, e.g. Gadus morhua: \"Dorsal soft rays (total): 44 - 55; Anal soft rays : 33 - 45; Vertebrae : 51 - 55\""
+      ],
+      "variables_missing": [
+        "individual-level counts and sample sizes",
+        "plants"
+      ],
+      "scope": "Fishes; minimum-maximum ranges per species, not individual observations",
+      "evidence": "Summary page Morphology section text: \"Dorsal spines (total): 0; Dorsal soft rays (total): 44 - 55; Anal spines : 0; Anal soft rays : 33 - 45; Vertebrae : 51 - 55.\"",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad",
+      "name": "Dryad Digital Repository (portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:44Z",
+        "method": "GET landing; search API (see search_log)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a portal, not a dataset"
+      ],
+      "scope": null,
+      "evidence": "Searches for vertebral counts in snakes returned 0; stamen number variation returned 1 (a Penstemon nectary dataset).",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:24Z",
+        "method": "GET landing page and GET /index.php/Projects/ProjectList (second request 2026-11-01T08:03:24Z, also 403)",
+        "http_status": 403,
+        "bytes": 919,
+        "note": "403 to a non-browser client; contents not inspected, so the matrices MorphoBank holds are neither confirmed nor ruled out"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "could not list matrices"
+      ],
+      "scope": null,
+      "evidence": "Both requests returned HTTP 403 with a 919-byte HTML error page to a scripted client; no project or matrix content could be listed.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:59Z",
+        "method": "GET landing page",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "could not inspect"
+      ],
+      "scope": null,
+      "evidence": "Response was HTTP 200 with an anti-bot interstitial titled \"Making sure you're not a bot!\", not the site.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "vertnet",
+      "name": "VertNet",
+      "landing_url": "https://www.vertnet.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:59Z",
+        "method": "GET http://vertnet.org/ (redirected to https://www.vertnet.org/, 200); API host api.vertnet-portal.appspot.com failed TLS certificate verification (hostname mismatch)",
+        "http_status": 200,
+        "note": "API host certificate hostname mismatch at 08:06:45Z; contents unverified"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "meristic counts not confirmed"
+      ],
+      "scope": null,
+      "evidence": "Landing 200; API request failed before any response.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gift",
+      "name": "GIFT (Global Inventory of Floras and Traits)",
+      "landing_url": "https://gift.uni-goettingen.de/",
+      "access_url": "https://gift.uni-goettingen.de/api/index.php?query=traits_meta",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:59Z",
+        "method": "GET landing (200); GET API index.php?query=traits_meta (200, body \"No query selected.\")",
+        "http_status": 200,
+        "note": "contents unverified"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "trait list not obtained"
+      ],
+      "scope": null,
+      "evidence": "API responded \"No query selected.\" to the query I tried (08:06:45Z).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "try-plant-trait",
+      "name": "TRY Plant Trait Database",
+      "landing_url": "https://www.try-db.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:43Z",
+        "method": "GET landing and TryWeb/Home.php (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "plant trait records (22,860,407 records, 306,701 taxa)"
+      ],
+      "variables_missing": [
+        "floral organ counts and within-species variance not confirmed"
+      ],
+      "scope": null,
+      "evidence": "Home page counts as quoted.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-15091246-aphaniops-meristic-table",
+      "name": "Frequencies of counts of preural vertebrae, modified vertebrae and meristic characters among Aphaniops species (Zenodo figure/table record)",
+      "landing_url": "https://zenodo.org/api/records/15091246",
+      "access_url": null,
+      "doi": null,
+      "license": "notspecified",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:08:53Z",
+        "method": "GET Zenodo records API (found via Zenodo search)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "a table image (figure.svg, figure.png) of meristic count frequencies for four species"
+      ],
+      "variables_missing": [
+        "machine-readable data"
+      ],
+      "scope": "Aphaniops (Teleostei)",
+      "evidence": "Title as given; files figure.svg 1905 B and figure.png 11528 B only; license listed as notspecified.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "FishBase",
+      "query": "Gadus morhua species page, Vertebrae field",
+      "url": "https://www.fishbase.se/summary/Gadus-morhua.html",
+      "hits": 1,
+      "note": "min-max range per species"
+    },
+    {
+      "source": "Dryad",
+      "query": "vertebral count intraspecific variation snakes",
+      "url": "https://datadryad.org/api/v2/search?q=vertebral+count+intraspecific+variation+snakes&per_page=8",
+      "hits": 0
+    },
+    {
+      "source": "Dryad",
+      "query": "stamen number variation within species flowers",
+      "url": "https://datadryad.org/api/v2/search?q=stamen+number+variation+within+species+flowers&per_page=8",
+      "hits": 1,
+      "note": "Penstemon nectary dataset; not stamen counts"
+    },
+    {
+      "source": "Zenodo",
+      "query": "meristic counts vertebrae variation within species dataset individuals",
+      "url": "https://zenodo.org/api/records?q=meristic+counts+vertebrae+variation+within+species+dataset+individuals&size=8",
+      "hits": 1896939,
+      "note": "hits are mostly taxonomic-paper tables and figures; one snake vertebral atlas article"
+    },
+    {
+      "source": "DataCite",
+      "query": "floral organ number variation stamens petals individuals",
+      "url": "https://api.datacite.org/dois?query=floral+organ+number+variation+stamens+petals+individuals&page%5Bsize%5D=8&resource-type-id=dataset",
+      "hits": 0
+    }
+  ],
+  "status": "partial",
+  "summary": "Per-species meristic ranges are public for fishes (FishBase pages show min-max vertebrae, fin-ray counts), but no open dataset of individual-level or variance-bearing counts for vertebrae or stamens was found; MorphoSource and MorphoBank were not reachable by script and the VertNet API failed TLS.",
+  "next_step": "Compile per-species counts with sample sizes from taxonomic revisions (fishes first, using FishBase ranges plus original tables) and pre-register the variance-vs-mean regression on that table.",
+  "obstacles_confirmed": [
+    "Repositories emphasize species representatives rather than within-species samples.",
+    "Museum counts and trait databases use inconsistent sample sizes."
+  ]
+}

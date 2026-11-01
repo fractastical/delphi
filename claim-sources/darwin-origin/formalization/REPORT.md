@@ -437,4 +437,4 @@ Ordered by how clean the statement is and how much of Darwin's wording it captur
 - Validation fields come from `docs/claims.json` as built on its `built` date; re-running
   `node scripts/site/build-claim-graph.mjs` will change the truth scores and the Lean fields
   (the four Darwin reports were added after that build).
-- Nothing here changes `claims.json`, `docs/` or any nanopub. The Lean sources were not edited.
+- Nothing here changes `claims.json`, `site/` or any nanopub. The Lean sources were not edited.

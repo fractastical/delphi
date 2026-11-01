@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/bioelectric-prepattern-predicts-anatomy--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Leave-one-paper-out decoder of published Vmem figures" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> ;
+    dct:description "Admissible images are the voltage-reporter figures (DiBAC or CC2-DMPE) in the open-access papers of Levin and Martyniuk 2018, Pietak and Levin 2016, and Durant et al. 2017, with the phenotype class taken from the caption: for planaria, two-headed, normal, or no-head; for the other tissues, the classes the caption itself names. Features, frozen first, are the anterior-posterior dipole of the reported potential, the number of domains above the caption's own threshold, and a left-right asymmetry index. The split is by paper: train on two, test on the third, all three rotations. Support requires accuracy at least 0.7 and a binomial test against the test paper's majority class at p below 0.05, in at least two rotations. Independent experiments, not panels of one experiment, are the sample. Fewer than 20 independent experiments across the three papers makes the test underpowered. Raw stacks are not required and are not invented." ;
+
+    delphi:proposedTest "Accuracy at least 0.7 and above the majority class at p below 0.05 in at least two of three paper rotations, on at least 20 independent experiments." ;
+    delphi:context "Fails if: Accuracy consistent with the majority class in two or more rotations. The dipole-and-domain decoder then does not predict anatomy on these figures." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Freeze features, classes and the 0.7 accuracy bar before measuring figures. 2. Encode each admissible figure's features from the published image and its caption. 3. Rotate training and test by paper. 4. Score accuracy against the majority-class baseline. 5. Stop as underpowered if fewer than 20 independent experiments exist." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Raw microscopy. Published figures are a biased subset of the experiments, and the test cannot repair that." ;
+    skos:note "Tool: image-analysis" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-girardia-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-16> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2019-boundary-14> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.biosystems.2017.08.009> ;
+    rdfs:seeAlso <https://doi.org/10.3389/fbioe.2016.00055> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bpj.2017.04.011> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does the bioelectric prepattern predict anatomical outcome?" .
+
+
+  <https://doi.org/10.1016/j.biosystems.2017.08.009> dct:title "The bioelectric code: An ancient computational medium for dynamic control of growth and form" ;
+    dct:bibliographicCitation "Levin and Martyniuk 2018, The bioelectric code" .
+  <https://doi.org/10.3389/fbioe.2016.00055> dct:title "Exploring Instructive Physiological Signaling with the Bioelectric Tissue Simulation Engine" ;
+    dct:bibliographicCitation "Pietak and Levin 2016, BETSE paper, included for its published Vmem figures" .
+  <https://doi.org/10.1016/j.bpj.2017.04.011> dct:title "Long-Term, Stochastic Editing of Regenerative Anatomy via Targeting Endogenous Bioelectric Gradients" ;
+    dct:bibliographicCitation "Durant et al. 2017, planarian bioelectric perturbations" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to bioelectric-prepattern-predicts-anatomy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.343Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to bioelectric-prepattern-predicts-anatomy: Leave-one-paper-out decoder of published Vmem figures" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/bioelectric-prepattern-predicts-anatomy--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

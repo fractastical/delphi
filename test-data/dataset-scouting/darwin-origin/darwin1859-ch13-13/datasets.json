@@ -1,0 +1,211 @@
+{
+  "claim_id": "darwin1859-ch13-13",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-08"
+  },
+  "variables_needed": [
+    "identified homologous skeletal/anatomical elements across species within a class",
+    "adjacency or articulation relations between elements, per species",
+    "element size and shape measurements per species",
+    "a homology criterion independent of connection order (gene expression, development)"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET https://morphobank.org/, https://www.morphobank.org/, /index.php/Projects/Search",
+        "http_status": 403,
+        "note": "403 from CDN block page"
+      },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Character matrices across many taxa (per assessors); not verified",
+      "evidence": "All three MorphoBank URLs returned 403 ('The request could not be satisfied. Request blocked') to curl. A Zenodo record 10.5281/zenodo.17314625 ('AI-Assisted Curation of Morphological Matrices: List of projects added to MorphoBank', files 64,409 and 64,172 bytes) was found by search but not read.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET https://www.morphosource.org/api/media and /api/physical-objects (per_page=1)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "3D CT and surface scans of specimens (media_type, modality, taxonomy_name, taxonomy_gbif per specimen)",
+        "shape/size can be measured from meshes"
+      ],
+      "variables_missing": [
+        "connection/adjacency coding",
+        "homology labels per element"
+      ],
+      "scope": "209,875 media items and 98,459 physical objects across taxa; coverage per class not queried",
+      "evidence": "API returned 200 with pages.total_count 209,875 (media) and 98,459 (physical-objects). First record: media_type 'Volumetric Image Series', modality 'MicroNanoXRayComputedTomography'. The search_all=humerus parameter returned the same total_count as the unfiltered call, so a per-element count was not obtained. Download rights vary by item.",
+      "verdict": "partial"
+    },
+    {
+      "id": "uberon",
+      "name": "Uberon anatomy ontology",
+      "landing_url": "https://uberon.github.io/",
+      "access_url": "http://purl.obolibrary.org/obo/uberon.owl",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET OLS4 API /api/ontologies/uberon, property and class search; HEAD purl uberon.owl",
+        "http_status": 200,
+        "bytes": 96347629
+      },
+      "variables_present": [
+        "anatomical term identifiers for vertebrate parts (e.g. humerus UBERON_0000976)",
+        "relation types incl. 'attached to' (RO_0002371) and part_of"
+      ],
+      "variables_missing": [
+        "per-species connection matrices",
+        "invertebrate and floral organ coverage",
+        "size or shape values"
+      ],
+      "scope": "Anatomy of animals (26,735 terms); species-agnostic ontology, not a comparative matrix",
+      "evidence": "OLS returned 200: uberon 26,735 terms, 556 properties, version IRI releases/2026-10-01. Class search 'humerus' returned 110 hits incl. UBERON_0000976. Property search 'attaches to' returned 7 hits incl. 'attached to' RO_0002371; 'articulates with' returned 0. HEAD http://purl.obolibrary.org/obo/uberon.owl returned 200, content-length 96,347,629 (not downloaded). Both uberon.github.io and obophenotype.github.io/uberon returned 200.",
+      "verdict": "partial"
+    },
+    {
+      "id": "vsao",
+      "name": "Vertebrate Skeletal Anatomy Ontology (VSAO)",
+      "landing_url": "https://www.ebi.ac.uk/ols4/ontologies/vsao",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET OLS4 /api/ontologies/vsao",
+        "http_status": 200
+      },
+      "variables_present": [
+        "vertebrate skeletal element terms"
+      ],
+      "variables_missing": [
+        "species-level connectivity data"
+      ],
+      "scope": "Vertebrate skeleton only; 314 terms (version 2012-11-06)",
+      "evidence": "OLS returned 200: numberOfTerms 314, numberOfProperties 42, versionIri .../vsao/2012-11-06/vsao.owl.",
+      "verdict": "partial"
+    },
+    {
+      "id": "hao",
+      "name": "Hymenoptera Anatomy Ontology (HAO)",
+      "landing_url": "https://www.ebi.ac.uk/ols4/ontologies/hao",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET OLS4 /api/ontologies/hao",
+        "http_status": 200
+      },
+      "variables_present": [
+        "hymenopteran anatomical terms and individuals"
+      ],
+      "variables_missing": [
+        "comparison across arthropod orders",
+        "vertebrates or flowers"
+      ],
+      "scope": "Hymenoptera only; 2,597 terms, 2,764 individuals (version 2023-06-01)",
+      "evidence": "OLS returned 200: numberOfTerms 2597, numberOfIndividuals 2764, version 2023-06-01.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "OLS4 ontologies",
+      "query": "uberon, vsao, hao",
+      "url": "https://www.ebi.ac.uk/ols4/api/ontologies/uberon",
+      "hits": 3,
+      "note": "term counts recorded in dataset entries"
+    },
+    {
+      "source": "OLS4 property search",
+      "query": "attaches to",
+      "url": "https://www.ebi.ac.uk/ols4/api/search?q=attaches+to&type=property&ontology=uberon&rows=5",
+      "hits": 7,
+      "note": "'attached to' RO_0002371 present"
+    },
+    {
+      "source": "OLS4 property search",
+      "query": "articulates with",
+      "url": "https://www.ebi.ac.uk/ols4/api/search?q=articulates+with&type=property&ontology=uberon&rows=5",
+      "hits": 0
+    },
+    {
+      "source": "MorphoSource API",
+      "query": "all media; search_all=humerus",
+      "url": "https://www.morphosource.org/api/media?search_all=humerus&per_page=1",
+      "hits": 209875,
+      "note": "filter parameter appeared ignored (same total as unfiltered)"
+    },
+    {
+      "source": "Zenodo",
+      "query": "morphobank character matrix",
+      "url": "https://zenodo.org/api/records?q=morphobank+character+matrix&size=5",
+      "hits": 118917,
+      "note": "noisy; one record about MorphoBank project list (zenodo.17314625)"
+    },
+    {
+      "source": "DataCite",
+      "query": "tetrapod limb skeleton connectivity homology matrix",
+      "url": "https://api.datacite.org/dois?query=tetrapod+limb+skeleton+connectivity+homology+matrix&page%5Bsize%5D=5",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "arthropod appendage homology character matrix",
+      "url": "https://api.datacite.org/dois?query=arthropod+appendage+homology+character+matrix&page%5Bsize%5D=5",
+      "hits": 0
+    },
+    {
+      "source": "Phenoscape KB",
+      "query": "landing",
+      "url": "https://kb.phenoscape.org/",
+      "hits": null,
+      "note": "landing returned 200 (1,171 bytes); contents not inspected"
+    }
+  ],
+  "status": "partial",
+  "summary": "Anatomy ontologies (Uberon, VSAO, HAO) are open and record some relations such as 'attached to', and MorphoSource holds 209,875 specimen scans from which size and shape can be measured. No fetched resource is a comparative table of element-by-element connection order across classes, and MorphoBank was blocked (403) to scripted access.",
+  "next_step": "Choose one class (e.g. tetrapod limb) and compile a connection-order table from MorphoSource scans or MorphoBank limb matrices, with a homology standard fixed beforehand.",
+  "obstacles_confirmed": [
+    "No downloadable comparative connectivity matrix spanning tetrapod limbs, arthropod appendages and floral organs was found.",
+    "MorphoBank returned 403 to scripted access.",
+    "MorphoSource keyword filter did not narrow results in the API call tried."
+  ]
+}

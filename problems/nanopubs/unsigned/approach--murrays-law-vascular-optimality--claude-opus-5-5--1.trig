@@ -1,0 +1,97 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered multi-tissue branching-exponent estimation with errors-in-variables" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> ;
+    dct:description "Datasets: retinal fundus segmentations (DRIVE, HRF, manual vessel annotations), whole mouse brain vasculature (VesSAP), pig coronary morphometry (Kassab et al. 1993 tables) and xylem conduit data (McCulloh et al. 2003). At each bifurcation estimate radii from the segmentation distance transform averaged over a segment length of 5–10 radii away from the junction, and solve r₀^x = r₁^x + r₂^x for x by root-finding. Estimate per-tissue exponent distributions with a hierarchical errors-in-variables model: observed radii are true radii plus heteroscedastic noise with variance calibrated from approach 3. Hypotheses, stated in advance: H3, x = 3 (Murray); H7/3, x = 7/3 (turbulent, large arteries); H_none, no single x across tissues (between-tissue SD of x > 0.3). Decision: a tissue supports H3 if the 95% interval of its mean x contains 3 and excludes 7/3; it supports H7/3 conversely; H_none holds if tissue intervals are disjoint. Also test shear dependence: x versus vessel diameter class within retina and brain." ;
+
+    delphi:proposedTest "Per-tissue posterior intervals for the branching exponent across at least four tissue types, and a verdict among x = 3, x = 7/3, or no single exponent. Thousands of bifurcations per dataset give intervals of about ±0.1 once measurement error is modelled." ;
+    delphi:context "Fails if: Calibrated measurement noise in image-derived radii (2D retinal images especially) inflates x intervals beyond ±0.5, so 3 and 7/3 cannot be distinguished: inconclusive, measurement-limited." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Write result.json with datasets, estimator, noise calibration source and decision rules. 2. Download DRIVE and HRF; obtain VesSAP graphs; transcribe Kassab and McCulloh tables; record checksums. 3. Extract bifurcations and radii; fit the hierarchical model with noise priors from approach 3. 4. Report per-tissue x intervals, the diameter-class trend and the verdict." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: image-segmentation" ;
+    skos:note "Tool: vascular-morphometry" ;
+    skos:note "Tool: bayesian-hierarchical-models" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch15-13> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    rdfs:seeAlso <https://drive.grand-challenge.org/> ;
+    rdfs:seeAlso <https://www5.cs.fau.de/research/data/fundus-images/> ;
+    rdfs:seeAlso <https://discotechnologies.org/VesSAP/> ;
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.12.3.207> ;
+    rdfs:seeAlso <https://doi.org/10.1085/jgp.78.4.431> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature01444> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41592-020-0792-1> ;
+    rdfs:seeAlso <https://doi.org/10.1152/ajpheart.1993.265.1.h350> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2011.0270> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Does real vasculature obey Murray's law?" .
+
+  <https://drive.grand-challenge.org/> dct:title "DRIVE retinal vessel segmentation dataset" ;
+    dct:description "40 fundus images with manual vessel segmentations" .
+  <https://www5.cs.fau.de/research/data/fundus-images/> dct:title "HRF high-resolution fundus database" ;
+    dct:description "High-resolution fundus images with vessel annotations" .
+  <https://discotechnologies.org/VesSAP/> dct:title "VesSAP whole mouse brain vasculature" ;
+    dct:description "Vessel graphs with radii from cleared mouse brains" .
+  <https://doi.org/10.1073/pnas.12.3.207> dct:title "The Physiological Principle of Minimum Work" ;
+    dct:bibliographicCitation "Murray 1926, The physiological principle of minimum work" .
+  <https://doi.org/10.1085/jgp.78.4.431> dct:title "On connecting large vessels to small. The meaning of Murray's law." ;
+    dct:bibliographicCitation "Sherman 1981, On connecting large vessels to small" .
+  <https://doi.org/10.1038/nature01444> dct:title "Water transport in plants obeys Murray's law" ;
+    dct:bibliographicCitation "McCulloh, Sperry and Adler 2003, Water transport in plants obeys Murray's law" .
+  <https://doi.org/10.1038/s41592-020-0792-1> dct:title "Machine learning analysis of whole mouse brain vasculature" ;
+    dct:bibliographicCitation "Todorov et al. 2020, Machine learning analysis of whole mouse brain vasculature (VesSAP)" .
+  <https://doi.org/10.1152/ajpheart.1993.265.1.h350> dct:title "Morphometry of pig coronary arterial trees" ;
+    dct:bibliographicCitation "Kassab, Rider, Tang and Fung 1993, Morphometry of pig coronary arterial trees" .
+  <https://doi.org/10.1098/rsif.2011.0270> dct:title "Intraspecific scaling laws of vascular trees" ;
+    dct:bibliographicCitation "Huo and Kassab 2012 (online 2011), Intraspecific scaling laws of vascular trees" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to murrays-law-vascular-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.302Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to murrays-law-vascular-optimality: Pre-registered multi-tissue branching-exponent estimation with errors-in-variables" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

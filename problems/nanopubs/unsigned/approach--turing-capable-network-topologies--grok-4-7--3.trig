@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/turing-capable-network-topologies--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Monte Carlo the n=4 genericity conjecture" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/turing-capable-network-topologies> ;
+    dct:description "The genericity claim is that for n at least 3, almost all topologies with a feedback loop are Turing-capable. For n = 4 an exact census of 3^16 patterns is not the target. Draw 2000 sign patterns uniformly among those whose interaction digraph contains at least one directed cycle, assign diffusion to a non-empty random subset of species, and test 100 log-uniform rate draws with the same Routh–Hurwitz and wave-number sweep as the n = 3 census. Estimate the capable fraction and a Clopper–Pearson 95 percent interval. Almost-all is pre-registered as a fraction above 0.9. A cycle is required in the sample by construction, so the estimate is conditional on that event. This sample can refute the conjecture and cannot prove it." ;
+
+    delphi:proposedTest "A Clopper–Pearson 95 percent interval for the Turing-capable fraction among 4-node cyclic sign patterns. The conjecture is refuted for this n if the interval lies entirely below 0.9." ;
+    delphi:context "Fails if: The interval covers both sides of 0.9, so the sample does not decide the conjecture. That is a failed test, not evidence for the conjecture. Patterns found capable only because diffusion was accidentally scalar are a bug, not a result." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Sample 2000 four-species sign patterns conditioned on having a directed cycle. 2. Sample diffusion supports that are not scalar. 3. Test 100 rate draws per pattern with the Hurwitz criteria. 4. Compute the capable fraction and the Clopper–Pearson interval. 5. Declare the conjecture refuted for n = 4 if the interval lies below 0.9, and unrefuted otherwise." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: enumeration" ;
+    skos:note "Tool: sign-pattern-matrices" ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-ddi> ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-wavelength> ;
+    skos:related <https://w3id.org/delphi/resource/claim/turing-morphogen-hypothesis> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.cels.2019.07.007> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/turing-capable-network-topologies> a delphi:Concept, schema:Question ;
+    rdfs:label "Classify the network topologies that admit diffusion-driven instability" .
+
+
+  <https://doi.org/10.1016/j.cels.2019.07.007> dct:title "A Comprehensive Network Atlas Reveals That Turing Patterns Are Common but Not Robust" ;
+    dct:bibliographicCitation "Scholes et al. 2019, the numerical genericity claim this sample tests at n = 4" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to turing-capable-network-topologies, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.337Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to turing-capable-network-topologies: Monte Carlo the n=4 genericity conjecture" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/turing-capable-network-topologies--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

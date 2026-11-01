@@ -1,0 +1,104 @@
+{
+  "claim_id": "darwin1859-ch08-12",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:50:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "darwin-07" },
+  "variables_needed": [
+    "cross-fertility or seed/offspring set between named varieties, ecotypes or subspecies, with within-variety controls",
+    "cross-fertility between species pairs (for the species side of the comparison), on a comparable scale",
+    "an independent (non-fertility-based) classification of what counts as a variety vs a species",
+    "maize varieties/stocks with recorded partial or complete cross-incompatibility (Ga1 etc.)"
+  ],
+  "datasets": [
+    {
+      "id": "maizegdb",
+      "name": "MaizeGDB (stocks, loci and crossing records)",
+      "landing_url": "https://www.maizegdb.org/",
+      "access_url": "https://download.maizegdb.org/",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T08:40:00Z", "method": "GET www.maizegdb.org, GET /data_center/stock, HEAD download.maizegdb.org", "http_status": 403, "note": "www.maizegdb.org and /data_center/stock returned 403 to curl (bot block); download.maizegdb.org returned 200 but its contents were not inspected" },
+      "variables_present": [],
+      "variables_missing": ["not verified: stock/cross records and Ga1 incompatibility entries were not read"],
+      "scope": "Maize only.",
+      "evidence": "Only HTTP statuses were obtained, so no variable could be confirmed.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "drosophila-speciation-dataset-coyne-orr-2014",
+      "name": "Data from: On the Coyne and Orr-igin of species (Drosophila speciation, Dryad)",
+      "landing_url": "https://doi.org/10.5061/dryad.g5g43",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.g5g43",
+      "doi": "10.5061/dryad.g5g43",
+      "license": "CC0-1.0 (per Dryad API)",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T08:42:00Z", "method": "GET doi.org (resolved to datadryad.org, 200) and Dryad API dataset metadata", "http_status": 200, "bytes": 58489 },
+      "variables_present": ["intrinsic postzygotic isolation of Drosophila species pairs, dichotomised by whether hybrid males show complete inviability/sterility", "premating isolation scores for species pairs"],
+      "variables_missing": ["variety-level crosses", "taxa other than Drosophila"],
+      "scope": "Drosophila species pairs only; storageSize 58,489 bytes; files named CoynOrriginDat_funk and CoynOrriginDat_roman.",
+      "evidence": "Dryad API abstract and usageNotes quoted: raw data for analyses using Funk et al. 2006 when Funk and Yukilevich data conflict. Species side only.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-incipient-speciation-tree-successional-varieties",
+      "name": "Incipient ecological speciation between successional varieties of a dominant tree (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.q0s20",
+      "access_url": null,
+      "doi": "10.5061/dryad.q0s20",
+      "license": "CC0-1.0 (per Dryad API)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T08:44:00Z", "method": "GET Dryad API dataset metadata (found via Dryad search 'postzygotic isolation hybrid fertility species pairs')", "http_status": 200, "bytes": 98233 },
+      "variables_present": ["postpollination reproductive barriers between varieties of one tree species (per abstract)"],
+      "variables_missing": ["any other taxon", "species-level contrast in the same deposit"],
+      "scope": "One species' varieties; storageSize 98,233 bytes; published 2018-03-13. File contents not opened.",
+      "evidence": "Dryad abstract: examines postpollination reproductive isolating barriers below the species boundary between successional varieties.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-digital-repository-search-interface",
+      "name": "Dryad Digital Repository (assessor-named general repository)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "gemini"],
+      "checked": { "at": "2026-11-01T08:41:00Z", "method": "GET landing (200) and API search", "http_status": 200, "bytes": 15621 },
+      "variables_present": [],
+      "variables_missing": ["a repository, not a dataset: see specific deposits above"],
+      "scope": "A search for 'cross-compatibility varieties partial sterility crosses' returned 0 hits.",
+      "evidence": "Search API results listed in search_log.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "grin-global-accessions",
+      "name": "GRIN-Global (germplasm and accession information)",
+      "landing_url": "https://www.grin-global.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T07:39:00Z", "method": "GET landing page", "http_status": 200, "bytes": 32013 },
+      "variables_present": [],
+      "variables_missing": ["cross-fertility data not located"],
+      "scope": "Germplasm management software site; accession records, not crossing experiments.",
+      "evidence": "Landing page only.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "cross-compatibility varieties partial sterility crosses", "url": "https://datadryad.org/api/v2/search?q=cross-compatibility%20varieties%20partial%20sterility%20crosses", "hits": 0, "note": "nothing" },
+    { "source": "Dryad", "query": "postzygotic isolation hybrid fertility species pairs", "url": "https://datadryad.org/api/v2/search?q=postzygotic%20isolation%20hybrid%20fertility%20species%20pairs", "hits": 3, "note": "tree varieties (q0s20, opened), flycatcher hybrid males (5d44q, opened; one species pair), Neodiprion sawflies (not opened)" },
+    { "source": "DataCite", "query": "reproductive isolation meta-analysis conspecific populations crosses", "url": "https://api.datacite.org/dois?query=reproductive%20isolation%20meta-analysis%20conspecific%20populations%20crosses&page%5Bsize%5D=6", "hits": 0, "note": "nothing" },
+    { "source": "Dryad", "query": "reproductive isolation meta-analysis angiosperms", "url": "https://datadryad.org/api/v2/search?q=reproductive%20isolation%20meta-analysis%20angiosperms", "hits": 1, "note": "whole genome duplication and flowering traits meta-analysis; not relevant" },
+    { "source": "Figshare", "query": "hybrid sterility species pairs crossing experiments", "url": "https://api.figshare.com/v2/articles/search", "hits": 1, "note": "POST search; one hit (PLoS Biol inversion polymorphism paper), not relevant" }
+  ],
+  "status": "partial",
+  "summary": "Species-side data exist for Drosophila (Dryad, CC0) and a one-tree-species variety study is on Dryad, but no multi-taxon table of variety-by-variety cross-fertility was found, and the named MaizeGDB source could not be read (HTTP 403).",
+  "next_step": "Compile a cross-fertility table for varieties/ecotypes (e.g. maize Ga1 lines from MaizeGDB via a browser or the download host, Mimulus, Arabidopsis, Oryza studies named by assessors) and match it with the species-level Drosophila data under an independent taxonomy.",
+  "obstacles_confirmed": [
+    "Variety status is often defined by interfertility (circularity).",
+    "No repository table of conspecific-variety crossing results was found by three searches.",
+    "www.maizegdb.org blocks scripted requests (403)."
+  ]
+}

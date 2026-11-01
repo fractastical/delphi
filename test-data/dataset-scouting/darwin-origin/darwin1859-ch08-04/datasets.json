@@ -1,0 +1,102 @@
+{
+  "claim_id": "darwin1859-ch08-04",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:55:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5", "run": "darwin-07" },
+  "variables_needed": [
+    "F1 production / fertility of interspecific crosses relative to within-species controls",
+    "a denominator of attempted species-pair crosses (including failed or fully fertile ones)",
+    "taxon coverage beyond one genus (plants and animals)",
+    "divergence times or independent taxonomy to define genuine species pairs"
+  ],
+  "datasets": [
+    {
+      "id": "drosophila-speciation-dataset-coyne-orr-2014",
+      "name": "Data from: On the Coyne and Orr-igin of species (Drosophila speciation, Dryad)",
+      "landing_url": "https://doi.org/10.5061/dryad.g5g43",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.g5g43",
+      "doi": "10.5061/dryad.g5g43",
+      "license": "CC0-1.0 (per Dryad API)",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T08:42:00Z", "method": "GET doi.org (resolved to datadryad.org, 200) and Dryad API dataset metadata", "http_status": 200, "bytes": 58489 },
+      "variables_present": ["intrinsic postzygotic isolation per Drosophila species pair, dichotomised by whether hybrid males show complete inviability/sterility", "premating isolation scores per pair"],
+      "variables_missing": ["fertility on a continuous scale relative to conspecific controls (not verified)", "any non-Drosophila taxon"],
+      "scope": "Drosophila species pairs only; storageSize 58,489 bytes; two files (CoynOrriginDat_funk, CoynOrriginDat_roman) per usageNotes; contents not opened.",
+      "evidence": "Dryad API abstract: Coyne and Orr meta-analyses; Haldane's rule; intrinsic postzygotic isolation dichotomised as complete inviability/sterility of hybrid males.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-low-fertility-hybrid-male-flycatchers",
+      "name": "Low fertility of wild hybrid male flycatchers despite recent divergence (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.5d44q",
+      "access_url": null,
+      "doi": "10.5061/dryad.5d44q",
+      "license": "CC0-1.0 (per Dryad API)",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T08:45:00Z", "method": "GET Dryad API dataset metadata (found via Dryad search)", "http_status": 200, "bytes": 11005 },
+      "variables_present": ["hybrid male fertility traits for one bird species pair (per abstract)"],
+      "variables_missing": ["other taxa", "systematic denominator of crosses"],
+      "scope": "One species pair; storageSize 11,005 bytes.",
+      "evidence": "Dryad abstract on postzygotic isolation and hybrid male sperm traits.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-digital-repository-search-interface",
+      "name": "Dryad Digital Repository (assessor-named general repository)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "gemini"],
+      "checked": { "at": "2026-11-01T08:41:00Z", "method": "GET landing (200) and API search", "http_status": 200, "bytes": 15621 },
+      "variables_present": [],
+      "variables_missing": ["a repository, not a dataset; the named compilations (Coyne & Orr, Moyle, Lowry, Rabosky & Matute) were not located here by search"],
+      "scope": "Search 'postzygotic isolation hybrid fertility species pairs' returned 3 hits (one-species or one-genus studies).",
+      "evidence": "See search_log.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "ncbi-genbank-landing",
+      "name": "GenBank (genetic distances and taxonomy for crossed species)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T07:36:00Z", "method": "GET landing page", "http_status": 200, "bytes": 37829 },
+      "variables_present": [],
+      "variables_missing": ["crossing outcomes (sequence archive holds none)"],
+      "scope": "Sequence archive; could supply genetic distance but no hybrid fertility.",
+      "evidence": "Landing page only.",
+      "verdict": "rejected"
+    },
+    {
+      "id": "timetree-divergence-times",
+      "name": "TimeTree (divergence times)",
+      "landing_url": "https://timetree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T07:40:00Z", "method": "GET landing page", "http_status": 200, "bytes": 66349 },
+      "variables_present": ["divergence times between taxa (site purpose; no query run by this scout)"],
+      "variables_missing": ["hybrid fertility"],
+      "scope": "Supplies the covariate, not the outcome.",
+      "evidence": "Landing page HTTP 200 only.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "hybrid sterility interspecific crosses compilation postzygotic isolation", "url": "https://api.datacite.org/dois?query=hybrid%20sterility%20interspecific%20crosses%20compilation%20postzygotic%20isolation&page%5Bsize%5D=6", "hits": 0, "note": "nothing" },
+    { "source": "Dryad", "query": "postzygotic isolation hybrid fertility species pairs", "url": "https://datadryad.org/api/v2/search?q=postzygotic%20isolation%20hybrid%20fertility%20species%20pairs", "hits": 3, "note": "flycatchers (5d44q), tree varieties (q0s20), Neodiprion sawflies (qrfj6q5j3, not opened)" },
+    { "source": "DataCite", "query": "\"tree of sex\" (reproductive-system context)", "url": "https://api.datacite.org/dois?query=%22tree%20of%20sex%22&page%5Bsize%5D=5", "hits": 20, "note": "sexual-system data, not crossing outcomes" },
+    { "source": "Figshare", "query": "hybrid sterility species pairs crossing experiments", "url": "https://api.figshare.com/v2/articles/search", "hits": 1, "note": "POST search; one hit, irrelevant" }
+  ],
+  "status": "partial",
+  "summary": "A CC0 Drosophila species-pair isolation dataset and single-pair studies are public, but no multi-taxon table of attempted interspecific crosses with fertility outcomes (and failed crosses) was found, so the claim's 'plants and animals' scope is not covered.",
+  "next_step": "Locate the Coyne & Orr and Lowry/Moyle supplementary tables (paper supplements, not repository deposits) and combine with the Drosophila deposit and TimeTree divergence times before pre-registering the proportion test.",
+  "obstacles_confirmed": [
+    "Failed and null crosses are under-reported; no denominator of attempted crosses found.",
+    "Public coverage found is dominated by Drosophila, which cannot represent plants and animals at large."
+  ]
+}

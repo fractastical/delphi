@@ -1,0 +1,84 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/clade-trajectory-universality--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "SQS hat-shape test of marine orders and families" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/clade-trajectory-universality> ;
+    dct:description "Pre-register on the Paleobiology Database occurrence API. Taxa: marine invertebrate orders and families with at least 50 occurrences and at least 8 occupied international stages, accepted names only. Richness in each stage is shareholder-quorum subsampling at quorum 0.6 with 1000 trials, using Alroy's sqs. A clade is hat-shaped if the stage of peak subsampled richness lies in the middle third of its occupied duration and richness at both endpoint stages is below half the peak. The null for each clade is a constant-rate birth-death trajectory conditioned on the same duration and the same number of occurrences, passed through the same quorum filter, 200 replicates. The clade p-value is the fraction of null trajectories with symmetry at least as strong. The summary is the fraction of clades that are hat-shaped. Universality, pre-registered, requires that fraction above 0.5 and a bootstrap interval for the excess over the null mean that excludes 0. Repeat with the two most recent Cenozoic stages removed. If that sensitivity flips the call, the result is a pull-of-the-recent artifact." ;
+
+    delphi:proposedTest "Fraction of qualifying clades hat-shaped, with a bootstrap interval for its excess over the null. Supports a general hat only if the fraction exceeds 0.5, the excess interval excludes 0, and the call survives dropping the last two Cenozoic stages." ;
+    delphi:context "Fails if: The excess interval contains 0, or the call flips when recent stages are dropped. The pattern is then indistinguishable from the null or is a sampling-edge artifact." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Freeze quorum, trials, occurrence floor, hat definition and the 0.5 fraction before download. 2. Download PBDB occurrences for accepted marine invertebrate orders and families. 3. Compute SQS richness curves and the hat indicator. 4. Simulate the conditioned birth-death null through the same filter. 5. Bootstrap the excess over the null and repeat after dropping the last two Cenozoic stages." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: PBDB taxonomic status is not a monophyly proof. The test excludes unaccepted names and still cannot guarantee monophyletic clades." ;
+    skos:note "Tool: pbdb" ;
+    skos:note "Tool: paleobiology-statistics" ;
+    skos:note "Tool: subsampling" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-02> ;
+    rdfs:seeAlso <https://paleobiodb.org/data1.2/> ;
+    rdfs:seeAlso <http://bio.mq.edu.au/~jalroy/SQS.html> ;
+    rdfs:seeAlso <https://doi.org/10.1666/06084.1> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1239431> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/clade-trajectory-universality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are clade diversity trajectories universally hat-shaped?" .
+
+  <https://paleobiodb.org/data1.2/> dct:title "Paleobiology Database data service 1.2" ;
+    dct:description "Occurrence lists for marine invertebrate orders and families." .
+  <http://bio.mq.edu.au/~jalroy/SQS.html> dct:title "Alroy shareholder quorum subsampling" ;
+    dct:description "sqs implementation, quorum 0.6, 1000 trials." .
+  <https://doi.org/10.1666/06084.1> dct:title "Symmetric waxing and waning of marine invertebrate genera" ;
+    dct:bibliographicCitation "Foote 2007, Symmetric waxing and waning of marine invertebrate genera" .
+  <https://doi.org/10.1126/science.1239431> dct:title "How the Red Queen Drives Terrestrial Mammals to Extinction" ;
+    dct:bibliographicCitation "Quental and Marshall 2013, How the Red Queen drives terrestrial mammals to extinction" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to clade-trajectory-universality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.340Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to clade-trajectory-universality: SQS hat-shape test of marine orders and families" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/clade-trajectory-universality--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

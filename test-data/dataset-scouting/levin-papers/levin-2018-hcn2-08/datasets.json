@@ -1,0 +1,158 @@
+{
+  "claim_id": "levin-2018-hcn2-08",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T10:25:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "levin-04"
+  },
+  "variables_needed": [
+    "dye-calibrated neural-tube Vmem in Hcn2-injected vs control Xenopus embryos (mV)",
+    "BETSE model configuration reproducing the HCN2 condition",
+    "simulated neural-tube Vmem change under that configuration (mV)"
+  ],
+  "datasets": [
+    {
+      "id": "betse-github",
+      "name": "BETSE: BioElectric Tissue Simulation Engine (betsee/betse)",
+      "landing_url": "https://github.com/betsee/betse",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing page; GitHub API repo and license endpoints; Europe PMC title search for the BETSE paper",
+        "http_status": 200,
+        "bytes": 373748
+      },
+      "variables_present": [
+        "open-source simulator that can run bioelectric tissue models"
+      ],
+      "variables_missing": [
+        "the paper-specific HCN2 simulation configuration (not located)",
+        "in vivo voltage data"
+      ],
+      "scope": "simulator code, not experiment data",
+      "evidence": "Landing HTTP 200 (373,748 bytes); API repos/betsee/betse HTTP 200; repos/betsee/betse/license HTTP 200 (LICENSE file, 1,317 bytes; license type not read). The BETSE paper is PMC4933718 (Front Bioeng Biotechnol 2016, doi 10.3389/fbioe.2016.00055). No search of repo files for an HCN2 config was made.",
+      "verdict": "partial"
+    },
+    {
+      "id": "pai-2018-hcn2-nat-commun",
+      "name": "Pai et al. 2018, HCN2 rescues brain defects (article and supplementary information)",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC5843655/fullTextXML",
+      "access_url": null,
+      "doi": "10.1038/s41467-018-03334-5",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET Europe PMC full-text XML for PMC5843655 and search for a data availability statement and repository names",
+        "http_status": 200,
+        "bytes": 164397
+      },
+      "variables_present": [
+        "published Vmem and model values within the article and SI (per assessors; SI not opened)"
+      ],
+      "variables_missing": [
+        "deposited embryo-level voltage images",
+        "model configuration files"
+      ],
+      "scope": "one paper",
+      "evidence": "HTTP 200, 164,397 bytes. Statement (start of sentence not captured): \"... generated or analyzed during this study are included in this published article and its supplementary information files, or from the corresponding author upon request.\" Zero matches for Dryad, Zenodo, figshare or github in the text.",
+      "verdict": "partial"
+    },
+    {
+      "id": "xenbase-portal-hcn2",
+      "name": "Xenbase",
+      "landing_url": "https://www.xenbase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing with a browser user agent",
+        "http_status": 200,
+        "bytes": 1556,
+        "note": "reCAPTCHA wall"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "dye-calibrated neural-tube Vmem in Hcn2-injected vs control Xenopus embryos (mV)",
+        "BETSE model configuration reproducing the HCN2 condition",
+        "simulated neural-tube Vmem change under that configuration (mV)"
+      ],
+      "scope": "Xenopus community database",
+      "evidence": "HTTP 200 but redirected to a reCAPTCHA page (https://www.xenbase.org/xenbase/recaptcha.do?nextUrl=%2Fxenbase%2F, 1,556 bytes); not queryable by script.",
+      "verdict": "unreachable"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "HCN2 Xenopus",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=HCN2%20Xenopus",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "HCN2 Xenopus voltage BETSE",
+      "url": "https://zenodo.org/api/records?size=5&q=HCN2%20Xenopus%20voltage%20BETSE",
+      "hits": 19621,
+      "note": "free-text; top 5 unrelated to HCN2 voltage"
+    },
+    {
+      "source": "Zenodo",
+      "query": "betse bioelectric tissue simulation engine",
+      "url": "https://zenodo.org/api/records?size=5&q=betse%20bioelectric%20tissue%20simulation%20engine",
+      "hits": 187430,
+      "note": "free-text; no BETSE project archive in top 5"
+    },
+    {
+      "source": "Figshare",
+      "query": "HCN2 Xenopus voltage pre-pattern",
+      "url": "https://api.figshare.com/v2/articles/search",
+      "hits": 0
+    },
+    {
+      "source": "NCBI GEO (eutils db=gds)",
+      "query": "HCN2 Xenopus",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&retmode=json&retmax=5&term=HCN2%20Xenopus",
+      "hits": 0
+    },
+    {
+      "source": "BioStudies",
+      "query": "HCN2 Xenopus voltage",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?pageSize=5&query=HCN2%20Xenopus%20voltage",
+      "hits": 17868,
+      "note": "S-EPMC5843655 is a mirror of the paper itself"
+    },
+    {
+      "source": "DataCite",
+      "query": "Xenopus resting membrane potential CC2-DMPE voltage dye",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=Xenopus%20resting%20membrane%20potential%20CC2-DMPE%20voltage%20dye",
+      "hits": 0
+    },
+    {
+      "source": "Europe PMC",
+      "query": "TITLE:\"BETSE\" OR TITLE:\"Bioelectric Tissue Simulation Engine\"",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?format=json&pageSize=5&query=TITLE%3A%22BETSE%22%20OR%20TITLE%3A%22Bioelectric%20Tissue%20Simulation%20Engine%22",
+      "hits": 1,
+      "note": "PMC4933718"
+    }
+  ],
+  "status": "partial",
+  "summary": "The simulator is open (betsee/betse on GitHub) so the model side can in principle be re-run, but the HCN2-specific configuration was not located and the in vivo dye-calibrated voltages are not deposited: the paper says the data are in the article and SI or on request.",
+  "next_step": "Search the BETSE repo and the paper SI for the HCN2 configuration; extract the reported embryo Vmem values from the article and SI; request embryo-level voltage images from the authors.",
+  "obstacles_confirmed": [
+    "Raw voltage measurements are not linked to an open repository.",
+    "Model output depends on the unpublished-here configuration."
+  ]
+}

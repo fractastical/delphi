@@ -1,0 +1,74 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/species-area-exponent--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Prove the METE slope is not a constant power" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/species-area-exponent> ;
+    dct:description "Formalize the Harte 2009 claim that the MaxEnt species-area curve is not a power law, so a local exponent near 0.25 is an accident of scale. Define expected richness S(A) as S0 times the sum over abundances of the MaxEnt species-abundance probabilities times the probability a species of that abundance is present in a nested cell of area A. Define the local exponent as the derivative of log S with respect to log A. Prove it is not constant on (0, A0) under the Harte constraints, and prove the published limiting statement that the local exponent tends to 0, not to 1/4, as mean abundance per species goes to infinity. This is a theorem about the model. It does not say islands obey the model." ;
+
+    delphi:proposedTest "A no-sorry proof that the METE local exponent is not constant and tends to 0 as mean abundance per species tends to infinity." ;
+    delphi:context "Fails if: Under the stated constraints the local exponent is in fact constant. The formalization would then have found that METE does not say what the approach claims it says." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Encode the MaxEnt abundance distribution and the spatial presence probability from Harte et al. 2009. 2. Define S(A) and the local exponent. 3. Prove the local exponent is non-constant for finite mean abundance. 4. Prove the infinite-abundance limit is 0. 5. Audit axioms." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: macroecology" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch12-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch11-02> ;
+
+    rdfs:seeAlso <https://doi.org/10.1111/j.1461-0248.2009.01328.x> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/species-area-exponent> a delphi:Concept, schema:Question ;
+    rdfs:label "Why does the species-area exponent cluster where it does?" .
+
+
+  <https://doi.org/10.1111/j.1461-0248.2009.01328.x> dct:title "Biodiversity scales from plots to biomes with a universal species–area curve" ;
+    dct:bibliographicCitation "Harte et al. 2009, Biodiversity scales from plots to biomes with a universal species-area curve" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to species-area-exponent, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.340Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to species-area-exponent: Prove the METE slope is not a constant power" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/species-area-exponent--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

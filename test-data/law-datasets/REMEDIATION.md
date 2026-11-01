@@ -23,7 +23,7 @@ removes to `dropped` with `dropped_reason` (nothing is deleted).
 - Blind where stated: round 2 must not read earlier `remediation` entries or the scout's `summary`.
 - Every change is logged in your entry's `actions` (`{source_id, action, reason}`), where `action`
   is one of `verified`, `corrected`, `dropped`, `added`, `flag-resolved`, `flag-kept`.
-- Don't touch other slices, claim files, `docs/`, or the scripts.
+- Don't touch other slices, claim files, `site/`, or the scripts.
 - A dropped source is moved to `dropped` with `dropped_in_round` and `dropped_reason`.
 - Run `node test-data/law-datasets/validate.mjs <law>/<kingdom>` before you finish.
 

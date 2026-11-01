@@ -1,0 +1,87 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does hierarchy itself explain the toughness of biological composites?" ;
+    dct:description "Across nacre, bone, dentin, antler and other mineralised composites, is fracture toughness predicted by quantitative structural descriptors (mineral volume fraction, platelet aspect ratio, interface compliance, number of hierarchical levels) beyond what the constituents' stiffness and strength predict? Is there a scaling of toughness enhancement with the number of hierarchical levels?" ;
+
+    skos:historyNote "Known state: Natural composites reach toughness well above that of their brittle mineral phase (Launey and Ritchie 2009; Wegst et al. 2015). Nacre's tablets and soft interlayer have been modelled as a tension-shear chain and measured at the tablet scale (Jackson, Vincent and Turner 1988; Barthelat et al. 2007), and interface mechanics is reviewed by Barthelat et al. 2016. Ashby, Gibson, Wegst and Olive 1995 chart property ranges of natural materials. What is missing is a single dataset-wide regression that separates the contribution of architecture from constituents, and a test of whether toughness gain compounds with hierarchical levels as often asserted. Thompson's claim (ch. 16-02) that bone is an economical material is the starting point for the bone case." ;
+    dct:subject "both" ;
+    delphi:hypothesisType "open-problem/tier-B" ;
+    skos:scopeNote "Resolved when: A pre-registered meta-analysis of at least 40 published material records spanning at least five biocomposite families, with structural descriptors extracted by stated rules, the null model (constituent-only mixing law) and the toughness-enhancement metric fixed in advance, and a leave-one-family-out validation." ;
+    skos:scopeNote "Refuted if: If a constituent-only model explains the toughness within the stated error bound, hierarchy adds nothing and the claim is refuted for this dataset." ;
+    skos:scopeNote "Refuted if: If enhancement is not monotone in the number of hierarchical levels after controlling for volume fraction, the compounding claim is refuted." ;
+    skos:note "Data access: Published material property tables and supplementary data (Ashby et al. 1995 charts, Wegst et al. 2015 and Barthelat et al. 2016 compilations, tablet-scale nacre measurements); records have to be extracted with provenance and each family's measurement method checked, because fracture toughness methods differ between papers." ;
+    skos:note "Requires: literature-extraction" ;
+    skos:note "Requires: meta-analysis" ;
+    skos:note "Requires: data-test" ;
+    skos:note "Scale: molecular" ;
+    skos:note "Scale: tissue" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-02> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+    rdfs:seeAlso <https://doi.org/10.1002/adma.200803322> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nmat4089> ;
+    rdfs:seeAlso <https://doi.org/10.1038/natrevmats.2016.7> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspb.1988.0056> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.jmps.2006.07.007> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rspa.1995.0075> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> .
+
+  <https://doi.org/10.1002/adma.200803322> dct:title "On the Fracture Toughness of Advanced Materials" ;
+    dct:bibliographicCitation "Launey and Ritchie 2009, On the fracture toughness of advanced materials" .
+  <https://doi.org/10.1038/nmat4089> dct:title "Bioinspired structural materials" ;
+    dct:bibliographicCitation "Wegst et al. 2015, Bioinspired structural materials" .
+  <https://doi.org/10.1038/natrevmats.2016.7> dct:title "Structure and mechanics of interfaces in biological materials" ;
+    dct:bibliographicCitation "Barthelat et al. 2016, Structure and mechanics of interfaces in biological materials" .
+  <https://doi.org/10.1098/rspb.1988.0056> dct:title "The mechanical design of nacre" ;
+    dct:bibliographicCitation "Jackson, Vincent and Turner 1988, The mechanical design of nacre" .
+  <https://doi.org/10.1016/j.jmps.2006.07.007> dct:title "On the mechanics of mother-of-pearl: A key feature in the material hierarchical structure" ;
+    dct:bibliographicCitation "Barthelat et al. 2007, On the mechanics of mother-of-pearl: a key feature in the material hierarchical structure" .
+  <https://doi.org/10.1098/rspa.1995.0075> dct:title "The mechanical properties of natural materials. I. Material property charts" ;
+    dct:bibliographicCitation "Ashby, Gibson, Wegst and Olive 1995, The mechanical properties of natural materials. I. Material property charts" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:curation .
+  sub:curation a prov:Activity ;
+    rdfs:label "Curating open problems that the delphisci agent swarm could attack, from the claim graph (docs/claims.json), its test candidates and the literature" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> ;
+    prov:used <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/site/claims.json> .
+  <https://w3id.org/delphi/resource/agent/cursor-claude-fable-5-1-problem-curator> a prov:SoftwareAgent ;
+    rdfs:label "Cursor agent (Claude Fable 5.1) curating open problems from the claim graph and the literature" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-fable-5-1> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-fable-5-1> a delphi:LanguageModel ;
+    rdfs:label "Claude Fable 5.1" ;
+    dct:identifier "claude-fable-5-1" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.292Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Open problem: Does hierarchy itself explain the toughness of biological composites?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Concept ;
+    npx:introduces <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

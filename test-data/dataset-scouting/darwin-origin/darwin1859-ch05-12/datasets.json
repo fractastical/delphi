@@ -1,0 +1,198 @@
+{
+  "claim_id": "darwin1859-ch05-12",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:50:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-08"
+  },
+  "variables_needed": [
+    "individual-level trait measurements within each species",
+    "grouping of species into congeners / phylogeny to define 'closely allied'",
+    "multiple traits per individual to compare an extreme trait with ordinary traits",
+    "clade-wide versus species-specific trait novelty"
+  ],
+  "datasets": [
+    {
+      "id": "avonet",
+      "name": "AVONET: morphological, ecological and geographical data for all birds",
+      "landing_url": "https://figshare.com/articles/dataset/AVONET_morphological_ecological_and_geographical_data_for_all_birds_Tobias_et_al_2021_Ecology_Letters_/16586228",
+      "access_url": "https://ndownloader.figshare.com/files/34480856",
+      "doi": "10.6084/m9.figshare.16586228",
+      "license": "CC-BY-4.0",
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET Figshare API /v2/articles/16586228; GET landing and doi.org; HEAD ndownloader files",
+        "http_status": 200,
+        "bytes": 21524673,
+        "note": "Landing page 202 and file HEAD 403 from CDN/signed URL; status 200 is for the Figshare API."
+      },
+      "variables_present": [
+        "raw morphological measurements for individual birds (11 continuous traits incl. beak, tarsus, wing, tail)",
+        "species averages in three taxonomic formats (BirdLife, eBird, BirdTree)"
+      ],
+      "variables_missing": [
+        "secondary sexual characters",
+        "taxa other than birds",
+        "per-species sample size not examined"
+      ],
+      "scope": "Birds only: raw measurements from 90,020 individuals of 11,009 species (per Figshare description)",
+      "evidence": "Figshare API returned 200: version v7, DOI 10.6084/m9.figshare.16586228.v7, CC BY 4.0, published 2022-12-05. Files: 'AVONET Supplementary dataset 1.xlsx' 21,524,673 bytes (full dataset incl. raw measurements and species averages), 'Supplementary dataset 2.xlsx' 1,241,301 bytes (duplicate measurements), ELEData.zip 17,758,930 bytes. Figshare landing returned 202 (WAF), doi.org redirects to Wiley (403), HEAD on the signed ndownloader URL returned 403; nothing was downloaded.",
+      "verdict": "partial"
+    },
+    {
+      "id": "birdtree",
+      "name": "BirdTree (global bird phylogeny)",
+      "landing_url": "https://birdtree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET landing",
+        "http_status": 200
+      },
+      "variables_present": [
+        "bird phylogeny for defining congeners"
+      ],
+      "variables_missing": [
+        "trait data"
+      ],
+      "scope": "Birds only; page contents not parsed beyond status",
+      "evidence": "Landing returned 200 (4,828 bytes). AVONET's Figshare description states its species averages are provided in a BirdTree-compatible format.",
+      "verdict": "partial"
+    },
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET https://morphobank.org/ and https://www.morphobank.org/",
+        "http_status": 403,
+        "note": "403 block page"
+      },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "not verified",
+      "evidence": "Both URLs returned 403 (CDN block page) to curl.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET https://www.morphosource.org/api/media?per_page=1",
+        "http_status": 200
+      },
+      "variables_present": [
+        "3D specimen scans across taxa"
+      ],
+      "variables_missing": [
+        "individual-level measurements already extracted",
+        "many individuals per species"
+      ],
+      "scope": "209,875 media items; measurements would have to be taken from meshes",
+      "evidence": "API returned 200 with pages.total_count 209,875.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-repository-portal",
+      "name": "Dryad (repository portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:50:00Z",
+        "method": "GET landing; GET search API",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "any single dataset covering many species with individual measurements"
+      ],
+      "scope": "Portal, not a dataset",
+      "evidence": "Dryad landing page https://datadryad.org/ returned 200 (15,621 bytes); it is a repository, not a dataset. API searches for exaggerated-trait variance returned only single-species studies (see search_log).",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Figshare API",
+      "query": "AVONET article 16586228",
+      "url": "https://api.figshare.com/v2/articles/16586228",
+      "hits": 1,
+      "note": "file list and description recorded"
+    },
+    {
+      "source": "Dryad",
+      "query": "sexually selected trait coefficient of variation",
+      "url": "https://datadryad.org/api/v2/search?q=sexually+selected+trait+coefficient+of+variation&per_page=5",
+      "hits": 2,
+      "note": "2 hits, neither a multi-species trait variance table"
+    },
+    {
+      "source": "Dryad",
+      "query": "intraspecific variation exaggerated trait congeners",
+      "url": "https://datadryad.org/api/v2/search?q=intraspecific+variation+exaggerated+trait+congeners&per_page=5",
+      "hits": null,
+      "note": "HTTP 429 rate limit"
+    },
+    {
+      "source": "DataCite",
+      "query": "condition-dependent exaggerated trait variability among species",
+      "url": "https://api.datacite.org/dois?query=condition-dependent+exaggerated+trait+variability+among+species&page%5Bsize%5D=5",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "coefficient of variation morphological traits individual measurements birds",
+      "url": "https://api.datacite.org/dois?query=coefficient+of+variation+morphological+traits+individual+measurements+birds&page%5Bsize%5D=5",
+      "hits": 4,
+      "note": "no multi-species table; hits were single-study datasets"
+    },
+    {
+      "source": "Zenodo",
+      "query": "within-species variance exaggerated sexually selected traits comparative",
+      "url": "https://zenodo.org/api/records?q=within-species+variance+exaggerated+sexually+selected+traits+comparative&size=5",
+      "hits": 1286074,
+      "note": "noisy; single-species beetle/Drosophila datasets (dryad.f40f4qg, dryad.zcrjdfnhd) and a quantitative-genetics review dataset (dryad.7tv47) not inspected"
+    }
+  ],
+  "status": "partial",
+  "summary": "AVONET is an open, CC BY 4.0 table with raw individual measurements (90,020 birds, 11,009 species, 11 morphological traits) and BirdTree-compatible species averages, so within-species variation can be computed for birds. It covers no secondary sexual characters and no non-bird groups; other groups appear only as single-species datasets.",
+  "next_step": "Confirm per-species individual counts in AVONET Supplementary dataset 1, define congener groups from the BirdTree taxonomy, and pre-register how 'unusually developed' is defined for beak, tail and wing traits.",
+  "obstacles_confirmed": [
+    "AVONET is limited to birds and to size/shape traits, not Darwin's secondary sexual characters.",
+    "No multi-species individual-level table for cirripedes or insects was found.",
+    "Dryad API rate-limited (429) on two queries."
+  ]
+}

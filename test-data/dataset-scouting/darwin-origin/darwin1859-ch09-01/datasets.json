@@ -1,0 +1,200 @@
+{
+  "claim_id": "darwin1859-ch09-01",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T08:10:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-05"
+  },
+  "variables_needed": [
+    "morphological character matrix coding living species and extinct stem fossils of the same clade",
+    "phylogenetic placement of the fossils and living species (stem vs crown, ancestral nodes)",
+    "dated fossil occurrences for extinct taxa"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:10:24Z",
+        "method": "GET landing page and GET /index.php/Projects/ProjectList (second request 2026-11-01T08:03:24Z, also 403)",
+        "http_status": 403,
+        "bytes": 919,
+        "note": "403 to a non-browser client; contents not inspected, so the matrices MorphoBank holds are neither confirmed nor ruled out"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "could not list matrices"
+      ],
+      "scope": null,
+      "evidence": "Both requests returned HTTP 403 with a 919-byte HTML error page to a scripted client; no project or matrix content could be listed.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "paleobiology",
+      "name": "Paleobiology Database (data1.2 API)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Equidae",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:03:04Z",
+        "method": "GET landing (200 at 05:10:24Z); GET taxa/single.json?name=Equidae; GET occs/list.json rowcount queries",
+        "http_status": 200
+      },
+      "variables_present": [
+        "dated fossil occurrences (early/late age bounds eag/lag per occurrence, 2026-11-01 record sample)",
+        "taxonomic placement of extinct taxa"
+      ],
+      "variables_missing": [
+        "morphological character matrices",
+        "phylogenetic position of fossils relative to crown species",
+        "ancestor reconstructions"
+      ],
+      "scope": "All fossil clades; Equidae record: noc 6519 occurrences",
+      "evidence": "taxa/single.json?name=Equidae returned {\"oid\":\"txn:42984\",\"nam\":\"Equidae\",\"ext\":\"1\",\"noc\":6519}; occs/list records carry eag (early age) and lag (late age) in Ma.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree, v3 API)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:03:24Z",
+        "method": "POST tree_of_life/about (landing page tree.opentreeoflife.org: timeout at 05:10:24Z, HTTP 503 at 08:03:07Z)",
+        "http_status": 200,
+        "note": "API answered 200; the web landing page returned 503 when checked"
+      },
+      "variables_present": [
+        "branching relationships among living species (topology of the synthetic tree)"
+      ],
+      "variables_missing": [
+        "morphology",
+        "fossil stem lineages placed in character space"
+      ],
+      "scope": "Synthetic tree opentree16.1, taxonomy 3.7draft3: 2,385,875 tips, built from 2,064 source trees in 1,931 studies",
+      "evidence": "tree_of_life/about response: synth_id opentree16.1, root \"cellular organisms\" num_tips 2385875, num_source_trees 2064, num_source_studies 1931.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "zenodo-13913229-darwin-wasp-matrix",
+      "name": "Morphological data matrix for extant and fossil Darwin wasps (Ichneumonidae)",
+      "landing_url": "https://zenodo.org/api/records/13913229",
+      "access_url": "https://zenodo.org/api/records/13913229",
+      "doi": "10.5281/zenodo.13913229",
+      "license": "cc-by-4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:03:37Z",
+        "method": "GET Zenodo records API for the record (found via Zenodo search)",
+        "http_status": 200,
+        "bytes": 97024
+      },
+      "variables_present": [
+        "morphological character matrix (NEXUS, MorphoData.nex) for extant and fossil taxa of one insect family",
+        "taxon list spreadsheet"
+      ],
+      "variables_missing": [
+        "vertebrate or multi-clade coverage",
+        "stem/crown labels not checked in the file (file content not opened)"
+      ],
+      "scope": "One family (Ichneumonidae)",
+      "evidence": "Record title \"Morphological data matrix for extant and fossil Darwin wasps (Ichneumonidae)\"; files MorphoData.nex 97024 bytes and TaxonList_MorphoData.xlsx 30638 bytes; license cc-by-4.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-4g42q-primate-fossil-matrix",
+      "name": "Data from: Phylogeny, palaeontology, and primates: do incomplete fossils bias the tree of life?",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.4g42q",
+      "access_url": null,
+      "doi": "10.5061/dryad.4g42q",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:03:38Z",
+        "method": "GET Dryad datasets API (found via Dryad search)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "a compiled phylogenetic (morphological) matrix for primates including fossils, per the abstract"
+      ],
+      "variables_missing": [
+        "file list and matrix dimensions not inspected"
+      ],
+      "scope": "Primates",
+      "evidence": "API abstract: \"We compiled a phylogenetic matrix for primates and simulated ...\"; license https://spdx.org/licenses/CC0-1.0.html.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "morphological character matrix fossil extant phylogeny",
+      "url": "https://datadryad.org/api/v2/search?q=morphological+character+matrix+fossil+extant+phylogeny&per_page=8",
+      "hits": 6,
+      "note": "primate fossil matrix (dryad.4g42q), waterfowl Paleogene fossil dataset (dryad.v15dv4208), Lissamphibia and others; mostly single-clade matrices"
+    },
+    {
+      "source": "Zenodo",
+      "query": "morphological character matrix extant fossil taxa phylogeny nexus",
+      "url": "https://zenodo.org/api/records?q=morphological+character+matrix+extant+fossil+taxa+phylogeny+nexus&size=8",
+      "hits": 418561,
+      "note": "Zenodo's total is dominated by unrelated records; top hits include Darwin wasp matrix and Dryad-mirrored fossil-terminal datasets"
+    },
+    {
+      "source": "DataCite",
+      "query": "morphological character matrix fossil extant total evidence",
+      "url": "https://api.datacite.org/dois?query=morphological+character+matrix+fossil+extant+total+evidence&page%5Bsize%5D=8&resource-type-id=dataset",
+      "hits": null,
+      "note": "first hit a Dryad dataset on a fish clade; total not extracted"
+    },
+    {
+      "source": "PBDB",
+      "query": "taxon Equidae",
+      "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Equidae",
+      "hits": 1,
+      "note": "noc 6519"
+    },
+    {
+      "source": "Open Tree of Life",
+      "query": "tree_of_life/about",
+      "url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "hits": 1,
+      "note": "2,385,875 tips"
+    }
+  ],
+  "status": "partial",
+  "summary": "Matrices coding both living species and extinct stem forms exist only as single-clade deposits (a Darwin-wasp matrix on Zenodo, a primate matrix on Dryad) and in MorphoBank, which returned 403 to scripted access. PBDB supplies dated occurrences and Open Tree supplies a living-species tree, but neither holds characters or stem/crown placements.",
+  "next_step": "Pick a clade with a deposited fossil+extant matrix (e.g. the Zenodo Darwin-wasp NEXUS or the Dryad primate matrix), open the files, and pre-register the morphospace geometry test on it; or obtain MorphoBank matrices through a browser or the project export.",
+  "obstacles_confirmed": [
+    "Morphospace geometry depends on character selection.",
+    "No repository found holds a ready cross-clade collection of crown+stem matrices; MorphoBank was not browsable by script."
+  ]
+}

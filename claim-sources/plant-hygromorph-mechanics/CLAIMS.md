@@ -2,7 +2,7 @@
 
 Human-readable version of [`claims/key-claims.json`](claims/key-claims.json), with proof and test
 status, followed by the candidates for the next batch. Status fields follow the repo rule
-([AGENTS.md](../../AGENTS.md), "Theorem is a proof status"): a claim is a theorem only when it is a
+([AGENTS.md](../../../AGENTS.md), "Theorem is a proof status"): a claim is a theorem only when it is a
 mathematical statement and its proof is established (Lean 4 or recorded in the literature); a data
 test is a separate axis and never promotes a claim.
 

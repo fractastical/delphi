@@ -1,0 +1,81 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/mutant-morphant-discrepancy-prediction--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Two-feature transcriptional-adaptation rule tested as a single hypothesis" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> ;
+    dct:description "Instead of a flexible classifier, test the mechanism's own prediction as one pre-registered hypothesis with no tuning. From El-Brolosy et al. 2019 and Ma et al. 2019, transcriptional adaptation requires mutant mRNA decay (an NMD-triggering PTC allele) and upregulates genes sharing sequence similarity with the mutated gene. Rule: predict 'discrepant' iff (i) the phenotyped mutant allele is PTC-bearing and NMD-sensitive and (ii) a paralog with ≥ 50% nucleotide identity over the region of similarity exists. Predict 'concordant' otherwise, including promoter-less or whole-gene deletion alleles, which the mechanism predicts do not compensate. Compute the 2 × 2 contingency table against ZFIN-derived labels (same rule as approach 1), Fisher's exact test, and the odds ratio. Pre-registered: supports if OR ≥ 3 with a 95% CI lower bound > 1.5. A natural experiment within the data: genes with both a PTC allele and a promoter-less allele phenotyped, where the mechanism predicts discordance only for the PTC allele." ;
+
+    delphi:proposedTest "Odds ratio for discrepancy given the two-feature mechanistic signature, and within-gene allele contrasts. A strong association, especially in within-gene contrasts, would turn transcriptional adaptation into a quantitative predictor; OR ≈ 1 would show it does not explain most discrepancies." ;
+    delphi:context "Fails if: Too few genes have promoter-less or whole-gene-deletion alleles phenotyped (fewer than 15) for the within-gene contrast; and allele PTC annotation is missing for many ZFIN alleles." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register the two-feature rule, identity threshold and statistics. 2. Annotate allele classes from ZFIN (PTC position relative to last exon junction; deletion type). 3. Compute paralog identities (Ensembl Compara plus nucleotide alignment of the similarity region). 4. Run Fisher's test; analyse the within-gene PTC versus promoter-less contrast separately." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: zfin" ;
+    skos:note "Tool: sequence-analysis" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch05-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://zfin.org/downloads> ;
+    rdfs:seeAlso <https://rest.ensembl.org/> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41586-019-1064-z> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41586-019-1057-y> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> a delphi:Concept, schema:Question ;
+    rdfs:label "Predict which genes show mutant-morphant discrepancies" .
+
+  <https://zfin.org/downloads> dct:title "ZFIN data downloads" ;
+    dct:description "Allele types and phenotypes" .
+  <https://rest.ensembl.org/> dct:title "Ensembl REST API" ;
+    dct:description "Paralog sequences and identities" .
+  <https://doi.org/10.1038/s41586-019-1064-z> dct:title "Genetic compensation triggered by mutant mRNA degradation" ;
+    dct:bibliographicCitation "El-Brolosy et al. 2019" .
+  <https://doi.org/10.1038/s41586-019-1057-y> dct:title "PTC-bearing mRNA elicits a genetic compensation response via Upf3a and COMPASS components" ;
+    dct:bibliographicCitation "Ma et al. 2019, PTC-bearing mRNA elicits a genetic compensation response via Upf3a and COMPASS components" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to mutant-morphant-discrepancy-prediction, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.306Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to mutant-morphant-discrepancy-prediction: Two-feature transcriptional-adaptation rule tested as a single hypothesis" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/mutant-morphant-discrepancy-prediction--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

@@ -1,0 +1,133 @@
+{
+  "claim_id": "thompson1917-ch16-12",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "craniocaudal profile of neural-spine height per species (from skeletons, CT or measurements)",
+    "mass fraction in head and neck versus tail (or a body-segment mass reconstruction) per species",
+    "locomotor posture (quadruped / bipedal) per species",
+    "phylogeny"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Diplodocus",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET MorphoSource media API with q=Diplodocus (47 media), q=Ovis (1), q=Brachiopoda (0)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "public 3D media for some taxa, e.g. 47 media records matching 'Diplodocus'"
+      ],
+      "variables_missing": [
+        "no neural-spine height or segment-mass fields; measurements would have to be taken from the scans",
+        "coverage by taxon is uneven (0 for some queries)"
+      ],
+      "scope": "Vertebrate-dominated 3D specimen repository",
+      "evidence": "pages.total_count 47 for q=Diplodocus, 1 for q=Ovis, 0 for q=Brachiopoda; each record is a media file, not a measurement table.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "digimorph",
+      "name": "DigiMorph",
+      "landing_url": "https://digimorph.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "HEAD landing page",
+        "http_status": 200,
+        "note": "Landing page was a 161-byte stub to my client; content not examined."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "no machine-readable index obtained"
+      ],
+      "scope": "CT collection portal",
+      "evidence": "HEAD returned 200 but only 161 bytes (text/html, iso-8859-1); I could not enumerate specimens or check for postcranial scans.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Diplodocidae&show=attr",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "GET taxa/single.json?name=Diplodocidae&show=attr",
+        "http_status": 200
+      },
+      "variables_present": [
+        "taxonomy and occurrence counts, e.g. Diplodocidae 270 occurrences (noc)"
+      ],
+      "variables_missing": [
+        "no neural-spine heights",
+        "no body-mass or segment-mass data"
+      ],
+      "scope": "Fossil occurrences across all taxa",
+      "evidence": "Response record: oid txn:38664, nam Diplodocidae, noc 270.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "MorphoSource",
+      "query": "Diplodocus",
+      "url": "https://www.morphosource.org/api/media?q=Diplodocus",
+      "hits": 47
+    },
+    {
+      "source": "DataCite",
+      "query": "neural spine height vertebral column mammals",
+      "url": "https://api.datacite.org/dois?query=neural%20spine%20height%20vertebral%20column%20mammals&page[size]=5",
+      "hits": 7,
+      "note": "all seven are Zenodo taxon-treatment records, no measurements"
+    },
+    {
+      "source": "Dryad",
+      "query": "vertebral column neural spine height",
+      "url": "https://datadryad.org/api/v2/search?q=vertebral%20column%20neural%20spine%20height&per_page=5",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "dinosaur body mass segment head neck tail mass distribution",
+      "url": "https://zenodo.org/api/records?q=dinosaur%20body%20mass%20segment%20head%20neck%20tail%20mass%20distribution&size=5",
+      "hits": 848539,
+      "note": "unranked broad match; top hits are Tyrannosaurus taxon treatments and a deer-mouse body-size set, none with segment masses"
+    }
+  ],
+  "status": "gap",
+  "summary": "No repository dataset holds neural-spine height profiles together with head/neck/tail mass fractions. MorphoSource has scans for some taxa (47 media for 'Diplodocus') and the PBDB gives occurrence context, but spine heights and segment masses would have to be measured or compiled; searches of Dryad, DataCite and Zenodo returned no measurement tables.",
+  "next_step": "Compile a table of tallest-spine position and height from published skeletal measurements or scans for a clade-spanning set (anteaters, kangaroos, sauropods, ungulates), and a segment-mass source for the living species; keep reconstructed fossil masses flagged because they depend on the skeleton.",
+  "obstacles_confirmed": [
+    "Soft-tissue mass in fossils is reconstructed indirectly.",
+    "No spine-height database located."
+  ]
+}

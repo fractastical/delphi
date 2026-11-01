@@ -1,0 +1,76 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--gemini-4-argon--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean 4 proof of constrained hollow-tube optimality with core mass and buckling bounds" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> ;
+    dct:description "Extend `ThompsonLaws/Mechanics.lean` (which currently formalizes `thompson1917-ch16-04` for thin-walled section modulus) to formalize the exact constrained optimization of a circular tube with outer radius R, inner radius r = q R (0 <= q < 1), wall density rho_w, and internal core (marrow or foam) density rho_c = alpha * rho_w under two distinct mechanical constraints: (A) fixed total linear mass m = pi R^2 [(1 - q^2) + alpha q^2] rho_w, and (B) the Brazier-type local buckling inequality R / (R - r) <= k_max.\n\nProve in Lean 4 that: (1) for an empty tube (alpha = 0), bending stiffness EI = (pi/4) E R^4 (1 - q^4) at fixed mass m diverges as q -> 1, so no finite unconstrained optimum exists without a buckling or minimum-thickness bound, and under the constraint 1/(1 - q) <= k_max the unique global maximizer sits on the buckling boundary; and (2) for a marrow- or pith-filled tube (0 < alpha < 1), EI / m^2 attains a unique interior global maximum at an exact algebraic root q*(alpha), which reproduces the Alexander-Currey thickness ratio when alpha approx 0.5." ;
+
+    delphi:proposedTest "A machine-checked Lean 4 theorem (`hollowTube_optimal_radiusRatio`) with zero `sorry` proving both the buckling-boundary optimum for empty tubes and the exact interior optimum q*(alpha) for core-filled tubes, resolving the ambiguity in Thompson's (`thompson1917-ch16-03`) optimization statement." ;
+    delphi:context "Fails if: Inability to close the algebraic positivity and derivative-sign lemmas in Lean 4, or finding that the core-mass objective fails to have a unique interior maximum on (0, 1)." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define the exact second moment of area I(R, q) = (pi/4) R^4 (1 - q^4) and linear mass m(R, q, alpha) in `ThompsonLaws/Mechanics.lean`. 2. Prove that for alpha = 0, the mass-normalized bending efficiency I / m^2 = (1 + q^2) / (1 - q^2) is strictly increasing on [0, 1), forcing the constrained optimum onto the buckling boundary q = 1 - 1/k_max. 3. Differentiate the efficiency functional (1 - q^4) / (1 - (1 - alpha) q^2)^2 for 0 < alpha < 1 in Lean 4 and prove the unique interior maximum at q^2 = (1 - 2 alpha) / (2 - 2 alpha) when alpha < 1/2. 4. Prove the regime-transition corollary showing that marrow-filled bones (alpha >= 1/2) and pneumatized bones (alpha -> 0) occupy mathematically distinct optimization regimes." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: mechanics-modelling" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+
+    rdfs:seeAlso <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> ;
+    rdfs:seeAlso <https://doi.org/10.1080/14786430410001680935> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/hollow-tube-mass-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are biological hollow structures at the stiffness-per-mass optimum?" .
+
+
+  <https://doi.org/10.1111/j.1469-7998.1985.tb03551.x> dct:title "The thickness of the walls of tubular bones" ;
+    dct:bibliographicCitation "Currey and Alexander 1985, The thickness of the walls of tubular bones" .
+  <https://doi.org/10.1080/14786430410001680935> dct:title "The mechanical efficiency of natural materials" ;
+    dct:bibliographicCitation "Wegst and Ashby 2004, The mechanical efficiency of natural materials" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to hollow-tube-mass-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.314Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to hollow-tube-mass-optimality: Lean 4 proof of constrained hollow-tube optimality with core mass and buckling bounds" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/hollow-tube-mass-optimality--gemini-4-argon--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

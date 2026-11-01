@@ -3,7 +3,7 @@
   "claim_iri": "https://w3id.org/delphi/resource/claim/levin-2022-tame-19",
   "project": "levin-papers",
   "approach": "morphogenesis-cognition-gene-overlap--grok-4-7--1",
-  "status": "preregistered",
+  "status": "complete",
   "hypothesis": "Among human protein-coding genes, genes annotated (non-IEA) to GO:0009653 anatomical structure morphogenesis and genes annotated (non-IEA) to GO:0007611 learning or memory overlap with odds ratio > 2, and that overlap exceeds a permutation null that preserves both set sizes and matches genes on number of GO annotations and on degree in the INDRA CoGEx statement graph; the same holds within the ion-channel subset (GO:0005216) and within the gap-junction subset (GO:0005921).",
   "pass_criterion": "Pre-registered. Primary run (IEA excluded). For each of three endpoints, (E1) all human protein-coding genes, (E2) the subset annotated to GO:0005216 monoatomic ion channel activity or descendants, (E3) the subset annotated to GO:0005921 gap junction or descendants, the endpoint passes if the observed odds ratio of the 2x2 table (morphogenesis membership x learning-or-memory membership, within that endpoint's universe) is > 2 AND the one-sided matched-permutation p-value, (1 + #{null OR >= observed OR}) / (1 + 10000), is < 0.01. Verdict 'supports' requires E1, E2 and E3 all to pass in the primary run.",
   "fail_criterion": "Pre-registered. Verdict 'refutes' if E1 fails in the primary run (observed OR <= 2 or matched-permutation p >= 0.01), i.e. the full-set overlap is not wide beyond annotation volume and statement-graph degree. Verdict 'mixed' if E1 passes but E2 or E3 fails or is underpowered. A subset endpoint is underpowered (and counted as not passing) if its universe has fewer than 5 learning-or-memory genes or fewer than 5 morphogenesis genes. A pass that appears only in the IEA-included run does not count toward any verdict; that run is reported, labelled, as a secondary analysis.",
@@ -20,6 +20,227 @@
     "admissible_datasets": "Current GO Consortium human annotations and ontology, HGNC protein-coding gene list, INDRA CoGEx statement graph; all public, none derived from Levin's papers.",
     "inference_method": "Observed 2x2 odds ratio compared with 10,000 stratified label permutations matched on annotation count and INDRA degree; thresholds OR > 2 and one-sided permutation p < 0.01 per endpoint."
   },
+  "interpretation": "TAME (Levin 2022) predicts that genes involved in morphogenesis overlap widely with memory and learning genes. 'Morphogenesis' is GO:0009653 anatomical structure morphogenesis and 'learning and memory' is GO:0007611 learning or memory, each with is_a/part_of descendants, in human protein-coding genes. 'Beyond pleiotropy' is operationalised as beyond a permutation null matched on number of GO annotations (annotation volume) and number of INDRA CoGEx statements (how studied and how connected a gene is). The ion-channel and gap-junction subsets are the bioelectric machinery Levin names. Primary evidence rule is every GO evidence code except IEA (so ISS, IBA, TAS and similar curated inferences are included, unlike the earlier mouse experimental-only test in the parent directory).",
+  "datasets": [
+    {
+      "id": "go-basic-obo",
+      "name": "Gene Ontology, basic edition (go-basic.obo)",
+      "landing_url": "https://geneontology.org/docs/download-ontology/",
+      "doi": null,
+      "version": "current release as retrieved (server last-modified 2026-08-08)",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://purl.obolibrary.org/obo/go/go-basic.obo",
+          "retrieved_at": "2026-11-01T10:15:33Z",
+          "byte_size": 32227785,
+          "sha256": "b08d45b268b8c24ccb2513dbbbc7d4df9f6521c099b413f79eb31e06e0fa3bcc"
+        }
+      ],
+      "role": "term hierarchy (is_a, part_of) for propagation and set definition"
+    },
+    {
+      "id": "goa-human-gaf",
+      "name": "GOA human GO annotations (GAF 2.2), via the GO Consortium",
+      "landing_url": "https://current.geneontology.org/products/pages/downloads.html",
+      "doi": null,
+      "version": "current release as retrieved",
+      "license": "CC BY 4.0",
+      "files": [
+        {
+          "download_url": "https://current.geneontology.org/annotations/goa_human.gaf.gz",
+          "retrieved_at": "2026-11-01T10:15:35Z",
+          "byte_size": 15041996,
+          "sha256": "db472faff1785878521693af62646546cea6af4a386609dd01c72c0554a46a30"
+        }
+      ],
+      "role": "gene-to-GO annotations with evidence codes (set membership, annotation counts, subsets)"
+    },
+    {
+      "id": "hgnc-protein-coding",
+      "name": "HGNC approved genes, locus type 'gene with protein product'",
+      "landing_url": "https://www.genenames.org/download/statistics-and-files/",
+      "doi": null,
+      "version": "current release as retrieved",
+      "license": "CC0",
+      "files": [
+        {
+          "download_url": "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/locus_types/gene_with_protein_product.txt",
+          "retrieved_at": "2026-11-01T10:15:35Z",
+          "byte_size": 9498389,
+          "sha256": "6a274291fd9029a2ca41b8b00cd114b039629db3a6d68a52eedd3e6b422a3304"
+        }
+      ],
+      "role": "universe of human protein-coding genes and UniProt-to-HGNC mapping"
+    },
+    {
+      "id": "indra-cogex-statement-degree",
+      "name": "INDRA CoGEx knowledge graph, per-gene count of distinct INDRA statements",
+      "landing_url": "https://discovery.indra.bio/",
+      "doi": null,
+      "version": "indra_cogex MCP server 1.27.1, queried live",
+      "license": "INDRA CoGEx public service terms (BSD-2 code; content per upstream sources)",
+      "files": [
+        {
+          "download_url": "https://discovery.indra.bio/mcp",
+          "retrieved_at": "2026-11-01T10:15:37Z",
+          "byte_size": 280302,
+          "sha256": "bf594d1a330454034d7f3edb4ece8b4dd046a5cf0fcec234ffc43357f6dd490a",
+          "query": "UNWIND $ids AS gid MATCH (a:BioEntity {id: gid}) OPTIONAL MATCH (a)-[r:indra_rel]-() RETURN gid AS id, count(DISTINCT r.stmt_hash) AS degree"
+        }
+      ],
+      "role": "statement-graph degree, a matching covariate of the permutation null"
+    }
+  ],
+  "method": "fetch.py downloads go-basic.obo, the GOA human GAF and the HGNC protein-coding list, and queries INDRA CoGEx (execute_cypher over the public MCP endpoint, batches of 250 HGNC ids) for each gene's count of distinct indra_rel statement hashes. analysis.py drops NOT-qualified and obsolete-term lines, maps UniProt accessions to 19,276 HGNC protein-coding genes, propagates annotations over is_a/part_of, and builds the 2x2 table of GO:0009653 x GO:0007611 membership overall (E1) and within the GO:0005216 (E2) and GO:0005921 (E3) subsets. The null shuffles learning-or-memory labels within strata of annotation count x INDRA degree (5x5 quantile strata for E1, 3x3 within subsets), 10,000 permutations, seed 20261101; p = (1 + #null OR >= observed) / 10,001. The primary run excludes IEA; a labelled secondary run includes it.",
+  "measured": {
+    "value": 5.9585,
+    "unit": "odds ratio, GO:0009653 x GO:0007611 human protein-coding genes, IEA excluded",
+    "n": 19276,
+    "uncertainty": "95% CI 4.0202-8.8316; matched-permutation p = 0.0002",
+    "extra": {
+      "universe_hgnc_protein_coding": 19276,
+      "gaf": {
+        "lines": 906445,
+        "unmapped_to_hgnc_protein_coding": 60356,
+        "not_qualified": 1501,
+        "obsolete_or_unknown_term": 162
+      },
+      "indra": {
+        "genes_queried": 19276,
+        "genes_absent_from_cogex_set_to_0": 10,
+        "median_statements": 253.0
+      },
+      "primary_iea_excluded": {
+        "genes_with_any_annotation": 18504,
+        "E1_all_protein_coding": {
+          "endpoint": "E1 all human protein-coding genes",
+          "n": 19276,
+          "morphogenesis_genes": 1417,
+          "learning_or_memory_genes": 117,
+          "overlap": 37,
+          "underpowered": false,
+          "odds_ratio": 5.9585,
+          "ci95": [
+            4.0202,
+            8.8316
+          ],
+          "expected_overlap_independence": 8.6,
+          "fisher_one_sided_p": 9.012e-15,
+          "strata": 25,
+          "null_overlap_mean": 20.07,
+          "null_or_median": 2.6215,
+          "null_or_p99": 4.4184,
+          "or_over_null_median": 2.2729,
+          "permutation_p": 0.0002,
+          "passes": true
+        },
+        "E2_ion_channel_GO_0005216": {
+          "endpoint": "E2 ion-channel subset",
+          "n": 407,
+          "morphogenesis_genes": 21,
+          "learning_or_memory_genes": 7,
+          "overlap": 2,
+          "underpowered": false,
+          "odds_ratio": 8.0211,
+          "ci95": [
+            1.4604,
+            44.054
+          ],
+          "expected_overlap_independence": 0.36,
+          "fisher_one_sided_p": 0.04557,
+          "strata": 9,
+          "null_overlap_mean": 0.92,
+          "null_or_median": 3.1667,
+          "null_or_p99": 15.9167,
+          "or_over_null_median": 2.533,
+          "permutation_p": 0.2254,
+          "passes": false
+        },
+        "E3_gap_junction_GO_0005921": {
+          "endpoint": "E3 gap-junction subset",
+          "n": 26,
+          "morphogenesis_genes": 3,
+          "learning_or_memory_genes": 0,
+          "overlap": 0,
+          "underpowered": true,
+          "passes": false
+        },
+        "verdict_by_preregistered_rule": "mixed"
+      },
+      "secondary_iea_included_LABELLED": {
+        "genes_with_any_annotation": 18848,
+        "E1_all_protein_coding": {
+          "endpoint": "E1 all human protein-coding genes",
+          "n": 19276,
+          "morphogenesis_genes": 1550,
+          "learning_or_memory_genes": 176,
+          "overlap": 57,
+          "underpowered": false,
+          "odds_ratio": 5.6488,
+          "ci95": [
+            4.1014,
+            7.7799
+          ],
+          "expected_overlap_independence": 14.15,
+          "fisher_one_sided_p": 1.044e-20,
+          "strata": 25,
+          "null_overlap_mean": 35.32,
+          "null_or_median": 2.8812,
+          "null_or_p99": 4.3936,
+          "or_over_null_median": 1.9605,
+          "permutation_p": 0.0002,
+          "passes": true
+        },
+        "E2_ion_channel_GO_0005216": {
+          "endpoint": "E2 ion-channel subset",
+          "n": 437,
+          "morphogenesis_genes": 29,
+          "learning_or_memory_genes": 13,
+          "overlap": 5,
+          "underpowered": false,
+          "odds_ratio": 10.4167,
+          "ci95": [
+            3.1662,
+            34.2705
+          ],
+          "expected_overlap_independence": 0.86,
+          "fisher_one_sided_p": 0.0008053,
+          "strata": 9,
+          "null_overlap_mean": 2.77,
+          "null_or_median": 4.5923,
+          "null_or_p99": 14.9441,
+          "or_over_null_median": 2.2683,
+          "permutation_p": 0.1044,
+          "passes": false
+        },
+        "E3_gap_junction_GO_0005921": {
+          "endpoint": "E3 gap-junction subset",
+          "n": 29,
+          "morphogenesis_genes": 3,
+          "learning_or_memory_genes": 0,
+          "overlap": 0,
+          "underpowered": true,
+          "passes": false
+        },
+        "verdict_by_preregistered_rule": "mixed"
+      }
+    }
+  },
+  "data_kind": "biological",
+  "verdict": "mixed",
+  "confidence": 0.6,
+  "caveats": [
+    "Pre-registered rule gives 'mixed': the full-set endpoint passes (OR 5.96, 95% CI 4.02-8.83, 37 genes vs 8.6 expected; matched-null median OR 2.62, p = 0.0002), the ion-channel endpoint fails (2 of 7 learning-or-memory ion-channel genes are morphogenesis genes; OR 8.02 but p = 0.23, CI 1.46-44.1), and the gap-junction endpoint is underpowered (26 genes, 0 annotated to learning or memory). The bioelectric subsets Levin names therefore give no support, mostly for lack of data.",
+    "The OR > 2 threshold is weak on its own: the matched null's median OR is already 2.62, so the informative quantity is the excess over the null (2.27x) and the permutation p.",
+    "The IEA-included run gives the same picture (E1 OR 5.65, p = 0.0002; E2 OR 10.42, p = 0.10; E3 underpowered), so the full-set hit is not an IEA artefact.",
+    "This conflicts in direction with the earlier mouse test in the parent directory (experimental codes only, annotation-depth decile Mantel-Haenszel OR 0.94, refutes). Species, evidence codes and the matching scheme differ; 5x5 quantile strata control annotation volume more coarsely than within-decile stratification, so residual study bias may remain.",
+    "GO annotation bias: genes are annotated to learning or memory mostly after behavioural knockout studies, which favour genes already studied in development. Matching on annotation count and INDRA degree absorbs this only approximately; INDRA degree is itself literature-derived.",
+    "Only 117 human genes carry non-IEA learning-or-memory annotations, so the learning set is small and subset endpoints have little power.",
+    "60,356 GAF lines did not map to an approved HGNC protein-coding gene through HGNC's UniProt list and were dropped; 10 HGNC ids are absent from CoGEx and were given degree 0.",
+    "GO, GOA, HGNC and CoGEx are 'current' and unversioned in their URLs; re-running later will fetch newer releases and numbers will drift. The SHA-256s identify the files used; the INDRA table is regenerated by query.",
+    "Approach executed by a Claude Opus 5.5 agent on a plan proposed by grok-4-7. During the run the repo was restructured (test-data moved under ); the pre-registered result.json was written before any data were fetched (prereg 2026-11-01T05:50Z, first download 10:15Z)."
+  ],
   "agent": {
     "kind": "local-agent",
     "model": "claude-opus-5.5",

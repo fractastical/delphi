@@ -1,0 +1,92 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Estimate the branching exponent on retina and large vessels" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> ;
+    dct:description "Pre-register three sources: the DRIVE gold-standard vessel segmentations (40 images), the HRF gold-standard segmentations (45 images: 15 healthy, 15 glaucoma, 15 diabetic retinopathy), and the cardiovascular models in the Vascular Model Repository. Extract branch points from the existing segmentations and from the repository centerlines. At each bifurcation estimate α by minimizing the squared difference between log(r_parent to the α) and log(r_1 to the α plus r_2 to the α). Pool α in a Gaussian model with a random intercept for image or model. Hypotheses, decided by AIC and by the 95 percent interval: a single α whose interval contains 3, a single α whose interval contains 7/3, or no single exponent. No single exponent wins if a model with α depending on source (retina versus large vessel) beats the single-α model by AIC of more than 10, or if the single-α interval has width greater than 1. A source with fewer than 100 branch points is dropped. The test proceeds only if at least two sources remain." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--grok-4-7--2#n_images-40> ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--grok-4-7--2#n_images-45> ;
+    delphi:proposedTest "A 95 percent interval for α and an AIC comparison. Murray's cubic law is supported only if the interval contains 3 and excludes 7/3, and the source-dependent model does not win." ;
+    delphi:context "Fails if: The interval excludes 3 in both retina and large vessels, which refutes a general cubic law, or the interval contains both 3 and 7/3 and the source model does not win, which leaves the exponent unresolved." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Freeze the estimator, the AIC gap and the 100-branch minimum. 2. Extract bifurcations from DRIVE, HRF and the Vascular Model Repository. 3. Estimate per-junction α and pool with a random intercept. 4. Compare α = 3, α = 7/3 and a source-dependent α by AIC and intervals. 5. Drop any source under 100 branch points and stop if fewer than two sources remain." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: image-segmentation" ;
+    skos:note "Tool: vascular-morphometry" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch15-13> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-03> ;
+    rdfs:seeAlso <https://drive.grand-challenge.org/> ;
+    rdfs:seeAlso <https://www5.cs.fau.de/research/data/fundus-images/index.html> ;
+    rdfs:seeAlso <https://www.vascularmodel.com/> ;
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.12.3.207> ;
+    rdfs:seeAlso <https://doi.org/10.1085/jgp.78.4.431> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/murrays-law-vascular-optimality> a delphi:Concept, schema:Question ;
+    rdfs:label "Does real vasculature obey Murray's law?" .
+  <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--grok-4-7--2#n_images-40> a schema:PropertyValue ;
+    schema:propertyID "n_images" ;
+    schema:value 40 ;
+    schema:description "images named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--grok-4-7--2#n_images-45> a schema:PropertyValue ;
+    schema:propertyID "n_images" ;
+    schema:value 45 ;
+    schema:description "images named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://drive.grand-challenge.org/> dct:title "DRIVE retinal vessel segmentation" ;
+    dct:description "Forty fundus images with manual vessel masks; branch points taken from the masks." .
+  <https://www5.cs.fau.de/research/data/fundus-images/index.html> dct:title "High-Resolution Fundus image database" ;
+    dct:description "Forty-five images with binary vessel gold standards." .
+  <https://www.vascularmodel.com/> dct:title "Vascular Model Repository" ;
+    dct:description "Cardiovascular models whose centerline radii supply large-vessel bifurcations." .
+  <https://doi.org/10.1073/pnas.12.3.207> dct:title "The Physiological Principle of Minimum Work" ;
+    dct:bibliographicCitation "Murray 1926, the cubic prediction" .
+  <https://doi.org/10.1085/jgp.78.4.431> dct:title "On connecting large vessels to small. The meaning of Murray's law." ;
+    dct:bibliographicCitation "Sherman 1981, arterial agreement with the cubic law" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to murrays-law-vascular-optimality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.342Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to murrays-law-vascular-optimality: Estimate the branching exponent on retina and large vessels" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/murrays-law-vascular-optimality--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

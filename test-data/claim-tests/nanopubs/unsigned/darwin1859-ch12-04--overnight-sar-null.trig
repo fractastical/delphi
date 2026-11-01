@@ -1,0 +1,71 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-04--claim-test--overnight-sar-null> a delphi:Assessment ;
+    rdfs:label "Claim test of darwin1859-ch12-04 (overnight-sar-null): inconclusive, confidence 0.8" ;
+    delphi:assessmentType "claim-test/0.1.0" ;
+    delphi:hasVerdict "inconclusive" ;
+    delphi:hasConfidence "0.8"^^xsd:double ;
+    delphi:hypothesis "If no mechanism beyond the species-abundance distribution and random placement sets the island species-area exponent, the distribution of dataset-level power-law exponents z in the Triantis, Guilhaumon and Whittaker 2012 island compilation is indistinguishable from the Coleman null E[S(a)] = sum_i 1-(1-a)^{n_i}." ;
+    delphi:passCriterion "A two-sample Anderson-Darling test of the observed per-dataset z values against the Coleman-null z values gives p > 0.05 under at least one pre-registered SAD family (lognormal with sigma in [1, 3], log-series with alpha in [5, 500], or Preston's canonical constraint). That result means z needs no ecological mechanism beyond abundance structure and random placement." ;
+    delphi:failCriterion "Observed z is systematically higher than the null when the Anderson-Darling p is at most 0.05 and the observed median z exceeds the null median z. That excess (observed median minus null median) is the contribution of a further mechanism. A systematic shortfall is a mismatch of the sampling-only account and is not called an excess." ;
+    delphi:expectedObservation "Per-dataset power-law exponents from the Triantis et al. 2012 island compilation fall inside the Coleman random-placement null (Anderson-Darling p > 0.05) for a pre-registered species-abundance family." ;
+    delphi:disconfirmingObservation "The observed exponents are systematically higher than that null (Anderson-Darling p <= 0.05 and a higher observed median), an excess over sampling. If the compilation's observed z values cannot be obtained from a public file, the comparison is not run and the verdict is inconclusive with reason data-unavailable; observed z values are never invented." ;
+    delphi:admissibleDatasets "A public file from the Triantis, Guilhaumon and Whittaker 2012 Journal of Biogeography paper (DOI 10.1111/j.1365-2699.2011.02652.x) or its journal supplement, Dryad, Zenodo or Figshare deposit, that reports island species-area datasets with a fitted exponent z, or the island areas and richness values from which z can be refit. The file must be fetched from a URL that resolves; area span and island count may be used to place the null, but the comparison requires the observed z values themselves." ;
+    delphi:inferenceMethod "Null z is the ordinary-least-squares slope of log(E[S(a)]) on log(a), with E[S(a)] = sum_i 1-(1-a)^{n_i} (Coleman 1981). The SAD grid, fixed before any download, is: J in {1e3, 1e5, 1e7, 1e9}; lognormal sigma in {1, 2, 3} with S0 in {20, 100, 500}, abundances set by lognormal quantiles scaled to sum to J and then largest-remainder rounded to integers of at least 1; log-series alpha in {5, 50, 500} with the closed form E[S(a)] = alpha * ln(1 + a*J/alpha); Preston canonical with S0 in {20, 100, 500}, sigma chosen so the log2 individuals-curve mode coincides with the octave of the most abundant species and the least abundant species is one individual. Cells with S0 > J are infeasible. If a public per-dataset area list exists, each dataset is matched to that list; otherwise the null is reported on a fallback geometry that was also fixed in advance: n_islands in {5, 10, 20, 40}, log10(Amax/Amin) in {1, 2, 3, 4}, islands geometrically spaced, and two pool conventions (a_i = A_i/sum(A), or a_i = A_i/(10*Amax)). Islands with E[S] < 0.5 are dropped; a cell with fewer than 4 remaining islands is infeasible. For J = 1e3 only, one stochastic abundance draw with seed 20261101 is compared with the analytical z and is not used in the Anderson-Darling test. The decision rule is the two-sample Anderson-Darling test (scipy anderson_ksamp) of observed z against null z within each SAD family. Quantile regression is descriptive and is not the decision rule." ;
+    delphi:preregistered false ;
+    delphi:dataKind "computational" ;
+    dct:description "No public file supplied the Triantis et al. 2012 per-dataset exponents or island areas, so the null was evaluated on the fallback geometries named in the pre-registered contract: 5, 10, 20 and 40 geometrically spaced islands, area spans of 1, 2, 3 and 4 orders of magnitude, and two pool conventions (island areas partition the pool, or the pool is ten times the largest island). Lognormal communities use sigma in {1, 2, 3} and S0 in {20, 100, 500}, with normal quantiles scaled to J in {1e3, 1e5, 1e7, 1e9} and largest-remainder rounded to integers of at least 1. Log-series communities use alpha in {5, 50, 500} and the closed form alpha*ln(1+a*J/alpha), checked against a truncated Coleman sum. Preston communities use S0 in {20, 100, 500} with sigma equal to the upper normal quantile, which enforces the canonical mode condition. z is the ordinary-least-squares slope of log expected richness on log relative area, dropping islands with expected richness below 0.5 and requiring at least four islands. For J=1000 only, one stochastic abundance draw from Generator seed 20261101 was compared with the analytical z and was not treated as an observation. The Anderson-Darling comparison was not run." ;
+    rdfs:comment "Measured: 0.13432457143522103 Coleman-null power-law exponent z on the pre-registered grid (n = 1618, 5th–95th percentile 0.0000 to 0.9255). Interpretation: Darwin's sentence says oceanic islands hold far fewer species than continental areas of equal size, and that physical conditions do not explain the difference. The open problem asks what sets the species-area exponent z. This run maps that question onto Coleman's random-placement curve, E[S(a)] = sum_i 1-(1-a)^{n_i}, which already predicts fewer species in a smaller sample. The numbers below are that null, not a measurement of islands. Preston's canonical constraint is implemented as a lognormal whose least abundant species has one individual and whose individuals-curve mode sits on the richest species; it is not rescaled onto the J grid, because that rescaling would move the veil line. The classic claim that a canonical lognormal yields z around 0.25 is a different sampling construction from the ordinary-least-squares slope of this Coleman curve on the pre-registered windows." ;
+    delphi:evidenceAgainst "The comparison with observed exponents was not run. No Dryad, Zenodo, Figshare or DataCite record of the Triantis, Guilhaumon and Whittaker 2012 compilation (DOI 10.1111/j.1365-2699.2011.02652.x) was found, Unpaywall and OpenAlex mark the paper closed, and Europe PMC records no supplement. Wiley returned HTTP 403, so a subscription appendix was not inspected. Observed z values were not invented." ;
+    delphi:evidenceAgainst "The CRAN package sars cites the paper and is the only OpenAlex dataset that does so. Its data files are seven small examples (aegean, aegean2, cole_sim, countryside, galap, habitat, niering), not the 601-dataset compilation, and they were not used as observations." ;
+    delphi:evidenceAgainst "Without per-dataset area lists, null exponents use the pre-registered fallback windows. Those windows are not the archipelagos in the compilation, so the null spread is not an estimate of between-dataset variance." ;
+    delphi:evidenceAgainst "A power-law slope is a local summary of a Coleman curve that is not itself a power law. On the lognormal and log-series cells, total abundance J accounts for 79% of the variation in null z: the median is 0.752 at J=10^3 and 0.001 at J=10^9. Species-abundance family, area span, island count and pool convention each have a small main-effect share. The null can therefore sit almost anywhere in (0, 1) when J is free. That is a property of these curves, not a comparison with islands." ;
+    delphi:evidenceAgainst "The stochastic check is one draw at J=1000. It is a numerical comparison with the analytical curve, not a second null distribution and not biological data." ;
+    delphi:hasEvidence () ;
+    prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-grok-4-7> ;
+    rdfs:seeAlso <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/darwin-origin/darwin1859-ch12-04/overnight-sar-null/result.json> .
+  <https://w3id.org/delphi/resource/claim/darwin1859-ch12-04> delphi:hasAssessment <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-04--claim-test--overnight-sar-null> .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/darwin-origin/darwin1859-ch12-04/overnight-sar-null/result.json> ;
+    prov:wasGeneratedBy sub:test .
+  sub:test a prov:Activity ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphisci/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/README.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-claim-tester-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci claim tester (grok-4.7; species-area-exponent--claude-opus-5-5--2)" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    dct:identifier "grok-4.7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:44:02.947Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Claim test of darwin1859-ch12-04 (overnight-sar-null): inconclusive, confidence 0.8" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType delphi:Assessment ;
+    npx:introduces <https://w3id.org/delphi/resource/assessment/darwin1859-ch12-04--claim-test--overnight-sar-null> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/darwin-origin-1859> .
+}

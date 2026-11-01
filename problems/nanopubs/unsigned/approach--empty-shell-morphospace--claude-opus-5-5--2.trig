@@ -1,0 +1,82 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Compute functional landscapes over the whole Raup space by generative modelling and FE" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> ;
+    dct:description "Make the functional hypothesis predictive before looking at occupancy. Generate shells on a dense grid over (log W ∈ [0, 6], D ∈ [0, 0.9], T ∈ [0, 6]) with a circular or elliptical generating curve. For each, compute: (a) internal volume per unit shell material (constructional economy); (b) for planispiral forms, hydrostatic stability, the distance between centres of buoyancy and mass with a stated tissue density; (c) crushing resistance by linear-elastic finite-element analysis of a compression load across the aperture, normalized by material volume; (d) a self-overlap indicator (whorls that would intersect). Define the functional hypothesis as the Pareto front of (a)–(c). Its predicted occupied region is the set of points within δ of the front, with δ fixed from a pilot of 20 species chosen at random and excluded from approach 1's test. The output is a predicted occupancy surface supplied to approach 1 as M_fun." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--2#n_species> ;
+    delphi:proposedTest "A pre-computed functional occupancy surface whose boundary is fixed before occupancy data are examined, evaluated in approach 1 against developmental and phylogenetic surfaces. If it predicts the empty regions (for example sparse occupancy at high D and low W), functional selection is supported quantitatively." ;
+    delphi:context "Fails if: The Pareto front is so broad that nearly the whole space is within δ, so it predicts no empty region, or results are dominated by the arbitrary choice of load case." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Implement the Raup generator with mesh output; validate against published Raup figures. 2. Compute volume and material metrics analytically or numerically on the grid. 3. Run FE compression on a coarser grid (about 10^4 shells) and interpolate. 4. Compute the Pareto front and the predicted occupancy surface; freeze it before approach 1's scoring." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: simulation" ;
+    skos:note "Tool: finite-element-analysis" ;
+    skos:note "Tool: theoretical-morphology" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch11-15> ;
+
+    rdfs:seeAlso <https://doi.org/10.1111/brv.12276> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.jtbi.2012.07.009> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/empty-shell-morphospace> a delphi:Concept, schema:Question ;
+    rdfs:label "Why is shell morphospace empty where it is?" .
+  <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--2#n_species> a schema:PropertyValue ;
+    schema:propertyID "n_species" ;
+    schema:value 20 ;
+    schema:description "species named in the text (a sample size as stated there, not a measurement made here)" .
+
+  <https://doi.org/10.1111/brv.12276> dct:title "The geometry of morphospaces: lessons from the classic\n                    <scp>R</scp>\n                    aup shell coiling model" ;
+    dct:bibliographicCitation "Gerber 2017, review of functional and constructional explanations" .
+  <https://doi.org/10.1016/j.jtbi.2012.07.009> dct:title "Mechanical growth and morphogenesis of seashells" ;
+    dct:bibliographicCitation "Moulton, Goriely and Chirat 2012, Mechanical growth and morphogenesis of seashells" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to empty-shell-morphospace, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.301Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to empty-shell-morphospace: Compute functional landscapes over the whole Raup space by generative modelling and FE" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/empty-shell-morphospace--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

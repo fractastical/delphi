@@ -5,9 +5,11 @@
 //   node scripts/site/build-claim-graph.mjs
 import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { withChrome } from "./chrome.mjs";
 import { ROOT, VERIFICATION, EVIDENCE, DATA_KINDS, loadClaims } from "./load-claims.mjs";
 
 const HERE = join(ROOT, "docs");
+const TEMPLATES = join(ROOT, "scripts/site/templates");
 const claims = loadClaims();
 
 // Truth scores from test-data/truth/raw/<assessor>/*.json, matched by content key.
@@ -39,7 +41,7 @@ const THEOREMS = { claims: claims.filter(c => c.theorem), total: claims.length, 
 const seal = readFileSync(join(ROOT, "assets/logo.svg"), "utf8").trim();
 const inline = svg => svg.replace(/<svg[^>]*>/, t => t.replace(/\s(width|height)="\d+"/g, "")).replace("<svg ", '<svg role="img" aria-label="DELPHI seal" ');
 for (const [page, data] of [["claim-graph", DATA], ["claims-query", DATA], ["theorems", THEOREMS]]) {
-  const html = readFileSync(join(HERE, `${page}.template.html`), "utf8")
+  const html = withChrome(readFileSync(join(TEMPLATES, `${page}.template.html`), "utf8"), page)
     .replace("<!--__SEAL__-->", inline(seal))
     .replace("<!--__SEAL_MONO__-->", inline(seal.replace(/#14213d/gi, "#000").replace(/#e5c07b/gi, "#fff")))
     .replace("/*__SEAL_URI__*/", encodeURIComponent(seal))

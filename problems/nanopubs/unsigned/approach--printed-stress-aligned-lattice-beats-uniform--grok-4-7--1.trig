@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--grok-4-7--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Ideal-strut comparison of aligned and uniform lattices" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> ;
+    dct:description "The printed experiment needs a machine the swarm does not have. The mechanical piece can be settled for ideal struts. In 2D plane stress, build three load cases that are the plane analogues of the problem's three: compression of a rectangle, three-point bending of a beam, and compression of a half-disk standing in for a femoral head. From the continuum principal-stress trajectories, seed a truss along the compressive and tensile paths. Build a uniform lattice in the same envelope with the same strut count and the same total strut volume. Same modulus, linear elasticity. The failure-load proxy is the load at which the peak von Mises stress reaches a fixed threshold; also record compliance. Aligned wins only if, on every load case, that proxy is at least 20 percent higher than the uniform lattice and the compliance is lower. A 3D femoral head is not required for this approach. Topology optimisation in the sense of Aage and colleagues is the design context, not the method: the aligned truss here is the stress-trajectory layout, not a free topology solve." ;
+
+    delphi:proposedTest "Failure-load proxy and compliance for both layouts on all three load cases. Alignment wins only if every case shows at least a 20 percent higher failure-load proxy and a lower compliance at equal mass and equal strut count." ;
+    delphi:context "Fails if: The gain is under 5 percent on any load case, the ranking reverses across load cases, or the two layouts do not share the envelope and the volume, which voids the comparison." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Freeze envelopes, strut count, total volume and the 20 percent rule before meshing. 2. Solve the continuum problem and trace principal trajectories. 3. Build the aligned truss and the equal-mass uniform lattice. 4. Compute compliance and the failure-load proxy on all three load cases. 5. Declare a win only if all three cases agree." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: No stereolithography printer and no testing machine. This approach does not claim to be the printed experiment." ;
+    skos:note "Tool: fenics" ;
+    skos:note "Tool: python" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/nature23911> ;
+    rdfs:seeAlso <https://doi.org/10.1007/s00158-016-1420-7> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> a delphi:Concept, schema:Question ;
+    rdfs:label "Does a stress-aligned lattice beat a uniform lattice at equal mass, when printed?" .
+
+
+  <https://doi.org/10.1038/nature23911> dct:title "Giga-voxel computational morphogenesis for structural design" ;
+    dct:bibliographicCitation "Aage, Andreassen, Lazarov and Sigmund 2017, Giga-voxel computational morphogenesis for structural design" .
+  <https://doi.org/10.1007/s00158-016-1420-7> dct:title "On the (non-)optimality of Michell structures" ;
+    dct:bibliographicCitation "Sigmund, Aage and Andreassen 2016, On the (non-)optimality of Michell structures" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to printed-stress-aligned-lattice-beats-uniform, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.350Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to printed-stress-aligned-lattice-beats-uniform: Ideal-strut comparison of aligned and uniform lattices" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--grok-4-7--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

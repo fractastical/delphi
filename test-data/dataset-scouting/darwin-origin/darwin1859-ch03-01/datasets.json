@@ -1,0 +1,83 @@
+{
+  "claim_id": "darwin1859-ch03-01",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:06:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "darwin-04-retry" },
+  "variables_needed": [
+    "fecundity and survival schedules (or intrinsic growth rate r_max / R0) per species at low density",
+    "realized long-term abundance or population growth rate per population",
+    "density-dependent or abiotic mortality fractions"
+  ],
+  "datasets": [
+    {
+      "id": "compadre-comadre",
+      "name": "COMPADRE Plant and COMADRE Animal Matrix Databases",
+      "landing_url": "https://compadre-db.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:05:10Z", "method": "GET landing page", "http_status": 200, "bytes": 1295651 },
+      "variables_present": ["stage-specific fecundity and survival in matrix population models (from which potential growth rate can be derived)"],
+      "variables_missing": ["partitioned causes of mortality", "microbes and most invertebrates"],
+      "scope": "Landing page states: matrix population models of hundreds of plant and animal species, plus algae, fungi, bacteria, viruses; live species/study/matrix counters render by JavaScript and were not readable (0 in static HTML).",
+      "evidence": "Landing page text read; counts not available without JS. Download mechanism (R package / data files) not fetched.",
+      "verdict": "holds"
+    },
+    {
+      "id": "gpdd-knb",
+      "name": "Global Population Dynamics Database (GPDD), KNB",
+      "landing_url": "https://knb.ecoinformatics.org/view/doi:10.5063/F1BZ63Z8",
+      "access_url": "https://knb.ecoinformatics.org/knb/d1/mn/v2/object/doi:10.5063/F1BZ63Z8",
+      "doi": "10.5063/F1BZ63Z8",
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:05:40Z", "method": "GET EML metadata via KNB DataONE object endpoint", "http_status": 200, "bytes": null },
+      "variables_present": ["population counts per year (data.csv: Population, SampleYear)", "taxon, location, biotope tables"],
+      "variables_missing": ["fecundity or survival schedules", "cause-specific mortality"],
+      "scope": "EML abstract: nearly five thousand separate time series, taxonomic details of over 1400 species. Entities: data.csv, main.csv, timeperiod.csv, taxon.csv, datasource.csv, biotope.csv, location.csv, GPDD-User-Guide.pdf.",
+      "evidence": "EML abstract and attributeName list (Population, PopulationUntransformed, SampleYear, Generation, SiblyFittedTheta, ...) read from the response.",
+      "verdict": "partial"
+    },
+    {
+      "id": "living-planet-index",
+      "name": "Living Planet Index",
+      "landing_url": "https://www.livingplanetindex.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:05:10Z", "method": "GET landing page", "http_status": 200, "bytes": 7636 },
+      "variables_present": ["vertebrate population abundance time series (not verified by download)"],
+      "variables_missing": ["fecundity and survival schedules", "mortality partitioning"],
+      "scope": "Landing page is an R Shiny app shell; contents and download terms not read.",
+      "evidence": "HTTP 200 with Shiny HTML only.",
+      "verdict": "partial"
+    },
+    {
+      "id": "fishbase",
+      "name": "FishBase",
+      "landing_url": "https://www.fishbase.se/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:05:10Z", "method": "GET landing page", "http_status": 200, "bytes": 447 },
+      "variables_present": ["fecundity and growth parameters for fish (not verified; only a redirect stub was fetched)"],
+      "variables_missing": ["realized abundance", "mortality partitioning"],
+      "scope": "Page is a meta-refresh redirect to search.php; no data fields inspected.",
+      "evidence": "447-byte HTML redirect to search.php.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "COMADRE matrix population models", "url": "https://api.datacite.org/dois?query=COMADRE%20matrix%20population%20models&page%5Bsize%5D=3", "hits": null, "note": "HTTP 200; mostly Zenodo code/paper records, no new primary dataset identified" },
+    { "source": "DataCite", "query": "COMADRE", "url": "https://api.datacite.org/dois?query=COMADRE&page%5Bsize%5D=2", "hits": 75, "note": "Top hits unrelated or derived (e.g. figshare MOSAIC trait database 10.6084/m9.figshare.21035857, not inspected)" },
+    { "source": "Zenodo", "query": "COMADRE COMPADRE matrix", "url": "https://zenodo.org/api/records?q=COMADRE%20COMPADRE%20matrix&size=3", "hits": 65012, "note": "Total looks inflated by loose matching; top hits are code (Keyfitz entropy 10.5281/zenodo.7639453, MatPopMod 10.5281/zenodo.5711709), not the databases" },
+    { "source": "Dryad", "query": "intrinsic rate of increase life table", "url": "https://datadryad.org/api/v2/search?q=intrinsic%20rate%20of%20increase%20life%20table&per_page=3", "hits": 6, "note": "HTTP 200; results not inspected further" }
+  ],
+  "status": "data-ready",
+  "summary": "COMPADRE/COMADRE hold fecundity and survival matrices for hundreds of plant and animal species, enough to derive potential growth rate; GPDD (about 5,000 time series, over 1,400 species) gives realized abundance. Cause-specific mortality is not in either.",
+  "next_step": "Obtain the COMPADRE/COMADRE release files (not fetched here) and the GPDD data.csv/main.csv; pair matrix-derived growth with GPDD series for taxa present in both.",
+  "obstacles_confirmed": ["Neither source partitions mortality into intraspecific, interspecific and abiotic causes.", "COMPADRE/COMADRE counts could not be read statically (JS counters)."]
+}

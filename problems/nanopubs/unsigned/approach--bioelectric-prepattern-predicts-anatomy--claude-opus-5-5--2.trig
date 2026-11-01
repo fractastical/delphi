@@ -1,0 +1,85 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered forward predictions of perturbation outcomes from bioelectric simulation" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> ;
+    dct:description "Test the instructive (causal) form of the hypothesis on perturbations whose outcomes are published but held out from calibration. Calibrate a BETSE or frontier_simulate model of the planarian fragment (ion channels, pumps, gap junctions per Durant et al. 2017 and Pietak and Levin 2017) on control and two perturbation conditions only. Then, for each held-out perturbation in the literature (for example ivermectin-induced hyperpolarization, SCH-28080 H,K-ATPase inhibition, octanol gap-junction block at stated concentrations), predict the steady-state anterior–posterior Vmem pattern. Map it to anatomy with a rule fixed in advance: a depolarized region above threshold θ predicts a head, θ fixed from the calibration conditions. Lodge predictions as a timestamped commit before comparison. Score the fraction of held-out perturbations whose predicted outcome class matches the published one, against a baseline that always predicts the most common outcome." ;
+
+    delphi:proposedTest "The fraction of held-out pharmacological and genetic perturbations whose anatomical outcome class the frozen model predicts, against the most-common-class baseline. Accuracy significantly above baseline (binomial p < 0.01, at least 10 held-out conditions) supports the predictive bioelectric code; baseline accuracy refutes this model's version of it." ;
+    delphi:context "Fails if: Too few held-out perturbations with clear published outcomes and known molecular targets (fewer than 10), or model outcomes so sensitive to unmeasured parameters that predictions are not robust to plausible parameter ranges (report the fraction of the parameter posterior agreeing)." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Fix model structure and calibration conditions; pre-register the Vmem-to-anatomy rule and the held-out list. 2. Calibrate parameters on the calibration set; freeze. 3. Simulate each held-out perturbation; commit predictions before reading outcomes. 4. Compare with published outcomes; report accuracy against the baseline with a binomial test." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: frontier_simulate offers bounded previews only; full BETSE calibration needs more compute and parameter data (channel densities) than published papers supply." ;
+    skos:note "Tool: bioelectric-simulation" ;
+    skos:note "Tool: frontier_simulate" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-girardia-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2018-hcn2-16> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2019-boundary-14> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.bpj.2017.04.011> ;
+    rdfs:seeAlso <https://doi.org/10.3389/fbioe.2016.00055> ;
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2017.0425> ;
+    rdfs:seeAlso <https://github.com/betsee/betse> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/bioelectric-prepattern-predicts-anatomy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does the bioelectric prepattern predict anatomical outcome?" .
+
+
+  <https://doi.org/10.1016/j.bpj.2017.04.011> dct:title "Long-Term, Stochastic Editing of Regenerative Anatomy via Targeting Endogenous Bioelectric Gradients" ;
+    dct:bibliographicCitation "Durant et al. 2017, Long-term, stochastic editing of regenerative anatomy via bioelectric gradients" .
+  <https://doi.org/10.3389/fbioe.2016.00055> dct:title "Exploring Instructive Physiological Signaling with the Bioelectric Tissue Simulation Engine" ;
+    dct:bibliographicCitation "Pietak and Levin 2016, BETSE" .
+  <https://doi.org/10.1098/rsif.2017.0425> dct:title "Bioelectric gene and reaction networks: computational modelling of genetic, biochemical and bioelectrical dynamics in pattern regulation" ;
+    dct:bibliographicCitation "Pietak and Levin 2017, Bioelectric gene and reaction networks" .
+  <https://github.com/betsee/betse> dct:bibliographicCitation "BETSE source code" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to bioelectric-prepattern-predicts-anatomy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.304Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to bioelectric-prepattern-predicts-anatomy: Pre-registered forward predictions of perturbation outcomes from bioelectric simulation" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/bioelectric-prepattern-predicts-anatomy--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

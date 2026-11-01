@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule30-center-column--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Show the center column is not 2-automatic" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule30-center-column> ;
+    dct:description "Attack the linear-effort prize by way of automatic sequences. A shortcut that computed the n-th center cell from the binary digits of n in o(n) time, uniformly, would make the sequence 2-automatic or at least would give a finite 2-kernel. Compute the 2-kernel of the center column: the subsequences u(2^k n + r) for residues r. Prove in Lean that the step function commutes with the kernel construction in the usual way for a cellular automaton. Then exhibit more distinct kernel sequences than any finite automaton of a given size can hold, using a certified prefix from the first approach as the witness for the small kernels, and a theorem that a new distinct subsequence appears at arbitrarily large scales. Refuting all linear recurrences over GF(2) up to a fixed order is a weaker lemma and should be stated separately; it does not by itself give an Ω(n) lower bound." ;
+
+    delphi:proposedTest "A proof that the center column is not 2-automatic, together with a reduction showing that any uniform o(n) digit-based algorithm would imply automaticity. That is a form of the linear-effort lower bound, not yet a general Ω(n) time lower bound against all algorithms." ;
+    delphi:context "Fails if: The kernel collapses to a finite set, or a new distinct subsequence cannot be forced past the certified prefix. Recurrence-refutation alone is a failure to reach the prize statement." ;
+    delphi:hypothesisType "approach/proof" ;
+    skos:note "Steps: 1. Define the 2-kernel of the center column. 2. Prove the Rule 30 step constrains kernel sequences. 3. Certify, from a checked prefix, that the kernel already has more than M distinct sequences. 4. Prove distinctness persists at arbitrary scale, or isolate the missing lemma. 5. Separately refute linear recurrences up to an order fixed by the certified prefix, and do not call that the prize theorem." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: A general time lower bound against arbitrary algorithms is beyond a kernel argument. This approach only targets digit-based and automatic shortcuts." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: large-scale-simulation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch02-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch12-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch06-14> ;
+    rdfs:seeAlso <https://www.rule30prize.org/> ;
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/rule30-center-column> a delphi:Concept, schema:Question ;
+    rdfs:label "The Rule 30 center column" .
+
+  <https://www.rule30prize.org/> dct:title "Wolfram Rule 30 Prizes" ;
+    dct:description "Problem 3 asks for at least linear effort in n for the n-th center cell." .
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule30-center-column, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.337Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule30-center-column: Show the center column is not 2-automatic" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule30-center-column--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

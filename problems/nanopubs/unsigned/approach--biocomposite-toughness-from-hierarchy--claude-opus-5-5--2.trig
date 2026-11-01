@@ -1,0 +1,83 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Simulated fracture of self-similar staggered composites with 1 to 4 levels" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> ;
+    dct:description "Settle the compounding question in a model where constituents are held exactly fixed, which no dataset allows. Build 2D lattice-spring (or discrete-element beam) fracture models of the tension-shear staggered architecture (Ji and Gao 2004; Gao et al. 2003): level 1 is mineral platelets in a soft matrix; level n replaces each platelet of level n-1 with a scaled-up copy of the level n-1 composite, keeping the total mineral fraction fixed. Mineral and matrix springs have fixed stiffness and brittle failure strains. Load notched specimens in mode I to compute work of fracture and the resistance curve. Vary aspect ratio and mineral fraction at each level; compare against a single-level composite with the same total mineral fraction and against a random (non-staggered) arrangement of the same phases." ;
+
+    delphi:proposedTest "Curve of work-of-fracture enhancement versus number of levels at fixed constituents with realization-level 95% CIs, showing whether enhancement is monotone, saturating or non-monotone, and its sensitivity to aspect ratio." ;
+    delphi:context "Fails if: Results that change by more than the realization spread when specimen size or lattice resolution changes (size effect not controlled), making the levels comparison an artefact; or failure to reproduce the level-1 analytic stiffness within 5%." ;
+    delphi:hypothesisType "approach/simulation" ;
+    skos:note "Steps: 1. Implement a 2D quasi-static lattice-spring fracture code (Python with sparse solvers), validated on the analytic tension-shear chain stiffness formula for level 1. 2. Generate hierarchical geometries for n = 1..4 at fixed total phi, with 20 random realizations each (platelet offset jitter). 3. Run notched fracture tests; record peak load, work of fracture, R-curve slope; check mesh and specimen-size convergence (specimen at least 10 times the largest level length). 4. Fit enhancement versus n and test monotonicity and saturation (isotonic versus logistic-saturation fit). 5. Write the predicted enhancement-per-level curve as the quantitative prior for approach 1's levels coefficient." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Missing: A 2D spring model omits 3D crack deflection and twisting and fibril-level plasticity; it answers the compounding question for the model, not for real tissues." ;
+    skos:note "Tool: python" ;
+    skos:note "Tool: scipy-sparse" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-02> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1016/j.jmps.2004.03.006> ;
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.0631609100> ;
+    rdfs:seeAlso <https://doi.org/10.1038/361511a0> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.jmps.2006.07.007> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does hierarchy itself explain the toughness of biological composites?" .
+
+
+  <https://doi.org/10.1016/j.jmps.2004.03.006> dct:title "Mechanical properties of nanostructure of biological materials" ;
+    dct:bibliographicCitation "Ji and Gao 2004, Mechanical properties of nanostructure of biological materials" .
+  <https://doi.org/10.1073/pnas.0631609100> dct:title "Materials become insensitive to flaws at nanoscale: Lessons from nature" ;
+    dct:bibliographicCitation "Gao et al. 2003, Materials become insensitive to flaws at nanoscale: lessons from nature" .
+  <https://doi.org/10.1038/361511a0> dct:title "Materials with structural hierarchy" ;
+    dct:bibliographicCitation "Lakes 1993, Materials with structural hierarchy" .
+  <https://doi.org/10.1016/j.jmps.2006.07.007> dct:title "On the mechanics of mother-of-pearl: A key feature in the material hierarchical structure" ;
+    dct:bibliographicCitation "Barthelat et al. 2007, On the mechanics of mother-of-pearl" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biocomposite-toughness-from-hierarchy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.308Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biocomposite-toughness-from-hierarchy: Simulated fracture of self-similar staggered composites with 1 to 4 levels" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

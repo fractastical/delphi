@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--gemini-4-argon--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Lean 4 formalization of the Gao-Ji tension-shear chain and N-level flaw insensitivity" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> ;
+    dct:description "Formalize in Lean 4 the recursive hierarchical fracture-energy model of Gao et al. (2003) and Fratzl et al. (2006) alongside the stimulus-response composition framework already present in `ThompsonLaws/Hygromorphs.lean` (`stimulus-response-systems-category`). Define a single stagger level as a tension-shear chain of mineral platelets of aspect ratio rho, volume fraction phi, tensile strength sigma_m, and interfacial shear yield tau_i, and derive the effective fracture energy G_1 = G_0 * f(phi, rho, tau_i / sigma_m) under the pull-out condition rho < sigma_m / tau_i.\n\nExtend the single-level operator recursively to an N-level self-similar stagger hierarchy where level k serves as the reinforcing phase of level k+1, and prove in Lean 4 the exact conditions under which toughness enhancement G_N / G_0 grows exponentially with N versus saturating due to stiffness loss ((phi_eff)^N -> 0) or platelet fracture transition. Then evaluate the formalized closed-form upper bound on the empirical parameter tuples (phi, rho, N) of nacre, bone, and antler." ;
+
+    delphi:proposedTest "A zero-`sorry` Lean 4 proof characterizing the exact regime in (phi_k, rho_k) space where N-level hierarchy compounds fracture energy, paired with an numerical evaluation showing whether real bone and nacre sit inside the proved compounding regime." ;
+    delphi:context "Fails if: The proved theorem shows that under realistic total mineral volume fractions (phi >= 0.45) and interface compliances, adding hierarchical levels beyond N = 2 strictly decreases specific toughness per unit stiffness unless extrinsic bridging mechanisms outside the tension-shear recurrence are invoked." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define the tension-shear chain effective modulus and pull-out vs platelet-fracture regime boundary rho_crit = sigma_m / tau_i in Lean 4. 2. Prove the single-level toughness amplification theorem and the optimal aspect ratio theorem under bounded shear transfer. 3. Define the N-fold hierarchical composition operator and prove the necessary and sufficient condition on inter-level volume fractions phi_k for G_N / G_0 to be strictly increasing in N at fixed total mineral mass. 4. Plug measured (phi_k, rho_k) values for nacre (N = 2) and cortical bone (N = 5) into the proved bound to test whether theoretical compounding matches observed toughness ratios." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: continuum-mechanics" ;
+    skos:note "Tool: computation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-02> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1073/pnas.0631609100> ;
+    rdfs:seeAlso <https://doi.org/10.1007/s10704-006-7156-4> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.jmps.2006.07.007> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/biocomposite-toughness-from-hierarchy> a delphi:Concept, schema:Question ;
+    rdfs:label "Does hierarchy itself explain the toughness of biological composites?" .
+
+
+  <https://doi.org/10.1073/pnas.0631609100> dct:title "Materials become insensitive to flaws at nanoscale: Lessons from nature" ;
+    dct:bibliographicCitation "Gao et al. 2003, Materials become insensitive to flaws at nanoscale: Lessons from nature" .
+  <https://doi.org/10.1007/s10704-006-7156-4> dct:title "Application of Fracture Mechanics Concepts to Hierarchical Biomechanics of Bone and Bone-like Materials" ;
+    dct:bibliographicCitation "Fratzl et al. 2006, Application of Fracture Mechanics Concepts to Hierarchical Biomechanics of Bone and Bone-like Materials" .
+  <https://doi.org/10.1016/j.jmps.2006.07.007> dct:title "On the mechanics of mother-of-pearl: A key feature in the material hierarchical structure" ;
+    dct:bibliographicCitation "Barthelat et al. 2007, On the mechanics of mother-of-pearl: a key feature in the material hierarchical structure" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to biocomposite-toughness-from-hierarchy, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.314Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to biocomposite-toughness-from-hierarchy: Lean 4 formalization of the Gao-Ji tension-shear chain and N-level flaw insensitivity" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/biocomposite-toughness-from-hierarchy--gemini-4-argon--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

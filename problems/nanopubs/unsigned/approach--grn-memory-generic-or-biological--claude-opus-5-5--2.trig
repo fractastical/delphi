@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/grn-memory-generic-or-biological--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Attribution by surgery: rewire topology vs shuffle parameters in real models" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/grn-memory-generic-or-biological> ;
+    dct:description "Random networks differ from biological ones in many ways at once. A sharper design perturbs the biological models themselves along one axis at a time. For each of the 35 models: (a) topology surgery, degree-preserving edge swaps (100 swaps per edge) keeping every reaction's rate law and parameters; (b) parameter surgery, permuting parameter values among reactions of the same kinetic type, keeping topology; (c) kinetic surgery, replacing Hill terms with Michaelis–Menten terms (n = 1), keeping topology and parameters; (d) a combination. Generate 20 variants per model per surgery, discard variants without a stable steady state, and re-run the memory protocol. Memory that survives (a) but not (b) points to tuned parameters; memory surviving (b) but lost under (c) points to cooperativity (ultrasensitivity) as the generic cause. This decomposes any biological enrichment from approach 1 into causes." ;
+
+    delphi:proposedTest "Retention rates of each memory type under topology, parameter and kinetic surgery. For example, '80% of UCS memory survives topology rewiring but only 20% survives replacing Hill terms' would identify ultrasensitivity, not network wiring, as the cause." ;
+    delphi:context "Fails if: Most surgical variants lose steady-state stability, so the surviving variants are a biased subset and retention rates are uninterpretable." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Implement SBML-level surgery operators with libsbml; verify that variants remain valid and stable. 2. Pre-register the attribution logic (which surgery outcomes imply which cause). 3. Run the memory protocol on all variants. 4. Report per-memory-type retention rates under each surgery with CIs." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: ode-simulation" ;
+    skos:note "Tool: biomodels" ;
+    skos:note "Tool: random-network-nulls" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-08> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-11> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-grn-learning-16> ;
+    rdfs:seeAlso <https://www.ebi.ac.uk/biomodels/> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.isci.2021.102131> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/grn-memory-generic-or-biological> a delphi:Concept, schema:Question ;
+    rdfs:label "Is memory in gene regulatory network models generic or a biological signature?" .
+
+  <https://www.ebi.ac.uk/biomodels/> dct:title "BioModels" ;
+    dct:description "Source SBML models for surgery" .
+  <https://doi.org/10.1016/j.isci.2021.102131> dct:title "Gene regulatory networks exhibit several kinds of memory: Quantification of memory in biological and random transcriptional networks" ;
+    dct:bibliographicCitation "Biswas et al. 2021" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to grn-memory-generic-or-biological, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.304Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to grn-memory-generic-or-biological: Attribution by surgery: rewire topology vs shuffle parameters in real models" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/grn-memory-generic-or-biological--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

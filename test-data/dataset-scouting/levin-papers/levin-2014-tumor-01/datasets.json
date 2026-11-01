@@ -1,0 +1,87 @@
+{
+  "claim_id": "levin-2014-tumor-01",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T10:25:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "levin-04"
+  },
+  "variables_needed": [
+    "tumor-like-structure incidence per embryo for oncogene alone, oncogene plus remote hyperpolarizing channel, and controls",
+    "Vmem measurements confirming voltage change at the remote site",
+    "blastomere injection design (oncogene and channel mRNA in separate cells)"
+  ],
+  "datasets": [
+    {
+      "id": "chernet-2014-oncotarget-pmc4102810",
+      "name": "Chernet and Levin 2014, Transmembrane voltage potential of somatic cells controls oncogene-mediated tumorigenesis at long-range",
+      "landing_url": "https://doi.org/10.18632/oncotarget.1935",
+      "access_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC4102810/fullTextXML",
+      "doi": "10.18632/oncotarget.1935",
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET doi redirect (publisher returns 403); GET Europe PMC full-text XML for PMC4102810 and search for data availability and repository names",
+        "http_status": 403,
+        "bytes": 248332,
+        "note": "publisher 403; text read through Europe PMC REST"
+      },
+      "variables_present": [
+        "published incidence and sample-size counts in the article text (per assessors; not verified here)"
+      ],
+      "variables_missing": [
+        "deposited embryo-level data"
+      ],
+      "scope": "one paper",
+      "evidence": "doi.org redirected to https://www.oncotarget.com/article/1935/text/ with HTTP 403. Europe PMC full text HTTP 200, 248,332 bytes; zero matches for \"Data availability\", \"Dryad\", \"Zenodo\", \"figshare\", \"github\", \"Source Data\" or supplementary data/movie/video headings.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "Xenopus oncogene tumor voltage",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=Xenopus%20oncogene%20tumor%20voltage",
+      "hits": 0
+    },
+    {
+      "source": "Zenodo",
+      "query": "Xenopus tadpole oncogene tumorigenesis membrane potential",
+      "url": "https://zenodo.org/api/records?size=5&q=Xenopus%20tadpole%20oncogene%20tumorigenesis%20membrane%20potential",
+      "hits": 315283,
+      "note": "free-text; top 5 unrelated"
+    },
+    {
+      "source": "Figshare",
+      "query": "Xenopus tumor-like structures oncogene membrane potential",
+      "url": "https://api.figshare.com/v2/articles/search",
+      "hits": 0
+    },
+    {
+      "source": "BioStudies",
+      "query": "Xenopus oncogene tumorigenesis membrane potential",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?pageSize=5&query=Xenopus%20oncogene%20tumorigenesis%20membrane%20potential",
+      "hits": 750779,
+      "note": "free-text; top 5 unrelated caveolae papers"
+    },
+    {
+      "source": "Europe PMC",
+      "query": "TITLE of the claim paper",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?format=json&pageSize=5&query=TITLE%3A%22Transmembrane%20voltage%20potential%20of%20somatic%20cells%20controls%20oncogene-mediated%20tumorigenesis%20at%20long-range%22%20OR%20TITLE%3A%22Kinematic%20self-replication%20in%20reconfigurable%20organisms%22",
+      "hits": 2,
+      "note": "PMC4102810 (and an unrelated paper from the same OR clause)"
+    }
+  ],
+  "status": "gap",
+  "summary": "No deposited data were found for the remote-voltage tumorigenesis experiments; the paper has no data availability statement in its full text and searches of Dryad, Figshare, Zenodo and BioStudies returned nothing relevant. Incidence counts would have to be read off the article.",
+  "next_step": "Extract per-condition incidence and n from the article tables and figures into a table, or request embryo-level scores from the authors.",
+  "obstacles_confirmed": [
+    "Individual embryo data are not deposited.",
+    "Publisher site blocks scripted access (403); only Europe PMC text was readable."
+  ]
+}

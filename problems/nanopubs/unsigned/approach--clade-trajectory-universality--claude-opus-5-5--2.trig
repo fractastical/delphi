@@ -1,0 +1,83 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/clade-trajectory-universality--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Model-based rates: does net diversification decline through clade life?" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/clade-trajectory-universality> ;
+    dct:description "Hat-shapedness from diversity curves is indirect; the mechanistic claim (Quental and Marshall) is that origination falls and extinction rises with clade age. Estimate this directly with PyRate (Bayesian joint estimation of preservation, origination and extinction from occurrence data) for each family with ≥ 20 genera and ≥ 100 occurrences, using a time-variable preservation model. For each clade compute the posterior of the slope of net diversification rate r(t) = λ(t) − μ(t) against standardized clade age (birth–death shift model or a linear-trend model in clade age). Pre-registered: the claim holds if more than 50% of clades have posterior probability > 0.95 of a negative slope, and the median slope is negative with a 95% interval excluding 0; it fails if negative-slope clades are no more frequent than positive-slope ones." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/clade-trajectory-universality--claude-opus-5-5--2#n_genera> ;
+    delphi:proposedTest "The distribution across clades of the posterior slope of net diversification versus clade age. A majority of significantly negative slopes would support Red-Queen decline as general; a symmetric distribution around zero would mean hat shapes, if present, are not driven by systematic rate decline." ;
+    delphi:context "Fails if: Rate trends are not identifiable from preservation trends for most clades (posterior slopes span zero widely), which is likely for small clades: inconclusive." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register clade inclusion, PyRate settings (preservation model, MCMC length, convergence criteria ESS > 200) and the decision rule. 2. Prepare PyRate inputs from PBDB occurrences with age ranges. 3. Run PyRate per clade on a compute cluster; check convergence. 4. Summarize slope posteriors across clades; apply the decision rule; compare with approach 1's CG and unimodality." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Compute for hundreds of PyRate runs (each hours to days); approach is feasible but may need to restrict to a few hundred clades." ;
+    skos:note "Tool: pbdb" ;
+    skos:note "Tool: bayesian-inference" ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch10-02> ;
+    rdfs:seeAlso <https://paleobiodb.org/data1.2/> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.1239431> ;
+    rdfs:seeAlso <https://github.com/dsilvestro/PyRate> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/clade-trajectory-universality> a delphi:Concept, schema:Question ;
+    rdfs:label "Are clade diversity trajectories universally hat-shaped?" .
+  <https://w3id.org/delphi/resource/approach/clade-trajectory-universality--claude-opus-5-5--2#n_genera> a schema:PropertyValue ;
+    schema:propertyID "n_genera" ;
+    schema:value 20 ;
+    schema:description "genera named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://paleobiodb.org/data1.2/> dct:title "Paleobiology Database API" ;
+    dct:description "Occurrences with age ranges for PyRate" .
+  <https://doi.org/10.1126/science.1239431> dct:title "How the Red Queen Drives Terrestrial Mammals to Extinction" ;
+    dct:bibliographicCitation "Quental and Marshall 2013, How the Red Queen drives terrestrial mammals to extinction" .
+  <https://github.com/dsilvestro/PyRate> dct:bibliographicCitation "PyRate source" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to clade-trajectory-universality, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.301Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to clade-trajectory-universality: Model-based rates: does net diversification decline through clade life?" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/clade-trajectory-universality--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

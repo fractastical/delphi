@@ -1,0 +1,219 @@
+{
+  "claim_id": "levin-2025-wisdom-01",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T09:46:54Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "levin-02"
+  },
+  "variables_needed": [
+    "ploidy / heterozygosity / repeats of asexual Schmidtea mediterranea genome(s)",
+    "regeneration success, tumour incidence and survival curves of asexual strains",
+    "comparative longevity records"
+  ],
+  "datasets": [
+    {
+      "id": "ncbi-genome",
+      "name": "NCBI Assembly records for Schmidtea mediterranea",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genome/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=assembly&id=33831561,33831521,25785221,25785191,12303431,1361681,228778,181301,124651&retmode=json",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "E-utilities esearch and esummary on db=assembly; GET landing page",
+        "http_status": 200
+      },
+      "variables_present": [
+        "genome assemblies (chromosome, scaffold and contig level) of S. mediterranea"
+      ],
+      "variables_missing": [
+        "regeneration, tumour and ageing phenotypes",
+        "a computed ploidy or heterozygosity table"
+      ],
+      "scope": "9 assemblies; esummary names include schMedA2h1 (GCA_057920485.1), schMedA2h2 (GCA_057920495.1), schMedS3h1 (GCA_045838265.1), schMedS3h2 (GCA_045838255.1), g4wRepeats_chr_ref_UCLA (GCA_022537955.1), ASM260089v1 (GCA_002600895.1, S2, scaffold), ASM18107v1 (GCA_000181075.1, S2F2, contig)",
+      "evidence": "esearch count 9 (first attempt HTTP 429); esummary lists the accessions and assembly levels above. I did not verify which are asexual-strain assemblies beyond the names.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-sequence-read-archive",
+      "name": "NCBI SRA (Schmidtea mediterranea)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/sra",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "E-utilities esearch db=sra, two queries; GET landing page",
+        "http_status": 200
+      },
+      "variables_present": [
+        "sequencing reads (genomic and transcriptomic)"
+      ],
+      "variables_missing": [
+        "phenotypes"
+      ],
+      "scope": "6,382 SRA experiments for the organism, 149 with WGS strategy; strain/reproductive mode not checked",
+      "evidence": "esearch counts 6382 and 149 (query adds AND WGS[Strategy]).",
+      "verdict": "partial"
+    },
+    {
+      "id": "anage",
+      "name": "AnAge (HAGR) species database",
+      "landing_url": "https://genomics.senescence.info/species/",
+      "access_url": "https://genomics.senescence.info/species/dataset.zip",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET dataset.zip (169,150 bytes); unzipped and grepped for flatworm rows",
+        "http_status": 200,
+        "bytes": 169150
+      },
+      "variables_present": [
+        "longevity records for Schmidtea polychroa (3.6 yr) and Macrostomum lignano"
+      ],
+      "variables_missing": [
+        "Schmidtea mediterranea maximum longevity (field empty; data quality 'low', sample size 'tiny')",
+        "asexual-strain data",
+        "actuarial ageing curves"
+      ],
+      "scope": "4,646 species rows; 3 flatworms: Macrostomum lignano, Schmidtea mediterranea, Schmidtea polychroa",
+      "evidence": "anage_data.txt rows 04658-04660. S. mediterranea row: specimen origin 'unknown', sample size 'tiny', data quality 'low', longevity column blank. S. polychroa row: 3.6 in the longevity column, origin captivity, data quality acceptable.",
+      "verdict": "partial"
+    },
+    {
+      "id": "planmine",
+      "name": "PlanMine (InterMine for planarian genomes and transcriptomes)",
+      "landing_url": "https://planmine.mpibpc.mpg.de/planmine/begin.do",
+      "access_url": "https://planmine.mpibpc.mpg.de/planmine/service/version",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "curl GET landing page, /service/version (returned 26) and an organism-list query",
+        "http_status": 200
+      },
+      "variables_present": [
+        "assemblies and annotations for asexual and sexual S. mediterranea and other flatworms"
+      ],
+      "variables_missing": [
+        "phenotype, tumour and survival data"
+      ],
+      "scope": "InterMine web service v26; landing text refers to asexual 'Smed' and sexual 'Smes' assemblies and S. mediterranea S2F2",
+      "evidence": "Organism-list query returned flatworm organisms (e.g. Dugesia japonica, Dendrocoelum lacteum, Macrostomum lignano); landing-page text mentions asexual and sexual S. mediterranea assemblies.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-v15dv425h-non-senescent-planaria",
+      "name": "Data from: Non-senescent species are not immortal: Stress and decline in two planaria species (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.v15dv425h",
+      "access_url": null,
+      "doi": "10.5061/dryad.v15dv425h",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET Dryad API dataset record (landing_url); abstract read; files not downloaded",
+        "http_status": 200,
+        "bytes": 5616
+      },
+      "variables_present": [
+        "population-level performance and life-history traits of Schmidtea mediterranea and Dugesia tahitiensis under a 19-week factorial feeding design (quantity x quality x interval)"
+      ],
+      "variables_missing": [
+        "strain (asexual vs sexual) not stated in the abstract",
+        "individual-level survival curves / actuarial ageing not confirmed",
+        "tumour incidence",
+        "genomic ploidy"
+      ],
+      "scope": "two planarian species, lab populations, 19 weeks; storageSize 4,693,015 bytes; published 2024-09-17",
+      "evidence": "Abstract (from API response): examines resource quantity, quality and feeding interval on population structure, performance and life-history trade-offs in 'two long-lived planaria that do not senesce: Schmidtea mediterranea and Dugesia tahitiensis'.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-c5f0ps6-fissiparous-dugesia-intraindividual-diversity",
+      "name": "Data from: Outstanding intraindividual genetic diversity in fissiparous planarians (Dugesia, Platyhelminthes) with facultative sex (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.c5f0ps6",
+      "access_url": null,
+      "doi": "10.5061/dryad.c5f0ps6",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:46:54Z",
+        "method": "GET Dryad API dataset record (landing_url); abstract read; files not downloaded",
+        "http_status": 200,
+        "bytes": 5723
+      },
+      "variables_present": [
+        "intraindividual haplotype/nucleotide diversity at one nuclear and one mitochondrial gene in sexual, fissiparous and facultative wild Dugesia subtentaculata"
+      ],
+      "variables_missing": [
+        "Schmidtea mediterranea (the species named in the claim)",
+        "genome-wide ploidy or heterozygosity",
+        "regeneration, tumour and ageing measures"
+      ],
+      "scope": "Dugesia subtentaculata, 2 loci; 717,169 bytes; published 2019-05-20",
+      "evidence": "Abstract (from API response): cloned data of a nuclear and a mitochondrial gene; 'most individuals ... are mosaics', intraindividual diversity higher in fissiparous and facultative than in sexual individuals.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "NCBI Assembly (E-utilities)",
+      "query": "Schmidtea mediterranea[Organism]",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=assembly&term=Schmidtea%20mediterranea%5BOrganism%5D&retmode=json",
+      "hits": 9,
+      "note": "first attempt returned HTTP 429, retry returned 9"
+    },
+    {
+      "source": "NCBI SRA (E-utilities)",
+      "query": "Schmidtea mediterranea[Organism]",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=sra&term=Schmidtea%20mediterranea%5BOrganism%5D&retmode=json&retmax=1",
+      "hits": 6382,
+      "note": "SRA experiments; 149 of them with WGS strategy (same query + AND WGS[Strategy])"
+    },
+    {
+      "source": "AnAge (dataset.zip)",
+      "query": "grep Schmidtea|Dugesia|Platyhelminth|Turbellaria in anage_data.txt",
+      "url": "https://genomics.senescence.info/species/dataset.zip",
+      "hits": 3,
+      "note": "169,150-byte zip, 4,646 species rows; 3 flatworm rows: Macrostomum lignano, Schmidtea mediterranea, Schmidtea polychroa"
+    },
+    {
+      "source": "PlanMine (InterMine web service)",
+      "query": "list Organism.name",
+      "url": "https://planmine.mpibpc.mpg.de/planmine/service/query/results?query=%3Cquery+name%3D%22%22+model%3D%22genomic%22+view%3D%22Organism.name%22%3E%3C%2Fquery%3E&format=json",
+      "hits": null,
+      "note": "HTTP 200 with a list of flatworm and outgroup organisms (e.g. Dugesia japonica, Dendrocoelum lacteum, Macrostomum lignano); response truncated in my view, count not recorded"
+    },
+    {
+      "source": "Dryad",
+      "query": "planarian",
+      "url": "https://datadryad.org/api/v2/search?q=planarian",
+      "hits": 11,
+      "note": "11 datasets; none about bioelectric manipulation or head number; two relevant to genome/aging (dryad.v15dv425h, dryad.c5f0ps6)"
+    }
+  ],
+  "status": "partial",
+  "summary": "Genome side is covered by public assemblies (9 NCBI records for S. mediterranea, incl. A2/S3 haplotype assemblies) and 6,382 SRA experiments; a Dryad set (CC0, 2024) holds population performance of S. mediterranea and Dugesia tahitiensis under varied feeding. Tumour incidence and actuarial ageing of asexual strains were not found anywhere, and AnAge has no longevity for S. mediterranea.",
+  "next_step": "Compute heterozygosity/ploidy from the asexual-strain SRA runs or assemblies, and check dryad.v15dv425h's files for survival or reproduction variables; tumour incidence needs a literature compilation.",
+  "obstacles_confirmed": [
+    "Lifespan and tumour-incidence numbers are not in the genome databases and are sparse for asexual strains.",
+    "Champions of regeneration is a comparative ranking without a single coded trait matrix."
+  ]
+}

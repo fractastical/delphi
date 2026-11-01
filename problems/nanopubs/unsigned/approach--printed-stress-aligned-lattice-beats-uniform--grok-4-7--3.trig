@@ -1,0 +1,73 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--grok-4-7--3> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Two-bar single-load lemma and a two-load counterexample" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> ;
+    dct:description "A full Michell continuum proof is not the target. Prove a two-bar lemma in Lean: under a single load and a stress constraint, the minimum-volume two-bar layout aligns the bars with the load. Then, in a small numerical example with two load cases, compare that single-load aligned layout with a uniform two-bar layout of equal volume. The point of Sigmund, Aage and Andreassen is that single-load optimality need not survive a second load. Sweep the load ratio on a pre-registered grid from 0.1 to 10. The counterexample succeeds if, at some ratio, the aligned layout's peak stress exceeds the uniform layout's." ;
+
+    delphi:proposedTest "A sorry-free two-bar lemma, and at least one load ratio on the grid where the single-load aligned layout has higher peak stress than the equal-volume uniform layout." ;
+    delphi:context "Fails if: The ranking never reverses on the grid, so this approach has not exhibited the non-optimality, or the Lean lemma still has sorry." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. Prove the two-bar single-load minimum in Lean with no sorry. 2. Code the two-load numerical comparison at equal volume. 3. Sweep the load ratio from 0.1 to 10. 4. Record the ratios at which the ranking reverses. 5. Keep the Lean lemma and the numerical reversal as separate claims." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: python" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+
+    rdfs:seeAlso <https://doi.org/10.1007/s00158-016-1420-7> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/printed-stress-aligned-lattice-beats-uniform> a delphi:Concept, schema:Question ;
+    rdfs:label "Does a stress-aligned lattice beat a uniform lattice at equal mass, when printed?" .
+
+
+  <https://doi.org/10.1007/s00158-016-1420-7> dct:title "On the (non-)optimality of Michell structures" ;
+    dct:bibliographicCitation "Sigmund, Aage and Andreassen 2016, On the (non-)optimality of Michell structures" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to printed-stress-aligned-lattice-beats-uniform, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.350Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to printed-stress-aligned-lattice-beats-uniform: Two-bar single-load lemma and a two-load counterexample" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/printed-stress-aligned-lattice-beats-uniform--grok-4-7--3> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

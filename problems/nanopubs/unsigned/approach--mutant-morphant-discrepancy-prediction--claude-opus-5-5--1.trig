@@ -1,0 +1,88 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/mutant-morphant-discrepancy-prediction--claude-opus-5-5--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered classifier from ZFIN labels with paralog, NMD and network features" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> ;
+    dct:description "Labels: from ZFIN downloads, genes with at least one morpholino phenotype and at least one phenotyped mutant allele. A gene is 'discrepant' if the mutant lacks the morphant's phenotype in the same anatomical system and stage window, and 'concordant' otherwise; this rule is fixed in advance and applied by script. Features, fixed in advance: (a) paralog structure (number of zebrafish paralogs including ohnologs from Ensembl Compara, maximum protein identity, and whether the closest paralog is co-expressed in the same tissue per ZFIN expression); (b) NMD susceptibility of the mutant allele (premature termination codon more than 50 nt upstream of the last exon junction, from allele annotation); (c) network features from INDRA CoGEx on human orthologs (degree, number of upstream regulators, membership in complexes); (d) gene length and expression level. Models: L1-regularized logistic regression and gradient-boosted trees, nested cross-validation, with a gene-family-grouped split so paralogs never span train and test. Pre-registered: success if held-out AUROC ≥ 0.70 against a feature-free baseline of 0.5 (permutation p < 0.01). Output: a ranked list of untested genes by predicted discrepancy probability." ;
+
+    delphi:proposedTest "Held-out AUROC with 95% CI under gene-family-grouped cross-validation against the 0.5 baseline, plus a published ranked list of predictions for genes whose mutants are not yet phenotyped, so future ZFIN records check the prediction." ;
+    delphi:context "Fails if: Fewer than about 150 genes have both morphant and mutant phenotypes comparable in system and stage, or AUROC CI includes 0.5: refutes predictability with present features." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Write result.json with label rule, features, model, split and threshold before computing labels. 2. Download ZFIN phenotype, morpholino and allele files; Ensembl paralog tables; query CoGEx; record versions and checksums. 3. Construct labels and features; run nested grouped cross-validation. 4. Report AUROC with CI, feature importances and the ranked prediction list for genes lacking mutant data." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: indra-cogex" ;
+    skos:note "Tool: zfin" ;
+    skos:note "Tool: machine-learning" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/darwin1859-ch05-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2022-tame-19> ;
+    rdfs:seeAlso <https://zfin.org/downloads> ;
+    rdfs:seeAlso <https://rest.ensembl.org/> ;
+    rdfs:seeAlso <https://discovery.indra.bio/> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.devcel.2014.11.018> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature14580> ;
+    rdfs:seeAlso <https://doi.org/10.1038/s41586-019-1064-z> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/mutant-morphant-discrepancy-prediction> a delphi:Concept, schema:Question ;
+    rdfs:label "Predict which genes show mutant-morphant discrepancies" .
+
+  <https://zfin.org/downloads> dct:title "ZFIN data downloads" ;
+    dct:description "Morpholino and mutant phenotype annotations, allele details, expression" .
+  <https://rest.ensembl.org/> dct:title "Ensembl REST API (Compara homology)" ;
+    dct:description "Zebrafish paralogs and protein identities" .
+  <https://discovery.indra.bio/> dct:title "INDRA CoGEx" ;
+    dct:description "Network features of human orthologs" .
+  <https://doi.org/10.1016/j.devcel.2014.11.018> dct:title "Reverse Genetic Screening Reveals Poor Correlation between Morpholino-Induced and Mutant Phenotypes in Zebrafish" ;
+    dct:bibliographicCitation "Kok et al. 2015, poor correlation between morpholino and mutant phenotypes" .
+  <https://doi.org/10.1038/nature14580> dct:title "Genetic compensation induced by deleterious mutations but not gene knockdowns" ;
+    dct:bibliographicCitation "Rossi et al. 2015, Genetic compensation induced by deleterious mutations but not gene knockdowns" .
+  <https://doi.org/10.1038/s41586-019-1064-z> dct:title "Genetic compensation triggered by mutant mRNA degradation" ;
+    dct:bibliographicCitation "El-Brolosy et al. 2019, Genetic compensation triggered by mutant mRNA degradation" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to mutant-morphant-discrepancy-prediction, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.306Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to mutant-morphant-discrepancy-prediction: Pre-registered classifier from ZFIN labels with paralog, NMD and network features" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/mutant-morphant-discrepancy-prediction--claude-opus-5-5--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

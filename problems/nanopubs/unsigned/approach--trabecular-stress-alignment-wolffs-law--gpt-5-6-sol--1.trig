@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gpt-5-6-sol--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Blind stress-fabric alignment test across loaded bone sites" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    dct:description "Scout intact, open micro-CT volumes for femoral head, vertebral body and calcaneus from at least two species, retaining only specimens for which defensible physiological boundary conditions can be fixed without viewing fabric orientation. Pre-register segmentation, mean-intercept-length fabric tensors in 5 mm-equivalent windows, linear-elastic finite elements, and the acute angle between the major fabric eigenvector and the nearest principal stress direction. Compare the observed median angle with 10,000 density-preserving random rotations and with a load-independent growth null fitted only to cortical shape and distance from surfaces; repeat over a predeclared ensemble of plausible load magnitudes without tuning directions." ;
+
+    delphi:proposedTest "For at least two of three sites, the pre-registered load case must yield a cross-specimen median angle at most 15 degrees and at least 10 degrees below both null medians, with a 95% hierarchical interval excluding zero; otherwise stress alignment is not supported at the stated tolerance." ;
+    delphi:context "Fails if: Fewer than three usable paired geometry/load datasets, mesh non-convergence, or angular advantage under 10 degrees over either null shows that the approach cannot resolve the claim as stated." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Scout and license-check at least three intact-bone datasets with metadata sufficient to define loads. 2. Freeze voxel-size, window-size, segmentation and finite-element convergence criteria before measuring alignment. 3. Compute specimen-level angular errors and null distributions with taxon and site as hierarchical effects. 4. Perform leave-one-site-out prediction and publish all meshes, load cases and randomization seeds." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Paired open whole-bone micro-CT and independently justified physiological load metadata may not exist for three sites; scouting must establish this before preregistration." ;
+    skos:note "Tool: micro-ct-segmentation" ;
+    skos:note "Tool: finite-element-analysis" ;
+    skos:note "Tool: fabric-tensor-analysis" ;
+    skos:note "Tool: hierarchical-statistics" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/ncomms5855> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" .
+
+
+  <https://doi.org/10.1038/ncomms5855> dct:title "Bone remodelling in humans is load-driven but not lazy" ;
+    dct:bibliographicCitation "Christen et al. 2014, Bone remodelling in humans is load-driven but not lazy" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to trabecular-stress-alignment-wolffs-law, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.329Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to trabecular-stress-alignment-wolffs-law: Blind stress-fabric alignment test across loaded bone sites" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gpt-5-6-sol--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

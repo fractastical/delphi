@@ -1,0 +1,162 @@
+{
+  "claim_id": "levin-2020-xenobots-01",
+  "variables_needed": [
+    "simulated behaviour (fitness) of each design from the evolutionary pipeline",
+    "measured behaviour of the constructed organism for each transferred design",
+    "control designs (random or shape-scrambled) built and measured",
+    "evolutionary-pipeline code to regenerate designs"
+  ],
+  "datasets": [
+    {
+      "id": "reconfigurable-organisms",
+      "name": "reconfigurable_organisms (Kriegman et al. code repository)",
+      "landing_url": "https://github.com/skriegman/reconfigurable_organisms",
+      "access_url": "https://api.github.com/repos/skriegman/reconfigurable_organisms/contents/",
+      "doi": null,
+      "license": "CC0-1.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GitHub REST repo, contents of root, exp, data_analysis, tools, _voxcad; GET raw README.md",
+        "http_status": 200
+      },
+      "variables_present": [
+        "evolutionary design code (tools/algorithms.py, es.py, evaluation.py) and Voxelyze/VoxCad physics engine",
+        "data_analysis/Transferal_from_silico_to_vivo.py and other analysis scripts"
+      ],
+      "variables_missing": [
+        "stored simulation outputs for the published designs",
+        "build videos",
+        "controls measured in vivo"
+      ],
+      "scope": "Python 2.7 + Voxelyze/VoxCad physics engine; repo size 28,496 KB; CC0-1.0 per GitHub API; last push 2020-02-19",
+      "evidence": "Contents API: exp/ has Object_Manipulation.py, Object_Expulsion.py, Object_Transport.py, Collective_Behavior.py, Locomotion_pass1/2.py; fitness tag in Object_Manipulation.py is <BlockPos>. data_analysis/ has 20 entries incl. vivo_data.csv and imaging/ (4x1.tif..4x4.tif, 5,760,154 bytes each, design.npy).",
+      "verdict": "partial"
+    },
+    {
+      "id": "vivo-data-csv",
+      "name": "data_analysis/vivo_data.csv in reconfigurable_organisms (tracked positions of built organisms)",
+      "landing_url": "https://raw.githubusercontent.com/skriegman/reconfigurable_organisms/master/data_analysis/vivo_data.csv",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "Ranged GET of the first 1,500 bytes; size from GitHub contents API (1,215,040 bytes, not downloaded in full)",
+        "http_status": 200,
+        "bytes": 1215040
+      },
+      "variables_present": [
+        "per-frame X, Y position per Robot and Run, with Upright flag and Start_X/Start_Y"
+      ],
+      "variables_missing": [
+        "simulated counterparts in the same file",
+        "number of organisms or runs (not counted; file not downloaded in full)",
+        "control builds not identified"
+      ],
+      "scope": "organism position-vs-time table",
+      "evidence": "Header line: X,Y,Robot,Run,Upright,Start_X,Start_Y,Time; first rows Robot 1, Run 1, Time 0..10.",
+      "verdict": "partial"
+    },
+    {
+      "id": "paper-pmc6994979",
+      "name": "Open-access article PMC6994979: A scalable pipeline for designing reconfigurable organisms (PNAS)",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1073/pnas.1910837117&format=json&resultType=core",
+      "access_url": null,
+      "doi": "10.1073/pnas.1910837117",
+      "license": "cc by",
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "Europe PMC core record for DOI",
+        "http_status": 200
+      },
+      "variables_present": [
+        "designs, methods and figures; supplement flagged (hasSuppl Y, hasData Y)"
+      ],
+      "variables_missing": [
+        "supplement contents not opened"
+      ],
+      "scope": "single article, license cc by",
+      "evidence": "Europe PMC core record: PMCID PMC6994979, license cc by, hasSuppl Y, hasData Y.",
+      "verdict": "partial"
+    },
+    {
+      "id": "sim2real4designs",
+      "name": "skriegman/sim2real4designs (different paper: sim-to-real transfer of soft robot designs)",
+      "landing_url": "https://github.com/skriegman/sim2real4designs",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GitHub REST contents of root, reality, simulation; GET raw README.md",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "Xenopus-cell constructs"
+      ],
+      "scope": "soft-robot paper (RoboSoft 2020); reality/ holds mold.DXF and an .ino file",
+      "evidence": "README title 'Scalable sim-to-real transfer of soft robot designs'.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "GitHub API",
+      "query": "users/skriegman/repos",
+      "url": "https://api.github.com/users/skriegman/repos?per_page=100",
+      "hits": 26,
+      "note": "also lists kinematically_replicating_organisms (not examined)"
+    },
+    {
+      "source": "Dryad",
+      "query": "xenobot",
+      "url": "https://datadryad.org/api/v2/search?q=xenobot&per_page=5",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Zenodo",
+      "query": "xenobot*",
+      "url": "https://zenodo.org/api/records?q=xenobot*&size=5",
+      "hits": 19,
+      "note": "no record for this pipeline's data"
+    },
+    {
+      "source": "DataCite",
+      "query": "\"reconfigurable organisms\"",
+      "url": "https://api.datacite.org/dois?query=%22reconfigurable+organisms%22&page%5Bsize%5D=5",
+      "hits": 4,
+      "note": "figshare presentation/video only"
+    },
+    {
+      "source": "Europe PMC",
+      "query": "DOI:10.1073/pnas.1910837117",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1073/pnas.1910837117&format=json&resultType=core",
+      "hits": 1,
+      "note": "open access, CC BY"
+    }
+  ],
+  "status": "partial",
+  "summary": "Public: the CC0 design/simulation code and a 1.2 MB tracking table of built organisms (vivo_data.csv) in the same repo, plus four imaging TIFFs; the simulated half needs a re-run since stored simulation outputs and any controls measured in vivo were not found.",
+  "next_step": "Count robots and runs in vivo_data.csv, check what the imaging TIFFs show, and read Transferal_from_silico_to_vivo.py to see which simulation outputs it expects.",
+  "obstacles_confirmed": [
+    "Build videos and a full measurement archive are not in a repository searched.",
+    "Manual construction steps are outside what the code can reproduce."
+  ],
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "levin-03"
+  }
+}

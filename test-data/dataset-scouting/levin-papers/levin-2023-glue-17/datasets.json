@@ -1,0 +1,173 @@
+{
+  "claim_id": "levin-2023-glue-17",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T10:25:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "levin-04"
+  },
+  "variables_needed": [
+    "time-lapse movies of Xenobot parents gathering loose cells",
+    "counts of piles formed and of offspring that become motile",
+    "time from assembly to first offspring",
+    "a survey of other species for the same mode (not testable from one archive)"
+  ],
+  "datasets": [
+    {
+      "id": "kriegman-kro-github",
+      "name": "skriegman/kinematically_replicating_organisms (simulation and design code)",
+      "landing_url": "https://github.com/skriegman/kinematically_replicating_organisms",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing; GitHub contents API for root and the five subfolders; GET README",
+        "http_status": 200,
+        "bytes": 203421
+      },
+      "variables_present": [
+        "voxel simulation and design code (body, circuits, rescue, terrain, analysis folders)"
+      ],
+      "variables_missing": [
+        "wet-lab movies",
+        "wet-lab pile and offspring counts"
+      ],
+      "scope": "in-silico design of kinematically replicating organisms",
+      "evidence": "Contents API lists analysis/, body/, circuits/, rescue/, terrain/ and README.md (402 bytes) pointing to voxcraft-sim and to krorgs.github.io for FAQ, videos and images. No data files for Petri-dish counts were seen.",
+      "verdict": "partial"
+    },
+    {
+      "id": "krorgs-github-io",
+      "name": "krorgs.github.io (FAQ, videos and images for kinematic replication)",
+      "landing_url": "https://krorgs.github.io",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing page; linked from the repo README",
+        "http_status": 200,
+        "bytes": 6803
+      },
+      "variables_present": [
+        "project page said by the repo README to hold FAQ, videos and images"
+      ],
+      "variables_missing": [
+        "machine-readable counts"
+      ],
+      "scope": "illustrative videos and images",
+      "evidence": "HTTP 200, 6,803 bytes. The repo README states \"FAQ, videos, and images can be found here: krorgs.github.io\". Page content was not parsed beyond status and size.",
+      "verdict": "partial"
+    },
+    {
+      "id": "kriegman-2021-pnas-pmc8670470",
+      "name": "Kriegman et al. 2021, Kinematic self-replication in reconfigurable organisms (PNAS)",
+      "landing_url": "https://doi.org/10.1073/pnas.2112672118",
+      "access_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8670470/fullTextXML",
+      "doi": "10.1073/pnas.2112672118",
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET doi redirect (publisher returns 403); GET Europe PMC full-text XML for PMC8670470 and read the Data Availability section",
+        "http_status": 403,
+        "bytes": 99350,
+        "note": "publisher 403; text read through Europe PMC REST"
+      },
+      "variables_present": [
+        "published counts and SI movies (per assessors; SI not inspected)"
+      ],
+      "variables_missing": [
+        "repository-hosted per-trial data"
+      ],
+      "scope": "one paper",
+      "evidence": "doi.org redirected to pnas.org with HTTP 403 (bot wall). Europe PMC full text HTTP 200, 99,350 bytes: \"Data Availability: Source code is available in the GitHub repository (https://github.com/skriegman/kinematically_replicating_organisms). All other data are included in the manuscript and/or supporting information.\"",
+      "verdict": "rejected"
+    },
+    {
+      "id": "pmc10770221-bioelectric-networks-review",
+      "name": "Levin 2023 review, Bioelectric networks: the cognitive glue (PMC10770221)",
+      "landing_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10770221/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing page",
+        "http_status": 200,
+        "bytes": 386425
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "time-lapse movies of Xenobot parents gathering loose cells",
+        "counts of piles formed and of offspring that become motile",
+        "time from assembly to first offspring",
+        "a survey of other species for the same mode (not testable from one archive)"
+      ],
+      "scope": "review article",
+      "evidence": "HTTP 200, 386,425 bytes. It is the review that states the claim; a literature source, not a dataset.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Zenodo",
+      "query": "xenobot",
+      "url": "https://zenodo.org/api/records?size=5&q=xenobot",
+      "hits": 5,
+      "note": "no replication movies or counts in top hits"
+    },
+    {
+      "source": "Dryad",
+      "query": "xenobots",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=xenobots",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "xenobots OR anthrobots",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=xenobots%20OR%20anthrobots",
+      "hits": 42,
+      "note": "top 5 unrelated"
+    },
+    {
+      "source": "BioStudies",
+      "query": "xenobot",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?pageSize=5&query=xenobot",
+      "hits": 1,
+      "note": "S-EPMC12015265, Xenobot transcriptomics"
+    },
+    {
+      "source": "NCBI GEO (eutils db=gds)",
+      "query": "Xenopus xenobot transcriptomics",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&retmode=json&retmax=5&term=Xenopus%20xenobot%20transcriptomics",
+      "hits": 3,
+      "note": "GSE320387, GSE277182, GSE275807: expression series, not replication"
+    },
+    {
+      "source": "Europe PMC",
+      "query": "TITLE:\"Kinematic self-replication in reconfigurable organisms\"",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?format=json&pageSize=5&query=TITLE%3A%22Kinematic%20self-replication%20in%20reconfigurable%20organisms%22",
+      "hits": 1,
+      "note": "PMC8670470"
+    }
+  ],
+  "status": "partial",
+  "summary": "The simulation and design code is public on GitHub, but the wet-lab pile and offspring counts and movies are only in the PNAS manuscript and its supporting information, which the paper itself names as the home of all non-code data. No repository deposit of the Petri-dish data or of a cross-species survey was found.",
+  "next_step": "Compile pile and offspring counts and timings from the PNAS figures and SI movies into a table; the cross-species clause needs a separate literature survey.",
+  "obstacles_confirmed": [
+    "Non-code data are only in the manuscript and SI (Data Availability statement).",
+    "No public survey covers whether other species use kinematic replication."
+  ]
+}

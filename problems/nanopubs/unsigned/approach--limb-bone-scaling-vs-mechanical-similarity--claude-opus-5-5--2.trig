@@ -1,0 +1,81 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Clade and posture heterogeneity of exponents by phylogenetic ANCOVA" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    dct:description "The falsifier is clade-dependent exponents. On the dataset of approach 1, fit phylogenetic ANCOVA models with clade-specific slopes (Mammalia orders with at least 15 species, squamates, testudines, crocodylians) and a posture covariate coded in advance (sprawling, semi-erect, erect; cursorial versus not), and compare a single-slope model against clade-slope and posture-slope models by AICc and likelihood ratio, with tree uncertainty propagated over posterior trees. Biewener's posture hypothesis predicts that once posture is in the model, residual clade slopes are not needed; a single mechanical law predicts the single-slope model wins outright." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--2#n_species> ;
+    delphi:proposedTest "Delta AICc and LR test of the single-slope model versus clade-slope and posture-slope models, with per-clade exponent CIs." ;
+    delphi:context "Fails if: Clade sample sizes too small to estimate slopes with CI half-width below 0.05, making heterogeneity undetectable rather than absent." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Pre-register clade partition, posture coding (from literature, coded blind to bone data), minimum clade size and model set. 2. Fit single, clade-slope, posture-slope and clade-plus-posture models (phylolm, or MCMCglmm with tree as random effect). 3. Report per-clade exponents with CIs against the three hypotheses. 4. Check robustness to removing the largest-bodied taxa (elephants, rhinoceroses) and to SMA versus OLS." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: r-phylolm" ;
+    skos:note "Tool: r-mcmcglmm" ;
+    skos:note "Tool: organisms-layer" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    rdfs:seeAlso <https://bmcbiol.biomedcentral.com/articles/10.1186/1741-7007-10-60> ;
+    rdfs:seeAlso <https://doi.org/10.1126/science.2740914> ;
+    rdfs:seeAlso <https://doi.org/10.1186/1741-7007-10-60> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" .
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--2#n_species> a schema:PropertyValue ;
+    schema:propertyID "n_species" ;
+    schema:value 15 ;
+    schema:description "species named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://bmcbiol.biomedcentral.com/articles/10.1186/1741-7007-10-60> dct:title "Campione and Evans 2012 additional files" ;
+    dct:description "Base dataset." .
+  <https://doi.org/10.1126/science.2740914> dct:title "Scaling Body Support in Mammals: Limb Posture and Muscle Mechanics" ;
+    dct:bibliographicCitation "Biewener 1989, Scaling body support in mammals: limb posture and muscle mechanics" .
+  <https://doi.org/10.1186/1741-7007-10-60> dct:title "A universal scaling relationship between body mass and proximal limb bone dimensions in quadrupedal terrestrial tetrapods" ;
+    dct:bibliographicCitation "Campione and Evans 2012" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to limb-bone-scaling-vs-mechanical-similarity, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.309Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to limb-bone-scaling-vs-mechanical-similarity: Clade and posture heterogeneity of exponents by phylogenetic ANCOVA" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

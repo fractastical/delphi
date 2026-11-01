@@ -19,7 +19,7 @@ from PIL import Image, ImageOps
 
 ROOT = Path(__file__).resolve().parents[2]
 LINKS = ROOT / "test-data/morpholib/links.json"
-OUT = ROOT / "docs/thumbs"
+OUT = ROOT.parent / "docs/thumbs"  # ROOT is 
 CACHE = Path(os.path.expanduser("~/.cache/delphisci/morpholib-media"))
 REPO = "fractastical/morpholib"
 # Thumbnail pixel size: the card box is 146x58 CSS px; render at 2x for retina.

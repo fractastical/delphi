@@ -45,7 +45,7 @@ const used = Object.keys(summary.images).filter(id => summary.images[id].suffici
 const cellpose = Object.fromEntries(used.map(id => [id, JSON.parse(readFileSync(join(ROOT, "results", id, "cellpose.json"), "utf8"))]));
 const control = summary.controls["random-voronoi"];
 
-const BLOB = path => `https://github.com/fractastical/delphisci/blob/${commit}/${path}`;
+const BLOB = path => `https://github.com/fractastical/delphisci/blob/${commit}/${path.startsWith("site/") ? "" : ""}${path}`;
 const AGENT = "https://w3id.org/delphi/resource/agent/delphisci-cell-geometry";
 const MODEL = "https://w3id.org/delphi/resource/model/claude-opus-5.5";
 const OWNER = "https://orcid.org/0009-0007-4948-9192";

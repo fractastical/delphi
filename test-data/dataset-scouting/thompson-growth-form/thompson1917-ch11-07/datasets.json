@@ -1,0 +1,95 @@
+{
+  "claim_id": "thompson1917-ch11-07",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T08:16:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "thompson-01" },
+  "variables_needed": [
+    "outlines or 3D curves of accreted hard parts (shells, tusks, horns, claws), with growth lines visible",
+    "outlines of simultaneously formed structures (leaf margins, fish body contours) for the same fit procedure",
+    "an a-priori label for each structure: accretionary vs. simultaneously formed",
+    "enough specimens per class to compare fit quality"
+  ],
+  "datasets": [
+    {
+      "id": "morphosource",
+      "name": "MorphoSource media search (keyword)",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=shell&per_page=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T08:14:32Z", "method": "GET /api/media?q=<term>&per_page=1 reading pages.total_count for tusk, horn, claw, shell (also Nautilus 1, Gastropoda 6 earlier)", "http_status": 200 },
+      "variables_present": ["media matching keywords: shell 1,195; claw 82; horn 45; tusk 25 (keyword hits, mixed element types)"],
+      "variables_missing": [
+        "keyword hits include any media whose text contains the word (e.g. turtle shells, skull horn cores); how many are logarithmic-spiral candidates such as mollusc shells, ungulate horns, tusks was not sorted",
+        "no soft-outline structures (leaves, fish contours) in this source by design"
+      ],
+      "scope": "3D scans, all taxa",
+      "evidence": "pages.total_count values as stated: shell 1195, claw 82, horn 45, tusk 25",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "inaturalist",
+      "name": "iNaturalist observations with photos (API)",
+      "landing_url": "https://www.inaturalist.org/",
+      "access_url": "https://api.inaturalist.org/v1/observations?taxon_name=Nautilus&per_page=0&photos=true",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T08:14:35Z", "method": "GET v1/observations?taxon_name=Nautilus&photos=true&per_page=0 (total_results 1840); HEAD landing page 200", "http_status": 200 },
+      "variables_present": ["1,840 photo observations of Nautilus, as an example of a spiral shell taxon (total_results)"],
+      "variables_missing": ["photos have uncontrolled viewpoint and scale; no growth-line or outline annotation; per-photo licences vary"],
+      "scope": "Community photographs, worldwide",
+      "evidence": "API returned total_results 1840",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "idigbio-plantae-images",
+      "name": "iDigBio specimen records of plants with images (herbarium leaves)",
+      "landing_url": "https://www.idigbio.org/",
+      "access_url": "https://search.idigbio.org/v2/search/records?rq=%7B%22kingdom%22:%22plantae%22,%22hasImage%22:true%7D",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T08:14:43Z", "method": "GET search/records with kingdom=plantae and hasImage=true, limit=1 (response 719,516 bytes)", "http_status": 200 },
+      "variables_present": ["39,870,613 plant specimen records with images (itemCount), mostly herbarium sheets"],
+      "variables_missing": ["leaf margin outlines are not segmented; sheets hold many leaves, folded or pressed; no accretion labels"],
+      "scope": "Herbarium and museum records",
+      "evidence": "API returned itemCount 39870613",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "fishbase",
+      "name": "FishBase",
+      "landing_url": "https://www.fishbase.se/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T08:14:42Z", "method": "HEAD landing page (Content-Length 447); the ropensci mirror https://fishbase.ropensci.org failed TLS verification (self-signed certificate)", "http_status": 200, "note": "image counts and licences were not queried" },
+      "variables_present": [],
+      "variables_missing": ["whether the site offers bulk-downloadable fish photographs with usable outlines was not established"],
+      "scope": null,
+      "evidence": "HTTP 200 on landing page; TLS error on the API mirror",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "MorphoSource", "query": "media q=shell / claw / horn / tusk", "url": "https://www.morphosource.org/api/media?q=shell&per_page=1", "hits": 1195, "note": "claw 82, horn 45, tusk 25" },
+    { "source": "iNaturalist", "query": "observations taxon_name=Nautilus photos", "url": "https://api.inaturalist.org/v1/observations?taxon_name=Nautilus&per_page=0&photos=true", "hits": 1840, "note": "single example taxon" },
+    { "source": "iDigBio", "query": "kingdom plantae hasImage", "url": "https://search.idigbio.org/v2/search/records?rq=%7B%22kingdom%22:%22plantae%22,%22hasImage%22:true%7D&limit=1", "hits": 39870613, "note": "herbarium images, not outlines" },
+    { "source": "Dryad", "query": "logarithmic spiral shell growth", "url": "https://datadryad.org/api/v2/search?q=logarithmic%20spiral%20shell%20growth", "hits": 1, "note": "Pelagiella exigua Cambrian gastropod (dryad.5tb2rbp0q); not opened" },
+    { "source": "Zenodo", "query": "\"logarithmic spiral\" shell morphology measurements", "url": "https://zenodo.org/api/records?q=%22logarithmic%20spiral%22%20shell%20morphology%20measurements&size=5", "hits": 272135, "note": "count inflated; top hits are papers' figures and 'Refined methods for estimating spirals and spiral deviations' (10.26879/1071) and a Nautilus spiral note; no outline table opened" }
+  ],
+  "status": "partial",
+  "summary": "Raw material for the accretionary class is open (MorphoSource keyword hits: 1,195 shell, 82 claw, 45 horn, 25 tusk; 1,840 iNaturalist Nautilus photos) and for the simultaneous class as herbarium images (iDigBio, about 39.9 million imaged plant records), but no source provides outlines or spiral-fit annotations and no dataset pairs the two classes with an accretion label. Spiral-deviation methodology papers exist on Zenodo, with no outline tables confirmed.",
+  "next_step": "Choose a fixed sample (e.g. gastropod and Nautilus shells, tusks and horns from MorphoSource vs. leaves from a labelled herbarium subset and fish outlines), pre-register the spiral-fit criterion and the accretion/simultaneous labelling rule, then extract outlines.",
+  "obstacles_confirmed": [
+    "Keyword counts in MorphoSource mix many element types; the spiral-bearing subset is smaller and was not counted.",
+    "Labelling a structure as 'simultaneously formed' needs developmental knowledge that no dataset records."
+  ]
+}

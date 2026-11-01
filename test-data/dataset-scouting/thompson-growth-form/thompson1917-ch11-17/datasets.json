@@ -1,0 +1,252 @@
+{
+  "claim_id": "thompson1917-ch11-17",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-04"
+  },
+  "variables_needed": [
+    "carapace outline coordinates of conchostracan (Spinicaudata) specimens, with surface growth lines",
+    "sections or CT showing retained, stacked moults",
+    "moulting behaviour of fully-moulting branchiopods for comparison",
+    "taxon resolution for the historical name Estheria"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-fbg79cnxs-clam-shrimp-delimitation",
+      "name": "Data from: Testing the success of palaeontological methods in the delimitation of clam shrimp (Crustacea, Branchiopoda) on extant species (Dryad)",
+      "landing_url": "https://doi.org/10.5061/dryad.fbg79cnxs",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.fbg79cnxs",
+      "doi": "10.5061/dryad.fbg79cnxs",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD doi.org/10.5061/dryad.fbg79cnxs (200); GET Dryad API datasets/doi (200) and versions/211806/files (200)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "carapace size, shape and ornamentation data for extant spinicaudatans (abstract: 'carapace features (size, shape, ornamentation)')",
+        "files Data_S1.csv (21,015 bytes), Data_S2.csv (56,144), Data_S3.csv (80,620) and ten Species_*.zip archives of 0.8-2.6 MB; CC0; publication 2022-12-19"
+      ],
+      "variables_missing": [
+        "growth-line coordinates and moult sections not confirmed",
+        "genus Ozestheria in file names, not Estheria"
+      ],
+      "scope": "Extant clam shrimps; total 39,192,015 bytes (not downloaded)",
+      "evidence": "Dryad API: license CC0-1.0, storageSize 39192015, file list as given",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "idigbio",
+      "name": "iDigBio (specimen records API)",
+      "landing_url": "https://www.idigbio.org/",
+      "access_url": "https://search.idigbio.org/v2/search/records?rq={\"family\":\"cyzicidae\"}&limit=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET search.idigbio.org records: genus=estheria (80), family=cyzicidae (2,328), class=branchiopoda (31,797), order=spinicaudata (0)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "Cyzicidae specimen records: 2,328; Branchiopoda: 31,797"
+      ],
+      "variables_missing": [
+        "the 80 'estheria' records examined (first three) are Tachinidae, Diptera, hasImage false: the fly genus Estheria, not the crustacean",
+        "image counts for Cyzicidae not queried"
+      ],
+      "scope": "Museum specimen records; images unverified",
+      "evidence": "itemCount values from four queries; fields scientificname/class/order/family/hasImage for first 3 estheria items",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gbif-estheria-rueppell-1837",
+      "name": "GBIF backbone: Estheria Rüppell, 1837 (Branchiopoda, Cyzicidae, synonym)",
+      "landing_url": "https://api.gbif.org/v1/species/match?name=Estheria&kingdom=Animalia&class=Branchiopoda",
+      "access_url": "https://api.gbif.org/v1/species/match?name=Estheria&kingdom=Animalia&class=Branchiopoda",
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET GBIF species/search q=Estheria rank=GENUS (51 usages); GET species/match name=Estheria class=Branchiopoda",
+        "http_status": 200
+      },
+      "variables_present": [
+        "name resolution: usageKey 6006738, 'Estheria Rüppell, 1837', status SYNONYM, class Branchiopoda, family Cyzicidae"
+      ],
+      "variables_missing": [
+        "no occurrence or image data fetched for the crustacean taxon; species/match for order Spinicaudata returned no usageKey"
+      ],
+      "scope": "Taxonomic name only; the first 10 'Estheria' usages in species/search were Tachinidae (Diptera) or without family",
+      "evidence": "match response fields as quoted; species/search count 51",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "pbdb-spinicaudata",
+      "name": "Paleobiology Database: Spinicaudata",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Spinicaudata&show=attr,size",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET data1.2 taxa/single.json?name=Spinicaudata&show=attr,size (200); GET occs/list.json base_name=Spinicaudata limit=2",
+        "http_status": 200
+      },
+      "variables_present": [
+        "taxon record txn:57393 with noc=165, siz=83, exs=19; occurrence records carry identification, stratigraphic interval and ages (e.g. '? Cyzicus shupei', Cenomanian)"
+      ],
+      "variables_missing": [
+        "no outlines, images or growth-line measures"
+      ],
+      "scope": "Fossil and extant Spinicaudata occurrences",
+      "evidence": "JSON fields noc 165, siz 83, exs 19 as returned",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource media API",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?locale=en&q=Spinicaudata",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET /api/media?locale=en&q=Spinicaudata",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "response contained an empty media list for the query"
+      ],
+      "scope": "Query 'Spinicaudata'",
+      "evidence": "JSON: \"media\":[] (zero items)",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive, BioStudies search",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=Branchiopoda%20moulting%20carapace%20Spinicaudata%20clam%20shrimp",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "GET BioImages search 'Branchiopoda moulting carapace Spinicaudata clam shrimp'",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "zero hits"
+      ],
+      "scope": "Archive-wide",
+      "evidence": "totalHits 0",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "digital-atlas-of-ancient-life",
+      "name": "Digital Atlas of Ancient Life",
+      "landing_url": "https://www.digitalatlasofancientlife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:15:00Z",
+        "method": "HEAD landing page (200)",
+        "http_status": 200,
+        "note": "only the landing page was checked; no conchostracan holdings enumerated"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "no machine-readable listing checked; whether conchostracan pages exist was not verified"
+      ],
+      "scope": "Not verified",
+      "evidence": "HTTP 200 on landing page only",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "GBIF species API",
+      "query": "Estheria, rank=GENUS",
+      "url": "https://api.gbif.org/v1/species/search?q=Estheria&rank=GENUS&limit=10",
+      "hits": 51,
+      "note": "first 10 are Tachinidae or unplaced; crustacean Estheria Rüppell is a synonym of a Cyzicidae name"
+    },
+    {
+      "source": "GBIF occurrence API",
+      "query": "q=Estheria",
+      "url": "https://api.gbif.org/v1/occurrence/search?q=Estheria&limit=0",
+      "hits": 1510,
+      "note": "free-text; mixes fly and crustacean records, not separated"
+    },
+    {
+      "source": "iDigBio",
+      "query": "genus=estheria / family=cyzicidae / class=branchiopoda",
+      "url": "https://search.idigbio.org/v2/search/records?rq=%7B%22family%22%3A%22cyzicidae%22%7D&limit=1",
+      "hits": 2328,
+      "note": "80 estheria records are flies in the first three examined"
+    },
+    {
+      "source": "PBDB",
+      "query": "taxa/single Spinicaudata",
+      "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Spinicaudata&show=attr,size",
+      "hits": 1,
+      "note": "noc 165"
+    },
+    {
+      "source": "Zenodo",
+      "query": "Spinicaudata conchostraca carapace growth lines, type=dataset",
+      "url": "https://zenodo.org/api/records?q=Spinicaudata%20conchostraca%20carapace%20growth%20lines&type=dataset&size=6",
+      "hits": 24115,
+      "note": "relevant: 7458364 (= Dryad fbg79cnxs), 5000760 Ecological stasis in Spinicaudata (Early Cretaceous Yixian), 13972512 Australian Eocyzicus"
+    },
+    {
+      "source": "BioImage Archive (BioStudies API)",
+      "query": "Branchiopoda moulting carapace Spinicaudata clam shrimp",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=Branchiopoda%20moulting%20carapace%20Spinicaudata%20clam%20shrimp&pageSize=6",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "MorphoSource",
+      "query": "q=Spinicaudata",
+      "url": "https://www.morphosource.org/api/media?locale=en&q=Spinicaudata",
+      "hits": 0,
+      "note": "empty media list"
+    }
+  ],
+  "status": "partial",
+  "summary": "Carapace size/shape/ornamentation data for extant clam shrimps are open (Dryad 10.5061/dryad.fbg79cnxs, CSV tables plus per-species archives, CC0), and Spinicaudata occurrences exist in PBDB (165 occurrences) and iDigBio (Cyzicidae, 2,328 records). I found no section, CT or time-series data showing retained moults, and MorphoSource and the BioImage Archive returned nothing for Spinicaudata. The name Estheria resolves in GBIF to a Cyzicidae synonym but also to a fly genus, so searches by name mix taxa.",
+  "next_step": "Open the Dryad Data_S*.csv headers and Species_*.zip contents to see whether growth-line positions are recorded; for the mechanism itself compile sectioned-carapace images from the literature.",
+  "obstacles_confirmed": [
+    "External lines alone cannot separate retained moults from true shell accretion; sections are mostly in papers.",
+    "Estheria is a historical name now split among modern genera and shared with a fly genus in GBIF and iDigBio."
+  ]
+}

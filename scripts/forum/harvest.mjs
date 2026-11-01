@@ -198,9 +198,10 @@ async function main() {
     root = worktree;
   }
   try {
+    const base = root;
     for (const e of accepted) {
-      mkdirSync(dirname(join(root, e.path)), { recursive: true });
-      writeFileSync(join(root, e.path), JSON.stringify(e.file, null, 2) + "\n");
+      mkdirSync(dirname(join(base, e.path)), { recursive: true });
+      writeFileSync(join(base, e.path), JSON.stringify(e.file, null, 2) + "\n");
       console.log(`wrote ${e.path}`);
     }
     if (!PR) return;
@@ -241,7 +242,7 @@ function prBody(accepted, report) {
     ...(notes.length ? ["", "**Warnings**", ...notes] : []),
     ...(rejected.length ? ["", "**Rejected (not included)**", ...rejected] : []),
     "",
-    "Then run `node scripts/site/build-claim-graph.mjs` so docs/claims.json and SUMMARY.md pick the tests up.",
+    "Then run `node scripts/site/build-claim-graph.mjs`so docs/claims.json and SUMMARY.md pick the tests up.",
   ].join("\n");
 }
 

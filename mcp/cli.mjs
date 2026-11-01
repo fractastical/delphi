@@ -21,12 +21,14 @@
 //   node mcp/cli.mjs morpholib list --relation tests --thinker thompson
 //   node mcp/cli.mjs morpholib --id thompson1917-ch11-08
 //   node mcp/cli.mjs morpholib live                     (what is published now vs test-data/morpholib/links.json)
+//   node mcp/cli.mjs replications [claim-id] [--quorum 2] [--trusted ed25519:..] [--peers]
 //   node mcp/cli.mjs forum --view claim --claim levin-2022-tame-19
 //   node mcp/cli.mjs forum --view requests
 //   node mcp/cli.mjs propose-claim proposal.json      (fields as in delphi_propose_claim)
 //   node mcp/cli.mjs log-result result.json            (fields as in delphi_log_test_result)
 
 import { readFileSync } from "node:fs";
+import { replicationsTool } from "./federation.mjs";
 import { forumRead, logTestResult, proposeClaim } from "./forum.mjs";
 import { browseClaims, getClaimWithStatus, overviewWithGraph, rankClaimsWithStatus, searchClaimsWithStatus } from "./graph.mjs";
 import { sparql } from "./lib.mjs";
@@ -60,6 +62,7 @@ const commands = {
   }),
   tests: () => claimTestsTool({ view: positional[0], ...opts }),
   morpholib: () => morpholibTool({ view: positional[0], ...opts }),
+  replications: () => replicationsTool({ claim: positional[0] ?? opts.claim, quorum: opts.quorum, trusted: opts.trusted ? String(opts.trusted).split(",") : undefined, includePeers: Boolean(opts.peers) }),
   organism: () => getOrganism({ id: positional[0] ?? opts.id, includeMentions: opts.includeMentions !== false }),
   forum: () => forumRead({ view: positional[0] ?? opts.view ?? "feed", limit: 25, ...opts }),
   "propose-claim": () => proposeClaim(JSON.parse(readFileSync(positional[0], "utf8"))),

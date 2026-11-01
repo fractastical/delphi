@@ -1,0 +1,187 @@
+{
+  "claim_id": "levin-2024-anthrobots-23",
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T10:25:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5",
+    "run": "levin-04"
+  },
+  "variables_needed": [
+    "Xenobot trajectories with movement-type labels (linear, circular, curvilinear, eclectic)",
+    "Anthrobot trajectories with movement-type labels",
+    "Identical straightness / gyration indices for both platforms",
+    "Per-segment state sequences to estimate transition rates"
+  ],
+  "datasets": [
+    {
+      "id": "anthrobots-2024-adv-sci-pmc10811512",
+      "name": "Gumuskaya et al. 2024, Motile Living Biobots (PMC10811512) article and supporting information",
+      "landing_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10811512/",
+      "access_url": null,
+      "doi": "10.1002/advs.202303575",
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET PMC article page and search the text for a data availability statement and supplementary files",
+        "http_status": 200,
+        "bytes": 310783
+      },
+      "variables_present": [
+        "article text with reported transition and consistency summaries",
+        "Supplemental Videos 1-7 and a 1.5 MB Supporting Information PDF listed as downloads"
+      ],
+      "variables_missing": [
+        "Anthrobot track files",
+        "single-cell lineage or seeding records",
+        "per-spheroid counts"
+      ],
+      "scope": "Anthrobots (adult human bronchial epithelial cells), one paper",
+      "evidence": "HTTP 200, 310,783 bytes. Data Availability Statement reads: \"The data that support the findings of this study are available from the corresponding author upon reasonable request.\" The supplement list names Supplemental Video 1 (2 MB mp4), 2 (11.5 MB avi), 3 ... 7 (10.9 MB avi) and a 1.5 MB PDF.",
+      "verdict": "partial"
+    },
+    {
+      "id": "swarm-lab-xenobots-behavior-data",
+      "name": "Xenobot behavioral data and R analysis code (Blackiston et al. 2021, swarm-lab/xenobots)",
+      "landing_url": "https://github.com/swarm-lab/xenobots",
+      "access_url": "https://api.github.com/repos/swarm-lab/xenobots/contents/rawdata",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET landing page; GitHub contents API for repo root and rawdata/; GET README, data_prep.R, final.Rmd",
+        "http_status": 200,
+        "bytes": 217561
+      },
+      "variables_present": [
+        "raw Xenobot tracking CSVs (12 zipped files, replicates 3-14) plus info.xlsx",
+        "R code (final.Rmd) whose section \"Behavioral transitions\" fits a multi-state transition model with msm::statetable.msm to bot states"
+      ],
+      "variables_missing": [
+        "Anthrobot trajectories",
+        "Anthrobot segment labels"
+      ],
+      "scope": "Xenobots only, from the Blackiston et al. 2021 Cell Reports platform paper; the Anthrobot half of the claim has no counterpart here",
+      "evidence": "rawdata/ lists 10.csv.zip (5,078,204 B), 11 (13,206,143), 12 (1,861,680), 13 (4,432,550), 14 (5,582,720), 3 (3,687,035), 4 (3,196,954), 5 (8,167,062), 6 (4,922,189), 7 (5,683,935), 8 (3,807,479), 9 (4,309,946) and info.xlsx (10,621). data_prep.R reads rawdata/*.csv.zip with readr and the trackdf package. final.Rmd lines 554-609 contain the \"Behavioral transitions\" section. CSV column names were not inspected (zips are over the 1 MB limit); the Zenodo release below archives the repo.",
+      "verdict": "partial"
+    },
+    {
+      "id": "zenodo-4435617-swarm-lab-xenobots-release",
+      "name": "swarm-lab/xenobots: Original release (Zenodo archive)",
+      "landing_url": "https://zenodo.org/records/4435617",
+      "access_url": null,
+      "doi": "10.5281/zenodo.4435617",
+      "license": "other-open",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "GET https://zenodo.org/api/records/4435617 (metadata) and landing page",
+        "http_status": 200,
+        "bytes": 60149
+      },
+      "variables_present": [
+        "archived copy of the swarm-lab/xenobots repository (rawdata CSV zips, R code)"
+      ],
+      "variables_missing": [
+        "Anthrobot trajectories"
+      ],
+      "scope": "Xenobot behavioral data only",
+      "evidence": "API metadata: doi 10.5281/zenodo.4435617, one file swarm-lab/xenobots-1.0.zip of 63,973,930 bytes, license id other-open, publication_date 2021-01-13. Zip not downloaded (over 1 MB).",
+      "verdict": "partial"
+    },
+    {
+      "id": "geo-gse281379-anthrobot-lifecycle",
+      "name": "GSE281379: A Transcriptome Analysis of the Lifecycle of Anthrobots",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE281379",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T10:25:00Z",
+        "method": "eutils esearch/esummary db=gds, then GET landing page",
+        "http_status": 200,
+        "bytes": 21545
+      },
+      "variables_present": [
+        "Homo sapiens Anthrobot transcriptome series"
+      ],
+      "variables_missing": [
+        "Anthrobot trajectories",
+        "movement-type labels"
+      ],
+      "scope": "Anthrobot gene expression; not behavior tracks",
+      "evidence": "esummary returned accession GSE281379, title \"A Transcriptome Analysis of the Lifecycle of Anthrobots\", taxon Homo sapiens. Landing page HTTP 200 (21,545 bytes, the same size as other GEO pages, content not read).",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Zenodo",
+      "query": "anthrobots",
+      "url": "https://zenodo.org/api/records?size=5&q=anthrobots",
+      "hits": 9,
+      "note": "top hits are theory preprints and PDFs, no tracking data"
+    },
+    {
+      "source": "Zenodo",
+      "query": "xenobot",
+      "url": "https://zenodo.org/api/records?size=5&q=xenobot",
+      "hits": 5,
+      "note": "no tracking data in top hits"
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"swarm-lab/xenobots\"",
+      "url": "https://zenodo.org/api/records?size=5&q=%22swarm-lab/xenobots%22",
+      "hits": 1,
+      "note": "finds record 4435617"
+    },
+    {
+      "source": "Dryad",
+      "query": "xenobots",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=xenobots",
+      "hits": 0
+    },
+    {
+      "source": "Dryad",
+      "query": "anthrobots",
+      "url": "https://datadryad.org/api/v2/search?per_page=5&q=anthrobots",
+      "hits": 0
+    },
+    {
+      "source": "DataCite",
+      "query": "xenobots OR anthrobots",
+      "url": "https://api.datacite.org/dois?page%5Bsize%5D=5&query=xenobots%20OR%20anthrobots",
+      "hits": 42,
+      "note": "top 5 are unrelated Zenodo preprints"
+    },
+    {
+      "source": "BioStudies",
+      "query": "anthrobots",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/search?pageSize=5&query=anthrobots",
+      "hits": 2,
+      "note": "S-EPMC12376695 (life cycle paper) and S-EPMC10811512 (the 2024 paper); both are article mirrors"
+    },
+    {
+      "source": "NCBI GEO (eutils db=gds)",
+      "query": "anthrobots OR xenobots",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&retmode=json&retmax=5&term=anthrobots%20OR%20xenobots",
+      "hits": 25,
+      "note": "includes GSE281379 (Anthrobot lifecycle), GSE277182 and GSE275807 (Xenobot transcriptomics), GSE320387 (Xenobot memory): expression, not tracks"
+    }
+  ],
+  "status": "partial",
+  "summary": "The Xenobot trajectories and the R code for their behavioral-transition analysis are public (GitHub swarm-lab/xenobots, archived on Zenodo 4435617). Anthrobot tracks are not public: the 2024 paper says the data are available on request, and the only open Anthrobot items are 7 supplemental videos and a GEO transcriptome series.",
+  "next_step": "Download one rawdata CSV zip from swarm-lab/xenobots to read its columns and confirm it carries movement-type labels; request Anthrobot tracks from the corresponding author, or re-track the supplemental videos, before pre-registering a joint transition-matrix comparison.",
+  "obstacles_confirmed": [
+    "Raw Anthrobot trajectories are not in a public repository (data statement: on reasonable request).",
+    "No dataset holds both platforms analysed with the same indices."
+  ]
+}

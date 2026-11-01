@@ -1,0 +1,78 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/rule110-universality-machine-checked--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Independent exhaustive audit of Cook's glider and collision table" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/rule110-universality-machine-checked> ;
+    dct:description "Before or alongside formalization, re-derive from scratch every fact Cook's construction depends on, using code written without reference to Cook's tables except for the final comparison. Enumerate all gliders on the ether background up to period 200 and width 100 using de Bruijn-diagram search for spacetime-periodic patterns. For every ordered pair of gliders used by the construction, simulate the collision at every relative phase and every integer gap in the range the construction allows, and record the outgoing glider multiset with phases. Then run the full construction for small cyclic tag systems (including Cook's worked example and randomly generated CTS with up to 6 appendants of length up to 6) for at least 10^7 generations with bit-parallel simulation, and decode the CTS tape from the glider stream at each emulated step, comparing with a direct CTS interpreter." ;
+
+    delphi:proposedTest "Either a complete match (every collision the construction needs behaves as stated at every allowed gap, and all end-to-end emulations decode correctly for 10^7 generations), which hands layer 3 of a formal proof a verified target, or a specific (glider pair, phase, gap) triple whose outcome differs from Cook's table and breaks an emulation." ;
+    delphi:context "Fails if: The audit cannot settle universality either way by itself; it fails as an approach if the gap ranges the construction needs cannot be extracted unambiguously from the paper, so the audit checks a reconstruction rather than Cook's proof." ;
+    delphi:hypothesisType "approach/computation" ;
+    skos:note "Steps: 1. Implement a bit-sliced Rule 110 simulator and a de Bruijn-diagram glider finder; verify against the published list of Rule 110 gliders. 2. Produce a machine-readable collision table (JSON) over all phases and gaps used by the construction, with SHA-256 of the generating code and output. 3. Diff the table against a transcription of Cook's table; classify every discrepancy as transcription error, phase-convention difference or genuine mismatch. 4. Run end-to-end emulations of at least 100 random CTS and compare decoded tapes step by step with a reference interpreter." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): tractable" ;
+    skos:note "Tool: large-scale-computation" ;
+    skos:note "Tool: cellular-automaton-simulation" ;
+    skos:note "Tool: de-bruijn-diagrams" ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-14> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch11-27> ;
+    skos:related <https://w3id.org/delphi/resource/claim/wolfram2002-ch01-07> ;
+
+    rdfs:seeAlso <https://doi.org/10.25088/ComplexSystems.15.1.1> ;
+    rdfs:seeAlso <https://doi.org/10.1007/11786986_13> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/rule110-universality-machine-checked> a delphi:Concept, schema:Question ;
+    rdfs:label "Machine-check the universality of Rule 110" .
+
+
+  <https://doi.org/10.25088/ComplexSystems.15.1.1> dct:title "Universality in Elementary Cellular Automata" ;
+    dct:bibliographicCitation "Cook 2004, source of the glider catalogue and collision table to audit" .
+  <https://doi.org/10.1007/11786986_13> dct:title "P-completeness of Cellular Automaton Rule 110" ;
+    dct:bibliographicCitation "Neary and Woods 2006, gives an alternative account of the construction's timing" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to rule110-universality-machine-checked, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.295Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to rule110-universality-machine-checked: Independent exhaustive audit of Cook's glider and collision table" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/rule110-universality-machine-checked--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

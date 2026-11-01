@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/run/limb-bone-scaling-vs-mechanical-similarity--unplanned--2026-11-01> a prov:Activity ;
+    rdfs:label "Run of an unplanned test on limb-bone-scaling-vs-mechanical-similarity (2026-11-01): completed, did not settle its target" ;
+    dct:description "Claim-level PGLS of humeral cross-sectional area on body mass for 84 terrestrial mammals (Amson and Bibi 2021 deposit, their timetree, Pagel's lambda by ML = 0): b = 0.709, 95% CI 0.673 to 0.746, entirely above the geometric 2/3, so the claim is supported (0.6). The interval excludes all three similarity exponents (2/3, 3/4, 1), which is the problem's live question, but this run followed its own pre-registration, not any proposed approach: one table, no circumference data, no clade fits, no 300-taxon count. It is a data point for the problem, not a run of grok-4-7 n=1 or claude-opus-5-5 n=1." ;
+
+    dct:subject <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    prov:startedAtTime "2026-11-01"^^xsd:date ;
+    prov:endedAtTime "2026-11-01"^^xsd:date ;
+    schema:actionStatus schema:CompletedActionStatus ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/run/limb-bone-scaling-vs-mechanical-similarity--unplanned--2026-11-01#settled>, <https://w3id.org/delphi/resource/run/limb-bone-scaling-vs-mechanical-similarity--unplanned--2026-11-01#solves_problem> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    prov:generated <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/test-data/claim-tests/thompson-growth-form/thompson1917-ch02-03/limb-bone-pgls-01/result.json>, <https://w3id.org/delphi/resource/assessment/thompson1917-ch02-03--claim-test--limb-bone-pgls-01> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/runs.json> .
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" .
+  <https://w3id.org/delphi/resource/run/limb-bone-scaling-vs-mechanical-similarity--unplanned--2026-11-01#settled> a schema:PropertyValue ;
+    schema:propertyID "settled" ;
+    schema:value false ;
+    schema:description "Whether the run settled the piece of the problem its approach names (forecasts/INSTRUCTIONS.md)" .
+  <https://w3id.org/delphi/resource/run/limb-bone-scaling-vs-mechanical-similarity--unplanned--2026-11-01#solves_problem> a schema:PropertyValue ;
+    schema:propertyID "solves_problem" ;
+    schema:value false ;
+    schema:description "Whether the logged artifacts meet the problem's acceptance criteria or hit one of its falsifiers definitively" .
+  <https://w3id.org/delphi/resource/assessment/thompson1917-ch02-03--claim-test--limb-bone-pgls-01> a delphi:Assessment ;
+    rdfs:label "Claim test produced by this run (test-data/claim-tests/thompson-growth-form/thompson1917-ch02-03/limb-bone-pgls-01/result.json)" .
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-runner-claude-sonnet-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/runs.json> ;
+    prov:wasGeneratedBy sub:logging .
+  sub:logging a prov:Activity ;
+    rdfs:label "Logging what the swarm ran against limb-bone-scaling-vs-mechanical-similarity in problems/forecasts/runs.json, following problems/forecasts/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-runner-claude-sonnet-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/forecasts/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-runner-claude-sonnet-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach runner (claude-sonnet-5-5), executing a proposed approach and logging the result" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-sonnet-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-sonnet-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-sonnet-5-5" ;
+    dct:identifier "claude-sonnet-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.353Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Run of an unplanned test on limb-bone-scaling-vs-mechanical-similarity (2026-11-01): completed, did not settle its target" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Activity ;
+    npx:introduces <https://w3id.org/delphi/resource/run/limb-bone-scaling-vs-mechanical-similarity--unplanned--2026-11-01> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

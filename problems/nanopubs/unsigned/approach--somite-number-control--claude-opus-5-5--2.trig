@@ -1,0 +1,77 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/somite-number-control--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Fit a PSM balance model across species and predict held-out species" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/somite-number-control> ;
+    dct:description "Formalize the clock-and-wavefront count as a dynamical model and test it out of sample. Model: PSM length L(t) obeys dL/dt = v_g(t) − v_s(t), where v_g is tailbud addition and v_s = S(t)/τ(t) is segmentation (segment length S over period τ), with S set by the wavefront speed, S = v_w τ. Somitogenesis ends at t* when L(t*) = L_min. N = ∫₀^{t*} dt/τ(t). Prove in Lean the qualitative theorems: (a) with constant τ and v_g decaying exponentially at rate k, N is an explicit closed-form function of τ k and L₀/S₀; (b) N increases when τ decreases at fixed elongation and v_w (the snake mechanism), and the elasticity of N to τ is exactly −1 only when elongation is independent of the clock. Then fit the free parameters (k and L_min) on four well-measured species and predict N for a held-out fifth (leave-one-out), comparing elasticity predictions with snake–lizard contrasts." ;
+
+    delphi:proposedTest "Leave-one-out prediction errors for N across the measured species (decisive if all within 15%), and a Lean-proved elasticity statement making precise how much of the snake's high count is due to τ versus elongation." ;
+    delphi:context "Fails if: Leave-one-out errors exceed 30% for any species, meaning species differ in mechanisms the model lacks (for example termination by Hox or Gdf11 timing rather than PSM depletion)." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. Prove the closed form and elasticity theorems in Lean (ODE solution by explicit integration, monotonicity). 2. Extract L(t), S(t) and τ(t) from published time courses (zebrafish, chick, mouse, corn snake). 3. Fit k and L_min; predict the held-out species; report leave-one-out errors. 4. State which comparative contrast (for example snake versus lizard) would most sharply test the elasticity prediction." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Digitized PSM time courses exist only as published figures; extraction is laborious and introduces measurement error." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: ode-simulation" ;
+    skos:note "Tool: comparative-data" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch17-04> ;
+
+    rdfs:seeAlso <https://doi.org/10.1038/nature07020> ;
+    rdfs:seeAlso <https://doi.org/10.1038/nature11804> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/somite-number-control> a delphi:Concept, schema:Question ;
+    rdfs:label "What sets vertebrate somite number?" .
+
+
+  <https://doi.org/10.1038/nature07020> dct:title "Control of segment number in vertebrate embryos" ;
+    dct:bibliographicCitation "Gomez et al. 2008, PSM dynamics in four species" .
+  <https://doi.org/10.1038/nature11804> dct:title "Scaling of embryonic patterning based on phase-gradient encoding" ;
+    dct:bibliographicCitation "Lauschke et al. 2013 (online 2012), Scaling of embryonic patterning based on phase-gradient encoding" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to somite-number-control, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.302Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to somite-number-control: Fit a PSM balance model across species and predict held-out species" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/somite-number-control--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

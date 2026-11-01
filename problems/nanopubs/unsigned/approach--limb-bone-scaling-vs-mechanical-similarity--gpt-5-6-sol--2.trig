@@ -1,0 +1,75 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--gpt-5-6-sol--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Mechanistic safety-factor scaling with posture compensation" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> ;
+    dct:description "For a mammal subset with force-plate or published peak ground-reaction forces, combine body mass, limb effective mechanical advantage, bone length and CT-derived section modulus to estimate peak bending plus axial stress and safety factor. Fit two causal models: geometry-only similarity and posture-compensated stress similarity. Use measurement-error propagation and leave-clade-out prediction; the target is whether nearly flat safety factors arise only after posture is included." ;
+
+    delphi:proposedTest "Posture compensation is supported if the mass slope of log safety factor has absolute value below 0.05 only in the posture model, and that model lowers held-out stress RMSE by at least 20% relative to geometry-only similarity." ;
+    delphi:context "Fails if: Fewer than 40 matched species, a non-flat safety-factor slope after posture, or no predictive gain means the approach fails to explain scaling by mechanical similarity." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. Scout at least 40 species with matchable gait force, posture and limb geometry records. 2. Pre-register load decomposition, muscle-force bounds and admissible taxonomic matching. 3. Estimate stress and safety-factor allometry with and without posture. 4. Test predictions in a held-out clade and conduct sensitivity analysis over material strength." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: The necessary force, posture, CT geometry and material-strength measurements are not known to coexist publicly for 40 species." ;
+    skos:note "Tool: comparative-biomechanics" ;
+    skos:note "Tool: ct-morphometry" ;
+    skos:note "Tool: phylogenetic-regression" ;
+    skos:note "Tool: uncertainty-propagation" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch02-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-04> ;
+    skos:note "Dataset (no resolvable link): Published mammalian locomotor force and limb-geometry records. Species are admissible only when posture and geometry can be matched without genus-level substitution." ;
+
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json> .
+  <https://w3id.org/delphi/resource/problem/limb-bone-scaling-vs-mechanical-similarity> a delphi:Concept, schema:Question ;
+    rdfs:label "How do limb bones actually scale with body mass?" .
+
+
+
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gpt-5-6-sol.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to limb-bone-scaling-vs-mechanical-similarity, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gpt-5-6-sol> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gpt-5-6-sol, OpenAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gpt-5-6-sol> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gpt-5-6-sol> a delphi:LanguageModel ;
+    rdfs:label "gpt-5-6-sol" ;
+    dct:identifier "gpt-5-6-sol" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.331Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to limb-bone-scaling-vs-mechanical-similarity: Mechanistic safety-factor scaling with posture compensation" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/limb-bone-scaling-vs-mechanical-similarity--gpt-5-6-sol--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

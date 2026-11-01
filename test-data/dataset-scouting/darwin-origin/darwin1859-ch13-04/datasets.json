@@ -1,0 +1,98 @@
+{
+  "claim_id": "darwin1859-ch13-04",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:34:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "darwin-04-retry" },
+  "variables_needed": [
+    "Linnaean rank (genus, family, order) assigned to each clade, with species richness per clade",
+    "crown or divergence age per clade",
+    "historical rank assignments across taxonomic revisions (to test rank elevation after species discovery)"
+  ],
+  "datasets": [
+    {
+      "id": "catalogue-of-life",
+      "name": "Catalogue of Life (ChecklistBank dataset 3LR, release 2026-10-14)",
+      "landing_url": "https://www.catalogueoflife.org/",
+      "access_url": "https://api.checklistbank.org/dataset/3LR",
+      "doi": null,
+      "license": "cc by",
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:33:00Z", "method": "GET ChecklistBank API dataset 3LR metadata", "http_status": 200, "bytes": null },
+      "variables_present": ["current rank assignments for names", "taxonomic hierarchy"],
+      "variables_missing": ["divergence or crown ages", "historical rank assignments"],
+      "scope": "API returned title 'Catalogue of Life', version 2026-10-14, licence 'cc by', and a size field of 5466019 (unit not stated in the response).",
+      "evidence": "ChecklistBank /dataset/3LR returned the metadata above; a taxon record (id 6W3C4) also returned 200.",
+      "verdict": "partial"
+    },
+    {
+      "id": "gbif-backbone-taxonomy",
+      "name": "GBIF Backbone Taxonomy",
+      "landing_url": "https://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "access_url": "https://api.gbif.org/v1/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+      "doi": null,
+      "license": "CC BY 4.0",
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T12:33:00Z", "method": "GBIF API dataset record and species/search counts by rank, status=ACCEPTED", "http_status": 200, "bytes": null },
+      "variables_present": ["rank per name", "accepted family and genus counts", "synonymy"],
+      "variables_missing": ["divergence ages", "rank history through time"],
+      "scope": "API counts: 27,016 accepted FAMILY records and 268,274 accepted GENUS records; dataset modified 2023-11-17.",
+      "evidence": "species/search with limit=0 returned count 27016 for FAMILY and 268274 for GENUS.",
+      "verdict": "partial"
+    },
+    {
+      "id": "timetree",
+      "name": "TimeTree",
+      "landing_url": "https://timetree.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T12:33:00Z", "method": "HEAD -L landing page", "http_status": 200, "bytes": null },
+      "variables_present": ["divergence times between taxa (not inspected; landing page only)"],
+      "variables_missing": ["rank assignments"],
+      "scope": "http://www.timetree.org/ redirected to https://timetree.org/. API and bulk-download terms were not examined.",
+      "evidence": "HTTP 200 only.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree v16.1, taxonomy v3)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:33:00Z", "method": "POST tree_of_life/about", "http_status": 200, "bytes": null },
+      "variables_present": ["global hierarchy and tip counts per node via API"],
+      "variables_missing": ["calibrated divergence ages in the synthetic tree (not confirmed)"],
+      "scope": "API returned synth_id opentree16.1, root 'cellular organisms' with num_tips 2,385,875, num_source_studies 1,931, num_source_trees 2,064.",
+      "evidence": "JSON response from /v3/tree_of_life/about.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-taxonomy",
+      "name": "NCBI Taxonomy",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/taxonomy",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:33:00Z", "method": "HEAD -L landing page", "http_status": 200, "bytes": null },
+      "variables_present": ["lineage ranks (not inspected)"],
+      "variables_missing": ["divergence ages", "rank history"],
+      "scope": "Redirected to https://www.ncbi.nlm.nih.gov/datasets/taxonomy/.",
+      "evidence": "HTTP 200 only.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "GBIF", "query": "species/search datasetKey=backbone rank=FAMILY status=ACCEPTED", "url": "https://api.gbif.org/v1/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&rank=FAMILY&status=ACCEPTED&limit=0", "hits": 27016, "note": "accepted families in backbone" },
+    { "source": "GBIF", "query": "species/search datasetKey=backbone rank=GENUS status=ACCEPTED", "url": "https://api.gbif.org/v1/species/search?datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&rank=GENUS&status=ACCEPTED&limit=0", "hits": 268274, "note": "accepted genera in backbone" },
+    { "source": "ChecklistBank", "query": "dataset 3LR metadata", "url": "https://api.checklistbank.org/dataset/3LR", "hits": 1, "note": "Catalogue of Life release 2026-10-14" },
+    { "source": "Open Tree of Life", "query": "tree_of_life/about", "url": "https://api.opentreeoflife.org/v3/tree_of_life/about", "hits": 1, "note": "synthetic tree opentree16.1" }
+  ],
+  "status": "partial",
+  "summary": "Current ranks and hierarchy are openly available (CoL release 2026-10-14; GBIF backbone with 27,016 accepted families and 268,274 genera; Open Tree of Life with 2.39 million tips). Divergence ages are held by TimeTree, which was only checked for reachability, and no source provides historical rank changes.",
+  "next_step": "Check TimeTree's download or API terms for crown ages by taxon name; join to CoL ranks and species counts; for the rank-elevation clause, compile revisions from a historical source such as past CoL releases (not checked here).",
+  "obstacles_confirmed": ["No fetched source records historical rank assignments or the reason for rank changes."]
+}

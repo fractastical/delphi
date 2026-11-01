@@ -1,0 +1,180 @@
+{
+  "claim_id": "darwin1859-ch04-01",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:13:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-10" },
+  "variables_needed": [
+    "standardized linear and quadratic selection gradients or differentials on heritable-trait values, per trait and population",
+    "fitness component measured (survival, fecundity or lifetime reproductive success) in the same rows",
+    "stage-structured survival and fecundity (to estimate offspring surplus over replacement)",
+    "allele-frequency or fitness-effect data for deleterious versus neutral variants (alternative route)"
+  ],
+  "datasets": [
+    {
+      "id": "kingsolver-2001-selection-database-dryad-166",
+      "name": "Kingsolver et al. phenotypic selection database (Dryad: The strength of phenotypic selection in natural populations)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.166",
+      "access_url": null,
+      "doi": "10.5061/dryad.166",
+      "license": "CC0-1.0",
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:01:00Z", "method": "DataCite search 'Kingsolver phenotypic selection database' (3 hits) then GET Dryad dataset record and its version file list", "http_status": 200, "bytes": 776704 },
+      "variables_present": [
+        "standardized linear and quadratic selection gradients or differentials from 63 published studies of 62 species, over 2,500 estimates (Dryad abstract); one file Kingsolveretal.SelnDatabase.norepdur.3.2001.xls, 776,704 bytes"
+      ],
+      "variables_missing": [
+        "heritability or genetic basis of each trait (not stated in the record)",
+        "column names not inspected, so which fitness component each row uses is unconfirmed",
+        "literature covers 1984 to 1997 and mostly morphological traits (record: more than 80 percent morphological)"
+      ],
+      "scope": "62 species, field populations, published 1984 to 1997",
+      "evidence": "Dryad API record: title 'Data from: The strength of phenotypic selection in natural populations', license CC0-1.0, abstract as quoted, file list shows the .xls above.",
+      "verdict": "holds",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "kingsolver-diamond-kd-js-databases-dryad-v4t80",
+      "name": "Persistent directional selection on body size (Dryad v4t80: KD-Database and JS-Database CSVs)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.v4t80",
+      "access_url": null,
+      "doi": "10.5061/dryad.v4t80",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T12:01:00Z", "method": "GET Dryad dataset record and version file list", "http_status": 200, "bytes": 444789 },
+      "variables_present": [
+        "selection estimates on body size from the Kingsolver and Diamond compilation (KD-Database_Dryad.csv, 207,915 bytes) and a juvenile-size subset (JS_Database_Dryad.csv, 221,561 bytes); Genetic_Phenotypic_Correlations_Dryad.csv, 15,313 bytes"
+      ],
+      "variables_missing": ["trait scope is body size, not all heritable variation"],
+      "scope": "Selection on size; many estimates from juveniles (per the record's abstract)",
+      "evidence": "Dryad API record and file list as above; license CC0-1.0.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "singh-punzalan-2018-sex-specific-selection-dryad-b0bp357",
+      "name": "The strength of sex-specific selection in the wild (Dryad b0bp357, Singh and Punzalan 2018)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.b0bp357",
+      "access_url": null,
+      "doi": "10.5061/dryad.b0bp357",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T12:03:00Z", "method": "Dryad search 'phenotypic selection gradients' (305 hits) then GET dataset record and file list", "http_status": 200, "bytes": 138261 },
+      "variables_present": ["sex-specific selection estimates compiled from wild populations (Singh_and_Punzalan_2018_Evolution.csv, 119,680 bytes, plus README xlsx)"],
+      "variables_missing": ["not a general compilation: focus on male versus female differences"],
+      "scope": "Wild populations, sex-specific selection",
+      "evidence": "Dryad API record, CC0-1.0, files listed.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "compadre-plant-matrix-database",
+      "name": "COMPADRE Plant Matrix Database v6.26.3.0",
+      "landing_url": "https://compadre-db.org/Data/Compadre",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T11:58:00Z", "method": "GET Data/Compadre page text", "http_status": 200, "bytes": 16756 },
+      "variables_present": ["matrix population models with stage-structured survival and fecundity: 812 taxonomic species, 669 publications, 9,178 matrices (page text)"],
+      "variables_missing": ["no heritable-trait or individual phenotype data, so no selection gradient", "download link not followed; Data User Agreement applies per page text"],
+      "scope": "Plants, algae, fungi and others as stated on the site",
+      "evidence": "Page text: 'Version 6.26.3.0 812 Taxonomic Species 669 Publications 9178 Matrix Population Models'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "comadre-animal-matrix-database",
+      "name": "COMADRE Animal Matrix Database v4.26.4.0",
+      "landing_url": "https://compadre-db.org/Data/Comadre",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok", "gpt"],
+      "checked": { "at": "2026-11-01T11:58:00Z", "method": "GET Data/Comadre page text", "http_status": 200, "bytes": 16748 },
+      "variables_present": ["animal matrix population models: 445 taxonomic species, 424 publications, 3,548 matrices (page text)"],
+      "variables_missing": ["no individual-level trait-fitness link"],
+      "scope": "Animals as stated on the site",
+      "evidence": "Page text: 'Version 4.26.4.0 445 Taxonomic Species 424 Publications 3548 Matrix Population Models'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "spi-birds-network",
+      "name": "SPI-Birds Network and Database",
+      "landing_url": "https://www.spibirds.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:05:00Z", "method": "GET landing page; GBIF dataset search for 'SPI-Birds' (78 datasets, first is NIOO-KNAW nestbox breeding pairs, doi 10.15468/n3rm4u)", "http_status": 200, "bytes": 229291 },
+      "variables_present": ["the network hosts individually marked breeding-bird records; open GBIF-published pieces seen are annual breeding-pair counts, not individual trait-fitness rows"],
+      "variables_missing": ["individual-level files were not confirmed as openly downloadable; access terms not read"],
+      "scope": "Hole-nesting birds in long-term nestbox sites",
+      "evidence": "Landing page 229,291 bytes; GBIF search count 78 for 'SPI-Birds' (title and description seen mention SPI-Birds hosting).",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "gnomad-portal",
+      "name": "gnomAD",
+      "landing_url": "https://gnomad.broadinstitute.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T11:58:00Z", "method": "GET landing page", "http_status": 200, "bytes": 8943 },
+      "variables_present": [],
+      "variables_missing": ["only the app shell was fetched (8,943 bytes); variant frequency fields not confirmed in this run; human only"],
+      "scope": "Human",
+      "evidence": "Landing page returned HTTP 200.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ltee-portal",
+      "name": "Long-Term Evolution Experiment (LTEE)",
+      "landing_url": "https://the-ltee.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T11:58:00Z", "method": "GET landing page", "http_status": 200, "bytes": 103522 },
+      "variables_present": [],
+      "variables_missing": ["mutation frequency trajectories not confirmed on the landing page; one species, E. coli"],
+      "scope": "Experimental E. coli",
+      "evidence": "Landing page returned HTTP 200.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=phenotypic%20selection%20gradients&per_page=6",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T12:01:00Z", "method": "Dryad search API", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["repository, not a dataset; see the specific Dryad datasets above"],
+      "scope": "Repository",
+      "evidence": "Search 'phenotypic selection gradients' returned total 305.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "Kingsolver phenotypic selection database", "url": "https://api.datacite.org/dois?query=Kingsolver%20phenotypic%20selection%20database&page%5Bsize%5D=5", "hits": 3, "note": "10.5061/dryad.166 (2008), 10.5061/dryad.v4t80 and its KD-Database file (2015)" },
+    { "source": "Dryad", "query": "phenotypic selection gradients", "url": "https://datadryad.org/api/v2/search?q=phenotypic%20selection%20gradients&per_page=6", "hits": 305, "note": "many single-study datasets; Singh and Punzalan 2018 opened" },
+    { "source": "Dryad", "query": "lifetime reproductive success selection gradient wild population", "url": "https://datadryad.org/api/v2/search?q=lifetime%20reproductive%20success%20selection%20gradient%20wild%20population&per_page=6", "hits": 1, "note": "one hit, doi 10.5061/dryad.j6q05, not opened" },
+    { "source": "Zenodo", "query": "phenotypic selection gradients database meta-analysis", "url": "https://zenodo.org/api/records?q=phenotypic%20selection%20gradients%20database%20meta-analysis&size=5", "hits": 601007, "note": "broad OR match; top hits are Dryad-mirrored meta-analyses (floral selection 10.5061/dryad.2v8c5g0; experimental selection 10.5061/dryad.r19f8; heritability and selection 10.5061/dryad.rd5rn), not opened" },
+    { "source": "GBIF", "query": "SPI-Birds", "url": "https://api.gbif.org/v1/dataset/search?q=SPI-Birds&limit=3", "hits": 78, "note": "nestbox datasets published via SPI-Birds" }
+  ],
+  "status": "partial",
+  "summary": "The Kingsolver selection-gradient compilation (over 2,500 estimates, 62 species, CC0, one xls on Dryad) and its 2015 successor CSVs hold the selection-gradient variable; COMPADRE (9,178 matrices) and COMADRE (3,548) hold survival and fecundity, but nothing found pairs measured heritability with fitness in the same rows.",
+  "next_step": "Open the Kingsolver xls header to confirm the fitness-component and trait-type columns, then decide how to treat heritability (a separate source or ignoring it, as the claim's own text says 'any advantage').",
+  "obstacles_confirmed": [
+    "Selection compilations cover mostly morphological traits in vertebrates, insects and plants (1984 to 1997 literature for the main file).",
+    "Demographic matrix databases carry no individual heritable traits."
+  ]
+}

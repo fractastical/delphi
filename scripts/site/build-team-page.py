@@ -22,7 +22,8 @@ from urllib.parse import quote
 from PIL import Image
 
 REPO = Path(__file__).resolve().parents[2]
-DOCS = REPO / "docs"
+DOCS = REPO.parent / "site"  # REPO is ; the built site sits beside it
+TEMPLATES = REPO / "scripts/site/templates"
 OUT = DOCS / "team"
 ORG_IMAGES = REPO / "test-data/organisms/images"
 
@@ -269,10 +270,12 @@ def main():
     seal = (REPO / "assets/logo.svg").read_text().strip()
     inline = re.sub(r"<svg[^>]*>", lambda t: re.sub(r'\s(width|height)="\d+"', "", t.group(0)), seal, count=1)
     inline = inline.replace("<svg ", '<svg role="img" aria-label="DELPHI seal" ', 1)
-    page = (DOCS / "team.template.html").read_text()
-    mono = inline.replace("#14213d", "#000").replace("#e5c07b", "#fff")
-    page = (page.replace("<!--__SEAL__-->", inline)
-                .replace("<!--__SEAL_MONO__-->", mono)
+    page = (TEMPLATES / "team.template.html").read_text()
+    parts = TEMPLATES / "partials"
+    head = (parts / "site-head.html").read_text().replace('data-page="team"', 'aria-current="page"')
+    head = re.sub(r' data-page="[^"]*"', "", head)
+    page = (page.replace("<!--__SITE_HEAD__-->", head)
+                .replace("<!--__SITE_FOOT__-->", (parts / "site-foot.html").read_text())
                 .replace("/*__SEAL_URI__*/", quote(seal, safe="-_.!~*'()"))
                 .replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")))
     (DOCS / "team.html").write_text(page)

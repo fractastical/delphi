@@ -1,0 +1,129 @@
+{
+  "claim_id": "levin-2015-place-07",
+  "variables_needed": [
+    "runnable active-inference morphogenesis model with editable signal sensitivities (precisions)",
+    "in-model outcomes under perturbed sensitivity: segment size, migration, differentiation, atrophy",
+    "embryo cohorts pairing a pharmacological signal manipulation with an anatomical readout (for the in vivo reading)"
+  ],
+  "datasets": [
+    {
+      "id": "spm-dem-morphogenesis",
+      "name": "SPM DEM_morphogenesis.m (toolbox/DEM)",
+      "landing_url": "https://github.com/spm/spm/blob/main/toolbox/DEM/DEM_morphogenesis.m",
+      "access_url": "https://raw.githubusercontent.com/spm/spm/main/toolbox/DEM/DEM_morphogenesis.m",
+      "doi": null,
+      "license": "GPL-2.0",
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "HEAD and GET of the raw file (first 12 lines read); GitHub REST repo record for spm/spm",
+        "http_status": 200
+      },
+      "variables_present": [
+        "public MATLAB routine described as self-assembly/morphogenesis under active inference with 16 cells"
+      ],
+      "variables_missing": [
+        "named switches for the specific sensitivity perturbations in the claim (not checked in the source)",
+        "embryo data"
+      ],
+      "scope": "simulation code; spm/spm is GPL-2.0 per GitHub API",
+      "evidence": "Raw file header: 'This routine illustrates self-assembly or morphogenesis under active inference (free energy minimisation)... 16 cells'.",
+      "verdict": "partial"
+    },
+    {
+      "id": "paper-pmc4387527",
+      "name": "Open-access article PMC4387527: Knowing one's place: a free-energy approach to pattern regulation",
+      "landing_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI:10.1098/rsif.2014.1383&format=json&resultType=core",
+      "access_url": null,
+      "doi": "10.1098/rsif.2014.1383",
+      "license": "cc by",
+      "suggested_by": [
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "Europe PMC core record for DOI (doi.org returned HTTP 403)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "description of the model and sensitivity interventions"
+      ],
+      "variables_missing": [
+        "supplementary data (hasSuppl N, hasData N)",
+        "embryo data"
+      ],
+      "scope": "single article, license cc by",
+      "evidence": "Europe PMC core record: PMCID PMC4387527, license cc by, hasSuppl N, hasData N.",
+      "verdict": "partial"
+    },
+    {
+      "id": "spm-academic-software",
+      "name": "SPM academic software page",
+      "landing_url": "https://www.fil.ion.ucl.ac.uk/spm/software/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T08:20:00Z",
+        "method": "GET landing_url",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "data"
+      ],
+      "scope": "software distribution page",
+      "evidence": "HTTP 200 landing page; it is software, not a dataset.",
+      "verdict": "rejected"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "GitHub",
+      "query": "spm/spm toolbox/DEM/DEM_morphogenesis.m (raw file)",
+      "url": "https://raw.githubusercontent.com/spm/spm/main/toolbox/DEM/DEM_morphogenesis.m",
+      "hits": 1,
+      "note": "file exists"
+    },
+    {
+      "source": "Zenodo",
+      "query": "\"active inference\" AND morphogenesis",
+      "url": "https://zenodo.org/api/records?q=%22active+inference%22+AND+morphogenesis&size=3",
+      "hits": 19,
+      "note": "top hits are a discussion transcript and unrelated preprints; no embryo dataset"
+    },
+    {
+      "source": "DataCite",
+      "query": "\"DEM_morphogenesis\"",
+      "url": "https://api.datacite.org/dois?query=%22DEM_morphogenesis%22&page%5Bsize%5D=3",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Dryad",
+      "query": "morphogen sensitivity teratogen embryo anatomy",
+      "url": "https://datadryad.org/api/v2/search?q=morphogen+sensitivity+teratogen+embryo+anatomy&per_page=3",
+      "hits": 0,
+      "note": ""
+    }
+  ],
+  "status": "partial",
+  "summary": "The in-model half rests on a public SPM routine (GPL-2.0) that could be re-run, but this scouting did not verify that it exposes the claim's specific sensitivity perturbations; no public embryo dataset pairing a drug or signal change with anatomy was found.",
+  "next_step": "Read DEM_morphogenesis.m for the precision and chemotactic-signal parameters, then pre-register an in-model perturbation test; treat the embryo reading as a gap.",
+  "obstacles_confirmed": [
+    "No public embryo dataset maps this model's signal channels onto a drug and an anatomical readout was found in Dryad, Zenodo or DataCite."
+  ],
+  "project": "levin-papers",
+  "scouted_at": "2026-11-01T08:20:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "levin-03"
+  }
+}

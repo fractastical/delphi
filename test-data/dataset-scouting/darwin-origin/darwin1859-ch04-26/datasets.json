@@ -1,0 +1,97 @@
+{
+  "claim_id": "darwin1859-ch04-26",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:35:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "darwin-04-retry" },
+  "variables_needed": [
+    "fossil taxa (species, genus, family, order) with first and last appearance dates",
+    "extant/extinct status per taxon",
+    "phylogenetic links between fossil and living clades"
+  ],
+  "datasets": [
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (PBDB) data service 1.2",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/taxa/list.csv?base_name=Metazoa&rank=family&extant=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:34:30Z", "method": "GET taxa/list.csv with base_name=Metazoa, rank=family, extant=0, limit=1 (record count); taxa/list for Mammalia orders; taxa/single for Trilobita", "http_status": 200, "bytes": null },
+      "variables_present": ["is_extant flag per taxon (extant / extinct)", "n_occs occurrences per taxon", "taxonomic rank and parent links", "first and last appearance via occurrence/taxon endpoints (fields not exercised here)"],
+      "variables_missing": ["species-level ancestor-descendant links", "completeness of fossil sampling"],
+      "scope": "The Metazoa family query with extant=0 reported 'Records Found' 8065 (counts the records the query matched; validity filtering not applied). Trilobita: ext 0, noc 56,593. Mammalia order listing returned rows with is_extant values.",
+      "evidence": "CSV header: orig_no, taxon_no, record_type, flags, taxon_rank, taxon_name, difference, accepted_no, accepted_rank, accepted_name, parent_no, reference_no, is_extant, n_occs; 'Records Found' 8065.",
+      "verdict": "holds"
+    },
+    {
+      "id": "sepkoski-online-genus-database",
+      "name": "Sepkoski's Online Genus Database (University of Wisconsin-Madison)",
+      "landing_url": "https://strata.geology.wisc.edu/jack/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T12:34:45Z", "method": "GET landing page and read text", "http_status": 200, "bytes": 2227 },
+      "variables_present": ["genera with stratigraphic ranges (Sepkoski 2002 port), searchable by Evolutionary Fauna, Phylum or Class", "genus richness and taxonomic rate summaries"],
+      "variables_missing": ["family/order lists by extinct status not verified", "bulk download not located"],
+      "scope": "Page text: a direct port of Sepkoski (2002), a global genus compendium, built by Shanan Peters, hosted at UW-Madison. Marine animals per assessor description; the page excerpt read does not state scope.",
+      "evidence": "Landing page text read (2,227 bytes).",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree v16.1)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:33:00Z", "method": "POST tree_of_life/about", "http_status": 200, "bytes": null },
+      "variables_present": ["relationships among living and some fossil taxa (fossil coverage not verified)"],
+      "variables_missing": ["fossil dating"],
+      "scope": "API reports synth_id opentree16.1, 2,385,875 tips, 1,931 source studies.",
+      "evidence": "JSON response from /v3/tree_of_life/about.",
+      "verdict": "partial"
+    },
+    {
+      "id": "catalogue-of-life",
+      "name": "Catalogue of Life (release 2026-10-14)",
+      "landing_url": "https://www.catalogueoflife.org/",
+      "access_url": "https://api.checklistbank.org/dataset/3LR",
+      "doi": null,
+      "license": "cc by",
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:33:00Z", "method": "GET ChecklistBank API dataset 3LR", "http_status": 200, "bytes": null },
+      "variables_present": ["living species and higher taxa"],
+      "variables_missing": ["fossil taxa"],
+      "scope": "Provides the extant side of a survival score.",
+      "evidence": "ChecklistBank metadata: title Catalogue of Life, version 2026-10-14, licence cc by.",
+      "verdict": "partial"
+    },
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://www.morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt"],
+      "checked": { "at": "2026-11-01T12:34:05Z", "method": "GET landing page", "http_status": 403, "bytes": 919, "note": "403 ERROR (CloudFront-style block) to curl; not retried" },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Not examined.",
+      "evidence": "HTTP 403.",
+      "verdict": "unreachable"
+    }
+  ],
+  "search_log": [
+    { "source": "PBDB", "query": "taxa/list base_name=Metazoa rank=family extant=0", "url": "https://paleobiodb.org/data1.2/taxa/list.csv?base_name=Metazoa&rank=family&extant=0&limit=1&rowcount", "hits": 8065, "note": "records found for extinct-flagged family-rank taxa" },
+    { "source": "PBDB", "query": "taxa/list base_name=Mammalia rank=order", "url": "https://paleobiodb.org/data1.2/taxa/list.csv?base_name=Mammalia&rank=order&show=attr&limit=5", "hits": 5, "note": "first five rows returned with is_extant column" },
+    { "source": "PBDB", "query": "taxa/single name=Trilobita", "url": "https://paleobiodb.org/data1.2/taxa/single.json?name=Trilobita&show=attr", "hits": 1, "note": "ext 0, noc 56593" }
+  ],
+  "status": "data-ready",
+  "summary": "PBDB's open API gives extinct/extant flags, ranks and occurrence counts for fossil taxa (8,065 extinct-flagged family-rank records under Metazoa) and Sepkoski's genus compendium is online; together with Catalogue of Life they cover the taxon-level counts, while species-level ancestry is not recorded anywhere found.",
+  "next_step": "Pre-register how pseudoextinction is handled, then pull PBDB taxa for Paleozoic and Mesozoic orders and families and join to extant status; species-level survival would need phylogenetic links not found here.",
+  "obstacles_confirmed": ["No source found gives species-level ancestor-descendant links.", "PBDB record count was not filtered to valid names or marine animals, so 8,065 is an upper bound on distinct families."]
+}

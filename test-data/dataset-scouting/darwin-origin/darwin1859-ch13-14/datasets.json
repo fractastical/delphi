@@ -1,0 +1,218 @@
+{
+  "claim_id": "darwin1859-ch13-14",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T07:51:24Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5-5-high",
+    "run": "darwin-06"
+  },
+  "variables_needed": [
+    "homologous-organ character states or measurements for fossil and living taxa of one class (e.g. tetrapod limb, insect mouthparts)",
+    "time-calibrated phylogeny including stem fossils for ancestral-state reconstruction",
+    "fossil age/occurrence order of early stem and crown members",
+    "stepwise disparity or connection-topology scores per node"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:51:24Z",
+        "method": "GET morphobank.org and www.morphobank.org (CloudFront 403, retried with browser User-Agent)",
+        "http_status": 403,
+        "note": "403 on every URL tried"
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "everything: nothing could be inspected"
+      ],
+      "scope": "Morphological matrices (not verified)",
+      "evidence": "Both URLs returned HTTP 403 with a CloudFront error page; no project listing, API or matrix could be checked.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "pbdb-api",
+      "name": "Paleobiology Database (data1.2 API)",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:51:24Z",
+        "method": "GET paleobiodb.org/data1.2/taxa/list.json?base_name=Tetrapoda&limit=1&rowcount; taxa/single.json?name=Aves&show=attr,app",
+        "http_status": 200
+      },
+      "variables_present": [
+        "fossil taxa and occurrences with age bounds (Tetrapoda: 66,210 taxon records; Aves taxon first appearance field fea 161.5)"
+      ],
+      "variables_missing": [
+        "homologous-organ character states",
+        "connection/topology data"
+      ],
+      "scope": "Global fossil record",
+      "evidence": "API 200 with the counts quoted.",
+      "verdict": "partial"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree API)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:51:24Z",
+        "method": "POST api.opentreeoflife.org/v3/tree_of_life/about",
+        "http_status": 200
+      },
+      "variables_present": [
+        "synthetic tree topology across life (2,385,875 tips)"
+      ],
+      "variables_missing": [
+        "calibrated ages",
+        "fossil tips",
+        "organ characters"
+      ],
+      "scope": "All life",
+      "evidence": "API 200: 1,931 source studies, 2,064 source trees.",
+      "verdict": "partial"
+    },
+    {
+      "id": "ncbi-genbank",
+      "name": "GenBank / nuccore (Entrez)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T07:51:24Z",
+        "method": "GET eutils esearch db=nuccore term Tetrapoda[Organism] retmax=0",
+        "http_status": 200
+      },
+      "variables_present": [
+        "sequence data for independent molecular phylogenies of living taxa (Tetrapoda: 129,490,830 nuccore records)"
+      ],
+      "variables_missing": [
+        "fossils",
+        "organ morphology"
+      ],
+      "scope": "Living taxa",
+      "evidence": "Entrez 200: count 129490830.",
+      "verdict": "partial"
+    },
+    {
+      "id": "dryad-protocetid-forelimb",
+      "name": "Data from: From limb to fin: an Eocene protocetid forelimb from Senegal (Dryad)",
+      "landing_url": "https://datadryad.org/dataset/doi:10.5061/dryad.2vr4152",
+      "access_url": null,
+      "doi": "10.5061/dryad.2vr4152",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:51:24Z",
+        "method": "Dryad search API listing (datadryad.org/api/v2/search?q=forelimb+evolution+fossil+tetrapods+characters)",
+        "http_status": 200,
+        "bytes": 108011
+      },
+      "variables_present": [
+        "a fossil forelimb dataset (per title)"
+      ],
+      "variables_missing": [
+        "a class-wide comparative matrix"
+      ],
+      "scope": "One fossil cetacean",
+      "evidence": "Search listing shows title and 108,011 bytes; record not opened.",
+      "verdict": "partial"
+    },
+    {
+      "id": "phenoscape-kb",
+      "name": "Phenoscape Knowledgebase",
+      "landing_url": "https://kb.phenoscape.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T07:51:24Z",
+        "method": "GET kb.phenoscape.org; GET /api/kb/annotation/summary (404)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "landing page of an evolutionary-phenotype knowledgebase (title only)"
+      ],
+      "variables_missing": [
+        "verified content"
+      ],
+      "scope": "Unknown",
+      "evidence": "Landing 200 titled 'Phenoscape Knowledgebase'; the API path tried returned 404 and page content is script-rendered, so holdings were not inspected.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "tetrapod limb morphological character matrix fossil",
+      "url": "https://datadryad.org/api/v2/search?q=tetrapod+limb+morphological+character+matrix+fossil&per_page=4",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Dryad",
+      "query": "insect mouthparts morphological characters phylogeny fossil",
+      "url": "https://datadryad.org/api/v2/search?q=insect+mouthparts+morphological+characters+phylogeny+fossil&per_page=4",
+      "hits": 0,
+      "note": ""
+    },
+    {
+      "source": "Dryad",
+      "query": "forelimb evolution fossil tetrapods characters",
+      "url": "https://datadryad.org/api/v2/search?q=forelimb+evolution+fossil+tetrapods+characters&per_page=3",
+      "hits": 1,
+      "note": "protocetid forelimb"
+    },
+    {
+      "source": "DataCite",
+      "query": "tetrapod limb fossil phylogenetic matrix",
+      "url": "https://api.datacite.org/dois?query=tetrapod+limb+fossil+phylogenetic+matrix&page%5Bsize%5D=4",
+      "hits": 10,
+      "note": "species-description records, not matrices"
+    },
+    {
+      "source": "DataCite",
+      "query": "Phenoscape",
+      "url": "https://api.datacite.org/dois?query=%22Phenoscape%22&page%5Bsize%5D=4",
+      "hits": 109,
+      "note": "mostly unrelated"
+    }
+  ],
+  "status": "partial",
+  "summary": "Fossil occurrences and age order (PBDB) and an extant phylogeny backbone (Open Tree) are open, but I could not verify any matrix of homologous organs (limbs, mouthparts) across fossil and living taxa: MorphoBank returned 403 and simple Dryad searches found almost nothing. The test needs class-specific character matrices or measurements to be compiled.",
+  "next_step": "Compile limb-bone matrices or measurements for fossil and extant tetrapods from published matrices (via MorphoBank if reachable); place on a dated tree; pre-register a stepwise-change criterion.",
+  "obstacles_confirmed": [
+    "Ancestral states are inferred, not observed",
+    "Method assumes tree and mode of change",
+    "Fine stratigraphic series available for few lineages"
+  ]
+}

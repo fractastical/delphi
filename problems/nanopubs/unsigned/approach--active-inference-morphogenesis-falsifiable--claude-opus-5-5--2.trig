@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/active-inference-morphogenesis-falsifiable--claude-opus-5-5--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Fix Friston et al.'s generative model and derive a graded-excision prediction" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/active-inference-morphogenesis-falsifiable> ;
+    dct:description "Take the published generative model (Friston et al. 2015: cells with a shared model of target positions and signal expression) without modification and derive a quantitative prediction for an experiment that already exists. Simulate excision of fractions f ∈ {0.1, …, 0.9} of the ensemble and measure (a) time to reach the target configuration and (b) the probability of incorrect pattern (a residual error above threshold). The model predicts specific functional forms, for example recovery time increasing with f up to a critical fraction f_c beyond which the pattern fails. Freeze these predictions, functional forms and f_c with intervals over the model's stated parameter ranges, before collecting data. Then compare with published planarian regeneration data on fragment size versus regeneration success and time, and Xenopus or axolotl data where graded removals exist. Pre-registered: refuted if the observed success-versus-fragment-size curve is outside the predicted envelope at ≥ 2 fragment sizes." ;
+
+    delphi:proposedTest "A pre-registered comparison of the fixed-model prediction (recovery time and failure probability versus fraction removed, with envelope) against published regeneration data. Observations outside the envelope refute this active-inference model of pattern regulation; observations inside it are a first non-trivial success." ;
+    delphi:context "Fails if: The envelope over plausible parameters is so wide that it contains every monotone curve, so the fixed model still makes no risky prediction. This would confirm Theorem 1's warning in practice even with the model fixed." ;
+    delphi:hypothesisType "approach/mixed" ;
+    skos:note "Steps: 1. Reimplement the Friston et al. 2015 simulation from the published equations; reproduce its figures. 2. Run graded excisions over the model's parameter ranges; freeze predicted curves with envelopes. 3. Compile published fragment-size and regeneration-outcome data with a pre-registered inclusion rule. 4. Compare; report verdict and which model parameters, if any, the data constrain." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Published regeneration datasets reporting outcomes over graded fragment sizes are sparse and old; the decisive experiment would need new lab work." ;
+    skos:note "Tool: variational-inference" ;
+    skos:note "Tool: simulation" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-place-03> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-place-04> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2019-boundary-15> ;
+    skos:related <https://w3id.org/delphi/resource/claim/levin-2015-girardia-20> ;
+
+    rdfs:seeAlso <https://doi.org/10.1098/rsif.2014.1383> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.plrev.2019.06.001> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json> .
+  <https://w3id.org/delphi/resource/problem/active-inference-morphogenesis-falsifiable> a delphi:Concept, schema:Question ;
+    rdfs:label "A falsifiable form of active-inference morphogenesis" .
+
+
+  <https://doi.org/10.1098/rsif.2014.1383> dct:title "Knowing one's place: a free-energy approach to pattern regulation" ;
+    dct:bibliographicCitation "Friston et al. 2015, the generative model to fix" .
+  <https://doi.org/10.1016/j.plrev.2019.06.001> dct:title "Morphogenesis as Bayesian inference: A variational approach to pattern formation and control in complex biological systems" ;
+    dct:bibliographicCitation "Kuchling, Friston, Georgiev and Levin 2020, Morphogenesis as Bayesian inference (regeneration extensions)" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/claude-opus-5-5.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to active-inference-morphogenesis-falsifiable, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-claude-opus-5-5> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (claude-opus-5-5, Anthropic), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/claude-opus-5-5> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/claude-opus-5-5> a delphi:LanguageModel ;
+    rdfs:label "claude-opus-5-5" ;
+    dct:identifier "claude-opus-5-5" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.305Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to active-inference-morphogenesis-falsifiable: Fix Friston et al.'s generative model and derive a graded-excision prediction" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/active-inference-morphogenesis-falsifiable--claude-opus-5-5--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

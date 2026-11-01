@@ -1,0 +1,90 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gemini-4-argon--1> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Pre-registered micro-CT fabric vs voxel-FE principal stress test against growth nulls" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> ;
+    dct:description "Execute a pre-registered cross-species data test on 30 specimens spanning three anatomical sites (femoral head, lumbar vertebral body, and calcaneus) across at least two mammalian species retrieved from MorphoSource and Dryad micro-CT repositories. For each scan, segment the trabecular core and cortical shell, compute the local second-rank mean-intercept-length (MIL) and star-volume-distribution fabric tensors H across a 5 mm grid using BoneJ algorithms, and run linear voxel-based finite-element (FE) analyses on the segmented whole-bone geometry under two canonical physiological boundary conditions (habitual stance and peak locomotor joint reaction). Extract the principal stress eigenvectors e_i(sigma) and fabric eigenvectors e_i(H) in each subvolume.\n\nTo test whether alignment reflects mechanical load rather than developmental geometry or density gradients, compare the observed unsigned geodesic angular error theta = arccos(|e_1(H) . e_1(sigma)|) against two explicit null models in every specimen: (1) a density-matched rotational permutation null that preserves the local bone volume fraction field BV/TV(x) while randomly rotating H(x) on SO(3), and (2) a load-independent developmental growth-axis null where trajectories follow the Laplacian harmonic gradient between the epiphyseal growth plate and diaphyseal cortex." ;
+    schema:additionalProperty <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gemini-4-argon--1#n_specimens> ;
+    delphi:proposedTest "Across the 30 specimens, a pooled volume-weighted median fabric-to-principal-stress angle theta <= 15 degrees that beats both the SO(3) randomized-fabric null and the harmonic growth-axis null (Wilcoxon p < 0.001) and increases by at least 5 degrees under swapped non-physiological load cases settles static stress alignment in the affirmative." ;
+    delphi:context "Fails if: A median angular error theta > 25 degrees, failure to improve significantly over the load-independent harmonic growth-axis null (p >= 0.05), or insensitivity (< 2 degrees change) when boundary loads are rotated by 45 degrees refutes stress alignment as the primary determinant of static trabecular fabric." ;
+    delphi:hypothesisType "approach/data-test" ;
+    skos:note "Steps: 1. Select and checksum 30 open micro-CT scans covering femoral head, vertebral body, and calcaneus across Homo sapiens, Ovis aries, and primate or rodent taxa from MorphoSource and Dryad. 2. Pre-register the subvolume grid size, segmentation thresholds, canonical joint-loading boundary conditions, and angular tolerance before running FE or fabric pairing. 3. Compute the local 3x3 fabric tensor H via star-volume and MIL methods and solve the voxel-FE linear elasticity system for the principal stress directions e_1(sigma). 4. Evaluate the volume-weighted median angular error theta and perform paired one-sided Wilcoxon signed-rank tests against the SO(3)-rotated fabric null and the harmonic growth-axis null, plus a load-case swap sensitivity test." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): hard" ;
+    skos:note "Missing: Subject-specific in vivo joint force telemetry paired to the exact scanned museum specimens is largely absent from public archives, requiring canonical physiological load cases and sensitivity bounds." ;
+    skos:note "Tool: micro-ct-morphometry" ;
+    skos:note "Tool: finite-element-analysis" ;
+    skos:note "Tool: data-test" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-07> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch16-16> ;
+    rdfs:seeAlso <https://www.morphosource.org/> ;
+    rdfs:seeAlso <https://datadryad.org/dataset/doi:10.5061/dryad.b2rbnzsq4> ;
+    rdfs:seeAlso <https://doi.org/10.1038/35015116> ;
+    rdfs:seeAlso <https://doi.org/10.1038/ncomms5855> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.bone.2010.08.023> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json> .
+  <https://w3id.org/delphi/resource/problem/trabecular-stress-alignment-wolffs-law> a delphi:Concept, schema:Question ;
+    rdfs:label "Do trabeculae align with principal stress, and is that alignment causal?" .
+  <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gemini-4-argon--1#n_specimens> a schema:PropertyValue ;
+    schema:propertyID "n_specimens" ;
+    schema:value 30 ;
+    schema:description "specimens named in the text (a sample size as stated there, not a measurement made here)" .
+  <https://www.morphosource.org/> dct:title "MorphoSource 3D trabecular and whole-bone micro-CT collections" ;
+    dct:description "High-resolution micro-CT volumes of mammalian femora, calcanei, and vertebrae for paired fabric tensor and whole-bone FE analysis" .
+  <https://datadryad.org/dataset/doi:10.5061/dryad.b2rbnzsq4> dct:title "Dryad micro-CT cortical and trabecular segmentation dataset (10.5061/dryad.b2rbnzsq4)" ;
+    dct:description "Segmented micro-CT volumes of cortical bone, trabecular bone, and medullary pores for benchmarking fabric extraction" .
+  <https://doi.org/10.1038/35015116> dct:title "Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" ;
+    dct:bibliographicCitation "Huiskes et al. 2000, Effects of mechanical forces on maintenance and adaptation of form in trabecular bone" .
+  <https://doi.org/10.1038/ncomms5855> dct:title "Bone remodelling in humans is load-driven but not lazy" ;
+    dct:bibliographicCitation "Christen et al. 2014, Bone remodelling in humans is load-driven but not lazy" .
+  <https://doi.org/10.1016/j.bone.2010.08.023> dct:title "BoneJ: Free and extensible bone image analysis in ImageJ" ;
+    dct:bibliographicCitation "Doube et al. 2010, BoneJ: Free and extensible bone image analysis in ImageJ" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/gemini-4-argon.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to trabecular-stress-alignment-wolffs-law, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-gemini-4-argon> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (gemini-4-argon, Google), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/gemini-4-argon> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/gemini-4-argon> a delphi:LanguageModel ;
+    rdfs:label "gemini-4-argon" ;
+    dct:identifier "gemini-4-argon" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.313Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to trabecular-stress-alignment-wolffs-law: Pre-registered micro-CT fabric vs voxel-FE principal stress test against growth nulls" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/trabecular-stress-alignment-wolffs-law--gemini-4-argon--1> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

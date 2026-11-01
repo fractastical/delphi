@@ -1,0 +1,113 @@
+{
+  "claim_id": "darwin1859-ch06-05",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:36:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5-5-high", "run": "darwin-04-retry" },
+  "variables_needed": [
+    "wing aerofoil / membrane and limb measurements for fossil bats and for living bats and gliding mammals",
+    "morphological character matrix or 3D anatomy for bats, colugos and gliding rodents",
+    "a mammal phylogeny placing bats relative to gliders",
+    "fossil bat occurrences with ages"
+  ],
+  "datasets": [
+    {
+      "id": "dryad-onychonycteris-aerodynamics",
+      "name": "Data from: Aerodynamic reconstruction of the primitive fossil bat Onychonycteris finneyi (Dryad)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.0ks22bg",
+      "access_url": null,
+      "doi": "10.5061/dryad.0ks22bg",
+      "license": "CC0-1.0",
+      "suggested_by": [],
+      "checked": { "at": "2026-11-01T12:35:10Z", "method": "Dryad API dataset record plus version file list (file contents not downloaded)", "http_status": 200, "bytes": 86948 },
+      "variables_present": ["aerofoil reconstruction measures for the two known Onychonycteris specimens, compared with extant bats and gliding mammals (per abstract)", "Table S1_measures.references.xlsx (55,987 bytes) and a README docx (30,961 bytes)"],
+      "variables_missing": ["character matrix", "other Eocene bats not confirmed", "wing membrane attachment (uropatagium) coding not confirmed"],
+      "scope": "Abstract: Onychonycteris finneyi, Early Eocene Green River Formation, about 52.5 mya, estimated about 40 g; aerofoil reconstructed for the two known specimens and compared with extant bats and gliding mammals.",
+      "evidence": "Dryad API returned title, CC0 licence, storageSize 86,948 and two files. Spreadsheet columns not read.",
+      "verdict": "partial"
+    },
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (PBDB) data service 1.2",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/occs/list.csv?base_name=Chiroptera&max_ma=66&show=time",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "grok"],
+      "checked": { "at": "2026-11-01T12:35:00Z", "method": "GET taxa/single name=Chiroptera and occs/list base_name=Chiroptera max_ma=66 rowcount", "http_status": 200, "bytes": null },
+      "variables_present": ["Chiroptera occurrences with ages and accepted names"],
+      "variables_missing": ["soft-tissue wing membrane information", "locomotor character scores"],
+      "scope": "Taxon record for Chiroptera: ext 1 (extant), noc 1,707; occurrence query reported 1,707 records found (max_ma=66).",
+      "evidence": "taxa/single returned oid txn:40622, noc 1707; occs/list 'Records Found' 1707.",
+      "verdict": "partial"
+    },
+    {
+      "id": "morphosource",
+      "name": "MorphoSource",
+      "landing_url": "https://www.morphosource.org/",
+      "access_url": "https://www.morphosource.org/api/media?q=Chiroptera&per_page=1",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt"],
+      "checked": { "at": "2026-11-01T12:35:10Z", "method": "GET public API media search q=Chiroptera per_page=1", "http_status": 200, "bytes": 1260 },
+      "variables_present": [],
+      "variables_missing": ["bat scan counts could not be read"],
+      "scope": "The API responded with a 'media' array that was empty and facet lists; the query parameter may not be a valid filter, so this does not show whether bat scans exist.",
+      "evidence": "Response begins {\"response\":{\"media\":[],\"facets\":[...]. An earlier call to api.morphosource.org/api/media returned curl status 000 (no HTTP response).",
+      "verdict": "partial"
+    },
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://www.morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "gpt"],
+      "checked": { "at": "2026-11-01T12:34:05Z", "method": "GET landing page", "http_status": 403, "bytes": 919, "note": "403 to curl; not retried" },
+      "variables_present": [],
+      "variables_missing": [],
+      "scope": "Not examined.",
+      "evidence": "HTTP 403.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthetic tree v16.1)",
+      "landing_url": "https://tree.opentreeoflife.org/",
+      "access_url": "https://api.opentreeoflife.org/v3/tree_of_life/about",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:33:00Z", "method": "POST tree_of_life/about", "http_status": 200, "bytes": null },
+      "variables_present": ["phylogenetic relationships among living taxa including bats and gliders (placement not queried)"],
+      "variables_missing": ["fossil bats not confirmed"],
+      "scope": "API reports synth_id opentree16.1, 2,385,875 tips.",
+      "evidence": "JSON response from /v3/tree_of_life/about.",
+      "verdict": "partial"
+    },
+    {
+      "id": "genbank",
+      "name": "GenBank",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/genbank/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:35:14Z", "method": "HEAD -L landing page", "http_status": 200, "bytes": null },
+      "variables_present": ["mammal sequences (not queried)"],
+      "variables_missing": ["morphology"],
+      "scope": "Landing page only.",
+      "evidence": "HTTP 200.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    { "source": "Dryad", "query": "bat wing gliding flight evolution", "url": "https://datadryad.org/api/v2/search?q=bat%20wing%20gliding%20flight%20evolution&per_page=4", "hits": 2, "note": "10.5061/dryad.0ks22bg (Onychonycteris aerodynamics) and 10.5061/dryad.0859ks3 (flight in ground effect in bats, not relevant to ancestry)" },
+    { "source": "PBDB", "query": "occs/list base_name=Chiroptera max_ma=66", "url": "https://paleobiodb.org/data1.2/occs/list.csv?base_name=Chiroptera&max_ma=66&limit=0&show=time&rowcount", "hits": 1707, "note": "occurrences of Chiroptera" },
+    { "source": "MorphoSource", "query": "media q=Chiroptera", "url": "https://www.morphosource.org/api/media?q=Chiroptera&per_page=1", "hits": 0, "note": "empty media array; filter parameter uncertain" }
+  ],
+  "status": "partial",
+  "summary": "One openly licensed (CC0) Dryad dataset gives aerofoil measures for the Eocene bat Onychonycteris versus living bats and gliders, and PBDB lists 1,707 Chiroptera occurrences, but no fetched source provides a bat-and-glider character matrix or wing-membrane codings; MorphoBank returned 403 and the MorphoSource query returned nothing readable.",
+  "next_step": "Read Table S1 from the Dryad record for columns; search MorphoBank manually for bat character matrices; check MorphoSource with a documented filter such as taxonomy name.",
+  "obstacles_confirmed": ["MorphoBank returned 403 to automated requests.", "No fetched source codes the uropatagium or gliding-apparatus characters for fossil bats."]
+}

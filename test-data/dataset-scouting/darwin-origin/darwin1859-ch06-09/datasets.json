@@ -1,0 +1,213 @@
+{
+  "claim_id": "darwin1859-ch06-09",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T09:28:48Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "darwin-03"
+  },
+  "variables_needed": [
+    "presence of lungs or swim bladder (and type: ventral lung, dorsal bladder) coded per vertebrate species",
+    "time-calibrated vertebrate phylogeny including fossil osteichthyans",
+    "fossil osteichthyan/sarcopterygian occurrences",
+    "developmental/gene-expression data for lungs and swim bladders (homology)"
+  ],
+  "datasets": [
+    {
+      "id": "morphobank",
+      "name": "MorphoBank",
+      "landing_url": "https://morphobank.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "curl -sL https://morphobank.org/ and https://www.morphobank.org/ (also with a browser User-Agent)",
+        "http_status": 403,
+        "note": "CloudFront 403 to non-browser clients; portal content (project/matrix counts) not verified."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "osteichthyan matrices coding respiratory/buoyancy structures (portal not reachable)"
+      ],
+      "scope": "Not inspected: the site refused every request from this client.",
+      "evidence": "Both URLs returned HTTP 403 with a 919-byte CloudFront error page (server: CloudFront, x-cache: Error from cloudfront); no project list or matrix could be fetched.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "open-tree-of-life",
+      "name": "Open Tree of Life (synthesis tree, taxonomy, studies API)",
+      "landing_url": "https://opentreeoflife.github.io/",
+      "access_url": "https://api.opentreeoflife.org/v3/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini",
+        "gpt",
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://opentreeoflife.github.io/; POST https://api.opentreeoflife.org/v3/tree_of_life/about; POST /v3/tnrs/match_names",
+        "http_status": 200,
+        "note": "tree.opentreeoflife.org (the URL the assessors gave) returned no HTTP response (curl status 000) at check time; the API host and project site answered HTTP 200."
+      },
+      "variables_present": [
+        "synthetic vertebrate topology incl. Polypteridae, Dipnoi, Actinopterygii, Mammalia, Aves"
+      ],
+      "variables_missing": [
+        "character states for lungs/swim bladders"
+      ],
+      "scope": "All life; 2,385,875 tips in the synthesis tree; includes taxonomy ranks and an 'extinct' flag on taxa",
+      "evidence": "POST /v3/tree_of_life/about returned synth_id opentree16.1, taxonomy_version 3.7draft3, num_source_studies 1931, num_source_trees 2064, root 'cellular organisms' with num_tips 2385875. POST /v3/tnrs/match_names resolved Aves=ott81461 (class), Mammalia=ott244265, Dipnoi=ott29500, Polypteridae=ott458429, Actinopterygii=ott773483 and Archaeopteryx=ott3604083 (flags: extinct, incertae_sedis).",
+      "verdict": "partial"
+    },
+    {
+      "id": "paleobiology-database",
+      "name": "Paleobiology Database (PBDB) data service v1.2",
+      "landing_url": "https://paleobiodb.org/",
+      "access_url": "https://paleobiodb.org/data1.2/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET PBDB occs/list.json with &rowcount&limit=0",
+        "http_status": 200,
+        "note": "Landing page HTTP 200; API calls below also HTTP 200."
+      },
+      "variables_present": [
+        "fossil osteichthyan occurrences with ages"
+      ],
+      "variables_missing": [
+        "soft-tissue (lung/bladder) characters"
+      ],
+      "scope": "Osteichthyes 241,417 occurrences; Sarcopterygii 213,441; Actinopterygii 26,920",
+      "evidence": "occs/list.json?base_name=Osteichthyes&rowcount&limit=0 -> 241417; Sarcopterygii -> 213441; Actinopterygii -> 26920.",
+      "verdict": "partial"
+    },
+    {
+      "id": "bgee",
+      "name": "Bgee gene expression database",
+      "landing_url": "https://www.bgee.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gemini"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://www.bgee.org/ (403); GET https://www.bgee.org/api/?display_type=json&page=data&action=expression_calls&species_id=7955&anat_entity_id=UBERON:0006860 (400)",
+        "http_status": 403,
+        "note": "Landing blocked; API reachable but my parameters were wrong, so content not verified."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "verified lung/swim-bladder expression calls"
+      ],
+      "scope": "Not inspected",
+      "evidence": "Landing page 403 (5,200 bytes). The API answered HTTP 400 'The request does not have any mandatory parameter' for my guessed parameters, so no expression calls were retrieved.",
+      "verdict": "unreachable"
+    },
+    {
+      "id": "ncbi-geo",
+      "name": "NCBI Gene Expression Omnibus (GEO DataSets)",
+      "landing_url": "https://www.ncbi.nlm.nih.gov/geo/",
+      "access_url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=lungfish&retmode=json&retmax=0",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T05:15:00Z",
+        "method": "GET https://www.ncbi.nlm.nih.gov/geo/ (200); Entrez esearch db=gds for 'swim bladder', 'lung AND swim bladder', 'lungfish'",
+        "http_status": 200
+      },
+      "variables_present": [
+        "some expression datasets matching swim bladder terms"
+      ],
+      "variables_missing": [
+        "a systematic lung-versus-bladder comparison across species"
+      ],
+      "scope": "esearch counts: 'swim bladder' 204 (term expanded by Entrez to MeSH 'swimming' OR swim, so includes swimming-related records); 'lung AND swim bladder' 2; 'lungfish' 1",
+      "evidence": "Entrez esearch JSON counts as listed; records were not opened.",
+      "verdict": "partial"
+    }
+  ],
+  "search_log": [
+    {
+      "source": "NCBI Entrez (GEO)",
+      "query": "swim bladder",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=swim+bladder&retmode=json&retmax=0",
+      "hits": 204,
+      "note": "Entrez translated 'swim' to MeSH swimming OR swim"
+    },
+    {
+      "source": "NCBI Entrez (GEO)",
+      "query": "lung AND swim bladder",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=lung+AND+%22swim+bladder%22&retmode=json&retmax=0",
+      "hits": 2,
+      "note": null
+    },
+    {
+      "source": "NCBI Entrez (GEO)",
+      "query": "lungfish",
+      "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term=lungfish&retmode=json&retmax=0",
+      "hits": 1,
+      "note": null
+    },
+    {
+      "source": "PBDB data1.2",
+      "query": "occurrence counts Osteichthyes/Sarcopterygii/Actinopterygii",
+      "url": "https://paleobiodb.org/data1.2/occs/list.json?base_name=Osteichthyes&rowcount&limit=0",
+      "hits": 241417,
+      "note": null
+    },
+    {
+      "source": "DataCite",
+      "query": "swim bladder lung homology gene expression",
+      "url": "https://api.datacite.org/dois?query=swim%20bladder%20lung%20homology%20gene%20expression",
+      "hits": 2,
+      "note": "two records for 'A single-cell transcriptome atlas of the West African lungfish...' (DOI prefix 10.60692, OpenAlex-style records; a paper, not a dataset)"
+    },
+    {
+      "source": "Dryad",
+      "query": "swim bladder",
+      "url": "https://datadryad.org/api/v2/search?q=swim%20bladder",
+      "hits": 6,
+      "note": "acoustic and buoyancy studies; none a lung-bladder homology matrix"
+    },
+    {
+      "source": "Dryad",
+      "query": "lungfish",
+      "url": "https://datadryad.org/api/v2/search?q=lungfish",
+      "hits": 21,
+      "note": "biogeography, endocast morphometrics and Romer's Gap lungfish diversity; none coding lungs/bladders"
+    },
+    {
+      "source": "Zenodo",
+      "query": "swim bladder lung evolution morphological matrix",
+      "url": "https://zenodo.org/api/records?q=swim%20bladder%20lung%20evolution%20morphological%20matrix",
+      "hits": 422777,
+      "note": "top relevant by title: 'The origin of lungs, the swim bladder as an oxygen-enriched diving system' (doi 10.5281/zenodo.4277822), a paper-type record"
+    }
+  ],
+  "status": "partial",
+  "summary": "A vertebrate phylogeny (Open Tree) and fossil osteichthyan occurrences (PBDB, 241,417 occurrences) are open, but no dataset coding lungs versus swim bladders per species was found, and the matrices (MorphoBank) and expression database (Bgee) named by assessors returned 403. The ancestral-state test would need a hand-compiled trait table from the anatomical literature.",
+  "next_step": "Compile a per-species coding of gas-bladder type (ventral lung / dorsal bladder / none) for major osteichthyan lineages from the literature and map it on the Open Tree vertebrate subtree.",
+  "obstacles_confirmed": [
+    "Soft tissue rarely fossilises; extant phylogenetic bracketing is required.",
+    "No ready lung/bladder trait table located.",
+    "MorphoBank and Bgee were blocked (403)."
+  ]
+}

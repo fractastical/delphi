@@ -241,7 +241,7 @@ def pearson(x, y):
 
 
 def truth():
-    claims = json.loads((ROOT / "docs/claims.json").read_text())["claims"]
+    claims = json.loads((ROOT.parent / "docs/claims.json").read_text())["claims"]
     checks = {
         "data tests (supports=1, refutes=0)": lambda c: {"supports": 1, "refutes": 0}.get((c.get("data_test") or {}).get("verdict")),
         "proof status (proved=1, refuted=0)": lambda c: {"proved": 1, "refuted": 0}.get(c.get("status")),

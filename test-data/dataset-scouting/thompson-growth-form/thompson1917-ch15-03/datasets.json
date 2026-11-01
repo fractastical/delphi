@@ -1,0 +1,121 @@
+{
+  "claim_id": "thompson1917-ch15-03",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "egg length and breadth (or mass and shape index) per egg",
+    "laying order or hen age at each egg (first eggs vs later eggs) per pullet",
+    "breed and hen body weight per hen",
+    "egg mass relative to body mass per breed"
+  ],
+  "datasets": [
+    {
+      "id": "ag-data-commons",
+      "name": "Ag Data Commons (USDA NAL)",
+      "landing_url": "https://agdatacommons.nal.usda.gov/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:35:00Z",
+        "method": "HEAD landing page (202, empty body); GET CKAN package_search API (redirected to an HTML search page)",
+        "http_status": 202,
+        "note": "HTTP 202 with empty body; the JSON API was not usable."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "API did not return JSON to my client, so no records inspected"
+      ],
+      "scope": "US agricultural research datasets",
+      "evidence": "HEAD returned 202 with content-length 0; https://data.nal.usda.gov/api/3/action/package_search?q=egg+shape+index redirected to https://www.nal.usda.gov/services/agdatacommons?q=egg+shape+index and returned HTML.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-layer-diet-trials",
+      "name": "Dryad: laying-hen diet trial datasets (isoleucine and L-valine in LSL-LITE layers)",
+      "landing_url": "https://datadryad.org/api/v2/search?q=egg%20shape%20index%20hens",
+      "access_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.m905qfv1t",
+      "doi": "10.5061/dryad.m905qfv1t",
+      "license": "CC0-1.0",
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET Dryad search 'egg shape index hens' (2 hits) and dataset records m905qfv1t and v41ns1rx2",
+        "http_status": 200
+      },
+      "variables_present": [
+        "10.5061/dryad.m905qfv1t (519,325 bytes, CC0): young laying hens 23 to 30 weeks old, performance and 'egg quality' outcomes by week"
+      ],
+      "variables_missing": [
+        "abstracts do not list egg shape index, individual laying order, or breed contrasts",
+        "single commercial line (LSL-LITE)",
+        "treatment-driven, not natural age series"
+      ],
+      "scope": "One commercial layer strain, 23-30 weeks",
+      "evidence": "Dataset API: m905qfv1t abstract 'diets containing total isoleucine ... fed as 7 treatments x 7 replicates x 10 birds per replicate ... egg quality'; v41ns1rx2 (606,441 bytes, CC0) is its L-valine follow-up.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "Dryad",
+      "query": "egg shape index hens",
+      "url": "https://datadryad.org/api/v2/search?q=egg%20shape%20index%20hens&per_page=5",
+      "hits": 2,
+      "note": "two layer diet trials, shape not stated in abstracts"
+    },
+    {
+      "source": "DataCite",
+      "query": "egg shape index laying hens age first eggs",
+      "url": "https://api.datacite.org/dois?query=egg%20shape%20index%20laying%20hens%20age%20first%20eggs&page[size]=5",
+      "hits": 3,
+      "note": "egg-yolk fatty acid and mineral-digestibility studies, not shape"
+    },
+    {
+      "source": "Zenodo",
+      "query": "egg shape index chicken breed",
+      "url": "https://zenodo.org/api/records?q=egg%20shape%20index%20chicken%20breed&size=5",
+      "hits": 268938,
+      "note": "unranked broad match; top hits are a duck-breed study, journal records on egg quality in specific chicken ecotypes, and an unrelated 'chicken-egg' code repo"
+    },
+    {
+      "source": "Zenodo",
+      "query": "egg shape index first eggs pullets",
+      "url": "https://zenodo.org/api/records?q=egg%20shape%20index%20first%20eggs%20pullets&size=5",
+      "hits": 720758,
+      "note": "unranked broad match; top hits are stored-egg quality, tree sparrow egg-shape repeatability and a bird-egg conicality metric dataset (Dryad zcrjdfn7s), not pullet laying series"
+    },
+    {
+      "source": "DataCite",
+      "query": "Stoddard bird egg shape dataset",
+      "url": "https://api.datacite.org/dois?query=Stoddard%20bird%20egg%20shape%20dataset&page[size]=5",
+      "hits": 3,
+      "note": "3D-printed surrogate eggs only"
+    },
+    {
+      "source": "Dryad",
+      "query": "avian egg shape ellipticity asymmetry",
+      "url": "https://datadryad.org/api/v2/search?q=avian%20egg%20shape%20ellipticity%20asymmetry&per_page=5",
+      "hits": 0
+    }
+  ],
+  "status": "gap",
+  "summary": "I found no public dataset of per-egg dimensions with laying order or hen age for domestic fowl. Dryad has layer diet trials (young hens 23-30 weeks; egg quality outcomes) whose abstracts do not mention shape, and Zenodo/DataCite hits are about yolk composition, stored-egg quality or other species. Ag Data Commons could not be queried (HTTP 202, API not JSON).",
+  "next_step": "Compile breed- and age-resolved egg length, breadth and mass from poultry-science papers (Zenodo/journal tables surfaced in the search, e.g. body-weight and egg-characteristic studies on chicken ecotypes) and, for the first-eggs half, obtain a hen-level longitudinal record from a poultry research station.",
+  "obstacles_confirmed": [
+    "Public poultry datasets often omit egg shape or exact laying order.",
+    "Breed and age series exist mainly as tables inside poultry papers and would have to be compiled."
+  ]
+}

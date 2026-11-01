@@ -1,0 +1,80 @@
+@prefix this: <http://purl.org/nanopub/temp/np1/> .
+@prefix sub: <http://purl.org/nanopub/temp/np1/> .
+@prefix np: <http://www.nanopub.org/nschema#> .
+@prefix npx: <http://purl.org/nanopub/x/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
+@prefix delphi: <https://w3id.org/delphi/ontology/> .
+
+sub:Head {
+  this: a np:Nanopublication ;
+    np:hasAssertion sub:assertion ;
+    np:hasProvenance sub:provenance ;
+    np:hasPublicationInfo sub:pubinfo .
+}
+
+sub:assertion {
+  <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--grok-4-7--2> a prov:Plan, delphi:TestableHypothesis ;
+    rdfs:label "Formalize the Atela–Golé–Hotton fixed-point theorem" ;
+    dct:subject <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> ;
+    dct:description "Turn the 2003 existence-and-stability argument into Lean lemmas, restricted to the hypotheses printed in that paper. The first theorem is the characterization of fixed points as cylindrical lattices whose divergence angle is a noble number, with the Fibonacci and Lucas branches identified by their continued-fraction endings. The second is stability of those fixed points on the branches where the paper proves stability, with the same restrictions. Do not extend the theorem to the disc, to bijugate branches the paper does not cover, or to a full-measure basin. Those are different claims. A proof that uses an unformalized estimate must keep that estimate as a named hypothesis. The module is a success only if the named hypotheses are exactly the paper's." ;
+
+    delphi:proposedTest "A no-sorry fixed-point theorem and a stability theorem whose hypotheses match Atela, Golé and Hotton 2003, including the Lucas branch where their proof includes it." ;
+    delphi:context "Fails if: A numerically certified attractor from the interval sweep lies outside the theorem's fixed-point list inside the theorem's parameter range. The formalization and the sweep then disagree." ;
+    delphi:hypothesisType "approach/formalization" ;
+    skos:note "Steps: 1. Define the cylindrical lattice and the divergence angle. 2. Prove the fixed-point characterization and the continued-fraction labeling. 3. Formalize the stability estimates under the paper's restrictions. 4. Leave any unformalized estimate as a named hypothesis and list it. 5. Audit axioms." ;
+    skos:note "Difficulty (proposer's estimate of completion within about a month of agent time): long-shot" ;
+    skos:note "Missing: The paper is a long real-analysis argument. A month is enough to formalize definitions and perhaps the fixed-point labeling, and unlikely to finish every stability estimate." ;
+    skos:note "Tool: lean4" ;
+    skos:note "Tool: dynamical-systems" ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-01> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-05> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-06> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-09> ;
+    skos:related <https://w3id.org/delphi/resource/claim/thompson1917-ch14-02> ;
+
+    rdfs:seeAlso <https://doi.org/10.1007/s00332-002-0513-1> ;
+    rdfs:seeAlso <https://doi.org/10.1016/j.physd.2015.05.003> ;
+    rdfs:isDefinedBy <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json> .
+  <https://w3id.org/delphi/resource/problem/phyllotaxis-attractor-classification> a delphi:Concept, schema:Question ;
+    rdfs:label "Rigorous classification of attractors in dynamical phyllotaxis" .
+
+
+  <https://doi.org/10.1007/s00332-002-0513-1> dct:title "A Dynamical System for Plant Pattern Formation: A Rigorous Analysis" ;
+    dct:bibliographicCitation "Atela, Golé and Hotton 2003, the theorem being formalized" .
+  <https://doi.org/10.1016/j.physd.2015.05.003> dct:title "Phyllotaxis: Some progress, but a story far from over" ;
+    dct:bibliographicCitation "Pennybacker, Shipman and Newell 2015, the review that marks the remaining gaps" .
+}
+
+sub:provenance {
+  sub:assertion prov:wasAttributedTo <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:wasDerivedFrom <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/grok-4-7.json>, <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/problems.json> ;
+    prov:wasGeneratedBy sub:proposal .
+  sub:proposal a prov:Activity ;
+    rdfs:label "Proposing approaches to phyllotaxis-attractor-classification, blind to other proposers, following problems/approaches/INSTRUCTIONS.md" ;
+    prov:wasAssociatedWith <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> ;
+    prov:qualifiedAssociation sub:plan .
+  sub:plan prov:hadPlan <https://github.com/fractastical/delphi/blob/ee98025a1960b300fcc06aa2106f51118b60f565/problems/approaches/INSTRUCTIONS.md> .
+  <https://w3id.org/delphi/resource/agent/delphisci-approach-proposer-grok-4-7> a prov:SoftwareAgent ;
+    rdfs:label "delphisci approach proposer (grok-4-7, xAI), working blind from problems.json" ;
+    delphi:usesModel <https://w3id.org/delphi/resource/model/grok-4-7> ;
+    prov:actedOnBehalfOf <https://orcid.org/0009-0007-4948-9192> .
+  <https://w3id.org/delphi/resource/model/grok-4-7> a delphi:LanguageModel ;
+    rdfs:label "grok-4-7" ;
+    dct:identifier "grok-4-7" .
+}
+
+sub:pubinfo {
+  this: dct:created "2026-11-01T13:45:44.338Z"^^xsd:dateTime ;
+    dct:creator <https://orcid.org/0009-0007-4948-9192> ;
+    rdfs:label "Approach to phyllotaxis-attractor-classification: Formalize the Atela–Golé–Hotton fixed-point theorem" ;
+    dct:license <https://creativecommons.org/licenses/by/4.0/> ;
+    npx:hasNanopubType prov:Plan ;
+    npx:introduces <https://w3id.org/delphi/resource/approach/phyllotaxis-attractor-classification--grok-4-7--2> ;
+    delphi:domain <https://w3id.org/delphi/resource/domain/open-problems> .
+  <https://w3id.org/delphi/resource/domain/open-problems> rdfs:label "open-problems" .
+}

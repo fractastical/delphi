@@ -1,0 +1,237 @@
+{
+  "claim_id": "thompson1917-ch07-15",
+  "project": "thompson-growth-form",
+  "scouted_at": "2026-11-01T09:41:00Z",
+  "scout": {
+    "kind": "cursor-subagent",
+    "model": "claude-sonnet-5.5",
+    "run": "thompson-03"
+  },
+  "variables_needed": [
+    "relative blastomere volumes at the four-cell stage per embryo",
+    "polar-furrow (median partition) arrangement class per embryo",
+    "species and phylum identity per embryo",
+    "more than one phylum or clade"
+  ],
+  "datasets": [
+    {
+      "id": "bioimage-archive",
+      "name": "BioImage Archive (EMBL-EBI), BioStudies search API",
+      "landing_url": "https://www.ebi.ac.uk/bioimage-archive/",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=four-cell%20embryo%20blastomere",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "GET BioStudies search 'four-cell embryo blastomere' (135 hits); GET study JSON for S-BIAD1057",
+        "http_status": 200
+      },
+      "variables_present": [
+        "S-BIAD1057 time-lapse of dissociated mouse 4-cell blastomeres and 8-cell doublets"
+      ],
+      "variables_missing": [
+        "135 hits include chick, C. elegans and mouse studies but no four-cell volume-and-furrow dataset across phyla was identified"
+      ],
+      "scope": "Archive-wide",
+      "evidence": "totalHits 135; top titles: S-BIAD1057 (mouse compaction, 391 files), S-BSST401 ultrasound mouse embryo, S-BIAD553 chick gastrulation, S-BIAD842 C. elegans PAR caps, S-BIAD1474 chick time-lapse.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "bia-s-biad1057-mouse-compaction",
+      "name": "S-BIAD1057: Mechanical strengthening of cell-cell adhesion during mouse embryo compaction",
+      "landing_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD1057",
+      "access_url": "https://www.ebi.ac.uk/biostudies/api/v1/studies/S-BIAD1057",
+      "doi": "10.6019/S-BIAD1057",
+      "license": null,
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "GET BioStudies study JSON",
+        "http_status": 200
+      },
+      "variables_present": [
+        "time-lapse imaging of dissociated 4-cell-stage mouse blastomeres and 8-cell doublets; contact size and shape analysis"
+      ],
+      "variables_missing": [
+        "one species",
+        "dissociated blastomeres, not intact four-cell embryos with furrow arrangements",
+        "no furrow class labels"
+      ],
+      "scope": "Mouse, 391 files",
+      "evidence": "Study JSON: Image acquisition 'Time lapse imaging of dissociated 4-cell stage blastomeres and separation of 8-cell stage doublets'; ReleaseDate 2024-04-01.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "echinobase",
+      "name": "Echinobase",
+      "landing_url": "https://www.echinobase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "HEAD landing page",
+        "http_status": 200,
+        "note": "Captcha wall for non-browser clients; content not inspected."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "scripted access is redirected to a reCAPTCHA page"
+      ],
+      "scope": "Sea-urchin database",
+      "evidence": "HEAD returned 200 but the final URL was https://www.echinobase.org/echinobase/recaptcha.do?nextUrl=%2Fechinobase%2F.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "xenbase",
+      "name": "Xenbase",
+      "landing_url": "https://www.xenbase.org/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "HEAD landing page",
+        "http_status": 200,
+        "note": "Captcha wall for non-browser clients; content not inspected."
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "scripted access is redirected to a reCAPTCHA page"
+      ],
+      "scope": "Xenopus database",
+      "evidence": "HEAD returned 200 but the final URL was https://www.xenbase.org/xenbase/recaptcha.do?nextUrl=%2Fxenbase%2F.",
+      "verdict": "unreachable",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "image-data-resource",
+      "name": "Image Data Resource (IDR)",
+      "landing_url": "https://idr.openmicroscopy.org/",
+      "access_url": "https://idr.openmicroscopy.org/api/v0/m/projects/",
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "gpt"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:38:00Z",
+        "method": "HEAD landing page (302 to the web client login URL); GET /api/v0/m/projects/ and /api/v0/m/screens/ with limit=1 (200)",
+        "http_status": 200,
+        "note": "Landing page redirects to a login URL, but the JSON API answered 200 without credentials."
+      },
+      "variables_present": [
+        "public API answers without login: 147 projects and 105 screens (totalCount)"
+      ],
+      "variables_missing": [
+        "I did not identify a plant-parenchyma, cell-aggregate-segmentation or early-embryo study inside IDR within my request budget"
+      ],
+      "scope": "Archive-wide; mostly cell-culture screens and tissue imaging",
+      "evidence": "Landing page HEAD returned 302 to https://idr.openmicroscopy.org/webclient/login/?url=%2Fwebclient%2F%3Fexperimenter%3D-1; https://idr.openmicroscopy.org/api/v0/m/projects/?limit=1 returned meta totalCount 147, .../screens/?limit=1 totalCount 105.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "ssbd",
+      "name": "SSBD (Systems Science of Biological Dynamics database)",
+      "landing_url": "https://ssbd.riken.jp/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": [
+        "grok"
+      ],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "HEAD landing page (200, redirects to /database/)",
+        "http_status": 200
+      },
+      "variables_present": [
+        "quantitative bioimage database landing page"
+      ],
+      "variables_missing": [
+        "I did not enumerate early-embryo entries or check for four-cell stage cell volumes"
+      ],
+      "scope": "Bioimage datasets",
+      "evidence": "HEAD final URL https://ssbd.riken.jp/database/, content-length 35,194, text/html; no records inspected.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "generic-theoretical-models-cleaving-embryos-zenodo",
+      "name": "Generic Theoretical Models to Predict Division Patterns of Cleaving Embryos (Zenodo record)",
+      "landing_url": "https://zenodo.org/api/records?q=blastomere%20volume%20four-cell%20embryo",
+      "access_url": null,
+      "doi": "10.1016/j.devcel.2016.11.018",
+      "license": "cc-by-4.0",
+      "suggested_by": [],
+      "checked": {
+        "at": "2026-11-01T09:33:00Z",
+        "method": "listed in Zenodo search results (DOI 10.1016/j.devcel.2016.11.018)",
+        "http_status": 200
+      },
+      "variables_present": [],
+      "variables_missing": [
+        "a journal article record (Elsevier DOI prefix), not an embryo dataset; contents not opened"
+      ],
+      "scope": "Cleaving embryos, modelling",
+      "evidence": "Search hit: DOI 10.1016/j.devcel.2016.11.018, cc-by-4.0, 56,716,662 bytes in the record.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    {
+      "source": "BioImage Archive",
+      "query": "four-cell embryo blastomere",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=four-cell%20embryo%20blastomere&pageSize=5",
+      "hits": 135
+    },
+    {
+      "source": "BioImage Archive",
+      "query": "C. elegans embryo cell volume segmentation",
+      "url": "https://www.ebi.ac.uk/biostudies/api/v1/BioImages/search?query=C.%20elegans%20embryo%20cell%20volume%20segmentation&pageSize=5",
+      "hits": 2987,
+      "note": "unranked broad match; top hits are lifetime imaging, EM, lifespan datasets"
+    },
+    {
+      "source": "Zenodo",
+      "query": "blastomere volume four-cell embryo",
+      "url": "https://zenodo.org/api/records?q=blastomere%20volume%20four-cell%20embryo&size=5",
+      "hits": 356705,
+      "note": "unranked broad match; top hits are taxonomic-paper figures on embryology and the cleavage-pattern modelling article"
+    },
+    {
+      "source": "Zenodo",
+      "query": "C. elegans embryo 4D segmentation cell volume contacts",
+      "url": "https://zenodo.org/api/records?q=C.%20elegans%20embryo%204D%20segmentation%20cell%20volume%20contacts&size=5",
+      "hits": 1459441,
+      "note": "unranked broad match; nothing identified as four-cell volumes"
+    },
+    {
+      "source": "DataCite",
+      "query": "ascidian embryo cell contact 3D segmentation",
+      "url": "https://api.datacite.org/dois?query=ascidian%20embryo%20cell%20contact%203D%20segmentation&page[size]=5",
+      "hits": 0
+    }
+  ],
+  "status": "gap",
+  "summary": "No dataset links blastomere volumes to polar-furrow class across phyla. The BioImage Archive has a mouse 4-cell-to-8-cell time-lapse set (S-BIAD1057), Xenbase and Echinobase sit behind a captcha for scripted clients, and searches for ascidian, C. elegans and generic four-cell volume sets found no matching tables.",
+  "next_step": "Compile furrow class and relative blastomere sizes from published figures and drawings across molluscs, annelids, nematodes and echinoderms, or obtain intact four-cell time-lapse volumes (C. elegans, ascidian) from their consortia; check Xenbase and Echinobase manually in a browser.",
+  "obstacles_confirmed": [
+    "Molluscs, annelids and coelenterates, where many of the classical furrow variants were drawn, are poorly represented in these databases.",
+    "Cross-phyla image protocols and stage definitions differ."
+  ]
+}

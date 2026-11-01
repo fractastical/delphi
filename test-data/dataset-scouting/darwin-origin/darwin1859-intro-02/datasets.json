@@ -1,0 +1,126 @@
+{
+  "claim_id": "darwin1859-intro-02",
+  "project": "darwin-origin",
+  "scouted_at": "2026-11-01T12:13:00Z",
+  "scout": { "kind": "cursor-subagent", "model": "claude-sonnet-5.5", "run": "darwin-10" },
+  "variables_needed": [
+    "stage-structured fecundity and survival (potential versus realized population growth) per species",
+    "standardized selection gradients or survival and reproductive differentials on measured traits",
+    "abundance time series showing realized growth held below geometric potential",
+    "heritability of the trait in the same population (rarely paired)"
+  ],
+  "datasets": [
+    {
+      "id": "kingsolver-2001-selection-database-dryad-166",
+      "name": "Kingsolver et al. phenotypic selection database (Dryad: The strength of phenotypic selection in natural populations)",
+      "landing_url": "https://datadryad.org/api/v2/datasets/doi%3A10.5061%2Fdryad.166",
+      "access_url": null,
+      "doi": "10.5061/dryad.166",
+      "license": "CC0-1.0",
+      "suggested_by": ["gemini"],
+      "checked": { "at": "2026-11-01T11:59:00Z", "method": "DataCite search 'Kingsolver phenotypic selection database' (3 hits) then GET Dryad dataset record and version file list", "http_status": 200, "bytes": 776704 },
+      "variables_present": [
+        "standardized linear and quadratic selection gradients or differentials from 63 published studies of 62 species, over 2,500 estimates (Dryad abstract); file Kingsolveretal.SelnDatabase.norepdur.3.2001.xls, 776,704 bytes"
+      ],
+      "variables_missing": ["offspring surplus or population growth (not in the record)", "heritability", "column names not inspected"],
+      "scope": "62 species, field populations, literature from 1984 to 1997",
+      "evidence": "Dryad API record: license CC0-1.0, abstract as quoted, file list shows the .xls.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "compadre-plant-matrix-database",
+      "name": "COMPADRE Plant Matrix Database v6.26.3.0",
+      "landing_url": "https://compadre-db.org/Data/Compadre",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "gemini", "grok"],
+      "checked": { "at": "2026-11-01T11:58:00Z", "method": "GET Data/Compadre page text", "http_status": 200, "bytes": 16756 },
+      "variables_present": ["stage-structured survival and fecundity in matrix population models: 812 taxonomic species, 669 publications, 9,178 matrices (page text)"],
+      "variables_missing": ["no individual traits, so no selection step", "download link not followed"],
+      "scope": "Plants, algae, fungi and others as stated on the site",
+      "evidence": "Page text: 'Version 6.26.3.0 812 Taxonomic Species 669 Publications 9178 Matrix Population Models'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "comadre-animal-matrix-database",
+      "name": "COMADRE Animal Matrix Database v4.26.4.0",
+      "landing_url": "https://compadre-db.org/Data/Comadre",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gemini", "grok"],
+      "checked": { "at": "2026-11-01T11:58:00Z", "method": "GET Data/Comadre page text", "http_status": 200, "bytes": 16748 },
+      "variables_present": ["animal matrix population models: 445 taxonomic species, 424 publications, 3,548 matrices (page text)"],
+      "variables_missing": ["no individual traits, so no selection step"],
+      "scope": "Animals as stated on the site",
+      "evidence": "Page text: 'Version 4.26.4.0 445 Taxonomic Species 424 Publications 3548 Matrix Population Models'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "living-planet-database",
+      "name": "Living Planet Database (public version)",
+      "landing_url": "https://www.livingplanetindex.org/data_portal",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:02:00Z", "method": "GET homepage (7,636 bytes) and data_portal page text", "http_status": 200, "bytes": 13791 },
+      "variables_present": ["vertebrate population abundance time series, 1970 to 2022, described as tens of thousands of series (page text)"],
+      "variables_missing": ["vertebrates only", "no fecundity or trait fields described; download terms not read"],
+      "scope": "Vertebrate populations, public version",
+      "evidence": "Page text: 'The Living Planet Database contains tens of thousands of vertebrate population time-series ... spanning years between 1970 and 2022'.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "fishbase-portal",
+      "name": "FishBase",
+      "landing_url": "https://www.fishbase.se/",
+      "access_url": null,
+      "doi": null,
+      "license": null,
+      "suggested_by": ["grok"],
+      "checked": { "at": "2026-11-01T12:01:00Z", "method": "GET landing page (447 bytes, frame or redirect shell); GET fishbase.ropensci.org fecundity endpoint failed with an SSL certificate error", "http_status": 200, "bytes": 447, "note": "the rOpenSci API endpoint was unreachable on this run (certificate verify failed), so fecundity fields were not confirmed" },
+      "variables_present": [],
+      "variables_missing": ["fecundity fields not confirmed in this run"],
+      "scope": "Fishes",
+      "evidence": "Landing page returned 447 bytes only.",
+      "verdict": "partial",
+      "reuses_organism_dataset": null
+    },
+    {
+      "id": "dryad-portal",
+      "name": "Dryad (portal)",
+      "landing_url": "https://datadryad.org/",
+      "access_url": "https://datadryad.org/api/v2/search?q=phenotypic%20selection%20gradients&per_page=6",
+      "doi": null,
+      "license": null,
+      "suggested_by": ["gpt", "gemini"],
+      "checked": { "at": "2026-11-01T11:59:00Z", "method": "Dryad search API", "http_status": 200 },
+      "variables_present": [],
+      "variables_missing": ["repository; see Kingsolver dataset above"],
+      "scope": "Repository",
+      "evidence": "Search 'phenotypic selection gradients' returned total 305; 'survival fecundity heritable trait fitness wild pedigree' returned 0.",
+      "verdict": "rejected",
+      "reuses_organism_dataset": null
+    }
+  ],
+  "search_log": [
+    { "source": "DataCite", "query": "Kingsolver phenotypic selection database", "url": "https://api.datacite.org/dois?query=Kingsolver%20phenotypic%20selection%20database&page%5Bsize%5D=5", "hits": 3, "note": "10.5061/dryad.166, 10.5061/dryad.v4t80, KD-Database" },
+    { "source": "Dryad", "query": "phenotypic selection gradients", "url": "https://datadryad.org/api/v2/search?q=phenotypic%20selection%20gradients&per_page=6", "hits": 305, "note": "many single-study datasets" },
+    { "source": "Dryad", "query": "survival fecundity heritable trait fitness wild pedigree", "url": "https://datadryad.org/api/v2/search?q=survival%20fecundity%20heritable%20trait%20fitness%20wild%20pedigree&per_page=5", "hits": 0, "note": null },
+    { "source": "Zenodo", "query": "COMADRE COMPADRE matrix population database", "url": "https://zenodo.org/api/records?q=COMADRE%20COMPADRE%20matrix%20population%20database&size=4", "hits": 335685, "note": "broad OR match; only code and papers on matrix models surfaced; no mirror of the matrix databases found in the top hits" },
+    { "source": "DataCite", "query": "Living Planet Database population time series", "url": "https://api.datacite.org/dois?query=Living%20Planet%20Database%20population%20time%20series&page%5Bsize%5D=3", "hits": null, "note": "response was truncated at 1 MB and not parsed; first record off-topic" }
+  ],
+  "status": "partial",
+  "summary": "Kingsolver selection gradients (2,500+ estimates, 62 species) cover the survival and reproductive differential half, and COMPADRE/COMADRE (12,726 matrices combined by the page counts) cover fecundity and survival, but the two sets are different species and rows, and none records heritability alongside fitness.",
+  "next_step": "Confirm columns in the Kingsolver xls; download COMPADRE and COMADRE under their Data User Agreement and compute population growth potential per species separately from the selection compilation.",
+  "obstacles_confirmed": [
+    "Public demographic databases do not pair individual heritable differences with fitness in the same rows.",
+    "Selection compilations are biased to vertebrates, insects and annual plants."
+  ]
+}
