@@ -16,14 +16,24 @@ ASSEMBLY_SCHEMA = "frontier.biodesign.assembly/1"
 REPORT_SCHEMA = "frontier.biodesign.report/1"
 AXES = ("structural_refs", "units_context", "model_domain", "numerical", "empirical", "implementation")
 LAYERS = ("genetic_blueprint", "cell_program", "tissue_model", "geometry", "aero", "behavior")
+PINS = LAYERS + ("geometry_panels", "geometry_components")  # every pin an assembly carries
 # which layers each stage reads; a changed pin invalidates exactly the stages that read it
 STAGE_LAYERS = {
-    "structural_refs": LAYERS,
+    "structural_refs": PINS,
     "units_context": ("tissue_model", "geometry", "aero"),
     "model_domain": ("aero",),
     "numerical": ("aero",),
     "empirical": ("genetic_blueprint", "tissue_model", "behavior"),
     "implementation": ("genetic_blueprint", "cell_program"),
+}
+# files a stage reads that are not assembly pins, plus the code that computes it: a change to any invalidates the stage
+STAGE_FILES = {
+    "structural_refs": ("engineering/biodesign_compiler/compile.py",),
+    "units_context": ("engineering/biodesign_compiler/compile.py", "engineering/coupling.py", "engineering/COUPLING_MANIFEST.json"),
+    "model_domain": ("engineering/biodesign_compiler/compile.py",),
+    "numerical": ("engineering/biodesign_compiler/compile.py",),
+    "empirical": ("engineering/biodesign_compiler/compile.py", "engineering/COUPLING_MANIFEST.json"),
+    "implementation": ("engineering/biodesign_compiler/compile.py",),
 }
 VARIANTS = {"v3a": "fish3d-v3a-fan", "v3b": "fish3d-v3b-glide-pose", "v3c": "fish3d-v3c-daane-length"}
 SHARED = {
@@ -138,6 +148,15 @@ def unresolved_bridges(reg, root: Path) -> list[dict]:
     ]
 
 
+def stage_key(root: Path, a: dict, stage: str) -> str:
+    """Cache key: path and sha256 of every pin the stage reads, plus the sha256 of the other files and code it depends on."""
+    pins = {k: [a["components"][k]["path"], a["components"][k]["sha256"]] for k in STAGE_LAYERS[stage]}
+    files = {f: sha((root / f).read_bytes()) for f in STAGE_FILES[stage]}
+    if stage == "units_context":
+        files.update({str(f.relative_to(root)): sha(f.read_bytes()) for f in sorted((root / "engineering/model_interfaces").glob("*.json"))})
+    return json.dumps({"pins": pins, "files": files}, sort_keys=True)
+
+
 def compile_assembly(root: Path, a: dict, reg=None, couplings=None, cache=None) -> dict:
     reg = reg or cp.default_registry()
     couplings = couplings or cp.default_couplings()
@@ -151,7 +170,7 @@ def compile_assembly(root: Path, a: dict, reg=None, couplings=None, cache=None) 
     }
     axes, reused = {}, []
     for s in AXES:
-        key = json.dumps({k: a["components"][k]["sha256"] for k in STAGE_LAYERS[s]}, sort_keys=True)
+        key = stage_key(root, a, s)
         if cache is not None and s in cache and cache[s]["key"] == key:
             axes[s] = cache[s]["result"]
             reused.append(s)
@@ -165,7 +184,8 @@ def compile_assembly(root: Path, a: dict, reg=None, couplings=None, cache=None) 
 
 
 def impact(old: dict, new: dict) -> dict:
-    changed = [k for k in sorted(set(old["components"]) | set(new["components"])) if old["components"].get(k, {}).get("sha256") != new["components"].get(k, {}).get("sha256")]
+    g = lambda a, k: (a["components"].get(k, {}).get("path"), a["components"].get(k, {}).get("sha256"))
+    changed = [k for k in sorted(set(old["components"]) | set(new["components"])) if g(old, k) != g(new, k)]
     inv = [s for s in AXES if set(STAGE_LAYERS[s]) & set(changed)]
     return {"changed_layers": changed, "invalidated_stages": inv, "kept_stages": [s for s in AXES if s not in inv]}
 
