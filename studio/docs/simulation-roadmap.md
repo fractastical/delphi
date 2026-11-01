@@ -359,7 +359,8 @@ declared parameters, and no organism, tissue or cell measurement enters it. The 
 **numerical soft-voxel ground-contact mechanics benchmark, not tissue**: 45 nominal 10 mm
 voxels, an outer envelope of 50 x 30 x 30 mm, a 40 mm centre-to-centre span and a nominal
 45 g at the assumed 1000 kg/m^3. It is not tissue-scale, not a Xenopus or microcarrier
-model, and not material-calibrated. The known
+model, and not material-calibrated.
+
 If anything from this track is rendered,
 `artifacts/voxel-actuation/trajectory/travelling-voxels.csv` stores voxel **centres and the
 imposed temperature only** — no orientations, no deformed voxel meshes, no forces. A renderer
