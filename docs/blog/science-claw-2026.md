@@ -4,7 +4,7 @@ Blog · Project report · November 2026
 
 One weekend at MIT. Five books, sixteen papers, a team of people and a swarm of agents: 1,763 machine-readable claims about living things, 91 of them proved as mathematics, 174 tested against data, 880 published as signed nanopublications, and a design studio that checks an engineered organism against the same laws.
 
-Project Delphi · Science Claw Hack @ MIT, 30 Oct – 1 Nov 2026 · Figures computed 1 November 2026 (2026-11-01 21:12 UTC) by `scripts/site/build-blog.mjs`; nothing typed by hand
+Project Delphi · Science Claw Hack @ MIT, 30 Oct – 1 Nov 2026 · Figures computed 1 November 2026 (2026-11-01 21:12 UTC) by `scripts/site/build-blog.mjs`; the few figures quoted from the product report are marked as quoted
 
 ![Drosophila compound eye, cells segmented and coloured: a near-perfect hexagonal lattice](compound-eye.jpg)
 
