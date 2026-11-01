@@ -103,3 +103,35 @@ earlier cuts accessible as an archive.
   are visions, not completed results.
 - Validate every scientific spoken claim before synthesis. Inspect the final
   media, captions, sources and public playback under the existing acceptance.
+
+## Additional Delphi portal edition (October 31, late evening)
+
+The user requested two further films, 60 and 120 seconds, primarily pitching
+https://kavitakoolkarni-bio.github.io/delphi-portal/#about. Preserve the science
+pair and every earlier film. Feature both pairs with distinct edition labels;
+changing duration stays within the selected edition.
+
+Use the actual portal's pale blue field, cobalt/rose scientific diagrams and
+large visual panels. Scientific imagery should occupy roughly 70–85% of frame
+height instead of shrinking entire browser pages inside generous margins.
+Record real interactions; label schematic visuals. The portal's default mock
+run replay must not appear to be a live backend execution. Source-reported
+aggregate scores, proof counts and species claims need their own evidence
+before narration treats them as verified.
+
+The story should connect the rubric to demonstrated work: meaningful cross-scale
+engineering questions, scoped Lean checks and failed controls, exact-version
+claim reuse, independent disagreement, and a working MCP contribution surface.
+The recorded agency pilot was at ceiling; it establishes no collective advantage.
+Do not turn activity counts into scientific impact or biological feasibility.
+
+Narration revision: use the SciDEX female voice `English_Graceful_Lady`, initially
+`speech-02-hd`, speed 1.0, with no audio tempo acceleration. Fit by shortening
+copy and leaving visual holds. Retain the faster draft as a superseded edit.
+Lead with Lean as the formal foundation: scoped statements, explicit assumptions,
+checkable implications, reusable constraints and future model composition.
+Present validation as a constructive loop rather than a list of disclaimers.
+A biological compiler's intended output is candidate DNA plus a build plan and
+validation requirements; the implemented artifact checker is not that complete
+compiler. Compare reference zebrafish, computational candidates and natural
+flying-fish evidence separately. No unsupported genomic similarity score.

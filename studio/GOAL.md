@@ -66,6 +66,11 @@ about a proposed action.
 - [ ] Deliver new science-focused 60- and 120-second cuts: actual Lean source and
   checks, multiscale design evidence, genetic-context limits and validation;
   retain old cuts and feature the new pair after public playback checks.
+- [ ] Add a second 60s/120s pair centered on the Delphi portal, retaining the
+  first science pair and all prior cuts; use taller scientific imagery and
+  evidence-backed collaboration examples without claiming a pilot advantage.
+- [ ] Refresh System participant counts from scoped harness and child transcripts,
+  distinguishing historical contributors, active workers and capacity.
 - [x] Recover codex-api, codex-01, codex-02 and claude-15 handoffs.
 - [x] Preserve the existing foundation and scope the product around Frontier.
 - [x] Assign separate worktrees to existing harnesses and record ownership.

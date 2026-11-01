@@ -770,7 +770,8 @@ def demo_videos(ins: Inputs, out: dict) -> dict | None:
     present = False
     for directory, expected in (("artifacts/demo-video", {"frontier-60s": 60, "frontier-120s": 120}),
                                 ("artifacts/demo-video-90", {"frontier-90s": 90}),
-                                ("artifacts/demo-video-science", {"frontier-science-60s": 60, "frontier-science-120s": 120})):
+                                ("artifacts/demo-video-science", {"frontier-science-60s": 60, "frontier-science-120s": 120}),
+                                ("artifacts/demo-video-delphi", {"frontier-delphi-60s": 60, "frontier-delphi-120s": 120})):
         manifest = _demo_manifest(ins, out, directory, expected)
         if manifest is None:
             continue

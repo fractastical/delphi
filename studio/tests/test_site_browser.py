@@ -1916,7 +1916,7 @@ def test_demo_page_defaults_to_latest_published_cut_and_preserves_old_downloads(
         return
     pg = page(browser, 1280, 900)
     pg.goto(base + "#/demo"); pg.wait_for_selector("#demo-video")
-    expected = cuts.get("frontier-science-60s") or cuts.get("frontier-90s") or cuts["frontier-60s"]
+    expected = cuts.get("frontier-delphi-60s") or cuts.get("frontier-science-60s") or cuts.get("frontier-90s") or cuts["frontier-60s"]
     assert pg.locator("#demo-video source").get_attribute("src") == expected["href"]
     assert pg.locator(".demodl li").count() == len(cuts) and pg.locator(".demodl a[download]").count() >= len(cuts)
 
@@ -2212,7 +2212,7 @@ def test_tables_keep_badges_on_one_line_stack_on_phones_and_say_when_they_scroll
 
 def test_new_ninety_second_cut_is_featured_with_accurate_label_and_old_cuts(browser, base):
     snap = json.loads((ROOT / 'site/data/snapshot.json').read_text())
-    old = [c for c in snap['demo_videos']['cuts'] if not c['id'].startswith('frontier-science-')]
+    old = [c for c in snap['demo_videos']['cuts'] if not c['id'].startswith(('frontier-science-', 'frontier-delphi-'))]
     assert {c['id'] for c in old} >= {'frontier-60s', 'frontier-120s'}
     latest = dict(old[0], id='frontier-90s', title='New narrated tour', duration_s=90)
     snap['demo_videos']['cuts'] = [c for c in old if c['id'] != 'frontier-90s'] + [latest]
@@ -2233,7 +2233,7 @@ def test_new_ninety_second_cut_is_featured_with_accurate_label_and_old_cuts(brow
 
 def test_science_pair_is_featured_and_earlier_videos_remain_playable(browser, base):
     snap = json.loads((ROOT / 'site/data/snapshot.json').read_text())
-    old = [c for c in snap['demo_videos']['cuts'] if not c['id'].startswith('frontier-science-')]
+    old = [c for c in snap['demo_videos']['cuts'] if not c['id'].startswith(('frontier-science-', 'frontier-delphi-'))]
     new = [dict(old[0], id=f'frontier-science-{seconds}s', title=title, duration_s=seconds)
            for seconds, title in [(60, 'Lean for biology'), (120, 'Design across scales')]]
     snap['demo_videos']['cuts'] = old + new
@@ -2296,4 +2296,30 @@ def test_observed_update_card_keeps_worsening_separate_from_observations(browser
         assert pg.get_by_role("link", name="Lean proof gallery").count() == 1
         assert pg.locator("img[alt*='Observed-data update']").count() == 1
         assert _overflow(pg) <= 0 and pg.errors == []
+        pg.close()
+
+
+def test_delphi_and_science_pairs_remain_distinct_and_selectable(browser, base):
+    snap = json.loads((ROOT / 'site/data/snapshot.json').read_text())
+    old = [c for c in snap['demo_videos']['cuts'] if c['id'] in {'frontier-60s', 'frontier-90s', 'frontier-120s'}]
+    cuts = [dict(old[0], id=f'frontier-{edition}-{seconds}s', title=f'{edition} {seconds}', duration_s=seconds)
+            for edition in ('science', 'delphi') for seconds in (60, 120)]
+    snap['demo_videos']['cuts'] = old + cuts
+    for width in (1440, 390):
+        pg = page(browser, width, 960)
+        pg.route('**/data/snapshot.json', lambda r: r.fulfill(json=snap))
+        pg.goto(base + '#/demo')
+        pg.wait_for_selector('#demo-video')
+        assert pg.locator('.democut[aria-current=page]').get_attribute('href').endswith('frontier-delphi-60s')
+        assert pg.locator('nav[aria-label="Choose a cut"] .democut').count() == 4
+        assert pg.locator('.demoarchive .democut').count() == len(old)
+        for edition in ('delphi', 'science'):
+            pg.locator(f'.democut[href$="frontier-{edition}-60s"]').click()
+            pg.wait_for_selector(f'.democut[aria-current=page][href$="frontier-{edition}-60s"]')
+            assert pg.locator('#demo-switch').get_attribute('href').endswith(f'frontier-{edition}-120s')
+            pg.locator('#demo-switch').click()
+            pg.wait_for_selector(f'.democut[aria-current=page][href$="frontier-{edition}-120s"]')
+            assert pg.locator('#demo-switch').get_attribute('href').endswith(f'frontier-{edition}-60s')
+        assert pg.get_by_role('link', name='Explore Delphi', exact=True).get_attribute('href') == 'https://kavitakoolkarni-bio.github.io/delphi-portal/#about'
+        assert _overflow(pg) <= 0 and not pg.errors
         pg.close()
