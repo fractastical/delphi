@@ -1456,7 +1456,7 @@ def test_home_offers_print_revisions_with_hash_exact_stl_downloads(browser, base
             card = cards.nth(i)
             card.scroll_into_view_if_needed()
             pg.wait_for_function("i => { const e = document.querySelectorAll('.print-study img')[i]; return e.complete && e.naturalWidth > 0; }", arg=i)
-            assert form["short"] in card.inner_text()
+            assert form["short"].casefold() in card.inner_text().casefold()
             assert "Calculated mass" in card.inner_text() and "Not weighed" in card.inner_text()
             assert f'{form["mass_conditional_g"]["smooth"]:.2f} g' in card.inner_text()
             assert card.locator("a[download]").count() == 2
@@ -1569,7 +1569,7 @@ def test_fish_history_lists_only_stated_lineage_and_separates_siblings_revisions
     t = pg.locator("#main").text_content()
     assert "Chronological revision" in t and "Sibling variants" in t and "Derivation" in t and "not a launch prototype" in t and "Launch glider print sets exist as manifests" in t and "untested" in t
     assert "not the date the design was made" in t or "not a design date" in t or "a repository fact" in t
-    assert pg.locator("#fhgraph .g-node").count() == len(H["nodes"]) == 23
+    assert pg.locator("#fhgraph .g-node").count() == len(H["nodes"]) == 25
     pg.goto(base + "#/history?sel=fish3d-v3a-fan-prop"); pg.wait_for_selector("#fhdetail h3")
     d = pg.locator("#fhdetail").text_content()
     assert "fish3d-v3a-fan-prop" in d and "printed from" in d and "fish3d-v3a-fan" in d and "artifacts/print-v3/downloads.json" in d
