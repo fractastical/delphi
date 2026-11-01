@@ -92,7 +92,8 @@ def test_committed_ledger_is_consistent_and_hashes_match_available_files():
         for e in v["evidence"]:
             f = md / e["file"]
             if f.exists():
-                assert ac.sha(f.read_bytes()) == e["sha256"] or f.stat().st_mtime > ac.ts(o["window"]["observed_utc"].replace("Z", "+00:00")); checked += 1
+                assert ac.sha(f.read_bytes()) == e["sha256"] or f.stat().st_mtime > ac.ts(o["window"]["observed_utc"].replace("Z", "+00:00"))
+                checked += 1
     assert checked > 0
 
 
@@ -190,3 +191,22 @@ def test_committed_native_class_is_three_verified_and_disjoint_from_harnesses():
     assert not set(n["identities"]) & (set(o["supported_harnesses"]) | set(o["tmux"]))
     assert n["combined_with_harness_floor_if_classes_are_disjoint"] == len(o["supported_harnesses"]) + 3
     assert any(c["files_changed"] > 0 for e in n["entries"] for c in e["checks"])
+
+
+def test_transcript_participants_replace_native_floor_without_double_counting():
+    out = run({'claude05-to-site.md': msg('# x')})
+    out['native_contributors']['identities'] = ['/root/a']
+    receipt = {
+        'participants': [
+            {'kind': 'codex_native_child', 'identity': '/root/a'},
+            {'kind': 'codex_native_child', 'identity': '/root/retired'},
+            {'kind': 'claude_nested_child', 'identity': 'nested-child'}],
+        'window': {'start_utc': 'start', 'observed_utc': 'end'},
+        'live_native_api': {'running_children': 1}, 'counts': {}}
+    ac.attach_participation(out, receipt, 'a' * 64)
+    assert out['participation']['recorded_participant_floor'] == 4
+    assert out['participation']['recorded_native_children'] == 2
+    assert out['participation']['live_native_api']['running_children'] == 1
+    receipt['participants'] = receipt['participants'][1:]
+    with pytest.raises(ValueError, match='misses previously supported'):
+        ac.attach_participation(out, receipt, 'a' * 64)
