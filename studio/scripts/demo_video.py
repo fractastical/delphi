@@ -799,7 +799,8 @@ def render_storyboard(story_path: Path, media_map_path: Path, tts_path: Path,
 
 
 def finalize_existing(story_path: Path, media_map_path: Path, tts_path: Path,
-                      output_root: Path, only_cut: str | None = None) -> dict:
+                      output_root: Path, only_cut: str | None = None,
+                      rendered_commit: str | None = None) -> dict:
     """Write a release manifest for already-rendered, independently checked files."""
     story = load_story(story_path)
     media_map, source_rows = validate_media_map(story, media_map_path)
@@ -845,8 +846,11 @@ def finalize_existing(story_path: Path, media_map_path: Path, tts_path: Path,
     capture_path = Path(media_map["capture_manifest_path"])
     if not capture_path.is_file() or sha256_file(capture_path) != media_map["capture_manifest_sha256"]:
         raise ValueError("captured-screen manifest hash mismatch")
-    renderer_commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
-                                     text=True, timeout=10, check=True).stdout.strip()
+    finalizer_commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True,
+                                      text=True, timeout=10, check=True).stdout.strip()
+    renderer_commit = rendered_commit or finalizer_commit
+    renderer_source = subprocess.run(["git", "show", f"{renderer_commit}:scripts/demo_video.py"],
+                                     cwd=ROOT, capture_output=True, timeout=10, check=True).stdout
     stable_sources = []
     for row in source_rows:
         ref = _source_reference(row["path"], renderer_commit)
@@ -858,6 +862,9 @@ def finalize_existing(story_path: Path, media_map_path: Path, tts_path: Path,
                                        "sha256": source_story_sha}
                                       if story.get("audio_source_storyboard_path") else None),
                 "editing": story.get("editing"), "renderer_commit": renderer_commit,
+                "renderer_sha256": hashlib.sha256(renderer_source).hexdigest(),
+                "finalizer_commit": finalizer_commit,
+                "finalizer_sha256": sha256_file(Path(__file__).resolve()),
                 "media_map": {"path": stable_path(media_map_path), "sha256": sha256_file(media_map_path)},
                 "tts_manifest": {"path": stable_path(tts_path), "sha256": sha256_file(tts_path),
                                  "provider": tts_manifest["provider"], "model": tts_manifest["model"],
@@ -890,6 +897,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--voice-id", default=VOICE_ID, help="MiniMax voice id; used only by synthesize")
     parser.add_argument("--speed", type=float, default=1.0, help="MiniMax voice speed in the provider's 0.5–2.0 range")
     parser.add_argument("--tempo", type=float, default=1.3, help="pitch-preserving editorial atempo multiplier for prepare-edit")
+    parser.add_argument("--rendered-commit", default=None, help="renderer source commit for finalize; defaults to current HEAD")
     args = parser.parse_args(argv)
     try:
         if args.command == "synthesize":
@@ -910,7 +918,8 @@ def main(argv: list[str] | None = None) -> int:
                                  "bytes": cut["files"]["video"]["bytes"]} for cut in result["cuts"]]}
         else:
             tts_path = args.tts_manifest or args.output / "tts-manifest.json"
-            result = finalize_existing(args.storyboard, args.media_map, tts_path, args.output, args.cut)
+            result = finalize_existing(args.storyboard, args.media_map, tts_path, args.output, args.cut,
+                                       rendered_commit=args.rendered_commit)
             summary = {"ok": True, "manifest": str(args.output / "manifest.json"),
                        "cuts": [{"id": cut["id"], "duration_s": cut["duration_s"],
                                  "bytes": cut["files"]["video"]["bytes"]} for cut in result["cuts"]]}
