@@ -58,11 +58,35 @@ about a proposed action.
 
 ## Delivery checklist
 
+- [ ] Add two bounded reuse studies, tissue microcarrier and epithelial repair,
+  preserving Flying Fish as the flagship. Give each exact source/model context,
+  shared-frontier questions, a bounded computation and a validation plan; measure
+  reuse separately from biological transfer (SPEC-007 and SPEC-017).
+- [ ] Research Xenobot/ICDO and additional multiscale simulators, publish a
+  primary-source capability/compatibility catalog, and execute bounded useful
+  comparisons with controls, trajectories and explicit biological-transfer gaps.
+  Convert supported results into contextual reusable rules and design controls.
+- [ ] Implement the self-validation loop in SPEC-017: falsifiable candidate
+  contracts, validator controls, cross-scale validation slices, virtual instruments
+  and evidence-directed next actions; preserve the separation between internal
+  consistency and biological validity.
 - [x] Deliver 60-second and 120-second narrated demo videos with MiniMax voice,
   real interface captures and recorded simulation footage; preserve source and
   validation limits, and map the story to the judging rubric (SPEC-016).
 - [x] Publish the additive 90-second MiniMax narrated cut, preserve older cuts,
   and check actual public playback, downloads, captions and fullscreen.
+- [ ] Deliver new science-focused 60- and 120-second cuts: actual Lean source and
+  checks, multiscale design evidence, genetic-context limits and validation;
+  retain old cuts and feature the new pair after public playback checks.
+- [ ] Add a second 60s/120s pair centered on the Delphi portal, retaining the
+  first science pair and all prior cuts; use taller scientific imagery and
+  evidence-backed collaboration examples without claiming a pilot advantage.
+- [ ] Refresh System participant counts from scoped harness and child transcripts,
+  distinguishing historical contributors, active workers and capacity.
+- [ ] Build a source-grounded DNA-to-design ledger, compiler dependency graph,
+  candidate-screening/experimental-design workflow and virtual-instrument
+  contracts, preserving uncalibrated inter-layer connections and requiring
+  functional testing before calling generated DNA a working implementation.
 - [x] Recover codex-api, codex-01, codex-02 and claude-15 handoffs.
 - [x] Preserve the existing foundation and scope the product around Frontier.
 - [x] Assign separate worktrees to existing harnesses and record ownership.

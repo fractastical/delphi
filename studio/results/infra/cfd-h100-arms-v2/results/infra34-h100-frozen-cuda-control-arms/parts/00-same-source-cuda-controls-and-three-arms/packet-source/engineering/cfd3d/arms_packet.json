@@ -1,0 +1,189 @@
+{
+ "schema": "cfd3d-cyl2d-packet-0.2",
+ "device": "cuda",
+ "purpose": "A separately declared CUDA comparison of the frozen 2-D cylinder control arms R1, R3_domain and M1_mutant (cyl2d_contract.json 9d53cd1 + ddc7095; band cyl2d_band.json 5a02b46) on one H100, one arm at a time. Equations, domain, boundary conditions, grid, t_end, force normalisation, averaging, reference bands and the mutant criterion are those of the CPU packet 95ac40c9 (repaired as 3507d462 on VM03) and of the R2 packet 751a23c3; only the backend differs, and the code changes are declared in backend_declaration.",
+ "backend_declaration": {
+  "backend": "CUDA (Float32, env_gpu pins: the 751a23c3 R2 packet's env) instead of the CPU packet's CPU (env Manifest). Every run JSON carries gpu: true and eval.json reports backend per run; nothing here is labelled CPU.",
+  "solver_source": "cyl2d.jl, cyl2d_contract.json, cyl2d_band.json and env_gpu are byte-identical to those in R2 packet 751a23c3 (cyl2d.jl differs from the CPU packet's ebc21ef0 by the host copy of p for surface sampling and Float32 series with series_dtype; on T_restart the two give equal series after Float32 rounding, r2-packet-controls.json)",
+  "code_changes": [
+   "cyl2d_entry.py: calibration times every arm (arms form) and adds each arm's measured process start-up to its projection; cases_sequential runs one arm at a time and does not start an arm whose calibrated projection no longer fits",
+   "cyl2d_eval.py: reports backend per run, backends and mixed_backends in the verdict (reported, not a criterion; no criterion changed)"
+  ],
+  "not_relabelled": "these runs are CUDA R1/R3_domain/M1_mutant. They do not replace VM03's CPU runs; both are kept and reported separately"
+ },
+ "science": "model diagnostics; never 'passed'. eval.json here evaluates R1, R3_domain and M1_mutant on CUDA (periodicity, band, mutant); R2_fidelity, grid_pair and control_passes need the returned R2 as well, combined by cyl2d_eval.py afterwards with every original criterion. The 3-D C1 sphere reference gate FAILED and stays failed. No fin, fish, swimming or flight claim.",
+ "reference_gate": {
+  "C1_sphere_3d": "FAILED (|Cd| 0.875 at D16 CPU, 0.918/0.881 at D32 GPU, vs band [0.95, 1.35]); blocks physical-validation wording",
+  "cyl2d": "frozen contract + band; evaluator fails closed (a92d80e)"
+ },
+ "platform_note": "R1/R3_domain/M1_mutant here run on CUDA (Float32, env_gpu pins); VM03 runs the same arms on CPU. Same WaterLily 1.10.0 and Julia 1.12.7; the same-state control measures the CPU/CUDA difference on one shared flow state in this job before any arm starts.",
+ "files": [
+  "cyl2d_entry.py",
+  "arms_packet.json",
+  "packet.json",
+  "cyl2d.jl",
+  "cyl2d_contract.json",
+  "cyl2d_band.json",
+  "cyl2d_eval.py",
+  "env_gpu/Project.toml",
+  "env_gpu/pins.tsv"
+ ],
+ "stages": [
+  "telemetry",
+  "julia",
+  "env",
+  "restart_check",
+  "platform",
+  "calibration",
+  "cases",
+  "eval",
+  "output"
+ ],
+ "env": {
+  "project": "engineering/cfd3d/env_gpu/Project.toml",
+  "pins": "engineering/cfd3d/env_gpu/pins.tsv",
+  "pin_count": 103,
+  "canonical_sha256": "d1a8e00741a5d1733be9e007b49bb2844fff2bdd232ccb993c1838319ed926bc",
+  "timeout_s": 2400,
+  "note": "the same pins and digest as the H100 fish packet 5af94b3f, which instantiated and passed its CUDA gate on 2026-10-31"
+ },
+ "outer_budget_s": 5400,
+ "outer_budget_note": "default 5400 s (root's initial 90 min). The dispatcher sets CFD3D_OUTER_BUDGET_S = science budget; the calibration rule compares the arms' summed projection with what is left of it. Requested before dispatch: 7200 s (see handoff), because the conservative projection does not fit 5400 s",
+ "emit_margin_s": 600,
+ "segment_s": 3600,
+ "min_segment_s": 300,
+ "ckpt_every_s": 900,
+ "ckpt_margin_s": 600,
+ "export_every_s": 10800,
+ "export_reserve_bytes": 900000000,
+ "max_out_bytes": 12000000,
+ "restart_check": {
+  "run_id": "T_restart",
+  "threads": 2,
+  "mem_gb": 6,
+  "timeout_s": 1200,
+  "split_after_steps": 120,
+  "min_steps_after_split": 50,
+  "min_cp_samples_after_split": 5
+ },
+ "same_state": {
+  "run_id": "T_same",
+  "t_state": 100.0,
+  "steps": 20,
+  "shift": 10,
+  "cpu_threads": 4,
+  "timeout_s": 1800,
+  "tolerance": {
+   "Cd": 0.005,
+   "Cd_p": 0.005,
+   "Cl": 0.005,
+   "t": 0.001,
+   "u_abs": 0.01
+  },
+  "tolerance_units": "Cd, Cd_p, Cl: max |difference| over the compared steps divided by the CPU mean |Cd|; t: max relative difference; u_abs: max |u_cpu - u_cuda| over the whole field after the continuation, U = 1",
+  "tolerance_basis": "frozen before any CUDA run of this code; 0.005 is the GPU tolerance the earlier CUDA platform gate used (packet.json local_cpu_pins rel_tol_gpu) and passed with",
+  "mutant": "the same comparison with the CUDA series shifted by 10 steps must NOT be within tolerance (shows the comparison can fail on a developed shedding flow)"
+ },
+ "export_bytes_max": 0,
+ "export_note": "off by default; the dispatcher sets CFD3D_EXPORT_BYTES_MAX for checkpoint transport. With export_every_s 10800 > the budget, a snapshot is exported only when an arm stops at the budget (R1/M1 ~0.2 GB, R3_domain ~0.8 GB), listed in OUT/checkpoints/manifest.json; CFD3D_RESUME_FROM continues it",
+ "cases_sequential": true,
+ "calibration": {
+  "arms": [
+   {
+    "run_id": "R1",
+    "steps_projected": [
+     67000,
+     112000
+    ]
+   },
+   {
+    "run_id": "M1_mutant",
+    "steps_projected": [
+     157000,
+     205000
+    ]
+   },
+   {
+    "run_id": "R3_domain",
+    "steps_projected": [
+     69000,
+     115000
+    ]
+   }
+  ],
+  "steps": 300,
+  "timeout_s": 900,
+  "run_overhead": 1.3,
+  "host_rss_max_gb": 10,
+  "gpu_mem_frac_max": 0.8,
+  "steps_basis": "steps = t_end 600 x n_D 32 / dt (grid units). Lower: the start-up dt measured on CPU (R1 0.285, M1 0.122, R3 0.277; cpu_packet.json measured_local). Upper: developed-wake dt = 0.6 x start-up for R1 and R3 (the CPU packet's assumption). M1 (Re 25, nu x4): WaterLily's dt = 1/(max flux + 5 nu); R1's start-up and 0.6x developed dt give max flux 1.91 and 4.25 (nu = 0.32); with M1's nu = 1.28 that is 0.120 (measured 0.122) and 0.094, so 205k steps. All are ASSUMPTIONS frozen before any arm runs; each arm's own steps and wall_s are the measurement",
+  "rule": "GO only if: every arm's TIMING rc 0 on the device; the sum over R1, M1_mutant, R3_domain of (steps_projected[1] x measured s/step x run_overhead 1.3 + that arm's measured process start-up) <= time left before the outer budget minus emit and checkpoint margins; every arm's nvidia-smi device-memory peak <= 0.8 x card total; every host RSS peak <= 10 GB. Otherwise rc 11: stop with the controls, calibration.json and nvidia-smi kept; no arm started. fits_time_lower_only reports when only the lower projections would fit (a decision for root/infra, not taken here). After GO the arms run in packet order; an arm whose own projection exceeds the time left when it would start is not started and is recorded so",
+  "note": "force-free TIMING; run_overhead 1.3 (forces every step, host copy of p every 10th step after t = 100) is an ASSUMPTION; each arm's own wall_s and steps are the measurement"
+ },
+ "cases": [
+  {
+   "run_id": "R1",
+   "gpu": true,
+   "threads": 2,
+   "mem_gb": 11,
+   "budget_s": 7200
+  },
+  {
+   "run_id": "M1_mutant",
+   "gpu": true,
+   "threads": 2,
+   "mem_gb": 11,
+   "budget_s": 7200
+  },
+  {
+   "run_id": "R3_domain",
+   "gpu": true,
+   "threads": 2,
+   "mem_gb": 11,
+   "budget_s": 7200
+  }
+ ],
+ "expected": {
+  "h100_basis": "R2 on H100 (aijob-e00dydgq6ps3hkzjfv): 13.363 ms/step, 0.905 ns/cell-step at 14.76M cells; controls through calibration took 765 s including a 356 s fresh env build",
+  "R1": {
+   "cells": 3694084,
+   "steps": "67k-112k",
+   "h100_wall": "NOT ASSUMED; orientation: ~4-6 ms/step if the 3.69M grid runs at 1.0-1.3 ns/cell-step, so ~0.2-0.25 h at the upper steps x 1.3",
+   "output_gzip_mb": "~1.6"
+  },
+  "M1_mutant": {
+   "cells": 3694084,
+   "steps": "157k-205k",
+   "h100_wall": "NOT ASSUMED; orientation ~0.3-0.45 h",
+   "output_gzip_mb": "~2.9"
+  },
+  "R3_domain": {
+   "cells": 14760964,
+   "steps": "69k-115k",
+   "h100_wall": "NOT ASSUMED; orientation from R2's 13.4 ms/step: ~0.55 h at 115k x 1.3",
+   "output_gzip_mb": "~1.6"
+  },
+  "device_memory_gb": "~2 of 80",
+  "host_rss_gb": "~2",
+  "output_note": "gzip sizes from a synthetic Float32 series of the same length (shortest decimals, 4 series); total ~6-7 MB plus controls, under max_out_bytes 12 MB"
+ },
+ "outputs": [
+  "status.json",
+  "nvidia-smi.txt",
+  "resolved-Manifest.toml",
+  "restart_check.json",
+  "platform.json",
+  "calibration.json (per arm under arms)",
+  "runs/R1.json.gz, runs/M1_mutant.json.gz, runs/R3_domain.json.gz (each only if that arm finishes)",
+  "eval.json (over the finished arms)",
+  "checkpoints/<arm>-<n>.ckpt + checkpoints/manifest.json (only with CFD3D_EXPORT_BYTES_MAX and an arm stopped at the budget)"
+ ],
+ "host_requirements": {
+  "vcpu": 4,
+  "host_ram_gib_max": 12,
+  "caps": "every Julia process tree <= 11 GB host RSS (systemd scope MemoryMax + MemorySwapMax=0 where available, and the RSS watchdog); the steps run one at a time",
+  "gpu": "one CUDA device (target: one H100 80 GB), driver supporting CUDA 12",
+  "disk_gb": 15,
+  "python": ">=3.11 (3.12 on the pinned image)"
+ }
+}

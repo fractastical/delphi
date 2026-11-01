@@ -49,16 +49,47 @@ def validity(fin, forces, EI):
     return result
 
 
-def solve_arm(compliance, speed, mesh, arm, directory, deadline, grid_override=None):
+def solve_arm(
+    compliance,
+    speed,
+    mesh,
+    arm,
+    directory,
+    deadline,
+    grid_override=None,
+    scenario=None,
+    pressure_policy="updated-deformed-distribution",
+):
     p = protocol()
     g = p["gates"]
     params = p["parameters"]
+    scales = {
+        "EI_scale": 1.0,
+        "aerodynamic_load_scale": 1.0,
+        "mass_scale": 1.0,
+        "CD0_scale": 1.0,
+    }
+    if scenario is not None:
+        if set(scenario) - set(scales):
+            raise ValueError("Scenario contains unknown scale fields")
+        scales.update(scenario)
+    if (
+        not np.isfinite(list(scales.values())).all()
+        or any(value <= 0 for value in scales.values())
+    ):
+        raise ValueError("Scenario scales must be finite and positive")
+    if pressure_policy not in [
+        "frozen-rigid-distribution",
+        "updated-deformed-distribution",
+    ]:
+        raise ValueError(f"Unknown pressure policy: {pressure_policy}")
     grid = params["meshes"][mesh] if grid_override is None else grid_override
     fins = setup(grid["span"], grid["chord"])
     rho = params["rho_kg_m3"]
     alpha = params["alpha_deg"]
     EI = {
         name: params["EI_inputs"][name]["EI_Nm2_by_compliance"][str(compliance)]
+        * scales["EI_scale"]
         for name in fins
     }
     current = {
@@ -73,6 +104,11 @@ def solve_arm(compliance, speed, mesh, arm, directory, deadline, grid_override=N
     previous_CL = None
     status = "unconverged: iteration budget"
     final = None
+    frozen_unitF = None
+    if pressure_policy == "frozen-rigid-distribution":
+        _, frozen_unitF, _, _ = vlm.solve(
+            vlm.combine({name: fin["lattice"] for name, fin in fins.items()}), alpha
+        )
     max_iterations = (
         1
         if arm == "rigid"
@@ -94,8 +130,11 @@ def solve_arm(compliance, speed, mesh, arm, directory, deadline, grid_override=N
             name: deform(fin, current[name], EI[name]) for name, fin in fins.items()
         }
         combined = vlm.combine(lattices)
-        _, unitF, _, _ = vlm.solve(combined, alpha)
-        physical = unitF * rho * speed**2
+        if pressure_policy == "frozen-rigid-distribution":
+            unitF = frozen_unitF
+        else:
+            _, unitF, _, _ = vlm.solve(combined, alpha)
+        physical = unitF * rho * speed**2 * scales["aerodynamic_load_scale"]
         if not np.isfinite(physical).all():
             status = "failed: nonfinite force"
             break
@@ -141,6 +180,8 @@ def solve_arm(compliance, speed, mesh, arm, directory, deadline, grid_override=N
             "total_force_N": physical.sum(axis=0).tolist(),
             "shape_residual_over_span": residual,
             "CL_change": delta,
+            "pressure_policy": pressure_policy,
+            "aerodynamic_load_scale": scales["aerodynamic_load_scale"],
             "shape_validity": checks,
             "transfer": ledgers,
         }
@@ -201,6 +242,8 @@ def solve_arm(compliance, speed, mesh, arm, directory, deadline, grid_override=N
         "actual_lattice": grid,
         "local_control_not_production_arm": grid_override is not None,
         "arm": arm,
+        "scenario_scales": scales,
+        "pressure_policy": pressure_policy,
         "status": status,
         "valid_for_declared_transfer": valid,
         "EI_Nm2": EI,
@@ -231,7 +274,15 @@ def solve_arm(compliance, speed, mesh, arm, directory, deadline, grid_override=N
             ("main", p["glide"]["dt_s"]),
             ("half", p["glide"]["half_dt_s"]),
         ]:
-            series, metrics = trajectory(final["CL"], area, AR, speed, dt)
+            series, metrics = trajectory(
+                final["CL"],
+                area,
+                AR,
+                speed,
+                dt,
+                mass_scale=scales["mass_scale"],
+                CD0_scale=scales["CD0_scale"],
+            )
             path = directory / f"glide-{label}.npz"
             np.savez_compressed(path, **series)
             flights.append(

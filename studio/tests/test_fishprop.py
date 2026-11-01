@@ -152,3 +152,136 @@ def test_v3_candidates_untouched():
             except (subprocess.CalledProcessError, FileNotFoundError):
                 pytest.skip("commit 8dc5cc4 not in this clone")
             assert (ROOT / "artifacts/fish3d" / cid / name).read_bytes() == old, (cid, name)
+
+
+# ------------------------------------------------------------------ print-v4: v3c props
+OUT4 = ROOT / "artifacts" / "print-v4"
+V4_SPECS = {**P.SETS["v4"]["forms"], **P.V4_PENDING}
+
+
+def design4(pid: str) -> dict:
+    return json.loads((OUT4 / "design" / f"{pid}.json").read_text())
+
+
+@pytest.fixture(scope="module")
+def man4():
+    if not (OUT4 / "manifest.json").exists():
+        pytest.skip("artifacts/print-v4 not built")
+    return json.loads((OUT4 / "manifest.json").read_text())
+
+
+def test_v4_has_two_distinct_v3c_props_and_hashes_match(man4):
+    assert sorted(man4["props"]) == ["fish3d-v3c-daane-length-prop", "fish3d-v3c-daane-length-prop-reinforced"]
+    meshes = {r["mesh_sha256"] for r in man4["props"].values()}
+    assert len(meshes) == 2                                   # not renamed copies
+    assert {"relief_degenerate_triangles_before_cleanup", "glide_pose_prop_failed_dense_wall"} <= {
+        f["id"] for f in man4["findings"]}
+    assert not any("glide-pose" in rel for rel in man4["files"])   # the failed form is not published
+    for rel, h in man4["files"].items():
+        assert sha(OUT4 / rel) == h, rel
+    dl = json.loads((OUT4 / "downloads.json").read_text())
+    assert dl["base"] == "artifacts/print-v4/" and len(dl["forms"]) == 2
+    for f in dl["forms"]:
+        assert f["mass_density_kg_m3"] == 1220.0 and set(f["mass_conditional_g"]) == {"smooth", "relief", "stand"}
+        for e in f["files"]:
+            p = OUT4 / e["path"]
+            assert p.stat().st_size == e["bytes"] and sha(p) == e["sha256"], e["path"]
+
+
+@pytest.mark.parametrize("pid", ["fish3d-v3c-daane-length-prop", "fish3d-v3c-daane-length-prop-reinforced"])
+def test_v4_prop_checks_are_gated_and_stated_separately(man4, pid):
+    d = design4(pid)
+    src = d["source_candidate"]
+    assert src["id"] == "fish3d-v3c-daane-length" and sha(ROOT / src["path"]) == src["sha256"]
+    wall = d["wall_rule"]["min_wall_mm"]
+    for kind, v in (("smooth", d["validation"]), ("stand", d["stand"]["validation"])):
+        assert v["ok"] and v["face_connected_components"] == 1 and v["degenerate_triangles"] == 0, kind
+        assert v["min_wall_ok"] and v["min_wall_mm_required"] == wall, kind
+        m = v["manufacturing"]
+        assert m["ok"] and m["dense_wall"]["ok"] and m["dense_wall"]["min_mm"] >= wall, kind
+        assert m["dense_wall"]["samples"] == min(P.DENSE_WALL_SAMPLES, v["triangles"]) and m["extremities"]["ok"], kind
+    assert d["validation"]["manufacturing"]["mirror_symmetry"]["ok"]
+    r = d["validation_relief"]
+    assert r["ok"] and r["degenerate_triangles"] == 0 and r["face_connected_components"] == 1
+    assert "min_wall_ok" not in r and r["relief"]["wall_rule_gated"] is False
+    for v in (d["validation"], r, d["stand"]["validation"]):
+        assert abs(v["float32_weld"]["clean_volume_change_mm3"]) < 0.01      # the cleanup does not reshape the part
+    assert r["manufacturing"]["dense_wall"]["ok"] is None and r["manufacturing"]["mirror_symmetry"]["ok"] is None
+    assert r["manufacturing"]["extremities"]["ok"]
+    assert r["signed_volume_mm3"] > d["validation"]["signed_volume_mm3"]
+    assert set(d["checks_stated_separately"]) == {"smooth", "relief", "stand"}
+    for k, mc in d["mass_conditional"].items():
+        vol = {"smooth": d["validation"], "relief": r, "stand": d["stand"]["validation"]}[k]["signed_volume_mm3"]
+        assert mc["mass_g"] == pytest.approx(vol * 1220e-6, rel=1e-9) and mc["card"]["commit"] == "f1796ec"
+    assert all(abs(x) < 1e-9 for x in d["stand"]["assembly_overlap_mm3"].values())   # float noise, not overlap
+    assert d["lineage"]["builder_parent_commit"] == "aaa71f8" and d["why"]
+    assert any("not a biological claim" in x for x in d["limitations"])
+    V, T = VAL.read_stl((OUT4 / d["files"]["stl_smooth"]["path"]).read_bytes())
+    assert VAL.check(V, T, P.BOX_MM, thickness=False)["mesh_sha256"] == d["stl_roundtrip"]["smooth"]["mesh_sha256"]
+
+
+def test_v4_reinforced_is_stricter_and_heavier_than_display(man4):
+    disp, rein = design4("fish3d-v3c-daane-length-prop"), design4("fish3d-v3c-daane-length-prop-reinforced")
+    assert disp["wall_rule"]["min_wall_mm"] == 1.0 and rein["wall_rule"]["min_wall_mm"] == 1.5
+    assert {r["what"] for r in rein["alterations"]} - {r["what"] for r in disp["alterations"]} == {"fin root gusset"}
+    assert rein["validation"]["signed_volume_mm3"] > disp["validation"]["signed_volume_mm3"]
+    assert rein["validation"]["wall_thickness"]["min_mm"] >= 1.5 > disp["validation"]["wall_thickness"]["min_mm"]
+
+
+def test_v4_glide_pose_changes_pose_knobs_only():
+    cand = V3.candidate("c-daane-length")
+    alt, rows = P.alterations(cand, 0.5, 1.0, V4_SPECS["c-glide-pose"])
+    changed = {k for k in cand["knobs"] if cand["knobs"][k]["value"] != alt["knobs"][k]["value"]}
+    assert changed and changed <= set(P.POSE_KNOBS)
+    assert alt["knobs"]["pectoral_length_source"] == cand["knobs"]["pectoral_length_source"]
+    assert alt["knobs"]["pelvic_x_over_sl"] == cand["knobs"]["pelvic_x_over_sl"]
+    assert next(r for r in rows if r["what"] == "pose")["status"] == "design assumption"
+    *_, fans, _srec, _body = V3.build_components(alt)
+    built = V3.rays_json(fans)
+    src = json.loads((ROOT / "artifacts/fish3d/fish3d-v3c-daane-length/rays.json").read_text())["fins"]
+    for fin, rec in src.items():
+        assert [x["length_m"] for x in rec["rays"]] == [x["length_m"] for x in built[fin]["rays"]], fin
+
+
+def test_root_gusset_thickens_at_the_root_only():
+    roots = np.array([[0.0, 0.0], [0.0, 10.0]])
+    pts = np.array([[0.0, 5.0, 1.0], [3.0, 5.0, 1.0], [6.0, 5.0, 1.0], [9.0, 5.0, -1.0]])
+    out = P.root_thicken(pts, roots, 1.0, 6.0)
+    assert out[:, 2].tolist() == pytest.approx([2.0, 1.5, 1.0, -1.0])
+    assert out[:, :2].tolist() == pts[:, :2].tolist()
+
+
+def test_extremity_and_mirror_checks_catch_a_needle_and_an_asymmetry():
+    import manifold3d as mf
+    block = mf.Manifold.cube((20, 20, 20), True)
+    needle = block + mf.Manifold.cylinder(15, 0.2, 0.2, 16).rotate((0, 90, 0)).translate((9, 0, 0))
+    stub = block + mf.Manifold.cylinder(15, 1.0, 1.0, 32).rotate((0, 90, 0)).translate((9, 0, 0))
+    assert not P.extremities(needle, 1.0)["ok"]            # positive control: a 0.4 mm needle fails a 1 mm rod
+    assert P.extremities(stub, 1.0)["ok"]
+    assert P.mirror_fraction(block) == pytest.approx(0.0, abs=1e-9)
+    assert P.mirror_fraction(block + mf.Manifold.cube((4, 4, 4)).translate((0, 12, 0))) > P.MIRROR_MAX_FRACTION
+
+
+def test_print_v3_props_are_unchanged_since_they_were_frozen():
+    for rel in MANIFEST["files"]:
+        p = f"artifacts/print-v3/{rel}"
+        try:
+            old = subprocess.run(["git", "-C", str(ROOT), "show", f"aaa71f8:{p}"], check=True,
+                                 capture_output=True).stdout
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pytest.skip("commit aaa71f8 not in this clone")
+        assert (ROOT / p).read_bytes() == old, p
+    assert (OUT / "manifest.json").read_bytes() == subprocess.run(
+        ["git", "-C", str(ROOT), "show", "aaa71f8:artifacts/print-v3/manifest.json"], check=True,
+        capture_output=True).stdout
+
+
+def test_v4_page_is_what_the_generator_writes(man4):
+    page = (ROOT / "docs" / "fish-print-v4.md").read_text()
+    assert page == P.v4_doc()
+    assert "measured" not in page.lower() and "not weighed" in page
+
+
+def test_v4_records_name_the_code_that_built_them(man4):
+    assert man4["run"]["code_sha256"] == P.code_hash()
+    assert json.loads((OUT4 / "downloads.json").read_text())["code_sha256"] == P.code_hash()

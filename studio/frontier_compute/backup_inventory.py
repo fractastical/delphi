@@ -3,12 +3,63 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
+import stat
 import subprocess
 
 from frontier_compute.backup import exclusion
+
+
+def hash_prefix(stream, length):
+    digest = hashlib.sha256()
+    stream.seek(0)
+    while length:
+        block = stream.read(min(1 << 20, length))
+        if not block:
+            raise ValueError('Transcript truncated during prefix verification')
+        digest.update(block)
+        length -= len(block)
+    return digest.hexdigest()
+
+
+def snapshot_jsonl_prefix(source, destination, max_bytes=1_000_000_000):
+    """Stage a twice-checked complete-line cutoff; later appends are explicitly not captured."""
+    started = datetime.now(timezone.utc).isoformat()
+    fd = os.open(source, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK)
+    with os.fdopen(fd, 'rb', buffering=0) as incoming, Path(destination).open('xb+', buffering=0) as outgoing:
+        before = os.fstat(incoming.fileno())
+        if not stat.S_ISREG(before.st_mode) or not 0 < before.st_size <= max_bytes:
+            raise ValueError('Transcript must be a bounded nonempty regular file')
+        remaining, position, last_newline = before.st_size, 0, 0
+        while remaining:
+            block = incoming.read(min(1 << 20, remaining))
+            if not block:
+                raise ValueError('Transcript truncated during prefix capture')
+            outgoing.write(block)
+            newline = block.rfind(b'\n')
+            if newline >= 0:
+                last_newline = position + newline + 1
+            position += len(block)
+            remaining -= len(block)
+        if not last_newline:
+            raise ValueError('Transcript has no complete line')
+        outgoing.truncate(last_newline)
+        outgoing.flush()
+        expected = hash_prefix(outgoing, last_newline)
+        if hash_prefix(incoming, last_newline) != expected:
+            raise ValueError('Transcript prefix changed during verification')
+        after = os.fstat(incoming.fileno())
+        current = os.stat(source, follow_symlinks=False)
+        if after.st_size < before.st_size or (current.st_dev, current.st_ino) != (before.st_dev, before.st_ino):
+            raise ValueError('Transcript truncated or path replaced')
+    return {'source': str(source), 'started_utc': started,
+            'finished_utc': datetime.now(timezone.utc).isoformat(),
+            'source_bytes_at_start': before.st_size, 'source_bytes_at_end': after.st_size,
+            'captured_complete_line_prefix_bytes': last_newline, 'sha256': expected,
+            'scope': 'Prefix matched source on a second read. Partial final line and later appended messages are outside this declared cutoff.'}
 
 
 def command(argv, *, cwd=None, destination=None, timeout=180):
@@ -77,8 +128,11 @@ def prepare(repo, staging, recipients):
             if matched:
                 label = 'codex' if '.codex' in str(folder) else 'claude'
                 logical = f'transcripts/{label}/{path.relative_to(folder).as_posix()}'
-                files.append({'path': str(path), 'logical': logical})
-                selected_transcripts.append({'path': str(path), 'bytes_at_inventory': path.stat().st_size})
+                staged = staging / logical
+                staged.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+                prefix = snapshot_jsonl_prefix(path, staged)
+                files.append({'path': str(staged), 'logical': logical})
+                selected_transcripts.append(prefix)
     (metadata/'transcript-selection.json').write_text(json.dumps({'since_utc':'2026-10-30T00:00:00Z','selection':'JSONL modified in hackathon window containing exact Frontier URL/worktree/artifact markers; unrelated sessions omitted.','files':selected_transcripts},indent=2)+'\n')
     command(['journalctl','--user','-u','delphi-frontier-*','-u','frontier-infra*','-u','frontier-cfd-collector','-u','frontier-betse-collector','--since','2026-10-30','--no-pager','-o','short-iso'],destination=metadata/'frontier-services.log')
     for unit in ['delphi-frontier-postgres.service','delphi-frontier-web.service','delphi-frontier-mcp.service']:

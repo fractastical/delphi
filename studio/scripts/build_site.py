@@ -344,10 +344,10 @@ def build_timeline(ins: Inputs) -> dict | None:
         {"quantity": "GPU seconds", "value": f"{tel_s:.0f} s inside {len(R['historical_gpu_telemetry'])} sampled telemetry windows", "status": "partial", "note": "Sampled windows only, a lower bound on measured time. Total GPU seconds across all jobs: unknown.", "source": ri},
         {"quantity": "CPU jobs and usage", "value": "No CPU counter is recorded", "status": "unknown", "note": "One Nebius CPU worker request was refused (ResourceExhausted); local CPU runs are not metered here.", "source": "results/resources/provider-outcome.json"},
         {"quantity": "Cost", "value": "Unknown", "status": "unknown", "note": R["cost"]["interpretation"], "source": ri}]
+    def pdt(iso):
+        return datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d %H:%M:%S %Z")
     usage = None
     if U:
-        def pdt(iso):
-            return datetime.datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d %H:%M:%S %Z")
         def job_kind(job):
             platform = job.get("platform", "")
             return "gpu" if platform.startswith("gpu-") else "cpu" if platform.startswith("cpu-") else "unknown"
@@ -387,6 +387,25 @@ def build_timeline(ins: Inputs) -> dict | None:
                       ("models", "results/resources/bio-model-usage.json")):
         if (ROOT / path).is_file():
             audits[key] = {"data": ins.json(path), "path": path, "sha256": sha(path)}
+    activity_path = "results/resources/repository-activity-20261101-0523.json"
+    if (ROOT / activity_path).is_file():
+        document = ins.json(activity_path)
+        module_path = "scripts/repository_activity.py"
+        ins.read(module_path)
+        spec = importlib.util.spec_from_file_location("frontier_repository_activity", ROOT / module_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        checked = module.combine(document["repositories"], document["since_utc"], document["until_utc"])
+        if checked["deduplicated_counts"] != document["deduplicated_counts"]:
+            raise ValueError("Repository activity counts do not match the commit records")
+        summary = {k: document[k] for k in ("since_utc", "until_utc", "scope", "deduplicated_counts")}
+        summary["repositories"] = [{k: v for k, v in r.items() if k != "commits"} for r in document["repositories"]]
+        for repo in document["repositories"]:
+            if repo["counts"] != module.counts(repo["commits"]):
+                raise ValueError("Per-repository count does not match commit records")
+        audits["repositories"] = {"data": summary, "path": activity_path, "sha256": sha(activity_path)}
+        c = document["deduplicated_counts"]
+        counters.append({"quantity": "Repository commits", "value": f"{c['commit_objects']:,} across four repositories", "status": "actual", "note": f"{c['non_merge_commits']:,} non-merge and {c['merge_commits']:,} merge commit objects; full SHAs deduplicated. Default branches pinned separately, {pdt(document['since_utc'])} to {pdt(document['until_utc'])}. Code activity, not agent or scientific-result counts.", "source": activity_path})
     if "contributors" in audits:
         a = audits["contributors"]; c = a["data"]["counts"]
         observed = datetime.datetime.fromisoformat(a["data"]["window"]["observed_utc"].replace("Z", "+00:00")).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d %H:%M:%S %Z")
@@ -395,6 +414,27 @@ def build_timeline(ins: Inputs) -> dict | None:
             {"quantity": "Contributing harnesses", "value": f"At least {c['distinct_contributing_harness_ids_supported_minimum']} distinct harness identities", "status": "partial", "note": f"Authored handoffs or reviewed identity mappings with checked artifacts, observed {observed}. A supported minimum, not a census or concurrent-worker count.", "source": a["path"]},
             {"quantity": "Native collaborators", "value": str(c['native_contributors_supported_minimum']), "status": "partial", "note": "Separate native collaboration identities; work artifacts checked and attribution attested by the coordinator. Root is not counted again. No collective speedup is inferred.", "source": a["path"]},
             {"quantity": "Live harness processes", "value": str(c['live_harness_processes_now']), "status": "partial", "note": f"Process snapshot at {observed}. Includes idle and authentication-blocked sessions; this is not a count of agents working.", "source": a["path"]}]
+        participation = a["data"].get("participation")
+        if participation:
+            source = "results/resources/agent-participation.json"
+            raw = ins.read(source)
+            if digest_bytes(raw) != participation["source_sha256"]:
+                raise ValueError("Participant receipt changed; refuse stale counts")
+            native = participation["recorded_native_children"]
+            nested = participation["recorded_nested_claude_children"]
+            floor = participation["supported_harnesses"] + native + nested
+            if floor != participation["recorded_participant_floor"]:
+                raise ValueError("Participant classes do not reproduce the recorded floor")
+            cutoff = pdt(participation["window"]["observed_utc"])
+            live = participation["live_native_api"]
+            for counter in counters:
+                if counter["quantity"] == "Native collaborators":
+                    counter.update(value=str(native), note=f"Historical native children, including retired sessions; transcript evidence through {cutoff}. Artifact-backed identities below are a subset. Not a count of running workers.", source=source)
+            counters[:0] = [
+                {"quantity": "Recorded participants", "value": f"At least {floor}", "status": "partial", "note": f"{participation['supported_harnesses']} harnesses + {native} native children + {nested} nested Claude children. Historical supported floor through {cutoff}; root counted once. Not completed scientific tasks.", "source": source},
+                {"quantity": "Recorded subagents", "value": str(native + nested), "status": "partial", "note": f"{native} native + {nested} nested Claude child identities; shared with the participant total, not additional participants. Global current activity is unknown.", "source": source},
+                {"quantity": "Native running snapshot", "value": str(live['running_roots'] + live['running_children']), "status": "actual", "note": f"{live['running_roots']} coordinator + {live['running_children']} children at {pdt(live['observed_utc'])}. API running state, not CPU or model utilization; other harnesses not covered.", "source": source}]
+
     return {"observed_at": R["observed_at"], "usage": usage, "audits": audits, "counters": counters, "event_window_start_utc": EVENT_START_UTC, "rows": rows, "undated": undated, "nebius": {"own_job_count": N["own_job_count"], "job_states": N["job_states"], "observed_at_utc": N["observed_at_utc"]},
         "unknown": [R["cost"]["interpretation"], "Total provider LLM usage: " + str(R["model_usage"].get("total_provider_llm_usage", "unknown")), "Utilisation of currently allocated GPUs is unknown until sampled."],
         "limitations": R["scope"]["limitations"], "inventory": ri, "inventory_sha256": sha(ri)}
@@ -666,7 +706,10 @@ def print_v3_block(ins: Inputs, out: dict) -> dict | None:
                     continue
                 out["@" + href] = raw
                 files.append({"kind": item["kind"], "href": href, "bytes": item["bytes"], "sha256": item["sha256"], "units": item.get("units")})
-            forms.append({"id": form["id"], "title": form.get("title") or form["id"], "short": form.get("short"), "display_scale": form["display_scale"], "prop_size_mm": form.get("prop_size_mm"), "source_candidate": form.get("source_candidate"), "source_candidate_sha256": form.get("source_candidate_sha256"), "family": directory.name, "files": files})
+            forms.append({"id": form["id"], "title": form.get("title") or form["id"], "short": form.get("short"), "display_scale": form["display_scale"], "prop_size_mm": form.get("prop_size_mm"), "source_candidate": form.get("source_candidate"), "source_candidate_sha256": form.get("source_candidate_sha256"), "family": directory.name, "files": files,
+                          "why": form.get("why"), "wall_rule_mm": form.get("wall_rule_mm"),
+                          "mass_conditional_g": form.get("mass_conditional_g"),
+                          "mass_density_kg_m3": form.get("mass_density_kg_m3")})
     return {"forms": forms, "limitations": limitations, "printer_resin": printer_resin, "refused": refused} if forms else None
 
 
@@ -752,12 +795,23 @@ def print_laws(ins: Inputs, out: dict, downloads: dict) -> dict | None:
     return {"data": index, "href": path, "sha256": digest_bytes(raw), "refused": []}
 
 
+def lean_proofs(ins: Inputs, out: dict) -> dict:
+    module_path = "scripts/lean_gallery.py"
+    ins.read(module_path)
+    spec = importlib.util.spec_from_file_location("frontier_lean_gallery", ROOT / module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.build(ins, out, root=ROOT)
+
+
 def demo_videos(ins: Inputs, out: dict) -> dict | None:
     """Preserve earlier cuts while admitting an additive, completely pinned edit."""
     result = {"cuts": [], "refused": [], "limits": []}
     present = False
     for directory, expected in (("artifacts/demo-video", {"frontier-60s": 60, "frontier-120s": 120}),
-                                ("artifacts/demo-video-90", {"frontier-90s": 90})):
+                                ("artifacts/demo-video-90", {"frontier-90s": 90}),
+                                ("artifacts/demo-video-science", {"frontier-science-60s": 60, "frontier-science-120s": 120}),
+                                ("artifacts/demo-video-delphi", {"frontier-delphi-60s": 60, "frontier-delphi-120s": 120})):
         manifest = _demo_manifest(ins, out, directory, expected)
         if manifest is None:
             continue
@@ -1073,6 +1127,35 @@ def lifecycle_block(ins: Inputs) -> dict | None:
         "equations": [{"id": q["id"], "name": q["name"], "form": q["form"], "context": q.get("context", ""), "not_established_here": q.get("not_established_here", ""), "claimed_by_source": q.get("claimed_by_source", "")} for q in E["equations"]],
         "diffusion": {"status": N["status"], "derived": N["derived"], "inputs": N["inputs"], "assumptions": N["geometry_assumptions"], "not_known": N["not_known"], "reading": N["comparison_with_fish_body_height"]["reading"], "rows": N["comparison_with_fish_body_height"]["rows"]},
         "manifest": f"{d}/manifest.json", "doc": "docs/fish-lifecycle.md"}
+
+
+def observed_update_cards(ins: Inputs, out: dict) -> list[dict]:
+    """Expose the pinned observed-data update through the common evidence gallery."""
+    module_path = "engineering/observed_update/site.py"
+    ins.read(module_path)
+    spec = importlib.util.spec_from_file_location("frontier_observed_update", ROOT / module_path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    card = module.build(ins, out)
+    f = card["facts"]
+    card.update({
+        "time": {"units": "cross-sectional specimen measurements; no trajectory", "note": "No new wet-lab measurements."},
+        "numerical_checks": [
+            {"name": "Held-out-species log10 RMSE", "result": f"WORSENED: {f['heldout_RMSE_log10']['heldout_before']:.6f} → {f['heldout_RMSE_log10']['heldout_after']:.6f}"},
+            {"name": "Prediction at standard length 8.35 cm", "result": f"{f['prediction_before_cm']:.5f} → {f['prediction_after_cm']:.5f} cm after adding 19 specimen rows"},
+            {"name": "Exact-version cache", "result": "Stale result rejected and recomputed"},
+            {"name": "Import read-back", "result": "6 typed records read back; imported_unreviewed, Action proposed"}],
+        "parameter_unknowns": ["Transfer to zebrafish, growth dynamics and causal genetic effects are uncalibrated.", "Only three flying-fish species; working uncertainty bands are not calibrated population confidence."],
+        "open_questions": ["Which additional species or growth-stage observations would improve held-out transfer?"],
+        "couplings": [], "manifest_href": card["manifest"],
+        "sources": card["sources"] + [
+            {"label": "Measurements and fitted predictions", "href": card["report"], "locator": "Source observations remain separate from model predictions."},
+            {"label": "Corrected record bundle", "href": card["current_bundle_href"], "locator": "Exact Claim, Evidence, Problem and proposed Action versions."},
+            {"label": "Live import receipt", "href": card["import_receipt_href"], "locator": card["record_status"]},
+            {"label": "Grouping correction and preserved history", "href": card["correction_report"], "locator": "Original and corrected scientific outputs match on this dataset."}],
+        "files": [{"name": "Source observations CSV", **next(x for x in card["downloads"] if x["path"].endswith("/source-observations.csv"))}],
+    })
+    return [card]
 
 
 def engineering_cards(ins: Inputs, out: dict) -> list[dict]:
@@ -1690,11 +1773,12 @@ def build() -> dict[str, bytes]:
     resources = resource_inventory(ins)
     mcp_chk = mcp_check(ins)
     extra: dict = {}
+    proofs = lean_proofs(ins, extra)
     prints = print_forms(ins, extra)
     controlled = controlled_results(ins, files)
     if simulation is not None:
         simulation["controlled"] = controlled
-    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra) + aeroelastic_cards(ins, extra) + nca_cards(ins, extra)
+    manifests = manifests + native_video_cards(ins, extra) + engineering_cards(ins, extra) + aeroelastic_cards(ins, extra) + nca_cards(ins, extra) + observed_update_cards(ins, extra)
     couplings_m = coupling_manifest(ins, files, docs)
     system = system_block(ins, files, docs, board, lean_receipt, simulation, attestation)
     design_review = ins.json("site/content/design-review.json")
@@ -1739,6 +1823,7 @@ def build() -> dict[str, bytes]:
         "capabilities": tools,
         "board": board,
         "lean_receipt": lean_receipt,
+        "lean_gallery": proofs,
         "simulation": simulation,
         "attestation_check": attestation,
         "simulation_manifests": manifests,
@@ -1783,7 +1868,7 @@ def build() -> dict[str, bytes]:
 
 
 def generated_artifact_families() -> list[str]:
-    return ["results", "fish3d", "molecular", "rd-diffusion", *(path.name for path in print_families())]
+    return ["results", "fish3d", "molecular", "rd-diffusion", "lean-gallery", "observed-allometry", *(path.name for path in print_families())]
 
 
 def write(out: dict[str, bytes]) -> None:

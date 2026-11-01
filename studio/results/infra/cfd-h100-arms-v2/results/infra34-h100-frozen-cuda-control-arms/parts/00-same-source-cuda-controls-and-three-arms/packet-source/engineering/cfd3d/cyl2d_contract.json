@@ -1,0 +1,43 @@
+{
+  "schema": "cfd3d-cyl2d-contract-0.1",
+  "frozen_note": "Problem, domain, boundary conditions, force and averaging procedure, frozen before any 2-D cylinder run and before an acceptance band was chosen. The band lives in a separate file (cyl2d_band.json), frozen after this one and also before any run. Neither changes after a result.",
+  "purpose": "2-D solver-fidelity control for the planned resolved fin-section packet (claude-07 protocol work/fin-patch@f8ebc13). Passing it would not erase the failed 3-D sphere gate C1, would not validate fin sections at Re_c 2500-9900, 3-D fins or flight, and is not biological validation.",
+  "reference_problem": {
+    "source": "Qu, Norberg, Davidson, Peng & Wang 2013, J. Fluids Struct., doi 10.1016/j.jfluidstructs.2013.02.007, author manuscript (sha256 1a67139ea4d70d4149a66506c663e185ed927c48bd4a4396cdb13270fc30c73b); read by mechanobio, Tables 2 and 3 re-read here with pdftotext from the same file",
+    "their_setup": "uniform inlet, lateral free-stream condition, no-slip cylinder, convective outlet at U_inf; square domain H (in D) centred on the cylinder; body-fitted O-mesh, near-wall cell 0.0054 D",
+    "matched_row": "Table 2 case D4 (H = 60, 386 x 210, dt 0.02) for the H = 60 runs; case D2 (H = 120, 386 x 322, dt 0.02) for the H = 120 domain diagnostic"
+  },
+  "scaling": {"D": "2R, the cylinder diameter", "Re": "U_inf D / nu = 100", "St": "f D / U_inf, f the lift frequency",
+              "time": "t U_inf / D", "coefficients": "per unit span, on 0.5 rho U_inf^2 D (rho = 1 in grid units)"},
+  "solver": {"code": "WaterLily.jl 1.10.0, pinned env engineering/cfd3d/env (CPU) and env_gpu (GPU)",
+             "precision": "Float32", "immersed_boundary": "BDIM, default kernel eps = 1 cell (WaterLily/src/Body.jl:15,28,70)",
+             "body": "AutoBody, sdf = |x - c| - R", "time_step": "WaterLily adaptive (CFL-limited), not fixed"},
+  "domain": {"shape": "square, side H = 60 D, cylinder centre at (30 D, 30 D) from the lower-left interior corner: 30 D upstream, 30 D downstream, 30 D to each lateral face",
+             "grid": "uniform Cartesian, h = D / n_D; runs use n_D = 32 and 64"},
+  "boundary_conditions_as_implemented": {
+    "inlet": "Dirichlet u = (U, 0) (WaterLily/src/core.jl:231-246, normal component Dirichlet)",
+    "lateral": "free-slip: v = 0 Dirichlet, du/dy = 0 Neumann (core.jl:241-244). DIFFERS from Qu's free-stream lateral condition; the size of that difference is not quantified by Qu",
+    "outlet": "convective: exitBC = true, 1-D convection at the inflow mean speed with a mass-flux correction (core.jl:256-264); conceptually close to Qu's convective outlet at U_inf, equivalence not established",
+    "cylinder": "no-slip through BDIM"},
+  "initial_condition": "u = (U, 0) everywhere plus a declared symmetry-breaking v bump 0.01 U exp(-|x - c - (2D, 0)|^2 / D^2), discarded with the transient",
+  "time": {"t_end": 600, "transient_discarded_before": 100,
+           "averaging_window": "from the first lift up-crossing after t = 100 to the last lift up-crossing before t_end: whole periods only"},
+  "forces": {"total": "Cd = -2 total_force(sim)[1] / (U^2 D), Cl = -2 total_force(sim)[2] / (U^2 D): pressure plus viscous stress (Metrics.jl:188); minus because WaterLily returns the force on the fluid",
+             "pressure_only": "Cd_p = -2 pressure_force(sim)[1] / (U^2 D) (Metrics.jl:146)",
+             "sampling": "every time step, recorded with its time"},
+  "frequency": {"method": "lift up-crossings (linear interpolation in t) inside the averaging window; period = mean spacing; St = D / (U * mean period)",
+                "uncertainty": "std of periods / mean period, and the count of periods",
+                "periodic_state_required": "at least 20 whole periods in the window and period CV <= 0.02; otherwise the run is recorded as NO PERIODIC STATE (a failure, not a reason to change the window)"},
+  "surface_pressure_internal_check": {
+    "what": "720 equally spaced angles; p sampled with WaterLily.interp at r = R + 1.5 h, R + 2.5 h, R + 3.5 h, extrapolated quadratically to r = R; Cp = (p - p_ref) / (0.5 U^2), p_ref = mean p over the inlet plane interior at the same step",
+    "time": "time mean of the per-sample Cp over the averaging window, sampled every 10th step",
+    "integral": "Cd_p_surface = -sum(Cp * n_x * R dtheta) / D over the 720 points (Cp already carries the 0.5 U^2)",
+    "correction_2026_10_31": "frozen text read / (0.5 D), which double-counts the 0.5 already in Cp; corrected before any cylinder run existed (derivation: F_x = -oint p n_x R dtheta, Cd = F_x / (0.5 U^2 D))",
+    "role": "INTERNAL consistency between wall-extrapolated surface pressure and the solver's pressure_force; not a comparison with Qu and not a validation of total drag"},
+  "runs": {
+    "R1": {"n_D": 32, "H": 60, "Re": 100},
+    "R2": {"n_D": 64, "H": 60, "Re": 100},
+    "R3_domain": {"n_D": 32, "H": 120, "Re": 100, "role": "domain diagnostic: same grid as R1, Qu's H = 120"},
+    "M1_mutant": {"n_D": 32, "H": 60, "Re": 25, "role": "viscosity x4; must not pass the band"}},
+  "not_in_scope": "3-D effects (2-D shedding at Re 100 is physical: below the ~190 3-D wake transition, recalled), any fin section, any flight or swimming claim"
+}

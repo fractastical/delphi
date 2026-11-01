@@ -56,7 +56,7 @@ def test_http_real_authenticated_proposal_and_shared_read(store):
 
 
 ROOT = Path(__file__).resolve().parents[1]
-READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_capabilities", "frontier_artifacts",
+READ_TOOLS = {"frontier_search", "frontier_get", "frontier_neighborhood", "frontier_events", "frontier_capabilities", "frontier_artifacts", "frontier_proofs",
               "frontier_discover", "frontier_graph", "frontier_catalogue", "frontier_project_inspect", "frontier_artifact_inspect",
               "frontier_design_context", "frontier_simulate", "frontier_engineer", "frontier_formalize", "frontier_belief",
               "frontier_plan_experiments"}
@@ -125,6 +125,14 @@ def test_official_mcp_stdio_reads_same_persisted_record(store):
             tools = (await session.list_tools()).tools
             assert {t.name for t in tools} == READ_TOOLS
             assert all(t.annotations.readOnlyHint for t in tools)
+            proofs = val(await session.call_tool("frontier_proofs", {}))
+            assert len(proofs["families"]) == 3 and proofs["withheld"] == []
+            assert not proofs["compile_executed"] and not proofs["biological_validation"]
+            assert all("source" not in f for f in proofs["families"])
+            theorem = val(await session.call_tool("frontier_proofs", {"family": "cantilever-guard", "include_source": True}))
+            assert "cantilever_guard_hypotheses_satisfiable" in theorem["families"][0]["source"]["text"]
+            assert (await session.call_tool("frontier_proofs", {"family": "../../secret"})).isError
+
             value = val(await session.call_tool("frontier_get", {"target": ref(record)}))
             assert value["record"] == record
             assert (await session.call_tool("frontier_search", {"limit": 51})).isError

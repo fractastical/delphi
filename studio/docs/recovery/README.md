@@ -17,7 +17,7 @@ capabilities. Never publish a decrypted tree, the private manifest, or either da
   specifications in source, and a per-file hash/size/mode manifest.
 
 The capture is a declared time window, not an atomic filesystem snapshot. Each individual
-file must remain stable while copied. A changing file is reported as a capture error; publication
+file must remain stable while copied. Active JSONL transcripts are first staged at a declared complete-line cutoff, checked against a second unbuffered source read; later appends are explicitly outside that cutoff. Prefix rewrites, truncation and symlink replacement are refused. A changing staged file is reported as a capture error; publication
 refuses a snapshot with capture errors. The database has its own transactional snapshot.
 The receipt's `bundled-refs.txt` describes actual bundled refs; an earlier worktree inventory
 can describe an earlier capture moment.
@@ -137,7 +137,7 @@ The first receipt lists two missing selected files. Both were tracked deletions 
 `nca-flow` worktree's `pilot_tmp` directory: original contents remain in the source bundle,
 and deletion state remains in the binary patch. This is explicitly distinguished from missing
 untracked evidence; subsequent tooling fails publication for an unexplained missing selection.
-The final corrected film remains deferred until its publication manifest is ready.
+The final corrected film was deferred in this first snapshot and was included in the second snapshot below.
 
 The parent reviewer also independently read the actual sb03-restored sanitized dump and
 matched its23,236,752 bytes and SHA256 to the dump used in its18-table/application replay.
@@ -173,3 +173,76 @@ reports `plpgsql1.0` and `vector0.6.0`; the corrected drill selects the official
 actual immutable digest and PG minor version, and requires the restored extension versions to
 match. Future database receipts also record installed extensions. Do not omit pgvector when
 rebuilding the database; successful extraction alone would not have discovered this gap.
+
+
+## Separate-host recovery exercised
+
+The second snapshot, `20261101T0410`, contains the corrected 90-second film, NCA curriculum
+returns, design-control records and source refs through the declared capture window. Its
+1,586,623,355-byte encrypted archive has SHA256
+`4c8cfb98f3529fddb9cb2905c3942a1611cb456ac18283c731118821933d7501`.
+The complete off-host extraction verified 15,564 files and 3,305,659,592 logical bytes.
+
+At **9:36:58pm PDT on October31,2026**, a separate-host service drill on sb03 passed from
+that recovered source bundle and sanitized dump. It used source
+`8a1f0914ec86d7905f5d19a4d20ee70a8f5fd587`, a new Python3.14.4 virtual environment, and a
+socket-only PostgreSQL16.1 container with vector0.6.0. Its actual image digest, dependency
+freeze, command exit codes and receipts are retained. All18 table counts matched before any
+disposable write. Website health/catalog, official MCP authenticated writes and public reads,
+idempotent retries, private-record withholding, invalid-bearer401 and credential-log checks
+passed. Both application processes and the owned container were stopped and removed. Existing
+sb03 services were not changed. This is an isolated service-recovery test, not a domain cutover,
+and newer source refs captured afterward are not thereby claimed to have been executed.
+
+Three prior failures remain in the encrypted recovery set: the first lacked pgvector;
+the second let the verifier's host Python package shadow its fresh environment; the third
+expected the intentionally public-only MCP read surface to return a private fixture. The final
+checker runs its client with the new virtual environment's Python in isolated mode, requires
+package paths inside it, preserves private-record refusal and separately round-trips a public
+software fixture in the disposable loopback-only database. No API access rule was weakened.
+
+Run the reusable service check from a restored tree, choosing a new private short path for
+its socket directory. It refuses existing destinations and nested execution:
+
+```sh
+systemd-run --user --scope -p CPUQuota=100% -p MemoryMax=3G \
+  -p MemorySwapMax=0 -p TasksMax=128 -p RuntimeMaxSec=1200 \
+  python -m frontier_compute.backup_service_check \
+  --restored RESTORED_DIRECTORY --root NEW_SHORT_CHECK_DIRECTORY \
+  --source-sha EXACT_BUNDLED_COMMIT --dump-sha EXACT_SANITIZED_DUMP_SHA256 \
+  --video-sha EXACT_CORRECTED_VIDEO_SHA256
+```
+
+The checker requires Docker, a new virtual environment and dependency download access. It uses
+no host database listener, exposes no public port, retains failed receipts and records cleanup.
+The storage download/archive rehash, independent database replay and separate-host application
+run are distinct evidence, joined in `results/resources/backup-recovery-service-20261101.json`.
+
+The first final follow-up capture (`20261101T0440`) was withheld from publication because one active Codex transcript changed during copying. Its failed receipt remains preserved. The immutable transcript-prefix staging above was added in response; the archive stable-file gate was not weakened.
+
+
+## Stable add-on and newer database
+
+The private `20261101T0455` snapshot recovered **17,486 files / 3,707,042,825 logical bytes**
+on sb03 at **9:56:00pm PDT**. Its encrypted archive is1,806,700,211 bytes, SHA256
+`d95096e63db197efa597c04ad8befee4f59d304a6b5ff1fe3ee78efa74d1e7e3`.
+It includes the corrected film, canonical BETSE media, NCA/design-control/CFD returns, source
+refs and all four service-drill attempts. Active transcripts have declared complete-line
+cutoffs. The recovered bundle was cloned on sb03 and every required commit checked.
+
+A separate new read-only database transaction at **9:52:17pm PDT** contains **3,924 record
+versions / 3,918 current heads / 1,970 events**. Its raw dump reproduced all18 source counts
+in scratch; sanitization preserved scientific envelopes. All six exact newly imported observed
+record references were also found in the sanitized dump's data stream. The private encrypted
+`20261101T0500` add-on is47,038,250 bytes, SHA256
+`f16301f7bbc2b7d960d70db6cb6e8ea62b02d07c445a051647c1f0071a1440b4`;
+actual S3 download and sb03 decrypt/file checks passed. Use this newer sanitized dump with the
+base source/artifact recovery. It does not overwrite or relabel the earlier dump.
+
+`results/resources/backup-recovery-stable-addons-20261101.json` joins creation, private-storage,
+off-host restore, exact source/video/dump identities and the new import-presence receipts.
+The full website/MCP drill remains explicitly tied to its older tested source and dump.
+The withheld0440 and0450 captures remain recorded; neither was uploaded. The latter caught
+16 print-v4 paths being replaced during active repair. Print-v4 and new science videos are
+explicitly deferred until their final publication, as are later cloud states not yet returned.
+This is a declared recovery cutoff, not a claim to capture future writes.

@@ -1,0 +1,76 @@
+{
+  "schema": "frontier.observed-allometry.protocol/1",
+  "question": "How does species/catalog-blocked internal prediction differ from a pooled allometry fit, and can an exact observed subset update genuinely invalidate/refit a dependent allometry prediction?",
+  "base_commit": "97d85471b60bef320345352d9e18ebdf14feae9d",
+  "input_contract_sha256": "878af1a56a581dcf57adee34cb8cab50a52c1403b5b8250489ae8bcc4ff0e4f8",
+  "model": {
+    "equation": "log10(fin_cm)=beta0+beta1*log10(SL_cm)",
+    "method": "OLS via numpy.linalg.lstsq; same model form as connectors/fish_controls/build.py:fit, no download/bootstrap rerun",
+    "outcomes": [
+      "pectoral_cm",
+      "pelvic_cm"
+    ],
+    "groups": [
+      "flying fish",
+      "flying halfbeak",
+      "halfbeak",
+      "needlefish"
+    ],
+    "no_tuning": "Fixed model/form/nominal band; no held-out response influences estimation/selection"
+  },
+  "blocking": {
+    "species": "Within each group, hold out each species completely; purge training rows sharing any catalog token with that test species",
+    "catalog": "Within each group, connected components of shared digit catalog tokens; hold out each whole component; no row-wise shuffle",
+    "identity_unknown": "Refuse unparseable/empty catalog identities rather than assume independence",
+    "comparison_scope": "Two internal-validation schemes reuse the same observations; never pool their scores as independent replicates. Only3 flying-fish species, not population-level species transfer."
+  },
+  "uncertainty": {
+    "noise": "training-only residual sum of squares/(n-2), units log10(cm)^2",
+    "parameter_covariance": "catalog-component delete-one jackknife covariance, only when>=3 components and every delete-one fit is full-rank with n>=3",
+    "working_prediction_band": "beta prediction \u00b11.959963984540054*sqrt(h Cov_jackknife hT + training_noise_variance); back-transform endpoints to cm",
+    "scope": "Nominal Gaussian working band, not calibrated95% confidence/coverage guarantee; catalog groups are dependence proxies, not established independent animals. Missing/degenerate uncertainty stays null."
+  },
+  "failure_flags": [
+    "missing_outcome_not_scored",
+    "n_train<3",
+    "rank_deficient",
+    "catalog_uncertainty_unidentifiable",
+    "outside_training_SL_range",
+    "outside_working_prediction_band",
+    "source_ratio_mismatch"
+  ],
+  "update_demo": {
+    "group": "flying fish",
+    "outcome": "pectoral_cm",
+    "version1_species": [
+      "Cheilopogon furcatus"
+    ],
+    "version2_add_species": [
+      "Exocoetus volitans"
+    ],
+    "heldout_species": [
+      "Hirundichthys rondeleti"
+    ],
+    "catalog_purge": "remove training rows sharing held-out tokens at both versions",
+    "dependent_query": "median SL of version1 eligible training rows; same query for both versions",
+    "cache": "exact model version+query digest; requestv2 againstv1 cache must raise stale result error, retainv1, explicitly recomputev2; report change, never presume improved prediction"
+  },
+  "controls": [
+    "analytic noiseless power law recovers coefficients",
+    "heldout response mutation cannot alter training fit/noise/jackknife band",
+    "shared catalog labels never cross fold",
+    "bad source ratios remain unchanged, missingness retained",
+    "rank-deficient fit blocked",
+    "stale model cache refuses old result, refreshed prediction is actually recomputed"
+  ],
+  "resources": {
+    "local_cpu": 1,
+    "threads": 1,
+    "memory_GiB": 2,
+    "tasks": 128,
+    "wall_s": 1800,
+    "GPU": 0,
+    "provider_jobs": 0
+  },
+  "reporting": "All folds/endpoints/residuals/missing/failed fits and band misses retained. No pass threshold or biological/casual/flight success inferred. Existing planner API unchanged. Adapter drafts only if schema/licensegate valid; no DB write/ready/lease/acceptance claimed."
+}

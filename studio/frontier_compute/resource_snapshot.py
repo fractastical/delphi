@@ -9,7 +9,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 import csv
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import math
@@ -17,6 +17,8 @@ from pathlib import Path
 import re
 import subprocess
 import statistics
+import urllib.parse
+import urllib.request
 from zoneinfo import ZoneInfo
 
 PREFIXES = ("delphi-evolve-ops-", "bioservices-")
@@ -271,9 +273,88 @@ def refresh(path: Path, cli: str) -> dict:
     return snapshot
 
 
+def gcp_allocation(instances, quotas):
+    """Only RUNNING owned VMs count as allocated; quota is a separate unit."""
+    owned = [row for row in instances if row.get("name", "").startswith(("frontier-cpu-", "frontier-gpu-"))]
+    running = [row for row in owned if row.get("status") == "RUNNING"]
+    cpu = 0
+    for row in running:
+        match = re.search(r"(?:e2|g2)-standard-(\d+)$", row.get("machineType", ""))
+        if not match:
+            raise ValueError("Unknown owned machine type; cannot infer allocated CPUs")
+        cpu += int(match.group(1))
+    gpu = sum(acc.get("acceleratorCount", 0) for row in running for acc in row.get("guestAccelerators", []))
+    allowed = {"name", "id", "status", "zone", "machineType", "lastStartTimestamp", "guestAccelerators"}
+    quota_limits = {row.get("metric"): row.get("limit") for row in quotas}
+    return {
+        "instances": [{key: value for key, value in row.items() if key in allowed} for row in owned],
+        "active_allocated_vcpus": cpu, "active_allocated_gpus": gpu,
+        "active_cpu_vms": sum(not row.get("guestAccelerators") for row in running),
+        "active_gpu_vms": sum(bool(row.get("guestAccelerators")) for row in running),
+        "quotas": [row for row in quotas if row.get("metric") in ("CPUS_ALL_REGIONS", "GPUS_ALL_REGIONS")],
+        "global_cpu_limit": quota_limits.get("CPUS_ALL_REGIONS"),
+        "gpu_quota_granted": quota_limits.get("GPUS_ALL_REGIONS"),
+        "instantaneous_cpu_utilization": None,
+    }
+
+
+def refresh_gcp(directory: Path, project: str) -> dict:
+    """Read allocation/quota and timestamped CPU metrics without retaining tokens."""
+    def command(args):
+        result = subprocess.run(["gcloud", *args], capture_output=True, text=True, timeout=45)
+        if result.returncode:
+            raise RuntimeError(f"GCP read failed with exit {result.returncode}; no command output retained")
+        return result.stdout
+
+    start = datetime.now(timezone.utc)
+    instances = json.loads(command(["compute", "instances", "list", "--project", project,
+                                  "--format=json(name,id,status,zone,machineType,lastStartTimestamp,guestAccelerators)"]))
+    quota = json.loads(command(["compute", "project-info", "describe", "--project", project, "--format=json(quotas)"]))
+    result = gcp_allocation(instances, quota.get("quotas", []))
+    result.update(project=project, observed_at_utc=datetime.now(timezone.utc).isoformat(),
+                  request_started_utc=start.isoformat(), cost=None)
+    running_ids = {str(row["id"]) for row in result["instances"] if row["status"] == "RUNNING"}
+    metric = {"observed_utc": result["observed_at_utc"], "metric": "compute.googleapis.com/instance/cpu/utilization",
+              "series": [], "scope": "Provider timestamped CPU fractions; allocation is not utilization; no scientific-success or billing inference"}
+    if running_ids:
+        token = command(["auth", "print-access-token"]).strip()
+        query = urllib.parse.urlencode({
+            "filter": 'metric.type="compute.googleapis.com/instance/cpu/utilization" AND resource.type="gce_instance"',
+            "interval.startTime": (start - timedelta(minutes=15)).isoformat(),
+            "interval.endTime": start.isoformat(), "view": "FULL", "pageSize": "1000",
+        })
+        request = urllib.request.Request(
+            f"https://monitoring.googleapis.com/v3/projects/{project}/timeSeries?{query}",
+            headers={"Authorization": f"Bearer {token}"})
+        with urllib.request.urlopen(request, timeout=30) as response:
+            raw = response.read(2 * 1024 * 1024 + 1)
+        if len(raw) > 2 * 1024 * 1024:
+            raise ValueError("GCP metric response exceeds limit")
+        document = json.loads(raw)
+        if document.get("nextPageToken"):
+            raise ValueError("GCP metrics paginated; refuse incomplete snapshot")
+        metric["series"] = [row for row in document.get("timeSeries", [])
+                            if row.get("resource", {}).get("labels", {}).get("instance_id") in running_ids]
+    runtime_path = directory / "runtime-status.json"
+    runtime = json.loads(runtime_path.read_text()) if runtime_path.exists() else {}
+    runtime.update(result)
+    runtime["status_update_utc"] = result["observed_at_utc"]
+    runtime["active_vcpus"] = result["active_allocated_vcpus"]
+    runtime["active_gpu_count"] = result["active_allocated_gpus"]
+    runtime["metric_receipt"] = str(directory / "cpu-metric-current.json")
+    runtime["state"] = "Read-only allocation snapshot; scientific stages retain their separately dated receipts."
+    for path, payload in ((runtime_path, runtime), (directory / "cpu-metric-current.json", metric)):
+        temporary = path.with_suffix(".tmp")
+        temporary.write_text(json.dumps(payload, indent=2) + "\n")
+        temporary.replace(path)
+    return result
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--inventory", type=Path, default=Path("results/resources/resource-inventory.json"))
     parser.add_argument("--cli", default=str(Path.home() / ".nebius/bin/nebius"))
+    parser.add_argument("--gcp-project", help="Refresh owned Google allocation/quota/CPU metrics instead of Nebius")
     args = parser.parse_args()
-    print(json.dumps(refresh(args.inventory, args.cli), indent=2))
+    snapshot = refresh_gcp(args.inventory.parent / "gcp", args.gcp_project) if args.gcp_project else refresh(args.inventory, args.cli)
+    print(json.dumps(snapshot, indent=2))

@@ -12,6 +12,13 @@ from pathlib import Path
 import time
 from urllib.request import Request, urlopen
 
+EDITIONS = {
+    "artifacts/demo-video": {"frontier-60s": 60, "frontier-120s": 120},
+    "artifacts/demo-video-90": {"frontier-90s": 90},
+    "artifacts/demo-video-science": {"frontier-science-60s": 60, "frontier-science-120s": 120},
+    "artifacts/demo-video-delphi": {"frontier-delphi-60s": 60, "frontier-delphi-120s": 120},
+}
+
 
 def verify(base: str, capture: Path | None = None) -> dict:
     base = base.rstrip("/")
@@ -23,7 +30,7 @@ def verify(base: str, capture: Path | None = None) -> dict:
             raise ValueError("Demo check failed: " + name)
 
     def fetch(path, limit=16_000_000, headers=None):
-        if not path.startswith(("artifacts/demo-video/", "artifacts/demo-video-90/")) or ".." in Path(path).parts:
+        if not path.startswith(tuple(directory + "/" for directory in EDITIONS)) or ".." in Path(path).parts:
             raise ValueError("Media path outside demo subtree")
         with urlopen(Request(base + "/" + path, headers=headers or {}), timeout=30) as response:
             data = response.read(limit + 1)
@@ -32,18 +39,17 @@ def verify(base: str, capture: Path | None = None) -> dict:
             return response.status, dict(response.headers.items()), data
 
     cuts, directories, manifests = {}, {}, {}
-    for directory, expected in (("artifacts/demo-video", {"frontier-60s", "frontier-120s"}),
-                                ("artifacts/demo-video-90", {"frontier-90s"})):
+    for directory, expected in EDITIONS.items():
         status, _, raw = fetch(directory + "/manifest.json")
         manifest = json.loads(raw)
         check(directory + " complete public manifest", status == 200 and manifest["status"] == "complete")
         entries = manifest["cuts"]
-        check(directory + " requested cuts present", len(entries) == len(expected) and {c["id"] for c in entries} == expected)
+        check(directory + " requested cuts present", len(entries) == len(expected) and {c["id"] for c in entries} == set(expected))
         manifests[directory] = hashlib.sha256(raw).hexdigest()
         for cut in entries:
             cuts[cut["id"]], directories[cut["id"]] = cut, directory
     for name, cut in cuts.items():
-        expected_duration = {"frontier-60s": 60, "frontier-90s": 90, "frontier-120s": 120}[name]
+        expected_duration = EDITIONS[directories[name]][name]
         check(name + " declared duration", abs(cut["duration_s"] - expected_duration) <= 0.25)
         for role in ("video", "poster", "captions", "transcript"):
             pin = cut["files"][role]
@@ -78,7 +84,7 @@ def verify(base: str, capture: Path | None = None) -> dict:
             raise TimeoutError("Browser state did not become true: " + expression)
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
-        for name in ("frontier-90s", "frontier-60s", "frontier-120s"):
+        for name in cuts:
             page.goto(base + "/#/demo?cut=" + name, wait_until="domcontentloaded")
             page.wait_for_selector("#demo-video")
             wait_js("document.querySelector('#demo-video').readyState >= 2")
@@ -89,14 +95,22 @@ def verify(base: str, capture: Path | None = None) -> dict:
                 decodedFrames:v.getVideoPlaybackQuality().totalVideoFrames,source:v.currentSrc};}""")
             check(name + " browser decoded and played",
                   state["width"] == 1920 and state["height"] == 1080 and state["decodedFrames"] > 0
-                  and abs(state["duration"] - cuts[name]["duration_s"]) <= 0.25)
+                  and abs(state["duration"] - cuts[name]["duration_s"]) <= 0.25
+                  and state["source"].endswith(directories[name] + "/" + cuts[name]["files"]["video"]["path"]))
+            page.evaluate("""() => {const v=document.querySelector('#demo-video');
+                v.textTracks[0].mode='showing';v.currentTime=v.duration/2;}""")
+            wait_js("document.querySelector('#demo-video track').readyState === 2")
+            wait_js("!document.querySelector('#demo-video').seeking && document.querySelector('#demo-video').readyState >= 2")
+            check(name + " captions loaded and seek completed", page.evaluate("""() => {
+                const v=document.querySelector('#demo-video');return v.textTracks[0].cues.length>0
+                && Math.abs(v.currentTime-v.duration/2)<0.5;}"""))
             check(name + " no horizontal overflow", page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"))
             page.locator("#demo-fs").click()
             wait_js("document.fullscreenElement?.id === 'demo-stage'")
             check(name + " fullscreen entered", page.evaluate("document.fullscreenElement.id === 'demo-stage'"))
             page.evaluate("document.exitFullscreen()")
             wait_js("document.fullscreenElement === null")
-            check(name + " all three cuts have direct downloads", page.locator(".demodl a[download][href$='.mp4']").count() == len(cuts))
+            check(name + " all seven cuts have direct downloads", page.locator(".demodl a[download][href$='.mp4']").count() == len(cuts))
             if capture:
                 capture.mkdir(parents=True, exist_ok=True)
                 page.screenshot(path=str(capture / (name + ".png")))
@@ -104,7 +118,7 @@ def verify(base: str, capture: Path | None = None) -> dict:
         page.set_viewport_size({"width": 390, "height": 844})
         page.goto(base + "/#/demo", wait_until="domcontentloaded")
         page.wait_for_selector("#demo-video")
-        check("mobile defaults to new 90-second cut", page.locator("#demo-video source").get_attribute("src").endswith("frontier-90s.mp4"))
+        check("mobile defaults to new Delphi 60-second cut", page.locator("#demo-video source").get_attribute("src").endswith("frontier-delphi-60s.mp4"))
         check("mobile has no horizontal overflow", page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"))
         page.locator(".aboutmenu summary").click()
         check("About exposes Demo videos", page.locator(".aboutmenu a[href$='#/demo']").inner_text() == "Demo videos")
