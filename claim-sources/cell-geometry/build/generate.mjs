@@ -2,8 +2,14 @@
 // nanopub per tissue image used, and one delphi:EvidenceItem nanopub per tested claim.
 // Signing replaces the temp base with the trusty URI (build/publish.mjs).
 //
-//   node build/generate.mjs [--out nanopubs/unsigned]
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
+//   node build/generate.mjs [--out nanopubs/unsigned] [--claim thompson1917-ch07-04 ...]
+//
+// With --claim, only the named evidence nanopubs are rewritten (the dataset nanopubs and the other
+// evidence files are left alone, so unchanged records do not get new trusty URIs). An evidence
+// nanopub that was already published for the same claim (nanopubs/manifest.jsonl) is superseded:
+// the new record carries npx:supersedes <old trusty URI> and the revisions recorded in result.json
+// as prov:Activity nodes (BEST_PRACTICES.md section 7).
+import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from "node:fs";
 import { execSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
