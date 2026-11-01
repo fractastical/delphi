@@ -2176,6 +2176,11 @@ def test_system_audit_separates_contributors_activity_and_model_receipts(browser
         assert 'none in this tree' not in t
         pg.locator('.contributor-audit > summary').click()
         pg.locator('.model-usage-audit > summary').click()
+        pg.locator('.repository-activity-audit > summary').click()
+        assert pg.locator('.repository-activity-audit tbody tr').count() == 4
+        assert '1,252 across four repositories' in t
+        assert 'fractastical/delphi' in pg.locator('.repository-activity-audit').inner_text()
+        assert 'Commits are not participants' in pg.locator('.repository-activity-audit').inner_text()
         assert pg.locator('.model-usage-audit tbody tr').count() == 15
         assert 'provider completed science runner failed' in pg.locator('.model-usage-audit').inner_text()
         assert 'No BioNeMo or BioNeMo NIM execution is established' in pg.locator('.model-usage-audit').inner_text()

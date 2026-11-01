@@ -387,6 +387,25 @@ def build_timeline(ins: Inputs) -> dict | None:
                       ("models", "results/resources/bio-model-usage.json")):
         if (ROOT / path).is_file():
             audits[key] = {"data": ins.json(path), "path": path, "sha256": sha(path)}
+    activity_path = "results/resources/repository-activity-20261101-0523.json"
+    if (ROOT / activity_path).is_file():
+        document = ins.json(activity_path)
+        module_path = "scripts/repository_activity.py"
+        ins.read(module_path)
+        spec = importlib.util.spec_from_file_location("frontier_repository_activity", ROOT / module_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        checked = module.combine(document["repositories"], document["since_utc"], document["until_utc"])
+        if checked["deduplicated_counts"] != document["deduplicated_counts"]:
+            raise ValueError("Repository activity counts do not match the commit records")
+        summary = {k: document[k] for k in ("since_utc", "until_utc", "scope", "deduplicated_counts")}
+        summary["repositories"] = [{k: v for k, v in r.items() if k != "commits"} for r in document["repositories"]]
+        for repo in document["repositories"]:
+            if repo["counts"] != module.counts(repo["commits"]):
+                raise ValueError("Per-repository count does not match commit records")
+        audits["repositories"] = {"data": summary, "path": activity_path, "sha256": sha(activity_path)}
+        c = document["deduplicated_counts"]
+        counters.append({"quantity": "Repository commits", "value": f"{c['commit_objects']:,} across four repositories", "status": "actual", "note": f"{c['non_merge_commits']:,} non-merge and {c['merge_commits']:,} merge commit objects; full SHAs deduplicated. Default branches pinned separately, {pdt(document['since_utc'])} to {pdt(document['until_utc'])}. Code activity, not agent or scientific-result counts.", "source": activity_path})
     if "contributors" in audits:
         a = audits["contributors"]; c = a["data"]["counts"]
         observed = datetime.datetime.fromisoformat(a["data"]["window"]["observed_utc"].replace("Z", "+00:00")).astimezone(ZoneInfo("America/Los_Angeles")).strftime("%Y-%m-%d %H:%M:%S %Z")
