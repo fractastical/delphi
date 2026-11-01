@@ -630,6 +630,52 @@ def model_downloads(ins: Inputs, out: dict) -> dict:
     return {"groups": groups, "refused": refused}
 
 
+def demo_videos(ins: Inputs, out: dict) -> dict | None:
+    """Publish complete edits only when every required media file matches its pin."""
+    directory = "artifacts/demo-video"
+    manifest_path = f"{directory}/manifest.json"
+    if not (ROOT / manifest_path).is_file():
+        return None
+    manifest = ins.json(manifest_path)
+    result = {"cuts": [], "refused": [], "limits": manifest.get("limits", [])}
+    if manifest.get("status") != "complete":
+        return result
+    required = {"video": {".mp4"}, "poster": {".png", ".jpg"}, "captions": {".vtt"}, "transcript": {".txt"}}
+    for cut in manifest.get("cuts", []):
+        expected = {"frontier-60s": 60, "frontier-120s": 120}.get(cut.get("id"))
+        if expected is None or not isinstance(cut.get("duration_s"), (int, float)) or abs(cut["duration_s"] - expected) > 0.25:
+            result["refused"].append({"id": cut.get("id"), "reason": "unexpected cut or duration"})
+            continue
+        pending, hrefs = {}, {}
+        for role, extensions in required.items():
+            pin = cut.get("files", {}).get(role, {})
+            path = Path(pin.get("path", ""))
+            rel = f"{directory}/{path.as_posix()}"
+            limit = 64_000_000 if role == "video" else 16_000_000
+            if path.is_absolute() or ".." in path.parts or path.suffix not in extensions or not (ROOT / rel).is_file():
+                break
+            if not (ROOT / rel).resolve().is_relative_to((ROOT / directory).resolve()):
+                break
+            size = (ROOT / rel).stat().st_size
+            if not 0 < size <= limit or size != pin.get("bytes"):
+                break
+            data = ins.read(rel)
+            if digest_bytes(data) != pin.get("sha256") or (role == "captions" and not data.startswith(b"WEBVTT")):
+                break
+            pending["@" + rel], hrefs[role] = data, rel
+        else:
+            out.update(pending)
+            result["cuts"].append({"id": cut["id"], "title": cut["title"], "duration_s": cut["duration_s"],
+                                   "href": hrefs["video"], "poster_href": hrefs["poster"],
+                                   "subtitles_href": hrefs["captions"], "transcript_href": hrefs["transcript"],
+                                   "manifest_href": manifest_path})
+            continue
+        result["refused"].append({"id": cut.get("id"), "reason": "required media missing, outside scope, oversized, or changed"})
+    if result["cuts"]:
+        out["@" + manifest_path] = ins.read(manifest_path)
+    return result
+
+
 def diffusion_pilot(ins: Inputs, out: dict) -> dict | None:
     """Recorded denoising frames and evaluation receipts, with failed checks preserved."""
     directory = "artifacts/rd-diffusion/visuals"
@@ -1377,6 +1423,7 @@ def build() -> dict[str, bytes]:
     formalize_ex = formalize_examples(ins)
     print_v3 = print_v3_block(ins, extra)
     downloads = model_downloads(ins, extra)
+    demos = demo_videos(ins, extra)
     diffusion = diffusion_pilot(ins, extra)
     recovery_in = recovery_inputs(ins, extra)
     secondary_in = runtime_inputs(ins, extra, "secondary-runtime-inputs")
@@ -1421,6 +1468,7 @@ def build() -> dict[str, bytes]:
         "formalize": formalize_ex,
         "print_v3": print_v3,
         "model_downloads": downloads,
+        "demo_videos": demos,
         "diffusion_pilot": diffusion,
         "recovery_inputs": recovery_in,
         "secondary_inputs": secondary_in,
