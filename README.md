@@ -38,10 +38,10 @@ The hosted server serves `main` as of the last deploy. Tools and ranking semanti
 ## Progress at a glance
 
 <p align="center">
-  <a href="https://mcp.delphibio.org/docs/team.html"><img src="docs/team/team.gif" alt="Animated tour of the team page" width="800"></a>
+  <a href="https://delphibio.org/team.html"><img src="docs/team/team.gif" alt="Animated tour of the team page" width="800"></a>
 </p>
 
-The [team page](https://mcp.delphibio.org/docs/team.html) is the quick tour: hover a pattern for its claims and tested species, or the right-edge tab for its knowledge graph (thinkers, claims, AI assessors, Lean proofs, data tests, MorphoEval audits).
+The [team page](https://delphibio.org/team.html) is the quick tour: hover a pattern for its claims and tested species, or the right-edge tab for its knowledge graph (thinkers, claims, AI assessors, Lean proofs, data tests, MorphoEval audits).
 
 ### Current numbers
 
@@ -175,16 +175,16 @@ Team roles and deadlines are in [#53](https://github.com/fractastical/delphi/iss
 covers the genotype–phenotype, validation and MCP-testing work (Amit's row) and the agent threads that
 produce it. Everything below is built from repository files by scripts; no figure is typed by hand.
 
-**Start here:** https://delphibio.org/start/ — one page that reads every
+**Start here:** https://delphi-mission-control.ashenoy000.workers.dev/start/ — one page that reads every
 thread's status live.
 
 | Page | What it shows |
 | --- | --- |
-| [Knowledge graph](https://delphibio.org/graph/) | Claims, data tests from both agent swarms, Lean theorems, datasets, taxa, the flying-fish blueprint, open problems and candidate answers, with provenance on every node. `?view=theorems` clusters open problems by the claims their theorems formalise. |
-| [Claim Book](https://delphibio.org/proofs/) | Each formalised claim end to end: source, data verdict, the Lean source, the prover's own explanation beside each step, the mutations that had to fail, and the faithfulness verdict. |
-| [Figures](https://delphibio.org/figures/) | Every figure with its data source and SHA-256, including the flight phylogeny and gene families. |
-| [Deck](https://delphibio.org/deck/) | The running pitch; unevidenced slides are greyed out. A PowerPoint is built from the same data. |
-| [Lean](https://delphibio.org/t/lean/) | 53 theorems, zero `sorry`, statement-level mutation testing, the constraint checker and the open-problems elimination ledger. |
+| [Knowledge graph](https://delphi-mission-control.ashenoy000.workers.dev/graph/) | Claims, data tests from both agent swarms, Lean theorems, datasets, taxa, the flying-fish blueprint, open problems and candidate answers, with provenance on every node. `?view=theorems` clusters open problems by the claims their theorems formalise. |
+| [Claim Book](https://delphi-mission-control.ashenoy000.workers.dev/proofs/) | Each formalised claim end to end: source, data verdict, the Lean source, the prover's own explanation beside each step, the mutations that had to fail, and the faithfulness verdict. |
+| [Figures](https://delphi-mission-control.ashenoy000.workers.dev/figures/) | Every figure with its data source and SHA-256, including the flight phylogeny and gene families. |
+| [Deck](https://delphi-mission-control.ashenoy000.workers.dev/deck/) | The running pitch; unevidenced slides are greyed out. A PowerPoint is built from the same data. |
+| [Lean](https://delphi-mission-control.ashenoy000.workers.dev/t/lean/) | 53 theorems, zero `sorry`, statement-level mutation testing, the constraint checker and the open-problems elimination ledger. |
 
 **Where things live**
 
@@ -232,13 +232,13 @@ candidate with a new binding violation and says "no design meets the spec" when 
 
 Three ways in:
 
-- **In the browser:** [Open the Fish, Perturb & optimise mode](https://delphibio.org/blueprint3d/explode.html?mode=perturb)
+- **In the browser:** [Open the Fish, Perturb & optimise mode](https://delphi-mission-control.ashenoy000.workers.dev/blueprint3d/explode.html?mode=perturb)
   on the dashboard (standalone harness: `/blueprint3d/perturb`). It runs the same engine code as the server, copied by
   `dashboard/build-engine.mjs`.
 - **From your own agent or shell (local):** the `sim-engine` MCP server (`node sim-engine/server.mjs`, stdio), its CLI
   (`node sim-engine/cli.mjs`, `node sim-engine/lean-cli.mjs`) and its HTTP bridge (`node sim-engine/http.mjs`, localhost
   only). Start with [`sim-engine/AGENT-GUIDE.md`](sim-engine/AGENT-GUIDE.md); the contract is
-  [`sim-engine/CONTRACT.md`](sim-engine/CONTRACT.md) and the page [`/studio-api/`](https://delphibio.org/studio-api/).
+  [`sim-engine/CONTRACT.md`](sim-engine/CONTRACT.md) and the page [`/studio-api/`](https://delphi-mission-control.ashenoy000.workers.dev/studio-api/).
 - **Hosted:** the `delphisci` MCP server (`claude mcp add --transport http delphisci https://mcp.delphibio.org/mcp`).
   Version 0.3.0 in [`mcp/`](mcp/README.md) adds the `lean_*` law tools (`lean_laws_list`, `lean_law_get`,
   `lean_lawset_get`, `lean_check`, `lean_verify`). The hosted copy serves `main` as of its last deploy, so check its
@@ -276,7 +276,7 @@ Before building, publishing, or querying nanopubs, read [BEST_PRACTICES.md](BEST
 
 ## Nanopublication resources
 
-To query this project's claims, their math and their assessment rankings, use the `delphisci` MCP server ([setup](#connect-via-mcp)) or its CLI in [`mcp/`](mcp/README.md). Agents should start with [AGENTS.md](AGENTS.md). Live team dashboard: https://delphibio.org/start/
+To query this project's claims, their math and their assessment rankings, use the `delphisci` MCP server ([setup](#connect-via-mcp)) or its CLI in [`mcp/`](mcp/README.md). Agents should start with [AGENTS.md](AGENTS.md). Live team dashboard: https://delphi-mission-control.ashenoy000.workers.dev/start/
 
 - [Nanodash](https://nanodash.knowledgepixels.com/): browse, search and publish in the browser.
 - [Nanopub Query](https://query.knowledgepixels.com/) ([docs](https://github.com/knowledgepixels/nanopub-query)): SPARQL endpoints over the network.

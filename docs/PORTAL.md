@@ -4,9 +4,13 @@ The Delphi website. Two parts live side by side here:
 
 - **The portal**, imported unchanged from
   [kavitakoolkarni-bio/delphi-portal](https://github.com/kavitakoolkarni-bio/delphi-portal)
-  (live at <https://kavitakoolkarni-bio.github.io/delphi-portal/>), commit `ad8e85e`:
-  `index.html`, `platform.html`, `data/`, `.nojekyll`. Edit these in the portal repo and copy them
-  over; don't restyle them here.
+  (also live at <https://kavitakoolkarni-bio.github.io/delphi-portal/>), commit `ad8e85e`
+  (the portal repo's `main` as of 2026-11-01): `index.html`, `platform.html`, `data/` (1,256 files),
+  `.nojekyll`. That import matches the portal tree byte for byte. Edit these in the portal repo and
+  copy them over; don't restyle them here.
+
+GitHub Pages publishes this `docs/` directory, with `CNAME` set to `delphibio.org`. The homepage is
+the portal. The mission-control dashboard stays on its Cloudflare worker.
 - **The claims atlas**, built from this repo by `` scripts: `claim-graph.html`,
   `theorems.html`, `claims-query.html`, `problems.html`, `team.html`, plus `claims.json`,
   `problems.json`, `export/`, `thumbs/`, `team/`. Don't edit these by hand; rebuild them.

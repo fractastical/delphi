@@ -225,7 +225,8 @@ human-readable.
 ### Source of truth
 - **The dashboard is the human-readable truth.** `dashboard/` builds one static site
   (`node dashboard/build.mjs`, then deploy with `npx wrangler deploy` from `dashboard/`), published at
-  https://delphibio.org. Every count and score on it is computed from repo files, never typed by hand. If you add a result, add it to a repo
+  https://delphi-mission-control.ashenoy000.workers.dev. The public site is GitHub Pages from `docs/`
+  at https://delphibio.org (the imported portal). Every count and score on the dashboard is computed from repo files, never typed by hand. If you add a result, add it to a repo
   file the builder reads (for example a `test-data/claim-tests/**/result.json`), not to the HTML.
 - **Narrative context** (glossary, risks, analogies, recommendations, sources) lives in
   `dashboard/public/glossary.js` and `content.js`. Each source row states whether it was verified.
