@@ -311,6 +311,21 @@ def test_the_shipped_pins_file_is_well_formed_and_points_at_a_repo_relative_path
         assert ss.SHA64.fullmatch(p["sha256"]) and not Path(p["path"]).is_absolute() and ".." not in Path(p["path"]).parts
 
 
+def test_shipped_compute_pin_surfaces_current_mixed_outcome_receipts_without_inventing_cost():
+    pin_doc = json.loads((ROOT / "deploy" / "system" / "receipt-pins.json").read_text())
+    pin = next(p for p in pin_doc["pins"] if p["id"] == "compute-receipts")
+    receipt_bytes = (ROOT / pin["path"]).read_bytes()
+    receipt = json.loads(receipt_bytes)
+    assert hashlib.sha256(receipt_bytes).hexdigest() == pin["sha256"]
+    report = ss.receipts_report(ROOT)
+    assert report["receipt_files"][0]["status"] == "verified against its pin"
+    assert report["jobs_reported"] == len(receipt["jobs"]) == 11
+    assert {j["job_id"] for j in report["jobs"]} == {j["job_id"] for j in receipt["jobs"]}
+    assert {j["job_state"] for j in report["jobs"]} >= {"COMPLETED", "FAILED", "CANCELLING"}
+    assert report["actual_cost"]["status"] == "unknown" and report["actual_cost"]["spend_usd"] is None
+    assert report["utilization"]["status"] == "not_computed"
+
+
 # ------------------------------------------------------------------ static manifest fallback
 def test_manifest_cli_has_only_worker_reports_and_measures_nothing(checkout):
     out = subprocess.run([sys.executable, "-m", "frontier.system_status", "--manifest", "--root", str(checkout)], capture_output=True, text=True, timeout=30,
