@@ -192,9 +192,7 @@ def controls(draws_doc):
         for run in cand["runs"]:
             recorded += 1
             mismatch += _analytic_pass(run["inputs"]) != run["passed"]
-            # the mutant uses q*L^2/EI scaled so the units stay comparable (L multiplies back), a wrong exponent
-            i = run["inputs"]
-            mutant_changes += _analytic_pass({**i, "q_N_m": i["q_N_m"] / i["L_m"]}, 3.0 + 1.0) != run["passed"]
+            mutant_changes += _analytic_pass(run["inputs"], 2.0) != run["passed"]  # wrong exponent: qL^2/EI
     base = draws_doc["draws"][0]
     zero = _analytic_pass({**_inputs(base, 0.15, 1.0), "q_N_m": 0.0})
     huge = _analytic_pass({**_inputs(base, 0.15, 1.0), "q_N_m": _inputs(base, 0.15, 1.0)["q_N_m"] * 1e6})
