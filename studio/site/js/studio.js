@@ -207,14 +207,53 @@
     return {
       html: html`<section class="pagehead"><h1>Studio</h1><p class="lede">Design projects, each broken into subsystems by scale. ${snap.projects.note}</p></section>
         <section class="panel goalpanel">${goalForm(goal)}</section><div id="goalout"></div>
-        <section class="panel"><h2 class="sr">Projects</h2>${snap.projects.projects.map((p) => html`<article class="card pform"><h3>${p.title} ${p.featured ? U.pill("featured", "gen") : ""} ${U.pill(p.status, "st-unk")}</h3><p><b>Goal.</b> ${p.goal}</p><p class="small">${p.summary}</p><p><a class="btn" href="${DF.href("/studio/" + p.id)}">Open studio</a></p></article>`)}
-        <p class="note small">${snap.projects.other_projects_note}</p><p class="small faint">Starting a new project needs a Project record and a credentialed submission route; this page does not create one.</p></section>`,
+        <section class="panel"><h2 class="sr">Projects</h2>${snap.projects.projects.filter((p) => !p.template).map((p) => html`<article class="card pform"><h3>${p.title} ${p.featured ? U.pill("featured", "gen") : ""} ${U.pill(p.status, "st-unk")}</h3><p><b>Goal.</b> ${p.goal}</p><p class="small">${p.summary}</p><p><a class="btn" href="${DF.href("/studio/" + p.id)}">Open studio</a></p></article>`)}
+        ${reuseList(snap)}<p class="note small">${snap.projects.other_projects_note}</p><p class="small faint">Starting a new project needs a Project record and a credentialed submission route; this page does not create one.</p></section>`,
       async after(root) {
         DF.bindForm(root, "goal", (v) => DF.href("/studio", { goal: v.goal }));
         if (goal) { const host = root.querySelector("#goalout"); host.innerHTML = '<p role="status" class="small">Looking…</p>'; host.innerHTML = goalPanel(snap, goal, await goalResults(snap, goal)).toString(); }
       },
     };
   };
+
+  /* ---------------------------------------------------------------- reuse studies: a bounded, data-driven template (site/content/projects.json, template "reuse-study").
+   * Each one is an authored proposal. It is shown as stored only when its entry names a live_project_id, which is set after a Project import receipt exists. */
+  const reuseStudies = (snap) => snap.projects.projects.filter((p) => p.template === "reuse-study");
+  const stored = (p) => !!p.live_project_id;
+  const storeChip = (p) => (stored(p) ? U.pill("stored Project " + p.live_project_id, "ok") : U.pill("authored proposal, not a stored Project", "warn"));
+  function reuseList(snap) {
+    const rs = reuseStudies(snap);
+    if (!rs.length) return "";
+    return html`<h2 class="small">Reuse studies</h2><p class="small faint">Secondary, bounded proposals that reuse tools and records from the main project. None is a designed organism or a clinical claim, and none changes the featured project.</p>
+      ${rs.map((p) => html`<article class="card pform"><h3>${p.title} ${U.pill(p.group, "grp")} ${storeChip(p)}</h3><p><b>Question.</b> ${p.goal}</p><p class="small">${p.summary}</p><p><a class="btn ghost" href="${DF.href("/studio/" + p.id)}">Open reuse study</a></p></article>`)}`;
+  }
+  const entityLink = (r) => html`<a href="${DF.href("/entity/" + r.kind + "/" + r.id, { v: r.version, ns: r.namespace || "snapshot" })}">${r.id}</a> <span class="faint small">@${r.version.slice(0, 12)}…</span>`;
+  function reuseStudy(snap, p) {
+    const PD = (snap.project_drafts || {})[p.draft_key]; const sc = (k) => (snap.mission.scales.find((s) => s.key === k) || { label: k }).label;
+    const tool = (t) => { const m = vidOf(snap, t.id); return html`<article class="card"><h4>${m ? m.title : t.id}</h4><p class="small">${U.pill("tool, not proof of transfer", "st-unk")} ${m ? U.pill(m.evidence_kind.split(" (")[0], "grp") : U.pill("not in this snapshot", "no")}</p><p class="small"><b>Use here.</b> ${t.use}</p><p class="small"><b>Limit.</b> ${t.limit}</p>${m ? html`<p class="small"><a href="${DF.href("/simulations", { q: m.title })}">Inspect its results, checks and sources</a></p>` : ""}</article>`; };
+    const inst = (x) => html`<li><b>${x.name}</b> ${U.pill(x.status, "warn")}${x.owner ? html` <span class="small faint">owner ${x.owner}</span>` : ""}<br><span class="small">${x.plan}</span>${x.needs ? html`<br><span class="small faint">Needs: ${x.needs}</span>` : ""}</li>`;
+    return {
+      html: html`<section class="pagehead"><p class="eyebrow"><a href="${DF.href("/studio")}">Studio</a> / ${p.group}</p><h1>${p.title}</h1><p class="lede">${p.goal}</p>
+        <p>${storeChip(p)} ${U.pill(p.status, "st-unk")}</p></section>
+        <section class="panel" aria-labelledby="rs-st"><h2 id="rs-st">What this page is</h2>${stored(p) ? html`<p class="small">A Project record <code>${p.live_project_id}</code> was imported into the node. This page is still the site's authored projection of it.</p>` : html`<p class="note warn small"><b>An authored proposal, not a stored Project.</b> No Project record has been imported and no import receipt exists. ${PD ? html`The draft file <code>${PD.path}</code> (sha256 ${U.sha(PD.sha256)}) validates against the Project schema and has not been submitted. ` : ""}Nothing below is accepted, reviewed or run.</p>`}
+          <p class="small">${p.summary}</p><p class="small"><b>Base context.</b> ${p.context.base}</p>
+          <p class="small"><b>This is not:</b></p><ul class="small">${p.context.not_this.map((x) => html`<li>${x}</li>`)}</ul></section>
+        <section class="panel" aria-labelledby="rs-sc"><h2 id="rs-sc">Scales involved</h2><ol class="small">${p.scales.map((s) => html`<li><b>${sc(s.scale)}.</b> ${s.role}</li>`)}</ol></section>
+        <section class="panel" aria-labelledby="rs-src"><h2 id="rs-src">Sources and what they report</h2>
+          <ul>${p.sources.map((s) => html`<li>${s.cite} ${U.pill(s.read_level + " read", "rl")}<br><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.url}</a> <span class="small faint">PMID ${s.pmid} · doi ${s.doi}${s.license ? " · licence: " + s.license : ""}</span><br><span class="small faint">${s.note}</span></li>`)}</ul>
+          <h3>Claims, as the sources state them</h3>${p.claims.map((c) => html`<div class="eqcard"><p>${c.text}</p><p class="small">${U.pill(c.status, "st-unk")} source ${c.source} · quoted fragment: <q>${c.quote}</q></p></div>`)}
+          <p class="small faint">These are paraphrases of abstracts, not of full texts. They describe what a source reports, not what holds in this project's setting.</p></section>
+        <section class="panel" aria-labelledby="rs-tools"><h2 id="rs-tools">Existing tools that could be reused</h2><p class="small">Each tool exists in this node as a run or a record. Naming one here does not establish that its result transfers to this biology.</p><div class="cards">${p.tools.map(tool)}</div></section>
+        <section class="panel" aria-labelledby="rs-ch"><h2 id="rs-ch">Intended reuse chain</h2><p class="small">One exact record is pinned. Nothing has reused it for this project yet, so every later step is intended.</p>
+          <ol class="small">${p.chain.map((c) => html`<li><b>${c.role}.</b> ${c.ref || c.kind ? entityLink(c.ref || c) : ""} ${c.label || ""}${c.note ? html`<br><span class="faint">${c.note}</span>` : ""}</li>`)}</ol></section>
+        <section class="panel" aria-labelledby="rs-gap"><h2 id="rs-gap">Missing couplings</h2><ul class="small">${p.missing_couplings.map((x) => html`<li>${x}</li>`)}</ul></section>
+        <section class="panel" aria-labelledby="rs-ep"><h2 id="rs-ep">Falsifiable endpoints (proposed)</h2><div class="tablewrap"><table class="qtable"><caption class="sr">Endpoints and what would falsify each</caption><thead><tr><th scope="col">Endpoint</th><th scope="col">What would falsify it</th></tr></thead><tbody>${p.endpoints.map((e) => html`<tr><td class="small">${e.text}</td><td class="small">${e.falsifier}</td></tr>`)}</tbody></table></div></section>
+        <section class="panel" aria-labelledby="rs-in"><h2 id="rs-in">Proposed instruments</h2><p class="note small"><b>Proposed, not available.</b> No runner exists for this project in this node, so there are no controls to operate here. A control surface will appear only for a supported runner.</p>
+          <h3>Virtual</h3><ul>${p.proposed_instruments.virtual.map(inst)}</ul><h3>Physical</h3><ul>${p.proposed_instruments.physical.map(inst)}</ul></section>
+        <section class="panel" aria-labelledby="rs-q"><h2 id="rs-q">Shared-frontier open questions</h2><ul class="small">${p.open_questions.map((q) => html`<li>${q}</li>`)}</ul>${p.related_problem ? html`<p class="small">Registered related question: ${entityLink(p.related_problem)}</p>` : html`<p class="small faint">These are proposed questions. None is registered as a Frontier problem.</p>`}</section>
+        ${PD ? projectDraftPanel(PD) : ""}`,
+    };
+  }
 
   /* The Project record draft (guilds' schema): requirements and open questions as declared; a draft is not a store record and nothing here is accepted. */
   function projectDraftPanel(PD) {
@@ -242,6 +281,7 @@
 
   function projectStudio(snap, route, id) {
     const p = snap.projects.projects.find((x) => x.id === id);
+    if (p && p.template === "reuse-study") return reuseStudy(snap, p);
     if (!p) return { html: html`<section class="pagehead"><h1>No such project</h1><p class="lede">There is no project “${id}” in this snapshot. <a href="${DF.href("/studio")}">See the projects</a>.</p></section>` };
     const m = snap.mission; const scale = route.params.scale && p.panels[route.params.scale] ? route.params.scale : "organism"; const pan = p.panels[scale]; const sc = m.scales.find((s) => s.key === scale);
     const sub = html`<nav class="subnav" aria-label="Project sections"><a href="${DF.href("/studio/" + p.id)}" aria-current="page">Studio</a><a href="${DF.href("/engineering")}">Engineering workspace</a><a href="${DF.href("/simulations")}">Simulations</a><a href="${DF.href("/belief")}">Belief</a><a href="${DF.href("/formalize")}">Proposal checker</a><a href="${DF.href("/history")}">Fish design history</a><a href="${DF.href("/regulatory")}">Regulatory applicability</a><a href="${DF.href("/blueprints")}">Genetic blueprints</a><a href="${DF.href("/experimentation", { scale })}">Experimentation</a><a href="${DF.href("/ecology")}">Ecology scenarios</a><a href="${DF.href("/assemblies")}">Assemblies</a><a href="${DF.href("/reuse")}">Claim reuse and dispute</a><a href="${DF.href("/frontier", { scale })}">Open questions at this scale</a></nav>`;
