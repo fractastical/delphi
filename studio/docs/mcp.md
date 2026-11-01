@@ -132,8 +132,8 @@ action submitted through this MCP server and that a different operator can accep
 
 ## Expanded read and calculation tools
 
-The documented live release registers 16 read-only tools in both stdio and
-remote modes. This branch adds `frontier_plan_experiments` for a later release.
+This implementation registers 17 read-only tools in both stdio and
+remote modes, including `frontier_plan_experiments`.
 Check `frontier_capabilities` on the actual server before relying on a tool,
 because subsequent deployment changes may differ from this dated record.
 
@@ -155,7 +155,7 @@ because subsequent deployment changes may differ from this dated record.
 | `frontier_engineer` | Existing finite aircraft-constraint calculation | Ephemeral exact-constraint result. The optional Z3 solver must be installed; otherwise the adapter returns a bounded `solver_unavailable` error. No biological validation is implied. |
 | `frontier_formalize` | Existing finite expression/formalization proposal | Ephemeral proposal; not a persisted or accepted formal Evidence record. |
 | `frontier_belief` | Existing finite scenario calculation | Conditional on declared inputs and explicitly uncalibrated; ephemeral and not accepted. |
-| `frontier_plan_experiments` | Prospective linear-Gaussian design comparison | Branch addition pending release; returns assumption-based covariance and rank diagnostics, no measurements or writes. |
+| `frontier_plan_experiments` | Prospective linear-Gaussian design comparison | Returns assumption-based covariance and rank diagnostics, no measurements or writes. Check the connected server's capabilities for availability. |
 
 Example calls through the official MCP SDK:
 
@@ -177,7 +177,7 @@ await session.call_tool("frontier_simulate", {
 
 ### Prospective experiment planning
 
-The `frontier_plan_experiments` addition is implemented in this branch and should
+The `frontier_plan_experiments` tool is implemented here and should
 be relied on only when `frontier_capabilities` lists it on the connected server.
 It accepts one complete `frontier.experimental-design.request/1` contract under
 the argument `contract`. The existing local planner validates exact source and
