@@ -16,6 +16,29 @@
 | **31** | recorded simulations across 9 biological scales | `site/data/snapshot.json` → `simulation_manifests` |
 | **98.6%** | peak mean GPU utilisation, sampled at 1 Hz | `results/resources/telemetry/ns2d-refine.json`, 181 samples |
 | **2,444** | documents embedded for live semantic search | `gemini-embedding-001`, 49 requests, 0 failed |
+| **474K** | lines of code written across two repositories | `git log --all --numstat` over source extensions: delphi-frontier 409,190 + delphi-evolve 65,372 |
+| **2,175** | commits, both repositories created this week | `git log --all --oneline`: delphi-frontier 1,714 + delphi-evolve 461 |
+
+## Band — swarm vs single agent (the headline comparison)
+
+**Pre-registered, two experiments, 20 test plans.**
+**Every multi-agent arm beat the single agent.**
+
+| Arm | Verified datasets, exp 1 · exp 2 | Cost, exp 1 · exp 2 |
+|---|---|---|
+| single | 13 · 12 | $0.57 · $0.52 |
+| isolated | 17 · 16 | $2.60 · $4.48 |
+| centralized | 19 · 18 | $2.98 · $5.61 |
+| decentralized | 18 (1 fabricated id) · 17 | $3.28 · $6.37 |
+
+`claude-sonnet-5-5` via headless `claude -p` in every arm.
+Source: `test-data/agent-comparison/four-arm.json`.
+
+Every multi-agent arm beat the single agent by at least 4 of 20 verified datasets in both
+experiments, with 0 fabricated identifiers in the final plans. **The three multi-agent arms
+are not distinguishable from one another at n=20** under the pre-registered 2-claim margin —
+centralized versus decentralized shows no difference in either experiment. Say that out loud:
+the win is multi-agent over single, not one topology over another.
 
 ## Column 1 — GPU, CPU and VMs
 **Nebius · Google Cloud**
@@ -25,6 +48,7 @@
 - **Google Cloud** — 5 CPU VMs, 32 vCPU quota (project `scienceclaw26bos-3016`)
 - **NVIDIA CUDA** — under every GPU run
 - **Nebius CPU batch** — 4-vCPU arms, pinned image digest
+- **NVIDIA Brev** — L40S instance `df-boltz2-kcnj13`, org `kganjam-c5d0a6-7kae`, serving Boltz-2
 - **6 jobs** still running at slide time
 
 > Telemetry at 1 Hz recorded **96.6%**, **98.6%** and 51.6% mean utilisation — measured, not allocated.
@@ -34,8 +58,9 @@
 
 - **Evo 2** — genomic language model, 14 jobs (13 completed, 1 failed)
 - **OpenFold2** — structure prediction, 4 predictions (mean pLDDT 41–56, low confidence, labelled)
+- **Boltz-2** — served on a Brev L40S instance for KCNJ13 (instance up; no output receipt yet)
 - **ESM2** — protein likelihoods, Kir2.1 variant-assay agreement pilot with passing controls
-- **Gemini** — `embedding-001`, `3.8-flash`, `4-argon`
+- **Gemini** — `embedding-001`, `3.8-flash`, `3.1-pro-preview`
 - **Claude** — Opus 5.5 / Opus 5 / Sonnet 5.5 / Haiku 5.5
 - **MiniMax** M2.7 · **GLM** 5 · **GPT-5.6**
 
@@ -69,20 +94,23 @@
 - **12 agent harnesses**, each with its own worktree, branch and job prefix
 - **Lean 4 + Z3** — 37 statements, 17/17 mutants rejected, solver conflict certificates
 - **14 cell-aggregate STLs** + 6 printable fish forms
+- **Two parts physically printed** — design to object in one pipeline
 - **Public MCP** — 21 tools, agents read the same record
 
-> Every artifact carries a sha256, its inputs and the command that made it. **Failures are published too.**
+> Design to printed part in one pipeline: **two pieces printed**. Every artifact carries a sha256,
+> its inputs and the command that made it — **failures too**.
 
 ## Footer line
 
 Counts read from provider CLIs, session transcripts and receipt files on the build host.
-Printer and resin not yet selected; nothing physically printed. NVIDIA Brev: account not activated.
+Brev instance `df-boltz2-kcnj13` (L40S) read from the Brev CLI. Print count attested by the
+team; the STL manifests do not yet record the printer and resin used.
 
 ## What we did NOT do — keep these off the slide as claims
 
-- **NVIDIA Brev**: the CLI is installed but the account was never activated. No Brev run exists.
-- **Formlabs**: STLs pass their print gates, but printer and resin are recorded as `unknown`
-  and **nothing was physically printed**.
+- **Formlabs**: two parts were printed (team-attested). The STL manifests still record printer
+  and resin as `unknown`, so the *machine and material* are not yet in the record even though
+  the prints happened. Worth closing before anyone audits the artifact chain.
 - **Nebius Scientific AI**: 69 tools were available; only OpenFold2 and ESM2 have receipts here.
 - No biological validation of anything. No wet-lab experiment. No registered cross-scale calibration.
 - Total provider spend is **unknown** — the billing meter was never queried.
